@@ -37,10 +37,12 @@ export const INCREMENT_ICON = 'fas fa-plus';
 export const INITIATIVE_ICON = 'fas fa-clock';
 export const INSPIRATION_ICON = 'fas fa-sun';
 export const LINKED_ICON = 'fas fa-link';
+export const LOCK_ICON = 'fas fa-lock';
 export const LONG_REST_ICON = 'fas fa-bed';
 export const MELEE_ICON = 'fas fa-sword';
 export const MIND_ICON = 'fas fa-brain';
 export const MOD_ICON = 'fas fa-plus-minus';
+export const MOVE_TO_FOLDER_ICON = 'fas fa-folder-arrow-down';
 export const MULTI_ATTACK_ICON = 'fas fa-swords';
 export const NO_MULTI_ATTCK_ICON = 'fas fa-sword';
 export const OVERKILL_ICON = 'fas fa-explosion';
@@ -50,6 +52,7 @@ export const RADIUS_ICON = 'fas fa-bullseye';
 export const RANGE_ICON = 'fas fa-ruler';
 export const REGAIN_RESOLVE_ICON = 'fas fa-bolt';
 export const REMOVE_TEMP_EFFECTS_ICON = 'fas fa-arrow-rotate-left';
+export const RENAME_ICON = 'fas fa-pen';
 export const REND_ICON = 'fas fa-hammer-crash';
 export const REPAIR_ICON = 'fas fa-screwdriver-wrench';
 export const RESET_ICON = 'fas fa-rotate-left';
@@ -61,10 +64,12 @@ export const SHORT_REST_ICON = 'fas fa-face-exhaling';
 export const SOUL_ICON = 'fas fa-fire-flame-simple';
 export const SPEND_RESOLVE_ICON = 'fas fa-bolt';
 export const STAMINA_ICON = 'fas fa-heart';
+export const TARGET_ICON = 'fas fa-bullseye-arrow';
 export const TRAINING_ICON = 'fas fa-dumbbell';
 export const TURN_END_ICON = 'fas fa-hourglass-end';
 export const TURN_START_ICON = 'fas fa-hourglass-start';
 export const UNCHECKED_ICON = 'fas fa-square';
+export const UNLOCK_ICON = 'fas fa-lock-open';
 export const UNLINKED_ICON = 'fas fa-unlink';
 export const USER_ICON = 'fas fa-user-circle';
 export const WOUNDS_ICON = 'fas fa-face-head-bandage';
@@ -111,10 +116,12 @@ const ICON_MAP = deepFreeze({
    initiative: INITIATIVE_ICON,
    inspiration: INSPIRATION_ICON,
    linked: LINKED_ICON,
+   lock: LOCK_ICON,
    longRest: LONG_REST_ICON,
    melee: MELEE_ICON,
    mind: MIND_ICON,
    mod: MOD_ICON,
+   moveToFolder: MOVE_TO_FOLDER_ICON,
    multiAttack: MULTI_ATTACK_ICON,
    noMultiAttack: NO_MULTI_ATTCK_ICON,
    overkill: OVERKILL_ICON,
@@ -124,6 +131,7 @@ const ICON_MAP = deepFreeze({
    range: RANGE_ICON,
    regainResolve: REGAIN_RESOLVE_ICON,
    removeTempEffects: REMOVE_TEMP_EFFECTS_ICON,
+   rename: RENAME_ICON,
    rend: REND_ICON,
    repair: REPAIR_ICON,
    reset: RESET_ICON,
@@ -135,10 +143,12 @@ const ICON_MAP = deepFreeze({
    soul: SOUL_ICON,
    spendResolve: SPEND_RESOLVE_ICON,
    stamina: STAMINA_ICON,
+   target: TARGET_ICON,
    training: TRAINING_ICON,
    turnEnd: TURN_END_ICON,
    turnStart: TURN_START_ICON,
    unchecked: UNCHECKED_ICON,
+   unlock: UNLOCK_ICON,
    unlinked: UNLINKED_ICON,
    user: USER_ICON,
    wounds: WOUNDS_ICON,
