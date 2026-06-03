@@ -7,7 +7,7 @@ describe('buildEffectRowContextMenu', () => {
       globalThis.game = { i18n: { localize: (key) => key } };
    });
 
-   it('lists the seven entries in order with localized labels', () => {
+   it('lists the six entries in order with localized labels', () => {
       /** @type {object} A fake tray state: editable pack that supports folders. */
       const trayState = { canEdit: true, selectedPack: { folders: {} } };
       /** @type {object[]} The built context-menu entries. */
