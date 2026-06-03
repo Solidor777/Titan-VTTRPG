@@ -1,4 +1,5 @@
 import TitanDocumentSheet from '~/document/sheet/TitanDocumentSheet.js';
+import ItemSheetHeaderButtons from '~/document/types/item/sheet/ItemSheetHeaderButtons.svelte';
 import mergeArrays from '~/helpers/utility-functions/MergeArrays.js';
 import createRulesElementItemSheetState from '~/document/types/item/sheet/RulesElementItemSheetState.js';
 import localize from '~/helpers/utility-functions/Localize.js';
@@ -80,6 +81,16 @@ export default class TitanItemSheet extends TitanDocumentSheet {
       }
 
       return controls;
+   }
+
+   /**
+    * Supply the always-visible item header-buttons component for the window header.
+    * @override
+    * @returns {import('svelte').Component} The component rendering the send-to-chat and import buttons.
+    * @protected
+    */
+   _getHeaderButtonsComponent() {
+      return ItemSheetHeaderButtons;
    }
 
    /**
