@@ -11,17 +11,18 @@ import createStringField from '~/helpers/utility-functions/CreateStringField.js'
  */
 export default class CheckChatMessageDataModel extends TitanChatMessageDataModel {
    /**
-    * Defines the document schema for check chat messages, excluding component schemas.
+    * Defines the document schema for check chat messages, adding parameters, results,
+    * the re-roll flag, and an attached message array.
+    * @override
     * @returns {object} Map of schema field instances keyed by field name, defining the persisted data shape.
     * @protected
     */
    static _defineDocumentSchema() {
-      return {
-         ...super._defineDocumentSchema(),
-         parameters: createObjectField(),
-         results: createObjectField(),
-         failuresReRolled: createBooleanField(false),
-         message: createArrayField(createStringField()),
-      };
+      const schema = super._defineDocumentSchema();
+      schema.parameters = createObjectField();
+      schema.results = createObjectField();
+      schema.failuresReRolled = createBooleanField(false);
+      schema.message = createArrayField(createStringField());
+      return schema;
    }
 }
