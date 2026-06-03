@@ -521,6 +521,8 @@
       "scaling.text": "Scaling",
       "self.text": "Self",
       "sendToChat.text": "Send to Chat",
+      "sendItemToChat.desc.text": "<p>Display this <strong>Item</strong> in chat.</p>",
+      "sendEffectToChat.desc.text": "<p>Display this <strong>Effect</strong> in chat.</p>",
       "sense.text": "Sense",
       "shield.text": "Shield",
       "shieldTrait.text": "Shield Trait",
