@@ -322,4 +322,107 @@ test.describe('effect tray sidebar tab', () => {
          await copy?.delete();
       });
    });
+
+   test('left-clicking a row opens the effect sheet', async ({ page }) => {
+      await page.evaluate(async () => {
+         await ui.titanEffects.render(true);
+         ui.titanEffects.activate();
+         await new Promise((resolve) => { setTimeout(resolve, 300); });
+         const select = ui.titanEffects.element.querySelector('[data-testid="effect-tray-pack-select"]');
+         select.value = 'world.e2e-tray-effects';
+         select.dispatchEvent(new Event('change', { bubbles: true }));
+         await new Promise((resolve) => { setTimeout(resolve, 400); });
+      });
+
+      await page.locator('[data-testid="effect-tray-row"]', { hasText: 'E2E Tray Effect' })
+         .locator('.effect-tray-row-icon')
+         .first()
+         .click();
+      await page.waitForTimeout(500);
+
+      const opened = await page.evaluate(() => {
+         // v14 sheets are ApplicationV2 (foundry.applications.instances), not legacy ui.windows.
+         const apps = [
+            ...Object.values(ui.windows),
+            ...(foundry.applications?.instances?.values?.() ?? []),
+         ];
+         return apps.some((app) => app?.document?.name === 'E2E Tray Effect');
+      });
+      expect(opened, 'left-clicking the row must open the effect sheet').toBe(true);
+
+      await page.evaluate(() => {
+         const apps = [
+            ...Object.values(ui.windows),
+            ...(foundry.applications?.instances?.values?.() ?? []),
+         ];
+         for (const app of apps) {
+            if (app?.document?.name === 'E2E Tray Effect') { app.close(); }
+         }
+      });
+   });
+
+   test('right-click context menu opens the effect sheet', async ({ page }) => {
+      await page.evaluate(async () => {
+         await ui.titanEffects.render(true);
+         ui.titanEffects.activate();
+         await new Promise((resolve) => { setTimeout(resolve, 300); });
+         const select = ui.titanEffects.element.querySelector('[data-testid="effect-tray-pack-select"]');
+         select.value = 'world.e2e-tray-effects';
+         select.dispatchEvent(new Event('change', { bubbles: true }));
+         await new Promise((resolve) => { setTimeout(resolve, 400); });
+      });
+
+      await page.locator('[data-testid="effect-tray-row"]', { hasText: 'E2E Tray Effect' })
+         .first()
+         .click({ button: 'right' });
+      await expect(page.locator('#context-menu')).toBeVisible();
+
+      const openLabel = await page.evaluate(() => game.i18n.localize('LOCAL.effectTrayOpen.text'));
+      await page.locator('#context-menu li.context-item', { hasText: openLabel }).first().click();
+      await page.waitForTimeout(400);
+
+      const opened = await page.evaluate(() => {
+         // v14 sheets are ApplicationV2 (foundry.applications.instances), not legacy ui.windows.
+         const apps = [
+            ...Object.values(ui.windows),
+            ...(foundry.applications?.instances?.values?.() ?? []),
+         ];
+         return apps.some((app) => app?.document?.name === 'E2E Tray Effect');
+      });
+      expect(opened, 'the context-menu Open Sheet entry must open the effect sheet').toBe(true);
+
+      await page.evaluate(() => {
+         const apps = [
+            ...Object.values(ui.windows),
+            ...(foundry.applications?.instances?.values?.() ?? []),
+         ];
+         for (const app of apps) {
+            if (app?.document?.name === 'E2E Tray Effect') { app.close(); }
+         }
+      });
+   });
+
+   test('GM lock toggle flips the pack locked state', async ({ page }) => {
+      await page.evaluate(async () => {
+         const pack = game.packs.get('world.e2e-tray-effects');
+         if (pack.locked) { await pack.configure({ locked: false }); }
+         await ui.titanEffects.render(true);
+         ui.titanEffects.activate();
+         await new Promise((resolve) => { setTimeout(resolve, 300); });
+         const select = ui.titanEffects.element.querySelector('[data-testid="effect-tray-pack-select"]');
+         select.value = 'world.e2e-tray-effects';
+         select.dispatchEvent(new Event('change', { bubbles: true }));
+         await new Promise((resolve) => { setTimeout(resolve, 400); });
+      });
+
+      await page.locator('[data-testid="effect-tray-lock"]').first().click();
+      await page.waitForTimeout(400);
+      const locked = await page.evaluate(() => game.packs.get('world.e2e-tray-effects').locked);
+      expect(locked, 'clicking the lock toggle must lock the pack').toBe(true);
+
+      await page.locator('[data-testid="effect-tray-lock"]').first().click();
+      await page.waitForTimeout(400);
+      const unlocked = await page.evaluate(() => game.packs.get('world.e2e-tray-effects').locked);
+      expect(unlocked, 'clicking the lock toggle again must unlock the pack').toBe(false);
+   });
 });
