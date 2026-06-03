@@ -6,7 +6,10 @@
    /** @type {object} The reactive Document store provided by TitanChatMessage#renderHTML. */
    const { documentStore = void 0 } = $props();
 
-   // Expose the document to descendant components via context.
+   // documentStore is a stable ReactiveDocument bridge for the component's lifetime — the chat
+   // message mounts this shell once and never replaces the bridge, so capturing it into context
+   // exactly once is intentional.
+   // svelte-ignore state_referenced_locally
    setContext('document', documentStore);
 
    /** @type {object} Reference to the reactive Document store. */
