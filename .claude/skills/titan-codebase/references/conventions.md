@@ -285,9 +285,15 @@ sheet header actions are returned from `_getHeaderControls()` (runs on every fra
 is `{ action, icon, label, onClick?, visible?, ownership? }` (`ApplicationHeaderControlsEntry` =
 `ContextMenuEntry` + `action`). Controls render **in the header controls dropdown** opened by the
 ellipsis button (`button[data-action="toggleControls"]`), as `#context-menu li.context-item` rows
-(icon `<i>` + label `<span>`) — NOT inline in the header (`_renderHeaderControl` is unused in v14 core;
-inline buttons would require `_getFrameButtons`). The menu entry shows only icon + label (no tooltip
-field), and the label runs through core `_loc` (pass already-localized text). Click dispatch: if
+(icon `<i>` + label `<span>`) — NOT inline in the header (`_renderHeaderControl` is unused in v14 core.
+TITAN renders always-visible inline header buttons as Svelte instead: `TitanDocumentSheet._onFirstRender`
+mounts the component from `_getHeaderButtonsComponent()` into `this.window.header`, anchored at
+`this.window.controls`, with a context map providing `application` + the `document` bridge; `_onClose`
+unmounts it. The frame is built once on first render, so the header mount survives `render({ parts: [] })`.
+See `ActorSheetHeaderButtons.svelte` / `ItemSheetHeaderButtons.svelte` /
+`ActiveEffectSheetHeaderButtons.svelte`. These COEXIST with the `_getHeaderControls()` dropdown.) The
+menu entry shows only icon + label (no tooltip field), and the label runs through core `_loc` (pass
+already-localized text). Click dispatch: if
 `onClick` is a function it is called directly; otherwise the `action` string is looked up in
 `options.actions`. TITAN sheets (`TitanActorSheet`, `TitanItemSheet`) use `onClick` arrow functions
 bound to the sheet instance so dynamic per-render entries (the actor link/unlink control) need no

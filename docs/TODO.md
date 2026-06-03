@@ -213,8 +213,27 @@ split off to keep that spec focused.
 
 ## v14 migration — related items
 
-### 7. Rich (TyphonJS-style) sheet header buttons
+### 7. Rich (TyphonJS-style) sheet header buttons — DONE
 
+- **Status: COMPLETE.** The TyphonJS-era experience is restored as
+  **always-visible inline Svelte header buttons**. Base machinery lives in
+  `TitanDocumentSheet` (`src/document/sheet/TitanDocumentSheet.js`): a
+  `_getHeaderButtonsComponent()` factory (undefined in base) is mounted in
+  `_onFirstRender` into `this.window.header`, anchored at `this.window.controls`,
+  with a context map providing `application` + the `document` bridge; `_onClose`
+  unmounts it. Because the frame is built once on first render, the mount
+  survives `render({ parts: [] })`. The actor sheet
+  (`ActorSheetHeaderButtons.svelte`) ships Import / Edit Token / a reactive
+  Toggle-Link-Unlink-Unlinked button (`.linked` orange + `.unlinked` brown glow),
+  all with rich `.desc` tippy tooltips; the item sheet
+  (`ItemSheetHeaderButtons.svelte`) ships Send to Chat (fixing the old
+  send-to-chat tooltip key → `sendItemToChat.desc`) plus a conditional Import.
+  The effect-subtype ActiveEffect sheet
+  (`ActiveEffectSheetHeaderButtons.svelte`) gains a Send-to-Chat header button
+  and a matching `_getHeaderControls()` entry, so the action exists both inline
+  and in the ⋮ dropdown. All three inline trees **coexist** with the native v14
+  `_getHeaderControls()` dropdown rather than replacing it. E2E coverage:
+  `tests/e2e/header-buttons.spec.js`.
 - **What:** The actor/item sheet header buttons (edit-token, dynamic
   link/unlink, import, send-to-chat) were restored under v14 via native AppV2
   `_getHeaderControls()` (see the v14 context-and-migration-repair spec, Task
@@ -222,15 +241,13 @@ split off to keep that spec focused.
   only an icon + label (no tooltip field), so the dynamic link/unlink state is
   conveyed by a changing icon + label and is only visible when the dropdown is
   open.
-- **To do:** Re-create the old TyphonJS-era experience — **always-visible inline
-  header buttons rendered as Svelte components** in the sheet's window header,
-  with the rich `.desc` HTML tooltips restored (especially for the dynamic
-  link/unlink button). Likely approach: mount a small Svelte tree into the AppV2
-  `.window-header` in `_onRender` (and unmount in `_onClose`), mirroring how
-  TyphonJS injected header content — or render the buttons inside the sheet's
-  Svelte header area.
-- **Why deferred:** Native `_getHeaderControls()` is functional and shipped; the
-  rich always-visible+tooltip version is a UX enhancement, not a correctness fix.
+- **Done in:** The Svelte header-buttons spec
+  (`docs/superpowers/specs/2026-06-02-svelte-header-buttons-design.md`) and plan
+  (`docs/superpowers/plans/2026-06-02-svelte-header-buttons.md`). The shipped
+  implementation mounts the Svelte tree in `_onFirstRender` (first render only),
+  not the `_onRender`/`_onClose` approach this item originally proposed —
+  `_onFirstRender` is the correct hook because the AppV2 frame (and its header)
+  is built exactly once.
 - **Depends on:** The v14 context-and-migration-repair spec (Task 11).
 
 ## E2E suite — related items
