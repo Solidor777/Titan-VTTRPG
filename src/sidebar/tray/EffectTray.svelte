@@ -2,6 +2,7 @@
    import { getContext } from 'svelte';
    import EffectTrayHeader from '~/sidebar/tray/EffectTrayHeader.svelte';
    import EffectTrayList from '~/sidebar/tray/EffectTrayList.svelte';
+   import buildEffectRowContextMenu from '~/sidebar/tray/EffectRowContextMenu.js';
 
    /**
     * @type {import('~/sidebar/tray/EffectTrayState.svelte.js').default} The reactive tray state from
@@ -44,6 +45,29 @@
 
       void trayState.stashFromDragData(dragData);
    }
+
+   /**
+    * Svelte action attaching a Foundry ContextMenu to the tray root, targeting effect rows by their
+    * `data-effect-id`. Entries read the live tray state for permission gating and effect resolution.
+    * Torn down with the component.
+    * @param {HTMLElement} node - The tray root element the menu delegates from.
+    * @returns {{ destroy: () => void }} The action lifecycle handle.
+    */
+   function effectContextMenu(node) {
+      /** @type {object} The Foundry context menu bound to the tray's effect rows. */
+      const menu = new foundry.applications.ux.ContextMenu(
+         node,
+         '[data-effect-id]',
+         buildEffectRowContextMenu(trayState),
+         { jQuery: false, fixed: true },
+      );
+
+      return {
+         destroy() {
+            menu.close?.({ animate: false });
+         },
+      };
+   }
 </script>
 
 <div
@@ -52,6 +76,7 @@
    ondragover={onDragOver}
    ondrop={onDrop}
    role="region"
+   use:effectContextMenu
 >
    <EffectTrayHeader />
    <EffectTrayList />

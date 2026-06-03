@@ -2,10 +2,9 @@
    import { getContext } from 'svelte';
    import localize from '~/helpers/utility-functions/Localize.js';
    import applyEffectToTargets from '~/helpers/utility-functions/ApplyEffectToTargets.js';
-   import ConfirmationDialog from '~/helpers/dialogs/ConfirmationDialog.js';
    import focusOnMount from '~/helpers/svelte-actions/FocusOnMount.js';
    import IconButton from '~/helpers/svelte-components/button/IconButton.svelte';
-   import { DELETE_ICON, DUPLICATE_ICON, SHEET_ICON } from '~/system/Icons.js';
+   import { TARGET_ICON } from '~/system/Icons.js';
 
    /**
     * @typedef {object} EffectTrayRowProps
@@ -24,15 +23,6 @@
    /** @type {string} The localized label for the Apply to Target button. */
    const applyLabel = localize('effectTrayApply');
 
-   /** @type {string} The localized label for the Open Sheet button. */
-   const openLabel = localize('effectTrayOpen');
-
-   /** @type {string} The localized label for the Duplicate button. */
-   const duplicateLabel = localize('effectTrayDuplicate');
-
-   /** @type {string} The localized label for the Delete button. */
-   const deleteLabel = localize('effectTrayDelete');
-
    /** @type {boolean} Whether the name is currently being edited inline. */
    let isRenaming = $state(false);
 
@@ -42,12 +32,60 @@
    /** @type {boolean} Whether the current rename is being cancelled, so the blur commit is skipped. */
    let isCancellingRename = false;
 
+   /** @type {ReturnType<typeof setTimeout> | null} Pending single-click timer, cancelled by a dblclick. */
+   let openTimer = null;
+
+   /**
+    * Opens the effect's sheet on a single left-click of the row. Debounced so a double-click (which
+    * starts an inline rename) does not also open the sheet. No-ops while renaming.
+    * @returns {void}
+    */
+   function onRowClick() {
+      if (isRenaming) {
+         return;
+      }
+
+      if (openTimer) {
+         clearTimeout(openTimer);
+      }
+
+      openTimer = setTimeout(() => {
+         openTimer = null;
+         effect.sheet.render(true);
+      }, 200);
+   }
+
+   /**
+    * Svelte action: begins inline rename when the row receives the `titan-effect-rename` event the
+    * context menu dispatches. Lets the right-click "Rename" entry drive the existing inline-rename UX.
+    * @param {HTMLElement} node - The row root element.
+    * @returns {{ destroy: () => void }} The action lifecycle handle.
+    */
+   function renameOnEvent(node) {
+      /**
+       * Starts the inline rename in response to the context menu's rename event.
+       * @returns {void}
+       */
+      const handler = () => beginRename();
+      node.addEventListener('titan-effect-rename', handler);
+      return {
+         destroy() {
+            node.removeEventListener('titan-effect-rename', handler);
+         },
+      };
+   }
+
    /**
     * Enters inline-rename mode, seeding the input with the effect's current name. No-ops when the
     * current user cannot edit the selected pack.
     * @returns {void}
     */
    function beginRename() {
+      if (openTimer) {
+         clearTimeout(openTimer);
+         openTimer = null;
+      }
+
       if (!trayState.canEdit) {
          return;
       }
@@ -112,29 +150,23 @@
    function onDragStart(event) {
       event.dataTransfer.setData('text/plain', JSON.stringify(effect.toDragData()));
    }
-
-   /**
-    * Prompts for confirmation, then deletes the effect from its pack on confirm.
-    * @returns {void}
-    */
-   function requestDelete() {
-      new ConfirmationDialog(
-         deleteLabel,
-         [effect.name],
-         localize('effectTrayConfirmDelete.desc'),
-         deleteLabel,
-         () => effect.delete(),
-      ).render(true);
-   }
 </script>
 
+<!--
+   The row is click-to-open for pointer users; keyboard parity is provided by the focusable name
+   (`role="button"`, Enter/F2 to rename) and the row's right-click context menu (Open Sheet, etc.).
+-->
+<!-- svelte-ignore a11y_click_events_have_key_events -->
+<!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
 <div
    class="effect-tray-row"
    data-effect-id={effect.id}
    data-testid="effect-tray-row"
    draggable={true}
+   onclick={onRowClick}
    ondragstart={onDragStart}
    role="listitem"
+   use:renameOnEvent
 >
    <img
       alt=""
@@ -150,6 +182,7 @@
          type="text"
          use:focusOnMount
          onblur={() => void commitRename()}
+         onclick={(event) => event.stopPropagation()}
          onkeydown={onRenameKeydown}
          bind:value={renameValue}
       />
@@ -166,43 +199,17 @@
    {/if}
 
    <div class="effect-tray-row-controls">
-      <!--Apply to Target button-->
+      <!--Apply to Target button (stops propagation so applying does not also open the sheet)-->
       <IconButton
-         icon="fa-solid fa-bullseye-arrow"
+         icon={TARGET_ICON}
          label={applyLabel}
-         onclick={() => applyEffectToTargets(effect)}
+         onclick={(event) => {
+            event.stopPropagation();
+            applyEffectToTargets(effect);
+         }}
          testId="effect-tray-apply"
          tooltip={applyLabel}
       />
-
-      {#if trayState.canEdit}
-         <!--Open Sheet button-->
-         <IconButton
-            icon={SHEET_ICON}
-            label={openLabel}
-            onclick={() => effect.sheet.render(true)}
-            testId="effect-tray-open"
-            tooltip={openLabel}
-         />
-
-         <!--Duplicate button-->
-         <IconButton
-            icon={DUPLICATE_ICON}
-            label={duplicateLabel}
-            onclick={() => trayState.duplicateEffect(effect)}
-            testId="effect-tray-duplicate"
-            tooltip={duplicateLabel}
-         />
-
-         <!--Delete button-->
-         <IconButton
-            icon={DELETE_ICON}
-            label={deleteLabel}
-            onclick={requestDelete}
-            testId="effect-tray-delete"
-            tooltip={deleteLabel}
-         />
-      {/if}
    </div>
 </div>
 
