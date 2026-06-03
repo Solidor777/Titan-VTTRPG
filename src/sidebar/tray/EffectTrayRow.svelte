@@ -1,5 +1,5 @@
 <script>
-   import { getContext } from 'svelte';
+   import { getContext, onDestroy } from 'svelte';
    import localize from '~/helpers/utility-functions/Localize.js';
    import applyEffectToTargets from '~/helpers/utility-functions/ApplyEffectToTargets.js';
    import focusOnMount from '~/helpers/svelte-actions/FocusOnMount.js';
@@ -52,8 +52,17 @@
       openTimer = setTimeout(() => {
          openTimer = null;
          effect.sheet.render(true);
-      }, 200);
+      }, 250);
    }
+
+   // Cancel a pending open timer if the row unmounts mid-debounce (e.g. a hook-driven list refresh),
+   // so the sheet never opens after the row is gone.
+   onDestroy(() => {
+      if (openTimer) {
+         clearTimeout(openTimer);
+         openTimer = null;
+      }
+   });
 
    /**
     * Svelte action: begins inline rename when the row receives the `titan-effect-rename` event the
