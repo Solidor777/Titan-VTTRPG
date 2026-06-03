@@ -199,7 +199,7 @@
                   label={group.folder.name}
                   onclick={() => trayState.toggleFolder(group.folder.id)}
                   testId="effect-tray-folder-toggle"
-                  tooltip={group.folder.name}
+                  tooltip={{ text: group.folder.name, localize: false }}
                />
 
                <!--Folder name (double-click to rename when editable)-->
@@ -232,7 +232,7 @@
                      label={localize('effectTrayDeleteFolder')}
                      onclick={() => trayState.deleteFolder(group.folder)}
                      testId="effect-tray-folder-delete"
-                     tooltip={localize('effectTrayDeleteFolder')}
+                     tooltip={'effectTrayDeleteFolder'}
                   />
                {/if}
             </header>

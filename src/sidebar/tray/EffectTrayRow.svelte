@@ -217,7 +217,7 @@
             applyEffectToTargets(effect);
          }}
          testId="effect-tray-apply"
-         tooltip={applyLabel}
+         tooltip={'effectTrayApply'}
       />
    </div>
 </div>

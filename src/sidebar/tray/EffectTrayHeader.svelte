@@ -9,24 +9,29 @@
    /** @type {import('~/sidebar/tray/EffectTrayState.svelte.js').default} The reactive tray state from context. */
    const trayState = getContext('trayState');
 
-   // The dropdown options: one per visible ActiveEffect compendium.
-   /** @type {{ value: string, label: string }[]} The pack-select options. */
+   // The dropdown options: one per visible ActiveEffect compendium. The pack label is already a
+   // resolved display name, so it is wrapped as non-localizing TextData to avoid the Text/tooltip
+   // layer re-localizing it into a `LOCAL.<name>.text` key.
+   /** @type {{ value: string, label: { text: string, localize: false } }[]} The pack-select options. */
    const packOptions = $derived(trayState.compendiums.map((pack) => ({
       value: pack.collection,
-      label: pack.metadata.label,
+      label: { text: pack.metadata.label, localize: false },
    })));
 
-   /** @type {string} The localized label for the New Effect button. */
+   /** @type {string} The localized aria-label for the New Effect button. */
    const newLabel = localize('effectTrayNew');
 
-   /** @type {string} The localized label for the New Folder button. */
+   /** @type {string} The localized aria-label for the New Folder button. */
    const newFolderLabel = localize('effectTrayNewFolder');
 
    /** @type {boolean} Whether the selected pack supports folders (compendium packs do). */
    const supportsFolders = $derived(!!trayState.selectedPack?.folders);
 
-   /** @type {string} The localized label for the lock/unlock toggle, reflecting current state. */
+   /** @type {string} The localized aria-label for the lock/unlock toggle, reflecting current state. */
    const lockLabel = $derived(trayState.isLocked ? localize('effectTrayUnlock') : localize('effectTrayLock'));
+
+   /** @type {string} The i18n key for the lock/unlock tooltip, localized once by the tooltip action. */
+   const lockTooltipKey = $derived(trayState.isLocked ? 'effectTrayUnlock' : 'effectTrayLock');
 </script>
 
 <div class="effect-tray-header">
@@ -47,7 +52,7 @@
             label={newLabel}
             onclick={() => trayState.createBlankEffect()}
             testId="effect-tray-new"
-            tooltip={newLabel}
+            tooltip={'effectTrayNew'}
          />
 
          {#if supportsFolders}
@@ -57,7 +62,7 @@
                label={newFolderLabel}
                onclick={() => trayState.createFolder()}
                testId="effect-tray-new-folder"
-               tooltip={newFolderLabel}
+               tooltip={'effectTrayNewFolder'}
             />
          {/if}
 
@@ -67,7 +72,7 @@
                label={lockLabel}
                onclick={() => trayState.toggleLock()}
                testId="effect-tray-lock"
-               tooltip={lockLabel}
+               tooltip={lockTooltipKey}
             />
          {/if}
       </div>
