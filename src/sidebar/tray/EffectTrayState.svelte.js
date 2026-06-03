@@ -59,6 +59,9 @@ export default class EffectTrayState {
          ? remembered
          : (ids.find((id) => id === `${game.system.id}.effects`) ?? ids[0] ?? '');
 
+      // Seed the lock mirror synchronously so CRUD affordances are correct before the first refresh.
+      this.isLocked = !!this.selectedPack?.locked;
+
       this.#registerHooks();
       void this.refresh();
    }
@@ -102,8 +105,10 @@ export default class EffectTrayState {
          return;
       }
 
-      await pack.configure({ locked: !pack.locked });
-      this.isLocked = pack.locked;
+      /** @type {boolean} The target locked state, applied to the pack and mirrored locally. */
+      const nextLocked = !pack.locked;
+      await pack.configure({ locked: nextLocked });
+      this.isLocked = nextLocked;
    }
 
    /**
