@@ -310,3 +310,33 @@ split off to keep that spec focused.
   flake-prevention, and fixing it well means revisiting the shared pattern across
   specs rather than one helper.
 - **Found by:** Final code review of the 2b-3 implementation.
+
+## Chat message subtypes — related items
+
+The "first-class ChatMessage subtypes" effort is specced/planned in
+`specs/2026-06-03-chat-message-subtypes-phase1-design.md` and
+`plans/2026-06-03-chat-message-subtypes-phase1.md` (Phase 1 = infrastructure +
+the five check subtypes; later phases cover items, reports, and effect).
+
+### 10. Chat-message Svelte mount is keyed per-document, not per-element
+
+- **What:** `TitanChatMessage` stores a single `_svelteComponent = { handle, bridge }`
+  per message document. Foundry renders one message into TWO elements when chat
+  notifications are active — the main chat log (`ChatLog#postOne` / `#updateMessage`)
+  AND the notifications pane (`ChatLog#postNotification`) — each calling `renderHTML`.
+  The second render's `_teardownComponent()` unmounts the first element's component
+  (leaving its `.message-content` blank until the next re-render), and the
+  notification-pane mount + its `ReactiveDocument` bridge later leak, because
+  notification auto-dismissal removes the element without a teardown hook.
+- **Severity:** Only manifests when the chat sidebar tab is NOT the active tab (so a
+  notification is posted). **Pre-existing:** the legacy `OnRenderChatMessageHTML` hook
+  uses the identical single-slot `message._svelteComponent` pattern, so the Phase 1
+  refactor preserves parity rather than regressing.
+- **To do:** Key the mount per rendered element (store `{ handle, bridge }` on the
+  `<li>` element, or a `WeakMap<HTMLElement, …>` keyed by target), tearing down
+  per-element; on delete, tear down all of a message's mounts. Consider a
+  MutationObserver (or Foundry hook) to unmount on notification-pane element removal.
+  Apply the same model to the legacy hook until it is retired in the final phase.
+- **Why deferred:** Out of scope for Phase 1 (parity migration of checks). Fixing it
+  well means reworking the mount-tracking model shared with the legacy path.
+- **Found by:** Opus code-quality review of Phase 1, Task 3.

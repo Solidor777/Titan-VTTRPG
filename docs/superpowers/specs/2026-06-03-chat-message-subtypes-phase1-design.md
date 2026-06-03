@@ -231,9 +231,16 @@ unmigrated families. The paths never collide, by construction:
 - **`renderHTML` couples us to Foundry's card template.** Rebuilding `messageData` mirrors core
   internals; isolated to the one base method and added to the v15 intake checklist in
   `foundry-versioning` follow-ups.
-- **Re-render / notification double-mount leaks.** The base unmounts the prior
-  `parent._svelteComponent` before mounting; the notifications popout (`chat.mjs:1394`) can mount
-  the same message twice — the plan tracks handles so a stale mount is always torn down.
+- **Re-render / notification double-mount (DEFERRED, pre-existing).** The mount handle is stored in
+  a single per-document slot (`_svelteComponent`), and `renderHTML` tears down the prior mount before
+  mounting. This is correct for the ordinary single-element re-render path, but Foundry renders one
+  message into TWO elements when chat notifications are active (the main log via
+  `ChatLog#postOne`/`#updateMessage` AND the notifications pane via `ChatLog#postNotification`). With a
+  single slot, the second render unmounts the first element's component (its `.message-content` goes
+  blank until the next re-render) and the notification-pane mount + bridge can leak. This is
+  **pre-existing legacy behavior** — the old `OnRenderChatMessageHTML` hook uses the identical
+  single-slot `message._svelteComponent` pattern — so Phase 1 preserves parity rather than regressing.
+  The per-element fix is tracked in `docs/TODO.md` (#10).
 - **`ObjectField` cleaning.** Confirm `parameters`/`results` survive `ObjectField` ingestion (they
   already serialize through `flags`, so expected to be safe; verified in unit tests).
 
