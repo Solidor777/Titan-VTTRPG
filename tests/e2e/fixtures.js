@@ -100,3 +100,65 @@ export async function ensureDocument(page, documentType, subtype, name) {
    return `() => ${collectionExpr}.find((d) => d.type === '${subtype}' && d.name === '${name}') `
       + `?? ${collectionExpr}.find((d) => d.type === '${subtype}')`;
 }
+
+/**
+ * Collect every user-facing string under a root element that contains the TITAN i18n namespace
+ * substring `LOCAL.` — the signature of a missing or double-localized key. Scans text content, the
+ * common text-bearing attributes, and tippy tooltip content (read from `_tippy.props.content`, which
+ * is populated at mount so no hover is required).
+ * @param {import('@playwright/test').Page} page - The Playwright page to evaluate within.
+ * @param {string} rootSelector - CSS selector for the root element to scan (e.g. an app element).
+ * @returns {Promise<string[]>} The offending strings (deduplicated) found under the root.
+ */
+export async function collectLocalizationOffenders(page, rootSelector) {
+   return page.evaluate((selector) => {
+      /** @type {HTMLElement | null} The root element to scan. */
+      const root = document.querySelector(selector);
+      if (!root) {
+         return [`__ROOT_NOT_FOUND__: ${selector}`];
+      }
+
+      /** @type {Set<string>} The collected offending strings. */
+      const offenders = new Set();
+
+      /** @type {string[]} The text-bearing attributes to inspect on every element. */
+      const attributes = ['aria-label', 'title', 'placeholder', 'alt', 'data-tooltip'];
+
+      /**
+       * Records a candidate string as an offender when it embeds the LOCAL. namespace.
+       * @param {unknown} value - The candidate string (ignored when not a non-empty string).
+       * @returns {void}
+       */
+      const consider = (value) => {
+         if (typeof value === 'string' && value.includes('LOCAL.')) {
+            offenders.add(value.trim());
+         }
+      };
+
+      // Visible text nodes.
+      /** @type {Node} The tree walker over text nodes under the root. */
+      const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
+      while (walker.nextNode()) {
+         consider(walker.currentNode.nodeValue);
+      }
+
+      // Attributes and tippy content on every element (including the root).
+      for (const element of [root, ...root.querySelectorAll('*')]) {
+         for (const attribute of attributes) {
+            consider(element.getAttribute(attribute));
+         }
+
+         /** @type {*} The tippy tooltip content, when the element carries a tippy instance. */
+         const tippyContent = element._tippy?.props?.content;
+         if (typeof tippyContent === 'string') {
+            consider(tippyContent);
+         }
+         else if (tippyContent instanceof HTMLElement) {
+            consider(tippyContent.textContent);
+            consider(tippyContent.outerHTML);
+         }
+      }
+
+      return [...offenders];
+   }, rootSelector);
+}
