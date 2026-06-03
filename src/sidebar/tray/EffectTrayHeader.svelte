@@ -2,13 +2,11 @@
    import { getContext } from 'svelte';
    import localize from '~/helpers/utility-functions/Localize.js';
    import Select from '~/helpers/svelte-components/input/select/Select.svelte';
+   import TextInput from '~/helpers/svelte-components/input/TextInput.svelte';
    import IconButton from '~/helpers/svelte-components/button/IconButton.svelte';
-   import { CREATE_ICON, FOLDER_ICON } from '~/system/Icons.js';
+   import { CREATE_ICON, FOLDER_ICON, LOCK_ICON, UNLOCK_ICON } from '~/system/Icons.js';
 
-   /**
-    * @type {import('~/sidebar/tray/EffectTrayState.svelte.js').default} The reactive tray state from
-    *    context.
-    */
+   /** @type {import('~/sidebar/tray/EffectTrayState.svelte.js').default} The reactive tray state from context. */
    const trayState = getContext('trayState');
 
    // The dropdown options: one per visible ActiveEffect compendium.
@@ -26,6 +24,9 @@
 
    /** @type {boolean} Whether the selected pack supports folders (compendium packs do). */
    const supportsFolders = $derived(!!trayState.selectedPack?.folders);
+
+   /** @type {string} The localized label for the lock/unlock toggle, reflecting current state. */
+   const lockLabel = $derived(trayState.isLocked ? localize('effectTrayUnlock') : localize('effectTrayLock'));
 </script>
 
 <div class="effect-tray-header">
@@ -38,7 +39,7 @@
          bind:value={trayState.selectedPackId}
       />
 
-      <!--New Effect and New Folder buttons-->
+      <!--New Effect / New Folder / Lock toggle buttons-->
       <div class="effect-tray-header-new">
          <IconButton
             disabled={!trayState.canEdit}
@@ -59,15 +60,31 @@
                tooltip={newFolderLabel}
             />
          {/if}
+
+         {#if trayState.isOwner}
+            <IconButton
+               icon={trayState.isLocked ? LOCK_ICON : UNLOCK_ICON}
+               label={lockLabel}
+               onclick={() => trayState.toggleLock()}
+               testId="effect-tray-lock"
+               tooltip={lockLabel}
+            />
+         {/if}
       </div>
    </div>
-   <input
-      class="effect-tray-search"
-      data-testid="effect-tray-search"
-      placeholder={localize('effectTraySearch')}
-      type="text"
-      bind:value={trayState.filter}
-   />
+
+   <!--Filter row (mirrors the actor-sheet tab header)-->
+   <div class="effect-tray-filter-row">
+      <div class="label">
+         {localize('filter')}
+      </div>
+      <div class="input">
+         <TextInput
+            testId="effect-tray-search"
+            bind:value={trayState.filter}
+         />
+      </div>
+   </div>
 </div>
 
 <style lang="scss">
@@ -89,11 +106,24 @@
          }
       }
 
-      .effect-tray-search {
-         @include input;
+      .effect-tray-filter-row {
+         @include flex-row;
+         @include flex-group-center;
          @include margin-top-standard;
 
          width: 100%;
+
+         .label {
+            font-weight: bold;
+
+            @include margin-right-standard;
+         }
+
+         .input {
+            @include flex-group-left;
+
+            flex: 1;
+         }
       }
    }
 </style>
