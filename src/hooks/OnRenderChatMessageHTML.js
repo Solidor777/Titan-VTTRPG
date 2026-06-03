@@ -3,6 +3,7 @@ import ReactiveDocument from '~/document/reactive/ReactiveDocument.svelte.js';
 import darkModeChatMessages from '~/helpers/Settings/DarkModeChatMessages.js';
 import ChatMessageShell from '~/document/types/chat-message/ChatMessageShell.svelte';
 import deepFreeze from '~/helpers/utility-functions/DeepFreeze.js';
+import TitanChatMessageDataModel from '~/document/types/chat-message/ChatMessageDataModel.js';
 
 /** @type {Set<string>} List of Titan Chat Message types. */
 const TITAN_CHAT_MESSAGE_TYPES = deepFreeze(new Set([
@@ -39,6 +40,11 @@ const TITAN_CHAT_MESSAGE_TYPES = deepFreeze(new Set([
  * @param {HTMLElement} html - The HTML element of the Chat Message.
  */
 export default function onRenderChatMessageHTML(message, html) {
+   // Subtyped TITAN messages render themselves via TitanChatMessage#renderHTML; skip them here.
+   if (message?.system instanceof TitanChatMessageDataModel) {
+      return;
+   }
+
    // Check if this is a valid titan chat message.
    const titanFlags = message?.flags?.titan;
    if (TITAN_CHAT_MESSAGE_TYPES.has(titanFlags?.type)) {
