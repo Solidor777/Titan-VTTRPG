@@ -101,7 +101,7 @@
             icon={SEND_TO_CHAT_ICON}
             label={localize('sendToChat')}
             onclick={() => effect.sendToChat()}
-            tooltip={localize('sendToChat')}
+            tooltip={'sendToChat'}
          />
       </div>
 
@@ -111,7 +111,7 @@
             icon={document.data.isOwner ? EDIT_ICON : SHEET_ICON}
             label={localize(document.data.isOwner ? 'editItem' : 'viewItemSheet')}
             onclick={() => effect.sheet.render(true)}
-            tooltip={localize(document.data.isOwner ? 'editItem' : 'viewItemSheet')}
+            tooltip={document.data.isOwner ? 'editItem' : 'viewItemSheet'}
          />
       </div>
 
@@ -121,7 +121,7 @@
             icon={DELETE_ICON}
             label={localize('deleteEffect')}
             onclick={() => document.data.system.requestEffectDeletion(effect.id)}
-            tooltip={localize('deleteEffect')}
+            tooltip={'deleteEffect'}
          />
       </div>
    {/snippet}
@@ -159,7 +159,7 @@
       <!--Traits-->
       {#each customTrait as trait}
          <div class="tag">
-            <Tag tooltip={trait.description}>
+            <Tag tooltip={{ text: trait.description, localize: false }}>
                {trait.name}
             </Tag>
          </div>

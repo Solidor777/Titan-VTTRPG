@@ -48,7 +48,7 @@
    difficulty={checkParameters.difficulty}
    onclick={() => document.data.system.requestItemCheck(checkOptions)}
    resolveCost={checkParameters.resolveCost}
-   {tooltip}
+   tooltip={{ text: tooltip, localize: false }}
    totalDice={checkParameters.totalDice}
    totalExpertise={checkParameters.totalExpertise}
 />

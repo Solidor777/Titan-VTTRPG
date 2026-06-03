@@ -49,7 +49,7 @@
    <Button
       {disabled}
       onclick={() => requestResistanceCheck()}
-      tooltip={localize(`${resistance}.desc`)}
+      tooltip={`${resistance}.desc`}
    >
       {`${localize(resistance)} ${difficulty}:${complexity}`}
    </Button>

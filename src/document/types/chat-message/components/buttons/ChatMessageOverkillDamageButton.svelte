@@ -15,7 +15,7 @@
 
 <ChatMessageButton
    onclick={() => applyDamageToTargets(damage, { ignoreArmor: true })}
-   tooltip={localize('applyOverkillDamage')}
+   tooltip={'applyOverkillDamage'}
 >
    <i class={OVERKILL_ICON}></i>
    {localize('X%OverkillDamage').replace('X%', damage)}

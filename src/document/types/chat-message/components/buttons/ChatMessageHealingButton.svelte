@@ -13,7 +13,7 @@
    const { healing = void 0 } = $props();
 </script>
 
-<ChatMessageButton onclick={() => applyHealingToTargets(healing)} tooltip={localize('applyHealing')}>
+<ChatMessageButton onclick={() => applyHealingToTargets(healing)} tooltip={'applyHealing'}>
    <i class={HEALING_ICON}></i>
    {localize('healX%Damage').replace('X%', healing)}
 </ChatMessageButton>

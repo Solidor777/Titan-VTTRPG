@@ -45,7 +45,7 @@
    complexity={checkParameters.complexity}
    difficulty={checkParameters.difficulty}
    onclick={() => document.data.system.requestCastingCheck(checkOptions)}
-   {tooltip}
+   tooltip={{ text: tooltip, localize: false }}
    totalDice={checkParameters.totalDice}
    totalExpertise={checkParameters.totalExpertise}
 />

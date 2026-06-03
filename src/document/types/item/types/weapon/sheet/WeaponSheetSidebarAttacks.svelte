@@ -125,7 +125,7 @@
                <!--Custom Traits-->
                {#each attack.customTrait as trait (trait.uuid)}
                   <div class="stat" transition:slide|local>
-                     <Tag tooltip={trait.description}>
+                     <Tag tooltip={{ text: trait.description, localize: false }}>
                         {trait.name}
                      </Tag>
                   </div>

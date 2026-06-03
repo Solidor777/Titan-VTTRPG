@@ -44,7 +44,7 @@
       <IconStatTag
          icon={DEFENSE_ICON}
          label={localize('defense')}
-         tooltip={localize('defense.desc')}
+         tooltip={'defense.desc'}
          value={defense}
       />
    </div>
@@ -67,7 +67,7 @@
          <TraitTag
             label={localize(traitEntry.name)}
             value={traitEntry.value}
-            tooltip={localize(traitDescriptions[traitEntry.name])}
+            tooltip={traitDescriptions[traitEntry.name]}
          />
       </div>
    {/each}
@@ -75,7 +75,7 @@
    <!--Custom Traits-->
    {#each customTrait as customTraitEntry}
       <div class="stat">
-         <Tag tooltip={customTraitEntry.description}>
+         <Tag tooltip={{ text: customTraitEntry.description, localize: false }}>
             {customTraitEntry.name}
          </Tag>
       </div>

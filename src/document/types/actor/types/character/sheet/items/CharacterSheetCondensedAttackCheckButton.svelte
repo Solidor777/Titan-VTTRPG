@@ -52,7 +52,7 @@
    attribute={checkParameters.attribute}
    checkIcon={icon}
    onclick={() => document.data.system.requestAttackCheck(checkOptions)}
-   {tooltip}
+   tooltip={{ text: tooltip, localize: false }}
    totalDice={checkParameters.totalDice}
    totalExpertise={checkParameters.totalExpertise}
 />

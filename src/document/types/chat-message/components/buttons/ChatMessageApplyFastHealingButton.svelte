@@ -72,6 +72,6 @@
 <ChatMessageResourceModButton
    icon={HEALING_ICON}
    label={localize('healX%Damage').replace('X%', document.data.flags.titan.fastHealing.total)}
-   tooltip={getTooltip()}
+   tooltip={{ text: getTooltip(), localize: false }}
    confirmFn={confirm}
 />

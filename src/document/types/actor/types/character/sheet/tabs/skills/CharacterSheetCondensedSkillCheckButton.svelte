@@ -26,6 +26,6 @@
    attribute={checkParameters.attribute}
    label={localize(checkParameters.skill)}
    onclick={() => document.data.system.requestAttributeCheck({skill: checkParameters.skill})}
-   {tooltip}
+   tooltip={{ text: tooltip, localize: false }}
    totalDice={checkParameters.totalDice}
 />

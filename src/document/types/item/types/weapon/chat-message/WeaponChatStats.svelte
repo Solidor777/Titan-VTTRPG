@@ -28,7 +28,7 @@
    <!--Custom Traits-->
    {#each item.customTrait as trait}
       <div class="stat">
-         <Tag tooltip={trait.description}>
+         <Tag tooltip={{ text: trait.description, localize: false }}>
             {trait.name}
          </Tag>
       </div>

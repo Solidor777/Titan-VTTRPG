@@ -76,6 +76,6 @@
 <ChatMessageResourceModButton
    icon={PERSISTENT_DAMAGE_ICON}
    label={localize('applyX%Damage').replace('X%', document.data.flags.titan.persistentDamage.total)}
-   tooltip={getTooltip()}
+   tooltip={{ text: getTooltip(), localize: false }}
    confirmFn={confirm}
 />

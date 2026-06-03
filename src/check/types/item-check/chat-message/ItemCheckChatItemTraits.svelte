@@ -10,7 +10,7 @@
    <!--Item Traits-->
    {#each document.data.flags.titan.parameters.itemTrait as trait}
       <div class="stat">
-         <Tag tooltip={trait.description}>
+         <Tag tooltip={{ text: trait.description, localize: false }}>
             {trait.name}
          </Tag>
       </div>

@@ -49,11 +49,11 @@
       <div class="stat">
          {#if typeof (trait.value) === 'number'}
             <StatTag
-               tooltip={localize(traitDescriptions[trait.name])}
+               tooltip={traitDescriptions[trait.name]}
                label={localize(trait.name)}
                value={trait.value}/>
          {:else}
-            <Tag tooltip={localize(traitDescriptions[trait.name])}>
+            <Tag tooltip={traitDescriptions[trait.name]}>
                {localize(trait.name)}
             </Tag>
          {/if}
@@ -63,7 +63,7 @@
    <!--Custom Traits-->
    {#each item.system.customTrait as trait}
       <div class="stat">
-         <Tag tooltip={trait.description}>
+         <Tag tooltip={{ text: trait.description, localize: false }}>
             {trait.name}
          </Tag>
       </div>

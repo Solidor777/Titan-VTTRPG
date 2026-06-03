@@ -20,5 +20,5 @@
    icon={DELETE_ICON}
    label={localize('deleteItem')}
    onclick={() => document.data.system.requestItemDeletion(itemId)}
-   tooltip={localize('deleteItem')}
+   tooltip={'deleteItem'}
 />

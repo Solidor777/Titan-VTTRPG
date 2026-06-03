@@ -129,7 +129,7 @@
                      checkParameters.trainingMod
                   }
                   currentValue={checkParameters.totalTrainingDice}
-                  tooltip={totalTrainingTooltip}
+                  tooltip={{ text: totalTrainingTooltip, localize: false }}
                />
             </div>
          </div>
@@ -172,7 +172,7 @@
                      checkParameters.expertiseMod
                   }
                   currentValue={checkParameters.totalExpertise}
-                  tooltip={totalExpertiseTooltip}
+                  tooltip={{ text: totalExpertiseTooltip, localize: false }}
                />
             </div>
          </div>

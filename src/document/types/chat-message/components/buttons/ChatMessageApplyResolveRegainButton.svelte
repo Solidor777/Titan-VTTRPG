@@ -72,6 +72,6 @@
 <ChatMessageResourceModButton
    icon={REGAIN_RESOLVE_ICON}
    label={localize('regainX%Resolve').replace('X%', document.data.flags.titan.resolveRegain.total)}
-   tooltip={getTooltip()}
+   tooltip={{ text: getTooltip(), localize: false }}
    confirmFn={confirm}
 />

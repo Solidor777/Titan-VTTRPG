@@ -19,7 +19,7 @@
             id: document.data.system.trait[idx].name,
             component: LabelTag,
             props: {
-               tooltip: localize(getShieldTraitDescription(document.data.system.trait[idx].name)),
+               tooltip: getShieldTraitDescription(document.data.system.trait[idx].name),
                label: localize(document.data.system.trait[idx].name),
             }
          });

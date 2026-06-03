@@ -213,7 +213,7 @@
             <TraitTag
                label={localize(trait.name)}
                value={trait.value}
-               tooltip={localize(traitDescriptions[trait.name])}
+               tooltip={traitDescriptions[trait.name]}
             />
          </div>
       {/each}
@@ -221,7 +221,7 @@
       <!--Custom Traits-->
       {#each attack.customTrait as trait}
          <div class="stat">
-            <Tag tooltip={trait.description}>
+            <Tag tooltip={{ text: trait.description, localize: false }}>
                {trait.name}
             </Tag>
          </div>

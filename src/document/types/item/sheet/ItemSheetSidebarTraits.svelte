@@ -1,6 +1,5 @@
 <script>
    import { getContext } from 'svelte';
-   import localize from '~/helpers/utility-functions/Localize.js';
    import { CREATE_ICON, EDIT_ICON } from '~/system/Icons.js';
    import ItemSheetCustomTraitTag from '~/document/types/item/sheet/ItemSheetCustomTraitTag.svelte';
    import TagContainer from '~/helpers/svelte-components/tag/TagContainer.svelte';
@@ -44,7 +43,7 @@
       <div class="button">
          <IconLabelButton
             icon={EDIT_ICON}
-            label={localize('editTraits')}
+            label={'editTraits'}
             onclick={() => {editTraits()}}
          />
       </div>

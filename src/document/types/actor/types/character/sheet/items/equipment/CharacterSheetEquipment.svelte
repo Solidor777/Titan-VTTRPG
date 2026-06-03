@@ -123,7 +123,7 @@
       <!--Custom Traits-->
       {#each customTrait as trait}
          <div class="tag">
-            <Tag tooltip={trait.description}>
+            <Tag tooltip={{ text: trait.description, localize: false }}>
                {trait.name}
             </Tag>
          </div>

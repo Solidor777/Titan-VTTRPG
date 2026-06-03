@@ -96,14 +96,14 @@
             <IconButton
                icon={SEND_TO_CHAT_ICON}
                label={localize('sendToChat')}
-               tooltip={localize('sendToChat')}
+               tooltip={'sendToChat'}
                onclick={() => effect.sendToChat()}
             />
          {/if}
          <DocumentOwnerIconButton
             icon={DELETE_ICON}
             label={localize('deleteEffect')}
-            tooltip={localize('deleteEffect')}
+            tooltip={'deleteEffect'}
             onclick={() => document.data.system.requestEffectDeletion(effect.id)}
          />
       </div>

@@ -1,6 +1,5 @@
 <script>
    import { getContext } from 'svelte';
-   import localize from '~/helpers/utility-functions/Localize.js';
    import DocumentName from '~/document/svelte-components/input/DocumentNameInput.svelte';
    import DocumentCheckboxInput from '~/document/svelte-components/input/DocumentCheckboxInput.svelte';
    import DocumentIconPicker from '~/document/svelte-components/input/DocumentIconPicker.svelte';
@@ -24,7 +23,7 @@
 
       <!--Name-->
       <div class="input name">
-         <DocumentName tooltip={localize('abilityName.desc')}/>
+         <DocumentName tooltip={'abilityName.desc'}/>
       </div>
 
       <!--Stats-->
@@ -37,7 +36,7 @@
 
          <!--XP Cost-->
          <div class="input number">
-            <ItemSheetXPCostInput tooltip={localize('abilityXpCost.desc')}/>
+            <ItemSheetXPCostInput tooltip={'abilityXpCost.desc'}/>
          </div>
       </div>
    </div>

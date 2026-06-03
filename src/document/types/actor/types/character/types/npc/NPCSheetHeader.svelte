@@ -1,6 +1,5 @@
 <script>
    import { getContext } from 'svelte';
-   import localize from '~/helpers/utility-functions/Localize.js';
    import DocumentNameInput from '~/document/svelte-components/input/DocumentNameInput.svelte';
    import CharacterSheetAttributes
       from '~/document/types/actor/types/character/sheet/header/CharacterSheetAttributes.svelte';
@@ -22,7 +21,7 @@
 <div class="header">
    <!--Name-->
    <div class="row">
-      <DocumentNameInput tooltip={localize('characterName.desc')}/>
+      <DocumentNameInput tooltip={'characterName.desc'}/>
    </div>
 
    <!--Character Info-->
