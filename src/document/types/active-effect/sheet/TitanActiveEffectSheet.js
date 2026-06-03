@@ -1,7 +1,10 @@
 import TitanDocumentSheet from '~/document/sheet/TitanDocumentSheet.js';
+import ActiveEffectSheetHeaderButtons from '~/document/types/active-effect/sheet/ActiveEffectSheetHeaderButtons.svelte';
 import ActiveEffectSheetShell from '~/document/types/active-effect/sheet/ActiveEffectSheetShell.svelte';
 import createRulesElementItemSheetState from '~/document/types/item/sheet/RulesElementItemSheetState.js';
+import localize from '~/helpers/utility-functions/Localize.js';
 import mergeArrays from '~/helpers/utility-functions/MergeArrays.js';
+import { SEND_TO_CHAT_ICON } from '~/system/Icons.js';
 
 /**
  * A Document Sheet class for Titan Active Effects of the 'effect' subtype.
@@ -63,6 +66,38 @@ export default class TitanActiveEffectSheet extends TitanDocumentSheet {
     */
    _createReactiveState() {
       return createRulesElementItemSheetState(/** @type {TitanActiveEffect} */ this.document);
+   }
+
+   /**
+    * Supply the always-visible effect header-buttons component for the window header.
+    * @override
+    * @returns {import('svelte').Component} The component rendering the send-to-chat button.
+    * @protected
+    */
+   _getHeaderButtonsComponent() {
+      return ActiveEffectSheetHeaderButtons;
+   }
+
+   /**
+    * Build the native AppV2 header controls for this Active Effect sheet, adding a Send-to-Chat entry
+    * so the action is reachable from the controls dropdown as well as the inline header button.
+    * @override
+    * @returns {ApplicationHeaderControlsEntry[]} The header control entries to render.
+    * @protected
+    */
+   _getHeaderControls() {
+      /** @type {ApplicationHeaderControlsEntry[]} The accumulated control entries. */
+      const controls = super._getHeaderControls();
+
+      // Send to Chat control: posts this Active Effect to chat.
+      controls.push({
+         action: 'titanSendEffectToChat',
+         icon: SEND_TO_CHAT_ICON,
+         label: localize('sendToChat'),
+         onClick: () => this.effect.sendToChat(),
+      });
+
+      return controls;
    }
 
    /**
