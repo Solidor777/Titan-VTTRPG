@@ -129,6 +129,23 @@ split off to keep that spec focused.
   `docs/superpowers/plans/2026-06-02-effect-tray-sidebar-tab.md`. Covered by
   `tests/e2e/effect-tray.spec.js` (5 cases) + `tests/unit/GetEffectCompendiums.test.js`
   and `tests/unit/GetBestCharactersToUpdate.test.js`.
+- **Enhancement — COMPLETE (2026-06-02).** Row interaction reworked: a right-click
+  **context menu** (Apply / Open Sheet / Rename / Move to Folder / Duplicate / Delete) via
+  `src/sidebar/tray/EffectRowContextMenu.js` + a Foundry `ContextMenu` attached to the tray
+  root; **left-click a row opens its sheet** (debounced 250 ms vs double-click-rename); inline
+  buttons reduced to **Apply** only; an actor-sheet-style labelled **Filter** bar; a GM/owner-only
+  compendium **lock toggle** (`pack.configure({ locked })`, reactive `isLocked` mirror); and a
+  **Move-to-Folder** picker dialog. Spec/plan:
+  `docs/superpowers/specs/2026-06-02-effect-tray-context-menu-and-localization-test-design.md`,
+  `docs/superpowers/plans/2026-06-02-effect-tray-context-menu-and-localization-test.md`. Covered by
+  3 new `effect-tray.spec.js` cases + `tests/unit/EffectRowContextMenu.test.js`.
+- **Localization double-localization guard — COMPLETE (2026-06-02).** New
+  `tests/e2e/localization.spec.js` renders every actor/item/effect sheet + the effects sidebar and
+  fails on any rendered text/tippy-tooltip containing `LOCAL.`; `tests/unit/LocalizationKeys.test.js`
+  guards `lang/en.json` values. The scan surfaced a pre-existing system-wide bug class — tooltips/`Text`
+  passing already-localized or dynamic strings (which `processTextData` re-localizes into `LOCAL.…`) —
+  fixed across 49 components (actor/item sheets, chat, reports, effect HUD). See the tooltip/`Text`
+  value contract now documented in `references/conventions.md`.
 - **Sub-project B (deferred):** ship a seeded *standard effects* compendium — needs
   a pack-build pipeline (foundryvtt-cli `compilePack` or ClassicLevel) and the
   effect content (a future rulebook-scrape script). The tray already works against

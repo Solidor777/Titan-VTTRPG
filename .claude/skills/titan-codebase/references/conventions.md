@@ -203,12 +203,20 @@ font-size, line-height, cursor) without touching `font-family` or `font-weight`;
 lives on the `<i>` these two properties are irrelevant on the button, but must still not be reset to
 `inherit` in any context where FA icon `<i>` elements are nested inside buttons.
 
-**User-authored text in tooltips must use `{ text, localize: false }`** — `TooltipAction.js`
-processes tooltip data through `processTextData`, which calls `localize()` on a bare string. Passing a
-user-written value (e.g. a custom-trait description) as a plain string therefore runs it through
-`game.i18n.localize`, corrupting arbitrary text. Pass a TextData object instead:
-`{ text: userValue, localize: false }`. Localization keys (edit/delete button tooltips, etc.) can
-continue as plain strings.
+**Tooltip / `Text` value contract (avoid double-localization)** — `TooltipAction.js` and the `Text`
+component both run their value through `processTextData`, which calls `localize()` on a **bare string**
+(treating it as an i18n key → `LOCAL.<value>.text`). So a tooltip/`Text` value must be EITHER a raw i18n
+**key** string (e.g. `tooltip={'defense.desc'}`, `tooltip={`${rating}.desc`}`) OR a TextData object
+`{ text: <already-localized-or-dynamic>, localize: false }`. The classic bug is passing
+**already-localized** text as a bare string — `tooltip={localize('x')}` or
+`tooltip={composedLocalizedHtml}` or a dynamic `tooltip={doc.name}` — which localizes it a second time
+and renders `LOCAL.<text>.text` to the user. Fixes: drop the redundant `localize` and pass the raw key
+(`tooltip={'x'}`), or wrap already-localized/dynamic/user text as `{ text, localize: false }`. Note
+`label` / aria-label props are **not** routed through `processTextData`, so those stay
+`label={localize('x')}`. Trait-description maps (`ATTACK_/ARMOR_/SHIELD_TRAIT_DESCRIPTIONS`) hold **keys**,
+not display text. A comprehensive e2e guard, `tests/e2e/localization.spec.js`, renders every actor/item/
+effect sheet and the effects sidebar and fails on any rendered text/tippy-tooltip containing `LOCAL.`;
+`tests/unit/LocalizationKeys.test.js` guards `lang/en.json` values against embedded `LOCAL.` keys.
 
 **Where mixins live:** `src/styles/Mixins/` contains per-domain files (see `architecture.md`,
 `src/styles/` section, for the full mixin file list).

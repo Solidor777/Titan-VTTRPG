@@ -365,18 +365,36 @@ and one or more inner Svelte component trees.
   Svelte context as `'trayState'`. Registered additively in `OnceInit.js` (`Sidebar.TABS.titanEffects` +
   `CONFIG.ui.titanEffects`); core instantiates `ui.titanEffects` and handles the tab strip / activation / popout.
 - `EffectTrayState` (`src/sidebar/tray/EffectTrayState.svelte.js`) is a Svelte 5 runes class holding `compendiums`,
-  `selectedPackId`, `effects`, `folders`, `filter`, and `expandedFolders`. `getEffectCompendiums()`
-  (`src/sidebar/tray/GetEffectCompendiums.js`) lists visible `ActiveEffect`-type packs (system/TITAN first, then
-  alphabetical). `refresh()` loads `pack.getDocuments()` (TITAN/system packs filtered to `type==='effect'`; user
-  packs show all), with a post-await stale-selection guard. The last-selected pack persists in the per-user
-  `effectTrayLastPack` client setting. The state registers create/update/delete hooks for both `ActiveEffect` and
-  `Folder`, refreshing only when `document.pack === selectedPackId`; `destroy()` (called from the tab's `_onClose`)
-  removes them. `canEdit` = unlocked pack + owner level; it gates all CRUD/folder writes.
-- UI: `EffectTrayShell` → `EffectTray` (hosts the drag-in stash drop zone) → `EffectTrayHeader` (compendium
-  `Select` dropdown, search, owner-gated New / New Folder) + `EffectTrayList` (folder-grouped or flat; folder
-  headers carry owner-gated inline-rename mirroring the row, plus collapse toggle, count, delete) of
-  `EffectTrayRow` (icon, inline-rename, owner-gated Open/Duplicate/Delete, drag-out via `effect.toDragData()`, and
-  an always-visible owner-gated **Apply**). Apply uses `applyEffectToTargets()`
+  `selectedPackId`, `effects`, `folders`, `filter`, `expandedFolders`, and `isLocked` (a reactive `$state` mirror of
+  `pack.locked`). `getEffectCompendiums()` (`src/sidebar/tray/GetEffectCompendiums.js`) lists visible
+  `ActiveEffect`-type packs (system/TITAN first, then alphabetical). `refresh()` loads `pack.getDocuments()` (TITAN/
+  system packs filtered to `type==='effect'`; user packs show all), sets `isLocked = !!pack.locked` before the await
+  (or resets it to `true` in the no-pack guard), with a post-await stale-selection guard. The last-selected pack
+  persists in the per-user `effectTrayLastPack` client setting. The state registers create/update/delete hooks for
+  both `ActiveEffect` and `Folder`, refreshing only when `document.pack === selectedPackId`; `destroy()` (called from
+  the tab's `_onClose`) removes them. `isOwner` getter = `pack.getUserLevel(game.user) >= OWNER`. `canEdit` getter =
+  `!this.isLocked && this.isOwner` (reads the reactive mirror, so the UI reacts when the lock flips). `toggleLock()`
+  calls `await pack.configure({ locked: !pack.locked })` then updates the mirror; owner-gated. `requestDeleteEffect()`
+  prompts via `ConfirmationDialog` then calls `effect.delete()` on confirm; `canEdit`-gated.
+- `buildEffectRowContextMenu(trayState)` (`src/sidebar/tray/EffectRowContextMenu.js`) returns the six
+  right-click `ContextMenuEntry` objects for an effect-tray row. Entry shape: `{ label, icon, visible(), onClick() }`.
+  Apply and Open are always visible; Rename, Duplicate, and Delete are gated on `trayState.canEdit`; Move to Folder
+  is gated on `canEdit && !!selectedPack?.folders`. The Move-to-Folder `onClick` lazy-loads `MoveEffectToFolderDialog`
+  via a dynamic `import()` so this module stays importable in unit tests without stubbing
+  `foundry.applications.api`. `resolveEffect(target, trayState)` (module-private) looks up the effect by reading
+  `data-effect-id` off the closest ancestor element.
+- UI: `EffectTrayShell` → `EffectTray` (hosts the drag-in stash drop zone; attaches a Foundry `ContextMenu` to the
+  tray root via the `effectContextMenu` action, delegating on `[data-effect-id]` rows with `buildEffectRowContextMenu`)
+  → `EffectTrayHeader` (compendium `Select` dropdown, GM/owner-only lock toggle calling `toggleLock()`, owner-gated
+  New / New Folder, and an actor-sheet-style labelled **Filter** row bound to `trayState.filter`) + `EffectTrayList`
+  (folder-grouped or flat; folder headers carry owner-gated inline-rename mirroring the row, plus collapse toggle,
+  count, delete) of `EffectTrayRow` (icon, inline-rename, drag-out via `effect.toDragData()`, and a single
+  always-visible **Apply** button). **Left-click on a row opens the effect sheet**, debounced 250 ms so it does not
+  collide with double-click-to-rename; the row listens for a `titan-effect-rename` CustomEvent so the context menu's
+  Rename entry drives the inline rename. Open / Duplicate / Delete / Rename / Move-to-Folder live in the right-click
+  context menu; **Move to Folder** opens `MoveEffectToFolderDialog` (`src/sidebar/tray/MoveEffectToFolderDialog.js` +
+  `MoveEffectToFolderDialogShell.svelte`), a folder-picker that calls `trayState.moveEffectToFolder`. Apply uses
+  `applyEffectToTargets()`
   (`src/helpers/utility-functions/ApplyEffectToTargets.js`) → copies `effect.toObject()` onto each
   `getBestCharactersToUpdate()` target the user owns. Stash-in resolves the drop via
   `getDocumentClass('ActiveEffect').fromDropData(...)` and creates a copy in the selected pack (guarding against
