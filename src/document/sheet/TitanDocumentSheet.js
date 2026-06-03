@@ -19,6 +19,9 @@ export default class TitanDocumentSheet extends DocumentSheetV2 {
    /** @type {ReactiveDocument | undefined} The reactive document bridge. */
    #bridge = void 0;
 
+   /** @type {object | undefined} The mounted header-buttons Svelte component handle. */
+   #headerMountHandle = void 0;
+
    /**
     * Resolves the polymorphic constructor arguments and applies the default and theme CSS classes to the sheet.
     * @param {foundry.abstract.Document} sheetDocument - The Document this sheet represents.
@@ -69,6 +72,16 @@ export default class TitanDocumentSheet extends DocumentSheetV2 {
    }
 
    /**
+    * Overridable factory for the always-visible header-buttons Svelte component mounted into the window
+    * header. Subclasses return a component; the base mounts nothing.
+    * @returns {import('svelte').Component | undefined} The header-buttons component, or undefined for none.
+    * @protected
+    */
+   _getHeaderButtonsComponent() {
+      return void 0;
+   }
+
+   /**
     * Prepare render data. Props are assembled in `_replaceHTML`; nothing is needed here.
     * @override
     * @param {object} context - Render context (unused).
@@ -106,6 +119,33 @@ export default class TitanDocumentSheet extends DocumentSheetV2 {
    }
 
    /**
+    * Mount the always-visible header-buttons Svelte tree into the window header on first render. The
+    * tree is anchored before the controls (ellipsis) button and shares the application and reactive
+    * document via context, mirroring the content shell mount.
+    * @override
+    * @param {object} context - Prepared render context (unused).
+    * @param {object} options - Render options forwarded from the first-render lifecycle.
+    * @returns {Promise<void>} Resolves once the header tree is mounted.
+    * @protected
+    */
+   async _onFirstRender(context, options) {
+      await super._onFirstRender(context, options);
+
+      // The per-type header-buttons component, if any.
+      const headerButtons = this._getHeaderButtonsComponent();
+      if (headerButtons) {
+         this.#headerMountHandle = mount(headerButtons, {
+            target: this.window.header,
+            anchor: this.window.controls,
+            context: new Map([
+               ['application', this],
+               ['document', this.#bridge],
+            ]),
+         });
+      }
+   }
+
+   /**
     * Tear down the Svelte tree and the bridge when the window closes.
     * @override
     * @param {object} options - Settings forwarded from the Application close lifecycle.
@@ -116,6 +156,10 @@ export default class TitanDocumentSheet extends DocumentSheetV2 {
       if (this.#mountHandle) {
          unmount(this.#mountHandle, { outro: true });
          this.#mountHandle = void 0;
+      }
+      if (this.#headerMountHandle) {
+         unmount(this.#headerMountHandle, { outro: true });
+         this.#headerMountHandle = void 0;
       }
       this.#bridge?.destroy();
    }
