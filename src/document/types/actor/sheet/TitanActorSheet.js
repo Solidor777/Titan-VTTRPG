@@ -1,4 +1,5 @@
 import TitanDocumentSheet from '~/document/sheet/TitanDocumentSheet.js';
+import ActorSheetHeaderButtons from '~/document/types/actor/sheet/ActorSheetHeaderButtons.svelte';
 import warn from '~/helpers/utility-functions/Warn.js';
 import mergeArrays from '~/helpers/utility-functions/MergeArrays.js';
 import resolveDocumentSheetArguments from '~/helpers/utility-functions/ResolveDocumentSheetArguments.js';
@@ -127,6 +128,16 @@ export default class TitanActorSheet extends TitanDocumentSheet {
          label: localize('tokenUnlinked'),
          onClick: () => {},
       };
+   }
+
+   /**
+    * Supply the always-visible actor header-buttons component for the window header.
+    * @override
+    * @returns {import('svelte').Component} The component rendering the import, edit-token, and link-state buttons.
+    * @protected
+    */
+   _getHeaderButtonsComponent() {
+      return ActorSheetHeaderButtons;
    }
 
    /**
