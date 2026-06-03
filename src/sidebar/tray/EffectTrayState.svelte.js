@@ -1,3 +1,5 @@
+import ConfirmationDialog from '~/helpers/dialogs/ConfirmationDialog.js';
+import localize from '~/helpers/utility-functions/Localize.js';
 import getEffectCompendiums from '~/sidebar/tray/GetEffectCompendiums.js';
 
 /**
@@ -8,11 +10,11 @@ import getEffectCompendiums from '~/sidebar/tray/GetEffectCompendiums.js';
  *
  * Public interface (read by tray components via `getContext('trayState')`):
  * - `$state` fields: `compendiums`, `selectedPackId`, `effects`, `filter`, `expandedFolders`,
- *   `folders`.
- * - Getters: `selectedPack`, `canEdit`.
- * - Methods: `selectPack`, `refresh`, `createBlankEffect`, `duplicateEffect`, `renameEffect`,
- *   `stashFromDragData`, `createFolder`, `renameFolder`, `deleteFolder`, `moveEffectToFolder`,
- *   `toggleFolder`, `destroy`.
+ *   `folders`, `isLocked`.
+ * - Getters: `selectedPack`, `isOwner`, `canEdit`.
+ * - Methods: `selectPack`, `refresh`, `createBlankEffect`, `duplicateEffect`, `requestDeleteEffect`,
+ *   `renameEffect`, `stashFromDragData`, `createFolder`, `renameFolder`, `deleteFolder`,
+ *   `moveEffectToFolder`, `toggleFolder`, `toggleLock`, `destroy`.
  */
 export default class EffectTrayState {
 
@@ -33,6 +35,9 @@ export default class EffectTrayState {
 
    /** @type {Folder[]} The folders of the selected pack, mirrored for reactive folder grouping. */
    folders = $state([]);
+
+   /** @type {boolean} Reactive mirror of the selected pack's locked state, so the UI reacts to it. */
+   isLocked = $state(true);
 
    /** @type {{ hook: string, id: number }[]} The registered hook ids, removed on destroy. */
    #hookIds = [];
@@ -67,15 +72,38 @@ export default class EffectTrayState {
    }
 
    /**
-    * Whether the selected pack is editable by the current user (unlocked and owner).
+    * Whether the current user owns the selected pack (a GM for world/module packs).
+    * @returns {boolean} True when the user can manage the pack (lock, configure).
+    */
+   get isOwner() {
+      /** @type {CompendiumCollection | undefined} The selected pack. */
+      const pack = this.selectedPack;
+      return !!pack && pack.getUserLevel(game.user) >= CONST.DOCUMENT_OWNERSHIP_LEVELS.OWNER;
+   }
+
+   /**
+    * Whether the selected pack is editable by the current user (owned and unlocked). Reads the
+    * reactive `isLocked` mirror so CRUD affordances update when the lock is toggled.
     * @returns {boolean} True when CRUD actions should be enabled.
     */
    get canEdit() {
+      return !this.isLocked && this.isOwner;
+   }
+
+   /**
+    * Toggles the locked state of the selected pack. GM/owner only; persists via `pack.configure` and
+    * updates the reactive `isLocked` mirror so the UI and `canEdit` react immediately.
+    * @returns {Promise<void>}
+    */
+   async toggleLock() {
       /** @type {CompendiumCollection | undefined} The selected pack. */
       const pack = this.selectedPack;
-      return !!pack
-         && !pack.locked
-         && pack.getUserLevel(game.user) >= CONST.DOCUMENT_OWNERSHIP_LEVELS.OWNER;
+      if (!pack || !this.isOwner) {
+         return;
+      }
+
+      await pack.configure({ locked: !pack.locked });
+      this.isLocked = pack.locked;
    }
 
    /**
@@ -100,8 +128,11 @@ export default class EffectTrayState {
       if (!pack) {
          this.effects = [];
          this.folders = [];
+         this.isLocked = true;
          return;
       }
+
+      this.isLocked = !!pack.locked;
 
       /** @type {object[]} The full documents in the selected pack. */
       const documents = await pack.getDocuments();
@@ -167,6 +198,28 @@ export default class EffectTrayState {
       delete data._id;
 
       await pack.documentClass.createDocuments([data], { pack: pack.collection });
+   }
+
+   /**
+    * Prompts for confirmation, then deletes the effect from its pack on confirm. No-ops when the
+    * current user cannot edit the selected pack.
+    * @param {ActiveEffect} effect - The effect to delete.
+    * @returns {void}
+    */
+   requestDeleteEffect(effect) {
+      if (!this.canEdit) {
+         return;
+      }
+
+      /** @type {string} The localized Delete label, reused as title and confirm-button text. */
+      const label = localize('effectTrayDelete');
+      new ConfirmationDialog(
+         label,
+         [effect.name],
+         localize('effectTrayConfirmDelete.desc'),
+         label,
+         () => effect.delete(),
+      ).render(true);
    }
 
    /**
