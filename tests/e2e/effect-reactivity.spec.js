@@ -38,7 +38,6 @@ test.describe('effect toggle reactivity', () => {
 
       // Activate the Effects tab so the effect row and its toggle render.
       await page.getByText('Effects', { exact: true }).first().click();
-      await page.waitForTimeout(400);
    });
 
    test('clicking the active toggle flips the rendered checkmark without a tab switch', async ({ page }) => {
@@ -49,7 +48,6 @@ test.describe('effect toggle reactivity', () => {
 
       // Toggle to inactive — staying on the Effects tab (no re-mount).
       await row.locator('i.fa-square-check').click();
-      await page.waitForTimeout(400);
 
       // The rendered checkmark must update reactively in place.
       await expect(row.locator('i.fa-square-check'), 'checkmark cleared reactively').toHaveCount(0);

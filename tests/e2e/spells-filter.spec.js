@@ -30,7 +30,6 @@ test.describe('spells tab filter', () => {
       }, ACTOR_NAME);
 
       await page.getByText('Spells', { exact: true }).first().click();
-      await page.waitForTimeout(400);
    });
 
    test('typing in the spells filter narrows the spell list', async ({ page }) => {
@@ -41,7 +40,6 @@ test.describe('spells tab filter', () => {
       const filterInput = page.locator('.tab .header .input input').first();
       await filterInput.fill('Fireball');
       await filterInput.dispatchEvent('keyup');
-      await page.waitForTimeout(400);
 
       await expect(page.locator('[data-item-id]'), 'narrowed to the matching spell').toHaveCount(1);
       await expect(page.getByText('Zzz Fireball')).toBeVisible();

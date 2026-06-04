@@ -50,7 +50,6 @@ test.describe('character sheet effect row reactivity', () => {
 
       // Activate the Effects tab so the effect row renders.
       await page.getByText('Effects', { exact: true }).first().click();
-      await page.waitForTimeout(400);
    });
 
    test('effect footer duration + expired tags update in place after an in-place effect update', async ({
@@ -61,7 +60,6 @@ test.describe('character sheet effect row reactivity', () => {
 
       // Expand the row in place (the expand button is the first button in the header label area).
       await row.locator('.header .label .button button').first().click();
-      await page.waitForTimeout(400);
 
       // The DurationTag renders its own `.tag` root nested inside the footer's wrapper `.tag`. Disambiguate
       // it from other tags by the bold `.label` reading the localized 'Duration' string. Its remaining count
@@ -90,7 +88,6 @@ test.describe('character sheet effect row reactivity', () => {
             },
          });
       }, ACTOR_NAME);
-      await page.waitForTimeout(400);
 
       // The rendered footer must reflect the NEW remaining value in place.
       await expect(durationRemaining, 'duration remaining updated to 7 in place').toHaveText('7');
@@ -107,7 +104,6 @@ test.describe('character sheet effect row reactivity', () => {
             },
          });
       }, ACTOR_NAME);
-      await page.waitForTimeout(400);
 
       // The footer must reflect the new remaining and the Expired tag in place.
       await expect(durationRemaining, 'duration remaining updated to 0 in place').toHaveText('0');
@@ -130,25 +126,30 @@ test.describe('character sheet effect row reactivity', () => {
          const actor = game.actors.getName(actorName);
          await actor.effects.contents[0].update({ system: { duration: { remaining: 5 } } });
       }, ACTOR_NAME);
-      await page.waitForTimeout(400);
       await expect(remainingInput, 'remaining input updated to 5 in place').toHaveValue('5');
 
       // TYPING COMMIT (regression lock): type a new value; it must persist to the document.
       await remainingInput.fill('8');
       await remainingInput.dispatchEvent('keyup', { key: 'End' });
-      await page.waitForTimeout(400);
-      const typed = await page.evaluate((actorName) => {
-         return game.actors.getName(actorName).effects.contents[0].system.duration.remaining;
-      }, ACTOR_NAME);
-      expect(typed, 'typed remaining persisted to the document').toBe(8);
+      await expect
+         .poll(
+            () => page.evaluate((actorName) => {
+               return game.actors.getName(actorName).effects.contents[0].system.duration.remaining;
+            }, ACTOR_NAME),
+            { message: 'typed remaining persisted to the document' },
+         )
+         .toBe(8);
 
       // INCREMENT COMMIT (latent-bug regression): clicking + must persist the incremented value.
       await row.locator('.increment button').first().click();
-      await page.waitForTimeout(400);
-      const incremented = await page.evaluate((actorName) => {
-         return game.actors.getName(actorName).effects.contents[0].system.duration.remaining;
-      }, ACTOR_NAME);
-      expect(incremented, 'increment button persisted to the document').toBe(9);
+      await expect
+         .poll(
+            () => page.evaluate((actorName) => {
+               return game.actors.getName(actorName).effects.contents[0].system.duration.remaining;
+            }, ACTOR_NAME),
+            { message: 'increment button persisted to the document' },
+         )
+         .toBe(9);
    });
 
    test('duration initiative input reflects an external in-place update and persists edits', async ({
@@ -162,7 +163,6 @@ test.describe('character sheet effect row reactivity', () => {
             system: { duration: { type: 'initiative', initiative: 3 } },
          });
       }, ACTOR_NAME);
-      await page.waitForTimeout(400);
 
       // With an 'initiative' duration the initiative input renders FIRST (remaining is second).
       const row = page.locator('[data-effect-id]').first();
@@ -176,17 +176,19 @@ test.describe('character sheet effect row reactivity', () => {
          const actor = game.actors.getName(actorName);
          await actor.effects.contents[0].update({ system: { duration: { initiative: 6 } } });
       }, ACTOR_NAME);
-      await page.waitForTimeout(400);
       await expect(initiativeInput, 'initiative input updated to 6 in place').toHaveValue('6');
 
       // TYPING COMMIT: type a new value; it must persist.
       await initiativeInput.fill('2');
       await initiativeInput.dispatchEvent('keyup', { key: 'End' });
-      await page.waitForTimeout(400);
-      const typed = await page.evaluate((actorName) => {
-         return game.actors.getName(actorName).effects.contents[0].system.duration.initiative;
-      }, ACTOR_NAME);
-      expect(typed, 'typed initiative persisted to the document').toBe(2);
+      await expect
+         .poll(
+            () => page.evaluate((actorName) => {
+               return game.actors.getName(actorName).effects.contents[0].system.duration.initiative;
+            }, ACTOR_NAME),
+            { message: 'typed initiative persisted to the document' },
+         )
+         .toBe(2);
       // No increment-commit assertion here: the initiative field uses a plain IntegerInput (no +/- buttons).
    });
 });

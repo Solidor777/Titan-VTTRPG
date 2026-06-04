@@ -64,14 +64,12 @@ async function seedActorWithItem(page, actorName, itemType) {
 async function expectInventoryRowReactive(page, actorName) {
    // Activate the Inventory tab and let it settle.
    await page.getByText('Inventory', { exact: true }).first().click();
-   await page.waitForTimeout(400);
 
    // The first inventory row.
    const row = page.locator('[data-item-id]').first();
 
    // Expand the row in place (the expand button is the first button in the header label area).
    await row.locator('.header .label .button button').first().click();
-   await page.waitForTimeout(400);
 
    // The expandable footer's tag container, plus the two drivable display reads we assert on:
    // the RarityTag root (class carries the rarity key) and the value StatTag.
@@ -93,7 +91,6 @@ async function expectInventoryRowReactive(page, actorName) {
          },
       });
    }, actorName);
-   await page.waitForTimeout(400);
 
    // The rendered footer must reflect the NEW values in place.
    await expect(rarityRare, 'rarity tag updated to rare in place').toHaveCount(1);
@@ -138,7 +135,6 @@ test.describe('character sheet inventory row reactivity', () => {
 
       // Activate the Inventory tab and locate the commodity row's quantity input.
       await page.getByText('Inventory', { exact: true }).first().click();
-      await page.waitForTimeout(400);
       const row = page.locator('[data-item-id]').first();
       const quantityInput = row.locator('input[type="number"]').first();
 
@@ -150,24 +146,29 @@ test.describe('character sheet inventory row reactivity', () => {
          const actor = game.actors.getName(actorName);
          await actor.items.contents[0].update({ system: { quantity: 5 } });
       }, ACTOR);
-      await page.waitForTimeout(400);
       await expect(quantityInput, 'quantity input updated to 5 in place').toHaveValue('5');
 
       // TYPING COMMIT (regression lock).
       await quantityInput.fill('8');
       await quantityInput.dispatchEvent('keyup', { key: 'End' });
-      await page.waitForTimeout(400);
-      let qty = await page.evaluate((actorName) => {
-         return game.actors.getName(actorName).items.contents[0].system.quantity;
-      }, ACTOR);
-      expect(qty, 'typed quantity persisted to the document').toBe(8);
+      await expect
+         .poll(
+            () => page.evaluate((actorName) => {
+               return game.actors.getName(actorName).items.contents[0].system.quantity;
+            }, ACTOR),
+            { message: 'typed quantity persisted to the document' },
+         )
+         .toBe(8);
 
       // INCREMENT COMMIT (latent-bug regression).
       await row.locator('.increment button').first().click();
-      await page.waitForTimeout(400);
-      qty = await page.evaluate((actorName) => {
-         return game.actors.getName(actorName).items.contents[0].system.quantity;
-      }, ACTOR);
-      expect(qty, 'increment button persisted quantity').toBe(9);
+      await expect
+         .poll(
+            () => page.evaluate((actorName) => {
+               return game.actors.getName(actorName).items.contents[0].system.quantity;
+            }, ACTOR),
+            { message: 'increment button persisted quantity' },
+         )
+         .toBe(9);
    });
 });
