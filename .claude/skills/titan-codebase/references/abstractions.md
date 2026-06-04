@@ -54,23 +54,34 @@ management). Data model classes hold the schema, field validation, and derived-d
   `sendToChat` (sends that `type` + `system` as a first-class chat-message subtype, NOT `flags.titan`),
   custom-trait management, and the `isMarkedForDeletion` guard flag.
 - `TitanItemDataModel` (`src/document/types/item/TitanItemDataModel.js`) extends `TitanDataModel`.
-  Adds `description`, a `check` array (item check templates), and a `customTrait` array. Its
-  `getRollData()` override returns `description`, `check`, and `customTrait` on top of the base
-  document-level keys; because the chat snapshot is sourced from `getRollData()` (via
-  `buildChatMessageData`), any system field a chat card reads MUST be returned here or it falls back
-  to the schema initial and the card hides it.
-- **Shared item-system shape templates** (plain-data, framework-agnostic, reusable by both the chat
-  data models and a future item-DataModel refactor): `createItemSystemTemplate()`
-  (`src/document/types/item/ItemSystemTemplate.js`) is the DRY base fragment (description, one
-  representative check, one representative custom trait); `createRulesElementTemplate()`
+  Adds `description`, a `check` array (item check templates), and a `customTrait` array — its
+  `_defineDocumentSchema()` is built from the shared shape template
+  (`{ ...super._defineDocumentSchema(), ...buildSchemaFromShape(createItemSystemTemplate()) }`;
+  `documentVersion` still comes only from `super`). Its `getRollData()` override returns
+  `description`, `check`, and `customTrait` on top of the base document-level keys; because the chat
+  snapshot is sourced from `getRollData()` (via `buildChatMessageData`), any system field a chat card
+  reads MUST be returned here or it falls back to the schema initial and the card hides it.
+- **Shared item-system shape templates** (plain-data, framework-agnostic, the single source of truth
+  for BOTH the item DataModel schemas AND the chat-card schemas — the item DataModels and their chat
+  DMs each build their schema from these via `buildSchemaFromShape`, so the two cannot drift):
+  `createItemSystemTemplate()`
+  (`src/document/types/item/ItemSystemTemplate.js`) is the DRY base fragment (description, plus
+  `check`/`customTrait` as empty dynamic arrays → `ArrayField(ObjectField)`); `createRulesElementTemplate()`
   (`src/document/types/item/rules-element/RulesElementTemplate.js`) is the rules-element fragment
   (empty array → `ArrayField(ObjectField)`). Each type has `create<Type>SystemTemplate()`
   (`.../types/<type>/<Type>SystemTemplate.js`) that spreads those fragments and adds its
-  type-specific fields, faithfully mirroring the corresponding `<Type>DataModel` schema.
+  type-specific fields, faithfully mirroring the corresponding `<Type>DataModel` schema (an array
+  literal supplies the field's default contents — empty for dynamic lists, e.g. spell `aspect`/
+  `customAspect`; one seeded element for weapon `attack`; `spell`/`ability` `xpCost` defaults from the
+  world setting via `defaultXpCost*()`).
 - `RulesElementItemDataModel` (`src/document/types/item/RulesElementItemDataModel.js`) extends
-  `TitanItemDataModel`. Adds a `rulesElement` array; exposes `addRulesElement` and
-  `deleteRulesElement`. Item types that carry rules elements extend this class.
-- Concrete item data models and which base they extend:
+  `RulesElementMixin(TitanItemDataModel)`. The mixin adds a `rulesElement` array via the shared shape
+  template (`{ ...super._defineDocumentSchema(), ...buildSchemaFromShape(createRulesElementTemplate()) }`)
+  and exposes `addRulesElement` / `deleteRulesElement`. Item types that carry rules elements extend
+  this class.
+- Concrete item data models and which base they extend (each `_defineDocumentSchema()` is now
+  `{ ...super._defineDocumentSchema(), ...buildSchemaFromShape(create<Type>SystemTemplate()) }` —
+  no hand-written fields):
   - `AbilityDataModel` — `RulesElementItemDataModel` (adds xpCost, rarity)
   - `ArmorDataModel` — `RulesElementItemDataModel` (adds rarity, value, armor value schema, traits)
   - `EquipmentDataModel` — `RulesElementItemDataModel` (adds rarity, value, equipped state)
