@@ -22,8 +22,15 @@ the assumed-approved decisions this plan executes).
 
 ## ⚠ Status & the restart gate (read before starting)
 
-- **DECISIONS ASSUMED:** D1 = typed flat schema; D2 = fix the dead reads (flatten to `system.X`). If the
-  user chose otherwise, revise before executing.
+- **DESIGN UPDATED (2026-06-04, user decision = PATH PARITY).** Supersedes the "typed-flat + flatten"
+  assumption below. See the spec's "RESOLVED DESIGN". In short: **`message.system` mirrors `item.system`**
+  (the chat subtype schema mirrors the item data model's system schema + `name`/`img` metadata; the
+  producer snapshots `item.system` into `message.system`), and **every component read becomes
+  `document.data.system.X`** (= the item's `system.X` path) — both the current top-level `flags.titan.X`
+  reads and the dead `flags.titan.system.X` reads converge there. This enables item-sheet/chat-card
+  component reuse (#12 north-star). Task details below are reframed by this: Task 1 schema = mirror item
+  system; Task 2 producer = snapshot `item.system`; Task 3 sweep = ALL item reads → `document.data.system.X`.
+- **DECISIONS (resolved):** path parity (above). The original D1/D2 framing in the spec is moot.
 - **Land on a branch** `feat/chat-message-subtypes-phase2-items`. **Do NOT merge to main** until the
   user has restarted Foundry and the post-restart e2e (Task 7) passes.
 - **Agent-verifiable now (no restart):** unit tests (datamodels + producer builder), component-probe e2e

@@ -1,9 +1,31 @@
 # Chat Message Subtypes — Phase 2 (Item Cards)
 
 - **Date:** 2026-06-04
-- **Status:** **DRAFT — awaiting user approval.** Two open decisions (D1, D2) need a yes/no; the
-  implementation + final verification are **Foundry-restart-gated** (see "Verification & the restart
-  gate"). Authored autonomously overnight after e2e Phase 2 shipped; not yet implemented.
+- **Status:** **APPROVED (2026-06-04) — path-parity design.** User decision resolves D1 + D2: the chat
+  message's `system` is a faithful snapshot of the source item's `system` data, so cards read
+  `document.data.system.X` exactly as the item sheet reads `item.system.X` (TODO #12 north-star; enables
+  component reuse). This SUPERSEDES the original "typed-flat with dead-read flatten" framing in the "Open
+  decisions" section below — that section is kept for history. Final self-render verification remains
+  **Foundry-restart-gated** (`documentTypes` register at world load; the user restarts for the e2e step).
+
+## RESOLVED DESIGN (authoritative — 2026-06-04 user decision)
+
+- **`message.system` mirrors `item.system`.** Each item chat subtype's schema mirrors the corresponding
+  item data model's system schema (typed, via the shared `create*Field` helpers / by reusing the item
+  system schema definition), plus the minimal label metadata the card needs that is NOT in `item.system`
+  (`name`, `img` — `id`/`type` come from the message document itself). The producer snapshots the item's
+  system data into `message.system` at send time (historical snapshot; the source item is NOT resolved
+  live — a card must not mutate when the item is later edited/deleted, per #12).
+- **All component reads converge to `document.data.system.X`** (= the item's `system.X` path). Both the
+  current top-level `flags.titan.X` reads AND the dead `flags.titan.system.X` reads become
+  `document.data.system.X`. This is the path-parity goal: the same Svelte components can be reused across
+  the item sheet and the chat card.
+- **Snapshot source:** snapshot the data that reproduces what the card shows today (prepared/derived
+  values where the card currently displays them); confirm field-by-field via the post-restart e2e. Use
+  `item.system.toObject()` for source-faithful fields and capture derived ones the components rely on.
+  (The implementer resolves the exact source per field against the runtime capture; the invariant is
+  `document.data.system.X` renders the same value the card shows today.)
+- **D1/D2 below are now MOOT** (superseded by this path-parity decision) — retained only for context.
 - **Parent:** `docs/superpowers/specs/2026-06-03-chat-message-subtypes-phase1-design.md` (Phase 1 =
   checks, SHIPPED). This is Phase 2 of that roadmap ("Item cards — `ItemChatMessageDataModel` + 7
   leaves; migrate the item-to-chat producer; sweep item chat components").
