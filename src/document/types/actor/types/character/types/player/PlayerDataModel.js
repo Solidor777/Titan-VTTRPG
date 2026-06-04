@@ -1,6 +1,6 @@
 import CharacterDataModel from '~/document/types/actor/types/character/CharacterDataModel.js';
 import createSchemaField from '~/helpers/utility-functions/CreateSchemaField.js';
-import createNumberField from '~/helpers/utility-functions/CreateNumberField.js';
+import createIntegerField from '~/helpers/utility-functions/CreateIntegerField.js';
 import createBooleanField from '~/helpers/utility-functions/CreateBooleanField.js';
 import assert from '~/helpers/utility-functions/Assert.js';
 
@@ -31,7 +31,7 @@ export default class PlayerDataModel extends CharacterDataModel {
    static _defineDocumentSchema() {
       const schema = super._defineDocumentSchema();
       schema.xp = createSchemaField({
-         earned: createNumberField(),
+         earned: createIntegerField(),
       });
       schema.inspiration = createBooleanField(false);
 

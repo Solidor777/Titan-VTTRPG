@@ -113,31 +113,19 @@ describe('buildSchemaFromShape — flat primitives', () => {
       expect(schema.equipped.options.initial).toBe(true);
    });
 
-   it('maps a whole-number value to an integer-enforced number field', () => {
-      /** @type {object} The schema built from a shape whose number value is a whole number. */
+   it('maps a number value to an integer-enforced number field', () => {
+      /** @type {object} The schema built from a shape whose value is a number. */
       const schema = buildSchemaFromShape({
          value: 250,
       });
 
-      // A whole-number value dispatches to createIntegerField, producing a NumberField with integer
-      // enforcement (integer: true) seeded with the representative value.
+      // Every number value dispatches to createIntegerField, producing a NumberField with integer
+      // enforcement (integer: true) seeded with the representative value. The system has no non-integer
+      // schema fields built by this helper, so integer is assumed for all numbers.
       expect(schema.value).toBeInstanceOf(MockNumberField);
       expect(schema.value.options.integer).toBe(true);
       expect(schema.value.options.initial).toBe(250);
       expect(schema.value.options.nullable).toBe(false);
-   });
-
-   it('maps a fractional number value to a plain (non-integer) number field', () => {
-      /** @type {object} The schema built from a shape whose number value is fractional. */
-      const schema = buildSchemaFromShape({
-         multiplier: 0.5,
-      });
-
-      // A fractional value dispatches to createNumberField, which does not set integer enforcement,
-      // so decimals are permitted and the field's initial is the representative fractional value.
-      expect(schema.multiplier).toBeInstanceOf(MockNumberField);
-      expect(schema.multiplier.options.integer).toBeUndefined();
-      expect(schema.multiplier.options.initial).toBe(0.5);
    });
 });
 
@@ -271,10 +259,11 @@ describe('buildSchemaFromShape — combined shape', () => {
       ]);
       expect(schema.name).toBeInstanceOf(MockStringField);
       expect(schema.value).toBeInstanceOf(MockNumberField);
-      // The whole-number value is integer-enforced, while the fractional value is a plain number field.
+      // Every number value is integer-enforced, so both the whole-number and the fractional shape values
+      // produce a NumberField with integer: true.
       expect(schema.value.options.integer).toBe(true);
       expect(schema.multiplier).toBeInstanceOf(MockNumberField);
-      expect(schema.multiplier.options.integer).toBeUndefined();
+      expect(schema.multiplier.options.integer).toBe(true);
       expect(schema.equipped).toBeInstanceOf(MockBooleanField);
       expect(schema.armor).toBeInstanceOf(MockSchemaField);
       expect(schema.attack).toBeInstanceOf(MockArrayField);

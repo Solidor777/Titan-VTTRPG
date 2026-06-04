@@ -1,7 +1,6 @@
 import createArrayField from '~/helpers/utility-functions/CreateArrayField.js';
 import createBooleanField from '~/helpers/utility-functions/CreateBooleanField.js';
 import createIntegerField from '~/helpers/utility-functions/CreateIntegerField.js';
-import createNumberField from '~/helpers/utility-functions/CreateNumberField.js';
 import createObjectField from '~/helpers/utility-functions/CreateObjectField.js';
 import createSchemaField from '~/helpers/utility-functions/CreateSchemaField.js';
 import createStringField from '~/helpers/utility-functions/CreateStringField.js';
@@ -12,10 +11,11 @@ import createStringField from '~/helpers/utility-functions/CreateStringField.js'
  *
  * Mapping (by value type):
  * - `string` -> `createStringField(value)` (the representative value seeds the field's initial).
- * - `number` -> `createIntegerField(value)` when the representative value is a whole number
- *   (`Number.isInteger(value)`), otherwise `createNumberField(value)`. Whole-number template values
- *   therefore produce an integer-enforced field (matching the hand-written item schemas, which use
- *   `createIntegerField` for all numeric fields), while fractional values produce a plain number field.
+ * - `number` -> `createIntegerField(value)`. ALL numeric template values produce an integer-enforced
+ *   field (matching the hand-written item schemas, which use `createIntegerField` for every numeric
+ *   field). The float case is omitted by design: the system has no non-integer schema fields except the
+ *   base `documentVersion`, which is defined directly in `TitanDataModel` (not via this helper), so this
+ *   helper assumes integer for all numbers. If a genuine float field is ever templated, revisit this.
  * - `boolean` -> `createBooleanField(value)`.
  * - `Array` -> `createArrayField(<element field>)`, where the element field is derived by recursing on
  *   the first element (`value[0]`). An EMPTY array has no representative element, so it falls back to an
@@ -57,9 +57,11 @@ function buildFieldFromValue(value) {
          return createStringField(value);
       }
       case 'number': {
-         // Whole-number template values map to an integer-enforced field (mirroring the hand-written
-         // item schemas); fractional values keep the plain number field that permits decimals.
-         return Number.isInteger(value) ? createIntegerField(value) : createNumberField(value);
+         // All numeric template values map to an integer-enforced field (mirroring the hand-written item
+         // schemas). The system has no non-integer schema fields except the base `documentVersion`, which
+         // is defined directly in `TitanDataModel` (not via this helper), so the float case is omitted by
+         // design; if a genuine float field is ever templated, this assumption must be revisited.
+         return createIntegerField(value);
       }
       case 'boolean': {
          return createBooleanField(value);
@@ -79,9 +81,10 @@ function buildFieldFromValue(value) {
  *
  * Each own enumerable property of `shape` is mapped to a field by the runtime type of its value:
  * `string`/`number`/`boolean` become the matching typed field (seeded with the representative value),
- * where a `number` becomes an integer-enforced field when its value is whole (`Number.isInteger`) and a
- * plain number field otherwise, arrays become an `ArrayField` whose element schema is derived from a
- * representative element (empty
+ * where a `number` always becomes an integer-enforced field (the system has no non-integer schema
+ * fields except the base `documentVersion`, defined directly in `TitanDataModel` rather than via this
+ * helper, so integer is assumed for all numbers), arrays become an `ArrayField` whose element schema is
+ * derived from a representative element (empty
  * arrays fall back to an object element field), and plain objects become a `SchemaField` built by
  * recursing into the object. `null` / `undefined` values become a nullable object field. The result
  * deeply mirrors the shape's nesting so the resulting schema's READ PATHS match the shape's paths
