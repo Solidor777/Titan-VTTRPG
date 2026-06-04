@@ -174,8 +174,33 @@ stored chat-message data.
 **Document**
 
 - `TitanChatMessage` (`src/document/types/chat-message/ChatMessage.js`) extends Foundry's
-  `ChatMessage`. A thin subclass; system data is stored in `flags.titan` and read by Svelte
-  components.
+  `ChatMessage`. Overrides `renderHTML(options)`: when `this.system instanceof TitanChatMessageDataModel`,
+  calls `super.renderHTML(options)` for the standard card chrome, applies TITAN styling classes, tears down
+  any prior mount via `_teardownComponent()`, then mounts `ChatMessageContent.svelte` into the
+  `.message-content` div, storing the handle and bridge on `_svelteComponent = { handle, bridge }`.
+  Non-subtyped messages return the chrome unchanged. `_teardownComponent()` is a shared cleanup method
+  called both on re-render (within `renderHTML`) and on delete (from `OnPreDeleteChatMessage`).
+
+**Chat message data models** (Phase 1 — not yet registered)
+
+A `TitanDataModel` hierarchy for first-class chat message subtypes is being built in parallel with
+the existing `flags.titan` approach. Registration and activation happen in a later phase.
+
+- `TitanChatMessageDataModel` (`src/document/types/chat-message/ChatMessageDataModel.js`) extends
+  `TitanDataModel`. Universal base for all TITAN chat message type data models; declares the
+  abstract `get component()` getter that concrete subtypes must override to return the Svelte
+  component class used to render the message content.
+- `CheckChatMessageDataModel` (`src/check/chat-message/CheckChatMessageDataModel.js`) extends
+  `TitanChatMessageDataModel`. Shared schema for all check chat message subtypes: adds `parameters`
+  (ObjectField), `results` (ObjectField), `failuresReRolled` (BooleanField, default `false`), and
+  `message` (ArrayField of StringField).
+- Five leaf models, each colocated with its Svelte component under
+  `src/check/types/<name>/chat-message/`, each implementing `get component()`:
+  - `AttributeCheckChatMessageDataModel` → `AttributeCheckChatMessage.svelte`
+  - `ResistanceCheckChatMessageDataModel` → `ResistanceCheckChatMessage.svelte`
+  - `AttackCheckChatMessageDataModel` → `AttackCheckChatMessage.svelte`
+  - `CastingCheckChatMessageDataModel` → `CastingCheckChatMessage.svelte`
+  - `ItemCheckChatMessageDataModel` → `ItemCheckChatMessage.svelte`
 
 **Svelte shell**
 

@@ -50,25 +50,51 @@ type-specific override, e.g. `calculateAttributeCheckResults` via `AttributeChec
 The resulting `CheckResults` object is stored on `check.results`.
 
 **5. Chat message creation — `TitanCheck.sendToChat`**
-Builds a `messageData` object containing `{ type, parameters, results, failuresReRolled, message }` and
-calls `ChatMessage.create({ flags: { titan: messageData }, ... })`. All check data travels in
-`flags.titan`.
+Creates the message as a typed check subtype: a top-level `type` (`this._getCheckType()`, one of
+`attributeCheck`/`resistanceCheck`/`attackCheck`/`castingCheck`/`itemCheck`) plus a `system` payload
+`{ parameters, results, failuresReRolled, message }` (no `type` field inside `system`). All check data
+travels in `message.system` (a `CheckChatMessageDataModel` subclass), NOT `flags.titan`.
 
-**6. Chat render — `onRenderChatMessageHTML` hook (src/hooks/OnRenderChatMessageHTML.js)**
-Foundry fires `renderChatMessageHTML` (v13+) after inserting the message HTML. The hook checks
+**6. Chat render — dual-path (subtype self-render vs. legacy hook)**
+
+*Subtype path (checks):*
+`TitanChatMessage#renderHTML` (src/document/types/chat-message/ChatMessage.js) overrides Foundry's base to
+detect `this.system instanceof TitanChatMessageDataModel`. When true it adds the `titan`/`owner`/dark-mode
+classes to the full `<li>` chrome returned by `super.renderHTML(options)`, calls `_teardownComponent()` to
+unmount any prior mount (the chat log replaces the `<li>` on every update), then mounts `ChatMessageContent`
+(src/document/types/chat-message/ChatMessageContent.svelte) into the `.message-content` div. The bridge and
+handle are stored on `message._svelteComponent = { handle, bridge }`. `_teardownComponent()` is also called
+directly by `OnPreDeleteChatMessage.js` (src/hooks/OnPreDeleteChatMessage.js) for delete-time cleanup.
+
+*Legacy path (flags.titan messages — reports, item cards, effect cards):*
+Foundry fires `renderChatMessageHTML` after inserting the message HTML. `onRenderChatMessageHTML`
+(src/hooks/OnRenderChatMessageHTML.js) early-returns for any message whose `system instanceof
+TitanChatMessageDataModel` (this guard now catches every check, so checks never reach the legacy hook).
+As a second safety layer, check type strings (`attributeCheck`, `skillCheck`, `resistanceCheck`,
+`attackCheck`, `castingCheck`, `itemCheck`) are also absent from the frozen `TITAN_CHAT_MESSAGE_TYPES`
+set — legacy `flags.titan` check messages (pre-subtype) are intentionally deprecated and render blank
+rather than being routed to the now-`system`-reading check components.
+For remaining messages it checks
 `message.flags.titan.type` against the frozen `TITAN_CHAT_MESSAGE_TYPES` set; if it matches, it builds a
 `new ReactiveDocument(message)` bridge and mounts `ChatMessageShell.svelte`
 (src/document/types/chat-message/ChatMessageShell.svelte) into the `.message-content` element via Svelte 5
 `mount()`, passing the bridge as the `documentStore` prop (a name retained from the old API — it is the
 `ReactiveDocument` bridge, not a Svelte store). The mount handle and bridge are stored on
-`message._svelteComponent = { handle, bridge }` for teardown in `OnPreDeleteChatMessage.js`. The shell sets
-the bridge into context as `'document'` and `selectComponent()` looks up the correct component for the type
-(e.g. `AttributeCheckChatMessage`), which is then rendered via `{@const}` (not `<svelte:component>`).
+`message._svelteComponent = { handle, bridge }` for teardown. The shell sets the bridge into context as
+`'document'` and `selectComponent()` looks up the correct component for the type (e.g.
+`AttributeCheckChatMessage`), which is then rendered via `{@const}` (not `<svelte:component>`).
+`OnPreDeleteChatMessage` calls `message._teardownComponent()` uniformly; `TitanChatMessage#_teardownComponent`
+handles both old and new mounts since both store their handle on `_svelteComponent`.
 
 **7. Check chat component — e.g. `AttributeCheckChatMessage.svelte`**
 (src/check/types/attribute-check/chat-message/AttributeCheckChatMessage.svelte)
-Reads `document.data.flags.titan.results` and `document.data.flags.titan.parameters` from the `document`
-context bridge. Composes the
+`ChatMessageContent.selectComponent()` returns the leaf data model's `component` getter (e.g.
+`AttributeCheckChatMessage`). Check components read `document.data.system.results` /
+`document.data.system.parameters` from the `document` context bridge and write back via
+`document.data.update({ system: { … } })`. The `message` array is guarded on `.length` (schema default
+`[]`). Recalc call sites (`CheckChatMessageDie`, `CheckChatResetExpertiseButton`, and the re-roll/double
+context menu in `OnGetChatLogEntryContext.js`) pass `recalculateCheckResults` an object built with
+`{ type: <message.type>, parameters, results }`, because `system` carries no `type` field. Composes the
 header, dice display (`CheckChatMessageDice.svelte`), results (`CheckChatResults.svelte`), and — when
 relevant — action buttons.
 
