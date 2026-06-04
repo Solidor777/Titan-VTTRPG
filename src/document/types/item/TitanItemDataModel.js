@@ -78,6 +78,7 @@ export default class TitanItemDataModel extends TitanDataModel {
       const retVal = super.getRollData();
       retVal.check = structuredClone(this.check);
       retVal.customTrait = structuredClone(this.customTrait);
+      retVal.description = this.description;
 
       return retVal;
    }

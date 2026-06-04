@@ -12,7 +12,7 @@
 
    /**
     * @typedef {object} ItemChatMessageItemChecksProps
-    * @property {object} [item] - The titan flags data for the item.
+    * @property {object} [item] - The chat-message system snapshot (`document.data.system`) for the item.
     */
 
    /** @type {ItemChatMessageItemChecksProps} */

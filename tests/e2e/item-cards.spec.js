@@ -50,15 +50,26 @@ test.describe('item chat-message subtype cards', () => {
          // A name unique to this test run so the card's name read is unambiguous within the chat log.
          const itemName = `E2E ${type} card ${Date.now()}`;
 
+         // A description unique to this test run, used to prove the snapshot carries `system.description`
+         // (regression for the missing-description bug) and that the card renders it.
+         const itemDescription = `E2E desc ${type} ${Date.now()}`;
+
          // Create the temp item, post it to chat, and report the new message's id and subtype. The temp
          // item is deleted here so item state does not accumulate; the posted chat message persists (the
          // file's beforeAll clearChat is the per-file reset) but is scoped by its unique data-message-id.
-         const result = await page.evaluate(async ({ type, itemName }) => {
+         const result = await page.evaluate(async ({ type, itemName, itemDescription }) => {
             // Snapshot the message count so the post can be awaited deterministically.
             const before = game.messages.size;
 
-            // Create the temp item and post its chat card.
-            const item = await Item.create({ name: itemName, type });
+            // Create the temp item with a non-empty description so the chat snapshot includes it.
+            const item = await Item.create({ name: itemName, type, system: { description: itemDescription } });
+
+            // Ensure the description took (fall back to an explicit update if creation did not set it).
+            if (item.system.description !== itemDescription) {
+               await item.update({ system: { description: itemDescription } });
+            }
+
+            // Post the item's chat card.
             const message = await item.sendToChat();
 
             // Wait for the new chat message to register before reading it back.
@@ -73,7 +84,7 @@ test.describe('item chat-message subtype cards', () => {
                messageId: message?.id,
                messageType: message?.type,
             };
-         }, { type, itemName });
+         }, { type, itemName, itemDescription });
 
          // A new message must have been created with the expected subtype.
          expect(result.after, 'message count should increase after sendToChat').toBeGreaterThan(result.before);
@@ -106,6 +117,14 @@ test.describe('item chat-message subtype cards', () => {
          await expect(
             card.getByText(itemName, { exact: false }),
             'card displays the item name',
+         ).toBeVisible();
+
+         // The snapshot description must render on the card. This is the regression guard for the
+         // missing-description bug: `getRollData()` must include `description` so the snapshot carries it
+         // and the card's description guard (`item.description && item.description !== ''`) does not hide it.
+         await expect(
+            card.getByText(itemDescription, { exact: false }),
+            'card displays the item description',
          ).toBeVisible();
 
          // No uncaught errors may have fired during the card lifecycle.
