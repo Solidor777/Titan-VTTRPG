@@ -1,5 +1,6 @@
-import { expect, test } from '@playwright/test';
+import { test, expect } from '@playwright/test';
 import { login } from './fixtures.js';
+import { closeAllApps, clearChat, attachPageErrors } from './world.js';
 
 /**
  * Reactivity anchor: a character-sheet effect row reads its display values (duration remaining,
@@ -16,10 +17,29 @@ import { login } from './fixtures.js';
 /** @type {string} - Name of the throwaway player actor seeded for this spec. */
 const ACTOR_NAME = 'E2E Reactive Effect Row Actor';
 
-test.describe('character sheet effect row reactivity', () => {
-   test.beforeEach(async ({ page }) => {
-      await login(page);
+/** @type {import('@playwright/test').Page} The file-shared, logged-in page (one world boot per file). */
+let page;
+/** @type {string[]} Uncaught page errors collected during the current test (cleared each afterEach). */
+let errors;
 
+test.beforeAll(async ({ browser }) => {
+   page = await browser.newPage();
+   errors = attachPageErrors(page);
+   await login(page);
+   await clearChat(page);
+});
+
+test.afterEach(async () => {
+   await closeAllApps(page);
+   errors.length = 0;
+});
+
+test.afterAll(async () => {
+   await page?.close();
+});
+
+test.describe('character sheet effect row reactivity', () => {
+   test.beforeEach(async () => {
       // Seed a fresh player actor with one non-permanent effect. The 'effect' data model defaults the
       // duration to type 'turnStart' with remaining 1, so a DurationTag with a numeric remaining renders.
       await page.evaluate(async (actorName) => {
@@ -52,9 +72,7 @@ test.describe('character sheet effect row reactivity', () => {
       await page.getByText('Effects', { exact: true }).first().click();
    });
 
-   test('effect footer duration + expired tags update in place after an in-place effect update', async ({
-      page,
-   }) => {
+   test('effect footer duration + expired tags update in place after an in-place effect update', async () => {
       // The effect row.
       const row = page.locator('[data-effect-id]').first();
 
@@ -110,9 +128,7 @@ test.describe('character sheet effect row reactivity', () => {
       await expect(expiredTag, 'Expired tag appears in place when expired').toHaveCount(1);
    });
 
-   test('duration remaining input reflects an external in-place update and persists edits', async ({
-      page,
-   }) => {
+   test('duration remaining input reflects an external in-place update and persists edits', async () => {
       // The effect row, and its remaining duration input (a turnStart effect renders only the remaining
       // field, so the first number input is `remaining`).
       const row = page.locator('[data-effect-id]').first();
@@ -152,9 +168,7 @@ test.describe('character sheet effect row reactivity', () => {
          .toBe(9);
    });
 
-   test('duration initiative input reflects an external in-place update and persists edits', async ({
-      page,
-   }) => {
+   test('duration initiative input reflects an external in-place update and persists edits', async () => {
       // Reconfigure the seeded effect to an 'initiative' duration so the initiative IntegerInput renders.
       // durationType is a reactive derived, so the initiative field appears in place (no remount).
       await page.evaluate(async (actorName) => {

@@ -1,5 +1,6 @@
-import { expect, test } from '@playwright/test';
+import { test, expect } from '@playwright/test';
 import { login } from './fixtures.js';
+import { closeAllApps, clearChat, attachPageErrors } from './world.js';
 
 /**
  * Reactivity anchor: a character-sheet ability row reads several display values (rarity, xpCost, etc.)
@@ -14,9 +15,29 @@ import { login } from './fixtures.js';
 /** @type {string} - Name of the throwaway player actor seeded for this spec. */
 const ACTOR_NAME = 'E2E Reactive Ability Actor';
 
+/** @type {import('@playwright/test').Page} The file-shared, logged-in page (one world boot per file). */
+let page;
+/** @type {string[]} Uncaught page errors collected during the current test (cleared each afterEach). */
+let errors;
+
+test.beforeAll(async ({ browser }) => {
+   page = await browser.newPage();
+   errors = attachPageErrors(page);
+   await login(page);
+   await clearChat(page);
+});
+
+test.afterEach(async () => {
+   await closeAllApps(page);
+   errors.length = 0;
+});
+
+test.afterAll(async () => {
+   await page?.close();
+});
+
 test.describe('character sheet ability row reactivity', () => {
-   test.beforeEach(async ({ page }) => {
-      await login(page);
+   test.beforeEach(async () => {
       await page.evaluate(async (actorName) => {
          // Remove any stale fixture from a prior run.
          const stale = game.actors.getName(actorName);
@@ -47,7 +68,7 @@ test.describe('character sheet ability row reactivity', () => {
       }, ACTOR_NAME);
    });
 
-   test('ability footer display values update in place after an in-place item update', async ({ page }) => {
+   test('ability footer display values update in place after an in-place item update', async () => {
       // Activate the Abilities tab; the row click below auto-waits for the rendered row.
       await page.getByText('Abilities', { exact: true }).first().click();
 

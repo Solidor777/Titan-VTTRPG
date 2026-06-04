@@ -1,5 +1,6 @@
-import { expect, test } from '@playwright/test';
+import { test, expect } from '@playwright/test';
 import { login } from './fixtures.js';
+import { closeAllApps, clearChat, attachPageErrors } from './world.js';
 
 /**
  * Reactivity regression for the two armor/shield Inventory-tab item rows. Each row's stat sub-component
@@ -17,6 +18,27 @@ const ARMOR_ACTOR_NAME = 'E2E Reactive Armor Actor';
 
 /** @type {string} - Name of the throwaway player actor seeded for the shield case. */
 const SHIELD_ACTOR_NAME = 'E2E Reactive Shield Actor';
+
+/** @type {import('@playwright/test').Page} The file-shared, logged-in page (one world boot per file). */
+let page;
+/** @type {string[]} Uncaught page errors collected during the current test (cleared each afterEach). */
+let errors;
+
+test.beforeAll(async ({ browser }) => {
+   page = await browser.newPage();
+   errors = attachPageErrors(page);
+   await login(page);
+   await clearChat(page);
+});
+
+test.afterEach(async () => {
+   await closeAllApps(page);
+   errors.length = 0;
+});
+
+test.afterAll(async () => {
+   await page?.close();
+});
 
 /**
  * Seeds a fresh player actor with a single item of the given type/system and renders its sheet.
@@ -72,9 +94,7 @@ async function openInventoryAndExpandFirstRow(page) {
 }
 
 test.describe('character sheet armor/shield row reactivity', () => {
-   test('armor stats update in place after an in-place item update', async ({ page }) => {
-      await login(page);
-
+   test('armor stats update in place after an in-place item update', async () => {
       // Seed armor with rarity 'common' and armor value/max equal at 1 (IconStatTag shows just '1').
       await seedActorWithItem(page, ARMOR_ACTOR_NAME, 'armor', {
          rarity: 'common',
@@ -118,9 +138,7 @@ test.describe('character sheet armor/shield row reactivity', () => {
       await expect(rarityCommon, 'rarity tag no longer common in place').toHaveCount(0);
    });
 
-   test('shield stats update in place after an in-place item update', async ({ page }) => {
-      await login(page);
-
+   test('shield stats update in place after an in-place item update', async () => {
       // Seed shield with rarity 'common' and defense 2 (IconStatTag shows '2').
       await seedActorWithItem(page, SHIELD_ACTOR_NAME, 'shield', {
          rarity: 'common',

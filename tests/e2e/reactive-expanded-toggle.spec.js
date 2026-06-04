@@ -1,5 +1,6 @@
-import { expect, test } from '@playwright/test';
+import { test, expect } from '@playwright/test';
 import { login } from './fixtures.js';
+import { closeAllApps, clearChat, attachPageErrors } from './world.js';
 
 /**
  * Regression: the character-sheet expand toggle must reveal a row's expandable content IN PLACE (no tab
@@ -12,9 +13,29 @@ import { login } from './fixtures.js';
 
 const ACTOR_NAME = 'E2E Expanded Toggle Actor';
 
+/** @type {import('@playwright/test').Page} The file-shared, logged-in page (one world boot per file). */
+let page;
+/** @type {string[]} Uncaught page errors collected during the current test (cleared each afterEach). */
+let errors;
+
+test.beforeAll(async ({ browser }) => {
+   page = await browser.newPage();
+   errors = attachPageErrors(page);
+   await login(page);
+   await clearChat(page);
+});
+
+test.afterEach(async () => {
+   await closeAllApps(page);
+   errors.length = 0;
+});
+
+test.afterAll(async () => {
+   await page?.close();
+});
+
 test.describe('character sheet expand toggle reactivity', () => {
-   test.beforeEach(async ({ page }) => {
-      await login(page);
+   test.beforeEach(async () => {
       await page.evaluate(async (actorName) => {
          const stale = game.actors.getName(actorName);
          if (stale) {
@@ -59,19 +80,19 @@ test.describe('character sheet expand toggle reactivity', () => {
       ).toHaveCount(1);
    }
 
-   test('effect rows expand in place (CharacterSheetEffectList)', async ({ page }) => {
+   test('effect rows expand in place (CharacterSheetEffectList)', async () => {
       await expectExpandInPlace(page, 'Effects', '[data-effect-id]');
    });
 
-   test('ability rows expand in place (CharacterSheetItemList)', async ({ page }) => {
+   test('ability rows expand in place (CharacterSheetItemList)', async () => {
       await expectExpandInPlace(page, 'Abilities', '[data-item-id]');
    });
 
-   test('inventory rows expand in place (CharacterSheetMultiItemList)', async ({ page }) => {
+   test('inventory rows expand in place (CharacterSheetMultiItemList)', async () => {
       await expectExpandInPlace(page, 'Inventory', '[data-item-id]');
    });
 
-   test('spell rows expand in place (CharacterSheetItemList/spells)', async ({ page }) => {
+   test('spell rows expand in place (CharacterSheetItemList/spells)', async () => {
       await expectExpandInPlace(page, 'Spells', '[data-item-id]');
    });
 });

@@ -1,5 +1,6 @@
-import { expect, test } from '@playwright/test';
+import { test, expect } from '@playwright/test';
 import { login } from './fixtures.js';
+import { closeAllApps, clearChat, attachPageErrors } from './world.js';
 
 /**
  * Reactivity regression for the two Inventory-tab item rows (commodity and equipment). Each row reads
@@ -16,6 +17,27 @@ const COMMODITY_ACTOR_NAME = 'E2E Reactive Commodity Actor';
 
 /** @type {string} - Name of the throwaway player actor seeded for the equipment case. */
 const EQUIPMENT_ACTOR_NAME = 'E2E Reactive Equipment Actor';
+
+/** @type {import('@playwright/test').Page} The file-shared, logged-in page (one world boot per file). */
+let page;
+/** @type {string[]} Uncaught page errors collected during the current test (cleared each afterEach). */
+let errors;
+
+test.beforeAll(async ({ browser }) => {
+   page = await browser.newPage();
+   errors = attachPageErrors(page);
+   await login(page);
+   await clearChat(page);
+});
+
+test.afterEach(async () => {
+   await closeAllApps(page);
+   errors.length = 0;
+});
+
+test.afterAll(async () => {
+   await page?.close();
+});
 
 /**
  * Seeds a fresh player actor with a single item of the given type and renders its sheet.
@@ -98,23 +120,18 @@ async function expectInventoryRowReactive(page, actorName) {
 }
 
 test.describe('character sheet inventory row reactivity', () => {
-   test('commodity footer display values update in place after an in-place item update', async ({ page }) => {
-      await login(page);
+   test('commodity footer display values update in place after an in-place item update', async () => {
       await seedActorWithItem(page, COMMODITY_ACTOR_NAME, 'commodity');
       await expectInventoryRowReactive(page, COMMODITY_ACTOR_NAME);
    });
 
-   test('equipment footer display values update in place after an in-place item update', async ({ page }) => {
-      await login(page);
+   test('equipment footer display values update in place after an in-place item update', async () => {
       await seedActorWithItem(page, EQUIPMENT_ACTOR_NAME, 'equipment');
       await expectInventoryRowReactive(page, EQUIPMENT_ACTOR_NAME);
    });
 
-   test('commodity quantity input reflects an external in-place update and persists edits', async ({
-      page,
-   }) => {
+   test('commodity quantity input reflects an external in-place update and persists edits', async () => {
       const ACTOR = 'E2E Reactive Commodity Quantity Actor';
-      await login(page);
 
       // Seed a commodity with a known starting quantity and render the sheet.
       await page.evaluate(async (actorName) => {
