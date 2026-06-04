@@ -42,10 +42,11 @@ test.describe('custom trait edit/delete on effects', () => {
                },
             },
          ]);
-         await effect.sheet.render(true);
-         await new Promise((resolve) => {
-            setTimeout(resolve, 500);
-         });
+         const app = await effect.sheet.render(true);
+         await titanWait(
+            () => !!app?.element?.querySelector('.sidebar'),
+            { message: 'sheet mounted' },
+         );
       }, { actorName: ACTOR_NAME, traitName: ORIGINAL_NAME });
    });
 

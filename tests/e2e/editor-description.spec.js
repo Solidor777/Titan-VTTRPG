@@ -26,10 +26,11 @@ test('item description editor mounts toggled and fills the tab', async ({ page }
    await page.evaluate(async (src) => {
       // Reconstruct the locator function from its stringified body and render the located sheet.
       const doc = new Function(`return (${src})()`)();
-      await doc.sheet.render(true);
-      await new Promise((resolve) => {
-         setTimeout(resolve, 600);
-      });
+      const app = await doc.sheet.render(true);
+      await titanWait(
+         () => !!app?.element?.querySelector('prose-mirror'),
+         { message: 'sheet mounted' },
+      );
    }, locate);
 
    // Inspect the mounted <prose-mirror> element: it must exist, be toggled (edit button present), and

@@ -48,12 +48,13 @@ test.describe('add custom trait on items', () => {
 
          // A weapon carries the shared `customTrait` array from TitanItemDataModel.
          const item = await Item.create({ name: itemName, type: 'weapon' });
-         await item.sheet.render(true);
+         const app = await item.sheet.render(true);
 
          // Allow the Svelte mount and ApplicationV2 render cycle to settle.
-         await new Promise((resolve) => {
-            setTimeout(resolve, 500);
-         });
+         await titanWait(
+            () => !!app?.element?.querySelector('.window-content')?.children.length,
+            { message: 'sheet mounted' },
+         );
       }, ITEM_NAME);
    });
 

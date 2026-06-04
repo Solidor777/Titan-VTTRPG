@@ -16,9 +16,10 @@ async function renderSheetFrame(page, locateSrc, sheetClass) {
          return null;
       }
       const app = await doc.sheet.render(true);
-      await new Promise((resolve) => {
-         setTimeout(resolve, 500);
-      });
+      await titanWait(
+         () => !!app?.element?.querySelector('.window-content')?.children.length,
+         { message: 'sheet mounted' },
+      );
       return app.id;
    }, locateSrc);
 
@@ -94,9 +95,10 @@ test.describe('always-visible Svelte header buttons', () => {
             effect = created;
          }
          const app = await effect.sheet.render(true);
-         await new Promise((resolve) => {
-            setTimeout(resolve, 500);
-         });
+         await titanWait(
+            () => !!app?.element?.querySelector('.window-content')?.children.length,
+            { message: 'sheet mounted' },
+         );
          return app.id;
       });
 

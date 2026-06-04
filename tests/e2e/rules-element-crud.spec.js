@@ -27,10 +27,11 @@ test.describe('rules-element add/delete reactivity', () => {
             await stale.delete();
          }
          const item = await Item.create({ name, type: 'weapon' });
-         await item.sheet.render(true);
-         await new Promise((resolve) => {
-            setTimeout(resolve, 500);
-         });
+         const app = await item.sheet.render(true);
+         await titanWait(
+            () => !!app?.element?.querySelector('.window-content')?.children.length,
+            { message: 'sheet mounted' },
+         );
       }, ITEM_NAME);
 
       // Activate the Rules Elements tab so its list and Add button render.
@@ -80,10 +81,11 @@ test.describe('rules-element selector default key', () => {
             await stale.delete();
          }
          const item = await Item.create({ name, type: 'weapon' });
-         await item.sheet.render(true);
-         await new Promise((resolve) => {
-            setTimeout(resolve, 500);
-         });
+         const app = await item.sheet.render(true);
+         await titanWait(
+            () => !!app?.element?.querySelector('.window-content')?.children.length,
+            { message: 'sheet mounted' },
+         );
       }, ITEM_NAME_SELECTOR);
 
       // Activate the Rules Elements tab so its list and Add button render.

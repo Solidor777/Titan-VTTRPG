@@ -24,9 +24,10 @@ async function openHeaderControls(page, locateSrc, sheetSelector) {
       const app = await doc.sheet.render(true);
 
       // Allow the Svelte mount and ApplicationV2 render cycle to settle.
-      await new Promise((resolve) => {
-         setTimeout(resolve, 500);
-      });
+      await titanWait(
+         () => !!app?.element?.querySelector('.window-content')?.children.length,
+         { message: 'sheet mounted' },
+      );
       return app.id;
    }, locateSrc);
 

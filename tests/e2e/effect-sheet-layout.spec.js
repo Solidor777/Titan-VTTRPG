@@ -29,10 +29,11 @@ test('effect AE sheet renders with a non-collapsed content body', async ({ page 
          ]);
          effect = created;
       }
-      await effect.sheet.render(true);
-      await new Promise((resolve) => {
-         setTimeout(resolve, 600);
-      });
+      const app = await effect.sheet.render(true);
+      await titanWait(
+         () => !!app?.element?.querySelector('.titan-sheet > .body'),
+         { message: 'sheet mounted' },
+      );
    });
 
    // Measure the rendered sheet's body (the tab-content region). When the height chain collapses this

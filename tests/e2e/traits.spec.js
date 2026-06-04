@@ -55,10 +55,11 @@ test.describe('custom trait edit/delete on items', () => {
                ],
             },
          });
-         await item.sheet.render(true);
-         await new Promise((resolve) => {
-            setTimeout(resolve, 500);
-         });
+         const app = await item.sheet.render(true);
+         await titanWait(
+            () => !!app?.element?.querySelector('.sidebar'),
+            { message: 'sheet mounted' },
+         );
       }, { itemName: ITEM_NAME, traitName: ORIGINAL_NAME, description: DESCRIPTION_KEY });
    });
 
