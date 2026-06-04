@@ -1,16 +1,34 @@
 /**
- * Close every open Foundry application so sheets, dialogs, HUDs, and tooltips do not leak into the next
- * test on the shared page. Closes both ApplicationV2 instances (`foundry.applications.instances`) and
- * legacy AppV1 windows (`ui.windows`); each close is individually try-caught so one failure does not
- * abort the rest of teardown.
+ * Close every open *transient* Foundry application so sheets, dialogs, HUDs, and tooltips do not leak
+ * into the next test on the shared page. Closes both ApplicationV2 instances
+ * (`foundry.applications.instances`) and legacy AppV1 windows (`ui.windows`); each close is individually
+ * try-caught so one failure does not abort the rest of teardown.
+ *
+ * Core UI singletons (the persistent layout: `Sidebar`, `ChatLog`, `Hotbar`, `Players`, directories,
+ * the `titanEffects` tray, etc.) are deliberately KEPT open. They are registered in `CONFIG.ui` and held
+ * live on the `ui` namespace; closing them tears down DOM that the sidebar tab-switch lifecycle depends
+ * on (e.g. `Sidebar.changeTab` → `ChatLog._toggleNotifications` → the `#hotbar` element), which would
+ * crash any later test that activates a sidebar tab on the shared page.
  * @param {import('@playwright/test').Page} page - The shared page to clean.
- * @returns {Promise<void>} Resolves once every open application has been asked to close.
+ * @returns {Promise<void>} Resolves once every open transient application has been asked to close.
  */
 export async function closeAllApps(page) {
    await page.evaluate(async () => {
-      // Close ApplicationV2 instances (the modern app registry).
+      // The set of persistent core UI singletons to keep, resolved from CONFIG.ui's registered slots.
+      const coreUi = new Set();
+      for (const key of Object.keys(CONFIG.ui ?? {})) {
+         const instance = globalThis.ui?.[key];
+         if (instance) {
+            coreUi.add(instance);
+         }
+      }
+
+      // Close ApplicationV2 instances (the modern app registry), skipping the core UI singletons.
       const appV2 = [...(foundry.applications.instances?.values?.() ?? [])];
       for (const app of appV2) {
+         if (coreUi.has(app)) {
+            continue;
+         }
          try {
             await app.close();
          }
