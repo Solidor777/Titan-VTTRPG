@@ -74,7 +74,8 @@ function resolveProbeComponents(value) {
 /**
  * Install the test-only component probe API on `game.titan._probe`. Mounts a registered primitive
  * into a detached container appended to `document.body`, tracks the handle, and exposes teardown.
- * This module is only imported when the bundle is built with `--mode e2e` (gated by `__TITAN_PROBE__`).
+ * This module is loaded only by the standalone probe build (`vite.probe.config.mjs`) via
+ * `src/test-probe/probeBundleEntry.js`; it is never part of a system build.
  * @returns {void}
  */
 export default function registerProbe() {

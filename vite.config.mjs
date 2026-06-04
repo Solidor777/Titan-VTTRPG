@@ -11,7 +11,7 @@ const s_PACKAGE_ID = 'systems/titan';
 const s_COMPRESS = true;  // Set to true to compress the module bundle.
 const s_SOURCEMAPS = true; // Generate sourcemaps for the bundle (recommended).
 
-export default ({ mode }) => {
+export default () => {
    /** @type {import('vite').UserConfig} */
    return {
       root: 'src/',                 // Source location / esbuild root.
@@ -32,8 +32,6 @@ export default ({ mode }) => {
 
       define: {
          'process.env.NODE_ENV': JSON.stringify('production'),
-         // Test-only probe harness gate: true only under `vite build --mode e2e`.
-         __TITAN_PROBE__: JSON.stringify(mode === 'e2e'),
       },
 
       server: {
