@@ -43,9 +43,9 @@ test.describe('rules elements — derived attribute math', () => {
          const actor = await Actor.create({ name, type: 'player' });
          await actor.createEmbeddedDocuments('Item', [abilityData]);
 
-         // Let the derived-data preparation settle, then read the derived Body value.
-         await new Promise((resolve) => {
-            setTimeout(resolve, 100);
+         // Wait until the +2 ability is owned and its boost has reached the derived Body value (base 1).
+         await titanWait(() => actor.items.size > 0 && actor.system.attribute.body.value > 1, {
+            message: 'flatModifier ability applied to derived Body',
          });
          return actor.system.attribute.body.value;
       }, { name: ACTOR_NAME, abilityData: buildFlatModifierAbilityData('E2E +2 Body', [2]) });
@@ -62,8 +62,9 @@ test.describe('rules elements — derived attribute math', () => {
          }
          const actor = await Actor.create({ name, type: 'player' });
          await actor.createEmbeddedDocuments('Item', [abilityData]);
-         await new Promise((resolve) => {
-            setTimeout(resolve, 100);
+         // Wait until the mulBase ability is owned and its boost has reached the derived Body value (base 1).
+         await titanWait(() => actor.items.size > 0 && actor.system.attribute.body.value > 1, {
+            message: 'mulBase ability applied to derived Body',
          });
          return actor.system.attribute.body.value;
       }, { name: ACTOR_NAME, abilityData: buildMulBaseAbilityData('E2E x2 Body', 2) });
@@ -80,8 +81,9 @@ test.describe('rules elements — derived attribute math', () => {
          }
          const actor = await Actor.create({ name, type: 'player' });
          await actor.createEmbeddedDocuments('Item', [abilityData]);
-         await new Promise((resolve) => {
-            setTimeout(resolve, 100);
+         // Wait until the mulBase+flat ability is owned and its boost has reached derived Body (base 1).
+         await titanWait(() => actor.items.size > 0 && actor.system.attribute.body.value > 1, {
+            message: 'mulBase plus flatModifier ability applied to derived Body',
          });
          return actor.system.attribute.body.value;
       }, { name: ACTOR_NAME, abilityData: buildMulBaseAbilityData('E2E x2 +3 Body', 2, [3]) });
@@ -115,8 +117,9 @@ test.describe('rules elements — all-key selector', () => {
          }
          const actor = await Actor.create({ name, type: 'player' });
          await actor.createEmbeddedDocuments('Item', [abilityData]);
-         await new Promise((resolve) => {
-            setTimeout(resolve, 100);
+         // Wait until the all-key ability is owned and its +2 has reached the derived Body value (base 1).
+         await titanWait(() => actor.items.size > 0 && actor.system.attribute.body.value > 1, {
+            message: 'all-key flatModifier ability applied to derived attributes',
          });
          return {
             body: actor.system.attribute.body.value,
@@ -229,8 +232,9 @@ test.describe('rules elements — mulSum (multiply total)', () => {
          }
          const actor = await Actor.create({ name, type: 'player' });
          await actor.createEmbeddedDocuments('Item', [abilityData]);
-         await new Promise((resolve) => {
-            setTimeout(resolve, 100);
+         // Wait until the mulSum ability is owned and its boost has reached the derived Body value (base 1).
+         await titanWait(() => actor.items.size > 0 && actor.system.attribute.body.value > 1, {
+            message: 'mulSum ability applied to derived Body',
          });
          return actor.system.attribute.body.value;
       }, {
@@ -252,8 +256,9 @@ test.describe('rules elements — mulSum (multiply total)', () => {
          }
          const actor = await Actor.create({ name, type: 'player' });
          await actor.createEmbeddedDocuments('Item', [abilityData]);
-         await new Promise((resolve) => {
-            setTimeout(resolve, 100);
+         // Wait until the stacked-mulSum ability is owned and its boost has reached derived Body (base 1).
+         await titanWait(() => actor.items.size > 0 && actor.system.attribute.body.value > 1, {
+            message: 'stacked mulSum ability applied to derived Body',
          });
          return actor.system.attribute.body.value;
       }, {
@@ -294,8 +299,10 @@ test.describe('rules elements — setSum (set total)', () => {
             }
             const actor = await Actor.create({ name, type: 'player' });
             await actor.createEmbeddedDocuments('Item', [abilityData]);
-            await new Promise((resolve) => {
-               setTimeout(resolve, 100);
+            // setSum totals can land at 0, so wait on the monotonic fact that the ability is owned
+            // (createEmbeddedDocuments resolves only after derived data is recomputed).
+            await titanWait(() => actor.items.size > 0, {
+               message: 'setSum ability owned and derived data recomputed',
             });
             const value = actor.system.attribute.body.value;
             await actor.delete();
@@ -325,8 +332,9 @@ test.describe('rules elements — setSum (set total)', () => {
          }
          const actor = await Actor.create({ name, type: 'player' });
          await actor.createEmbeddedDocuments('Item', [abilityData]);
-         await new Promise((resolve) => {
-            setTimeout(resolve, 100);
+         // Wait until the setSum-min ability is owned and its floor has reached derived Body (base 1).
+         await titanWait(() => actor.items.size > 0 && actor.system.attribute.body.value > 1, {
+            message: 'setSum min ability applied to derived Body',
          });
          return actor.system.attribute.body.value;
       }, {
@@ -348,8 +356,9 @@ test.describe('rules elements — setSum (set total)', () => {
          }
          const actor = await Actor.create({ name, type: 'player' });
          await actor.createEmbeddedDocuments('Item', [abilityData]);
-         await new Promise((resolve) => {
-            setTimeout(resolve, 100);
+         // Wait until the setSum-max ability is owned and its boost has reached derived Body (base 1).
+         await titanWait(() => actor.items.size > 0 && actor.system.attribute.body.value > 1, {
+            message: 'setSum max ability applied to derived Body',
          });
          return actor.system.attribute.body.value;
       }, {
@@ -390,8 +399,10 @@ test.describe('rules elements — mulBase rounding', () => {
             }
             const actor = await Actor.create({ name, type: 'player' });
             await actor.createEmbeddedDocuments('Item', [abilityData]);
-            await new Promise((resolve) => {
-               setTimeout(resolve, 100);
+            // mulBase rounding lands Body at 0 or 1, so wait on the monotonic fact that the ability is
+            // owned (createEmbeddedDocuments resolves only after derived data is recomputed).
+            await titanWait(() => actor.items.size > 0, {
+               message: 'mulBase rounding ability owned and derived data recomputed',
             });
             const value = actor.system.attribute.body.value;
             await actor.delete();

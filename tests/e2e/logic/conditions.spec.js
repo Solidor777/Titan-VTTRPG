@@ -54,8 +54,9 @@ test.describe('conditions — derived-stat mechanics', () => {
          }
          const actor = await Actor.create({ name, type: 'player' });
          await actor.createEmbeddedDocuments('Item', [abilityData]);
-         await new Promise((resolve) => {
-            setTimeout(resolve, 100);
+         // Wait until the boost ability is owned and its +4 has reached the derived Body value (base 1).
+         await titanWait(() => actor.items.size > 0 && actor.system.attribute.body.value > 1, {
+            message: 'boost ability applied to derived attributes',
          });
 
          const snapshot = () => ({
@@ -70,8 +71,10 @@ test.describe('conditions — derived-stat mechanics', () => {
 
          const baseline = snapshot();
          await actor.toggleStatusEffect(statusId, { active: true });
-         await new Promise((resolve) => {
-            setTimeout(resolve, 100);
+         // Wait until the condition is present in the actor's statuses (proves the toggle reached the
+         // recomputed derived data); inert conditions still register their status id.
+         await titanWait(() => !!actor.statuses?.has(statusId), {
+            message: `condition ${statusId} applied to actor`,
          });
          const after = snapshot();
 
