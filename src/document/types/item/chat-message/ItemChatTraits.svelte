@@ -5,12 +5,12 @@
    /** @type {object} Reference to the reactive Document store. */
    const document = getContext('document');
 
-   // Chat context reference.
-   const titanFlags = document.data.flags.titan;
+   // Chat-message system snapshot reference.
+   const system = document.data.system;
 </script>
 
 <div class="traits">
-   {#each titanFlags.system.traits as trait}
+   {#each system.trait as trait}
       <div class="trait">
          {localize(trait.name)}
          {#if typeof (trait.value) === 'number'}

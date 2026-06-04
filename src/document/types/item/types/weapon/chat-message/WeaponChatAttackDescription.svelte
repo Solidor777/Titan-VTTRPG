@@ -4,8 +4,8 @@
    /** @type {object} Reference to the reactive Document store. */
    const document = getContext('document');
 
-   // Chat context reference.
-   const titanFlags = document.data.flags.titan;
+   // Chat-message system snapshot reference.
+   const system = document.data.system;
 </script>
 
 <div class="description">Temporary Attack Notes</div>

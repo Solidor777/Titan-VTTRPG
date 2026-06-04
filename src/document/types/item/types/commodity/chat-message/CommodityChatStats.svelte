@@ -17,13 +17,13 @@
 <div class="stats">
    <!--Rarity-->
    <div class="stat">
-      <RarityTag rarity={item.system.rarity}/>
+      <RarityTag rarity={item.rarity}/>
    </div>
 
    <!--Value-->
-   {#if item.system.value}
+   {#if item.value}
       <div class="stat">
-         <ValueTag value={item.system.value}/>
+         <ValueTag value={item.value}/>
       </div>
    {/if}
 
@@ -31,12 +31,12 @@
    <div class="stat">
       <StatTag
          label={localize('quantity')}
-         value={item.system.quantity}
+         value={item.quantity}
       />
    </div>
 
    <!--Custom Traits-->
-   {#each item.system.customTrait as trait}
+   {#each item.customTrait as trait}
       <div class="stat">
          <Tag tooltip={{ text: trait.description, localize: false }}>
             {trait.name}

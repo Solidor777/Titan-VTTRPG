@@ -10,8 +10,8 @@
    /** @type {object} Reference to the reactive Document store. */
    const document = getContext('document');
 
-   /** @type {object} The titan flags data for the item. */
-   const item = document.data.flags.titan;
+   /** @type {object} The item's chat-message system snapshot. */
+   const item = document.data.system;
 </script>
 
 <ItemChatMessageShell {item}>
@@ -26,7 +26,7 @@
    </div>
 
    <!--Aspects-->
-   {#if item.system.aspect.some((aspect) => aspect.enabled) || item.customAspect.length > 0}
+   {#if item.aspect.some((aspect) => aspect.enabled) || item.customAspect.length > 0}
       <div class="section">
          <SpellChatAspects {item}/>
       </div>

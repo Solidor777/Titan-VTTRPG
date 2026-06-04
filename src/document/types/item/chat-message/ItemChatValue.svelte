@@ -7,4 +7,4 @@
    const document = getContext('document');
 </script>
 
-<StatTag label={localize('value')} value={document.data.flags.titan.system.value}/>
+<StatTag label={localize('value')} value={document.data.system.value}/>

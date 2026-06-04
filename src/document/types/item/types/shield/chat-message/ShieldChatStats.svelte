@@ -26,24 +26,24 @@
          icon={DEFENSE_ICON}
          label={localize('defense')}
          tooltip={'defense.desc'}
-         value={item.system.defense}
+         value={item.defense}
       />
    </div>
 
    <!--Rarity-->
    <div class="stat">
-      <RarityTag rarity={item.system.rarity}/>
+      <RarityTag rarity={item.rarity}/>
    </div>
 
    <!--Value-->
-   {#if item.system.value}
+   {#if item.value}
       <div class="stat">
-         <ValueTag value={item.system.value}/>
+         <ValueTag value={item.value}/>
       </div>
    {/if}
 
    <!--Traits-->
-   {#each item.system.trait as trait}
+   {#each item.trait as trait}
       <div class="stat">
          {#if typeof (trait.value) === 'number'}
             <StatTag
@@ -60,7 +60,7 @@
    {/each}
 
    <!--Custom Traits-->
-   {#each item.system.customTrait as trait}
+   {#each item.customTrait as trait}
       <div class="stat">
          <Tag tooltip={{ text: trait.description, localize: false }}>
             {trait.name}

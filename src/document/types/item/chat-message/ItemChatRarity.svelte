@@ -4,11 +4,13 @@
 
    /** @type {object} Reference to the reactive Document store. */
    const document = getContext('document');
-   const titanFlags = document.data.flags.titan;
+
+   // Chat-message system snapshot reference.
+   const system = document.data.system;
 </script>
 
-<div class="tag {titanFlags.system.rarity}">
-   {localize(titanFlags.system.rarity)}
+<div class="tag {system.rarity}">
+   {localize(system.rarity)}
 </div>
 
 <style lang="scss">

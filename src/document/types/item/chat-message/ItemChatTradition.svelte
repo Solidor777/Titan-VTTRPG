@@ -5,7 +5,9 @@
 
    /** @type {object} Reference to the reactive Document store. */
    const document = getContext('document');
-   const titanFlags = document.data.flags.titan;
+
+   // Chat-message system snapshot reference.
+   const system = document.data.system;
 </script>
 
-<StatTag label={localize('tradition')} value={titanFlags.system.tradition}/>
+<StatTag label={localize('tradition')} value={system.tradition}/>

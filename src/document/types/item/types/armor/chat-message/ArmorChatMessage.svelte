@@ -8,8 +8,8 @@
    /** @type {object} Reference to the reactive Document store. */
    const document = getContext('document');
 
-   /** @type {object} The titan flags data for the item. */
-   const item = document.data.flags.titan;
+   /** @type {object} The item's chat-message system snapshot. */
+   const item = document.data.system;
 </script>
 
 <ItemChatMessageShell {item}>
@@ -19,14 +19,14 @@
    </div>
 
    <!--Description-->
-   {#if item.system.description !== '' && item.system.description !== '<p></p>'}
+   {#if item.description !== '' && item.description !== '<p></p>'}
       <div class="section rich-text">
-         <RichText value={item.system.description}/>
+         <RichText value={item.description}/>
       </div>
    {/if}
 
    <!--Checks-->
-   {#if item.system.check.length > 0}
+   {#if item.check.length > 0}
       <div class="section">
          <ItemChatChecks {item}/>
       </div>
