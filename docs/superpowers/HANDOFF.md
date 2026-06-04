@@ -1,73 +1,62 @@
-# Session Handoff — 2026-06-04 (prepare-for-clear)
+# Session Handoff — 2026-06-04 (overnight autonomous run)
 
-Resume point after a context `/clear`. Read this, then the referenced docs.
+Read this, then the referenced docs. Two things happened this session: e2e speedup Phase 2 shipped, and
+chat-message subtypes Phase 2 (item cards) was specced + planned (not implemented — see why below).
 
-## Resume sequence (what to do next)
+## ✅ Shipped this session (merged to `main`, pushed to origin)
 
-**Implement e2e speedup Phase 2 (`docs/TODO.md` #15) — the shared-world harness + hygiene.** Brainstorm
-is DONE and the implementation design is **written + approved**:
-`docs/superpowers/specs/2026-06-04-e2e-phase2-shared-world-harness-design.md` (resolves the parent
-spec's open decisions). **Resume by:** (optionally let the user glance at that spec, then) invoke
-`superpowers:writing-plans` to create the implementation plan, then `superpowers:subagent-driven-development`
-to execute it. Route all `.js` edits through the `titan-svelte-dev` subagent; load
-`foundry-vtt` + `titan-codebase`. The suite is the regression gate for its own refactor — keep it green
-at parity, verifying each migrated file with `npx playwright test <file> --reporter=line`.
+**E2E speedup Phase 2 — shared-world harness (`docs/TODO.md` #15) — DONE** (`main` @ `99efdfad`).
+- Migrated **all 42 eligible e2e specs** to a module-scoped shared `page` (one Foundry world boot per
+  spec FILE) via inline `beforeAll(login)` + `afterEach(closeAllApps + errors reset)` + `afterAll`.
+- New `tests/e2e/world.js` (`closeAllApps`, `clearChat`, `attachPageErrors`); `renderSheet` gained an
+  optional shared-`errors` param; per-test `pageerror` listeners folded into one shared collector.
+- **Full suite: 358 passed in 15.1 min** (was ~34 min, ~56% faster) — green at parity.
+- **Closed `OPEN_BUGS.md` #1** (socket-sync A1/A2 flake) — per-file `clearChat` keeps the world lean;
+  socket-sync A1–A5 green in-run.
+- Harness bugfix (`3744bfdc`): `closeAllApps` must skip core UI singletons (`CONFIG.ui` slots).
+- Spec `specs/2026-06-04-e2e-phase2-shared-world-harness-design.md`; plan
+  `plans/2026-06-04-e2e-speedup-phase2-shared-world.md`; convention in `titan-codebase` conventions.md.
 
-### Approved Phase 2 decisions (locked — do not re-litigate)
+## ⏸ Awaiting you: chat-message subtypes Phase 2 (item cards) — SPECCED + PLANNED, NOT implemented
 
-- **Mechanism:** module-scoped `let page` + closure; tests/`beforeEach` become `async () =>` using the
-  closure `page`. **Hooks are written FULLY INLINE in each spec** (`beforeAll` boots once via `login`;
-  `afterEach` calls `closeAllApps(page)` + clears the error array; `afterAll` closes the page). New
-  `tests/e2e/world.js` exports only **stateless helpers** — `closeAllApps(page)`, `clearChat(page)`,
-  `attachPageErrors(page) → errors[]` — NOT a hook-registrar.
-- **Rollout:** migrate **all ~40 eligible specs this cycle** (every `beforeEach(login)` spec),
-  file-by-file. **Do NOT migrate** `multi-client.spec.js` / `socket-sync.spec.js` (self-managed
-  contexts). Per-spec opt-out = keep `beforeEach(login)`.
-- **Hygiene:** `afterEach` closes all apps (`foundry.applications.instances` + `ui.windows`, try-caught)
-  and resets the shared page-error collector (`errors.length = 0`). **World reset:** per-file
-  `clearChat(page)` in `beforeAll` (the chat bloat is what times out socket replication → fixes
-  `OPEN_BUGS.md` #1). Actor/item fixtures left to specs' find-or-create logic.
-- **Page-error refactor:** the per-test `page.on('pageerror')` in `renderSheet` (`fixtures.js`) and in
-  `render-smoke` / `localization` / `effect-tray` (test 1) is replaced by reading the shared `errors`
-  array (listeners would otherwise stack on the reused page). `renderSheet` gains an `errors` param.
+`main` @ `57899e01` carries the spec + plan only (docs). **The agent deliberately did NOT implement**,
+because:
+1. **Restart gate:** the new `documentTypes.ChatMessage` item keys register only at Foundry world load.
+   The agent cannot restart your launched world, so the self-render path is unverifiable overnight.
+2. **A real pre-existing bug + a design decision** were found (below) that warrant your sign-off before
+   touching shipping `src/` + the manifest.
 
-### Measurement
+### What you need to decide (both RECOMMENDED yes)
+- **D1 — typed-flat `system` schema** for the 7 item datamodels (vs. an ObjectField passthrough).
+- **D2 — fix the dead reads.** Runtime capture proved the item roll-data payload has **no `system` key**
+  (`hasSystemKey: false` for all 7 types), yet `ItemChat{Value,Rarity,Traits,Tradition}` and several
+  leaves read `flags.titan.system.X` → **broken today**. D2 repairs them by flattening to `system.X`.
+  (`ItemChatTraits` reads a nonexistent `system.traits` — needs a `trait`/`customTrait` mapping confirmed
+  by e2e, or drop the component.)
 
-Capture a before/after full-suite wall-clock (`npm run test:e2e`, ~34 min, **world-launch-gated** — the
-human must have the world launched on `:30000`). Per-file boot-once is the primary success signal; also
-confirm the socket-sync A1/A2 flake is gone.
+### Resume sequence (after you approve D1/D2)
+1. Branch `feat/chat-message-subtypes-phase2-items`. Execute the plan subagent-driven
+   (`plans/2026-06-04-chat-message-subtypes-phase2-items.md`) — route `.js`/`.svelte` via
+   `titan-svelte-dev`; load `svelte-5`/`foundry-vtt`/`foundry-svelte`/`foundry-data-models`.
+2. Agent-side verify: unit (datamodels + producer `buildChatMessageData()`), component-probe e2e (cards
+   render with flat `system` — probe rebuilds `src` fresh, no restart), `npm run build` clean.
+3. **You restart Foundry** (registers the 7 subtypes), relaunch on `:30000`.
+4. Post-restart e2e (`tests/e2e/item-cards.spec.js`) green → full suite green → merge.
+- Spec (authoritative, with captured per-leaf `getRollData()` shapes):
+  `specs/2026-06-04-chat-message-subtypes-phase2-items-design.md`.
+- The render infra (`ChatMessage.js` `renderHTML`/mount; `ChatMessageContent.svelte` →
+  `system.component`) is shared Phase-1 code, untouched by Phase 2.
 
-## Just shipped (this session, merged + pushed to `main` at `5ef9d2e9`)
-
-- **E2E speedup Phase 1b (`docs/TODO.md` #14) — DONE.** Removed **all 92 fixed sleeps** (33 `setTimeout`
-  + 59 `page.waitForTimeout`) across **19 e2e spec files**, replaced with deterministic conditions
-  (`titanWait` in-page / `expect.poll` / auto-retrying web-first assertions). No assertion changed
-  (final adversarial review APPROVED). One sanctioned bounded wait remains in
-  `permissions-auto-open.spec.js` (negative assertion; the auto-open hook is un-awaited). Patterns
-  documented in `titan-codebase` `conventions.md` ("No fixed sleeps in E2E"). Plan:
-  `docs/superpowers/plans/2026-06-04-e2e-speedup-phase1b-bespoke-sleeps.md`. Unit **92** green; each
-  touched e2e file verified green file-by-file (full-suite at-parity run not yet done).
-  **Grep proof:** `git grep -nE "setTimeout|waitForTimeout" -- tests/e2e` → only `poll.js:25` + the one
-  documented exception.
-
-## The "no fixed sleeps" conversion patterns (reuse in Phase 2 if any settle is needed)
-
-- **Delete** a sleep that precedes an auto-retrying `expect(locator).toX` / auto-waiting `.click()`/`.fill()`.
-- **`expect.poll`** before a non-retrying read (`page.evaluate`, `locator.count()/.textContent()/
-  .inputValue()/.getAttribute()/.allTextContents()`) — guard the poll body so it returns a sentinel, not throws.
-- In-page **`titanWait(syncPredicate, {message})`** (`tests/e2e/poll.js`, installed by `login()` before nav).
+### Later (unspecced)
+- Chat Phase 3 (reports ×13), Phase 4 (effect + delete legacy `OnRenderChatMessageHTML` mount +
+  `ChatMessageShell.svelte` switch). Backlog #12 (deep schema-from-shape parity) depends on these.
 
 ## Rules (CLAUDE.md Strict Rules, non-negotiable)
-
-1. No test/e2e code in shipping builds. 2. Test/e2e code → `test/build/`, self-cleaning. 3. No dynamic
-imports in shipping builds, ever. 4. No stub fixes (fix root cause). 5. No unlogged todos (→ `docs/TODO.md`);
-bugs → `docs/OPEN_BUGS.md`. 7. Project `.claude/CLAUDE.md` supersedes all others.
+1. No test/e2e code in shipping builds. 2. Test/e2e → `test/build/`, self-cleaning. 3. No dynamic imports
+in shipping, ever. 4. No stub fixes (fix root cause). 5. Todos → `docs/TODO.md`; bugs → `docs/OPEN_BUGS.md`.
+7. Project `.claude/CLAUDE.md` supersedes all. Route `.js`/`.svelte` work to `titan-svelte-dev`.
 
 ## Pointers
-- Rules: `.claude/CLAUDE.md`. Todos: `docs/TODO.md` (**#15 NEXT**; #14 closed). Bugs: `docs/OPEN_BUGS.md`
-  (#1 socket-sync flake — fixed by #15's world-reset).
-- E2E speedup design (covers #14 done + #15 next): `docs/superpowers/specs/2026-06-03-e2e-suite-speedup-design.md`.
-- E2E harness facts: `tests/e2e/fixtures.js` (`login`/`renderSheet`/`ensureDocument`),
-  `tests/e2e/poll.js` (`installPoll`/`titanWait`), `tests/e2e/multiClient.js` (self-managed — do not migrate),
-  `playwright.config.mjs` (`workers: 1`, `fullyParallel: false`). Conventions: `titan-codebase` `conventions.md`.
-- Gotcha: test **source** is `tests/` (plural); built test **artifacts** are `test/build/` (singular, gitignored).
+- Todos: `docs/TODO.md` (#15 DONE; chat subtypes section updated). Bugs: `docs/OPEN_BUGS.md` (none open).
+- e2e is **world-launch-gated** (world must run on `:30000`). Test source = `tests/` (plural); built
+  artifacts = `test/build/` (singular, gitignored). Never `git add packs/` (live-world LevelDB churn).
