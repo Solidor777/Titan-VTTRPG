@@ -1,5 +1,6 @@
 import { expect } from '@playwright/test';
 import { DEFAULT_GM } from './users.js';
+import { installPoll } from './poll.js';
 
 /**
  * Authenticate against the live Foundry v14 `/join` screen and wait for the
@@ -15,6 +16,9 @@ import { DEFAULT_GM } from './users.js';
  * @returns {Promise<void>} Resolves once `game.ready === true`.
  */
 export async function login(page, user = process.env.FOUNDRY_USER || DEFAULT_GM) {
+
+   // Install the in-page poll helper before navigating (addInitScript runs on document load).
+   await installPoll(page);
 
    // Navigate to the join screen and select the configured user.
    await page.goto('/join');
