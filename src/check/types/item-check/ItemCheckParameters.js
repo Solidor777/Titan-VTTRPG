@@ -1,12 +1,4 @@
 /**
- * Base parameters for an opposed check stored on check parameters.
- * @typedef {object} OpposedCheckBase
- * @property {boolean} enabled - Whether the opposed check is active.
- * @property {string} attribute - The Attribute to use for the opposed Check.
- * @property {string} skill - The Skill to use for the opposed Check.
- */
-
-/**
  * Data for an opposed check configuration on an item.
  * @typedef {object} OpposedCheck
  * @property {string} attribute - The Attribute to use for the Check.
