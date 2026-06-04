@@ -57,7 +57,7 @@ travels in `message.system` (a `CheckChatMessageDataModel` subclass), NOT `flags
 
 **6. Chat render — dual-path (subtype self-render vs. legacy hook)**
 
-*Subtype path (checks):*
+*Subtype path (checks + item cards):*
 `TitanChatMessage#renderHTML` (src/document/types/chat-message/ChatMessage.js) overrides Foundry's base to
 detect `this.system instanceof TitanChatMessageDataModel`. When true it adds the `titan`/`owner`/dark-mode
 classes to the full `<li>` chrome returned by `super.renderHTML(options)`, calls `_teardownComponent()` to
@@ -66,14 +66,16 @@ unmount any prior mount (the chat log replaces the `<li>` on every update), then
 handle are stored on `message._svelteComponent = { handle, bridge }`. `_teardownComponent()` is also called
 directly by `OnPreDeleteChatMessage.js` (src/hooks/OnPreDeleteChatMessage.js) for delete-time cleanup.
 
-*Legacy path (flags.titan messages — reports, item cards, effect cards):*
+*Legacy path (flags.titan messages — reports, effect cards):*
 Foundry fires `renderChatMessageHTML` after inserting the message HTML. `onRenderChatMessageHTML`
 (src/hooks/OnRenderChatMessageHTML.js) early-returns for any message whose `system instanceof
-TitanChatMessageDataModel` (this guard now catches every check, so checks never reach the legacy hook).
-As a second safety layer, check type strings (`attributeCheck`, `skillCheck`, `resistanceCheck`,
-`attackCheck`, `castingCheck`, `itemCheck`) are also absent from the frozen `TITAN_CHAT_MESSAGE_TYPES`
-set — legacy `flags.titan` check messages (pre-subtype) are intentionally deprecated and render blank
-rather than being routed to the now-`system`-reading check components.
+TitanChatMessageDataModel` (this guard now catches every check AND every item card, so they never reach
+the legacy hook). As a second safety layer, check type strings (`attributeCheck`, `skillCheck`,
+`resistanceCheck`, `attackCheck`, `castingCheck`, `itemCheck`) AND item type strings (`weapon`, `armor`,
+`spell`, `ability`, `shield`, `equipment`, `commodity`) are also absent from the frozen
+`TITAN_CHAT_MESSAGE_TYPES` set (only `effect` + the report keys remain) — legacy `flags.titan` check and
+item messages (pre-subtype) are intentionally deprecated and render blank rather than being routed to the
+now-`system`-reading components.
 For remaining messages it checks
 `message.flags.titan.type` against the frozen `TITAN_CHAT_MESSAGE_TYPES` set; if it matches, it builds a
 `new ReactiveDocument(message)` bridge and mounts `ChatMessageShell.svelte`

@@ -223,8 +223,9 @@ the existing `flags.titan` approach. Registration and activation happen in a lat
   and returns its `.svelte` from `get component()`: `weapon`, `armor`, `spell`, `ability`
   (component file `AbilityChatMesssage.svelte`, 3 s's), `shield`, `equipment`, `commodity`. Registered
   in `OnceInit.js` `CONFIG.ChatMessage.dataModels` + `system.json` `documentTypes.ChatMessage` +
-  `lang/en.json` `TYPES.ChatMessage`. NOTE: as of this branch the item chat *components* still read the
-  legacy `flags.titan` shape — the read-path sweep to `document.data.system.X` is the next phase.
+  `lang/en.json` `TYPES.ChatMessage`. The item chat *components* read the flat snapshot at
+  `document.data.system.X` (path parity with the item sheet) — they self-render via
+  `TitanChatMessage#renderHTML`. (Restart-gated: subtype registration happens at world load.)
 
 **Svelte shell**
 
