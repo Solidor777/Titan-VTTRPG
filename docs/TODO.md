@@ -357,3 +357,30 @@ the five check subtypes; later phases cover items, reports, and effect).
   clone-then-update pattern already used in `OnGetChatLogEntryContext.js`.
 - **Why deferred:** Behavior-preserving cleanup, low risk; outside Phase 1's parity scope.
 - **Found by:** Opus code-quality review of Phase 1, Task 5.
+
+### 12. Chat-message ↔ document path parity (schema-from-shape)
+
+- **What:** Bring chat messages to **path parity** with their source documents so
+  the same display/edit components are reusable across item sheets, character
+  sheets, and chat — e.g. the weapon **item** card shows attacks via
+  `document.data.system.attack[index]` (parity with the weapon item document),
+  and the attack-**check** chat message gains parity with the attack check
+  (deep `parameters` / `results` schemas instead of opaque `ObjectField`s).
+- **Mechanism:** a `buildSchemaFromShape(shape)` helper that recursively converts
+  a canonical plain-object shape into an appropriate Foundry schema (string →
+  `StringField`, number → `NumberField`, bool → `BooleanField`, array →
+  `ArrayField`, nested object → `SchemaField`). One shape feeds both the source
+  document schema and the chat-message document schema; differentiating fields
+  are added/overridden on top of the base shape.
+- **No migration:** chat cards are historical snapshots — new messages carry the
+  parity shape; historical messages are not retrofitted, and the source document
+  is *not* resolved live (a card must not mutate when the weapon is later edited
+  or deleted).
+- **North-star:** progressively move all fields on all documents onto consistent
+  `system.*` paths via the helper.
+- **Depends on / sequencing:** the in-flight chat-message-subtypes conversion
+  (`specs/2026-06-03-chat-message-subtypes-phase1-design.md` + later item/report/
+  effect phases) must finish first.
+- **Origin:** branched off the embedded-document-stores design —
+  `specs/2026-06-03-embedded-document-stores-design.md` (Follow-up work →
+  "Chat-message path parity").

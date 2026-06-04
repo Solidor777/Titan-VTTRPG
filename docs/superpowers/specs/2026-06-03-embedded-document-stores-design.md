@@ -61,6 +61,11 @@ hook multiplication) and drives the delegating design below.
 - Migrating any component to read `'sheetDocument'`. This spec only establishes
   the contract.
 - Deleting the existing `CharacterSheetWeapon*` components.
+- **Any chat-message change.** Chat-message path parity (showing attacks on the
+  weapon *item* card via `document.data.system.attack[index]`, and deep
+  check-chat schemas) is **deferred until the in-flight chat-message-subtypes
+  conversion finishes**, and is built on a schema-from-shape helper. Captured in
+  Follow-up work; no chat code lands in this spec.
 
 ## Architecture
 
@@ -253,6 +258,8 @@ together so cleanup is unambiguous.
 
 Each becomes its own spec + plan when picked up:
 
+### Sheet-side reuse
+
 - Migrate the weapon attack **display + roll** to read the attack via an embedded
   bridge while reading actor stats via `'sheetDocument'`, and/or offer inline
   attack editing on the character sheet by reusing `WeaponSheetAttackSettings`.
@@ -260,3 +267,45 @@ Each becomes its own spec + plan when picked up:
   on the character sheet.
 - Migrate commodity / effect rows off the `item._id`-lookup pattern.
 - Remove the temporary proof field once a real consumer exists.
+
+### Chat-message path parity (after the chat-message-subtypes conversion)
+
+**Sequencing:** do not start until the in-flight chat-message-subtypes
+conversion (`feat/chat-message-subtypes-phase1` and its later phases) finishes,
+so item/report/effect cards are already first-class `system`-based subtypes.
+
+**Why path parity, not a live bridge:** a chat card is a historical snapshot —
+it must not mutate when the source weapon is later edited or deleted. So chat
+parity is achieved by **data shape** (the message carries the data at the same
+`system.*` path as its source document), not by the live `EmbeddedDocument`
+re-resolution used on sheets. Same *path*, different *backing*. No data
+migration: new messages carry the parity shape; historical messages are not
+retrofitted.
+
+**Schema-from-shape helper (the unifying mechanism).** A helper —
+`buildSchemaFromShape(shape)` (name TBD) — that recursively converts a canonical
+plain-object shape into an appropriate Foundry schema: strings →
+`StringField`, numbers → `NumberField`, booleans → `BooleanField`, arrays →
+`ArrayField` over the inferred element schema, nested objects → `SchemaField`.
+One shape definition then feeds **both** the source document's schema **and** the
+chat-message document's schema. Differentiating fields are added or overridden on
+top of the shared base shape where a particular document needs them. This also
+**unlocks deep schemas for check chat messages**: instead of today's opaque
+`parameters` / `results` `ObjectField`s, the check-chat schema can adopt the same
+shape as the actual `CheckParameters` / `CheckResults`, giving fully-typed check
+chat data.
+
+**Concrete targets:**
+
+- **Weapon item card** (the "send weapon to chat" message): show the weapon's
+  attacks via `document.data.system.attack[index]` — parity with the weapon item
+  *document* — and reuse one read-only attack-row display component across the
+  weapon sheet, the character sheet, and the item card.
+- **Attack-check chat message:** parity with the **attack check** — its
+  `parameters` / `results` become deep schemas derived from the same shapes the
+  check classes use.
+
+**North-star:** progressively move **all** fields on **all** documents (and their
+chat-message counterparts) onto consistent `system.*` paths via the
+schema-from-shape helper, so display/edit components are universally reusable
+across item sheets, character sheets, and chat — no data migration required.
