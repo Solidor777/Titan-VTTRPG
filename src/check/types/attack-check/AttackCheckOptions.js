@@ -40,6 +40,7 @@ export default function createAttackCheckOptions(options) {
       attackerMelee: options.attackerMelee,
       attribute: options.attribute ?? 'default',
       cleave: options.cleave ?? false,
+      damageMod: options.damageMod ?? 0,
       diceMod: options.diceMod ?? 0,
       doubleExpertise: options.doubleExpertise ?? false,
       doubleTraining: options.doubleTraining ?? false,
