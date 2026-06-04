@@ -183,15 +183,24 @@ expertise, and computing type-specific results.
 Each check type has a companion factory function: `createAttackCheckParameters`,
 `createAttributeCheckParameters`, etc. (in `src/check/types/<name>/`), plus a corresponding
 `create<Name>CheckOptions` factory. Parameters are plain objects (`CheckParameters` typedef and
-per-type extensions). Dialogs (`AttackCheckDialog`, `AttributeCheckDialog`, etc.) collect user
-options before constructing parameters.
+per-type extensions). Each parameters factory now SPREADS a co-located, exported
+`create<Name>CheckParametersShape()` — a zero-value shape of every field (option-derived fields at
+their default, factory constants kept, e.g. attack's `complexity: 1`/`difficulty: 4`) — then overrides
+only the option/computed fields. That SAME shape feeds the typed chat-message schema via
+`buildSchemaFromShape`, so the factory output and the chat schema cannot drift (a key-parity gate is
+`tests/unit/check/check-shape-parity.test.js`). The `create<Name>CheckOptions` factories default each
+optional field with `?? <default>` (e.g. `damageMod: options.damageMod ?? 0` — a missing default there
+once produced `NaN` damage that the typed schema rejects). Dialogs (`AttackCheckDialog`,
+`AttributeCheckDialog`, etc.) collect user options before constructing parameters.
 
 **Results**
 
 The `CheckResults` typedef (`src/check/CheckResults.js`) describes the result shape;
-`calculateCheckResults` is the factory that builds it, counting successes, critical
-successes/failures, and extra successes from sorted dice and parameters. Each check type's
-`calculate<Name>CheckResults` function extends the base output. `recalculateCheckResults`
+`calculateCheckResults` is the factory that builds it (spreading a co-located, exported
+`createCheckResultsShape()` base, then computing successes, critical successes/failures, and extra
+successes from sorted dice and parameters). Each check type's `calculate<Name>CheckResults` function
+spreads its own `create<Name>CheckResultsShape()` (which composes the base shape + per-type extras)
+and extends the base output. `recalculateCheckResults`
 (`src/check/chat-message/RecalculateCheckResults.js`) re-runs the appropriate calculator from
 stored chat-message data.
 
@@ -208,21 +217,26 @@ stored chat-message data.
   Non-subtyped messages return the chrome unchanged. `_teardownComponent()` is a shared cleanup method
   called both on re-render (within `renderHTML`) and on delete (from `OnPreDeleteChatMessage`).
 
-**Chat message data models** (Phase 1 — not yet registered)
+**Chat message data models**
 
-A `TitanDataModel` hierarchy for first-class chat message subtypes is being built in parallel with
-the existing `flags.titan` approach. Registration and activation happen in a later phase.
+A `TitanDataModel` hierarchy provides first-class chat message subtypes (the five checks + the seven
+item cards are registered and active; check/item data travels in `message.system`, not `flags.titan`).
 
 - `TitanChatMessageDataModel` (`src/document/types/chat-message/ChatMessageDataModel.js`) extends
   `TitanDataModel`. Universal base for all TITAN chat message type data models; declares the
   abstract `get component()` getter that concrete subtypes must override to return the Svelte
   component class used to render the message content.
 - `CheckChatMessageDataModel` (`src/check/chat-message/CheckChatMessageDataModel.js`) extends
-  `TitanChatMessageDataModel`. Shared schema for all check chat message subtypes: adds `parameters`
-  (ObjectField), `results` (ObjectField), `failuresReRolled` (BooleanField, default `false`), and
-  `message` (ArrayField of StringField).
+  `TitanChatMessageDataModel`. Shared base for all check chat message subtypes: its schema adds only
+  `failuresReRolled` (BooleanField, default `false`) and `message` (ArrayField of StringField). It
+  exposes a static helper `_defineCheckDataSchema(parametersShape, resultsShape)` returning TYPED
+  `parameters`/`results` SchemaFields via `createSchemaField(buildSchemaFromShape(...))` — the
+  per-subtype parameters/results are typed, NOT untyped ObjectField bags.
 - Five leaf models, each colocated with its Svelte component under
-  `src/check/types/<name>/chat-message/`, each implementing `get component()`:
+  `src/check/types/<name>/chat-message/`. Each overrides `_defineDocumentSchema()` as
+  `{ ...super._defineDocumentSchema(), ...CheckChatMessageDataModel._defineCheckDataSchema(
+  create<Type>CheckParametersShape(), create<Type>CheckResultsShape()) }` and implements
+  `get component()`:
   - `AttributeCheckChatMessageDataModel` → `AttributeCheckChatMessage.svelte`
   - `ResistanceCheckChatMessageDataModel` → `ResistanceCheckChatMessage.svelte`
   - `AttackCheckChatMessageDataModel` → `AttackCheckChatMessage.svelte`
@@ -558,10 +572,15 @@ each rules element to the character's stats, building the final computed values 
 ratings, resistances, mods).
 
 When a character performs a check, `CharacterDataModel` reads those derived stats, constructs a
-parameters object (via a `create<Type>CheckParameters` factory), optionally opens a dialog for
-user options, then instantiates the appropriate `TitanCheck` subclass and calls `evaluateCheck`.
-The resulting `CheckResults` (or subtype) and parameters are packaged into `flags.titan` and
-passed to `ChatMessage.create`.
+parameters object (via a `create<Type>CheckParameters` factory, then enriched by the orchestrating
+`get<Type>CheckParameters` method — e.g. `getItemCheckParameters` mirrors the item's check config:
+`isDamage`/`isHealing`, the typed nested `opposedCheck {enabled,attribute,skill}`, and
+`damageReducedBy` from `checkData`, so the opposed/resistance damage-reduction feeds the opposing
+attribute check via that check's optional `damageToReduce`→`damageTaken`), optionally opens a dialog
+for user options, then instantiates the appropriate `TitanCheck` subclass and calls `evaluateCheck`.
+The resulting parameters and `CheckResults` (or subtype) travel in the chat message's `system` (a
+typed `CheckChatMessageDataModel` subtype: `{ parameters, results, failuresReRolled, message }`),
+passed to `ChatMessage.create` with the check `type` — NOT `flags.titan`.
 
 The newly created `ChatMessage` is handled by `TitanChatMessage`. In the chat window,
 `ChatMessageShell.svelte` reads the message type flag from `flags.titan` and mounts the correct

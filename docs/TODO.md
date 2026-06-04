@@ -347,9 +347,29 @@ unit 115, full e2e **365** (incl. new `tests/e2e/item-cards.spec.js` ×7), build
   test (`tests/unit/ItemDataModelSchemaEquivalence.test.js`, a golden master of all 7 item schemas) plus
   item-sheet + chat e2e. Verified: unit **124**, full e2e **365** at parity, build clean. Plan:
   `docs/superpowers/plans/2026-06-04-chat-subtypes-followup-B-item-dm-templates.md`.
-- **(D) Build the check chat schemas from the check template objects** via `buildSchemaFromShape` (the
-  reparenting is done; this is the template-typing so resistance's shape genuinely diverges). Preserve
-  check component read paths; verify unit + e2e.
+- **(D) Check chat schemas typed from single-source shapes — DONE** (2026-06-04, merged to `main`).
+  Shipped via **approach B (single-source factory refactor)** + **path 2 (model `opposedCheck`
+  properly)**. Each check parameter/result factory now spreads a co-located zero-value
+  `create<T>Check{Parameters,Results}Shape()` (results compose `createCheckResultsShape()`; params are
+  flat), so the factory output and the chat schema share ONE field-set. The 5 leaf chat DataModels
+  build typed `parameters`/`results` via a `CheckChatMessageDataModel._defineCheckDataSchema(pShape,
+  rShape)` helper (`createSchemaField(buildSchemaFromShape(...))`); the base drops its untyped
+  `ObjectField` bags. **Item-check correctness (user-confirmed):** `getItemCheckParameters` now mirrors
+  the item config — copies `isDamage`/`isHealing`, carries `opposedCheck.enabled`, and fixes the
+  `damageReducedBy` gate to read `checkData` (was a self-comparison against the `'none'` default) — so
+  the opposed/resistance damage-reduction actually feeds the opposing check; `opposedCheck` is a typed
+  nested `{enabled,attribute,skill}` object and all its truthiness guards use `.enabled`; stale
+  `parameters.itemTrait` card reads were repointed to `customTrait`; the sourceless `opposedCheck.
+  difficulty` read was dropped. **Pre-existing bug exposed + fixed:** `createAttackCheckOptions` dropped
+  `damageMod` (siblings had `?? 0`) → dialog attack rolls produced `NaN` `results.damage`, silently
+  stored by the old untyped bag but rejected by the typed integer field; added
+  `damageMod: options.damageMod ?? 0`. **DATA-INTEGRITY SENSITIVE** — gated by a golden-master
+  (`tests/unit/CheckChatMessageSchemaEquivalence.test.js`, all 5 typed schemas) + a factory↔shape
+  parity test (`tests/unit/check/check-shape-parity.test.js`) + new e2e
+  (`tests/e2e/item-check-damage-reduction.spec.js`). Verified: unit **140**, check/chat e2e surface
+  **44** green (all 5 check types via dialog + API), build clean. Spec/plan:
+  `specs/2026-06-04-chat-subtypes-followup-D-check-templates-design.md`,
+  `plans/2026-06-04-chat-subtypes-followup-D-check-templates.md`.
 
 **Phase 3 (reports ×13) and Phase 4 (effect + delete the legacy hook/`ChatMessageShell.svelte`) remain to
 be specced.**
