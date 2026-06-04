@@ -1,3 +1,34 @@
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
+
+/** @type {string} Absolute path to the probe IIFE built by Playwright global-setup into test/build/. */
+const PROBE_BUNDLE = path.resolve(
+   path.dirname(fileURLToPath(import.meta.url)),
+   '../../test/build/probe.iife.js',
+);
+
+/** @type {string} Absolute path to the probe's extracted global stylesheet (tippy.js styles), built alongside the IIFE. */
+const PROBE_STYLES = path.resolve(
+   path.dirname(fileURLToPath(import.meta.url)),
+   '../../test/build/probe.css',
+);
+
+/**
+ * Ensure the in-page component-probe API is registered, injecting the probe bundle (and its global
+ * stylesheet) when absent. The IIFE (built by global-setup) registers `game.titan._probe` synchronously
+ * on execution; the stylesheet covers global (non-scoped) styles such as tippy.js tooltips.
+ * @param {import('@playwright/test').Page} page - The Playwright page (must already be at a ready world).
+ * @returns {Promise<void>} Resolves once the probe bundle has been injected (or was already present).
+ */
+async function ensureProbe(page) {
+   // Whether the probe API is already registered on this page.
+   const present = await page.evaluate(() => !!globalThis.game?.titan?._probe);
+   if (!present) {
+      await page.addStyleTag({ path: PROBE_STYLES });
+      await page.addScriptTag({ path: PROBE_BUNDLE });
+   }
+}
+
 /**
  * Mount a single registered primitive in isolation inside the live Foundry runtime and return a
  * handle. Props (including instrumented callbacks) are built inside the page because functions
@@ -10,11 +41,12 @@
  * @returns {Promise<{ id: string, selector: string }>} The probe id and its container selector.
  */
 export async function mountProbe(page, name, { props = {}, events = [], context = {} } = {}) {
+   await ensureProbe(page);
    return page.evaluate(({ name, props, events, context }) => {
       globalThis.window.__titanProbeEvents = globalThis.window.__titanProbeEvents ?? [];
       const probe = globalThis.game.titan._probe;
       if (!probe) {
-         throw new Error('game.titan._probe is not registered — build the e2e bundle with `npm run build:e2e`.');
+         throw new Error('game.titan._probe is not registered — ensure test/build/probe.iife.js was built (npm run test:e2e builds it via global-setup).');
       }
       const builtProps = { ...props };
       for (const ev of events) {

@@ -1,10 +1,10 @@
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-// The absolute path to the fast-check IIFE bundle produced by global-setup.js.
+/** @type {string} The absolute path to the fast-check IIFE bundle produced by global-setup.js. */
 const FAST_CHECK_BUNDLE = path.resolve(
    path.dirname(fileURLToPath(import.meta.url)),
-   '../vendor/fast-check.iife.js',
+   '../../test/build/fast-check.iife.js',
 );
 
 /**

@@ -47,7 +47,8 @@ export default {
    },
 
    // emitCss:false → the Svelte runtime injects component styles at mount, so probe-mounted components
-   // stay styled despite scoped-class hashes differing from the system's dist/style.css.
+   // stay styled despite scoped-class hashes differing from the system's dist/style.css. Non-scoped
+   // global CSS (e.g. tippy.js) is still extracted as probe.css and injected separately by the harness.
    plugins: [
       createSveltePlugin({ emitCss: false }),
    ],
