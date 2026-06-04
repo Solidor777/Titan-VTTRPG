@@ -6,6 +6,10 @@
 * **Core Stack:** JavaScript, Svelte 5 (Runes), SCSS.
 * **Integration:** Direct mount of Svelte to ApplicationV2. No middleware.
 * **File Structure:** All source code strictly resides in `~/src/`. Build output is generated in the `dist/` directory.
+* **Build Rules (strict):**
+1. No test or e2e code is compiled into shipping builds.
+2. Test and e2e code builds to `test/build/`; stale built files are deleted after every build.
+3. No dynamic imports in shipping builds, ever.
 
 **2. Strict Code Style Guidelines**
 
