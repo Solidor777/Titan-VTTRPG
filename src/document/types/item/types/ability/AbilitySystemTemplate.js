@@ -1,5 +1,6 @@
 import createItemSystemTemplate from '~/document/types/item/ItemSystemTemplate.js';
 import createRulesElementTemplate from '~/document/types/item/rules-element/RulesElementTemplate.js';
+import defaultXpCostAbility from '~/helpers/Settings/DefaultXpCostAbility.js';
 
 /**
  * Creates the canonical plain-object shape of an Ability's `system` data, mirroring
@@ -13,8 +14,8 @@ export default function createAbilitySystemTemplate() {
       ...createItemSystemTemplate(),
       ...createRulesElementTemplate(),
 
-      // Experience-point cost to learn the ability.
-      xpCost: 0,
+      // Experience-point cost to learn the ability; default comes from the world setting.
+      xpCost: defaultXpCostAbility(),
 
       // Rarity tier of the ability.
       rarity: 'common',
