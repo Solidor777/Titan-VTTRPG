@@ -49,9 +49,20 @@ management). Data model classes hold the schema, field validation, and derived-d
 **Item side**
 
 - `TitanItem` (`src/document/types/item/TitanItem.js`) extends Foundry's `Item`. Adds
-  `sendToChat`, custom-trait management, and the `isMarkedForDeletion` guard flag.
+  `buildChatMessageData` (pure: returns `{ type, system }` from the prepared system snapshot —
+  `system.getRollData()` minus document-level `id`/`type`, plus `name`/`img` as label metadata),
+  `sendToChat` (sends that `type` + `system` as a first-class chat-message subtype, NOT `flags.titan`),
+  custom-trait management, and the `isMarkedForDeletion` guard flag.
 - `TitanItemDataModel` (`src/document/types/item/TitanItemDataModel.js`) extends `TitanDataModel`.
   Adds `description`, a `check` array (item check templates), and a `customTrait` array.
+- **Shared item-system shape templates** (plain-data, framework-agnostic, reusable by both the chat
+  data models and a future item-DataModel refactor): `createItemSystemTemplate()`
+  (`src/document/types/item/ItemSystemTemplate.js`) is the DRY base fragment (description, one
+  representative check, one representative custom trait); `createRulesElementTemplate()`
+  (`src/document/types/item/rules-element/RulesElementTemplate.js`) is the rules-element fragment
+  (empty array → `ArrayField(ObjectField)`). Each type has `create<Type>SystemTemplate()`
+  (`.../types/<type>/<Type>SystemTemplate.js`) that spreads those fragments and adds its
+  type-specific fields, faithfully mirroring the corresponding `<Type>DataModel` schema.
 - `RulesElementItemDataModel` (`src/document/types/item/RulesElementItemDataModel.js`) extends
   `TitanItemDataModel`. Adds a `rulesElement` array; exposes `addRulesElement` and
   `deleteRulesElement`. Item types that carry rules elements extend this class.
@@ -77,9 +88,10 @@ management). Data model classes hold the schema, field validation, and derived-d
   re-syncs that flag whenever `description` changes. Enrichment uses
   `foundry.applications.ux.TextEditor.implementation.enrichHTML(html, { secrets: true })` (v14 async API).
   `sendToChat` spreads `getRollData()` flat into `flags.titan`, then sets `type: 'effect'` and
-  `description` — matching the flat item `sendToChat` shape (`TitanItem.sendToChat` sets
-  `flags.titan = getRollData()` directly). This puts `check`, `customTrait`, and `duration` at the
-  `flags.titan` root, where both the effect chat components and the item-check roll path resolve them.
+  `description`. This puts `check`, `customTrait`, and `duration` at the `flags.titan` root, where both
+  the effect chat components and the item-check roll path resolve them. (Effect chat messages are still
+  on the legacy `flags.titan` hook path; items have since moved to first-class `type`+`system`
+  chat-message subtypes via `TitanItem.buildChatMessageData` — the effect conversion is a later phase.)
   The class also carries check and custom-trait mutators with the same bodies as `TitanItem` (`addCheck`
   / `deleteCheck` / `addCustomTrait` / `editCustomTrait` / `deleteCustomTrait`), ported inline (not via a
   shared mixin); they operate on `system.check` / `system.customTrait` via `this.update(...)`, notify the
@@ -201,6 +213,18 @@ the existing `flags.titan` approach. Registration and activation happen in a lat
   - `AttackCheckChatMessageDataModel` → `AttackCheckChatMessage.svelte`
   - `CastingCheckChatMessageDataModel` → `CastingCheckChatMessage.svelte`
   - `ItemCheckChatMessageDataModel` → `ItemCheckChatMessage.svelte`
+- `ItemChatMessageDataModel` (`src/document/types/item/chat-message/ItemChatMessageDataModel.js`)
+  extends `TitanChatMessageDataModel`. Family base for item chat-card subtypes: schema is generated
+  from `createItemSystemTemplate()` via `buildSchemaFromShape` (so `system.description`/`check`/
+  `customTrait` mirror the item) plus `name`/`img` label fields; `get component()` stays abstract.
+- Seven leaf models, colocated with their Svelte component under
+  `src/document/types/item/types/<type>/chat-message/<Type>ChatMessageDataModel.js`; each builds its
+  full per-type schema via `{ ...super._defineDocumentSchema(), ...buildSchemaFromShape(create<Type>SystemTemplate()) }`
+  and returns its `.svelte` from `get component()`: `weapon`, `armor`, `spell`, `ability`
+  (component file `AbilityChatMesssage.svelte`, 3 s's), `shield`, `equipment`, `commodity`. Registered
+  in `OnceInit.js` `CONFIG.ChatMessage.dataModels` + `system.json` `documentTypes.ChatMessage` +
+  `lang/en.json` `TYPES.ChatMessage`. NOTE: as of this branch the item chat *components* still read the
+  legacy `flags.titan` shape — the read-path sweep to `document.data.system.X` is the next phase.
 
 **Svelte shell**
 
