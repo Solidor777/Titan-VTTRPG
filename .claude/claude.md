@@ -5,7 +5,7 @@
 * **Platform:** Foundry VTT v14 (ApplicationV2 API).
 * **Core Stack:** JavaScript, Svelte 5 (Runes), SCSS.
 * **Integration:** Direct mount of Svelte to ApplicationV2. No middleware.
-* **File Structure:** All source code strictly resides in `~/src/`. Build output is generated in the root directory.
+* **File Structure:** All source code strictly resides in `~/src/`. Build output is generated in the `dist/` directory.
 
 **2. Strict Code Style Guidelines**
 
