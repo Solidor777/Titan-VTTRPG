@@ -1,17 +1,11 @@
-import { svelte } from '@sveltejs/vite-plugin-svelte';
-import { sveltePreprocess } from 'svelte-preprocess';
 import path from 'path';
 import { fileURLToPath } from 'url';
-import autoprefixer from 'autoprefixer';
+import { alias, css, createSveltePlugin } from './vite.shared.mjs';
 
 const __filename = fileURLToPath(import.meta.url); // get the resolved path to the file
 const __dirname = path.dirname(__filename); // get the name of the directory
 
-// ATTENTION!
-// Please modify the below variables: s_PACKAGE_ID and s_SVELTE_HASH_ID appropriately.
-
-// For convenience, you just need to modify the package ID below as it is used to fill in default proxy settings for
-// the dev server.
+// For convenience, modify the package ID below; it fills in default proxy settings for the dev server.
 const s_PACKAGE_ID = 'systems/titan';
 
 const s_COMPRESS = true;  // Set to true to compress the module bundle.
@@ -21,34 +15,20 @@ export default ({ mode }) => {
    /** @type {import('vite').UserConfig} */
    return {
       root: 'src/',                 // Source location / esbuild root.
-      base: `/${s_PACKAGE_ID}/`,    // Base module path that 30001 / served dev directory.
+      base: `/${s_PACKAGE_ID}/`,    // Base module path served by the dev server.
       publicDir: false,             // No public resources to copy.
       cacheDir: '../.vite-cache',   // Relative from root directory.
 
       resolve: {
          conditions: ['import', 'browser'],
-         alias: {
-            '~/': `${path.resolve(__dirname, 'src')}/`,
-            '$fonts/': `${path.resolve(__dirname, 'fonts')}/`,
-         },
+         alias,
       },
 
       esbuild: {
          target: ['es2022'],
       },
 
-      css: {
-         postcss: {
-            plugins: [autoprefixer()],
-         },
-
-         // Use the modern compiler
-         preprocessorOptions: {
-            scss: {
-               api: 'modern-compiler' // or "modern"
-            }
-         }
-      },
+      css,
 
       define: {
          'process.env.NODE_ENV': JSON.stringify('production'),
@@ -56,15 +36,6 @@ export default ({ mode }) => {
          __TITAN_PROBE__: JSON.stringify(mode === 'e2e'),
       },
 
-      // About server options:
-      // - Set to `open` to boolean `false` to not open a browser window automatically. This is useful if you set up a
-      // debugger instance in your IDE and launch it with the URL: 'http://localhost:30001/game'.
-      //
-      // - The top proxy entry redirects requests under the module path for `style.css` and following standard static
-      // directories: `assets`, `lang`, and `packs` and will pull those resources from the main Foundry / 30000 server.
-      // This is necessary to reference the dev resources as the root is `/src` and there is no public / static
-      // resources served with this particular Vite configuration. Modify the proxy rule as necessary for your
-      // static resources / project.
       server: {
          port: 30001,
          open: '/game',
@@ -91,33 +62,12 @@ export default ({ mode }) => {
             entry: './index.js',
             formats: ['es'],
             fileName: 'index',
-            // Emit CSS as `style.css` to match `system.json` styles and the dev-server proxy. Without this
-            // the lib CSS filename follows `fileName` ('index') and Foundry keeps loading a stale style.css.
+            // Emit CSS as `style.css` to match `system.json` styles and the dev-server proxy.
             cssFileName: 'style',
          },
       },
       plugins: [
-         svelte({
-            configFile: false,
-            preprocess: sveltePreprocess({
-               scss: {
-                  api: 'modern',
-                  prependData: '@use "src/styles/Root.scss" as *;'
-               },
-               postcss: {
-                  plugins: [autoprefixer()]
-               }
-            }),
-            onwarn: (warning, handler) => {
-               // Don't warn on preprocess dependencies
-               if (warning.code === 'vite-plugin-svelte-preprocess-many-dependencies') {
-                  return;
-               }
-
-               // let vite handle all other warnings normally
-               handler(warning);
-            },
-         }),
+         createSveltePlugin(),
       ],
    };
 };
