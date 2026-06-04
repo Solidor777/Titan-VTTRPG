@@ -166,7 +166,7 @@ test.describe('v14 interaction rolls', () => {
                before,
                after: game.messages.size,
                newestId: newest?.id,
-               newestType: newest?.flags?.titan?.type,
+               newestType: newest?.type,
             };
          }, { actorLocate: ACTOR_LOCATE, invokeSrc: checkCase.invoke });
 

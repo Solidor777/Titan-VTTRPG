@@ -115,7 +115,7 @@ test.describe('v14 effect check rolling', () => {
             before,
             after: game.messages.size,
             newestId: newest?.id,
-            newestType: newest?.flags?.titan?.type,
+            newestType: newest?.type,
          };
       }, { actorName: ACTOR_NAME, effectName: EFFECT_NAME });
 
