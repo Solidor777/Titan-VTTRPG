@@ -176,9 +176,11 @@ hard to read and grows unbounded.
 - Live skill docs: update `references/architecture.md` (build-output-at-root facts, ~lines 135–148)
   and `references/conventions.md` (~353–356) to describe `dist/`. Do **not** edit historical
   spec/plan docs that merely record the old state.
-- Delete the 154 stale root artifacts; the `dist/` move + `emptyOutDir` prevents recurrence.
-  Separately investigate `fix-comments.js` at the repo root — a likely stray one-off script (not
-  build output) — and remove only if confirmed dead.
+- Delete the 154 stale root **build artifacts only** (`index.js`, `index.js.map`, `style.css`, and
+  the hashed `*-<hash>.js[.map]` chunks); the `dist/` move + `emptyOutDir` prevents recurrence. Do
+  NOT delete the intentional root dev scripts/config — `eslint.config.js`, `vite.config.mjs`,
+  `fix-comments.js`, `count-long.cjs` (the last two are already in the eslint ignore list), nor
+  `package.json`/`system.json`/`module.json`/`README`/`LICENSE`/`AUTHORS`.
 
 **Success criteria:** a clean build leaves the repo root free of `*.js`/`*.js.map`/`style.css`
 build artifacts (all under `dist/`); Foundry loads the system from `dist/` after a restart (sheets +
