@@ -486,8 +486,11 @@ domain:
 - **Schema field factories** — thin wrappers around Foundry field constructors for consistent
   schema definitions (e.g., `CreateStringField`, `CreateIntegerField`). `BuildSchemaFromShape.js`
   (`buildSchemaFromShape(shape)`) recursively converts a plain-object shape template into a schema
-  field map by value type — `string`/`number`/`boolean` → the matching `create*Field` seeded with the
-  representative value, array → `createArrayField` whose element schema is derived from the first
+  field map by value type — `string`/`boolean` → the matching `create*Field` seeded with the
+  representative value; `number` → `createIntegerField` when the value is a whole number
+  (`Number.isInteger`, integer-enforced) else `createNumberField` (so whole-number template values
+  match the hand-written item schemas, which use integer fields throughout); array → `createArrayField`
+  whose element schema is derived from the first
   element (empty array → object element field), plain object → a `SchemaField` (recursing), and
   `null`/`undefined` → a nullable object field; it composes the `create*Field`/`createSchemaField`
   helpers so a data model can be defined from a canonical shape.
