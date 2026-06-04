@@ -45,4 +45,50 @@ describe('buildEffectRowContextMenu', () => {
       const move = entries.find((entry) => entry.label === 'LOCAL.effectTrayMoveToFolder.text');
       expect(move.visible()).toBe(false);
    });
+
+   it('Move to Folder onClick invokes the injected opener with the resolved effect', () => {
+      /** @type {object} The effect the menu resolves from the clicked row. */
+      const effect = { id: 'abc' };
+      /** @type {object} An editable, folder-capable tray state exposing the effect. */
+      const trayState = { canEdit: true, selectedPack: { folders: {} }, effects: [effect] };
+      /** @type {object[]} Effects captured by the injected opener spy. */
+      const opened = [];
+      /** @type {(effect: object) => void} The injected move-to-folder opener. */
+      const openMoveToFolder = (resolved) => opened.push(resolved);
+
+      /** @type {object[]} The built menu entries. */
+      const entries = buildEffectRowContextMenu(trayState, openMoveToFolder);
+      /** @type {object} The Move-to-Folder entry. */
+      const move = entries.find((entry) => entry.label === 'LOCAL.effectTrayMoveToFolder.text');
+
+      /** @type {HTMLElement} A fake row carrying the effect id read by resolveEffect. */
+      const target = document.createElement('div');
+      target.dataset.effectId = 'abc';
+
+      move.onClick({}, target);
+      expect(opened).toEqual([effect]);
+   });
+
+   it('Move to Folder onClick does not invoke the opener when the effect cannot be resolved', () => {
+      /** @type {object} A tray state with no effects to resolve against. */
+      const trayState = { canEdit: true, selectedPack: { folders: {} }, effects: [] };
+      /** @type {number} How many times the injected opener was called. */
+      let callCount = 0;
+      /** @type {(effect: object) => void} The injected move-to-folder opener spy. */
+      const openMoveToFolder = () => {
+         callCount += 1;
+      };
+
+      /** @type {object[]} The built menu entries. */
+      const entries = buildEffectRowContextMenu(trayState, openMoveToFolder);
+      /** @type {object} The Move-to-Folder entry. */
+      const move = entries.find((entry) => entry.label === 'LOCAL.effectTrayMoveToFolder.text');
+
+      /** @type {HTMLElement} A row whose id is absent from trayState.effects. */
+      const target = document.createElement('div');
+      target.dataset.effectId = 'not-found';
+
+      move.onClick({}, target);
+      expect(callCount).toBe(0);
+   });
 });

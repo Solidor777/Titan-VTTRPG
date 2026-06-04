@@ -3,6 +3,7 @@
    import EffectTrayHeader from '~/sidebar/tray/EffectTrayHeader.svelte';
    import EffectTrayList from '~/sidebar/tray/EffectTrayList.svelte';
    import buildEffectRowContextMenu from '~/sidebar/tray/EffectRowContextMenu.js';
+   import MoveEffectToFolderDialog from '~/sidebar/tray/MoveEffectToFolderDialog.js';
 
    /**
     * @type {import('~/sidebar/tray/EffectTrayState.svelte.js').default} The reactive tray state from
@@ -54,11 +55,21 @@
     * @returns {{ destroy: () => void }} The action lifecycle handle.
     */
    function effectContextMenu(node) {
+      /**
+       * Opens the move-to-folder picker for an effect. Defined here so the menu module carries no
+       * AppV2-dialog import (keeping it unit-testable); the dialog is statically imported above.
+       * @param {object} effect - The effect to relocate.
+       * @returns {void}
+       */
+      const openMoveToFolder = (effect) => {
+         new MoveEffectToFolderDialog(effect, trayState).render(true);
+      };
+
       /** @type {object} The Foundry context menu bound to the tray's effect rows. */
       const menu = new foundry.applications.ux.ContextMenu(
          node,
          '[data-effect-id]',
-         buildEffectRowContextMenu(trayState),
+         buildEffectRowContextMenu(trayState, openMoveToFolder),
          { jQuery: false, fixed: true },
       );
 

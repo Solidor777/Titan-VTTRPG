@@ -29,9 +29,11 @@ function resolveEffect(target, trayState) {
  * (`{ label, icon, visible(target), onClick(event, target) }`).
  * @param {import('~/sidebar/tray/EffectTrayState.svelte.js').default} trayState - Reactive tray state
  * read by the entries for permission gating and effect resolution.
+ * @param {(effect: object) => void} openMoveToFolder - Opens the move-to-folder picker for an effect.
+ * Injected by the tray so this module carries no AppV2-dialog import and stays unit-testable.
  * @returns {object[]} The ContextMenuEntry array.
  */
-export default function buildEffectRowContextMenu(trayState) {
+export default function buildEffectRowContextMenu(trayState, openMoveToFolder) {
    return [
       {
          label: localize('effectTrayApply'),
@@ -67,18 +69,12 @@ export default function buildEffectRowContextMenu(trayState) {
          label: localize('effectTrayMoveToFolder'),
          icon: `<i class="${MOVE_TO_FOLDER_ICON}"></i>`,
          visible: () => trayState.canEdit && !!trayState.selectedPack?.folders,
-         onClick: async (event, target) => {
+         onClick: (event, target) => {
             /** @type {object | undefined} The effect for the clicked row. */
             const effect = resolveEffect(target, trayState);
-            if (!effect) {
-               return;
+            if (effect) {
+               openMoveToFolder(effect);
             }
-
-            // Lazy-load the dialog so this module stays importable in unit tests (the dialog pulls in
-            // TitanDialog, which reads `foundry.applications.api` at module load).
-            const { default: MoveEffectToFolderDialog } =
-               await import('~/sidebar/tray/MoveEffectToFolderDialog.js');
-            new MoveEffectToFolderDialog(effect, trayState).render(true);
          },
       },
       {
