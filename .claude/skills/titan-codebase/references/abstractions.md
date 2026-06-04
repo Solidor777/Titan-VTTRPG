@@ -54,7 +54,11 @@ management). Data model classes hold the schema, field validation, and derived-d
   `sendToChat` (sends that `type` + `system` as a first-class chat-message subtype, NOT `flags.titan`),
   custom-trait management, and the `isMarkedForDeletion` guard flag.
 - `TitanItemDataModel` (`src/document/types/item/TitanItemDataModel.js`) extends `TitanDataModel`.
-  Adds `description`, a `check` array (item check templates), and a `customTrait` array.
+  Adds `description`, a `check` array (item check templates), and a `customTrait` array. Its
+  `getRollData()` override returns `description`, `check`, and `customTrait` on top of the base
+  document-level keys; because the chat snapshot is sourced from `getRollData()` (via
+  `buildChatMessageData`), any system field a chat card reads MUST be returned here or it falls back
+  to the schema initial and the card hides it.
 - **Shared item-system shape templates** (plain-data, framework-agnostic, reusable by both the chat
   data models and a future item-DataModel refactor): `createItemSystemTemplate()`
   (`src/document/types/item/ItemSystemTemplate.js`) is the DRY base fragment (description, one
