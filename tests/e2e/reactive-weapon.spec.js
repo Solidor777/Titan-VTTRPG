@@ -51,16 +51,14 @@ test.describe('character sheet weapon row reactivity', () => {
    });
 
    test('weapon footer display values update in place after an in-place item update', async ({ page }) => {
-      // Activate the Inventory tab and let it settle.
+      // Activate the Inventory tab; the row click below auto-waits for the rendered row.
       await page.getByText('Inventory', { exact: true }).first().click();
-      await page.waitForTimeout(400);
 
       // The first inventory row.
       const row = page.locator('[data-item-id]').first();
 
       // Expand the row in place (the expand button is the first button in the header label area).
       await row.locator('.header .label .button button').first().click();
-      await page.waitForTimeout(400);
 
       // The expandable footer's tag container, plus the two drivable display reads we assert on: the
       // RarityTag root (class carries the rarity key) and the ValueTag StatTag value.
@@ -84,9 +82,8 @@ test.describe('character sheet weapon row reactivity', () => {
             },
          });
       }, ACTOR_NAME);
-      await page.waitForTimeout(400);
 
-      // The rendered footer must reflect the NEW values in place.
+      // The rendered footer must reflect the NEW values in place (assertions below auto-retry).
       await expect(rarityRare, 'rarity tag updated to rare in place').toHaveCount(1);
       await expect(rarityCommon, 'rarity tag no longer common in place').toHaveCount(0);
       await expect(valueTag, 'ValueTag now present in place').toHaveCount(1);
@@ -94,16 +91,14 @@ test.describe('character sheet weapon row reactivity', () => {
    });
 
    test('weapon attack label updates in place after an in-place item update', async ({ page }) => {
-      // Activate the Inventory tab and let it settle.
+      // Activate the Inventory tab; the row click below auto-waits for the rendered row.
       await page.getByText('Inventory', { exact: true }).first().click();
-      await page.waitForTimeout(400);
 
       // The first inventory row.
       const row = page.locator('[data-item-id]').first();
 
       // Expand the row in place (the expand button is the first button in the header label area).
       await row.locator('.header .label .button button').first().click();
-      await page.waitForTimeout(400);
 
       // The default attack renders its label in the attack header. The weapon is unequipped, so the label
       // renders as a plain `.attack .header .label` div (no DocumentOwnerButton).
@@ -126,9 +121,8 @@ test.describe('character sheet weapon row reactivity', () => {
             },
          });
       }, ACTOR_NAME);
-      await page.waitForTimeout(400);
 
-      // The rendered attack header must reflect the NEW label in place.
+      // The rendered attack header must reflect the NEW label in place (assertions below auto-retry).
       await expect(attackLabel, 'attack label updated in place').toContainText('Renamed Strike');
       await expect(attackLabel, 'old attack label gone in place').not.toContainText('Attack');
    });

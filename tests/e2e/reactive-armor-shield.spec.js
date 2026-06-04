@@ -59,16 +59,14 @@ async function seedActorWithItem(page, actorName, itemType, system) {
  * @returns {Promise<import('@playwright/test').Locator>} The expanded row locator.
  */
 async function openInventoryAndExpandFirstRow(page) {
-   // Activate the Inventory tab and let it settle.
+   // Activate the Inventory tab; the row click below auto-waits for the rendered row.
    await page.getByText('Inventory', { exact: true }).first().click();
-   await page.waitForTimeout(400);
 
    // The first inventory row.
    const row = page.locator('[data-item-id]').first();
 
    // Expand the row in place (the expand button is the first button in the header label area).
    await row.locator('.header .label .button button').first().click();
-   await page.waitForTimeout(400);
 
    return row;
 }
@@ -113,7 +111,6 @@ test.describe('character sheet armor/shield row reactivity', () => {
             },
          });
       }, ARMOR_ACTOR_NAME);
-      await page.waitForTimeout(400);
 
       // The rendered stats must reflect the NEW values in place (value !== max now shows '3 / 5').
       await expect(armorValue, 'armor value updated to 3 / 5 in place').toHaveText('3 / 5');
@@ -154,7 +151,6 @@ test.describe('character sheet armor/shield row reactivity', () => {
             },
          });
       }, SHIELD_ACTOR_NAME);
-      await page.waitForTimeout(400);
 
       // The rendered stats must reflect the NEW values in place.
       await expect(defenseValue, 'defense value updated to 6 in place').toHaveText('6');

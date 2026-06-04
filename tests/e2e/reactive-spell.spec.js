@@ -52,16 +52,14 @@ test.describe('character sheet spell row reactivity', () => {
    });
 
    test('spell footer display values update in place after an in-place item update', async ({ page }) => {
-      // Activate the Spells tab and let it settle.
+      // Activate the Spells tab; the row click below auto-waits for the rendered row.
       await page.getByText('Spells', { exact: true }).first().click();
-      await page.waitForTimeout(400);
 
       // The first spell row.
       const row = page.locator('[data-item-id]').first();
 
       // Expand the row in place (the expand button is the first button in the header label area).
       await row.locator('.header .label .button button').first().click();
-      await page.waitForTimeout(400);
 
       // The expandable footer's tag container, plus the drivable display reads we assert on: the RarityTag
       // root (class carries the rarity key), the Tradition StatTag (matched by its 'Tradition' label) and
@@ -94,9 +92,8 @@ test.describe('character sheet spell row reactivity', () => {
             },
          });
       }, ACTOR_NAME);
-      await page.waitForTimeout(400);
 
-      // The rendered footer must reflect the NEW values in place.
+      // The rendered footer must reflect the NEW values in place (assertions below auto-retry).
       await expect(rarityRare, 'rarity tag updated to rare in place').toHaveCount(1);
       await expect(rarityCommon, 'rarity tag no longer common in place').toHaveCount(0);
       await expect(traditionValue, 'tradition updated to Divine in place').toHaveText('Divine');
