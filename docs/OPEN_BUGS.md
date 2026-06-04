@@ -16,6 +16,33 @@ Deferred/known bugs. Todos (planned work) live in `docs/TODO.md`; this file is b
 - **To do:** if the initial-only capture is intended, suppress the rule locally with a comment
   explaining why; otherwise derive it reactively (e.g. `$derived`) or initialize in an effect.
 
+### 2. Attack chat header sub-label is always blank (`attackName` never set by the producer)
+
+- **What:** `AttackCheckChatHeader.svelte:21` renders `document.data.system.parameters.attackName`, and
+  `attackName` is a field in `createAttackCheckParametersShape()` (and the typed schema/golden), but
+  `CharacterDataModel.getAttackCheckParameters` never assigns `parameters.attackName` (grep: zero sets
+  across `src/`). So the attack card's sub-label has always rendered blank.
+- **Severity:** Low / cosmetic. Surfaced during follow-up D's whole-branch review; D enshrined the
+  field into the typed schema but did not introduce the producer gap.
+- **Pre-existing:** the producer never set it before D either. Out of D's typing scope.
+- **To do:** set it in `getAttackCheckParameters` from the attack data (e.g.
+  `parameters.attackName = attackData.label ?? attackData.name ?? ''`); verify the correct source
+  field and add an e2e/assertion. (No golden change needed — the shape default stays `''`.)
+
+### 3. Item-check `resistanceCheck` shape default is `''` but guards compare `!== 'none'`
+
+- **What:** `createItemCheckParametersShape()` defaults `resistanceCheck: ''` (inherited from the
+  original factory), while the item check template default and all guards use `'none'`
+  (`ItemCheckChatMessage.svelte:84` renders the resistance button when `resistanceCheck !== 'none'`).
+  For freshly-rolled messages the field is populated from `checkData.resistanceCheck` (always `'none'`
+  by default), so this is fine in practice; the mismatch only bites a chat message rendered against the
+  typed schema with NO stored `resistanceCheck` value (the schema would then init it to `''`, spuriously
+  showing the resistance button with an empty resistance).
+- **Severity:** Very low / narrow edge case. Spec explicitly accepted ephemeral-log migration risk.
+- **Pre-existing:** the `''` default predates D (original `createItemCheckParameters`).
+- **To do:** change the shape default to `resistanceCheck: 'none'` (matches the item template) and
+  update the golden's `resistanceCheck` initial from `stringField('')` to `stringField('none')`.
+
 <!--
 Recently resolved: the socket-sync A1/A2 full-run timeout flake was fixed by the e2e Phase 2
 shared-world harness (per-file `clearChat` keeps the world lean). Verified: `socket-sync.spec.js`
