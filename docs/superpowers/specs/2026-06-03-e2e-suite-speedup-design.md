@@ -1,10 +1,12 @@
-# E2E Suite Speedup — Design (Strategy A)
+# E2E Suite Speedup & Build-Output Hygiene — Design
 
 - **Date:** 2026-06-03
 - **Status:** Approved (design); ready for implementation plan(s)
-- **Scope:** Make the Playwright e2e suite materially faster (full-suite wall-clock *and*
-  single-spec iteration) and less flaky, without changing what the tests assert and without
-  introducing parallel workers.
+- **Scope:** Two developer-experience workstreams: (A) make the Playwright e2e suite materially
+  faster (full-suite wall-clock *and* single-spec iteration) and less flaky, without changing what
+  the tests assert and without introducing parallel workers; and (B) build-output hygiene — emit the
+  Vite build to `dist/` instead of littering the repo root, and clear the accumulated stale
+  artifacts. The two are independent; B is lower-risk and runs first.
 
 ## Context
 
@@ -144,6 +146,47 @@ Two plans under this one spec; the first de-risks the second.
   (Phase 2, incremental). `playwright.config.mjs` likely unchanged (still `workers: 1`).
 - **Not touched:** `multi-client.spec.js`, `socket-sync.spec.js` (self-managed contexts); test
   assertions and fixtures' find-or-create logic.
+
+## Workstream B — Build-output hygiene (root → dist/)
+
+Independent of the speedup work and lower-risk; intended to run **first** (call it Phase 0).
+
+**Problem.** `vite.config.mjs` sets `build.outDir: __dirname` (the repo root) with
+`emptyOutDir: false`, so every build emits `index.js`, `index.js.map`, `style.css`, **and** hashed
+code-split chunks (`<Name>-<hash>.js[.map]`) directly into the repo root. The root cannot be safely
+auto-emptied, so stale chunks accumulate indefinitely — currently **154 loose build files** in root
+(e.g. a dozen stale `InventoryItemTypeSelect-*.js`). All are already gitignored (`.gitignore`
+lines 8–13), so this is local working-tree clutter, not tracked pollution — but it makes the tree
+hard to read and grows unbounded.
+
+**Fix — emit to `dist/` and empty it each build.**
+- `vite.config.mjs`: `build.outDir` → `path.join(__dirname, 'dist')`; `emptyOutDir: true` (safe —
+  `dist/` is dedicated and already gitignored — so stale chunks are wiped every build). The `lib`
+  entry (`./index.js`, relative to `root: 'src/'`) and `cssFileName: 'style'` are unchanged.
+- `system.json`: `esmodules: ["dist/index.js"]`, `styles: ["dist/style.css"]`. Foundry resolves
+  these relative to the system root; chunks load relative to `dist/index.js`. **Manifest change →
+  requires a Foundry restart** to take effect.
+- Dev server (`npm run dev`, port 30001): the `server.proxy` rule proxying `style.css` from :30000
+  (`vite.config.mjs:73`) follows to `dist/style.css`; verify the live-reload entry path still serves.
+- Release packaging: `.github/workflows/main.yml:33` zips root `index.js index.js.map style.css`
+  **and** `dist/` — drop the three root names (now inside `dist/`), keep `dist/`.
+- Lint ignore: `eslint.config.js` (ignores `'index.js'`) → ignore `dist/` instead.
+- `.gitignore`: the now-moot root build-output lines (8–13) can be removed (`dist/` at line 6 covers
+  them).
+- Live skill docs: update `references/architecture.md` (build-output-at-root facts, ~lines 135–148)
+  and `references/conventions.md` (~353–356) to describe `dist/`. Do **not** edit historical
+  spec/plan docs that merely record the old state.
+- Delete the 154 stale root artifacts; the `dist/` move + `emptyOutDir` prevents recurrence.
+  Separately investigate `fix-comments.js` at the repo root — a likely stray one-off script (not
+  build output) — and remove only if confirmed dead.
+
+**Success criteria:** a clean build leaves the repo root free of `*.js`/`*.js.map`/`style.css`
+build artifacts (all under `dist/`); Foundry loads the system from `dist/` after a restart (sheets +
+chat render, the full e2e suite stays green); the release zip still contains the runnable bundle.
+
+**Risk:** a wrong path makes the system fail to load → mitigated by a post-change build + relaunch
+smoke (render a sheet and a chat card, run a check spec) before merge. Loading a Foundry system from
+a `dist/` subpath is a standard, supported pattern.
 
 ## Out of scope (possible future)
 
