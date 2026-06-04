@@ -38,11 +38,12 @@ test.describe('character sheet ability row reactivity', () => {
             },
          ]);
 
-         // Render the sheet and let the Svelte mount and ApplicationV2 render cycle settle.
-         await actor.sheet.render(true);
-         await new Promise((resolve) => {
-            setTimeout(resolve, 600);
-         });
+         // Render the sheet and wait until the Svelte component has mounted its content.
+         const app = await actor.sheet.render(true);
+         await titanWait(
+            () => !!app?.element?.querySelector('.window-content')?.children.length,
+            { message: 'sheet mounted' },
+         );
       }, ACTOR_NAME);
    });
 

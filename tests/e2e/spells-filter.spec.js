@@ -22,10 +22,11 @@ test.describe('spells tab filter', () => {
             { name: 'Zzz Fireball', type: 'spell' },
             { name: 'Qqq Frostbite', type: 'spell' },
          ]);
-         await actor.sheet.render(true);
-         await new Promise((resolve) => {
-            setTimeout(resolve, 600);
-         });
+         const app = await actor.sheet.render(true);
+         await titanWait(
+            () => !!app?.element?.querySelector('.window-content')?.children.length,
+            { message: 'sheet mounted' },
+         );
       }, ACTOR_NAME);
 
       await page.getByText('Spells', { exact: true }).first().click();

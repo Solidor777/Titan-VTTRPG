@@ -46,11 +46,12 @@ async function seedActorWithItem(page, actorName, itemType) {
          },
       ]);
 
-      // Render the sheet and let the Svelte mount and ApplicationV2 render cycle settle.
-      await actor.sheet.render(true);
-      await new Promise((resolve) => {
-         setTimeout(resolve, 600);
-      });
+      // Render the sheet and wait until the Svelte component has mounted its content.
+      const app = await actor.sheet.render(true);
+      await titanWait(
+         () => !!app?.element?.querySelector('.window-content')?.children.length,
+         { message: 'sheet mounted' },
+      );
    }, { actorName, itemType });
 }
 
@@ -128,10 +129,11 @@ test.describe('character sheet inventory row reactivity', () => {
          await actor.createEmbeddedDocuments('Item', [
             { name: 'E2E Reactive Commodity Qty', type: 'commodity', system: { quantity: 2 } },
          ]);
-         await actor.sheet.render(true);
-         await new Promise((resolve) => {
-            setTimeout(resolve, 600);
-         });
+         const app = await actor.sheet.render(true);
+         await titanWait(
+            () => !!app?.element?.querySelector('.window-content')?.children.length,
+            { message: 'sheet mounted' },
+         );
       }, ACTOR);
 
       // Activate the Inventory tab and locate the commodity row's quantity input.

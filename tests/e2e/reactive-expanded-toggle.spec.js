@@ -29,10 +29,11 @@ test.describe('character sheet expand toggle reactivity', () => {
             { name: 'E2E Expand Weapon', type: 'weapon' },
             { name: 'E2E Expand Spell', type: 'spell' },
          ]);
-         await actor.sheet.render(true);
-         await new Promise((resolve) => {
-            setTimeout(resolve, 600);
-         });
+         const app = await actor.sheet.render(true);
+         await titanWait(
+            () => !!app?.element?.querySelector('.window-content')?.children.length,
+            { message: 'sheet mounted' },
+         );
       }, ACTOR_NAME);
    });
 
