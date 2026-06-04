@@ -1,5 +1,6 @@
 import { expect, test } from '@playwright/test';
 import { ensureDocument, login } from './fixtures.js';
+import { attachPageErrors, clearChat, closeAllApps } from './world.js';
 
 /**
  * Regression: the ProseMirror description editor must mount as a toggled, enriched editor that fills
@@ -7,15 +8,29 @@ import { ensureDocument, login } from './fixtures.js';
  * item in the full-height tab. This drives an ability item sheet (Description is its first tab) and
  * asserts the native <prose-mirror> element is toggled (exposes the edit button) and fills top-to-bottom.
  */
-test('item description editor mounts toggled and fills the tab', async ({ page }) => {
-   // Collected uncaught page errors fired during the render window.
-   const errors = [];
-   page.on('pageerror', (err) => {
-      errors.push(err.message);
-   });
 
+/** @type {import('@playwright/test').Page} The file-shared, logged-in page (one world boot per file). */
+let page;
+/** @type {string[]} Uncaught page errors collected during the current test (cleared each afterEach). */
+let errors;
+
+test.beforeAll(async ({ browser }) => {
+   page = await browser.newPage();
+   errors = attachPageErrors(page);
    await login(page);
+   await clearChat(page);
+});
 
+test.afterEach(async () => {
+   await closeAllApps(page);
+   errors.length = 0;
+});
+
+test.afterAll(async () => {
+   await page?.close();
+});
+
+test('item description editor mounts toggled and fills the tab', async () => {
    // The TITAN system must be initialized before rendering any sheet.
    const systemReady = await page.evaluate(() => typeof game.titan !== 'undefined'
       && !!CONFIG.Item?.dataModels?.ability);

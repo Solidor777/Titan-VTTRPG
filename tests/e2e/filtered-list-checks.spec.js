@@ -1,5 +1,6 @@
 import { expect, test } from '@playwright/test';
 import { login } from './fixtures.js';
+import { attachPageErrors, clearChat, closeAllApps } from './world.js';
 
 /**
  * Integration regression for the FiltereedList fix: the item sheet's Checks-tab search filter must
@@ -10,20 +11,39 @@ import { login } from './fixtures.js';
  * filter matching exactly one check, and asserts the rendered list narrows to that single check.
  */
 
+/** @type {import('@playwright/test').Page} The file-shared, logged-in page (one world boot per file). */
+let page;
+/** @type {string[]} Uncaught page errors collected during the current test (cleared each afterEach). */
+let errors;
+
+test.beforeAll(async ({ browser }) => {
+   page = await browser.newPage();
+   errors = attachPageErrors(page);
+   await login(page);
+   await clearChat(page);
+});
+
+test.afterEach(async () => {
+   await closeAllApps(page);
+   errors.length = 0;
+});
+
+test.afterAll(async () => {
+   await page?.close();
+});
+
 // The two distinct check labels seeded onto the fixture ability.
 const CHECK_LABELS = ['AlphaCheck', 'BravoCheck'];
 
 test.describe('checks tab filter (live item sheet)', () => {
-   test.beforeEach(async ({ page }) => {
-      await login(page);
-
+   test.beforeEach(async () => {
       // Precondition: the TITAN system must have initialized.
       const systemReady = await page.evaluate(() => typeof game.titan !== 'undefined'
          && !!CONFIG.Item?.dataModels?.ability);
       expect(systemReady, 'TITAN system initialized before checks-filter walk').toBe(true);
    });
 
-   test.afterEach(async ({ page }) => {
+   test.afterEach(async () => {
       // Close any open sheet and delete the fixture item so sheets do not accumulate across retries.
       await page.evaluate(async () => {
          const item = globalThis.game.items.getName('E2E Filter Ability');
@@ -32,13 +52,7 @@ test.describe('checks tab filter (live item sheet)', () => {
       });
    });
 
-   test('typing into the TopFilter narrows the rendered checks list to the matching check', async ({ page }) => {
-      // Capture uncaught errors during the render/filter window.
-      const errors = [];
-      page.on('pageerror', (err) => {
-         errors.push(err.message);
-      });
-
+   test('typing into the TopFilter narrows the rendered checks list to the matching check', async () => {
       // Rebuild a clean ability fixture carrying two distinctly labelled checks, then render its sheet.
       await page.evaluate(async (labels) => {
          const stale = game.items.getName('E2E Filter Ability');

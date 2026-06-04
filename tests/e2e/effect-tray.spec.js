@@ -1,9 +1,30 @@
 import { expect, test } from '@playwright/test';
 import { login } from './fixtures.js';
+import { attachPageErrors, clearChat, closeAllApps } from './world.js';
+
+/** @type {import('@playwright/test').Page} The file-shared, logged-in page (one world boot per file). */
+let page;
+/** @type {string[]} Uncaught page errors collected during the current test (cleared each afterEach). */
+let errors;
+
+test.beforeAll(async ({ browser }) => {
+   page = await browser.newPage();
+   errors = attachPageErrors(page);
+   await login(page);
+   await clearChat(page);
+});
+
+test.afterEach(async () => {
+   await closeAllApps(page);
+   errors.length = 0;
+});
+
+test.afterAll(async () => {
+   await page?.close();
+});
 
 test.describe('effect tray sidebar tab', () => {
-   test.beforeEach(async ({ page }) => {
-      await login(page);
+   test.beforeEach(async () => {
       const ready = await page.evaluate(() => typeof game.titan !== 'undefined'
          && !!CONFIG.ui?.titanEffects);
       expect(ready, 'TITAN system + titanEffects tab must be registered').toBe(true);
@@ -31,7 +52,7 @@ test.describe('effect tray sidebar tab', () => {
       });
    });
 
-   test('the titanEffects tab is registered and its panel mounts', async ({ page }) => {
+   test('the titanEffects tab is registered and its panel mounts', async () => {
       // The tab class is registered on CONFIG.ui and added to the Sidebar tab list.
       const registered = await page.evaluate(() => {
          const inTabs = 'titanEffects' in foundry.applications.sidebar.Sidebar.TABS;
@@ -41,10 +62,6 @@ test.describe('effect tray sidebar tab', () => {
       expect(registered, 'titanEffects must be in Sidebar.TABS and CONFIG.ui').toBe(true);
 
       // Activate the tab and confirm the Svelte panel mounted with our marker.
-      const errors = [];
-      page.on('pageerror', (err) => {
-         errors.push(err.message);
-      });
       await page.evaluate(async () => {
          await ui.titanEffects.render(true);
          ui.titanEffects.activate();
@@ -57,7 +74,7 @@ test.describe('effect tray sidebar tab', () => {
       expect(errors, `uncaught errors mounting the tray:\n${errors.join('\n')}`).toEqual([]);
    });
 
-   test('the dropdown lists ActiveEffect packs and browsing shows seeded effects', async ({ page }) => {
+   test('the dropdown lists ActiveEffect packs and browsing shows seeded effects', async () => {
       await page.evaluate(async () => {
          await ui.titanEffects.render(true);
          ui.titanEffects.activate();
@@ -92,7 +109,7 @@ test.describe('effect tray sidebar tab', () => {
       ).toBeVisible();
    });
 
-   test('Apply copies the effect onto the controlled token actor', async ({ page }) => {
+   test('Apply copies the effect onto the controlled token actor', async () => {
       // Create an actor + token on the active scene and control it.
       await page.evaluate(async () => {
          const stale = game.actors.getName('E2E Tray Target');
@@ -160,7 +177,7 @@ test.describe('effect tray sidebar tab', () => {
          .toBe(true);
    });
 
-   test('create, rename, and delete round-trip in the selected world pack', async ({ page }) => {
+   test('create, rename, and delete round-trip in the selected world pack', async () => {
       await page.evaluate(async () => {
          await ui.titanEffects.render(true);
          ui.titanEffects.activate();
@@ -226,7 +243,7 @@ test.describe('effect tray sidebar tab', () => {
          .toBe(true);
    });
 
-   test('renaming a folder inline persists the new name to the pack', async ({ page }) => {
+   test('renaming a folder inline persists the new name to the pack', async () => {
       // Seed a folder in the world pack to rename, render the tray, and select the world pack.
       await page.evaluate(async () => {
          const pack = game.packs.get('world.e2e-tray-effects');
@@ -282,7 +299,7 @@ test.describe('effect tray sidebar tab', () => {
       });
    });
 
-   test('stash-from-actor copies a dropped effect into the selected pack', async ({ page }) => {
+   test('stash-from-actor copies a dropped effect into the selected pack', async () => {
       // Create an actor that owns an effect to stash, render the tray, and select the world pack.
       await page.evaluate(async () => {
          const stale = game.actors.getName('E2E Stash Source');
@@ -353,7 +370,7 @@ test.describe('effect tray sidebar tab', () => {
       });
    });
 
-   test('left-clicking a row opens the effect sheet', async ({ page }) => {
+   test('left-clicking a row opens the effect sheet', async () => {
       await page.evaluate(async () => {
          await ui.titanEffects.render(true);
          ui.titanEffects.activate();
@@ -401,7 +418,7 @@ test.describe('effect tray sidebar tab', () => {
       });
    });
 
-   test('right-click context menu opens the effect sheet', async ({ page }) => {
+   test('right-click context menu opens the effect sheet', async () => {
       await page.evaluate(async () => {
          await ui.titanEffects.render(true);
          ui.titanEffects.activate();
@@ -452,7 +469,7 @@ test.describe('effect tray sidebar tab', () => {
       });
    });
 
-   test('GM lock toggle flips the pack locked state', async ({ page }) => {
+   test('GM lock toggle flips the pack locked state', async () => {
       await page.evaluate(async () => {
          const pack = game.packs.get('world.e2e-tray-effects');
          if (pack.locked) { await pack.configure({ locked: false }); }

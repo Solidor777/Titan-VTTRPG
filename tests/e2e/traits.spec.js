@@ -1,5 +1,6 @@
 import { expect, test } from '@playwright/test';
 import { login } from './fixtures.js';
+import { attachPageErrors, clearChat, closeAllApps } from './world.js';
 
 /**
  * Phase 3a — custom-trait behavioral coverage on an Item sheet, driven through the live UI. Regressions
@@ -25,19 +26,33 @@ const ORIGINAL_NAME = 'E2E Original Trait';
 const EDITED_NAME = 'E2E Edited Trait';
 const DESCRIPTION_KEY = 'addCustomTrait';
 
+/** @type {import('@playwright/test').Page} The file-shared, logged-in page (one world boot per file). */
+let page;
+/** @type {string[]} Uncaught page errors collected during the current test (cleared each afterEach). */
+let errors;
+
+test.beforeAll(async ({ browser }) => {
+   page = await browser.newPage();
+   errors = attachPageErrors(page);
+   await login(page);
+   await clearChat(page);
+});
+
+test.afterEach(async () => {
+   await closeAllApps(page);
+   errors.length = 0;
+});
+
+test.afterAll(async () => {
+   await page?.close();
+});
+
 test.describe('custom trait edit/delete on items', () => {
-   // Log in, rebuild a clean weapon seeded with one custom trait, and open its sheet.
-   test.beforeEach(async ({ page }) => {
-      const bootErrors = [];
-      page.on('pageerror', (err) => {
-         bootErrors.push(err.message);
-      });
-
-      await login(page);
-
+   // Rebuild a clean weapon seeded with one custom trait, and open its sheet.
+   test.beforeEach(async () => {
       const ready = await page.evaluate(() => typeof game.titan !== 'undefined'
          && !!CONFIG.Item?.dataModels?.weapon);
-      expect(ready, `TITAN system failed to initialize.\n${bootErrors.join('\n')}`).toBe(true);
+      expect(ready, `TITAN system failed to initialize.\n${errors.join('\n')}`).toBe(true);
 
       await page.evaluate(async ({ itemName, traitName, description }) => {
          const stale = game.items.getName(itemName);
@@ -63,12 +78,7 @@ test.describe('custom trait edit/delete on items', () => {
       }, { itemName: ITEM_NAME, traitName: ORIGINAL_NAME, description: DESCRIPTION_KEY });
    });
 
-   test('editing a custom trait persists the new name and re-renders the tag', async ({ page }) => {
-      const errors = [];
-      page.on('pageerror', (err) => {
-         errors.push(err.message);
-      });
-
+   test('editing a custom trait persists the new name and re-renders the tag', async () => {
       // The seeded trait renders in the sidebar.
       await expect(
          page.locator('.sidebar').getByText(ORIGINAL_NAME).first(),
@@ -109,12 +119,7 @@ test.describe('custom trait edit/delete on items', () => {
       expect(errors, `uncaught errors during edit:\n${errors.join('\n')}`).toEqual([]);
    });
 
-   test('deleting a custom trait removes it and re-renders without the tag', async ({ page }) => {
-      const errors = [];
-      page.on('pageerror', (err) => {
-         errors.push(err.message);
-      });
-
+   test('deleting a custom trait removes it and re-renders without the tag', async () => {
       await expect(
          page.locator('.sidebar').getByText(ORIGINAL_NAME).first(),
          'seeded trait should render',
@@ -142,7 +147,7 @@ test.describe('custom trait edit/delete on items', () => {
       expect(errors, `uncaught errors during delete:\n${errors.join('\n')}`).toEqual([]);
    });
 
-   test('the edit and delete icons use the FontAwesome font (glyphs render)', async ({ page }) => {
+   test('the edit and delete icons use the FontAwesome font (glyphs render)', async () => {
       // A FontAwesome glyph only renders when its element resolves to the FA font family; on a bare
       // `<button>` Foundry's UI font wins and the glyph falls back to the notdef box. Assert the element
       // bearing each icon class resolves to a "Font Awesome" family.
@@ -159,7 +164,7 @@ test.describe('custom trait edit/delete on items', () => {
       expect(families.delete, 'delete icon font-family').toMatch(/Font Awesome/i);
    });
 
-   test('the custom-trait description tooltip is shown verbatim, not localized', async ({ page }) => {
+   test('the custom-trait description tooltip is shown verbatim, not localized', async () => {
       // The seeded description is a real localization key; if it were localized the tooltip would read
       // its localized value instead of the raw user text. Read the label's tippy content directly.
       const tooltipContent = await page.evaluate((name) => {
@@ -176,7 +181,7 @@ test.describe('custom trait edit/delete on items', () => {
       expect(tooltipContent, 'tooltip shows the raw description, not its localization').toBe(DESCRIPTION_KEY);
    });
 
-   test('the edit dialog carries its stable CSS class', async ({ page }) => {
+   test('the edit dialog carries its stable CSS class', async () => {
       // The edit dialog must apply `titan-edit-custom-trait-dialog` via `classes:[...]` (the
       // `_getDialogClasses()` override is dead in v14), matching the add dialog.
       await page.locator('.sidebar .fa-pen-to-square').click();

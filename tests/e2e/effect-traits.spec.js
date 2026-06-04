@@ -1,5 +1,6 @@
 import { expect, test } from '@playwright/test';
 import { login } from './fixtures.js';
+import { attachPageErrors, clearChat, closeAllApps } from './world.js';
 
 /**
  * Phase 3a Concern A — custom-trait edit/delete on an Effect sheet. Effects reuse the same (now-fixed)
@@ -7,22 +8,36 @@ import { login } from './fixtures.js';
  * `TitanActiveEffect`, so this locks in that the trait-sidebar fixes apply to effects too.
  */
 
+/** @type {import('@playwright/test').Page} The file-shared, logged-in page (one world boot per file). */
+let page;
+/** @type {string[]} Uncaught page errors collected during the current test (cleared each afterEach). */
+let errors;
+
+test.beforeAll(async ({ browser }) => {
+   page = await browser.newPage();
+   errors = attachPageErrors(page);
+   await login(page);
+   await clearChat(page);
+});
+
+test.afterEach(async () => {
+   await closeAllApps(page);
+   errors.length = 0;
+});
+
+test.afterAll(async () => {
+   await page?.close();
+});
+
 const ACTOR_NAME = 'E2E Effect Trait Actor';
 const ORIGINAL_NAME = 'E2E Original Effect Trait';
 const EDITED_NAME = 'E2E Edited Effect Trait';
 
 test.describe('custom trait edit/delete on effects', () => {
-   test.beforeEach(async ({ page }) => {
-      const bootErrors = [];
-      page.on('pageerror', (err) => {
-         bootErrors.push(err.message);
-      });
-
-      await login(page);
-
+   test.beforeEach(async () => {
       const ready = await page.evaluate(() => typeof game.titan !== 'undefined'
          && !!CONFIG.Actor?.dataModels?.player);
-      expect(ready, `TITAN system failed to initialize.\n${bootErrors.join('\n')}`).toBe(true);
+      expect(ready, `TITAN system failed to initialize.\n${errors.join('\n')}`).toBe(true);
 
       // Rebuild a character carrying one effect seeded with a custom trait, then render the effect sheet.
       await page.evaluate(async ({ actorName, traitName }) => {
@@ -50,12 +65,7 @@ test.describe('custom trait edit/delete on effects', () => {
       }, { actorName: ACTOR_NAME, traitName: ORIGINAL_NAME });
    });
 
-   test('editing an effect custom trait persists the new name and re-renders', async ({ page }) => {
-      const errors = [];
-      page.on('pageerror', (err) => {
-         errors.push(err.message);
-      });
-
+   test('editing an effect custom trait persists the new name and re-renders', async () => {
       await expect(
          page.locator('.sidebar').getByText(ORIGINAL_NAME).first(),
          'seeded effect trait should render',
@@ -87,12 +97,7 @@ test.describe('custom trait edit/delete on effects', () => {
       expect(errors, `uncaught errors during effect-trait edit:\n${errors.join('\n')}`).toEqual([]);
    });
 
-   test('deleting an effect custom trait removes it and re-renders', async ({ page }) => {
-      const errors = [];
-      page.on('pageerror', (err) => {
-         errors.push(err.message);
-      });
-
+   test('deleting an effect custom trait removes it and re-renders', async () => {
       await expect(
          page.locator('.sidebar').getByText(ORIGINAL_NAME).first(),
          'seeded effect trait should render',

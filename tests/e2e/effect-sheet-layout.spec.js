@@ -1,19 +1,35 @@
 import { expect, test } from '@playwright/test';
 import { login } from './fixtures.js';
+import { attachPageErrors, clearChat, closeAllApps } from './world.js';
 
 /**
  * Regression: the standalone Active Effect sheet must render with usable content height. It shares
  * ItemSheetBase (which lays out with height: 100%), so it requires a definite window height; without
  * one the body collapses to the tab-button strip (~40px) and the tab content is unreachable.
  */
-test('effect AE sheet renders with a non-collapsed content body', async ({ page }) => {
-   const errors = [];
-   page.on('pageerror', (err) => {
-      errors.push(err.message);
-   });
 
+/** @type {import('@playwright/test').Page} The file-shared, logged-in page (one world boot per file). */
+let page;
+/** @type {string[]} Uncaught page errors collected during the current test (cleared each afterEach). */
+let errors;
+
+test.beforeAll(async ({ browser }) => {
+   page = await browser.newPage();
+   errors = attachPageErrors(page);
    await login(page);
+   await clearChat(page);
+});
 
+test.afterEach(async () => {
+   await closeAllApps(page);
+   errors.length = 0;
+});
+
+test.afterAll(async () => {
+   await page?.close();
+});
+
+test('effect AE sheet renders with a non-collapsed content body', async () => {
    const systemReady = await page.evaluate(() => typeof game.titan !== 'undefined'
       && !!CONFIG.Actor?.dataModels?.player);
    expect(systemReady, 'TITAN system initialized').toBe(true);

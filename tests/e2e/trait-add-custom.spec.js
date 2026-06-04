@@ -1,5 +1,6 @@
 import { expect, test } from '@playwright/test';
 import { login } from './fixtures.js';
+import { attachPageErrors, clearChat, closeAllApps } from './world.js';
 
 /**
  * First behavioral vertical slice: the "Add Custom Trait" flow on an Item, driven entirely through
@@ -18,25 +19,38 @@ import { login } from './fixtures.js';
  * `ItemSheetCustomTraitTag.svelte` renders the persisted trait's name via `EditDeleteTag`.
  */
 
+/** @type {import('@playwright/test').Page} The file-shared, logged-in page (one world boot per file). */
+let page;
+/** @type {string[]} Uncaught page errors collected during the current test (cleared each afterEach). */
+let errors;
+
+test.beforeAll(async ({ browser }) => {
+   page = await browser.newPage();
+   errors = attachPageErrors(page);
+   await login(page);
+   await clearChat(page);
+});
+
+test.afterEach(async () => {
+   await closeAllApps(page);
+   errors.length = 0;
+});
+
+test.afterAll(async () => {
+   await page?.close();
+});
+
 // The world item the trait is added to, and the trait name typed into the dialog.
 const ITEM_NAME = 'E2E Trait Item';
 const TRAIT_NAME = 'E2E Custom Trait';
 
 test.describe('add custom trait on items', () => {
-   // Log in as the dedicated test GM, then build a clean weapon item and open its sheet.
-   test.beforeEach(async ({ page }) => {
-      // Capture uncaught page errors from the start so a fatal load break is surfaced verbatim.
-      const bootErrors = [];
-      page.on('pageerror', (err) => {
-         bootErrors.push(err.message);
-      });
-
-      await login(page);
-
+   // Build a clean weapon item and open its sheet.
+   test.beforeEach(async () => {
       // Precondition: the TITAN system must have initialized and registered item data models.
       const ready = await page.evaluate(() => typeof game.titan !== 'undefined'
          && !!CONFIG.Item?.dataModels?.weapon);
-      expect(ready, `TITAN system failed to initialize.\n${bootErrors.join('\n')}`).toBe(true);
+      expect(ready, `TITAN system failed to initialize.\n${errors.join('\n')}`).toBe(true);
 
       // Rebuild the fixture item from scratch and render its sheet inside the Foundry runtime.
       await page.evaluate(async (itemName) => {
@@ -59,13 +73,7 @@ test.describe('add custom trait on items', () => {
    });
 
    // Drive the full UI flow and assert the trait both persists and renders.
-   test('+ button opens the dialog; Add Trait persists and renders the trait', async ({ page }) => {
-      // Collected uncaught page errors fired during the interaction window.
-      const errors = [];
-      page.on('pageerror', (err) => {
-         errors.push(err.message);
-      });
-
+   test('+ button opens the dialog; Add Trait persists and renders the trait', async () => {
       // Open the Add Custom Trait dialog via the sidebar button (localized label "Add Custom Trait").
       await page.getByText('Add Custom Trait', { exact: true }).first().click();
 

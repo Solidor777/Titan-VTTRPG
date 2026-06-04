@@ -1,5 +1,6 @@
 import { expect, test } from '@playwright/test';
 import { login } from './fixtures.js';
+import { attachPageErrors, clearChat, closeAllApps } from './world.js';
 
 /**
  * Effect check-rolling path: an effect that carries a check[] entry can be rolled through the shared
@@ -13,26 +14,40 @@ import { login } from './fixtures.js';
  * flags.titan.type for an item check is 'itemCheck'; the mounted card root is '.check-chat-message'.
  */
 
+/** @type {import('@playwright/test').Page} The file-shared, logged-in page (one world boot per file). */
+let page;
+/** @type {string[]} Uncaught page errors collected during the current test (cleared each afterEach). */
+let errors;
+
+test.beforeAll(async ({ browser }) => {
+   page = await browser.newPage();
+   errors = attachPageErrors(page);
+   await login(page);
+   await clearChat(page);
+});
+
+test.afterEach(async () => {
+   await closeAllApps(page);
+   errors.length = 0;
+});
+
+test.afterAll(async () => {
+   await page?.close();
+});
+
 test.describe('v14 effect check rolling', () => {
    // The fixture actor name and its single seeded effect.
    const ACTOR_NAME = 'E2E Effect Roller';
    const EFFECT_NAME = 'E2E Check Effect';
    const EFFECT_DESCRIPTION = '<p>Inline effect-check description.</p>';
 
-   // Log in and build the actor with one effect carrying a complete check[] entry.
-   test.beforeEach(async ({ page }) => {
-      const bootErrors = [];
-      page.on('pageerror', (err) => {
-         bootErrors.push(err.message);
-      });
-
-      await login(page);
-
+   // Build the actor with one effect carrying a complete check[] entry.
+   test.beforeEach(async () => {
       const systemReady = await page.evaluate(() => typeof game.titan !== 'undefined'
          && !!CONFIG.Actor?.dataModels?.player);
       expect(
          systemReady,
-         `TITAN system failed to initialize before effect-check walk. Captured page errors:\n${bootErrors.join('\n')}`,
+         `TITAN system failed to initialize before effect-check walk. Captured page errors:\n${errors.join('\n')}`,
       ).toBe(true);
 
       await page.evaluate(async ({ actorName, effectName, effectDescription }) => {
@@ -83,7 +98,7 @@ test.describe('v14 effect check rolling', () => {
       }, { actorName: ACTOR_NAME, effectName: EFFECT_NAME, effectDescription: EFFECT_DESCRIPTION });
    });
 
-   test('effect roll data carries the effect description', async ({ page }) => {
+   test('effect roll data carries the effect description', async () => {
       const description = await page.evaluate(({ actorName, effectName }) => {
          const actor = game.actors.getName(actorName);
          const effect = actor.effects.find((e) => e.name === effectName);
@@ -93,12 +108,7 @@ test.describe('v14 effect check rolling', () => {
       expect(description, 'effect roll data exposes the native description').toBe(EFFECT_DESCRIPTION);
    });
 
-   test('effect check rolls, posts an itemCheck message, and renders its card', async ({ page }) => {
-      const errors = [];
-      page.on('pageerror', (err) => {
-         errors.push(err.message);
-      });
-
+   test('effect check rolls, posts an itemCheck message, and renders its card', async () => {
       // Roll the effect's check through the shared engine using the itemRollData passthrough.
       const result = await page.evaluate(async ({ actorName, effectName }) => {
          const actor = game.actors.getName(actorName);
