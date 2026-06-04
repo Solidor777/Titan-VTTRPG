@@ -4,36 +4,38 @@ Resume point after a context `/clear`. Read this, then the referenced docs.
 
 ## Resume sequence (what to do next)
 
-**Implement e2e speedup Phase 2 (`docs/TODO.md` #15) — the shared-world harness + hygiene.** This is
-the substantial speedup: the suite currently boots the Foundry world **once per test** (~100+ boots);
-Phase 2 collapses that to **once per spec file** (~40 boots) with per-test hygiene so a reused page
-behaves like a fresh one. **The per-file/per-run world reset also fixes the socket-sync flake**
-(`docs/OPEN_BUGS.md` #1). Approved design spec (Workstream A, Phase 2):
-`docs/superpowers/specs/2026-06-03-e2e-suite-speedup-design.md`.
+**Implement e2e speedup Phase 2 (`docs/TODO.md` #15) — the shared-world harness + hygiene.** Brainstorm
+is DONE and the implementation design is **written + approved**:
+`docs/superpowers/specs/2026-06-04-e2e-phase2-shared-world-harness-design.md` (resolves the parent
+spec's open decisions). **Resume by:** (optionally let the user glance at that spec, then) invoke
+`superpowers:writing-plans` to create the implementation plan, then `superpowers:subagent-driven-development`
+to execute it. Route all `.js` edits through the `titan-svelte-dev` subagent; load
+`foundry-vtt` + `titan-codebase`. The suite is the regression gate for its own refactor — keep it green
+at parity, verifying each migrated file with `npx playwright test <file> --reporter=line`.
 
-This is its own **brainstorm → plan → implement (subagent-driven)** cycle. Route all `.js` edits
-through the `titan-svelte-dev` subagent; load `foundry-vtt` + `titan-codebase` (the suite is the
-regression gate for its own refactor — keep it green at parity).
+### Approved Phase 2 decisions (locked — do not re-litigate)
 
-### Open implementation decisions to settle in the brainstorm
-
-The spec deliberately left these to the plan:
-1. **Shared-page mechanism** — file-scoped `beforeAll` that logs in one `browser.newPage()` and exposes
-   it via an accessor, **vs** a custom `test.extend` fixture whose `page` resolves to the file-shared
-   page. Both are established Playwright patterns; pick one and standardize it in `tests/e2e/world.js`.
-2. **Per-test hygiene** (`afterEach`) — close all open apps (`foundry.applications.instances` +
-   legacy `ui.windows`, try-caught); replace per-test `page.on('pageerror', …)` with a single shared
-   collector **cleared each test**; (per file) clear chat messages so they stop accumulating.
-3. **Migration strategy / opt-out** — migrate specs file-by-file (one line per file); `login()` stays
-   exported and unchanged as the opt-out. **Do NOT migrate** the self-managed multi-context specs
-   (`multi-client.spec.js`, `socket-sync.spec.js`) — they create their own contexts/pages.
-4. **World reset** — what to trim (chat clear + accumulated state) and when (per-file `beforeAll` and/or
-   per-run), without wiping the find-or-create fixtures specs rely on.
+- **Mechanism:** module-scoped `let page` + closure; tests/`beforeEach` become `async () =>` using the
+  closure `page`. **Hooks are written FULLY INLINE in each spec** (`beforeAll` boots once via `login`;
+  `afterEach` calls `closeAllApps(page)` + clears the error array; `afterAll` closes the page). New
+  `tests/e2e/world.js` exports only **stateless helpers** — `closeAllApps(page)`, `clearChat(page)`,
+  `attachPageErrors(page) → errors[]` — NOT a hook-registrar.
+- **Rollout:** migrate **all ~40 eligible specs this cycle** (every `beforeEach(login)` spec),
+  file-by-file. **Do NOT migrate** `multi-client.spec.js` / `socket-sync.spec.js` (self-managed
+  contexts). Per-spec opt-out = keep `beforeEach(login)`.
+- **Hygiene:** `afterEach` closes all apps (`foundry.applications.instances` + `ui.windows`, try-caught)
+  and resets the shared page-error collector (`errors.length = 0`). **World reset:** per-file
+  `clearChat(page)` in `beforeAll` (the chat bloat is what times out socket replication → fixes
+  `OPEN_BUGS.md` #1). Actor/item fixtures left to specs' find-or-create logic.
+- **Page-error refactor:** the per-test `page.on('pageerror')` in `renderSheet` (`fixtures.js`) and in
+  `render-smoke` / `localization` / `effect-tray` (test 1) is replaced by reading the shared `errors`
+  array (listeners would otherwise stack on the reused page). `renderSheet` gains an `errors` param.
 
 ### Measurement
 
 Capture a before/after full-suite wall-clock (`npm run test:e2e`, ~34 min, **world-launch-gated** — the
-human must have the world launched on `:30000`). Per-file boot-once is the primary success signal.
+human must have the world launched on `:30000`). Per-file boot-once is the primary success signal; also
+confirm the socket-sync A1/A2 flake is gone.
 
 ## Just shipped (this session, merged + pushed to `main` at `5ef9d2e9`)
 
