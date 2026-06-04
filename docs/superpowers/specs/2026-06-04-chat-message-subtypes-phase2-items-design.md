@@ -1,7 +1,12 @@
 # Chat Message Subtypes — Phase 2 (Item Cards)
 
 - **Date:** 2026-06-04
-- **Status:** **APPROVED (2026-06-04) — path-parity design.** User decision resolves D1 + D2: the chat
+- **Status:** **IMPLEMENTED + VERIFIED (2026-06-04) — path-parity design.** Shipped via `buildSchemaFromShape`
+  + shared item-system templates; item chat cards self-render their `system.X` snapshot. Verified: unit
+  115, full e2e 365 (incl. `tests/e2e/item-cards.spec.js` ×7), build clean, live-world probe across all 7
+  types. Follow-ups B (item DMs consume the templates) + D (check schemas from templates) tracked in
+  `docs/TODO.md`. The original "open decisions" below are superseded by the path-parity decision.
+- **Prior status:** **APPROVED (2026-06-04) — path-parity design.** User decision resolves D1 + D2: the chat
   message's `system` is a faithful snapshot of the source item's `system` data, so cards read
   `document.data.system.X` exactly as the item sheet reads `item.system.X` (TODO #12 north-star; enables
   component reuse). This SUPERSEDES the original "typed-flat with dead-read flatten" framing in the "Open

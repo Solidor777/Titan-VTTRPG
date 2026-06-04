@@ -318,17 +318,33 @@ The "first-class ChatMessage subtypes" effort is specced/planned in
 `plans/2026-06-03-chat-message-subtypes-phase1.md` (Phase 1 = infrastructure +
 the five check subtypes; later phases cover items, reports, and effect).
 
-**Phase 2 (item cards ×7) — SPECCED + PLANNED, awaiting approval + restart** (2026-06-04):
-`specs/2026-06-04-chat-message-subtypes-phase2-items-design.md` +
-`plans/2026-06-04-chat-message-subtypes-phase2-items.md`. Two open decisions need a yes/no
-(D1 typed-flat schema [recommended], D2 fix the pre-existing dead `flags.titan.system.X`
-reads [recommended]); full verification is **Foundry-restart-gated** (`documentTypes`
-register only at world load, which the agent cannot trigger). Authoritative per-leaf
-`getRollData()` shapes were captured at runtime and embedded in the spec appendix.
-**Critical finding:** `ItemChat{Value,Rarity,Traits,Tradition}` and several leaves read a
-`system` key that the item roll-data payload does NOT contain (`hasSystemKey: false` for all
-7 types) — they are dead/broken today; Phase 2 repairs them. Phases 3 (reports ×13) and 4
-(effect + delete the legacy hook/`ChatMessageShell.svelte`) remain to be specced.
+**Phase 2 (item cards ×7) — DONE** (2026-06-04, path-parity architecture). Implemented via a new
+recursive `buildSchemaFromShape` helper (`src/helpers/utility-functions/`) + shared per-type
+item-system shape templates feeding the item chat-message data models. Each item chat card is now a
+first-class `ChatMessage` subtype (`weapon`/`armor`/`spell`/`ability`/`shield`/`equipment`/`commodity`)
+whose `message.system` snapshots the item's `system` data, so cards read `document.data.system.X`
+exactly as item sheets do (component-reuse path parity — TODO #12 north-star). DataModel hierarchy:
+`TitanChatMessageDataModel` → `ItemChatMessageDataModel` (shared item ancestor) → 7 leaves; check side
+reparented so `AttributeCheckChatMessageDataModel` is the shared base for attack/casting/item checks and
+`ResistanceCheckChatMessageDataModel` stays separate. Producer `TitanItem.sendToChat()` →
+`buildChatMessageData()` (`{type, system}`); ~17 item chat components swept `flags.titan.X` →
+`document.data.system.X`; the pre-existing dead `flags.titan.system.X` reads were repaired. Verified:
+unit 115, full e2e **365** (incl. new `tests/e2e/item-cards.spec.js` ×7), build clean. Spec/plan:
+`specs/2026-06-04-chat-message-subtypes-phase2-items-design.md`,
+`plans/2026-06-04-chat-message-subtypes-phase2-items.md`.
+
+**Follow-ups (user-approved sequencing — do after Phase 2 merge):**
+- **(B) Item DataModels build their schema from the shared templates** (`buildSchemaFromShape(template)` +
+  per-field config overrides for integer/min/max/choices/initial) — completes single-source-of-truth so
+  the item schema and chat template cannot drift. **DATA-INTEGRITY SENSITIVE** (changes the schemas of
+  real actor/item data): require schema-equivalence unit tests + item-sheet e2e (render-smoke, reactive-*)
+  before merge. (Component reuse is already enabled by path parity; B removes drift risk.)
+- **(D) Build the check chat schemas from the check template objects** via `buildSchemaFromShape` (the
+  reparenting is done; this is the template-typing so resistance's shape genuinely diverges). Preserve
+  check component read paths; verify unit + e2e.
+
+**Phase 3 (reports ×13) and Phase 4 (effect + delete the legacy hook/`ChatMessageShell.svelte`) remain to
+be specced.**
 
 ### 10. Chat-message Svelte mount is keyed per-document, not per-element
 
