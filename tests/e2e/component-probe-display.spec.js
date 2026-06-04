@@ -1,24 +1,41 @@
 import { test, expect } from '@playwright/test';
 import { login } from './fixtures.js';
 import { mountProbe, unmountAll, clearProbeEvents, probeComponent } from './componentProbe.js';
+import { closeAllApps, clearChat, attachPageErrors } from './world.js';
+
+/** @type {import('@playwright/test').Page} The file-shared, logged-in page (one world boot per file). */
+let page;
+/** @type {string[]} Uncaught page errors collected during the current test (cleared each afterEach). */
+let errors;
+
+test.beforeAll(async ({ browser }) => {
+   page = await browser.newPage();
+   errors = attachPageErrors(page);
+   await login(page);
+   await clearChat(page);
+});
+
+test.afterEach(async () => {
+   await closeAllApps(page);
+   errors.length = 0;
+});
+
+test.afterAll(async () => {
+   await page?.close();
+});
 
 // ---------------------------------------------------------------------------
 // Meter
 // ---------------------------------------------------------------------------
 
 test.describe('component probe — Meter', () => {
-   /** Authenticate as E2E GM 1 before each probe. */
-   test.beforeEach(async ({ page }) => {
-      await login(page);
-   });
-
    /** Tear down every mounted probe so containers never leak between tests. */
-   test.afterEach(async ({ page }) => {
+   test.afterEach(async () => {
       await unmountAll(page);
       await clearProbeEvents(page);
    });
 
-   test('animates the bar width to value/max percent', async ({ page }) => {
+   test('animates the bar width to value/max percent', async () => {
       // Formula (per Meter.svelte, JS operator precedence): ((value / max) - min) * 100.
       // For value=3, max=4, min=0 → ((3 / 4) - 0) * 100 = 75 %.
       // The bar reaches its target asynchronously via setInterval; poll until it arrives.
@@ -40,7 +57,7 @@ test.describe('component probe — Meter', () => {
       ).toBe(75);
    });
 
-   test('testId resolves to data-testid on the root .meter div', async ({ page }) => {
+   test('testId resolves to data-testid on the root .meter div', async () => {
       const { selector } = await mountProbe(page, 'Meter', {
          props: {
             value: 1,
@@ -59,18 +76,13 @@ test.describe('component probe — Meter', () => {
 // ---------------------------------------------------------------------------
 
 test.describe('component probe — Text', () => {
-   /** Authenticate as E2E GM 1 before each probe. */
-   test.beforeEach(async ({ page }) => {
-      await login(page);
-   });
-
    /** Tear down every mounted probe so containers never leak between tests. */
-   test.afterEach(async ({ page }) => {
+   test.afterEach(async () => {
       await unmountAll(page);
       await clearProbeEvents(page);
    });
 
-   test('renders raw text when localize is false', async ({ page }) => {
+   test('renders raw text when localize is false', async () => {
       // Text renders processTextData(text) inline with no own root element.
       // Pass a TextData object with localize:false to skip i18n and assert the literal string.
       const { selector } = await mountProbe(page, 'Text', {
@@ -85,7 +97,7 @@ test.describe('component probe — Text', () => {
       await expect(page.locator(selector)).toContainText('HelloProbeText');
    });
 
-   test('renders a numeric value directly', async ({ page }) => {
+   test('renders a numeric value directly', async () => {
       const { selector } = await mountProbe(page, 'Text', {
          props: {
             text: 42,
@@ -100,18 +112,13 @@ test.describe('component probe — Text', () => {
 // ---------------------------------------------------------------------------
 
 test.describe('component probe — Tabs', () => {
-   /** Authenticate as E2E GM 1 before each probe. */
-   test.beforeEach(async ({ page }) => {
-      await login(page);
-   });
-
    /** Tear down every mounted probe so containers never leak between tests. */
-   test.afterEach(async ({ page }) => {
+   test.afterEach(async () => {
       await unmountAll(page);
       await clearProbeEvents(page);
    });
 
-   test('only the active tab content is mounted; inactive tab component is absent', async ({ page }) => {
+   test('only the active tab content is mounted; inactive tab component is absent', async () => {
       // Tabs lazy-mounts via `{#if tab.id === activeTab}`.  The component renders with no props, so
       // LabelTag renders an empty `.tag` div.  With 2 tabs but only one active, exactly ONE `.tag`
       // appears inside `.tab-content`; the inactive tab's component is never instantiated.
@@ -137,7 +144,7 @@ test.describe('component probe — Tabs', () => {
       await expect(page.locator(`${selector} .tab-content .tag`)).toHaveCount(1);
    });
 
-   test('switching activeTab to the other tab still renders exactly one body component', async ({ page }) => {
+   test('switching activeTab to the other tab still renders exactly one body component', async () => {
       // Mount with tab-b active — the inactive tab (tab-a) must not be instantiated.
       const { selector } = await mountProbe(page, 'Tabs', {
          props: {
@@ -159,7 +166,7 @@ test.describe('component probe — Tabs', () => {
       await expect(page.locator(`${selector} .tab-content .tag`)).toHaveCount(1);
    });
 
-   test('testId resolves to data-testid on the root .tabs div', async ({ page }) => {
+   test('testId resolves to data-testid on the root .tabs div', async () => {
       const { selector } = await mountProbe(page, 'Tabs', {
          props: {
             tabs: [
@@ -184,18 +191,13 @@ test.describe('component probe — Tabs', () => {
 // ---------------------------------------------------------------------------
 
 test.describe('component probe — ScrollingContainer', () => {
-   /** Authenticate as E2E GM 1 before each probe. */
-   test.beforeEach(async ({ page }) => {
-      await login(page);
-   });
-
    /** Tear down every mounted probe so containers never leak between tests. */
-   test.afterEach(async ({ page }) => {
+   test.afterEach(async () => {
       await unmountAll(page);
       await clearProbeEvents(page);
    });
 
-   test('renders children inside the .content wrapper', async ({ page }) => {
+   test('renders children inside the .content wrapper', async () => {
       // ScrollingContainer wraps children in .container > .content.
       // The harness string text prop becomes a snippet that renders inside the container.
       const { selector } = await mountProbe(page, 'ScrollingContainer', {
@@ -207,7 +209,7 @@ test.describe('component probe — ScrollingContainer', () => {
       await expect(page.locator(`${selector} .container .content`)).toContainText('ScrollProbeChild');
    });
 
-   test('testId resolves to data-testid on the root .container div', async ({ page }) => {
+   test('testId resolves to data-testid on the root .container div', async () => {
       // ScrollingContainer uses height:100% so the element has zero height in the fixed-position probe
       // container; use toBeAttached() to confirm the attribute is present without requiring a paint size.
       const { selector } = await mountProbe(page, 'ScrollingContainer', {
@@ -227,18 +229,13 @@ test.describe('component probe — ScrollingContainer', () => {
 // ---------------------------------------------------------------------------
 
 test.describe('component probe — LabeledElement', () => {
-   /** Authenticate as E2E GM 1 before each probe. */
-   test.beforeEach(async ({ page }) => {
-      await login(page);
-   });
-
    /** Tear down every mounted probe so containers never leak between tests. */
-   test.afterEach(async ({ page }) => {
+   test.afterEach(async () => {
       await unmountAll(page);
       await clearProbeEvents(page);
    });
 
-   test('renders the label text and children inside the wrapper', async ({ page }) => {
+   test('renders the label text and children inside the wrapper', async () => {
       // LabeledElement renders .labeled-element > .label + .element.
       // Pass `text` as the children snippet via the harness string prop.
       const { selector } = await mountProbe(page, 'LabeledElement', {
@@ -254,7 +251,7 @@ test.describe('component probe — LabeledElement', () => {
       await expect(page.locator(`${selector} .labeled-element > .element`)).toContainText('ElementChild');
    });
 
-   test('testId resolves to data-testid on the root .labeled-element div', async ({ page }) => {
+   test('testId resolves to data-testid on the root .labeled-element div', async () => {
       const { selector } = await mountProbe(page, 'LabeledElement', {
          props: {
             label: 'MyLabel',
@@ -272,18 +269,13 @@ test.describe('component probe — LabeledElement', () => {
 // ---------------------------------------------------------------------------
 
 test.describe('component probe — BorderedColumnList', () => {
-   /** Authenticate as E2E GM 1 before each probe. */
-   test.beforeEach(async ({ page }) => {
-      await login(page);
-   });
-
    /** Tear down every mounted probe so containers never leak between tests. */
-   test.afterEach(async ({ page }) => {
+   test.afterEach(async () => {
       await unmountAll(page);
       await clearProbeEvents(page);
    });
 
-   test('renders one .entry wrapper per entry and spreads props', async ({ page }) => {
+   test('renders one .entry wrapper per entry and spreads props', async () => {
       // Each entry's props are spread into the entryComponent (LabelTag here).
       // LabelTag renders .tag with its label text, so ContainText verifies prop spreading.
       const { selector } = await mountProbe(page, 'BorderedColumnList', {
@@ -301,7 +293,7 @@ test.describe('component probe — BorderedColumnList', () => {
       await expect(page.locator(`${selector} .entries`)).toContainText('EntryTwo');
    });
 
-   test('testId resolves to data-testid on the root .entries div', async ({ page }) => {
+   test('testId resolves to data-testid on the root .entries div', async () => {
       const { selector } = await mountProbe(page, 'BorderedColumnList', {
          props: {
             entryComponent: probeComponent('LabelTag'),
@@ -322,18 +314,13 @@ test.describe('component probe — BorderedColumnList', () => {
 // ---------------------------------------------------------------------------
 
 test.describe('component probe — TagContainer', () => {
-   /** Authenticate as E2E GM 1 before each probe. */
-   test.beforeEach(async ({ page }) => {
-      await login(page);
-   });
-
    /** Tear down every mounted probe so containers never leak between tests. */
-   test.afterEach(async ({ page }) => {
+   test.afterEach(async () => {
       await unmountAll(page);
       await clearProbeEvents(page);
    });
 
-   test('renders one tag wrapper per supplied tag', async ({ page }) => {
+   test('renders one tag wrapper per supplied tag', async () => {
       // TagContainer wraps each tag in .tag-container > .tag (the outer wrapper div).
       // LabelTag itself also renders a .tag div, so use direct-child `> .tag` to count only
       // the outer wrappers, not the inner LabelTag roots.
@@ -358,7 +345,7 @@ test.describe('component probe — TagContainer', () => {
       await expect(page.locator(`${selector} .tag-container`)).toContainText('Two');
    });
 
-   test('testId resolves to data-testid on the root .tag-container div', async ({ page }) => {
+   test('testId resolves to data-testid on the root .tag-container div', async () => {
       const { selector } = await mountProbe(page, 'TagContainer', {
          props: {
             tags: [

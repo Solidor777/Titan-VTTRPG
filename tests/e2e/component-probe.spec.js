@@ -1,20 +1,37 @@
 import { test, expect } from '@playwright/test';
 import { login } from './fixtures.js';
 import { mountProbe, readProbeEvents, clearProbeEvents, unmountAll } from './componentProbe.js';
+import { closeAllApps, clearChat, attachPageErrors } from './world.js';
+
+/** @type {import('@playwright/test').Page} The file-shared, logged-in page (one world boot per file). */
+let page;
+/** @type {string[]} Uncaught page errors collected during the current test (cleared each afterEach). */
+let errors;
+
+test.beforeAll(async ({ browser }) => {
+   page = await browser.newPage();
+   errors = attachPageErrors(page);
+   await login(page);
+   await clearChat(page);
+});
+
+test.afterEach(async () => {
+   await closeAllApps(page);
+   errors.length = 0;
+});
+
+test.afterAll(async () => {
+   await page?.close();
+});
 
 test.describe('component probe — Button', () => {
-   // Authenticate as E2E GM 1 before each probe.
-   test.beforeEach(async ({ page }) => {
-      await login(page);
-   });
-
    // Tear down every mounted probe so containers never leak between tests.
-   test.afterEach(async ({ page }) => {
+   test.afterEach(async () => {
       await unmountAll(page);
       await clearProbeEvents(page);
    });
 
-   test('click fires onclick', async ({ page }) => {
+   test('click fires onclick', async () => {
       const { selector } = await mountProbe(page, 'Button', {
          props: {
             text: 'Click me',
@@ -27,7 +44,7 @@ test.describe('component probe — Button', () => {
       expect(events.filter((e) => e.event === 'onclick')).toHaveLength(1);
    });
 
-   test('disabled suppresses onclick', async ({ page }) => {
+   test('disabled suppresses onclick', async () => {
       const { selector } = await mountProbe(page, 'Button', {
          props: {
             text: 'Nope',
@@ -41,7 +58,7 @@ test.describe('component probe — Button', () => {
       expect(events.filter((e) => e.event === 'onclick')).toHaveLength(0);
    });
 
-   test('testId resolves to data-testid', async ({ page }) => {
+   test('testId resolves to data-testid', async () => {
       const { selector } = await mountProbe(page, 'Button', {
          props: {
             text: 'Tagged',
@@ -53,15 +70,12 @@ test.describe('component probe — Button', () => {
 });
 
 test.describe('component probe — TextInput', () => {
-   test.beforeEach(async ({ page }) => {
-      await login(page);
-   });
-   test.afterEach(async ({ page }) => {
+   test.afterEach(async () => {
       await unmountAll(page);
       await clearProbeEvents(page);
    });
 
-   test('typing commits the value and forwards keyup', async ({ page }) => {
+   test('typing commits the value and forwards keyup', async () => {
       const { selector } = await mountProbe(page, 'TextInput', {
          props: {
             value: '',
@@ -79,7 +93,7 @@ test.describe('component probe — TextInput', () => {
       expect(events.some((e) => e.event === 'onkeyup')).toBe(true);
    });
 
-   test('disabled blocks editing', async ({ page }) => {
+   test('disabled blocks editing', async () => {
       const { selector } = await mountProbe(page, 'TextInput', {
          props: {
             value: 'locked',
@@ -93,15 +107,12 @@ test.describe('component probe — TextInput', () => {
 });
 
 test.describe('component probe — NumberInput / IntegerInput', () => {
-   test.beforeEach(async ({ page }) => {
-      await login(page);
-   });
-   test.afterEach(async ({ page }) => {
+   test.afterEach(async () => {
       await unmountAll(page);
       await clearProbeEvents(page);
    });
 
-   test('NumberInput clamps to max on commit and fires onchange', async ({ page }) => {
+   test('NumberInput clamps to max on commit and fires onchange', async () => {
       const { selector } = await mountProbe(page, 'NumberInput', {
          props: {
             value: 1,
@@ -122,7 +133,7 @@ test.describe('component probe — NumberInput / IntegerInput', () => {
       expect(events.some((e) => e.event === 'onchange')).toBe(true);
    });
 
-   test('IntegerInput commits an integer value', async ({ page }) => {
+   test('IntegerInput commits an integer value', async () => {
       const { selector } = await mountProbe(page, 'IntegerInput', {
          props: {
             value: 0,
@@ -143,7 +154,7 @@ test.describe('component probe — NumberInput / IntegerInput', () => {
       expect(events.some((e) => e.event === 'onchange')).toBe(true);
    });
 
-   test('disabled blocks editing', async ({ page }) => {
+   test('disabled blocks editing', async () => {
       const { selector } = await mountProbe(page, 'NumberInput', {
          props: {
             value: 3,
@@ -153,7 +164,7 @@ test.describe('component probe — NumberInput / IntegerInput', () => {
       await expect(page.locator(`${selector} input`)).toBeDisabled();
    });
 
-   test('testId resolves on NumberInput', async ({ page }) => {
+   test('testId resolves on NumberInput', async () => {
       const { selector } = await mountProbe(page, 'NumberInput', {
          props: {
             value: 1,
@@ -165,15 +176,12 @@ test.describe('component probe — NumberInput / IntegerInput', () => {
 });
 
 test.describe('component probe — CheckboxInput', () => {
-   test.beforeEach(async ({ page }) => {
-      await login(page);
-   });
-   test.afterEach(async ({ page }) => {
+   test.afterEach(async () => {
       await unmountAll(page);
       await clearProbeEvents(page);
    });
 
-   test('toggling flips the checked glyph and fires onchange', async ({ page }) => {
+   test('toggling flips the checked glyph and fires onchange', async () => {
       const { selector } = await mountProbe(page, 'CheckboxInput', {
          props: {
             value: false,
@@ -192,7 +200,7 @@ test.describe('component probe — CheckboxInput', () => {
       expect(events.filter((e) => e.event === 'onchange')).toHaveLength(2);
    });
 
-   test('disabled blocks toggling', async ({ page }) => {
+   test('disabled blocks toggling', async () => {
       const { selector } = await mountProbe(page, 'CheckboxInput', {
          props: {
             value: false,
@@ -207,15 +215,12 @@ test.describe('component probe — CheckboxInput', () => {
 });
 
 test.describe('component probe — Select', () => {
-   test.beforeEach(async ({ page }) => {
-      await login(page);
-   });
-   test.afterEach(async ({ page }) => {
+   test.afterEach(async () => {
       await unmountAll(page);
       await clearProbeEvents(page);
    });
 
-   test('changing the selection fires onchange and updates the value', async ({ page }) => {
+   test('changing the selection fires onchange and updates the value', async () => {
       const { selector } = await mountProbe(page, 'Select', {
          props: {
             value: 'a',
@@ -236,7 +241,7 @@ test.describe('component probe — Select', () => {
       expect(events.some((e) => e.event === 'onchange')).toBe(true);
    });
 
-   test('disabled blocks selection', async ({ page }) => {
+   test('disabled blocks selection', async () => {
       const { selector } = await mountProbe(page, 'Select', {
          props: {
             value: 'a',
@@ -252,15 +257,12 @@ test.describe('component probe — Select', () => {
 });
 
 test.describe('component probe — LabelTag', () => {
-   test.beforeEach(async ({ page }) => {
-      await login(page);
-   });
-   test.afterEach(async ({ page }) => {
+   test.afterEach(async () => {
       await unmountAll(page);
       await clearProbeEvents(page);
    });
 
-   test('renders the supplied label and resolves testId', async ({ page }) => {
+   test('renders the supplied label and resolves testId', async () => {
       const { selector } = await mountProbe(page, 'LabelTag', {
          props: {
             label: 'Frostbite',

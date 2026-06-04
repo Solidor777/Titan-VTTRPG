@@ -1,22 +1,40 @@
 import { test, expect } from '@playwright/test';
 import { login } from './fixtures.js';
 import { unmountAll, clearProbeEvents, mountProbe } from './componentProbe.js';
+import { closeAllApps, clearChat, attachPageErrors } from './world.js';
+
+/** @type {import('@playwright/test').Page} The file-shared, logged-in page (one world boot per file). */
+let page;
+/** @type {string[]} Uncaught page errors collected during the current test (cleared each afterEach). */
+let errors;
+
+test.beforeAll(async ({ browser }) => {
+   page = await browser.newPage();
+   errors = attachPageErrors(page);
+   await login(page);
+   await clearChat(page);
+});
+
+test.afterEach(async () => {
+   await closeAllApps(page);
+   errors.length = 0;
+});
+
+test.afterAll(async () => {
+   await page?.close();
+});
 
 // ---------------------------------------------------------------------------
 // Label
 // ---------------------------------------------------------------------------
 
 test.describe('component probe — Label', () => {
-   test.beforeEach(async ({ page }) => {
-      await login(page);
-   });
-
-   test.afterEach(async ({ page }) => {
+   test.afterEach(async () => {
       await unmountAll(page);
       await clearProbeEvents(page);
    });
 
-   test('renders children text and resolves testId on root .label div', async ({ page }) => {
+   test('renders children text and resolves testId on root .label div', async () => {
       // The harness converts a string `text` prop into a `children` snippet rendered by Label.
       const { selector } = await mountProbe(page, 'Label', {
          props: {
@@ -29,7 +47,7 @@ test.describe('component probe — Label', () => {
       await expect(root).toContainText('Strength');
    });
 
-   test('tooltip is attached via Tippy when a tooltip prop is provided', async ({ page }) => {
+   test('tooltip is attached via Tippy when a tooltip prop is provided', async () => {
       const { selector } = await mountProbe(page, 'Label', {
          props: {
             text: 'Hover me',
@@ -52,16 +70,12 @@ test.describe('component probe — Label', () => {
 // ---------------------------------------------------------------------------
 
 test.describe('component probe — TextLabel', () => {
-   test.beforeEach(async ({ page }) => {
-      await login(page);
-   });
-
-   test.afterEach(async ({ page }) => {
+   test.afterEach(async () => {
       await unmountAll(page);
       await clearProbeEvents(page);
    });
 
-   test('renders the raw label text', async ({ page }) => {
+   test('renders the raw label text', async () => {
       // Pass label as a TextData object with localize:false so processTextData returns the raw string.
       const { selector } = await mountProbe(page, 'TextLabel', {
          props: {
@@ -75,7 +89,7 @@ test.describe('component probe — TextLabel', () => {
       await expect(page.locator(`${selector} [data-testid="probe-text-label"]`)).toContainText('Strength');
    });
 
-   test('testId resolves on the .label root div', async ({ page }) => {
+   test('testId resolves on the .label root div', async () => {
       const { selector } = await mountProbe(page, 'TextLabel', {
          props: {
             label: {
@@ -88,7 +102,7 @@ test.describe('component probe — TextLabel', () => {
       await expect(page.locator(`${selector} .label[data-testid="probe-text-label"]`)).toBeVisible();
    });
 
-   test('tooltip is attached via Tippy when a tooltip prop is provided', async ({ page }) => {
+   test('tooltip is attached via Tippy when a tooltip prop is provided', async () => {
       const { selector } = await mountProbe(page, 'TextLabel', {
          props: {
             label: {
@@ -113,16 +127,12 @@ test.describe('component probe — TextLabel', () => {
 // ---------------------------------------------------------------------------
 
 test.describe('component probe — IconLabel', () => {
-   test.beforeEach(async ({ page }) => {
-      await login(page);
-   });
-
-   test.afterEach(async ({ page }) => {
+   test.afterEach(async () => {
       await unmountAll(page);
       await clearProbeEvents(page);
    });
 
-   test('renders the icon element and the label text', async ({ page }) => {
+   test('renders the icon element and the label text', async () => {
       const { selector } = await mountProbe(page, 'IconLabel', {
          props: {
             label: {
@@ -141,7 +151,7 @@ test.describe('component probe — IconLabel', () => {
       await expect(root).toContainText('Agility');
    });
 
-   test('testId resolves on the .label root div', async ({ page }) => {
+   test('testId resolves on the .label root div', async () => {
       const { selector } = await mountProbe(page, 'IconLabel', {
          props: {
             label: {
@@ -155,7 +165,7 @@ test.describe('component probe — IconLabel', () => {
       await expect(page.locator(`${selector} .label[data-testid="probe-icon-label"]`)).toBeVisible();
    });
 
-   test('tooltip is attached via Tippy when a tooltip prop is provided', async ({ page }) => {
+   test('tooltip is attached via Tippy when a tooltip prop is provided', async () => {
       const { selector } = await mountProbe(page, 'IconLabel', {
          props: {
             label: {
@@ -181,16 +191,12 @@ test.describe('component probe — IconLabel', () => {
 // ---------------------------------------------------------------------------
 
 test.describe('component probe — ModifiedValueLabel', () => {
-   test.beforeEach(async ({ page }) => {
-      await login(page);
-   });
-
-   test.afterEach(async ({ page }) => {
+   test.afterEach(async () => {
       await unmountAll(page);
       await clearProbeEvents(page);
    });
 
-   test('renders the currentValue and applies no modifier class when base equals current', async ({ page }) => {
+   test('renders the currentValue and applies no modifier class when base equals current', async () => {
       const { selector } = await mountProbe(page, 'ModifiedValueLabel', {
          props: {
             baseValue: 5,
@@ -207,7 +213,7 @@ test.describe('component probe — ModifiedValueLabel', () => {
       await expect(root).not.toHaveClass(/penalty/);
    });
 
-   test('applies bonus class when currentValue exceeds baseValue', async ({ page }) => {
+   test('applies bonus class when currentValue exceeds baseValue', async () => {
       const { selector } = await mountProbe(page, 'ModifiedValueLabel', {
          props: {
             baseValue: 3,
@@ -220,7 +226,7 @@ test.describe('component probe — ModifiedValueLabel', () => {
       await expect(root).toHaveClass(/bonus/);
    });
 
-   test('applies penalty class when currentValue is below baseValue', async ({ page }) => {
+   test('applies penalty class when currentValue is below baseValue', async () => {
       const { selector } = await mountProbe(page, 'ModifiedValueLabel', {
          props: {
             baseValue: 6,
@@ -233,7 +239,7 @@ test.describe('component probe — ModifiedValueLabel', () => {
       await expect(root).toHaveClass(/penalty/);
    });
 
-   test('tooltip is attached via Tippy when a tooltip prop is provided', async ({ page }) => {
+   test('tooltip is attached via Tippy when a tooltip prop is provided', async () => {
       const { selector } = await mountProbe(page, 'ModifiedValueLabel', {
          props: {
             baseValue: 5,
@@ -256,16 +262,12 @@ test.describe('component probe — ModifiedValueLabel', () => {
 // ---------------------------------------------------------------------------
 
 test.describe('component probe — ModifiableStatValueLabel', () => {
-   test.beforeEach(async ({ page }) => {
-      await login(page);
-   });
-
-   test.afterEach(async ({ page }) => {
+   test.afterEach(async () => {
       await unmountAll(page);
       await clearProbeEvents(page);
    });
 
-   test('renders the value and applies no modifier class when base equals value', async ({ page }) => {
+   test('renders the value and applies no modifier class when base equals value', async () => {
       // normalValue = baseValue (no abilityMod/equipmentMod); realValue = value = 5 — equal, so .label only.
       const { selector } = await mountProbe(page, 'ModifiableStatValueLabel', {
          props: {
@@ -281,7 +283,7 @@ test.describe('component probe — ModifiableStatValueLabel', () => {
       await expect(root).not.toHaveClass(/penalty/);
    });
 
-   test('applies bonus class when value exceeds normalValue', async ({ page }) => {
+   test('applies bonus class when value exceeds normalValue', async () => {
       // normalValue = baseValue (3); realValue = value (6) — bonus.
       const { selector } = await mountProbe(page, 'ModifiableStatValueLabel', {
          props: {
@@ -295,7 +297,7 @@ test.describe('component probe — ModifiableStatValueLabel', () => {
       await expect(root).toHaveClass(/bonus/);
    });
 
-   test('applies penalty class when value is below normalValue', async ({ page }) => {
+   test('applies penalty class when value is below normalValue', async () => {
       // normalValue = baseValue (6); realValue = value (3) — penalty.
       const { selector } = await mountProbe(page, 'ModifiableStatValueLabel', {
          props: {
@@ -309,9 +311,7 @@ test.describe('component probe — ModifiableStatValueLabel', () => {
       await expect(root).toHaveClass(/penalty/);
    });
 
-   test('valueOverride takes precedence over value for class calculation and display is still value', async ({
-      page,
-   }) => {
+   test('valueOverride takes precedence over value for class calculation and display is still value', async () => {
       // normalValue = baseValue (5); realValue = valueOverride (8 > 5) → bonus.
       // The DOM renders {value} (not valueOverride), so text shows value (5).
       const { selector } = await mountProbe(page, 'ModifiableStatValueLabel', {
@@ -329,7 +329,7 @@ test.describe('component probe — ModifiableStatValueLabel', () => {
       await expect(root).toHaveClass(/bonus/);
    });
 
-   test('abilityMod and equipmentMod shift normalValue and affect the class', async ({ page }) => {
+   test('abilityMod and equipmentMod shift normalValue and affect the class', async () => {
       // normalValue = baseValue (5) + abilityMod (2) + equipmentMod (1) = 8; realValue = value (5).
       // 8 > 5 → penalty class.
       const { selector } = await mountProbe(page, 'ModifiableStatValueLabel', {

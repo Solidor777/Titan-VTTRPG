@@ -8,17 +8,36 @@ import {
    readProbeEvents,
    probeFn,
 } from './componentProbe.js';
+import { closeAllApps, clearChat, attachPageErrors } from './world.js';
+
+/** @type {import('@playwright/test').Page} The file-shared, logged-in page (one world boot per file). */
+let page;
+/** @type {string[]} Uncaught page errors collected during the current test (cleared each afterEach). */
+let errors;
+
+test.beforeAll(async ({ browser }) => {
+   page = await browser.newPage();
+   errors = attachPageErrors(page);
+   await login(page);
+   await clearChat(page);
+});
+
+test.afterEach(async () => {
+   await closeAllApps(page);
+   errors.length = 0;
+});
+
+test.afterAll(async () => {
+   await page?.close();
+});
 
 test.describe('component probe — RichText (context)', () => {
-   test.beforeEach(async ({ page }) => {
-      await login(page);
-   });
-   test.afterEach(async ({ page }) => {
+   test.afterEach(async () => {
       await unmountAll(page);
       await clearProbeEvents(page);
    });
 
-   test('enriches its value into the rich-text div using the document context', async ({ page }) => {
+   test('enriches its value into the rich-text div using the document context', async () => {
       const { selector } = await mountProbe(page, 'RichText', {
          props: {
             value: '<p>Hello <strong>world</strong></p>',
@@ -30,7 +49,7 @@ test.describe('component probe — RichText (context)', () => {
       await expect(div).not.toHaveClass(/not-owner/);
    });
 
-   test('marks the div not-owner when the document context is not the owner', async ({ page }) => {
+   test('marks the div not-owner when the document context is not the owner', async () => {
       const { selector } = await mountProbe(page, 'RichText', {
          props: {
             value: '<p>Secret</p>',
@@ -42,15 +61,12 @@ test.describe('component probe — RichText (context)', () => {
 });
 
 test.describe('component probe — EffectTag (plain effect data)', () => {
-   test.beforeEach(async ({ page }) => {
-      await login(page);
-   });
-   test.afterEach(async ({ page }) => {
+   test.afterEach(async () => {
       await unmountAll(page);
       await clearProbeEvents(page);
    });
 
-   test('renders label, image, and custom remaining duration', async ({ page }) => {
+   test('renders label, image, and custom remaining duration', async () => {
       const { selector } = await mountProbe(page, 'EffectTag', {
          props: {
             effect: {
@@ -71,15 +87,12 @@ test.describe('component probe — EffectTag (plain effect data)', () => {
 });
 
 test.describe('component probe — CustomEffectTag', () => {
-   test.beforeEach(async ({ page }) => {
-      await login(page);
-   });
-   test.afterEach(async ({ page }) => {
+   test.afterEach(async () => {
       await unmountAll(page);
       await clearProbeEvents(page);
    });
 
-   test('renders its label and custom-unit remaining duration', async ({ page }) => {
+   test('renders its label and custom-unit remaining duration', async () => {
       const { selector } = await mountProbe(page, 'CustomEffectTag', {
          props: {
             effect: {
@@ -100,15 +113,12 @@ test.describe('component probe — CustomEffectTag', () => {
 });
 
 test.describe('component probe — ExpiredEffectTag', () => {
-   test.beforeEach(async ({ page }) => {
-      await login(page);
-   });
-   test.afterEach(async ({ page }) => {
+   test.afterEach(async () => {
       await unmountAll(page);
       await clearProbeEvents(page);
    });
 
-   test('renders its label and no time element (expired effects have no remaining)', async ({ page }) => {
+   test('renders its label and no time element (expired effects have no remaining)', async () => {
       const { selector } = await mountProbe(page, 'ExpiredEffectTag', {
          props: {
             effect: {
@@ -127,15 +137,12 @@ test.describe('component probe — ExpiredEffectTag', () => {
 });
 
 test.describe('component probe — InitiativeEffectTag', () => {
-   test.beforeEach(async ({ page }) => {
-      await login(page);
-   });
-   test.afterEach(async ({ page }) => {
+   test.afterEach(async () => {
       await unmountAll(page);
       await clearProbeEvents(page);
    });
 
-   test('renders its label and initiative-based remaining duration', async ({ page }) => {
+   test('renders its label and initiative-based remaining duration', async () => {
       const { selector } = await mountProbe(page, 'InitiativeEffectTag', {
          props: {
             effect: {
@@ -156,15 +163,12 @@ test.describe('component probe — InitiativeEffectTag', () => {
 });
 
 test.describe('component probe — PermanentEffectTag', () => {
-   test.beforeEach(async ({ page }) => {
-      await login(page);
-   });
-   test.afterEach(async ({ page }) => {
+   test.afterEach(async () => {
       await unmountAll(page);
       await clearProbeEvents(page);
    });
 
-   test('renders its label and no time element (permanent effects have no remaining)', async ({ page }) => {
+   test('renders its label and no time element (permanent effects have no remaining)', async () => {
       const { selector } = await mountProbe(page, 'PermanentEffectTag', {
          props: {
             effect: {
@@ -183,15 +187,12 @@ test.describe('component probe — PermanentEffectTag', () => {
 });
 
 test.describe('component probe — TurnEndEffectTag', () => {
-   test.beforeEach(async ({ page }) => {
-      await login(page);
-   });
-   test.afterEach(async ({ page }) => {
+   test.afterEach(async () => {
       await unmountAll(page);
       await clearProbeEvents(page);
    });
 
-   test('renders its label and bare turn-based remaining duration', async ({ page }) => {
+   test('renders its label and bare turn-based remaining duration', async () => {
       const { selector } = await mountProbe(page, 'TurnEndEffectTag', {
          props: {
             effect: {
@@ -211,15 +212,12 @@ test.describe('component probe — TurnEndEffectTag', () => {
 });
 
 test.describe('component probe — TurnStartEffectTag', () => {
-   test.beforeEach(async ({ page }) => {
-      await login(page);
-   });
-   test.afterEach(async ({ page }) => {
+   test.afterEach(async () => {
       await unmountAll(page);
       await clearProbeEvents(page);
    });
 
-   test('renders its label and bare turn-based remaining duration', async ({ page }) => {
+   test('renders its label and bare turn-based remaining duration', async () => {
       const { selector } = await mountProbe(page, 'TurnStartEffectTag', {
          props: {
             effect: {
@@ -239,15 +237,12 @@ test.describe('component probe — TurnStartEffectTag', () => {
 });
 
 test.describe('component probe — FiltereedList (context)', () => {
-   test.beforeEach(async ({ page }) => {
-      await login(page);
-   });
-   test.afterEach(async ({ page }) => {
+   test.afterEach(async () => {
       await unmountAll(page);
       await clearProbeEvents(page);
    });
 
-   test('renders only filtered entries while preserving each entry original index', async ({ page }) => {
+   test('renders only filtered entries while preserving each entry original index', async () => {
       const { selector } = await mountProbe(page, 'FiltereedList', {
          props: {
             entries: [
@@ -282,15 +277,12 @@ test.describe('component probe — FiltereedList (context)', () => {
 });
 
 test.describe('component probe — CondensedCheckButton (context)', () => {
-   test.beforeEach(async ({ page }) => {
-      await login(page);
-   });
-   test.afterEach(async ({ page }) => {
+   test.afterEach(async () => {
       await unmountAll(page);
       await clearProbeEvents(page);
    });
 
-   test('renders its label and stats and fires onclick when owned', async ({ page }) => {
+   test('renders its label and stats and fires onclick when owned', async () => {
       const { selector } = await mountProbe(page, 'CondensedCheckButton', {
          props: {
             attribute: 'body',
@@ -314,7 +306,7 @@ test.describe('component probe — CondensedCheckButton (context)', () => {
       expect(events.filter((entry) => entry.event === 'onclick').length).toBe(1);
    });
 
-   test('disables the button when the document context is not the owner', async ({ page }) => {
+   test('disables the button when the document context is not the owner', async () => {
       const { selector } = await mountProbe(page, 'CondensedCheckButton', {
          props: {
             attribute: 'body',
@@ -331,15 +323,12 @@ test.describe('component probe — CondensedCheckButton (context)', () => {
 });
 
 test.describe('component probe — ProseMirrorEditor', () => {
-   test.beforeEach(async ({ page }) => {
-      await login(page);
-   });
-   test.afterEach(async ({ page }) => {
+   test.afterEach(async () => {
       await unmountAll(page);
       await clearProbeEvents(page);
    });
 
-   test('builds the native prose-mirror element and tears it down on unmount', async ({ page }) => {
+   test('builds the native prose-mirror element and tears it down on unmount', async () => {
       const { id, selector } = await mountProbe(page, 'ProseMirrorEditor', {
          props: {
             value: '<p>Editor body</p>',
