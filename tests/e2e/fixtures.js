@@ -62,11 +62,6 @@ export async function renderSheet(page, locateSrc, expectedSelector) {
          return false;
       }
       await doc.sheet.render(true);
-
-      // Allow the Svelte mount and ApplicationV2 render cycle to settle.
-      await new Promise((resolve) => {
-         setTimeout(resolve, 500);
-      });
       return true;
    }, locateSrc);
 
