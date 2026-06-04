@@ -2,7 +2,7 @@
 
 **Date:** 2026-06-03
 **Status:** Design — approved, pending implementation plan
-**Scope:** Pattern + minimal weapon-attacks proof case (decomposed; see Follow-up work)
+**Scope:** Pattern + a durable shared-`AttackTags` proof — one component rendering a weapon's intrinsic attack tags across the weapon item-sheet sidebar and the character sheet (chat card joins after chat parity). Decomposed; see Follow-up work.
 
 ## Problem
 
@@ -25,9 +25,9 @@ cannot run on the other.
 The goal: be able to **pass an embedded document itself** (the weapon, an effect)
 to a component and have its reads stay reactive and its writes persist — so a
 component depends only on "the current document" and runs unchanged whether that
-document is a top-level sheet document or an embedded child. This unlocks future
-reuse of item-sheet components on the character sheet (and vice versa); it does
-**not** migrate any feature in this spec.
+document is a top-level sheet document or an embedded child. This spec builds that
+machinery and proves it with one **durable** de-dup (the shared `AttackTags`
+component); broader feature reuse is decomposed to Follow-up work.
 
 ## Reactivity constraint (why the chosen mechanism)
 
@@ -51,16 +51,23 @@ hook multiplication) and drives the delegating design below.
   so existing context-reading components and inputs work **unchanged**.
 - A documented two-context convention that gives actor-coupled components an
   escape hatch to the owning sheet document.
-- A minimal, temporary proof on the character sheet demonstrating reactive
-  read + persisted write to an embedded weapon's attack data.
+- A **durable** proof: one shared `AttackTags` component that renders a weapon's
+  intrinsic attack tags from `getContext('document').data.system.attack[idx]`,
+  consumed unchanged by the weapon item-sheet sidebar (top-level weapon) and the
+  character sheet (embedded weapon via the provider) — deleting the duplicated
+  intrinsic-tag markup from both.
 
 ## Non-goals (decomposed to follow-up specs)
 
-- Migrating any real feature (attack roll/display, checks tab, rules-elements
-  tab, commodity, effects) to the embedded-document pattern.
-- Migrating any component to read `'sheetDocument'`. This spec only establishes
-  the contract.
-- Deleting the existing `CharacterSheetWeapon*` components.
+- Migrating the **actor-derived** attack display (dice pool / training /
+  expertise) or the attack-**roll** button to a shared component — these stay on
+  the character sheet (refactored to read the actor via `'sheetDocument'`, not
+  extracted).
+- Generalizing the pattern to the checks tab, rules-elements tab, commodity, or
+  effect rows.
+- Deleting the `CharacterSheetWeapon*` components — they are **refactored** (to
+  source the weapon via the embedded provider and render the shared `AttackTags`),
+  not removed.
 - **Any chat-message change.** Chat-message path parity (showing attacks on the
   weapon *item* card via `document.data.system.attack[index]`, and deep
   check-chat schemas) is **deferred until the in-flight chat-message-subtypes
@@ -158,60 +165,75 @@ actor bridge); `setContext('document', …)` shadows it for descendants only.
 - Components that need the owning actor (roll buttons, etc.) read
   `'sheetDocument'`.
 
-**This spec adds the contract only — no consumer migrates to `'sheetDocument'`
-yet.** It exists so the pattern is complete and any future actor-coupled
-component placed inside a provider has a defined escape hatch.
+**This spec exercises the convention for real.** The character-sheet weapon
+attack row moves inside an `EmbeddedDocumentProvider`, so its intrinsic-tag reads
+use `'document'` (the embedded weapon) while its actor-derived tags (dice pool,
+training, expertise) and the attack-roll button read `'sheetDocument'` (the
+actor). The item-sheet sidebar needs no provider — its top-level `'document'` is
+already the weapon.
 
-## Data flow — edit an embedded weapon field on the character sheet
+## Data flow — bridge read/write mechanics (illustrative)
+
+The durable proof below uses only the **read** path; the write path is shown here
+for completeness (it is what future editor reuse will rely on, and what
+`refreshSystemDocument` already does through the same accessor).
 
 1. The character sheet mounts with `'document'` = `ReactiveDocument(actor)` and
    `'sheetDocument'` = the same bridge.
-2. A weapon row renders `<EmbeddedDocumentProvider doc={weapon}>`, shadowing
-   `'document'` = `EmbeddedDocument(actorBridge, 'items', weaponId)`.
-3. Inside, an existing `DocumentTextInput` reads
-   `getContext('document').data.system.attack[idx].label` → resolves
-   `actorBridge.data.items.get(weaponId).system.attack[idx].label`, reactive via
-   the actor's subscription.
-4. On change it mutates the live field and calls
-   `refreshSystemDocument(document.data)` → `weapon.update({ system: … })`.
+2. A weapon's attack list renders `<EmbeddedDocumentProvider doc={weapon}>`,
+   shadowing `'document'` = `EmbeddedDocument(actorBridge, 'items', weaponId)`.
+3. **Read:** a descendant reads `getContext('document').data.system.attack[idx]`
+   → resolves `actorBridge.data.items.get(weaponId).system.attack[idx]`, reactive
+   via the actor's subscription.
+4. **Write (future editors):** a context-reading input mutates the live field and
+   calls `refreshSystemDocument(document.data)` → `weapon.update({ system: … })`.
 5. Foundry fires `updateItem` → the actor bridge's subscriber invalidates → the
    embedded read re-runs → UI updates. **No new component code is touched** — the
-   same `DocumentTextInput` that runs on the item sheet runs here.
+   same context-reading component runs on the item sheet and the character sheet.
 
-## Proof case (temporary)
+## Proof case (durable): one shared `AttackTags` across document types
 
-A single throwaway component — `TempEmbeddedAttackName.svelte` — reads only
-`getContext('document')` and edits the attack labels of whatever document is in
-context, reusing the existing `DocumentTextInput`:
+Today the same intrinsic attack tags (damage, type, range, attribute/skill,
+traits, custom traits) are rendered by **three** near-identical blocks:
+`CharacterSheetWeaponAttack.svelte` (character sheet), `WeaponSheetSidebarAttacks
+.svelte` (weapon item-sheet sidebar), and `WeaponChatAttacks.svelte` (weapon item
+chat card). They differ only in how they reach the attack and in minor tag-
+component choices (`IconTag` vs `Tag` for type; `TraitTag` vs `StatTag` for
+numeric traits).
+
+**New shared component — `AttackTags.svelte`** (location:
+`src/document/types/item/types/weapon/components/`, shared across sheets/chat). It
+reads the attack from context by index and renders only the **intrinsic** tags:
 
 ```svelte
-<!-- TEMPORARY: embedded-store pattern proof. Remove per docs/TODO.md. -->
-const document = getContext('document');   // the embedded weapon, via the provider
-{#if document.data}
-   {#each document.data.system.attack as attack, idx (attack.uuid)}
-      <DocumentTextInput bind:value={document.data.system.attack[idx].label} />
-   {/each}
+let { idx = undefined } = $props();
+const document = getContext('document');                  // weapon (top-level or embedded)
+const attack = $derived(document.data?.system.attack[idx]);
+{#if attack}
+   <!-- damage, type, range, AttributeCheckTag, traits, customTraits -->
 {/if}
 ```
 
-Wired into `CharacterSheetWeapon.svelte`'s expandable content, clearly marked
-temporary:
+**Consumed unchanged in two places now:**
 
-```svelte
-<!-- TEMPORARY: embedded-store proof — remove per docs/TODO.md -->
-{#if weapon}
-   <EmbeddedDocumentProvider doc={weapon}>
-      <TempEmbeddedAttackName />
-   </EmbeddedDocumentProvider>
-{/if}
-```
+- **Weapon item-sheet sidebar** (`WeaponSheetSidebarAttacks`): `'document'` is
+  already the top-level weapon — iterate and render `<AttackTags {idx} />`.
+- **Character sheet** (`CharacterSheetWeaponAttacks` / `…Attack`): wrap the
+  weapon's attack list in `<EmbeddedDocumentProvider doc={weapon}>`, so
+  `'document'` becomes the embedded weapon and `<AttackTags {idx} />` renders
+  identically. The row's **actor-derived** tags and **roll** button switch to
+  `getContext('sheetDocument')` (the actor) — e.g.
+  `sheetDocument.data.system.requestAttackCheck({ itemId: document.data.id, attackIdx: idx })`.
 
-where `weapon` is resolved the existing reactive way
-(`document.data.items.get(item._id)`). The proof demonstrates that a component
-written against `'document'` runs unchanged when `'document'` is an embedded
-item — it would work verbatim on the item sheet too. The temp component, the
-temp block, and a `docs/TODO.md` entry with explicit removal criteria are added
-together so cleanup is unambiguous.
+Both call sites delete their duplicated intrinsic markup. Tag-component choices
+are normalized in `AttackTags` (a small, accepted visual change), and the
+character-sheet tag order shifts slightly because the intrinsic tags now render as
+one block. The provider is **keyed by weapon id** (the weapon list already is).
+
+**Chat card (deferred):** `WeaponChatAttacks` still reads `flags.titan.attack`; it
+becomes the third `AttackTags` consumer once chat path-parity exposes
+`system.attack[index]` on the item card (Follow-up work). The component is built
+now so adopting it there is a one-line swap.
 
 ## Edge cases & error handling
 
@@ -236,12 +258,17 @@ together so cleanup is unambiguous.
   return a fake `{ items: Map, effects: Map }`. Assert `.data`/`.doc` resolve the
   right document, return `undefined` safely for a missing id, and that the
   collection mapping is correct. Pure JS — no Svelte runtime needed.
-- **E2E (Playwright, world-launch-gated):** open a character owning a weapon with
-  ≥1 attack → open the sheet → expand the weapon → type into the temp
-  attack-name input → assert (a) the embedded item's `system.attack[0].label`
-  actually changed on the document, and (b) the value reflects reactively and
-  survives reopen. Optionally assert the weapon's own item sheet shows the new
-  name, proving the write reached the real item across bridges.
+- **E2E (Playwright, world-launch-gated):** with a character owning a weapon with
+  ≥1 attack —
+  - open the **weapon item sheet** and the **character sheet** (weapon expanded);
+    assert the same intrinsic attack tags (damage / type / range / attribute /
+    skill / traits) render in both `AttackTags` instances with matching values;
+  - **reactivity:** edit the attack (e.g. its damage) on the weapon item sheet and
+    assert the character sheet's `AttackTags` updates live (the embedded bridge
+    re-resolves through the actor's subscription);
+  - **two-context:** assert the character-sheet row still shows actor-derived tags
+    (dice pool / training / expertise) and that the roll button fires
+    `requestAttackCheck` on the actor (via `'sheetDocument'`).
 
 ## Implementation routing
 
@@ -250,9 +277,8 @@ together so cleanup is unambiguous.
 - On completion, update the `titan-codebase` skill
   (`references/abstractions.md` / `references/data-flow.md` /
   `references/conventions.md`) to document `EmbeddedDocument`, the provider, the
-  two-context convention, and the list-keying rule.
-- Add the temporary proof field to `docs/TODO.md` with removal criteria when it
-  is created.
+  two-context convention, the list-keying rule, and the shared `AttackTags`
+  component + its call sites.
 
 ## Follow-up work (decomposed, out of scope here)
 
@@ -260,13 +286,14 @@ Each becomes its own spec + plan when picked up:
 
 ### Sheet-side reuse
 
-- Migrate the weapon attack **display + roll** to read the attack via an embedded
-  bridge while reading actor stats via `'sheetDocument'`, and/or offer inline
-  attack editing on the character sheet by reusing `WeaponSheetAttackSettings`.
-- Generalize the same treatment to the shared checks tab and rules-elements tab
-  on the character sheet.
+- Offer inline attack **editing** on the character sheet by reusing
+  `WeaponSheetAttackSettings` inside the same `EmbeddedDocumentProvider` (the
+  write path the shared `AttackTags` proof leaves unexercised).
+- Generalize the embedded-provider treatment to the shared checks tab and
+  rules-elements tab on the character sheet.
 - Migrate commodity / effect rows off the `item._id`-lookup pattern.
-- Remove the temporary proof field once a real consumer exists.
+- Make `WeaponChatAttacks` the third `AttackTags` consumer once chat path-parity
+  (below) exposes `system.attack[index]` on the item card.
 
 ### Chat-message path parity (after the chat-message-subtypes conversion)
 
