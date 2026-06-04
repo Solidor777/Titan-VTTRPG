@@ -403,10 +403,11 @@ inside `page.waitForFunction` (30 s timeout) until all named users are active on
 the `/join` form. The smoke test is `tests/e2e/multi-client.spec.js`.
 
 **npm scripts** — `npm test` runs `vitest run` (single pass); `npm run test:watch` runs Vitest in watch
-mode; `npm run test:e2e` runs the Playwright suite above. `npm run build:e2e` (`vite build --mode e2e`)
-produces the probe-enabled bundle required by the component-probe specs (see next entry).
+mode; `npm run test:e2e` runs the Playwright suite above (its `global-setup.js` builds the test bundles into
+`test/build/` first). `npm run build:e2e` (`vite build --config vite.probe.config.mjs`) builds just the
+standalone component-probe IIFE (see next entry).
 
-**Component-probe harness (gated, test-only)** — `src/test-probe/` lets Playwright mount a single base
+**Component-probe harness (externalized, test-only)** — `src/test-probe/` lets Playwright mount a single base
 Svelte primitive in isolation inside the live Foundry runtime, with controlled props, to assert its
 interaction contract independent of any sheet. `registerProbe.js` installs `game.titan._probe =
 { components, mount(name, props?, context?), unmount(id), unmountAll() }`; `mount` creates a detached
@@ -418,10 +419,14 @@ shapes that survive the Node↔page boundary in place of un-serializable referen
 resolves to a registered component constructor (for component-valued props), and `{ __probeFn: kind, component? }`
 resolves to a fixed-library helper function — `returnTrue` (`() => true`), `returnEntry` (`(entry) => entry`),
 and `returnComponent` (`() => Component`, named via `component`) — sufficient for list components such as
-`FiltereedList` whose props are functions. The registry is gated: `OnceInit.js` registers
-the probe only behind `if (__TITAN_PROBE__)` (a Vite `define` compile-time constant, `true` only under
-`vite build --mode e2e`), via a fire-and-forget dynamic `import()` so terser dead-code-eliminates it from
-the production bundle entirely. The Playwright page object `tests/e2e/componentProbe.js` exposes
+`FiltereedList` whose props are functions. The probe is NEVER part of a system build: it is built as a
+standalone IIFE by `vite.probe.config.mjs` (`createSveltePlugin({ emitCss: false })`) to
+`test/build/probe.iife.js` (plus an extracted global stylesheet `test/build/probe.css`). `probeBundleEntry.js`
+is that bundle's entry — it calls `registerProbe()` immediately when `game.titan` already exists, else on the
+`ready` hook. Playwright injects it on demand: `componentProbe.js`'s `mountProbe` → `ensureProbe(page)` adds
+`probe.css` then `probe.iife.js` (the IIFE registers `game.titan._probe`) only when the API is absent. There
+is no `__TITAN_PROBE__` define and no dynamic `import()` anywhere — the production bundle is structurally
+probe-free. The Playwright page object `tests/e2e/componentProbe.js` exposes
 `mountProbe`/`readProbeEvents`/`clearProbeEvents`/`unmountAll`, the marker builders `probeComponent(name)`
 and `probeFn(kind, { component })`, and `documentContext({ isOwner })` (a minimal non-reactive `document`
 context for components reading `getContext('document')`); callbacks are instrumented INSIDE `page.evaluate`
@@ -442,8 +447,8 @@ container selector instead. Wrapper components forward `testId` to their inner p
 (e.g. wrapper selects → the `AttributeInput`/`RarityInput`/`ResistanceInput` div; bare selects → the inner
 `<Select>`'s `<select>`; `ImagePicker` → `ImageButton`'s `<button>`). To probe a new primitive: add it to
 `componentRegistry.js`, add a `testId` prop on its root if it lacks one (never add a wrapper element solely
-to host it), append a describe block, then `npm run build:e2e` before running the spec (the live Foundry
-serves the built bundle).
+to host it), append a describe block, then re-run the spec — `test:e2e`'s global-setup rebuilds
+`test/build/probe.iife.js` and the harness re-injects it (no `dist/` rebuild needed).
 
 **Gotcha — Foundry global `.disabled`:** Foundry's `foundry2.css` defines `.disabled { pointer-events: none; }`.
 Never use `disabled` as a CSS class on an element wrapping interactive content — it silently blocks all

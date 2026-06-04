@@ -87,8 +87,10 @@ extended by every concrete type under `document/types/`.
 
 ## Test layout
 
-Unit tests live under `tests/` (excluded from the Vite build); Vitest is configured in `vitest.config.mjs`
-(`environment: 'happy-dom'`, `globals: true`, `include: ['tests/unit/**/*.test.js']`):
+Test SOURCE lives under `tests/` (plural, excluded from the Vite build); built test artifacts go to
+`test/build/` (singular, gitignored, self-cleaning — see "Build and output"). The two directories are
+distinct. Vitest is configured in `vitest.config.mjs` (`environment: 'happy-dom'`, `globals: true`,
+`include: ['tests/unit/**/*.test.js']`):
 
 - `tests/setup.js` — global Vitest setup: injects `globalThis.foundry` (with `MockDocument` and `mergeObject`)
   and a fresh `HooksMock` on `globalThis.Hooks` before every test.
@@ -128,20 +130,30 @@ Unit tests live under `tests/` (excluded from the Vite build); Vitest is configu
 
 ## Build and output
 
-**Vite configuration** (`vite.config.mjs`):
-- `root` is set to `src/` — all source paths resolve from there.
-- Path aliases: `~/` maps to `src/` (used throughout, e.g. `~/helpers/…`); `$fonts/` maps to the repo `fonts/`
-  directory.
-- Build entry: `src/index.js` (referenced as `./index.js` relative to root).
-- Output format: ES module (`formats: ['es']`), output file named `index` → `index.js` in `dist/`.
-- `outDir` is `dist/` (`path.join(__dirname, 'dist')`); `emptyOutDir: true` so each build self-cleans stale chunks.
-- CSS is extracted and emitted as `style.css` in `dist/`; PostCSS runs `autoprefixer` (configured directly in
-  `vite.config.mjs`, no TyphonJS rollup config).
-- SCSS preprocessing uses two paths: `svelte-preprocess` (Svelte component styles) uses `api: 'modern'` and
-  prepends `@use "src/styles/Root.scss" as *;` to every `<style lang="scss">` block automatically; the global
-  `css.preprocessorOptions.scss` path uses `api: 'modern-compiler'`.
-- Compression (`s_COMPRESS`) is `false` by default; source maps (`s_SOURCEMAPS`) are enabled.
-- Target: `es2022` for both esbuild and Rollup/Terser.
+**Shared building blocks** (`vite.shared.mjs`) — consumed by both the production and probe configs:
+- `alias` — the intra-project aliases (`~/` → `src/`, `$fonts/` → the repo `fonts/` directory).
+- `css` — the global CSS / PostCSS (`autoprefixer`) / SCSS (`api: 'modern-compiler'`) config.
+- `createSveltePlugin({ emitCss })` — the Svelte plugin with shared SCSS preprocessing (`api: 'modern'`,
+  prepends `@use "src/styles/Root.scss" as *;` to every `<style lang="scss">` block). `emitCss: true`
+  (production) extracts component styles to the stylesheet; `emitCss: false` (probe) injects them at mount.
+
+**Production build** (`vite.config.mjs`, run by `npm run build`):
+- `root` is `src/`; build entry `src/index.js` (referenced as `./index.js`).
+- Output format ES module (`formats: ['es']`); `outDir` is `dist/`, `emptyOutDir: true` so each build
+  self-cleans. The result is a **single chunk** — `dist/index.js` + `dist/style.css` only, with no code-split
+  `*-[hash].js` chunks and no dynamic imports (the build is structurally probe-free; see Strict Rules 1 + 3).
+- CSS is extracted and emitted as `style.css` (`cssFileName: 'style'`).
+- Compression (`s_COMPRESS`) is `true` (Terser, `ecma: 2022`); source maps (`s_SOURCEMAPS`) are enabled.
+- Target: `es2022` for both esbuild and Terser.
+
+**Probe build** (`vite.probe.config.mjs`, run by `npm run build:e2e`):
+- Standalone build of the e2e component-probe → `test/build/` (NEVER part of a system build).
+- Entry `src/test-probe/probeBundleEntry.js`; output a self-contained IIFE (`formats: ['iife']`,
+  `name: 'TitanProbe'`, `fileName: 'probe'`) → `test/build/probe.iife.js`, plus the extracted global
+  stylesheet `test/build/probe.css`. `emptyOutDir: true` self-cleans (Strict Rule 2). Built with
+  `createSveltePlugin({ emitCss: false })`. Playwright's `tests/e2e/global-setup.js` builds this first (its
+  clean wipes `test/build/`), then bundles fast-check via esbuild. The harness injects the IIFE on demand
+  (see `references/conventions.md`).
 
 **Manifest wiring** (`system.json`):
 - `"esmodules": ["dist/index.js"]` — Foundry loads the compiled ES module from `dist/`.

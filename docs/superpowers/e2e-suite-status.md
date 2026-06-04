@@ -58,17 +58,21 @@ whole doc (silently non-reactive: stable instance). One deferral: the effect dur
 
 ### Phase 3b (first pass) — DONE (component-tier probe harness)
 
-- **Gated probe harness** — `src/test-probe/` (`componentRegistry.js` + `registerProbe.js`) installs
+- **Externalized probe harness** — `src/test-probe/` (`componentRegistry.js` + `registerProbe.js`) installs
   `game.titan._probe = { components, mount(name, props?, context?), unmount(id), unmountAll() }` inside the
   live Foundry runtime. `mount` drops a detached `<div data-titan-probe="<id>">` (positioned `fixed`, max
   `z-index` so it clears Foundry chrome for pointer events), mounts the named primitive, returns
   `{ id, selector }`. A string `text` prop becomes a `children` snippet via `createRawSnippet` (text via
-  `textContent`, never raw HTML). Gated by `__TITAN_PROBE__` (Vite `define`, `true` only under
-  `vite build --mode e2e`); `OnceInit.js` registers it via a fire-and-forget dynamic `import()` so terser
-  tree-shakes it out of production (verified: `npm run build` → 0 probe identifiers in `index.js`).
-- **New npm script** — `build:e2e` (`vite build --mode e2e`). **Build gotcha:** the component-probe specs
-  require this bundle, NOT `npm run build`. The live Foundry on :30000 serves the built `index.js`, so run
-  `npm run build:e2e` after any `src/` edit before running probe specs.
+  `textContent`, never raw HTML). The probe is NEVER part of a system build: `vite.probe.config.mjs` builds a
+  standalone IIFE → `test/build/probe.iife.js` (entry `probeBundleEntry.js`, which calls `registerProbe()`),
+  plus the extracted global stylesheet `test/build/probe.css`. Playwright injects them on demand
+  (`componentProbe.js` → `ensureProbe`). There is no `__TITAN_PROBE__` define and no dynamic `import()`; the
+  production bundle is structurally probe-free (verified: `npm run build` → 0 probe identifiers and 0 dynamic
+  imports in `index.js`).
+- **npm script** — `build:e2e` (`vite build --config vite.probe.config.mjs`) builds just the probe IIFE.
+  **Build note:** `npm run test:e2e`'s `global-setup.js` builds the test bundles into `test/build/`
+  automatically, so the standard developer flow is `npm run build` → `npm run test:e2e`; the harness
+  re-injects the rebuilt probe, so no `dist/` rebuild is required between probe-spec runs.
 - **Page object** — `tests/e2e/componentProbe.js`: `mountProbe`/`readProbeEvents`/`clearProbeEvents`/
   `unmountAll`. Callbacks are instrumented INSIDE `page.evaluate` (functions can't cross the Node↔page
   boundary) and record `{ event, key }` into `window.__titanProbeEvents`.

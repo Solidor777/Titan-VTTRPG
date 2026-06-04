@@ -385,33 +385,6 @@ the five check subtypes; later phases cover items, reports, and effect).
   `specs/2026-06-03-embedded-document-stores-design.md` (Follow-up work →
   "Chat-message path parity").
 
-## Build architecture — enact CLAUDE.md strict rules
-
-### 13. Build-architecture redesign (enact Build Rules 1–4) — NEXT (brainstorm first)
-
-- **What:** Restructure the build so it obeys CLAUDE.md's strict rules:
-  1. **No test/e2e code in shipping builds** — decouple the e2e component-probe from the system
-     bundle. Today `src/hooks/OnceInit.js:204` does
-     `if (__TITAN_PROBE__) import('~/test-probe/registerProbe.js')`; the probe statically pulls
-     `componentRegistry.js` (~60 components). Production tree-shakes it, but the rule wants it
-     *never* compiled into a system build.
-  2. **Test/e2e builds → `test/build/`**, self-cleaning (`emptyOutDir`), separate from `dist/`.
-  3. **No dynamic imports in shipping builds, ever** — remove the probe `import()` from OnceInit and
-     make the one genuine app dynamic import static: `EffectRowContextMenu.js:80`
-     `await import('~/sidebar/tray/MoveEffectToFolderDialog.js')`.
-  4. **No stub fixes** — the static-import fix must address the *root cause*: `MoveEffectToFolderDialog`
-     → `Dialog.js:7` `const { ApplicationV2 } = foundry.applications.api` runs at module load and
-     crashes vitest, which is why the import was deferred. A bare `ApplicationV2` mock in
-     `tests/setup.js` is FORBIDDEN by Rule 4 — instead restructure so `Dialog.js` doesn't evaluate a
-     Foundry global at module load (e.g. lazy/factory class definition), or decouple the menu's unit
-     test from the dialog, so a normal static import is safe in vitest.
-- **Target end-state:** production `npm run build` → `dist/index.js` + `dist/style.css` only (no
-  chunks, no dynamic imports, no probe); e2e build → `test/build/` (probe injected for tests by a
-  mechanism NOT compiled into the system bundle).
-- **Process:** brainstorm → spec → plan → implement. Key design decision: the probe-loading
-  mechanism (standalone probe bundle injected by Playwright vs separate manifest vs other).
-- **Found:** investigating dynamic imports during build-output-hygiene follow-up (2026-06-03).
-
 ## E2E suite speedup — remaining phases
 
 ### 14. E2E speedup Phase 1b — bespoke sleep removal
