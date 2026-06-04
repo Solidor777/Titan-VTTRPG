@@ -487,9 +487,9 @@ domain:
   schema definitions (e.g., `CreateStringField`, `CreateIntegerField`). `BuildSchemaFromShape.js`
   (`buildSchemaFromShape(shape)`) recursively converts a plain-object shape template into a schema
   field map by value type — `string`/`boolean` → the matching `create*Field` seeded with the
-  representative value; `number` → `createIntegerField` when the value is a whole number
-  (`Number.isInteger`, integer-enforced) else `createNumberField` (so whole-number template values
-  match the hand-written item schemas, which use integer fields throughout); array → `createArrayField`
+  representative value; `number` → `createIntegerField` (the helper ASSUMES integer — the system has no
+  non-integer schema fields except the base `documentVersion`, defined directly in `TitanDataModel`, not
+  template-generated; float support is deliberately YAGNI); array → `createArrayField`
   whose element schema is derived from the first
   element (empty array → object element field), plain object → a `SchemaField` (recursing), and
   `null`/`undefined` → a nullable object field; it composes the `create*Field`/`createSchemaField`
