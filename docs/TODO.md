@@ -318,6 +318,18 @@ The "first-class ChatMessage subtypes" effort is specced/planned in
 `plans/2026-06-03-chat-message-subtypes-phase1.md` (Phase 1 = infrastructure +
 the five check subtypes; later phases cover items, reports, and effect).
 
+**Phase 2 (item cards ×7) — SPECCED + PLANNED, awaiting approval + restart** (2026-06-04):
+`specs/2026-06-04-chat-message-subtypes-phase2-items-design.md` +
+`plans/2026-06-04-chat-message-subtypes-phase2-items.md`. Two open decisions need a yes/no
+(D1 typed-flat schema [recommended], D2 fix the pre-existing dead `flags.titan.system.X`
+reads [recommended]); full verification is **Foundry-restart-gated** (`documentTypes`
+register only at world load, which the agent cannot trigger). Authoritative per-leaf
+`getRollData()` shapes were captured at runtime and embedded in the spec appendix.
+**Critical finding:** `ItemChat{Value,Rarity,Traits,Tradition}` and several leaves read a
+`system` key that the item roll-data payload does NOT contain (`hasSystemKey: false` for all
+7 types) — they are dead/broken today; Phase 2 repairs them. Phases 3 (reports ×13) and 4
+(effect + delete the legacy hook/`ChatMessageShell.svelte`) remain to be specced.
+
 ### 10. Chat-message Svelte mount is keyed per-document, not per-element
 
 - **What:** `TitanChatMessage` stores a single `_svelteComponent = { handle, bridge }`
