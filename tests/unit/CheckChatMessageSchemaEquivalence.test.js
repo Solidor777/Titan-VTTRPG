@@ -438,8 +438,8 @@ const GOLDENS = {
       }),
    },
 
-   // Attack check: parameters carry factory constants complexity:1 and difficulty:4, two string arrays,
-   // and the attack metadata; results add a damage field.
+   // Attack check: parameters carry factory constants complexity:1 and difficulty:4, two object arrays
+   // (attackTrait, customTrait), and the attack metadata; results add a damage field.
    attack: {
       ...checkBaseFields(),
       parameters: schemaField({
@@ -448,32 +448,12 @@ const GOLDENS = {
          attackerMelee: integerField(0),
          attackName: stringField(''),
          attackerRating: integerField(0),
-         attackTrait: {
-            element: {
-               kind: 'StringField',
-               nullable: false,
-               required: true,
-            },
-            initial: [],
-            kind: 'ArrayField',
-            nullable: false,
-            required: true,
-         },
+         attackTrait: emptyObjectArray(),
          attribute: stringField(''),
          attributeDice: integerField(0),
          cleave: booleanField(false),
          complexity: integerField(1),
-         customTrait: {
-            element: {
-               kind: 'StringField',
-               nullable: false,
-               required: true,
-            },
-            initial: [],
-            kind: 'ArrayField',
-            nullable: false,
-            required: true,
-         },
+         customTrait: emptyObjectArray(),
          damage: integerField(0),
          damageMod: integerField(0),
          diceMod: integerField(0),
@@ -515,7 +495,7 @@ const GOLDENS = {
       }),
    },
 
-   // Casting check: parameters carry a customTrait string array and a scalingAspect object array;
+   // Casting check: parameters carry a customTrait object array and a scalingAspect object array;
    // results add damage, healing, extraSuccessesRemaining, and a scalingAspect object array.
    casting: {
       ...checkBaseFields(),
@@ -523,17 +503,7 @@ const GOLDENS = {
          attribute: stringField(''),
          attributeDice: integerField(0),
          complexity: integerField(0),
-         customTrait: {
-            element: {
-               kind: 'StringField',
-               nullable: false,
-               required: true,
-            },
-            initial: [],
-            kind: 'ArrayField',
-            nullable: false,
-            required: true,
-         },
+         customTrait: emptyObjectArray(),
          damage: integerField(0),
          damageMod: integerField(0),
          diceMod: integerField(0),
@@ -576,7 +546,7 @@ const GOLDENS = {
       }),
    },
 
-   // Item check: parameters carry the factory constant damageReducedBy:'none', a customTrait string
+   // Item check: parameters carry the factory constant damageReducedBy:'none', a customTrait object
    // array, and a nested typed opposedCheck SchemaField; results add damage, healing, and
    // opposedCheckComplexity.
    item: {
@@ -586,17 +556,7 @@ const GOLDENS = {
          attributeDice: integerField(0),
          checkLabel: stringField(''),
          complexity: integerField(0),
-         customTrait: {
-            element: {
-               kind: 'StringField',
-               nullable: false,
-               required: true,
-            },
-            initial: [],
-            kind: 'ArrayField',
-            nullable: false,
-            required: true,
-         },
+         customTrait: emptyObjectArray(),
          damage: integerField(0),
          damageMod: integerField(0),
          damageReducedBy: stringField('none'),
