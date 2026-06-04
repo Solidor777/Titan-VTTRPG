@@ -11,7 +11,7 @@ describe('buildEffectRowContextMenu', () => {
       /** @type {object} A fake tray state: editable pack that supports folders. */
       const trayState = { canEdit: true, selectedPack: { folders: {} } };
       /** @type {object[]} The built context-menu entries. */
-      const entries = buildEffectRowContextMenu(trayState);
+      const entries = buildEffectRowContextMenu(trayState, () => {});
       expect(entries.map((entry) => entry.label)).toEqual([
          'LOCAL.effectTrayApply.text',
          'LOCAL.effectTrayOpen.text',
@@ -26,7 +26,7 @@ describe('buildEffectRowContextMenu', () => {
       /** @type {object} A fake tray state: not editable. */
       const trayState = { canEdit: false, selectedPack: { folders: {} } };
       /** @type {object[]} The built context-menu entries. */
-      const entries = buildEffectRowContextMenu(trayState);
+      const entries = buildEffectRowContextMenu(trayState, () => {});
       /** @type {(label: string) => boolean} Resolves an entry's visibility by label. */
       const visibleOf = (label) => entries.find((entry) => entry.label === label).visible();
       expect(visibleOf('LOCAL.effectTrayApply.text')).toBe(true);
@@ -40,7 +40,7 @@ describe('buildEffectRowContextMenu', () => {
       /** @type {object} A fake tray state: editable but folderless pack. */
       const trayState = { canEdit: true, selectedPack: { folders: null } };
       /** @type {object[]} The built context-menu entries. */
-      const entries = buildEffectRowContextMenu(trayState);
+      const entries = buildEffectRowContextMenu(trayState, () => {});
       /** @type {object} The Move-to-Folder entry. */
       const move = entries.find((entry) => entry.label === 'LOCAL.effectTrayMoveToFolder.text');
       expect(move.visible()).toBe(false);

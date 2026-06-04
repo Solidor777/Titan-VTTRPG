@@ -7,7 +7,7 @@ const PROBE_BUNDLE = path.resolve(
    '../../test/build/probe.iife.js',
 );
 
-/** @type {string} Absolute path to the probe's extracted global stylesheet (tippy.js styles), built alongside the IIFE. */
+/** @type {string} Absolute path to the probe's extracted global stylesheet (tippy.js), built alongside the IIFE. */
 const PROBE_STYLES = path.resolve(
    path.dirname(fileURLToPath(import.meta.url)),
    '../../test/build/probe.css',
@@ -46,7 +46,10 @@ export async function mountProbe(page, name, { props = {}, events = [], context 
       globalThis.window.__titanProbeEvents = globalThis.window.__titanProbeEvents ?? [];
       const probe = globalThis.game.titan._probe;
       if (!probe) {
-         throw new Error('game.titan._probe is not registered — ensure test/build/probe.iife.js was built (npm run test:e2e builds it via global-setup).');
+         throw new Error(
+            'game.titan._probe is not registered — ensure test/build/probe.iife.js was built '
+            + '(npm run test:e2e builds it via global-setup).',
+         );
       }
       const builtProps = { ...props };
       for (const ev of events) {
