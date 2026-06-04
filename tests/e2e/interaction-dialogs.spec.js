@@ -34,13 +34,9 @@ async function triggerInWorld(page, evalSrc) {
       errors.push(err.message);
    });
 
-   // Execute the trigger source inside the world and let the AppV2 render + Svelte mount settle.
+   // Execute the trigger source inside the world; Node-side assertions handle the settle.
    await page.evaluate(async (src) => {
       await new Function(`return (async () => { ${src} })();`)();
-      await titanWait(
-         () => !!document.querySelector('.application.titan-dialog') || game.ready,
-         { message: 'dialog open or action settled' },
-      );
    }, evalSrc);
 
    return errors;
