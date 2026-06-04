@@ -133,9 +133,9 @@ Unit tests live under `tests/` (excluded from the Vite build); Vitest is configu
 - Path aliases: `~/` maps to `src/` (used throughout, e.g. `~/helpers/…`); `$fonts/` maps to the repo `fonts/`
   directory.
 - Build entry: `src/index.js` (referenced as `./index.js` relative to root).
-- Output format: ES module (`formats: ['es']`), output file named `index` → `index.js` at repo root.
-- `outDir` is the repo root (`__dirname`); `emptyOutDir: false` to avoid wiping non-built files.
-- CSS is extracted and emitted as `style.css` at repo root; PostCSS runs `autoprefixer` (configured directly in
+- Output format: ES module (`formats: ['es']`), output file named `index` → `index.js` in `dist/`.
+- `outDir` is `dist/` (`path.join(__dirname, 'dist')`); `emptyOutDir: true` so each build self-cleans stale chunks.
+- CSS is extracted and emitted as `style.css` in `dist/`; PostCSS runs `autoprefixer` (configured directly in
   `vite.config.mjs`, no TyphonJS rollup config).
 - SCSS preprocessing uses two paths: `svelte-preprocess` (Svelte component styles) uses `api: 'modern'` and
   prepends `@use "src/styles/Root.scss" as *;` to every `<style lang="scss">` block automatically; the global
@@ -144,8 +144,8 @@ Unit tests live under `tests/` (excluded from the Vite build); Vitest is configu
 - Target: `es2022` for both esbuild and Rollup/Terser.
 
 **Manifest wiring** (`system.json`):
-- `"esmodules": ["index.js"]` — Foundry loads the compiled ES module from the repo root.
-- `"styles": ["style.css"]` — Foundry loads the compiled CSS from the repo root.
+- `"esmodules": ["dist/index.js"]` — Foundry loads the compiled ES module from `dist/`.
+- `"styles": ["dist/style.css"]` — Foundry loads the compiled CSS from `dist/`.
 - Document types declared: Actor (`player`, `npc`), Item (`ability`, `armor`, `commodity`, `equipment`,
   `shield`, `spell`, `weapon`), ActiveEffect (`effect`, `condition`), ChatMessage (`attributeCheck`,
   `resistanceCheck`, `attackCheck`, `castingCheck`, `itemCheck`). The five ChatMessage check subtypes are

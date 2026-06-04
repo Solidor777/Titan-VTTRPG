@@ -349,13 +349,14 @@ static `actions` map. To refresh a dynamic control's icon/label after a state ch
   Read reactive data via `document.data.*` (not `$document`); context values are never passed as props down
   the tree.
 
-- **Build output goes to the repo root** — `vite.config.mjs` sets `build.outDir` to the project root
-  (`__dirname`), not a `dist/` folder. Source lives in `src/`; build artifacts such as `index.js` land at the
-  top level. See `architecture.md` for the full directory layout.
-- **CSS must be emitted as `style.css`** — `system.json` (`styles: ["style.css"]`) and the dev-server proxy
-  both reference `style.css`, so `build.lib.cssFileName` is pinned to `'style'`. Without it the Vite 8 lib
-  build names the CSS after `lib.fileName` (`index` → `index.css`), which Foundry never loads — CSS-only
-  changes then build cleanly but silently fail to deploy while JS changes still apply.
+- **Build output goes to `dist/`** — `vite.config.mjs` sets `build.outDir` to `path.join(__dirname, 'dist')`
+  with `emptyOutDir: true`, so each build self-cleans stale chunks. Source lives in `src/`; build artifacts
+  such as `index.js` land in `dist/`. See `architecture.md` for the full directory layout.
+- **CSS must be emitted as `style.css`** — `system.json` (`styles: ["dist/style.css"]`) and the dev-server
+  proxy both reference `dist/style.css`, so `build.lib.cssFileName` is pinned to `'style'` (producing
+  `dist/style.css`). Without it the Vite 8 lib build names the CSS after `lib.fileName` (`index` →
+  `index.css`), which Foundry never loads — CSS-only changes then build cleanly but silently fail to deploy
+  while JS changes still apply.
 
 ## Test infrastructure
 
