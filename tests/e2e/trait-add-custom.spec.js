@@ -79,21 +79,21 @@ test.describe('add custom trait on items', () => {
       // Click "Add Trait" — the first button under the dialog's button row.
       await dialog.locator('.buttons .button button').first().click();
 
-      // Allow the update + re-render cycle to settle.
-      await page.waitForTimeout(500);
-
       // Assert: the trait persisted to the item's data model exactly once, under the typed name.
-      const persisted = await page.evaluate((itemName) => {
-         const item = globalThis.game.items.getName(itemName);
-         const traits = item?.system?.customTrait ?? [];
-         return {
-            count: traits.length,
-            names: traits.map((t) => t.name),
-         };
-      }, ITEM_NAME);
-
-      expect(persisted.count, 'exactly one custom trait should be persisted').toBe(1);
-      expect(persisted.names, 'persisted trait carries the typed name').toContain(TRAIT_NAME);
+      // Poll the non-retrying document read until the add commits.
+      await expect
+         .poll(
+            () => page.evaluate((itemName) => {
+               const item = globalThis.game.items.getName(itemName);
+               const traits = item?.system?.customTrait ?? [];
+               return {
+                  count: traits.length,
+                  names: traits.map((t) => t.name),
+               };
+            }, ITEM_NAME),
+            { message: 'custom trait persisted to the item exactly once under the typed name' },
+         )
+         .toEqual({ count: 1, names: [TRAIT_NAME] });
 
       // Assert: the trait renders as a tag in the sidebar carrying its name.
       await expect(

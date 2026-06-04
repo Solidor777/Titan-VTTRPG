@@ -67,11 +67,16 @@ test.describe('custom trait edit/delete on effects', () => {
 
       await dialog.locator('input').first().fill(EDITED_NAME);
       await dialog.locator('.buttons .button button').first().click();
-      await page.waitForTimeout(500);
 
-      const names = await page.evaluate((actorName) =>
-         game.actors.getName(actorName).effects.contents[0].system.customTrait.map((t) => t.name), ACTOR_NAME);
-      expect(names, 'effect trait edited in place').toEqual([EDITED_NAME]);
+      // Poll the non-retrying document read until the edit commits to the effect's data model.
+      await expect
+         .poll(
+            () => page.evaluate((actorName) =>
+               game.actors.getName(actorName).effects.contents[0].system.customTrait.map((t) => t.name),
+            ACTOR_NAME),
+            { message: 'effect custom trait edited in place' },
+         )
+         .toEqual([EDITED_NAME]);
 
       await expect(page.locator('.sidebar').getByText(EDITED_NAME).first(), 'edited name renders').toBeVisible();
       await expect(
@@ -94,11 +99,15 @@ test.describe('custom trait edit/delete on effects', () => {
       ).toBeVisible();
 
       await page.locator('.sidebar .fa-trash').click();
-      await page.waitForTimeout(500);
 
-      const count = await page.evaluate((actorName) =>
-         game.actors.getName(actorName).effects.contents[0].system.customTrait.length, ACTOR_NAME);
-      expect(count, 'effect trait removed').toBe(0);
+      // Poll the non-retrying document read until the deletion commits to the effect's data model.
+      await expect
+         .poll(
+            () => page.evaluate((actorName) =>
+               game.actors.getName(actorName).effects.contents[0].system.customTrait.length, ACTOR_NAME),
+            { message: 'effect custom trait removed' },
+         )
+         .toBe(0);
 
       await expect(
          page.locator('.sidebar').getByText(ORIGINAL_NAME),

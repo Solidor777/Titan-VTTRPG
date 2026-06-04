@@ -37,7 +37,9 @@ test.describe('rules-element add/delete reactivity', () => {
       // Activate the Rules Elements tab so its list and Add button render.
       const label = await page.evaluate(() => game.i18n.localize('LOCAL.rulesElements.text'));
       await page.locator('.tab-list').getByText(label, { exact: true }).click();
-      await page.waitForTimeout(300);
+
+      // The tab is active once its Add button has rendered.
+      await expect(page.locator('.add-entry-button button'), 'rules-elements tab rendered').toBeVisible();
    });
 
    test('adding then deleting a rules element re-renders the list in place', async ({ page }) => {
@@ -46,20 +48,26 @@ test.describe('rules-element add/delete reactivity', () => {
 
       // Add via the tab's "Add Element" button.
       await page.locator('.add-entry-button button').click();
-      await page.waitForTimeout(400);
 
-      const afterAdd = await page.evaluate((name) =>
-         game.items.getName(name).system.rulesElement.length, ITEM_NAME);
-      expect(afterAdd, 'element persisted').toBe(1);
+      // Poll the non-retrying document read until the new element persists.
+      await expect
+         .poll(
+            () => page.evaluate((name) => game.items.getName(name).system.rulesElement.length, ITEM_NAME),
+            { message: 'rules element persisted' },
+         )
+         .toBe(1);
       await expect(rows, 'list re-rendered with the new row').toHaveCount(1);
 
       // Delete via the row's delete button.
       await page.locator('.rules-element .delete-button button').first().click();
-      await page.waitForTimeout(400);
 
-      const afterDelete = await page.evaluate((name) =>
-         game.items.getName(name).system.rulesElement.length, ITEM_NAME);
-      expect(afterDelete, 'element removed').toBe(0);
+      // Poll the non-retrying document read until the element is removed.
+      await expect
+         .poll(
+            () => page.evaluate((name) => game.items.getName(name).system.rulesElement.length, ITEM_NAME),
+            { message: 'rules element removed' },
+         )
+         .toBe(0);
       await expect(rows, 'list re-rendered without the row').toHaveCount(0);
    });
 });
@@ -91,33 +99,43 @@ test.describe('rules-element selector default key', () => {
       // Activate the Rules Elements tab so its list and Add button render.
       const label = await page.evaluate(() => game.i18n.localize('LOCAL.rulesElements.text'));
       await page.locator('.tab-list').getByText(label, { exact: true }).click();
-      await page.waitForTimeout(300);
+
+      // The tab is active once its Add button has rendered.
+      await expect(page.locator('.add-entry-button button'), 'rules-elements tab rendered').toBeVisible();
    });
 
    test('changing the selector resets the key to the curated default', async ({ page }) => {
       // Add a flatModifier element (defaults: selector "attribute", key "body").
       await page.locator('.add-entry-button button').click();
-      await page.waitForTimeout(400);
 
-      const seeded = await page.evaluate((name) => {
-         const el = game.items.getName(name).system.rulesElement[0];
-         return { operation: el.operation, selector: el.selector, key: el.key };
-      }, ITEM_NAME_SELECTOR);
-      expect(seeded, 'seeded default flatModifier element').toEqual({
-         operation: 'flatModifier',
-         selector: 'attribute',
-         key: 'body',
-      });
+      // Poll the non-retrying document read until the seeded default element persists.
+      await expect
+         .poll(
+            () => page.evaluate((name) => {
+               const el = game.items.getName(name).system.rulesElement[0];
+               return el ? { operation: el.operation, selector: el.selector, key: el.key } : null;
+            }, ITEM_NAME_SELECTOR),
+            { message: 'seeded default flatModifier element persisted' },
+         )
+         .toEqual({
+            operation: 'flatModifier',
+            selector: 'attribute',
+            key: 'body',
+         });
 
       // Change the operation-specific SELECTOR dropdown to "resource".
       const selector = page.locator('.rules-element .operation-settings .field.select select').first();
       await selector.selectOption('resource');
-      await page.waitForTimeout(400);
 
-      // The key must land on the curated default "resolve", NOT the clamp's first option "all".
-      const key = await page.evaluate((name) =>
-         game.items.getName(name).system.rulesElement[0].key, ITEM_NAME_SELECTOR);
-      expect(key, 'curated default key for the resource selector').toBe('resolve');
+      // The key must land on the curated default "resolve", NOT the clamp's first option "all". Poll the
+      // non-retrying document read until the selector change commits the curated key.
+      await expect
+         .poll(
+            () => page.evaluate((name) =>
+               game.items.getName(name).system.rulesElement[0].key, ITEM_NAME_SELECTOR),
+            { message: 'curated default key for the resource selector' },
+         )
+         .toBe('resolve');
 
       // The retired owner-guard must not have surfaced its "Cannot modify document" error toast.
       // (Foundry's own resolution/hardware-acceleration startup notices are unrelated and ignored.)

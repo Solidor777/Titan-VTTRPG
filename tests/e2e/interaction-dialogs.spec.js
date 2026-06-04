@@ -234,8 +234,7 @@ test.describe('v14 interaction dialogs', () => {
          .first()
          .click();
 
-      // Let the AppV2 render + Svelte mount settle, then assert the dialog window appeared.
-      await page.waitForTimeout(500);
+      // The dialog window appears once the AppV2 render + Svelte mount settle (auto-retried).
       await expect(page.locator(DIALOG_SELECTOR).first()).toBeVisible();
       expect(errors, `uncaught errors during edit-UUID dialog render:\n${errors.join('\n')}`).toEqual([]);
    });

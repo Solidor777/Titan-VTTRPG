@@ -83,15 +83,18 @@ test.describe('custom trait edit/delete on items', () => {
       // Replace the name and apply.
       await dialog.locator('input').first().fill(EDITED_NAME);
       await dialog.locator('.buttons .button button').first().click();
-      await page.waitForTimeout(500);
 
-      // Persisted: the trait's name changed in place (still exactly one trait).
-      const persisted = await page.evaluate((itemName) => {
-         const traits = game.items.getName(itemName)?.system?.customTrait ?? [];
-         return { count: traits.length, names: traits.map((t) => t.name) };
-      }, ITEM_NAME);
-      expect(persisted.count, 'still exactly one trait after edit').toBe(1);
-      expect(persisted.names, 'trait name was edited in place').toEqual([EDITED_NAME]);
+      // Persisted: the trait's name changed in place (still exactly one trait). Poll the non-retrying
+      // document read until the edit commits to the item's data model.
+      await expect
+         .poll(
+            () => page.evaluate((itemName) => {
+               const traits = game.items.getName(itemName)?.system?.customTrait ?? [];
+               return { count: traits.length, names: traits.map((t) => t.name) };
+            }, ITEM_NAME),
+            { message: 'custom trait edited in place on the item' },
+         )
+         .toEqual({ count: 1, names: [EDITED_NAME] });
 
       // Re-rendered: the sidebar shows the new name and no longer the old one.
       await expect(
@@ -119,12 +122,16 @@ test.describe('custom trait edit/delete on items', () => {
 
       // Delete via the tag's trash icon (click bubbles from the icon to the button).
       await page.locator('.sidebar .fa-trash').click();
-      await page.waitForTimeout(500);
 
-      // Persisted: the trait array is now empty.
-      const count = await page.evaluate((itemName) =>
-         (game.items.getName(itemName)?.system?.customTrait ?? []).length, ITEM_NAME);
-      expect(count, 'trait removed from the data model').toBe(0);
+      // Persisted: the trait array is now empty. Poll the non-retrying document read until the
+      // deletion commits to the item's data model.
+      await expect
+         .poll(
+            () => page.evaluate((itemName) =>
+               (game.items.getName(itemName)?.system?.customTrait ?? []).length, ITEM_NAME),
+            { message: 'custom trait removed from the item data model' },
+         )
+         .toBe(0);
 
       // Re-rendered: the tag is gone.
       await expect(
