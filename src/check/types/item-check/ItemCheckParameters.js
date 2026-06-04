@@ -1,5 +1,13 @@
 /**
- * Data for an opposed check.
+ * Base parameters for an opposed check stored on check parameters.
+ * @typedef {object} OpposedCheckBase
+ * @property {boolean} enabled - Whether the opposed check is active.
+ * @property {string} attribute - The Attribute to use for the opposed Check.
+ * @property {string} skill - The Skill to use for the opposed Check.
+ */
+
+/**
+ * Data for an opposed check configuration on an item.
  * @typedef {object} OpposedCheck
  * @property {string} attribute - The Attribute to use for the Check.
  * @property {string} skill - The Skill to use for the Check.
@@ -8,7 +16,9 @@
 /**
  * Options for requesting an Item Check from an Actor.
  * @typedef {CheckParameters} ItemCheckParameters
- * @property {object|boolean} opposedCheck - Opposed check data, if any.
+ * @property {OpposedCheckBase} opposedCheck - The opposed check data (enabled/attribute/skill).
+ * @property {boolean} isDamage - Whether the check inflicts damage.
+ * @property {boolean} isHealing - Whether the check heals damage.
  * @property {boolean} doubleExpertise - Whether to double the Expertise applied.
  * @property {boolean} doubleTraining - Whether to double the Training applied.
  * @property {boolean} extraFailureOnCritical - Whether a roll of 1 equals a negative success.
@@ -67,9 +77,15 @@ export default function createItemCheckParameters(options) {
       healing: 0,
       healingMod: options.healingMod,
       img: '',
+      isDamage: false,
+      isHealing: false,
       itemDescription: '',
       itemName: '',
-      opposedCheck: false,
+      opposedCheck: {
+         attribute: '',
+         enabled: false,
+         skill: '',
+      },
       resistanceCheck: '',
       resolveCost: options.resolveCost,
       scaling: false,
