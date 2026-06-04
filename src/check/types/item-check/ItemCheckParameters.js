@@ -1,12 +1,4 @@
 /**
- * Nested opposed-check configuration shared by item-check parameters.
- * @typedef {object} OpposedCheckBase
- * @property {boolean} enabled - Whether the opposed check is enabled.
- * @property {string} attribute - The attribute used for the opposed check.
- * @property {string} skill - The skill used for the opposed check.
- */
-
-/**
  * Options for requesting an Item Check from an Actor.
  * @typedef {CheckParameters} ItemCheckParameters
  * @property {OpposedCheckBase} opposedCheck - The opposed check data (enabled/attribute/skill).
