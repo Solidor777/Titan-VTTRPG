@@ -17,12 +17,19 @@ import createStringField from '~/helpers/utility-functions/CreateStringField.js'
  *   base `documentVersion`, which is defined directly in `TitanDataModel` (not via this helper), so this
  *   helper assumes integer for all numbers. If a genuine float field is ever templated, revisit this.
  * - `boolean` -> `createBooleanField(value)`.
- * - `Array` -> `createArrayField(<element field>)`, where the element field is derived by recursing on
- *   the first element (`value[0]`). An EMPTY array has no representative element, so it falls back to an
- *   `createObjectField()` element field; shape templates SHOULD provide at least one representative
- *   element so arrays of primitives or objects produce a faithful element schema.
- * - plain `object` -> a `SchemaField` (via `createSchemaField`) whose sub-fields are the result of
- *   recursing into the object with `buildSchemaFromShape`, so nested read paths are mirrored exactly.
+ * - `Array` -> `createArrayField(<element field>, structuredClone(value))`. The TEMPLATE ARRAY IS THE
+ *   FIELD'S DEFAULT CONTENTS: the array is cloned into the field's `initial` (so `attack: [oneAttack]`
+ *   defaults to one attack, `check: []` defaults to empty). The element field is derived from the
+ *   representative element (`value[0]`):
+ *   - EMPTY array -> `createObjectField()` element (no representative element to type against);
+ *   - representative element is a plain object (non-array) -> `createObjectField()` element, i.e. an
+ *     UNTYPED object bag (NOT a typed `SchemaField`), matching how the item DataModels store object
+ *     arrays;
+ *   - representative element is a primitive -> `buildFieldFromValue(value[0])`, keeping a typed element
+ *     (e.g. an array of strings yields a `StringField` element).
+ * - plain `object` (non-array) -> a `SchemaField` (via `createSchemaField`) whose sub-fields are the
+ *   result of recursing into the object with `buildSchemaFromShape`, so nested read paths are mirrored
+ *   exactly (this keeps `armor {max,value}` and `castingCheck {...}` typed).
  * - `null` / `undefined` -> a nullable `createObjectField(null)`; a shape cannot express a typed field
  *   for an absent value, so it is represented as a nullable object bag (the least-surprising default
  *   that preserves the key and tolerates any later value without throwing).
@@ -35,15 +42,20 @@ function buildFieldFromValue(value) {
       return createObjectField(null);
    }
 
-   // Arrays map to an ArrayField whose element schema is derived from a representative element.
+   // Arrays map to an ArrayField seeded with the template array as its default contents, whose element
+   // field is derived from a representative element.
    if (Array.isArray(value)) {
       // The representative element (the first entry), or undefined when the array is empty.
       const representativeElement = value[0];
 
-      // The element field: derived from the representative element, or an object field when empty.
-      const elementField = value.length > 0 ? buildFieldFromValue(representativeElement) : createObjectField();
+      // The element field: an untyped object bag for an empty array or an object-valued element (matching
+      // how the item DataModels store object arrays), or a typed field for a primitive-valued element.
+      const elementField = value.length > 0 && typeof representativeElement !== 'object'
+         ? buildFieldFromValue(representativeElement)
+         : createObjectField();
 
-      return createArrayField(elementField);
+      // The template array IS the field's default contents: clone it into the array's initial.
+      return createArrayField(elementField, structuredClone(value));
    }
 
    // Plain objects map to a SchemaField whose sub-fields are recursively built from the object.
@@ -83,13 +95,17 @@ function buildFieldFromValue(value) {
  * `string`/`number`/`boolean` become the matching typed field (seeded with the representative value),
  * where a `number` always becomes an integer-enforced field (the system has no non-integer schema
  * fields except the base `documentVersion`, defined directly in `TitanDataModel` rather than via this
- * helper, so integer is assumed for all numbers), arrays become an `ArrayField` whose element schema is
- * derived from a representative element (empty
- * arrays fall back to an object element field), and plain objects become a `SchemaField` built by
- * recursing into the object. `null` / `undefined` values become a nullable object field. The result
- * deeply mirrors the shape's nesting so the resulting schema's READ PATHS match the shape's paths
- * (e.g. shape `{ armor: { value: 1 } }` yields a schema where `system.armor.value` resolves). This is
- * a pure function with no side effects.
+ * helper, so integer is assumed for all numbers). An ARRAY becomes an `ArrayField` whose `initial` is a
+ * clone of the template array — the array literal IS the field's default contents (e.g. `attack:
+ * [oneAttack]` defaults to one attack, `check: []` defaults to empty). Its element field is an UNTYPED
+ * `ObjectField` when the array is empty or its representative element is an object (matching how the
+ * item DataModels store object arrays — NOT a typed `SchemaField`), and a typed field when the
+ * representative element is a primitive (e.g. an array of strings keeps a `StringField` element).
+ * A plain object (non-array) becomes a `SchemaField` built by recursing into the object. `null` /
+ * `undefined` values become a nullable object field. The result deeply mirrors the shape's nesting so
+ * the resulting schema's nested-object READ PATHS match the shape's paths (e.g. shape `{ armor:
+ * { value: 1 } }` yields a schema where `system.armor.value` resolves). This is a pure function with no
+ * side effects.
  * @param {object} shape - The plain-object shape template to convert into a schema field map.
  * @returns {object} A field map (property name -> DataField instance) suitable as a `defineSchema` /
  *    `_defineDocumentSchema` return value.

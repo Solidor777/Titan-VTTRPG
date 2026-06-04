@@ -195,11 +195,9 @@ describe('WeaponChatMessageDataModel schema (path parity with weapon system)', (
       expect(schema.equipped).toBeInstanceOf(MockBooleanField);
       expect(schema.attackNotes).toBeInstanceOf(MockStringField);
 
-      // attack is an array whose element schema mirrors a real weapon attack (a SchemaField).
+      // attack is an array whose element is an untyped object bag (object-valued array element).
       expect(schema.attack).toBeInstanceOf(MockArrayField);
-      expect(schema.attack.element).toBeInstanceOf(MockSchemaField);
-      expect(schema.attack.element.fields.label).toBeInstanceOf(MockStringField);
-      expect(schema.attack.element.fields.damage).toBeInstanceOf(MockNumberField);
+      expect(schema.attack.element).toBeInstanceOf(MockObjectField);
 
       // rulesElement is an array of untyped object bags (empty-array fallback), and trait likewise.
       expect(schema.rulesElement).toBeInstanceOf(MockArrayField);

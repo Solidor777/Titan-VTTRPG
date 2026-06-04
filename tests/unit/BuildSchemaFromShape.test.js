@@ -177,7 +177,7 @@ describe('buildSchemaFromShape — arrays', () => {
       expect(schema.tags.element).toBeInstanceOf(MockStringField);
    });
 
-   it('maps an array of objects to an ArrayField whose element is a SchemaField of the element shape', () => {
+   it('maps an array of objects to an ArrayField with an untyped object element seeded from the template', () => {
       /** @type {object} The schema built from a shape with an array of objects. */
       const schema = buildSchemaFromShape({
          attack: [
@@ -188,10 +188,18 @@ describe('buildSchemaFromShape — arrays', () => {
          ],
       });
 
+      // An object-valued array element is an untyped object bag (not a typed SchemaField), matching how
+      // the item DataModels store object arrays.
       expect(schema.attack).toBeInstanceOf(MockArrayField);
-      expect(schema.attack.element).toBeInstanceOf(MockSchemaField);
-      expect(schema.attack.element.fields.label).toBeInstanceOf(MockStringField);
-      expect(schema.attack.element.fields.damage).toBeInstanceOf(MockNumberField);
+      expect(schema.attack.element).toBeInstanceOf(MockObjectField);
+
+      // The template array IS the field's default contents: it is cloned into the array's initial.
+      expect(schema.attack.options.initial).toEqual([
+         {
+            label: 'Swing',
+            damage: 3,
+         },
+      ]);
    });
 
    it('falls back to an object element field for an empty array', () => {
@@ -202,6 +210,9 @@ describe('buildSchemaFromShape — arrays', () => {
 
       expect(schema.check).toBeInstanceOf(MockArrayField);
       expect(schema.check.element).toBeInstanceOf(MockObjectField);
+
+      // An empty template array clones to an empty initial.
+      expect(schema.check.options.initial).toEqual([]);
    });
 });
 
@@ -266,12 +277,24 @@ describe('buildSchemaFromShape — combined shape', () => {
       expect(schema.multiplier.options.integer).toBe(true);
       expect(schema.equipped).toBeInstanceOf(MockBooleanField);
       expect(schema.armor).toBeInstanceOf(MockSchemaField);
+      // An object-valued array element is an untyped object bag, seeded from the template contents.
       expect(schema.attack).toBeInstanceOf(MockArrayField);
-      expect(schema.attack.element).toBeInstanceOf(MockSchemaField);
+      expect(schema.attack.element).toBeInstanceOf(MockObjectField);
+      expect(schema.attack.options.initial).toEqual([
+         {
+            label: 'Cleave',
+         },
+      ]);
+      // A primitive-valued array element stays typed, and the template values seed the array initial.
       expect(schema.trait).toBeInstanceOf(MockArrayField);
       expect(schema.trait.element).toBeInstanceOf(MockStringField);
+      expect(schema.trait.options.initial).toEqual([
+         'martial',
+      ]);
+      // An empty array element falls back to an object bag and clones to an empty initial.
       expect(schema.check).toBeInstanceOf(MockArrayField);
       expect(schema.check.element).toBeInstanceOf(MockObjectField);
+      expect(schema.check.options.initial).toEqual([]);
       expect(schema.note).toBeInstanceOf(MockObjectField);
    });
 });
