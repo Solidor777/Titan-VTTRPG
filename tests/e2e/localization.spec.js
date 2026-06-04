@@ -1,38 +1,56 @@
 import { expect, test } from '@playwright/test';
 import { collectLocalizationOffenders, ensureDocument, login, renderSheet } from './fixtures.js';
+import { closeAllApps, clearChat, attachPageErrors } from './world.js';
 
 // The seven TITAN Item subtypes, all rendered through the shared item sheet.
 const ITEM_TYPES = ['ability', 'armor', 'commodity', 'equipment', 'shield', 'spell', 'weapon'];
 
-test.describe('no double-localized (LOCAL.) text in rendered UI', () => {
-   test.beforeEach(async ({ page }) => {
-      await login(page);
-   });
+/** @type {import('@playwright/test').Page} The file-shared, logged-in page (one world boot per file). */
+let page;
+/** @type {string[]} Uncaught page errors collected during the current test (cleared each afterEach). */
+let errors;
 
-   test('player actor sheet', async ({ page }) => {
+test.beforeAll(async ({ browser }) => {
+   page = await browser.newPage();
+   errors = attachPageErrors(page);
+   await login(page);
+   await clearChat(page);
+});
+
+test.afterEach(async () => {
+   await closeAllApps(page);
+   errors.length = 0;
+});
+
+test.afterAll(async () => {
+   await page?.close();
+});
+
+test.describe('no double-localized (LOCAL.) text in rendered UI', () => {
+   test('player actor sheet', async () => {
       const locate = await ensureDocument(page, 'Actor', 'player', 'E2E Player');
-      await renderSheet(page, locate, '.titan-player-sheet');
+      await renderSheet(page, locate, '.titan-player-sheet', errors);
       const offenders = await collectLocalizationOffenders(page, '.titan-player-sheet');
       expect(offenders, `LOCAL. text on player sheet:\n${offenders.join('\n')}`).toEqual([]);
    });
 
-   test('npc actor sheet', async ({ page }) => {
+   test('npc actor sheet', async () => {
       const locate = await ensureDocument(page, 'Actor', 'npc', 'E2E NPC');
-      await renderSheet(page, locate, '.titan-npc-sheet');
+      await renderSheet(page, locate, '.titan-npc-sheet', errors);
       const offenders = await collectLocalizationOffenders(page, '.titan-npc-sheet');
       expect(offenders, `LOCAL. text on npc sheet:\n${offenders.join('\n')}`).toEqual([]);
    });
 
    for (const type of ITEM_TYPES) {
-      test(`${type} item sheet`, async ({ page }) => {
+      test(`${type} item sheet`, async () => {
          const locate = await ensureDocument(page, 'Item', type, `E2E ${type}`);
-         await renderSheet(page, locate, '.titan-item-sheet');
+         await renderSheet(page, locate, '.titan-item-sheet', errors);
          const offenders = await collectLocalizationOffenders(page, '.titan-item-sheet');
          expect(offenders, `LOCAL. text on ${type} sheet:\n${offenders.join('\n')}`).toEqual([]);
       });
    }
 
-   test('embedded effect sheet', async ({ page }) => {
+   test('embedded effect sheet', async () => {
       await ensureDocument(page, 'Actor', 'player', 'E2E Player');
       const ids = await page.evaluate(async () => {
          const actor = game.actors.find((a) => a.type === 'player' && a.name === 'E2E Player')
@@ -47,12 +65,12 @@ test.describe('no double-localized (LOCAL.) text in rendered UI', () => {
          return { actorId: actor.id, effectId: effect.id };
       });
       const locateSrc = `() => game.actors.get('${ids.actorId}')?.effects.get('${ids.effectId}')`;
-      await renderSheet(page, locateSrc, '.titan-effect-sheet');
+      await renderSheet(page, locateSrc, '.titan-effect-sheet', errors);
       const offenders = await collectLocalizationOffenders(page, '.titan-effect-sheet');
       expect(offenders, `LOCAL. text on effect sheet:\n${offenders.join('\n')}`).toEqual([]);
    });
 
-   test('effects sidebar header, rows, and context menu', async ({ page }) => {
+   test('effects sidebar header, rows, and context menu', async () => {
       await page.evaluate(async () => {
          let pack = game.packs.get('world.e2e-tray-effects');
          if (!pack) {

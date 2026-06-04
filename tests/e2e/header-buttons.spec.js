@@ -1,5 +1,27 @@
 import { test, expect } from '@playwright/test';
 import { ensureDocument, login } from './fixtures.js';
+import { closeAllApps, clearChat, attachPageErrors } from './world.js';
+
+/** @type {import('@playwright/test').Page} The file-shared, logged-in page (one world boot per file). */
+let page;
+/** @type {string[]} Uncaught page errors collected during the current test (cleared each afterEach). */
+let errors;
+
+test.beforeAll(async ({ browser }) => {
+   page = await browser.newPage();
+   errors = attachPageErrors(page);
+   await login(page);
+   await clearChat(page);
+});
+
+test.afterEach(async () => {
+   await closeAllApps(page);
+   errors.length = 0;
+});
+
+test.afterAll(async () => {
+   await page?.close();
+});
 
 /**
  * Render a document's sheet inside the Foundry runtime and return a locator for its frame element.
@@ -32,13 +54,8 @@ async function renderSheetFrame(page, locateSrc, sheetClass) {
 }
 
 test.describe('always-visible Svelte header buttons', () => {
-   // Log in before every test so a single failure never poisons the rest.
-   test.beforeEach(async ({ page }) => {
-      await login(page);
-   });
-
    // The actor sheet shows inline Edit Token + Toggle Link buttons without opening the dropdown.
-   test('actor sheet shows inline header buttons', async ({ page }) => {
+   test('actor sheet shows inline header buttons', async () => {
       const locate = await ensureDocument(page, 'Actor', 'player', 'E2E Header Player');
       const sheet = await renderSheetFrame(page, locate, 'titan-player-sheet');
 
@@ -47,7 +64,7 @@ test.describe('always-visible Svelte header buttons', () => {
    });
 
    // The Toggle Link button's icon reacts to the prototype token link state via the document bridge.
-   test('actor toggle-link button reacts to prototype link state', async ({ page }) => {
+   test('actor toggle-link button reacts to prototype link state', async () => {
       const locate = await ensureDocument(page, 'Actor', 'player', 'E2E Header Player');
       const sheet = await renderSheetFrame(page, locate, 'titan-player-sheet');
       const icon = sheet.locator('.window-header .toggle-token-linked-button i');
@@ -67,7 +84,7 @@ test.describe('always-visible Svelte header buttons', () => {
    });
 
    // The item sheet's inline Send-to-Chat button posts a chat message.
-   test('item send-to-chat header button posts a message', async ({ page }) => {
+   test('item send-to-chat header button posts a message', async () => {
       const locate = await ensureDocument(page, 'Item', 'weapon', 'E2E Header Weapon');
       const sheet = await renderSheetFrame(page, locate, 'titan-item-sheet');
 
@@ -82,7 +99,7 @@ test.describe('always-visible Svelte header buttons', () => {
    });
 
    // The effect-subtype ActiveEffect sheet's inline Send-to-Chat button posts a chat message.
-   test('effect send-to-chat header button posts a message', async ({ page }) => {
+   test('effect send-to-chat header button posts a message', async () => {
       // Create an effect-subtype ActiveEffect on a player actor and render its sheet.
       const appId = await page.evaluate(async () => {
          const actor = game.actors.find((a) => a.type === 'player')
