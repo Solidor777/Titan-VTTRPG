@@ -1,11 +1,38 @@
 import { expect, test } from '@playwright/test';
 import { login } from '../fixtures.js';
+import { closeAllApps, clearChat, attachPageErrors } from '../world.js';
 import {
    buildFlatModifierAbilityData,
    buildMulBaseAbilityData,
    buildRulesElementAbilityData,
 } from '../../shared/builders.js';
 import { injectFastCheck } from '../fast-check.js';
+
+/** @type {import('@playwright/test').Page} The file-shared, logged-in page (one world boot per file). */
+let page;
+/** @type {string[]} Uncaught page errors collected during the current test (cleared each afterEach). */
+let errors;
+
+test.beforeAll(async ({ browser }) => {
+   page = await browser.newPage();
+   errors = attachPageErrors(page);
+   // Inject fast-check BEFORE login: it registers an init script that must be present at page load (the
+   // property-based describe below uses the `fc` global), and `login` performs the only navigation on the
+   // shared world. Injecting the library has no side effects beyond exposing `fc`, so the non-property
+   // describes (pure derived-data math, no dice) are unaffected.
+   await injectFastCheck(page);
+   await login(page);
+   await clearChat(page);
+});
+
+test.afterEach(async () => {
+   await closeAllApps(page);
+   errors.length = 0;
+});
+
+test.afterAll(async () => {
+   await page?.close();
+});
 
 /**
  * Behavioral coverage of the rules-element math, asserted against the live derived-data pipeline.
@@ -15,16 +42,15 @@ import { injectFastCheck } from '../fast-check.js';
 const ACTOR_NAME = 'E2E RulesElement Actor';
 
 test.describe('rules elements — derived attribute math', () => {
-   // Log in and assert the TITAN system initialized before each test.
-   test.beforeEach(async ({ page }) => {
-      await login(page);
+   // Assert the TITAN system initialized before each test.
+   test.beforeEach(async () => {
       const ready = await page.evaluate(() => typeof game.titan !== 'undefined'
          && !!CONFIG.Actor?.dataModels?.player);
       expect(ready, 'TITAN system must be initialized').toBe(true);
    });
 
    // Remove the fixture actor after each test so the world does not accumulate state.
-   test.afterEach(async ({ page }) => {
+   test.afterEach(async () => {
       await page.evaluate(async (name) => {
          const stale = game.actors.getName(name);
          if (stale) {
@@ -33,7 +59,7 @@ test.describe('rules elements — derived attribute math', () => {
       }, ACTOR_NAME);
    });
 
-   test('a single +2 flatModifier raises Body from 1 to 3', async ({ page }) => {
+   test('a single +2 flatModifier raises Body from 1 to 3', async () => {
       const bodyValue = await page.evaluate(async ({ name, abilityData }) => {
          // Build a clean player actor (Body defaults to 1) owning the flatModifier ability.
          const stale = game.actors.getName(name);
@@ -54,7 +80,7 @@ test.describe('rules elements — derived attribute math', () => {
       expect(bodyValue, 'derived Body should be base 1 + flat 2').toBe(3);
    });
 
-   test('a mulBase of 2 raises Body from 1 to 2', async ({ page }) => {
+   test('a mulBase of 2 raises Body from 1 to 2', async () => {
       const bodyValue = await page.evaluate(async ({ name, abilityData }) => {
          const stale = game.actors.getName(name);
          if (stale) {
@@ -73,7 +99,7 @@ test.describe('rules elements — derived attribute math', () => {
       expect(bodyValue, 'derived Body should be base 1 + base*(mul-1)=1').toBe(2);
    });
 
-   test('mulBase 2 plus flatModifier 3 raises Body from 1 to 5', async ({ page }) => {
+   test('mulBase 2 plus flatModifier 3 raises Body from 1 to 5', async () => {
       const bodyValue = await page.evaluate(async ({ name, abilityData }) => {
          const stale = game.actors.getName(name);
          if (stale) {
@@ -94,13 +120,12 @@ test.describe('rules elements — derived attribute math', () => {
 });
 
 test.describe('rules elements — all-key selector', () => {
-   test.beforeEach(async ({ page }) => {
-      await login(page);
+   test.beforeEach(async () => {
       const ready = await page.evaluate(() => typeof game.titan !== 'undefined'
          && !!CONFIG.Actor?.dataModels?.player);
       expect(ready, 'TITAN system must be initialized').toBe(true);
    });
-   test.afterEach(async ({ page }) => {
+   test.afterEach(async () => {
       await page.evaluate(async (name) => {
          const stale = game.actors.getName(name);
          if (stale) {
@@ -109,7 +134,7 @@ test.describe('rules elements — all-key selector', () => {
       }, ACTOR_NAME);
    });
 
-   test('flatModifier with key "all" shifts every attribute', async ({ page }) => {
+   test('flatModifier with key "all" shifts every attribute', async () => {
       const attributes = await page.evaluate(async ({ name, abilityData }) => {
          const stale = game.actors.getName(name);
          if (stale) {
@@ -138,17 +163,14 @@ test.describe('rules elements — all-key selector', () => {
 });
 
 test.describe('rules elements — stacking invariants (property-based)', () => {
-   // Inject fast-check, then log in and assert the system is ready.
-   test.beforeEach(async ({ page }) => {
-      await injectFastCheck(page);
-      await login(page);
+   test.beforeEach(async () => {
       const ready = await page.evaluate(() => typeof game.titan !== 'undefined'
          && !!CONFIG.Actor?.dataModels?.player);
       expect(ready, 'TITAN system must be initialized').toBe(true);
    });
 
    // Remove the fixture actor after the property run.
-   test.afterEach(async ({ page }) => {
+   test.afterEach(async () => {
       await page.evaluate(async (name) => {
          const stale = game.actors.getName(name);
          if (stale) {
@@ -157,7 +179,7 @@ test.describe('rules elements — stacking invariants (property-based)', () => {
       }, 'E2E Stacking Actor');
    });
 
-   test('for any set of flat modifiers, Body = max(0, 1 + sum)', async ({ page }) => {
+   test('for any set of flat modifiers, Body = max(0, 1 + sum)', async () => {
       // Run a fast-check property inside the runtime: one actor + one ability reused across iterations,
       // mutating the ability's rulesElement per iteration to avoid create/delete churn.
       const result = await page.evaluate(async () => {
@@ -209,13 +231,12 @@ test.describe('rules elements — stacking invariants (property-based)', () => {
 });
 
 test.describe('rules elements — mulSum (multiply total)', () => {
-   test.beforeEach(async ({ page }) => {
-      await login(page);
+   test.beforeEach(async () => {
       const ready = await page.evaluate(() => typeof game.titan !== 'undefined'
          && !!CONFIG.Actor?.dataModels?.player);
       expect(ready, 'TITAN system must be initialized').toBe(true);
    });
-   test.afterEach(async ({ page }) => {
+   test.afterEach(async () => {
       await page.evaluate(async (name) => {
          const stale = game.actors.getName(name);
          if (stale) {
@@ -224,7 +245,7 @@ test.describe('rules elements — mulSum (multiply total)', () => {
       }, ACTOR_NAME);
    });
 
-   test('mulSum halves the post-additive Body total, rounding up', async ({ page }) => {
+   test('mulSum halves the post-additive Body total, rounding up', async () => {
       const body = await page.evaluate(async ({ name, abilityData }) => {
          const stale = game.actors.getName(name);
          if (stale) {
@@ -248,7 +269,7 @@ test.describe('rules elements — mulSum (multiply total)', () => {
       expect(body, 'mulSum should halve the post-additive total of 5 to 3').toBe(3);
    });
 
-   test('stacked mulSum elements compound in order', async ({ page }) => {
+   test('stacked mulSum elements compound in order', async () => {
       const body = await page.evaluate(async ({ name, abilityData }) => {
          const stale = game.actors.getName(name);
          if (stale) {
@@ -275,13 +296,12 @@ test.describe('rules elements — mulSum (multiply total)', () => {
 });
 
 test.describe('rules elements — setSum (set total)', () => {
-   test.beforeEach(async ({ page }) => {
-      await login(page);
+   test.beforeEach(async () => {
       const ready = await page.evaluate(() => typeof game.titan !== 'undefined'
          && !!CONFIG.Actor?.dataModels?.player);
       expect(ready, 'TITAN system must be initialized').toBe(true);
    });
-   test.afterEach(async ({ page }) => {
+   test.afterEach(async () => {
       await page.evaluate(async (name) => {
          const stale = game.actors.getName(name);
          if (stale) {
@@ -290,7 +310,7 @@ test.describe('rules elements — setSum (set total)', () => {
       }, ACTOR_NAME);
    });
 
-   test('setSum set mode forces the Body total to the value', async ({ page }) => {
+   test('setSum set mode forces the Body total to the value', async () => {
       const results = await page.evaluate(async ({ name, zeroData, twoData }) => {
          const read = async (abilityData) => {
             const stale = game.actors.getName(name);
@@ -324,7 +344,7 @@ test.describe('rules elements — setSum (set total)', () => {
       expect(results).toEqual({ zero: 0, two: 2 });
    });
 
-   test('setSum min mode raises a low total to the floor', async ({ page }) => {
+   test('setSum min mode raises a low total to the floor', async () => {
       const body = await page.evaluate(async ({ name, abilityData }) => {
          const stale = game.actors.getName(name);
          if (stale) {
@@ -348,7 +368,7 @@ test.describe('rules elements — setSum (set total)', () => {
       expect(body, 'setSum min should raise Body from 1 to its floor of 5').toBe(5);
    });
 
-   test('setSum max mode caps a high total', async ({ page }) => {
+   test('setSum max mode caps a high total', async () => {
       const body = await page.evaluate(async ({ name, abilityData }) => {
          const stale = game.actors.getName(name);
          if (stale) {
@@ -375,13 +395,12 @@ test.describe('rules elements — setSum (set total)', () => {
 });
 
 test.describe('rules elements — mulBase rounding', () => {
-   test.beforeEach(async ({ page }) => {
-      await login(page);
+   test.beforeEach(async () => {
       const ready = await page.evaluate(() => typeof game.titan !== 'undefined'
          && !!CONFIG.Actor?.dataModels?.player);
       expect(ready, 'TITAN system must be initialized').toBe(true);
    });
-   test.afterEach(async ({ page }) => {
+   test.afterEach(async () => {
       await page.evaluate(async (name) => {
          const stale = game.actors.getName(name);
          if (stale) {
@@ -390,7 +409,7 @@ test.describe('rules elements — mulBase rounding', () => {
       }, ACTOR_NAME);
    });
 
-   test('a fractional mulBase rounds its base contribution up or down', async ({ page }) => {
+   test('a fractional mulBase rounds its base contribution up or down', async () => {
       const results = await page.evaluate(async ({ name, downData, upData }) => {
          const read = async (abilityData) => {
             const stale = game.actors.getName(name);
