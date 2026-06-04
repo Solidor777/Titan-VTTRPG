@@ -1,11 +1,4 @@
 /**
- * Data for an opposed check configuration on an item.
- * @typedef {object} OpposedCheck
- * @property {string} attribute - The Attribute to use for the Check.
- * @property {string} skill - The Skill to use for the Check.
- */
-
-/**
  * Options for requesting an Item Check from an Actor.
  * @typedef {CheckParameters} ItemCheckParameters
  * @property {OpposedCheckBase} opposedCheck - The opposed check data (enabled/attribute/skill).

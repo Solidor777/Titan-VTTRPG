@@ -66,18 +66,14 @@
       {/if}
 
       <!--Opposed Check Buttons-->
-      {#if document.data.system.parameters.opposedCheck}
+      {#if document.data.system.parameters.opposedCheck.enabled}
          <div class="section">
             <ChatAttributeCheckButton
-               attribute={document.data.system.parameters.opposedCheck
-                  .attribute}
+               attribute={document.data.system.parameters.opposedCheck.attribute}
                skill={document.data.system.parameters.opposedCheck.skill}
-               difficulty={document.data.system.parameters.opposedCheck
-                  .difficulty}
                complexity={document.data.system.results.extraSuccesses + 1}
                damageToReduce={document.data.system.parameters.isDamage &&
-               document.data.system.parameters.damageReducedBy ===
-                  'opposedCheck'
+               document.data.system.parameters.damageReducedBy === 'opposedCheck'
                   ? document.data.system.results.damage
                   : 0}
             />

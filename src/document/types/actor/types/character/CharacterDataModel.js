@@ -3637,13 +3637,16 @@ export default class CharacterDataModel extends TitanActorDataModel {
       parameters.resolveCost = checkData.resolveCost;
       parameters.resistanceCheck = checkData.resistanceCheck;
 
-      // Set the opposed check data.
-      if (checkData.opposedCheck.enabled) {
-         parameters.opposedCheck = {
-            attribute: checkData.opposedCheck.attribute,
-            skill: checkData.opposedCheck.skill,
-         };
-      }
+      // Carry the item's damage and healing flags so the chat card can read them.
+      parameters.isDamage = checkData.isDamage;
+      parameters.isHealing = checkData.isHealing;
+
+      // Set the opposed check data, carrying the enabled flag so the card and damage-reduction read it.
+      parameters.opposedCheck = {
+         attribute: checkData.opposedCheck.attribute,
+         enabled: checkData.opposedCheck.enabled,
+         skill: checkData.opposedCheck.skill,
+      };
 
       // If this check has damage or healing.
       if (checkData.isDamage || checkData.isHealing) {
@@ -3652,9 +3655,9 @@ export default class CharacterDataModel extends TitanActorDataModel {
          if (checkData.isDamage) {
             parameters.damage = checkData.initialValue;
 
-            // Set whether the damage can be reduced.
-            if ((parameters.damageReducedBy === 'opposedCheck' && parameters.opposedCheck.enabled) ||
-               (parameters.damageReducedBy === 'resistanceCheck' && parameters.resistanceCheck !== 'none')) {
+            // Carry the item's configured damage-reduction when an opposed or resistance check backs it.
+            if ((checkData.damageReducedBy === 'opposedCheck' && checkData.opposedCheck.enabled) ||
+               (checkData.damageReducedBy === 'resistanceCheck' && checkData.resistanceCheck !== 'none')) {
                parameters.damageReducedBy = checkData.damageReducedBy;
             }
          }
