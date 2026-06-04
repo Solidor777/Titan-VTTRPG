@@ -25,9 +25,12 @@ Resume point after a context `/clear`. Read this, then the referenced docs + the
 via path parity; B is the maintainability/drift-removal layer. DATA-INTEGRITY SENSITIVE — it changes the
 schemas of real actor/item data.**
 
-- **Step 1 DONE** (`cc826168` + skill note `f8f5561f`): `buildSchemaFromShape` now maps a whole-number
-  value → `createIntegerField` (via `Number.isInteger`), else `createNumberField`. Unit + build + item-cards
-  e2e green; merged chat side unaffected (item snapshot numbers are integers).
+- **Step 1 DONE** (`cc826168`/`f8f5561f`/`8ba15588`): `buildSchemaFromShape` maps EVERY number value →
+  `createIntegerField`. **SETTLED — DO NOT RE-SOLVE integer-vs-float (judged YAGNI):** the only non-integer
+  schema field is the base `documentVersion` (defined directly in `TitanDataModel`, not template-generated);
+  `xp.earned` was fixed to integer (`PlayerDataModel`); so the helper just assumes integer (no
+  `Number.isInteger` branch, no `createNumberField`). Revisit only if a genuine float field is ever
+  templated. Unit + build + item-cards + render-smoke green; merged chat side unaffected.
 - **Why B is now clean (key finding):** a grep proved the item DM schemas use ONLY
   `createStringField` (zero `choices`), `createIntegerField` (every item number is an integer — no
   `createNumberField`), `createBooleanField`, `createArrayField`, `createObjectField`, `createSchemaField`
