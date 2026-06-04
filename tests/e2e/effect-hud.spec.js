@@ -1,5 +1,27 @@
 import { expect, test } from '@playwright/test';
 import { login } from './fixtures.js';
+import { closeAllApps, clearChat, attachPageErrors } from './world.js';
+
+/** @type {import('@playwright/test').Page} The file-shared, logged-in page (one world boot per file). */
+let page;
+/** @type {string[]} Uncaught page errors collected during the current test (cleared each afterEach). */
+let errors;
+
+test.beforeAll(async ({ browser }) => {
+   page = await browser.newPage();
+   errors = attachPageErrors(page);
+   await login(page);
+   await clearChat(page);
+});
+
+test.afterEach(async () => {
+   await closeAllApps(page);
+   errors.length = 0;
+});
+
+test.afterAll(async () => {
+   await page?.close();
+});
 
 /**
  * Creates an actor with a controlled token on the active scene so the GM-login HUD resolves it
@@ -61,13 +83,12 @@ async function setupControlledActor(page, options) {
 }
 
 test.describe('native effect HUD', () => {
-   test.beforeEach(async ({ page }) => {
-      await login(page);
+   test.beforeEach(async () => {
       const ready = await page.evaluate(() => typeof game.titan?.effectHud !== 'undefined');
       expect(ready, 'TITAN effect HUD controller must be attached at ready').toBe(true);
    });
 
-   test('renders conditions and effects for the controlled token actor', async ({ page }) => {
+   test('renders conditions and effects for the controlled token actor', async () => {
       await setupControlledActor(page, { name: 'HUD Test Actor', addEffect: true, addCondition: true });
 
       // The panel mounts and shows the effect (the row name span; the icon alt is an attribute, not text).
@@ -80,7 +101,7 @@ test.describe('native effect HUD', () => {
       await expect(panel.getByText('HUD description body.')).toBeVisible();
    });
 
-   test('hides when the controlled actor has no effects or conditions', async ({ page }) => {
+   test('hides when the controlled actor has no effects or conditions', async () => {
       // Seed an effect first and prove the panel shows for this controlled actor. This guards against
       // a false pass: a bare toHaveCount(0) also succeeds when the actor silently fails to resolve
       // (HUD never mounts) — so we assert presence, then remove the content and assert the hide.
@@ -96,7 +117,7 @@ test.describe('native effect HUD', () => {
       await expect(panel).toHaveCount(0);
    });
 
-   test('unmounts when the enableEffectHud setting is turned off', async ({ page }) => {
+   test('unmounts when the enableEffectHud setting is turned off', async () => {
       await setupControlledActor(page, { name: 'HUD Toggle Actor', addEffect: true });
       await expect(page.locator('#titan-effect-hud .titan-effect-hud')).toBeVisible();
 

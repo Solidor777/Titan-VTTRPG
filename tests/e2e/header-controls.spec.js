@@ -1,5 +1,27 @@
 import { test, expect } from '@playwright/test';
 import { ensureDocument, login } from './fixtures.js';
+import { closeAllApps, clearChat, attachPageErrors } from './world.js';
+
+/** @type {import('@playwright/test').Page} The file-shared, logged-in page (one world boot per file). */
+let page;
+/** @type {string[]} Uncaught page errors collected during the current test (cleared each afterEach). */
+let errors;
+
+test.beforeAll(async ({ browser }) => {
+   page = await browser.newPage();
+   errors = attachPageErrors(page);
+   await login(page);
+   await clearChat(page);
+});
+
+test.afterEach(async () => {
+   await closeAllApps(page);
+   errors.length = 0;
+});
+
+test.afterAll(async () => {
+   await page?.close();
+});
 
 /**
  * Render a document's sheet and open its AppV2 window-header controls dropdown,
@@ -51,13 +73,8 @@ async function openHeaderControls(page, locateSrc, sheetSelector) {
 }
 
 test.describe('v14 header controls', () => {
-   // Log in before every surface so a single failure never poisons the rest.
-   test.beforeEach(async ({ page }) => {
-      await login(page);
-   });
-
    // The player actor sheet exposes the Edit Token and Toggle-Link controls.
-   test('player actor sheet exposes header controls', async ({ page }) => {
+   test('player actor sheet exposes header controls', async () => {
       // Ensure a player actor exists, then open its header controls dropdown.
       const locate = await ensureDocument(page, 'Actor', 'player', 'E2E Player');
       const labels = (await openHeaderControls(page, locate, '.titan-player-sheet')).map((l) => l.trim());
@@ -68,7 +85,7 @@ test.describe('v14 header controls', () => {
    });
 
    // The item sheet exposes the Send to Chat control.
-   test('weapon item sheet exposes header controls', async ({ page }) => {
+   test('weapon item sheet exposes header controls', async () => {
       // Ensure a weapon item exists, then open its header controls dropdown.
       const locate = await ensureDocument(page, 'Item', 'weapon', 'E2E weapon');
       const labels = (await openHeaderControls(page, locate, '.titan-item-sheet')).map((l) => l.trim());

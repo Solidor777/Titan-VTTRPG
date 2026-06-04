@@ -1,6 +1,28 @@
 import { expect, test } from '@playwright/test';
 import { login } from '../fixtures.js';
+import { closeAllApps, clearChat, attachPageErrors } from '../world.js';
 import { buildRulesElementAbilityData } from '../../shared/builders.js';
+
+/** @type {import('@playwright/test').Page} The file-shared, logged-in page (one world boot per file). */
+let page;
+/** @type {string[]} Uncaught page errors collected during the current test (cleared each afterEach). */
+let errors;
+
+test.beforeAll(async ({ browser }) => {
+   page = await browser.newPage();
+   errors = attachPageErrors(page);
+   await login(page);
+   await clearChat(page);
+});
+
+test.afterEach(async () => {
+   await closeAllApps(page);
+   errors.length = 0;
+});
+
+test.afterAll(async () => {
+   await page?.close();
+});
 
 /**
  * Behavioral coverage of condition mechanics, asserted against the live derived-data pipeline. Each test
@@ -23,14 +45,13 @@ const BOOST_ELEMENTS = [
 ];
 
 test.describe('conditions — derived-stat mechanics', () => {
-   test.beforeEach(async ({ page }) => {
-      await login(page);
+   test.beforeEach(async () => {
       const ready = await page.evaluate(() => typeof game.titan !== 'undefined'
          && !!CONFIG.Actor?.dataModels?.player);
       expect(ready, 'TITAN system must be initialized').toBe(true);
    });
 
-   test.afterEach(async ({ page }) => {
+   test.afterEach(async () => {
       await page.evaluate(async (name) => {
          const stale = game.actors.getName(name);
          if (stale) {
@@ -82,14 +103,14 @@ test.describe('conditions — derived-stat mechanics', () => {
       }, { name: ACTOR_NAME, abilityData: buildRulesElementAbilityData('E2E Condition Boost', BOOST_ELEMENTS), statusId });
    }
 
-   test('blinded lowers melee, accuracy, and defense by 1', async ({ page }) => {
+   test('blinded lowers melee, accuracy, and defense by 1', async () => {
       const { baseline, after } = await applyCondition(page, 'blinded');
       expect(after.melee).toBe(baseline.melee - 1);
       expect(after.accuracy).toBe(baseline.accuracy - 1);
       expect(after.defense).toBe(baseline.defense - 1);
    });
 
-   test('contaminated lowers every attribute and resistance by 1', async ({ page }) => {
+   test('contaminated lowers every attribute and resistance by 1', async () => {
       const { baseline, after } = await applyCondition(page, 'contaminated');
       for (const key of Object.keys(baseline.attribute)) {
          expect(after.attribute[key], `attribute ${key}`).toBe(baseline.attribute[key] - 1);
@@ -99,19 +120,19 @@ test.describe('conditions — derived-stat mechanics', () => {
       }
    });
 
-   test('stunned lowers defense by 1', async ({ page }) => {
+   test('stunned lowers defense by 1', async () => {
       const { baseline, after } = await applyCondition(page, 'stunned');
       expect(after.defense).toBe(baseline.defense - 1);
    });
 
-   test('prone halves speed (round up) and lowers melee/accuracy by 1', async ({ page }) => {
+   test('prone halves speed (round up) and lowers melee/accuracy by 1', async () => {
       const { baseline, after } = await applyCondition(page, 'prone');
       expect(after.stride).toBe(Math.ceil(baseline.stride / 2));
       expect(after.melee).toBe(baseline.melee - 1);
       expect(after.accuracy).toBe(baseline.accuracy - 1);
    });
 
-   test('restrained sets speed to 0 and lowers melee/accuracy/defense by 1', async ({ page }) => {
+   test('restrained sets speed to 0 and lowers melee/accuracy/defense by 1', async () => {
       const { baseline, after } = await applyCondition(page, 'restrained');
       expect(after.stride).toBe(0);
       expect(after.melee).toBe(baseline.melee - 1);
@@ -119,12 +140,12 @@ test.describe('conditions — derived-stat mechanics', () => {
       expect(after.defense).toBe(baseline.defense - 1);
    });
 
-   test('sleeping halves awareness (round up)', async ({ page }) => {
+   test('sleeping halves awareness (round up)', async () => {
       const { baseline, after } = await applyCondition(page, 'sleeping');
       expect(after.awareness).toBe(Math.ceil(baseline.awareness / 2));
    });
 
-   test('an inert condition (dead) changes no derived stats', async ({ page }) => {
+   test('an inert condition (dead) changes no derived stats', async () => {
       const { baseline, after } = await applyCondition(page, 'dead');
       expect(after).toEqual(baseline);
    });

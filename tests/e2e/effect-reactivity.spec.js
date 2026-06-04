@@ -1,5 +1,27 @@
 import { expect, test } from '@playwright/test';
 import { login } from './fixtures.js';
+import { closeAllApps, clearChat, attachPageErrors } from './world.js';
+
+/** @type {import('@playwright/test').Page} The file-shared, logged-in page (one world boot per file). */
+let page;
+/** @type {string[]} Uncaught page errors collected during the current test (cleared each afterEach). */
+let errors;
+
+test.beforeAll(async ({ browser }) => {
+   page = await browser.newPage();
+   errors = attachPageErrors(page);
+   await login(page);
+   await clearChat(page);
+});
+
+test.afterEach(async () => {
+   await closeAllApps(page);
+   errors.length = 0;
+});
+
+test.afterAll(async () => {
+   await page?.close();
+});
 
 /**
  * Regression: toggling an Active Effect's active state on a Character must update the rendered sheet
@@ -12,9 +34,7 @@ import { login } from './fixtures.js';
 const ACTOR_NAME = 'E2E Effect Reactivity Actor';
 
 test.describe('effect toggle reactivity', () => {
-   test.beforeEach(async ({ page }) => {
-      await login(page);
-
+   test.beforeEach(async () => {
       const ready = await page.evaluate(() => typeof game.titan !== 'undefined'
          && !!CONFIG.Actor?.dataModels?.player);
       expect(ready, 'TITAN system failed to initialize').toBe(true);
@@ -40,7 +60,7 @@ test.describe('effect toggle reactivity', () => {
       await page.getByText('Effects', { exact: true }).first().click();
    });
 
-   test('clicking the active toggle flips the rendered checkmark without a tab switch', async ({ page }) => {
+   test('clicking the active toggle flips the rendered checkmark without a tab switch', async () => {
       // The active toggle's checkmark is fa-square-check when active and fa-square when inactive; it is
       // the only square icon in the effect row, so target it directly (the click bubbles to its button).
       const row = page.locator('[data-effect-id]');

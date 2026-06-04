@@ -1,5 +1,27 @@
 import { expect, test } from '@playwright/test';
 import { login } from './fixtures.js';
+import { closeAllApps, clearChat, attachPageErrors } from './world.js';
+
+/** @type {import('@playwright/test').Page} The file-shared, logged-in page (one world boot per file). */
+let page;
+/** @type {string[]} Uncaught page errors collected during the current test (cleared each afterEach). */
+let errors;
+
+test.beforeAll(async ({ browser }) => {
+   page = await browser.newPage();
+   errors = attachPageErrors(page);
+   await login(page);
+   await clearChat(page);
+});
+
+test.afterEach(async () => {
+   await closeAllApps(page);
+   errors.length = 0;
+});
+
+test.afterAll(async () => {
+   await page?.close();
+});
 
 /**
  * Phase 3a Concern B — rules-element add/delete reactivity bug hunt. The rules-element tab renders one
@@ -13,9 +35,7 @@ import { login } from './fixtures.js';
 const ITEM_NAME = 'E2E RulesElement Item';
 
 test.describe('rules-element add/delete reactivity', () => {
-   test.beforeEach(async ({ page }) => {
-      await login(page);
-
+   test.beforeEach(async () => {
       const ready = await page.evaluate(() => typeof game.titan !== 'undefined'
          && !!CONFIG.Item?.dataModels?.weapon);
       expect(ready, 'TITAN system failed to initialize').toBe(true);
@@ -42,7 +62,7 @@ test.describe('rules-element add/delete reactivity', () => {
       await expect(page.locator('.add-entry-button button'), 'rules-elements tab rendered').toBeVisible();
    });
 
-   test('adding then deleting a rules element re-renders the list in place', async ({ page }) => {
+   test('adding then deleting a rules element re-renders the list in place', async () => {
       const rows = page.locator('.rules-element');
       await expect(rows, 'starts with no rules elements').toHaveCount(0);
 
@@ -75,9 +95,7 @@ test.describe('rules-element add/delete reactivity', () => {
 test.describe('rules-element selector default key', () => {
    const ITEM_NAME_SELECTOR = 'E2E RulesElement Selector Item';
 
-   test.beforeEach(async ({ page }) => {
-      await login(page);
-
+   test.beforeEach(async () => {
       const ready = await page.evaluate(() => typeof game.titan !== 'undefined'
          && !!CONFIG.Item?.dataModels?.weapon);
       expect(ready, 'TITAN system failed to initialize').toBe(true);
@@ -104,7 +122,7 @@ test.describe('rules-element selector default key', () => {
       await expect(page.locator('.add-entry-button button'), 'rules-elements tab rendered').toBeVisible();
    });
 
-   test('changing the selector resets the key to the curated default', async ({ page }) => {
+   test('changing the selector resets the key to the curated default', async () => {
       // Add a flatModifier element (defaults: selector "attribute", key "body").
       await page.locator('.add-entry-button button').click();
 

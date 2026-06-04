@@ -3,6 +3,28 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { login } from './fixtures.js';
+import { closeAllApps, clearChat, attachPageErrors } from './world.js';
+
+/** @type {import('@playwright/test').Page} The file-shared, logged-in page (one world boot per file). */
+let page;
+/** @type {string[]} Uncaught page errors collected during the current test (cleared each afterEach). */
+let errors;
+
+test.beforeAll(async ({ browser }) => {
+   page = await browser.newPage();
+   errors = attachPageErrors(page);
+   await login(page);
+   await clearChat(page);
+});
+
+test.afterEach(async () => {
+   await closeAllApps(page);
+   errors.length = 0;
+});
+
+test.afterAll(async () => {
+   await page?.close();
+});
 
 // Resolve and parse the shipped system.json once. This file is the manifest "source of truth": every test
 // compares the actual shipped artifact against the live runtime registration (CONFIG / game).
@@ -10,14 +32,10 @@ const here = path.dirname(fileURLToPath(import.meta.url));
 const manifest = JSON.parse(fs.readFileSync(path.resolve(here, '../../system.json'), 'utf8'));
 
 test.describe('integration manifest drift guard', () => {
-   // A ready GM world is required for settings / conditions / sheet-registration introspection.
-   test.beforeEach(async ({ page }) => {
-      await login(page);
-   });
 
    // The declared subtypes (system.json) must exactly equal the registered dataModels (CONFIG), both
    // directions: no declared subtype without a dataModel, and no orphan dataModel beyond what is declared.
-   test('declared documentTypes match registered dataModels (Actor/Item/ActiveEffect/ChatMessage)', async ({ page }) => {
+   test('declared documentTypes match registered dataModels (Actor/Item/ActiveEffect/ChatMessage)', async () => {
       // The declared subtype keys per base document, read from the shipped manifest.
       const declared = {
          Actor: Object.keys(manifest.documentTypes.Actor ?? {}),
@@ -45,7 +63,7 @@ test.describe('integration manifest drift guard', () => {
 
    // Every pack declared in the manifest must resolve in the live world under the titan package, with the
    // declared document type.
-   test('every manifest pack is loaded with matching metadata', async ({ page }) => {
+   test('every manifest pack is loaded with matching metadata', async () => {
       // The pack descriptors declared in the manifest.
       const declaredPacks = manifest.packs ?? [];
       expect(declaredPacks.length, 'manifest declares at least one pack').toBeGreaterThan(0);
@@ -69,7 +87,7 @@ test.describe('integration manifest drift guard', () => {
    });
 
    // The runtime System document must expose the manifest's grid + socket declarations.
-   test('grid and socket configuration match the manifest', async ({ page }) => {
+   test('grid and socket configuration match the manifest', async () => {
       // The grid units/diagonals and socket flag, read from the live System document.
       const live = await page.evaluate(() => ({
          units: game.system.grid.units,
@@ -86,7 +104,7 @@ test.describe('integration manifest drift guard', () => {
    // The runtime document classes must be Titan subclasses that override the Foundry base classes in
    // OnceInit. The production build minifies class names, so identity is checked structurally (a proper
    // subclass of, and not equal to, the Foundry base) rather than by constructor name.
-   test('base documents are overridden by Titan subclasses', async ({ page }) => {
+   test('base documents are overridden by Titan subclasses', async () => {
       // For each base document, whether CONFIG's class overrides and subclasses the Foundry base global.
       const result = await page.evaluate(() => {
          // Reports whether a configured document class overrides and subclasses the given base class.
@@ -114,7 +132,7 @@ test.describe('integration manifest drift guard', () => {
    // the core AppV1 sheets must be unregistered, and the ActiveEffect titan sheet must be default. Class
    // names are minified in the build, so a titan sheet is identified by its `titan.`-scoped registration
    // id prefix rather than an exact class name.
-   test('per-subtype Titan sheets are registered as default and core sheets are unregistered', async ({ page }) => {
+   test('per-subtype Titan sheets are registered as default and core sheets are unregistered', async () => {
       // The declared Actor/Item subtypes whose default-sheet registration is asserted.
       const subtypes = {
          Actor: ['player', 'npc'],
@@ -167,7 +185,7 @@ test.describe('integration manifest drift guard', () => {
 
    // Runtime-only wiring set in OnceInit (not declared in the manifest): round time, the disabled legacy
    // effect transferral, and the custom initiative formula.
-   test('runtime configuration flags are set by the system', async ({ page }) => {
+   test('runtime configuration flags are set by the system', async () => {
       // The runtime config values, read from the live CONFIG.
       const config = await page.evaluate(() => ({
          roundTime: CONFIG.time.roundTime,
@@ -185,7 +203,7 @@ test.describe('integration manifest drift guard', () => {
 
    // The system pushes its conditions onto CONFIG.statusEffects (OnceSetup) and registers its settings
    // (OnceInit). Assert the titan conditions are present and a representative set of settings is registered.
-   test('system conditions and settings are registered', async ({ page }) => {
+   test('system conditions and settings are registered', async () => {
       // The condition ids the system pushes onto CONFIG.statusEffects.
       const expectedConditions = [
          'blinded', 'contaminated', 'dead', 'deafened', 'frightened', 'incapacitated',
