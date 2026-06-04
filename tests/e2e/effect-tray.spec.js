@@ -48,9 +48,10 @@ test.describe('effect tray sidebar tab', () => {
       await page.evaluate(async () => {
          await ui.titanEffects.render(true);
          ui.titanEffects.activate();
-         await new Promise((resolve) => {
-            setTimeout(resolve, 500);
-         });
+         await titanWait(
+            () => !!ui.titanEffects.element?.querySelector('[data-testid="effect-tray"]'),
+            { message: 'tray panel mounted' },
+         );
       });
       await expect(page.locator('[data-testid="effect-tray"]').first()).toBeVisible();
       expect(errors, `uncaught errors mounting the tray:\n${errors.join('\n')}`).toEqual([]);
@@ -60,9 +61,11 @@ test.describe('effect tray sidebar tab', () => {
       await page.evaluate(async () => {
          await ui.titanEffects.render(true);
          ui.titanEffects.activate();
-         await new Promise((resolve) => {
-            setTimeout(resolve, 500);
-         });
+         await titanWait(
+            () => !!ui.titanEffects.element
+               ?.querySelector('[data-testid="effect-tray-pack-select"] option'),
+            { message: 'tray pack-select options rendered' },
+         );
       });
 
       // The pack select offers the seeded world pack.
@@ -77,9 +80,10 @@ test.describe('effect tray sidebar tab', () => {
          const select = ui.titanEffects.element.querySelector('[data-testid="effect-tray-pack-select"]');
          select.value = 'world.e2e-tray-effects';
          select.dispatchEvent(new Event('change', { bubbles: true }));
-         await new Promise((resolve) => {
-            setTimeout(resolve, 400);
-         });
+         await titanWait(
+            () => !!ui.titanEffects.element?.querySelector('[data-testid="effect-tray-row"]'),
+            { message: 'tray rows rendered for selected pack' },
+         );
       });
 
       // Selecting the world pack lists its seeded effect.
@@ -118,9 +122,10 @@ test.describe('effect tray sidebar tab', () => {
          tokenDoc.object?.control({ releaseOthers: true });
          await ui.titanEffects.render(true);
          ui.titanEffects.activate();
-         await new Promise((resolve) => {
-            setTimeout(resolve, 400);
-         });
+         await titanWait(
+            () => !!ui.titanEffects.element?.querySelector('[data-testid="effect-tray"]'),
+            { message: 'tray panel mounted' },
+         );
       });
 
       // Select the seeded world pack via the mounted select element, dispatching a change event so
@@ -130,9 +135,10 @@ test.describe('effect tray sidebar tab', () => {
          const select = ui.titanEffects.element.querySelector('[data-testid="effect-tray-pack-select"]');
          select.value = 'world.e2e-tray-effects';
          select.dispatchEvent(new Event('change', { bubbles: true }));
-         await new Promise((resolve) => {
-            setTimeout(resolve, 400);
-         });
+         await titanWait(
+            () => !!ui.titanEffects.element?.querySelector('[data-testid="effect-tray-row"]'),
+            { message: 'tray rows rendered for selected pack' },
+         );
       });
 
       // Scope the Apply click to the seeded effect's own row so the assertion is independent of how
@@ -141,22 +147,27 @@ test.describe('effect tray sidebar tab', () => {
          .locator('[data-testid="effect-tray-apply"]')
          .first()
          .click();
-      await page.waitForTimeout(400);
 
-      const applied = await page.evaluate(() => {
-         const actor = game.actors.getName('E2E Tray Target');
-         return [...actor.effects].some((e) => e.name === 'E2E Tray Effect');
-      });
-      expect(applied, 'the effect must be copied onto the controlled token actor').toBe(true);
+      // Apply copies the effect onto the controlled token actor asynchronously; poll until it lands.
+      await expect
+         .poll(
+            () => page.evaluate(() => {
+               const actor = game.actors.getName('E2E Tray Target');
+               return [...actor.effects].some((e) => e.name === 'E2E Tray Effect');
+            }),
+            { message: 'the effect must be copied onto the controlled token actor' },
+         )
+         .toBe(true);
    });
 
    test('create, rename, and delete round-trip in the selected world pack', async ({ page }) => {
       await page.evaluate(async () => {
          await ui.titanEffects.render(true);
          ui.titanEffects.activate();
-         await new Promise((resolve) => {
-            setTimeout(resolve, 300);
-         });
+         await titanWait(
+            () => !!ui.titanEffects.element?.querySelector('[data-testid="effect-tray"]'),
+            { message: 'tray panel mounted' },
+         );
       });
 
       // Select the seeded world pack via the mounted select element, dispatching a change event so
@@ -166,14 +177,25 @@ test.describe('effect tray sidebar tab', () => {
          const select = ui.titanEffects.element.querySelector('[data-testid="effect-tray-pack-select"]');
          select.value = 'world.e2e-tray-effects';
          select.dispatchEvent(new Event('change', { bubbles: true }));
-         await new Promise((resolve) => {
-            setTimeout(resolve, 400);
-         });
+         await titanWait(
+            () => !!ui.titanEffects.element?.querySelector('[data-testid="effect-tray-row"]'),
+            { message: 'tray rows rendered for selected pack' },
+         );
       });
 
       // Create a blank effect via the header + New button.
       await page.locator('[data-testid="effect-tray-new"]').click();
-      await page.waitForTimeout(500);
+
+      // The create writes a blank "New Effect" into the pack asynchronously; poll until it lands.
+      await expect
+         .poll(
+            () => page.evaluate(async () => {
+               const pack = game.packs.get('world.e2e-tray-effects');
+               return (await pack.getDocuments()).some((e) => e.name === 'New Effect');
+            }),
+            { message: 'a blank "New Effect" must be created in the pack' },
+         )
+         .toBe(true);
 
       // Close any sheet the create opened so it does not block subsequent assertions.
       await page.evaluate(() => {
@@ -184,12 +206,6 @@ test.describe('effect tray sidebar tab', () => {
          }
       });
 
-      const created = await page.evaluate(async () => {
-         const pack = game.packs.get('world.e2e-tray-effects');
-         return (await pack.getDocuments()).some((e) => e.name === 'New Effect');
-      });
-      expect(created, 'a blank "New Effect" must be created in the pack').toBe(true);
-
       // Delete it again (driven directly via doc.delete() to keep the round-trip deterministic; the
       // row's delete -> confirm UI is still implemented and verified by wiring + a manual pass).
       await page.evaluate(async () => {
@@ -197,13 +213,17 @@ test.describe('effect tray sidebar tab', () => {
          const doc = (await pack.getDocuments()).find((e) => e.name === 'New Effect');
          await doc.delete();
       });
-      await page.waitForTimeout(300);
 
-      const deleted = await page.evaluate(async () => {
-         const pack = game.packs.get('world.e2e-tray-effects');
-         return !(await pack.getDocuments()).some((e) => e.name === 'New Effect');
-      });
-      expect(deleted, 'the created effect must be deletable from the pack').toBe(true);
+      // The delete removes "New Effect" from the pack asynchronously; poll until it is gone.
+      await expect
+         .poll(
+            () => page.evaluate(async () => {
+               const pack = game.packs.get('world.e2e-tray-effects');
+               return !(await pack.getDocuments()).some((e) => e.name === 'New Effect');
+            }),
+            { message: 'the created effect must be deletable from the pack' },
+         )
+         .toBe(true);
    });
 
    test('renaming a folder inline persists the new name to the pack', async ({ page }) => {
@@ -218,17 +238,19 @@ test.describe('effect tray sidebar tab', () => {
 
          await ui.titanEffects.render(true);
          ui.titanEffects.activate();
-         await new Promise((resolve) => {
-            setTimeout(resolve, 300);
-         });
+         await titanWait(
+            () => !!ui.titanEffects.element?.querySelector('[data-testid="effect-tray"]'),
+            { message: 'tray panel mounted' },
+         );
 
          /** @type {HTMLSelectElement} The mounted pack-select element. */
          const select = ui.titanEffects.element.querySelector('[data-testid="effect-tray-pack-select"]');
          select.value = 'world.e2e-tray-effects';
          select.dispatchEvent(new Event('change', { bubbles: true }));
-         await new Promise((resolve) => {
-            setTimeout(resolve, 400);
-         });
+         await titanWait(
+            () => !!ui.titanEffects.element?.querySelector('[data-testid="effect-tray-folder"]'),
+            { message: 'tray folder rendered for selected pack' },
+         );
       });
 
       // Double-click the folder name to enter inline rename, type a new name, and commit with Enter.
@@ -239,14 +261,18 @@ test.describe('effect tray sidebar tab', () => {
       const input = page.locator('[data-testid="effect-tray-folder-rename"]').first();
       await input.fill('E2E Renamed Folder');
       await input.press('Enter');
-      await page.waitForTimeout(400);
 
-      const renamed = await page.evaluate(() => {
-         const pack = game.packs.get('world.e2e-tray-effects');
-         return pack.folders.some((f) => f.name === 'E2E Renamed Folder')
-            && !pack.folders.some((f) => f.name === 'E2E Rename Folder');
-      });
-      expect(renamed, 'the folder must be renamed in the pack').toBe(true);
+      // The rename persists to the pack folders asynchronously; poll until the new name lands.
+      await expect
+         .poll(
+            () => page.evaluate(() => {
+               const pack = game.packs.get('world.e2e-tray-effects');
+               return pack.folders.some((f) => f.name === 'E2E Renamed Folder')
+                  && !pack.folders.some((f) => f.name === 'E2E Rename Folder');
+            }),
+            { message: 'the folder must be renamed in the pack' },
+         )
+         .toBe(true);
 
       // Clean up the seeded folder so the shared world pack is left as later tests expect.
       await page.evaluate(async () => {
@@ -273,17 +299,19 @@ test.describe('effect tray sidebar tab', () => {
 
          await ui.titanEffects.render(true);
          ui.titanEffects.activate();
-         await new Promise((resolve) => {
-            setTimeout(resolve, 300);
-         });
+         await titanWait(
+            () => !!ui.titanEffects.element?.querySelector('[data-testid="effect-tray"]'),
+            { message: 'tray panel mounted' },
+         );
 
          /** @type {HTMLSelectElement} The mounted pack-select element. */
          const select = ui.titanEffects.element.querySelector('[data-testid="effect-tray-pack-select"]');
          select.value = 'world.e2e-tray-effects';
          select.dispatchEvent(new Event('change', { bubbles: true }));
-         await new Promise((resolve) => {
-            setTimeout(resolve, 400);
-         });
+         await titanWait(
+            () => !!ui.titanEffects.element?.querySelector('[data-testid="effect-tray-row"]'),
+            { message: 'tray rows rendered for selected pack' },
+         );
       });
 
       // Simulate a real drop of the actor's effect onto the tray container, dispatching a drop event
@@ -303,16 +331,18 @@ test.describe('effect tray sidebar tab', () => {
          dataTransfer.setData('text/plain', JSON.stringify(dragData));
 
          tray.dispatchEvent(new DragEvent('drop', { bubbles: true, cancelable: true, dataTransfer }));
-         await new Promise((resolve) => {
-            setTimeout(resolve, 500);
-         });
       });
 
-      const stashed = await page.evaluate(async () => {
-         const pack = game.packs.get('world.e2e-tray-effects');
-         return (await pack.getDocuments()).some((e) => e.name === 'E2E Stash Effect');
-      });
-      expect(stashed, 'the dropped effect must be copied into the selected pack').toBe(true);
+      // The drop copies the effect into the selected pack asynchronously; poll until the copy lands.
+      await expect
+         .poll(
+            () => page.evaluate(async () => {
+               const pack = game.packs.get('world.e2e-tray-effects');
+               return (await pack.getDocuments()).some((e) => e.name === 'E2E Stash Effect');
+            }),
+            { message: 'the dropped effect must be copied into the selected pack' },
+         )
+         .toBe(true);
 
       // Remove the stashed copy so the shared world pack is left holding only its seeded effect,
       // keeping later tests that act on the first pack row deterministic regardless of run order.
@@ -327,28 +357,38 @@ test.describe('effect tray sidebar tab', () => {
       await page.evaluate(async () => {
          await ui.titanEffects.render(true);
          ui.titanEffects.activate();
-         await new Promise((resolve) => { setTimeout(resolve, 300); });
+         await titanWait(
+            () => !!ui.titanEffects.element?.querySelector('[data-testid="effect-tray"]'),
+            { message: 'tray panel mounted' },
+         );
          const select = ui.titanEffects.element.querySelector('[data-testid="effect-tray-pack-select"]');
          select.value = 'world.e2e-tray-effects';
          select.dispatchEvent(new Event('change', { bubbles: true }));
-         await new Promise((resolve) => { setTimeout(resolve, 400); });
+         await titanWait(
+            () => !!ui.titanEffects.element?.querySelector('[data-testid="effect-tray-row"]'),
+            { message: 'tray rows rendered for selected pack' },
+         );
       });
 
       await page.locator('[data-testid="effect-tray-row"]', { hasText: 'E2E Tray Effect' })
          .locator('.effect-tray-row-icon')
          .first()
          .click();
-      await page.waitForTimeout(500);
 
-      const opened = await page.evaluate(() => {
-         // v14 sheets are ApplicationV2 (foundry.applications.instances), not legacy ui.windows.
-         const apps = [
-            ...Object.values(ui.windows),
-            ...(foundry.applications?.instances?.values?.() ?? []),
-         ];
-         return apps.some((app) => app?.document?.name === 'E2E Tray Effect');
-      });
-      expect(opened, 'left-clicking the row must open the effect sheet').toBe(true);
+      // Left-clicking the row opens the effect sheet asynchronously; poll until the app appears.
+      await expect
+         .poll(
+            () => page.evaluate(() => {
+               // v14 sheets are ApplicationV2 (foundry.applications.instances), not legacy ui.windows.
+               const apps = [
+                  ...Object.values(ui.windows),
+                  ...(foundry.applications?.instances?.values?.() ?? []),
+               ];
+               return apps.some((app) => app?.document?.name === 'E2E Tray Effect');
+            }),
+            { message: 'left-clicking the row must open the effect sheet' },
+         )
+         .toBe(true);
 
       await page.evaluate(() => {
          const apps = [
@@ -365,11 +405,17 @@ test.describe('effect tray sidebar tab', () => {
       await page.evaluate(async () => {
          await ui.titanEffects.render(true);
          ui.titanEffects.activate();
-         await new Promise((resolve) => { setTimeout(resolve, 300); });
+         await titanWait(
+            () => !!ui.titanEffects.element?.querySelector('[data-testid="effect-tray"]'),
+            { message: 'tray panel mounted' },
+         );
          const select = ui.titanEffects.element.querySelector('[data-testid="effect-tray-pack-select"]');
          select.value = 'world.e2e-tray-effects';
          select.dispatchEvent(new Event('change', { bubbles: true }));
-         await new Promise((resolve) => { setTimeout(resolve, 400); });
+         await titanWait(
+            () => !!ui.titanEffects.element?.querySelector('[data-testid="effect-tray-row"]'),
+            { message: 'tray rows rendered for selected pack' },
+         );
       });
 
       await page.locator('[data-testid="effect-tray-row"]', { hasText: 'E2E Tray Effect' })
@@ -379,17 +425,21 @@ test.describe('effect tray sidebar tab', () => {
 
       const openLabel = await page.evaluate(() => game.i18n.localize('LOCAL.effectTrayOpen.text'));
       await page.locator('#context-menu li.context-item', { hasText: openLabel }).first().click();
-      await page.waitForTimeout(400);
 
-      const opened = await page.evaluate(() => {
-         // v14 sheets are ApplicationV2 (foundry.applications.instances), not legacy ui.windows.
-         const apps = [
-            ...Object.values(ui.windows),
-            ...(foundry.applications?.instances?.values?.() ?? []),
-         ];
-         return apps.some((app) => app?.document?.name === 'E2E Tray Effect');
-      });
-      expect(opened, 'the context-menu Open Sheet entry must open the effect sheet').toBe(true);
+      // The context-menu Open entry opens the effect sheet asynchronously; poll until it appears.
+      await expect
+         .poll(
+            () => page.evaluate(() => {
+               // v14 sheets are ApplicationV2 (foundry.applications.instances), not legacy ui.windows.
+               const apps = [
+                  ...Object.values(ui.windows),
+                  ...(foundry.applications?.instances?.values?.() ?? []),
+               ];
+               return apps.some((app) => app?.document?.name === 'E2E Tray Effect');
+            }),
+            { message: 'the context-menu Open Sheet entry must open the effect sheet' },
+         )
+         .toBe(true);
 
       await page.evaluate(() => {
          const apps = [
@@ -408,21 +458,37 @@ test.describe('effect tray sidebar tab', () => {
          if (pack.locked) { await pack.configure({ locked: false }); }
          await ui.titanEffects.render(true);
          ui.titanEffects.activate();
-         await new Promise((resolve) => { setTimeout(resolve, 300); });
+         await titanWait(
+            () => !!ui.titanEffects.element?.querySelector('[data-testid="effect-tray"]'),
+            { message: 'tray panel mounted' },
+         );
          const select = ui.titanEffects.element.querySelector('[data-testid="effect-tray-pack-select"]');
          select.value = 'world.e2e-tray-effects';
          select.dispatchEvent(new Event('change', { bubbles: true }));
-         await new Promise((resolve) => { setTimeout(resolve, 400); });
+         await titanWait(
+            () => !!ui.titanEffects.element?.querySelector('[data-testid="effect-tray-row"]'),
+            { message: 'tray rows rendered for selected pack' },
+         );
       });
 
       await page.locator('[data-testid="effect-tray-lock"]').first().click();
-      await page.waitForTimeout(400);
-      const locked = await page.evaluate(() => game.packs.get('world.e2e-tray-effects').locked);
-      expect(locked, 'clicking the lock toggle must lock the pack').toBe(true);
+
+      // The lock toggle flips the pack locked state asynchronously; poll until it locks.
+      await expect
+         .poll(
+            () => page.evaluate(() => game.packs.get('world.e2e-tray-effects').locked),
+            { message: 'clicking the lock toggle must lock the pack' },
+         )
+         .toBe(true);
 
       await page.locator('[data-testid="effect-tray-lock"]').first().click();
-      await page.waitForTimeout(400);
-      const unlocked = await page.evaluate(() => game.packs.get('world.e2e-tray-effects').locked);
-      expect(unlocked, 'clicking the lock toggle again must unlock the pack').toBe(false);
+
+      // Toggling again unlocks the pack asynchronously; poll until it unlocks.
+      await expect
+         .poll(
+            () => page.evaluate(() => game.packs.get('world.e2e-tray-effects').locked),
+            { message: 'clicking the lock toggle again must unlock the pack' },
+         )
+         .toBe(false);
    });
 });
