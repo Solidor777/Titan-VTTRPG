@@ -91,7 +91,7 @@ describe('item results — damage scaling and opposed complexity', () => {
          damageMod: 1,
          healing: 0,
          scaling: true,
-         opposedCheck: false,
+         opposedCheck: { attribute: '', enabled: false, skill: '' },
       };
       const r = calculateItemCheckResults(diceResults([5, 4, 5]), params);
       expect(r.extraSuccesses).toBe(2);
@@ -108,7 +108,7 @@ describe('item results — damage scaling and opposed complexity', () => {
          damageMod: 0,
          healing: 0,
          scaling: false,
-         opposedCheck: { enabled: true },
+         opposedCheck: { attribute: '', enabled: true, skill: '' },
       };
       const r = calculateItemCheckResults(diceResults([5, 4, 5]), params);
       expect(r.opposedCheckComplexity).toBe(3);

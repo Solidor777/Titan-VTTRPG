@@ -67,8 +67,7 @@ export default function calculateItemCheckResults(diceResults, parameters) {
          }
       }
 
-      // If opposed check and extra successes, increase the complexity of the.
-      // opposed check.
+      // If an opposed check is enabled, set its complexity to 1 plus the number of extra successes.
       if (parameters.opposedCheck.enabled) {
          results.opposedCheckComplexity = 1 + results.extraSuccesses;
       }
