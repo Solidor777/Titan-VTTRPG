@@ -333,12 +333,20 @@ unit 115, full e2e **365** (incl. new `tests/e2e/item-cards.spec.js` ×7), build
 `specs/2026-06-04-chat-message-subtypes-phase2-items-design.md`,
 `plans/2026-06-04-chat-message-subtypes-phase2-items.md`.
 
-**Follow-ups (user-approved sequencing — do after Phase 2 merge):**
-- **(B) Item DataModels build their schema from the shared templates** (`buildSchemaFromShape(template)` +
-  per-field config overrides for integer/min/max/choices/initial) — completes single-source-of-truth so
-  the item schema and chat template cannot drift. **DATA-INTEGRITY SENSITIVE** (changes the schemas of
-  real actor/item data): require schema-equivalence unit tests + item-sheet e2e (render-smoke, reactive-*)
-  before merge. (Component reuse is already enabled by path parity; B removes drift risk.)
+**Follow-ups (user-approved sequencing):**
+- **(B) Item DataModels build their schema from the shared templates — DONE** (2026-06-04, merged to
+  `main`). Shipped via **approach C (generalize the helper)** rather than per-field overrides:
+  `buildSchemaFromShape` now treats an array literal as the field's default contents (cloned into
+  `initial`) with an untyped `ObjectField` element, so the shared templates express every current
+  item-schema default — weapon's seeded default `attack`, the empty dynamic arrays
+  (`check`/`customTrait`/`aspect`/`customAspect`/`trait`/`rulesElement`), and spell/ability `xpCost`
+  (the templates call `defaultXpCost*()`). Each item DataModel's `_defineDocumentSchema()` is now
+  `{ ...super._defineDocumentSchema(), ...buildSchemaFromShape(<template>) }` with **no hand-written
+  fields** (`documentVersion` still only from `super`); the item schema and the chat-card template are a
+  single source that cannot drift. **DATA-INTEGRITY SENSITIVE** — gated by a byte-exact characterization
+  test (`tests/unit/ItemDataModelSchemaEquivalence.test.js`, a golden master of all 7 item schemas) plus
+  item-sheet + chat e2e. Verified: unit **124**, full e2e **365** at parity, build clean. Plan:
+  `docs/superpowers/plans/2026-06-04-chat-subtypes-followup-B-item-dm-templates.md`.
 - **(D) Build the check chat schemas from the check template objects** via `buildSchemaFromShape` (the
   reparenting is done; this is the template-typing so resistance's shape genuinely diverges). Preserve
   check component read paths; verify unit + e2e.
