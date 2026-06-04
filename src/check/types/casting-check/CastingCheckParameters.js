@@ -56,7 +56,8 @@ export function createCastingCheckParametersShape() {
       diceMod: 0, difficulty: 0, doubleExpertise: false, doubleTraining: false, expertiseMod: 0,
       extraFailureOnCritical: false, extraSuccessOnCritical: false, healing: 0, healingMod: 0, img: '',
       itemDescription: '', itemName: '', reflexesCheck: false, resilienceCheck: false, scalingAspect: [],
-      skill: '', skillExpertise: 0, skillTrainingDice: 0, totalDice: 0, totalExpertise: 0, totalTrainingDice: 0, tradition: '',
+      skill: '', skillExpertise: 0, skillTrainingDice: 0, totalDice: 0, totalExpertise: 0,
+      totalTrainingDice: 0, tradition: '',
       trainingMod: 0, willpowerCheck: false,
    };
 }

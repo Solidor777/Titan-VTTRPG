@@ -1,4 +1,6 @@
 import { describe, it, expect } from 'vitest';
+import calculateCheckResults, { createCheckResultsShape }
+   from '~/check/CheckResults.js';
 import createAttributeCheckParameters, { createAttributeCheckParametersShape }
    from '~/check/types/attribute-check/AttributeCheckParameters.js';
 import calculateAttributeCheckResults, { createAttributeCheckResultsShape }
@@ -28,6 +30,8 @@ import { diceResults } from './check-test-helpers.js';
  */
 const OPTIONS = {
    attribute: 'body',
+   attackerAccuracy: 0,
+   attackerMelee: 0,
    cleave: false,
    complexity: 0,
    damageMod: 0,
@@ -54,8 +58,6 @@ const OPTIONS = {
    targetDefense: 0,
    trainingMod: 0,
    type: 'melee',
-   attackerAccuracy: 0,
-   attackerMelee: 0,
 };
 
 /** Parameter factory + shape pairs for all 5 check subtypes. */
@@ -106,6 +108,12 @@ const RESULT_CASES = [
 ];
 
 describe('check result shape ↔ factory parity', () => {
+   it('base results: shape keys === factory keys', () => {
+      const params = { difficulty: 4, complexity: 1, extraSuccessOnCritical: false, extraFailureOnCritical: false };
+      expect(Object.keys(calculateCheckResults(diceResults([6]), params)).sort())
+         .toEqual(Object.keys(createCheckResultsShape()).sort());
+   });
+
    it.each(RESULT_CASES)('%s results: shape keys === factory keys', (_name, factory, shape) => {
       expect(Object.keys(factory(diceResults([6, 5, 4]), RESULT_PARAMS)).sort())
          .toEqual(Object.keys(shape()).sort());

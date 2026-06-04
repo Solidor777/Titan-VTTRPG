@@ -31,7 +31,7 @@ import calculateCheckResults, { createCheckResultsShape } from '~/check/CheckRes
 /**
  * Builds the zero-value shape of a Casting Check's results.
  * Extends the base check-results shape with the Casting Check's additional fields.
- * @returns {object} The casting check-results shape (zeroed).
+ * @returns {CastingCheckResults} The casting check-results shape (zeroed).
  */
 export function createCastingCheckResultsShape() {
    return {

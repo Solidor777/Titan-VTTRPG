@@ -13,7 +13,7 @@
 /**
  * Builds the zero-value shape of the fields every check result shares.
  * All numeric fields default to 0, boolean fields to false, and array fields to [].
- * @returns {object} The base check-results shape (zeroed).
+ * @returns {CheckResults} The base check-results shape (zeroed).
  */
 export function createCheckResultsShape() {
    return {

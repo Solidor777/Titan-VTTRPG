@@ -18,7 +18,7 @@ import calculateCheckResults, { createCheckResultsShape } from '~/check/CheckRes
 /**
  * Builds the zero-value shape of an Item Check's results.
  * Extends the base check-results shape with the Item Check's additional fields.
- * @returns {object} The item check-results shape (zeroed).
+ * @returns {ItemCheckResults} The item check-results shape (zeroed).
  */
 export function createItemCheckResultsShape() {
    return {

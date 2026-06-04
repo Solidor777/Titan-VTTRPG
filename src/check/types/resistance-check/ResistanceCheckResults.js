@@ -16,7 +16,7 @@ import calculateCheckResults, { createCheckResultsShape } from '~/check/CheckRes
 /**
  * Builds the zero-value shape of a Resistance Check's results.
  * Extends the base check-results shape with the Resistance Check's additional fields.
- * @returns {object} The resistance check-results shape (zeroed).
+ * @returns {ResistanceCheckResults} The resistance check-results shape (zeroed).
  */
 export function createResistanceCheckResultsShape() {
    return {

@@ -16,7 +16,7 @@ import calculateCheckResults, { createCheckResultsShape } from '~/check/CheckRes
 /**
  * Builds the zero-value shape of an Attack Check's results.
  * Extends the base check-results shape with the Attack Check's additional fields.
- * @returns {object} The attack check-results shape (zeroed).
+ * @returns {AttackCheckResults} The attack check-results shape (zeroed).
  */
 export function createAttackCheckResultsShape() {
    return {
