@@ -70,7 +70,7 @@ export default ({ mode }) => {
          open: '/game',
          proxy: {
             // Serves static files from main Foundry server.
-            [`^(/${s_PACKAGE_ID}/(assets|lang|packs|style.css))`]: 'http://localhost:30000',
+            [`^(/${s_PACKAGE_ID}/(assets|lang|packs|dist/style.css))`]: 'http://localhost:30000',
 
             // All other paths besides package ID path are served from main Foundry server.
             [`^(?!/${s_PACKAGE_ID}/)`]: 'http://localhost:30000',
@@ -80,8 +80,8 @@ export default ({ mode }) => {
          },
       },
       build: {
-         outDir: __dirname,
-         emptyOutDir: false,
+         outDir: path.join(__dirname, 'dist'),
+         emptyOutDir: true,
          sourcemap: s_SOURCEMAPS,
          brotliSize: true,
          minify: s_COMPRESS ? 'terser' : false,

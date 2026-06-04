@@ -16,10 +16,10 @@
       }
    ],
    "esmodules": [
-      "index.js"
+      "dist/index.js"
    ],
    "styles": [
-      "style.css"
+      "dist/style.css"
    ],
    "languages": [
       {
