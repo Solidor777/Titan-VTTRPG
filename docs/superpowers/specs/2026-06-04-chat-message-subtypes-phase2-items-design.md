@@ -8,6 +8,28 @@
   decisions" section below — that section is kept for history. Final self-render verification remains
   **Foundry-restart-gated** (`documentTypes` register at world load; the user restarts for the e2e step).
 
+## RESOLVED DESIGN v2 (authoritative — 2026-06-04 user decision: shared templates + buildSchemaFromShape)
+
+Path parity is achieved structurally via a **shared shape template per type + a recursive
+`buildSchemaFromShape` helper**, realizing the TODO #12 north-star now:
+
+- **`buildSchemaFromShape(shape)`** (new, `src/helpers/utility-functions/`): recursively converts a plain
+  data object into a Foundry schema — `string`→`StringField`, `number`→`NumberField`,
+  `boolean`→`BooleanField`, `array`→`ArrayField(<schema of a representative element>)`, nested `object`→
+  `SchemaField(<recursively-built sub-fields>)`. Pure + fully unit-testable.
+- **Shared per-type shape templates:** one canonical plain-object template per item type. **BOTH** the
+  `<Type>DataModel` AND the new `<Type>ChatMessageDataModel` define their schema by feeding the shared
+  template through `buildSchemaFromShape` — so their shapes are guaranteed identical (→ component reuse).
+  Genuine per-side differences are added as extra schema fields on top. Field configs a plain template
+  can't express (choices / min-max / non-default initial) are preserved as per-field overrides layered on
+  the generated base; schema-equivalence unit tests guard the item-DM refactor.
+- **Checks** likewise: the check chat-message schema is built from the existing check template objects
+  (`createItemCheckTemplate()` etc.) via `buildSchemaFromShape`, guaranteeing the chat schema matches the
+  check shape.
+- Everything else from "RESOLVED DESIGN" below still holds (producer snapshots `item.system` into
+  `message.system`; reads converge to `document.data.system.X`; render infra untouched; restart-gated
+  final e2e). This v2 supersedes the per-leaf hand-written-schema approach.
+
 ## RESOLVED DESIGN (authoritative — 2026-06-04 user decision)
 
 - **`message.system` mirrors `item.system`.** Each item chat subtype's schema mirrors the corresponding

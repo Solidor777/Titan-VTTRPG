@@ -455,7 +455,13 @@ damage on the GM's behalf).
 Standalone pure or near-pure functions imported individually throughout the codebase. Grouped by
 domain:
 - **Schema field factories** — thin wrappers around Foundry field constructors for consistent
-  schema definitions (e.g., `CreateStringField`, `CreateIntegerField`).
+  schema definitions (e.g., `CreateStringField`, `CreateIntegerField`). `BuildSchemaFromShape.js`
+  (`buildSchemaFromShape(shape)`) recursively converts a plain-object shape template into a schema
+  field map by value type — `string`/`number`/`boolean` → the matching `create*Field` seeded with the
+  representative value, array → `createArrayField` whose element schema is derived from the first
+  element (empty array → object element field), plain object → a `SchemaField` (recursing), and
+  `null`/`undefined` → a nullable object field; it composes the `create*Field`/`createSchemaField`
+  helpers so a data model can be defined from a canonical shape.
 - **Token / actor queries** — resolve the best owner or target set for a given operation
   (e.g., `GetBestPlayerOwner`, `IsCurrentUserBestOwner`).
 - **Apply/revert automation** — entry points for applying or reverting damage, healing, rend, and
