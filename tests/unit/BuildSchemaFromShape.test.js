@@ -112,6 +112,33 @@ describe('buildSchemaFromShape — flat primitives', () => {
       expect(schema.value.options.initial).toBe(250);
       expect(schema.equipped.options.initial).toBe(true);
    });
+
+   it('maps a whole-number value to an integer-enforced number field', () => {
+      /** @type {object} The schema built from a shape whose number value is a whole number. */
+      const schema = buildSchemaFromShape({
+         value: 250,
+      });
+
+      // A whole-number value dispatches to createIntegerField, producing a NumberField with integer
+      // enforcement (integer: true) seeded with the representative value.
+      expect(schema.value).toBeInstanceOf(MockNumberField);
+      expect(schema.value.options.integer).toBe(true);
+      expect(schema.value.options.initial).toBe(250);
+      expect(schema.value.options.nullable).toBe(false);
+   });
+
+   it('maps a fractional number value to a plain (non-integer) number field', () => {
+      /** @type {object} The schema built from a shape whose number value is fractional. */
+      const schema = buildSchemaFromShape({
+         multiplier: 0.5,
+      });
+
+      // A fractional value dispatches to createNumberField, which does not set integer enforcement,
+      // so decimals are permitted and the field's initial is the representative fractional value.
+      expect(schema.multiplier).toBeInstanceOf(MockNumberField);
+      expect(schema.multiplier.options.integer).toBeUndefined();
+      expect(schema.multiplier.options.initial).toBe(0.5);
+   });
 });
 
 describe('buildSchemaFromShape — nested objects', () => {
@@ -214,6 +241,7 @@ describe('buildSchemaFromShape — combined shape', () => {
       const schema = buildSchemaFromShape({
          name: 'Greatsword',
          value: 250,
+         multiplier: 0.5,
          equipped: false,
          armor: {
             value: 2,
@@ -233,6 +261,7 @@ describe('buildSchemaFromShape — combined shape', () => {
       expect(Object.keys(schema)).toEqual([
          'name',
          'value',
+         'multiplier',
          'equipped',
          'armor',
          'attack',
@@ -242,6 +271,10 @@ describe('buildSchemaFromShape — combined shape', () => {
       ]);
       expect(schema.name).toBeInstanceOf(MockStringField);
       expect(schema.value).toBeInstanceOf(MockNumberField);
+      // The whole-number value is integer-enforced, while the fractional value is a plain number field.
+      expect(schema.value.options.integer).toBe(true);
+      expect(schema.multiplier).toBeInstanceOf(MockNumberField);
+      expect(schema.multiplier.options.integer).toBeUndefined();
       expect(schema.equipped).toBeInstanceOf(MockBooleanField);
       expect(schema.armor).toBeInstanceOf(MockSchemaField);
       expect(schema.attack).toBeInstanceOf(MockArrayField);
