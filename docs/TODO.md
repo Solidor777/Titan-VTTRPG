@@ -408,10 +408,25 @@ the five check subtypes; later phases cover items, reports, and effect).
 - **Plan:** `docs/superpowers/plans/2026-06-04-e2e-speedup-phase1b-bespoke-sleeps.md`.
   **Spec:** `docs/superpowers/specs/2026-06-03-e2e-suite-speedup-design.md` (Workstream A).
 
-### 15. E2E speedup Phase 2 — shared-world harness + hygiene
+### 15. E2E speedup Phase 2 — shared-world harness + hygiene — DONE
 
-- **What:** Per-file login (boot once per spec file, opt-out per the spec) to collapse ~100+
-  per-test world boots to ~40; per-test hygiene (close apps, reset error listeners); per-run/per-file
-  world reset (chat clear + trim accumulated state). The world-reset also fixes the bloat that causes
-  the **socket-sync flake** (`docs/OPEN_BUGS.md` #1).
-- **Spec:** `docs/superpowers/specs/2026-06-03-e2e-suite-speedup-design.md` (Workstream A, Phase 2).
+- **Status: COMPLETE** (branch `chore/e2e-speedup-phase2-shared-world`). Migrated **all 42 eligible
+  specs** to a module-scoped shared `page`: one world boot per spec FILE (inline `beforeAll(login)` +
+  `afterEach(closeAllApps + errors reset)` + `afterAll(page.close)`), replacing the per-test
+  `beforeEach(login)`. New `tests/e2e/world.js` exports the three stateless helpers `closeAllApps`,
+  `clearChat`, `attachPageErrors`; `renderSheet` (`fixtures.js`) gained an optional shared-`errors`
+  param; per-test `page.on('pageerror')` listeners were folded into the single shared collector.
+- **Results (full `npm run test:e2e`):** **358 passed in 15.1 min** — green at parity, and the
+  wall-clock dropped from the ~34-min Phase-1b baseline (~56% faster) from per-file boot-once.
+- **Closes `docs/OPEN_BUGS.md` #1 (socket-sync flake):** the per-file `clearChat` keeps the world
+  lean; `socket-sync.spec.js` A1–A5 all passed within the full run (A1/A2 were the intermittent
+  timeouts). No file needed to opt out.
+- **Harness bugfix landed (`3744bfdc`):** `closeAllApps` must skip the core UI singletons registered in
+  `CONFIG.ui` (`Sidebar`, `ChatLog`, `Hotbar`, the `titanEffects` tray, …) — closing them tore down DOM
+  the sidebar tab-switch lifecycle depends on and crashed later sidebar-activating tests on the shared
+  page. **Not migrated** (self-managed `BrowserContext`s): `multi-client.spec.js`, `socket-sync.spec.js`,
+  `permissions-compendium.spec.js`, `permissions-ownership.spec.js`, `permissions-auto-open.spec.js`.
+- **Spec:** `docs/superpowers/specs/2026-06-04-e2e-phase2-shared-world-harness-design.md` (parent:
+  `docs/superpowers/specs/2026-06-03-e2e-suite-speedup-design.md`, Workstream A Phase 2). **Plan:**
+  `docs/superpowers/plans/2026-06-04-e2e-speedup-phase2-shared-world.md`. Convention documented in
+  `titan-codebase` `conventions.md` ("Shared-world E2E harness").

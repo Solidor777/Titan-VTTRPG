@@ -390,8 +390,29 @@ coverage map, the wrapper-forwarding rules, and the selector each component reso
 sheet, asserts zero uncaught page errors), `interaction-rolls.spec.js` (each `roll<Type>Check` posts a
 chat message of the expected `flags.titan.type` and the card renders), and `interaction-dialogs.spec.js`
 (check/confirm/trait/edit-UUID dialogs mount). `tests/e2e/fixtures.js` provides `login`, `renderSheet`,
-and `ensureDocument` (creates missing world fixtures). Drives the real built system at the repo root, so
-it catches v14 API breaks that the mocked Vitest tier cannot.
+and `ensureDocument` (creates missing world fixtures; `renderSheet` takes an optional 4th `errors`
+collector — see the shared-world harness below). Drives the real built system at the repo root, so it
+catches v14 API breaks that the mocked Vitest tier cannot.
+
+**Shared-world E2E harness (one world boot per FILE)** — every eligible spec boots the world ONCE per
+file, not per test. The pattern: module-scoped `let page; let errors;` plus three inline lifecycle hooks
+at module scope — `test.beforeAll(async ({ browser }) => { page = await browser.newPage(); errors =
+attachPageErrors(page); await login(page); await clearChat(page); })`, `test.afterEach(async () => { await
+closeAllApps(page); errors.length = 0; })`, and `test.afterAll(async () => { await page?.close(); })`.
+Tests and `beforeEach`/`afterEach` hooks are `async () =>` (no `{ page }` fixture destructure) and use the
+closure `page`. The helpers live in `tests/e2e/world.js`: `closeAllApps(page)` closes transient apps
+(sheets/dialogs/HUDs) but DELIBERATELY KEEPS core UI singletons (those held on `ui[key]` for each
+`key in CONFIG.ui` — `Sidebar`, `ChatLog`, `Hotbar`, the `titanEffects` tray, …); closing them tears down
+DOM that the sidebar tab-switch lifecycle depends on and crashes any later sidebar-activating test.
+`clearChat(page)` deletes all chat messages in `beforeAll` (per-file world reset — keeps the world lean so
+GM→player socket replication does not time out). `attachPageErrors(page)` wires ONE `pageerror` listener
+and returns the shared `errors` array; per-test `page.on('pageerror', …)` is banned (it would stack on the
+reused page) — fold any per-test error assertion onto the shared `errors`, which is reset each `afterEach`.
+**Not migrated** (self-managed `BrowserContext`s via `multiClient.js`): `multi-client.spec.js`,
+`socket-sync.spec.js`, `permissions-compendium.spec.js`, `permissions-ownership.spec.js`,
+`permissions-auto-open.spec.js`. Fast-check (`injectFastCheck` → `page.addInitScript`) must run in
+`beforeAll` BEFORE `login` (init scripts must precede navigation). A spec needing pristine per-test boots
+opts out by keeping `beforeEach(login)`.
 
 **No fixed sleeps in E2E (banned)** — never settle with a fixed-duration `await page.waitForTimeout(n)`
 or an in-page `await new Promise(r => setTimeout(r, n))`; they are slow and flaky. Wait on a deterministic
