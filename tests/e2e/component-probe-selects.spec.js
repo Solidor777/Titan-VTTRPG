@@ -1,23 +1,40 @@
 import { test, expect } from '@playwright/test';
 import { login } from './fixtures.js';
 import { mountProbe, readProbeEvents, clearProbeEvents, unmountAll } from './componentProbe.js';
+import { closeAllApps, clearChat, attachPageErrors } from './world.js';
+
+/** @type {import('@playwright/test').Page} The file-shared, logged-in page (one world boot per file). */
+let page;
+/** @type {string[]} Uncaught page errors collected during the current test (cleared each afterEach). */
+let errors;
+
+test.beforeAll(async ({ browser }) => {
+   page = await browser.newPage();
+   errors = attachPageErrors(page);
+   await login(page);
+   await clearChat(page);
+});
+
+test.afterEach(async () => {
+   await closeAllApps(page);
+   errors.length = 0;
+});
+
+test.afterAll(async () => {
+   await page?.close();
+});
 
 // ---------------------------------------------------------------------------
 // AttributeSelect — ATTRIBUTES constant: body, mind, soul; optional allowNone.
 // Wraps AttributeInput (div root) + Select. testId lands on the wrapper div.
 // ---------------------------------------------------------------------------
 test.describe('component probe — AttributeSelect', () => {
-   /** @param {{ page: import('@playwright/test').Page }} fixture */
-   test.beforeEach(async ({ page }) => {
-      await login(page);
-   });
-
-   test.afterEach(async ({ page }) => {
+   test.afterEach(async () => {
       await unmountAll(page);
       await clearProbeEvents(page);
    });
 
-   test('renders the attribute options and fires onchange on change', async ({ page }) => {
+   test('renders the attribute options and fires onchange on change', async () => {
       const { selector } = await mountProbe(page, 'AttributeSelect', {
          props: {
             value: 'body',
@@ -47,7 +64,7 @@ test.describe('component probe — AttributeSelect', () => {
       expect(events.filter((e) => e.event === 'onchange')).toHaveLength(1);
    });
 
-   test('adds a none option when allowNone is set', async ({ page }) => {
+   test('adds a none option when allowNone is set', async () => {
       const { selector } = await mountProbe(page, 'AttributeSelect', {
          props: {
             value: 'none',
@@ -63,7 +80,7 @@ test.describe('component probe — AttributeSelect', () => {
       expect(optionValues).toHaveLength(4);
    });
 
-   test('disabled blocks selection', async ({ page }) => {
+   test('disabled blocks selection', async () => {
       const { selector } = await mountProbe(page, 'AttributeSelect', {
          props: {
             value: 'body',
@@ -73,7 +90,7 @@ test.describe('component probe — AttributeSelect', () => {
       await expect(page.locator(`${selector} select`)).toBeDisabled();
    });
 
-   test('testId resolves on the wrapper root', async ({ page }) => {
+   test('testId resolves on the wrapper root', async () => {
       const { selector } = await mountProbe(page, 'AttributeSelect', {
          props: {
             value: 'body',
@@ -89,16 +106,12 @@ test.describe('component probe — AttributeSelect', () => {
 // Bare Select. testId lands on the <select> element.
 // ---------------------------------------------------------------------------
 test.describe('component probe — SkillSelect', () => {
-   test.beforeEach(async ({ page }) => {
-      await login(page);
-   });
-
-   test.afterEach(async ({ page }) => {
+   test.afterEach(async () => {
       await unmountAll(page);
       await clearProbeEvents(page);
    });
 
-   test('renders all skill options and fires onchange on change', async ({ page }) => {
+   test('renders all skill options and fires onchange on change', async () => {
       const { selector } = await mountProbe(page, 'SkillSelect', {
          props: {
             value: 'arcana',
@@ -126,7 +139,7 @@ test.describe('component probe — SkillSelect', () => {
       expect(events.filter((e) => e.event === 'onchange')).toHaveLength(1);
    });
 
-   test('adds a none option when allowNone is set', async ({ page }) => {
+   test('adds a none option when allowNone is set', async () => {
       const { selector } = await mountProbe(page, 'SkillSelect', {
          props: {
             value: 'none',
@@ -142,7 +155,7 @@ test.describe('component probe — SkillSelect', () => {
       expect(optionValues).toHaveLength(19);
    });
 
-   test('disabled blocks selection', async ({ page }) => {
+   test('disabled blocks selection', async () => {
       const { selector } = await mountProbe(page, 'SkillSelect', {
          props: {
             value: 'arcana',
@@ -152,7 +165,7 @@ test.describe('component probe — SkillSelect', () => {
       await expect(page.locator(`${selector} select`)).toBeDisabled();
    });
 
-   test('testId resolves on the select element', async ({ page }) => {
+   test('testId resolves on the select element', async () => {
       const { selector } = await mountProbe(page, 'SkillSelect', {
          props: {
             value: 'arcana',
@@ -168,16 +181,12 @@ test.describe('component probe — SkillSelect', () => {
 // Wraps RarityInput (div root) + Select. testId lands on the wrapper div.
 // ---------------------------------------------------------------------------
 test.describe('component probe — RaritySelect', () => {
-   test.beforeEach(async ({ page }) => {
-      await login(page);
-   });
-
-   test.afterEach(async ({ page }) => {
+   test.afterEach(async () => {
       await unmountAll(page);
       await clearProbeEvents(page);
    });
 
-   test('renders all rarity options and fires onchange on change', async ({ page }) => {
+   test('renders all rarity options and fires onchange on change', async () => {
       const { selector } = await mountProbe(page, 'RaritySelect', {
          props: {
             value: 'common',
@@ -205,7 +214,7 @@ test.describe('component probe — RaritySelect', () => {
       expect(events.filter((e) => e.event === 'onchange')).toHaveLength(1);
    });
 
-   test('disabled blocks selection', async ({ page }) => {
+   test('disabled blocks selection', async () => {
       const { selector } = await mountProbe(page, 'RaritySelect', {
          props: {
             value: 'common',
@@ -215,7 +224,7 @@ test.describe('component probe — RaritySelect', () => {
       await expect(page.locator(`${selector} select`)).toBeDisabled();
    });
 
-   test('testId resolves on the wrapper root', async ({ page }) => {
+   test('testId resolves on the wrapper root', async () => {
       const { selector } = await mountProbe(page, 'RaritySelect', {
          props: {
             value: 'common',
@@ -231,16 +240,12 @@ test.describe('component probe — RaritySelect', () => {
 // Bare Select. testId lands on the <select> element.
 // ---------------------------------------------------------------------------
 test.describe('component probe — RatingSelect', () => {
-   test.beforeEach(async ({ page }) => {
-      await login(page);
-   });
-
-   test.afterEach(async ({ page }) => {
+   test.afterEach(async () => {
       await unmountAll(page);
       await clearProbeEvents(page);
    });
 
-   test('renders all rating options and fires onchange on change', async ({ page }) => {
+   test('renders all rating options and fires onchange on change', async () => {
       const { selector } = await mountProbe(page, 'RatingSelect', {
          props: {
             value: 'awareness',
@@ -268,7 +273,7 @@ test.describe('component probe — RatingSelect', () => {
       expect(events.filter((e) => e.event === 'onchange')).toHaveLength(1);
    });
 
-   test('adds a none option when allowNone is set', async ({ page }) => {
+   test('adds a none option when allowNone is set', async () => {
       const { selector } = await mountProbe(page, 'RatingSelect', {
          props: {
             value: 'none',
@@ -284,7 +289,7 @@ test.describe('component probe — RatingSelect', () => {
       expect(optionValues).toHaveLength(6);
    });
 
-   test('disabled blocks selection', async ({ page }) => {
+   test('disabled blocks selection', async () => {
       const { selector } = await mountProbe(page, 'RatingSelect', {
          props: {
             value: 'awareness',
@@ -294,7 +299,7 @@ test.describe('component probe — RatingSelect', () => {
       await expect(page.locator(`${selector} select`)).toBeDisabled();
    });
 
-   test('testId resolves on the select element', async ({ page }) => {
+   test('testId resolves on the select element', async () => {
       const { selector } = await mountProbe(page, 'RatingSelect', {
          props: {
             value: 'awareness',
@@ -310,16 +315,12 @@ test.describe('component probe — RatingSelect', () => {
 // Wraps ResistanceInput (div root) + Select. testId lands on the wrapper div.
 // ---------------------------------------------------------------------------
 test.describe('component probe — ResistanceSelect', () => {
-   test.beforeEach(async ({ page }) => {
-      await login(page);
-   });
-
-   test.afterEach(async ({ page }) => {
+   test.afterEach(async () => {
       await unmountAll(page);
       await clearProbeEvents(page);
    });
 
-   test('renders all resistance options and fires onchange on change', async ({ page }) => {
+   test('renders all resistance options and fires onchange on change', async () => {
       const { selector } = await mountProbe(page, 'ResistanceSelect', {
          props: {
             value: 'reflexes',
@@ -347,7 +348,7 @@ test.describe('component probe — ResistanceSelect', () => {
       expect(events.filter((e) => e.event === 'onchange')).toHaveLength(1);
    });
 
-   test('adds a none option when allowNone is set', async ({ page }) => {
+   test('adds a none option when allowNone is set', async () => {
       const { selector } = await mountProbe(page, 'ResistanceSelect', {
          props: {
             value: 'none',
@@ -363,7 +364,7 @@ test.describe('component probe — ResistanceSelect', () => {
       expect(optionValues).toHaveLength(4);
    });
 
-   test('disabled blocks selection', async ({ page }) => {
+   test('disabled blocks selection', async () => {
       const { selector } = await mountProbe(page, 'ResistanceSelect', {
          props: {
             value: 'reflexes',
@@ -373,7 +374,7 @@ test.describe('component probe — ResistanceSelect', () => {
       await expect(page.locator(`${selector} select`)).toBeDisabled();
    });
 
-   test('testId resolves on the wrapper root', async ({ page }) => {
+   test('testId resolves on the wrapper root', async () => {
       const { selector } = await mountProbe(page, 'ResistanceSelect', {
          props: {
             value: 'reflexes',
@@ -389,16 +390,12 @@ test.describe('component probe — ResistanceSelect', () => {
 // Bare Select. testId lands on the <select> element.
 // ---------------------------------------------------------------------------
 test.describe('component probe — ResourceSelect', () => {
-   test.beforeEach(async ({ page }) => {
-      await login(page);
-   });
-
-   test.afterEach(async ({ page }) => {
+   test.afterEach(async () => {
       await unmountAll(page);
       await clearProbeEvents(page);
    });
 
-   test('renders all resource options and fires onchange on change', async ({ page }) => {
+   test('renders all resource options and fires onchange on change', async () => {
       const { selector } = await mountProbe(page, 'ResourceSelect', {
          props: {
             value: 'stamina',
@@ -426,7 +423,7 @@ test.describe('component probe — ResourceSelect', () => {
       expect(events.filter((e) => e.event === 'onchange')).toHaveLength(1);
    });
 
-   test('adds a none option when allowNone is set', async ({ page }) => {
+   test('adds a none option when allowNone is set', async () => {
       const { selector } = await mountProbe(page, 'ResourceSelect', {
          props: {
             value: 'none',
@@ -442,7 +439,7 @@ test.describe('component probe — ResourceSelect', () => {
       expect(optionValues).toHaveLength(4);
    });
 
-   test('disabled blocks selection', async ({ page }) => {
+   test('disabled blocks selection', async () => {
       const { selector } = await mountProbe(page, 'ResourceSelect', {
          props: {
             value: 'stamina',
@@ -452,7 +449,7 @@ test.describe('component probe — ResourceSelect', () => {
       await expect(page.locator(`${selector} select`)).toBeDisabled();
    });
 
-   test('testId resolves on the select element', async ({ page }) => {
+   test('testId resolves on the select element', async () => {
       const { selector } = await mountProbe(page, 'ResourceSelect', {
          props: {
             value: 'stamina',
@@ -468,16 +465,12 @@ test.describe('component probe — ResourceSelect', () => {
 // Bare Select. testId lands on the <select> element.
 // ---------------------------------------------------------------------------
 test.describe('component probe — SpeedSelect', () => {
-   test.beforeEach(async ({ page }) => {
-      await login(page);
-   });
-
-   test.afterEach(async ({ page }) => {
+   test.afterEach(async () => {
       await unmountAll(page);
       await clearProbeEvents(page);
    });
 
-   test('renders all speed options and fires onchange on change', async ({ page }) => {
+   test('renders all speed options and fires onchange on change', async () => {
       const { selector } = await mountProbe(page, 'SpeedSelect', {
          props: {
             value: 'burrow',
@@ -507,7 +500,7 @@ test.describe('component probe — SpeedSelect', () => {
       expect(events.filter((e) => e.event === 'onchange')).toHaveLength(1);
    });
 
-   test('adds a none option when allowNone is set', async ({ page }) => {
+   test('adds a none option when allowNone is set', async () => {
       const { selector } = await mountProbe(page, 'SpeedSelect', {
          props: {
             value: 'none',
@@ -523,7 +516,7 @@ test.describe('component probe — SpeedSelect', () => {
       expect(optionValues).toHaveLength(6);
    });
 
-   test('disabled blocks selection', async ({ page }) => {
+   test('disabled blocks selection', async () => {
       const { selector } = await mountProbe(page, 'SpeedSelect', {
          props: {
             value: 'burrow',
@@ -533,7 +526,7 @@ test.describe('component probe — SpeedSelect', () => {
       await expect(page.locator(`${selector} select`)).toBeDisabled();
    });
 
-   test('testId resolves on the select element', async ({ page }) => {
+   test('testId resolves on the select element', async () => {
       const { selector } = await mountProbe(page, 'SpeedSelect', {
          props: {
             value: 'burrow',
@@ -549,16 +542,12 @@ test.describe('component probe — SpeedSelect', () => {
 // Bare Select. testId lands on the <select> element.
 // ---------------------------------------------------------------------------
 test.describe('component probe — ModSelect', () => {
-   test.beforeEach(async ({ page }) => {
-      await login(page);
-   });
-
-   test.afterEach(async ({ page }) => {
+   test.afterEach(async () => {
       await unmountAll(page);
       await clearProbeEvents(page);
    });
 
-   test('renders all mod options and fires onchange on change', async ({ page }) => {
+   test('renders all mod options and fires onchange on change', async () => {
       const { selector } = await mountProbe(page, 'ModSelect', {
          props: {
             value: 'armor',
@@ -588,7 +577,7 @@ test.describe('component probe — ModSelect', () => {
       expect(events.filter((e) => e.event === 'onchange')).toHaveLength(1);
    });
 
-   test('adds a none option when allowNone is set', async ({ page }) => {
+   test('adds a none option when allowNone is set', async () => {
       const { selector } = await mountProbe(page, 'ModSelect', {
          props: {
             value: 'none',
@@ -604,7 +593,7 @@ test.describe('component probe — ModSelect', () => {
       expect(optionValues).toHaveLength(6);
    });
 
-   test('disabled blocks selection', async ({ page }) => {
+   test('disabled blocks selection', async () => {
       const { selector } = await mountProbe(page, 'ModSelect', {
          props: {
             value: 'armor',
@@ -614,7 +603,7 @@ test.describe('component probe — ModSelect', () => {
       await expect(page.locator(`${selector} select`)).toBeDisabled();
    });
 
-   test('testId resolves on the select element', async ({ page }) => {
+   test('testId resolves on the select element', async () => {
       const { selector } = await mountProbe(page, 'ModSelect', {
          props: {
             value: 'armor',
@@ -630,16 +619,12 @@ test.describe('component probe — ModSelect', () => {
 // Bare Select. testId lands on the <select> element.
 // ---------------------------------------------------------------------------
 test.describe('component probe — AttackTypeSelect', () => {
-   test.beforeEach(async ({ page }) => {
-      await login(page);
-   });
-
-   test.afterEach(async ({ page }) => {
+   test.afterEach(async () => {
       await unmountAll(page);
       await clearProbeEvents(page);
    });
 
-   test('renders all attack type options and fires onchange on change', async ({ page }) => {
+   test('renders all attack type options and fires onchange on change', async () => {
       const { selector } = await mountProbe(page, 'AttackTypeSelect', {
          props: {
             value: 'melee',
@@ -665,7 +650,7 @@ test.describe('component probe — AttackTypeSelect', () => {
       expect(events.filter((e) => e.event === 'onchange')).toHaveLength(1);
    });
 
-   test('disabled blocks selection', async ({ page }) => {
+   test('disabled blocks selection', async () => {
       const { selector } = await mountProbe(page, 'AttackTypeSelect', {
          props: {
             value: 'melee',
@@ -675,7 +660,7 @@ test.describe('component probe — AttackTypeSelect', () => {
       await expect(page.locator(`${selector} select`)).toBeDisabled();
    });
 
-   test('testId resolves on the select element', async ({ page }) => {
+   test('testId resolves on the select element', async () => {
       const { selector } = await mountProbe(page, 'AttackTypeSelect', {
          props: {
             value: 'melee',
@@ -692,16 +677,12 @@ test.describe('component probe — AttackTypeSelect', () => {
 // testId lands on the <select> element.
 // ---------------------------------------------------------------------------
 test.describe('component probe — CheckDifficultySelect', () => {
-   test.beforeEach(async ({ page }) => {
-      await login(page);
-   });
-
-   test.afterEach(async ({ page }) => {
+   test.afterEach(async () => {
       await unmountAll(page);
       await clearProbeEvents(page);
    });
 
-   test('renders difficulty levels 1-6 and fires onchange on change', async ({ page }) => {
+   test('renders difficulty levels 1-6 and fires onchange on change', async () => {
       const { selector } = await mountProbe(page, 'CheckDifficultySelect', {
          props: {
             value: 1,
@@ -729,7 +710,7 @@ test.describe('component probe — CheckDifficultySelect', () => {
       expect(events.filter((e) => e.event === 'onchange')).toHaveLength(1);
    });
 
-   test('disabled blocks selection', async ({ page }) => {
+   test('disabled blocks selection', async () => {
       const { selector } = await mountProbe(page, 'CheckDifficultySelect', {
          props: {
             value: 1,
@@ -739,7 +720,7 @@ test.describe('component probe — CheckDifficultySelect', () => {
       await expect(page.locator(`${selector} select`)).toBeDisabled();
    });
 
-   test('testId resolves on the select element', async ({ page }) => {
+   test('testId resolves on the select element', async () => {
       const { selector } = await mountProbe(page, 'CheckDifficultySelect', {
          props: {
             value: 1,
@@ -755,16 +736,12 @@ test.describe('component probe — CheckDifficultySelect', () => {
 // No allowNone prop. Bare Select. testId lands on the <select> element.
 // ---------------------------------------------------------------------------
 test.describe('component probe — DamageReducedBySelect', () => {
-   test.beforeEach(async ({ page }) => {
-      await login(page);
-   });
-
-   test.afterEach(async ({ page }) => {
+   test.afterEach(async () => {
       await unmountAll(page);
       await clearProbeEvents(page);
    });
 
-   test('renders the base none option by default', async ({ page }) => {
+   test('renders the base none option by default', async () => {
       const { selector } = await mountProbe(page, 'DamageReducedBySelect', {
          props: {
             value: 'none',
@@ -780,7 +757,7 @@ test.describe('component probe — DamageReducedBySelect', () => {
       expect(optionValues).toHaveLength(1);
    });
 
-   test('adds resistanceCheck when allowResistanceCheck is set', async ({ page }) => {
+   test('adds resistanceCheck when allowResistanceCheck is set', async () => {
       const { selector } = await mountProbe(page, 'DamageReducedBySelect', {
          props: {
             value: 'none',
@@ -797,7 +774,7 @@ test.describe('component probe — DamageReducedBySelect', () => {
       expect(optionValues).toHaveLength(2);
    });
 
-   test('adds all options when both flags are set and fires onchange on change', async ({ page }) => {
+   test('adds all options when both flags are set and fires onchange on change', async () => {
       const { selector } = await mountProbe(page, 'DamageReducedBySelect', {
          props: {
             value: 'none',
@@ -825,7 +802,7 @@ test.describe('component probe — DamageReducedBySelect', () => {
       expect(events.filter((e) => e.event === 'onchange')).toHaveLength(1);
    });
 
-   test('disabled blocks selection', async ({ page }) => {
+   test('disabled blocks selection', async () => {
       const { selector } = await mountProbe(page, 'DamageReducedBySelect', {
          props: {
             value: 'none',
@@ -835,7 +812,7 @@ test.describe('component probe — DamageReducedBySelect', () => {
       await expect(page.locator(`${selector} select`)).toBeDisabled();
    });
 
-   test('testId resolves on the select element', async ({ page }) => {
+   test('testId resolves on the select element', async () => {
       const { selector } = await mountProbe(page, 'DamageReducedBySelect', {
          props: {
             value: 'none',
@@ -851,16 +828,12 @@ test.describe('component probe — DamageReducedBySelect', () => {
 // optional allowNone. Bare Select. testId lands on the <select> element.
 // ---------------------------------------------------------------------------
 test.describe('component probe — InventoryItemTypeSelect', () => {
-   test.beforeEach(async ({ page }) => {
-      await login(page);
-   });
-
-   test.afterEach(async ({ page }) => {
+   test.afterEach(async () => {
       await unmountAll(page);
       await clearProbeEvents(page);
    });
 
-   test('renders all inventory item type options and fires onchange on change', async ({ page }) => {
+   test('renders all inventory item type options and fires onchange on change', async () => {
       const { selector } = await mountProbe(page, 'InventoryItemTypeSelect', {
          props: {
             value: 'armor',
@@ -890,7 +863,7 @@ test.describe('component probe — InventoryItemTypeSelect', () => {
       expect(events.filter((e) => e.event === 'onchange')).toHaveLength(1);
    });
 
-   test('adds a none option when allowNone is set', async ({ page }) => {
+   test('adds a none option when allowNone is set', async () => {
       const { selector } = await mountProbe(page, 'InventoryItemTypeSelect', {
          props: {
             value: 'none',
@@ -906,7 +879,7 @@ test.describe('component probe — InventoryItemTypeSelect', () => {
       expect(optionValues).toHaveLength(6);
    });
 
-   test('disabled blocks selection', async ({ page }) => {
+   test('disabled blocks selection', async () => {
       const { selector } = await mountProbe(page, 'InventoryItemTypeSelect', {
          props: {
             value: 'armor',
@@ -916,7 +889,7 @@ test.describe('component probe — InventoryItemTypeSelect', () => {
       await expect(page.locator(`${selector} select`)).toBeDisabled();
    });
 
-   test('testId resolves on the select element', async ({ page }) => {
+   test('testId resolves on the select element', async () => {
       const { selector } = await mountProbe(page, 'InventoryItemTypeSelect', {
          props: {
             value: 'armor',
@@ -934,16 +907,12 @@ test.describe('component probe — InventoryItemTypeSelect', () => {
 // Bare Select. testId lands on the <select> element.
 // ---------------------------------------------------------------------------
 test.describe('component probe — RulesElementOperationSelect', () => {
-   test.beforeEach(async ({ page }) => {
-      await login(page);
-   });
-
-   test.afterEach(async ({ page }) => {
+   test.afterEach(async () => {
       await unmountAll(page);
       await clearProbeEvents(page);
    });
 
-   test('renders all rules element operation options and fires onchange on change', async ({ page }) => {
+   test('renders all rules element operation options and fires onchange on change', async () => {
       const { selector } = await mountProbe(page, 'RulesElementOperationSelect', {
          props: {
             value: 'flatModifier',
@@ -977,7 +946,7 @@ test.describe('component probe — RulesElementOperationSelect', () => {
       expect(events.filter((e) => e.event === 'onchange')).toHaveLength(1);
    });
 
-   test('disabled blocks selection', async ({ page }) => {
+   test('disabled blocks selection', async () => {
       const { selector } = await mountProbe(page, 'RulesElementOperationSelect', {
          props: {
             value: 'flatModifier',
@@ -987,7 +956,7 @@ test.describe('component probe — RulesElementOperationSelect', () => {
       await expect(page.locator(`${selector} select`)).toBeDisabled();
    });
 
-   test('testId resolves on the select element', async ({ page }) => {
+   test('testId resolves on the select element', async () => {
       const { selector } = await mountProbe(page, 'RulesElementOperationSelect', {
          props: {
             value: 'flatModifier',
@@ -1003,16 +972,12 @@ test.describe('component probe — RulesElementOperationSelect', () => {
 // Bare Select. testId lands on the <select> element.
 // ---------------------------------------------------------------------------
 test.describe('component probe — ArmorTraitSelect', () => {
-   test.beforeEach(async ({ page }) => {
-      await login(page);
-   });
-
-   test.afterEach(async ({ page }) => {
+   test.afterEach(async () => {
       await unmountAll(page);
       await clearProbeEvents(page);
    });
 
-   test('renders all armor trait options and fires onchange on change', async ({ page }) => {
+   test('renders all armor trait options and fires onchange on change', async () => {
       const { selector } = await mountProbe(page, 'ArmorTraitSelect', {
          props: {
             value: 'magical',
@@ -1041,7 +1006,7 @@ test.describe('component probe — ArmorTraitSelect', () => {
       expect(events.filter((e) => e.event === 'onchange')).toHaveLength(1);
    });
 
-   test('adds a none option when allowNone is set', async ({ page }) => {
+   test('adds a none option when allowNone is set', async () => {
       const { selector } = await mountProbe(page, 'ArmorTraitSelect', {
          props: {
             value: 'none',
@@ -1057,7 +1022,7 @@ test.describe('component probe — ArmorTraitSelect', () => {
       expect(optionValues).toHaveLength(5);
    });
 
-   test('disabled blocks selection', async ({ page }) => {
+   test('disabled blocks selection', async () => {
       const { selector } = await mountProbe(page, 'ArmorTraitSelect', {
          props: {
             value: 'magical',
@@ -1067,7 +1032,7 @@ test.describe('component probe — ArmorTraitSelect', () => {
       await expect(page.locator(`${selector} select`)).toBeDisabled();
    });
 
-   test('testId resolves on the select element', async ({ page }) => {
+   test('testId resolves on the select element', async () => {
       const { selector } = await mountProbe(page, 'ArmorTraitSelect', {
          props: {
             value: 'magical',
@@ -1083,16 +1048,12 @@ test.describe('component probe — ArmorTraitSelect', () => {
 // Bare Select. testId lands on the <select> element.
 // ---------------------------------------------------------------------------
 test.describe('component probe — AttackTraitSelect', () => {
-   test.beforeEach(async ({ page }) => {
-      await login(page);
-   });
-
-   test.afterEach(async ({ page }) => {
+   test.afterEach(async () => {
       await unmountAll(page);
       await clearProbeEvents(page);
    });
 
-   test('renders all attack trait options and fires onchange on change', async ({ page }) => {
+   test('renders all attack trait options and fires onchange on change', async () => {
       const { selector } = await mountProbe(page, 'AttackTraitSelect', {
          props: {
             value: 'blast',
@@ -1121,7 +1082,7 @@ test.describe('component probe — AttackTraitSelect', () => {
       expect(events.filter((e) => e.event === 'onchange')).toHaveLength(1);
    });
 
-   test('adds a none option when allowNone is set', async ({ page }) => {
+   test('adds a none option when allowNone is set', async () => {
       const { selector } = await mountProbe(page, 'AttackTraitSelect', {
          props: {
             value: 'none',
@@ -1137,7 +1098,7 @@ test.describe('component probe — AttackTraitSelect', () => {
       expect(optionValues).toHaveLength(19);
    });
 
-   test('disabled blocks selection', async ({ page }) => {
+   test('disabled blocks selection', async () => {
       const { selector } = await mountProbe(page, 'AttackTraitSelect', {
          props: {
             value: 'blast',
@@ -1147,7 +1108,7 @@ test.describe('component probe — AttackTraitSelect', () => {
       await expect(page.locator(`${selector} select`)).toBeDisabled();
    });
 
-   test('testId resolves on the select element', async ({ page }) => {
+   test('testId resolves on the select element', async () => {
       const { selector } = await mountProbe(page, 'AttackTraitSelect', {
          props: {
             value: 'blast',
@@ -1164,16 +1125,12 @@ test.describe('component probe — AttackTraitSelect', () => {
 // the default list has only one entry and the clamp would immediately reset any selection.
 // ---------------------------------------------------------------------------
 test.describe('component probe — ShieldTraitSelect', () => {
-   test.beforeEach(async ({ page }) => {
-      await login(page);
-   });
-
-   test.afterEach(async ({ page }) => {
+   test.afterEach(async () => {
       await unmountAll(page);
       await clearProbeEvents(page);
    });
 
-   test('renders the shield trait option set and fires onchange when switching to none', async ({ page }) => {
+   test('renders the shield trait option set and fires onchange when switching to none', async () => {
       const { selector } = await mountProbe(page, 'ShieldTraitSelect', {
          props: {
             value: 'magical',
@@ -1200,7 +1157,7 @@ test.describe('component probe — ShieldTraitSelect', () => {
       expect(events.filter((e) => e.event === 'onchange')).toHaveLength(1);
    });
 
-   test('base option set without allowNone contains only magical', async ({ page }) => {
+   test('base option set without allowNone contains only magical', async () => {
       const { selector } = await mountProbe(page, 'ShieldTraitSelect', {
          props: {
             value: 'magical',
@@ -1216,7 +1173,7 @@ test.describe('component probe — ShieldTraitSelect', () => {
       expect(optionValues).toHaveLength(1);
    });
 
-   test('disabled blocks selection', async ({ page }) => {
+   test('disabled blocks selection', async () => {
       const { selector } = await mountProbe(page, 'ShieldTraitSelect', {
          props: {
             value: 'magical',
@@ -1226,7 +1183,7 @@ test.describe('component probe — ShieldTraitSelect', () => {
       await expect(page.locator(`${selector} select`)).toBeDisabled();
    });
 
-   test('testId resolves on the select element', async ({ page }) => {
+   test('testId resolves on the select element', async () => {
       const { selector } = await mountProbe(page, 'ShieldTraitSelect', {
          props: {
             value: 'magical',

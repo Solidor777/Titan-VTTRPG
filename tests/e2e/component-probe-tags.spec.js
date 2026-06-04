@@ -1,20 +1,39 @@
 import { test, expect } from '@playwright/test';
 import { login } from './fixtures.js';
 import { mountProbe, readProbeEvents, clearProbeEvents, unmountAll } from './componentProbe.js';
+import { closeAllApps, clearChat, attachPageErrors } from './world.js';
+
+/** @type {import('@playwright/test').Page} The file-shared, logged-in page (one world boot per file). */
+let page;
+/** @type {string[]} Uncaught page errors collected during the current test (cleared each afterEach). */
+let errors;
+
+test.beforeAll(async ({ browser }) => {
+   page = await browser.newPage();
+   errors = attachPageErrors(page);
+   await login(page);
+   await clearChat(page);
+});
+
+test.afterEach(async () => {
+   await closeAllApps(page);
+   errors.length = 0;
+});
+
+test.afterAll(async () => {
+   await page?.close();
+});
 
 // ---------------------------------------------------------------------------
 // Tag
 // ---------------------------------------------------------------------------
 test.describe('component probe — Tag', () => {
-   test.beforeEach(async ({ page }) => {
-      await login(page);
-   });
-   test.afterEach(async ({ page }) => {
+   test.afterEach(async () => {
       await unmountAll(page);
       await clearProbeEvents(page);
    });
 
-   test('renders default-slot text and resolves testId', async ({ page }) => {
+   test('renders default-slot text and resolves testId', async () => {
       const { selector } = await mountProbe(page, 'Tag', {
          props: {
             text: 'Frostbite',
@@ -26,7 +45,7 @@ test.describe('component probe — Tag', () => {
       await expect(tag).toHaveText('Frostbite');
    });
 
-   test('tooltip content is forwarded to tippy', async ({ page }) => {
+   test('tooltip content is forwarded to tippy', async () => {
       const { selector } = await mountProbe(page, 'Tag', {
          props: {
             text: 'Ice Shard',
@@ -43,15 +62,12 @@ test.describe('component probe — Tag', () => {
 // IconTag
 // ---------------------------------------------------------------------------
 test.describe('component probe — IconTag', () => {
-   test.beforeEach(async ({ page }) => {
-      await login(page);
-   });
-   test.afterEach(async ({ page }) => {
+   test.afterEach(async () => {
       await unmountAll(page);
       await clearProbeEvents(page);
    });
 
-   test('renders icon class and label, resolves testId', async ({ page }) => {
+   test('renders icon class and label, resolves testId', async () => {
       const { selector } = await mountProbe(page, 'IconTag', {
          props: {
             icon: 'fas fa-fire',
@@ -65,7 +81,7 @@ test.describe('component probe — IconTag', () => {
       await expect(page.locator(`${selector} .tag .label`)).toHaveText('Fire');
    });
 
-   test('tooltip content is forwarded to tippy', async ({ page }) => {
+   test('tooltip content is forwarded to tippy', async () => {
       const { selector } = await mountProbe(page, 'IconTag', {
          props: {
             icon: 'fas fa-fire',
@@ -82,15 +98,12 @@ test.describe('component probe — IconTag', () => {
 // IconStatTag
 // ---------------------------------------------------------------------------
 test.describe('component probe — IconStatTag', () => {
-   test.beforeEach(async ({ page }) => {
-      await login(page);
-   });
-   test.afterEach(async ({ page }) => {
+   test.afterEach(async () => {
       await unmountAll(page);
       await clearProbeEvents(page);
    });
 
-   test('renders icon, label, and value, resolves testId', async ({ page }) => {
+   test('renders icon, label, and value, resolves testId', async () => {
       const { selector } = await mountProbe(page, 'IconStatTag', {
          props: {
             icon: 'fas fa-bolt',
@@ -106,7 +119,7 @@ test.describe('component probe — IconStatTag', () => {
       await expect(page.locator(`${selector} .tag .value`)).toHaveText('30');
    });
 
-   test('tooltip content is forwarded to tippy', async ({ page }) => {
+   test('tooltip content is forwarded to tippy', async () => {
       const { selector } = await mountProbe(page, 'IconStatTag', {
          props: {
             icon: 'fas fa-bolt',
@@ -124,15 +137,12 @@ test.describe('component probe — IconStatTag', () => {
 // StatTag
 // ---------------------------------------------------------------------------
 test.describe('component probe — StatTag', () => {
-   test.beforeEach(async ({ page }) => {
-      await login(page);
-   });
-   test.afterEach(async ({ page }) => {
+   test.afterEach(async () => {
       await unmountAll(page);
       await clearProbeEvents(page);
    });
 
-   test('renders label and value, resolves testId', async ({ page }) => {
+   test('renders label and value, resolves testId', async () => {
       const { selector } = await mountProbe(page, 'StatTag', {
          props: {
             label: 'Strength',
@@ -146,7 +156,7 @@ test.describe('component probe — StatTag', () => {
       await expect(page.locator(`${selector} .tag .value`)).toHaveText('4');
    });
 
-   test('tooltip content is forwarded to tippy', async ({ page }) => {
+   test('tooltip content is forwarded to tippy', async () => {
       const { selector } = await mountProbe(page, 'StatTag', {
          props: {
             label: 'Strength',
@@ -163,15 +173,12 @@ test.describe('component probe — StatTag', () => {
 // ValueTag
 // ---------------------------------------------------------------------------
 test.describe('component probe — ValueTag', () => {
-   test.beforeEach(async ({ page }) => {
-      await login(page);
-   });
-   test.afterEach(async ({ page }) => {
+   test.afterEach(async () => {
       await unmountAll(page);
       await clearProbeEvents(page);
    });
 
-   test('renders localized "value" label and the supplied value, resolves testId', async ({ page }) => {
+   test('renders localized "value" label and the supplied value, resolves testId', async () => {
       const { selector } = await mountProbe(page, 'ValueTag', {
          props: {
             value: 7,
@@ -189,15 +196,12 @@ test.describe('component probe — ValueTag', () => {
 // RarityTag
 // ---------------------------------------------------------------------------
 test.describe('component probe — RarityTag', () => {
-   test.beforeEach(async ({ page }) => {
-      await login(page);
-   });
-   test.afterEach(async ({ page }) => {
+   test.afterEach(async () => {
       await unmountAll(page);
       await clearProbeEvents(page);
    });
 
-   test('renders the localized rarity label and resolves testId', async ({ page }) => {
+   test('renders the localized rarity label and resolves testId', async () => {
       const { selector } = await mountProbe(page, 'RarityTag', {
          props: {
             rarity: 'rare',
@@ -209,7 +213,7 @@ test.describe('component probe — RarityTag', () => {
       await expect(tag).toBeVisible();
    });
 
-   test('tooltip content is forwarded to tippy', async ({ page }) => {
+   test('tooltip content is forwarded to tippy', async () => {
       const { selector } = await mountProbe(page, 'RarityTag', {
          props: {
             rarity: 'rare',
@@ -225,15 +229,12 @@ test.describe('component probe — RarityTag', () => {
 // DurationTag
 // ---------------------------------------------------------------------------
 test.describe('component probe — DurationTag', () => {
-   test.beforeEach(async ({ page }) => {
-      await login(page);
-   });
-   test.afterEach(async ({ page }) => {
+   test.afterEach(async () => {
       await unmountAll(page);
       await clearProbeEvents(page);
    });
 
-   test('renders type and remaining for a non-permanent duration, resolves testId', async ({ page }) => {
+   test('renders type and remaining for a non-permanent duration, resolves testId', async () => {
       const { selector } = await mountProbe(page, 'DurationTag', {
          props: {
             type: 'turnStart',
@@ -247,7 +248,7 @@ test.describe('component probe — DurationTag', () => {
       await expect(page.locator(`${selector} .tag .value`).last()).toHaveText('3');
    });
 
-   test('does not render remaining for permanent duration', async ({ page }) => {
+   test('does not render remaining for permanent duration', async () => {
       const { selector } = await mountProbe(page, 'DurationTag', {
          props: {
             type: 'permanent',
@@ -259,7 +260,7 @@ test.describe('component probe — DurationTag', () => {
       await expect(page.locator(`${selector} .tag .value`)).toHaveCount(1);
    });
 
-   test('tooltip content is forwarded to tippy', async ({ page }) => {
+   test('tooltip content is forwarded to tippy', async () => {
       const { selector } = await mountProbe(page, 'DurationTag', {
          props: {
             type: 'turnStart',
@@ -276,15 +277,12 @@ test.describe('component probe — DurationTag', () => {
 // AttributeTag
 // ---------------------------------------------------------------------------
 test.describe('component probe — AttributeTag', () => {
-   test.beforeEach(async ({ page }) => {
-      await login(page);
-   });
-   test.afterEach(async ({ page }) => {
+   test.afterEach(async () => {
       await unmountAll(page);
       await clearProbeEvents(page);
    });
 
-   test('renders default-slot text with attribute class and resolves testId', async ({ page }) => {
+   test('renders default-slot text with attribute class and resolves testId', async () => {
       const { selector } = await mountProbe(page, 'AttributeTag', {
          props: {
             attribute: 'body',
@@ -297,7 +295,7 @@ test.describe('component probe — AttributeTag', () => {
       await expect(tag).toHaveText('Lift');
    });
 
-   test('tooltip content is forwarded to tippy', async ({ page }) => {
+   test('tooltip content is forwarded to tippy', async () => {
       const { selector } = await mountProbe(page, 'AttributeTag', {
          props: {
             attribute: 'mind',
@@ -314,15 +312,12 @@ test.describe('component probe — AttributeTag', () => {
 // AttributeCheckTag
 // ---------------------------------------------------------------------------
 test.describe('component probe — AttributeCheckTag', () => {
-   test.beforeEach(async ({ page }) => {
-      await login(page);
-   });
-   test.afterEach(async ({ page }) => {
+   test.afterEach(async () => {
       await unmountAll(page);
       await clearProbeEvents(page);
    });
 
-   test('renders check label with attribute class and resolves testId', async ({ page }) => {
+   test('renders check label with attribute class and resolves testId', async () => {
       const { selector } = await mountProbe(page, 'AttributeCheckTag', {
          props: {
             attribute: 'body',
@@ -337,7 +332,7 @@ test.describe('component probe — AttributeCheckTag', () => {
       await expect(tag).toBeVisible();
    });
 
-   test('tooltip content is forwarded to tippy', async ({ page }) => {
+   test('tooltip content is forwarded to tippy', async () => {
       const { selector } = await mountProbe(page, 'AttributeCheckTag', {
          props: {
             attribute: 'soul',
@@ -354,15 +349,12 @@ test.describe('component probe — AttributeCheckTag', () => {
 // OpposedCheckTag
 // ---------------------------------------------------------------------------
 test.describe('component probe — OpposedCheckTag', () => {
-   test.beforeEach(async ({ page }) => {
-      await login(page);
-   });
-   test.afterEach(async ({ page }) => {
+   test.afterEach(async () => {
       await unmountAll(page);
       await clearProbeEvents(page);
    });
 
-   test('renders opposed check label and resolves testId', async ({ page }) => {
+   test('renders opposed check label and resolves testId', async () => {
       const { selector } = await mountProbe(page, 'OpposedCheckTag', {
          props: {
             attribute: 'body',
@@ -375,7 +367,7 @@ test.describe('component probe — OpposedCheckTag', () => {
       await expect(tag).toBeVisible();
    });
 
-   test('tooltip content is forwarded to tippy', async ({ page }) => {
+   test('tooltip content is forwarded to tippy', async () => {
       const { selector } = await mountProbe(page, 'OpposedCheckTag', {
          props: {
             attribute: 'mind',
@@ -392,15 +384,12 @@ test.describe('component probe — OpposedCheckTag', () => {
 // ResistanceTag
 // ---------------------------------------------------------------------------
 test.describe('component probe — ResistanceTag', () => {
-   test.beforeEach(async ({ page }) => {
-      await login(page);
-   });
-   test.afterEach(async ({ page }) => {
+   test.afterEach(async () => {
       await unmountAll(page);
       await clearProbeEvents(page);
    });
 
-   test('renders default-slot text with resistance class and resolves testId', async ({ page }) => {
+   test('renders default-slot text with resistance class and resolves testId', async () => {
       const { selector } = await mountProbe(page, 'ResistanceTag', {
          props: {
             resistance: 'reflexes',
@@ -413,7 +402,7 @@ test.describe('component probe — ResistanceTag', () => {
       await expect(tag).toHaveText('Dodge');
    });
 
-   test('tooltip content is forwarded to tippy', async ({ page }) => {
+   test('tooltip content is forwarded to tippy', async () => {
       const { selector } = await mountProbe(page, 'ResistanceTag', {
          props: {
             resistance: 'willpower',
@@ -430,15 +419,12 @@ test.describe('component probe — ResistanceTag', () => {
 // ResistedByTag
 // ---------------------------------------------------------------------------
 test.describe('component probe — ResistedByTag', () => {
-   test.beforeEach(async ({ page }) => {
-      await login(page);
-   });
-   test.afterEach(async ({ page }) => {
+   test.afterEach(async () => {
       await unmountAll(page);
       await clearProbeEvents(page);
    });
 
-   test('renders resisted-by label and resistance name, resolves testId', async ({ page }) => {
+   test('renders resisted-by label and resistance name, resolves testId', async () => {
       const { selector } = await mountProbe(page, 'ResistedByTag', {
          props: {
             resistance: 'resilience',
@@ -452,7 +438,7 @@ test.describe('component probe — ResistedByTag', () => {
       await expect(page.locator(`${selector} .tag .label`)).toBeVisible();
    });
 
-   test('tooltip content is forwarded to tippy', async ({ page }) => {
+   test('tooltip content is forwarded to tippy', async () => {
       const { selector } = await mountProbe(page, 'ResistedByTag', {
          props: {
             resistance: 'reflexes',
@@ -468,15 +454,12 @@ test.describe('component probe — ResistedByTag', () => {
 // TraitTag
 // ---------------------------------------------------------------------------
 test.describe('component probe — TraitTag', () => {
-   test.beforeEach(async ({ page }) => {
-      await login(page);
-   });
-   test.afterEach(async ({ page }) => {
+   test.afterEach(async () => {
       await unmountAll(page);
       await clearProbeEvents(page);
    });
 
-   test('renders as StatTag when value is a number, resolves testId', async ({ page }) => {
+   test('renders as StatTag when value is a number, resolves testId', async () => {
       const { selector } = await mountProbe(page, 'TraitTag', {
          props: {
             label: 'Brutal',
@@ -490,7 +473,7 @@ test.describe('component probe — TraitTag', () => {
       await expect(page.locator(`${selector} .tag .value`)).toHaveText('2');
    });
 
-   test('renders as plain Tag when value is undefined, resolves testId', async ({ page }) => {
+   test('renders as plain Tag when value is undefined, resolves testId', async () => {
       const { selector } = await mountProbe(page, 'TraitTag', {
          props: {
             label: 'Fearless',
@@ -507,15 +490,12 @@ test.describe('component probe — TraitTag', () => {
 // SpellAspectTag
 // ---------------------------------------------------------------------------
 test.describe('component probe — SpellAspectTag', () => {
-   test.beforeEach(async ({ page }) => {
-      await login(page);
-   });
-   test.afterEach(async ({ page }) => {
+   test.afterEach(async () => {
       await unmountAll(page);
       await clearProbeEvents(page);
    });
 
-   test('renders a damage aspect label and resolves testId', async ({ page }) => {
+   test('renders a damage aspect label and resolves testId', async () => {
       const { selector } = await mountProbe(page, 'SpellAspectTag', {
          props: {
             aspect: {
@@ -537,15 +517,12 @@ test.describe('component probe — SpellAspectTag', () => {
 // SpellCustomAspectTag
 // ---------------------------------------------------------------------------
 test.describe('component probe — SpellCustomAspectTag', () => {
-   test.beforeEach(async ({ page }) => {
-      await login(page);
-   });
-   test.afterEach(async ({ page }) => {
+   test.afterEach(async () => {
       await unmountAll(page);
       await clearProbeEvents(page);
    });
 
-   test('renders a custom aspect label and resolves testId', async ({ page }) => {
+   test('renders a custom aspect label and resolves testId', async () => {
       const { selector } = await mountProbe(page, 'SpellCustomAspectTag', {
          props: {
             aspect: {
@@ -569,15 +546,12 @@ test.describe('component probe — SpellCustomAspectTag', () => {
 // SpellAspectTags
 // ---------------------------------------------------------------------------
 test.describe('component probe — SpellAspectTags', () => {
-   test.beforeEach(async ({ page }) => {
-      await login(page);
-   });
-   test.afterEach(async ({ page }) => {
+   test.afterEach(async () => {
       await unmountAll(page);
       await clearProbeEvents(page);
    });
 
-   test('renders one tag per aspect entry and resolves testId', async ({ page }) => {
+   test('renders one tag per aspect entry and resolves testId', async () => {
       const { selector } = await mountProbe(page, 'SpellAspectTags', {
          props: {
             standardAspects: [
@@ -614,15 +588,12 @@ test.describe('component probe — SpellAspectTags', () => {
 // EditDeleteTag
 // ---------------------------------------------------------------------------
 test.describe('component probe — EditDeleteTag', () => {
-   test.beforeEach(async ({ page }) => {
-      await login(page);
-   });
-   test.afterEach(async ({ page }) => {
+   test.afterEach(async () => {
       await unmountAll(page);
       await clearProbeEvents(page);
    });
 
-   test('clicking edit fires editFunction callback', async ({ page }) => {
+   test('clicking edit fires editFunction callback', async () => {
       const { selector } = await mountProbe(page, 'EditDeleteTag', {
          props: {
             label: 'Fireball',
@@ -636,7 +607,7 @@ test.describe('component probe — EditDeleteTag', () => {
       expect(events.filter((e) => e.event === 'editFunction')).toHaveLength(1);
    });
 
-   test('clicking delete fires deleteFunction callback', async ({ page }) => {
+   test('clicking delete fires deleteFunction callback', async () => {
       const { selector } = await mountProbe(page, 'EditDeleteTag', {
          props: {
             label: 'Fireball',
@@ -650,7 +621,7 @@ test.describe('component probe — EditDeleteTag', () => {
       expect(events.filter((e) => e.event === 'deleteFunction')).toHaveLength(1);
    });
 
-   test('edit icon <i> uses Font Awesome (regression-lock bug #5)', async ({ page }) => {
+   test('edit icon <i> uses Font Awesome (regression-lock bug #5)', async () => {
       const { selector } = await mountProbe(page, 'EditDeleteTag', {
          props: {
             label: 'Fireball',
@@ -665,7 +636,7 @@ test.describe('component probe — EditDeleteTag', () => {
       expect(fontFamily).toMatch(/Font Awesome/i);
    });
 
-   test('resolves testId', async ({ page }) => {
+   test('resolves testId', async () => {
       const { selector } = await mountProbe(page, 'EditDeleteTag', {
          props: {
             label: 'Fireball',
