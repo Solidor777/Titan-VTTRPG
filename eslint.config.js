@@ -85,7 +85,6 @@ export default [
          'scripts/',
          'styles/',
          'templates/',
-         'index.js',
          'node_modules/',
          'fix-comments.js',
          'count-long.cjs',
