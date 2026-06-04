@@ -70,9 +70,7 @@ async function rollAttackWithTargets(page, targetNames) {
       try {
          game.user.targets = fakeTargets;
          await roller.system.rollAttackCheck({ itemId: weaponId, attackIdx: 0 });
-         await new Promise((resolve) => {
-            setTimeout(resolve, 300);
-         });
+         await titanWait(() => game.messages.size > before, { message: 'new chat message' });
          const newest = game.messages.contents[game.messages.size - 1];
          parameters = newest?.system?.parameters;
          results = newest?.system?.results;
@@ -216,9 +214,7 @@ test.describe('v14 opposed checks (forced dice)', () => {
             complexity: 2,
             damageToReduce: 5,
          });
-         await new Promise((resolve) => {
-            setTimeout(resolve, 300);
-         });
+         await titanWait(() => game.messages.size > before, { message: 'new chat message' });
          const newest = game.messages.contents[game.messages.size - 1];
          return {
             created: game.messages.size > before,
@@ -257,9 +253,7 @@ test.describe('v14 opposed checks (forced dice)', () => {
             complexity: 1,
             damageToReduce: 5,
          });
-         await new Promise((resolve) => {
-            setTimeout(resolve, 300);
-         });
+         await titanWait(() => game.messages.size > before, { message: 'new chat message' });
          const newest = game.messages.contents[game.messages.size - 1];
          return {
             created: game.messages.size > before,

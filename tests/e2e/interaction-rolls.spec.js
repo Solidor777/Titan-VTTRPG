@@ -156,9 +156,7 @@ test.describe('v14 interaction rolls', () => {
             // Snapshot the message count, perform the roll, and let the chat render settle.
             const before = game.messages.size;
             await new Function('actor', 'fixtures', `return (async () => { ${invokeSrc} })();`)(actor, fixtures);
-            await new Promise((resolve) => {
-               setTimeout(resolve, 500);
-            });
+            await titanWait(() => game.messages.size > before, { message: 'new chat message' });
 
             // Report the post-roll state for assertions in the Node process.
             const newest = game.messages.contents[game.messages.size - 1];

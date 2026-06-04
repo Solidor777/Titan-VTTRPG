@@ -106,9 +106,7 @@ test.describe('v14 effect check rolling', () => {
 
          const before = game.messages.size;
          await actor.system.requestItemCheck({ itemRollData: effect.getRollData(), checkIdx: 0 });
-         await new Promise((resolve) => {
-            setTimeout(resolve, 500);
-         });
+         await titanWait(() => game.messages.size > before, { message: 'new chat message' });
 
          const newest = game.messages.contents[game.messages.size - 1];
          return {
