@@ -81,12 +81,14 @@ class MockTypeDataModel {}
 
 /**
  * Distinct sentinel XP costs per setting key, so the golden also proves which setting feeds each
- * type's xpCost (spell -> 7, ability -> 9).
+ * type's xpCost (spell -> 777, ability -> 999). The sentinels are deliberately implausible (not the
+ * real world defaults) so a regression that hardcoded a literal xpCost instead of reading the setting
+ * would fail the gate.
  * @type {object}
  */
 const SENTINELS = {
-   'defaultXpCost.spell': 7,
-   'defaultXpCost.ability': 9,
+   'defaultXpCost.spell': 777,
+   'defaultXpCost.ability': 999,
 };
 
 /** @type {object} Holds the dynamically imported item-type DataModel classes keyed by item type. */
@@ -406,11 +408,11 @@ const GOLDENS = {
       trait: emptyObjectArray(),
    },
 
-   // Spell: NOT a rules-element type (no rulesElement field); xpCost seeded from the spell setting (7).
+   // Spell: NOT a rules-element type (no rulesElement field); xpCost seeded from the spell setting (777).
    spell: {
       ...baseFields(),
       rarity: stringField('common'),
-      xpCost: integerField(7),
+      xpCost: integerField(777),
       tradition: stringField(''),
       castingCheck: {
          fields: {
@@ -429,11 +431,11 @@ const GOLDENS = {
       customAspect: emptyObjectArray(),
    },
 
-   // Ability: rules-element type; xpCost seeded from the ability setting (9), three boolean toggles.
+   // Ability: rules-element type; xpCost seeded from the ability setting (999), three boolean toggles.
    ability: {
       ...baseFields(),
       rulesElement: emptyObjectArray(),
-      xpCost: integerField(9),
+      xpCost: integerField(999),
       rarity: stringField('common'),
       action: booleanField(false),
       reaction: booleanField(false),
