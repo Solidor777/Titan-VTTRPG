@@ -387,16 +387,26 @@ the five check subtypes; later phases cover items, reports, and effect).
 
 ## E2E suite speedup — remaining phases
 
-### 14. E2E speedup Phase 1b — bespoke sleep removal
+### 14. E2E speedup Phase 1b — bespoke sleep removal — DONE
 
-- **What:** Convert the `setTimeout` settles deferred from Phase 1a (the uniform bulk shipped on
-  branch `chore/e2e-sleep-removal`, merged to `main`). Bespoke, per-site conditions:
-  `effect-tray.spec.js` (18 — tray render+activate / select-change),
-  `logic/rules-elements.spec.js` (10 — derived-data settle), `logic/conditions.spec.js` (2),
-  `localization.spec.js` (2 tray sites), `permissions-auto-open.spec.js` (1 — assert-absence; needs
-  a positive signal or a bounded wait, can't poll a negative). Reuse the `titanWait` helper from
-  `tests/e2e/poll.js`.
-- **Spec:** `docs/superpowers/specs/2026-06-03-e2e-suite-speedup-design.md` (Workstream A).
+- **Status: COMPLETE** (branch `chore/e2e-sleep-removal-phase1b`, 6 commits
+  `ff0de166..ff596378`). **Scope expanded** beyond the original `setTimeout`-only wording to the
+  full intent of the design spec ("remove **every** fixed settle"): converted **all 33 `setTimeout`
+  settles AND all 59 `page.waitForTimeout` calls — 92 sites across 19 files** to deterministic
+  condition waits (`titanWait` in-page, `expect.poll` / auto-retrying web-first assertions at the
+  Node level). No test assertion changed (verified by an adversarial final review). Every touched
+  spec file was run green file-by-file against the live world.
+- **Patterns used:** (B) delete a sleep that precedes an auto-retrying `expect(locator)…` / auto-waiting
+  `.click()`/`.fill()`; (C) `expect.poll(() => page.evaluate(…)).toBe(…)` before a non-retrying read;
+  (A) in-page `titanWait` on a positive derived-data / DOM signal. **One sanctioned exception:**
+  `permissions-auto-open.spec.js` keeps a single bounded `waitForTimeout(1000)` for its negative
+  (assert-absence) test, paired with a positive `waitForFunction` (turn advanced to the effect
+  combatant) — the auto-open hook is un-awaited and a bare turn-effect actor has no pollable
+  consequence, so a bounded wait is unavoidable and is the design-spec-permitted fallback.
+- **Grep proof:** `git grep -nE "setTimeout|waitForTimeout" -- tests/e2e` → only `poll.js:25` (the
+  polling primitive) and the one documented `permissions-auto-open.spec.js` exception.
+- **Plan:** `docs/superpowers/plans/2026-06-04-e2e-speedup-phase1b-bespoke-sleeps.md`.
+  **Spec:** `docs/superpowers/specs/2026-06-03-e2e-suite-speedup-design.md` (Workstream A).
 
 ### 15. E2E speedup Phase 2 — shared-world harness + hygiene
 

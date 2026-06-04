@@ -1,6 +1,14 @@
 # TITAN E2E Test Suite — Status & Resume Handoff
 
-**Last updated:** 2026-06-01. **Branch:** `development`. **Next action:** **none queued — Phase 4 complete.**
+**Last updated:** 2026-06-04. **Next action:** **E2E speedup Phase 2 / TODO #15** (shared-world
+harness — also fixes the socket-sync flake, `OPEN_BUGS.md` #1). **DONE since this header was written:**
+backlog #1/#8/#9/#3, effect-tray, header buttons, build redesign (#13), and **E2E speedup Phase 1b /
+TODO #14 — all 92 fixed sleeps (`setTimeout` + `waitForTimeout`) across 19 e2e files replaced with
+`titanWait`/`expect.poll` conditions** (branch `chore/e2e-sleep-removal-phase1b`; one sanctioned
+bounded wait remains in `permissions-auto-open.spec.js`). See `docs/TODO.md` for current detail; this
+doc's body below is the Phase 3/4 historical record.
+
+**(historical header)** **Branch:** `development`. **Next action:** **none queued — Phase 4 complete.**
 ALL of Phase 3 AND Phase 4 are complete. Full e2e suite is **315 passing** (`npx playwright test`, on the
 `npm run build:e2e` bundle); unit suite **35 passing** (`npx vitest run`). Phase 3a, ALL of Phase 3b
 (component-probe coverage of all 84 primitives), ALL of Phase 3c (integration manifest drift guard),

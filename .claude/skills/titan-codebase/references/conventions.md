@@ -393,6 +393,22 @@ chat message of the expected `flags.titan.type` and the card renders), and `inte
 and `ensureDocument` (creates missing world fixtures). Drives the real built system at the repo root, so
 it catches v14 API breaks that the mocked Vitest tier cannot.
 
+**No fixed sleeps in E2E (banned)** — never settle with a fixed-duration `await page.waitForTimeout(n)`
+or an in-page `await new Promise(r => setTimeout(r, n))`; they are slow and flaky. Wait on a deterministic
+condition instead. Three patterns: (1) **delete** a sleep that precedes an auto-retrying Playwright
+web-first assertion (`expect(locator).toHaveText/.toHaveCount/.toBeVisible/.toHaveValue/...`) or an
+auto-waiting action (`.click()`/`.fill()`) — the assertion/action already polls; (2) before a
+**non-retrying read** (`await page.evaluate(...)`, `locator.textContent()/.inputValue()/.count()/
+.getAttribute()/.allTextContents()`), use `await expect.poll(() => <sameRead>, { message }).toBe(<value>)`
+(guard the poll body so it returns a sentinel rather than throwing on early iterations); (3) inside a
+`page.evaluate`, use `await titanWait(syncPredicate, { message })` — `globalThis.titanWait`
+(`tests/e2e/poll.js`), installed by `login()` via `installPoll`/`addInitScript` before navigation, polls a
+synchronous predicate (50 ms interval, 5 s default timeout). The ONLY allowed bounded wait is a **negative
+assertion** (assert-absence) that has no pollable positive edge — pair it with a positive `waitForFunction`
+signal and document it inline (see `permissions-auto-open.spec.js`). The two condition-polling
+`setInterval` canvas-readiness loops (`effect-tray.spec.js`, `effect-hud.spec.js`) are NOT fixed sleeps and
+are fine.
+
 **Multi-client harness** — `tests/e2e/multiClient.js` (Phase 4) provides two helpers for tests that
 require simultaneous Foundry sessions: `withClients(browser, clientSpec, fn)` creates one independent
 `BrowserContext` per entry in `clientSpec` (a `{label: userName}` map), logs each in via `login()`, then
