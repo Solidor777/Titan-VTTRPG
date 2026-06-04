@@ -74,8 +74,8 @@ async function rollAttackWithTargets(page, targetNames) {
             setTimeout(resolve, 300);
          });
          const newest = game.messages.contents[game.messages.size - 1];
-         parameters = newest?.flags?.titan?.parameters;
-         results = newest?.flags?.titan?.results;
+         parameters = newest?.system?.parameters;
+         results = newest?.system?.results;
       }
       finally {
          game.user.targets = original;
@@ -222,8 +222,8 @@ test.describe('v14 opposed checks (forced dice)', () => {
          const newest = game.messages.contents[game.messages.size - 1];
          return {
             created: game.messages.size > before,
-            parameters: newest?.flags?.titan?.parameters,
-            results: newest?.flags?.titan?.results,
+            parameters: newest?.system?.parameters,
+            results: newest?.system?.results,
          };
       });
 
@@ -263,7 +263,7 @@ test.describe('v14 opposed checks (forced dice)', () => {
          const newest = game.messages.contents[game.messages.size - 1];
          return {
             created: game.messages.size > before,
-            results: newest?.flags?.titan?.results,
+            results: newest?.system?.results,
          };
       });
 
