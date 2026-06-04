@@ -43,7 +43,14 @@
          "resistanceCheck": {},
          "attackCheck": {},
          "castingCheck": {},
-         "itemCheck": {}
+         "itemCheck": {},
+         "weapon": {},
+         "armor": {},
+         "spell": {},
+         "ability": {},
+         "shield": {},
+         "equipment": {},
+         "commodity": {}
       },
       "Item": {
          "ability": {},

@@ -35,6 +35,13 @@ import ResistanceCheckChatMessageDataModel from '~/check/types/resistance-check/
 import AttackCheckChatMessageDataModel from '~/check/types/attack-check/chat-message/AttackCheckChatMessageDataModel.js';
 import CastingCheckChatMessageDataModel from '~/check/types/casting-check/chat-message/CastingCheckChatMessageDataModel.js';
 import ItemCheckChatMessageDataModel from '~/check/types/item-check/chat-message/ItemCheckChatMessageDataModel.js';
+import WeaponChatMessageDataModel from '~/document/types/item/types/weapon/chat-message/WeaponChatMessageDataModel.js';
+import ArmorChatMessageDataModel from '~/document/types/item/types/armor/chat-message/ArmorChatMessageDataModel.js';
+import SpellChatMessageDataModel from '~/document/types/item/types/spell/chat-message/SpellChatMessageDataModel.js';
+import AbilityChatMessageDataModel from '~/document/types/item/types/ability/chat-message/AbilityChatMessageDataModel.js';
+import ShieldChatMessageDataModel from '~/document/types/item/types/shield/chat-message/ShieldChatMessageDataModel.js';
+import EquipmentChatMessageDataModel from '~/document/types/item/types/equipment/chat-message/EquipmentChatMessageDataModel.js';
+import CommodityChatMessageDataModel from '~/document/types/item/types/commodity/chat-message/CommodityChatMessageDataModel.js';
 import TitanActiveEffect from '~/document/types/active-effect/TitanActiveEffect.js';
 import TitanActiveEffectDataModel from '~/document/types/active-effect/TitanActiveEffectDataModel.js';
 import ConditionDataModel from '~/document/types/active-effect/ConditionDataModel.js';
@@ -101,6 +108,13 @@ export default function onceInit() {
       attackCheck: AttackCheckChatMessageDataModel,
       castingCheck: CastingCheckChatMessageDataModel,
       itemCheck: ItemCheckChatMessageDataModel,
+      weapon: WeaponChatMessageDataModel,
+      armor: ArmorChatMessageDataModel,
+      spell: SpellChatMessageDataModel,
+      ability: AbilityChatMessageDataModel,
+      shield: ShieldChatMessageDataModel,
+      equipment: EquipmentChatMessageDataModel,
+      commodity: CommodityChatMessageDataModel,
    };
 
    CONFIG.time.roundTime = 6;

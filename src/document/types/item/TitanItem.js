@@ -32,24 +32,52 @@ export default class TitanItem extends Item {
    }
 
    /**
-    * Creates a Chat Message containing this item's data and sends it to chat.
+    * Builds the chat message payload for this item as a first-class chat-message subtype. Produces a
+    * historical snapshot of this item's PREPARED system data (derived values included, mirroring what
+    * the card displays today) structured under `system`, so the resulting message's
+    * `system.X` paths match the item's `system.X` paths (path parity for component reuse). The item's
+    * `name` and `img` are folded into `system` as label metadata since they are not part of
+    * `item.system`; the document-level `id` and `type` are dropped (the chat document carries its own
+    * `id`, and `type` is returned at the top level to select the chat-message subtype). Pure and
+    * side-effect free so it is unit-testable without `ChatMessage.create`.
+    * @returns {object} The chat message data `{ type, system }`, where `type` selects the
+    * chat-message subtype and `system` is the prepared item-system snapshot plus `name` and `img`.
+    */
+   buildChatMessageData() {
+      // The prepared roll data: the document-level id/name/img/type plus the prepared system fields.
+      const rollData = this.system.getRollData();
+
+      // Separate the document-level keys from the prepared system fields.
+      const { id, type, name, img, ...systemData } = rollData;
+
+      return {
+         type: this.type,
+         system: {
+            ...systemData,
+            name,
+            img,
+         },
+      };
+   }
+
+   /**
+    * Creates a Chat Message containing this item's data and sends it to chat as a first-class
+    * chat-message subtype (`type` + `system`), preserving the speaker, style, sound, and roll mode.
     * @returns {Promise<ChatMessage>} The newly created Chat Message.
     */
    async sendToChat() {
-      // Create the context object.
-      const messageData = this.getRollData();
+      // Build the typed chat-message payload (type + prepared system snapshot).
+      const messageData = this.buildChatMessageData();
 
       // Create and post the message.
       return ChatMessage.create(
          ChatMessage.applyRollMode(
             {
+               ...messageData,
                user: game.user.id,
                speaker: this.parent?.getSpeaker() ?? ChatMessage.getSpeaker(),
                style: CONST.CHAT_MESSAGE_STYLES.OTHER,
                sound: CONFIG.sounds.notification,
-               flags: {
-                  titan: messageData,
-               },
                classes: ['titan'],
             },
             game.settings.get('core', 'rollMode'),

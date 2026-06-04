@@ -927,7 +927,14 @@
          "resistanceCheck": "Resistance Check",
          "attackCheck": "Attack Check",
          "castingCheck": "Casting Check",
-         "itemCheck": "Item Check"
+         "itemCheck": "Item Check",
+         "weapon": "Weapon",
+         "armor": "Armor",
+         "spell": "Spell",
+         "ability": "Ability",
+         "shield": "Shield",
+         "equipment": "Equipment",
+         "commodity": "Commodity"
       },
       "SidebarTab": {
          "titanEffects": "TITAN Effects"
