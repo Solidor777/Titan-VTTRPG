@@ -11,6 +11,23 @@
  */
 
 /**
+ * Builds the zero-value shape of the fields every check result shares.
+ * All numeric fields default to 0, boolean fields to false, and array fields to [].
+ * @returns {object} The base check-results shape (zeroed).
+ */
+export function createCheckResultsShape() {
+   return {
+      criticalFailures: 0,
+      criticalSuccesses: 0,
+      dice: [],
+      expertiseRemaining: 0,
+      extraSuccesses: 0,
+      succeeded: false,
+      successes: 0,
+   };
+}
+
+/**
  * Calculates the results of a check in the Titan system, based on the inputted parameters,
  * the dice rolled on the check, and the expertise that was applied.
  * @param {CheckDiceResults} diceResults - The sorted dice rolled for the check, after Expertise is applied.
@@ -18,15 +35,11 @@
  * @returns {CheckResults} The final results of the check.
  */
 export default function calculateCheckResults(diceResults, parameters) {
-   // Initialize return value.
+   // Initialize return value by spreading the zero shape, then assigning the computed fields.
    const retVal = {
+      ...createCheckResultsShape(),
       dice: diceResults.dice,
       expertiseRemaining: diceResults.expertiseRemaining,
-      criticalSuccesses: 0,
-      criticalFailures: 0,
-      extraSuccesses: 0,
-      succeeded: false,
-      successes: 0,
    };
 
    // Calculate successes and failures.

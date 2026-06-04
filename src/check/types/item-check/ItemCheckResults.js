@@ -1,4 +1,4 @@
-import calculateCheckResults from '~/check/CheckResults.js';
+import calculateCheckResults, { createCheckResultsShape } from '~/check/CheckResults.js';
 
 /**
  * Results of an Item Check.
@@ -16,6 +16,20 @@ import calculateCheckResults from '~/check/CheckResults.js';
  */
 
 /**
+ * Builds the zero-value shape of an Item Check's results.
+ * Extends the base check-results shape with the Item Check's additional fields.
+ * @returns {object} The item check-results shape (zeroed).
+ */
+export function createItemCheckResultsShape() {
+   return {
+      ...createCheckResultsShape(),
+      damage: 0,
+      healing: 0,
+      opposedCheckComplexity: 0,
+   };
+}
+
+/**
  * Calculates the results of an Item Check, based on the inputted parameters,
  * the dice rolled on the check, and the expertise that was applied.
  * Calls the base version of this function.
@@ -28,6 +42,7 @@ export default function calculateItemCheckResults(diceResults, parameters) {
    const baseResults = calculateCheckResults(diceResults, parameters);
 
    const results = {
+      ...createItemCheckResultsShape(),
       criticalFailures: baseResults.criticalFailures,
       criticalSuccesses: baseResults.criticalSuccesses,
       damage: 0,

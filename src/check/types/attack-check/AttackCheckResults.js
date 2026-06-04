@@ -1,4 +1,4 @@
-import calculateCheckResults from '~/check/CheckResults.js';
+import calculateCheckResults, { createCheckResultsShape } from '~/check/CheckResults.js';
 
 /**
  * Results of an Attack Check.
@@ -14,6 +14,18 @@ import calculateCheckResults from '~/check/CheckResults.js';
  */
 
 /**
+ * Builds the zero-value shape of an Attack Check's results.
+ * Extends the base check-results shape with the Attack Check's additional fields.
+ * @returns {object} The attack check-results shape (zeroed).
+ */
+export function createAttackCheckResultsShape() {
+   return {
+      ...createCheckResultsShape(),
+      damage: 0,
+   };
+}
+
+/**
  * Calculates the results of an Attack Check, based on the inputted parameters,
  * the dice rolled on the check, and the expertise that was applied.
  * Calls the base version of this function.
@@ -26,6 +38,7 @@ export default function calculateAttackCheckResults(diceResults, parameters) {
    const baseResults = calculateCheckResults(diceResults, parameters);
 
    const results = {
+      ...createAttackCheckResultsShape(),
       criticalFailures: baseResults.criticalFailures,
       criticalSuccesses: baseResults.criticalSuccesses,
       damage: 0,

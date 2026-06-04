@@ -1,4 +1,4 @@
-import calculateCheckResults from '~/check/CheckResults.js';
+import calculateCheckResults, { createCheckResultsShape } from '~/check/CheckResults.js';
 
 /**
  * Results of an Attribute Check.
@@ -14,6 +14,18 @@ import calculateCheckResults from '~/check/CheckResults.js';
  */
 
 /**
+ * Builds the zero-value shape of an Attribute Check's results.
+ * Extends the base check-results shape with the Attribute Check's additional fields.
+ * @returns {object} The attribute check-results shape (zeroed).
+ */
+export function createAttributeCheckResultsShape() {
+   return {
+      ...createCheckResultsShape(),
+      damageTaken: 0,
+   };
+}
+
+/**
  * Calculates the results of an Attribute Check, based on the inputted parameters,
  * the dice rolled on the check, and the expertise that was applied.
  * Calls the base version of this function.
@@ -26,6 +38,7 @@ export default function calculateAttributeCheckResults(diceResults, parameters) 
    const baseResults = calculateCheckResults(diceResults, parameters);
 
    return {
+      ...createAttributeCheckResultsShape(),
       criticalFailures: baseResults.criticalFailures,
       criticalSuccesses: baseResults.criticalSuccesses,
       damageTaken: parameters.damageToReduce && !baseResults.succeeded ?

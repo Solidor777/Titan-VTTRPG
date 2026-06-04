@@ -1,4 +1,4 @@
-import calculateCheckResults from '~/check/CheckResults.js';
+import calculateCheckResults, { createCheckResultsShape } from '~/check/CheckResults.js';
 
 /**
  * Data for a scaling aspect used in the check.
@@ -29,6 +29,21 @@ import calculateCheckResults from '~/check/CheckResults.js';
  */
 
 /**
+ * Builds the zero-value shape of a Casting Check's results.
+ * Extends the base check-results shape with the Casting Check's additional fields.
+ * @returns {object} The casting check-results shape (zeroed).
+ */
+export function createCastingCheckResultsShape() {
+   return {
+      ...createCheckResultsShape(),
+      damage: 0,
+      extraSuccessesRemaining: 0,
+      healing: 0,
+      scalingAspect: [],
+   };
+}
+
+/**
  * Calculates the results of a Casting Check, based on the inputted parameters,
  * the dice rolled on the check, and the expertise that was applied.
  * Calls the base version of this function.
@@ -41,6 +56,7 @@ export default function calculateCastingCheckResults(diceResults, parameters) {
    const baseResults = calculateCheckResults(diceResults, parameters);
 
    const results = {
+      ...createCastingCheckResultsShape(),
       criticalFailures: baseResults.criticalFailures,
       criticalSuccesses: baseResults.criticalSuccesses,
       damage: 0,

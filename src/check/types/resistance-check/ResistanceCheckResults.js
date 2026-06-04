@@ -1,4 +1,4 @@
-import calculateCheckResults from '~/check/CheckResults.js';
+import calculateCheckResults, { createCheckResultsShape } from '~/check/CheckResults.js';
 
 /**
  * Results of a Resistance Check.
@@ -14,6 +14,18 @@ import calculateCheckResults from '~/check/CheckResults.js';
  */
 
 /**
+ * Builds the zero-value shape of a Resistance Check's results.
+ * Extends the base check-results shape with the Resistance Check's additional fields.
+ * @returns {object} The resistance check-results shape (zeroed).
+ */
+export function createResistanceCheckResultsShape() {
+   return {
+      ...createCheckResultsShape(),
+      damageTaken: 0,
+   };
+}
+
+/**
  * Calculates the results of a Resistance Check, based on the inputted parameters,
  * the dice rolled on the check, and the expertise that was applied.
  * Calls the base version of this function.
@@ -26,6 +38,7 @@ export default function calculateResistanceCheckResults(diceResults, parameters)
    const baseResults = calculateCheckResults(diceResults, parameters);
 
    return {
+      ...createResistanceCheckResultsShape(),
       criticalFailures: baseResults.criticalFailures,
       criticalSuccesses: baseResults.criticalSuccesses,
       damageTaken: parameters.damageToReduce && !baseResults.succeeded ?
