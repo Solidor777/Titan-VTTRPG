@@ -56,8 +56,21 @@ test.describe('permissions — auto-open character sheets', () => {
             await gm.evaluate((id) => game.actors.get(id).sheet.close(), ids.effectActorId);
             await gm.evaluate((combatId) => game.combats.get(combatId).nextTurn(), ids.combatId);
 
-            // Give the turn-start handler time to run, then assert the sheet stayed closed.
-            await gm.evaluate(() => new Promise((r) => setTimeout(r, 1000)));
+            // Sanctioned negative-assertion exception (per the e2e speedup design spec, which permits a
+            // positive signal OR a bounded wait here). The auto-open render happens several awaits deep
+            // inside the UN-AWAITED async `combatNextTurn` → `onTurnStart` hook, so `nextTurn()` resolves
+            // before that branch runs. In the suppressed ('disabled') case the effect actor is bare — no
+            // turn-start rules elements — so it produces no resource/chat consequence to poll as a
+            // positive edge. We therefore (1) wait on the turn advancing to the effect actor, a real
+            // positive signal that the pipeline was triggered, then (2) hold one short bounded settle so
+            // the un-awaited render deterministically had its chance to fire, before asserting closed.
+            await gm.waitForFunction(
+               ({ combatId, combatantId }) => game.combats.get(combatId)?.combatant?.id === combatantId,
+               { combatId: ids.combatId, combatantId: ids.effectCombatantId },
+               { timeout: 15_000 },
+            );
+            await gm.waitForTimeout(1000);
+
             const rendered = await gm.evaluate(
                (id) => game.actors.get(id)?.sheet?.rendered === true,
                ids.effectActorId,

@@ -66,11 +66,18 @@ test.describe('no double-localized (LOCAL.) text in rendered UI', () => {
          }
          await ui.titanEffects.render(true);
          ui.titanEffects.activate();
-         await new Promise((resolve) => { setTimeout(resolve, 500); });
+         await titanWait(
+            () => !!ui.titanEffects.element
+               ?.querySelector('[data-testid="effect-tray-pack-select"] option'),
+            { message: 'tray pack-select options rendered' },
+         );
          const select = ui.titanEffects.element.querySelector('[data-testid="effect-tray-pack-select"]');
          select.value = 'world.e2e-tray-effects';
          select.dispatchEvent(new Event('change', { bubbles: true }));
-         await new Promise((resolve) => { setTimeout(resolve, 400); });
+         await titanWait(
+            () => !!ui.titanEffects.element?.querySelector('[data-testid="effect-tray-row"]'),
+            { message: 'tray rows rendered for selected pack' },
+         );
       });
 
       const trayOffenders = await collectLocalizationOffenders(page, '[data-testid="effect-tray"]');
