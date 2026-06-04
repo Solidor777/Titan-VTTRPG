@@ -22,14 +22,31 @@
  */
 
 /**
+ * Builds the zero-value shape of an Attribute Check's parameters.
+ * All numeric fields default to 0, boolean fields to false, and string fields to ''.
+ * Option-derived values are set to their zero/empty defaults; there are no factory constants
+ * for this check type.
+ * @returns {AttributeCheckParameters} The attribute check-parameters shape (zeroed).
+ */
+export function createAttributeCheckParametersShape() {
+   return {
+      attribute: '', attributeDice: 0, complexity: 0, damageToReduce: 0, diceMod: 0, difficulty: 0,
+      doubleExpertise: false, doubleTraining: false, expertiseMod: 0, extraFailureOnCritical: false,
+      extraSuccessOnCritical: false, skill: '', skillExpertise: 0, skillTrainingDice: 0, totalDice: 0,
+      totalExpertise: 0, totalTrainingDice: 0, trainingMod: 0,
+   };
+}
+
+/**
  * Creates an Attribute Check Parameters object, based off the provided input.
+ * Spreads the zero-value shape first, then re-assigns every option-derived field.
  * @param {AttributeCheckOptions} options - Fully populated Attribute Check Options.
  * @returns {AttributeCheckParameters} The new Attribute Check Parameters.
  */
 export default function createAttributeCheckParameters(options) {
    return {
+      ...createAttributeCheckParametersShape(),
       attribute: options.attribute,
-      attributeDice: 0,
       complexity: options.complexity,
       damageToReduce: options.damageToReduce,
       diceMod: options.diceMod,
@@ -40,11 +57,6 @@ export default function createAttributeCheckParameters(options) {
       extraFailureOnCritical: options.extraFailureOnCritical,
       extraSuccessOnCritical: options.extraSuccessOnCritical,
       skill: options.skill,
-      skillExpertise: 0,
-      skillTrainingDice: 0,
-      totalDice: 0,
-      totalExpertise: 0,
-      totalTrainingDice: 0,
       trainingMod: options.trainingMod,
    };
 }

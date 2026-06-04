@@ -43,36 +43,47 @@
  */
 
 /**
+ * Builds the zero-value shape of an Attack Check's parameters.
+ * All numeric fields default to 0, boolean fields to false, string fields to '', and arrays to [].
+ * Factory constants `complexity: 1` and `difficulty: 4` are kept at their canonical values.
+ * @returns {AttackCheckParameters} The attack check-parameters shape (with factory constants).
+ */
+export function createAttackCheckParametersShape() {
+   return {
+      attackNotes: '', attackerAccuracy: 0, attackerMelee: 0, attackName: '', attackerRating: 0,
+      attackTrait: [], attribute: '', attributeDice: 0, cleave: false, complexity: 1, customTrait: [],
+      damage: 0, damageMod: 0, diceMod: 0, difficulty: 4, doubleExpertise: false, doubleTraining: false,
+      expertiseMod: 0, extraFailureOnCritical: false, extraSuccessOnCritical: false, flurry: false,
+      img: '', ineffective: false, itemName: '', magical: false, multiAttack: false, penetrating: false,
+      plusExtraSuccessDamage: false, range: 0, rend: false, skill: '', skillExpertise: 0,
+      skillTrainingDice: 0, targetDefense: 0, totalDice: 0, totalExpertise: 0, totalTrainingDice: 0,
+      trainingMod: 0, type: '',
+   };
+}
+
+/**
  * Creates an Attack Check Parameters object, based off the provided input.
+ * Spreads the zero-value shape first (which includes factory constants `complexity: 1` and
+ * `difficulty: 4`), then re-assigns every option-derived field.
  * @param {AttackCheckOptions} options - Fully populated Attack Check Options.
  * @returns {AttackCheckParameters} The new Attack Check Parameters.
  */
 export default function createAttackCheckParameters(options) {
    return {
-      attackNotes: '',
+      ...createAttackCheckParametersShape(),
       attackerAccuracy: options.attackerAccuracy,
       attackerMelee: options.attackerMelee,
-      attackName: '',
-      attackerRating: 0,
-      attackTrait: [],
       attribute: options.attribute,
-      attributeDice: 0,
       cleave: options.cleave,
-      complexity: 1,
-      customTrait: [],
-      damage: 0,
       damageMod: options.damageMod,
       diceMod: options.diceMod,
-      difficulty: 4,
       doubleExpertise: options.doubleExpertise,
       doubleTraining: options.doubleTraining,
       expertiseMod: options.expertiseMod,
       extraFailureOnCritical: options.extraFailureOnCritical,
       extraSuccessOnCritical: options.extraSuccessOnCritical,
       flurry: options.flurry,
-      img: '',
       ineffective: options.ineffective,
-      itemName: '',
       magical: options.magical,
       multiAttack: options.multiAttack,
       penetrating: options.penetrating,
@@ -80,12 +91,7 @@ export default function createAttackCheckParameters(options) {
       range: options.range,
       rend: options.rend,
       skill: options.skill,
-      skillExpertise: 0,
-      skillTrainingDice: 0,
       targetDefense: options.targetDefense,
-      totalDice: 0,
-      totalExpertise: 0,
-      totalTrainingDice: 0,
       trainingMod: options.trainingMod,
       type: options.type,
    };

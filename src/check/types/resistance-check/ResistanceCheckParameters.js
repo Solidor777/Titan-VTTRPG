@@ -16,12 +16,29 @@
  */
 
 /**
+ * Builds the zero-value shape of a Resistance Check's parameters.
+ * All numeric fields default to 0, boolean fields to false, and string fields to ''.
+ * Option-derived values are set to their zero/empty defaults; there are no factory constants
+ * for this check type.
+ * @returns {ResistanceCheckParameters} The resistance check-parameters shape (zeroed).
+ */
+export function createResistanceCheckParametersShape() {
+   return {
+      complexity: 0, damageToReduce: 0, diceMod: 0, difficulty: 0, doubleExpertise: false,
+      expertiseMod: 0, extraFailureOnCritical: false, extraSuccessOnCritical: false, resistance: '',
+      resistanceDice: 0, totalDice: 0, totalExpertise: 0,
+   };
+}
+
+/**
  * Creates a Resistance Check Parameters object, based off the provided input.
+ * Spreads the zero-value shape first, then re-assigns every option-derived field.
  * @param {ResistanceCheckOptions} options - Fully populated Resistance Check Options.
  * @returns {ResistanceCheckParameters} The new Resistance Check Parameters.
  */
 export default function createResistanceCheckParameters(options) {
    return {
+      ...createResistanceCheckParametersShape(),
       complexity: options.complexity,
       damageToReduce: options.damageToReduce,
       diceMod: options.diceMod,
@@ -31,8 +48,5 @@ export default function createResistanceCheckParameters(options) {
       extraFailureOnCritical: options.extraFailureOnCritical,
       extraSuccessOnCritical: options.extraSuccessOnCritical,
       resistance: options.resistance,
-      resistanceDice: 0,
-      totalDice: 0,
-      totalExpertise: 0,
    };
 }

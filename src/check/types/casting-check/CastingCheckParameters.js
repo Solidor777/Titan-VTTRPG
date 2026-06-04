@@ -44,17 +44,34 @@
  */
 
 /**
+ * Builds the zero-value shape of a Casting Check's parameters.
+ * All numeric fields default to 0, boolean fields to false, string fields to '', and arrays to [].
+ * Option-derived values are set to their zero/empty defaults; there are no factory constants
+ * for this check type.
+ * @returns {CastingCheckParameters} The casting check-parameters shape (zeroed).
+ */
+export function createCastingCheckParametersShape() {
+   return {
+      attribute: '', attributeDice: 0, complexity: 0, customTrait: [], damage: 0, damageMod: 0,
+      diceMod: 0, difficulty: 0, doubleExpertise: false, doubleTraining: false, expertiseMod: 0,
+      extraFailureOnCritical: false, extraSuccessOnCritical: false, healing: 0, healingMod: 0, img: '',
+      itemDescription: '', itemName: '', reflexesCheck: false, resilienceCheck: false, scalingAspect: [],
+      skill: '', skillExpertise: 0, skillTrainingDice: 0, totalDice: 0, totalExpertise: 0, tradition: '',
+      trainingMod: 0, willpowerCheck: false,
+   };
+}
+
+/**
  * Creates a Casting Check Parameters object, based off the provided input.
+ * Spreads the zero-value shape first, then re-assigns every option-derived field.
  * @param {CastingCheckOptions} options - Fully populated Casting Check Options.
  * @returns {CastingCheckParameters} The new Casting Check Parameters.
  */
 export default function createCastingCheckParameters(options) {
    return {
+      ...createCastingCheckParametersShape(),
       attribute: options.attribute,
-      attributeDice: 0,
       complexity: options.complexity,
-      customTrait: [],
-      damage: 0,
       damageMod: options.damageMod,
       diceMod: options.diceMod,
       difficulty: options.difficulty,
@@ -63,22 +80,8 @@ export default function createCastingCheckParameters(options) {
       expertiseMod: options.expertiseMod,
       extraFailureOnCritical: options.extraFailureOnCritical,
       extraSuccessOnCritical: options.extraSuccessOnCritical,
-      healing: 0,
       healingMod: options.healingMod,
-      img: '',
-      itemDescription: '',
-      itemName: '',
-      scalingAspect: [],
       skill: options.skill,
-      skillExpertise: 0,
-      skillTrainingDice: 0,
-      reflexesCheck: false,
-      resilienceCheck: false,
-      totalDice: 0,
-      totalExpertise: 0,
-      totalTrainingDice: 0,
-      tradition: '',
       trainingMod: options.trainingMod,
-      willpowerCheck: false,
    };
 }

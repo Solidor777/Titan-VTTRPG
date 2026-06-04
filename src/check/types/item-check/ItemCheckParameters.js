@@ -1,4 +1,12 @@
 /**
+ * Nested opposed-check configuration shared by item-check parameters.
+ * @typedef {object} OpposedCheckBase
+ * @property {boolean} enabled - Whether the opposed check is enabled.
+ * @property {string} attribute - The attribute used for the opposed check.
+ * @property {string} skill - The skill used for the opposed check.
+ */
+
+/**
  * Options for requesting an Item Check from an Actor.
  * @typedef {CheckParameters} ItemCheckParameters
  * @property {OpposedCheckBase} opposedCheck - The opposed check data (enabled/attribute/skill).
@@ -38,20 +46,37 @@
  */
 
 /**
+ * Builds the zero-value shape of an Item Check's parameters.
+ * All numeric fields default to 0, boolean fields to false, string fields to '', and arrays to [].
+ * The factory constant `damageReducedBy: 'none'` is kept at its canonical default value.
+ * The nested `opposedCheck` object always uses the typed `OpposedCheckBase` structure.
+ * @returns {ItemCheckParameters} The item check-parameters shape (with factory constants).
+ */
+export function createItemCheckParametersShape() {
+   return {
+      attribute: '', attributeDice: 0, checkLabel: '', complexity: 0, customTrait: [], damage: 0,
+      damageMod: 0, damageReducedBy: 'none', diceMod: 0, difficulty: 0, doubleExpertise: false,
+      doubleTraining: false, expertiseMod: 0, extraFailureOnCritical: false, extraSuccessOnCritical: false,
+      healing: 0, healingMod: 0, img: '', isDamage: false, isHealing: false, itemDescription: '',
+      itemName: '', opposedCheck: { attribute: '', enabled: false, skill: '' }, resistanceCheck: '',
+      resolveCost: 0, scaling: false, skill: '', skillExpertise: 0, skillTrainingDice: 0, totalDice: 0,
+      totalExpertise: 0, totalTrainingDice: 0, trainingMod: 0,
+   };
+}
+
+/**
  * Creates an Item Check Parameters object, based off the provided input.
+ * Spreads the zero-value shape first (which includes the factory constant `damageReducedBy: 'none'`
+ * and the typed nested `opposedCheck` default), then re-assigns every option-derived field.
  * @param {ItemCheckOptions} options - Fully populated Item Check Options.
  * @returns {ItemCheckParameters} The new Item Check Parameters.
  */
 export default function createItemCheckParameters(options) {
    return {
+      ...createItemCheckParametersShape(),
       attribute: options.attribute,
-      attributeDice: 0,
-      checkLabel: '',
       complexity: options.complexity,
-      customTrait: [],
-      damage: 0,
       damageMod: options.damageMod,
-      damageReducedBy: 'none',
       diceMod: options.diceMod,
       difficulty: options.difficulty,
       doubleExpertise: options.doubleExpertise,
@@ -59,27 +84,9 @@ export default function createItemCheckParameters(options) {
       expertiseMod: options.expertiseMod,
       extraFailureOnCritical: options.extraFailureOnCritical,
       extraSuccessOnCritical: options.extraSuccessOnCritical,
-      healing: 0,
       healingMod: options.healingMod,
-      img: '',
-      isDamage: false,
-      isHealing: false,
-      itemDescription: '',
-      itemName: '',
-      opposedCheck: {
-         attribute: '',
-         enabled: false,
-         skill: '',
-      },
-      resistanceCheck: '',
       resolveCost: options.resolveCost,
-      scaling: false,
       skill: options.skill,
-      skillExpertise: 0,
-      skillTrainingDice: 0,
-      totalDice: 0,
-      totalExpertise: 0,
-      totalTrainingDice: 0,
       trainingMod: options.trainingMod,
    };
 }
