@@ -38,7 +38,7 @@
    {/if}
 
    <!--Item Traits-->
-   {#if document.data.system.parameters.itemTrait}
+   {#if document.data.system.parameters.customTrait.length}
       <div class="section tags">
          <ItemCheckChatItemTraits/>
       </div>
