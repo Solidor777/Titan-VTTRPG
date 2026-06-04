@@ -1,22 +1,39 @@
 import { test, expect } from '@playwright/test';
 import { login } from './fixtures.js';
 import { mountProbe, readProbeEvents, clearProbeEvents, unmountAll } from './componentProbe.js';
+import { closeAllApps, clearChat, attachPageErrors } from './world.js';
+
+/** @type {import('@playwright/test').Page} The file-shared, logged-in page (one world boot per file). */
+let page;
+/** @type {string[]} Uncaught page errors collected during the current test (cleared each afterEach). */
+let errors;
+
+test.beforeAll(async ({ browser }) => {
+   page = await browser.newPage();
+   errors = attachPageErrors(page);
+   await login(page);
+   await clearChat(page);
+});
+
+test.afterEach(async () => {
+   await closeAllApps(page);
+   errors.length = 0;
+});
+
+test.afterAll(async () => {
+   await page?.close();
+});
 
 // ─── IntegerIncrementInput ────────────────────────────────────────────────────
 
 test.describe('component probe — IntegerIncrementInput', () => {
-   /** Authenticate as E2E GM 1 before each probe. */
-   test.beforeEach(async ({ page }) => {
-      await login(page);
-   });
-
    /** Tear down every mounted probe so containers never leak between tests. */
-   test.afterEach(async ({ page }) => {
+   test.afterEach(async () => {
       await unmountAll(page);
       await clearProbeEvents(page);
    });
 
-   test('increment button raises the value by the increment', async ({ page }) => {
+   test('increment button raises the value by the increment', async () => {
       const { selector } = await mountProbe(page, 'IntegerIncrementInput', {
          props: {
             value: 2,
@@ -33,7 +50,7 @@ test.describe('component probe — IntegerIncrementInput', () => {
       await expect(input).toHaveValue('3');
    });
 
-   test('decrement button lowers the value by the increment', async ({ page }) => {
+   test('decrement button lowers the value by the increment', async () => {
       const { selector } = await mountProbe(page, 'IntegerIncrementInput', {
          props: {
             value: 2,
@@ -46,7 +63,7 @@ test.describe('component probe — IntegerIncrementInput', () => {
       await expect(page.locator(`${selector} input`)).toHaveValue('1');
    });
 
-   test('disabled propagates to both increment and decrement buttons', async ({ page }) => {
+   test('disabled propagates to both increment and decrement buttons', async () => {
       const { selector } = await mountProbe(page, 'IntegerIncrementInput', {
          props: {
             value: 5,
@@ -58,7 +75,7 @@ test.describe('component probe — IntegerIncrementInput', () => {
       await expect(page.locator(`${selector} .decrement button`)).toBeDisabled();
    });
 
-   test('testId resolves to data-testid on the root element', async ({ page }) => {
+   test('testId resolves to data-testid on the root element', async () => {
       const { selector } = await mountProbe(page, 'IntegerIncrementInput', {
          props: {
             value: 1,
@@ -72,18 +89,13 @@ test.describe('component probe — IntegerIncrementInput', () => {
 // ─── TextAreaInput ────────────────────────────────────────────────────────────
 
 test.describe('component probe — TextAreaInput', () => {
-   /** Authenticate as E2E GM 1 before each probe. */
-   test.beforeEach(async ({ page }) => {
-      await login(page);
-   });
-
    /** Tear down every mounted probe so containers never leak between tests. */
-   test.afterEach(async ({ page }) => {
+   test.afterEach(async () => {
       await unmountAll(page);
       await clearProbeEvents(page);
    });
 
-   test('filling and committing updates the value and fires onchange', async ({ page }) => {
+   test('filling and committing updates the value and fires onchange', async () => {
       const { selector } = await mountProbe(page, 'TextAreaInput', {
          props: {
             value: '',
@@ -99,7 +111,7 @@ test.describe('component probe — TextAreaInput', () => {
       expect(events.some((e) => e.event === 'onchange')).toBe(true);
    });
 
-   test('disabled blocks editing', async ({ page }) => {
+   test('disabled blocks editing', async () => {
       const { selector } = await mountProbe(page, 'TextAreaInput', {
          props: {
             value: 'locked',
@@ -111,7 +123,7 @@ test.describe('component probe — TextAreaInput', () => {
       await expect(textarea).toHaveValue('locked');
    });
 
-   test('testId resolves to data-testid on the textarea', async ({ page }) => {
+   test('testId resolves to data-testid on the textarea', async () => {
       const { selector } = await mountProbe(page, 'TextAreaInput', {
          props: {
             value: '',
@@ -125,18 +137,13 @@ test.describe('component probe — TextAreaInput', () => {
 // ─── LabeledTextInput ─────────────────────────────────────────────────────────
 
 test.describe('component probe — LabeledTextInput', () => {
-   /** Authenticate as E2E GM 1 before each probe. */
-   test.beforeEach(async ({ page }) => {
-      await login(page);
-   });
-
    /** Tear down every mounted probe so containers never leak between tests. */
-   test.afterEach(async ({ page }) => {
+   test.afterEach(async () => {
       await unmountAll(page);
       await clearProbeEvents(page);
    });
 
-   test('typing updates the bound value', async ({ page }) => {
+   test('typing updates the bound value', async () => {
       // LabeledTextInput wraps TextInput but does not expose an onkeyup callback prop;
       // assert the two-way bind keeps the input value in sync with what the user types.
       const { selector } = await mountProbe(page, 'LabeledTextInput', {
@@ -151,7 +158,7 @@ test.describe('component probe — LabeledTextInput', () => {
       await expect(input).toHaveValue('titan');
    });
 
-   test('disabled blocks editing', async ({ page }) => {
+   test('disabled blocks editing', async () => {
       const { selector } = await mountProbe(page, 'LabeledTextInput', {
          props: {
             value: 'locked',
@@ -163,7 +170,7 @@ test.describe('component probe — LabeledTextInput', () => {
       await expect(page.locator(`${selector} input`)).toHaveValue('locked');
    });
 
-   test('label text is rendered', async ({ page }) => {
+   test('label text is rendered', async () => {
       // Use the outer .label div (direct child of .labeled-element) to avoid the inner Label.svelte
       // wrapper that also carries the .label class, which causes a strict-mode multi-element error.
       const { selector } = await mountProbe(page, 'LabeledTextInput', {
@@ -175,7 +182,7 @@ test.describe('component probe — LabeledTextInput', () => {
       await expect(page.locator(`${selector} .labeled-element > .label`)).toContainText('Strength');
    });
 
-   test('testId resolves to data-testid on the inner input', async ({ page }) => {
+   test('testId resolves to data-testid on the inner input', async () => {
       const { selector } = await mountProbe(page, 'LabeledTextInput', {
          props: {
             value: '',
@@ -190,18 +197,13 @@ test.describe('component probe — LabeledTextInput', () => {
 // ─── AttributeInput ───────────────────────────────────────────────────────────
 
 test.describe('component probe — AttributeInput', () => {
-   /** Authenticate as E2E GM 1 before each probe. */
-   test.beforeEach(async ({ page }) => {
-      await login(page);
-   });
-
    /** Tear down every mounted probe so containers never leak between tests. */
-   test.afterEach(async ({ page }) => {
+   test.afterEach(async () => {
       await unmountAll(page);
       await clearProbeEvents(page);
    });
 
-   test('renders with the attribute class applied', async ({ page }) => {
+   test('renders with the attribute class applied', async () => {
       const { selector } = await mountProbe(page, 'AttributeInput', {
          props: {
             attribute: 'agility',
@@ -213,7 +215,7 @@ test.describe('component probe — AttributeInput', () => {
       await expect(root).toHaveClass(/agility/);
    });
 
-   test('renders child content inside the wrapper', async ({ page }) => {
+   test('renders child content inside the wrapper', async () => {
       const { selector } = await mountProbe(page, 'AttributeInput', {
          props: {
             attribute: 'strength',
@@ -223,7 +225,7 @@ test.describe('component probe — AttributeInput', () => {
       await expect(page.locator(`${selector} .attribute-input`)).toContainText('inner text');
    });
 
-   test('testId resolves to data-testid on the root element', async ({ page }) => {
+   test('testId resolves to data-testid on the root element', async () => {
       const { selector } = await mountProbe(page, 'AttributeInput', {
          props: {
             attribute: 'agility',
@@ -238,18 +240,13 @@ test.describe('component probe — AttributeInput', () => {
 // ─── RarityInput ──────────────────────────────────────────────────────────────
 
 test.describe('component probe — RarityInput', () => {
-   /** Authenticate as E2E GM 1 before each probe. */
-   test.beforeEach(async ({ page }) => {
-      await login(page);
-   });
-
    /** Tear down every mounted probe so containers never leak between tests. */
-   test.afterEach(async ({ page }) => {
+   test.afterEach(async () => {
       await unmountAll(page);
       await clearProbeEvents(page);
    });
 
-   test('renders with the rarity class applied', async ({ page }) => {
+   test('renders with the rarity class applied', async () => {
       const { selector } = await mountProbe(page, 'RarityInput', {
          props: {
             rarity: 'uncommon',
@@ -261,7 +258,7 @@ test.describe('component probe — RarityInput', () => {
       await expect(root).toHaveClass(/uncommon/);
    });
 
-   test('renders child content inside the wrapper', async ({ page }) => {
+   test('renders child content inside the wrapper', async () => {
       const { selector } = await mountProbe(page, 'RarityInput', {
          props: {
             rarity: 'rare',
@@ -271,7 +268,7 @@ test.describe('component probe — RarityInput', () => {
       await expect(page.locator(`${selector} .rarity-input`)).toContainText('rare item');
    });
 
-   test('testId resolves to data-testid on the root element', async ({ page }) => {
+   test('testId resolves to data-testid on the root element', async () => {
       const { selector } = await mountProbe(page, 'RarityInput', {
          props: {
             rarity: 'uncommon',
@@ -286,18 +283,13 @@ test.describe('component probe — RarityInput', () => {
 // ─── ResistanceInput ──────────────────────────────────────────────────────────
 
 test.describe('component probe — ResistanceInput', () => {
-   /** Authenticate as E2E GM 1 before each probe. */
-   test.beforeEach(async ({ page }) => {
-      await login(page);
-   });
-
    /** Tear down every mounted probe so containers never leak between tests. */
-   test.afterEach(async ({ page }) => {
+   test.afterEach(async () => {
       await unmountAll(page);
       await clearProbeEvents(page);
    });
 
-   test('renders with the resistance class applied', async ({ page }) => {
+   test('renders with the resistance class applied', async () => {
       const { selector } = await mountProbe(page, 'ResistanceInput', {
          props: {
             resistance: 'physical',
@@ -309,7 +301,7 @@ test.describe('component probe — ResistanceInput', () => {
       await expect(root).toHaveClass(/physical/);
    });
 
-   test('renders child content inside the wrapper', async ({ page }) => {
+   test('renders child content inside the wrapper', async () => {
       const { selector } = await mountProbe(page, 'ResistanceInput', {
          props: {
             resistance: 'magical',
@@ -319,7 +311,7 @@ test.describe('component probe — ResistanceInput', () => {
       await expect(page.locator(`${selector} .resistance-input`)).toContainText('magical resist');
    });
 
-   test('testId resolves to data-testid on the root element', async ({ page }) => {
+   test('testId resolves to data-testid on the root element', async () => {
       const { selector } = await mountProbe(page, 'ResistanceInput', {
          props: {
             resistance: 'physical',
@@ -334,18 +326,13 @@ test.describe('component probe — ResistanceInput', () => {
 // ─── ImagePicker ──────────────────────────────────────────────────────────────
 
 test.describe('component probe — ImagePicker', () => {
-   /** Authenticate as E2E GM 1 before each probe. */
-   test.beforeEach(async ({ page }) => {
-      await login(page);
-   });
-
    /** Tear down every mounted probe so containers never leak between tests. */
-   test.afterEach(async ({ page }) => {
+   test.afterEach(async () => {
       await unmountAll(page);
       await clearProbeEvents(page);
    });
 
-   test('renders the image with the supplied src', async ({ page }) => {
+   test('renders the image with the supplied src', async () => {
       const { selector } = await mountProbe(page, 'ImagePicker', {
          props: {
             value: 'icons/svg/item-bag.svg',
@@ -366,7 +353,7 @@ test.describe('component probe — ImagePicker', () => {
       await expect(img).toHaveAttribute('src', 'icons/svg/item-bag.svg');
    });
 
-   test('the picker button is rendered', async ({ page }) => {
+   test('the picker button is rendered', async () => {
       const { selector } = await mountProbe(page, 'ImagePicker', {
          props: {
             value: 'icons/svg/mystery-man.svg',
@@ -385,7 +372,7 @@ test.describe('component probe — ImagePicker', () => {
       await expect(page.locator(`${selector} button`)).toBeVisible();
    });
 
-   test('testId resolves to data-testid on the root element', async ({ page }) => {
+   test('testId resolves to data-testid on the root element', async () => {
       const { selector } = await mountProbe(page, 'ImagePicker', {
          props: {
             value: 'icons/svg/item-bag.svg',
@@ -409,18 +396,13 @@ test.describe('component probe — ImagePicker', () => {
 // ─── TopFilter ────────────────────────────────────────────────────────────────
 
 test.describe('component probe — TopFilter', () => {
-   /** Authenticate as E2E GM 1 before each probe. */
-   test.beforeEach(async ({ page }) => {
-      await login(page);
-   });
-
    /** Tear down every mounted probe so containers never leak between tests. */
-   test.afterEach(async ({ page }) => {
+   test.afterEach(async () => {
       await unmountAll(page);
       await clearProbeEvents(page);
    });
 
-   test('typing updates the filter value', async ({ page }) => {
+   test('typing updates the filter value', async () => {
       const { selector } = await mountProbe(page, 'TopFilter', {
          props: {
             label: 'filter',
@@ -433,7 +415,7 @@ test.describe('component probe — TopFilter', () => {
       await expect(input).toHaveValue('sword');
    });
 
-   test('testId resolves to data-testid on the inner input', async ({ page }) => {
+   test('testId resolves to data-testid on the inner input', async () => {
       const { selector } = await mountProbe(page, 'TopFilter', {
          props: {
             label: 'filter',
@@ -444,7 +426,7 @@ test.describe('component probe — TopFilter', () => {
       await expect(page.locator(`${selector} input[data-testid="probe-filter"]`)).toBeVisible();
    });
 
-   test('label text is rendered', async ({ page }) => {
+   test('label text is rendered', async () => {
       // Use the outer .label div (direct child of .labeled-element) to avoid the inner Label.svelte
       // wrapper that also carries the .label class, which causes a strict-mode multi-element error.
       const { selector } = await mountProbe(page, 'TopFilter', {
