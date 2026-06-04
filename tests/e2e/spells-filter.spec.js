@@ -1,5 +1,6 @@
-import { expect, test } from '@playwright/test';
+import { test, expect } from '@playwright/test';
 import { login } from './fixtures.js';
+import { closeAllApps, clearChat, attachPageErrors } from './world.js';
 
 /**
  * Regression: the Spells tab filter input must narrow the spell list. It was cross-wired to
@@ -7,11 +8,31 @@ import { login } from './fixtures.js';
  * the spell list. The fix binds it to $appState.tabs.spells.filter.
  */
 
+/** @type {import('@playwright/test').Page} The file-shared, logged-in page (one world boot per file). */
+let page;
+/** @type {string[]} Uncaught page errors collected during the current test (cleared each afterEach). */
+let errors;
+
+test.beforeAll(async ({ browser }) => {
+   page = await browser.newPage();
+   errors = attachPageErrors(page);
+   await login(page);
+   await clearChat(page);
+});
+
+test.afterEach(async () => {
+   await closeAllApps(page);
+   errors.length = 0;
+});
+
+test.afterAll(async () => {
+   await page?.close();
+});
+
 const ACTOR_NAME = 'E2E Spells Filter Actor';
 
 test.describe('spells tab filter', () => {
-   test.beforeEach(async ({ page }) => {
-      await login(page);
+   test.beforeEach(async () => {
       await page.evaluate(async (actorName) => {
          const stale = game.actors.getName(actorName);
          if (stale) {
@@ -32,7 +53,7 @@ test.describe('spells tab filter', () => {
       await page.getByText('Spells', { exact: true }).first().click();
    });
 
-   test('typing in the spells filter narrows the spell list', async ({ page }) => {
+   test('typing in the spells filter narrows the spell list', async () => {
       // Both spells visible initially.
       await expect(page.locator('[data-item-id]'), 'both spells shown').toHaveCount(2);
 

@@ -36,23 +36,27 @@ export async function login(page, user = process.env.FOUNDRY_USER || DEFAULT_GM)
 }
 
 /**
- * Render a single document's sheet inside the live world and assert it appears
- * with no uncaught page errors.
+ * Render a single document's sheet inside the live world and assert it appears with no uncaught page
+ * errors.
  *
- * The document is located inside the page via a stringified locator function
- * body (e.g. `"() => game.actors.find((a) => a.type === 'player')"`) so the
- * lookup runs in the Foundry runtime, not the Node test process.
+ * The document is located inside the page via a stringified locator function body (e.g.
+ * `"() => game.actors.find((a) => a.type === 'player')"`) so the lookup runs in the Foundry runtime, not
+ * the Node test process.
  * @param {import('@playwright/test').Page} page - The Playwright page to drive.
  * @param {string} locateSrc - Stringified locator: a function returning the document.
  * @param {string} expectedSelector - CSS selector the rendered sheet must expose.
+ * @param {string[]} [errors] - Optional shared page-error collector (from `attachPageErrors`). When
+ *   omitted, a local listener is attached for this single render (legacy/unmigrated behavior).
  * @returns {Promise<void>} Resolves once the sheet is visible and asserted error-free.
  */
-export async function renderSheet(page, locateSrc, expectedSelector) {
-   // Collected uncaught page errors fired during the render window.
-   const errors = [];
-   page.on('pageerror', (err) => {
-      errors.push(err.message);
-   });
+export async function renderSheet(page, locateSrc, expectedSelector, errors) {
+   // Use the shared collector when supplied; otherwise attach a local one for this render only.
+   const localErrors = errors ?? [];
+   if (!errors) {
+      page.on('pageerror', (err) => {
+         localErrors.push(err.message);
+      });
+   }
 
    // Locate the document and trigger its sheet render inside the Foundry runtime.
    const found = await page.evaluate(async (src) => {
@@ -68,7 +72,7 @@ export async function renderSheet(page, locateSrc, expectedSelector) {
    // The fixture must exist; assert the sheet is visible and no errors were thrown.
    expect(found, 'document fixture not found in world').toBe(true);
    await expect(page.locator(expectedSelector).first()).toBeVisible();
-   expect(errors, `uncaught errors during render:\n${errors.join('\n')}`).toEqual([]);
+   expect(localErrors, `uncaught errors during render:\n${localErrors.join('\n')}`).toEqual([]);
 }
 
 /**
