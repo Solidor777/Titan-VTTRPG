@@ -1,8 +1,6 @@
 import RulesElementItemDataModel from '~/document/types/item/RulesElementItemDataModel.js';
-import createIntegerField from '~/helpers/utility-functions/CreateIntegerField.js';
-import createStringField from '~/helpers/utility-functions/CreateStringField.js';
-import createBooleanField from '~/helpers/utility-functions/CreateBooleanField.js';
-import defaultXpCostAbility from '~/helpers/Settings/DefaultXpCostAbility.js';
+import buildSchemaFromShape from '~/helpers/utility-functions/BuildSchemaFromShape.js';
+import createAbilitySystemTemplate from '~/document/types/item/types/ability/AbilitySystemTemplate.js';
 import { ABILITY_IMAGE } from '~/system/DefaultImages.js';
 import localize from '~/helpers/utility-functions/Localize.js';
 
@@ -11,25 +9,18 @@ import localize from '~/helpers/utility-functions/Localize.js';
  * @extends {RulesElementItemDataModel}
  */
 export default class AbilityDataModel extends RulesElementItemDataModel {
+   /**
+    * Defines the data schema for Ability documents, built from the shared Ability system shape template
+    * (which spreads the base item and rules-element fragments before the ability-specific fields), so the
+    * item schema and its chat-card schema stay a single source of truth.
+    * @override
+    * @returns {object} Map of schema field instances keyed by field name, defining the persisted data shape.
+    */
    static _defineDocumentSchema() {
-      const schema = super._defineDocumentSchema();
-
-      // XP cost.
-      schema.xpCost = createIntegerField(defaultXpCostAbility());
-
-      // Rarity.
-      schema.rarity = createStringField('common');
-
-      // Action.
-      schema.action = createBooleanField();
-
-      // Reaction.
-      schema.reaction = createBooleanField();
-
-      // Passive.
-      schema.passive = createBooleanField();
-
-      return schema;
+      return {
+         ...super._defineDocumentSchema(),
+         ...buildSchemaFromShape(createAbilitySystemTemplate()),
+      };
    }
 
    _getDefaultImage() {

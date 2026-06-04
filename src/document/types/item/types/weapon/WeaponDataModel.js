@@ -1,10 +1,7 @@
 import RulesElementItemDataModel from '~/document/types/item/RulesElementItemDataModel.js';
-import createStringField from '~/helpers/utility-functions/CreateStringField.js';
-import createIntegerField from '~/helpers/utility-functions/CreateIntegerField.js';
-import createArrayField from '~/helpers/utility-functions/CreateArrayField.js';
-import createObjectField from '~/helpers/utility-functions/CreateObjectField.js';
+import buildSchemaFromShape from '~/helpers/utility-functions/BuildSchemaFromShape.js';
+import createWeaponSystemTemplate from '~/document/types/item/types/weapon/WeaponSystemTemplate.js';
 import createWeaponAttackTemplate from '~/document/types/item/types/weapon/WeaponAttack.js';
-import createBooleanField from '~/helpers/utility-functions/CreateBooleanField.js';
 import { WEAPON_IMAGE } from '~/system/DefaultImages.js';
 import EditAttackTraitsDialog from '~/document/types/item/types/weapon/dialog/EditAttackTraitsDialog.js';
 import AddCustomAttackTraitDialog from '~/document/types/item/types/weapon/dialog/AddCustomAttackTraitDialog.js';
@@ -18,35 +15,17 @@ import assert from '~/helpers/utility-functions/Assert.js';
  */
 export default class WeaponDataModel extends RulesElementItemDataModel {
    /**
-    * Defines the data schema for Weapon documents.
+    * Defines the data schema for Weapon documents, built from the shared Weapon system shape template
+    * (which spreads the base item and rules-element fragments before the weapon-specific fields), so the
+    * item schema and its chat-card schema stay a single source of truth.
     * @override
     * @returns {object} Map of schema field instances keyed by field name, defining the persisted data shape.
     */
    static _defineDocumentSchema() {
-      const schema = super._defineDocumentSchema();
-
-      // Rarity.
-      schema.rarity = createStringField('common');
-
-      // Value.
-      schema.value = createIntegerField();
-
-      // Equipped.
-      schema.equipped = createBooleanField();
-
-      // Attacks.
-      schema.attack = createArrayField(
-         createObjectField(() => createWeaponAttackTemplate()),
-         [createWeaponAttackTemplate()],
-      );
-
-      // Attack Notes.
-      schema.attackNotes = createStringField();
-
-      // Weapon Traits.
-      schema.trait = createArrayField(createObjectField());
-
-      return schema;
+      return {
+         ...super._defineDocumentSchema(),
+         ...buildSchemaFromShape(createWeaponSystemTemplate()),
+      };
    }
 
    /**

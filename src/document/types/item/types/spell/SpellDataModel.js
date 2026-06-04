@@ -1,11 +1,6 @@
 import TitanItemDataModel from '~/document/types/item/TitanItemDataModel.js';
-import defaultXpCostSpell from '~/helpers/Settings/DefaultXpCostSpell.js';
-import createSchemaField from '~/helpers/utility-functions/CreateSchemaField.js';
-import createIntegerField from '~/helpers/utility-functions/CreateIntegerField.js';
-import createStringField from '~/helpers/utility-functions/CreateStringField.js';
-import createBooleanField from '~/helpers/utility-functions/CreateBooleanField.js';
-import createArrayField from '~/helpers/utility-functions/CreateArrayField.js';
-import createObjectField from '~/helpers/utility-functions/CreateObjectField.js';
+import buildSchemaFromShape from '~/helpers/utility-functions/BuildSchemaFromShape.js';
+import createSpellSystemTemplate from '~/document/types/item/types/spell/SpellSystemTemplate.js';
 import createCustomAspectTemplate from '~/document/types/item/types/spell/SpellCustomAspect.js';
 import SpellAspects from '~/document/types/item/types/spell/SpellAspects.js';
 import { SPELL_IMAGE } from '~/system/DefaultImages.js';
@@ -18,39 +13,18 @@ import assert from '~/helpers/utility-functions/Assert.js';
  * @extends {TitanItemDataModel}
  */
 export default class SpellDataModel extends TitanItemDataModel {
+   /**
+    * Defines the data schema for Spell documents, built from the shared Spell system shape template
+    * (which spreads the base item fragment before the spell-specific fields; spells carry no rules
+    * elements), so the item schema and its chat-card schema stay a single source of truth.
+    * @override
+    * @returns {object} Map of schema field instances keyed by field name, defining the persisted data shape.
+    */
    static _defineDocumentSchema() {
-      const schema = super._defineDocumentSchema();
-
-      // Rarity.
-      schema.rarity = createStringField('common');
-
-      // XP Cost.
-      schema.xpCost = createIntegerField(defaultXpCostSpell());
-
-      // Tradition.
-      schema.tradition = createStringField('');
-
-      // Casting Check.
-      schema.castingCheck = createSchemaField({
-         attribute: createStringField('mind'),
-         skill: createStringField('arcana'),
-         difficulty: createIntegerField(4),
-         complexity: createIntegerField(1),
-         autoCalculateDC: createBooleanField(true),
-      });
-
-      // Quantity.
-      schema.quantity = createIntegerField(1);
-
-      // Aspects.
-      schema.aspect = createArrayField(createObjectField());
-
-      // Custom Aspects.
-      schema.customAspect = createArrayField(
-         createObjectField(() => createCustomAspectTemplate()),
-      );
-
-      return schema;
+      return {
+         ...super._defineDocumentSchema(),
+         ...buildSchemaFromShape(createSpellSystemTemplate()),
+      };
    }
 
    prepareDerivedData() {

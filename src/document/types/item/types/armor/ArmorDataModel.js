@@ -1,9 +1,6 @@
 import RulesElementItemDataModel from '~/document/types/item/RulesElementItemDataModel.js';
-import createArrayField from '~/helpers/utility-functions/CreateArrayField.js';
-import createObjectField from '~/helpers/utility-functions/CreateObjectField.js';
-import createStringField from '~/helpers/utility-functions/CreateStringField.js';
-import createIntegerField from '~/helpers/utility-functions/CreateIntegerField.js';
-import createSchemaField from '~/helpers/utility-functions/CreateSchemaField.js';
+import buildSchemaFromShape from '~/helpers/utility-functions/BuildSchemaFromShape.js';
+import createArmorSystemTemplate from '~/document/types/item/types/armor/ArmorSystemTemplate.js';
 import { ARMOR_IMAGE } from '~/system/DefaultImages.js';
 import EditArmorTraitsDialog from '~/document/types/item/types/armor/dialog/EditArmorTraitsDialog.js';
 import localize from '~/helpers/utility-functions/Localize.js';
@@ -14,25 +11,18 @@ import assert from '~/helpers/utility-functions/Assert.js';
  * @extends {RulesElementItemDataModel}
  */
 export default class ArmorDataModel extends RulesElementItemDataModel {
+   /**
+    * Defines the data schema for Armor documents, built from the shared Armor system shape template
+    * (which spreads the base item and rules-element fragments before the armor-specific fields), so the
+    * item schema and its chat-card schema stay a single source of truth.
+    * @override
+    * @returns {object} Map of schema field instances keyed by field name, defining the persisted data shape.
+    */
    static _defineDocumentSchema() {
-      const schema = super._defineDocumentSchema();
-
-      // Rarity.
-      schema.rarity = createStringField('common');
-
-      // Value.
-      schema.value = createIntegerField();
-
-      // Armor.
-      schema.armor = createSchemaField({
-         max: createIntegerField(1),
-         value: createIntegerField(1),
-      });
-
-      // Armor traits.
-      schema.trait = createArrayField(createObjectField({}));
-
-      return schema;
+      return {
+         ...super._defineDocumentSchema(),
+         ...buildSchemaFromShape(createArmorSystemTemplate()),
+      };
    }
 
    getRollData() {

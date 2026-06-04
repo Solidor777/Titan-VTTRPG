@@ -1,7 +1,6 @@
 import RulesElementItemDataModel from '~/document/types/item/RulesElementItemDataModel.js';
-import createStringField from '~/helpers/utility-functions/CreateStringField.js';
-import createIntegerField from '~/helpers/utility-functions/CreateIntegerField.js';
-import createBooleanField from '~/helpers/utility-functions/CreateBooleanField.js';
+import buildSchemaFromShape from '~/helpers/utility-functions/BuildSchemaFromShape.js';
+import createEquipmentSystemTemplate from '~/document/types/item/types/equipment/EquipmentSystemTemplate.js';
 import { EQUIPMENT_IMAGE } from '~/system/DefaultImages.js';
 import localize from '~/helpers/utility-functions/Localize.js';
 
@@ -10,19 +9,18 @@ import localize from '~/helpers/utility-functions/Localize.js';
  * @extends {RulesElementItemDataModel}
  */
 export default class EquipmentDataModel extends RulesElementItemDataModel {
+   /**
+    * Defines the data schema for Equipment documents, built from the shared Equipment system shape
+    * template (which spreads the base item and rules-element fragments before the equipment-specific
+    * fields), so the item schema and its chat-card schema stay a single source of truth.
+    * @override
+    * @returns {object} Map of schema field instances keyed by field name, defining the persisted data shape.
+    */
    static _defineDocumentSchema() {
-      const schema = super._defineDocumentSchema();
-
-      // Rarity.
-      schema.rarity = createStringField('common');
-
-      // Value.
-      schema.value = createIntegerField();
-
-      // Equipped.
-      schema.equipped = createBooleanField();
-
-      return schema;
+      return {
+         ...super._defineDocumentSchema(),
+         ...buildSchemaFromShape(createEquipmentSystemTemplate()),
+      };
    }
 
    _getDefaultImage() {

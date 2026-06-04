@@ -1,9 +1,6 @@
 import TitanDataModel from '~/document/data-model/TitanDataModel.js';
-import createStringField from '~/helpers/utility-functions/CreateStringField.js';
-import createArrayField from '~/helpers/utility-functions/CreateArrayField.js';
-import createObjectField from '~/helpers/utility-functions/CreateObjectField.js';
-import createItemCheckTemplate from '~/check/types/item-check/ItemCheckTemplate.js';
-import createCustomItemTraitTemplate from '~/document/types/item/CustomItemTrait.js';
+import buildSchemaFromShape from '~/helpers/utility-functions/BuildSchemaFromShape.js';
+import createItemSystemTemplate from '~/document/types/item/ItemSystemTemplate.js';
 import localize from '~/helpers/utility-functions/Localize.js';
 import { ITEM_IMAGE } from '~/system/DefaultImages.js';
 
@@ -14,28 +11,18 @@ import { ITEM_IMAGE } from '~/system/DefaultImages.js';
  */
 export default class TitanItemDataModel extends TitanDataModel {
    /**
-    * Defines the schema for Item documents, adding description, checks, and custom traits.
+    * Defines the schema for Item documents, built from the shared item-system shape template. The base
+    * `TitanDataModel` supplies `documentVersion`; the template supplies the shared description, checks,
+    * and custom-trait fields, keeping the item schema and its chat-card schema a single source of truth.
     * @override
     * @returns {object} Map of schema field instances keyed by field name, defining the persisted data shape.
     * @protected
     */
    static _defineDocumentSchema() {
-      const schema = super._defineDocumentSchema();
-
-      // Description.
-      schema.description = createStringField();
-
-      // Checks.
-      schema.check = createArrayField(
-         createObjectField(() => createItemCheckTemplate()),
-      );
-
-      // Custom Traits.
-      schema.customTrait = createArrayField(
-         createObjectField(() => createCustomItemTraitTemplate()),
-      );
-
-      return schema;
+      return {
+         ...super._defineDocumentSchema(),
+         ...buildSchemaFromShape(createItemSystemTemplate()),
+      };
    }
 
    /**

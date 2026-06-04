@@ -1,5 +1,5 @@
-import createArrayField from '~/helpers/utility-functions/CreateArrayField.js';
-import createObjectField from '~/helpers/utility-functions/CreateObjectField.js';
+import buildSchemaFromShape from '~/helpers/utility-functions/BuildSchemaFromShape.js';
+import createRulesElementTemplate from '~/document/types/item/rules-element/RulesElementTemplate.js';
 import createFlatModifierElement from '~/document/types/item/rules-element/FlatModifier.js';
 import assert from '~/helpers/utility-functions/Assert.js';
 
@@ -11,16 +11,17 @@ import assert from '~/helpers/utility-functions/Assert.js';
 export default function RulesElementMixin(BaseClass) {
    return class RulesElementDataModel extends BaseClass {
       /**
-       * Adds the Rules Elements array to the document schema.
+       * Adds the Rules Elements array to the document schema, built from the shared rules-element shape
+       * template so the field mirrors the canonical rules-element shape used across the system.
        * @override
        * @returns {object} Map of schema field instances keyed by field name, defining the persisted data shape.
        * @protected
        */
       static _defineDocumentSchema() {
-         const schema = super._defineDocumentSchema();
-         schema.rulesElement = createArrayField(createObjectField());
-
-         return schema;
+         return {
+            ...super._defineDocumentSchema(),
+            ...buildSchemaFromShape(createRulesElementTemplate()),
+         };
       }
 
       /**

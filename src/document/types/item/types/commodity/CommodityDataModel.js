@@ -1,6 +1,6 @@
 import TitanItemDataModel from '~/document/types/item/TitanItemDataModel.js';
-import createStringField from '~/helpers/utility-functions/CreateStringField.js';
-import createIntegerField from '~/helpers/utility-functions/CreateIntegerField.js';
+import buildSchemaFromShape from '~/helpers/utility-functions/BuildSchemaFromShape.js';
+import createCommoditySystemTemplate from '~/document/types/item/types/commodity/CommoditySystemTemplate.js';
 import { COMMODITY_IMAGE } from '~/system/DefaultImages.js';
 import localize from '~/helpers/utility-functions/Localize.js';
 
@@ -13,19 +13,18 @@ export default class CommodityDataModel extends TitanItemDataModel {
       return localize('newCommodity');
    }
 
+   /**
+    * Defines the data schema for Commodity documents, built from the shared Commodity system shape
+    * template (which spreads the base item fragment before the commodity-specific fields; commodities
+    * carry no rules elements), so the item schema and its chat-card schema stay a single source of truth.
+    * @override
+    * @returns {object} Map of schema field instances keyed by field name, defining the persisted data shape.
+    */
    static _defineDocumentSchema() {
-      const schema = super._defineDocumentSchema();
-
-      // Rarity.
-      schema.rarity = createStringField('common');
-
-      // Value.
-      schema.value = createIntegerField();
-
-      // Quantity.
-      schema.quantity = createIntegerField(1);
-
-      return schema;
+      return {
+         ...super._defineDocumentSchema(),
+         ...buildSchemaFromShape(createCommoditySystemTemplate()),
+      };
    }
 
    _getDefaultImage() {
