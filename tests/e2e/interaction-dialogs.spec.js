@@ -1,5 +1,6 @@
 import { expect, test } from '@playwright/test';
 import { login } from './fixtures.js';
+import { attachPageErrors, clearChat, closeAllApps } from './world.js';
 
 /**
  * Interaction-path walk: dialog-render smoke. For each dialog reachable in normal play this suite
@@ -22,44 +23,56 @@ import { login } from './fixtures.js';
 const DIALOG_SELECTOR = '.application.titan-dialog';
 
 /**
- * Drive a roll/dialog interaction inside the world and report any uncaught page errors.
- * @param {import('@playwright/test').Page} page - The Playwright page.
+ * Drive a roll/dialog interaction inside the world and report the uncaught page errors fired during it.
+ * Reads from the shared `errors` collector (wired once in `beforeAll`): snapshots its length before the
+ * trigger and returns only the errors appended while the trigger ran, so each call still reports just
+ * its own window without stacking a fresh `pageerror` listener on the reused page.
+ * @param {import('@playwright/test').Page} page - The shared Playwright page.
  * @param {string} evalSrc - Stringified async function body executed in the Foundry runtime.
- * @returns {Promise<string[]>} The list of uncaught page-error messages observed.
+ * @returns {Promise<string[]>} The list of uncaught page-error messages observed during the trigger.
  */
 async function triggerInWorld(page, evalSrc) {
-   // Collected uncaught page errors fired during the trigger window.
-   const errors = [];
-   page.on('pageerror', (err) => {
-      errors.push(err.message);
-   });
+   // The shared collector's length before the trigger, so we can slice out only this call's errors.
+   const before = errors.length;
 
    // Execute the trigger source inside the world; Node-side assertions handle the settle.
    await page.evaluate(async (src) => {
       await new Function(`return (async () => { ${src} })();`)();
    }, evalSrc);
 
-   return errors;
+   return errors.slice(before);
 }
 
+/** @type {import('@playwright/test').Page} The file-shared, logged-in page (one world boot per file). */
+let page;
+/** @type {string[]} Uncaught page errors collected during the current test (cleared each afterEach). */
+let errors;
+
+test.beforeAll(async ({ browser }) => {
+   page = await browser.newPage();
+   errors = attachPageErrors(page);
+   await login(page);
+   await clearChat(page);
+});
+
+test.afterEach(async () => {
+   await closeAllApps(page);
+   errors.length = 0;
+});
+
+test.afterAll(async () => {
+   await page?.close();
+});
+
 test.describe('v14 interaction dialogs', () => {
-   // Log in and build a fresh fixture actor with the owned items / traits each dialog needs.
-   test.beforeEach(async ({ page }) => {
-      // Capture uncaught page errors from the very start so a fatal system-load break is reported
-      // verbatim rather than surfacing as a downstream "not a function".
-      const bootErrors = [];
-      page.on('pageerror', (err) => {
-         bootErrors.push(err.message);
-      });
-
-      await login(page);
-
+   // Build a fresh fixture actor with the owned items / traits each dialog needs.
+   test.beforeEach(async () => {
       // Precondition: the TITAN system must have initialized for any dialog to be constructible.
       const systemReady = await page.evaluate(() => typeof game.titan !== 'undefined'
          && !!CONFIG.Actor?.dataModels?.player);
       expect(
          systemReady,
-         `TITAN system failed to initialize before dialog walk. Captured page errors:\n${bootErrors.join('\n')}`,
+         `TITAN system failed to initialize before dialog walk. Captured page errors:\n${errors.join('\n')}`,
       ).toBe(true);
 
       // Build (or rebuild) the E2E Dialog Actor and its fixtures inside the Foundry runtime.
@@ -107,7 +120,7 @@ test.describe('v14 interaction dialogs', () => {
    });
 
    // Close any open TitanDialog windows after each test so they do not leak across tests.
-   test.afterEach(async ({ page }) => {
+   test.afterEach(async () => {
       await page.evaluate(async () => {
          for (const app of Object.values(ui.windows ?? {})) {
             if (app?.element?.classList?.contains('titan-dialog')) {
@@ -128,7 +141,7 @@ test.describe('v14 interaction dialogs', () => {
    });
 
    // Check-options dialog (forced via the getCheckOptions setting + requestAttributeCheck).
-   test('check-options dialog mounts', async ({ page }) => {
+   test('check-options dialog mounts', async () => {
       const errors = await triggerInWorld(page, `
          const actor = game.actors.getName('E2E Dialog Actor');
          await game.settings.set('titan', 'getCheckOptions', true);
@@ -140,7 +153,7 @@ test.describe('v14 interaction dialogs', () => {
    });
 
    // Confirm-delete-item dialog (forced via the confirmDeletingItems setting + requestItemDeletion).
-   test('confirm-delete-item dialog mounts', async ({ page }) => {
+   test('confirm-delete-item dialog mounts', async () => {
       const errors = await triggerInWorld(page, `
          const actor = game.actors.getName('E2E Dialog Actor');
          const item = actor.items.getName('E2E Dialog Item');
@@ -153,7 +166,7 @@ test.describe('v14 interaction dialogs', () => {
    });
 
    // Confirm-delete-effect dialog (forced via the confirmDeletingEffects setting + requestEffectDeletion).
-   test('confirm-delete-effect dialog mounts', async ({ page }) => {
+   test('confirm-delete-effect dialog mounts', async () => {
       const errors = await triggerInWorld(page, `
          const actor = game.actors.getName('E2E Dialog Actor');
          const effect = actor.effects.getName('E2E Dialog Effect');
@@ -171,7 +184,7 @@ test.describe('v14 interaction dialogs', () => {
    });
 
    // Immediate effect deletion when confirmation is disabled (requestEffectDeletion -> safeDeleteEffect).
-   test('requestEffectDeletion deletes immediately when confirmation is disabled', async ({ page }) => {
+   test('requestEffectDeletion deletes immediately when confirmation is disabled', async () => {
       const errors = await triggerInWorld(page, `
          const actor = game.actors.getName('E2E Dialog Actor');
          const effect = actor.effects.getName('E2E Dialog Effect');
@@ -188,7 +201,7 @@ test.describe('v14 interaction dialogs', () => {
    });
 
    // Add custom-trait dialog (TitanItem#addCustomTrait).
-   test('add custom-trait dialog mounts', async ({ page }) => {
+   test('add custom-trait dialog mounts', async () => {
       const errors = await triggerInWorld(page, `
          const actor = game.actors.getName('E2E Dialog Actor');
          const item = actor.items.getName('E2E Dialog Item');
@@ -200,7 +213,7 @@ test.describe('v14 interaction dialogs', () => {
    });
 
    // Edit custom-trait dialog (TitanItem#editCustomTrait against the seeded trait at index 0).
-   test('edit custom-trait dialog mounts', async ({ page }) => {
+   test('edit custom-trait dialog mounts', async () => {
       const errors = await triggerInWorld(page, `
          const actor = game.actors.getName('E2E Dialog Actor');
          const item = actor.items.getName('E2E Dialog Item');
@@ -212,13 +225,7 @@ test.describe('v14 interaction dialogs', () => {
    });
 
    // Edit-UUID dialog (reached through the Actors-directory "Edit UUID" context-menu action).
-   test('edit-UUID dialog mounts', async ({ page }) => {
-      // Collected uncaught page errors fired during the context-menu interaction.
-      const errors = [];
-      page.on('pageerror', (err) => {
-         errors.push(err.message);
-      });
-
+   test('edit-UUID dialog mounts', async () => {
       // Open the Actors sidebar tab so the directory entry is in the DOM.
       await page.click('#sidebar-tabs [data-tab="actors"], #sidebar a[data-tab="actors"], nav#sidebar-tabs a[data-tab="actors"]');
 

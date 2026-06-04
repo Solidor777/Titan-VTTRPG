@@ -1,5 +1,6 @@
 import { expect, test } from '@playwright/test';
 import { login } from './fixtures.js';
+import { attachPageErrors, clearChat, closeAllApps } from './world.js';
 
 /**
  * Interaction-path walk: check-roll -> chat. For each TITAN check type this suite drives the
@@ -54,21 +55,33 @@ const CHECK_CASES = [
    },
 ];
 
+/** @type {import('@playwright/test').Page} The file-shared, logged-in page (one world boot per file). */
+let page;
+/** @type {string[]} Uncaught page errors collected during the current test (cleared each afterEach). */
+let errors;
+
+test.beforeAll(async ({ browser }) => {
+   page = await browser.newPage();
+   errors = attachPageErrors(page);
+   await login(page);
+   await clearChat(page);
+});
+
+test.afterEach(async () => {
+   await closeAllApps(page);
+   errors.length = 0;
+});
+
+test.afterAll(async () => {
+   await page?.close();
+});
+
 test.describe('v14 interaction rolls', () => {
    // The stringified locator that resolves the purpose-built roller actor inside the world.
    const ACTOR_LOCATE = '() => game.actors.getName("E2E Roller")';
 
-   // Log in and build the roller actor with all owned items needed to roll every check type.
-   test.beforeEach(async ({ page }) => {
-      // Capture uncaught page errors from the very start so a fatal system-load break (which would
-      // otherwise surface only as a confusing "not a function") is reported verbatim.
-      const bootErrors = [];
-      page.on('pageerror', (err) => {
-         bootErrors.push(err.message);
-      });
-
-      await login(page);
-
+   // Build the roller actor with all owned items needed to roll every check type.
+   test.beforeEach(async () => {
       // Precondition: the TITAN system must have initialized. If `game.titan` is absent, the system
       // bundle threw during load (CONFIG.Actor.documentClass/dataModels never registered) and no
       // interaction path can be exercised. Surface the captured load error as the deliverable.
@@ -76,7 +89,7 @@ test.describe('v14 interaction rolls', () => {
          && !!CONFIG.Actor?.dataModels?.player);
       expect(
          systemReady,
-         `TITAN system failed to initialize before interaction walk. Captured page errors:\n${bootErrors.join('\n')}`,
+         `TITAN system failed to initialize before interaction walk. Captured page errors:\n${errors.join('\n')}`,
       ).toBe(true);
 
       // Build (or rebuild) the E2E Roller actor and its owned items inside the Foundry runtime.
@@ -136,13 +149,7 @@ test.describe('v14 interaction rolls', () => {
 
    // One test per check type: roll, then assert message creation, flag type, and card render.
    for (const checkCase of CHECK_CASES) {
-      test(`${checkCase.name} check rolls, posts, and renders its card`, async ({ page }) => {
-         // Collected uncaught page errors fired during the roll + render window.
-         const errors = [];
-         page.on('pageerror', (err) => {
-            errors.push(err.message);
-         });
-
+      test(`${checkCase.name} check rolls, posts, and renders its card`, async () => {
          // Roll the check inside the world and report the new message's id and flag type.
          const result = await page.evaluate(async ({ actorLocate, invokeSrc }) => {
             // Resolve the roller actor and gather the owned item ids for the roll options.

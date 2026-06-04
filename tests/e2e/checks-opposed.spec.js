@@ -1,5 +1,6 @@
 import { expect, test } from '@playwright/test';
 import { login } from './fixtures.js';
+import { attachPageErrors, clearChat, closeAllApps } from './world.js';
 import { forceDice, resetDice } from './dice.js';
 import {
    buildE2EAttackerRatingItemData,
@@ -88,12 +89,31 @@ async function rollAttackWithTargets(page, targetNames) {
    }, targetNames);
 }
 
+/** @type {import('@playwright/test').Page} The file-shared, logged-in page (one world boot per file). */
+let page;
+/** @type {string[]} Uncaught page errors collected during the current test (cleared each afterEach). */
+let errors;
+
+test.beforeAll(async ({ browser }) => {
+   page = await browser.newPage();
+   errors = attachPageErrors(page);
+   await login(page);
+   await clearChat(page);
+});
+
+test.afterEach(async () => {
+   await closeAllApps(page);
+   errors.length = 0;
+});
+
+test.afterAll(async () => {
+   await page?.close();
+});
+
 test.describe('v14 opposed checks (forced dice)', () => {
 
    // Rebuild the roller (with the attack-rating boost) and the three target actors before each test.
-   test.beforeEach(async ({ page }) => {
-      await login(page);
-
+   test.beforeEach(async () => {
       // Precondition: the TITAN system must have initialized.
       const systemReady = await page.evaluate(() => typeof game.titan !== 'undefined'
          && !!CONFIG.Actor?.dataModels?.player);
@@ -129,11 +149,11 @@ test.describe('v14 opposed checks (forced dice)', () => {
    });
 
    // Always restore the RNG, even if a test fails mid-roll.
-   test.afterEach(async ({ page }) => {
+   test.afterEach(async () => {
       await resetDice(page);
    });
 
-   test('targeted attack derives difficulty from the target Defense (interior)', async ({ page }) => {
+   test('targeted attack derives difficulty from the target Defense (interior)', async () => {
       const flags = await rollAttackWithTargets(page, [targetName(6)]);
 
       expect(flags.created, 'an attack message was created').toBe(true);
@@ -166,7 +186,7 @@ test.describe('v14 opposed checks (forced dice)', () => {
       expect(flags.results.extraSuccesses, 'extraSuccesses').toBe(expected.extraSuccesses);
    });
 
-   test('attack difficulty clamps to both bounds (2 and 6)', async ({ page }) => {
+   test('attack difficulty clamps to both bounds (2 and 6)', async () => {
       // High bound: a far-above-attacker Defense pins the difficulty to 6.
       const high = await rollAttackWithTargets(page, [targetName(8)]);
       const highDefense = high.targetDefenses[0];
@@ -182,7 +202,7 @@ test.describe('v14 opposed checks (forced dice)', () => {
       expect(low.parameters.difficulty, 'difficulty clamps to 2').toBe(2);
    });
 
-   test('with multiple targets the first target Defense is used', async ({ page }) => {
+   test('with multiple targets the first target Defense is used', async () => {
       const flags = await rollAttackWithTargets(page, [targetName(6), targetName(8)]);
       const [firstDefense, secondDefense] = flags.targetDefenses;
 
@@ -192,7 +212,7 @@ test.describe('v14 opposed checks (forced dice)', () => {
          .toBe(expectedDifficulty(firstDefense, flags.parameters.attackerRating));
    });
 
-   test('with no target the attack falls back to the attacker rating (difficulty 4)', async ({ page }) => {
+   test('with no target the attack falls back to the attacker rating (difficulty 4)', async () => {
       const flags = await rollAttackWithTargets(page, []);
 
       expect(flags.created, 'an attack message was created').toBe(true);
@@ -201,7 +221,7 @@ test.describe('v14 opposed checks (forced dice)', () => {
       expect(flags.parameters.difficulty, 'fallback difficulty is the unopposed 4').toBe(4);
    });
 
-   test('failed resistance reduces incoming damage by the successes rolled', async ({ page }) => {
+   test('failed resistance reduces incoming damage by the successes rolled', async () => {
       // One resilience die forced to a success (face 4 >= difficulty 4); complexity 2 leaves the check
       // one success short, so it fails and reduces the incoming damage by the successes rolled.
       await forceDice(page, [4]);
@@ -240,7 +260,7 @@ test.describe('v14 opposed checks (forced dice)', () => {
       expect(flags.results.damageTaken, 'damageTaken = 5 - successes').toBe(5 - flags.results.successes);
    });
 
-   test('successful resistance takes no damage', async ({ page }) => {
+   test('successful resistance takes no damage', async () => {
       // One resilience die forced to a success; complexity 1 means the single success succeeds, so no
       // damage is taken even though damage was incoming.
       await forceDice(page, [4]);

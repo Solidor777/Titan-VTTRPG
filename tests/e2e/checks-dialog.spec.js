@@ -1,5 +1,6 @@
 import { expect, test } from '@playwright/test';
 import { login } from './fixtures.js';
+import { attachPageErrors, clearChat, closeAllApps } from './world.js';
 import { forceDice, resetDice } from './dice.js';
 import { buildE2ERollerActorData, buildE2ERollerItemData } from '../shared/builders.js';
 import { expectedCheckResults } from '../shared/checkOracle.js';
@@ -32,11 +33,30 @@ const CORE_CASES = [
    { type: 'item', expectedType: 'itemCheck' },
 ];
 
-test.describe('v14 checks dialog (driven from Playwright)', () => {
-   // Log in and (re)build the E2E Roller fixture before each test.
-   test.beforeEach(async ({ page }) => {
-      await login(page);
+/** @type {import('@playwright/test').Page} The file-shared, logged-in page (one world boot per file). */
+let page;
+/** @type {string[]} Uncaught page errors collected during the current test (cleared each afterEach). */
+let errors;
 
+test.beforeAll(async ({ browser }) => {
+   page = await browser.newPage();
+   errors = attachPageErrors(page);
+   await login(page);
+   await clearChat(page);
+});
+
+test.afterEach(async () => {
+   await closeAllApps(page);
+   errors.length = 0;
+});
+
+test.afterAll(async () => {
+   await page?.close();
+});
+
+test.describe('v14 checks dialog (driven from Playwright)', () => {
+   // (Re)build the E2E Roller fixture before each test.
+   test.beforeEach(async () => {
       // Precondition: the TITAN system must have initialized.
       const systemReady = await page.evaluate(() => typeof game.titan !== 'undefined'
          && !!CONFIG.Actor?.dataModels?.player);
@@ -54,7 +74,7 @@ test.describe('v14 checks dialog (driven from Playwright)', () => {
    });
 
    // Restore the RNG, the dialog-gate setting, and close any leftover dialog windows after each test.
-   test.afterEach(async ({ page }) => {
+   test.afterEach(async () => {
       await resetDice(page);
       await page.evaluate(async () => {
          await game.settings.set('titan', 'getCheckOptions', false);
@@ -70,13 +90,7 @@ test.describe('v14 checks dialog (driven from Playwright)', () => {
    });
 
    for (const checkCase of CORE_CASES) {
-      test(`${checkCase.type} dialog recomputes totals and rolls with mutated options`, async ({ page }) => {
-         // Capture uncaught errors during the dialog + roll window.
-         const errors = [];
-         page.on('pageerror', (err) => {
-            errors.push(err.message);
-         });
-
+      test(`${checkCase.type} dialog recomputes totals and rolls with mutated options`, async () => {
          const dialog = await openCheckDialog(page, checkCase.type);
 
          // Baseline totals straight from the freshly opened dialog.
@@ -144,12 +158,7 @@ test.describe('v14 checks dialog (driven from Playwright)', () => {
    }
 
    // Attribute extra: the difficulty `<select>` changes the rolled difficulty without changing dice count.
-   test('attribute dialog difficulty select flows through without changing dice', async ({ page }) => {
-      const errors = [];
-      page.on('pageerror', (err) => {
-         errors.push(err.message);
-      });
-
+   test('attribute dialog difficulty select flows through without changing dice', async () => {
       const dialog = await openCheckDialog(page, 'attribute');
       const baseDice = await readSummary(dialog, 'totalDice');
 
@@ -168,12 +177,7 @@ test.describe('v14 checks dialog (driven from Playwright)', () => {
    });
 
    // Attack extra: targetDefense set in the dialog flows into the rolled parameters and drives difficulty.
-   test('attack dialog targetDefense flows into rolled parameters', async ({ page }) => {
-      const errors = [];
-      page.on('pageerror', (err) => {
-         errors.push(err.message);
-      });
-
+   test('attack dialog targetDefense flows into rolled parameters', async () => {
       const dialog = await openCheckDialog(page, 'attack');
 
       // A high targetDefense drives difficulty to its clamp ceiling (6); the raw value flows through.

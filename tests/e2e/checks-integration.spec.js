@@ -1,5 +1,6 @@
 import { expect, test } from '@playwright/test';
 import { login } from './fixtures.js';
+import { attachPageErrors, clearChat, closeAllApps } from './world.js';
 import { readNewestCheckFlags } from './checkDialog.js';
 import { forceDice, resetDice } from './dice.js';
 import { buildE2ERollerActorData, buildE2ERollerItemData } from '../shared/builders.js';
@@ -59,14 +60,33 @@ const CHECK_CASES = [
    },
 ];
 
+/** @type {import('@playwright/test').Page} The file-shared, logged-in page (one world boot per file). */
+let page;
+/** @type {string[]} Uncaught page errors collected during the current test (cleared each afterEach). */
+let errors;
+
+test.beforeAll(async ({ browser }) => {
+   page = await browser.newPage();
+   errors = attachPageErrors(page);
+   await login(page);
+   await clearChat(page);
+});
+
+test.afterEach(async () => {
+   await closeAllApps(page);
+   errors.length = 0;
+});
+
+test.afterAll(async () => {
+   await page?.close();
+});
+
 test.describe('v14 checks integration (forced dice)', () => {
    // Resolves the roller actor inside the world.
    const ACTOR_LOCATE = '() => game.actors.getName("E2E Roller")';
 
-   // Log in and (re)build the roller fixture from the shared builders before each test.
-   test.beforeEach(async ({ page }) => {
-      await login(page);
-
+   // (Re)build the roller fixture from the shared builders before each test.
+   test.beforeEach(async () => {
       // Precondition: the TITAN system must have initialized.
       const systemReady = await page.evaluate(() => typeof game.titan !== 'undefined'
          && !!CONFIG.Actor?.dataModels?.player);
@@ -84,18 +104,12 @@ test.describe('v14 checks integration (forced dice)', () => {
    });
 
    // Always restore the RNG, even if a test fails mid-roll.
-   test.afterEach(async ({ page }) => {
+   test.afterEach(async () => {
       await resetDice(page);
    });
 
    for (const checkCase of CHECK_CASES) {
-      test(`${checkCase.name} check assembles parameters and plumbs forced dice`, async ({ page }) => {
-         // Capture uncaught errors during the roll/render window.
-         const errors = [];
-         page.on('pageerror', (err) => {
-            errors.push(err.message);
-         });
-
+      test(`${checkCase.name} check assembles parameters and plumbs forced dice`, async () => {
          // Force the known dice sequence immediately before rolling.
          await forceDice(page, FORCED_FACES);
 
