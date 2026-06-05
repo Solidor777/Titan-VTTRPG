@@ -938,7 +938,9 @@
          "damageReport": "Damage Report",
          "healingReport": "Healing Report",
          "spendResolveReport": "Spend Resolve Report",
-         "longRestReport": "Long Rest Report"
+         "longRestReport": "Long Rest Report",
+         "rendReport": "Rend Report",
+         "repairsReport": "Repairs Report"
       },
       "SidebarTab": {
          "titanEffects": "TITAN Effects"

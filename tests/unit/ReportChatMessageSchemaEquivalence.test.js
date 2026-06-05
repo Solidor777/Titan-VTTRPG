@@ -109,7 +109,19 @@ const EXPECTED = {
       wounds: { type: 'ObjectField', nullable: true },
    },
 
-   // Populated by Tasks 2b-2e.
+   // Task 2b: armor report leaves (rend, repairs). The armor resource snapshot is conditionally
+   // present, so the shape factory declares it null -> nullable ObjectField, preserving the cards'
+   // if (armor) guards.
+   rendReport: {
+      armorImg: { type: 'StringField' }, armorName: { type: 'StringField' },
+      armorLost: { type: 'NumberField' }, armor: { type: 'ObjectField', nullable: true },
+   },
+   repairsReport: {
+      armorImg: { type: 'StringField' }, armorName: { type: 'StringField' },
+      armorRepaired: { type: 'NumberField' }, armor: { type: 'ObjectField', nullable: true },
+   },
+
+   // Populated by Tasks 2c-2e.
 };
 
 beforeAll(async () => {
@@ -154,6 +166,14 @@ beforeAll(async () => {
    ).default;
    models.longRestReport = (
       await import('~/document/types/chat-message/report/types/long-rest/LongRestReportChatMessageDataModel.js')
+   ).default;
+
+   // Task 2b: the armor report leaves (rend, repairs).
+   models.rendReport = (
+      await import('~/document/types/chat-message/report/types/rend/RendReportChatMessageDataModel.js')
+   ).default;
+   models.repairsReport = (
+      await import('~/document/types/chat-message/report/types/repairs/RepairsReportChatMessageDataModel.js')
    ).default;
 });
 

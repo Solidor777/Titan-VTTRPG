@@ -54,7 +54,9 @@
          "damageReport": {},
          "healingReport": {},
          "spendResolveReport": {},
-         "longRestReport": {}
+         "longRestReport": {},
+         "rendReport": {},
+         "repairsReport": {}
       },
       "Item": {
          "ability": {},

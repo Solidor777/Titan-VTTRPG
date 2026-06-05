@@ -46,6 +46,8 @@ import DamageReportChatMessageDataModel from '~/document/types/chat-message/repo
 import HealingReportChatMessageDataModel from '~/document/types/chat-message/report/types/healing/HealingReportChatMessageDataModel.js';
 import SpendResolveReportChatMessageDataModel from '~/document/types/chat-message/report/types/spend-resolve/SpendResolveReportChatMessageDataModel.js';
 import LongRestReportChatMessageDataModel from '~/document/types/chat-message/report/types/long-rest/LongRestReportChatMessageDataModel.js';
+import RendReportChatMessageDataModel from '~/document/types/chat-message/report/types/rend/RendReportChatMessageDataModel.js';
+import RepairsReportChatMessageDataModel from '~/document/types/chat-message/report/types/repairs/RepairsReportChatMessageDataModel.js';
 import TitanActiveEffect from '~/document/types/active-effect/TitanActiveEffect.js';
 import TitanActiveEffectDataModel from '~/document/types/active-effect/TitanActiveEffectDataModel.js';
 import ConditionDataModel from '~/document/types/active-effect/ConditionDataModel.js';
@@ -123,6 +125,8 @@ export default function onceInit() {
       healingReport: HealingReportChatMessageDataModel,
       spendResolveReport: SpendResolveReportChatMessageDataModel,
       longRestReport: LongRestReportChatMessageDataModel,
+      rendReport: RendReportChatMessageDataModel,
+      repairsReport: RepairsReportChatMessageDataModel,
    };
 
    CONFIG.time.roundTime = 6;
