@@ -374,6 +374,24 @@ unit 115, full e2e **365** (incl. new `tests/e2e/item-cards.spec.js` ×7), build
 **Phase 3 (reports ×13) and Phase 4 (effect + delete the legacy hook/`ChatMessageShell.svelte`) remain to
 be specced.**
 
+### 13. E2E: `effectsExpiredReport` render not covered
+
+- **What:** `tests/e2e/report-cards.spec.js` (Phase 3, Task 5) covers 12 of the 13 report subtypes via
+  direct `CharacterDataModel` triggers, but NOT `effectsExpiredReport`. That report is produced only by
+  the deep `onInitiativeAdvanced` initiative-effect-expiry path (`CharacterDataModel.js` ~5015), which
+  requires seeding an `initiative`-duration effect with `remaining: 1`, advancing combat initiative past
+  its threshold, with `autoDecreaseEffectDuration` enabled and `reportEffects`/`autoRemoveExpiredEffects`
+  configured. Driving that reliably needs intricate multi-combatant initiative setup; a thin trigger
+  would be flaky.
+- **To do:** Add a reliable e2e case (likely via `seedCombatEncounter` + an initiative-duration effect +
+  `combat.nextTurn()` until the effect expires) asserting `type === 'effectsExpiredReport'` and a
+  non-empty card, OR a unit-level render smoke of the leaf component. The leaf schema is already covered
+  by the golden master (`tests/unit/ReportChatMessageSchemaEquivalence.test.js`).
+- **Why deferred:** Per the project no-flaky-tests rule — the other 12 reports (incl. the two revert
+  regressions and the fast-healing apply-confirm flow) are covered reliably; this one needs a bespoke
+  combat-initiative harness rather than a one-line trigger.
+- **Found by:** Phase 3 reports, Task 5 (e2e coverage).
+
 ### 10. Chat-message Svelte mount is keyed per-document, not per-element
 
 - **What:** `TitanChatMessage` stores a single `_svelteComponent = { handle, bridge }`
