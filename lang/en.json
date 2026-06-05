@@ -942,7 +942,9 @@
          "rendReport": "Rend Report",
          "repairsReport": "Repairs Report",
          "removeCombatEffectsReport": "Remove Combat Effects Report",
-         "shortRestReport": "Short Rest Report"
+         "shortRestReport": "Short Rest Report",
+         "turnStartReport": "Turn Start Report",
+         "turnEndReport": "Turn End Report"
       },
       "SidebarTab": {
          "titanEffects": "TITAN Effects"

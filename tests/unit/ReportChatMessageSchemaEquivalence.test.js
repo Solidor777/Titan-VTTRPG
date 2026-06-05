@@ -127,7 +127,36 @@ const EXPECTED = {
    removeCombatEffectsReport: {},
    shortRestReport: {},
 
-   // Populated by Tasks 2d-2e.
+   // Task 2d: turn report leaves (turn-start, turn-end). Every conditionally-present compound is a
+   // nullable ObjectField (null in the shape), preserving the cards' if (obj) guards; fastHealing and
+   // persistentDamage stay opaque to keep their variable per-source keys. The message (both) and
+   // conditions (turn-start only) array fields are explicit ArrayFields, declared on the data model
+   // rather than in the shape, because Foundry's ObjectField rejects arrays. The message element is a
+   // StringField (the producer pushes HTML strings); the harness asserts the ArrayField type only (no
+   // nullability), so the element type is not re-asserted here.
+   turnStartReport: {
+      expiredEffectsRemoved: { type: 'BooleanField' },
+      effects: { type: 'ObjectField', nullable: true },
+      fastHealing: { type: 'ObjectField', nullable: true },
+      persistentDamage: { type: 'ObjectField', nullable: true },
+      resolveRegain: { type: 'ObjectField', nullable: true },
+      stamina: { type: 'ObjectField', nullable: true },
+      wounds: { type: 'ObjectField', nullable: true },
+      resolve: { type: 'ObjectField', nullable: true },
+      message: { type: 'ArrayField' },
+      conditions: { type: 'ArrayField' },
+   },
+   turnEndReport: {
+      expiredEffectsRemoved: { type: 'BooleanField' },
+      effects: { type: 'ObjectField', nullable: true },
+      fastHealing: { type: 'ObjectField', nullable: true },
+      persistentDamage: { type: 'ObjectField', nullable: true },
+      stamina: { type: 'ObjectField', nullable: true },
+      wounds: { type: 'ObjectField', nullable: true },
+      message: { type: 'ArrayField' },
+   },
+
+   // Populated by Task 2e.
 };
 
 beforeAll(async () => {
@@ -192,6 +221,14 @@ beforeAll(async () => {
       await import(
          '~/document/types/chat-message/report/types/short-rest-report/ShortRestReportChatMessageDataModel.js'
       )
+   ).default;
+
+   // Task 2d: the turn report leaves (turn-start, turn-end).
+   models.turnStartReport = (
+      await import('~/document/types/chat-message/report/types/turn-start/TurnStartReportChatMessageDataModel.js')
+   ).default;
+   models.turnEndReport = (
+      await import('~/document/types/chat-message/report/types/turn-end/TurnEndReportChatMessageDataModel.js')
    ).default;
 });
 

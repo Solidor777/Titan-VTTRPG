@@ -58,7 +58,9 @@
          "rendReport": {},
          "repairsReport": {},
          "removeCombatEffectsReport": {},
-         "shortRestReport": {}
+         "shortRestReport": {},
+         "turnStartReport": {},
+         "turnEndReport": {}
       },
       "Item": {
          "ability": {},

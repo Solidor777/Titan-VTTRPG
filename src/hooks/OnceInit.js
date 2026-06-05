@@ -50,6 +50,8 @@ import RendReportChatMessageDataModel from '~/document/types/chat-message/report
 import RepairsReportChatMessageDataModel from '~/document/types/chat-message/report/types/repairs/RepairsReportChatMessageDataModel.js';
 import RemoveCombatEffectsReportChatMessageDataModel from '~/document/types/chat-message/report/types/remove-combat-effects/RemoveCombatEffectsReportChatMessageDataModel.js';
 import ShortRestReportChatMessageDataModel from '~/document/types/chat-message/report/types/short-rest-report/ShortRestReportChatMessageDataModel.js';
+import TurnStartReportChatMessageDataModel from '~/document/types/chat-message/report/types/turn-start/TurnStartReportChatMessageDataModel.js';
+import TurnEndReportChatMessageDataModel from '~/document/types/chat-message/report/types/turn-end/TurnEndReportChatMessageDataModel.js';
 import TitanActiveEffect from '~/document/types/active-effect/TitanActiveEffect.js';
 import TitanActiveEffectDataModel from '~/document/types/active-effect/TitanActiveEffectDataModel.js';
 import ConditionDataModel from '~/document/types/active-effect/ConditionDataModel.js';
@@ -131,6 +133,8 @@ export default function onceInit() {
       repairsReport: RepairsReportChatMessageDataModel,
       removeCombatEffectsReport: RemoveCombatEffectsReportChatMessageDataModel,
       shortRestReport: ShortRestReportChatMessageDataModel,
+      turnStartReport: TurnStartReportChatMessageDataModel,
+      turnEndReport: TurnEndReportChatMessageDataModel,
    };
 
    CONFIG.time.roundTime = 6;
