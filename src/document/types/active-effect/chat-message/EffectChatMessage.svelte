@@ -8,8 +8,8 @@
    /** @type {object} Reference to the reactive Document store. */
    const document = getContext('document');
 
-   /** @type {object} The titan flags data for the item. */
-   const item = document.data.flags.titan;
+   /** @type {object} The chat-message system snapshot for the effect. */
+   const item = document.data.system;
 </script>
 
 <ItemChatMessageShell {item}>

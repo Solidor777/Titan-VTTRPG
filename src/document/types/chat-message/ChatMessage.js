@@ -7,7 +7,8 @@ import darkModeChatMessages from '~/helpers/Settings/DarkModeChatMessages.js';
 /**
  * Extends the base Chat Message class so TITAN chat message subtypes render their own Svelte
  * component. Subtyped messages reuse Foundry's standard card chrome (via super.renderHTML) and mount
- * a Svelte component into the card's content region; all other messages render unchanged.
+ * a Svelte component into the card's content region; all other messages render unchanged apart from
+ * the dark-mode-'all' styling class.
  * @extends {ChatMessage}
  */
 export default class TitanChatMessage extends ChatMessage {
@@ -25,8 +26,12 @@ export default class TitanChatMessage extends ChatMessage {
       // Build Foundry's standard card chrome (header, content region, controls).
       const html = await super.renderHTML(options);
 
-      // Non-TITAN messages render unchanged.
+      // Non-TITAN messages render unchanged, except dark mode applies to every message when the
+      // setting is 'all' (previously handled by the deleted legacy renderChatMessageHTML hook).
       if (!(this.system instanceof TitanChatMessageDataModel)) {
+         if (darkModeChatMessages() === 'all') {
+            html.classList.add('titan-dark-mode');
+         }
          return html;
       }
 
