@@ -51,6 +51,7 @@
          "shield": {},
          "equipment": {},
          "commodity": {},
+         "effect": {},
          "damageReport": {},
          "healingReport": {},
          "spendResolveReport": {},

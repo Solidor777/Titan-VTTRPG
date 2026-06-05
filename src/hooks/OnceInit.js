@@ -55,6 +55,7 @@ import TurnEndReportChatMessageDataModel from '~/document/types/chat-message/rep
 import TurnStartRevertReportChatMessageDataModel from '~/document/types/chat-message/report/types/turn-start-revert/TurnStartRevertReportChatMessageDataModel.js';
 import TurnEndRevertReportChatMessageDataModel from '~/document/types/chat-message/report/types/turn-end-revert/TurnEndRevertReportChatMessageDataModel.js';
 import EffectsExpiredReportChatMessageDataModel from '~/document/types/chat-message/report/types/effects-expired/EffectsExpiredReportChatMessageDataModel.js';
+import EffectChatMessageDataModel from '~/document/types/active-effect/chat-message/EffectChatMessageDataModel.js';
 import TitanActiveEffect from '~/document/types/active-effect/TitanActiveEffect.js';
 import TitanActiveEffectDataModel from '~/document/types/active-effect/TitanActiveEffectDataModel.js';
 import ConditionDataModel from '~/document/types/active-effect/ConditionDataModel.js';
@@ -128,6 +129,7 @@ export default function onceInit() {
       shield: ShieldChatMessageDataModel,
       equipment: EquipmentChatMessageDataModel,
       commodity: CommodityChatMessageDataModel,
+      effect: EffectChatMessageDataModel,
       damageReport: DamageReportChatMessageDataModel,
       healingReport: HealingReportChatMessageDataModel,
       spendResolveReport: SpendResolveReportChatMessageDataModel,

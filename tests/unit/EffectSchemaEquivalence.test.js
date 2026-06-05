@@ -238,12 +238,14 @@ beforeAll(async () => {
       },
    };
 
-   // Some transitive modules destructure foundry.applications.api.ApplicationV2 at import time.
-   globalThis.foundry.applications = { api: { ApplicationV2: class {} } };
-
    // Dynamically import the live Active Effect data model against the installed stand-ins.
    models.effect = (
       await import('~/document/types/active-effect/TitanActiveEffectDataModel.js')
+   ).default;
+
+   // Dynamically import the effect chat-message snapshot data model against the same stand-ins.
+   models.effectChat = (
+      await import('~/document/types/active-effect/chat-message/EffectChatMessageDataModel.js')
    ).default;
 });
 
@@ -251,7 +253,6 @@ afterAll(() => {
    // Remove the stand-ins so later suites keep the shared minimal mock.
    delete globalThis.foundry.abstract.TypeDataModel;
    delete globalThis.foundry.data;
-   delete globalThis.foundry.applications;
    delete globalThis.game;
 });
 
@@ -346,7 +347,8 @@ function dataField(initial) {
 /**
  * Builds the golden fingerprint of the custom Titan duration SchemaField — the shape shared by the
  * live Active Effect schema and the effect chat-message snapshot schema (both sourced from
- * createEffectSystemTemplate()). createSchemaField passes no options, so required defaults to false.
+ * createEffectSystemTemplate()). createSchemaField passes no options, so no `required` option is
+ * declared and the fingerprint records the harness default `false`.
  * @returns {object} The fingerprint of the duration SchemaField.
  */
 function durationField() {
@@ -398,11 +400,36 @@ const EFFECT_DATA_MODEL_GOLDEN = {
    rulesElement: emptyObjectArray(),
 };
 
+/**
+ * The committed golden fingerprint of the effect chat-message snapshot schema: the effect system
+ * shape (duration/check/customTrait), the rules-element fragment, and the snapshot-only string
+ * fields (description from the native ActiveEffect field; name and img as label metadata). Authored
+ * from the shape templates (NOT derived from the schema, to avoid circularity).
+ * @type {object}
+ */
+const EFFECT_CHAT_GOLDEN = {
+   check: emptyObjectArray(),
+   customTrait: emptyObjectArray(),
+   description: stringField(''),
+   documentVersion: numberField(0),
+   duration: durationField(),
+   img: stringField(''),
+   name: stringField(''),
+   rulesElement: emptyObjectArray(),
+};
+
 describe('effect schema characterization (golden master)', () => {
    it('the live TitanActiveEffectDataModel schema fingerprint matches the committed golden', () => {
       // Fingerprint the live schema and compare it, key-sorted, to the frozen golden.
       const actual = fingerprintSchema(models.effect._defineDocumentSchema());
 
       expect(actual).toEqual(sortFingerprint(EFFECT_DATA_MODEL_GOLDEN));
+   });
+
+   it('the EffectChatMessageDataModel snapshot schema fingerprint matches the committed golden', () => {
+      // Fingerprint the chat snapshot schema and compare it, key-sorted, to the frozen golden.
+      const actual = fingerprintSchema(models.effectChat._defineDocumentSchema());
+
+      expect(actual).toEqual(sortFingerprint(EFFECT_CHAT_GOLDEN));
    });
 });

@@ -935,6 +935,7 @@
          "shield": "Shield",
          "equipment": "Equipment",
          "commodity": "Commodity",
+         "effect": "Effect",
          "damageReport": "Damage Report",
          "healingReport": "Healing Report",
          "spendResolveReport": "Spend Resolve Report",
