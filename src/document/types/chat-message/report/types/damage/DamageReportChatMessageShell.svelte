@@ -24,48 +24,48 @@
    const tags = [];
 
    // If we took damage, conditionally add more information to the messages.
-   if (document.data.flags.titan.damageTaken) {
+   if (document.data.system.damageTaken) {
       // Damage Resisted.
-      if (document.data.flags.titan.damageResisted) {
-         sections.unshift(localize('resistedX%Damage').replace('X%', document.data.flags.titan.damageResisted));
+      if (document.data.system.damageResisted) {
+         sections.unshift(localize('resistedX%Damage').replace('X%', document.data.system.damageResisted));
       }
 
       // Armored ignored.
-      else if (document.data.flags.titan.ignoredArmor) {
+      else if (document.data.system.ignoredArmor) {
          sections.unshift(localize('armorIgnored'));
       }
 
       // Wounds suffered.
-      if (document.data.flags.titan.woundsSuffered) {
+      if (document.data.system.woundsSuffered) {
 
          // Stamina lost if wounds were suffered so that we can see the.
          // breakdown.
-         if (document.data.flags.titan.staminaLost) {
-            sections.push(localize('lostX%Stamina').replace('X%', document.data.flags.titan.staminaLost));
+         if (document.data.system.staminaLost) {
+            sections.push(localize('lostX%Stamina').replace('X%', document.data.system.staminaLost));
          }
 
-         sections.push(localize('sufferedX%Wounds').replace('X%', document.data.flags.titan.woundsSuffered));
+         sections.push(localize('sufferedX%Wounds').replace('X%', document.data.system.woundsSuffered));
       }
 
       // Stamina.
       sections.push(ChatMessageStamina);
 
       // Add wounds if appropriate.
-      if (document.data.flags.titan.wounds) {
+      if (document.data.system.wounds) {
          sections.push(ChatMessageWounds);
       }
    }
 
    // Add tags.
-   if (document.data.flags.titan.tags) {
+   if (document.data.system.tags) {
 
       // Penetrating.
-      if (document.data.flags.titan.tags.penetrating) {
+      if (document.data.system.tags.penetrating) {
          tags.push(DamageReportChatMessagePenetratingTag);
       }
 
       // Ineffective.
-      if (document.data.flags.titan.tags.ineffective) {
+      if (document.data.system.tags.ineffective) {
          tags.push(DamageReportChatMessageIneffectiveTag);
       }
    }

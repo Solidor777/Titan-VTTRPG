@@ -8,12 +8,12 @@
    const document = getContext('document');
 
    /** @type {string} Main label for the header. */
-   const headerLabel = localize('restoredX%Stamina').replace('X%', document.data.flags.titan.staminaRestored);
+   const headerLabel = localize('restoredX%Stamina').replace('X%', document.data.system.staminaRestored);
 </script>
 
 <ChatReportHeader
    headerIcon={HEALING_ICON}
    headerLabel={headerLabel}
-   images={[document.data.flags.titan.actorImg]}
-   subHeaderLabels={[document.data.flags.titan.actorName]}
+   images={[document.data.system.actorImg]}
+   subHeaderLabels={[document.data.system.actorName]}
 />

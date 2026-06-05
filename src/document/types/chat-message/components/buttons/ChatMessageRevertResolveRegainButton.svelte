@@ -24,17 +24,16 @@
 
             // Regain resolve to undo the spend.
             await actor.system.regainResolve(
-               document.data.flags.titan.resolveRegainRevert.total,
+               document.data.system.resolveRegainRevert.total,
                { report: false },
             );
 
-            // Update the chat message.
+            // Update the chat message. The partial resolveRegainRevert update deep-merges into the stored
+            // object, preserving its total and per-source keys.
             await document.data.update({
-               flags: {
-                  titan: {
-                     resolveRegainRevert: { confirmed: true },
-                     resolve: { value: actor.system.resource.resolve.value },
-                  },
+               system: {
+                  resolveRegainRevert: { confirmed: true },
+                  resolve: { value: actor.system.resource.resolve.value },
                },
             });
          }
@@ -44,6 +43,6 @@
 
 <ChatMessageResourceModButton
    icon={SPEND_RESOLVE_ICON}
-   label={localize('revertX%ResolveRegain').replace('X%', document.data.flags.titan.resolveRegainRevert.total)}
+   label={localize('revertX%ResolveRegain').replace('X%', document.data.system.resolveRegainRevert.total)}
    confirmFn={confirm}
 />

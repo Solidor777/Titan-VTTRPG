@@ -19,18 +19,18 @@
       let retVal = `<p>${localize('persistentDamage.desc')}</p>`;
 
       // Equipment.
-      if (document.data.flags.titan.persistentDamageRevert.equipment) {
-         retVal += `<p>${localize('equipment')}: ${document.data.flags.titan.persistentDamageRevert.equipment}</p>`;
+      if (document.data.system.persistentDamageRevert.equipment) {
+         retVal += `<p>${localize('equipment')}: ${document.data.system.persistentDamageRevert.equipment}</p>`;
       }
 
       // Abilities.
-      if (document.data.flags.titan.persistentDamageRevert.ability) {
-         retVal += `<p>${localize('abilities')}: ${document.data.flags.titan.persistentDamageRevert.ability}</p>`;
+      if (document.data.system.persistentDamageRevert.ability) {
+         retVal += `<p>${localize('abilities')}: ${document.data.system.persistentDamageRevert.ability}</p>`;
       }
 
       // Effects.
-      if (document.data.flags.titan.persistentDamageRevert.effect) {
-         retVal += `<p>${localize('effects')}: ${document.data.flags.titan.persistentDamageRevert.effect}</p>`;
+      if (document.data.system.persistentDamageRevert.effect) {
+         retVal += `<p>${localize('effects')}: ${document.data.system.persistentDamageRevert.effect}</p>`;
       }
 
       return retVal;
@@ -50,17 +50,16 @@
 
             // Apply healing to undo the damage.
             await actor.system.applyHealing(
-               document.data.flags.titan.persistentDamageRevert.total,
+               document.data.system.persistentDamageRevert.total,
                { report: false },
             );
 
-            // Update the chat message.
+            // Update the chat message. The partial persistentDamageRevert update deep-merges into the
+            // stored object, preserving its total and per-source keys.
             await document.data.update({
-               flags: {
-                  titan: {
-                     persistentDamageRevert: { confirmed: true },
-                     stamina: { value: actor.system.resource.stamina.value },
-                  },
+               system: {
+                  persistentDamageRevert: { confirmed: true },
+                  stamina: { value: actor.system.resource.stamina.value },
                },
             });
          }
@@ -70,7 +69,7 @@
 
 <ChatMessageResourceModButton
    icon={HEALING_ICON}
-   label={localize('revertX%PersistentDamage').replace('X%', document.data.flags.titan.persistentDamageRevert.total)}
+   label={localize('revertX%PersistentDamage').replace('X%', document.data.system.persistentDamageRevert.total)}
    tooltip={{ text: getTooltip(), localize: false }}
    confirmFn={confirm}
 />

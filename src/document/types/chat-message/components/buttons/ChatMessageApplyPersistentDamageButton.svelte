@@ -19,18 +19,18 @@
       let retVal = `<p>${localize('persistentDamage.desc')}</p>`;
 
       // Equipment.
-      if (document.data.flags.titan.persistentDamage.equipment) {
-         retVal += `<p>${localize('equipment')}: ${document.data.flags.titan.persistentDamage.equipment}</p>`;
+      if (document.data.system.persistentDamage.equipment) {
+         retVal += `<p>${localize('equipment')}: ${document.data.system.persistentDamage.equipment}</p>`;
       }
 
       // Abilities.
-      if (document.data.flags.titan.persistentDamage.ability) {
-         retVal += `<p>${localize('abilities')}: ${document.data.flags.titan.persistentDamage.ability}</p>`;
+      if (document.data.system.persistentDamage.ability) {
+         retVal += `<p>${localize('abilities')}: ${document.data.system.persistentDamage.ability}</p>`;
       }
 
       // Effects.
-      if (document.data.flags.titan.persistentDamage.effect) {
-         retVal += `<p>${localize('effects')}: ${document.data.flags.titan.persistentDamage.effect}</p>`;
+      if (document.data.system.persistentDamage.effect) {
+         retVal += `<p>${localize('effects')}: ${document.data.system.persistentDamage.effect}</p>`;
       }
 
       return retVal;
@@ -51,21 +51,20 @@
 
             // Apply persistent damage to the actor, bypassing armor.
             await actor.system.applyDamage(
-               document.data.flags.titan.persistentDamage.total,
+               document.data.system.persistentDamage.total,
                {
                   report: false,
                   ignoreArmor: true,
                },
             );
 
-            // Update the chat message.
+            // Update the chat message. The partial persistentDamage update deep-merges into the stored
+            // object, preserving its total and per-source keys.
             await document.data.update({
-               flags: {
-                  titan: {
-                     persistentDamage: { confirmed: true },
-                     stamina: { value: actor.system.resource.stamina.value },
-                     wounds: { value: actor.system.resource.wounds.value },
-                  },
+               system: {
+                  persistentDamage: { confirmed: true },
+                  stamina: { value: actor.system.resource.stamina.value },
+                  wounds: { value: actor.system.resource.wounds.value },
                },
             });
          }
@@ -75,7 +74,7 @@
 
 <ChatMessageResourceModButton
    icon={PERSISTENT_DAMAGE_ICON}
-   label={localize('applyX%Damage').replace('X%', document.data.flags.titan.persistentDamage.total)}
+   label={localize('applyX%Damage').replace('X%', document.data.system.persistentDamage.total)}
    tooltip={{ text: getTooltip(), localize: false }}
    confirmFn={confirm}
 />

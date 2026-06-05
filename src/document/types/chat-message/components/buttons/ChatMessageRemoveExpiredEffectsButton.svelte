@@ -25,13 +25,10 @@
             // Remove expired effects from the actor.
             await actor.system.removeExpiredEffects();
 
-            // Update this document.
-            document.data.flags.titan.expiredEffectsRemoved = true;
+            // Update this document to record that the expired effects were removed.
             await document.data.update({
-               flags: {
-                  titan: {
-                     expiredEffectsRemoved: true,
-                  },
+               system: {
+                  expiredEffectsRemoved: true,
                },
             });
          }

@@ -24,20 +24,20 @@
    const sections = [];
 
    // Add Stamina if appropriate.
-   if (document.data.flags.titan.stamina) {
+   if (document.data.system.stamina) {
       sections.push(ChatMessageStamina);
    }
 
    // Add Wounds if appropriate.
-   if (document.data.flags.titan.wounds) {
+   if (document.data.system.wounds) {
       sections.push(ChatMessageWounds);
    }
 
    // Add fast healing revert information if appropriate.
-   if (document.data.flags.titan.fastHealingRevert) {
+   if (document.data.system.fastHealingRevert) {
 
       // Add fast healing revert tag if confirmed.
-      if (document.data.flags.titan.fastHealingRevert.confirmed) {
+      if (document.data.system.fastHealingRevert.confirmed) {
          sections.push(ChatMessageFastHealingRevertTag);
       }
 
@@ -48,10 +48,10 @@
    }
 
    // Add persistent damage revert information if appropriate.
-   if (document.data.flags.titan.persistentDamageRevert) {
+   if (document.data.system.persistentDamageRevert) {
 
       // Add persistent damage revert tag if confirmed.
-      if (document.data.flags.titan.persistentDamageRevert.confirmed) {
+      if (document.data.system.persistentDamageRevert.confirmed) {
          sections.push(ChatMessagePersistentDamageRevertTag);
       }
 

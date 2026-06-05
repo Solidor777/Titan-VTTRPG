@@ -11,6 +11,6 @@
 <ReportChatMessageHeader
    headerIcon={TURN_START_ICON}
    headerLabel={localize('turnStart')}
-   images={[document.data.flags.titan.actorImg]}
-   subHeaderLabels={[document.data.flags.titan.actorName]}
+   images={[document.data.system.actorImg]}
+   subHeaderLabels={[document.data.system.actorName]}
 />

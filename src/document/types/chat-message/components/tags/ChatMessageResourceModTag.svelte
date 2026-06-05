@@ -25,18 +25,18 @@
       let retVal = `<p>${localize(`${key}.desc`)}</p>`;
 
       // Equipment.
-      if (document.data.flags.titan[key].equipment) {
-         retVal += `<p>${localize('equipment')}: ${document.data.flags.titan[key].equipment}</p>`;
+      if (document.data.system[key].equipment) {
+         retVal += `<p>${localize('equipment')}: ${document.data.system[key].equipment}</p>`;
       }
 
       // Abilities.
-      if (document.data.flags.titan[key].ability) {
-         retVal += `<p>${localize('abilities')}: ${document.data.flags.titan[key].ability}</p>`;
+      if (document.data.system[key].ability) {
+         retVal += `<p>${localize('abilities')}: ${document.data.system[key].ability}</p>`;
       }
 
       // Effects.
-      if (document.data.flags.titan[key].effect) {
-         retVal += `<p>${localize('effects')}: ${document.data.flags.titan[key].effect}</p>`;
+      if (document.data.system[key].effect) {
+         retVal += `<p>${localize('effects')}: ${document.data.system[key].effect}</p>`;
       }
 
       return retVal;
@@ -56,7 +56,7 @@
    </div>
 
    <!--Value-->
-   <div>{document.data.flags.titan[key].total}</div>
+   <div>{document.data.system[key].total}</div>
 </div>
 
 <style lang="scss">

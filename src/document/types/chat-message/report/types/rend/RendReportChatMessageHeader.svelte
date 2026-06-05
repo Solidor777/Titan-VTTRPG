@@ -9,14 +9,14 @@
 
    /** @type {string[]} Actor and armor images. */
    const images = [
-      document.data.flags.titan.actorImg,
-      document.data.flags.titan.armorImg,
+      document.data.system.actorImg,
+      document.data.system.armorImg,
    ];
 
    /** @type {string[]} Actor and armor names. */
    const subHeaderLabels = [
-      document.data.flags.titan.actorName,
-      [document.data.flags.titan.armorName],
+      document.data.system.actorName,
+      [document.data.system.armorName],
    ];
 
    /** @type {string} Calculated main label for the header. */
@@ -26,10 +26,10 @@
    let headerIcon;
 
    // If armor was lost, update the header label and icon to show that the armor was damaged.
-   if (document.data.flags.titan.armorLost) {
+   if (document.data.system.armorLost) {
       headerLabel = localize('lostX%Armor').replace(
          'X%',
-         document.data.flags.titan.armorLost,
+         document.data.system.armorLost,
       );
       headerIcon = REND_ICON;
    }
@@ -38,7 +38,7 @@
    else {
       headerLabel = localize('resistedX%Rend').replace(
          'X%',
-         document.data.flags.titan.rend,
+         document.data.system.armorLost,
       );
       headerIcon = ARMOR_ICON;
    }

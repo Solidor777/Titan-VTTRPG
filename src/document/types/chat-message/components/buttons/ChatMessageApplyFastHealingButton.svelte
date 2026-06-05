@@ -19,18 +19,18 @@
       let retVal = `<p>${localize('fastHealing.desc')}</p>`;
 
       // Equipment.
-      if (document.data.flags.titan.fastHealing.equipment) {
-         retVal += `<p>${localize('equipment')}: ${document.data.flags.titan.fastHealing.equipment}</p>`;
+      if (document.data.system.fastHealing.equipment) {
+         retVal += `<p>${localize('equipment')}: ${document.data.system.fastHealing.equipment}</p>`;
       }
 
       // Abilities.
-      if (document.data.flags.titan.fastHealing.ability) {
-         retVal += `<p>${localize('abilities')}: ${document.data.flags.titan.fastHealing.ability}</p>`;
+      if (document.data.system.fastHealing.ability) {
+         retVal += `<p>${localize('abilities')}: ${document.data.system.fastHealing.ability}</p>`;
       }
 
       // Effects.
-      if (document.data.flags.titan.fastHealing.effect) {
-         retVal += `<p>${localize('effects')}: ${document.data.flags.titan.fastHealing.effect}</p>`;
+      if (document.data.system.fastHealing.effect) {
+         retVal += `<p>${localize('effects')}: ${document.data.system.fastHealing.effect}</p>`;
       }
 
       return retVal;
@@ -51,17 +51,16 @@
 
             // Apply healing to the actor.
             await actor.system.applyHealing(
-               document.data.flags.titan.fastHealing.total,
+               document.data.system.fastHealing.total,
                { report: false },
             );
 
-            // Update the chat message.
+            // Update the chat message. The partial fastHealing update deep-merges into the stored object,
+            // preserving its total and per-source keys.
             await document.data.update({
-               flags: {
-                  titan: {
-                     fastHealing: { confirmed: true },
-                     stamina: { value: actor.system.resource.stamina.value },
-                  },
+               system: {
+                  fastHealing: { confirmed: true },
+                  stamina: { value: actor.system.resource.stamina.value },
                },
             });
          }
@@ -71,7 +70,7 @@
 
 <ChatMessageResourceModButton
    icon={HEALING_ICON}
-   label={localize('healX%Damage').replace('X%', document.data.flags.titan.fastHealing.total)}
+   label={localize('healX%Damage').replace('X%', document.data.system.fastHealing.total)}
    tooltip={{ text: getTooltip(), localize: false }}
    confirmFn={confirm}
 />

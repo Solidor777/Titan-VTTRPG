@@ -12,8 +12,8 @@
 </script>
 
 <div class="effects">
-   {#if document.data.flags.titan.conditions}
-      {#each document.data.flags.titan.conditions as effect}
+   {#if document.data.system.conditions?.length}
+      {#each document.data.system.conditions as effect}
          <div class="effect">
             <EffectTag {effect}/>
          </div>
@@ -21,8 +21,8 @@
    {/if}
 
    <!--Permanent Effects-->
-   {#if document.data.flags.titan.effects.permanent}
-      {#each document.data.flags.titan.effects.permanent as effect}
+   {#if document.data.system.effects.permanent}
+      {#each document.data.system.effects.permanent as effect}
          <div class="effect">
             <PermanentEffectTag {effect}/>
          </div>
@@ -30,8 +30,8 @@
    {/if}
 
    <!--Turn Start Effects-->
-   {#if document.data.flags.titan.effects.turnStart}
-      {#each document.data.flags.titan.effects.turnStart as effect}
+   {#if document.data.system.effects.turnStart}
+      {#each document.data.system.effects.turnStart as effect}
          <div class="effect">
             <TurnEndEffectTag {effect}/>
          </div>
@@ -39,8 +39,8 @@
    {/if}
 
    <!--Turn End Effects-->
-   {#if document.data.flags.titan.effects.turnEnd}
-      {#each document.data.flags.titan.effects.turnEnd as effect}
+   {#if document.data.system.effects.turnEnd}
+      {#each document.data.system.effects.turnEnd as effect}
          <div class="effect">
             <TurnEndEffectTag {effect}/>
          </div>
@@ -48,8 +48,8 @@
    {/if}
 
    <!--Initiative Effects-->
-   {#if document.data.flags.titan.effects.initiative}
-      {#each document.data.flags.titan.effects.initiative as effect}
+   {#if document.data.system.effects.initiative}
+      {#each document.data.system.effects.initiative as effect}
          <div class="effect">
             <InitiativeEffectTag {effect}/>
          </div>
@@ -57,8 +57,8 @@
    {/if}
 
    <!--Custom Effects-->
-   {#if document.data.flags.titan.effects.custom}
-      {#each document.data.flags.titan.effects.custom as effect}
+   {#if document.data.system.effects.custom}
+      {#each document.data.system.effects.custom as effect}
          <div class="effect">
             <CustomEffectTag {effect}/>
          </div>
@@ -66,8 +66,8 @@
    {/if}
 
    <!--Expired Effects-->
-   {#if document.data.flags.titan.effects.expired}
-      {#each document.data.flags.titan.effects.expired as effect}
+   {#if document.data.system.effects.expired}
+      {#each document.data.system.effects.expired as effect}
          <div class="effect">
             <ExpiredEffectTag {effect}/>
          </div>

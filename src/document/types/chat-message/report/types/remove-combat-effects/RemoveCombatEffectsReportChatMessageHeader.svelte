@@ -14,6 +14,6 @@
 <ReportChatMessageHeader
    headerIcon={REMOVE_TEMP_EFFECTS_ICON}
    {headerLabel}
-   images={[document.data.flags.titan.actorImg]}
-   subHeaderLabels={[document.data.flags.titan.actorName]}
+   images={[document.data.system.actorImg]}
+   subHeaderLabels={[document.data.system.actorName]}
 />

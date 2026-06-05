@@ -11,6 +11,6 @@
 <ChatResource
    icon={STAMINA_ICON}
    label={localize('stamina')}
-   max={document.data.flags.titan.stamina.max}
-   value={document.data.flags.titan.stamina.value}
+   max={document.data.system.stamina.max}
+   value={document.data.system.stamina.value}
 />

@@ -19,18 +19,18 @@
       let retVal = `<p>${localize('fastHealing.desc')}</p>`;
 
       // Equipment.
-      if (document.data.flags.titan.fastHealingRevert.equipment) {
-         retVal += `<p>${localize('equipment')}: ${document.data.flags.titan.fastHealingRevert.equipment}</p>`;
+      if (document.data.system.fastHealingRevert.equipment) {
+         retVal += `<p>${localize('equipment')}: ${document.data.system.fastHealingRevert.equipment}</p>`;
       }
 
       // Abilities.
-      if (document.data.flags.titan.fastHealingRevert.ability) {
-         retVal += `<p>${localize('abilities')}: ${document.data.flags.titan.fastHealingRevert.ability}</p>`;
+      if (document.data.system.fastHealingRevert.ability) {
+         retVal += `<p>${localize('abilities')}: ${document.data.system.fastHealingRevert.ability}</p>`;
       }
 
       // Effects.
-      if (document.data.flags.titan.fastHealingRevert.effect) {
-         retVal += `<p>${localize('effects')}: ${document.data.flags.titan.fastHealingRevert.effect}</p>`;
+      if (document.data.system.fastHealingRevert.effect) {
+         retVal += `<p>${localize('effects')}: ${document.data.system.fastHealingRevert.effect}</p>`;
       }
 
       return retVal;
@@ -50,25 +50,24 @@
 
             // Apply damage to undo the healing, bypassing armor.
             await actor.system.applyDamage(
-               document.data.flags.titan.fastHealingRevert.total,
+               document.data.system.fastHealingRevert.total,
                {
                   ignoreArmor: true,
                   report: false,
                },
             );
 
-            // Build the update data, conditionally including wounds.
+            // Build the update data, conditionally including wounds. The partial fastHealingRevert update
+            // deep-merges into the stored object, preserving its total and per-source keys.
             /** @type {object} The data to update the document with. */
             const updateData = {
-               flags: {
-                  titan: {
-                     fastHealingRevert: { confirmed: true },
-                     stamina: { value: actor.system.resource.stamina.value },
-                  },
+               system: {
+                  fastHealingRevert: { confirmed: true },
+                  stamina: { value: actor.system.resource.stamina.value },
                },
             };
-            if (document.data.flags.titan.wounds) {
-               updateData.flags.titan.wounds = { value: actor.system.resource.wounds.value };
+            if (document.data.system.wounds) {
+               updateData.system.wounds = { value: actor.system.resource.wounds.value };
             }
 
             // Update the chat message.
@@ -80,7 +79,7 @@
 
 <ChatMessageResourceModButton
    icon={PERSISTENT_DAMAGE_ICON}
-   label={localize('revertX%FastHealing').replace('X%', document.data.flags.titan.fastHealingRevert.total)}
+   label={localize('revertX%FastHealing').replace('X%', document.data.system.fastHealingRevert.total)}
    tooltip={{ text: getTooltip(), localize: false }}
    confirmFn={confirm}
 />

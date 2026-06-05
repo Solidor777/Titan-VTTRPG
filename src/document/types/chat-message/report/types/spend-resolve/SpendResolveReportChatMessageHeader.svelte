@@ -9,15 +9,15 @@
 
    /** @type {string} Localized title text shown at the top of the report card. */
    const headerLabel = localize(
-      document.data.flags.titan.resolveShortage
+      document.data.system.resolveShortage
          ? 'attemptedToSpendX%Resolve'
          : 'spentX%Resolve',
-   ).replace('X%', document.data.flags.titan.resolveSpent);
+   ).replace('X%', document.data.system.resolveSpent);
 </script>
 
 <ReportChatMessageHeader
    headerIcon={SPEND_RESOLVE_ICON}
    headerLabel={headerLabel}
-   images={[document.data.flags.titan.actorImg]}
-   subHeaderLabels={[document.data.flags.titan.actorName]}
+   images={[document.data.system.actorImg]}
+   subHeaderLabels={[document.data.system.actorName]}
 />

@@ -8,28 +8,17 @@ import TitanChatMessageDataModel from '~/document/types/chat-message/ChatMessage
 /**
  * Legacy flags.titan message types still routed through this hook.
  *
- * Check types (attributeCheck, skillCheck, resistanceCheck, attackCheck, castingCheck, itemCheck)
- * and item types (weapon, armor, spell, ability, shield, equipment, commodity) are intentionally
- * absent: those chat messages are now first-class ChatMessage subtypes registered in
+ * Only `effect` remains: check types (attributeCheck, skillCheck, resistanceCheck, attackCheck,
+ * castingCheck, itemCheck), item types (weapon, armor, spell, ability, shield, equipment, commodity)
+ * and the 13 report types are now first-class ChatMessage subtypes registered in
  * CONFIG.ChatMessage.dataModels and self-render via TitanChatMessage#renderHTML. Legacy flags.titan
- * check and item messages are deprecated and intentionally render blank rather than being routed to
- * the now-system-reading components.
+ * check, item and report messages are deprecated and intentionally render blank rather than being
+ * routed to the now-system-reading components.
  *
  * @type {Set<string>}
  */
 const TITAN_CHAT_MESSAGE_TYPES = deepFreeze(new Set([
    'effect',
-   'turnStartReport',
-   'turnEndReport',
-   'damageReport',
-   'healingReport',
-   'spendResolveReport',
-   'removeCombatEffectsReport',
-   'shortRestReport',
-   'longRestReport',
-   'effectsExpiredReport',
-   'rendReport',
-   'repairsReport',
 ]));
 
 /**

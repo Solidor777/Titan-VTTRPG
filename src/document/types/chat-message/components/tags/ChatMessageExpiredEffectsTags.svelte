@@ -8,8 +8,8 @@
 
 <div class="effects">
    <!--Expired Effects-->
-   {#if document.data.flags.titan.effects.expired}
-      {#each document.data.flags.titan.effects.expired as effect}
+   {#if document.data.system.effects.expired}
+      {#each document.data.system.effects.expired as effect}
          <div class="effect">
             <ExpiredEffectTag
                {effect}

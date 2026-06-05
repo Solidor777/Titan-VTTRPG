@@ -9,20 +9,20 @@
 
    /** @type {string[]} Actor and armor images. */
    const images = [
-      document.data.flags.titan.actorImg,
-      document.data.flags.titan.armorImg,
+      document.data.system.actorImg,
+      document.data.system.armorImg,
    ];
 
    /** @type {string[]} Actor and armor names. */
    const subHeaderLabels = [
-      document.data.flags.titan.actorName,
-      [document.data.flags.titan.armorName],
+      document.data.system.actorName,
+      [document.data.system.armorName],
    ];
 
    /** @type {string} Calculated main label for the header. */
    const headerLabel = localize('repairedX%Armor').replace(
       'X%',
-      document.data.flags.titan.armorRepaired,
+      document.data.system.armorRepaired,
    );
 </script>
 

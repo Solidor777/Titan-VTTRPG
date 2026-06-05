@@ -33,17 +33,17 @@
    const sections = [];
 
    // Add Stamina if appropriate.
-   if (document.data.flags.titan.stamina) {
+   if (document.data.system.stamina) {
       sections.push(ChatMessageStamina);
    }
 
    // Add Wounds if appropriate.
-   if (document.data.flags.titan.wounds) {
+   if (document.data.system.wounds) {
       sections.push(ChatMessageWounds);
    }
 
    // Cache whether the report has expired effects.
-   const hasExpiredEffects = !!document.data.flags.titan.effects?.expired;
+   const hasExpiredEffects = !!document.data.system.effects?.expired;
 
    // Add expired effects.
    if (hasExpiredEffects) {
@@ -53,7 +53,7 @@
       });
 
       // Add message if the expired effects were removed.
-      if (document.data.flags.titan.expiredEffectsRemoved === true) {
+      if (document.data.system.expiredEffectsRemoved === true) {
          sections.push(ChatMessageExpiredEffectsRemovedMessage);
       }
 
@@ -64,10 +64,10 @@
    }
 
    // Add fast healing information if appropriate.
-   if (document.data.flags.titan.fastHealing) {
+   if (document.data.system.fastHealing) {
 
       // Add fast healing Tag if confirmed.
-      if (document.data.flags.titan.fastHealing.confirmed) {
+      if (document.data.system.fastHealing.confirmed) {
          sections.push(ChatMessageFastHealingTag);
       }
 
@@ -78,10 +78,10 @@
    }
 
    // Add fast persistent damage information if appropriate.
-   if (document.data.flags.titan.persistentDamage) {
+   if (document.data.system.persistentDamage) {
 
       // Add persistent damage Tag if confirmed.
-      if (document.data.flags.titan.persistentDamage.confirmed) {
+      if (document.data.system.persistentDamage.confirmed) {
          sections.push(ChatMessagePersistentDamageTag);
       }
 
@@ -91,8 +91,9 @@
       }
    }
 
-   // Add messages if appropriate.
-   if (document.data.flags.titan.message) {
+   // Add messages if appropriate. The message ArrayField has an initial [] (truthy when empty), so guard
+   // on length to keep "no messages" treated as absent.
+   if (document.data.system.message?.length) {
       sections.push({
          component: ChatMessageRichTextMessages,
          isRichText: true,

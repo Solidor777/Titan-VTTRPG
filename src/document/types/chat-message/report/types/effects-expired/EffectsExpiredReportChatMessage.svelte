@@ -27,7 +27,7 @@
    });
 
    // Add message if the expired effects were removed.
-   if (document.data.flags.titan.expiredEffectsRemoved === true) {
+   if (document.data.system.expiredEffectsRemoved === true) {
       sections.push(ChatMessageExpiredEffectsRemovedMessage);
    }
 

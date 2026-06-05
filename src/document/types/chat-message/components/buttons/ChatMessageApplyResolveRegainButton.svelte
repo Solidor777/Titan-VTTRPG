@@ -19,18 +19,18 @@
       let retVal = `<p>${localize('resolveRegain.desc')}</p>`;
 
       // Equipment.
-      if (document.data.flags.titan.resolveRegain.equipment) {
-         retVal += `<p>${localize('equipment')}: ${document.data.flags.titan.resolveRegain.equipment}</p>`;
+      if (document.data.system.resolveRegain.equipment) {
+         retVal += `<p>${localize('equipment')}: ${document.data.system.resolveRegain.equipment}</p>`;
       }
 
       // Abilities.
-      if (document.data.flags.titan.resolveRegain.ability) {
-         retVal += `<p>${localize('abilities')}: ${document.data.flags.titan.resolveRegain.ability}</p>`;
+      if (document.data.system.resolveRegain.ability) {
+         retVal += `<p>${localize('abilities')}: ${document.data.system.resolveRegain.ability}</p>`;
       }
 
       // Effects.
-      if (document.data.flags.titan.resolveRegain.effect) {
-         retVal += `<p>${localize('effects')}: ${document.data.flags.titan.resolveRegain.effect}</p>`;
+      if (document.data.system.resolveRegain.effect) {
+         retVal += `<p>${localize('effects')}: ${document.data.system.resolveRegain.effect}</p>`;
       }
 
       return retVal;
@@ -51,17 +51,16 @@
 
             // Restore resolve to the actor.
             await actor.system.regainResolve(
-               document.data.flags.titan.resolveRegain.total,
+               document.data.system.resolveRegain.total,
                { report: false },
             );
 
-            // Update the chat message.
+            // Update the chat message. The partial resolveRegain update deep-merges into the stored object,
+            // preserving its total and per-source keys.
             await document.data.update({
-               flags: {
-                  titan: {
-                     resolveRegain: { confirmed: true },
-                     resolve: { value: actor.system.resource.resolve.value },
-                  },
+               system: {
+                  resolveRegain: { confirmed: true },
+                  resolve: { value: actor.system.resource.resolve.value },
                },
             });
          }
@@ -71,7 +70,7 @@
 
 <ChatMessageResourceModButton
    icon={REGAIN_RESOLVE_ICON}
-   label={localize('regainX%Resolve').replace('X%', document.data.flags.titan.resolveRegain.total)}
+   label={localize('regainX%Resolve').replace('X%', document.data.system.resolveRegain.total)}
    tooltip={{ text: getTooltip(), localize: false }}
    confirmFn={confirm}
 />

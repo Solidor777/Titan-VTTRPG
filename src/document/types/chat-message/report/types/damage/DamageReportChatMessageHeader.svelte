@@ -14,14 +14,14 @@
    let headerIcon;
 
    // If we took damage, use that as the main header.
-   if (document.data.flags.titan.damageTaken) {
-      headerLabel = localize('tookX%Damage').replace('X%', document.data.flags.titan.damageTaken);
+   if (document.data.system.damageTaken) {
+      headerLabel = localize('tookX%Damage').replace('X%', document.data.system.damageTaken);
       headerIcon = DAMAGE_ICON;
    }
 
    // Otherwise, we resisted all damage, and should use that as the main header.
    else {
-      headerLabel = localize('resistedX%Damage').replace('X%', document.data.flags.titan.damageResisted);
+      headerLabel = localize('resistedX%Damage').replace('X%', document.data.system.damageResisted);
       headerIcon = ARMOR_ICON;
    }
 </script>
@@ -29,6 +29,6 @@
 <ReportChatMessageHeader
    headerIcon={headerIcon}
    headerLabel={headerLabel}
-   images={[document.data.flags.titan.actorImg]}
-   subHeaderLabels={[document.data.flags.titan.actorName]}
+   images={[document.data.system.actorImg]}
+   subHeaderLabels={[document.data.system.actorName]}
 />

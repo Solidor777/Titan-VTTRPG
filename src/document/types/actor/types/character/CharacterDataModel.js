@@ -5908,23 +5908,27 @@ export default class CharacterDataModel extends TitanActorDataModel {
    }
 
    /**
-    * Sends a private message to the character's owners.
-    * @param {object} messageData - Object containing the message data.
+    * Sends a private message to the character's owners. The report's discriminator (`type`) is placed at
+    * the chat message root so Foundry selects the matching report ChatMessage subtype, and the remaining
+    * report payload becomes the typed `system` data of that subtype.
+    * @param {object} messageData - Object containing the message data, including its `type` discriminator.
     * @param {string} userId - The ID of the user sending the message.
     * @param {boolean} [playSound] - Whether to play a sound when sending the message.
     * @returns {Promise<void>}
     * @protected
     */
    async _whisperOwners(messageData, userId, playSound = true) {
+      // Split the discriminator to the message root and the payload into the typed system data.
+      const { type, ...system } = messageData;
+
       // Initialize message.
       const message = {
+         type,
+         system,
          user: userId,
          speaker: this.parent.getSpeaker(),
          style: CONST.CHAT_MESSAGE_STYLES.OTHER,
          whisper: getOwners(this.parent),
-         flags: {
-            titan: messageData,
-         },
       };
 
       // Add sound if appropriate.
