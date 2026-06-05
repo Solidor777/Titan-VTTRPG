@@ -944,7 +944,10 @@
          "removeCombatEffectsReport": "Remove Combat Effects Report",
          "shortRestReport": "Short Rest Report",
          "turnStartReport": "Turn Start Report",
-         "turnEndReport": "Turn End Report"
+         "turnEndReport": "Turn End Report",
+         "turnStartRevertReport": "Turn Start Revert Report",
+         "turnEndRevertReport": "Turn End Revert Report",
+         "effectsExpiredReport": "Effects Expired Report"
       },
       "SidebarTab": {
          "titanEffects": "TITAN Effects"

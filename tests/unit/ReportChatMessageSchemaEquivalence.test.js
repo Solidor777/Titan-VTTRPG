@@ -156,7 +156,30 @@ const EXPECTED = {
       message: { type: 'ArrayField' },
    },
 
-   // Populated by Task 2e.
+   // Task 2e: revert + expired report leaves (turn-start-revert, turn-end-revert, effects-expired).
+   // Every conditionally-present compound is a nullable ObjectField (null in the shape), preserving the
+   // cards' if (obj) guards: the revert confirm-offer objects (fastHealingRevert/persistentDamageRevert/
+   // resolveRegainRevert) and the resource snapshots (stamina/wounds/resolve). Turn-end-revert carries
+   // neither resolveRegainRevert nor resolve (turn end never regains or reports resolve). The
+   // effects-expired report's only always-present field is the boolean expired-effects flag.
+   turnStartRevertReport: {
+      fastHealingRevert: { type: 'ObjectField', nullable: true },
+      persistentDamageRevert: { type: 'ObjectField', nullable: true },
+      resolveRegainRevert: { type: 'ObjectField', nullable: true },
+      stamina: { type: 'ObjectField', nullable: true },
+      wounds: { type: 'ObjectField', nullable: true },
+      resolve: { type: 'ObjectField', nullable: true },
+   },
+   turnEndRevertReport: {
+      fastHealingRevert: { type: 'ObjectField', nullable: true },
+      persistentDamageRevert: { type: 'ObjectField', nullable: true },
+      stamina: { type: 'ObjectField', nullable: true },
+      wounds: { type: 'ObjectField', nullable: true },
+   },
+   effectsExpiredReport: {
+      expiredEffectsRemoved: { type: 'BooleanField' },
+      effects: { type: 'ObjectField', nullable: true },
+   },
 };
 
 beforeAll(async () => {
@@ -229,6 +252,23 @@ beforeAll(async () => {
    ).default;
    models.turnEndReport = (
       await import('~/document/types/chat-message/report/types/turn-end/TurnEndReportChatMessageDataModel.js')
+   ).default;
+
+   // Task 2e: the revert + expired report leaves (turn-start-revert, turn-end-revert, effects-expired).
+   models.turnStartRevertReport = (
+      await import(
+         '~/document/types/chat-message/report/types/turn-start-revert/TurnStartRevertReportChatMessageDataModel.js'
+      )
+   ).default;
+   models.turnEndRevertReport = (
+      await import(
+         '~/document/types/chat-message/report/types/turn-end-revert/TurnEndRevertReportChatMessageDataModel.js'
+      )
+   ).default;
+   models.effectsExpiredReport = (
+      await import(
+         '~/document/types/chat-message/report/types/effects-expired/EffectsExpiredReportChatMessageDataModel.js'
+      )
    ).default;
 });
 

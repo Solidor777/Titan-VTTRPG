@@ -60,7 +60,10 @@
          "removeCombatEffectsReport": {},
          "shortRestReport": {},
          "turnStartReport": {},
-         "turnEndReport": {}
+         "turnEndReport": {},
+         "turnStartRevertReport": {},
+         "turnEndRevertReport": {},
+         "effectsExpiredReport": {}
       },
       "Item": {
          "ability": {},

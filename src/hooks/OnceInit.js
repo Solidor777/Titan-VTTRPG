@@ -52,6 +52,9 @@ import RemoveCombatEffectsReportChatMessageDataModel from '~/document/types/chat
 import ShortRestReportChatMessageDataModel from '~/document/types/chat-message/report/types/short-rest-report/ShortRestReportChatMessageDataModel.js';
 import TurnStartReportChatMessageDataModel from '~/document/types/chat-message/report/types/turn-start/TurnStartReportChatMessageDataModel.js';
 import TurnEndReportChatMessageDataModel from '~/document/types/chat-message/report/types/turn-end/TurnEndReportChatMessageDataModel.js';
+import TurnStartRevertReportChatMessageDataModel from '~/document/types/chat-message/report/types/turn-start-revert/TurnStartRevertReportChatMessageDataModel.js';
+import TurnEndRevertReportChatMessageDataModel from '~/document/types/chat-message/report/types/turn-end-revert/TurnEndRevertReportChatMessageDataModel.js';
+import EffectsExpiredReportChatMessageDataModel from '~/document/types/chat-message/report/types/effects-expired/EffectsExpiredReportChatMessageDataModel.js';
 import TitanActiveEffect from '~/document/types/active-effect/TitanActiveEffect.js';
 import TitanActiveEffectDataModel from '~/document/types/active-effect/TitanActiveEffectDataModel.js';
 import ConditionDataModel from '~/document/types/active-effect/ConditionDataModel.js';
@@ -135,6 +138,9 @@ export default function onceInit() {
       shortRestReport: ShortRestReportChatMessageDataModel,
       turnStartReport: TurnStartReportChatMessageDataModel,
       turnEndReport: TurnEndReportChatMessageDataModel,
+      turnStartRevertReport: TurnStartRevertReportChatMessageDataModel,
+      turnEndRevertReport: TurnEndRevertReportChatMessageDataModel,
+      effectsExpiredReport: EffectsExpiredReportChatMessageDataModel,
    };
 
    CONFIG.time.roundTime = 6;
