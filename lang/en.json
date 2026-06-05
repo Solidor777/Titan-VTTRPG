@@ -934,7 +934,11 @@
          "ability": "Ability",
          "shield": "Shield",
          "equipment": "Equipment",
-         "commodity": "Commodity"
+         "commodity": "Commodity",
+         "damageReport": "Damage Report",
+         "healingReport": "Healing Report",
+         "spendResolveReport": "Spend Resolve Report",
+         "longRestReport": "Long Rest Report"
       },
       "SidebarTab": {
          "titanEffects": "TITAN Effects"

@@ -50,7 +50,11 @@
          "ability": {},
          "shield": {},
          "equipment": {},
-         "commodity": {}
+         "commodity": {},
+         "damageReport": {},
+         "healingReport": {},
+         "spendResolveReport": {},
+         "longRestReport": {}
       },
       "Item": {
          "ability": {},

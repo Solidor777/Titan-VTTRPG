@@ -42,6 +42,10 @@ import AbilityChatMessageDataModel from '~/document/types/item/types/ability/cha
 import ShieldChatMessageDataModel from '~/document/types/item/types/shield/chat-message/ShieldChatMessageDataModel.js';
 import EquipmentChatMessageDataModel from '~/document/types/item/types/equipment/chat-message/EquipmentChatMessageDataModel.js';
 import CommodityChatMessageDataModel from '~/document/types/item/types/commodity/chat-message/CommodityChatMessageDataModel.js';
+import DamageReportChatMessageDataModel from '~/document/types/chat-message/report/types/damage/DamageReportChatMessageDataModel.js';
+import HealingReportChatMessageDataModel from '~/document/types/chat-message/report/types/healing/HealingReportChatMessageDataModel.js';
+import SpendResolveReportChatMessageDataModel from '~/document/types/chat-message/report/types/spend-resolve/SpendResolveReportChatMessageDataModel.js';
+import LongRestReportChatMessageDataModel from '~/document/types/chat-message/report/types/long-rest/LongRestReportChatMessageDataModel.js';
 import TitanActiveEffect from '~/document/types/active-effect/TitanActiveEffect.js';
 import TitanActiveEffectDataModel from '~/document/types/active-effect/TitanActiveEffectDataModel.js';
 import ConditionDataModel from '~/document/types/active-effect/ConditionDataModel.js';
@@ -115,6 +119,10 @@ export default function onceInit() {
       shield: ShieldChatMessageDataModel,
       equipment: EquipmentChatMessageDataModel,
       commodity: CommodityChatMessageDataModel,
+      damageReport: DamageReportChatMessageDataModel,
+      healingReport: HealingReportChatMessageDataModel,
+      spendResolveReport: SpendResolveReportChatMessageDataModel,
+      longRestReport: LongRestReportChatMessageDataModel,
    };
 
    CONFIG.time.roundTime = 6;

@@ -86,7 +86,30 @@ const models = {};
  * @type {Record<string, Record<string, {type: string, nullable?: boolean}>>}
  */
 const EXPECTED = {
-   // Populated by Tasks 2a-2e.
+   // Task 2a: flat-resource report leaves (damage, healing, spend-resolve, long-rest). The resource
+   // snapshots (stamina/wounds/resolve) and the damage tags container are conditionally present, so the
+   // shape factory declares them null -> nullable ObjectField, preserving the cards' if (obj) guards.
+   damageReport: {
+      damageTaken: { type: 'NumberField' }, damageResisted: { type: 'NumberField' },
+      staminaLost: { type: 'NumberField' }, woundsSuffered: { type: 'NumberField' },
+      ignoredArmor: { type: 'BooleanField' },
+      stamina: { type: 'ObjectField', nullable: true }, wounds: { type: 'ObjectField', nullable: true },
+      tags: { type: 'ObjectField', nullable: true },
+   },
+   healingReport: {
+      staminaRestored: { type: 'NumberField' },
+      stamina: { type: 'ObjectField', nullable: true }, wounds: { type: 'ObjectField', nullable: true },
+   },
+   spendResolveReport: {
+      resolveSpent: { type: 'NumberField' }, resolveShortage: { type: 'NumberField' },
+      resolve: { type: 'ObjectField', nullable: true },
+   },
+   longRestReport: {
+      woundsHealed: { type: 'NumberField' },
+      wounds: { type: 'ObjectField', nullable: true },
+   },
+
+   // Populated by Tasks 2b-2e.
 };
 
 beforeAll(async () => {
@@ -115,6 +138,22 @@ beforeAll(async () => {
    // their concrete report DataModels here as well.
    models.base = (
       await import('~/document/types/chat-message/report/ReportChatMessageDataModel.js')
+   ).default;
+
+   // Task 2a: the flat-resource report leaves (damage, healing, spend-resolve, long-rest).
+   models.damageReport = (
+      await import('~/document/types/chat-message/report/types/damage/DamageReportChatMessageDataModel.js')
+   ).default;
+   models.healingReport = (
+      await import('~/document/types/chat-message/report/types/healing/HealingReportChatMessageDataModel.js')
+   ).default;
+   models.spendResolveReport = (
+      await import(
+         '~/document/types/chat-message/report/types/spend-resolve/SpendResolveReportChatMessageDataModel.js'
+      )
+   ).default;
+   models.longRestReport = (
+      await import('~/document/types/chat-message/report/types/long-rest/LongRestReportChatMessageDataModel.js')
    ).default;
 });
 
