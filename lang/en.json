@@ -940,7 +940,9 @@
          "spendResolveReport": "Spend Resolve Report",
          "longRestReport": "Long Rest Report",
          "rendReport": "Rend Report",
-         "repairsReport": "Repairs Report"
+         "repairsReport": "Repairs Report",
+         "removeCombatEffectsReport": "Remove Combat Effects Report",
+         "shortRestReport": "Short Rest Report"
       },
       "SidebarTab": {
          "titanEffects": "TITAN Effects"

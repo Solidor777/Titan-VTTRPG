@@ -1,0 +1,10 @@
+/**
+ * Builds the canonical shape template for a short-rest report chat message's system data. This report is
+ * header-only: it carries no payload beyond the shared report label fields (actorName, actorImg) defined
+ * on the family base, so the shape is empty. It is kept for uniformity with the other report leaves and
+ * as the single source the schema and the golden-master test both reference.
+ * @returns {object} The short-rest report shape (empty; no leaf-specific fields).
+ */
+export default function createShortRestReportShape() {
+   return {};
+}

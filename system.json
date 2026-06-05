@@ -56,7 +56,9 @@
          "spendResolveReport": {},
          "longRestReport": {},
          "rendReport": {},
-         "repairsReport": {}
+         "repairsReport": {},
+         "removeCombatEffectsReport": {},
+         "shortRestReport": {}
       },
       "Item": {
          "ability": {},

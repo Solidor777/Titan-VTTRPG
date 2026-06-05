@@ -121,7 +121,13 @@ const EXPECTED = {
       armorRepaired: { type: 'NumberField' }, armor: { type: 'ObjectField', nullable: true },
    },
 
-   // Populated by Tasks 2c-2e.
+   // Task 2c: header-only report leaves (remove-combat-effects, short-rest). These carry no payload
+   // beyond the shared report label fields, so their shape factories are empty and their field maps are
+   // empty here; the per-leaf "no unexpected extra fields" guard asserts only the base fields exist.
+   removeCombatEffectsReport: {},
+   shortRestReport: {},
+
+   // Populated by Tasks 2d-2e.
 };
 
 beforeAll(async () => {
@@ -174,6 +180,18 @@ beforeAll(async () => {
    ).default;
    models.repairsReport = (
       await import('~/document/types/chat-message/report/types/repairs/RepairsReportChatMessageDataModel.js')
+   ).default;
+
+   // Task 2c: the header-only report leaves (remove-combat-effects, short-rest).
+   models.removeCombatEffectsReport = (
+      await import(
+         '~/document/types/chat-message/report/types/remove-combat-effects/RemoveCombatEffectsReportChatMessageDataModel.js'
+      )
+   ).default;
+   models.shortRestReport = (
+      await import(
+         '~/document/types/chat-message/report/types/short-rest-report/ShortRestReportChatMessageDataModel.js'
+      )
    ).default;
 });
 
