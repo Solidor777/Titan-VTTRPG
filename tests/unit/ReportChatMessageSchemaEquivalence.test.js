@@ -1,0 +1,164 @@
+import { describe, it, expect, beforeAll, afterAll } from 'vitest';
+
+// Golden-master gate for the report chat-message family. Phase 3 converts the 13 legacy report chat
+// messages into first-class ChatMessage subtypes, each a leaf DataModel whose static
+// _defineDocumentSchema() builds its typed system fields from a co-located shape factory. This suite
+// freezes a hand-authored expectation of every report leaf's schema (field constructor name +
+// nullability) so each leaf task can prove its typed schema matches what the producer + shape factory
+// declare. The expectation is authored by reading the producer/shape factory (NOT derived from the
+// schema, to avoid circularity); each leaf task (2a-2e) appends its entry to EXPECTED below.
+//
+// The report DataModels chain through TitanChatMessageDataModel -> TitanDataModel ->
+// foundry.abstract.TypeDataModel and define their schema via the create*Field helpers, which call
+// foundry.data.fields.*. The unit env (tests/setup.js) installs only a minimal foundry stub, so this
+// suite installs stand-ins for TypeDataModel and the data-field classes before dynamically importing
+// the real data models (matching ItemDataModelSchemaEquivalence.test.js). Dynamic import is permitted
+// in tests (the no-dynamic-import rule governs the shipping bundle only); the family base is imported
+// dynamically in beforeAll, after the stand-ins are installed.
+
+/**
+ * Minimal stand-in for a Foundry DataField that records the options it was constructed with, so the
+ * harness can read the declared required/nullable/initial the create*Field helpers pass.
+ */
+class MockField {
+   /**
+    * Stores the field options.
+    * @param {object} options - The field configuration (e.g. initial, nullable, integer).
+    */
+   constructor(options = {}) {
+      /** @type {object} The field configuration. */
+      this.options = options;
+   }
+}
+
+/** Stand-in for StringField, a distinct subclass so the produced field type can be asserted. */
+class MockStringField extends MockField {}
+
+/** Stand-in for NumberField, a distinct subclass so the produced field type can be asserted. */
+class MockNumberField extends MockField {}
+
+/** Stand-in for BooleanField, a distinct subclass so the produced field type can be asserted. */
+class MockBooleanField extends MockField {}
+
+/** Stand-in for ObjectField, a distinct subclass so the produced field type can be asserted. */
+class MockObjectField extends MockField {}
+
+/** Stand-in for ArrayField that captures its element field as the first constructor argument. */
+class MockArrayField extends MockField {
+   /**
+    * Stores the element field and options.
+    * @param {MockField} element - The field describing each array element.
+    * @param {object} options - The array field configuration.
+    */
+   constructor(element, options = {}) {
+      super(options);
+      /** @type {MockField} The element field. */
+      this.element = element;
+   }
+}
+
+/** Stand-in for SchemaField that captures its sub-fields map as the first constructor argument. */
+class MockSchemaField extends MockField {
+   /**
+    * Stores the sub-fields map and options.
+    * @param {object} fields - The map of sub-field name to MockField.
+    * @param {object} options - The schema field configuration.
+    */
+   constructor(fields, options = {}) {
+      super(options);
+      /** @type {object} The map of sub-field name to MockField. */
+      this.fields = fields;
+   }
+}
+
+/** Stand-in for TypeDataModel so the data-model classes can be declared and their statics invoked. */
+class MockTypeDataModel {}
+
+/** @type {object} Holds the dynamically imported report family base, keyed by a stable name. */
+const models = {};
+
+/**
+ * Hand-authored expectation of each report leaf's schema. For each subtype key, maps every top-level
+ * system field to a descriptor: { type: <constructor name>, nullable?: boolean }. Authored by reading
+ * the producer + shape factory (NOT derived from the schema, to avoid circularity). Leaf tasks 2a-2e
+ * append their entries; the shared base fields actorName/actorImg are asserted via the base test below
+ * and ignored in each leaf's extra-field check.
+ * @type {Record<string, Record<string, {type: string, nullable?: boolean}>>}
+ */
+const EXPECTED = {
+   // Populated by Tasks 2a-2e.
+};
+
+beforeAll(async () => {
+   // The create*Field helpers call localize() (game.i18n) when a schema is built. Provide pass-through
+   // i18n so any field label lookups resolve during schema construction.
+   globalThis.game = {
+      i18n: {
+         localize: (key) => key,
+      },
+   };
+
+   // Install the TypeDataModel and data-field stand-ins before importing the data models.
+   globalThis.foundry.abstract.TypeDataModel = MockTypeDataModel;
+   globalThis.foundry.data = {
+      fields: {
+         StringField: MockStringField,
+         NumberField: MockNumberField,
+         BooleanField: MockBooleanField,
+         ObjectField: MockObjectField,
+         ArrayField: MockArrayField,
+         SchemaField: MockSchemaField,
+      },
+   };
+
+   // Dynamically import the report family base against the installed stand-ins. Leaf tasks 2a-2e import
+   // their concrete report DataModels here as well.
+   models.base = (
+      await import('~/document/types/chat-message/report/ReportChatMessageDataModel.js')
+   ).default;
+});
+
+afterAll(() => {
+   // Remove the stand-ins so later suites keep the shared minimal mock.
+   delete globalThis.foundry.abstract.TypeDataModel;
+   delete globalThis.foundry.data;
+   delete globalThis.game;
+});
+
+describe('Report chat-message schema equivalence (golden master)', () => {
+   it('the family base defines actorName and actorImg as StringFields', () => {
+      // Build the base schema against the installed stand-ins and assert the shared label fields.
+      const schema = models.base._defineDocumentSchema();
+      expect(schema.actorName).toBeInstanceOf(MockStringField);
+      expect(schema.actorImg).toBeInstanceOf(MockStringField);
+
+      // The inherited documentVersion (built by TitanDataModel via createNumberField) must survive the
+      // super._defineDocumentSchema() spread; this catches a future regression that drops the super call.
+      expect(schema.documentVersion).toBeInstanceOf(MockNumberField);
+
+      // No other fields should exist on the report family base.
+      expect(Object.keys(schema).sort()).toEqual(['actorImg', 'actorName', 'documentVersion']);
+   });
+
+   for (const [key, fields] of Object.entries(EXPECTED)) {
+      it(`${key} schema matches the golden master`, () => {
+         // Build the leaf schema against the installed stand-ins.
+         const schema = models[key]._defineDocumentSchema();
+
+         // Every expected field must be present with the declared type (and nullability, when given).
+         for (const [name, descriptor] of Object.entries(fields)) {
+            const field = schema[name];
+            expect(field, `missing field ${name}`).toBeTruthy();
+            expect(field.constructor.name, `${key}.${name} type`).toBe(`Mock${descriptor.type}`);
+            if (descriptor.nullable !== undefined) {
+               expect(Boolean(field.options?.nullable), `${key}.${name} nullable`).toBe(descriptor.nullable);
+            }
+         }
+
+         // No unexpected fields beyond the shared base label fields and the version field.
+         const ignore = new Set(['actorName', 'actorImg', 'documentVersion']);
+         const extra = Object.keys(schema).filter((field) => !ignore.has(field) && !(field in fields));
+         expect(extra, `unexpected extra fields on ${key}`).toEqual([]);
+      });
+   }
+});
