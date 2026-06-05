@@ -4,10 +4,9 @@ import createSchemaField from '~/helpers/utility-functions/CreateSchemaField.js'
 import createStringField from '~/helpers/utility-functions/CreateStringField.js';
 import createIntegerField from '~/helpers/utility-functions/CreateIntegerField.js';
 import createArrayField from '~/helpers/utility-functions/CreateArrayField.js';
-import createObjectField from '~/helpers/utility-functions/CreateObjectField.js';
-import createItemCheckTemplate from '~/check/types/item-check/ItemCheckTemplate.js';
-import createCustomItemTraitTemplate from '~/document/types/item/CustomItemTrait.js';
 import createDataField from '~/helpers/utility-functions/CreateDataField.js';
+import buildSchemaFromShape from '~/helpers/utility-functions/BuildSchemaFromShape.js';
+import createEffectSystemTemplate from '~/document/types/active-effect/EffectSystemTemplate.js';
 
 /**
  * The typed system data model for Titan Active Effects (subtype 'effect').
@@ -19,7 +18,10 @@ import createDataField from '~/helpers/utility-functions/CreateDataField.js';
  */
 export default class TitanActiveEffectDataModel extends RulesElementMixin(TitanDataModel) {
    /**
-    * Defines the data schema for Titan Active Effect documents.
+    * Defines the data schema for Titan Active Effect documents. The duration, check, and customTrait
+    * fields are generated from the canonical effect shape template (the single source shared with the
+    * effect chat-message snapshot schema); the changes field stays hand-built because the Foundry v14
+    * verifier requires an ArrayField of a typed SchemaField, which a shape cannot express.
     * @override
     * @returns {object} Map of schema field instances keyed by field name, defining the persisted data shape.
     * @protected
@@ -27,19 +29,8 @@ export default class TitanActiveEffectDataModel extends RulesElementMixin(TitanD
    static _defineDocumentSchema() {
       const schema = super._defineDocumentSchema();
 
-      // Duration.
-      schema.duration = createSchemaField({
-         type: createStringField('turnStart'),
-         remaining: createIntegerField(1),
-         initiative: createIntegerField(1),
-         custom: createStringField(),
-      });
-
-      // Checks.
-      schema.check = createArrayField(createObjectField(() => createItemCheckTemplate()));
-
-      // Custom Traits.
-      schema.customTrait = createArrayField(createObjectField(() => createCustomItemTraitTemplate()));
+      // Duration, Checks, and Custom Traits, generated from the canonical effect shape template.
+      Object.assign(schema, buildSchemaFromShape(createEffectSystemTemplate()));
 
       // Changes.
       // Foundry v14 requires every ActiveEffect type data model to define `changes` as an ArrayField whose
