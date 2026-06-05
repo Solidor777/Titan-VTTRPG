@@ -219,8 +219,9 @@ stored chat-message data.
 
 **Chat message data models**
 
-A `TitanDataModel` hierarchy provides first-class chat message subtypes (the five checks + the seven
-item cards are registered and active; check/item data travels in `message.system`, not `flags.titan`).
+A `TitanDataModel` hierarchy provides first-class chat message subtypes (the five checks, the seven item
+cards, and the 13 report cards are registered and active; their data travels in `message.system`, not
+`flags.titan`). Only the `effect` card remains on the legacy `flags.titan` hook path (Phase 4).
 
 - `TitanChatMessageDataModel` (`src/document/types/chat-message/ChatMessageDataModel.js`) extends
   `TitanDataModel`. Universal base for all TITAN chat message type data models; declares the
@@ -255,11 +256,32 @@ item cards are registered and active; check/item data travels in `message.system
   `lang/en.json` `TYPES.ChatMessage`. The item chat *components* read the flat snapshot at
   `document.data.system.X` (path parity with the item sheet) — they self-render via
   `TitanChatMessage#renderHTML`. (Restart-gated: subtype registration happens at world load.)
+- `ReportChatMessageDataModel` (`src/document/types/chat-message/report/ReportChatMessageDataModel.js`)
+  extends `TitanChatMessageDataModel`. Family base for all 13 report chat-card subtypes (sibling to the
+  check + item families); adds only the shared `actorName`/`actorImg` `StringField`s; `get component()`
+  stays abstract.
+- 13 leaf models, colocated with their Svelte component under
+  `src/document/types/chat-message/report/types/<name>/<T>ReportChatMessageDataModel.js`; each builds its
+  typed `system` schema via `{ ...super._defineDocumentSchema(), ...buildSchemaFromShape(create<T>ReportShape()) }`
+  (co-located `<T>ReportShape.js` factory) and returns its `.svelte` from `get component()`: `damageReport`,
+  `healingReport`, `spendResolveReport`, `rendReport`, `repairsReport`, `removeCombatEffectsReport`,
+  `shortRestReport`, `longRestReport`, `turnStartReport`, `turnEndReport`, `turnStartRevertReport`,
+  `turnEndRevertReport`, `effectsExpiredReport`. Conditionally-present OBJECT fields are nullable
+  `ObjectField`s (`null` in the shape) so `{#if obj}` guards stay correct; the array fields
+  `message`/`conditions` are explicit `ArrayField`s on the leaf (ObjectField cannot hold arrays). The
+  producer `CharacterDataModel._whisperOwners` emits `{ type, system }`; report *components* read
+  `document.data.system.X` and self-render via `TitanChatMessage#renderHTML`. Registered in `OnceInit.js`
+  `CONFIG.ChatMessage.dataModels` + `system.json` `documentTypes.ChatMessage` + `lang/en.json`
+  `TYPES.ChatMessage`. Schema parity is gated by `tests/unit/ReportChatMessageSchemaEquivalence.test.js`.
+  (Restart-gated: subtype registration happens at world load.)
 
-**Svelte shell**
+**Svelte shells**
 
-`ChatMessageShell.svelte` is the root Svelte component mounted for every Titan chat message.
-It selects the correct inner component based on the message type flag.
+`ChatMessageContent.svelte` is the root Svelte component mounted by `TitanChatMessage#renderHTML` for every
+subtyped TITAN chat message (checks, item cards, reports); it reads the leaf DataModel's `get component()` via
+`selectComponent()` and renders it with `{@const}`. `ChatMessageShell.svelte` is the LEGACY shell, mounted by
+`OnRenderChatMessageHTML.js` only for the remaining `flags.titan` `effect` card; it dispatches on
+`document.data.flags.titan.type` via a type→component map (Phase 4 deletes it).
 
 **Check chat-message components** (`src/check/chat-message/`)
 
@@ -274,15 +296,17 @@ Svelte components that render an evaluated check in chat:
 **Report components** (`src/document/types/chat-message/report/`)
 
 Reports are structured summaries of automation outcomes (damage taken, healing, rest, effects
-expiring, etc.). Shared scaffolding:
-- `ReportChatMessageBase.svelte`, `ReportChatMessageHeader.svelte`, `ReportHeader.svelte`.
-- `ReportConfirmApplyDamageButton.svelte` / `ReportConfirmResolveRegainButton.svelte` — GM-side
-  confirmation buttons that commit pending automation.
+expiring, etc.), now first-class `ChatMessage` subtypes (see the report DataModel family above) whose
+components read `document.data.system.X`. Shared scaffolding:
+- `components/ReportChatMessageBase.svelte`, `components/ReportChatMessageHeader.svelte`.
 
-Named report shells (each in its own subdirectory under `report/types/`): `DamageReport`,
-`HealingReport`, `RendReport`, `RepairsReport`, `SpendResolveReport`, `LongRestReport`,
-`ShortRestReport`, `TurnStartReport`, `TurnEndReport`, `TurnStartRevertReport`,
-`TurnEndRevertReport`, `RemoveCombatEffectsReport`, `EffectsExpiredReport`.
+Each named report's leaf component lives beside its DataModel + shape factory in its own subdirectory
+under `report/types/` (e.g. `damage/DamageReportChatMessageShell.svelte` +
+`damage/DamageReportChatMessageDataModel.js` + `damage/DamageReportShape.js`): `damage`, `healing`,
+`spend-resolve`, `rend`, `repairs`, `remove-combat-effects`, `short-rest-report`, `long-rest`,
+`turn-start`, `turn-end`, `turn-start-revert`, `turn-end-revert`, `effects-expired`. (The dead
+`ReportHeader.svelte` / `ReportConfirmApplyDamageButton.svelte` / `ReportConfirmResolveRegainButton.svelte`
+components were deleted in Phase 3.)
 
 **Shared chat-message components** (`src/document/types/chat-message/components/`)
 
@@ -582,13 +606,14 @@ The resulting parameters and `CheckResults` (or subtype) travel in the chat mess
 typed `CheckChatMessageDataModel` subtype: `{ parameters, results, failuresReRolled, message }`),
 passed to `ChatMessage.create` with the check `type` — NOT `flags.titan`.
 
-The newly created `ChatMessage` is handled by `TitanChatMessage`. In the chat window,
-`ChatMessageShell.svelte` reads the message type flag from `flags.titan` and mounts the correct
-Svelte component tree — either a check display (using the `src/check/chat-message/` components)
-or a report shell (from `src/document/types/chat-message/report/types/`). Report shells include
-confirm/apply buttons that call back into `CharacterDataModel` methods (via `SocketManager` when
-the acting user is not the document owner) to commit automation outcomes such as damage or
-healing.
+The newly created `ChatMessage` is handled by `TitanChatMessage#renderHTML`, which (for any subtyped
+message — checks, item cards, reports) mounts `ChatMessageContent.svelte` and dispatches on the leaf
+DataModel's `get component()` — a check display (`src/check/chat-message/` components) or a report card
+(`src/document/types/chat-message/report/types/`). Report cards include apply buttons that call back into
+`CharacterDataModel` methods (via `SocketManager` when the acting user is not the document owner) to commit
+automation outcomes such as fast healing or persistent damage, then update `message.system`. Only the
+`effect` card still routes through the legacy `ChatMessageShell.svelte` + `OnRenderChatMessageHTML` hook
+(reading `flags.titan`); Phase 4 retires that path.
 
 `TitanDocumentSheet` (extending Foundry v14 `DocumentSheetV2`) wraps the document in a
 `ReactiveDocument` bridge and mounts `DocumentSheetShell.svelte` with Svelte 5 `mount()`, making the

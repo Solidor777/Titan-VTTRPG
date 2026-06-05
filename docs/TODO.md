@@ -371,8 +371,25 @@ unit 115, full e2e **365** (incl. new `tests/e2e/item-cards.spec.js` ×7), build
   `specs/2026-06-04-chat-subtypes-followup-D-check-templates-design.md`,
   `plans/2026-06-04-chat-subtypes-followup-D-check-templates.md`.
 
-**Phase 3 (reports ×13) and Phase 4 (effect + delete the legacy hook/`ChatMessageShell.svelte`) remain to
-be specced.**
+**Phase 3 (reports ×13) — DONE** (branch `feat/chat-subtypes-phase3-reports`; implementation complete +
+reviewed). The 13 report chat messages (`damageReport`, `healingReport`, `spendResolveReport`, `rendReport`,
+`repairsReport`, `removeCombatEffectsReport`, `shortRestReport`, `longRestReport`, `turnStartReport`,
+`turnEndReport`, `turnStartRevertReport`, `turnEndRevertReport`, `effectsExpiredReport`) are now first-class
+`ChatMessage` subtypes that self-render. Each has a leaf DataModel under
+`src/document/types/chat-message/report/types/<name>/` extending a shared `report/ReportChatMessageDataModel.js`
+base, with a co-located `<T>ReportShape.js` feeding `buildSchemaFromShape`. The producer
+`CharacterDataModel._whisperOwners` emits `{ type, system }` (was `flags: { titan }`); all report components read
+`document.data.system.X`. The legacy `OnRenderChatMessageHTML` hook now routes ONLY `effect`. Verified: unit
+**154** green, `tests/e2e/report-cards.spec.js` (13 cases) green (full e2e parity run being confirmed). Two
+free fixes landed (see `docs/OPEN_BUGS.md`): the turn-revert reports rendered blank (now self-render), and the
+rend header's "resisted rend" showed `undefined` (now carries the `rend` amount). Spec/plan:
+`specs/2026-06-04-chat-message-subtypes-phase3-reports-design.md`,
+`plans/2026-06-04-chat-message-subtypes-phase3-reports.md`.
+
+**Phase 4 (effect subtype + delete the legacy hook/`ChatMessageShell.svelte`) remains.** Cleanup that belongs
+to it: (a) `ChatMessageShell.svelte` still carries now-unreachable report map entries (the legacy hook only
+routes `effect`); (b) NPC `overkillDamage` (`NPCDataModel.js:47`) is written-but-never-read and now
+schema-stripped — harmless dead data, a candidate for producer cleanup.
 
 ### 13. E2E: `effectsExpiredReport` render not covered
 

@@ -47,4 +47,16 @@ Deferred/known bugs. Todos (planned work) live in `docs/TODO.md`; this file is b
 Recently resolved: the socket-sync A1/A2 full-run timeout flake was fixed by the e2e Phase 2
 shared-world harness (per-file `clearChat` keeps the world lean). Verified: `socket-sync.spec.js`
 A1–A5 all passed within a full `npm run test:e2e` run (358 passed, 15.1 min). See `docs/TODO.md` #15.
+
+Recently resolved (Phase 3 reports, branch `feat/chat-subtypes-phase3-reports`):
+1. `turnStartRevertReport` / `turnEndRevertReport` rendered BLANK. The two revert reports were produced by
+   `CharacterDataModel` but their type keys were absent from `OnRenderChatMessageHTML`'s
+   `TITAN_CHAT_MESSAGE_TYPES` set, so the legacy hook never mounted a component. Converting them to first-class
+   `ChatMessage` subtypes makes them self-render via `TitanChatMessage#renderHTML`. Covered by the two
+   revert-render regression cases in `tests/e2e/report-cards.spec.js`.
+2. `RendReportChatMessageHeader` "resisted rend" header showed `undefined`. The component reads
+   `document.data.system.rend`, but the producer never carried the rend amount into the report payload.
+   `_createRendReportData(armorLost, armor, rend)` now passes `rend` through and the leaf schema types it
+   (`RendReportShape.js` `rend: 0` → integer `NumberField`, covered by the golden master), so the resisted-rend
+   label renders the real value.
 -->

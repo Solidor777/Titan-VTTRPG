@@ -57,7 +57,7 @@ travels in `message.system` (a `CheckChatMessageDataModel` subclass), NOT `flags
 
 **6. Chat render — dual-path (subtype self-render vs. legacy hook)**
 
-*Subtype path (checks + item cards):*
+*Subtype path (checks + item cards + the 13 reports):*
 `TitanChatMessage#renderHTML` (src/document/types/chat-message/ChatMessage.js) overrides Foundry's base to
 detect `this.system instanceof TitanChatMessageDataModel`. When true it adds the `titan`/`owner`/dark-mode
 classes to the full `<li>` chrome returned by `super.renderHTML(options)`, calls `_teardownComponent()` to
@@ -66,18 +66,18 @@ unmount any prior mount (the chat log replaces the `<li>` on every update), then
 handle are stored on `message._svelteComponent = { handle, bridge }`. `_teardownComponent()` is also called
 directly by `OnPreDeleteChatMessage.js` (src/hooks/OnPreDeleteChatMessage.js) for delete-time cleanup.
 
-*Legacy path (flags.titan messages — reports, effect cards):*
+*Legacy path (flags.titan messages — only the effect card remains):*
 Foundry fires `renderChatMessageHTML` after inserting the message HTML. `onRenderChatMessageHTML`
 (src/hooks/OnRenderChatMessageHTML.js) early-returns for any message whose `system instanceof
-TitanChatMessageDataModel` (this guard now catches every check AND every item card, so they never reach
-the legacy hook). As a second safety layer, check type strings (`attributeCheck`, `skillCheck`,
-`resistanceCheck`, `attackCheck`, `castingCheck`, `itemCheck`) AND item type strings (`weapon`, `armor`,
-`spell`, `ability`, `shield`, `equipment`, `commodity`) are also absent from the frozen
-`TITAN_CHAT_MESSAGE_TYPES` set (only `effect` + the report keys remain) — legacy `flags.titan` check and
-item messages (pre-subtype) are intentionally deprecated and render blank rather than being routed to the
-now-`system`-reading components.
+TitanChatMessageDataModel` (this guard catches every check, every item card, AND every report, so they never
+reach the legacy hook). As a second safety layer, check type strings (`attributeCheck`, `resistanceCheck`,
+`attackCheck`, `castingCheck`, `itemCheck`), item type strings (`weapon`, `armor`, `spell`, `ability`,
+`shield`, `equipment`, `commodity`), and the 13 report type strings are all absent from the frozen
+`TITAN_CHAT_MESSAGE_TYPES` set (only `effect` remains) — legacy `flags.titan` check, item, and report messages
+(pre-subtype) are intentionally deprecated and render blank rather than being routed to the now-`system`-reading
+components.
 For remaining messages it checks
-`message.flags.titan.type` against the frozen `TITAN_CHAT_MESSAGE_TYPES` set; if it matches, it builds a
+`message.flags.titan.type` against the frozen `TITAN_CHAT_MESSAGE_TYPES` set; if it matches (only `effect`), it builds a
 `new ReactiveDocument(message)` bridge and mounts `ChatMessageShell.svelte`
 (src/document/types/chat-message/ChatMessageShell.svelte) into the `.message-content` element via Svelte 5
 `mount()`, passing the bridge as the `documentStore` prop (a name retained from the old API — it is the
@@ -106,10 +106,13 @@ Two button patterns coexist:
   buttons/ChatMessageDamageButtons.svelte): call `applyDamageToTargets(damage, options)` which calls
   `actor.system.applyDamage(...)` on each targeted actor immediately; no confirmed flag is set on the chat
   document.
-- **Report confirm buttons** (`ReportConfirmApplyDamageButton.svelte`, src/document/types/chat-message/
-  report/components/ReportConfirmApplyDamageButton.svelte): owned-actor flow. Calls
-  `actor.system.applyDamage(total, { ignoreArmor: true, report: false })`, then updates the chat message's
-  `flags.titan` to mark the damage confirmed and persist the new resource values.
+- **Report apply buttons** (`ChatMessageApplyFastHealingButton.svelte` /
+  `ChatMessageApplyPersistentDamageButton.svelte` / `ChatMessageApplyResolveRegainButton.svelte`, in
+  src/document/types/chat-message/components/buttons/): owned-actor flow on a turn-start/turn-end report.
+  Each calls the relevant `actor.system.*` method, then updates the report subtype's `message.system` (e.g.
+  `{ system: { fastHealing: { confirmed: true }, stamina: { value } } }`) to mark the outcome confirmed and
+  persist the new resource values. The nullable `ObjectField` partial update deep-merges into the stored
+  object (preserving `total` + the per-source keys).
 
 ---
 
@@ -305,11 +308,12 @@ same re-resolution applies to `onCombatPreviousTurn`. Then:
      whispered `turnStartReport` chat message.
 
 **4. Turn reports — `_whisperOwners` / `ChatMessage.create`**
-All turn reports are created via `CharacterDataModel._whisperOwners(reportData, userId, playSound)`. The
-method calls `ChatMessage.create` with `whisper: getOwners(actor)` and `flags: { titan: reportData }`.
-The `reportData.type` string (e.g. `'turnStartReport'`, `'turnEndReport'`, `'effectsExpiredReport'`) is
-used by `ChatMessageShell.svelte` to select the correct report component from the `chatComponents` map in
-`selectComponent()`. Report messages are visible only to document owners plus the GM.
+All reports are created via `CharacterDataModel._whisperOwners(reportData, userId, playSound)`. The method
+destructures `const { type, ...system } = messageData` and calls `ChatMessage.create` with that `type` at the
+message root and the rest as the typed `system` payload (plus `whisper: getOwners(actor)`), so Foundry selects
+the matching report `ChatMessage` subtype (e.g. `'turnStartReport'`, `'turnEndReport'`, `'effectsExpiredReport'`)
+and the card self-renders via `TitanChatMessage#renderHTML`. Reports are no longer routed through the legacy
+`ChatMessageShell.svelte` hook. Report messages are visible only to document owners plus the GM.
 
 **5. Revert — `TitanCombat.previousTurn` / `onCombatPreviousTurn`**
 Each revert handler is the inverse of its forward counterpart (see the turn-start/turn-end steps above).
@@ -327,7 +331,8 @@ live documents before use. It calls:
 
 **Report chat components** (see `abstractions.md` → Chat messages & reports for the full component list):
 All turn reports are whispered to document owners only. Each report component reads from
-`document.data.flags.titan` and displays the relevant changed resources or effect names. Revert report
-components include buttons (`ReportConfirmApplyDamageButton`, `ReportConfirmResolveRegainButton`) allowing
-owners to confirm/re-apply the changes, which call the appropriate `actor.system.*` method and update the
-chat document flags to reflect the new resource state.
+`document.data.system.X` (path parity with the typed report subtype) and displays the relevant changed
+resources or effect names. Turn-start/turn-end reports include apply buttons
+(`ChatMessageApplyFastHealingButton` / `ChatMessageApplyPersistentDamageButton` /
+`ChatMessageApplyResolveRegainButton`) allowing owners to confirm/re-apply the changes, which call the
+appropriate `actor.system.*` method and update `message.system` to reflect the new resource state.

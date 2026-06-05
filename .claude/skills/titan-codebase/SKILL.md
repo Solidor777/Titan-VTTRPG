@@ -60,9 +60,11 @@ When a character performs a check, `CharacterDataModel` reads derived stats buil
 elements, constructs a typed `CheckParameters` object, optionally opens a `TitanDialog`-based check dialog for
 user options, then instantiates the appropriate `TitanCheck` subclass (`AttributeCheck`, `AttackCheck`, etc.)
 and calls `evaluateCheck()`. The check rolls dice, applies expertise, and computes type-specific results; all
-output travels in `flags.titan` when `ChatMessage.create` is called. The `OnRenderChatMessageHTML` hook wraps
-the resulting message in a `ReactiveDocument` bridge and mounts `ChatMessageShell.svelte` with Svelte 5's
-`mount()`, which dispatches to the correct check or report Svelte component based on the `flags.titan.type` flag.
+output travels in `message.system` as a first-class `ChatMessage` subtype when `ChatMessage.create` is called.
+Checks, item cards, and the 13 report cards self-render via `TitanChatMessage#renderHTML` (which mounts
+`ChatMessageContent.svelte` and dispatches on the leaf DataModel's `get component()`). Only the `effect`
+chat card still travels in `flags.titan` and renders through the legacy `OnRenderChatMessageHTML` hook +
+`ChatMessageShell.svelte` (Phase 4 will retire both).
 
 All sheets follow a three-layer pattern: a JS application class extending Foundry v14 `DocumentSheetV2`
 (`TitanDocumentSheet` and its subclasses) builds a `ReactiveDocument` bridge around the Foundry document and
@@ -72,10 +74,11 @@ bridge and the `applicationState` store into Svelte context so every descendant 
 innermost components write back through `document.data.update(...)` or the `refreshSystemDocument` snapshot
 helper. The `~/` Vite alias (→ `src/`) is the intra-project import mechanism; no TyphonJS packages remain.
 
-Report chat messages close the loop between automation and actor state: confirm/apply buttons in report Svelte
+Report chat messages close the loop between automation and actor state: apply/confirm buttons in report Svelte
 components call back into `CharacterDataModel` methods (routed via `SocketManager` when the acting user does not
-own the document) to commit outcomes like damage or healing, then update `flags.titan` on the chat document to
-reflect the final resource state. `ActionQueue` is a serial task queue for sequencing racy async mutations,
+own the document) to commit outcomes like fast healing or persistent damage, then update `message.system` on the
+chat document (a typed report subtype) to reflect the final resource state. `ActionQueue` is a serial task queue
+for sequencing racy async mutations,
 lazily created per actor but currently without callers; `SocketManager` mirrors Foundry Hooks across all
 connected clients via the `system.titan` socket so turn-start/end effects, Fast Healing, Persistent Damage, and
 Resolve Regain are processed uniformly regardless of who advanced the combat turn.

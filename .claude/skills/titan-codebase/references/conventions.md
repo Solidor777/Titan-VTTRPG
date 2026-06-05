@@ -161,8 +161,9 @@ runes mode). Shells select a component class and render it with `{@const}`:
 {/if}
 ```
 
-`ChatMessageShell.svelte` dispatches on `document.data.flags.titan.type` via a type→component map and
-renders the chosen class the same way.
+`ChatMessageContent.svelte` (the subtype render path for checks/items/reports) selects the leaf
+DataModel's `get component()` and renders it this way; the legacy `ChatMessageShell.svelte` (now only the
+`effect` card) dispatches on `document.data.flags.titan.type` via a type→component map the same way.
 
 **Transitions** — Svelte built-ins from `'svelte/transition'` (`slide`, `fade`), e.g.
 `<li transition:slide|local>`. The TyphonJS `slideFade` transition is no longer used.
@@ -187,6 +188,23 @@ longer wrap it in their own `.editor` div; instead they pass `tooltip` and `notO
 `save()` → `_refresh()` repaints the inactive view from that snapshot, so the wrapper **rebuilds the
 element when `enriched` changes while inactive** (guarded by `classList.contains('active')`) to avoid
 stale rendered content; rebuilds never write `value`, so they do not loop with the persist effect.
+
+## Schema-from-shape: presence-guarded snapshot fields
+
+When typing a chat-message (or any) snapshot whose components use `{#if obj}` / `{#if arr}` presence
+guards, the shape value fed to `buildSchemaFromShape` must preserve the "absent is falsy" semantics the
+guard relies on:
+
+- **Conditionally-present OBJECT fields → `null` in the shape.** `buildSchemaFromShape` maps `null` to a
+  nullable `ObjectField` (initial `null`), so the `{#if obj}` guard stays correct. A typed non-null
+  `SchemaField` would have a truthy `{...}` initial and always pass the guard — a parity break. The
+  component still reads sub-fields off the opaque object (e.g. `wounds.value`, `fastHealing.total`).
+- **Conditionally-present ARRAY fields → an explicit `ArrayField`, NOT a shape entry.** Foundry's
+  `ObjectField` rejects arrays (`getType([]) === 'Array'`), so a `null`-in-shape `ObjectField` cannot hold
+  them. Declare these as real `ArrayField`s on the leaf schema (after the `buildSchemaFromShape` spread,
+  `initial: []`) and write their presence guards as `?.length` (the empty-array initial `[]` is truthy, so
+  a bare `{#if arr}` would always pass). Established by Phase 3 reports (`message`/`conditions` on the turn
+  reports).
 
 ## Styling
 

@@ -58,9 +58,12 @@
   registers the `hotbarDrop` sub-hook via `OnHotbarDrop.js`.
 - `OnCombatNextTurn.js` / `OnCombatPreviousTurn.js` delegate to actor system methods (`onTurnStart`, `onTurnEnd`,
   `onInitiativeAdvanced`) on `TitanActor`.
-- `OnRenderChatMessageHTML.js` mounts `ChatMessageShell.svelte` (from `src/document/types/chat-message/`) onto
-  titan-flagged chat messages via Svelte 5 `mount()`, passing a `ReactiveDocument` bridge as the `documentStore`
-  prop.
+- `OnRenderChatMessageHTML.js` is the LEGACY render path, now serving only the `effect` chat card: it early-returns
+  for any message whose `system instanceof TitanChatMessageDataModel` (checks, item cards, and the 13 report cards
+  self-render via `TitanChatMessage#renderHTML`), and otherwise mounts `ChatMessageShell.svelte` (from
+  `src/document/types/chat-message/`) onto messages whose `flags.titan.type` is in the frozen
+  `TITAN_CHAT_MESSAGE_TYPES` set (now `{ 'effect' }` only) via Svelte 5 `mount()`, passing a `ReactiveDocument`
+  bridge as the `documentStore` prop. Phase 4 will delete this hook and `ChatMessageShell.svelte`.
 - `OnPreDeleteChatMessage.js` fires before a chat message is deleted (e.g., to clean up associated data).
 - `OnGetChatLogEntryContext.js` adds custom entries to the chat-log context menu.
 - Directory-context hooks (`OnGetActorDirectoryEntryContext`, `OnGetItemDirectoryEntryContext`) add UUID
