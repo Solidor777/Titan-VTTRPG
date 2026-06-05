@@ -34,11 +34,11 @@
       headerIcon = REND_ICON;
    }
 
-   // Otherwise, show that no armor was lost.
+   // Otherwise, show the amount of rend that was resisted (the full rend, since no armor was lost).
    else {
       headerLabel = localize('resistedX%Rend').replace(
          'X%',
-         document.data.system.armorLost,
+         document.data.system.rend,
       );
       headerIcon = ARMOR_ICON;
    }

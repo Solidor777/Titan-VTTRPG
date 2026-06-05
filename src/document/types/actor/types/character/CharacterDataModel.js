@@ -207,6 +207,7 @@ import assert from '~/helpers/utility-functions/Assert.js';
  * @property {string} actorName - The character's name.
  * @property {string} armorImg - The armor's image.
  * @property {string} armorName - The armor's display name.
+ * @property {number} rend - The total Rend amount applied; shown as the resisted amount when no Armor was lost.
  * @property {number} [armorLost] - The amount of Armor lost, if any.
  */
 
@@ -4594,7 +4595,7 @@ export default class CharacterDataModel extends TitanActorDataModel {
             }
 
             // Get the report data.
-            const reportData = this._createRendReportData(armorLost, armor);
+            const reportData = this._createRendReportData(armorLost, armor, rend);
 
             // Report rending armor if appropriate.
             if (options?.report !== false && reportRendingArmor()) {
@@ -4612,10 +4613,11 @@ export default class CharacterDataModel extends TitanActorDataModel {
     * Initializes data for a report detailing Rend applied to this character.
     * @param {number} armorLost - The amount of Armor lost.
     * @param {TitanItem} armor - Reference to the Armor being Rent.
+    * @param {number} rend - The total Rend amount applied; shown as the resisted amount when no Armor was lost.
     * @returns {RendReport} Populated data for the report.
     * @private
     */
-   _createRendReportData(armorLost, armor) {
+   _createRendReportData(armorLost, armor, rend) {
       // Initialize data.
       const retVal = {
          type: 'rendReport',
@@ -4623,6 +4625,7 @@ export default class CharacterDataModel extends TitanActorDataModel {
          actorName: this.parent.name,
          armorImg: armor.img,
          armorName: armor.name,
+         rend: rend,
       };
 
       // If any armor was lost, add the armor lost and armor value to the chat.

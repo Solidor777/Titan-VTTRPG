@@ -3,8 +3,8 @@
  * representative value seeds the matching typed schema field via `buildSchemaFromShape`; the
  * conditionally-present armor resource snapshot is `null` so it becomes a nullable object field,
  * preserving the card's `if (armor)` presence guard.
- * @returns {object} The rend report shape: the armor label fields, the armor lost tally, and the
- *    armor resource snapshot.
+ * @returns {object} The rend report shape: the armor label fields, the total rend amount, the armor lost
+ *    tally, and the armor resource snapshot.
  */
 export default function createRendReportShape() {
    return {
@@ -13,6 +13,9 @@ export default function createRendReportShape() {
 
       // The display name of the armor that was rent.
       armorName: '',
+
+      // The total rend amount applied; shown as the resisted amount when no armor was lost.
+      rend: 0,
 
       // The amount of armor lost as a result of the rend.
       armorLost: 0,

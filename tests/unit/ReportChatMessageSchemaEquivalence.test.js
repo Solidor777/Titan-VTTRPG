@@ -114,6 +114,7 @@ const EXPECTED = {
    // if (armor) guards.
    rendReport: {
       armorImg: { type: 'StringField' }, armorName: { type: 'StringField' },
+      rend: { type: 'NumberField' },
       armorLost: { type: 'NumberField' }, armor: { type: 'ObjectField', nullable: true },
    },
    repairsReport: {
