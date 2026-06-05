@@ -186,34 +186,53 @@ export default class TitanActiveEffect extends foundry.documents.ActiveEffect {
    }
 
    /**
-    * Creates a Chat Message containing this effect's data and sends it to chat.
-    * Spreads the data model roll data flat onto the titan flags (matching the working item sendToChat shape) so the
-    * shared item chat card and the item-check roll path both resolve check/customTrait at the flags root, then forces
-    * the effect chat card via the 'effect' type flag and attaches the native description.
+    * Builds the chat-message data for this effect's chat card. The chat subtype is ALWAYS 'effect'
+    * (matching the legacy forced type flag; a condition's own subtype is not a registered chat
+    * subtype), and the prepared roll-data snapshot becomes `message.system`; the document-level `id`
+    * and `type` are dropped (the chat document carries its own `id`, and `type` is returned at the
+    * top level to select the chat-message subtype). Pure and side-effect free so it is unit-testable
+    * without `ChatMessage.create`.
+    * @returns {object} The chat message data `{ type, system }`, where `type` selects the
+    * chat-message subtype and `system` is the prepared effect snapshot plus `name` and `img`.
+    */
+   buildChatMessageData() {
+      // The prepared roll data: the document-level id/name/img/type plus the prepared system fields.
+      const rollData = this.getRollData();
+
+      // Separate the document-level keys from the prepared system fields.
+      const { id, type, name, img, ...systemData } = rollData;
+
+      return {
+         type: 'effect',
+         system: {
+            ...systemData,
+            name,
+            img,
+         },
+      };
+   }
+
+   /**
+    * Creates a Chat Message containing this effect's data and sends it to chat as a first-class
+    * chat-message subtype (`type` + `system`), preserving the speaker, style, sound, and roll mode.
     * @returns {Promise<ChatMessage>} The newly created Chat Message.
     */
    async sendToChat() {
       /** @type {Actor|undefined} - The owning actor, used for the chat speaker when available. */
       const actor = this.parent?.documentName === 'Actor' ? this.parent : void 0;
 
-      /** @type {object} - The titan flags payload, matching the flat item chat shape (check/customTrait at root). */
-      const messageData = {
-         ...this.getRollData(),
-         type: 'effect',
-         description: this.description,
-      };
+      // Build the typed chat-message payload (type + prepared system snapshot).
+      const messageData = this.buildChatMessageData();
 
       // Create and post the message.
       return ChatMessage.create(
          ChatMessage.applyRollMode(
             {
+               ...messageData,
                user: game.user.id,
                speaker: actor?.getSpeaker() ?? ChatMessage.getSpeaker(),
                style: CONST.CHAT_MESSAGE_STYLES.OTHER,
                sound: CONFIG.sounds.notification,
-               flags: {
-                  titan: messageData,
-               },
                classes: ['titan'],
             },
             game.settings.get('core', 'rollMode'),
