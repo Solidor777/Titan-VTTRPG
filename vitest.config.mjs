@@ -26,5 +26,10 @@ export default {
       globals: true,
       setupFiles: ['./tests/setup.js'],
       include: ['tests/unit/**/*.test.js'],
+      // The schema golden-master suites dynamically import large data-model graphs inside beforeAll,
+      // which compiles those graphs through the Svelte/Vite transform pipeline. Under a full parallel
+      // run that legitimately exceeds vitest's generic 10s default and intermittently times the hooks
+      // out, so give hooks deterministic headroom (the hooks either complete or genuinely hang).
+      hookTimeout: 60000,
    },
 };
