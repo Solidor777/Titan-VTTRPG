@@ -1139,6 +1139,14 @@ push) after user sign-off.
 
 ---
 
+## Buddy-check directives
+
+User-directed (2026-06-06): buddy-check this plan BEFORE implementation begins — two independent blind reviewers
+over the plan + spec, focusing on data-safety of the pack unlock/rewrite/delete path, invalid-document handling
+claims, and test adequacy; reconcile findings, surface unresolved disagreements to the user. Execution is
+subagent-driven (fresh `titan-svelte-dev` per task + two-stage review) and starts only after the buddy check
+resolves.
+
 ## Self-review notes
 
 - **Spec coverage:** §1/§3 → Task 2; §4 → Task 3; §5 (logging) → Task 3 code; §5 (OPEN_BUGS hygiene) + §7 → Task 5;
