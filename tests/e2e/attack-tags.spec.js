@@ -20,7 +20,7 @@ const WEAPON_NAME = 'E2E AttackTags Weapon';
 /** @type {string} Display name of the seeded custom trait (rendered raw by the custom-trait Tag). */
 const CUSTOM_TRAIT_NAME = 'E2E Custom Trait';
 
-/** @type {string} Camelized form of CUSTOM_TRAIT_NAME, replicating Camelize.js output for the engine call. */
+/** @type {string} Hand-computed `camelize(CUSTOM_TRAIT_NAME)` output (Camelize.js) — must track it on rename. */
 const CUSTOM_TRAIT_CAMELIZED = 'e2ECustomTrait';
 
 /** @type {string} Localized label of the seeded standard trait 'piercing' (LOCAL.piercing.text). */
@@ -98,6 +98,15 @@ test.describe('shared AttackTags across surfaces', () => {
             },
          });
       }, { actorName: ACTOR_NAME, weaponName: WEAPON_NAME, customTraitName: CUSTOM_TRAIT_NAME });
+   });
+
+   // Unconditionally restore the check-options dialog gate: a mid-test failure after the gate is enabled
+   // must not leak `getCheckOptions: true` into specs that rely on the default-off setting (house pattern
+   // per checks-dialog.spec.js).
+   test.afterEach(async () => {
+      await page.evaluate(async () => {
+         await game.settings.set('titan', 'getCheckOptions', false);
+      });
    });
 
    /**
@@ -198,10 +207,12 @@ test.describe('shared AttackTags across surfaces', () => {
    test('two-context: actor-derived tags render and the roll button fires requestAttackCheck', async () => {
       const row = await openCharacterSheetWeaponRow();
 
-      // The dice tag is actor-derived (read via 'sheetDocument'); its value must match the engine math.
-      // Mirrors the row recipe: attribute + (training + training mod) + dice mod, no multiAttack halving
-      // (the fixture is not multi-attacking). Custom traits enter camelized per the engine recipe.
-      /** @type {number} The expected dice pool computed from the live actor (engine-recipe call shape). */
+      // The dice tag is actor-derived (read via 'sheetDocument'). The fixture carries no conditional
+      // check-modifier rules elements, so both getAttackCheckMod calls return 0 regardless of arguments:
+      // this assertion proves the attribute + training read through 'sheetDocument', NOT the mod
+      // plumbing — the call shape is locked by tests/unit/CharacterSheetWeaponAttack.test.js. The calls
+      // are kept so the expectation mirrors the row recipe verbatim (no multiAttack halving: not seeded).
+      /** @type {number} The expected dice pool computed from the live actor (mirrors the row recipe). */
       const expectedDice = await page.evaluate(({ actorName, weaponName, customTraits }) => {
          const actor = game.actors.getName(actorName);
          const weapon = actor.items.getName(weaponName);
@@ -240,11 +251,6 @@ test.describe('shared AttackTags across surfaces', () => {
       await expect(
          page.locator('.application.titan-dialog[id^="titan-attack-check-dialog-"]').first(),
       ).toBeVisible();
-
-      // Restore the dialog gate so later specs see the default-off setting (matches checks-dialog hygiene).
-      await page.evaluate(async () => {
-         await game.settings.set('titan', 'getCheckOptions', false);
-      });
       expect(errors, `uncaught errors:\n${errors.join('\n')}`).toEqual([]);
    });
 
