@@ -30,23 +30,26 @@ const DELETE_ITEM_LABEL = 'Delete Item';
 /** @type {string} Localized `equipped` label: the ToggleButton text that names every equip toggle. */
 const EQUIPPED_LABEL = 'Equipped';
 
+/** @type {string} Localized `cancel` label: the confirm dialog's cancel button text. */
+const CANCEL_LABEL = 'Cancel';
+
 /**
  * @typedef {object} EmbeddedItemTypeCase One per-type functional-sweep descriptor.
  * @property {string} type - The item subtype this case covers.
  * @property {string} name - The seeded item's name.
  * @property {string} tab - The character-sheet tab label hosting this type's rows.
  * @property {string} [checkLabel] - Label of the seeded item check; absent for spell (its casting
- *   check is intrinsic, so no `system.check` entry is seeded).
+ * check is intrinsic, so no `system.check` entry is seeded).
  * @property {object} seedSystem - Type-distinctive `system` fields merged into the item seed.
  * @property {object} probe - API-edit reactivity probe: `{ kind: 'rarity' }` drives the row's
- *   RarityTag common→rare; `{ kind: 'stat', label, initial, updated, update }` drives the named
- *   StatTag's rendered value through the given `system` update.
+ * RarityTag common→rare; `{ kind: 'stat', label, initial, updated, update }` drives the named
+ * StatTag's rendered value through the given `system` update.
  * @property {object} roll - Roll case: kind `'condensed'` clicks the controls' condensed check
- *   button, `'itemCheck'` clicks the expanded check's roll button; `messageType` is the expected
- *   chat-message subtype.
+ * button, `'itemCheck'` clicks the expanded check's roll button; `messageType` is the expected
+ * chat-message subtype.
  * @property {object} [equip] - Equip case: `{ kind: 'item', expected }` polls the item's own
- *   `system.equipped` after the click; `{ kind: 'actor', slot }` polls the actor's
- *   `system.equipped[slot]` becoming the item id.
+ * `system.equipped` after the click; `{ kind: 'actor', slot }` polls the actor's
+ * `system.equipped[slot]` becoming the item id.
  */
 
 /** @type {EmbeddedItemTypeCase[]} The seven item-row sweeps, in the order they are seeded. */
@@ -203,7 +206,7 @@ const TYPE_CASES = [
 let page;
 /** @type {string[]} Uncaught page errors collected during the current test (cleared each afterEach). */
 let errors;
-/** @type {Object<string, string>} Seeded item ids keyed by item type (rebuilt fresh each test). */
+/** @type {{[key: string]: string}} Seeded item ids keyed by item type (rebuilt fresh each test). */
 let itemIds;
 
 test.beforeAll(async ({ browser }) => {
@@ -365,7 +368,7 @@ test.describe('embedded-context item rows', () => {
 
    /**
     * Returns the type's item row, scoped under the open Titan sheet root AND keyed by the seeded
-    * item id — other surfaces (e.g. compendium trays) share the `data-item-id` attribute, so a
+    * item id — other surfaces such as compendium trays share the `data-item-id` attribute, so a
     * page-global locator is banned.
     * @param {string} type - The item type whose seeded row to locate.
     * @returns {import('@playwright/test').Locator} The scoped row locator.
@@ -388,8 +391,8 @@ test.describe('embedded-context item rows', () => {
       const row = itemRow(typeCase.type);
       await expect(row, `${typeCase.type} row renders`).toBeVisible();
 
-      // The expand toggle is the row-header label button (house pattern; it has no stable
-      // accessible name — its text is the item name).
+      // The expand toggle is the row-header label button, clicked via the house-pattern CSS path
+      // shared with the sibling row specs (its accessible name is the seeded item name).
       await row.locator('.header .label .button button').first().click();
       await expect(
          row.locator('.expandable-content'),
@@ -589,7 +592,7 @@ test.describe('embedded-context item rows', () => {
       });
    }
 
-   test('weapon delete action confirms through the dialog and deletes on confirm', async () => {
+   test('weapon delete action cancels without deleting and deletes on confirm', async () => {
       await openCharacterSheetTab('Inventory');
 
       /** @type {import('@playwright/test').Locator} The seeded weapon's list row. */
@@ -602,9 +605,32 @@ test.describe('embedded-context item rows', () => {
       });
       await row.getByRole('button', { name: DELETE_ITEM_LABEL }).click();
 
-      /** @type {import('@playwright/test').Locator} The mounted TitanDialog window. */
-      const dialog = page.locator('.application.titan-dialog');
+      // The confirm dialog window, pinned by its stable element-id prefix (ConfirmationDialog passes
+      // `id: 'titan-confirmation-dialog'`; the TitanDialog constructor suffixes a UUID) — more
+      // precise than the generic `.titan-dialog` class shared by every TITAN dialog.
+      /** @type {import('@playwright/test').Locator} The mounted confirm-delete dialog window. */
+      const dialog = page.locator('.application.titan-dialog[id^="titan-confirmation-dialog"]');
       await expect(dialog, 'confirm-delete dialog mounts').toBeVisible();
+
+      // CANCEL preserves: the dialog unmounts (anchored by the visible positive above) and the
+      // weapon must still exist afterwards.
+      await dialog.getByRole('button', { name: CANCEL_LABEL }).click();
+      await expect(dialog, 'cancel click unmounts the dialog').toHaveCount(0);
+      await expect
+         .poll(
+            () => page.evaluate(({ actorName, itemId }) => {
+               return !!game.actors.getName(actorName).items.get(itemId);
+            }, {
+               actorName: ACTOR_NAME,
+               itemId: itemIds.weapon,
+            }),
+            { message: 'cancel click preserves the item' },
+         )
+         .toBe(true);
+
+      // Re-open the dialog through the same delete action.
+      await row.getByRole('button', { name: DELETE_ITEM_LABEL }).click();
+      await expect(dialog, 'confirm-delete dialog mounts again').toBeVisible();
 
       // POSITIVE signal first (dialog visible above), so this survival read cannot pass falsely.
       /** @type {boolean} Whether the weapon still exists while the confirmation is pending. */
@@ -616,7 +642,7 @@ test.describe('embedded-context item rows', () => {
       });
       expect(survives, 'item survives until the dialog is confirmed').toBe(true);
 
-      // Confirming deletes the item through the actor.
+      // CONFIRM deletes: the item is removed from the actor.
       await dialog.getByRole('button', { name: DELETE_ITEM_LABEL }).click();
       await expect
          .poll(
