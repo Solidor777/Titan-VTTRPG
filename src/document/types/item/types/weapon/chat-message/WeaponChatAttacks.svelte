@@ -1,106 +1,33 @@
 <script>
-   import localize from '~/helpers/utility-functions/Localize.js';
-   import { ATTACK_TRAIT_DESCRIPTIONS } from '~/document/types/item/types/weapon/AttackTraits.js';
-   import StatTag from '~/helpers/svelte-components/tag/StatTag.svelte';
-   import IconStatTag from '~/helpers/svelte-components/tag/IconStatTag.svelte';
-   import IconTag from '~/helpers/svelte-components/tag/IconTag.svelte';
+   import { getContext } from 'svelte';
+   import AttackTags from '~/document/types/item/types/weapon/components/AttackTags.svelte';
    import {
       ACCURACY_ICON,
-      DAMAGE_ICON,
       MELEE_ICON,
-      RANGE_ICON,
    } from '~/system/Icons.js';
-   import Tag from '~/helpers/svelte-components/tag/Tag.svelte';
-   import AttributeCheckTag from '~/helpers/svelte-components/tag/AttributeCheckTag.svelte';
 
-   /**
-    * @typedef {object} WeaponChatAttacksProps
-    * @property {object} [item] - The titan flags data for the item.
-    */
+   /** @type {object} Reference to the reactive Document store (the chat-message bridge). */
+   const document = getContext('document');
 
-   /** @type {WeaponChatAttacksProps} */
-   const { item = void 0 } = $props();
-
-   /** @type {Record<string, string>} Map of attack trait names to their description strings. */
-   const traitDescriptions = ATTACK_TRAIT_DESCRIPTIONS;
+   /** @type {object[]} The snapshot attack array carried by the chat message's system data. */
+   const attacks = $derived(document.data?.system.attack ?? []);
 </script>
 
 <ol>
-   {#each Object.values(item.attack) as attack}
+   {#each attacks as attack, idx (idx)}
       <!--Each attack-->
       <li>
          <div class="row header">
-            <!--Attack Button-->
+            <!--Attack name-->
             <div class="attack-name">
-               <i class={attack.type === 'melee'? MELEE_ICON: ACCURACY_ICON}></i>
+               <i class={attack.type === 'melee' ? MELEE_ICON : ACCURACY_ICON}></i>
                {attack.label}
             </div>
          </div>
 
+         <!--Intrinsic attack tags (shared component; path parity with the weapon document)-->
          <div class="row stats">
-            <!--Damage-->
-            <div class="stat">
-               <IconStatTag
-                  icon={DAMAGE_ICON}
-                  label={localize('damage')}
-                  value={`${attack.damage}${
-                     attack.plusExtraSuccessDamage ?
-                     ` + ${localize('extraSuccesses.short')}` :
-                     ''
-                  }`}
-               />
-            </div>
-
-            <!--Type-->
-            <div class="stat">
-               <IconTag
-                  icon={attack.type === 'melee' ? MELEE_ICON: ACCURACY_ICON}
-                  label={localize(attack.type)}
-               />
-            </div>
-
-            <!--Range-->
-            {#if attack.range !== 1}
-               <div class="stat">
-                  <IconStatTag
-                     label={localize('range')}
-                     value={attack.range}
-                     icon={RANGE_ICON}
-                  />
-               </div>
-            {/if}
-
-            <!--Attribute and skill-->
-            <div class="stat">
-               <AttributeCheckTag
-                  attribute={attack.attribute}
-                  skill={attack.skill}
-               />
-            </div>
-
-            <!--Traits-->
-            {#each attack.trait as trait}
-               <div class="stat">
-                  {#if typeof (trait.value) === 'number'}
-                     <StatTag
-                        tooltip={traitDescriptions[trait.name]}
-                        label={localize(trait.name)}
-                        value={trait.value}
-                     />
-                  {:else}
-                     <Tag tooltip={traitDescriptions[trait.name]}>{localize(trait.name)}</Tag>
-                  {/if}
-               </div>
-            {/each}
-
-            <!--Custom Traits-->
-            {#each attack.customTrait as trait}
-               <div class="stat">
-                  <Tag tooltip={{ text: trait.description, localize: false }}>
-                     {trait.name}
-                  </Tag>
-               </div>
-            {/each}
+            <AttackTags {idx}/>
          </div>
       </li>
    {/each}
@@ -139,10 +66,6 @@
 
             &.stats {
                @include flex-group-center;
-
-               .stat {
-                  @include tag-container-child-margin;
-               }
             }
 
             .attack-name {

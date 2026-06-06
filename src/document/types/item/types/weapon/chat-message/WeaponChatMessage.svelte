@@ -16,7 +16,7 @@
 <ItemChatMessageShell {item}>
    <!--Attacks-->
    <div class="section">
-      <WeaponChatAttacks {item}/>
+      <WeaponChatAttacks/>
    </div>
 
    <!--Attack Notes-->
