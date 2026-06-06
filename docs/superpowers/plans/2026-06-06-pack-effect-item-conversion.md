@@ -10,20 +10,35 @@ and extend it to convert actors inside world Actor compendium packs (index-gated
 
 **Architecture:** All shipping changes live in `src/helpers/migration/ConvertEffectItemsToActiveEffects.js`. Discovery
 moves from `actor.items` (blind to invalid documents) to `actor._source.items` (sees everything). A new pack path
-appends to the module's default every-load function: world Actor packs are scanned via a raw index projection
-(`pack.getIndex({ fields: ['items'] })`, no document construction); only packs that actually carry legacy items get
-unlocked, converted, and restored. Spec: `docs/superpowers/specs/2026-06-06-pack-effect-item-conversion-design.md`.
+appends to the module's default every-load function: world Actor packs are scanned via a summary index projection
+(`pack.getIndex({ fields: ['items'] })` — per-item index fields only, no document construction); only packs that
+actually carry legacy items get unlocked, converted, and restored. Replacement AEs carry a
+`flags.titan.convertedFromItem` provenance stamp and `convertActor` skips already-converted sources, making the
+create step idempotent under retry (user-approved design delta from the buddy check). Spec: `docs/superpowers/specs/2026-06-06-pack-effect-item-conversion-design.md`.
 
 **Tech Stack:** Foundry v14 client API (CompendiumCollection, embedded-document CRUD), Vitest (unit), Playwright (e2e).
 
-**Verified ground truth (do not re-litigate during implementation):**
+**Verified ground truth (buddy-checked by two independent reviewers, 2026-06-06):**
 - Unregistered-subtype documents throw in `DocumentTypeField._validateType` and land in
   `EmbeddedCollection#invalidDocumentIds`, excluded from `actor.items` iteration (v14
   `common/data/fields.mjs:4186`, `common/abstract/embedded-collection.mjs:152-216`).
 - Deleting invalid embedded documents by id works: the client backend resolves deletion targets with
   `collection.get(id, {strict: true, invalid: true})` (v14 `client/data/client-backend.mjs:403`).
-- `TitanItem` defines no `_preDelete`/`_onDelete`, so deleting an invalid legacy item runs no subtype code.
-- `buildEffectData` reads only fields that exist identically on raw source (`name`, `img`, `system.*`).
+- `TitanItem` defines no `_preDelete`/`_onDelete`. HOWEVER, deletion builds a temp doc (`getInvalid` →
+  `fromSource`) whose `_safePrepareData` runs `TitanItem.prepareDerivedData` against a plain-object `system` — a
+  caught TypeError logged as one red `Failed data preparation` error per legacy item. Stale worlds ALSO already
+  emit one red `Failed to initialize Item … "effect" is not a valid type` per legacy item on every load. Both
+  classes are EXPECTED on the conversion load and absent on the next — brief the manual verifier (Task 6).
+- `pack.getIndex({ fields: ['items'] })` does NOT return raw item sources: the server projects each embedded item
+  to the Item `compendiumIndexFields` + `_id` — `{ _id, name, img, type, sort, folder }`, **no `system`** — with no
+  validation, so invalid-typed (`effect`) entries ARE included and `type` IS readable (all the gate needs). The
+  scan retains these summary arrays in each pack's client index for the session, and they go stale after
+  conversion — harmless here, a trap for future same-session index consumers.
+- Raw source carries every field `buildEffectData` reads, but WITHOUT schema casting: template-era source
+  (verified at `2edf6262^:template.json`) persisted `active` as a STRING and may lack `check`/`customTrait`.
+  `buildEffectData` therefore normalizes `active` defensively (defense-in-depth: the one verified template-era
+  value `"active": "true"` happens to convert outcome-identically, and the era's toggle wrote booleans — no actual
+  misconversion case exists in this repo's history).
 - The unit setup (`tests/setup.js`) provides `foundry.utils.mergeObject` but NOT `foundry.utils.deepClone` and no
   `ui` global — the new suite installs scoped stand-ins (established pattern, see
   `tests/unit/EffectBuildChatMessageData.test.js`).
@@ -50,18 +65,20 @@ Expected: `Switched to a new branch 'feat/pack-effect-item-conversion'`.
 the raw-source contract BEFORE `convertActor` starts handing the function raw entries, and they are the file's
 shared scaffolding (stand-ins + fixtures) for Tasks 2-3.
 
+**Import staging (buddy-check finding):** the file imports ONLY symbols that exist at each task — Task 1 imports
+`buildEffectData` + `convertActor` (both exported today); Task 3 extends the import line when the pack symbols are
+implemented. Every task therefore ends with this suite executing green; no commit carries a non-evaluating module.
+
 **Files:**
 - Create: `tests/unit/ConvertEffectItemsToActiveEffects.test.js`
 
 - [ ] **Step 1: Write the test file with shared stand-ins, fixtures, and the `buildEffectData` suite**
 
 ```js
-import { describe, it, expect, beforeAll, afterAll } from 'vitest';
+import { describe, it, expect, beforeAll, afterAll, afterEach } from 'vitest';
 import {
    buildEffectData,
    convertActor,
-   convertPack,
-   convertWorldActorPacks,
 } from '~/helpers/migration/ConvertEffectItemsToActiveEffects.js';
 
 // The converter module imports only log/error at module scope, so a static import is safe. The shared test setup
@@ -69,16 +86,26 @@ import {
 // installs scoped stand-ins for both (deepClone backs buildEffectData's field copies; ui.notifications.error backs
 // the error() helper exercised by the isolation tests) and removes them so later suites keep the shared minimal mock.
 
+/** @type {string[]} - Messages recorded by the ui.notifications.error stand-in (reset after each test). */
+const uiErrors = [];
+
 beforeAll(() => {
    // Stand-in for foundry.utils.deepClone, used by buildEffectData to copy the four migrated system fields.
    globalThis.foundry.utils.deepClone = (value) => structuredClone(value);
 
-   // Stand-in for the ui global, used by the error() helper on the isolation paths.
+   // Recording stand-in for the ui global, used by the error() helper on the isolation paths.
    globalThis.ui = {
       notifications: {
-         error: () => {},
+         error: (message) => {
+            uiErrors.push(message);
+         },
       },
    };
+});
+
+afterEach(() => {
+   // Reset the recorded error messages so assertions never see another test's errors.
+   uiErrors.length = 0;
 });
 
 afterAll(() => {
@@ -149,30 +176,28 @@ function makeFakeActor({ items = [], effects = [] } = {}) {
 }
 
 describe('buildEffectData (raw source contract)', () => {
-   it('maps raw source fields onto effect AE creation data', () => {
+   it('maps the core raw source fields onto effect AE creation data', () => {
       const result = buildEffectData(makeLegacyItemSource());
 
-      expect(result).toEqual({
-         name: 'Legacy Effect',
-         img: 'icons/legacy.webp',
-         type: 'effect',
-         description: '<p>Legacy.</p>',
-         disabled: false,
-         system: {
-            rulesElement: [
-               {
-                  operation: 'flatModifier',
-               },
-            ],
-            duration: {
-               type: 'turnStart',
-               remaining: 2,
-               initiative: 7,
-               custom: '',
+      expect(result.name).toBe('Legacy Effect');
+      expect(result.img).toBe('icons/legacy.webp');
+      expect(result.type).toBe('effect');
+      expect(result.description).toBe('<p>Legacy.</p>');
+      expect(result.disabled).toBe(false);
+      expect(result.system).toEqual({
+         rulesElement: [
+            {
+               operation: 'flatModifier',
             },
-            check: [],
-            customTrait: [],
+         ],
+         duration: {
+            type: 'turnStart',
+            remaining: 2,
+            initiative: 7,
+            custom: '',
          },
+         check: [],
+         customTrait: [],
       });
    });
 
@@ -210,36 +235,87 @@ describe('buildEffectData (raw source contract)', () => {
 });
 ```
 
-- [ ] **Step 2: Run the new suite — `buildEffectData` cases pass, the import of not-yet-exported symbols fails**
+- [ ] **Step 2: Run the new suite — all `buildEffectData` characterization cases pass**
 
 Run: `npm test -- ConvertEffectItemsToActiveEffects`
-Expected: FAIL — the module does not yet export `convertPack` / `convertWorldActorPacks` (import error), and
-`convertActor` is exported but untested so far. This failure is the red state for Tasks 2-3.
+Expected: PASS — these cases characterize the current function against the raw-source shape (the function already
+reads only raw-compatible fields). The field-level assertions (not a whole-object `toEqual`) stay green when Task 2
+adds the provenance `flags` to the creation data.
 
-To confirm the `buildEffectData` cases themselves are green, temporarily note that only the import line blocks them —
-do NOT change the import; Tasks 2-3 add the exports.
-
-- [ ] **Step 3: Commit the red test scaffolding**
+- [ ] **Step 3: Commit the green characterization scaffolding**
 
 ```powershell
 git add tests/unit/ConvertEffectItemsToActiveEffects.test.js
-git commit -m "test(migration): raw-source contract suite for the effect-item converter (red)"
+git commit -m "test(migration): raw-source characterization suite for buildEffectData"
 ```
 
 ---
 
-### Task 2: `convertActor` discovers legacy items from raw `_source` (fixes OPEN_BUGS #8)
+### Task 2: `convertActor` discovers legacy items from raw `_source` (fixes OPEN_BUGS #8) + `active` normalization + provenance flag
+
+Three behavior changes land together because they share one write path: discovery moves to raw `_source.items`,
+`buildEffectData` normalizes the uncast raw `active` value and stamps `flags.titan.convertedFromItem`, and
+`convertActor` skips creating replacements whose source id already has a surviving converted AE (retry-idempotent
+create — the user-approved fix for the create-succeeded/delete-failed duplicate window).
 
 **Files:**
 - Modify: `src/helpers/migration/ConvertEffectItemsToActiveEffects.js:36-72` (`convertActor`), `:4-34`
-  (`buildEffectData` JSDoc/param rename)
+  (`buildEffectData`)
 - Test: `tests/unit/ConvertEffectItemsToActiveEffects.test.js`
 
-- [ ] **Step 1: Add the `convertActor` test suite**
+- [ ] **Step 1: Add the normalization, provenance, and `convertActor` test suites**
 
 Append to `tests/unit/ConvertEffectItemsToActiveEffects.test.js`:
 
 ```js
+describe('buildEffectData (raw active normalization + provenance)', () => {
+   it('normalizes template-era string active values like BooleanField casting would', () => {
+      /** @type {object} - A permanent legacy source whose active value is the template-era string 'false'. */
+      const stringFalse = makeLegacyItemSource();
+      stringFalse.system.duration.type = 'permanent';
+      stringFalse.system.active = 'false';
+
+      /** @type {object} - A permanent legacy source whose active value is the template-era string 'true'. */
+      const stringTrue = makeLegacyItemSource();
+      stringTrue.system.duration.type = 'permanent';
+      stringTrue.system.active = 'true';
+
+      expect(buildEffectData(stringFalse).disabled).toBe(true);
+      expect(buildEffectData(stringTrue).disabled).toBe(false);
+   });
+
+   it('defaults a missing active key to the schema default (enabled)', () => {
+      /** @type {object} - A permanent legacy source with no active key at all (sparse pre-schema source). */
+      const sparse = makeLegacyItemSource();
+      sparse.system.duration.type = 'permanent';
+      delete sparse.system.active;
+
+      expect(buildEffectData(sparse).disabled).toBe(false);
+   });
+
+   it('passes missing check/customTrait through as undefined (filled by schema initials at creation)', () => {
+      /** @type {object} - A template-era source lacking the later-added check and customTrait fields. */
+      const sparse = makeLegacyItemSource();
+      delete sparse.system.check;
+      delete sparse.system.customTrait;
+
+      const result = buildEffectData(sparse);
+
+      expect(result.system.check).toBeUndefined();
+      expect(result.system.customTrait).toBeUndefined();
+   });
+
+   it('stamps the source item id as the convertedFromItem provenance flag', () => {
+      const result = buildEffectData(makeLegacyItemSource());
+
+      expect(result.flags).toEqual({
+         titan: {
+            convertedFromItem: 'legacyitem000001',
+         },
+      });
+   });
+});
+
 describe('convertActor (raw _source discovery)', () => {
    it('converts only legacy effect entries: creates replacement AEs, then deletes the source items by _id', async () => {
       /** @type {object} - A legacy effect item source expected to convert. */
@@ -339,21 +415,82 @@ describe('convertActor (raw _source discovery)', () => {
          ['delete', 'ActiveEffect', ['mirrorfx00000001']],
       ]);
    });
+
+   it('skips creating a replacement whose source already has a converted AE, but still deletes the item', async () => {
+      /** @type {object} - A surviving converted AE stamped with the legacy source id (interrupted prior run). */
+      const survivor = {
+         id: 'convertedfx00001',
+         type: 'effect',
+         flags: {
+            titan: {
+               convertedFromItem: 'legacyitem000001',
+            },
+         },
+      };
+
+      /** @type {object} - The fake actor stuck mid-conversion: replacement exists, legacy item still present. */
+      const actor = makeFakeActor({
+         items: [makeLegacyItemSource()],
+         effects: [survivor],
+      });
+
+      await convertActor(actor);
+
+      expect(actor.calls).toEqual([
+         ['delete', 'Item', ['legacyitem000001']],
+      ]);
+   });
+
+   it('creates only the not-yet-converted sources when some replacements already exist', async () => {
+      /** @type {object} - A second legacy source with no surviving replacement. */
+      const fresh = makeLegacyItemSource({
+         _id: 'legacyitem000002',
+         name: 'Second Legacy Effect',
+      });
+
+      /** @type {object} - The fake actor with one converted and one unconverted legacy item. */
+      const actor = makeFakeActor({
+         items: [
+            makeLegacyItemSource(),
+            fresh,
+         ],
+         effects: [
+            {
+               id: 'convertedfx00001',
+               type: 'effect',
+               flags: {
+                  titan: {
+                     convertedFromItem: 'legacyitem000001',
+                  },
+               },
+            },
+         ],
+      });
+
+      await convertActor(actor);
+
+      expect(actor.calls).toEqual([
+         ['create', 'ActiveEffect', [buildEffectData(fresh)]],
+         ['delete', 'Item', ['legacyitem000001', 'legacyitem000002']],
+      ]);
+   });
 });
 ```
 
 - [ ] **Step 2: Run the suite to verify the red state**
 
 Run: `npm test -- ConvertEffectItemsToActiveEffects`
-Expected: FAIL — still the missing `convertPack` / `convertWorldActorPacks` exports; once Task 3's exports exist,
-these `convertActor` cases fail against current code because it reads `actor.items` (undefined on the fake) instead
-of `actor._source.items`. (If you want to see that specific failure now, temporarily trim the import to
-`{ buildEffectData, convertActor }` — then restore it.)
+Expected: FAIL with real assertion/throw failures (the Task 1 characterization cases stay green): the
+normalization cases fail (`!system.active` treats string `'false'` as truthy; missing `active` inverts), the
+provenance case fails (no `flags` in creation data), and every `convertActor` case throws because current code
+reads `actor.items` (undefined on the fake) instead of `actor._source.items`.
 
-- [ ] **Step 3: Implement raw-source discovery in `convertActor` and retarget `buildEffectData`'s contract**
+- [ ] **Step 3: Implement raw-source discovery, `active` normalization, the provenance flag, and the skip-guard**
 
-In `src/helpers/migration/ConvertEffectItemsToActiveEffects.js`, replace `buildEffectData`'s signature/JSDoc and
-`convertActor`'s discovery (bodies shown in full):
+In `src/helpers/migration/ConvertEffectItemsToActiveEffects.js`, replace `buildEffectData` and `convertActor`
+(bodies shown in full). Also verify (read, do not modify) that `TitanActiveEffect._preCreate` merges into
+`flags.titan` rather than replacing it wholesale — if it replaces, surface to the user before proceeding (the
+provenance stamp must survive creation).
 
 ```js
 /**
@@ -365,7 +502,9 @@ In `src/helpers/migration/ConvertEffectItemsToActiveEffects.js`, replace `buildE
  * Active Effects description flag are intentionally NOT set here; TitanActiveEffect._preCreate seeds them.
  * Operates on raw source entries (actor._source.items elements) rather than Item instances, because the 'effect'
  * Item subtype is no longer registered: legacy items fail strict construction, land in invalidDocumentIds, and are
- * invisible to actor.items iteration.
+ * invisible to actor.items iteration. Raw source bypasses schema casting, so the active value is normalized here
+ * (template-era source persisted strings; missing keys take the schema default of true). The created effect is
+ * stamped with flags.titan.convertedFromItem so an interrupted conversion never duplicates it on retry.
  * @param {object} itemSource - The legacy effect Item's raw source data (an actor._source.items entry).
  * @returns {object} The Active Effect creation data.
  */
@@ -373,8 +512,14 @@ export function buildEffectData(itemSource) {
    /** @type {object} - The legacy item's raw system data, the source of all migrated fields. */
    const system = itemSource.system;
 
+   /** @type {boolean|string} - The uncast raw active value, defaulted like the legacy schema (missing → true). */
+   const rawActive = system.active ?? true;
+
+   /** @type {boolean} - The normalized active state, mirroring BooleanField casting for template-era strings. */
+   const active = typeof rawActive === 'string' ? rawActive === 'true' : Boolean(rawActive);
+
    /** @type {boolean} - Whether the new effect should start disabled (explicitly-deactivated permanent only). */
-   const disabled = system.duration?.type === 'permanent' ? !system.active : false;
+   const disabled = system.duration?.type === 'permanent' ? !active : false;
 
    return {
       name: itemSource.name,
@@ -382,6 +527,11 @@ export function buildEffectData(itemSource) {
       type: 'effect',
       description: system.description ?? '',
       disabled,
+      flags: {
+         titan: {
+            convertedFromItem: itemSource._id,
+         },
+      },
       system: {
          rulesElement: foundry.utils.deepClone(system.rulesElement),
          duration: foundry.utils.deepClone(system.duration),
@@ -398,9 +548,11 @@ export function buildEffectData(itemSource) {
  * source (and deletable by id — the client backend resolves deletions with { invalid: true }). No destructive step
  * occurs before the replacement Active Effects exist: the replacement Active Effects are created first, then the
  * source effect Items are batch-deleted, then any stale cosmetic "mirror" Active Effects (the old base-subtype AEs
- * flagged with flags.titan.type === 'effect') are batch-deleted to avoid duplicates. Returns early when there is
- * nothing to do (no effect Items and no stale mirrors); if there are stale mirrors but no effect Items, the mirrors
- * are still removed.
+ * flagged with flags.titan.type === 'effect') are batch-deleted to avoid duplicates. Creation skips any source
+ * whose id already has a surviving converted Active Effect (the convertedFromItem provenance stamp), so a
+ * conversion interrupted between creation and deletion finishes cleanly on retry instead of duplicating effects.
+ * Returns early when there is nothing to do (no effect Items and no stale mirrors); if there are stale mirrors but
+ * no effect Items, the mirrors are still removed.
  * @param {TitanActor} actor - The actor whose legacy effect Items should be converted.
  * @returns {Promise<void>}
  */
@@ -418,11 +570,21 @@ export async function convertActor(actor) {
       return;
    }
 
-   // Create the replacement Active Effects before any destructive step, so no effect data is lost if creation fails.
-   if (effectItemSources.length > 0) {
-      await actor.createEmbeddedDocuments('ActiveEffect', effectItemSources.map(buildEffectData));
+   /** @type {Set<string>} - Source-item ids that already have a surviving converted Active Effect. */
+   const convertedItemIds = new Set(
+      actor.effects.map((effect) => effect.flags?.titan?.convertedFromItem).filter(Boolean),
+   );
 
-      // Batch-delete the source effect Items now that their replacements exist.
+   /** @type {object[]} - Legacy sources still needing a replacement (skips already-converted, retry-safe). */
+   const sourcesToCreate = effectItemSources.filter((item) => !convertedItemIds.has(item._id));
+
+   // Create the replacement Active Effects before any destructive step, so no effect data is lost if creation fails.
+   if (sourcesToCreate.length > 0) {
+      await actor.createEmbeddedDocuments('ActiveEffect', sourcesToCreate.map(buildEffectData));
+   }
+
+   // Batch-delete the source effect Items now that every replacement exists.
+   if (effectItemSources.length > 0) {
       await actor.deleteEmbeddedDocuments('Item', effectItemSources.map((item) => item._id));
    }
 
@@ -435,17 +597,16 @@ export async function convertActor(actor) {
 
 `convertActorIsolated` and the default function are untouched in this task.
 
-- [ ] **Step 4: Run the suite — `convertActor` cases must pass (exports still red until Task 3)**
+- [ ] **Step 4: Run the suite — everything green**
 
 Run: `npm test -- ConvertEffectItemsToActiveEffects`
-Expected: still FAIL on the missing `convertPack` / `convertWorldActorPacks` exports. Verify the failure is ONLY the
-import error — no assertion failures.
+Expected: PASS — all Task 1 characterization, normalization/provenance, and `convertActor` cases.
 
 - [ ] **Step 5: Commit**
 
 ```powershell
 git add src/helpers/migration/ConvertEffectItemsToActiveEffects.js tests/unit/ConvertEffectItemsToActiveEffects.test.js
-git commit -m "fix(migration): effect-item converter discovers legacy items from raw _source (OPEN_BUGS #8)"
+git commit -m "fix(migration): raw-_source discovery + active normalization + retry-idempotent create (OPEN_BUGS #8)"
 ```
 
 ---
@@ -466,14 +627,20 @@ Append to `tests/unit/ConvertEffectItemsToActiveEffects.test.js`:
  * Builds a fake compendium pack exposing only what the pack path reads: metadata, the locked flag, and recording
  * getIndex/configure/getDocument stubs.
  * @param {object} [options] - The fake's contents.
- * @param {object[]} [options.indexEntries] - Raw index entries returned by getIndex.
+ * @param {object[]} [options.indexEntries] - Projected index entries returned by getIndex.
  * @param {boolean} [options.locked] - The initial lock state.
  * @param {object} [options.documents] - Map of id → fake actor (or Error instance to throw) for getDocument.
  * @param {string} [options.type] - The pack's document type metadata.
  * @param {string} [options.packageType] - The pack's owning package type metadata.
  * @returns {object} The fake pack; its calls array records [method, payload] pairs in order.
  */
-function makeFakePack({ indexEntries = [], locked = false, documents = {}, type = 'Actor', packageType = 'world' } = {}) {
+function makeFakePack({
+   indexEntries = [],
+   locked = false,
+   documents = {},
+   type = 'Actor',
+   packageType = 'world',
+} = {}) {
    /** @type {Array<[string, *]>} - Recorded pack-API calls as [method, payload] pairs. */
    const calls = [];
 
@@ -509,16 +676,24 @@ function makeFakePack({ indexEntries = [], locked = false, documents = {}, type 
 }
 
 /**
- * Builds a raw pack-index entry carrying the projected items array.
+ * Builds a pack-index entry whose items array uses the REAL server projection: each embedded item is filtered to
+ * the Item compendiumIndexFields plus _id ({ _id, name, img, type, sort, folder }) — never a system bag.
  * @param {string} id - The entry's _id.
- * @param {object[]} items - The projected raw items array.
+ * @param {string[]} itemTypes - The type string of each projected embedded item.
  * @returns {object} The index-entry fixture.
  */
-function makeIndexEntry(id, items) {
+function makeIndexEntry(id, itemTypes) {
    return {
       _id: id,
       name: 'Packed Actor',
-      items,
+      items: itemTypes.map((itemType, index) => ({
+         _id: `projecteditem${String(index).padStart(3, '0')}`,
+         name: 'Projected Item',
+         img: 'icons/projected.webp',
+         type: itemType,
+         sort: 0,
+         folder: null,
+      })),
    };
 }
 
@@ -526,13 +701,7 @@ describe('convertPack (index gate + lock handling)', () => {
    it('leaves clean packs completely untouched (no configure, no document loads)', async () => {
       /** @type {object} - A locked pack whose only entry carries no legacy items. */
       const pack = makeFakePack({
-         indexEntries: [
-            makeIndexEntry('cleanactor000001', [
-               {
-                  type: 'weapon',
-               },
-            ]),
-         ],
+         indexEntries: [makeIndexEntry('cleanactor000001', ['weapon'])],
          locked: true,
       });
 
@@ -551,7 +720,7 @@ describe('convertPack (index gate + lock handling)', () => {
 
       /** @type {object} - A locked pack with one needy entry. */
       const pack = makeFakePack({
-         indexEntries: [makeIndexEntry('packedactor00001', [makeLegacyItemSource()])],
+         indexEntries: [makeIndexEntry('packedactor00001', ['effect'])],
          locked: true,
          documents: {
             packedactor00001: actor,
@@ -575,7 +744,7 @@ describe('convertPack (index gate + lock handling)', () => {
    it('never toggles the lock on an already-unlocked pack', async () => {
       /** @type {object} - An unlocked pack with one needy entry. */
       const pack = makeFakePack({
-         indexEntries: [makeIndexEntry('packedactor00001', [makeLegacyItemSource()])],
+         indexEntries: [makeIndexEntry('packedactor00001', ['effect'])],
          locked: false,
          documents: {
             packedactor00001: makeFakeActor({
@@ -598,8 +767,8 @@ describe('convertPack (index gate + lock handling)', () => {
       /** @type {object} - A locked pack where the first entry's document load fails. */
       const pack = makeFakePack({
          indexEntries: [
-            makeIndexEntry('brokenactor00001', [makeLegacyItemSource()]),
-            makeIndexEntry('packedactor00001', [makeLegacyItemSource()]),
+            makeIndexEntry('brokenactor00001', ['effect']),
+            makeIndexEntry('packedactor00001', ['effect']),
          ],
          locked: true,
          documents: {
@@ -617,7 +786,7 @@ describe('convertPack (index gate + lock handling)', () => {
    it('restores the lock in the finally path when the unlock itself fails wholesale', async () => {
       /** @type {object} - A locked pack with one needy entry whose unlock call fails. */
       const pack = makeFakePack({
-         indexEntries: [makeIndexEntry('packedactor00001', [makeLegacyItemSource()])],
+         indexEntries: [makeIndexEntry('packedactor00001', ['effect'])],
          locked: true,
          documents: {
             packedactor00001: makeFakeActor({
@@ -642,6 +811,78 @@ describe('convertPack (index gate + lock handling)', () => {
          ['configure', false],
          ['configure', true],
       ]);
+   });
+
+   it('logs a restore-specific error and resolves when only the re-lock fails', async () => {
+      /** @type {object} - A locked pack with one needy entry whose re-lock call fails. */
+      const pack = makeFakePack({
+         indexEntries: [makeIndexEntry('packedactor00001', ['effect'])],
+         locked: true,
+         documents: {
+            packedactor00001: makeFakeActor({
+               items: [makeLegacyItemSource()],
+            }),
+         },
+      });
+
+      // Replace configure with a stub that succeeds on unlock but fails the finally path's re-lock.
+      pack.configure = async ({ locked: nextLocked }) => {
+         pack.calls.push(['configure', nextLocked]);
+         if (nextLocked === true) {
+            throw new Error('re-lock failed');
+         }
+         pack.locked = nextLocked;
+      };
+
+      // The restore failure is caught inside the finally: conversion still resolves (it succeeded).
+      await convertPack(pack);
+
+      expect(uiErrors.some((message) => message.includes('Failed to restore the lock'))).toBe(true);
+   });
+});
+
+describe('default export (wiring: the pack scan is reachable from the boot path)', () => {
+   afterEach(() => {
+      // Remove the game stand-in so later suites keep the shared minimal mock.
+      delete globalThis.game;
+   });
+
+   it('reaches the world Actor pack scan when run as the GM', async () => {
+      /** @type {object} - An eligible world Actor pack that must receive the index scan. */
+      const pack = makeFakePack({});
+
+      globalThis.game = {
+         user: {
+            isGM: true,
+         },
+         actors: [],
+         scenes: [],
+         packs: [pack],
+      };
+
+      await convertEffectItemsToActiveEffects();
+
+      expect(pack.calls).toEqual([
+         ['getIndex', ['items']],
+      ]);
+   });
+
+   it('does nothing for non-GM users', async () => {
+      /** @type {object} - A pack that must never be scanned by a non-GM client. */
+      const pack = makeFakePack({});
+
+      globalThis.game = {
+         user: {
+            isGM: false,
+         },
+         actors: [],
+         scenes: [],
+         packs: [pack],
+      };
+
+      await convertEffectItemsToActiveEffects();
+
+      expect(pack.calls).toEqual([]);
    });
 });
 
@@ -708,10 +949,15 @@ describe('convertWorldActorPacks (pack filtering + isolation)', () => {
 });
 ```
 
-Also add `afterEach` to the existing vitest import line:
+Also extend the file's converter import (Task 1 staged it; the new symbols exist after Step 3 of this task):
 
 ```js
-import { describe, it, expect, beforeAll, afterAll, afterEach } from 'vitest';
+import convertEffectItemsToActiveEffects, {
+   buildEffectData,
+   convertActor,
+   convertPack,
+   convertWorldActorPacks,
+} from '~/helpers/migration/ConvertEffectItemsToActiveEffects.js';
 ```
 
 - [ ] **Step 2: Run the suite to verify the red state**
@@ -726,15 +972,18 @@ Append to `src/helpers/migration/ConvertEffectItemsToActiveEffects.js` (after `c
 ```js
 /**
  * Converts the legacy effect Items inside a single compendium pack's actors.
- * Index-gated: pulls the pack index with the raw items array projected (no document construction) and returns
- * without touching the pack when no entry carries a legacy effect Item. Otherwise the pack is unlocked if needed,
- * each flagged actor is loaded and converted (per-actor failures are logged and skipped so the rest of the pack
- * still converts), and the pack's original lock state is restored in a finally block even when conversion throws.
+ * Index-gated: pulls the pack index with each entry's embedded items projected to their summary index fields
+ * (_id/name/img/type/sort/folder — no document construction, no validation, so invalid-typed entries are visible)
+ * and returns without touching the pack when no entry carries a legacy effect Item. Otherwise the pack is unlocked
+ * if needed, each flagged actor is loaded and converted (per-actor failures are logged and skipped so the rest of
+ * the pack still converts), and the pack's original lock state is restored in a finally block even when conversion
+ * throws. A restore failure is caught inside the finally and logged as a restore-specific error, so it can never
+ * mask an in-flight conversion error or be misread as a conversion failure.
  * @param {CompendiumCollection} pack - The compendium pack to convert.
  * @returns {Promise<void>}
  */
 export async function convertPack(pack) {
-   /** @type {object[]} - The pack index with each entry's raw items array projected. */
+   /** @type {object[]} - The pack index with each entry's items projected to their summary index fields. */
    const index = await pack.getIndex({ fields: ['items'] });
 
    /** @type {string[]} - The ids of index entries that carry at least one legacy effect Item. */
@@ -756,6 +1005,9 @@ export async function convertPack(pack) {
          await pack.configure({ locked: false });
       }
 
+      /** @type {number} - The count of flagged actors successfully converted in this pack. */
+      let convertedCount = 0;
+
       // Load and convert each flagged actor, isolating per-actor failures so the rest of the pack still converts.
       for (const id of needyIds) {
          try {
@@ -763,6 +1015,7 @@ export async function convertPack(pack) {
             const actor = await pack.getDocument(id);
 
             await convertActor(actor);
+            convertedCount += 1;
          }
          catch (err) {
             error(
@@ -772,12 +1025,17 @@ export async function convertPack(pack) {
          }
       }
 
-      log(`Converted ${needyIds.length} actor(s) with legacy effect Items in world pack "${pack.metadata.label}".`);
+      log(`Converted ${convertedCount} of ${needyIds.length} flagged actor(s) in world pack "${pack.metadata.label}".`);
    }
    finally {
-      // Restore the pack's original lock state even when conversion throws.
+      // Restore the pack's original lock state even when conversion throws, without masking an in-flight error.
       if (wasLocked) {
-         await pack.configure({ locked: true });
+         try {
+            await pack.configure({ locked: true });
+         }
+         catch (err) {
+            error(`Failed to restore the lock on pack "${pack.metadata.label}" — the pack is left unlocked.`, err);
+         }
       }
    }
 }
@@ -991,15 +1249,24 @@ test.describe('pack effect-item conversion (clean-pack safety)', () => {
          actorName: ACTOR_NAME,
       });
 
-      // Reload: the every-load converter (including the pack scan) runs again on the boot path.
+      // Reload: the every-load converter (including the pack scan) runs again on the boot path. NOTE: this is the
+      // suite's FIRST mid-file reload of the shared page (a new harness idiom) — the waitForURL guard makes a lost
+      // session fail crisply instead of timing out opaquely downstream.
       consoleLines.length = 0;
       await page.reload();
+      await page.waitForURL('**/game', { timeout: 15_000 });
       await page.waitForFunction(() => globalThis.game?.ready === true && typeof game.titan !== 'undefined');
 
-      // Positive completion signal first: the converter's finish line proves the pack scan ran to completion.
+      // Positive completion signal first: the converter's finish line proves the boot-path conversion finished.
       await expect
          .poll(() => consoleLines.some((line) => line.includes(CONVERTER_DONE_LINE)), { timeout: 30_000 })
          .toBe(true);
+
+      // Lock-state symmetry cannot distinguish "gate skipped" from "unlocked and re-locked", so assert the absence
+      // of every per-pack line for the fixture: no conversion line, no per-pack failure, no failed lock-restore.
+      expect(consoleLines.some((line) => line.includes(`in world pack "${PACK_LABEL}"`))).toBe(false);
+      expect(consoleLines.some((line) => line.includes('Failed to convert legacy effect Items'))).toBe(false);
+      expect(consoleLines.some((line) => line.includes('Failed to restore the lock'))).toBe(false);
 
       // The clean pack survived untouched: still locked, one entry, one modern item, zero Active Effects.
       /** @type {{locked: boolean, size: number, itemTypes: string[], effectCount: number}} Post-boot pack state. */
@@ -1077,10 +1344,16 @@ In `.claude/skills/titan-codebase/references/data-flow.md`, replace the final se
 ```markdown
 Idempotent once no `effect` Items remain. Discovery reads raw `actor._source.items` (NOT `actor.items`): the
 `effect` subtype is unregistered, so legacy items are invalid documents excluded from collection iteration but
-present in raw source and deletable by id. World Actor compendium packs are also converted (`convertWorldActorPacks`
-→ `convertPack`): index-gated via `pack.getIndex({ fields: ['items'] })` (no document construction for clean packs),
-locked packs are unlocked and their lock state restored in a `finally`, per-actor and per-pack failures are isolated.
-Module/system packs are never touched.
+present in raw source and deletable by id. Replacement AEs are stamped `flags.titan.convertedFromItem = <item _id>`
+and creation skips already-stamped sources, so an interrupted create→delete window finishes cleanly on retry
+instead of duplicating effects; `buildEffectData` normalizes the uncast raw `active` value (template-era source
+persisted strings). World Actor compendium packs are also converted (`convertWorldActorPacks` → `convertPack`):
+index-gated via `pack.getIndex({ fields: ['items'] })` — a summary projection (`compendiumIndexFields` + `_id` per
+item, no `system`, no document construction for clean packs) that the client index retains for the session; locked
+packs are unlocked and their lock state restored in a `finally` (a restore failure logs its own pack-naming error
+and never masks a conversion error), per-actor and per-pack failures are isolated. Module/system packs are never
+touched. The conversion load emits two expected red-error classes per legacy item (invalid-doc init + temp-doc
+`Failed data preparation` during deletion); the following load is silent.
 ```
 
 - [ ] **Step 3: Commit**
@@ -1129,8 +1402,15 @@ would surface suite-wide — treat ANY new boot-path failure as caused by this b
 - [ ] **Step 4: Manual deep-path verification (user-assisted)**
 
 Ask the user to run the converter against a copy of a pre-conversion world containing a packed actor with legacy
-effect Items (the predecessor spec's section 6.7 mode), confirming: items become equivalent `effect` AEs, no
-leftover legacy items or mirror AEs, lock state restored, and a second load is a silent no-op.
+effect Items (the predecessor spec's section 6.7 mode), confirming: items become equivalent `effect` AEs (each
+stamped `flags.titan.convertedFromItem`), no leftover legacy items or mirror AEs, lock state restored, and a second
+load is a silent no-op.
+
+**Brief the verifier on expected console noise (buddy-check finding):** the conversion load WILL show red errors —
+one `Failed to initialize Item … "effect" is not a valid type` per legacy item (stale worlds emit these on every
+load already), plus one caught `Failed data preparation` per deleted legacy item (deletion builds a temp doc whose
+`prepareDerivedData` runs against a plain-object `system`). These indicate neither failure nor data damage. **The
+pass signal is the SECOND load: zero red errors, zero conversion lines.**
 
 - [ ] **Step 5: Hand off for merge**
 
@@ -1141,11 +1421,11 @@ push) after user sign-off.
 
 ## Buddy-check directives
 
-User-directed (2026-06-06): buddy-check this plan BEFORE implementation begins — two independent blind reviewers
-over the plan + spec, focusing on data-safety of the pack unlock/rewrite/delete path, invalid-document handling
-claims, and test adequacy; reconcile findings, surface unresolved disagreements to the user. Execution is
-subagent-driven (fresh `titan-svelte-dev` per task + two-stage review) and starts only after the buddy check
-resolves.
+- Plan buddy check: **done 2026-06-06** — two blind reviewers + one debate round; **13 agreed findings, 0
+  unresolved**, all folded into this plan and the spec. User approved the provenance-flag idempotency design delta
+  (`flags.titan.convertedFromItem` + skip-guard).
+- Flagged tasks: none pre-authorized — execution uses the normal two-stage per-task review.
+- Unflagged tasks showing risk signals during execution: **ask**.
 
 ## Self-review notes
 
@@ -1154,6 +1434,10 @@ resolves.
 - **Convention compliance:** explicit `git add` paths only (never `packs/`, `.claude/settings.local.json`,
   `.claude/scheduled_tasks.lock`); e2e foreground-only, sharded; no build during e2e; unit runner filters
   positionally (`npm test -- <pattern>`).
-- **Known risk:** none outstanding — `convertPack`'s finally-restore is covered both for per-actor failures (lock
-  restored, no rejection) and for a wholesale unlock failure (rejection propagates to the per-pack isolation in
-  `convertWorldActorPacks`, lock still restored).
+- **Known risk:** none outstanding — `convertPack`'s finally-restore is covered for per-actor failures (lock
+  restored, no rejection), a wholesale unlock failure (rejection propagates to the per-pack isolation in
+  `convertWorldActorPacks`, lock still restored), and a re-lock failure (caught inside the `finally`,
+  restore-specific error logged, no masking). The duplicate-AE window is closed by the provenance skip-guard.
+- **Buddy-check deviation note:** the pack loop's inline per-entry try/catch (covering `getDocument`) deliberately
+  supersedes the earlier pseudocode's `convertActorIsolated` reuse — spec §4 now documents this; do not "fix" it
+  back during implementation.
