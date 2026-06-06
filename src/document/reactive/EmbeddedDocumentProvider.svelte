@@ -19,7 +19,7 @@
    };
 
    // The provider captures its target document at init by design: instances in an {#each} MUST be keyed by
-   // doc.id so a new id mounts a new provider (see references/conventions.md).
+   // doc.id so a new id mounts a new provider (see .claude/skills/titan-codebase/references/conventions.md).
    /** @type {string|undefined} The parent collection holding the embedded document. */
    // svelte-ignore state_referenced_locally
    const collection = COLLECTION_BY_DOCUMENT_NAME[doc.documentName];

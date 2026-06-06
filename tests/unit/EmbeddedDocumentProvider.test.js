@@ -79,30 +79,43 @@ describe('EmbeddedDocumentProvider', () => {
       const bridge = new ReactiveDocument(actorDoc);
 
       // Warn.js touches the `ui` notification global; define it for this test only.
+      /** @type {import('vitest').Mock} The ui-notification warn stub Warn.js calls before console.warn. */
+      const notificationWarn = vi.fn();
       globalThis.ui = {
          notifications: {
-            warn: vi.fn(),
+            warn: notificationWarn,
          },
       };
+
+      /** @type {import('vitest').MockInstance} Spy silencing console.warn while capturing its calls. */
       const consoleWarn = vi.spyOn(console, 'warn').mockImplementation(() => {});
 
-      /** @type {object} A document of a kind the provider does not support. */
-      const stranger = {
-         id: 's1',
-         documentName: 'Scene',
-      };
-      render(ProviderHarness, {
-         props: { doc: stranger },
-         context: new Map([
-            ['document', bridge],
-            ['sheetDocument', bridge],
-         ]),
-      });
+      try {
+         /** @type {object} A document of a kind the provider does not support. */
+         const stranger = {
+            id: 's1',
+            documentName: 'Scene',
+         };
+         render(ProviderHarness, {
+            props: { doc: stranger },
+            context: new Map([
+               ['document', bridge],
+               ['sheetDocument', bridge],
+            ]),
+         });
 
-      expect(screen.getByTestId('document-id').textContent).toBe('missing');
-      expect(consoleWarn).toHaveBeenCalled();
-      consoleWarn.mockRestore();
-      delete globalThis.ui;
+         expect(screen.getByTestId('document-id').textContent).toBe('missing');
+         // Warn.js calls console.warn(prefixedMessage, restArgsArray) — pin the assertion to OUR warning.
+         expect(consoleWarn).toHaveBeenCalledWith(
+            expect.stringContaining('unsupported document type'),
+            expect.anything(),
+         );
+         expect(notificationWarn).toHaveBeenCalledTimes(1);
+      } finally {
+         // Always restore the spy and drop the ui global, even when an assertion above fails.
+         consoleWarn.mockRestore();
+         delete globalThis.ui;
+      }
    });
 });
 
