@@ -161,3 +161,213 @@ describe('buildEffectData (raw source contract)', () => {
       expect(source.system.rulesElement).toHaveLength(1);
    });
 });
+
+describe('buildEffectData (raw active normalization + provenance)', () => {
+   it('normalizes template-era string active values like BooleanField casting would', () => {
+      /** @type {object} - A permanent legacy source whose active value is the template-era string 'false'. */
+      const stringFalse = makeLegacyItemSource();
+      stringFalse.system.duration.type = 'permanent';
+      stringFalse.system.active = 'false';
+
+      /** @type {object} - A permanent legacy source whose active value is the template-era string 'true'. */
+      const stringTrue = makeLegacyItemSource();
+      stringTrue.system.duration.type = 'permanent';
+      stringTrue.system.active = 'true';
+
+      expect(buildEffectData(stringFalse).disabled).toBe(true);
+      expect(buildEffectData(stringTrue).disabled).toBe(false);
+   });
+
+   it('defaults a missing active key to the schema default (enabled)', () => {
+      /** @type {object} - A permanent legacy source with no active key at all (sparse pre-schema source). */
+      const sparse = makeLegacyItemSource();
+      sparse.system.duration.type = 'permanent';
+      delete sparse.system.active;
+
+      expect(buildEffectData(sparse).disabled).toBe(false);
+   });
+
+   it('passes missing check/customTrait through as undefined (filled by schema initials at creation)', () => {
+      /** @type {object} - A template-era source lacking the later-added check and customTrait fields. */
+      const sparse = makeLegacyItemSource();
+      delete sparse.system.check;
+      delete sparse.system.customTrait;
+
+      /** @type {object} - The Active Effect creation data produced by buildEffectData. */
+      const result = buildEffectData(sparse);
+
+      expect(result.system.check).toBeUndefined();
+      expect(result.system.customTrait).toBeUndefined();
+   });
+
+   it('stamps the source item id as the convertedFromItem provenance flag', () => {
+      /** @type {object} - The Active Effect creation data produced by buildEffectData. */
+      const result = buildEffectData(makeLegacyItemSource());
+
+      expect(result.flags).toEqual({
+         titan: {
+            convertedFromItem: 'legacyitem000001',
+         },
+      });
+   });
+});
+
+describe('convertActor (raw _source discovery)', () => {
+   it('converts only legacy effect entries: creates replacement AEs, then deletes source items by _id', async () => {
+      /** @type {object} - A legacy effect item source expected to convert. */
+      const legacy = makeLegacyItemSource();
+
+      /** @type {object} - A registered-subtype item source expected to be ignored. */
+      const weapon = makeLegacyItemSource({
+         _id: 'weaponitem000001',
+         type: 'weapon',
+      });
+
+      /** @type {object} - The fake actor carrying one legacy and one modern item. */
+      const actor = makeFakeActor({
+         items: [
+            legacy,
+            weapon,
+         ],
+      });
+
+      await convertActor(actor);
+
+      expect(actor.calls).toEqual([
+         ['create', 'ActiveEffect', [buildEffectData(legacy)]],
+         ['delete', 'Item', ['legacyitem000001']],
+      ]);
+   });
+
+   it('is a no-op when there are no legacy items and no stale mirrors', async () => {
+      /** @type {object} - A fake actor with only modern content. */
+      const actor = makeFakeActor({
+         items: [
+            makeLegacyItemSource({
+               _id: 'weaponitem000001',
+               type: 'weapon',
+            }),
+         ],
+         effects: [
+            {
+               id: 'modernfx00000001',
+               type: 'effect',
+               flags: {},
+            },
+         ],
+      });
+
+      await convertActor(actor);
+
+      expect(actor.calls).toEqual([]);
+   });
+
+   it('deletes stale mirror AEs last, after item conversion', async () => {
+      /** @type {object} - A stale cosmetic mirror AE (base subtype, titan effect flag). */
+      const mirror = {
+         id: 'mirrorfx00000001',
+         type: 'base',
+         flags: {
+            titan: {
+               type: 'effect',
+            },
+         },
+      };
+
+      /** @type {object} - The fake actor carrying one legacy item and one stale mirror. */
+      const actor = makeFakeActor({
+         items: [makeLegacyItemSource()],
+         effects: [mirror],
+      });
+
+      await convertActor(actor);
+
+      expect(actor.calls).toEqual([
+         ['create', 'ActiveEffect', [buildEffectData(makeLegacyItemSource())]],
+         ['delete', 'Item', ['legacyitem000001']],
+         ['delete', 'ActiveEffect', ['mirrorfx00000001']],
+      ]);
+   });
+
+   it('removes stale mirrors even when no legacy items remain', async () => {
+      /** @type {object} - The fake actor carrying only a stale mirror. */
+      const actor = makeFakeActor({
+         effects: [
+            {
+               id: 'mirrorfx00000001',
+               type: 'base',
+               flags: {
+                  titan: {
+                     type: 'effect',
+                  },
+               },
+            },
+         ],
+      });
+
+      await convertActor(actor);
+
+      expect(actor.calls).toEqual([
+         ['delete', 'ActiveEffect', ['mirrorfx00000001']],
+      ]);
+   });
+
+   it('skips creating a replacement whose source already has a converted AE, but still deletes the item', async () => {
+      /** @type {object} - A surviving converted AE stamped with the legacy source id (interrupted prior run). */
+      const survivor = {
+         id: 'convertedfx00001',
+         type: 'effect',
+         flags: {
+            titan: {
+               convertedFromItem: 'legacyitem000001',
+            },
+         },
+      };
+
+      /** @type {object} - The fake actor stuck mid-conversion: replacement exists, legacy item still present. */
+      const actor = makeFakeActor({
+         items: [makeLegacyItemSource()],
+         effects: [survivor],
+      });
+
+      await convertActor(actor);
+
+      expect(actor.calls).toEqual([
+         ['delete', 'Item', ['legacyitem000001']],
+      ]);
+   });
+
+   it('creates only the not-yet-converted sources when some replacements already exist', async () => {
+      /** @type {object} - A second legacy source with no surviving replacement. */
+      const fresh = makeLegacyItemSource({
+         _id: 'legacyitem000002',
+         name: 'Second Legacy Effect',
+      });
+
+      /** @type {object} - The fake actor with one converted and one unconverted legacy item. */
+      const actor = makeFakeActor({
+         items: [
+            makeLegacyItemSource(),
+            fresh,
+         ],
+         effects: [
+            {
+               id: 'convertedfx00001',
+               type: 'effect',
+               flags: {
+                  titan: {
+                     convertedFromItem: 'legacyitem000001',
+                  },
+               },
+            },
+         ],
+      });
+
+      await convertActor(actor);
+
+      expect(actor.calls).toEqual([
+         ['create', 'ActiveEffect', [buildEffectData(fresh)]],
+         ['delete', 'Item', ['legacyitem000001', 'legacyitem000002']],
+      ]);
+   });
+});

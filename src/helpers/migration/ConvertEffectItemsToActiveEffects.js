@@ -2,28 +2,44 @@ import log from '~/helpers/utility-functions/Log.js';
 import error from '~/helpers/utility-functions/Error.js';
 
 /**
- * Builds Active Effect creation data from a legacy effect Item.
+ * Builds Active Effect creation data from a legacy effect Item's raw source data.
  * Maps the legacy item's native and system fields onto the 'effect' Active Effect subtype. The old item used a
  * split active/duration model; under the new universal-disabled model an effect starts ENABLED unless it was an
  * explicitly-deactivated permanent effect. The migrated duration (including its captured initiative) is carried
  * through so the document's _preCreate handler will not override the combat initiative. The status icon and Visual
  * Active Effects description flag are intentionally NOT set here; TitanActiveEffect._preCreate seeds them.
- * @param {TitanItem} item - The legacy effect Item to convert.
+ * Operates on raw source entries (actor._source.items elements) rather than Item instances, because the 'effect'
+ * Item subtype is no longer registered: legacy items fail strict construction, land in invalidDocumentIds, and are
+ * invisible to actor.items iteration. Raw source bypasses schema casting, so the active value is normalized here
+ * (template-era source persisted strings; missing keys take the schema default of true). The created effect is
+ * stamped with flags.titan.convertedFromItem so an interrupted conversion never duplicates it on retry.
+ * @param {object} itemSource - The legacy effect Item's raw source data (an actor._source.items entry).
  * @returns {object} The Active Effect creation data.
  */
-export function buildEffectData(item) {
-   /** @type {object} - The legacy item's system data, the source of all migrated fields. */
-   const system = item.system;
+export function buildEffectData(itemSource) {
+   /** @type {object} - The legacy item's raw system data, the source of all migrated fields. */
+   const system = itemSource.system;
+
+   /** @type {boolean|string} - The uncast raw active value, defaulted like the legacy schema (missing → true). */
+   const rawActive = system.active ?? true;
+
+   /** @type {boolean} - The normalized active state, mirroring BooleanField casting for template-era strings. */
+   const active = typeof rawActive === 'string' ? rawActive === 'true' : Boolean(rawActive);
 
    /** @type {boolean} - Whether the new effect should start disabled (explicitly-deactivated permanent only). */
-   const disabled = system.duration?.type === 'permanent' ? !system.active : false;
+   const disabled = system.duration?.type === 'permanent' ? !active : false;
 
    return {
-      name: item.name,
-      img: item.img,
+      name: itemSource.name,
+      img: itemSource.img,
       type: 'effect',
       description: system.description ?? '',
       disabled,
+      flags: {
+         titan: {
+            convertedFromItem: itemSource._id,
+         },
+      },
       system: {
          rulesElement: foundry.utils.deepClone(system.rulesElement),
          duration: foundry.utils.deepClone(system.duration),
@@ -35,17 +51,22 @@ export function buildEffectData(item) {
 
 /**
  * Converts every legacy effect Item owned by a single actor into a native 'effect' Active Effect.
- * No destructive step occurs before the replacement Active Effects exist: the replacement Active Effects are created
- * first, then the source effect Items are batch-deleted, then any stale cosmetic "mirror" Active Effects (the old
- * base-subtype AEs flagged with flags.titan.type === 'effect') are batch-deleted to avoid duplicates. Returns early
- * when there is nothing to do (no effect Items and no stale mirrors); if there are stale mirrors but no effect Items,
- * the mirrors are still removed.
+ * Discovery reads the actor's raw _source.items rather than the items collection: the 'effect' subtype is no longer
+ * registered, so legacy items are invalid documents excluded from actor.items iteration but fully present in raw
+ * source (and deletable by id — the client backend resolves deletions with { invalid: true }). No destructive step
+ * occurs before the replacement Active Effects exist: the replacement Active Effects are created first, then the
+ * source effect Items are batch-deleted, then any stale cosmetic "mirror" Active Effects (the old base-subtype AEs
+ * flagged with flags.titan.type === 'effect') are batch-deleted to avoid duplicates. Creation skips any source
+ * whose id already has a surviving converted Active Effect (the convertedFromItem provenance stamp), so a
+ * conversion interrupted between creation and deletion finishes cleanly on retry instead of duplicating effects.
+ * Returns early when there is nothing to do (no effect Items and no stale mirrors); if there are stale mirrors but
+ * no effect Items, the mirrors are still removed.
  * @param {TitanActor} actor - The actor whose legacy effect Items should be converted.
  * @returns {Promise<void>}
  */
 export async function convertActor(actor) {
-   /** @type {TitanItem[]} - The legacy effect Items owned by this actor. */
-   const effectItems = actor.items.filter((item) => item.type === 'effect');
+   /** @type {object[]} - Raw source entries of the legacy effect Items owned by this actor. */
+   const effectItemSources = actor._source.items.filter((item) => item.type === 'effect');
 
    /** @type {string[]} - The ids of stale mirror Active Effects to delete (base subtype, titan effect flag). */
    const staleEffectIds = actor.effects
@@ -53,16 +74,26 @@ export async function convertActor(actor) {
       .map((effect) => effect.id);
 
    // Nothing to convert and no stale mirrors to clean up: this actor is already in the new state.
-   if (effectItems.length === 0 && staleEffectIds.length === 0) {
+   if (effectItemSources.length === 0 && staleEffectIds.length === 0) {
       return;
    }
 
-   // Create the replacement Active Effects before any destructive step, so no effect data is lost if creation fails.
-   if (effectItems.length > 0) {
-      await actor.createEmbeddedDocuments('ActiveEffect', effectItems.map(buildEffectData));
+   /** @type {Set<string>} - Source-item ids that already have a surviving converted Active Effect. */
+   const convertedItemIds = new Set(
+      actor.effects.map((effect) => effect.flags?.titan?.convertedFromItem).filter(Boolean),
+   );
 
-      // Batch-delete the source effect Items now that their replacements exist.
-      await actor.deleteEmbeddedDocuments('Item', effectItems.map((item) => item.id));
+   /** @type {object[]} - Legacy sources still needing a replacement (skips already-converted, retry-safe). */
+   const sourcesToCreate = effectItemSources.filter((item) => !convertedItemIds.has(item._id));
+
+   // Create the replacement Active Effects before any destructive step, so no effect data is lost if creation fails.
+   if (sourcesToCreate.length > 0) {
+      await actor.createEmbeddedDocuments('ActiveEffect', sourcesToCreate.map(buildEffectData));
+   }
+
+   // Batch-delete the source effect Items now that every replacement exists.
+   if (effectItemSources.length > 0) {
+      await actor.deleteEmbeddedDocuments('Item', effectItemSources.map((item) => item._id));
    }
 
    // Batch-delete the stale mirror Active Effects last.
