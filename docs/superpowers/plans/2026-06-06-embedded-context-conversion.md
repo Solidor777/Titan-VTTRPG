@@ -51,9 +51,11 @@ doubt, the rule wins:
   positions; in one-shot captures (options objects built once at init) use `document.doc._id` /
   `document.doc.id` (non-subscribing; the id is stable for the provider's lifetime — instances are
   id-keyed).
-- **R3 — document methods / writes:** `item.sendToChat()` → `document.doc.sendToChat()`;
-  `item.sheet.render(true)` → `document.doc.sheet.render(true)`;
-  `item.update({...})` / `effect.update({...})` → `document.doc.update({...})`.
+- **R3 — document methods / writes:** `item.sendToChat()` → `document.doc?.sendToChat()`;
+  `item.sheet.render(true)` → `document.doc?.sheet.render(true)`;
+  `item.update({...})` / `effect.update({...})` → `document.doc?.update({...})`. *(Idiom settled by
+  the Task 1 quality review: handler-time `.doc` method calls are `?.`-guarded so a click landing in
+  the deletion window no-ops instead of throwing.)*
 - **R4 — actor engine calls:** any `document.data.system.<actorMethod>(...)` in a row subtree (e.g.
   `requestItemDeletion`, `toggleEquipped`, `toggleEffectActive`, `requestEffectDeletion`,
   `requestAttackCheck`, `requestItemCheck`, `requestCastingCheck`, `getItemCheckParameters`,
@@ -61,10 +63,11 @@ doubt, the rule wins:
   `getCastingCheckParameters`, `initializeCastingCheckOptions`, `spendResolve`, `toggleMultiAttack`) →
   `const sheetDocument = getContext('sheetDocument');` + `sheetDocument.data.system.<actorMethod>(...)`.
   Actor STATE reads too: `document.data.system.equipped.armor` → `sheetDocument.data.system.equipped.armor`.
-- **R5 — owner gates stay on the nearest `'document'`:** `document.data.isOwner` (and
+- **R5 — owner gates stay on the nearest `'document'`:** `document.data?.isOwner` (and
   `DocumentOwnerButton`/`DocumentOwnerIconButton`, unchanged) keep reading the shadowed context — an
   embedded document's `isOwner` delegates to its parent actor, so the gate is preserved. Do NOT rewrite
-  these to `sheetDocument`.
+  these to `sheetDocument`. *(Idiom settled by the Task 1 quality review: converted in-row `isOwner`
+  reads carry the R6 `?.` guard.)*
 - **R6 — guards:** every converted read keeps a `?.` after `.data` (`document.data?.system.X`) — the
   embedded document can vanish in the deletion window before the list unmounts the row.
 - **R7 — props dropped:** the `item`/`effect`/`itemId`/`effectId` props disappear from the whole subtree.
@@ -602,10 +605,10 @@ Template: the click guard `if (item && !item.isMarkedForDeletion)` →
 
 `CharacterSheetItemSendToChatButton.svelte` — drop the `item` prop; add
 `const document = getContext('document');`; `onclick={() => item.sendToChat()}` →
-`onclick={() => document.doc.sendToChat()}`.
+`onclick={() => document.doc?.sendToChat()}`.
 
 `CharacterSheetItemEditButton.svelte` — drop the `item` prop;
-`onclick={() => item.sheet.render(true)}` → `onclick={() => document.doc.sheet.render(true)}`.
+`onclick={() => item.sheet.render(true)}` → `onclick={() => document.doc?.sheet.render(true)}`.
 The `document.data.isOwner` icon/label/tooltip reads are unchanged (R5 — the embedded item's `isOwner`
 delegates to the actor, so owners still see Edit and observers see View).
 
@@ -698,7 +701,8 @@ markup unchanged in this task; Task 5 revisits it):
    }
 ```
 
-Template: the `disabled={!document.data.isOwner}` reads stay (R5); the spend-resolve button becomes
+Template: the `disabled` owner gates stay on the nearest `'document'` and gain the R6 guard
+(`disabled={!document.data?.isOwner}`); the spend-resolve button becomes
 `onclick={() => sheetDocument.data.system.spendResolve(checkParameters.resolveCost)}` (R4).
 
 - [ ] **Step 5: The three condensed check buttons**
@@ -829,7 +833,7 @@ Identical treatment to Step 7 with the shield fields: row equip-state reads beco
 ```svelte
             bind:value={
                () => document.data?.system.quantity ?? 0,
-               (newValue) => document.doc.update({ system: { quantity: newValue } })
+               (newValue) => document.doc?.update({ system: { quantity: newValue } })
             }
 ```
 
