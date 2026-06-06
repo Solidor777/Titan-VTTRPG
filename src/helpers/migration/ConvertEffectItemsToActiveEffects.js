@@ -174,7 +174,7 @@ export async function convertPack(pack) {
       // Load and convert each flagged actor, isolating per-actor failures so the rest of the pack still converts.
       for (const id of needyIds) {
          try {
-            /** @type {TitanActor} - The packed actor to convert. */
+            /** @type {TitanActor|null} - The packed actor to convert. */
             const actor = await pack.getDocument(id);
 
             // A missing document (deleted mid-boot) cannot be converted; fail this entry with a clear message.
