@@ -44,6 +44,8 @@ let page;
 let errors;
 /** @type {{itemId: string, effectId: string}} Seeded document ids (rebuilt fresh each test). */
 let fixtureIds;
+/** @type {string|undefined} Id of the scene created by the HUD token fallback (removed in afterAll). */
+let fallbackSceneId;
 
 test.beforeAll(async ({ browser }) => {
    page = await browser.newPage();
@@ -78,7 +80,13 @@ test.describe('cross-surface check-tag parity', () => {
       // Remove any stale fixture (and its scene tokens) from a prior run or a prior test.
       await deleteFixtureActor();
 
-      fixtureIds = await page.evaluate(async ({ actorName, itemName, effectName, itemCheckLabel, effectCheckLabel }) => {
+      fixtureIds = await page.evaluate(async ({
+         actorName,
+         itemName,
+         effectName,
+         itemCheckLabel,
+         effectCheckLabel,
+      }) => {
          /**
           * Builds a COMPLETE item check entry mirroring createItemCheckTemplate()
           * (src/check/types/item-check/ItemCheckTemplate.js). The template module is not importable
@@ -170,6 +178,14 @@ test.describe('cross-surface check-tag parity', () => {
          await game.settings.set('titan', 'getCheckOptions', false);
       });
       await deleteFixtureActor();
+
+      // Remove the fallback scene when a HUD case had to create one (the shared world normally has
+      // an active scene, so this is usually a no-op).
+      if (fallbackSceneId) {
+         await page.evaluate(async (sceneId) => {
+            await game.scenes.get(sceneId)?.delete();
+         }, fallbackSceneId);
+      }
    });
 
    /**
@@ -280,13 +296,23 @@ test.describe('cross-surface check-tag parity', () => {
       const hudReady = await page.evaluate(() => typeof game.titan?.effectHud !== 'undefined');
       expect(hudReady, 'TITAN effect HUD controller must be attached at ready').toBe(true);
 
-      await page.evaluate(async (actorName) => {
+      /** @type {string|null} The fallback scene's id when this call had to create one, else null. */
+      const createdSceneId = await page.evaluate(async (actorName) => {
          const actor = game.actors.getName(actorName);
-         const scene = game.scenes.active
-            ?? (await Scene.create({
+
+         // Reuse the active scene; fall back to creating one and report its id for afterAll cleanup.
+         /** @type {Scene|null} The scene hosting the fixture token. */
+         let scene = game.scenes.active;
+         /** @type {string|null} The created fallback scene's id, when no scene was active. */
+         let fallbackId = null;
+         if (!scene) {
+            scene = await Scene.create({
                name: 'E2E Check Parity Scene',
                active: true,
-            }));
+            });
+            fallbackId = scene.id;
+         }
+
          const [tokenDoc] = await scene.createEmbeddedDocuments('Token', [
             await actor.getTokenDocument({
                x: 100,
@@ -300,7 +326,13 @@ test.describe('cross-surface check-tag parity', () => {
          tokenDoc.object.control({ releaseOthers: true });
 
          game.titan.effectHud.refresh();
+         return fallbackId;
       }, ACTOR_NAME);
+
+      // Remember the first fallback-created scene so afterAll can remove it from the world.
+      if (createdSceneId && !fallbackSceneId) {
+         fallbackSceneId = createdSceneId;
+      }
    }
 
    /**
@@ -310,6 +342,10 @@ test.describe('cross-surface check-tag parity', () => {
     * @returns {Promise<import('@playwright/test').Locator>} The mounted HUD panel locator.
     */
    async function openExpandedHudRow() {
+      // Close any open sheets first: the HUD is fixed-position in the bottom-right corner, and an
+      // overlapping AppV2 window could intercept its clicks on a long shared-page session.
+      await closeAllApps(page);
+
       await controlFixtureActorToken();
 
       /** @type {import('@playwright/test').Locator} The mounted HUD panel. */
@@ -335,14 +371,28 @@ test.describe('cross-surface check-tag parity', () => {
    }
 
    /**
-    * Captures the four CheckTags values under the given surface scope. Each tag is presence-asserted
-    * (visible) BEFORE its text is read, and each captured value is asserted non-empty, so a parity
-    * comparison built from two captures can never pass vacuously on a missing or blank tag.
+    * Captures the four CheckTags values under the given surface scope. The rendered `check-tags-*`
+    * ids are first asserted set-equal to the expected list, then each tag is presence-asserted
+    * (visible) BEFORE its text is read and each captured value is asserted non-empty, so a parity
+    * comparison built from two captures can never pass vacuously on a missing, extra, or blank tag.
     * @param {import('@playwright/test').Locator} scope - A locator containing exactly one CheckTags render.
     * @param {string} surface - Human-readable surface name for the per-assertion messages.
     * @returns {Promise<{[testId: string]: string}>} Whitespace-normalized tag texts keyed by testId.
     */
    async function captureCheckTagValues(scope, surface) {
+      // SET-EQUALITY GUARD (auto-retrying poll — the tags may still be mounting): the rendered
+      // `check-tags-*` ids must be exactly the expected list, so a component-side tag addition or
+      // rename fails loudly here and forces a deliberate CHECK_TAG_TEST_IDS update instead of
+      // silently escaping the parity net. Sorted-array equality also rejects duplicate renders.
+      await expect
+         .poll(
+            () => scope
+               .locator('[data-testid^="check-tags-"]')
+               .evaluateAll((elements) => elements.map((element) => element.dataset.testid).sort()),
+            { message: `${surface} renders exactly the expected check-tags testIds` },
+         )
+         .toEqual([...CHECK_TAG_TEST_IDS].sort());
+
       /** @type {{[testId: string]: string}} The captured tag texts keyed by testId. */
       const values = {};
       for (const testId of CHECK_TAG_TEST_IDS) {
@@ -390,7 +440,10 @@ test.describe('cross-surface check-tag parity', () => {
       // attribute is concrete ('body', not 'default'), so the actor-resolved attribute override on
       // the character-sheet surface must render the same attribute text as the item-sheet config read.
       for (const testId of CHECK_TAG_TEST_IDS) {
-         expect(rowValues[testId], `${testId} value matches across both surfaces`).toBe(sidebarValues[testId]);
+         expect(
+            rowValues[testId],
+            `${testId}: character-sheet equipment row must equal item-sheet sidebar`,
+         ).toBe(sidebarValues[testId]);
       }
 
       expect(errors, `uncaught errors:\n${errors.join('\n')}`).toEqual([]);
@@ -418,7 +471,10 @@ test.describe('cross-surface check-tag parity', () => {
       // VALUE PARITY: each of the four tags renders identical text on both surfaces (both captures
       // are presence-anchored above, so this loop cannot pass vacuously on missing tags).
       for (const testId of CHECK_TAG_TEST_IDS) {
-         expect(hudValues[testId], `${testId} value matches across both surfaces`).toBe(rowValues[testId]);
+         expect(
+            hudValues[testId],
+            `${testId}: Effect HUD row must equal character-sheet effect row`,
+         ).toBe(rowValues[testId]);
       }
 
       expect(errors, `uncaught errors:\n${errors.join('\n')}`).toEqual([]);

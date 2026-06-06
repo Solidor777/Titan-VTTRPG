@@ -358,7 +358,11 @@ test.describe('embedded-context item rows', () => {
             { message: 'sheet mounted' },
          );
       }, ACTOR_NAME);
-      await page.getByText(tab, { exact: true }).first().click();
+
+      // Activate the tab via a click SCOPED to the sheet root — the tab labels can also appear on
+      // other surfaces, so a page-global text click is banned (house pattern per
+      // embedded-context-check-parity.spec.js).
+      await page.locator('.application.titan-document-sheet').getByText(tab, { exact: true }).first().click();
    }
 
    /**
