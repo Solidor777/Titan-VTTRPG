@@ -508,7 +508,8 @@ git commit -m "test(e2e): effects-family embedded-context reactivity and functio
 
 ### Task 3: Stage 2 — item family conversion (one atomic task)
 
-**Files:** the 26 modify + 2 delete Stage-2 paths in the file map. **This task is wide but uniform** —
+**Files:** the 27 modify + 2 delete Stage-2 paths in the file map (the 27th is Step 14's
+`CharacterSheetEffect.svelte` temp-prop drop). **This task is wide but uniform** —
 every edit applies the recipe rules R1–R8. Work through the steps in order; the suite is only expected
 green again at Step 17 (wrap + conversion are atomic — intermediate states are NOT committed).
 
