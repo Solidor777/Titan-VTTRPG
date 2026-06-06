@@ -5,7 +5,7 @@ import { attachPageErrors, clearChat, closeAllApps } from './world.js';
 /**
  * Interaction-path walk: check-roll -> chat. For each TITAN check type this suite drives the
  * dialog-bypassing `roll<Type>Check` API on a purpose-built actor, then asserts the resulting chat
- * message exists, carries the expected `flags.titan.type`, and renders its chat card into the live
+ * message exists, carries the expected message subtype, and renders its chat card into the live
  * chat-log DOM without throwing.
  *
  * Confirmed against source:
@@ -14,9 +14,9 @@ import { attachPageErrors, clearChat, closeAllApps } from './world.js';
  * and skip the option dialog.
  * Option keys: attribute `{ attribute }`; resistance `{ resistance }`; attack `{ itemId, attackIdx }`;
  * casting `{ itemId }`; item `{ itemId, checkIdx }`.
- * `flags.titan.type` strings (ChatMessageShell dispatch map): attributeCheck, resistanceCheck,
- * attackCheck, castingCheck, itemCheck.
- * `OnRenderChatMessageHTML` adds the `titan` class to the `.message[data-message-id]` element and
+ * Check messages are first-class `ChatMessage` subtypes; the `message.type` strings are
+ * attributeCheck, resistanceCheck, attackCheck, castingCheck, and itemCheck.
+ * `TitanChatMessage#renderHTML` adds the `titan` class to the `.message[data-message-id]` element and
  * mounts the check card (root `.check-chat-message`) into `.message-content`.
  */
 
