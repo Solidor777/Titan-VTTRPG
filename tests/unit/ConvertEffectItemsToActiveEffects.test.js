@@ -670,6 +670,45 @@ describe('convertPack (index gate + lock handling)', () => {
 
       expect(uiErrors.some((message) => message.includes('Failed to restore the lock'))).toBe(true);
    });
+
+   it('isolates a missing pack document and still restores the lock', async () => {
+      /** @type {object} - A locked pack whose only needy entry no longer resolves to a document. */
+      const pack = makeFakePack({
+         indexEntries: [makeIndexEntry('vanishedactor001', ['effect'])],
+         locked: true,
+      });
+
+      // The missing document fails its entry with a clear per-entry error; convertPack still resolves.
+      await convertPack(pack);
+
+      expect(pack.calls.at(-1)).toEqual(['configure', true]);
+      expect(uiErrors.some((message) => message.includes('Failed to convert legacy effect Items for packed actor')))
+         .toBe(true);
+   });
+
+   it('surfaces the original unlock error even when the re-lock also fails', async () => {
+      /** @type {object} - A locked pack with one needy entry whose configure call fails in BOTH directions. */
+      const pack = makeFakePack({
+         indexEntries: [makeIndexEntry('packedactor00001', ['effect'])],
+         locked: true,
+         documents: {
+            packedactor00001: makeFakeActor({
+               items: [makeLegacyItemSource()],
+            }),
+         },
+      });
+
+      // Replace configure with a stub that records then throws on both the unlock and the finally path's re-lock.
+      pack.configure = async ({ locked: nextLocked }) => {
+         pack.calls.push(['configure', nextLocked]);
+         throw new Error(nextLocked === false ? 'unlock failed' : 're-lock failed');
+      };
+
+      // The finally's inner catch swallows the re-lock failure, so the ORIGINAL unlock error must surface.
+      await expect(convertPack(pack)).rejects.toThrow('unlock failed');
+
+      expect(uiErrors.some((message) => message.includes('Failed to restore the lock'))).toBe(true);
+   });
 });
 
 describe('default export (wiring: the pack scan is reachable from the boot path)', () => {

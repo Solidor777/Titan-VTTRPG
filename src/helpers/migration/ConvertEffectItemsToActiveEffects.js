@@ -177,6 +177,11 @@ export async function convertPack(pack) {
             /** @type {TitanActor} - The packed actor to convert. */
             const actor = await pack.getDocument(id);
 
+            // A missing document (deleted mid-boot) cannot be converted; fail this entry with a clear message.
+            if (!actor) {
+               throw new Error('The flagged pack entry no longer resolves to a document.');
+            }
+
             await convertActor(actor);
             convertedCount += 1;
          }
