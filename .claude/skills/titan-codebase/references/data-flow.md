@@ -229,8 +229,8 @@ and duration ticks flow through the bridge automatically. `EffectHudSection` wra
 `'document'` bridge. `EffectHudRow` sources its description per subtype:
 conditions render from `flags.titan.description` (conditions have no native description field), effects from the
 native `description`. Duration, embedded checks, and send-to-chat are effect-only; both subtypes expose an
-owner-gated delete (`sheetDocument.data.system.requestEffectDeletion`). The `visual-active-effects` module flag is no longer stamped on
-effects or conditions — this HUD replaces it.
+owner-gated delete (`sheetDocument.data.system.requestEffectDeletion`). The `visual-active-effects` module flag is
+no longer stamped on effects or conditions — this HUD replaces it.
 
 ---
 
