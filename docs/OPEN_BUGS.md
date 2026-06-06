@@ -90,6 +90,20 @@ Deferred/known bugs. Todos (planned work) live in `docs/TODO.md`; this file is b
   run `npm run build` concurrently with an e2e run.
 - **Found by:** embedded-document-stores final verification, 2026-06-06.
 
+### 7. `CharacterSheetWeaponAttack.svelte` dereferences the `attack` derived unguarded
+
+- **What:** The `attack` derived (`document.data?.system.attack[attackIdx]`,
+  `src/document/types/actor/types/character/sheet/items/weapon/CharacterSheetWeaponAttack.svelte:32`) can be
+  `undefined`, yet `trainingDice` (line 79), `getCheckMod` (lines 65-68), and the template reads (lines
+  131/141/143/148/150) all dereference it unguarded — while the same file guards `attackTraitNames`
+  (line 41). A deleted weapon / removed attack index in the mid-frame window (after the document mutation,
+  before the row unmounts) would throw.
+- **Severity:** Low / latent. E2e-green in practice — no throw observed across the suite.
+- **Pre-existing:** from the embedded-document-stores spec; NOT introduced by the embedded-context
+  conversion (which only changed how the weapon document is resolved).
+- **To do:** add an `{#if attack}` template gate and guard the deriveds.
+- **Found by:** the embedded-context conversion's final holistic review.
+
 <!--
 Recently resolved: the socket-sync A1/A2 full-run timeout flake was fixed by the e2e Phase 2
 shared-world harness (per-file `clearChat` keeps the world lean). Verified: `socket-sync.spec.js`

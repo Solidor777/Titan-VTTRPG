@@ -6,7 +6,7 @@
    /**
     * @typedef {object} CharacterSheetItemExpandButtonProps
     * @property {boolean} [isExpanded] Whether this Item is currently expanded.
-    * @property {boolean} [name] Optional override for the name text.
+    * @property {string|false} [name] Optional override for the name text.
     */
 
    /** @type {CharacterSheetItemExpandButtonProps} */
