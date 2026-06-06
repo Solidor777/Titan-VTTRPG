@@ -99,10 +99,13 @@ sheet-wide:
   - actor engine calls (roll checks/attacks, equip, `safeDeleteItem`, `requestEffectDeletion`,
     `getItemCheckParameters`/`initializeItemCheckOptions`): `getContext('sheetDocument')` — never
     the shadowed context.
-- **Effect HUD.** `EffectHudRow` wraps its detail subtree in its own provider over the HUD's actor
-  `ReactiveDocument`. `EmbeddedDocument` delegates to *any* ancestor bridge, so the HUD's reuse of
-  the character sheet's effect leaf components keeps working with zero HUD-specific code in the
-  leaves.
+- **Effect HUD.** *(Amended at plan time, user-approved 2026-06-06: the row DOES have a list
+  parent.)* `EffectHudSection` wraps each row in a provider inside its already-id-keyed `{#each}`
+  (`EffectHudSection.svelte:16`) — the same list-level convention as the sheets — and
+  `EffectHudShell` additionally sets the `'sheetDocument'` context (one line) so actor-coupled
+  leaves keep their escape hatch on the HUD surface. `EmbeddedDocument` delegates to *any* ancestor
+  bridge, so the HUD's reuse of the character sheet's effect leaf components keeps working with
+  zero HUD-specific code in the leaves.
 - **The bespoke `CharacterSheetWeaponAttacks` provider wrap dissolves** — its subtree now sits
   inside the row's list-level provider; the component keeps only its attack-list iteration.
 
@@ -145,8 +148,11 @@ sequences risk small → bulk → novel.
 - Every edit is the same rewrite shape: `document.data.items.get(item._id)?.system.X` →
   `document.data.system.X`; live-doc props dropped; ids from `document.data._id`; actor calls via
   `'sheetDocument'`.
-- 29 files under `…/character/sheet/items/` (the directory's 34 `.svelte` files minus the 5
-  effect-family files converted in Stage 1).
+- 27 files under `…/character/sheet/items/` (the directory's 34 `.svelte` files minus the 5
+  effect-family files converted in Stage 1 and minus the two deletions below).
+- *(Amended at plan time, user-approved 2026-06-06)*: `CharacterSheetItemTradition.svelte` and
+  `CharacterSheetItemFooter.svelte` have **zero consumers** (grep-proven) and are **deleted**, not
+  converted.
 
 ### Stage 3 — shared check display (`CheckTags`, the #21 deliverable)
 
