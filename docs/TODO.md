@@ -469,6 +469,14 @@ harmless dead data, a candidate for producer cleanup.
 
 ### 12. Chat-message ↔ document path parity (schema-from-shape)
 
+- **Update (2026-06-05):** the embedded-document-stores spec shipped
+  (`specs/2026-06-03-embedded-document-stores-design.md`): `EmbeddedDocument` +
+  `EmbeddedDocumentProvider` + the two-context convention (`'document'` nearest/shadowed,
+  `'sheetDocument'` top-level/never shadowed), with the shared `AttackTags` component rendering
+  identically across the weapon sheet, the character sheet (through the provider), and the weapon
+  chat card (snapshot path parity) — the component-reuse proof this item envisioned now exists. The
+  remaining north-star (ALL fields on ALL documents on consistent `system.*` paths) stays open; see
+  also "Embedded document contexts — follow-ups" below for the decomposed sheet-side reuse items.
 - **What:** Bring chat messages to **path parity** with their source documents so
   the same display/edit components are reusable across item sheets, character
   sheets, and chat — e.g. the weapon **item** card shows attacks via
@@ -513,6 +521,45 @@ harmless dead data, a candidate for producer cleanup.
   fall back to the type string).
 - **To do:** Remove `TYPES.Item.effect` and add a `TYPES.ActiveEffect` map in the same pass.
 - **Found by:** Phase 4 (effect chat subtype) review.
+
+## Embedded document contexts — follow-ups
+
+The embedded-document-stores spec
+(`docs/superpowers/specs/2026-06-03-embedded-document-stores-design.md`) shipped `EmbeddedDocument`,
+`EmbeddedDocumentProvider`, the two-context convention, and the shared `AttackTags` component across its
+three consumers. The spec's wider sheet-side reuse items below were each a deliberate deferral.
+
+### 20. Inline attack editing on the character sheet via the provider (write path)
+
+- **What:** Reuse `WeaponSheetAttackSettings` on the character sheet's weapon rows through
+  `EmbeddedDocumentProvider`, so owners edit attacks without opening the weapon sheet. This is the first
+  consumer to exercise the provider's WRITE path (`document.data.update(...)` /
+  `refreshSystemDocument` against an `EmbeddedDocument`); the shipped consumers are read-only displays.
+- **Deferred by:** the embedded-document-stores spec (sheet-side reuse follow-up).
+
+### 21. Generalize the provider treatment to the checks tab and rules-elements tab
+
+- **What:** The character sheet's checks tab and rules-elements tab still render embedded-item data via
+  passed props / `item._id` lookups. Wrap their rows in `EmbeddedDocumentProvider` so the existing item
+  sheet components (checks, rules-element settings) become reusable there, mirroring the AttackTags
+  pattern.
+- **Deferred by:** the embedded-document-stores spec (sheet-side reuse follow-up).
+
+### 22. Migrate commodity/effect rows off the `item._id`-lookup pattern
+
+- **What:** `CharacterSheetCommodity.svelte` and `CharacterSheetEffect.svelte` (and similar rows) reach
+  reactivity via per-leaf `document.data.<coll>.get(id)?.system.<leaf>` deriveds and function bindings
+  (see conventions.md). Replacing those with an `EmbeddedDocumentProvider` per row gives descendants the
+  plain `document.data.system.*` path and retires the bespoke lookup boilerplate.
+- **Deferred by:** the embedded-document-stores spec (sheet-side reuse follow-up).
+
+### 23. Cosmetic: sidebar attack-row header icon disagrees with the AttackTags type tag
+
+- **What:** `WeaponSheetSidebarAttacks.svelte` renders the attack-row HEADER icon as
+  `attack.type === 'melee' ? MELEE_ICON : RANGE_ICON`, while `AttackTags.svelte`'s type tag uses
+  `MELEE_ICON : ACCURACY_ICON` — so the same row shows two different icons for a ranged attack.
+  Normalize one way (pick RANGE_ICON or ACCURACY_ICON for non-melee everywhere).
+- **Found by:** embedded-document-stores implementation review.
 
 ## E2E suite speedup — remaining phases
 

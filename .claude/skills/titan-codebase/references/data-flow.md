@@ -172,6 +172,31 @@ Some sheet rows hold a local reference to an embedded document and call
 
 ---
 
+## Embedded-document contexts (two-context convention)
+
+**Two document context keys, one subscription.** `DocumentSheetShell.svelte` sets `'document'` (the sheet's
+`ReactiveDocument` bridge), `'applicationState'`, and `'sheetDocument'` (the SAME top-level bridge) at mount.
+`'document'` is always the *nearest* document and may be shadowed; `'sheetDocument'` always points at the
+owning sheet's top-level bridge and is never shadowed — the stable escape hatch for actor-coupled reads
+(derived stats, `requestAttackCheck`, check mods) inside an embedded subtree.
+
+**Shadowing.** `EmbeddedDocumentProvider.svelte` reads the ancestor `'document'`, wraps its live embedded
+`doc` prop in an `EmbeddedDocument`, and `setContext('document', …)` for its descendants. A component written
+against `document.data.system.X` therefore works unchanged whether its document is top-level (weapon sheet),
+embedded (weapon on a character sheet, under a provider), or a chat-message snapshot. The chat tree needs NO
+provider: `ChatMessageContent.svelte` sets only `'document'` (the message bridge), and the snapshot already
+exposes path-parity data at `document.data.system.*`.
+
+**How an embedded read resolves.** `EmbeddedDocument.data` is `parent.data?.[collection]?.get(id)` (e.g.
+`actorBridge.data.items.get(id)`). Reading it inside a component or `$derived` touches the ancestor bridge's
+`.data`, registering the single actor subscription (`createSubscriber`); the embedded document is then
+re-resolved by id, so any actor-level or embedded CRUD/update hook invalidates the read and the re-run fetches
+the fresh document — never a stale reference, and the embedded bridge needs no hooks of its own. Nested
+bridges (effect-on-item-on-actor) delegate upward read by read. `.doc` mirrors `ReactiveDocument.doc` for
+non-subscribing write-back call sites.
+
+---
+
 ## Effect HUD
 
 **Resolution & mount — `TitanEffectHud` (src/ui/effect-hud/TitanEffectHud.js)**

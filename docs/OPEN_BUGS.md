@@ -53,6 +53,24 @@ Deferred/known bugs. Todos (planned work) live in `docs/TODO.md`; this file is b
 - **To do:** Watch for recurrence. If it reproduces, capture the message's stored `system.fastHealing` at
   failure time to determine whether the partial-merge update or the fixture seed raced.
 
+### 5. `WeaponDataModel.addAttack` sheet notification is dead AND mis-targeted (new attacks mount collapsed)
+
+- **What:** `WeaponDataModel.addAttack`
+  (`src/document/types/item/types/weapon/WeaponDataModel.js:164-167`) reads the sheet into a local
+  (`const sheet = this.parent._sheet;`) but guards on `this._sheet` — `_sheet` on the DATA MODEL, which is
+  always `undefined`, so the branch never runs. Even if the guard were fixed, the body calls
+  `sheet.postAddCheck()` (which grows the CHECKS-tab `isExpanded` arrays) instead of the attack-expansion
+  handler `sheet.addAttack()` (`WeaponSheet.js:51` → `WeaponSheetState.addAttack`, which pushes `true` onto
+  both attack `isExpanded` arrays). Net effect: a newly added attack mounts collapsed instead of the
+  intended default-expanded (existing attacks initialize expanded — `WeaponSheetData.js:44`). The sibling
+  `deleteAttack` (lines 183-186) guards and dispatches correctly (`if (sheet) { sheet.postDeleteAttack(idx) }`).
+- **Severity:** Low / cosmetic. The attack is created and persisted correctly; only its initial
+  expanded/collapsed UI state is wrong, and one click expands it.
+- **Pre-existing:** present on `main`; NOT introduced by the embedded-document-stores branch (which never
+  touched `addAttack`).
+- **To do:** guard on the local `sheet` and call `sheet.addAttack()`.
+- **Found by:** embedded-document-stores Task 4 code review, 2026-06-05.
+
 <!--
 Recently resolved: the socket-sync A1/A2 full-run timeout flake was fixed by the e2e Phase 2
 shared-world harness (per-file `clearChat` keeps the world lean). Verified: `socket-sync.spec.js`

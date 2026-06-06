@@ -89,6 +89,16 @@ description, check.length, customTrait) — handler/child-prop uses of the raw `
 `CharacterSheetItemChecks {item}`) are left as-is. Child components that themselves read off the passed
 `item` are separate reactivity candidates.
 
+**`EmbeddedDocumentProvider` in an `{#each}` MUST be keyed by `doc.id`** — the provider captures its target
+document at init (`setContext` runs once per instance; the `EmbeddedDocument` stores the id it was
+constructed with), so an unkeyed or index-keyed `{#each}` reuses a provider instance across DIFFERENT
+documents on list reorder/removal and every descendant silently reads the wrong document. Key the block by
+id (`{#each items as item (item.id)}`) so a new id mounts a new provider.
+`EmbeddedDocumentProvider.svelte`'s own comment points to this rule. Chat cards need NO provider: the
+chat-message bridge already exposes the snapshot at `document.data.system.*` (path parity), so shared
+components such as `AttackTags` render unchanged under `ChatMessageContent`'s `'document'` context — and
+snapshot semantics are deliberate (the card never mutates with the source document).
+
 **Row two-way INPUTS to a child-doc leaf use a function binding, never `bind:value={<prop>.system.x}`** —
 a `$derived` is read-only, so you cannot `bind:value` to the reactive display read. For a row input that
 edits a child collection member, use a Svelte 5 **function binding** (≥5.9.0) whose getter reads through
@@ -355,9 +365,12 @@ static `actions` map. To refresh a dynamic control's icon/label after a state ch
 - **`~/` alias vs relative paths** — The codebase uses the `~/` alias for cross-directory imports;
   relative paths (`./`, `../`) appear only within the same immediate directory.
 
-- **Svelte context protocol** — Three keys are set into Svelte context at mount time:
-  - `'document'` (`ReactiveDocument` bridge) and `'applicationState'` (writable store) are set by
-    `DocumentSheetShell.svelte`; all sheet descendant components access them via `getContext`.
+- **Svelte context protocol** — Four keys are set into Svelte context at mount time:
+  - `'document'` (`ReactiveDocument` bridge), `'applicationState'` (writable store), and `'sheetDocument'`
+    (the SAME top-level bridge as `'document'`) are set by `DocumentSheetShell.svelte`; all sheet descendant
+    components access them via `getContext`. `'document'` is the NEAREST document and is shadowed by
+    `EmbeddedDocumentProvider` for embedded subtrees; `'sheetDocument'` is never shadowed (see data-flow.md,
+    "Embedded-document contexts").
   - `'application'` (the owning `ApplicationV2` / `DocumentSheetV2` instance) is set at the `mount()` call
     site in both `TitanDocumentSheet._replaceHTML` and `TitanDialog._replaceHTML`. All components (sheet,
     dialog, and their descendants) can call `getApplication()` (`~/helpers/utility-functions/GetApplication.js`)
@@ -389,6 +402,10 @@ default under full parallelism. Tests live in `tests/unit/**/*.test.js`; there i
   merge.
 - `globalThis.Hooks` — a `HooksMock` instance reinstalled fresh `beforeEach` test so hook registrations
   never leak across tests. Supports `on(name, fn)`, `off(name, fn)`, and `call(name, ...args)`.
+
+**Tooltip-bearing tags render fine under happy-dom** — components using the tippy `tooltipAction` (e.g.
+`TraitTag`) mount cleanly in Vitest's happy-dom environment; unit tests can seed real trait names (whose
+tags attach tippy tooltips) with no tippy or tooltip mocking required.
 
 **`data-testid` convention** — Stable E2E selectors are wired via `testId` props on shared dialog
 wrappers. `CheckDialogField` (`src/check/dialog/CheckDialogField.svelte`) forwards its `testId` prop

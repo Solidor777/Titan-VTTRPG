@@ -1,5 +1,11 @@
 # TITAN E2E Test Suite — Status & Resume Handoff
 
+> **HISTORICAL / STALE — do not trust the counts in this document.** This is a frozen record of the
+> original e2e suite build-out (Phases 1–4). Its claimed totals (315 e2e / 35 unit) are long out of date:
+> as of 2026-06-05 the unit suite is **177 tests (36 files)** and the e2e suite is **382+4** (the +4
+> attack-tags cases pending the current verification run). The per-suite source of truth is the test tree
+> itself (`tests/unit/`, `tests/e2e/`); for current work status see `docs/TODO.md`.
+
 **Last updated:** 2026-06-04. **Next action:** **E2E speedup Phase 2 / TODO #15** (shared-world
 harness — also fixes the socket-sync flake, `OPEN_BUGS.md` #1). **DONE since this header was written:**
 backlog #1/#8/#9/#3, effect-tray, header buttons, build redesign (#13), and **E2E speedup Phase 1b /

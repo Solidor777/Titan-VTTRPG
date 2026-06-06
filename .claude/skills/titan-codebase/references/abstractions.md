@@ -400,9 +400,22 @@ and one or more inner Svelte component trees.
   `DocumentSheetShell.svelte` via Svelte 5 `mount()`, passing `{ document: bridge, applicationState,
   shell }` as props. `_onClose` calls `unmount(handle, { outro: true })`.
 - `DocumentSheetShell.svelte` — receives `{ document, applicationState, shell }` as `$props()`, sets
-  `document` (the `ReactiveDocument` bridge) and `applicationState` into Svelte context, and renders
+  `document` (the `ReactiveDocument` bridge), `applicationState`, AND `sheetDocument` (the same top-level
+  bridge, never shadowed — see the two-context convention in data-flow.md) into Svelte context, and renders
   the type-specific shell via `{#if shell}{@const Shell = shell}<Shell />{/if}` (not
   `<svelte:component>`).
+- `EmbeddedDocument` (`src/document/reactive/EmbeddedDocument.svelte.js`) — a delegating bridge over an
+  embedded document: `new EmbeddedDocument(parent, collection, id)` resolves `.data` / `.doc` as
+  `parent.data?.[collection]?.get(id)` / `parent.doc?.[collection]?.get(id)`. It registers NO hooks of its
+  own — reactivity rides the ancestor `ReactiveDocument`'s `createSubscriber`, and the embedded document is
+  re-resolved by id on every read (the reference is never stale). Bridges nest (effect-on-item-on-actor
+  chains delegate upward); `destroy()` is a no-op (the ancestor owns hook teardown).
+- `EmbeddedDocumentProvider.svelte` (`src/document/reactive/EmbeddedDocumentProvider.svelte`) — takes a
+  live embedded `doc` prop, maps `doc.documentName` to the parent collection via
+  `COLLECTION_BY_DOCUMENT_NAME` (Item → `items`, ActiveEffect → `effects`; any other type `warn()`s and
+  yields a null-resolving bridge), reads the ancestor `'document'` context, and shadows `'document'` for
+  its descendants with an `EmbeddedDocument`. It never shadows `'sheetDocument'`. Provider instances inside
+  an `{#each}` MUST be keyed by `doc.id` (see conventions.md — the component's own comment points there).
 
 **Actor sheets**
 
@@ -451,6 +464,23 @@ and one or more inner Svelte component trees.
 - Per-type item sheets all extend `TitanItemSheet`: `TitanWeaponSheet`, `TitanArmorSheet`,
   `TitanSpellSheet`, `TitanShieldSheet`, `TitanAbilitySheet`, `TitanEquipmentSheet`,
   `TitanCommoditySheet`. Each mounts its own `*SheetShell.svelte`.
+- `AttackTags.svelte` (`src/document/types/item/types/weapon/components/AttackTags.svelte`) — the ONE
+  shared component rendering a weapon attack's intrinsic tags from
+  `getContext('document').data?.system?.attack?.[idx]`; props `{ idx, damageMod = 0 }` (`damageMod` is the
+  actor-derived damage modifier, supplied by the character sheet only). Canonical tag order: damage → type →
+  range (hidden at 1) → attribute/skill → traits (`TraitTag`) → custom traits; testIds
+  `attack-tags-damage/type/range/attribute`. Three consumers, no duplicated tag markup:
+  1. `WeaponSheetSidebarAttacks.svelte` — the top-level weapon document; no provider needed.
+  2. `CharacterSheetWeaponAttacks.svelte` wraps its rows in `<EmbeddedDocumentProvider doc={item}>`;
+     `CharacterSheetWeaponAttack.svelte` is two-context (weapon via `'document'`, actor via
+     `'sheetDocument'`), passes `damageMod`, and hand-renders only the actor-derived tags
+     (dice/training/expertise, testIds `attack-row-dice/training/expertise`). Its display-parity math
+     mirrors the engine: a local `getCheckMod` helper calls `getAttackCheckMod(modifierType, attribute,
+     skill, multiAttack, type, attackTraits, customTraits)` (the real engine signature, with trait-name
+     arrays and weapon-then-attack camelized unique customTraits), the training conditional mod folds into
+     the pre-halving dice base, and the multi-attack rounding honors the `flurry` trait (round up).
+  3. `WeaponChatAttacks.svelte` — the chat-message bridge snapshot (path parity; the card never mutates
+     with the weapon; no provider).
 
 **Active Effect sheet**
 
