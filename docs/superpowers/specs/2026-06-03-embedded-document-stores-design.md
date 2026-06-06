@@ -1,8 +1,14 @@
 # Embedded Document Stores — Design
 
-**Date:** 2026-06-03
+**Date:** 2026-06-03 (refreshed 2026-06-05)
 **Status:** Design — approved, pending implementation plan
-**Scope:** Pattern + a durable shared-`AttackTags` proof — one component rendering a weapon's intrinsic attack tags across the weapon item-sheet sidebar and the character sheet (chat card joins after chat parity). Decomposed; see Follow-up work.
+**Scope:** Pattern + a durable shared-`AttackTags` proof — one component rendering a weapon's intrinsic attack tags across the weapon item-sheet sidebar, the character sheet, and the weapon item chat card. Decomposed; see Follow-up work.
+
+> **2026-06-05 refresh:** the chat-message-subtypes conversion (Phases 1-4 + follow-ups B/D) has
+> since shipped, so the weapon item card already reads `document.data.system.attack` (a snapshot
+> with path parity to the weapon document). The chat card therefore joins the proof as the third
+> `AttackTags` consumer (it was deferred when this spec was first written). Deltas are folded in
+> inline; the core machinery (bridge / provider / two-context convention) is unchanged.
 
 ## Problem
 
@@ -53,26 +59,31 @@ hook multiplication) and drives the delegating design below.
   escape hatch to the owning sheet document.
 - A **durable** proof: one shared `AttackTags` component that renders a weapon's
   intrinsic attack tags from `getContext('document').data.system.attack[idx]`,
-  consumed unchanged by the weapon item-sheet sidebar (top-level weapon) and the
-  character sheet (embedded weapon via the provider) — deleting the duplicated
-  intrinsic-tag markup from both.
+  consumed unchanged by the weapon item-sheet sidebar (top-level weapon), the
+  character sheet (embedded weapon via the provider), and the weapon item chat
+  card (snapshot via path parity) — deleting the duplicated intrinsic-tag markup
+  from all three.
 
 ## Non-goals (decomposed to follow-up specs)
 
 - Migrating the **actor-derived** attack display (dice pool / training /
   expertise) or the attack-**roll** button to a shared component — these stay on
   the character sheet (refactored to read the actor via `'sheetDocument'`, not
-  extracted).
+  extracted). One deliberate exception: the actor's **damage modifier** reaches
+  the shared component as the optional `damageMod` prop (see Proof case), so the
+  character sheet's damage tag keeps showing modified damage.
 - Generalizing the pattern to the checks tab, rules-elements tab, commodity, or
   effect rows.
 - Deleting the `CharacterSheetWeapon*` components — they are **refactored** (to
   source the weapon via the embedded provider and render the shared `AttackTags`),
   not removed.
-- **Any chat-message change.** Chat-message path parity (showing attacks on the
-  weapon *item* card via `document.data.system.attack[index]`, and deep
-  check-chat schemas) is **deferred until the in-flight chat-message-subtypes
-  conversion finishes**, and is built on a schema-from-shape helper. Captured in
-  Follow-up work; no chat code lands in this spec.
+- **Any chat-message schema or producer change.** Chat-message path parity (item
+  cards snapshotting `system.*`, deep check-chat schemas, the
+  `buildSchemaFromShape` helper) **shipped with the chat-message-subtypes
+  conversion** (closed 2026-06-05), so `document.data.system.attack[index]`
+  already resolves on the weapon card. This spec only swaps the card's
+  hand-rendered stats row onto the shared `AttackTags`; schemas, producers, and
+  message data are untouched.
 
 ## Architecture
 
@@ -206,15 +217,34 @@ numeric traits).
 reads the attack from context by index and renders only the **intrinsic** tags:
 
 ```svelte
-let { idx = undefined } = $props();
-const document = getContext('document');                  // weapon (top-level or embedded)
+let { idx = undefined, damageMod = 0 } = $props();
+const document = getContext('document');   // weapon (top-level or embedded) or chat-message snapshot
 const attack = $derived(document.data?.system.attack[idx]);
 {#if attack}
    <!-- damage, type, range, AttributeCheckTag, traits, customTraits -->
 {/if}
 ```
 
-**Consumed unchanged in two places now:**
+Canonical tag order and components (the normalization): **damage (`IconStatTag`,
+value `attack.damage + damageMod`, with the `+ <extra successes>` suffix when
+`plusExtraSuccessDamage`) → type (`IconTag`, melee/accuracy icon) → range
+(`IconStatTag`, hidden at 1) → attribute/skill (`AttributeCheckTag`) → traits
+(`TraitTag`) → custom traits (`Tag`)**. `TraitTag` already encapsulates the
+`typeof value === 'number' ? StatTag : Tag` branch all three call sites
+hand-write, so trait rendering is visually unchanged everywhere; the sidebar's
+type tag gains the icon it lacked (it used a plain `Tag`) and its stat order
+shifts slightly (it led with type).
+
+**One escape hatch — `damageMod` (number, default 0).** The character sheet's
+damage tag today shows `attack.damage + getAttackCheckMod('damage', item,
+attack, multiAttack)` — an actor-derived modifier the original intrinsic/actor
+split overlooked. Rather than render two damage tags or silently drop the
+modified value, `AttackTags` adds the optional prop into its damage value; the
+character-sheet row computes the mod through `'sheetDocument'` and passes it,
+while the sidebar and chat card omit it (intrinsic damage). Rendered values on
+all three surfaces are exactly today's.
+
+**Consumed unchanged in three places:**
 
 - **Weapon item-sheet sidebar** (`WeaponSheetSidebarAttacks`): `'document'` is
   already the top-level weapon — iterate and render `<AttackTags {idx} />`.
@@ -225,15 +255,20 @@ const attack = $derived(document.data?.system.attack[idx]);
   `getContext('sheetDocument')` (the actor) — e.g.
   `sheetDocument.data.system.requestAttackCheck({ itemId: document.data.id, attackIdx: idx })`.
 
-Both call sites delete their duplicated intrinsic markup. Tag-component choices
-are normalized in `AttackTags` (a small, accepted visual change), and the
-character-sheet tag order shifts slightly because the intrinsic tags now render as
-one block. The provider is **keyed by weapon id** (the weapon list already is).
+- **Weapon item chat card** (`WeaponChatAttacks`): the chat tree's `'document'`
+  context is the message bridge, and path parity (chat-subtypes Phase 2) makes
+  `document.data.system.attack[idx]` resolve on the message's snapshot — so
+  `<AttackTags {idx} />` needs **no provider and no schema change**. The
+  component keeps its chrome (the `<ol>`, per-attack name header) and replaces
+  only its hand-rendered stats row. Snapshot semantics are preserved
+  automatically: the message bridge wraps the message, not the live weapon, so
+  the card never mutates when the weapon is later edited or deleted.
 
-**Chat card (deferred):** `WeaponChatAttacks` still reads `flags.titan.attack`; it
-becomes the third `AttackTags` consumer once chat path-parity exposes
-`system.attack[index]` on the item card (Follow-up work). The component is built
-now so adopting it there is a one-line swap.
+All three call sites delete their duplicated intrinsic markup. Tag-component
+choices are normalized in `AttackTags` (the small, accepted visual change made
+concrete above), and the character-sheet tag order shifts slightly because the
+intrinsic tags now render as one block. The provider is **keyed by weapon id**
+(the weapon list already is).
 
 ## Edge cases & error handling
 
@@ -267,8 +302,14 @@ now so adopting it there is a one-line swap.
     assert the character sheet's `AttackTags` updates live (the embedded bridge
     re-resolves through the actor's subscription);
   - **two-context:** assert the character-sheet row still shows actor-derived tags
-    (dice pool / training / expertise) and that the roll button fires
-    `requestAttackCheck` on the actor (via `'sheetDocument'`).
+    (dice pool / training / expertise), that its damage tag still includes the
+    actor's damage modifier (the `damageMod` prop), and that the roll button
+    fires `requestAttackCheck` on the actor (via `'sheetDocument'`);
+  - **chat (snapshot parity + non-reactivity):** send the weapon to chat; assert
+    the card's `AttackTags` renders the same intrinsic tags as the sheets; then
+    edit the attack on the weapon item sheet and assert the chat card does
+    **not** change (snapshot semantics — the inverse of the sheet reactivity
+    assertion).
 
 ## Implementation routing
 
@@ -292,47 +333,20 @@ Each becomes its own spec + plan when picked up:
 - Generalize the embedded-provider treatment to the shared checks tab and
   rules-elements tab on the character sheet.
 - Migrate commodity / effect rows off the `item._id`-lookup pattern.
-- Make `WeaponChatAttacks` the third `AttackTags` consumer once chat path-parity
-  (below) exposes `system.attack[index]` on the item card.
 
-### Chat-message path parity (after the chat-message-subtypes conversion)
+### Chat-message path parity — DELIVERED (chat-subtypes effort, closed 2026-06-05)
 
-**Sequencing:** do not start until the in-flight chat-message-subtypes
-conversion (`feat/chat-message-subtypes-phase1` and its later phases) finishes,
-so item/report/effect cards are already first-class `system`-based subtypes.
+Everything this section originally deferred has shipped via the
+chat-message-subtypes conversion (Phases 1-4 + follow-ups B/D): all 26 chat
+messages are first-class `system`-based subtypes; `buildSchemaFromShape`
+(`src/helpers/utility-functions/`) feeds the item document schemas, the item
+cards, the check chat schemas, and the effect card from single-source shapes.
+The weapon card reads `document.data.system.attack[index]` (parity with the
+weapon document) — which is exactly what lets the chat card join this spec's
+proof as the third `AttackTags` consumer. Same *path*, different *backing*
+(snapshot, not a live bridge), as originally designed.
 
-**Why path parity, not a live bridge:** a chat card is a historical snapshot —
-it must not mutate when the source weapon is later edited or deleted. So chat
-parity is achieved by **data shape** (the message carries the data at the same
-`system.*` path as its source document), not by the live `EmbeddedDocument`
-re-resolution used on sheets. Same *path*, different *backing*. No data
-migration: new messages carry the parity shape; historical messages are not
-retrofitted.
-
-**Schema-from-shape helper (the unifying mechanism).** A helper —
-`buildSchemaFromShape(shape)` (name TBD) — that recursively converts a canonical
-plain-object shape into an appropriate Foundry schema: strings →
-`StringField`, numbers → `NumberField`, booleans → `BooleanField`, arrays →
-`ArrayField` over the inferred element schema, nested objects → `SchemaField`.
-One shape definition then feeds **both** the source document's schema **and** the
-chat-message document's schema. Differentiating fields are added or overridden on
-top of the shared base shape where a particular document needs them. This also
-**unlocks deep schemas for check chat messages**: instead of today's opaque
-`parameters` / `results` `ObjectField`s, the check-chat schema can adopt the same
-shape as the actual `CheckParameters` / `CheckResults`, giving fully-typed check
-chat data.
-
-**Concrete targets:**
-
-- **Weapon item card** (the "send weapon to chat" message): show the weapon's
-  attacks via `document.data.system.attack[index]` — parity with the weapon item
-  *document* — and reuse one read-only attack-row display component across the
-  weapon sheet, the character sheet, and the item card.
-- **Attack-check chat message:** parity with the **attack check** — its
-  `parameters` / `results` become deep schemas derived from the same shapes the
-  check classes use.
-
-**North-star:** progressively move **all** fields on **all** documents (and their
-chat-message counterparts) onto consistent `system.*` paths via the
-schema-from-shape helper, so display/edit components are universally reusable
-across item sheets, character sheets, and chat — no data migration required.
+**Remaining north-star** — progressively move **all** fields on **all**
+documents (and their chat-message counterparts) onto consistent `system.*`
+paths so display/edit components are universally reusable — is tracked as
+`docs/TODO.md` #12.
