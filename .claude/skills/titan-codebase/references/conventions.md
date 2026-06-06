@@ -56,62 +56,59 @@ automatically when the last reactive reader unsubscribes (on unmount). Because `
 document, reads (`.data.system.x`), writes (`.data.update(...)`), collections (`.data.items`), and
 methods all go through the same accessor.
 
-**Always read displayed document values through `document.data`, never off a raw prop** — Svelte 5's
-fine-grained reactivity only tracks reads that go through the `ReactiveDocument` `.data` accessor.
-Reading a value directly off a passed Document prop (e.g. `effect.system.isActive`) is **not** tracked
-and will never re-render when the underlying data changes. Derive such values through `document.data`:
+**Always read displayed document values through a bridge's `document.data`, never off a raw prop** —
+Svelte 5's fine-grained reactivity only tracks reads that go through the `.data` accessor of a
+`ReactiveDocument` / `EmbeddedDocument` bridge. Reading a value directly off a passed Document prop
+(e.g. `effect.system.isActive`) is **not** tracked and will never re-render when the underlying data
+changes. Inside a provider-wrapped row subtree, the nearest `'document'` context IS the embedded
+document, so the read is a plain optional-chained derived:
 
 ```svelte
 // WRONG — not reactive; the toggle will not update when the effect is toggled
 const isActive = effect.system.isActive;
 
-// CORRECT — reads through the reactive accessor; re-evaluates on every document change
-const isActive = $derived(document.data.effects.get(effect.id)?.system.isActive ?? false);
+// CORRECT — reads through the embedded bridge; re-evaluates on every document change
+const isActive = $derived(document.data?.system.isActive ?? false);
 ```
 
-This rule applies to any document collection member (effects, items, embedded docs) whose display state
-must stay in sync with Foundry mutations. The fix was applied to
-`CharacterSheetEffectToggleActiveButton.svelte` (commit a960e135).
+The `?.` guards the mid-frame window where the embedded document has been deleted but the row has not
+yet unmounted (the bridge re-resolves by id and returns `undefined`).
 
-**Re-reading a whole embedded document through `document.data` must return a CHANGING value, not the
-live document object** — a `$derived` whose value is the live embedded document
-(`const reactiveItem = $derived(document.data.items.get(item._id))`) does NOT propagate: the document
-reference is stable across `update()`, so the derived's new value is `===` its previous value, Svelte's
-equality check trips, and downstream `reactiveItem?.system.x` reads stay stale even though the derived
-re-ran and the leaf data changed. Two working shapes: (a) derive the leaf PRIMITIVE directly, as the
-effect toggle does (`$derived(document.data.effects.get(id)?.system.isActive ?? false)`); or (b) when a
-component has many display reads off one embedded doc and a per-leaf derived would be verbose, expose a
-plain **function** accessor and invoke it inline at each read so each markup expression subscribes to
-`document.data` itself: `const reactiveItem = () => document.data.items.get(item._id);` then
-`reactiveItem()?.system.rarity`, `reactiveItem()?.system.xpCost`, etc. `CharacterSheetAbility.svelte`
-uses shape (b) for its expandable-footer display reads (rarity, action, reaction, passive, xpCost,
-description, check.length, customTrait) — handler/child-prop uses of the raw `item` prop (`item._id`,
-`CharacterSheetItemChecks {item}`) are left as-is. Child components that themselves read off the passed
-`item` are separate reactivity candidates.
+**Never make a `$derived` whose VALUE is a live document object** — a document reference is stable
+across `update()`, so the derived's new value is `===` its previous value, Svelte's equality check
+trips, and downstream `.system.x` reads stay stale even though the leaf data changed. Always derive
+leaf values (primitives, arrays) through the bridge instead, one `$derived` per displayed value.
+Embedded rows never look their document up themselves — the list-level `EmbeddedDocumentProvider`
+shadows `'document'` and every leaf derives through the shadowed bridge; no per-leaf
+`document.data.items.get(...)` / `.effects.get(...)` lookup (or function-accessor workaround for one)
+remains in `src/`.
 
 **`EmbeddedDocumentProvider` in an `{#each}` MUST be keyed by `doc.id`** — the provider captures its target
 document at init (`setContext` runs once per instance; the `EmbeddedDocument` stores the id it was
 constructed with), so an unkeyed or index-keyed `{#each}` reuses a provider instance across DIFFERENT
 documents on list reorder/removal and every descendant silently reads the wrong document. Key the block by
 id (`{#each items as item (item.id)}`) so a new id mounts a new provider.
-`EmbeddedDocumentProvider.svelte`'s own comment points to this rule. Chat cards need NO provider: the
+`EmbeddedDocumentProvider.svelte`'s own comment points to this rule. Four list-level wrap sites exist —
+`CharacterSheetMultiItemList`, `CharacterSheetItemList`, `CharacterSheetEffectList`, and
+`EffectHudSection` — each keyed by the document id. Chat cards need NO provider: the
 chat-message bridge already exposes the snapshot at `document.data.system.*` (path parity), so shared
 components such as `AttackTags` render unchanged under `ChatMessageContent`'s `'document'` context — and
 snapshot semantics are deliberate (the card never mutates with the source document).
 
-**Row two-way INPUTS to a child-doc leaf use a function binding, never `bind:value={<prop>.system.x}`** —
-a `$derived` is read-only, so you cannot `bind:value` to the reactive display read. For a row input that
-edits a child collection member, use a Svelte 5 **function binding** (≥5.9.0) whose getter reads through
-the bridge and whose setter commits via the child document's own `update()`:
-`bind:value={() => document.data.<coll>.get(id)?.system.<leaf> ?? <fallback>, (v) => <childDoc>.update({ system: { <leaf>: v } })}`.
-Binding straight to the passed prop (`bind:value={effect.system.duration.remaining}`) is the input twin of
+**Row two-way INPUTS to an embedded-document leaf use a function binding, never
+`bind:value={<prop>.system.x}`** — a `$derived` is read-only, so you cannot `bind:value` to the reactive
+display read. For a row input that edits an embedded document, use a Svelte 5 **function binding**
+(≥5.9.0) whose getter reads the provider-shadowed bridge and whose setter commits through the bridge's
+non-subscribing `.doc` handle:
+`bind:value={() => document.data?.system.<leaf> ?? <fallback>, (v) => document.doc?.update({ system: { <leaf>: v } })}`.
+Binding straight to a passed prop (`bind:value={effect.system.duration.remaining}`) is the input twin of
 the display-read bug: the read is non-reactive (stale until remount) and, on `IntegerIncrementInput`, the
 +/- buttons never persist (they mutate the prop but never fire `onchange`). The function binding fixes both
 — the setter commits on typing AND the buttons. The `?? <fallback>` guards the mid-deletion transient where
-the derived is `undefined` (`NumberInput` would throw at `value.toString()`). Applied to
+the read is `undefined` (`NumberInput` would throw at `value.toString()`). Used by
 `CharacterSheetEffect.svelte` (duration remaining + initiative) and `CharacterSheetCommodity.svelte`
 (quantity). NOTE: `bind:value={document.data.system.x}` on a document's OWN sheet is already reactive and
-does NOT need this — only rows binding a *passed child-doc prop* do.
+does NOT need this — only embedded-row inputs do.
 
 **Trait-sidebar index iteration must be numeric** — All three trait-sidebar `$derived.by` loops
 (`ItemSheetSidebarTraits`, `ArmorSheetSidebarTraits`, `ShieldSheetSidebarTraits`) iterate with a
@@ -148,6 +145,24 @@ then accesses reactive data via `document.data.system.*`. There is no `$document
 auto-subscription — that syntax was swept out across all of `src/`. `applicationState` is still a
 Svelte `writable()` store (factory functions such as `createCharacterSheetState`), consumed with
 `$appState` / `.update()`.
+
+**Embedded-row idioms (the sheet-wide end state)** — inside a provider-wrapped row subtree, `'document'`
+IS the embedded document, and components take no document props. The settled idioms:
+
+- **Display reads** are optional-chained deriveds through the nearest bridge:
+  `$derived(document.data?.system.x)` (the `?.` guards the mid-frame deletion window).
+- **Ids**: reactive contexts read `document.data?._id`; an init-time one-shot capture (e.g. a
+  check-options builder run inside a handler) may use `document.doc._id`.
+- **Handler-time document METHOD calls** go through the non-subscribing handle:
+  `document.doc?.sendToChat()`, `document.doc?.sheet.render(true)`, `document.doc?.update(...)`.
+- **Actor method calls and actor-derived state** go through `'sheetDocument'`, e.g.
+  `sheetDocument.data.system.requestItemDeletion(document.data?._id)` or
+  `sheetDocument.data.system.getItemCheckParameters(...)`.
+- **Owner gates** read the NEAREST `'document'` with `?.` (`disabled={!document.data?.isOwner}`) —
+  the shared leaves `RichText` and `DocumentOwner*Button` do exactly this, so they work under a sheet,
+  a provider, or a chat bridge.
+- **List-script logic** (sort/filter/drag payloads) stays on the actor bridge in the list component,
+  above the providers.
 
 **`applicationState` writes must be ROOTED at `$appState`** — the compiler only emits a store `.set()`
 for assignments whose left-hand side is `$`-prefixed (`$appState.tabs.effects.filter = v`, or
@@ -477,10 +492,17 @@ are fine.
 
 **E2E helpers must not blind-toggle expanders** — verify a row's mount default before clicking its
 expand/collapse toggle: weapon-sheet sidebar attacks mount EXPANDED (`WeaponSheetData` seeds `isExpanded`
-true per existing attack), so an "expand" click actually COLLAPSES the row and starts a 400 ms `slide`
+true per existing attack), and item-sheet sidebar checks likewise mount EXPANDED (`TitanItemSheetData`
+pushes `true` per existing check, for both `sidebar.checks` and `tabs.checks`). An "expand" click on such
+a row actually COLLAPSES it and starts a 400 ms `slide`
 out-transition that subsequent assertions race — a latent flake that an unrelated bundle-timing shift can
 flip. Assert the expanded content directly (web-first assertions auto-wait) and click only to change state
 whose default you have verified. (Root-caused in `attack-tags.spec.js`'s weapon-sheet helper.)
+
+**Run e2e from a foreground shell (machine-local)** — launching Playwright from a DETACHED background
+shell on this machine crashes its worker processes at startup with Windows status `0xC0000142`
+(process-initialization failure), so the run dies before any test executes. Always run
+`npm run test:e2e` from a foreground shell.
 
 **Multi-client harness** — `tests/e2e/multiClient.js` (Phase 4) provides two helpers for tests that
 require simultaneous Foundry sessions: `withClients(browser, clientSpec, fn)` creates one independent

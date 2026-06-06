@@ -49,6 +49,18 @@ surviving deferrals.
   `tests/e2e/embedded-context-effects.spec.js` is the model).
 - **Found by:** Phase 4 (effect chat subtype) review.
 
+### 24. Extract the shared e2e fixture helpers into `tests/e2e/world.js`
+
+- **What:** `newestMessageType`, `deleteFixtureActor`, `controlFixtureActorToken`, and `buildCheck`
+  now exist in 3-4 near-identical copies across the `embedded-context-*` spec family (plus the
+  older token-control specs #18 targets).
+- **To do:** Promote the hardened copies (the check-parity spec's variants are the most complete)
+  into `tests/e2e/world.js` (parameterizing the fixture-count assumptions flagged in review), and
+  retrofit the family; fold in the #18/#19 token-fixture cleanup while touching the same code.
+- **Why deferred:** Touches four reviewed spec files at the tail of the conversion branch; better as
+  its own small pass with one full-suite verification.
+- **Found by:** Task 6 quality review of the embedded-context conversion.
+
 ## Chat message subtypes — related items
 
 The "first-class ChatMessage subtypes" effort (Phases 1-4 + follow-ups B/D) has shipped — all 26
@@ -168,18 +180,6 @@ is written-but-never-read and schema-stripped — harmless dead data, a candidat
 - **To do:** Remove `TYPES.Item.effect` and add a `TYPES.ActiveEffect` map in the same pass.
 - **Found by:** Phase 4 (effect chat subtype) review.
 
-### 24. Extract the shared e2e fixture helpers into `tests/e2e/world.js`
-
-- **What:** `newestMessageType`, `deleteFixtureActor`, `controlFixtureActorToken`, and `buildCheck`
-  now exist in 3-4 near-identical copies across the `embedded-context-*` spec family (plus the
-  older token-control specs #18 targets).
-- **To do:** Promote the hardened copies (the check-parity spec's variants are the most complete)
-  into `tests/e2e/world.js` (parameterizing the fixture-count assumptions flagged in review), and
-  retrofit the family; fold in the #18/#19 token-fixture cleanup while touching the same code.
-- **Why deferred:** Touches four reviewed spec files at the tail of the conversion branch; better as
-  its own small pass with one full-suite verification.
-- **Found by:** Task 6 quality review of the embedded-context conversion.
-
 ### 23. Extract the shared check-row presentation from ItemCheck/EffectCheck
 
 - **What:** After the CheckTags extraction (embedded-context conversion, Stage 3),
@@ -196,39 +196,20 @@ is written-but-never-read and schema-stripped — harmless dead data, a candidat
 The embedded-document-stores spec
 (`docs/superpowers/specs/2026-06-03-embedded-document-stores-design.md`) shipped `EmbeddedDocument`,
 `EmbeddedDocumentProvider`, the two-context convention, and the shared `AttackTags` component across its
-three consumers. The spec's wider sheet-side reuse items below were each a deliberate deferral.
+three consumers; the embedded-context conversion then moved every character-sheet item/effect row and the
+Effect HUD onto list-level providers. The item below is the surviving deferral.
 
 ### 20. Inline attack editing on the character sheet via the provider (write path)
 
-- **What:** The character sheet's weapon rows display attacks through `EmbeddedDocumentProvider` but
-  offer no inline editing — owners must open the weapon sheet to edit an attack. The editor component
+- **What:** The character sheet's weapon rows already resolve their weapon through the list-level
+  `EmbeddedDocumentProvider` wrap (embedded-context conversion), but they offer no inline attack
+  editing — owners must open the weapon sheet to edit an attack. The editor component
   `WeaponSheetAttackSettings` is written against `document.data.system.*`, so it should render unchanged
   under the provider.
-- **To do:** Reuse `WeaponSheetAttackSettings` on the character sheet's weapon rows through the provider —
-  the first consumer to exercise the provider's WRITE path (`document.data.update(...)` /
-  `refreshSystemDocument` against an `EmbeddedDocument`); the shipped consumers are read-only displays.
+- **To do:** Mount `WeaponSheetAttackSettings` on the character sheet's weapon rows and verify the
+  full-blob write path (`refreshSystemDocument` / `document.data.update(...)` against an
+  `EmbeddedDocument`); the row inputs shipped so far write single leaves via `document.doc?.update(...)`.
 - **Why deferred:** Sheet-side reuse follow-up split from the embedded-document-stores spec
   (`docs/superpowers/specs/2026-06-03-embedded-document-stores-design.md`) to keep its scope to the
   read-path proof (AttackTags across three surfaces).
-- **Found by:** the embedded-document-stores design (decomposed follow-up).
-
-### 21. Generalize the provider treatment to the checks tab and rules-elements tab
-
-- **What:** The character sheet's checks tab and rules-elements tab still render embedded-item data via
-  passed props / `item._id` lookups rather than through `EmbeddedDocumentProvider`.
-- **To do:** Wrap their rows in `EmbeddedDocumentProvider` so the existing item sheet components (checks,
-  rules-element settings) become reusable there, mirroring the AttackTags pattern.
-- **Why deferred:** Sheet-side reuse follow-up split from the embedded-document-stores spec
-  (`docs/superpowers/specs/2026-06-03-embedded-document-stores-design.md`).
-- **Found by:** the embedded-document-stores design (decomposed follow-up).
-
-### 22. Migrate commodity/effect rows off the `item._id`-lookup pattern
-
-- **What:** `CharacterSheetCommodity.svelte` and `CharacterSheetEffect.svelte` (and similar rows) reach
-  reactivity via per-leaf `document.data.<coll>.get(id)?.system.<leaf>` deriveds and function bindings
-  (see conventions.md).
-- **To do:** Replace those with an `EmbeddedDocumentProvider` per row so descendants get the plain
-  `document.data.system.*` path, retiring the bespoke lookup boilerplate.
-- **Why deferred:** Sheet-side reuse follow-up split from the embedded-document-stores spec
-  (`docs/superpowers/specs/2026-06-03-embedded-document-stores-design.md`).
 - **Found by:** the embedded-document-stores design (decomposed follow-up).

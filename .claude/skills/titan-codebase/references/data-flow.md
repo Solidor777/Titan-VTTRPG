@@ -165,11 +165,11 @@ rules-element settings components (`src/document/types/item/sheet/rules-element/
 reset a sensible-default `key` when the `selector`/`checkType`/`rating` changes, then let
 `DocumentSelect` persist once. Those handlers are pure key-setters; they do not call `update()` themselves.
 
-*Direct document.update calls* (e.g. `CharacterSheetCommodity.svelte`, `CharacterSheetEffect.svelte`):
-Some sheet rows hold a local reference to an embedded document and call
-`doc.update({ system: { fieldName: newValue } })` directly on `change`, bypassing the snapshot helper.
-`CharacterSheetCommodity` holds a `TitanItem`; `CharacterSheetEffect` holds an effect-subtype
-`TitanActiveEffect` and writes its duration via `effect.update(...)`.
+*Direct document.update calls through the embedded bridge* (e.g. `CharacterSheetCommodity.svelte`,
+`CharacterSheetEffect.svelte`): row inputs that edit an embedded document use a function binding whose
+getter reads the provider-shadowed bridge (`document.data?.system.<leaf> ?? <fallback>`) and whose setter
+writes through the non-subscribing handle (`document.doc?.update({ system: { <leaf>: newValue } })`),
+bypassing the snapshot helper. See conventions.md, "Row two-way INPUTS to an embedded-document leaf".
 
 ---
 
@@ -177,6 +177,7 @@ Some sheet rows hold a local reference to an embedded document and call
 
 **Two document context keys, one subscription.** `DocumentSheetShell.svelte` sets `'document'` (the sheet's
 `ReactiveDocument` bridge), `'applicationState'`, and `'sheetDocument'` (the SAME top-level bridge) at mount.
+`EffectHudShell.svelte` does the same for the Effect HUD (both keys; no `applicationState`).
 `'document'` is always the *nearest* document and may be shadowed; `'sheetDocument'` always points at the
 owning sheet's top-level bridge and is never shadowed — the stable escape hatch for actor-coupled reads
 (derived stats, `requestAttackCheck`, check mods) inside an embedded subtree.
@@ -187,6 +188,14 @@ against `document.data.system.X` therefore works unchanged whether its document 
 embedded (weapon on a character sheet, under a provider), or a chat-message snapshot. The chat tree needs NO
 provider: `ChatMessageContent.svelte` sets only `'document'` (the message bridge), and the snapshot already
 exposes path-parity data at `document.data.system.*`.
+
+**Where the providers live.** The character sheet's item and effect rows and the Effect HUD's rows all
+resolve their embedded document through LIST-level provider wraps: `CharacterSheetMultiItemList`,
+`CharacterSheetItemList`, `CharacterSheetEffectList`, and `EffectHudSection` each wrap every row in an
+id-keyed `EmbeddedDocumentProvider`. Inside any row subtree `'document'` IS the embedded document, so row
+leaves read `document.data?.system.*` directly — there are no per-leaf `items.get(...)`/`effects.get(...)`
+lookups and no document-valued row props. List-script logic (sort/filter/drag payloads) stays on the actor
+bridge in the list component, above the providers.
 
 **How an embedded read resolves.** `EmbeddedDocument.data` is `parent.data?.[collection]?.get(id)` (e.g.
 `actorBridge.data.items.get(id)`). Reading it inside a component or `$derived` touches the ancestor bridge's
@@ -209,15 +218,18 @@ plus the `enableEffectHud` setting's `onChange`, each calling `refresh()`. `refr
 only the first selected token). It early-returns when the resolved actor id is unchanged — within one actor the
 bridge drives reactivity. On an actor change it rebuilds a `new ReactiveDocument(actor)` bridge and remounts
 `EffectHudShell` via Svelte 5 `mount()`, passing the bridge as `documentStore` and the shared `EffectHudState` as
-`hudState`. The shell sets the bridge into context as `'document'`.
+`hudState`. The shell sets the bridge into context as BOTH `'document'` and `'sheetDocument'` (mirroring
+`DocumentSheetShell`), so embedded-row leaves and their actor-coupled escape hatch work unchanged under the HUD.
 
 **Render — `EffectHud.svelte` → sections → rows**
 `EffectHud` derives condition-subtype and effect-subtype lists from `document.data.effects` and renders nothing
 when both are empty (so the panel only mounts a `.titan-effect-hud` when there is something to show). Effect CRUD
-and duration ticks flow through the bridge automatically. `EffectHudRow` sources its description per subtype:
+and duration ticks flow through the bridge automatically. `EffectHudSection` wraps each row in an id-keyed
+`EmbeddedDocumentProvider`; `EffectHudRow` takes no document prop and reads the effect via the shadowed
+`'document'` bridge. `EffectHudRow` sources its description per subtype:
 conditions render from `flags.titan.description` (conditions have no native description field), effects from the
 native `description`. Duration, embedded checks, and send-to-chat are effect-only; both subtypes expose an
-owner-gated delete (`requestEffectDeletion`). The `visual-active-effects` module flag is no longer stamped on
+owner-gated delete (`sheetDocument.data.system.requestEffectDeletion`). The `visual-active-effects` module flag is no longer stamped on
 effects or conditions — this HUD replaces it.
 
 ---

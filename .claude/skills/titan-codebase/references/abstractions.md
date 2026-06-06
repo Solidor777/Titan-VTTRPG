@@ -441,11 +441,12 @@ and one or more inner Svelte component trees.
   `document.data.createEmbeddedDocuments('ActiveEffect', [{ name, type: 'effect' }])`. It uses a
   dedicated `CharacterSheetEffectList.svelte` (sibling of the item-only `CharacterSheetItemList`)
   that iterates `document.data.effects` filtered to `type === 'effect'`, handles actor→actor drag-out
-  via the effect's native `toDragData()`, and renders each via `CharacterSheetEffect.svelte`.
-  `CharacterSheetEffect` takes an `effect` prop, reuses the generic `CharacterSheetItem` shell, and
-  exposes a `CharacterSheetEffectToggleActiveButton.svelte` (active = `effect.system.isActive`,
-  toggled via `document.data.system.toggleEffectActive(effect.id)`) shown for all duration types.
-  Its delete button routes through `document.data.system.requestEffectDeletion(effect.id)`, which —
+  via the effect's native `toDragData()`, and wraps each row in an id-keyed `EmbeddedDocumentProvider`
+  rendering `CharacterSheetEffect.svelte`. `CharacterSheetEffect` takes no document prop — it reads the
+  effect via the shadowed `'document'` bridge — reuses the generic `CharacterSheetItem` shell, and
+  exposes a `CharacterSheetEffectToggleActiveButton.svelte` (active = `document.data?.system.isActive`,
+  toggled via `sheetDocument.data.system.toggleEffectActive(document.data?.id)`) shown for all duration
+  types. Its delete button routes through `sheetDocument.data.system.requestEffectDeletion(...)`, which —
   gated by the `confirmDeletingEffects` client setting (default true, Shift inverts, via
   `ShouldConfirmDeletingEffects`) — either shows `ConfirmDeleteEffectDialog` or immediately calls
   `safeDeleteEffect` (owner-gated `deleteEmbeddedDocuments('ActiveEffect', …)`). This mirrors the
@@ -469,7 +470,8 @@ and one or more inner Svelte component trees.
   range (hidden at 1) → attribute/skill → traits (`TraitTag`) → custom traits; testIds
   `attack-tags-damage/type/range/attribute`. Three consumers, no duplicated tag markup:
   1. `WeaponSheetSidebarAttacks.svelte` — the top-level weapon document; no provider needed.
-  2. `CharacterSheetWeaponAttacks.svelte` wraps its rows in `<EmbeddedDocumentProvider doc={item}>`;
+  2. `CharacterSheetWeaponAttacks.svelte` reads the weapon via the list-level provider's shadowed
+     `'document'` context (the weapon row is wrapped by `CharacterSheetMultiItemList`);
      `CharacterSheetWeaponAttack.svelte` is two-context (weapon via `'document'`, actor via
      `'sheetDocument'`), passes `damageMod`, and hand-renders only the actor-derived tags
      (dice/training/expertise, testIds `attack-row-dice/training/expertise`). Its display-parity math
