@@ -2,18 +2,15 @@
    import { getContext } from 'svelte';
    import localize from '~/helpers/utility-functions/Localize.js';
    import autoSpendResolveChecks from '~/helpers/Settings/AutoSpendResolveChecks.js';
-   import OpposedCheckTag from '~/helpers/svelte-components/tag/OpposedCheckTag.svelte';
-   import ResistedByTag from '~/helpers/svelte-components/tag/ResistedByTag.svelte';
    import IconStatTag from '~/helpers/svelte-components/tag/IconStatTag.svelte';
    import ItemCheckButton from '~/helpers/svelte-components/button/ItemCheckButton.svelte';
    import SpendResolveButton from '~/helpers/svelte-components/button/SpendResolveButton.svelte';
+   import CheckTags from '~/document/svelte-components/check/CheckTags.svelte';
    import {
       DICE_ICON,
       EXPERTISE_ICON,
-      SPEND_RESOLVE_ICON,
       TRAINING_ICON,
    } from '~/system/Icons.js';
-   import AttributeCheckTag from '~/helpers/svelte-components/tag/AttributeCheckTag.svelte';
 
    /** @type {object} The embedded item bridge provided by EmbeddedDocumentProvider. */
    const document = getContext('document');
@@ -64,12 +61,41 @@
 </script>
 
 <!--Check-->
-<div class="check">
-   <!--Buttons-->
-   <div class="buttons">
-      {#if checkParameters.resolveCost}
-         {#if autoSpendResolve}
-            <!--Combined Item Check and Spend Resolve button-->
+{#if checkParameters}
+   <div class="check">
+      <!--Buttons-->
+      <div class="buttons">
+         {#if checkParameters.resolveCost}
+            {#if autoSpendResolve}
+               <!--Combined Item Check and Spend Resolve button-->
+               <ItemCheckButton
+                  label={checkParameters.checkLabel}
+                  attribute={checkParameters.attribute}
+                  disabled={!document.data?.isOwner}
+                  resolveCost={checkParameters.resolveCost}
+                  onclick={() => rollItemCheck()}
+               />
+            {:else}
+               <!--Check Button-->
+               <div>
+                  <ItemCheckButton
+                     label={checkParameters.checkLabel}
+                     attribute={checkParameters.attribute}
+                     disabled={!document.data?.isOwner}
+                     onclick={() => rollItemCheck()}
+                  />
+               </div>
+
+               <!--Resolve Cost Button-->
+               <div class="resolve-cost-button">
+                  <SpendResolveButton
+                     resolveCost={checkParameters.resolveCost}
+                     onclick={() => sheetDocument.data.system.spendResolve(checkParameters.resolveCost)}
+                  />
+               </div>
+            {/if}
+         {:else}
+            <!--Check Button-->
             <ItemCheckButton
                label={checkParameters.checkLabel}
                attribute={checkParameters.attribute}
@@ -77,108 +103,49 @@
                resolveCost={checkParameters.resolveCost}
                onclick={() => rollItemCheck()}
             />
-         {:else}
-            <!--Check Button-->
-            <div>
-               <ItemCheckButton
-                  label={checkParameters.checkLabel}
-                  attribute={checkParameters.attribute}
-                  disabled={!document.data?.isOwner}
-                  onclick={() => rollItemCheck()}
-               />
-            </div>
+         {/if}
+      </div>
 
-            <!--Resolve Cost Button-->
-            <div class="resolve-cost-button">
-               <SpendResolveButton
-                  resolveCost={checkParameters.resolveCost}
-                  onclick={() => sheetDocument.data.system.spendResolve(checkParameters.resolveCost)}
+      <div class="stats">
+         <!--Intrinsic check tags (shared component; attribute carries the actor-resolved value)-->
+         <CheckTags
+            attribute={checkParameters.attribute}
+            idx={checkIdx}
+         />
+
+         <!--Dice-->
+         <div class="stat">
+            <IconStatTag
+               icon={DICE_ICON}
+               label={localize('dice')}
+               value={checkParameters.totalDice}
+            />
+         </div>
+
+         <!--Training-->
+         {#if checkParameters.totalTrainingDice}
+            <div class="stat">
+               <IconStatTag
+                  label={localize('training')}
+                  value={checkParameters.totalTrainingDice}
+                  icon={TRAINING_ICON}
                />
             </div>
          {/if}
-      {:else}
-         <!--Check Button-->
-         <ItemCheckButton
-            label={checkParameters.checkLabel}
-            attribute={checkParameters.attribute}
-            disabled={!document.data?.isOwner}
-            resolveCost={checkParameters.resolveCost}
-            onclick={() => rollItemCheck()}
-         />
-      {/if}
-   </div>
 
-   <div class="stats">
-      <!--DC, Attribute, and Skill-->
-      <div class="stat">
-         <AttributeCheckTag
-            attribute={checkParameters.attribute}
-            complexity={checkParameters.complexity}
-            difficulty={checkParameters.difficulty}
-            skill={checkParameters.skill}
-         />
+         <!--Expertise-->
+         {#if checkParameters.totalExpertise}
+            <div class="stat">
+               <IconStatTag
+                  label={localize('expertise')}
+                  value={checkParameters.totalExpertise}
+                  icon={EXPERTISE_ICON}
+               />
+            </div>
+         {/if}
       </div>
-
-      <!--Dice-->
-      <div class="stat">
-         <IconStatTag
-            icon={DICE_ICON}
-            label={localize('dice')}
-            value={checkParameters.totalDice}
-         />
-      </div>
-
-      <!--Training-->
-      {#if checkParameters.totalTrainingDice}
-         <div class="stat">
-            <IconStatTag
-               label={localize('training')}
-               value={checkParameters.totalTrainingDice}
-               icon={TRAINING_ICON}
-            />
-         </div>
-      {/if}
-
-      <!--Expertise-->
-      {#if checkParameters.totalExpertise}
-         <div class="stat">
-            <IconStatTag
-               label={localize('expertise')}
-               value={checkParameters.totalExpertise}
-               icon={EXPERTISE_ICON}
-            />
-         </div>
-      {/if}
-
-      <!--Resolve Cost-->
-      {#if checkParameters.resolveCost}
-         <div class="stat">
-            <IconStatTag
-               label={localize('resolveCost')}
-               value={checkParameters.resolveCost}
-               icon={SPEND_RESOLVE_ICON}
-            />
-         </div>
-      {/if}
-
-      <!--Resistance Check-->
-      {#if checkParameters.resistanceCheck !== 'none'}
-         <div class="stat">
-            <ResistedByTag resistance={checkParameters.resistanceCheck}/>
-         </div>
-      {/if}
-
-      <!--Opposed Check-->
-      {#if checkParameters.opposedCheck.enabled}
-         <div class="stat">
-            <OpposedCheckTag
-               attribute={checkParameters.opposedCheck.attribute}
-               skill={checkParameters.opposedCheck.skill}
-            />
-         </div>
-      {/if}
    </div>
-</div>
+{/if}
 
 <style lang="scss">
    .check {

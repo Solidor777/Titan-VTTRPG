@@ -1,13 +1,10 @@
 <script>
    import { getContext } from 'svelte';
-   import localize from '~/helpers/utility-functions/Localize.js';
    import { slide } from 'svelte/transition';
-   import ResistanceTag from '~/helpers/svelte-components/tag/ResistanceTag.svelte';
-   import StatTag from '~/helpers/svelte-components/tag/StatTag.svelte';
    import { DICE_ICON } from '~/system/Icons.js';
-   import AttributeCheckTag from '~/helpers/svelte-components/tag/AttributeCheckTag.svelte';
    import IconLabel from '~/helpers/svelte-components/label/IconLabel.svelte';
    import ExpandButton from '~/helpers/svelte-components/button/ExpandButton.svelte';
+   import CheckTags from '~/document/svelte-components/check/CheckTags.svelte';
 
    /**
     * @typedef {object} ItemSheetSidebarCheckProps
@@ -39,80 +36,15 @@
                }}
             />
          </div>
-
-         <!--Rolled Stats-->
-         <div class="rolled-stats">
-            {#if document.data.system.check[idx].skill !== 'none'}
-               {`${localize(document.data.system.check[idx].attribute)} (${localize(document.data.system.check[idx].skill)}) ${
-                  document.data.system.check[idx].difficulty
-               }:${document.data.system.check[idx].complexity}`}
-            {:else}
-               {`${localize(document.data.system.check[idx].attribute)} ${document.data.system.check[idx].difficulty}:${
-                  document.data.system.check[idx].complexity
-               }`}
-            {/if}
-         </div>
       </div>
 
-      <!--Expand Button if there is anything to expand-->
-      {#if document.data.system.check[idx].resolveCost > 0
-      || document.data.system.check[idx].resistanceCheck !== 'none'
-      || document.data.system.check[idx].opposedCheck.enabled === true}
-         <ExpandButton bind:expanded={$appState.sidebar.checks.isExpanded[idx]}/>
-      {/if}
+      <!--Expand Button-->
+      <ExpandButton bind:expanded={$appState.sidebar.checks.isExpanded[idx]}/>
 
-      <!--Advanced Details-->
-      {#if $appState.sidebar.checks.isExpanded[idx]
-      && (document.data.system.check[idx].resolveCost > 0
-         || document.data.system.check[idx].resistanceCheck !== 'none'
-         || document.data.system.check[idx].opposedCheck.enabled === true)}
-         <div class="advanced-details" transition:slide|local>
-
-            <!--Resolve Cost-->
-            {#if document.data.system.check[idx].resolveCost > 0}
-               <div class="stat" transition:slide|local>
-                  <StatTag
-                     label={localize('resolveCost')}
-                     value={document.data.system.check[idx].resolveCost}
-                  />
-               </div>
-            {/if}
-
-            <!--Resistance Check-->
-            {#if document.data.system.check[idx].resistanceCheck !== 'none'}
-               <div class="labeled-stat" transition:slide|local>
-
-                  <!--Label-->
-                  <div class="stat-label">
-                     {localize('resistedBy')}
-                  </div>
-
-                  <!--Value-->
-                  <div class="value">
-                     <ResistanceTag resistance={document.data.system.check[idx].resistanceCheck}>
-                        {localize(document.data.system.check[idx].resistanceCheck)}
-                     </ResistanceTag>
-                  </div>
-               </div>
-            {/if}
-
-            <!--Opposed Check-->
-            {#if document.data.system.check[idx].opposedCheck.enabled === true}
-               <div class="labeled-stat" transition:slide|local>
-                  <!--Label-->
-                  <div class="stat-label">
-                     {localize('opposedBy')}
-                  </div>
-
-                  <!--Value-->
-                  <div class="value stat">
-                     <AttributeCheckTag
-                        attribute={document.data.system.check[idx].opposedCheck.attribute}
-                        skill={document.data.system.check[idx].opposedCheck.skill}
-                     />
-                  </div>
-               </div>
-            {/if}
+      <!--Check tags (shared component)-->
+      {#if $appState.sidebar.checks.isExpanded[idx]}
+         <div class="stats" transition:slide|local>
+            <CheckTags {idx}/>
          </div>
       {/if}
    </div>
@@ -131,30 +63,15 @@
          @include bordered-label;
          @include flex-column;
          @include flex-group-top;
-
-         .rolled-stats {
-            font-weight: normal;
-         }
       }
 
-      .advanced-details {
+      .stats {
          @include border-bottom;
-         @include flex-column;
-         @include flex-group-top;
+         @include flex-row;
+         @include flex-group-center;
          @include padding-standard;
-         @include separated-column;
 
          width: 100%;
-
-         .stat {
-            @include flex-row;
-            @include flex-group-center;
-         }
-
-         .labeled-stat {
-            @include flex-column;
-            @include flex-group-top;
-         }
       }
    }
 </style>
