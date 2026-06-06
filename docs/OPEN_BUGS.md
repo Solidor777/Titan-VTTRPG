@@ -104,20 +104,6 @@ Deferred/known bugs. Todos (planned work) live in `docs/TODO.md`; this file is b
 - **To do:** add an `{#if attack}` template gate and guard the deriveds.
 - **Found by:** the embedded-context conversion's final holistic review.
 
-### 8. World effect-Item converter is blind to invalid legacy items (unregistered subtype)
-
-- **What:** `convertActor` (`src/helpers/migration/ConvertEffectItemsToActiveEffects.js:48`) discovers legacy items
-  via `actor.items.filter((item) => item.type === 'effect')`, but `33697e2f` removed the `effect` Item subtype from
-  `system.json`, so legacy effect Items fail strict construction (`DocumentTypeField._validateType` throws on an
-  unregistered type) and land in `EmbeddedCollection#invalidDocumentIds` — excluded from `actor.items` iteration.
-  On any world whose FIRST load on a post-removal build still contains legacy effect Items, the every-load converter
-  silently no-ops and the items are stranded as invalid documents (not lost — still in `_source`/the database).
-- **Severity:** Medium / latent for upgrades. Dev worlds converted while interim builds still registered the
-  subtype, so no live world is known-affected; any pre-conversion world backup or fresh upgrade hits it.
-- **To do:** switch discovery to raw source (`actor._source.items`) — specced together with the TODO #6 pack
-  extension in `docs/superpowers/specs/2026-06-06-pack-effect-item-conversion-design.md`.
-- **Found by:** brainstorm exploration for TODO #6, 2026-06-06 (verified against the v14 source).
-
 <!--
 Recently resolved: the socket-sync A1/A2 full-run timeout flake was fixed by the e2e Phase 2
 shared-world harness (per-file `clearChat` keeps the world lean). Verified: `socket-sync.spec.js`

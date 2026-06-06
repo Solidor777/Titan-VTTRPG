@@ -267,7 +267,20 @@ source Items, then batch-deletes any stale cosmetic "mirror" AEs (base subtype, 
 through, so `TitanActiveEffect._preCreate` does not override combat initiative.
 `buildEffectData` does NOT set `showIcon` or the Visual Active Effects flag — `_preCreate` seeds those. Each actor's
 conversion is wrapped in its own try/catch (`convertActorIsolated`), so a failure on one actor is logged and the
-remaining actors still process. Idempotent once no `effect` Items remain. Compendium-packed actors are NOT converted.
+remaining actors still process. Idempotent once no `effect` Items remain. Discovery reads raw `actor._source.items` (NOT `actor.items`): the
+`effect` subtype is unregistered, so legacy items are invalid documents excluded from collection iteration but
+present in raw source and deletable by id. Replacement AEs are stamped `flags.titan.convertedFromItem = <item _id>`;
+creation skips already-stamped sources AND deletion is stamp-verified (a source is deleted only when its replacement
+verifiably exists — a pre-existing stamp or a document returned by the create call), so an interrupted or
+hook-vetoed conversion finishes cleanly on a later load instead of duplicating or losing effects. `buildEffectData`
+normalizes the uncast raw `active` value (template-era source persisted strings). World Actor compendium packs are
+also converted (`convertWorldActorPacks` → `convertPack`): index-gated via `pack.getIndex({ fields: ['items'] })` —
+a summary projection (`compendiumIndexFields` + `_id` per item, no `system`, no document construction for clean
+packs) that the client index retains for the session; locked packs are unlocked and their lock state restored in a
+`finally` (a restore failure logs its own pack-naming error and never masks a conversion error), per-actor and
+per-pack failures are isolated. Module/system packs are never touched. The conversion load emits two expected
+red-error classes per legacy item (invalid-doc init + temp-doc `Failed data preparation` during deletion); the
+following load is silent.
 
 **Version comparison — `documentNeedsMigration`**
 Each document stores its current schema version in `system.documentVersion` (a numeric field defined in

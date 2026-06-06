@@ -160,7 +160,7 @@ test.describe('pack effect-item conversion (clean-pack safety)', () => {
             ],
          });
 
-         /** @type {object} The single packed actor's index entry. */
+         /** @type {object|undefined} The single packed actor's index entry. */
          const entry = index.contents[0];
 
          return {

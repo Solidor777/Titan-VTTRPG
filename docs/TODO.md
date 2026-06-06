@@ -18,15 +18,6 @@ surviving deferrals.
   and user packs; B just fills a pack with shipped defaults.
 - **Why deferred:** Content + pipeline work, independent of the tray feature that shipped.
 
-### 6. Convert effect Items inside compendium-packed actors
-
-- **What:** The `convertEffectItemsToActiveEffects` migration handles world
-  actors and unlinked token actors, but NOT actors stored inside compendium
-  packs. Those actors keep their legacy `effect` Items.
-- **To do:** Extend the converter (or add a one-shot tool) to iterate unlocked
-  actor compendium packs and convert their effect Items, then re-lock.
-- **Depends on:** The "Effects → TitanActiveEffect" spec.
-
 ## E2E suite — related items
 
 ### 18. Shared-world e2e fixture hygiene: token-control fixtures orphan a token per run

@@ -490,6 +490,16 @@ signal and document it inline (see `permissions-auto-open.spec.js`). The two con
 `setInterval` canvas-readiness loops (`effect-tray.spec.js`, `effect-hud.spec.js`) are NOT fixed sleeps and
 are fine.
 
+**Mid-file `page.reload()` idiom** (first used in `tests/e2e/pack-conversion.spec.js`): `page.on('console')` and
+`attachPageErrors` listeners survive reloads (they attach to the Page object). Sequence: (1) PROVE the first
+boot's converter/async ready-work finished via a positive console-line poll BEFORE clearing the capture buffer
+(`game.ready` is set before the un-awaited ready hooks finish, so login resolving proves nothing about them);
+(2) clear the buffer; (3) `await page.reload()`; (4) `await page.waitForURL('**/game', { timeout: 15_000 })` so a
+lost session fails crisply; (5) `waitForFunction(() => globalThis.game?.ready === true && ..., null,
+{ timeout: 60_000 })` — note the THREE-positional form (`fn, arg, options`); the two-argument form silently binds
+options as `arg`; (6) poll the positive completion signal again before any absence assertion. Budget the test via
+`test.setTimeout(120_000)` (a full reboot inside one test exceeds the 60s default under the throttled runner).
+
 **E2E helpers must not blind-toggle expanders** — verify a row's mount default before clicking its
 expand/collapse toggle: weapon-sheet sidebar attacks mount EXPANDED (`WeaponSheetData` seeds `isExpanded`
 true per existing attack), and item-sheet sidebar checks likewise mount EXPANDED (`TitanItemSheetData`
