@@ -50,8 +50,6 @@
    </div>
 {/if}
 
-<div></div>
-
 <style lang="scss">
    .check {
       @include flex-column;

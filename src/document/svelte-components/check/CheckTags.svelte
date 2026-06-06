@@ -10,7 +10,8 @@
    /**
     * @typedef {object} CheckTagsProps
     * @property {number} [idx] - The index of the check in the current document's `system.check` array.
-    * @property {string} [attribute] - Optional actor-resolved attribute overriding the config attribute.
+    * @property {string} [attribute] - Optional actor-resolved attribute overriding the config attribute. Pass
+    *    `checkParameters.attribute` from actor-context consumers; omit on top-level document sheets.
     */
 
    /** @type {CheckTagsProps} */
@@ -20,7 +21,7 @@
    const document = getContext('document');
 
    /** @type {object|undefined} The current check config, re-read reactively through the document bridge. */
-   const check = $derived(document.data?.system.check[idx]);
+   const check = $derived(document.data?.system?.check?.[idx]);
 </script>
 
 {#if check}

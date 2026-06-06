@@ -38,7 +38,7 @@
    /** @type {boolean} Whether to automatically spend the resolve for checks. */
    const autoSpendResolve = autoSpendResolveChecks();
 
-   /** @type {ItemCheckParameters} Calculated item check parameters. */
+   /** @type {ItemCheckParameters | undefined} Calculated item check parameters. */
    let checkParameters = $derived.by(() => {
 
       // Ensure the item and check are valid.

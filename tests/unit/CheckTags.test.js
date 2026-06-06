@@ -98,4 +98,12 @@ describe('CheckTags', () => {
       });
       expect(container.querySelector('.check-tags')).toBeNull();
    });
+
+   it('renders nothing during the deletion window when the bridge data is undefined', () => {
+      const { container } = render(CheckTags, {
+         props: { idx: 0 },
+         context: new Map([['document', { data: undefined }]]),
+      });
+      expect(container.querySelector('.check-tags')).toBeNull();
+   });
 });

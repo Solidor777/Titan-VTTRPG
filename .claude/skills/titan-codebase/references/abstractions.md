@@ -488,8 +488,8 @@ and one or more inner Svelte component trees.
   (hidden at `'none'`) → opposed (hidden unless `.enabled`); testIds
   `check-tags-attribute/resolve-cost/resisted-by/opposed`. Three consumers, no duplicated tag markup:
   1. `ItemSheetSidebarCheck.svelte` — the top-level item/effect document; the expander is always present
-     and the expanded `.stats` body is just `<CheckTags {idx}/>` (the old at-a-glance `.rolled-stats` text
-     line and labeled `.advanced-details` column are gone — user-approved convergence).
+     and the expanded `.stats` body is the entire check display — no separate at-a-glance line
+     (user-approved convergence).
   2. `CharacterSheetItemCheck.svelte` / `CharacterSheetEffectCheck.svelte` — two-context rows that pass
      `attribute={checkParameters.attribute}` and hand-render only the actor-derived dice/training/expertise
      tags after it; both templates are guarded by `{#if checkParameters}` against the mid-frame embedded
