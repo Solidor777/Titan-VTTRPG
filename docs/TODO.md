@@ -168,6 +168,18 @@ is written-but-never-read and schema-stripped — harmless dead data, a candidat
 - **To do:** Remove `TYPES.Item.effect` and add a `TYPES.ActiveEffect` map in the same pass.
 - **Found by:** Phase 4 (effect chat subtype) review.
 
+### 24. Extract the shared e2e fixture helpers into `tests/e2e/world.js`
+
+- **What:** `newestMessageType`, `deleteFixtureActor`, `controlFixtureActorToken`, and `buildCheck`
+  now exist in 3-4 near-identical copies across the `embedded-context-*` spec family (plus the
+  older token-control specs #18 targets).
+- **To do:** Promote the hardened copies (the check-parity spec's variants are the most complete)
+  into `tests/e2e/world.js` (parameterizing the fixture-count assumptions flagged in review), and
+  retrofit the family; fold in the #18/#19 token-fixture cleanup while touching the same code.
+- **Why deferred:** Touches four reviewed spec files at the tail of the conversion branch; better as
+  its own small pass with one full-suite verification.
+- **Found by:** Task 6 quality review of the embedded-context conversion.
+
 ### 23. Extract the shared check-row presentation from ItemCheck/EffectCheck
 
 - **What:** After the CheckTags extraction (embedded-context conversion, Stage 3),
