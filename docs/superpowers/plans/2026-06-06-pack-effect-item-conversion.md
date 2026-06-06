@@ -613,9 +613,21 @@ git commit -m "fix(migration): raw-_source discovery + active normalization + re
 
 ### Task 3: Pack path — `convertPack` + `convertWorldActorPacks`, wired into the default function
 
+**Scope addition (user-approved 2026-06-06, closes OPEN_BUGS #9 — stamp-verified deletion):** `convertActor` deletes
+only legacy sources whose `_id` has a verified replacement: the union of pre-existing `convertedFromItem` stamps
+(skip-guard survivors) and stamps on documents actually RETURNED by `createEmbeddedDocuments` (a third-party
+`preCreateActiveEffect` veto removes its document from the returned array). Vetoed sources stay in `_source` for the
+next load. Requires: `makeFakeActor`'s `createEmbeddedDocuments` stub returns pseudo-docs
+(`data.map((d, i) => ({ id: \`createdfx\${String(i).padStart(8, '0')}\`, type: d.type, flags: d.flags }))`), two new
+tests (veto-all → create call only, no Item delete; partial veto → only the verified source's id deleted), and the
+existing convertActor tests stay green unchanged. Delete `docs/OPEN_BUGS.md` entry #9 in this task's commit (fixed
+entries are deleted). Also reword the test file's scaffolding comment (line ~72) to the plan-agnostic "Shared
+scaffolding for the convertActor and pack-path suites." (deferred Task 2 review minor).
+
 **Files:**
-- Modify: `src/helpers/migration/ConvertEffectItemsToActiveEffects.js` (append two functions; extend the default
-  function and its JSDoc)
+- Modify: `src/helpers/migration/ConvertEffectItemsToActiveEffects.js` (`convertActor` deletion verification; append
+  two functions; extend the default function and its JSDoc)
+- Modify: `docs/OPEN_BUGS.md` (delete entry #9 — fixed here)
 - Test: `tests/unit/ConvertEffectItemsToActiveEffects.test.js`
 
 - [ ] **Step 1: Add the pack-path test suites**

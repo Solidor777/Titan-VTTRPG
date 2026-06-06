@@ -61,11 +61,15 @@ All in `src/helpers/migration/ConvertEffectItemsToActiveEffects.js`:
   Before creating, it skips any source whose `_id` already has a surviving AE carrying `convertedFromItem` — making
   the create step **idempotent under retry** (a create-succeeded/delete-failed interruption, or two GM clients
   racing the same actor, no longer duplicates effects; the retry just finishes the deletion).
-  `createEmbeddedDocuments('ActiveEffect', …)` and `deleteEmbeddedDocuments('Item', ids)` are otherwise unchanged —
-  embedded deletion by id operates at the source level and works on invalid documents (the same path Foundry's own
+  Embedded deletion by id operates at the source level and works on invalid documents (the same path Foundry's own
   invalid-document recovery uses). The stale-mirror cleanup (`actor.effects`, valid base-subtype AEs) is untouched.
-- Non-destructive ordering preserved: create replacement AEs (skipping already-converted) → delete source items →
-  delete stale mirrors.
+- **Stamp-verified deletion (user-approved 2026-06-06, closes OPEN_BUGS #9):** legacy sources are deleted only when
+  their `_id` has a VERIFIED replacement — a pre-existing stamped AE (skip-guard survivors) or a stamp on a document
+  actually RETURNED by `createEmbeddedDocuments` (a third-party `preCreateActiveEffect` veto removes its document
+  from the returned array). Vetoed sources stay in `_source` — data preserved, retried next load — instead of being
+  unconditionally deleted.
+- Non-destructive ordering preserved: create replacement AEs (skipping already-converted) → delete stamp-verified
+  source items → delete stale mirrors.
 - JSDoc updated: the module-level "Compendium-packed actors are NOT converted by this routine" limitation is removed;
   `buildEffectData`'s parameter contract documents the raw-source shape, the casting caveat, and the provenance flag.
 
