@@ -265,7 +265,8 @@ each. For each `effect`-type Item, `convertActor` builds AE creation data via `b
 source Items, then batch-deletes any stale cosmetic "mirror" AEs (base subtype, `flags.titan.type === 'effect'`) last
 (create-before-delete, so no effect data is lost if creation fails). The migrated `duration.initiative` is carried
 through, so `TitanActiveEffect._preCreate` does not override combat initiative.
-`buildEffectData` does NOT set `showIcon` or the Visual Active Effects flag — `_preCreate` seeds those. Each actor's
+`buildEffectData` does NOT set `showIcon` — `TitanActiveEffect._preCreate` seeds it (the Visual Active Effects
+flag is gone entirely). Each actor's
 conversion is wrapped in its own try/catch (`convertActorIsolated`), so a failure on one actor is logged and the
 remaining actors still process. Idempotent once no `effect` Items remain.
 Discovery reads raw `actor._source.items` (NOT `actor.items`): the

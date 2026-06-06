@@ -141,7 +141,10 @@ async function convertActorIsolated(actor) {
  * if needed, each flagged actor is loaded and converted (per-actor failures are logged and skipped so the rest of
  * the pack still converts), and the pack's original lock state is restored in a finally block even when conversion
  * throws. A restore failure is caught inside the finally and logged as a restore-specific error, so it can never
- * mask an in-flight conversion error or be misread as a conversion failure.
+ * mask an in-flight conversion error or be misread as a conversion failure. Accepted limitation: the index gate
+ * flags entries by legacy effect Items only, so a packed actor carrying ONLY stale mirror AEs is never flagged
+ * (mirror detection needs flags absent from the summary projection); mirrors normally co-exist with their source
+ * items.
  * @param {CompendiumCollection} pack - The compendium pack to convert.
  * @returns {Promise<void>}
  */

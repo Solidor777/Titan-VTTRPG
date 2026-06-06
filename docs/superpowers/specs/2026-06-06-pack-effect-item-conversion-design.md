@@ -3,8 +3,9 @@
 **Date:** 2026-06-06
 **Status:** Approved (brainstorm 2026-06-06); amended same day after a two-reviewer buddy check (13 agreed
 findings folded in, 0 unresolved; user approved the provenance-flag idempotency delta).
-**Closes:** `docs/TODO.md` #6 (convert effect Items inside compendium-packed actors) and `docs/OPEN_BUGS.md` #8
-(world converter blind to invalid legacy effect Items).
+**Closes:** `docs/TODO.md` #6 (convert effect Items inside compendium-packed actors), `docs/OPEN_BUGS.md` #8
+(world converter blind to invalid legacy effect Items), and `docs/OPEN_BUGS.md` #9 (converter deleted all legacy
+sources even if a third-party hook vetoed a creation — closed by the stamp-verified deletion delta).
 **Predecessor:** `specs/2026-05-30-titan-active-effects-conversion-design.md` (shipped; section 5 deferred packs).
 
 ---
