@@ -18,10 +18,10 @@
       children,
    } = $props();
 
-   /** @type {object} Reference to the reactive Document store. */
+   /** @type {object} The nearest document bridge ('document' context — possibly an embedded one). */
    const document = getContext('document');
 </script>
 
-<Button disabled={disabled || !document.data.isOwner} {onclick} {tooltip}>
+<Button disabled={disabled || !document.data?.isOwner} {onclick} {tooltip}>
    {@render children?.()}
 </Button>

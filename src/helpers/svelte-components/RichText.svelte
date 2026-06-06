@@ -9,7 +9,7 @@
    /** @type {RichTextProps} */
    let { value = undefined } = $props();
 
-   /** @type {object} Reference to the reactive Document store. */
+   /** @type {object} The nearest document bridge ('document' context — possibly an embedded one). */
    const document = getContext('document');
 
    /** @type {string} - The enriched HTML, resolved asynchronously. */
@@ -32,7 +32,7 @@
 </script>
 
 <div
-   class={document.data.isOwner ? 'rich-text' : 'rich-text not-owner'}>
+   class={document.data?.isOwner ? 'rich-text' : 'rich-text not-owner'}>
    {@html displayText}
 </div>
 

@@ -20,8 +20,8 @@
       label,
    } = $props();
 
-   /** @type {object} Reference to the reactive Document store. */
+   /** @type {object} The nearest document bridge ('document' context — possibly an embedded one). */
    const document = getContext('document');
 </script>
 
-<IconButton disabled={disabled || !document.data.isOwner} {icon} {label} {onclick} {tooltip}/>
+<IconButton disabled={disabled || !document.data?.isOwner} {icon} {label} {onclick} {tooltip}/>

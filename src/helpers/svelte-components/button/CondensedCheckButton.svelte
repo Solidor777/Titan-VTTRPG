@@ -4,11 +4,7 @@
       EXPERTISE_ICON,
       SPEND_RESOLVE_ICON,
    } from '~/system/Icons.js';
-   import { getContext } from 'svelte';
    import DocumentOwnerAttributeButton from '~/document/svelte-components/DocumentOwnerAttributeButton.svelte';
-
-   /** @type {object} Reference to the reactive Document store. */
-   const document = getContext('document');
 
    /**
     * @typedef {object} CondensedCheckButtonProps

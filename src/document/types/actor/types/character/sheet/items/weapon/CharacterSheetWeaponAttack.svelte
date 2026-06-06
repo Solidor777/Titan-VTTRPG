@@ -133,7 +133,7 @@
          <DocumentOwnerButton
             onclick={() =>
                sheetDocument.data.system.requestAttackCheck({
-                  itemId: document.data._id,
+                  itemId: document.data?._id,
                   attackIdx: attackIdx,
                })}
          >

@@ -8,8 +8,8 @@ import { closeAllApps, clearChat, attachPageErrors } from './world.js';
  * `document.data.items`. Svelte 5 fine-grained reactivity only tracks reads routed through the reactive
  * `document.data` store, so a plain prop read of `item.system.x` has no reactive dependency. When the
  * underlying item is mutated in place (no tab switch, no re-expand) the rendered controls must update; if
- * they stay stale the bug class is confirmed for spell rows. The tradition read also exercises the shared
- * `CharacterSheetItemTradition` tag pattern (a StatTag in the footer). This spec seeds one spell, expands
+ * they stay stale the bug class is confirmed for spell rows. The tradition read also exercises the spell
+ * row's own tradition display (a StatTag in the footer). This spec seeds one spell, expands
  * it, then mutates rarity (common -> rare), tradition (Arcane -> Divine) and xpCost (0 -> 5) in place and
  * asserts the rendered footer reflects the new values.
  */
