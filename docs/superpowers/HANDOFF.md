@@ -1,81 +1,70 @@
-# Session Handoff — 2026-06-05 (Phase 3 reports merged; resume at Phase 4)
+# Session Handoff — 2026-06-05 (Phase 4 merged; chat-subtypes effort CLOSED)
 
 Resume point after a context `/clear`. Read this, then the referenced docs + the auto-loaded memory
-(`MEMORY.md` → `chat-subtypes-phase3-reports.md`).
+(`MEMORY.md` → `chat-subtypes-phase4-effect.md`).
 
-## ✅ Last session — Chat-message subtypes Phase 3 (reports ×13) — DONE + MERGED
+## ✅ Last session — Chat-message subtypes Phase 4 (effect + legacy-path deletion) — DONE + MERGED
 
-`main` is at **`8a19c5c0`** (Phase 3 fast-forward-merged and **pushed to origin**; feature branch
+`main` is at **`1336e312`** (Phase 4 fast-forward-merged and **pushed to origin**; feature branch
 deleted). Built subagent-driven (6 tasks, fresh `titan-svelte-dev` implementer + two-stage review
-each + a final holistic review). **Verified: unit 154 / full e2e 380 green, build clean.**
+each + a final holistic review). **Verified: unit 158 / full e2e 382 green, build probe-free.**
 
-All 13 report chat messages are now first-class self-rendering `ChatMessage` subtypes (typed
-`system` payloads). Producer `CharacterDataModel._whisperOwners` emits `{type, system}`; the legacy
-hook `OnRenderChatMessageHTML` `TITAN_CHAT_MESSAGE_TYPES` is trimmed to **only `'effect'`**. Spec/plan:
-`specs/2026-06-04-chat-message-subtypes-phase3-reports-design.md`,
-`plans/2026-06-04-chat-message-subtypes-phase3-reports.md`. Full detail + gotchas live in the
-`chat-subtypes-phase3-reports` memory.
+The **entire chat-subtypes roadmap (Phases 1-4 + follow-ups B/D) is closed**: all 26 chat messages
+(5 checks, 7 item cards, 13 reports, effect) are first-class self-rendering `ChatMessage` subtypes;
+the legacy hook (`OnRenderChatMessageHTML.js`) and dispatcher (`ChatMessageShell.svelte`) are
+DELETED; no chat payload travels in `flags.titan` (remaining `flags.titan` users are document flags:
+macros, item uuid, condition descriptions). `TitanActiveEffectDataModel` and
+`EffectChatMessageDataModel` share `createEffectSystemTemplate()` (single source, golden-master
+gated by `tests/unit/EffectSchemaEquivalence.test.js`). Dark-mode-`'all'` for non-TITAN messages
+lives in `TitanChatMessage.renderHTML`. Spec/plan:
+`specs/2026-06-05-chat-message-subtypes-phase4-effect-design.md`,
+`plans/2026-06-05-chat-message-subtypes-phase4-effect.md`.
 
-## ▶ NEXT — Phase 4 (effect subtype + delete the legacy render path) — THE FINAL chat-subtypes phase
+Bonus fixes shipped on the branch: the since-2024 unlabeled zero-resolve-cost check-button bug
+(`ItemChatMessageItemChecks.svelte`); two e2e teardown traps in `closeAllApps` (nested
+`options.directory` sub-apps; `canvas.hud`); **`npm run test:e2e` is now THROTTLED by default**
+(BelowNormal priority, half the cores, `tests/e2e/run-e2e-throttled.ps1`; `test:e2e:fast` =
+unthrottled; filter args pass through via `@($args)` — PS 5.1 drops the automatic `$args` in
+native-command position); vitest `hookTimeout` 60s.
 
-After Phase 4 the **entire** chat system is subtype-self-rendering and the legacy `flags.titan`
-hook/shell are gone. Phase 4 is small — only the `effect` type remains on the legacy path. It is
-**not specced yet**: run the normal **brainstorm → spec → plan → subagent execution** flow (the user
-expects this rhythm and approves the spec before planning). Reuse the proven Phase 2/3 pattern.
+## ▶ NEXT — no designated big-ticket item; pick from the backlog
 
-**Scope (from the Phase 1 roadmap + Phase 3's deferred-cleanup list):**
-1. Add the single **`effect`** subtype: `EffectChatMessageDataModel` (extend `TitanChatMessageDataModel`;
-   colocate with the existing `src/document/types/active-effect/chat-message/EffectChatMessage.svelte`).
-   Type its `system` from a shape via `buildSchemaFromShape` + a golden-master entry; apply the Phase-3
-   typing convention (nullable `ObjectField` for presence-guarded objects; explicit `ArrayField`+`?.length`
-   for arrays). Register the `effect` key in `OnceInit.js` `CONFIG.ChatMessage.dataModels` + `system.json`
-   `documentTypes.ChatMessage` + `lang/en.json` `TYPES.ChatMessage`.
-2. **Migrate the effect producer** to emit `{type:'effect', system}` instead of `flags.titan`
-   (RESEARCH FIRST: grep how effect cards are created — likely a `sendToChat` on `TitanActiveEffect`,
-   triggered by the effect sheet's "Send to Chat" header button, `ActiveEffectSheetHeaderButtons.svelte`).
-   Sweep `EffectChatMessage.svelte` (+ any effect-card subcomponents) `flags.titan.X → system.X`.
-3. **DELETE the legacy path entirely:** remove `src/hooks/OnRenderChatMessageHTML.js` AND its
-   `Hooks.on('renderChatMessageHTML', …)` registration (grep for where it's wired — a hooks index/register
-   file), AND `src/document/types/chat-message/ChatMessageShell.svelte`. ChatMessageShell currently still
-   maps checks/items/reports — all now-unreachable dead entries that vanish with the file. Confirm via grep
-   that nothing else imports either. The `OnPreDeleteChatMessage` teardown already keys on
-   `svelteComponent?.handle`, so it stays correct after the hook is gone.
-4. Tests: golden-master entry for `effect`; an e2e that sends an effect to chat and asserts
-   `message.type === 'effect'` + the card renders (+ any rollable embedded check still works).
-5. Docs/skill: mark Phase 4 / the whole chat-subtypes effort DONE in `docs/TODO.md`; clear the now-resolved
-   cleanup notes (ChatMessageShell dead entries); update the `titan-codebase` skill so the chat section
-   states ALL chat messages self-render (no legacy hook remains).
+The chat-subtypes effort was the active workstream and is now closed. Next session: brainstorm with
+the user which backlog item to take. Open inventory:
 
-## Gotchas (confirmed in Phase 3 — apply to Phase 4)
-- e2e RUN is world-launch-gated AND needs a **server RESTART** after any `documentTypes` manifest change
-  (browser refresh insufficient — `game.documentTypes.ChatMessage` is baked at world load; a stale world
-  rejects `ChatMessage.create({type:'effect'})` as an invalid type). The USER must relaunch; ask for it.
-- Unit runner is **`npm test`** (there is NO `test:unit` script); filter positionally, e.g.
-  `npm test -- <pattern>`. e2e: `npm run test:e2e` (full ~12 min — run in background;
-  `npm run test:e2e -- <pattern>` for a subset). Always `npm run build` before e2e (needs current `dist/`).
-- Golden-master harness: Mock fields installed in `beforeAll` + dynamic import + static
-  `_defineDocumentSchema()` (match `tests/unit/ItemDataModelSchemaEquivalence.test.js` /
-  `ReportChatMessageSchemaEquivalence.test.js`; golden literals hand-authored, not derived).
-- **Grep-clean is the sweep-completeness gate** — for Phase 4, `git grep -n "flags\.titan" -- src` should
-  end at ZERO (the `effect` path is the last `flags.titan` user; in Phase 3 grep caught 7 report-only
-  components a hand-list missed). Note `EffectChatMessage` may share subcomponents with the effect HUD /
-  effect sheet — verify each swept component is chat-card-only before sweeping (Phase 3 lesson).
-- Resume a finished subagent with its context via `SendMessage` to its `agentId` (used for review-fix loops).
+- `docs/TODO.md`: #10 (per-element chat mount keying — notification-pane leak), #11 (check chat
+  components mutate live DataModel before update), #13 (`effectsExpiredReport` e2e trigger),
+  **NEW #16** (consolidate the 4-copy golden-master fingerprint harness), **NEW #17** (lang TYPES
+  housekeeping: stale `TYPES.Item.effect`, missing `TYPES.ActiveEffect`), **NEW #18** (orphaned
+  fixture tokens in the 3 token-control specs), **NEW #19** (canvas-poll silent exhaustion → throw),
+  NPC `overkillDamage` dead-data note.
+- `docs/OPEN_BUGS.md`: **NEW #4** (fast-healing apply-confirm e2e flake — one occurrence 2026-06-05,
+  green on re-runs; watch for recurrence).
+- Deferred sub-project B (seeded standard-effects pack + pipeline) from the effect-tray session.
+- `docs/superpowers/e2e-suite-status.md` is STALE (claims 315 e2e / 35 unit; reality 382/158) —
+  retire it or banner-mark it historical on the next docs touch.
+
+## Gotchas (carried forward)
+- e2e RUN is world-launch-gated; a `documentTypes` manifest change needs a world server RESTART
+  (none pending — Phase 4's restart already happened).
+- Unit runner is **`npm test`** (NO `test:unit` script); filter positionally. e2e:
+  `npm run test:e2e -- <pattern>` (throttled default; full run ~15 min, run in background). Always
+  `npm run build` before e2e.
+- **`git add` explicit paths only — NEVER stage `packs/`** (now includes `packs/effects/lost/`
+  LevelDB recovery artifacts), **`.claude/settings.local.json`, or `.claude/scheduled_tasks.lock`**.
+- Golden-master harness recipe: mock fields in `beforeAll` + dynamic import + hand-authored golden
+  literals; ArrayField element initial is inert (gates omit it).
+- Resume a finished subagent with its context via `SendMessage` to its `agentId` (used for the
+  Task 5 fix loops this session).
 
 ## Rules (CLAUDE.md, non-negotiable)
 No test/e2e code in shipping builds; test/e2e → `test/build/` (self-cleaning); no dynamic imports in
-shipping; no stub fixes (fix the root cause); todos → `docs/TODO.md`, bugs → `docs/OPEN_BUGS.md`; project
-`.claude/CLAUDE.md` supersedes all; route `.js`/`.svelte` to `titan-svelte-dev` (load `svelte-5`,
-`foundry-vtt`, `foundry-svelte`); update the `titan-codebase` skill after each spec. **`git add` explicit
-paths only — NEVER stage `packs/`, `.claude/settings.local.json`, or `.claude/scheduled_tasks.lock`** (the
-last is harness scaffolding; `packs/` is runtime LevelDB churn from the live world). e2e world is `:30000`;
-test source = `tests/` (plural), built artifacts = `test/build/` (singular, gitignored); `dist/` is the
-shipping bundle (gitignored).
+shipping; no stub fixes (fix the root cause); todos → `docs/TODO.md`, bugs → `docs/OPEN_BUGS.md`;
+project `.claude/CLAUDE.md` supersedes all; route `.js`/`.svelte` to `titan-svelte-dev` (load
+`svelte-5`, `foundry-vtt`, `foundry-svelte`); update the `titan-codebase` skill after each spec.
+e2e world is `:30000`; test source = `tests/` (plural), built artifacts = `test/build/` (singular,
+gitignored); `dist/` is the shipping bundle (gitignored).
 
 ## Repo state at handoff
-- Branch `main` @ `8a19c5c0`, clean of pending source/doc work. Working tree shows only the three
-  non-yours runtime/harness files above.
-- Open follow-ups in `docs/TODO.md`: Phase 4 (above); #13 (`effectsExpiredReport` e2e trigger deferred —
-  its schema IS golden-mastered, only the intricate `onInitiativeAdvanced` combat e2e setup is deferred);
-  NPC `overkillDamage` written-but-never-read dead data (`NPCDataModel.js:47`); the ChatMessageShell
-  dead-entries note (resolved by Phase 4 deleting the file).
+- Branch `main` @ `1336e312`, pushed; working tree dirty only with the sanctioned never-stage noise
+  (`packs/effects/*` incl. `lost/`, `.claude/settings.local.json`, `.claude/scheduled_tasks.lock`).
