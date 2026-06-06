@@ -49,20 +49,26 @@ test.afterEach(async () => {
 });
 
 test.afterAll(async () => {
-   // Remove the fixture pack so reruns and other files see a clean world (unlock first — the test locks it).
-   await page?.evaluate(async (packId) => {
-      /** @type {CompendiumCollection|undefined} The fixture pack, if it survived to teardown. */
-      const pack = game.packs.get(packId);
-      if (pack) {
-         await pack.configure({ locked: false });
-         await pack.deleteCompendium();
-      }
-   }, PACK_ID);
-   await page?.close();
+   try {
+      // Remove the fixture pack so reruns and other files see a clean world (unlock first — the test locks it).
+      await page?.evaluate(async (packId) => {
+         /** @type {CompendiumCollection|undefined} The fixture pack, if it survived to teardown. */
+         const pack = game?.packs?.get(packId);
+         if (pack) {
+            await pack.configure({ locked: false });
+            await pack.deleteCompendium();
+         }
+      }, PACK_ID);
+   }
+   finally {
+      await page?.close();
+   }
 });
 
 test.describe('pack effect-item conversion (clean-pack safety)', () => {
    test('boot-path converter leaves a clean locked world Actor pack untouched', async () => {
+      test.setTimeout(120_000);
+
       // Precondition: the TITAN system must have initialized before any pack manipulation.
       /** @type {boolean} Whether the TITAN system finished initializing in the shared page. */
       const systemReady = await page.evaluate(() => typeof game.titan !== 'undefined'
@@ -111,13 +117,21 @@ test.describe('pack effect-item conversion (clean-pack safety)', () => {
          actorName: ACTOR_NAME,
       });
 
+      // The first boot's converter is un-awaited by the ready gate; prove it finished BEFORE clearing, so any
+      // post-clear done line is unambiguously from the post-reload boot.
+      await expect.poll(() => consoleLines.some((line) => line.includes(CONVERTER_DONE_LINE))).toBe(true);
+
       // Reload: the every-load converter (including the pack scan) runs again on the boot path. NOTE: this is the
       // suite's FIRST mid-file reload of the shared page (a new harness idiom) — the waitForURL guard makes a lost
       // session fail crisply instead of timing out opaquely downstream.
       consoleLines.length = 0;
       await page.reload();
       await page.waitForURL('**/game', { timeout: 15_000 });
-      await page.waitForFunction(() => globalThis.game?.ready === true && typeof game.titan !== 'undefined');
+      await page.waitForFunction(
+         () => globalThis.game?.ready === true && typeof game.titan !== 'undefined',
+         null,
+         { timeout: 60_000 },
+      );
 
       // Positive completion signal first: the converter's finish line proves the boot-path conversion finished.
       await expect
@@ -126,6 +140,8 @@ test.describe('pack effect-item conversion (clean-pack safety)', () => {
 
       // Lock-state symmetry cannot distinguish "gate skipped" from "unlocked and re-locked", so assert the absence
       // of every per-pack line for the fixture: no conversion line, no per-pack failure, no failed lock-restore.
+      // The failure-line check is deliberately world-wide (fail-conservative): any converter error anywhere fails
+      // this test.
       expect(consoleLines.some((line) => line.includes(`in world pack "${PACK_LABEL}"`))).toBe(false);
       expect(consoleLines.some((line) => line.includes('Failed to convert legacy effect Items'))).toBe(false);
       expect(consoleLines.some((line) => line.includes('Failed to restore the lock'))).toBe(false);
@@ -150,8 +166,8 @@ test.describe('pack effect-item conversion (clean-pack safety)', () => {
          return {
             locked: pack.locked,
             size: index.size,
-            itemTypes: entry.items.map((item) => item.type),
-            effectCount: entry.effects?.length ?? 0,
+            itemTypes: entry?.items?.map((item) => item.type) ?? [],
+            effectCount: entry?.effects?.length ?? 0,
          };
       }, PACK_ID);
 
