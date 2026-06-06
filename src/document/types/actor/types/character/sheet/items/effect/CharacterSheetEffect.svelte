@@ -152,6 +152,7 @@
          <DurationTag
             type={durationType}
             remaining={durationRemaining}
+            testId={'effect-row-duration'}
          />
       </div>
 

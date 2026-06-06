@@ -33,8 +33,11 @@ const EFFECT_DESCRIPTION_TEXT = 'Embedded-context effect description body.';
 /** @type {string} Label of the seeded embedded check (rendered on its ItemCheckButton). */
 const CHECK_LABEL = 'E2E Context Check';
 
-/** @type {string} Localized confirm-button label of ConfirmDeleteEffectDialog (lang/en.json `deleteEffect.text`). */
-const CONFIRM_DELETE_LABEL = 'Delete Effect';
+/** @type {string} Localized `deleteEffect` label: the delete buttons' aria-label AND the dialog confirm button. */
+const DELETE_EFFECT_LABEL = 'Delete Effect';
+
+/** @type {string} Localized `sendToChat` label (lang/en.json `sendToChat.text`): the send button's aria-label. */
+const SEND_TO_CHAT_LABEL = 'Send to Chat';
 
 /** @type {import('@playwright/test').Page} The file-shared, logged-in page (one world boot per file). */
 let page;
@@ -70,22 +73,10 @@ test.describe('embedded-context effects family', () => {
          `TITAN system failed to initialize before the effects walk. Captured page errors:\n${errors.join('\n')}`,
       ).toBe(true);
 
-      await page.evaluate(async ({ actorName, effectName, effectDescription, checkLabel }) => {
-         // Remove any stale fixture (and its scene tokens) from a prior run or a prior test.
-         const stale = game.actors.getName(actorName);
-         if (stale) {
-            const scene = game.scenes.active;
-            if (scene) {
-               const staleTokenIds = scene.tokens
-                  .filter((token) => token.actorId === stale.id)
-                  .map((token) => token.id);
-               if (staleTokenIds.length > 0) {
-                  await scene.deleteEmbeddedDocuments('Token', staleTokenIds);
-               }
-            }
-            await stale.delete();
-         }
+      // Remove any stale fixture (and its scene tokens) from a prior run or a prior test.
+      await deleteFixtureActor();
 
+      await page.evaluate(async ({ actorName, effectName, effectDescription, checkLabel }) => {
          // Seed a fresh player actor owning one effect-subtype Active Effect. The check object
          // mirrors createItemCheckTemplate() (src/check/types/item-check/ItemCheckTemplate.js) —
          // the template module is not importable in the browser context, so the full default object
@@ -152,30 +143,44 @@ test.describe('embedded-context effects family', () => {
       });
    });
 
-   // Final-state guarantee for later spec files: restore every changed setting and remove the fixture
-   // actor (and its scene token) once the describe completes. Inner-scope after-hooks run before the
-   // file-level page close, so the shared page is still open here.
+   // In-file final-state hygiene (house pattern): re-assert the suite's test-default settings and
+   // remove the fixture actor (and its scene token) once the describe completes. The settings are
+   // client-scope and this spec's browser context is file-local, so nothing crosses spec files —
+   // note the test default for confirmDeletingEffects (false) differs from its registered default
+   // (true). Inner-scope after-hooks run before the file-level page close, so `page` is still open.
    test.afterAll(async () => {
-      await page.evaluate(async (actorName) => {
+      await page.evaluate(async () => {
          await game.settings.set('titan', 'getCheckOptions', false);
          await game.settings.set('titan', 'confirmDeletingEffects', false);
-
-         // Delete the fixture actor and any token it left on the active scene.
-         const actor = game.actors.getName(actorName);
-         if (actor) {
-            const scene = game.scenes.active;
-            if (scene) {
-               const tokenIds = scene.tokens
-                  .filter((token) => token.actorId === actor.id)
-                  .map((token) => token.id);
-               if (tokenIds.length > 0) {
-                  await scene.deleteEmbeddedDocuments('Token', tokenIds);
-               }
-            }
-            await actor.delete();
-         }
-      }, ACTOR_NAME);
+      });
+      await deleteFixtureActor();
    });
+
+   /**
+    * Deletes the fixture actor by name (when present) along with any token it left on the active
+    * scene. Serves both the stale sweep at seed time and the final afterAll cleanup.
+    * @returns {Promise<void>} Resolves once the actor and its tokens are removed from the world.
+    */
+   async function deleteFixtureActor() {
+      await page.evaluate(async (actorName) => {
+         const actor = game.actors.getName(actorName);
+         if (!actor) {
+            return;
+         }
+
+         // Remove the actor's tokens from the active scene before deleting the actor itself.
+         const scene = game.scenes.active;
+         if (scene) {
+            const tokenIds = scene.tokens
+               .filter((token) => token.actorId === actor.id)
+               .map((token) => token.id);
+            if (tokenIds.length > 0) {
+               await scene.deleteEmbeddedDocuments('Token', tokenIds);
+            }
+         }
+         await actor.delete();
+      }, ACTOR_NAME);
+   }
 
    /**
     * Opens the fixture actor's character sheet, activates the Effects tab, and expands the single
@@ -196,8 +201,10 @@ test.describe('embedded-context effects family', () => {
       // Activate the Effects tab; the row click below auto-waits for the rendered row.
       await page.getByText('Effects', { exact: true }).first().click();
 
+      // Scope under the open sheet root: the always-mounted effects tray also emits [data-effect-id]
+      // rows, so a page-global locator would collide once the tray's compendium pack has content.
       /** @type {import('@playwright/test').Locator} The effect's list row (the only seeded effect). */
-      const row = page.locator('[data-effect-id]').first();
+      const row = page.locator('.application.titan-document-sheet [data-effect-id]').first();
       await row.locator('.header .label .button button').first().click();
       return row;
    }
@@ -240,9 +247,48 @@ test.describe('embedded-context effects family', () => {
     */
    function newestMessageType(before) {
       return page.evaluate((count) => {
-         const newest = game.messages.contents[game.messages.size - 1];
-         return game.messages.size > count ? newest?.type : undefined;
+         if (game.messages.size <= count) {
+            return undefined;
+         }
+         return game.messages.contents[game.messages.size - 1]?.type;
       }, before);
+   }
+
+   /**
+    * Drives the confirm-gated delete path from a surface's delete button: enables the
+    * confirmDeletingEffects gate, clicks the button, asserts the confirm dialog mounts while the
+    * effect survives, then confirms and waits for the deletion to land on the fixture actor.
+    * @param {import('@playwright/test').Locator} deleteButton - The surface's effect-delete button.
+    * @returns {Promise<void>} Resolves once the effect is confirmed deleted from the fixture actor.
+    */
+   async function confirmEffectDeletion(deleteButton) {
+      // Enable the confirmation gate so the click must route through the dialog.
+      await page.evaluate(async () => {
+         await game.settings.set('titan', 'confirmDeletingEffects', true);
+      });
+      await deleteButton.click();
+
+      /** @type {import('@playwright/test').Locator} The mounted TitanDialog window. */
+      const dialog = page.locator('.application.titan-dialog');
+      await expect(dialog.first(), 'confirm-delete dialog mounts').toBeVisible();
+
+      // POSITIVE signal first (dialog visible above), so this survival read cannot pass falsely.
+      /** @type {boolean} Whether the effect still exists while the confirmation is pending. */
+      const survives = await page.evaluate((actorName) => {
+         return game.actors.getName(actorName).effects.contents.length === 1;
+      }, ACTOR_NAME);
+      expect(survives, 'effect survives until the dialog is confirmed').toBe(true);
+
+      // Confirming deletes the effect through safeDeleteEffect.
+      await dialog.getByRole('button', { name: DELETE_EFFECT_LABEL }).first().click();
+      await expect
+         .poll(
+            () => page.evaluate((actorName) => {
+               return game.actors.getName(actorName).effects.contents.length;
+            }, ACTOR_NAME),
+            { message: 'confirm click deletes the effect' },
+         )
+         .toBe(0);
    }
 
    test('effect row name and DurationTag update in place through the embedded bridge', async () => {
@@ -253,13 +299,10 @@ test.describe('embedded-context effects family', () => {
       /** @type {import('@playwright/test').Locator} The row-header name element. */
       const name = row.locator('.header .label .name');
 
-      // The DurationTag renders its own `.tag` root nested inside the footer's wrapper `.tag`;
-      // disambiguate by the bold `.label` reading the localized 'Duration' string. Its `.value`
-      // children are, in DOM order, the localized type then the remaining count.
-      /** @type {import('@playwright/test').Locator} The expanded row's footer tag strip. */
-      const tags = row.locator('.section.tags');
-      /** @type {import('@playwright/test').Locator} The footer DurationTag (wrapper + root union). */
-      const durationTag = tags.locator('.tag', { has: page.locator('.label', { hasText: 'Duration' }) });
+      // The footer DurationTag carries a stable data-testid; its `.value` children are, in DOM
+      // order, the localized type then the remaining count.
+      /** @type {import('@playwright/test').Locator} The footer DurationTag root. */
+      const durationTag = row.getByTestId('effect-row-duration');
       /** @type {import('@playwright/test').Locator} The DurationTag's localized type value. */
       const durationType = durationTag.locator('.value').first();
       /** @type {import('@playwright/test').Locator} The DurationTag's remaining-count value. */
@@ -314,10 +357,10 @@ test.describe('embedded-context effects family', () => {
          )
          .toBe(false);
 
-      // SEND TO CHAT: the row's comment button posts an effect-subtype message.
+      // SEND TO CHAT: the row's send button posts an effect-subtype message.
       /** @type {number} The world message count before the send-to-chat click. */
       const beforeSend = await page.evaluate(() => game.messages.size);
-      await row.locator('i.fa-comment').first().click();
+      await row.getByRole('button', { name: SEND_TO_CHAT_LABEL }).click();
       await expect
          .poll(() => newestMessageType(beforeSend), { message: 'send-to-chat posts an effect message' })
          .toBe('effect');
@@ -331,34 +374,9 @@ test.describe('embedded-context effects family', () => {
          .poll(() => newestMessageType(beforeRoll), { message: 'check roll posts an itemCheck message' })
          .toBe('itemCheck');
 
-      // DELETE with confirmation ON: the trash button must mount the confirm dialog instead of
-      // deleting outright.
-      await page.evaluate(async () => {
-         await game.settings.set('titan', 'confirmDeletingEffects', true);
-      });
-      await row.locator('i.fa-trash').first().click();
-
-      /** @type {import('@playwright/test').Locator} The mounted TitanDialog window. */
-      const dialog = page.locator('.application.titan-dialog');
-      await expect(dialog.first(), 'confirm-delete dialog mounts').toBeVisible();
-
-      // POSITIVE signal first (dialog visible above), so this survival read cannot pass falsely.
-      /** @type {boolean} Whether the effect still exists while the confirmation is pending. */
-      const survives = await page.evaluate((actorName) => {
-         return game.actors.getName(actorName).effects.contents.length === 1;
-      }, ACTOR_NAME);
-      expect(survives, 'effect survives until the dialog is confirmed').toBe(true);
-
-      // Confirming deletes the effect through safeDeleteEffect.
-      await dialog.getByRole('button', { name: CONFIRM_DELETE_LABEL }).first().click();
-      await expect
-         .poll(
-            () => page.evaluate((actorName) => {
-               return game.actors.getName(actorName).effects.contents.length;
-            }, ACTOR_NAME),
-            { message: 'confirm click deletes the effect' },
-         )
-         .toBe(0);
+      // DELETE with confirmation ON: the row's delete button must mount the confirm dialog instead
+      // of deleting outright; confirming completes the deletion.
+      await confirmEffectDeletion(row.getByRole('button', { name: DELETE_EFFECT_LABEL }));
 
       expect(errors, `uncaught errors:\n${errors.join('\n')}`).toEqual([]);
    });
@@ -406,31 +424,7 @@ test.describe('embedded-context effects family', () => {
       // DELETE through the HUD's owner-gated button (the GM owns the fixture actor, so the
       // DocumentOwnerIconButton is enabled) with confirmation ON: the dialog mounts, the effect
       // survives until confirmed, and confirming deletes it.
-      await page.evaluate(async () => {
-         await game.settings.set('titan', 'confirmDeletingEffects', true);
-      });
-      await panel.locator('.controls i.fa-trash').first().click();
-
-      /** @type {import('@playwright/test').Locator} The mounted TitanDialog window. */
-      const dialog = page.locator('.application.titan-dialog');
-      await expect(dialog.first(), 'confirm-delete dialog mounts from the HUD').toBeVisible();
-
-      // POSITIVE signal first (dialog visible above), so this survival read cannot pass falsely.
-      /** @type {boolean} Whether the effect still exists while the confirmation is pending. */
-      const survives = await page.evaluate((actorName) => {
-         return game.actors.getName(actorName).effects.contents.length === 1;
-      }, ACTOR_NAME);
-      expect(survives, 'effect survives until the dialog is confirmed').toBe(true);
-
-      await dialog.getByRole('button', { name: CONFIRM_DELETE_LABEL }).first().click();
-      await expect
-         .poll(
-            () => page.evaluate((actorName) => {
-               return game.actors.getName(actorName).effects.contents.length;
-            }, ACTOR_NAME),
-            { message: 'confirm click deletes the effect' },
-         )
-         .toBe(0);
+      await confirmEffectDeletion(panel.getByRole('button', { name: DELETE_EFFECT_LABEL }));
 
       // With its only entry gone, the bridge-driven panel hides entirely (anchored by the earlier
       // visibility assertions, so this cannot pass on a never-mounted HUD).
