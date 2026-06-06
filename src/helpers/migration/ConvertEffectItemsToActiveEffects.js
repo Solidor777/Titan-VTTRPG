@@ -59,6 +59,9 @@ export function buildEffectData(itemSource) {
  * flagged with flags.titan.type === 'effect') are batch-deleted to avoid duplicates. Creation skips any source
  * whose id already has a surviving converted Active Effect (the convertedFromItem provenance stamp), so a
  * conversion interrupted between creation and deletion finishes cleanly on retry instead of duplicating effects.
+ * Deletion is stamp-verified: only sources whose replacement verifiably exists (a pre-existing stamp or a document
+ * returned by the create call) are deleted, so a third-party preCreateActiveEffect veto retains its source for the
+ * next load instead of losing data.
  * Returns early when there is nothing to do (no effect Items and no stale mirrors); if there are stale mirrors but
  * no effect Items, the mirrors are still removed.
  * @param {TitanActor} actor - The actor whose legacy effect Items should be converted.
@@ -87,13 +90,25 @@ export async function convertActor(actor) {
    const sourcesToCreate = effectItemSources.filter((item) => !convertedItemIds.has(item._id));
 
    // Create the replacement Active Effects before any destructive step, so no effect data is lost if creation fails.
-   if (sourcesToCreate.length > 0) {
-      await actor.createEmbeddedDocuments('ActiveEffect', sourcesToCreate.map(buildEffectData));
-   }
+   /** @type {object[]} - The replacement Active Effects actually created (third-party vetoes excluded). */
+   const createdEffects = sourcesToCreate.length > 0
+      ? await actor.createEmbeddedDocuments('ActiveEffect', sourcesToCreate.map(buildEffectData))
+      : [];
 
-   // Batch-delete the source effect Items now that every replacement exists.
-   if (effectItemSources.length > 0) {
-      await actor.deleteEmbeddedDocuments('Item', effectItemSources.map((item) => item._id));
+   /** @type {Set<string>} - Source ids with a VERIFIED replacement (pre-existing stamps plus just-created). */
+   const verifiedItemIds = new Set([
+      ...convertedItemIds,
+      ...createdEffects.map((effect) => effect.flags?.titan?.convertedFromItem).filter(Boolean),
+   ]);
+
+   /** @type {string[]} - Ids of legacy sources safe to delete (replacement verified; vetoed sources retained). */
+   const deletableItemIds = effectItemSources
+      .filter((item) => verifiedItemIds.has(item._id))
+      .map((item) => item._id);
+
+   // Batch-delete only the source effect Items whose replacements verifiably exist.
+   if (deletableItemIds.length > 0) {
+      await actor.deleteEmbeddedDocuments('Item', deletableItemIds);
    }
 
    // Batch-delete the stale mirror Active Effects last.
@@ -119,11 +134,104 @@ async function convertActorIsolated(actor) {
 }
 
 /**
+ * Converts the legacy effect Items inside a single compendium pack's actors.
+ * Index-gated: pulls the pack index with each entry's embedded items projected to their summary index fields
+ * (_id/name/img/type/sort/folder — no document construction, no validation, so invalid-typed entries are visible)
+ * and returns without touching the pack when no entry carries a legacy effect Item. Otherwise the pack is unlocked
+ * if needed, each flagged actor is loaded and converted (per-actor failures are logged and skipped so the rest of
+ * the pack still converts), and the pack's original lock state is restored in a finally block even when conversion
+ * throws. A restore failure is caught inside the finally and logged as a restore-specific error, so it can never
+ * mask an in-flight conversion error or be misread as a conversion failure.
+ * @param {CompendiumCollection} pack - The compendium pack to convert.
+ * @returns {Promise<void>}
+ */
+export async function convertPack(pack) {
+   /** @type {object[]} - The pack index with each entry's items projected to their summary index fields. */
+   const index = await pack.getIndex({ fields: ['items'] });
+
+   /** @type {string[]} - The ids of index entries that carry at least one legacy effect Item. */
+   const needyIds = index
+      .filter((entry) => entry.items?.some((item) => item.type === 'effect'))
+      .map((entry) => entry._id);
+
+   // Index gate: leave clean packs completely untouched (no unlock, no document loads).
+   if (needyIds.length === 0) {
+      return;
+   }
+
+   /** @type {boolean} - Whether the pack was locked before conversion (restored in the finally block). */
+   const wasLocked = pack.locked;
+
+   try {
+      // Unlock the pack for the duration of the conversion.
+      if (wasLocked) {
+         await pack.configure({ locked: false });
+      }
+
+      /** @type {number} - The count of flagged actors successfully converted in this pack. */
+      let convertedCount = 0;
+
+      // Load and convert each flagged actor, isolating per-actor failures so the rest of the pack still converts.
+      for (const id of needyIds) {
+         try {
+            /** @type {TitanActor} - The packed actor to convert. */
+            const actor = await pack.getDocument(id);
+
+            await convertActor(actor);
+            convertedCount += 1;
+         }
+         catch (err) {
+            error(
+               `Failed to convert legacy effect Items for packed actor (${id}) in pack "${pack.metadata.label}".`,
+               err,
+            );
+         }
+      }
+
+      log(
+         `Converted ${convertedCount} of ${needyIds.length} flagged actor(s) in world pack "${pack.metadata.label}".`,
+      );
+   }
+   finally {
+      // Restore the pack's original lock state even when conversion throws, without masking an in-flight error.
+      if (wasLocked) {
+         try {
+            await pack.configure({ locked: true });
+         }
+         catch (err) {
+            error(`Failed to restore the lock on pack "${pack.metadata.label}" — the pack is left unlocked.`, err);
+         }
+      }
+   }
+}
+
+/**
+ * Converts legacy effect Items inside every world Actor compendium pack.
+ * Covers world-package Actor packs only: module and system packs belong to their packages and are not rewritten.
+ * Each pack's conversion is isolated, so a failure on one pack (index read, lock toggle, or a wholesale conversion
+ * failure) is logged and the remaining packs still process.
+ * @returns {Promise<void>}
+ */
+export async function convertWorldActorPacks() {
+   for (const pack of game.packs) {
+      // Only world-package Actor packs are eligible for conversion.
+      if (pack.metadata.type === 'Actor' && pack.metadata.packageType === 'world') {
+         try {
+            await convertPack(pack);
+         }
+         catch (err) {
+            error(`Failed to convert legacy effect Items in pack "${pack.metadata.label}".`, err);
+         }
+      }
+   }
+}
+
+/**
  * Converts all legacy effect Items in the world into native 'effect' Active Effects.
- * Runs only for the GM. Processes every world actor, plus the actors of unlinked tokens across all scenes. Each
- * actor's conversion is isolated, so a failure on one actor is logged and the migration continues with the next.
- * Idempotent: once no legacy effect Items remain, the converter is a no-op. Compendium-packed actors are NOT
- * converted by this routine.
+ * Runs only for the GM. Processes every world actor, the actors of unlinked tokens across all scenes, and the
+ * actors inside world Actor compendium packs (index-gated, with locked packs unlocked and restored). Each actor's
+ * conversion is isolated, so a failure on one actor is logged and the migration continues with the next.
+ * Idempotent: once no legacy effect Items remain, the converter is a no-op.
  * @returns {Promise<void>}
  */
 export default async function convertEffectItemsToActiveEffects() {
@@ -146,6 +254,9 @@ export default async function convertEffectItemsToActiveEffects() {
          }
       }
    }
+
+   // Convert the actors inside world Actor compendium packs.
+   await convertWorldActorPacks();
 
    log('Conversion of legacy effect Items to Active Effects complete.');
 }
