@@ -12,7 +12,7 @@ import localize from '~/helpers/utility-functions/Localize.js';
  * @property {number} damage - The minimum damage a successful attack will inflict.
  * @property {boolean} plusExtraSuccessDamage - Whether to increase the damage for each extra success.
  * @property {StandardTrait[]} trait - Array of standard attack traits applied to this Attack.
- * @property {string[]} customTrait - Array of custom traits applied to this Attack.
+ * @property {object[]} customTrait - Array of custom traits ({name, description, uuid}) applied to this Attack.
  * @property {string} uuid - Generated unique identifier for the Attack.
  */
 

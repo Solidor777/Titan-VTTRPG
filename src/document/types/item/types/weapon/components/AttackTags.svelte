@@ -27,7 +27,7 @@
    const document = getContext('document');
 
    /** @type {object|undefined} The current attack data, re-read reactively through the document bridge. */
-   const attack = $derived(document.data?.system.attack[idx]);
+   const attack = $derived(document.data?.system?.attack?.[idx]);
 
    /** @type {Record<string, string>} Map of attack trait names to their description strings. */
    const traitDescriptions = ATTACK_TRAIT_DESCRIPTIONS;
