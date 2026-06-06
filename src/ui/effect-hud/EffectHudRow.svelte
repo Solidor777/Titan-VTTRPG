@@ -9,43 +9,35 @@
       from '~/document/types/actor/types/character/sheet/items/effect/CharacterSheetEffectChecks.svelte';
    import { DELETE_ICON, SEND_TO_CHAT_ICON } from '~/system/Icons.js';
 
-   /**
-    * @typedef {object} EffectHudRowProps
-    * @property {TitanActiveEffect} effect - The effect or condition to render.
-    */
-
-   /** @type {EffectHudRowProps} */
-   const { effect } = $props();
-
-   /** @type {object} Reactive bridge around the active actor. */
+   /** @type {object} The embedded effect bridge provided by EmbeddedDocumentProvider. */
    const document = getContext('document');
+
+   /** @type {object} The HUD's top-level actor bridge (never shadowed by providers). */
+   const sheetDocument = getContext('sheetDocument');
 
    /** @type {boolean} Whether this row is expanded to show its detail. */
    let isExpanded = $state(false);
 
    /** @type {boolean} Whether this entry is a full effect (vs an inert condition). */
-   const isEffect = $derived(effect.type === 'effect');
-
-   /** @type {TitanActiveEffect | undefined} The live effect re-read through the bridge so the row updates in place (undefined once deleted). */
-   const liveEffect = $derived(document.data.effects.get(effect.id));
+   const isEffect = $derived(document.data?.type === 'effect');
 
    /** @type {string} The entry's description HTML, sourced per subtype. */
    const description = $derived(
       isEffect
-         ? (liveEffect?.description ?? '')
-         : (liveEffect?.flags?.titan?.description ?? ''),
+         ? (document.data?.description ?? '')
+         : (document.data?.flags?.titan?.description ?? ''),
    );
 
    /** @type {number} The effect's embedded-check count (conditions have none). */
-   const checkLength = $derived(isEffect ? (liveEffect?.system.check.length ?? 0) : 0);
+   const checkLength = $derived(isEffect ? (document.data?.system.check.length ?? 0) : 0);
 
    /** @type {string} The effect's duration type (effects only; defaults to permanent when absent). */
    const durationType = $derived(
-      isEffect ? (liveEffect?.system.duration.type ?? 'permanent') : 'permanent',
+      isEffect ? (document.data?.system.duration.type ?? 'permanent') : 'permanent',
    );
 
    /** @type {number} The effect's remaining duration (effects only; conditions carry no duration). */
-   const durationRemaining = $derived(isEffect ? liveEffect?.system.duration?.remaining : undefined);
+   const durationRemaining = $derived(isEffect ? document.data?.system.duration?.remaining : undefined);
 </script>
 
 <div
@@ -56,15 +48,15 @@
    <button
       class="row-header"
       type="button"
-      aria-label={`${effect.name}: ${localize(isExpanded ? 'collapse' : 'expand')}`}
+      aria-label={`${document.data?.name}: ${localize(isExpanded ? 'collapse' : 'expand')}`}
       onclick={() => isExpanded = !isExpanded}
    >
       <img
          class="icon"
-         src={effect.img}
-         alt={effect.name}
+         src={document.data?.img}
+         alt={document.data?.name}
       />
-      <span class="name">{effect.name}</span>
+      <span class="name">{document.data?.name}</span>
       {#if isEffect && durationType !== 'permanent'}
          <span class="duration">
             <DurationTag
@@ -83,10 +75,10 @@
          </div>
       {/if}
 
-      <!--Embedded checks (passed the effect prop, mirroring the sheet; the checkLength gate is reactive)-->
+      <!--Embedded checks (context-sourced, mirroring the sheet; the checkLength gate is reactive)-->
       {#if checkLength > 0}
          <div class="checks">
-            <CharacterSheetEffectChecks {effect}/>
+            <CharacterSheetEffectChecks/>
          </div>
       {/if}
 
@@ -97,14 +89,14 @@
                icon={SEND_TO_CHAT_ICON}
                label={localize('sendToChat')}
                tooltip={'sendToChat'}
-               onclick={() => effect.sendToChat()}
+               onclick={() => document.doc.sendToChat()}
             />
          {/if}
          <DocumentOwnerIconButton
             icon={DELETE_ICON}
             label={localize('deleteEffect')}
             tooltip={'deleteEffect'}
-            onclick={() => document.data.system.requestEffectDeletion(effect.id)}
+            onclick={() => sheetDocument.data.system.requestEffectDeletion(document.data?.id)}
          />
       </div>
    {/if}

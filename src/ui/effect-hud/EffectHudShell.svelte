@@ -17,6 +17,11 @@
    // this mount's lifetime (the controller remounts the shell when the tracked actor changes).
    // svelte-ignore state_referenced_locally
    setContext('document', documentStore);
+
+   // 'sheetDocument' mirrors DocumentSheetShell: the HUD's top-level actor bridge, never shadowed by
+   // embedded-document providers, so actor-coupled leaves (checks, delete) keep an escape hatch.
+   // svelte-ignore state_referenced_locally
+   setContext('sheetDocument', documentStore);
 </script>
 
 <EffectHud {hudState}/>

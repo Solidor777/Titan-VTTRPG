@@ -1,24 +1,19 @@
 <script>
-
+   import { getContext } from 'svelte';
    import CharacterSheetEffectCheck
       from '~/document/types/actor/types/character/sheet/items/effect/CharacterSheetEffectCheck.svelte';
 
-   /**
-    * @typedef {object} CharacterSheetEffectChecksProps
-    * @property {TitanActiveEffect} [effect] Reference to the Active Effect document.
-    */
-
-   /** @type {CharacterSheetEffectChecksProps} */
-   const { effect = undefined } = $props();
+   /** @type {object} The embedded effect bridge provided by EmbeddedDocumentProvider. */
+   const document = getContext('document');
 </script>
 
 <!--Checks-->
 <div class="checks">
 
    <!--Each Check-->
-   {#each effect.system.check as check, checkIdx (check.uuid)}
+   {#each document.data?.system.check ?? [] as check, checkIdx (check.uuid)}
       <div class="check">
-         <CharacterSheetEffectCheck effectId={effect.id} {checkIdx}/>
+         <CharacterSheetEffectCheck {checkIdx}/>
       </div>
    {/each}
 

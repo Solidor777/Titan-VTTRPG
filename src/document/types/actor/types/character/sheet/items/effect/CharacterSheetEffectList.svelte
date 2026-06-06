@@ -2,6 +2,7 @@
    import { getContext } from 'svelte';
    import { slide } from 'svelte/transition';
    import sortAscending from '~/helpers/utility-functions/SortAscending.js';
+   import EmbeddedDocumentProvider from '~/document/reactive/EmbeddedDocumentProvider.svelte';
    import CharacterSheetEffect
       from '~/document/types/actor/types/character/sheet/items/effect/CharacterSheetEffect.svelte';
 
@@ -99,10 +100,9 @@
             }}
             transition:slide|local
          >
-            <CharacterSheetEffect
-               {effect}
-               bind:isExpanded={$appState.tabs.effects.isExpanded[effect.id]}
-            />
+            <EmbeddedDocumentProvider doc={effect}>
+               <CharacterSheetEffect bind:isExpanded={$appState.tabs.effects.isExpanded[effect.id]}/>
+            </EmbeddedDocumentProvider>
          </li>
       {/each}
    </ol>

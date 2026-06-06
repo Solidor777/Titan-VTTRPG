@@ -1,5 +1,6 @@
 <script>
    import EffectHudRow from '~/ui/effect-hud/EffectHudRow.svelte';
+   import EmbeddedDocumentProvider from '~/document/reactive/EmbeddedDocumentProvider.svelte';
 
    /**
     * @typedef {object} EffectHudSectionProps
@@ -14,7 +15,9 @@
 <div class="section">
    <div class="section-title">{title}</div>
    {#each effects as effect (effect.id)}
-      <EffectHudRow {effect}/>
+      <EmbeddedDocumentProvider doc={effect}>
+         <EffectHudRow/>
+      </EmbeddedDocumentProvider>
    {/each}
 </div>
 

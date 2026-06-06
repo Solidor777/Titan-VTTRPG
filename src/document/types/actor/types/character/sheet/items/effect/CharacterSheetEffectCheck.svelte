@@ -15,17 +15,19 @@
    } from '~/system/Icons.js';
    import AttributeCheckTag from '~/helpers/svelte-components/tag/AttributeCheckTag.svelte';
 
-   /** @type {object} Reference to the reactive Document store. */
+   /** @type {object} The embedded effect bridge provided by EmbeddedDocumentProvider. */
    const document = getContext('document');
+
+   /** @type {object} The owning sheet's actor bridge (never shadowed by providers). */
+   const sheetDocument = getContext('sheetDocument');
 
    /**
     * @typedef {object} CharacterSheetEffectCheckProps
-    * @property {string} [effectId] The ID of the effect to get the check from.
     * @property {number} [checkIdx] The index of the check in the checks array.
     */
 
    /** @type {CharacterSheetEffectCheckProps} */
-   const { effectId = undefined, checkIdx = undefined } = $props();
+   const { checkIdx = undefined } = $props();
 
    /** @type {boolean} Whether to automatically spend the resolve for checks. */
    const autoSpendResolve = autoSpendResolveChecks();
@@ -37,8 +39,8 @@
     * @returns {ItemCheckOptions | undefined} The check options, or undefined if the effect or check is invalid.
     */
    function getCheckOptions() {
-      // Resolve the effect from the reactive collection and ensure the check index is valid.
-      const effect = document.data.effects.get(effectId);
+      // Resolve the live effect through the embedded bridge and ensure the check index is valid.
+      const effect = document.data;
       if (effect?.system.check.length > checkIdx) {
          return {
             itemRollData: effect.getRollData(),
@@ -54,8 +56,8 @@
       // Build the options from current effect roll data, then calculate the display parameters.
       const checkOptions = getCheckOptions();
       if (checkOptions) {
-         return document.data.system.getItemCheckParameters(
-            document.data.system.initializeItemCheckOptions(checkOptions),
+         return sheetDocument.data.system.getItemCheckParameters(
+            sheetDocument.data.system.initializeItemCheckOptions(checkOptions),
          );
       }
       return undefined;
@@ -65,11 +67,10 @@
     * Rolls the effect's Check via the shared item-check engine.
     */
    function rollEffectCheck() {
-      // Build options fresh at roll time so the roll captures the effect's current state, unlike the
-      // item check which can reuse a static options constant resolved by item ID.
+      // Build options fresh at roll time so the roll captures the effect's current state.
       const checkOptions = getCheckOptions();
       if (checkOptions) {
-         document.data.system.requestItemCheck(checkOptions);
+         sheetDocument.data.system.requestItemCheck(checkOptions);
       }
    }
 </script>
@@ -104,7 +105,7 @@
                <div class="resolve-cost-button">
                   <SpendResolveButton
                      resolveCost={checkParameters.resolveCost}
-                     onclick={() => document.data.system.spendResolve(checkParameters.resolveCost)}
+                     onclick={() => sheetDocument.data.system.spendResolve(checkParameters.resolveCost)}
                   />
                </div>
             {/if}

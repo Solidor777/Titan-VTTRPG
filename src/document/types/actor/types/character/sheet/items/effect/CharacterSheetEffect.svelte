@@ -18,39 +18,41 @@
 
    /**
     * @typedef {object} CharacterSheetEffectProps
-    * @property {TitanActiveEffect} [effect] - Reference to the effect Active Effect document.
     * @property {boolean} [isExpanded] - Whether this effect is currently expanded.
     */
 
    /** @type {CharacterSheetEffectProps} */
-   let { effect = undefined, isExpanded = $bindable(undefined) } = $props();
+   let { isExpanded = $bindable(undefined) } = $props();
 
-   /** @type {object} Reference to the reactive Document store. */
+   /** @type {object} The embedded effect bridge provided by EmbeddedDocumentProvider. */
    const document = getContext('document');
 
-   /** @type {string} The effect's duration type, re-read through document.data so the row updates in place. */
-   const durationType = $derived(document.data.effects.get(effect.id)?.system.duration.type);
+   /** @type {object} The owning sheet's actor bridge (never shadowed by providers). */
+   const sheetDocument = getContext('sheetDocument');
 
-   /** @type {string} The effect's custom duration label, re-read through document.data so it updates in place. */
-   const durationCustom = $derived(document.data.effects.get(effect.id)?.system.duration.custom);
+   /** @type {string} The effect's duration type, read reactively through the embedded bridge. */
+   const durationType = $derived(document.data?.system.duration.type);
 
-   /** @type {number} The effect's remaining duration, re-read through document.data so it updates in place. */
-   const durationRemaining = $derived(document.data.effects.get(effect.id)?.system.duration.remaining);
+   /** @type {string} The effect's custom duration label, read reactively through the embedded bridge. */
+   const durationCustom = $derived(document.data?.system.duration.custom);
 
-   /** @type {boolean} Whether the effect is expired, re-read through document.data so the row updates in place. */
-   const isExpired = $derived(document.data.effects.get(effect.id)?.system.isExpired);
+   /** @type {number} The effect's remaining duration, read reactively through the embedded bridge. */
+   const durationRemaining = $derived(document.data?.system.duration.remaining);
 
-   /** @type {string} The effect's rich-text description, re-read through document.data so it updates in place. */
-   const description = $derived(document.data.effects.get(effect.id)?.description ?? '');
+   /** @type {boolean} Whether the effect is expired, read reactively through the embedded bridge. */
+   const isExpired = $derived(document.data?.system.isExpired);
 
-   /** @type {number} The effect's check count, re-read through document.data so the gate updates in place. */
-   const checkLength = $derived(document.data.effects.get(effect.id)?.system.check.length ?? 0);
+   /** @type {string} The effect's rich-text description, read reactively through the embedded bridge. */
+   const description = $derived(document.data?.description ?? '');
 
-   /** @type {Array<object>} The effect's custom traits, re-read through document.data so they update in place. */
-   const customTrait = $derived(document.data.effects.get(effect.id)?.system.customTrait ?? []);
+   /** @type {number} The effect's check count, read reactively through the embedded bridge. */
+   const checkLength = $derived(document.data?.system.check.length ?? 0);
+
+   /** @type {Array<object>} The effect's custom traits, read reactively through the embedded bridge. */
+   const customTrait = $derived(document.data?.system.customTrait ?? []);
 </script>
 
-<CharacterSheetItem item={effect} bind:isExpanded>
+<CharacterSheetItem item={document.data} bind:isExpanded>
    {#snippet controls()}
       <!--Duration-->
       {#if durationType !== 'permanent'}
@@ -64,8 +66,8 @@
                   <IntegerInput
                      min={0}
                      bind:value={
-                        () => document.data.effects.get(effect.id)?.system.duration.initiative ?? 0,
-                        (newValue) => effect.update({ system: { duration: { initiative: newValue } } })
+                        () => document.data?.system.duration.initiative ?? 0,
+                        (newValue) => document.doc.update({ system: { duration: { initiative: newValue } } })
                      }
                   />
                </div>
@@ -84,8 +86,8 @@
                <IntegerIncrementInput
                   min={0}
                   bind:value={
-                     () => document.data.effects.get(effect.id)?.system.duration.remaining ?? 0,
-                     (newValue) => effect.update({ system: { duration: { remaining: newValue } } })
+                     () => document.data?.system.duration.remaining ?? 0,
+                     (newValue) => document.doc.update({ system: { duration: { remaining: newValue } } })
                   }
                />
             </div>
@@ -93,14 +95,14 @@
       {/if}
 
       <!--Toggle Active Button-->
-      <CharacterSheetEffectToggleActiveButton {effect}/>
+      <CharacterSheetEffectToggleActiveButton/>
 
       <!--Send to Chat button-->
       <div class="button">
          <IconButton
             icon={SEND_TO_CHAT_ICON}
             label={localize('sendToChat')}
-            onclick={() => effect.sendToChat()}
+            onclick={() => document.doc.sendToChat()}
             tooltip={'sendToChat'}
          />
       </div>
@@ -110,7 +112,7 @@
          <IconButton
             icon={document.data.isOwner ? EDIT_ICON : SHEET_ICON}
             label={localize(document.data.isOwner ? 'editItem' : 'viewItemSheet')}
-            onclick={() => effect.sheet.render(true)}
+            onclick={() => document.doc.sheet.render(true)}
             tooltip={document.data.isOwner ? 'editItem' : 'viewItemSheet'}
          />
       </div>
@@ -120,7 +122,7 @@
          <DocumentOwnerIconButton
             icon={DELETE_ICON}
             label={localize('deleteEffect')}
-            onclick={() => document.data.system.requestEffectDeletion(effect.id)}
+            onclick={() => sheetDocument.data.system.requestEffectDeletion(document.data?.id)}
             tooltip={'deleteEffect'}
          />
       </div>
@@ -136,7 +138,7 @@
    <!--Checks-->
    {#if checkLength > 0}
       <div class="section">
-         <CharacterSheetEffectChecks {effect}/>
+         <CharacterSheetEffectChecks/>
       </div>
    {/if}
 
