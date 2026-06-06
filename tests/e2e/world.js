@@ -9,6 +9,12 @@
  * live on the `ui` namespace; closing them tears down DOM that the sidebar tab-switch lifecycle depends
  * on (e.g. `Sidebar.changeTab` → `ChatLog._toggleNotifications` → the `#hotbar` element), which would
  * crash any later test that activates a sidebar tab on the shared page.
+ *
+ * Nested sub-applications OWNED by a kept singleton are kept too. The v14 `PlaceableDirectory`
+ * (`ui.placeables`) caches a per-type `PlaceableTab` app (e.g. `TokenTab`) constructed with
+ * `{ directory: ui.placeables }`; closing that nested app detaches the element its owner re-queries on
+ * every later render, so each subsequent token create/delete crashes `PlaceableDirectory#_renderTab`
+ * with an uncaught `null.replaceWith` TypeError that pollutes a later test's page-error window.
  * @param {import('@playwright/test').Page} page - The shared page to clean.
  * @returns {Promise<void>} Resolves once every open transient application has been asked to close.
  */
@@ -23,10 +29,11 @@ export async function closeAllApps(page) {
          }
       }
 
-      // Close ApplicationV2 instances (the modern app registry), skipping the core UI singletons.
+      // Close ApplicationV2 instances (the modern app registry), skipping the core UI singletons and
+      // any nested sub-application a kept singleton still owns through its `options.directory` link.
       const appV2 = [...(foundry.applications.instances?.values?.() ?? [])];
       for (const app of appV2) {
-         if (coreUi.has(app)) {
+         if (coreUi.has(app) || coreUi.has(app.options?.directory)) {
             continue;
          }
          try {
