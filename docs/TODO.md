@@ -2,205 +2,21 @@
 
 Work that has been intentionally parked. Each item should graduate into its own
 spec (`docs/superpowers/specs/`) and plan (`docs/superpowers/plans/`) when picked up.
+Completed items are deleted, not marked done.
 
 ## Active Effects conversion — related items
 
-The "Effects → TitanActiveEffect" effort is specced in
-`specs/2026-05-30-titan-active-effects-conversion-design.md`. The following were
-split off to keep that spec focused.
+The "Effects → TitanActiveEffect" effort (specced in
+`specs/2026-05-30-titan-active-effects-conversion-design.md`) has shipped; these are its
+surviving deferrals.
 
-### 1. Convert Conditions to rules elements — DONE
+### 2. Seeded standard-effects compendium (sub-project B)
 
-- **Status: COMPLETE.** Both Spec A (sum operations) and Spec B (conditions as a
-  `condition`-subtype Active Effect) have shipped. Spec B design:
-  `docs/superpowers/specs/2026-06-01-conditions-to-rules-elements-design.md`; plan:
-  `docs/superpowers/plans/2026-06-01-conditions-to-rules-elements.md`.
-- **Spec B end-state (shipped):**
-  - Conditions are a native `condition` ActiveEffect subtype (`system.json`
-    `documentTypes.ActiveEffect.condition`; `CONFIG.ActiveEffect.dataModels.condition =
-    ConditionDataModel`, a `RulesElementMixin(TitanDataModel)` carrying only the
-    v14-mandated `changes` ArrayField — no duration/checks/customTraits).
-  - `Conditions.js` exports pure `buildConditionDefinitions()`; every condition is
-    `type: 'condition'`, and the six mechanically-active ones (blinded, contaminated,
-    prone, restrained, stunned, sleeping) carry a seeded `system.rulesElement` built
-    from the Spec A operations. The five inert conditions (dead, deafened, frightened,
-    incapacitated, unconscious) carry none.
-  - `CharacterDataModel._applyRulesElements` derives from three sources — owned items,
-    `effect`-subtype AEs, and `condition`-subtype AEs (tagged `'condition'`);
-    `_resetDynamicMods` has a `condition` mod bucket; `getConditions()` filters
-    `effect.type === 'condition'`. The old `_applyConditions` `switch` was **removed**.
-  - `TitanActiveEffectSheet` is registered for `types: ['effect']` only; conditions use
-    Foundry's default config sheet.
-  - Verified by unit tests (`ConditionDefinitions.test.js`, 8) and e2e
-    (`tests/e2e/logic/conditions.spec.js`, 7).
-- **No migration (deliberate):** legacy applied conditions created before the subtype
-  existed are inert (their mechanics no longer run through any code path) until removed
-  and re-toggled, which re-instantiates them as the `condition` subtype with the seeded
-  rules elements. No one-shot converter was written for in-world condition effects.
-- **Spec A (sum operations) — COMPLETE.** The rules-element operations needed to
-  express condition math now ship: **`mulSum`** (multiply the post-additive
-  running total), **`setSum`** (force/floor/cap the running total via
-  `set`/`min`/`max`), the **`'all'` key selector** (expand one element per
-  concrete key under the selector, engine-wide via `_expandAllKeyElements`), and
-  **`mulBase` rounding** (directional `up`/`down` round on the scaled base). All
-  shipped with settings UI, unit tests (`RoundDirectional` /
-  `ComputeMulSumDelta` / `ComputeSetSumDelta`), and e2e
-  (`tests/e2e/logic/rules-elements.spec.js`). See spec
-  `docs/superpowers/specs/2026-06-01-rules-element-sum-operations-design.md` and
-  plan `docs/superpowers/plans/2026-06-01-rules-element-sum-operations.md`.
-- **Spec B (the remaining work) — convert status effects into rules elements.**
-  - Make each status effect a proper `TitanActiveEffect` of a **`condition`
-    subtype** carrying `system.rulesElement` (via `RulesElementMixin`).
-  - Seed each **mechanically-active** condition's rules elements using the Spec A
-    operations: blinded / contaminated / stunned via `flatModifier` (incl.
-    `'all'`); prone via `mulSum` 0.5 `up` on speed `'all'` + `flatModifier` −1
-    melee/accuracy; restrained via `flatModifier` + `setSum` `set` 0 on speed
-    `'all'`; sleeping via `mulSum` 0.5 `up` on awareness.
-  - **Mechanically-inert** conditions (dead / deafened / frightened /
-    incapacitated / unconscious) intentionally get **no** rules elements.
-  - Extend `CharacterDataModel._applyRulesElements` to also process
-    `effect.type === 'condition'`, then **retire `_applyConditions`**.
-  - **Feasibility hinge:** how Foundry v14 instantiates a `CONFIG.statusEffects`
-    entry into the `condition` subtype — verify whether
-    `ActiveEffect.fromStatusEffect` honors `type` + `system`, or whether a
-    `preCreate` hook is needed to stamp them.
-- **Risk:** Behavior drift in condition math. Needs careful parity testing
-  against the current `_applyConditions` results.
-- **Depends on:** The "Effects → TitanActiveEffect" spec (conditions are already
-  `TitanActiveEffect` instances after it; their mechanics still run through
-  `_applyConditions`).
-
-### 1a. Rules-element settings: `onSelectorChange` never fires — DONE
-
-- **Status: COMPLETE.** `DocumentSelect` now declares and forwards an optional
-  `onchange`, composed to run the consumer callback as a pure mutation **before**
-  `refreshSystemDocument` persists, so the curated default-key reset fires on
-  selector change. All **seven** rules-element settings components that wire a
-  handler through `DocumentSelect` (the four sum-operation files plus
-  `ItemSheetConditionalRatingModifierSettings`, `ItemSheetRollMessageSettings`,
-  and `ItemSheetConditionalCheckModifierSettings`) became pure key-setters:
-  the dead `assert(document?.isOwner, …)` guard (it checked the `ReactiveDocument`
-  bridge, which has no `isOwner`/`name`) and the handlers' own
-  `document.data.update(...)` were removed; `ConditionalCheckModifier` also shed
-  an obsolete boolean return-value protocol. Owner-gating + persistence now live
-  solely in `DocumentSelect` (disables for non-owners) and `refreshSystemDocument`.
-  Commits `e67f9863`, `d9a510a7`, `f383b56a`. Spec/plan:
-  `docs/superpowers/specs/2026-06-01-rules-element-selector-onchange-design.md`,
-  `docs/superpowers/plans/2026-06-01-rules-element-selector-onchange.md`.
-- **Note (7th component):** `ItemSheetConditionalCheckModifierSettings` was not in
-  the original audit (it had no broken `assert` guard) but was surfaced during
-  execution because the `DocumentSelect` fix is global — its previously-dead
-  handlers began double-persisting. A discriminating e2e case is impossible for it:
-  its curated key defaults coincide with each key-select's first option
-  (`body`/`blast`/`melee`/`arcana`) and it uses no `allowAll`, so the `Select`
-  clamp produces the identical end-state — which is precisely why the dead cascade
-  went unnoticed. Verified by full-suite regression instead. The discriminating
-  e2e lives on the flatModifier `resource`→`resolve` case in
-  `tests/e2e/rules-element-crud.spec.js`.
-
-- **What:** The per-operation settings components (`ItemSheetFlatModifierSettings`,
-  `ItemSheetMulBaseSettings`, `ItemSheetMulSumSettings`, `ItemSheetSetSumSettings`)
-  pass `onchange={onSelectorChange}` to `DocumentSelect`, but `DocumentSelect`
-  ignores the `onchange` prop — it hardcodes its own
-  `onchange={() => refreshSystemDocument(...)}`. So the curated default-key reset
-  on selector change is **dead code**.
-- **Impact:** Not a crash. `Select.svelte`'s clamp `$effect` auto-corrects an
-  out-of-range key to the first valid option, so the key never becomes invalid —
-  but the intended *sensible-default* key (e.g. `body` for `attribute`) is lost;
-  the key just falls to whatever option is first.
-- **To do:** Have `DocumentSelect` accept and forward an optional `onchange` (and
-  still run `refreshSystemDocument`), or move the default-key logic elsewhere.
-- **Found by:** Spec A (sum operations) verification — pre-existing, not
-  introduced by that work.
-
-### 2. Custom sidebar-tab effect directory
-
-- **Status: COMPLETE (sub-project A).** Shipped the Effect Tray: a native
-  `titanEffects` sidebar tab (`TitanEffectTrayTab` extends `AbstractSidebarTab`,
-  mounts a Svelte tray; registered additively via `Sidebar.TABS` +
-  `CONFIG.ui.titanEffects`). A compendium **dropdown** selects any visible
-  `ActiveEffect` pack (system + the user's own); **search**; per-row one-click
-  **Apply** (owner-gated copy to smart targets) + drag-to-apply; **full CRUD**
-  (create / stash-from-actor drag-in / duplicate / inline rename / confirmed
-  delete / open sheet) and native compendium **folders**. The shared
-  `getBestCharactersToUpdate` targeting ladder was upgraded in place (damage/
-  healing benefit too). Spec/plan:
-  `docs/superpowers/specs/2026-06-02-effect-tray-sidebar-tab-design.md`,
-  `docs/superpowers/plans/2026-06-02-effect-tray-sidebar-tab.md`. Covered by
-  `tests/e2e/effect-tray.spec.js` (5 cases) + `tests/unit/GetEffectCompendiums.test.js`
-  and `tests/unit/GetBestCharactersToUpdate.test.js`.
-- **Enhancement — COMPLETE (2026-06-02).** Row interaction reworked: a right-click
-  **context menu** (Apply / Open Sheet / Rename / Move to Folder / Duplicate / Delete) via
-  `src/sidebar/tray/EffectRowContextMenu.js` + a Foundry `ContextMenu` attached to the tray
-  root; **left-click a row opens its sheet** (debounced 250 ms vs double-click-rename); inline
-  buttons reduced to **Apply** only; an actor-sheet-style labelled **Filter** bar; a GM/owner-only
-  compendium **lock toggle** (`pack.configure({ locked })`, reactive `isLocked` mirror); and a
-  **Move-to-Folder** picker dialog. Spec/plan:
-  `docs/superpowers/specs/2026-06-02-effect-tray-context-menu-and-localization-test-design.md`,
-  `docs/superpowers/plans/2026-06-02-effect-tray-context-menu-and-localization-test.md`. Covered by
-  3 new `effect-tray.spec.js` cases + `tests/unit/EffectRowContextMenu.test.js`.
-- **Localization double-localization guard — COMPLETE (2026-06-02).** New
-  `tests/e2e/localization.spec.js` renders every actor/item/effect sheet + the effects sidebar and
-  fails on any rendered text/tippy-tooltip containing `LOCAL.`; `tests/unit/LocalizationKeys.test.js`
-  guards `lang/en.json` values. The scan surfaced a pre-existing system-wide bug class — tooltips/`Text`
-  passing already-localized or dynamic strings (which `processTextData` re-localizes into `LOCAL.…`) —
-  fixed across 49 components (actor/item sheets, chat, reports, effect HUD). See the tooltip/`Text`
-  value contract now documented in `references/conventions.md`.
-- **Sub-project B (deferred):** ship a seeded *standard effects* compendium — needs
-  a pack-build pipeline (foundryvtt-cli `compilePack` or ClassicLevel) and the
-  effect content (a future rulebook-scrape script). The tray already works against
-  the empty scratch pack and user packs; B just fills a pack with shipped defaults.
-- **What:** A custom sidebar-tab directory (ApplicationV2 + Svelte) presenting a
-  browsable library of reusable effects, backed by the ActiveEffect compendium
-  (or a world-setting store), as a dedicated top-level tab.
-- **Why deferred:** A *native* world ActiveEffect tab is impossible without
-  forking the Foundry engine (`ActiveEffect` is not a `WORLD_DOCUMENT_TYPE`; the
-  world-collection init list is hardcoded; the server vends world data per
-  hardcoded type). The conversion spec delivers the reusable library via a native
-  compendium instead. A custom tab is a heavier, non-standard enhancement on top.
-- **Depends on:** The compendium shipped by the conversion spec.
-
-### 3. Native visual-active-effects-style panel
-
-- **Status: COMPLETE.** Shipped a native screen-level Effect HUD
-  (`src/ui/effect-hud/`): a `TitanEffectHud` singleton controller (created on
-  `ready`, attached as `game.titan.effectHud`) that mounts `EffectHudShell` into
-  a fixed-position container and tracks the active actor via the pure
-  `resolveHudActor` ladder. Grouped Conditions/Effects sections, a
-  collapse-to-icon-grid header, owner-gated send-to-chat + delete, and rollable
-  embedded checks (reusing the character sheet's effect leaf components through
-  the actor `ReactiveDocument` bridge). Gated by an `enableEffectHud` client
-  setting (default on). The `visual-active-effects` flag stamping and the dead
-  `_enrichDescription` method were removed. Spec/plan:
-  `docs/superpowers/specs/2026-06-02-native-effect-hud-design.md`,
-  `docs/superpowers/plans/2026-06-02-native-effect-hud.md`. Covered by
-  `tests/unit/ResolveHudActor.test.js` + `tests/e2e/effect-hud.spec.js`.
-- **What:** Build a native, in-system panel that displays active effects with
-  their descriptions on the character UI — replacing the dependency on the
-  third-party `visual-active-effects` module. Until this lands, the conversion
-  spec keeps setting `flags['visual-active-effects.data.content']` on effects so
-  the module still works for users who have it.
-- **Reference source:** Zhell's `visual-active-effects` —
-  https://git.gay/Zhell/visual-active-effects
-- **Depends on:** The "Effects → TitanActiveEffect" spec (effects are native AEs
-  with native `description`).
-
-### 5. Confirm-delete dialog for effects
-
-- **Status: COMPLETE.** Added a `confirmDeletingEffects` client setting (default
-  true, Shift inverts) + `shouldConfirmDeletingEffects` helper +
-  `ConfirmDeleteEffectDialog` + `requestEffectDeletion`/`safeDeleteEffect` on
-  `CharacterDataModel` (inherited by player + npc). The effect-row delete button
-  is repointed off the raw `effect.delete()` onto `requestEffectDeletion` and its
-  `deleteItem`->`deleteEffect` label fixed. Two new `interaction-dialogs` e2e
-  cases cover confirm-on (dialog mounts, effect persists) and confirm-off
-  (immediate deletion). Commit `fd9ececd`.
-- **What:** Effect deletion uses native `effect.delete()` (owner-gated) with no
-  confirmation dialog. The "confirm deleting items" setting and
-  `ConfirmDeleteItemDialog` are item-only, so effects bypass it.
-- **To do:** Add a `requestEffectDeletion` path mirroring the item
-  confirm-delete dialog, honoring the delete-confirm setting.
-- **Depends on:** The "Effects → TitanActiveEffect" spec.
+- **What:** Ship a seeded *standard effects* compendium for the Effect Tray. Needs a
+  pack-build pipeline (foundryvtt-cli `compilePack` or ClassicLevel) and the effect content
+  (a future rulebook-scrape script). The tray already works against the empty scratch pack
+  and user packs; B just fills a pack with shipped defaults.
+- **Why deferred:** Content + pipeline work, independent of the tray feature that shipped.
 
 ### 6. Convert effect Items inside compendium-packed actors
 
@@ -211,105 +27,7 @@ split off to keep that spec focused.
   actor compendium packs and convert their effect Items, then re-lock.
 - **Depends on:** The "Effects → TitanActiveEffect" spec.
 
-## v14 migration — related items
-
-### 7. Rich (TyphonJS-style) sheet header buttons — DONE
-
-- **Status: COMPLETE.** The TyphonJS-era experience is restored as
-  **always-visible inline Svelte header buttons**. Base machinery lives in
-  `TitanDocumentSheet` (`src/document/sheet/TitanDocumentSheet.js`): a
-  `_getHeaderButtonsComponent()` factory (undefined in base) is mounted in
-  `_onFirstRender` into `this.window.header`, anchored at `this.window.controls`,
-  with a context map providing `application` + the `document` bridge; `_onClose`
-  unmounts it. Because the frame is built once on first render, the mount
-  survives `render({ parts: [] })`. The actor sheet
-  (`ActorSheetHeaderButtons.svelte`) ships Import / Edit Token / a reactive
-  Toggle-Link-Unlink-Unlinked button (`.linked` orange + `.unlinked` brown glow),
-  all with rich `.desc` tippy tooltips; the item sheet
-  (`ItemSheetHeaderButtons.svelte`) ships Send to Chat (fixing the old
-  send-to-chat tooltip key → `sendItemToChat.desc`) plus a conditional Import.
-  The effect-subtype ActiveEffect sheet
-  (`ActiveEffectSheetHeaderButtons.svelte`) gains a Send-to-Chat header button
-  and a matching `_getHeaderControls()` entry, so the action exists both inline
-  and in the ⋮ dropdown. All three inline trees **coexist** with the native v14
-  `_getHeaderControls()` dropdown rather than replacing it. E2E coverage:
-  `tests/e2e/header-buttons.spec.js`.
-- **What:** The actor/item sheet header buttons (edit-token, dynamic
-  link/unlink, import, send-to-chat) were restored under v14 via native AppV2
-  `_getHeaderControls()` (see the v14 context-and-migration-repair spec, Task
-  11). Native v14 controls render in the header **ellipsis dropdown**, expose
-  only an icon + label (no tooltip field), so the dynamic link/unlink state is
-  conveyed by a changing icon + label and is only visible when the dropdown is
-  open.
-- **Done in:** The Svelte header-buttons spec
-  (`docs/superpowers/specs/2026-06-02-svelte-header-buttons-design.md`) and plan
-  (`docs/superpowers/plans/2026-06-02-svelte-header-buttons.md`). The shipped
-  implementation mounts the Svelte tree in `_onFirstRender` (first render only),
-  not the `_onRender`/`_onClose` approach this item originally proposed —
-  `_onFirstRender` is the correct hook because the AppV2 frame (and its header)
-  is built exactly once.
-- **Depends on:** The v14 context-and-migration-repair spec (Task 11).
-
 ## E2E suite — related items
-
-### 8. Harden the `itemRollData` false-sentinel root cause — DONE
-
-- **Status: COMPLETE.** Both prongs shipped: `createItemCheckOptions`
-  (`src/check/types/item-check/ItemCheckOptions.js`) now passes `itemRollData`
-  through unchanged (absent → `undefined`, a true "absent") instead of defaulting
-  to the literal `false`, so `??` and `||` behave identically across every
-  consumer; and `initializeItemCheckOptions` (`CharacterDataModel.js`) now writes
-  the resolved roll data back into `checkOptions.itemRollData` so
-  post-initialization readers get the real object. A grep confirmed all current
-  `itemRollData` consumers use truthy checks, so the sentinel change is
-  behavior-preserving. Parity unit test: `tests/unit/CreateItemCheckOptions.test.js`
-  (default-`undefined` + passthrough + shape). Commits `52015399`, `bfb592d8`.
-- **What:** The 2b-3 fix (`fix(item-check)`, commit `f155c1e0`) changed
-  `validateItemCheckOptions` from `??` to `||` so the literal-`false`
-  `itemRollData` default falls back to the item lookup. That was the deliberate
-  minimal fix, but the underlying fragility remains: `createItemCheckOptions`
-  (`src/check/types/item-check/ItemCheckOptions.js:43`) defaults `itemRollData`
-  to the literal `false` (forcing every consumer to use truthy checks rather
-  than `??`), and `initializeItemCheckOptions`
-  (`CharacterDataModel.js:3369-3371`) resolves the real roll data into a *local*
-  variable and never writes it back into `checkOptions` — so any future code that
-  reads `checkOptions.itemRollData` after initialization gets `false` even when an
-  item was supplied.
-- **To do:** Either default `itemRollData` to `undefined` (so `??` and `||`
-  behave identically everywhere and the sentinel is a true "absent"), or have
-  `initializeItemCheckOptions` assign the resolved roll data back into the returned
-  options. Add parity tests.
-- **Why deferred:** The shipped minimal fix closes the user-facing bug (the item
-  options dialog no longer self-closes) and all five dialog types pass E2E; this
-  is hardening against a latent class of bug, not a live defect.
-- **Found by:** The 2b-3 checks-dialog E2E (see `e2e-suite-status.md` bug #3).
-
-### 9. Replace fixed-timeout waits in the E2E dialog/check helpers — DONE
-
-- **Status: COMPLETE.** `openCheckDialog` dropped its 400ms mount sleep (relies on
-  the auto-retried `toBeVisible`); `clickRoll(dialog, page)` now captures the
-  pre-roll `game.messages.size` baseline; `readNewestCheckFlags(page, baseline)`
-  `expect.poll`s for the newest titan-flagged message created at/after that
-  baseline (no fixed sleep, no global-newest read). The shared helper is reused in
-  `checks-integration.spec.js` (its 300ms-sleep + global-newest block replaced;
-  redundant `created` assertion removed); the three `checks-dialog.spec.js` call
-  sites were updated. The same fixed-sleep pattern in other specs
-  (`checks-opposed`, `effect-checks`, `interaction-rolls`) was left out of scope
-  for a future pass. **E2E run is user-gated** (needs the launched world) — pending
-  a green run before merge. Commits `7d491c1f`, `0c0774e8`.
-- **What:** `tests/e2e/checkDialog.js` waits a hard-coded 400ms for the dialog to
-  mount (`openCheckDialog`) and 300ms for the chat message to settle
-  (`readNewestCheckFlags`), and `readNewestCheckFlags` reads the *globally* newest
-  message (`game.messages.contents[size-1]`) rather than the one this roll
-  produced. The same fixed-sleep + global-newest pattern exists in the 2b-2
-  `checks-integration.spec.js`. These are race-prone on a loaded/CI machine.
-- **To do:** Replace fixed sleeps with polling (e.g. `expect.poll`) — wait for the
-  dialog locator (already auto-retried) and poll for a chat message whose creation
-  postdates the roll click, across both the dialog and integration helpers.
-- **Why deferred:** Non-blocking — the full suite is green (40/40 e2e); this is
-  flake-prevention, and fixing it well means revisiting the shared pattern across
-  specs rather than one helper.
-- **Found by:** Final code review of the 2b-3 implementation.
 
 ### 18. Shared-world e2e fixture hygiene: token-control fixtures orphan a token per run
 
@@ -318,7 +36,8 @@ split off to keep that spec focused.
   `stale.delete()`), but deleting an actor does NOT delete its placed tokens — so each run leaves one
   orphaned token on the fixture scene.
 - **To do:** Add a suite-wide orphaned-token cleanup (e.g. delete scene tokens whose `actorId` no longer
-  resolves, in the shared fixture or `tests/e2e/world.js`).
+  resolves, in the shared fixture or `tests/e2e/world.js`). The improved fixture shape to promote
+  already exists in `tests/e2e/embedded-context-effects.spec.js` (`deleteFixtureActor`).
 - **Found by:** Phase 4 (effect chat subtype) review.
 
 ### 19. Bounded canvas-drawn polls give up silently — make exhaustion throw
@@ -326,88 +45,16 @@ split off to keep that spec focused.
 - **What:** The bounded canvas-drawn polls in the same three specs (50 × 50 ms `setInterval` loops waiting
   for `tokenDoc.object`, ~2.5 s budget) resolve silently on exhaustion, so a never-drawn placeable defers
   the failure to a later, less-diagnostic timeout instead of failing at the poll with a clear message.
-- **To do:** Reject (throw) on poll exhaustion with a descriptive message.
+- **To do:** Reject (throw) on poll exhaustion with a descriptive message (the `titanWait` pattern in
+  `tests/e2e/embedded-context-effects.spec.js` is the model).
 - **Found by:** Phase 4 (effect chat subtype) review.
 
 ## Chat message subtypes — related items
 
-The "first-class ChatMessage subtypes" effort is specced/planned in
-`specs/2026-06-03-chat-message-subtypes-phase1-design.md` and
-`plans/2026-06-03-chat-message-subtypes-phase1.md` (Phase 1 = infrastructure +
-the five check subtypes; later phases covered items, reports, and effect — the
-whole effort, including Phase 4, is complete).
-
-**Phase 2 (item cards ×7) — DONE** (2026-06-04, path-parity architecture). Implemented via a new
-recursive `buildSchemaFromShape` helper (`src/helpers/utility-functions/`) + shared per-type
-item-system shape templates feeding the item chat-message data models. Each item chat card is now a
-first-class `ChatMessage` subtype (`weapon`/`armor`/`spell`/`ability`/`shield`/`equipment`/`commodity`)
-whose `message.system` snapshots the item's `system` data, so cards read `document.data.system.X`
-exactly as item sheets do (component-reuse path parity — TODO #12 north-star). DataModel hierarchy:
-`TitanChatMessageDataModel` → `ItemChatMessageDataModel` (shared item ancestor) → 7 leaves; check side
-reparented so `AttributeCheckChatMessageDataModel` is the shared base for attack/casting/item checks and
-`ResistanceCheckChatMessageDataModel` stays separate. Producer `TitanItem.sendToChat()` →
-`buildChatMessageData()` (`{type, system}`); ~17 item chat components swept `flags.titan.X` →
-`document.data.system.X`; the pre-existing dead `flags.titan.system.X` reads were repaired. Verified:
-unit 115, full e2e **365** (incl. new `tests/e2e/item-cards.spec.js` ×7), build clean. Spec/plan:
-`specs/2026-06-04-chat-message-subtypes-phase2-items-design.md`,
-`plans/2026-06-04-chat-message-subtypes-phase2-items.md`.
-
-**Follow-ups (user-approved sequencing):**
-- **(B) Item DataModels build their schema from the shared templates — DONE** (2026-06-04, merged to
-  `main`). Shipped via **approach C (generalize the helper)** rather than per-field overrides:
-  `buildSchemaFromShape` now treats an array literal as the field's default contents (cloned into
-  `initial`) with an untyped `ObjectField` element, so the shared templates express every current
-  item-schema default — weapon's seeded default `attack`, the empty dynamic arrays
-  (`check`/`customTrait`/`aspect`/`customAspect`/`trait`/`rulesElement`), and spell/ability `xpCost`
-  (the templates call `defaultXpCost*()`). Each item DataModel's `_defineDocumentSchema()` is now
-  `{ ...super._defineDocumentSchema(), ...buildSchemaFromShape(<template>) }` with **no hand-written
-  fields** (`documentVersion` still only from `super`); the item schema and the chat-card template are a
-  single source that cannot drift. **DATA-INTEGRITY SENSITIVE** — gated by a byte-exact characterization
-  test (`tests/unit/ItemDataModelSchemaEquivalence.test.js`, a golden master of all 7 item schemas) plus
-  item-sheet + chat e2e. Verified: unit **124**, full e2e **365** at parity, build clean. Plan:
-  `docs/superpowers/plans/2026-06-04-chat-subtypes-followup-B-item-dm-templates.md`.
-- **(D) Check chat schemas typed from single-source shapes — DONE** (2026-06-04, merged to `main`).
-  Shipped via **approach B (single-source factory refactor)** + **path 2 (model `opposedCheck`
-  properly)**. Each check parameter/result factory now spreads a co-located zero-value
-  `create<T>Check{Parameters,Results}Shape()` (results compose `createCheckResultsShape()`; params are
-  flat), so the factory output and the chat schema share ONE field-set. The 5 leaf chat DataModels
-  build typed `parameters`/`results` via a `CheckChatMessageDataModel._defineCheckDataSchema(pShape,
-  rShape)` helper (`createSchemaField(buildSchemaFromShape(...))`); the base drops its untyped
-  `ObjectField` bags. **Item-check correctness (user-confirmed):** `getItemCheckParameters` now mirrors
-  the item config — copies `isDamage`/`isHealing`, carries `opposedCheck.enabled`, and fixes the
-  `damageReducedBy` gate to read `checkData` (was a self-comparison against the `'none'` default) — so
-  the opposed/resistance damage-reduction actually feeds the opposing check; `opposedCheck` is a typed
-  nested `{enabled,attribute,skill}` object and all its truthiness guards use `.enabled`; stale
-  `parameters.itemTrait` card reads were repointed to `customTrait`; the sourceless `opposedCheck.
-  difficulty` read was dropped. **Pre-existing bug exposed + fixed:** `createAttackCheckOptions` dropped
-  `damageMod` (siblings had `?? 0`) → dialog attack rolls produced `NaN` `results.damage`, silently
-  stored by the old untyped bag but rejected by the typed integer field; added
-  `damageMod: options.damageMod ?? 0`. **DATA-INTEGRITY SENSITIVE** — gated by a golden-master
-  (`tests/unit/CheckChatMessageSchemaEquivalence.test.js`, all 5 typed schemas) + a factory↔shape
-  parity test (`tests/unit/check/check-shape-parity.test.js`) + new e2e
-  (`tests/e2e/item-check-damage-reduction.spec.js`). Verified: unit **140**, check/chat e2e surface
-  **44** green (all 5 check types via dialog + API), build clean. Spec/plan:
-  `specs/2026-06-04-chat-subtypes-followup-D-check-templates-design.md`,
-  `plans/2026-06-04-chat-subtypes-followup-D-check-templates.md`.
-
-**Phase 3 (reports ×13) — DONE** (branch `feat/chat-subtypes-phase3-reports`; implementation complete +
-reviewed). The 13 report chat messages (`damageReport`, `healingReport`, `spendResolveReport`, `rendReport`,
-`repairsReport`, `removeCombatEffectsReport`, `shortRestReport`, `longRestReport`, `turnStartReport`,
-`turnEndReport`, `turnStartRevertReport`, `turnEndRevertReport`, `effectsExpiredReport`) are now first-class
-`ChatMessage` subtypes that self-render. Each has a leaf DataModel under
-`src/document/types/chat-message/report/types/<name>/` extending a shared `report/ReportChatMessageDataModel.js`
-base, with a co-located `<T>ReportShape.js` feeding `buildSchemaFromShape`. The producer
-`CharacterDataModel._whisperOwners` emits `{ type, system }` (was `flags: { titan }`); all report components read
-`document.data.system.X`. The legacy `OnRenderChatMessageHTML` hook was trimmed to route ONLY `effect`
-(Phase 4 then deleted it entirely). Verified: unit
-**154** green, `tests/e2e/report-cards.spec.js` (13 cases) green (full e2e parity run being confirmed). Two
-free fixes landed (see `docs/OPEN_BUGS.md`): the turn-revert reports rendered blank (now self-render), and the
-rend header's "resisted rend" showed `undefined` (now carries the `rend` amount). Spec/plan:
-`specs/2026-06-04-chat-message-subtypes-phase3-reports-design.md`,
-`plans/2026-06-04-chat-message-subtypes-phase3-reports.md`.
-
-**Note:** NPC `overkillDamage` (`NPCDataModel.js:47`) is written-but-never-read and now schema-stripped —
-harmless dead data, a candidate for producer cleanup.
+The "first-class ChatMessage subtypes" effort (Phases 1-4 + follow-ups B/D) has shipped — all 26
+chat messages are self-rendering subtypes. Specs/plans under `specs/2026-06-03-chat-message-subtypes-*`
+and successors. These are its surviving deferrals. (Note: NPC `overkillDamage` (`NPCDataModel.js:47`)
+is written-but-never-read and schema-stripped — harmless dead data, a candidate for producer cleanup.)
 
 ### 13. E2E: `effectsExpiredReport` render not covered
 
@@ -495,9 +142,8 @@ harmless dead data, a candidate for producer cleanup.
   or deleted).
 - **North-star:** progressively move all fields on all documents onto consistent
   `system.*` paths via the helper.
-- **Depends on / sequencing:** the in-flight chat-message-subtypes conversion
-  (`specs/2026-06-03-chat-message-subtypes-phase1-design.md` + later item/report/
-  effect phases) must finish first.
+- **Depends on / sequencing:** the chat-message-subtypes conversion shipped; the remaining
+  north-star is incremental.
 - **Origin:** branched off the embedded-document-stores design —
   `specs/2026-06-03-embedded-document-stores-design.md` (Follow-up work →
   "Chat-message path parity").
@@ -563,49 +209,3 @@ three consumers. The spec's wider sheet-side reuse items below were each a delib
 - **Why deferred:** Sheet-side reuse follow-up split from the embedded-document-stores spec
   (`docs/superpowers/specs/2026-06-03-embedded-document-stores-design.md`).
 - **Found by:** the embedded-document-stores design (decomposed follow-up).
-
-## E2E suite speedup — remaining phases
-
-### 14. E2E speedup Phase 1b — bespoke sleep removal — DONE
-
-- **Status: COMPLETE** (branch `chore/e2e-sleep-removal-phase1b`, 6 commits
-  `ff0de166..ff596378`). **Scope expanded** beyond the original `setTimeout`-only wording to the
-  full intent of the design spec ("remove **every** fixed settle"): converted **all 33 `setTimeout`
-  settles AND all 59 `page.waitForTimeout` calls — 92 sites across 19 files** to deterministic
-  condition waits (`titanWait` in-page, `expect.poll` / auto-retrying web-first assertions at the
-  Node level). No test assertion changed (verified by an adversarial final review). Every touched
-  spec file was run green file-by-file against the live world.
-- **Patterns used:** (B) delete a sleep that precedes an auto-retrying `expect(locator)…` / auto-waiting
-  `.click()`/`.fill()`; (C) `expect.poll(() => page.evaluate(…)).toBe(…)` before a non-retrying read;
-  (A) in-page `titanWait` on a positive derived-data / DOM signal. **One sanctioned exception:**
-  `permissions-auto-open.spec.js` keeps a single bounded `waitForTimeout(1000)` for its negative
-  (assert-absence) test, paired with a positive `waitForFunction` (turn advanced to the effect
-  combatant) — the auto-open hook is un-awaited and a bare turn-effect actor has no pollable
-  consequence, so a bounded wait is unavoidable and is the design-spec-permitted fallback.
-- **Grep proof:** `git grep -nE "setTimeout|waitForTimeout" -- tests/e2e` → only `poll.js:25` (the
-  polling primitive) and the one documented `permissions-auto-open.spec.js` exception.
-- **Plan:** `docs/superpowers/plans/2026-06-04-e2e-speedup-phase1b-bespoke-sleeps.md`.
-  **Spec:** `docs/superpowers/specs/2026-06-03-e2e-suite-speedup-design.md` (Workstream A).
-
-### 15. E2E speedup Phase 2 — shared-world harness + hygiene — DONE
-
-- **Status: COMPLETE** (branch `chore/e2e-speedup-phase2-shared-world`). Migrated **all 42 eligible
-  specs** to a module-scoped shared `page`: one world boot per spec FILE (inline `beforeAll(login)` +
-  `afterEach(closeAllApps + errors reset)` + `afterAll(page.close)`), replacing the per-test
-  `beforeEach(login)`. New `tests/e2e/world.js` exports the three stateless helpers `closeAllApps`,
-  `clearChat`, `attachPageErrors`; `renderSheet` (`fixtures.js`) gained an optional shared-`errors`
-  param; per-test `page.on('pageerror')` listeners were folded into the single shared collector.
-- **Results (full `npm run test:e2e`):** **358 passed in 15.1 min** — green at parity, and the
-  wall-clock dropped from the ~34-min Phase-1b baseline (~56% faster) from per-file boot-once.
-- **Closes `docs/OPEN_BUGS.md` #1 (socket-sync flake):** the per-file `clearChat` keeps the world
-  lean; `socket-sync.spec.js` A1–A5 all passed within the full run (A1/A2 were the intermittent
-  timeouts). No file needed to opt out.
-- **Harness bugfix landed (`3744bfdc`):** `closeAllApps` must skip the core UI singletons registered in
-  `CONFIG.ui` (`Sidebar`, `ChatLog`, `Hotbar`, the `titanEffects` tray, …) — closing them tore down DOM
-  the sidebar tab-switch lifecycle depends on and crashed later sidebar-activating tests on the shared
-  page. **Not migrated** (self-managed `BrowserContext`s): `multi-client.spec.js`, `socket-sync.spec.js`,
-  `permissions-compendium.spec.js`, `permissions-ownership.spec.js`, `permissions-auto-open.spec.js`.
-- **Spec:** `docs/superpowers/specs/2026-06-04-e2e-phase2-shared-world-harness-design.md` (parent:
-  `docs/superpowers/specs/2026-06-03-e2e-suite-speedup-design.md`, Workstream A Phase 2). **Plan:**
-  `docs/superpowers/plans/2026-06-04-e2e-speedup-phase2-shared-world.md`. Convention documented in
-  `titan-codebase` `conventions.md` ("Shared-world E2E harness").
