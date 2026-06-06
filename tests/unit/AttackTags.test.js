@@ -3,9 +3,9 @@ import { render, screen } from '@testing-library/svelte';
 import AttackTags from '~/document/types/item/types/weapon/components/AttackTags.svelte';
 
 /**
- * Builds a stub document bridge exposing one weapon attack at `data.system.attack[0]`. Traits are left
- * empty so the unit render avoids tooltip-bearing tags; trait rendering (standard + custom) is covered
- * by the e2e parity spec (`tests/e2e/attack-tags.spec.js`).
+ * Builds a stub document bridge exposing one weapon attack at `data.system.attack[0]`. Traits are kept
+ * empty here to focus these cases on the scalar tags; trait rendering (standard + custom) is covered by
+ * `tests/unit/CharacterSheetWeaponAttack.test.js` and the e2e parity spec (`tests/e2e/attack-tags.spec.js`).
  * @param {object} [attackOverrides] - Field overrides merged onto the default attack.
  * @returns {object} The stub bridge for the 'document' context.
  */

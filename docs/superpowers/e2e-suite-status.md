@@ -2,9 +2,9 @@
 
 > **HISTORICAL / STALE — do not trust the counts in this document.** This is a frozen record of the
 > original e2e suite build-out (Phases 1–4). Its claimed totals (315 e2e / 35 unit) are long out of date:
-> as of 2026-06-05 the unit suite is **177 tests (36 files)** and the e2e suite is **382+4** (the +4
-> attack-tags cases pending the current verification run). The per-suite source of truth is the test tree
-> itself (`tests/unit/`, `tests/e2e/`); for current work status see `docs/TODO.md`.
+> as of 2026-06-06 the unit suite is **177 tests (36 files)** and the e2e suite is **386 passed** (full
+> run, 2026-06-06). The per-suite source of truth is the test tree itself (`tests/unit/`, `tests/e2e/`);
+> for current work status see `docs/TODO.md`.
 
 **Last updated:** 2026-06-04. **Next action:** **E2E speedup Phase 2 / TODO #15** (shared-world
 harness — also fixes the socket-sync flake, `OPEN_BUGS.md` #1). **DONE since this header was written:**

@@ -5,10 +5,10 @@
    import IconButton from '~/helpers/svelte-components/button/IconButton.svelte';
    import AttackTags from '~/document/types/item/types/weapon/components/AttackTags.svelte';
    import {
+      ACCURACY_ICON,
       COLLAPSED_ICON,
       EXPANDED_ICON,
       MELEE_ICON,
-      RANGE_ICON,
    } from '~/system/Icons.js';
 
    /** @type {object} Reference to the reactive Document store. */
@@ -28,7 +28,7 @@
             <!--Label-->
             <div class="label">
                <!--Icon-->
-               <i class={attack.type === 'melee' ? MELEE_ICON : RANGE_ICON}></i>
+               <i class={attack.type === 'melee' ? MELEE_ICON : ACCURACY_ICON}></i>
                <!-- Text-->
                <div class="text">
                   {attack.label}

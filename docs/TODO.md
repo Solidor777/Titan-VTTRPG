@@ -531,35 +531,38 @@ three consumers. The spec's wider sheet-side reuse items below were each a delib
 
 ### 20. Inline attack editing on the character sheet via the provider (write path)
 
-- **What:** Reuse `WeaponSheetAttackSettings` on the character sheet's weapon rows through
-  `EmbeddedDocumentProvider`, so owners edit attacks without opening the weapon sheet. This is the first
-  consumer to exercise the provider's WRITE path (`document.data.update(...)` /
+- **What:** The character sheet's weapon rows display attacks through `EmbeddedDocumentProvider` but
+  offer no inline editing — owners must open the weapon sheet to edit an attack. The editor component
+  `WeaponSheetAttackSettings` is written against `document.data.system.*`, so it should render unchanged
+  under the provider.
+- **To do:** Reuse `WeaponSheetAttackSettings` on the character sheet's weapon rows through the provider —
+  the first consumer to exercise the provider's WRITE path (`document.data.update(...)` /
   `refreshSystemDocument` against an `EmbeddedDocument`); the shipped consumers are read-only displays.
-- **Deferred by:** the embedded-document-stores spec (sheet-side reuse follow-up).
+- **Why deferred:** Sheet-side reuse follow-up split from the embedded-document-stores spec
+  (`docs/superpowers/specs/2026-06-03-embedded-document-stores-design.md`) to keep its scope to the
+  read-path proof (AttackTags across three surfaces).
+- **Found by:** the embedded-document-stores design (decomposed follow-up).
 
 ### 21. Generalize the provider treatment to the checks tab and rules-elements tab
 
 - **What:** The character sheet's checks tab and rules-elements tab still render embedded-item data via
-  passed props / `item._id` lookups. Wrap their rows in `EmbeddedDocumentProvider` so the existing item
-  sheet components (checks, rules-element settings) become reusable there, mirroring the AttackTags
-  pattern.
-- **Deferred by:** the embedded-document-stores spec (sheet-side reuse follow-up).
+  passed props / `item._id` lookups rather than through `EmbeddedDocumentProvider`.
+- **To do:** Wrap their rows in `EmbeddedDocumentProvider` so the existing item sheet components (checks,
+  rules-element settings) become reusable there, mirroring the AttackTags pattern.
+- **Why deferred:** Sheet-side reuse follow-up split from the embedded-document-stores spec
+  (`docs/superpowers/specs/2026-06-03-embedded-document-stores-design.md`).
+- **Found by:** the embedded-document-stores design (decomposed follow-up).
 
 ### 22. Migrate commodity/effect rows off the `item._id`-lookup pattern
 
 - **What:** `CharacterSheetCommodity.svelte` and `CharacterSheetEffect.svelte` (and similar rows) reach
   reactivity via per-leaf `document.data.<coll>.get(id)?.system.<leaf>` deriveds and function bindings
-  (see conventions.md). Replacing those with an `EmbeddedDocumentProvider` per row gives descendants the
-  plain `document.data.system.*` path and retires the bespoke lookup boilerplate.
-- **Deferred by:** the embedded-document-stores spec (sheet-side reuse follow-up).
-
-### 23. Cosmetic: sidebar attack-row header icon disagrees with the AttackTags type tag
-
-- **What:** `WeaponSheetSidebarAttacks.svelte` renders the attack-row HEADER icon as
-  `attack.type === 'melee' ? MELEE_ICON : RANGE_ICON`, while `AttackTags.svelte`'s type tag uses
-  `MELEE_ICON : ACCURACY_ICON` — so the same row shows two different icons for a ranged attack.
-  Normalize one way (pick RANGE_ICON or ACCURACY_ICON for non-melee everywhere).
-- **Found by:** embedded-document-stores implementation review.
+  (see conventions.md).
+- **To do:** Replace those with an `EmbeddedDocumentProvider` per row so descendants get the plain
+  `document.data.system.*` path, retiring the bespoke lookup boilerplate.
+- **Why deferred:** Sheet-side reuse follow-up split from the embedded-document-stores spec
+  (`docs/superpowers/specs/2026-06-03-embedded-document-stores-design.md`).
+- **Found by:** the embedded-document-stores design (decomposed follow-up).
 
 ## E2E suite speedup — remaining phases
 

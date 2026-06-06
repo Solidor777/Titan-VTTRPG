@@ -128,8 +128,9 @@ via `setContext('applicationState', applicationState)` inside `DocumentSheetShel
 On first render (`options.isFirstRender`), `TitanDocumentSheet._replaceHTML` calls Svelte 5 `mount(
 DocumentSheetShell, { target: content, props: { document: this.#bridge, applicationState, shell } })` and
 stores the handle. Subsequent ApplicationV2 renders do not re-mount the Svelte tree — reactivity is driven by the
-`ReactiveDocument` bridge, not the render cycle. `DocumentSheetShell` sets `document` (the bridge) and
-`applicationState` into context, then renders the shell via `{#if shell}{@const Shell = shell}<Shell />{/if}`.
+`ReactiveDocument` bridge, not the render cycle. `DocumentSheetShell` sets `document` (the bridge),
+`applicationState`, and `sheetDocument` (the same top-level bridge; see "Embedded-document contexts" below)
+into context, then renders the shell via `{#if shell}{@const Shell = shell}<Shell />{/if}`.
 
 **4. Sheet body — e.g. `CharacterSheetBase.svelte`**
 Reads the bridge with `const document = getContext('document')`, gates rendering behind

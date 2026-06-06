@@ -71,7 +71,9 @@ All sheets follow a three-layer pattern: a JS application class extending Foundr
 (`TitanDocumentSheet` and its subclasses) builds a `ReactiveDocument` bridge around the Foundry document and
 mounts `DocumentSheetShell.svelte` with Svelte 5's `mount()` on first render; the shell sets the `document`
 bridge and the `applicationState` store into Svelte context so every descendant reads
-`const document = getContext('document')` and accesses live, reactive data via `document.data.system.*`; the
+`const document = getContext('document')` and accesses live, reactive data via `document.data.system.*`
+(`'document'` may be shadowed by `EmbeddedDocumentProvider` for embedded subtrees; `'sheetDocument'` is the
+never-shadowed top-level bridge); the
 innermost components write back through `document.data.update(...)` or the `refreshSystemDocument` snapshot
 helper. The `~/` Vite alias (→ `src/`) is the intra-project import mechanism; no TyphonJS packages remain.
 

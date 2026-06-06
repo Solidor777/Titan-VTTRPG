@@ -133,8 +133,10 @@ test.describe('shared AttackTags across surfaces', () => {
    }
 
    /**
-    * Opens the weapon item sheet and expands the first sidebar attack. Closes all other apps first so
-    * the `.titan-document-sheet` locator is unambiguous — call AFTER finishing with the character sheet.
+    * Opens the weapon item sheet. Closes all other apps first so the `.titan-document-sheet` locator is
+    * unambiguous — call AFTER finishing with the character sheet. The sidebar attack needs no expand
+    * click: `WeaponSheetData` seeds `sidebar.attacks.isExpanded` true per existing attack, so the row
+    * mounts expanded (clicking the toggle here COLLAPSES it and races the 400 ms slide-out transition).
     * @returns {Promise<import('@playwright/test').Locator>} The item-sheet application root locator.
     */
    async function openWeaponSheetSidebarAttack() {
@@ -150,9 +152,6 @@ test.describe('shared AttackTags across surfaces', () => {
 
       /** @type {import('@playwright/test').Locator} The weapon item-sheet application root (only app open). */
       const sheet = page.locator('.application.titan-document-sheet').first();
-
-      // Expand the first sidebar attack (the expand IconButton lives in the sidebar row-header spacer).
-      await sheet.locator('.sidebar li .spacer button').first().click();
       return sheet;
    }
 

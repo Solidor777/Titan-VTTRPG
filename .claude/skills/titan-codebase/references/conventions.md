@@ -130,12 +130,17 @@ not re-render. Always build a fresh array and pass that to `update()` (e.g.
 across the custom-trait add/edit/delete paths on items and effects; the same antipattern still exists
 in `TitanActiveEffect`'s inline-`check` add/delete paths and in `RulesElementMixin` add/delete.
 
-**Context access convention** — `DocumentSheetShell.svelte` sets the `ReactiveDocument` bridge into
-context under `'document'` and the UI-state store under `'applicationState'`. Every descendant reads:
+**Context access convention** — `DocumentSheetShell.svelte` sets three context keys at mount: the
+`ReactiveDocument` bridge under `'document'`, the UI-state store under `'applicationState'`, and the SAME
+top-level bridge again under `'sheetDocument'`. `'document'` is always the NEAREST document —
+`EmbeddedDocumentProvider` shadows it for embedded subtrees — while `'sheetDocument'` always points at the
+owning sheet's top-level bridge and is never shadowed (the escape hatch for actor-coupled reads inside an
+embedded subtree). Resolution mechanics live in data-flow.md, "Embedded-document contexts". Every
+descendant reads:
 
 ```svelte
 import { getContext } from 'svelte';
-const document = getContext('document');          // ReactiveDocument bridge
+const document = getContext('document');          // nearest document bridge (may be an EmbeddedDocument)
 const appState = getContext('applicationState');  // writable store
 ```
 
@@ -366,11 +371,8 @@ static `actions` map. To refresh a dynamic control's icon/label after a state ch
   relative paths (`./`, `../`) appear only within the same immediate directory.
 
 - **Svelte context protocol** — Four keys are set into Svelte context at mount time:
-  - `'document'` (`ReactiveDocument` bridge), `'applicationState'` (writable store), and `'sheetDocument'`
-    (the SAME top-level bridge as `'document'`) are set by `DocumentSheetShell.svelte`; all sheet descendant
-    components access them via `getContext`. `'document'` is the NEAREST document and is shadowed by
-    `EmbeddedDocumentProvider` for embedded subtrees; `'sheetDocument'` is never shadowed (see data-flow.md,
-    "Embedded-document contexts").
+  - `'document'`, `'applicationState'`, and `'sheetDocument'` are set by `DocumentSheetShell.svelte` — see
+    the **Context access convention** entry above for what each holds and the provider-shadowing rule.
   - `'application'` (the owning `ApplicationV2` / `DocumentSheetV2` instance) is set at the `mount()` call
     site in both `TitanDocumentSheet._replaceHTML` and `TitanDialog._replaceHTML`. All components (sheet,
     dialog, and their descendants) can call `getApplication()` (`~/helpers/utility-functions/GetApplication.js`)
@@ -472,6 +474,13 @@ assertion** (assert-absence) that has no pollable positive edge — pair it with
 signal and document it inline (see `permissions-auto-open.spec.js`). The two condition-polling
 `setInterval` canvas-readiness loops (`effect-tray.spec.js`, `effect-hud.spec.js`) are NOT fixed sleeps and
 are fine.
+
+**E2E helpers must not blind-toggle expanders** — verify a row's mount default before clicking its
+expand/collapse toggle: weapon-sheet sidebar attacks mount EXPANDED (`WeaponSheetData` seeds `isExpanded`
+true per existing attack), so an "expand" click actually COLLAPSES the row and starts a 400 ms `slide`
+out-transition that subsequent assertions race — a latent flake that an unrelated bundle-timing shift can
+flip. Assert the expanded content directly (web-first assertions auto-wait) and click only to change state
+whose default you have verified. (Root-caused in `attack-tags.spec.js`'s weapon-sheet helper.)
 
 **Multi-client harness** — `tests/e2e/multiClient.js` (Phase 4) provides two helpers for tests that
 require simultaneous Foundry sessions: `withClients(browser, clientSpec, fn)` creates one independent

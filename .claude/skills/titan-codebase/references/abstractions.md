@@ -400,22 +400,19 @@ and one or more inner Svelte component trees.
   `DocumentSheetShell.svelte` via Svelte 5 `mount()`, passing `{ document: bridge, applicationState,
   shell }` as props. `_onClose` calls `unmount(handle, { outro: true })`.
 - `DocumentSheetShell.svelte` — receives `{ document, applicationState, shell }` as `$props()`, sets
-  `document` (the `ReactiveDocument` bridge), `applicationState`, AND `sheetDocument` (the same top-level
-  bridge, never shadowed — see the two-context convention in data-flow.md) into Svelte context, and renders
-  the type-specific shell via `{#if shell}{@const Shell = shell}<Shell />{/if}` (not
-  `<svelte:component>`).
+  `document` (the `ReactiveDocument` bridge), `applicationState`, and `sheetDocument` into Svelte context
+  (see conventions.md, "Context access convention"), and renders the type-specific shell via
+  `{#if shell}{@const Shell = shell}<Shell />{/if}` (not `<svelte:component>`).
 - `EmbeddedDocument` (`src/document/reactive/EmbeddedDocument.svelte.js`) — a delegating bridge over an
-  embedded document: `new EmbeddedDocument(parent, collection, id)` resolves `.data` / `.doc` as
-  `parent.data?.[collection]?.get(id)` / `parent.doc?.[collection]?.get(id)`. It registers NO hooks of its
-  own — reactivity rides the ancestor `ReactiveDocument`'s `createSubscriber`, and the embedded document is
-  re-resolved by id on every read (the reference is never stale). Bridges nest (effect-on-item-on-actor
-  chains delegate upward); `destroy()` is a no-op (the ancestor owns hook teardown).
+  embedded document: `new EmbeddedDocument(parent, collection, id)` resolves `.data` / `.doc` through the
+  ancestor bridge by id. It registers no hooks of its own, nests (effect-on-item-on-actor), and its
+  `destroy()` is a no-op. Resolution/reactivity mechanics: data-flow.md, "Embedded-document contexts".
 - `EmbeddedDocumentProvider.svelte` (`src/document/reactive/EmbeddedDocumentProvider.svelte`) — takes a
   live embedded `doc` prop, maps `doc.documentName` to the parent collection via
   `COLLECTION_BY_DOCUMENT_NAME` (Item → `items`, ActiveEffect → `effects`; any other type `warn()`s and
   yields a null-resolving bridge), reads the ancestor `'document'` context, and shadows `'document'` for
-  its descendants with an `EmbeddedDocument`. It never shadows `'sheetDocument'`. Provider instances inside
-  an `{#each}` MUST be keyed by `doc.id` (see conventions.md — the component's own comment points there).
+  its descendants with an `EmbeddedDocument`. Provider instances inside an `{#each}` MUST be keyed by
+  `doc.id` (see conventions.md — the component's own comment points there).
 
 **Actor sheets**
 
