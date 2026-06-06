@@ -52,7 +52,11 @@
    const customTrait = $derived(document.data?.system.customTrait ?? []);
 </script>
 
-<CharacterSheetItem item={document.data} bind:isExpanded>
+<!--TEMPORARY (Stage 2 converts the shared shell): pass the live re-resolved document as the prop.-->
+<CharacterSheetItem
+   item={document.data}
+   bind:isExpanded
+>
    {#snippet controls()}
       <!--Duration-->
       {#if durationType !== 'permanent'}
@@ -67,7 +71,7 @@
                      min={0}
                      bind:value={
                         () => document.data?.system.duration.initiative ?? 0,
-                        (newValue) => document.doc.update({ system: { duration: { initiative: newValue } } })
+                        (newValue) => document.doc?.update({ system: { duration: { initiative: newValue } } })
                      }
                   />
                </div>
@@ -87,7 +91,7 @@
                   min={0}
                   bind:value={
                      () => document.data?.system.duration.remaining ?? 0,
-                     (newValue) => document.doc.update({ system: { duration: { remaining: newValue } } })
+                     (newValue) => document.doc?.update({ system: { duration: { remaining: newValue } } })
                   }
                />
             </div>
@@ -102,7 +106,7 @@
          <IconButton
             icon={SEND_TO_CHAT_ICON}
             label={localize('sendToChat')}
-            onclick={() => document.doc.sendToChat()}
+            onclick={() => document.doc?.sendToChat()}
             tooltip={'sendToChat'}
          />
       </div>
@@ -110,10 +114,10 @@
       <!--Edit Button-->
       <div class="button">
          <IconButton
-            icon={document.data.isOwner ? EDIT_ICON : SHEET_ICON}
-            label={localize(document.data.isOwner ? 'editItem' : 'viewItemSheet')}
-            onclick={() => document.doc.sheet.render(true)}
-            tooltip={document.data.isOwner ? 'editItem' : 'viewItemSheet'}
+            icon={document.data?.isOwner ? EDIT_ICON : SHEET_ICON}
+            label={localize(document.data?.isOwner ? 'editItem' : 'viewItemSheet')}
+            onclick={() => document.doc?.sheet.render(true)}
+            tooltip={document.data?.isOwner ? 'editItem' : 'viewItemSheet'}
          />
       </div>
 

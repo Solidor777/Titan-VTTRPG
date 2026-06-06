@@ -11,10 +11,11 @@
    /** @type {EffectHudShellProps} */
    const { documentStore, hudState } = $props();
 
-   // Provide the actor bridge as the 'document' context so reused effect leaf components
-   // (checks, description, owner-gated delete) resolve the active actor exactly as they
-   // do inside the character sheet. The capture is intentional: documentStore is stable for
-   // this mount's lifetime (the controller remounts the shell when the tracked actor changes).
+   // Provide the actor bridge as the 'document' context: it anchors the HUD's own actor reads and is
+   // the parent each EmbeddedDocumentProvider chains from, so converted effect leaves read the effect
+   // via the shadowed 'document' and reach the actor via 'sheetDocument'. The capture is intentional:
+   // documentStore is stable for this mount's lifetime (the controller remounts the shell when the
+   // tracked actor changes).
    // svelte-ignore state_referenced_locally
    setContext('document', documentStore);
 

@@ -37,7 +37,7 @@
    );
 
    /** @type {number} The effect's remaining duration (effects only; conditions carry no duration). */
-   const durationRemaining = $derived(isEffect ? document.data?.system.duration?.remaining : undefined);
+   const durationRemaining = $derived(isEffect ? document.data?.system.duration.remaining : undefined);
 </script>
 
 <div
@@ -89,7 +89,7 @@
                icon={SEND_TO_CHAT_ICON}
                label={localize('sendToChat')}
                tooltip={'sendToChat'}
-               onclick={() => document.doc.sendToChat()}
+               onclick={() => document.doc?.sendToChat()}
             />
          {/if}
          <DocumentOwnerIconButton

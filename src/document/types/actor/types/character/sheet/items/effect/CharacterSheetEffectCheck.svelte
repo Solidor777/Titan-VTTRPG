@@ -86,7 +86,7 @@
                <ItemCheckButton
                   label={checkParameters.checkLabel}
                   attribute={checkParameters.attribute}
-                  disabled={!document.data.isOwner}
+                  disabled={!document.data?.isOwner}
                   resolveCost={checkParameters.resolveCost}
                   onclick={() => rollEffectCheck()}
                />
@@ -96,7 +96,7 @@
                   <ItemCheckButton
                      label={checkParameters.checkLabel}
                      attribute={checkParameters.attribute}
-                     disabled={!document.data.isOwner}
+                     disabled={!document.data?.isOwner}
                      onclick={() => rollEffectCheck()}
                   />
                </div>
@@ -114,7 +114,7 @@
             <ItemCheckButton
                label={checkParameters.checkLabel}
                attribute={checkParameters.attribute}
-               disabled={!document.data.isOwner}
+               disabled={!document.data?.isOwner}
                resolveCost={checkParameters.resolveCost}
                onclick={() => rollEffectCheck()}
             />
