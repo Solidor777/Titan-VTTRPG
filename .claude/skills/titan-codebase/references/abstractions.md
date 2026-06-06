@@ -145,7 +145,8 @@ management). Data model classes hold the schema, field validation, and derived-d
 - Effect rows render inline check buttons via `CharacterSheetEffectChecks` /
   `CharacterSheetEffectCheck` (`src/document/types/actor/types/character/sheet/items/effect/`), mirrors
   of the item `CharacterSheetItemChecks` / `CharacterSheetItemCheck`. They reuse the **item-check
-  engine** with no effect-specific path: each resolves `document.data.effects.get(effectId)` and calls
+  engine** with no effect-specific path: each reads the embedded effect from the provider-shadowed
+  `'document'` bridge (`const effect = document.data`) and calls
   `getItemCheckParameters` / `requestItemCheck` with `{ itemRollData: effect.getRollData(), checkIdx }`.
   The engine's `validateItemCheckOptions` / `initializeItemCheckOptions` / `getItemCheckParameters` all
   branch on `options.itemRollData` and skip `actor.items.get(id)` when it is supplied (and
@@ -478,6 +479,23 @@ and one or more inner Svelte component trees.
      the pre-halving dice base, and the multi-attack rounding honors the `flurry` trait (round up).
   3. `WeaponChatAttacks.svelte` — the chat-message bridge snapshot (path parity; the card never mutates
      with the weapon; no provider).
+- `CheckTags.svelte` (`src/document/svelte-components/check/CheckTags.svelte`) — the ONE shared component
+  rendering a check's intrinsic tags from `getContext('document').data?.system.check[idx]`; props
+  `{ idx, attribute }` (`attribute` overrides the config attribute with the actor-resolved value — only the
+  character-sheet consumers pass it, from `checkParameters.attribute`; all other intrinsic fields reach
+  `checkParameters` verbatim from the config, so config reads are display-parity). Tag order:
+  attribute/skill/difficulty/complexity (`AttributeCheckTag`) → resolve cost (hidden at 0) → resisted-by
+  (hidden at `'none'`) → opposed (hidden unless `.enabled`); testIds
+  `check-tags-attribute/resolve-cost/resisted-by/opposed`. Three consumers, no duplicated tag markup:
+  1. `ItemSheetSidebarCheck.svelte` — the top-level item/effect document; the expander is always present
+     and the expanded `.stats` body is just `<CheckTags {idx}/>` (the old at-a-glance `.rolled-stats` text
+     line and labeled `.advanced-details` column are gone — user-approved convergence).
+  2. `CharacterSheetItemCheck.svelte` / `CharacterSheetEffectCheck.svelte` — two-context rows that pass
+     `attribute={checkParameters.attribute}` and hand-render only the actor-derived dice/training/expertise
+     tags after it; both templates are guarded by `{#if checkParameters}` against the mid-frame embedded
+     deletion window. The Effect HUD inherits via `CharacterSheetEffectCheck` reuse.
+  `src/document/svelte-components/check/` is the home for document-generic check components that read the
+  `'document'` context.
 
 **Active Effect sheet**
 
