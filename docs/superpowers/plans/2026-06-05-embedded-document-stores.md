@@ -10,6 +10,12 @@
 
 **Spec:** `docs/superpowers/specs/2026-06-03-embedded-document-stores-design.md` (refreshed 2026-06-05).
 
+## Buddy-check directives
+
+Standing rule (user-confirmed 2026-06-05): **no buddy checks** — every task gets the standard two-stage
+review (spec-compliance reviewer, then code-quality reviewer), plus the final holistic review after all
+tasks. No task is flagged.
+
 ---
 
 ## Project rules the implementer MUST follow (from `.claude/CLAUDE.md` + handoff)
