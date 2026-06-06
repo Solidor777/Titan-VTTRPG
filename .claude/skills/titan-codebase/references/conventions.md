@@ -545,7 +545,7 @@ with one flatModifier rules element per value, each targeting `selector: 'attrib
 ## Integration manifest drift guard
 
 **`system.json` is the source of truth** for declared document subtypes, packs, grid config, and the socket
-flag. `tests/e2e/integration-manifest.spec.js` (8 tests, Phase 3c) guards against runtime drift by reading
+flag. `tests/e2e/integration-manifest.spec.js` (7 tests, Phase 3c) guards against runtime drift by reading
 `system.json` via Node `fs.readFileSync` inside the Playwright process and comparing the parsed values to live
 `CONFIG`/`game` state:
 
