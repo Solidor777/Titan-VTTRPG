@@ -56,7 +56,7 @@
    /**
     * Reads the actor's conditional check modifier for one aspect of this attack, mirroring the engine
     * call shape used by initializeAttackCheckOptions.
-    * @param {string} modifierType - The modifier type to read ('dice' | 'expertise' | 'damage').
+    * @param {string} modifierType - The modifier type to read ('dice' | 'training' | 'expertise' | 'damage').
     * @returns {number} The modifier for this aspect of the attack check.
     */
    function getCheckMod(modifierType) {
@@ -74,14 +74,19 @@
    /** @type {number} Actor-derived damage modifier added to the displayed attack damage. */
    const damageMod = $derived(getCheckMod('damage'));
 
+   /** @type {number} Total training dice (skill training + training mod), folded in before multiAttack halving. */
+   const trainingDice = $derived(
+      sheetDocument.data.system.skill[attack.skill].training.value + getCheckMod('training'),
+   );
+
    // Calculate dice pool.
    /** @type {number} Calculated total dice pool for the attack. */
-   let dicePool = $derived.by(() => {
+   const dicePool = $derived.by(() => {
 
       // Get base dice.
       let pool =
          sheetDocument.data.system.attribute[attack.attribute].value +
-         sheetDocument.data.system.skill[attack.skill].training.value +
+         trainingDice +
          getCheckMod('dice');
 
       // Cut the dice in half if multi attacking.
@@ -105,7 +110,7 @@
 
    // Calculate expertise.
    /** @type {number} Calculated total expertise for the attack. */
-   let expertise = $derived.by(() => {
+   const expertise = $derived.by(() => {
 
       // Get base expertise.
       let exp =
@@ -154,17 +159,19 @@
          <IconStatTag
             icon={DICE_ICON}
             label={localize('dice')}
+            testId={'attack-row-dice'}
             value={dicePool}
          />
       </div>
 
       <!--Training-->
-      {#if sheetDocument.data.system.skill[attack.skill].training.value !== 0}
+      {#if trainingDice !== 0}
          <div class="stat">
             <IconStatTag
                icon={TRAINING_ICON}
                label={localize('training')}
-               value={sheetDocument.data.system.skill[attack.skill].training.value}
+               testId={'attack-row-training'}
+               value={trainingDice}
             />
          </div>
       {/if}
@@ -175,6 +182,7 @@
             <IconStatTag
                icon={EXPERTISE_ICON}
                label={localize('expertise')}
+               testId={'attack-row-expertise'}
                value={expertise}
             />
          </div>
