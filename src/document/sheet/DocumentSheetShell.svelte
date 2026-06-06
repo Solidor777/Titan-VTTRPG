@@ -19,6 +19,10 @@
    setContext('document', document);
    // svelte-ignore state_referenced_locally
    setContext('applicationState', applicationState);
+   // 'sheetDocument' always points at the owning sheet's top-level bridge; embedded-document providers
+   // shadow 'document' but never this key, giving actor-coupled components a stable escape hatch.
+   // svelte-ignore state_referenced_locally
+   setContext('sheetDocument', document);
 </script>
 
 {#if shell}
