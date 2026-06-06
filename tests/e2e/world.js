@@ -15,6 +15,13 @@
  * `{ directory: ui.placeables }`; closing that nested app detaches the element its owner re-queries on
  * every later render, so each subsequent token create/delete crashes `PlaceableDirectory#_renderTab`
  * with an uncaught `null.replaceWith` TypeError that pollutes a later test's page-error window.
+ *
+ * The canvas HUD container (`canvas.hud`, element id `hud`) is the same detached-DOM class and is kept
+ * as well even though it is not in `CONFIG.ui`: it renders only during canvas draw, and two core
+ * consumers re-query its DOM with no null guard and no re-render path —
+ * `BasePlaceableHUD#_insertElement` appends into `document.getElementById('hud')`, and `ChatBubbles`
+ * appends into its `#chat-bubbles` child — so closing it crashes the first later test that opens a
+ * token HUD or emits a chat bubble.
  * @param {import('@playwright/test').Page} page - The shared page to clean.
  * @returns {Promise<void>} Resolves once every open transient application has been asked to close.
  */
@@ -27,6 +34,14 @@ export async function closeAllApps(page) {
          if (instance) {
             coreUi.add(instance);
          }
+      }
+
+      // Also keep the canvas HUD container: placeable HUDs and chat bubbles re-query its DOM with no
+      // null guard, and nothing re-renders it before the next canvas draw. Guarded so a missing canvas
+      // never adds `undefined` to the keep-set (which would match every directory-less app below).
+      const hudContainer = globalThis.canvas?.hud;
+      if (hudContainer) {
+         coreUi.add(hudContainer);
       }
 
       // Close ApplicationV2 instances (the modern app registry), skipping the core UI singletons and
