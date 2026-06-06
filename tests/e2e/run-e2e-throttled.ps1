@@ -23,6 +23,11 @@ $self.ProcessorAffinity = $mask
 
 Write-Host "e2e throttled: BelowNormal priority, $maskBits of $coreCount cores (mask $mask)."
 
+# The pass-through arguments for `playwright test`. Windows PowerShell 5.1 silently drops the
+# AUTOMATIC $args variable when it is used directly in native-command argument position, so the
+# arguments are copied into an ordinary array first (which flattens correctly into separate args).
+$passThroughArgs = @($args)
+
 # Run the suite; the npm-supplied arguments pass through to `playwright test`.
-npx playwright test @args
+npx playwright test $passThroughArgs
 exit $LASTEXITCODE
