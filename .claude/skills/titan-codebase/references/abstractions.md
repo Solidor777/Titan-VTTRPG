@@ -95,13 +95,10 @@ management). Data model classes hold the schema, field validation, and derived-d
 - `TitanActiveEffect` (`src/document/types/active-effect/TitanActiveEffect.js`) extends
   `foundry.documents.ActiveEffect`. Registered as `CONFIG.ActiveEffect.documentClass`. Conditions are the
   native `condition` subtype (`CONFIG.ActiveEffect.dataModels.condition = ConditionDataModel`, declared in
-  `system.json` `documentTypes.ActiveEffect`); effects are the `effect` subtype. Its `_preCreate` /
-  `_preUpdate` overrides guard their work on `this.type === 'effect'`
-  so conditions and other subtypes are unaffected: `_preCreate` runs `this.system.onPreCreate(data)`,
-  forces `showIcon` to `CONST.ACTIVE_EFFECT_SHOW_ICON.ALWAYS` (2), and seeds
-  `flags['visual-active-effects'].data.content` with the enriched native `description`; `_preUpdate`
-  re-syncs that flag whenever `description` changes. Enrichment uses
-  `foundry.applications.ux.TextEditor.implementation.enrichHTML(html, { secrets: true })` (v14 async API).
+  `system.json` `documentTypes.ActiveEffect`); effects are the `effect` subtype. Its `_preCreate` override
+  guards its work on `this.type === 'effect'` so conditions and other subtypes are unaffected: it runs
+  `this.system.onPreCreate(data)` (the data model's initial-data capture, e.g. combat initiative) and
+  forces `showIcon` to `CONST.ACTIVE_EFFECT_SHOW_ICON.ALWAYS`; `_preUpdate` is a super-only pass-through.
   `buildChatMessageData()` (pure, byte-parallel to `TitanItem`'s) returns `{ type: 'effect', system }` —
   the prepared `getRollData()` snapshot minus the document-level `id`/`type`, plus `name`/`img` as label
   metadata; the chat subtype is hardcoded `'effect'` (a condition's own subtype is not a registered chat

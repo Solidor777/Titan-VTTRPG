@@ -439,15 +439,15 @@ harmless dead data, a candidate for producer cleanup.
   notification auto-dismissal removes the element without a teardown hook.
 - **Severity:** Only manifests when the chat sidebar tab is NOT the active tab (so a
   notification is posted). **Pre-existing:** the legacy `OnRenderChatMessageHTML` hook
-  uses the identical single-slot `message._svelteComponent` pattern, so the Phase 1
-  refactor preserves parity rather than regressing.
+  (since deleted; Phase 4) used the identical single-slot `message._svelteComponent`
+  pattern, so the Phase 1 refactor preserved parity rather than regressing.
 - **To do:** Key the mount per rendered element (store `{ handle, bridge }` on the
   `<li>` element, or a `WeakMap<HTMLElement, …>` keyed by target), tearing down
   per-element; on delete, tear down all of a message's mounts. Consider a
   MutationObserver (or Foundry hook) to unmount on notification-pane element removal.
-  Apply the same model to the legacy hook until it is retired in the final phase.
-- **Why deferred:** Out of scope for Phase 1 (parity migration of checks). Fixing it
-  well means reworking the mount-tracking model shared with the legacy path.
+  Only `TitanChatMessage.renderHTML` carries the pattern now.
+- **Why deferred:** Out of scope for Phase 1 (parity migration of checks); the
+  mount-tracking model rework remains the actual fix.
 - **Found by:** Opus code-quality review of Phase 1, Task 3.
 
 ### 11. Check chat components mutate the live DataModel before `update()`
