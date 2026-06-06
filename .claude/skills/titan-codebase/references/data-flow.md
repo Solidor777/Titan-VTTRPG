@@ -267,7 +267,8 @@ source Items, then batch-deletes any stale cosmetic "mirror" AEs (base subtype, 
 through, so `TitanActiveEffect._preCreate` does not override combat initiative.
 `buildEffectData` does NOT set `showIcon` or the Visual Active Effects flag — `_preCreate` seeds those. Each actor's
 conversion is wrapped in its own try/catch (`convertActorIsolated`), so a failure on one actor is logged and the
-remaining actors still process. Idempotent once no `effect` Items remain. Discovery reads raw `actor._source.items` (NOT `actor.items`): the
+remaining actors still process. Idempotent once no `effect` Items remain.
+Discovery reads raw `actor._source.items` (NOT `actor.items`): the
 `effect` subtype is unregistered, so legacy items are invalid documents excluded from collection iteration but
 present in raw source and deletable by id. Replacement AEs are stamped `flags.titan.convertedFromItem = <item _id>`;
 creation skips already-stamped sources AND deletion is stamp-verified (a source is deleted only when its replacement
