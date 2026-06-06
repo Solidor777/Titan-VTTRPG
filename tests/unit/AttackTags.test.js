@@ -4,7 +4,8 @@ import AttackTags from '~/document/types/item/types/weapon/components/AttackTags
 
 /**
  * Builds a stub document bridge exposing one weapon attack at `data.system.attack[0]`. Traits are left
- * empty so the unit render avoids tooltip-bearing tags; trait rendering is covered by the e2e parity spec.
+ * empty so the unit render avoids tooltip-bearing tags; trait rendering (standard + custom) is covered
+ * by the e2e parity spec (`tests/e2e/attack-tags.spec.js`).
  * @param {object} [attackOverrides] - Field overrides merged onto the default attack.
  * @returns {object} The stub bridge for the 'document' context.
  */
