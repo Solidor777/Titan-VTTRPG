@@ -311,12 +311,31 @@ split off to keep that spec focused.
   specs rather than one helper.
 - **Found by:** Final code review of the 2b-3 implementation.
 
+### 18. Shared-world e2e fixture hygiene: token-control fixtures orphan a token per run
+
+- **What:** The token-control fixtures in `effect-hud.spec.js`, `effect-tray.spec.js`, and
+  `effect-chat-card.spec.js` delete the prior run's stale actor (`game.actors.getName(name)` →
+  `stale.delete()`), but deleting an actor does NOT delete its placed tokens — so each run leaves one
+  orphaned token on the fixture scene.
+- **To do:** Add a suite-wide orphaned-token cleanup (e.g. delete scene tokens whose `actorId` no longer
+  resolves, in the shared fixture or `tests/e2e/world.js`).
+- **Found by:** Phase 4 (effect chat subtype) review.
+
+### 19. Bounded canvas-drawn polls give up silently — make exhaustion throw
+
+- **What:** The bounded canvas-drawn polls in the same three specs (50 × 50 ms `setInterval` loops waiting
+  for `tokenDoc.object`, ~2.5 s budget) resolve silently on exhaustion, so a never-drawn placeable defers
+  the failure to a later, less-diagnostic timeout instead of failing at the poll with a clear message.
+- **To do:** Reject (throw) on poll exhaustion with a descriptive message.
+- **Found by:** Phase 4 (effect chat subtype) review.
+
 ## Chat message subtypes — related items
 
 The "first-class ChatMessage subtypes" effort is specced/planned in
 `specs/2026-06-03-chat-message-subtypes-phase1-design.md` and
 `plans/2026-06-03-chat-message-subtypes-phase1.md` (Phase 1 = infrastructure +
-the five check subtypes; later phases cover items, reports, and effect).
+the five check subtypes; later phases covered items, reports, and effect — the
+whole effort, including Phase 4, is complete).
 
 **Phase 2 (item cards ×7) — DONE** (2026-06-04, path-parity architecture). Implemented via a new
 recursive `buildSchemaFromShape` helper (`src/helpers/utility-functions/`) + shared per-type
@@ -379,17 +398,16 @@ reviewed). The 13 report chat messages (`damageReport`, `healingReport`, `spendR
 `src/document/types/chat-message/report/types/<name>/` extending a shared `report/ReportChatMessageDataModel.js`
 base, with a co-located `<T>ReportShape.js` feeding `buildSchemaFromShape`. The producer
 `CharacterDataModel._whisperOwners` emits `{ type, system }` (was `flags: { titan }`); all report components read
-`document.data.system.X`. The legacy `OnRenderChatMessageHTML` hook now routes ONLY `effect`. Verified: unit
+`document.data.system.X`. The legacy `OnRenderChatMessageHTML` hook was trimmed to route ONLY `effect`
+(Phase 4 then deleted it entirely). Verified: unit
 **154** green, `tests/e2e/report-cards.spec.js` (13 cases) green (full e2e parity run being confirmed). Two
 free fixes landed (see `docs/OPEN_BUGS.md`): the turn-revert reports rendered blank (now self-render), and the
 rend header's "resisted rend" showed `undefined` (now carries the `rend` amount). Spec/plan:
 `specs/2026-06-04-chat-message-subtypes-phase3-reports-design.md`,
 `plans/2026-06-04-chat-message-subtypes-phase3-reports.md`.
 
-**Phase 4 (effect subtype + delete the legacy hook/`ChatMessageShell.svelte`) remains.** Cleanup that belongs
-to it: (a) `ChatMessageShell.svelte` still carries now-unreachable report map entries (the legacy hook only
-routes `effect`); (b) NPC `overkillDamage` (`NPCDataModel.js:47`) is written-but-never-read and now
-schema-stripped — harmless dead data, a candidate for producer cleanup.
+**Note:** NPC `overkillDamage` (`NPCDataModel.js:47`) is written-but-never-read and now schema-stripped —
+harmless dead data, a candidate for producer cleanup.
 
 ### 13. E2E: `effectsExpiredReport` render not covered
 
@@ -475,6 +493,26 @@ schema-stripped — harmless dead data, a candidate for producer cleanup.
 - **Origin:** branched off the embedded-document-stores design —
   `specs/2026-06-03-embedded-document-stores-design.md` (Follow-up work →
   "Chat-message path parity").
+
+### 16. Consolidate the golden-master fingerprint harness into a shared helper
+
+- **What:** Four unit suites carry near-identical copies of the byte-exact schema-fingerprint harness:
+  `tests/unit/ItemDataModelSchemaEquivalence.test.js`, `CheckChatMessageSchemaEquivalence.test.js`,
+  `ReportChatMessageSchemaEquivalence.test.js`, and `EffectSchemaEquivalence.test.js` each duplicate the
+  field-walker/fingerprint code.
+- **To do:** Extract the harness into a shared `tests/unit/` helper module. The golden masters themselves
+  stay inline per suite (hand-authored literals, per the characterization-test rule).
+- **Why deferred:** Until after the Phase 4 merge, so no frozen golden-master gate is touched mid-refactor.
+- **Found by:** Phase 4 (effect chat subtype) review.
+
+### 17. Lang TYPES housekeeping: stale `TYPES.Item.effect` label; no `TYPES.ActiveEffect` map
+
+- **What:** `lang/en.json` `TYPES.Item` still carries an `"effect"` label, but `effect` is no longer an
+  Item subtype (effects became native Active Effects); and there is no `TYPES.ActiveEffect` map for the
+  `effect`/`condition` ActiveEffect subtypes. Both are inert (the stale key is unread; missing AE labels
+  fall back to the type string).
+- **To do:** Remove `TYPES.Item.effect` and add a `TYPES.ActiveEffect` map in the same pass.
+- **Found by:** Phase 4 (effect chat subtype) review.
 
 ## E2E suite speedup — remaining phases
 

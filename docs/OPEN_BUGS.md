@@ -43,6 +43,16 @@ Deferred/known bugs. Todos (planned work) live in `docs/TODO.md`; this file is b
 - **To do:** change the shape default to `resistanceCheck: 'none'` (matches the item template) and
   update the golden's `resistanceCheck` initial from `stringField('')` to `stringField('none')`.
 
+### 4. `report-cards.spec.js` fast-healing apply-confirm e2e flaked once (mechanism unknown)
+
+- **What:** The apply-confirm e2e (`tests/e2e/report-cards.spec.js:410`, "clicking apply heals the actor and
+  partial-merges fastHealing") failed once during a full-suite run on 2026-06-05 — the
+  `fastHealing.total survived the partial-merge update` assertion expected `2`.
+- **Severity:** Flake. It passed in the immediately preceding full run, in a targeted re-run of the file
+  (13/13), and in isolation; no code change is implicated and the mechanism is unknown.
+- **To do:** Watch for recurrence. If it reproduces, capture the message's stored `system.fastHealing` at
+  failure time to determine whether the partial-merge update or the fixture seed raced.
+
 <!--
 Recently resolved: the socket-sync A1/A2 full-run timeout flake was fixed by the e2e Phase 2
 shared-world harness (per-file `clearChat` keeps the world lean). Verified: `socket-sync.spec.js`

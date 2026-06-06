@@ -55,38 +55,23 @@ Creates the message as a typed check subtype: a top-level `type` (`this._getChec
 `{ parameters, results, failuresReRolled, message }` (no `type` field inside `system`). All check data
 travels in `message.system` (a `CheckChatMessageDataModel` subclass), NOT `flags.titan`.
 
-**6. Chat render — dual-path (subtype self-render vs. legacy hook)**
+**6. Chat render — `TitanChatMessage#renderHTML` (the only TITAN chat render path)**
 
-*Subtype path (checks + item cards + the 13 reports):*
 `TitanChatMessage#renderHTML` (src/document/types/chat-message/ChatMessage.js) overrides Foundry's base to
-detect `this.system instanceof TitanChatMessageDataModel`. When true it adds the `titan`/`owner`/dark-mode
-classes to the full `<li>` chrome returned by `super.renderHTML(options)`, calls `_teardownComponent()` to
-unmount any prior mount (the chat log replaces the `<li>` on every update), then mounts `ChatMessageContent`
-(src/document/types/chat-message/ChatMessageContent.svelte) into the `.message-content` div. The bridge and
-handle are stored on `message._svelteComponent = { handle, bridge }`. `_teardownComponent()` is also called
-directly by `OnPreDeleteChatMessage.js` (src/hooks/OnPreDeleteChatMessage.js) for delete-time cleanup.
+detect `this.system instanceof TitanChatMessageDataModel` (every check, item card, report, and the effect
+card). When true it adds the `titan`/`owner`/dark-mode classes to the full `<li>` chrome returned by
+`super.renderHTML(options)`, calls `_teardownComponent()` to unmount any prior mount (the chat log replaces
+the `<li>` on every update), then builds a `new ReactiveDocument(message)` bridge and mounts
+`ChatMessageContent` (src/document/types/chat-message/ChatMessageContent.svelte) into the `.message-content`
+div, passing the bridge as the `documentStore` prop (a name retained from the old API — it is the
+`ReactiveDocument` bridge, not a Svelte store); the shell sets it into context as `'document'`. The bridge
+and handle are stored on `message._svelteComponent = { handle, bridge }`. `_teardownComponent()` is also
+called directly by `OnPreDeleteChatMessage.js` (src/hooks/OnPreDeleteChatMessage.js) for delete-time cleanup.
 
-*Legacy path (flags.titan messages — only the effect card remains):*
-Foundry fires `renderChatMessageHTML` after inserting the message HTML. `onRenderChatMessageHTML`
-(src/hooks/OnRenderChatMessageHTML.js) early-returns for any message whose `system instanceof
-TitanChatMessageDataModel` (this guard catches every check, every item card, AND every report, so they never
-reach the legacy hook). As a second safety layer, check type strings (`attributeCheck`, `resistanceCheck`,
-`attackCheck`, `castingCheck`, `itemCheck`), item type strings (`weapon`, `armor`, `spell`, `ability`,
-`shield`, `equipment`, `commodity`), and the 13 report type strings are all absent from the frozen
-`TITAN_CHAT_MESSAGE_TYPES` set (only `effect` remains) — legacy `flags.titan` check, item, and report messages
-(pre-subtype) are intentionally deprecated and render blank rather than being routed to the now-`system`-reading
-components.
-For remaining messages it checks
-`message.flags.titan.type` against the frozen `TITAN_CHAT_MESSAGE_TYPES` set; if it matches (only `effect`), it builds a
-`new ReactiveDocument(message)` bridge and mounts `ChatMessageShell.svelte`
-(src/document/types/chat-message/ChatMessageShell.svelte) into the `.message-content` element via Svelte 5
-`mount()`, passing the bridge as the `documentStore` prop (a name retained from the old API — it is the
-`ReactiveDocument` bridge, not a Svelte store). The mount handle and bridge are stored on
-`message._svelteComponent = { handle, bridge }` for teardown. The shell sets the bridge into context as
-`'document'` and `selectComponent()` looks up the correct component for the type (e.g.
-`AttributeCheckChatMessage`), which is then rendered via `{@const}` (not `<svelte:component>`).
-`OnPreDeleteChatMessage` calls `message._teardownComponent()` uniformly; `TitanChatMessage#_teardownComponent`
-handles both old and new mounts since both store their handle on `_svelteComponent`.
+Non-TITAN messages (no `TitanChatMessageDataModel` system) early-return the chrome unchanged, except the
+`titan-dark-mode` class is added when the `darkModeChatMessages` setting is `'all'`. There is NO
+`renderChatMessageHTML` hook in the system. Historical pre-subtype `flags.titan` messages take this
+early-return and render with empty content (deliberately deprecated, never retrofitted).
 
 **7. Check chat component — e.g. `AttributeCheckChatMessage.svelte`**
 (src/check/types/attribute-check/chat-message/AttributeCheckChatMessage.svelte)
@@ -312,8 +297,8 @@ All reports are created via `CharacterDataModel._whisperOwners(reportData, userI
 destructures `const { type, ...system } = messageData` and calls `ChatMessage.create` with that `type` at the
 message root and the rest as the typed `system` payload (plus `whisper: getOwners(actor)`), so Foundry selects
 the matching report `ChatMessage` subtype (e.g. `'turnStartReport'`, `'turnEndReport'`, `'effectsExpiredReport'`)
-and the card self-renders via `TitanChatMessage#renderHTML`. Reports are no longer routed through the legacy
-`ChatMessageShell.svelte` hook. Report messages are visible only to document owners plus the GM.
+and the card self-renders via `TitanChatMessage#renderHTML`. Report messages are visible only to document
+owners plus the GM.
 
 **5. Revert — `TitanCombat.previousTurn` / `onCombatPreviousTurn`**
 Each revert handler is the inverse of its forward counterpart (see the turn-start/turn-end steps above).

@@ -61,10 +61,11 @@ elements, constructs a typed `CheckParameters` object, optionally opens a `Titan
 user options, then instantiates the appropriate `TitanCheck` subclass (`AttributeCheck`, `AttackCheck`, etc.)
 and calls `evaluateCheck()`. The check rolls dice, applies expertise, and computes type-specific results; all
 output travels in `message.system` as a first-class `ChatMessage` subtype when `ChatMessage.create` is called.
-Checks, item cards, and the 13 report cards self-render via `TitanChatMessage#renderHTML` (which mounts
-`ChatMessageContent.svelte` and dispatches on the leaf DataModel's `get component()`). Only the `effect`
-chat card still travels in `flags.titan` and renders through the legacy `OnRenderChatMessageHTML` hook +
-`ChatMessageShell.svelte` (Phase 4 will retire both).
+ALL TITAN chat messages — the 5 checks, the 7 item cards, the 13 report cards, and the `effect` card — are
+first-class self-rendering subtypes via `TitanChatMessage#renderHTML` (which mounts `ChatMessageContent.svelte`
+and dispatches on the leaf DataModel's `get component()`); no chat payload travels in `flags.titan`, and there
+is no legacy chat render hook or shell. `TitanActiveEffectDataModel` and the effect card's
+`EffectChatMessageDataModel` build their schemas from the shared `createEffectSystemTemplate()` single source.
 
 All sheets follow a three-layer pattern: a JS application class extending Foundry v14 `DocumentSheetV2`
 (`TitanDocumentSheet` and its subclasses) builds a `ReactiveDocument` bridge around the Foundry document and

@@ -102,11 +102,10 @@ management). Data model classes hold the schema, field validation, and derived-d
   `flags['visual-active-effects'].data.content` with the enriched native `description`; `_preUpdate`
   re-syncs that flag whenever `description` changes. Enrichment uses
   `foundry.applications.ux.TextEditor.implementation.enrichHTML(html, { secrets: true })` (v14 async API).
-  `sendToChat` spreads `getRollData()` flat into `flags.titan`, then sets `type: 'effect'` and
-  `description`. This puts `check`, `customTrait`, and `duration` at the `flags.titan` root, where both
-  the effect chat components and the item-check roll path resolve them. (Effect chat messages are still
-  on the legacy `flags.titan` hook path; items have since moved to first-class `type`+`system`
-  chat-message subtypes via `TitanItem.buildChatMessageData` — the effect conversion is a later phase.)
+  `buildChatMessageData()` (pure, byte-parallel to `TitanItem`'s) returns `{ type: 'effect', system }` —
+  the prepared `getRollData()` snapshot minus the document-level `id`/`type`, plus `name`/`img` as label
+  metadata; the chat subtype is hardcoded `'effect'` (a condition's own subtype is not a registered chat
+  subtype). `sendToChat` posts that payload as a first-class chat-message subtype, NOT `flags.titan`.
   The class also carries check and custom-trait mutators with the same bodies as `TitanItem` (`addCheck`
   / `deleteCheck` / `addCustomTrait` / `editCustomTrait` / `deleteCustomTrait`), ported inline (not via a
   shared mixin); they operate on `system.check` / `system.customTrait` via `this.update(...)`, notify the
@@ -114,15 +113,19 @@ management). Data model classes hold the schema, field validation, and derived-d
   `AddCustomTraitDialog` / `EditCustomTraitDialog` (passed `this`). They are invoked by the reused item
   Checks tab and Custom-Traits sidebar via `document.data.*`. Effect chat components
   (`EffectChatMessage.svelte`, `EffectChatStats.svelte`) live in
-  `src/document/types/active-effect/chat-message/`; `ChatMessageShell.svelte` maps the `effect` chat-card
-  type to `EffectChatMessage`.
+  `src/document/types/active-effect/chat-message/` beside `EffectChatMessageDataModel.js`, whose
+  `get component()` returns `EffectChatMessage`.
 - `TitanActiveEffectDataModel` (`src/document/types/active-effect/TitanActiveEffectDataModel.js`)
   extends `RulesElementMixin(TitanDataModel)`. Registered as `CONFIG.ActiveEffect.dataModels.effect`.
   Beyond the mixin's `rulesElement` array, its schema adds a custom `duration` ({ type, remaining,
-  initiative, custom }), a `check` array, a `customTrait` array, and a `changes` ArrayField whose
+  initiative, custom }), a `check` array, and a `customTrait` array — all generated via
+  `buildSchemaFromShape(createEffectSystemTemplate())` (`EffectSystemTemplate.js`, the single-source
+  shape also feeding the effect chat-message snapshot schema; parity gated by
+  `tests/unit/EffectSchemaEquivalence.test.js`) — plus a hand-built `changes` ArrayField whose
   element is a `SchemaField` ({ key, value, mode, priority, type, phase }) — Foundry v14's
   `Game##verifyActiveEffectModels` requires every ActiveEffect type data model to define `changes` as
-  an ArrayField of SchemaField exposing a numeric `priority` and string `type`/`phase`; TITAN keeps a
+  an ArrayField of SchemaField exposing a numeric `priority` and string `type`/`phase` (a shape cannot
+  express that typed element, so `changes` stays hand-built); TITAN keeps a
   permissive shape (no core `type` validator) while satisfying that verifier. It provides `isExpired` /
   `isActive` (`!parent?.disabled`, for all duration types) / `isCombatEffect` getters and
   `_getInitialDocumentData` (captures the owning actor's active-combat initiative via
@@ -220,8 +223,8 @@ stored chat-message data.
 **Chat message data models**
 
 A `TitanDataModel` hierarchy provides first-class chat message subtypes (the five checks, the seven item
-cards, and the 13 report cards are registered and active; their data travels in `message.system`, not
-`flags.titan`). Only the `effect` card remains on the legacy `flags.titan` hook path (Phase 4).
+cards, the 13 report cards, and the effect card are all registered and active; their data travels in
+`message.system`, not `flags.titan`). There is no legacy chat render path.
 
 - `TitanChatMessageDataModel` (`src/document/types/chat-message/ChatMessageDataModel.js`) extends
   `TitanDataModel`. Universal base for all TITAN chat message type data models; declares the
@@ -274,14 +277,21 @@ cards, and the 13 report cards are registered and active; their data travels in 
   `CONFIG.ChatMessage.dataModels` + `system.json` `documentTypes.ChatMessage` + `lang/en.json`
   `TYPES.ChatMessage`. Schema parity is gated by `tests/unit/ReportChatMessageSchemaEquivalence.test.js`.
   (Restart-gated: subtype registration happens at world load.)
+- `EffectChatMessageDataModel` (`src/document/types/active-effect/chat-message/EffectChatMessageDataModel.js`)
+  extends `TitanChatMessageDataModel`. The `effect` chat-card subtype: its schema is the effect snapshot —
+  the shared `createEffectSystemTemplate()` plus the rules-element fragment via `buildSchemaFromShape`, plus
+  `description`/`name`/`img` label fields. The producer is `TitanActiveEffect.sendToChat()` →
+  `buildChatMessageData()` (`{ type: 'effect', system }`); the card (`EffectChatMessage.svelte`) reads
+  `document.data.system.X` and self-renders via `TitanChatMessage#renderHTML`. Registered in `OnceInit.js`
+  `CONFIG.ChatMessage.dataModels` + `system.json` `documentTypes.ChatMessage` + `lang/en.json`
+  `TYPES.ChatMessage`. Schema parity with the live AE data model is gated by
+  `tests/unit/EffectSchemaEquivalence.test.js`.
 
 **Svelte shells**
 
 `ChatMessageContent.svelte` is the root Svelte component mounted by `TitanChatMessage#renderHTML` for every
-subtyped TITAN chat message (checks, item cards, reports); it reads the leaf DataModel's `get component()` via
-`selectComponent()` and renders it with `{@const}`. `ChatMessageShell.svelte` is the LEGACY shell, mounted by
-`OnRenderChatMessageHTML.js` only for the remaining `flags.titan` `effect` card; it dispatches on
-`document.data.flags.titan.type` via a type→component map (Phase 4 deletes it).
+subtyped TITAN chat message (checks, item cards, reports, effect); it reads the leaf DataModel's
+`get component()` via `selectComponent()` and renders it with `{@const}`.
 
 **Check chat-message components** (`src/check/chat-message/`)
 
@@ -607,13 +617,12 @@ typed `CheckChatMessageDataModel` subtype: `{ parameters, results, failuresReRol
 passed to `ChatMessage.create` with the check `type` — NOT `flags.titan`.
 
 The newly created `ChatMessage` is handled by `TitanChatMessage#renderHTML`, which (for any subtyped
-message — checks, item cards, reports) mounts `ChatMessageContent.svelte` and dispatches on the leaf
-DataModel's `get component()` — a check display (`src/check/chat-message/` components) or a report card
-(`src/document/types/chat-message/report/types/`). Report cards include apply buttons that call back into
+message — checks, item cards, reports, effect) mounts `ChatMessageContent.svelte` and dispatches on the leaf
+DataModel's `get component()` — a check display (`src/check/chat-message/` components), a report card
+(`src/document/types/chat-message/report/types/`), or the effect card
+(`src/document/types/active-effect/chat-message/`). Report cards include apply buttons that call back into
 `CharacterDataModel` methods (via `SocketManager` when the acting user is not the document owner) to commit
-automation outcomes such as fast healing or persistent damage, then update `message.system`. Only the
-`effect` card still routes through the legacy `ChatMessageShell.svelte` + `OnRenderChatMessageHTML` hook
-(reading `flags.titan`); Phase 4 retires that path.
+automation outcomes such as fast healing or persistent damage, then update `message.system`.
 
 `TitanDocumentSheet` (extending Foundry v14 `DocumentSheetV2`) wraps the document in a
 `ReactiveDocument` bridge and mounts `DocumentSheetShell.svelte` with Svelte 5 `mount()`, making the

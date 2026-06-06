@@ -161,9 +161,8 @@ runes mode). Shells select a component class and render it with `{@const}`:
 {/if}
 ```
 
-`ChatMessageContent.svelte` (the subtype render path for checks/items/reports) selects the leaf
-DataModel's `get component()` and renders it this way; the legacy `ChatMessageShell.svelte` (now only the
-`effect` card) dispatches on `document.data.flags.titan.type` via a type→component map the same way.
+`ChatMessageContent.svelte` (the render path for every TITAN chat subtype — checks, item cards, reports,
+effect) selects the leaf DataModel's `get component()` and renders it this way.
 
 **Transitions** — Svelte built-ins from `'svelte/transition'` (`slide`, `fade`), e.g.
 `<li transition:slide|local>`. The TyphonJS `slideFade` transition is no longer used.
@@ -380,8 +379,9 @@ static `actions` map. To refresh a dynamic control's icon/label after a state ch
 
 **Vitest harness** — `vitest.config.mjs` (project root) configures Vitest 2 with `happy-dom`, Svelte 5
 (`@sveltejs/vite-plugin-svelte` with `hot: false`), `svelte-preprocess` (same SCSS `prependData` as
-`vite.config.mjs`), and the `~/` / `$fonts/` aliases. Tests live in `tests/unit/**/*.test.js`; there is NO
-test code under `src/`.
+`vite.config.mjs`), and the `~/` / `$fonts/` aliases. `hookTimeout` is 60 s — the schema-equivalence
+golden-master suites' `beforeAll` dynamic imports are transform-heavy (Svelte compiles) and exceed the 10 s
+default under full parallelism. Tests live in `tests/unit/**/*.test.js`; there is NO test code under `src/`.
 
 **Foundry globals mock** — `tests/setup.js` (loaded as Vitest `setupFiles`) installs:
 - `globalThis.foundry = { abstract: { Document: MockDocument }, utils: { mergeObject } }` — a minimal
@@ -406,7 +406,7 @@ coverage map, the wrapper-forwarding rules, and the selector each component reso
 (`playwright.config.mjs`, `baseURL: http://localhost:30000`; env `FOUNDRY_USER` / optional
 `FOUNDRY_PASSWORD`). Specs live in `tests/e2e/`: `render-smoke.spec.js` (renders every document type's
 sheet, asserts zero uncaught page errors), `interaction-rolls.spec.js` (each `roll<Type>Check` posts a
-chat message of the expected `flags.titan.type` and the card renders), and `interaction-dialogs.spec.js`
+chat message of the expected subtype (`message.type`) and the card renders), and `interaction-dialogs.spec.js`
 (check/confirm/trait/edit-UUID dialogs mount). `tests/e2e/fixtures.js` provides `login`, `renderSheet`,
 and `ensureDocument` (creates missing world fixtures; `renderSheet` takes an optional 4th `errors`
 collector — see the shared-world harness below). Drives the real built system at the repo root, so it
@@ -419,9 +419,17 @@ attachPageErrors(page); await login(page); await clearChat(page); })`, `test.aft
 closeAllApps(page); errors.length = 0; })`, and `test.afterAll(async () => { await page?.close(); })`.
 Tests and `beforeEach`/`afterEach` hooks are `async () =>` (no `{ page }` fixture destructure) and use the
 closure `page`. The helpers live in `tests/e2e/world.js`: `closeAllApps(page)` closes transient apps
-(sheets/dialogs/HUDs) but DELIBERATELY KEEPS core UI singletons (those held on `ui[key]` for each
-`key in CONFIG.ui` — `Sidebar`, `ChatLog`, `Hotbar`, the `titanEffects` tray, …); closing them tears down
-DOM that the sidebar tab-switch lifecycle depends on and crashes any later sidebar-activating test.
+(sheets/dialogs/HUDs) but DELIBERATELY KEEPS three classes of app — (1) core UI singletons (those held on
+`ui[key]` for each `key in CONFIG.ui` — `Sidebar`, `ChatLog`, `Hotbar`, the `titanEffects` tray, …);
+closing them tears down DOM that the sidebar tab-switch lifecycle depends on and crashes any later
+sidebar-activating test; (2) nested sub-apps OWNED by a kept singleton — any app whose `options.directory`
+is in the keep-set (the v14 `PlaceableDirectory` caches per-type `PlaceableTab` apps constructed with
+`{ directory: ui.placeables }`; closing one detaches the element its owner re-queries on every later
+render, so each subsequent token create/delete crashes `PlaceableDirectory#_renderTab` with a
+`null.replaceWith` TypeError); and (3) the canvas HUD container (`canvas.hud`, element id `hud` — NOT in
+`CONFIG.ui`): it renders only during canvas draw, and `BasePlaceableHUD#_insertElement` and `ChatBubbles`
+re-query its DOM with no null guard, so closing it crashes the first later test that opens a token HUD or
+emits a chat bubble.
 `clearChat(page)` deletes all chat messages in `beforeAll` (per-file world reset — keeps the world lean so
 GM→player socket replication does not time out). `attachPageErrors(page)` wires ONE `pageerror` listener
 and returns the shared `errors` array; per-test `page.on('pageerror', …)` is banned (it would stack on the
@@ -459,8 +467,11 @@ the `/join` form. The smoke test is `tests/e2e/multi-client.spec.js`.
 
 **npm scripts** — `npm test` runs `vitest run` (single pass); `npm run test:watch` runs Vitest in watch
 mode; `npm run test:e2e` runs the Playwright suite above (its `global-setup.js` builds the test bundles into
-`test/build/` first). `npm run build:e2e` (`vite build --config vite.probe.config.mjs`) builds just the
-standalone component-probe IIFE (see next entry).
+`test/build/` first) and is THROTTLED by default — it wraps `playwright test` in
+`tests/e2e/run-e2e-throttled.ps1` (BelowNormal process priority, affinity limited to half the cores; filter
+args pass through) so a full run does not starve the machine. `npm run test:e2e:fast` is the unthrottled
+`playwright test` escape hatch. `npm run build:e2e` (`vite build --config vite.probe.config.mjs`) builds just
+the standalone component-probe IIFE (see next entry).
 
 **Component-probe harness (externalized, test-only)** — `src/test-probe/` lets Playwright mount a single base
 Svelte primitive in isolation inside the live Foundry runtime, with controlled props, to assert its
@@ -540,10 +551,10 @@ flag. `tests/e2e/integration-manifest.spec.js` (8 tests, Phase 3c) guards agains
 
 - Every subtype declared in `documentTypes` has a registered `CONFIG` data model (and vice versa), including
   `ChatMessage`: the bidirectional guard now covers `Actor`, `Item`, `ActiveEffect`, and `ChatMessage`.
-- `ChatMessage` now declares 5 check subtypes (`attributeCheck`, `resistanceCheck`, `attackCheck`,
-  `castingCheck`, `itemCheck`), registered in `CONFIG.ChatMessage.dataModels` (set in `OnceInit.js`). The old
+- `ChatMessage` declares all 26 TITAN chat subtypes (the 5 checks, the 7 item cards, the 13 reports, and
+  `effect`), registered in `CONFIG.ChatMessage.dataModels` (set in `OnceInit.js`). The old
   `'ChatMessage declares no document subtypes'` test was removed and replaced by the bidirectional declared ==
-  registered guard above. Later phases will add item/report/effect subtypes.
+  registered guard above.
 - Every declared pack resolves via `game.packs.get(`titan.${name}`)` with matching `metadata.type` and
   `metadata.packageName === 'titan'`.
 - Grid and socket config (`game.system.grid.units`/`.diagonals` and `game.system.socket` equal the manifest

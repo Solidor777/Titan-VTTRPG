@@ -58,12 +58,9 @@
   registers the `hotbarDrop` sub-hook via `OnHotbarDrop.js`.
 - `OnCombatNextTurn.js` / `OnCombatPreviousTurn.js` delegate to actor system methods (`onTurnStart`, `onTurnEnd`,
   `onInitiativeAdvanced`) on `TitanActor`.
-- `OnRenderChatMessageHTML.js` is the LEGACY render path, now serving only the `effect` chat card: it early-returns
-  for any message whose `system instanceof TitanChatMessageDataModel` (checks, item cards, and the 13 report cards
-  self-render via `TitanChatMessage#renderHTML`), and otherwise mounts `ChatMessageShell.svelte` (from
-  `src/document/types/chat-message/`) onto messages whose `flags.titan.type` is in the frozen
-  `TITAN_CHAT_MESSAGE_TYPES` set (now `{ 'effect' }` only) via Svelte 5 `mount()`, passing a `ReactiveDocument`
-  bridge as the `documentStore` prop. Phase 4 will delete this hook and `ChatMessageShell.svelte`.
+- There is NO `renderChatMessageHTML` hook: every TITAN chat message (checks, item cards, reports, effect) is a
+  first-class subtype that self-renders via `TitanChatMessage#renderHTML` (see `data-flow.md`), which also applies
+  the dark-mode-`'all'` styling class to non-TITAN messages.
 - `OnPreDeleteChatMessage.js` fires before a chat message is deleted (e.g., to clean up associated data).
 - `OnGetChatLogEntryContext.js` adds custom entries to the chat-log context menu.
 - Directory-context hooks (`OnGetActorDirectoryEntryContext`, `OnGetItemDirectoryEntryContext`) add UUID
@@ -162,10 +159,9 @@ distinct. Vitest is configured in `vitest.config.mjs` (`environment: 'happy-dom'
 - `"esmodules": ["dist/index.js"]` — Foundry loads the compiled ES module from `dist/`.
 - `"styles": ["dist/style.css"]` — Foundry loads the compiled CSS from `dist/`.
 - Document types declared: Actor (`player`, `npc`), Item (`ability`, `armor`, `commodity`, `equipment`,
-  `shield`, `spell`, `weapon`), ActiveEffect (`effect`, `condition`), ChatMessage (`attributeCheck`,
-  `resistanceCheck`, `attackCheck`, `castingCheck`, `itemCheck`). The five ChatMessage check subtypes are
-  fully registered: declared in `system.json`, mapped to data models via `CONFIG.ChatMessage.dataModels` in
-  `OnceInit.js`, and labelled under `TYPES.ChatMessage` in `lang/en.json`. Later phases will add
-  item/report/effect subtypes.
+  `shield`, `spell`, `weapon`), ActiveEffect (`effect`, `condition`), ChatMessage (all 26 TITAN chat
+  subtypes: the 5 checks, the 7 item cards, the 13 reports, and `effect`). Every ChatMessage subtype is
+  fully registered: declared in `system.json`, mapped to a data model via `CONFIG.ChatMessage.dataModels` in
+  `OnceInit.js`, and labelled under `TYPES.ChatMessage` in `lang/en.json`.
 - `"socket": true` enables the system socket used by `SocketManager`.
 - Foundry compatibility (`system.json`): minimum v13, verified v14, maximum v14.
