@@ -94,7 +94,11 @@
          {:else}
             <!--Check Button-->
             <div class="button">
-               <ItemCheckButton {check} onclick={() => rollItemCheck(idx)}/>
+               <ItemCheckButton
+                  label={check.label}
+                  attribute={check.attribute}
+                  onclick={() => rollItemCheck(idx)}
+               />
             </div>
          {/if}
 
