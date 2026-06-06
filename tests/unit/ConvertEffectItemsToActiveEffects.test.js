@@ -187,6 +187,24 @@ describe('buildEffectData (raw active normalization + provenance)', () => {
       expect(buildEffectData(sparse).disabled).toBe(false);
    });
 
+   it('treats an explicit null active as the schema default (enabled)', () => {
+      /** @type {object} - Permanent source, null active: BooleanField cleans null to initial true; ?? true matches. */
+      const nullActive = makeLegacyItemSource();
+      nullActive.system.duration.type = 'permanent';
+      nullActive.system.active = null;
+
+      expect(buildEffectData(nullActive).disabled).toBe(false);
+   });
+
+   it('casts a numeric zero active to false like BooleanField._cast', () => {
+      /** @type {object} - Permanent source, numeric 0 active: Boolean(0) is false, matching BooleanField._cast. */
+      const zeroActive = makeLegacyItemSource();
+      zeroActive.system.duration.type = 'permanent';
+      zeroActive.system.active = 0;
+
+      expect(buildEffectData(zeroActive).disabled).toBe(true);
+   });
+
    it('passes missing check/customTrait through as undefined (filled by schema initials at creation)', () => {
       /** @type {object} - A template-era source lacking the later-added check and customTrait fields. */
       const sparse = makeLegacyItemSource();

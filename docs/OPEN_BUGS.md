@@ -118,6 +118,20 @@ Deferred/known bugs. Todos (planned work) live in `docs/TODO.md`; this file is b
   extension in `docs/superpowers/specs/2026-06-06-pack-effect-item-conversion-design.md`.
 - **Found by:** brainstorm exploration for TODO #6, 2026-06-06 (verified against the v14 source).
 
+### 9. Effect-item converter deletes all legacy sources even if a third-party hook vetoed a creation
+
+- **What:** If a third-party `preCreateActiveEffect` hook vetoes an individual replacement creation,
+  `createEmbeddedDocuments` resolves with fewer documents and `convertActor`
+  (`src/helpers/migration/ConvertEffectItemsToActiveEffects.js`) still deletes ALL legacy effect-item sources —
+  permanently losing the vetoed effect's data. Pre-existing hazard: the original converter had the identical
+  create-then-delete shape. The new `convertedFromItem` stamps make a cheap closure possible (delete only sources
+  whose stamp has a surviving replacement, or assert `created.length === sourcesToCreate.length`).
+- **Severity:** Low / latent — requires a third-party module vetoing AE creation during the boot-path conversion;
+  no such module in use.
+- **To do:** pending user decision — fix on the `feat/pack-effect-item-conversion` branch (small spec delta) or
+  accept as residual.
+- **Found by:** Task 2 quality review, 2026-06-06.
+
 <!--
 Recently resolved: the socket-sync A1/A2 full-run timeout flake was fixed by the e2e Phase 2
 shared-world harness (per-file `clearChat` keeps the world lean). Verified: `socket-sync.spec.js`

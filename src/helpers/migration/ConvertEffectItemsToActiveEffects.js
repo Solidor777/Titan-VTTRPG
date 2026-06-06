@@ -6,8 +6,8 @@ import error from '~/helpers/utility-functions/Error.js';
  * Maps the legacy item's native and system fields onto the 'effect' Active Effect subtype. The old item used a
  * split active/duration model; under the new universal-disabled model an effect starts ENABLED unless it was an
  * explicitly-deactivated permanent effect. The migrated duration (including its captured initiative) is carried
- * through so the document's _preCreate handler will not override the combat initiative. The status icon and Visual
- * Active Effects description flag are intentionally NOT set here; TitanActiveEffect._preCreate seeds them.
+ * through so the document's _preCreate handler will not override the combat initiative. The status icon is
+ * intentionally NOT set here; TitanActiveEffect._preCreate seeds it.
  * Operates on raw source entries (actor._source.items elements) rather than Item instances, because the 'effect'
  * Item subtype is no longer registered: legacy items fail strict construction, land in invalidDocumentIds, and are
  * invisible to actor.items iteration. Raw source bypasses schema casting, so the active value is normalized here
@@ -20,7 +20,7 @@ export function buildEffectData(itemSource) {
    /** @type {object} - The legacy item's raw system data, the source of all migrated fields. */
    const system = itemSource.system;
 
-   /** @type {boolean|string} - The uncast raw active value, defaulted like the legacy schema (missing → true). */
+   /** @type {boolean|string|number} - The uncast raw active value; null/missing takes the legacy default of true. */
    const rawActive = system.active ?? true;
 
    /** @type {boolean} - The normalized active state, mirroring BooleanField casting for template-era strings. */
