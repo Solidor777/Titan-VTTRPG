@@ -1,44 +1,78 @@
 <script>
-   import localize from '~/helpers/utility-functions/Localize.js';
    import { getContext } from 'svelte';
-   import { ATTACK_TRAIT_DESCRIPTIONS } from '~/document/types/item/types/weapon/AttackTraits.js';
+   import localize from '~/helpers/utility-functions/Localize.js';
+   import camelize from '~/helpers/utility-functions/Camelize.js';
+   import pushUnique from '~/helpers/utility-functions/PushUnique.js';
    import DocumentOwnerButton from '~/document/svelte-components/DocumentOwnerButton.svelte';
-   import TraitTag from '~/helpers/svelte-components/tag/TraitTag.svelte';
+   import AttackTags from '~/document/types/item/types/weapon/components/AttackTags.svelte';
    import IconStatTag from '~/helpers/svelte-components/tag/IconStatTag.svelte';
-   import IconTag from '~/helpers/svelte-components/tag/IconTag.svelte';
    import {
       ACCURACY_ICON,
-      DAMAGE_ICON,
       DICE_ICON,
       EXPERTISE_ICON,
       MELEE_ICON,
-      RANGE_ICON,
       TRAINING_ICON,
    } from '~/system/Icons.js';
-   import Tag from '~/helpers/svelte-components/tag/Tag.svelte';
-   import AttributeCheckTag from '~/helpers/svelte-components/tag/AttributeCheckTag.svelte';
-
-   /** @type {object} Reference to the reactive Document store. */
-   const document = getContext('document');
 
    /**
     * @typedef {object} CharacterSheetWeaponAttackProps
-    * @property {TitanItem} [item] The Item this component belongs to.
     * @property {number} [attackIdx] The index of the attack in the attacks array.
     */
 
    /** @type {CharacterSheetWeaponAttackProps} */
-   const { item = undefined, attackIdx = undefined } = $props();
+   const { attackIdx = undefined } = $props();
 
-   // Attack reference, read reactively through document.data (its identity changes on every update).
-   /** @type {object} The current attack data. */
-   const attack = $derived(document.data.items.get(item._id)?.system.attack[attackIdx]);
+   /** @type {object} The embedded weapon bridge provided by EmbeddedDocumentProvider. */
+   const document = getContext('document');
 
-   /** @type {boolean} Whether this Weapon is multi attacking, read reactively through document.data. */
-   const multiAttack = $derived(document.data.items.get(item._id)?.system.multiAttack);
+   /** @type {object} The owning sheet's actor bridge (never shadowed by providers). */
+   const sheetDocument = getContext('sheetDocument');
 
-   /** @type {boolean} Whether this Weapon is equipped, read reactively through document.data. */
-   const equipped = $derived(document.data.items.get(item._id)?.system.equipped);
+   /** @type {object|undefined} The current attack data, re-read reactively through the embedded bridge. */
+   const attack = $derived(document.data?.system.attack[attackIdx]);
+
+   /** @type {boolean|undefined} Whether this Weapon is multi attacking, read through the embedded bridge. */
+   const multiAttack = $derived(document.data?.system.multiAttack);
+
+   /** @type {boolean|undefined} Whether this Weapon is equipped, read through the embedded bridge. */
+   const equipped = $derived(document.data?.system.equipped);
+
+   /** @type {string[]} The attack's trait names, mirroring the engine's attack-trait extraction. */
+   const attackTraitNames = $derived(attack ? attack.trait.map((trait) => trait.name) : []);
+
+   /** @type {string[]} Unique camelized custom-trait names from the weapon then the attack (engine recipe). */
+   const customTraitNames = $derived.by(() => {
+      /** @type {string[]} The collected unique camelized names. */
+      const names = [];
+      for (const trait of document.data?.system.customTrait ?? []) {
+         pushUnique(names, camelize(trait.name));
+      }
+      for (const trait of attack?.customTrait ?? []) {
+         pushUnique(names, camelize(trait.name));
+      }
+      return names;
+   });
+
+   /**
+    * Reads the actor's conditional check modifier for one aspect of this attack, mirroring the engine
+    * call shape used by initializeAttackCheckOptions.
+    * @param {string} modifierType - The modifier type to read ('dice' | 'expertise' | 'damage').
+    * @returns {number} The modifier for this aspect of the attack check.
+    */
+   function getCheckMod(modifierType) {
+      return sheetDocument.data.system.getAttackCheckMod(
+         modifierType,
+         attack.attribute,
+         attack.skill,
+         multiAttack,
+         attack.type,
+         attackTraitNames,
+         customTraitNames,
+      );
+   }
+
+   /** @type {number} Actor-derived damage modifier added to the displayed attack damage. */
+   const damageMod = $derived(getCheckMod('damage'));
 
    // Calculate dice pool.
    /** @type {number} Calculated total dice pool for the attack. */
@@ -46,14 +80,9 @@
 
       // Get base dice.
       let pool =
-         document.data.system.attribute[attack.attribute].value +
-         document.data.system.skill[attack.skill].training.value +
-         document.data.system.getAttackCheckMod(
-            'expertise',
-            item,
-            attack,
-            multiAttack,
-         );
+         sheetDocument.data.system.attribute[attack.attribute].value +
+         sheetDocument.data.system.skill[attack.skill].training.value +
+         getCheckMod('dice');
 
       // Cut the dice in half if multi attacking.
       if (multiAttack) {
@@ -61,7 +90,7 @@
          /** @type {boolean} Whether the flurry trait is active. */
          let flurry = false;
          for (const trait of attack.trait) {
-            if (trait.name === flurry) {
+            if (trait.name === 'flurry') {
                flurry = true;
             }
          }
@@ -80,13 +109,8 @@
 
       // Get base expertise.
       let exp =
-         document.data.system.skill[attack.skill].expertise.value +
-         document.data.system.getAttackCheckMod(
-            'expertise',
-            item,
-            attack,
-            multiAttack,
-         );
+         sheetDocument.data.system.skill[attack.skill].expertise.value +
+         getCheckMod('expertise');
 
       // Cut the expertise in half if multi attacking.
       if (multiAttack) {
@@ -95,9 +119,6 @@
 
       return exp;
    });
-
-   /** @type {object} Descriptions of each attack trait. */
-   const traitDescriptions = ATTACK_TRAIT_DESCRIPTIONS;
 </script>
 
 <div class="attack">
@@ -106,8 +127,8 @@
       {#if equipped}
          <DocumentOwnerButton
             onclick={() =>
-               document.data.system.requestAttackCheck({
-                  itemId: item._id,
+               sheetDocument.data.system.requestAttackCheck({
+                  itemId: document.data._id,
                   attackIdx: attackIdx,
                })}
          >
@@ -137,34 +158,13 @@
          />
       </div>
 
-      <!--Damage-->
-      <div class="stat">
-         <IconStatTag
-            icon={DAMAGE_ICON}
-            label={localize('damage')}
-            value={`${
-               attack.damage +
-               document.data.system.getAttackCheckMod(
-                  'damage',
-                  item,
-                  attack,
-                  multiAttack,
-               )
-            }${
-               attack.plusExtraSuccessDamage
-                  ? ` + ${localize('extraSuccesses.short')}`
-                  : ''
-            }`}
-         />
-      </div>
-
       <!--Training-->
-      {#if document.data.system.skill[attack.skill].training.value !== 0}
+      {#if sheetDocument.data.system.skill[attack.skill].training.value !== 0}
          <div class="stat">
             <IconStatTag
-               label={localize('training')}
-               value={document.data.system.skill[attack.skill].training.value}
                icon={TRAINING_ICON}
+               label={localize('training')}
+               value={sheetDocument.data.system.skill[attack.skill].training.value}
             />
          </div>
       {/if}
@@ -173,59 +173,18 @@
       {#if expertise !== 0}
          <div class="stat">
             <IconStatTag
+               icon={EXPERTISE_ICON}
                label={localize('expertise')}
                value={expertise}
-               icon={EXPERTISE_ICON}
             />
          </div>
       {/if}
 
-      <!--Type-->
-      <div class="stat">
-         <IconTag
-            icon={attack.type === 'melee' ? MELEE_ICON :  ACCURACY_ICON}
-            label={localize(attack.type)}
-         />
-      </div>
-
-      <!--Range-->
-      {#if attack.range !== 1}
-         <div class="stat">
-            <IconStatTag
-               label={localize('range')}
-               value={attack.range}
-               icon={RANGE_ICON}
-            />
-         </div>
-      {/if}
-
-      <!--Attribute and skill-->
-      <div class="stat">
-         <AttributeCheckTag
-            attribute={attack.attribute}
-            skill={attack.skill}
-         />
-      </div>
-
-      <!--Traits-->
-      {#each attack.trait as trait}
-         <div class="stat">
-            <TraitTag
-               label={localize(trait.name)}
-               value={trait.value}
-               tooltip={traitDescriptions[trait.name]}
-            />
-         </div>
-      {/each}
-
-      <!--Custom Traits-->
-      {#each attack.customTrait as trait}
-         <div class="stat">
-            <Tag tooltip={{ text: trait.description, localize: false }}>
-               {trait.name}
-            </Tag>
-         </div>
-      {/each}
+      <!--Intrinsic attack tags (shared component; damage carries the actor-derived modifier)-->
+      <AttackTags
+         {damageMod}
+         idx={attackIdx}
+      />
    </div>
 </div>
 
