@@ -7,14 +7,13 @@
 
    /**
     * @typedef {object} CharacterSheetItemProps
-    * @property {TitanItem} [item] Reference to the Item document.
     * @property {boolean} [isExpanded] Whether this Item is currently expanded.
     * @property {import('svelte').Snippet} [controls] Controls content rendered in the header controls area.
     * @property {import('svelte').Snippet} [children] Expandable content rendered when the item is expanded.
     */
 
    /** @type {CharacterSheetItemProps} */
-   let { item = undefined, isExpanded = $bindable(undefined), controls, children } = $props();
+   let { isExpanded = $bindable(undefined), controls, children } = $props();
 </script>
 
 <div class="item">
@@ -23,12 +22,12 @@
       <div class="label">
          <!--Image-->
          <div class="image">
-            <CharacterSheetItemImage {item}/>
+            <CharacterSheetItemImage/>
          </div>
 
          <!--Expand button-->
          <div class="button">
-            <CharacterSheetItemExpandButton bind:isExpanded {item}/>
+            <CharacterSheetItemExpandButton bind:isExpanded/>
          </div>
       </div>
 

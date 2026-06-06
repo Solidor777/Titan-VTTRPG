@@ -9,33 +9,28 @@
    } from '~/system/Icons.js';
    import AttributeCheckTag from '~/helpers/svelte-components/tag/AttributeCheckTag.svelte';
 
-   /**
-    * @typedef {object} CharacterSheetSpellCastingCheckProps
-    * @property {TitanItem} [item] The Item this component belongs to.
-    */
-
-   /** @type {CharacterSheetSpellCastingCheckProps} */
-   const { item = undefined } = $props();
-
-   /** @type {object} Reference to the reactive Document store. */
+   /** @type {object} The embedded spell bridge provided by EmbeddedDocumentProvider. */
    const document = getContext('document');
 
-   // item is fixed per mounted instance; capturing item._id once in checkOptions is intentional.
-   // svelte-ignore state_referenced_locally
+   /** @type {object} The owning sheet's actor bridge (never shadowed by providers). */
+   const sheetDocument = getContext('sheetDocument');
+
+   // The item id is fixed for this component's lifetime (provider instances are id-keyed); capturing
+   // once in checkOptions is intentional.
    /** @type {CastingCheckOptions} Base options for the Casting Check. */
    const checkOptions = {
-      itemId: item._id,
+      itemId: document.doc._id,
    };
 
    /** @type {CastingCheckParameters} Resolved dice and modifiers for the spell's casting check. */
    let checkParameters = $derived.by(() => {
 
       // Ensure the item is still valid.
-      if (document.data.items.get(item._id)) {
+      if (document.data) {
 
          // Update the parameters.
-         return document.data.system.getCastingCheckParameters(
-            document.data.system.initializeCastingCheckOptions(checkOptions)
+         return sheetDocument.data.system.getCastingCheckParameters(
+            sheetDocument.data.system.initializeCastingCheckOptions(checkOptions)
          );
       }
       return undefined;

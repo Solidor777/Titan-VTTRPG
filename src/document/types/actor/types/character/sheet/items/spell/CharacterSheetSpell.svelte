@@ -23,70 +23,69 @@
 
    /**
     * @typedef {object} CharacterSheetSpellProps
-    * @property {TitanItem} [item] Reference to the Item document.
     * @property {boolean} [isExpanded] Whether this Item is currently expanded.
     */
 
    /** @type {CharacterSheetSpellProps} */
-   let { item = undefined, isExpanded = $bindable(undefined) } = $props();
+   let { isExpanded = $bindable(undefined) } = $props();
 
-   /** @type {object} Reactive bridge to the parent document; descendants read live data via `data`. */
+   /** @type {object} The embedded spell bridge provided by EmbeddedDocumentProvider. */
    const document = getContext('document');
 
-   /** @type {SpellAspect[]} Standard Spell Aspects, re-read reactively through the document store. */
-   const aspect = $derived(document.data.items.get(item._id)?.system.aspect ?? []);
+   /** @type {SpellAspect[]} Standard Spell Aspects, read reactively through the embedded bridge. */
+   const aspect = $derived(document.data?.system.aspect ?? []);
 
-   /** @type {object[]} Custom Spell Aspects, re-read reactively through the document store. */
-   const customAspect = $derived(document.data.items.get(item._id)?.system.customAspect ?? []);
+   /** @type {object[]} Custom Spell Aspects, read reactively through the embedded bridge. */
+   const customAspect = $derived(document.data?.system.customAspect ?? []);
 
-   /** @type {object[]} Casting checks, re-read reactively through the document store. */
-   const check = $derived(document.data.items.get(item._id)?.system.check ?? []);
+   /** @type {object[]} Casting checks, read reactively through the embedded bridge. */
+   const check = $derived(document.data?.system.check ?? []);
 
-   /** @type {string} Rich-text description, re-read reactively through the document store. */
-   const description = $derived(document.data.items.get(item._id)?.system.description);
+   /** @type {string} Rich-text description, read reactively through the embedded bridge. */
+   const description = $derived(document.data?.system.description);
 
-   /** @type {string} Rarity key, re-read reactively through the document store. */
-   const rarity = $derived(document.data.items.get(item._id)?.system.rarity);
+   /** @type {string} Rarity key, read reactively through the embedded bridge. */
+   const rarity = $derived(document.data?.system.rarity);
 
-   /** @type {string} Spell tradition, re-read reactively through the document store. */
-   const tradition = $derived(document.data.items.get(item._id)?.system.tradition);
+   /** @type {string} Spell tradition, read reactively through the embedded bridge. */
+   const tradition = $derived(document.data?.system.tradition);
 
-   /** @type {number} XP cost, re-read reactively through the document store. */
-   const xpCost = $derived(document.data.items.get(item._id)?.system.xpCost);
+   /** @type {number} XP cost, read reactively through the embedded bridge. */
+   const xpCost = $derived(document.data?.system.xpCost);
 
-   /** @type {object[]} Custom traits, re-read reactively through the document store. */
-   const customTrait = $derived(document.data.items.get(item._id)?.system.customTrait ?? []);
+   /** @type {object[]} Custom traits, read reactively through the embedded bridge. */
+   const customTrait = $derived(document.data?.system.customTrait ?? []);
 
    /** @type {SpellAspect[]} List of enabled Spell Aspects. */
    const enabledAspects = $derived(aspect.filter((aspect) => aspect.enabled));
 </script>
 
-<CharacterSheetItem {item} bind:isExpanded>
+<CharacterSheetItem bind:isExpanded>
    {#snippet controls()}
       <!--Cast Spell-->
       <div class="button">
-         <CharacterSheetCondensedCastingCheckButton itemId={item._id}/>
+         <CharacterSheetCondensedCastingCheckButton/>
       </div>
 
       <!--Send to Chat button-->
       <div class="button">
-         <CharacterSheetItemSendToChatButton {item}/>
+         <CharacterSheetItemSendToChatButton/>
       </div>
 
       <!--Edit Button-->
       <div class="button">
-         <CharacterSheetItemEditButton {item}/>
+         <CharacterSheetItemEditButton/>
       </div>
 
       <!--Delete Button-->
       <div class="button">
-         <CharacterSheetItemDeleteButton itemId={item._id}/>
+         <CharacterSheetItemDeleteButton/>
       </div>
    {/snippet}
 
    <!--Item Check Data-->
    <div class="section tags">
-      <CharacterSheetSpellCastingCheck {item}/>
+      <CharacterSheetSpellCastingCheck/>
    </div>
 
    <!--Spell Aspects-->
@@ -102,7 +101,7 @@
    <!--Item Checks-->
    {#if check.length > 0}
       <div class="section">
-         <CharacterSheetItemChecks {item}/>
+         <CharacterSheetItemChecks/>
       </div>
    {/if}
 

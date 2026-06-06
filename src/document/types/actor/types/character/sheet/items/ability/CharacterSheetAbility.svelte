@@ -21,63 +21,52 @@
 
    /**
     * @typedef {object} CharacterSheetAbilityProps
-    * @property {TitanItem} [item] Reference to the Item document.
     * @property {boolean} [isExpanded] Whether this Item is currently expanded.
     */
 
    /** @type {CharacterSheetAbilityProps} */
-   let { item = undefined, isExpanded = $bindable(undefined) } = $props();
+   let { isExpanded = $bindable(undefined) } = $props();
 
-   /** @type {object} Reference to the reactive Document store. */
+   /** @type {object} The embedded ability bridge provided by EmbeddedDocumentProvider. */
    const document = getContext('document');
-
-   /**
-    * Re-reads this ability item through the reactive `document.data` store. Invoked inline at each display
-    * read so the read subscribes to the document's update hooks and re-runs in place when the item changes.
-    * A `$derived` returning the live item is insufficient: the item reference is stable across updates, so
-    * its value never trips Svelte's equality check and downstream reads stay stale. Calling this in markup
-    * routes every read through `document.data`, the only reactive dependency Svelte tracks.
-    * @returns {TitanItem | undefined} The live ability item from the reactive collection.
-    */
-   const reactiveItem = () => document.data.items.get(item._id);
 </script>
 
-<CharacterSheetItem {item} bind:isExpanded>
+<CharacterSheetItem bind:isExpanded>
    {#snippet controls()}
       <!--Check-->
-      {#if reactiveItem()?.system.check.length > 0}
+      {#if document.data?.system.check.length > 0}
          <div class="button">
-            <CharacterSheetCondensedItemCheckButton itemId={item._id}/>
+            <CharacterSheetCondensedItemCheckButton/>
          </div>
       {/if}
 
       <!--Send to Chat button-->
       <div class="button">
-         <CharacterSheetItemSendToChatButton {item}/>
+         <CharacterSheetItemSendToChatButton/>
       </div>
 
       <!--Edit Button-->
       <div class="button">
-         <CharacterSheetItemEditButton {item}/>
+         <CharacterSheetItemEditButton/>
       </div>
 
       <!--Delete Button-->
       <div class="button">
-         <CharacterSheetItemDeleteButton itemId={item._id}/>
+         <CharacterSheetItemDeleteButton/>
       </div>
    {/snippet}
 
    <!--Item Checks-->
-   {#if reactiveItem()?.system.check.length > 0}
+   {#if document.data?.system.check.length > 0}
       <div class="section">
-         <CharacterSheetItemChecks {item}/>
+         <CharacterSheetItemChecks/>
       </div>
    {/if}
 
    <!--Item Description-->
-   {#if !(isHTMLBlank(reactiveItem()?.system.description))}
+   {#if !(isHTMLBlank(document.data?.system.description))}
       <div class="section rich-text">
-         <RichText value={reactiveItem()?.system.description}/>
+         <RichText value={document.data?.system.description}/>
       </div>
    {/if}
 
@@ -85,42 +74,42 @@
    <div class="section tags small-text">
       <!--Rarity-->
       <div class="tag">
-         <RarityTag rarity={reactiveItem()?.system.rarity}/>
+         <RarityTag rarity={document.data?.system.rarity}/>
       </div>
 
       <!--Action-->
-      {#if reactiveItem()?.system.action}
+      {#if document.data?.system.action}
          <div class="tag">
             <Tag>{localize('action')}</Tag>
          </div>
       {/if}
 
       <!--Reaction-->
-      {#if reactiveItem()?.system.reaction}
+      {#if document.data?.system.reaction}
          <div class="tag">
             <Tag>{localize('reaction')}</Tag>
          </div>
       {/if}
 
       <!--Passive-->
-      {#if reactiveItem()?.system.passive}
+      {#if document.data?.system.passive}
          <div class="tag">
             <Tag>{localize('passive')}</Tag>
          </div>
       {/if}
 
       <!--XP Cost-->
-      {#if reactiveItem()?.system.xpCost}
+      {#if document.data?.system.xpCost}
          <div class="tag">
             <StatTag
                label={localize('xpCost')}
-               value={reactiveItem()?.system.xpCost}
+               value={document.data?.system.xpCost}
             />
          </div>
       {/if}
 
       <!--Custom Traits-->
-      {#each reactiveItem()?.system.customTrait ?? [] as trait}
+      {#each document.data?.system.customTrait ?? [] as trait}
          <div class="tag">
             <Tag tooltip={{ text: trait.description, localize: false }}>
                {trait.name}

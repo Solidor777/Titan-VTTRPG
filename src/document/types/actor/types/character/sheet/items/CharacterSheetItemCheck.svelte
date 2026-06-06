@@ -15,25 +15,27 @@
    } from '~/system/Icons.js';
    import AttributeCheckTag from '~/helpers/svelte-components/tag/AttributeCheckTag.svelte';
 
-   /** @type {object} Reference to the reactive Document store. */
+   /** @type {object} The embedded item bridge provided by EmbeddedDocumentProvider. */
    const document = getContext('document');
+
+   /** @type {object} The owning sheet's actor bridge (never shadowed by providers). */
+   const sheetDocument = getContext('sheetDocument');
 
    /**
     * @typedef {object} CharacterSheetItemCheckProps
-    * @property {string} [itemId] The ID of the item to get the check from.
     * @property {number} [checkIdx] The index of the check in the checks array.
     */
 
    /** @type {CharacterSheetItemCheckProps} */
-   const { itemId = undefined, checkIdx = undefined } = $props();
+   const { checkIdx = undefined } = $props();
 
-   // itemId and checkIdx are fixed props for this component's lifetime; the checkOptions object
-   // is intentionally built once and reused across derived reads and event handlers.
+   // The id and index are fixed for this component's lifetime (provider instances are id-keyed); the
+   // checkOptions object is intentionally built once and reused across derived reads and event handlers.
    // svelte-ignore state_referenced_locally
    /** @type {ItemCheckOptions} Options for the check. */
    const checkOptions = {
-      itemId: itemId,
-      checkIdx: checkIdx
+      itemId: document.doc._id,
+      checkIdx: checkIdx,
    };
 
    /** @type {boolean} Whether to automatically spend the resolve for checks. */
@@ -43,12 +45,11 @@
    let checkParameters = $derived.by(() => {
 
       // Ensure the item and check are valid.
-      const item = document.data.items.get(itemId);
-      if (item?.system.check.length > checkIdx) {
+      if (document.data?.system.check.length > checkIdx) {
 
          // Update the check parameters.
-         return document.data.system.getItemCheckParameters(
-            document.data.system.initializeItemCheckOptions(checkOptions)
+         return sheetDocument.data.system.getItemCheckParameters(
+            sheetDocument.data.system.initializeItemCheckOptions(checkOptions)
          );
       }
       return undefined;
@@ -58,7 +59,7 @@
     * Rolls the Item Check.
     */
    function rollItemCheck() {
-      document.data.system.requestItemCheck(checkOptions);
+      sheetDocument.data.system.requestItemCheck(checkOptions);
    }
 </script>
 
@@ -72,7 +73,7 @@
             <ItemCheckButton
                label={checkParameters.checkLabel}
                attribute={checkParameters.attribute}
-               disabled={!document.data.isOwner}
+               disabled={!document.data?.isOwner}
                resolveCost={checkParameters.resolveCost}
                onclick={() => rollItemCheck()}
             />
@@ -82,7 +83,7 @@
                <ItemCheckButton
                   label={checkParameters.checkLabel}
                   attribute={checkParameters.attribute}
-                  disabled={!document.data.isOwner}
+                  disabled={!document.data?.isOwner}
                   onclick={() => rollItemCheck()}
                />
             </div>
@@ -91,7 +92,7 @@
             <div class="resolve-cost-button">
                <SpendResolveButton
                   resolveCost={checkParameters.resolveCost}
-                  onclick={() => document.data.system.spendResolve(checkParameters.resolveCost)}
+                  onclick={() => sheetDocument.data.system.spendResolve(checkParameters.resolveCost)}
                />
             </div>
          {/if}
@@ -100,7 +101,7 @@
          <ItemCheckButton
             label={checkParameters.checkLabel}
             attribute={checkParameters.attribute}
-            disabled={!document.data.isOwner}
+            disabled={!document.data?.isOwner}
             resolveCost={checkParameters.resolveCost}
             onclick={() => rollItemCheck()}
          />

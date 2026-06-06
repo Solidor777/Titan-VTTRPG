@@ -25,87 +25,80 @@
 
    /**
     * @typedef {object} CharacterSheetWeaponProps
-    * @property {TitanItem} [item] Reference to the Item document.
     * @property {boolean} [isExpanded] Whether this Item is currently expanded.
     */
 
    /** @type {CharacterSheetWeaponProps} */
-   let { item = undefined, isExpanded = $bindable(undefined) } = $props();
+   let { isExpanded = $bindable(undefined) } = $props();
 
-   /** @type {object} Reference to the reactive Document store. */
+   /** @type {object} The embedded weapon bridge provided by EmbeddedDocumentProvider. */
    const document = getContext('document');
 
-   /** @type {boolean} Whether this Weapon is currently equipped, read reactively through document.data. */
-   const equipped = $derived(document.data.items.get(item._id)?.system.equipped);
+   /** @type {boolean} Whether this Weapon is currently equipped, read reactively through the embedded bridge. */
+   const equipped = $derived(document.data?.system.equipped);
 
-   /** @type {number} Number of Attacks on this Weapon, read reactively through document.data. */
-   const attackCount = $derived(document.data.items.get(item._id)?.system.attack.length ?? 0);
+   /** @type {number} Number of Attacks on this Weapon, read reactively through the embedded bridge. */
+   const attackCount = $derived(document.data?.system.attack.length ?? 0);
 
-   /** @type {number} Number of Checks on this Weapon, read reactively through document.data. */
-   const checkCount = $derived(document.data.items.get(item._id)?.system.check.length ?? 0);
+   /** @type {number} Number of Checks on this Weapon, read reactively through the embedded bridge. */
+   const checkCount = $derived(document.data?.system.check.length ?? 0);
 
-   /** @type {string} The Weapon's Attack notes, read reactively through document.data. */
-   const attackNotes = $derived(document.data.items.get(item._id)?.system.attackNotes);
+   /** @type {string} The Weapon's Attack notes, read reactively through the embedded bridge. */
+   const attackNotes = $derived(document.data?.system.attackNotes);
 
-   /** @type {string} The Weapon's description, read reactively through document.data. */
-   const description = $derived(document.data.items.get(item._id)?.system.description);
+   /** @type {string} The Weapon's description, read reactively through the embedded bridge. */
+   const description = $derived(document.data?.system.description);
 
-   /** @type {string} The Weapon's rarity key, read reactively through document.data. */
-   const rarity = $derived(document.data.items.get(item._id)?.system.rarity);
+   /** @type {string} The Weapon's rarity key, read reactively through the embedded bridge. */
+   const rarity = $derived(document.data?.system.rarity);
 
-   /** @type {number} The Weapon's value, read reactively through document.data. */
-   const value = $derived(document.data.items.get(item._id)?.system.value);
+   /** @type {number} The Weapon's value, read reactively through the embedded bridge. */
+   const value = $derived(document.data?.system.value);
 
-   /** @type {object[]} The Weapon's custom traits, read reactively through document.data. */
-   const customTrait = $derived(document.data.items.get(item._id)?.system.customTrait ?? []);
+   /** @type {object[]} The Weapon's custom traits, read reactively through the embedded bridge. */
+   const customTrait = $derived(document.data?.system.customTrait ?? []);
 </script>
 
-<CharacterSheetItem {item} bind:isExpanded>
+<CharacterSheetItem bind:isExpanded>
    {#snippet controls()}
       <div class="button">
          {#if !equipped}
             <!--Toggle Equipped button-->
-            <CharacterSheetItemEquipButton
-               {item}
-               {equipped}
-            />
+            <CharacterSheetItemEquipButton {equipped}/>
          {:else if attackCount > 0}
-            <CharacterSheetCondensedAttackCheckButton itemId={item._id}/>
+            <CharacterSheetCondensedAttackCheckButton/>
          {/if}
       </div>
 
       <!--Send to Chat button-->
       <div class="button">
-         <CharacterSheetItemSendToChatButton {item}/>
+         <CharacterSheetItemSendToChatButton/>
       </div>
 
       <!--Edit Button-->
       <div class="button">
-         <CharacterSheetItemEditButton {item}/>
+         <CharacterSheetItemEditButton/>
       </div>
 
       <!--Delete Button-->
       <div class="button">
-         <CharacterSheetItemDeleteButton itemId={item._id}/>
+         <CharacterSheetItemDeleteButton/>
       </div>
    {/snippet}
 
    <div class="section buttons">
       <div class="button">
-         <CharacterSheetWeaponMultiAttackButton {item}/>
+         <CharacterSheetWeaponMultiAttackButton/>
       </div>
 
       <div class="button">
-         <CharacterSheetItemEquipButton
-            {item}
-            {equipped}
-         />
+         <CharacterSheetItemEquipButton {equipped}/>
       </div>
    </div>
 
    <!--Attacks-->
    <div class="section">
-      <CharacterSheetWeaponAttacks {item}/>
+      <CharacterSheetWeaponAttacks/>
    </div>
 
    <!--Attack notes-->
@@ -125,7 +118,7 @@
    <!--Item Checks-->
    {#if checkCount > 0}
       <div class="section">
-         <CharacterSheetItemChecks {item}/>
+         <CharacterSheetItemChecks/>
       </div>
    {/if}
 

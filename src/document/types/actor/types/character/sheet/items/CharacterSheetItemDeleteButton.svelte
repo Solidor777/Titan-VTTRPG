@@ -4,21 +4,16 @@
    import localize from '~/helpers/utility-functions/Localize.js';
    import DocumentOwnerIconButton from '~/document/svelte-components/DocumentOwnerIconButton.svelte';
 
-   /** @type {object} Reference to the reactive Document store. */
+   /** @type {object} The embedded item bridge provided by EmbeddedDocumentProvider. */
    const document = getContext('document');
 
-   /**
-    * @typedef {object} CharacterSheetItemDeleteButtonProps
-    * @property {string} [itemId] The ID of the item this button is for.
-    */
-
-   /** @type {CharacterSheetItemDeleteButtonProps} */
-   const { itemId = undefined } = $props();
+   /** @type {object} The owning sheet's actor bridge (never shadowed by providers). */
+   const sheetDocument = getContext('sheetDocument');
 </script>
 
 <DocumentOwnerIconButton
    icon={DELETE_ICON}
    label={localize('deleteItem')}
-   onclick={() => document.data.system.requestItemDeletion(itemId)}
+   onclick={() => sheetDocument.data.system.requestItemDeletion(document.data?._id)}
    tooltip={'deleteItem'}
 />

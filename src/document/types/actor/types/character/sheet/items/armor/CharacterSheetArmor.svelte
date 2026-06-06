@@ -20,52 +20,53 @@
 
    /**
     * @typedef {object} CharacterSheetArmorProps
-    * @property {TitanItem} [item] Reference to the Item document.
     * @property {boolean} [isExpanded] Whether this Item is currently expanded.
     */
 
    /** @type {CharacterSheetArmorProps} */
-   let { item = undefined, isExpanded = $bindable(undefined) } = $props();
+   let { isExpanded = $bindable(undefined) } = $props();
 
-   /** @type {object} Reference to the reactive Document store. */
+   /** @type {object} The embedded armor bridge provided by EmbeddedDocumentProvider. */
    const document = getContext('document');
 
-   /** @type {Array<object>} The armor's checks, re-read through document.data so the row updates in place. */
-   const check = $derived(document.data.items.get(item._id)?.system.check ?? []);
+   /** @type {object} The owning sheet's actor bridge (never shadowed by providers). */
+   const sheetDocument = getContext('sheetDocument');
 
-   /** @type {string} The armor's description, re-read through document.data so the row updates in place. */
-   const description = $derived(document.data.items.get(item._id)?.system.description);
+   /** @type {Array<object>} The armor's checks, read reactively through the embedded bridge. */
+   const check = $derived(document.data?.system.check ?? []);
+
+   /** @type {string} The armor's description, read reactively through the embedded bridge. */
+   const description = $derived(document.data?.system.description);
 </script>
 
-<CharacterSheetItem {item} bind:isExpanded>
+<CharacterSheetItem bind:isExpanded>
    {#snippet controls()}
       <!--Toggle Equipped button-->
-      {#if (document.data.system.equipped.armor === item._id) === false || check.length === 0}
+      {#if (sheetDocument.data.system.equipped.armor === document.data?._id) === false || check.length === 0}
          <div class="button">
             <CharacterSheetItemEquipButton
-               {item}
-               equipped={document.data.system.equipped.armor === item._id}
+               equipped={sheetDocument.data.system.equipped.armor === document.data?._id}
             />
          </div>
       {:else if check.length > 0}
          <div class="button">
-            <CharacterSheetCondensedItemCheckButton itemId={item._id}/>
+            <CharacterSheetCondensedItemCheckButton/>
          </div>
       {/if}
 
       <!--Send to Chat button-->
       <div class="button">
-         <CharacterSheetItemSendToChatButton {item}/>
+         <CharacterSheetItemSendToChatButton/>
       </div>
 
       <!--Edit Button-->
       <div class="button">
-         <CharacterSheetItemEditButton {item}/>
+         <CharacterSheetItemEditButton/>
       </div>
 
       <!--Delete Button-->
       <div class="button">
-         <CharacterSheetItemDeleteButton itemId={item._id}/>
+         <CharacterSheetItemDeleteButton/>
       </div>
    {/snippet}
 
@@ -73,21 +74,20 @@
    {#if check.length > 0}
       <div class="section">
          <CharacterSheetItemEquipButton
-            {item}
-            equipped={document.data.system.equipped.armor === item._id}
+            equipped={sheetDocument.data.system.equipped.armor === document.data?._id}
          />
       </div>
    {/if}
 
    <!--Armor Stats-->
    <div class="section tags">
-      <CharacterSheetArmorStats {item}/>
+      <CharacterSheetArmorStats/>
    </div>
 
    <!--Item Checks-->
    {#if check.length > 0}
       <div class="section">
-         <CharacterSheetItemChecks {item}/>
+         <CharacterSheetItemChecks/>
       </div>
    {/if}
 

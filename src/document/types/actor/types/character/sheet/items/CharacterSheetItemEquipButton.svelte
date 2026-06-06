@@ -5,19 +5,21 @@
 
    /**
     * @typedef {object} CharacterSheetItemEquipButtonProps
-    * @property {TitanItem} [item] The Item this component belongs to.
     * @property {boolean} [equipped] Whether the item is currently equipped.
     */
 
    /** @type {CharacterSheetItemEquipButtonProps} */
-   const { item = undefined, equipped = undefined } = $props();
+   const { equipped = undefined } = $props();
 
-   /** @type {object} Reference to the reactive Document store. */
+   /** @type {object} The embedded item bridge provided by EmbeddedDocumentProvider. */
    const document = getContext('document');
+
+   /** @type {object} The owning sheet's actor bridge (never shadowed by providers). */
+   const sheetDocument = getContext('sheetDocument');
 </script>
 
 <ToggleButton
    active={equipped}
    label={localize('equipped')}
-   onclick={() => document.data.system.toggleEquipped(item._id)}
+   onclick={() => sheetDocument.data.system.toggleEquipped(document.data?._id)}
 />

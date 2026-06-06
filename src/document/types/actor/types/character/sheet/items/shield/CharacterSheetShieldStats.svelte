@@ -9,34 +9,26 @@
    import { DEFENSE_ICON } from '~/system/Icons.js';
    import Tag from '~/helpers/svelte-components/tag/Tag.svelte';
 
-   /**
-    * @typedef {object} CharacterSheetShieldStatsProps
-    * @property {TitanItem} [item] The Item this component belongs to.
-    */
-
-   /** @type {CharacterSheetShieldStatsProps} */
-   const { item = undefined } = $props();
-
-   /** @type {object} Reference to the reactive Document store. */
+   /** @type {object} The embedded shield bridge provided by EmbeddedDocumentProvider. */
    const document = getContext('document');
 
    /** @type {object} Descriptions of each shield trait. */
    const traitDescriptions = SHIELD_TRAIT_DESCRIPTIONS;
 
-   /** @type {number} The shield's defense value, re-read through document.data so the row updates in place. */
-   const defense = $derived(document.data.items.get(item._id)?.system.defense);
+   /** @type {number} The shield's defense value, read reactively through the embedded bridge. */
+   const defense = $derived(document.data?.system.defense);
 
-   /** @type {string} The shield's rarity, re-read through document.data so the row updates in place. */
-   const rarity = $derived(document.data.items.get(item._id)?.system.rarity);
+   /** @type {string} The shield's rarity, read reactively through the embedded bridge. */
+   const rarity = $derived(document.data?.system.rarity);
 
-   /** @type {number} The shield's gp value, re-read through document.data so the row updates in place. */
-   const value = $derived(document.data.items.get(item._id)?.system.value);
+   /** @type {number} The shield's gp value, read reactively through the embedded bridge. */
+   const value = $derived(document.data?.system.value);
 
-   /** @type {Array<object>} The shield's traits, re-read through document.data so the row updates in place. */
-   const trait = $derived(document.data.items.get(item._id)?.system.trait ?? []);
+   /** @type {Array<object>} The shield's traits, read reactively through the embedded bridge. */
+   const trait = $derived(document.data?.system.trait ?? []);
 
-   /** @type {Array<object>} The shield's custom traits, re-read through document.data for in-place updates. */
-   const customTrait = $derived(document.data.items.get(item._id)?.system.customTrait ?? []);
+   /** @type {Array<object>} The shield's custom traits, read reactively through the embedded bridge. */
+   const customTrait = $derived(document.data?.system.customTrait ?? []);
 </script>
 
 <div class="stats">

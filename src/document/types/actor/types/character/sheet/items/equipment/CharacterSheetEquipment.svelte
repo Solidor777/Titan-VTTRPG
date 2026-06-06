@@ -21,81 +21,74 @@
 
    /**
     * @typedef {object} CharacterSheetEquipmentProps
-    * @property {TitanItem} [item] Reference to the Item document.
     * @property {boolean} [isExpanded] Whether this Item is currently expanded.
     */
 
    /** @type {CharacterSheetEquipmentProps} */
-   let { item = undefined, isExpanded = $bindable(undefined) } = $props();
+   let { isExpanded = $bindable(undefined) } = $props();
 
-   /** @type {object} Reference to the reactive Document store. */
+   /** @type {object} The embedded equipment bridge provided by EmbeddedDocumentProvider. */
    const document = getContext('document');
 
-   /** @type {boolean} The item's equipped state, re-read through document.data so the row updates in place. */
-   const equipped = $derived(document.data.items.get(item._id)?.system.equipped);
+   /** @type {boolean} The item's equipped state, read reactively through the embedded bridge. */
+   const equipped = $derived(document.data?.system.equipped);
 
-   /** @type {number} The item's check count, re-read through document.data so the row updates in place. */
-   const checkLength = $derived(document.data.items.get(item._id)?.system.check.length);
+   /** @type {number} The item's check count, read reactively through the embedded bridge. */
+   const checkLength = $derived(document.data?.system.check.length);
 
-   /** @type {string} The item's description, re-read through document.data so the row updates in place. */
-   const description = $derived(document.data.items.get(item._id)?.system.description);
+   /** @type {string} The item's description, read reactively through the embedded bridge. */
+   const description = $derived(document.data?.system.description);
 
-   /** @type {string} The item's rarity, re-read through document.data so the footer updates in place. */
-   const rarity = $derived(document.data.items.get(item._id)?.system.rarity);
+   /** @type {string} The item's rarity, read reactively through the embedded bridge. */
+   const rarity = $derived(document.data?.system.rarity);
 
-   /** @type {number} The item's value, re-read through document.data so the footer updates in place. */
-   const value = $derived(document.data.items.get(item._id)?.system.value);
+   /** @type {number} The item's value, read reactively through the embedded bridge. */
+   const value = $derived(document.data?.system.value);
 
-   /** @type {Array<object>} The item's custom traits, re-read through document.data so the row updates. */
-   const customTrait = $derived(document.data.items.get(item._id)?.system.customTrait ?? []);
+   /** @type {Array<object>} The item's custom traits, read reactively through the embedded bridge. */
+   const customTrait = $derived(document.data?.system.customTrait ?? []);
 </script>
 
-<CharacterSheetItem {item} bind:isExpanded>
+<CharacterSheetItem bind:isExpanded>
    {#snippet controls()}
       <!--Toggle Equipped button-->
       {#if equipped === false || checkLength === 0}
          <div class="button">
-            <CharacterSheetItemEquipButton
-               {item}
-               {equipped}
-            />
+            <CharacterSheetItemEquipButton {equipped}/>
          </div>
       {:else if (checkLength > 0)}
          <div class="button">
-            <CharacterSheetCondensedItemCheckButton itemId={item._id}/>
+            <CharacterSheetCondensedItemCheckButton/>
          </div>
       {/if}
 
       <!--Send to Chat button-->
       <div class="button">
-         <CharacterSheetItemSendToChatButton {item}/>
+         <CharacterSheetItemSendToChatButton/>
       </div>
 
       <!--Edit Button-->
       <div class="button">
-         <CharacterSheetItemEditButton {item}/>
+         <CharacterSheetItemEditButton/>
       </div>
 
       <!--Delete Button-->
       <div class="button">
-         <CharacterSheetItemDeleteButton itemId={item._id}/>
+         <CharacterSheetItemDeleteButton/>
       </div>
    {/snippet}
 
    <!--Equip button-->
    {#if checkLength > 0}
       <div class="section">
-         <CharacterSheetItemEquipButton
-            {item}
-            {equipped}
-         />
+         <CharacterSheetItemEquipButton {equipped}/>
       </div>
    {/if}
 
    <!--Item Checks-->
    {#if checkLength > 0}
       <div class="section">
-         <CharacterSheetItemChecks {item}/>
+         <CharacterSheetItemChecks/>
       </div>
    {/if}
 

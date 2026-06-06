@@ -20,67 +20,66 @@
 
    /**
     * @typedef {object} CharacterSheetCommodityProps
-    * @property {TitanItem} [item] Reference to the Item document.
     * @property {boolean} [isExpanded] Whether this Item is currently expanded.
     */
 
    /** @type {CharacterSheetCommodityProps} */
-   let { item = undefined, isExpanded = $bindable(undefined) } = $props();
+   let { isExpanded = $bindable(undefined) } = $props();
 
-   /** @type {object} Reference to the reactive Document store. */
+   /** @type {object} The embedded commodity bridge provided by EmbeddedDocumentProvider. */
    const document = getContext('document');
 
-   /** @type {number} The item's quantity, re-read through document.data so the footer updates in place. */
-   const quantity = $derived(document.data.items.get(item._id)?.system.quantity);
+   /** @type {number} The item's quantity, read reactively through the embedded bridge. */
+   const quantity = $derived(document.data?.system.quantity);
 
-   /** @type {number} The item's check count, re-read through document.data so the row updates in place. */
-   const checkLength = $derived(document.data.items.get(item._id)?.system.check.length);
+   /** @type {number} The item's check count, read reactively through the embedded bridge. */
+   const checkLength = $derived(document.data?.system.check.length);
 
-   /** @type {string} The item's description, re-read through document.data so the row updates in place. */
-   const description = $derived(document.data.items.get(item._id)?.system.description);
+   /** @type {string} The item's description, read reactively through the embedded bridge. */
+   const description = $derived(document.data?.system.description);
 
-   /** @type {string} The item's rarity, re-read through document.data so the footer updates in place. */
-   const rarity = $derived(document.data.items.get(item._id)?.system.rarity);
+   /** @type {string} The item's rarity, read reactively through the embedded bridge. */
+   const rarity = $derived(document.data?.system.rarity);
 
-   /** @type {number} The item's value, re-read through document.data so the footer updates in place. */
-   const value = $derived(document.data.items.get(item._id)?.system.value);
+   /** @type {number} The item's value, read reactively through the embedded bridge. */
+   const value = $derived(document.data?.system.value);
 
-   /** @type {Array<object>} The item's custom traits, re-read through document.data so the row updates. */
-   const customTrait = $derived(document.data.items.get(item._id)?.system.customTrait ?? []);
+   /** @type {Array<object>} The item's custom traits, read reactively through the embedded bridge. */
+   const customTrait = $derived(document.data?.system.customTrait ?? []);
 </script>
 
-<CharacterSheetItem {item} bind:isExpanded>
+<CharacterSheetItem bind:isExpanded>
    {#snippet controls()}
       <!--Quantity-->
       <div class="field">
          <IntegerIncrementInput
             bind:value={
-               () => document.data.items.get(item._id)?.system.quantity ?? 0,
-               (newValue) => item.update({ system: { quantity: newValue } })
+               () => document.data?.system.quantity ?? 0,
+               (newValue) => document.doc?.update({ system: { quantity: newValue } })
             }
          />
       </div>
 
       <!--Send to Chat button-->
       <div class="button">
-         <CharacterSheetItemSendToChatButton {item}/>
+         <CharacterSheetItemSendToChatButton/>
       </div>
 
       <!--Edit Button-->
       <div class="button">
-         <CharacterSheetItemEditButton {item}/>
+         <CharacterSheetItemEditButton/>
       </div>
 
       <!--Delete Button-->
       <div class="button">
-         <CharacterSheetItemDeleteButton itemId={item._id}/>
+         <CharacterSheetItemDeleteButton/>
       </div>
    {/snippet}
 
    <!--Item Checks-->
    {#if checkLength > 0}
       <div class="section">
-         <CharacterSheetItemChecks {item}/>
+         <CharacterSheetItemChecks/>
       </div>
    {/if}
 

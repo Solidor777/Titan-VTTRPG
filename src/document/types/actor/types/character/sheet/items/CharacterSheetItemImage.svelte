@@ -1,14 +1,11 @@
 <script>
-   /**
-    * @typedef {object} CharacterSheetItemImageProps
-    * @property {TitanItem} [item] The Item this component belongs to.
-    */
+   import { getContext } from 'svelte';
 
-   /** @type {CharacterSheetItemImageProps} */
-   const { item = undefined } = $props();
+   /** @type {object} The embedded document bridge provided by EmbeddedDocumentProvider. */
+   const document = getContext('document');
 </script>
 
-<img class="item-image" src={item.img} alt="item"/>
+<img class="item-image" src={document.data?.img} alt="item"/>
 
 <style lang="scss">
    .item-image {

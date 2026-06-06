@@ -52,11 +52,7 @@
    const customTrait = $derived(document.data?.system.customTrait ?? []);
 </script>
 
-<!--TEMPORARY (Stage 2 converts the shared shell): pass the live re-resolved document as the prop.-->
-<CharacterSheetItem
-   item={document.data}
-   bind:isExpanded
->
+<CharacterSheetItem bind:isExpanded>
    {#snippet controls()}
       <!--Duration-->
       {#if durationType !== 'permanent'}

@@ -4,21 +4,13 @@
    import localize from '~/helpers/utility-functions/Localize.js';
    import { getContext } from 'svelte';
 
-   /** @type {object} Reference to the reactive Document store. */
+   /** @type {object} The embedded item bridge provided by EmbeddedDocumentProvider. */
    const document = getContext('document');
-
-   /**
-    * @typedef {object} CharacterSheetItemEditButtonProps
-    * @property {Item} [item] The Item this button is for.
-    */
-
-   /** @type {CharacterSheetItemEditButtonProps} */
-   const { item = undefined } = $props();
 </script>
 
 <IconButton
-   icon={document.data.isOwner ? EDIT_ICON : SHEET_ICON}
-   label={localize(document.data.isOwner ? 'editItem' : 'viewItemSheet')}
-   onclick={() => item.sheet.render(true)}
-   tooltip={document.data.isOwner ? 'editItem' : 'viewItemSheet'}
+   icon={document.data?.isOwner ? EDIT_ICON : SHEET_ICON}
+   label={localize(document.data?.isOwner ? 'editItem' : 'viewItemSheet')}
+   onclick={() => document.doc?.sheet.render(true)}
+   tooltip={document.data?.isOwner ? 'editItem' : 'viewItemSheet'}
 />

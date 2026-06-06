@@ -2,6 +2,7 @@
    import { getContext } from 'svelte';
    import { slide } from 'svelte/transition';
    import sortAscending from '~/helpers/utility-functions/SortAscending.js';
+   import EmbeddedDocumentProvider from '~/document/reactive/EmbeddedDocumentProvider.svelte';
 
    /**
     * @typedef {object} CharacterSheetMultiItemListProps
@@ -104,12 +105,11 @@
             }}
             transition:slide|local
          >
-            {#each [itemComponents[item.type]] as ItemComponent}
-               <ItemComponent
-                  {item}
-                  bind:isExpanded={$appState.tabs[tabKey].isExpanded[item._id]}
-               />
-            {/each}
+            <EmbeddedDocumentProvider doc={item}>
+               {#each [itemComponents[item.type]] as ItemComponent}
+                  <ItemComponent bind:isExpanded={$appState.tabs[tabKey].isExpanded[item._id]}/>
+               {/each}
+            </EmbeddedDocumentProvider>
          </li>
       {/each}
    </ol>

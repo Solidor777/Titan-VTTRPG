@@ -3,35 +3,28 @@
    import { getContext } from 'svelte';
    import getItemCheckParametersTooltip from '~/helpers/utility-functions/GetItemCheckParametersTooltip.js';
 
-   /**
-    * @typedef {object} CharacterSheetCondensedItemCheckButtonProps
-    * @property {string} [itemId] The ID of the Item to get the check from.
-    */
-
-   /** @type {CharacterSheetCondensedItemCheckButtonProps} */
-   const { itemId = undefined } = $props();
-
-   /** @type {object} Reference to the reactive Document store. */
+   /** @type {object} The embedded item bridge provided by EmbeddedDocumentProvider. */
    const document = getContext('document');
 
-   // itemId is fixed per mounted instance (keyed list items do not change their ID); capturing
+   /** @type {object} The owning sheet's actor bridge (never shadowed by providers). */
+   const sheetDocument = getContext('sheetDocument');
+
+   // The item id is fixed for this component's lifetime (provider instances are id-keyed); capturing
    // once in checkOptions is intentional.
-   // svelte-ignore state_referenced_locally
    /** @type {ItemCheckOptions} Base options for the Item Check. */
    const checkOptions = {
-      itemId: itemId,
+      itemId: document.doc._id,
    };
 
    /** @type {ItemCheckParameters} Resolved dice and modifiers for the item check this button rolls. */
    let checkParameters = $derived.by(() => {
 
       // Ensure the item and check are valid.
-      const item = document.data.items.get(itemId);
-      if (item?.system.check.length > 0) {
+      if (document.data?.system.check.length > 0) {
 
          // Update the parameters.
-         return document.data.system.getItemCheckParameters(
-            document.data.system.initializeItemCheckOptions(checkOptions)
+         return sheetDocument.data.system.getItemCheckParameters(
+            sheetDocument.data.system.initializeItemCheckOptions(checkOptions)
          );
       }
       return undefined;
@@ -46,7 +39,7 @@
    attribute={checkParameters.attribute}
    complexity={checkParameters.complexity}
    difficulty={checkParameters.difficulty}
-   onclick={() => document.data.system.requestItemCheck(checkOptions)}
+   onclick={() => sheetDocument.data.system.requestItemCheck(checkOptions)}
    resolveCost={checkParameters.resolveCost}
    tooltip={{ text: tooltip, localize: false }}
    totalDice={checkParameters.totalDice}

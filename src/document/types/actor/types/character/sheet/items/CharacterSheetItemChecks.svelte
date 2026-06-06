@@ -1,24 +1,19 @@
 <script>
-
+   import { getContext } from 'svelte';
    import CharacterSheetItemCheck
       from '~/document/types/actor/types/character/sheet/items/CharacterSheetItemCheck.svelte';
 
-   /**
-    * @typedef {object} CharacterSheetItemChecksProps
-    * @property {TitanItem} [item] Reference to the Item document.
-    */
-
-   /** @type {CharacterSheetItemChecksProps} */
-   const { item = undefined } = $props();
+   /** @type {object} The embedded item bridge provided by EmbeddedDocumentProvider. */
+   const document = getContext('document');
 </script>
 
 <!--Checks-->
 <div class="checks">
 
    <!--Each Check-->
-   {#each item.system.check as check, checkIdx (check.uuid)}
+   {#each document.data?.system.check ?? [] as check, checkIdx (check.uuid)}
       <div class="check">
-         <CharacterSheetItemCheck itemId={item._id} {checkIdx}/>
+         <CharacterSheetItemCheck {checkIdx}/>
       </div>
    {/each}
 

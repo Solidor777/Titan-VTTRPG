@@ -9,22 +9,17 @@
       UNCHECKED_ICON,
    } from '~/system/Icons.js';
 
-   /**
-    * @typedef {object} CharacterSheetWeaponMultiAttackButtonProps
-    * @property {TitanItem} [item] The Item this component belongs to.
-    */
-
-   /** @type {CharacterSheetWeaponMultiAttackButtonProps} */
-   const { item = undefined } = $props();
-
-   /** @type {object} Reference to the reactive Document store. */
+   /** @type {object} The embedded weapon bridge provided by EmbeddedDocumentProvider. */
    const document = getContext('document');
 
-   /** @type {boolean} Whether this Weapon is multi attacking, read reactively through document.data. */
-   const multiAttack = $derived(document.data.items.get(item._id)?.system.multiAttack);
+   /** @type {object} The owning sheet's actor bridge (never shadowed by providers). */
+   const sheetDocument = getContext('sheetDocument');
+
+   /** @type {boolean} Whether this Weapon is multi attacking, read reactively through the embedded bridge. */
+   const multiAttack = $derived(document.data?.system.multiAttack);
 </script>
 
-<DocumentOwnerButton onclick={() => document.data.system.toggleMultiAttack(item._id)}>
+<DocumentOwnerButton onclick={() => sheetDocument.data.system.toggleMultiAttack(document.data?._id)}>
    <div class="button-inner">
       <i class={multiAttack ? MULTI_ATTACK_ICON : NO_MULTI_ATTCK_ICON}></i>
       <div class="label">
