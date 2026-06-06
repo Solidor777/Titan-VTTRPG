@@ -69,6 +69,7 @@ function makeLegacyItemSource(overrides = {}) {
    };
 }
 
+// Scaffolding for Tasks 2-3: used by the convertActor suites added in those tasks.
 /**
  * Builds a fake actor exposing only what convertActor reads: raw _source.items, the effects array, and recording
  * embedded-CRUD stubs.
@@ -100,6 +101,7 @@ function makeFakeActor({ items = [], effects = [] } = {}) {
 
 describe('buildEffectData (raw source contract)', () => {
    it('maps the core raw source fields onto effect AE creation data', () => {
+      /** @type {object} - The Active Effect creation data produced by buildEffectData. */
       const result = buildEffectData(makeLegacyItemSource());
 
       expect(result.name).toBe('Legacy Effect');
@@ -149,10 +151,13 @@ describe('buildEffectData (raw source contract)', () => {
       const source = makeLegacyItemSource();
       delete source.system.description;
 
+      /** @type {object} - The Active Effect creation data produced by buildEffectData. */
       const result = buildEffectData(source);
       result.system.duration.remaining = 99;
+      result.system.rulesElement.push({});
 
       expect(result.description).toBe('');
       expect(source.system.duration.remaining).toBe(2);
+      expect(source.system.rulesElement).toHaveLength(1);
    });
 });
