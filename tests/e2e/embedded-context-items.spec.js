@@ -57,7 +57,9 @@ const TYPE_CASES = [
    {
       // Seeded EQUIPPED so the controls render the condensed attack button (an unequipped weapon
       // shows the equip button there instead); the equip case uses the expanded-content toggle,
-      // which is always rendered, and flips equipped back to false.
+      // which is always rendered, and flips equipped back to false. The check entry is seeded for
+      // uniformity with the other check-capable types — the roll case goes through the condensed
+      // attack button, not this check.
       type: 'weapon',
       name: 'E2E Context Weapon',
       tab: 'Inventory',
@@ -214,14 +216,6 @@ test.beforeAll(async ({ browser }) => {
    errors = attachPageErrors(page);
    await login(page);
    await clearChat(page);
-
-   // File-wide gating defaults: rolls must skip the check-options dialog and deletes must not
-   // confirm unless a case flips the gate explicitly (re-seeded each beforeEach, restored each
-   // afterEach).
-   await page.evaluate(async () => {
-      await game.settings.set('titan', 'getCheckOptions', false);
-      await game.settings.set('titan', 'confirmDeletingItems', false);
-   });
 });
 
 test.afterEach(async () => {
@@ -324,8 +318,9 @@ test.describe('embedded-context item rows', () => {
 
    // In-file final-state hygiene (house pattern): re-assert the suite's test-default settings and
    // remove the fixture actor once the describe completes. The settings are client-scope and this
-   // spec's browser context is file-local, so nothing crosses spec files. Inner-scope after-hooks
-   // run before the file-level page close, so `page` is still open.
+   // spec's browser context is file-local, so nothing crosses spec files — note the test default
+   // for confirmDeletingItems (false) differs from its registered default (true). Inner-scope
+   // after-hooks run before the file-level page close, so `page` is still open.
    test.afterAll(async () => {
       await page.evaluate(async () => {
          await game.settings.set('titan', 'getCheckOptions', false);
@@ -613,20 +608,20 @@ test.describe('embedded-context item rows', () => {
       await expect(dialog, 'confirm-delete dialog mounts').toBeVisible();
 
       // CANCEL preserves: the dialog unmounts (anchored by the visible positive above) and the
-      // weapon must still exist afterwards.
+      // weapon must still exist afterwards. A direct read suffices — a poll-to-true would pass on
+      // its first read and add no wait; if cancel ever kicked off a slow async delete, the
+      // "dialog mounts again" anchor below would catch the vanished row.
       await dialog.getByRole('button', { name: CANCEL_LABEL }).click();
       await expect(dialog, 'cancel click unmounts the dialog').toHaveCount(0);
-      await expect
-         .poll(
-            () => page.evaluate(({ actorName, itemId }) => {
-               return !!game.actors.getName(actorName).items.get(itemId);
-            }, {
-               actorName: ACTOR_NAME,
-               itemId: itemIds.weapon,
-            }),
-            { message: 'cancel click preserves the item' },
-         )
-         .toBe(true);
+
+      /** @type {boolean} Whether the weapon still exists after the cancel click. */
+      const preserved = await page.evaluate(({ actorName, itemId }) => {
+         return !!game.actors.getName(actorName).items.get(itemId);
+      }, {
+         actorName: ACTOR_NAME,
+         itemId: itemIds.weapon,
+      });
+      expect(preserved, 'cancel click preserves the item').toBe(true);
 
       // Re-open the dialog through the same delete action.
       await row.getByRole('button', { name: DELETE_ITEM_LABEL }).click();
