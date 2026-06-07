@@ -104,6 +104,19 @@ Deferred/known bugs. Todos (planned work) live in `docs/TODO.md`; this file is b
 - **To do:** add an `{#if attack}` template gate and guard the deriveds.
 - **Found by:** the embedded-context conversion's final holistic review.
 
+### 8. `TitanDataModel` component prepare/migrate hooks can never run (Object.entries pair bug)
+
+- **What:** `src/document/data-model/TitanDataModel.js` — `_migrateComponentData` (line 108) and
+  `_prepareComponentDerivedData` (line 153) iterate `for (const component of Object.entries(...))`, so
+  `component` is a `[key, value]` PAIR (an Array); `component.migrateData` /
+  `component.prepareDerivedData` is always `undefined` and the component-level hooks never run.
+- **Severity:** Latent — no registered component currently defines `migrateData` or
+  `prepareDerivedData`, so today it is a dead path with zero behavioral effect; it becomes live the
+  moment a component adds either hook.
+- **To do:** iterate `Object.values(...)` (or destructure the pair) in both methods.
+- **Found by:** Task 5 quality review of the chat-mount-keying branch, 2026-06-06 (verified against
+  source by the controller).
+
 <!--
 Recently resolved: the socket-sync A1/A2 full-run timeout flake was fixed by the e2e Phase 2
 shared-world harness (per-file `clearChat` keeps the world lean). Verified: `socket-sync.spec.js`

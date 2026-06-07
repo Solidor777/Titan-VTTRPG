@@ -49,6 +49,14 @@ resistance or rating dice — boost a resistance via a `resistance`-selector ele
 type-specific override, e.g. `calculateAttributeCheckResults` via `AttributeCheck._calculateResults`).
 The resulting `CheckResults` object is stored on `check.results`.
 
+Casting-check roll-time auto-max: `calculateCastingCheckResults`
+(src/check/types/casting-check/CastingCheckResults.js) auto-maximizes the SINGLE affordable scaling aspect
+at roll time — when exactly one scaling aspect has `cost <= extraSuccesses`, every whole purchase the extra
+successes afford is spent on it (a cost-1 aspect drains `extraSuccessesRemaining` to 0), with damage/healing
+scaled by the aspect increment `max(initialValue, 1)` per purchase — consistent with the chat card's
+per-step math (history: CLOSED_BUGS #1). The card's reset control returns the aspect to `initialValue`,
+refunding ALL spent successes — NOT the auto-maxed roll-time state.
+
 **5. Chat message creation — `TitanCheck.sendToChat`**
 Creates the message as a typed check subtype: a top-level `type` (`this._getCheckType()`, one of
 `attributeCheck`/`resistanceCheck`/`attackCheck`/`castingCheck`/`itemCheck`) plus a `system` payload
@@ -59,14 +67,19 @@ travels in `message.system` (a `CheckChatMessageDataModel` subclass), NOT `flags
 
 `TitanChatMessage#renderHTML` (src/document/types/chat-message/ChatMessage.js) overrides Foundry's base to
 detect `this.system instanceof TitanChatMessageDataModel` (every check, item card, report, and the effect
-card). When true it adds the `titan`/`owner`/dark-mode classes to the full `<li>` chrome returned by
-`super.renderHTML(options)`, calls `_teardownComponent()` to unmount any prior mount (the chat log replaces
-the `<li>` on every update), then builds a `new ReactiveDocument(message)` bridge and mounts
-`ChatMessageContent` (src/document/types/chat-message/ChatMessageContent.svelte) into the `.message-content`
-div, passing the bridge as the `documentStore` prop (a name retained from the old API — it is the
-`ReactiveDocument` bridge, not a Svelte store); the shell sets it into context as `'document'`. The bridge
-and handle are stored on `message._svelteComponent = { handle, bridge }`. `_teardownComponent()` is also
-called directly by `OnPreDeleteChatMessage.js` (src/hooks/OnPreDeleteChatMessage.js) for delete-time cleanup.
+card). It sweeps stale mounts at entry (`sweepStaleMounts()` — every render is a sweep opportunity). When
+the subtype check passes it adds the `titan`/`owner`/dark-mode classes to the full `<li>` chrome returned by
+`super.renderHTML(options)`, builds a `new ReactiveDocument(message)` bridge and mounts `ChatMessageContent`
+(src/document/types/chat-message/ChatMessageContent.svelte) into the `.message-content` div, passing the
+bridge as the `documentStore` prop (a name retained from the old API — it is the `ReactiveDocument` bridge,
+not a Svelte store); the shell sets it into context as `'document'`. The mount is tracked PER RENDERED
+ELEMENT in `ChatMessageMountRegistry.js` via `registerMount(html, this.id, handle)` (see abstractions.md
+for the registry's state and teardown paths), and a post-render `requestAnimationFrame(sweepStaleMounts)`
+reaps the predecessor element that Foundry `replaceWith`s after an update render returns. One message
+renders into up to three elements (main chat log, notification pane, popout), each holding its own mount;
+each mounted card's bridge holds exactly one `updateChatMessage` hook registration while mounted. Message
+deletion tears down all of a message's mounts via the `deleteChatMessage` hook
+(src/hooks/OnDeleteChatMessage.js → `teardownMessageMounts`).
 
 Non-TITAN messages (no `TitanChatMessageDataModel` system) early-return the chrome unchanged, except the
 `titan-dark-mode` class is added when the `darkModeChatMessages` setting is `'all'`. There is NO
@@ -77,8 +90,10 @@ early-return and render with empty content (deliberately deprecated, never retro
 (src/check/types/attribute-check/chat-message/AttributeCheckChatMessage.svelte)
 `ChatMessageContent.selectComponent()` returns the leaf data model's `component` getter (e.g.
 `AttributeCheckChatMessage`). Check components read `document.data.system.results` /
-`document.data.system.parameters` from the `document` context bridge and write back via
-`document.data.update({ system: { … } })`. The `message` array is guarded on `.length` (schema default
+`document.data.system.parameters` from the `document` context bridge; update handlers never mutate the live
+model — they build the payload from `document.data.system.toObject()`, mutate the clone, and write back via
+`document.data.update({ system: { … } })` (see conventions.md, "Chat components never mutate the live
+DataModel"). The `message` array is guarded on `.length` (schema default
 `[]`). Recalc call sites (`CheckChatMessageDie`, `CheckChatResetExpertiseButton`, and the re-roll/double
 context menu in `OnGetChatLogEntryContext.js`) pass `recalculateCheckResults` an object built with
 `{ type: <message.type>, parameters, results }`, because `system` carries no `type` field. Composes the

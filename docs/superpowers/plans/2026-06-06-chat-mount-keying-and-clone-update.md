@@ -775,6 +775,8 @@ refactor.
 
 Append to `tests/e2e/checks-integration.spec.js` (inside the file, after the existing describe; it reuses the
 file's shared `page`, the `E2E Roller` rebuild in the existing `beforeEach`, and `forceDice`/`resetDice`):
+[Execution note: hooks were describe-scoped at the time — the review fix hoisted them to file level, which
+made this true; see commit b6b0b94a.]
 
 ```js
 test.describe('check chat-card interactions (clone-then-update parity)', () => {

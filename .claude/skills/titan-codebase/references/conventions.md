@@ -127,6 +127,13 @@ not re-render. Always build a fresh array and pass that to `update()` (e.g.
 across the custom-trait add/edit/delete paths on items and effects; the same antipattern still exists
 in `TitanActiveEffect`'s inline-`check` add/delete paths and in `RulesElementMixin` add/delete.
 
+**Chat components never mutate the live DataModel** — chat-card update handlers build their payload from
+`document.data.system.toObject()` (source ≡ prepared for the check chat DMs — they derive nothing over
+`parameters`/`results`), mutate the clone, then `document.data.update(...)`. Display `$derived`s stay on
+the live model; only update handlers clone. Exemplar: `OnGetChatLogEntryContext.js`. Known accepted
+limitation: two rapid clicks on DIFFERENT targets within one update round-trip are last-write-wins — the
+second silently reverts the first (see `docs/POST_WORK_FINDINGS.md`).
+
 **Context access convention** — `DocumentSheetShell.svelte` sets three context keys at mount: the
 `ReactiveDocument` bridge under `'document'`, the UI-state store under `'applicationState'`, and the SAME
 top-level bridge again under `'sheetDocument'`. `'document'` is always the NEAREST document —
@@ -499,6 +506,19 @@ lost session fails crisply; (5) `waitForFunction(() => globalThis.game?.ready ==
 { timeout: 60_000 })` — note the THREE-positional form (`fn, arg, options`); the two-argument form silently binds
 options as `arg`; (6) poll the positive completion signal again before any absence assertion. Budget the test via
 `test.setTimeout(120_000)` (a full reboot inside one test exceeds the 60s default under the throttled runner).
+
+**E2E leak probe for chat-card mounts** — `Hooks.events.updateChatMessage?.length` deltas count live
+chat-card mounts (`Hooks.events` is public Foundry API; each mounted card's `ReactiveDocument` bridge holds
+exactly one `updateChatMessage` registration while mounted).
+
+**E2E sidebar / chat-notification gotchas** — the world boots with the sidebar COLLAPSED, and programmatic
+`ui.sidebar.changeTab(...)` never expands it (only the user-click path does), so Playwright clicks on chat
+cards need `ui.sidebar.expand()` first or fail "outside of the viewport". Notification-pane tests must
+raise `ChatLog.NOTIFY_DURATION` (stash/restore; it is read live each ticker tick) because
+`#rerenderMessage` carries `_lifeSpan` over to replacement elements — the 5 s auto-dismiss clock is NOT
+reset by updates. Notification posting requires `core.uiConfig.chatNotifications === 'cards'` AND (a
+collapsed sidebar with sufficient viewport width, or the chat tab not visible) — a RENDERED popout
+suppresses posting entirely.
 
 **E2E helpers must not blind-toggle expanders** — verify a row's mount default before clicking its
 expand/collapse toggle: weapon-sheet sidebar attacks mount EXPANDED (`WeaponSheetData` seeds `isExpanded`

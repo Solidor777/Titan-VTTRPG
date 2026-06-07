@@ -61,7 +61,9 @@
 - There is NO `renderChatMessageHTML` hook: every TITAN chat message (checks, item cards, reports, effect) is a
   first-class subtype that self-renders via `TitanChatMessage#renderHTML` (see `data-flow.md`), which also applies
   the dark-mode-`'all'` styling class to non-TITAN messages.
-- `OnPreDeleteChatMessage.js` fires before a chat message is deleted (e.g., to clean up associated data).
+- `OnDeleteChatMessage.js` (registered on `deleteChatMessage`, which fires on ALL clients for confirmed
+  deletions) tears down all of a deleted message's tracked Svelte mounts via `teardownMessageMounts` in
+  `src/document/types/chat-message/ChatMessageMountRegistry.js` (see `abstractions.md`).
 - `OnGetChatLogEntryContext.js` adds custom entries to the chat-log context menu.
 - Directory-context hooks (`OnGetActorDirectoryEntryContext`, `OnGetItemDirectoryEntryContext`) add UUID
   management options via helpers in `src/helpers/utility-functions/`.

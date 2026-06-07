@@ -212,11 +212,22 @@ stored chat-message data.
 
 - `TitanChatMessage` (`src/document/types/chat-message/ChatMessage.js`) extends Foundry's
   `ChatMessage`. Overrides `renderHTML(options)`: when `this.system instanceof TitanChatMessageDataModel`,
-  calls `super.renderHTML(options)` for the standard card chrome, applies TITAN styling classes, tears down
-  any prior mount via `_teardownComponent()`, then mounts `ChatMessageContent.svelte` into the
-  `.message-content` div, storing the handle and bridge on `_svelteComponent = { handle, bridge }`.
-  Non-subtyped messages return the chrome unchanged. `_teardownComponent()` is a shared cleanup method
-  called both on re-render (within `renderHTML`) and on delete (from `OnPreDeleteChatMessage`).
+  calls `super.renderHTML(options)` for the standard card chrome, applies TITAN styling classes, then mounts
+  `ChatMessageContent.svelte` into the `.message-content` div, tracking the mount per rendered element in
+  the mount registry below. Non-subtyped messages return the chrome unchanged.
+- `ChatMessageMountRegistry.js` (`src/document/types/chat-message/ChatMessageMountRegistry.js`) — a
+  module-level `Map<HTMLElement, { handle, messageId, seen }>` keyed by the rendered card root element. One
+  message holds up to three live mounts: the main chat log, the notification pane (`#chat-notifications`),
+  and the chat popout (`#chat-popout`); per-message `ChatPopout` windows are covered by the same
+  element-keyed mechanism. Teardown paths: an entry sweep at every `renderHTML` plus a post-render rAF
+  sweep; one MutationObserver on `#chat-notifications .chat-log` (lazy, idempotent, re-attaches if the
+  element instance changes) for notification dismissals; and the `deleteChatMessage` hook
+  (`OnDeleteChatMessage.js`) → `teardownMessageMounts` — that hook fires on ALL clients for confirmed
+  deletions (`preDeleteChatMessage` is initiator-only and pre-confirmation; deliberately not used). The
+  `seen` flag defers sweeping until an element has been connected once (`ChatLog##doRenderBatch` renders
+  whole batches before inserting any element); `registerMount` guards double-registration by unmounting the
+  prior handle. The `ReactiveDocument` bridge needs no explicit teardown — `createSubscriber` self-cleans on
+  unmount and `destroy()` is a documented no-op.
 
 **Chat message data models**
 

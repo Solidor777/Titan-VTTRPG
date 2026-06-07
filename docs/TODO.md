@@ -77,46 +77,6 @@ is written-but-never-read and schema-stripped — harmless dead data, a candidat
   combat-initiative harness rather than a one-line trigger.
 - **Found by:** Phase 3 reports, Task 5 (e2e coverage).
 
-### 10. Chat-message Svelte mount is keyed per-document, not per-element
-
-- **What:** `TitanChatMessage` stores a single `_svelteComponent = { handle, bridge }`
-  per message document. Foundry renders one message into TWO elements when chat
-  notifications are active — the main chat log (`ChatLog#postOne` / `#updateMessage`)
-  AND the notifications pane (`ChatLog#postNotification`) — each calling `renderHTML`.
-  The second render's `_teardownComponent()` unmounts the first element's component
-  (leaving its `.message-content` blank until the next re-render), and the
-  notification-pane mount + its `ReactiveDocument` bridge later leak, because
-  notification auto-dismissal removes the element without a teardown hook.
-- **Severity:** Only manifests when the chat sidebar tab is NOT the active tab (so a
-  notification is posted). **Pre-existing:** the legacy `OnRenderChatMessageHTML` hook
-  (since deleted; Phase 4) used the identical single-slot `message._svelteComponent`
-  pattern, so the Phase 1 refactor preserved parity rather than regressing.
-- **To do:** Key the mount per rendered element (store `{ handle, bridge }` on the
-  `<li>` element, or a `WeakMap<HTMLElement, …>` keyed by target), tearing down
-  per-element; on delete, tear down all of a message's mounts. Consider a
-  MutationObserver (or Foundry hook) to unmount on notification-pane element removal.
-  Only `TitanChatMessage.renderHTML` carries the pattern now.
-- **Why deferred:** Out of scope for Phase 1 (parity migration of checks); the
-  mount-tracking model rework remains the actual fix.
-- **Found by:** Opus code-quality review of Phase 1, Task 3.
-
-### 11. Check chat components mutate the live DataModel before `update()`
-
-- **What:** Several check chat components — `CheckChatMessageDie.svelte`,
-  `CheckChatResetExpertiseButton.svelte`, `CastingCheckChatMessageScalingAspect.svelte` —
-  mutate `document.data.system.results` / `.parameters` (and `die.*`) in place on the live
-  `system` DataModel instance, then persist via
-  `document.data.update({ system: { results: structuredClone(...) } })`.
-- **Severity:** Not a corruption bug — Foundry's `update()` diffs the submitted payload against
-  `_source`, not the mutated prepared data, and the component remounts on the resulting
-  `updateChatMessage` render (discarding the transient mutated state). This is a **pre-existing**
-  pattern carried over unchanged from the `flags.titan` implementation.
-- **To do:** Refactor to build a local plain object (e.g. from `document.data.system.toObject()`),
-  mutate only that, and pass it to `update()` — never mutate the live model. Mirrors the clean
-  clone-then-update pattern already used in `OnGetChatLogEntryContext.js`.
-- **Why deferred:** Behavior-preserving cleanup, low risk; outside Phase 1's parity scope.
-- **Found by:** Opus code-quality review of Phase 1, Task 5.
-
 ### 12. Chat-message ↔ document path parity (schema-from-shape)
 
 - **Update (2026-06-05):** the embedded-document-stores spec shipped
