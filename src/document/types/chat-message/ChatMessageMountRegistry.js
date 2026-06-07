@@ -22,13 +22,20 @@ let notificationObserver = void 0;
 
 /**
  * Registers a mounted chat-card Svelte component for lifecycle tracking, keyed by its rendered root
- * element, and lazily (re)attaches the notification-pane removal observer.
+ * element, and lazily (re)attaches the notification-pane removal observer. Re-registering an already
+ * tracked element first tears down the existing entry, so the prior handle can never leak.
  * @param {HTMLElement} element - The rendered chat-card root element (the chat-log `li`).
  * @param {string} messageId - The id of the chat message the mount renders.
  * @param {object} handle - The Svelte mount handle returned by `mount()`.
  * @returns {void}
  */
 export function registerMount(element, messageId, handle) {
+   /** @type {ChatMessageMountEntry | undefined} The entry already tracking this element, when re-registering. */
+   const existing = mounts.get(element);
+   if (existing) {
+      unmountEntry(element, existing);
+   }
+
    mounts.set(element, {
       handle: handle,
       messageId: messageId,
@@ -89,6 +96,8 @@ function unmountEntry(element, entry) {
  * already under observation. Notification dismissal removes elements with NO adjacent render
  * (`ChatLog##dismissNotification` → `element.remove()`), so removal must be observed directly; every
  * other removal path is reaped by a sweep. Idempotent; lazily re-checked on every `registerMount`.
+ * Accepted bounded retention: if the pane is removed and never re-created, the observer and its
+ * detached log element are retained until the next pane creation re-attaches.
  * @returns {void}
  */
 function attachNotificationObserver() {

@@ -47,6 +47,23 @@ beforeEach(async () => {
    registry = await import('~/document/types/chat-message/ChatMessageMountRegistry.js');
 });
 
+describe('registerMount', () => {
+   it('tears down the existing entry when an element is registered twice', () => {
+      const element = cardElement('m1');
+      registry.registerMount(element, 'm1', { id: 'h1' });
+      registry.registerMount(element, 'm1', { id: 'h2' });
+
+      // Re-registration unmounts the first handle so it can never leak.
+      expect(mocks.unmount).toHaveBeenCalledTimes(1);
+      expect(mocks.unmount).toHaveBeenCalledWith({ id: 'h1' }, { outro: false });
+
+      // Only the second handle remains tracked for the message.
+      registry.teardownMessageMounts('m1');
+      expect(mocks.unmount).toHaveBeenCalledTimes(2);
+      expect(mocks.unmount).toHaveBeenCalledWith({ id: 'h2' }, { outro: false });
+   });
+});
+
 describe('sweepStaleMounts', () => {
    it('keeps connected mounts and unmounts them once disconnected', () => {
       const element = cardElement('m1');
@@ -60,6 +77,10 @@ describe('sweepStaleMounts', () => {
       registry.sweepStaleMounts();
       expect(mocks.unmount).toHaveBeenCalledTimes(1);
       expect(mocks.unmount).toHaveBeenCalledWith({ id: 'handle-1' }, { outro: false });
+
+      // A swept entry is dropped: a further sweep never double-unmounts it.
+      registry.sweepStaleMounts();
+      expect(mocks.unmount).toHaveBeenCalledTimes(1);
    });
 
    it('skips never-connected mounts (batch insertion race)', () => {
