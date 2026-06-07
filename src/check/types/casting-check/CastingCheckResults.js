@@ -95,7 +95,7 @@ export default function calculateCastingCheckResults(diceResults, parameters) {
       const affordableAspects = results.scalingAspect.filter((aspect) => aspect.cost <= results.extraSuccesses);
       if (affordableAspects.length === 1) {
 
-         // Get the highest amount by which we can increase the aspect.
+         // Get the number of whole purchases the extra successes afford.
          const aspect = affordableAspects[0];
          const delta = Math.floor(results.extraSuccesses / aspect.cost);
 
@@ -103,17 +103,20 @@ export default function calculateCastingCheckResults(diceResults, parameters) {
          // This is to prevent us from spending fractional successes.
          // or increasing the aspect by fractional amount.
          const cost = delta * aspect.cost;
-         aspect.currentValue += (delta * Math.max(aspect.initialValue, 1));
+
+         // Each purchase moves the aspect by its increment, matching the chat card's per-step math.
+         const increase = delta * Math.max(aspect.initialValue, 1);
+         aspect.currentValue += increase;
          results.extraSuccessesRemaining -= cost;
 
-         // Update damage.
+         // Update damage by the increment-scaled increase.
          if (aspect.isDamage) {
-            results.damage += delta;
+            results.damage += increase;
          }
 
-         // Update healing.
+         // Update healing by the increment-scaled increase.
          if (aspect.isHealing) {
-            results.healing += delta;
+            results.healing += increase;
          }
       }
 

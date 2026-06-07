@@ -161,6 +161,35 @@ describe('casting results — damage, healing, scaling aspect', () => {
       expect(r.extraSuccessesRemaining).toBe(0);
    });
 
+   it('scales auto-maximized damage by the aspect increment, not the purchase count', () => {
+      const params = {
+         difficulty: 4,
+         complexity: 1,
+         extraSuccessOnCritical: false,
+         extraFailureOnCritical: false,
+         damage: 3,
+         healing: 0,
+         damageMod: 0,
+         healingMod: 0,
+         scalingAspect: [
+            {
+               isDamage: true,
+               isHealing: false,
+               cost: 1,
+               initialValue: 2,
+               label: 'Damage',
+            },
+         ],
+      };
+      // Each purchase moves the aspect by its increment (max(initialValue, 1) = 2), so 3 purchases
+      // grow value AND damage by 6 — matching the chat card's per-step decrease/increase math.
+      const r = calculateCastingCheckResults(diceResults([5, 4, 5, 4]), params);
+      expect(r.extraSuccesses).toBe(3);
+      expect(r.scalingAspect[0].currentValue).toBe(8);
+      expect(r.damage).toBe(9);
+      expect(r.extraSuccessesRemaining).toBe(0);
+   });
+
    it('deals no damage or healing on a failed casting check', () => {
       const params = {
          difficulty: 4,
