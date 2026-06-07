@@ -18,6 +18,13 @@ Playwright e2e on the shared-world harness.
 
 **Spec:** `docs/superpowers/specs/2026-06-06-chat-mount-keying-and-clone-update-design.md`
 
+## Buddy-check directives
+
+No tasks are flagged for a buddy check. High-risk signals were assessed at plan handoff (2026-06-06): no data
+destruction, no migration, behavior-preserving refactor + new lifecycle code fully gated by unit/e2e suites. A
+buddy check was offered to the human at handoff and declined (execution approved without one). Standing rule for
+all tasks: standard two-stage review (spec compliance, then code quality).
+
 ---
 
 ## Verified facts the implementer must NOT re-derive
