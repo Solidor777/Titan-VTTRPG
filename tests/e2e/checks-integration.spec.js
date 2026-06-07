@@ -170,3 +170,184 @@ test.describe('v14 checks integration (forced dice)', () => {
       });
    }
 });
+
+test.describe('check chat-card interactions (clone-then-update parity)', () => {
+   /**
+    * Reads a plain snapshot of the newest message's check state for delta assertions.
+    * @param {string} messageId - The message to read.
+    * @returns {Promise<object>} `{ dice: {final, expertiseApplied}[], expertiseRemaining }`.
+    */
+   function readCheckState(messageId) {
+      return page.evaluate((id) => {
+         const system = game.messages.get(id).system.toObject();
+         return {
+            dice: system.results.dice.map((die) => ({
+               final: die.final,
+               expertiseApplied: die.expertiseApplied,
+            })),
+            expertiseRemaining: system.results.expertiseRemaining,
+         };
+      }, messageId);
+   }
+
+   test('die click applies expertise; reset restores the roll', async () => {
+      // Difficulty 4, expertiseMod 2, forced [3, 1, 1]: roll-time auto-expertise raises the 3 to 4
+      // (cheapest first) and leaves 1 expertise remaining with two clickable failure dice.
+      await forceDice(page, [3, 1, 1]);
+      const messageId = await page.evaluate(async () => {
+         const actor = game.actors.getName('E2E Roller');
+         const before = game.messages.size;
+         await actor.system.rollAttributeCheck({ attribute: 'body', expertiseMod: 2 });
+         await globalThis.titanWait(() => game.messages.size > before, { message: 'check message created' });
+         return game.messages.contents.at(-1).id;
+      });
+
+      // Confirm the roll-time state the click test depends on.
+      expect(await readCheckState(messageId)).toEqual({
+         dice: [
+            { final: 4, expertiseApplied: 1 },
+            { final: 1, expertiseApplied: 0 },
+            { final: 1, expertiseApplied: 0 },
+         ],
+         expertiseRemaining: 1,
+      });
+
+      // Show the chat tab and click the second die (final 1 — clickable while expertise remains).
+      // The sidebar boots collapsed and programmatic changeTab does not expand it (a user's tab
+      // click does, via _onClickTab), so expand explicitly to bring the chat log into the viewport.
+      await page.evaluate(() => {
+         ui.sidebar.changeTab('chat', 'primary');
+         ui.sidebar.expand();
+      });
+      const card = page.locator(`#chat .chat-log li[data-message-id="${messageId}"]`);
+      await card.locator('.die button').nth(1).click();
+
+      // The update round-trip persists the bumped die and spends the last expertise.
+      await expect.poll(() => readCheckState(messageId)).toEqual({
+         dice: [
+            { final: 4, expertiseApplied: 1 },
+            { final: 2, expertiseApplied: 1 },
+            { final: 1, expertiseApplied: 0 },
+         ],
+         expertiseRemaining: 0,
+      });
+
+      // The card re-renders the die with its expertise label.
+      await expect(card.locator('.die').nth(1)).toContainText('1 + 1');
+
+      // Reset restores every die to its base and refunds the full expertise pool.
+      await card.locator('button:has(i.fa-rotate-left)').click();
+      await expect.poll(() => readCheckState(messageId)).toEqual({
+         dice: [
+            { final: 3, expertiseApplied: 0 },
+            { final: 1, expertiseApplied: 0 },
+            { final: 1, expertiseApplied: 0 },
+         ],
+         expertiseRemaining: 2,
+      });
+   });
+
+   test('scaling aspect increase/decrease/reset adjust the clone-backed results', async () => {
+      // Give the roller's spell a scaling damage aspect (in-test only; the shared builders stay
+      // untouched so the zero-expertise oracle tests keep their complexity expectations).
+      await page.evaluate(async () => {
+         const actor = game.actors.getName('E2E Roller');
+         const spell = actor.items.find((item) => item.type === 'spell');
+         await spell.update({
+            system: {
+               customAspect: [
+                  {
+                     label: 'E2E Damage Aspect',
+                     scaling: true,
+                     initialValue: 1,
+                     cost: 1,
+                     resistanceCheck: 'none',
+                     isDamage: true,
+                     isHealing: false,
+                     uuid: 'e2e0aaaa-0000-4000-8000-000000000001',
+                  },
+               ],
+            },
+         });
+      });
+
+      // Force three successes (difficulty 4, complexity 1), banking two extra successes at roll time.
+      await forceDice(page, [6, 6, 6]);
+      const messageId = await page.evaluate(async () => {
+         const actor = game.actors.getName('E2E Roller');
+         const spell = actor.items.find((item) => item.type === 'spell');
+         const before = game.messages.size;
+         await actor.system.rollCastingCheck({ itemId: spell.id });
+         await globalThis.titanWait(() => game.messages.size > before, { message: 'casting message created' });
+         return game.messages.contents.at(-1).id;
+      });
+
+      /**
+       * Reads a plain snapshot of the casting message's scaling state.
+       * @returns {Promise<object>} `{ currentValue, extraSuccessesRemaining, damage }`.
+       */
+      const readScalingState = () => page.evaluate((id) => {
+         const system = game.messages.get(id).system.toObject();
+         return {
+            currentValue: system.results.scalingAspect[0].currentValue,
+            extraSuccessesRemaining: system.results.extraSuccessesRemaining,
+            damage: system.results.damage,
+         };
+      }, messageId);
+
+      // Roll-time auto-maximization: with exactly ONE affordable scaling aspect,
+      // calculateCastingCheckResults spends every extra success on it at roll time (2 extra successes
+      // at cost 1 each), so the card opens maxed out: value 1 + 2, damage 1 + 2, nothing left to spend.
+      expect(await readScalingState()).toEqual({
+         currentValue: 3,
+         extraSuccessesRemaining: 0,
+         damage: 3,
+      });
+
+      // Show the chat tab; expand explicitly because programmatic changeTab keeps the sidebar
+      // collapsed, parking the chat log outside the viewport.
+      await page.evaluate(() => {
+         ui.sidebar.changeTab('chat', 'primary');
+         ui.sidebar.expand();
+      });
+
+      // The scaling-aspects list nests a div.aspect wrapper around the component's own div.aspect
+      // root, so target the first (outermost) match for the single seeded aspect.
+      const aspect = page.locator(`#chat .chat-log li[data-message-id="${messageId}"] .aspect`).first();
+
+      // Decrease (third .control) refunds one success: -1 value and damage, +cost extra successes.
+      // Increase starts DISABLED (no extra successes remain), so decrease must move first.
+      await aspect.locator('.controls .control:nth-child(3) button').click();
+      await expect.poll(readScalingState).toEqual({
+         currentValue: 2,
+         extraSuccessesRemaining: 1,
+         damage: 2,
+      });
+      await expect(aspect.locator('.header .value')).toHaveText('2');
+
+      // Increase (fourth .control) spends it back: +1 value and damage, -cost extra successes.
+      await aspect.locator('.controls .control:nth-child(4) button').click();
+      await expect.poll(readScalingState).toEqual({
+         currentValue: 3,
+         extraSuccessesRemaining: 0,
+         damage: 3,
+      });
+      await expect(aspect.locator('.header .value')).toHaveText('3');
+
+      // Reset (second .control) restores the aspect to its INITIAL value, refunding every spent
+      // success — it does NOT return to the auto-maximized roll-time state. Decrease first so reset
+      // is exercised from a mid-range value with a known delta of 1.
+      await aspect.locator('.controls .control:nth-child(3) button').click();
+      await expect.poll(readScalingState).toEqual({
+         currentValue: 2,
+         extraSuccessesRemaining: 1,
+         damage: 2,
+      });
+      await aspect.locator('.controls .control:nth-child(2) button').click();
+      await expect.poll(readScalingState).toEqual({
+         currentValue: 1,
+         extraSuccessesRemaining: 2,
+         damage: 1,
+      });
+   });
+});
