@@ -35,7 +35,9 @@ all tasks: standard two-stage review (spec compliance, then code quality).
   second `ChatLog`). `#updateMessage` re-renders every surface holding the message.
 - Element-removal paths with NO hook: `#dismissNotification` → `element.remove()`; `#rerenderMessage` →
   `existing.replaceWith(replacement)` (the replacement is rendered BEFORE the old element is removed). Message
-  delete fires `preDeleteChatMessage`.
+  delete fires `preDeleteChatMessage` on the INITIATING client only, BEFORE confirmation; `deleteChatMessage`
+  fires on ALL clients for confirmed deletions (verified `client-backend.mjs`) — the teardown hook is therefore
+  registered on `deleteChatMessage` (user-approved spec amendment, Task 2 review).
 - `ChatLog##doRenderBatch` renders an entire batch (awaiting each message) BEFORE inserting ANY element — a sweep
   may run while batch mounts are registered but not yet connected. Hence the registry's `seen` guard.
 - `#chat-notifications` is created ONCE per session (`ChatLog._onFirstRender` → `#renderNotifications`) and
@@ -66,7 +68,7 @@ all tasks: standard two-stage review (spec compliance, then code quality).
 | --- | --- | --- |
 | `src/document/types/chat-message/ChatMessageMountRegistry.js` | Create | Element-keyed mount tracking, sweeps, notification observer |
 | `src/document/types/chat-message/ChatMessage.js` | Modify | Use the registry; delete the single slot |
-| `src/hooks/OnPreDeleteChatMessage.js` | Modify | Per-message registry teardown |
+| `src/hooks/OnDeleteChatMessage.js` | Create (replaces `OnPreDeleteChatMessage.js`, deleted) | Per-message registry teardown on `deleteChatMessage` |
 | `src/check/chat-message/CheckChatMessageDice.svelte` | Modify | Pass `idx` to each die |
 | `src/check/chat-message/CheckChatMessageDie.svelte` | Modify | Clone-then-update `applyExpertise` |
 | `src/check/chat-message/CheckChatResetExpertiseButton.svelte` | Modify | Clone-then-update `resetExpertise` |
@@ -688,7 +690,7 @@ test.describe('chat-message mount keying', () => {
          }, messageId);
          await expect.poll(hookCount, { message: 'notification mount torn down' }).toBe(baseline + 1);
 
-         // Deleting the message tears the remaining mount down via preDeleteChatMessage.
+         // Deleting the message tears the remaining mount down via deleteChatMessage.
          await page.evaluate(async (id) => {
             await game.messages.get(id).delete();
          }, messageId);
@@ -1229,7 +1231,7 @@ Make these edits (concise, current-state phrasing; no changelog narration):
 1. `references/abstractions.md` — in the chat-message section, add: `TitanChatMessage` mounts are tracked in
    `ChatMessageMountRegistry.js` (module-level `Map<HTMLElement, {handle, messageId, seen}>`); one message holds
    up to three live mounts (main log, notification pane, popout); teardown paths = render-entry sweep +
-   post-render rAF sweep + a `MutationObserver` on `#chat-notifications .chat-log` + `preDeleteChatMessage` →
+   post-render rAF sweep + a `MutationObserver` on `#chat-notifications .chat-log` + `deleteChatMessage` →
    `teardownMessageMounts`. The `seen` flag defers sweeping until an element has been connected once
    (`ChatLog##doRenderBatch` inserts batches after rendering them).
 2. `references/data-flow.md` — wherever the chat render flow describes the single `_svelteComponent` slot or

@@ -1,7 +1,11 @@
 # Chat-message mount keying + clone-then-update — Design
 
 **Date:** 2026-06-06
-**Status:** Approved (brainstorm 2026-06-06).
+**Status:** Approved (brainstorm 2026-06-06); amended same day after the Task 2 quality review (user-approved):
+delete teardown moved from `preDeleteChatMessage` to `deleteChatMessage` — preDelete fires on the INITIATING
+client only and BEFORE confirmation (verified `client-backend.mjs` `#preDeleteDocumentArray` vs the
+`Hooks.callAll('delete<Type>')` response path), so remote clients never tore down and vetoed deletions blanked
+cards. `deleteChatMessage` fires on all clients for confirmed deletions only.
 **Closes:** `docs/TODO.md` #10 (chat-message Svelte mount keyed per-document, not per-element) and #11 (check chat
 components mutate the live DataModel before `update()`).
 **Predecessor:** the chat-message-subtypes conversion (Phases 1-4 + follow-ups B/D, shipped). Both items were found
@@ -87,8 +91,9 @@ Coverage by removal path:
 | --- | --- |
 | Update replacement (`#rerenderMessage` `replaceWith`) | post-render rAF sweep (same frame) |
 | Notification auto-dismissal / manual close | MutationObserver (immediate) |
-| Message delete (`#deleteMessage`) | `preDeleteChatMessage` → `teardownMessageMounts` |
+| Message delete (`#deleteMessage`) | `deleteChatMessage` → `teardownMessageMounts` (all clients, confirmed deletions) |
 | Popout close / sidebar re-render | next render's entry sweep |
+| Visibility-change removal (`ChatMessage#_onUpdate` → `ui.chat.deleteMessage`) | next render's entry sweep (+ observer for the notification element) |
 
 Steady-state stale mounts: zero.
 
@@ -101,8 +106,9 @@ Steady-state stale mounts: zero.
   frame are idempotent and O(registry size); no debounce.
 - The `_svelteComponent` field and `_teardownComponent()` are DELETED; the stale "the chat log replaces the
   element on every update" comment goes with them.
-- `src/hooks/OnPreDeleteChatMessage.js` calls `teardownMessageMounts(message.id)` instead of
-  `_teardownComponent()`.
+- The delete teardown hook (`src/hooks/OnDeleteChatMessage.js`, registered on `deleteChatMessage` — see the
+  amendment note above; replaces `OnPreDeleteChatMessage.js`) calls `teardownMessageMounts(message.id)` instead
+  of `_teardownComponent()`.
 - The per-mount `ReactiveDocument` construction in `renderHTML` is unchanged (one bridge per mounted element).
 
 ## 5. Clone-then-update refactors (#11)
