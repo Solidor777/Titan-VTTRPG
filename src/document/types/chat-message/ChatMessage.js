@@ -1,28 +1,34 @@
-import { mount, unmount } from 'svelte';
+import { mount } from 'svelte';
 import ReactiveDocument from '~/document/reactive/ReactiveDocument.svelte.js';
 import ChatMessageContent from '~/document/types/chat-message/ChatMessageContent.svelte';
 import TitanChatMessageDataModel from '~/document/types/chat-message/ChatMessageDataModel.js';
 import darkModeChatMessages from '~/helpers/Settings/DarkModeChatMessages.js';
+import {
+   registerMount,
+   sweepStaleMounts,
+} from '~/document/types/chat-message/ChatMessageMountRegistry.js';
 
 /**
  * Extends the base Chat Message class so TITAN chat message subtypes render their own Svelte
  * component. Subtyped messages reuse Foundry's standard card chrome (via super.renderHTML) and mount
  * a Svelte component into the card's content region; all other messages render unchanged apart from
- * the dark-mode-'all' styling class.
+ * the dark-mode-'all' styling class. One message renders into up to THREE elements (main chat log,
+ * notification pane, chat popout), each through its own renderHTML call; every mount is tracked
+ * per element in the chat-message mount registry.
  * @extends {ChatMessage}
  */
 export default class TitanChatMessage extends ChatMessage {
-   /** @type {{ handle: object, bridge: ReactiveDocument } | undefined} The mounted Svelte component. */
-   _svelteComponent = void 0;
-
    /**
     * Renders the chat message HTML. For TITAN subtypes, mounts the subtype's Svelte component into
-    * the standard card content region.
+    * the standard card content region and tracks it per rendered element.
     * @override
     * @param {object} [options] - Options forwarded to the base renderer.
     * @returns {Promise<HTMLElement>} The rendered chat message element.
     */
    async renderHTML(options) {
+      // Reap tracked mounts whose elements have left the DOM (closed popouts, sidebar re-renders).
+      sweepStaleMounts();
+
       // Build Foundry's standard card chrome (header, content region, controls).
       const html = await super.renderHTML(options);
 
@@ -44,10 +50,9 @@ export default class TitanChatMessage extends ChatMessage {
          html.classList.add('titan-dark-mode');
       }
 
-      // Tear down any prior mount: the chat log replaces the element on every update.
-      this._teardownComponent();
-
-      // Mount the subtype's Svelte component into the card content region.
+      // Mount the subtype's Svelte component into the card content region and track it per element.
+      // The ReactiveDocument bridge needs no explicit teardown: its createSubscriber hooks self-clean
+      // when the component unmounts.
       const bridge = new ReactiveDocument(this);
       const handle = mount(ChatMessageContent, {
          target: html.querySelector('.message-content'),
@@ -55,20 +60,13 @@ export default class TitanChatMessage extends ChatMessage {
             documentStore: bridge,
          },
       });
-      this._svelteComponent = { handle, bridge };
+      registerMount(html, this.id, handle);
+
+      // Foundry replaces a re-rendered card's predecessor element AFTER this render returns
+      // (ChatLog##rerenderMessage → replaceWith); sweep again once the DOM settles so the
+      // predecessor's mount is reaped in the same frame.
+      requestAnimationFrame(() => sweepStaleMounts());
 
       return html;
-   }
-
-   /**
-    * Unmounts the message's Svelte component and tears down its reactive bridge, if mounted.
-    * @returns {void}
-    */
-   _teardownComponent() {
-      if (this._svelteComponent?.handle) {
-         unmount(this._svelteComponent.handle, { outro: false });
-         this._svelteComponent.bridge?.destroy();
-         this._svelteComponent = void 0;
-      }
    }
 }
