@@ -63,11 +63,14 @@ function contentChildCount(rootSelector, messageId) {
  */
 async function rollCheckMessage() {
    return page.evaluate(async () => {
+      /** @type {Actor | undefined} A stale fixture actor left over from a previous test, if any. */
       const stale = game.actors.getName('E2E Mount Roller');
       if (stale) {
          await stale.delete();
       }
+      /** @type {Actor} The rebuilt fixture actor that rolls the check. */
       const actor = await Actor.create({ name: 'E2E Mount Roller', type: 'player' });
+      /** @type {number} The message count before the roll; the wait below detects the new message. */
       const before = game.messages.size;
       await actor.system.rollAttributeCheck({ attribute: 'body' });
       await globalThis.titanWait(() => game.messages.size > before, { message: 'check message created' });
@@ -77,18 +80,31 @@ async function rollCheckMessage() {
 
 test.describe('chat-message mount keying', () => {
    test('notification pane and main log each hold a live mount through update, dismissal, delete', async () => {
-      // Force card notifications and park the sidebar on a non-chat tab so notifications post.
-      await page.evaluate(async () => {
-         globalThis.__e2ePriorUiConfig = game.settings.get('core', 'uiConfig');
-         await game.settings.set('core', 'uiConfig', {
-            ...globalThis.__e2ePriorUiConfig,
-            chatNotifications: 'cards',
-         });
-         ui.sidebar.changeTab('actors', 'primary');
-      });
-
       try {
+         // Force card notifications. They post because the sidebar is COLLAPSED — chat-tab-active
+         // suppression requires `ui.sidebar.expanded`, and the e2e viewport clears the collapsed
+         // width gate — so `collapse()` pins that precondition (a no-op when already collapsed) and
+         // `changeTab` merely parks the chat log off-screen. `NOTIFY_DURATION` is raised so the ~5s
+         // auto-dismiss ticker cannot race the manual dismissal below: the static is read live each
+         // tick, so the raise applies immediately, and it matters because update re-renders carry
+         // `_lifeSpan` over — a mid-test update does NOT reset the clock.
+         await page.evaluate(async () => {
+            /** @type {object} The prior core `uiConfig` setting, stashed for the finally restore. */
+            globalThis.__e2ePriorUiConfig = game.settings.get('core', 'uiConfig');
+            /** @type {number} The prior notification auto-dismiss duration, stashed for the finally restore. */
+            globalThis.__e2ePriorNotifyDuration = foundry.applications.sidebar.tabs.ChatLog.NOTIFY_DURATION;
+            foundry.applications.sidebar.tabs.ChatLog.NOTIFY_DURATION = 600_000;
+            await game.settings.set('core', 'uiConfig', {
+               ...globalThis.__e2ePriorUiConfig,
+               chatNotifications: 'cards',
+            });
+            ui.sidebar.collapse();
+            ui.sidebar.changeTab('actors', 'primary');
+         });
+
+         /** @type {number} The `updateChatMessage` hook-count baseline before the fixture message exists. */
          const baseline = await hookCount();
+         /** @type {string} The id of the freshly rolled check message under test. */
          const messageId = await rollCheckMessage();
 
          // Both surfaces hold mounted content (pre-fix the MAIN LOG card is blank: the notification
@@ -133,13 +149,19 @@ test.describe('chat-message mount keying', () => {
       finally {
          await page.evaluate(async () => {
             await game.settings.set('core', 'uiConfig', globalThis.__e2ePriorUiConfig);
+            foundry.applications.sidebar.tabs.ChatLog.NOTIFY_DURATION = globalThis.__e2ePriorNotifyDuration;
             ui.sidebar.changeTab('chat', 'primary');
+            delete globalThis.__e2ePriorUiConfig;
+            delete globalThis.__e2ePriorNotifyDuration;
          });
       }
    });
 
    test('popout and main log each hold a live mount; closing the popout reaps via sweep', async () => {
-      // Chat tab active: notifications never post; the popout is the second surface.
+      // The RENDERED POPOUT suppresses notification cards (`_shouldShowNotifications` Case 3), so
+      // the popout is the second surface. The message MUST be created only after `renderPopout()`
+      // resolves — rolled before it, a notification card would also post and break the strict
+      // `baseline + 2` count.
       await page.evaluate(() => {
          ui.sidebar.changeTab('chat', 'primary');
       });
@@ -148,8 +170,9 @@ test.describe('chat-message mount keying', () => {
          await globalThis.titanWait(() => ui.chat.popout?.rendered === true, { message: 'chat popout rendered' });
       });
 
-      // Baseline AFTER the popout opens (it re-renders any existing messages into its own log).
+      /** @type {number} The hook-count baseline, read AFTER the popout opens (it re-renders existing messages). */
       const baseline = await hookCount();
+      /** @type {string} The id of the freshly rolled check message under test. */
       const messageId = await rollCheckMessage();
 
       // Both surfaces hold mounted content (pre-fix the MAIN LOG card is blank: the popout render's
