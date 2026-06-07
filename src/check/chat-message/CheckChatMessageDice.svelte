@@ -10,9 +10,12 @@
 </script>
 
 <div class="container">
-   {#each dice as die}
+   {#each dice as die, idx}
       <div class="dice">
-         <CheckChatMessageDie {die}/>
+         <CheckChatMessageDie
+            {die}
+            {idx}
+         />
       </div>
    {/each}
 </div>

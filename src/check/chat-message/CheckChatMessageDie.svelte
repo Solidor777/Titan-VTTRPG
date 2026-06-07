@@ -9,11 +9,13 @@
    /**
     * @typedef {object} CheckChatMessageDieProps
     * @property {CheckDie} [die] - The individual die being displayed.
+    * @property {number} [idx] - Index of the die in the check results' dice array.
     */
 
    /** @type {CheckChatMessageDieProps} */
    let {
       die = undefined,
+      idx = undefined,
    } = $props();
 
    /** @type {object} Reference to the reactive Document store. */
@@ -52,31 +54,34 @@
    });
 
    /**
-    * Applies a point of Expertise to the die.
+    * Applies a point of Expertise to the die. Mutates a detached system clone only — the live
+    * DataModel is never written; the update round-trip re-renders the card.
     */
    function applyExpertise() {
+      // Clone the system data and address this die in the clone.
+      const system = document.data.system.toObject();
+      const clonedDie = system.results.dice[idx];
+
       // If expertise can be applied.
-      if (document.data.system.results.expertiseRemaining > 0 &&
-         die.final < 6
-      ) {
+      if (system.results.expertiseRemaining > 0 && clonedDie.final < 6) {
          // Add the expertise and decrement it from those remaining.
-         die.final += 1;
-         die.expertiseApplied += 1;
-         document.data.system.results.expertiseRemaining -= 1;
+         clonedDie.final += 1;
+         clonedDie.expertiseApplied += 1;
+         system.results.expertiseRemaining -= 1;
 
          // Recalculate the results, passing the message type for type-specific recalculation.
-         document.data.system.results = recalculateCheckResults(
+         const results = recalculateCheckResults(
             {
                type: document.data.type,
-               parameters: document.data.system.parameters,
-               results: document.data.system.results,
+               parameters: system.parameters,
+               results: system.results,
             },
          );
 
          // Update the document.
          document.data.update({
             system: {
-               results: structuredClone(document.data.system.results),
+               results: results,
             },
          });
       }

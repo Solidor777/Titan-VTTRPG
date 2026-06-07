@@ -9,28 +9,32 @@
    const document = getContext('document');
 
    /**
-    * Resets all applied Expertise.
+    * Resets all applied Expertise. Mutates a detached system clone only — the live DataModel is never
+    * written; the update round-trip re-renders the card.
     */
    function resetExpertise() {
+      // Clone the system data.
+      const system = document.data.system.toObject();
+
       // Remove the expertise from each die.
-      for (const die of document.data.system.results.dice) {
+      for (const die of system.results.dice) {
          die.final = die.base;
          die.expertiseApplied = 0;
       }
 
       // Reset the expertise available and recalculate the check results.
-      document.data.system.results.expertiseRemaining = document.data.system.parameters.totalExpertise;
-      const newResults = recalculateCheckResults(
+      system.results.expertiseRemaining = system.parameters.totalExpertise;
+      const results = recalculateCheckResults(
          {
             type: document.data.type,
-            parameters: document.data.system.parameters,
-            results: document.data.system.results,
+            parameters: system.parameters,
+            results: system.results,
          },
       );
 
       document.data.update({
          system: {
-            results: structuredClone(newResults),
+            results: results,
          },
       });
    }

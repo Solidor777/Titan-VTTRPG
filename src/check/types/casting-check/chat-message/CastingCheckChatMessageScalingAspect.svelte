@@ -40,90 +40,105 @@
    });
 
    /**
-    * Increases the aspect by the increment and updates the total cost.
+    * Increases the aspect by the increment and updates the total cost. Mutates a detached system clone
+    * only — the live DataModel is never written; the update round-trip re-renders the card.
     */
    function increaseAspect() {
+      // Clone the system data and address this aspect in the clone.
+      const system = document.data.system.toObject();
+      const clonedAspect = system.results.scalingAspect[idx];
+
       // Increase the aspect.
-      aspect.currentValue += aspectIncrement;
+      clonedAspect.currentValue += aspectIncrement;
 
       // Decrease the extra successes by the cost.
-      document.data.system.results.extraSuccessesRemaining -= aspect.cost;
+      system.results.extraSuccessesRemaining -= clonedAspect.cost;
 
       // Update damage if appropriate.
-      if (aspect.isDamage) {
-         document.data.system.results.damage += aspectIncrement;
+      if (clonedAspect.isDamage) {
+         system.results.damage += aspectIncrement;
       }
 
       // Update healing if appropriate.
-      if (aspect.isHealing) {
-         document.data.system.results.healing += aspectIncrement;
+      if (clonedAspect.isHealing) {
+         system.results.healing += aspectIncrement;
       }
 
       // Update the document.
       document.data.update({
          system: {
-            results: structuredClone(document.data.system.results),
-         }
+            results: system.results,
+         },
       });
    }
 
    /**
-    * Decreases the aspect by the increment and updates the total cost.
+    * Decreases the aspect by the increment and updates the total cost. Mutates a detached system clone
+    * only — the live DataModel is never written; the update round-trip re-renders the card.
     */
    function decreaseAspect() {
+      // Clone the system data and address this aspect in the clone.
+      const system = document.data.system.toObject();
+      const clonedAspect = system.results.scalingAspect[idx];
+
       // Decrease the aspect.
-      aspect.currentValue -= aspectIncrement;
+      clonedAspect.currentValue -= aspectIncrement;
 
       // Increase the extra successes by the cost.
-      document.data.system.results.extraSuccessesRemaining += aspect.cost;
+      system.results.extraSuccessesRemaining += clonedAspect.cost;
 
       // Update damage if appropriate.
-      if (aspect.isDamage) {
-         document.data.system.results.damage -= aspectIncrement;
+      if (clonedAspect.isDamage) {
+         system.results.damage -= aspectIncrement;
       }
 
       // Update healing if appropriate.
-      if (aspect.isHealing) {
-         document.data.system.results.healing -= aspectIncrement;
+      if (clonedAspect.isHealing) {
+         system.results.healing -= aspectIncrement;
       }
 
       // Update the document.
       document.data.update({
          system: {
-            results: structuredClone(document.data.system.results),
-         }
+            results: system.results,
+         },
       });
    }
 
    /**
-    * Resets all increases to the aspect and restores the total cost.
+    * Resets all increases to the aspect and restores the total cost. Mutates a detached system clone
+    * only — the live DataModel is never written; the update round-trip re-renders the card.
     */
    function resetAspect() {
+      // Clone the system data and address this aspect in the clone.
+      const system = document.data.system.toObject();
+      const clonedAspect = system.results.scalingAspect[idx];
+
       // Get the aspect delta.
-      const delta = aspect.currentValue - aspect.initialValue;
+      const delta = clonedAspect.currentValue - clonedAspect.initialValue;
       const incrementCount = delta / aspectIncrement;
-      const cost = incrementCount * aspect.cost;
+      const cost = incrementCount * clonedAspect.cost;
 
       // Reset the aspect to its original value.
-      aspect.currentValue = aspect.initialValue;
+      clonedAspect.currentValue = clonedAspect.initialValue;
 
       // Reset the extra successes.
-      document.data.system.results.extraSuccessesRemaining += cost;
+      system.results.extraSuccessesRemaining += cost;
 
       // Update damage if appropriate.
-      if (aspect.isDamage) {
-         document.data.system.results.damage -= delta;
+      if (clonedAspect.isDamage) {
+         system.results.damage -= delta;
       }
 
       // Update healing if appropriate.
-      if (aspect.isHealing) {
-         document.data.system.results.healing -= delta;
+      if (clonedAspect.isHealing) {
+         system.results.healing -= delta;
       }
 
       document.data.update({
          system: {
-            results: structuredClone(document.data.system.results),
-         }
+            results: system.results,
+         },
       });
    }
 </script>
