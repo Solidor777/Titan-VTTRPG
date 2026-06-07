@@ -13,8 +13,8 @@ import {
  * component. Subtyped messages reuse Foundry's standard card chrome (via super.renderHTML) and mount
  * a Svelte component into the card's content region; all other messages render unchanged apart from
  * the dark-mode-'all' styling class. One message renders into up to THREE elements (main chat log,
- * notification pane, chat popout), each through its own renderHTML call; every mount is tracked
- * per element in the chat-message mount registry.
+ * notification pane, chat popout — plus per-message chat popout windows), each through its own
+ * renderHTML call; every mount is tracked per element in the chat-message mount registry.
  * @extends {ChatMessage}
  */
 export default class TitanChatMessage extends ChatMessage {
