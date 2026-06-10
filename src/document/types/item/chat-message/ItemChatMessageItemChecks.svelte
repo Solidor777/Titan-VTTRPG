@@ -1,14 +1,9 @@
 <script>
    import autoSpendResolveChecks from '~/helpers/Settings/AutoSpendResolveChecks.js';
-   import localize from '~/helpers/utility-functions/Localize.js';
-   import OpposedCheckTag from '~/helpers/svelte-components/tag/OpposedCheckTag.svelte';
-   import ResistedByTag from '~/helpers/svelte-components/tag/ResistedByTag.svelte';
    import ItemCheckButton from '~/helpers/svelte-components/button/ItemCheckButton.svelte';
-   import IconStatTag from '~/helpers/svelte-components/tag/IconStatTag.svelte';
    import SpendResolveButton from '~/helpers/svelte-components/button/SpendResolveButton.svelte';
-   import { RESOLVE_ICON } from '~/system/Icons.js';
    import getControlledCharacters from '~/helpers/utility-functions/GetControlledCharacters.js';
-   import AttributeCheckTag from '~/helpers/svelte-components/tag/AttributeCheckTag.svelte';
+   import CheckTags from '~/document/svelte-components/check/CheckTags.svelte';
 
    /**
     * @typedef {object} ItemChatMessageItemChecksProps
@@ -102,48 +97,8 @@
             </div>
          {/if}
 
-         <div class="tags">
-            <!--Main Check Stats -->
-            <div class="tag">
-               <AttributeCheckTag
-                  attribute={check.attribute}
-                  difficulty={check.difficulty}
-                  complexity={check.complexity}
-                  skill={check.skill}
-               />
-            </div>
-
-            <!--DC-->
-            <div class="stat label"></div>
-
-            <!--Resolve Cost-->
-            {#if check.resolveCost > 0}
-               <div class="tag">
-                  <IconStatTag
-                     label={localize('resolveCost')}
-                     value={check.resolveCost}
-                     icon={RESOLVE_ICON}
-                  />
-               </div>
-            {/if}
-
-            <!--Resistance Check-->
-            {#if check.resistanceCheck !== 'none'}
-               <div class="tag">
-                  <ResistedByTag resistance={check.resistanceCheck}/>
-               </div>
-            {/if}
-
-            <!--Opposed Check-->
-            {#if check.opposedCheck.enabled}
-               <div class="tag">
-                  <OpposedCheckTag
-                     attribute={check.opposedCheck.attribute}
-                     skill={check.opposedCheck.skill}
-                  />
-               </div>
-            {/if}
-         </div>
+         <!--Intrinsic check tags (shared component; config attribute — chat cards have no actor context)-->
+         <CheckTags {idx}/>
       </li>
    {/each}
 </ol>
@@ -175,18 +130,6 @@
 
             &:not(:first-child) {
                @include margin-top-large;
-            }
-         }
-
-         .tags {
-            @include flex-row;
-            @include flex-group-center;
-            @include font-size-small;
-
-            flex-wrap: wrap;
-
-            .tag {
-               margin: var(--titan-spacing-large) var(--titan-spacing-standard) 0 var(--titan-spacing-standard);
             }
          }
       }
