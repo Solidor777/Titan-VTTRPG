@@ -162,8 +162,8 @@ export default class WeaponDataModel extends RulesElementItemDataModel {
 
          // Notify the sheet of the added attack.
          const sheet = this.parent._sheet;
-         if (this._sheet) {
-            sheet.postAddCheck();
+         if (sheet) {
+            sheet.addAttack();
          }
       }
    }
