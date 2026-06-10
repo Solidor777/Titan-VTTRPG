@@ -1,9 +1,6 @@
 <script>
-   import localize from '~/helpers/utility-functions/Localize.js';
    import RichText from '~/helpers/svelte-components/RichText.svelte';
-   import RarityTag from '~/helpers/svelte-components/tag/RarityTag.svelte';
-   import StatTag from '~/helpers/svelte-components/tag/StatTag.svelte';
-   import Tag from '~/helpers/svelte-components/tag/Tag.svelte';
+   import AbilityStats from '~/document/types/item/types/ability/components/AbilityStats.svelte';
    import CharacterSheetItem
       from '~/document/types/actor/types/character/sheet/items/CharacterSheetItem.svelte';
    import CharacterSheetItemSendToChatButton
@@ -70,52 +67,9 @@
       </div>
    {/if}
 
-   <!--Footer-->
-   <div class="section tags small-text">
-      <!--Rarity-->
-      <div class="tag">
-         <RarityTag rarity={document.data?.system.rarity}/>
-      </div>
-
-      <!--Action-->
-      {#if document.data?.system.action}
-         <div class="tag">
-            <Tag>{localize('action')}</Tag>
-         </div>
-      {/if}
-
-      <!--Reaction-->
-      {#if document.data?.system.reaction}
-         <div class="tag">
-            <Tag>{localize('reaction')}</Tag>
-         </div>
-      {/if}
-
-      <!--Passive-->
-      {#if document.data?.system.passive}
-         <div class="tag">
-            <Tag>{localize('passive')}</Tag>
-         </div>
-      {/if}
-
-      <!--XP Cost-->
-      {#if document.data?.system.xpCost}
-         <div class="tag">
-            <StatTag
-               label={localize('xpCost')}
-               value={document.data?.system.xpCost}
-            />
-         </div>
-      {/if}
-
-      <!--Custom Traits-->
-      {#each document.data?.system.customTrait ?? [] as trait}
-         <div class="tag">
-            <Tag tooltip={{ text: trait.description, localize: false }}>
-               {trait.name}
-            </Tag>
-         </div>
-      {/each}
+   <!--Footer (shared stats component; reads the ability through the document context)-->
+   <div class="section footer">
+      <AbilityStats/>
    </div>
 </CharacterSheetItem>
 
@@ -131,7 +85,7 @@
          @include padding-bottom-large;
       }
 
-      &:not(.rich-text, .tags) {
+      &:not(.rich-text, .footer) {
          @include padding-top-large;
       }
 
@@ -139,24 +93,9 @@
          @include border-top;
       }
 
-      &.tags {
-         @include flex-row;
-         @include flex-group-center;
-
-         flex-wrap: wrap;
-
-         .tag {
-            @include tag-container-child-margin;
-         }
-      }
-
-      &:not(.tags, .buttons) {
+      &:not(.footer, .buttons) {
          @include flex-column;
          @include flex-group-top;
-      }
-
-      &.small-text {
-         @include font-size-small;
       }
    }
 </style>

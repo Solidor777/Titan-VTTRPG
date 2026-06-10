@@ -89,7 +89,7 @@
    {/if}
 
    <!--Footer (shared stats component; reads the equipment through the document context)-->
-   <div class="section">
+   <div class="section footer">
       <ItemStats/>
    </div>
 </CharacterSheetItem>
@@ -106,7 +106,7 @@
          @include padding-bottom-large;
       }
 
-      &:not(.rich-text, .tags) {
+      &:not(.rich-text, .footer) {
          @include padding-top-large;
       }
 
@@ -114,24 +114,9 @@
          @include border-top;
       }
 
-      &.tags {
-         @include flex-row;
-         @include flex-group-center;
-
-         flex-wrap: wrap;
-
-         .tag {
-            @include tag-container-child-margin;
-         }
-      }
-
-      &:not(.tags, .buttons) {
+      &:not(.footer, .buttons) {
          @include flex-column;
          @include flex-group-top;
-      }
-
-      &.small-text {
-         @include font-size-small;
       }
    }
 </style>

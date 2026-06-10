@@ -4,7 +4,7 @@
    import ItemChatMessageItemChecks
       from '~/document/types/item/chat-message/ItemChatMessageItemChecks.svelte';
    import ItemChatMessageShell from '~/document/types/item/chat-message/ItemChatMessageShell.svelte';
-   import AbilityChatStats from '~/document/types/item/types/ability/chat-message/AbilityChatStats.svelte';
+   import AbilityStats from '~/document/types/item/types/ability/components/AbilityStats.svelte';
 
    /** @type {object} Reference to the reactive Document store. */
    const document = getContext('document');
@@ -28,9 +28,9 @@
       </div>
    {/if}
 
-   <!--Stats-->
+   <!--Stats (shared component; reads the snapshot through the message's document context)-->
    <div class="section">
-      <AbilityChatStats {item}/>
+      <AbilityStats/>
    </div>
 </ItemChatMessageShell>
 
