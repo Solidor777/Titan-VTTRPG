@@ -3,7 +3,7 @@
    import RichText from '~/helpers/svelte-components/RichText.svelte';
    import ItemChatChecks from '~/document/types/item/chat-message/ItemChatMessageItemChecks.svelte';
    import ItemChatMessageShell from '~/document/types/item/chat-message/ItemChatMessageShell.svelte';
-   import ShieldChatStats from '~/document/types/item/types/shield/chat-message/ShieldChatStats.svelte';
+   import ShieldStats from '~/document/types/item/types/shield/components/ShieldStats.svelte';
 
    /** @type {object} Reference to the reactive Document store. */
    const document = getContext('document');
@@ -13,9 +13,9 @@
 </script>
 
 <ItemChatMessageShell {item}>
-   <!--Shield stats-->
+   <!--Shield stats (shared component; reads the snapshot through the message's document context)-->
    <div class="section">
-      <ShieldChatStats {item}/>
+      <ShieldStats/>
    </div>
 
    <!--Description-->

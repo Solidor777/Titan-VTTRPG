@@ -9,29 +9,30 @@
    import { DEFENSE_ICON } from '~/system/Icons.js';
    import Tag from '~/helpers/svelte-components/tag/Tag.svelte';
 
-   /** @type {object} The embedded shield bridge provided by EmbeddedDocumentProvider. */
+   /** @type {object} The nearest document bridge (embedded shield or chat-message snapshot). */
    const document = getContext('document');
 
    /** @type {object} Descriptions of each shield trait. */
    const traitDescriptions = SHIELD_TRAIT_DESCRIPTIONS;
 
-   /** @type {number} The shield's defense value, read reactively through the embedded bridge. */
+   /** @type {number} The shield's defense value, read reactively through the document bridge. */
    const defense = $derived(document.data?.system.defense);
 
-   /** @type {string} The shield's rarity, read reactively through the embedded bridge. */
+   /** @type {string} The shield's rarity, read reactively through the document bridge. */
    const rarity = $derived(document.data?.system.rarity);
 
-   /** @type {number} The shield's gp value, read reactively through the embedded bridge. */
+   /** @type {number} The shield's gp value, read reactively through the document bridge. */
    const value = $derived(document.data?.system.value);
 
-   /** @type {Array<object>} The shield's traits, read reactively through the embedded bridge. */
+   /** @type {Array<object>} The shield's traits, read reactively through the document bridge. */
    const trait = $derived(document.data?.system.trait ?? []);
 
-   /** @type {Array<object>} The shield's custom traits, read reactively through the embedded bridge. */
+   /** @type {Array<object>} The shield's custom traits, read reactively through the document bridge. */
    const customTrait = $derived(document.data?.system.customTrait ?? []);
 </script>
 
 <div class="stats">
+   <!--Defense-->
    <div class="stat">
       <IconStatTag
          icon={DEFENSE_ICON}
@@ -76,15 +77,9 @@
 
 <style lang="scss">
    .stats {
-      @include flex-row;
-      @include flex-group-center;
+      @include tag-container;
       @include font-size-small;
 
       width: 100%;
-      flex-wrap: wrap;
-
-      .stat {
-         @include tag-container-child-margin;
-      }
    }
 </style>
