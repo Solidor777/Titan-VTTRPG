@@ -18,6 +18,9 @@
    /** @type {MoveEffectToFolderDialog} The Svelte component's owning application. */
    const application = getApplication();
 
+   // initialValue is fixed for this dialog's lifetime (a new dialog is constructed per move
+   // request), so capturing only the initial prop value is intended.
+   // svelte-ignore state_referenced_locally
    /** @type {string} The currently selected destination folder id ('' = pack root). */
    let selectedFolderId = $state(initialValue);
 
