@@ -105,7 +105,7 @@ export default class TitanDataModel extends foundry.abstract.TypeDataModel {
     * @protected
     */
    static _migrateComponentData(source) {
-      for (const component of Object.entries(this._prototypeComponents)) {
+      for (const component of Object.values(this._prototypeComponents)) {
          if (typeof component.migrateData === 'function') {
             component.migrateData(source);
          }
@@ -150,7 +150,7 @@ export default class TitanDataModel extends foundry.abstract.TypeDataModel {
     * @protected
     */
    _prepareComponentDerivedData() {
-      for (const component of Object.entries(this.components)) {
+      for (const component of Object.values(this.components)) {
          if (typeof component.prepareDerivedData === 'function') {
             component.prepareDerivedData();
          }
