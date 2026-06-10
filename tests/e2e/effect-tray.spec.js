@@ -1,6 +1,13 @@
 import { expect, test } from '@playwright/test';
 import { login } from './fixtures.js';
-import { attachPageErrors, clearChat, closeAllApps } from './world.js';
+import {
+   attachPageErrors,
+   clearChat,
+   closeAllApps,
+   controlFixtureActorToken,
+   deleteFixtureActor,
+   deleteOrphanedTokens,
+} from './world.js';
 
 /** @type {import('@playwright/test').Page} The file-shared, logged-in page (one world boot per file). */
 let page;
@@ -12,6 +19,9 @@ test.beforeAll(async ({ browser }) => {
    errors = attachPageErrors(page);
    await login(page);
    await clearChat(page);
+
+   // One-time sweep of orphaned fixture tokens left behind by prior runs (TODO #18).
+   await deleteOrphanedTokens(page);
 });
 
 test.afterEach(async () => {
@@ -110,33 +120,21 @@ test.describe('effect tray sidebar tab', () => {
    });
 
    test('Apply copies the effect onto the controlled token actor', async () => {
-      // Create an actor + token on the active scene and control it.
+      // Create an actor + token on the active scene and control it (throws if it never draws).
+      await deleteFixtureActor(page, 'E2E Tray Target');
       await page.evaluate(async () => {
-         const stale = game.actors.getName('E2E Tray Target');
-         if (stale) {
-            await stale.delete();
-         }
-         const actor = await Actor.create({ name: 'E2E Tray Target', type: 'player' });
-         const scene = game.scenes.active ?? (await Scene.create({ name: 'E2E Tray Scene', active: true }));
-         const [tokenDoc] = await scene.createEmbeddedDocuments('Token', [
-            await actor.getTokenDocument({ x: 100, y: 100 }),
-         ]);
-         // Poll until the placeable is rendered on the canvas, then control it. A fixed delay races
-         // canvas readiness and can no-op when the placeable is not yet drawn.
-         await new Promise((resolve) => {
-            /** @type {number} The remaining poll attempts before giving up. */
-            let attempts = 50;
-
-            /** @type {number} The interval handle used to poll for the placeable. */
-            const handle = setInterval(() => {
-               attempts -= 1;
-               if (tokenDoc.object || attempts <= 0) {
-                  clearInterval(handle);
-                  resolve();
-               }
-            }, 50);
+         await Actor.create({
+            name: 'E2E Tray Target',
+            type: 'player',
          });
-         tokenDoc.object?.control({ releaseOthers: true });
+      });
+      await controlFixtureActorToken(page, {
+         actorName: 'E2E Tray Target',
+         fallbackSceneName: 'E2E Tray Scene',
+      });
+
+      // Mount and activate the tray over the controlled token.
+      await page.evaluate(async () => {
          await ui.titanEffects.render(true);
          ui.titanEffects.activate();
          await titanWait(
@@ -301,11 +299,8 @@ test.describe('effect tray sidebar tab', () => {
 
    test('stash-from-actor copies a dropped effect into the selected pack', async () => {
       // Create an actor that owns an effect to stash, render the tray, and select the world pack.
+      await deleteFixtureActor(page, 'E2E Stash Source');
       await page.evaluate(async () => {
-         const stale = game.actors.getName('E2E Stash Source');
-         if (stale) {
-            await stale.delete();
-         }
          const actor = await Actor.create({ name: 'E2E Stash Source', type: 'player' });
          await actor.createEmbeddedDocuments('ActiveEffect', [
             {

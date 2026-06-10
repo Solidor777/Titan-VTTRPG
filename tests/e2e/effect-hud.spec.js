@@ -1,6 +1,13 @@
 import { expect, test } from '@playwright/test';
 import { login } from './fixtures.js';
-import { closeAllApps, clearChat, attachPageErrors } from './world.js';
+import {
+   attachPageErrors,
+   clearChat,
+   closeAllApps,
+   controlFixtureActorToken,
+   deleteFixtureActor,
+   deleteOrphanedTokens,
+} from './world.js';
 
 /** @type {import('@playwright/test').Page} The file-shared, logged-in page (one world boot per file). */
 let page;
@@ -12,6 +19,9 @@ test.beforeAll(async ({ browser }) => {
    errors = attachPageErrors(page);
    await login(page);
    await clearChat(page);
+
+   // One-time sweep of orphaned fixture tokens left behind by prior runs (TODO #18).
+   await deleteOrphanedTokens(page);
 });
 
 test.afterEach(async () => {
@@ -35,38 +45,24 @@ test.afterAll(async () => {
  * @returns {Promise<void>} Resolves once the token is controlled, content seeded, and the HUD refreshed.
  */
 async function setupControlledActor(page, options) {
-   await page.evaluate(async ({ name, addEffect, addCondition }) => {
-      // Remove any stale actor from a prior run so the controlled actor is deterministic.
-      const stale = game.actors.getName(name);
-      if (stale) {
-         await stale.delete();
-      }
+   // Remove any stale fixture (and its tokens) so the controlled actor is deterministic.
+   await deleteFixtureActor(page, options.name);
 
-      // Create the actor and place a token for it on the active scene.
-      const actor = await Actor.create({ name, type: 'player' });
-      const scene = game.scenes.active ?? (await Scene.create({ name: 'E2E HUD Scene', active: true }));
-      const [tokenDoc] = await scene.createEmbeddedDocuments('Token', [
-         await actor.getTokenDocument({ x: 100, y: 100 }),
-      ]);
-
-      // Poll until the placeable is drawn on the canvas, then control it. A fixed delay races canvas
-      // readiness and can no-op when the placeable is not yet drawn.
-      await new Promise((resolve) => {
-         /** @type {number} The remaining poll attempts before giving up. */
-         let attempts = 50;
-
-         /** @type {number} The interval handle used to poll for the placeable. */
-         const handle = setInterval(() => {
-            attempts -= 1;
-            if (tokenDoc.object || attempts <= 0) {
-               clearInterval(handle);
-               resolve();
-            }
-         }, 50);
+   // Create the actor, then place and control its token (throws if the placeable never draws).
+   await page.evaluate(async (name) => {
+      await Actor.create({
+         name,
+         type: 'player',
       });
-      tokenDoc.object?.control({ releaseOthers: true });
+   }, options.name);
+   await controlFixtureActorToken(page, {
+      actorName: options.name,
+      fallbackSceneName: 'E2E HUD Scene',
+   });
 
-      // Seed the requested effect and condition.
+   // Seed the requested effect and condition, then refresh the HUD over the seeded content.
+   await page.evaluate(async ({ name, addEffect, addCondition }) => {
+      const actor = game.actors.getName(name);
       if (addEffect) {
          await actor.createEmbeddedDocuments('ActiveEffect', [{
             name: 'HUD Test Effect',
@@ -77,7 +73,6 @@ async function setupControlledActor(page, options) {
       if (addCondition) {
          await actor.toggleStatusEffect('stunned');
       }
-
       game.titan.effectHud.refresh();
    }, options);
 }

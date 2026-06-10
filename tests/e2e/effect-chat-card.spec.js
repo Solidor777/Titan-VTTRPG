@@ -1,6 +1,14 @@
 import { test, expect } from '@playwright/test';
 import { login } from './fixtures.js';
-import { closeAllApps, clearChat, attachPageErrors } from './world.js';
+import {
+   attachPageErrors,
+   buildCheck,
+   clearChat,
+   closeAllApps,
+   controlFixtureActorToken,
+   deleteFixtureActor,
+   deleteOrphanedTokens,
+} from './world.js';
 
 /**
  * Effect chat cards are first-class `ChatMessage` subtypes (Phase 4). `effect.sendToChat()` creates a
@@ -23,6 +31,9 @@ test.beforeAll(async ({ browser }) => {
    errors = attachPageErrors(page);
    await login(page);
    await clearChat(page);
+
+   // One-time sweep of orphaned fixture tokens left behind by prior runs (TODO #18).
+   await deleteOrphanedTokens(page);
 });
 
 test.afterEach(async () => {
@@ -45,42 +56,24 @@ test.describe('effect chat-message subtype card', () => {
    // Build the actor with a controlled token (the card's check button rolls for controlled character
    // tokens) and one effect carrying a description, a custom trait, and a complete check[] entry.
    test.beforeEach(async () => {
-      await page.evaluate(async ({ actorName, effectName, effectDescription, traitName, checkLabel }) => {
-         // Remove any stale fixture so each run starts clean.
-         const stale = game.actors.getName(actorName);
-         if (stale) {
-            await stale.delete();
-         }
-
-         // Create the actor and place a token for it on the active scene.
-         const actor = await Actor.create({ name: actorName, type: 'player' });
-         const scene = game.scenes.active ?? (await Scene.create({ name: 'E2E Effect Card Scene', active: true }));
-         const [tokenDoc] = await scene.createEmbeddedDocuments('Token', [
-            await actor.getTokenDocument({ x: 100, y: 100 }),
-         ]);
-
-         // Poll until the placeable is drawn on the canvas, then control it. A fixed delay races canvas
-         // readiness and can no-op when the placeable is not yet drawn.
-         await new Promise((resolve) => {
-            /** @type {number} The remaining poll attempts before giving up. */
-            let attempts = 50;
-
-            /** @type {number} The interval handle used to poll for the placeable. */
-            const handle = setInterval(() => {
-               attempts -= 1;
-               if (tokenDoc.object || attempts <= 0) {
-                  clearInterval(handle);
-                  resolve();
-               }
-            }, 50);
+      // Remove any stale fixture (and its tokens) so each run starts clean, then create the actor
+      // and place + control its token (throws if the placeable never draws).
+      await deleteFixtureActor(page, ACTOR_NAME);
+      await page.evaluate(async (actorName) => {
+         await Actor.create({
+            name: actorName,
+            type: 'player',
          });
-         tokenDoc.object?.control({ releaseOthers: true });
+      }, ACTOR_NAME);
+      await controlFixtureActorToken(page, {
+         actorName: ACTOR_NAME,
+         fallbackSceneName: 'E2E Effect Card Scene',
+      });
 
-         // One effect with a description, a custom trait, and a single COMPLETE check[] entry. The
-         // check object mirrors createItemCheckTemplate() (src/check/types/item-check/
-         // ItemCheckTemplate.js) — the template module is not importable in the browser context, so
-         // the full default object is inlined; omitting fields like opposedCheck makes
-         // getItemCheckParameters throw.
+      // One effect with a description, a custom trait, and a single COMPLETE check[] entry built by
+      // the shared buildCheck factory (this card's check is unopposed, unresisted, and free).
+      await page.evaluate(async ({ actorName, effectName, effectDescription, traitName, check }) => {
+         const actor = game.actors.getName(actorName);
          await actor.createEmbeddedDocuments('ActiveEffect', [
             {
                name: effectName,
@@ -94,28 +87,7 @@ test.describe('effect chat-message subtype card', () => {
                         uuid: 'e2ecafd0-e2ec-4afd-8afd-e2ecafd0e2ec',
                      },
                   ],
-                  check: [
-                     {
-                        attribute: 'body',
-                        complexity: 1,
-                        damageReducedBy: 'none',
-                        difficulty: 4,
-                        initialValue: 1,
-                        isDamage: false,
-                        isHealing: false,
-                        label: checkLabel,
-                        opposedCheck: {
-                           attribute: 'body',
-                           enabled: false,
-                           skill: 'athletics',
-                        },
-                        resistanceCheck: 'none',
-                        resolveCost: 0,
-                        scaling: true,
-                        skill: 'arcana',
-                        uuid: 'e2ecafd1-e2ec-4afd-8afd-e2ecafd1e2ec',
-                     },
-                  ],
+                  check: [check],
                },
             },
          ]);
@@ -124,7 +96,15 @@ test.describe('effect chat-message subtype card', () => {
          effectName: EFFECT_NAME,
          effectDescription: EFFECT_DESCRIPTION,
          traitName: TRAIT_NAME,
-         checkLabel: CHECK_LABEL,
+         check: buildCheck(CHECK_LABEL, 'e2ecafd1-e2ec-4afd-8afd-e2ecafd1e2ec', {
+            opposedCheck: {
+               attribute: 'body',
+               enabled: false,
+               skill: 'athletics',
+            },
+            resistanceCheck: 'none',
+            resolveCost: 0,
+         }),
       });
    });
 
