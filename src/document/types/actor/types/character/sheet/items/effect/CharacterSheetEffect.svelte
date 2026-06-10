@@ -2,8 +2,7 @@
    import localize from '~/helpers/utility-functions/Localize.js';
    import { getContext } from 'svelte';
    import RichText from '~/helpers/svelte-components/RichText.svelte';
-   import DurationTag from '~/helpers/svelte-components/tag/DurationTag.svelte';
-   import Tag from '~/helpers/svelte-components/tag/Tag.svelte';
+   import EffectStats from '~/document/types/active-effect/components/EffectStats.svelte';
    import IconButton from '~/helpers/svelte-components/button/IconButton.svelte';
    import IntegerInput from '~/helpers/svelte-components/input/IntegerInput.svelte';
    import IntegerIncrementInput from '~/helpers/svelte-components/input/IntegerIncrementInput.svelte';
@@ -36,20 +35,11 @@
    /** @type {string} The effect's custom duration label, read reactively through the embedded bridge. */
    const durationCustom = $derived(document.data?.system.duration.custom);
 
-   /** @type {number} The effect's remaining duration, read reactively through the embedded bridge. */
-   const durationRemaining = $derived(document.data?.system.duration.remaining);
-
-   /** @type {boolean} Whether the effect is expired, read reactively through the embedded bridge. */
-   const isExpired = $derived(document.data?.system.isExpired);
-
    /** @type {string} The effect's rich-text description, read reactively through the embedded bridge. */
    const description = $derived(document.data?.description ?? '');
 
    /** @type {number} The effect's check count, read reactively through the embedded bridge. */
    const checkLength = $derived(document.data?.system.check.length ?? 0);
-
-   /** @type {Array<object>} The effect's custom traits, read reactively through the embedded bridge. */
-   const customTrait = $derived(document.data?.system.customTrait ?? []);
 </script>
 
 <CharacterSheetItem bind:isExpanded>
@@ -142,31 +132,9 @@
       </div>
    {/if}
 
-   <div class="section tags small-text">
-      <!--Duration-->
-      <div class="tag">
-         <DurationTag
-            type={durationType}
-            remaining={durationRemaining}
-            testId={'effect-row-duration'}
-         />
-      </div>
-
-      <!--Expired-->
-      {#if isExpired}
-         <div class="tag">
-            <Tag>{localize('expired')}</Tag>
-         </div>
-      {/if}
-
-      <!--Traits-->
-      {#each customTrait as trait}
-         <div class="tag">
-            <Tag tooltip={{ text: trait.description, localize: false }}>
-               {trait.name}
-            </Tag>
-         </div>
-      {/each}
+   <!--Footer (shared stats component; reads the effect through the document context)-->
+   <div class="section footer">
+      <EffectStats/>
    </div>
 </CharacterSheetItem>
 
@@ -182,7 +150,7 @@
          @include padding-bottom-large;
       }
 
-      &:not(.rich-text, .tags) {
+      &:not(.rich-text, .footer) {
          @include padding-top-large;
       }
 
@@ -190,24 +158,9 @@
          @include border-top;
       }
 
-      &.tags {
-         @include flex-row;
-         @include flex-group-center;
-
-         flex-wrap: wrap;
-
-         .tag {
-            @include tag-container-child-margin;
-         }
-      }
-
-      &:not(.tags, .buttons) {
+      &:not(.footer, .buttons) {
          @include flex-column;
          @include flex-group-top;
-      }
-
-      &.small-text {
-         @include font-size-small;
       }
    }
 
