@@ -22,7 +22,7 @@
     * @typedef {object} CheckRowProps
     * @property {ItemCheckParameters} [checkParameters] Calculated check parameters; renders nothing when undefined.
     * @property {number} [checkIdx] The index of the check in the checks array.
-    * @property {Function} [onRoll] Callback invoked when the check button is clicked.
+    * @property {(() => void) | undefined} [onRoll] Callback invoked when the check button is clicked.
     */
 
    /** @type {CheckRowProps} */

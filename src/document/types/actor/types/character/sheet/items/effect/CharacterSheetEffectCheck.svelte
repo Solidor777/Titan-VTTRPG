@@ -49,6 +49,7 @@
 
    /**
     * Rolls the effect's Check via the shared item-check engine.
+    * @returns {void}
     */
    function rollEffectCheck() {
       // Build options fresh at roll time so the roll captures the effect's current state.

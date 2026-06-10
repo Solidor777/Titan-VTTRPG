@@ -41,6 +41,7 @@
 
    /**
     * Rolls the Item Check.
+    * @returns {void}
     */
    function rollItemCheck() {
       sheetDocument.data.system.requestItemCheck(checkOptions);
