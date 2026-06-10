@@ -16,3 +16,5 @@ packs/**/LOCK
 *.old
 test/build/
 .superpowers/
+graphify-out/
+.claude/scheduled_tasks.lock

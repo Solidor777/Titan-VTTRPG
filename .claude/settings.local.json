@@ -1,4 +1,7 @@
 {
+  "env": {
+    "CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS": "1"
+  },
   "permissions": {
     "allow": [
       "Bash(node -e ':*)",
@@ -72,7 +75,9 @@
       "Bash(sed -i \"s|import getSetting from '~/helpers/utility-functions/GetSetting.js';|import minionStaminaMultiplier from '~/helpers/Settings/MinionStaminaMultiplier.js';\\\\nimport reportTakingDamage from '~/helpers/Settings/ReportTakingDamage.js';|\" \"/c/FoundryVTT/V13/Dev/foundryuserdata/Data/systems/titan/src/document/types/actor/types/character/types/npc/NPCDataModel.js\")",
       "Bash(sed -i \"s|getSetting\\('minionStaminaMultiplier'\\)|minionStaminaMultiplier\\(\\)|g; s|getSetting\\('reportTakingDamage'\\)|reportTakingDamage\\(\\)|g\" \"/c/FoundryVTT/V13/Dev/foundryuserdata/Data/systems/titan/src/document/types/actor/types/character/types/npc/NPCDataModel.js\")",
       "Bash(npx eslint *)",
-      "Read(//c/FoundryVTT/**)"
+      "Read(//c/FoundryVTT/**)",
+      "Bash(python -c \"import json;d=json.load\\(open\\('system.json'\\)\\);print\\(json.dumps\\(d.get\\('documentTypes',{}\\).get\\('ChatMessage',{}\\),indent=2\\)\\)\")",
+      "Bash(python -c \"import json;d=json.load\\(open\\('lang/en.json'\\)\\);print\\(json.dumps\\(d.get\\('TYPES',{}\\).get\\('ChatMessage',{}\\),indent=2\\)\\)\")"
     ]
   }
 }

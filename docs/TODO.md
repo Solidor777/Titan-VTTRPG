@@ -146,26 +146,3 @@ is written-but-never-read and schema-stripped — harmless dead data, a candidat
   strategy (increment 2 of #12); the actor-context consumer passes resolved overrides, document
   consumers read config paths.
 - **Found by:** #12 increment-1 gap inventory (2026-06-09).
-
-## Embedded document contexts — follow-ups
-
-The embedded-document-stores spec
-(`docs/superpowers/specs/2026-06-03-embedded-document-stores-design.md`) shipped `EmbeddedDocument`,
-`EmbeddedDocumentProvider`, the two-context convention, and the shared `AttackTags` component across its
-three consumers; the embedded-context conversion then moved every character-sheet item/effect row and the
-Effect HUD onto list-level providers. The item below is the surviving deferral.
-
-### 20. Inline attack editing on the character sheet via the provider (write path)
-
-- **What:** The character sheet's weapon rows already resolve their weapon through the list-level
-  `EmbeddedDocumentProvider` wrap (embedded-context conversion), but they offer no inline attack
-  editing — owners must open the weapon sheet to edit an attack. The editor component
-  `WeaponSheetAttackSettings` is written against `document.data.system.*`, so it should render unchanged
-  under the provider.
-- **To do:** Mount `WeaponSheetAttackSettings` on the character sheet's weapon rows and verify the
-  full-blob write path (`refreshSystemDocument` / `document.data.update(...)` against an
-  `EmbeddedDocument`); the row inputs shipped so far write single leaves via `document.doc?.update(...)`.
-- **Why deferred:** Sheet-side reuse follow-up split from the embedded-document-stores spec
-  (`docs/superpowers/specs/2026-06-03-embedded-document-stores-design.md`) to keep its scope to the
-  read-path proof (AttackTags across three surfaces).
-- **Found by:** the embedded-document-stores design (decomposed follow-up).
