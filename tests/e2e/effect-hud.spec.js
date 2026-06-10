@@ -20,7 +20,7 @@ test.beforeAll(async ({ browser }) => {
    await login(page);
    await clearChat(page);
 
-   // One-time sweep of orphaned fixture tokens left behind by prior runs (TODO #18).
+   // One-time sweep of orphaned fixture tokens left behind by prior runs.
    await deleteOrphanedTokens(page);
 });
 

@@ -22,7 +22,7 @@ const PROBE_STYLES = path.resolve(
  */
 async function ensureProbe(page) {
    // Wait for the system to finish init before injecting: a mid-boot injection skips the IIFE's
-   // immediate-registration path and would strand the current test (OPEN_BUGS #6).
+   // immediate-registration path and would strand the current test.
    await page.waitForFunction(() => !!globalThis.game?.titan);
 
    // Whether the probe API is already registered on this page.

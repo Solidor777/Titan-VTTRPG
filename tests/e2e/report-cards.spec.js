@@ -469,7 +469,7 @@ test.describe('report chat-message subtype cards', () => {
 
          // The apply handler updates the ACTOR first and the MESSAGE second, so the stamina poll above
          // can resolve before the message's confirmed flag lands — poll the message state too instead of
-         // single-shot reading it (the former OPEN_BUGS #4 read-race flake; history in CLOSED_BUGS #2).
+         // single-shot reading it (an actor-poll-then-message-read sequence loses that race under load).
          await expect
             .poll(
                () =>

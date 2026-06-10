@@ -77,7 +77,8 @@
       "Bash(npx eslint *)",
       "Read(//c/FoundryVTT/**)",
       "Bash(python -c \"import json;d=json.load\\(open\\('system.json'\\)\\);print\\(json.dumps\\(d.get\\('documentTypes',{}\\).get\\('ChatMessage',{}\\),indent=2\\)\\)\")",
-      "Bash(python -c \"import json;d=json.load\\(open\\('lang/en.json'\\)\\);print\\(json.dumps\\(d.get\\('TYPES',{}\\).get\\('ChatMessage',{}\\),indent=2\\)\\)\")"
+      "Bash(python -c \"import json;d=json.load\\(open\\('lang/en.json'\\)\\);print\\(json.dumps\\(d.get\\('TYPES',{}\\).get\\('ChatMessage',{}\\),indent=2\\)\\)\")",
+      "PowerShell(npm *)"
     ]
   }
 }

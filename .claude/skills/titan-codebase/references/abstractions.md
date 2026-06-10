@@ -108,10 +108,11 @@ management). Data model classes hold the schema, field validation, and derived-d
   shared mixin); they operate on `system.check` / `system.customTrait` via `this.update(...)`, notify the
   sheet through `this.sheet.postAddCheck()` / `preDeleteCheck(idx)`, and reuse the item
   `AddCustomTraitDialog` / `EditCustomTraitDialog` (passed `this`). They are invoked by the reused item
-  Checks tab and Custom-Traits sidebar via `document.data.*`. Effect chat components
-  (`EffectChatMessage.svelte`, `EffectChatStats.svelte`) live in
-  `src/document/types/active-effect/chat-message/` beside `EffectChatMessageDataModel.js`, whose
-  `get component()` returns `EffectChatMessage`.
+  Checks tab and Custom-Traits sidebar via `document.data.*`. The effect chat component
+  (`EffectChatMessage.svelte`) lives in `src/document/types/active-effect/chat-message/` beside
+  `EffectChatMessageDataModel.js`, whose `get component()` returns `EffectChatMessage`; its stats
+  block is the shared `EffectStats.svelte` (`src/document/types/active-effect/components/`), also
+  consumed by the character sheet's effect row footer.
 - `TitanActiveEffectDataModel` (`src/document/types/active-effect/TitanActiveEffectDataModel.js`)
   extends `RulesElementMixin(TitanDataModel)`. Registered as `CONFIG.ActiveEffect.dataModels.effect`.
   Beyond the mixin's `rulesElement` array, its schema adds a custom `duration` ({ type, remaining,
@@ -517,6 +518,28 @@ and one or more inner Svelte component trees.
   (static `itemId` capture; provider instances are id-keyed) and `CharacterSheetEffectCheck.svelte` (fresh
   `itemRollData` from the effect at derive/roll time — the engine's effect passthrough). The Effect HUD
   inherits via `CharacterSheetEffectCheck` reuse.
+- `CastingCheckTags.svelte` (`src/document/svelte-components/check/CastingCheckTags.svelte`) — the ONE
+  shared casting-check tag display. Optional prop `{ parameters }`: when passed
+  (`getCastingCheckParameters` output), it renders the resolved attribute tag PLUS
+  dice/training/expertise `IconStatTag`s; when omitted, it renders the config
+  `document.data?.system?.castingCheck` through the nearest `'document'` context. TestIds
+  `casting-check-tags-attribute/dice/training/expertise`. Three consumers:
+  `SpellChatMessage.svelte` (snapshot, no prop), `CharacterSheetSpellCastingCheck.svelte`
+  (`parameters={checkParameters}` — a thin wrapper that only computes the parameters), and
+  `SpellSheetSidebarCastingCheck.svelte` (config, no prop; the tag renders inside the colored
+  expandable header).
+- **Per-type stats components** — ONE shared component per type renders the footer/stats tag block on
+  BOTH the character-sheet row and the chat card (the snapshot satisfies the same
+  `document.data?.system.*` reads via path parity; no props carry data): shared `ItemStats.svelte`
+  (`src/document/types/item/components/` — rarity/value/custom traits; serves BOTH weapon and
+  equipment, 4 surfaces), `AbilityStats` (+action/reaction/passive/xpCost), `ArmorStats` (armor
+  icon-stat value/max + `TraitTag` traits), `ShieldStats` (defense icon-stat + traits), `SpellStats`
+  (tradition/xpCost), `CommodityStats` (quantity-first order), each in its type's `components/` dir,
+  and `EffectStats` (`src/document/types/active-effect/components/` — `DurationTag` with testId
+  `effect-row-duration`, computed expired tag, custom traits). The old per-surface `*ChatStats.svelte`
+  and `CharacterSheet{Armor,Shield}Stats.svelte` copies are deleted. Sheet footers wrap these in
+  `<div class="section footer">` (armor/shield rows: `section stats`), whose class keeps the section
+  excluded from `padding-top-large`/flex-column rules exactly as the old `.tags` class did.
   `src/document/svelte-components/check/` is the home for document-generic check components that read the
   `'document'` context.
 
