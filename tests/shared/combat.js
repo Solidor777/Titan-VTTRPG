@@ -65,6 +65,12 @@ export const seedCombatEncounter = async (opts) => {
 
    // Create combat bound to the scene with explicit (deterministic) initiative.
    const combat = await Combat.create({ scene: scene.id });
+
+   // View the seeded combat in the tracker (the posture of a GM actually running the encounter).
+   // Foundry v14's CombatTracker._onRender does `renderData.find(d => d._id === this.viewed?.id)`
+   // and then `"turn" in <result>` — for a NON-viewed combat the find returns undefined and the
+   // render throws an uncaught TypeError on every round/turn update, polluting page-error checks.
+   ui.combat.viewed = combat;
    const [effectCombatant] = await combat.createEmbeddedDocuments('Combatant', [
       { tokenId: effectToken.id, sceneId: scene.id, initiative: effectInitiative },
    ]);
@@ -101,6 +107,10 @@ export const seedCombatEncounter = async (opts) => {
 export const teardownCombatEncounter = async (ids) => {
    const combat = game.combats.get(ids.combatId);
    if (combat) {
+      // Stop viewing the combat before deleting it (seedCombatEncounter set it as viewed).
+      if (ui.combat.viewed?.id === ids.combatId) {
+         ui.combat.viewed = null;
+      }
       await combat.delete();
    }
    const scene = game.scenes.get(ids.sceneId);

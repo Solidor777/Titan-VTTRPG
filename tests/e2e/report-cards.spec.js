@@ -2,6 +2,7 @@ import { expect, test } from '@playwright/test';
 import { login } from './fixtures.js';
 import { attachPageErrors, clearChat, closeAllApps } from './world.js';
 import { setWorldSetting } from './settings.js';
+import { seedCombatEncounter, teardownCombatEncounter } from '../shared/combat.js';
 
 /**
  * Report chat cards are first-class `ChatMessage` subtypes (Phase 3). Each of the 13 TITAN report types
@@ -19,8 +20,7 @@ import { setWorldSetting } from './settings.js';
  *
  * NOTE: the login user is a GM, so whispered owner reports are visible to it and world-scope settings
  * are writable. `effectsExpiredReport` is produced only by the deep `onInitiativeAdvanced` initiative-
- * effect-expiry path, which needs intricate combat setup to drive reliably; per the project's
- * no-flaky-tests / no-unlogged-todos rules it is logged in docs/TODO.md and not covered here.
+ * effect-expiry path and is covered by the combat-harness case at the end of this spec.
  */
 
 /** @type {import('@playwright/test').Page} The file-shared, logged-in page (one world boot per file). */
@@ -495,6 +495,79 @@ test.describe('report chat-message subtype cards', () => {
          await page.evaluate((id) => game.actors.get(id)?.delete(), setup.actorId);
 
          expect(errors, `uncaught errors during apply-confirm flow:\n${errors.join('\n')}`).toEqual([]);
+      });
+   });
+
+   /**
+    * Initiative-expiry flow (the 13th report subtype): drives the deep onInitiativeAdvanced path
+    * (CharacterDataModel.js ~4944) through a real seeded encounter rather than a thin trigger.
+    */
+   test.describe('effects-expired report (combat harness)', () => {
+      test('effects-expired report renders after an initiative effect expires', async () => {
+         // An initiative-duration effect with remaining 1 at an initiative BETWEEN the two
+         // combatants' values is advanced (and expires) on the first nextTurn() from the started
+         // state. All three gates are world-scope and read live.
+         await setWorldSetting(page, 'autoDecreaseEffectDuration', true);
+         await setWorldSetting(page, 'reportEffects', true);
+         await setWorldSetting(page, 'autoRemoveExpiredEffects', 'enabled');
+
+         /** @type {object|undefined} The seeded encounter's document ids (for teardown). */
+         let ids;
+         try {
+            ids = await page.evaluate(seedCombatEncounter, {
+               sceneName: 'E2E Effects Expired Scene',
+               effectActor: {
+                  name: 'E2E Effects Expired Actor',
+                  type: 'player',
+               },
+               otherActor: {
+                  name: 'E2E Effects Expired Other',
+                  type: 'player',
+               },
+               effectInitiative: 5,
+               otherInitiative: 10,
+            });
+
+            /** @type {{messageId: string, messageType: string}} The expiry report's id and type. */
+            const result = await page.evaluate(async ({ effectActorId, combatId }) => {
+               const actor = game.actors.get(effectActorId);
+               await actor.createEmbeddedDocuments('ActiveEffect', [{
+                  name: 'E2E Expiring Effect',
+                  type: 'effect',
+                  disabled: false,
+                  system: {
+                     duration: {
+                        type: 'initiative',
+                        remaining: 1,
+                        initiative: 7,
+                     },
+                  },
+               }]);
+
+               // Advance from the other combatant (initiative 10) to the effect actor (initiative
+               // 5): the effect's initiative 7 lies in (5, 10), so remaining decrements 1 -> 0.
+               await game.combats.get(combatId).nextTurn();
+               await titanWait(
+                  () => game.messages.contents[game.messages.size - 1]?.type === 'effectsExpiredReport',
+                  { message: 'effectsExpiredReport message created' },
+               );
+               const message = game.messages.contents[game.messages.size - 1];
+               return {
+                  messageId: message.id,
+                  messageType: message.type,
+               };
+            }, ids);
+
+            await expectReportCard(result, 'effectsExpiredReport');
+         }
+         finally {
+            if (ids) {
+               await page.evaluate(teardownCombatEncounter, ids);
+            }
+
+            // Restore the file's suite-wide posture (beforeAll pins autoRemoveExpiredEffects off).
+            await setWorldSetting(page, 'autoRemoveExpiredEffects', 'disabled');
+         }
       });
    });
 });
