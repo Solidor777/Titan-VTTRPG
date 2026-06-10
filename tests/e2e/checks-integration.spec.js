@@ -167,6 +167,39 @@ test.describe('v14 checks integration (forced dice)', () => {
          expect(errors, `uncaught errors during ${checkCase.name} roll:\n${errors.join('\n')}`).toEqual([]);
       });
    }
+
+   test('attack check carries the attack label as attackName', async () => {
+      // Roll an attack check and read both the fixture's attack label and the stored parameter.
+      /** @type {{expectedLabel: string, attackName: string, messageId: string}} */
+      const result = await page.evaluate(async () => {
+         const actor = game.actors.getName('E2E Roller');
+         const weapon = actor.items.find((item) => item.type === 'weapon');
+         const before = game.messages.size;
+         await actor.system.rollAttackCheck({
+            itemId: weapon.id,
+            attackIdx: 0,
+         });
+         await globalThis.titanWait(() => game.messages.size > before, { message: 'attack message created' });
+         const message = game.messages.contents[game.messages.size - 1];
+         return {
+            expectedLabel: weapon.system.attack[0].label,
+            attackName: message.system.parameters.attackName,
+            messageId: message.id,
+         };
+      });
+
+      // Non-vacuous: the fixture label must be non-empty before the equality proves anything.
+      expect(result.expectedLabel, 'fixture attack label is non-empty').not.toBe('');
+      expect(result.attackName, 'attackName matches the rolled attack label').toBe(result.expectedLabel);
+
+      // The mounted attack-check header renders the attack name as its sub-label.
+      await expect(
+         page
+            .locator(`.message[data-message-id="${result.messageId}"]`)
+            .getByText(result.expectedLabel)
+            .first(),
+      ).toBeVisible();
+   });
 });
 
 test.describe('check chat-card interactions (clone-then-update parity)', () => {

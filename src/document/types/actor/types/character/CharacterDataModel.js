@@ -2789,6 +2789,7 @@ export default class CharacterDataModel extends TitanActorDataModel {
       parameters.img = itemRollData.img;
       parameters.itemName = itemRollData.name;
       parameters.attackNotes = itemRollData.attackNotes;
+      parameters.attackName = attackData.label;
       parameters.damage = attackData.damage;
       parameters.attackTrait = attackData.trait;
 
