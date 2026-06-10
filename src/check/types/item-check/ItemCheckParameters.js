@@ -40,7 +40,8 @@
 /**
  * Builds the zero-value shape of an Item Check's parameters.
  * All numeric fields default to 0, boolean fields to false, string fields to '', and arrays to [].
- * The factory constant `damageReducedBy: 'none'` is kept at its canonical default value.
+ * The factory constants `damageReducedBy: 'none'` and `resistanceCheck: 'none'` are kept at their
+ * canonical default values.
  * The nested `opposedCheck` object always uses the typed `OpposedCheckBase` structure.
  * @returns {ItemCheckParameters} The item check-parameters shape (with factory constants).
  */
@@ -50,7 +51,7 @@ export function createItemCheckParametersShape() {
       damageMod: 0, damageReducedBy: 'none', diceMod: 0, difficulty: 0, doubleExpertise: false,
       doubleTraining: false, expertiseMod: 0, extraFailureOnCritical: false, extraSuccessOnCritical: false,
       healing: 0, healingMod: 0, img: '', isDamage: false, isHealing: false, itemDescription: '',
-      itemName: '', opposedCheck: { attribute: '', enabled: false, skill: '' }, resistanceCheck: '',
+      itemName: '', opposedCheck: { attribute: '', enabled: false, skill: '' }, resistanceCheck: 'none',
       resolveCost: 0, scaling: false, skill: '', skillExpertise: 0, skillTrainingDice: 0, totalDice: 0,
       totalExpertise: 0, totalTrainingDice: 0, trainingMod: 0,
    };

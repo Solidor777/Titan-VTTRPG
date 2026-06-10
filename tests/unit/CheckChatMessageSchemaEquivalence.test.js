@@ -579,7 +579,7 @@ const GOLDENS = {
             enabled: booleanField(false),
             skill: stringField(''),
          }),
-         resistanceCheck: stringField(''),
+         resistanceCheck: stringField('none'),
          resolveCost: integerField(0),
          scaling: booleanField(false),
          skill: stringField(''),
