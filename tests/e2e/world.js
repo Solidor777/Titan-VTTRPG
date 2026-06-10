@@ -104,3 +104,149 @@ export function attachPageErrors(page) {
    });
    return errors;
 }
+
+/**
+ * Builds a COMPLETE item/effect check entry mirroring createItemCheckTemplate()
+ * (src/check/types/item-check/ItemCheckTemplate.js). Node-side data factory: build the object here
+ * and pass it INTO page.evaluate as data (the template module is not importable in the browser
+ * context, and omitting fields like opposedCheck makes getItemCheckParameters throw).
+ * @param {string} label - The check's display label (rendered on its ItemCheckButton).
+ * @param {string} uuid - A unique id for the check entry.
+ * @param {object} [overrides] - Field overrides merged over the complete default entry.
+ * @returns {object} The complete check entry.
+ */
+export function buildCheck(label, uuid, overrides = {}) {
+   return {
+      attribute: 'body',
+      complexity: 1,
+      damageReducedBy: 'none',
+      difficulty: 4,
+      initialValue: 1,
+      isDamage: false,
+      isHealing: false,
+      label: label,
+      opposedCheck: {
+         attribute: 'mind',
+         enabled: true,
+         skill: 'perception',
+      },
+      resistanceCheck: 'reflexes',
+      resolveCost: 2,
+      scaling: true,
+      skill: 'arcana',
+      uuid: uuid,
+      ...overrides,
+   };
+}
+
+/**
+ * Deletes a fixture actor by name (when present) along with any token it left on the active scene
+ * (deleting an actor does NOT delete its placed tokens). Serves both the stale sweep at seed time
+ * and final afterAll cleanup.
+ * @param {import('@playwright/test').Page} page - The shared page.
+ * @param {string} actorName - The fixture actor's name.
+ * @returns {Promise<void>} Resolves once the actor and its tokens are removed from the world.
+ */
+export async function deleteFixtureActor(page, actorName) {
+   await page.evaluate(async (name) => {
+      const actor = game.actors.getName(name);
+      if (!actor) {
+         return;
+      }
+
+      // Remove the actor's tokens from the active scene before deleting the actor itself.
+      const scene = game.scenes.active;
+      if (scene) {
+         const tokenIds = scene.tokens
+            .filter((token) => token.actorId === actor.id)
+            .map((token) => token.id);
+         if (tokenIds.length > 0) {
+            await scene.deleteEmbeddedDocuments('Token', tokenIds);
+         }
+      }
+      await actor.delete();
+   }, actorName);
+}
+
+/**
+ * Deletes every token on every scene whose actor no longer resolves — the orphans left behind by
+ * prior runs whose fixtures deleted the actor without deleting its placed tokens. Call once per
+ * spec file (beforeAll, after login) in any spec that places fixture tokens.
+ * @param {import('@playwright/test').Page} page - The shared page.
+ * @returns {Promise<void>} Resolves once all orphaned tokens are deleted.
+ */
+export async function deleteOrphanedTokens(page) {
+   await page.evaluate(async () => {
+      for (const scene of game.scenes) {
+         const orphanIds = scene.tokens
+            .filter((token) => !token.actorId || !game.actors.get(token.actorId))
+            .map((token) => token.id);
+         if (orphanIds.length > 0) {
+            await scene.deleteEmbeddedDocuments('Token', orphanIds);
+         }
+      }
+   });
+}
+
+/**
+ * Places a token for the named actor on the active scene (creating a fallback scene when none is
+ * active), waits until the placeable is DRAWN (throwing with a clear message on exhaustion — a
+ * never-drawn placeable must fail here, not at a later, less-diagnostic timeout), controls it, and
+ * refreshes the Effect HUD so the GM resolution ladder (first SELECTED token) resolves the actor.
+ * @param {import('@playwright/test').Page} page - The shared page.
+ * @param {object} options - Control options.
+ * @param {string} options.actorName - The fixture actor's name (must already exist).
+ * @param {string} options.fallbackSceneName - Name for the fallback scene if none is active.
+ * @returns {Promise<string|null>} The created fallback scene's id for afterAll cleanup, or null.
+ */
+export async function controlFixtureActorToken(page, { actorName, fallbackSceneName }) {
+   return page.evaluate(async ({ name, sceneName }) => {
+      const actor = game.actors.getName(name);
+
+      // Reuse the active scene; fall back to creating one and report its id for cleanup.
+      /** @type {Scene|null} The scene hosting the fixture token. */
+      let scene = game.scenes.active;
+      /** @type {string|null} The created fallback scene's id, when no scene was active. */
+      let fallbackId = null;
+      if (!scene) {
+         scene = await Scene.create({
+            name: sceneName,
+            active: true,
+         });
+         fallbackId = scene.id;
+      }
+
+      const [tokenDoc] = await scene.createEmbeddedDocuments('Token', [
+         await actor.getTokenDocument({
+            x: 100,
+            y: 100,
+         }),
+      ]);
+
+      // titanWait THROWS on exhaustion — a never-drawn placeable fails loudly right here.
+      await titanWait(() => !!tokenDoc.object, { message: 'token placeable drawn' });
+      tokenDoc.object.control({ releaseOthers: true });
+
+      game.titan.effectHud.refresh();
+      return fallbackId;
+   }, {
+      name: actorName,
+      sceneName: fallbackSceneName,
+   });
+}
+
+/**
+ * Reads the newest chat message's subtype once a message beyond the given count exists. Returns
+ * undefined while no new message has landed so `expect.poll` keeps retrying.
+ * @param {import('@playwright/test').Page} page - The shared page.
+ * @param {number} before - The world message count snapshotted before the UI trigger.
+ * @returns {Promise<string|undefined>} The newest message's subtype, or undefined when none landed.
+ */
+export function newestMessageType(page, before) {
+   return page.evaluate((count) => {
+      if (game.messages.size <= count) {
+         return undefined;
+      }
+      return game.messages.contents[game.messages.size - 1]?.type;
+   }, before);
+}
