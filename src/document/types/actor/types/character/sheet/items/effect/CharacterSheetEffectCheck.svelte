@@ -1,16 +1,6 @@
 <script>
    import { getContext } from 'svelte';
-   import localize from '~/helpers/utility-functions/Localize.js';
-   import autoSpendResolveChecks from '~/helpers/Settings/AutoSpendResolveChecks.js';
-   import IconStatTag from '~/helpers/svelte-components/tag/IconStatTag.svelte';
-   import ItemCheckButton from '~/helpers/svelte-components/button/ItemCheckButton.svelte';
-   import SpendResolveButton from '~/helpers/svelte-components/button/SpendResolveButton.svelte';
-   import CheckTags from '~/document/svelte-components/check/CheckTags.svelte';
-   import {
-      DICE_ICON,
-      EXPERTISE_ICON,
-      TRAINING_ICON,
-   } from '~/system/Icons.js';
+   import CheckRow from '~/document/svelte-components/check/CheckRow.svelte';
 
    /** @type {object} The embedded effect bridge provided by EmbeddedDocumentProvider. */
    const document = getContext('document');
@@ -25,9 +15,6 @@
 
    /** @type {CharacterSheetEffectCheckProps} */
    const { checkIdx = undefined } = $props();
-
-   /** @type {boolean} Whether to automatically spend the resolve for checks. */
-   const autoSpendResolve = autoSpendResolveChecks();
 
    /**
     * Builds the Check Options for this effect check, resolving fresh roll data from the effect.
@@ -72,118 +59,9 @@
    }
 </script>
 
-<!--Check-->
-{#if checkParameters}
-   <div class="check">
-      <!--Buttons-->
-      <div class="buttons">
-         {#if checkParameters.resolveCost}
-            {#if autoSpendResolve}
-               <!--Combined Item Check and Spend Resolve button-->
-               <ItemCheckButton
-                  label={checkParameters.checkLabel}
-                  attribute={checkParameters.attribute}
-                  disabled={!document.data?.isOwner}
-                  resolveCost={checkParameters.resolveCost}
-                  onclick={() => rollEffectCheck()}
-               />
-            {:else}
-               <!--Check Button-->
-               <div>
-                  <ItemCheckButton
-                     label={checkParameters.checkLabel}
-                     attribute={checkParameters.attribute}
-                     disabled={!document.data?.isOwner}
-                     onclick={() => rollEffectCheck()}
-                  />
-               </div>
-
-               <!--Resolve Cost Button-->
-               <div class="resolve-cost-button">
-                  <SpendResolveButton
-                     resolveCost={checkParameters.resolveCost}
-                     onclick={() => sheetDocument.data.system.spendResolve(checkParameters.resolveCost)}
-                  />
-               </div>
-            {/if}
-         {:else}
-            <!--Check Button-->
-            <ItemCheckButton
-               label={checkParameters.checkLabel}
-               attribute={checkParameters.attribute}
-               disabled={!document.data?.isOwner}
-               resolveCost={checkParameters.resolveCost}
-               onclick={() => rollEffectCheck()}
-            />
-         {/if}
-      </div>
-
-      <div class="stats">
-         <!--Intrinsic check tags (shared component; attribute carries the actor-resolved value)-->
-         <CheckTags
-            attribute={checkParameters.attribute}
-            idx={checkIdx}
-         />
-
-         <!--Dice-->
-         <div class="stat">
-            <IconStatTag
-               icon={DICE_ICON}
-               label={localize('dice')}
-               value={checkParameters.totalDice}
-            />
-         </div>
-
-         <!--Training-->
-         {#if checkParameters.totalTrainingDice}
-            <div class="stat">
-               <IconStatTag
-                  label={localize('training')}
-                  value={checkParameters.totalTrainingDice}
-                  icon={TRAINING_ICON}
-               />
-            </div>
-         {/if}
-
-         <!--Expertise-->
-         {#if checkParameters.totalExpertise}
-            <div class="stat">
-               <IconStatTag
-                  label={localize('expertise')}
-                  value={checkParameters.totalExpertise}
-                  icon={EXPERTISE_ICON}
-               />
-            </div>
-         {/if}
-      </div>
-   </div>
-{/if}
-
-<style lang="scss">
-   .check {
-      @include flex-column;
-      @include flex-group-top;
-
-      width: 100%;
-
-      .buttons {
-         @include flex-row;
-
-         .resolve-cost-button {
-            @include margin-left-large;
-         }
-      }
-
-      .stats {
-         @include flex-row;
-         @include flex-group-center;
-         @include font-size-small;
-
-         flex-wrap: wrap;
-
-         .stat {
-            @include tag-container-child-margin;
-         }
-      }
-   }
-</style>
+<!--Shared check-row presentation; this component only builds the options-->
+<CheckRow
+   {checkParameters}
+   {checkIdx}
+   onRoll={rollEffectCheck}
+/>
