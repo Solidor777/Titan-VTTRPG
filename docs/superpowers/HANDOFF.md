@@ -1,95 +1,70 @@
-# Session Handoff — 2026-06-09 (chat mount keying + clone-then-update merged; NEXT = #23 → #12)
+# Session Handoff — 2026-06-09 (#23 + #12 increment 1 merged; backlog open)
 
-Resume point after a context `/clear`. Read this, then the referenced docs + the auto-loaded memory.
+Resume point. Read this, then the referenced docs + the auto-loaded memory.
 
-## ✅ Last session — TODO #10 + #11 — DONE + MERGED + PUSHED
+## ✅ This session — TODO #23 + TODO #12 (strategy + increment 1) — DONE + MERGED + PUSHED
 
-`main` is at **`a48d1445`** (fast-forward merged and **pushed to origin**; feature branch `chat-mount-keying`
-deleted). Subagent-driven (6 plan tasks, fresh `titan-svelte-dev` implementers + two-stage review each + a final
-dual holistic review: senior reviewer **and** `feature-dev:code-reviewer`, both cleared it with zero blocking
-findings). **Verified: unit 221 (39 files) / full e2e green (3 foreground shards).**
+`main` is at **`35a98a12`** (two fast-forward merges, pushed to origin). Executed mainline
+(`mainline-plan-execution`), one dispatched final review per branch, both clean.
 
-Spec `specs/2026-06-06-chat-mount-keying-and-clone-update-design.md`, plan
-`plans/2026-06-06-chat-mount-keying-and-clone-update.md`. Shipped:
+- **#23 — shared check-row** (branch `check-row-extraction`, merged @ `e3228401`): new
+  `src/document/svelte-components/check/CheckRow.svelte` (props
+  `{ checkParameters, checkIdx, onRoll }`; two-context; reads `autoSpendResolveChecks`; gate
+  inside). `CharacterSheetItemCheck` / `CharacterSheetEffectCheck` keep only options-building +
+  roll handlers (258 duplicated lines deleted). Spec/plan
+  `2026-06-09-check-row-extraction*`. Verified: build clean, unit 221, targeted e2e 13/13
+  (checks-integration, embedded-context-effects, effect-hud).
+- **#12 — path parity** (branch `checktags-item-cards`, merged @ `35a98a12`): strategy locked
+  **component-driven** (user-approved; spec
+  `specs/2026-06-09-path-parity-strategy-and-checktags-chat-design.md`) — each increment converges
+  one duplicated cross-surface display onto a shared component reading parity paths; schema work
+  only where parity is missing. **Increment 1 shipped:** `ItemChatMessageItemChecks` (all 7 item
+  cards) renders intrinsic check tags via shared `CheckTags` (`<CheckTags {idx}/>`, zero schema
+  change — the message bridge satisfies the `'document'` context via snapshot path parity). Two
+  user-approved display convergences: resolve-cost icon → `SPEND_RESOLVE_ICON`, tag spacing →
+  `tag-container-child-margin`. Verified: build clean, unit 221, targeted e2e 14/14 (item-cards,
+  checks-integration). **#12 stays open** (north-star); increment 2 queued as **TODO #25**
+  (CastingCheckTags across `SpellChatMessage` / `CharacterSheetSpellCastingCheck` /
+  `SpellSheetSidebarCastingCheck`).
+- **Full e2e suite NOT run this session** — both specs scoped verification to targeted specs +
+  unit; run the full 3-shard suite before the next large merge.
+- titan-codebase skill updated (CheckRow entry; CheckTags consumer list → 3 consumers).
 
-- **#10 — per-element chat mount keying:** new `src/document/types/chat-message/ChatMessageMountRegistry.js`
-  (`Map<HTMLElement,{handle,messageId,seen}>`); `TitanChatMessage.renderHTML` sweeps at entry + schedules a
-  post-render `requestAnimationFrame(sweepStaleMounts)`; a `MutationObserver` on `#chat-notifications .chat-log`
-  tears down dismissed notification cards; `registerMount` guards double-registration. Fixes the
-  notification-pane/popout double-render blank card + the orphaned-mount hook leak across all three surfaces.
-  `_svelteComponent`/`_teardownComponent` deleted.
-- **Hook swap (user-approved spec amendment):** teardown moved from `preDeleteChatMessage` (initiator-only,
-  pre-confirmation) → **`deleteChatMessage`** (`src/hooks/OnDeleteChatMessage.js`, all clients, confirmed
-  deletions). Verified in `client-backend.mjs`.
-- **#11 — clone-then-update:** the 3 check chat components (`CheckChatMessageDie`,
-  `CheckChatResetExpertiseButton`, `CastingCheckChatMessageScalingAspect`; `CheckChatMessageDice` passes `idx`)
-  build payloads from `system.toObject()`, mutate the clone, `update()`; the live DataModel is never written
-  (12 mutation lines removed; `structuredClone` dropped).
-- **2 opportunistic fixes (logged in `docs/CLOSED_BUGS.md`):** #1 `CastingCheckResults.js` roll-time auto-max now
-  scales damage/healing by the aspect increment `delta*max(initialValue,1)` (was `delta` — divergence only with
-  `initialValue>1` aspects), TDD'd. #2 fast-healing apply-confirm e2e read-race (was OPEN_BUGS #4) — the test
-  polled the actor's stamina but one-shot-read the message's `confirmed`, which `confirm()` writes a SECOND await
-  later; fix polls the message. Both pre-existing, unrelated to the branch.
-- **New latent bug logged `docs/OPEN_BUGS.md` #8:** `TitanDataModel._migrateComponentData` /
-  `_prepareComponentDerivedData` iterate `Object.entries(...)` treating the `[key,value]` pair as the component →
-  component hooks can never run (dead path today; fix = `Object.values`).
-- Docs/skill: TODO #10/#11 deleted; titan-codebase `abstractions.md`/`data-flow.md`/`conventions.md`/
-  `architecture.md` updated; `docs/POST_WORK_FINDINGS.md` created (records the clone-then-update last-write-wins
-  window).
+## ⚠ Working-tree note
 
-## 🆕 Config change this session — Fable-class working-style layer (CLAUDE.md)
+The user live-deleted **TODO #20** (inline attack editing, the whole "Embedded document contexts —
+follow-ups" section) in `docs/TODO.md` — left **uncommitted** by agreement (user-managed edit; do
+not revert). Work branches `check-row-extraction` and `checktags-item-cards` are merged but NOT
+deleted (deletion needs user confirmation).
 
-Added a model-conditioned override layer, **active only on Fable-class models** (`claude-fable-5`,
-`claude-mythos-5`); inert on Opus 4.8 and others:
+## ▶ NEXT — remaining backlog (order = user's call)
 
-- **Global `~/.claude/CLAUDE.md`** — new `## Working style (Fable-class models)` section: Scope discipline,
-  Assessment vs. action, Checkpoints (keeps design-decision consent), Finishing a turn, Subagents, Context budget.
-- **Project `.claude/CLAUDE.md` (this repo)** AND **`C:\Dev\Titan\CLAUDE.md` (the separate Rust engine)** — each
-  got a `## Fable-class models` section that defers to the global one. The project "Project Precedence" rule was
-  left untouched (the project-authored deferral activates the global layer cleanly). On Fable, the single real
-  project-rule override is context-budget (no 80% pause); Consent required + No unilateral spec/plan changes stay
-  in force.
-- Also present: the earlier-added global `### Plan execution on Fable-class models` rule (use the
-  `mainline-plan-execution` skill instead of `subagent-driven-development`/`executing-plans`; subagent dispatch
-  reserved for genuinely parallel work). These CLAUDE.md edits are **uncommitted** (config files, user-managed —
-  do not stage them).
+Open TODO items: **#25** (CastingCheckTags, #12 increment 2 — natural continuation), **#24**
+(+#18/#19 folded in: e2e fixture-helper consolidation), **#13** (effectsExpiredReport e2e), **#16**
+(golden-master harness consolidation), **#17** (lang TYPES housekeeping), **#2** (seeded
+standard-effects compendium). #12's north-star continues via component-driven increments.
 
-## ▶ NEXT — remaining TODO batch, user-approved order: #23 → #12
+## ⚠ Carried-forward OUTSTANDING (from prior handoffs)
 
-1. **#23** — extract the shared check-row presentation from `CharacterSheetItemCheck.svelte` /
-   `CharacterSheetEffectCheck.svelte` (byte-identical template + styles after the CheckTags extraction; only the
-   options-building script differs). Needs its own small pass (touches roll wiring).
-2. **#12** — chat ↔ document path parity north-star (brainstorm strategy + first increment), informed by the
-   path friction the chat-hygiene work surfaced.
+User still owes the **manual deep-path pack-conversion verification** (run a COPY of a
+pre-conversion world with a packed actor + world actor carrying legacy effect Items against
+current `main`; pass = a SECOND load with zero red errors + zero conversion lines).
 
-Planning rules: load `foundry-vtt` + `titan-codebase` (+ `svelte-5`/`foundry-svelte` for Svelte specs).
+## Gotchas (this session)
 
-## ⚠ Carried-forward OUTSTANDING (from the prior handoff)
-
-User still owes the **manual deep-path pack-conversion verification** (run a COPY of a pre-conversion world with a
-packed actor + world actor carrying legacy effect Items against current `main`; pass signal = a SECOND load with
-zero red errors + zero conversion lines). Independent of this session's work.
-
-## Gotchas (new this session)
-
-- Leak probe for chat mounts = `Hooks.events.updateChatMessage?.length` deltas (1 registration per mounted card).
-- The e2e world boots with the sidebar **COLLAPSED**; programmatic `ui.sidebar.changeTab` never expands it (only
-  the user-click path does) — Playwright clicks on chat cards need `ui.sidebar.expand()` or they fail "outside the
-  viewport".
-- Notification-pane e2e must raise `ChatLog.NOTIFY_DURATION` (read live each ticker tick; `#rerenderMessage`
-  carries `_lifeSpan` to the replacement, so an update does NOT reset the 5s auto-dismiss clock).
-- Notification posting needs `core.uiConfig.chatNotifications === 'cards'` AND (collapsed sidebar with sufficient
-  viewport width, or the chat tab not visible); a RENDERED popout suppresses posting entirely.
-- `calculateCastingCheckResults` auto-maximizes a SOLE affordable scaling aspect at roll time (spends all extra
-  successes; `extraSuccessesRemaining` → 0 for a cost-1 aspect).
-- Per the user's live `.claude` edits, on **Fable-class models** use the `mainline-plan-execution` skill (inline
-  compliance + single final branch review), NOT per-task subagent-driven review — even when a plan header names
-  the older skills.
+- The item chat cards' checks **buttons** block does NOT share `CheckRow` (multi-controlled-actor
+  roll, no owner gate, config label vs `checkParameters`) — known non-goal, documented in the
+  path-parity spec.
+- `CheckTags` reads `check.opposedCheck.enabled` unguarded — safe because every check comes from
+  `createItemCheckTemplate()` (reviewer-verified across all item types).
+- Targeted e2e invocation: `npx playwright test <spec-names> --reporter=line` (foreground only;
+  world must be launched — probe `http://localhost:30000/join` first, 200 = up).
 
 ## Repo state at handoff
 
-- `main` @ `a48d1445`, pushed; `origin/main` in sync. Working tree dirty only with the sanctioned never-stage
-  noise (`packs/effects/*`, `.claude/settings.local.json`, `.claude/scheduled_tasks.lock`) **plus the uncommitted
-  CLAUDE.md Fable-layer edit** (project `.claude/CLAUDE.md`). Do not stage `packs/` or `.claude/*`.
-- Branches left: `development`, `chore/build-output-dist`, `chore/e2e-sleep-removal`,
-  `feat/chat-message-subtypes-phase2-item-dm-templates` (older; not this session's concern).
+- `main` @ `35a98a12`, pushed; `origin/main` in sync. Working tree dirty with the sanctioned
+  never-stage noise (`packs/effects/*`, `.claude/*`, `graphify-out/`, root `CLAUDE.md` graphify
+  section) **plus the user's uncommitted TODO #20 deletion**. Do not stage `packs/` or `.claude/*`.
+- Branches: `check-row-extraction`, `checktags-item-cards` (merged, pending deletion confirmation),
+  plus the older `development`, `chore/build-output-dist`, `chore/e2e-sleep-removal`,
+  `feat/chat-message-subtypes-phase2-item-dm-templates`.
