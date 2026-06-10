@@ -21,11 +21,19 @@ const PROBE_STYLES = path.resolve(
  * @returns {Promise<void>} Resolves once the probe bundle has been injected (or was already present).
  */
 async function ensureProbe(page) {
+   // Wait for the system to finish init before injecting: a mid-boot injection skips the IIFE's
+   // immediate-registration path and would strand the current test (OPEN_BUGS #6).
+   await page.waitForFunction(() => !!globalThis.game?.titan);
+
    // Whether the probe API is already registered on this page.
    const present = await page.evaluate(() => !!globalThis.game?.titan?._probe);
    if (!present) {
       await page.addStyleTag({ path: PROBE_STYLES });
       await page.addScriptTag({ path: PROBE_BUNDLE });
+
+      // Block until registration lands, so a ready-hook fallback registration cannot strand the
+      // first probe call of the file.
+      await page.waitForFunction(() => !!globalThis.game?.titan?._probe);
    }
 }
 
