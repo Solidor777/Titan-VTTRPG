@@ -912,11 +912,14 @@
          "npc": "Non-Player Character",
          "player": "Player Character"
       },
+      "ActiveEffect": {
+         "condition": "Condition",
+         "effect": "Effect"
+      },
       "Item": {
          "ability": "Ability",
          "armor": "Armor",
          "commodity": "Commodity",
-         "effect": "Effect",
          "equipment": "Equipment",
          "shield": "Shield",
          "spell": "Spell",
