@@ -6,7 +6,6 @@ import {
    installSchemaMocks,
    integerField,
    numberField,
-   objectElement,
    restoreSchemaMocks,
    sortFingerprint,
    stringField,
