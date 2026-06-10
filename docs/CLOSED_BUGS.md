@@ -101,3 +101,16 @@ when fixed.
   OPEN_BUGS #8.
 - **Fixed:** 2026-06-10 on `chore/pre-retheme-housekeeping` (`f056dc88`) — both methods iterate
   `Object.values(...)`.
+
+### 9. E2E `ensureProbe` stranded the first probe test when injected mid-boot (was OPEN_BUGS #6)
+
+- **What:** The probe IIFE registers immediately when `game.titan` exists and otherwise arms a
+  one-shot ready-hook fallback; an injection during a page boot window (`game` exists, `game.titan`
+  not yet set) skipped the immediate path and stranded the current test on
+  `game.titan._probe === undefined`. Observed once (2026-06-06) during a run that overlapped a
+  concurrent `npm run build`.
+- **Found:** embedded-document-stores final verification (2026-06-06), logged as OPEN_BUGS #6.
+- **Fixed:** 2026-06-10 on `chore/e2e-fixture-hygiene` (`2ab39a48`) — `ensureProbe` now waits for
+  `game.titan` before injecting and for `game.titan._probe` after, so a mid-boot injection blocks
+  until registration instead of stranding the test. (The operator rule stands: never run
+  `npm run build` concurrently with an e2e run.)

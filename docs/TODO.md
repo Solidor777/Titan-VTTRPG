@@ -18,64 +18,12 @@ surviving deferrals.
   and user packs; B just fills a pack with shipped defaults.
 - **Why deferred:** Content + pipeline work, independent of the tray feature that shipped.
 
-## E2E suite — related items
-
-### 18. Shared-world e2e fixture hygiene: token-control fixtures orphan a token per run
-
-- **What:** The token-control fixtures in `effect-hud.spec.js`, `effect-tray.spec.js`, and
-  `effect-chat-card.spec.js` delete the prior run's stale actor (`game.actors.getName(name)` →
-  `stale.delete()`), but deleting an actor does NOT delete its placed tokens — so each run leaves one
-  orphaned token on the fixture scene.
-- **To do:** Add a suite-wide orphaned-token cleanup (e.g. delete scene tokens whose `actorId` no longer
-  resolves, in the shared fixture or `tests/e2e/world.js`). The improved fixture shape to promote
-  already exists in `tests/e2e/embedded-context-effects.spec.js` (`deleteFixtureActor`).
-- **Found by:** Phase 4 (effect chat subtype) review.
-
-### 19. Bounded canvas-drawn polls give up silently — make exhaustion throw
-
-- **What:** The bounded canvas-drawn polls in the same three specs (50 × 50 ms `setInterval` loops waiting
-  for `tokenDoc.object`, ~2.5 s budget) resolve silently on exhaustion, so a never-drawn placeable defers
-  the failure to a later, less-diagnostic timeout instead of failing at the poll with a clear message.
-- **To do:** Reject (throw) on poll exhaustion with a descriptive message (the `titanWait` pattern in
-  `tests/e2e/embedded-context-effects.spec.js` is the model).
-- **Found by:** Phase 4 (effect chat subtype) review.
-
-### 24. Extract the shared e2e fixture helpers into `tests/e2e/world.js`
-
-- **What:** `newestMessageType`, `deleteFixtureActor`, `controlFixtureActorToken`, and `buildCheck`
-  now exist in 3-4 near-identical copies across the `embedded-context-*` spec family (plus the
-  older token-control specs #18 targets).
-- **To do:** Promote the hardened copies (the check-parity spec's variants are the most complete)
-  into `tests/e2e/world.js` (parameterizing the fixture-count assumptions flagged in review), and
-  retrofit the family; fold in the #18/#19 token-fixture cleanup while touching the same code.
-- **Why deferred:** Touches four reviewed spec files at the tail of the conversion branch; better as
-  its own small pass with one full-suite verification.
-- **Found by:** Task 6 quality review of the embedded-context conversion.
-
 ## Chat message subtypes — related items
 
 The "first-class ChatMessage subtypes" effort (Phases 1-4 + follow-ups B/D) has shipped — all 26
 chat messages are self-rendering subtypes. Specs/plans under `specs/2026-06-03-chat-message-subtypes-*`
 and successors. These are its surviving deferrals. (Note: NPC `overkillDamage` (`NPCDataModel.js:47`)
 is written-but-never-read and schema-stripped — harmless dead data, a candidate for producer cleanup.)
-
-### 13. E2E: `effectsExpiredReport` render not covered
-
-- **What:** `tests/e2e/report-cards.spec.js` (Phase 3, Task 5) covers 12 of the 13 report subtypes via
-  direct `CharacterDataModel` triggers, but NOT `effectsExpiredReport`. That report is produced only by
-  the deep `onInitiativeAdvanced` initiative-effect-expiry path (`CharacterDataModel.js` ~5015), which
-  requires seeding an `initiative`-duration effect with `remaining: 1`, advancing combat initiative past
-  its threshold, with `autoDecreaseEffectDuration` enabled and `reportEffects`/`autoRemoveExpiredEffects`
-  configured. Driving that reliably needs intricate multi-combatant initiative setup; a thin trigger
-  would be flaky.
-- **To do:** Add a reliable e2e case (likely via `seedCombatEncounter` + an initiative-duration effect +
-  `combat.nextTurn()` until the effect expires) asserting `type === 'effectsExpiredReport'` and a
-  non-empty card, OR a unit-level render smoke of the leaf component. The leaf schema is already covered
-  by the golden master (`tests/unit/ReportChatMessageSchemaEquivalence.test.js`).
-- **Why deferred:** Per the project no-flaky-tests rule — the other 12 reports (incl. the two revert
-  regressions and the fast-healing apply-confirm flow) are covered reliably; this one needs a bespoke
-  combat-initiative harness rather than a one-line trigger.
-- **Found by:** Phase 3 reports, Task 5 (e2e coverage).
 
 ### 12. Chat-message ↔ document path parity (schema-from-shape)
 
