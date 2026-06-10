@@ -202,6 +202,9 @@ export async function deleteOrphanedTokens(page) {
 export async function controlFixtureActorToken(page, { actorName, fallbackSceneName }) {
    return page.evaluate(async ({ name, sceneName }) => {
       const actor = game.actors.getName(name);
+      if (!actor) {
+         throw new Error(`controlFixtureActorToken: no actor named "${name}" exists in the world.`);
+      }
 
       // Reuse the active scene; fall back to creating one and report its id for cleanup.
       /** @type {Scene|null} The scene hosting the fixture token. */

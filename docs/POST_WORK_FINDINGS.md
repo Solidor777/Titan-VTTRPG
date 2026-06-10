@@ -12,8 +12,11 @@ non-viewed scene), the `find` returns `undefined` and the render throws an uncau
 `Cannot use 'in' operator to search for 'turn' in undefined` on every round/turn update. Core bug,
 not ours (we have no engine fork). Mitigation in our harness: `tests/shared/combat.js`
 `seedCombatEncounter` sets `ui.combat.viewed` to the seeded combat (the posture of a GM actually
-running the encounter) and `teardownCombatEncounter` clears it; any future combat-driving e2e that
-bypasses the shared seeder must do the same or its page-error assertions will trip. Surfaced by the
+running the encounter) and `teardownCombatEncounter` clears it. The mitigation is PER-CLIENT: it
+covers only the page that evaluated the seeder, so a multi-client spec that attaches page-error
+assertions to a NON-seeding client must set `ui.combat.viewed` on that client too (today
+`socket-sync.spec.js` does not assert page errors on the remote client, so the throw is unobserved
+there); likewise any combat-driving e2e that bypasses the shared seeder. Surfaced by the
 `effectsExpiredReport` e2e (TODO #13).
 
 ### Clone-then-update chat handlers: last-write-wins window (TODO #11 refactor, 2026-06-06)

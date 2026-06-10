@@ -506,7 +506,13 @@ test.describe('report chat-message subtype cards', () => {
       test('effects-expired report renders after an initiative effect expires', async () => {
          // An initiative-duration effect with remaining 1 at an initiative BETWEEN the two
          // combatants' values is advanced (and expires) on the first nextTurn() from the started
-         // state. All three gates are world-scope and read live.
+         // state. All three gates are world-scope and read live; snapshot the two un-pinned ones so
+         // the finally can restore the host world's configuration.
+         /** @type {{autoDecrease: boolean, report: boolean}} The pre-test values of the two gates. */
+         const priorSettings = await page.evaluate(() => ({
+            autoDecrease: game.settings.get('titan', 'autoDecreaseEffectDuration'),
+            report: game.settings.get('titan', 'reportEffects'),
+         }));
          await setWorldSetting(page, 'autoDecreaseEffectDuration', true);
          await setWorldSetting(page, 'reportEffects', true);
          await setWorldSetting(page, 'autoRemoveExpiredEffects', 'enabled');
@@ -545,13 +551,20 @@ test.describe('report chat-message subtype cards', () => {
                }]);
 
                // Advance from the other combatant (initiative 10) to the effect actor (initiative
-               // 5): the effect's initiative 7 lies in (5, 10), so remaining decrements 1 -> 0.
+               // 5): the effect's initiative 7 lies in (5, 10), so remaining decrements 1 -> 0. The
+               // wait scans every message created after the snapshot (not just the newest), so a
+               // trailing turn-start/turn-end report can never strand the predicate.
+               const before = game.messages.size;
                await game.combats.get(combatId).nextTurn();
                await titanWait(
-                  () => game.messages.contents[game.messages.size - 1]?.type === 'effectsExpiredReport',
+                  () => game.messages.contents
+                     .slice(before)
+                     .some((created) => created.type === 'effectsExpiredReport'),
                   { message: 'effectsExpiredReport message created' },
                );
-               const message = game.messages.contents[game.messages.size - 1];
+               const message = game.messages.contents
+                  .slice(before)
+                  .find((created) => created.type === 'effectsExpiredReport');
                return {
                   messageId: message.id,
                   messageType: message.type,
@@ -565,8 +578,11 @@ test.describe('report chat-message subtype cards', () => {
                await page.evaluate(teardownCombatEncounter, ids);
             }
 
-            // Restore the file's suite-wide posture (beforeAll pins autoRemoveExpiredEffects off).
+            // Restore the file's suite-wide posture (beforeAll pins autoRemoveExpiredEffects off)
+            // and the host world's values for the two un-pinned gates.
             await setWorldSetting(page, 'autoRemoveExpiredEffects', 'disabled');
+            await setWorldSetting(page, 'autoDecreaseEffectDuration', priorSettings.autoDecrease);
+            await setWorldSetting(page, 'reportEffects', priorSettings.report);
          }
       });
    });
