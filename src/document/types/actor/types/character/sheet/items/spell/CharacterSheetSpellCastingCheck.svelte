@@ -1,13 +1,6 @@
 <script>
-   import localize from '~/helpers/utility-functions/Localize.js';
    import { getContext } from 'svelte';
-   import IconStatTag from '~/helpers/svelte-components/tag/IconStatTag.svelte';
-   import {
-      DICE_ICON,
-      EXPERTISE_ICON,
-      TRAINING_ICON,
-   } from '~/system/Icons.js';
-   import AttributeCheckTag from '~/helpers/svelte-components/tag/AttributeCheckTag.svelte';
+   import CastingCheckTags from '~/document/svelte-components/check/CastingCheckTags.svelte';
 
    /** @type {object} The embedded spell bridge provided by EmbeddedDocumentProvider. */
    const document = getContext('document');
@@ -37,59 +30,5 @@
    });
 </script>
 
-<div class="check">
-   <!--Label-->
-   <div class="tag">
-      <AttributeCheckTag
-         attribute={checkParameters.attribute}
-         complexity={checkParameters.complexity}
-         difficulty={checkParameters.difficulty}
-         skill={checkParameters.skill}
-      />
-   </div>
-
-   <!--Dice-->
-   <div class="tag">
-      <IconStatTag
-         icon={DICE_ICON}
-         label={localize('dice')}
-         value={checkParameters.totalDice}
-      />
-   </div>
-
-   <!--Training-->
-   {#if checkParameters.totalTrainingDice}
-      <div class="tag">
-         <IconStatTag
-            label={localize('training')}
-            value={checkParameters.totalTrainingDice}
-            icon={TRAINING_ICON}
-         />
-      </div>
-   {/if}
-
-   <!--Expertise-->
-   {#if checkParameters.totalExpertise}
-      <div class="tag">
-         <IconStatTag
-            label={localize('expertise')}
-            value={checkParameters.totalExpertise}
-            icon={EXPERTISE_ICON}
-         />
-      </div>
-   {/if}
-</div>
-
-<style lang="scss">
-   .check {
-      @include flex-row;
-      @include flex-space-evenly;
-      @include font-size-small;
-
-      flex-wrap: wrap;
-
-      .tag {
-         @include tag-container-child-margin;
-      }
-   }
-</style>
+<!--Shared casting-check tags, rendering the actor-resolved parameters (incl. dice/training/expertise)-->
+<CastingCheckTags parameters={checkParameters}/>

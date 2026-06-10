@@ -5,7 +5,7 @@
    import ItemChatMessageShell from '~/document/types/item/chat-message/ItemChatMessageShell.svelte';
    import SpellChatAspects from '~/document/types/item/types/spell/chat-message/SpellChatAspects.svelte';
    import SpellChatStats from '~/document/types/item/types/spell/chat-message/SpellChatStats.svelte';
-   import AttributeCheckTag from '~/helpers/svelte-components/tag/AttributeCheckTag.svelte';
+   import CastingCheckTags from '~/document/svelte-components/check/CastingCheckTags.svelte';
 
    /** @type {object} Reference to the reactive Document store. */
    const document = getContext('document');
@@ -15,14 +15,9 @@
 </script>
 
 <ItemChatMessageShell {item}>
-   <!--Casting check-->
+   <!--Casting check (shared component; reads the snapshot through the message's document context)-->
    <div class="section">
-      <AttributeCheckTag
-         attribute={item.castingCheck.attribute}
-         complexity={item.castingCheck.complexity}
-         difficulty={item.castingCheck.difficulty}
-         skill={item.castingCheck.skill}
-      />
+      <CastingCheckTags/>
    </div>
 
    <!--Aspects-->

@@ -4,6 +4,7 @@
    import { slide } from 'svelte/transition';
    import IconButton from '~/helpers/svelte-components/button/IconButton.svelte';
    import SpellSheetSidebarAspects from '~/document/types/item/types/spell/sheet/SpellSheetSidebarAspects.svelte';
+   import CastingCheckTags from '~/document/svelte-components/check/CastingCheckTags.svelte';
    import { COLLAPSED_ICON, EXPANDED_ICON } from '~/system/Icons.js';
 
    /** @type {object} Reference to the reactive Document store. */
@@ -38,12 +39,9 @@
    <!--Head-->
    <div class="header {document.data.system.castingCheck.attribute}">
       {#if aspectsEnabled}
-         <!--Label-->
+         <!--Casting-check tags (shared component; reads the spell's config through the document context)-->
          <div class="label-button">
-            {localize(document.data.system.castingCheck.attribute)} ({localize(
-            document.data.system.castingCheck.skill,
-         )}) {document.data.system.castingCheck.difficulty}:{document.data.system
-            .castingCheck.complexity}
+            <CastingCheckTags/>
          </div>
          <!--Expand button-->
          <div class="spacer">
@@ -68,12 +66,9 @@
             {/if}
          </div>
       {:else}
-         <!--Label-->
+         <!--Casting-check tags (shared component; reads the spell's config through the document context)-->
          <div class="label-normal">
-            {localize(document.data.system.castingCheck.attribute)} ({localize(
-            document.data.system.castingCheck.skill,
-         )}) {document.data.system.castingCheck.difficulty}:{document.data.system
-            .castingCheck.complexity}
+            <CastingCheckTags/>
          </div>
       {/if}
    </div>
