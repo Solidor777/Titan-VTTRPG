@@ -1,4 +1,10 @@
 import { describe, it, expect, beforeAll, afterAll } from 'vitest';
+import {
+   MockNumberField,
+   MockStringField,
+   installSchemaMocks,
+   restoreSchemaMocks,
+} from './helpers/schemaFingerprint.js';
 
 // Golden-master gate for the report chat-message family. Phase 3 converts the 13 legacy report chat
 // messages into first-class ChatMessage subtypes, each a leaf DataModel whose static
@@ -15,64 +21,6 @@ import { describe, it, expect, beforeAll, afterAll } from 'vitest';
 // the real data models (matching ItemDataModelSchemaEquivalence.test.js). Dynamic import is permitted
 // in tests (the no-dynamic-import rule governs the shipping bundle only); the family base is imported
 // dynamically in beforeAll, after the stand-ins are installed.
-
-/**
- * Minimal stand-in for a Foundry DataField that records the options it was constructed with, so the
- * harness can read the declared required/nullable/initial the create*Field helpers pass.
- */
-class MockField {
-   /**
-    * Stores the field options.
-    * @param {object} options - The field configuration (e.g. initial, nullable, integer).
-    */
-   constructor(options = {}) {
-      /** @type {object} The field configuration. */
-      this.options = options;
-   }
-}
-
-/** Stand-in for StringField, a distinct subclass so the produced field type can be asserted. */
-class MockStringField extends MockField {}
-
-/** Stand-in for NumberField, a distinct subclass so the produced field type can be asserted. */
-class MockNumberField extends MockField {}
-
-/** Stand-in for BooleanField, a distinct subclass so the produced field type can be asserted. */
-class MockBooleanField extends MockField {}
-
-/** Stand-in for ObjectField, a distinct subclass so the produced field type can be asserted. */
-class MockObjectField extends MockField {}
-
-/** Stand-in for ArrayField that captures its element field as the first constructor argument. */
-class MockArrayField extends MockField {
-   /**
-    * Stores the element field and options.
-    * @param {MockField} element - The field describing each array element.
-    * @param {object} options - The array field configuration.
-    */
-   constructor(element, options = {}) {
-      super(options);
-      /** @type {MockField} The element field. */
-      this.element = element;
-   }
-}
-
-/** Stand-in for SchemaField that captures its sub-fields map as the first constructor argument. */
-class MockSchemaField extends MockField {
-   /**
-    * Stores the sub-fields map and options.
-    * @param {object} fields - The map of sub-field name to MockField.
-    * @param {object} options - The schema field configuration.
-    */
-   constructor(fields, options = {}) {
-      super(options);
-      /** @type {object} The map of sub-field name to MockField. */
-      this.fields = fields;
-   }
-}
-
-/** Stand-in for TypeDataModel so the data-model classes can be declared and their statics invoked. */
-class MockTypeDataModel {}
 
 /** @type {object} Holds the dynamically imported report family base, keyed by a stable name. */
 const models = {};
@@ -184,26 +132,8 @@ const EXPECTED = {
 };
 
 beforeAll(async () => {
-   // The create*Field helpers call localize() (game.i18n) when a schema is built. Provide pass-through
-   // i18n so any field label lookups resolve during schema construction.
-   globalThis.game = {
-      i18n: {
-         localize: (key) => key,
-      },
-   };
-
-   // Install the TypeDataModel and data-field stand-ins before importing the data models.
-   globalThis.foundry.abstract.TypeDataModel = MockTypeDataModel;
-   globalThis.foundry.data = {
-      fields: {
-         StringField: MockStringField,
-         NumberField: MockNumberField,
-         BooleanField: MockBooleanField,
-         ObjectField: MockObjectField,
-         ArrayField: MockArrayField,
-         SchemaField: MockSchemaField,
-      },
-   };
+   // Install the shared Foundry stand-ins (i18n, TypeDataModel, data fields, ApplicationV2).
+   installSchemaMocks();
 
    // Dynamically import the report family base against the installed stand-ins. Leaf tasks 2a-2e import
    // their concrete report DataModels here as well.
@@ -275,9 +205,7 @@ beforeAll(async () => {
 
 afterAll(() => {
    // Remove the stand-ins so later suites keep the shared minimal mock.
-   delete globalThis.foundry.abstract.TypeDataModel;
-   delete globalThis.foundry.data;
-   delete globalThis.game;
+   restoreSchemaMocks();
 });
 
 describe('Report chat-message schema equivalence (golden master)', () => {
