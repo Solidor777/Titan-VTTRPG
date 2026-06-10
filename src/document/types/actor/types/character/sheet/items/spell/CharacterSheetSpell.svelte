@@ -128,10 +128,6 @@
          @include flex-group-center;
 
          flex-wrap: wrap;
-
-         .tag {
-            @include tag-container-child-margin;
-         }
       }
 
       &:not(.tags, .buttons, .footer) {
