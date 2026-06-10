@@ -503,10 +503,17 @@ and one or more inner Svelte component trees.
   1. `ItemSheetSidebarCheck.svelte` — the top-level item/effect document; the expander is always present
      and the expanded `.stats` body is the entire check display — no separate at-a-glance line
      (user-approved convergence).
-  2. `CharacterSheetItemCheck.svelte` / `CharacterSheetEffectCheck.svelte` — two-context rows that pass
-     `attribute={checkParameters.attribute}` and hand-render only the actor-derived dice/training/expertise
-     tags after it; both templates are guarded by `{#if checkParameters}` against the mid-frame embedded
-     deletion window. The Effect HUD inherits via `CharacterSheetEffectCheck` reuse.
+  2. `CheckRow.svelte` (below) — the shared check-row that passes `attribute={checkParameters.attribute}`
+     and renders the actor-derived dice/training/expertise tags after it.
+- `CheckRow.svelte` (`src/document/svelte-components/check/CheckRow.svelte`) — the ONE shared check-row
+  presentation (buttons + stats blocks) for character-sheet item/effect rows; props
+  `{ checkParameters, checkIdx, onRoll }`, gated by `{#if checkParameters}` (covers the mid-frame embedded
+  deletion window), two-context (owner-gate via `'document'`, `spendResolve` via `'sheetDocument'`), and
+  reads the `autoSpendResolveChecks` setting to pick combined vs split check/spend-resolve buttons. The two
+  consumers keep only their options-building scripts and roll handlers: `CharacterSheetItemCheck.svelte`
+  (static `itemId` capture; provider instances are id-keyed) and `CharacterSheetEffectCheck.svelte` (fresh
+  `itemRollData` from the effect at derive/roll time — the engine's effect passthrough). The Effect HUD
+  inherits via `CharacterSheetEffectCheck` reuse.
   `src/document/svelte-components/check/` is the home for document-generic check components that read the
   `'document'` context.
 

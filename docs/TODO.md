@@ -131,17 +131,6 @@ is written-but-never-read and schema-stripped — harmless dead data, a candidat
 - **To do:** Remove `TYPES.Item.effect` and add a `TYPES.ActiveEffect` map in the same pass.
 - **Found by:** Phase 4 (effect chat subtype) review.
 
-### 23. Extract the shared check-row presentation from ItemCheck/EffectCheck
-
-- **What:** After the CheckTags extraction (embedded-context conversion, Stage 3),
-  `CharacterSheetItemCheck.svelte` and `CharacterSheetEffectCheck.svelte` are byte-identical in
-  template + styles (~115 lines each, roll-handler name aside); only the script's options-building
-  differs (static `itemId` capture vs fresh `itemRollData` from the effect).
-- **To do:** Extract one shared presentational check-row component taking `checkParameters` + an
-  `onRoll` callback; the two consumers keep their options-building scripts.
-- **Why deferred:** Touches roll wiring — scope creep for the conversion spec; needs its own small pass.
-- **Found by:** Task 5 quality review of the embedded-context conversion.
-
 ## Embedded document contexts — follow-ups
 
 The embedded-document-stores spec
