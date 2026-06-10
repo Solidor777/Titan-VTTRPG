@@ -38,3 +38,66 @@ when fixed.
 - **Fixed:** 2026-06-06 on the `chat-mount-keying` branch — the test now polls
   `fastHealing.confirmed` via `expect.poll` before asserting `total`. Production code is unchanged
   (the handler's actor-then-message update ordering is legitimate).
+
+### 3. `MoveEffectToFolderDialogShell` initial-only `$state(prop)` capture lint error (was OPEN_BUGS #1)
+
+- **What:** `let selectedFolderId = $state(initialValue);` tripped the `state_referenced_locally`
+  compile error (`svelte/valid-compile`). The capture is intended — a new dialog is constructed per
+  move request, so `initialValue` never changes during the component's lifetime.
+- **Found:** during follow-up D's verification (2026-06-04), logged as OPEN_BUGS #1.
+- **Fixed:** 2026-06-10 on `chore/pre-retheme-housekeeping` (`fa159570`) — suppressed locally with a
+  rationale comment (the `SpellChatAspects.svelte` precedent). A SECOND pre-existing instance of the
+  same class surfaced once this one was fixed (the "system's only ESLint error" claim was stale):
+  `EmbeddedDocumentProvider.svelte`'s unsupported-type `warn(...)` path — its existing in-block
+  `svelte-ignore` did not suppress; moving the comment above the `if` statement does (`2c1a2162`).
+  `npx eslint .` now reports 0 errors.
+
+### 4. Attack chat header sub-label always blank — `attackName` never set by the producer (was OPEN_BUGS #2)
+
+- **What:** `AttackCheckChatHeader.svelte` renders `system.parameters.attackName`, but
+  `CharacterDataModel.getAttackCheckParameters` never assigned it, so the sub-label rendered blank
+  since the field was introduced.
+- **Found:** follow-up D's whole-branch review (2026-06-04), logged as OPEN_BUGS #2.
+- **Fixed:** 2026-06-10 on `chore/pre-retheme-housekeeping` (`c1fd1b40`) —
+  `parameters.attackName = attackData.label;` in the item-roll-data caching block (the same field
+  the weapon sheet row renders), plus a checks-integration e2e asserting the stored parameter AND
+  the rendered sub-label match the rolled attack's label.
+
+### 5. Item-check `resistanceCheck` shape default `''` vs `'none'` guards (was OPEN_BUGS #3)
+
+- **What:** `createItemCheckParametersShape()` defaulted `resistanceCheck: ''` while the item check
+  template and every consumer guard compare against `'none'` — a schema-initialized message with no
+  stored value would spuriously show the resistance button.
+- **Found:** follow-up D (2026-06-04), logged as OPEN_BUGS #3.
+- **Fixed:** 2026-06-10 on `chore/pre-retheme-housekeeping` (`c10e680d`) — shape default is now
+  `'none'`; the check chat golden master's `resistanceCheck` initial updated to match.
+
+### 6. `WeaponDataModel.addAttack` sheet notification dead AND mis-targeted (was OPEN_BUGS #5)
+
+- **What:** `addAttack` read `this.parent._sheet` into a local but guarded on `this._sheet` (always
+  undefined on the data model), and the dead body called `postAddCheck()` (the CHECKS-tab handler)
+  instead of the attack-expansion handler — new attacks mounted collapsed.
+- **Found:** embedded-document-stores Task 4 code review (2026-06-05), logged as OPEN_BUGS #5.
+- **Fixed:** 2026-06-10 on `chore/pre-retheme-housekeeping` (`7af8272d`) — guards the local `sheet`
+  and calls `sheet.addAttack()` (mirrors the correct sibling `deleteAttack`).
+
+### 7. `CharacterSheetWeaponAttack.svelte` dereferenced the `attack` derived unguarded (was OPEN_BUGS #7)
+
+- **What:** The `attack` derived can be `undefined` in the mid-frame window between a document
+  mutation (deleted weapon / removed attack index) and the row unmount, yet `trainingDice`,
+  `getCheckMod`, and the template reads all dereferenced it unguarded.
+- **Found:** the embedded-context conversion's final holistic review (2026-06-06), logged as
+  OPEN_BUGS #7.
+- **Fixed:** 2026-06-10 on `chore/pre-retheme-housekeeping` (`73d8fae3`) — `{#if attack}` template
+  gate plus guards in `getCheckMod`, `trainingDice`, `dicePool`, and `expertise`.
+
+### 8. `TitanDataModel` component prepare/migrate hooks could never run (was OPEN_BUGS #8)
+
+- **What:** `_migrateComponentData` and `_prepareComponentDerivedData` iterated
+  `Object.entries(...)`, so the loop variable was a `[key, value]` pair and the per-component
+  `migrateData`/`prepareDerivedData` hooks were always `undefined` — a latent dead path (no
+  registered component defines either hook yet).
+- **Found:** Task 5 quality review of the chat-mount-keying branch (2026-06-06), logged as
+  OPEN_BUGS #8.
+- **Fixed:** 2026-06-10 on `chore/pre-retheme-housekeeping` (`f056dc88`) — both methods iterate
+  `Object.values(...)`.

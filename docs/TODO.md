@@ -127,15 +127,6 @@ is written-but-never-read and schema-stripped — harmless dead data, a candidat
 - **Why deferred:** Until after the Phase 4 merge, so no frozen golden-master gate is touched mid-refactor.
 - **Found by:** Phase 4 (effect chat subtype) review.
 
-### 17. Lang TYPES housekeeping: stale `TYPES.Item.effect` label; no `TYPES.ActiveEffect` map
-
-- **What:** `lang/en.json` `TYPES.Item` still carries an `"effect"` label, but `effect` is no longer an
-  Item subtype (effects became native Active Effects); and there is no `TYPES.ActiveEffect` map for the
-  `effect`/`condition` ActiveEffect subtypes. Both are inert (the stale key is unread; missing AE labels
-  fall back to the type string).
-- **To do:** Remove `TYPES.Item.effect` and add a `TYPES.ActiveEffect` map in the same pass.
-- **Found by:** Phase 4 (effect chat subtype) review.
-
 ### 25. CastingCheckTags: extract the shared casting-check tag display
 
 - **What:** The casting-check tag display (AttributeCheckTag + stats) is hand-rendered on three
