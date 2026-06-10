@@ -79,6 +79,11 @@ is written-but-never-read and schema-stripped — harmless dead data, a candidat
 
 ### 12. Chat-message ↔ document path parity (schema-from-shape)
 
+- **Update (2026-06-09):** strategy locked **component-driven** (spec
+  `specs/2026-06-09-path-parity-strategy-and-checktags-chat-design.md`): each increment converges
+  one duplicated cross-surface display onto a shared component reading parity paths; schema work
+  only where parity is missing. Increment 1 shipped — `ItemChatMessageItemChecks` renders intrinsic
+  check tags via the shared `CheckTags` (zero schema change). Increment 2 = #25 (CastingCheckTags).
 - **Update (2026-06-05):** the embedded-document-stores spec shipped
   (`specs/2026-06-03-embedded-document-stores-design.md`): `EmbeddedDocument` +
   `EmbeddedDocumentProvider` + the two-context convention (`'document'` nearest/shadowed,
@@ -130,6 +135,17 @@ is written-but-never-read and schema-stripped — harmless dead data, a candidat
   fall back to the type string).
 - **To do:** Remove `TYPES.Item.effect` and add a `TYPES.ActiveEffect` map in the same pass.
 - **Found by:** Phase 4 (effect chat subtype) review.
+
+### 25. CastingCheckTags: extract the shared casting-check tag display
+
+- **What:** The casting-check tag display (AttributeCheckTag + stats) is hand-rendered on three
+  spell surfaces: `SpellChatMessage.svelte` (snapshot paths `item.castingCheck.*`),
+  `CharacterSheetSpellCastingCheck.svelte` (engine `checkParameters.*`), and
+  `SpellSheetSidebarCastingCheck.svelte` (spell document config paths).
+- **To do:** Extract a shared casting-check tag component per the component-driven path-parity
+  strategy (increment 2 of #12); the actor-context consumer passes resolved overrides, document
+  consumers read config paths.
+- **Found by:** #12 increment-1 gap inventory (2026-06-09).
 
 ## Embedded document contexts — follow-ups
 

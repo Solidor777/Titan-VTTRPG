@@ -505,6 +505,9 @@ and one or more inner Svelte component trees.
      (user-approved convergence).
   2. `CheckRow.svelte` (below) — the shared check-row that passes `attribute={checkParameters.attribute}`
      and renders the actor-derived dice/training/expertise tags after it.
+  3. `ItemChatMessageItemChecks.svelte` — the item chat cards' checks block (all 7 cards); the
+     message bridge satisfies the `'document'` context read via snapshot path parity, no
+     `attribute` override (chat cards have no actor context).
 - `CheckRow.svelte` (`src/document/svelte-components/check/CheckRow.svelte`) — the ONE shared check-row
   presentation (buttons + stats blocks) for character-sheet item/effect rows; props
   `{ checkParameters, checkIdx, onRoll }`, gated by `{#if checkParameters}` (covers the mid-frame embedded
