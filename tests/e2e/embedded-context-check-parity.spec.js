@@ -1,6 +1,15 @@
 import { expect, test } from '@playwright/test';
 import { login } from './fixtures.js';
-import { attachPageErrors, clearChat, closeAllApps } from './world.js';
+import {
+   attachPageErrors,
+   buildCheck,
+   clearChat,
+   closeAllApps,
+   controlFixtureActorToken,
+   deleteFixtureActor,
+   deleteOrphanedTokens,
+   newestMessageType,
+} from './world.js';
 
 /**
  * Embedded-context conversion lock (Stage 3, cross-surface check-tag parity): the shared CheckTags
@@ -52,6 +61,9 @@ test.beforeAll(async ({ browser }) => {
    errors = attachPageErrors(page);
    await login(page);
    await clearChat(page);
+
+   // One-time sweep of orphaned fixture tokens left behind by prior runs (TODO #18).
+   await deleteOrphanedTokens(page);
 });
 
 test.afterEach(async () => {
@@ -78,48 +90,19 @@ test.describe('cross-surface check-tag parity', () => {
       ).toBe(true);
 
       // Remove any stale fixture (and its scene tokens) from a prior run or a prior test.
-      await deleteFixtureActor();
+      await deleteFixtureActor(page, ACTOR_NAME);
 
+      // The shared buildCheck factory seeds the FULL intrinsic set so all four CheckTags render:
+      // resolveCost 2, resistanceCheck 'reflexes', and an enabled mind/perception opposed check. The
+      // attribute is concrete ('body', not 'default'), so the actor-resolved attribute on actor
+      // surfaces must match the config read.
       fixtureIds = await page.evaluate(async ({
          actorName,
          itemName,
          effectName,
-         itemCheckLabel,
-         effectCheckLabel,
+         itemCheck,
+         effectCheck,
       }) => {
-         /**
-          * Builds a COMPLETE item check entry mirroring createItemCheckTemplate()
-          * (src/check/types/item-check/ItemCheckTemplate.js). The template module is not importable
-          * in the browser context, so the full default object is inlined; omitting fields like
-          * opposedCheck makes getItemCheckParameters throw. This spec's overrides seed the FULL
-          * intrinsic set so all four CheckTags render: resolveCost 2, resistanceCheck 'reflexes',
-          * and an enabled mind/perception opposed check. The attribute is concrete ('body', not
-          * 'default'), so the actor-resolved attribute on actor surfaces must match the config read.
-          * @param {string} label - The check's display label (rendered on its ItemCheckButton).
-          * @param {string} uuid - A unique id for the check entry.
-          * @returns {object} The complete check entry.
-          */
-         const buildCheck = (label, uuid) => ({
-            attribute: 'body',
-            complexity: 1,
-            damageReducedBy: 'none',
-            difficulty: 4,
-            initialValue: 1,
-            isDamage: false,
-            isHealing: false,
-            label: label,
-            opposedCheck: {
-               attribute: 'mind',
-               enabled: true,
-               skill: 'perception',
-            },
-            resistanceCheck: 'reflexes',
-            resolveCost: 2,
-            scaling: true,
-            skill: 'arcana',
-            uuid: uuid,
-         });
-
          // Seed the fresh player actor, its equipment item, and its effect-subtype Active Effect.
          const actor = await Actor.create({
             name: actorName,
@@ -130,7 +113,7 @@ test.describe('cross-surface check-tag parity', () => {
                name: itemName,
                type: 'equipment',
                system: {
-                  check: [buildCheck(itemCheckLabel, 'e2e-parity-item-check')],
+                  check: [itemCheck],
                },
             },
          ]);
@@ -140,7 +123,7 @@ test.describe('cross-surface check-tag parity', () => {
                type: 'effect',
                disabled: false,
                system: {
-                  check: [buildCheck(effectCheckLabel, 'e2e-parity-effect-check')],
+                  check: [effectCheck],
                },
             },
          ]);
@@ -156,8 +139,8 @@ test.describe('cross-surface check-tag parity', () => {
          actorName: ACTOR_NAME,
          itemName: ITEM_NAME,
          effectName: EFFECT_NAME,
-         itemCheckLabel: ITEM_CHECK_LABEL,
-         effectCheckLabel: EFFECT_CHECK_LABEL,
+         itemCheck: buildCheck(ITEM_CHECK_LABEL, 'e2e-parity-item-check'),
+         effectCheck: buildCheck(EFFECT_CHECK_LABEL, 'e2e-parity-effect-check'),
       });
    });
 
@@ -177,7 +160,7 @@ test.describe('cross-surface check-tag parity', () => {
       await page.evaluate(async () => {
          await game.settings.set('titan', 'getCheckOptions', false);
       });
-      await deleteFixtureActor();
+      await deleteFixtureActor(page, ACTOR_NAME);
 
       // Remove the fallback scene when a HUD case had to create one (the shared world normally has
       // an active scene, so this is usually a no-op).
@@ -187,32 +170,6 @@ test.describe('cross-surface check-tag parity', () => {
          }, fallbackSceneId);
       }
    });
-
-   /**
-    * Deletes the fixture actor by name (when present) along with any token it left on the active
-    * scene. Serves both the stale sweep at seed time and the final afterAll cleanup.
-    * @returns {Promise<void>} Resolves once the actor and its tokens are removed from the world.
-    */
-   async function deleteFixtureActor() {
-      await page.evaluate(async (actorName) => {
-         const actor = game.actors.getName(actorName);
-         if (!actor) {
-            return;
-         }
-
-         // Remove the actor's tokens from the active scene before deleting the actor itself.
-         const scene = game.scenes.active;
-         if (scene) {
-            const tokenIds = scene.tokens
-               .filter((token) => token.actorId === actor.id)
-               .map((token) => token.id);
-            if (tokenIds.length > 0) {
-               await scene.deleteEmbeddedDocuments('Token', tokenIds);
-            }
-         }
-         await actor.delete();
-      }, ACTOR_NAME);
-   }
 
    /**
     * Opens the seeded equipment's ITEM sheet (closing other apps first so the Titan sheet root is
@@ -285,57 +242,6 @@ test.describe('cross-surface check-tag parity', () => {
    }
 
    /**
-    * Places a token for the fixture actor on the active scene, controls it, and refreshes the Effect
-    * HUD so the GM resolution ladder (first SELECTED token) resolves the fixture actor — without a
-    * controlled token a GM-login HUD null-resolves and every "renders" assertion would pass falsely.
-    * @returns {Promise<void>} Resolves once the token is controlled and the HUD refresh requested.
-    */
-   async function controlFixtureActorToken() {
-      // Precondition: the HUD controller must be attached at ready.
-      /** @type {boolean} Whether the TITAN effect HUD controller exists on the game object. */
-      const hudReady = await page.evaluate(() => typeof game.titan?.effectHud !== 'undefined');
-      expect(hudReady, 'TITAN effect HUD controller must be attached at ready').toBe(true);
-
-      /** @type {string|null} The fallback scene's id when this call had to create one, else null. */
-      const createdSceneId = await page.evaluate(async (actorName) => {
-         const actor = game.actors.getName(actorName);
-
-         // Reuse the active scene; fall back to creating one and report its id for afterAll cleanup.
-         /** @type {Scene|null} The scene hosting the fixture token. */
-         let scene = game.scenes.active;
-         /** @type {string|null} The created fallback scene's id, when no scene was active. */
-         let fallbackId = null;
-         if (!scene) {
-            scene = await Scene.create({
-               name: 'E2E Check Parity Scene',
-               active: true,
-            });
-            fallbackId = scene.id;
-         }
-
-         const [tokenDoc] = await scene.createEmbeddedDocuments('Token', [
-            await actor.getTokenDocument({
-               x: 100,
-               y: 100,
-            }),
-         ]);
-
-         // Wait until the placeable is drawn on the canvas before controlling it; controlling too
-         // early no-ops and would strand the HUD on a stale resolution.
-         await titanWait(() => !!tokenDoc.object, { message: 'token placeable drawn' });
-         tokenDoc.object.control({ releaseOthers: true });
-
-         game.titan.effectHud.refresh();
-         return fallbackId;
-      }, ACTOR_NAME);
-
-      // Remember the first fallback-created scene so afterAll can remove it from the world.
-      if (createdSceneId && !fallbackSceneId) {
-         fallbackSceneId = createdSceneId;
-      }
-   }
-
-   /**
     * Mounts the Effect HUD for the fixture actor and expands its single effect row. HUD rows hold
     * local collapsed expand state and the HUD is freshly resolved per test, so the row is known to
     * mount collapsed — this is the only header click.
@@ -346,7 +252,22 @@ test.describe('cross-surface check-tag parity', () => {
       // overlapping AppV2 window could intercept its clicks on a long shared-page session.
       await closeAllApps(page);
 
-      await controlFixtureActorToken();
+      // Precondition: the HUD controller must be attached at ready — without a controlled token a
+      // GM-login HUD null-resolves and every "renders" assertion would pass falsely.
+      /** @type {boolean} Whether the TITAN effect HUD controller exists on the game object. */
+      const hudReady = await page.evaluate(() => typeof game.titan?.effectHud !== 'undefined');
+      expect(hudReady, 'TITAN effect HUD controller must be attached at ready').toBe(true);
+
+      // Place and control the fixture token (throws if the placeable never draws); remember the
+      // first fallback-created scene so afterAll can remove it from the world.
+      /** @type {string|null} The fallback scene's id when this call had to create one, else null. */
+      const createdSceneId = await controlFixtureActorToken(page, {
+         actorName: ACTOR_NAME,
+         fallbackSceneName: 'E2E Check Parity Scene',
+      });
+      if (createdSceneId && !fallbackSceneId) {
+         fallbackSceneId = createdSceneId;
+      }
 
       /** @type {import('@playwright/test').Locator} The mounted HUD panel. */
       const panel = page.locator('#titan-effect-hud .titan-effect-hud');
@@ -405,21 +326,6 @@ test.describe('cross-surface check-tag parity', () => {
          expect(values[testId], `${surface} ${testId} renders non-empty text`).not.toBe('');
       }
       return values;
-   }
-
-   /**
-    * Reads the newest chat message's subtype once a message beyond the given count exists. Returns
-    * undefined while no new message has landed so `expect.poll` keeps retrying.
-    * @param {number} before - The world message count snapshotted before the UI trigger.
-    * @returns {Promise<string|undefined>} The newest message's subtype, or undefined when none landed yet.
-    */
-   function newestMessageType(before) {
-      return page.evaluate((count) => {
-         if (game.messages.size <= count) {
-            return undefined;
-         }
-         return game.messages.contents[game.messages.size - 1]?.type;
-      }, before);
    }
 
    test('equipment check tags render identical values on the item sheet and the character sheet', async () => {
@@ -491,7 +397,7 @@ test.describe('cross-surface check-tag parity', () => {
       await row.getByRole('button').filter({ hasText: ITEM_CHECK_LABEL }).first().click();
       await expect
          .poll(
-            () => newestMessageType(beforeRoll),
+            () => newestMessageType(page, beforeRoll),
             { message: 'roll posts an itemCheck message' },
          )
          .toBe('itemCheck');
@@ -532,7 +438,7 @@ test.describe('cross-surface check-tag parity', () => {
       await checkButton.click();
       await expect
          .poll(
-            () => newestMessageType(beforeRoll),
+            () => newestMessageType(page, beforeRoll),
             { message: 'HUD check roll posts an itemCheck message' },
          )
          .toBe('itemCheck');

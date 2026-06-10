@@ -1,6 +1,15 @@
 import { expect, test } from '@playwright/test';
 import { login } from './fixtures.js';
-import { attachPageErrors, clearChat, closeAllApps } from './world.js';
+import {
+   attachPageErrors,
+   buildCheck,
+   clearChat,
+   closeAllApps,
+   controlFixtureActorToken,
+   deleteFixtureActor,
+   deleteOrphanedTokens,
+   newestMessageType,
+} from './world.js';
 
 /**
  * Embedded-context conversion lock (Stage 1, effects family): effect rows on the character sheet
@@ -49,6 +58,9 @@ test.beforeAll(async ({ browser }) => {
    errors = attachPageErrors(page);
    await login(page);
    await clearChat(page);
+
+   // One-time sweep of orphaned fixture tokens left behind by prior runs (TODO #18).
+   await deleteOrphanedTokens(page);
 });
 
 test.afterEach(async () => {
@@ -74,13 +86,11 @@ test.describe('embedded-context effects family', () => {
       ).toBe(true);
 
       // Remove any stale fixture (and its scene tokens) from a prior run or a prior test.
-      await deleteFixtureActor();
+      await deleteFixtureActor(page, ACTOR_NAME);
 
-      await page.evaluate(async ({ actorName, effectName, effectDescription, checkLabel }) => {
-         // Seed a fresh player actor owning one effect-subtype Active Effect. The check object
-         // mirrors createItemCheckTemplate() (src/check/types/item-check/ItemCheckTemplate.js) —
-         // the template module is not importable in the browser context, so the full default object
-         // is inlined; omitting fields like opposedCheck makes getItemCheckParameters throw.
+      // Seed a fresh player actor owning one effect-subtype Active Effect; the COMPLETE check entry
+      // is built by the shared buildCheck factory (unopposed, unresisted, and free for this spec).
+      await page.evaluate(async ({ actorName, effectName, effectDescription, check }) => {
          const actor = await Actor.create({
             name: actorName,
             type: 'player',
@@ -96,28 +106,7 @@ test.describe('embedded-context effects family', () => {
                      type: 'turnStart',
                      remaining: 1,
                   },
-                  check: [
-                     {
-                        attribute: 'body',
-                        complexity: 1,
-                        damageReducedBy: 'none',
-                        difficulty: 4,
-                        initialValue: 1,
-                        isDamage: false,
-                        isHealing: false,
-                        label: checkLabel,
-                        opposedCheck: {
-                           attribute: 'body',
-                           enabled: false,
-                           skill: 'athletics',
-                        },
-                        resistanceCheck: 'none',
-                        resolveCost: 0,
-                        scaling: true,
-                        skill: 'arcana',
-                        uuid: 'e2ec0d7e-e2ec-4d7e-8d7e-e2ec0d7ee2ec',
-                     },
-                  ],
+                  check: [check],
                },
             },
          ]);
@@ -129,7 +118,15 @@ test.describe('embedded-context effects family', () => {
          actorName: ACTOR_NAME,
          effectName: EFFECT_NAME,
          effectDescription: EFFECT_DESCRIPTION,
-         checkLabel: CHECK_LABEL,
+         check: buildCheck(CHECK_LABEL, 'e2ec0d7e-e2ec-4d7e-8d7e-e2ec0d7ee2ec', {
+            opposedCheck: {
+               attribute: 'body',
+               enabled: false,
+               skill: 'athletics',
+            },
+            resistanceCheck: 'none',
+            resolveCost: 0,
+         }),
       });
    });
 
@@ -153,34 +150,8 @@ test.describe('embedded-context effects family', () => {
          await game.settings.set('titan', 'getCheckOptions', false);
          await game.settings.set('titan', 'confirmDeletingEffects', false);
       });
-      await deleteFixtureActor();
+      await deleteFixtureActor(page, ACTOR_NAME);
    });
-
-   /**
-    * Deletes the fixture actor by name (when present) along with any token it left on the active
-    * scene. Serves both the stale sweep at seed time and the final afterAll cleanup.
-    * @returns {Promise<void>} Resolves once the actor and its tokens are removed from the world.
-    */
-   async function deleteFixtureActor() {
-      await page.evaluate(async (actorName) => {
-         const actor = game.actors.getName(actorName);
-         if (!actor) {
-            return;
-         }
-
-         // Remove the actor's tokens from the active scene before deleting the actor itself.
-         const scene = game.scenes.active;
-         if (scene) {
-            const tokenIds = scene.tokens
-               .filter((token) => token.actorId === actor.id)
-               .map((token) => token.id);
-            if (tokenIds.length > 0) {
-               await scene.deleteEmbeddedDocuments('Token', tokenIds);
-            }
-         }
-         await actor.delete();
-      }, ACTOR_NAME);
-   }
 
    /**
     * Opens the fixture actor's character sheet, activates the Effects tab, and expands the single
@@ -207,51 +178,6 @@ test.describe('embedded-context effects family', () => {
       const row = page.locator('.application.titan-document-sheet [data-effect-id]').first();
       await row.locator('.header .label .button button').first().click();
       return row;
-   }
-
-   /**
-    * Places a token for the fixture actor on the active scene, controls it, and refreshes the Effect
-    * HUD so the GM resolution ladder (first SELECTED token) resolves the fixture actor — without a
-    * controlled token a GM-login HUD null-resolves and every "renders" assertion would pass falsely.
-    * @returns {Promise<void>} Resolves once the token is controlled and the HUD refresh requested.
-    */
-   async function controlFixtureActorToken() {
-      await page.evaluate(async (actorName) => {
-         const actor = game.actors.getName(actorName);
-         const scene = game.scenes.active
-            ?? (await Scene.create({
-               name: 'E2E Embedded Context Scene',
-               active: true,
-            }));
-         const [tokenDoc] = await scene.createEmbeddedDocuments('Token', [
-            await actor.getTokenDocument({
-               x: 100,
-               y: 100,
-            }),
-         ]);
-
-         // Wait until the placeable is drawn on the canvas before controlling it; controlling too
-         // early no-ops and would strand the HUD on a stale resolution.
-         await titanWait(() => !!tokenDoc.object, { message: 'token placeable drawn' });
-         tokenDoc.object.control({ releaseOthers: true });
-
-         game.titan.effectHud.refresh();
-      }, ACTOR_NAME);
-   }
-
-   /**
-    * Reads the newest chat message's subtype once a message beyond the given count exists. Returns
-    * undefined while no new message has landed so `expect.poll` keeps retrying.
-    * @param {number} before - The world message count snapshotted before the UI trigger.
-    * @returns {Promise<string|undefined>} The newest message's subtype, or undefined when none landed yet.
-    */
-   function newestMessageType(before) {
-      return page.evaluate((count) => {
-         if (game.messages.size <= count) {
-            return undefined;
-         }
-         return game.messages.contents[game.messages.size - 1]?.type;
-      }, before);
    }
 
    /**
@@ -362,7 +288,7 @@ test.describe('embedded-context effects family', () => {
       const beforeSend = await page.evaluate(() => game.messages.size);
       await row.getByRole('button', { name: SEND_TO_CHAT_LABEL }).click();
       await expect
-         .poll(() => newestMessageType(beforeSend), { message: 'send-to-chat posts an effect message' })
+         .poll(() => newestMessageType(page, beforeSend), { message: 'send-to-chat posts an effect message' })
          .toBe('effect');
 
       // CHECK ROLL: with the check-options dialog gated off (seeded), the embedded check's button
@@ -371,7 +297,7 @@ test.describe('embedded-context effects family', () => {
       const beforeRoll = await page.evaluate(() => game.messages.size);
       await row.getByRole('button').filter({ hasText: CHECK_LABEL }).first().click();
       await expect
-         .poll(() => newestMessageType(beforeRoll), { message: 'check roll posts an itemCheck message' })
+         .poll(() => newestMessageType(page, beforeRoll), { message: 'check roll posts an itemCheck message' })
          .toBe('itemCheck');
 
       // DELETE with confirmation ON: the row's delete button must mount the confirm dialog instead
@@ -387,7 +313,10 @@ test.describe('embedded-context effects family', () => {
       const hudReady = await page.evaluate(() => typeof game.titan?.effectHud !== 'undefined');
       expect(hudReady, 'TITAN effect HUD controller must be attached at ready').toBe(true);
 
-      await controlFixtureActorToken();
+      await controlFixtureActorToken(page, {
+         actorName: ACTOR_NAME,
+         fallbackSceneName: 'E2E Embedded Context Scene',
+      });
 
       /** @type {import('@playwright/test').Locator} The mounted HUD panel. */
       const panel = page.locator('#titan-effect-hud .titan-effect-hud');

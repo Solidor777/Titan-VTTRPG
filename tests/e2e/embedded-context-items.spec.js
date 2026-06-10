@@ -1,6 +1,13 @@
 import { expect, test } from '@playwright/test';
 import { login } from './fixtures.js';
-import { attachPageErrors, clearChat, closeAllApps } from './world.js';
+import {
+   attachPageErrors,
+   buildCheck,
+   clearChat,
+   closeAllApps,
+   deleteFixtureActor,
+   newestMessageType,
+} from './world.js';
 
 /**
  * Embedded-context conversion lock (Stage 2, item families): every character-sheet item row type
@@ -241,39 +248,9 @@ test.describe('embedded-context item rows', () => {
       ).toBe(true);
 
       // Remove any stale fixture from a prior run or a prior test.
-      await deleteFixtureActor();
+      await deleteFixtureActor(page, ACTOR_NAME);
 
       itemIds = await page.evaluate(async ({ actorName, itemSeeds }) => {
-         /**
-          * Builds a COMPLETE item check entry mirroring createItemCheckTemplate()
-          * (src/check/types/item-check/ItemCheckTemplate.js). The template module is not importable
-          * in the browser context, so the full default object is inlined; omitting fields like
-          * opposedCheck makes getItemCheckParameters throw.
-          * @param {string} label - The check's display label (rendered on its ItemCheckButton).
-          * @param {string} uuid - A unique id for the check entry.
-          * @returns {object} The complete check entry.
-          */
-         const buildCheck = (label, uuid) => ({
-            attribute: 'body',
-            complexity: 1,
-            damageReducedBy: 'none',
-            difficulty: 4,
-            initialValue: 1,
-            isDamage: false,
-            isHealing: false,
-            label: label,
-            opposedCheck: {
-               attribute: 'body',
-               enabled: false,
-               skill: 'athletics',
-            },
-            resistanceCheck: 'none',
-            resolveCost: 0,
-            scaling: true,
-            skill: 'arcana',
-            uuid: uuid,
-         });
-
          // Seed the fresh player actor and its seven items in one embedded-create call.
          const actor = await Actor.create({
             name: actorName,
@@ -284,8 +261,8 @@ test.describe('embedded-context item rows', () => {
             type: seed.type,
             system: {
                ...seed.system,
-               ...(seed.checkLabel
-                  ? { check: [buildCheck(seed.checkLabel, `e2e-item-check-${seed.type}`)] }
+               ...(seed.check
+                  ? { check: seed.check }
                   : {}),
             },
          })));
@@ -297,11 +274,25 @@ test.describe('embedded-context item rows', () => {
          return Object.fromEntries(created.map((doc) => [doc.type, doc.id]));
       }, {
          actorName: ACTOR_NAME,
+         // Each seed's COMPLETE check entry is built by the shared buildCheck factory (unopposed,
+         // unresisted, and free for this sweep).
          itemSeeds: TYPE_CASES.map((typeCase) => ({
             name: typeCase.name,
             type: typeCase.type,
             system: typeCase.seedSystem,
-            checkLabel: typeCase.checkLabel,
+            ...(typeCase.checkLabel
+               ? {
+                  check: [buildCheck(typeCase.checkLabel, `e2e-item-check-${typeCase.type}`, {
+                     opposedCheck: {
+                        attribute: 'body',
+                        enabled: false,
+                        skill: 'athletics',
+                     },
+                     resistanceCheck: 'none',
+                     resolveCost: 0,
+                  })],
+               }
+               : {}),
          })),
       });
    });
@@ -326,22 +317,8 @@ test.describe('embedded-context item rows', () => {
          await game.settings.set('titan', 'getCheckOptions', false);
          await game.settings.set('titan', 'confirmDeletingItems', false);
       });
-      await deleteFixtureActor();
+      await deleteFixtureActor(page, ACTOR_NAME);
    });
-
-   /**
-    * Deletes the fixture actor by name when present. Serves both the stale sweep at seed time and
-    * the final afterAll cleanup (this spec never places tokens, so an actor delete is sufficient).
-    * @returns {Promise<void>} Resolves once any fixture actor is removed from the world.
-    */
-   async function deleteFixtureActor() {
-      await page.evaluate(async (actorName) => {
-         const actor = game.actors.getName(actorName);
-         if (actor) {
-            await actor.delete();
-         }
-      }, ACTOR_NAME);
-   }
 
    /**
     * Renders the fixture actor's character sheet, waits for the Svelte mount, and activates the
@@ -460,21 +437,6 @@ test.describe('embedded-context item rows', () => {
    }
 
    /**
-    * Reads the newest chat message's subtype once a message beyond the given count exists. Returns
-    * undefined while no new message has landed so `expect.poll` keeps retrying.
-    * @param {number} before - The world message count snapshotted before the UI trigger.
-    * @returns {Promise<string|undefined>} The newest message's subtype, or undefined when none landed yet.
-    */
-   function newestMessageType(before) {
-      return page.evaluate((count) => {
-         if (game.messages.size <= count) {
-            return undefined;
-         }
-         return game.messages.contents[game.messages.size - 1]?.type;
-      }, before);
-   }
-
-   /**
     * Reports whether a Titan document sheet for the given item is currently mounted, read from the
     * v14 AppV2 registry (`foundry.applications.instances` — `ui.windows` does not track AppV2 apps).
     * @param {string} itemId - The item id whose sheet to look for.
@@ -507,7 +469,7 @@ test.describe('embedded-context item rows', () => {
          await row.getByRole('button', { name: SEND_TO_CHAT_LABEL }).click();
          await expect
             .poll(
-               () => newestMessageType(beforeSend),
+               () => newestMessageType(page, beforeSend),
                { message: `send-to-chat posts a ${typeCase.type} message` },
             )
             .toBe(typeCase.type);
@@ -550,7 +512,7 @@ test.describe('embedded-context item rows', () => {
          }
          await expect
             .poll(
-               () => newestMessageType(beforeRoll),
+               () => newestMessageType(page, beforeRoll),
                { message: `roll posts a ${typeCase.roll.messageType} message` },
             )
             .toBe(typeCase.roll.messageType);
