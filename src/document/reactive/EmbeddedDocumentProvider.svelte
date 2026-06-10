@@ -23,6 +23,7 @@
    /** @type {string|undefined} The parent collection holding the embedded document. */
    // svelte-ignore state_referenced_locally
    const collection = COLLECTION_BY_DOCUMENT_NAME[doc.documentName];
+   // The warn path intentionally reads the initial doc only (same init-capture design as above).
    // svelte-ignore state_referenced_locally
    if (!collection) {
       warn(`EmbeddedDocumentProvider received an unsupported document type (${doc.documentName}).`);

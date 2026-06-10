@@ -196,7 +196,7 @@ test.describe('v14 checks integration (forced dice)', () => {
       await expect(
          page
             .locator(`.message[data-message-id="${result.messageId}"]`)
-            .getByText(result.expectedLabel)
+            .getByText(result.expectedLabel, { exact: true })
             .first(),
       ).toBeVisible();
    });
