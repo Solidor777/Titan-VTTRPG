@@ -467,17 +467,28 @@ test.describe('report chat-message subtype cards', () => {
             )
             .toBe(2);
 
-         // The message's fastHealing must now be confirmed AND still carry its total (the partial-merge
-         // proof). If `total` is gone, the update replaced the object instead of merging — a real bug.
+         // The apply handler updates the ACTOR first and the MESSAGE second, so the stamina poll above
+         // can resolve before the message's confirmed flag lands — poll the message state too instead of
+         // single-shot reading it (the former OPEN_BUGS #4 read-race flake; history in CLOSED_BUGS #2).
+         await expect
+            .poll(
+               () =>
+                  page.evaluate(
+                     (id) => game.messages.get(id)?.system?.fastHealing?.confirmed === true,
+                     setup.messageId,
+                  ),
+               { message: 'fastHealing.confirmed flipped true after apply' },
+            )
+            .toBe(true);
+
+         // With confirmation in, `total` must still be present (the partial-merge proof). If `total` were
+         // ever lost to a replace-instead-of-merge update, confirmation would still succeed above, so this
+         // plain read still catches that real bug.
          const afterApply = await page.evaluate((id) => {
             const message = game.messages.get(id);
-            return {
-               confirmed: message?.system?.fastHealing?.confirmed,
-               total: message?.system?.fastHealing?.total,
-            };
+            return { total: message?.system?.fastHealing?.total };
          }, setup.messageId);
 
-         expect(afterApply.confirmed, 'fastHealing.confirmed flipped true after apply').toBe(true);
          expect(afterApply.total, 'fastHealing.total survived the partial-merge update').toBe(2);
 
          // Clean up the persisted actor (the card snapshot keeps the message renderable).

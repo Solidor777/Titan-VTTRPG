@@ -20,3 +20,21 @@ when fixed.
   increment-scaled `increase` as `currentValue`, gated by a TDD unit case
   (`tests/unit/check/type-results.test.js`, "scales auto-maximized damage by the aspect increment,
   not the purchase count").
+
+### 2. `report-cards.spec.js` fast-healing apply-confirm e2e read-race flake (was OPEN_BUGS #4)
+
+- **What:** The apply-confirm e2e (`tests/e2e/report-cards.spec.js`, "clicking apply heals the actor
+  and partial-merges fastHealing") flaked once in a 2026-06-05 full-suite run (logged as OPEN_BUGS
+  #4, mechanism unknown) and recurred in the 2026-06-06 full-suite verification on the
+  `chat-mount-keying` branch (`fastHealing.confirmed` read `false`). Mechanism: the apply handler
+  (`ChatMessageApplyFastHealingButton.svelte`) updates the ACTOR first (`applyHealing`) and the
+  MESSAGE second (`fastHealing.confirmed: true`); the test polled only the stamina (the first
+  update), then single-shot read the message (the second) between the two updates — a read-race
+  that loses under full-suite load.
+- **Evidence:** The Playwright failure snapshot showed both rendered cards already re-rendered in
+  the confirmed state moments after the failed read — the message update landed late, not never.
+  The file passed 13/13 in isolation.
+- **Found:** 2026-06-05 (original flake, full-suite run); mechanism identified 2026-06-06.
+- **Fixed:** 2026-06-06 on the `chat-mount-keying` branch — the test now polls
+  `fastHealing.confirmed` via `expect.poll` before asserting `total`. Production code is unchanged
+  (the handler's actor-then-message update ordering is legitimate).
