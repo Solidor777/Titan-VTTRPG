@@ -13,8 +13,7 @@
       from '~/document/types/actor/types/character/sheet/items/CharacterSheetItemEquipButton.svelte';
    import CharacterSheetItemChecks
       from '~/document/types/actor/types/character/sheet/items/CharacterSheetItemChecks.svelte';
-   import CharacterSheetArmorStats
-      from '~/document/types/actor/types/character/sheet/items/armor/CharacterSheetArmorStats.svelte';
+   import ArmorStats from '~/document/types/item/types/armor/components/ArmorStats.svelte';
    import CharacterSheetCondensedItemCheckButton
       from '~/document/types/actor/types/character/sheet/items/CharacterSheetCondensedItemCheckButton.svelte';
 
@@ -79,9 +78,9 @@
       </div>
    {/if}
 
-   <!--Armor Stats-->
-   <div class="section tags">
-      <CharacterSheetArmorStats/>
+   <!--Armor Stats (shared component; reads the armor through the document context)-->
+   <div class="section stats">
+      <ArmorStats/>
    </div>
 
    <!--Item Checks-->
@@ -111,7 +110,7 @@
          @include padding-bottom-large;
       }
 
-      &:not(.rich-text, .tags) {
+      &:not(.rich-text, .stats) {
          @include padding-top-large;
       }
 
@@ -119,14 +118,7 @@
          @include border-top;
       }
 
-      &.tags {
-         @include flex-row;
-         @include flex-group-center;
-
-         flex-wrap: wrap;
-      }
-
-      &:not(.tags, .buttons) {
+      &:not(.stats, .buttons) {
          @include flex-column;
          @include flex-group-top;
       }
