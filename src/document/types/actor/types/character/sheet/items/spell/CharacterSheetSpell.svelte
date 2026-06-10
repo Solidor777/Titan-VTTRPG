@@ -1,11 +1,8 @@
 <script>
    import { getContext } from 'svelte';
-   import localize from '~/helpers/utility-functions/Localize.js';
-   import StatTag from '~/helpers/svelte-components/tag/StatTag.svelte';
    import RichText from '~/helpers/svelte-components/RichText.svelte';
-   import RarityTag from '~/helpers/svelte-components/tag/RarityTag.svelte';
    import SpellAspectTags from '~/helpers/svelte-components/tag/SpellAspectTags.svelte';
-   import Tag from '~/helpers/svelte-components/tag/Tag.svelte';
+   import SpellStats from '~/document/types/item/types/spell/components/SpellStats.svelte';
    import CharacterSheetItem
       from '~/document/types/actor/types/character/sheet/items/CharacterSheetItem.svelte';
    import CharacterSheetItemSendToChatButton
@@ -43,18 +40,6 @@
 
    /** @type {string} Rich-text description, read reactively through the embedded bridge. */
    const description = $derived(document.data?.system.description);
-
-   /** @type {string} Rarity key, read reactively through the embedded bridge. */
-   const rarity = $derived(document.data?.system.rarity);
-
-   /** @type {string} Spell tradition, read reactively through the embedded bridge. */
-   const tradition = $derived(document.data?.system.tradition);
-
-   /** @type {number} XP cost, read reactively through the embedded bridge. */
-   const xpCost = $derived(document.data?.system.xpCost);
-
-   /** @type {object[]} Custom traits, read reactively through the embedded bridge. */
-   const customTrait = $derived(document.data?.system.customTrait ?? []);
 
    /** @type {SpellAspect[]} List of enabled Spell Aspects. */
    const enabledAspects = $derived(aspect.filter((aspect) => aspect.enabled));
@@ -112,39 +97,9 @@
       </div>
    {/if}
 
-   <!--Footer-->
-   <div class="section tags small-text">
-      <!--Rarity-->
-      <div class="tag">
-         <RarityTag {rarity}/>
-      </div>
-
-      <!--Tradition-->
-      <div class="tag">
-         <StatTag
-            label={localize('tradition')}
-            value={tradition}
-         />
-      </div>
-
-      <!--XP Cost-->
-      {#if xpCost}
-         <div class="tag">
-            <StatTag
-               label={localize('xpCost')}
-               value={xpCost}
-            />
-         </div>
-      {/if}
-
-      <!--Custom Traits-->
-      {#each customTrait as trait}
-         <div class="tag">
-            <Tag tooltip={{ text: trait.description, localize: false }}>
-               {trait.name}
-            </Tag>
-         </div>
-      {/each}
+   <!--Footer (shared stats component; reads the spell through the document context)-->
+   <div class="section footer">
+      <SpellStats/>
    </div>
 </CharacterSheetItem>
 
@@ -160,7 +115,7 @@
          @include padding-bottom-large;
       }
 
-      &:not(.rich-text, .tags) {
+      &:not(.rich-text, .tags, .footer) {
          @include padding-top-large;
       }
 
@@ -179,13 +134,9 @@
          }
       }
 
-      &:not(.tags, .buttons) {
+      &:not(.tags, .buttons, .footer) {
          @include flex-column;
          @include flex-group-top;
-      }
-
-      &.small-text {
-         @include font-size-small;
       }
    }
 </style>
