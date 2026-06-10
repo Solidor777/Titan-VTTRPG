@@ -116,17 +116,6 @@ is written-but-never-read and schema-stripped — harmless dead data, a candidat
   `specs/2026-06-03-embedded-document-stores-design.md` (Follow-up work →
   "Chat-message path parity").
 
-### 16. Consolidate the golden-master fingerprint harness into a shared helper
-
-- **What:** Four unit suites carry near-identical copies of the byte-exact schema-fingerprint harness:
-  `tests/unit/ItemDataModelSchemaEquivalence.test.js`, `CheckChatMessageSchemaEquivalence.test.js`,
-  `ReportChatMessageSchemaEquivalence.test.js`, and `EffectSchemaEquivalence.test.js` each duplicate the
-  field-walker/fingerprint code.
-- **To do:** Extract the harness into a shared `tests/unit/` helper module. The golden masters themselves
-  stay inline per suite (hand-authored literals, per the characterization-test rule).
-- **Why deferred:** Until after the Phase 4 merge, so no frozen golden-master gate is touched mid-refactor.
-- **Found by:** Phase 4 (effect chat subtype) review.
-
 ### 25. CastingCheckTags: extract the shared casting-check tag display
 
 - **What:** The casting-check tag display (AttributeCheckTag + stats) is hand-rendered on three
