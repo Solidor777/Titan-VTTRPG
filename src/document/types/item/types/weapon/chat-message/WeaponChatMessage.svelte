@@ -4,7 +4,7 @@
    import ItemChatChecks from '~/document/types/item/chat-message/ItemChatMessageItemChecks.svelte';
    import ItemChatMessageShell from '~/document/types/item/chat-message/ItemChatMessageShell.svelte';
    import WeaponChatAttacks from '~/document/types/item/types/weapon/chat-message/WeaponChatAttacks.svelte';
-   import WeaponChatStats from '~/document/types/item/types/weapon/chat-message/WeaponChatStats.svelte';
+   import ItemStats from '~/document/types/item/components/ItemStats.svelte';
 
    /** @type {object} Reference to the reactive Document store. */
    const document = getContext('document');
@@ -40,9 +40,9 @@
       </div>
    {/if}
 
-   <!--Stats-->
+   <!--Stats (shared component; reads the snapshot through the message's document context)-->
    <div class="section">
-      <WeaponChatStats {item}/>
+      <ItemStats/>
    </div>
 </ItemChatMessageShell>
 
