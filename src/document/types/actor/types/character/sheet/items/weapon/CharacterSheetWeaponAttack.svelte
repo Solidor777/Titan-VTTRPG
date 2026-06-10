@@ -60,6 +60,9 @@
     * @returns {number} The modifier for this aspect of the attack check.
     */
    function getCheckMod(modifierType) {
+      if (!attack) {
+         return 0;
+      }
       return sheetDocument.data.system.getAttackCheckMod(
          modifierType,
          attack.attribute,
@@ -75,13 +78,16 @@
    const damageMod = $derived(getCheckMod('damage'));
 
    /** @type {number} Total training dice (skill training + training mod), folded in before multiAttack halving. */
-   const trainingDice = $derived(
-      sheetDocument.data.system.skill[attack.skill].training.value + getCheckMod('training'),
-   );
+   const trainingDice = $derived(attack
+      ? sheetDocument.data.system.skill[attack.skill].training.value + getCheckMod('training')
+      : 0);
 
    // Calculate dice pool.
    /** @type {number} Calculated total dice pool for the attack. */
    const dicePool = $derived.by(() => {
+      if (!attack) {
+         return 0;
+      }
 
       // Get base dice.
       let pool =
@@ -111,6 +117,9 @@
    // Calculate expertise.
    /** @type {number} Calculated total expertise for the attack. */
    const expertise = $derived.by(() => {
+      if (!attack) {
+         return 0;
+      }
 
       // Get base expertise.
       let exp =
@@ -126,75 +135,77 @@
    });
 </script>
 
-<div class="attack">
-   <!--Header-->
-   <div class="header {attack.attribute}">
-      {#if equipped}
-         <DocumentOwnerButton
-            onclick={() =>
-               sheetDocument.data.system.requestAttackCheck({
-                  itemId: document.data?._id,
-                  attackIdx: attackIdx,
-               })}
-         >
-            <i
-               class={attack.type === 'melee' ? MELEE_ICON : ACCURACY_ICON}
-            ></i>
-            {attack.label}
-         </DocumentOwnerButton>
-      {:else}
-         <div class="label">
-            <i
-               class={attack.type === 'melee' ? MELEE_ICON : ACCURACY_ICON}
-            ></i>
-            <div>{attack.label}</div>
-         </div>
-      {/if}
-   </div>
-
-   <!--Check Label-->
-   <div class="check-stats">
-      <!--Dice-->
-      <div class="stat">
-         <IconStatTag
-            icon={DICE_ICON}
-            label={localize('dice')}
-            testId={'attack-row-dice'}
-            value={dicePool}
-         />
+{#if attack}
+   <div class="attack">
+      <!--Header-->
+      <div class="header {attack.attribute}">
+         {#if equipped}
+            <DocumentOwnerButton
+               onclick={() =>
+                  sheetDocument.data.system.requestAttackCheck({
+                     itemId: document.data?._id,
+                     attackIdx: attackIdx,
+                  })}
+            >
+               <i
+                  class={attack.type === 'melee' ? MELEE_ICON : ACCURACY_ICON}
+               ></i>
+               {attack.label}
+            </DocumentOwnerButton>
+         {:else}
+            <div class="label">
+               <i
+                  class={attack.type === 'melee' ? MELEE_ICON : ACCURACY_ICON}
+               ></i>
+               <div>{attack.label}</div>
+            </div>
+         {/if}
       </div>
 
-      <!--Training-->
-      {#if trainingDice !== 0}
+      <!--Check Label-->
+      <div class="check-stats">
+         <!--Dice-->
          <div class="stat">
             <IconStatTag
-               icon={TRAINING_ICON}
-               label={localize('training')}
-               testId={'attack-row-training'}
-               value={trainingDice}
+               icon={DICE_ICON}
+               label={localize('dice')}
+               testId={'attack-row-dice'}
+               value={dicePool}
             />
          </div>
-      {/if}
 
-      <!--Expertise-->
-      {#if expertise !== 0}
-         <div class="stat">
-            <IconStatTag
-               icon={EXPERTISE_ICON}
-               label={localize('expertise')}
-               testId={'attack-row-expertise'}
-               value={expertise}
-            />
-         </div>
-      {/if}
+         <!--Training-->
+         {#if trainingDice !== 0}
+            <div class="stat">
+               <IconStatTag
+                  icon={TRAINING_ICON}
+                  label={localize('training')}
+                  testId={'attack-row-training'}
+                  value={trainingDice}
+               />
+            </div>
+         {/if}
 
-      <!--Intrinsic attack tags (shared component; damage carries the actor-derived modifier)-->
-      <AttackTags
-         {damageMod}
-         idx={attackIdx}
-      />
+         <!--Expertise-->
+         {#if expertise !== 0}
+            <div class="stat">
+               <IconStatTag
+                  icon={EXPERTISE_ICON}
+                  label={localize('expertise')}
+                  testId={'attack-row-expertise'}
+                  value={expertise}
+               />
+            </div>
+         {/if}
+
+         <!--Intrinsic attack tags (shared component; damage carries the actor-derived modifier)-->
+         <AttackTags
+            {damageMod}
+            idx={attackIdx}
+         />
+      </div>
    </div>
-</div>
+{/if}
 
 <style lang="scss">
    .attack {
