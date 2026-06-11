@@ -18,6 +18,7 @@ import assert from '~/helpers/utility-functions/Assert.js';
 import error from '~/helpers/utility-functions/Error.js';
 import getTrackableAttributes from '~/system/TrackableAttributes.js';
 import registerSystemSettings from '~/system/SystemSettings.js';
+import ThemeManager from '~/theme/ThemeManager.js';
 import registerInitiativeFormula from '~/system/Initiative.js';
 import AbilityDataModel from '~/document/types/item/types/ability/AbilityDataModel.js';
 import CommodityDataModel from '~/document/types/item/types/commodity/CommodityDataModel.js';
@@ -83,6 +84,10 @@ export default function onceInit() {
 
    // Register system settings.
    registerSystemSettings();
+
+   // Create the theme manager and apply the active theme before any TITAN surface renders.
+   game.titan.themeManager = new ThemeManager();
+   game.titan.themeManager.initialize();
 
    // Register initiative formula.
    registerInitiativeFormula();

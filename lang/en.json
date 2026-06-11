@@ -671,20 +671,27 @@
          "all": "All actors",
          "disabled": "Disabled"
       },
-      "darkModeSheets": {
-         "label": "Dark Mode Sheets",
-         "hint": "Enable dark styling for sheets."
+      "theme": {
+         "label": "Theme",
+         "hint": "The color theme for TITAN sheets, dialogs, and chat messages. Auto follows Foundry's color scheme using the world default themes.",
+         "auto": "Auto (match Foundry)"
       },
-      "darkModeChatMessages": {
-         "label": "Dark Mode Chat Messages",
-         "hint": "Enable dark styling for chat messages.",
-         "all": "All",
-         "systemOnly": "System messages only",
-         "disabled": "Disabled"
+      "defaultDarkTheme": {
+         "label": "Default Dark Theme",
+         "hint": "The TITAN theme used on Auto when Foundry's color scheme is dark."
       },
-      "darkModeJournals": {
-         "label": "Dark Mode Journals",
-         "hint": "Enable dark styling for journals."
+      "defaultLightTheme": {
+         "label": "Default Light Theme",
+         "hint": "The TITAN theme used on Auto when Foundry's color scheme is light."
+      },
+      "themeCoreMessages": {
+         "label": "Theme Non-TITAN Chat Messages",
+         "hint": "Apply the TITAN chat theme to chat messages from Foundry core and other modules."
+      },
+      "themeEditor": {
+         "label": "Theme Editor",
+         "button": "Open Theme Editor",
+         "hint": "Customize, export, and import TITAN themes."
       },
       "initiativeFormula": {
          "label": "Initiative Formula",
