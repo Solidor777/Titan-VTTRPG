@@ -46,13 +46,20 @@
    .titan-sheet {
       @include flex-row;
 
+      // Rounded and clipped so square children cannot poke past the panel corners.
       .header {
          @include panel-1;
+
+         border-radius: var(--titan-border-radius);
+         overflow: hidden;
       }
 
       .sidebar {
          @include panel-1;
          @include margin-right-large;
+
+         border-radius: var(--titan-border-radius);
+         overflow: hidden;
       }
 
       // The body stays unfilled so the gap between the header and tab panels shows the sheet

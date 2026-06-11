@@ -64,14 +64,20 @@
 
          @include margin-top-large;
 
+         // Rounded and clipped so square children cannot poke past the panel corners.
          .sidebar {
             @include panel-1;
+
+            border-radius: var(--titan-border-radius);
+            overflow: hidden;
          }
 
          .tabs {
             @include panel-1;
             @include margin-left-large;
 
+            border-radius: var(--titan-border-radius);
+            overflow: hidden;
             width: 100%;
          }
       }
