@@ -25,6 +25,7 @@
    import Tag from '~/helpers/svelte-components/tag/Tag.svelte';
    import WeaponSheetAttackCustomTraitTag
       from '~/document/types/item/types/weapon/sheet/WeaponSheetAttackCustomTraitTag.svelte';
+   import CondensedAttackCheckButton from '~/document/svelte-components/check/CondensedAttackCheckButton.svelte';
 
    /**
     * @typedef {object} WeaponSheetAttackSettingsProps
@@ -39,6 +40,9 @@
 
    /** @type {object} Reference to the Application State store. */
    const appState = getContext('applicationState');
+
+   /** @type {object|undefined} The actor that can roll this attack, or undefined when the current user cannot. */
+   const rollActor = getContext('rollActor');
 
    /** @type {Record<string, string>} Map of attack trait names to their description localization keys. */
    const traitDescriptions = ATTACK_TRAIT_DESCRIPTIONS;
@@ -126,6 +130,13 @@
       <!--Expandable Content-->
       {#if isExpanded}
          <div class="expandable-content" transition:slide|local>
+            {#if rollActor}
+               <!--Live roll preview for the configured attack.-->
+               <div class="row">
+                  <CondensedAttackCheckButton {idx}/>
+               </div>
+            {/if}
+
             <div class="row">
                <!--Type-->
                <div class="field">

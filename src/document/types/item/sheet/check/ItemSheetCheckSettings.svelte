@@ -22,6 +22,7 @@
       SPEND_RESOLVE_ICON,
    } from '~/system/Icons.js';
    import LabeledElement from '~/helpers/svelte-components/LabeledElement.svelte';
+   import CondensedItemCheckButton from '~/document/svelte-components/check/CondensedItemCheckButton.svelte';
 
    /**
     * @typedef {object} ItemSheetCheckSettingsProps
@@ -36,6 +37,9 @@
 
    /** @type {object} Reference to the Application State store. */
    const appState = getContext('applicationState');
+
+   /** @type {object|undefined} The actor that can roll this check, or undefined when the current user cannot. */
+   const rollActor = getContext('rollActor');
 
    /** @type {ItemCheck} The Check this component represents. */
    const check = $derived(document.data.system.check[idx]);
@@ -90,6 +94,13 @@
 
       {#if isExpanded}
          <div class="expandable-content" transition:slide|local>
+            {#if rollActor}
+               <!--Live roll preview for the configured check.-->
+               <div class="row">
+                  <CondensedItemCheckButton {idx}/>
+               </div>
+            {/if}
+
             <div class="row">
                <!--Attribute Select-->
                <div class="field">

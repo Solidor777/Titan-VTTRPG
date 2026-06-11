@@ -9,17 +9,28 @@
    import DocumentAttributeSelect from '~/document/svelte-components/select/DocumentAttributeSelect.svelte';
    import DocumentCheckDifficultySelect from '~/document/svelte-components/select/DocumentCheckDifficultySelect.svelte';
    import StatTag from '~/helpers/svelte-components/tag/StatTag.svelte';
+   import CondensedCastingCheckButton from '~/document/svelte-components/check/CondensedCastingCheckButton.svelte';
 
    /** @type {object} Reference to the reactive Document store. */
    const document = getContext('document');
 
    /** @type {object} Reference to the Application State store. */
    const appState = getContext('applicationState');
+
+   /** @type {object|undefined} The actor that can roll this casting check, or undefined when the current user cannot. */
+   const rollActor = getContext('rollActor');
 </script>
 
 <div class="casting-check-tab">
    <!--check Settings-->
    <div class="casting-check-settings">
+      {#if rollActor}
+         <!--Live roll preview for the casting check.-->
+         <div class="row">
+            <CondensedCastingCheckButton/>
+         </div>
+      {/if}
+
       <!--Attribute and skill-->
       <div class="row">
          <!--Attribute-->
