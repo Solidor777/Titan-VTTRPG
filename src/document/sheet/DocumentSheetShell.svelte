@@ -1,5 +1,6 @@
 <script>
    import { setContext } from 'svelte';
+   import resolveRollActor from '~/document/reactive/ResolveRollActor.js';
 
    /**
     * @typedef {object} DocumentSheetShellProps
@@ -23,6 +24,13 @@
    // shadow 'document' but never this key, giving actor-coupled components a stable escape hatch.
    // svelte-ignore state_referenced_locally
    setContext('sheetDocument', document);
+   // The actor that rolls checks for this sheet, or undefined when the sheet is not roll-capable for
+   // the current user (world/compendium item, non-owner, or a document type that does not roll
+   // checks). Resolved once at mount: an item's parent and ownership are stable while its sheet is open.
+   // svelte-ignore state_referenced_locally
+   const rollActor = resolveRollActor(document);
+   // svelte-ignore state_referenced_locally
+   setContext('rollActor', rollActor);
 </script>
 
 {#if shell}
