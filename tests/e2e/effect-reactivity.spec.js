@@ -46,8 +46,14 @@ test.describe('effect toggle reactivity', () => {
             await stale.delete();
          }
          const actor = await Actor.create({ name: actorName, type: 'player' });
+         // A PERMANENT duration: the active toggle renders for permanent effects only.
          await actor.createEmbeddedDocuments('ActiveEffect', [
-            { name: 'E2E Reactive Effect', type: 'effect', disabled: false },
+            {
+               name: 'E2E Reactive Effect',
+               type: 'effect',
+               disabled: false,
+               system: { duration: { type: 'permanent' } },
+            },
          ]);
          const app = await actor.sheet.render(true);
          await titanWait(

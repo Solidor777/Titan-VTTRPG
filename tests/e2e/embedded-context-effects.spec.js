@@ -269,9 +269,15 @@ test.describe('embedded-context effects family', () => {
       /** @type {import('@playwright/test').Locator} The expanded effect row. */
       const row = await openCharacterSheetEffectRow();
 
-      // TOGGLE ACTIVE: the checkmark icon is the toggle's rendered state (the only square icon in the
-      // row); the click bubbles to its button and must flip the underlying system.isActive.
-      await expect(row.locator('i.fa-square-check'), 'effect starts active (checked)').toHaveCount(1);
+      // TOGGLE ACTIVE: the toggle renders for PERMANENT effects only — the seeded timed effect shows
+      // none until its duration is flipped to permanent. The checkmark icon is the toggle's rendered
+      // state; the click bubbles to its button and must flip the underlying system.isActive.
+      await expect(row.locator('i.fa-square-check'), 'timed effect shows no active toggle').toHaveCount(0);
+      await page.evaluate(async (actorName) => {
+         await game.actors.getName(actorName).effects.contents[0]
+            .update({ system: { duration: { type: 'permanent' } } });
+      }, ACTOR_NAME);
+      await expect(row.locator('i.fa-square-check'), 'permanent effect starts active (checked)').toHaveCount(1);
       await row.locator('i.fa-square-check').click();
       await expect(row.locator('i.fa-square'), 'toggle renders unchecked after the flip').toHaveCount(1);
       await expect

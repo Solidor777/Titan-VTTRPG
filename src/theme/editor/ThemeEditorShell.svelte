@@ -9,11 +9,14 @@
    /** @type {object} The singleton theme manager. */
    const themeManager = game.titan.themeManager;
 
+   /** @type {object} The theme shown when the editor opens. */
+   const initialTheme = themeManager.getActiveTheme();
+
    /** @type {string} The id of the theme currently shown in the editor. */
-   let selectedId = $state(themeManager.getActiveTheme().id);
+   let selectedId = $state(initialTheme.id);
 
    /** @type {object} A deep editable copy of the selected theme. */
-   let draft = $state(structuredClone(themeManager.getTheme(selectedId)));
+   let draft = $state(structuredClone(initialTheme));
 
    /** @type {boolean} Whether the selected theme is a built-in (read-only). */
    const isBuiltIn = $derived(BUILT_IN_THEMES.some((theme) => theme.id === selectedId));
