@@ -31,7 +31,7 @@ export default class TitanPlayerHud {
    /** @type {HudLayoutState | undefined} Shared layout state, preserved across remounts. */
    #layoutState;
 
-   /** @type {number | undefined} The pending sidebar re-measure timer id. */
+   /** @type {number | undefined} The sidebar settle-loop interval id. */
    #sidebarTimer;
 
    /**
@@ -216,8 +216,14 @@ export default class TitanPlayerHud {
     * @returns {void}
     */
    #measureRect() {
-      /** @type {number} The sidebar's current rendered width, 0 when absent. */
-      const sidebarWidth = ui.sidebar?.element?.getBoundingClientRect()?.width ?? 0;
+      // The sidebar's root element is only the tab rail; the content panel is a separate node
+      // that occupies canvas space whenever the sidebar is expanded.
+      /** @type {number} The sidebar rail's rendered width, 0 when absent. */
+      let sidebarWidth = ui.sidebar?.element?.getBoundingClientRect()?.width ?? 0;
+      if (ui.sidebar?.expanded) {
+         sidebarWidth +=
+            window.document.querySelector('#sidebar-content')?.getBoundingClientRect()?.width ?? 0;
+      }
 
       if (this.#layoutState) {
          this.#layoutState.rect = computeCanvasRect({
@@ -229,14 +235,32 @@ export default class TitanPlayerHud {
    }
 
    /**
-    * Re-measures the rect when the sidebar toggles; measures again after the collapse animation
-    * settles so edge-anchored elements land on the final edge.
+    * Re-measures the rect while the sidebar's collapse animation plays, stopping once two
+    * consecutive measurements agree (or after a 2s cap) so edge-anchored elements track the
+    * moving edge and land on the final one.
     * @returns {void}
     */
    #onSidebarToggle() {
+      window.clearInterval(this.#sidebarTimer);
       this.#measureRect();
-      window.clearTimeout(this.#sidebarTimer);
-      this.#sidebarTimer = window.setTimeout(() => this.#measureRect(), 400);
+
+      /** @type {number} The previous measured width, for settle detection. */
+      let lastWidth = this.#layoutState?.rect.width ?? 0;
+
+      /** @type {number} How many settle-loop ticks have elapsed. */
+      let ticks = 0;
+
+      this.#sidebarTimer = window.setInterval(() => {
+         this.#measureRect();
+
+         /** @type {number} The freshly measured width. */
+         const width = this.#layoutState?.rect.width ?? 0;
+         ticks += 1;
+         if ((width === lastWidth && ticks >= 3) || ticks >= 20) {
+            window.clearInterval(this.#sidebarTimer);
+         }
+         lastWidth = width;
+      }, 100);
    }
 
    /**
