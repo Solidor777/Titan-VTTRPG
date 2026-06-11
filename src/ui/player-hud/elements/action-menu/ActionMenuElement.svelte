@@ -161,20 +161,23 @@
    }
 
    /**
-    * Closes the cascade on Escape.
-    * @param {KeyboardEvent} event - The window-level keyboard event.
+    * Closes the cascade on Escape, consuming the event so Foundry's core Escape handling (which
+    * releases token control and would unmount the whole HUD) only fires when no cascade is open.
+    * @param {KeyboardEvent} event - The window-level keyboard event (capture phase).
     * @returns {void}
     */
    function onWindowKeyDown(event) {
       if (event.key === 'Escape' && layoutState.openCategory) {
          layoutState.openCategory = null;
+         event.preventDefault();
+         event.stopImmediatePropagation();
       }
    }
 </script>
 
 <svelte:window
    onpointerdowncapture={onWindowPointerDown}
-   onkeydown={onWindowKeyDown}
+   onkeydowncapture={onWindowKeyDown}
 />
 
 <div

@@ -22,6 +22,18 @@
    /** @type {number} The hovered row's top offset, aligning the sub-button lane to it. */
    let hoveredOffset = $state(0);
 
+   /** @type {number} The sub-option column's measured height. */
+   let columnHeight = $state(0);
+
+   /** @type {number} The sub-button lane's measured height. */
+   let laneHeight = $state(0);
+
+   /**
+    * @type {number} The lane's clamped top: row-aligned, but never past the column's bottom (a
+    * lane spilling below a bottom-anchored menu would land off-screen).
+    */
+   const laneTop = $derived(Math.min(hoveredOffset, columnHeight - laneHeight));
+
    /** @type {number} The highest valid scroll-window start. */
    const maxStart = $derived(Math.max(0, category.subOptions.length - windowSize));
 
@@ -70,6 +82,7 @@
 <div
    class="sub-options"
    data-testid="player-hud-flyout"
+   bind:clientHeight={columnHeight}
    use:wheelScroll
 >
    {#each visible as sub (sub.key)}
@@ -101,7 +114,8 @@
          class="sub-buttons-lane"
          class:before={subButtonsSide === 'before'}
          class:after={subButtonsSide === 'after'}
-         style:top={`${hoveredOffset}px`}
+         style:top={`${laneTop}px`}
+         bind:clientHeight={laneHeight}
       >
          <ActionMenuSubButtons
             subOption={hovered}
