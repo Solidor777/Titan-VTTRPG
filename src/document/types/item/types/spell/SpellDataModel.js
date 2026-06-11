@@ -7,6 +7,8 @@ import { SPELL_IMAGE } from '~/system/DefaultImages.js';
 import localize from '~/helpers/utility-functions/Localize.js';
 import sortAscending from '~/helpers/utility-functions/SortAscending.js';
 import assert from '~/helpers/utility-functions/Assert.js';
+import moveArrayEntry from '~/helpers/utility-functions/MoveArrayEntry.js';
+import cloneElementWithNewUuid from '~/helpers/utility-functions/CloneElementWithNewUuid.js';
 
 /**
  * Data model with extra functionality for Spells.
@@ -251,6 +253,62 @@ export default class SpellDataModel extends TitanItemDataModel {
          await this.parent.update({
             system: {
                customAspect: structuredClone(this.customAspect),
+            },
+         });
+      }
+   }
+
+   /**
+    * Reorders a Custom Aspect within this Spell, keeping the sheet's per-aspect expansion state aligned.
+    * @param {number} fromIdx - The aspect's current index.
+    * @param {number} toIdx - The insertion point to move it before.
+    * @returns {Promise<void>}
+    */
+   async moveCustomAspect(fromIdx, toIdx) {
+      if (assert(
+         this.parent.isOwner,
+         'Cannot modify document %s if not owner.',
+         this.parent.name,
+      )) {
+         // Keep per-aspect expansion state aligned before the reactive re-render.
+         const sheet = this.parent._sheet;
+         if (sheet) {
+            sheet.postMoveCustomAspect(fromIdx, toIdx);
+         }
+
+         await this.parent.update({
+            system: {
+               customAspect: moveArrayEntry(this.customAspect, fromIdx, toIdx),
+            },
+         });
+      }
+   }
+
+   /**
+    * Inserts a copy of a Custom Aspect (from this or another spell) at a position, with a fresh uuid.
+    * @param {object} element - The aspect data to copy in.
+    * @param {number} atIdx - The insertion point.
+    * @returns {Promise<void>}
+    */
+   async insertCustomAspect(element, atIdx) {
+      if (assert(
+         this.parent.isOwner,
+         'Cannot modify document %s if not owner.',
+         this.parent.name,
+      )) {
+         /** @type {Array<object>} A fresh array so ReactiveDocument change-detection fires. */
+         const next = this.customAspect.slice();
+         next.splice(atIdx, 0, cloneElementWithNewUuid(element));
+
+         // Seed expansion state for the inserted row before the reactive re-render.
+         const sheet = this.parent._sheet;
+         if (sheet) {
+            sheet.postInsertCustomAspect(atIdx);
+         }
+
+         await this.parent.update({
+            system: {
+               customAspect: next,
             },
          });
       }

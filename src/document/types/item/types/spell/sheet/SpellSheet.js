@@ -51,6 +51,23 @@ export default class TitanSpellSheet extends TitanItemSheet {
    }
 
    /**
+    * Reorders the per-aspect expansion state to track a moved Custom Aspect.
+    * @param {number} fromIdx - The aspect's previous index.
+    * @param {number} toIdx - The insertion point it moved before.
+    */
+   postMoveCustomAspect(fromIdx, toIdx) {
+      this.applicationState.postMoveCustomAspect(fromIdx, toIdx);
+   }
+
+   /**
+    * Seeds expansion state for a copied Custom Aspect inserted at the provided index.
+    * @param {number} atIdx - The insertion point.
+    */
+   postInsertCustomAspect(atIdx) {
+      this.applicationState.postInsertCustomAspect(atIdx);
+   }
+
+   /**
     * Overridable function for creating the reactive state store for this sheet.
     * @override
     * @returns {typeof SpellSheetState} The newly created state store.
