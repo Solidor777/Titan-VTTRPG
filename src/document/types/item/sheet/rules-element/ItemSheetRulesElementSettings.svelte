@@ -25,6 +25,7 @@
    import ItemSheetInvalidRulesElement
       from '~/document/types/item/sheet/rules-element/ItemSheetInvalidRulesElement.svelte';
    import LabeledElement from '~/helpers/svelte-components/LabeledElement.svelte';
+   import DragHandle from '~/helpers/svelte-components/drag-reorder/DragHandle.svelte';
 
    /**
     * @typedef {object} ItemSheetRulesElementSettingsProps
@@ -84,8 +85,10 @@
 {#if document.data?.system.rulesElement[idx]}
    <div class="rules-element">
       <div class="row">
-         <!--Operation Select-->
+         <!--Drag handle-->
+         <DragHandle/>
 
+         <!--Operation Select-->
          <div class="operation">
             <LabeledElement label="operation">
                <ItemSheetRulesElementOperationSelect {idx}/>
