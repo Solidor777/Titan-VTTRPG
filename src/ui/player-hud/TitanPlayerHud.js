@@ -84,6 +84,23 @@ export default class TitanPlayerHud {
    }
 
    /**
+    * The shared layout/UI state (positions, sizes, edit mode), for the settings application and
+    * the edit toolbar.
+    * @returns {HudLayoutState | undefined} The layout state, once initialized.
+    */
+   get layoutState() {
+      return this.#layoutState;
+   }
+
+   /**
+    * Restores the default layout (positions, effects panel size, minimized states) and persists.
+    * @returns {void}
+    */
+   resetLayout() {
+      this.#layoutState?.reset();
+   }
+
+   /**
     * Shows or hides the core macro hotbar per the user setting.
     * @returns {void}
     */

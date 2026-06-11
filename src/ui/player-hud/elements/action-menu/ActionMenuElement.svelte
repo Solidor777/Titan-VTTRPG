@@ -81,10 +81,14 @@
    /** @type {object | null} The open category's model entry. */
    const openCategory = $derived(model.find((entry) => entry.key === layoutState.openCategory) ?? null);
 
-   // Re-measure the bar and the active button whenever the cascade opens or the rect changes.
+   // Re-measure the bar whenever the cascade opens, the rect changes, or the flyout's measured
+   // size settles — the frame shifts as the flyout lays out, and a stale bar box would compute
+   // the cascade side from the pre-layout position.
    $effect(() => {
       void layoutState.openCategory;
       void layoutState.rect;
+      void flyoutWidth;
+      void flyoutHeight;
       barBox = barEl?.getBoundingClientRect() ?? null;
       activeOffset = barEl?.querySelector('.active')?.offsetLeft ?? 0;
    });
