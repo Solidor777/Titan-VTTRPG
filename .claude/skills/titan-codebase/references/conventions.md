@@ -530,9 +530,8 @@ auto-waiting action (`.click()`/`.fill()`) — the assertion/action already poll
 (`tests/e2e/poll.js`), installed by `login()` via `installPoll`/`addInitScript` before navigation, polls a
 synchronous predicate (50 ms interval, 5 s default timeout). The ONLY allowed bounded wait is a **negative
 assertion** (assert-absence) that has no pollable positive edge — pair it with a positive `waitForFunction`
-signal and document it inline (see `permissions-auto-open.spec.js`). The two condition-polling
-`setInterval` canvas-readiness loops (`effect-tray.spec.js`, `effect-hud.spec.js`) are NOT fixed sleeps and
-are fine.
+signal and document it inline (see `permissions-auto-open.spec.js`). Condition-polling
+`setInterval` canvas-readiness loops (`effect-tray.spec.js`) are NOT fixed sleeps and are fine.
 
 **Mid-file `page.reload()` idiom** (first used in `tests/e2e/pack-conversion.spec.js`): `page.on('console')` and
 `attachPageErrors` listeners survive reloads (they attach to the Page object). Sequence: (1) PROVE the first

@@ -215,3 +215,14 @@ when fixed.
   private field, the `token` getter validates it (same actor, still on its scene), and
   `_onUnlinkToken` keeps the pre-update reference for the close-and-reopen onto the synthetic
   actor's sheet, with an assert guard. Regression-locked in `tests/e2e/sheet-regressions.spec.js`.
+
+### 19. Effect HUD rendered in the bottom right with its elements smooshed together (was OPEN_BUGS #1)
+
+- **What:** After the theming-foundation restyle, the native Effect HUD (`src/ui/effect-hud/`)
+  rendered with its elements compressed together — fallout from the panel-mixin rework (the new
+  `panel-1` mixin no longer carries padding/border/spacing, which the HUD shell relied on).
+- **Found:** 2026-06-10 by the user during the second theming-foundation visual pass.
+- **Fixed:** 2026-06-11 by replacement: the Player HUD's effects panel
+  (spec `docs/superpowers/specs/2026-06-11-player-hud-design.md`) supersedes the Effect HUD
+  wholesale; `src/ui/effect-hud/` is deleted and the new panel spaces rows with explicit
+  between-row margins and panel padding.

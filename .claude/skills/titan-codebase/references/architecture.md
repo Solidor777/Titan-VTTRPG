@@ -18,13 +18,21 @@
   like a sheet) plus a `tray/` folder of the Effect Tray UI (`EffectTrayState.svelte.js` runes state,
   `GetEffectCompendiums.js`, and the shell/tray/header/list/row components). Registered in `OnceInit.js`. See
   `abstractions.md` "Effect Tray sidebar tab".
-- `src/ui/` — Screen-level (non-sheet, non-sidebar) Svelte mounts. Currently holds `effect-hud/` — the native
-  Effect HUD: a `TitanEffectHud` singleton controller (created on the `ready` hook, attached as
-  `game.titan.effectHud`) that mounts `EffectHudShell` into a fixed-position container appended to `#interface`.
-  A pure `ResolveHudActor.js` ladder picks the tracked actor; `EffectHudState.svelte.js` holds the runes UI state
-  (`collapsed`), preserved across remounts. The shell sets the active actor's `ReactiveDocument` bridge as the
-  `document` context, so the reused effect leaf components (checks, description, owner-gated delete) resolve the
-  actor exactly as they do inside the character sheet. See `data-flow.md` "Effect HUD".
+- `src/ui/` — Screen-level (non-sheet, non-sidebar) Svelte mounts. Currently holds `player-hud/` — the Player
+  HUD: a `TitanPlayerHud` singleton controller (created on the `ready` hook, attached as `game.titan.playerHud`)
+  that mounts `PlayerHudShell` into a full-viewport pointer-pass-through layer inside `#interface`. A pure
+  `ResolveHudActors.js` ladder resolves the displayed actor set; `HudLayoutState.svelte.js` holds the persistent
+  runes layout/UI state (canvas-rect-anchored positions, effects-panel size, minimized flags, edit mode, open
+  category) over the `playerHudLayout` client setting; `HudGeometry.js` is the pure anchor/clamp/cascade math.
+  Three per-user elements under `elements/`: `portrait/` (three styles, editable resource bars, utility icon
+  row), `action-menu/` (cascading categories from the pure `BuildActionMenuModel.js`, plus `HudAmountDialog`),
+  and `effects-panel/` (list + icon-tray styles, resizable). `settings/` holds the
+  `PlayerHudSettingsApplication` configuration window (settings-menu entry + edit-toolbar gear; `Shift+H`
+  toggles edit mode). Client settings: `enablePlayerHud`, `showFoundryHotbar` (default off — the HUD hides
+  `ui.hotbar`), `playerHudOptions` (element/category/sub-button/filter options), `playerHudLayout`. The shell
+  sets the primary actor's `ReactiveDocument` bridge as the `document` context, so the reused effect leaf
+  components (checks, description, owner-gated delete) resolve the actor exactly as they do inside the
+  character sheet. See `data-flow.md` "Player HUD".
 - `src/styles/` — Global SCSS: font imports (`Lato.scss`, `OpenSans.scss`), the STATIC structure tokens
   (`Variables.scss` — spacing, radii, border widths, font sizes; every color and font-family token is injected at
   runtime by the ThemeManager), global resets (`Global.scss`, incl. the chat visibility surface and badge), a

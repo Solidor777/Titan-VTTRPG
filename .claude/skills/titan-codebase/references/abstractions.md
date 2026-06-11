@@ -516,8 +516,8 @@ and one or more inner Svelte component trees.
   reads the `autoSpendResolveChecks` setting to pick combined vs split check/spend-resolve buttons. The two
   consumers keep only their options-building scripts and roll handlers: `CharacterSheetItemCheck.svelte`
   (static `itemId` capture; provider instances are id-keyed) and `CharacterSheetEffectCheck.svelte` (fresh
-  `itemRollData` from the effect at derive/roll time — the engine's effect passthrough). The Effect HUD
-  inherits via `CharacterSheetEffectCheck` reuse.
+  `itemRollData` from the effect at derive/roll time — the engine's effect passthrough). The Player HUD's
+  effects panel inherits via `CharacterSheetEffectCheck` reuse.
 - `CastingCheckTags.svelte` (`src/document/svelte-components/check/CastingCheckTags.svelte`) — the ONE
   shared casting-check tag display. Optional prop `{ parameters }`: when passed
   (`getCastingCheckParameters` output), it renders the resolved attribute tag PLUS

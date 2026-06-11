@@ -195,7 +195,7 @@ bypassing the snapshot helper. See conventions.md, "Row two-way INPUTS to an emb
 
 **Two document context keys, one subscription.** `DocumentSheetShell.svelte` sets `'document'` (the sheet's
 `ReactiveDocument` bridge), `'applicationState'`, and `'sheetDocument'` (the SAME top-level bridge) at mount.
-`EffectHudShell.svelte` does the same for the Effect HUD (both keys; no `applicationState`).
+`PlayerHudShell.svelte` does the same for the Player HUD (both keys; no `applicationState`).
 `'document'` is always the *nearest* document and may be shadowed; `'sheetDocument'` always points at the
 owning sheet's top-level bridge and is never shadowed — the stable escape hatch for actor-coupled reads
 (derived stats, `requestAttackCheck`, check mods) inside an embedded subtree.
@@ -207,9 +207,9 @@ embedded (weapon on a character sheet, under a provider), or a chat-message snap
 provider: `ChatMessageContent.svelte` sets only `'document'` (the message bridge), and the snapshot already
 exposes path-parity data at `document.data.system.*`.
 
-**Where the providers live.** The character sheet's item and effect rows and the Effect HUD's rows all
+**Where the providers live.** The character sheet's item and effect rows and the Player HUD's effect rows all
 resolve their embedded document through LIST-level provider wraps: `CharacterSheetMultiItemList`,
-`CharacterSheetItemList`, `CharacterSheetEffectList`, and `EffectHudSection` each wrap every row in an
+`CharacterSheetItemList`, `CharacterSheetEffectList`, and `EffectsListPanel` each wrap every row in an
 id-keyed `EmbeddedDocumentProvider`. Inside any row subtree `'document'` IS the embedded document, so row
 leaves read `document.data?.system.*` directly — there are no per-leaf `items.get(...)`/`effects.get(...)`
 lookups and no document-valued row props. List-script logic (sort/filter/drag payloads) stays on the actor
@@ -225,30 +225,57 @@ non-subscribing write-back call sites.
 
 ---
 
-## Effect HUD
+## Player HUD
 
-**Resolution & mount — `TitanEffectHud` (src/ui/effect-hud/TitanEffectHud.js)**
-Created on the `ready` hook and attached as `game.titan.effectHud`. `init()` builds a fixed-position container
-(`#titan-effect-hud`), appends it to `#interface`, and wires `controlToken` / `canvasReady` / `updateUser` hooks
-plus the `enableEffectHud` setting's `onChange`, each calling `refresh()`. `refresh()` honors the
-`enableEffectHud` client setting (unmounts and stops when off), then resolves the tracked actor via the pure
-`resolveHudActor` ladder (selected character tokens, owned scene tokens, the user's assigned character; GM tracks
-only the first selected token). It early-returns when the resolved actor id is unchanged — within one actor the
-bridge drives reactivity. On an actor change it rebuilds a `new ReactiveDocument(actor)` bridge and remounts
-`EffectHudShell` via Svelte 5 `mount()`, passing the bridge as `documentStore` and the shared `EffectHudState` as
-`hudState`. The shell sets the bridge into context as BOTH `'document'` and `'sheetDocument'` (mirroring
-`DocumentSheetShell`), so embedded-row leaves and their actor-coupled escape hatch work unchanged under the HUD.
+**Resolution & mount — `TitanPlayerHud` (src/ui/player-hud/TitanPlayerHud.js)**
+Created on the `ready` hook and attached as `game.titan.playerHud`. `init()` builds a full-viewport
+pointer-pass-through layer (`#titan-player-hud`, `pointer-events: none`; element frames opt back in) inside
+`#interface`, wires `controlToken` / `canvasReady` / `updateUser` / `collapseSidebar` / combat hooks and a
+window-resize listener, applies the hotbar visibility (`showFoundryHotbar`, default off → `ui.hotbar` hidden),
+and calls `refresh()`. `refresh()` honors `enablePlayerHud` and the viewed scene, then resolves actors via the
+pure `resolveHudActors` ladder (GM: all selected characters, no fallback; player: all selected owned characters
+with the assigned character promoted to primary, else the single-actor fallback ladder). It early-returns while
+the resolved id set is unchanged (`{force: true}` remounts anyway — the `playerHudOptions` onChange uses it);
+on a change it rebuilds a `ReactiveDocument` around the primary and remounts `PlayerHudShell`, passing the
+actors array, the persistent `HudLayoutState`, and a `playerHudOptions()` snapshot. The shell sets the primary
+bridge as BOTH `'document'` and `'sheetDocument'` and gates each element: portrait and effects panel render for
+exactly one resolved character (the effects panel additionally requires at least one effect), the action menu
+for one or many; each element also honors its `enabled` and `combatOnly` options.
 
-**Render — `EffectHud.svelte` → sections → rows**
-`EffectHud` derives condition-subtype and effect-subtype lists from `document.data.effects` and renders nothing
-when both are empty (so the panel only mounts a `.titan-effect-hud` when there is something to show). Effect CRUD
-and duration ticks flow through the bridge automatically. `EffectHudSection` wraps each row in an id-keyed
-`EmbeddedDocumentProvider`; `EffectHudRow` takes no document prop and reads the effect via the shadowed
-`'document'` bridge. `EffectHudRow` sources its description per subtype:
-conditions render from `flags.titan.description` (conditions have no native description field), effects from the
-native `description`. Duration, embedded checks, and send-to-chat are effect-only; both subtypes expose an
-owner-gated delete (`sheetDocument.data.system.requestEffectDeletion`). The `visual-active-effects` module flag is
-no longer stamped on effects or conditions — this HUD replaces it.
+**Layout — `HudLayoutState.svelte.js` + `HudGeometry.js` + `HudElementFrame.svelte`**
+Positions persist per user (`playerHudLayout` setting) as `{anchorX, anchorY, dx, dy}` anchored to the canvas
+rect (viewport minus the sidebar's occupied width — the rail plus, when `ui.sidebar.expanded`, the separate
+`#sidebar-content` panel; `collapseSidebar` re-measures in a settle loop while the animation plays). Right/
+bottom-anchored elements therefore track the sidebar edge. `HudElementFrame` resolves the anchored point with
+`resolvePosition` (clamped by `clampPoint`), owns the edit-mode drag (8px snap, anchors re-derived via
+`deriveAnchors` on drop, persisted), the corner minimize chip (placement via `chipCorner`), and the effects
+panel's resize handle. Edit mode (`layoutState.editMode`) toggles from the settings app, the edit toolbar, and
+the `Shift+H` keybinding; `HudEditToolbar` offers Done / Reset Layout / Settings.
+
+**Action menu — `BuildActionMenuModel.js` → cascade components**
+The pure builder derives categories → sub-options → sub-buttons from the live actors (skills/resistances/
+utility run for ALL resolved actors; weapons/inventory/abilities/spells/effects read the primary only and are
+omitted in group mode), applying the per-category gates, per-sub-button-type gates, and content filters from
+`playerHudOptions().actionMenu`. Empty categories are omitted. `ActionMenuElement` renders the bar and wires
+the four amount-prompt utilities to `HudAmountDialog` (`applyDamage`/`applyHealing`/`applyRend`/`applyRepairs`
+for every resolved actor); the cascade renders as in-flow flex lanes whose order flips through
+`resolveCascadeDirection` so lanes never overlap and flip away from screen edges. Sub-options window to
+`windowSize` entries with wheel scrolling (non-passive listener via a `use:` action) and gradient scroll fades;
+the hovered/focused sub-option's sub-buttons overlay in an absolutely-positioned lane beside the column
+(clamped to the column's bottom) so revealing them never reflows the menu. Main actions and roll/chat/sheet
+sub-buttons close the cascade; equip/quantity/duration/remove keep it open. Escape closes the cascade in the
+window capture phase and CONSUMES the event — otherwise Foundry's core Escape releases token control and
+unmounts the whole HUD.
+
+**Effects panel — `EffectsPanelElement` → list or tray**
+Two user styles: the sectioned list (`EffectsListPanel` → id-keyed `EmbeddedDocumentProvider` rows →
+`EffectsListRow`, click-to-expand) and the icon tray (`EffectsIconTray`, duration badges, click → fixed-position
+`EffectsDetailPopout` clamped into the rect, Escape-consuming dismissal). Both expanded surfaces share
+`EffectsDetailBody`: description per subtype (conditions render `flags.titan.description`, effects the native
+`description`), embedded checks via `CharacterSheetEffectChecks`, duration −/+ steppers, send-to-chat
+(effect-only), open-sheet, and the owner-gated delete (`sheetDocument.data.system.requestEffectDeletion`). The
+panel body is user-resizable in edit mode (size persisted) and scrolls beyond it. The `visual-active-effects`
+module flag is no longer stamped on effects or conditions — this HUD replaces it.
 
 ---
 
