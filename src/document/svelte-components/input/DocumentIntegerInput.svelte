@@ -11,6 +11,7 @@
     * @property {number | boolean} [maxDigits] - The maximum number of digits this input can display.
     * @property {boolean} [disabled] - Whether editing this input should be disabled.
     * @property {string | object} [tooltip] - The Tooltip to display for this element, if any.
+    * @property {string} [testId] - Optional stable selector forwarded to the inner input.
     */
 
    /** @type {DocumentIntegerInputProps} */
@@ -21,6 +22,7 @@
       maxDigits = false,
       disabled = false,
       tooltip = void 0,
+      testId = void 0,
    } = $props();
 
    /** @type {object} Reference to the reactive Document store. */
@@ -43,5 +45,6 @@
    {min}
    onchange={updateDocument}
    onkeyup={updateDocument}
+   {testId}
    {tooltip}
 />

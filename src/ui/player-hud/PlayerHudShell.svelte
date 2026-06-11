@@ -1,6 +1,8 @@
 <script>
    import { setContext } from 'svelte';
    import HudEditToolbar from '~/ui/player-hud/HudEditToolbar.svelte';
+   import HudElementFrame from '~/ui/player-hud/HudElementFrame.svelte';
+   import PortraitElement from '~/ui/player-hud/elements/portrait/PortraitElement.svelte';
 
    /**
     * @typedef {object} PlayerHudShellProps
@@ -45,7 +47,14 @@
 </script>
 
 {#if portraitVisible}
-   <!-- TODO: mount the portrait element. -->
+   <HudElementFrame
+      elementKey="portrait"
+      {layoutState}
+      minimizeIcon="fas fa-user"
+      testId="player-hud-portrait"
+   >
+      <PortraitElement options={options.portrait}/>
+   </HudElementFrame>
 {/if}
 
 {#if actionMenuVisible}
