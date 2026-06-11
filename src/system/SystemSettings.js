@@ -1,4 +1,5 @@
 import { BUILT_IN_THEMES, buildThemeChoices } from '~/theme/ThemeManager.js';
+import ThemeEditorApplication from '~/theme/editor/ThemeEditorApplication.js';
 
 /**
  * Registers the settings for the Titan system.
@@ -122,6 +123,16 @@ export default function registerSystemSettings() {
       scope: 'world',
       type: String,
       onChange: () => game.titan?.themeManager?.apply(),
+   });
+
+   // Theme Editor menu entry.
+   game.settings.registerMenu('titan', 'themeEditor', {
+      hint: 'SETTINGS.themeEditor.hint',
+      icon: 'fas fa-palette',
+      label: 'SETTINGS.themeEditor.button',
+      name: 'SETTINGS.themeEditor.label',
+      restricted: false,
+      type: ThemeEditorApplication,
    });
 
    // Theme Core Chat Messages.
