@@ -39,7 +39,14 @@
       </div>
 
       <!--Expand Button-->
-      <ExpandButton bind:expanded={$appState.sidebar.checks.isExpanded[idx]}/>
+      <!--Function binding: a freshly added check renders before the state array grows, so the read
+      falls back to the seeded default (expanded) instead of binding undefined.-->
+      <ExpandButton
+         bind:expanded={
+            () => $appState.sidebar.checks.isExpanded[idx] ?? true,
+            (value) => $appState.sidebar.checks.isExpanded[idx] = value
+         }
+      />
 
       <!--Check tags (shared component)-->
       {#if $appState.sidebar.checks.isExpanded[idx]}

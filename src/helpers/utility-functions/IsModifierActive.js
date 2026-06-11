@@ -3,5 +3,5 @@
  * @returns {boolean} Whether the modifier key is pressed.
  */
 export default function isModifierActive() {
-   return game.keyboard.isModifierActive(KeyboardManager.MODIFIER_KEYS.SHIFT);
+   return game.keyboard.isModifierActive(foundry.helpers.interaction.KeyboardManager.MODIFIER_KEYS.SHIFT);
 }

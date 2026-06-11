@@ -129,7 +129,7 @@ export default class TitanActor extends Actor {
          let itemName = localize(`new${capitalize(type)}`);
 
          // Add a number suffix if a duplicate name already exists.
-         const duplicateNames = this.parent.items.filter((item) => item.name.includes(itemName));
+         const duplicateNames = this.items.filter((item) => item.name.includes(itemName));
          if (duplicateNames.length > 0) {
             itemName += ` (${duplicateNames.length})`;
          }

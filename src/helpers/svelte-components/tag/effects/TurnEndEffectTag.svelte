@@ -15,5 +15,6 @@
       --titan-tag-background: linear-gradient(
          var(--titan-gradient-degree), var(--titan-turn-end-effect-primary), var(--titan-turn-end-effect-secondary) 100%
       );
+      --titan-tag-font-color: var(--titan-turn-end-effect-font-color);
    }
 </style>

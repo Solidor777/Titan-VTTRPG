@@ -1,39 +1,51 @@
 @mixin attribute-colors {
    &.body {
       background: var(--titan-body-background);
+      color: var(--titan-body-font-color);
    }
 
    &.mind {
       background: var(--titan-mind-background);
+      color: var(--titan-mind-font-color);
    }
 
    &.soul {
       background: var(--titan-soul-background);
+      color: var(--titan-soul-font-color);
    }
 }
 
 @mixin attribute-button {
    &.body {
       --titan-button-background: var(--titan-body-background);
+      --titan-button-font-color: var(--titan-body-font-color);
+      --titan-button-hover-font-color: var(--titan-body-font-color);
 
       &:disabled {
          --titan-button-disabled-background: var(--titan-body-background);
+         --titan-button-disabled-font-color: var(--titan-body-font-color);
       }
    }
 
    &.mind {
       --titan-button-background: var(--titan-mind-background);
+      --titan-button-font-color: var(--titan-mind-font-color);
+      --titan-button-hover-font-color: var(--titan-mind-font-color);
 
       &:disabled {
          --titan-button-disabled-background: var(--titan-mind-background);
+         --titan-button-disabled-font-color: var(--titan-mind-font-color);
       }
    }
 
    &.soul {
       --titan-button-background: var(--titan-soul-background);
+      --titan-button-font-color: var(--titan-soul-font-color);
+      --titan-button-hover-font-color: var(--titan-soul-font-color);
 
       &:disabled {
          --titan-button-disabled-background: var(--titan-soul-background);
+         --titan-button-disabled-font-color: var(--titan-soul-font-color);
       }
    }
 }
@@ -41,25 +53,31 @@
 @mixin attribute-input {
    &.body {
       --titan-input-background: var(--titan-body-background);
+      --titan-input-font-color: var(--titan-body-font-color);
 
       &:disabled {
          --titan-input-disabled-background: var(--titan-body-background);
+         --titan-input-disabled-font-color: var(--titan-body-font-color);
       }
    }
 
    &.mind {
       --titan-input-background: var(--titan-mind-background);
+      --titan-input-font-color: var(--titan-mind-font-color);
 
       &:disabled {
          --titan-input-disabled-background: var(--titan-mind-background);
+         --titan-input-disabled-font-color: var(--titan-mind-font-color);
       }
    }
 
    &.soul {
       --titan-input-background: var(--titan-soul-background);
+      --titan-input-font-color: var(--titan-soul-font-color);
 
       &:disabled {
          --titan-input-disabled-background: var(--titan-soul-background);
+         --titan-input-disabled-font-color: var(--titan-soul-font-color);
       }
    }
 }

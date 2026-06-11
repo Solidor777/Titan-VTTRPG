@@ -226,7 +226,7 @@ export default class TitanActiveEffect extends foundry.documents.ActiveEffect {
 
       // Create and post the message.
       return ChatMessage.create(
-         ChatMessage.applyRollMode(
+         ChatMessage.applyMode(
             {
                ...messageData,
                user: game.user.id,
@@ -235,7 +235,6 @@ export default class TitanActiveEffect extends foundry.documents.ActiveEffect {
                sound: CONFIG.sounds.notification,
                classes: ['titan'],
             },
-            game.settings.get('core', 'rollMode'),
          ),
       );
    }

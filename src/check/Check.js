@@ -203,7 +203,7 @@ export default class TitanCheck {
 
       // Create and post the message as a typed check subtype.
       return ChatMessage.create(
-         ChatMessage.applyRollMode(
+         ChatMessage.applyMode(
             {
                user: game.user.id,
                type: this._getCheckType(),
@@ -213,7 +213,6 @@ export default class TitanCheck {
                system,
                classes: ['titan'],
             },
-            game.settings.get('core', 'rollMode'),
          ),
       );
    }

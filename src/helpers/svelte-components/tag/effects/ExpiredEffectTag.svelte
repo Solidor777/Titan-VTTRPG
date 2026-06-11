@@ -15,5 +15,6 @@
       --titan-tag-background: linear-gradient(
          var(--titan-gradient-degree), var(--titan-expired-effect-primary), var(--titan-expired-effect-secondary) 100%
       );
+      --titan-tag-font-color: var(--titan-expired-effect-font-color);
    }
 </style>

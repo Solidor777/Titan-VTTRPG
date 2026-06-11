@@ -6290,7 +6290,7 @@ export default class CharacterDataModel extends TitanActorDataModel {
 
             // Create a chat message from the roll and send it to chat.
             const chatData = await roll.toMessage(messageData, { create: false });
-            chatData.rollMode = game.settings.get('core', 'rollMode');
+            ChatMessage.applyMode(chatData);
 
             await ChatMessage.create(chatData);
          }

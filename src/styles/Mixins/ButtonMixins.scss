@@ -13,7 +13,7 @@
    --titan-label-font-weight: var(--titan-button-font-weight);
    --titan-label-font-size: var(--titan-button-font-size);
 
-   background: radial-gradient(var(--titan-button-background));
+   background: var(--titan-button-background);
    box-sizing: var(--titan-button-box-sizing);
    color: var(--titan-button-font-color);
    font-family: var(--titan-button-font-family), sans-serif;
@@ -36,10 +36,10 @@
 
    &:not(:disabled) {
       &:hover {
-         --titan-button-hover-font-color: var(--titan-button-font-color);
+         --titan-button-font-color: var(--titan-button-hover-font-color);
          --titan-button-border-color: var(--titan-button-hover-border-color);
 
-         background: radial-gradient(ellipse at center, var(--titan-button-hover-background), var(--titan-button-background));
+         background: var(--titan-button-hover-background);
       }
    }
 }

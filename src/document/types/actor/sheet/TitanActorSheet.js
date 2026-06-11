@@ -11,6 +11,9 @@ import { EDIT_TOKEN_ICON, IMPORT_ICON, LINKED_ICON, UNLINKED_ICON } from '~/syst
  * @extends {TitanDocumentSheet}
  */
 export default class TitanActorSheet extends TitanDocumentSheet {
+   /** @type {foundry.applications.ux.DragDrop | null} The drop controller bound to the sheet element. */
+   #dragDrop = null;
+
    /**
     * Resolves the synthetic-token Actor, merges the Actor sheet CSS classes, and stores the Actor on the sheet.
     * @param {TitanActor} sheetDocument - The Document this sheet is for.
@@ -46,6 +49,30 @@ export default class TitanActorSheet extends TitanDocumentSheet {
    static DEFAULT_OPTIONS = {
       position: { width: 750 },
    };
+
+   /**
+    * Bind the drop controller to the sheet element on every render. ApplicationV2 wires no drag-drop
+    * handlers itself, so without this binding `_onDrop` never fires and sheet drops silently no-op.
+    * @override
+    * @param {object} context - Prepared render context.
+    * @param {object} options - Render options.
+    * @returns {Promise<void>} Resolves once the listeners are bound.
+    * @protected
+    */
+   async _onRender(context, options) {
+      await super._onRender(context, options);
+
+      // The cached drop controller, created on first render.
+      this.#dragDrop ??= new foundry.applications.ux.DragDrop.implementation({
+         permissions: {
+            drop: () => this.isEditable,
+         },
+         callbacks: {
+            drop: this._onDrop.bind(this),
+         },
+      });
+      this.#dragDrop.bind(this.element);
+   }
 
    /**
     * Build the native AppV2 header controls for this Actor sheet. These render in the window's
@@ -363,7 +390,7 @@ export default class TitanActorSheet extends TitanDocumentSheet {
     */
    async _onDrop(event) {
       // Get the data from the drag event.
-      const data = TextEditor.getDragEventData(event);
+      const data = foundry.applications.ux.TextEditor.implementation.getDragEventData(event);
 
       /**
        * A hook event that fires when some useful data is dropped onto an ActorSheet.

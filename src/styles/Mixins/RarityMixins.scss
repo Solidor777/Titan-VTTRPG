@@ -1,39 +1,48 @@
 @mixin rarity-colors {
    &.uncommon {
       background: var(--titan-uncommon-background);
+      color: var(--titan-uncommon-font-color);
    }
 
    &.rare {
       background: var(--titan-rare-background);
+      color: var(--titan-rare-font-color);
    }
 
    &.unique {
       background: var(--titan-unique-background);
+      color: var(--titan-unique-font-color);
    }
 }
 
 @mixin rarity-input {
    &.uncommon {
       --titan-input-background: var(--titan-uncommon-background);
+      --titan-input-font-color: var(--titan-uncommon-font-color);
 
       &:disabled {
          --titan-input-disabled-background: var(--titan-uncommon-background);
+         --titan-input-disabled-font-color: var(--titan-uncommon-font-color);
       }
    }
 
    &.rare {
       --titan-input-background: var(--titan-rare-background);
+      --titan-input-font-color: var(--titan-rare-font-color);
 
       &:disabled {
          --titan-input-disabled-background: var(--titan-rare-background);
+         --titan-input-disabled-font-color: var(--titan-rare-font-color);
       }
    }
 
    &.unique {
       --titan-input-background: var(--titan-unique-background);
+      --titan-input-font-color: var(--titan-unique-font-color);
 
       &:disabled {
          --titan-input-disabled-background: var(--titan-unique-background);
+         --titan-input-disabled-font-color: var(--titan-unique-font-color);
       }
    }
 }

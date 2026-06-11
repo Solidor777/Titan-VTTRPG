@@ -71,7 +71,7 @@ export default class TitanItem extends Item {
 
       // Create and post the message.
       return ChatMessage.create(
-         ChatMessage.applyRollMode(
+         ChatMessage.applyMode(
             {
                ...messageData,
                user: game.user.id,
@@ -80,7 +80,6 @@ export default class TitanItem extends Item {
                sound: CONFIG.sounds.notification,
                classes: ['titan'],
             },
-            game.settings.get('core', 'rollMode'),
          ),
       );
    }

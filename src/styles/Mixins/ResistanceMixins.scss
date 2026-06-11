@@ -1,39 +1,51 @@
 @mixin resistance-colors {
    &.reflexes {
       background: var(--titan-reflexes-background);
+      color: var(--titan-reflexes-font-color);
    }
 
    &.resilience {
       background: var(--titan-resilience-background);
+      color: var(--titan-resilience-font-color);
    }
 
    &.willpower {
       background: var(--titan-willpower-background);
+      color: var(--titan-willpower-font-color);
    }
 }
 
 @mixin resistance-button {
    &.reflexes {
       --titan-button-background: var(--titan-reflexes-background);
+      --titan-button-font-color: var(--titan-reflexes-font-color);
+      --titan-button-hover-font-color: var(--titan-reflexes-font-color);
 
       &:disabled {
          --titan-button-disabled-background: var(--titan-reflexes-background);
+         --titan-button-disabled-font-color: var(--titan-reflexes-font-color);
       }
    }
 
    &.resilience {
       --titan-button-background: var(--titan-resilience-background);
+      --titan-button-font-color: var(--titan-resilience-font-color);
+      --titan-button-hover-font-color: var(--titan-resilience-font-color);
 
       &:disabled {
          --titan-button-disabled-background: var(--titan-resilience-background);
+         --titan-button-disabled-font-color: var(--titan-resilience-font-color);
       }
    }
 
    &.willpower {
       --titan-button-background: var(--titan-willpower-background);
+      --titan-button-font-color: var(--titan-willpower-font-color);
+      --titan-button-hover-font-color: var(--titan-willpower-font-color);
 
       &:disabled {
          --titan-button-disabled-background: var(--titan-willpower-background);
+         --titan-button-disabled-font-color: var(--titan-willpower-font-color);
       }
    }
 }
@@ -41,25 +53,31 @@
 @mixin resistance-input {
    &.reflexes {
       --titan-input-background: var(--titan-reflexes-background);
+      --titan-input-font-color: var(--titan-reflexes-font-color);
 
       &:disabled {
          --titan-input-disabled-background: var(--titan-reflexes-background);
+         --titan-input-disabled-font-color: var(--titan-reflexes-font-color);
       }
    }
 
    &.resilience {
       --titan-input-background: var(--titan-resilience-background);
+      --titan-input-font-color: var(--titan-resilience-font-color);
 
       &:disabled {
          --titan-input-disabled-background: var(--titan-resilience-background);
+         --titan-input-disabled-font-color: var(--titan-resilience-font-color);
       }
    }
 
    &.willpower {
       --titan-input-background: var(--titan-willpower-background);
+      --titan-input-font-color: var(--titan-willpower-font-color);
 
       &:disabled {
          --titan-input-disabled-background: var(--titan-willpower-background);
+         --titan-input-disabled-font-color: var(--titan-willpower-font-color);
       }
    }
 }
