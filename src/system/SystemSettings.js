@@ -47,6 +47,45 @@ export default function registerSystemSettings() {
       onChange: () => game.titan?.effectHud?.refresh(),
    });
 
+   // Enable the Player HUD.
+   game.settings.register('titan', 'enablePlayerHud', {
+      config: true,
+      default: true,
+      hint: 'SETTINGS.enablePlayerHud.hint',
+      name: 'SETTINGS.enablePlayerHud.label',
+      scope: 'client',
+      type: Boolean,
+      onChange: () => game.titan?.playerHud?.refresh(),
+   });
+
+   // Show the core Foundry hotbar (the Player HUD replaces it by default).
+   game.settings.register('titan', 'showFoundryHotbar', {
+      config: true,
+      default: false,
+      hint: 'SETTINGS.showFoundryHotbar.hint',
+      name: 'SETTINGS.showFoundryHotbar.label',
+      scope: 'client',
+      type: Boolean,
+      onChange: () => game.titan?.playerHud?.applyHotbarVisibility(),
+   });
+
+   // Player HUD element options, managed by the Player HUD settings application.
+   game.settings.register('titan', 'playerHudOptions', {
+      config: false,
+      default: {},
+      scope: 'client',
+      type: Object,
+      onChange: () => game.titan?.playerHud?.refresh({ force: true }),
+   });
+
+   // Player HUD layout (element positions, effects panel size, minimized flags), managed by edit mode.
+   game.settings.register('titan', 'playerHudLayout', {
+      config: false,
+      default: {},
+      scope: 'client',
+      type: Object,
+   });
+
    // Auto-open Combatant Sheets for Players.
    game.settings.register('titan', 'autoOpenCharacterSheetsPlayer', {
       config: true,
