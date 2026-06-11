@@ -3,7 +3,7 @@ import resolveHudActors from '~/ui/player-hud/ResolveHudActors.js';
 
 /**
  * Builds a minimal actor stub.
- * @param {string} id - The actor id.
+ * @param {string} id - The id to assign to the stub.
  * @param {boolean} [isOwner] - Whether the current user owns the actor.
  * @returns {object} The actor stub.
  */
