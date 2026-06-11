@@ -55,9 +55,10 @@
          @include margin-right-large;
       }
 
+      // The body stays unfilled so the gap between the header and tab panels shows the sheet
+      // background.
       .body {
          @include flex-column;
-         @include panel-1;
 
          flex-grow: 1;
 
