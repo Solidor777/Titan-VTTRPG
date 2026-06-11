@@ -21,9 +21,18 @@ function mergeObject(original, other = {}) {
    return original;
 }
 
+/**
+ * Minimal stand-in for foundry.utils.randomID: a random alphanumeric identifier.
+ * @param {number} [length] - The desired identifier length.
+ * @returns {string} The generated identifier.
+ */
+function randomID(length = 16) {
+   return Math.random().toString(36).slice(2, 2 + length);
+}
+
 globalThis.foundry = {
    abstract: { Document: MockDocument },
-   utils: { mergeObject },
+   utils: { mergeObject, randomID },
 };
 
 /** Minimal Hooks mock supporting on/off/call. */
