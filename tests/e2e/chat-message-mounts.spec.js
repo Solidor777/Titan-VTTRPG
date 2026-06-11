@@ -3,7 +3,7 @@ import { login } from './fixtures.js';
 import { attachPageErrors, clearChat, closeAllApps } from './world.js';
 
 /**
- * Chat-message mount keying (TODO #10): one message renders into up to three elements (main chat
+ * Chat-message mount keying: one message renders into up to three elements (main chat
  * log, notification pane, chat popout); each element carries its OWN tracked Svelte mount, and every
  * removal path tears its mount down. Leak probe: each mounted card's ReactiveDocument bridge holds
  * exactly one `updateChatMessage` hook registration while mounted, so

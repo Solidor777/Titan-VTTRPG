@@ -3,14 +3,12 @@ import { login } from './fixtures.js';
 import { closeAllApps, clearChat, attachPageErrors } from './world.js';
 
 /**
- * Reactivity regression for the two armor/shield Inventory-tab item rows. Each row's stat sub-component
- * (`CharacterSheetArmorStats` / `CharacterSheetShieldStats`) reads its display values (armor value, defense,
- * rarity, etc.) directly off the `item` Document prop iterated from `document.data.items`. Svelte 5
- * fine-grained reactivity only tracks reads routed through the reactive `document.data` store, so a plain
- * prop read of `item.system.x` has no reactive dependency: when the underlying item is mutated in place (no
- * tab switch, no re-expand) the rendered stats stay stale. Each test below seeds one item of the relevant
- * type, expands it, then mutates rarity (common -> rare) and the numeric stat in place and asserts the
- * rendered stats reflect the new values.
+ * Reactivity regression for the two armor/shield Inventory-tab item rows. Each row's stats block is the
+ * shared `ArmorStats` / `ShieldStats` component, whose display values (armor value, defense, rarity, etc.)
+ * are deriveds reading the embedded `'document'` context bridge — the reactive read path that keeps the
+ * rendered stats live when the underlying item is mutated in place (no tab switch, no re-expand). Each test
+ * below seeds one item of the relevant type, expands it, then mutates rarity (common -> rare) and the
+ * numeric stat in place and asserts the rendered stats reflect the new values.
  */
 
 /** @type {string} - Name of the throwaway player actor seeded for the armor case. */
