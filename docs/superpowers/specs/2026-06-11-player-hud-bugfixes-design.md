@@ -15,9 +15,10 @@ persisted layouts are untouched.
 The chip corner is already correctly placed on the stable (non-expanding) side via
 `actionMenuChipCorner` (`PlayerHudShell.svelte`). The defect is that the action-menu content fills the
 frame edge-to-edge, so the chip sits on top of the corner category button. Reserve a gutter on the
-chip's edge so the buttons clear it: pass `chipCorner` into `ActionMenuElement`, and reserve padding on
-the matching edge of `.action-menu` (bottom for vertical layouts, right for horizontal — sized to the
-chip). Corner logic itself is unchanged.
+chip's edge so the buttons clear it. The chip edge is fully determined by layout (always bottom in a
+vertical layout, always right in a horizontal one — see `actionMenuChipCorner`), so `.categories`
+reserves `padding-right` in horizontal and `padding-bottom` in vertical off the existing `vertical`
+flag; no extra prop is threaded. Corner logic itself is unchanged.
 
 ### 3. Expand direction is ignored (the core change)
 `resolveCascadeDirection` (`HudGeometry.js`) silently flips the sub-option and sub-button lanes away
