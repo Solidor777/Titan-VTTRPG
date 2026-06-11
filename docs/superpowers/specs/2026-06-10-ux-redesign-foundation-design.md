@@ -140,6 +140,18 @@ sheet layout, item/effect sheets, chat cards in detail, dialogs, Effect Tray/HUD
   ThemeManager.
 - Log follow-up surface passes in `docs/TODO.md`; clear completed items.
 
+## Plan-time amendments (2026-06-10, user-approved)
+
+- The legacy `darkModeSheets` / `darkModeChatMessages` / `darkModeJournals` settings, their accessors,
+  the two journal render hooks, and every `titan-dark-mode` class push are removed — the class has been
+  CSS-inert since the v14 migration, so all three settings are visual no-ops today.
+- New client setting `themeCoreMessages` (default ON): applies the theme's chat surface (public +
+  visibility tints, no badge) to non-TITAN chat messages via a `titan-core-themed` class.
+- The theme system lives in `src/theme/` (data, manager, pure helpers, editor app).
+- Meter shadows stay in the static tier (alpha overlays, not theme colors). Theme token values are
+  6-digit hex (8-digit accepted on import). Built-in theme names are raw display strings; editor token
+  labels are prettified token names, group headings localized.
+
 ## Attribution
 
 Catppuccin palette values © Catppuccin Org, MIT — attribution retained in source where the palette
