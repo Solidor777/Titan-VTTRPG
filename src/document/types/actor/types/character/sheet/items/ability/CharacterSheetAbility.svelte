@@ -9,8 +9,7 @@
       from '~/document/types/actor/types/character/sheet/items/CharacterSheetItemEditButton.svelte';
    import CharacterSheetItemDeleteButton
       from '~/document/types/actor/types/character/sheet/items/CharacterSheetItemDeleteButton.svelte';
-   import CharacterSheetCondensedItemCheckButton
-      from '~/document/types/actor/types/character/sheet/items/CharacterSheetCondensedItemCheckButton.svelte';
+   import CondensedItemCheckButton from '~/document/svelte-components/check/CondensedItemCheckButton.svelte';
    import CharacterSheetItemChecks
       from '~/document/types/actor/types/character/sheet/items/CharacterSheetItemChecks.svelte';
    import isHTMLBlank from '~/helpers/utility-functions/IsHTMLBlank.js';
@@ -33,7 +32,7 @@
       <!--Check-->
       {#if document.data?.system.check.length > 0}
          <div class="button">
-            <CharacterSheetCondensedItemCheckButton/>
+            <CondensedItemCheckButton/>
          </div>
       {/if}
 

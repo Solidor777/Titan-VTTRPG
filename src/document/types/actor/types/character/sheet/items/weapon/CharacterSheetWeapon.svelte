@@ -18,8 +18,7 @@
       from '~/document/types/actor/types/character/sheet/items/weapon/CharacterSheetWeaponMultiAttackButton.svelte';
    import CharacterSheetWeaponAttacks
       from '~/document/types/actor/types/character/sheet/items/weapon/CharacterSheetWeaponAttacks.svelte';
-   import CharacterSheetCondensedAttackCheckButton
-      from '~/document/types/actor/types/character/sheet/items/CharacterSheetCondensedAttackCheckButton.svelte';
+   import CondensedAttackCheckButton from '~/document/svelte-components/check/CondensedAttackCheckButton.svelte';
 
    /**
     * @typedef {object} CharacterSheetWeaponProps
@@ -55,7 +54,7 @@
             <!--Toggle Equipped button-->
             <CharacterSheetItemEquipButton {equipped}/>
          {:else if attackCount > 0}
-            <CharacterSheetCondensedAttackCheckButton/>
+            <CondensedAttackCheckButton/>
          {/if}
       </div>
 

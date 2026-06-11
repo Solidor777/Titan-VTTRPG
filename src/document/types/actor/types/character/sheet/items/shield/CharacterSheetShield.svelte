@@ -14,8 +14,7 @@
    import CharacterSheetItemChecks
       from '~/document/types/actor/types/character/sheet/items/CharacterSheetItemChecks.svelte';
    import ShieldStats from '~/document/types/item/types/shield/components/ShieldStats.svelte';
-   import CharacterSheetCondensedItemCheckButton
-      from '~/document/types/actor/types/character/sheet/items/CharacterSheetCondensedItemCheckButton.svelte';
+   import CondensedItemCheckButton from '~/document/svelte-components/check/CondensedItemCheckButton.svelte';
 
    /**
     * @typedef {object} CharacterSheetShieldProps
@@ -49,7 +48,7 @@
          </div>
       {:else if check.length > 0}
          <div class="button">
-            <CharacterSheetCondensedItemCheckButton/>
+            <CondensedItemCheckButton/>
          </div>
       {/if}
 

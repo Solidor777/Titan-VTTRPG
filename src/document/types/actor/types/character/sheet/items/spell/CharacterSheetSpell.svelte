@@ -15,8 +15,7 @@
       from '~/document/types/actor/types/character/sheet/items/CharacterSheetItemChecks.svelte';
    import CharacterSheetSpellCastingCheck
       from '~/document/types/actor/types/character/sheet/items/spell/CharacterSheetSpellCastingCheck.svelte';
-   import CharacterSheetCondensedCastingCheckButton
-      from '~/document/types/actor/types/character/sheet/items/spell/CharacterSheetCondensedCastingCheckButton.svelte';
+   import CondensedCastingCheckButton from '~/document/svelte-components/check/CondensedCastingCheckButton.svelte';
 
    /**
     * @typedef {object} CharacterSheetSpellProps
@@ -49,7 +48,7 @@
    {#snippet controls()}
       <!--Cast Spell-->
       <div class="button">
-         <CharacterSheetCondensedCastingCheckButton/>
+         <CondensedCastingCheckButton/>
       </div>
 
       <!--Send to Chat button-->

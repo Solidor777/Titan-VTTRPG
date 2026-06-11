@@ -13,8 +13,7 @@
       from '~/document/types/actor/types/character/sheet/items/CharacterSheetItemEquipButton.svelte';
    import CharacterSheetItemChecks
       from '~/document/types/actor/types/character/sheet/items/CharacterSheetItemChecks.svelte';
-   import CharacterSheetCondensedItemCheckButton
-      from '~/document/types/actor/types/character/sheet/items/CharacterSheetCondensedItemCheckButton.svelte';
+   import CondensedItemCheckButton from '~/document/svelte-components/check/CondensedItemCheckButton.svelte';
    import { getContext } from 'svelte';
 
    /**
@@ -47,7 +46,7 @@
          </div>
       {:else if (checkLength > 0)}
          <div class="button">
-            <CharacterSheetCondensedItemCheckButton/>
+            <CondensedItemCheckButton/>
          </div>
       {/if}
 
