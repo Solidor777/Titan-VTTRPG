@@ -84,8 +84,11 @@
          </div>
       {/if}
 
-      <!--Toggle Active Button-->
-      <CharacterSheetEffectToggleActiveButton/>
+      <!--Toggle Active Button (permanent effects only; timed effects are active while their
+      duration runs, so a manual toggle would be redundant)-->
+      {#if durationType === 'permanent'}
+         <CharacterSheetEffectToggleActiveButton/>
+      {/if}
 
       <!--Send to Chat button-->
       <div class="button">

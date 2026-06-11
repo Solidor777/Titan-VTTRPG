@@ -35,5 +35,6 @@
 <style lang="scss">
    .enabled {
       --titan-button-background: var(--titan-highlighted-background);
+      --titan-button-font-color: var(--titan-highlighted-font-color);
    }
 </style>

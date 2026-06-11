@@ -1,11 +1,9 @@
 <script>
    import { getContext } from 'svelte';
-   import localize from '~/helpers/utility-functions/Localize.js';
    import { slide } from 'svelte/transition';
-   import IconButton from '~/helpers/svelte-components/button/IconButton.svelte';
+   import ExpandButton from '~/helpers/svelte-components/button/ExpandButton.svelte';
    import SpellSheetSidebarAspects from '~/document/types/item/types/spell/sheet/SpellSheetSidebarAspects.svelte';
    import CastingCheckTags from '~/document/svelte-components/check/CastingCheckTags.svelte';
-   import { COLLAPSED_ICON, EXPANDED_ICON } from '~/system/Icons.js';
 
    /** @type {object} Reference to the reactive Document store. */
    const appState = getContext('applicationState');
@@ -43,27 +41,9 @@
          <div class="label-button">
             <CastingCheckTags/>
          </div>
-         <!--Expand button-->
+         <!--Expand button (shared component, matching the item-check sidebar)-->
          <div class="spacer">
-            {#if $appState.sidebar.castingCheck.isExpanded}
-               <!--Collapse button-->
-               <IconButton
-                  icon={EXPANDED_ICON}
-                  label={localize('collapse')}
-                  onclick={() => {
-                     $appState.sidebar.castingCheck.isExpanded = false;
-                  }}
-               />
-            {:else}
-               <!--Expand button-->
-               <IconButton
-                  icon={COLLAPSED_ICON}
-                  label={localize('expand')}
-                  onclick={() => {
-                     $appState.sidebar.castingCheck.isExpanded = true;
-                  }}
-               />
-            {/if}
+            <ExpandButton bind:expanded={$appState.sidebar.castingCheck.isExpanded}/>
          </div>
       {:else}
          <!--Casting-check tags (shared component; reads the spell's config through the document context)-->
@@ -91,14 +71,12 @@
       .header {
          @include flex-row;
          @include flex-group-center;
-         @include border-top-bottom;
          @include attribute-colors;
-         @include tag;
-
-         width: 100%;
-
          @include padding-standard;
 
+         width: 100%;
+         align-items: center;
+         font-size: var(--titan-tag-font-size);
          font-weight: bold;
          min-height: 48px;
 
@@ -108,6 +86,7 @@
 
             width: 100%;
             flex-wrap: wrap;
+            align-items: center;
          }
 
          .label-button {
@@ -116,6 +95,7 @@
 
             width: 100%;
             flex-wrap: wrap;
+            align-items: center;
          }
 
          .spacer {

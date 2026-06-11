@@ -47,7 +47,9 @@
 @mixin mini-button {
    @include button;
 
-   --titan-button-border-radius: var(--titan-border-radius);
+   // Referencing --titan-border-radius here would close a var() cycle with the button mixin
+   // (which derives --titan-border-radius FROM --titan-button-border-radius), zeroing the radius.
+   --titan-button-border-radius: var(--titan-tag-border-radius);
    --titan-button-font-size: var(--titan-font-size-small);
    --titan-button-font-weight: normal;
    --titan-button-line-height: var(--titan-line-height-small);

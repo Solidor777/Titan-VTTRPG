@@ -60,6 +60,9 @@
 
       &.bordered {
          @include border;
+
+         // Clip the square tab strip and content to the rounded frame so nothing pokes past it.
+         overflow: hidden;
       }
 
       width: 100%;
@@ -80,11 +83,16 @@
          .button {
             @include flex-row;
 
+            // The strip reads as one continuous bar; the frame's clipping rounds the outer corners.
+            // The mini-button mixin derives its radius from the tag radius token, so zero that.
+            --titan-tag-border-radius: 0;
+
             width: 100%;
             height: 100%;
 
             &.active {
                --titan-button-background: var(--titan-highlighted-background);
+               --titan-button-font-color: var(--titan-highlighted-font-color);
             }
 
             &:not(:first-child) {

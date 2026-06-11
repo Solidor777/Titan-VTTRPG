@@ -21,6 +21,7 @@
       @include flex-column;
       @include flex-group-top;
       @include panel-2;
+      @include padding-standard;
 
       height: 100%;
       width: 100%;

@@ -46,8 +46,8 @@
 
 {#if check}
    <div class="check" transition:slide|local>
-      <!--Header-->
-      <div class="header">
+      <!--Header (color-coded to the check's attribute)-->
+      <div class="header {check.attribute}">
          <!--Expand Toggle-->
          <div>
             {#if isExpanded}
@@ -290,6 +290,7 @@
       @include flex-group-top;
 
       width: 100%;
+      margin-bottom: var(--titan-spacing-large);
 
       .header {
          @include border;
@@ -297,6 +298,7 @@
          @include flex-space-between;
          @include panel-1;
          @include padding-large;
+         @include attribute-colors;
 
          width: 100%;
 

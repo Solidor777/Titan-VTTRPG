@@ -16,11 +16,14 @@
 
 <div class="label">
    <div class="content {attribute}">
-      <img
-         alt="item"
-         class={img.indexOf('.svg') === -1 ? '' : 'svg'}
-         src={img}
-      />
+      <!--Item image (omitted when the document has none; an empty src is an invalid media URI)-->
+      {#if img}
+         <img
+            alt="item"
+            class={img.indexOf('.svg') === -1 ? '' : 'svg'}
+            src={img}
+         />
+      {/if}
 
       <!--Labels-->
       <div class="labels">
@@ -32,13 +35,13 @@
 <style lang="scss">
    .label {
       @include flex-row;
-      @include flex-group-left;
+      @include flex-group-center;
 
       width: 100%;
 
       .content {
          @include flex-row;
-         @include flex-group-left;
+         @include flex-group-center;
          @include attribute-colors;
          @include border;
          @include tag;

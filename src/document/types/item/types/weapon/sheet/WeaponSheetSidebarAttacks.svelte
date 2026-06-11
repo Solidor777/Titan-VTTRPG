@@ -1,13 +1,10 @@
 <script>
    import { getContext } from 'svelte';
    import { slide } from 'svelte/transition';
-   import localize from '~/helpers/utility-functions/Localize.js';
-   import IconButton from '~/helpers/svelte-components/button/IconButton.svelte';
+   import ExpandButton from '~/helpers/svelte-components/button/ExpandButton.svelte';
    import AttackTags from '~/document/types/item/types/weapon/components/AttackTags.svelte';
    import {
       ACCURACY_ICON,
-      COLLAPSED_ICON,
-      EXPANDED_ICON,
       MELEE_ICON,
    } from '~/system/Icons.js';
 
@@ -35,31 +32,20 @@
                </div>
             </div>
 
-            <!--Expand Toggle-->
+            <!--Expand Toggle (shared component, matching the item-check sidebar). Function binding:
+            a freshly added attack renders before the state array grows, so the read falls back to
+            the seeded default (expanded) instead of binding undefined.-->
             <div class="spacer">
-               {#if $appState.sidebar.attacks.isExpanded[idx]}
-                  <!--Collapse button-->
-                  <IconButton
-                     icon={EXPANDED_ICON}
-                     label={localize('collapse')}
-                     onclick={() => {
-                        $appState.sidebar.attacks.isExpanded[idx] = false;
-                     }}
-                  />
-               {:else}
-                  <!--Expand button-->
-                  <IconButton
-                     icon={COLLAPSED_ICON}
-                     label={localize('expand')}
-                     onclick={() => {
-                        $appState.sidebar.attacks.isExpanded[idx] = true;
-                     }}
-                  />
-               {/if}
+               <ExpandButton
+                  bind:expanded={
+                     () => $appState.sidebar.attacks.isExpanded[idx] ?? true,
+                     (value) => $appState.sidebar.attacks.isExpanded[idx] = value
+                  }
+               />
             </div>
          </div>
 
-         {#if $appState.sidebar.attacks.isExpanded[idx]}
+         {#if $appState.sidebar.attacks.isExpanded[idx] ?? true}
             <div class="stats" transition:slide|local>
                <AttackTags {idx}/>
             </div>

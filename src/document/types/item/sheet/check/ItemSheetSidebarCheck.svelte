@@ -23,8 +23,8 @@
 
 {#if document.data?.system.check[idx]}
    <div class="check">
-      <!--Label-->
-      <div class="label">
+      <!--Label (color-coded to the check's attribute)-->
+      <div class="label {document.data.system.check[idx].attribute}">
 
          <!--Name-->
          <div class="name">
@@ -68,6 +68,7 @@
          @include bordered-label;
          @include flex-column;
          @include flex-group-top;
+         @include attribute-colors;
       }
 
       .stats {
