@@ -39,13 +39,13 @@
       <!--Extra Successes-->
       {#if document.data.system.results.extraSuccesses !== undefined}
          {#if document.data.system.results.extraSuccessesRemaining !== undefined}
-            <div class="stat">
+            <div class="stat extra">
                {localize('extraSuccesses')}: {document.data.system.results
                .extraSuccessesRemaining}/{document.data.system.results
                .extraSuccesses}
             </div>
          {:else if document.data.system.results.extraSuccesses > 0}
-            <div class="stat">
+            <div class="stat extra">
                {localize('extraSuccesses')}: {document.data.system.results
                .extraSuccesses}
             </div>
@@ -147,14 +147,17 @@
 </div>
 
 <style lang="scss">
+   // A column of centered result rows on a quiet panel; the tag fill would drown the paired
+   // succeeded/failed colors, which are tuned against the chat surface.
    .results {
       @include border;
       @include flex-column;
       @include flex-group-center;
-      @include tag;
+      @include panel-3;
       @include font-size-normal;
       @include padding-large;
 
+      border-radius: var(--titan-border-radius);
       font-weight: bold;
       width: 100%;
 
@@ -179,8 +182,14 @@
          @include flex-row;
          @include flex-group-center;
 
+         width: 100%;
+
          &:not(:first-child) {
             @include margin-top-standard;
+         }
+
+         &.extra {
+            @include font-size-small;
          }
 
          i {

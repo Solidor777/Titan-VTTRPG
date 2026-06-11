@@ -37,42 +37,6 @@
       }
    }
 
-   &.chat-message {
-      background: var(--titan-chat-public-background);
-
-      .message-header {
-         background: var(--titan-chat-public-header-background);
-         border-radius: var(--titan-border-radius) var(--titan-border-radius) 0 0;
-         padding: var(--titan-spacing-standard);
-      }
-
-      &.titan-secret {
-         background: var(--titan-chat-secret-background);
-
-         .message-header {
-            background: var(--titan-chat-secret-header-background);
-         }
-
-         .titan-visibility-badge {
-            background: var(--titan-chat-secret-badge-background);
-            color: var(--titan-chat-secret-badge-font-color);
-         }
-      }
-
-      &.titan-gm-only {
-         background: var(--titan-chat-gm-background);
-
-         .message-header {
-            background: var(--titan-chat-gm-header-background);
-         }
-
-         .titan-visibility-badge {
-            background: var(--titan-chat-gm-badge-background);
-            color: var(--titan-chat-gm-badge-font-color);
-         }
-      }
-   }
-
    .svg {
       filter: brightness(0);
    }
@@ -82,30 +46,73 @@
    }
 }
 
-// Non-TITAN chat messages opted into the TITAN chat surface (no badge; core metadata keeps its layout).
+// The TITAN chat surface, shared by TITAN cards and core messages opted in via titan-core-themed.
+.titan.chat-message,
 .titan-core-themed.chat-message {
    background: var(--titan-chat-public-background);
    color: var(--titan-app-font-color);
 
-   &.whisper {
-      background: var(--titan-chat-secret-background);
+   .message-header {
+      background: var(--titan-chat-public-header-background);
+      border-radius: var(--titan-border-radius) var(--titan-border-radius) 0 0;
+      color: var(--titan-app-font-color);
+      margin-bottom: var(--titan-spacing-standard);
+      padding: var(--titan-spacing-standard);
+
+      // The visibility badge replaces the core whisper-recipient line.
+      .whisper-to {
+         display: none;
+      }
    }
 
-   &.blind {
+   .titan-visibility-badge {
+      background: var(--titan-chat-public-badge-background);
+      color: var(--titan-chat-public-badge-font-color);
+   }
+
+   &.titan-secret {
+      background: var(--titan-chat-secret-background);
+
+      .message-header {
+         background: var(--titan-chat-secret-header-background);
+      }
+
+      .titan-visibility-badge {
+         background: var(--titan-chat-secret-badge-background);
+         color: var(--titan-chat-secret-badge-font-color);
+      }
+   }
+
+   &.titan-gm-only {
       background: var(--titan-chat-gm-background);
+
+      .message-header {
+         background: var(--titan-chat-gm-header-background);
+      }
+
+      .titan-visibility-badge {
+         background: var(--titan-chat-gm-badge-background);
+         color: var(--titan-chat-gm-badge-font-color);
+      }
    }
 }
 
-// The visibility badge: centered between the speaker and the metadata, sized to stay readable.
+// The badge row breaks onto its own header line, left-aligned under the speaker name.
+.titan-visibility-row {
+   display: flex;
+   flex: 0 0 100%;
+   justify-content: flex-start;
+   margin-top: 2px;
+}
+
+// The visibility badge: sized and spaced to stay readable.
 .titan-visibility-badge {
-   align-self: center;
    border-radius: var(--titan-tag-border-radius);
    font-family: var(--titan-font-family-normal), sans-serif;
    font-size: 13px;
    font-weight: bold;
    letter-spacing: 0.06em;
    line-height: 1;
-   margin-inline: auto var(--titan-spacing-large);
    padding: 4px 9px;
    text-transform: uppercase;
    white-space: nowrap;

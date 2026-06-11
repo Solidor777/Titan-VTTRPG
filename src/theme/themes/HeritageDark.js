@@ -111,6 +111,8 @@ const HERITAGE_DARK = Object.freeze({
       'turn-start-effect-font-color': '#1b1c26',
       'chat-public-background': '#2e3044',
       'chat-public-header-background': '#262836',
+      'chat-public-badge-background': '#424557',
+      'chat-public-badge-font-color': '#d8dbe8',
       'chat-secret-background': '#2c2a4e',
       'chat-secret-header-background': '#232148',
       'chat-secret-badge-background': '#3b3878',

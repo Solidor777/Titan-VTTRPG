@@ -45,6 +45,11 @@ export default class TitanActiveEffect extends foundry.documents.ActiveEffect {
             updateData.showIcon = CONST.ACTIVE_EFFECT_SHOW_ICON.ALWAYS;
          }
 
+         // Timed effects derive their active state from their duration: active while time remains.
+         if (this.system.duration.type !== 'permanent') {
+            updateData.disabled = this.system.duration.remaining <= 0;
+         }
+
          this.updateSource(updateData);
       }
 
@@ -65,6 +70,20 @@ export default class TitanActiveEffect extends foundry.documents.ActiveEffect {
       const retVal = await super._preUpdate(changes, options, user);
       if (retVal === false) {
          return false;
+      }
+
+      // Timed effects derive their active state from their duration: active while time remains.
+      // The disabled flag stays a manual toggle for permanent effects only.
+      if (this.type === 'effect') {
+         /** @type {string} - The duration type this update results in. */
+         const durationType =
+            foundry.utils.getProperty(changes, 'system.duration.type') ?? this.system.duration.type;
+         if (durationType !== 'permanent') {
+            /** @type {number} - The remaining duration this update results in. */
+            const remaining =
+               foundry.utils.getProperty(changes, 'system.duration.remaining') ?? this.system.duration.remaining;
+            changes.disabled = remaining <= 0;
+         }
       }
 
       return retVal;

@@ -110,6 +110,8 @@ const CLEAN_NEUTRAL_LIGHT = Object.freeze({
       'turn-start-effect-font-color': '#29303f',
       'chat-public-background': '#ffffff',
       'chat-public-header-background': '#f0f2f5',
+      'chat-public-badge-background': '#e2e6eb',
+      'chat-public-badge-font-color': '#3a4150',
       'chat-secret-background': '#eef0fd',
       'chat-secret-header-background': '#dfe3fa',
       'chat-secret-badge-background': '#c9cef7',

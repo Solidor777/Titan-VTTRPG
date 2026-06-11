@@ -267,8 +267,6 @@
 
          width: 100%;
 
-         --titan-button-border-radius: var(--titan-button-border-radius);
-
          .cost {
             @include flex-row;
             @include flex-group-center;

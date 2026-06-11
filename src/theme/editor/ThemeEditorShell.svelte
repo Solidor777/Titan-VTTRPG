@@ -103,6 +103,17 @@
    }
 
    /**
+    * Applies the selected theme as the active theme, saving custom draft edits first.
+    * @returns {Promise<void>} Resolves once the theme setting is stored and applied.
+    */
+   async function applyTheme() {
+      if (!isBuiltIn) {
+         await save();
+      }
+      await game.settings.set('titan', 'theme', selectedId);
+   }
+
+   /**
     * Downloads the draft as a theme JSON file.
     */
    function exportTheme() {
@@ -147,6 +158,7 @@
             <option value={theme.id}>{theme.name}</option>
          {/each}
       </select>
+      <button onclick={applyTheme}>{localize('applyTheme')}</button>
       <button onclick={duplicate}>{localize('duplicateTheme')}</button>
       <button
          disabled={isBuiltIn}
@@ -182,12 +194,15 @@
          />
       </label>
       <label>
-         {localize('darkTheme')}
-         <input
+         {localize('themeMode')}
+         <select
             disabled={isBuiltIn}
-            type="checkbox"
-            bind:checked={draft.dark}
-         />
+            value={draft.dark ? 'dark' : 'light'}
+            onchange={(event) => draft.dark = event.target.value === 'dark'}
+         >
+            <option value="light">{localize('lightMode')}</option>
+            <option value="dark">{localize('darkMode')}</option>
+         </select>
       </label>
    </div>
 
@@ -281,7 +296,8 @@
             gap: var(--titan-spacing-standard);
             font-weight: bold;
 
-            input[type='text'] {
+            input[type='text'],
+            select {
                @include input;
 
                width: auto;

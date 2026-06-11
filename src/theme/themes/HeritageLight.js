@@ -110,6 +110,8 @@ const HERITAGE_LIGHT = Object.freeze({
       'turn-start-effect-font-color': '#1b1c26',
       'chat-public-background': '#ffffff',
       'chat-public-header-background': '#f0f0f4',
+      'chat-public-badge-background': '#e2e2e8',
+      'chat-public-badge-font-color': '#3f3f4d',
       'chat-secret-background': '#efedfc',
       'chat-secret-header-background': '#e0ddf7',
       'chat-secret-badge-background': '#cbc6f2',

@@ -58,7 +58,5 @@
 
       width: 100%;
 
-      --titan-button-border-radius: var(--titan-button-border-radius);
-
    }
 </style>

@@ -205,13 +205,24 @@ export default class ThemeManager {
 
    /**
     * Rebuilds the registered theme setting's choices after custom themes change so the picker
-    * reflects the current theme list.
+    * reflects the current theme list, re-registering the setting (the settings form derives its
+    * dropdown from the registered definition) and re-rendering an open settings window.
     */
    refreshThemeChoices() {
-      // The registered setting config whose choices are rebuilt in place.
+      // The registered setting config, re-registered with the rebuilt choices.
       const config = game.settings.settings.get('titan.theme');
       if (config) {
-         config.choices = buildThemeChoices(this.getAllThemes());
+         game.settings.register('titan', 'theme', {
+            ...config,
+            choices: buildThemeChoices(this.getAllThemes()),
+         });
+      }
+
+      // Re-render an open settings window so the picker updates without a reload.
+      for (const app of foundry.applications.instances.values()) {
+         if (app instanceof foundry.applications.settings.SettingsConfig) {
+            app.render();
+         }
       }
    }
 }

@@ -40,6 +40,7 @@ export default class TitanChatMessage extends ChatMessage {
          if (themeCoreMessages()) {
             html.classList.add('titan-core-themed');
             applyVisibilityClass(html, this);
+            insertVisibilityBadge(html, this);
          }
          return html;
       }
@@ -88,26 +89,27 @@ function applyVisibilityClass(html, message) {
 }
 
 /**
- * Inserts the centered visibility badge into the card header for non-public messages.
+ * Inserts the visibility badge into the card header: a full-width row breaking onto its own header
+ * line, left-aligned under the speaker name (the hidden core whisper-recipient line's position).
  * @param {HTMLElement} html - The rendered chat-message element.
  * @param {TitanChatMessage} message - The message being rendered.
  */
 function insertVisibilityBadge(html, message) {
-   // Public messages carry no badge.
-   if (!message.blind && message.whisper.length === 0) {
-      return;
+   // The visibility label key: GM-only for blind messages, secret for other whispers, else public.
+   let labelKey = 'publicMessage';
+   if (message.blind) {
+      labelKey = 'gmOnlyMessage';
+   }
+   else if (message.whisper.length > 0) {
+      labelKey = 'secretMessage';
    }
 
-   // The badge element, labeled by visibility and slotted before the header metadata.
+   // The badge inside its line-breaking row, appended after the header's first line.
    const badge = document.createElement('span');
    badge.classList.add('titan-visibility-badge');
-   badge.textContent = localize(message.blind ? 'gmOnlyMessage' : 'secretMessage');
-   const header = html.querySelector('.message-header');
-   const metadata = header?.querySelector('.message-metadata');
-   if (metadata) {
-      metadata.before(badge);
-   }
-   else {
-      header?.append(badge);
-   }
+   badge.textContent = localize(labelKey);
+   const row = document.createElement('div');
+   row.classList.add('titan-visibility-row');
+   row.append(badge);
+   html.querySelector('.message-header')?.append(row);
 }

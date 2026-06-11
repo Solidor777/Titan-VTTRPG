@@ -35,13 +35,13 @@
 <style lang="scss">
    .label {
       @include flex-row;
-      @include flex-group-center;
+      @include flex-group-left;
 
       width: 100%;
 
       .content {
          @include flex-row;
-         @include flex-group-center;
+         @include flex-group-left;
          @include attribute-colors;
          @include border;
          @include tag;

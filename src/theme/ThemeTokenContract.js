@@ -69,6 +69,7 @@ export const THEME_TOKEN_GROUPS = Object.freeze({
    ),
    chat: [
       'chat-public-background', 'chat-public-header-background',
+      'chat-public-badge-background', 'chat-public-badge-font-color',
       'chat-secret-background', 'chat-secret-header-background',
       'chat-secret-badge-background', 'chat-secret-badge-font-color',
       'chat-gm-background', 'chat-gm-header-background',
@@ -129,6 +130,7 @@ export const THEME_TOKEN_PAIRS = Object.freeze([
    ['lesser-background', 'lesser-color'],
    ['greater-background', 'greater-color'],
    ...EFFECT_TYPES.map((type) => [`${type}-effect-primary`, `${type}-effect-font-color`]),
+   ['chat-public-badge-background', 'chat-public-badge-font-color'],
    ['chat-secret-badge-background', 'chat-secret-badge-font-color'],
    ['chat-gm-badge-background', 'chat-gm-badge-font-color'],
 ]);

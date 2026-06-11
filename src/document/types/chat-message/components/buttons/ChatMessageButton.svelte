@@ -22,6 +22,5 @@
    button {
       @include button;
 
-      --titan-button-border-radius: var(--titan-button-border-radius);
    }
 </style>

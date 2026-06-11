@@ -52,7 +52,6 @@
       .button {
          @include tag-container-child-margin;
 
-         --titan-button-border-radius: var(--titan-button-border-radius);
       }
    }
 </style>

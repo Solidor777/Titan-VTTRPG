@@ -111,6 +111,8 @@ const MACCHIATO = Object.freeze({
       'turn-start-effect-font-color': '#181926',
       'chat-public-background': '#2a2d42',
       'chat-public-header-background': '#1e2030',
+      'chat-public-badge-background': '#494d64',
+      'chat-public-badge-font-color': '#cad3f5',
       'chat-secret-background': '#2d3050',
       'chat-secret-header-background': '#23264a',
       'chat-secret-badge-background': '#3d4178',

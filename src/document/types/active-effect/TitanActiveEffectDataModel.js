@@ -58,8 +58,9 @@ export default class TitanActiveEffectDataModel extends RulesElementMixin(TitanD
    }
 
    /**
-    * Whether this effect is currently active. An effect is active when it is not disabled, for all
-    * duration types; duration governs expiry only.
+    * Whether this effect is currently active. An effect is active when it is not disabled. The
+    * disabled flag is a manual toggle for permanent effects only; for timed effects the document
+    * lifecycle keeps it synced to the duration (active while time remains).
     * @returns {boolean} Whether this effect is currently active.
     */
    get isActive() {
