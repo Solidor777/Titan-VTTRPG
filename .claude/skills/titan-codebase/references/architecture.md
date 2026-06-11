@@ -25,10 +25,18 @@
   (`collapsed`), preserved across remounts. The shell sets the active actor's `ReactiveDocument` bridge as the
   `document` context, so the reused effect leaf components (checks, description, owner-gated delete) resolve the
   actor exactly as they do inside the character sheet. See `data-flow.md` "Effect HUD".
-- `src/styles/` — Global SCSS: font imports (`Lato.scss`, `OpenSans.scss`), CSS custom-property variables
-  (`Variables.scss`), global resets (`Global.scss`), a prepended `Root.scss` (injected into every Svelte component
-  via svelte-preprocess), and a `Mixins/` folder of per-domain SCSS mixin files covering flex, font, border, button,
-  panel, tag, input, label, list, margin, padding, rarity, resistance, separator, system, and attribute domains.
+- `src/styles/` — Global SCSS: font imports (`Lato.scss`, `OpenSans.scss`), the STATIC structure tokens
+  (`Variables.scss` — spacing, radii, border widths, font sizes; every color and font-family token is injected at
+  runtime by the ThemeManager), global resets (`Global.scss`, incl. the chat visibility surface and badge), a
+  prepended `Root.scss` (injected into every Svelte component via svelte-preprocess), and a `Mixins/` folder of
+  per-domain SCSS mixin files covering flex, font, border, button, panel, tag, input, label, list, margin, padding,
+  rarity, resistance, separator, system, and attribute domains.
+- `src/theme/` — The theming system: `ThemeTokenContract.js` (the ~112-token contract, editor groups, and
+  fill→text pairing list), `themes/` (the four built-in theme data modules: Heritage Dark, Catppuccin Macchiato,
+  Heritage Light, Clean Neutral), pure helpers (`BuildThemeStylesheetText.js`, `ResolveActiveThemeId.js`,
+  `ValidateThemeData.js`), `ThemeManager.js` (resolution, `:root` stylesheet injection, per-sheet scheme
+  overrides, custom-theme CRUD/import/export; created in `OnceInit`, exposed as `game.titan.themeManager`), and
+  `editor/` (the ApplicationV2 + Svelte theme editor opened from the settings menu).
 - `src/system/` — System-wide constants and registrations: constant and registration modules covering attributes,
   skills, conditions, icons, settings registration (`SystemSettings.js`), initiative formula (`Initiative.js`),
   macros (`Macros.js`), trackable attributes (`TrackableAttributes.js`), and enumeration files (roles, resistances,
@@ -43,7 +51,9 @@
 
 **`src/hooks/` wiring:**
 - `OnceInit.js` (Foundry `init` hook) does all heavy registration: creates `game.titan` namespace, calls
-  `registerSystemSettings()` and `registerInitiativeFormula()` from `src/system/`, sets `CONFIG.Actor`,
+  `registerSystemSettings()` from `src/system/`, creates + initializes the `ThemeManager`
+  (`game.titan.themeManager` — applies the active theme stylesheet before any TITAN surface renders),
+  calls `registerInitiativeFormula()`, sets `CONFIG.Actor`,
   `CONFIG.Item`, `CONFIG.ChatMessage`, and `CONFIG.Combat` document classes and data models from `src/document/`,
   and registers all sheet classes. It also registers the custom Effect Tray sidebar tab additively —
   `foundry.applications.sidebar.Sidebar.TABS.titanEffects = { icon, tooltip }` plus

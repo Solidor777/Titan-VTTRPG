@@ -39,7 +39,7 @@ and tears it down with `unmount(handle, { outro: true })` in `_onClose()`. `_ren
 ApplicationV2 options object — the `svelte` key is a naming holdover, not TyphonJS middleware).
 `TitanDialog` (`src/helpers/dialogs/Dialog.js`) follows the same lifecycle on a bare
 `foundry.applications.api.ApplicationV2`, mounting `options.content.class` with `options.content.props`.
-Its constructor hardcodes element classes `['titan', 'titan-dialog']` (plus `titan-dark-mode`); any
+Its constructor hardcodes element classes `['titan', 'titan-dialog']`; any
 per-type CSS classes must be passed as `classes: [...]` in the `super({...})` options object (the
 v14 `TitanDialog` never calls `_getDialogClasses()` — that leftover de-TyphonJS override is dead).
 `AddCustomTraitDialog` and `EditCustomTraitDialog` both use the correct `classes:` pattern. The stable
@@ -246,6 +246,43 @@ guard relies on:
 
 SCSS mixins are the deliberate, preferred styling mechanism — a codebase-wide refactor replaced all
 `:global` selector usage with mixins, and no `:global` occurrences remain in `src/`.
+
+**Theming model (two-tier tokens, runtime injection)** — `src/styles/Variables.scss` holds ONLY the
+static structure tier (spacing, radii, border widths, font sizes). Every color and the two font-family
+tokens are THEMED: `src/theme/ThemeTokenContract.js` defines the contract (~112 tokens + the fill→text
+pairing list — every `…-background` fill that carries text has a paired `…-font-color`, so a theme can
+never produce light-on-saturated text), the four built-in themes live in `src/theme/themes/`, and
+`ThemeManager.apply()` writes one `<style id="titan-theme-style">` containing the active theme on
+`:root` plus `.titan.themed.theme-light` / `.titan.themed.theme-dark` scoped blocks (the world-default
+light/dark themes) so Foundry's per-sheet color-scheme option overrides individual windows. Resolution:
+client `theme` setting → `auto` follows Foundry's `theme-dark`/`theme-light` body class (a
+MutationObserver re-applies on change) → GM world defaults (`defaultDarkTheme`/`defaultLightTheme`) →
+built-in heritage fallback. Custom themes live in the `customThemes` client setting (same data shape as
+built-ins) and are managed by the theme editor (`src/theme/editor/`, opened via `registerMenu`). Theme
+switching is live — no reload; settings `onChange` calls `apply()`.
+
+**Setting localization keys are `SETTINGS.<key>.label`** (plus `.hint` and per-choice children) —
+`lang/en.json` defines `label`, not `text`, for every setting; a `name: 'SETTINGS.x.text'` reference
+renders as the raw key in the settings window. The settings-menu button label key is
+`SETTINGS.themeEditor.button`.
+
+**AppV2 sheets must bind their own DragDrop** — ApplicationV2 wires no drag-drop handlers;
+`TitanActorSheet._onRender` creates a `foundry.applications.ux.DragDrop.implementation` (drop
+permission = `isEditable`) and binds it to `this.element` every render. Without that, `_onDrop` is
+dead code and sheet drops silently no-op.
+
+**Never `bind:` a possibly-undefined value into a defaulted `$bindable` prop** — Svelte 5 throws
+`props_invalid_value` at runtime. The recurring case is a per-index sheet-state read for a row the
+document just gained (the state array grows AFTER the document update renders the row). Use a function
+binding with the seeded default as fallback:
+`bind:expanded={() => $appState...isExpanded[idx] ?? true, (v) => $appState...isExpanded[idx] = v}`
+(`ItemSheetSidebarCheck`, `WeaponSheetSidebarAttacks`).
+
+**mini-button radius derives from the tag radius token** — the `button` mixin sets
+`--titan-border-radius: var(--titan-button-border-radius)`, so `mini-button` re-pointing
+`--titan-button-border-radius` back at `--titan-border-radius` closes a var() cycle that invalidates
+both (radius collapses to 0). It uses `--titan-tag-border-radius` instead; `Tabs.svelte` zeroes that
+token inside its strip to keep tab buttons square under the clipped rounded frame.
 
 **FontAwesome icon classes belong on an inner `<i>`, never on `<button>` directly** —
 Foundry's global button styling (`Signika, …`) has higher specificity than `.fas`, so placing the FA

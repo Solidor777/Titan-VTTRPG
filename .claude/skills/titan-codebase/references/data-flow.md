@@ -81,10 +81,13 @@ each mounted card's bridge holds exactly one `updateChatMessage` hook registrati
 deletion tears down all of a message's mounts via the `deleteChatMessage` hook
 (src/hooks/OnDeleteChatMessage.js → `teardownMessageMounts`).
 
-Non-TITAN messages (no `TitanChatMessageDataModel` system) early-return the chrome unchanged, except the
-`titan-dark-mode` class is added when the `darkModeChatMessages` setting is `'all'`. There is NO
-`renderChatMessageHTML` hook in the system. Historical pre-subtype `flags.titan` messages take this
-early-return and render with empty content (deliberately deprecated, never retrofitted).
+Non-TITAN messages (no `TitanChatMessageDataModel` system) early-return the chrome unchanged, except when
+the `themeCoreMessages` client setting is on (default): they then receive `titan-core-themed` plus the
+visibility tint class, joining the TITAN chat surface without a badge. TITAN messages get `titan`,
+`owner` (when owned), a visibility class (`titan-gm-only` for blind, `titan-secret` for other whispers),
+and a centered `.titan-visibility-badge` in the card header. There is NO `renderChatMessageHTML` hook in
+the system. Historical pre-subtype `flags.titan` messages take the non-TITAN early-return and render with
+empty content (deliberately deprecated, never retrofitted).
 
 **7. Check chat component — e.g. `AttributeCheckChatMessage.svelte`**
 (src/check/types/attribute-check/chat-message/AttributeCheckChatMessage.svelte)

@@ -114,3 +114,89 @@ when fixed.
   `game.titan` before injecting and for `game.titan._probe` after, so a mid-boot injection blocks
   until registration instead of stranding the test. (The operator rule stands: never run
   `npm run build` concurrently with an e2e run.)
+
+### 10. `TitanActor.createItemFromType` crashed on world actors (`this.parent` is null)
+
+- **What:** The method read `this.parent.items` as if it lived on the data model; on a `TitanActor`
+  document, `parent` is null for world actors, so every Add New Item/Spell/Effect-style button threw
+  `TypeError: can't access property "items", this.parent is null`.
+- **Found:** 2026-06-10 by the user during the theming-foundation visual pass (pre-existing on main).
+- **Fixed:** 2026-06-10 on `feature/theme-foundation` — reads `this.items`; regression-locked by
+  `tests/e2e/sheet-regressions.spec.js` ("createItemFromType adds an owned item to a world actor").
+
+### 11. Sheet drag-drop never fired: no DragDrop binding + un-wrapped single-item payloads
+
+- **What:** Two stacked faults. (1) ApplicationV2 wires no drag-drop handlers, and no TITAN sheet
+  bound a `DragDrop` controller, so `TitanActorSheet._onDrop` was dead code — dropping an item from
+  the directory or a compendium did nothing, silently. (2) Once bound, the drop path still failed:
+  `TitanActor.addItem`/`addActiveEffect` guarded with `!data instanceof Array`, which parses as
+  `(!data) instanceof Array` (always false), so the single-object payload from `_onDropItem` was
+  never wrapped and `createEmbeddedDocuments` rejected it.
+- **Found:** 2026-06-10 by the user during the theming-foundation visual pass (pre-existing on main).
+- **Fixed:** 2026-06-10 on `feature/theme-foundation` — `_onRender` binds a
+  `foundry.applications.ux.DragDrop` controller (drop permission = `isEditable`), the instanceof
+  guards are parenthesized, and `_onDrop` uses the namespaced v14 `TextEditor`. Regression-locked by
+  the synthetic-drop e2e in `tests/e2e/sheet-regressions.spec.js`.
+
+### 12. Weapon attacks tab crashed on load (`$appState.attacks` does not exist)
+
+- **What:** `WeaponSheetAttackSettings.svelte` read `$appState.attacks.isExpanded[idx]` but the
+  weapon sheet state defines `tabs.attacks.isExpanded` — `$appState.attacks` is undefined, so the
+  attacks tab threw on first open.
+- **Found:** 2026-06-10 by the user during the theming-foundation visual pass (pre-existing on main).
+- **Fixed:** 2026-06-10 on `feature/theme-foundation` — path corrected to `tabs.attacks` with an
+  `?? true` fallback for freshly added attacks; regression-locked by
+  `tests/e2e/sheet-regressions.spec.js` ("the weapon attacks tab renders its seeded attack").
+
+### 13. Adding a check crashed the open sheet (`props_invalid_value` on an undefined bind)
+
+- **What:** `TitanItem.addCheck` updates the document before the sheet state's expansion array
+  grows, so the freshly rendered sidebar row bound `undefined` into `ExpandButton`'s defaulted
+  `expanded` prop — Svelte 5 throws `props_invalid_value` and the checks list failed to render
+  until the tab was reloaded.
+- **Found:** 2026-06-10 by the user during the theming-foundation visual pass (pre-existing on main).
+- **Fixed:** 2026-06-10 on `feature/theme-foundation` — the bind is a function binding falling back
+  to the seeded expanded default; same treatment on the weapon attack sidebar. Regression-locked by
+  `tests/e2e/sheet-regressions.spec.js` ("adding a check while the sheet is open").
+
+### 14. Every TITAN setting name rendered as a raw `SETTINGS.*.text` key
+
+- **What:** All `game.settings.register` calls referenced `SETTINGS.<key>.text` for their names, but
+  `lang/en.json` defines `SETTINGS.<key>.label` — `game.i18n.localize` returns the key unchanged
+  when missing, so the v14 settings window showed raw keys for every TITAN setting.
+- **Found:** 2026-06-10 while registering the theme settings (pre-existing on main).
+- **Fixed:** 2026-06-10 on `feature/theme-foundation` — every name reference now uses the `.label`
+  keys the lang file actually defines.
+
+### 15. Mini buttons rendered square: a CSS custom-property cycle zeroed their radius
+
+- **What:** The `button` mixin derives `--titan-border-radius` FROM `--titan-button-border-radius`;
+  the `mini-button` mixin then redefined `--titan-button-border-radius` from `--titan-border-radius`
+  on the same element. The cycle invalidates both properties, so every mini/option/toggle button
+  rendered with radius 0 regardless of theme.
+- **Found:** 2026-06-10 chasing the user's "option buttons should be rounded" feedback
+  (pre-existing on main).
+- **Fixed:** 2026-06-10 on `feature/theme-foundation` — `mini-button` derives its radius from the
+  non-circular `--titan-tag-border-radius` token (Tabs zeroes that token inside its strip).
+
+### 16. Spell aspect selects and the training-mod field double-localized their labels
+
+- **What:** `SpellSheetStandardAspectsTab` pre-localized aspect option labels and
+  `CheckDialogTrainingModField` pre-localized its field label; both feed `Text`-localizing leaves,
+  so the rendered strings re-localized to `LOCAL.Self.text`, `LOCAL.Rounds.text`,
+  `LOCAL.Training Mod.text`, etc.
+- **Found:** 2026-06-10 by the user (aspect options); pinned by the extended localization e2e guard,
+  which now walks every spell tab with enabled aspects plus the casting-check dialog.
+- **Fixed:** 2026-06-10 on `feature/theme-foundation` — both sites pass raw i18n keys per the
+  Text/tooltip value contract.
+
+### 17. Check roll path used deprecated v13/v14 APIs and loaded an empty media URI
+
+- **What:** Rolls warned on every use: global `KeyboardManager`, the `core.rollMode` setting,
+  `ChatMessage.applyRollMode`, and global `TextEditor` are all deprecated in v14; item/effect check
+  chat headers also rendered `<img src="">` when the document had no image, logging
+  "Invalid URI. Load of media resource failed".
+- **Found:** 2026-06-10 by the user during the theming-foundation visual pass (pre-existing on main).
+- **Fixed:** 2026-06-10 on `feature/theme-foundation` — namespaced v14 equivalents
+  (`foundry.helpers.interaction.KeyboardManager`, `core.messageMode`, `ChatMessage.applyMode`,
+  `foundry.applications.ux.TextEditor.implementation`) and an `{#if img}` guard on the header image.

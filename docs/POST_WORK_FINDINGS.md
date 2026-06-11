@@ -29,3 +29,15 @@ the revert is visually self-evident and recoverable by re-clicking, and the new 
 old flow's invalid-state (compounding double-click) and dirty-model-on-rejected-update hazards. If
 it ever bites in play, the principled fix is a per-message serial queue around
 `document.data.update(...)`.
+
+## 2026-06-10 — Theming foundation visual pass
+
+- Light-theme input identity diverged from the approved mockups during contrast tuning: Heritage
+  Light inputs are now a soft lavender tint (`#eae6fc`/`#23184d`) rather than white, and Clean
+  Neutral inputs a gray tint (`#eef1f5`), because white inputs were indistinguishable from white
+  panels. Sanctioned by the spec's "guidelines, not hard rules" mandate; revisit during the
+  character-sheet surface pass if the lavender reads too strong.
+- The chat-card commit `a556e592` also carries the Task 6 primitives restyle (the mixin work was
+  staged when the fix batch landed) — one-task-one-commit was not held there.
+- `ui.chat.render()` on the `themeCoreMessages` onChange re-renders the chat log but NOT the chat
+  notification pane's previously posted cards; they restyle on their next natural re-render.
