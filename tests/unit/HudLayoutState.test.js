@@ -39,10 +39,10 @@ describe('HudLayoutState', () => {
 
    it('resets to defaults and persists', () => {
       const { state, onSave } = build();
-      state.positions.portrait.dx = 400;
+      state.positions.portrait.dx = 4000;
       state.minimized.portrait = true;
       state.reset();
-      expect(state.positions.portrait.dx).toBe(16);
+      expect(state.positions.portrait.dx).toBe(createDefaultHudLayout().positions.portrait.dx);
       expect(state.minimized.portrait).toBe(false);
       expect(onSave).toHaveBeenCalled();
    });

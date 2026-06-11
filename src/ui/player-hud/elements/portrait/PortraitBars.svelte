@@ -23,11 +23,13 @@
             value={document.data.system.resource[resource].value}
          />
          <span class="value">
-            <DocumentIntegerInput
-               bind:value={document.data.system.resource[resource].value}
-               testId={`player-hud-bar-${resource}-input`}
-            />
-            <span class="max">/ {document.data.system.resource[resource].max}</span>
+            <span class="input-box">
+               <DocumentIntegerInput
+                  bind:value={document.data.system.resource[resource].value}
+                  testId={`player-hud-bar-${resource}-input`}
+               />
+            </span>
+            <span class="max">{document.data.system.resource[resource].max}</span>
          </span>
       </div>
    {/each}
@@ -61,19 +63,33 @@
          }
 
          .label {
-            width: 60px;
+            width: 56px;
+            overflow: hidden;
             text-align: left;
+            text-overflow: ellipsis;
+            white-space: nowrap;
          }
 
          .value {
             @include flex-row;
             @include flex-group-center;
 
-            width: 64px;
+            flex-shrink: 0;
+            gap: 2px;
+
+            .input-box {
+               // The inner input fills its container; this floor keeps two digits readable.
+               display: inline-block;
+               min-width: 2.5em;
+            }
 
             .max {
-               @include margin-left-standard;
+               @include panel-3;
 
+               min-width: 2.5em;
+               padding: 1px 4px;
+               text-align: center;
+               border-radius: var(--titan-border-radius);
                white-space: nowrap;
             }
          }

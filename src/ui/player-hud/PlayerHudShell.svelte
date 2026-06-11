@@ -3,6 +3,7 @@
    import HudEditToolbar from '~/ui/player-hud/HudEditToolbar.svelte';
    import HudElementFrame from '~/ui/player-hud/HudElementFrame.svelte';
    import PortraitElement from '~/ui/player-hud/elements/portrait/PortraitElement.svelte';
+   import ActionMenuElement from '~/ui/player-hud/elements/action-menu/ActionMenuElement.svelte';
 
    /**
     * @typedef {object} PlayerHudShellProps
@@ -58,7 +59,18 @@
 {/if}
 
 {#if actionMenuVisible}
-   <!-- TODO: mount the action menu element. -->
+   <HudElementFrame
+      elementKey="actionMenu"
+      {layoutState}
+      minimizeIcon="fas fa-bars"
+      testId="player-hud-action-menu"
+   >
+      <ActionMenuElement
+         {actors}
+         {layoutState}
+         options={options.actionMenu}
+      />
+   </HudElementFrame>
 {/if}
 
 {#if effectsPanelVisible}
