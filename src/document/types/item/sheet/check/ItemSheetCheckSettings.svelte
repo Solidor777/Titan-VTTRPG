@@ -293,10 +293,11 @@
       margin-bottom: var(--titan-spacing-large);
 
       .header {
-         @include border;
          @include flex-row;
          @include flex-space-between;
          @include panel-1;
+
+         border-radius: var(--titan-border-radius);
          @include padding-large;
          @include attribute-colors;
 
@@ -317,8 +318,9 @@
       .expandable-content {
          @include flex-column;
          @include flex-group-top;
-         @include border-bottom-sides;
          @include panel-3;
+
+         border-radius: var(--titan-border-radius);
          @include padding-standard;
 
          --titan-label-font-size: var(--titan-font-size-small);

@@ -1,9 +1,7 @@
 <script>
    import { getContext } from 'svelte';
-   import { slide } from 'svelte/transition';
    import { DICE_ICON } from '~/system/Icons.js';
-   import IconLabel from '~/helpers/svelte-components/label/IconLabel.svelte';
-   import ExpandButton from '~/helpers/svelte-components/button/ExpandButton.svelte';
+   import SidebarCheck from '~/document/svelte-components/check/SidebarCheck.svelte';
    import CheckTags from '~/document/svelte-components/check/CheckTags.svelte';
 
    /**
@@ -19,65 +17,35 @@
 
    /** @type {object} Reference to the Application State store. */
    const appState = getContext('applicationState');
+
+   /** @type {object|undefined} The current check config, re-read reactively through the document bridge. */
+   const check = $derived(document.data?.system.check[idx]);
+
+   /** @type {boolean} Whether the check carries details beyond the header's attribute/skill/DC. */
+   const hasDetails = $derived(
+      !!check
+      && (check.resolveCost > 0 || check.resistanceCheck !== 'none' || check.opposedCheck.enabled),
+   );
 </script>
 
-{#if document.data?.system.check[idx]}
-   <div class="check">
-      <!--Label (color-coded to the check's attribute)-->
-      <div class="label {document.data.system.check[idx].attribute}">
-
-         <!--Name-->
-         <div class="name">
-            <IconLabel
-               icon={DICE_ICON}
-               label={{
-                  text: document.data.system.check[idx].label,
-                  localize: false,
-               }}
-            />
-         </div>
-      </div>
-
-      <!--Expand Button-->
-      <!--Function binding: a freshly added check renders before the state array grows, so the read
-      falls back to the seeded default (expanded) instead of binding undefined.-->
-      <ExpandButton
-         bind:expanded={
-            () => $appState.sidebar.checks.isExpanded[idx] ?? true,
-            (value) => $appState.sidebar.checks.isExpanded[idx] = value
-         }
+{#if check}
+   <SidebarCheck
+      attribute={check.attribute}
+      complexity={check.complexity}
+      difficulty={check.difficulty}
+      icon={DICE_ICON}
+      label={check.label}
+      skill={check.skill}
+      {hasDetails}
+      bind:expanded={
+         () => $appState.sidebar.checks.isExpanded[idx] ?? true,
+         (value) => $appState.sidebar.checks.isExpanded[idx] = value
+      }
+   >
+      <!--Check details beyond the header basics-->
+      <CheckTags
+         {idx}
+         hideBasics={true}
       />
-
-      <!--Check tags (shared component)-->
-      {#if $appState.sidebar.checks.isExpanded[idx]}
-         <div class="stats" transition:slide|local>
-            <CheckTags {idx}/>
-         </div>
-      {/if}
-   </div>
+   </SidebarCheck>
 {/if}
-
-<style lang="scss">
-   .check {
-      @include flex-column;
-      @include flex-group-top;
-
-      width: 100%;
-
-      .label {
-         @include bordered-label;
-         @include flex-column;
-         @include flex-group-top;
-         @include attribute-colors;
-      }
-
-      .stats {
-         @include border-bottom;
-         @include flex-row;
-         @include flex-group-center;
-         @include padding-standard;
-
-         width: 100%;
-      }
-   }
-</style>

@@ -192,9 +192,10 @@
       .details {
          @include flex-column;
          @include flex-group-top;
-         @include border-bottom-sides;
          @include font-size-small;
          @include panel-3;
+
+         border-radius: var(--titan-border-radius);
 
          padding: 0 var(--titan-spacing-standard) var(--titan-spacing-standard);
          width: calc(100% - 30px);

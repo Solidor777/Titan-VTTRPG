@@ -27,7 +27,6 @@
 
 <style lang="scss">
    .sidebar {
-      @include border;
       @include panel-1;
       @include flex-column;
       @include flex-group-top;

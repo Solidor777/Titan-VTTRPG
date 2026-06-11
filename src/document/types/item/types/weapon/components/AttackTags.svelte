@@ -18,10 +18,12 @@
     * @typedef {object} AttackTagsProps
     * @property {number} [idx] - The index of the attack in the current document's `system.attack` array.
     * @property {number} [damageMod] - Optional actor-derived modifier added to the displayed damage.
+    * @property {boolean} [hideBasics] - Skips the type and attribute/skill tags for consumers whose
+    *    header already shows those basics (the sidebar attack panels).
     */
 
    /** @type {AttackTagsProps} */
-   const { idx = undefined, damageMod = 0 } = $props();
+   const { idx = undefined, damageMod = 0, hideBasics = false } = $props();
 
    /** @type {object} The nearest document bridge (weapon, embedded weapon, or chat-message snapshot). */
    const document = getContext('document');
@@ -48,13 +50,15 @@
       </div>
 
       <!--Type-->
-      <div class="stat">
-         <IconTag
-            icon={attack.type === 'melee' ? MELEE_ICON : ACCURACY_ICON}
-            label={localize(attack.type)}
-            testId={'attack-tags-type'}
-         />
-      </div>
+      {#if !hideBasics}
+         <div class="stat">
+            <IconTag
+               icon={attack.type === 'melee' ? MELEE_ICON : ACCURACY_ICON}
+               label={localize(attack.type)}
+               testId={'attack-tags-type'}
+            />
+         </div>
+      {/if}
 
       <!--Range-->
       {#if attack.range !== 1}
@@ -69,13 +73,15 @@
       {/if}
 
       <!--Attribute and Skill-->
-      <div class="stat">
-         <AttributeCheckTag
-            attribute={attack.attribute}
-            skill={attack.skill}
-            testId={'attack-tags-attribute'}
-         />
-      </div>
+      {#if !hideBasics}
+         <div class="stat">
+            <AttributeCheckTag
+               attribute={attack.attribute}
+               skill={attack.skill}
+               testId={'attack-tags-attribute'}
+            />
+         </div>
+      {/if}
 
       <!--Traits-->
       {#each attack.trait as trait (trait.name)}

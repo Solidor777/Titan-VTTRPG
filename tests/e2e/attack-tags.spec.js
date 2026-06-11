@@ -169,11 +169,13 @@ test.describe('shared AttackTags across surfaces', () => {
       await expect(row.locator('.attack-tags').getByText(STANDARD_TRAIT_LABEL, { exact: true })).toBeVisible();
       await expect(row.locator('.attack-tags').getByText(CUSTOM_TRAIT_NAME, { exact: true })).toBeVisible();
 
-      // Weapon item sheet sidebar: the SAME component renders the SAME values.
+      // Weapon item sheet sidebar: the SAME component renders the SAME values. The sidebar hides
+      // the basics tags (hideBasics) — type and attribute live in the SidebarCheck header instead.
       const sheet = await openWeaponSheetSidebarAttack();
       await expect(sheet.getByTestId('attack-tags-damage').locator('.value')).toHaveText('7');
       await expect(sheet.getByTestId('attack-tags-range').locator('.value')).toHaveText('3');
-      await expect(sheet.getByTestId('attack-tags-type')).toBeVisible();
+      await expect(sheet.getByTestId('attack-tags-type')).toHaveCount(0);
+      await expect(sheet.locator('.sidebar-check .header').first()).toBeVisible();
 
       // Trait parity on the sidebar surface (scoped to AttackTags: the attack-settings tab also lists traits).
       await expect(sheet.locator('.attack-tags').getByText(STANDARD_TRAIT_LABEL, { exact: true })).toBeVisible();

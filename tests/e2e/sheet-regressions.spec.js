@@ -129,9 +129,9 @@ test.describe('v14 sheet regressions', () => {
          await titanWait(() => weapon.system.check.length === 1, { message: 'check stored' });
       });
 
-      // The sidebar check row renders with its label and no uncaught errors.
+      // The sidebar check row renders with its header and no uncaught errors.
       const sheet = page.locator('.titan-document-sheet:has-text("E2E Regression Weapon")');
-      await expect(sheet.locator('.check').first(), 'check row renders').toBeVisible();
+      await expect(sheet.locator('.sidebar-check').first(), 'check row renders').toBeVisible();
       expect(errors, `uncaught errors during add-check:\n${errors.join('\n')}`).toEqual([]);
    });
 });

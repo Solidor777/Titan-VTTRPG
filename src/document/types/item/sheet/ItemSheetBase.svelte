@@ -64,11 +64,13 @@
 
          @include margin-top-large;
 
-         // Rounded and clipped so square children cannot poke past the panel corners.
+         // Rounded and clipped so square children cannot poke past the panel corners. Clipping
+         // zeroes the automatic flex minimum, so the fixed-width sidebar must not shrink.
          .sidebar {
             @include panel-1;
 
             border-radius: var(--titan-border-radius);
+            flex: 0 0 auto;
             overflow: hidden;
          }
 

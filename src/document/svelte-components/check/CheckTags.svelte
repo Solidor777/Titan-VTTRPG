@@ -12,10 +12,12 @@
     * @property {number} [idx] - The index of the check in the current document's `system.check` array.
     * @property {string} [attribute] - Optional actor-resolved attribute overriding the config attribute. Pass
     *    `checkParameters.attribute` from actor-context consumers; omit on top-level document sheets.
+    * @property {boolean} [hideBasics] - Skips the attribute/skill/DC tag for consumers whose header
+    *    already shows those basics (the sidebar check panels).
     */
 
    /** @type {CheckTagsProps} */
-   const { idx = undefined, attribute = undefined } = $props();
+   const { idx = undefined, attribute = undefined, hideBasics = false } = $props();
 
    /** @type {object} The nearest document bridge (item, effect, or embedded document via a provider). */
    const document = getContext('document');
@@ -27,15 +29,17 @@
 {#if check}
    <div class="check-tags">
       <!--Attribute, Skill, Difficulty, and Complexity-->
-      <div class="stat">
-         <AttributeCheckTag
-            attribute={attribute ?? check.attribute}
-            complexity={check.complexity}
-            difficulty={check.difficulty}
-            skill={check.skill}
-            testId={'check-tags-attribute'}
-         />
-      </div>
+      {#if !hideBasics}
+         <div class="stat">
+            <AttributeCheckTag
+               attribute={attribute ?? check.attribute}
+               complexity={check.complexity}
+               difficulty={check.difficulty}
+               skill={check.skill}
+               testId={'check-tags-attribute'}
+            />
+         </div>
+      {/if}
 
       <!--Resolve Cost-->
       {#if check.resolveCost > 0}

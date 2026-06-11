@@ -273,10 +273,11 @@
       width: 100%;
 
       .header {
-         @include border;
          @include flex-row;
          @include flex-space-between;
          @include panel-1;
+
+         border-radius: var(--titan-border-radius);
          @include padding-standard;
 
          width: 100%;
@@ -296,8 +297,9 @@
       .expandable-content {
          @include flex-column;
          @include flex-group-top;
-         @include border-bottom-sides;
          @include panel-3;
+
+         border-radius: var(--titan-border-radius);
 
          width: calc(100% - 16px);
 

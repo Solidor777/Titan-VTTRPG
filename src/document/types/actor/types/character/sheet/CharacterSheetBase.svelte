@@ -54,11 +54,13 @@
          overflow: hidden;
       }
 
+      // Clipping zeroes the automatic flex minimum, so the fixed-width sidebar must not shrink.
       .sidebar {
          @include panel-1;
          @include margin-right-large;
 
          border-radius: var(--titan-border-radius);
+         flex: 0 0 auto;
          overflow: hidden;
       }
 
