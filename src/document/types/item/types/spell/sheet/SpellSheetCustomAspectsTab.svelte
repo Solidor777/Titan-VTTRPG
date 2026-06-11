@@ -24,9 +24,9 @@
    const sourceKey = $derived(`${document.data.uuid}:customAspect`);
 
    // Indices of custom aspects matching the filter, recomputed on document/filter change.
-   /** @type {*[]} */
+   /** @type {number[]} */
    const filteredEntries = $derived.by(() => {
-      /** @type {*[]} The matching indices. */
+      /** @type {number[]} The matching unfiltered indices. */
       const result = [];
       document.data.system.customAspect.forEach((entry, idx) => {
          if (
@@ -61,6 +61,7 @@
                   kind: 'customAspect',
                   sourceKey,
                   rowSelector: 'li.reorder-row',
+                  acceptsForeign: true,
                   onIndicator: (index) => { dropIndex = index; },
                   onReorder: (from, to) => { document.data.system.moveCustomAspect(from, to); },
                   onForeignDrop: (payload, at) => { document.data.system.insertCustomAspect(payload.element, at); },
@@ -73,6 +74,7 @@
                   {/if}
                   <li
                      class="reorder-row"
+                     data-row-index={idx}
                      out:slide|local
                      use:draggableRow={{
                         kind: 'customAspect',

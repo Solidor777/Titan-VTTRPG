@@ -17,6 +17,9 @@
 /** @type {ActiveDrag | null} The drag in progress, shared between source and drop zone. */
 let activeDrag = null;
 
+/** @type {HTMLElement | null} The row element the active drag started from, cleared if it is destroyed mid-drag. */
+let activeDragNode = null;
+
 /**
  * Makes a list row draggable, but only when the press begins on the row's `[data-drag-handle]`.
  * @param {HTMLElement} node - The row element (e.g. an `<li>`).
@@ -69,6 +72,7 @@ export function draggableRow(node, params) {
          sourceKey: current.sourceKey,
          index: current.index,
       };
+      activeDragNode = node;
       event.dataTransfer.effectAllowed = 'copyMove';
       event.dataTransfer.setData('text/plain', current.getDataTransfer());
       current.onDragStart?.();
@@ -79,6 +83,7 @@ export function draggableRow(node, params) {
     */
    function onDragEnd() {
       activeDrag = null;
+      activeDragNode = null;
       armed = false;
       node.draggable = false;
       current.onDragEnd?.();
@@ -94,6 +99,12 @@ export function draggableRow(node, params) {
          current = next;
       },
       destroy() {
+         // A row removed mid-drag (e.g. a filter change) never fires its own dragend; clear the shared
+         // descriptor here so a stale drag cannot make every drop zone a target for the rest of the session.
+         if (activeDragNode === node) {
+            activeDrag = null;
+            activeDragNode = null;
+         }
          node.removeEventListener('pointerdown', onPointerDown);
          node.removeEventListener('pointerup', onPointerUp);
          node.removeEventListener('dragstart', onDragStart);
@@ -109,7 +120,11 @@ export function draggableRow(node, params) {
  * @param {object} params - Action parameters.
  * @param {string} params.kind - The kind this zone accepts.
  * @param {string} params.sourceKey - Identity of this zone's own list (document uuid + ':' + kind).
- * @param {string} params.rowSelector - CSS selector matching draggable row children.
+ * @param {string} params.rowSelector - CSS selector matching draggable row children, each carrying a
+ * `data-row-index` attribute with its index in the FULL (unfiltered) array.
+ * @param {boolean} [params.acceptsForeign] - Whether this zone handles drags from a different source
+ * (a cross-sheet copy). When false, foreign drags pass through untouched so Foundry's own drop handler
+ * (e.g. cross-actor item creation) still runs.
  * @param {(index: number | null) => void} params.onIndicator - Reports the live insertion index
  * (or null when the pointer leaves), for the insertion-line render.
  * @param {(fromIdx: number, toIdx: number) => void} params.onReorder - Commits a same-list reorder.
@@ -121,21 +136,39 @@ export function reorderDropZone(node, params) {
    let current = params;
 
    /**
-    * Computes the insertion index by comparing the pointer Y against each row's vertical midpoint.
+    * Whether the active drag is one this zone should handle: a matching kind that is either a same-list
+    * reorder or, for zones that accept them, a foreign-source copy.
+    * @returns {boolean} True when this zone owns the drop.
+    */
+   function handlesActiveDrag() {
+      return !!activeDrag
+         && activeDrag.kind === current.kind
+         && (activeDrag.sourceKey === current.sourceKey || !!current.acceptsForeign);
+   }
+
+   /**
+    * Computes the insertion index in the FULL array frame by reading the `data-row-index` of the row
+    * the pointer is above (its midpoint). Reading the row's own index keeps the result correct even when
+    * the list is filtered and the DOM holds only a subset of rows.
     * @param {number} clientY - The pointer's viewport Y coordinate.
-    * @returns {number} The insertion index in the list frame (0..rowCount).
+    * @returns {number} The insertion point in the unfiltered array frame.
     */
    function computeIndex(clientY) {
-      /** @type {HTMLElement[]} The current row elements. */
+      /** @type {HTMLElement[]} The current (possibly filtered) row elements. */
       const rows = Array.from(node.querySelectorAll(current.rowSelector));
       for (let i = 0; i < rows.length; i += 1) {
          const rect = rows[i].getBoundingClientRect();
          if (clientY < rect.top + rect.height / 2) {
-            return i;
+            return Number(rows[i].dataset.rowIndex);
          }
       }
 
-      return rows.length;
+      // Below the last visible row: land just after its unfiltered index.
+      if (rows.length > 0) {
+         return Number(rows[rows.length - 1].dataset.rowIndex) + 1;
+      }
+
+      return 0;
    }
 
    /**
@@ -143,7 +176,7 @@ export function reorderDropZone(node, params) {
     * @param {DragEvent} event - The dragover event.
     */
    function onDragOver(event) {
-      if (!activeDrag || activeDrag.kind !== current.kind) {
+      if (!handlesActiveDrag()) {
          return;
       }
       event.preventDefault();
@@ -162,11 +195,12 @@ export function reorderDropZone(node, params) {
    }
 
    /**
-    * Commits the drop: a same-list reorder, or a foreign copy parsed from the payload.
+    * Commits the drop: a same-list reorder, or a foreign copy parsed from the payload. Foreign drags
+    * this zone does not accept are left untouched so Foundry's own drop handler can run.
     * @param {DragEvent} event - The drop event.
     */
    function onDrop(event) {
-      if (!activeDrag || activeDrag.kind !== current.kind) {
+      if (!handlesActiveDrag()) {
          return;
       }
       event.preventDefault();

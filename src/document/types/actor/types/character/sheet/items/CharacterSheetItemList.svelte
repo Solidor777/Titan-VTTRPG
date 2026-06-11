@@ -94,7 +94,6 @@
          rowSelector: 'li.reorder-row',
          onIndicator: (index) => { dropIndex = index; },
          onReorder: (from, to) => { reorderItem(from, to); },
-         onForeignDrop: () => {},
       }}
    >
       <!--Each Item-->
@@ -105,6 +104,7 @@
          <li
             class="item reorder-row"
             data-item-id={item._id}
+            data-row-index={idx}
             transition:slide|local
             use:draggableRow={{
                kind: 'item',

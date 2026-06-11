@@ -44,6 +44,7 @@
                kind: 'rulesElement',
                sourceKey,
                rowSelector: 'li.reorder-row',
+               acceptsForeign: true,
                onIndicator: (index) => { dropIndex = index; },
                onReorder: (from, to) => { document.data.system.moveRulesElement(from, to); },
                onForeignDrop: (payload, at) => { document.data.system.insertRulesElement(payload.element, at); },
@@ -56,6 +57,7 @@
                {/if}
                <li
                   class="reorder-row"
+                  data-row-index={idx}
                   transition:slide|local
                   use:draggableRow={{
                      kind: 'rulesElement',

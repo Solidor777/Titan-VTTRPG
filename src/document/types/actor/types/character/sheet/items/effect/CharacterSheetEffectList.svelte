@@ -87,7 +87,6 @@
          rowSelector: 'li.reorder-row',
          onIndicator: (index) => { dropIndex = index; },
          onReorder: (from, to) => { reorderEffect(from, to); },
-         onForeignDrop: () => {},
       }}
    >
       <!--Each Effect-->
@@ -98,6 +97,7 @@
          <li
             class="effect reorder-row"
             data-effect-id={effect.id}
+            data-row-index={idx}
             transition:slide|local
             use:draggableRow={{
                kind: 'effect',

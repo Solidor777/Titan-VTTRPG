@@ -57,6 +57,7 @@
                   kind: 'attack',
                   sourceKey,
                   rowSelector: 'li.reorder-row',
+                  acceptsForeign: true,
                   onIndicator: (index) => { dropIndex = index; },
                   onReorder: (from, to) => { document.data.system.moveAttack(from, to); },
                   onForeignDrop: (payload, at) => { document.data.system.insertAttack(payload.element, at); },
@@ -69,6 +70,7 @@
                   {/if}
                   <li
                      class="reorder-row"
+                     data-row-index={idx}
                      out:slide|local
                      use:draggableRow={{
                         kind: 'attack',

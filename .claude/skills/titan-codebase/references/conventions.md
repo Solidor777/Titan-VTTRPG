@@ -254,7 +254,16 @@ item and effect lists:
   `dataTransfer` payload; `reorderDropZone` reads `activeDrag` synchronously during `dragover`
   (which `dataTransfer` payloads are **not** readable in) to gate by `kind` and tell a same-list
   reorder (`sourceKey` match → `onReorder`) from a foreign-sheet copy (`onForeignDrop`). `sourceKey`
-  is `` `${document.data.uuid}:${kind}` ``.
+  is `` `${document.data.uuid}:${kind}` ``. Two load-bearing requirements when wiring a new list:
+  - **Every draggable `<li>` must carry `data-row-index={idx}`** with its index in the FULL
+    (unfiltered) array. `computeIndex` reads that attribute (not the DOM position), so reorder/insert
+    indices stay correct when the list is filtered and the DOM holds only a subset of rows.
+  - **`acceptsForeign`** must be `true` on a zone that handles cross-sheet copies (the four settings
+    lists) and falsy on the character item/effect zones. When falsy, foreign-source drags pass through
+    untouched so Foundry's own drop handler still runs (cross-actor item/effect creation); `drop`'s
+    `stopPropagation()` fires only for drops this zone actually owns. `activeDrag` is also cleared in
+    `draggableRow`'s `destroy()` when its node is the drag source, so a row removed mid-drag (filter
+    change) cannot leave a stale descriptor.
 
 `animate:flip` cannot be combined with the interleaved `{#if dropIndex === idx}<InsertionLine/>{/if}`
 because Svelte requires an `animate:` element to be the **only** child of its keyed `{#each}`. The

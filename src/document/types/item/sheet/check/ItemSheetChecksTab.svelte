@@ -57,6 +57,7 @@
                   kind: 'check',
                   sourceKey,
                   rowSelector: 'li.reorder-row',
+                  acceptsForeign: true,
                   onIndicator: (index) => { dropIndex = index; },
                   onReorder: (from, to) => { document.data.moveCheck(from, to); },
                   onForeignDrop: (payload, at) => { document.data.insertCheck(payload.element, at); },
@@ -68,6 +69,7 @@
                   {/if}
                   <li
                      class="reorder-row"
+                     data-row-index={idx}
                      use:draggableRow={{
                         kind: 'check',
                         sourceKey,
