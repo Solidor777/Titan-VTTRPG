@@ -49,7 +49,8 @@ const CHECK_TAG_TEST_IDS = [
 
 /**
  * @type {string[]} The CheckTags testIds rendered on the item-sheet SIDEBAR, which hides the basics
- * tag (hideBasics) because the SidebarCheck header carries the attribute/skill/DC instead.
+ * tag (hideBasics). For a user who can roll the check the SidebarCheck header carries the condensed
+ * roll button (basics on the button/tooltip); otherwise it carries the attribute/skill/DC info line.
  */
 const SIDEBAR_CHECK_TAG_TEST_IDS = CHECK_TAG_TEST_IDS.filter((id) => id !== 'check-tags-attribute');
 
@@ -337,17 +338,20 @@ test.describe('cross-surface check-tag parity', () => {
 
    test('equipment check tags render identical values on the item sheet and the character sheet', async () => {
       // ITEM SHEET SIDEBAR: the sidebar check is seeded expanded, so the tags are visible at mount.
-      // The sidebar hides the basics tag — the SidebarCheck header carries attribute/skill/DC.
+      // The sidebar hides the basics tag — as the GM (an owner) the SidebarCheck header carries the
+      // roll button in their place.
       /** @type {import('@playwright/test').Locator} The equipment item-sheet root. */
       const itemSheet = await openEquipmentItemSheet();
       /** @type {{[testId: string]: string}} The item-sheet sidebar's captured tag values. */
       const sidebarValues =
          await captureCheckTagValues(itemSheet, 'item-sheet sidebar', SIDEBAR_CHECK_TAG_TEST_IDS);
 
-      // The sidebar header must render the basics the hidden tag used to carry.
-      /** @type {import('@playwright/test').Locator} The sidebar check header's info row. */
-      const headerInfo = itemSheet.locator('.sidebar-check .header .info').first();
-      await expect(headerInfo, 'sidebar header renders the attribute/skill/DC row').not.toHaveText('');
+      // As the GM (an owner of every item) the sidebar header renders the condensed roll button in
+      // place of the static info line; the attribute/skill/DC the hidden tag used to carry now live
+      // on the button and its tooltip.
+      /** @type {import('@playwright/test').Locator} The sidebar check header's roll button. */
+      const headerRoll = itemSheet.locator('.sidebar-check .header .roll button').first();
+      await expect(headerRoll, 'sidebar header renders the roll button for an owner').toBeVisible();
 
       // CHARACTER SHEET: the expanded equipment row renders the SAME shared component.
       /** @type {import('@playwright/test').Locator} The expanded equipment row. */
