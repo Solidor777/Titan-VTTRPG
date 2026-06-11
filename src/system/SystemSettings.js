@@ -1,5 +1,6 @@
 import { BUILT_IN_THEMES, buildThemeChoices } from '~/theme/ThemeManager.js';
 import ThemeEditorApplication from '~/theme/editor/ThemeEditorApplication.js';
+import PlayerHudSettingsApplication from '~/ui/player-hud/settings/PlayerHudSettingsApplication.js';
 
 /**
  * Registers the settings for the Titan system.
@@ -73,6 +74,27 @@ export default function registerSystemSettings() {
       default: {},
       scope: 'client',
       type: Object,
+   });
+
+   // The Player HUD configuration window.
+   game.settings.registerMenu('titan', 'playerHudSettings', {
+      hint: 'SETTINGS.playerHudSettings.hint',
+      icon: 'fas fa-gauge-high',
+      label: 'SETTINGS.playerHudSettings.button',
+      name: 'SETTINGS.playerHudSettings.label',
+      restricted: false,
+      type: PlayerHudSettingsApplication,
+   });
+
+   // Toggle the Player HUD's layout-edit mode.
+   game.keybindings.register('titan', 'togglePlayerHudEditMode', {
+      editable: [{ key: 'KeyH', modifiers: ['Shift'] }],
+      hint: 'SETTINGS.togglePlayerHudEditMode.hint',
+      name: 'SETTINGS.togglePlayerHudEditMode.label',
+      onDown: () => {
+         game.titan?.playerHud?.toggleEditMode();
+         return true;
+      },
    });
 
    // Auto-open Combatant Sheets for Players.

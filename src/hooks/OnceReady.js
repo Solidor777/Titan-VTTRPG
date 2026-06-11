@@ -3,6 +3,7 @@ import { worldNeedsMigration, migrateWorld } from '~/helpers/migration/MigrateWo
 import convertEffectItemsToActiveEffects from '~/helpers/migration/ConvertEffectItemsToActiveEffects.js';
 import ConfirmMigrateWorldDialog from '~/helpers/migration/ConfirmMigrateWorldDialog.js';
 import TitanPlayerHud from '~/ui/player-hud/TitanPlayerHud.js';
+import PlayerHudSettingsApplication from '~/ui/player-hud/settings/PlayerHudSettingsApplication.js';
 
 /**
  * Attached to the Ready hook.
@@ -37,7 +38,8 @@ export default async function onceReady() {
    // Register sub-hooks.
    Hooks.on('hotbarDrop', onHotbarDrop);
 
-   // Build and attach the Player HUD.
+   // Build and attach the Player HUD and its shared configuration window.
    game.titan.playerHud = new TitanPlayerHud();
    game.titan.playerHud.init();
+   game.titan.playerHudSettings = new PlayerHudSettingsApplication();
 }
