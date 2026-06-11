@@ -66,3 +66,16 @@ schema-stripped — harmless dead data, a candidate for producer cleanup.)
 - **Origin:** branched off the embedded-document-stores design —
   `specs/2026-06-03-embedded-document-stores-design.md` (Follow-up work → "Chat-message path
   parity"); strategy locked in `specs/2026-06-09-path-parity-strategy-and-checktags-chat-design.md`.
+
+## Cleanup
+
+### 27. Remove the orphaned `FiltereedList` component
+
+- **What:** `src/helpers/svelte-components/FiltereedList.svelte` no longer has a production consumer —
+  the item checks tab (its only user) inlined its own `filteredEntries` index loop when drag-reorder
+  was added (spec `specs/2026-06-11-drag-reorder-and-cross-sheet-copy-design.md`). Remove the
+  component and its test-probe registration (`src/test-probe/registerProbe.js`,
+  `src/test-probe/componentRegistry.js`).
+- **Why deferred:** Out of scope for the drag-reorder change; touching the probe registry is a
+  separate, self-contained cleanup. The `checks tab filter` e2e (`filtered-list-checks.spec.js`)
+  exercises the live tab and stays green without it.

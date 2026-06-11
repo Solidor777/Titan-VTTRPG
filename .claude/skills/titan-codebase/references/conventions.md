@@ -239,6 +239,51 @@ longer wrap it in their own `.editor` div; instead they pass `tooltip` and `notO
 element when `enriched` changes while inactive** (guarded by `classList.contains('active')`) to avoid
 stale rendered content; rebuilds never write `value`, so they do not loop with the persist effect.
 
+## Drag-to-reorder lists & cross-sheet element copy
+
+`src/helpers/svelte-components/drag-reorder/` holds the shared drag system used by the four
+item-settings lists (`rulesElement`, `check`, `attack`, `customAspect`) and the character sheet's
+item and effect lists:
+
+- **`DragHandle.svelte`** — the ⋮⋮ grip (`data-drag-handle`). A row is grabbable only by its handle,
+  so text selection inside settings-row inputs is never hijacked.
+- **`InsertionLine.svelte`** — the drop-position bar. It is `height: 0` with an absolutely-positioned
+  `::before`, so rendering it between rows does **not** shift layout (no dragover jitter).
+- **`DragReorderActions.js`** — two Svelte actions plus a module-level `activeDrag` descriptor.
+  `draggableRow` sets `activeDrag` (`{kind, sourceKey, index}`) on `dragstart` and writes the
+  `dataTransfer` payload; `reorderDropZone` reads `activeDrag` synchronously during `dragover`
+  (which `dataTransfer` payloads are **not** readable in) to gate by `kind` and tell a same-list
+  reorder (`sourceKey` match → `onReorder`) from a foreign-sheet copy (`onForeignDrop`). `sourceKey`
+  is `` `${document.data.uuid}:${kind}` ``.
+
+`animate:flip` cannot be combined with the interleaved `{#if dropIndex === idx}<InsertionLine/>{/if}`
+because Svelte requires an `animate:` element to be the **only** child of its keyed `{#each}`. The
+insertion line is kept; flip is dropped.
+
+**Reorder/copy data mutators** mirror the existing `addX`/`deleteX` convention, one pair per kind:
+`moveX(fromIdx, toIdx)` (uses `moveArrayEntry`, insertion-point semantics) and `insertX(element,
+atIdx)` (uses `cloneElementWithNewUuid` → fresh uuid, copy semantics). Locations:
+`moveRulesElement`/`insertRulesElement` on `RulesElementMixin`; `moveCheck`/`insertCheck` on
+`TitanItem` (the check array is `system.check` but its mutators live on the Item, like `addCheck`);
+`moveAttack`/`insertAttack` on `WeaponDataModel`; `moveCustomAspect`/`insertCustomAspect` on
+`SpellDataModel`.
+
+**Per-row UI-state lockstep:** checks, attacks, and custom aspects keep index-keyed expansion arrays
+(`tabs.<kind>.isExpanded`, plus `sidebar.<kind>.isExpanded` for checks and attacks). A reorder/insert
+must reorder/splice those arrays via sheet-state methods (`postMove<Kind>`/`postInsert<Kind>`),
+invoked through the sheet before the `update()` re-render. These methods must be forwarded through
+**every** wrapping sheet-state factory: `TitanItemSheetState` defines the check pair;
+`RulesElementItemSheetState`, `WeaponSheetState`, and `SpellSheetState` each re-destructure their
+parent and must re-export it, or the sheet's delegate throws `is not a function`.
+
+**Items/effects reorder** through Foundry's `sort` field via `foundry.utils.performIntegerSort`
+(the bare `SortingHelpers` global is deprecated, since 13/until 15) +
+`updateEmbeddedDocuments(..., [{...update, _id: target._id}])`. The native list `drop` calls
+`stopPropagation()` only for same-actor reorders, so the actor sheet's Foundry `DragDrop` still
+receives genuine external drops (compendium / cross-actor item creation). Cross-sheet element drags
+use a custom `{titanElementDrag, kind, sourceDocUuid, sourceIdx, element}` payload, which Foundry's
+Item/Effect drop handlers ignore (no `type` field) and vice-versa.
+
 ## Schema-from-shape: presence-guarded snapshot fields
 
 When typing a chat-message (or any) snapshot whose components use `{#if obj}` / `{#if arr}` presence
