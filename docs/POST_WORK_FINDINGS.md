@@ -3,6 +3,16 @@
 Living record of post-work review issues — gotchas, accepted limitations, and issues that deserve
 attention. NOT a to-do list (deferred work goes to `docs/TODO.md`; bugs go to `docs/OPEN_BUGS.md`).
 
+### Player HUD: the shell's `options` prop is a mount-time snapshot (2026-06-11)
+
+`TitanPlayerHud.#mountActors` passes `playerHudOptions()` as a plain prop into `PlayerHudShell`;
+elements and `buildActionMenuModel` read it non-reactively. It stays correct ONLY because every
+settings write goes through `game.settings.set('titan', 'playerHudOptions', …)`, whose `onChange`
+calls `refresh({ force: true })` and remounts the shell with a fresh snapshot. Any future path that
+changes HUD options without `game.settings.set` (or that removes the `onChange`) leaves the mounted
+HUD silently stale — no error surfaces. Flagged by the 2026-06-11 final branch review of
+`feature/player-hud` as an accepted tradeoff matching the codebase's shell patterns.
+
 ### Foundry v14 core: CombatTracker render throws on non-viewed combat updates (2026-06-10)
 
 Core's `CombatTracker._onRender` (`client/applications/sidebar/tabs/combat-tracker.mjs:185-188`)
