@@ -26,6 +26,8 @@ export default function createWeaponSheetState(item) {
             subscribe,
             postAddCheck,
             preDeleteCheck,
+            postMoveCheck,
+            postInsertCheck,
          } = createRulesElementItemSheetState(item, createWeaponSheetData(item));
 
    /**
@@ -87,6 +89,8 @@ export default function createWeaponSheetState(item) {
       postMoveAttack,
       postInsertAttack,
       postAddCheck,
-      preDeleteCheck
+      preDeleteCheck,
+      postMoveCheck,
+      postInsertCheck,
    };
 }

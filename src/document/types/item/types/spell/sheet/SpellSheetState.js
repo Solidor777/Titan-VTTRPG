@@ -25,7 +25,9 @@ export default function createSpellSheetState(item) {
             update,
             subscribe,
             postAddCheck,
-            preDeleteCheck
+            preDeleteCheck,
+            postMoveCheck,
+            postInsertCheck,
          } = createTitanItemSheetState(item, createSpellSheetData(item));
 
    /**
@@ -84,5 +86,7 @@ export default function createSpellSheetState(item) {
       postInsertCustomAspect,
       postAddCheck,
       preDeleteCheck,
+      postMoveCheck,
+      postInsertCheck,
    };
 }
