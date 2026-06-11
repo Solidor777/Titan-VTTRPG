@@ -144,7 +144,7 @@ export function buildCheck(label, uuid, overrides = {}) {
  * (deleting an actor does NOT delete its placed tokens). Serves both the stale sweep at seed time
  * and final afterAll cleanup.
  * @param {import('@playwright/test').Page} page - The shared page.
- * @param {string} actorName - The fixture actor's name.
+ * @param {string} actorName - The name of the fixture actor to remove.
  * @returns {Promise<void>} Resolves once the actor and its tokens are removed from the world.
  */
 export async function deleteFixtureActor(page, actorName) {
@@ -192,15 +192,16 @@ export async function deleteOrphanedTokens(page) {
  * Places a token for the named actor on the active scene (creating a fallback scene when none is
  * active), waits until the placeable is DRAWN (throwing with a clear message on exhaustion — a
  * never-drawn placeable must fail here, not at a later, less-diagnostic timeout), controls it, and
- * refreshes the Effect HUD so the GM resolution ladder (first SELECTED token) resolves the actor.
+ * refreshes the Effect HUD and Player HUD so the GM resolution ladders resolve the actor.
  * @param {import('@playwright/test').Page} page - The shared page.
- * @param {object} options - Control options.
+ * @param {object} options - Selects the fixture token and how it is controlled.
  * @param {string} options.actorName - The fixture actor's name (must already exist).
  * @param {string} options.fallbackSceneName - Name for the fallback scene if none is active.
+ * @param {boolean} [options.releaseOthers] - Whether controlling the token releases other tokens.
  * @returns {Promise<string|null>} The created fallback scene's id for afterAll cleanup, or null.
  */
-export async function controlFixtureActorToken(page, { actorName, fallbackSceneName }) {
-   return page.evaluate(async ({ name, sceneName }) => {
+export async function controlFixtureActorToken(page, { actorName, fallbackSceneName, releaseOthers = true }) {
+   return page.evaluate(async ({ name, sceneName, releaseOthers }) => {
       const actor = game.actors.getName(name);
       if (!actor) {
          throw new Error(`controlFixtureActorToken: no actor named "${name}" exists in the world.`);
@@ -228,13 +229,15 @@ export async function controlFixtureActorToken(page, { actorName, fallbackSceneN
 
       // titanWait THROWS on exhaustion — a never-drawn placeable fails loudly right here.
       await titanWait(() => !!tokenDoc.object, { message: 'token placeable drawn' });
-      tokenDoc.object.control({ releaseOthers: true });
+      tokenDoc.object.control({ releaseOthers });
 
       game.titan.effectHud.refresh();
+      game.titan.playerHud?.refresh();
       return fallbackId;
    }, {
       name: actorName,
       sceneName: fallbackSceneName,
+      releaseOthers,
    });
 }
 
