@@ -4,6 +4,7 @@
    import HudElementFrame from '~/ui/player-hud/HudElementFrame.svelte';
    import PortraitElement from '~/ui/player-hud/elements/portrait/PortraitElement.svelte';
    import ActionMenuElement from '~/ui/player-hud/elements/action-menu/ActionMenuElement.svelte';
+   import EffectsPanelElement from '~/ui/player-hud/elements/effects-panel/EffectsPanelElement.svelte';
 
    /**
     * @typedef {object} PlayerHudShellProps
@@ -43,8 +44,10 @@
    /** @type {boolean} Action menu visibility (single or group). */
    const actionMenuVisible = $derived(elementVisible('actionMenu'));
 
-   /** @type {boolean} Effects panel visibility (single character only). */
-   const effectsPanelVisible = $derived(single && elementVisible('effectsPanel'));
+   /** @type {boolean} Effects panel visibility (single character with at least one effect). */
+   const effectsPanelVisible = $derived(
+      single && elementVisible('effectsPanel') && (documentStore.data.effects?.size ?? 0) > 0,
+   );
 
    /** @type {string} The action menu's minimize-chip corner, kept on the stable (non-expanding) side. */
    const actionMenuChipCorner = $derived.by(() => {
@@ -83,7 +86,18 @@
 {/if}
 
 {#if effectsPanelVisible}
-   <!-- TODO: mount the effects panel element. -->
+   <HudElementFrame
+      elementKey="effectsPanel"
+      {layoutState}
+      minimizeIcon="fas fa-sparkles"
+      resizable={true}
+      testId="player-hud-effects-panel"
+   >
+      <EffectsPanelElement
+         options={options.effectsPanel}
+         {layoutState}
+      />
+   </HudElementFrame>
 {/if}
 
 {#if layoutState.editMode}

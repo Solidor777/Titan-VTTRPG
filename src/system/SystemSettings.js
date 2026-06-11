@@ -36,17 +36,6 @@ export default function registerSystemSettings() {
       type: Boolean,
    });
 
-   // Enable the native Effect HUD.
-   game.settings.register('titan', 'enableEffectHud', {
-      config: true,
-      default: true,
-      hint: 'SETTINGS.enableEffectHud.hint',
-      name: 'SETTINGS.enableEffectHud.label',
-      scope: 'client',
-      type: Boolean,
-      onChange: () => game.titan?.effectHud?.refresh(),
-   });
-
    // Enable the Player HUD.
    game.settings.register('titan', 'enablePlayerHud', {
       config: true,

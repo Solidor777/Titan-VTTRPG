@@ -315,18 +315,18 @@ test.describe('embedded-context effects family', () => {
 
    test('HUD row header updates in place and the owner-gated delete confirms through', async () => {
       // Precondition: the HUD controller must be attached at ready.
-      /** @type {boolean} Whether the TITAN effect HUD controller exists on the game object. */
-      const hudReady = await page.evaluate(() => typeof game.titan?.effectHud !== 'undefined');
-      expect(hudReady, 'TITAN effect HUD controller must be attached at ready').toBe(true);
+      /** @type {boolean} Whether the TITAN player HUD controller exists on the game object. */
+      const hudReady = await page.evaluate(() => typeof game.titan?.playerHud !== 'undefined');
+      expect(hudReady, 'TITAN player HUD controller must be attached at ready').toBe(true);
 
       await controlFixtureActorToken(page, {
          actorName: ACTOR_NAME,
          fallbackSceneName: 'E2E Embedded Context Scene',
       });
 
-      /** @type {import('@playwright/test').Locator} The mounted HUD panel. */
-      const panel = page.locator('#titan-effect-hud .titan-effect-hud');
-      await expect(panel, 'HUD panel mounts for the controlled token actor').toBeVisible();
+      /** @type {import('@playwright/test').Locator} The mounted effects panel. */
+      const panel = page.locator('[data-testid="player-hud-effects-panel"]');
+      await expect(panel, 'effects panel mounts for the controlled token actor').toBeVisible();
 
       // The row header shows the seeded name; rows mount collapsed, so this is the only expander
       // click (clicking the header toggles the row open).

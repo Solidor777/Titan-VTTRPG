@@ -712,10 +712,6 @@
          "label": "Confirm Deleting Effects from Actors",
          "hint": "If true, a confirmation dialog will be displayed when attempting to delete an Effect from an Actor. Can be suppressed by holding Shift."
       },
-      "enableEffectHud": {
-         "label": "Enable Effect HUD",
-         "hint": "If true, a panel listing the active character's conditions and effects is shown on screen, replacing the Visual Active Effects module."
-      },
       "enablePlayerHud": {
          "label": "Enable Player HUD",
          "hint": "If true, the on-canvas player HUD (portrait, action menu, and effects panel) is shown."

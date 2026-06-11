@@ -9,6 +9,7 @@
     * @property {string | object} [tooltip] - The Tooltip to display for this element, if any.
     * @property {((event: MouseEvent) => void) | undefined} [onclick] - Callback invoked when the button is clicked.
     * @property {string} label - Accessible label, forwarded to the inner IconButton.
+    * @property {string} [testId] - Optional stable selector forwarded to the inner IconButton.
     */
 
    /** @type {DocumentOwnerIconButtonProps} */
@@ -18,10 +19,11 @@
       tooltip = void 0,
       onclick = void 0,
       label,
+      testId = void 0,
    } = $props();
 
    /** @type {object} The nearest document bridge ('document' context — possibly an embedded one). */
    const document = getContext('document');
 </script>
 
-<IconButton disabled={disabled || !document.data?.isOwner} {icon} {label} {onclick} {tooltip}/>
+<IconButton disabled={disabled || !document.data?.isOwner} {icon} {label} {onclick} {testId} {tooltip}/>

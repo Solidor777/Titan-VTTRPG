@@ -231,7 +231,6 @@ export async function controlFixtureActorToken(page, { actorName, fallbackSceneN
       await titanWait(() => !!tokenDoc.object, { message: 'token placeable drawn' });
       tokenDoc.object.control({ releaseOthers });
 
-      game.titan.effectHud.refresh();
       game.titan.playerHud?.refresh();
       return fallbackId;
    }, {

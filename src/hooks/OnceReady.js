@@ -2,7 +2,6 @@ import onHotbarDrop from '~/hooks/OnHotbarDrop.js';
 import { worldNeedsMigration, migrateWorld } from '~/helpers/migration/MigrateWorld.js';
 import convertEffectItemsToActiveEffects from '~/helpers/migration/ConvertEffectItemsToActiveEffects.js';
 import ConfirmMigrateWorldDialog from '~/helpers/migration/ConfirmMigrateWorldDialog.js';
-import TitanEffectHud from '~/ui/effect-hud/TitanEffectHud.js';
 import TitanPlayerHud from '~/ui/player-hud/TitanPlayerHud.js';
 
 /**
@@ -37,10 +36,6 @@ export default async function onceReady() {
 
    // Register sub-hooks.
    Hooks.on('hotbarDrop', onHotbarDrop);
-
-   // Build and attach the native Effect HUD.
-   game.titan.effectHud = new TitanEffectHud();
-   game.titan.effectHud.init();
 
    // Build and attach the Player HUD.
    game.titan.playerHud = new TitanPlayerHud();

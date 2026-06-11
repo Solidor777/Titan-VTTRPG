@@ -260,9 +260,9 @@ test.describe('cross-surface check-tag parity', () => {
 
       // Precondition: the HUD controller must be attached at ready — without a controlled token a
       // GM-login HUD null-resolves and every "renders" assertion would pass falsely.
-      /** @type {boolean} Whether the TITAN effect HUD controller exists on the game object. */
-      const hudReady = await page.evaluate(() => typeof game.titan?.effectHud !== 'undefined');
-      expect(hudReady, 'TITAN effect HUD controller must be attached at ready').toBe(true);
+      /** @type {boolean} Whether the TITAN player HUD controller exists on the game object. */
+      const hudReady = await page.evaluate(() => typeof game.titan?.playerHud !== 'undefined');
+      expect(hudReady, 'TITAN player HUD controller must be attached at ready').toBe(true);
 
       // Place and control the fixture token (throws if the placeable never draws); remember the
       // first fallback-created scene so afterAll can remove it from the world.
@@ -275,9 +275,9 @@ test.describe('cross-surface check-tag parity', () => {
          fallbackSceneId = createdSceneId;
       }
 
-      /** @type {import('@playwright/test').Locator} The mounted HUD panel. */
-      const panel = page.locator('#titan-effect-hud .titan-effect-hud');
-      await expect(panel, 'HUD panel mounts for the controlled token actor').toBeVisible();
+      /** @type {import('@playwright/test').Locator} The mounted effects panel. */
+      const panel = page.locator('[data-testid="player-hud-effects-panel"]');
+      await expect(panel, 'effects panel mounts for the controlled token actor').toBeVisible();
 
       // POSITIVE signal first: the header must show the seeded effect before the expander click.
       /** @type {import('@playwright/test').Locator} The effect row's header button. */
