@@ -59,4 +59,21 @@ export default class TitanWeaponSheet extends TitanItemSheet {
    postDeleteAttack(idx) {
       this.applicationState.postDeleteAttack(idx);
    }
+
+   /**
+    * Reorders the per-attack expansion state to track a moved Attack.
+    * @param {number} fromIdx - The attack's previous index.
+    * @param {number} toIdx - The insertion point it moved before.
+    */
+   postMoveAttack(fromIdx, toIdx) {
+      this.applicationState.postMoveAttack(fromIdx, toIdx);
+   }
+
+   /**
+    * Seeds expansion state for a copied Attack inserted at the provided index.
+    * @param {number} atIdx - The insertion point.
+    */
+   postInsertAttack(atIdx) {
+      this.applicationState.postInsertAttack(atIdx);
+   }
 }

@@ -8,6 +8,8 @@ import AddCustomAttackTraitDialog from '~/document/types/item/types/weapon/dialo
 import EditCustomAttackTraitDialog from '~/document/types/item/types/weapon/dialog/EditCustomAttackTraitDialog.js';
 import localize from '~/helpers/utility-functions/Localize.js';
 import assert from '~/helpers/utility-functions/Assert.js';
+import moveArrayEntry from '~/helpers/utility-functions/MoveArrayEntry.js';
+import cloneElementWithNewUuid from '~/helpers/utility-functions/CloneElementWithNewUuid.js';
 
 /**
  * Data model with extra functionality for Weapons.
@@ -189,6 +191,62 @@ export default class WeaponDataModel extends RulesElementItemDataModel {
          await this.parent.update({
             system: {
                attack: structuredClone(this.attack),
+            }
+         });
+      }
+   }
+
+   /**
+    * Reorders an Attack within this Weapon, keeping the sheet's per-attack expansion state aligned.
+    * @param {number} fromIdx - The attack's current index.
+    * @param {number} toIdx - The insertion point to move it before.
+    * @returns {Promise<void>}
+    */
+   async moveAttack(fromIdx, toIdx) {
+      if (assert(
+         this.parent.isOwner,
+         'Cannot modify document %s if not owner.',
+         this.parent.name,
+      )) {
+         // Keep per-attack expansion state aligned before the reactive re-render.
+         const sheet = this.parent._sheet;
+         if (sheet) {
+            sheet.postMoveAttack(fromIdx, toIdx);
+         }
+
+         await this.parent.update({
+            system: {
+               attack: moveArrayEntry(this.attack, fromIdx, toIdx),
+            }
+         });
+      }
+   }
+
+   /**
+    * Inserts a copy of an Attack (from this or another weapon) at a position, with a fresh uuid.
+    * @param {object} element - The attack data to copy in.
+    * @param {number} atIdx - The insertion point.
+    * @returns {Promise<void>}
+    */
+   async insertAttack(element, atIdx) {
+      if (assert(
+         this.parent.isOwner,
+         'Cannot modify document %s if not owner.',
+         this.parent.name,
+      )) {
+         /** @type {Array<object>} A fresh array so ReactiveDocument change-detection fires. */
+         const next = this.attack.slice();
+         next.splice(atIdx, 0, cloneElementWithNewUuid(element));
+
+         // Seed expansion state for the inserted row before the reactive re-render.
+         const sheet = this.parent._sheet;
+         if (sheet) {
+            sheet.postInsertAttack(atIdx);
+         }
+
+         await this.parent.update({
+            system: {
+               attack: next,
             }
          });
       }

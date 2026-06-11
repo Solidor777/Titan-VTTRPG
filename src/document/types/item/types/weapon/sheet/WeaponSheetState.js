@@ -1,11 +1,16 @@
 import createWeaponSheetData from '~/document/types/item/types/weapon/sheet/WeaponSheetData.js';
 import createRulesElementItemSheetState from '~/document/types/item/sheet/RulesElementItemSheetState.js';
+import moveArrayEntry from '~/helpers/utility-functions/MoveArrayEntry.js';
 
 /**
  * @typedef {RulesElementItemSheetState} WeaponSheetState A custom reactive store for managing a Weapon Sheet.
  * @property {() => void} addAttack - Updates the reactive state store in response to an Attack being added.
  * @property {(idx: number) => void} postDeleteAttack - Updates the reactive state store in response to an Attack being
  * deleted.
+ * @property {(fromIdx: number, toIdx: number) => void} postMoveAttack - Reorders the per-attack expansion arrays in
+ * lockstep with an Attack reorder.
+ * @property {(atIdx: number) => void} postInsertAttack - Splices an expanded flag into the per-attack expansion arrays
+ * when a copied Attack is inserted.
  */
 
 /**
@@ -46,12 +51,41 @@ export default function createWeaponSheetState(item) {
       });
    }
 
+   /**
+    * Reorders the per-attack expansion arrays in lockstep with an Attack reorder so expansion state
+    * tracks the moved row.
+    * @param {number} fromIdx - The attack's current index.
+    * @param {number} toIdx - The insertion point to move it before.
+    */
+   function postMoveAttack(fromIdx, toIdx) {
+      update((data) => {
+         data.tabs.attacks.isExpanded = moveArrayEntry(data.tabs.attacks.isExpanded, fromIdx, toIdx);
+         data.sidebar.attacks.isExpanded = moveArrayEntry(data.sidebar.attacks.isExpanded, fromIdx, toIdx);
+         return data;
+      });
+   }
+
+   /**
+    * Splices a fresh expanded flag into both per-attack expansion arrays when a copied attack is
+    * inserted, keeping them aligned with the attack array.
+    * @param {number} atIdx - The insertion point.
+    */
+   function postInsertAttack(atIdx) {
+      update((data) => {
+         data.tabs.attacks.isExpanded.splice(atIdx, 0, true);
+         data.sidebar.attacks.isExpanded.splice(atIdx, 0, true);
+         return data;
+      });
+   }
+
    return {
       set,
       update,
       subscribe,
       addAttack,
       postDeleteAttack,
+      postMoveAttack,
+      postInsertAttack,
       postAddCheck,
       preDeleteCheck
    };
