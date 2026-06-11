@@ -64,13 +64,10 @@ export function createDefaultHudOptions() {
 
 /**
  * Creates the default per-user HUD layout (positions are canvas-rect anchored). The portrait
- * defaults to just right of the core players list, which occupies the bottom-left corner.
+ * defaults to the right of the core players list and scene controls in the bottom-left corner.
  * @returns {object} A fresh layout object (safe to mutate).
  */
 export function createDefaultHudLayout() {
-   /** @type {number} The players list's rendered width, with a fallback outside a live client. */
-   const playersWidth = globalThis.ui?.players?.element?.getBoundingClientRect()?.width ?? 200;
-
    return {
       effectsPanelSize: {
          height: 320,
@@ -97,7 +94,7 @@ export function createDefaultHudLayout() {
          portrait: {
             anchorX: 'left',
             anchorY: 'bottom',
-            dx: Math.round(playersWidth) + 16,
+            dx: 500,
             dy: 16,
          },
       },
