@@ -5,7 +5,7 @@ import { createDefaultHudOptions } from '~/ui/player-hud/PlayerHudDefaults.js';
 /**
  * Builds a mock character actor with spied engine methods.
  * @param {object} [overrides] - Replaces the stub's id, type, items, effects, or equipped map.
- * @returns {object} The mock actor.
+ * @returns {object} An actor stub whose engine methods are vi.fn spies.
  */
 function mockActor(overrides = {}) {
    return {
@@ -34,7 +34,7 @@ function mockActor(overrides = {}) {
 /**
  * Builds a mock item.
  * @param {object} fields - Seeds the stub's id, type, name, and system pieces.
- * @returns {object} The mock item.
+ * @returns {object} An item stub with spied sendToChat/sheet/update entry points.
  */
 function mockItem(fields) {
    return {
