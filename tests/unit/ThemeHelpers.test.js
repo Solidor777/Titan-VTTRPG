@@ -14,6 +14,12 @@ describe('buildThemeStylesheetText', () => {
       expect(css).toContain("--titan-font-family-normal: 'Lato';");
       expect(css.match(/--titan-/g)).toHaveLength(THEME_TOKENS.length);
    });
+
+   it('declares the tokens under a custom selector when one is given', () => {
+      const css = buildThemeStylesheetText(HERITAGE_DARK, '.titan.themed.theme-dark');
+      expect(css.startsWith('.titan.themed.theme-dark {')).toBe(true);
+      expect(css).toContain('--titan-app-background: #262836;');
+   });
 });
 
 describe('resolveActiveThemeId', () => {

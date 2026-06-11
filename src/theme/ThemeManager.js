@@ -85,7 +85,28 @@ export default class ThemeManager {
    }
 
    /**
-    * Builds and injects (or updates) the theme stylesheet for the active theme.
+    * Resolves the theme a fixed color scheme maps to (the world default for that scheme, with the
+    * built-in heritage fallback). Drives the per-sheet scheme overrides.
+    * @param {boolean} dark - Whether to resolve the dark-scheme theme.
+    * @returns {object} The resolved theme.
+    */
+   getSchemeTheme(dark) {
+      // The resolved theme id, ignoring the user's explicit selection.
+      const id = resolveActiveThemeId({
+         selectedThemeId: 'auto',
+         prefersDark: dark,
+         defaultDarkThemeId: getSetting('defaultDarkTheme'),
+         defaultLightThemeId: getSetting('defaultLightTheme'),
+         themeExists: (themeId) => this.getTheme(themeId) !== undefined,
+      });
+
+      return this.getTheme(id);
+   }
+
+   /**
+    * Builds and injects (or updates) the theme stylesheet: the active theme on `:root`, plus scoped
+    * overrides for windows Foundry has explicitly themed via the per-sheet color scheme option
+    * (the sheet root then carries `themed theme-light` / `themed theme-dark` beside `titan`).
     */
    apply() {
       // The injected style element, created on first application.
@@ -95,7 +116,11 @@ export default class ThemeManager {
          style.id = STYLE_ELEMENT_ID;
          document.head.append(style);
       }
-      style.textContent = buildThemeStylesheetText(this.getActiveTheme());
+      style.textContent = [
+         buildThemeStylesheetText(this.getActiveTheme()),
+         buildThemeStylesheetText(this.getSchemeTheme(false), '.titan.themed.theme-light'),
+         buildThemeStylesheetText(this.getSchemeTheme(true), '.titan.themed.theme-dark'),
+      ].join('\n');
    }
 
    /**
