@@ -40,7 +40,7 @@
    function wheelScroll(node) {
       /**
        * Steps the scroll window by one sub-option per wheel tick.
-       * @param {WheelEvent} event - The wheel event.
+       * @param {WheelEvent} event - Carries the wheel direction in deltaY.
        * @returns {void}
        */
       const onWheel = (event) => {
