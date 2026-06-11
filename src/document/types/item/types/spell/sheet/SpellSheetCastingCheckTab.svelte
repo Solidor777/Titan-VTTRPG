@@ -176,11 +176,11 @@
       .casting-check-settings {
          @include flex-column;
          @include flex-group-top;
-         @include border-bottom-sides;
          @include panel-3;
          @include padding-standard;
 
-         width: calc(100% - 16px);
+         border-radius: 0 0 var(--titan-border-radius) var(--titan-border-radius);
+         width: calc(100% - 2 * var(--titan-spacing-standard));
 
          .stat {
             @include flex-row;

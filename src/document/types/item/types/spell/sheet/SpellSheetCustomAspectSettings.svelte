@@ -206,9 +206,9 @@
          @include flex-group-top;
          @include panel-3;
 
-         border-radius: var(--titan-border-radius);
+         border-radius: 0 0 var(--titan-border-radius) var(--titan-border-radius);
 
-         width: calc(100% - 16px);
+         width: calc(100% - 2 * var(--titan-spacing-standard));
 
          @include padding-standard;
          @include font-size-small;

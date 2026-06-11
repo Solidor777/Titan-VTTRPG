@@ -81,7 +81,7 @@
 {#if attack}
    <div class="attack" transition:slide|local>
       <!--Header-->
-      <div class="header">
+      <div class="header {attack.attribute}">
          <!--Expand Toggle-->
          <div>
             {#if isExpanded}
@@ -277,8 +277,10 @@
          @include flex-space-between;
          @include panel-1;
 
+         @include attribute-colors;
+
          border-radius: var(--titan-border-radius);
-         @include padding-standard;
+         @include padding-large;
 
          width: 100%;
 
@@ -299,9 +301,9 @@
          @include flex-group-top;
          @include panel-3;
 
-         border-radius: var(--titan-border-radius);
+         border-radius: 0 0 var(--titan-border-radius) var(--titan-border-radius);
 
-         width: calc(100% - 16px);
+         width: calc(100% - 2 * var(--titan-spacing-standard));
 
          @include padding-standard;
          @include font-size-small;

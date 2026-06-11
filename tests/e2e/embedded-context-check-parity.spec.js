@@ -47,6 +47,12 @@ const CHECK_TAG_TEST_IDS = [
    'check-tags-opposed',
 ];
 
+/**
+ * @type {string[]} The CheckTags testIds rendered on the item-sheet SIDEBAR, which hides the basics
+ * tag (hideBasics) because the SidebarCheck header carries the attribute/skill/DC instead.
+ */
+const SIDEBAR_CHECK_TAG_TEST_IDS = CHECK_TAG_TEST_IDS.filter((id) => id !== 'check-tags-attribute');
+
 /** @type {import('@playwright/test').Page} The file-shared, logged-in page (one world boot per file). */
 let page;
 /** @type {string[]} Uncaught page errors collected during the current test (cleared each afterEach). */
@@ -298,9 +304,10 @@ test.describe('cross-surface check-tag parity', () => {
     * comparison built from two captures can never pass vacuously on a missing, extra, or blank tag.
     * @param {import('@playwright/test').Locator} scope - A locator containing exactly one CheckTags render.
     * @param {string} surface - Human-readable surface name for the per-assertion messages.
+    * @param {string[]} [expectedIds] - The testIds this surface renders (sidebars hide the basics tag).
     * @returns {Promise<{[testId: string]: string}>} Whitespace-normalized tag texts keyed by testId.
     */
-   async function captureCheckTagValues(scope, surface) {
+   async function captureCheckTagValues(scope, surface, expectedIds = CHECK_TAG_TEST_IDS) {
       // SET-EQUALITY GUARD (auto-retrying poll — the tags may still be mounting): the rendered
       // `check-tags-*` ids must be exactly the expected list, so a component-side tag addition or
       // rename fails loudly here and forces a deliberate CHECK_TAG_TEST_IDS update instead of
@@ -312,11 +319,11 @@ test.describe('cross-surface check-tag parity', () => {
                .evaluateAll((elements) => elements.map((element) => element.dataset.testid).sort()),
             { message: `${surface} renders exactly the expected check-tags testIds` },
          )
-         .toEqual([...CHECK_TAG_TEST_IDS].sort());
+         .toEqual([...expectedIds].sort());
 
       /** @type {{[testId: string]: string}} The captured tag texts keyed by testId. */
       const values = {};
-      for (const testId of CHECK_TAG_TEST_IDS) {
+      for (const testId of expectedIds) {
          /** @type {import('@playwright/test').Locator} The tag root carrying this testId. */
          const tag = scope.getByTestId(testId);
          await expect(tag, `${surface} renders ${testId}`).toBeVisible();
@@ -330,10 +337,17 @@ test.describe('cross-surface check-tag parity', () => {
 
    test('equipment check tags render identical values on the item sheet and the character sheet', async () => {
       // ITEM SHEET SIDEBAR: the sidebar check is seeded expanded, so the tags are visible at mount.
+      // The sidebar hides the basics tag — the SidebarCheck header carries attribute/skill/DC.
       /** @type {import('@playwright/test').Locator} The equipment item-sheet root. */
       const itemSheet = await openEquipmentItemSheet();
       /** @type {{[testId: string]: string}} The item-sheet sidebar's captured tag values. */
-      const sidebarValues = await captureCheckTagValues(itemSheet, 'item-sheet sidebar');
+      const sidebarValues =
+         await captureCheckTagValues(itemSheet, 'item-sheet sidebar', SIDEBAR_CHECK_TAG_TEST_IDS);
+
+      // The sidebar header must render the basics the hidden tag used to carry.
+      /** @type {import('@playwright/test').Locator} The sidebar check header's info row. */
+      const headerInfo = itemSheet.locator('.sidebar-check .header .info').first();
+      await expect(headerInfo, 'sidebar header renders the attribute/skill/DC row').not.toHaveText('');
 
       // CHARACTER SHEET: the expanded equipment row renders the SAME shared component.
       /** @type {import('@playwright/test').Locator} The expanded equipment row. */
@@ -341,11 +355,9 @@ test.describe('cross-surface check-tag parity', () => {
       /** @type {{[testId: string]: string}} The character-sheet row's captured tag values. */
       const rowValues = await captureCheckTagValues(row, 'character-sheet equipment row');
 
-      // VALUE PARITY: each of the four tags renders identical text on both surfaces (both captures
-      // are presence-anchored above, so this loop cannot pass vacuously on missing tags). The seeded
-      // attribute is concrete ('body', not 'default'), so the actor-resolved attribute override on
-      // the character-sheet surface must render the same attribute text as the item-sheet config read.
-      for (const testId of CHECK_TAG_TEST_IDS) {
+      // VALUE PARITY: each tag both surfaces render carries identical text (both captures are
+      // presence-anchored above, so this loop cannot pass vacuously on missing tags).
+      for (const testId of SIDEBAR_CHECK_TAG_TEST_IDS) {
          expect(
             rowValues[testId],
             `${testId}: character-sheet equipment row must equal item-sheet sidebar`,

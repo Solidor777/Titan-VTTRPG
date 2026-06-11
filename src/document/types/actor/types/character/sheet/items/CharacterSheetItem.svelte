@@ -55,10 +55,10 @@
       .header {
          @include flex-row;
          @include flex-space-between;
-         @include border-top-bottom-right;
          @include panel-1;
          @include padding-large;
 
+         border-radius: var(--titan-border-radius);
          width: 100%;
          font-weight: bold;
 
@@ -83,10 +83,10 @@
          @include flex-column;
          @include flex-group-top;
          @include panel-3;
-         @include border-bottom-sides;
 
-         width: calc(100% - 16px);
-         padding: 0 var(--titan-spacing-standard);
+         border-radius: 0 0 var(--titan-border-radius) var(--titan-border-radius);
+         width: calc(100% - 2 * var(--titan-spacing-standard));
+         padding: 0 var(--titan-spacing-standard) var(--titan-spacing-standard);
       }
    }
 </style>

@@ -320,13 +320,13 @@
          @include flex-group-top;
          @include panel-3;
 
-         border-radius: var(--titan-border-radius);
+         border-radius: 0 0 var(--titan-border-radius) var(--titan-border-radius);
          @include padding-standard;
 
          --titan-label-font-size: var(--titan-font-size-small);
          --titan-input-font-size: var(--titan-font-size-small);
 
-         width: calc(100% - 16px);
+         width: calc(100% - 2 * var(--titan-spacing-standard));
 
 
          .row {
