@@ -23,6 +23,7 @@
    } from '~/system/Icons.js';
    import LabeledElement from '~/helpers/svelte-components/LabeledElement.svelte';
    import CondensedItemCheckButton from '~/document/svelte-components/check/CondensedItemCheckButton.svelte';
+   import DragHandle from '~/helpers/svelte-components/drag-reorder/DragHandle.svelte';
 
    /**
     * @typedef {object} ItemSheetCheckSettingsProps
@@ -52,6 +53,9 @@
    <div class="check" transition:slide|local>
       <!--Header (color-coded to the check's attribute)-->
       <div class="header {check.attribute}">
+         <!--Drag handle-->
+         <DragHandle/>
+
          <!--Expand Toggle-->
          <div>
             {#if isExpanded}
