@@ -24,6 +24,7 @@ test.beforeAll(async ({ browser }) => {
 test.afterEach(async () => {
    // Remove the per-test fixture documents so world state does not accumulate.
    await page.evaluate(async () => {
+      await game.scenes.getName('E2E Regression Scene')?.delete();
       for (const name of ['E2E Regression Actor', 'E2E Regression Weapon', 'E2E Regression Source']) {
          await game.actors.getName(name)?.delete();
          await game.items.getName(name)?.delete();
@@ -117,6 +118,39 @@ test.describe('v14 sheet regressions', () => {
       await sheet.getByRole('button', { name: 'Attacks', exact: true }).first().click();
       await expect(sheet.locator('.attack').first(), 'attack settings render').toBeVisible();
       expect(errors, `uncaught errors on the attacks tab:\n${errors.join('\n')}`).toEqual([]);
+   });
+
+   test('the sheet unlink control unlinks the placed token, not the prototype', async () => {
+      const result = await page.evaluate(async () => {
+         // A linked actor placed on a fresh scene; linked tokens open the WORLD actor's sheet.
+         const actor = await Actor.create({
+            name: 'E2E Regression Actor',
+            type: 'player',
+            prototypeToken: { actorLink: true },
+         });
+         const scene = await Scene.create({ name: 'E2E Regression Scene', width: 1000, height: 1000 });
+         const tokenData = (await actor.getTokenDocument({ x: 100, y: 100 })).toObject();
+         const [tokenDoc] = await scene.createEmbeddedDocuments('Token', [tokenData]);
+
+         // Open the sheet the way the canvas double-click does: passing the originating token.
+         const sheet = actor.sheet;
+         await sheet.render(true, { token: tokenDoc });
+         await titanWait(() => !!sheet.element, { message: 'linked actor sheet rendered' });
+
+         // The unlink control's handler must unlink the PLACED token and leave the prototype alone.
+         await sheet._onUnlinkToken();
+         await titanWait(() => tokenDoc.actorLink === false, { message: 'token unlinked' });
+         return {
+            tokenLinked: tokenDoc.actorLink,
+            prototypeLinked: actor.prototypeToken.actorLink,
+            syntheticActor: tokenDoc.actor !== actor && tokenDoc.actor?.isToken === true,
+         };
+      });
+
+      expect(result.tokenLinked, 'the placed token is unlinked').toBe(false);
+      expect(result.prototypeLinked, 'the prototype link is untouched').toBe(true);
+      expect(result.syntheticActor, 'the token now resolves a synthetic actor').toBe(true);
+      expect(errors, `uncaught errors during unlink:\n${errors.join('\n')}`).toEqual([]);
    });
 
    test('adding a check while the sheet is open renders the new check row', async () => {

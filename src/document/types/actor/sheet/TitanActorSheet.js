@@ -1,6 +1,7 @@
 import TitanDocumentSheet from '~/document/sheet/TitanDocumentSheet.js';
 import ActorSheetHeaderButtons from '~/document/types/actor/sheet/ActorSheetHeaderButtons.svelte';
 import warn from '~/helpers/utility-functions/Warn.js';
+import assert from '~/helpers/utility-functions/Assert.js';
 import mergeArrays from '~/helpers/utility-functions/MergeArrays.js';
 import resolveDocumentSheetArguments from '~/helpers/utility-functions/ResolveDocumentSheetArguments.js';
 import localize from '~/helpers/utility-functions/Localize.js';
@@ -13,6 +14,9 @@ import { EDIT_TOKEN_ICON, IMPORT_ICON, LINKED_ICON, UNLINKED_ICON } from '~/syst
 export default class TitanActorSheet extends TitanDocumentSheet {
    /** @type {foundry.applications.ux.DragDrop | null} The drop controller bound to the sheet element. */
    #dragDrop = null;
+
+   /** @type {TokenDocument | null} The placed Token captured from an open-with-token render. */
+   #originToken = null;
 
    /**
     * Resolves the synthetic-token Actor, merges the Actor sheet CSS classes, and stores the Actor on the sheet.
@@ -49,6 +53,21 @@ export default class TitanActorSheet extends TitanDocumentSheet {
    static DEFAULT_OPTIONS = {
       position: { width: 750 },
    };
+
+   /**
+    * Capture the placed Token the canvas passes when a token is double-clicked. A LINKED token opens
+    * its world Actor's sheet, which otherwise cannot know which placed Token it was opened from —
+    * and the header's unlink control would fall back to the prototype-link toggle.
+    * @override
+    * @param {object} options - Render options, possibly carrying the originating Token document.
+    * @protected
+    */
+   _configureRenderOptions(options) {
+      super._configureRenderOptions(options);
+      if (options.token) {
+         this.#originToken = options.token;
+      }
+   }
 
    /**
     * Bind the drop controller to the sheet element on every render. ApplicationV2 wires no drag-drop
@@ -204,14 +223,17 @@ export default class TitanActorSheet extends TitanDocumentSheet {
     * @protected
     */
    async _onUnlinkToken() {
-      // Unlink the active token.
+      // Unlink the active token. The reference is taken BEFORE the update: afterwards the token
+      // resolves a synthetic actor, so this sheet's token getter no longer returns it.
       const token = this.token;
+      if (!assert(token, 'Cannot unlink %s: the sheet has no active Token.', this.actor.name)) {
+         return;
+      }
       await token.update({ actorLink: false });
 
-      // Close this sheet and open the newly synthetic Actor's sheet.
-      const newToken = this.token;
+      // Close this sheet and open the now-synthetic Actor's sheet for the same token.
       await this.close();
-      newToken.actor.sheet.render({ force: true });
+      token.actor.sheet.render({ force: true });
    }
 
    /**
@@ -224,11 +246,24 @@ export default class TitanActorSheet extends TitanDocumentSheet {
    }
 
    /**
-    * If this sheet's Actor Sheet represents a synthetic Token actor, gets a reference to the active Token.
+    * The active placed Token for this sheet: the synthetic Actor's own token, or the captured
+    * originating Token when a LINKED token opened this world Actor's sheet. The captured token only
+    * counts while it still exists on its scene and still resolves to this Actor.
     * @type {TokenDocument | null}
     */
    get token() {
-      return this.options?.token || this.actor.token || null;
+      // Synthetic token Actor: the Actor knows its own token.
+      if (this.actor.token) {
+         return this.actor.token;
+      }
+
+      /** @type {TokenDocument | null} The Token captured from the opening double-click. */
+      const captured = this.#originToken ?? this.options?.token;
+      if (captured && captured.actor === this.actor && captured.parent?.tokens.has(captured.id)) {
+         return captured;
+      }
+
+      return null;
    }
 
    /**

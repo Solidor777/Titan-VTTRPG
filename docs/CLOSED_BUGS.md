@@ -200,3 +200,18 @@ when fixed.
 - **Fixed:** 2026-06-10 on `feature/theme-foundation` — namespaced v14 equivalents
   (`foundry.helpers.interaction.KeyboardManager`, `core.messageMode`, `ChatMessage.applyMode`,
   `foundry.applications.ux.TextEditor.implementation`) and an `{#if img}` guard on the header image.
+
+### 18. Sheet unlink control toggled the prototype instead of the placed token
+
+- **What:** Double-clicking a LINKED token opens its world Actor's sheet, and v14 passes the
+  originating token only as a render option (`sheet.render(true, {token})`) that nothing captured —
+  so the sheet's `token` getter returned null and the header's link control fell into the
+  directory branch, silently toggling the PROTOTYPE token's link. The placed token stayed linked
+  (edits still hit the source actor) while the next dragged copy came out unlinked. Once captured,
+  a second fault surfaced: `_onUnlinkToken` re-read `this.token` AFTER the update, getting null and
+  throwing (`can't access property "actor"`).
+- **Found:** 2026-06-10 by the user (pre-existing since the v14 migration; v13 conveyed the token).
+- **Fixed:** 2026-06-10 on `main` — `_configureRenderOptions` captures the originating token onto a
+  private field, the `token` getter validates it (same actor, still on its scene), and
+  `_onUnlinkToken` keeps the pre-update reference for the close-and-reopen onto the synthetic
+  actor's sheet, with an assert guard. Regression-locked in `tests/e2e/sheet-regressions.spec.js`.
