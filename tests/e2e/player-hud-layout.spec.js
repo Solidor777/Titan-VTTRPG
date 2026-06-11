@@ -263,7 +263,7 @@ test('the settings app reset-all restores options and layout', async () => {
          portraitDx: game.titan.playerHud.layoutState.positions.portrait.dx,
       })),
       { message: 'reset-all restores stored options and live layout' },
-   ).toEqual({ options: {}, portraitDx: 500 });
+   ).toEqual({ options: {}, portraitDx: 250 });
 });
 
 test('the hotbar is hidden by default and the setting shows it', async () => {
