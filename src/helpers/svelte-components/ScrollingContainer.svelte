@@ -81,6 +81,8 @@
    .container {
       @include flex-column;
 
+      // Follow a rounded parent so scrolled content clips at the same corners instead of poking out.
+      border-radius: inherit;
       position: relative;
       width: 100%;
       height: 100%;
@@ -88,6 +90,7 @@
       .content {
          @include flex-column;
 
+         border-radius: inherit;
          width: 100%;
          height: 100%;
          position: absolute;
