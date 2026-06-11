@@ -1,8 +1,9 @@
 <script>
    import { getContext } from 'svelte';
-   import localize from '~/helpers/utility-functions/Localize.js';
+   import tooltipAction from '~/helpers/svelte-actions/TooltipAction.js';
    import Meter from '~/helpers/svelte-components/Meter.svelte';
    import DocumentIntegerInput from '~/document/svelte-components/input/DocumentIntegerInput.svelte';
+   import { getIcon } from '~/system/Icons.js';
 
    /** @type {object} The primary actor bridge. */
    const document = getContext('document');
@@ -17,7 +18,10 @@
          class={`bar ${resource}`}
          data-testid={`player-hud-bar-${resource}`}
       >
-         <span class="label">{localize(resource)}</span>
+         <i
+            class={`label ${getIcon(resource)}`}
+            use:tooltipAction={`${resource}.desc`}
+         ></i>
          <Meter
             max={document.data.system.resource[resource].max}
             value={document.data.system.resource[resource].value}
@@ -25,7 +29,7 @@
          <span class="value">
             <DocumentIntegerInput
                bind:value={document.data.system.resource[resource].value}
-               maxDigits={3}
+               maxDigits={2}
                testId={`player-hud-bar-${resource}-input`}
             />
             <span class="max">{document.data.system.resource[resource].max}</span>
@@ -62,11 +66,8 @@
          }
 
          .label {
-            width: 48px;
-            overflow: hidden;
-            text-align: left;
-            text-overflow: ellipsis;
-            white-space: nowrap;
+            width: 20px;
+            text-align: center;
          }
 
          .value {
