@@ -3,7 +3,6 @@ import DocumentSheetShell from '~/document/sheet/DocumentSheetShell.svelte';
 import ReactiveDocument from '~/document/reactive/ReactiveDocument.svelte.js';
 import mergeArrays from '~/helpers/utility-functions/MergeArrays.js';
 import resolveDocumentSheetArguments from '~/helpers/utility-functions/ResolveDocumentSheetArguments.js';
-import darkModeSheets from '~/helpers/Settings/DarkModeSheets.js';
 
 const { DocumentSheetV2 } = foundry.applications.api;
 
@@ -23,7 +22,7 @@ export default class TitanDocumentSheet extends DocumentSheetV2 {
    #headerMountHandle = void 0;
 
    /**
-    * Resolves the polymorphic constructor arguments and applies the default and theme CSS classes to the sheet.
+    * Resolves the polymorphic constructor arguments and applies the default CSS classes to the sheet.
     * @param {foundry.abstract.Document} sheetDocument - The Document this sheet represents.
     * @param {object} [options={}] - Application configuration options.
     */
@@ -33,11 +32,8 @@ export default class TitanDocumentSheet extends DocumentSheetV2 {
       const { document: resolvedDocument, options: resolvedOptions } =
          resolveDocumentSheetArguments(sheetDocument, options);
 
-      // Add default and dark-mode classes.
+      // Add default classes.
       const classes = ['titan', 'titan-document-sheet'];
-      if (darkModeSheets()) {
-         classes.push('titan-dark-mode');
-      }
       resolvedOptions.classes = resolvedOptions.classes
          ? mergeArrays(classes, resolvedOptions.classes)
          : classes;

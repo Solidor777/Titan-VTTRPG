@@ -1,7 +1,6 @@
 import { mount, unmount } from 'svelte';
 import { Z_INDEX_APP } from '~/system/Constants.js';
 import generateUUID from '~/helpers/utility-functions/GenerateUUID.js';
-import darkModeSheets from '~/helpers/Settings/DarkModeSheets.js';
 import mergeArrays from '~/helpers/utility-functions/MergeArrays.js';
 
 const { ApplicationV2 } = foundry.applications.api;
@@ -20,15 +19,12 @@ export default class TitanDialog extends ApplicationV2 {
    #content;
 
    /**
-    * Applies the default and theme CSS classes, assigns a unique id, and stores the Svelte content descriptor.
+    * Applies the default CSS classes, assigns a unique id, and stores the Svelte content descriptor.
     * @param {object} options - Options for the dialog window. Must include
     * `content: { class, props }` describing the Svelte component to mount.
     */
    constructor(options) {
       const classes = ['titan', 'titan-dialog'];
-      if (darkModeSheets()) {
-         classes.push('titan-dark-mode');
-      }
       options.classes = options.classes ? mergeArrays(classes, options.classes) : classes;
       options.id = options.id ? `${options.id}-${generateUUID()}` : `titan-dialog-${generateUUID()}`;
 

@@ -2,7 +2,7 @@ import { mount } from 'svelte';
 import ReactiveDocument from '~/document/reactive/ReactiveDocument.svelte.js';
 import ChatMessageContent from '~/document/types/chat-message/ChatMessageContent.svelte';
 import TitanChatMessageDataModel from '~/document/types/chat-message/ChatMessageDataModel.js';
-import darkModeChatMessages from '~/helpers/Settings/DarkModeChatMessages.js';
+import themeCoreMessages from '~/helpers/Settings/ThemeCoreMessages.js';
 import {
    registerMount,
    sweepStaleMounts,
@@ -32,11 +32,11 @@ export default class TitanChatMessage extends ChatMessage {
       // Build Foundry's standard card chrome (header, content region, controls).
       const html = await super.renderHTML(options);
 
-      // Non-TITAN messages render unchanged, except dark mode applies to every message when the
-      // setting is 'all' (previously handled by the deleted legacy renderChatMessageHTML hook).
+      // Non-TITAN messages render unchanged unless the user opted to theme core messages, in which
+      // case the card joins the TITAN chat surface (background + visibility tint, no badge).
       if (!(this.system instanceof TitanChatMessageDataModel)) {
-         if (darkModeChatMessages() === 'all') {
-            html.classList.add('titan-dark-mode');
+         if (themeCoreMessages()) {
+            html.classList.add('titan-core-themed');
          }
          return html;
       }
@@ -45,9 +45,6 @@ export default class TitanChatMessage extends ChatMessage {
       html.classList.add('titan');
       if (this.isOwner) {
          html.classList.add('owner');
-      }
-      if (darkModeChatMessages() !== 'disabled') {
-         html.classList.add('titan-dark-mode');
       }
 
       // Mount the subtype's Svelte component into the card content region and track it per element.

@@ -16,9 +16,9 @@ import {
  * (duration/check/customTrait/rulesElement/description plus `name`/`img`); the message self-renders
  * via `TitanChatMessage#renderHTML`. This spec asserts the posted subtype, the rendered card content
  * (name, description, custom trait), and that the card's embedded check button rolls an itemCheck
- * through the controlled character. It also locks in the dark-mode-'all' relocation: with the
- * legacy hook deleted, non-TITAN messages must still receive the titan-dark-mode class from
- * TitanChatMessage#renderHTML when the setting is 'all'.
+ * through the controlled character. It also locks in core-message theming: non-TITAN messages
+ * receive the titan-core-themed class from TitanChatMessage#renderHTML when the themeCoreMessages
+ * setting is enabled, and stay unclassed when it is disabled.
  */
 
 /** @type {import('@playwright/test').Page} The file-shared, logged-in page (one world boot per file). */
@@ -162,49 +162,49 @@ test.describe('effect chat-message subtype card', () => {
       expect(errors, `uncaught errors during effect card lifecycle:\n${errors.join('\n')}`).toEqual([]);
    });
 
-   test('dark mode "all" classes non-TITAN messages; "systemOnly" does not', async () => {
-      // Render a plain (non-TITAN) message under each dark-mode setting and report the classes the
-      // chat-log element received from TitanChatMessage#renderHTML (the relocated legacy-hook branch).
+   test('core-message theming classes non-TITAN messages when enabled', async () => {
+      // Render a plain (non-TITAN) message under each themeCoreMessages value and report the classes
+      // the chat-log element received from TitanChatMessage#renderHTML.
       const observed = await page.evaluate(async () => {
-         /** @type {string} The original setting value, restored after the probe. */
-         const original = game.settings.get('titan', 'darkModeChatMessages');
+         /** @type {boolean} The original setting value, restored after the probe. */
+         const original = game.settings.get('titan', 'themeCoreMessages');
 
          /**
-          * Posts a plain chat message under the given dark-mode setting and reads back the rendered
-          * chat-log element's relevant classes.
-          * @param {string} settingValue - The darkModeChatMessages value to probe under.
-          * @returns {Promise<object>} The observed { darkMode, titan } class flags.
+          * Posts a plain chat message under the given core-theming setting and reads back the
+          * rendered chat-log element's relevant classes.
+          * @param {boolean} settingValue - The themeCoreMessages value to probe under.
+          * @returns {Promise<object>} The observed { coreThemed, titan } class flags.
           */
          async function probe(settingValue) {
-            await game.settings.set('titan', 'darkModeChatMessages', settingValue);
-            const message = await ChatMessage.create({ content: `Dark-mode probe ${settingValue}` });
+            await game.settings.set('titan', 'themeCoreMessages', settingValue);
+            const message = await ChatMessage.create({ content: `Core-theming probe ${settingValue}` });
             await titanWait(
                () => !!globalThis.document.querySelector(`.message[data-message-id="${message.id}"]`),
                { message: 'plain message rendered' },
             );
             const li = globalThis.document.querySelector(`.message[data-message-id="${message.id}"]`);
             return {
-               darkMode: !!li?.classList.contains('titan-dark-mode'),
+               coreThemed: !!li?.classList.contains('titan-core-themed'),
                titan: !!li?.classList.contains('titan'),
             };
          }
 
-         const all = await probe('all');
-         const systemOnly = await probe('systemOnly');
+         const enabled = await probe(true);
+         const disabled = await probe(false);
 
-         // Restore the original setting so later tests see the world default.
-         await game.settings.set('titan', 'darkModeChatMessages', original);
+         // Restore the original setting so later tests see the user default.
+         await game.settings.set('titan', 'themeCoreMessages', original);
 
-         return { all, systemOnly };
+         return { enabled, disabled };
       });
 
-      // 'all' must class plain messages with titan-dark-mode (without the titan system class).
-      expect(observed.all.darkMode, 'dark mode all classes a plain message').toBe(true);
-      expect(observed.all.titan, 'plain message never gets the titan class').toBe(false);
+      // Enabled must class plain messages with titan-core-themed (without the titan system class).
+      expect(observed.enabled.coreThemed, 'core theming classes a plain message').toBe(true);
+      expect(observed.enabled.titan, 'plain message never gets the titan class').toBe(false);
 
-      // 'systemOnly' must leave plain messages unclassed.
-      expect(observed.systemOnly.darkMode, 'systemOnly leaves a plain message unclassed').toBe(false);
+      // Disabled must leave plain messages unclassed.
+      expect(observed.disabled.coreThemed, 'disabled leaves a plain message unclassed').toBe(false);
 
-      expect(errors, `uncaught errors during dark-mode probe:\n${errors.join('\n')}`).toEqual([]);
+      expect(errors, `uncaught errors during core-theming probe:\n${errors.join('\n')}`).toEqual([]);
    });
 });

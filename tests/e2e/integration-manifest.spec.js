@@ -213,6 +213,7 @@ test.describe('integration manifest drift guard', () => {
       const expectedSettings = [
          'titan.migrationMode', 'titan.getCheckOptions', 'titan.initiativeFormula',
          'titan.staminaBaseMultiplier', 'titan.defaultAttribute.arcana', 'titan.defaultXpCost.ability',
+         'titan.theme',
       ];
 
       // Read the live status-effect ids and which sampled settings are missing.
