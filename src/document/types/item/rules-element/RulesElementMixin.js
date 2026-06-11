@@ -2,6 +2,8 @@ import buildSchemaFromShape from '~/helpers/utility-functions/BuildSchemaFromSha
 import createRulesElementTemplate from '~/document/types/item/rules-element/RulesElementTemplate.js';
 import createFlatModifierElement from '~/document/types/item/rules-element/FlatModifier.js';
 import assert from '~/helpers/utility-functions/Assert.js';
+import moveArrayEntry from '~/helpers/utility-functions/MoveArrayEntry.js';
+import cloneElementWithNewUuid from '~/helpers/utility-functions/CloneElementWithNewUuid.js';
 
 /**
  * Mixin that adds a Rules Elements array and its mutators to any TitanDataModel subclass.
@@ -64,6 +66,41 @@ export default function RulesElementMixin(BaseClass) {
             await this.parent.update({
                system: {
                   rulesElement: this.rulesElement,
+               },
+            });
+         }
+      }
+
+      /**
+       * Reorders a Rules Element within this document's array.
+       * @param {number} fromIdx - The current index of the element.
+       * @param {number} toIdx - The insertion point (original-frame index) to move it before.
+       * @returns {Promise<void>}
+       */
+      async moveRulesElement(fromIdx, toIdx) {
+         if (assert(this.parent.isOwner, 'Cannot modify document %s if not owner.', this.parent.name)) {
+            await this.parent.update({
+               system: {
+                  rulesElement: moveArrayEntry(this.rulesElement, fromIdx, toIdx),
+               },
+            });
+         }
+      }
+
+      /**
+       * Inserts a copy of a Rules Element (from this or another item) at a position, with a fresh uuid.
+       * @param {object} element - The element data to copy in.
+       * @param {number} atIdx - The insertion point in the array.
+       * @returns {Promise<void>}
+       */
+      async insertRulesElement(element, atIdx) {
+         if (assert(this.parent.isOwner, 'Cannot modify document %s if not owner.', this.parent.name)) {
+            /** @type {Array<object>} A fresh array so ReactiveDocument change-detection fires. */
+            const next = this.rulesElement.slice();
+            next.splice(atIdx, 0, cloneElementWithNewUuid(element));
+            await this.parent.update({
+               system: {
+                  rulesElement: next,
                },
             });
          }
