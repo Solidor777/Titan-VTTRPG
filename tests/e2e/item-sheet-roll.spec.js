@@ -63,17 +63,26 @@ test.describe('item-sheet check rolling (owner)', () => {
             { name: 'E2E Roll Equipment', type: 'equipment', system: { check: [itemCheck] } },
          ]);
          const [weapon] = await actor.createEmbeddedDocuments('Item', [
-            {
-               name: 'E2E Roll Weapon',
-               type: 'weapon',
-               system: {
-                  attack: [
-                     { label: 'E2E Roll Attack One', attribute: 'body', skill: 'meleeWeapons', type: 'melee' },
-                     { label: 'E2E Roll Attack Two', attribute: 'mind', skill: 'rangedWeapons', type: 'ranged' },
-                  ],
-               },
-            },
+            { name: 'E2E Roll Weapon', type: 'weapon', system: { equipped: true } },
          ]);
+
+         // Build TWO valid attacks by cloning the schema-default attack (clone-and-write per the
+         // array-update convention) — a hand-built attack literal would miss schema-defaulted
+         // sub-arrays the sheet maps over. The second attack gets a fresh uuid so the sidebar's
+         // id-keyed each block does not collide.
+         const attacks = foundry.utils.deepClone(weapon.system.attack);
+         attacks[0].label = 'E2E Roll Attack One';
+         attacks[0].attribute = 'body';
+         attacks[0].skill = 'meleeWeapons';
+         attacks[0].type = 'melee';
+         const secondAttack = foundry.utils.deepClone(attacks[0]);
+         secondAttack.uuid = foundry.utils.randomID();
+         secondAttack.label = 'E2E Roll Attack Two';
+         secondAttack.attribute = 'mind';
+         secondAttack.skill = 'rangedWeapons';
+         secondAttack.type = 'ranged';
+         attacks.push(secondAttack);
+         await weapon.update({ system: { attack: attacks } });
          const [spell] = await actor.createEmbeddedDocuments('Item', [
             { name: 'E2E Roll Spell', type: 'spell' },
          ]);
