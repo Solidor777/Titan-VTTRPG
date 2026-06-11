@@ -7,6 +7,13 @@ import MACCHIATO from '~/theme/themes/Macchiato.js';
 /** @type {RegExp} Matches a 6- or 8-digit hex color value. */
 const HEX_COLOR = /^#(?:[0-9a-fA-F]{6}|[0-9a-fA-F]{8})$/;
 
+/**
+ * @type {RegExp} Matches a safe font-family value. Brace and angle characters are rejected because
+ * token values land verbatim in an injected <style> element; a value containing `}` could close the
+ * declaration block and inject arbitrary CSS.
+ */
+const SAFE_FONT = /^[^{}<>;]+$/;
+
 /** @type {number} The theme export format version this build reads and writes. */
 export const THEME_FORMAT_VERSION = 1;
 
@@ -55,9 +62,12 @@ export default function validateThemeData(data, { getBaseTheme } = {}) {
       const isColor = THEME_COLOR_TOKENS.includes(token);
       const validProvided = isColor
          ? (typeof provided === 'string' && HEX_COLOR.test(provided))
-         : (typeof provided === 'string' && provided.length > 0);
-      if (isColor && token in data.tokens && !validProvided) {
-         return { ok: false, error: `Invalid color value for token '${token}': ${provided}.` };
+         : (typeof provided === 'string' && SAFE_FONT.test(provided));
+      if (token in data.tokens && !validProvided && typeof provided === 'string' && provided.length > 0) {
+         return {
+            ok: false,
+            error: `Invalid ${isColor ? 'color' : 'font'} value for token '${token}': ${provided}.`,
+         };
       }
       tokens[token] = validProvided ? provided : base.tokens[token];
    }

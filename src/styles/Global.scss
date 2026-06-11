@@ -6,9 +6,8 @@
    font-family: var(--titan-font-family-normal), sans-serif;
    font-size: var(--titan-font-size-normal);
 
-   // Scrollbar
-   scrollbar-color: var(--titan-scrollbar-color);
-   scrollbar-track-color: var(--titan-scrollbar-gutter-color);
+   // Scrollbar (two-value shorthand: thumb then track).
+   scrollbar-color: var(--titan-scrollbar-color) var(--titan-scrollbar-gutter-color);
 
    // Hide secrets
    .rich-text {

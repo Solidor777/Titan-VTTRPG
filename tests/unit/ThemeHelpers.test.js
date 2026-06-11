@@ -96,4 +96,17 @@ describe('validateThemeData', () => {
       const alpha = { ...valid, tokens: { ...valid.tokens, 'app-background': '#10101880' } };
       expect(validateThemeData(alpha).ok).toBe(true);
    });
+
+   it('rejects font values that could escape the injected style declaration', () => {
+      const injected = {
+         ...valid,
+         tokens: {
+            ...valid.tokens,
+            'font-family-normal': "'Lato'} body{display:none} :root{--x:",
+         },
+      };
+      const result = validateThemeData(injected);
+      expect(result.ok).toBe(false);
+      expect(result.error).toContain('font-family-normal');
+   });
 });
