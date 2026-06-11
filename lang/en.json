@@ -516,6 +516,7 @@
       "resetExpertise.text": "Reset Expertise",
       "resetFilter.text": "Reset Filter",
       "resetLayout.text": "Reset Layout",
+      "resizeElement.text": "Resize",
       "resilience.baseValue.text": "<strong>Resilience</strong> = your <strong>Body</strong> + <strong>1 / 2</strong> of your <strong>Soul</strong>, rounded down.",
       "resilience.desc.text": "<p><strong>Resilience</strong> is your ability to endure pain and resist illnesses.</p><p>Your <strong>Resilience</strong> is equal to your <strong>Body</strong> + <strong>1 / 2</strong> of your <strong>Soul</strong>, rounded down.</p>",
       "resilience.text": "Resilience",
