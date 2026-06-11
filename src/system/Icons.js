@@ -18,6 +18,7 @@ export const DECREMENT_ICON = 'fas fa-minus';
 export const DEFENSE_ICON = 'fas fa-shield';
 export const DELETE_ICON = 'fas fa-trash';
 export const DICE_ICON = 'fas fa-dice';
+export const DRAG_HANDLE_ICON = 'fas fa-grip-vertical';
 export const DUPLICATE_ICON = 'fas fa-copy';
 export const DURATION_ICON = 'fas fa-clock';
 export const EDIT_ICON = 'fas fa-pen-to-square';
