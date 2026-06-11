@@ -94,7 +94,6 @@
 
          @include margin-top-standard;
 
-         --titan-button-border-radius: var(--titan-button-border-radius);
       }
    }
 </style>

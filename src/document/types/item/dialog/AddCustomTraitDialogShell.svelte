@@ -163,8 +163,6 @@
 
             width: 100%;
 
-            --titan-button-border-radius: var(--titan-button-border-radius);
-
             &:not(:first-child) {
                @include margin-left-standard;
             }
