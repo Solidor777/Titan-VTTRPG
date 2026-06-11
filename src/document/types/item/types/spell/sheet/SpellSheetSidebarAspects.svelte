@@ -33,15 +33,14 @@
 </ol>
 
 <style lang="scss">
+   // The surrounding SidebarCheck details panel supplies the surface; the list draws no frame.
    ol {
       @include flex-column;
       @include flex-group-top;
       @include list;
-      @include border-bottom-sides;
-      @include panel-3;
 
-      width: calc(100% - var(--titan-spacing-large));
-      padding: 0 var(--titan-spacing-standard);
+      width: 100%;
+      padding: 0;
 
       li {
          @include flex-column;

@@ -97,21 +97,26 @@
          }
       }
 
+      // The toggle strip hangs off the banner: slightly narrower, square top, rounded bottom.
       .toggle {
          @include flex-row;
          @include flex-group-center;
-         @include margin-top-standard;
+
+         --titan-button-border-radius: 0 0 var(--titan-border-radius) var(--titan-border-radius);
+
+         width: calc(100% - 2 * var(--titan-spacing-standard));
       }
 
+      // The details panel hangs off the toggle the same way. Top padding stays zero because the
+      // contained tag rows carry their own top margins; matching bottom padding keeps the inset even.
       .details {
          @include flex-column;
          @include flex-group-top;
          @include panel-3;
-         @include padding-standard;
-         @include margin-top-standard;
 
-         border-radius: var(--titan-border-radius);
-         width: 100%;
+         border-radius: 0 0 var(--titan-border-radius) var(--titan-border-radius);
+         padding: 0 var(--titan-spacing-standard) var(--titan-spacing-large);
+         width: calc(100% - 4 * var(--titan-spacing-standard));
       }
    }
 </style>

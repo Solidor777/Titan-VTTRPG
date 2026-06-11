@@ -35,6 +35,7 @@
    .sections {
       @include flex-column;
       @include flex-group-top;
+      @include margin-top-large;
 
       width: 100%;
    }

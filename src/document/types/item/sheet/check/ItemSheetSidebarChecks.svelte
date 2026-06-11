@@ -24,5 +24,9 @@
       @include list;
 
       width: 100%;
+
+      .check:not(:first-child) {
+         @include margin-top-large;
+      }
    }
 </style>
