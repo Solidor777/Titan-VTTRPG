@@ -85,7 +85,7 @@ test.describe('character sheet spell row reactivity', () => {
       // The expandable footer's tag container, plus the drivable display reads we assert on: the RarityTag
       // root (class carries the rarity key), the Tradition StatTag (matched by its 'Tradition' label) and
       // the xpCost StatTag (matched by its 'XP Cost' label).
-      const tags = row.locator('.section.tags.small-text');
+      const tags = row.locator('.section.footer');
       const rarityCommon = tags.locator('.tag.common');
       const rarityRare = tags.locator('.tag.rare');
 

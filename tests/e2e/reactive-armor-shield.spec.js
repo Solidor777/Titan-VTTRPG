@@ -108,7 +108,7 @@ test.describe('character sheet armor/shield row reactivity', () => {
 
       // The expandable footer's tag container and the two drivable display reads we assert on: the armor
       // IconStatTag value (first `.stat .value`) and the RarityTag root (class carries the rarity key).
-      const tags = row.locator('.section.tags');
+      const tags = row.locator('.section.stats');
       const armorValue = tags.locator('.stat .value').first();
       const rarityCommon = tags.locator('.tag.common');
       const rarityRare = tags.locator('.tag.rare');
@@ -149,7 +149,7 @@ test.describe('character sheet armor/shield row reactivity', () => {
 
       // The expandable footer's tag container and the two drivable display reads we assert on: the defense
       // IconStatTag value (first `.stat .value`) and the RarityTag root (class carries the rarity key).
-      const tags = row.locator('.section.tags');
+      const tags = row.locator('.section.stats');
       const defenseValue = tags.locator('.stat .value').first();
       const rarityCommon = tags.locator('.tag.common');
       const rarityRare = tags.locator('.tag.rare');

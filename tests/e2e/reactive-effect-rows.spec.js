@@ -79,17 +79,17 @@ test.describe('character sheet effect row reactivity', () => {
       // Expand the row in place (the expand button is the first button in the header label area).
       await row.locator('.header .label .button button').first().click();
 
-      // The DurationTag renders its own `.tag` root nested inside the footer's wrapper `.tag`. Disambiguate
+      // The DurationTag renders its own `.tag` root nested inside the footer's wrapper `.stat`. Disambiguate
       // it from other tags by the bold `.label` reading the localized 'Duration' string. Its remaining count
       // is the LAST `.value` inside that root.
-      const tags = row.locator('.section.tags');
+      const tags = row.locator('.section.footer');
       const durationTag = tags.locator('.tag', { has: page.locator('.label', { hasText: 'Duration' }) });
       const durationRemaining = durationTag.locator('.value').last();
 
-      // The Expired tag is a wrapper `.tag` whose nested `Tag` root also carries class `.tag`, so matching
+      // The Expired tag is a wrapper `.stat` whose nested `Tag` root carries class `.tag`, so matching
       // on text alone resolves to 2 elements once present. Scope to the wrapper via the direct-child
       // combinator so the count reflects the single footer tag.
-      const expiredTag = tags.locator('> .tag', { hasText: 'Expired' });
+      const expiredTag = tags.locator('.stats > .stat', { hasText: 'Expired' });
 
       // INITIAL rendered state: duration remaining is 1, and the Expired tag is absent.
       await expect(durationRemaining, 'initial duration remaining is 1').toHaveText('1');

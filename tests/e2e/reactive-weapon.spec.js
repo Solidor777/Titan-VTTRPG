@@ -83,7 +83,7 @@ test.describe('character sheet weapon row reactivity', () => {
 
       // The expandable footer's tag container, plus the two drivable display reads we assert on: the
       // RarityTag root (class carries the rarity key) and the ValueTag StatTag value.
-      const tags = row.locator('.section.tags');
+      const tags = row.locator('.section.footer');
       const rarityCommon = tags.locator('.tag.common');
       const rarityRare = tags.locator('.tag.rare');
       const valueTag = tags.locator('.tag .value');
