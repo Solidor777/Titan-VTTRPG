@@ -45,6 +45,14 @@
 
    /** @type {boolean} Effects panel visibility (single character only). */
    const effectsPanelVisible = $derived(single && elementVisible('effectsPanel'));
+
+   /** @type {string} The action menu's minimize-chip corner, kept on the stable (non-expanding) side. */
+   const actionMenuChipCorner = $derived.by(() => {
+      if (options.actionMenu.layout === 'vertical') {
+         return options.actionMenu.directions.vertical.subOptions === 'left' ? 'bottom-right' : 'bottom-left';
+      }
+      return options.actionMenu.directions.horizontal.subOptions === 'up' ? 'bottom-right' : 'top-right';
+   });
 </script>
 
 {#if portraitVisible}
@@ -63,6 +71,7 @@
       elementKey="actionMenu"
       {layoutState}
       minimizeIcon="fas fa-bars"
+      chipCorner={actionMenuChipCorner}
       testId="player-hud-action-menu"
    >
       <ActionMenuElement

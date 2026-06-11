@@ -67,12 +67,41 @@
    }
 </script>
 
-<div class="flyout">
+<div
+   class="sub-options"
+   data-testid="player-hud-flyout"
+   use:wheelScroll
+>
+   {#each visible as sub (sub.key)}
+      <ActionMenuSubOption
+         {sub}
+         categoryKey={category.key}
+         {onAction}
+         onreveal={reveal}
+      />
+   {/each}
+
+   <!--Scroll fades mark hidden entries above/below the window without affecting layout.-->
+   {#if windowStart > 0}
+      <span
+         class="overflow top"
+         data-testid="player-hud-flyout-up"
+      ></span>
+   {/if}
+   {#if windowStart < maxStart}
+      <span
+         class="overflow bottom"
+         data-testid="player-hud-flyout-down"
+      ></span>
+   {/if}
+
+   <!--The sub-button lane overlays beside the column so revealing it never reflows the menu.-->
    {#if hovered && hovered.subButtons.length > 0}
       <div
          class="sub-buttons-lane"
-         style:order={subButtonsSide === 'before' ? 0 : 2}
-         style:margin-top={`${hoveredOffset}px`}
+         class:before={subButtonsSide === 'before'}
+         class:after={subButtonsSide === 'after'}
+         style:top={`${hoveredOffset}px`}
       >
          <ActionMenuSubButtons
             subOption={hovered}
@@ -80,63 +109,43 @@
          />
       </div>
    {/if}
-   <div
-      class="sub-options"
-      style:order={1}
-      data-testid="player-hud-flyout"
-      use:wheelScroll
-   >
-      {#if windowStart > 0}
-         <div
-            class="scroll-indicator"
-            data-testid="player-hud-flyout-up"
-         >
-            <i class="fas fa-chevron-up"></i>
-         </div>
-      {/if}
-      {#each visible as sub (sub.key)}
-         <ActionMenuSubOption
-            {sub}
-            categoryKey={category.key}
-            {onAction}
-            onreveal={reveal}
-         />
-      {/each}
-      {#if windowStart < maxStart}
-         <div
-            class="scroll-indicator"
-            data-testid="player-hud-flyout-down"
-         >
-            <i class="fas fa-chevron-down"></i>
-         </div>
-      {/if}
-   </div>
 </div>
 
 <style lang="scss">
-   .flyout {
-      @include flex-row;
+   .sub-options {
+      @include flex-column;
       @include flex-group-top;
 
-      gap: var(--titan-spacing-standard);
-      align-items: flex-start;
+      position: relative;
+      gap: 2px;
 
-      .sub-buttons-lane {
-         flex-shrink: 0;
+      .overflow {
+         position: absolute;
+         width: 100%;
+         height: 12px;
+         pointer-events: none;
+
+         &.top {
+            top: 0;
+            background: linear-gradient(to bottom, var(--titan-panel-1-background), transparent);
+         }
+
+         &.bottom {
+            bottom: 0;
+            background: linear-gradient(to top, var(--titan-panel-1-background), transparent);
+         }
       }
 
-      .sub-options {
-         @include flex-column;
-         @include flex-group-top;
+      .sub-buttons-lane {
+         position: absolute;
+         z-index: 1;
 
-         gap: 2px;
+         &.before {
+            right: calc(100% + var(--titan-spacing-standard));
+         }
 
-         .scroll-indicator {
-            @include font-size-small;
-
-            width: 100%;
-            text-align: center;
-            opacity: 0.6;
+         &.after {
+            left: calc(100% + var(--titan-spacing-standard));
          }
       }
    }

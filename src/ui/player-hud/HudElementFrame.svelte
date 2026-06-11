@@ -7,13 +7,22 @@
     * @property {string} elementKey - The layout key for this element.
     * @property {HudLayoutState} layoutState - Shared layout/UI state.
     * @property {string} minimizeIcon - Font Awesome classes for the minimized chip icon.
+    * @property {string} [chipCorner] - The minimize chip's corner: 'top-right' (the default), 'top-left', 'bottom-right', or 'bottom-left'.
     * @property {boolean} [resizable] - Whether edit mode offers a resize handle (effects panel).
     * @property {string} [testId] - Optional data-testid forwarded to the frame root.
     * @property {Snippet} children - The element content.
     */
 
    /** @type {HudElementFrameProps} */
-   const { elementKey, layoutState, minimizeIcon, resizable = false, testId, children } = $props();
+   const {
+      elementKey,
+      layoutState,
+      minimizeIcon,
+      chipCorner = 'top-right',
+      resizable = false,
+      testId,
+      children,
+   } = $props();
 
    /** @type {number} The frame's measured width. */
    let width = $state(0);
@@ -152,7 +161,7 @@
       </button>
    {:else}
       <button
-         class="minimize-chip"
+         class={`minimize-chip ${chipCorner}`}
          type="button"
          aria-label={localize('minimizeElement')}
          data-testid={testId ? `${testId}-minimize` : undefined}
@@ -185,20 +194,40 @@
       }
 
       .minimize-chip {
+         @include panel-2;
          @include font-size-small;
 
          position: absolute;
-         top: 0;
-         right: 0;
-         z-index: 1;
-         background: none;
+         z-index: 2;
+         padding: 1px 5px;
          border: none;
+         border-radius: var(--titan-border-radius);
          color: inherit;
          cursor: pointer;
-         opacity: 0.6;
+         opacity: 0.8;
 
          &:hover {
             opacity: 1;
+         }
+
+         &.top-right {
+            top: 0;
+            right: 0;
+         }
+
+         &.top-left {
+            top: 0;
+            left: 0;
+         }
+
+         &.bottom-right {
+            bottom: 0;
+            right: 0;
+         }
+
+         &.bottom-left {
+            bottom: 0;
+            left: 0;
          }
       }
 
