@@ -533,6 +533,20 @@ assertion** (assert-absence) that has no pollable positive edge — pair it with
 signal and document it inline (see `permissions-auto-open.spec.js`). Condition-polling
 `setInterval` canvas-readiness loops (`effect-tray.spec.js`) are NOT fixed sleeps and are fine.
 
+**`createEmbeddedDocuments` return order is NOT input order.** Never map the returned array by index
+to your payloads — resolve created ids by NAME afterward (`actor.items.getName(payload.name)?.id`),
+as the player-hud specs' `seedDocuments` helpers do. Index-mapping produced wrong-id assertions that
+only failed in multi-payload creates.
+
+**One-shot `boundingBox()` snapshots race layout settling.** Element sizes bound via
+`bind:clientWidth/Height` update through ResizeObserver a frame after remounts; geometry assertions
+must `expect.poll` re-reading boxes (see `expectBoxes` in `player-hud-action-menu-layout.spec.js`).
+
+**Foundry core Escape releases token control.** Any canvas-overlay UI that closes on Escape must
+consume the event in the WINDOW CAPTURE phase (`onkeydowncapture` + `stopImmediatePropagation`),
+or core deselects the token and selection-driven UI unmounts mid-interaction (the player HUD's
+cascade and effect popout both do this).
+
 **Mid-file `page.reload()` idiom** (first used in `tests/e2e/pack-conversion.spec.js`): `page.on('console')` and
 `attachPageErrors` listeners survive reloads (they attach to the Page object). Sequence: (1) PROVE the first
 boot's converter/async ready-work finished via a positive console-line poll BEFORE clearing the capture buffer
