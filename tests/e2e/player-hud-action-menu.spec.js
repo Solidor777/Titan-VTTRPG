@@ -449,6 +449,12 @@ test('a disabled sub-button gate removes that sub-button from the flyout', async
       system: { equipped: true },
    }] });
 
+   // A prior test can leave the weapons cascade open (the open category persists in layout state);
+   // dismiss it first so clicking weapons OPENS the cascade rather than toggling it closed.
+   if (await page.locator('[data-testid="player-hud-flyout"]').count() > 0) {
+      await page.keyboard.press('Escape');
+      await expect(page.locator('[data-testid="player-hud-flyout"]')).toHaveCount(0);
+   }
    await page.locator('[data-testid="player-hud-category-weapons"]').click();
    const subOption = page.locator(`[data-testid="player-hud-sub-option-weapons-${itemIds[0]}"]`);
    await subOption.hover();
