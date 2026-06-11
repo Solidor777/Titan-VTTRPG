@@ -5,6 +5,9 @@
    import EmbeddedDocumentProvider from '~/document/reactive/EmbeddedDocumentProvider.svelte';
    import CharacterSheetEffect
       from '~/document/types/actor/types/character/sheet/items/effect/CharacterSheetEffect.svelte';
+   import DragHandle from '~/helpers/svelte-components/drag-reorder/DragHandle.svelte';
+   import InsertionLine from '~/helpers/svelte-components/drag-reorder/InsertionLine.svelte';
+   import { draggableRow, reorderDropZone } from '~/helpers/svelte-components/drag-reorder/DragReorderActions.js';
 
    /**
     * @typedef {object} CharacterSheetEffectListProps
@@ -20,11 +23,11 @@
    /** @type {object} Reference to the Application State store. */
    const appState = getContext('applicationState');
 
-   // Currently drag hovered state.
-   /** @type {boolean} Whether a drag is currently in progress. */
-   let isDragHovering = $state(false);
-   /** @type {string} The ID of the effect currently being drag-hovered. */
-   let hoveredEffectId = $state('');
+   /** @type {number | null} The live insertion index for the drop line, or null when idle. */
+   let dropIndex = $state(null);
+
+   /** @type {string} Identity of this actor's effect list, distinguishing a reorder from a foreign drop. */
+   const sourceKey = $derived(`${document.data.uuid}:effect`);
 
    // Sort and filter the actor's effect Active Effects.
    /** @type {TitanActiveEffect[]} The filtered and sorted list of effects to display. */
@@ -37,74 +40,83 @@
       }).sort((a, b) => sortAscending(a.sort, b.sort)),
    );
 
-   // Drag effect start.
    /**
-    * Begins dragging an effect, populating the drag data via the effect's native toDragData payload.
-    * @param {DragEvent} event - The native dragstart event whose data transfer receives the payload.
-    * @param {string} id - The ID of the effect being dragged.
+    * Commits an effect reorder by integer-sorting the source relative to the effect at the insertion
+    * point, so only the moved effect's sort changes.
+    * @param {number} fromIdx - The dragged effect's index in the filtered/sorted list.
+    * @param {number} toIdx - The insertion point in the filtered/sorted list.
+    * @returns {Promise<void>}
     */
-   function onDragStart(event, id) {
-      /** @type {TitanActiveEffect | undefined} - The effect being dragged. */
-      const effect = document.data.effects.get(id);
-
-      /** @type {object | undefined} - The drag data payload for the effect. */
-      const dragData = effect?.toDragData();
-
-      if (!dragData) {
+   async function reorderEffect(fromIdx, toIdx) {
+      /** @type {object | undefined} The effect being moved. */
+      const source = effects[fromIdx];
+      if (!source || toIdx === fromIdx || toIdx === fromIdx + 1) {
          return;
       }
 
-      hoveredEffectId = id;
-      isDragHovering = true;
+      /** @type {object[]} The other visible effects, the sort frame for this move. */
+      const siblings = effects.filter((effect) => effect._id !== source._id);
 
-      event.dataTransfer.setData('text/plain', JSON.stringify(dragData));
-   }
+      /** @type {object | undefined} The neighbor the moved effect anchors against. */
+      const target = toIdx >= effects.length ? effects[effects.length - 1] : effects[toIdx];
 
-   // Drag effect hovered.
-   /**
-    * Tracks the effect currently hovered during a drag.
-    * @param {string} id - The ID of the effect being hovered over.
-    */
-   function onDragEnter(id) {
-      if (isDragHovering) {
-         hoveredEffectId = id;
+      /** @type {boolean} Place before the target when dropping above it; after when appending. */
+      const sortBefore = toIdx < effects.length;
+      if (!target || target._id === source._id) {
+         return;
       }
-   }
 
-   /**
-    * Handles the end of an effect drag event, resetting drag state.
-    */
-   function onDragEnd() {
-      hoveredEffectId = '';
-      isDragHovering = false;
+      /** @type {object[]} The minimal sort updates produced by the integer-sort helper. */
+      const updates = foundry.utils.performIntegerSort(source, { target, siblings, sortBefore });
+      await document.data.updateEmbeddedDocuments(
+         'ActiveEffect',
+         updates.map((entry) => {
+            return { ...entry.update, _id: entry.target._id };
+         }),
+      );
    }
 </script>
 
 <!--Effect List-->
 {#if effects.length > 0}
-   <ol transition:slide|local>
+   <ol
+      transition:slide|local
+      use:reorderDropZone={{
+         kind: 'effect',
+         sourceKey,
+         rowSelector: 'li.reorder-row',
+         onIndicator: (index) => { dropIndex = index; },
+         onReorder: (from, to) => { reorderEffect(from, to); },
+         onForeignDrop: () => {},
+      }}
+   >
       <!--Each Effect-->
-      {#each effects as effect (effect.id)}
+      {#each effects as effect, idx (effect.id)}
+         {#if dropIndex === idx}
+            <InsertionLine/>
+         {/if}
          <li
-            class="effect{hoveredEffectId === effect.id ? ' drag-hovered' : ''}"
+            class="effect reorder-row"
             data-effect-id={effect.id}
-            draggable={true}
-            ondragstart={(event) => {
-               onDragStart(event, effect.id);
-            }}
-            ondragenter={() => {
-               onDragEnter(effect.id);
-            }}
-            ondragend={() => {
-               onDragEnd();
-            }}
             transition:slide|local
+            use:draggableRow={{
+               kind: 'effect',
+               sourceKey,
+               index: idx,
+               getDataTransfer: () => JSON.stringify(document.data.effects.get(effect.id).toDragData()),
+            }}
          >
-            <EmbeddedDocumentProvider doc={effect}>
-               <CharacterSheetEffect bind:isExpanded={$appState.tabs.effects.isExpanded[effect.id]}/>
-            </EmbeddedDocumentProvider>
+            <DragHandle/>
+            <div class="row-content">
+               <EmbeddedDocumentProvider doc={effect}>
+                  <CharacterSheetEffect bind:isExpanded={$appState.tabs.effects.isExpanded[effect.id]}/>
+               </EmbeddedDocumentProvider>
+            </div>
          </li>
       {/each}
+      {#if dropIndex === effects.length}
+         <InsertionLine/>
+      {/if}
    </ol>
 {/if}
 
@@ -119,12 +131,13 @@
 
       li {
          @include flex-row;
-         @include flex-space-between;
+         @include flex-group-center;
 
          width: 100%;
 
-         &.drag-hovered {
-            background: var(--titan-highlighted-background);
+         .row-content {
+            flex: 1;
+            min-width: 0;
          }
 
          &:not(:first-child) {
