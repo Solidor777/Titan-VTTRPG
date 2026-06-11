@@ -3,6 +3,7 @@ import ReactiveDocument from '~/document/reactive/ReactiveDocument.svelte.js';
 import ChatMessageContent from '~/document/types/chat-message/ChatMessageContent.svelte';
 import TitanChatMessageDataModel from '~/document/types/chat-message/ChatMessageDataModel.js';
 import themeCoreMessages from '~/helpers/Settings/ThemeCoreMessages.js';
+import localize from '~/helpers/utility-functions/Localize.js';
 import {
    registerMount,
    sweepStaleMounts,
@@ -37,6 +38,7 @@ export default class TitanChatMessage extends ChatMessage {
       if (!(this.system instanceof TitanChatMessageDataModel)) {
          if (themeCoreMessages()) {
             html.classList.add('titan-core-themed');
+            applyVisibilityClass(html, this);
          }
          return html;
       }
@@ -46,6 +48,8 @@ export default class TitanChatMessage extends ChatMessage {
       if (this.isOwner) {
          html.classList.add('owner');
       }
+      applyVisibilityClass(html, this);
+      insertVisibilityBadge(html, this);
 
       // Mount the subtype's Svelte component into the card content region and track it per element.
       // The ReactiveDocument bridge needs no explicit teardown: its createSubscriber hooks self-clean
@@ -65,5 +69,44 @@ export default class TitanChatMessage extends ChatMessage {
       requestAnimationFrame(() => sweepStaleMounts());
 
       return html;
+   }
+}
+
+/**
+ * Adds the visibility tint class for non-public messages.
+ * @param {HTMLElement} html - The rendered chat-message element.
+ * @param {TitanChatMessage} message - The message being rendered.
+ */
+function applyVisibilityClass(html, message) {
+   if (message.blind) {
+      html.classList.add('titan-gm-only');
+   }
+   else if (message.whisper.length > 0) {
+      html.classList.add('titan-secret');
+   }
+}
+
+/**
+ * Inserts the centered visibility badge into the card header for non-public messages.
+ * @param {HTMLElement} html - The rendered chat-message element.
+ * @param {TitanChatMessage} message - The message being rendered.
+ */
+function insertVisibilityBadge(html, message) {
+   // Public messages carry no badge.
+   if (!message.blind && message.whisper.length === 0) {
+      return;
+   }
+
+   // The badge element, labeled by visibility and slotted before the header metadata.
+   const badge = document.createElement('span');
+   badge.classList.add('titan-visibility-badge');
+   badge.textContent = localize(message.blind ? 'gmOnlyMessage' : 'secretMessage');
+   const header = html.querySelector('.message-header');
+   const metadata = header?.querySelector('.message-metadata');
+   if (metadata) {
+      metadata.before(badge);
+   }
+   else {
+      header?.append(badge);
    }
 }

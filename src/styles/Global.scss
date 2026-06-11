@@ -39,14 +39,38 @@
    }
 
    &.chat-message {
-      background: var(--titan-chat-message-background);
+      background: var(--titan-chat-public-background);
 
-      &.whisper {
-         background: var(--titan-chat-message-whisper-background);
+      .message-header {
+         background: var(--titan-chat-public-header-background);
+         border-radius: var(--titan-border-radius) var(--titan-border-radius) 0 0;
+         padding: var(--titan-spacing-standard);
       }
 
-      &.blind {
-         background: var(--titan-chat-message-blind-background);
+      &.titan-secret {
+         background: var(--titan-chat-secret-background);
+
+         .message-header {
+            background: var(--titan-chat-secret-header-background);
+         }
+
+         .titan-visibility-badge {
+            background: var(--titan-chat-secret-badge-background);
+            color: var(--titan-chat-secret-badge-font-color);
+         }
+      }
+
+      &.titan-gm-only {
+         background: var(--titan-chat-gm-background);
+
+         .message-header {
+            background: var(--titan-chat-gm-header-background);
+         }
+
+         .titan-visibility-badge {
+            background: var(--titan-chat-gm-badge-background);
+            color: var(--titan-chat-gm-badge-font-color);
+         }
       }
    }
 
@@ -57,4 +81,33 @@
    .dark-svg {
       filter: brightness(0);
    }
+}
+
+// Non-TITAN chat messages opted into the TITAN chat surface (no badge; core metadata keeps its layout).
+.titan-core-themed.chat-message {
+   background: var(--titan-chat-public-background);
+   color: var(--titan-app-font-color);
+
+   &.whisper {
+      background: var(--titan-chat-secret-background);
+   }
+
+   &.blind {
+      background: var(--titan-chat-gm-background);
+   }
+}
+
+// The visibility badge: centered between the speaker and the metadata, sized to stay readable.
+.titan-visibility-badge {
+   align-self: center;
+   border-radius: var(--titan-tag-border-radius);
+   font-family: var(--titan-font-family-normal), sans-serif;
+   font-size: 13px;
+   font-weight: bold;
+   letter-spacing: 0.06em;
+   line-height: 1;
+   margin-inline: auto var(--titan-spacing-large);
+   padding: 4px 9px;
+   text-transform: uppercase;
+   white-space: nowrap;
 }
