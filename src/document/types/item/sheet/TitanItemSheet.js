@@ -116,4 +116,21 @@ export default class TitanItemSheet extends TitanDocumentSheet {
    preDeleteCheck(idx) {
       this.applicationState.preDeleteCheck(idx);
    }
+
+   /**
+    * Called after an Item Check is reordered, to keep per-check expansion state aligned.
+    * @param {number} fromIdx - The check's previous index.
+    * @param {number} toIdx - The insertion point it moved before.
+    */
+   postMoveCheck(fromIdx, toIdx) {
+      this.applicationState.postMoveCheck(fromIdx, toIdx);
+   }
+
+   /**
+    * Called after a copied Item Check is inserted, to seed its expansion state.
+    * @param {number} atIdx - The insertion point.
+    */
+   postInsertCheck(atIdx) {
+      this.applicationState.postInsertCheck(atIdx);
+   }
 }

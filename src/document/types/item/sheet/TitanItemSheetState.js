@@ -1,5 +1,6 @@
 import { writable } from 'svelte/store';
 import createTitanItemSheetData from '~/document/types/item/sheet/TitanItemSheetData.js';
+import moveArrayEntry from '~/helpers/utility-functions/MoveArrayEntry.js';
 
 /**
  * @typedef {import('svelte/store').Writable<TitanItemSheetData>} ItemSheetState A custom reactive store for managing
@@ -12,6 +13,10 @@ import createTitanItemSheetData from '~/document/types/item/sheet/TitanItemSheet
  * @property {() => void} postAddCheck - Updates the reactive state store in response to an Item Check being added.
  * @property {(idx: number) => void} preDeleteCheck - Updates the reactive state store in response to an Item Check
  * being deleted.
+ * @property {(fromIdx: number, toIdx: number) => void} postMoveCheck - Reorders the per-check expansion arrays in
+ * lockstep with an Item Check reorder.
+ * @property {(atIdx: number) => void} postInsertCheck - Splices an expanded flag into the per-check expansion arrays
+ * when a copied Item Check is inserted.
  */
 
 /**
@@ -47,11 +52,40 @@ export default function createTitanItemSheetState(item, overrideData) {
       });
    }
 
+   /**
+    * Reorders the per-check expansion arrays in lockstep with a check reorder so expansion state
+    * tracks the moved row.
+    * @param {number} fromIdx - The check's current index.
+    * @param {number} toIdx - The insertion point to move it before.
+    */
+   function postMoveCheck(fromIdx, toIdx) {
+      update((data) => {
+         data.tabs.checks.isExpanded = moveArrayEntry(data.tabs.checks.isExpanded, fromIdx, toIdx);
+         data.sidebar.checks.isExpanded = moveArrayEntry(data.sidebar.checks.isExpanded, fromIdx, toIdx);
+         return data;
+      });
+   }
+
+   /**
+    * Splices a fresh expanded flag into both per-check expansion arrays when a copied check is
+    * inserted, keeping them aligned with the check array.
+    * @param {number} atIdx - The insertion point.
+    */
+   function postInsertCheck(atIdx) {
+      update((data) => {
+         data.tabs.checks.isExpanded.splice(atIdx, 0, true);
+         data.sidebar.checks.isExpanded.splice(atIdx, 0, true);
+         return data;
+      });
+   }
+
    return {
       set,
       update,
       subscribe,
       postAddCheck,
       preDeleteCheck,
+      postMoveCheck,
+      postInsertCheck,
    };
 }
