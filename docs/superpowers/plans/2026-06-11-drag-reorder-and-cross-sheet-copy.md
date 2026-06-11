@@ -10,6 +10,12 @@
 
 **Spec:** `docs/superpowers/specs/2026-06-11-drag-reorder-and-cross-sheet-copy-design.md`
 
+## Buddy-check directives
+
+A pre-build buddy-check was offered (risks: cross-document copy/insert mutation, native-drop vs
+Foundry `DragDrop` coexistence) and **declined** by the user. Proceed without one; the verify-live
+points listed in the self-review notes cover the main risks.
+
 ---
 
 ## File map
