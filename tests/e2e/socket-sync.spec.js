@@ -215,8 +215,15 @@ test.describe('socket sync — replicated turn-effect state', () => {
                ids.effectActorId,
             );
 
-            // GM 2 (NOT the best owner) advances the turn.
-            await gm2.evaluate((combatId) => game.combats.get(combatId).nextTurn(), ids.combatId);
+            // GM 2 (NOT the best owner) advances the turn — after the combat created on GM 1's
+            // client has replicated over the socket (the create ack does not cover other clients).
+            await gm2.evaluate(async (combatId) => {
+               await titanWait(
+                  () => !!game.combats.get(combatId),
+                  { message: 'the seeded combat replicates to GM 2', timeout: 15000 },
+               );
+               await game.combats.get(combatId).nextTurn();
+            }, ids.combatId);
 
             // The effect is applied exactly once (before - 1), observed on GM 2's client (replicated).
             await gm2.waitForFunction(
