@@ -23,12 +23,11 @@
             value={document.data.system.resource[resource].value}
          />
          <span class="value">
-            <span class="input-box">
-               <DocumentIntegerInput
-                  bind:value={document.data.system.resource[resource].value}
-                  testId={`player-hud-bar-${resource}-input`}
-               />
-            </span>
+            <DocumentIntegerInput
+               bind:value={document.data.system.resource[resource].value}
+               maxDigits={3}
+               testId={`player-hud-bar-${resource}-input`}
+            />
             <span class="max">{document.data.system.resource[resource].max}</span>
          </span>
       </div>
@@ -63,7 +62,7 @@
          }
 
          .label {
-            width: 56px;
+            width: 48px;
             overflow: hidden;
             text-align: left;
             text-overflow: ellipsis;
@@ -77,16 +76,10 @@
             flex-shrink: 0;
             gap: 2px;
 
-            .input-box {
-               // The inner input fills its container; this floor keeps two digits readable.
-               display: inline-block;
-               min-width: 2.5em;
-            }
-
             .max {
                @include panel-3;
 
-               min-width: 2.5em;
+               min-width: 2em;
                padding: 1px 4px;
                text-align: center;
                border-radius: var(--titan-border-radius);
