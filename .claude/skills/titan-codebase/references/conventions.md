@@ -547,6 +547,12 @@ consume the event in the WINDOW CAPTURE phase (`onkeydowncapture` + `stopImmedia
 or core deselects the token and selection-driven UI unmounts mid-interaction (the player HUD's
 cascade and effect popout both do this).
 
+**The action menu's open category persists across e2e tests.** `openCategory` lives in the shared
+layout state and `afterEach` only closes apps, so a cascade left open by one test survives into the
+next. A test that clicks the SAME category the previous test left open TOGGLES it closed; dismiss any
+open flyout first (`Escape` when `player-hud-flyout` is present), as the `openCategory` helper in
+`player-hud-action-menu-layout.spec.js` does.
+
 **Mid-file `page.reload()` idiom** (first used in `tests/e2e/pack-conversion.spec.js`): `page.on('console')` and
 `attachPageErrors` listeners survive reloads (they attach to the Page object). Sequence: (1) PROVE the first
 boot's converter/async ready-work finished via a positive console-line poll BEFORE clearing the capture buffer
