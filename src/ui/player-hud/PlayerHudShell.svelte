@@ -29,7 +29,7 @@
     * @returns {boolean} Whether the element should render.
     */
    function elementVisible(elementKey) {
-      /** @type {object} The element's options. */
+      /** @type {object} The enable and combat-only settings for this element. */
       const elementOptions = options[elementKey];
       return elementOptions.enabled && (!elementOptions.combatOnly || layoutState.combatActive);
    }
