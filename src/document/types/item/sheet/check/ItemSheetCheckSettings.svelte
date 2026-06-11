@@ -289,8 +289,9 @@
       @include flex-column;
       @include flex-group-top;
 
+      // Top margin so the first check clears the filter bar, matching the attacks tab.
       width: 100%;
-      margin-bottom: var(--titan-spacing-large);
+      margin-top: var(--titan-spacing-large);
 
       .header {
          @include flex-row;
