@@ -8,12 +8,20 @@
    import SpellSheetCustomAspectSettings
       from '~/document/types/item/types/spell/sheet/SpellSheetCustomAspectSettings.svelte';
    import { CREATE_ICON } from '~/system/Icons.js';
+   import InsertionLine from '~/helpers/svelte-components/drag-reorder/InsertionLine.svelte';
+   import { draggableRow, reorderDropZone } from '~/helpers/svelte-components/drag-reorder/DragReorderActions.js';
 
    /** @type {object} Reference to the reactive Document store. */
    const document = getContext('document');
 
    /** @type {object} Reference to the Application State store. */
    const appState = getContext('applicationState');
+
+   /** @type {number | null} The live insertion index for the drop line, or null when idle. */
+   let dropIndex = $state(null);
+
+   /** @type {string} Identity of this list, distinguishing a reorder from a foreign-sheet copy. */
+   const sourceKey = $derived(`${document.data.uuid}:customAspect`);
 
    // Indices of custom aspects matching the filter, recomputed on document/filter change.
    /** @type {*[]} */
@@ -47,13 +55,44 @@
       <div class="scrolling-content">
          <!--Aspects List-->
          {#if document.data.system.customAspect.length > 0}
-            <ol out:slide|local>
+            <ol
+               out:slide|local
+               use:reorderDropZone={{
+                  kind: 'customAspect',
+                  sourceKey,
+                  rowSelector: 'li.reorder-row',
+                  onIndicator: (index) => { dropIndex = index; },
+                  onReorder: (from, to) => { document.data.system.moveCustomAspect(from, to); },
+                  onForeignDrop: (payload, at) => { document.data.system.insertCustomAspect(payload.element, at); },
+               }}
+            >
                <!--Each Aspect-->
                {#each filteredEntries as idx (document.data.system.customAspect[idx].uuid)}
-                  <li out:slide|local>
+                  {#if dropIndex === idx}
+                     <InsertionLine/>
+                  {/if}
+                  <li
+                     class="reorder-row"
+                     out:slide|local
+                     use:draggableRow={{
+                        kind: 'customAspect',
+                        sourceKey,
+                        index: idx,
+                        getDataTransfer: () => JSON.stringify({
+                           titanElementDrag: true,
+                           kind: 'customAspect',
+                           sourceDocUuid: document.data.uuid,
+                           sourceIdx: idx,
+                           element: document.data.system.customAspect[idx],
+                        }),
+                     }}
+                  >
                      <SpellSheetCustomAspectSettings {idx}/>
                   </li>
                {/each}
+               {#if dropIndex === document.data.system.customAspect.length}
+                  <InsertionLine/>
+               {/if}
             </ol>
          {/if}
 

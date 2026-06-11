@@ -7,6 +7,7 @@
    import DocumentTextInput from '~/document/svelte-components/input/DocumentTextInput.svelte';
    import IconButton from '~/helpers/svelte-components/button/IconButton.svelte';
    import DocumentIntegerInput from '~/document/svelte-components/input/DocumentIntegerInput.svelte';
+   import DragHandle from '~/helpers/svelte-components/drag-reorder/DragHandle.svelte';
    import {
       COLLAPSED_ICON,
       DAMAGE_ICON,
@@ -40,6 +41,9 @@
    <div class="aspect" transition:slide|local>
       <!--Header-->
       <div class="header">
+         <!--Drag handle-->
+         <DragHandle/>
+
          <!--Expand Toggle-->
          <div>
             {#if isExpanded}
