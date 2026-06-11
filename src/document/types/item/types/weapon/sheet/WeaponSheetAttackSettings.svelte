@@ -26,6 +26,7 @@
    import WeaponSheetAttackCustomTraitTag
       from '~/document/types/item/types/weapon/sheet/WeaponSheetAttackCustomTraitTag.svelte';
    import CondensedAttackCheckButton from '~/document/svelte-components/check/CondensedAttackCheckButton.svelte';
+   import DragHandle from '~/helpers/svelte-components/drag-reorder/DragHandle.svelte';
 
    /**
     * @typedef {object} WeaponSheetAttackSettingsProps
@@ -86,6 +87,9 @@
    <div class="attack" transition:slide|local>
       <!--Header-->
       <div class="header {attack.attribute}">
+         <!--Drag handle-->
+         <DragHandle/>
+
          <!--Expand Toggle-->
          <div>
             {#if isExpanded}
