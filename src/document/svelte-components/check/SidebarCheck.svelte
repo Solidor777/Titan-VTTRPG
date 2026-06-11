@@ -13,6 +13,7 @@
     * @property {number} [complexity] - The check's complexity, shown with the difficulty.
     * @property {boolean} [hasDetails] - Whether the check carries extra details behind the toggle.
     * @property {boolean} [expanded] - Whether the details panel is currently expanded.
+    * @property {import('svelte').Snippet} [rollButton] - Optional roll button rendered in place of the info line.
     * @property {import('svelte').Snippet} [children] - The details panel content.
     */
 
@@ -26,6 +27,7 @@
       complexity = undefined,
       hasDetails = false,
       expanded = $bindable(true),
+      rollButton = undefined,
       children,
    } = $props();
 </script>
@@ -39,13 +41,20 @@
          <div class="text">{label}</div>
       </div>
 
-      <!--Attribute, Skill, and DC row-->
-      <div class="info">
-         {localize(attribute)}{skill && skill !== 'none' ? ` (${localize(skill)})` : ''}
-         {#if difficulty !== undefined}
-            &nbsp;•&nbsp;{localize('dc')} {difficulty}:{complexity}
-         {/if}
-      </div>
+      {#if rollButton}
+         <!--Roll button replaces the static info line for a user who can roll this check.-->
+         <div class="roll">
+            {@render rollButton()}
+         </div>
+      {:else}
+         <!--Attribute, Skill, and DC row-->
+         <div class="info">
+            {localize(attribute)}{skill && skill !== 'none' ? ` (${localize(skill)})` : ''}
+            {#if difficulty !== undefined}
+               &nbsp;•&nbsp;{localize('dc')} {difficulty}:{complexity}
+            {/if}
+         </div>
+      {/if}
    </div>
 
    {#if hasDetails}
@@ -94,6 +103,13 @@
             @include flex-row;
             @include flex-group-center;
             @include font-size-small;
+         }
+
+         .roll {
+            @include flex-row;
+            @include flex-group-center;
+
+            width: 100%;
          }
       }
 
