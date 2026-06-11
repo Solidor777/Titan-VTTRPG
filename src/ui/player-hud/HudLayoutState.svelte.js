@@ -13,7 +13,7 @@ export default class HudLayoutState {
    positions = $state({});
 
    /** @type {{width: number, height: number}} The effects panel's user-set size. */
-   effectsPanelSize = $state({ width: 260, height: 320 });
+   effectsPanelSize = $state({ width: 300, height: 320 });
 
    /** @type {object} Per-element minimized flags, keyed by element key. */
    minimized = $state({});

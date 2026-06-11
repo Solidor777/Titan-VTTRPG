@@ -4,7 +4,6 @@
    import buildActionMenuModel from '~/ui/player-hud/elements/action-menu/BuildActionMenuModel.js';
    import HudAmountDialog from '~/ui/player-hud/elements/action-menu/HudAmountDialog.js';
    import ActionMenuFlyout from '~/ui/player-hud/elements/action-menu/ActionMenuFlyout.svelte';
-   import { resolveCascadeDirection } from '~/ui/player-hud/HudGeometry.js';
 
    /**
     * @typedef {object} ActionMenuElementProps
@@ -36,17 +35,8 @@
    /** @type {HTMLElement | undefined} The category bar, anchoring the cascade flip measurements. */
    let barEl = $state();
 
-   /** @type {DOMRect | null} The category bar's box, measured when the open category changes. */
-   let barBox = $state(null);
-
    /** @type {number} The active category button's offset along the bar (horizontal alignment). */
    let activeOffset = $state(0);
-
-   /** @type {number} The flyout lane's measured width. */
-   let flyoutWidth = $state(0);
-
-   /** @type {number} The flyout lane's measured height. */
-   let flyoutHeight = $state(0);
 
    /** @type {boolean} Whether the categories stack vertically. */
    const vertical = $derived(options.layout === 'vertical');
@@ -81,58 +71,33 @@
    /** @type {object | null} The open category's model entry. */
    const openCategory = $derived(model.find((entry) => entry.key === layoutState.openCategory) ?? null);
 
-   // Re-measure the bar whenever the cascade opens, the rect changes, or the flyout's measured
-   // size settles — the frame shifts as the flyout lays out, and a stale bar box would compute
-   // the cascade side from the pre-layout position.
+   // Re-measure the active button's offset whenever the open category changes, so the horizontal
+   // flyout lane aligns under it.
    $effect(() => {
       void layoutState.openCategory;
-      void layoutState.rect;
-      void flyoutWidth;
-      void flyoutHeight;
-      barBox = barEl?.getBoundingClientRect() ?? null;
       activeOffset = barEl?.querySelector('.active')?.offsetLeft ?? 0;
    });
 
-   /** @type {string} The sub-option lane side: 'before' (left/up) or 'after' (right/down). */
-   const subOptionsSide = $derived.by(() => {
-      /** @type {string} The configured preference mapped onto the lane axis. */
-      const preferred = vertical
+   /**
+    * @type {string} The sub-option lane side: 'before' (left/up) or 'after' (right/down). The
+    * configured direction is authoritative — the lane always opens toward the chosen side.
+    */
+   const subOptionsSide = $derived(
+      vertical
          ? (options.directions.vertical.subOptions === 'left' ? 'before' : 'after')
-         : (options.directions.horizontal.subOptions === 'up' ? 'before' : 'after');
-      if (!barBox) {
-         return preferred;
-      }
-      return vertical
-         ? resolveCascadeDirection({
-            preferred,
-            spaceBefore: barBox.left - layoutState.rect.left,
-            spaceAfter: layoutState.rect.left + layoutState.rect.width - barBox.right,
-            required: flyoutWidth,
-         })
-         : resolveCascadeDirection({
-            preferred,
-            spaceBefore: barBox.top - layoutState.rect.top,
-            spaceAfter: layoutState.rect.top + layoutState.rect.height - barBox.bottom,
-            required: flyoutHeight,
-         });
-   });
+         : (options.directions.horizontal.subOptions === 'up' ? 'before' : 'after'),
+   );
 
-   /** @type {string} The sub-button lane side within the flyout: 'before' (left) or 'after' (right). */
-   const subButtonsSide = $derived.by(() => {
-      /** @type {string} The configured preference mapped onto the horizontal lane axis. */
-      const preferred = (vertical
-         ? options.directions.vertical.subButtons
-         : options.directions.horizontal.subButtons) === 'left' ? 'before' : 'after';
-      if (!barBox) {
-         return preferred;
-      }
-      return resolveCascadeDirection({
-         preferred,
-         spaceBefore: barBox.left - layoutState.rect.left,
-         spaceAfter: layoutState.rect.left + layoutState.rect.width - barBox.right,
-         required: 140,
-      });
-   });
+   /**
+    * @type {string} The sub-button lane side within the flyout: 'before' (left) or 'after' (right).
+    * In a vertical layout the sub-buttons follow the sub-option direction; in a horizontal layout
+    * they use their own configured side. The configured direction is authoritative (no auto-flip).
+    */
+   const subButtonsSide = $derived(
+      vertical
+         ? subOptionsSide
+         : (options.directions.horizontal.subButtons === 'left' ? 'before' : 'after'),
+   );
 
    /**
     * Runs a clicked entry's action and closes the cascade unless the entry is an in-place toggle
@@ -195,12 +160,12 @@
             class="flyout-lane"
             style:order={subOptionsSide === 'before' ? 0 : 2}
             style:margin-left={!vertical && activeOffset > 0 ? `${activeOffset}px` : null}
-            bind:clientWidth={flyoutWidth}
-            bind:clientHeight={flyoutHeight}
          >
             <ActionMenuFlyout
                category={openCategory}
                windowSize={options.windowSize}
+               {vertical}
+               {subOptionsSide}
                {subButtonsSide}
                {onAction}
             />
@@ -251,6 +216,10 @@
 
          gap: 2px;
 
+         // Reserve a gutter so the minimize chip clears the buttons: in a horizontal layout the chip
+         // sits at the right; in a vertical layout it sits at the bottom (see actionMenuChipCorner).
+         padding-right: 22px;
+
          button {
             @include panel-2;
             @include font-size-small;
@@ -271,6 +240,9 @@
       &.vertical .categories {
          @include flex-column;
          @include flex-group-top;
+
+         padding-right: 0;
+         padding-bottom: 18px;
 
          button {
             width: 100%;

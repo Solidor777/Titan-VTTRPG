@@ -71,7 +71,7 @@ export function createDefaultHudLayout() {
    return {
       effectsPanelSize: {
          height: 320,
-         width: 260,
+         width: 300,
       },
       minimized: {
          actionMenu: false,
@@ -94,7 +94,7 @@ export function createDefaultHudLayout() {
          portrait: {
             anchorX: 'left',
             anchorY: 'bottom',
-            dx: 500,
+            dx: 250,
             dy: 16,
          },
       },

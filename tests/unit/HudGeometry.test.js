@@ -3,7 +3,6 @@ import {
    clampPoint,
    computeCanvasRect,
    deriveAnchors,
-   resolveCascadeDirection,
    resolvePosition,
 } from '~/ui/player-hud/HudGeometry.js';
 
@@ -49,22 +48,5 @@ describe('deriveAnchors', () => {
    it('anchors left/bottom when the element center sits in that quadrant', () => {
       const anchors = deriveAnchors({ x: 20, y: 700 }, { width: 100, height: 50 }, RECT);
       expect(anchors).toEqual({ anchorX: 'left', anchorY: 'bottom', dx: 20, dy: 50 });
-   });
-});
-
-describe('resolveCascadeDirection', () => {
-   it('keeps the preferred direction when it fits', () => {
-      expect(resolveCascadeDirection({ preferred: 'before', spaceBefore: 200, spaceAfter: 50, required: 150 }))
-         .toBe('before');
-   });
-
-   it('flips when the preferred side cannot fit but the other can', () => {
-      expect(resolveCascadeDirection({ preferred: 'before', spaceBefore: 100, spaceAfter: 300, required: 150 }))
-         .toBe('after');
-   });
-
-   it('keeps the preferred direction when neither side fits', () => {
-      expect(resolveCascadeDirection({ preferred: 'after', spaceBefore: 100, spaceAfter: 100, required: 150 }))
-         .toBe('after');
    });
 });

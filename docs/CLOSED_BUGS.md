@@ -226,3 +226,29 @@ when fixed.
   (spec `docs/superpowers/specs/2026-06-11-player-hud-design.md`) supersedes the Effect HUD
   wholesale; `src/ui/effect-hud/` is deleted and the new panel spaces rows with explicit
   between-row margins and panel padding.
+
+### 20. Player HUD post-ship defect batch (portrait offset, chip overlap, expand direction, effects row)
+
+- **What:** Six defects found in live use of the shipped Player HUD:
+  1. The default portrait docked ~2× too far from the left edge (`PlayerHudDefaults.js` portrait
+     `dx: 500`).
+  2. The action-menu minimize chip overlapped the category buttons — the chip corner was already
+     placed on the stable side, but `.categories` reserved no gutter for it.
+  3. The action-menu expand-direction setting appeared dead: `resolveCascadeDirection` silently
+     flipped the cascade away from the configured side whenever that side lacked room, and the
+     default corner placement always lacked room, so the configured direction was never honored.
+  4. In a vertical layout the sub-button direction was an independent (and confusing) control rather
+     than following the sub-option direction.
+  5. The portrait resource max rendered as a plain chip instead of the character sheet's
+     `ModifiableStatValueLabel` (mod breakdown + bonus/penalty colour).
+  6. Selecting an effect in the list-panel grew the row header (the expanded `.row` added padding
+     around the header), and the name/duration sat on one cramped line.
+- **Found:** 2026-06-11 by the user during live testing of the shipped Player HUD.
+- **Fixed:** 2026-06-11 on the `player-hud-bugfixes` branch
+  (spec `docs/superpowers/specs/2026-06-11-player-hud-bugfixes-design.md`): portrait `dx → 250`;
+  `.categories` reserves a chip gutter; the configured expand direction is now authoritative
+  (`resolveCascadeDirection` deleted) with vertical sub-buttons following the sub-option direction;
+  `PortraitBars` uses `ModifiableStatValueLabel`; the effects row keeps a fixed header (panel/padding
+  moved to a `.detail` wrapper) with the icon centred against a stacked name/duration column. Shipped
+  alongside friendlier setting labels ("Category Expansion"/"Category Button"), staggered slide-in
+  transitions for the sub-options, and a presence-first e2e for the sub-button gate.

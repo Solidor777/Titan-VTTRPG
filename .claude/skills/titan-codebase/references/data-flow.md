@@ -258,11 +258,14 @@ utility run for ALL resolved actors; weapons/inventory/abilities/spells/effects 
 omitted in group mode), applying the per-category gates, per-sub-button-type gates, and content filters from
 `playerHudOptions().actionMenu`. Empty categories are omitted. `ActionMenuElement` renders the bar and wires
 the four amount-prompt utilities to `HudAmountDialog` (`applyDamage`/`applyHealing`/`applyRend`/`applyRepairs`
-for every resolved actor); the cascade renders as in-flow flex lanes whose order flips through
-`resolveCascadeDirection` so lanes never overlap and flip away from screen edges. Sub-options window to
-`windowSize` entries with wheel scrolling (non-passive listener via a `use:` action) and gradient scroll fades;
-the hovered/focused sub-option's sub-buttons overlay in an absolutely-positioned lane beside the column
-(clamped to the column's bottom) so revealing them never reflows the menu. Main actions and roll/chat/sheet
+for every resolved actor); the cascade renders as in-flow flex lanes whose order follows the configured
+expand direction (authoritative — there is no auto-flip; off-screen placement is the user's responsibility),
+and in a vertical layout the sub-buttons follow the sub-option direction. `.categories` reserves a gutter on
+the chip's edge so the minimize chip never overlaps the buttons. Sub-options window to
+`windowSize` entries with wheel scrolling (non-passive listener via a `use:` action) and gradient scroll fades,
+sliding in with a staggered `fly` transition along the expand direction; the hovered/focused sub-option's
+sub-buttons overlay in an absolutely-positioned lane beside the column (clamped to the column's bottom) so
+revealing them never reflows the menu. Main actions and roll/chat/sheet
 sub-buttons close the cascade; equip/quantity/duration/remove keep it open. Escape closes the cascade in the
 window capture phase and CONSUMES the event — otherwise Foundry's core Escape releases token control and
 unmounts the whole HUD.

@@ -27,7 +27,7 @@
    class:expanded={isExpanded}
    data-testid="player-hud-effect-row"
 >
-   <!--Row header (click to expand)-->
+   <!--Row header (click to expand): icon centered against the stacked name/duration column-->
    <button
       class="row-header"
       type="button"
@@ -39,19 +39,23 @@
          src={document.data?.img}
          alt={document.data?.name}
       />
-      <span class="name">{document.data?.name}</span>
-      {#if isEffect && durationType !== 'permanent'}
-         <span class="duration">
-            <DurationTag
-               type={durationType}
-               remaining={durationRemaining}
-            />
-         </span>
-      {/if}
+      <span class="text">
+         <span class="name">{document.data?.name}</span>
+         {#if isEffect && durationType !== 'permanent'}
+            <span class="duration">
+               <DurationTag
+                  type={durationType}
+                  remaining={durationRemaining}
+               />
+            </span>
+         {/if}
+      </span>
    </button>
 
    {#if isExpanded}
-      <EffectsDetailBody/>
+      <div class="detail">
+         <EffectsDetailBody/>
+      </div>
    {/if}
 </div>
 
@@ -66,16 +70,9 @@
          @include margin-top-standard;
       }
 
-      &.expanded {
-         @include panel-2;
-         @include padding-standard;
-
-         border-radius: var(--titan-border-radius);
-      }
-
       .row-header {
          @include flex-row;
-         @include flex-group-center;
+         @include flex-group-left;
 
          width: 100%;
          background: none;
@@ -84,17 +81,32 @@
          color: inherit;
 
          .icon {
+            flex-shrink: 0;
             width: 30px;
             height: 30px;
             object-fit: contain;
          }
 
-         .name {
+         .text {
+            @include flex-column;
+            @include flex-group-top-left;
             @include margin-left-standard;
 
             flex: 1;
-            text-align: left;
+            min-width: 0;
+            gap: 2px;
          }
+      }
+
+      // The expanded detail carries the panel background and padding so the header geometry is
+      // identical whether the row is collapsed or expanded.
+      .detail {
+         @include panel-2;
+         @include padding-standard;
+         @include margin-top-standard;
+
+         width: 100%;
+         border-radius: var(--titan-border-radius);
       }
    }
 </style>

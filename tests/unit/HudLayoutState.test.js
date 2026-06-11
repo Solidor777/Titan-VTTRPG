@@ -15,7 +15,7 @@ describe('HudLayoutState', () => {
    it('loads positions, size, and minimized flags from the layout', () => {
       const { state } = build();
       expect(state.positions.portrait.anchorX).toBe('left');
-      expect(state.effectsPanelSize.width).toBe(260);
+      expect(state.effectsPanelSize.width).toBe(300);
       expect(state.minimized.actionMenu).toBe(false);
    });
 

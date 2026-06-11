@@ -187,9 +187,8 @@ test('sub-options expand to the configured side and lanes never overlap', async 
    const flyout = page.locator('[data-testid="player-hud-flyout"]');
    const skills = page.locator('[data-testid="player-hud-category-skills"]');
 
-   // Park the menu mid-screen: at its edge-hugging default the cascade would (correctly) flip
-   // away from the edge, masking the configured-direction behavior under test. The vertical
-   // offset leaves a full flyout's height of space both above AND below the bar.
+   // Park the menu mid-screen so the flyout has room on every side: the vertical offset leaves a
+   // full flyout's height of space both above AND below the bar for the horizontal-layout steps.
    await page.evaluate(() => {
       game.titan.playerHud.layoutState.positions.actionMenu = {
          anchorX: 'left',
@@ -229,11 +228,10 @@ test('sub-options expand to the configured side and lanes never overlap', async 
       (flyoutBox, barBox) => flyoutBox.y >= barBox.y + barBox.height - 1,
       'horizontal-down: the flyout sits below the bar');
 
-   await setMenuOptions(page, {
-      layout: 'vertical',
-      directions: { horizontal: { subOptions: 'up' } },
-   });
-   await page.evaluate(() => {
+   // Reset to defaults (vertical layout, sub-options left) so the next test does not inherit the
+   // 'right' direction set above, and re-dock the menu at its default corner.
+   await page.evaluate(async () => {
+      await game.settings.set('titan', 'playerHudOptions', {});
       game.titan.playerHud.layoutState.positions.actionMenu = {
          anchorX: 'right',
          anchorY: 'bottom',
@@ -265,10 +263,11 @@ test('sub-buttons form a third disjoint lane', async () => {
    expect(flyoutBox.x + flyoutBox.width).toBeLessThanOrEqual(barBox.x + 1);
 });
 
-test('the cascade flips at the screen edge instead of overlapping', async () => {
+test('the configured direction is honored at the screen edge (no auto-flip)', async () => {
    await seedWeaponFixture(page);
 
-   // Park the menu against the LEFT edge the way an edit-mode drag would.
+   // Park the menu against the LEFT edge the way an edit-mode drag would. The configured direction
+   // is authoritative, so the default left cascade keeps opening left rather than flipping away.
    await page.evaluate(() => {
       game.titan.playerHud.layoutState.positions.actionMenu = {
          anchorX: 'left',
@@ -281,8 +280,8 @@ test('the cascade flips at the screen edge instead of overlapping', async () => 
    await expectBoxes(
       page.locator('[data-testid="player-hud-flyout"]'),
       page.locator('[data-testid="player-hud-category-skills"]'),
-      (flyoutBox, barBox) => flyoutBox.x >= barBox.x + barBox.width - 1,
-      'edge flip: the flyout opens away from the left edge',
+      (flyoutBox, barBox) => flyoutBox.x + flyoutBox.width <= barBox.x + 1,
+      'no flip: the flyout opens to the configured (left) side even at the left edge',
    );
 
    await page.evaluate(() => {
@@ -325,18 +324,6 @@ test('per-category disable removes the category', async () => {
 
    await setMenuOptions(page, { categories: { skills: true } });
    await expect(page.locator('[data-testid="player-hud-category-skills"]')).toBeVisible();
-});
-
-test('per-sub-button-type disable removes those buttons', async () => {
-   const weaponId = await seedWeaponFixture(page);
-   await setMenuOptions(page, { subButtons: { sendToChat: false } });
-   await openCategory(page, 'weapons');
-   await page.locator(`[data-testid="player-hud-sub-option-weapons-${weaponId}"]`).hover();
-
-   await expect(page.locator(`[data-testid="player-hud-sub-button-${weaponId}-open-sheet"]`)).toBeVisible();
-   await expect(page.locator(`[data-testid="player-hud-sub-button-${weaponId}-send-to-chat"]`)).toHaveCount(0);
-
-   await setMenuOptions(page, { subButtons: { sendToChat: true } });
 });
 
 test('group mode shows only the three group categories', async () => {

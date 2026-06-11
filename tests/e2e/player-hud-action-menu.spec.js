@@ -441,6 +441,39 @@ test('the weapons filter hides action-less weapons until disabled', async () => 
    });
 });
 
+test('a disabled sub-button gate removes that sub-button from the flyout', async () => {
+   const actorId = await seedControlledActor(page, { name: 'HUD Menu Player' });
+   const { itemIds } = await seedDocuments(page, actorId, { items: [{
+      name: 'HUD Gate Blade',
+      type: 'weapon',
+      system: { equipped: true },
+   }] });
+
+   await page.locator('[data-testid="player-hud-category-weapons"]').click();
+   const subOption = page.locator(`[data-testid="player-hud-sub-option-weapons-${itemIds[0]}"]`);
+   await subOption.hover();
+   // Presence: the send-to-chat sub-button shows under the default gates.
+   await expect(page.locator(`[data-testid="player-hud-sub-button-${itemIds[0]}-send-to-chat"]`)).toBeVisible();
+
+   await page.evaluate(async () => {
+      await game.settings.set('titan', 'playerHudOptions', {
+         actionMenu: { subButtons: { sendToChat: false } },
+      });
+   });
+
+   // The options change forces a remount, but the open category persists in the layout state, so
+   // re-hovering the same sub-option reveals its (now-gated) sub-buttons without re-opening.
+   await subOption.hover();
+   // The independently-gated open-sheet button proves the gated flyout re-rendered...
+   await expect(page.locator(`[data-testid="player-hud-sub-button-${itemIds[0]}-open-sheet"]`)).toBeVisible();
+   // ...and absence: the same send-to-chat sub-button is gone once its gate is disabled.
+   await expect(page.locator(`[data-testid="player-hud-sub-button-${itemIds[0]}-send-to-chat"]`)).toHaveCount(0);
+
+   await page.evaluate(async () => {
+      await game.settings.set('titan', 'playerHudOptions', {});
+   });
+});
+
 test('Escape and click-away close the cascade', async () => {
    await seedControlledActor(page, { name: 'HUD Menu Player' });
    await page.locator('[data-testid="player-hud-category-skills"]').click();

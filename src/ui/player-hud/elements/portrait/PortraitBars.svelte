@@ -1,7 +1,9 @@
 <script>
    import { getContext } from 'svelte';
+   import localize from '~/helpers/utility-functions/Localize.js';
    import tooltipAction from '~/helpers/svelte-actions/TooltipAction.js';
    import Meter from '~/helpers/svelte-components/Meter.svelte';
+   import ModifiableStatValueLabel from '~/helpers/svelte-components/label/ModifiableStatValueLabel.svelte';
    import DocumentIntegerInput from '~/document/svelte-components/input/DocumentIntegerInput.svelte';
    import { getIcon } from '~/system/Icons.js';
 
@@ -32,7 +34,15 @@
                maxDigits={2}
                testId={`player-hud-bar-${resource}-input`}
             />
-            <span class="max">{document.data.system.resource[resource].max}</span>
+            <ModifiableStatValueLabel
+               abilityMod={document.data.system.resource[resource].mod.ability}
+               baseTooltip={localize(`${resource}.maxValue`)}
+               baseValue={document.data.system.resource[resource].maxBase}
+               effectMod={document.data.system.resource[resource].mod.effect}
+               equipmentMod={document.data.system.resource[resource].mod.equipment}
+               staticMod={document.data.system.resource[resource].mod.static}
+               value={document.data.system.resource[resource].max}
+            />
          </span>
       </div>
    {/each}
@@ -76,16 +86,6 @@
 
             flex-shrink: 0;
             gap: 2px;
-
-            .max {
-               @include panel-3;
-
-               min-width: 2em;
-               padding: 1px 4px;
-               text-align: center;
-               border-radius: var(--titan-border-radius);
-               white-space: nowrap;
-            }
          }
       }
    }

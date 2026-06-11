@@ -77,27 +77,3 @@ export function deriveAnchors(point, size, rect) {
       dy: Math.max(0, anchorY === 'top' ? point.y - rect.top : rect.top + rect.height - point.y - size.height),
    };
 }
-
-/**
- * Picks the expansion side for a cascade level so levels never overlap: the preferred side wins
- * when it fits; otherwise flip when (and only when) the opposite side fits.
- * @param {object} params - Available space inputs.
- * @param {string} params.preferred - The configured side: 'before' (left/up) or 'after' (right/down).
- * @param {number} params.spaceBefore - Free pixels on the 'before' side.
- * @param {number} params.spaceAfter - Free pixels on the 'after' side.
- * @param {number} params.required - Pixels the level needs.
- * @returns {string} The side to expand toward: 'before' or 'after'.
- */
-export function resolveCascadeDirection({ preferred, spaceBefore, spaceAfter, required }) {
-   /** @type {number} Free pixels on the preferred side. */
-   const preferredSpace = preferred === 'before' ? spaceBefore : spaceAfter;
-
-   /** @type {number} Free pixels on the opposite side. */
-   const otherSpace = preferred === 'before' ? spaceAfter : spaceBefore;
-
-   if (preferredSpace >= required || otherSpace < required) {
-      return preferred;
-   }
-
-   return preferred === 'before' ? 'after' : 'before';
-}

@@ -203,22 +203,12 @@
          </select>
       </label>
       {#if options.actionMenu.layout === 'vertical'}
+         <!--Vertical sub-buttons follow the sub-option direction, so only one control is shown.-->
          <label>
             {localize('subOptionDirection')}
             <select
                bind:value={options.actionMenu.directions.vertical.subOptions}
                data-testid="player-hud-settings-menu-sub-options-direction"
-               onchange={save}
-            >
-               <option value="left">{localize('expandLeft')}</option>
-               <option value="right">{localize('expandRight')}</option>
-            </select>
-         </label>
-         <label>
-            {localize('subButtonDirection')}
-            <select
-               bind:value={options.actionMenu.directions.vertical.subButtons}
-               data-testid="player-hud-settings-menu-sub-buttons-direction"
                onchange={save}
             >
                <option value="left">{localize('expandLeft')}</option>

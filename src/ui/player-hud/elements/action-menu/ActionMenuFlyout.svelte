@@ -6,12 +6,34 @@
     * @typedef {object} ActionMenuFlyoutProps
     * @property {object} category - The open category whose sub-options are shown.
     * @property {number} windowSize - The maximum number of sub-options visible before scrolling.
+    * @property {boolean} vertical - Whether the menu uses a vertical layout (sub-options slide on the x axis).
+    * @property {string} subOptionsSide - The sub-option lane side: 'before' (left/up) or 'after' (right/down).
     * @property {string} subButtonsSide - The sub-button lane side: 'before' (left) or 'after' (right).
     * @property {Function} onAction - Receives ('main'|'sub', entry) for every click.
     */
 
    /** @type {ActionMenuFlyoutProps} */
-   const { category, windowSize, subButtonsSide, onAction } = $props();
+   const { category, windowSize, vertical, subOptionsSide, subButtonsSide, onAction } = $props();
+
+   /** @type {number} The slide-in offset, in pixels, for each sub-option's entrance. */
+   const FLY_DISTANCE = 12;
+
+   /** @type {number} The per-row entrance delay, in milliseconds, producing the staggered cascade. */
+   const FLY_STAGGER = 30;
+
+   /** @type {number} The entrance duration, in milliseconds. */
+   const FLY_DURATION = 150;
+
+   /**
+    * @type {object} The slide-in parameters (without delay), sliding the rows in along the expand
+    * direction: horizontally in a vertical layout, vertically in a horizontal one. A 'before' side
+    * starts the rows offset toward the category bar so they emerge from it.
+    */
+   const flyParams = $derived(
+      vertical
+         ? { x: subOptionsSide === 'before' ? FLY_DISTANCE : -FLY_DISTANCE, duration: FLY_DURATION }
+         : { y: subOptionsSide === 'before' ? FLY_DISTANCE : -FLY_DISTANCE, duration: FLY_DURATION },
+   );
 
    /** @type {number} The first visible sub-option index of the scroll window. */
    let windowStart = $state(0);
@@ -85,10 +107,11 @@
    bind:clientHeight={columnHeight}
    use:wheelScroll
 >
-   {#each visible as sub (sub.key)}
+   {#each visible as sub, i (sub.key)}
       <ActionMenuSubOption
          {sub}
          categoryKey={category.key}
+         flyIn={{ ...flyParams, delay: i * FLY_STAGGER }}
          {onAction}
          onreveal={reveal}
       />
