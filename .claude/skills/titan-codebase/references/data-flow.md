@@ -147,8 +147,9 @@ On first render (`options.isFirstRender`), `TitanDocumentSheet._replaceHTML` cal
 DocumentSheetShell, { target: content, props: { document: this.#bridge, applicationState, shell } })` and
 stores the handle. Subsequent ApplicationV2 renders do not re-mount the Svelte tree — reactivity is driven by the
 `ReactiveDocument` bridge, not the render cycle. `DocumentSheetShell` sets `document` (the bridge),
-`applicationState`, and `sheetDocument` (the same top-level bridge; see "Embedded-document contexts" below)
-into context, then renders the shell via `{#if shell}{@const Shell = shell}<Shell />{/if}`.
+`applicationState`, `sheetDocument` (the same top-level bridge; see "Embedded-document contexts" below), and
+`rollActor` (the check-rolling actor, or `undefined`) into context, then renders the shell via
+`{#if shell}{@const Shell = shell}<Shell />{/if}`.
 
 **4. Sheet body — e.g. `CharacterSheetBase.svelte`**
 Reads the bridge with `const document = getContext('document')`, gates rendering behind
@@ -194,8 +195,10 @@ bypassing the snapshot helper. See conventions.md, "Row two-way INPUTS to an emb
 ## Embedded-document contexts (two-context convention)
 
 **Two document context keys, one subscription.** `DocumentSheetShell.svelte` sets `'document'` (the sheet's
-`ReactiveDocument` bridge), `'applicationState'`, and `'sheetDocument'` (the SAME top-level bridge) at mount.
-`PlayerHudShell.svelte` does the same for the Player HUD (both keys; no `applicationState`).
+`ReactiveDocument` bridge), `'applicationState'`, `'sheetDocument'` (the SAME top-level bridge), and
+`'rollActor'` (the check-rolling actor bridge, or `undefined`) at mount.
+`PlayerHudShell.svelte` does the same for the Player HUD (both document keys; no `applicationState`, no
+`'rollActor'` — its action menu rolls through its own model, not the shared condensed buttons).
 `'document'` is always the *nearest* document and may be shadowed; `'sheetDocument'` always points at the
 owning sheet's top-level bridge and is never shadowed — the stable escape hatch for actor-coupled reads
 (derived stats, `requestAttackCheck`, check mods) inside an embedded subtree.

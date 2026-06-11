@@ -413,8 +413,8 @@ and one or more inner Svelte component trees.
   `DocumentSheetShell.svelte` via Svelte 5 `mount()`, passing `{ document: bridge, applicationState,
   shell }` as props. `_onClose` calls `unmount(handle, { outro: true })`.
 - `DocumentSheetShell.svelte` — receives `{ document, applicationState, shell }` as `$props()`, sets
-  `document` (the `ReactiveDocument` bridge), `applicationState`, and `sheetDocument` into Svelte context
-  (see conventions.md, "Context access convention"), and renders the type-specific shell via
+  `document` (the `ReactiveDocument` bridge), `applicationState`, `sheetDocument`, and `rollActor` into
+  Svelte context (see conventions.md, "Context access convention"), and renders the type-specific shell via
   `{#if shell}{@const Shell = shell}<Shell />{/if}` (not `<svelte:component>`).
 - `EmbeddedDocument` (`src/document/reactive/EmbeddedDocument.svelte.js`) — a delegating bridge over an
   embedded document: `new EmbeddedDocument(parent, collection, id)` resolves `.data` / `.doc` through the

@@ -252,3 +252,15 @@ when fixed.
   moved to a `.detail` wrapper) with the icon centred against a stacked name/duration column. Shipped
   alongside friendlier setting labels ("Category Expansion"/"Category Button"), staggered slide-in
   transitions for the sub-options, and a presence-first e2e for the sub-button gate.
+
+### 21. Stale player-HUD reset-all e2e expected the pre-#20 portrait offset
+
+- **What:** `player-hud-layout.spec.js` ("the settings app reset-all restores options and layout")
+  asserted the reset-all control restored the portrait offset to `portraitDx: 500`. CLOSED_BUGS #20
+  changed the portrait default to `dx: 250` (`PlayerHudDefaults.js`) but did not update this
+  expectation, so the test failed against the corrected default (it was looking for the old value).
+- **Severity:** Test-only; no shipping-code defect. The reset-all behaviour was correct; the
+  assertion was stale.
+- **Found:** 2026-06-11 in the full-suite verification on the `item-sheet-roll-checks` branch.
+- **Fixed:** 2026-06-11 — expectation updated to `portraitDx: 250` to match the current default;
+  `player-hud-layout.spec.js` passes 10/10.

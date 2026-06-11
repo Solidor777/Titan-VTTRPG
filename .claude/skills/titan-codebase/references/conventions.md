@@ -134,13 +134,17 @@ the live model; only update handlers clone. Exemplar: `OnGetChatLogEntryContext.
 limitation: two rapid clicks on DIFFERENT targets within one update round-trip are last-write-wins — the
 second silently reverts the first (see `docs/POST_WORK_FINDINGS.md`).
 
-**Context access convention** — `DocumentSheetShell.svelte` sets three context keys at mount: the
-`ReactiveDocument` bridge under `'document'`, the UI-state store under `'applicationState'`, and the SAME
-top-level bridge again under `'sheetDocument'`. `'document'` is always the NEAREST document —
-`EmbeddedDocumentProvider` shadows it for embedded subtrees — while `'sheetDocument'` always points at the
-owning sheet's top-level bridge and is never shadowed (the escape hatch for actor-coupled reads inside an
-embedded subtree). Resolution mechanics live in data-flow.md, "Embedded-document contexts". Every
-descendant reads:
+**Context access convention** — `DocumentSheetShell.svelte` sets four context keys at mount: the
+`ReactiveDocument` bridge under `'document'`, the UI-state store under `'applicationState'`, the SAME
+top-level bridge again under `'sheetDocument'`, and the check-rolling actor bridge under `'rollActor'`.
+`'document'` is always the NEAREST document — `EmbeddedDocumentProvider` shadows it for embedded subtrees
+— while `'sheetDocument'` always points at the owning sheet's top-level bridge and is never shadowed (the
+escape hatch for actor-coupled reads inside an embedded subtree). `'rollActor'` (resolved once by
+`src/document/reactive/ResolveRollActor.js`) is the actor that performs checks for the sheet: the actor
+itself on an actor sheet; an owned item's parent character actor on an item sheet, but only when the
+current user owns it (`item.isOwner` already means "owns the actor or is GM"); otherwise `undefined`. A
+present `'rollActor'` is the single gate for showing a roll button on an item sheet. Resolution mechanics
+live in data-flow.md, "Embedded-document contexts". Every descendant reads:
 
 ```svelte
 import { getContext } from 'svelte';
@@ -165,6 +169,16 @@ IS the embedded document, and components take no document props. The settled idi
 - **Actor method calls and actor-derived state** go through `'sheetDocument'`, e.g.
   `sheetDocument.data.system.requestItemDeletion(document.data?._id)` or
   `sheetDocument.data.system.getItemCheckParameters(...)`.
+- **Condensed check roll** goes through `'rollActor'`, NOT `'sheetDocument'`: the shared
+  `document/svelte-components/check/Condensed{Item,Attack,Casting}CheckButton.svelte` resolve params and
+  roll via `rollActor.data.system.{getItemCheckParameters,request*Check}({ itemId, checkIdx|attackIdx })`,
+  taking the item id from `'document'` and an optional `idx` prop (default 0). The SAME buttons serve the
+  character-sheet item rows and the item-sheet sidebars/settings; on the character sheet `'rollActor'`
+  resolves to the sheet's own actor, so behavior there is unchanged. `SidebarCheck.svelte` takes an
+  optional `rollButton` snippet that replaces its static attribute/skill/DC info line; the three item-sheet
+  sidebars (`ItemSheetSidebarCheck`, `WeaponSheetSidebarAttacks`, `SpellSheetSidebarCastingCheck`) and the
+  three settings panels (`ItemSheetCheckSettings`, `WeaponSheetAttackSettings`, `SpellSheetCastingCheckTab`)
+  render the matching button only when `'rollActor'` is present.
 - **Owner gates** read the NEAREST `'document'` with `?.` (`disabled={!document.data?.isOwner}`) —
   the shared leaves `RichText` and `DocumentOwner*Button` do exactly this, so they work under a sheet,
   a provider, or a chat bridge.
@@ -429,9 +443,10 @@ static `actions` map. To refresh a dynamic control's icon/label after a state ch
 - **`~/` alias vs relative paths** — The codebase uses the `~/` alias for cross-directory imports;
   relative paths (`./`, `../`) appear only within the same immediate directory.
 
-- **Svelte context protocol** — Four keys are set into Svelte context at mount time:
-  - `'document'`, `'applicationState'`, and `'sheetDocument'` are set by `DocumentSheetShell.svelte` — see
-    the **Context access convention** entry above for what each holds and the provider-shadowing rule.
+- **Svelte context protocol** — Five keys are set into Svelte context at mount time:
+  - `'document'`, `'applicationState'`, `'sheetDocument'`, and `'rollActor'` are set by
+    `DocumentSheetShell.svelte` — see the **Context access convention** entry above for what each holds, the
+    provider-shadowing rule, and how `'rollActor'` gates item-sheet roll buttons.
   - `'application'` (the owning `ApplicationV2` / `DocumentSheetV2` instance) is set at the `mount()` call
     site in both `TitanDocumentSheet._replaceHTML` and `TitanDialog._replaceHTML`. All components (sheet,
     dialog, and their descendants) can call `getApplication()` (`~/helpers/utility-functions/GetApplication.js`)
