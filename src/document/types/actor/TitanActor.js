@@ -95,7 +95,7 @@ export default class TitanActor extends Actor {
          this.name,
       )) {
          // Ensure the item data is in an array.
-         if (!itemData instanceof Array) {
+         if (!(itemData instanceof Array)) {
             itemData = [itemData];
          }
 
@@ -155,7 +155,7 @@ export default class TitanActor extends Actor {
          this.name,
       )) {
          // Ensure the active effect data is in an array.
-         if (!activeEffectData instanceof Array) {
+         if (!(activeEffectData instanceof Array)) {
             activeEffectData = [activeEffectData];
          }
 

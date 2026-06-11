@@ -10,29 +10,9 @@
    /** @type {object} Reference to the Application State store. */
    const appState = getContext('applicationState');
 
-   // Aspect Options.
+   // Aspect Options. Option labels stay raw i18n keys: the Select's Text leaf localizes them, and
+   // pre-localized text would be localized a second time there.
    const aspectOptions = structuredClone(SpellAspects);
-
-   // Localize Option Labels.
-   for (const aspect of Object.values(aspectOptions)) {
-      // Localize value options.
-      if (aspect.settings?.initialValueOptions) {
-         aspect.settings.initialValueOptions.forEach((option) => {
-            if (typeof option.label === 'string') {
-               option.label = localize(option.label);
-            }
-         });
-      }
-
-      // Localize unit options.
-      if (aspect.settings?.unitOptions) {
-         aspect.settings.unitOptions.forEach((option) => {
-            if (typeof option.label === 'string') {
-               option.label = localize(option.label);
-            }
-         });
-      }
-   }
 </script>
 
 <div class="standard-aspects-tab">

@@ -70,6 +70,67 @@ test.describe('no double-localized (LOCAL.) text in rendered UI', () => {
       expect(offenders, `LOCAL. text on effect sheet:\n${offenders.join('\n')}`).toEqual([]);
    });
 
+   test('spell aspect surfaces, every spell tab, and the casting-check dialog', async () => {
+      // Seed a spell with enabled range + duration aspects (string and numeric values) on a player.
+      await page.evaluate(async () => {
+         const actor = game.actors.find((a) => a.type === 'player' && a.name === 'E2E Player')
+            ?? await Actor.create({ name: 'E2E Player', type: 'player' });
+         let spell = actor.items.find((i) => i.name === 'E2E Aspect Spell');
+         if (!spell) {
+            [spell] = await actor.createEmbeddedDocuments('Item', [
+               { name: 'E2E Aspect Spell', type: 'spell' },
+            ]);
+         }
+         await spell.update({
+            system: {
+               aspect: [
+                  {
+                     label: 'range',
+                     initialValue: 10,
+                     cost: 2,
+                     enabled: true,
+                  },
+                  {
+                     label: 'duration',
+                     scaling: true,
+                     initialValue: 1,
+                     unit: 'rounds',
+                     cost: 1,
+                     enabled: true,
+                     scalingCost: 1,
+                  },
+               ],
+            },
+         });
+         await spell.sheet.render(true);
+         await titanWait(() => !!spell.sheet.element, { message: 'spell sheet rendered' });
+      });
+
+      // Walk every tab in the sheet's tab strip, scanning each rendered state.
+      const sheet = page.locator('.titan-item-sheet:has-text("E2E Aspect Spell")');
+      const tabButtons = sheet.locator('.tab-list button');
+      const tabCount = await tabButtons.count();
+      for (let idx = 0; idx < tabCount; idx++) {
+         await tabButtons.nth(idx).click();
+         const offenders = await collectLocalizationOffenders(page, '.titan-item-sheet');
+         expect(offenders, `LOCAL. text on spell sheet tab ${idx}:\n${offenders.join('\n')}`).toEqual([]);
+      }
+
+      // The casting-check options dialog (gated by the getCheckOptions setting).
+      await page.evaluate(async () => {
+         await game.settings.set('titan', 'getCheckOptions', true);
+         const actor = game.actors.find((a) => a.type === 'player' && a.name === 'E2E Player');
+         const spell = actor.items.find((i) => i.name === 'E2E Aspect Spell');
+         actor.system.requestCastingCheck({ itemId: spell.id });
+      });
+      await expect(page.locator('.titan-dialog')).toBeVisible();
+      const dialogOffenders = await collectLocalizationOffenders(page, '.titan-dialog');
+      await page.evaluate(async () => {
+         await game.settings.set('titan', 'getCheckOptions', false);
+      });
+      expect(dialogOffenders, `LOCAL. text in casting dialog:\n${dialogOffenders.join('\n')}`).toEqual([]);
+   });
+
    test('effects sidebar header, rows, and context menu', async () => {
       await page.evaluate(async () => {
          let pack = game.packs.get('world.e2e-tray-effects');
