@@ -166,6 +166,8 @@
 <div
    class="action-menu"
    class:vertical
+   class:flyout-before={subOptionsSide === 'before'}
+   class:flyout-after={subOptionsSide === 'after'}
    bind:this={rootEl}
 >
    {#if openCategory}
@@ -269,8 +271,47 @@
 
             &.active {
                @include panel-3;
+
+               position: relative;
+            }
+
+            // The accent edge-bar marks the open category on the side facing its flyout.
+            &.active::after {
+               content: '';
+               position: absolute;
+               background: var(--titan-cyan);
             }
          }
+      }
+
+      // Place the accent edge-bar: left/right edge in a vertical layout, top/bottom in a horizontal
+      // one, on the side the flyout opens toward (before vs after).
+      &.vertical.flyout-before .categories button.active::after {
+         top: 0;
+         bottom: 0;
+         left: 0;
+         width: 2px;
+      }
+
+      &.vertical.flyout-after .categories button.active::after {
+         top: 0;
+         bottom: 0;
+         right: 0;
+         width: 2px;
+      }
+
+      &:not(.vertical).flyout-before .categories button.active::after {
+         left: 0;
+         right: 0;
+         top: 0;
+         height: 2px;
+      }
+
+      &:not(.vertical).flyout-after .categories button.active::after {
+         left: 0;
+         right: 0;
+         bottom: 0;
+         height: 2px;
       }
 
       &.vertical .categories {

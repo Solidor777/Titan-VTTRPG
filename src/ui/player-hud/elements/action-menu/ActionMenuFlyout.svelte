@@ -118,6 +118,7 @@
       <ActionMenuSubOption
          {sub}
          categoryKey={category.key}
+         active={sub.key === hoveredKey}
          flyIn={{ ...flyParams, delay: i * FLY_STAGGER }}
          {onAction}
          onreveal={reveal}
