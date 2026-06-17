@@ -261,14 +261,22 @@ utility run for ALL resolved actors; weapons/inventory/abilities/spells/effects 
 omitted in group mode), applying the per-category gates, per-sub-button-type gates, and content filters from
 `playerHudOptions().actionMenu`. Empty categories are omitted. `ActionMenuElement` renders the bar and wires
 the four amount-prompt utilities to `HudAmountDialog` (`applyDamage`/`applyHealing`/`applyRend`/`applyRepairs`
-for every resolved actor); the cascade renders as in-flow flex lanes whose order follows the configured
-expand direction (authoritative — there is no auto-flip; off-screen placement is the user's responsibility),
-and in a vertical layout the sub-buttons follow the sub-option direction. `.categories` reserves a gutter on
-the chip's edge so the minimize chip never overlaps the buttons. Sub-options window to
-`windowSize` entries with wheel scrolling (non-passive listener via a `use:` action) and gradient scroll fades,
-sliding in with a staggered `fly` transition along the expand direction; the hovered/focused sub-option's
-sub-buttons overlay in an absolutely-positioned lane beside the column (clamped to the column's bottom) so
-revealing them never reflows the menu. Main actions and roll/chat/sheet
+for every resolved actor); the cascade's order follows the configured expand direction (authoritative — there
+is no auto-flip; off-screen placement is the user's responsibility), and in a vertical layout the sub-buttons
+follow the sub-option direction. In a horizontal layout the flyout lane stays in flow, aligned under the open
+category via a measured `margin-left`. In a vertical layout the flyout lane is lifted out of flow and
+absolutely anchored beside the category column at the open button's row — its top to the button (flow down) or
+its bottom to the button (flow up), measured from the active button's `offsetTop`/`offsetHeight` — so opening a
+category never reflows the bar. The per-user `directions.vertical.subOptionsFlow` (`down`/`up`, default `down`)
+chooses the stacking direction; flow up renders the visible window reversed so the first logical option is the
+bottom-most row, on the button. `.categories` reserves a gutter on the chip's edge so the minimize chip never
+overlaps the buttons. Sub-options window to `windowSize` entries with wheel scrolling (non-passive listener via
+a `use:` action) and gradient scroll fades, sliding in with a staggered `fly` transition along the expand
+direction; the hovered/focused sub-option's sub-buttons overlay in an absolutely-positioned lane beside the
+column (clamped to the column's bottom) so revealing them never reflows the menu. The open category keeps its
+`panel-3` fill plus a `--titan-cyan` accent edge-bar on the side facing its flyout, and the hovered/focused
+sub-option takes a `panel-3` fill with an inset accent edge-bar (no row is highlighted by default). Main
+actions and roll/chat/sheet
 sub-buttons close the cascade; equip/quantity/duration/remove keep it open. Escape closes the cascade in the
 window capture phase and CONSUMES the event — otherwise Foundry's core Escape releases token control and
 unmounts the whole HUD.
@@ -276,11 +284,16 @@ unmounts the whole HUD.
 **Effects panel — `EffectsPanelElement` → list or tray**
 Two user styles: the sectioned list (`EffectsListPanel` → id-keyed `EmbeddedDocumentProvider` rows →
 `EffectsListRow`, click-to-expand) and the icon tray (`EffectsIconTray`, duration badges, click → fixed-position
-`EffectsDetailPopout` clamped into the rect, Escape-consuming dismissal). Both expanded surfaces share
+`EffectsDetailPopout` clamped into the rect, Escape-consuming dismissal). Each list row is its own `panel-2`
+sub-panel (icon left, name-over-duration right, name ellipsis, controls that wrap), so expanding one row grows
+only that sub-panel and pushes its neighbours down rather than overlapping. Both expanded surfaces share
 `EffectsDetailBody`: description per subtype (conditions render `flags.titan.description`, effects the native
 `description`), embedded checks via `CharacterSheetEffectChecks`, duration −/+ steppers, send-to-chat
 (effect-only), open-sheet, and the owner-gated delete (`sheetDocument.data.system.requestEffectDeletion`). The
-panel body is user-resizable in edit mode (size persisted) and scrolls beyond it. The `visual-active-effects`
+outer panel has a fixed user-resizable width AND height (both persisted via the edit-mode handle); the header is
+pinned and the row list is a bounded `.body` (`flex: 1; min-height: 0; overflow-y: auto`) that scrolls
+internally when the effects exceed the panel height. The edit-mode mount is retained across token-selection
+changes while the layout is being edited, so the panel stays visible to resize. The `visual-active-effects`
 module flag is no longer stamped on effects or conditions — this HUD replaces it.
 
 ---
