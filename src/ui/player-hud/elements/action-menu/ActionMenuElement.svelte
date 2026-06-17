@@ -32,7 +32,7 @@
    /** @type {HTMLElement | undefined} The element root, for click-away containment checks. */
    let rootEl = $state();
 
-   /** @type {HTMLElement | undefined} The category bar, anchoring the cascade flip measurements. */
+   /** @type {HTMLElement | undefined} The category bar, anchoring the active-button offset measurements. */
    let barEl = $state();
 
    /** @type {number} The active category button's offset along the bar (horizontal alignment). */
@@ -84,6 +84,10 @@
    // aligns to it: horizontally in a horizontal layout, vertically (top + height) in a vertical one.
    $effect(() => {
       void layoutState.openCategory;
+      // Orientation and flow change which edge of the button the lane anchors to, so re-measure when
+      // they change while a category is open.
+      void vertical;
+      void flowUp;
 
       /** @type {HTMLElement | null} The open category's button, when one is open. */
       const active = barEl?.querySelector('.active') ?? null;

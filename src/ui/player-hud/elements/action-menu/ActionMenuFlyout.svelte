@@ -73,6 +73,16 @@
    const hovered = $derived(visible.find((sub) => sub.key === hoveredKey) ?? null);
 
    /**
+    * @type {boolean} Whether hidden sub-options sit above the visible window, marked by a fade.
+    * Flowing up reverses the render order, so the logically-later (off-window-end) entries are the
+    * ones hidden above.
+    */
+   const fadeAbove = $derived(flowUp ? windowStart < maxStart : windowStart > 0);
+
+   /** @type {boolean} Whether hidden sub-options sit below the visible window, marked by a fade. */
+   const fadeBelow = $derived(flowUp ? windowStart > 0 : windowStart < maxStart);
+
+   /**
     * Action attaching a non-passive wheel listener (Svelte's wheel attribute is passive, which
     * would forbid the preventDefault needed to keep the canvas from zooming under the menu).
     * @param {HTMLElement} node - The scrollable sub-option lane.
@@ -89,7 +99,11 @@
             return;
          }
          event.preventDefault();
-         windowStart = Math.min(maxStart, Math.max(0, windowStart + (event.deltaY > 0 ? 1 : -1)));
+
+         // Flowing up reverses the render order, so a wheel-down tick must walk the window the other
+         // way to keep scrolling visually consistent with the cursor's direction.
+         const step = (event.deltaY > 0 ? 1 : -1) * (flowUp ? -1 : 1);
+         windowStart = Math.min(maxStart, Math.max(0, windowStart + step));
       };
 
       node.addEventListener('wheel', onWheel, { passive: false });
@@ -126,13 +140,13 @@
    {/each}
 
    <!--Scroll fades mark hidden entries above/below the window without affecting layout.-->
-   {#if windowStart > 0}
+   {#if fadeAbove}
       <span
          class="overflow top"
          data-testid="player-hud-flyout-up"
       ></span>
    {/if}
-   {#if windowStart < maxStart}
+   {#if fadeBelow}
       <span
          class="overflow bottom"
          data-testid="player-hud-flyout-down"
