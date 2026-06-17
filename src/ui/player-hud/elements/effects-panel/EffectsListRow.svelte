@@ -60,11 +60,15 @@
 </div>
 
 <style lang="scss">
+   // Each effect sits on its own panel, spaced from its neighbours, so rows stay visually distinct.
    .row {
       @include flex-column;
       @include flex-group-top;
+      @include panel-2;
+      @include padding-standard;
 
       width: 100%;
+      border-radius: var(--titan-border-radius);
 
       &:not(:first-child) {
          @include margin-top-standard;
@@ -95,18 +99,22 @@
             flex: 1;
             min-width: 0;
             gap: 2px;
+
+            // Truncate rather than overflow the panel when the row is narrow.
+            .name {
+               width: 100%;
+               overflow: hidden;
+               text-overflow: ellipsis;
+               white-space: nowrap;
+            }
          }
       }
 
-      // The expanded detail carries the panel background and padding so the header geometry is
-      // identical whether the row is collapsed or expanded.
+      // The detail shares the row's panel; a top margin separates it from the header.
       .detail {
-         @include panel-2;
-         @include padding-standard;
          @include margin-top-standard;
 
          width: 100%;
-         border-radius: var(--titan-border-radius);
       }
    }
 </style>

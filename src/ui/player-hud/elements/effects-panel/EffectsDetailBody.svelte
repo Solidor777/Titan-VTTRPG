@@ -113,6 +113,8 @@
       @include flex-group-right;
       @include margin-top-standard;
 
+      // Wrap the action icons onto a new line instead of overflowing a narrow panel.
+      flex-wrap: wrap;
       width: 100%;
       gap: var(--titan-spacing-standard);
    }

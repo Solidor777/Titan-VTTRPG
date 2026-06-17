@@ -267,6 +267,10 @@ test('an edit-mode resize persists the panel size', async () => {
       () => page.evaluate(() => game.settings.get('titan', 'playerHudLayout').effectsPanelSize?.width),
       { message: 'the resized width persists to the layout setting' },
    ).toBe(before.width + 60);
+   await expect.poll(
+      () => page.evaluate(() => game.settings.get('titan', 'playerHudLayout').effectsPanelSize?.height),
+      { message: 'the resized height persists to the layout setting' },
+   ).toBe(before.height + 40);
 
    await page.evaluate(async () => {
       await game.settings.set('titan', 'playerHudLayout', {});

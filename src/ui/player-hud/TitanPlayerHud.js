@@ -162,6 +162,12 @@ export default class TitanPlayerHud {
          return;
       }
 
+      // While editing the layout, keep the current mount regardless of token selection so the HUD
+      // stays visible to edit; selection-driven actor changes resume once edit mode exits.
+      if (this.#layoutState?.editMode && this.#mountKey !== undefined) {
+         return;
+      }
+
       const { actors, primary } = this.resolveActors();
 
       /** @type {string} Identity of the resolved set; membership changes force a remount. */
