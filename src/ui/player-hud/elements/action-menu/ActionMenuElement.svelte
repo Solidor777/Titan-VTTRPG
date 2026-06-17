@@ -38,8 +38,17 @@
    /** @type {number} The active category button's offset along the bar (horizontal alignment). */
    let activeOffset = $state(0);
 
+   /** @type {number} The active category button's top within the bar (vertical anchoring). */
+   let activeTop = $state(0);
+
+   /** @type {number} The active category button's height, anchoring the flyout's first row. */
+   let activeHeight = $state(0);
+
    /** @type {boolean} Whether the categories stack vertically. */
    const vertical = $derived(options.layout === 'vertical');
+
+   /** @type {boolean} Whether vertical sub-options stack upward (first row on the button, rest above). */
+   const flowUp = $derived(vertical && options.directions.vertical.subOptionsFlow === 'up');
 
    /** @type {Array<object>} The menu model with the amount-prompt utilities wired to the dialog. */
    const model = $derived.by(() => {
@@ -71,11 +80,16 @@
    /** @type {object | null} The open category's model entry. */
    const openCategory = $derived(model.find((entry) => entry.key === layoutState.openCategory) ?? null);
 
-   // Re-measure the active button's offset whenever the open category changes, so the horizontal
-   // flyout lane aligns under it.
+   // Re-measure the active button's position whenever the open category changes, so the flyout lane
+   // aligns to it: horizontally in a horizontal layout, vertically (top + height) in a vertical one.
    $effect(() => {
       void layoutState.openCategory;
-      activeOffset = barEl?.querySelector('.active')?.offsetLeft ?? 0;
+
+      /** @type {HTMLElement | null} The open category's button, when one is open. */
+      const active = barEl?.querySelector('.active') ?? null;
+      activeOffset = active?.offsetLeft ?? 0;
+      activeTop = active?.offsetTop ?? 0;
+      activeHeight = active?.offsetHeight ?? 0;
    });
 
    /**
@@ -158,13 +172,19 @@
       {#key openCategory.key}
          <div
             class="flyout-lane"
+            class:anchored={vertical}
+            class:before={vertical && subOptionsSide === 'before'}
+            class:after={vertical && subOptionsSide === 'after'}
             style:order={subOptionsSide === 'before' ? 0 : 2}
             style:margin-left={!vertical && activeOffset > 0 ? `${activeOffset}px` : null}
+            style:top={vertical && !flowUp ? `${activeTop}px` : null}
+            style:bottom={vertical && flowUp ? `calc(100% - ${activeTop + activeHeight}px)` : null}
          >
             <ActionMenuFlyout
                category={openCategory}
                windowSize={options.windowSize}
                {vertical}
+               {flowUp}
                {subOptionsSide}
                {subButtonsSide}
                {onAction}
@@ -203,11 +223,27 @@
       &.vertical {
          @include flex-row;
 
-         align-items: flex-end;
+         position: relative;
+         align-items: flex-start;
       }
 
       .flyout-lane {
          flex-shrink: 0;
+
+         // In a vertical layout the lane is lifted out of flow and anchored beside the category
+         // column at the open button's row, so opening a category never reflows the bar.
+         &.anchored {
+            position: absolute;
+            z-index: 1;
+
+            &.before {
+               right: calc(100% + var(--titan-spacing-standard));
+            }
+
+            &.after {
+               left: calc(100% + var(--titan-spacing-standard));
+            }
+         }
       }
 
       .categories {
