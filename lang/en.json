@@ -625,6 +625,7 @@
       "subButtonDirection.text": "Category Button",
       "subButtons.text": "Sub-Buttons",
       "subOptionDirection.text": "Category Expansion",
+      "subOptionFlow.text": "Stack Direction",
       "subterfuge.desc.text": "<p><strong>Subterfuge</strong> is your ability to steal, pick a lock, or perform other acts involving sleight of hand.</p>",
       "subterfuge.text": "Subterfuge",
       "succeeded.text": "Succeeded",

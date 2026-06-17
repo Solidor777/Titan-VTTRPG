@@ -215,6 +215,17 @@
                <option value="right">{localize('expandRight')}</option>
             </select>
          </label>
+         <label>
+            {localize('subOptionFlow')}
+            <select
+               bind:value={options.actionMenu.directions.vertical.subOptionsFlow}
+               data-testid="player-hud-settings-menu-sub-options-flow"
+               onchange={save}
+            >
+               <option value="down">{localize('expandDown')}</option>
+               <option value="up">{localize('expandUp')}</option>
+            </select>
+         </label>
       {:else}
          <label>
             {localize('subOptionDirection')}
