@@ -241,6 +241,46 @@ test('sub-options expand to the configured side and lanes never overlap', async 
    });
 });
 
+test('the vertical flyout anchors to the open category button and flows up or down', async () => {
+   await seedControlledActor(page, { name: 'HUD Layout Player' });
+   const flyout = page.locator('[data-testid="player-hud-flyout"]');
+   const skills = page.locator('[data-testid="player-hud-category-skills"]');
+
+   // Park the menu mid-screen so the flyout has vertical room both above and below the bar.
+   await page.evaluate(() => {
+      game.titan.playerHud.layoutState.positions.actionMenu = {
+         anchorX: 'left',
+         anchorY: 'bottom',
+         dx: 450,
+         dy: 320,
+      };
+   });
+
+   // Default flow (down): the first sub-option lines up with the open button's top, stacking below.
+   await openCategory(page, 'skills');
+   await expectBoxes(flyout, skills,
+      (flyoutBox, barBox) => Math.abs(flyoutBox.y - barBox.y) <= 2,
+      'flow-down: the flyout top aligns to the open category button');
+
+   // Flow up: the flyout's bottom lines up with the open button's bottom, stacking earlier options above.
+   await setMenuOptions(page, { directions: { vertical: { subOptionsFlow: 'up' } } });
+   await openCategory(page, 'skills');
+   await expectBoxes(flyout, skills,
+      (flyoutBox, barBox) => Math.abs((flyoutBox.y + flyoutBox.height) - (barBox.y + barBox.height)) <= 2,
+      'flow-up: the flyout bottom aligns to the open category button');
+
+   // Reset to defaults and re-dock the menu at its default corner.
+   await page.evaluate(async () => {
+      await game.settings.set('titan', 'playerHudOptions', {});
+      game.titan.playerHud.layoutState.positions.actionMenu = {
+         anchorX: 'right',
+         anchorY: 'bottom',
+         dx: 16,
+         dy: 16,
+      };
+   });
+});
+
 test('sub-buttons form a third disjoint lane', async () => {
    const weaponId = await seedWeaponFixture(page);
    await openCategory(page, 'weapons');

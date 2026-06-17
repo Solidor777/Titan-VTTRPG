@@ -7,13 +7,14 @@
     * @property {object} category - The open category whose sub-options are shown.
     * @property {number} windowSize - The maximum number of sub-options visible before scrolling.
     * @property {boolean} vertical - Whether the menu uses a vertical layout (sub-options slide on the x axis).
+    * @property {boolean} flowUp - Whether the vertical sub-options stack upward (reversed render, bottom-anchored).
     * @property {string} subOptionsSide - The sub-option lane side: 'before' (left/up) or 'after' (right/down).
     * @property {string} subButtonsSide - The sub-button lane side: 'before' (left) or 'after' (right).
     * @property {Function} onAction - Receives ('main'|'sub', entry) for every click.
     */
 
    /** @type {ActionMenuFlyoutProps} */
-   const { category, windowSize, vertical, subOptionsSide, subButtonsSide, onAction } = $props();
+   const { category, windowSize, vertical, flowUp, subOptionsSide, subButtonsSide, onAction } = $props();
 
    /** @type {number} The slide-in offset, in pixels, for each sub-option's entrance. */
    const FLY_DISTANCE = 12;
@@ -62,6 +63,12 @@
    /** @type {Array<object>} The visible sub-option window. */
    const visible = $derived(category.subOptions.slice(windowStart, windowStart + windowSize));
 
+   /**
+    * @type {Array<object>} The window in render order — reversed when stacking upward so the first
+    * logical option is the bottom-most row, landing on the open category button.
+    */
+   const rendered = $derived(flowUp ? [...visible].reverse() : visible);
+
    /** @type {object | null} The sub-option whose sub-buttons are revealed, when still visible. */
    const hovered = $derived(visible.find((sub) => sub.key === hoveredKey) ?? null);
 
@@ -107,7 +114,7 @@
    bind:clientHeight={columnHeight}
    use:wheelScroll
 >
-   {#each visible as sub, i (sub.key)}
+   {#each rendered as sub, i (sub.key)}
       <ActionMenuSubOption
          {sub}
          categoryKey={category.key}
