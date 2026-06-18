@@ -1,4 +1,5 @@
 <script>
+   import HudButton from '~/helpers/svelte-components/button/HudButton.svelte';
    import localize from '~/helpers/utility-functions/Localize.js';
 
    /**
@@ -13,16 +14,16 @@
 
 <div class="sub-buttons">
    {#each subOption.subButtons as button (button.key)}
-      <button
-         type="button"
-         data-testid={`player-hud-sub-button-${subOption.key}-${button.key}`}
+      <HudButton
+         variant="sub-button"
+         testId={`player-hud-sub-button-${subOption.key}-${button.key}`}
          onclick={() => onAction('sub', button)}
       >
          {#if button.icon}
             <i class={button.icon}></i>
          {/if}
          <span>{button.label ?? localize(button.labelKey)}</span>
-      </button>
+      </HudButton>
    {/each}
 </div>
 
@@ -31,22 +32,8 @@
       @include flex-column;
       @include flex-group-top;
 
+      // Grow to the longest sub-button label rather than clipping it.
+      width: max-content;
       gap: 2px;
-
-      button {
-         @include panel-3;
-         @include flex-row;
-         @include flex-group-left;
-         @include font-size-small;
-
-         width: 100%;
-         gap: var(--titan-spacing-standard);
-         padding: 2px var(--titan-spacing-standard);
-         border: none;
-         border-radius: var(--titan-border-radius);
-         color: inherit;
-         cursor: pointer;
-         white-space: nowrap;
-      }
    }
 </style>
