@@ -20,7 +20,11 @@ export const THEME_TOKEN_GROUPS = Object.freeze({
    application: [
       'app-background', 'app-font-color', 'border-color', 'window-content-background',
       'content-link-font-color', 'editor-menu-color', 'scrollbar-color', 'scrollbar-gutter-color',
-      'highlighted-background', 'highlighted-font-color', 'heading-font-color', 'accent-color',
+      'highlighted-background', 'highlighted-font-color', 'accent-color',
+   ],
+   headers: [
+      'header-1-font-color', 'header-2-font-color', 'header-3-font-color',
+      'header-4-font-color', 'header-5-font-color', 'header-6-font-color',
    ],
    panels: [
       'panel-1-background', 'panel-1-color', 'panel-2-background', 'panel-2-color',
