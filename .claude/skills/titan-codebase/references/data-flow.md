@@ -273,9 +273,14 @@ window reversed so the first logical option is the bottom-most row, on the butto
 overlaps the buttons. Sub-options window to `windowSize` entries with wheel scrolling (non-passive listener via
 a `use:` action) and gradient scroll fades, sliding in with a staggered `fly` transition along the expand
 direction; the hovered/focused sub-option's sub-buttons overlay in an absolutely-positioned lane beside the
-column (clamped to the column's bottom) so revealing them never reflows the menu. The open category keeps its
-`panel-3` fill plus a `--titan-cyan` accent edge-bar on the side facing its flyout, and the hovered/focused
-sub-option takes a `panel-3` fill with an inset accent edge-bar (no row is highlighted by default). Main
+column (clamped to the column's bottom) so revealing them never reflows the menu. Every HUD button (category,
+sub-option, sub-button, frame chip, effect row header) is a `HudButton`
+(`src/helpers/svelte-components/button/HudButton.svelte`): one variant-driven primitive that defines every
+box/text property from `--titan-button-*` tokens via `@include button` with per-variant overrides, so Foundry
+core button styling cannot leak in and text uses the paired panel colors. The flyout columns size to
+`max-content` so labels never clip. The open category keeps its `panel-3` fill plus a themed `accent-color`
+edge-bar on the side facing its flyout (via `HudButton`'s `accentEdge` prop), and the hovered/focused
+sub-option takes a `panel-3` fill with an inset `accent-color` bar (no row is highlighted by default). Main
 actions and roll/chat/sheet
 sub-buttons close the cascade; equip/quantity/duration/remove keep it open. Escape closes the cascade in the
 window capture phase and CONSUMES the event — otherwise Foundry's core Escape releases token control and

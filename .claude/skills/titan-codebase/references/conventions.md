@@ -322,7 +322,11 @@ pairing list — every `…-background` fill that carries text has a paired `…
 never produce light-on-saturated text), the four built-in themes live in `src/theme/themes/`, and
 `ThemeManager.apply()` writes one `<style id="titan-theme-style">` containing the active theme on
 `:root` plus `.titan.themed.theme-light` / `.titan.themed.theme-dark` scoped blocks (the world-default
-light/dark themes) so Foundry's per-sheet color-scheme option overrides individual windows. Resolution:
+light/dark themes) so Foundry's per-sheet color-scheme option overrides individual windows. Two standalone
+(unpaired) application-group tokens carry text/accent color with no single fill: `heading-font-color` colors
+rich-text headings via a `.rich-text :is(h1..h6)` rule in `Global.scss` (reaching both sheets and the
+un-themed Player HUD), and `accent-color` is the HUD flyout accent (replacing the former undefined
+`--titan-cyan`). Resolution:
 client `theme` setting → `auto` follows Foundry's `theme-dark`/`theme-light` body class (a
 MutationObserver re-applies on change) → GM world defaults (`defaultDarkTheme`/`defaultLightTheme`) →
 built-in heritage fallback. Custom themes live in the `customThemes` client setting (same data shape as

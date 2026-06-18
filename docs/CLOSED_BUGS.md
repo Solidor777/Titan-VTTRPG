@@ -264,3 +264,63 @@ when fixed.
 - **Found:** 2026-06-11 in the full-suite verification on the `item-sheet-roll-checks` branch.
 - **Fixed:** 2026-06-11 — expectation updated to `portraitDx: 250` to match the current default;
   `player-hud-layout.spec.js` passes 10/10.
+
+### 22. Player-HUD effect row header clipped its text out the bottom
+
+- **What:** `EffectsListRow.svelte`'s row header was a raw `<button>` that left Foundry core's
+  `min-height`/`line-height` in place. The stacked icon + name + duration-tag column is taller than
+  that forced box, so the content overflowed the bottom of the header.
+- **Found:** 2026-06-18, user-reported.
+- **Fixed:** 2026-06-18 on `fix/player-hud-styling` — the header routes through the new
+  `HudButton` (`ghost` variant), whose `--titan-button-height: auto` lets content drive the height.
+
+### 23. Player-HUD action-menu sub-options/sub-buttons clipped long labels
+
+- **What:** Sub-option and sub-button rows are `width: 100%; white-space: nowrap` inside flyout
+  columns that had no intrinsic width, so long option/item names spilled past the button.
+- **Found:** 2026-06-18, user-reported.
+- **Fixed:** 2026-06-18 on `fix/player-hud-styling` — the flyout sub-option column
+  (`ActionMenuFlyout.svelte` `.sub-options`) and the sub-button lane (`ActionMenuSubButtons.svelte`
+  `.sub-buttons`) use `width: max-content`, so the column grows to the longest label.
+
+### 24. Player-HUD action-menu button text ignored the theme
+
+- **What:** Every HUD button carried `@include panel-2/3` (a paired, readable panel font color) and
+  then overrode it with `color: inherit`. The HUD renders outside any `.titan` themed scope, so
+  `inherit` resolved to Foundry core's bright ambient text — the text neither matched nor tracked
+  the theme.
+- **Found:** 2026-06-18, user-reported.
+- **Fixed:** 2026-06-18 on `fix/player-hud-styling` — all HUD buttons route through `HudButton`,
+  which defines every box/text property from `--titan-button-*` tokens via `@include button` with
+  per-variant overrides (text from the paired panel tokens). No HUD button uses `color: inherit`.
+
+### 25. Rich-text headings stayed bright and unreadable on light themes
+
+- **What:** Heading elements (`h1`–`h6`) in rich text (effect descriptions, sheets) had no color
+  rule. On the un-themed HUD and on light themes they fell back to Foundry core's bright heading
+  color, becoming unreadable on a light surface.
+- **Found:** 2026-06-18, user-reported.
+- **Fixed:** 2026-06-18 on `fix/player-hud-styling` — a new themed `heading-font-color` token
+  (contract + all four built-in themes) plus a `.rich-text :is(h1..h6)` rule in `Global.scss`.
+
+### 26. Player-HUD minimize chip overlapped the categories
+
+- **What:** The action-menu categories bar reserved a fixed gutter (`padding-right: 22px` /
+  `padding-bottom: 18px`) that did not track the chip's computed corner
+  (`actionMenuChipCorner`) across every layout/direction permutation, so the chip overlapped the
+  category buttons in some configurations.
+- **Found:** 2026-06-18, user-reported.
+- **Fixed:** 2026-06-18 on `fix/player-hud-styling` — `PlayerHudShell` passes the chip corner into
+  `ActionMenuElement`, which reserves the gutter on the chip's own corner (`chip-<corner>` root
+  class driving corner-specific padding).
+
+### 27. Player-HUD flyout accent referenced an undefined `--titan-cyan`
+
+- **What:** The action-menu accent (the open-category edge-bar and the revealed sub-option's inset
+  bar) referenced `--titan-cyan`, which is defined nowhere in `src/` and is not a theme token, so
+  the accent resolved to nothing.
+- **Found:** 2026-06-18, during the bug-fix brainstorm.
+- **Fixed:** 2026-06-18 on `fix/player-hud-styling` — a new themed `accent-color` token (contract +
+  all four built-in themes, a cyan/sky value per theme); the HUD accent references it via
+  `HudButton`'s `accentEdge` prop and the sub-option inset shadow. The sibling undefined palette
+  colors feeding the chat resource-mod tag gradients are logged separately (OPEN_BUGS #1).
