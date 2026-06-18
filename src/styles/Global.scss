@@ -6,6 +6,12 @@
    font-family: var(--titan-font-family-normal), sans-serif;
    font-size: var(--titan-font-size-normal);
 
+   // Redefine Foundry's text variables so core-painted text in any TITAN surface follows the active
+   // TITAN theme rather than Foundry's color scheme.
+   --color-text-primary: var(--titan-app-font-color);
+   --color-text-secondary: var(--titan-app-font-color);
+   --color-text-emphatic: var(--titan-app-font-color);
+
    // Scrollbar (two-value shorthand: thumb then track).
    scrollbar-color: var(--titan-scrollbar-color) var(--titan-scrollbar-gutter-color);
 
@@ -46,10 +52,17 @@
    }
 }
 
-// Rich-text headings read from the themed heading color so they stay legible on light themes and in
-// the Player HUD, which renders outside the .titan themed text scope.
-.rich-text :is(h1, h2, h3, h4, h5, h6) {
-   color: var(--titan-heading-font-color);
+// Per-level heading color across TITAN surfaces (.titan) and the non-.titan Player HUD rich text.
+// Setting --color-text-primary on the heading element itself makes Foundry's own
+// `color: var(--color-text-primary)` heading rule resolve to our token regardless of that rule's
+// specificity; the explicit `color` covers surfaces where Foundry does not paint the heading (the HUD).
+@for $level from 1 through 6 {
+   .titan h#{$level},
+   .rich-text h#{$level} {
+      color: var(--titan-header-#{$level}-font-color);
+
+      --color-text-primary: var(--titan-header-#{$level}-font-color);
+   }
 }
 
 // The TITAN chat surface, shared by TITAN cards and core messages opted in via titan-core-themed.
