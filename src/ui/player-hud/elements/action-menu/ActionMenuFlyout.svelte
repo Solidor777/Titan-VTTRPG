@@ -115,9 +115,11 @@
    }
 
    /**
-    * Reveals a sub-option's sub-buttons and aligns the lane to its row.
-    * @param {object} sub - The hovered/focused sub-option.
-    * @param {Event} event - The triggering pointer/focus event.
+    * Reveals a sub-option's sub-buttons and aligns the lane to its row. Driven by pointer movement over
+    * the row (not boundary entry), so the flyout swooshing in under a stationary cursor never auto-opens
+    * a sub-option — only a genuine hover or keyboard focus does.
+    * @param {object} sub - The moved-over/focused sub-option.
+    * @param {Event} event - The triggering pointer-move or focus event.
     * @returns {void}
     */
    function reveal(sub, event) {

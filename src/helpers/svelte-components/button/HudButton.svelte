@@ -11,7 +11,7 @@
     * @property {string | undefined} [testId] - Stable selector applied as `data-testid`.
     * @property {HTMLElement | undefined} [element] - Bindable reference to the underlying button element.
     * @property {((event: MouseEvent) => void) | undefined} [onclick] - The click handler.
-    * @property {((event: PointerEvent) => void) | undefined} [onpointerenter] - The pointer-enter handler (sub-option reveal).
+    * @property {((event: PointerEvent) => void) | undefined} [onpointermove] - The pointer-move handler (sub-option reveal).
     * @property {((event: FocusEvent) => void) | undefined} [onfocus] - The focus handler (sub-option reveal).
     * @property {import('svelte').Snippet} children - The button content.
     */
@@ -28,7 +28,7 @@
       testId = undefined,
       element = $bindable(undefined),
       onclick = undefined,
-      onpointerenter = undefined,
+      onpointermove = undefined,
       onfocus = undefined,
       children,
    } = $props();
@@ -48,7 +48,7 @@
    aria-label={ariaLabel}
    data-testid={testId}
    {onclick}
-   {onpointerenter}
+   {onpointermove}
    {onfocus}
 >
    {@render children()}

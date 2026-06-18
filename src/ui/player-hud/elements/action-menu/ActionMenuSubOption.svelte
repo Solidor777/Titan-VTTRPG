@@ -22,7 +22,7 @@
    {align}
    testId={`player-hud-sub-option-${categoryKey}-${sub.key}`}
    onclick={() => onAction('main', sub)}
-   onpointerenter={(event) => onreveal(sub, event)}
+   onpointermove={(event) => onreveal(sub, event)}
    onfocus={(event) => onreveal(sub, event)}
 >
    {#if sub.img}
