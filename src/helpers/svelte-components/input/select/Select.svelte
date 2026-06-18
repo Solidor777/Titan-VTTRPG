@@ -171,7 +171,9 @@
    }
 
    /**
-    * Handles keyboard interaction on the trigger, providing native-select parity.
+    * Handles keyboard interaction on the trigger, providing native-select parity. Handled keys call
+    * `stopPropagation` so navigation does not leak to Foundry's global keybindings (Escape would open
+    * the main menu; arrow keys would pan the canvas) while the combobox owns the interaction.
     * @param {KeyboardEvent} event - The keydown event.
     * @returns {void}
     */
@@ -179,6 +181,7 @@
       switch (event.key) {
          case 'ArrowDown': {
             event.preventDefault();
+            event.stopPropagation();
             if (listOpen) {
                moveHover(1);
             }
@@ -189,6 +192,7 @@
          }
          case 'ArrowUp': {
             event.preventDefault();
+            event.stopPropagation();
             if (listOpen) {
                moveHover(-1);
             }
@@ -200,6 +204,7 @@
          case 'Home': {
             if (listOpen) {
                event.preventDefault();
+               event.stopPropagation();
                hoverIndex = 0;
             }
             break;
@@ -207,6 +212,7 @@
          case 'End': {
             if (listOpen) {
                event.preventDefault();
+               event.stopPropagation();
                hoverIndex = normalized.length - 1;
             }
             break;
@@ -214,6 +220,7 @@
          case 'Enter':
          case ' ': {
             event.preventDefault();
+            event.stopPropagation();
             if (listOpen) {
                commit(normalized[hoverIndex]);
             }
@@ -225,6 +232,7 @@
          case 'Escape': {
             if (listOpen) {
                event.preventDefault();
+               event.stopPropagation();
                close();
             }
             break;
@@ -236,7 +244,10 @@
             break;
          }
          default: {
-            if (event.key.length === 1) {
+            // Unmodified single characters drive typeahead; modifier combos (Ctrl/Alt/Meta) pass
+            // through so they reach Foundry/browser shortcuts.
+            if (event.key.length === 1 && !event.ctrlKey && !event.altKey && !event.metaKey) {
+               event.stopPropagation();
                if (!listOpen) {
                   open();
                }

@@ -1,5 +1,6 @@
 import { expect, test } from '@playwright/test';
 import { collectLocalizationOffenders, ensureDocument, login, renderSheet } from './fixtures.js';
+import { selectTitanOption } from './select.js';
 import { closeAllApps, clearChat, attachPageErrors } from './world.js';
 
 // The seven TITAN Item subtypes, all rendered through the shared item sheet.
@@ -146,18 +147,19 @@ test.describe('no double-localized (LOCAL.) text in rendered UI', () => {
          await ui.titanEffects.render(true);
          ui.titanEffects.activate();
          await titanWait(
-            () => !!ui.titanEffects.element
-               ?.querySelector('[data-testid="effect-tray-pack-select"] option'),
-            { message: 'tray pack-select options rendered' },
-         );
-         const select = ui.titanEffects.element.querySelector('[data-testid="effect-tray-pack-select"]');
-         select.value = 'world.e2e-tray-effects';
-         select.dispatchEvent(new Event('change', { bubbles: true }));
-         await titanWait(
-            () => !!ui.titanEffects.element?.querySelector('[data-testid="effect-tray-row"]'),
-            { message: 'tray rows rendered for selected pack' },
+            () => !!ui.titanEffects.element?.querySelector('[data-testid="effect-tray-pack-select"]'),
+            { message: 'tray pack-select rendered' },
          );
       });
+
+      // Select the seeded world pack in the pack-select combobox (a role=combobox, not a native
+      // <select>); the seeded effect row then loads asynchronously.
+      await selectTitanOption(
+         page,
+         page.locator('[role="combobox"][data-testid="effect-tray-pack-select"]'),
+         'world.e2e-tray-effects',
+      );
+      await expect(page.locator('[data-testid="effect-tray-row"]').first()).toBeVisible();
 
       const trayOffenders = await collectLocalizationOffenders(page, '[data-testid="effect-tray"]');
       expect(trayOffenders, `LOCAL. text in effect tray:\n${trayOffenders.join('\n')}`).toEqual([]);
