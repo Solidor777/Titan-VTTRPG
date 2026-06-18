@@ -1,4 +1,5 @@
 <script>
+   import { fly } from 'svelte/transition';
    import ActionMenuSubOption from '~/ui/player-hud/elements/action-menu/ActionMenuSubOption.svelte';
    import ActionMenuSubButtons from '~/ui/player-hud/elements/action-menu/ActionMenuSubButtons.svelte';
 
@@ -22,6 +23,22 @@
     * connected; horizontal keeps the default.
     */
    const subOptionAlign = $derived(vertical && subOptionsSide === 'before' ? 'end' : 'start');
+
+   /** @type {number} The sub-button lane swoosh distance, in pixels. */
+   const SUB_BUTTON_SWOOSH_DISTANCE = 24;
+
+   /** @type {number} The sub-button lane swoosh duration, in milliseconds. */
+   const SUB_BUTTON_SWOOSH_DURATION = 180;
+
+   /**
+    * @type {object} The sub-button lane entrance: a horizontal slide+fade emerging from the sub-option
+    * toward the lane's side ('before' lane sits left → slides left from a positive offset; 'after' lane
+    * sits right → slides right from a negative offset).
+    */
+   const subButtonFly = $derived({
+      x: subButtonsSide === 'before' ? SUB_BUTTON_SWOOSH_DISTANCE : -SUB_BUTTON_SWOOSH_DISTANCE,
+      duration: SUB_BUTTON_SWOOSH_DURATION,
+   });
 
    /** @type {number} The first visible sub-option index of the scroll window. */
    let windowStart = $state(0);
@@ -148,6 +165,7 @@
          class:after={subButtonsSide === 'after'}
          style:top={`${laneTop}px`}
          bind:clientHeight={laneHeight}
+         in:fly={subButtonFly}
       >
          <ActionMenuSubButtons
             subOption={hovered}
