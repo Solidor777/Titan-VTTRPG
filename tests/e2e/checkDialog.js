@@ -89,15 +89,18 @@ export async function setNumberField(dialog, key, value) {
 }
 
 /**
- * Selects an option in a native `<select>` field by its visible label.
+ * Selects an option in a TITAN custom Select field by its value (which equals the label for these
+ * enum fields). Opens the `role="combobox"` trigger, then clicks the portaled option row.
  * @param {import('@playwright/test').Locator} dialog - The dialog root locator.
  * @param {string} key - The option key (testId is `check-field-<key>`).
- * @param {string|number} label - The visible option label to select.
+ * @param {string|number} value - The option value to select.
  * @returns {Promise<void>} Resolves once the option is selected.
  */
-export async function setSelectField(dialog, key, label) {
-   const select = dialog.getByTestId(`check-field-${key}`).locator('select');
-   await select.selectOption({ label: String(label) });
+export async function setSelectField(dialog, key, value) {
+   // The combobox trigger inside the field wrapper.
+   const trigger = dialog.getByTestId(`check-field-${key}`).locator('[role="combobox"]');
+   await trigger.click();
+   await dialog.page().locator(`[role="option"][data-value="${value}"]`).click();
 }
 
 /**

@@ -1,6 +1,7 @@
 import { expect, test } from '@playwright/test';
 import { login } from './fixtures.js';
 import { closeAllApps, clearChat, attachPageErrors } from './world.js';
+import { selectTitanOption } from './select.js';
 
 /** @type {import('@playwright/test').Page} The file-shared, logged-in page (one world boot per file). */
 let page;
@@ -142,8 +143,8 @@ test.describe('rules-element selector default key', () => {
          });
 
       // Change the operation-specific SELECTOR dropdown to "resource".
-      const selector = page.locator('.rules-element .operation-settings .field.select select').first();
-      await selector.selectOption('resource');
+      const operationSelect = page.locator('.rules-element .operation-settings .field.select [role="combobox"]').first();
+      await selectTitanOption(page, operationSelect, 'resource');
 
       // The key must land on the curated default "resolve", NOT the clamp's first option "all". Poll the
       // non-retrying document read until the selector change commits the curated key.
