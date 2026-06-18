@@ -1,6 +1,4 @@
 <script>
-   import { fly } from 'svelte/transition';
-
    /**
     * @typedef {object} HudButtonProps
     * @property {'category' | 'sub-option' | 'sub-button' | 'chip' | 'restore' | 'ghost'} [variant] - Visual variant selecting the panel surface, padding, and alignment.
@@ -11,7 +9,6 @@
     * @property {string} [type] - The native button type.
     * @property {string | undefined} [ariaLabel] - The accessible label.
     * @property {string | undefined} [testId] - Stable selector applied as `data-testid`.
-    * @property {object | undefined} [flyIn] - `svelte/transition` fly parameters for the entrance; applied only when present.
     * @property {HTMLElement | undefined} [element] - Bindable reference to the underlying button element.
     * @property {((event: MouseEvent) => void) | undefined} [onclick] - The click handler.
     * @property {((event: PointerEvent) => void) | undefined} [onpointerenter] - The pointer-enter handler (sub-option reveal).
@@ -29,7 +26,6 @@
       type = 'button',
       ariaLabel = undefined,
       testId = undefined,
-      flyIn = undefined,
       element = $bindable(undefined),
       onclick = undefined,
       onpointerenter = undefined,
@@ -38,48 +34,25 @@
    } = $props();
 </script>
 
-{#if flyIn}
-   <button
-      bind:this={element}
-      class={`hud-button ${variant}`}
-      class:active
-      class:align-end={align === 'end'}
-      class:accent-top={accentEdge === 'top'}
-      class:accent-right={accentEdge === 'right'}
-      class:accent-bottom={accentEdge === 'bottom'}
-      class:accent-left={accentEdge === 'left'}
-      {type}
-      {disabled}
-      aria-label={ariaLabel}
-      data-testid={testId}
-      in:fly={flyIn}
-      {onclick}
-      {onpointerenter}
-      {onfocus}
-   >
-      {@render children()}
-   </button>
-{:else}
-   <button
-      bind:this={element}
-      class={`hud-button ${variant}`}
-      class:active
-      class:align-end={align === 'end'}
-      class:accent-top={accentEdge === 'top'}
-      class:accent-right={accentEdge === 'right'}
-      class:accent-bottom={accentEdge === 'bottom'}
-      class:accent-left={accentEdge === 'left'}
-      {type}
-      {disabled}
-      aria-label={ariaLabel}
-      data-testid={testId}
-      {onclick}
-      {onpointerenter}
-      {onfocus}
-   >
-      {@render children()}
-   </button>
-{/if}
+<button
+   bind:this={element}
+   class={`hud-button ${variant}`}
+   class:active
+   class:align-end={align === 'end'}
+   class:accent-top={accentEdge === 'top'}
+   class:accent-right={accentEdge === 'right'}
+   class:accent-bottom={accentEdge === 'bottom'}
+   class:accent-left={accentEdge === 'left'}
+   {type}
+   {disabled}
+   aria-label={ariaLabel}
+   data-testid={testId}
+   {onclick}
+   {onpointerenter}
+   {onfocus}
+>
+   {@render children()}
+</button>
 
 <style lang="scss">
    // Every box/text property is defined from --titan-button-* tokens via @include button, so Foundry

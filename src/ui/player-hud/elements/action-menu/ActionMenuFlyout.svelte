@@ -16,26 +16,6 @@
    /** @type {ActionMenuFlyoutProps} */
    const { category, windowSize, vertical, flowUp, subOptionsSide, subButtonsSide, onAction } = $props();
 
-   /** @type {number} The slide-in offset, in pixels, for each sub-option's entrance. */
-   const FLY_DISTANCE = 12;
-
-   /** @type {number} The per-row entrance delay, in milliseconds, producing the staggered cascade. */
-   const FLY_STAGGER = 30;
-
-   /** @type {number} The entrance duration, in milliseconds. */
-   const FLY_DURATION = 150;
-
-   /**
-    * @type {object} The slide-in parameters (without delay), sliding the rows in along the expand
-    * direction: horizontally in a vertical layout, vertically in a horizontal one. A 'before' side
-    * starts the rows offset toward the category bar so they emerge from it.
-    */
-   const flyParams = $derived(
-      vertical
-         ? { x: subOptionsSide === 'before' ? FLY_DISTANCE : -FLY_DISTANCE, duration: FLY_DURATION }
-         : { y: subOptionsSide === 'before' ? FLY_DISTANCE : -FLY_DISTANCE, duration: FLY_DURATION },
-   );
-
    /**
     * @type {'start' | 'end'} Sub-option label alignment: the opposite of the category in the vertical
     * dock (flyout-left → labels hug the right/end toward the categories), so the cascade reads
@@ -135,13 +115,12 @@
    bind:clientHeight={columnHeight}
    use:wheelScroll
 >
-   {#each rendered as sub, i (sub.key)}
+   {#each rendered as sub (sub.key)}
       <ActionMenuSubOption
          {sub}
          categoryKey={category.key}
          active={sub.key === hoveredKey}
          align={subOptionAlign}
-         flyIn={{ ...flyParams, delay: i * FLY_STAGGER }}
          {onAction}
          onreveal={reveal}
       />

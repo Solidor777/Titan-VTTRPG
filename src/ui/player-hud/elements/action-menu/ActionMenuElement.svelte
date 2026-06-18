@@ -1,5 +1,6 @@
 <script>
    import { getContext } from 'svelte';
+   import { fly } from 'svelte/transition';
    import localize from '~/helpers/utility-functions/Localize.js';
    import buildActionMenuModel from '~/ui/player-hud/elements/action-menu/BuildActionMenuModel.js';
    import HudAmountDialog from '~/ui/player-hud/elements/action-menu/HudAmountDialog.js';
@@ -136,6 +137,30 @@
     */
    const categoryAlign = $derived(vertical && subOptionsSide === 'after' ? 'end' : 'start');
 
+   /** @type {number} The flyout swoosh distance, in pixels (the whole lane slides in by this much). */
+   const LANE_SWOOSH_DISTANCE = 40;
+
+   /** @type {number} The flyout swoosh duration, in milliseconds. */
+   const LANE_SWOOSH_DURATION = 200;
+
+   /**
+    * @type {object} The whole-flyout entrance: the lane slides + fades in along the open axis,
+    * starting offset toward the category bar so it appears to swoosh out from the open category
+    * toward its sub-options (horizontal slide in a vertical layout, vertical slide in a horizontal
+    * one; a 'before' side starts offset toward the bar).
+    */
+   const laneFly = $derived(
+      vertical
+         ? {
+            x: subOptionsSide === 'before' ? LANE_SWOOSH_DISTANCE : -LANE_SWOOSH_DISTANCE,
+            duration: LANE_SWOOSH_DURATION,
+         }
+         : {
+            y: subOptionsSide === 'before' ? LANE_SWOOSH_DISTANCE : -LANE_SWOOSH_DISTANCE,
+            duration: LANE_SWOOSH_DURATION,
+         },
+   );
+
    /**
     * Runs a clicked entry's action and closes the cascade unless the entry is an in-place toggle
     * (equip, quantity, duration, remove), which keeps the menu open for repeat use.
@@ -204,6 +229,7 @@
             style:margin-left={!vertical && activeOffset > 0 ? `${activeOffset}px` : null}
             style:top={vertical && !flowUp ? `${activeTop}px` : null}
             style:bottom={vertical && flowUp ? `calc(100% - ${activeTop + activeHeight}px)` : null}
+            in:fly={laneFly}
          >
             <ActionMenuFlyout
                category={openCategory}
