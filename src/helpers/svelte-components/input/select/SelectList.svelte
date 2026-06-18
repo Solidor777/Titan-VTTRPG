@@ -101,13 +101,13 @@
       // Portaled to <body>; sits above Foundry sheets and overlays as a transient dropdown.
       position: absolute;
       z-index: 10000;
-      max-height: 16rem;
+      max-height: 256px;
       overflow-y: auto;
       padding: 2px;
       border: var(--titan-input-border);
       border-radius: var(--titan-input-border-radius);
       background: var(--titan-panel-1-background);
-      box-shadow: 0 4px 12px rgb(0 0 0 / 40%);
+      box-shadow: 0 4px 12px rgb(0 0 0 / 0.4);
 
       &.prefloat {
          opacity: 0;

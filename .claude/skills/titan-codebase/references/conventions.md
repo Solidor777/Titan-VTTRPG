@@ -396,6 +396,37 @@ can call any mixin directly without an explicit `@use`, e.g.:
 
 See `architecture.md` — `src/styles/` section — for the full list of global SCSS files.
 
+## Custom Select (combobox, not native `<select>`)
+
+`src/helpers/svelte-components/input/select/Select.svelte` is a custom listbox, **not** a native
+`<select>` — a native option popup cannot render icons or per-option styling. It is a `<button
+role="combobox">` trigger that, when open, mounts `SelectList.svelte` (`role="listbox"`) **portaled to
+`document.body`** via the `portalToBody` action (`src/helpers/svelte-actions/`) and positioned with
+`svelte-floating-ui` (`createFloatingActions`, `offset`/`flip`/`shift`; positions once on open and
+**closes on outside-click / scroll / resize**, no live reposition). Portaling escapes ApplicationV2
+windows' `transform` containing block; theme `--titan-*` tokens still apply because they are injected on
+`:root`.
+
+The public contract is unchanged from the old native version — `{ options, value (primitive,
+`$bindable`), disabled, tooltip, onchange, testId }` — so all ~37 wrappers (domain selects +
+`Document*Select`) are untouched. `value` stays a primitive written straight to the document (no whole-item
+object). Additions: `SelectOption` gains an optional `icon` (FontAwesome class, drawn left of the label in
+the row and the closed control), and `Select` accepts optional `option(opt, i)` / `selection(opt)` snippets
+for full per-row styling. `AttributeSelect`/`AttackTypeSelect` populate `icon` from `~/system/Icons.js`;
+`AttributeSelect` also supplies an `option` snippet that tints each row by its attribute via the
+`attribute-colors` mixin (the closed control is tinted by the existing `AttributeInput` wrapper).
+
+Keyboard parity with the native element: Up/Down/Home/End, Enter/Space to commit, Esc/Tab to close,
+first-letter typeahead, plus `aria-expanded`/`aria-controls`/`aria-activedescendant`. The clamp `$effect`
+(reset to the first option when `value` is out of range) is preserved.
+
+**e2e:** drive it through `tests/e2e/select.js` — `selectTitanOption(page, trigger, value)`,
+`titanSelectOptionValues(page, trigger)`, `readTitanSelectValue(trigger)`. The trigger is
+`[role="combobox"]`; option rows carry `data-value` and are matched **document-wide** (the list is portaled
+to `<body>`, and only one list is open at a time). The trigger reflects the committed value as its own
+`data-value`. Never use Playwright `selectOption` on a TITAN select (it is not a native `<select>`); the
+Foundry login `select[name="userid"]` in `fixtures.js` IS native and stays on `selectOption`.
+
 ## assert()
 
 `assert` is a standalone default export from `src/helpers/utility-functions/Assert.js`, imported with the
@@ -714,7 +745,7 @@ carries a `testId` (`data-testid` passthrough) **except `Text`**, which renders 
 inline with no root element — a wrapper would change its DOM contract, so its probe locates via the probe
 container selector instead. Wrapper components forward `testId` to their inner primitive's rendered root
 (e.g. wrapper selects → the `AttributeInput`/`RarityInput`/`ResistanceInput` div; bare selects → the inner
-`<Select>`'s `<select>`; `ImagePicker` → `ImageButton`'s `<button>`). To probe a new primitive: add it to
+`<Select>`'s combobox button (`[role="combobox"]`); `ImagePicker` → `ImageButton`'s `<button>`). To probe a new primitive: add it to
 `componentRegistry.js`, add a `testId` prop on its root if it lacks one (never add a wrapper element solely
 to host it), append a describe block, then re-run the spec — `test:e2e`'s global-setup rebuilds
 `test/build/probe.iife.js` and the harness re-injects it (no `dist/` rebuild needed).
