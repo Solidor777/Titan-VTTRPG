@@ -19,6 +19,8 @@ const HERITAGE_DARK = Object.freeze({
       'scrollbar-gutter-color': '#1b1c26',
       'highlighted-background': '#ffe9ae',
       'highlighted-font-color': '#3d3304',
+      'heading-font-color': '#d8dbe8',
+      'accent-color': '#3fb6dd',
       'panel-1-background': '#373949',
       'panel-1-color': '#d8dbe8',
       'panel-2-background': '#424557',

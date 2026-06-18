@@ -18,6 +18,8 @@ const CLEAN_NEUTRAL_LIGHT = Object.freeze({
       'scrollbar-gutter-color': '#e9ebee',
       'highlighted-background': '#fdeec9',
       'highlighted-font-color': '#6d4708',
+      'heading-font-color': '#1f2430',
+      'accent-color': '#38bdf8',
       'panel-1-background': '#f5f6f8',
       'panel-1-color': '#1f2430',
       'panel-2-background': '#eef0f3',

@@ -18,6 +18,8 @@ const HERITAGE_LIGHT = Object.freeze({
       'scrollbar-gutter-color': '#e2e2e8',
       'highlighted-background': '#ffe9ae',
       'highlighted-font-color': '#3d3304',
+      'heading-font-color': '#262626',
+      'accent-color': '#3fb6dd',
       'panel-1-background': '#ffffff',
       'panel-1-color': '#262626',
       'panel-2-background': '#f2f2f6',

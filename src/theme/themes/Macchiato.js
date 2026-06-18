@@ -19,6 +19,8 @@ const MACCHIATO = Object.freeze({
       'scrollbar-gutter-color': '#181926',
       'highlighted-background': '#eed49f',
       'highlighted-font-color': '#3d2e0a',
+      'heading-font-color': '#cad3f5',
+      'accent-color': '#91d7e3',
       'panel-1-background': '#363a4f',
       'panel-1-color': '#cad3f5',
       'panel-2-background': '#494d64',
