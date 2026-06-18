@@ -8,6 +8,7 @@
    "author": "Solidor",
    "dependencies": {
       "short-unique-id": "^5.0.3",
+      "svelte-floating-ui": "^1.6.2",
       "tippy.js": "^6.3.7"
    },
    "devDependencies": {
