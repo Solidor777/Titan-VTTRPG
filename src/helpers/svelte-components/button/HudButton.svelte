@@ -13,6 +13,8 @@
     * @property {object | undefined} [flyIn] - `svelte/transition` fly parameters for the entrance; applied only when present.
     * @property {HTMLElement | undefined} [element] - Bindable reference to the underlying button element.
     * @property {((event: MouseEvent) => void) | undefined} [onclick] - The click handler.
+    * @property {((event: PointerEvent) => void) | undefined} [onpointerenter] - The pointer-enter handler (sub-option reveal).
+    * @property {((event: FocusEvent) => void) | undefined} [onfocus] - The focus handler (sub-option reveal).
     * @property {import('svelte').Snippet} children - The button content.
     */
 
@@ -28,8 +30,9 @@
       flyIn = undefined,
       element = $bindable(undefined),
       onclick = undefined,
+      onpointerenter = undefined,
+      onfocus = undefined,
       children,
-      ...rest
    } = $props();
 </script>
 
@@ -48,7 +51,8 @@
       data-testid={testId}
       in:fly={flyIn}
       {onclick}
-      {...rest}
+      {onpointerenter}
+      {onfocus}
    >
       {@render children()}
    </button>
@@ -66,7 +70,8 @@
       aria-label={ariaLabel}
       data-testid={testId}
       {onclick}
-      {...rest}
+      {onpointerenter}
+      {onfocus}
    >
       {@render children()}
    </button>
