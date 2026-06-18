@@ -418,7 +418,11 @@ for full per-row styling. `AttributeSelect`/`AttackTypeSelect` populate `icon` f
 
 Keyboard parity with the native element: Up/Down/Home/End, Enter/Space to commit, Esc/Tab to close,
 first-letter typeahead, plus `aria-expanded`/`aria-controls`/`aria-activedescendant`. The clamp `$effect`
-(reset to the first option when `value` is out of range) is preserved.
+(reset to the first option when `value` is out of range) is preserved. Handled keys call
+`stopPropagation` so they do not leak to Foundry's bubble-phase keybindings — otherwise Esc pops the
+main `#menu` dialog and arrow keys pan the canvas while the list is open (unmodified single characters
+drive typeahead; Ctrl/Alt/Meta combos pass through to Foundry/browser shortcuts). This is also why e2e
+helpers can safely close the list with `Escape`.
 
 **e2e:** drive it through `tests/e2e/select.js` — `selectTitanOption(page, trigger, value)`,
 `titanSelectOptionValues(page, trigger)`, `readTitanSelectValue(trigger)`. The trigger is
