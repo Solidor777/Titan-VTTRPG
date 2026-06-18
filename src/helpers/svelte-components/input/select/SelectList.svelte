@@ -24,7 +24,7 @@
       hoverIndex = $bindable(0),
       listId,
       testId = void 0,
-      listEl = $bindable(void 0),
+      listEl = $bindable(),
       floatingContent,
       option: optionSnippet = void 0,
       onselect,
