@@ -322,11 +322,17 @@ pairing list — every `…-background` fill that carries text has a paired `…
 never produce light-on-saturated text), the four built-in themes live in `src/theme/themes/`, and
 `ThemeManager.apply()` writes one `<style id="titan-theme-style">` containing the active theme on
 `:root` plus `.titan.themed.theme-light` / `.titan.themed.theme-dark` scoped blocks (the world-default
-light/dark themes) so Foundry's per-sheet color-scheme option overrides individual windows. Two standalone
-(unpaired) application-group tokens carry text/accent color with no single fill: `heading-font-color` colors
-rich-text headings via a `.rich-text :is(h1..h6)` rule in `Global.scss` (reaching both sheets and the
-un-themed Player HUD), and `accent-color` is the HUD flyout accent (replacing the former undefined
-`--titan-cyan`). Resolution:
+light/dark themes) so Foundry's per-sheet color-scheme option overrides individual windows. Unpaired text/
+accent tokens: the `headers` group `header-1-font-color`…`header-6-font-color` (per heading level) and the
+application-group `accent-color` (the HUD flyout accent, replacing the former undefined `--titan-cyan`).
+TITAN surfaces must use TITAN text colors, not Foundry's `--color-text-*` (which track Foundry's color
+scheme and mismatch the active TITAN theme): `Global.scss` redefines `--color-text-primary`/`-secondary`/
+`-emphatic` to `--titan-app-font-color` inside `.titan`, and colors `.titan`/`.rich-text` headings per level
+by setting BOTH `color` AND `--color-text-primary` on the heading element (so Foundry's own
+`color: var(--color-text-primary)` heading rule resolves to the TITAN token regardless of that rule's
+specificity; the `color` covers the non-`.titan` HUD). Every TITAN app/dialog/sheet/chat carries the base
+`titan` class — `TitanDocumentSheet` and `TitanDialog` constructors MERGE `'titan'` into the `classes`
+array, the direct `ApplicationV2` subclasses set it, and `ChatMessage#renderHTML` adds it. Resolution:
 client `theme` setting → `auto` follows Foundry's `theme-dark`/`theme-light` body class (a
 MutationObserver re-applies on change) → GM world defaults (`defaultDarkTheme`/`defaultLightTheme`) →
 built-in heritage fallback. Custom themes live in the `customThemes` client setting (same data shape as

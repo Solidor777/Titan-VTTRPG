@@ -271,9 +271,12 @@ category never reflows the bar. The per-user `directions.vertical.subOptionsFlow
 bottom-anchored dock so the flyout grows on-screen) chooses the stacking direction; flow up renders the visible
 window reversed so the first logical option is the bottom-most row, on the button. `.categories` reserves a gutter on the chip's edge so the minimize chip never
 overlaps the buttons. Sub-options window to `windowSize` entries with wheel scrolling (non-passive listener via
-a `use:` action) and gradient scroll fades, sliding in with a staggered `fly` transition along the expand
-direction; the hovered/focused sub-option's sub-buttons overlay in an absolutely-positioned lane beside the
-column (clamped to the column's bottom) so revealing them never reflows the menu. Every HUD button (category,
+a `use:` action) and gradient scroll fades; the whole flyout lane swooshes in with a directional `in:fly`
+from the open category toward the sub-options (horizontal slide in a vertical layout, vertical in a
+horizontal one). The sub-option moved-over (`onpointermove`, NOT `onpointerenter`, so a flyout swooshing in
+under a stationary cursor never auto-opens a sub-option) or keyboard-focused reveals its sub-buttons in an
+absolutely-positioned lane beside the column (clamped to the column's bottom, itself swooshing in via
+`in:fly` toward `subButtonsSide`) so revealing them never reflows the menu. Every HUD button (category,
 sub-option, sub-button, frame chip, effect row header) is a `HudButton`
 (`src/helpers/svelte-components/button/HudButton.svelte`): one variant-driven primitive that defines every
 box/text property from `--titan-button-*` tokens via `@include button` with per-variant overrides, so Foundry

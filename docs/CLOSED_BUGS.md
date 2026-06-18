@@ -324,3 +324,49 @@ when fixed.
   all four built-in themes, a cyan/sky value per theme); the HUD accent references it via
   `HudButton`'s `accentEdge` prop and the sub-option inset shadow. The sibling undefined palette
   colors feeding the chat resource-mod tag gradients are logged separately (OPEN_BUGS #1).
+
+### 28. Action-menu sub-button lane appeared instantly instead of animating
+
+- **What:** The action-menu sub-button lane (`ActionMenuFlyout.svelte`) popped in instantly when a
+  sub-option was revealed, unlike the flyout itself.
+- **Found:** 2026-06-18, user-reported.
+- **Fixed:** 2026-06-18 on `fix/hud-anim-and-theme-contrast` — a directional `in:fly` on the lane
+  (`subButtonFly`, 24px/180ms), sliding in from the sub-option toward `subButtonsSide`.
+
+### 29. Opening a category inconsistently auto-opened its sub-buttons
+
+- **What:** Opening a category could open it with a sub-option's sub-buttons already showing or not,
+  depending on where the category button was clicked. The flyout swooshes in under the cursor; the
+  sub-option under the cursor fired `pointerenter` and auto-revealed its sub-buttons (clicking the side
+  the flyout opens toward put the cursor on a sub-option; the opposite side did not).
+- **Found:** 2026-06-18, user-reported.
+- **Fixed:** 2026-06-18 on `fix/hud-anim-and-theme-contrast` — a sub-option now reveals its sub-buttons
+  on pointer movement over the row (`onpointermove`) rather than `onpointerenter`. A flyout sliding in
+  under a stationary cursor generates no `pointermove`, so a category always opens with sub-buttons
+  closed; a genuine hover (or keyboard focus) still reveals.
+
+### 30. Headers (and text) used Foundry's color, unreadable on TITAN light themes (supersedes #25)
+
+- **What:** Foundry core paints headings — and assorted text — with `var(--color-text-primary)`, which
+  tracks Foundry's color scheme and mismatches the active TITAN theme (light text on a TITAN light
+  theme). The earlier `heading-font-color` fix (CLOSED_BUGS #25) was wired only to `.rich-text`, so
+  TITAN's own headings (e.g. the theme-editor `<h3>` section titles) were never covered.
+- **Found:** 2026-06-18, user-reported (theme-editor section headers).
+- **Fixed:** 2026-06-18 on `fix/hud-anim-and-theme-contrast` — `heading-font-color` replaced by per-level
+  tokens `header-1-font-color` … `header-6-font-color` (new `headers` contract group, all four themes).
+  `Global.scss` redefines Foundry's `--color-text-*` within `.titan` to the TITAN body color, and sets
+  per-level header color on `.titan`/`.rich-text` headings by overriding `--color-text-primary` on the
+  heading element itself (so Foundry's own heading rule resolves to the TITAN token regardless of its
+  specificity) plus an explicit `color` for the non-`.titan` HUD. Every TITAN app/dialog/sheet/chat
+  already carries the base `titan` class (verified — `TitanDocumentSheet`/`TitanDialog` bases merge it,
+  the direct `ApplicationV2` subclasses set it, and `ChatMessage` adds it).
+
+### 31. Light-theme panels were indistinguishable from the background
+
+- **What:** Both light themes collapsed panels into the app background (`HeritageLight` `panel-2 #f2f2f6`
+  ≈ `app-background #f4f4f6`; `CleanNeutralLight` `panel-3 #ffffff` == `app-background #ffffff`), so
+  panels and panel-surfaced controls (e.g. the HUD action-menu buttons) did not read as distinct.
+- **Found:** 2026-06-18, user-reported.
+- **Fixed:** 2026-06-18 on `fix/hud-anim-and-theme-contrast` — retuned `HeritageLight` and
+  `CleanNeutralLight` so `app-background → panel-1 → panel-2 → panel-3` step progressively darker
+  (distinct raised surfaces), keeping each panel's dark text color.
