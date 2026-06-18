@@ -176,6 +176,9 @@
       @include flex-group-top;
 
       position: relative;
+
+      // Grow to the longest sub-option label rather than clipping it.
+      width: max-content;
       gap: 2px;
 
       .overflow {
