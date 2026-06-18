@@ -81,6 +81,7 @@
          {actors}
          {layoutState}
          options={options.actionMenu}
+         chipCorner={actionMenuChipCorner}
       />
    </HudElementFrame>
 {/if}

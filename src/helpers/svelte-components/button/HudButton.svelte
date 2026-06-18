@@ -112,6 +112,8 @@
          --titan-button-hover-background: var(--titan-panel-2-background);
          --titan-button-hover-font-color: var(--titan-panel-2-color);
 
+         // Content-width in a horizontal bar; a vertical column stretches it via align-items: stretch.
+         width: auto;
          padding: 3px var(--titan-spacing-standard);
 
          &.active {

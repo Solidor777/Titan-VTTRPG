@@ -4,16 +4,18 @@
    import buildActionMenuModel from '~/ui/player-hud/elements/action-menu/BuildActionMenuModel.js';
    import HudAmountDialog from '~/ui/player-hud/elements/action-menu/HudAmountDialog.js';
    import ActionMenuFlyout from '~/ui/player-hud/elements/action-menu/ActionMenuFlyout.svelte';
+   import HudButton from '~/helpers/svelte-components/button/HudButton.svelte';
 
    /**
     * @typedef {object} ActionMenuElementProps
     * @property {Array<Actor>} actors - All resolved actors (group actions iterate these).
     * @property {HudLayoutState} layoutState - Shared layout/UI state.
     * @property {object} options - The actionMenu options.
+    * @property {string} chipCorner - The minimize-chip corner ('top-right' | 'top-left' | 'bottom-right' | 'bottom-left'), so the category bar reserves its gutter on the chip's side.
     */
 
    /** @type {ActionMenuElementProps} */
-   const { actors, layoutState, options } = $props();
+   const { actors, layoutState, options, chipCorner } = $props();
 
    /** @type {object} The primary actor bridge (live reads keep the model reactive). */
    const document = getContext('document');
@@ -118,6 +120,17 @@
    );
 
    /**
+    * @type {'top' | 'right' | 'bottom' | 'left'} The edge the open category's accent bar sits on,
+    * facing the flyout: left/right in a vertical layout, top/bottom in a horizontal one.
+    */
+   const accentEdge = $derived.by(() => {
+      if (vertical) {
+         return subOptionsSide === 'before' ? 'left' : 'right';
+      }
+      return subOptionsSide === 'before' ? 'top' : 'bottom';
+   });
+
+   /**
     * Runs a clicked entry's action and closes the cascade unless the entry is an in-place toggle
     * (equip, quantity, duration, remove), which keeps the menu open for repeat use.
     * @param {string} kind - 'main' for sub-option rows, 'sub' for sub-buttons.
@@ -168,7 +181,7 @@
 />
 
 <div
-   class="action-menu"
+   class={`action-menu chip-${chipCorner}`}
    class:vertical
    class:flyout-before={subOptionsSide === 'before'}
    class:flyout-after={subOptionsSide === 'after'}
@@ -204,16 +217,17 @@
       bind:this={barEl}
    >
       {#each model as entry (entry.key)}
-         <button
-            type="button"
-            class:active={layoutState.openCategory === entry.key}
-            data-testid={`player-hud-category-${entry.key}`}
+         <HudButton
+            variant="category"
+            active={layoutState.openCategory === entry.key}
+            accentEdge={layoutState.openCategory === entry.key ? accentEdge : undefined}
+            testId={`player-hud-category-${entry.key}`}
             onclick={() => {
                layoutState.openCategory = layoutState.openCategory === entry.key ? null : entry.key;
             }}
          >
             {localize(entry.labelKey)}
-         </button>
+         </HudButton>
       {/each}
    </div>
 </div>
@@ -257,78 +271,33 @@
          @include flex-group-left;
 
          gap: 2px;
+      }
 
-         // Reserve a gutter so the minimize chip clears the buttons: in a horizontal layout the chip
-         // sits at the right; in a vertical layout it sits at the bottom (see actionMenuChipCorner).
+      // Reserve a gutter on the chip's own corner so the minimize chip never overlaps the categories.
+      &.chip-top-right .categories,
+      &.chip-bottom-right .categories {
          padding-right: 22px;
-
-         button {
-            @include panel-2;
-            @include font-size-small;
-
-            padding: 3px var(--titan-spacing-standard);
-            border: none;
-            border-radius: var(--titan-border-radius);
-            color: inherit;
-            cursor: pointer;
-            white-space: nowrap;
-
-            &.active {
-               @include panel-3;
-
-               position: relative;
-            }
-
-            // The accent edge-bar marks the open category on the side facing its flyout.
-            &.active::after {
-               content: '';
-               position: absolute;
-               background: var(--titan-cyan);
-            }
-         }
       }
 
-      // Place the accent edge-bar: left/right edge in a vertical layout, top/bottom in a horizontal
-      // one, on the side the flyout opens toward (before vs after).
-      &.vertical.flyout-before .categories button.active::after {
-         top: 0;
-         bottom: 0;
-         left: 0;
-         width: 2px;
-      }
-
-      &.vertical.flyout-after .categories button.active::after {
-         top: 0;
-         bottom: 0;
-         right: 0;
-         width: 2px;
-      }
-
-      &:not(.vertical).flyout-before .categories button.active::after {
-         left: 0;
-         right: 0;
-         top: 0;
-         height: 2px;
-      }
-
-      &:not(.vertical).flyout-after .categories button.active::after {
-         left: 0;
-         right: 0;
-         bottom: 0;
-         height: 2px;
+      &.chip-top-left .categories,
+      &.chip-bottom-left .categories {
+         padding-left: 22px;
       }
 
       &.vertical .categories {
          @include flex-column;
          @include flex-group-top;
 
-         padding-right: 0;
-         padding-bottom: 18px;
+         // Stretch the category buttons to the column width (they are content-width on their own).
+         align-items: stretch;
+      }
 
-         button {
-            width: 100%;
-            text-align: right;
-         }
+      // In a vertical layout the chip sits at a bottom corner, so the gutter is reserved below.
+      &.vertical.chip-bottom-right .categories,
+      &.vertical.chip-bottom-left .categories {
+         padding-right: 0;
+         padding-left: 0;
+         padding-bottom: 18px;
       }
    }
 </style>
