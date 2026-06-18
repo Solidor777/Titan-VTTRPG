@@ -1,5 +1,6 @@
 <script>
    import localize from '~/helpers/utility-functions/Localize.js';
+   import HudButton from '~/helpers/svelte-components/button/HudButton.svelte';
    import { clampPoint, deriveAnchors, resolvePosition } from '~/ui/player-hud/HudGeometry.js';
 
    /**
@@ -150,25 +151,25 @@
    onpointerdown={onDragStart}
 >
    {#if minimized}
-      <button
-         class="restore-chip"
-         type="button"
-         aria-label={localize('restoreElement')}
-         data-testid={testId ? `${testId}-restore` : undefined}
+      <HudButton
+         variant="restore"
+         ariaLabel={localize('restoreElement')}
+         testId={testId ? `${testId}-restore` : undefined}
          onclick={() => layoutState.toggleMinimized(elementKey)}
       >
          <i class={minimizeIcon}></i>
-      </button>
+      </HudButton>
    {:else}
-      <button
-         class={`minimize-chip ${chipCorner}`}
-         type="button"
-         aria-label={localize('minimizeElement')}
-         data-testid={testId ? `${testId}-minimize` : undefined}
-         onclick={() => layoutState.toggleMinimized(elementKey)}
-      >
-         <i class="fas fa-minus"></i>
-      </button>
+      <div class={`minimize-chip ${chipCorner}`}>
+         <HudButton
+            variant="chip"
+            ariaLabel={localize('minimizeElement')}
+            testId={testId ? `${testId}-minimize` : undefined}
+            onclick={() => layoutState.toggleMinimized(elementKey)}
+         >
+            <i class="fas fa-minus"></i>
+         </HudButton>
+      </div>
       {@render children()}
       {#if resizable && layoutState.editMode}
          <button
@@ -193,17 +194,10 @@
          outline-offset: 2px;
       }
 
+      // Positioning wrapper for the minimize chip; its surface and text come from HudButton.
       .minimize-chip {
-         @include panel-2;
-         @include font-size-small;
-
          position: absolute;
          z-index: 2;
-         padding: 1px 5px;
-         border: none;
-         border-radius: var(--titan-border-radius);
-         color: inherit;
-         cursor: pointer;
          opacity: 0.8;
 
          &:hover {
@@ -229,16 +223,6 @@
             bottom: 0;
             left: 0;
          }
-      }
-
-      .restore-chip {
-         @include panel-2;
-         @include padding-standard;
-
-         border: none;
-         border-radius: var(--titan-border-radius);
-         color: inherit;
-         cursor: pointer;
       }
 
       .resize-handle {
