@@ -99,22 +99,27 @@ Give the flyout sub-option column and the sub-button lane `width: max-content` s
 longest label; the buttons keep `width: 100%` to fill the resolved column width. Unbounded growth, per
 decision — the column always fits the option / item names.
 
-### Dedicated heading token (fixes #4)
+### New theme tokens (fixes #4 and the HUD accent)
 
-Add a `heading-font-color` token to the theme contract and color rich-text headings from it:
+Two standalone text/accent colors are added to the theme contract. Both go in the `application` group
+of `ThemeTokenContract.js`; `THEME_COLOR_TOKENS`, `THEME_TOKENS`, validation (`ValidateThemeData.js`),
+and the editor (`THEME_TOKEN_GROUPS`) all derive from the contract, so they propagate automatically.
+Neither has a single paired fill, so neither is added to `THEME_TOKEN_PAIRS`. All four built-in themes
+(`HeritageDark`, `HeritageLight`, `Macchiato`, `CleanNeutralLight`) gain a value for each; the
+`ThemeContract` unit test enforces per-theme completeness against the contract.
 
-- `ThemeTokenContract.js`: add `'heading-font-color'` to the `application` group. `THEME_COLOR_TOKENS`,
-  `THEME_TOKENS`, validation (`ValidateThemeData.js`), and the editor (`THEME_TOKEN_GROUPS`) all derive
-  from the contract, so they pick it up automatically. It is a standalone text color (sits on already
-  paired panel/app backgrounds), so it is **not** added to `THEME_TOKEN_PAIRS`.
-- All four built-in themes (`HeritageDark`, `HeritageLight`, `Macchiato`, `CleanNeutralLight`) gain a
-  `heading-font-color` value. The `ThemeContract` unit test enforces per-theme completeness against the
-  contract.
-- `Global.scss` (a plain global stylesheet — the `:global` ban applies only to Svelte component
-  `<style>` blocks) gains a rule coloring rich-text headings:
-  `.rich-text :is(h1, h2, h3, h4, h5, h6) { color: var(--titan-heading-font-color); }`. The `.rich-text`
-  class is present on both HUD and sheet rich text, so one rule covers both; scoping to `.rich-text`
-  avoids restyling Foundry core headings.
+- **`heading-font-color` (fixes #4).** Colors rich-text headings. `Global.scss` (a plain global
+  stylesheet — the `:global` ban applies only to Svelte component `<style>` blocks) gains:
+  `.rich-text :is(h1, h2, h3, h4, h5, h6) { color: var(--titan-heading-font-color); }`. The
+  `.rich-text` class is present on both HUD and sheet rich text, so one rule covers both; scoping to
+  `.rich-text` avoids restyling Foundry core headings.
+
+- **`accent-color` (fixes the undefined `--titan-cyan` HUD accent).** The flyout accent currently
+  references `--titan-cyan`, which is defined nowhere in `src/`, so the accent resolves to nothing. The
+  redesign intended a swappable accent but never gave it a token. Replace the two HUD accent references
+  — the sub-option's inset accent (`ActionMenuSubOption.svelte`) and the category accent edge-bar (now a
+  sibling element in `ActionMenuElement.svelte`, per the relocation above) — with
+  `var(--titan-accent-color)`. The accent now resolves and tracks the active theme.
 
 ### Minimize-chip gutter (fixes #5)
 
@@ -125,25 +130,27 @@ side and magnitude verified live against the current configuration.
 
 ## Out of scope (logged, not fixed here)
 
-- `--titan-cyan` (the flyout accent referenced in `ActionMenuSubOption.svelte` and
-  `ActionMenuElement.svelte`) is **not defined anywhere in `src/`** and is not a theme token, so the
-  accent currently resolves to nothing. This is a separate latent defect; it will be logged to
-  `docs/OPEN_BUGS.md`, not addressed in this batch.
+- The named brand palette `--titan-blue`, `--titan-green`, `--titan-yellow`, `--titan-maroon`,
+  `--titan-orange`, and `--titan-cyan` is **defined nowhere in `src/`**. Beyond the HUD accent (fixed
+  above via `accent-color`), these feed the three chat resource-mod tag gradients in `SystemMixins.scss`
+  (`fast-healing-tag`, `persistent-damage-tag`, `resolve-regain-tag`, consumed by
+  `ChatMessageResourceModTag.svelte`), so those gradients currently render invalid. This is a separate
+  chat-surface defect; it will be logged to `docs/OPEN_BUGS.md` and fixed outside this batch.
 
 ## Testing
 
 - Existing player-HUD e2e specs must stay green; they select by the `data-testid`s and `.active` class
   that `HudButton` preserves. Add/extend assertions only where a fix is directly observable
   (e.g. heading color token applied; sub-option column width tracks label).
-- `ThemeContract` / `ThemeHelpers` unit tests validate the new token across the contract and all
-  themes.
+- `ThemeContract` / `ThemeHelpers` unit tests validate the two new tokens (`heading-font-color`,
+  `accent-color`) across the contract and all themes.
 - Live verification in Foundry for the inherently visual fixes (#1 row height, #2 column growth, #5
   chip clearance, #4 heading readability on a light theme), since pixel overflow and chip overlap are
   not reliably asserted headlessly.
 
 ## Documentation (required final step)
 
-- Move all five bugs to `docs/CLOSED_BUGS.md` on completion; add the `--titan-cyan` finding to
-  `docs/OPEN_BUGS.md`.
+- Move all five reported bugs to `docs/CLOSED_BUGS.md` on completion; log the undefined named-palette /
+  chat-tag-gradient finding to `docs/OPEN_BUGS.md`.
 - Update the `titan-codebase` skill: record `HudButton.svelte` as the themed button primitive for the
-  HUD (mixin + token-override pattern) and the new `heading-font-color` token in the theme contract.
+  HUD (mixin + token-override pattern) and the new `heading-font-color` and `accent-color` theme tokens.
