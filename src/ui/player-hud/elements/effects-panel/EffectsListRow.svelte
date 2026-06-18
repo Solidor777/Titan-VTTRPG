@@ -1,6 +1,7 @@
 <script>
    import { getContext } from 'svelte';
    import localize from '~/helpers/utility-functions/Localize.js';
+   import HudButton from '~/helpers/svelte-components/button/HudButton.svelte';
    import DurationTag from '~/helpers/svelte-components/tag/DurationTag.svelte';
    import EffectsDetailBody from '~/ui/player-hud/elements/effects-panel/EffectsDetailBody.svelte';
 
@@ -27,11 +28,10 @@
    class:expanded={isExpanded}
    data-testid="player-hud-effect-row"
 >
-   <!--Row header (click to expand): icon centered against the stacked name/duration column-->
-   <button
-      class="row-header"
-      type="button"
-      aria-label={`${document.data?.name}: ${localize(isExpanded ? 'collapse' : 'expand')}`}
+   <!--Row header (click to expand): icon centred against the stacked name/duration column-->
+   <HudButton
+      variant="ghost"
+      ariaLabel={`${document.data?.name}: ${localize(isExpanded ? 'collapse' : 'expand')}`}
       onclick={() => isExpanded = !isExpanded}
    >
       <img
@@ -50,7 +50,7 @@
             </span>
          {/if}
       </span>
-   </button>
+   </HudButton>
 
    {#if isExpanded}
       <div class="detail">
@@ -74,39 +74,29 @@
          @include margin-top-standard;
       }
 
-      .row-header {
-         @include flex-row;
-         @include flex-group-left;
+      // The header's icon + stacked name/duration column (the button shell is HudButton's ghost variant).
+      .icon {
+         flex-shrink: 0;
+         width: 30px;
+         height: 30px;
+         object-fit: contain;
+      }
 
-         width: 100%;
-         background: none;
-         border: none;
-         cursor: pointer;
-         color: inherit;
+      .text {
+         @include flex-column;
+         @include flex-group-top-left;
+         @include margin-left-standard;
 
-         .icon {
-            flex-shrink: 0;
-            width: 30px;
-            height: 30px;
-            object-fit: contain;
-         }
+         flex: 1;
+         min-width: 0;
+         gap: 2px;
 
-         .text {
-            @include flex-column;
-            @include flex-group-top-left;
-            @include margin-left-standard;
-
-            flex: 1;
-            min-width: 0;
-            gap: 2px;
-
-            // Truncate rather than overflow the panel when the row is narrow.
-            .name {
-               width: 100%;
-               overflow: hidden;
-               text-overflow: ellipsis;
-               white-space: nowrap;
-            }
+         // Truncate rather than overflow the panel when the row is narrow.
+         .name {
+            width: 100%;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
          }
       }
 
