@@ -157,12 +157,12 @@ test.describe('v14 checks dialog (driven from Playwright)', () => {
       });
    }
 
-   // Attribute extra: the difficulty `<select>` changes the rolled difficulty without changing dice count.
+   // Attribute extra: the difficulty Select combobox changes the rolled difficulty without changing dice count.
    test('attribute dialog difficulty select flows through without changing dice', async () => {
       const dialog = await openCheckDialog(page, 'attribute');
       const baseDice = await readSummary(dialog, 'totalDice');
 
-      // Difficulty is a 1-6 native select; changing it must not change the dice count.
+      // Difficulty is a 1-6 Select combobox; changing it must not change the dice count.
       await setSelectField(dialog, 'difficulty', 6);
       await expect(dialog.getByTestId('check-summary-totalDice')).toHaveText(String(baseDice));
 

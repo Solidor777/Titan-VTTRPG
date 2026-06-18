@@ -59,4 +59,17 @@ describe('Select', () => {
       render(Select, { props: { options: ['body'], value: 'body', disabled: true } });
       expect(screen.getByRole('combobox').disabled).toBe(true);
    });
+
+   it('stays closed and does not throw with an empty option list', async () => {
+      render(Select, { props: { options: [], value: void 0 } });
+      const trigger = screen.getByRole('combobox');
+
+      // Clicking and key navigation on an empty Select must not open a list or throw.
+      await fireEvent.click(trigger);
+      await fireEvent.keyDown(trigger, { key: 'ArrowDown' });
+      await fireEvent.keyDown(trigger, { key: 'Enter' });
+
+      expect(screen.queryAllByRole('option')).toHaveLength(0);
+      expect(trigger.getAttribute('aria-expanded')).toBe('false');
+   });
 });

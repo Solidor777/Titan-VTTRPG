@@ -952,7 +952,8 @@ test.describe('component probe — RulesElementOperationSelect', () => {
             testId: 'probe-re-operation-select',
          },
       });
-      await expect(page.locator(`${selector} [role="combobox"][data-testid="probe-re-operation-select"]`)).toBeVisible();
+      const trigger = page.locator(`${selector} [role="combobox"][data-testid="probe-re-operation-select"]`);
+      await expect(trigger).toBeVisible();
    });
 });
 
@@ -1102,7 +1103,8 @@ test.describe('component probe — AttackTraitSelect', () => {
             testId: 'probe-attack-trait-select',
          },
       });
-      await expect(page.locator(`${selector} [role="combobox"][data-testid="probe-attack-trait-select"]`)).toBeVisible();
+      const trigger = page.locator(`${selector} [role="combobox"][data-testid="probe-attack-trait-select"]`);
+      await expect(trigger).toBeVisible();
    });
 });
 
@@ -1176,6 +1178,7 @@ test.describe('component probe — ShieldTraitSelect', () => {
             testId: 'probe-shield-trait-select',
          },
       });
-      await expect(page.locator(`${selector} [role="combobox"][data-testid="probe-shield-trait-select"]`)).toBeVisible();
+      const trigger = page.locator(`${selector} [role="combobox"][data-testid="probe-shield-trait-select"]`);
+      await expect(trigger).toBeVisible();
    });
 });

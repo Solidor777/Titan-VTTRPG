@@ -1,4 +1,5 @@
 <script>
+   import { onDestroy } from 'svelte';
    import { createFloatingActions } from 'svelte-floating-ui';
    import { offset, flip, shift } from 'svelte-floating-ui/dom';
    import tooltipAction from '~/helpers/svelte-actions/TooltipAction.js';
@@ -63,6 +64,9 @@
    /** @type {number} Timer id clearing the typeahead buffer. */
    let typeaheadTimer = 0;
 
+   // Clear a pending typeahead-buffer timer if the component unmounts within its 500ms window.
+   onDestroy(() => clearTimeout(typeaheadTimer));
+
    // Floating-ui actions: floatingRef on the trigger, floatingContent on the list. Positions once on
    // open (flip/shift handle viewport edges); the list closes on scroll/resize rather than tracking.
    const [floatingRef, floatingContent] = createFloatingActions({
@@ -106,7 +110,7 @@
     * @returns {void}
     */
    function open() {
-      if (disabled) {
+      if (disabled || normalized.length === 0) {
          return;
       }
 
@@ -146,6 +150,9 @@
    function moveHover(step) {
       // The option count, used to wrap the highlight index.
       const count = normalized.length;
+      if (count === 0) {
+         return;
+      }
       hoverIndex = (hoverIndex + step + count) % count;
    }
 
@@ -222,7 +229,9 @@
             event.preventDefault();
             event.stopPropagation();
             if (listOpen) {
-               commit(normalized[hoverIndex]);
+               if (normalized[hoverIndex]) {
+                  commit(normalized[hoverIndex]);
+               }
             }
             else {
                open();

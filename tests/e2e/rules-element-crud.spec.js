@@ -143,7 +143,8 @@ test.describe('rules-element selector default key', () => {
          });
 
       // Change the operation-specific SELECTOR dropdown to "resource".
-      const operationSelect = page.locator('.rules-element .operation-settings .field.select [role="combobox"]').first();
+      const operationSelect = page.locator('.rules-element .operation-settings .field.select [role="combobox"]')
+         .first();
       await selectTitanOption(page, operationSelect, 'resource');
 
       // The key must land on the curated default "resolve", NOT the clamp's first option "all". Poll the

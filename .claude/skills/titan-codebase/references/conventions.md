@@ -749,9 +749,10 @@ carries a `testId` (`data-testid` passthrough) **except `Text`**, which renders 
 inline with no root element — a wrapper would change its DOM contract, so its probe locates via the probe
 container selector instead. Wrapper components forward `testId` to their inner primitive's rendered root
 (e.g. wrapper selects → the `AttributeInput`/`RarityInput`/`ResistanceInput` div; bare selects → the inner
-`<Select>`'s combobox button (`[role="combobox"]`); `ImagePicker` → `ImageButton`'s `<button>`). To probe a new primitive: add it to
-`componentRegistry.js`, add a `testId` prop on its root if it lacks one (never add a wrapper element solely
-to host it), append a describe block, then re-run the spec — `test:e2e`'s global-setup rebuilds
+`<Select>`'s combobox button (`[role="combobox"]`); `ImagePicker` → `ImageButton`'s `<button>`). To probe
+a new primitive: add it to `componentRegistry.js`, add a `testId` prop on its root if it lacks one (never
+add a wrapper element solely to host it), append a describe block, then re-run the spec — `test:e2e`'s
+global-setup rebuilds
 `test/build/probe.iife.js` and the harness re-injects it (no `dist/` rebuild needed).
 
 **Gotcha — Foundry global `.disabled`:** Foundry's `foundry2.css` defines `.disabled { pointer-events: none; }`.

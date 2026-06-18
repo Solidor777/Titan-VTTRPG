@@ -12,7 +12,7 @@
     * @property {boolean} [allowNone] - Whether to allow None as an option.
     * @property {boolean} [disabled] - Whether the input should currently be disabled.
     * @property {string | TooltipAction} [tooltip] - The Tooltip to display for this element, if any.
-    * @property {(event: Event) => void} [onchange] - Callback fired when the selected value changes.
+    * @property {() => void} [onchange] - Callback fired when the selected value changes.
     * @property {string} [testId] - Optional stable selector applied as `data-testid` on the root element.
     */
 
