@@ -46,6 +46,12 @@
    }
 }
 
+// Rich-text headings read from the themed heading color so they stay legible on light themes and in
+// the Player HUD, which renders outside the .titan themed text scope.
+.rich-text :is(h1, h2, h3, h4, h5, h6) {
+   color: var(--titan-heading-font-color);
+}
+
 // The TITAN chat surface, shared by TITAN cards and core messages opted in via titan-core-themed.
 .titan.chat-message,
 .titan-core-themed.chat-message {
