@@ -256,7 +256,8 @@ test('the vertical flyout anchors to the open category button and flows up or do
       };
    });
 
-   // Default flow (down): the first sub-option lines up with the open button's top, stacking below.
+   // Flow down: the first sub-option lines up with the open button's top, stacking below.
+   await setMenuOptions(page, { directions: { vertical: { subOptionsFlow: 'down' } } });
    await openCategory(page, 'skills');
    await expectBoxes(flyout, skills,
       (flyoutBox, barBox) => Math.abs(flyoutBox.y - barBox.y) <= 2,
@@ -336,7 +337,8 @@ test('the configured direction is honored at the screen edge (no auto-flip)', as
 
 test('long lists window and wheel-scroll', async () => {
    await seedControlledActor(page, { name: 'HUD Layout Player' });
-   await setMenuOptions(page, { windowSize: 5 });
+   // Pin flow down so the scroll fades and wheel direction assert the natural top-to-bottom window.
+   await setMenuOptions(page, { windowSize: 5, directions: { vertical: { subOptionsFlow: 'down' } } });
    await openCategory(page, 'skills');
 
    const subOptions = page.locator('[data-testid^="player-hud-sub-option-skills-"]');
@@ -351,7 +353,10 @@ test('long lists window and wheel-scroll', async () => {
    await expect(subOptions.first()).not.toHaveAttribute('data-testid', firstBefore);
    await expect(page.locator('[data-testid="player-hud-flyout-up"]')).toBeVisible();
 
-   await setMenuOptions(page, { windowSize: 8 });
+   // Clear the window-size and flow overrides so later tests inherit the defaults.
+   await page.evaluate(async () => {
+      await game.settings.set('titan', 'playerHudOptions', {});
+   });
 });
 
 test('per-category disable removes the category', async () => {

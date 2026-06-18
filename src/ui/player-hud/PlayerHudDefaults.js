@@ -32,7 +32,7 @@ export function createDefaultHudOptions() {
             vertical: {
                subButtons: 'left',
                subOptions: 'left',
-               subOptionsFlow: 'down',
+               subOptionsFlow: 'up',
             },
          },
          enabled: true,

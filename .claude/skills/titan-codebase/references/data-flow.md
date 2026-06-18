@@ -267,9 +267,9 @@ follow the sub-option direction. In a horizontal layout the flyout lane stays in
 category via a measured `margin-left`. In a vertical layout the flyout lane is lifted out of flow and
 absolutely anchored beside the category column at the open button's row — its top to the button (flow down) or
 its bottom to the button (flow up), measured from the active button's `offsetTop`/`offsetHeight` — so opening a
-category never reflows the bar. The per-user `directions.vertical.subOptionsFlow` (`down`/`up`, default `down`)
-chooses the stacking direction; flow up renders the visible window reversed so the first logical option is the
-bottom-most row, on the button. `.categories` reserves a gutter on the chip's edge so the minimize chip never
+category never reflows the bar. The per-user `directions.vertical.subOptionsFlow` (`down`/`up`, default `up` — matching the default
+bottom-anchored dock so the flyout grows on-screen) chooses the stacking direction; flow up renders the visible
+window reversed so the first logical option is the bottom-most row, on the button. `.categories` reserves a gutter on the chip's edge so the minimize chip never
 overlaps the buttons. Sub-options window to `windowSize` entries with wheel scrolling (non-passive listener via
 a `use:` action) and gradient scroll fades, sliding in with a staggered `fly` transition along the expand
 direction; the hovered/focused sub-option's sub-buttons overlay in an absolutely-positioned lane beside the
