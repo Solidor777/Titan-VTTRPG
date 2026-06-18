@@ -1,5 +1,6 @@
 import { expect, test } from '@playwright/test';
 import { login } from './fixtures.js';
+import { selectTitanOption } from './select.js';
 import {
    attachPageErrors,
    clearChat,
@@ -8,6 +9,18 @@ import {
    deleteFixtureActor,
    deleteOrphanedTokens,
 } from './world.js';
+
+/**
+ * Selects the seeded world pack in the tray's pack-select combobox (a `role="combobox"`, not a native
+ * `<select>`). The seeded effect/folder rows then load asynchronously; callers wait on the row/folder
+ * locator they act on next.
+ * @param {import('@playwright/test').Page} page - The Playwright page.
+ * @returns {Promise<void>} Resolves once the world pack option is committed.
+ */
+async function selectTrayPack(page) {
+   const trigger = page.locator('[role="combobox"][data-testid="effect-tray-pack-select"]');
+   await selectTitanOption(page, trigger, 'world.e2e-tray-effects');
+}
 
 /** @type {import('@playwright/test').Page} The file-shared, logged-in page (one world boot per file). */
 let page;
@@ -89,29 +102,19 @@ test.describe('effect tray sidebar tab', () => {
          await ui.titanEffects.render(true);
          ui.titanEffects.activate();
          await titanWait(
-            () => !!ui.titanEffects.element
-               ?.querySelector('[data-testid="effect-tray-pack-select"] option'),
-            { message: 'tray pack-select options rendered' },
+            () => !!ui.titanEffects.element?.querySelector('[data-testid="effect-tray-pack-select"]'),
+            { message: 'tray pack-select rendered' },
          );
       });
 
-      // The pack select offers the seeded world pack.
-      const options = await page.locator('[data-testid="effect-tray-pack-select"] option')
-         .allTextContents();
+      // The pack select offers the seeded world pack; open the combobox and read its option labels.
+      const packTrigger = page.locator('[role="combobox"][data-testid="effect-tray-pack-select"]');
+      await packTrigger.click();
+      const options = await page.locator('[role="option"]').allTextContents();
       expect(options.join(' ')).toContain('E2E Tray Effects');
 
-      // Select the seeded world pack via the mounted select element, dispatching a change event so
-      // the Svelte onchange handler fires regardless of the harness's native-select behavior.
-      await page.evaluate(async () => {
-         /** @type {HTMLSelectElement} The mounted pack-select element. */
-         const select = ui.titanEffects.element.querySelector('[data-testid="effect-tray-pack-select"]');
-         select.value = 'world.e2e-tray-effects';
-         select.dispatchEvent(new Event('change', { bubbles: true }));
-         await titanWait(
-            () => !!ui.titanEffects.element?.querySelector('[data-testid="effect-tray-row"]'),
-            { message: 'tray rows rendered for selected pack' },
-         );
-      });
+      // Commit the seeded world pack from the open list.
+      await page.locator('[role="option"][data-value="world.e2e-tray-effects"]').click();
 
       // Selecting the world pack lists its seeded effect.
       await expect(
@@ -143,18 +146,8 @@ test.describe('effect tray sidebar tab', () => {
          );
       });
 
-      // Select the seeded world pack via the mounted select element, dispatching a change event so
-      // the Svelte onchange handler fires regardless of the harness's native-select behavior.
-      await page.evaluate(async () => {
-         /** @type {HTMLSelectElement} The mounted pack-select element. */
-         const select = ui.titanEffects.element.querySelector('[data-testid="effect-tray-pack-select"]');
-         select.value = 'world.e2e-tray-effects';
-         select.dispatchEvent(new Event('change', { bubbles: true }));
-         await titanWait(
-            () => !!ui.titanEffects.element?.querySelector('[data-testid="effect-tray-row"]'),
-            { message: 'tray rows rendered for selected pack' },
-         );
-      });
+      // Select the seeded world pack in the pack-select combobox; rows then load asynchronously.
+      await selectTrayPack(page);
 
       // Scope the Apply click to the seeded effect's own row so the assertion is independent of how
       // many other effects the shared world pack holds or their alphabetical ordering.
@@ -185,18 +178,8 @@ test.describe('effect tray sidebar tab', () => {
          );
       });
 
-      // Select the seeded world pack via the mounted select element, dispatching a change event so
-      // the Svelte onchange handler fires regardless of the harness's native-select behavior.
-      await page.evaluate(async () => {
-         /** @type {HTMLSelectElement} The mounted pack-select element. */
-         const select = ui.titanEffects.element.querySelector('[data-testid="effect-tray-pack-select"]');
-         select.value = 'world.e2e-tray-effects';
-         select.dispatchEvent(new Event('change', { bubbles: true }));
-         await titanWait(
-            () => !!ui.titanEffects.element?.querySelector('[data-testid="effect-tray-row"]'),
-            { message: 'tray rows rendered for selected pack' },
-         );
-      });
+      // Select the seeded world pack in the pack-select combobox; rows then load asynchronously.
+      await selectTrayPack(page);
 
       // Create a blank effect via the header + New button.
       await page.locator('[data-testid="effect-tray-new"]').click();
@@ -257,16 +240,10 @@ test.describe('effect tray sidebar tab', () => {
             () => !!ui.titanEffects.element?.querySelector('[data-testid="effect-tray"]'),
             { message: 'tray panel mounted' },
          );
-
-         /** @type {HTMLSelectElement} The mounted pack-select element. */
-         const select = ui.titanEffects.element.querySelector('[data-testid="effect-tray-pack-select"]');
-         select.value = 'world.e2e-tray-effects';
-         select.dispatchEvent(new Event('change', { bubbles: true }));
-         await titanWait(
-            () => !!ui.titanEffects.element?.querySelector('[data-testid="effect-tray-folder"]'),
-            { message: 'tray folder rendered for selected pack' },
-         );
       });
+
+      // Select the seeded world pack in the pack-select combobox; its folder then loads asynchronously.
+      await selectTrayPack(page);
 
       // Double-click the folder name to enter inline rename, type a new name, and commit with Enter.
       await page.locator('[data-testid="effect-tray-folder"]', { hasText: 'E2E Rename Folder' })
@@ -315,16 +292,10 @@ test.describe('effect tray sidebar tab', () => {
             () => !!ui.titanEffects.element?.querySelector('[data-testid="effect-tray"]'),
             { message: 'tray panel mounted' },
          );
-
-         /** @type {HTMLSelectElement} The mounted pack-select element. */
-         const select = ui.titanEffects.element.querySelector('[data-testid="effect-tray-pack-select"]');
-         select.value = 'world.e2e-tray-effects';
-         select.dispatchEvent(new Event('change', { bubbles: true }));
-         await titanWait(
-            () => !!ui.titanEffects.element?.querySelector('[data-testid="effect-tray-row"]'),
-            { message: 'tray rows rendered for selected pack' },
-         );
       });
+
+      // Select the seeded world pack in the pack-select combobox; rows then load asynchronously.
+      await selectTrayPack(page);
 
       // Simulate a real drop of the actor's effect onto the tray container, dispatching a drop event
       // carrying the effect's standard Foundry drag data on a DataTransfer.
@@ -373,14 +344,10 @@ test.describe('effect tray sidebar tab', () => {
             () => !!ui.titanEffects.element?.querySelector('[data-testid="effect-tray"]'),
             { message: 'tray panel mounted' },
          );
-         const select = ui.titanEffects.element.querySelector('[data-testid="effect-tray-pack-select"]');
-         select.value = 'world.e2e-tray-effects';
-         select.dispatchEvent(new Event('change', { bubbles: true }));
-         await titanWait(
-            () => !!ui.titanEffects.element?.querySelector('[data-testid="effect-tray-row"]'),
-            { message: 'tray rows rendered for selected pack' },
-         );
       });
+
+      // Select the seeded world pack in the pack-select combobox; rows then load asynchronously.
+      await selectTrayPack(page);
 
       await page.locator('[data-testid="effect-tray-row"]', { hasText: 'E2E Tray Effect' })
          .locator('.effect-tray-row-icon')
@@ -421,14 +388,10 @@ test.describe('effect tray sidebar tab', () => {
             () => !!ui.titanEffects.element?.querySelector('[data-testid="effect-tray"]'),
             { message: 'tray panel mounted' },
          );
-         const select = ui.titanEffects.element.querySelector('[data-testid="effect-tray-pack-select"]');
-         select.value = 'world.e2e-tray-effects';
-         select.dispatchEvent(new Event('change', { bubbles: true }));
-         await titanWait(
-            () => !!ui.titanEffects.element?.querySelector('[data-testid="effect-tray-row"]'),
-            { message: 'tray rows rendered for selected pack' },
-         );
       });
+
+      // Select the seeded world pack in the pack-select combobox; rows then load asynchronously.
+      await selectTrayPack(page);
 
       await page.locator('[data-testid="effect-tray-row"]', { hasText: 'E2E Tray Effect' })
          .first()
@@ -474,14 +437,10 @@ test.describe('effect tray sidebar tab', () => {
             () => !!ui.titanEffects.element?.querySelector('[data-testid="effect-tray"]'),
             { message: 'tray panel mounted' },
          );
-         const select = ui.titanEffects.element.querySelector('[data-testid="effect-tray-pack-select"]');
-         select.value = 'world.e2e-tray-effects';
-         select.dispatchEvent(new Event('change', { bubbles: true }));
-         await titanWait(
-            () => !!ui.titanEffects.element?.querySelector('[data-testid="effect-tray-row"]'),
-            { message: 'tray rows rendered for selected pack' },
-         );
       });
+
+      // Select the seeded world pack in the pack-select combobox; rows then load asynchronously.
+      await selectTrayPack(page);
 
       await page.locator('[data-testid="effect-tray-lock"]').first().click();
 

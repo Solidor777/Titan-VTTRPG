@@ -2,6 +2,7 @@ import { test, expect } from '@playwright/test';
 import { login } from './fixtures.js';
 import { mountProbe, readProbeEvents, clearProbeEvents, unmountAll } from './componentProbe.js';
 import { closeAllApps, clearChat, attachPageErrors } from './world.js';
+import { selectTitanOption, titanSelectOptionValues, readTitanSelectValue } from './select.js';
 
 /** @type {import('@playwright/test').Page} The file-shared, logged-in page (one world boot per file). */
 let page;
@@ -47,18 +48,17 @@ test.describe('component probe — AttributeSelect', () => {
       // Drop the mount-time clamp onchange (if any) before asserting user-driven change.
       await clearProbeEvents(page);
 
-      const select = page.locator(`${selector} select`);
-      await expect(select.locator('option')).not.toHaveCount(0);
+      const trigger = page.locator(`${selector} [role="combobox"]`);
 
       /** @type {string[]} */
-      const optionValues = await select.locator('option').evaluateAll((opts) => opts.map((o) => o.value));
+      const optionValues = await titanSelectOptionValues(page, trigger);
       expect(optionValues).toContain('body');
       expect(optionValues).toContain('mind');
       expect(optionValues).toContain('soul');
       expect(optionValues).toHaveLength(3);
 
-      await select.selectOption('mind');
-      await expect(select).toHaveValue('mind');
+      await selectTitanOption(page, trigger, 'mind');
+      expect(await readTitanSelectValue(trigger)).toBe('mind');
 
       const events = await readProbeEvents(page);
       expect(events.filter((e) => e.event === 'onchange')).toHaveLength(1);
@@ -72,10 +72,10 @@ test.describe('component probe — AttributeSelect', () => {
          },
       });
 
+      const trigger = page.locator(`${selector} [role="combobox"]`);
+
       /** @type {string[]} */
-      const optionValues = await page.locator(`${selector} select option`).evaluateAll(
-         (opts) => opts.map((o) => o.value),
-      );
+      const optionValues = await titanSelectOptionValues(page, trigger);
       expect(optionValues).toContain('none');
       expect(optionValues).toHaveLength(4);
    });
@@ -87,7 +87,7 @@ test.describe('component probe — AttributeSelect', () => {
             disabled: true,
          },
       });
-      await expect(page.locator(`${selector} select`)).toBeDisabled();
+      await expect(page.locator(`${selector} [role="combobox"]`)).toBeDisabled();
    });
 
    test('testId resolves on the wrapper root', async () => {
@@ -122,18 +122,17 @@ test.describe('component probe — SkillSelect', () => {
       });
       await clearProbeEvents(page);
 
-      const select = page.locator(`${selector} select`);
-      await expect(select.locator('option')).not.toHaveCount(0);
+      const trigger = page.locator(`${selector} [role="combobox"]`);
 
       /** @type {string[]} */
-      const optionValues = await select.locator('option').evaluateAll((opts) => opts.map((o) => o.value));
+      const optionValues = await titanSelectOptionValues(page, trigger);
       expect(optionValues).toContain('arcana');
       expect(optionValues).toContain('athletics');
       expect(optionValues).toContain('stealth');
       expect(optionValues).toHaveLength(18);
 
-      await select.selectOption('athletics');
-      await expect(select).toHaveValue('athletics');
+      await selectTitanOption(page, trigger, 'athletics');
+      expect(await readTitanSelectValue(trigger)).toBe('athletics');
 
       const events = await readProbeEvents(page);
       expect(events.filter((e) => e.event === 'onchange')).toHaveLength(1);
@@ -147,10 +146,10 @@ test.describe('component probe — SkillSelect', () => {
          },
       });
 
+      const trigger = page.locator(`${selector} [role="combobox"]`);
+
       /** @type {string[]} */
-      const optionValues = await page.locator(`${selector} select option`).evaluateAll(
-         (opts) => opts.map((o) => o.value),
-      );
+      const optionValues = await titanSelectOptionValues(page, trigger);
       expect(optionValues).toContain('none');
       expect(optionValues).toHaveLength(19);
    });
@@ -162,7 +161,7 @@ test.describe('component probe — SkillSelect', () => {
             disabled: true,
          },
       });
-      await expect(page.locator(`${selector} select`)).toBeDisabled();
+      await expect(page.locator(`${selector} [role="combobox"]`)).toBeDisabled();
    });
 
    test('testId resolves on the select element', async () => {
@@ -172,7 +171,7 @@ test.describe('component probe — SkillSelect', () => {
             testId: 'probe-skill-select',
          },
       });
-      await expect(page.locator(`${selector} select[data-testid="probe-skill-select"]`)).toBeVisible();
+      await expect(page.locator(`${selector} [role="combobox"][data-testid="probe-skill-select"]`)).toBeVisible();
    });
 });
 
@@ -196,19 +195,18 @@ test.describe('component probe — RaritySelect', () => {
       });
       await clearProbeEvents(page);
 
-      const select = page.locator(`${selector} select`);
-      await expect(select.locator('option')).not.toHaveCount(0);
+      const trigger = page.locator(`${selector} [role="combobox"]`);
 
       /** @type {string[]} */
-      const optionValues = await select.locator('option').evaluateAll((opts) => opts.map((o) => o.value));
+      const optionValues = await titanSelectOptionValues(page, trigger);
       expect(optionValues).toContain('common');
       expect(optionValues).toContain('uncommon');
       expect(optionValues).toContain('rare');
       expect(optionValues).toContain('unique');
       expect(optionValues).toHaveLength(4);
 
-      await select.selectOption('rare');
-      await expect(select).toHaveValue('rare');
+      await selectTitanOption(page, trigger, 'rare');
+      expect(await readTitanSelectValue(trigger)).toBe('rare');
 
       const events = await readProbeEvents(page);
       expect(events.filter((e) => e.event === 'onchange')).toHaveLength(1);
@@ -221,7 +219,7 @@ test.describe('component probe — RaritySelect', () => {
             disabled: true,
          },
       });
-      await expect(page.locator(`${selector} select`)).toBeDisabled();
+      await expect(page.locator(`${selector} [role="combobox"]`)).toBeDisabled();
    });
 
    test('testId resolves on the wrapper root', async () => {
@@ -256,18 +254,17 @@ test.describe('component probe — RatingSelect', () => {
       });
       await clearProbeEvents(page);
 
-      const select = page.locator(`${selector} select`);
-      await expect(select.locator('option')).not.toHaveCount(0);
+      const trigger = page.locator(`${selector} [role="combobox"]`);
 
       /** @type {string[]} */
-      const optionValues = await select.locator('option').evaluateAll((opts) => opts.map((o) => o.value));
+      const optionValues = await titanSelectOptionValues(page, trigger);
       expect(optionValues).toContain('awareness');
       expect(optionValues).toContain('defense');
       expect(optionValues).toContain('initiative');
       expect(optionValues).toHaveLength(5);
 
-      await select.selectOption('defense');
-      await expect(select).toHaveValue('defense');
+      await selectTitanOption(page, trigger, 'defense');
+      expect(await readTitanSelectValue(trigger)).toBe('defense');
 
       const events = await readProbeEvents(page);
       expect(events.filter((e) => e.event === 'onchange')).toHaveLength(1);
@@ -281,10 +278,10 @@ test.describe('component probe — RatingSelect', () => {
          },
       });
 
+      const trigger = page.locator(`${selector} [role="combobox"]`);
+
       /** @type {string[]} */
-      const optionValues = await page.locator(`${selector} select option`).evaluateAll(
-         (opts) => opts.map((o) => o.value),
-      );
+      const optionValues = await titanSelectOptionValues(page, trigger);
       expect(optionValues).toContain('none');
       expect(optionValues).toHaveLength(6);
    });
@@ -296,7 +293,7 @@ test.describe('component probe — RatingSelect', () => {
             disabled: true,
          },
       });
-      await expect(page.locator(`${selector} select`)).toBeDisabled();
+      await expect(page.locator(`${selector} [role="combobox"]`)).toBeDisabled();
    });
 
    test('testId resolves on the select element', async () => {
@@ -306,7 +303,7 @@ test.describe('component probe — RatingSelect', () => {
             testId: 'probe-rating-select',
          },
       });
-      await expect(page.locator(`${selector} select[data-testid="probe-rating-select"]`)).toBeVisible();
+      await expect(page.locator(`${selector} [role="combobox"][data-testid="probe-rating-select"]`)).toBeVisible();
    });
 });
 
@@ -331,18 +328,17 @@ test.describe('component probe — ResistanceSelect', () => {
       });
       await clearProbeEvents(page);
 
-      const select = page.locator(`${selector} select`);
-      await expect(select.locator('option')).not.toHaveCount(0);
+      const trigger = page.locator(`${selector} [role="combobox"]`);
 
       /** @type {string[]} */
-      const optionValues = await select.locator('option').evaluateAll((opts) => opts.map((o) => o.value));
+      const optionValues = await titanSelectOptionValues(page, trigger);
       expect(optionValues).toContain('reflexes');
       expect(optionValues).toContain('resilience');
       expect(optionValues).toContain('willpower');
       expect(optionValues).toHaveLength(3);
 
-      await select.selectOption('resilience');
-      await expect(select).toHaveValue('resilience');
+      await selectTitanOption(page, trigger, 'resilience');
+      expect(await readTitanSelectValue(trigger)).toBe('resilience');
 
       const events = await readProbeEvents(page);
       expect(events.filter((e) => e.event === 'onchange')).toHaveLength(1);
@@ -356,10 +352,10 @@ test.describe('component probe — ResistanceSelect', () => {
          },
       });
 
+      const trigger = page.locator(`${selector} [role="combobox"]`);
+
       /** @type {string[]} */
-      const optionValues = await page.locator(`${selector} select option`).evaluateAll(
-         (opts) => opts.map((o) => o.value),
-      );
+      const optionValues = await titanSelectOptionValues(page, trigger);
       expect(optionValues).toContain('none');
       expect(optionValues).toHaveLength(4);
    });
@@ -371,7 +367,7 @@ test.describe('component probe — ResistanceSelect', () => {
             disabled: true,
          },
       });
-      await expect(page.locator(`${selector} select`)).toBeDisabled();
+      await expect(page.locator(`${selector} [role="combobox"]`)).toBeDisabled();
    });
 
    test('testId resolves on the wrapper root', async () => {
@@ -406,18 +402,17 @@ test.describe('component probe — ResourceSelect', () => {
       });
       await clearProbeEvents(page);
 
-      const select = page.locator(`${selector} select`);
-      await expect(select.locator('option')).not.toHaveCount(0);
+      const trigger = page.locator(`${selector} [role="combobox"]`);
 
       /** @type {string[]} */
-      const optionValues = await select.locator('option').evaluateAll((opts) => opts.map((o) => o.value));
+      const optionValues = await titanSelectOptionValues(page, trigger);
       expect(optionValues).toContain('stamina');
       expect(optionValues).toContain('resolve');
       expect(optionValues).toContain('wounds');
       expect(optionValues).toHaveLength(3);
 
-      await select.selectOption('resolve');
-      await expect(select).toHaveValue('resolve');
+      await selectTitanOption(page, trigger, 'resolve');
+      expect(await readTitanSelectValue(trigger)).toBe('resolve');
 
       const events = await readProbeEvents(page);
       expect(events.filter((e) => e.event === 'onchange')).toHaveLength(1);
@@ -431,10 +426,10 @@ test.describe('component probe — ResourceSelect', () => {
          },
       });
 
+      const trigger = page.locator(`${selector} [role="combobox"]`);
+
       /** @type {string[]} */
-      const optionValues = await page.locator(`${selector} select option`).evaluateAll(
-         (opts) => opts.map((o) => o.value),
-      );
+      const optionValues = await titanSelectOptionValues(page, trigger);
       expect(optionValues).toContain('none');
       expect(optionValues).toHaveLength(4);
    });
@@ -446,7 +441,7 @@ test.describe('component probe — ResourceSelect', () => {
             disabled: true,
          },
       });
-      await expect(page.locator(`${selector} select`)).toBeDisabled();
+      await expect(page.locator(`${selector} [role="combobox"]`)).toBeDisabled();
    });
 
    test('testId resolves on the select element', async () => {
@@ -456,7 +451,7 @@ test.describe('component probe — ResourceSelect', () => {
             testId: 'probe-resource-select',
          },
       });
-      await expect(page.locator(`${selector} select[data-testid="probe-resource-select"]`)).toBeVisible();
+      await expect(page.locator(`${selector} [role="combobox"][data-testid="probe-resource-select"]`)).toBeVisible();
    });
 });
 
@@ -481,11 +476,10 @@ test.describe('component probe — SpeedSelect', () => {
       });
       await clearProbeEvents(page);
 
-      const select = page.locator(`${selector} select`);
-      await expect(select.locator('option')).not.toHaveCount(0);
+      const trigger = page.locator(`${selector} [role="combobox"]`);
 
       /** @type {string[]} */
-      const optionValues = await select.locator('option').evaluateAll((opts) => opts.map((o) => o.value));
+      const optionValues = await titanSelectOptionValues(page, trigger);
       expect(optionValues).toContain('burrow');
       expect(optionValues).toContain('climb');
       expect(optionValues).toContain('fly');
@@ -493,8 +487,8 @@ test.describe('component probe — SpeedSelect', () => {
       expect(optionValues).toContain('swim');
       expect(optionValues).toHaveLength(5);
 
-      await select.selectOption('stride');
-      await expect(select).toHaveValue('stride');
+      await selectTitanOption(page, trigger, 'stride');
+      expect(await readTitanSelectValue(trigger)).toBe('stride');
 
       const events = await readProbeEvents(page);
       expect(events.filter((e) => e.event === 'onchange')).toHaveLength(1);
@@ -508,10 +502,10 @@ test.describe('component probe — SpeedSelect', () => {
          },
       });
 
+      const trigger = page.locator(`${selector} [role="combobox"]`);
+
       /** @type {string[]} */
-      const optionValues = await page.locator(`${selector} select option`).evaluateAll(
-         (opts) => opts.map((o) => o.value),
-      );
+      const optionValues = await titanSelectOptionValues(page, trigger);
       expect(optionValues).toContain('none');
       expect(optionValues).toHaveLength(6);
    });
@@ -523,7 +517,7 @@ test.describe('component probe — SpeedSelect', () => {
             disabled: true,
          },
       });
-      await expect(page.locator(`${selector} select`)).toBeDisabled();
+      await expect(page.locator(`${selector} [role="combobox"]`)).toBeDisabled();
    });
 
    test('testId resolves on the select element', async () => {
@@ -533,7 +527,7 @@ test.describe('component probe — SpeedSelect', () => {
             testId: 'probe-speed-select',
          },
       });
-      await expect(page.locator(`${selector} select[data-testid="probe-speed-select"]`)).toBeVisible();
+      await expect(page.locator(`${selector} [role="combobox"][data-testid="probe-speed-select"]`)).toBeVisible();
    });
 });
 
@@ -558,11 +552,10 @@ test.describe('component probe — ModSelect', () => {
       });
       await clearProbeEvents(page);
 
-      const select = page.locator(`${selector} select`);
-      await expect(select.locator('option')).not.toHaveCount(0);
+      const trigger = page.locator(`${selector} [role="combobox"]`);
 
       /** @type {string[]} */
-      const optionValues = await select.locator('option').evaluateAll((opts) => opts.map((o) => o.value));
+      const optionValues = await titanSelectOptionValues(page, trigger);
       expect(optionValues).toContain('armor');
       expect(optionValues).toContain('damage');
       expect(optionValues).toContain('healing');
@@ -570,8 +563,8 @@ test.describe('component probe — ModSelect', () => {
       expect(optionValues).toContain('woundRegain');
       expect(optionValues).toHaveLength(5);
 
-      await select.selectOption('damage');
-      await expect(select).toHaveValue('damage');
+      await selectTitanOption(page, trigger, 'damage');
+      expect(await readTitanSelectValue(trigger)).toBe('damage');
 
       const events = await readProbeEvents(page);
       expect(events.filter((e) => e.event === 'onchange')).toHaveLength(1);
@@ -585,10 +578,10 @@ test.describe('component probe — ModSelect', () => {
          },
       });
 
+      const trigger = page.locator(`${selector} [role="combobox"]`);
+
       /** @type {string[]} */
-      const optionValues = await page.locator(`${selector} select option`).evaluateAll(
-         (opts) => opts.map((o) => o.value),
-      );
+      const optionValues = await titanSelectOptionValues(page, trigger);
       expect(optionValues).toContain('none');
       expect(optionValues).toHaveLength(6);
    });
@@ -600,7 +593,7 @@ test.describe('component probe — ModSelect', () => {
             disabled: true,
          },
       });
-      await expect(page.locator(`${selector} select`)).toBeDisabled();
+      await expect(page.locator(`${selector} [role="combobox"]`)).toBeDisabled();
    });
 
    test('testId resolves on the select element', async () => {
@@ -610,7 +603,7 @@ test.describe('component probe — ModSelect', () => {
             testId: 'probe-mod-select',
          },
       });
-      await expect(page.locator(`${selector} select[data-testid="probe-mod-select"]`)).toBeVisible();
+      await expect(page.locator(`${selector} [role="combobox"][data-testid="probe-mod-select"]`)).toBeVisible();
    });
 });
 
@@ -634,17 +627,16 @@ test.describe('component probe — AttackTypeSelect', () => {
       });
       await clearProbeEvents(page);
 
-      const select = page.locator(`${selector} select`);
-      await expect(select.locator('option')).not.toHaveCount(0);
+      const trigger = page.locator(`${selector} [role="combobox"]`);
 
       /** @type {string[]} */
-      const optionValues = await select.locator('option').evaluateAll((opts) => opts.map((o) => o.value));
+      const optionValues = await titanSelectOptionValues(page, trigger);
       expect(optionValues).toContain('melee');
       expect(optionValues).toContain('ranged');
       expect(optionValues).toHaveLength(2);
 
-      await select.selectOption('ranged');
-      await expect(select).toHaveValue('ranged');
+      await selectTitanOption(page, trigger, 'ranged');
+      expect(await readTitanSelectValue(trigger)).toBe('ranged');
 
       const events = await readProbeEvents(page);
       expect(events.filter((e) => e.event === 'onchange')).toHaveLength(1);
@@ -657,7 +649,7 @@ test.describe('component probe — AttackTypeSelect', () => {
             disabled: true,
          },
       });
-      await expect(page.locator(`${selector} select`)).toBeDisabled();
+      await expect(page.locator(`${selector} [role="combobox"]`)).toBeDisabled();
    });
 
    test('testId resolves on the select element', async () => {
@@ -667,7 +659,7 @@ test.describe('component probe — AttackTypeSelect', () => {
             testId: 'probe-attack-type-select',
          },
       });
-      await expect(page.locator(`${selector} select[data-testid="probe-attack-type-select"]`)).toBeVisible();
+      await expect(page.locator(`${selector} [role="combobox"][data-testid="probe-attack-type-select"]`)).toBeVisible();
    });
 });
 
@@ -692,19 +684,18 @@ test.describe('component probe — CheckDifficultySelect', () => {
       });
       await clearProbeEvents(page);
 
-      const select = page.locator(`${selector} select`);
-      await expect(select.locator('option')).not.toHaveCount(0);
+      const trigger = page.locator(`${selector} [role="combobox"]`);
 
       /** @type {string[]} */
-      const optionValues = await select.locator('option').evaluateAll((opts) => opts.map((o) => o.value));
+      const optionValues = await titanSelectOptionValues(page, trigger);
 
       // Numeric options serialize to strings in the DOM.
       expect(optionValues).toContain('1');
       expect(optionValues).toContain('6');
       expect(optionValues).toHaveLength(6);
 
-      await select.selectOption('3');
-      await expect(select).toHaveValue('3');
+      await selectTitanOption(page, trigger, '3');
+      expect(await readTitanSelectValue(trigger)).toBe('3');
 
       const events = await readProbeEvents(page);
       expect(events.filter((e) => e.event === 'onchange')).toHaveLength(1);
@@ -717,7 +708,7 @@ test.describe('component probe — CheckDifficultySelect', () => {
             disabled: true,
          },
       });
-      await expect(page.locator(`${selector} select`)).toBeDisabled();
+      await expect(page.locator(`${selector} [role="combobox"]`)).toBeDisabled();
    });
 
    test('testId resolves on the select element', async () => {
@@ -727,7 +718,7 @@ test.describe('component probe — CheckDifficultySelect', () => {
             testId: 'probe-difficulty-select',
          },
       });
-      await expect(page.locator(`${selector} select[data-testid="probe-difficulty-select"]`)).toBeVisible();
+      await expect(page.locator(`${selector} [role="combobox"][data-testid="probe-difficulty-select"]`)).toBeVisible();
    });
 });
 
@@ -749,10 +740,10 @@ test.describe('component probe — DamageReducedBySelect', () => {
          },
       });
 
+      const trigger = page.locator(`${selector} [role="combobox"]`);
+
       /** @type {string[]} */
-      const optionValues = await page.locator(`${selector} select option`).evaluateAll(
-         (opts) => opts.map((o) => o.value),
-      );
+      const optionValues = await titanSelectOptionValues(page, trigger);
       expect(optionValues).toContain('none');
       expect(optionValues).toHaveLength(1);
    });
@@ -766,10 +757,10 @@ test.describe('component probe — DamageReducedBySelect', () => {
          },
       });
 
+      const trigger = page.locator(`${selector} [role="combobox"]`);
+
       /** @type {string[]} */
-      const optionValues = await page.locator(`${selector} select option`).evaluateAll(
-         (opts) => opts.map((o) => o.value),
-      );
+      const optionValues = await titanSelectOptionValues(page, trigger);
       expect(optionValues).toContain('resistanceCheck');
       expect(optionValues).toHaveLength(2);
    });
@@ -786,17 +777,17 @@ test.describe('component probe — DamageReducedBySelect', () => {
       });
       await clearProbeEvents(page);
 
-      const select = page.locator(`${selector} select`);
+      const trigger = page.locator(`${selector} [role="combobox"]`);
 
       /** @type {string[]} */
-      const optionValues = await select.locator('option').evaluateAll((opts) => opts.map((o) => o.value));
+      const optionValues = await titanSelectOptionValues(page, trigger);
       expect(optionValues).toContain('none');
       expect(optionValues).toContain('resistanceCheck');
       expect(optionValues).toContain('opposedCheck');
       expect(optionValues).toHaveLength(3);
 
-      await select.selectOption('resistanceCheck');
-      await expect(select).toHaveValue('resistanceCheck');
+      await selectTitanOption(page, trigger, 'resistanceCheck');
+      expect(await readTitanSelectValue(trigger)).toBe('resistanceCheck');
 
       const events = await readProbeEvents(page);
       expect(events.filter((e) => e.event === 'onchange')).toHaveLength(1);
@@ -809,7 +800,7 @@ test.describe('component probe — DamageReducedBySelect', () => {
             disabled: true,
          },
       });
-      await expect(page.locator(`${selector} select`)).toBeDisabled();
+      await expect(page.locator(`${selector} [role="combobox"]`)).toBeDisabled();
    });
 
    test('testId resolves on the select element', async () => {
@@ -819,7 +810,7 @@ test.describe('component probe — DamageReducedBySelect', () => {
             testId: 'probe-damage-reduced-by',
          },
       });
-      await expect(page.locator(`${selector} select[data-testid="probe-damage-reduced-by"]`)).toBeVisible();
+      await expect(page.locator(`${selector} [role="combobox"][data-testid="probe-damage-reduced-by"]`)).toBeVisible();
    });
 });
 
@@ -844,11 +835,10 @@ test.describe('component probe — InventoryItemTypeSelect', () => {
       });
       await clearProbeEvents(page);
 
-      const select = page.locator(`${selector} select`);
-      await expect(select.locator('option')).not.toHaveCount(0);
+      const trigger = page.locator(`${selector} [role="combobox"]`);
 
       /** @type {string[]} */
-      const optionValues = await select.locator('option').evaluateAll((opts) => opts.map((o) => o.value));
+      const optionValues = await titanSelectOptionValues(page, trigger);
       expect(optionValues).toContain('armor');
       expect(optionValues).toContain('commodity');
       expect(optionValues).toContain('equipment');
@@ -856,8 +846,8 @@ test.describe('component probe — InventoryItemTypeSelect', () => {
       expect(optionValues).toContain('weapon');
       expect(optionValues).toHaveLength(5);
 
-      await select.selectOption('weapon');
-      await expect(select).toHaveValue('weapon');
+      await selectTitanOption(page, trigger, 'weapon');
+      expect(await readTitanSelectValue(trigger)).toBe('weapon');
 
       const events = await readProbeEvents(page);
       expect(events.filter((e) => e.event === 'onchange')).toHaveLength(1);
@@ -871,10 +861,10 @@ test.describe('component probe — InventoryItemTypeSelect', () => {
          },
       });
 
+      const trigger = page.locator(`${selector} [role="combobox"]`);
+
       /** @type {string[]} */
-      const optionValues = await page.locator(`${selector} select option`).evaluateAll(
-         (opts) => opts.map((o) => o.value),
-      );
+      const optionValues = await titanSelectOptionValues(page, trigger);
       expect(optionValues).toContain('none');
       expect(optionValues).toHaveLength(6);
    });
@@ -886,7 +876,7 @@ test.describe('component probe — InventoryItemTypeSelect', () => {
             disabled: true,
          },
       });
-      await expect(page.locator(`${selector} select`)).toBeDisabled();
+      await expect(page.locator(`${selector} [role="combobox"]`)).toBeDisabled();
    });
 
    test('testId resolves on the select element', async () => {
@@ -897,7 +887,7 @@ test.describe('component probe — InventoryItemTypeSelect', () => {
          },
       });
       await expect(
-         page.locator(`${selector} select[data-testid="probe-inventory-item-type-select"]`),
+         page.locator(`${selector} [role="combobox"][data-testid="probe-inventory-item-type-select"]`),
       ).toBeVisible();
    });
 });
@@ -922,11 +912,10 @@ test.describe('component probe — RulesElementOperationSelect', () => {
       });
       await clearProbeEvents(page);
 
-      const select = page.locator(`${selector} select`);
-      await expect(select.locator('option')).not.toHaveCount(0);
+      const trigger = page.locator(`${selector} [role="combobox"]`);
 
       /** @type {string[]} */
-      const optionValues = await select.locator('option').evaluateAll((opts) => opts.map((o) => o.value));
+      const optionValues = await titanSelectOptionValues(page, trigger);
       expect(optionValues).toContain('flatModifier');
       expect(optionValues).toContain('mulBase');
       expect(optionValues).toContain('mulSum');
@@ -939,8 +928,8 @@ test.describe('component probe — RulesElementOperationSelect', () => {
       expect(optionValues).toContain('conditionalCheckModifier');
       expect(optionValues).toHaveLength(10);
 
-      await select.selectOption('mulBase');
-      await expect(select).toHaveValue('mulBase');
+      await selectTitanOption(page, trigger, 'mulBase');
+      expect(await readTitanSelectValue(trigger)).toBe('mulBase');
 
       const events = await readProbeEvents(page);
       expect(events.filter((e) => e.event === 'onchange')).toHaveLength(1);
@@ -953,7 +942,7 @@ test.describe('component probe — RulesElementOperationSelect', () => {
             disabled: true,
          },
       });
-      await expect(page.locator(`${selector} select`)).toBeDisabled();
+      await expect(page.locator(`${selector} [role="combobox"]`)).toBeDisabled();
    });
 
    test('testId resolves on the select element', async () => {
@@ -963,7 +952,8 @@ test.describe('component probe — RulesElementOperationSelect', () => {
             testId: 'probe-re-operation-select',
          },
       });
-      await expect(page.locator(`${selector} select[data-testid="probe-re-operation-select"]`)).toBeVisible();
+      const trigger = page.locator(`${selector} [role="combobox"][data-testid="probe-re-operation-select"]`);
+      await expect(trigger).toBeVisible();
    });
 });
 
@@ -988,19 +978,18 @@ test.describe('component probe — ArmorTraitSelect', () => {
       });
       await clearProbeEvents(page);
 
-      const select = page.locator(`${selector} select`);
-      await expect(select.locator('option')).not.toHaveCount(0);
+      const trigger = page.locator(`${selector} [role="combobox"]`);
 
       /** @type {string[]} */
-      const optionValues = await select.locator('option').evaluateAll((opts) => opts.map((o) => o.value));
+      const optionValues = await titanSelectOptionValues(page, trigger);
       expect(optionValues).toContain('magical');
       expect(optionValues).toContain('loud');
       expect(optionValues).toContain('encumbering');
       expect(optionValues).toContain('heavy');
       expect(optionValues).toHaveLength(4);
 
-      await select.selectOption('loud');
-      await expect(select).toHaveValue('loud');
+      await selectTitanOption(page, trigger, 'loud');
+      expect(await readTitanSelectValue(trigger)).toBe('loud');
 
       const events = await readProbeEvents(page);
       expect(events.filter((e) => e.event === 'onchange')).toHaveLength(1);
@@ -1014,10 +1003,10 @@ test.describe('component probe — ArmorTraitSelect', () => {
          },
       });
 
+      const trigger = page.locator(`${selector} [role="combobox"]`);
+
       /** @type {string[]} */
-      const optionValues = await page.locator(`${selector} select option`).evaluateAll(
-         (opts) => opts.map((o) => o.value),
-      );
+      const optionValues = await titanSelectOptionValues(page, trigger);
       expect(optionValues).toContain('none');
       expect(optionValues).toHaveLength(5);
    });
@@ -1029,7 +1018,7 @@ test.describe('component probe — ArmorTraitSelect', () => {
             disabled: true,
          },
       });
-      await expect(page.locator(`${selector} select`)).toBeDisabled();
+      await expect(page.locator(`${selector} [role="combobox"]`)).toBeDisabled();
    });
 
    test('testId resolves on the select element', async () => {
@@ -1039,7 +1028,7 @@ test.describe('component probe — ArmorTraitSelect', () => {
             testId: 'probe-armor-trait-select',
          },
       });
-      await expect(page.locator(`${selector} select[data-testid="probe-armor-trait-select"]`)).toBeVisible();
+      await expect(page.locator(`${selector} [role="combobox"][data-testid="probe-armor-trait-select"]`)).toBeVisible();
    });
 });
 
@@ -1064,19 +1053,18 @@ test.describe('component probe — AttackTraitSelect', () => {
       });
       await clearProbeEvents(page);
 
-      const select = page.locator(`${selector} select`);
-      await expect(select.locator('option')).not.toHaveCount(0);
+      const trigger = page.locator(`${selector} [role="combobox"]`);
 
       /** @type {string[]} */
-      const optionValues = await select.locator('option').evaluateAll((opts) => opts.map((o) => o.value));
+      const optionValues = await titanSelectOptionValues(page, trigger);
       expect(optionValues).toContain('blast');
       expect(optionValues).toContain('cleave');
       expect(optionValues).toContain('magical');
       expect(optionValues).toContain('vicious');
       expect(optionValues).toHaveLength(18);
 
-      await select.selectOption('cleave');
-      await expect(select).toHaveValue('cleave');
+      await selectTitanOption(page, trigger, 'cleave');
+      expect(await readTitanSelectValue(trigger)).toBe('cleave');
 
       const events = await readProbeEvents(page);
       expect(events.filter((e) => e.event === 'onchange')).toHaveLength(1);
@@ -1090,10 +1078,10 @@ test.describe('component probe — AttackTraitSelect', () => {
          },
       });
 
+      const trigger = page.locator(`${selector} [role="combobox"]`);
+
       /** @type {string[]} */
-      const optionValues = await page.locator(`${selector} select option`).evaluateAll(
-         (opts) => opts.map((o) => o.value),
-      );
+      const optionValues = await titanSelectOptionValues(page, trigger);
       expect(optionValues).toContain('none');
       expect(optionValues).toHaveLength(19);
    });
@@ -1105,7 +1093,7 @@ test.describe('component probe — AttackTraitSelect', () => {
             disabled: true,
          },
       });
-      await expect(page.locator(`${selector} select`)).toBeDisabled();
+      await expect(page.locator(`${selector} [role="combobox"]`)).toBeDisabled();
    });
 
    test('testId resolves on the select element', async () => {
@@ -1115,7 +1103,8 @@ test.describe('component probe — AttackTraitSelect', () => {
             testId: 'probe-attack-trait-select',
          },
       });
-      await expect(page.locator(`${selector} select[data-testid="probe-attack-trait-select"]`)).toBeVisible();
+      const trigger = page.locator(`${selector} [role="combobox"][data-testid="probe-attack-trait-select"]`);
+      await expect(trigger).toBeVisible();
    });
 });
 
@@ -1141,17 +1130,16 @@ test.describe('component probe — ShieldTraitSelect', () => {
       });
       await clearProbeEvents(page);
 
-      const select = page.locator(`${selector} select`);
-      await expect(select.locator('option')).not.toHaveCount(0);
+      const trigger = page.locator(`${selector} [role="combobox"]`);
 
       /** @type {string[]} */
-      const optionValues = await select.locator('option').evaluateAll((opts) => opts.map((o) => o.value));
+      const optionValues = await titanSelectOptionValues(page, trigger);
       expect(optionValues).toContain('magical');
       expect(optionValues).toContain('none');
       expect(optionValues).toHaveLength(2);
 
-      await select.selectOption('none');
-      await expect(select).toHaveValue('none');
+      await selectTitanOption(page, trigger, 'none');
+      expect(await readTitanSelectValue(trigger)).toBe('none');
 
       const events = await readProbeEvents(page);
       expect(events.filter((e) => e.event === 'onchange')).toHaveLength(1);
@@ -1165,10 +1153,10 @@ test.describe('component probe — ShieldTraitSelect', () => {
          },
       });
 
+      const trigger = page.locator(`${selector} [role="combobox"]`);
+
       /** @type {string[]} */
-      const optionValues = await page.locator(`${selector} select option`).evaluateAll(
-         (opts) => opts.map((o) => o.value),
-      );
+      const optionValues = await titanSelectOptionValues(page, trigger);
       expect(optionValues).toContain('magical');
       expect(optionValues).toHaveLength(1);
    });
@@ -1180,7 +1168,7 @@ test.describe('component probe — ShieldTraitSelect', () => {
             disabled: true,
          },
       });
-      await expect(page.locator(`${selector} select`)).toBeDisabled();
+      await expect(page.locator(`${selector} [role="combobox"]`)).toBeDisabled();
    });
 
    test('testId resolves on the select element', async () => {
@@ -1190,6 +1178,7 @@ test.describe('component probe — ShieldTraitSelect', () => {
             testId: 'probe-shield-trait-select',
          },
       });
-      await expect(page.locator(`${selector} select[data-testid="probe-shield-trait-select"]`)).toBeVisible();
+      const trigger = page.locator(`${selector} [role="combobox"][data-testid="probe-shield-trait-select"]`);
+      await expect(trigger).toBeVisible();
    });
 });

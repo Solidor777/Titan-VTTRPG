@@ -2,6 +2,7 @@ import { test, expect } from '@playwright/test';
 import { login } from './fixtures.js';
 import { mountProbe, readProbeEvents, clearProbeEvents, unmountAll } from './componentProbe.js';
 import { closeAllApps, clearChat, attachPageErrors } from './world.js';
+import { selectTitanOption, readTitanSelectValue } from './select.js';
 
 /** @type {import('@playwright/test').Page} The file-shared, logged-in page (one world boot per file). */
 let page;
@@ -234,9 +235,9 @@ test.describe('component probe — Select', () => {
       });
       // Drop the mount-time clamp onchange (if any) so we assert only the user-driven change.
       await clearProbeEvents(page);
-      const select = page.locator(`${selector} select`);
-      await select.selectOption('b');
-      await expect(select).toHaveValue('b');
+      const trigger = page.locator(`${selector} [role="combobox"]`);
+      await selectTitanOption(page, trigger, 'b');
+      expect(await readTitanSelectValue(trigger)).toBe('b');
       const events = await readProbeEvents(page);
       expect(events.some((e) => e.event === 'onchange')).toBe(true);
    });
@@ -252,7 +253,7 @@ test.describe('component probe — Select', () => {
             ],
          },
       });
-      await expect(page.locator(`${selector} select`)).toBeDisabled();
+      await expect(page.locator(`${selector} [role="combobox"]`)).toBeDisabled();
    });
 });
 
