@@ -28,8 +28,11 @@
 
       cursor: grab;
       padding: 0 var(--titan-spacing-standard);
-      color: var(--titan-app-font-color);
-      opacity: 0.4;
+
+      // Inherit the row's own text color so the grip stays legible on attribute-coloured check/attack
+      // headers as well as plain panels; a hardcoded app colour washes out on the bright headers.
+      color: inherit;
+      opacity: 0.55;
       transition: opacity 0.1s ease;
 
       &:hover {

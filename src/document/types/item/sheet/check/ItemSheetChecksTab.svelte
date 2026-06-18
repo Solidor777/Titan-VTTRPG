@@ -136,7 +136,10 @@
          @include panel-2;
 
          width: 100%;
-         height: 100%;
+
+         // Grow with the content so the panel background covers every row; a fixed 100% height clips the
+         // background to the viewport and the rows past it show the darker layer beneath.
+         min-height: 100%;
 
          ol {
             @include flex-column;
@@ -146,6 +149,10 @@
             padding: 0;
             margin: 0;
             width: 100%;
+
+            li {
+               width: 100%;
+            }
          }
 
          .add-entry-button {
