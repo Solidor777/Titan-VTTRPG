@@ -78,7 +78,11 @@
       "Read(//c/FoundryVTT/**)",
       "Bash(python -c \"import json;d=json.load\\(open\\('system.json'\\)\\);print\\(json.dumps\\(d.get\\('documentTypes',{}\\).get\\('ChatMessage',{}\\),indent=2\\)\\)\")",
       "Bash(python -c \"import json;d=json.load\\(open\\('lang/en.json'\\)\\);print\\(json.dumps\\(d.get\\('TYPES',{}\\).get\\('ChatMessage',{}\\),indent=2\\)\\)\")",
-      "PowerShell(npm *)"
+      "PowerShell(npm *)",
+      "Bash(echo \"--- events ---\")",
+      "Bash(cat C:/FoundryVTT/V14/dev/foundryuserdata/Data/systems/titan/.superpowers/brainstorm/1210-1781225525/state/events)",
+      "Bash(echo \"--- stopped? ---\")",
+      "Bash(ls C:/FoundryVTT/V14/dev/foundryuserdata/Data/systems/titan/.superpowers/brainstorm/1210-1781225525/state)"
     ]
   }
 }
