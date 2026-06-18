@@ -6,6 +6,7 @@
     * @property {'category' | 'sub-option' | 'sub-button' | 'chip' | 'restore' | 'ghost'} [variant] - Visual variant selecting the panel surface, padding, and alignment.
     * @property {boolean} [active] - Whether the button is in its open/revealed state (panel-3 surface plus the `active` class).
     * @property {'top' | 'right' | 'bottom' | 'left' | undefined} [accentEdge] - The edge to draw the accent bar on when active; omitted for no accent.
+    * @property {'start' | 'end'} [align] - Horizontal content alignment for the text/icon variants; 'end' right-aligns.
     * @property {boolean} [disabled] - Whether the button is disabled.
     * @property {string} [type] - The native button type.
     * @property {string | undefined} [ariaLabel] - The accessible label.
@@ -23,6 +24,7 @@
       variant = 'category',
       active = false,
       accentEdge = undefined,
+      align = 'start',
       disabled = false,
       type = 'button',
       ariaLabel = undefined,
@@ -41,6 +43,7 @@
       bind:this={element}
       class={`hud-button ${variant}`}
       class:active
+      class:align-end={align === 'end'}
       class:accent-top={accentEdge === 'top'}
       class:accent-right={accentEdge === 'right'}
       class:accent-bottom={accentEdge === 'bottom'}
@@ -61,6 +64,7 @@
       bind:this={element}
       class={`hud-button ${variant}`}
       class:active
+      class:align-end={align === 'end'}
       class:accent-top={accentEdge === 'top'}
       class:accent-right={accentEdge === 'right'}
       class:accent-bottom={accentEdge === 'bottom'}
@@ -109,6 +113,12 @@
       &.ghost {
          justify-content: flex-start;
          text-align: left;
+      }
+
+      // Right-align content (the vertical-dock rule: categories toward the flyout, sub-options away).
+      &.align-end {
+         justify-content: flex-end;
+         text-align: right;
       }
 
       &.category {

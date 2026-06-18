@@ -131,6 +131,12 @@
    });
 
    /**
+    * @type {'start' | 'end'} Category-label alignment: in the vertical dock the label hugs the side
+    * its flyout opens toward (left/before → start, right/after → end); horizontal keeps the default.
+    */
+   const categoryAlign = $derived(vertical && subOptionsSide === 'after' ? 'end' : 'start');
+
+   /**
     * Runs a clicked entry's action and closes the cascade unless the entry is an in-place toggle
     * (equip, quantity, duration, remove), which keeps the menu open for repeat use.
     * @param {string} kind - 'main' for sub-option rows, 'sub' for sub-buttons.
@@ -221,6 +227,7 @@
             variant="category"
             active={layoutState.openCategory === entry.key}
             accentEdge={layoutState.openCategory === entry.key ? accentEdge : undefined}
+            align={categoryAlign}
             testId={`player-hud-category-${entry.key}`}
             onclick={() => {
                layoutState.openCategory = layoutState.openCategory === entry.key ? null : entry.key;

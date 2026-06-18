@@ -7,18 +7,20 @@
     * @property {object} sub - The sub-option to render.
     * @property {string} categoryKey - The owning category's key (for the test selector).
     * @property {boolean} [active] - Whether this row is the hovered/revealed one (accent highlight).
+    * @property {'start' | 'end'} [align] - Label alignment (right-aligned in the vertical dock).
     * @property {object} [flyIn] - The `svelte/transition` fly parameters for the row's slide-in entrance.
     * @property {Function} onAction - Receives ('main', sub) when the row is clicked.
     * @property {Function} onreveal - Receives (sub, event) when the row is hovered or focused.
     */
 
    /** @type {ActionMenuSubOptionProps} */
-   const { sub, categoryKey, active = false, flyIn = {}, onAction, onreveal } = $props();
+   const { sub, categoryKey, active = false, align = 'start', flyIn = {}, onAction, onreveal } = $props();
 </script>
 
 <HudButton
    variant="sub-option"
    {active}
+   {align}
    testId={`player-hud-sub-option-${categoryKey}-${sub.key}`}
    {flyIn}
    onclick={() => onAction('main', sub)}

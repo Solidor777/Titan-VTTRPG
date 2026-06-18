@@ -36,6 +36,13 @@
          : { y: subOptionsSide === 'before' ? FLY_DISTANCE : -FLY_DISTANCE, duration: FLY_DURATION },
    );
 
+   /**
+    * @type {'start' | 'end'} Sub-option label alignment: the opposite of the category in the vertical
+    * dock (flyout-left → labels hug the right/end toward the categories), so the cascade reads
+    * connected; horizontal keeps the default.
+    */
+   const subOptionAlign = $derived(vertical && subOptionsSide === 'before' ? 'end' : 'start');
+
    /** @type {number} The first visible sub-option index of the scroll window. */
    let windowStart = $state(0);
 
@@ -133,6 +140,7 @@
          {sub}
          categoryKey={category.key}
          active={sub.key === hoveredKey}
+         align={subOptionAlign}
          flyIn={{ ...flyParams, delay: i * FLY_STAGGER }}
          {onAction}
          onreveal={reveal}
