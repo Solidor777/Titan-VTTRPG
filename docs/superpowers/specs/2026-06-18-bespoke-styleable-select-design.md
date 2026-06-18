@@ -128,6 +128,13 @@ renderer draws `icon` in both the list row and the closed control, icons appear 
 `Document*` variants (`DocumentAttributeSelect`, `DocumentAttackTypeSelect`) wrap these base
 wrappers, so they inherit the icons with no change.
 
+Additionally, **each attribute option is colored by its own attribute color**. `AttributeSelect`
+supplies an `option` snippet that renders each row inside `<span class="attribute-option {value}">`
+and applies the existing `attribute-colors` mixin (per-attribute `--titan-<attr>-background` /
+`--titan-<attr>-font-color`); a negative margin bleeds the fill across the `SelectList` row padding.
+The closed control is already colored by the existing `AttributeInput` wrapper (it sets
+`--titan-input-*`, which the trigger button inherits).
+
 ## Styling / theming
 
 - The control and list use TITAN's existing input mixins (e.g. `@include input`) so they match other

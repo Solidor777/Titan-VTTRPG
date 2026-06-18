@@ -1,6 +1,7 @@
 <script>
    import Select from '~/helpers/svelte-components/input/select/Select.svelte';
    import { ATTACK_TYPES } from '~/system/AttackTypes.js';
+   import { MELEE_ICON, ACCURACY_ICON } from '~/system/Icons.js';
 
    /**
     * @typedef {object} AttackTypeSelectProps
@@ -20,8 +21,14 @@
       testId = void 0,
    } = $props();
 
-   /** @type {string[]} Options for the Select Svelte component. */
-   const options = structuredClone(ATTACK_TYPES);
+   /** @type {object} Maps each attack type to its FontAwesome icon class (ranged uses the accuracy icon). */
+   const ATTACK_TYPE_ICONS = {
+      melee: MELEE_ICON,
+      ranged: ACCURACY_ICON,
+   };
+
+   /** @type {object[]} Options for the Select component, each carrying its icon. */
+   const options = ATTACK_TYPES.map((type) => ({ value: type, icon: ATTACK_TYPE_ICONS[type] }));
 </script>
 
 <Select
