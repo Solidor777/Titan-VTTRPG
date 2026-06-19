@@ -223,6 +223,49 @@ test('a window resize clamps elements into the canvas rect', async () => {
    await page.setViewportSize({ width: 1280, height: 720 });
 });
 
+test('the action menu defaults to the right of the portrait with a right-opening flyout', async () => {
+   await seedControlledActor(page);
+
+   // Restore factory defaults (empty stored settings → createDefaultHud* values).
+   await page.evaluate(async () => {
+      await game.settings.set('titan', 'playerHudLayout', {});
+      await game.settings.set('titan', 'playerHudOptions', {});
+      game.titan.playerHud.resetLayout();
+      game.titan.playerHud.refresh({ force: true });
+   });
+
+   const portrait = page.locator('[data-testid="player-hud-portrait"]');
+   const menu = page.locator('[data-testid="player-hud-action-menu"]');
+   await expect(portrait).toBeVisible();
+   await expect(menu).toBeVisible();
+
+   /** @type {object} The portrait and action-menu bounding boxes. */
+   const boxes = await page.evaluate(() => {
+      const r = (sel) => {
+         const b = document.querySelector(sel).getBoundingClientRect();
+         return { left: Math.round(b.left), right: Math.round(b.right), bottom: Math.round(b.bottom), width: Math.round(b.width) };
+      };
+      return { portrait: r('[data-testid="player-hud-portrait"]'), menu: r('[data-testid="player-hud-action-menu"]') };
+   });
+
+   // The menu's left edge sits just to the right of the portrait's right edge, bottoms aligned.
+   expect(boxes.menu.left).toBeGreaterThanOrEqual(boxes.portrait.right - 2);
+   expect(boxes.menu.left - boxes.portrait.right).toBeLessThanOrEqual(24);
+   expect(Math.abs(boxes.menu.bottom - boxes.portrait.bottom)).toBeLessThanOrEqual(2);
+
+   // The flyout opens to the right: open a category and confirm its lane sits right of the category bar.
+   await page.locator('[data-testid="player-hud-category-skills"]').click();
+   await expect(page.locator('[data-testid="player-hud-flyout"]')).toBeVisible();
+   /** @type {boolean} Whether the flyout lane is to the right of the categories bar. */
+   const flyoutRight = await page.evaluate(() => {
+      const cats = document.querySelector('#titan-player-hud .categories').getBoundingClientRect();
+      const flyout = document.querySelector('[data-testid="player-hud-flyout"]').getBoundingClientRect();
+      return flyout.left >= cats.right - 2;
+   });
+   expect(flyoutRight).toBe(true);
+   await page.keyboard.press('Escape');
+});
+
 test('the edit toolbar reset restores default positions', async () => {
    await seedControlledActor(page);
    const frame = page.locator('[data-testid="player-hud-portrait"]');

@@ -30,8 +30,8 @@ export function createDefaultHudOptions() {
                subOptions: 'up',
             },
             vertical: {
-               subButtons: 'left',
-               subOptions: 'left',
+               subButtons: 'right',
+               subOptions: 'right',
                subOptionsFlow: 'up',
             },
          },
@@ -65,7 +65,8 @@ export function createDefaultHudOptions() {
 
 /**
  * Creates the default per-user HUD layout (positions are canvas-rect anchored). The portrait
- * defaults to the right of the core players list and scene controls in the bottom-left corner.
+ * defaults to the right of the core players list and scene controls in the bottom-left corner; the
+ * action menu sits immediately to the portrait's right (bottom-aligned), its flyout opening rightward.
  * @returns {object} A fresh layout object (safe to mutate).
  */
 export function createDefaultHudLayout() {
@@ -81,9 +82,9 @@ export function createDefaultHudLayout() {
       },
       positions: {
          actionMenu: {
-            anchorX: 'right',
+            anchorX: 'left',
             anchorY: 'bottom',
-            dx: 16,
+            dx: 466,
             dy: 16,
          },
          effectsPanel: {

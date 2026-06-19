@@ -198,7 +198,8 @@ test('sub-options expand to the configured side and lanes never overlap', async 
       };
    });
 
-   // Vertical, sub-options left (the default): the flyout lane ends before the bar begins.
+   // Vertical, sub-options left (pinned — the default is now 'right'): the flyout lane ends before the bar.
+   await setMenuOptions(page, { layout: 'vertical', directions: { vertical: { subOptions: 'left' } } });
    await openCategory(page, 'skills');
    await expectBoxes(flyout, skills,
       (flyoutBox, barBox) => flyoutBox.x + flyoutBox.width <= barBox.x + 1,
@@ -284,6 +285,8 @@ test('the vertical flyout anchors to the open category button and flows up or do
 
 test('sub-buttons form a third disjoint lane', async () => {
    const weaponId = await seedWeaponFixture(page);
+   // Pin the left cascade (the default is now 'right') so the lanes run right-to-left.
+   await setMenuOptions(page, { layout: 'vertical', directions: { vertical: { subOptions: 'left' } } });
    await openCategory(page, 'weapons');
    const subOption = page.locator(`[data-testid="player-hud-sub-option-weapons-${weaponId}"]`);
    await subOption.hover();
@@ -298,17 +301,21 @@ test('sub-buttons form a third disjoint lane', async () => {
    /** @type {object} The category lane probe box. */
    const barBox = await page.locator('[data-testid="player-hud-category-weapons"]').boundingBox();
 
-   // The default cascade runs right-to-left: sub-buttons end before the sub-options begin, which
+   // The left cascade runs right-to-left: sub-buttons end before the sub-options begin, which
    // in turn end before the category bar begins.
    expect(buttonBox.x + buttonBox.width).toBeLessThanOrEqual(flyoutBox.x + 1);
    expect(flyoutBox.x + flyoutBox.width).toBeLessThanOrEqual(barBox.x + 1);
+
+   await page.evaluate(async () => game.settings.set('titan', 'playerHudOptions', {}));
 });
 
 test('the configured direction is honored at the screen edge (no auto-flip)', async () => {
    await seedWeaponFixture(page);
+   // Pin the left cascade (the default is now 'right').
+   await setMenuOptions(page, { layout: 'vertical', directions: { vertical: { subOptions: 'left' } } });
 
    // Park the menu against the LEFT edge the way an edit-mode drag would. The configured direction
-   // is authoritative, so the default left cascade keeps opening left rather than flipping away.
+   // is authoritative, so the left cascade keeps opening left rather than flipping away.
    await page.evaluate(() => {
       game.titan.playerHud.layoutState.positions.actionMenu = {
          anchorX: 'left',
@@ -325,7 +332,8 @@ test('the configured direction is honored at the screen edge (no auto-flip)', as
       'no flip: the flyout opens to the configured (left) side even at the left edge',
    );
 
-   await page.evaluate(() => {
+   await page.evaluate(async () => {
+      await game.settings.set('titan', 'playerHudOptions', {});
       game.titan.playerHud.layoutState.positions.actionMenu = {
          anchorX: 'right',
          anchorY: 'bottom',
