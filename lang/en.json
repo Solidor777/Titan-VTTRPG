@@ -119,6 +119,8 @@
       "chatPreviewGmOnly.text": "GM-only message",
       "chatPreviewPublic.text": "Public message",
       "chatPreviewSecret.text": "Secret message",
+      "themePreviewHeader.text": "Header",
+      "themePreviewPanel.text": "Panel",
       "check.attackType.desc.text": "The type of attack to use for calculating the Difficulty of the Check.",
       "check.attackerAccuracy.desc.text": "The attacker's Accuracy to use for calculating the Difficulty of the Check.",
       "check.attackerMelee.desc.text": "The attacker's Melee to use for calculating the Difficulty of the Check.",
