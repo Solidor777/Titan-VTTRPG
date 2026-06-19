@@ -1,5 +1,6 @@
 <script>
    import { getContext } from 'svelte';
+   import IntegerInput from '~/helpers/svelte-components/input/IntegerInput.svelte';
    import localize from '~/helpers/utility-functions/Localize.js';
 
    /**
@@ -14,7 +15,7 @@
    /** @type {TitanDialog} The owning dialog application. */
    const application = getContext('application');
 
-   /** @type {number} The entered amount. */
+   /** @type {number} The entered amount; `IntegerInput` keeps it a whole number >= 0. */
    let amount = $state(1);
 
    /**
@@ -22,24 +23,29 @@
     * @returns {void}
     */
    function confirm() {
-      onConfirm(Math.max(0, Math.floor(amount)));
+      onConfirm(amount);
       application.close();
+   }
+
+   /**
+    * Handles implicit form submission (Enter in the field). The input commits its value on the same
+    * keydown before submission fires, so `amount` is already up to date.
+    * @param {SubmitEvent} event - The native submit event.
+    * @returns {void}
+    */
+   function handleSubmit(event) {
+      event.preventDefault();
+      confirm();
    }
 </script>
 
-<div class="amount-dialog">
+<form class="amount-dialog" onsubmit={handleSubmit}>
    <label>
       {localize('amount')}
-      <input
-         type="number"
-         min="0"
+      <IntegerInput
          bind:value={amount}
-         data-testid="hud-amount-input"
-         onkeydown={(event) => {
-            if (event.key === 'Enter') {
-               confirm();
-            }
-         }}
+         min={0}
+         testId="hud-amount-input"
       />
    </label>
    <button
@@ -49,7 +55,7 @@
    >
       {confirmLabel}
    </button>
-</div>
+</form>
 
 <style lang="scss">
    .amount-dialog {
@@ -63,11 +69,10 @@
          @include flex-row;
          @include flex-group-center;
 
-         gap: var(--titan-spacing-standard);
-      }
+         // Cascades into the IntegerInput's inner field, which reads `--titan-input-width`.
+         --titan-input-width: 80px;
 
-      input {
-         width: 80px;
+         gap: var(--titan-spacing-standard);
       }
 
       button {

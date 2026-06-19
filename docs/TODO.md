@@ -80,18 +80,6 @@ schema-stripped — harmless dead data, a candidate for producer cleanup.)
   separate, self-contained cleanup. The `checks tab filter` e2e (`filtered-list-checks.spec.js`)
   exercises the live tab and stays green without it.
 
-### 29. Math expressions in bespoke numeric inputs
-
-- **What:** Math-expression entry (`10+5` → `15`, leading-operator relative delta) ships on the
-  shared `NumberInput.svelte` and every wrapper that routes through it. Three bespoke inputs use
-  their own raw `<input type="number">` and do NOT inherit it: `HudAmountDialogShell.svelte`
-  (action-menu amount entry — the most plausible opt-in, for damage/healing amounts),
-  `PlayerHudSettingsShell.svelte`, and `ThemeEditorShell.svelte`. Route each through `NumberInput`
-  (or `IntegerInput`) to gain math, or leave as-is.
-- **Why deferred:** Out of scope for the shared-component change (spec
-  `specs/2026-06-18-numeric-input-math-evaluation-design.md`); each is a working bespoke input whose
-  migration is independent.
-
 ### 28. Optional live reposition for the custom Select dropdown
 
 - **What:** `Select.svelte`'s dropdown (`SelectList`) positions once on open via `svelte-floating-ui`

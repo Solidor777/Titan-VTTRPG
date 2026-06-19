@@ -1,5 +1,6 @@
 <script>
    import { getContext } from 'svelte';
+   import IntegerInput from '~/helpers/svelte-components/input/IntegerInput.svelte';
    import localize from '~/helpers/utility-functions/Localize.js';
    import getSetting from '~/helpers/utility-functions/GetSetting.js';
    import playerHudOptions from '~/helpers/Settings/PlayerHudOptions.js';
@@ -252,14 +253,15 @@
       {/if}
       <label>
          {localize('visibleSubOptions')}
-         <input
-            type="number"
-            min="3"
-            max="20"
-            bind:value={options.actionMenu.windowSize}
-            data-testid="player-hud-settings-menu-window-size"
-            onchange={save}
-         />
+         <span class="number-field">
+            <IntegerInput
+               bind:value={options.actionMenu.windowSize}
+               max={20}
+               min={3}
+               onchange={save}
+               testId="player-hud-settings-menu-window-size"
+            />
+         </span>
       </label>
 
       <div class="sub-title">{localize('categories')}</div>
@@ -406,7 +408,7 @@
             gap: var(--titan-spacing-standard);
 
             select,
-            input[type='number'] {
+            .number-field {
                margin-left: auto;
                max-width: 180px;
             }
