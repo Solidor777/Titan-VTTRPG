@@ -163,30 +163,41 @@ test('minimize persists across remounts', async () => {
    await expect(page.locator('[data-testid="player-hud-bar-stamina"]')).toBeVisible();
 });
 
-test('sidebar expansion pushes right-anchored elements; collapse pulls them back', async () => {
+test('the HUD anchors to the expanded sidebar edge and stays put when the sidebar toggles', async () => {
    await seedControlledActor(page);
    const menu = page.locator('[data-testid="player-hud-action-menu"]');
 
-   // The test viewport boots with the sidebar collapsed, so the transition under test runs
-   // expand-first: expanding occupies canvas space and must push the menu left.
-   await page.evaluate(() => ui.sidebar.collapse());
-   /** @type {object} The menu box with the sidebar collapsed. */
-   const collapsed = await menu.boundingBox();
-
+   // The HUD anchors to the LEFT of the sidebar at its EXPANDED width, so its position is independent
+   // of the sidebar's collapse state (chat notifications still surface in the freed space).
    await page.evaluate(() => ui.sidebar.expand());
-   await expect.poll(
-      async () => (await menu.boundingBox())?.x,
-      { message: 'the expanding sidebar pushes the menu left', timeout: 10000 },
-   ).toBeLessThan(collapsed.x - 50);
+   /** @type {object} The menu box with the sidebar expanded. */
+   const expanded = await menu.boundingBox();
 
+   // Its right edge sits at (or left of) the expanded sidebar's left edge — never overlapping it.
+   /** @type {number} The expanded sidebar's left edge. */
+   const sidebarLeft = await page.evaluate(() => ui.sidebar.element.getBoundingClientRect().left);
+   expect(expanded.x + expanded.width).toBeLessThanOrEqual(sidebarLeft + 1);
+
+   // Collapsing the sidebar must NOT move the menu.
    await page.evaluate(() => ui.sidebar.collapse());
    await expect.poll(
       async () => {
-         /** @type {object | null} The menu box after re-collapse. */
+         /** @type {object | null} The menu box after collapse. */
          const box = await menu.boundingBox();
-         return box ? Math.abs(box.x - collapsed.x) <= 2 : false;
+         return box ? Math.abs(box.x - expanded.x) <= 2 : false;
       },
-      { message: 'the collapsing sidebar pulls the menu back to the edge', timeout: 10000 },
+      { message: 'the HUD stays put when the sidebar collapses', timeout: 10000 },
+   ).toBe(true);
+
+   // Re-expanding must also leave it in place.
+   await page.evaluate(() => ui.sidebar.expand());
+   await expect.poll(
+      async () => {
+         /** @type {object | null} The menu box after re-expand. */
+         const box = await menu.boundingBox();
+         return box ? Math.abs(box.x - expanded.x) <= 2 : false;
+      },
+      { message: 'the HUD stays put when the sidebar re-expands', timeout: 10000 },
    ).toBe(true);
 });
 

@@ -233,7 +233,7 @@ non-subscribing write-back call sites.
 **Resolution & mount — `TitanPlayerHud` (src/ui/player-hud/TitanPlayerHud.js)**
 Created on the `ready` hook and attached as `game.titan.playerHud`. `init()` builds a full-viewport
 pointer-pass-through layer (`#titan-player-hud`, `pointer-events: none`; element frames opt back in) inside
-`#interface`, wires `controlToken` / `canvasReady` / `updateUser` / `collapseSidebar` / combat hooks and a
+`#interface`, wires `controlToken` / `canvasReady` / `updateUser` / combat hooks and a
 window-resize listener, applies the hotbar visibility (`showFoundryHotbar`, default off → `ui.hotbar` hidden),
 and calls `refresh()`. `refresh()` honors `enablePlayerHud` and the viewed scene, then resolves actors via the
 pure `resolveHudActors` ladder (GM: all selected characters, no fallback; player: all selected owned characters
@@ -247,9 +247,11 @@ for one or many; each element also honors its `enabled` and `combatOnly` options
 
 **Layout — `HudLayoutState.svelte.js` + `HudGeometry.js` + `HudElementFrame.svelte`**
 Positions persist per user (`playerHudLayout` setting) as `{anchorX, anchorY, dx, dy}` anchored to the canvas
-rect (viewport minus the sidebar's occupied width — the rail plus, when `ui.sidebar.expanded`, the separate
-`#sidebar-content` panel; `collapseSidebar` re-measures in a settle loop while the animation plays). Right/
-bottom-anchored elements therefore track the sidebar edge. `HudElementFrame` resolves the anchored point with
+rect (viewport minus the sidebar at its EXPANDED width — `ui.sidebar.element` is the whole `#sidebar`, the
+rail alone while collapsed, so `#measureRect` adds back the `--sidebar-width` custom property when collapsed).
+The rect is therefore collapse-invariant: right/bottom-anchored elements anchor to the LEFT of the open
+sidebar and stay put when it collapses (chat notifications still surface in the freed space) — no
+`collapseSidebar` hook or settle loop. `HudElementFrame` resolves the anchored point with
 `resolvePosition` (clamped by `clampPoint`), owns the edit-mode drag (8px snap, anchors re-derived via
 `deriveAnchors` on drop, persisted), the corner minimize chip (placement via `chipCorner`), and the effects
 panel's resize handle. Edit mode (`layoutState.editMode`) toggles from the settings app, the edit toolbar, and
