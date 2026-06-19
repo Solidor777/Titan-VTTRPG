@@ -95,6 +95,21 @@ test('editing the stamina bar persists to the actor', async () => {
    ).toBe(4);
 });
 
+test('the bar max value is as wide as the 2-digit current-value input', async () => {
+   await seedControlledActor(page);
+
+   /** @type {object} The rendered widths of the current-value input and the max-value label. */
+   const widths = await page.evaluate(() => {
+      const w = (sel) => Math.round(document.querySelector(sel).getBoundingClientRect().width);
+      return {
+         input: w('[data-testid="player-hud-bar-stamina-input"]'),
+         max: w('[data-testid="player-hud-bar-stamina-max"]'),
+      };
+   });
+
+   expect(Math.abs(widths.max - widths.input)).toBeLessThanOrEqual(1);
+});
+
 test('all three portrait styles render', async () => {
    await seedControlledActor(page);
    for (const style of ['panelCard', 'wideStrip', 'roundToken']) {

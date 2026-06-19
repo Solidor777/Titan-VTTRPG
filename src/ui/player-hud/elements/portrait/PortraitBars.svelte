@@ -41,6 +41,7 @@
                effectMod={document.data.system.resource[resource].mod.effect}
                equipmentMod={document.data.system.resource[resource].mod.equipment}
                staticMod={document.data.system.resource[resource].mod.static}
+               testId={`player-hud-bar-${resource}-max`}
                value={document.data.system.resource[resource].max}
             />
          </span>
@@ -83,6 +84,9 @@
          .value {
             @include flex-row;
             @include flex-group-center;
+
+            // Size the max value (a bordered label) to match the 2-digit current-value input beside it.
+            --titan-label-width: calc(var(--titan-input-digit-width) * 2 + 12px);
 
             flex-shrink: 0;
             gap: 2px;
