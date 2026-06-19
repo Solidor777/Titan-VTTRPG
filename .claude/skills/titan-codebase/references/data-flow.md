@@ -177,6 +177,16 @@ mirror the `document.data.system.*` field, then call `refreshSystemDocument(docu
 `document.update({ system: structuredClone(document.system), flags: structuredClone(document.flags) })`,
 writing the entire mutated system blob back to Foundry in one call.
 
+`NumberInput.svelte` (the base every numeric wrapper mounts — `IntegerInput`, `DocumentNumberInput`,
+`IntegerIncrementInput`, `AttributeInput`, etc.) is a `type="text"` field carrying a stable
+`titan-number-input` class (the selector e2e uses to target numeric inputs). It supports math
+expressions via `evaluateMathExpression` (`src/helpers/utility-functions/EvaluateMathExpression.js`,
+clean-room recursive descent — `+ - * /`, parentheses, decimals, unary minus; a leading operator is a
+relative delta against the current value, e.g. `+5` → current + 5; returns `null` on malformed input).
+Commit model: plain numbers parse live on `keyup` (preserving per-keystroke document writes);
+expressions are evaluated only on commit (`change`/blur and Enter), then clamped by the same
+integer→min→max→maxDigits sequence. Malformed input reverts the display to the committed value.
+
 `DocumentSelect.svelte` accepts an optional `onchange` callback, composed to run **before**
 `refreshSystemDocument`: `() => { onchange?.(); refreshSystemDocument(document.data, disabled); }`.
 Consumers use it for pure in-memory mutations that must land in the persisted snapshot — e.g. the

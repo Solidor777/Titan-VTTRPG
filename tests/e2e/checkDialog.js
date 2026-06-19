@@ -9,9 +9,10 @@ import { expect } from '@playwright/test';
  * identified by its element id prefix `titan-<type>-check-dialog-<actorId>...` (the actor id is
  * suffixed with a generated UUID by the base constructor). The per-type CSS class declared in each
  * subclass's `_getDialogClasses()` does NOT reach the DOM (the v14 `TitanDialog` never invokes that
- * leftover method), so id-prefix targeting is the stable per-type selector. Option inputs are native
- * widgets: `NumberInput` renders `<input type="number">`
- * and commits on keyup; `Select` renders a native `<select>`; `CheckboxInput` renders a toggle
+ * leftover method), so id-prefix targeting is the stable per-type selector. Option inputs are
+ * widgets: `NumberInput` renders a text `<input class="titan-number-input">` that live-commits plain
+ * numbers on keyup and evaluates math expressions on change/Enter; `Select` renders a bespoke
+ * combobox; `CheckboxInput` renders a toggle
  * `<button>` whose checked state is the presence of an `i.fa-check`. Totals render as text inside a
  * `.tag` carrying a `check-summary-*` test id.
  */

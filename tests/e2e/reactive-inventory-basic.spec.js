@@ -153,7 +153,7 @@ test.describe('character sheet inventory row reactivity', () => {
       // Activate the Inventory tab and locate the commodity row's quantity input.
       await page.getByText('Inventory', { exact: true }).first().click();
       const row = page.locator('[data-item-id]').first();
-      const quantityInput = row.locator('input[type="number"]').first();
+      const quantityInput = row.locator('input.titan-number-input').first();
 
       // INITIAL rendered state: quantity is 2.
       await expect(quantityInput, 'initial quantity input value is 2').toHaveValue('2');
@@ -187,5 +187,58 @@ test.describe('character sheet inventory row reactivity', () => {
             { message: 'increment button persisted quantity' },
          )
          .toBe(9);
+   });
+
+   test('commodity quantity input evaluates math expressions and relative deltas', async () => {
+      const ACTOR = 'E2E Math Quantity Actor';
+
+      // Seed a commodity with a known starting quantity and render the sheet.
+      await page.evaluate(async (actorName) => {
+         const stale = game.actors.getName(actorName);
+         if (stale) {
+            await stale.delete();
+         }
+         const actor = await Actor.create({ name: actorName, type: 'player' });
+         await actor.createEmbeddedDocuments('Item', [
+            { name: 'E2E Math Commodity Qty', type: 'commodity', system: { quantity: 4 } },
+         ]);
+         const app = await actor.sheet.render(true);
+         await titanWait(
+            () => !!app?.element?.querySelector('.window-content')?.children.length,
+            { message: 'sheet mounted' },
+         );
+      }, ACTOR);
+
+      // Activate the Inventory tab and locate the commodity row's quantity input.
+      await page.getByText('Inventory', { exact: true }).first().click();
+      const row = page.locator('[data-item-id]').first();
+      const quantityInput = row.locator('input.titan-number-input').first();
+      await expect(quantityInput, 'initial quantity input value is 4').toHaveValue('4');
+
+      // EXPRESSION: typing "10+5" and committing with Enter evaluates to 15.
+      await quantityInput.fill('10+5');
+      await quantityInput.press('Enter');
+      await expect(quantityInput, 'expression display normalized to 15').toHaveValue('15');
+      await expect
+         .poll(
+            () => page.evaluate((actorName) => {
+               return game.actors.getName(actorName).items.contents[0].system.quantity;
+            }, ACTOR),
+            { message: 'evaluated expression persisted to the document' },
+         )
+         .toBe(15);
+
+      // RELATIVE DELTA: a leading operator adjusts the current value (15 + 5 = 20).
+      await quantityInput.fill('+5');
+      await quantityInput.press('Enter');
+      await expect(quantityInput, 'relative delta display normalized to 20').toHaveValue('20');
+      await expect
+         .poll(
+            () => page.evaluate((actorName) => {
+               return game.actors.getName(actorName).items.contents[0].system.quantity;
+            }, ACTOR),
+            { message: 'relative delta persisted to the document' },
+         )
+         .toBe(20);
    });
 });

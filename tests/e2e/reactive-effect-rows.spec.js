@@ -132,7 +132,7 @@ test.describe('character sheet effect row reactivity', () => {
       // The effect row, and its remaining duration input (a turnStart effect renders only the remaining
       // field, so the first number input is `remaining`).
       const row = page.locator('[data-effect-id]').first();
-      const remainingInput = row.locator('input[type="number"]').first();
+      const remainingInput = row.locator('input.titan-number-input').first();
 
       // INITIAL rendered state: remaining is 1.
       await expect(remainingInput, 'initial remaining input value is 1').toHaveValue('1');
@@ -180,7 +180,7 @@ test.describe('character sheet effect row reactivity', () => {
 
       // With an 'initiative' duration the initiative input renders FIRST (remaining is second).
       const row = page.locator('[data-effect-id]').first();
-      const initiativeInput = row.locator('input[type="number"]').first();
+      const initiativeInput = row.locator('input.titan-number-input').first();
 
       // INITIAL rendered state: initiative is 3.
       await expect(initiativeInput, 'initial initiative input value is 3').toHaveValue('3');

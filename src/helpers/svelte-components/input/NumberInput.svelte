@@ -1,4 +1,5 @@
 <script>
+   import evaluateMathExpression from '~/helpers/utility-functions/EvaluateMathExpression.js';
    import tooltipAction from '~/helpers/svelte-actions/TooltipAction.js';
 
    /**
@@ -36,6 +37,9 @@
    /** @type {boolean} Whether editing is currently active for the input. */
    let editingActive = $state(false);
 
+   /** @type {number} The committed value captured when editing begins; the base for relative-delta entries. */
+   let editBaseValue = value;
+
    /** @type {string} The actual input from the user. */
    let input = $state(value.toString());
 
@@ -47,17 +51,13 @@
    });
 
    /**
-    * Called when the input changes to ensure the input is valid before setting the value.
-    * @returns {void}
+    * Clamps a raw numeric result to the input's integer, min, max, and maxDigits constraints.
+    * @param {number} raw - The unclamped numeric value.
+    * @returns {number} The constrained value.
     */
-   function parseInput() {
-      // Get the new value from the inputted string.
-      let newValue = isInteger ? parseInt(input) : parseFloat(input);
-
-      // If the new value is not a number (such as if it is blank), set it to 0.
-      if (isNaN(newValue)) {
-         newValue = 0;
-      }
+   function clampValue(raw) {
+      // Integer inputs round the result to the nearest whole number.
+      let newValue = isInteger ? Math.round(raw) : raw;
 
       // Ensure the value is >= the minimum, if appropriate.
       if (min !== false) {
@@ -78,11 +78,62 @@
          }
       }
 
-      // If the value changed, update it and fire the change callback.
+      return newValue;
+   }
+
+   /**
+    * Live-parses plain numeric input on each keystroke. Expressions (any input containing an
+    * operator or parenthesis) are deferred to commit, so partial entries like "10+" are not coerced.
+    * @returns {void}
+    */
+   function parseInput() {
+      // Only plain non-negative numbers live-parse; anything with a leading operator (including a
+      // leading minus, which is a relative delta) or an embedded operator waits for commit.
+      if (!/^\d*\.?\d*$/.test(input.trim())) {
+         return;
+      }
+
+      // Blank input resolves to 0, matching the previous behavior.
+      let raw = isInteger ? parseInt(input) : parseFloat(input);
+      if (isNaN(raw)) {
+         raw = 0;
+      }
+
+      // Commit the clamped value and fire the change callback when it differs.
+      const newValue = clampValue(raw);
       if (value !== newValue) {
          value = newValue;
          onchange?.();
       }
+   }
+
+   /**
+    * Evaluates the raw input as a math expression and commits the result. Reverts the display to the
+    * last committed value when the expression is malformed. Invoked on the change event and on Enter.
+    * @returns {void}
+    */
+   function commitInput() {
+      // Evaluate the expression, using the value captured at focus as the base for relative-delta
+      // entries so live per-keystroke writes cannot corrupt it.
+      const result = evaluateMathExpression(input, { currentValue: editBaseValue });
+
+      // Malformed expressions revert the display to the committed value.
+      if (result === null) {
+         input = value.toString();
+         return;
+      }
+
+      // Commit the clamped result and fire the change callback when it differs.
+      const newValue = clampValue(result);
+      if (value !== newValue) {
+         value = newValue;
+         onchange?.();
+      }
+
+      // Normalize the display and re-baseline so a further relative entry in the same focus session
+      // (Enter commits without blurring) adjusts the freshly committed value.
+      input = newValue.toString();
+      editBaseValue = newValue;
    }
 
    /**
@@ -102,36 +153,35 @@
     */
    function handleFocus(event) {
       editingActive = true;
+      editBaseValue = value;
       onfocus?.(event);
    }
 
    /**
-    * Called on each keypress to filter out non-numeric characters.
+    * Called on each keypress to filter out characters that are not part of a math expression.
+    * Only printable single-character keys are filtered; control keys (Enter, Backspace, arrows) pass.
     * @param {KeyboardEvent} event - The native keypress event.
     * @returns {void}
     */
    function filterInput(event) {
-      if (!/[0-9.,-]/.test(event.key)) {
-         event.preventDefault();
-      }
-      else if (/[.,]/.test(event.key)) {
+      if (event.key.length === 1 && !/[0-9.+\-*/() ]/.test(event.key)) {
          event.preventDefault();
       }
    }
 
    /**
-    * Called when the native change event fires. Resets the display string if the raw input is not
-    * a valid number.
+    * Called on Enter to commit the expression without waiting for the input to blur.
+    * @param {KeyboardEvent} event - The native keydown event.
     * @returns {void}
     */
-   function handleChange() {
-      if (isNaN(isInteger ? parseInt(input) : parseFloat(input))) {
-         input = value.toString();
+   function handleKeydown(event) {
+      if (event.key === 'Enter') {
+         commitInput();
       }
    }
 
    /**
-    * Called on each keyup event. Parses the input and forwards the event to the consumer.
+    * Called on each keyup event. Live-parses plain numbers and forwards the event to the consumer.
     * @param {KeyboardEvent} event - The native keyup event.
     * @returns {void}
     */
@@ -142,16 +192,17 @@
 </script>
 
 <input bind:value={input}
-       class={`${maxDigits ? 'max-digits' : ''}`}
+       class={`titan-number-input ${maxDigits ? 'max-digits' : ''}`}
        data-testid={testId}
        {disabled}
        onblur={handleBlur}
-       onchange={handleChange}
+       onchange={commitInput}
        onfocus={handleFocus}
+       onkeydown={handleKeydown}
        onkeypress={filterInput}
        onkeyup={handleKeyup}
        style:--titan-max-digits={maxDigits ? maxDigits : 15}
-       type="number"
+       type="text"
        use:tooltipAction={tooltip}
 />
 
