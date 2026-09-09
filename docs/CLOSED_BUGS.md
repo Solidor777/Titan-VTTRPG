@@ -370,3 +370,35 @@ when fixed.
 - **Fixed:** 2026-06-18 on `fix/hud-anim-and-theme-contrast` — retuned `HeritageLight` and
   `CleanNeutralLight` so `app-background → panel-1 → panel-2 → panel-3` step progressively darker
   (distinct raised surfaces), keeping each panel's dark text color.
+
+### 32. E2E ran below Foundry's minimum resolution, so a warning banner intercepted HUD clicks
+
+- **What:** `playwright.config.mjs` set no `viewport`, so the suite ran at Playwright's 1280x720
+  default. Foundry v14 requires 1366x768 and otherwise raises a permanent
+  "requires a screen resolution of 1366px by 768px or greater" notification. The `#notifications`
+  banner spans the full viewport width at y=72..172; the player HUD's effects panel mounts at
+  `top: 16` with height 320, so the banner's `<p>` sat over the panel and intercepted every click
+  on an effect row — Playwright retried the click until the 60s test timeout.
+- **Symptom:** 3 specs timed out on an effect-row click
+  (`embedded-context-check-parity.spec.js` x2, `embedded-context-effects.spec.js`). Measured, not
+  inferred: the probe read `innerWidth/innerHeight` 1280x720 against the banner's rect and the
+  panel's rect.
+- **Fix:** `use.viewport` set to 1920x1080 — above Foundry's minimum, so the warning never fires.
+  Full suite 497/497 after the change.
+
+### 33. Two e2e specs asserted markup and a palette value that had since changed
+
+- **What:** Two stale expectations, both masked behind bug #32 above and initially misfiled as
+  product defects:
+  - `.row .row-header` — the effect-row header element was replaced by a `HudButton` in
+    `252dac10` ("route effect row header through HudButton so its text no longer clips").
+    `.row-header` exists nowhere in `src/`; the name now lives at `.row .name`, and the row carries
+    `data-testid="player-hud-effect-row"` (the idiom `player-hud-effects-panel.spec.js` already
+    used). Affected `embedded-context-check-parity.spec.js` and `embedded-context-effects.spec.js`.
+  - `theme.spec.js` hardcoded `#f4f4f6` as the light world default. `010c2e1e` ("step light-theme
+    panels darker") deliberately changed `HeritageLight`'s `app-background` to `#fbfbfc`. The theme
+    system was verified working live — the core scheme flips `body.theme-light`, `prefersDark()`
+    follows, and `getActiveTheme()` resolves `heritage-light`.
+- **Fix:** the row specs use the `player-hud-effect-row` testid; `theme.spec.js` resolves both
+  expected backgrounds from the theme registry via `getSchemeTheme()` and additionally asserts the
+  resolved theme ids differ, so a future palette change cannot silently stale it again.

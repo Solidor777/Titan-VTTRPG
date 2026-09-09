@@ -665,6 +665,11 @@ process before spawning anything, so npx, node, Foundry, and every Chromium inhe
 
 Invalid core or priority values are hard errors, never silent fallbacks to the default.
 
+**The e2e viewport must stay at or above Foundry's 1366x768 minimum** (`use.viewport` is 1920x1080).
+Below it, Foundry raises a permanent resolution notification whose `#notifications` banner spans the
+full viewport width near the top and **intercepts pointer events on anything under it** — the player
+HUD included, which makes row clicks retry until the test times out with no visible cause.
+
 **`createEmbeddedDocuments` return order is NOT input order.** Never map the returned array by index
 to your payloads — resolve created ids by NAME afterward (`actor.items.getName(payload.name)?.id`),
 as the player-hud specs' `seedDocuments` helpers do. Index-mapping produced wrong-id assertions that
