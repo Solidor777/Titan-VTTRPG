@@ -255,3 +255,32 @@ export function newestMessageType(page, before) {
       return game.messages.contents[game.messages.size - 1]?.type;
    }, before);
 }
+
+/**
+ * Waits for every running transition and animation under a subtree to finish, so geometry read
+ * afterwards is the settled layout rather than an arbitrary mid-animation frame. Event-driven: each
+ * animation's `finished` promise resolves on its own finish event, so this returns the moment the
+ * subtree settles and never samples on a timer.
+ *
+ * Infinite animations are excluded (they never finish, and never move the layout to a final state).
+ * A cancelled animation rejects its `finished` promise — a replaced or interrupted transition is
+ * settled for layout purposes, so a rejection resolves rather than failing the caller.
+ * @param {import('@playwright/test').Page} page - The Playwright page bound to the live world.
+ * @param {string} selector - CSS selector for the subtree root to settle.
+ * @returns {Promise<void>} Resolves once no finite animation under the root is still running.
+ */
+export async function waitForAnimations(page, selector) {
+   await page.evaluate(async (rootSelector) => {
+      /** @type {Element | null} The subtree root whose animations must settle. */
+      const root = document.querySelector(rootSelector);
+      if (!root) {
+         throw new Error(`waitForAnimations: no element matches ${rootSelector}`);
+      }
+
+      /** @type {Animation[]} The finite animations currently running under the root. */
+      const running = root.getAnimations({ subtree: true })
+         .filter((animation) => animation.effect?.getTiming().iterations !== Infinity);
+
+      await Promise.all(running.map((animation) => animation.finished.catch(() => undefined)));
+   }, selector);
+}

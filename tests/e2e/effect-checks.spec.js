@@ -130,6 +130,11 @@ test.describe('v14 effect check rolling', () => {
       expect(result.after, 'message count should increase after the roll').toBeGreaterThan(result.before);
       expect(result.newestType, 'newest message flag type').toBe('itemCheck');
 
+      // Creating the ChatMessage document does not render it: the log entry mounts asynchronously, so
+      // the one-shot DOM read below is gated on the mounted card rather than racing the mount.
+      await expect(page.locator(`.message[data-message-id="${result.newestId}"] .check-chat-message`).first())
+         .toBeAttached();
+
       const rendered = await page.evaluate((messageId) => {
          const li = globalThis.document.querySelector(`.message[data-message-id="${messageId}"]`);
          return {

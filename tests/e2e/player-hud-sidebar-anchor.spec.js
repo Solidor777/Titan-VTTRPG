@@ -8,8 +8,24 @@ test('HUD rect anchors to the expanded sidebar edge and does not move on collaps
    await login(page);
 
    const result = await page.evaluate(async () => {
-      const wait = (ms) => new Promise((r) => setTimeout(r, ms));
       const sb = ui.sidebar;
+
+      /** Yields until the next animation frame, so a pending style change is applied and laid out. */
+      const nextFrame = () => new Promise((resolve) => requestAnimationFrame(resolve));
+
+      /**
+       * Waits out the sidebar's expand/collapse transition. Event-driven: two frames let the toggle's
+       * style change register its transitions, then each transition's `finished` promise resolves on
+       * its own end event. A cancelled transition (a toggle interrupting another) counts as settled.
+       */
+      const settle = async () => {
+         await nextFrame();
+         await nextFrame();
+         await Promise.all(sb.element.getAnimations({ subtree: true })
+            .filter((animation) => animation.effect?.getTiming().iterations !== Infinity)
+            .map((animation) => animation.finished.catch(() => undefined)));
+      };
+
       const hud = game.titan.playerHud;
       const toggle = () => (sb.toggleExpanded
          ? sb.toggleExpanded()
@@ -20,24 +36,24 @@ test('HUD rect anchors to the expanded sidebar edge and does not move on collaps
       // Expanded.
       if (!sb.expanded) {
          toggle();
-         await wait(600);
+         await settle();
       }
       window.dispatchEvent(new Event('resize'));
-      await wait(50);
+      await nextFrame();
       const expandedRectRight = rectRight();
       const expandedSidebarLeft = sidebarLeft();
 
       // Collapsed — re-measure to exercise the collapsed branch of the width calc.
       toggle();
-      await wait(600);
+      await settle();
       window.dispatchEvent(new Event('resize'));
-      await wait(50);
+      await nextFrame();
       const collapsedRectRight = rectRight();
       const collapsedSidebarLeft = sidebarLeft();
 
       // Restore.
       toggle();
-      await wait(400);
+      await settle();
       return { expandedRectRight, expandedSidebarLeft, collapsedRectRight, collapsedSidebarLeft };
    });
 

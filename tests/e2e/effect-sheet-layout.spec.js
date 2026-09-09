@@ -1,6 +1,6 @@
 import { expect, test } from '@playwright/test';
 import { login } from './fixtures.js';
-import { attachPageErrors, clearChat, closeAllApps } from './world.js';
+import { attachPageErrors, clearChat, closeAllApps, waitForAnimations } from './world.js';
 
 /**
  * Regression: the standalone Active Effect sheet must render with usable content height. It shares
@@ -54,6 +54,9 @@ test('effect AE sheet renders with a non-collapsed content body', async () => {
 
    // Measure the rendered sheet's body (the tab-content region). When the height chain collapses this
    // is ~40px (tab buttons only); a correctly sized sheet gives it substantial height.
+   // The sheet mounts before it finishes sizing, so the height is measured only once it has settled.
+   await waitForAnimations(page, '.titan-effect-sheet');
+
    const bodyHeight = await page.evaluate(() => {
       const root = globalThis.document.querySelector('.titan-effect-sheet');
       const body = root?.querySelector('.titan-sheet > .body');

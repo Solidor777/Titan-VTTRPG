@@ -7,6 +7,7 @@ import {
    controlFixtureActorToken,
    deleteFixtureActor,
    deleteOrphanedTokens,
+   waitForAnimations,
 } from './world.js';
 
 /** @type {import('@playwright/test').Page} The file-shared, logged-in page (one world boot per file). */
@@ -255,6 +256,11 @@ test('an edit-mode resize persists the panel size', async () => {
 
    const handle = page.locator('[data-testid="player-hud-effects-panel-resize"]');
    await expect(handle).toBeVisible();
+
+   // Edit mode reveals the handle through a transition; the drag below starts from this box, so a
+   // mid-transition read would grab the handle at the wrong place and drag from empty space.
+   await waitForAnimations(page, '#titan-player-hud');
+
    /** @type {object} The resize handle's box. */
    const box = await handle.boundingBox();
    await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2);

@@ -7,6 +7,7 @@ import {
    controlFixtureActorToken,
    deleteFixtureActor,
    deleteOrphanedTokens,
+   waitForAnimations,
 } from './world.js';
 
 /** @type {import('@playwright/test').Page} The file-shared, logged-in page (one world boot per file). */
@@ -166,18 +167,18 @@ test('vertical layout stacks categories in a column; horizontal in a row', async
    const skills = page.locator('[data-testid="player-hud-category-skills"]');
    const resistances = page.locator('[data-testid="player-hud-category-resistances"]');
 
-   /** @type {{x: number, y: number}} Skills button box under the vertical layout. */
-   let skillsBox = await skills.boundingBox();
-   /** @type {{x: number, y: number}} Resistances button box under the vertical layout. */
-   let resistancesBox = await resistances.boundingBox();
-   expect(Math.abs(skillsBox.x - resistancesBox.x)).toBeLessThan(2);
-   expect(resistancesBox.y).toBeGreaterThan(skillsBox.y);
+   // A layout switch re-flows the bar asynchronously, so both arrangements are asserted through the
+   // settling comparison rather than from one-shot boxes read the instant the setting write returns.
+   await expectBoxes(skills, resistances,
+      (skillsBox, resistancesBox) => Math.abs(skillsBox.x - resistancesBox.x) < 2
+         && resistancesBox.y > skillsBox.y,
+      'vertical layout: categories share a column and stack downward');
 
    await setMenuOptions(page, { layout: 'horizontal' });
-   skillsBox = await skills.boundingBox();
-   resistancesBox = await resistances.boundingBox();
-   expect(Math.abs(skillsBox.y - resistancesBox.y)).toBeLessThan(2);
-   expect(resistancesBox.x).toBeGreaterThan(skillsBox.x);
+   await expectBoxes(skills, resistances,
+      (skillsBox, resistancesBox) => Math.abs(skillsBox.y - resistancesBox.y) < 2
+         && resistancesBox.x > skillsBox.x,
+      'horizontal layout: categories share a row and run rightward');
 
    await setMenuOptions(page, { layout: 'vertical' });
 });
@@ -293,6 +294,11 @@ test('sub-buttons form a third disjoint lane', async () => {
 
    const subButton = page.locator(`[data-testid="player-hud-sub-button-${weaponId}-open-sheet"]`);
    await expect(subButton).toBeVisible();
+
+   // The lanes reach their final positions through the sub-button reveal transition, and
+   // `boundingBox()` does not auto-retry — reading before the transition finishes samples a
+   // mid-slide frame. Settling the HUD subtree first makes the geometry below deterministic.
+   await waitForAnimations(page, '#titan-player-hud');
 
    /** @type {object} The sub-button lane probe box. */
    const buttonBox = await subButton.boundingBox();

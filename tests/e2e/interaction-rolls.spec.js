@@ -179,6 +179,11 @@ test.describe('v14 interaction rolls', () => {
          expect(result.after, 'message count should increase after the roll').toBeGreaterThan(result.before);
          expect(result.newestType, 'newest message flag type').toBe(checkCase.expectedType);
 
+         // Creating the ChatMessage document does not render it: the log entry mounts asynchronously,
+         // so the one-shot DOM read below is gated on the mounted card rather than racing the mount.
+         await expect(page.locator(`.message[data-message-id="${result.newestId}"] .check-chat-message`).first())
+            .toBeAttached();
+
          // Assert: the chat card rendered into the live DOM (titan class + mounted check card).
          const rendered = await page.evaluate(async (messageId) => {
             // Locate the rendered chat-log entry for the new message.

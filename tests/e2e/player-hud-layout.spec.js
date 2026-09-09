@@ -7,6 +7,7 @@ import {
    controlFixtureActorToken,
    deleteFixtureActor,
    deleteOrphanedTokens,
+   waitForAnimations,
 } from './world.js';
 
 /** @type {import('@playwright/test').Page} The file-shared, logged-in page (one world boot per file). */
@@ -80,6 +81,11 @@ test('edit-mode drag moves the portrait and persists anchors', async () => {
    await seedControlledActor(page);
    await page.evaluate(() => game.titan.playerHud.toggleEditMode());
    const frame = page.locator('[data-testid="player-hud-portrait"]');
+
+   // Entering edit mode re-frames the element; the drag below starts from this box, so it is read
+   // only once that transition has finished.
+   await waitForAnimations(page, '#titan-player-hud');
+
    /** @type {object} The portrait box before the drag. */
    const box = await frame.boundingBox();
    await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2);
@@ -91,6 +97,10 @@ test('edit-mode drag moves the portrait and persists anchors', async () => {
    /** @type {object} The portrait anchors persisted by the drag. */
    const stored = await page.evaluate(() => game.settings.get('titan', 'playerHudLayout').positions.portrait);
    expect(stored.dx).toBeGreaterThan(100);
+
+   // Leaving edit mode re-frames the element again; the settled box is the one the drag produced.
+   await waitForAnimations(page, '#titan-player-hud');
+
    /** @type {object} The portrait box after the drag. */
    const after = await frame.boundingBox();
    expect(Math.abs(after.x - (box.x + 120))).toBeLessThanOrEqual(8);
@@ -170,6 +180,11 @@ test('the HUD anchors to the expanded sidebar edge and stays put when the sideba
    // The HUD anchors to the LEFT of the sidebar at its EXPANDED width, so its position is independent
    // of the sidebar's collapse state (chat notifications still surface in the freed space).
    await page.evaluate(() => ui.sidebar.expand());
+
+   // The sidebar expands through a transition and the HUD re-anchors to its settled edge, so both
+   // the menu box and the sidebar edge below are read only once that motion has finished.
+   await waitForAnimations(page, 'body');
+
    /** @type {object} The menu box with the sidebar expanded. */
    const expanded = await menu.boundingBox();
 
@@ -239,6 +254,9 @@ test('the action menu defaults to the right of the portrait with a right-opening
    await expect(portrait).toBeVisible();
    await expect(menu).toBeVisible();
 
+   // Visibility precedes the settled position, so the elements are measured only once still.
+   await waitForAnimations(page, '#titan-player-hud');
+
    /** @type {object} The portrait and action-menu bounding boxes. */
    const boxes = await page.evaluate(() => {
       const r = (sel) => {
@@ -256,6 +274,10 @@ test('the action menu defaults to the right of the portrait with a right-opening
    // The flyout opens to the right: open a category and confirm its lane sits right of the category bar.
    await page.locator('[data-testid="player-hud-category-skills"]').click();
    await expect(page.locator('[data-testid="player-hud-flyout"]')).toBeVisible();
+
+   // The flyout slides into its lane; measuring before that finishes reads a mid-slide position.
+   await waitForAnimations(page, '#titan-player-hud');
+
    /** @type {boolean} Whether the flyout lane is to the right of the categories bar. */
    const flyoutRight = await page.evaluate(() => {
       const cats = document.querySelector('#titan-player-hud .categories').getBoundingClientRect();
