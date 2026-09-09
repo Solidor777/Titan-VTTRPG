@@ -330,8 +330,8 @@ test.describe('embedded-context effects family', () => {
 
       // The row header shows the seeded name; rows mount collapsed, so this is the only expander
       // click (clicking the header toggles the row open).
-      /** @type {import('@playwright/test').Locator} The effect row's header button. */
-      const rowHeader = panel.locator('.row .row-header');
+      /** @type {import('@playwright/test').Locator} The effect row; its header button toggles expansion. */
+      const rowHeader = panel.locator('[data-testid="player-hud-effect-row"]');
       await expect(rowHeader.locator('.name'), 'HUD row header shows the seeded name').toHaveText(EFFECT_NAME);
       await rowHeader.click();
 

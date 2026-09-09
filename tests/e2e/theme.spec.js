@@ -54,18 +54,26 @@ test.describe('v14 theme system', () => {
    });
 
    test('auto follows the Foundry core color scheme', async () => {
-      // Force the core scheme light, then dark, asserting the world-default theme tracks it.
+      // Force the core scheme light, then dark, asserting the world-default theme tracks it. The
+      // expected backgrounds come from the theme registry rather than literals, so a palette change
+      // cannot silently stale this test; the resolved theme ids below keep it a real assertion.
       const observed = await page.evaluate(async () => {
          await game.settings.set('titan', 'theme', 'auto');
 
          /** @type {object} The original core UI config, restored after the probe. */
          const original = game.settings.get('core', 'uiConfig');
 
+         /** @type {object} The world-default theme for the light scheme, which `auto` must resolve to. */
+         const expectedLight = game.titan.themeManager.getSchemeTheme(false);
+
+         /** @type {object} The world-default theme for the dark scheme, which `auto` must resolve to. */
+         const expectedDark = game.titan.themeManager.getSchemeTheme(true);
+
          /**
-          * Sets the core applications color scheme and reads back the applied app background.
+          * Sets the core applications color scheme and reads back the applied theme.
           * @param {string} scheme - The colorScheme.applications value to probe under.
           * @param {string} expected - The app-background value that proves the theme applied.
-          * @returns {Promise<string>} The applied --titan-app-background value.
+          * @returns {Promise<object>} The applied `--titan-app-background` and the active theme id.
           */
          async function probe(scheme, expected) {
             await game.settings.set('core', 'uiConfig', {
@@ -77,18 +85,32 @@ test.describe('v14 theme system', () => {
                   .getPropertyValue('--titan-app-background').trim() === expected,
                { message: `theme for scheme ${scheme} applied` },
             );
-            return getComputedStyle(document.documentElement).getPropertyValue('--titan-app-background').trim();
+            return {
+               background: getComputedStyle(document.documentElement)
+                  .getPropertyValue('--titan-app-background').trim(),
+               id: game.titan.themeManager.getActiveTheme().id,
+            };
          }
 
-         const light = await probe('light', '#f4f4f6');
-         const dark = await probe('dark', '#262836');
+         const light = await probe('light', expectedLight.tokens['app-background']);
+         const dark = await probe('dark', expectedDark.tokens['app-background']);
          await game.settings.set('core', 'uiConfig', original);
-         return { light, dark };
+         return {
+            light,
+            dark,
+            expectedLight: { id: expectedLight.id, background: expectedLight.tokens['app-background'] },
+            expectedDark: { id: expectedDark.id, background: expectedDark.tokens['app-background'] },
+         };
       });
 
-      // World defaults: heritage-light and heritage-dark.
-      expect(observed.light, 'auto resolves the light world default').toBe('#f4f4f6');
-      expect(observed.dark, 'auto resolves the dark world default').toBe('#262836');
+      // Each scheme resolves that scheme's world default, by theme id and by the background applied.
+      expect(observed.light.id, 'auto resolves the light world default').toBe(observed.expectedLight.id);
+      expect(observed.light.background, 'the light default is applied').toBe(observed.expectedLight.background);
+      expect(observed.dark.id, 'auto resolves the dark world default').toBe(observed.expectedDark.id);
+      expect(observed.dark.background, 'the dark default is applied').toBe(observed.expectedDark.background);
+
+      // The schemes must resolve DIFFERENT themes, or tracking the core scheme proved nothing.
+      expect(observed.light.id, 'the two schemes resolve different themes').not.toBe(observed.dark.id);
       expect(errors, `uncaught errors during auto probe:\n${errors.join('\n')}`).toEqual([]);
    });
 

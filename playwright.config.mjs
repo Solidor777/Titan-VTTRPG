@@ -24,6 +24,13 @@ export default defineConfig({
    use: {
       baseURL: 'http://localhost:30000',
       headless: true,
+      // Foundry v14 requires 1366x768 and otherwise raises a permanent resolution warning whose
+      // notification banner spans the viewport and intercepts clicks on anything beneath it (the
+      // player HUD sits under that band). Playwright's 1280x720 default is below that minimum.
+      viewport: {
+         width: 1920,
+         height: 1080,
+      },
       launchOptions: {
          args: chromiumArgs,
       },

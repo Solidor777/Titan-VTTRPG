@@ -281,8 +281,8 @@ test.describe('cross-surface check-tag parity', () => {
       await expect(panel, 'effects panel mounts for the controlled token actor').toBeVisible();
 
       // POSITIVE signal first: the header must show the seeded effect before the expander click.
-      /** @type {import('@playwright/test').Locator} The effect row's header button. */
-      const rowHeader = panel.locator('.row .row-header');
+      /** @type {import('@playwright/test').Locator} The effect row; its header button toggles expansion. */
+      const rowHeader = panel.locator('[data-testid="player-hud-effect-row"]');
       await expect(rowHeader.locator('.name'), 'HUD row header shows the seeded effect').toHaveText(EFFECT_NAME);
       await rowHeader.click();
       return panel;
