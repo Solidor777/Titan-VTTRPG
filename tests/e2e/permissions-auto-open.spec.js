@@ -2,7 +2,7 @@ import { expect, test } from '@playwright/test';
 import { withClients } from './multiClient.js';
 import { setClientSetting } from './settings.js';
 import { seedCombatEncounter, teardownCombatEncounter } from '../shared/combat.js';
-import { buildTurnEffectActorData } from '../shared/builders.js';
+import { buildFastHealingAbilityData, buildTurnEffectActorData } from '../shared/builders.js';
 
 test.describe('permissions — auto-open character sheets', () => {
    test('GM "all": the current actor sheet auto-opens on the GM client at turn start', async ({ browser }) => {
@@ -29,7 +29,7 @@ test.describe('permissions — auto-open character sheets', () => {
             await gm.waitForFunction(
                (id) => game.actors.get(id)?.sheet?.rendered === true,
                ids.effectActorId,
-               { timeout: 15_000 },
+               { timeout: 1000 },
             );
          }
          finally {
@@ -43,12 +43,18 @@ test.describe('permissions — auto-open character sheets', () => {
       await withClients(browser, { gm: 'E2E GM 1' }, async ({ gm }) => {
          await setClientSetting(gm, 'autoOpenCharacterSheetsGM', 'disabled');
 
+         // The effect actor carries turn-start fast healing purely as a synchronization signal.
+         // `onTurnStart` resolves the auto-open branch FIRST and performs the start-of-turn resource
+         // updates after it, so an observed heal proves the auto-open decision has already been made
+         // and declined to render. Stamina is pre-seeded below max so the +2 heal moves the value.
          const seed = {
             sceneName: 'B4 Off Scene',
             effectActor: buildTurnEffectActorData('B4 Off Actor'),
+            effectAbilities: [buildFastHealingAbilityData('B4 Off Fast Healing', 2)],
             otherActor: buildTurnEffectActorData('B4 Off Other'),
             effectInitiative: 10,
             otherInitiative: 20,
+            staminaValue: 1,
          };
          const ids = await gm.evaluate(seedCombatEncounter, seed);
 
@@ -56,20 +62,21 @@ test.describe('permissions — auto-open character sheets', () => {
             await gm.evaluate((id) => game.actors.get(id).sheet.close(), ids.effectActorId);
             await gm.evaluate((combatId) => game.combats.get(combatId).nextTurn(), ids.combatId);
 
-            // Sanctioned negative-assertion exception (per the e2e speedup design spec, which permits a
-            // positive signal OR a bounded wait here). The auto-open render happens several awaits deep
-            // inside the UN-AWAITED async `combatNextTurn` → `onTurnStart` hook, so `nextTurn()` resolves
-            // before that branch runs. In the suppressed ('disabled') case the effect actor is bare — no
-            // turn-start rules elements — so it produces no resource/chat consequence to poll as a
-            // positive edge. We therefore (1) wait on the turn advancing to the effect actor, a real
-            // positive signal that the pipeline was triggered, then (2) hold one short bounded settle so
-            // the un-awaited render deterministically had its chance to fire, before asserting closed.
+            // The auto-open render happens several awaits deep inside the UN-AWAITED async
+            // `combatNextTurn` → `onTurnStart` hook, so `nextTurn()` resolves before that branch runs.
+            // Sequence on a real edge rather than a bounded settle: first the turn reaching the effect
+            // actor (the pipeline was triggered), then its turn-start heal landing — which `onTurnStart`
+            // performs strictly AFTER the auto-open branch, so the sheet's fate is already decided.
             await gm.waitForFunction(
                ({ combatId, combatantId }) => game.combats.get(combatId)?.combatant?.id === combatantId,
                { combatId: ids.combatId, combatantId: ids.effectCombatantId },
-               { timeout: 15_000 },
+               { timeout: 1000 },
             );
-            await gm.waitForTimeout(1000);
+            await gm.waitForFunction(
+               ({ id }) => game.actors.get(id)?.system.resource.stamina.value === 3,
+               { id: ids.effectActorId },
+               { timeout: 1000 },
+            );
 
             const rendered = await gm.evaluate(
                (id) => game.actors.get(id)?.sheet?.rendered === true,

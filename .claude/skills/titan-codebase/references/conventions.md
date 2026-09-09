@@ -642,9 +642,13 @@ auto-waiting action (`.click()`/`.fill()`) — the assertion/action already poll
 (guard the poll body so it returns a sentinel rather than throwing on early iterations); (3) inside a
 `page.evaluate`, use `await titanWait(syncPredicate, { message })` — `globalThis.titanWait`
 (`tests/e2e/poll.js`), installed by `login()` via `installPoll`/`addInitScript` before navigation, polls a
-synchronous predicate (50 ms interval, 5 s default timeout). The ONLY allowed bounded wait is a **negative
-assertion** (assert-absence) that has no pollable positive edge — pair it with a positive `waitForFunction`
-signal and document it inline (see `permissions-auto-open.spec.js`). Condition-polling
+synchronous predicate (50 ms interval, 5 s default timeout). **There are now no fixed sleeps in the suite
+at all**, including assert-absence tests. When a negative assertion appears to have no pollable positive
+edge, look for a **happens-after edge**: an observable the code under test emits strictly LATER than the
+decision being asserted. `permissions-auto-open.spec.js` waits on a turn-start fast-healing change,
+because `onTurnStart` resolves the auto-open branch BEFORE its resource updates — so the heal landing
+proves the sheet's fate was already decided. Seeding an extra rules element purely as a synchronization
+signal is preferred over a bounded wait. Condition-polling
 `setInterval` canvas-readiness loops (`effect-tray.spec.js`) are NOT fixed sleeps and are fine.
 
 **E2E runner configuration (all optional; defaults reproduce historical behavior).**
