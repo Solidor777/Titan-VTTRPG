@@ -51,3 +51,23 @@ it ever bites in play, the principled fix is a per-message serial queue around
   staged when the fix batch landed) — one-task-one-commit was not held there.
 - `ui.chat.render()` on the `themeCoreMessages` onChange re-renders the chat log but NOT the chat
   notification pane's previously posted cards; they restyle on their next natural re-render.
+
+## 2026-09-09 — E2E 1-second operation budget
+
+- **Wait ceilings now equal the budget.** 34 explicit `timeout:` values across the e2e suite are set
+  to 1000ms, so an operation exceeding the budget fails loudly instead of silently absorbing 15s.
+  **Six are deliberately exempt** because they are inherently multi-second and would break at 1s:
+  `fixtures.js:35` and `player-hud-layout.spec.js:139` (`game.ready`, world boot),
+  `multiClient.js:48` (a second browser context finishing login), and `pack-conversion.spec.js`
+  129/133/138 (login navigation plus the bulk pack conversion). Do not sweep these to 1s.
+- **`titanWait`'s default timeout is still 5000ms** (`tests/e2e/poll.js`). Calls that pass no
+  explicit `timeout` therefore still permit a 5s ceiling. The slow-operation reporter catches any
+  such call that actually exceeds 1s, so this is a reporting backstop rather than a hard gate.
+  Lowering the default is a one-line change affecting ~88 call sites; not done here.
+- **Intermittent: a 1378ms click at `effect-chat-card.spec.js:150`.** Observed ONCE in four
+  full-suite runs and never in five isolated runs of that spec, so it appears only deep in a
+  full-suite session, not from the spec itself. Playwright's click waits for actionability, and the
+  target is a button inside a just-posted chat card, so the time is spent waiting for the card to
+  stop moving as the chat log settles. Not reproducible on demand, so no fix was attempted — the
+  reporter will surface it again if it recurs, and a second sighting is the trigger to diagnose
+  (settle the chat log before clicking, the same pattern the HUD geometry reads now use).

@@ -165,7 +165,7 @@ test('send to chat creates the effect card', async () => {
    await page.locator('[data-testid="player-hud-effect-chat"]').click();
    await expect.poll(
       () => page.evaluate(() => game.messages.contents.at(-1)?.type),
-      { message: 'the effect card lands in chat', timeout: 10000 },
+      { message: 'the effect card lands in chat', timeout: 1000 },
    ).toBe('effect');
 });
 

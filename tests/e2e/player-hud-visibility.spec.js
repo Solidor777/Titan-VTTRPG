@@ -212,7 +212,7 @@ test('switching to a tokenless scene hides the HUD; returning restores it', asyn
       // scene transition issued mid-draw races the first and strands the canvas on a dead scene.
       await titanWait(
          () => canvas.ready && canvas.scene?.id === temp.id,
-         { message: 'temp scene drawn after activation', timeout: 15000 },
+         { message: 'temp scene drawn after activation', timeout: 1000 },
       );
       return { tempId: temp.id, originalId };
    });
@@ -225,7 +225,7 @@ test('switching to a tokenless scene hides the HUD; returning restores it', asyn
       await game.scenes.get(originalId).view();
       await titanWait(
          () => canvas.ready && canvas.scene?.id === originalId,
-         { message: 'original scene redrawn after view', timeout: 15000 },
+         { message: 'original scene redrawn after view', timeout: 1000 },
       );
       await game.scenes.get(originalId).activate();
       await game.scenes.get(tempId)?.delete();

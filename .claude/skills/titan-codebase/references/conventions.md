@@ -667,6 +667,15 @@ process before spawning anything, so npx, node, Foundry, and every Chromium inhe
   every operation over budget at end of run and dumps the full record to `debug/dumps/`. It reads
   Playwright's own step stream, so no spec needs instrumenting, and it never fails a test.
 
+**No e2e operation may exceed 1 second**, and wait ceilings are set to that budget so a breach fails
+loudly instead of silently absorbing 15s: explicit `timeout:` values are `1000`. Six waits are
+deliberately exempt because they are inherently multi-second — `game.ready` world boot
+(`fixtures.js`, `player-hud-layout.spec.js`), a second browser context finishing login
+(`multiClient.js`), and login navigation plus bulk conversion (`pack-conversion.spec.js`). Do not
+sweep those to 1s. A ceiling is a failure bound, not a duration: a `waitForFunction` returns the
+moment its predicate holds. `titanWait`'s own default is still 5000ms, so calls passing no explicit
+timeout rely on the reporter rather than a hard gate.
+
 Invalid core or priority values are hard errors, never silent fallbacks to the default.
 
 **The e2e viewport must stay at or above Foundry's 1366x768 minimum** (`use.viewport` is 1920x1080).

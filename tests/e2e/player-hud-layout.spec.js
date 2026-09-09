@@ -201,7 +201,7 @@ test('the HUD anchors to the expanded sidebar edge and stays put when the sideba
          const box = await menu.boundingBox();
          return box ? Math.abs(box.x - expanded.x) <= 2 : false;
       },
-      { message: 'the HUD stays put when the sidebar collapses', timeout: 10000 },
+      { message: 'the HUD stays put when the sidebar collapses', timeout: 1000 },
    ).toBe(true);
 
    // Re-expanding must also leave it in place.
@@ -212,7 +212,7 @@ test('the HUD anchors to the expanded sidebar edge and stays put when the sideba
          const box = await menu.boundingBox();
          return box ? Math.abs(box.x - expanded.x) <= 2 : false;
       },
-      { message: 'the HUD stays put when the sidebar re-expands', timeout: 10000 },
+      { message: 'the HUD stays put when the sidebar re-expands', timeout: 1000 },
    ).toBe(true);
 });
 
@@ -232,7 +232,7 @@ test('a window resize clamps elements into the canvas rect', async () => {
                   && box.right <= (900 - sidebarWidth) + 1 && box.bottom <= 601;
             });
       }),
-      { message: 'every HUD element clamps into the shrunken canvas rect', timeout: 10000 },
+      { message: 'every HUD element clamps into the shrunken canvas rect', timeout: 1000 },
    ).toBe(true);
 
    await page.setViewportSize({ width: 1280, height: 720 });

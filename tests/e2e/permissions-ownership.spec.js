@@ -54,7 +54,7 @@ test.describe('permissions — sheet ownership levels', () => {
             return sheet?.rendered === true && sheet?.isVisible === true;
          },
          actorId,
-         { timeout: 15_000 },
+         { timeout: 1000 },
       );
       await player.evaluate((id) => game.actors.get(id)?.sheet.close(), actorId);
 
@@ -69,7 +69,7 @@ test.describe('permissions — sheet ownership levels', () => {
       await withClients(browser, { gm: 'E2E GM 1', player: 'E2E Player 1' }, async ({ gm, player }) => {
          const id = await seedOwnedActor(gm, 'B1 Owner Actor', 'E2E Player 1', 'OWNER');
          try {
-            await player.waitForFunction((id) => !!game.actors.get(id), id, { timeout: 15_000 });
+            await player.waitForFunction((id) => !!game.actors.get(id), id, { timeout: 1000 });
             const state = await readSheetState(player, id);
             expect(state.visible).toBe(true);
             expect(state.editable).toBe(true);
@@ -85,7 +85,7 @@ test.describe('permissions — sheet ownership levels', () => {
       await withClients(browser, { gm: 'E2E GM 1', player: 'E2E Player 1' }, async ({ gm, player }) => {
          const id = await seedOwnedActor(gm, 'B1 Observer Actor', 'E2E Player 1', 'OBSERVER');
          try {
-            await player.waitForFunction((id) => !!game.actors.get(id), id, { timeout: 15_000 });
+            await player.waitForFunction((id) => !!game.actors.get(id), id, { timeout: 1000 });
             const state = await readSheetState(player, id);
             expect(state.visible).toBe(true);
             expect(state.editable).toBe(false);
@@ -101,7 +101,7 @@ test.describe('permissions — sheet ownership levels', () => {
       await withClients(browser, { gm: 'E2E GM 1', player: 'E2E Player 1' }, async ({ gm, player }) => {
          const id = await seedOwnedActor(gm, 'B1 Limited Actor', 'E2E Player 1', 'LIMITED');
          try {
-            await player.waitForFunction((id) => !!game.actors.get(id), id, { timeout: 15_000 });
+            await player.waitForFunction((id) => !!game.actors.get(id), id, { timeout: 1000 });
             // LIMITED meets the default viewPermission (LIMITED) so the sheet is visible, but not editable.
             const state = await player.evaluate((id) => {
                const actor = game.actors.get(id);
@@ -128,7 +128,7 @@ test.describe('permissions — sheet ownership levels', () => {
             // Foundry replicates the Actor document to ALL clients regardless of ownership — permission
             // gates VISIBILITY, not collection membership. So the doc IS present in the player's
             // collection; wait for it to arrive, then assert the player resolves below LIMITED (no view).
-            await player.waitForFunction((id) => !!game.actors.get(id), id, { timeout: 15_000 });
+            await player.waitForFunction((id) => !!game.actors.get(id), id, { timeout: 1000 });
             const view = await player.evaluate(
                (id) => game.actors.get(id).testUserPermission(game.user, 'LIMITED'),
                id,

@@ -183,7 +183,7 @@ test('equipped weapon main action rolls the first attack to chat', async () => {
    await subOption.click();
    await expect.poll(
       () => page.evaluate(() => game.messages.contents.at(-1)?.type),
-      { message: 'an attack check chat message', timeout: 10000 },
+      { message: 'an attack check chat message', timeout: 1000 },
    ).toBe('attackCheck');
 });
 
@@ -220,7 +220,7 @@ test('weapon sub-buttons send to chat and open the sheet', async () => {
    await page.locator(`[data-testid="player-hud-sub-button-${weaponId}-send-to-chat"]`).click();
    await expect.poll(
       () => page.evaluate(() => game.messages.contents.at(-1)?.type),
-      { message: 'the weapon item card lands in chat', timeout: 10000 },
+      { message: 'the weapon item card lands in chat', timeout: 1000 },
    ).toBe('weapon');
 
    await page.locator('[data-testid="player-hud-category-weapons"]').click();
@@ -248,7 +248,7 @@ test('skill roll for a group hits every selected actor', async () => {
          const fresh = game.messages.contents.slice(count);
          return fresh.filter((message) => message.type === 'attributeCheck').length;
       }, before),
-      { message: 'one skill check per selected actor', timeout: 10000 },
+      { message: 'one skill check per selected actor', timeout: 1000 },
    ).toBe(2);
 });
 
@@ -264,7 +264,7 @@ test('resistance roll rolls for all selected actors', async () => {
          const fresh = game.messages.contents.slice(count);
          return fresh.filter((message) => message.type === 'resistanceCheck').length;
       }, before),
-      { message: 'one resistance check per selected actor', timeout: 10000 },
+      { message: 'one resistance check per selected actor', timeout: 1000 },
    ).toBe(2);
 });
 
@@ -296,7 +296,7 @@ test('apply damage dialog applies the amount to all selected actors', async () =
             game.actors.get(secondId).system.resource.stamina.value,
          ];
       }, { firstId, secondId }),
-      { message: 'both actors take the entered damage', timeout: 10000 },
+      { message: 'both actors take the entered damage', timeout: 1000 },
    ).toEqual([before.first - 3, before.second - 3]);
 });
 
@@ -310,7 +310,7 @@ test('spell main action rolls a casting check', async () => {
    await page.locator(`[data-testid="player-hud-sub-option-spells-${itemIds[0]}"]`).click();
    await expect.poll(
       () => page.evaluate(() => game.messages.contents.at(-1)?.type),
-      { message: 'a casting check chat message', timeout: 10000 },
+      { message: 'a casting check chat message', timeout: 1000 },
    ).toBe('castingCheck');
 });
 
@@ -325,7 +325,7 @@ test('ability and effect main actions roll their first check', async () => {
    await page.locator(`[data-testid="player-hud-sub-option-abilities-${itemIds[0]}"]`).click();
    await expect.poll(
       () => page.evaluate(() => game.messages.contents.at(-1)?.type),
-      { message: 'an item check from the ability', timeout: 10000 },
+      { message: 'an item check from the ability', timeout: 1000 },
    ).toBe('itemCheck');
 
    const { effectIds } = await seedDocuments(page, actorId, { effects: [{
@@ -340,7 +340,7 @@ test('ability and effect main actions roll their first check', async () => {
    await page.locator(`[data-testid="player-hud-sub-option-effects-${effectIds[0]}"]`).click();
    await expect.poll(
       () => page.evaluate(() => game.messages.contents.at(-1)?.type),
-      { message: 'an item check from the effect', timeout: 10000 },
+      { message: 'an item check from the effect', timeout: 1000 },
    ).toBe('itemCheck');
 });
 

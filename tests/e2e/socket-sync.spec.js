@@ -41,7 +41,7 @@ test.describe('socket sync — replicated turn-effect state', () => {
             await player.waitForFunction(
                ({ id, expected }) => game.actors.get(id)?.system.resource.stamina.value === expected,
                { id: ids.effectActorId, expected: before - 1 },
-               { timeout: 15_000 },
+               { timeout: 1000 },
             );
 
             // Confirm exactly-once: the value is before-1, not before-2.
@@ -79,7 +79,7 @@ test.describe('socket sync — replicated turn-effect state', () => {
             await player.waitForFunction(
                ({ id }) => game.actors.get(id)?.system.resource.stamina.value === 1,
                { id: ids.effectActorId },
-               { timeout: 15_000 },
+               { timeout: 1000 },
             );
 
             await gm.evaluate((combatId) => game.combats.get(combatId).nextTurn(), ids.combatId);
@@ -88,7 +88,7 @@ test.describe('socket sync — replicated turn-effect state', () => {
             await player.waitForFunction(
                ({ id }) => game.actors.get(id)?.system.resource.stamina.value === 3,
                { id: ids.effectActorId },
-               { timeout: 15_000 },
+               { timeout: 1000 },
             );
          }
          finally {
@@ -124,7 +124,7 @@ test.describe('socket sync — replicated turn-effect state', () => {
             await player.waitForFunction(
                ({ id }) => game.actors.get(id)?.system.resource.resolve.value === 0,
                { id: ids.effectActorId },
-               { timeout: 15_000 },
+               { timeout: 1000 },
             );
 
             // GM (best owner) advances the turn → effect actor's turn starts → resolve regain applies.
@@ -134,7 +134,7 @@ test.describe('socket sync — replicated turn-effect state', () => {
             await player.waitForFunction(
                ({ id, expected }) => game.actors.get(id)?.system.resource.resolve.value === expected,
                { id: ids.effectActorId, expected: expectedResolve },
-               { timeout: 15_000 },
+               { timeout: 1000 },
             );
          }
          finally {
@@ -170,7 +170,7 @@ test.describe('socket sync — replicated turn-effect state', () => {
             await player.waitForFunction(
                ({ id, expected }) => game.actors.get(id)?.system.resource.stamina.value === expected,
                { id: ids.effectActorId, expected: before - 1 },
-               { timeout: 15_000 },
+               { timeout: 1000 },
             );
 
             // Backward: previousTurn reverts the damage.
@@ -178,7 +178,7 @@ test.describe('socket sync — replicated turn-effect state', () => {
             await player.waitForFunction(
                ({ id, expected }) => game.actors.get(id)?.system.resource.stamina.value === expected,
                { id: ids.effectActorId, expected: before },
-               { timeout: 15_000 },
+               { timeout: 1000 },
             );
          }
          finally {
@@ -220,7 +220,7 @@ test.describe('socket sync — replicated turn-effect state', () => {
             await gm2.evaluate(async (combatId) => {
                await titanWait(
                   () => !!game.combats.get(combatId),
-                  { message: 'the seeded combat replicates to GM 2', timeout: 15000 },
+                  { message: 'the seeded combat replicates to GM 2', timeout: 1000 },
                );
                await game.combats.get(combatId).nextTurn();
             }, ids.combatId);
@@ -229,7 +229,7 @@ test.describe('socket sync — replicated turn-effect state', () => {
             await gm2.waitForFunction(
                ({ id, expected }) => game.actors.get(id)?.system.resource.stamina.value === expected,
                { id: ids.effectActorId, expected: before - 1 },
-               { timeout: 15_000 },
+               { timeout: 1000 },
             );
 
             // Re-read on GM 1 to confirm no double-apply (still before - 1, not before - 2).

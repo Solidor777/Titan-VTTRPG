@@ -180,7 +180,7 @@ export async function readNewestCheckFlags(page, baseline) {
       },
       {
          message: 'a titan check chat message should be created after the roll',
-         timeout: 10000,
+         timeout: 1000,
       },
    ).not.toBeNull();
    return flags;

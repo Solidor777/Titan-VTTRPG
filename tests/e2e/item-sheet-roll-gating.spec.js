@@ -87,7 +87,7 @@ test.describe('item-sheet roll-button gating (player)', () => {
             await player.waitForFunction(
                (actorIds) => actorIds.every((id) => !!game.actors.get(id)),
                [ids.ownedActorId, ids.observedActorId],
-               { timeout: 30_000 },
+               { timeout: 1000 },
             );
 
             /**

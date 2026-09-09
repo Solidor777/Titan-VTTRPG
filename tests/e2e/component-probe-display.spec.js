@@ -53,7 +53,7 @@ test.describe('component probe — Meter', () => {
                return Math.round(parseFloat(el.style.width));
             });
          },
-         { timeout: 5000 },
+         { timeout: 1000 },
       ).toBe(75);
    });
 
