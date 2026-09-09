@@ -647,14 +647,49 @@ assertion** (assert-absence) that has no pollable positive edge — pair it with
 signal and document it inline (see `permissions-auto-open.spec.js`). Condition-polling
 `setInterval` canvas-readiness loops (`effect-tray.spec.js`) are NOT fixed sleeps and are fine.
 
+**E2E runner configuration (all optional; defaults reproduce historical behavior).**
+`npm run test:e2e` wraps `playwright test` in `tests/e2e/run-e2e-throttled.ps1`, which throttles ITS OWN
+process before spawning anything, so npx, node, Foundry, and every Chromium inherit the limits:
+
+- `TITAN_E2E_CORES` — logical cores for the affinity mask; an integer, or `all` to skip masking. Defaults
+  to half the machine's logical cores.
+- `TITAN_E2E_PRIORITY` — process priority class. Defaults to `BelowNormal`.
+- `TITAN_E2E_GPU=0` — falls back to software rendering. The default is GPU-on via the `--enable-gpu`
+  Chromium arg in `playwright.config.mjs`; without it headless Chromium silently uses the SwiftShader CPU
+  rasterizer, which renders the PIXI canvas across every core. `gpu-rendering.spec.js` asserts the adapter
+  is not software. Verified minimal: `--use-angle` needlessly pins a backend and `--ignore-gpu-blocklist`
+  does nothing on its own.
+- `TITAN_E2E_SLOW_MS` — threshold for `tests/e2e/slow-operation-reporter.js` (default 1000), which ranks
+  every operation over budget at end of run and dumps the full record to `debug/dumps/`. It reads
+  Playwright's own step stream, so no spec needs instrumenting, and it never fails a test.
+
+Invalid core or priority values are hard errors, never silent fallbacks to the default.
+
 **`createEmbeddedDocuments` return order is NOT input order.** Never map the returned array by index
 to your payloads — resolve created ids by NAME afterward (`actor.items.getName(payload.name)?.id`),
 as the player-hud specs' `seedDocuments` helpers do. Index-mapping produced wrong-id assertions that
 only failed in multi-payload creates.
 
-**One-shot `boundingBox()` snapshots race layout settling.** Element sizes bound via
-`bind:clientWidth/Height` update through ResizeObserver a frame after remounts; geometry assertions
-must `expect.poll` re-reading boxes (see `expectBoxes` in `player-hud-action-menu-layout.spec.js`).
+**One-shot `boundingBox()` snapshots race layout settling.** `boundingBox()` and in-page
+`getBoundingClientRect()` are non-retrying reads, and `toBeVisible()` resolves at the START of a reveal
+transition — so a geometry read gated only on visibility samples a mid-animation frame. Two settling
+mechanisms, in preference order:
+
+1. **Event-driven (preferred): `waitForAnimations(page, selector)`** (`tests/e2e/world.js`) awaits every
+   finite transition/animation under a subtree via each `Animation`'s `finished` promise (infinite
+   animations excluded; a cancelled animation counts as settled). Use it before any geometry read that
+   follows a reveal, drag, edit-mode toggle, or sidebar expand — `#titan-player-hud` is the HUD root.
+2. **Retry (when the settle has no event, e.g. a ResizeObserver re-flow after a setting write):**
+   `expect.poll` re-reading the boxes each attempt — see `expectBoxes` in
+   `player-hud-action-menu-layout.spec.js`.
+
+The same rule covers chat: creating a `ChatMessage` document does not render it. Gate a one-shot
+chat-DOM read on the mounted card (`expect(locator('.message[data-message-id="…"] .check-chat-message')
+.first()).toBeAttached()`) — the card mounts in BOTH `#chat` and `#chat-notifications`, so the locator
+needs `.first()` or it trips strict mode.
+
+This class of race stays latent while rendering is slow enough to mask it: under the SwiftShader software
+rasterizer the Playwright round-trip outlasted the transition, and enabling GPU rendering exposed it.
 
 **Foundry core Escape releases token control.** Any canvas-overlay UI that closes on Escape must
 consume the event in the WINDOW CAPTURE phase (`onkeydowncapture` + `stopImmediatePropagation`),
