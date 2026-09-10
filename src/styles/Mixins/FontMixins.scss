@@ -13,3 +13,12 @@
 @mixin font-size-extra-large {
    font-size: var(--titan-font-size-extra-large);
 }
+
+@mixin section-label {
+   @include font-size-small;
+
+   font-weight: bold;
+   letter-spacing: 0.06em;
+   text-transform: uppercase;
+   color: var(--titan-header-6-font-color);
+}

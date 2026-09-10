@@ -9,13 +9,17 @@
       from '~/document/types/actor/types/character/sheet/sidebar/CharacterSheetPortrait.svelte';
    import DocumentSheetSidebar from '~/document/sheet/DocumentSheetSidebar.svelte';
 
-   /** @type {SvelteComponent[]} List of Svelte Components that make up the sections of the sidebar. */
+   /**
+    * @type {(SvelteComponent | import('~/document/sheet/DocumentSheetSidebar.svelte').DocumentSheetSidebarSection)[]}
+    * List of sections that make up the sidebar. Portrait and Resources render bare; Ratings, Mods, and Speeds render
+    * with an uppercase section label above them.
+    */
    const sections = [
       CharacterSheetPortrait,
       CharacterSheetResources,
-      CharacterSheetRatings,
-      CharacterSheetMods,
-      CharacterSheetSpeeds
+      { component: CharacterSheetRatings, label: 'ratings' },
+      { component: CharacterSheetMods, label: 'mods' },
+      { component: CharacterSheetSpeeds, label: 'speeds' }
    ];
 </script>
 

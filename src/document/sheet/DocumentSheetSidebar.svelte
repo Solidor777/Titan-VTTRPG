@@ -1,8 +1,17 @@
 <script>
+   import localize from '~/helpers/utility-functions/Localize.js';
+
+   /**
+    * @typedef {object} DocumentSheetSidebarSection
+    * @property {import('svelte').SvelteComponent} component The Svelte Component that renders the section.
+    * @property {string} [label] Localization key for a label rendered above the section.
+    */
+
    /**
     * @typedef {object} DocumentSheetSidebarProps
-    * @property {import('svelte').SvelteComponent[]} [sections] List of Svelte Components that make up the sections of
-    * the sidebar.
+    * @property {(import('svelte').SvelteComponent | DocumentSheetSidebarSection)[]} [sections] List of sections to
+    * render. Each entry is either a bare Svelte Component or a `{ component, label }` object that renders a label
+    * above the component.
     */
 
    /** @type {DocumentSheetSidebarProps} */
@@ -10,8 +19,13 @@
 </script>
 
 <div class="sidebar">
-   {#each sections as Section}
+   {#each sections as entry}
+      {@const isDescriptor = Boolean(entry.component)}
+      {@const Section = isDescriptor ? entry.component : entry}
       <div class="section">
+         {#if isDescriptor && entry.label}
+            <div class="section-label">{localize(entry.label)}</div>
+         {/if}
          <Section/>
       </div>
    {/each}
@@ -28,5 +42,9 @@
       width: var(--titan-sidebar-width);
       min-width: var(--titan-sidebar-width);
       padding: var(--titan-sidebar-padding);
+
+      .section-label {
+         @include section-label;
+      }
    }
 </style>
