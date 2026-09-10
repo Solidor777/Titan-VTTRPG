@@ -89,6 +89,7 @@
       <!--Cancel Button-->
       <div class="button">
          <Button
+            secondary
             onclick={() => {
                application.close();
             }}

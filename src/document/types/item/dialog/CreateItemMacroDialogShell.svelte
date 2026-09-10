@@ -285,7 +285,7 @@
       </div>
 
       <div class="button">
-         <Button onclick={onCancel}><Text text="cancel"/></Button>
+         <Button secondary onclick={onCancel}><Text text="cancel"/></Button>
       </div>
    </div>
 </div>

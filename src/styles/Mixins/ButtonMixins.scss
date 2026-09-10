@@ -44,6 +44,13 @@
    }
 }
 
+@mixin button-secondary {
+   @include button;
+
+   --titan-button-background: transparent;
+   --titan-button-font-color: var(--titan-app-font-color);
+}
+
 @mixin mini-button {
    @include button;
 

@@ -99,7 +99,7 @@
 
    <!--Cancel Button-->
    <div class="button">
-      <Button onclick={() => application.close()}>
+      <Button secondary onclick={() => application.close()}>
          <Text text="cancel"/>
       </Button>
    </div>

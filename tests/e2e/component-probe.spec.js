@@ -68,6 +68,32 @@ test.describe('component probe — Button', () => {
       });
       await expect(page.locator(`${selector} button[data-testid="probe-button"]`)).toBeVisible();
    });
+
+   test('secondary renders a transparent fill', async () => {
+      const secondaryProbe = await mountProbe(page, 'Button', {
+         props: {
+            text: 'Cancel',
+            secondary: true,
+            testId: 'probe-secondary',
+         },
+      });
+      const defaultProbe = await mountProbe(page, 'Button', {
+         props: {
+            text: 'Confirm',
+            testId: 'probe-default',
+         },
+      });
+
+      const secondaryBackground = await page
+         .locator(`${secondaryProbe.selector} button`)
+         .evaluate((el) => globalThis.getComputedStyle(el).backgroundColor);
+      const defaultBackground = await page
+         .locator(`${defaultProbe.selector} button`)
+         .evaluate((el) => globalThis.getComputedStyle(el).backgroundColor);
+
+      expect(secondaryBackground, 'secondary button fill is transparent').toBe('rgba(0, 0, 0, 0)');
+      expect(defaultBackground, 'default button fill is not transparent').not.toBe('rgba(0, 0, 0, 0)');
+   });
 });
 
 test.describe('component probe — TextInput', () => {

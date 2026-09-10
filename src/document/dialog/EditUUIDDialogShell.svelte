@@ -83,7 +83,7 @@
       </div>
 
       <div class="button">
-         <Button onclick={onCancel}>{localize('cancel')}</Button>
+         <Button secondary onclick={onCancel}>{localize('cancel')}</Button>
       </div>
    </div>
 </div>

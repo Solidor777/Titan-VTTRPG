@@ -54,7 +54,7 @@
 
    <!--Canceled button-->
    <div class="button">
-      <Button onclick={onCanceled}>
+      <Button secondary onclick={onCanceled}>
          <Text text="cancel"/>
       </Button>
    </div>

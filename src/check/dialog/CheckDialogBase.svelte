@@ -50,7 +50,7 @@
       </div>
 
       <div class="button">
-         <Button onclick={onCancel} testId={'check-dialog-cancel'}><Text text="cancel"/></Button>
+         <Button secondary onclick={onCancel} testId={'check-dialog-cancel'}><Text text="cancel"/></Button>
       </div>
    </div>
 </div>
