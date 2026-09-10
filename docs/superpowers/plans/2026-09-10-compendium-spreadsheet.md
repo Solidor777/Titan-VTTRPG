@@ -4009,6 +4009,9 @@ describe('onGetCompendiumContextOptions', () => {
       globalThis.game = {
          user: { isGM: true },
          packs: { get: (id) => (id === 'test.weapons' ? { metadata: { type: 'Item' } } : undefined) },
+         // Localize.js unconditionally calls game.i18n.localize(`LOCAL.${key}.text`) with no raw-key
+         // fallback, so a label assertion must match that exact prefixed/suffixed echo, not the bare key.
+         i18n: { localize: (key) => key },
       };
    });
 
@@ -4017,7 +4020,7 @@ describe('onGetCompendiumContextOptions', () => {
       const options = [];
       onGetCompendiumContextOptions({}, options);
       /** @type {object} */
-      const exportEntry = options.find((o) => o.label === 'exportToSpreadsheet');
+      const exportEntry = options.find((o) => o.label === 'LOCAL.exportToSpreadsheet.text');
       /** @type {object} A pack li stand-in. */
       const li = { dataset: { pack: 'test.weapons' } };
       expect(exportEntry.visible(li)).toBe(true);
@@ -4032,7 +4035,7 @@ describe('onGetCompendiumContextOptions', () => {
       const options = [];
       onGetCompendiumContextOptions({}, options);
       /** @type {object} */
-      const exportEntry = options.find((o) => o.label === 'exportToSpreadsheet');
+      const exportEntry = options.find((o) => o.label === 'LOCAL.exportToSpreadsheet.text');
       expect(exportEntry.visible({ dataset: { pack: 'test.weapons' } })).toBe(false);
    });
 
@@ -4041,18 +4044,11 @@ describe('onGetCompendiumContextOptions', () => {
       const options = [];
       onGetCompendiumContextOptions({}, options);
       /** @type {object} */
-      const importEntry = options.find((o) => o.label === 'importSpreadsheet');
+      const importEntry = options.find((o) => o.label === 'LOCAL.importSpreadsheet.text');
       expect(importEntry.visible({ dataset: { pack: 'test.weapons' } })).toBe(true);
    });
 });
 ```
-
-Note: `localize('exportToSpreadsheet')` in the real handler returns the localized string, but this test
-mocks nothing for `localize` — before writing the implementation, check whether this codebase's
-`localize()` helper falls back to the raw key when `game.i18n` is unset (many of this project's own hook
-tests rely on exactly that fallback; grep `src/helpers/utility-functions/Localize.js` and an existing
-hook test like `tests/unit/hooks/` for the established pattern) so the assertions above comparing
-against the raw key string continue to work without an i18n mock.
 
 - [ ] **Step 2: Run test to verify it fails**
 
