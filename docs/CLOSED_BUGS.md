@@ -442,3 +442,13 @@ when fixed.
 - **Found:** 2026-09-10, from a screenshot sweep of every TITAN surface for the redesign passes.
 - **Fix:** the five fields pass the raw key like every other dialog field. `localization.spec.js`
   now opens all five check-options dialogs against a rebuilt roller fixture and scans each.
+
+### 37. Six item sheet headers rendered "Rarity" twice
+
+- **What:** The armor, commodity, equipment, shield, spell, and weapon sheet headers wrapped
+  `ItemSheetRaritySelect` in their own `{localize('rarity')}` label, but the select already renders
+  a labelled `LabeledElement`, so the header read "Rarity Rarity Common". The ability header used
+  the select alone and was correct.
+- **Found:** 2026-09-10, from the surface screenshot sweep.
+- **Fix:** the six headers keep only the self-labelled select. `sheet-regressions.spec.js` asserts
+  every rarity-bearing item sheet header shows exactly one "Rarity" label.

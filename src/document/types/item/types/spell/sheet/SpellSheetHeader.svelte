@@ -13,12 +13,7 @@
 <ItemSheetHeader>
    <!--Rarity-->
    <div class="stat">
-      <div class="label">
-         {localize('rarity')}
-      </div>
-      <div class="input">
-         <ItemSheetRaritySelect/>
-      </div>
+      <ItemSheetRaritySelect/>
    </div>
 
    <!--XP Cost-->

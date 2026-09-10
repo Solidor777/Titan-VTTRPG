@@ -39,6 +39,24 @@ test.afterAll(async () => {
 });
 
 test.describe('v14 sheet regressions', () => {
+   test('item sheet headers render the rarity label exactly once', async () => {
+      // Every rarity-bearing item type shares ItemSheetRaritySelect, which carries its own label.
+      for (const type of ['ability', 'armor', 'commodity', 'equipment', 'shield', 'spell', 'weapon']) {
+         await page.evaluate(async (type) => {
+            const item = await Item.create({ name: 'E2E Regression Rarity Item', type });
+            await item.sheet.render(true);
+            await titanWait(() => !!item.sheet.element, { message: `${type} sheet rendered` });
+         }, type);
+         const sheet = page.locator('.titan-item-sheet:has-text("E2E Regression Rarity Item")');
+         await expect(sheet).toBeVisible();
+         const labels = sheet.locator('.header').getByText('Rarity', { exact: true });
+         expect(await labels.count(), `${type} sheet header shows one Rarity label`).toBe(1);
+         await closeAllApps(page);
+         await page.evaluate(async () => game.items.getName('E2E Regression Rarity Item')?.delete());
+      }
+      expect(errors, `uncaught errors rendering item sheets:\n${errors.join('\n')}`).toEqual([]);
+   });
+
    test('createItemFromType adds an owned item to a world actor', async () => {
       const result = await page.evaluate(async () => {
          // A fresh world actor exercises the non-embedded document path.
