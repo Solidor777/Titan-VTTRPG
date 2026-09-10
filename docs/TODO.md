@@ -37,8 +37,7 @@ surviving deferrals.
 
 The "first-class ChatMessage subtypes" effort (Phases 1-4 + follow-ups B/D) has shipped — all 26
 chat messages are self-rendering subtypes. Specs/plans under `specs/2026-06-03-chat-message-subtypes-*`
-and successors. (Note: NPC `overkillDamage` (`NPCDataModel.js:47`) is written-but-never-read and
-schema-stripped — harmless dead data, a candidate for producer cleanup.)
+and successors.
 
 ### 12. Chat-message ↔ document path parity (standing strategy; verified inventory CLOSED)
 

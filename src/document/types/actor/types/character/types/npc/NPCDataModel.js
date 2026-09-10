@@ -11,7 +11,7 @@ import assert from '~/helpers/utility-functions/Assert.js';
 export default class NPCDataModel extends CharacterDataModel {
    /**
     * Applies Damage to the Character.
-    * Override for handling Minions dying in 1 hit and overkill damage.
+    * Override for handling Minions dying in 1 hit.
     * @param {number} damage - Amount of Damage to apply.
     * @param {DamageOptions} [options] - Options for applying the Damage.
     * @returns {Promise<DamageReport|void>} Results of applying the Damage.
@@ -40,12 +40,6 @@ export default class NPCDataModel extends CharacterDataModel {
 
             // Set stamina to 0.
             this.resource.stamina.value = 0;
-
-            // Calculate overkill damage.
-            const overkillDamage = reportData.damageTaken - this.resource.stamina.max;
-            if (overkillDamage > 0) {
-               reportData.overkillDamage = overkillDamage;
-            }
 
             // Update the actor document unless explicitly instructed otherwise.
             if (options?.updateActor !== false) {
