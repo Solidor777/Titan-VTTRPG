@@ -44,9 +44,9 @@
    }
 }
 
+// Modifier layered on an element that already includes `button`: it only redefines the fill and text tokens
+// the base mixin reads, so the border, sizing, and hover rules come from that base declaration.
 @mixin button-secondary {
-   @include button;
-
    --titan-button-background: transparent;
    --titan-button-font-color: var(--titan-app-font-color);
 }
