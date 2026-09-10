@@ -15,7 +15,7 @@ import ItemCheckDialog from '~/check/types/item-check/dialog/ItemCheckDialog.js'
 import ResistanceCheck from '~/check/types/resistance-check/ResistanceCheck.js';
 import ResistanceCheckDialog from '~/check/types/resistance-check/dialog/ResistanceCheckDialog.js';
 import appendUnique from '~/helpers/utility-functions/AppendUnique.js';
-import appendUniqueByFunctionValue from '~/helpers/utility-functions/appendUniqueByFunctionValue.js';
+import appendUniqueByFunctionValue from '~/helpers/utility-functions/AppendUniqueByFunctionValue.js';
 import camelize from '~/helpers/utility-functions/Camelize.js';
 import clamp from '~/helpers/utility-functions/Clamp.js';
 import computeMulSumDelta from '~/helpers/utility-functions/ComputeMulSumDelta.js';

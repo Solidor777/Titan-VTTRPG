@@ -476,3 +476,14 @@ when fixed.
   expanded; `toggleFolder` persists the current folders absent from the reactive set, which drops deleted
   ids. `effect-tray.spec.js` creates a folder after a collapse was saved for the pack and asserts it renders
   expanded while the stored entry lists only the collapsed id.
+
+### 40. The system failed to build on case-sensitive filesystems (miscased import)
+
+- **What:** `CharacterDataModel.js` imported `~/helpers/utility-functions/appendUniqueByFunctionValue.js`
+  while the tracked file is `AppendUniqueByFunctionValue.js`. Windows resolves the path case-insensitively,
+  so every local build, unit run, and e2e run passed; the first GitHub Actions run on `ubuntu-latest`
+  failed in Vite with "Failed to resolve import". Present since the 2024 data-model rebuild.
+- **Found:** 2026-09-10, by the first CI run after the release/CI workflows landed.
+- **Fix:** the import now matches the tracked filename. A scan of every `~/` and relative import/export
+  specifier across the 985 tracked source, test, and script files against `git ls-files` found no other
+  case mismatch. CI on Linux is the standing guard against a recurrence.
