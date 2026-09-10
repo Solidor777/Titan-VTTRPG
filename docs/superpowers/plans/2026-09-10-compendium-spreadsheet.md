@@ -4238,135 +4238,244 @@ test('exporting the seeded effects pack produces a manifest and one row per effe
 });
 ```
 
-- [ ] **Step 2: Full export → mutate → import-into-existing round trip**
+**Safety note (binding — read before writing Steps 2-4):** `titan.effects` is this system's one SHIPPED
+compendium — every other e2e spec that touches it (`permissions-compendium.spec.js`, `effect-tray.spec.js`)
+only ever reads from it, never mutates it, and it carries real shared content other specs depend on. A
+rename or delete against it with no restore step is a destructive, hard-to-reverse action on shared state,
+so Steps 2-4 below (the ones that mutate/create pack documents) instead create and seed their OWN scratch
+world-package compendium per test and delete it in a `finally`, following the exact pattern already
+established in `tests/e2e/pack-conversion.spec.js` (`configure({ locked: false })` then `deleteCompendium()`,
+with a stale-pack sweep at the start in case a prior run crashed before cleanup). Step 1 (pure export, no
+write) and Step 5 (locked-pack refusal — the import is refused, so nothing is ever created, and the lock is
+restored in a `finally` exactly like the existing pack-conversion precedent) are read-only/self-restoring
+against `titan.effects` and need no scratch pack.
+
+- [ ] **Step 2: Full export → mutate → import-into-existing round trip (own scratch pack)**
 
 ```js
+/**
+ * Deletes the named world-package compendium if it exists, unlocking it first (a locked pack refuses
+ * deletion). Used both to sweep a stale pack left by a crashed prior run and to clean up after a test.
+ * @param {import('@playwright/test').Page} page - The shared page.
+ * @param {string} packId - The compendium's collection id (e.g. "world.e2e-spreadsheet-update").
+ * @returns {Promise<void>} Resolves once the pack is gone (or was never present).
+ */
+async function deleteScratchPackIfExists(page, packId) {
+   await page.evaluate(async (id) => {
+      /** @type {CompendiumCollection|undefined} */
+      const pack = game.packs.get(id);
+      if (pack) {
+         await pack.configure({ locked: false });
+         await pack.deleteCompendium();
+      }
+   }, packId);
+}
+
+/**
+ * Creates a fresh Item-type world-package compendium seeded with the given documents, sweeping any
+ * same-id pack left by a crashed prior run first.
+ * @param {import('@playwright/test').Page} page - The shared page.
+ * @param {{packId:string, packName:string, packLabel:string, documents:object[]}} fixture - The pack to
+ *    create (`packId` is `world.<packName>`) and the Item create-data to seed it with.
+ * @returns {Promise<void>} Resolves once the pack exists and every document is created.
+ */
+async function seedScratchPack(page, fixture) {
+   await deleteScratchPackIfExists(page, fixture.packId);
+   await page.evaluate(async ({ packName, packLabel, documents }) => {
+      await foundry.documents.collections.CompendiumCollection.createCompendium({
+         name: packName,
+         label: packLabel,
+         type: 'Item',
+      });
+      for (const documentData of documents) {
+         await Item.create(documentData, { pack: `world.${packName}` });
+      }
+   }, fixture);
+}
+
 test('a mutated exported CSV file imports back into the same pack, updating a field', async ({ page }) => {
-   await openPackContextMenu(page, 'TITAN Effects');
-   /** @type {Promise<import('@playwright/test').Download>} */
-   const downloadPromise = page.waitForEvent('download');
-   await page.locator('.context-item', { hasText: 'Export to Spreadsheet' }).click();
-   await page.locator('[data-testid="export-format-select"]').selectOption('csv');
-   await page.locator('[data-testid="export-confirm-button"]').click();
    /** @type {string} */
-   const zipPath = await (await downloadPromise).path();
+   const packId = 'world.e2e-spreadsheet-update';
+   try {
+      await seedScratchPack(page, {
+         packId,
+         packName: 'e2e-spreadsheet-update',
+         packLabel: 'E2E Spreadsheet Update',
+         documents: [{ name: 'E2E Original Weapon', type: 'weapon' }],
+      });
 
-   /** @type {Object<string,Uint8Array>} */
-   const entries = unzipSync(new Uint8Array(await require('node:fs/promises').readFile(zipPath)));
-   /** @type {string} */
-   const effectCsv = strFromU8(entries['effect.csv']);
-   // Replace the first effect's `name` column value with a fixed marker string, locating the `name`
-   // column by the header row rather than assuming its position.
-   /** @type {string[]} */
-   const lines = effectCsv.replace(/^﻿/, '').split('\r\n').filter(Boolean);
-   /** @type {string[]} */
-   const header = lines[0].split(',');
-   /** @type {number} */
-   const nameIndex = header.indexOf('name');
-   /** @type {string[]} */
-   const firstDataRow = lines[1].split(',');
-   firstDataRow[nameIndex] = 'E2E Renamed Effect';
-   lines[1] = firstDataRow.join(',');
-   /** @type {string} */
-   const rewritten = `﻿${lines.join('\r\n')}\r\n`;
+      await openPackContextMenu(page, 'E2E Spreadsheet Update');
+      /** @type {Promise<import('@playwright/test').Download>} */
+      const downloadPromise = page.waitForEvent('download');
+      await page.locator('.context-item', { hasText: 'Export to Spreadsheet' }).click();
+      await page.locator('[data-testid="export-format-select"]').selectOption('csv');
+      await page.locator('[data-testid="export-confirm-button"]').click();
+      /** @type {string} */
+      const zipPath = await (await downloadPromise).path();
 
-   /** @type {string} */
-   const tmpPath = require('node:path').join(require('node:os').tmpdir(), 'titan-e2e-effect.csv');
-   await require('node:fs/promises').writeFile(tmpPath, rewritten);
+      /** @type {Object<string,Uint8Array>} */
+      const entries = unzipSync(new Uint8Array(await require('node:fs/promises').readFile(zipPath)));
+      /** @type {string} */
+      const weaponCsv = strFromU8(entries['weapon.csv']);
+      // Replace the seeded weapon's `name` column value with a fixed marker string, locating the `name`
+      // column by the header row rather than assuming its position.
+      /** @type {string[]} */
+      const lines = weaponCsv.replace(/^﻿/, '').split('\r\n').filter(Boolean);
+      /** @type {string[]} */
+      const header = lines[0].split(',');
+      /** @type {number} */
+      const nameIndex = header.indexOf('name');
+      /** @type {string[]} */
+      const firstDataRow = lines[1].split(',');
+      firstDataRow[nameIndex] = 'E2E Renamed Weapon';
+      lines[1] = firstDataRow.join(',');
+      /** @type {string} */
+      const rewritten = `﻿${lines.join('\r\n')}\r\n`;
 
-   await openPackContextMenu(page, 'TITAN Effects');
-   await page.locator('.context-item', { hasText: 'Import Spreadsheet' }).click();
-   await page.locator('[data-testid="import-file-input"]').setInputFiles(tmpPath);
-   await page.locator('[data-testid="import-preview-button"]').click();
-   /** @type {import('@playwright/test').Locator} */
-   const summary = page.locator('[data-testid="import-preview-summary"]');
-   await expect(summary).toContainText('1 to update');
-   await page.locator('[data-testid="import-apply-button"]').click();
+      /** @type {string} */
+      const tmpPath = require('node:path').join(require('node:os').tmpdir(), 'titan-e2e-weapon.csv');
+      await require('node:fs/promises').writeFile(tmpPath, rewritten);
 
-   /** @type {string} */
-   const updatedName = await page.evaluate(async () => {
-      /** @type {object} */
-      const pack = game.packs.get('titan.effects');
-      /** @type {object[]} */
-      const index = await pack.getIndex();
-      /** @type {object} */
-      const renamed = await pack.getDocument(index.find((e) => e.name === 'E2E Renamed Effect')._id);
-      return renamed.name;
-   });
-   expect(updatedName).toBe('E2E Renamed Effect');
+      await openPackContextMenu(page, 'E2E Spreadsheet Update');
+      await page.locator('.context-item', { hasText: 'Import Spreadsheet' }).click();
+      await page.locator('[data-testid="import-file-input"]').setInputFiles(tmpPath);
+      await page.locator('[data-testid="import-preview-button"]').click();
+      /** @type {import('@playwright/test').Locator} */
+      const summary = page.locator('[data-testid="import-preview-summary"]');
+      await expect(summary).toContainText('1 to update');
+      await page.locator('[data-testid="import-apply-button"]').click();
+
+      /** @type {string} */
+      const updatedName = await page.evaluate(async (id) => {
+         /** @type {object} */
+         const pack = game.packs.get(id);
+         /** @type {object[]} */
+         const index = await pack.getIndex();
+         /** @type {object} */
+         const renamed = await pack.getDocument(index.find((e) => e.name === 'E2E Renamed Weapon')._id);
+         return renamed.name;
+      }, packId);
+      expect(updatedName).toBe('E2E Renamed Weapon');
+   }
+   finally {
+      await deleteScratchPackIfExists(page, packId);
+   }
 });
 ```
 
-- [ ] **Step 3: Import into a new compendium**
+- [ ] **Step 3: Import into a new compendium (source export stays read-only; the newly created pack is
+  cleaned up)**
 
 ```js
 test('importing into "New Compendium" creates a pack with the imported documents', async ({ page }) => {
-   await openPackContextMenu(page, 'TITAN Effects');
-   /** @type {Promise<import('@playwright/test').Download>} */
-   const downloadPromise = page.waitForEvent('download');
-   await page.locator('.context-item', { hasText: 'Export to Spreadsheet' }).click();
-   await page.locator('[data-testid="export-format-select"]').selectOption('csv');
-   await page.locator('[data-testid="export-confirm-button"]').click();
    /** @type {string} */
-   const zipPath = await (await downloadPromise).path();
+   const newPackLabel = 'E2E Imported Effects';
+   try {
+      await openPackContextMenu(page, 'TITAN Effects');
+      /** @type {Promise<import('@playwright/test').Download>} */
+      const downloadPromise = page.waitForEvent('download');
+      await page.locator('.context-item', { hasText: 'Export to Spreadsheet' }).click();
+      await page.locator('[data-testid="export-format-select"]').selectOption('csv');
+      await page.locator('[data-testid="export-confirm-button"]').click();
+      /** @type {string} */
+      const zipPath = await (await downloadPromise).path();
 
-   await page.locator('#sidebar-tabs [data-tab="compendium"]').click();
-   await page.locator('[data-testid="titan-import-spreadsheet-button"]').click();
-   await page.locator('[data-testid="import-file-input"]').setInputFiles(zipPath);
-   await page.locator('[data-testid="import-target-mode-select"]').selectOption('new');
-   await page.locator('[data-testid="import-new-label-input"]').fill('E2E Imported Effects');
-   await page.locator('[data-testid="import-preview-button"]').click();
-   await page.locator('[data-testid="import-apply-button"]').click();
+      await page.locator('#sidebar-tabs [data-tab="compendium"]').click();
+      await page.locator('[data-testid="titan-import-spreadsheet-button"]').click();
+      await page.locator('[data-testid="import-file-input"]').setInputFiles(zipPath);
+      await page.locator('[data-testid="import-target-mode-select"]').selectOption('new');
+      await page.locator('[data-testid="import-new-label-input"]').fill(newPackLabel);
+      await page.locator('[data-testid="import-preview-button"]').click();
+      await page.locator('[data-testid="import-apply-button"]').click();
 
-   /** @type {number} */
-   const newPackSize = await page.evaluate(async () => {
-      /** @type {object|undefined} */
-      const pack = [...game.packs].find((p) => p.metadata.label === 'E2E Imported Effects');
-      return pack ? (await pack.getIndex()).size ?? (await pack.getIndex()).length : 0;
-   });
-   expect(newPackSize).toBeGreaterThan(0);
+      /** @type {number} */
+      const newPackSize = await page.evaluate(async (label) => {
+         /** @type {object|undefined} */
+         const pack = [...game.packs].find((p) => p.metadata.label === label);
+         return pack ? (await pack.getIndex()).size ?? (await pack.getIndex()).length : 0;
+      }, newPackLabel);
+      expect(newPackSize).toBeGreaterThan(0);
+   }
+   finally {
+      // The context-menu export never wrote to titan.effects; only the freshly created pack needs cleanup.
+      await page.evaluate(async (label) => {
+         /** @type {object|undefined} */
+         const pack = [...game.packs].find((p) => p.metadata.label === label);
+         if (pack) {
+            await pack.configure({ locked: false });
+            await pack.deleteCompendium();
+         }
+      }, newPackLabel);
+   }
 });
 ```
 
-- [ ] **Step 4: Delete-missing option**
+- [ ] **Step 4: Delete-missing option (own scratch pack)**
 
 ```js
 test('deleteMissing removes a top-level pack document absent from the imported file', async ({ page }) => {
-   await openPackContextMenu(page, 'TITAN Effects');
-   /** @type {Promise<import('@playwright/test').Download>} */
-   const downloadPromise = page.waitForEvent('download');
-   await page.locator('.context-item', { hasText: 'Export to Spreadsheet' }).click();
-   await page.locator('[data-testid="export-format-select"]').selectOption('csv');
-   await page.locator('[data-testid="export-confirm-button"]').click();
    /** @type {string} */
-   const zipPath = await (await downloadPromise).path();
+   const packId = 'world.e2e-spreadsheet-delete-missing';
+   try {
+      await seedScratchPack(page, {
+         packId,
+         packName: 'e2e-spreadsheet-delete-missing',
+         packLabel: 'E2E Spreadsheet Delete Missing',
+         documents: [
+            { name: 'E2E Keep Weapon', type: 'weapon' },
+            { name: 'E2E Remove Weapon', type: 'weapon' },
+         ],
+      });
 
-   /** @type {Object<string,Uint8Array>} */
-   const entries = unzipSync(new Uint8Array(await require('node:fs/promises').readFile(zipPath)));
-   /** @type {string[]} */
-   const lines = strFromU8(entries['effect.csv']).replace(/^﻿/, '').split('\r\n').filter(Boolean);
-   /** @type {string} The id column value being removed, read before dropping the row. */
-   const removedId = lines[1].split(',')[0];
-   /** @type {string} The file with its first data row removed (one fewer effect than the live pack). */
-   const rewritten = `﻿${[lines[0], ...lines.slice(2)].join('\r\n')}\r\n`;
-   /** @type {string} */
-   const tmpPath = require('node:path').join(require('node:os').tmpdir(), 'titan-e2e-effect-missing.csv');
-   await require('node:fs/promises').writeFile(tmpPath, rewritten);
+      await openPackContextMenu(page, 'E2E Spreadsheet Delete Missing');
+      /** @type {Promise<import('@playwright/test').Download>} */
+      const downloadPromise = page.waitForEvent('download');
+      await page.locator('.context-item', { hasText: 'Export to Spreadsheet' }).click();
+      await page.locator('[data-testid="export-format-select"]').selectOption('csv');
+      await page.locator('[data-testid="export-confirm-button"]').click();
+      /** @type {string} */
+      const zipPath = await (await downloadPromise).path();
 
-   await openPackContextMenu(page, 'TITAN Effects');
-   await page.locator('.context-item', { hasText: 'Import Spreadsheet' }).click();
-   await page.locator('[data-testid="import-file-input"]').setInputFiles(tmpPath);
-   await page.locator('[data-testid="import-delete-missing-checkbox"]').click();
-   await page.locator('[data-testid="import-preview-button"]').click();
-   await page.locator('[data-testid="import-apply-button"]').click();
+      /** @type {Object<string,Uint8Array>} */
+      const entries = unzipSync(new Uint8Array(await require('node:fs/promises').readFile(zipPath)));
+      /** @type {string[]} */
+      const lines = strFromU8(entries['weapon.csv']).replace(/^﻿/, '').split('\r\n').filter(Boolean);
+      /** @type {string[]} */
+      const header = lines[0].split(',');
+      /** @type {number} */
+      const nameIndex = header.indexOf('name');
+      /** @type {number} */
+      const idIndex = header.indexOf('_id');
+      /** @type {number} The data-row index (1-based within `lines`) of the weapon being removed. */
+      const removedLineIndex = lines.findIndex(
+         (line, i) => i > 0 && line.split(',')[nameIndex] === 'E2E Remove Weapon',
+      );
+      /** @type {string} The id column value being removed, read before dropping the row. */
+      const removedId = lines[removedLineIndex].split(',')[idIndex];
+      /** @type {string} The file with the targeted data row removed (one fewer weapon than the pack). */
+      const rewritten = `﻿${lines.filter((_line, i) => i !== removedLineIndex).join('\r\n')}\r\n`;
+      /** @type {string} */
+      const tmpPath = require('node:path').join(require('node:os').tmpdir(), 'titan-e2e-weapon-missing.csv');
+      await require('node:fs/promises').writeFile(tmpPath, rewritten);
 
-   /** @type {boolean} */
-   const stillExists = await page.evaluate(async (id) => {
-      /** @type {object} */
-      const pack = game.packs.get('titan.effects');
-      return Boolean(await pack.getDocument(id));
-   }, removedId);
-   expect(stillExists).toBe(false);
+      await openPackContextMenu(page, 'E2E Spreadsheet Delete Missing');
+      await page.locator('.context-item', { hasText: 'Import Spreadsheet' }).click();
+      await page.locator('[data-testid="import-file-input"]').setInputFiles(tmpPath);
+      await page.locator('[data-testid="import-delete-missing-checkbox"]').click();
+      await page.locator('[data-testid="import-preview-button"]').click();
+      await page.locator('[data-testid="import-apply-button"]').click();
+
+      /** @type {boolean} */
+      const stillExists = await page.evaluate(async ({ id, packId: pid }) => {
+         /** @type {object} */
+         const pack = game.packs.get(pid);
+         return Boolean(await pack.getDocument(id));
+      }, { id: removedId, packId });
+      expect(stillExists).toBe(false);
+   }
+   finally {
+      await deleteScratchPackIfExists(page, packId);
+   }
 });
 ```
 
