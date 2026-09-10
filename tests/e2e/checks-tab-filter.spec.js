@@ -3,10 +3,9 @@ import { login } from './fixtures.js';
 import { attachPageErrors, clearChat, closeAllApps } from './world.js';
 
 /**
- * Integration regression for the FiltereedList fix: the item sheet's Checks-tab search filter must
- * actually narrow the rendered checks list. Before the fix, FiltereedList rendered the UNFILTERED
- * source array, so typing in the TopFilter changed nothing (and a no-match filter hid the whole list
- * via the length guard). This drives the live ability-item sheet end to end: it creates an ability
+ * Integration regression for the item sheet Checks-tab search filter: typing in the TopFilter must
+ * narrow the rendered checks list to the matching entries, and a no-match filter must hide every row
+ * rather than the whole list. This drives the live ability-item sheet end to end: it creates an ability
  * with two distinctly labelled checks, opens the sheet as the GM, navigates to the Checks tab, types a
  * filter matching exactly one check, and asserts the rendered list narrows to that single check.
  */
@@ -86,7 +85,7 @@ test.describe('checks tab filter (live item sheet)', () => {
       // Navigate to the Checks tab by clicking its tab button.
       await sheet.getByText('Checks', { exact: true }).click();
 
-      // The checks list (FiltereedList <ol>) and the filter input both live inside the checks tab.
+      // The checks list <ol> and the filter input both live inside the checks tab.
       const checkItems = sheet.locator('.scrolling-content > ol > li');
       const filterInput = sheet.locator('.filter input');
 

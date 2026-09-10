@@ -6,7 +6,6 @@ import {
    clearProbeEvents,
    documentContext,
    readProbeEvents,
-   probeFn,
 } from './componentProbe.js';
 import { closeAllApps, clearChat, attachPageErrors } from './world.js';
 
@@ -233,46 +232,6 @@ test.describe('component probe — TurnStartEffectTag', () => {
       await expect(tag).toContainText('Burning Aura');
       await expect(tag.locator('.time')).toHaveText('6');
       await expect(tag.locator('i.fa-hourglass-start')).toHaveCount(1);
-   });
-});
-
-test.describe('component probe — FiltereedList (context)', () => {
-   test.afterEach(async () => {
-      await unmountAll(page);
-      await clearProbeEvents(page);
-   });
-
-   test('renders only filtered entries while preserving each entry original index', async () => {
-      const { selector } = await mountProbe(page, 'FiltereedList', {
-         props: {
-            entries: [
-               {
-                  keep: true,
-               },
-               {
-                  keep: false,
-               },
-               {
-                  keep: true,
-               },
-            ],
-            filterFunction: probeFn('entryKeep'),
-            componentFunction: probeFn('returnComponent', { component: 'LabelTag' }),
-            propsFunction: probeFn('labelFromIdx'),
-            testId: 'probe-list',
-         },
-      });
-
-      // The middle entry is filtered out, so exactly two list items render.
-      const list = page.locator(`${selector} [data-testid="probe-list"]`);
-      await expect(list).toHaveCount(1);
-      await expect(list.locator('li')).toHaveCount(2);
-
-      // Each rendered tag is labelled with its ORIGINAL index — "0" and "2", not "0" and "1".
-      const tags = list.locator('li .tag');
-      await expect(tags).toHaveCount(2);
-      await expect(tags.nth(0)).toHaveText('0');
-      await expect(tags.nth(1)).toHaveText('2');
    });
 });
 

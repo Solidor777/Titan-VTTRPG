@@ -59,7 +59,6 @@ import SpellAspectTags from '~/helpers/svelte-components/tag/SpellAspectTags.sve
 import SpellCustomAspectTag from '~/helpers/svelte-components/tag/SpellCustomAspectTag.svelte';
 import EditDeleteTag from '~/helpers/svelte-components/tag/EditDeleteTag.svelte';
 import RichText from '~/helpers/svelte-components/RichText.svelte';
-import FiltereedList from '~/helpers/svelte-components/FiltereedList.svelte';
 import AttributeButton from '~/helpers/svelte-components/button/AttributeButton.svelte';
 import CondensedCheckButton from '~/helpers/svelte-components/button/CondensedCheckButton.svelte';
 import ExpandButton from '~/helpers/svelte-components/button/ExpandButton.svelte';
@@ -150,7 +149,6 @@ const componentRegistry = {
    SpellCustomAspectTag,
    EditDeleteTag,
    RichText,
-   FiltereedList,
    AttributeButton,
    CondensedCheckButton,
    ExpandButton,

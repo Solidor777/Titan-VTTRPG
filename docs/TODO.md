@@ -69,17 +69,6 @@ schema-stripped — harmless dead data, a candidate for producer cleanup.)
 
 ## Cleanup
 
-### 27. Remove the orphaned `FiltereedList` component
-
-- **What:** `src/helpers/svelte-components/FiltereedList.svelte` no longer has a production consumer —
-  the item checks tab (its only user) inlined its own `filteredEntries` index loop when drag-reorder
-  was added (spec `specs/2026-06-11-drag-reorder-and-cross-sheet-copy-design.md`). Remove the
-  component and its test-probe registration (`src/test-probe/registerProbe.js`,
-  `src/test-probe/componentRegistry.js`).
-- **Why deferred:** Out of scope for the drag-reorder change; touching the probe registry is a
-  separate, self-contained cleanup. The `checks tab filter` e2e (`filtered-list-checks.spec.js`)
-  exercises the live tab and stays green without it.
-
 ### 28. Optional live reposition for the custom Select dropdown
 
 - **What:** `Select.svelte`'s dropdown (`SelectList`) positions once on open via `svelte-floating-ui`

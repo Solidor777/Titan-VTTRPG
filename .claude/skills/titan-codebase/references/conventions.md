@@ -798,12 +798,10 @@ interaction contract independent of any sheet. `registerProbe.js` installs `game
 `<div data-titan-probe="<id>">` (positioned `fixed`, max `z-index` so it sits above Foundry chrome and
 receives pointer events), mounts the named component from `componentRegistry.js`, and returns
 `{ id, selector }`. A string `text` prop is converted to a `children` snippet via `createRawSnippet`
-(text set through `textContent`, never interpolated HTML). Props are recursively scanned for two marker
-shapes that survive the Node↔page boundary in place of un-serializable references: `{ __probeComponent: name }`
-resolves to a registered component constructor (for component-valued props), and `{ __probeFn: kind, component? }`
-resolves to a fixed-library helper function — `returnTrue` (`() => true`), `returnEntry` (`(entry) => entry`),
-and `returnComponent` (`() => Component`, named via `component`) — sufficient for list components such as
-`FiltereedList` whose props are functions. The probe is NEVER part of a system build: it is built as a
+(text set through `textContent`, never interpolated HTML). Props are recursively scanned for the one marker
+shape that survives the Node↔page boundary in place of an un-serializable reference: `{ __probeComponent: name }`
+resolves to a registered component constructor (for component-valued props). Function-valued props cannot be
+probed; no registered primitive takes one. The probe is NEVER part of a system build: it is built as a
 standalone IIFE by `vite.probe.config.mjs` (`createSveltePlugin({ emitCss: false })`) to
 `test/build/probe.iife.js` (plus an extracted global stylesheet `test/build/probe.css`). `probeBundleEntry.js`
 is that bundle's entry — it calls `registerProbe()` immediately when `game.titan` already exists, else on the
@@ -811,16 +809,16 @@ is that bundle's entry — it calls `registerProbe()` immediately when `game.tit
 `probe.css` then `probe.iife.js` (the IIFE registers `game.titan._probe`) only when the API is absent. There
 is no `__TITAN_PROBE__` define and no dynamic `import()` anywhere — the production bundle is structurally
 probe-free. The Playwright page object `tests/e2e/componentProbe.js` exposes
-`mountProbe`/`readProbeEvents`/`clearProbeEvents`/`unmountAll`, the marker builders `probeComponent(name)`
-and `probeFn(kind, { component })`, and `documentContext({ isOwner })` (a minimal non-reactive `document`
+`mountProbe`/`readProbeEvents`/`clearProbeEvents`/`unmountAll`, the marker builder `probeComponent(name)`,
+and `documentContext({ isOwner })` (a minimal non-reactive `document`
 context for components reading `getContext('document')`); callbacks are instrumented INSIDE `page.evaluate`
 (functions cannot cross the Node↔page boundary) and record into `window.__titanProbeEvents`.
 
-**Coverage is complete:** all **84** primitives in `src/helpers/svelte-components/**` are registered in
+**Coverage is complete:** all **83** primitives in `src/helpers/svelte-components/**` are registered in
 `componentRegistry.js` and probed. Specs are split by family (each describe = one component):
 `tests/e2e/component-probe.spec.js` (core: `Button`, `TextInput`, `NumberInput`, `IntegerInput`,
 `CheckboxInput`, `Select`, `LabelTag`); `-context.spec.js` (`RichText`, the `EffectTag` family + its six
-duration-variant wrappers, `FiltereedList`, `CondensedCheckButton`, `ProseMirrorEditor`); `-tags.spec.js`
+duration-variant wrappers, `CondensedCheckButton`, `ProseMirrorEditor`); `-tags.spec.js`
 (17 `tag/` primitives incl. `EditDeleteTag` whose probe also locks in the FontAwesome `font-family`
 regression); `-labels.spec.js` (5 `label/`); `-inputs.spec.js` (8 `input/` non-select); `-selects.spec.js`
 (16 `input/select/` typed wrappers); `-buttons.spec.js` (13 `button/`); `-display.spec.js` (`Meter`, `Text`,

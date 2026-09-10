@@ -2,50 +2,9 @@ import { mount, unmount, createRawSnippet } from 'svelte';
 import componentRegistry from '~/test-probe/componentRegistry.js';
 
 /**
- * Resolve a `{ __probeFn: kind, ... }` marker into a real function. Function props cannot cross the
- * Node<->page boundary, so the spec supplies a serializable marker that this resolver turns into one of
- * a small fixed library of pure helpers (sufficient for list-style components such as `FiltereedList`).
- * @param {{ __probeFn: string, component?: string }} marker - The function marker to resolve.
- * @returns {Function} The resolved helper function.
- * @throws {Error} When the marker kind is unknown or names an unregistered component.
- */
-function resolveProbeFunction(marker) {
-   switch (marker.__probeFn) {
-      // Always-true predicate, e.g. a `filterFunction` that keeps every entry.
-      case 'returnTrue':
-         return () => true;
-
-      // Identity passthrough over the entry, e.g. a `propsFunction` that passes the entry through.
-      case 'returnEntry':
-         return (entry) => entry;
-
-      // Selective predicate keeping only entries whose `keep` flag is truthy, e.g. a `filterFunction`.
-      case 'entryKeep':
-         return (entry) => entry.keep;
-
-      // Props supplier labelling an entry by its original index, e.g. a `propsFunction` for `LabelTag`.
-      case 'labelFromIdx':
-         return (entry, idx) => ({ label: String(idx) });
-
-      // Constant supplier of a registered component, e.g. a `componentFunction`.
-      case 'returnComponent': {
-         const resolved = componentRegistry[marker.component];
-         if (!resolved) {
-            throw new Error(`resolveProbeFunction: unknown component "${marker.component}"`);
-         }
-         return () => resolved;
-      }
-
-      default:
-         throw new Error(`resolveProbeFunction: unknown function marker "${marker.__probeFn}"`);
-   }
-}
-
-/**
- * Recursively replace `{ __probeComponent: name }` markers with the registered component constructor and
- * `{ __probeFn: kind }` markers with a resolved helper function (see `resolveProbeFunction`).
- * @param {*} value - Any prop value possibly containing component or function markers.
- * @returns {*} The value with markers resolved to component constructors or functions.
+ * Recursively replace `{ __probeComponent: name }` markers with the registered component constructor.
+ * @param {*} value - Any prop value possibly containing component markers.
+ * @returns {*} The value with markers resolved to component constructors.
  */
 function resolveProbeComponents(value) {
    if (Array.isArray(value)) {
@@ -58,9 +17,6 @@ function resolveProbeComponents(value) {
             throw new Error(`resolveProbeComponents: unknown component "${value.__probeComponent}"`);
          }
          return resolved;
-      }
-      if (typeof value.__probeFn === 'string') {
-         return resolveProbeFunction(value);
       }
       const out = {};
       for (const [k, v] of Object.entries(value)) {

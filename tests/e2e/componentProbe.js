@@ -99,25 +99,6 @@ export function probeComponent(name) {
 }
 
 /**
- * Build a marker the harness resolves in-page to a real function, for props that take a function
- * (functions cannot cross the Node<->page boundary). Supported kinds: `returnTrue` (always-true
- * predicate), `returnEntry` (identity over the entry), `returnComponent` (constant supplier of a
- * registered component, named via `component`), `entryKeep` (predicate keeping entries whose `keep`
- * flag is truthy), and `labelFromIdx` (props supplier labelling an entry by its original index).
- * @param {string} kind - The function marker kind (`returnTrue` | `returnEntry` | `returnComponent` |
- *   `entryKeep` | `labelFromIdx`).
- * @param {{ component?: string }} [options] - Extra marker fields; `component` names a registered component
- *   for the `returnComponent` kind.
- * @returns {{ __probeFn: string, component?: string }} The marker object.
- */
-export function probeFn(kind, { component = void 0 } = {}) {
-   return {
-      __probeFn: kind,
-      ...(component !== void 0 ? { component } : {}),
-   };
-}
-
-/**
  * Read the recorded probe event log.
  * @param {import('@playwright/test').Page} page - The Playwright page to drive.
  * @returns {Promise<Array<{ event: string, key?: string }>>} The recorded events.
