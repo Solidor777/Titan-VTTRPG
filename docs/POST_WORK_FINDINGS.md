@@ -85,11 +85,12 @@ it ever bites in play, the principled fix is a per-message serial queue around
   CLICK fails, with "element is outside of the viewport". `showChatLog()` (`world.js`) expands the
   sidebar and activates the chat tab; any spec interacting with a card in `#chat` must call it in
   `beforeAll`. Scoping plus the helper cut that group of specs from 2.7m to 40s.
-- **`permissions-auto-open.spec.js:78` is a documented 5000ms exception to the 1s budget.** That edge
-  spans a multi-hop server round-trip (turn advance → un-awaited hook → resource calc →
-  `actor.update` → client sync), not a UI operation. It lands well under 1s in isolation (8 runs, no
-  slow-op report) but exceeded it once under full-suite load, so the ceiling is relaxed there rather
-  than left as a known flake.
+- **`permissions-auto-open.spec.js:78` stays at the 1000ms budget — no exception.** A 5000ms
+  relaxation was tried and reverted: measured on this hardware the pipeline is instant, with
+  `nextTurn()` at 1-2ms and the turn-start heal landing in **52-61ms** across six samples. A >1s
+  reading is therefore an 18x anomaly worth failing on, not latency to accommodate. It breached once
+  in three full runs while the world was bloated (see the world-hygiene entry below) and has not
+  recurred since the purge.
 
 ## 2026-09-10 — E2E world hygiene
 

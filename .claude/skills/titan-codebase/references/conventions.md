@@ -679,6 +679,11 @@ explicit `timeout` only for an inherently multi-second wait, such as a world boo
 
 Invalid core or priority values are hard errors, never silent fallbacks to the default.
 
+**Fixture hygiene:** `controlFixtureActorToken` creates a fallback scene only when none is active and
+reuses a same-named one thereafter, so the world holds at most one scene per fallback name. Killing a
+full-suite run mid-flight skips every `afterAll` and leaves its fixtures behind; accumulated fixtures
+show up as slow LOGIN (`Navigate to "/join"` and `game.ready`), not as slow tests.
+
 **The e2e viewport must stay at or above Foundry's 1366x768 minimum** (`use.viewport` is 1920x1080).
 Below it, Foundry raises a permanent resolution notification whose `#notifications` banner spans the
 full viewport width near the top and **intercepts pointer events on anything under it** — the player
