@@ -196,7 +196,6 @@
          @include panel-3;
 
          border-radius: 0 0 var(--titan-border-radius) var(--titan-border-radius);
-
          padding: 0 var(--titan-spacing-standard) var(--titan-spacing-standard);
          width: calc(100% - 2 * var(--titan-spacing-standard));
 

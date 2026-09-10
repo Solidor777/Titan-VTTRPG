@@ -46,7 +46,7 @@
             @include font-size-small;
 
             position: absolute;
-            inset: auto 0 0 0;
+            inset: auto 0 0;
             padding: 2px 0;
             text-align: center;
             background: color-mix(in srgb, var(--titan-panel-1-background) 75%, transparent);

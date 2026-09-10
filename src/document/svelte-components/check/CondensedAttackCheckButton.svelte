@@ -18,12 +18,11 @@
    /** @type {object|undefined} The actor that rolls this attack. */
    const rollActor = getContext('rollActor');
 
-   // The item id is fixed for this component's lifetime; capturing it once in checkOptions is intentional.
    /** @type {AttackCheckOptions} Base options for the Attack Check, targeting this row's attack index. */
-   const checkOptions = {
+   const checkOptions = $derived({
       itemId: document.doc._id,
       attackIdx: idx,
-   };
+   });
 
    /** @type {AttackCheckParameters|undefined} Resolved dice and modifiers for the attack check this button rolls. */
    let checkParameters = $derived.by(() => {

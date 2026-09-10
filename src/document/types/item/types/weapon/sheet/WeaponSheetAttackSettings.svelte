@@ -291,10 +291,10 @@
          @include flex-row;
          @include flex-space-between;
          @include panel-1;
-
          @include attribute-colors;
 
          border-radius: var(--titan-border-radius);
+
          @include padding-large;
 
          width: 100%;
@@ -317,7 +317,6 @@
          @include panel-3;
 
          border-radius: 0 0 var(--titan-border-radius) var(--titan-border-radius);
-
          width: calc(100% - 2 * var(--titan-spacing-standard));
 
          @include padding-standard;

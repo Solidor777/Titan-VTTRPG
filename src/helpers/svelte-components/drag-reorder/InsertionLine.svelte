@@ -4,20 +4,16 @@
 <style lang="scss">
    .insertion-line {
       position: relative;
-
       width: 100%;
       height: 0;
 
       &::before {
          content: '';
-
          position: absolute;
          top: -2px;
          right: 0;
          left: 0;
-
          height: 3px;
-
          border-radius: 2px;
 
          // The highlight pair reads on any panel: the cream fill + glow pops on dark themes, while the

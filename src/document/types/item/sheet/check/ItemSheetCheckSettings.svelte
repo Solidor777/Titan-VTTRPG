@@ -314,6 +314,7 @@
          @include panel-1;
 
          border-radius: var(--titan-border-radius);
+
          @include padding-large;
          @include attribute-colors;
 
@@ -337,6 +338,7 @@
          @include panel-3;
 
          border-radius: 0 0 var(--titan-border-radius) var(--titan-border-radius);
+
          @include padding-standard;
 
          --titan-label-font-size: var(--titan-font-size-small);

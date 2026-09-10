@@ -17,12 +17,11 @@
    /** @type {object|undefined} The actor that rolls this check (actor sheet's actor, or the item's parent actor). */
    const rollActor = getContext('rollActor');
 
-   // The item id is fixed for this component's lifetime; capturing it once in checkOptions is intentional.
    /** @type {ItemCheckOptions} Base options for the Item Check, targeting this row's check index. */
-   const checkOptions = {
+   const checkOptions = $derived({
       itemId: document.doc._id,
       checkIdx: idx,
-   };
+   });
 
    /** @type {ItemCheckParameters|undefined} Resolved dice and modifiers for the item check this button rolls. */
    let checkParameters = $derived.by(() => {

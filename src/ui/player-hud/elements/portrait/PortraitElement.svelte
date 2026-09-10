@@ -19,7 +19,7 @@
    };
 
    /** @type {Component} The active style component. */
-   const Style = $derived(styles[options.style] ?? PortraitPanelCard);
+   const PortraitStyle = $derived(styles[options.style] ?? PortraitPanelCard);
 </script>
 
-<Style/>
+<PortraitStyle/>
