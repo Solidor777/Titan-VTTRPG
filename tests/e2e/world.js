@@ -210,8 +210,19 @@ export async function controlFixtureActorToken(page, { actorName, fallbackSceneN
       // Reuse the active scene; fall back to creating one and report its id for cleanup.
       /** @type {Scene|null} The scene hosting the fixture token. */
       let scene = game.scenes.active;
-      /** @type {string|null} The created fallback scene's id, when no scene was active. */
+      /** @type {string|null} The created fallback scene's id, when no scene was created before. */
       let fallbackId = null;
+
+      // Reuse a same-named fallback from an earlier run before adding another to the world. Only one
+      // of the ten callers deletes the id returned below, so creating unconditionally leaked a scene
+      // per fallback (26 duplicates accumulated, measurably slowing world load).
+      if (!scene) {
+         scene = game.scenes.getName(sceneName) ?? null;
+         if (scene) {
+            await scene.activate();
+         }
+      }
+
       if (!scene) {
          scene = await Scene.create({
             name: sceneName,
