@@ -135,3 +135,58 @@ test.describe('item chat-message subtype cards', () => {
       });
    }
 });
+
+test.describe('spell card tradition tag', () => {
+   /** @type {string} World spell reused across both assertions in this describe block. */
+   const spellName = `E2E spell tradition ${Date.now()}`;
+
+   test.afterAll(async () => {
+      await page.evaluate(async (name) => {
+         await game.items.getName(name)?.delete();
+      }, spellName);
+   });
+
+   test('hides the tradition tag when the spell has none', async () => {
+      const result = await page.evaluate(async (name) => {
+         const before = game.messages.size;
+         const spell = game.items.getName(name)
+            ?? await Item.create({ name, type: 'spell', system: { tradition: '' } });
+         if (spell.system.tradition !== '') {
+            await spell.update({ system: { tradition: '' } });
+         }
+         const message = await spell.sendToChat();
+         await titanWait(() => game.messages.size > before, { message: 'new chat message' });
+         return { messageId: message?.id };
+      }, spellName);
+
+      const card = page
+         .locator(`#chat .message[data-message-id="${result.messageId}"] .item-chat-message`)
+         .first();
+      await expect(card, 'mounted spell card is visible').toBeVisible();
+      await expect(
+         card.locator('.tag').filter({ hasText: 'Tradition' }),
+         'no Tradition tag renders when the spell has no tradition',
+      ).toHaveCount(0);
+      expect(errors, `uncaught errors:\n${errors.join('\n')}`).toEqual([]);
+   });
+
+   test('shows the tradition tag once the spell has one', async () => {
+      const result = await page.evaluate(async (name) => {
+         const before = game.messages.size;
+         const spell = game.items.getName(name);
+         await spell.update({ system: { tradition: 'Air' } });
+         const message = await spell.sendToChat();
+         await titanWait(() => game.messages.size > before, { message: 'new chat message' });
+         return { messageId: message?.id };
+      }, spellName);
+
+      const card = page
+         .locator(`#chat .message[data-message-id="${result.messageId}"] .item-chat-message`)
+         .first();
+      await expect(card, 'mounted spell card is visible').toBeVisible();
+      const traditionTag = card.locator('.tag').filter({ hasText: 'Tradition' });
+      await expect(traditionTag, 'Tradition tag renders once the spell has one').toBeVisible();
+      await expect(traditionTag, 'Tradition tag shows the tradition value').toContainText('Air');
+      expect(errors, `uncaught errors:\n${errors.join('\n')}`).toEqual([]);
+   });
+});

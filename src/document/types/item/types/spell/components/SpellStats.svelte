@@ -27,13 +27,15 @@
       <RarityTag {rarity}/>
    </div>
 
-   <!--Tradition-->
-   <div class="stat">
-      <StatTag
-         label={localize('tradition')}
-         value={tradition}
-      />
-   </div>
+   <!--Tradition, hidden when the spell has none-->
+   {#if tradition}
+      <div class="stat">
+         <StatTag
+            label={localize('tradition')}
+            value={tradition}
+         />
+      </div>
+   {/if}
 
    <!--XP Cost-->
    {#if xpCost}
