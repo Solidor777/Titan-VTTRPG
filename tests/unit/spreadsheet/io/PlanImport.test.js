@@ -188,4 +188,25 @@ describe('planImport', () => {
 
       delete globalThis.foundry.data;
    });
+
+   it('returns a graceful error-only plan when the uploaded file itself cannot be decoded', async () => {
+      /** @type {object} A single .xlsx-named file whose bytes are not a valid zip/xlsx archive. */
+      const corruptXlsx = {
+         name: 'weapons.xlsx',
+         arrayBuffer: async () => new TextEncoder().encode('not a real xlsx file').buffer,
+      };
+      /** @type {object} */
+      const targetPack = { metadata: { type: 'Item' }, getDocument: async () => null, getIndex: async () => [] };
+
+      const plan = await planImport([corruptXlsx], targetPack, false);
+
+      expect(plan.creates).toEqual([]);
+      expect(plan.updates).toEqual([]);
+      expect(plan.deletes).toEqual([]);
+      expect(plan.folders).toEqual([]);
+      expect(plan.errors).toHaveLength(1);
+      expect(plan.errors[0]).toMatchObject({ sheet: '_manifest', row: 0, column: '' });
+      expect(plan.errors[0].message).toContain('Failed to read the file:');
+      expect(plan.packType).toBe('');
+   });
 });

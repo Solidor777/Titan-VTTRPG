@@ -123,13 +123,25 @@ function depthOf(envelope, byId) {
  */
 export async function planImport(files, targetPack, deleteMissing) {
    /** @type {import('~/spreadsheet/codec/Workbook.js').Workbook} */
-   const workbook = await decodeFiles(files);
-
+   let workbook;
    // The type schemas needed to decode a row aren't known until we know packType, which readTables
    // itself extracts from the manifest — so read once with no schemas (falls back to untyped-literal
    // decode for every column), recover packType, then re-read with the real schemas if it differs.
    /** @type {{packType:string}} */
-   const probe = readTables(workbook, {});
+   let probe;
+   try {
+      workbook = await decodeFiles(files);
+      probe = readTables(workbook, {});
+   }
+   catch (error) {
+      // A corrupt/unreadable upload (a malformed xlsx zip, an unparseable csv) fails before packType is
+      // even known; report it as a single file-level error rather than crashing the import.
+      return {
+         creates: [], updates: [], deletes: [], folders: [],
+         errors: [{ sheet: '_manifest', row: 0, column: '', message: `Failed to read the file: ${error.message}` }],
+         packType: '',
+      };
+   }
    /** @type {string} */
    const packType = probe.packType;
 
