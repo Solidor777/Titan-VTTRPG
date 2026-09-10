@@ -18,8 +18,14 @@ management). Data model classes hold the schema, field validation, and derived-d
   `_getInitialPrototypeTokenData`), and the `postAddItem` / `preDeleteItem` / `postDeleteItem`
   lifecycle hooks that subclasses override.
 - `CharacterDataModel` (`src/document/types/actor/types/character/CharacterDataModel.js`) extends
-  `TitanActorDataModel`. The primary character model; coordinates check rolling, resource
-  management, rest/regen automation, and effect-duration tracking. The duration/combat/expiry
+  `TitanActorDataModel`. Its `_defineDocumentSchema()` is built from the shared shape template
+  (`{ ...super._defineDocumentSchema(), ...buildSchemaFromShape(createCharacterSystemTemplate()) }`;
+  `CharacterSystemTemplate.js` also exports the `createBaseStatShape` / `createDerivedStatShape` /
+  `createSkillShape` / `createResourceShape` sub-shape factories). `equipped.armor` / `equipped.shield`
+  are pre-built nullable `StringField`s passed through `buildSchemaFromShape` unchanged (a `null` shape
+  value would otherwise build a nullable `ObjectField`, rejecting the stored string ids). The primary
+  character model; coordinates check rolling, resource management, rest/regen automation, and
+  effect-duration tracking. The duration/combat/expiry
   methods (`getExpiredEffects`, `getSortedEffects`, `onInitiativeAdvanced`/`Reverted`,
   `onTurnStart`/`End` and their reverts, `_decreaseTurnEffectDuration`/`_increaseTurnEffectDuration`,
   `_processExpiredEffects`, `removeCombatEffects`, `requestRemoveExpiredEffects`, `removeExpiredEffects`,
@@ -31,12 +37,14 @@ management). Data model classes hold the schema, field validation, and derived-d
   `_getCustomEffectReportData`) read effect AEs (including the native `description`) into the turn/expiry
   report payloads.
 - `PlayerDataModel` (`src/document/types/actor/types/character/types/player/PlayerDataModel.js`)
-  extends `CharacterDataModel`. Adds XP tracking and an `inspiration` flag.
+  extends `CharacterDataModel`. Its `_defineDocumentSchema()` is built from
+  `createPlayerSystemTemplate()` (`PlayerSystemTemplate.js` — the Character shape template plus `xp`
+  and `inspiration`) via `buildSchemaFromShape`. Adds XP tracking and an `inspiration` flag.
 - `NPCDataModel` (`src/document/types/actor/types/character/types/npc/NPCDataModel.js`) extends
-  `CharacterDataModel`. Adds `role` (minion / etc.), adds a `type` subfield to the inherited `bio`
-  SchemaField via `schema.bio.extendFields({ type })` (assigning `schema.bio.type` directly does not
-  register a real subfield), and overrides `applyDamage` to handle one-hit kills and overkill damage
-  for minions.
+  `CharacterDataModel`. Its `_defineDocumentSchema()` is built from `createNPCSystemTemplate()`
+  (`NPCSystemTemplate.js` — the Character shape template, `bio` spread with an added `type` field, plus
+  `role`) via `buildSchemaFromShape`. Adds `role` (minion / etc.) and overrides `applyDamage` to handle
+  one-hit kills and overkill damage for minions.
 
 **Data model base**
 
@@ -282,11 +290,23 @@ cards, the 13 report cards, and the effect card are all registered and active; t
   `turnEndRevertReport`, `effectsExpiredReport`. Conditionally-present OBJECT fields are nullable
   `ObjectField`s (`null` in the shape) so `{#if obj}` guards stay correct; the array fields
   `message`/`conditions` are explicit `ArrayField`s on the leaf (ObjectField cannot hold arrays). The
-  producer `CharacterDataModel._whisperOwners` emits `{ type, system }`; report *components* read
-  `document.data.system.X` and self-render via `TitanChatMessage#renderHTML`. Registered in `OnceInit.js`
-  `CONFIG.ChatMessage.dataModels` + `system.json` `documentTypes.ChatMessage` + `lang/en.json`
-  `TYPES.ChatMessage`. Schema parity is gated by `tests/unit/ReportChatMessageSchemaEquivalence.test.js`.
-  (Restart-gated: subtype registration happens at world load.)
+  eight report shapes that snapshot actor resources (damage, healing, long-rest, spend-resolve,
+  turn-start, turn-start-revert, turn-end, turn-end-revert) nest the stamina/wounds/resolve snapshots
+  under a `resource` sub-shape (e.g. `resource: { stamina: null, wounds: null }`), so the card reads
+  `system.resource.X`, the same path as the actor's own persisted resources. `_defineDocumentSchema()`
+  builds `resource` as a `SchemaField` whose declared sub-fields are nullable `ObjectField`s, matching the
+  presence guards. The producer `CharacterDataModel._whisperOwners` emits `{ type, system }`, with the
+  resource producer sites writing `retVal.resource.X = { value, max }` (a report with no snapshot leaves
+  `resource` absent, which the SchemaField initializes to nulls);
+  `ReportChatMessageDataModel.migrateData(source)` hoists legacy top-level `stamina`/`wounds`/`resolve`
+  keys into `source.resource` on load (idempotent, no version gate — the legacy keys exist only on
+  pre-2026-09-10 messages) so existing chat history keeps rendering. Report *components* read
+  `document.data.system.resource.X` and self-render via `TitanChatMessage#renderHTML`. Registered in
+  `OnceInit.js` `CONFIG.ChatMessage.dataModels` + `system.json` `documentTypes.ChatMessage` +
+  `lang/en.json` `TYPES.ChatMessage`. Schema parity is gated by
+  `tests/unit/ReportChatMessageSchemaEquivalence.test.js`; the hoist is gated by
+  `tests/unit/ReportChatMessageDataModel.test.js`. (Restart-gated: subtype registration happens at world
+  load.)
 - `EffectChatMessageDataModel` (`src/document/types/active-effect/chat-message/EffectChatMessageDataModel.js`)
   extends `TitanChatMessageDataModel`. The `effect` chat-card subtype: its schema is the effect snapshot —
   the shared `createEffectSystemTemplate()` plus the rules-element fragment via `buildSchemaFromShape`, plus

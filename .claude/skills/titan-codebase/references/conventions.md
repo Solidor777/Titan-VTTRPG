@@ -309,6 +309,11 @@ guard relies on:
   `initial: []`) and write their presence guards as `?.length` (the empty-array initial `[]` is truthy, so
   a bare `{#if arr}` would always pass). Established by Phase 3 reports (`message`/`conditions` on the turn
   reports).
+- **A shape value that is already a `foundry.data.fields.DataField` instance passes through
+  `buildSchemaFromShape` unchanged**, at top level and nested. This is the only way a shape can express a
+  nullable `StringField`: a `null` shape value builds a nullable `ObjectField` instead, which rejects a
+  string id. Used by the actor shape templates for `equipped.armor` / `equipped.shield` (nullable ids
+  defaulting to `null`, built with `createStringField(null)` and passed through as-is).
 
 ## Styling
 
