@@ -3839,7 +3839,11 @@ export default class ImportDialog extends TitanDialog {
       const result = await applyImport(plan, resolveTargetPack(), newCompendiumLabel);
       busy = false;
       ui.notifications.info(
-         localize('importSpreadsheetComplete', { created: result.created, updated: result.updated, deleted: result.deleted }),
+         localize('importSpreadsheetComplete', {
+            created: result.created,
+            updated: result.updated,
+            deleted: result.deleted,
+         }),
       );
       plan = null;
       selectedFiles = [];
@@ -3894,7 +3898,13 @@ export default class ImportDialog extends TitanDialog {
 
    {#if plan}
       <div class="titan-import-preview" data-testid="import-preview-summary">
-         <Text text={localize('importPlanSummary', { creates: plan.creates.length, updates: plan.updates.length, deletes: plan.deletes.length })} />
+         <Text
+            text={localize('importPlanSummary', {
+               creates: plan.creates.length,
+               updates: plan.updates.length,
+               deletes: plan.deletes.length,
+            })}
+         />
          {#if plan.errors.length > 0}
             <ul>
                {#each plan.errors as error (error.sheet + error.row + error.column)}
@@ -4117,7 +4127,8 @@ export default function onRenderCompendiumDirectory(_application, element) {
       return;
    }
    /** @type {HTMLElement|null} */
-   const controls = element.querySelector('.directory-header .header-actions') ?? element.querySelector('.directory-header');
+   const controls =
+      element.querySelector('.directory-header .header-actions') ?? element.querySelector('.directory-header');
    if (!controls || controls.querySelector('[data-action="titanImportSpreadsheet"]')) {
       return;
    }
