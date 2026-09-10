@@ -78,107 +78,79 @@
 </script>
 
 <div class="skill">
-   <!--Button-->
-   <div class="label-button">
-      <CharacterSheetCondensedSkillCheckButton {checkParameters}/>
+   <!--Check button-->
+   <CharacterSheetCondensedSkillCheckButton {checkParameters}/>
+
+   <!--Default Attribute-->
+   <div class="attribute" use:tooltipAction={'defaultAttribute.desc'}>
+      <DocumentAttributeSelect bind:value={document.data.system.skill[key].defaultAttribute}/>
    </div>
 
-   <div class="columns">
-      <!--Default Attribute-->
-      <div class="column" use:tooltipAction={'defaultAttribute.desc'}>
-         <DocumentAttributeSelect bind:value={document.data.system.skill[key].defaultAttribute}/>
-      </div>
+   <!--Training and Expertise stats-->
+   <div class="stats">
 
-      <!--Training and Expertise-->
-      <div class="column">
+      <!--Training-->
+      <div class="stat">
+         <i class={TRAINING_ICON} use:tooltipAction={'training.desc'}></i>
 
-         <!--Training-->
-         <div class="row">
-
-            <!--Label-->
-            <div class="label" use:tooltipAction={'training.desc'}>
-
-               <!--Icon-->
-               <i class={EXPERTISE_ICON}></i>
-
-               <!--Inner Label-->
-               <div class="inner-label">
-                  {localize('training')}
-               </div>
-            </div>
-
-            <!--Base Value-->
-            <div class="input">
-               <DocumentIntegerInput bind:value={document.data.system.skill[key].training.baseValue}/>
-            </div>
-
-            <!--Static Mod-->
-            <div class="symbol">+</div>
-            <div class="input">
-               <DocumentIntegerInput bind:value={document.data.system.skill[key].training.mod.static}/>
-            </div>
-
-            <!--Total Value-->
-            <div class="symbol">=</div>
-            <div class="value">
-               <ModifiedValueLabel
-                  baseValue={
-                     document.data.system.skill[key].training.baseValue +
-                     document.data.system.skill[key].training.mod.ability +
-                     document.data.system.skill[key].training.mod.equipment +
-                     checkParameters.trainingMod
-                  }
-                  currentValue={checkParameters.totalTrainingDice}
-                  tooltip={{ text: totalTrainingTooltip, localize: false }}
-               />
-            </div>
+         <!--Base Value-->
+         <div class="input">
+            <DocumentIntegerInput bind:value={document.data.system.skill[key].training.baseValue}/>
          </div>
 
-         <!--Expertise row-->
-         <div class="row">
-            <!--Label-->
-            <div class="label" use:tooltipAction={'expertise.desc'}>
+         <!--Static Mod-->
+         <div class="symbol">+</div>
+         <div class="input">
+            <DocumentIntegerInput bind:value={document.data.system.skill[key].training.mod.static}/>
+         </div>
 
-               <!--Icon-->
-               <i class={TRAINING_ICON}></i>
+         <!--Total Value-->
+         <div class="symbol">=</div>
+         <div class="value">
+            <ModifiedValueLabel
+               baseValue={
+                  document.data.system.skill[key].training.baseValue +
+                  document.data.system.skill[key].training.mod.ability +
+                  document.data.system.skill[key].training.mod.equipment +
+                  checkParameters.trainingMod
+               }
+               currentValue={checkParameters.totalTrainingDice}
+               tooltip={{ text: totalTrainingTooltip, localize: false }}
+            />
+         </div>
+      </div>
 
-               <!--Inner Label-->
-               <div class="inner-label">
-                  {localize('expertise')}
-               </div>
-            </div>
+      <!--Expertise-->
+      <div class="stat">
+         <i class={EXPERTISE_ICON} use:tooltipAction={'expertise.desc'}></i>
 
-            <!--Base Value-->
-            <div class="input">
-               <DocumentIntegerInput
-                  bind:value={document.data.system.skill[key].expertise.baseValue}
-               />
-            </div>
+         <!--Base Value-->
+         <div class="input">
+            <DocumentIntegerInput bind:value={document.data.system.skill[key].expertise.baseValue}/>
+         </div>
 
-            <!--Static Mod-->
-            <div class="symbol">+</div>
-            <div class="input">
-               <DocumentIntegerInput bind:value={document.data.system.skill[key].expertise.mod.static}/>
-            </div>
+         <!--Static Mod-->
+         <div class="symbol">+</div>
+         <div class="input">
+            <DocumentIntegerInput bind:value={document.data.system.skill[key].expertise.mod.static}/>
+         </div>
 
-            <!--Total Value-->
-            <div class="symbol">=</div>
-            <div class="value">
-               <ModifiedValueLabel
-                  baseValue={
-                     document.data.system.skill[key].expertise.baseValue +
-                     document.data.system.skill[key].expertise.mod.ability +
-                     document.data.system.skill[key].expertise.mod.equipment +
-                     checkParameters.expertiseMod
-                  }
-                  currentValue={checkParameters.totalExpertise}
-                  tooltip={{ text: totalExpertiseTooltip, localize: false }}
-               />
-            </div>
+         <!--Total Value-->
+         <div class="symbol">=</div>
+         <div class="value">
+            <ModifiedValueLabel
+               baseValue={
+                  document.data.system.skill[key].expertise.baseValue +
+                  document.data.system.skill[key].expertise.mod.ability +
+                  document.data.system.skill[key].expertise.mod.equipment +
+                  checkParameters.expertiseMod
+               }
+               currentValue={checkParameters.totalExpertise}
+               tooltip={{ text: totalExpertiseTooltip, localize: false }}
+            />
          </div>
       </div>
    </div>
-
 </div>
 
 <style lang="scss">
@@ -187,86 +159,61 @@
       @include flex-space-between;
       @include panel-2;
 
+      align-items: center;
       width: 100%;
       padding: var(--titan-spacing-standard) var(--titan-spacing-standard) var(--titan-spacing-standard) var(--titan-spacing-large);
 
-      .label-button {
-         @include flex-column;
-         @include flex-group-left;
-      }
-
-      .test {
-         font-weight: bold;
-      }
-
-      .columns {
+      .attribute {
          @include flex-row;
-         @include flex-space-between;
+         @include flex-group-center;
+      }
 
-         .column {
-            @include flex-column;
-            @include flex-group-top;
+      .stats {
+         @include flex-row;
+         @include flex-group-right;
+
+         .stat {
+            @include flex-row;
+            @include flex-group-right;
+
+            height: 100%;
 
             &:not(:first-child) {
                @include margin-left-large;
+            }
 
-               .row {
-                  @include flex-row;
-                  @include flex-group-right;
+            i {
+               @include margin-right-standard;
+            }
 
-                  width: 100%;
+            .input {
+               @include flex-row;
+               @include flex-group-center;
 
-                  &:not(:first-child) {
-                     @include border-top;
-                     @include padding-top-standard;
-                     @include margin-top-standard;
-                  }
+               height: 100%;
+               width: 28px;
 
-                  .label {
-                     @include flex-row;
-                     @include flex-group-right;
-                     @include font-size-small;
+               @include margin-left-standard;
+            }
 
-                     height: 100%;
-                     font-weight: bold;
+            .value {
+               @include flex-row;
+               @include flex-group-center;
 
-                     @include margin-right-standard;
+               font-weight: normal;
+               height: 100%;
+               width: 28px;
 
-                     i {
-                        @include margin-right-standard;
-                     }
-                  }
+               @include margin-left-standard;
+            }
 
-                  .input {
-                     @include flex-row;
-                     @include flex-group-center;
+            .symbol {
+               @include flex-row;
+               @include flex-group-center;
 
-                     height: 100%;
-                     width: 28px;
+               height: 100%;
 
-                     @include margin-left-standard;
-                  }
-
-                  .value {
-                     @include flex-row;
-                     @include flex-group-center;
-
-                     font-weight: normal;
-                     height: 100%;
-                     width: 28px;
-
-                     @include margin-left-standard;
-                  }
-
-                  .symbol {
-                     @include flex-row;
-                     @include flex-group-center;
-
-                     height: 100%;
-
-                     @include margin-left-standard;
-                  }
-               }
+               @include margin-left-standard;
             }
          }
       }
