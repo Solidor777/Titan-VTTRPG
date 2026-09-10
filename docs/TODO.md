@@ -67,13 +67,3 @@ schema-stripped — harmless dead data, a candidate for producer cleanup.)
   `specs/2026-06-03-embedded-document-stores-design.md` (Follow-up work → "Chat-message path
   parity"); strategy locked in `specs/2026-06-09-path-parity-strategy-and-checktags-chat-design.md`.
 
-## Cleanup
-
-### 28. Optional live reposition for the custom Select dropdown
-
-- **What:** `Select.svelte`'s dropdown (`SelectList`) positions once on open via `svelte-floating-ui`
-  and **closes** on scroll/resize rather than tracking the trigger. If continuous reposition is
-  wanted, pass `autoUpdate: true` to `createFloatingActions` and add a no-op `ResizeObserver` /
-  `IntersectionObserver` to `tests/setup.js` so unit mounts (happy-dom) don't throw.
-- **Why deferred:** close-on-scroll is correct and dependency-light for these small fixed enum lists;
-  live tracking is a polish-only enhancement (`specs/2026-06-18-bespoke-styleable-select-design.md`).

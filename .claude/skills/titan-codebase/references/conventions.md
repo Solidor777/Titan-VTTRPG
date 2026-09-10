@@ -412,10 +412,10 @@ See `architecture.md` — `src/styles/` section — for the full list of global 
 `<select>` — a native option popup cannot render icons or per-option styling. It is a `<button
 role="combobox">` trigger that, when open, mounts `SelectList.svelte` (`role="listbox"`) **portaled to
 `document.body`** via the `portalToBody` action (`src/helpers/svelte-actions/`) and positioned with
-`svelte-floating-ui` (`createFloatingActions`, `offset`/`flip`/`shift`; positions once on open and
-**closes on outside-click / scroll / resize**, no live reposition). Portaling escapes ApplicationV2
-windows' `transform` containing block; theme `--titan-*` tokens still apply because they are injected on
-`:root`.
+`svelte-floating-ui` (`createFloatingActions`, `offset`/`flip`/`shift`; `autoUpdate: true` keeps the
+list anchored to the trigger through ancestor scroll, resize, and layout shift; **closes on
+outside-click**). Portaling escapes ApplicationV2 windows' `transform` containing block; theme
+`--titan-*` tokens still apply because they are injected on `:root`.
 
 The public contract is unchanged from the old native version — `{ options, value (primitive,
 `$bindable`), disabled, tooltip, onchange, testId }` — so all ~37 wrappers (domain selects +

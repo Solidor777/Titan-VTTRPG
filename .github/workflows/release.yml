@@ -1,0 +1,61 @@
+# Release packaging: when a GitHub release is published, stamp its tag into `system.json`, build the
+# system, and attach the manifest plus the installable archive to the release. Foundry installs the
+# system from the `manifest` URL (always the latest release) and downloads the tagged `titan.zip`.
+name: Release
+
+on:
+  release:
+    types: [published]
+
+jobs:
+  package:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Stamp the release tag and asset URLs into the manifest
+        env:
+          TAG: ${{ github.event.release.tag_name }}
+          REPO: ${{ github.repository }}
+        run: |
+          node --input-type=module -e '
+            import { readFileSync, writeFileSync } from "node:fs";
+            const manifest = JSON.parse(readFileSync("system.json", "utf8"));
+            const repo = `https://github.com/${process.env.REPO}`;
+            manifest.version = process.env.TAG.replace(/^v/, "");
+            manifest.url = repo;
+            manifest.bugs = `${repo}/issues`;
+            manifest.manifest = `${repo}/releases/latest/download/system.json`;
+            manifest.download = `${repo}/releases/download/${process.env.TAG}/titan.zip`;
+            manifest.readme = `${repo}/releases/latest/download/README.md`;
+            manifest.changelog = `${repo}/releases/latest/download/CHANGELOG.md`;
+            writeFileSync("system.json", `${JSON.stringify(manifest, null, 3)}\n`);
+          '
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build the system bundle
+        run: npm run build
+
+      - name: Create the installable archive
+        run: zip -r ./titan.zip system.json dist/ lang/ packs/ fonts/ LICENSE-MIT README.md CHANGELOG.md
+
+      - name: Attach the manifest and archive to the release
+        uses: ncipollo/release-action@v1
+        with:
+          allowUpdates: true
+          name: ${{ github.event.release.name }}
+          draft: false
+          prerelease: ${{ github.event.release.prerelease }}
+          token: ${{ secrets.GITHUB_TOKEN }}
+          artifacts: './system.json, ./titan.zip, ./README.md, ./CHANGELOG.md'
+          tag: ${{ github.event.release.tag_name }}
+          body: ${{ github.event.release.body }}

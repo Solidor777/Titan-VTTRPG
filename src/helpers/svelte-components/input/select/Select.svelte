@@ -67,9 +67,11 @@
    // Clear a pending typeahead-buffer timer if the component unmounts within its 500ms window.
    onDestroy(() => clearTimeout(typeaheadTimer));
 
-   // Floating-ui actions: floatingRef on the trigger, floatingContent on the list. Positions once on
-   // open (flip/shift handle viewport edges); the list closes on scroll/resize rather than tracking.
+   // Floating-ui actions: floatingRef on the trigger, floatingContent on the list. `autoUpdate` keeps the
+   // portaled list anchored to the trigger through ancestor scroll, window resize, and layout shift, so
+   // the list stays open while its sheet scrolls; flip/shift handle viewport edges.
    const [floatingRef, floatingContent] = createFloatingActions({
+      autoUpdate: true,
       strategy: 'fixed',
       placement: 'bottom-start',
       middleware: [offset(4), flip(), shift({ padding: 4 })],
@@ -293,23 +295,9 @@
       }
       listOpen = false;
    }
-
-   /**
-    * Closes the list when the page scrolls or resizes, since the list positions once on open.
-    * @returns {void}
-    */
-   function closeOnViewportChange() {
-      if (listOpen) {
-         listOpen = false;
-      }
-   }
 </script>
 
-<svelte:window
-   onclick={handleWindowClick}
-   onscroll={closeOnViewportChange}
-   onresize={closeOnViewportChange}
-/>
+<svelte:window onclick={handleWindowClick}/>
 
 <button
    bind:this={triggerEl}
