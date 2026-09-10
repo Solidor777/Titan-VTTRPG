@@ -450,7 +450,7 @@ and one or more inner Svelte component trees.
 **Actor sheets**
 
 - `TitanActorSheet` (`src/document/types/actor/sheet/TitanActorSheet.js`) extends
-  `TitanDocumentSheet`. Declares `static DEFAULT_OPTIONS = { position: { width: 750 } }` to widen
+  `TitanDocumentSheet`. Declares `static DEFAULT_OPTIONS = { position: { width: 850 } }` to widen
   the sheet (AppV2 deep-merges this onto the base 700-wide value). Overrides `_getHeaderControls()`
   to add native AppV2 header controls (see conventions.md): an Edit Token control (`_onEditToken`,
   gated by `game.user.isGM || (actor.isOwner && game.user.can('TOKEN_CONFIGURE'))`), a dynamic

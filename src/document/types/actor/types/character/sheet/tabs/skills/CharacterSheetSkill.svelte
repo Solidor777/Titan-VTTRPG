@@ -160,6 +160,7 @@
       @include panel-2;
 
       align-items: center;
+      gap: var(--titan-spacing-standard);
       width: 100%;
       padding: var(--titan-spacing-standard) var(--titan-spacing-standard) var(--titan-spacing-standard) var(--titan-spacing-large);
 
@@ -171,6 +172,9 @@
       .stats {
          @include flex-row;
          @include flex-group-right;
+
+         // The two stat groups keep their full width; the check button and select absorb any squeeze.
+         flex-shrink: 0;
 
          .stat {
             @include flex-row;

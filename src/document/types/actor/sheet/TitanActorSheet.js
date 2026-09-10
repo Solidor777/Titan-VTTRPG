@@ -51,7 +51,7 @@ export default class TitanActorSheet extends TitanDocumentSheet {
     * @override
     */
    static DEFAULT_OPTIONS = {
-      position: { width: 750 },
+      position: { width: 850 },
    };
 
    /**

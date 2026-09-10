@@ -106,3 +106,26 @@ it ever bites in play, the principled fix is a per-message serial queue around
   before suspecting the harness.
 - **Killed runs are the main source of cruft.** Stopping a full-suite run mid-flight skips every
   `afterAll`, so its fixtures survive. Prefer letting a run finish; sweep afterwards if not.
+
+## 2026-09-10 — Backlog close-out campaign
+
+- **The live `titan.effects` pack was seeded through the game API, not by `npm run build:packs`.** The
+  running world holds an exclusive LevelDB lock on every declared pack, stopping the Foundry process is
+  blocked for the autonomous session, and `/setup` needs the admin password, so the compile script was
+  validated against a scratch directory (20 keys: 3 folders + 17 effects, `_key` stripped, folder refs
+  intact) and the live pack was filled with the same source through `Folder.createDocuments` /
+  `ActiveEffect.createDocuments` (`keepId: true`). The next `npm run build:packs` with the world returned
+  to setup clears and recompiles the pack to identical content — no drift is possible because the source
+  ids are the document ids.
+- **`ci.yml` gates on ESLint errors only; the warning baseline is ~3000 JSDoc warnings** (mostly
+  `jsdoc/require-description` on Svelte props typedefs). They do not fail the workflow. Raising the gate
+  to `--max-warnings 0` requires that sweep first.
+- **The two workflow files landed in commit `194c1991` ("keep the Select dropdown anchored")**, not in the
+  OPEN_BUGS #2 commit: they were staged before the Select commit and `git commit` commits the whole index.
+  History was left intact rather than rewritten; the #2 commit message points at `194c1991`.
+- **Surface capture method.** Every TITAN surface was screenshotted in two themes by a throwaway
+  Playwright spec (login → theme setting → render sheets/dialogs/cards → `locator.screenshot()` into
+  `debug/dumps/surfaces/`). It found three shipped defects (CLOSED_BUGS #36-#38) that the localization
+  and layout e2e suites had missed because they did not open those dialogs or seed a description. A
+  spec that scans a surface must render the STATE that exposes the text (an effect WITH a description,
+  every check dialog, a spell WITHOUT a tradition).
