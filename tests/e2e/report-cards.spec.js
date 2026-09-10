@@ -121,12 +121,63 @@ test.describe('report chat-message subtype cards', () => {
             await titanWait(() => game.messages.size > before, { message: 'damage report message' });
 
             const newest = game.messages.contents.at(-1);
-            const out = { messageId: newest?.id, messageType: newest?.type };
+            const out = {
+               messageId: newest?.id,
+               messageType: newest?.type,
+               // The card's snapshot and the actor's live maxima must resolve at the same
+               // system.resource.* path (path parity in the wild).
+               reportStaminaMax: newest?.system?.resource?.stamina?.max,
+               reportWoundsMax: newest?.system?.resource?.wounds?.max,
+               actorStaminaMax: actor.system.resource.stamina.max,
+               actorWoundsMax: actor.system.resource.wounds.max,
+            };
             await actor.delete();
             return out;
          });
 
          await expectReportCard(result, 'damageReport');
+
+         // The report's resource snapshot maxima equal the actor's live maxima at the same path.
+         expect(result.reportStaminaMax, 'report stamina.max equals the actor live stamina.max')
+            .toBe(result.actorStaminaMax);
+         expect(result.reportWoundsMax, 'report wounds.max equals the actor live wounds.max')
+            .toBe(result.actorWoundsMax);
+      });
+
+      test('a legacy top-level resource snapshot is hoisted onto system.resource on load', async () => {
+         const result = await page.evaluate(async () => {
+            const actor = await Actor.create({ name: `E2E LegacyDamage ${Date.now()}`, type: 'player' });
+
+            // A pre-2026-09-10 damageReport message, shaped with the legacy top-level `stamina` key
+            // instead of the current `resource.stamina` nesting.
+            const message = await ChatMessage.create({
+               type: 'damageReport',
+               speaker: { alias: actor.name },
+               system: {
+                  actorName: actor.name,
+                  actorImg: actor.img,
+                  damageTaken: 1,
+                  stamina: { value: 1, max: 6 },
+               },
+            });
+
+            const out = {
+               messageId: message.id,
+               messageType: message.type,
+               // migrateData hoists the legacy top-level key into system.resource on load.
+               resourceStaminaMax: game.messages.get(message.id)?.system?.resource?.stamina?.max,
+            };
+            await actor.delete();
+            return out;
+         });
+
+         await expectReportCard(result, 'damageReport');
+         expect(result.resourceStaminaMax, 'the legacy stamina snapshot resolves at system.resource.stamina')
+            .toBe(6);
+
+         // The rendered card must show the Stamina row sourced from the hoisted snapshot.
+         const card = page.locator(`#chat .message[data-message-id="${result.messageId}"] .report`).first();
+         await expect(card.getByText('Stamina', { exact: false }), 'card shows the Stamina row').toBeVisible();
       });
 
       test('applyHealing posts a healingReport card', async () => {

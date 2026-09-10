@@ -1,6 +1,7 @@
 import { describe, it, expect, beforeAll, afterAll } from 'vitest';
 import {
    MockNumberField,
+   MockSchemaField,
    MockStringField,
    installSchemaMocks,
    restoreSchemaMocks,
@@ -34,27 +35,29 @@ const models = {};
  * @type {Record<string, Record<string, {type: string, nullable?: boolean}>>}
  */
 const EXPECTED = {
-   // Task 2a: flat-resource report leaves (damage, healing, spend-resolve, long-rest). The resource
-   // snapshots (stamina/wounds/resolve) and the damage tags container are conditionally present, so the
-   // shape factory declares them null -> nullable ObjectField, preserving the cards' if (obj) guards.
+   // Flat-resource report leaves (damage, healing, spend-resolve, long-rest). The resource snapshots
+   // (resource.stamina/wounds/resolve) nest under a `resource` SchemaField, at the same path as the
+   // actor's own persisted resources; the damage tags container is conditionally present, so the shape
+   // factory declares it null -> nullable ObjectField, preserving the cards' if (obj) guards. Each key's
+   // nested resource sub-fields are asserted separately below (RESOURCE_FIELDS).
    damageReport: {
       damageTaken: { type: 'NumberField' }, damageResisted: { type: 'NumberField' },
       staminaLost: { type: 'NumberField' }, woundsSuffered: { type: 'NumberField' },
       ignoredArmor: { type: 'BooleanField' },
-      stamina: { type: 'ObjectField', nullable: true }, wounds: { type: 'ObjectField', nullable: true },
+      resource: { type: 'SchemaField' },
       tags: { type: 'ObjectField', nullable: true },
    },
    healingReport: {
       staminaRestored: { type: 'NumberField' },
-      stamina: { type: 'ObjectField', nullable: true }, wounds: { type: 'ObjectField', nullable: true },
+      resource: { type: 'SchemaField' },
    },
    spendResolveReport: {
       resolveSpent: { type: 'NumberField' }, resolveShortage: { type: 'NumberField' },
-      resolve: { type: 'ObjectField', nullable: true },
+      resource: { type: 'SchemaField' },
    },
    longRestReport: {
       woundsHealed: { type: 'NumberField' },
-      wounds: { type: 'ObjectField', nullable: true },
+      resource: { type: 'SchemaField' },
    },
 
    // Task 2b: armor report leaves (rend, repairs). The armor resource snapshot is conditionally
@@ -76,9 +79,10 @@ const EXPECTED = {
    removeCombatEffectsReport: {},
    shortRestReport: {},
 
-   // Task 2d: turn report leaves (turn-start, turn-end). Every conditionally-present compound is a
-   // nullable ObjectField (null in the shape), preserving the cards' if (obj) guards; fastHealing and
-   // persistentDamage stay opaque to keep their variable per-source keys. The message (both) and
+   // Turn report leaves (turn-start, turn-end). Every conditionally-present compound is a nullable
+   // ObjectField (null in the shape), preserving the cards' if (obj) guards; fastHealing and
+   // persistentDamage stay opaque to keep their variable per-source keys. The resource snapshots nest
+   // under a `resource` SchemaField, asserted separately below (RESOURCE_FIELDS). The message (both) and
    // conditions (turn-start only) array fields are explicit ArrayFields, declared on the data model
    // rather than in the shape, because Foundry's ObjectField rejects arrays. The message element is a
    // StringField (the producer pushes HTML strings); the harness asserts the ArrayField type only (no
@@ -89,9 +93,7 @@ const EXPECTED = {
       fastHealing: { type: 'ObjectField', nullable: true },
       persistentDamage: { type: 'ObjectField', nullable: true },
       resolveRegain: { type: 'ObjectField', nullable: true },
-      stamina: { type: 'ObjectField', nullable: true },
-      wounds: { type: 'ObjectField', nullable: true },
-      resolve: { type: 'ObjectField', nullable: true },
+      resource: { type: 'SchemaField' },
       message: { type: 'ArrayField' },
       conditions: { type: 'ArrayField' },
    },
@@ -100,35 +102,50 @@ const EXPECTED = {
       effects: { type: 'ObjectField', nullable: true },
       fastHealing: { type: 'ObjectField', nullable: true },
       persistentDamage: { type: 'ObjectField', nullable: true },
-      stamina: { type: 'ObjectField', nullable: true },
-      wounds: { type: 'ObjectField', nullable: true },
+      resource: { type: 'SchemaField' },
       message: { type: 'ArrayField' },
    },
 
-   // Task 2e: revert + expired report leaves (turn-start-revert, turn-end-revert, effects-expired).
-   // Every conditionally-present compound is a nullable ObjectField (null in the shape), preserving the
-   // cards' if (obj) guards: the revert confirm-offer objects (fastHealingRevert/persistentDamageRevert/
-   // resolveRegainRevert) and the resource snapshots (stamina/wounds/resolve). Turn-end-revert carries
-   // neither resolveRegainRevert nor resolve (turn end never regains or reports resolve). The
-   // effects-expired report's only always-present field is the boolean expired-effects flag.
+   // Revert + expired report leaves (turn-start-revert, turn-end-revert, effects-expired). Every
+   // conditionally-present compound is a nullable ObjectField (null in the shape), preserving the cards'
+   // if (obj) guards: the revert confirm-offer objects (fastHealingRevert/persistentDamageRevert/
+   // resolveRegainRevert). The resource snapshots nest under a `resource` SchemaField, asserted
+   // separately below (RESOURCE_FIELDS); turn-end-revert carries neither resolveRegainRevert nor a
+   // resolve snapshot (turn end never regains or reports resolve). The effects-expired report's only
+   // always-present field is the boolean expired-effects flag.
    turnStartRevertReport: {
       fastHealingRevert: { type: 'ObjectField', nullable: true },
       persistentDamageRevert: { type: 'ObjectField', nullable: true },
       resolveRegainRevert: { type: 'ObjectField', nullable: true },
-      stamina: { type: 'ObjectField', nullable: true },
-      wounds: { type: 'ObjectField', nullable: true },
-      resolve: { type: 'ObjectField', nullable: true },
+      resource: { type: 'SchemaField' },
    },
    turnEndRevertReport: {
       fastHealingRevert: { type: 'ObjectField', nullable: true },
       persistentDamageRevert: { type: 'ObjectField', nullable: true },
-      stamina: { type: 'ObjectField', nullable: true },
-      wounds: { type: 'ObjectField', nullable: true },
+      resource: { type: 'SchemaField' },
    },
    effectsExpiredReport: {
       expiredEffectsRemoved: { type: 'BooleanField' },
       effects: { type: 'ObjectField', nullable: true },
    },
+};
+
+/**
+ * The set of nested `resource` sub-fields declared by each report leaf that snapshots a resource, at
+ * the same paths as the actor's own persisted resources. Every entry is a nullable ObjectField
+ * (preserving the cards' `if (obj)` presence guards); a report leaf absent from this map declares no
+ * `resource` field at all.
+ * @type {Record<string, string[]>}
+ */
+const RESOURCE_FIELDS = {
+   damageReport: ['stamina', 'wounds'],
+   healingReport: ['stamina', 'wounds'],
+   spendResolveReport: ['resolve'],
+   longRestReport: ['wounds'],
+   turnStartReport: ['stamina', 'wounds', 'resolve'],
+   turnEndReport: ['stamina', 'wounds'],
+   turnStartRevertReport: ['stamina', 'wounds', 'resolve'],
+   turnEndRevertReport: ['stamina', 'wounds'],
 };
 
 beforeAll(async () => {
@@ -243,5 +260,24 @@ describe('Report chat-message schema equivalence (golden master)', () => {
          const extra = Object.keys(schema).filter((field) => !ignore.has(field) && !(field in fields));
          expect(extra, `unexpected extra fields on ${key}`).toEqual([]);
       });
+
+      // Every report that snapshots a resource nests it under `resource`, at the same paths as the
+      // actor's own persisted resources; each sub-field is a nullable ObjectField.
+      if (RESOURCE_FIELDS[key]) {
+         it(`${key} resource sub-fields match the golden master`, () => {
+            const schema = models[key]._defineDocumentSchema();
+
+            expect(schema.resource).toBeInstanceOf(MockSchemaField);
+            for (const name of RESOURCE_FIELDS[key]) {
+               const field = schema.resource.fields[name];
+               expect(field, `missing resource field ${name}`).toBeTruthy();
+               expect(field.constructor.name, `${key}.resource.${name} type`).toBe('MockObjectField');
+               expect(Boolean(field.options?.nullable), `${key}.resource.${name} nullable`).toBe(true);
+            }
+
+            // No unexpected nested resource fields.
+            expect(Object.keys(schema.resource.fields).sort()).toEqual([...RESOURCE_FIELDS[key]].sort());
+         });
+      }
    }
 });

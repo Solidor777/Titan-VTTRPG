@@ -26,4 +26,28 @@ export default class ReportChatMessageDataModel extends TitanChatMessageDataMode
 
       return schema;
    }
+
+   /**
+    * Hoists legacy top-level resource snapshots (`stamina`, `wounds`, `resolve`) into the nested
+    * `resource` object every report now snapshots resources under. INVARIANT: the legacy top-level keys
+    * exist only on chat messages persisted before 2026-09-10; every report created since then already
+    * writes `resource.*` directly, so this hoist is idempotent (a legacy key is only moved when no
+    * nested value already occupies its slot) and needs no version gate.
+    * @override
+    * @param {object} source - The source data for the report chat message.
+    * @returns {object} The migrated source data.
+    */
+   static migrateData(source) {
+      for (const key of ['stamina', 'wounds', 'resolve']) {
+         if (source[key] !== undefined) {
+            source.resource ??= {};
+            if (source.resource[key] === undefined) {
+               source.resource[key] = source[key];
+            }
+            delete source[key];
+         }
+      }
+
+      return super.migrateData(source);
+   }
 }

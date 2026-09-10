@@ -4156,7 +4156,8 @@ export default class CharacterDataModel extends TitanActorDataModel {
 
       // Add wounds if appropriate.
       if (this.resource.wounds.max > 0) {
-         retVal.wounds = {
+         retVal.resource ??= {};
+         retVal.resource.wounds = {
             value: this.resource.wounds.value,
             max: this.resource.wounds.max,
          };
@@ -4168,7 +4169,8 @@ export default class CharacterDataModel extends TitanActorDataModel {
          retVal.damageTaken = damageTaken;
 
          // Add the stamina if any damage was taken.
-         retVal.stamina = {
+         retVal.resource ??= {};
+         retVal.resource.stamina = {
             value: this.resource.stamina.value,
             max: this.resource.stamina.max,
          };
@@ -4275,15 +4277,17 @@ export default class CharacterDataModel extends TitanActorDataModel {
          actorImg: this.parent.img,
          actorName: this.parent.name,
          staminaRestored: staminaRestored,
-         stamina: {
-            value: this.resource.stamina.value,
-            max: this.resource.stamina.max,
+         resource: {
+            stamina: {
+               value: this.resource.stamina.value,
+               max: this.resource.stamina.max,
+            },
          },
       };
 
       // Add wounds if appropriate.
       if (this.resource.wounds.max > 0) {
-         retVal.wounds = {
+         retVal.resource.wounds = {
             value: this.resource.wounds.value,
             max: this.resource.wounds.max,
          };
@@ -4383,9 +4387,11 @@ export default class CharacterDataModel extends TitanActorDataModel {
          actorImg: this.parent.img,
          actorName: this.parent.name,
          resolveSpent: resolveSpent,
-         resolve: {
-            value: this.resource.resolve.value,
-            max: this.resource.resolve.max,
+         resource: {
+            resolve: {
+               value: this.resource.resolve.value,
+               max: this.resource.resolve.max,
+            },
          },
       };
 
@@ -4773,9 +4779,11 @@ export default class CharacterDataModel extends TitanActorDataModel {
             // Add wounds healed if appropriate.
             if (woundsHealed > 0) {
                reportData.woundsHealed = woundsHealed;
-               reportData.wounds = {
-                  value: wounds.value,
-                  max: wounds.max,
+               reportData.resource = {
+                  wounds: {
+                     value: wounds.value,
+                     max: wounds.max,
+                  },
                };
             }
 
@@ -5534,14 +5542,15 @@ export default class CharacterDataModel extends TitanActorDataModel {
                }
 
                // Add stamina.
-               reportData.stamina = {
+               reportData.resource ??= {};
+               reportData.resource.stamina = {
                   max: this.resource.stamina.max,
                   value: this.resource.stamina.value,
                };
 
                // Add wounds if appropriate.
                if (damage > 0 && this.resource.wounds.max > 0) {
-                  reportData.wounds = {
+                  reportData.resource.wounds = {
                      max: this.resource.wounds.max,
                      value: this.resource.wounds.value,
                   };
@@ -5587,7 +5596,8 @@ export default class CharacterDataModel extends TitanActorDataModel {
 
                // Update the report data if appropriate.
                if (reportRegainingResolve() || !confirmed) {
-                  reportData.resolve = {
+                  reportData.resource ??= {};
+                  reportData.resource.resolve = {
                      value: resolve.value,
                      max: resolve.max,
                   };
@@ -5698,14 +5708,15 @@ export default class CharacterDataModel extends TitanActorDataModel {
             }
 
             // Add stamina to the report.
-            reportData.stamina = {
+            reportData.resource ??= {};
+            reportData.resource.stamina = {
                max: this.resource.stamina.max,
                value: this.resource.stamina.value,
             };
 
             // Add wounds to the report if appropriate.
             if (healingToRevert > 0 && this.resource.wounds.max > 0) {
-               reportData.wounds = {
+               reportData.resource.wounds = {
                   max: this.resource.wounds.max,
                   value: this.resource.wounds.value,
                };
@@ -5746,7 +5757,8 @@ export default class CharacterDataModel extends TitanActorDataModel {
 
             // Update the report data if appropriate.
             if (reportRegainingResolve() || !confirmed) {
-               reportData.resolve = {
+               reportData.resource ??= {};
+               reportData.resource.resolve = {
                   value: this.resource.resolve.value,
                   max: this.resource.resolve.max,
                };

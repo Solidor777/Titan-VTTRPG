@@ -11,6 +11,6 @@
 <ChatResource
    icon={WOUNDS_ICON}
    label={localize('wounds')}
-   max={document.data.system.wounds.max}
-   value={document.data.system.wounds.value}
+   max={document.data.system.resource.wounds.max}
+   value={document.data.system.resource.wounds.value}
 />

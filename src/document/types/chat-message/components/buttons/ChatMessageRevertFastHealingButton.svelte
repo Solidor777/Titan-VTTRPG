@@ -63,11 +63,13 @@
             const updateData = {
                system: {
                   fastHealingRevert: { confirmed: true },
-                  stamina: { value: actor.system.resource.stamina.value },
+                  resource: {
+                     stamina: { value: actor.system.resource.stamina.value },
+                  },
                },
             };
-            if (document.data.system.wounds) {
-               updateData.system.wounds = { value: actor.system.resource.wounds.value };
+            if (document.data.system.resource.wounds) {
+               updateData.system.resource.wounds = { value: actor.system.resource.wounds.value };
             }
 
             // Update the chat message.

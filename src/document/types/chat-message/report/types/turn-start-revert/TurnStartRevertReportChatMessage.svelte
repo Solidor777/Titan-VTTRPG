@@ -29,17 +29,17 @@
    const sections = [];
 
    // Add Stamina if appropriate.
-   if (document.data.system.stamina) {
+   if (document.data.system.resource.stamina) {
       sections.push(ChatMessageStamina);
    }
 
    // Add Wounds if appropriate.
-   if (document.data.system.wounds) {
+   if (document.data.system.resource.wounds) {
       sections.push(ChatMessageWounds);
    }
 
    // Add Resolve if appropriate.
-   if (document.data.system.resolve) {
+   if (document.data.system.resource.resolve) {
       sections.push(ChatMessageResolve);
    }
 

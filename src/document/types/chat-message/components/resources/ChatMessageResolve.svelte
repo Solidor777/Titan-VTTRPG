@@ -11,6 +11,6 @@
 <ChatResource
    icon={RESOLVE_ICON}
    label={localize('resolve')}
-   max={document.data.system.resolve.max}
-   value={document.data.system.resolve.value}
+   max={document.data.system.resource.resolve.max}
+   value={document.data.system.resource.resolve.value}
 />

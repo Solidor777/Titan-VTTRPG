@@ -16,7 +16,7 @@
    const sections = [ChatMessageStamina];
 
    // Add wounds if appropriate.
-   if (document.data.system.wounds) {
+   if (document.data.system.resource.wounds) {
       sections.push(ChatMessageWounds);
    }
 </script>
