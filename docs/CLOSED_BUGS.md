@@ -464,3 +464,15 @@ when fixed.
 - **Fix:** the tab now uses `DocumentEditorInput` with `path: 'description'`, which enriches the
   native field for the inactive view and persists edits through the document. `effect-sheet-layout.spec.js`
   asserts the inactive editor shows a seeded description.
+
+### 39. Effect Tray folders created after a pack's expansion state was saved rendered collapsed
+
+- **What:** `EffectTrayState` persisted the EXPANDED folder ids per pack and restored that list verbatim,
+  so a folder created after the entry was saved was absent from it and derived as collapsed — the same
+  state as a folder the user had deliberately closed. Deleted folder ids also lingered in the entry.
+- **Found:** 2026-09-10, by the whole-branch final review of the redesign surface passes.
+- **Fix:** the setting is now `effectTrayCollapsedFolders` (pack collection id → COLLAPSED folder ids).
+  Every refresh derives `expandedFolders` as the pack's current folders minus that set, so absence means
+  expanded; `toggleFolder` persists the current folders absent from the reactive set, which drops deleted
+  ids. `effect-tray.spec.js` creates a folder after a collapse was saved for the pack and asserts it renders
+  expanded while the stored entry lists only the collapsed id.
