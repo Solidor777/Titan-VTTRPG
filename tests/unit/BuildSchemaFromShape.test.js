@@ -66,8 +66,10 @@ let buildSchemaFromShape;
 
 beforeAll(async () => {
    // Install the data-field stand-ins before importing the helper (and the create*Field helpers it uses).
+   // DataField is the common base class the pass-through rule instanceof-checks a shape value against.
    globalThis.foundry.data = {
       fields: {
+         DataField: MockField,
          StringField: MockStringField,
          NumberField: MockNumberField,
          BooleanField: MockBooleanField,
@@ -213,6 +215,30 @@ describe('buildSchemaFromShape — arrays', () => {
 
       // An empty template array clones to an empty initial.
       expect(schema.check.options.initial).toEqual([]);
+   });
+});
+
+describe('buildSchemaFromShape — pre-built fields', () => {
+   it('returns a shape value that is already a DataField instance as-is, at top level and nested', () => {
+      /** @type {MockField} A pre-built field instance used directly as a shape value. */
+      const prebuilt = new MockStringField({
+         initial: null,
+         nullable: true,
+         required: true,
+      });
+
+      /** @type {object} The schema built from a shape mixing plain values with a pre-built field. */
+      const schema = buildSchemaFromShape({
+         armor: prebuilt,
+         equipped: {
+            shield: prebuilt,
+         },
+      });
+
+      // The pre-built field is returned unchanged (same object identity), at top level and nested,
+      // rather than being re-wrapped by the value-type dispatch.
+      expect(schema.armor).toBe(prebuilt);
+      expect(schema.equipped.fields.shield).toBe(prebuilt);
    });
 });
 

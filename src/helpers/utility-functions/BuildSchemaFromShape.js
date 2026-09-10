@@ -10,6 +10,11 @@ import createStringField from '~/helpers/utility-functions/CreateStringField.js'
  * runtime type of the value. This is the per-value core of the recursive shape-to-schema conversion.
  *
  * Mapping (by value type):
+ * - a value that is already a `foundry.data.fields.DataField` instance -> returned as-is (same object
+ *   identity), at top level and nested. This is the only way a shape can express a nullable
+ *   `StringField`: a `null` shape value builds a nullable `ObjectField` (see below), which rejects a
+ *   string id, so a caller that needs a nullable string id (e.g. an equipped-item id defaulting to
+ *   `null`) pre-builds the field itself and passes it through unconverted.
  * - `string` -> `createStringField(value)` (the representative value seeds the field's initial).
  * - `number` -> `createIntegerField(value)`. ALL numeric template values produce an integer-enforced
  *   field (matching the hand-written item schemas, which use `createIntegerField` for every numeric
@@ -37,6 +42,13 @@ import createStringField from '~/helpers/utility-functions/CreateStringField.js'
  * @returns {DataField} The Foundry data field describing the value.
  */
 function buildFieldFromValue(value) {
+   // A pre-built DataField instance is returned unchanged. This is the only way a shape can express a
+   // field the value-type dispatch below cannot produce, such as a nullable StringField (a `null` shape
+   // value would build a nullable ObjectField instead, which rejects the string ids this system stores).
+   if (value instanceof foundry.data.fields.DataField) {
+      return value;
+   }
+
    // Absent values cannot be typed from the shape, so represent them as a nullable object bag.
    if (value === null || value === undefined) {
       return createObjectField(null);
@@ -91,8 +103,13 @@ function buildFieldFromValue(value) {
  * (a map of schema-field instances keyed by property name), so a data model can be defined from a
  * canonical shape rather than hand-written field by field.
  *
- * Each own enumerable property of `shape` is mapped to a field by the runtime type of its value:
- * `string`/`number`/`boolean` become the matching typed field (seeded with the representative value),
+ * Each own enumerable property of `shape` is mapped to a field by the runtime type of its value. A value
+ * that is already a `foundry.data.fields.DataField` instance is returned as-is (same object identity),
+ * at top level and nested — the only way a shape can express a field the type-dispatch below cannot
+ * produce, such as a nullable `StringField` (a `null` shape value builds a nullable `ObjectField`
+ * instead, which rejects the string ids this system stores, e.g. an equipped-item id defaulting to
+ * `null`). Otherwise, `string`/`number`/`boolean` become the matching typed field (seeded with the
+ * representative value),
  * where a `number` always becomes an integer-enforced field (the system has no non-integer schema
  * fields except the base `documentVersion`, defined directly in `TitanDataModel` rather than via this
  * helper, so integer is assumed for all numbers). An ARRAY becomes an `ArrayField` whose `initial` is a
