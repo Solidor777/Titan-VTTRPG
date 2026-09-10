@@ -122,6 +122,93 @@ test.describe('effect tray sidebar tab', () => {
       ).toBeVisible();
    });
 
+   test('the shipped TITAN Effects pack lists the standard effects in their folders', async () => {
+      await page.evaluate(async () => {
+         await ui.titanEffects.render(true);
+         ui.titanEffects.activate();
+         await titanWait(
+            () => !!ui.titanEffects.element?.querySelector('[data-testid="effect-tray-pack-select"]'),
+            { message: 'tray pack-select rendered' },
+         );
+      });
+
+      // The system pack is compiled from packs/_source/effects; browse it and expand every folder.
+      await selectTitanOption(
+         page,
+         page.locator('[role="combobox"][data-testid="effect-tray-pack-select"]'),
+         'titan.effects',
+      );
+      for (const folderName of ['Actions', 'Circumstances', 'Death']) {
+         const folder = page.locator('[data-testid="effect-tray-folder"]', { hasText: folderName }).first();
+         await expect(folder, `${folderName} folder is listed`).toBeVisible();
+      }
+      // Folders start collapsed; expand each section that hides its rows, then count every row.
+      const rows = page.locator('[data-testid="effect-tray-row"]');
+      for (const section of await page.locator('section.effect-tray-folder[data-folder-id]').all()) {
+         if ((await section.locator('[data-testid="effect-tray-row"]').count()) === 0) {
+            await section.locator('[data-testid="effect-tray-folder-toggle"]').click();
+         }
+      }
+      await expect(rows, 'every seeded standard effect row renders').toHaveCount(17);
+      for (const name of ['Dodging', 'Charging', 'Light Cover', 'Dying', 'Last Stand']) {
+         await expect(rows.filter({ hasText: name }).first(), `${name} is seeded`).toBeVisible();
+      }
+   });
+
+   test('applying the seeded Dodging effect raises the token actor Defense and Reflexes by one', async () => {
+      await deleteFixtureActor(page, 'E2E Tray Target');
+      await page.evaluate(async () => {
+         await Actor.create({ name: 'E2E Tray Target', type: 'player' });
+      });
+      await controlFixtureActorToken(page, {
+         actorName: 'E2E Tray Target',
+         fallbackSceneName: 'E2E Tray Scene',
+      });
+      const before = await page.evaluate(() => {
+         const actor = game.actors.getName('E2E Tray Target');
+         return { defense: actor.system.rating.defense.value, reflexes: actor.system.resistance.reflexes.value };
+      });
+
+      await page.evaluate(async () => {
+         await ui.titanEffects.render(true);
+         ui.titanEffects.activate();
+         await titanWait(
+            () => !!ui.titanEffects.element?.querySelector('[data-testid="effect-tray"]'),
+            { message: 'tray panel mounted' },
+         );
+      });
+      await selectTitanOption(
+         page,
+         page.locator('[role="combobox"][data-testid="effect-tray-pack-select"]'),
+         'titan.effects',
+      );
+      // Expand the Actions folder (folders start collapsed) so its rows render.
+      const actions = page.locator('section.effect-tray-folder[data-folder-id]', { hasText: 'Actions' }).first();
+      await expect(actions).toBeVisible();
+      if ((await actions.locator('[data-testid="effect-tray-row"]').count()) === 0) {
+         await actions.locator('[data-testid="effect-tray-folder-toggle"]').click();
+      }
+      await page.locator('[data-testid="effect-tray-row"]', { hasText: 'Dodging' })
+         .locator('[data-testid="effect-tray-apply"]')
+         .first()
+         .click();
+
+      // The copied effect's rules elements flow through derived data: +1 Defense, +1 Reflexes.
+      await expect
+         .poll(
+            () => page.evaluate(() => {
+               const actor = game.actors.getName('E2E Tray Target');
+               return {
+                  applied: [...actor.effects].some((e) => e.name === 'Dodging'),
+                  defense: actor.system.rating.defense.value,
+                  reflexes: actor.system.resistance.reflexes.value,
+               };
+            }),
+            { message: 'Dodging applies its +1 Defense and +1 Reflexes' },
+         )
+         .toEqual({ applied: true, defense: before.defense + 1, reflexes: before.reflexes + 1 });
+   });
+
    test('Apply copies the effect onto the controlled token actor', async () => {
       // Create an actor + token on the active scene and control it (throws if it never draws).
       await deleteFixtureActor(page, 'E2E Tray Target');

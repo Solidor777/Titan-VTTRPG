@@ -1,0 +1,42 @@
+{
+  "_id": "uTariWqxCIQkV2qs",
+  "_key": "!effects!uTariWqxCIQkV2qs",
+  "name": "Last Stand",
+  "type": "effect",
+  "img": "icons/svg/combat.svg",
+  "description": "<p>As death looms, you sacrifice everything to save your allies. You must choose this on your turn before making a Death Check. You are no longer Stunned and remove any other conditions; your <strong>Resolve</strong> refills to its maximum; you are immune to all Damage; your <strong>Melee</strong> and <strong>Accuracy</strong> increase by 1; and any Damage you inflict ignores Armor.</p><p>When your turn ends, you die, and nothing can save you.</p>",
+  "disabled": false,
+  "transfer": false,
+  "origin": null,
+  "statuses": [],
+  "changes": [],
+  "folder": "JoRHOWbNyfrj6eng",
+  "sort": 200000,
+  "flags": {},
+  "system": {
+    "duration": {
+      "type": "turnEnd",
+      "remaining": 1,
+      "initiative": 1,
+      "custom": ""
+    },
+    "check": [],
+    "customTrait": [],
+    "rulesElement": [
+      {
+        "operation": "flatModifier",
+        "selector": "rating",
+        "key": "melee",
+        "value": 1,
+        "uuid": "standard-last-stand-melee"
+      },
+      {
+        "operation": "flatModifier",
+        "selector": "rating",
+        "key": "accuracy",
+        "value": 1,
+        "uuid": "standard-last-stand-accuracy"
+      }
+    ]
+  }
+}

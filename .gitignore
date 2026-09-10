@@ -11,8 +11,9 @@ node_modules/
 titan.zip
 test-results/
 playwright-report/
-packs/**/LOG
-packs/**/LOCK
+# Compiled LevelDB packs are build output of `npm run build:packs`; only their JSON source is tracked.
+packs/*
+!packs/_source/
 *.old
 test/build/
 .superpowers/

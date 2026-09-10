@@ -45,6 +45,9 @@ jobs:
       - name: Build the system bundle
         run: npm run build
 
+      - name: Compile the compendium packs
+        run: npm run build:packs
+
       - name: Create the installable archive
         run: zip -r ./titan.zip system.json dist/ lang/ packs/ fonts/ LICENSE-MIT README.md CHANGELOG.md
 

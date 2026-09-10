@@ -1,0 +1,36 @@
+{
+  "_id": "pgP7IW9R4VD630fE",
+  "_key": "!effects!pgP7IW9R4VD630fE",
+  "name": "Surprised",
+  "type": "effect",
+  "img": "icons/svg/daze.svg",
+  "description": "<p>Combat began while you were unaware or unprepared. You skip your turn in the <strong>Surprise Round</strong> and have a <strong>Defense</strong> of <strong>0</strong> until the end of the Surprise Round.</p>",
+  "disabled": false,
+  "transfer": false,
+  "origin": null,
+  "statuses": [],
+  "changes": [],
+  "folder": "LtIZsoyiXhF5vfQl",
+  "sort": 800000,
+  "flags": {},
+  "system": {
+    "duration": {
+      "type": "turnEnd",
+      "remaining": 1,
+      "initiative": 1,
+      "custom": ""
+    },
+    "check": [],
+    "customTrait": [],
+    "rulesElement": [
+      {
+        "operation": "setSum",
+        "selector": "rating",
+        "key": "defense",
+        "value": 0,
+        "mode": "set",
+        "uuid": "standard-surprised-defense"
+      }
+    ]
+  }
+}

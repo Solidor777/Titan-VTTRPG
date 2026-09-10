@@ -1,0 +1,27 @@
+{
+  "_id": "ICRPPVEofiv09du4",
+  "_key": "!effects!ICRPPVEofiv09du4",
+  "name": "Helped",
+  "type": "effect",
+  "img": "icons/svg/aura.svg",
+  "description": "<p>An ally has taken the <strong>Help</strong> action on your behalf. Provided they have Training or Expertise in a skill relevant to their helpful action, you gain <strong>Advantage</strong> on your next check, decreasing its Difficulty by 1 (to a minimum of 2).</p>",
+  "disabled": false,
+  "transfer": false,
+  "origin": null,
+  "statuses": [],
+  "changes": [],
+  "folder": "4HQEK4rXtWkQ0AFL",
+  "sort": 600000,
+  "flags": {},
+  "system": {
+    "duration": {
+      "type": "custom",
+      "remaining": 1,
+      "initiative": 1,
+      "custom": "Until your next check"
+    },
+    "check": [],
+    "customTrait": [],
+    "rulesElement": []
+  }
+}

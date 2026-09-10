@@ -1,0 +1,27 @@
+{
+  "_id": "0LjwAItFadaTqH5W",
+  "_key": "!effects!0LjwAItFadaTqH5W",
+  "name": "Total Cover",
+  "type": "effect",
+  "img": "icons/svg/castle.svg",
+  "description": "<p>You are completely concealed by an obstacle. You cannot be targeted directly by an attack or a spell, although some spells can still reach you by including you in an area of effect.</p>",
+  "disabled": false,
+  "transfer": false,
+  "origin": null,
+  "statuses": [],
+  "changes": [],
+  "folder": "LtIZsoyiXhF5vfQl",
+  "sort": 700000,
+  "flags": {},
+  "system": {
+    "duration": {
+      "type": "custom",
+      "remaining": 1,
+      "initiative": 1,
+      "custom": "While in cover"
+    },
+    "check": [],
+    "customTrait": [],
+    "rulesElement": []
+  }
+}

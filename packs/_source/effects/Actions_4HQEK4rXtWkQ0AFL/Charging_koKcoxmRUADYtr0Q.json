@@ -1,0 +1,44 @@
+{
+  "_id": "koKcoxmRUADYtr0Q",
+  "_key": "!effects!koKcoxmRUADYtr0Q",
+  "name": "Charging",
+  "type": "effect",
+  "img": "icons/svg/thrust.svg",
+  "description": "<p>You move as far as your Speed allows and make an attack. You must move at least 2 spaces in a straight line towards your target.</p><p>You gain <strong>+1 bonus die</strong> on the attack, but your <strong>Defense</strong> is reduced by 1 until the start of your next turn. If you are controlling a mount, you use the mount's Speed, and you both reduce your Defense until the start of your next turn.</p>",
+  "disabled": false,
+  "transfer": false,
+  "origin": null,
+  "statuses": [],
+  "changes": [],
+  "folder": "4HQEK4rXtWkQ0AFL",
+  "sort": 100000,
+  "flags": {},
+  "system": {
+    "duration": {
+      "type": "turnStart",
+      "remaining": 1,
+      "initiative": 1,
+      "custom": ""
+    },
+    "check": [],
+    "customTrait": [],
+    "rulesElement": [
+      {
+        "operation": "flatModifier",
+        "selector": "rating",
+        "key": "defense",
+        "value": -1,
+        "uuid": "standard-charging-defense"
+      },
+      {
+        "operation": "conditionalCheckModifier",
+        "modifierType": "dice",
+        "checkType": "attack",
+        "selector": "any",
+        "key": "",
+        "value": 1,
+        "uuid": "standard-charging-dice"
+      }
+    ]
+  }
+}

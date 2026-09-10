@@ -82,7 +82,6 @@ export default [
          'docs/',
          'external/',
          'lang/',
-         'scripts/',
          'styles/',
          'templates/',
          'node_modules/',

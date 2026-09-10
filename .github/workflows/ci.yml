@@ -33,3 +33,6 @@ jobs:
 
       - name: Build the system bundle
         run: npm run build
+
+      - name: Compile the compendium packs
+        run: npm run build:packs

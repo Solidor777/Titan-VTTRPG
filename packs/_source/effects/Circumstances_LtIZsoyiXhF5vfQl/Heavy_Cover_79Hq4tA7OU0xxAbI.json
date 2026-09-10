@@ -1,0 +1,42 @@
+{
+  "_id": "79Hq4tA7OU0xxAbI",
+  "_key": "!effects!79Hq4tA7OU0xxAbI",
+  "name": "Heavy Cover",
+  "type": "effect",
+  "img": "icons/svg/tower.svg",
+  "description": "<p>About three-quarters of your body is covered by an obstacle such as a portcullis, an arrow slit, or a thick tree trunk. You benefit from cover only against attacks and effects that originate on the opposite side of it.</p><p>You have <strong>+2</strong> to your <strong>Defense</strong> and <strong>Reflexes</strong>.</p>",
+  "disabled": false,
+  "transfer": false,
+  "origin": null,
+  "statuses": [],
+  "changes": [],
+  "folder": "LtIZsoyiXhF5vfQl",
+  "sort": 600000,
+  "flags": {},
+  "system": {
+    "duration": {
+      "type": "custom",
+      "remaining": 1,
+      "initiative": 1,
+      "custom": "While in cover"
+    },
+    "check": [],
+    "customTrait": [],
+    "rulesElement": [
+      {
+        "operation": "flatModifier",
+        "selector": "rating",
+        "key": "defense",
+        "value": 2,
+        "uuid": "standard-heavy-cover-defense"
+      },
+      {
+        "operation": "flatModifier",
+        "selector": "resistance",
+        "key": "reflexes",
+        "value": 2,
+        "uuid": "standard-heavy-cover-reflexes"
+      }
+    ]
+  }
+}

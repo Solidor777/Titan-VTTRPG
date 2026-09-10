@@ -599,8 +599,12 @@ and one or more inner Svelte component trees.
   (`src/helpers/utility-functions/ApplyEffectToTargets.js`) → copies `effect.toObject()` onto each
   `getBestCharactersToUpdate()` target the user owns. Stash-in resolves the drop via
   `getDocumentClass('ActiveEffect').fromDropData(...)` and creates a copy in the selected pack (guarding against
-  re-stashing an effect already in that pack). The system ships one empty `effects` compendium (scratch); seeding a
-  standard-effects pack + pack-build pipeline is deferred (backlog #2 sub-project B).
+  re-stashing an effect already in that pack). The system ships the `titan.effects` compendium, compiled by `npm run build:packs`
+  (`scripts/build-packs.mjs`, foundryvtt-cli `compilePack` after a classic-level `clear()`) from
+  `packs/_source/effects/` — 17 standard effects (rulebook actions, circumstances, cover, death states) in
+  three folders (Actions, Circumstances, Death), each `type: 'effect'` with `system.rulesElement` where the
+  rule has a mechanical effect. `EffectTrayState` falls back to this pack (`${game.system.id}.effects`) when
+  no remembered pack exists; `tests/unit/EffectPackSource.test.js` lints the source.
 - **Shared-targeting upgrade:** `getBestCharactersToUpdate()` (`src/helpers/utility-functions/`) was upgraded for
   this feature (used by damage/healing too): the prior primary order is preserved and fallbacks are appended — GM:
   targeted → controlled → focused-sheet actor; player: controlled → assigned (`game.user.character`) →

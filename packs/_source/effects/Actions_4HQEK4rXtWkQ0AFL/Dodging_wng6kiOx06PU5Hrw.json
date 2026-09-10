@@ -1,0 +1,42 @@
+{
+  "_id": "wng6kiOx06PU5Hrw",
+  "_key": "!effects!wng6kiOx06PU5Hrw",
+  "name": "Dodging",
+  "type": "effect",
+  "img": "icons/svg/wingfoot.svg",
+  "description": "<p>You spend your turn trying to avoid harm. Until the start of your next turn, your <strong>Defense</strong> and <strong>Reflexes</strong> increase by <strong>+1</strong>.</p>",
+  "disabled": false,
+  "transfer": false,
+  "origin": null,
+  "statuses": [],
+  "changes": [],
+  "folder": "4HQEK4rXtWkQ0AFL",
+  "sort": 400000,
+  "flags": {},
+  "system": {
+    "duration": {
+      "type": "turnStart",
+      "remaining": 1,
+      "initiative": 1,
+      "custom": ""
+    },
+    "check": [],
+    "customTrait": [],
+    "rulesElement": [
+      {
+        "operation": "flatModifier",
+        "selector": "rating",
+        "key": "defense",
+        "value": 1,
+        "uuid": "standard-dodging-defense"
+      },
+      {
+        "operation": "flatModifier",
+        "selector": "resistance",
+        "key": "reflexes",
+        "value": 1,
+        "uuid": "standard-dodging-reflexes"
+      }
+    ]
+  }
+}

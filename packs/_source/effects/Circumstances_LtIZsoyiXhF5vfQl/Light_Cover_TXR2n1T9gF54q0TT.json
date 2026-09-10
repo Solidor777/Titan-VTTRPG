@@ -1,0 +1,42 @@
+{
+  "_id": "TXR2n1T9gF54q0TT",
+  "_key": "!effects!TXR2n1T9gF54q0TT",
+  "name": "Light Cover",
+  "type": "effect",
+  "img": "icons/svg/oak.svg",
+  "description": "<p>An obstacle blocks at least half of your body: a low wall, a large piece of furniture, a narrow tree trunk, or another creature. You benefit from cover only against attacks and effects that originate on the opposite side of it.</p><p>You have <strong>+1</strong> to your <strong>Defense</strong> and <strong>Reflexes</strong>.</p>",
+  "disabled": false,
+  "transfer": false,
+  "origin": null,
+  "statuses": [],
+  "changes": [],
+  "folder": "LtIZsoyiXhF5vfQl",
+  "sort": 500000,
+  "flags": {},
+  "system": {
+    "duration": {
+      "type": "custom",
+      "remaining": 1,
+      "initiative": 1,
+      "custom": "While in cover"
+    },
+    "check": [],
+    "customTrait": [],
+    "rulesElement": [
+      {
+        "operation": "flatModifier",
+        "selector": "rating",
+        "key": "defense",
+        "value": 1,
+        "uuid": "standard-light-cover-defense"
+      },
+      {
+        "operation": "flatModifier",
+        "selector": "resistance",
+        "key": "reflexes",
+        "value": 1,
+        "uuid": "standard-light-cover-reflexes"
+      }
+    ]
+  }
+}

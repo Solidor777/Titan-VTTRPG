@@ -1,0 +1,27 @@
+{
+  "_id": "GBpXDupXNOU5ueMG",
+  "_key": "!effects!GBpXDupXNOU5ueMG",
+  "name": "Advantage",
+  "type": "effect",
+  "img": "icons/svg/up.svg",
+  "description": "<p>Circumstances make the task easier for you. <strong>Advantage</strong> decreases the Difficulty of the check by <strong>-1</strong>, to a minimum of 2. Advantage cancels out Disadvantage.</p>",
+  "disabled": false,
+  "transfer": false,
+  "origin": null,
+  "statuses": [],
+  "changes": [],
+  "folder": "LtIZsoyiXhF5vfQl",
+  "sort": 100000,
+  "flags": {},
+  "system": {
+    "duration": {
+      "type": "custom",
+      "remaining": 1,
+      "initiative": 1,
+      "custom": "While circumstances persist"
+    },
+    "check": [],
+    "customTrait": [],
+    "rulesElement": []
+  }
+}

@@ -1,0 +1,27 @@
+{
+  "_id": "eTEztKkVO4cKRGwR",
+  "_key": "!effects!eTEztKkVO4cKRGwR",
+  "name": "Greater Disadvantage",
+  "type": "effect",
+  "img": "icons/svg/downgrade.svg",
+  "description": "<p>You have two or more sources of <strong>Disadvantage</strong>. <strong>Greater Disadvantage</strong> increases the Difficulty of the check by <strong>+2</strong>, to a maximum of 6.</p>",
+  "disabled": false,
+  "transfer": false,
+  "origin": null,
+  "statuses": [],
+  "changes": [],
+  "folder": "LtIZsoyiXhF5vfQl",
+  "sort": 400000,
+  "flags": {},
+  "system": {
+    "duration": {
+      "type": "custom",
+      "remaining": 1,
+      "initiative": 1,
+      "custom": "While circumstances persist"
+    },
+    "check": [],
+    "customTrait": [],
+    "rulesElement": []
+  }
+}

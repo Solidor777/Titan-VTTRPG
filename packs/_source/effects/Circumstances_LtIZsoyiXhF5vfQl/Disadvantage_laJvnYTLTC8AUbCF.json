@@ -1,0 +1,27 @@
+{
+  "_id": "laJvnYTLTC8AUbCF",
+  "_key": "!effects!laJvnYTLTC8AUbCF",
+  "name": "Disadvantage",
+  "type": "effect",
+  "img": "icons/svg/down.svg",
+  "description": "<p>Circumstances make the task harder for you. <strong>Disadvantage</strong> increases the Difficulty of the check by <strong>+1</strong>, to a maximum of 6. Disadvantage cancels out Advantage.</p>",
+  "disabled": false,
+  "transfer": false,
+  "origin": null,
+  "statuses": [],
+  "changes": [],
+  "folder": "LtIZsoyiXhF5vfQl",
+  "sort": 300000,
+  "flags": {},
+  "system": {
+    "duration": {
+      "type": "custom",
+      "remaining": 1,
+      "initiative": 1,
+      "custom": "While circumstances persist"
+    },
+    "check": [],
+    "customTrait": [],
+    "rulesElement": []
+  }
+}

@@ -1,0 +1,27 @@
+{
+  "_id": "eP7lnWO2PIWnxqW1",
+  "_key": "!effects!eP7lnWO2PIWnxqW1",
+  "name": "Greater Advantage",
+  "type": "effect",
+  "img": "icons/svg/upgrade.svg",
+  "description": "<p>You have two or more sources of <strong>Advantage</strong>. <strong>Greater Advantage</strong> decreases the Difficulty of the check by <strong>-2</strong>, to a minimum of 2.</p>",
+  "disabled": false,
+  "transfer": false,
+  "origin": null,
+  "statuses": [],
+  "changes": [],
+  "folder": "LtIZsoyiXhF5vfQl",
+  "sort": 200000,
+  "flags": {},
+  "system": {
+    "duration": {
+      "type": "custom",
+      "remaining": 1,
+      "initiative": 1,
+      "custom": "While circumstances persist"
+    },
+    "check": [],
+    "customTrait": [],
+    "rulesElement": []
+  }
+}

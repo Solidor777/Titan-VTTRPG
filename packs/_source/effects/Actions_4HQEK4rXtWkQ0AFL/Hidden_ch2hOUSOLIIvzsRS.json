@@ -1,0 +1,27 @@
+{
+  "_id": "ch2hOUSOLIIvzsRS",
+  "_key": "!effects!ch2hOUSOLIIvzsRS",
+  "name": "Hidden",
+  "type": "effect",
+  "img": "icons/svg/invisible.svg",
+  "description": "<p>You are using the environment, terrain, and even other combatants to mask your presence. Creatures searching for you make an opposed <strong>Mind (Perception)</strong> check against your <strong>Body (Stealth)</strong>; otherwise you must beat their <strong>Awareness</strong>.</p><p>You give away your position if you make too much noise. When you attack a creature that is aware of you but cannot see you, you have <strong>Advantage</strong>; against a creature completely unaware of you, you have <strong>Greater Advantage</strong>.</p>",
+  "disabled": false,
+  "transfer": false,
+  "origin": null,
+  "statuses": [],
+  "changes": [],
+  "folder": "4HQEK4rXtWkQ0AFL",
+  "sort": 500000,
+  "flags": {},
+  "system": {
+    "duration": {
+      "type": "custom",
+      "remaining": 1,
+      "initiative": 1,
+      "custom": "Until noticed"
+    },
+    "check": [],
+    "customTrait": [],
+    "rulesElement": []
+  }
+}

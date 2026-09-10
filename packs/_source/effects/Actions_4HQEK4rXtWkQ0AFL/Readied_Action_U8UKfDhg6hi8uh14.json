@@ -1,0 +1,27 @@
+{
+  "_id": "U8UKfDhg6hi8uh14",
+  "_key": "!effects!U8UKfDhg6hi8uh14",
+  "name": "Readied Action",
+  "type": "effect",
+  "img": "icons/svg/target.svg",
+  "description": "<p>You have chosen a trigger and an action to take when it occurs, such as making a melee attack when an enemy comes within melee range. When the trigger occurs, you may perform the action or not.</p><p>If the start of your turn comes and the trigger never occurred, you may immediately perform the action or not; your turn then begins as normal.</p>",
+  "disabled": false,
+  "transfer": false,
+  "origin": null,
+  "statuses": [],
+  "changes": [],
+  "folder": "4HQEK4rXtWkQ0AFL",
+  "sort": 700000,
+  "flags": {},
+  "system": {
+    "duration": {
+      "type": "turnStart",
+      "remaining": 1,
+      "initiative": 1,
+      "custom": ""
+    },
+    "check": [],
+    "customTrait": [],
+    "rulesElement": []
+  }
+}

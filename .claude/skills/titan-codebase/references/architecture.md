@@ -50,6 +50,16 @@
   macros (`Macros.js`), trackable attributes (`TrackableAttributes.js`), and enumeration files (roles, resistances,
   resources, speeds, etc.).
 
+## Non-src build inputs
+
+- `packs/_source/<pack>/` — JSON source of each shipped compendium (one document per file, folder directories
+  holding `_Folder.json`). `scripts/build-packs.mjs` (`npm run build:packs`) compiles them into the untracked
+  LevelDB directories `packs/<pack>/`; `scripts/extract-packs.mjs` (`npm run extract:packs`) round-trips edits
+  made inside Foundry back to source. Both need the world returned to setup (Foundry locks open packs).
+- `.github/workflows/ci.yml` runs ESLint, stylelint, the unit suite, the production build, and the pack
+  compile on every push/PR; `release.yml` stamps the release tag into `system.json`, builds, compiles packs, and
+  attaches `system.json` + `titan.zip` (`dist/ lang/ packs/ fonts/ LICENSE-MIT README.md CHANGELOG.md`).
+
 ## Module boundaries
 
 **Entry point:** `src/index.js` is the single ES-module entry. It:

@@ -1,0 +1,37 @@
+{
+  "_id": "1y2kav6vuiJpJ2dX",
+  "_key": "!effects!1y2kav6vuiJpJ2dX",
+  "name": "Dying",
+  "type": "effect",
+  "img": "icons/svg/blood.svg",
+  "description": "<p>Your Wounds have reached their maximum. You gain the <strong>Stunned</strong> condition and cannot recover Stamina while Dying. You suffer a <strong>-1 dice penalty</strong> to all other checks you make.</p><p>At the beginning of your next turn you must make a <strong>Death Check</strong> using your highest Attribute (Difficulty 4, Complexity 1). Each failure raises the Difficulty by 1; if it would rise above 6, you die. Success, an adjacent ally's <strong>Mind (Medicine)</strong> check, spending an Inspiration, or any effect that reduces your Wounds ends this effect.</p>",
+  "disabled": false,
+  "transfer": false,
+  "origin": null,
+  "statuses": [],
+  "changes": [],
+  "folder": "JoRHOWbNyfrj6eng",
+  "sort": 100000,
+  "flags": {},
+  "system": {
+    "duration": {
+      "type": "custom",
+      "remaining": 1,
+      "initiative": 1,
+      "custom": "Until a Death Check succeeds"
+    },
+    "check": [],
+    "customTrait": [],
+    "rulesElement": [
+      {
+        "operation": "conditionalCheckModifier",
+        "modifierType": "dice",
+        "checkType": "any",
+        "selector": "any",
+        "key": "",
+        "value": -1,
+        "uuid": "standard-dying-dice"
+      }
+    ]
+  }
+}

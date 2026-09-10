@@ -19,20 +19,6 @@ Completed items are deleted, not marked done.
   editor, shared-primitive restyle, chat visibility treatment) shipped on `feature/theme-foundation`
   (2026-06-10); the passes apply the language it defines, surface by surface.
 
-## Active Effects conversion — related items
-
-The "Effects → TitanActiveEffect" effort (specced in
-`specs/2026-05-30-titan-active-effects-conversion-design.md`) has shipped; these are its
-surviving deferrals.
-
-### 2. Seeded standard-effects compendium (sub-project B)
-
-- **What:** Ship a seeded *standard effects* compendium for the Effect Tray. Needs a
-  pack-build pipeline (foundryvtt-cli `compilePack` or ClassicLevel) and the effect content
-  (a future rulebook-scrape script). The tray already works against the empty scratch pack
-  and user packs; B just fills a pack with shipped defaults.
-- **Why deferred:** Content + pipeline work, independent of the tray feature that shipped.
-
 ## Chat message subtypes — related items
 
 The "first-class ChatMessage subtypes" effort (Phases 1-4 + follow-ups B/D) has shipped — all 26

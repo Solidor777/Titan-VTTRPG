@@ -1,0 +1,27 @@
+{
+  "_id": "3bNJdEg1VP8hejrw",
+  "_key": "!effects!3bNJdEg1VP8hejrw",
+  "name": "Defending an Ally",
+  "type": "effect",
+  "img": "icons/svg/holy-shield.svg",
+  "description": "<p>Until the start of your next turn, any attacks or spells that target your chosen ally (within melee range) target you instead. You use your <strong>Defense</strong> to resolve attacks, and you make any Checks to resist spell effects.</p><p>Your ally is still affected by spells and effects that target an area. If more than one character is defending the same ally, their players choose which character is the target of any attacks.</p>",
+  "disabled": false,
+  "transfer": false,
+  "origin": null,
+  "statuses": [],
+  "changes": [],
+  "folder": "4HQEK4rXtWkQ0AFL",
+  "sort": 200000,
+  "flags": {},
+  "system": {
+    "duration": {
+      "type": "turnStart",
+      "remaining": 1,
+      "initiative": 1,
+      "custom": ""
+    },
+    "check": [],
+    "customTrait": [],
+    "rulesElement": []
+  }
+}

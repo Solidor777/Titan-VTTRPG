@@ -12,12 +12,14 @@
       "tippy.js": "^6.3.7"
    },
    "devDependencies": {
+      "@foundryvtt/foundryvtt-cli": "^3.0.4",
       "@playwright/test": "^1.60.0",
       "@sveltejs/vite-plugin-svelte": "^7.1.2",
       "@testing-library/jest-dom": "^6.9.1",
       "@testing-library/svelte": "^5.3.1",
       "@types/node": "^22.10.02",
       "autoprefixer": "^10.4.19",
+      "classic-level": "^3.0.0",
       "esbuild": "^0.28.0",
       "eslint": "^9.3.0",
       "eslint-plugin-jsdoc": "^48.2.5",
@@ -40,6 +42,8 @@
    ],
    "scripts": {
       "build": "vite build",
+      "build:packs": "node scripts/build-packs.mjs",
+      "extract:packs": "node scripts/extract-packs.mjs",
       "build:e2e": "vite build --config vite.probe.config.mjs",
       "dev": "vite",
       "test": "vitest run",

@@ -1,0 +1,27 @@
+{
+  "_id": "mO4j41zgqQBY0bxw",
+  "_key": "!effects!mO4j41zgqQBY0bxw",
+  "name": "Defending an Area",
+  "type": "effect",
+  "img": "icons/svg/wall-direction.svg",
+  "description": "<p>You block, guard, or otherwise impede entry, such as blocking a doorway or guarding a perimeter. Any creature attempting to enter your melee range must use an Action to make an opposed <strong>Body (Athletics)</strong> check against you; if you are wielding a shield, you have <strong>Advantage</strong> on this check.</p><p>If the creature fails, it cannot enter your melee range and its movement stops immediately. Allies can use the <strong>Help</strong> action to grant you <strong>+1 bonus die</strong> per ally aiding the defense.</p>",
+  "disabled": false,
+  "transfer": false,
+  "origin": null,
+  "statuses": [],
+  "changes": [],
+  "folder": "4HQEK4rXtWkQ0AFL",
+  "sort": 300000,
+  "flags": {},
+  "system": {
+    "duration": {
+      "type": "turnStart",
+      "remaining": 1,
+      "initiative": 1,
+      "custom": ""
+    },
+    "check": [],
+    "customTrait": [],
+    "rulesElement": []
+  }
+}
