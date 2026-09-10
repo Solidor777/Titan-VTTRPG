@@ -416,3 +416,18 @@ when fixed.
   `--titan-tag-background` and `--titan-tag-font-color` so the theme contract's fill/text pairing
   holds. `report-cards.spec.js`'s apply-confirm case now asserts the confirmed fast-healing tag's
   computed colors equal the resolved `--titan-stamina-*` tokens.
+
+### 35. The release workflow targeted a module layout this system does not have
+
+- **What:** `.github/workflows/main.yml` was the unmodified League-of-Foundry-Developers *module*
+  template: it substituted URLs into a `module.json` this repo does not have and zipped `assets/`,
+  `LICENSE`, and `AUTHORS`, none of which exist, while omitting `system.json`. It had never fired
+  (0 workflow runs). `system.json` also pointed `license` at a nonexistent `LICENSE.txt` and used
+  `releases/download/latest/…` URLs, which require a tag literally named `latest`.
+- **Fix:** replaced by `release.yml` (on `release: published`: stamp the tag into `system.json`,
+  build, zip `system.json dist/ lang/ packs/ fonts/ LICENSE-MIT README.md CHANGELOG.md`, attach the
+  manifest and archive) and a new `ci.yml` (on push and pull request: `npm ci`, ESLint, stylelint,
+  the unit suite, and the production build — the e2e suite needs a live Foundry server and stays
+  local). The manifest now uses GitHub's `releases/latest/download/…` redirect for the manifest,
+  readme, and changelog, a versioned download URL, and `LICENSE-MIT`. The workflow files themselves
+  landed in commit `194c1991`.
