@@ -1,3 +1,5 @@
+import { resolveFolderPath } from '~/spreadsheet/io/FolderPath.js';
+
 /**
  * Resolves which embedded document type a given nesting depth represents for a pack type: depth 0 is
  * the pack's own type; depth 1 is "Item" for an Actor pack (an owned item) or "ActiveEffect" otherwise
@@ -38,21 +40,33 @@ function groupBy(items, keyOf) {
 }
 
 /**
- * Rebuilds a folder's slash-separated path from the pack root, mirroring the export side's escaping so
- * paths compare equal.
- * @param {Folder} folder - The folder to compute the path for.
- * @returns {string} The folder's path.
+ * Splits an escaped folder path into its raw segments, splitting only on unescaped `/` (a `\/` inside a
+ * segment stays literal). Segments are returned still escaped, matching the map keys built from
+ * {@link resolveFolderPath} joins, so callers must unescape a segment themselves before using it as a
+ * folder name.
+ * @param {string} path - The escaped, slash-separated folder path.
+ * @returns {string[]} The path's escaped segments, root to leaf.
  */
-function folderPathOf(folder) {
+function splitFolderPath(path) {
    /** @type {string[]} */
-   const names = [];
-   /** @type {Folder|null} */
-   let current = folder;
-   while (current) {
-      names.unshift(current.name.replace(/\//g, '\\/'));
-      current = current.folder ?? null;
+   const segments = [];
+   /** @type {string} The segment currently being built, still escaped. */
+   let current = '';
+   for (let i = 0; i < path.length; i += 1) {
+      if (path[i] === '\\' && path[i + 1] === '/') {
+         current += '\\/';
+         i += 1;
+      }
+      else if (path[i] === '/') {
+         segments.push(current);
+         current = '';
+      }
+      else {
+         current += path[i];
+      }
    }
-   return names.join('/');
+   segments.push(current);
+   return segments;
 }
 
 /**
@@ -66,25 +80,25 @@ async function resolveFolders(paths, pack) {
    /** @type {Map<string,string>} path -> folder id. */
    const resolved = new Map();
    for (const folder of pack.folders ?? []) {
-      resolved.set(folderPathOf(folder), folder.id);
+      resolved.set(resolveFolderPath(folder), folder.id);
    }
 
    /** @type {string[]} */
    const sortedPaths = [...new Set(paths)]
       .filter(Boolean)
-      .sort((a, b) => a.split('/').length - b.split('/').length);
+      .sort((a, b) => splitFolderPath(a).length - splitFolderPath(b).length);
    for (const path of sortedPaths) {
       if (resolved.has(path)) {
          continue;
       }
-      /** @type {string[]} */
-      const segments = path.split('/');
+      /** @type {string[]} Escaped segments; the map keys above are also escaped-segment joins. */
+      const segments = splitFolderPath(path);
       /** @type {string} */
       const parentPath = segments.slice(0, -1).join('/');
       /** @type {Folder[]} */
       const [created] = await Folder.createDocuments(
          [{
-            name: segments[segments.length - 1],
+            name: segments[segments.length - 1].replace(/\\\//g, '/'),
             type: pack.metadata.type,
             folder: resolved.get(parentPath) ?? null,
          }],
@@ -140,17 +154,27 @@ export async function applyImport(plan, targetPack, newCompendiumLabel) {
             ...(depth === 0 ? { folder: folderIds.get(c.folderPath) ?? null } : {}),
          }));
          /** @type {object[]} */
-         const docs = depth === 0
-            ? await getDocumentClass(embeddedTypeAt(plan.packType, depth)).createDocuments(
+         let docs;
+         if (depth === 0) {
+            docs = await getDocumentClass(embeddedTypeAt(plan.packType, depth)).createDocuments(
                data,
                { pack: pack.collection, keepId: true },
-            )
-            : await resolved.get(parentId).createEmbeddedDocuments(
-               embeddedTypeAt(plan.packType, depth),
-               data,
-               { keepId: true },
             );
-         docs.forEach((doc, i) => resolved.set(group[i].id, doc));
+         }
+         else {
+            /** @type {object|undefined} The parent instance: created or updated earlier this same run, or
+             * fetched fresh when the parent wasn't itself touched by this import (e.g. an already-existing,
+             * unchanged Actor that owns newly created Items). */
+            const parent = resolved.get(parentId) ?? await pack.getDocument(parentId);
+            if (!parent) {
+               throw new Error(
+                  `Cannot create ${embeddedTypeAt(plan.packType, depth)} documents under parent "${parentId}": `
+                  + 'the parent document was not found in this import or in the target pack.',
+               );
+            }
+            docs = await parent.createEmbeddedDocuments(embeddedTypeAt(plan.packType, depth), data, { keepId: true });
+         }
+         docs.forEach((doc) => resolved.set(doc.id, doc));
          createdCount += docs.length;
       }
 
@@ -166,8 +190,8 @@ export async function applyImport(plan, targetPack, newCompendiumLabel) {
             }
          }
          else {
-            /** @type {object} The resolved parent instance: created/updated earlier in this same pass, or
-             * (a parent whose own fields are unchanged, only its embedded child changed) fetched fresh. */
+            /** @type {object} The resolved parent instance: created or updated earlier in this same pass, or
+             * fetched fresh when only its embedded child changed and its own fields did not. */
             const parent = resolved.get(parentId) ?? await pack.getDocument(parentId);
             await parent.updateEmbeddedDocuments(
                embeddedTypeAt(plan.packType, depth),

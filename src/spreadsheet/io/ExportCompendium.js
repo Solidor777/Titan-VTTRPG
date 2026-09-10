@@ -3,27 +3,7 @@ import { encodeXlsx } from '~/spreadsheet/format/Xlsx.js';
 import { encodeCsv } from '~/spreadsheet/format/Csv.js';
 import { zipFiles } from '~/spreadsheet/format/Zip.js';
 import { resolveTypeSchemas } from '~/spreadsheet/io/ResolveTypeSchemas.js';
-
-/**
- * Resolves a document's folder into a slash-separated path of folder names from the pack root,
- * escaping a literal slash inside a folder's own name.
- * @param {Folder|null|undefined} folder - The document's folder, or nullish for the pack root.
- * @returns {string} The folder path, or an empty string for the pack root.
- */
-function resolveFolderPath(folder) {
-   if (!folder) {
-      return '';
-   }
-   /** @type {string[]} Folder names from root to leaf. */
-   const names = [];
-   /** @type {Folder|null} */
-   let current = folder;
-   while (current) {
-      names.unshift(current.name.replace(/\//g, '\\/'));
-      current = current.folder ?? null;
-   }
-   return names.join('/');
-}
+import { resolveFolderPath } from '~/spreadsheet/io/FolderPath.js';
 
 /**
  * Recursively collects one document (and, for an actor, its embedded items and their effects) into

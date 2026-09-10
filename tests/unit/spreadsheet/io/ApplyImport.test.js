@@ -72,6 +72,50 @@ describe('applyImport', () => {
       expect(result.created).toBe(2);
    });
 
+   it('creates a depth-2 effect via the resolved owned-item instance', async () => {
+      /** @type {object[]} */
+      const createdActors = [{ id: 'p'.repeat(16), items: { get: () => undefined } }];
+      /** @type {object[]} */
+      const createdItems = [{ id: 'i'.repeat(16), effects: { get: () => undefined } }];
+      /** @type {object[]} */
+      const createdEffects = [{ id: 'e'.repeat(16) }];
+      /** @type {object} */
+      const ActorClass = { createDocuments: vi.fn(async () => createdActors) };
+      createdActors[0].createEmbeddedDocuments = vi.fn(async () => createdItems);
+      createdItems[0].createEmbeddedDocuments = vi.fn(async () => createdEffects);
+      globalThis.getDocumentClass = (name) => (name === 'Actor' ? ActorClass : undefined);
+      /** @type {object} */
+      const pack = { locked: false, collection: 'world.test', metadata: { type: 'Actor' } };
+      /** @type {object} */
+      const plan = {
+         packType: 'Actor', folders: [],
+         creates: [
+            {
+               documentType: 'npc', id: 'p'.repeat(16), parentId: '', depth: 0,
+               source: { _id: 'p'.repeat(16) }, folderPath: '',
+            },
+            {
+               documentType: 'weapon', id: 'i'.repeat(16), parentId: 'p'.repeat(16), depth: 1,
+               source: { _id: 'i'.repeat(16) }, folderPath: '',
+            },
+            {
+               documentType: 'condition', id: 'e'.repeat(16), parentId: 'i'.repeat(16), depth: 2,
+               source: { _id: 'e'.repeat(16) }, folderPath: '',
+            },
+         ],
+         updates: [], deletes: [],
+      };
+
+      const result = await applyImport(plan, pack);
+
+      expect(createdItems[0].createEmbeddedDocuments).toHaveBeenCalledWith(
+         'ActiveEffect',
+         [{ _id: 'e'.repeat(16) }],
+         { keepId: true },
+      );
+      expect(result.created).toBe(3);
+   });
+
    it('updates a top-level document by fetching it from the pack and calling update', async () => {
       /** @type {object} */
       const existing = { update: vi.fn() };
