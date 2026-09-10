@@ -5,13 +5,16 @@
 }
 
 @mixin fast-healing-tag {
-   --titan-tag-background: linear-gradient(var(--titan-gradient-degree), var(--titan-green), var(--titan-yellow) 100%);
+   --titan-tag-background: var(--titan-stamina-background);
+   --titan-tag-font-color: var(--titan-stamina-font-color);
 }
 
 @mixin persistent-damage-tag {
-   --titan-tag-background: linear-gradient(var(--titan-gradient-degree), var(--titan-maroon), var(--titan-orange) 100%);
+   --titan-tag-background: var(--titan-wounds-background);
+   --titan-tag-font-color: var(--titan-wounds-font-color);
 }
 
 @mixin resolve-regain-tag {
-   --titan-tag-background: linear-gradient(var(--titan-gradient-degree), var(--titan-blue), var(--titan-cyan) 100%);
+   --titan-tag-background: var(--titan-resolve-background);
+   --titan-tag-font-color: var(--titan-resolve-font-color);
 }

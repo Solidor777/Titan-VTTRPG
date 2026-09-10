@@ -494,6 +494,32 @@ test.describe('report chat-message subtype cards', () => {
 
          expect(afterApply.total, 'fastHealing.total survived the partial-merge update').toBe(2);
 
+         // The confirmed card swaps the apply button for the fast-healing tag, which carries the themed
+         // stamina identity pair: its computed colors must equal the resolved `--titan-stamina-*` tokens,
+         // proving the tag mixin references tokens the theme defines.
+         const tag = card.locator('.tag.fast-healing');
+         await expect(tag, 'fast-healing tag replaces the apply button').toBeVisible();
+         const colors = await tag.evaluate((el) => {
+            // Resolves a token through a throwaway child so hex values normalize to the computed rgb() form.
+            const resolve = (token) => {
+               const probe = document.createElement('span');
+               probe.style.color = `var(${token})`;
+               el.appendChild(probe);
+               const value = getComputedStyle(probe).color;
+               probe.remove();
+               return value;
+            };
+            const computed = getComputedStyle(el);
+            return {
+               background: computed.backgroundColor,
+               color: computed.color,
+               stamina: resolve('--titan-stamina-background'),
+               staminaFont: resolve('--titan-stamina-font-color'),
+            };
+         });
+         expect(colors.background, 'tag background is the stamina token').toBe(colors.stamina);
+         expect(colors.color, 'tag text is the stamina font token').toBe(colors.staminaFont);
+
          // Clean up the persisted actor (the card snapshot keeps the message renderable).
          await page.evaluate((id) => game.actors.get(id)?.delete(), setup.actorId);
 

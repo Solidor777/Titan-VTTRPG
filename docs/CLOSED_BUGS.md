@@ -402,3 +402,17 @@ when fixed.
 - **Fix:** the row specs use the `player-hud-effect-row` testid; `theme.spec.js` resolves both
   expected backgrounds from the theme registry via `getSchemeTheme()` and additionally asserts the
   resolved theme ids differ, so a future palette change cannot silently stale it again.
+
+### 34. Chat resource-mod tag gradients referenced an undefined named palette
+
+- **What:** The three resource-mod tag mixins in `src/styles/Mixins/SystemMixins.scss`
+  (`fast-healing-tag`, `persistent-damage-tag`, `resolve-regain-tag`, consumed by
+  `ChatMessageResourceModTag.svelte`) built `--titan-tag-background` from `--titan-green`,
+  `--titan-yellow`, `--titan-maroon`, `--titan-orange`, `--titan-blue`, and `--titan-cyan` — a named
+  brand palette defined nowhere in `src/`, so the declaration was invalid at computed-value time and
+  the tag lost its intended background.
+- **Fix:** each tag now carries the themed identity pair of the resource it modifies — fast healing →
+  `stamina`, persistent damage → `wounds`, resolve regain → `resolve` — setting both
+  `--titan-tag-background` and `--titan-tag-font-color` so the theme contract's fill/text pairing
+  holds. `report-cards.spec.js`'s apply-confirm case now asserts the confirmed fast-healing tag's
+  computed colors equal the resolved `--titan-stamina-*` tokens.
