@@ -59,6 +59,17 @@ export class MockSchemaField extends MockField {
       /** @type {object} The map of sub-field name to MockField. */
       this.fields = fields;
    }
+
+   /**
+    * Stand-in for Foundry SchemaField#extendFields: merges additional sub-fields into this schema
+    * field's map in place, mirroring how a subclass DataModel registers extra sub-fields on an
+    * inherited SchemaField without re-parenting the inherited ones.
+    * @param {object} additionalFields - The map of sub-field name to MockField to merge in.
+    * @returns {void}
+    */
+   extendFields(additionalFields) {
+      Object.assign(this.fields, additionalFields);
+   }
 }
 
 /** Stand-in for TypeDataModel so the data-model classes can be declared and their statics invoked. */
