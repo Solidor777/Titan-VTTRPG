@@ -124,7 +124,7 @@ test.describe('effect tray sidebar tab', () => {
 
    test('the shipped TITAN Effects pack lists the standard effects in their folders', async () => {
       // Clear any persisted expansion so this run observes the default (first-open expands all).
-      await page.evaluate(() => game.settings.set('titan', 'effectTrayExpandedFolders', {}));
+      await page.evaluate(() => game.settings.set('titan', 'effectTrayCollapsedFolders', {}));
 
       await page.evaluate(async () => {
          await ui.titanEffects.render(true);
@@ -155,7 +155,7 @@ test.describe('effect tray sidebar tab', () => {
 
    test('folder collapse state is remembered per pack across re-renders', async () => {
       // Start from the default (all expanded) so the toggle below is a genuine collapse.
-      await page.evaluate(() => game.settings.set('titan', 'effectTrayExpandedFolders', {}));
+      await page.evaluate(() => game.settings.set('titan', 'effectTrayCollapsedFolders', {}));
 
       await page.evaluate(async () => {
          await ui.titanEffects.render(true);
@@ -199,6 +199,82 @@ test.describe('effect tray sidebar tab', () => {
          circumstances.locator('[data-testid="effect-tray-row"]').first(),
          'Circumstances is unaffected and still shows rows',
       ).toBeVisible();
+   });
+
+   test('a folder created after the pack saved a collapse starts expanded', async () => {
+      // The stored entry lists COLLAPSED ids, so a folder the entry has never seen derives as expanded.
+      // Prove it on the world pack: collapse one seeded folder (persisting the entry), then create a second
+      // folder holding an effect and assert its row renders with no toggle while the first stays collapsed.
+      await page.evaluate(async () => {
+         const pack = game.packs.get('world.e2e-tray-effects');
+         for (const effect of await pack.getDocuments()) {
+            if (effect.name === 'E2E Early Folder Effect' || effect.name === 'E2E Late Folder Effect') {
+               await effect.delete();
+            }
+         }
+         for (const name of ['E2E Early Folder', 'E2E Late Folder']) {
+            await pack.folders.find((f) => f.name === name)?.delete();
+         }
+         const early = await Folder.create({ name: 'E2E Early Folder', type: 'ActiveEffect' }, { pack: pack.collection });
+         await ActiveEffect.create(
+            { name: 'E2E Early Folder Effect', type: 'effect', folder: early.id },
+            { pack: pack.collection },
+         );
+
+         await ui.titanEffects.render(true);
+         ui.titanEffects.activate();
+         await titanWait(
+            () => !!ui.titanEffects.element?.querySelector('[data-testid="effect-tray"]'),
+            { message: 'tray panel mounted' },
+         );
+      });
+      await selectTrayPack(page);
+
+      const early = page.locator('section.effect-tray-folder[data-folder-id]', { hasText: 'E2E Early Folder' }).first();
+      await expect(early.locator('[data-testid="effect-tray-row"]'), 'Early folder starts expanded').toHaveCount(1);
+      await early.locator('[data-testid="effect-tray-folder-toggle"]').click();
+      await expect(early.locator('[data-testid="effect-tray-row"]'), 'Early folder collapses').toHaveCount(0);
+
+      // Create the late folder and an effect inside it; the create hooks refresh the tray state.
+      await page.evaluate(async () => {
+         const pack = game.packs.get('world.e2e-tray-effects');
+         const late = await Folder.create({ name: 'E2E Late Folder', type: 'ActiveEffect' }, { pack: pack.collection });
+         await ActiveEffect.create(
+            { name: 'E2E Late Folder Effect', type: 'effect', folder: late.id },
+            { pack: pack.collection },
+         );
+      });
+
+      const late = page.locator('section.effect-tray-folder[data-folder-id]', { hasText: 'E2E Late Folder' }).first();
+      await expect(
+         late.locator('[data-testid="effect-tray-row"]').first(),
+         'Late folder renders expanded without a toggle',
+      ).toBeVisible();
+      await expect(early.locator('[data-testid="effect-tray-row"]'), 'Early folder stays collapsed').toHaveCount(0);
+
+      // The persisted entry for this pack is exactly the collapsed id list.
+      const stored = await page.evaluate(() => {
+         const pack = game.packs.get('world.e2e-tray-effects');
+         return {
+            earlyId: pack.folders.find((f) => f.name === 'E2E Early Folder').id,
+            entry: game.settings.get('titan', 'effectTrayCollapsedFolders')[pack.collection],
+         };
+      });
+      expect(stored.entry, 'the stored entry lists only the collapsed folder').toEqual([stored.earlyId]);
+
+      // Clean up so the shared world pack and the setting are left as later tests expect.
+      await page.evaluate(async () => {
+         const pack = game.packs.get('world.e2e-tray-effects');
+         for (const effect of await pack.getDocuments()) {
+            if (effect.name === 'E2E Early Folder Effect' || effect.name === 'E2E Late Folder Effect') {
+               await effect.delete();
+            }
+         }
+         for (const name of ['E2E Early Folder', 'E2E Late Folder']) {
+            await pack.folders.find((f) => f.name === name)?.delete();
+         }
+         await game.settings.set('titan', 'effectTrayCollapsedFolders', {});
+      });
    });
 
    test('applying the seeded Dodging effect raises the token actor Defense and Reflexes by one', async () => {

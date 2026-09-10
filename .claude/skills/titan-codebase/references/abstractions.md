@@ -592,11 +592,13 @@ and one or more inner Svelte component trees.
   `ActiveEffect`-type packs (system/TITAN first, then alphabetical). `refresh()` loads `pack.getDocuments()` (TITAN/
   system packs filtered to `type==='effect'`; user packs show all), sets `isLocked = !!pack.locked` before the await
   (or resets it to `true` in the no-pack guard), with a post-await stale-selection guard. The last-selected pack
-  persists in the per-user `effectTrayLastPack` client setting. Every `refresh()` also re-initializes
-  `expandedFolders` from the per-user `effectTrayExpandedFolders` client setting (`{ [packCollectionId]:
-  string[] }`): a pack with a stored entry restores it, a pack with none expands (and persists) every folder id.
-  `toggleFolder(folderId)` flips membership in the reactive set and persists the result under the selected pack's
-  collection id via `#persistExpandedFolders()`. The state registers create/update/delete hooks for
+  persists in the per-user `effectTrayLastPack` client setting. Every `refresh()` also derives
+  `expandedFolders` (`#deriveExpandedFolders()`) as the pack's current folder ids minus the ids stored in the
+  per-user `effectTrayCollapsedFolders` client setting (`{ [packCollectionId]: string[] }` of COLLAPSED ids) —
+  absence means expanded, so a pack with no entry and any folder created after the entry was saved render
+  expanded, and deleted folder ids are never consulted. `toggleFolder(folderId)` flips membership in the reactive
+  set and persists the current folders absent from it via `#persistCollapsedFolders()` (which thereby prunes
+  ids of deleted folders). The state registers create/update/delete hooks for
   both `ActiveEffect` and `Folder`, refreshing only when `document.pack === selectedPackId`; `destroy()` (called from
   the tab's `_onClose`) removes them. `isOwner` getter = `pack.getUserLevel(game.user) >= OWNER`. `canEdit` getter =
   `!this.isLocked && this.isOwner` (reads the reactive mirror, so the UI reacts when the lock flips). `toggleLock()`

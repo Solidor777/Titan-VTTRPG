@@ -7,9 +7,11 @@ import getEffectCompendiums from '~/sidebar/tray/GetEffectCompendiums.js';
  * Reactive state for the Effect Tray: the available compendiums, the selected pack, its loaded
  * effect documents, the search filter, and expanded-folder tracking. Lives in Svelte context and is
  * read by every tray component. Refreshes itself when the selected pack's contents change.
- * `expandedFolders` is restored per-pack from the `effectTrayExpandedFolders` client setting on every
- * `refresh()` (first open of a pack expands and persists every folder), and `toggleFolder` persists
- * the new set under the selected pack's collection id.
+ * `expandedFolders` is derived per-pack on every `refresh()`: the pack's current folders minus the ids
+ * persisted as collapsed in the `effectTrayCollapsedFolders` client setting. Absence from the stored
+ * entry means expanded, so a folder created after the entry was saved opens expanded and a deleted
+ * folder's id is never consulted. `toggleFolder` persists the collapsed set under the selected pack's
+ * collection id.
  *
  * Public interface (read by tray components via `getContext('trayState')`):
  * - `$state` fields: `compendiums`, `selectedPackId`, `effects`, `filter`, `expandedFolders`,
@@ -161,43 +163,46 @@ export default class EffectTrayState {
       // Mirror the pack's folder documents for reactive grouping (empty when the pack lacks folders).
       this.folders = pack.folders ? Array.from(pack.folders.values()) : [];
 
-      await this.#initializeExpandedFolders();
+      this.#deriveExpandedFolders();
    }
 
    /**
-    * Restores the expanded-folder set for the selected pack from the persisted per-pack setting. When
-    * the pack has no stored entry (first time it is opened), every folder starts expanded and that
-    * default is persisted so subsequent opens are stable.
-    * @returns {Promise<void>}
+    * Derives the expanded-folder set for the selected pack: every current folder except those whose ids
+    * are persisted as collapsed for this pack. Storing the collapsed ids (not the expanded ones) makes
+    * "expanded" the default for any folder the entry has never seen, so folders created after the entry
+    * was saved open expanded without a reconciliation pass.
+    * @returns {void}
     */
-   async #initializeExpandedFolders() {
-      /** @type {Record<string, string[]>} Persisted expanded-folder ids, keyed by pack collection id. */
-      const stored = game.settings.get('titan', 'effectTrayExpandedFolders');
+   #deriveExpandedFolders() {
+      /** @type {Record<string, string[]>} Persisted collapsed-folder ids, keyed by pack collection id. */
+      const stored = game.settings.get('titan', 'effectTrayCollapsedFolders');
 
-      /** @type {string[] | undefined} The stored entry for the currently-selected pack, if any. */
-      const entry = stored[this.selectedPackId];
+      /** @type {Set<string>} The collapsed folder ids stored for the selected pack (empty when none). */
+      const collapsed = new Set(stored[this.selectedPackId] ?? []);
 
-      if (entry) {
-         this.expandedFolders = new Set(entry);
-         return;
-      }
-
-      this.expandedFolders = new Set(this.folders.map((folder) => folder.id));
-      await this.#persistExpandedFolders();
+      this.expandedFolders = new Set(
+         this.folders.map((folder) => folder.id).filter((id) => !collapsed.has(id)),
+      );
    }
 
    /**
-    * Persists the current expanded-folder set under the selected pack's collection id, leaving every
-    * other pack's stored entry untouched.
+    * Persists the selected pack's collapsed folder ids (its current folders absent from `expandedFolders`)
+    * under the pack's collection id, leaving every other pack's stored entry untouched. Computing the set
+    * from the current folders drops the ids of folders that no longer exist.
     * @returns {Promise<void>}
     */
-   async #persistExpandedFolders() {
-      /** @type {Record<string, string[]>} Persisted expanded-folder ids, keyed by pack collection id. */
-      const stored = game.settings.get('titan', 'effectTrayExpandedFolders');
+   async #persistCollapsedFolders() {
+      /** @type {Record<string, string[]>} Persisted collapsed-folder ids, keyed by pack collection id. */
+      const stored = game.settings.get('titan', 'effectTrayCollapsedFolders');
 
-      await game.settings.set('titan', 'effectTrayExpandedFolders', {
+      /** @type {string[]} The ids of the selected pack's folders that are currently collapsed. */
+      const collapsed = this.folders
+         .map((folder) => folder.id)
+         .filter((id) => !this.expandedFolders.has(id));
+
+      await game.settings.set('titan', 'effectTrayCollapsedFolders', {
          ...stored,
-         [this.selectedPackId]: Array.from(this.expandedFolders),
+         [this.selectedPackId]: collapsed,
       });
    }
 
@@ -386,7 +391,7 @@ export default class EffectTrayState {
 
    /**
     * Toggles the expanded state of a folder by id, mutating the reactive expanded-folders set and
-    * persisting the result under the selected pack's collection id.
+    * persisting the resulting collapsed ids under the selected pack's collection id.
     * @param {string} folderId - The id of the folder to expand or collapse.
     * @returns {Promise<void>}
     */
@@ -401,7 +406,7 @@ export default class EffectTrayState {
       }
 
       this.expandedFolders = next;
-      await this.#persistExpandedFolders();
+      await this.#persistCollapsedFolders();
    }
 
    /**

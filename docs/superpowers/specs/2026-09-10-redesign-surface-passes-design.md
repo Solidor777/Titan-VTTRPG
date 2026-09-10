@@ -88,16 +88,19 @@ background is transparent while the default is the button token; `checks-dialog.
 **Finding.** Folders start collapsed on every session and their expansion is not remembered. With the
 shipped standard-effects pack (3 folders, 17 effects), the first sight of the tray is three closed folders.
 
-**Decision.** Folder expansion persists per pack in a new client setting `effectTrayExpandedFolders`
-(`Object`: pack collection id → array of expanded folder ids). A pack with no stored entry starts with
-every folder expanded; `toggleFolder` writes the setting. Setting registration follows
-`effectTrayLastPack`.
+**Decision.** Folder collapse persists per pack in a new client setting `effectTrayCollapsedFolders`
+(`Object`: pack collection id → array of COLLAPSED folder ids). Expanded is the default for any folder
+absent from its pack's entry, so a pack with no entry and a folder created after the entry was saved both
+render expanded without a reconciliation pass (storing expanded ids instead would make a new folder
+indistinguishable from a collapsed one). `toggleFolder` writes the setting from the pack's current folders,
+which also drops deleted ids. Setting registration follows `effectTrayLastPack`.
 
 **Verification.** `effect-tray.spec.js`: the shipped pack's folders are expanded on first open (rows visible
-without clicking), collapsing one and re-rendering the tray keeps it collapsed.
+without clicking), collapsing one and re-rendering the tray keeps it collapsed, and a folder created after a
+collapse was saved for the pack renders expanded while the stored entry lists only the collapsed id.
 
 ## Documentation (required final step)
 
 - Delete TODO #26 (and the now-empty "UX/UI redesign" section) from `docs/TODO.md`.
 - `titan-codebase` skill: skill row layout, sidebar section labels, `Button` `secondary`, the tray
-  `effectTrayExpandedFolders` setting, the pack-source/screenshot method is NOT recorded (session-only).
+  `effectTrayCollapsedFolders` setting, the pack-source/screenshot method is NOT recorded (session-only).
