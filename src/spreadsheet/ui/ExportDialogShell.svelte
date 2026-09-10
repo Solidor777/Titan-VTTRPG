@@ -22,13 +22,18 @@
    let exporting = $state(false);
 
    /**
-    * Runs the export and re-enables the button once the download has been triggered.
-    * @returns {Promise<void>} Resolves once `exportCompendium` finishes.
+    * Runs the export, re-enabling the button once the download has been triggered or the export fails.
+    * @returns {Promise<void>} Resolves once `exportCompendium` finishes or its rejection is reported.
     */
    async function onExport() {
       exporting = true;
-      await exportCompendium(pack, format, layout);
-      exporting = false;
+      try {
+         await exportCompendium(pack, format, layout);
+      } catch (error) {
+         ui.notifications.error(`TITAN | ${error.message}`);
+      } finally {
+         exporting = false;
+      }
    }
 </script>
 

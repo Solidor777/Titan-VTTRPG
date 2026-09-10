@@ -3835,16 +3835,22 @@ export default class ImportDialog extends TitanDialog {
    /** Applies the current plan, then closes by unmounting (the dialog's own close button remains available). */
    async function onApply() {
       busy = true;
-      /** @type {{created:number, updated:number, deleted:number}} */
-      const result = await applyImport(plan, resolveTargetPack(), newCompendiumLabel);
-      busy = false;
-      ui.notifications.info(
-         localize('importSpreadsheetComplete', {
-            created: result.created,
-            updated: result.updated,
-            deleted: result.deleted,
-         }),
-      );
+      try {
+         /** @type {{created:number, updated:number, deleted:number}} */
+         const result = await applyImport(plan, resolveTargetPack(), newCompendiumLabel);
+         ui.notifications.info(
+            localize('importSpreadsheetComplete', {
+               created: result.created,
+               updated: result.updated,
+               deleted: result.deleted,
+            }),
+         );
+      } catch (error) {
+         ui.notifications.error(`TITAN | ${error.message}`);
+         return;
+      } finally {
+         busy = false;
+      }
       plan = null;
       selectedFiles = [];
    }
