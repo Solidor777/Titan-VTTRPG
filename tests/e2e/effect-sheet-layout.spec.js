@@ -66,3 +66,29 @@ test('effect AE sheet renders with a non-collapsed content body', async () => {
    expect(bodyHeight, 'effect sheet body (tab content) height in px').toBeGreaterThan(200);
    expect(errors, `uncaught errors:\n${errors.join('\n')}`).toEqual([]);
 });
+
+test('effect AE sheet renders the description in the inactive editor view', async () => {
+   // A fresh effect with a description; the toggled editor must show the enriched text before any edit.
+   await page.evaluate(async () => {
+      const actor = game.actors.find((a) => a.type === 'player')
+         ?? await Actor.create({ name: 'Layout Host', type: 'player' });
+      await actor.effects.find((e) => e.name === 'Layout Described Effect')?.delete();
+      const [effect] = await actor.createEmbeddedDocuments('ActiveEffect', [
+         { name: 'Layout Described Effect', type: 'effect', description: '<p>Blessed by the sun.</p>' },
+      ]);
+      const app = await effect.sheet.render(true);
+      await titanWait(
+         () => !!app?.element?.querySelector('prose-mirror .editor-content'),
+         { message: 'description editor mounted' },
+      );
+   });
+
+   const content = page.locator('.titan-effect-sheet prose-mirror .editor-content');
+   await expect(content, 'inactive editor view shows the description').toHaveText('Blessed by the sun.');
+   expect(errors, `uncaught errors:\n${errors.join('\n')}`).toEqual([]);
+
+   await page.evaluate(async () => {
+      const actor = game.actors.find((a) => a.type === 'player');
+      await actor?.effects.find((e) => e.name === 'Layout Described Effect')?.delete();
+   });
+});

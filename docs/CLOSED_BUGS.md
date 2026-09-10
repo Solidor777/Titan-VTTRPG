@@ -452,3 +452,15 @@ when fixed.
 - **Found:** 2026-09-10, from the surface screenshot sweep.
 - **Fix:** the six headers keep only the self-labelled select. `sheet-regressions.spec.js` asserts
   every rarity-bearing item sheet header shows exactly one "Rarity" label.
+
+### 38. The effect sheet's description tab rendered an empty inactive editor
+
+- **What:** `ActiveEffectSheetDescriptionTab` mounted `ProseMirrorEditor` in toggled mode with no
+  `enriched` HTML. Foundry's `<prose-mirror>` constructor sets `#enriched = enriched || innerHTML`,
+  which is `''` (not nullish) when neither is supplied, and `_refresh()` paints
+  `#enriched ?? _value` — so the inactive view was always blank even though the value was set.
+  Item description tabs did not share the defect because `DocumentBoundEditorInput` enriches first.
+- **Found:** 2026-09-10, from the surface screenshot sweep (the seeded description never appeared).
+- **Fix:** the tab now uses `DocumentEditorInput` with `path: 'description'`, which enriches the
+  native field for the inactive view and persists edits through the document. `effect-sheet-layout.spec.js`
+  asserts the inactive editor shows a seeded description.
