@@ -82,8 +82,11 @@ beforeAll(async () => {
 
    // Install the TypeDataModel and data-field stand-ins before importing the data models.
    globalThis.foundry.abstract.TypeDataModel = MockTypeDataModel;
+   // DataField is the common base class the buildSchemaFromShape pass-through rule instanceof-checks a
+   // shape value against; MockField plays that role since every other mock field extends it.
    globalThis.foundry.data = {
       fields: {
+         DataField: MockField,
          StringField: MockStringField,
          NumberField: MockNumberField,
          BooleanField: MockBooleanField,

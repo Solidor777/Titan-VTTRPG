@@ -1,7 +1,6 @@
 import CharacterDataModel from '~/document/types/actor/types/character/CharacterDataModel.js';
-import createSchemaField from '~/helpers/utility-functions/CreateSchemaField.js';
-import createIntegerField from '~/helpers/utility-functions/CreateIntegerField.js';
-import createBooleanField from '~/helpers/utility-functions/CreateBooleanField.js';
+import buildSchemaFromShape from '~/helpers/utility-functions/BuildSchemaFromShape.js';
+import createPlayerSystemTemplate from '~/document/types/actor/types/character/types/player/PlayerSystemTemplate.js';
 import assert from '~/helpers/utility-functions/Assert.js';
 
 /**
@@ -28,14 +27,18 @@ export default class PlayerDataModel extends CharacterDataModel {
       }
    }
 
+   /**
+    * Defines the data schema for Player documents, built from the shared Player system shape template
+    * (which spreads the Character shape template before the Player-specific fields), so the actor
+    * schema and its shape-template-derived siblings stay a single source of truth.
+    * @override
+    * @returns {object} Map of schema field instances keyed by field name, defining the persisted data shape.
+    */
    static _defineDocumentSchema() {
-      const schema = super._defineDocumentSchema();
-      schema.xp = createSchemaField({
-         earned: createIntegerField(),
-      });
-      schema.inspiration = createBooleanField(false);
-
-      return schema;
+      return {
+         ...super._defineDocumentSchema(),
+         ...buildSchemaFromShape(createPlayerSystemTemplate()),
+      };
    }
 
    prepareDerivedData() {

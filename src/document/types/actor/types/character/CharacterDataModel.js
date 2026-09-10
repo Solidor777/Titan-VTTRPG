@@ -27,13 +27,12 @@ import createAttributeCheckOptions from '~/check/types/attribute-check/Attribute
 import createAttributeCheckParameters from '~/check/types/attribute-check/AttributeCheckParameters.js';
 import createCastingCheckOptions from '~/check/types/casting-check/CastingCheckOptions.js';
 import createCastingCheckParameters from '~/check/types/casting-check/CastingCheckParameters.js';
-import createIntegerField from '~/helpers/utility-functions/CreateIntegerField.js';
 import createItemCheckOptions from '~/check/types/item-check/ItemCheckOptions.js';
 import createItemCheckParameters from '~/check/types/item-check/ItemCheckParameters.js';
 import createResistanceCheckOptions from '~/check/types/resistance-check/ResistanceCheckOptions.js';
 import createResistanceCheckParameters from '~/check/types/resistance-check/ResistanceCheckParameters.js';
-import createSchemaField from '~/helpers/utility-functions/CreateSchemaField.js';
-import createStringField from '~/helpers/utility-functions/CreateStringField.js';
+import buildSchemaFromShape from '~/helpers/utility-functions/BuildSchemaFromShape.js';
+import createCharacterSystemTemplate from '~/document/types/actor/types/character/CharacterSystemTemplate.js';
 import getBestPlayerOwner from '~/helpers/utility-functions/GetBestPlayerOwner.js';
 import getOwners from '~/helpers/utility-functions/GetOwners.js';
 import autoDecreaseEffectDuration from '~/helpers/Settings/AutoDecreaseEffectDuration.js';
@@ -49,24 +48,6 @@ import autoRevertResolveRegain from '~/helpers/Settings/AutoRevertResolveRegain.
 import autoSpendResolveChecks from '~/helpers/Settings/AutoSpendResolveChecks.js';
 import autoSpendResolveDoubleExpertise from '~/helpers/Settings/AutoSpendResolveDoubleExpertise.js';
 import autoSpendResolveDoubleTraining from '~/helpers/Settings/AutoSpendResolveDoubleTraining.js';
-import defaultAttributeArcana from '~/helpers/Settings/DefaultAttributeArcana.js';
-import defaultAttributeAthletics from '~/helpers/Settings/DefaultAttributeAthletics.js';
-import defaultAttributeDeception from '~/helpers/Settings/DefaultAttributeDeception.js';
-import defaultAttributeDexterity from '~/helpers/Settings/DefaultAttributeDexterity.js';
-import defaultAttributeDiplomacy from '~/helpers/Settings/DefaultAttributeDiplomacy.js';
-import defaultAttributeEngineering from '~/helpers/Settings/DefaultAttributeEngineering.js';
-import defaultAttributeIntimidation from '~/helpers/Settings/DefaultAttributeIntimidation.js';
-import defaultAttributeInvestigation from '~/helpers/Settings/DefaultAttributeInvestigation.js';
-import defaultAttributeLore from '~/helpers/Settings/DefaultAttributeLore.js';
-import defaultAttributeMedicine from '~/helpers/Settings/DefaultAttributeMedicine.js';
-import defaultAttributeMeleeWeapons from '~/helpers/Settings/DefaultAttributeMeleeWeapons.js';
-import defaultAttributeMetaphysics from '~/helpers/Settings/DefaultAttributeMetaphysics.js';
-import defaultAttributeNature from '~/helpers/Settings/DefaultAttributeNature.js';
-import defaultAttributePerception from '~/helpers/Settings/DefaultAttributePerception.js';
-import defaultAttributePerformance from '~/helpers/Settings/DefaultAttributePerformance.js';
-import defaultAttributeRangedWeapons from '~/helpers/Settings/DefaultAttributeRangedWeapons.js';
-import defaultAttributeSubterfuge from '~/helpers/Settings/DefaultAttributeSubterfuge.js';
-import defaultAttributeStealth from '~/helpers/Settings/DefaultAttributeStealth.js';
 import initiativeFormula from '~/helpers/Settings/InitiativeFormula.js';
 import reportEffects from '~/helpers/Settings/ReportEffects.js';
 import reportHealingDamage from '~/helpers/Settings/ReportHealingDamage.js';
@@ -304,148 +285,18 @@ export default class CharacterDataModel extends TitanActorDataModel {
       return true;
    }
 
+   /**
+    * Defines the data schema for Character documents, built from the shared Character system shape
+    * template, so the actor schema and its shape-template-derived siblings (items, effects, checks,
+    * reports) stay a single source of truth.
+    * @override
+    * @returns {object} Map of schema field instances keyed by field name, defining the persisted data shape.
+    */
    static _defineDocumentSchema() {
-      const schema = super._defineDocumentSchema();
-
-      /**
-       * Creates a schema field formatted as a mod for a Character state (Skills, Attributes, Resistances, etc.).
-       * @returns {SchemaField} A schema field formatted as a mod for a Character state.
-       */
-      function createStatModField() {
-         return createSchemaField({
-            static: createIntegerField(0),
-         });
-      }
-
-      /**
-       * Creates a schema field formatted as a base stat for the Character (Attributes, Speeds, etc.).
-       * @param {number} [initial] - The initial value of the schema field.
-       * @returns {SchemaField} A schema field formatted as a base stat for the Character.
-       */
-      function createBaseStatField(initial) {
-         return createSchemaField({
-            baseValue: createIntegerField(initial),
-            mod: createStatModField(),
-         });
-      }
-
-      /**
-       * Creates a schema field formatted as a derived stat for the Character (Resistances, Ratings, etc.).
-       * @returns {SchemaField} A schema field formatted as a derived stat for the Character.
-       */
-      function createDerivedStatField() {
-         return createSchemaField({
-            mod: createStatModField(),
-         });
-      }
-
-      /**
-       * Creates a schema field formatted as a Character Skill (Athletics, Perception, etc.).
-       * @param {string} defaultAttribute - Default Attribute to be used when rolling the Skill.
-       * @returns {SchemaField} A schema field formatted as a Character Skill.
-       */
-      function createSkillSchema(defaultAttribute) {
-         return createSchemaField({
-            defaultAttribute: createStringField(defaultAttribute),
-            training: createBaseStatField(),
-            expertise: createBaseStatField(),
-         });
-      }
-
-      /**
-       * Creates a schema field formatted as a Character Resource (Stamina, Resolve, or Wounds).
-       * @param {number} initial - The initial value of the field.
-       * @returns {SchemaField} A schema field formatted as a Character Resource.
-       */
-      function createResourceSchema(initial) {
-         return createSchemaField({
-            value: createIntegerField(initial),
-            mod: createStatModField(),
-         });
-      }
-
-      // Add attributes.
-      schema.attribute = createSchemaField({
-         body: createBaseStatField(1),
-         mind: createBaseStatField(1),
-         soul: createBaseStatField(1),
-      });
-
-      // Add resistances.
-      schema.resistance = createSchemaField({
-         reflexes: createDerivedStatField(),
-         resilience: createDerivedStatField(),
-         willpower: createDerivedStatField(),
-      });
-
-      // Add skills.
-      schema.skill = createSchemaField({
-         arcana: createSkillSchema(defaultAttributeArcana()),
-         athletics: createSkillSchema(defaultAttributeAthletics()),
-         deception: createSkillSchema(defaultAttributeDeception()),
-         dexterity: createSkillSchema(defaultAttributeDexterity()),
-         diplomacy: createSkillSchema(defaultAttributeDiplomacy()),
-         engineering: createSkillSchema(defaultAttributeEngineering()),
-         intimidation: createSkillSchema(defaultAttributeIntimidation()),
-         investigation: createSkillSchema(defaultAttributeInvestigation()),
-         lore: createSkillSchema(defaultAttributeLore()),
-         medicine: createSkillSchema(defaultAttributeMedicine()),
-         meleeWeapons: createSkillSchema(defaultAttributeMeleeWeapons()),
-         metaphysics: createSkillSchema(defaultAttributeMetaphysics()),
-         nature: createSkillSchema(defaultAttributeNature()),
-         perception: createSkillSchema(defaultAttributePerception()),
-         performance: createSkillSchema(defaultAttributePerformance()),
-         rangedWeapons: createSkillSchema(defaultAttributeRangedWeapons()),
-         subterfuge: createSkillSchema(defaultAttributeSubterfuge()),
-         stealth: createSkillSchema(defaultAttributeStealth()),
-      });
-
-      // Add ratings.
-      schema.rating = createSchemaField({
-         awareness: createDerivedStatField(),
-         defense: createDerivedStatField(),
-         melee: createDerivedStatField(),
-         accuracy: createDerivedStatField(),
-         initiative: createDerivedStatField(),
-      });
-
-      // Add resources.
-      schema.resource = createSchemaField({
-         stamina: createResourceSchema(Math.ceil(3 * staminaBaseMultiplier())),
-         resolve: createResourceSchema(Math.ceil(1 * resolveBaseMultiplier())),
-         wounds: createResourceSchema(0),
-      });
-
-      // Add speeds.
-      schema.speed = createSchemaField({
-         stride: createBaseStatField(5),
-         fly: createBaseStatField(),
-         climb: createBaseStatField(),
-         swim: createBaseStatField(),
-         burrow: createBaseStatField(),
-      });
-
-      // Add mods.
-      schema.mod = createSchemaField({
-         armor: createDerivedStatField(),
-         damage: createDerivedStatField(),
-         healing: createDerivedStatField(),
-         resolveRegain: createDerivedStatField(),
-         woundRegain: createDerivedStatField(),
-      });
-
-      // Add equipment.
-      schema.equipped = createSchemaField({
-         armor: createStringField(null),
-         shield: createStringField(null),
-      });
-
-      // Add bio.
-      schema.bio = createSchemaField({
-         description: createStringField(),
-      });
-
-      return schema;
+      return {
+         ...super._defineDocumentSchema(),
+         ...buildSchemaFromShape(createCharacterSystemTemplate()),
+      };
    }
 
    prepareDerivedData() {

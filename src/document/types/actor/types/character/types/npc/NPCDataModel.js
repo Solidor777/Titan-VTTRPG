@@ -1,5 +1,6 @@
 import CharacterDataModel from '~/document/types/actor/types/character/CharacterDataModel.js';
-import createStringField from '~/helpers/utility-functions/CreateStringField.js';
+import buildSchemaFromShape from '~/helpers/utility-functions/BuildSchemaFromShape.js';
+import createNPCSystemTemplate from '~/document/types/actor/types/character/types/npc/NPCSystemTemplate.js';
 import minionStaminaMultiplier from '~/helpers/Settings/MinionStaminaMultiplier.js';
 import reportTakingDamage from '~/helpers/Settings/ReportTakingDamage.js';
 import assert from '~/helpers/utility-functions/Assert.js';
@@ -76,24 +77,17 @@ export default class NPCDataModel extends CharacterDataModel {
    }
 
    /**
+    * Defines the data schema for NPC documents, built from the shared NPC system shape template (which
+    * spreads the Character shape template, extends `bio` with `type`, and adds the NPC-specific fields),
+    * so the actor schema and its shape-template-derived siblings stay a single source of truth.
     * @override
-    * @returns {object} The schema for this data model.
-    * @protected
+    * @returns {object} Map of schema field instances keyed by field name, defining the persisted data shape.
     */
    static _defineDocumentSchema() {
-      const schema = super._defineDocumentSchema();
-
-      // Register the NPC `type` subfield on the inherited `bio` SchemaField. Assigning
-      // `schema.bio.type` directly would mutate the SchemaField instance rather than register a
-      // real subfield, leaving `system.bio.type` undefined; `extendFields` initializes and parents
-      // the new field correctly without re-parenting the inherited subfields.
-      schema.bio.extendFields({
-         type: createStringField(),
-      });
-
-      schema.role = createStringField('warrior');
-
-      return schema;
+      return {
+         ...super._defineDocumentSchema(),
+         ...buildSchemaFromShape(createNPCSystemTemplate()),
+      };
    }
 
    /**
