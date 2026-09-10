@@ -123,6 +123,9 @@ test.describe('effect tray sidebar tab', () => {
    });
 
    test('the shipped TITAN Effects pack lists the standard effects in their folders', async () => {
+      // Clear any persisted expansion so this run observes the default (first-open expands all).
+      await page.evaluate(() => game.settings.set('titan', 'effectTrayExpandedFolders', {}));
+
       await page.evaluate(async () => {
          await ui.titanEffects.render(true);
          ui.titanEffects.activate();
@@ -132,7 +135,7 @@ test.describe('effect tray sidebar tab', () => {
          );
       });
 
-      // The system pack is compiled from packs/_source/effects; browse it and expand every folder.
+      // The system pack is compiled from packs/_source/effects; browse it (folders default expanded).
       await selectTitanOption(
          page,
          page.locator('[role="combobox"][data-testid="effect-tray-pack-select"]'),
@@ -142,17 +145,60 @@ test.describe('effect tray sidebar tab', () => {
          const folder = page.locator('[data-testid="effect-tray-folder"]', { hasText: folderName }).first();
          await expect(folder, `${folderName} folder is listed`).toBeVisible();
       }
-      // Folders start collapsed; expand each section that hides its rows, then count every row.
+      // Every folder starts expanded on first open; no toggling is needed to see all rows.
       const rows = page.locator('[data-testid="effect-tray-row"]');
-      for (const section of await page.locator('section.effect-tray-folder[data-folder-id]').all()) {
-         if ((await section.locator('[data-testid="effect-tray-row"]').count()) === 0) {
-            await section.locator('[data-testid="effect-tray-folder-toggle"]').click();
-         }
-      }
       await expect(rows, 'every seeded standard effect row renders').toHaveCount(17);
       for (const name of ['Dodging', 'Charging', 'Light Cover', 'Dying', 'Last Stand']) {
          await expect(rows.filter({ hasText: name }).first(), `${name} is seeded`).toBeVisible();
       }
+   });
+
+   test('folder collapse state is remembered per pack across re-renders', async () => {
+      // Start from the default (all expanded) so the toggle below is a genuine collapse.
+      await page.evaluate(() => game.settings.set('titan', 'effectTrayExpandedFolders', {}));
+
+      await page.evaluate(async () => {
+         await ui.titanEffects.render(true);
+         ui.titanEffects.activate();
+         await titanWait(
+            () => !!ui.titanEffects.element?.querySelector('[data-testid="effect-tray-pack-select"]'),
+            { message: 'tray pack-select rendered' },
+         );
+      });
+      await selectTitanOption(
+         page,
+         page.locator('[role="combobox"][data-testid="effect-tray-pack-select"]'),
+         'titan.effects',
+      );
+
+      const actions = page.locator('section.effect-tray-folder[data-folder-id]', { hasText: 'Actions' }).first();
+      await expect(actions).toBeVisible();
+      await actions.locator('[data-testid="effect-tray-folder-toggle"]').click();
+      await expect(actions.locator('[data-testid="effect-tray-row"]'), 'Actions collapses').toHaveCount(0);
+
+      // Force a fresh mount of the tab (render(true) recreates the Svelte tree) and reselect the pack;
+      // the collapse must persist through the state's own re-initialization, not merely survive DOM reuse.
+      await page.evaluate(async () => {
+         await ui.titanEffects.render(true);
+         ui.titanEffects.activate();
+         await titanWait(
+            () => !!ui.titanEffects.element?.querySelector('[data-testid="effect-tray-pack-select"]'),
+            { message: 'tray pack-select re-rendered' },
+         );
+      });
+      await selectTitanOption(
+         page,
+         page.locator('[role="combobox"][data-testid="effect-tray-pack-select"]'),
+         'titan.effects',
+      );
+
+      const reopenedActions = page.locator('section.effect-tray-folder[data-folder-id]', { hasText: 'Actions' }).first();
+      const circumstances = page.locator('section.effect-tray-folder[data-folder-id]', { hasText: 'Circumstances' }).first();
+      await expect(reopenedActions.locator('[data-testid="effect-tray-row"]'), 'Actions stays collapsed').toHaveCount(0);
+      await expect(
+         circumstances.locator('[data-testid="effect-tray-row"]').first(),
+         'Circumstances is unaffected and still shows rows',
+      ).toBeVisible();
    });
 
    test('applying the seeded Dodging effect raises the token actor Defense and Reflexes by one', async () => {

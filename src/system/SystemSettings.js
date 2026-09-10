@@ -643,4 +643,12 @@ export default function registerSystemSettings() {
       scope: 'client',
       type: String,
    });
+
+   // Expanded folder ids per Effect Tray pack (per-user): { [packCollectionId]: string[] }.
+   game.settings.register('titan', 'effectTrayExpandedFolders', {
+      config: false,
+      default: {},
+      scope: 'client',
+      type: Object,
+   });
 }

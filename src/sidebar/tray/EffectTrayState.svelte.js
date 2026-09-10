@@ -7,6 +7,9 @@ import getEffectCompendiums from '~/sidebar/tray/GetEffectCompendiums.js';
  * Reactive state for the Effect Tray: the available compendiums, the selected pack, its loaded
  * effect documents, the search filter, and expanded-folder tracking. Lives in Svelte context and is
  * read by every tray component. Refreshes itself when the selected pack's contents change.
+ * `expandedFolders` is restored per-pack from the `effectTrayExpandedFolders` client setting on every
+ * `refresh()` (first open of a pack expands and persists every folder), and `toggleFolder` persists
+ * the new set under the selected pack's collection id.
  *
  * Public interface (read by tray components via `getContext('trayState')`):
  * - `$state` fields: `compendiums`, `selectedPackId`, `effects`, `filter`, `expandedFolders`,
@@ -133,6 +136,7 @@ export default class EffectTrayState {
       if (!pack) {
          this.effects = [];
          this.folders = [];
+         this.expandedFolders = new Set();
          this.isLocked = true;
          return;
       }
@@ -156,6 +160,45 @@ export default class EffectTrayState {
 
       // Mirror the pack's folder documents for reactive grouping (empty when the pack lacks folders).
       this.folders = pack.folders ? Array.from(pack.folders.values()) : [];
+
+      await this.#initializeExpandedFolders();
+   }
+
+   /**
+    * Restores the expanded-folder set for the selected pack from the persisted per-pack setting. When
+    * the pack has no stored entry (first time it is opened), every folder starts expanded and that
+    * default is persisted so subsequent opens are stable.
+    * @returns {Promise<void>}
+    */
+   async #initializeExpandedFolders() {
+      /** @type {Record<string, string[]>} Persisted expanded-folder ids, keyed by pack collection id. */
+      const stored = game.settings.get('titan', 'effectTrayExpandedFolders');
+
+      /** @type {string[] | undefined} The stored entry for the currently-selected pack, if any. */
+      const entry = stored[this.selectedPackId];
+
+      if (entry) {
+         this.expandedFolders = new Set(entry);
+         return;
+      }
+
+      this.expandedFolders = new Set(this.folders.map((folder) => folder.id));
+      await this.#persistExpandedFolders();
+   }
+
+   /**
+    * Persists the current expanded-folder set under the selected pack's collection id, leaving every
+    * other pack's stored entry untouched.
+    * @returns {Promise<void>}
+    */
+   async #persistExpandedFolders() {
+      /** @type {Record<string, string[]>} Persisted expanded-folder ids, keyed by pack collection id. */
+      const stored = game.settings.get('titan', 'effectTrayExpandedFolders');
+
+      await game.settings.set('titan', 'effectTrayExpandedFolders', {
+         ...stored,
+         [this.selectedPackId]: Array.from(this.expandedFolders),
+      });
    }
 
    /**
@@ -342,11 +385,12 @@ export default class EffectTrayState {
    }
 
    /**
-    * Toggles the expanded state of a folder by id, mutating the reactive expanded-folders set.
+    * Toggles the expanded state of a folder by id, mutating the reactive expanded-folders set and
+    * persisting the result under the selected pack's collection id.
     * @param {string} folderId - The id of the folder to expand or collapse.
-    * @returns {void}
+    * @returns {Promise<void>}
     */
-   toggleFolder(folderId) {
+   async toggleFolder(folderId) {
       /** @type {Set<string>} A new set so the reactive assignment is observed by Svelte. */
       const next = new Set(this.expandedFolders);
       if (next.has(folderId)) {
@@ -357,6 +401,7 @@ export default class EffectTrayState {
       }
 
       this.expandedFolders = next;
+      await this.#persistExpandedFolders();
    }
 
    /**
