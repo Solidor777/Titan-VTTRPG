@@ -554,7 +554,8 @@ and one or more inner Svelte component trees.
   (`src/document/types/item/components/` — rarity/value/custom traits; serves BOTH weapon and
   equipment, 4 surfaces), `AbilityStats` (+action/reaction/passive/xpCost), `ArmorStats` (armor
   icon-stat value/max + `TraitTag` traits), `ShieldStats` (defense icon-stat + traits), `SpellStats`
-  (tradition/xpCost), `CommodityStats` (quantity-first order), each in its type's `components/` dir,
+  (tradition — `{#if tradition}`-guarded, hidden when the spell has none, mirroring the xpCost guard —
+  /xpCost), `CommodityStats` (quantity-first order), each in its type's `components/` dir,
   and `EffectStats` (`src/document/types/active-effect/components/` — `DurationTag` with testId
   `effect-row-duration`, computed expired tag, custom traits). The old per-surface `*ChatStats.svelte`
   and `CharacterSheet{Armor,Shield}Stats.svelte` copies are deleted. Sheet footers wrap these in
@@ -591,7 +592,11 @@ and one or more inner Svelte component trees.
   `ActiveEffect`-type packs (system/TITAN first, then alphabetical). `refresh()` loads `pack.getDocuments()` (TITAN/
   system packs filtered to `type==='effect'`; user packs show all), sets `isLocked = !!pack.locked` before the await
   (or resets it to `true` in the no-pack guard), with a post-await stale-selection guard. The last-selected pack
-  persists in the per-user `effectTrayLastPack` client setting. The state registers create/update/delete hooks for
+  persists in the per-user `effectTrayLastPack` client setting. Every `refresh()` also re-initializes
+  `expandedFolders` from the per-user `effectTrayExpandedFolders` client setting (`{ [packCollectionId]:
+  string[] }`): a pack with a stored entry restores it, a pack with none expands (and persists) every folder id.
+  `toggleFolder(folderId)` flips membership in the reactive set and persists the result under the selected pack's
+  collection id via `#persistExpandedFolders()`. The state registers create/update/delete hooks for
   both `ActiveEffect` and `Folder`, refreshing only when `document.pack === selectedPackId`; `destroy()` (called from
   the tab's `_onClose`) removes them. `isOwner` getter = `pack.getUserLevel(game.user) >= OWNER`. `canEdit` getter =
   `!this.isLocked && this.isOwner` (reads the reactive mirror, so the UI reacts when the lock flips). `toggleLock()`

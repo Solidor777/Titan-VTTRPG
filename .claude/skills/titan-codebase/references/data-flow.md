@@ -154,7 +154,14 @@ stores the handle. Subsequent ApplicationV2 renders do not re-mount the Svelte t
 **4. Sheet body — e.g. `CharacterSheetBase.svelte`**
 Reads the bridge with `const document = getContext('document')`, gates rendering behind
 `{#if document.data}`, and composes the sidebar and body (`CharacterSheetSidebar`, `CharacterSheetTabs`).
-Sub-components likewise call `getContext` and read `document.data.*`.
+Sub-components likewise call `getContext` and read `document.data.*`. `DocumentSheetSidebar.svelte`
+(`src/document/sheet/`) accepts `sections` entries as either a bare Svelte component or a `{ component,
+label }` descriptor; a `label` renders a `localize()`d, uppercase `.section-label` (the `section-label`
+font mixin, `src/styles/Mixins/FontMixins.scss`) above the component. `CharacterSheetSidebar` labels
+Ratings/Mods/Speeds this way; Portrait and Resources stay bare. Each `CharacterSheetSkill.svelte` row
+(`.../sheet/tabs/skills/`) lays the check button, `DocumentAttributeSelect`, and the training/expertise
+stat groups on a single flex row (no stacked sub-rows); the `TRAINING_ICON`/`EXPERTISE_ICON` labels carry
+their meaning via `use:tooltipAction` only (no visible text label).
 
 **5. ReactiveDocument reactivity**
 `ReactiveDocument.data` registers a `createSubscriber()` reader and returns the live Foundry document. Any
@@ -292,7 +299,11 @@ absolutely-positioned lane beside the column (clamped to the column's bottom, it
 sub-option, sub-button, frame chip, effect row header) is a `HudButton`
 (`src/helpers/svelte-components/button/HudButton.svelte`): one variant-driven primitive that defines every
 box/text property from `--titan-button-*` tokens via `@include button` with per-variant overrides, so Foundry
-core button styling cannot leak in and text uses the paired panel colors. The flyout columns size to
+core button styling cannot leak in and text uses the paired panel colors. Outside the HUD, the shared
+`Button.svelte` (`src/helpers/svelte-components/button/`) takes a `secondary` prop that swaps in the
+`button-secondary` mixin (`ButtonMixins.scss` — transparent `--titan-button-background`, `--titan-app-font-color`
+text, unchanged border) for dismiss actions (every dialog Cancel/close button uses it) so they do not visually
+compete with a dialog's primary action. The flyout columns size to
 `max-content` so labels never clip. The open category keeps its `panel-3` fill plus a themed `accent-color`
 edge-bar on the side facing its flyout (via `HudButton`'s `accentEdge` prop), and the hovered/focused
 sub-option takes a `panel-3` fill with an inset `accent-color` bar (no row is highlighted by default). Main
