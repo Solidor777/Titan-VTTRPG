@@ -68,7 +68,7 @@ test.describe('character sheet expand toggle reactivity', () => {
    async function expectExpandInPlace(page, tabLabel, rowSelector) {
       await page.getByText(tabLabel, { exact: true }).first().click();
 
-      const row = page.locator(rowSelector).first();
+      const row = page.locator('.application.titan-document-sheet').locator(rowSelector).first();
       await expect(row.locator('.expandable-content'), `${tabLabel}: starts collapsed`).toHaveCount(0);
 
       // The expand button is the first button in the row header's label area.

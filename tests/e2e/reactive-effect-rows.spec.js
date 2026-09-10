@@ -74,7 +74,7 @@ test.describe('character sheet effect row reactivity', () => {
 
    test('effect footer duration + expired tags update in place after an in-place effect update', async () => {
       // The effect row.
-      const row = page.locator('[data-effect-id]').first();
+      const row = page.locator('.application.titan-document-sheet [data-effect-id]').first();
 
       // Expand the row in place (the expand button is the first button in the header label area).
       await row.locator('.header .label .button button').first().click();
@@ -131,7 +131,7 @@ test.describe('character sheet effect row reactivity', () => {
    test('duration remaining input reflects an external in-place update and persists edits', async () => {
       // The effect row, and its remaining duration input (a turnStart effect renders only the remaining
       // field, so the first number input is `remaining`).
-      const row = page.locator('[data-effect-id]').first();
+      const row = page.locator('.application.titan-document-sheet [data-effect-id]').first();
       const remainingInput = row.locator('input.titan-number-input').first();
 
       // INITIAL rendered state: remaining is 1.
@@ -179,7 +179,7 @@ test.describe('character sheet effect row reactivity', () => {
       }, ACTOR_NAME);
 
       // With an 'initiative' duration the initiative input renders FIRST (remaining is second).
-      const row = page.locator('[data-effect-id]').first();
+      const row = page.locator('.application.titan-document-sheet [data-effect-id]').first();
       const initiativeInput = row.locator('input.titan-number-input').first();
 
       // INITIAL rendered state: initiative is 3.

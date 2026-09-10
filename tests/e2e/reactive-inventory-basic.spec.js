@@ -88,7 +88,7 @@ async function expectInventoryRowReactive(page, actorName) {
    await page.getByText('Inventory', { exact: true }).first().click();
 
    // The first inventory row.
-   const row = page.locator('[data-item-id]').first();
+   const row = page.locator('.application.titan-document-sheet [data-item-id]').first();
 
    // Expand the row in place (the expand button is the first button in the header label area).
    await row.locator('.header .label .button button').first().click();
@@ -152,7 +152,7 @@ test.describe('character sheet inventory row reactivity', () => {
 
       // Activate the Inventory tab and locate the commodity row's quantity input.
       await page.getByText('Inventory', { exact: true }).first().click();
-      const row = page.locator('[data-item-id]').first();
+      const row = page.locator('.application.titan-document-sheet [data-item-id]').first();
       const quantityInput = row.locator('input.titan-number-input').first();
 
       // INITIAL rendered state: quantity is 2.
@@ -211,7 +211,7 @@ test.describe('character sheet inventory row reactivity', () => {
 
       // Activate the Inventory tab and locate the commodity row's quantity input.
       await page.getByText('Inventory', { exact: true }).first().click();
-      const row = page.locator('[data-item-id]').first();
+      const row = page.locator('.application.titan-document-sheet [data-item-id]').first();
       const quantityInput = row.locator('input.titan-number-input').first();
       await expect(quantityInput, 'initial quantity input value is 4').toHaveValue('4');
 

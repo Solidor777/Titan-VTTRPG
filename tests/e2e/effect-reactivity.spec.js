@@ -69,7 +69,7 @@ test.describe('effect toggle reactivity', () => {
    test('clicking the active toggle flips the rendered checkmark without a tab switch', async () => {
       // The active toggle's checkmark is fa-square-check when active and fa-square when inactive; it is
       // the only square icon in the effect row, so target it directly (the click bubbles to its button).
-      const row = page.locator('[data-effect-id]');
+      const row = page.locator('.application.titan-document-sheet [data-effect-id]');
       await expect(row.locator('i.fa-square-check'), 'starts active (checked)').toHaveCount(1);
 
       // Toggle to inactive — staying on the Effects tab (no re-mount).

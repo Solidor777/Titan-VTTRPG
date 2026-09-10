@@ -129,3 +129,14 @@ it ever bites in play, the principled fix is a per-message serial queue around
   and layout e2e suites had missed because they did not open those dialogs or seed a description. A
   spec that scans a surface must render the STATE that exposes the text (an effect WITH a description,
   every check dialog, a spell WITHOUT a tradition).
+- **Hidden sidebar tabs populate the DOM: page-level row locators must be scoped to the open sheet.** Foundry
+  renders every sidebar tab at ready, so once the shipped `titan.effects` pack is seeded the Effects tray keeps
+  17 invisible `[data-effect-id]` rows in `#sidebar` ahead of any sheet in document order. Five
+  `reactive-*` e2e cases that used `page.locator('[data-effect-id]').first()` silently matched a hidden tray
+  row (Playwright reports "element(s) not found" for the row's inputs, or times out clicking). Every row
+  locator in `tests/e2e` now reads `page.locator('.application.titan-document-sheet [data-item-id|data-effect-id]')`;
+  new specs must scope the same way (`data-item-id` rows would fail identically the day another always-mounted
+  surface renders them).
+- **`.agents/skills/titan-codebase/` is a tracked, stale copy of `.claude/skills/titan-codebase/`** (last touched
+  by commit `5526adee`; every reference file differs). The project rules name `.claude/skills/titan-codebase/`
+  as the maintained skill; the `.agents` copy was left untouched.
