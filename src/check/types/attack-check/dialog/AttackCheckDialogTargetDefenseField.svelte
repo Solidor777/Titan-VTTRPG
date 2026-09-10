@@ -1,7 +1,6 @@
 <script>
    import CheckDialogField from '~/check/dialog/CheckDialogField.svelte';
    import { getContext } from 'svelte';
-   import localize from '~/helpers/utility-functions/Localize.js';
    import IntegerInput from '~/helpers/svelte-components/input/IntegerInput.svelte';
 
    /** @type {object} Reference to the Check Options store. */
@@ -15,7 +14,7 @@
    bind:value={$checkOptions.targetDefense}
    input={IntegerInput}
    {inputProps}
-   label={localize('targetDefense')}
+   label={'targetDefense'}
    testId={'check-field-targetDefense'}
    tooltip={'check.targetDefense.desc'}
 />

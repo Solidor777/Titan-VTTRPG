@@ -2,6 +2,7 @@ import { expect, test } from '@playwright/test';
 import { collectLocalizationOffenders, ensureDocument, login, renderSheet } from './fixtures.js';
 import { selectTitanOption } from './select.js';
 import { closeAllApps, clearChat, attachPageErrors } from './world.js';
+import { buildE2ERollerItemData } from '../shared/builders.js';
 
 // The seven TITAN Item subtypes, all rendered through the shared item sheet.
 const ITEM_TYPES = ['ability', 'armor', 'commodity', 'equipment', 'shield', 'spell', 'weapon'];
@@ -130,6 +131,45 @@ test.describe('no double-localized (LOCAL.) text in rendered UI', () => {
          await game.settings.set('titan', 'getCheckOptions', false);
       });
       expect(dialogOffenders, `LOCAL. text in casting dialog:\n${dialogOffenders.join('\n')}`).toEqual([]);
+   });
+
+   test('every check-options dialog', async () => {
+      // Seed a player with one weapon, spell, and ability so every check type has a roller.
+      await page.evaluate(async (items) => {
+         // Always rebuild the roller so a stale fixture from an aborted run cannot mask a missing check.
+         await game.actors.getName('E2E Dialog Roller')?.delete();
+         const actor = await Actor.create({ name: 'E2E Dialog Roller', type: 'player' });
+         await actor.createEmbeddedDocuments('Item', items);
+         await game.settings.set('titan', 'getCheckOptions', true);
+      }, buildE2ERollerItemData());
+
+      // Each request opens its options dialog (gated by getCheckOptions); scan every dialog once mounted.
+      const requests = {
+         attribute: 'actor.system.requestAttributeCheck({ attribute: "body", skill: "athletics" })',
+         resistance: 'actor.system.requestResistanceCheck({ resistance: "resilience" })',
+         attack: 'actor.system.requestAttackCheck({ itemId: actor.items.find((i) => i.type === "weapon").id, attackIdx: 0 })',
+         casting: 'actor.system.requestCastingCheck({ itemId: actor.items.find((i) => i.type === "spell").id })',
+         item: 'actor.system.requestItemCheck({ itemId: actor.items.find((i) => i.type === "ability").id, checkIdx: 0 })',
+      };
+      const offendersByDialog = {};
+      for (const [type, request] of Object.entries(requests)) {
+         await page.evaluate((src) => {
+            const actor = game.actors.getName('E2E Dialog Roller');
+            new Function('actor', src)(actor);
+         }, request);
+         const dialog = page.locator(`.titan-dialog[id^="titan-${type}-check-dialog-"]`);
+         await expect(dialog).toBeVisible();
+         offendersByDialog[type] = await collectLocalizationOffenders(page, '.titan-dialog');
+         await closeAllApps(page);
+      }
+
+      await page.evaluate(async () => {
+         await game.settings.set('titan', 'getCheckOptions', false);
+         await game.actors.getName('E2E Dialog Roller')?.delete();
+      });
+      for (const [type, offenders] of Object.entries(offendersByDialog)) {
+         expect(offenders, `LOCAL. text in the ${type} check dialog:\n${offenders.join('\n')}`).toEqual([]);
+      }
    });
 
    test('effects sidebar header, rows, and context menu', async () => {

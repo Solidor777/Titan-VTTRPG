@@ -431,3 +431,14 @@ when fixed.
   local). The manifest now uses GitHub's `releases/latest/download/…` redirect for the manifest,
   readme, and changelog, a versioned download URL, and `LICENSE-MIT`. The workflow files themselves
   landed in commit `194c1991`.
+
+### 36. Attack and resistance check dialogs showed raw `LOCAL.*` keys for five field labels
+
+- **What:** `AttackCheckDialogAttackerAccuracyField`, `…AttackerMeleeField`, `…AttackTypeField`,
+  `…TargetDefenseField`, and `ResistanceCheckDialogResistanceField` passed `label={localize('…')}`
+  into `CheckDialogField`, whose `<Text>` localizes the label again, so the dialogs rendered
+  `LOCAL.Attacker Melee.text`, `LOCAL.Target Defense.text`, `LOCAL.Type.text`, and
+  `LOCAL.Resistance.text`. The localization e2e scanned only the casting-check dialog.
+- **Found:** 2026-09-10, from a screenshot sweep of every TITAN surface for the redesign passes.
+- **Fix:** the five fields pass the raw key like every other dialog field. `localization.spec.js`
+  now opens all five check-options dialogs against a rebuilt roller fixture and scans each.
