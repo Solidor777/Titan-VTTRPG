@@ -134,7 +134,10 @@
    {/if}
 
    <label>
-      <CheckboxInput bind:value={deleteMissing} testId="import-delete-missing-checkbox" />
+      <CheckboxInput
+         bind:value={deleteMissing}
+         testId="import-delete-missing-checkbox"
+      />
       <Text text={localize('deletePackDocumentsAbsentFromFile')} />
    </label>
 
