@@ -60,10 +60,17 @@ it ever bites in play, the principled fix is a per-message serial queue around
   `fixtures.js:35` and `player-hud-layout.spec.js:139` (`game.ready`, world boot),
   `multiClient.js:48` (a second browser context finishing login), and `pack-conversion.spec.js`
   129/133/138 (login navigation plus the bulk pack conversion). Do not sweep these to 1s.
-- **`titanWait`'s default timeout is still 5000ms** (`tests/e2e/poll.js`). Calls that pass no
-  explicit `timeout` therefore still permit a 5s ceiling. The slow-operation reporter catches any
-  such call that actually exceeds 1s, so this is a reporting backstop rather than a hard gate.
-  Lowering the default is a one-line change affecting ~88 call sites; not done here.
+- **`titanWait`'s default timeout is 1000ms** (`tests/e2e/poll.js`), so the budget is the default at
+  all 101 call sites that pass no explicit `timeout`. The single override is the exempt 30s world
+  boot in `player-hud-layout.spec.js:139`. Verified across two consecutive full-suite runs: 497/497
+  each, with zero `titanWait timed out after 1000ms` failures — no wait in the suite needs more than
+  a second.
+- **A world that is not launched looks like a code failure.** After the machine slept, Foundry served
+  `/setup` while still answering `/join` with HTTP 200 and a `Critical Failure!` title. Every
+  `beforeAll` then died at `page.selectOption('select[name="userid"]')`, producing a wall of `0ms`
+  failures on the first test of each file with no error pointing at the cause. Check
+  `curl -s localhost:30000/join | grep -oE '<title>[^<]*</title>'` before diagnosing a mass failure:
+  the world name means live, `Critical Failure!` means no world is launched.
 - **Intermittent: a 1378ms click at `effect-chat-card.spec.js:150`.** Observed ONCE in four
   full-suite runs and never in five isolated runs of that spec, so it appears only deep in a
   full-suite session, not from the spec itself. Playwright's click waits for actionability, and the

@@ -11,11 +11,14 @@ export async function installPoll(page) {
       /**
        * Polls `predicate` until it returns truthy or the timeout elapses.
        * @param {() => boolean} predicate - Condition to await; evaluated in the page realm.
+       * The default timeout is the suite's 1-second operation budget, so a wait that exceeds it fails
+       * loudly rather than silently absorbing a longer ceiling. Pass an explicit `timeout` only for an
+       * inherently multi-second wait, such as a world boot.
        * @param {{ timeout?: number, interval?: number, message?: string }} [options] - Wait options.
        * @returns {Promise<void>} Resolves when the predicate is truthy; rejects on timeout.
        */
       globalThis.titanWait = async (predicate, options = {}) => {
-         const { timeout = 5000, interval = 50, message = 'condition' } = options;
+         const { timeout = 1000, interval = 50, message = 'condition' } = options;
          const start = Date.now();
          while (!predicate()) {
             if (Date.now() - start > timeout) {

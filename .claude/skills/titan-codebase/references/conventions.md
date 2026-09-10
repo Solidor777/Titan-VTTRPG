@@ -673,8 +673,9 @@ deliberately exempt because they are inherently multi-second — `game.ready` wo
 (`fixtures.js`, `player-hud-layout.spec.js`), a second browser context finishing login
 (`multiClient.js`), and login navigation plus bulk conversion (`pack-conversion.spec.js`). Do not
 sweep those to 1s. A ceiling is a failure bound, not a duration: a `waitForFunction` returns the
-moment its predicate holds. `titanWait`'s own default is still 5000ms, so calls passing no explicit
-timeout rely on the reporter rather than a hard gate.
+moment its predicate holds. **`titanWait`'s default timeout is also 1000ms** (`tests/e2e/poll.js`), so
+the budget is the default everywhere and the exceptions are the few explicit overrides — pass an
+explicit `timeout` only for an inherently multi-second wait, such as a world boot.
 
 Invalid core or priority values are hard errors, never silent fallbacks to the default.
 
