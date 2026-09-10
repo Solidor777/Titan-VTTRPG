@@ -90,3 +90,18 @@ it ever bites in play, the principled fix is a per-message serial queue around
   `actor.update` → client sync), not a UI operation. It lands well under 1s in isolation (8 runs, no
   slow-op report) but exceeded it once under full-suite load, so the ceiling is relaxed there rather
   than left as a known flake.
+
+## 2026-09-10 — E2E world hygiene
+
+- **`controlFixtureActorToken` leaked a scene per fallback.** It creates a scene when none is active
+  and returns the id for cleanup, but only ONE of its ten callers ever deleted it. The world had
+  accumulated **26 duplicate `E2E Player HUD Scene`** entries plus ~30 orphaned timestamped fixture
+  actors (`E2E ApplyFH 1780636195030` and similar). The helper now reuses and re-activates a
+  same-named fallback, so at most one exists per name; the existing duplicates were purged.
+- **World bloat shows up as slow LOGIN, not slow tests.** At 31 scenes / 71 actors a full run
+  reported `Navigate to "/join"` at 4062ms and `game.ready` at 1865ms. After the purge (5 scenes /
+  41 actors) the same suite reported **`Slow operations (> 1000ms): none`** — the first run with
+  nothing over budget, boot included. If boot times start climbing, check for accumulated fixtures
+  before suspecting the harness.
+- **Killed runs are the main source of cruft.** Stopping a full-suite run mid-flight skips every
+  `afterAll`, so its fixtures survive. Prefer letting a run finish; sweep afterwards if not.
