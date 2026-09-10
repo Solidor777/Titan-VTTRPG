@@ -9,6 +9,7 @@ import {
    deleteFixtureActor,
    deleteOrphanedTokens,
    newestMessageType,
+   showChatLog,
 } from './world.js';
 
 /**
@@ -68,6 +69,9 @@ test.beforeAll(async ({ browser }) => {
    errors = attachPageErrors(page);
    await login(page);
    await clearChat(page);
+
+   // The chat log must be on screen: cards in a collapsed sidebar sit outside the viewport.
+   await showChatLog(page);
 
    // One-time sweep of orphaned fixture tokens left behind by prior runs.
    await deleteOrphanedTokens(page);
@@ -431,7 +435,7 @@ test.describe('cross-surface check-tag parity', () => {
       // FUNCTIONALITY: the self-rendering subtype mounts non-empty card content in the chat log
       // (the card header renders the seeded check label).
       /** @type {import('@playwright/test').Locator} The mounted check card (first visible mount). */
-      const card = page.locator(`.message[data-message-id="${newest.id}"] .check-chat-message`).first();
+      const card = page.locator(`#chat .message[data-message-id="${newest.id}"] .check-chat-message`).first();
       await expect(card, 'itemCheck card mounts').toBeVisible();
       await expect(card, 'itemCheck card renders the check label').toContainText(ITEM_CHECK_LABEL);
 

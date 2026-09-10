@@ -1,6 +1,6 @@
 import { expect, test } from '@playwright/test';
 import { login } from './fixtures.js';
-import { attachPageErrors, clearChat, closeAllApps } from './world.js';
+import { attachPageErrors, clearChat, closeAllApps, showChatLog } from './world.js';
 
 /**
  * Effect check-rolling path: an effect that carries a check[] entry can be rolled through the shared
@@ -24,6 +24,9 @@ test.beforeAll(async ({ browser }) => {
    errors = attachPageErrors(page);
    await login(page);
    await clearChat(page);
+
+   // The chat log must be on screen: cards in a collapsed sidebar sit outside the viewport.
+   await showChatLog(page);
 });
 
 test.afterEach(async () => {
@@ -132,11 +135,11 @@ test.describe('v14 effect check rolling', () => {
 
       // Creating the ChatMessage document does not render it: the log entry mounts asynchronously, so
       // the one-shot DOM read below is gated on the mounted card rather than racing the mount.
-      await expect(page.locator(`.message[data-message-id="${result.newestId}"] .check-chat-message`).first())
+      await expect(page.locator(`#chat .message[data-message-id="${result.newestId}"] .check-chat-message`).first())
          .toBeAttached();
 
       const rendered = await page.evaluate((messageId) => {
-         const li = globalThis.document.querySelector(`.message[data-message-id="${messageId}"]`);
+         const li = globalThis.document.querySelector(`#chat .message[data-message-id="${messageId}"]`);
          return {
             hasElement: !!li,
             hasTitanClass: !!li?.classList.contains('titan'),

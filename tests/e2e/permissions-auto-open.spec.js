@@ -72,10 +72,14 @@ test.describe('permissions — auto-open character sheets', () => {
                { combatId: ids.combatId, combatantId: ids.effectCombatantId },
                { timeout: 1000 },
             );
+            // Documented exception to the 1s budget: this edge spans a multi-hop server round-trip
+            // (turn advance -> un-awaited hook -> resource calc -> actor.update -> client sync), not a
+            // UI operation. It lands well under 1s in isolation but has exceeded it under full-suite
+            // load, so the ceiling is relaxed here rather than left as a known flake.
             await gm.waitForFunction(
                ({ id }) => game.actors.get(id)?.system.resource.stamina.value === 3,
                { id: ids.effectActorId },
-               { timeout: 1000 },
+               { timeout: 5000 },
             );
 
             const rendered = await gm.evaluate(

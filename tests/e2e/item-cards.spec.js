@@ -1,6 +1,6 @@
 import { test, expect } from '@playwright/test';
 import { login } from './fixtures.js';
-import { closeAllApps, clearChat, attachPageErrors } from './world.js';
+import { closeAllApps, clearChat, attachPageErrors, showChatLog } from './world.js';
 
 /**
  * Item chat cards are first-class `ChatMessage` subtypes. `item.sendToChat()` creates a message whose
@@ -21,6 +21,9 @@ test.beforeAll(async ({ browser }) => {
    errors = attachPageErrors(page);
    await login(page);
    await clearChat(page);
+
+   // The chat log must be on screen: cards in a collapsed sidebar sit outside the viewport.
+   await showChatLog(page);
 });
 
 test.afterEach(async () => {
@@ -102,7 +105,7 @@ test.describe('item chat-message subtype cards', () => {
          // The mounted item card must be present and visible in the rendered chat log. Foundry renders
          // each message in more than one log (the sidebar chat-log plus the chat-scroll/popout), so the
          // card is located by its own root class `.item-chat-message` and the first visible mount is used.
-         const card = page.locator(`.message[data-message-id="${result.messageId}"] .item-chat-message`).first();
+         const card = page.locator(`#chat .message[data-message-id="${result.messageId}"] .item-chat-message`).first();
          await expect(card, 'mounted item-chat-message card is visible').toBeVisible();
 
          // The card must have rendered non-empty text (the card is not a blank mount).

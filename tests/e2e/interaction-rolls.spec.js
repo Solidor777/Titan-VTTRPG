@@ -1,6 +1,6 @@
 import { expect, test } from '@playwright/test';
 import { login } from './fixtures.js';
-import { attachPageErrors, clearChat, closeAllApps } from './world.js';
+import { attachPageErrors, clearChat, closeAllApps, showChatLog } from './world.js';
 
 /**
  * Interaction-path walk: check-roll -> chat. For each TITAN check type this suite drives the
@@ -65,6 +65,9 @@ test.beforeAll(async ({ browser }) => {
    errors = attachPageErrors(page);
    await login(page);
    await clearChat(page);
+
+   // The chat log must be on screen: cards in a collapsed sidebar sit outside the viewport.
+   await showChatLog(page);
 });
 
 test.afterEach(async () => {
@@ -181,13 +184,13 @@ test.describe('v14 interaction rolls', () => {
 
          // Creating the ChatMessage document does not render it: the log entry mounts asynchronously,
          // so the one-shot DOM read below is gated on the mounted card rather than racing the mount.
-         await expect(page.locator(`.message[data-message-id="${result.newestId}"] .check-chat-message`).first())
+         await expect(page.locator(`#chat .message[data-message-id="${result.newestId}"] .check-chat-message`).first())
             .toBeAttached();
 
          // Assert: the chat card rendered into the live DOM (titan class + mounted check card).
          const rendered = await page.evaluate(async (messageId) => {
             // Locate the rendered chat-log entry for the new message.
-            const li = globalThis.document.querySelector(`.message[data-message-id="${messageId}"]`);
+            const li = globalThis.document.querySelector(`#chat .message[data-message-id="${messageId}"]`);
             return {
                hasElement: !!li,
                hasTitanClass: !!li?.classList.contains('titan'),

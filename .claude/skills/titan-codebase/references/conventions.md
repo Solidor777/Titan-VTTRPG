@@ -702,10 +702,21 @@ mechanisms, in preference order:
    `expect.poll` re-reading the boxes each attempt — see `expectBoxes` in
    `player-hud-action-menu-layout.spec.js`.
 
-The same rule covers chat: creating a `ChatMessage` document does not render it. Gate a one-shot
-chat-DOM read on the mounted card (`expect(locator('.message[data-message-id="…"] .check-chat-message')
-.first()).toBeAttached()`) — the card mounts in BOTH `#chat` and `#chat-notifications`, so the locator
-needs `.first()` or it trips strict mode.
+**Chat cards render TWICE — always target `#chat`.** Every TITAN card mounts in the persistent `#chat`
+log AND as a transient toast in `#chat-notifications`. They are siblings under `#ui-right` and the
+toast is FIRST in DOM order, so an unscoped `.message[data-message-id=…]` locator with `.first()`
+silently selects the toast — which has no layout box for ~500ms, is stable only to ~4750ms, and
+**removes itself from the DOM at ~5250ms**. Always scope to `` `#chat .message[data-message-id="…"]` ``
+(exactly one match, so `.first()` becomes redundant). The exception is
+`chat-message-mounts.spec.js`, which drives both panes deliberately.
+
+Because the e2e client starts with the sidebar COLLAPSED, `#chat` sits at x=1920 in a 1920-wide
+viewport — off-screen. Text and `toBeVisible()` assertions still pass there (non-empty bounding box),
+but a click fails with "element is outside of the viewport". Any spec that interacts with a card must
+call **`showChatLog(page)`** (`world.js`) in `beforeAll`.
+
+Creating a `ChatMessage` document does not render it, so still gate a one-shot chat-DOM read on the
+mounted card: `expect(page.locator('#chat .message[data-message-id="…"] .check-chat-message')).toBeAttached()`.
 
 This class of race stays latent while rendering is slow enough to mask it: under the SwiftShader software
 rasterizer the Playwright round-trip outlasted the transition, and enabling GPU rendering exposed it.

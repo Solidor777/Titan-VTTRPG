@@ -71,10 +71,22 @@ it ever bites in play, the principled fix is a per-message serial queue around
   failures on the first test of each file with no error pointing at the cause. Check
   `curl -s localhost:30000/join | grep -oE '<title>[^<]*</title>'` before diagnosing a mass failure:
   the world name means live, `Critical Failure!` means no world is launched.
-- **Intermittent: a 1378ms click at `effect-chat-card.spec.js:150`.** Observed ONCE in four
-  full-suite runs and never in five isolated runs of that spec, so it appears only deep in a
-  full-suite session, not from the spec itself. Playwright's click waits for actionability, and the
-  target is a button inside a just-posted chat card, so the time is spent waiting for the card to
-  stop moving as the chat log settles. Not reproducible on demand, so no fix was attempted — the
-  reporter will surface it again if it recurs, and a second sighting is the trigger to diagnose
-  (settle the chat log before clicking, the same pattern the HUD geometry reads now use).
+- **RESOLVED — the 1378ms click at `effect-chat-card.spec.js:150` was a test driving the wrong
+  element.** Every TITAN chat card renders TWICE: once in the persistent `#chat` log and once as a
+  transient toast in `#chat-notifications`. The two are siblings under `#ui-right` and the toast is
+  FIRST in DOM order, so `.first()` on an unscoped `.message[data-message-id=...]` locator selected
+  the toast. Measured toast lifecycle: no layout box at t=0, animating in to ~500ms, stable until
+  ~4750ms, **detached from the DOM at ~5250ms**. A spec that posts a card, runs several assertions,
+  then clicks was racing that ~4.25s window — clicking early paid the stability wait (the 1378ms),
+  clicking late would hit a detached node. Fixed by scoping all 15 such locators to `#chat`.
+- **The e2e client starts with the sidebar COLLAPSED**, which parks `#chat` at x=1920 in a 1920-wide
+  viewport, entirely outside it. That is why the drift went unnoticed for so long: an off-screen card
+  still satisfies text and `toBeVisible()` assertions, because its bounding box is non-empty — only a
+  CLICK fails, with "element is outside of the viewport". `showChatLog()` (`world.js`) expands the
+  sidebar and activates the chat tab; any spec interacting with a card in `#chat` must call it in
+  `beforeAll`. Scoping plus the helper cut that group of specs from 2.7m to 40s.
+- **`permissions-auto-open.spec.js:78` is a documented 5000ms exception to the 1s budget.** That edge
+  spans a multi-hop server round-trip (turn advance → un-awaited hook → resource calc →
+  `actor.update` → client sync), not a UI operation. It lands well under 1s in isolation (8 runs, no
+  slow-op report) but exceeded it once under full-suite load, so the ceiling is relaxed there rather
+  than left as a known flake.

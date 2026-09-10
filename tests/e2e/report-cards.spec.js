@@ -1,6 +1,6 @@
 import { expect, test } from '@playwright/test';
 import { login } from './fixtures.js';
-import { attachPageErrors, clearChat, closeAllApps } from './world.js';
+import { attachPageErrors, clearChat, closeAllApps, showChatLog } from './world.js';
 import { setWorldSetting } from './settings.js';
 import { seedCombatEncounter, teardownCombatEncounter } from '../shared/combat.js';
 
@@ -33,6 +33,9 @@ test.beforeAll(async ({ browser }) => {
    errors = attachPageErrors(page);
    await login(page);
    await clearChat(page);
+
+   // The chat log must be on screen: cards in a collapsed sidebar sit outside the viewport.
+   await showChatLog(page);
 
    // Force the report-gating world settings ON so each direct-method report is actually emitted,
    // regardless of the host world's current configuration. All read live via getSetting, so no reload
@@ -85,7 +88,7 @@ async function expectReportCard(result, expectedType) {
    // The mounted report card must be present and visible. Foundry renders each message in more than one
    // log (sidebar chat-log plus chat-scroll/popout), so the card is located by its root class `.report`
    // and the first visible mount is used.
-   const card = page.locator(`.message[data-message-id="${result.messageId}"] .report`).first();
+   const card = page.locator(`#chat .message[data-message-id="${result.messageId}"] .report`).first();
    await expect(card, `mounted ${expectedType} card is visible`).toBeVisible();
 
    // The card must have rendered non-empty text (it is not a blank mount). This is the key regression
@@ -452,7 +455,7 @@ test.describe('report chat-message subtype cards', () => {
          // The fast-healing apply button is the only <button> on this card (resource/stamina sections
          // render no buttons), so the card's first button is unambiguously the apply button. Its label
          // carries the healing-amount text ("Heal 2 Damage"); assert that before clicking.
-         const card = page.locator(`.message[data-message-id="${setup.messageId}"] .report`).first();
+         const card = page.locator(`#chat .message[data-message-id="${setup.messageId}"] .report`).first();
          await expect(card, 'mounted turnStartReport card is visible').toBeVisible();
          const applyButton = card.locator('button').first();
          await expect(applyButton, 'fast-healing apply button is visible').toBeVisible();

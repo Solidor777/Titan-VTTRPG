@@ -1,6 +1,6 @@
 import { expect, test } from '@playwright/test';
 import { login } from './fixtures.js';
-import { attachPageErrors, clearChat, closeAllApps } from './world.js';
+import { attachPageErrors, clearChat, closeAllApps, showChatLog } from './world.js';
 import { readNewestCheckFlags } from './checkDialog.js';
 import { forceDice, resetDice } from './dice.js';
 import { buildE2ERollerActorData, buildE2ERollerItemData } from '../shared/builders.js';
@@ -70,6 +70,9 @@ test.beforeAll(async ({ browser }) => {
    errors = attachPageErrors(page);
    await login(page);
    await clearChat(page);
+
+   // The chat log must be on screen: cards in a collapsed sidebar sit outside the viewport.
+   await showChatLog(page);
 });
 
 // (Re)build the roller fixture from the shared builders before each test in the file.
@@ -195,7 +198,7 @@ test.describe('v14 checks integration (forced dice)', () => {
       // The mounted attack-check header renders the attack name as its sub-label.
       await expect(
          page
-            .locator(`.message[data-message-id="${result.messageId}"]`)
+            .locator(`#chat .message[data-message-id="${result.messageId}"]`)
             .getByText(result.expectedLabel, { exact: true })
             .first(),
       ).toBeVisible();

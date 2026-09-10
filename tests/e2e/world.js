@@ -284,3 +284,33 @@ export async function waitForAnimations(page, selector) {
       await Promise.all(running.map((animation) => animation.finished.catch(() => undefined)));
    }, selector);
 }
+
+/**
+ * Expands the sidebar and activates the chat tab so the persistent chat log is on screen.
+ *
+ * The e2e client starts with the sidebar COLLAPSED, which parks `#chat` at x=1920 in a 1920-wide
+ * viewport — fully outside it. An off-screen card still satisfies text and visibility assertions
+ * (its bounding box is non-empty), but a click on one fails with "element is outside of the
+ * viewport". Any spec that interacts with a card in `#chat` must call this first.
+ *
+ * Prefer `#chat` over the `#chat-notifications` toast as the assertion target: the toast is a
+ * transient copy of the same message that animates in over ~500ms and removes itself from the DOM
+ * about 5.25s after posting, so tests that drive it race its lifetime.
+ * @param {import('@playwright/test').Page} page - The Playwright page bound to the live world.
+ * @returns {Promise<void>} Resolves once the chat log is within the viewport.
+ */
+export async function showChatLog(page) {
+   await page.evaluate(async () => {
+      ui.sidebar.expand();
+      ui.sidebar.changeTab('chat', 'primary');
+
+      // The expand runs a transition; wait for the log's own edge to land inside the viewport.
+      await titanWait(
+         () => {
+            const box = document.querySelector('#chat')?.getBoundingClientRect();
+            return !!box && box.right <= window.innerWidth;
+         },
+         { message: 'chat log within the viewport' },
+      );
+   });
+}

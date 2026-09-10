@@ -1,6 +1,6 @@
 import { test, expect } from '@playwright/test';
 import { login } from './fixtures.js';
-import { closeAllApps, clearChat, attachPageErrors } from './world.js';
+import { closeAllApps, clearChat, attachPageErrors, showChatLog } from './world.js';
 
 /**
  * Shared-AttackTags proof (embedded-document-stores spec): one component renders a weapon's intrinsic
@@ -36,6 +36,9 @@ test.beforeAll(async ({ browser }) => {
    errors = attachPageErrors(page);
    await login(page);
    await clearChat(page);
+
+   // The chat log must be on screen: cards in a collapsed sidebar sit outside the viewport.
+   await showChatLog(page);
 });
 
 test.afterEach(async () => {
@@ -267,7 +270,7 @@ test.describe('shared AttackTags across surfaces', () => {
       }, { actorName: ACTOR_NAME, weaponName: WEAPON_NAME });
 
       /** @type {import('@playwright/test').Locator} The mounted weapon card (first visible mount). */
-      const card = page.locator(`.message[data-message-id="${messageId}"] .item-chat-message`).first();
+      const card = page.locator(`#chat .message[data-message-id="${messageId}"] .item-chat-message`).first();
       await expect(card).toBeVisible();
 
       // Parity: the card's AttackTags shows the same intrinsic values as the sheets, traits included.

@@ -8,6 +8,7 @@ import {
    controlFixtureActorToken,
    deleteFixtureActor,
    deleteOrphanedTokens,
+   showChatLog,
 } from './world.js';
 
 /**
@@ -31,6 +32,9 @@ test.beforeAll(async ({ browser }) => {
    errors = attachPageErrors(page);
    await login(page);
    await clearChat(page);
+
+   // The chat log must be on screen: cards in a collapsed sidebar sit outside the viewport.
+   await showChatLog(page);
 
    // One-time sweep of orphaned fixture tokens left behind by prior runs.
    await deleteOrphanedTokens(page);
@@ -133,7 +137,7 @@ test.describe('effect chat-message subtype card', () => {
       expect(result.messageType, 'message subtype is effect').toBe('effect');
 
       // The mounted effect card must be present and visible in the rendered chat log.
-      const card = page.locator(`.message[data-message-id="${result.messageId}"] .item-chat-message`).first();
+      const card = page.locator(`#chat .message[data-message-id="${result.messageId}"] .item-chat-message`).first();
       await expect(card, 'mounted effect card is visible').toBeVisible();
 
       // The snapshot name, description, and custom trait must render on the card.
@@ -179,10 +183,10 @@ test.describe('effect chat-message subtype card', () => {
             await game.settings.set('titan', 'themeCoreMessages', settingValue);
             const message = await ChatMessage.create({ content: `Core-theming probe ${settingValue}` });
             await titanWait(
-               () => !!globalThis.document.querySelector(`.message[data-message-id="${message.id}"]`),
+               () => !!globalThis.document.querySelector(`#chat .message[data-message-id="${message.id}"]`),
                { message: 'plain message rendered' },
             );
-            const li = globalThis.document.querySelector(`.message[data-message-id="${message.id}"]`);
+            const li = globalThis.document.querySelector(`#chat .message[data-message-id="${message.id}"]`);
             return {
                coreThemed: !!li?.classList.contains('titan-core-themed'),
                titan: !!li?.classList.contains('titan'),

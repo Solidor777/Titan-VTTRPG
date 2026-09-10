@@ -1,6 +1,6 @@
 import { expect, test } from '@playwright/test';
 import { login } from './fixtures.js';
-import { attachPageErrors, clearChat, closeAllApps } from './world.js';
+import { attachPageErrors, clearChat, closeAllApps, showChatLog } from './world.js';
 
 /**
  * Theme-system walk: live switching, Auto resolution against the core color scheme, custom-theme
@@ -17,6 +17,9 @@ test.beforeAll(async ({ browser }) => {
    errors = attachPageErrors(page);
    await login(page);
    await clearChat(page);
+
+   // The chat log must be on screen: cards in a collapsed sidebar sit outside the viewport.
+   await showChatLog(page);
 });
 
 test.afterEach(async () => {
@@ -164,10 +167,10 @@ test.describe('v14 theme system', () => {
          // The newest message and its rendered chat-log element.
          const message = game.messages.contents[game.messages.size - 1];
          await titanWait(
-            () => !!globalThis.document.querySelector(`.message[data-message-id="${message.id}"]`),
+            () => !!globalThis.document.querySelector(`#chat .message[data-message-id="${message.id}"]`),
             { message: 'blind card rendered' },
          );
-         const li = globalThis.document.querySelector(`.message[data-message-id="${message.id}"]`);
+         const li = globalThis.document.querySelector(`#chat .message[data-message-id="${message.id}"]`);
          const badge = li?.querySelector('.titan-visibility-badge');
          const badgeStyle = badge ? getComputedStyle(badge) : undefined;
 
