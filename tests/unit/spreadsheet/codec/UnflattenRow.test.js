@@ -54,4 +54,15 @@ describe('unflattenRow', () => {
    it('returns an empty object for an all-ABSENT input', () => {
       expect(unflattenRow({ name: ABSENT, 'system.rarity': ABSENT })).toEqual({});
    });
+
+   // Intentional asymmetry vs. the object-branch ABSENT-propagation rule above: the wide layout treats
+   // any column under an array path as explicit write intent for that whole array on this row, so an
+   // array that reduces to zero surviving elements must still emit [] (clear the collection on update)
+   // rather than propagate ABSENT and silently leave an existing document's array untouched.
+   it('keeps a fully-blank array as an explicit [] rather than propagating ABSENT', () => {
+      expect(unflattenRow({
+         'system.attack.0.label': ABSENT,
+         'system.attack.0.damage': ABSENT,
+      })).toEqual({ system: { attack: [] } });
+   });
 });
