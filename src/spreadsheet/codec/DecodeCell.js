@@ -56,8 +56,12 @@ export function decodeCell(rawValue, fieldSchema) {
    }
 
    if (isBlank) {
-      if (fieldSchema.nullable) return null;
-      if (fieldSchema.type === 'string') return '';
+      if (fieldSchema.nullable) {
+         return null;
+      }
+      if (fieldSchema.type === 'string') {
+         return '';
+      }
       return ABSENT;
    }
 
@@ -71,9 +75,15 @@ export function decodeCell(rawValue, fieldSchema) {
          return numeric;
       }
       case 'boolean': {
-         if (typeof rawValue === 'boolean') return rawValue;
-         if (rawValue === 'true') return true;
-         if (rawValue === 'false') return false;
+         if (typeof rawValue === 'boolean') {
+            return rawValue;
+         }
+         if (rawValue === 'true') {
+            return true;
+         }
+         if (rawValue === 'false') {
+            return false;
+         }
          throw new Error(`Expected true or false, got "${rawValue}"`);
       }
       default:
