@@ -67,10 +67,18 @@ export function detectArrayPaths(paths) {
  * with `{index: "0.1", subField: "name"}`; the concrete path "system.attack.0.damage" does NOT match
  * (it belongs to the shallower "system.attack" array path instead — its remainder after consuming
  * "system.attack.<N>" doesn't start with "trait", so segment-comparison fails).
+ *
+ * Reserved sentinel: for a PRIMITIVE array (e.g. `statuses: ["prone"]`), the concrete path
+ * "statuses.0" has nothing left after consuming the array segment and its index — the array element
+ * IS the leaf value, not an object with sub-fields. That case matches with the reserved sub-field name
+ * "_value" (distinct from the "_id"/"_index" columns every child sheet also carries), so `statuses`
+ * matched against "statuses.0" yields `{index: "0", subField: "_value"}`. The import-side expander
+ * must special-case "_value" back into a bare array element rather than an object property.
  * @param {string} arrayPath - The array path being matched, e.g. "system.attack.trait".
  * @param {string[]} allArrayPaths - Every array path detected for the document type.
  * @returns {(path: string) => {index: string, subField: string}|null} A matcher returning the dotted
- *    index and remaining sub-field path for a concrete path belonging to this array, or null.
+ *    index and remaining sub-field path (or "_value" for a primitive array element) for a concrete path
+ *    belonging to this array, or null.
  */
 export function buildArrayPathMatcher(arrayPath, allArrayPaths) {
    /** @type {string[]} */
@@ -87,19 +95,29 @@ export function buildArrayPathMatcher(arrayPath, allArrayPaths) {
       const indices = [];
       let cursor = 0;
       for (let i = 0; i < segments.length; i += 1) {
-         if (pathSegments[cursor] !== segments[i]) return null;
+         if (pathSegments[cursor] !== segments[i]) {
+            return null;
+         }
          cursor += 1;
          if (indexFollows[i]) {
-            if (!/^\d+$/.test(pathSegments[cursor] ?? '')) return null;
+            if (!/^\d+$/.test(pathSegments[cursor] ?? '')) {
+               return null;
+            }
             indices.push(pathSegments[cursor]);
             cursor += 1;
          }
       }
       /** @type {string[]} The remaining segments: the sub-field within this specific array element. */
       const subFieldSegments = pathSegments.slice(cursor);
-      // Empty, or containing a further numeric segment, means this path belongs to a DEEPER nested
-      // array instead (that array's own matcher pulls it into its own child sheet).
-      if (subFieldSegments.length === 0 || subFieldSegments.some((seg) => /^\d+$/.test(seg))) {
+      // An empty remainder means the concrete path IS the array element's own leaf value (a primitive
+      // array, e.g. "statuses.0"): matched with the reserved sentinel sub-field name "_value", distinct
+      // from the "_id"/"_index" reserved columns every child sheet also carries.
+      if (subFieldSegments.length === 0) {
+         return { index: indices.join('.'), subField: '_value' };
+      }
+      // A remainder still containing a numeric segment belongs to a DEEPER nested array instead (that
+      // array's own matcher pulls it into its own child sheet).
+      if (subFieldSegments.some((seg) => /^\d+$/.test(seg))) {
          return null;
       }
       return { index: indices.join('.'), subField: subFieldSegments.join('.') };
@@ -137,7 +155,9 @@ function buildWideSheet(documentType, flatRows, typeSchema) {
    const discovered = new Set();
    for (const row of flatRows) {
       for (const path of Object.keys(row)) {
-         if (!FIXED_COLUMNS.includes(path)) discovered.add(path);
+         if (!FIXED_COLUMNS.includes(path)) {
+            discovered.add(path);
+         }
       }
    }
    /** @type {string[]} */
@@ -183,9 +203,13 @@ function buildChildSheet(documentType, arrayPath, allArrayPaths, flatRows) {
       for (const [path, value] of Object.entries(row)) {
          /** @type {{index:string,subField:string}|null} */
          const match = matcher(path);
-         if (!match) continue;
+         if (!match) {
+            continue;
+         }
          subFields.add(match.subField);
-         if (!elements.has(match.index)) elements.set(match.index, {});
+         if (!elements.has(match.index)) {
+            elements.set(match.index, {});
+         }
          elements.get(match.index)[match.subField] = value;
       }
    }
@@ -210,14 +234,17 @@ function buildChildSheet(documentType, arrayPath, allArrayPaths, flatRows) {
  * @param {string} documentType - The document type (also the document sheet's name).
  * @param {Array<Object<string,*>>} flatRows - One flat row map per document (fixed columns included).
  * @param {{fieldOrder: string[]}} [typeSchema] - The type's resolved schema order info.
- * @returns {{documentSheet: import('~/spreadsheet/codec/Workbook.js').Sheet, childSheets: Array<{sheet:object,arrayPath:string}>}}
+ * @returns {{documentSheet: import('~/spreadsheet/codec/Workbook.js').Sheet, childSheets:
+ *    Array<{sheet:object,arrayPath:string}>}} The document sheet plus its array-derived child sheets.
  */
 function buildRelationalSheets(documentType, flatRows, typeSchema) {
    /** @type {Set<string>} Every non-fixed column discovered across all rows. */
    const discovered = new Set();
    for (const row of flatRows) {
       for (const path of Object.keys(row)) {
-         if (!FIXED_COLUMNS.includes(path)) discovered.add(path);
+         if (!FIXED_COLUMNS.includes(path)) {
+            discovered.add(path);
+         }
       }
    }
 
@@ -235,7 +262,9 @@ function buildRelationalSheets(documentType, flatRows, typeSchema) {
    const documentRows = flatRows.map((row) => {
       /** @type {Object<string,*>} */
       const picked = {};
-      for (const column of [...FIXED_COLUMNS, ...scalarColumns]) picked[column] = row[column];
+      for (const column of [...FIXED_COLUMNS, ...scalarColumns]) {
+         picked[column] = row[column];
+      }
       return picked;
    });
 
@@ -261,7 +290,9 @@ export function buildTables(envelopes, layout, packType, typeSchemas) {
    /** @type {Map<string, DocumentEnvelope[]>} Envelopes grouped by document type, first-seen order. */
    const byType = new Map();
    for (const envelope of envelopes) {
-      if (!byType.has(envelope.documentType)) byType.set(envelope.documentType, []);
+      if (!byType.has(envelope.documentType)) {
+         byType.set(envelope.documentType, []);
+      }
       byType.get(envelope.documentType).push(envelope);
    }
 

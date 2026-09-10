@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { buildTables } from '~/spreadsheet/codec/BuildTables.js';
+import { buildTables, buildArrayPathMatcher, detectArrayPaths } from '~/spreadsheet/codec/BuildTables.js';
 
 /** A minimal typeSchemas stand-in: no schema-typed fields, so column order falls back to first-seen. */
 const NO_SCHEMA = {};
@@ -107,5 +107,53 @@ describe('buildTables — relational layout', () => {
       expect(manifest.rows).toEqual(expect.arrayContaining([
          { key: 'sheet', value: 'weapon.system.attack', documentType: 'weapon', arrayPath: 'system.attack' },
       ]));
+   });
+
+   it('puts a primitive array element value under the reserved "_value" sub-field, not a wide column', () => {
+      const envelopes = [
+         { documentType: 'weapon', source: { _id: 'a'.repeat(16), system: { statuses: ['prone', 'stunned'] } } },
+      ];
+      const workbook = buildTables(envelopes, 'relational', 'Item', NO_SCHEMA);
+      /** @type {object} */
+      const weaponSheet = workbook.sheets.find((s) => s.name === 'weapon');
+      expect(weaponSheet.columns).not.toEqual(expect.arrayContaining(['system.statuses.0']));
+
+      /** @type {object} */
+      const statusesSheet = workbook.sheets.find((s) => s.name === 'weapon.system.statuses');
+      expect(statusesSheet.columns).toEqual(['_id', '_index', '_value']);
+      expect(statusesSheet.rows).toEqual([
+         { _id: 'a'.repeat(16), _index: '0', _value: 'prone' },
+         { _id: 'a'.repeat(16), _index: '1', _value: 'stunned' },
+      ]);
+
+      /** @type {object} */
+      const manifest = workbook.sheets.find((s) => s.name === '_manifest');
+      expect(manifest.rows).toEqual(expect.arrayContaining([
+         { key: 'sheet', value: 'weapon.system.statuses', documentType: 'weapon', arrayPath: 'system.statuses' },
+      ]));
+   });
+});
+
+describe('buildArrayPathMatcher', () => {
+   it('matches a primitive array element path with the reserved "_value" sub-field', () => {
+      const matcher = buildArrayPathMatcher('statuses', ['statuses']);
+      expect(matcher('statuses.0')).toEqual({ index: '0', subField: '_value' });
+   });
+
+   it('only matches paths under its own array when two arrays are siblings, not nested', () => {
+      const allArrayPaths = ['attack', 'trait'];
+      const attackMatcher = buildArrayPathMatcher('attack', allArrayPaths);
+      const traitMatcher = buildArrayPathMatcher('trait', allArrayPaths);
+
+      expect(attackMatcher('attack.0.damage')).toEqual({ index: '0', subField: 'damage' });
+      expect(attackMatcher('trait.0.name')).toBeNull();
+      expect(traitMatcher('trait.0.name')).toEqual({ index: '0', subField: 'name' });
+      expect(traitMatcher('attack.0.damage')).toBeNull();
+   });
+});
+
+describe('detectArrayPaths', () => {
+   it('returns both a shallow and a nested array path, ordered outermost-first', () => {
+      expect(detectArrayPaths(['a.b.0.c.1.d'])).toEqual(['a.b', 'a.b.c']);
    });
 });
