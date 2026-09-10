@@ -2688,7 +2688,9 @@ import { resolveTypeSchemas } from '~/spreadsheet/io/ResolveTypeSchemas.js';
  * @returns {string} The folder path, or an empty string for the pack root.
  */
 function resolveFolderPath(folder) {
-   if (!folder) return '';
+   if (!folder) {
+      return '';
+   }
    /** @type {string[]} Folder names from root to leaf. */
    const names = [];
    /** @type {Folder|null} */
@@ -3027,7 +3029,9 @@ function depthOf(envelope, byId) {
    while (current.parentId) {
       depth += 1;
       current = byId.get(current.parentId);
-      if (!current) break;
+      if (!current) {
+         break;
+      }
    }
    return depth;
 }
@@ -3315,8 +3319,12 @@ Expected: FAIL — module not found.
  * @returns {'Actor'|'Item'|'ActiveEffect'} The document type at that depth.
  */
 function embeddedTypeAt(packType, depth) {
-   if (depth === 0) return packType;
-   if (depth === 1) return packType === 'Actor' ? 'Item' : 'ActiveEffect';
+   if (depth === 0) {
+      return packType;
+   }
+   if (depth === 1) {
+      return packType === 'Actor' ? 'Item' : 'ActiveEffect';
+   }
    return 'ActiveEffect';
 }
 
@@ -3333,7 +3341,9 @@ function groupBy(items, keyOf) {
    for (const item of items) {
       /** @type {string} */
       const key = keyOf(item);
-      if (!groups.has(key)) groups.set(key, []);
+      if (!groups.has(key)) {
+         groups.set(key, []);
+      }
       groups.get(key).push(item);
    }
    return groups;
@@ -3374,7 +3384,9 @@ async function resolveFolders(paths, pack) {
    /** @type {string[]} */
    const sortedPaths = [...new Set(paths)].filter(Boolean).sort((a, b) => a.split('/').length - b.split('/').length);
    for (const path of sortedPaths) {
-      if (resolved.has(path)) continue;
+      if (resolved.has(path)) {
+         continue;
+      }
       /** @type {string[]} */
       const segments = path.split('/');
       /** @type {string} */
@@ -4060,7 +4072,9 @@ export default function onGetCompendiumContextOptions(_application, options) {
       label: localize('exportToSpreadsheet'),
       icon: '<i class="fas fa-file-export"></i>',
       visible: (li) => {
-         if (!game.user.isGM) return false;
+         if (!game.user.isGM) {
+            return false;
+         }
          /** @type {CompendiumCollection|undefined} */
          const pack = getPack(li);
          return Boolean(pack) && SUPPORTED_EXPORT_TYPES.includes(pack.metadata.type);
@@ -4099,10 +4113,14 @@ import ImportDialog from '~/spreadsheet/ui/ImportDialog.js';
  * @param {HTMLElement} element - The rendered sidebar tab's root element.
  */
 export default function onRenderCompendiumDirectory(_application, element) {
-   if (!game.user.isGM) return;
+   if (!game.user.isGM) {
+      return;
+   }
    /** @type {HTMLElement|null} */
    const controls = element.querySelector('.directory-header .header-actions') ?? element.querySelector('.directory-header');
-   if (!controls || controls.querySelector('[data-action="titanImportSpreadsheet"]')) return;
+   if (!controls || controls.querySelector('[data-action="titanImportSpreadsheet"]')) {
+      return;
+   }
 
    /** @type {HTMLButtonElement} */
    const button = document.createElement('button');
