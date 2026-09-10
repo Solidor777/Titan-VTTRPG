@@ -3712,11 +3712,11 @@ describe('ImportDialog', () => {
 
       /** @type {object} */
       const withPack = new ImportDialog(pack);
-      expect(withPack.options.content.props.initialPack).toBe(pack);
+      expect(withPack.content.props.initialPack).toBe(pack);
 
       /** @type {object} */
       const withoutPack = new ImportDialog(null);
-      expect(withoutPack.options.content.props.initialPack).toBeNull();
+      expect(withoutPack.content.props.initialPack).toBeNull();
    });
 });
 ```
@@ -3932,16 +3932,16 @@ export default class ImportDialog extends TitanDialog {
 <style lang="scss">
    .titan-import-dialog {
       @include flex-column;
+      @include padding-standard;
 
-      gap: var(--titan-spacing-md);
-      padding: var(--titan-spacing-md);
+      gap: var(--titan-spacing-standard);
    }
 
    .titan-import-preview ul {
       @include flex-column;
 
-      color: var(--titan-error-color);
-      gap: var(--titan-spacing-xs);
+      color: var(--titan-failed-font-color);
+      gap: var(--titan-spacing-standard);
       max-height: 200px;
       overflow-y: auto;
    }
