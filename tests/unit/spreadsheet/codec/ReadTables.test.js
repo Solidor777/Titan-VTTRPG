@@ -70,4 +70,35 @@ describe('readTables — relational layout', () => {
       const result = readTables(workbook, NO_SCHEMA);
       expect(result.envelopes[0].source.system.statuses).toEqual(['prone']);
    });
+
+   it('decodes a blank cell on a schema-typed array-element field to "" in relational layout, matching wide layout (not ABSENT)', () => {
+      /** A synthetic per-type schema: "label" is a non-nullable string on each "attack" array element. */
+      const typeSchemas = {
+         weapon: {
+            fieldTypes: { 'system.attack.*.label': { type: 'string', nullable: false } },
+            fieldOrder: [],
+         },
+      };
+      // Two documents so the "label" column exists in both layouts' sheets (seen on the first document)
+      // while the second document's own attack element leaves it blank (a genuine blank cell, not a
+      // simply-absent column).
+      const envelopes = [
+         {
+            documentType: 'weapon',
+            source: { _id: 'a'.repeat(16), system: { attack: [{ label: 'Slash', damage: 5 }] } },
+         },
+         {
+            documentType: 'weapon',
+            source: { _id: 'b'.repeat(16), system: { attack: [{ damage: 3 }] } },
+         },
+      ];
+
+      const wideResult = readTables(buildTables(envelopes, 'wide', 'Item', typeSchemas), typeSchemas);
+      const wideBlank = wideResult.envelopes.find((e) => e.source._id === 'b'.repeat(16));
+      expect(wideBlank.source.system.attack[0].label).toBe('');
+
+      const relationalResult = readTables(buildTables(envelopes, 'relational', 'Item', typeSchemas), typeSchemas);
+      const relationalBlank = relationalResult.envelopes.find((e) => e.source._id === 'b'.repeat(16));
+      expect(relationalBlank.source.system.attack[0].label).toBe('');
+   });
 });

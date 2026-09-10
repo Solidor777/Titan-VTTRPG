@@ -1,4 +1,4 @@
-import { decodeRow } from '~/spreadsheet/codec/DecodeCell.js';
+import { decodeRow, decodeCell, lookupFieldSchema } from '~/spreadsheet/codec/DecodeCell.js';
 import { unflattenRow } from '~/spreadsheet/codec/UnflattenRow.js';
 
 /**
@@ -6,8 +6,9 @@ import { unflattenRow } from '~/spreadsheet/codec/UnflattenRow.js';
  * data sheet. Falls back to "every sheet is a wide-layout document sheet named after its own type,
  * packType unknown" when no manifest is present, so a hand-made file still imports.
  * @param {import('~/spreadsheet/codec/Workbook.js').Workbook} workbook - The decoded workbook.
- * @returns {{layout: 'wide'|'relational', packType: string, entries: Array<{sheet:string,documentType:string,arrayPath:string}>}}
- *    The manifest's layout/packType, plus one entry per data sheet.
+ * @returns {{layout: 'wide'|'relational', packType: string, entries:
+ *    Array<{sheet:string,documentType:string,arrayPath:string}>}} The manifest's layout/packType, plus
+ *    one entry per data sheet.
  */
 function readManifest(workbook) {
    /** @type {import('~/spreadsheet/codec/Workbook.js').Sheet|undefined} */
@@ -27,9 +28,15 @@ function readManifest(workbook) {
    /** @type {Array<{sheet:string,documentType:string,arrayPath:string}>} */
    const entries = [];
    for (const row of manifestSheet.rows) {
-      if (row.key === 'layout') layout = row.value;
-      else if (row.key === 'packType') packType = row.value;
-      else if (row.key === 'sheet') entries.push({ sheet: row.value, documentType: row.documentType, arrayPath: row.arrayPath });
+      if (row.key === 'layout') {
+         layout = row.value;
+      }
+      else if (row.key === 'packType') {
+         packType = row.value;
+      }
+      else if (row.key === 'sheet') {
+         entries.push({ sheet: row.value, documentType: row.documentType, arrayPath: row.arrayPath });
+      }
    }
    return { layout, packType, entries };
 }
@@ -75,15 +82,21 @@ function buildArrayPathExpander(arrayPath, allArrayPaths) {
 /**
  * Collects every relational child-sheet cell for a document type into a flat-path-map addition, keyed
  * by owning document id, ready to be merged into that document's own decoded flat row before
- * unflattening. Child-sheet cells always decode with the untyped-bag literal rules (array-of-object
- * fields have no per-field schema type in this system — see resolveFieldSchema's ObjectField handling).
+ * unflattening. Each cell decodes against the SAME schema `readTables` uses for the equivalent
+ * wide-layout column: the expanded concrete path (indices spliced back in) is looked up in `fieldTypes`,
+ * so a schema-typed array element (e.g. an ActiveEffect's `changes` field) decodes identically regardless
+ * of layout. A path with no schema entry still falls back to the untyped-bag literal rules (array-of-
+ * object fields have no per-field schema type in this system — see resolveFieldSchema's ObjectField
+ * handling).
  * @param {string} documentType - The owning document type.
  * @param {string[]} arrayPaths - Every array path for this document type, from the manifest.
  * @param {Array<{sheet:string,documentType:string,arrayPath:string}>} manifestEntries - Every manifest entry.
  * @param {Map<string, import('~/spreadsheet/codec/Workbook.js').Sheet>} sheetsByName - Sheets by name.
+ * @param {Object<string, {type:string,nullable:boolean}>} fieldTypes - The document type's resolved
+ *    schema-typed field map, used to decode each cell against its real field schema by expanded path.
  * @returns {Map<string, Object<string,*>>} Document id -> additional flat entries from child sheets.
  */
-function collectChildFlatEntries(documentType, arrayPaths, manifestEntries, sheetsByName) {
+function collectChildFlatEntries(documentType, arrayPaths, manifestEntries, sheetsByName, fieldTypes) {
    /** @type {Map<string, Object<string,*>>} */
    const result = new Map();
    for (const arrayPath of arrayPaths) {
@@ -91,7 +104,9 @@ function collectChildFlatEntries(documentType, arrayPaths, manifestEntries, shee
       const entry = manifestEntries.find((e) => e.documentType === documentType && e.arrayPath === arrayPath);
       /** @type {import('~/spreadsheet/codec/Workbook.js').Sheet|undefined} */
       const sheet = entry && sheetsByName.get(entry.sheet);
-      if (!sheet) continue;
+      if (!sheet) {
+         continue;
+      }
 
       /** @type {(index:string, subField:string) => string} */
       const expand = buildArrayPathExpander(arrayPath, arrayPaths);
@@ -102,8 +117,12 @@ function collectChildFlatEntries(documentType, arrayPaths, manifestEntries, shee
          const flat = result.get(id) ?? {};
          result.set(id, flat);
          for (const column of sheet.columns) {
-            if (column === '_id' || column === '_index') continue;
-            flat[expand(row._index, column)] = decodeRow({ [column]: row[column] }, [column], {})[column];
+            if (column === '_id' || column === '_index') {
+               continue;
+            }
+            /** @type {string} The concrete path AFTER indices are spliced back in; the schema lookup key. */
+            const expandedPath = expand(row._index, column);
+            flat[expandedPath] = decodeCell(row[column], lookupFieldSchema(fieldTypes, expandedPath));
          }
       }
    }
@@ -116,8 +135,9 @@ function collectChildFlatEntries(documentType, arrayPaths, manifestEntries, shee
  * @param {import('~/spreadsheet/codec/Workbook.js').Workbook} workbook - The decoded workbook.
  * @param {Object<string, {fieldTypes: object, fieldOrder: string[]}>} typeSchemas - Per document-type
  *    schema info from resolveTypeSchemas, used for schema-driven decode of document-sheet columns.
- * @returns {{layout:'wide'|'relational', packType:string, envelopes: Array<import('~/spreadsheet/codec/BuildTables.js').DocumentEnvelope & {sheetName:string, rowNumber:number}>}}
- *    The workbook's layout and pack type, plus one document envelope per data row.
+ * @returns {{layout:'wide'|'relational', packType:string, envelopes:
+ *    Array<import('~/spreadsheet/codec/BuildTables.js').DocumentEnvelope & {sheetName:string,
+ *    rowNumber:number}>}} The workbook's layout and pack type, plus one document envelope per data row.
  */
 export function readTables(workbook, typeSchemas) {
    /** @type {{layout:string,packType:string,entries:Array<{sheet:string,documentType:string,arrayPath:string}>}} */
@@ -126,7 +146,9 @@ export function readTables(workbook, typeSchemas) {
    /** @type {Map<string, string[]>} Array paths per document type, from non-blank manifest entries. */
    const arrayPathsByType = new Map();
    for (const entry of manifest.entries) {
-      if (!entry.arrayPath) continue;
+      if (!entry.arrayPath) {
+         continue;
+      }
       /** @type {string[]} */
       const list = arrayPathsByType.get(entry.documentType) ?? [];
       list.push(entry.arrayPath);
@@ -136,23 +158,35 @@ export function readTables(workbook, typeSchemas) {
    /** @type {Map<string, import('~/spreadsheet/codec/Workbook.js').Sheet>} */
    const sheetsByName = new Map(workbook.sheets.map((s) => [s.name, s]));
 
-   /** @type {Array<import('~/spreadsheet/codec/BuildTables.js').DocumentEnvelope & {sheetName:string,rowNumber:number}>} */
+   /** @type {Array<import('~/spreadsheet/codec/BuildTables.js').DocumentEnvelope &
+    *    {sheetName:string,rowNumber:number}>} */
    const envelopes = [];
    for (const entry of manifest.entries.filter((e) => !e.arrayPath)) {
       /** @type {import('~/spreadsheet/codec/Workbook.js').Sheet|undefined} */
       const sheet = sheetsByName.get(entry.sheet);
-      if (!sheet) continue;
+      if (!sheet) {
+         continue;
+      }
 
       /** @type {string[]} */
       const arrayPaths = arrayPathsByType.get(entry.documentType) ?? [];
-      /** @type {Map<string, Object<string,*>>} */
-      const childFlatById = collectChildFlatEntries(entry.documentType, arrayPaths, manifest.entries, sheetsByName);
       /** @type {{fieldTypes:object}} */
       const typeSchema = typeSchemas[entry.documentType] ?? { fieldTypes: {} };
+      /** @type {Map<string, Object<string,*>>} */
+      const childFlatById = collectChildFlatEntries(
+         entry.documentType,
+         arrayPaths,
+         manifest.entries,
+         sheetsByName,
+         typeSchema.fieldTypes,
+      );
 
       sheet.rows.forEach((row, rowIndex) => {
          /** @type {Object<string,*>} */
-         const flat = { ...decodeRow(row, sheet.columns, typeSchema.fieldTypes), ...(childFlatById.get(row._id) ?? {}) };
+         const flat = {
+            ...decodeRow(row, sheet.columns, typeSchema.fieldTypes),
+            ...(childFlatById.get(row._id) ?? {}),
+         };
          /** @type {object} */
          const source = unflattenRow(flat);
          /** @type {string} */
