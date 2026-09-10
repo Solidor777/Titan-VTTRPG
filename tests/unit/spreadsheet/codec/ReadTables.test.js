@@ -10,7 +10,10 @@ describe('readTables — wide layout', () => {
       const envelopes = [
          {
             documentType: 'weapon',
-            source: { _id: 'a'.repeat(16), name: 'Sword', type: 'weapon', img: 'i.svg', sort: 1, system: { rarity: 'common', attack: [{ label: 'Slash', damage: 5 }] } },
+            source: {
+               _id: 'a'.repeat(16), name: 'Sword', type: 'weapon', img: 'i.svg', sort: 1,
+               system: { rarity: 'common', attack: [{ label: 'Slash', damage: 5 }] },
+            },
             parentId: '',
             folderPath: 'Loot',
          },
@@ -38,7 +41,10 @@ describe('readTables — wide layout', () => {
          ],
       };
       const result = readTables(handMade, NO_SCHEMA);
-      expect(result.envelopes[0]).toMatchObject({ documentType: 'weapon', source: { _id: 'a'.repeat(16), name: 'Axe' } });
+      expect(result.envelopes[0]).toMatchObject({
+         documentType: 'weapon',
+         source: { _id: 'a'.repeat(16), name: 'Axe' },
+      });
    });
 });
 
@@ -47,7 +53,12 @@ describe('readTables — relational layout', () => {
       const envelopes = [
          {
             documentType: 'weapon',
-            source: { _id: 'a'.repeat(16), system: { attack: [{ label: 'Slash', trait: [{ name: 'Reach' }, { name: 'Heavy' }] }, { label: 'Stab' }] } },
+            source: {
+               _id: 'a'.repeat(16),
+               system: {
+                  attack: [{ label: 'Slash', trait: [{ name: 'Reach' }, { name: 'Heavy' }] }, { label: 'Stab' }],
+               },
+            },
          },
       ];
       const workbook = buildTables(envelopes, 'relational', 'Item', NO_SCHEMA);
@@ -71,7 +82,7 @@ describe('readTables — relational layout', () => {
       expect(result.envelopes[0].source.system.statuses).toEqual(['prone']);
    });
 
-   it('decodes a blank cell on a schema-typed array-element field to "" in relational layout, matching wide layout (not ABSENT)', () => {
+   it('decodes a blank schema-typed array-element cell to "" in relational layout, matching wide (not ABSENT)', () => {
       /** A synthetic per-type schema: "label" is a non-nullable string on each "attack" array element. */
       const typeSchemas = {
          weapon: {
