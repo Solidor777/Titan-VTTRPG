@@ -599,9 +599,16 @@ Essentially every base primitive in `src/helpers/svelte-components/**` now carri
 the lone exception is `Text` (no root element). See the component-probe harness entry below for the full
 coverage map, the wrapper-forwarding rules, and the selector each component resolves to.
 
-**Playwright E2E** — `npm run test:e2e` runs `playwright test` against a running Foundry world
-(`playwright.config.mjs`, `baseURL: http://localhost:30000`; env `FOUNDRY_USER` / optional
-`FOUNDRY_PASSWORD`). Specs live in `tests/e2e/`: `render-smoke.spec.js` (renders every document type's
+**Playwright E2E** — `npm run test:e2e` runs `playwright test` against a Foundry world on
+`http://localhost:30000` (`playwright.config.mjs`; env `FOUNDRY_USER` / optional `FOUNDRY_PASSWORD`). The
+config's `webServer` reuses a server already on the port and otherwise runs `scripts/e2e-foundry-server.mjs`,
+a supervisor (`scripts/lib/superviseServer.mjs`) that spawns `node main.js --dataPath=… --world=test-titan`
+from the sibling `foundry/` install (paths derived from the repo location; `FOUNDRY_APP_DIR` /
+`FOUNDRY_DATA_PATH` / `FOUNDRY_PORT` / `FOUNDRY_WORLD` override) and kills the whole tree when Playwright ends
+the run or when the Playwright runner process itself disappears (it watches the nearest non-shell ancestor
+pid, polling liveness once a second), so a hard-killed run never leaves a Foundry holding the port and the
+pack LevelDB locks. `tests/unit/SuperviseServer.test.js` covers spawn/reuse/teardown. Specs live in
+`tests/e2e/`: `render-smoke.spec.js` (renders every document type's
 sheet, asserts zero uncaught page errors), `interaction-rolls.spec.js` (each `roll<Type>Check` posts a
 chat message of the expected subtype (`message.type`) and the card renders), and `interaction-dialogs.spec.js`
 (check/confirm/trait/edit-UUID dialogs mount). `tests/e2e/fixtures.js` provides `login`, `renderSheet`,

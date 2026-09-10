@@ -140,3 +140,16 @@ it ever bites in play, the principled fix is a per-message serial queue around
 - **`.agents/skills/titan-codebase/` is a tracked, stale copy of `.claude/skills/titan-codebase/`** (last touched
   by commit `5526adee`; every reference file differs). The project rules name `.claude/skills/titan-codebase/`
   as the maintained skill; the `.agents` copy was left untouched.
+
+## 2026-09-10 — Orphaned Playwright-launched Foundry
+
+- **A `playwright test` run from 2026-09-09 hung with its runner alive and left the Foundry it had launched
+  running for a day.** Playwright's `webServer` only tears its server down when the runner exits, so a hung
+  or hard-killed runner orphans the server: it kept port 30000, blocked the user's own Foundry launch, and
+  held the pack LevelDB locks that stopped `build:packs` during the backlog campaign. `webServer.command` is
+  now `scripts/e2e-foundry-server.mjs`, which supervises the launched server and kills it when the Playwright
+  runner process disappears (verified: killing a stand-in runner freed the port within seconds; a real
+  `render-smoke` run launched, passed, and left no process behind). A run that hangs while its runner stays
+  alive is indistinguishable from a long run and is still not caught — stop the runner and the server follows.
+- **A Playwright-launched Foundry now opens `test-titan` directly (`--world=`).** Without it a fresh server
+  lands on the setup screen, where the `login` fixture cannot join.

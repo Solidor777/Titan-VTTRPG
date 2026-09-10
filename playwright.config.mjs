@@ -35,10 +35,13 @@ export default defineConfig({
          args: chromiumArgs,
       },
    },
-   // Reuse a running Foundry on :30000; otherwise launch it directly (no UAC elevation) and wait.
+   // Reuse a running Foundry on :30000; otherwise launch it through the supervisor, which kills the launched
+   // server when the run ends or the Playwright runner itself disappears (no orphaned Foundry holding the
+   // port and the pack locks). A launched server opens the test world directly. Paths and the world are
+   // derived from this repo's location; FOUNDRY_APP_DIR / FOUNDRY_DATA_PATH / FOUNDRY_PORT / FOUNDRY_WORLD
+   // override them.
    webServer: {
-      command: 'node foundry/main.js --dataPath=/foundryvtt/V14/dev/foundryuserdata',
-      cwd: 'C:/FoundryVTT/V14/dev',
+      command: 'node scripts/e2e-foundry-server.mjs',
       url: 'http://localhost:30000',
       reuseExistingServer: true,
       timeout: 120_000,
