@@ -1,13 +1,14 @@
 import { zipFiles, unzipFilesAsText } from '~/spreadsheet/format/Zip.js';
 
 /**
- * Escapes text for safe inclusion as XML element content (not attribute values, which this module
- * never builds from untrusted text).
+ * Escapes text for safe inclusion as XML element content or as a double-quoted attribute value.
+ * Escaping `"` is a no-op for element content (the character never needs escaping there) but is
+ * required wherever the result is interpolated into a `"..."` attribute.
  * @param {string} text - The raw text.
  * @returns {string} The XML-escaped text.
  */
 function escapeXml(text) {
-   return text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+   return text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 }
 
 /**
@@ -111,6 +112,7 @@ export function uniqueSheetNames(names) {
       const cleaned = rawName.replace(/[[\]:*?/\\]/g, '');
       /** @type {string} The candidate name, truncated and made unique below. */
       let candidate = cleaned.slice(0, 31);
+      /** @type {number} The collision count seen so far for this candidate. */
       let suffix = 1;
       while (used.has(candidate)) {
          /** @type {string} The numeric collision-breaking suffix, e.g. "~2". */
@@ -224,7 +226,9 @@ export function encodeXlsx(workbook) {
 function parseSharedStrings(xml) {
    /** @type {string[]} */
    const strings = [];
+   /** @type {RegExp} Matches one <si> (shared-string item) element and captures its inner XML. */
    const siPattern = /<si>([\s\S]*?)<\/si>/g;
+   /** @type {RegExpExecArray|null} The current <si> match, or null once exhausted. */
    let siMatch = siPattern.exec(xml);
    while (siMatch !== null) {
       /** @type {string[]} Every <t> run's decoded text within this <si> (rich text splits across runs). */
@@ -256,6 +260,7 @@ function parseSheetNames(xml) {
 function decodeXlsxCellValue(attrs, inner, sharedStrings) {
    /** @type {RegExpMatchArray|null} */
    const typeMatch = attrs.match(/\bt="([^"]*)"/);
+   /** @type {string|undefined} The cell's `t` attribute value, or undefined for a numeric cell. */
    const type = typeMatch?.[1];
 
    if (type === 'inlineStr') {
@@ -269,6 +274,7 @@ function decodeXlsxCellValue(attrs, inner, sharedStrings) {
    if (!valueMatch) {
       return undefined;
    }
+   /** @type {string} The raw text inside the <v> element, still XML-escaped and un-typed. */
    const rawValue = valueMatch[1];
 
    if (type === 's') {
@@ -293,12 +299,16 @@ function decodeXlsxCellValue(attrs, inner, sharedStrings) {
 function parseSheetXml(xml, sharedStrings) {
    /** @type {Array<Array<string|number|boolean|undefined>>} */
    const rows = [];
+   /** @type {RegExp} Matches one <row> element and captures its inner XML. */
    const rowPattern = /<row[^>]*>([\s\S]*?)<\/row>/g;
+   /** @type {RegExpExecArray|null} The current <row> match, or null once exhausted. */
    let rowMatch = rowPattern.exec(xml);
    while (rowMatch !== null) {
       /** @type {Array<string|number|boolean|undefined>} */
       const row = [];
+      /** @type {RegExp} Matches one <c> element, either with inner content or self-closing. */
       const cellPattern = /<c\b([^>]*)>([\s\S]*?)<\/c>|<c\b([^>]*)\/>/g;
+      /** @type {RegExpExecArray|null} The current <c> match, or null once exhausted. */
       let cellMatch = cellPattern.exec(rowMatch[1]);
       while (cellMatch !== null) {
          /** @type {string} The cell element's raw attributes, whichever branch matched. */
@@ -338,6 +348,8 @@ export function decodeXlsx(bytes) {
    const sheets = sheetNames.map((name, i) => {
       /** @type {Array<Array<string|number|boolean|undefined>>} Every row of raw cells, header first. */
       const rows = parseSheetXml(files[`xl/worksheets/sheet${i + 1}.xml`] ?? '', sharedStrings);
+      /** @type {Array<string|number|boolean|undefined>|undefined} The header row (column names). */
+      /** @type {Array<Array<string|number|boolean|undefined>>} Every subsequent data row. */
       const [header, ...dataRows] = rows;
       return {
          name,
