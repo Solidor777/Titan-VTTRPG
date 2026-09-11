@@ -269,7 +269,8 @@ export async function superviseServer(options) {
    });
 
    if (logLine) {
-      logLine('supervisor', `started pid ${child.pid}: ${command} ${args.join(' ')}`);
+      // Supervisor messages carry their own newline: the sink only emits complete lines.
+      logLine('supervisor', `started pid ${child.pid}: ${command} ${args.join(' ')}\n`);
       child.stdout.setEncoding('utf8');
       child.stderr.setEncoding('utf8');
       child.stdout.on('data', (chunk) => {
