@@ -1,4 +1,4 @@
-import { resolveFolderPath } from '~/spreadsheet/io/FolderPath.js';
+import { resolveFolderPath, splitFolderPath, unescapeFolderName } from '~/spreadsheet/io/FolderPath.js';
 
 /**
  * Groups an array by a key function, preserving first-seen key order.
@@ -19,36 +19,6 @@ function groupBy(items, keyOf) {
       groups.get(key).push(item);
    }
    return groups;
-}
-
-/**
- * Splits an escaped folder path into its raw segments, splitting only on unescaped `/` (a `\/` inside a
- * segment stays literal). Segments are returned still escaped, matching the map keys built from
- * {@link resolveFolderPath} joins, so callers must unescape a segment themselves before using it as a
- * folder name.
- * @param {string} path - The escaped, slash-separated folder path.
- * @returns {string[]} The path's escaped segments, root to leaf.
- */
-function splitFolderPath(path) {
-   /** @type {string[]} */
-   const segments = [];
-   /** @type {string} The segment currently being built, still escaped. */
-   let current = '';
-   for (let i = 0; i < path.length; i += 1) {
-      if (path[i] === '\\' && path[i + 1] === '/') {
-         current += '\\/';
-         i += 1;
-      }
-      else if (path[i] === '/') {
-         segments.push(current);
-         current = '';
-      }
-      else {
-         current += path[i];
-      }
-   }
-   segments.push(current);
-   return segments;
 }
 
 /**
@@ -80,7 +50,7 @@ async function resolveFolders(paths, pack) {
       /** @type {Folder[]} */
       const [created] = await Folder.createDocuments(
          [{
-            name: segments[segments.length - 1].replace(/\\\//g, '/'),
+            name: unescapeFolderName(segments[segments.length - 1]),
             type: pack.metadata.type,
             folder: resolved.get(parentPath) ?? null,
          }],

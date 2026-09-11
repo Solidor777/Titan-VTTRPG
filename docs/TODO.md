@@ -22,11 +22,6 @@ Completed items are deleted, not marked done.
   `pack.getDocument(parentId)` when the parent isn't in the in-run `resolved` map, and throwing a
   descriptive Error if genuinely absent. Currently exercised only indirectly.
 
-- `FolderPath.js`'s folder-name escaping doesn't escape a literal backslash. It escapes a literal `/` in
-  a folder name as `\/` for its path-joining scheme, but a folder name containing both `\` and `/` in
-  certain arrangements can be mis-split by `ApplyImport.js`'s `splitFolderPath`. Narrow edge case;
-  pre-existing gap in the escaping scheme design.
-
 - One checked-in XLSX test fixture is still needed from the user: a `.xlsx` exported by real Google
   Sheets, derived from this feature's real `titan.effects` export, added as
   `tests/fixtures/spreadsheet/google-sheets-edited.xlsx` with a matching test in `Xlsx.test.js` (see the
