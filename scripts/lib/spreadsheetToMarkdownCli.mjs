@@ -188,6 +188,10 @@ export async function runCli(argv) {
       const documents = groupFilesForDecoding(files)
          .flatMap((entries) => workbookToDocuments(decodeSpreadsheetFiles(entries)));
 
+      if (documents.length === 0) {
+         throw new Error(`No renderable documents found in ${args.inputs.join(', ')}`);
+      }
+
       /** @type {string} The language file path. */
       const langPath = args.lang ?? DEFAULT_LANG_PATH;
       /** @type {object} The parsed language JSON. */
