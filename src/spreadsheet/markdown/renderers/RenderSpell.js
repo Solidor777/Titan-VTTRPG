@@ -147,7 +147,12 @@ export function renderSpell(document, { labels, slugFor }) {
       statLines.push(areaLine);
    }
    if (enhancementParts.length > 0) {
-      statLines.push(statLine(labels('enhancements', 'Enhancements'), enhancementParts.join(', ')));
+      // Google-Docs-export quirk: the LAST entry's closing paren is escaped only when it directly
+      // follows a whitespace-preceded all-digit token, e.g. `Fly Speed (5 \+ ES / 2\)`, but
+      // `Dexterity (1 \+ ES)` and mid-line `/ 2), Body` stay unescaped. Confirmed against 24/24
+      // compendium samples (e.g. compendium lines 4647, 5593, 6091).
+      const enhancementsValue = enhancementParts.join(', ').replace(/(\s\d+)\)$/, '$1\\)');
+      statLines.push(statLine(labels('enhancements', 'Enhancements'), enhancementsValue));
    }
    statLines.push(...otherLines);
 

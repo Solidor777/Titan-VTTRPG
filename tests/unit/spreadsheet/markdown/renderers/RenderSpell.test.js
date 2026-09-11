@@ -69,6 +69,54 @@ function damageAspect(overrides = {}) {
 }
 
 /**
+ * Builds an `extraTargets` standard-aspect entry, defaulting the fields `calculateSpellAspectCosts` reads.
+ * @param {object} [overrides] - Fields to override.
+ * @returns {object} The aspect entry.
+ */
+function extraTargetsAspect(overrides = {}) {
+   return {
+      label: 'extraTargets',
+      initialValue: 1,
+      resistanceCheck: 'none',
+      ...overrides,
+   };
+}
+
+/**
+ * Builds a `duration` standard-aspect entry, defaulting the fields `calculateSpellAspectCosts` reads.
+ * @param {string} unit - The duration unit (`'rounds'` or `'minutes'`).
+ * @param {number} initialValue - The duration's initial value.
+ * @returns {object} The aspect entry.
+ */
+function durationAspect(unit, initialValue) {
+   return {
+      label: 'duration',
+      initialValue,
+      unit,
+      resistanceCheck: 'none',
+   };
+}
+
+/**
+ * Builds a scaling custom-aspect entry, defaulting the fields the renderer reads.
+ * @param {string} label - The free-form aspect label.
+ * @param {number} initialValue - The aspect's initial value.
+ * @param {number} cost - The aspect's per-increment cost.
+ * @returns {object} The custom aspect entry.
+ */
+function scalingCustomAspect(label, initialValue, cost) {
+   return {
+      label,
+      scaling: true,
+      initialValue,
+      cost,
+      resistanceCheck: 'none',
+      isDamage: false,
+      isHealing: false,
+   };
+}
+
+/**
  * Builds a minimal Spell `system` fixture, overridden per test.
  * @param {object} [overrides] - Fields to override.
  * @returns {object} The `system` fixture.
@@ -161,8 +209,74 @@ describe('renderSpell', () => {
          '#### ***Air Walk*** {#air-walk}\n\n'
          + '**Mind (Arcana) 6:1**  \n**XP Cost:** 2  \n'
          + '**Range:** Self  \n'
-         + '**Enhancements:** Fly Speed (5 \\+ ES / 2)  \n**Traits:** Air  \n---\n\n'
+         + '**Enhancements:** Fly Speed (5 \\+ ES / 2\\)  \n**Traits:** Air  \n---\n\n'
          + 'Gusts of air carry you over land.  \n---',
+      );
+   });
+
+   it('escapes the Enhancements line\'s trailing digit-paren byte-equal to the compendium (Air Walk)', () => {
+      // Compendium line 4647 (verified via `cat -A`): "**Enhancements:** Minutes (1 \+ ES), Fly Speed
+      // (5 \+ ES / 2\)  ". The standard `duration` aspect's `minutes` unit always costs 4 build points
+      // (SpellAspects.js's fixed unitCosts table), which would force an unwanted "/ 4" suffix; the
+      // compendium's "Minutes (1 \+ ES)" (no suffix, cost 1) is therefore authored as a custom aspect,
+      // not the standard `duration` aspect. Modeled that way here.
+      /** @type {object} The Air Walk document fixture, matching the compendium's actual Enhancements text. */
+      const document = {
+         name: 'Air Walk',
+         system: makeSystem({
+            xpCost: 2,
+            tradition: 'Air',
+            castingCheck: {
+               attribute: 'mind',
+               skill: 'arcana',
+               difficulty: 6,
+               complexity: 1,
+               autoCalculateDC: false,
+            },
+            aspect: [rangeAspect('self')],
+            customAspect: [
+               scalingCustomAspect('Minutes', 1, 1),
+               scalingCustomAspect('Fly Speed', 5, 2),
+            ],
+            description: '<p>Gusts of air carry you over land.</p>',
+         }),
+      };
+
+      expect(renderSpell(document, realContext())).toContain(
+         '**Enhancements:** Minutes (1 \\+ ES), Fly Speed (5 \\+ ES / 2\\)  \n',
+      );
+   });
+
+   it('merges a standard scaling aspect and a custom scaling aspect onto one Enhancements line', () => {
+      // Verifies the standard-aspect loop and the custom-aspect loop both push into the same
+      // `enhancementParts` array, in the order each loop runs (standard aspects, sorted, then customs).
+      /** @type {object} The fixture: a `duration`/`rounds` standard aspect plus a custom Fly Speed aspect. */
+      const document = {
+         name: 'Wind Dash',
+         system: makeSystem({
+            aspect: [durationAspect('rounds', 1)],
+            customAspect: [scalingCustomAspect('Fly Speed', 5, 2)],
+         }),
+      };
+
+      expect(renderSpell(document, realContext())).toContain(
+         '**Enhancements:** Rounds (1 \\+ ES), Fly Speed (5 \\+ ES / 2\\)  \n',
+      );
+   });
+
+   it('sorts enabled standard aspects by SpellAspects sortOrder, not fixture order', () => {
+      // damage (sortOrder 4) is supplied before extraTargets (sortOrder 2); the rendered Enhancements
+      // line must list Extra Targets first.
+      /** @type {object} The fixture, with standard aspects supplied out of sortOrder. */
+      const document = {
+         name: 'Scatter Bolt',
+         system: makeSystem({
+            aspect: [damageAspect(), extraTargetsAspect()],
+         }),
+      };
+
+      expect(renderSpell(document, realContext())).toContain(
+         '**Enhancements:** Extra Targets (1 \\+ ES), Damage (1 \\+ ES)  \n',
       );
    });
 
