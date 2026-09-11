@@ -87,6 +87,7 @@ export default [
          'node_modules/',
          'fix-comments.js',
          'count-long.cjs',
+         'test/build/',
       ],
    },
 ];
