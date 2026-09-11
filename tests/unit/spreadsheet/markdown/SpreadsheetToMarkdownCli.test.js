@@ -1,7 +1,6 @@
-import { describe, expect, it, afterEach } from 'vitest';
+import { describe, expect, it, beforeAll } from 'vitest';
 import { execFileSync } from 'node:child_process';
-import { readFileSync, writeFileSync, mkdtempSync, rmSync } from 'node:fs';
-import { tmpdir } from 'node:os';
+import { readFileSync, writeFileSync, mkdirSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { buildTables } from '~/spreadsheet/codec/BuildTables.js';
@@ -19,19 +18,17 @@ const NO_SCHEMA = {};
 /** @type {object} The system's real English localization map, used to match the CLI's default `--lang`. */
 const realLang = JSON.parse(readFileSync(path.resolve(repoRoot, 'lang', 'en.json'), 'utf-8'));
 
-/** @type {string[]} Temp directories created by this suite, cleaned up after every test. */
-const tempDirs = [];
-
 /**
- * Creates a fresh `mkdtemp` scratch directory and records it for post-test cleanup.
- * @returns {string} The created directory's path.
+ * The fixed, gitignored sink every fixture and output file in this suite is written into. Every test
+ * uses a deterministic file name inside it, so repeated runs overwrite rather than accumulate; nothing
+ * in this suite is ever deleted.
+ * @type {string}
  */
-function makeTempDir() {
-   /** @type {string} The created temp directory's path. */
-   const dir = mkdtempSync(path.join(tmpdir(), 'titan-markdown-cli-'));
-   tempDirs.push(dir);
-   return dir;
-}
+const sinkDir = path.resolve(repoRoot, 'debug', 'dumps', 'spreadsheet-to-markdown-cli');
+
+beforeAll(() => {
+   mkdirSync(sinkDir, { recursive: true });
+});
 
 /**
  * Builds the hand-made envelope set for a small Item pack: a weapon, an armor, and a spell inside a
@@ -106,18 +103,18 @@ function fixtureEnvelopes() {
 }
 
 /**
- * Writes the shared fixture pack as an `.xlsx` file into a fresh temp directory.
- * @returns {{dir: string, xlsxPath: string}} The temp directory and the written `.xlsx` file's path.
+ * Writes the shared fixture pack as an `.xlsx` file at a deterministic path inside the sink directory,
+ * overwriting whatever a previous run left there.
+ * @param {string} fileName - The `.xlsx` file name to write inside the sink directory.
+ * @returns {string} The written `.xlsx` file's absolute path.
  */
-function writeFixtureXlsx() {
-   /** @type {string} The scratch directory. */
-   const dir = makeTempDir();
+function writeFixtureXlsx(fileName) {
    /** @type {import('~/spreadsheet/codec/Workbook.js').Workbook} */
    const built = buildTables(fixtureEnvelopes(), 'wide', 'Item', NO_SCHEMA);
    /** @type {string} The written `.xlsx` file's path. */
-   const xlsxPath = path.join(dir, 'items.xlsx');
+   const xlsxPath = path.join(sinkDir, fileName);
    writeFileSync(xlsxPath, encodeXlsx(built));
-   return { dir, xlsxPath };
+   return xlsxPath;
 }
 
 /**
@@ -139,16 +136,10 @@ function runCliProcess(args) {
    }
 }
 
-afterEach(() => {
-   while (tempDirs.length > 0) {
-      rmSync(tempDirs.pop(), { recursive: true, force: true });
-   }
-});
-
 describe('spreadsheet-to-markdown CLI', () => {
    it('renders a workbook to its default output path and title, matching direct rendering', () => {
-      /** @type {{dir: string, xlsxPath: string}} The fixture directory and `.xlsx` path. */
-      const { xlsxPath } = writeFixtureXlsx();
+      /** @type {string} The fixture `.xlsx` path. */
+      const xlsxPath = writeFixtureXlsx('default-out.xlsx');
       /** @type {string} The default output path: the input path with its extension replaced by `.md`. */
       const expectedOut = xlsxPath.replace(/\.xlsx$/, '.md');
 
@@ -165,15 +156,65 @@ describe('spreadsheet-to-markdown CLI', () => {
       /** @type {string} The expected Markdown, rendered directly for byte comparison. */
       const expected = renderCompendiumMarkdown(
          workbookToDocuments(built),
-         { title: 'items', labels: createLabels(realLang) },
+         { title: 'default-out', labels: createLabels(realLang) },
       );
 
       expect(written).toBe(expected);
    });
 
-   it('exits 1 with a stderr message for an Actor-pack workbook', () => {
-      /** @type {string} The scratch directory. */
-      const dir = makeTempDir();
+   it('renders with an explicit --title and --out, overriding the input-derived defaults', () => {
+      /** @type {string} The fixture `.xlsx` path. */
+      const xlsxPath = writeFixtureXlsx('custom-out.xlsx');
+      /** @type {string} The explicit output path, distinct from the input-derived default. */
+      const outPath = path.join(sinkDir, 'custom-out-explicit.md');
+
+      /** @type {{status: number, stdout: string, stderr: string}} The CLI process result. */
+      const result = runCliProcess([xlsxPath, '--title', 'Custom Title', '--out', outPath]);
+
+      expect(result.status).toBe(0);
+      expect(result.stdout.trim()).toBe(`Wrote ${outPath} (3 documents)`);
+
+      /** @type {string} The written Markdown file's contents. */
+      const written = readFileSync(outPath, 'utf-8');
+      /** @type {object[]} The documents decoded directly from the same envelope fixture. */
+      const built = buildTables(fixtureEnvelopes(), 'wide', 'Item', NO_SCHEMA);
+      /** @type {string} The expected Markdown, rendered directly with the explicit title. */
+      const expected = renderCompendiumMarkdown(
+         workbookToDocuments(built),
+         { title: 'Custom Title', labels: createLabels(realLang) },
+      );
+
+      expect(written).toBe(expected);
+   });
+
+   it('renders every spreadsheet file directly inside a directory input', () => {
+      /** @type {string} The directory input, containing one `.xlsx` and nothing else. */
+      const dirPath = path.join(sinkDir, 'dir-input');
+      mkdirSync(dirPath, { recursive: true });
+      /** @type {import('~/spreadsheet/codec/Workbook.js').Workbook} */
+      const built = buildTables(fixtureEnvelopes(), 'wide', 'Item', NO_SCHEMA);
+      writeFileSync(path.join(dirPath, 'items.xlsx'), encodeXlsx(built));
+      /** @type {string} The default output path for a directory input: `<dir>/<dirname>.md`. */
+      const expectedOut = path.join(dirPath, 'dir-input.md');
+
+      /** @type {{status: number, stdout: string, stderr: string}} The CLI process result. */
+      const result = runCliProcess([dirPath]);
+
+      expect(result.status).toBe(0);
+      expect(result.stdout.trim()).toBe(`Wrote ${expectedOut} (3 documents)`);
+
+      /** @type {string} The written Markdown file's contents. */
+      const written = readFileSync(expectedOut, 'utf-8');
+      /** @type {string} The expected Markdown, rendered directly with the directory-derived title. */
+      const expected = renderCompendiumMarkdown(
+         workbookToDocuments(built),
+         { title: 'dir-input', labels: createLabels(realLang) },
+      );
+
+      expect(written).toBe(expected);
+   });
+
+   it('exits 1 with a stderr message for an Actor-pack workbook and does not write the output file', () => {
       /** @type {import('~/spreadsheet/codec/Workbook.js').Workbook} */
       const built = buildTables(
          [{
@@ -187,8 +228,13 @@ describe('spreadsheet-to-markdown CLI', () => {
          NO_SCHEMA,
       );
       /** @type {string} The written `.xlsx` file's path. */
-      const xlsxPath = path.join(dir, 'actors.xlsx');
+      const xlsxPath = path.join(sinkDir, 'actor-pack.xlsx');
       writeFileSync(xlsxPath, encodeXlsx(built));
+      /** @type {string} The default output path a failed run must not touch. */
+      const outPath = xlsxPath.replace(/\.xlsx$/, '.md');
+      /** @type {string} A sentinel written before the run, to prove the CLI leaves it untouched on error. */
+      const sentinel = 'sentinel: actor-pack must not overwrite this file';
+      writeFileSync(outPath, sentinel, 'utf-8');
 
       /** @type {{status: number, stdout: string, stderr: string}} The CLI process result. */
       const result = runCliProcess([xlsxPath]);
@@ -197,14 +243,24 @@ describe('spreadsheet-to-markdown CLI', () => {
       expect(result.stderr.trim()).toBe(
          'Only Item compendium exports can be rendered as Markdown (this file is an Actor export)',
       );
+      expect(readFileSync(outPath, 'utf-8')).toBe(sentinel);
    });
 
-   it('exits 1 with a stderr message for a missing input path', () => {
+   it('exits 1 with a stderr message for a missing input path and does not write the output file', () => {
+      /** @type {string} A CLI input path that does not exist on disk. */
+      const missingPath = path.join(sinkDir, 'does-not-exist.xlsx');
+      /** @type {string} The default output path a failed run must not touch. */
+      const outPath = missingPath.replace(/\.xlsx$/, '.md');
+      /** @type {string} A sentinel written before the run, to prove the CLI leaves it untouched on error. */
+      const sentinel = 'sentinel: missing-path run must not overwrite this file';
+      writeFileSync(outPath, sentinel, 'utf-8');
+
       /** @type {{status: number, stdout: string, stderr: string}} The CLI process result. */
-      const result = runCliProcess([path.join(makeTempDir(), 'does-not-exist.xlsx')]);
+      const result = runCliProcess([missingPath]);
 
       expect(result.status).toBe(1);
       expect(result.stderr.trim().length).toBeGreaterThan(0);
+      expect(readFileSync(outPath, 'utf-8')).toBe(sentinel);
    });
 
    it('prints usage and exits 0 for --help', () => {
