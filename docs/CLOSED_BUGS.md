@@ -487,3 +487,19 @@ when fixed.
 - **Fix:** the import now matches the tracked filename. A scan of every `~/` and relative import/export
   specifier across the 985 tracked source, test, and script files against `git ls-files` found no other
   case mismatch. CI on Linux is the standing guard against a recurrence.
+
+### 41. `ImportDialogShell.svelte` failed `npm run eslint` with two `svelte/valid-compile` errors
+
+- **What:** `src/spreadsheet/ui/ImportDialogShell.svelte` initialized `targetMode`/`targetCollection`
+  with `$state(...)` expressions that read the `initialPack` prop directly, which the Svelte 5
+  compiler flags as `state_referenced_locally` (an eslint ERROR under this project's config) — the
+  branch's `eslint` CI gate was red because of it.
+- **Severity:** Low-to-medium. Functionally harmless: `TitanDialog` only mounts on `isFirstRender`
+  and every `ImportDialog` call site constructs a fresh instance, so `initialPack` never changes
+  post-mount — confirmed by reading both call sites and the mount lifecycle, not assumed.
+- **Found:** 2026-09-10, during the compendium-spreadsheet Task 18 final `npm run eslint` gate run.
+  Introduced by an earlier task on the same branch (commit `0d9c114e`, "feat: add the compendium
+  spreadsheet import dialog") and not caught by that task's review.
+- **Fixed:** 2026-09-10 on the `compendium-spreadsheet` branch — wrapped both prop reads in
+  `untrack(...)`, matching the identical one-shot-capture-from-context pattern already established
+  in `DocumentPathRaritySelect.svelte`.
