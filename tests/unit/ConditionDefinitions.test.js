@@ -149,7 +149,13 @@ describe('buildConditionDefinitions', () => {
    });
 
    it('leaves mechanically-inert conditions without rules elements', () => {
-      for (const id of ['dead', 'deafened', 'frightened', 'incapacitated', 'unconscious']) {
+      for (const id of [
+         'dead',
+         'deafened',
+         'frightened',
+         'incapacitated',
+         'unconscious',
+      ]) {
          expect(def(id).system, `${id} should have no system.rulesElement`).toBeUndefined();
       }
    });

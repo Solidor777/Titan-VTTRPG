@@ -41,13 +41,13 @@
          {#if document.data.system.results.extraSuccessesRemaining !== undefined}
             <div class="stat extra">
                {localize('extraSuccesses')}: {document.data.system.results
-               .extraSuccessesRemaining}/{document.data.system.results
-               .extraSuccesses}
+                  .extraSuccessesRemaining}/{document.data.system.results
+                  .extraSuccesses}
             </div>
          {:else if document.data.system.results.extraSuccesses > 0}
             <div class="stat extra">
                {localize('extraSuccesses')}: {document.data.system.results
-               .extraSuccesses}
+                  .extraSuccesses}
             </div>
          {/if}
       {/if}

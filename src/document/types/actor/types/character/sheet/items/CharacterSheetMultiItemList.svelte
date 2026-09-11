@@ -45,7 +45,7 @@
                item.name.toLowerCase().indexOf(filter.toLowerCase()) !== -1
             );
          })
-         .sort((a, b) => sortAscending(a.sort, b.sort))
+         .sort((a, b) => sortAscending(a.sort, b.sort)),
    );
 
    /**
@@ -76,11 +76,18 @@
       }
 
       /** @type {object[]} The minimal sort updates produced by the integer-sort helper. */
-      const updates = foundry.utils.performIntegerSort(source, { target, siblings, sortBefore });
+      const updates = foundry.utils.performIntegerSort(source, {
+         target,
+         siblings,
+         sortBefore,
+      });
       await document.data.updateEmbeddedDocuments(
          'Item',
          updates.map((entry) => {
-            return { ...entry.update, _id: entry.target._id };
+            return {
+               ...entry.update,
+               _id: entry.target._id,
+            };
          }),
       );
    }

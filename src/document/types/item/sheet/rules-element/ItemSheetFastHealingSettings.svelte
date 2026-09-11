@@ -17,7 +17,7 @@
    /** @type {{label: string, value: string}[]} Options for when in the turn the Fast Healing activates. */
    const selectorOptions = [
       'turnStart',
-      'turnEnd'
+      'turnEnd',
    ];
 </script>
 

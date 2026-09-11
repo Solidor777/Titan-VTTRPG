@@ -2,7 +2,7 @@
    import { getContext } from 'svelte';
    import localize from '~/helpers/utility-functions/Localize.js';
    import CharacterSheetSkill
-      from '~/document/types/actor/types/character/sheet/tabs/skills/CharacterSheetSkill.svelte';
+   from '~/document/types/actor/types/character/sheet/tabs/skills/CharacterSheetSkill.svelte';
    import { slide } from 'svelte/transition';
 
    /** @type {object} Reference to the reactive Document store. */

@@ -9,7 +9,14 @@
  */
 
 /** @type {string[]} The six effect types that carry primary/secondary/font-color token triplets. */
-const EFFECT_TYPES = ['custom', 'expired', 'initiative', 'permanent', 'turn-end', 'turn-start'];
+const EFFECT_TYPES = [
+   'custom',
+   'expired',
+   'initiative',
+   'permanent',
+   'turn-end',
+   'turn-start',
+];
 
 /**
  * Editor grouping of every themed token. Group key → token names (without the `--titan-` prefix).
@@ -18,68 +25,149 @@ const EFFECT_TYPES = ['custom', 'expired', 'initiative', 'permanent', 'turn-end'
  */
 export const THEME_TOKEN_GROUPS = Object.freeze({
    application: [
-      'app-background', 'app-font-color', 'border-color', 'window-content-background',
-      'content-link-font-color', 'editor-menu-color', 'scrollbar-color', 'scrollbar-gutter-color',
-      'highlighted-background', 'highlighted-font-color', 'accent-color',
+      'app-background',
+      'app-font-color',
+      'border-color',
+      'window-content-background',
+      'content-link-font-color',
+      'editor-menu-color',
+      'scrollbar-color',
+      'scrollbar-gutter-color',
+      'highlighted-background',
+      'highlighted-font-color',
+      'accent-color',
    ],
    headers: [
-      'header-1-font-color', 'header-2-font-color', 'header-3-font-color',
-      'header-4-font-color', 'header-5-font-color', 'header-6-font-color',
+      'header-1-font-color',
+      'header-2-font-color',
+      'header-3-font-color',
+      'header-4-font-color',
+      'header-5-font-color',
+      'header-6-font-color',
    ],
    panels: [
-      'panel-1-background', 'panel-1-color', 'panel-2-background', 'panel-2-color',
-      'panel-3-background', 'panel-3-color',
+      'panel-1-background',
+      'panel-1-color',
+      'panel-2-background',
+      'panel-2-color',
+      'panel-3-background',
+      'panel-3-color',
    ],
    buttons: [
-      'button-background', 'button-font-color', 'button-border-color',
-      'button-hover-background', 'button-hover-border-color', 'button-hover-font-color',
-      'button-disabled-background', 'button-disabled-border-color', 'button-disabled-font-color',
+      'button-background',
+      'button-font-color',
+      'button-border-color',
+      'button-hover-background',
+      'button-hover-border-color',
+      'button-hover-font-color',
+      'button-disabled-background',
+      'button-disabled-border-color',
+      'button-disabled-font-color',
    ],
    inputs: [
-      'input-background', 'input-font-color', 'input-border-color',
-      'input-hover-background', 'input-hover-border-color', 'input-hover-font-color',
-      'input-disabled-background', 'input-disabled-border-color', 'input-disabled-font-color',
+      'input-background',
+      'input-font-color',
+      'input-border-color',
+      'input-hover-background',
+      'input-hover-border-color',
+      'input-hover-font-color',
+      'input-disabled-background',
+      'input-disabled-border-color',
+      'input-disabled-font-color',
    ],
-   labels: ['label-background', 'label-font-color', 'label-border-color'],
-   tags: ['tag-background', 'tag-font-color', 'tag-border-color'],
+   labels: [
+      'label-background',
+      'label-font-color',
+      'label-border-color',
+   ],
+   tags: [
+      'tag-background',
+      'tag-font-color',
+      'tag-border-color',
+   ],
    calculatedValues: [
-      'calculated-value-background', 'calculated-value-font-color', 'calculated-value-border-color',
+      'calculated-value-background',
+      'calculated-value-font-color',
+      'calculated-value-border-color',
    ],
    attributes: [
-      'body-background', 'body-font-color', 'mind-background', 'mind-font-color',
-      'soul-background', 'soul-font-color',
+      'body-background',
+      'body-font-color',
+      'mind-background',
+      'mind-font-color',
+      'soul-background',
+      'soul-font-color',
    ],
    resistances: [
-      'reflexes-background', 'reflexes-font-color', 'resilience-background', 'resilience-font-color',
-      'willpower-background', 'willpower-font-color',
+      'reflexes-background',
+      'reflexes-font-color',
+      'resilience-background',
+      'resilience-font-color',
+      'willpower-background',
+      'willpower-font-color',
    ],
    resources: [
-      'stamina-background', 'stamina-font-color', 'resolve-background', 'resolve-font-color',
-      'wounds-background', 'wounds-font-color',
+      'stamina-background',
+      'stamina-font-color',
+      'resolve-background',
+      'resolve-font-color',
+      'wounds-background',
+      'wounds-font-color',
    ],
    rarity: [
-      'uncommon-background', 'uncommon-font-color', 'rare-background', 'rare-font-color',
-      'unique-background', 'unique-font-color',
+      'uncommon-background',
+      'uncommon-font-color',
+      'rare-background',
+      'rare-font-color',
+      'unique-background',
+      'unique-font-color',
    ],
    diceResults: [
-      'critical-success-background', 'critical-success-font-color', 'success-background', 'success-font-color',
-      'failure-background', 'failure-font-color', 'critical-failure-background', 'critical-failure-font-color',
+      'critical-success-background',
+      'critical-success-font-color',
+      'success-background',
+      'success-font-color',
+      'failure-background',
+      'failure-font-color',
+      'critical-failure-background',
+      'critical-failure-font-color',
    ],
-   checkResults: ['succeeded-font-color', 'failed-font-color'],
-   mods: ['lesser-background', 'lesser-color', 'greater-background', 'greater-color'],
+   checkResults: [
+      'succeeded-font-color',
+      'failed-font-color',
+   ],
+   mods: [
+      'lesser-background',
+      'lesser-color',
+      'greater-background',
+      'greater-color',
+   ],
    meters: ['meter-background'],
    effects: EFFECT_TYPES.flatMap(
-      (type) => [`${type}-effect-primary`, `${type}-effect-secondary`, `${type}-effect-font-color`],
+      (type) => [
+         `${type}-effect-primary`,
+         `${type}-effect-secondary`,
+         `${type}-effect-font-color`,
+      ],
    ),
    chat: [
-      'chat-public-background', 'chat-public-header-background',
-      'chat-public-badge-background', 'chat-public-badge-font-color',
-      'chat-secret-background', 'chat-secret-header-background',
-      'chat-secret-badge-background', 'chat-secret-badge-font-color',
-      'chat-gm-background', 'chat-gm-header-background',
-      'chat-gm-badge-background', 'chat-gm-badge-font-color',
+      'chat-public-background',
+      'chat-public-header-background',
+      'chat-public-badge-background',
+      'chat-public-badge-font-color',
+      'chat-secret-background',
+      'chat-secret-header-background',
+      'chat-secret-badge-background',
+      'chat-secret-badge-font-color',
+      'chat-gm-background',
+      'chat-gm-header-background',
+      'chat-gm-badge-background',
+      'chat-gm-badge-font-color',
    ],
-   fonts: ['font-family-normal', 'font-family-rich-text'],
+   fonts: [
+      'font-family-normal',
+      'font-family-rich-text',
+   ],
 });
 
 /** @type {string[]} The two themed font-family tokens. */
@@ -93,7 +181,10 @@ export const THEME_COLOR_TOKENS = Object.freeze(
 );
 
 /** @type {string[]} The complete themed token contract (colors then fonts). */
-export const THEME_TOKENS = Object.freeze([...THEME_COLOR_TOKENS, ...THEME_FONT_TOKENS]);
+export const THEME_TOKENS = Object.freeze([
+   ...THEME_COLOR_TOKENS,
+   ...THEME_FONT_TOKENS,
+]);
 
 /**
  * Fill → text token pairs. Every colored fill that can carry text declares its paired text color so a
@@ -101,40 +192,148 @@ export const THEME_TOKENS = Object.freeze([...THEME_COLOR_TOKENS, ...THEME_FONT_
  * @type {string[][]}
  */
 export const THEME_TOKEN_PAIRS = Object.freeze([
-   ['app-background', 'app-font-color'],
-   ['highlighted-background', 'highlighted-font-color'],
-   ['panel-1-background', 'panel-1-color'],
-   ['panel-2-background', 'panel-2-color'],
-   ['panel-3-background', 'panel-3-color'],
-   ['button-background', 'button-font-color'],
-   ['button-hover-background', 'button-hover-font-color'],
-   ['button-disabled-background', 'button-disabled-font-color'],
-   ['input-background', 'input-font-color'],
-   ['input-hover-background', 'input-hover-font-color'],
-   ['input-disabled-background', 'input-disabled-font-color'],
-   ['label-background', 'label-font-color'],
-   ['tag-background', 'tag-font-color'],
-   ['calculated-value-background', 'calculated-value-font-color'],
-   ['body-background', 'body-font-color'],
-   ['mind-background', 'mind-font-color'],
-   ['soul-background', 'soul-font-color'],
-   ['reflexes-background', 'reflexes-font-color'],
-   ['resilience-background', 'resilience-font-color'],
-   ['willpower-background', 'willpower-font-color'],
-   ['stamina-background', 'stamina-font-color'],
-   ['resolve-background', 'resolve-font-color'],
-   ['wounds-background', 'wounds-font-color'],
-   ['uncommon-background', 'uncommon-font-color'],
-   ['rare-background', 'rare-font-color'],
-   ['unique-background', 'unique-font-color'],
-   ['critical-success-background', 'critical-success-font-color'],
-   ['success-background', 'success-font-color'],
-   ['failure-background', 'failure-font-color'],
-   ['critical-failure-background', 'critical-failure-font-color'],
-   ['lesser-background', 'lesser-color'],
-   ['greater-background', 'greater-color'],
-   ...EFFECT_TYPES.map((type) => [`${type}-effect-primary`, `${type}-effect-font-color`]),
-   ['chat-public-badge-background', 'chat-public-badge-font-color'],
-   ['chat-secret-badge-background', 'chat-secret-badge-font-color'],
-   ['chat-gm-badge-background', 'chat-gm-badge-font-color'],
+   [
+      'app-background',
+      'app-font-color',
+   ],
+   [
+      'highlighted-background',
+      'highlighted-font-color',
+   ],
+   [
+      'panel-1-background',
+      'panel-1-color',
+   ],
+   [
+      'panel-2-background',
+      'panel-2-color',
+   ],
+   [
+      'panel-3-background',
+      'panel-3-color',
+   ],
+   [
+      'button-background',
+      'button-font-color',
+   ],
+   [
+      'button-hover-background',
+      'button-hover-font-color',
+   ],
+   [
+      'button-disabled-background',
+      'button-disabled-font-color',
+   ],
+   [
+      'input-background',
+      'input-font-color',
+   ],
+   [
+      'input-hover-background',
+      'input-hover-font-color',
+   ],
+   [
+      'input-disabled-background',
+      'input-disabled-font-color',
+   ],
+   [
+      'label-background',
+      'label-font-color',
+   ],
+   [
+      'tag-background',
+      'tag-font-color',
+   ],
+   [
+      'calculated-value-background',
+      'calculated-value-font-color',
+   ],
+   [
+      'body-background',
+      'body-font-color',
+   ],
+   [
+      'mind-background',
+      'mind-font-color',
+   ],
+   [
+      'soul-background',
+      'soul-font-color',
+   ],
+   [
+      'reflexes-background',
+      'reflexes-font-color',
+   ],
+   [
+      'resilience-background',
+      'resilience-font-color',
+   ],
+   [
+      'willpower-background',
+      'willpower-font-color',
+   ],
+   [
+      'stamina-background',
+      'stamina-font-color',
+   ],
+   [
+      'resolve-background',
+      'resolve-font-color',
+   ],
+   [
+      'wounds-background',
+      'wounds-font-color',
+   ],
+   [
+      'uncommon-background',
+      'uncommon-font-color',
+   ],
+   [
+      'rare-background',
+      'rare-font-color',
+   ],
+   [
+      'unique-background',
+      'unique-font-color',
+   ],
+   [
+      'critical-success-background',
+      'critical-success-font-color',
+   ],
+   [
+      'success-background',
+      'success-font-color',
+   ],
+   [
+      'failure-background',
+      'failure-font-color',
+   ],
+   [
+      'critical-failure-background',
+      'critical-failure-font-color',
+   ],
+   [
+      'lesser-background',
+      'lesser-color',
+   ],
+   [
+      'greater-background',
+      'greater-color',
+   ],
+   ...EFFECT_TYPES.map((type) => [
+      `${type}-effect-primary`,
+      `${type}-effect-font-color`,
+   ]),
+   [
+      'chat-public-badge-background',
+      'chat-public-badge-font-color',
+   ],
+   [
+      'chat-secret-badge-background',
+      'chat-secret-badge-font-color',
+   ],
+   [
+      'chat-gm-badge-background',
+      'chat-gm-badge-font-color',
+   ],
 ]);

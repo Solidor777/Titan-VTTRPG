@@ -4,13 +4,34 @@
  * @type {Object<string, [string, string]>}
  */
 export const PLURAL_TYPE_LABELS = {
-   weapon: ['weapons', 'Weapons'],
-   armor: ['armor', 'Armor'],
-   shield: ['shields', 'Shields'],
-   equipment: ['equipment', 'Equipment'],
-   commodity: ['commodities', 'Commodities'],
-   ability: ['abilities', 'Abilities'],
-   spell: ['spells', 'Spells'],
+   weapon: [
+      'weapons',
+      'Weapons',
+   ],
+   armor: [
+      'armor',
+      'Armor',
+   ],
+   shield: [
+      'shields',
+      'Shields',
+   ],
+   equipment: [
+      'equipment',
+      'Equipment',
+   ],
+   commodity: [
+      'commodities',
+      'Commodities',
+   ],
+   ability: [
+      'abilities',
+      'Abilities',
+   ],
+   spell: [
+      'spells',
+      'Spells',
+   ],
 };
 
 /**
@@ -31,7 +52,7 @@ export const TYPE_ORDER = [
  * Builds a pure label lookup over a Foundry language JSON's `LOCAL` map.
  * @param {{LOCAL?: Object<string, string>}} langJson - A loaded language file (`lang/en.json` shape).
  * @returns {function(string, string=): string} `label(key, fallback = key)`, resolving
- *    `LOCAL['<key>.text']` and falling back to `fallback` when the key is absent.
+ * `LOCAL['<key>.text']` and falling back to `fallback` when the key is absent.
  */
 export function createLabels(langJson) {
    /** @type {Object<string, string>} The flat `LOCAL` map, or an empty map when absent. */

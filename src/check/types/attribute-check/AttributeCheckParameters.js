@@ -30,10 +30,24 @@
  */
 export function createAttributeCheckParametersShape() {
    return {
-      attribute: '', attributeDice: 0, complexity: 0, damageToReduce: 0, diceMod: 0, difficulty: 0,
-      doubleExpertise: false, doubleTraining: false, expertiseMod: 0, extraFailureOnCritical: false,
-      extraSuccessOnCritical: false, skill: '', skillExpertise: 0, skillTrainingDice: 0, totalDice: 0,
-      totalExpertise: 0, totalTrainingDice: 0, trainingMod: 0,
+      attribute: '',
+      attributeDice: 0,
+      complexity: 0,
+      damageToReduce: 0,
+      diceMod: 0,
+      difficulty: 0,
+      doubleExpertise: false,
+      doubleTraining: false,
+      expertiseMod: 0,
+      extraFailureOnCritical: false,
+      extraSuccessOnCritical: false,
+      skill: '',
+      skillExpertise: 0,
+      skillTrainingDice: 0,
+      totalDice: 0,
+      totalExpertise: 0,
+      totalTrainingDice: 0,
+      trainingMod: 0,
    };
 }
 

@@ -54,7 +54,12 @@ test('HUD rect anchors to the expanded sidebar edge and does not move on collaps
       // Restore.
       toggle();
       await settle();
-      return { expandedRectRight, expandedSidebarLeft, collapsedRectRight, collapsedSidebarLeft };
+      return {
+         expandedRectRight,
+         expandedSidebarLeft,
+         collapsedRectRight,
+         collapsedSidebarLeft,
+      };
    });
 
    // The rect's right edge sits exactly at the expanded sidebar's left edge.

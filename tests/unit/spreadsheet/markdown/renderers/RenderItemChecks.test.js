@@ -47,14 +47,21 @@ describe('renderItemCheckLines', () => {
    });
 
    it('appends a scaling Damage segment when isDamage and scaling', () => {
-      expect(renderItemCheckLines([makeCheck({ isDamage: true, initialValue: 3 })], fakeLabels)).toEqual([
+      expect(renderItemCheckLines([makeCheck({
+         isDamage: true,
+         initialValue: 3,
+      })], fakeLabels)).toEqual([
          '**Slam:** Body (Athletics) 4:1, Damage 3 \\+ ES  ',
       ]);
    });
 
    it('appends a non-scaling Healing segment when isHealing and not scaling', () => {
       expect(renderItemCheckLines([
-         makeCheck({ isHealing: true, initialValue: 2, scaling: false }),
+         makeCheck({
+            isHealing: true,
+            initialValue: 2,
+            scaling: false,
+         }),
       ], fakeLabels)).toEqual([
          '**Slam:** Body (Athletics) 4:1, Healing 2  ',
       ]);

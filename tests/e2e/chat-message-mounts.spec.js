@@ -53,7 +53,10 @@ function contentChildCount(rootSelector, messageId) {
          `${rootSelector} li[data-message-id="${messageId}"] .message-content`,
       );
       return content?.children.length ?? 0;
-   }, { rootSelector, messageId });
+   }, {
+      rootSelector,
+      messageId,
+   });
 }
 
 /**
@@ -69,7 +72,10 @@ async function rollCheckMessage() {
          await stale.delete();
       }
       /** @type {Actor} The rebuilt fixture actor that rolls the check. */
-      const actor = await Actor.create({ name: 'E2E Mount Roller', type: 'player' });
+      const actor = await Actor.create({
+         name: 'E2E Mount Roller',
+         type: 'player',
+      });
       /** @type {number} The message count before the roll; the wait below detects the new message. */
       const before = game.messages.size;
       await actor.system.rollAttributeCheck({ attribute: 'body' });

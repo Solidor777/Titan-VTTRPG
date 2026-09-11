@@ -106,8 +106,14 @@ function renderRow(weapon, actor) {
          attackIdx: 0,
       },
       context: new Map([
-         ['document', weapon],
-         ['sheetDocument', actor],
+         [
+            'document',
+            weapon,
+         ],
+         [
+            'sheetDocument',
+            actor,
+         ],
       ]),
    });
 }
@@ -137,7 +143,12 @@ describe('CharacterSheetWeaponAttack', () => {
       );
 
       // Every modifier type is requested with (type, attribute, skill, multiAttack, attackType, traits, customs).
-      for (const modifierType of ['dice', 'training', 'expertise', 'damage']) {
+      for (const modifierType of [
+         'dice',
+         'training',
+         'expertise',
+         'damage',
+      ]) {
          expect(getAttackCheckMod).toHaveBeenCalledWith(
             modifierType,
             'body',

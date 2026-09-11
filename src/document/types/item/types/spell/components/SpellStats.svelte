@@ -50,7 +50,10 @@
    <!--Custom Traits-->
    {#each customTrait as trait}
       <div class="stat">
-         <Tag tooltip={{ text: trait.description, localize: false }}>
+         <Tag tooltip={{
+            text: trait.description,
+            localize: false,
+         }}>
             {trait.name}
          </Tag>
       </div>

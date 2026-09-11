@@ -92,8 +92,8 @@
       // Get base dice.
       let pool =
          sheetDocument.data.system.attribute[attack.attribute].value +
-         trainingDice +
-         getCheckMod('dice');
+            trainingDice +
+            getCheckMod('dice');
 
       // Cut the dice in half if multi attacking.
       if (multiAttack) {
@@ -124,7 +124,7 @@
       // Get base expertise.
       let exp =
          sheetDocument.data.system.skill[attack.skill].expertise.value +
-         getCheckMod('expertise');
+            getCheckMod('expertise');
 
       // Cut the expertise in half if multi attacking.
       if (multiAttack) {

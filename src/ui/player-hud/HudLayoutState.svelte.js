@@ -7,13 +7,21 @@ import { createDefaultHudLayout } from '~/ui/player-hud/PlayerHudDefaults.js';
  */
 export default class HudLayoutState {
    /** @type {{left: number, top: number, width: number, height: number}} The usable canvas rect. */
-   rect = $state({ left: 0, top: 0, width: 0, height: 0 });
+   rect = $state({
+      left: 0,
+      top: 0,
+      width: 0,
+      height: 0,
+   });
 
    /** @type {object} Per-element anchored positions, keyed by element key. */
    positions = $state({});
 
    /** @type {{width: number, height: number}} The effects panel's user-set size. */
-   effectsPanelSize = $state({ width: 300, height: 320 });
+   effectsPanelSize = $state({
+      width: 300,
+      height: 320,
+   });
 
    /** @type {object} Per-element minimized flags, keyed by element key. */
    minimized = $state({});

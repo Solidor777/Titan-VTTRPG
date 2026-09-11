@@ -55,9 +55,15 @@ async function seedControlledActor(page, { name, type = 'player', releaseOthers 
    }
    await page.evaluate(async ({ name, type }) => {
       if (!game.actors.getName(name)) {
-         await Actor.create({ name, type });
+         await Actor.create({
+            name,
+            type,
+         });
       }
-   }, { name, type });
+   }, {
+      name,
+      type,
+   });
 
    /** @type {boolean} Whether the actor already has a drawn token on the viewed scene. */
    const hasToken = await page.evaluate(({ name }) => {
@@ -68,7 +74,10 @@ async function seedControlledActor(page, { name, type = 'player', releaseOthers 
          return true;
       }
       return false;
-   }, { name, releaseOthers });
+   }, {
+      name,
+      releaseOthers,
+   });
 
    if (hasToken) {
       if (releaseOthers) {
@@ -125,7 +134,10 @@ test('GM with no selection shows no HUD elements', async () => {
 });
 
 test('NPC selection shows the portrait without the inspiration button', async () => {
-   await seedControlledActor(page, { name: 'HUD Vis NPC', type: 'npc' });
+   await seedControlledActor(page, {
+      name: 'HUD Vis NPC',
+      type: 'npc',
+   });
    await expect(page.locator('[data-testid="player-hud-portrait"]')).toBeVisible();
    await expect(page.locator('[data-testid="player-hud-toggle-inspiration"]')).toHaveCount(0);
    await expect(page.locator('[data-testid="player-hud-spend-resolve"]')).toBeVisible();
@@ -135,7 +147,10 @@ test('group selection hides the portrait', async () => {
    await seedControlledActor(page, { name: 'HUD Vis Player' });
    await expect(page.locator('[data-testid="player-hud-portrait"]')).toBeVisible();
 
-   await seedControlledActor(page, { name: 'HUD Vis Player 2', releaseOthers: false });
+   await seedControlledActor(page, {
+      name: 'HUD Vis Player 2',
+      releaseOthers: false,
+   });
    await expect(page.locator('[data-testid="player-hud-portrait"]')).toHaveCount(0);
 });
 
@@ -177,10 +192,17 @@ test('combat-only hides the portrait outside combat and shows it during combat',
    /** @type {string} The created combat's id, for teardown. */
    const combatId = await page.evaluate(async (id) => {
       const token = canvas.tokens.placeables.find((placeable) => placeable.actor?.id === id);
-      const combat = await Combat.create({ scene: canvas.scene.id, active: true });
+      const combat = await Combat.create({
+         scene: canvas.scene.id,
+         active: true,
+      });
       ui.combat.viewed = combat;
       await combat.createEmbeddedDocuments('Combatant', [
-         { tokenId: token.document.id, sceneId: canvas.scene.id, initiative: 10 },
+         {
+            tokenId: token.document.id,
+            sceneId: canvas.scene.id,
+            initiative: 10,
+         },
       ]);
       await combat.startCombat();
       return combat.id;
@@ -206,15 +228,24 @@ test('switching to a tokenless scene hides the HUD; returning restores it', asyn
    /** @type {{tempId: string, originalId: string}} The temp and original scene ids. */
    const ids = await page.evaluate(async () => {
       const originalId = game.scenes.active.id;
-      const temp = await Scene.create({ name: 'E2E HUD Empty Scene', active: true });
+      const temp = await Scene.create({
+         name: 'E2E HUD Empty Scene',
+         active: true,
+      });
 
       // Let the temp scene's canvas draw finish before anything else touches the view; a second
       // scene transition issued mid-draw races the first and strands the canvas on a dead scene.
       await titanWait(
          () => canvas.ready && canvas.scene?.id === temp.id,
-         { message: 'temp scene drawn after activation', timeout: 1000 },
+         {
+            message: 'temp scene drawn after activation',
+            timeout: 1000,
+         },
       );
-      return { tempId: temp.id, originalId };
+      return {
+         tempId: temp.id,
+         originalId,
+      };
    });
    await expect(page.locator('[data-testid="player-hud-portrait"]')).toHaveCount(0);
 
@@ -225,7 +256,10 @@ test('switching to a tokenless scene hides the HUD; returning restores it', asyn
       await game.scenes.get(originalId).view();
       await titanWait(
          () => canvas.ready && canvas.scene?.id === originalId,
-         { message: 'original scene redrawn after view', timeout: 1000 },
+         {
+            message: 'original scene redrawn after view',
+            timeout: 1000,
+         },
       );
       await game.scenes.get(originalId).activate();
       await game.scenes.get(tempId)?.delete();

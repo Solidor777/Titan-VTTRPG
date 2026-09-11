@@ -17,19 +17,50 @@ const NAMED_ENTITIES = {
  * Void elements: tags with no closing tag and no children, regardless of a trailing `/`.
  * @type {Set<string>}
  */
-const VOID_ELEMENTS = new Set(['br', 'hr', 'img']);
+const VOID_ELEMENTS = new Set([
+   'br',
+   'hr',
+   'img',
+]);
 
 /**
  * Element tags rendered as standalone Markdown blocks (paragraphs, lists, tables, etc.).
  * @type {Set<string>}
  */
-const BLOCK_TAGS = new Set(['p', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'hr', 'blockquote', 'pre', 'ul', 'ol', 'table']);
+const BLOCK_TAGS = new Set([
+   'p',
+   'h1',
+   'h2',
+   'h3',
+   'h4',
+   'h5',
+   'h6',
+   'hr',
+   'blockquote',
+   'pre',
+   'ul',
+   'ol',
+   'table',
+]);
 
 /**
  * Element tags rendered inline (inside a block's text run), including the self-closing `<br>`.
  * @type {Set<string>}
  */
-const INLINE_TAGS = new Set(['strong', 'b', 'em', 'i', 's', 'del', 'strike', 'u', 'code', 'a', 'br', 'img']);
+const INLINE_TAGS = new Set([
+   'strong',
+   'b',
+   'em',
+   'i',
+   's',
+   'del',
+   'strike',
+   'u',
+   'code',
+   'a',
+   'br',
+   'img',
+]);
 
 /**
  * Tags whose start tag implicitly closes an open ancestor `<p>`, per the HTML5 "optional tags"
@@ -41,9 +72,25 @@ const INLINE_TAGS = new Set(['strong', 'b', 'em', 'i', 's', 'del', 'strike', 'u'
  * @type {Set<string>}
  */
 const P_CLOSING_TAGS = new Set([
-   'p', 'ul', 'ol', 'li', 'table', 'blockquote', 'pre',
-   'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'hr', 'div', 'section',
-   'tr', 'td', 'th',
+   'p',
+   'ul',
+   'ol',
+   'li',
+   'table',
+   'blockquote',
+   'pre',
+   'h1',
+   'h2',
+   'h3',
+   'h4',
+   'h5',
+   'h6',
+   'hr',
+   'div',
+   'section',
+   'tr',
+   'td',
+   'th',
 ]);
 
 /**
@@ -51,7 +98,13 @@ const P_CLOSING_TAGS = new Set([
  * HTML5 "has a p element in button scope" rule.
  * @type {string[]}
  */
-const P_CLOSING_BOUNDARIES = ['table', 'tr', 'td', 'th', 'li'];
+const P_CLOSING_BOUNDARIES = [
+   'table',
+   'tr',
+   'td',
+   'th',
+   'li',
+];
 
 /**
  * Matches a single HTML entity reference: a named entity, a decimal numeric reference, or a
@@ -195,16 +248,36 @@ function closeImplicit(stack, tag) {
    }
 
    if (tag === 'li') {
-      closeSibling(stack, ['li'], ['ul', 'ol']);
+      closeSibling(stack, ['li'], [
+         'ul',
+         'ol',
+      ]);
    }
    else if (tag === 'td' || tag === 'th') {
-      closeSibling(stack, ['td', 'th'], ['tr', 'table', 'thead', 'tbody', 'tfoot']);
+      closeSibling(stack, [
+         'td',
+         'th',
+      ], [
+         'tr',
+         'table',
+         'thead',
+         'tbody',
+         'tfoot',
+      ]);
    }
    else if (tag === 'tr') {
-      closeSibling(stack, ['tr'], ['table', 'thead', 'tbody', 'tfoot']);
+      closeSibling(stack, ['tr'], [
+         'table',
+         'thead',
+         'tbody',
+         'tfoot',
+      ]);
    }
    else if (tag === 'dt' || tag === 'dd') {
-      closeSibling(stack, ['dt', 'dd'], ['dl']);
+      closeSibling(stack, [
+         'dt',
+         'dd',
+      ], ['dl']);
    }
 }
 
@@ -236,7 +309,10 @@ function parseHtml(html) {
       /** @type {string} The literal text between the previous token and this one. */
       const textBefore = html.slice(lastIndex, match.index);
       if (textBefore !== '') {
-         stack[stack.length - 1].children.push({ type: 'text', value: textBefore });
+         stack[stack.length - 1].children.push({
+            type: 'text',
+            value: textBefore,
+         });
       }
 
       lastIndex = TOKEN_RE.lastIndex;
@@ -279,7 +355,10 @@ function parseHtml(html) {
    /** @type {string} Any text following the final token. */
    const trailingText = html.slice(lastIndex);
    if (trailingText !== '') {
-      stack[stack.length - 1].children.push({ type: 'text', value: trailingText });
+      stack[stack.length - 1].children.push({
+         type: 'text',
+         value: trailingText,
+      });
    }
 
    return root;

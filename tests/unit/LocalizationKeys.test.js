@@ -18,7 +18,10 @@ function collectStringValues(object, prefix = '') {
       /** @type {string} The dotted key path for this leaf. */
       const keyPath = prefix ? `${prefix}.${key}` : key;
       if (typeof value === 'string') {
-         pairs.push([keyPath, value]);
+         pairs.push([
+            keyPath,
+            value,
+         ]);
       }
       else if (value && typeof value === 'object') {
          pairs.push(...collectStringValues(value, keyPath));

@@ -5,7 +5,7 @@
    /**
     * @typedef {object} EffectTrayShellProps
     * @property {import('~/sidebar/tray/EffectTrayState.svelte.js').default} trayState - The reactive
-    *    Effect Tray state instance.
+    * Effect Tray state instance.
     */
 
    /** @type {EffectTrayShellProps} */

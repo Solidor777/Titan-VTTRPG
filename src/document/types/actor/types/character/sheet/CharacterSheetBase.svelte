@@ -1,7 +1,7 @@
 <script>
    import CharacterSheetTabs from '~/document/types/actor/types/character/sheet/tabs/CharacterSheetTabs.svelte';
    import CharacterSheetSidebar
-      from '~/document/types/actor/types/character/sheet/sidebar/CharacterSheetSidebar.svelte';
+   from '~/document/types/actor/types/character/sheet/sidebar/CharacterSheetSidebar.svelte';
    import { getContext } from 'svelte';
 
    /**

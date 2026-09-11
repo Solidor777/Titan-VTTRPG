@@ -74,8 +74,16 @@ describe('renderCompendiumMarkdown', () => {
                rarity: 'common',
                value: 20,
                attack: [
-                  makeAttack({ label: 'Slash', type: 'melee' }),
-                  makeAttack({ label: 'Throw', type: 'ranged', attribute: 'body', skill: 'rangedWeapons' }),
+                  makeAttack({
+                     label: 'Slash',
+                     type: 'melee',
+                  }),
+                  makeAttack({
+                     label: 'Throw',
+                     type: 'ranged',
+                     attribute: 'body',
+                     skill: 'rangedWeapons',
+                  }),
                ],
                attackNotes: '',
                trait: [],
@@ -93,17 +101,28 @@ describe('renderCompendiumMarkdown', () => {
             type: 'spell',
             name: 'Blast',
             folderPath: [],
-            system: makeSpellSystem({ xpCost: 2, tradition: 'fire', description: '<p>A burst of flame.</p>' }),
+            system: makeSpellSystem({
+               xpCost: 2,
+               tradition: 'fire',
+               description: '<p>A burst of flame.</p>',
+            }),
          },
          {
             type: 'commodity',
             name: 'Rope',
             folderPath: ['Trade Goods'],
-            system: { rarity: 'common', value: 5, description: '' },
+            system: {
+               rarity: 'common',
+               value: 5,
+               description: '',
+            },
          },
       ];
 
-      expect(renderCompendiumMarkdown(documents, { title: 'Test Pack', labels })).toBe(
+      expect(renderCompendiumMarkdown(documents, {
+         title: 'Test Pack',
+         labels,
+      })).toBe(
          '# Test Pack {#test-pack}\n\n'
          + '# Contents {#contents}\n\n'
          + '[Test Pack](#test-pack)\n\n'
@@ -144,12 +163,33 @@ describe('renderCompendiumMarkdown', () => {
    it('deduplicates a repeated heading text with -1, -2, ... suffixes in document order', () => {
       /** @type {object[]} Two root-level commodities that happen to share a name. */
       const documents = [
-         { type: 'commodity', name: 'Rope', folderPath: [], system: { rarity: 'common', value: 1, description: '' } },
-         { type: 'commodity', name: 'Rope', folderPath: [], system: { rarity: 'common', value: 2, description: '' } },
+         {
+            type: 'commodity',
+            name: 'Rope',
+            folderPath: [],
+            system: {
+               rarity: 'common',
+               value: 1,
+               description: '',
+            },
+         },
+         {
+            type: 'commodity',
+            name: 'Rope',
+            folderPath: [],
+            system: {
+               rarity: 'common',
+               value: 2,
+               description: '',
+            },
+         },
       ];
 
       /** @type {string} The rendered file. */
-      const result = renderCompendiumMarkdown(documents, { title: 'Test Pack', labels });
+      const result = renderCompendiumMarkdown(documents, {
+         title: 'Test Pack',
+         labels,
+      });
 
       expect(result).toContain('#### ***Rope*** {#rope}\n\n**Value:** 1');
       expect(result).toContain('#### ***Rope*** {#rope-1}\n\n**Value:** 2');
@@ -172,7 +212,10 @@ describe('renderCompendiumMarkdown', () => {
             system: {
                rarity: 'common',
                value: 1,
-               attack: [makeAttack({ label: 'Punch', type: 'melee' })],
+               attack: [makeAttack({
+                  label: 'Punch',
+                  type: 'melee',
+               })],
                attackNotes: '',
                trait: [],
                check: [],
@@ -187,8 +230,16 @@ describe('renderCompendiumMarkdown', () => {
                rarity: 'common',
                value: 1,
                attack: [
-                  makeAttack({ label: 'Strike', type: 'melee' }),
-                  makeAttack({ label: 'Throw', type: 'ranged', attribute: 'body', skill: 'rangedWeapons' }),
+                  makeAttack({
+                     label: 'Strike',
+                     type: 'melee',
+                  }),
+                  makeAttack({
+                     label: 'Throw',
+                     type: 'ranged',
+                     attribute: 'body',
+                     skill: 'rangedWeapons',
+                  }),
                ],
                attackNotes: '',
                trait: [],
@@ -199,7 +250,10 @@ describe('renderCompendiumMarkdown', () => {
       ];
 
       /** @type {string} The rendered file. */
-      const result = renderCompendiumMarkdown(documents, { title: 'Test Pack', labels });
+      const result = renderCompendiumMarkdown(documents, {
+         title: 'Test Pack',
+         labels,
+      });
 
       expect(result).toContain('#### ***Strike (Melee)*** {#strike-melee}\n\n');
       expect(result).toContain('##### ***Strike (Melee)*** {#strike-melee-1}\n\n');
@@ -210,11 +264,23 @@ describe('renderCompendiumMarkdown', () => {
    it('ends the file with a single trailing newline', () => {
       /** @type {object[]} A single root-level commodity. */
       const documents = [
-         { type: 'commodity', name: 'Rope', folderPath: [], system: { rarity: 'common', value: 1, description: '' } },
+         {
+            type: 'commodity',
+            name: 'Rope',
+            folderPath: [],
+            system: {
+               rarity: 'common',
+               value: 1,
+               description: '',
+            },
+         },
       ];
 
       /** @type {string} The rendered file. */
-      const result = renderCompendiumMarkdown(documents, { title: 'Test Pack', labels });
+      const result = renderCompendiumMarkdown(documents, {
+         title: 'Test Pack',
+         labels,
+      });
 
       expect(result.endsWith('\n')).toBe(true);
       expect(result.endsWith('\n\n')).toBe(false);

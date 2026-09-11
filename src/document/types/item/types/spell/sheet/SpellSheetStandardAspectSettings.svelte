@@ -3,7 +3,7 @@
    import localize from '~/helpers/utility-functions/Localize.js';
    import { slide } from 'svelte/transition';
    import SpellSheetEnableAspectButton
-      from '~/document/types/item/types/spell/sheet/SpellSheetEnableAspectButton.svelte';
+   from '~/document/types/item/types/spell/sheet/SpellSheetEnableAspectButton.svelte';
    import DocumentSelect from '~/document/svelte-components/select/DocumentSelect.svelte';
    import DocumentResistanceSelect from '~/document/svelte-components/select/DocumentResistanceSelect.svelte';
    import DocumentCheckboxInput from '~/document/svelte-components/input/DocumentCheckboxInput.svelte';
@@ -51,7 +51,7 @@
          ? document.data.system.aspect.findIndex((aspect) => {
             return aspect.label === aspectOptions.template.label;
          })
-         : -1
+         : -1,
    );
 </script>
 

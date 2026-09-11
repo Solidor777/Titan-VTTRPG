@@ -162,7 +162,7 @@ export default class TitanActor extends Actor {
          // Create the active effect or effects.
          return  /** @type ActiveEffect[] */ this.createEmbeddedDocuments(
             'ActiveEffect',
-            activeEffectData
+            activeEffectData,
          );
 
       }
@@ -181,11 +181,11 @@ export default class TitanActor extends Actor {
       )) {
          const item = this.items.get(id);
          if (assert(
-               item !== undefined,
-               'Item was not valid.',
-               this.name,
-               id,
-            )
+            item !== undefined,
+            'Item was not valid.',
+            this.name,
+            id,
+         )
             && assert(
                !item.isMarkedForDeletion,
                'Item is already marked for deletion.',

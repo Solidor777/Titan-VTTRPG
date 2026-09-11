@@ -1,6 +1,6 @@
 <script>
    import ChatMessageButton
-      from '~/document/types/chat-message/components/buttons/ChatMessageButton.svelte';
+   from '~/document/types/chat-message/components/buttons/ChatMessageButton.svelte';
 
    /**
     * @typedef {object} ChatMessageResourceModButtonProps

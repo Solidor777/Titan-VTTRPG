@@ -47,7 +47,10 @@ test.describe('character sheet ability row reactivity', () => {
 
          // Seed a fresh player actor with one ability whose initial display state is known:
          // rarity 'common' (RarityTag class .common) and xpCost 0 (StatTag absent via {#if xpCost}).
-         const actor = await Actor.create({ name: actorName, type: 'player' });
+         const actor = await Actor.create({
+            name: actorName,
+            type: 'player',
+         });
          await actor.createEmbeddedDocuments('Item', [
             {
                name: 'E2E Reactive Ability',

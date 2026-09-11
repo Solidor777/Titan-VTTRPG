@@ -102,8 +102,14 @@ describe('renderAbility', () => {
          name: 'Path of the Arbiter',
          system: makeSystem({
             customTrait: [
-               { name: 'Path', description: '' },
-               { name: 'Arbiter', description: '' },
+               {
+                  name: 'Path',
+                  description: '',
+               },
+               {
+                  name: 'Arbiter',
+                  description: '',
+               },
             ],
             check: [{
                label: 'Sense Corruption',

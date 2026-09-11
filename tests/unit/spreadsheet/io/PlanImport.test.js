@@ -1,9 +1,17 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { planImport } from '~/spreadsheet/io/PlanImport.js';
 
-/** Builds a minimal in-browser File-like object carrying CSV text. */
+/**
+ * Builds a minimal in-browser File-like object carrying CSV text.
+ * @param name
+ * @param text
+ */
 function csvFile(name, text) {
-   return { name, text: async () => text, arrayBuffer: async () => new TextEncoder().encode(text).buffer };
+   return {
+      name,
+      text: async () => text,
+      arrayBuffer: async () => new TextEncoder().encode(text).buffer,
+   };
 }
 
 /** Minimal stand-in for SchemaField, matched via instanceof by resolveFieldSchema. */
@@ -72,8 +80,14 @@ describe('planImport', () => {
       // walks each registered subtype's static schema via instanceof checks against these field classes.
       globalThis.foundry.data = { fields: { SchemaField: MockSchemaField } };
       globalThis.CONFIG = {
-         Item: { dataModels: {}, documentClass: class { constructor(source) { Object.assign(this, source); } } },
-         ActiveEffect: { dataModels: {}, documentClass: { schema: {} } },
+         Item: {
+            dataModels: {},
+            documentClass: class { constructor(source) { Object.assign(this, source); } },
+         },
+         ActiveEffect: {
+            dataModels: {},
+            documentClass: { schema: {} },
+         },
       };
       // A fresh, call-unique 16-char id per invocation: some scenarios (e.g. a blank _id AND a
       // file-local key both needing a generated id in the same import) need two distinct fresh ids,
@@ -90,7 +104,10 @@ describe('planImport', () => {
       /** @type {string} */
       const weapon = '﻿_id,_parentId,_folder,name,type,img,sort\r\n'
          + `${'a'.repeat(16)},,,Sword,weapon,i.svg,1\r\n`;
-      const files = [csvFile('_manifest.csv', manifest), csvFile('weapon.csv', weapon)];
+      const files = [
+         csvFile('_manifest.csv', manifest),
+         csvFile('weapon.csv', weapon),
+      ];
       /** @type {object} A target pack with no existing documents. */
       const targetPack = {
          metadata: { type: 'Item' },
@@ -103,7 +120,12 @@ describe('planImport', () => {
 
       expect(plan.errors).toEqual([]);
       expect(plan.creates).toHaveLength(1);
-      expect(plan.creates[0]).toMatchObject({ documentType: 'weapon', id: 'a'.repeat(16), depth: 0, parentId: '' });
+      expect(plan.creates[0]).toMatchObject({
+         documentType: 'weapon',
+         id: 'a'.repeat(16),
+         depth: 0,
+         parentId: '',
+      });
    });
 
    it('plans an update for a row whose id already exists in the target pack, via a dry-run validation', async () => {
@@ -112,11 +134,18 @@ describe('planImport', () => {
          + 'sheet,weapon,weapon,\r\n';
       /** @type {string} */
       const weapon = `﻿_id,_parentId,_folder,name\r\n${'a'.repeat(16)},,,Renamed Sword\r\n`;
-      const files = [csvFile('_manifest.csv', manifest), csvFile('weapon.csv', weapon)];
+      const files = [
+         csvFile('_manifest.csv', manifest),
+         csvFile('weapon.csv', weapon),
+      ];
       /** @type {object} A pretend existing document supporting a dry-run updateSource. */
       const existing = { updateSource: vi.fn() };
       /** @type {object} */
-      const targetPack = { metadata: { type: 'Item' }, getDocument: async () => existing, getIndex: async () => [] };
+      const targetPack = {
+         metadata: { type: 'Item' },
+         getDocument: async () => existing,
+         getIndex: async () => [],
+      };
 
       const plan = await planImport(files, targetPack, false);
 
@@ -132,7 +161,10 @@ describe('planImport', () => {
          + 'sheet,weapon,weapon,\r\n';
       /** @type {string} */
       const weapon = `﻿_id,name\r\n${'a'.repeat(16)},Sword\r\n`;
-      const files = [csvFile('_manifest.csv', manifest), csvFile('weapon.csv', weapon)];
+      const files = [
+         csvFile('_manifest.csv', manifest),
+         csvFile('weapon.csv', weapon),
+      ];
       /** @type {object} */
       const targetPack = {
          metadata: { type: 'Item' },
@@ -160,7 +192,11 @@ describe('planImport', () => {
          dataModels: {},
          documentClass: class { constructor(source) { Object.assign(this, source); } },
       };
-      const files = [csvFile('_manifest.csv', manifest), csvFile('npc.csv', npc), csvFile('weapon.csv', weapon)];
+      const files = [
+         csvFile('_manifest.csv', manifest),
+         csvFile('npc.csv', npc),
+         csvFile('weapon.csv', weapon),
+      ];
       /** @type {object} */
       const targetPack = {
          metadata: { type: 'Actor' },
@@ -183,42 +219,85 @@ describe('planImport', () => {
    it('routes an actor pack\'s owned item, own effect, and item effect to their own document classes',
       async () => {
       /** @type {object[]} Every document-class construction planImport performs, in order. */
-      const constructed = [];
-      /** Builds a stand-in document class recording the class name each row is validated against. */
-      const makeDocumentClass = (documentName) => class {
-         constructor(source) {
-            constructed.push({ documentName, id: source._id });
-            Object.assign(this, source);
-         }
-      };
-      globalThis.CONFIG = {
-         Actor: { dataModels: {}, documentClass: makeDocumentClass('Actor') },
-         Item: { dataModels: {}, documentClass: makeDocumentClass('Item') },
-         // The subtype registry is what tells an actor's own effect apart from its owned item: both are
-         // depth-1 children of the actor, so depth and pack type alone cannot route them.
-         ActiveEffect: { dataModels: { effect: makeEmptySchemaDataModel() }, documentClass: makeDocumentClass('ActiveEffect') },
-      };
-      const files = actorGraphFiles();
+         const constructed = [];
+         /**
+          * Builds a stand-in document class recording the class name each row is validated against.
+          * @param documentName
+          */
+         const makeDocumentClass = (documentName) => class {
+            constructor(source) {
+               constructed.push({
+                  documentName,
+                  id: source._id,
+               });
+               Object.assign(this, source);
+            }
+         };
+         globalThis.CONFIG = {
+            Actor: {
+               dataModels: {},
+               documentClass: makeDocumentClass('Actor'),
+            },
+            Item: {
+               dataModels: {},
+               documentClass: makeDocumentClass('Item'),
+            },
+            // The subtype registry is what tells an actor's own effect apart from its owned item: both are
+            // depth-1 children of the actor, so depth and pack type alone cannot route them.
+            ActiveEffect: {
+               dataModels: { effect: makeEmptySchemaDataModel() },
+               documentClass: makeDocumentClass('ActiveEffect'),
+            },
+         };
+         const files = actorGraphFiles();
 
-      const plan = await planImport(files, null, false);
+         const plan = await planImport(files, null, false);
 
-      expect(plan.errors).toEqual([]);
-      expect(plan.creates).toHaveLength(4);
-      expect(plan.creates.find((c) => c.id === ACTOR_ID))
-         .toMatchObject({ documentName: 'Actor', depth: 0, parentId: '' });
-      expect(plan.creates.find((c) => c.id === ITEM_ID))
-         .toMatchObject({ documentName: 'Item', depth: 1, parentId: ACTOR_ID });
-      expect(plan.creates.find((c) => c.id === ACTOR_EFFECT_ID))
-         .toMatchObject({ documentName: 'ActiveEffect', depth: 1, parentId: ACTOR_ID });
-      expect(plan.creates.find((c) => c.id === ITEM_EFFECT_ID))
-         .toMatchObject({ documentName: 'ActiveEffect', depth: 2, parentId: ITEM_ID });
-      // Each row is validated through the class it will actually be created as: constructing the owned
-      // weapon as an Actor is what the real Foundry DocumentTypeField rejects.
-      expect(constructed).toContainEqual({ documentName: 'Item', id: ITEM_ID });
-      expect(constructed).toContainEqual({ documentName: 'ActiveEffect', id: ACTOR_EFFECT_ID });
-      expect(constructed).toContainEqual({ documentName: 'ActiveEffect', id: ITEM_EFFECT_ID });
-      expect(constructed.filter((c) => c.documentName === 'Actor')).toEqual([{ documentName: 'Actor', id: ACTOR_ID }]);
-   });
+         expect(plan.errors).toEqual([]);
+         expect(plan.creates).toHaveLength(4);
+         expect(plan.creates.find((c) => c.id === ACTOR_ID))
+            .toMatchObject({
+               documentName: 'Actor',
+               depth: 0,
+               parentId: '',
+            });
+         expect(plan.creates.find((c) => c.id === ITEM_ID))
+            .toMatchObject({
+               documentName: 'Item',
+               depth: 1,
+               parentId: ACTOR_ID,
+            });
+         expect(plan.creates.find((c) => c.id === ACTOR_EFFECT_ID))
+            .toMatchObject({
+               documentName: 'ActiveEffect',
+               depth: 1,
+               parentId: ACTOR_ID,
+            });
+         expect(plan.creates.find((c) => c.id === ITEM_EFFECT_ID))
+            .toMatchObject({
+               documentName: 'ActiveEffect',
+               depth: 2,
+               parentId: ITEM_ID,
+            });
+         // Each row is validated through the class it will actually be created as: constructing the owned
+         // weapon as an Actor is what the real Foundry DocumentTypeField rejects.
+         expect(constructed).toContainEqual({
+            documentName: 'Item',
+            id: ITEM_ID,
+         });
+         expect(constructed).toContainEqual({
+            documentName: 'ActiveEffect',
+            id: ACTOR_EFFECT_ID,
+         });
+         expect(constructed).toContainEqual({
+            documentName: 'ActiveEffect',
+            id: ITEM_EFFECT_ID,
+         });
+         expect(constructed.filter((c) => c.documentName === 'Actor')).toEqual([{
+            documentName: 'Actor',
+            id: ACTOR_ID,
+         }]);
+      });
 
    it('decodes an embedded row\'s typed cell via resolveTypeSchemasForPack(\'Actor\') feeding the weapon\'s '
       + 'own Item schema into readTables', async () => {
@@ -244,7 +323,10 @@ describe('planImport', () => {
             return new MockSchemaField({ rarity: new MockStringField({ nullable: false }) });
          }
       }
-      globalThis.CONFIG.Actor = { dataModels: {}, documentClass: class {} };
+      globalThis.CONFIG.Actor = {
+         dataModels: {},
+         documentClass: class {},
+      };
       globalThis.CONFIG.Item.dataModels = { weapon: WeaponDataModel };
 
       /** @type {string} */
@@ -258,7 +340,11 @@ describe('planImport', () => {
       // the fallback path.
       /** @type {string} */
       const weapon = `﻿_id,_parentId,name,system.rarity\r\n${ITEM_ID},${ACTOR_ID},Dagger,007\r\n`;
-      const files = [csvFile('_manifest.csv', manifest), csvFile('npc.csv', npc), csvFile('weapon.csv', weapon)];
+      const files = [
+         csvFile('_manifest.csv', manifest),
+         csvFile('npc.csv', npc),
+         csvFile('weapon.csv', weapon),
+      ];
       /** @type {object} A target pack with no existing documents, so the weapon row plans as a create. */
       const targetPack = {
          metadata: { type: 'Actor' },
@@ -277,9 +363,18 @@ describe('planImport', () => {
 
    it('plans updates for embedded rows that already exist in the target pack, at every depth', async () => {
       globalThis.CONFIG = {
-         Actor: { dataModels: {}, documentClass: class {} },
-         Item: { dataModels: {}, documentClass: class {} },
-         ActiveEffect: { dataModels: { effect: makeEmptySchemaDataModel() }, documentClass: class {} },
+         Actor: {
+            dataModels: {},
+            documentClass: class {},
+         },
+         Item: {
+            dataModels: {},
+            documentClass: class {},
+         },
+         ActiveEffect: {
+            dataModels: { effect: makeEmptySchemaDataModel() },
+            documentClass: class {},
+         },
       };
       /** @type {object} The effect already on the owned item (depth 2). */
       const existingItemEffect = { updateSource: vi.fn() };
@@ -309,11 +404,23 @@ describe('planImport', () => {
       expect(plan.creates).toEqual([]);
       expect(plan.updates).toHaveLength(4);
       expect(plan.updates.find((u) => u.id === ITEM_ID))
-         .toMatchObject({ documentName: 'Item', depth: 1, parentId: ACTOR_ID });
+         .toMatchObject({
+            documentName: 'Item',
+            depth: 1,
+            parentId: ACTOR_ID,
+         });
       expect(plan.updates.find((u) => u.id === ACTOR_EFFECT_ID))
-         .toMatchObject({ documentName: 'ActiveEffect', depth: 1, parentId: ACTOR_ID });
+         .toMatchObject({
+            documentName: 'ActiveEffect',
+            depth: 1,
+            parentId: ACTOR_ID,
+         });
       expect(plan.updates.find((u) => u.id === ITEM_EFFECT_ID))
-         .toMatchObject({ documentName: 'ActiveEffect', depth: 2, parentId: ITEM_ID });
+         .toMatchObject({
+            documentName: 'ActiveEffect',
+            depth: 2,
+            parentId: ITEM_ID,
+         });
       // Every embedded row is dry-run validated against its OWN existing document, not the actor's.
       expect(existingItem.updateSource).toHaveBeenCalledWith({ name: 'Dagger' }, { dryRun: true });
       expect(existingActorEffect.updateSource).toHaveBeenCalledWith({ name: 'Blessed' }, { dryRun: true });
@@ -322,89 +429,143 @@ describe('planImport', () => {
 
    it('resolves a child-sheet-only row against its real out-of-file parent already in the target pack',
       async () => {
-      globalThis.CONFIG.Actor = { dataModels: {}, documentClass: class {} };
-      /** @type {string} */
-      const manifest = '﻿key,value,documentType,arrayPath\r\nlayout,wide,,\r\npackType,Actor,,\r\n'
+         globalThis.CONFIG.Actor = {
+            dataModels: {},
+            documentClass: class {},
+         };
+         /** @type {string} */
+         const manifest = '﻿key,value,documentType,arrayPath\r\nlayout,wide,,\r\npackType,Actor,,\r\n'
          + 'sheet,weapon,weapon,\r\n';
-      // No _parentId column at all: the file itself has no idea this row is embedded.
-      /** @type {string} */
-      const weapon = `﻿_id,name\r\n${ITEM_ID},Dagger\r\n`;
-      const files = [csvFile('_manifest.csv', manifest), csvFile('weapon.csv', weapon)];
-      /** @type {object} The weapon already owned by the actor in the pack, matched by id. */
-      const existingWeapon = { id: ITEM_ID, updateSource: vi.fn(), effects: [] };
-      /** @type {object} The actor already in the pack, owning the weapon above. */
-      const existingActor = { id: ACTOR_ID, items: [existingWeapon], effects: [] };
-      /** @type {object} */
-      const targetPack = {
-         metadata: { type: 'Actor' }, getDocument: async () => null, getDocuments: async () => [existingActor],
-         getIndex: async () => [],
-      };
+         // No _parentId column at all: the file itself has no idea this row is embedded.
+         /** @type {string} */
+         const weapon = `﻿_id,name\r\n${ITEM_ID},Dagger\r\n`;
+         const files = [
+            csvFile('_manifest.csv', manifest),
+            csvFile('weapon.csv', weapon),
+         ];
+         /** @type {object} The weapon already owned by the actor in the pack, matched by id. */
+         const existingWeapon = {
+            id: ITEM_ID,
+            updateSource: vi.fn(),
+            effects: [],
+         };
+         /** @type {object} The actor already in the pack, owning the weapon above. */
+         const existingActor = {
+            id: ACTOR_ID,
+            items: [existingWeapon],
+            effects: [],
+         };
+         /** @type {object} */
+         const targetPack = {
+            metadata: { type: 'Actor' },
+            getDocument: async () => null,
+            getDocuments: async () => [existingActor],
+            getIndex: async () => [],
+         };
 
-      const plan = await planImport(files, targetPack, false);
+         const plan = await planImport(files, targetPack, false);
 
-      expect(plan.errors).toEqual([]);
-      expect(plan.creates).toEqual([]);
-      expect(plan.updates).toHaveLength(1);
-      expect(plan.updates[0]).toMatchObject({
-         documentName: 'Item', id: ITEM_ID, parentId: ACTOR_ID, depth: 1,
+         expect(plan.errors).toEqual([]);
+         expect(plan.creates).toEqual([]);
+         expect(plan.updates).toHaveLength(1);
+         expect(plan.updates[0]).toMatchObject({
+            documentName: 'Item',
+            id: ITEM_ID,
+            parentId: ACTOR_ID,
+            depth: 1,
+         });
+         expect(existingWeapon.updateSource).toHaveBeenCalledWith({ name: 'Dagger' }, { dryRun: true });
       });
-      expect(existingWeapon.updateSource).toHaveBeenCalledWith({ name: 'Dagger' }, { dryRun: true });
-   });
 
    it('plans a create for a child-sheet-only row whose id matches no document anywhere in the target pack',
       async () => {
-      globalThis.CONFIG.Actor = { dataModels: {}, documentClass: class {} };
-      /** @type {string} */
-      const manifest = '﻿key,value,documentType,arrayPath\r\nlayout,wide,,\r\npackType,Actor,,\r\n'
+         globalThis.CONFIG.Actor = {
+            dataModels: {},
+            documentClass: class {},
+         };
+         /** @type {string} */
+         const manifest = '﻿key,value,documentType,arrayPath\r\nlayout,wide,,\r\npackType,Actor,,\r\n'
          + 'sheet,weapon,weapon,\r\n';
-      /** @type {string} */
-      const weapon = `﻿_id,name\r\n${ITEM_ID},Dagger\r\n`;
-      const files = [csvFile('_manifest.csv', manifest), csvFile('weapon.csv', weapon)];
-      /** @type {object} An unrelated actor already in the pack, owning an unrelated item. */
-      const unrelatedActor = { id: ACTOR_ID, items: [{ id: 'e'.repeat(16), effects: [] }], effects: [] };
-      /** @type {object} */
-      const targetPack = {
-         metadata: { type: 'Actor' }, getDocument: async () => null, getDocuments: async () => [unrelatedActor],
-         getIndex: async () => [],
-      };
+         /** @type {string} */
+         const weapon = `﻿_id,name\r\n${ITEM_ID},Dagger\r\n`;
+         const files = [
+            csvFile('_manifest.csv', manifest),
+            csvFile('weapon.csv', weapon),
+         ];
+         /** @type {object} An unrelated actor already in the pack, owning an unrelated item. */
+         const unrelatedActor = {
+            id: ACTOR_ID,
+            items: [{
+               id: 'e'.repeat(16),
+               effects: [],
+            }],
+            effects: [],
+         };
+         /** @type {object} */
+         const targetPack = {
+            metadata: { type: 'Actor' },
+            getDocument: async () => null,
+            getDocuments: async () => [unrelatedActor],
+            getIndex: async () => [],
+         };
 
-      const plan = await planImport(files, targetPack, false);
+         const plan = await planImport(files, targetPack, false);
 
-      expect(plan.errors).toEqual([]);
-      expect(plan.updates).toEqual([]);
-      expect(plan.creates).toHaveLength(1);
-      // With no matching parent anywhere (in the file or the pack), the row falls through unchanged to the
-      // pre-existing top-level create path (depth 0, no parent) rather than being misidentified as an update.
-      expect(plan.creates[0]).toMatchObject({ id: ITEM_ID, parentId: '', depth: 0 });
-   });
+         expect(plan.errors).toEqual([]);
+         expect(plan.updates).toEqual([]);
+         expect(plan.creates).toHaveLength(1);
+         // With no matching parent anywhere (in the file or the pack), the row falls through unchanged to the
+         // pre-existing top-level create path (depth 0, no parent) rather than being misidentified as an update.
+         expect(plan.creates[0]).toMatchObject({
+            id: ITEM_ID,
+            parentId: '',
+            depth: 0,
+         });
+      });
 
    it('plans a delete for every top-level pack index entry absent from the file when deleteMissing is true',
       async () => {
       /** @type {string} */
-      const manifest = '﻿key,value,documentType,arrayPath\r\nlayout,wide,,\r\npackType,Item,,\r\n'
+         const manifest = '﻿key,value,documentType,arrayPath\r\nlayout,wide,,\r\npackType,Item,,\r\n'
          + 'sheet,weapon,weapon,\r\n';
-      /** @type {string} */
-      const weapon = `﻿_id,name\r\n${'a'.repeat(16)},Sword\r\n`;
-      const files = [csvFile('_manifest.csv', manifest), csvFile('weapon.csv', weapon)];
-      /** @type {object} */
-      const targetPack = {
-         metadata: { type: 'Item' },
-         getDocument: async () => null,
-         getDocuments: async () => [],
-         getIndex: async () => [{ _id: 'a'.repeat(16), type: 'weapon' }, { _id: 'z'.repeat(16), type: 'weapon' }],
-      };
+         /** @type {string} */
+         const weapon = `﻿_id,name\r\n${'a'.repeat(16)},Sword\r\n`;
+         const files = [
+            csvFile('_manifest.csv', manifest),
+            csvFile('weapon.csv', weapon),
+         ];
+         /** @type {object} */
+         const targetPack = {
+            metadata: { type: 'Item' },
+            getDocument: async () => null,
+            getDocuments: async () => [],
+            getIndex: async () => [
+               {
+                  _id: 'a'.repeat(16),
+                  type: 'weapon',
+               },
+               {
+                  _id: 'z'.repeat(16),
+                  type: 'weapon',
+               },
+            ],
+         };
 
-      const plan = await planImport(files, targetPack, true);
+         const plan = await planImport(files, targetPack, true);
 
-      expect(plan.deletes).toEqual([{ id: 'z'.repeat(16) }]);
-   });
+         expect(plan.deletes).toEqual([{ id: 'z'.repeat(16) }]);
+      });
 
    it('refuses a file whose packType does not match the target pack', async () => {
       /** @type {string} */
       const manifest = '﻿key,value,documentType,arrayPath\r\nlayout,wide,,\r\npackType,Item,,\r\n';
       const files = [csvFile('_manifest.csv', manifest)];
       /** @type {object} */
-      const targetPack = { metadata: { type: 'Actor' }, getDocument: async () => null, getIndex: async () => [] };
+      const targetPack = {
+         metadata: { type: 'Actor' },
+         getDocument: async () => null,
+         getIndex: async () => [],
+      };
 
       const plan = await planImport(files, targetPack, false);
 
@@ -450,9 +611,16 @@ describe('planImport', () => {
          + 'sheet,weapon,weapon,\r\n';
       /** @type {string} A malformed non-numeric value in the "system.value" number-typed column. */
       const weapon = `﻿_id,name,system.value\r\n${'a'.repeat(16)},Sword,not-a-number\r\n`;
-      const files = [csvFile('_manifest.csv', manifest), csvFile('weapon.csv', weapon)];
+      const files = [
+         csvFile('_manifest.csv', manifest),
+         csvFile('weapon.csv', weapon),
+      ];
       /** @type {object} */
-      const targetPack = { metadata: { type: 'Item' }, getDocument: async () => null, getIndex: async () => [] };
+      const targetPack = {
+         metadata: { type: 'Item' },
+         getDocument: async () => null,
+         getIndex: async () => [],
+      };
 
       const plan = await planImport(files, targetPack, false);
 
@@ -461,7 +629,11 @@ describe('planImport', () => {
       expect(plan.deletes).toEqual([]);
       expect(plan.folders).toEqual([]);
       expect(plan.errors).toHaveLength(1);
-      expect(plan.errors[0]).toMatchObject({ sheet: '_manifest', row: 0, column: '' });
+      expect(plan.errors[0]).toMatchObject({
+         sheet: '_manifest',
+         row: 0,
+         column: '',
+      });
       expect(plan.errors[0].message).toContain('Failed to read the file:');
 
       delete globalThis.foundry.data;
@@ -474,7 +646,11 @@ describe('planImport', () => {
          arrayBuffer: async () => new TextEncoder().encode('not a real xlsx file').buffer,
       };
       /** @type {object} */
-      const targetPack = { metadata: { type: 'Item' }, getDocument: async () => null, getIndex: async () => [] };
+      const targetPack = {
+         metadata: { type: 'Item' },
+         getDocument: async () => null,
+         getIndex: async () => [],
+      };
 
       const plan = await planImport([corruptXlsx], targetPack, false);
 
@@ -483,7 +659,11 @@ describe('planImport', () => {
       expect(plan.deletes).toEqual([]);
       expect(plan.folders).toEqual([]);
       expect(plan.errors).toHaveLength(1);
-      expect(plan.errors[0]).toMatchObject({ sheet: '_manifest', row: 0, column: '' });
+      expect(plan.errors[0]).toMatchObject({
+         sheet: '_manifest',
+         row: 0,
+         column: '',
+      });
       expect(plan.errors[0].message).toContain('Failed to read the file:');
       expect(plan.packType).toBe('');
    });

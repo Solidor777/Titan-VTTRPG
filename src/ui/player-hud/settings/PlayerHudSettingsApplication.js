@@ -20,10 +20,20 @@ export default class PlayerHudSettingsApplication extends ApplicationV2 {
     * @override
     */
    static DEFAULT_OPTIONS = {
-      classes: ['titan', 'titan-player-hud-settings'],
+      classes: [
+         'titan',
+         'titan-player-hud-settings',
+      ],
       id: 'titan-player-hud-settings',
-      position: { width: 520, height: 680 },
-      window: { resizable: true, minimizable: true, title: 'LOCAL.playerHudSettings.text' },
+      position: {
+         width: 520,
+         height: 680,
+      },
+      window: {
+         resizable: true,
+         minimizable: true,
+         title: 'LOCAL.playerHudSettings.text',
+      },
    };
 
    /**
@@ -50,7 +60,10 @@ export default class PlayerHudSettingsApplication extends ApplicationV2 {
       if (options.isFirstRender) {
          this.#mountHandle = mount(PlayerHudSettingsShell, {
             target: content,
-            context: new Map([['application', this]]),
+            context: new Map([[
+               'application',
+               this,
+            ]]),
          });
       }
    }

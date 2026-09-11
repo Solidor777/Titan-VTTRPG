@@ -8,7 +8,7 @@
    import CheckChatMessages from '~/check/chat-message/CheckChatMessages.svelte';
    import ChatRendButtons from '~/document/types/chat-message/components/buttons/ChatMessageRendButtons.svelte';
    import AttackCheckChatDamageButtons
-      from '~/check/types/attack-check/chat-message/AttackCheckChatDamageButtons.svelte';
+   from '~/check/types/attack-check/chat-message/AttackCheckChatDamageButtons.svelte';
 
    /** @type {object} Reference to the reactive Document store. */
    const document = getContext('document');
@@ -22,9 +22,9 @@
 
    <!--Attack Notes-->
    {#if document.data.system.parameters.attackNotes !==
-   '' &&
-   document.data.system.parameters.attackNotes !==
-   '<p></p>'}
+      '' &&
+      document.data.system.parameters.attackNotes !==
+      '<p></p>'}
       <div class="section rich-text">
          <RichText value={document.data.system.parameters.attackNotes}/>
       </div>

@@ -49,7 +49,10 @@ describe('AttackTags', () => {
             idx: 0,
             damageMod: 2,
          },
-         context: new Map([['document', makeBridge()]]),
+         context: new Map([[
+            'document',
+            makeBridge(),
+         ]]),
       });
 
       expect(screen.getByTestId('attack-tags-damage').querySelector('.value').textContent).toBe('5');
@@ -58,7 +61,10 @@ describe('AttackTags', () => {
    it('renders intrinsic damage when damageMod is omitted and appends the extra-successes suffix', () => {
       render(AttackTags, {
          props: { idx: 0 },
-         context: new Map([['document', makeBridge({ plusExtraSuccessDamage: true })]]),
+         context: new Map([[
+            'document',
+            makeBridge({ plusExtraSuccessDamage: true }),
+         ]]),
       });
 
       /** @type {string} The rendered damage value text. */
@@ -70,14 +76,20 @@ describe('AttackTags', () => {
    it('hides the range tag at range 1 and shows it otherwise', () => {
       const first = render(AttackTags, {
          props: { idx: 0 },
-         context: new Map([['document', makeBridge()]]),
+         context: new Map([[
+            'document',
+            makeBridge(),
+         ]]),
       });
       expect(screen.queryByTestId('attack-tags-range')).toBeNull();
       first.unmount();
 
       render(AttackTags, {
          props: { idx: 0 },
-         context: new Map([['document', makeBridge({ range: 4 })]]),
+         context: new Map([[
+            'document',
+            makeBridge({ range: 4 }),
+         ]]),
       });
       expect(screen.getByTestId('attack-tags-range').querySelector('.value').textContent).toBe('4');
    });
@@ -85,7 +97,10 @@ describe('AttackTags', () => {
    it('renders nothing for a missing attack index', () => {
       const { container } = render(AttackTags, {
          props: { idx: 7 },
-         context: new Map([['document', makeBridge()]]),
+         context: new Map([[
+            'document',
+            makeBridge(),
+         ]]),
       });
       expect(container.querySelector('.attack-tags')).toBeNull();
    });
@@ -93,7 +108,10 @@ describe('AttackTags', () => {
    it('renders nothing during the deletion window when the bridge data is undefined', () => {
       const { container } = render(AttackTags, {
          props: { idx: 0 },
-         context: new Map([['document', { data: undefined }]]),
+         context: new Map([[
+            'document',
+            { data: undefined },
+         ]]),
       });
       expect(container.querySelector('.attack-tags')).toBeNull();
    });

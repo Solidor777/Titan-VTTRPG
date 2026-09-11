@@ -6,7 +6,11 @@
  */
 export function diceResults(finals, expertiseRemaining = 0) {
    return {
-      dice: finals.map((final) => ({ base: final, expertiseApplied: 0, final: final })),
+      dice: finals.map((final) => ({
+         base: final,
+         expertiseApplied: 0,
+         final: final,
+      })),
       expertiseRemaining: expertiseRemaining,
    };
 }
@@ -17,7 +21,11 @@ export function diceResults(finals, expertiseRemaining = 0) {
  * @returns {object[]} An array of `{ base, expertiseApplied, final }`.
  */
 export function dice(finals) {
-   return finals.map((final) => ({ base: final, expertiseApplied: 0, final: final }));
+   return finals.map((final) => ({
+      base: final,
+      expertiseApplied: 0,
+      final: final,
+   }));
 }
 
 /**

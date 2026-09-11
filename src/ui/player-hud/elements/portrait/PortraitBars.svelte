@@ -11,7 +11,11 @@
    const document = getContext('document');
 
    /** @type {Array<string>} The displayed resources, in order. */
-   const resources = ['stamina', 'resolve', 'wounds'];
+   const resources = [
+      'stamina',
+      'resolve',
+      'wounds',
+   ];
 </script>
 
 <div class="bars">

@@ -27,7 +27,7 @@ export default class TitanPlayerSheet extends TitanCharacterSheet {
                   shell: PlayerSheetShell,
                },
             },
-         }
+         },
       );
 
       // Initialize self object.

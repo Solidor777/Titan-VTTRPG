@@ -17,7 +17,11 @@ export default async function onCombatPreviousTurn(restoredCombatantId, displace
       const restoredCombatant = combat?.combatants.get(restoredCombatantId);
       const displacedCombatant = combat?.combatants.get(displacedCombatantId);
       return combat && restoredCombatant && displacedCombatant
-         ? { combat, restoredCombatant, displacedCombatant }
+         ? {
+            combat,
+            restoredCombatant,
+            displacedCombatant,
+         }
          : null;
    });
 

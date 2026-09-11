@@ -99,47 +99,47 @@ beforeAll(async () => {
    // Dynamically import every leaf data model and its corresponding Svelte component so the
    // get-component getter can be asserted to resolve to the right component.
    leaves.weapon = (await import(
-      '~/document/types/item/types/weapon/chat-message/WeaponChatMessageDataModel.js'
+      '~/document/types/item/types/weapon/chat-message/WeaponChatMessageDataModel.js',
    )).default;
    leaves.armor = (await import(
-      '~/document/types/item/types/armor/chat-message/ArmorChatMessageDataModel.js'
+      '~/document/types/item/types/armor/chat-message/ArmorChatMessageDataModel.js',
    )).default;
    leaves.spell = (await import(
-      '~/document/types/item/types/spell/chat-message/SpellChatMessageDataModel.js'
+      '~/document/types/item/types/spell/chat-message/SpellChatMessageDataModel.js',
    )).default;
    leaves.ability = (await import(
-      '~/document/types/item/types/ability/chat-message/AbilityChatMessageDataModel.js'
+      '~/document/types/item/types/ability/chat-message/AbilityChatMessageDataModel.js',
    )).default;
    leaves.shield = (await import(
-      '~/document/types/item/types/shield/chat-message/ShieldChatMessageDataModel.js'
+      '~/document/types/item/types/shield/chat-message/ShieldChatMessageDataModel.js',
    )).default;
    leaves.equipment = (await import(
-      '~/document/types/item/types/equipment/chat-message/EquipmentChatMessageDataModel.js'
+      '~/document/types/item/types/equipment/chat-message/EquipmentChatMessageDataModel.js',
    )).default;
    leaves.commodity = (await import(
-      '~/document/types/item/types/commodity/chat-message/CommodityChatMessageDataModel.js'
+      '~/document/types/item/types/commodity/chat-message/CommodityChatMessageDataModel.js',
    )).default;
 
    components.weapon = (await import(
-      '~/document/types/item/types/weapon/chat-message/WeaponChatMessage.svelte'
+      '~/document/types/item/types/weapon/chat-message/WeaponChatMessage.svelte',
    )).default;
    components.armor = (await import(
-      '~/document/types/item/types/armor/chat-message/ArmorChatMessage.svelte'
+      '~/document/types/item/types/armor/chat-message/ArmorChatMessage.svelte',
    )).default;
    components.spell = (await import(
-      '~/document/types/item/types/spell/chat-message/SpellChatMessage.svelte'
+      '~/document/types/item/types/spell/chat-message/SpellChatMessage.svelte',
    )).default;
    components.ability = (await import(
-      '~/document/types/item/types/ability/chat-message/AbilityChatMesssage.svelte'
+      '~/document/types/item/types/ability/chat-message/AbilityChatMesssage.svelte',
    )).default;
    components.shield = (await import(
-      '~/document/types/item/types/shield/chat-message/ShieldChatMessage.svelte'
+      '~/document/types/item/types/shield/chat-message/ShieldChatMessage.svelte',
    )).default;
    components.equipment = (await import(
-      '~/document/types/item/types/equipment/chat-message/EquipmentChatMessage.svelte'
+      '~/document/types/item/types/equipment/chat-message/EquipmentChatMessage.svelte',
    )).default;
    components.commodity = (await import(
-      '~/document/types/item/types/commodity/chat-message/CommodityChatMessage.svelte'
+      '~/document/types/item/types/commodity/chat-message/CommodityChatMessage.svelte',
    )).default;
 
    WeaponChatMessageDataModel = leaves.weapon;

@@ -31,31 +31,55 @@ import TitanCombat from '~/document/types/combat/TitanCombat.js';
 import SocketManager from '~/helpers/SocketManager.js';
 import ArmorDataModel from '~/document/types/item/types/armor/ArmorDataModel.js';
 import TitanChatMessage from '~/document/types/chat-message/ChatMessage.js';
-import AttributeCheckChatMessageDataModel from '~/check/types/attribute-check/chat-message/AttributeCheckChatMessageDataModel.js';
-import ResistanceCheckChatMessageDataModel from '~/check/types/resistance-check/chat-message/ResistanceCheckChatMessageDataModel.js';
-import AttackCheckChatMessageDataModel from '~/check/types/attack-check/chat-message/AttackCheckChatMessageDataModel.js';
-import CastingCheckChatMessageDataModel from '~/check/types/casting-check/chat-message/CastingCheckChatMessageDataModel.js';
+import AttributeCheckChatMessageDataModel
+   from '~/check/types/attribute-check/chat-message/AttributeCheckChatMessageDataModel.js';
+import ResistanceCheckChatMessageDataModel
+   from '~/check/types/resistance-check/chat-message/ResistanceCheckChatMessageDataModel.js';
+import AttackCheckChatMessageDataModel
+   from '~/check/types/attack-check/chat-message/AttackCheckChatMessageDataModel.js';
+import CastingCheckChatMessageDataModel
+   from '~/check/types/casting-check/chat-message/CastingCheckChatMessageDataModel.js';
 import ItemCheckChatMessageDataModel from '~/check/types/item-check/chat-message/ItemCheckChatMessageDataModel.js';
-import WeaponChatMessageDataModel from '~/document/types/item/types/weapon/chat-message/WeaponChatMessageDataModel.js';
-import ArmorChatMessageDataModel from '~/document/types/item/types/armor/chat-message/ArmorChatMessageDataModel.js';
-import SpellChatMessageDataModel from '~/document/types/item/types/spell/chat-message/SpellChatMessageDataModel.js';
-import AbilityChatMessageDataModel from '~/document/types/item/types/ability/chat-message/AbilityChatMessageDataModel.js';
-import ShieldChatMessageDataModel from '~/document/types/item/types/shield/chat-message/ShieldChatMessageDataModel.js';
-import EquipmentChatMessageDataModel from '~/document/types/item/types/equipment/chat-message/EquipmentChatMessageDataModel.js';
-import CommodityChatMessageDataModel from '~/document/types/item/types/commodity/chat-message/CommodityChatMessageDataModel.js';
-import DamageReportChatMessageDataModel from '~/document/types/chat-message/report/types/damage/DamageReportChatMessageDataModel.js';
-import HealingReportChatMessageDataModel from '~/document/types/chat-message/report/types/healing/HealingReportChatMessageDataModel.js';
-import SpendResolveReportChatMessageDataModel from '~/document/types/chat-message/report/types/spend-resolve/SpendResolveReportChatMessageDataModel.js';
-import LongRestReportChatMessageDataModel from '~/document/types/chat-message/report/types/long-rest/LongRestReportChatMessageDataModel.js';
-import RendReportChatMessageDataModel from '~/document/types/chat-message/report/types/rend/RendReportChatMessageDataModel.js';
-import RepairsReportChatMessageDataModel from '~/document/types/chat-message/report/types/repairs/RepairsReportChatMessageDataModel.js';
-import RemoveCombatEffectsReportChatMessageDataModel from '~/document/types/chat-message/report/types/remove-combat-effects/RemoveCombatEffectsReportChatMessageDataModel.js';
-import ShortRestReportChatMessageDataModel from '~/document/types/chat-message/report/types/short-rest-report/ShortRestReportChatMessageDataModel.js';
-import TurnStartReportChatMessageDataModel from '~/document/types/chat-message/report/types/turn-start/TurnStartReportChatMessageDataModel.js';
-import TurnEndReportChatMessageDataModel from '~/document/types/chat-message/report/types/turn-end/TurnEndReportChatMessageDataModel.js';
-import TurnStartRevertReportChatMessageDataModel from '~/document/types/chat-message/report/types/turn-start-revert/TurnStartRevertReportChatMessageDataModel.js';
-import TurnEndRevertReportChatMessageDataModel from '~/document/types/chat-message/report/types/turn-end-revert/TurnEndRevertReportChatMessageDataModel.js';
-import EffectsExpiredReportChatMessageDataModel from '~/document/types/chat-message/report/types/effects-expired/EffectsExpiredReportChatMessageDataModel.js';
+import WeaponChatMessageDataModel
+   from '~/document/types/item/types/weapon/chat-message/WeaponChatMessageDataModel.js';
+import ArmorChatMessageDataModel
+   from '~/document/types/item/types/armor/chat-message/ArmorChatMessageDataModel.js';
+import SpellChatMessageDataModel
+   from '~/document/types/item/types/spell/chat-message/SpellChatMessageDataModel.js';
+import AbilityChatMessageDataModel
+   from '~/document/types/item/types/ability/chat-message/AbilityChatMessageDataModel.js';
+import ShieldChatMessageDataModel
+   from '~/document/types/item/types/shield/chat-message/ShieldChatMessageDataModel.js';
+import EquipmentChatMessageDataModel
+   from '~/document/types/item/types/equipment/chat-message/EquipmentChatMessageDataModel.js';
+import CommodityChatMessageDataModel
+   from '~/document/types/item/types/commodity/chat-message/CommodityChatMessageDataModel.js';
+import DamageReportChatMessageDataModel
+   from '~/document/types/chat-message/report/types/damage/DamageReportChatMessageDataModel.js';
+import HealingReportChatMessageDataModel
+   from '~/document/types/chat-message/report/types/healing/HealingReportChatMessageDataModel.js';
+import SpendResolveReportChatMessageDataModel
+   from '~/document/types/chat-message/report/types/spend-resolve/SpendResolveReportChatMessageDataModel.js';
+import LongRestReportChatMessageDataModel
+   from '~/document/types/chat-message/report/types/long-rest/LongRestReportChatMessageDataModel.js';
+import RendReportChatMessageDataModel
+   from '~/document/types/chat-message/report/types/rend/RendReportChatMessageDataModel.js';
+import RepairsReportChatMessageDataModel
+   from '~/document/types/chat-message/report/types/repairs/RepairsReportChatMessageDataModel.js';
+import RemoveCombatEffectsReportChatMessageDataModel from
+   '~/document/types/chat-message/report/types/remove-combat-effects/RemoveCombatEffectsReportChatMessageDataModel.js';
+import ShortRestReportChatMessageDataModel
+   from '~/document/types/chat-message/report/types/short-rest-report/ShortRestReportChatMessageDataModel.js';
+import TurnStartReportChatMessageDataModel
+   from '~/document/types/chat-message/report/types/turn-start/TurnStartReportChatMessageDataModel.js';
+import TurnEndReportChatMessageDataModel
+   from '~/document/types/chat-message/report/types/turn-end/TurnEndReportChatMessageDataModel.js';
+import TurnStartRevertReportChatMessageDataModel
+   from '~/document/types/chat-message/report/types/turn-start-revert/TurnStartRevertReportChatMessageDataModel.js';
+import TurnEndRevertReportChatMessageDataModel
+   from '~/document/types/chat-message/report/types/turn-end-revert/TurnEndRevertReportChatMessageDataModel.js';
+import EffectsExpiredReportChatMessageDataModel
+   from '~/document/types/chat-message/report/types/effects-expired/EffectsExpiredReportChatMessageDataModel.js';
 import EffectChatMessageDataModel from '~/document/types/active-effect/chat-message/EffectChatMessageDataModel.js';
 import TitanActiveEffect from '~/document/types/active-effect/TitanActiveEffect.js';
 import TitanActiveEffectDataModel from '~/document/types/active-effect/TitanActiveEffectDataModel.js';

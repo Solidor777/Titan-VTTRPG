@@ -100,7 +100,10 @@ function getCheckData(li) {
       && message.constructor.getSpeakerActor(message.speaker)?.isOwner
       && isCheck(message.type)
    ) {
-      return { type: message.type, ...message.system.toObject() };
+      return {
+         type: message.type,
+         ...message.system.toObject(),
+      };
    }
 
    return false;

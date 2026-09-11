@@ -6,7 +6,7 @@
    import IconTag from '~/helpers/svelte-components/tag/IconTag.svelte';
    import TraitTag from '~/helpers/svelte-components/tag/TraitTag.svelte';
    import Tag from '~/helpers/svelte-components/tag/Tag.svelte';
-   import { ACCURACY_ICON, MELEE_ICON, MULTI_ATTACK_ICON, RANGE_ICON, } from '~/system/Icons.js';
+   import { ACCURACY_ICON, MELEE_ICON, MULTI_ATTACK_ICON, RANGE_ICON } from '~/system/Icons.js';
 
    /** @type {object} Reference to the reactive Document store. */
    const document = getContext('document');
@@ -50,7 +50,10 @@
    <!--Custom Traits-->
    {#each document.data.system.parameters.customTrait as trait}
       <div class="stat">
-         <Tag tooltip={{ text: trait.description, localize: false }}>
+         <Tag tooltip={{
+            text: trait.description,
+            localize: false,
+         }}>
             {trait.name}
          </Tag>
       </div>

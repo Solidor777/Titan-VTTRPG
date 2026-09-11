@@ -70,7 +70,10 @@ describe('renderWeapon', () => {
             attack: [makeAttack({
                damage: 2,
                plusExtraSuccessDamage: true,
-               trait: [{ name: 'slashing', value: true }],
+               trait: [{
+                  name: 'slashing',
+                  value: true,
+               }],
             })],
             description: '<p>These axes are designed explicitly as weapons, rather than tools.</p>',
          }),
@@ -95,8 +98,14 @@ describe('renderWeapon', () => {
                   type: 'melee',
                   damage: 1,
                   trait: [
-                     { name: 'flurry', value: true },
-                     { name: 'slashing', value: true },
+                     {
+                        name: 'flurry',
+                        value: true,
+                     },
+                     {
+                        name: 'slashing',
+                        value: true,
+                     },
                   ],
                }),
                makeAttack({
@@ -106,7 +115,10 @@ describe('renderWeapon', () => {
                   skill: 'rangedWeapons',
                   damage: 1,
                   range: 5,
-                  trait: [{ name: 'slashing', value: true }],
+                  trait: [{
+                     name: 'slashing',
+                     value: true,
+                  }],
                }),
             ],
             description: '<p>This small, bladed weapon is held in one hand and used to stab a creature in '
@@ -137,8 +149,14 @@ describe('renderWeapon', () => {
             attack: [makeAttack({
                damage: 1,
                trait: [
-                  { name: 'crushing', value: true },
-                  { name: 'flurry', value: true },
+                  {
+                     name: 'crushing',
+                     value: true,
+                  },
+                  {
+                     name: 'flurry',
+                     value: true,
+                  },
                ],
             })],
          }),
@@ -155,7 +173,10 @@ describe('renderWeapon', () => {
       const document = {
          name: 'Sling',
          system: makeSystem({
-            attack: [makeAttack({ damage: 3, plusExtraSuccessDamage: false })],
+            attack: [makeAttack({
+               damage: 3,
+               plusExtraSuccessDamage: false,
+            })],
          }),
       };
 
@@ -167,7 +188,10 @@ describe('renderWeapon', () => {
       const document = {
          name: 'Odd Blade',
          system: makeSystem({
-            attack: [makeAttack({ attribute: 'body', skill: 'athletics' })],
+            attack: [makeAttack({
+               attribute: 'body',
+               skill: 'athletics',
+            })],
          }),
       };
 
@@ -179,7 +203,10 @@ describe('renderWeapon', () => {
       const document = {
          name: 'Greatsword',
          system: makeSystem({
-            trait: [{ name: 'twoHanded', value: true }],
+            trait: [{
+               name: 'twoHanded',
+               value: true,
+            }],
          }),
       };
 

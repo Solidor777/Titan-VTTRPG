@@ -41,7 +41,10 @@
    const packOptions = $derived(
       game.packs
          .filter((pack) => !plan || pack.metadata.type === plan.packType)
-         .map((pack) => ({ value: pack.collection, label: pack.metadata.label })),
+         .map((pack) => ({
+            value: pack.collection,
+            label: pack.metadata.label,
+         })),
    );
 
    // A stored plan is only valid against the target pack and options it was computed with; Apply must stay
@@ -130,8 +133,14 @@
 
    <Select
       options={[
-         { value: 'existing', label: localize('importIntoExisting') },
-         { value: 'new', label: localize('importIntoNew') },
+         {
+            value: 'existing',
+            label: localize('importIntoExisting'),
+         },
+         {
+            value: 'new',
+            label: localize('importIntoNew'),
+         },
       ]}
       bind:value={targetMode}
       testId="import-target-mode-select"

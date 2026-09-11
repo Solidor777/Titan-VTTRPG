@@ -271,7 +271,10 @@ test.describe('embedded-context item rows', () => {
          await game.settings.set('titan', 'getCheckOptions', false);
          await game.settings.set('titan', 'confirmDeletingItems', false);
 
-         return Object.fromEntries(created.map((doc) => [doc.type, doc.id]));
+         return Object.fromEntries(created.map((doc) => [
+            doc.type,
+            doc.id,
+         ]));
       }, {
          actorName: ACTOR_NAME,
          // Each seed's COMPLETE check entry is built by the shared buildCheck factory (unopposed,

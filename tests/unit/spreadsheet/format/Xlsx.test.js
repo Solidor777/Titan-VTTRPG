@@ -8,10 +8,28 @@ describe('Xlsx', () => {
       sheets: [
          {
             name: 'weapon',
-            columns: ['_id', 'name', 'damage', 'equipped', 'notes'],
+            columns: [
+               '_id',
+               'name',
+               'damage',
+               'equipped',
+               'notes',
+            ],
             rows: [
-               { _id: 'a'.repeat(16), name: 'Sword & Shield', damage: 5, equipped: true, notes: undefined },
-               { _id: 'b'.repeat(16), name: 'Bow', damage: 0, equipped: false, notes: '"5"' },
+               {
+                  _id: 'a'.repeat(16),
+                  name: 'Sword & Shield',
+                  damage: 5,
+                  equipped: true,
+                  notes: undefined,
+               },
+               {
+                  _id: 'b'.repeat(16),
+                  name: 'Bow',
+                  damage: 0,
+                  equipped: false,
+                  notes: '"5"',
+               },
             ],
          },
       ],
@@ -23,10 +41,18 @@ describe('Xlsx', () => {
       expect(decoded.sheets[0].name).toBe('weapon');
       expect(decoded.sheets[0].columns).toEqual(workbook.sheets[0].columns);
       expect(decoded.sheets[0].rows[0]).toEqual({
-         _id: 'a'.repeat(16), name: 'Sword & Shield', damage: 5, equipped: true, notes: undefined,
+         _id: 'a'.repeat(16),
+         name: 'Sword & Shield',
+         damage: 5,
+         equipped: true,
+         notes: undefined,
       });
       expect(decoded.sheets[0].rows[1]).toEqual({
-         _id: 'b'.repeat(16), name: 'Bow', damage: 0, equipped: false, notes: '"5"',
+         _id: 'b'.repeat(16),
+         name: 'Bow',
+         damage: 0,
+         equipped: false,
+         notes: '"5"',
       });
    });
 
@@ -84,7 +110,10 @@ describe('Xlsx', () => {
       });
 
       const decoded = decodeXlsx(bytes);
-      expect(decoded.sheets[0].rows[0]).toEqual({ name: 'Shared Value', formula: 'computed value' });
+      expect(decoded.sheets[0].rows[0]).toEqual({
+         name: 'Shared Value',
+         formula: 'computed value',
+      });
    });
 
    describe('real-application fixtures', () => {
@@ -93,7 +122,10 @@ describe('Xlsx', () => {
          const bytes = readFileSync('tests/fixtures/spreadsheet/excel-edited.xlsx');
          /** @type {import('~/spreadsheet/codec/Workbook.js').Workbook} */
          const decoded = decodeXlsx(new Uint8Array(bytes));
-         expect(decoded.sheets.map((s) => s.name)).toEqual(expect.arrayContaining(['_manifest', 'effect']));
+         expect(decoded.sheets.map((s) => s.name)).toEqual(expect.arrayContaining([
+            '_manifest',
+            'effect',
+         ]));
          /** @type {import('~/spreadsheet/codec/Workbook.js').Sheet} */
          const effectSheet = decoded.sheets.find((s) => s.name === 'effect');
          expect(effectSheet.columns).toContain('name');
@@ -112,7 +144,10 @@ describe('Xlsx', () => {
       });
 
       it('de-duplicates collisions with a numeric suffix', () => {
-         const names = uniqueSheetNames(['weapon', 'weapon']);
+         const names = uniqueSheetNames([
+            'weapon',
+            'weapon',
+         ]);
          expect(names[0]).toBe('weapon');
          expect(names[1]).not.toBe('weapon');
          expect(new Set(names).size).toBe(2);

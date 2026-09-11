@@ -19,7 +19,7 @@
             ItemSheetSidebarTraits,
             ItemSheetSidebarChecks,
          ]
-         : [ItemSheetSidebarTraits]
+         : [ItemSheetSidebarTraits],
    );
 </script>
 

@@ -33,7 +33,10 @@ export default class TitanDocumentSheet extends DocumentSheetV2 {
          resolveDocumentSheetArguments(sheetDocument, options);
 
       // Add default classes.
-      const classes = ['titan', 'titan-document-sheet'];
+      const classes = [
+         'titan',
+         'titan-document-sheet',
+      ];
       resolvedOptions.classes = resolvedOptions.classes
          ? mergeArrays(classes, resolvedOptions.classes)
          : classes;
@@ -54,8 +57,14 @@ export default class TitanDocumentSheet extends DocumentSheetV2 {
     * @override
     */
    static DEFAULT_OPTIONS = {
-      position: { width: 700, height: 'auto' },
-      window: { resizable: false, minimizable: true },
+      position: {
+         width: 700,
+         height: 'auto',
+      },
+      window: {
+         resizable: false,
+         minimizable: true,
+      },
    };
 
    /**
@@ -109,7 +118,10 @@ export default class TitanDocumentSheet extends DocumentSheetV2 {
                applicationState: this.applicationState,
                shell,
             },
-            context: new Map([['application', this]]),
+            context: new Map([[
+               'application',
+               this,
+            ]]),
          });
       }
    }
@@ -134,8 +146,14 @@ export default class TitanDocumentSheet extends DocumentSheetV2 {
             target: this.window.header,
             anchor: this.window.controls,
             context: new Map([
-               ['application', this],
-               ['document', this.#bridge],
+               [
+                  'application',
+                  this,
+               ],
+               [
+                  'document',
+                  this.#bridge,
+               ],
             ]),
          });
       }

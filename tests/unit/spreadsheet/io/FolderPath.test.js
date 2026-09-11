@@ -12,7 +12,10 @@ function chainFolders(names) {
    /** @type {object|null} */
    let current = null;
    for (const name of names) {
-      current = { name, folder: current };
+      current = {
+         name,
+         folder: current,
+      };
    }
    return current;
 }
@@ -22,9 +25,15 @@ describe('FolderPath round trip', () => {
       fc.assert(
          fc.property(
             fc.array(
-               fc.array(fc.constantFrom(...'ab\\/ '.split('')), { minLength: 1, maxLength: 8 })
+               fc.array(fc.constantFrom(...'ab\\/ '.split('')), {
+                  minLength: 1,
+                  maxLength: 8,
+               })
                   .map((chars) => chars.join('')),
-               { minLength: 1, maxLength: 5 },
+               {
+                  minLength: 1,
+                  maxLength: 5,
+               },
             ),
             (names) => {
                const path = resolveFolderPath(chainFolders(names));
@@ -36,9 +45,15 @@ describe('FolderPath round trip', () => {
    });
 
    it('splits a path with an escaped backslash then a real separator', () => {
-      const path = resolveFolderPath(chainFolders(['a\\', 'b']));
+      const path = resolveFolderPath(chainFolders([
+         'a\\',
+         'b',
+      ]));
       expect(path).toBe('a\\\\/b');
-      expect(splitFolderPath(path).map(unescapeFolderName)).toEqual(['a\\', 'b']);
+      expect(splitFolderPath(path).map(unescapeFolderName)).toEqual([
+         'a\\',
+         'b',
+      ]);
    });
 
    it('splits a single segment containing an escaped literal slash', () => {
@@ -47,8 +62,14 @@ describe('FolderPath round trip', () => {
    });
 
    it('splits two segments joined on a real separator', () => {
-      const path = resolveFolderPath(chainFolders(['a/b', 'c']));
-      expect(splitFolderPath(path).map(unescapeFolderName)).toEqual(['a/b', 'c']);
+      const path = resolveFolderPath(chainFolders([
+         'a/b',
+         'c',
+      ]));
+      expect(splitFolderPath(path).map(unescapeFolderName)).toEqual([
+         'a/b',
+         'c',
+      ]);
    });
 
    it('returns an empty string for the pack root', () => {

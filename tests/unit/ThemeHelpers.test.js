@@ -29,27 +29,52 @@ describe('resolveActiveThemeId', () => {
       prefersDark: true,
       defaultDarkThemeId: 'heritage-dark',
       defaultLightThemeId: 'heritage-light',
-      themeExists: (id) => ['heritage-dark', 'heritage-light', 'macchiato', 'custom-1'].includes(id),
+      themeExists: (id) => [
+         'heritage-dark',
+         'heritage-light',
+         'macchiato',
+         'custom-1',
+      ].includes(id),
    };
 
    it('explicit selection wins when the theme exists', () => {
-      expect(resolveActiveThemeId({ ...base, selectedThemeId: 'macchiato' })).toBe('macchiato');
-      expect(resolveActiveThemeId({ ...base, selectedThemeId: 'custom-1', prefersDark: false })).toBe('custom-1');
+      expect(resolveActiveThemeId({
+         ...base,
+         selectedThemeId: 'macchiato',
+      })).toBe('macchiato');
+      expect(resolveActiveThemeId({
+         ...base,
+         selectedThemeId: 'custom-1',
+         prefersDark: false,
+      })).toBe('custom-1');
    });
 
    it('auto resolves the world default matching the preferred scheme', () => {
       expect(resolveActiveThemeId(base)).toBe('heritage-dark');
-      expect(resolveActiveThemeId({ ...base, prefersDark: false })).toBe('heritage-light');
+      expect(resolveActiveThemeId({
+         ...base,
+         prefersDark: false,
+      })).toBe('heritage-light');
    });
 
    it('a missing selected theme falls through to auto resolution', () => {
-      expect(resolveActiveThemeId({ ...base, selectedThemeId: 'deleted-custom' })).toBe('heritage-dark');
+      expect(resolveActiveThemeId({
+         ...base,
+         selectedThemeId: 'deleted-custom',
+      })).toBe('heritage-dark');
    });
 
    it('a missing world default falls back to the built-in heritage themes', () => {
-      const noDefaults = { ...base, defaultDarkThemeId: 'gone', defaultLightThemeId: 'gone' };
+      const noDefaults = {
+         ...base,
+         defaultDarkThemeId: 'gone',
+         defaultLightThemeId: 'gone',
+      };
       expect(resolveActiveThemeId(noDefaults)).toBe('heritage-dark');
-      expect(resolveActiveThemeId({ ...noDefaults, prefersDark: false })).toBe('heritage-light');
+      expect(resolveActiveThemeId({
+         ...noDefaults,
+         prefersDark: false,
+      })).toBe('heritage-light');
    });
 });
 
@@ -60,7 +85,10 @@ describe('validateThemeData', () => {
       name: 'My Theme',
       dark: true,
       base: 'heritage-dark',
-      tokens: { ...HERITAGE_DARK.tokens, 'app-background': '#101018' },
+      tokens: {
+         ...HERITAGE_DARK.tokens,
+         'app-background': '#101018',
+      },
    };
 
    it('accepts a valid payload and normalizes it onto the contract', () => {
@@ -72,7 +100,13 @@ describe('validateThemeData', () => {
    });
 
    it('fills missing tokens from the declared base and drops unknown tokens', () => {
-      const sparse = { ...valid, tokens: { 'app-background': '#101018', bogus: '#ffffff' } };
+      const sparse = {
+         ...valid,
+         tokens: {
+            'app-background': '#101018',
+            bogus: '#ffffff',
+         },
+      };
       const result = validateThemeData(sparse);
       expect(result.ok).toBe(true);
       expect(result.theme.tokens['button-background']).toBe(HERITAGE_DARK.tokens['button-background']);
@@ -81,19 +115,46 @@ describe('validateThemeData', () => {
 
    it('rejects malformed payloads with a reason', () => {
       expect(validateThemeData(null).ok).toBe(false);
-      expect(validateThemeData({ ...valid, formatVersion: 99 }).ok).toBe(false);
-      expect(validateThemeData({ ...valid, name: '' }).ok).toBe(false);
-      expect(validateThemeData({ ...valid, tokens: 'nope' }).ok).toBe(false);
-      const badColor = { ...valid, tokens: { ...valid.tokens, 'app-background': 'red' } };
+      expect(validateThemeData({
+         ...valid,
+         formatVersion: 99,
+      }).ok).toBe(false);
+      expect(validateThemeData({
+         ...valid,
+         name: '',
+      }).ok).toBe(false);
+      expect(validateThemeData({
+         ...valid,
+         tokens: 'nope',
+      }).ok).toBe(false);
+      const badColor = {
+         ...valid,
+         tokens: {
+            ...valid.tokens,
+            'app-background': 'red',
+         },
+      };
       expect(validateThemeData(badColor).ok).toBe(false);
-      for (const result of [validateThemeData(null), validateThemeData({ ...valid, formatVersion: 99 })]) {
+      for (const result of [
+         validateThemeData(null),
+         validateThemeData({
+            ...valid,
+            formatVersion: 99,
+         }),
+      ]) {
          expect(typeof result.error).toBe('string');
          expect(result.error.length).toBeGreaterThan(0);
       }
    });
 
    it('accepts 8-digit hex on import', () => {
-      const alpha = { ...valid, tokens: { ...valid.tokens, 'app-background': '#10101880' } };
+      const alpha = {
+         ...valid,
+         tokens: {
+            ...valid.tokens,
+            'app-background': '#10101880',
+         },
+      };
       expect(validateThemeData(alpha).ok).toBe(true);
    });
 

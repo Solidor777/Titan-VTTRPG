@@ -4,7 +4,7 @@
    import ItemSheetSidebarTraits from '~/document/types/item/sheet/ItemSheetSidebarTraits.svelte';
    import ItemSheetSidebarSections from '~/document/types/item/sheet/ItemSheetSidebarSections.svelte';
    import SpellSheetSidebarCastingCheck
-      from '~/document/types/item/types/spell/sheet/SpellSheetSidebarCastingCheck.svelte';
+   from '~/document/types/item/types/spell/sheet/SpellSheetSidebarCastingCheck.svelte';
 
    /** @type {object} Reference to the reactive Document store. */
    const document = getContext('document');
@@ -20,7 +20,7 @@
          : [
             ItemSheetSidebarTraits,
             SpellSheetSidebarCastingCheck,
-         ]
+         ],
    );
 </script>
 

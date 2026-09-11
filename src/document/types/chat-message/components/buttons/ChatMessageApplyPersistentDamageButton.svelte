@@ -4,7 +4,7 @@
    import localize from '~/helpers/utility-functions/Localize.js';
    import { PERSISTENT_DAMAGE_ICON } from '~/system/Icons.js';
    import ChatMessageResourceModButton
-      from '~/document/types/chat-message/components/buttons/ChatMessageResourceModButton.svelte';
+   from '~/document/types/chat-message/components/buttons/ChatMessageResourceModButton.svelte';
    import assert from '~/helpers/utility-functions/Assert.js';
 
    /** @type {object} Reference to the reactive Document store. */
@@ -75,6 +75,9 @@
 <ChatMessageResourceModButton
    icon={PERSISTENT_DAMAGE_ICON}
    label={localize('applyX%Damage').replace('X%', document.data.system.persistentDamage.total)}
-   tooltip={{ text: getTooltip(), localize: false }}
+   tooltip={{
+      text: getTooltip(),
+      localize: false,
+   }}
    confirmFn={confirm}
 />

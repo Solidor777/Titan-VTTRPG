@@ -12,7 +12,8 @@
     * @property {Array<Actor>} actors - All resolved actors (group actions iterate these).
     * @property {HudLayoutState} layoutState - Shared layout/UI state.
     * @property {object} options - The actionMenu options.
-    * @property {string} chipCorner - The minimize-chip corner ('top-right' | 'top-left' | 'bottom-right' | 'bottom-left'), so the category bar reserves its gutter on the chip's side.
+    * @property {string} chipCorner - The minimize-chip corner ('top-right' | 'top-left' |
+    * 'bottom-right' | 'bottom-left'), so the category bar reserves its gutter on the chip's side.
     */
 
    /** @type {ActionMenuElementProps} */
@@ -30,7 +31,12 @@
    };
 
    /** @type {Array<string>} Sub-button key prefixes that keep the cascade open after clicking. */
-   const KEEP_OPEN_PREFIXES = ['equipped', 'quantity-', 'duration-', 'remove'];
+   const KEEP_OPEN_PREFIXES = [
+      'equipped',
+      'quantity-',
+      'duration-',
+      'remove',
+   ];
 
    /** @type {HTMLElement | undefined} The element root, for click-away containment checks. */
    let rootEl = $state();
@@ -55,7 +61,11 @@
 
    /** @type {Array<object>} The menu model with the amount-prompt utilities wired to the dialog. */
    const model = $derived.by(() => {
-      return buildActionMenuModel({ actors, primary: document.data, options }).map((entry) => {
+      return buildActionMenuModel({
+         actors,
+         primary: document.data,
+         options,
+      }).map((entry) => {
          if (entry.key !== 'utility') {
             return entry;
          }

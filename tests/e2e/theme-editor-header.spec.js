@@ -29,7 +29,11 @@ test('theme editor h3 uses the header token, and light-theme panel-1 is stepped'
          const panel1 = getComputedStyle(document.documentElement)
             .getPropertyValue('--titan-panel-1-background').trim();
          await editor.close();
-         return { defaultColor, overriddenColor, panel1 };
+         return {
+            defaultColor,
+            overriddenColor,
+            panel1,
+         };
       }
       finally {
          await game.settings.set('titan', 'theme', original);
@@ -80,7 +84,11 @@ test('theme editor preview shows the three stepped panels and per-level headers'
    expect(result.panel1Bg).toBe('rgb(228, 231, 238)'); // #e4e7ee
    expect(result.panel2Bg).toBe('rgb(208, 213, 223)'); // #d0d5df
    expect(result.panel3Bg).toBe('rgb(188, 195, 209)'); // #bcc3d1
-   expect(new Set([result.panel1Bg, result.panel2Bg, result.panel3Bg]).size).toBe(3);
+   expect(new Set([
+      result.panel1Bg,
+      result.panel2Bg,
+      result.panel3Bg,
+   ]).size).toBe(3);
    // The preview headers are driven by the per-level header tokens.
    expect(result.headerColorBefore).toBe('rgb(38, 38, 38)');
    expect(result.headerColorAfter).toBe('rgb(170, 51, 119)');

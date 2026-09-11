@@ -143,7 +143,12 @@ export default class TitanPlayerHud {
       /** @type {Actor | null} The user's assigned character, if it is a character actor. */
       const assigned = isCharacter(game.user.character) ? game.user.character : null;
 
-      return resolveHudActors({ isGM: game.user.isGM, selected, owned, assigned });
+      return resolveHudActors({
+         isGM: game.user.isGM,
+         selected,
+         owned,
+         assigned,
+      });
    }
 
    /**

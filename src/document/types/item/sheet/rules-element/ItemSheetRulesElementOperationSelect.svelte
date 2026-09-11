@@ -1,7 +1,7 @@
 <script>
    import { getContext } from 'svelte';
    import RulesElementOperationSelect
-      from '~/helpers/svelte-components/input/select/RulesElementOperationSelect.svelte';
+   from '~/helpers/svelte-components/input/select/RulesElementOperationSelect.svelte';
    import createFlatModifierElement from '~/document/types/item/rules-element/FlatModifier.js';
    import createMulBaseElement from '~/document/types/item/rules-element/MulBase.js';
    import createMulSumElement from '~/document/types/item/rules-element/MulSum.js';
@@ -11,7 +11,7 @@
    import createTurnMessageElement from '~/document/types/item/rules-element/TurnMessage.js';
    import createRollMessageElement from '~/document/types/item/rules-element/RollMessage.js';
    import createConditionalRatingModifierElement
-      from '~/document/types/item/rules-element/ConditionalRatingModifier.js';
+   from '~/document/types/item/rules-element/ConditionalRatingModifier.js';
    import createConditionalCheckModifierElement from '~/document/types/item/rules-element/ConditionalCheckModifier.js';
    import error from '~/helpers/utility-functions/Error.js';
 
@@ -107,7 +107,7 @@
             }
             default: {
                const op =
-                        document.data.system.rulesElement[idx].operation;
+                  document.data.system.rulesElement[idx].operation;
                error(`Invalid Rules Element operation ${op}`);
                return;
             }

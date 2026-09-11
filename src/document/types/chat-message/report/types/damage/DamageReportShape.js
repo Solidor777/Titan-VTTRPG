@@ -6,7 +6,7 @@
  * guards. The resource snapshots nest under `resource` so the card can read the same `system.resource.*`
  * path as the actor's own persisted resources.
  * @returns {object} The damage report shape: damage tallies, the ignored-armor flag, the nested stamina
- *    and wounds resource snapshots, and the tags container.
+ * and wounds resource snapshots, and the tags container.
  */
 export default function createDamageReportShape() {
    return {

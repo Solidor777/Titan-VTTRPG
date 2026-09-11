@@ -20,7 +20,10 @@ export default () => {
       cacheDir: '../.vite-cache',   // Relative from root directory.
 
       resolve: {
-         conditions: ['import', 'browser'],
+         conditions: [
+            'import',
+            'browser',
+         ],
          alias,
       },
 
@@ -45,7 +48,10 @@ export default () => {
             [`^(?!/${s_PACKAGE_ID}/)`]: 'http://localhost:30000',
 
             // Enable socket.io from main Foundry server.
-            '/socket.io': { target: 'ws://localhost:30000', ws: true },
+            '/socket.io': {
+               target: 'ws://localhost:30000',
+               ws: true,
+            },
          },
       },
       build: {

@@ -13,9 +13,9 @@
 
 <!-- Send to Chat -->
 <button aria-label={localize('sendToChat')}
-        class="header-control icon titan-header-button send-to-chat-button"
-        onclick={() => application.item.sendToChat()}
-        use:tooltipAction={'sendItemToChat.desc'}
+   class="header-control icon titan-header-button send-to-chat-button"
+   onclick={() => application.item.sendToChat()}
+   use:tooltipAction={'sendItemToChat.desc'}
 >
    <i class={SEND_TO_CHAT_ICON}></i>
 </button>
@@ -23,9 +23,9 @@
 {#if canImport}
    <!-- Import Item -->
    <button aria-label={localize('importItem')}
-           class="header-control icon titan-header-button import-item-button"
-           onclick={() => application._onImportItem()}
-           use:tooltipAction={'importItemToWorld'}
+      class="header-control icon titan-header-button import-item-button"
+      onclick={() => application._onImportItem()}
+      use:tooltipAction={'importItemToWorld'}
    >
       <i class={IMPORT_ICON}></i>
    </button>

@@ -24,10 +24,10 @@ export default class TitanNPCSheet extends TitanCharacterSheet {
          options, {
             svelte: {
                props: {
-                  shell: NPCSheetShell
+                  shell: NPCSheetShell,
                },
             },
-         }
+         },
       );
 
       // Initialize self object.

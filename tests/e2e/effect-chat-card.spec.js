@@ -129,7 +129,10 @@ test.describe('effect chat-message subtype card', () => {
             messageId: message?.id,
             messageType: message?.type,
          };
-      }, { actorName: ACTOR_NAME, effectName: EFFECT_NAME });
+      }, {
+         actorName: ACTOR_NAME,
+         effectName: EFFECT_NAME,
+      });
 
       // A new message must have been created with the effect subtype.
       expect(result.after, 'message count should increase after sendToChat').toBeGreaterThan(result.before);
@@ -199,7 +202,10 @@ test.describe('effect chat-message subtype card', () => {
          // Restore the original setting so later tests see the user default.
          await game.settings.set('titan', 'themeCoreMessages', original);
 
-         return { enabled, disabled };
+         return {
+            enabled,
+            disabled,
+         };
       });
 
       // Enabled must class plain messages with titan-core-themed (without the titan system class).

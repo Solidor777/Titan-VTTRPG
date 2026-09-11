@@ -10,7 +10,12 @@ vi.hoisted(() => {
       },
       packs: Object.assign([], { get: () => undefined }),
    };
-   globalThis.ui = { notifications: { error: vi.fn(), info: vi.fn() } };
+   globalThis.ui = {
+      notifications: {
+         error: vi.fn(),
+         info: vi.fn(),
+      },
+   };
 });
 
 vi.mock('~/spreadsheet/io/PlanImport.js', () => ({ planImport: vi.fn() }));
@@ -20,16 +25,34 @@ import ImportDialogShell from '~/spreadsheet/ui/ImportDialogShell.svelte';
 import { planImport } from '~/spreadsheet/io/PlanImport.js';
 
 /** @type {object} The first stub pack offered by the target-pack Select. */
-const packA = { collection: 'world.a', metadata: { type: 'Item', label: 'Pack A' } };
+const packA = {
+   collection: 'world.a',
+   metadata: {
+      type: 'Item',
+      label: 'Pack A',
+   },
+};
 /** @type {object} The second stub pack offered by the target-pack Select. */
-const packB = { collection: 'world.b', metadata: { type: 'Item', label: 'Pack B' } };
+const packB = {
+   collection: 'world.b',
+   metadata: {
+      type: 'Item',
+      label: 'Pack B',
+   },
+};
 
 /**
  * Builds a stub ImportPlan with the given error count, matching the shape ImportDialogShell reads.
  * @returns {object} The stub plan.
  */
 function makePlan() {
-   return { packType: 'Item', creates: [], updates: [], deletes: [], errors: [] };
+   return {
+      packType: 'Item',
+      creates: [],
+      updates: [],
+      deletes: [],
+      errors: [],
+   };
 }
 
 beforeEach(() => {
@@ -38,9 +61,22 @@ beforeEach(() => {
          localize: (key) => key,
          format: (key) => key,
       },
-      packs: Object.assign([packA, packB], { get: (id) => [packA, packB].find((p) => p.collection === id) }),
+      packs: Object.assign([
+         packA,
+         packB,
+      ], {
+         get: (id) => [
+            packA,
+            packB,
+         ].find((p) => p.collection === id),
+      }),
    };
-   globalThis.ui = { notifications: { error: vi.fn(), info: vi.fn() } };
+   globalThis.ui = {
+      notifications: {
+         error: vi.fn(),
+         info: vi.fn(),
+      },
+   };
    planImport.mockReset();
 });
 

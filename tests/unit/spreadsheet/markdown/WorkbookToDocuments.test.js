@@ -30,7 +30,14 @@ function fixtureEnvelopes() {
       },
       {
          documentType: 'effect',
-         source: { _id: 'e'.repeat(16), name: 'Sharp', type: 'effect', img: 'i.svg', sort: 1, system: {} },
+         source: {
+            _id: 'e'.repeat(16),
+            name: 'Sharp',
+            type: 'effect',
+            img: 'i.svg',
+            sort: 1,
+            system: {},
+         },
          parentId: 'a'.repeat(16),
          folderPath: '',
       },
@@ -66,15 +73,27 @@ function fixtureEnvelopes() {
 /**
  * Asserts the three top-level renderable documents from the shared fixture, independent of layout.
  * @param {import('~/spreadsheet/markdown/WorkbookToDocuments.js').RenderableDocument[]} documents - The
- *    decoded documents.
+ * decoded documents.
  */
 function assertFixtureDocuments(documents) {
    expect(documents).toHaveLength(3);
-   expect(documents.find((d) => d.type === 'weapon')).toMatchObject({ name: 'Sword', folderPath: [] });
-   expect(documents.find((d) => d.type === 'armor')).toMatchObject({ name: 'Plate', folderPath: [] });
+   expect(documents.find((d) => d.type === 'weapon')).toMatchObject({
+      name: 'Sword',
+      folderPath: [],
+   });
+   expect(documents.find((d) => d.type === 'armor')).toMatchObject({
+      name: 'Plate',
+      folderPath: [],
+   });
    /** @type {object} */
    const spell = documents.find((d) => d.type === 'spell');
-   expect(spell).toMatchObject({ name: 'Fireball', folderPath: ['Magic', 'Fire'] });
+   expect(spell).toMatchObject({
+      name: 'Fireball',
+      folderPath: [
+         'Magic',
+         'Fire',
+      ],
+   });
    expect(spell.system.tradition).toBe('evocation');
    expect(documents.some((d) => d.name === 'Sharp')).toBe(false);
 }
@@ -97,7 +116,13 @@ describe('workbookToDocuments', () => {
                ...envelope,
                source: {
                   ...envelope.source,
-                  system: { rarity: 'common', attack: [{ damage: 5 }, { damage: 3 }] },
+                  system: {
+                     rarity: 'common',
+                     attack: [
+                        { damage: 5 },
+                        { damage: 3 },
+                     ],
+                  },
                },
             }
             : envelope
@@ -114,7 +139,10 @@ describe('workbookToDocuments', () => {
       /** @type {import('~/spreadsheet/codec/Workbook.js').Workbook} */
       const built = buildTables(fixtureEnvelopes(), 'wide', 'Item', NO_SCHEMA);
       /** @type {Object<string, string>} */
-      const csvFiles = Object.fromEntries(built.sheets.map((sheet) => [`${sheet.name}.csv`, encodeCsv(sheet)]));
+      const csvFiles = Object.fromEntries(built.sheets.map((sheet) => [
+         `${sheet.name}.csv`,
+         encodeCsv(sheet),
+      ]));
       /** @type {import('~/spreadsheet/codec/Workbook.js').Workbook} */
       const decoded = {
          sheets: Object.entries(csvFiles).map(([name, text]) => decodeCsv(text, name.replace(/\.csv$/, ''))),
@@ -128,7 +156,12 @@ describe('workbookToDocuments', () => {
       const built = buildTables(
          [{
             documentType: 'npc',
-            source: { _id: 'a'.repeat(16), name: 'Goblin', type: 'npc', system: {} },
+            source: {
+               _id: 'a'.repeat(16),
+               name: 'Goblin',
+               type: 'npc',
+               system: {},
+            },
             parentId: '',
             folderPath: '',
          }],
@@ -147,7 +180,12 @@ describe('workbookToDocuments', () => {
       const built = buildTables(
          [{
             documentType: 'effect',
-            source: { _id: 'a'.repeat(16), name: 'Blessed', type: 'effect', system: {} },
+            source: {
+               _id: 'a'.repeat(16),
+               name: 'Blessed',
+               type: 'effect',
+               system: {},
+            },
             parentId: '',
             folderPath: '',
          }],
@@ -165,14 +203,29 @@ describe('workbookToDocuments', () => {
       /** @type {import('~/spreadsheet/codec/Workbook.js').Workbook} */
       const workbook = {
          sheets: [
-            { name: 'weapon', columns: ['_id', 'name'], rows: [{ _id: 'a'.repeat(16), name: 'Sword' }] },
+            {
+               name: 'weapon',
+               columns: [
+                  '_id',
+                  'name',
+               ],
+               rows: [{
+                  _id: 'a'.repeat(16),
+                  name: 'Sword',
+               }],
+            },
          ],
       };
 
       /** @type {import('~/spreadsheet/markdown/WorkbookToDocuments.js').RenderableDocument[]} */
       const documents = workbookToDocuments(workbook);
 
-      expect(documents).toEqual([{ type: 'weapon', name: 'Sword', folderPath: [], system: undefined }]);
+      expect(documents).toEqual([{
+         type: 'weapon',
+         name: 'Sword',
+         folderPath: [],
+         system: undefined,
+      }]);
    });
 
    it('unescapes folder segments through the shared codec escaping, including backslashes', () => {
@@ -181,8 +234,16 @@ describe('workbookToDocuments', () => {
          sheets: [
             {
                name: 'weapon',
-               columns: ['_id', 'name', '_folder'],
-               rows: [{ _id: 'a'.repeat(16), name: 'Sword', _folder: 'A\\\\B/C\\/D' }],
+               columns: [
+                  '_id',
+                  'name',
+                  '_folder',
+               ],
+               rows: [{
+                  _id: 'a'.repeat(16),
+                  name: 'Sword',
+                  _folder: 'A\\\\B/C\\/D',
+               }],
             },
          ],
       };
@@ -190,14 +251,27 @@ describe('workbookToDocuments', () => {
       /** @type {import('~/spreadsheet/markdown/WorkbookToDocuments.js').RenderableDocument[]} */
       const documents = workbookToDocuments(workbook);
 
-      expect(documents[0].folderPath).toEqual(['A\\B', 'C/D']);
+      expect(documents[0].folderPath).toEqual([
+         'A\\B',
+         'C/D',
+      ]);
    });
 
    it('refuses a manifest-less workbook with a sheet not named after an Item type', () => {
       /** @type {import('~/spreadsheet/codec/Workbook.js').Workbook} */
       const workbook = {
          sheets: [
-            { name: 'goblin', columns: ['_id', 'name'], rows: [{ _id: 'a'.repeat(16), name: 'Goblin' }] },
+            {
+               name: 'goblin',
+               columns: [
+                  '_id',
+                  'name',
+               ],
+               rows: [{
+                  _id: 'a'.repeat(16),
+                  name: 'Goblin',
+               }],
+            },
          ],
       };
 

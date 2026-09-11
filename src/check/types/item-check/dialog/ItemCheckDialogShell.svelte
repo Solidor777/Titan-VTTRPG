@@ -33,7 +33,10 @@
    /** @type {ItemCheckDialog} The Svelte Component's Application. */
    const application = getApplication();
 
-   /** @type {Array<typeof import('svelte').SvelteComponent>} Components for changing the options and displaying the parameters. */
+   /**
+    * @type {Array<typeof import('svelte').SvelteComponent>} Components for changing the options and
+    *    displaying the parameters.
+    */
    const rows = [
       CheckDialogAttributeField,
       CheckDialogSkillField,

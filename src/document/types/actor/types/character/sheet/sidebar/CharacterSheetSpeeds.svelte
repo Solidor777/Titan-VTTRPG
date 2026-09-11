@@ -5,11 +5,11 @@
 
 <BorderedColumnList
    entries={[
-   {speed: 'stride'},
-   {speed: 'fly'},
-   {speed: 'swim'},
-   {speed: 'climb'},
-   {speed: 'burrow'},
-]}
+      {speed: 'stride'},
+      {speed: 'fly'},
+      {speed: 'swim'},
+      {speed: 'climb'},
+      {speed: 'burrow'},
+   ]}
    entryComponent={CharacterSheetSpeed}
 />

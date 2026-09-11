@@ -441,7 +441,10 @@ export default class EffectTrayState {
       for (const hook of hooks) {
          /** @type {number} The hook registration id returned by Hooks.on. */
          const id = Hooks.on(hook, onChange);
-         this.#hookIds.push({ hook, id });
+         this.#hookIds.push({
+            hook,
+            id,
+         });
       }
    }
 

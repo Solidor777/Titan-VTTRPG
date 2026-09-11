@@ -24,9 +24,9 @@
 {#if canImport}
    <!-- Import Actor -->
    <button aria-label={localize('importActor')}
-           class="header-control icon titan-header-button import-actor-button"
-           onclick={() => application._onImportActor()}
-           use:tooltipAction={'importActorToWorld'}
+      class="header-control icon titan-header-button import-actor-button"
+      onclick={() => application._onImportActor()}
+      use:tooltipAction={'importActorToWorld'}
    >
       <i class={IMPORT_ICON}></i>
    </button>
@@ -35,13 +35,13 @@
 {#if canEditToken}
    <!-- Edit Token: tooltip reflects whether edits affect linked instances -->
    <button aria-label={localize('editToken')}
-           class="header-control icon titan-header-button edit-token-button"
-           onclick={() => application._onEditToken()}
-           use:tooltipAction={
-              (token?.actorLink || (token === null && document.data.prototypeToken?.actorLink))
-                 ? 'editLinkedToken.desc'
-                 : 'editUnlinkedToken.desc'
-           }
+      class="header-control icon titan-header-button edit-token-button"
+      onclick={() => application._onEditToken()}
+      use:tooltipAction={
+         (token?.actorLink || (token === null && document.data.prototypeToken?.actorLink))
+            ? 'editLinkedToken.desc'
+            : 'editUnlinkedToken.desc'
+      }
    >
       <i class={EDIT_TOKEN_ICON}></i>
    </button>
@@ -49,13 +49,13 @@
    {#if token === null}
       <!-- Directory Actor: toggle the prototype token link (reactive icon + tooltip + glow) -->
       <button aria-label={localize('toggleTokenLink')}
-              class="header-control icon titan-header-button toggle-token-linked-button"
-              onclick={() => application._onToggleTokenLink()}
-              use:tooltipAction={
-                 document.data.prototypeToken?.actorLink
-                    ? 'toggleTokenUnlinkedButton.desc'
-                    : 'toggleTokenLinkedButton.desc'
-              }
+         class="header-control icon titan-header-button toggle-token-linked-button"
+         onclick={() => application._onToggleTokenLink()}
+         use:tooltipAction={
+            document.data.prototypeToken?.actorLink
+               ? 'toggleTokenUnlinkedButton.desc'
+               : 'toggleTokenLinkedButton.desc'
+         }
       >
          <i
             class={document.data.prototypeToken?.actorLink
@@ -66,9 +66,9 @@
    {:else if token.actorLink === true}
       <!-- Placed, linked Token: irreversible unlink -->
       <button aria-label={localize('unlinkToken')}
-              class="header-control icon titan-header-button unlink-token-button"
-              onclick={() => application._onUnlinkToken()}
-              use:tooltipAction={'unlinkTokenButton.desc'}
+         class="header-control icon titan-header-button unlink-token-button"
+         onclick={() => application._onUnlinkToken()}
+         use:tooltipAction={'unlinkTokenButton.desc'}
       >
          <i class="linked {LINKED_ICON}"></i>
       </button>
@@ -76,8 +76,8 @@
       <!-- Placed, already-unlinked Token: informational (disabled) -->
       <div class="inactive-button" use:tooltipAction={'unlinkedTokenButton.desc'}>
          <button aria-label={localize('tokenUnlinked')}
-                 class="header-control icon titan-header-button unlinked-token-button"
-                 disabled={true}
+            class="header-control icon titan-header-button unlinked-token-button"
+            disabled={true}
          >
             <i class="unlinked {UNLINKED_ICON}"></i>
          </button>

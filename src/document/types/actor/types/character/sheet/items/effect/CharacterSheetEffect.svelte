@@ -8,11 +8,11 @@
    import IntegerIncrementInput from '~/helpers/svelte-components/input/IntegerIncrementInput.svelte';
    import DocumentOwnerIconButton from '~/document/svelte-components/DocumentOwnerIconButton.svelte';
    import CharacterSheetItem
-      from '~/document/types/actor/types/character/sheet/items/CharacterSheetItem.svelte';
+   from '~/document/types/actor/types/character/sheet/items/CharacterSheetItem.svelte';
    import CharacterSheetEffectToggleActiveButton
-      from '~/document/types/actor/types/character/sheet/items/effect/CharacterSheetEffectToggleActiveButton.svelte';
+   from '~/document/types/actor/types/character/sheet/items/effect/CharacterSheetEffectToggleActiveButton.svelte';
    import CharacterSheetEffectChecks
-      from '~/document/types/actor/types/character/sheet/items/effect/CharacterSheetEffectChecks.svelte';
+   from '~/document/types/actor/types/character/sheet/items/effect/CharacterSheetEffectChecks.svelte';
    import { DELETE_ICON, EDIT_ICON, SEND_TO_CHAT_ICON, SHEET_ICON } from '~/system/Icons.js';
 
    /**

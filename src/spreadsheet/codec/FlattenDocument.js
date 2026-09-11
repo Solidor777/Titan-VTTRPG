@@ -4,7 +4,13 @@
  * envelopes. `folder` is likewise excluded — the caller supplies a resolved `_folder` path instead.
  * @type {Set<string>}
  */
-const EXCLUDED_TOP_LEVEL_KEYS = new Set(['_stats', 'ownership', 'items', 'effects', 'folder']);
+const EXCLUDED_TOP_LEVEL_KEYS = new Set([
+   '_stats',
+   'ownership',
+   'items',
+   'effects',
+   'folder',
+]);
 
 /**
  * Recursively flattens one value into the accumulator, dotting object keys and array indices onto the

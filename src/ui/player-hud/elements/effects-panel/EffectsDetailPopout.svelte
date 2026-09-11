@@ -24,7 +24,10 @@
    let height = $state(0);
 
    /** @type {{x: number, y: number}} The clamped popout point. */
-   const point = $derived(clampPoint(anchor, { width, height }, layoutState.rect));
+   const point = $derived(clampPoint(anchor, {
+      width,
+      height,
+   }, layoutState.rect));
 
    /**
     * Dismisses the popout when a press lands outside it.

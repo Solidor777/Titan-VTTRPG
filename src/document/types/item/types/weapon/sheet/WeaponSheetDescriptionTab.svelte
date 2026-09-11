@@ -4,7 +4,7 @@
    import Tabs from '~/helpers/svelte-components/Tabs.svelte';
    import WeaponSheetAttackNotesTab from '~/document/types/item/types/weapon/sheet/WeaponSheetAttackNotesTab.svelte';
    import WeaponSheetItemDescriptionTab
-      from '~/document/types/item/types/weapon/sheet/WeaponSheetItemDescriptionTab.svelte';
+   from '~/document/types/item/types/weapon/sheet/WeaponSheetItemDescriptionTab.svelte';
 
    /** @type {object} Reference to the Application State store. */
    const appState = getContext('applicationState');

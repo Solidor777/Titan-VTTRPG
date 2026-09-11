@@ -75,7 +75,7 @@
    /** @type {string} Calculated tooltip depending on whether the effect has a description. */
    const tooltip = $derived(!isHTMLBlank(effect.description) ?
       `${localize('effect.custom.desc')}${effect.description}` :
-      localize('effect.custom.desc'));
+         localize('effect.custom.desc'));
 </script>
 
 <div class="tag" data-testid={testId} use:tooltipAction={tooltip}>

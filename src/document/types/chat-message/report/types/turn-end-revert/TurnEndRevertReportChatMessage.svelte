@@ -1,17 +1,17 @@
 <script>
    import ChatMessageRevertFastHealingButton
-      from '~/document/types/chat-message/components/buttons/ChatMessageRevertFastHealingButton.svelte';
+   from '~/document/types/chat-message/components/buttons/ChatMessageRevertFastHealingButton.svelte';
    import ChatMessageRevertPersistentDamageButton
-      from '~/document/types/chat-message/components/buttons/ChatMessageRevertPersistentDamageButton.svelte';
+   from '~/document/types/chat-message/components/buttons/ChatMessageRevertPersistentDamageButton.svelte';
    import ChatMessageFastHealingRevertTag
-      from '~/document/types/chat-message/components/tags/ChatMessageFastHealingRevertTag.svelte';
+   from '~/document/types/chat-message/components/tags/ChatMessageFastHealingRevertTag.svelte';
    import ChatMessagePersistentDamageRevertTag
-      from '~/document/types/chat-message/components/tags/ChatMessagePersistentDamageRevertTag.svelte';
+   from '~/document/types/chat-message/components/tags/ChatMessagePersistentDamageRevertTag.svelte';
    import ChatMessageStamina from '~/document/types/chat-message/components/resources/ChatMessageStamina.svelte';
    import ChatMessageWounds from '~/document/types/chat-message/components/resources/ChatMessageWounds.svelte';
    import ReportChatMessageBase from '~/document/types/chat-message/report/components/ReportChatMessageBase.svelte';
    import TurnEndRevertReportChatMessageHeader
-      from '~/document/types/chat-message/report/types/turn-end-revert/TurnEndRevertReportChatMessageHeader.svelte';
+   from '~/document/types/chat-message/report/types/turn-end-revert/TurnEndRevertReportChatMessageHeader.svelte';
    import { getContext } from 'svelte';
 
    /** @type {object} Reference to the reactive Document store. */

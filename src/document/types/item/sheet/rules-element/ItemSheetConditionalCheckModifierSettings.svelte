@@ -126,7 +126,7 @@
          document.data.system.rulesElement[idx].selector !== 'customTrait' &&
          document.data.system.rulesElement[idx].selector !== 'attribute' &&
          !(document.data.system.rulesElement[idx].checkType !== 'any' &&
-           document.data.system.rulesElement[idx].selector === 'skill')
+            document.data.system.rulesElement[idx].selector === 'skill')
       ) {
          document.data.system.rulesElement[idx].selector = 'any';
          onSelectorChange();
@@ -219,8 +219,8 @@
          bind:value={document.data.system.rulesElement[idx].checkType}
          onchange={onCheckTypeChange}
          options={document.data.system.rulesElement[idx].modifierType === 'healing'
-                  ? healingCheckTypeOptions
-                  : checkTypeOptions}
+            ? healingCheckTypeOptions
+            : checkTypeOptions}
       />
    </div>
 

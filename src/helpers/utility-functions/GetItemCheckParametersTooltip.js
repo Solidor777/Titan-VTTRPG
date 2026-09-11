@@ -12,8 +12,8 @@ export default function getItemCheckParametersTooltip(checkParameters) {
 
    // Add resolve cost.
    if (checkParameters.resolveCost) {
-      retVal +=
-         `<p><i style="width:20px;text-align:center" class="${RESOLVE_ICON}"></i> ${localize('resolveCost')}: ${checkParameters.resolveCost}</p>`;
+      retVal += `<p><i style="width:20px;text-align:center" class="${RESOLVE_ICON}"></i> ` +
+         `${localize('resolveCost')}: ${checkParameters.resolveCost}</p>`;
    }
 
    return retVal;

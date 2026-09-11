@@ -4,17 +4,17 @@
    import SpellAspectTags from '~/helpers/svelte-components/tag/SpellAspectTags.svelte';
    import SpellStats from '~/document/types/item/types/spell/components/SpellStats.svelte';
    import CharacterSheetItem
-      from '~/document/types/actor/types/character/sheet/items/CharacterSheetItem.svelte';
+   from '~/document/types/actor/types/character/sheet/items/CharacterSheetItem.svelte';
    import CharacterSheetItemSendToChatButton
-      from '~/document/types/actor/types/character/sheet/items/CharacterSheetItemSendToChatButton.svelte';
+   from '~/document/types/actor/types/character/sheet/items/CharacterSheetItemSendToChatButton.svelte';
    import CharacterSheetItemEditButton
-      from '~/document/types/actor/types/character/sheet/items/CharacterSheetItemEditButton.svelte';
+   from '~/document/types/actor/types/character/sheet/items/CharacterSheetItemEditButton.svelte';
    import CharacterSheetItemDeleteButton
-      from '~/document/types/actor/types/character/sheet/items/CharacterSheetItemDeleteButton.svelte';
+   from '~/document/types/actor/types/character/sheet/items/CharacterSheetItemDeleteButton.svelte';
    import CharacterSheetItemChecks
-      from '~/document/types/actor/types/character/sheet/items/CharacterSheetItemChecks.svelte';
+   from '~/document/types/actor/types/character/sheet/items/CharacterSheetItemChecks.svelte';
    import CharacterSheetSpellCastingCheck
-      from '~/document/types/actor/types/character/sheet/items/spell/CharacterSheetSpellCastingCheck.svelte';
+   from '~/document/types/actor/types/character/sheet/items/spell/CharacterSheetSpellCastingCheck.svelte';
    import CondensedCastingCheckButton from '~/document/svelte-components/check/CondensedCastingCheckButton.svelte';
 
    /**

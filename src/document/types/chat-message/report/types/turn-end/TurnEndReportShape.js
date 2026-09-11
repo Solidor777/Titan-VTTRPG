@@ -10,7 +10,7 @@
  * snapshots nest under `resource` so the card can read the same `system.resource.*` path as the actor's
  * own persisted resources.
  * @returns {object} The turn-end report object-field shape: the expired-effects flag and the
- *    conditionally-present effects, healing/damage offers, and nested stamina/wounds resource snapshots.
+ * conditionally-present effects, healing/damage offers, and nested stamina/wounds resource snapshots.
  */
 export default function createTurnEndReportShape() {
    return {

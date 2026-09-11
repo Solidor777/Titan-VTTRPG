@@ -12,8 +12,8 @@
  * @param {number} [opts.staminaValue] - If set, the effect actor's stamina is pre-seeded to this value.
  * @param {number} [opts.resolveValue] - If set, the effect actor's resolve is pre-seeded to this value.
  * @param {string} [opts.observerUserName] - If set, this user is granted OWNER on the effect actor.
- * @returns {Promise<{sceneId: string, combatId: string, effectActorId: string, otherActorId: string, effectCombatantId: string}>}
- *   The created document ids.
+ * @returns {Promise<{sceneId: string, combatId: string, effectActorId: string, otherActorId: string,
+ *    effectCombatantId: string}>} The created document ids.
  */
 export const seedCombatEncounter = async (opts) => {
    const {
@@ -38,7 +38,10 @@ export const seedCombatEncounter = async (opts) => {
    }
 
    // Create the two actors and the effect actor's abilities.
-   const effect = await Actor.create({ ...effectActor, ownership: ownership });
+   const effect = await Actor.create({
+      ...effectActor,
+      ownership: ownership,
+   });
    if (effectAbilities && effectAbilities.length > 0) {
       await effect.createEmbeddedDocuments('Item', effectAbilities);
    }
@@ -57,9 +60,19 @@ export const seedCombatEncounter = async (opts) => {
    }
 
    // Create a scene and place a token for each actor (required for Combatant.actor to resolve).
-   const scene = await Scene.create({ name: sceneName, width: 2000, height: 2000 });
-   const effectTokenData = (await effect.getTokenDocument({ x: 500, y: 500 })).toObject();
-   const otherTokenData = (await other.getTokenDocument({ x: 1000, y: 500 })).toObject();
+   const scene = await Scene.create({
+      name: sceneName,
+      width: 2000,
+      height: 2000,
+   });
+   const effectTokenData = (await effect.getTokenDocument({
+      x: 500,
+      y: 500,
+   })).toObject();
+   const otherTokenData = (await other.getTokenDocument({
+      x: 1000,
+      y: 500,
+   })).toObject();
    const [effectToken] = await scene.createEmbeddedDocuments('Token', [effectTokenData]);
    const [otherToken] = await scene.createEmbeddedDocuments('Token', [otherTokenData]);
 
@@ -72,10 +85,18 @@ export const seedCombatEncounter = async (opts) => {
    // render throws an uncaught TypeError on every round/turn update, polluting page-error checks.
    ui.combat.viewed = combat;
    const [effectCombatant] = await combat.createEmbeddedDocuments('Combatant', [
-      { tokenId: effectToken.id, sceneId: scene.id, initiative: effectInitiative },
+      {
+         tokenId: effectToken.id,
+         sceneId: scene.id,
+         initiative: effectInitiative,
+      },
    ]);
    await combat.createEmbeddedDocuments('Combatant', [
-      { tokenId: otherToken.id, sceneId: scene.id, initiative: otherInitiative },
+      {
+         tokenId: otherToken.id,
+         sceneId: scene.id,
+         initiative: otherInitiative,
+      },
    ]);
 
    // Start the encounter at round 1, turn 0 (highest initiative first = the OTHER actor).
@@ -83,7 +104,11 @@ export const seedCombatEncounter = async (opts) => {
       await combat.startCombat();
    }
    else {
-      await combat.update({ active: true, round: 1, turn: 0 });
+      await combat.update({
+         active: true,
+         round: 1,
+         turn: 0,
+      });
    }
 
    return {
@@ -117,7 +142,10 @@ export const teardownCombatEncounter = async (ids) => {
    if (scene) {
       await scene.delete();
    }
-   for (const actorId of [ids.effectActorId, ids.otherActorId]) {
+   for (const actorId of [
+      ids.effectActorId,
+      ids.otherActorId,
+   ]) {
       const actor = game.actors.get(actorId);
       if (actor) {
          await actor.delete();

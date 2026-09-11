@@ -24,7 +24,10 @@ export default class TitanDialog extends ApplicationV2 {
     * `content: { class, props }` describing the Svelte component to mount.
     */
    constructor(options) {
-      const classes = ['titan', 'titan-dialog'];
+      const classes = [
+         'titan',
+         'titan-dialog',
+      ];
       options.classes = options.classes ? mergeArrays(classes, options.classes) : classes;
       options.id = options.id ? `${options.id}-${generateUUID()}` : `titan-dialog-${generateUUID()}`;
 
@@ -58,8 +61,14 @@ export default class TitanDialog extends ApplicationV2 {
     * @override
     */
    static DEFAULT_OPTIONS = {
-      position: { width: 320, height: 'auto' },
-      window: { resizable: false, minimizable: false },
+      position: {
+         width: 320,
+         height: 'auto',
+      },
+      window: {
+         resizable: false,
+         minimizable: false,
+      },
       zIndex: Z_INDEX_APP,
    };
 
@@ -88,7 +97,10 @@ export default class TitanDialog extends ApplicationV2 {
          this.#mountHandle = mount(this.#content.class, {
             target: content,
             props: this.#content.props,
-            context: new Map([['application', this]]),
+            context: new Map([[
+               'application',
+               this,
+            ]]),
          });
       }
    }

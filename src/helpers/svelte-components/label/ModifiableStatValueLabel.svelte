@@ -69,7 +69,7 @@
       equipmentMod,
       staticMod,
       valueOverride ? valueOverride - value : 0,
-      baseTooltip
+      baseTooltip,
    ));
 </script>
 
@@ -79,7 +79,7 @@
    data-testid={testId}
    use:tooltipAction={{
       text: tooltip,
-      localize: false
+      localize: false,
    }}
 >
    {value}

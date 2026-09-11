@@ -74,7 +74,11 @@
       autoUpdate: true,
       strategy: 'fixed',
       placement: 'bottom-start',
-      middleware: [offset(4), flip(), shift({ padding: 4 })],
+      middleware: [
+         offset(4),
+         flip(),
+         shift({ padding: 4 }),
+      ],
    });
 
    /**
@@ -85,9 +89,19 @@
    function toOption(raw) {
       // Primitive entries become their own value; object entries pass their fields through.
       if (raw !== null && typeof raw === 'object') {
-         return { value: raw.value, label: raw.label ?? raw.value, tooltip: raw.tooltip, icon: raw.icon };
+         return {
+            value: raw.value,
+            label: raw.label ?? raw.value,
+            tooltip: raw.tooltip,
+            icon: raw.icon,
+         };
       }
-      return { value: raw, label: raw, tooltip: void 0, icon: void 0 };
+      return {
+         value: raw,
+         label: raw,
+         tooltip: void 0,
+         icon: void 0,
+      };
    }
 
    /** @type {Array<object>} The normalized option list. */

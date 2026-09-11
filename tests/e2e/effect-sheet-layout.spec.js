@@ -37,11 +37,17 @@ test('effect AE sheet renders with a non-collapsed content body', async () => {
    // Ensure a host player actor carries an effect, then render its Active Effect sheet.
    await page.evaluate(async () => {
       const actor = game.actors.find((a) => a.type === 'player')
-         ?? await Actor.create({ name: 'Layout Host', type: 'player' });
+         ?? await Actor.create({
+            name: 'Layout Host',
+            type: 'player',
+         });
       let effect = actor.effects.find((e) => e.type === 'effect');
       if (!effect) {
          const [created] = await actor.createEmbeddedDocuments('ActiveEffect', [
-            { name: 'Layout Effect', type: 'effect' },
+            {
+               name: 'Layout Effect',
+               type: 'effect',
+            },
          ]);
          effect = created;
       }
@@ -71,10 +77,17 @@ test('effect AE sheet renders the description in the inactive editor view', asyn
    // A fresh effect with a description; the toggled editor must show the enriched text before any edit.
    await page.evaluate(async () => {
       const actor = game.actors.find((a) => a.type === 'player')
-         ?? await Actor.create({ name: 'Layout Host', type: 'player' });
+         ?? await Actor.create({
+            name: 'Layout Host',
+            type: 'player',
+         });
       await actor.effects.find((e) => e.name === 'Layout Described Effect')?.delete();
       const [effect] = await actor.createEmbeddedDocuments('ActiveEffect', [
-         { name: 'Layout Described Effect', type: 'effect', description: '<p>Blessed by the sun.</p>' },
+         {
+            name: 'Layout Described Effect',
+            type: 'effect',
+            description: '<p>Blessed by the sun.</p>',
+         },
       ]);
       const app = await effect.sheet.render(true);
       await titanWait(

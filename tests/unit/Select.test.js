@@ -15,7 +15,16 @@ afterEach(() => cleanup());
 
 describe('Select', () => {
    it('renders the selected option label on the trigger', () => {
-      render(Select, { props: { options: ['body', 'mind', 'soul'], value: 'mind' } });
+      render(Select, {
+         props: {
+            options: [
+               'body',
+               'mind',
+               'soul',
+            ],
+            value: 'mind',
+         },
+      });
       const trigger = screen.getByRole('combobox');
       expect(trigger.textContent).toContain('mind');
       expect(trigger.getAttribute('data-value')).toBe('mind');
@@ -25,7 +34,11 @@ describe('Select', () => {
       const onchange = vi.fn();
       render(Select, {
          props: {
-            options: ['body', 'mind', 'soul'],
+            options: [
+               'body',
+               'mind',
+               'soul',
+            ],
             value: 'body',
             onchange,
          },
@@ -45,7 +58,10 @@ describe('Select', () => {
       const onchange = vi.fn();
       render(Select, {
          props: {
-            options: ['body', 'mind'],
+            options: [
+               'body',
+               'mind',
+            ],
             value: 'not-a-real-value',
             onchange,
          },
@@ -56,12 +72,23 @@ describe('Select', () => {
    });
 
    it('disables the trigger when disabled', () => {
-      render(Select, { props: { options: ['body'], value: 'body', disabled: true } });
+      render(Select, {
+         props: {
+            options: ['body'],
+            value: 'body',
+            disabled: true,
+         },
+      });
       expect(screen.getByRole('combobox').disabled).toBe(true);
    });
 
    it('stays closed and does not throw with an empty option list', async () => {
-      render(Select, { props: { options: [], value: void 0 } });
+      render(Select, {
+         props: {
+            options: [],
+            value: void 0,
+         },
+      });
       const trigger = screen.getByRole('combobox');
 
       // Clicking and key navigation on an empty Select must not open a list or throw.

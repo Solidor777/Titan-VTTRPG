@@ -3,7 +3,7 @@
    import DocumentIntegerInput from '~/document/svelte-components/input/DocumentIntegerInput.svelte';
    import ModifiableStatValueLabel from '~/helpers/svelte-components/label/ModifiableStatValueLabel.svelte';
    import CharacterSheetCondensedAttributeCheckButton
-      from '~/document/types/actor/types/character/sheet/header/CharacterSheetAttributeCheckButton.svelte';
+   from '~/document/types/actor/types/character/sheet/header/CharacterSheetAttributeCheckButton.svelte';
 
    /**
     * @typedef {object} CharacterSheetAttributeProps

@@ -19,7 +19,10 @@
    /** @type {object} Reference to the Application State store. */
    const appState = getContext('applicationState');
 
-   /** @type {object|undefined} The actor that can roll this item's checks, or undefined when the current user cannot. */
+   /**
+    * @type {object|undefined} The actor that can roll this item's checks, or undefined when the
+    *    current user cannot.
+    */
    const rollActor = getContext('rollActor');
 
    /** @type {object|undefined} The current check config, re-read reactively through the document bridge. */
@@ -28,7 +31,7 @@
    /** @type {boolean} Whether the check carries details beyond the header's attribute/skill/DC. */
    const hasDetails = $derived(
       !!check
-      && (check.resolveCost > 0 || check.resistanceCheck !== 'none' || check.opposedCheck.enabled),
+         && (check.resolveCost > 0 || check.resistanceCheck !== 'none' || check.opposedCheck.enabled),
    );
 </script>
 

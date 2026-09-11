@@ -1,17 +1,22 @@
 <script>
    /**
     * @typedef {object} HudButtonProps
-    * @property {'category' | 'sub-option' | 'sub-button' | 'chip' | 'restore' | 'ghost'} [variant] - Visual variant selecting the panel surface, padding, and alignment.
-    * @property {boolean} [active] - Whether the button is in its open/revealed state (panel-3 surface plus the `active` class).
-    * @property {'top' | 'right' | 'bottom' | 'left' | undefined} [accentEdge] - The edge to draw the accent bar on when active; omitted for no accent.
-    * @property {'start' | 'end'} [align] - Horizontal content alignment for the text/icon variants; 'end' right-aligns.
+    * @property {'category' | 'sub-option' | 'sub-button' | 'chip' | 'restore' | 'ghost'} [variant] -
+    * Visual variant selecting the panel surface, padding, and alignment.
+    * @property {boolean} [active] - Whether the button is in its open/revealed state (panel-3 surface
+    * plus the `active` class).
+    * @property {'top' | 'right' | 'bottom' | 'left' | undefined} [accentEdge] - The edge to draw the
+    * accent bar on when active; omitted for no accent.
+    * @property {'start' | 'end'} [align] - Horizontal content alignment for the text/icon variants;
+    * 'end' right-aligns.
     * @property {boolean} [disabled] - Whether the button is disabled.
     * @property {string} [type] - The native button type.
     * @property {string | undefined} [ariaLabel] - The accessible label.
     * @property {string | undefined} [testId] - Stable selector applied as `data-testid`.
     * @property {HTMLElement | undefined} [element] - Bindable reference to the underlying button element.
     * @property {((event: MouseEvent) => void) | undefined} [onclick] - The click handler.
-    * @property {((event: PointerEvent) => void) | undefined} [onpointermove] - The pointer-move handler (sub-option reveal).
+    * @property {((event: PointerEvent) => void) | undefined} [onpointermove] - The pointer-move handler
+    * (sub-option reveal).
     * @property {((event: FocusEvent) => void) | undefined} [onfocus] - The focus handler (sub-option reveal).
     * @property {import('svelte').Snippet} children - The button content.
     */

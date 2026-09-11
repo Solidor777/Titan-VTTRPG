@@ -43,7 +43,10 @@ function buildNode(entries) {
       if (!children.has(head)) {
          children.set(head, []);
       }
-      children.get(head).push({ segments: rest, value: entry.value });
+      children.get(head).push({
+         segments: rest,
+         value: entry.value,
+      });
    }
 
    /** @type {string[]} */
@@ -54,7 +57,10 @@ function buildNode(entries) {
    if (isArrayNode) {
       /** @type {Array<{index:number, value:*}>} Every candidate index with its built node, sorted ascending. */
       const candidates = keys
-         .map((key) => ({ index: Number(key), value: buildNode(children.get(key)) }))
+         .map((key) => ({
+            index: Number(key),
+            value: buildNode(children.get(key)),
+         }))
          .sort((a, b) => a.index - b.index);
       // Keep only elements with at least one non-blank cell, then reindex densely (ascending order).
       return candidates.filter((c) => !isBlankValue(c.value)).map((c) => c.value);
@@ -84,7 +90,10 @@ function buildNode(entries) {
  */
 export function unflattenRow(flat) {
    /** @type {Array<{segments: string[], value: *}>} */
-   const entries = Object.entries(flat).map(([path, value]) => ({ segments: path.split('.'), value }));
+   const entries = Object.entries(flat).map(([path, value]) => ({
+      segments: path.split('.'),
+      value,
+   }));
    /** @type {*} */
    const result = buildNode(entries);
    return result === ABSENT ? {} : result;

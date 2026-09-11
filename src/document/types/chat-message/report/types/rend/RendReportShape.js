@@ -4,7 +4,7 @@
  * conditionally-present armor resource snapshot is `null` so it becomes a nullable object field,
  * preserving the card's `if (armor)` presence guard.
  * @returns {object} The rend report shape: the armor label fields, the total rend amount, the armor lost
- *    tally, and the armor resource snapshot.
+ * tally, and the armor resource snapshot.
  */
 export default function createRendReportShape() {
    return {

@@ -38,7 +38,11 @@ export default class ReportChatMessageDataModel extends TitanChatMessageDataMode
     * @returns {object} The migrated source data.
     */
    static migrateData(source) {
-      for (const key of ['stamina', 'wounds', 'resolve']) {
+      for (const key of [
+         'stamina',
+         'wounds',
+         'resolve',
+      ]) {
          if (source[key] !== undefined) {
             source.resource ??= {};
             if (source.resource[key] === undefined) {

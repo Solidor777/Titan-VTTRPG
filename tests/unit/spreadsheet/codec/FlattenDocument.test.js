@@ -9,7 +9,10 @@ describe('flattenDocument', () => {
          type: 'weapon',
          img: 'icons/sword.svg',
          sort: 100000,
-         system: { rarity: 'common', castingCheck: { difficulty: 4 } },
+         system: {
+            rarity: 'common',
+            castingCheck: { difficulty: 4 },
+         },
       };
       expect(flattenDocument(source)).toEqual({
          _id: 'a'.repeat(16),
@@ -26,7 +29,10 @@ describe('flattenDocument', () => {
       const source = {
          system: {
             attack: [
-               { label: 'Slash', trait: [{ name: 'Reach' }] },
+               {
+                  label: 'Slash',
+                  trait: [{ name: 'Reach' }],
+               },
             ],
          },
       };

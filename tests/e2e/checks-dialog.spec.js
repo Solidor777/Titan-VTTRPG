@@ -22,15 +22,37 @@ import {
  */
 
 // Forced faces; six entries cover the largest dice count in this spec (baseline 3 + diceMod 2 = 5).
-const FORCED_FACES = [6, 5, 4, 3, 2, 1];
+const FORCED_FACES = [
+   6,
+   5,
+   4,
+   3,
+   2,
+   1,
+];
 
 // The check types exercised by the uniform core test and their expected `flags.titan.type`.
 const CORE_CASES = [
-   { type: 'attribute', expectedType: 'attributeCheck' },
-   { type: 'resistance', expectedType: 'resistanceCheck' },
-   { type: 'attack', expectedType: 'attackCheck' },
-   { type: 'casting', expectedType: 'castingCheck' },
-   { type: 'item', expectedType: 'itemCheck' },
+   {
+      type: 'attribute',
+      expectedType: 'attributeCheck',
+   },
+   {
+      type: 'resistance',
+      expectedType: 'resistanceCheck',
+   },
+   {
+      type: 'attack',
+      expectedType: 'attackCheck',
+   },
+   {
+      type: 'casting',
+      expectedType: 'castingCheck',
+   },
+   {
+      type: 'item',
+      expectedType: 'itemCheck',
+   },
 ];
 
 /** @type {import('@playwright/test').Page} The file-shared, logged-in page (one world boot per file). */
@@ -70,7 +92,10 @@ test.describe('v14 checks dialog (driven from Playwright)', () => {
          }
          const actor = await Actor.create(actorData);
          await actor.createEmbeddedDocuments('Item', itemData);
-      }, { actorData: buildE2ERollerActorData(), itemData: buildE2ERollerItemData() });
+      }, {
+         actorData: buildE2ERollerActorData(),
+         itemData: buildE2ERollerItemData(),
+      });
    });
 
    // Restore the RNG, the dialog-gate setting, and close any leftover dialog windows after each test.

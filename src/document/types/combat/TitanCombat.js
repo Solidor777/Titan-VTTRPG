@@ -23,7 +23,12 @@ export default class TitanCombat extends Combat {
       const retVal = await super.nextTurn();
       if (this.turns.length > 1) {
          const currentCombatant = this.combatant;
-         game.titan.socketManager.triggerSocketHook('combatNextTurn', currentCombatant?.id, previousCombatant?.id, this.id);
+         game.titan.socketManager.triggerSocketHook(
+            'combatNextTurn',
+            currentCombatant?.id,
+            previousCombatant?.id,
+            this.id,
+         );
       }
       return retVal;
    }
@@ -40,7 +45,12 @@ export default class TitanCombat extends Combat {
       const retVal = await super.previousTurn();
       if (this.turns.length > 1) {
          const restoredCombatant = this.combatant;
-         game.titan.socketManager.triggerSocketHook('combatPreviousTurn', restoredCombatant?.id, displacedCombatant?.id, this.id);
+         game.titan.socketManager.triggerSocketHook(
+            'combatPreviousTurn',
+            restoredCombatant?.id,
+            displacedCombatant?.id,
+            this.id,
+         );
       }
       return retVal;
    }

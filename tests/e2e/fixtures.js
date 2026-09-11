@@ -12,7 +12,7 @@ import { installPoll } from './poll.js';
  * `button[name="join"]` is the "Join Game Session" submit button.
  * @param {import('@playwright/test').Page} page - The Playwright page to drive.
  * @param {string} [user] - The display name of the Foundry user to log in as.
- *   Defaults to `FOUNDRY_USER` env var when set, otherwise `DEFAULT_GM` (`'E2E GM 1'`).
+ * Defaults to `FOUNDRY_USER` env var when set, otherwise `DEFAULT_GM` (`'E2E GM 1'`).
  * @returns {Promise<void>} Resolves once `game.ready === true`.
  */
 export async function login(page, user = process.env.FOUNDRY_USER || DEFAULT_GM) {
@@ -46,7 +46,7 @@ export async function login(page, user = process.env.FOUNDRY_USER || DEFAULT_GM)
  * @param {string} locateSrc - Stringified locator: a function returning the document.
  * @param {string} expectedSelector - CSS selector the rendered sheet must expose.
  * @param {string[]} [errors] - Optional shared page-error collector (from `attachPageErrors`). When
- *   omitted, a local listener is attached for this single render (legacy/unmigrated behavior).
+ * omitted, a local listener is attached for this single render (legacy/unmigrated behavior).
  * @returns {Promise<void>} Resolves once the sheet is visible and asserted error-free.
  */
 export async function renderSheet(page, locateSrc, expectedSelector, errors) {
@@ -94,9 +94,16 @@ export async function ensureDocument(page, documentType, subtype, name) {
       const existing = collection.find((d) => d.type === subtype);
       if (!existing) {
          const cls = documentType === 'Actor' ? globalThis.Actor : globalThis.Item;
-         await cls.create({ name, type: subtype });
+         await cls.create({
+            name,
+            type: subtype,
+         });
       }
-   }, { documentType, subtype, name });
+   }, {
+      documentType,
+      subtype,
+      name,
+   });
 
    // Prefer the named fixture (created here) and fall back to any of the subtype.
    const collectionExpr = documentType === 'Actor' ? 'game.actors' : 'game.items';
@@ -125,10 +132,16 @@ export async function collectLocalizationOffenders(page, rootSelector) {
       const offenders = new Set();
 
       /** @type {string[]} The text-bearing attributes to inspect on every element. */
-      const attributes = ['aria-label', 'title', 'placeholder', 'alt', 'data-tooltip'];
+      const attributes = [
+         'aria-label',
+         'title',
+         'placeholder',
+         'alt',
+         'data-tooltip',
+      ];
 
       /**
-       * Records a candidate string as an offender when it embeds the LOCAL. namespace.
+       * Records a candidate string as an offender when it embeds the `LOCAL.` namespace prefix.
        * @param {unknown} value - The candidate string (ignored when not a non-empty string).
        * @returns {void}
        */
@@ -146,7 +159,10 @@ export async function collectLocalizationOffenders(page, rootSelector) {
       }
 
       // Attributes and tippy content on every element (including the root).
-      for (const element of [root, ...root.querySelectorAll('*')]) {
+      for (const element of [
+         root,
+         ...root.querySelectorAll('*'),
+      ]) {
          for (const attribute of attributes) {
             consider(element.getAttribute(attribute));
          }

@@ -28,7 +28,7 @@ export default class TitanAbilitySheet extends TitanItemSheet {
                   shell: AbilitySheetShell,
                },
             },
-         }
+         },
       );
 
       // Initialize self object.

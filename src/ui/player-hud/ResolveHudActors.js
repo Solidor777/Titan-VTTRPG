@@ -18,7 +18,10 @@ export default function resolveHudActors({ isGM, selected, owned, assigned }) {
     * @returns {{actors: Array<Actor>, primary: Actor | null}} The result shape.
     */
    const result = (actors) => {
-      return { actors, primary: actors[0] ?? null };
+      return {
+         actors,
+         primary: actors[0] ?? null,
+      };
    };
 
    // GMs track the selection only.

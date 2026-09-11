@@ -16,7 +16,10 @@ describe('registerSrcAlias', () => {
             '-e',
             "import('~/spreadsheet/codec/Workbook.js').then(m => console.log(m.FIXED_COLUMNS.length))",
          ],
-         { cwd: repoRoot, encoding: 'utf8' },
+         {
+            cwd: repoRoot,
+            encoding: 'utf8',
+         },
       );
 
       expect(output.trim()).toBe('7');

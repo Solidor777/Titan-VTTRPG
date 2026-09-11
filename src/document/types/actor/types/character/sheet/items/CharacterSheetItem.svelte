@@ -1,9 +1,9 @@
 <script>
    import { slide } from 'svelte/transition';
    import CharacterSheetItemImage
-      from '~/document/types/actor/types/character/sheet/items/CharacterSheetItemImage.svelte';
+   from '~/document/types/actor/types/character/sheet/items/CharacterSheetItemImage.svelte';
    import CharacterSheetItemExpandButton
-      from '~/document/types/actor/types/character/sheet/items/CharacterSheetItemExpandButton.svelte';
+   from '~/document/types/actor/types/character/sheet/items/CharacterSheetItemExpandButton.svelte';
 
    /**
     * @typedef {object} CharacterSheetItemProps

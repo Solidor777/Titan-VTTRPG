@@ -55,7 +55,10 @@ async function seedActorWithItem(page, actorName, itemType, system) {
       }
 
       // Seed a fresh player actor with one item whose initial display state is known.
-      const actor = await Actor.create({ name: actorName, type: 'player' });
+      const actor = await Actor.create({
+         name: actorName,
+         type: 'player',
+      });
       await actor.createEmbeddedDocuments('Item', [
          {
             name: `E2E Reactive ${itemType}`,
@@ -70,7 +73,11 @@ async function seedActorWithItem(page, actorName, itemType, system) {
          () => !!app?.element?.querySelector('.window-content')?.children.length,
          { message: 'sheet mounted' },
       );
-   }, { actorName, itemType, system });
+   }, {
+      actorName,
+      itemType,
+      system,
+   });
 }
 
 /**

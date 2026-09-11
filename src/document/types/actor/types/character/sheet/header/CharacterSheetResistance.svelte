@@ -3,7 +3,7 @@
    import tooltipAction from '~/helpers/svelte-actions/TooltipAction.js';
    import DocumentIntegerInput from '~/document/svelte-components/input/DocumentIntegerInput.svelte';
    import CharacterSheetResistanceCheckButton
-      from '~/document/types/actor/types/character/sheet/header/CharacterSheetResistanceCheckButton.svelte';
+   from '~/document/types/actor/types/character/sheet/header/CharacterSheetResistanceCheckButton.svelte';
    import ModifiableStatValueLabel from '~/helpers/svelte-components/label/ModifiableStatValueLabel.svelte';
    import localize from '~/helpers/utility-functions/Localize.js';
 

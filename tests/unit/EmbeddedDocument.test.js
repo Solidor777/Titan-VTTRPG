@@ -25,8 +25,14 @@ function makeParent() {
 
    /** @type {object} The fake parent document shape shared by both accessors. */
    const docShape = {
-      items: new Map([['w1', weapon]]),
-      effects: new Map([['e1', effect]]),
+      items: new Map([[
+         'w1',
+         weapon,
+      ]]),
+      effects: new Map([[
+         'e1',
+         effect,
+      ]]),
    };
 
    return {
@@ -85,7 +91,10 @@ describe('EmbeddedDocument', () => {
             duration: 5,
          },
       };
-      weapon.effects = new Map([['we1', weaponEffect]]);
+      weapon.effects = new Map([[
+         'we1',
+         weaponEffect,
+      ]]);
 
       const itemBridge = new EmbeddedDocument(parent, 'items', 'w1');
       const effectBridge = new EmbeddedDocument(itemBridge, 'effects', 'we1');

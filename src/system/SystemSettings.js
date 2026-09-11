@@ -88,7 +88,10 @@ export default function registerSystemSettings() {
 
    // Toggle the Player HUD's layout-edit mode.
    game.keybindings.register('titan', 'togglePlayerHudEditMode', {
-      editable: [{ key: 'KeyH', modifiers: ['Shift'] }],
+      editable: [{
+         key: 'KeyH',
+         modifiers: ['Shift'],
+      }],
       hint: 'SETTINGS.togglePlayerHudEditMode.hint',
       name: 'SETTINGS.togglePlayerHudEditMode.label',
       onDown: () => {
@@ -150,7 +153,10 @@ export default function registerSystemSettings() {
    // Default Dark Theme.
    game.settings.register('titan', 'defaultDarkTheme', {
       choices: Object.fromEntries(BUILT_IN_THEMES.filter((theme) => theme.dark)
-         .map((theme) => [theme.id, theme.name])),
+         .map((theme) => [
+            theme.id,
+            theme.name,
+         ])),
       config: true,
       default: 'heritage-dark',
       hint: 'SETTINGS.defaultDarkTheme.hint',
@@ -164,7 +170,10 @@ export default function registerSystemSettings() {
    // Default Light Theme.
    game.settings.register('titan', 'defaultLightTheme', {
       choices: Object.fromEntries(BUILT_IN_THEMES.filter((theme) => !theme.dark)
-         .map((theme) => [theme.id, theme.name])),
+         .map((theme) => [
+            theme.id,
+            theme.name,
+         ])),
       config: true,
       default: 'heritage-light',
       hint: 'SETTINGS.defaultLightTheme.hint',

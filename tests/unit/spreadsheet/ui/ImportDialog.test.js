@@ -23,7 +23,10 @@ afterEach(() => {
 describe('ImportDialog', () => {
    it('preselects the given pack and titles the dialog generically when none is given', () => {
       /** @type {object} */
-      const pack = { metadata: { label: 'Test Weapons' }, collection: 'world.test' };
+      const pack = {
+         metadata: { label: 'Test Weapons' },
+         collection: 'world.test',
+      };
 
       /** @type {object} */
       const withPack = new ImportDialog(pack);

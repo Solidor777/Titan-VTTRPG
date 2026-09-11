@@ -53,7 +53,12 @@ test.describe('integration manifest drift guard', () => {
       }));
 
       // Each base document's declared subtypes must equal its registered dataModels.
-      for (const documentName of ['Actor', 'Item', 'ActiveEffect', 'ChatMessage']) {
+      for (const documentName of [
+         'Actor',
+         'Item',
+         'ActiveEffect',
+         'ChatMessage',
+      ]) {
          expect(
             registered[documentName].sort(),
             `${documentName} dataModels must match declared documentTypes`,
@@ -72,8 +77,15 @@ test.describe('integration manifest drift guard', () => {
       const live = await page.evaluate((packs) => packs.map((entry) => {
          const pack = game.packs.get(`titan.${entry.name}`);
          return pack
-            ? { name: entry.name, type: pack.metadata.type, packageName: pack.metadata.packageName }
-            : { name: entry.name, missing: true };
+            ? {
+               name: entry.name,
+               type: pack.metadata.type,
+               packageName: pack.metadata.packageName,
+            }
+            : {
+               name: entry.name,
+               missing: true,
+            };
       }), declaredPacks);
 
       // Each declared pack must resolve, belong to the titan system, and carry the declared document type.
@@ -122,7 +134,13 @@ test.describe('integration manifest drift guard', () => {
       });
 
       // Every base document must be overridden by a proper Titan subclass.
-      for (const documentName of ['Actor', 'Item', 'ActiveEffect', 'ChatMessage', 'Combat']) {
+      for (const documentName of [
+         'Actor',
+         'Item',
+         'ActiveEffect',
+         'ChatMessage',
+         'Combat',
+      ]) {
          expect(result[documentName].overridden, `${documentName} documentClass overridden`).toBe(true);
          expect(result[documentName].subclass, `${documentName} documentClass subclasses the base`).toBe(true);
       }
@@ -135,8 +153,19 @@ test.describe('integration manifest drift guard', () => {
    test('per-subtype Titan sheets are registered as default and core sheets are unregistered', async () => {
       // The declared Actor/Item subtypes whose default-sheet registration is asserted.
       const subtypes = {
-         Actor: ['player', 'npc'],
-         Item: ['ability', 'armor', 'commodity', 'equipment', 'shield', 'spell', 'weapon'],
+         Actor: [
+            'player',
+            'npc',
+         ],
+         Item: [
+            'ability',
+            'armor',
+            'commodity',
+            'equipment',
+            'shield',
+            'spell',
+            'weapon',
+         ],
       };
 
       // Inspect the live sheet-registration maps (CONFIG[doc].sheetClasses[subtype]).
@@ -153,7 +182,11 @@ test.describe('integration manifest drift guard', () => {
             };
          };
 
-         const out = { Actor: {}, Item: {}, ActiveEffect: {} };
+         const out = {
+            Actor: {},
+            Item: {},
+            ActiveEffect: {},
+         };
          for (const subtype of subtypes.Actor) {
             out.Actor[subtype] = inspect('Actor', subtype);
          }
@@ -166,7 +199,10 @@ test.describe('integration manifest drift guard', () => {
       }, { subtypes });
 
       // Every declared Actor/Item subtype: a titan-scoped sheet is registered AND is the default.
-      for (const documentName of ['Actor', 'Item']) {
+      for (const documentName of [
+         'Actor',
+         'Item',
+      ]) {
          for (const subtype of subtypes[documentName]) {
             const r = result[documentName][subtype];
             expect(r.hasTitanSheet, `${documentName}.${subtype} titan sheet registered`).toBe(true);
@@ -206,13 +242,26 @@ test.describe('integration manifest drift guard', () => {
    test('system conditions and settings are registered', async () => {
       // The condition ids the system pushes onto CONFIG.statusEffects.
       const expectedConditions = [
-         'blinded', 'contaminated', 'dead', 'deafened', 'frightened', 'incapacitated',
-         'prone', 'restrained', 'stunned', 'sleeping', 'unconscious',
+         'blinded',
+         'contaminated',
+         'dead',
+         'deafened',
+         'frightened',
+         'incapacitated',
+         'prone',
+         'restrained',
+         'stunned',
+         'sleeping',
+         'unconscious',
       ];
       // A representative sample of registered setting keys (mix of scopes and value kinds).
       const expectedSettings = [
-         'titan.migrationMode', 'titan.getCheckOptions', 'titan.initiativeFormula',
-         'titan.staminaBaseMultiplier', 'titan.defaultAttribute.arcana', 'titan.defaultXpCost.ability',
+         'titan.migrationMode',
+         'titan.getCheckOptions',
+         'titan.initiativeFormula',
+         'titan.staminaBaseMultiplier',
+         'titan.defaultAttribute.arcana',
+         'titan.defaultXpCost.ability',
          'titan.theme',
       ];
 

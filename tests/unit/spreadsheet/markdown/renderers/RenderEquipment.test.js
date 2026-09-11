@@ -46,7 +46,10 @@ describe('renderEquipment', () => {
          system: makeSystem({
             rarity: 'uncommon',
             value: 15,
-            customTrait: [{ name: 'Weighted', description: '' }],
+            customTrait: [{
+               name: 'Weighted',
+               description: '',
+            }],
             description: '<p>A hook on a length of rope.</p>',
          }),
       };

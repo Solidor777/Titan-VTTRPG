@@ -15,7 +15,10 @@
    /** @type {{ value: string, label: { text: string, localize: false } }[]} The pack-select options. */
    const packOptions = $derived(trayState.compendiums.map((pack) => ({
       value: pack.collection,
-      label: { text: pack.metadata.label, localize: false },
+      label: {
+         text: pack.metadata.label,
+         localize: false,
+      },
    })));
 
    /** @type {string} The localized aria-label for the New Effect button. */

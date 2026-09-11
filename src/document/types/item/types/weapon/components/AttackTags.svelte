@@ -19,7 +19,7 @@
     * @property {number} [idx] - The index of the attack in the current document's `system.attack` array.
     * @property {number} [damageMod] - Optional actor-derived modifier added to the displayed damage.
     * @property {boolean} [hideBasics] - Skips the type and attribute/skill tags for consumers whose
-    *    header already shows those basics (the sidebar attack panels).
+    * header already shows those basics (the sidebar attack panels).
     */
 
    /** @type {AttackTagsProps} */
@@ -97,7 +97,10 @@
       <!--Custom Traits-->
       {#each attack.customTrait as trait (trait.uuid)}
          <div class="stat">
-            <Tag tooltip={{ text: trait.description, localize: false }}>
+            <Tag tooltip={{
+               text: trait.description,
+               localize: false,
+            }}>
                {trait.name}
             </Tag>
          </div>

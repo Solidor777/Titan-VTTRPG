@@ -9,7 +9,10 @@
 export async function setWorldSetting(pageGm, key, value) {
    await pageGm.evaluate(
       ({ key, value }) => game.settings.set('titan', key, value),
-      { key, value },
+      {
+         key,
+         value,
+      },
    );
 }
 
@@ -23,7 +26,10 @@ export async function setWorldSetting(pageGm, key, value) {
 export async function setClientSetting(page, key, value) {
    await page.evaluate(
       ({ key, value }) => game.settings.set('titan', key, value),
-      { key, value },
+      {
+         key,
+         value,
+      },
    );
 }
 

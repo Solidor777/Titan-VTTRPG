@@ -71,11 +71,17 @@ test.describe('v14 render-smoke', () => {
          let effect = actor.effects.find((e) => e.name === 'E2E Effect');
          if (!effect) {
             const [created] = await actor.createEmbeddedDocuments('ActiveEffect', [
-               { name: 'E2E Effect', type: 'effect' },
+               {
+                  name: 'E2E Effect',
+                  type: 'effect',
+               },
             ]);
             effect = created;
          }
-         return { actorId: actor.id, effectId: effect.id };
+         return {
+            actorId: actor.id,
+            effectId: effect.id,
+         };
       });
 
       // Build a locator that resolves the embedded effect from the world.

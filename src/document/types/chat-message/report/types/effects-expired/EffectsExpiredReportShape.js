@@ -5,7 +5,7 @@
  * conditionally present, so it is `null` to become a nullable object field, preserving the card's
  * `if (effects)` presence guard.
  * @returns {object} The effects-expired report shape: the expired-effects-removed flag and the
- *    conditionally-present effects snapshot.
+ * conditionally-present effects snapshot.
  */
 export default function createEffectsExpiredReportShape() {
    return {

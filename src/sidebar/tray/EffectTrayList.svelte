@@ -199,7 +199,10 @@
                   label={group.folder.name}
                   onclick={() => trayState.toggleFolder(group.folder.id)}
                   testId="effect-tray-folder-toggle"
-                  tooltip={{ text: group.folder.name, localize: false }}
+                  tooltip={{
+                     text: group.folder.name,
+                     localize: false,
+                  }}
                />
 
                <!--Folder name (double-click to rename when editable)-->

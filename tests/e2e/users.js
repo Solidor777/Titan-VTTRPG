@@ -6,10 +6,22 @@
 
 /** @type {E2EUser[]} The four dedicated E2E identities (no passwords). */
 export const E2E_USERS = [
-   { name: 'E2E GM 1', role: 'gm' },
-   { name: 'E2E GM 2', role: 'gm' },
-   { name: 'E2E Player 1', role: 'player' },
-   { name: 'E2E Player 2', role: 'player' },
+   {
+      name: 'E2E GM 1',
+      role: 'gm',
+   },
+   {
+      name: 'E2E GM 2',
+      role: 'gm',
+   },
+   {
+      name: 'E2E Player 1',
+      role: 'player',
+   },
+   {
+      name: 'E2E Player 2',
+      role: 'player',
+   },
 ];
 
 /** @type {E2EUser[]} The two Gamemaster identities. */

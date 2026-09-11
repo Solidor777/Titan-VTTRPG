@@ -5,7 +5,7 @@
    import ScrollingContainer from '~/helpers/svelte-components/ScrollingContainer.svelte';
    import TopFilter from '~/helpers/svelte-components/input/TopFilter.svelte';
    import SpellSheetStandardAspectSettings
-      from '~/document/types/item/types/spell/sheet/SpellSheetStandardAspectSettings.svelte';
+   from '~/document/types/item/types/spell/sheet/SpellSheetStandardAspectSettings.svelte';
 
    /** @type {object} Reference to the Application State store. */
    const appState = getContext('applicationState');

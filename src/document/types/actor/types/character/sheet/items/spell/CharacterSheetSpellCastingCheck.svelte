@@ -23,7 +23,7 @@
 
          // Update the parameters.
          return sheetDocument.data.system.getCastingCheckParameters(
-            sheetDocument.data.system.initializeCastingCheckOptions(checkOptions)
+            sheetDocument.data.system.initializeCastingCheckOptions(checkOptions),
          );
       }
       return undefined;

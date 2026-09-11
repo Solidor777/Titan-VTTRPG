@@ -2,9 +2,9 @@
    import { getContext } from 'svelte';
    import DocumentNameInput from '~/document/svelte-components/input/DocumentNameInput.svelte';
    import CharacterSheetAttributes
-      from '~/document/types/actor/types/character/sheet/header/CharacterSheetAttributes.svelte';
+   from '~/document/types/actor/types/character/sheet/header/CharacterSheetAttributes.svelte';
    import CharacterSheetResistances
-      from '~/document/types/actor/types/character/sheet/header/CharacterSheetResistances.svelte';
+   from '~/document/types/actor/types/character/sheet/header/CharacterSheetResistances.svelte';
    import DocumentSelect from '~/document/svelte-components/select/DocumentSelect.svelte';
    import StatTag from '~/helpers/svelte-components/tag/StatTag.svelte';
    import DocumentTextInput from '~/document/svelte-components/input/DocumentTextInput.svelte';

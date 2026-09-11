@@ -1,15 +1,15 @@
 <script>
    import CharacterSheetAbilitiesTab
-      from '~/document/types/actor/types/character/sheet/tabs/CharacterSheetAbilitiesTab.svelte';
+   from '~/document/types/actor/types/character/sheet/tabs/CharacterSheetAbilitiesTab.svelte';
    import CharacterSheetEffectsTab
-      from '~/document/types/actor/types/character/sheet/tabs/CharacterSheetEffectsTab.svelte';
+   from '~/document/types/actor/types/character/sheet/tabs/CharacterSheetEffectsTab.svelte';
    import CharacterSheetInventoryTab
-      from '~/document/types/actor/types/character/sheet/tabs/inventory/CharacterSheetInventoryTab.svelte';
+   from '~/document/types/actor/types/character/sheet/tabs/inventory/CharacterSheetInventoryTab.svelte';
    import CharacterSheetNotesTab from '~/document/types/actor/types/character/sheet/tabs/CharacterSheetNotesTab.svelte';
    import CharacterSheetSkillsTab
-      from '~/document/types/actor/types/character/sheet/tabs/skills/CharacterSheetSkillsTab.svelte';
+   from '~/document/types/actor/types/character/sheet/tabs/skills/CharacterSheetSkillsTab.svelte';
    import CharacterSheetSpellsTab
-      from '~/document/types/actor/types/character/sheet/tabs/CharacterSheetSpellsTab.svelte';
+   from '~/document/types/actor/types/character/sheet/tabs/CharacterSheetSpellsTab.svelte';
    import localize from '~/helpers/utility-functions/Localize.js';
    import { getContext } from 'svelte';
    import Tabs from '~/helpers/svelte-components/Tabs.svelte';

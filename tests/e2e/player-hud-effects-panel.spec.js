@@ -27,7 +27,10 @@ test.beforeAll(async ({ browser }) => {
    await deleteOrphanedTokens(page);
 
    // Start from a clean slate: a crashed prior run can leave stale fixtures behind.
-   for (const name of [FIXTURE_NAME, 'HUD Effects Player 2']) {
+   for (const name of [
+      FIXTURE_NAME,
+      'HUD Effects Player 2',
+   ]) {
       await deleteFixtureActor(page, name);
    }
 
@@ -70,7 +73,10 @@ async function seedControlledActor(page, { name, releaseOthers = true }) {
    }
    await page.evaluate(async ({ name }) => {
       if (!game.actors.getName(name)) {
-         await Actor.create({ name, type: 'player' });
+         await Actor.create({
+            name,
+            type: 'player',
+         });
       }
    }, { name });
 
@@ -84,7 +90,10 @@ async function seedControlledActor(page, { name, releaseOthers = true }) {
          return true;
       }
       return false;
-   }, { name, releaseOthers });
+   }, {
+      name,
+      releaseOthers,
+   });
 
    if (!hasToken) {
       await controlFixtureActorToken(page, {
@@ -114,12 +123,20 @@ async function seedPanelFixture(page) {
             name: 'HUD Panel Effect',
             type: 'effect',
             description: '<p>Panel description body.</p>',
-            system: { duration: { type: 'turnStart', remaining: 2 } },
+            system: {
+               duration: {
+                  type: 'turnStart',
+                  remaining: 2,
+               },
+            },
          }]);
       }
       return actor.effects.getName('HUD Panel Effect').id;
    }, actorId);
-   return { actorId, effectId };
+   return {
+      actorId,
+      effectId,
+   };
 }
 
 test('the panel renders sections for conditions and effects', async () => {
@@ -146,7 +163,10 @@ test('the duration controls step the effect duration', async () => {
    await expect.poll(
       () => page.evaluate(({ actorId, effectId }) => {
          return game.actors.get(actorId).effects.get(effectId).system.duration.remaining;
-      }, { actorId, effectId }),
+      }, {
+         actorId,
+         effectId,
+      }),
       { message: 'the duration increments from the panel' },
    ).toBe(3);
 
@@ -154,7 +174,10 @@ test('the duration controls step the effect duration', async () => {
    await expect.poll(
       () => page.evaluate(({ actorId, effectId }) => {
          return game.actors.get(actorId).effects.get(effectId).system.duration.remaining;
-      }, { actorId, effectId }),
+      }, {
+         actorId,
+         effectId,
+      }),
       { message: 'the duration decrements from the panel' },
    ).toBe(2);
 });
@@ -165,7 +188,10 @@ test('send to chat creates the effect card', async () => {
    await page.locator('[data-testid="player-hud-effect-chat"]').click();
    await expect.poll(
       () => page.evaluate(() => game.messages.contents.at(-1)?.type),
-      { message: 'the effect card lands in chat', timeout: 1000 },
+      {
+         message: 'the effect card lands in chat',
+         timeout: 1000,
+      },
    ).toBe('effect');
 });
 
@@ -192,7 +218,10 @@ test('remove deletes the effect', async () => {
    await expect.poll(
       () => page.evaluate(({ actorId, effectId }) => {
          return game.actors.get(actorId).effects.get(effectId) ?? null;
-      }, { actorId, effectId }),
+      }, {
+         actorId,
+         effectId,
+      }),
       { message: 'the effect is deleted from the panel' },
    ).toBe(null);
    await expect(row).toHaveCount(0);
@@ -227,7 +256,10 @@ test('the panel body scrolls when content exceeds its size', async () => {
       for (let index = 0; index < 12; index++) {
          const name = `HUD Bulk Effect ${index}`;
          if (!actor.effects.getName(name)) {
-            payloads.push({ name, type: 'effect' });
+            payloads.push({
+               name,
+               type: 'effect',
+            });
          }
       }
       if (payloads.length > 0) {
@@ -288,6 +320,9 @@ test('group selection hides the panel', async () => {
    await seedPanelFixture(page);
    await expect(page.locator('[data-testid="player-hud-effects-panel"]')).toBeVisible();
 
-   await seedControlledActor(page, { name: 'HUD Effects Player 2', releaseOthers: false });
+   await seedControlledActor(page, {
+      name: 'HUD Effects Player 2',
+      releaseOthers: false,
+   });
    await expect(page.locator('[data-testid="player-hud-effects-panel"]')).toHaveCount(0);
 });

@@ -125,7 +125,7 @@ function buildFieldFromValue(value) {
  * side effects.
  * @param {object} shape - The plain-object shape template to convert into a schema field map.
  * @returns {object} A field map (property name -> DataField instance) suitable as a `defineSchema` /
- *    `_defineDocumentSchema` return value.
+ * `_defineDocumentSchema` return value.
  */
 export default function buildSchemaFromShape(shape) {
    // The schema field map being assembled from the shape's properties.

@@ -8,7 +8,12 @@ import HERITAGE_LIGHT from '~/theme/themes/HeritageLight.js';
 import MACCHIATO from '~/theme/themes/Macchiato.js';
 
 /** @type {object[]} The built-in themes in picker order. */
-export const BUILT_IN_THEMES = Object.freeze([HERITAGE_DARK, MACCHIATO, HERITAGE_LIGHT, CLEAN_NEUTRAL_LIGHT]);
+export const BUILT_IN_THEMES = Object.freeze([
+   HERITAGE_DARK,
+   MACCHIATO,
+   HERITAGE_LIGHT,
+   CLEAN_NEUTRAL_LIGHT,
+]);
 
 /** @type {string} The DOM id of the injected theme stylesheet. */
 const STYLE_ELEMENT_ID = 'titan-theme-style';
@@ -31,7 +36,10 @@ export default class ThemeManager {
 
       // Foundry's configureUI() swaps theme-dark/theme-light on document.body; re-resolve on changes.
       this.#schemeObserver = new MutationObserver(() => this.apply());
-      this.#schemeObserver.observe(document.body, { attributes: true, attributeFilter: ['class'] });
+      this.#schemeObserver.observe(document.body, {
+         attributes: true,
+         attributeFilter: ['class'],
+      });
    }
 
    /**
@@ -39,7 +47,10 @@ export default class ThemeManager {
     * @returns {object[]} All themes.
     */
    getAllThemes() {
-      return [...BUILT_IN_THEMES, ...Object.values(getSetting('customThemes') ?? {})];
+      return [
+         ...BUILT_IN_THEMES,
+         ...Object.values(getSetting('customThemes') ?? {}),
+      ];
    }
 
    /**
@@ -192,7 +203,10 @@ export default class ThemeManager {
          data = JSON.parse(text);
       }
       catch (error) {
-         return { ok: false, error: `Invalid JSON: ${error.message}` };
+         return {
+            ok: false,
+            error: `Invalid JSON: ${error.message}`,
+         };
       }
 
       const result = validateThemeData(data);

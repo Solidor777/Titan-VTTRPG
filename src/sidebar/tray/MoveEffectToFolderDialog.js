@@ -19,10 +19,16 @@ export default class MoveEffectToFolderDialog extends TitanDialog {
    constructor(effect, trayState) {
       /** @type {{ value: string, label: string }[]} The folder options, root first then by name. */
       const folderOptions = [
-         { value: '', label: localize('effectTrayRoot') },
+         {
+            value: '',
+            label: localize('effectTrayRoot'),
+         },
          ...[...trayState.folders]
             .sort((a, b) => a.name.localeCompare(b.name))
-            .map((folder) => ({ value: folder.id, label: folder.name })),
+            .map((folder) => ({
+               value: folder.id,
+               label: folder.name,
+            })),
       ];
 
       super({

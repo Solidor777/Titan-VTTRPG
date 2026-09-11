@@ -69,13 +69,19 @@ describe('resolveRollActor', () => {
          documentName: 'Item',
          isEmbedded: true,
          isOwner: true,
-         parent: { documentName: 'Actor', system: {} },
+         parent: {
+            documentName: 'Actor',
+            system: {},
+         },
       });
       expect(resolveRollActor(bridge)).toBeUndefined();
    });
 
    it('returns undefined for a non-character actor sheet', () => {
-      const bridge = makeBridge({ documentName: 'Actor', system: {} });
+      const bridge = makeBridge({
+         documentName: 'Actor',
+         system: {},
+      });
       expect(resolveRollActor(bridge)).toBeUndefined();
    });
 

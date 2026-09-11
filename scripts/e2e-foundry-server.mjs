@@ -36,14 +36,23 @@ const logFile = process.env.FOUNDRY_SERVER_LOG ?? path.join(repoRoot, 'debug', '
 /** @type {import('./lib/superviseServer.mjs').SuperviseHandle} The supervised server. */
 const handle = await superviseServer({
    command: process.execPath,
-   args: ['main.js', `--dataPath=${dataPath}`, `--world=${world}`],
+   args: [
+      'main.js',
+      `--dataPath=${dataPath}`,
+      `--world=${world}`,
+   ],
    cwd: appDir,
    port,
    watchPid,
    logFile,
 });
 
-for (const signal of ['SIGINT', 'SIGTERM', 'SIGHUP', 'SIGBREAK']) {
+for (const signal of [
+   'SIGINT',
+   'SIGTERM',
+   'SIGHUP',
+   'SIGBREAK',
+]) {
    process.on(signal, () => handle.stop());
 }
 process.on('exit', () => handle.stop());

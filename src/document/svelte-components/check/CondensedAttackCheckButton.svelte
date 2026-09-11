@@ -50,7 +50,10 @@
       attribute={checkParameters.attribute}
       checkIcon={icon}
       onclick={() => rollActor.data.system.requestAttackCheck(checkOptions)}
-      tooltip={{ text: tooltip, localize: false }}
+      tooltip={{
+         text: tooltip,
+         localize: false,
+      }}
       totalDice={checkParameters.totalDice}
       totalExpertise={checkParameters.totalExpertise}
    />

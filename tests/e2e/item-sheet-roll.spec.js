@@ -58,12 +58,23 @@ test.describe('item-sheet check rolling (owner)', () => {
       await deleteFixtureActor(page, ACTOR_NAME);
 
       ids = await page.evaluate(async ({ actorName, itemCheck }) => {
-         const actor = await Actor.create({ name: actorName, type: 'player' });
+         const actor = await Actor.create({
+            name: actorName,
+            type: 'player',
+         });
          const [equipment] = await actor.createEmbeddedDocuments('Item', [
-            { name: 'E2E Roll Equipment', type: 'equipment', system: { check: [itemCheck] } },
+            {
+               name: 'E2E Roll Equipment',
+               type: 'equipment',
+               system: { check: [itemCheck] },
+            },
          ]);
          const [weapon] = await actor.createEmbeddedDocuments('Item', [
-            { name: 'E2E Roll Weapon', type: 'weapon', system: { equipped: true } },
+            {
+               name: 'E2E Roll Weapon',
+               type: 'weapon',
+               system: { equipped: true },
+            },
          ]);
 
          // Build TWO valid attacks by cloning the schema-default attack (clone-and-write per the
@@ -84,13 +95,20 @@ test.describe('item-sheet check rolling (owner)', () => {
          attacks.push(secondAttack);
          await weapon.update({ system: { attack: attacks } });
          const [spell] = await actor.createEmbeddedDocuments('Item', [
-            { name: 'E2E Roll Spell', type: 'spell' },
+            {
+               name: 'E2E Roll Spell',
+               type: 'spell',
+            },
          ]);
 
          // Roll straight to chat: no options dialog.
          await game.settings.set('titan', 'getCheckOptions', false);
 
-         return { equipmentId: equipment.id, weaponId: weapon.id, spellId: spell.id };
+         return {
+            equipmentId: equipment.id,
+            weaponId: weapon.id,
+            spellId: spell.id,
+         };
       }, {
          actorName: ACTOR_NAME,
          itemCheck: buildCheck(ITEM_CHECK_LABEL, 'e2e-roll-item-check'),
@@ -121,7 +139,10 @@ test.describe('item-sheet check rolling (owner)', () => {
             () => !!app?.element?.querySelector('.window-content')?.children.length,
             { message: 'item sheet mounted' },
          );
-      }, { actorName: ACTOR_NAME, id: itemId });
+      }, {
+         actorName: ACTOR_NAME,
+         id: itemId,
+      });
       return page.locator('.application.titan-document-sheet');
    }
 

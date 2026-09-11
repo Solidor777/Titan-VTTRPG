@@ -20,7 +20,7 @@ export default class EditCustomTraitDialog extends TitanDialog {
             class: EditCustomTraitDialogShell,
             props: {
                item: item,
-               traitIdx: traitIdx
+               traitIdx: traitIdx,
             },
          },
          id: `titan-edit-custom-trait-dialog-${item._id}`,

@@ -1,11 +1,11 @@
 <script>
    import ReportChatMessageBase from '~/document/types/chat-message/report/components/ReportChatMessageBase.svelte';
    import ChatMessageResolveRestoredMessage
-      from '~/document/types/chat-message/components/messages/ChatMessageResolveRestoredMessage.svelte';
+   from '~/document/types/chat-message/components/messages/ChatMessageResolveRestoredMessage.svelte';
    import ChatMessageStaminaRestoredMessage
-      from '~/document/types/chat-message/components/messages/ChatMessageStaminaRestoredMessage.svelte';
+   from '~/document/types/chat-message/components/messages/ChatMessageStaminaRestoredMessage.svelte';
    import LongRestReportChatMessageHeader
-      from '~/document/types/chat-message/report/types/long-rest/LongRestReportChatMessageHeader.svelte';
+   from '~/document/types/chat-message/report/types/long-rest/LongRestReportChatMessageHeader.svelte';
    import { getContext } from 'svelte';
    import localize from '~/helpers/utility-functions/Localize.js';
    import ChatMessageWounds from '~/document/types/chat-message/components/resources/ChatMessageWounds.svelte';

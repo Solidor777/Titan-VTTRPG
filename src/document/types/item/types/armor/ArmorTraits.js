@@ -27,7 +27,7 @@ export const ARMOR_TRAITS = deepFreeze([
    {
       name: 'heavy',
       value: false,
-   }
+   },
 ]);
 
 /**

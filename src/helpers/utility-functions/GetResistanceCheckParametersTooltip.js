@@ -37,22 +37,24 @@ export default function getResistanceCheckParametersTooltip(checkParameters) {
          }
       }
 
-      retVal +=
-         `<p><i style="width:20px;text-align:center" class="${resistanceIcon}"></i> ${localize(checkParameters.resistance)}: ${checkParameters.resistanceDice}</p>`;
+      retVal += `<p><i style="width:20px;text-align:center" class="${resistanceIcon}"></i> ` +
+         `${localize(checkParameters.resistance)}: ${checkParameters.resistanceDice}</p>`;
    }
 
    // Add Dice Mod data.
    if (checkParameters.diceMod) {
-      retVal +=
-         `<p><i style="width:20px;text-align:center" class="${MOD_ICON}"></i> ${localize('diceMod')}: ${checkParameters.diceMod}</p>`;
+      retVal += `<p><i style="width:20px;text-align:center" class="${MOD_ICON}"></i> ` +
+         `${localize('diceMod')}: ${checkParameters.diceMod}</p>`;
    }
 
    // Add Total Dice data.
-   retVal += `<p><i style="width:20px;text-align:center" class="${DICE_ICON}"></i> ${localize('totalDice')}: ${checkParameters.totalDice}</p>`;
+   retVal += `<p><i style="width:20px;text-align:center" class="${DICE_ICON}"></i> ` +
+      `${localize('totalDice')}: ${checkParameters.totalDice}</p>`;
 
    // Add Expertise data.
    if (checkParameters.totalExpertise) {
-      retVal += `<p><i style="width:20px;text-align:center" class="${EXPERTISE_ICON}"></i> ${localize('expertise')}: ${checkParameters.totalExpertise}</p>`;
+      retVal += `<p><i style="width:20px;text-align:center" class="${EXPERTISE_ICON}"></i> ` +
+         `${localize('expertise')}: ${checkParameters.totalExpertise}</p>`;
    }
 
    return retVal;

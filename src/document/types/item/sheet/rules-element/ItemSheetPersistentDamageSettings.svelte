@@ -3,7 +3,7 @@
    import DocumentSelect from '~/document/svelte-components/select/DocumentSelect.svelte';
    import DocumentIntegerInput from '~/document/svelte-components/input/DocumentIntegerInput.svelte';
    import ItemSheetRulesElementOperationSelect
-      from '~/document/types/item/sheet/rules-element/ItemSheetRulesElementOperationSelect.svelte';
+   from '~/document/types/item/sheet/rules-element/ItemSheetRulesElementOperationSelect.svelte';
 
    /**
     * @typedef {object} ItemSheetPersistentDamageSettingsProps

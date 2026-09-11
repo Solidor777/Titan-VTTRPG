@@ -4,9 +4,9 @@
    import ScrollingContainer from '~/helpers/svelte-components/ScrollingContainer.svelte';
    import TextInput from '~/helpers/svelte-components/input/TextInput.svelte';
    import CharacterSheetEffectList
-      from '~/document/types/actor/types/character/sheet/items/effect/CharacterSheetEffectList.svelte';
+   from '~/document/types/actor/types/character/sheet/items/effect/CharacterSheetEffectList.svelte';
    import CharacterSheetTabHeaderButton
-      from '~/document/types/actor/types/character/sheet/tabs/CharacterSheetTabHeaderButton.svelte';
+   from '~/document/types/actor/types/character/sheet/tabs/CharacterSheetTabHeaderButton.svelte';
    import { CREATE_ICON, REMOVE_TEMP_EFFECTS_ICON } from '~/system/Icons.js';
 
    /** @type {object} Reference to the Application State store. */

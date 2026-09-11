@@ -41,6 +41,12 @@ already wrapped in quotes, so it stays text the next time you import the file.
 missing" setting, which only removes top-level documents that were in the pack but are absent from the
 sheet.
 
+## Linting
+
+`npm run eslint` / `npm run eslint-fix` lint `src/`, `tests/`, `scripts/`, and the config files
+themselves. `test/build/` (the built IIFE test/e2e bundles) is build output, not source, and is
+excluded via `eslint.config.js`'s `ignores`.
+
 ## Publishing a spreadsheet as Markdown
 
 `npm run export:markdown -- <input> [<input>...] [--out <file.md>] [--title <text>] [--lang <file>]`

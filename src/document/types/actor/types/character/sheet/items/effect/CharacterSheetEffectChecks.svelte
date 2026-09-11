@@ -1,7 +1,7 @@
 <script>
    import { getContext } from 'svelte';
    import CharacterSheetEffectCheck
-      from '~/document/types/actor/types/character/sheet/items/effect/CharacterSheetEffectCheck.svelte';
+   from '~/document/types/actor/types/character/sheet/items/effect/CharacterSheetEffectCheck.svelte';
 
    /** @type {object} The embedded effect bridge provided by EmbeddedDocumentProvider. */
    const document = getContext('document');

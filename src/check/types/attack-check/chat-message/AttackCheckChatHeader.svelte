@@ -5,6 +5,26 @@
 
    /** @type {object} Reference to the reactive Document store. */
    const document = getContext('document');
+
+   /** @type {string} The attack-type-and-rating-versus-defense summary line. */
+   const targetDefenseLabel = $derived.by(() => {
+      const typeLabel = document.data.system.parameters.type === 'melee'
+         ? localize('melee')
+         : localize('accuracy');
+
+      return `${typeLabel} ${document.data.system.parameters.attackerRating} ${localize('versus')} ` +
+         `${localize('defense')} ${document.data.system.parameters.targetDefense}`;
+   });
+
+   /** @type {string} The damage total, with an extra-successes suffix when applicable. */
+   const damageLabel = $derived.by(() => {
+      const total = document.data.system.results.damage + document.data.system.parameters.damageMod;
+      const suffix = document.data.system.parameters.plusExtraSuccessDamage
+         ? ` + ${localize('extraSuccesses.short')}`
+         : '';
+
+      return `${localize('damage')}: ${total}${suffix}`;
+   });
 </script>
 
 <CheckChatMessageItemHeader
@@ -28,12 +48,12 @@
 
    <!--Target Defense-->
    {#if document.data.system.parameters.targetDefense !== undefined}
-      {`${document.data.system.parameters.type === 'melee' ? localize('melee') : localize('accuracy')} ${document.data.system.parameters.attackerRating} ${localize('versus')} ${localize('defense')} ${document.data.system.parameters.targetDefense}`}
+      {targetDefenseLabel}
    {/if}
 
    <!--Damage-->
    <div class="sub-label">
-      {`${localize('damage')}: ${document.data.system.results.damage + document.data.system.parameters.damageMod}${document.data.system.parameters.plusExtraSuccessDamage ? ` + ${localize('extraSuccesses.short')}` : ''}`}
+      {damageLabel}
    </div>
 </CheckChatMessageItemHeader>
 

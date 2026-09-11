@@ -29,7 +29,7 @@ export default class TitanWeaponSheet extends TitanItemSheet {
                   shell: WeaponSheetShell,
                },
             },
-         }
+         },
       );
 
       super(sheetDocument, options);

@@ -56,7 +56,10 @@ async function seedActorWithItem(page, actorName, itemType) {
 
       // Seed a fresh player actor with one item whose initial display state is known:
       // rarity 'common' (RarityTag class .common) and value 0 (ValueTag absent via {#if value}).
-      const actor = await Actor.create({ name: actorName, type: 'player' });
+      const actor = await Actor.create({
+         name: actorName,
+         type: 'player',
+      });
       await actor.createEmbeddedDocuments('Item', [
          {
             name: `E2E Reactive ${itemType}`,
@@ -74,7 +77,10 @@ async function seedActorWithItem(page, actorName, itemType) {
          () => !!app?.element?.querySelector('.window-content')?.children.length,
          { message: 'sheet mounted' },
       );
-   }, { actorName, itemType });
+   }, {
+      actorName,
+      itemType,
+   });
 }
 
 /**
@@ -139,9 +145,16 @@ test.describe('character sheet inventory row reactivity', () => {
          if (stale) {
             await stale.delete();
          }
-         const actor = await Actor.create({ name: actorName, type: 'player' });
+         const actor = await Actor.create({
+            name: actorName,
+            type: 'player',
+         });
          await actor.createEmbeddedDocuments('Item', [
-            { name: 'E2E Reactive Commodity Qty', type: 'commodity', system: { quantity: 2 } },
+            {
+               name: 'E2E Reactive Commodity Qty',
+               type: 'commodity',
+               system: { quantity: 2 },
+            },
          ]);
          const app = await actor.sheet.render(true);
          await titanWait(
@@ -198,9 +211,16 @@ test.describe('character sheet inventory row reactivity', () => {
          if (stale) {
             await stale.delete();
          }
-         const actor = await Actor.create({ name: actorName, type: 'player' });
+         const actor = await Actor.create({
+            name: actorName,
+            type: 'player',
+         });
          await actor.createEmbeddedDocuments('Item', [
-            { name: 'E2E Math Commodity Qty', type: 'commodity', system: { quantity: 4 } },
+            {
+               name: 'E2E Math Commodity Qty',
+               type: 'commodity',
+               system: { quantity: 4 },
+            },
          ]);
          const app = await actor.sheet.render(true);
          await titanWait(

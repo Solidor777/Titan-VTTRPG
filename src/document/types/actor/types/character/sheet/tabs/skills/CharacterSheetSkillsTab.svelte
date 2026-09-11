@@ -2,7 +2,7 @@
    import { getContext } from 'svelte';
    import TopFilter from '~/helpers/svelte-components/input/TopFilter.svelte';
    import CharacterSheetSkillsList
-      from '~/document/types/actor/types/character/sheet/tabs/skills/CharacterSheetSkillsList.svelte';
+   from '~/document/types/actor/types/character/sheet/tabs/skills/CharacterSheetSkillsList.svelte';
    import ScrollingContainer from '~/helpers/svelte-components/ScrollingContainer.svelte';
 
    /** @type {object} Reference to the Application State store. */

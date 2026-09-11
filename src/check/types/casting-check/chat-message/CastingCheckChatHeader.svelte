@@ -23,7 +23,7 @@
 
    <!--Tradition-->
    {#if document.data.system.parameters.tradition !== '' &&
-   document.data.system.parameters.tradition !== localize('any')}
+      document.data.system.parameters.tradition !== localize('any')}
       <div class="sub-label">
          {document.data.system.parameters.tradition}
       </div>

@@ -3,7 +3,14 @@ import { expectedCheckResults } from '../../shared/checkOracle.js';
 
 describe('expectedCheckResults oracle', () => {
    it('counts a crit, a normal success, and a crit failure at difficulty 4, complexity 1', () => {
-      const result = expectedCheckResults([6, 4, 1], { difficulty: 4, complexity: 1 });
+      const result = expectedCheckResults([
+         6,
+         4,
+         1,
+      ], {
+         difficulty: 4,
+         complexity: 1,
+      });
       expect(result).toEqual({
          successes: 2,
          criticalSuccesses: 1,
@@ -15,7 +22,10 @@ describe('expectedCheckResults oracle', () => {
    });
 
    it('treats complexity 0 as never-succeeded (attribute/resistance defaults)', () => {
-      const result = expectedCheckResults([6], { difficulty: 4, complexity: 0 });
+      const result = expectedCheckResults([6], {
+         difficulty: 4,
+         complexity: 0,
+      });
       expect(result).toEqual({
          successes: 1,
          criticalSuccesses: 1,
@@ -27,7 +37,10 @@ describe('expectedCheckResults oracle', () => {
    });
 
    it('honors extraSuccessOnCritical and extraFailureOnCritical flags', () => {
-      const result = expectedCheckResults([6, 1], {
+      const result = expectedCheckResults([
+         6,
+         1,
+      ], {
          difficulty: 4,
          complexity: 1,
          extraSuccessOnCritical: true,

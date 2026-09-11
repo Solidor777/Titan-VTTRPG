@@ -192,18 +192,18 @@
 </script>
 
 <input bind:value={input}
-       class={`titan-number-input ${maxDigits ? 'max-digits' : ''}`}
-       data-testid={testId}
-       {disabled}
-       onblur={handleBlur}
-       onchange={commitInput}
-       onfocus={handleFocus}
-       onkeydown={handleKeydown}
-       onkeypress={filterInput}
-       onkeyup={handleKeyup}
-       style:--titan-max-digits={maxDigits ? maxDigits : 15}
-       type="text"
-       use:tooltipAction={tooltip}
+   class={`titan-number-input ${maxDigits ? 'max-digits' : ''}`}
+   data-testid={testId}
+   {disabled}
+   onblur={handleBlur}
+   onchange={commitInput}
+   onfocus={handleFocus}
+   onkeydown={handleKeydown}
+   onkeypress={filterInput}
+   onkeyup={handleKeyup}
+   style:--titan-max-digits={maxDigits ? maxDigits : 15}
+   type="text"
+   use:tooltipAction={tooltip}
 />
 
 <style lang="scss">

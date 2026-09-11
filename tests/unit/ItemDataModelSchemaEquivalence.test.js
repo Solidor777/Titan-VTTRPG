@@ -225,10 +225,19 @@ describe('item DataModel schema characterization (golden master)', () => {
 
    it('spell and commodity carry no rulesElement field; the other five do', () => {
       // The five rules-element item types expose a rulesElement array; spell and commodity do not.
-      for (const type of ['weapon', 'armor', 'ability', 'shield', 'equipment']) {
+      for (const type of [
+         'weapon',
+         'armor',
+         'ability',
+         'shield',
+         'equipment',
+      ]) {
          expect(models[type]._defineDocumentSchema().rulesElement).toBeInstanceOf(MockArrayField);
       }
-      for (const type of ['spell', 'commodity']) {
+      for (const type of [
+         'spell',
+         'commodity',
+      ]) {
          expect(models[type]._defineDocumentSchema().rulesElement).toBeUndefined();
       }
    });

@@ -70,7 +70,10 @@
          node,
          '[data-effect-id]',
          buildEffectRowContextMenu(trayState, openMoveToFolder),
-         { jQuery: false, fixed: true },
+         {
+            jQuery: false,
+            fixed: true,
+         },
       );
 
       return {

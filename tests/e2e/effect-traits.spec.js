@@ -45,14 +45,21 @@ test.describe('custom trait edit/delete on effects', () => {
          if (stale) {
             await stale.delete();
          }
-         const actor = await Actor.create({ name: actorName, type: 'player' });
+         const actor = await Actor.create({
+            name: actorName,
+            type: 'player',
+         });
          const [effect] = await actor.createEmbeddedDocuments('ActiveEffect', [
             {
                name: 'E2E Effect',
                type: 'effect',
                system: {
                   customTrait: [
-                     { name: traitName, description: 'seeded', uuid: 'e2e-eff-trait-0' },
+                     {
+                        name: traitName,
+                        description: 'seeded',
+                        uuid: 'e2e-eff-trait-0',
+                     },
                   ],
                },
             },
@@ -62,7 +69,10 @@ test.describe('custom trait edit/delete on effects', () => {
             () => !!app?.element?.querySelector('.sidebar'),
             { message: 'sheet mounted' },
          );
-      }, { actorName: ACTOR_NAME, traitName: ORIGINAL_NAME });
+      }, {
+         actorName: ACTOR_NAME,
+         traitName: ORIGINAL_NAME,
+      });
    });
 
    test('editing an effect custom trait persists the new name and re-renders', async () => {

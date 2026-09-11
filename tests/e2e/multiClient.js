@@ -5,7 +5,8 @@ import { login } from './fixtures.js';
  * Each client is its own browser context (separate session/cookies), logged in as the named user.
  * @param {import('@playwright/test').Browser} browser - The Playwright browser from the test fixture.
  * @param {Object<string, string>} clientSpec - Map of label to Foundry user display name.
- * @param {(pages: Object<string, import('@playwright/test').Page>) => Promise<void>} fn - Callback receiving the page map.
+ * @param {(pages: Object<string, import('@playwright/test').Page>) => Promise<void>} fn - Callback
+ * receiving the page map.
  * @returns {Promise<void>} Resolves once the callback completes and all contexts are closed.
  */
 export async function withClients(browser, clientSpec, fn) {

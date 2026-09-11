@@ -19,10 +19,20 @@ export default class ThemeEditorApplication extends ApplicationV2 {
     * @override
     */
    static DEFAULT_OPTIONS = {
-      classes: ['titan', 'titan-theme-editor'],
+      classes: [
+         'titan',
+         'titan-theme-editor',
+      ],
       id: 'titan-theme-editor',
-      position: { width: 960, height: 700 },
-      window: { resizable: true, minimizable: true, title: 'LOCAL.themeEditor.text' },
+      position: {
+         width: 960,
+         height: 700,
+      },
+      window: {
+         resizable: true,
+         minimizable: true,
+         title: 'LOCAL.themeEditor.text',
+      },
    };
 
    /**
@@ -49,7 +59,10 @@ export default class ThemeEditorApplication extends ApplicationV2 {
       if (options.isFirstRender) {
          this.#mountHandle = mount(ThemeEditorShell, {
             target: content,
-            context: new Map([['application', this]]),
+            context: new Map([[
+               'application',
+               this,
+            ]]),
          });
       }
    }

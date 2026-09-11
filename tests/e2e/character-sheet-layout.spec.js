@@ -31,7 +31,10 @@ test.beforeEach(async () => {
          await stale.delete();
       }
 
-      const actor = await Actor.create({ name: actorName, type: 'player' });
+      const actor = await Actor.create({
+         name: actorName,
+         type: 'player',
+      });
       await actor.update({
          'system.skill.athletics.training.baseValue': 2,
          'system.skill.perception.training.baseValue': 3,

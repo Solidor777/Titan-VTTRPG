@@ -47,7 +47,10 @@ export function resolvePosition(position, size, rect) {
       ? rect.top + position.dy
       : rect.top + rect.height - position.dy - size.height;
 
-   return clampPoint({ x, y }, size, rect);
+   return clampPoint({
+      x,
+      y,
+   }, size, rect);
 }
 
 /**

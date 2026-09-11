@@ -1,7 +1,7 @@
 <script>
    import { getContext, setContext } from 'svelte';
    import PrivateRollChatMessage
-      from '~/document/types/chat-message/components/messages/ChatMessagePrivateRollMessage.svelte';
+   from '~/document/types/chat-message/components/messages/ChatMessagePrivateRollMessage.svelte';
 
    /** @type {object} The reactive Document store provided by TitanChatMessage#renderHTML. */
    const { documentStore = void 0 } = $props();

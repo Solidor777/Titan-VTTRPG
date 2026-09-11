@@ -5,9 +5,9 @@
 
 <BorderedColumnList
    entries={[
-   {mod: 'armor'},
-   {mod: 'damage'},
-   {mod: 'healing'}
-]}
+      {mod: 'armor'},
+      {mod: 'damage'},
+      {mod: 'healing'},
+   ]}
    entryComponent={CharacterSheetMod}
 />

@@ -1,31 +1,31 @@
 <script>
    import ChatMessageApplyFastHealingButton
-      from '~/document/types/chat-message/components/buttons/ChatMessageApplyFastHealingButton.svelte';
+   from '~/document/types/chat-message/components/buttons/ChatMessageApplyFastHealingButton.svelte';
    import ChatMessageApplyPersistentDamageButton
-      from '~/document/types/chat-message/components/buttons/ChatMessageApplyPersistentDamageButton.svelte';
+   from '~/document/types/chat-message/components/buttons/ChatMessageApplyPersistentDamageButton.svelte';
    import ChatMessageApplyResolveRegainButton
-      from '~/document/types/chat-message/components/buttons/ChatMessageApplyResolveRegainButton.svelte';
+   from '~/document/types/chat-message/components/buttons/ChatMessageApplyResolveRegainButton.svelte';
    import ChatMessageEffectsTags from '~/document/types/chat-message/components/tags/ChatMessageEffectsTags.svelte';
    import ChatMessageExpiredEffectsRemovedMessage
-      from '~/document/types/chat-message/components/messages/ChatMessageExpiredEffectsRemovedMessage.svelte';
+   from '~/document/types/chat-message/components/messages/ChatMessageExpiredEffectsRemovedMessage.svelte';
    import ChatMessageFastHealingTag
-      from '~/document/types/chat-message/components/tags/ChatMessageFastHealingTag.svelte';
+   from '~/document/types/chat-message/components/tags/ChatMessageFastHealingTag.svelte';
    import ChatMessagePersistentDamageTag
-      from '~/document/types/chat-message/components/tags/ChatMessagePersistentDamageTag.svelte';
+   from '~/document/types/chat-message/components/tags/ChatMessagePersistentDamageTag.svelte';
    import ChatMessageResolve from '~/document/types/chat-message/components/resources/ChatMessageResolve.svelte';
    import ChatMessageResolveRegainTag
-      from '~/document/types/chat-message/components/tags/ChatMessageResolveRegainTag.svelte';
+   from '~/document/types/chat-message/components/tags/ChatMessageResolveRegainTag.svelte';
    import ChatMessageRichTextMessages
-      from '~/document/types/chat-message/components/resources/ChatMessageRichTextMessages.svelte';
+   from '~/document/types/chat-message/components/resources/ChatMessageRichTextMessages.svelte';
    import ChatMessageStamina from '~/document/types/chat-message/components/resources/ChatMessageStamina.svelte';
    import ChatMessageWounds from '~/document/types/chat-message/components/resources/ChatMessageWounds.svelte';
    import ReportChatMessageBase from '~/document/types/chat-message/report/components/ReportChatMessageBase.svelte';
    import TurnStartReportChatMessageHeader
-      from '~/document/types/chat-message/report/types/turn-start/TurnStartReportChatMessageHeader.svelte';
+   from '~/document/types/chat-message/report/types/turn-start/TurnStartReportChatMessageHeader.svelte';
    import autoRemoveExpiredEffects from '~/helpers/Settings/AutoRemoveExpiredEffects.js';
    import { getContext } from 'svelte';
    import ChatMessageRemoveExpiredEffectsButton
-      from '~/document/types/chat-message/components/buttons/ChatMessageRemoveExpiredEffectsButton.svelte';
+   from '~/document/types/chat-message/components/buttons/ChatMessageRemoveExpiredEffectsButton.svelte';
 
    /** @type {object} Reference to the reactive Document store. */
    const document = getContext('document');

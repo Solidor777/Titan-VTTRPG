@@ -27,7 +27,7 @@ export default function createTitanItemSheetData(item) {
          checks: {
             isExpanded: [],
          },
-         scrollTop: 0
+         scrollTop: 0,
       },
       tabs: {
          activeTab: 'description',
@@ -39,7 +39,7 @@ export default function createTitanItemSheetData(item) {
             isExpanded: [],
             scrollTop: 0,
          },
-      }
+      },
    };
 
    // Initialize expanded state for checks.

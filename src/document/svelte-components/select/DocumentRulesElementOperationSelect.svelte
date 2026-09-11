@@ -1,7 +1,7 @@
 <script>
    import { getContext } from 'svelte';
    import RulesElementOperationSelect
-      from '~/helpers/svelte-components/input/select/RulesElementOperationSelect.svelte';
+   from '~/helpers/svelte-components/input/select/RulesElementOperationSelect.svelte';
    import refreshSystemDocument from '~/helpers/utility-functions/RefreshSystemDocumentData.js';
 
    /**

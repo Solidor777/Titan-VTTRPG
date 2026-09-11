@@ -31,7 +31,11 @@ describe('getEffectCompendiums', () => {
          ],
       };
       expect(getEffectCompendiums().map((p) => p.collection))
-         .toEqual(['titan.effects', 'world.aeffects', 'world.zeffects']);
+         .toEqual([
+            'titan.effects',
+            'world.aeffects',
+            'world.zeffects',
+         ]);
    });
 
    it('returns an empty array when no ActiveEffect packs are visible', () => {

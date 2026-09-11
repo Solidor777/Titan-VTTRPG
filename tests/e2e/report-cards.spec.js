@@ -114,7 +114,10 @@ test.describe('report chat-message subtype cards', () => {
       test('applyDamage posts a damageReport card', async () => {
          const result = await page.evaluate(async () => {
             // A base player has stamina max 3 and no equipped armor (so 5 damage lands in full).
-            const actor = await Actor.create({ name: `E2E Damage ${Date.now()}`, type: 'player' });
+            const actor = await Actor.create({
+               name: `E2E Damage ${Date.now()}`,
+               type: 'player',
+            });
 
             const before = game.messages.size;
             await actor.system.applyDamage(5, { report: true });
@@ -146,7 +149,10 @@ test.describe('report chat-message subtype cards', () => {
 
       test('a legacy top-level resource snapshot is hoisted onto system.resource on load', async () => {
          const result = await page.evaluate(async () => {
-            const actor = await Actor.create({ name: `E2E LegacyDamage ${Date.now()}`, type: 'player' });
+            const actor = await Actor.create({
+               name: `E2E LegacyDamage ${Date.now()}`,
+               type: 'player',
+            });
 
             // A pre-2026-09-10 damageReport message, shaped with the legacy top-level `stamina` key
             // instead of the current `resource.stamina` nesting.
@@ -157,7 +163,10 @@ test.describe('report chat-message subtype cards', () => {
                   actorName: actor.name,
                   actorImg: actor.img,
                   damageTaken: 1,
-                  stamina: { value: 1, max: 6 },
+                  stamina: {
+                     value: 1,
+                     max: 6,
+                  },
                },
             });
 
@@ -183,7 +192,10 @@ test.describe('report chat-message subtype cards', () => {
       test('applyHealing posts a healingReport card', async () => {
          const result = await page.evaluate(async () => {
             // Seed stamina below max so a heal moves it (healing of a full resource produces no report).
-            const actor = await Actor.create({ name: `E2E Healing ${Date.now()}`, type: 'player' });
+            const actor = await Actor.create({
+               name: `E2E Healing ${Date.now()}`,
+               type: 'player',
+            });
             await actor.update({ system: { resource: { stamina: { value: 0 } } } });
 
             const before = game.messages.size;
@@ -191,7 +203,10 @@ test.describe('report chat-message subtype cards', () => {
             await titanWait(() => game.messages.size > before, { message: 'healing report message' });
 
             const newest = game.messages.contents.at(-1);
-            const out = { messageId: newest?.id, messageType: newest?.type };
+            const out = {
+               messageId: newest?.id,
+               messageType: newest?.type,
+            };
             await actor.delete();
             return out;
          });
@@ -201,7 +216,10 @@ test.describe('report chat-message subtype cards', () => {
 
       test('spendResolve posts a spendResolveReport card', async () => {
          const result = await page.evaluate(async () => {
-            const actor = await Actor.create({ name: `E2E Resolve ${Date.now()}`, type: 'player' });
+            const actor = await Actor.create({
+               name: `E2E Resolve ${Date.now()}`,
+               type: 'player',
+            });
 
             const before = game.messages.size;
             // Spend more resolve than held so the report also exercises the shortage branch.
@@ -209,7 +227,10 @@ test.describe('report chat-message subtype cards', () => {
             await titanWait(() => game.messages.size > before, { message: 'spend-resolve report message' });
 
             const newest = game.messages.contents.at(-1);
-            const out = { messageId: newest?.id, messageType: newest?.type };
+            const out = {
+               messageId: newest?.id,
+               messageType: newest?.type,
+            };
             await actor.delete();
             return out;
          });
@@ -220,9 +241,21 @@ test.describe('report chat-message subtype cards', () => {
       test('applyRend posts a rendReport card', async () => {
          const result = await page.evaluate(async () => {
             // Rend requires an equipped armor with a positive armor value.
-            const actor = await Actor.create({ name: `E2E Rend ${Date.now()}`, type: 'player' });
+            const actor = await Actor.create({
+               name: `E2E Rend ${Date.now()}`,
+               type: 'player',
+            });
             const [armor] = await actor.createEmbeddedDocuments('Item', [
-               { name: 'E2E Rend Armor', type: 'armor', system: { armor: { value: 4, max: 4 } } },
+               {
+                  name: 'E2E Rend Armor',
+                  type: 'armor',
+                  system: {
+                     armor: {
+                        value: 4,
+                        max: 4,
+                     },
+                  },
+               },
             ]);
             await actor.update({ system: { equipped: { armor: armor.id } } });
 
@@ -231,7 +264,10 @@ test.describe('report chat-message subtype cards', () => {
             await titanWait(() => game.messages.size > before, { message: 'rend report message' });
 
             const newest = game.messages.contents.at(-1);
-            const out = { messageId: newest?.id, messageType: newest?.type };
+            const out = {
+               messageId: newest?.id,
+               messageType: newest?.type,
+            };
             await actor.delete();
             return out;
          });
@@ -242,9 +278,21 @@ test.describe('report chat-message subtype cards', () => {
       test('applyRepairs posts a repairsReport card', async () => {
          const result = await page.evaluate(async () => {
             // Repairs requires an equipped armor whose value is below its max.
-            const actor = await Actor.create({ name: `E2E Repairs ${Date.now()}`, type: 'player' });
+            const actor = await Actor.create({
+               name: `E2E Repairs ${Date.now()}`,
+               type: 'player',
+            });
             const [armor] = await actor.createEmbeddedDocuments('Item', [
-               { name: 'E2E Repairs Armor', type: 'armor', system: { armor: { value: 1, max: 4 } } },
+               {
+                  name: 'E2E Repairs Armor',
+                  type: 'armor',
+                  system: {
+                     armor: {
+                        value: 1,
+                        max: 4,
+                     },
+                  },
+               },
             ]);
             await actor.update({ system: { equipped: { armor: armor.id } } });
 
@@ -253,7 +301,10 @@ test.describe('report chat-message subtype cards', () => {
             await titanWait(() => game.messages.size > before, { message: 'repairs report message' });
 
             const newest = game.messages.contents.at(-1);
-            const out = { messageId: newest?.id, messageType: newest?.type };
+            const out = {
+               messageId: newest?.id,
+               messageType: newest?.type,
+            };
             await actor.delete();
             return out;
          });
@@ -263,14 +314,20 @@ test.describe('report chat-message subtype cards', () => {
 
       test('removeCombatEffects posts a removeCombatEffectsReport card', async () => {
          const result = await page.evaluate(async () => {
-            const actor = await Actor.create({ name: `E2E RemoveFX ${Date.now()}`, type: 'player' });
+            const actor = await Actor.create({
+               name: `E2E RemoveFX ${Date.now()}`,
+               type: 'player',
+            });
 
             const before = game.messages.size;
             await actor.system.removeCombatEffects();
             await titanWait(() => game.messages.size > before, { message: 'remove-combat-effects report message' });
 
             const newest = game.messages.contents.at(-1);
-            const out = { messageId: newest?.id, messageType: newest?.type };
+            const out = {
+               messageId: newest?.id,
+               messageType: newest?.type,
+            };
             await actor.delete();
             return out;
          });
@@ -280,14 +337,20 @@ test.describe('report chat-message subtype cards', () => {
 
       test('shortRest posts a shortRestReport card', async () => {
          const result = await page.evaluate(async () => {
-            const actor = await Actor.create({ name: `E2E ShortRest ${Date.now()}`, type: 'player' });
+            const actor = await Actor.create({
+               name: `E2E ShortRest ${Date.now()}`,
+               type: 'player',
+            });
 
             const before = game.messages.size;
             await actor.system.shortRest();
             await titanWait(() => game.messages.size > before, { message: 'short-rest report message' });
 
             const newest = game.messages.contents.at(-1);
-            const out = { messageId: newest?.id, messageType: newest?.type };
+            const out = {
+               messageId: newest?.id,
+               messageType: newest?.type,
+            };
             await actor.delete();
             return out;
          });
@@ -297,14 +360,20 @@ test.describe('report chat-message subtype cards', () => {
 
       test('longRest posts a longRestReport card', async () => {
          const result = await page.evaluate(async () => {
-            const actor = await Actor.create({ name: `E2E LongRest ${Date.now()}`, type: 'player' });
+            const actor = await Actor.create({
+               name: `E2E LongRest ${Date.now()}`,
+               type: 'player',
+            });
 
             const before = game.messages.size;
             await actor.system.longRest();
             await titanWait(() => game.messages.size > before, { message: 'long-rest report message' });
 
             const newest = game.messages.contents.at(-1);
-            const out = { messageId: newest?.id, messageType: newest?.type };
+            const out = {
+               messageId: newest?.id,
+               messageType: newest?.type,
+            };
             await actor.delete();
             return out;
          });
@@ -328,7 +397,10 @@ test.describe('report chat-message subtype cards', () => {
 
       test('onTurnStart posts a turnStartReport card', async () => {
          const result = await page.evaluate(async () => {
-            const actor = await Actor.create({ name: `E2E TurnStart ${Date.now()}`, type: 'player' });
+            const actor = await Actor.create({
+               name: `E2E TurnStart ${Date.now()}`,
+               type: 'player',
+            });
             // A turnStart fast-healing ability gives the start-of-turn report content.
             await actor.createEmbeddedDocuments('Item', [
                {
@@ -336,7 +408,12 @@ test.describe('report chat-message subtype cards', () => {
                   type: 'ability',
                   system: {
                      rulesElement: [
-                        { operation: 'fastHealing', selector: 'turnStart', value: 2, uuid: 'e2e-fh-ts' },
+                        {
+                           operation: 'fastHealing',
+                           selector: 'turnStart',
+                           value: 2,
+                           uuid: 'e2e-fh-ts',
+                        },
                      ],
                   },
                },
@@ -349,7 +426,10 @@ test.describe('report chat-message subtype cards', () => {
             await titanWait(() => game.messages.size > before, { message: 'turn-start report message' });
 
             const newest = game.messages.contents.at(-1);
-            const out = { messageId: newest?.id, messageType: newest?.type };
+            const out = {
+               messageId: newest?.id,
+               messageType: newest?.type,
+            };
             await actor.delete();
             return out;
          });
@@ -359,7 +439,10 @@ test.describe('report chat-message subtype cards', () => {
 
       test('onTurnEnd posts a turnEndReport card', async () => {
          const result = await page.evaluate(async () => {
-            const actor = await Actor.create({ name: `E2E TurnEnd ${Date.now()}`, type: 'player' });
+            const actor = await Actor.create({
+               name: `E2E TurnEnd ${Date.now()}`,
+               type: 'player',
+            });
             // A turnEnd fast-healing ability gives the end-of-turn report content.
             await actor.createEmbeddedDocuments('Item', [
                {
@@ -367,7 +450,12 @@ test.describe('report chat-message subtype cards', () => {
                   type: 'ability',
                   system: {
                      rulesElement: [
-                        { operation: 'fastHealing', selector: 'turnEnd', value: 2, uuid: 'e2e-fh-te' },
+                        {
+                           operation: 'fastHealing',
+                           selector: 'turnEnd',
+                           value: 2,
+                           uuid: 'e2e-fh-te',
+                        },
                      ],
                   },
                },
@@ -379,7 +467,10 @@ test.describe('report chat-message subtype cards', () => {
             await titanWait(() => game.messages.size > before, { message: 'turn-end report message' });
 
             const newest = game.messages.contents.at(-1);
-            const out = { messageId: newest?.id, messageType: newest?.type };
+            const out = {
+               messageId: newest?.id,
+               messageType: newest?.type,
+            };
             await actor.delete();
             return out;
          });
@@ -397,14 +488,22 @@ test.describe('report chat-message subtype cards', () => {
    test.describe('revert reports (regression: rendered blank pre-Phase-3)', () => {
       test('onTurnStartReverted posts a NON-EMPTY turnStartRevertReport card', async () => {
          const result = await page.evaluate(async () => {
-            const actor = await Actor.create({ name: `E2E RevertStart ${Date.now()}`, type: 'player' });
+            const actor = await Actor.create({
+               name: `E2E RevertStart ${Date.now()}`,
+               type: 'player',
+            });
             await actor.createEmbeddedDocuments('Item', [
                {
                   name: 'E2E FH Start',
                   type: 'ability',
                   system: {
                      rulesElement: [
-                        { operation: 'fastHealing', selector: 'turnStart', value: 2, uuid: 'e2e-fh-rts' },
+                        {
+                           operation: 'fastHealing',
+                           selector: 'turnStart',
+                           value: 2,
+                           uuid: 'e2e-fh-rts',
+                        },
                      ],
                   },
                },
@@ -415,7 +514,10 @@ test.describe('report chat-message subtype cards', () => {
             await titanWait(() => game.messages.size > before, { message: 'turn-start-revert report message' });
 
             const newest = game.messages.contents.at(-1);
-            const out = { messageId: newest?.id, messageType: newest?.type };
+            const out = {
+               messageId: newest?.id,
+               messageType: newest?.type,
+            };
             await actor.delete();
             return out;
          });
@@ -425,14 +527,22 @@ test.describe('report chat-message subtype cards', () => {
 
       test('onTurnEndReverted posts a NON-EMPTY turnEndRevertReport card', async () => {
          const result = await page.evaluate(async () => {
-            const actor = await Actor.create({ name: `E2E RevertEnd ${Date.now()}`, type: 'player' });
+            const actor = await Actor.create({
+               name: `E2E RevertEnd ${Date.now()}`,
+               type: 'player',
+            });
             await actor.createEmbeddedDocuments('Item', [
                {
                   name: 'E2E FH End',
                   type: 'ability',
                   system: {
                      rulesElement: [
-                        { operation: 'fastHealing', selector: 'turnEnd', value: 2, uuid: 'e2e-fh-rte' },
+                        {
+                           operation: 'fastHealing',
+                           selector: 'turnEnd',
+                           value: 2,
+                           uuid: 'e2e-fh-rte',
+                        },
                      ],
                   },
                },
@@ -443,7 +553,10 @@ test.describe('report chat-message subtype cards', () => {
             await titanWait(() => game.messages.size > before, { message: 'turn-end-revert report message' });
 
             const newest = game.messages.contents.at(-1);
-            const out = { messageId: newest?.id, messageType: newest?.type };
+            const out = {
+               messageId: newest?.id,
+               messageType: newest?.type,
+            };
             await actor.delete();
             return out;
          });
@@ -467,14 +580,22 @@ test.describe('report chat-message subtype cards', () => {
 
          // Seed the actor + report; keep the actor alive (the button reads the live actor via the speaker).
          const setup = await page.evaluate(async () => {
-            const actor = await Actor.create({ name: `E2E ApplyFH ${Date.now()}`, type: 'player' });
+            const actor = await Actor.create({
+               name: `E2E ApplyFH ${Date.now()}`,
+               type: 'player',
+            });
             await actor.createEmbeddedDocuments('Item', [
                {
                   name: 'E2E FH Apply',
                   type: 'ability',
                   system: {
                      rulesElement: [
-                        { operation: 'fastHealing', selector: 'turnStart', value: 2, uuid: 'e2e-fh-apply' },
+                        {
+                           operation: 'fastHealing',
+                           selector: 'turnStart',
+                           value: 2,
+                           uuid: 'e2e-fh-apply',
+                        },
                      ],
                   },
                },

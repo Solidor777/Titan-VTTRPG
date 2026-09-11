@@ -31,7 +31,11 @@
    });
 
    /** @type {string[]} The bundled font families offered by the font pickers. */
-   const BUNDLED_FONTS = ["'Lato'", "'Open Sans'", "'Signika'"];
+   const BUNDLED_FONTS = [
+      "'Lato'",
+      "'Open Sans'",
+      "'Signika'",
+   ];
 
    /** @type {HTMLInputElement | undefined} The hidden file input backing the import button. */
    let importInput = $state();

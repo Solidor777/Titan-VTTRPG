@@ -1,5 +1,7 @@
 import eslintPluginSvelte from 'eslint-plugin-svelte';
 import jsdoc from 'eslint-plugin-jsdoc';
+import stylistic from '@stylistic/eslint-plugin';
+import arrayLiteralNewlineRule from './eslint/rules/array-literal-newline.js';
 
 export default [
    // add more generic rule sets here, such as:
@@ -7,7 +9,13 @@ export default [
    ...eslintPluginSvelte.configs['flat/recommended'],
    {
       plugins: {
-         jsdoc
+         jsdoc,
+         '@stylistic': stylistic,
+         titan: {
+            rules: {
+               'array-literal-newline': arrayLiteralNewlineRule,
+            },
+         },
       },
       settings: {
          jsdoc: {
@@ -48,7 +56,20 @@ export default [
          // 'jsdoc/no-undefined-types': 1, // Recommended
          'jsdoc/require-asterisk-prefix': 1,
          'jsdoc/require-description': 1,
-         'jsdoc/require-description-complete-sentence': 1,
+         'jsdoc/require-description-complete-sentence': [
+            1,
+            {
+               // Prevents the fixer from treating the word after these abbreviations as a new sentence
+               // and capitalizing it.
+               abbreviations: [
+                  'e.g.',
+                  'i.e.',
+                  'etc.',
+                  'vs.',
+                  'cf.',
+               ],
+            },
+         ],
          // 'jsdoc/require-example': 1,
          // 'jsdoc/require-file-overview': 1,
          'jsdoc/require-hyphen-before-param-description': 1,
@@ -71,7 +92,88 @@ export default [
          'jsdoc/sort-tags': 1,
          'jsdoc/tag-lines': 1, // Recommended
          // 'jsdoc/valid-types': 1 // Recommended
-         'capitalized-comments': 'off'
+         'capitalized-comments': 'off',
+
+         // House formatting rules (.claude/CLAUDE.md): 120-char wrap, multi-line conditionals, and
+         // multi-line object/array literals.
+         '@stylistic/max-len': [
+            'error',
+            {
+               code: 120,
+               ignoreUrls: true,
+               ignoreRegExpLiterals: true,
+            },
+         ],
+         curly: [
+            'error',
+            'all',
+         ],
+         // Scoped to ObjectExpression only: object literals with 2+ properties must break after `{`
+         // and before `}`; destructuring patterns, imports, and exports are untouched. Verified with a
+         // scratch fixture: a single-property object written multi-line is not an error, and a
+         // two-property object on one line is.
+         '@stylistic/object-curly-newline': [
+            'error',
+            {
+               ObjectExpression: {
+                  multiline: true,
+                  minProperties: 2,
+                  consistent: true,
+               },
+            },
+         ],
+         // Verified against the same scratch fixture: this rule does not fire on ObjectPattern
+         // (destructuring), so no extra scoping is needed.
+         '@stylistic/object-property-newline': [
+            'error',
+            {
+               allowAllPropertiesOnSameLine: false,
+            },
+         ],
+         // Array literals only (not destructuring patterns); see eslint/rules/array-literal-newline.js.
+         'titan/array-literal-newline': 'error',
+         // Trailing commas on every multi-line object/array/import/export/function-arg list; matches
+         // the pre-existing codebase convention (verified 3,902 uses vs. 83 exceptions pre-lint).
+         '@stylistic/comma-dangle': [
+            'error',
+            'always-multiline',
+         ],
+         // No blank trailing whitespace on any line.
+         '@stylistic/no-trailing-spaces': 'error',
+         // Every file ends with exactly one trailing newline.
+         '@stylistic/eol-last': 'error',
+      },
+   },
+   {
+      // @stylistic/indent understands plain JS/ESM ASTs; run unscoped against .svelte files it
+      // misjudges markup-nested mustache expressions (e.g. under `{#if}`) as JS continuation lines,
+      // producing 41 false positives across 14 files. svelte/indent (template-aware) covers .svelte
+      // files instead.
+      files: [
+         '**/*.{js,mjs,cjs}',
+      ],
+      rules: {
+         '@stylistic/indent': [
+            'error',
+            3,
+            {
+               SwitchCase: 1,
+            },
+         ],
+      },
+   },
+   {
+      files: [
+         '**/*.svelte',
+      ],
+      rules: {
+         'svelte/indent': [
+            'error',
+            {
+               indent: 3,
+               switchCase: 1,
+            },
+         ],
       },
    },
    {
@@ -87,6 +189,7 @@ export default [
          'node_modules/',
          'fix-comments.js',
          'count-long.cjs',
+         'test/build/',
       ],
    },
 ];

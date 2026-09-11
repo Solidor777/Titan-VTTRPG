@@ -10,21 +10,62 @@ const NO_SCHEMA = {};
 describe('buildTables — wide layout', () => {
    it('builds one sheet per document type with fixed columns first, plus a _manifest sheet', () => {
       const envelopes = [
-         { documentType: 'weapon', source: { _id: 'a'.repeat(16), name: 'Sword', type: 'weapon', img: 'i.svg', sort: 1, system: { rarity: 'common' } } },
+         {
+            documentType: 'weapon',
+            source: {
+               _id: 'a'.repeat(16),
+               name: 'Sword',
+               type: 'weapon',
+               img: 'i.svg',
+               sort: 1,
+               system: { rarity: 'common' },
+            },
+         },
       ];
       const workbook = buildTables(envelopes, 'wide', 'Item', NO_SCHEMA);
       expect(workbook.sheets[0].name).toBe('_manifest');
       /** @type {object} */
       const weaponSheet = workbook.sheets.find((s) => s.name === 'weapon');
-      expect(weaponSheet.columns.slice(0, 7)).toEqual(['_id', '_parentId', '_folder', 'name', 'type', 'img', 'sort']);
+      expect(weaponSheet.columns.slice(0, 7)).toEqual([
+         '_id',
+         '_parentId',
+         '_folder',
+         'name',
+         'type',
+         'img',
+         'sort',
+      ]);
       expect(weaponSheet.columns).toContain('system.rarity');
-      expect(weaponSheet.rows[0]).toMatchObject({ _id: 'a'.repeat(16), name: 'Sword', 'system.rarity': 'common', _parentId: '', _folder: '' });
+      expect(weaponSheet.rows[0]).toMatchObject({
+         _id: 'a'.repeat(16),
+         name: 'Sword',
+         'system.rarity': 'common',
+         _parentId: '',
+         _folder: '',
+      });
    });
 
    it('expands arrays into indexed dotted columns and unions columns across documents', () => {
       const envelopes = [
-         { documentType: 'weapon', source: { _id: 'a'.repeat(16), system: { attack: [{ damage: 5 }] } } },
-         { documentType: 'weapon', source: { _id: 'b'.repeat(16), system: { attack: [{ damage: 1 }, { damage: 2 }] } } },
+         {
+            documentType: 'weapon',
+            source: {
+               _id: 'a'.repeat(16),
+               system: { attack: [{ damage: 5 }] },
+            },
+         },
+         {
+            documentType: 'weapon',
+            source: {
+               _id: 'b'.repeat(16),
+               system: {
+                  attack: [
+                     { damage: 1 },
+                     { damage: 2 },
+                  ],
+               },
+            },
+         },
       ];
       const workbook = buildTables(envelopes, 'wide', 'Item', NO_SCHEMA);
       const weaponSheet = workbook.sheets.find((s) => s.name === 'weapon');
@@ -35,7 +76,12 @@ describe('buildTables — wide layout', () => {
 
    it('records _parentId and _folder from the envelope', () => {
       const envelopes = [
-         { documentType: 'weapon', source: { _id: 'a'.repeat(16) }, parentId: 'b'.repeat(16), folderPath: 'Loot/Rare' },
+         {
+            documentType: 'weapon',
+            source: { _id: 'a'.repeat(16) },
+            parentId: 'b'.repeat(16),
+            folderPath: 'Loot/Rare',
+         },
       ];
       const workbook = buildTables(envelopes, 'wide', 'Item', NO_SCHEMA);
       const weaponSheet = workbook.sheets.find((s) => s.name === 'weapon');
@@ -44,9 +90,27 @@ describe('buildTables — wide layout', () => {
    });
 
    it('orders non-fixed columns by schema field order, falling back to first-seen for the rest', () => {
-      const typeSchemas = { weapon: { fieldTypes: {}, fieldOrder: ['system.value', 'system.rarity'] } };
+      const typeSchemas = {
+         weapon: {
+            fieldTypes: {},
+            fieldOrder: [
+               'system.value',
+               'system.rarity',
+            ],
+         },
+      };
       const envelopes = [
-         { documentType: 'weapon', source: { _id: 'a'.repeat(16), system: { rarity: 'common', value: 5, extra: 'x' } } },
+         {
+            documentType: 'weapon',
+            source: {
+               _id: 'a'.repeat(16),
+               system: {
+                  rarity: 'common',
+                  value: 5,
+                  extra: 'x',
+               },
+            },
+         },
       ];
       const weaponSheet = buildTables(envelopes, 'wide', 'Item', typeSchemas).sheets.find((s) => s.name === 'weapon');
       /** @type {string[]} */
@@ -56,12 +120,30 @@ describe('buildTables — wide layout', () => {
    });
 
    it('writes manifest rows naming layout, packType, and one entry per data sheet', () => {
-      const envelopes = [{ documentType: 'weapon', source: { _id: 'a'.repeat(16) } }];
+      const envelopes = [{
+         documentType: 'weapon',
+         source: { _id: 'a'.repeat(16) },
+      }];
       const manifest = buildTables(envelopes, 'wide', 'Item', NO_SCHEMA).sheets.find((s) => s.name === '_manifest');
       expect(manifest.rows).toEqual(expect.arrayContaining([
-         { key: 'layout', value: 'wide', documentType: '', arrayPath: '' },
-         { key: 'packType', value: 'Item', documentType: '', arrayPath: '' },
-         { key: 'sheet', value: 'weapon', documentType: 'weapon', arrayPath: '' },
+         {
+            key: 'layout',
+            value: 'wide',
+            documentType: '',
+            arrayPath: '',
+         },
+         {
+            key: 'packType',
+            value: 'Item',
+            documentType: '',
+            arrayPath: '',
+         },
+         {
+            key: 'sheet',
+            value: 'weapon',
+            documentType: 'weapon',
+            arrayPath: '',
+         },
       ]));
    });
 });
@@ -69,7 +151,26 @@ describe('buildTables — wide layout', () => {
 describe('buildTables — relational layout', () => {
    it('drops array columns from the document sheet and puts them in a child sheet keyed by _id and _index', () => {
       const envelopes = [
-         { documentType: 'weapon', source: { _id: 'a'.repeat(16), name: 'Sword', system: { rarity: 'common', attack: [{ label: 'Slash', damage: 5 }, { label: 'Stab', damage: 3 }] } } },
+         {
+            documentType: 'weapon',
+            source: {
+               _id: 'a'.repeat(16),
+               name: 'Sword',
+               system: {
+                  rarity: 'common',
+                  attack: [
+                     {
+                        label: 'Slash',
+                        damage: 5,
+                     },
+                     {
+                        label: 'Stab',
+                        damage: 3,
+                     },
+                  ],
+               },
+            },
+         },
       ];
       const workbook = buildTables(envelopes, 'relational', 'Item', NO_SCHEMA);
       /** @type {object} */
@@ -79,42 +180,106 @@ describe('buildTables — relational layout', () => {
 
       /** @type {object} */
       const attackSheet = workbook.sheets.find((s) => s.name === 'weapon.system.attack');
-      expect(attackSheet.columns).toEqual(['_id', '_index', 'label', 'damage']);
+      expect(attackSheet.columns).toEqual([
+         '_id',
+         '_index',
+         'label',
+         'damage',
+      ]);
       expect(attackSheet.rows).toEqual([
-         { _id: 'a'.repeat(16), _index: '0', label: 'Slash', damage: 5 },
-         { _id: 'a'.repeat(16), _index: '1', label: 'Stab', damage: 3 },
+         {
+            _id: 'a'.repeat(16),
+            _index: '0',
+            label: 'Slash',
+            damage: 5,
+         },
+         {
+            _id: 'a'.repeat(16),
+            _index: '1',
+            label: 'Stab',
+            damage: 3,
+         },
       ]);
    });
 
    it('builds a separate child sheet per nesting level, with a compound dotted _index', () => {
       const envelopes = [
-         { documentType: 'weapon', source: { _id: 'a'.repeat(16), system: { attack: [{ label: 'Slash', trait: [{ name: 'Reach' }, { name: 'Heavy' }] }] } } },
+         {
+            documentType: 'weapon',
+            source: {
+               _id: 'a'.repeat(16),
+               system: {
+                  attack: [{
+                     label: 'Slash',
+                     trait: [
+                        { name: 'Reach' },
+                        { name: 'Heavy' },
+                     ],
+                  }],
+               },
+            },
+         },
       ];
       const workbook = buildTables(envelopes, 'relational', 'Item', NO_SCHEMA);
       /** @type {object} */
       const attackSheet = workbook.sheets.find((s) => s.name === 'weapon.system.attack');
-      expect(attackSheet.columns).toEqual(['_id', '_index', 'label']);
+      expect(attackSheet.columns).toEqual([
+         '_id',
+         '_index',
+         'label',
+      ]);
 
       /** @type {object} */
       const traitSheet = workbook.sheets.find((s) => s.name === 'weapon.system.attack.trait');
       expect(traitSheet.rows).toEqual([
-         { _id: 'a'.repeat(16), _index: '0.0', name: 'Reach' },
-         { _id: 'a'.repeat(16), _index: '0.1', name: 'Heavy' },
+         {
+            _id: 'a'.repeat(16),
+            _index: '0.0',
+            name: 'Reach',
+         },
+         {
+            _id: 'a'.repeat(16),
+            _index: '0.1',
+            name: 'Heavy',
+         },
       ]);
    });
 
    it('records each child sheet in the manifest with its array path', () => {
-      const envelopes = [{ documentType: 'weapon', source: { _id: 'a'.repeat(16), system: { attack: [{ damage: 5 }] } } }];
+      const envelopes = [{
+         documentType: 'weapon',
+         source: {
+            _id: 'a'.repeat(16),
+            system: { attack: [{ damage: 5 }] },
+         },
+      }];
+      const tables = buildTables(envelopes, 'relational', 'Item', NO_SCHEMA);
       /** @type {object} */
-      const manifest = buildTables(envelopes, 'relational', 'Item', NO_SCHEMA).sheets.find((s) => s.name === '_manifest');
+      const manifest = tables.sheets.find((s) => s.name === '_manifest');
       expect(manifest.rows).toEqual(expect.arrayContaining([
-         { key: 'sheet', value: 'weapon.system.attack', documentType: 'weapon', arrayPath: 'system.attack' },
+         {
+            key: 'sheet',
+            value: 'weapon.system.attack',
+            documentType: 'weapon',
+            arrayPath: 'system.attack',
+         },
       ]));
    });
 
    it('puts a primitive array element value under the reserved "_value" sub-field, not a wide column', () => {
       const envelopes = [
-         { documentType: 'weapon', source: { _id: 'a'.repeat(16), system: { statuses: ['prone', 'stunned'] } } },
+         {
+            documentType: 'weapon',
+            source: {
+               _id: 'a'.repeat(16),
+               system: {
+                  statuses: [
+                     'prone',
+                     'stunned',
+                  ],
+               },
+            },
+         },
       ];
       const workbook = buildTables(envelopes, 'relational', 'Item', NO_SCHEMA);
       /** @type {object} */
@@ -123,16 +288,33 @@ describe('buildTables — relational layout', () => {
 
       /** @type {object} */
       const statusesSheet = workbook.sheets.find((s) => s.name === 'weapon.system.statuses');
-      expect(statusesSheet.columns).toEqual(['_id', '_index', '_value']);
+      expect(statusesSheet.columns).toEqual([
+         '_id',
+         '_index',
+         '_value',
+      ]);
       expect(statusesSheet.rows).toEqual([
-         { _id: 'a'.repeat(16), _index: '0', _value: 'prone' },
-         { _id: 'a'.repeat(16), _index: '1', _value: 'stunned' },
+         {
+            _id: 'a'.repeat(16),
+            _index: '0',
+            _value: 'prone',
+         },
+         {
+            _id: 'a'.repeat(16),
+            _index: '1',
+            _value: 'stunned',
+         },
       ]);
 
       /** @type {object} */
       const manifest = workbook.sheets.find((s) => s.name === '_manifest');
       expect(manifest.rows).toEqual(expect.arrayContaining([
-         { key: 'sheet', value: 'weapon.system.statuses', documentType: 'weapon', arrayPath: 'system.statuses' },
+         {
+            key: 'sheet',
+            value: 'weapon.system.statuses',
+            documentType: 'weapon',
+            arrayPath: 'system.statuses',
+         },
       ]));
    });
 
@@ -143,7 +325,16 @@ describe('buildTables — relational layout', () => {
       const envelopes = [
          {
             documentType,
-            source: { _id: 'a'.repeat(16), name: 'Longname', system: { somethingreallylong: ['one', 'two'] } },
+            source: {
+               _id: 'a'.repeat(16),
+               name: 'Longname',
+               system: {
+                  somethingreallylong: [
+                     'one',
+                     'two',
+                  ],
+               },
+            },
          },
       ];
       const workbook = buildTables(envelopes, 'relational', 'Item', NO_SCHEMA);
@@ -165,7 +356,10 @@ describe('buildTables — relational layout', () => {
       const { envelopes: readEnvelopes } = readTables(decoded, NO_SCHEMA);
       expect(readEnvelopes).toHaveLength(1);
       expect(readEnvelopes[0].documentType).toBe(documentType);
-      expect(readEnvelopes[0].source.system.somethingreallylong).toEqual(['one', 'two']);
+      expect(readEnvelopes[0].source.system.somethingreallylong).toEqual([
+         'one',
+         'two',
+      ]);
    });
 });
 
@@ -174,7 +368,15 @@ describe('buildTables — untyped-bag string protection', () => {
       const envelopes = [
          {
             documentType: 'weapon',
-            source: { _id: 'a'.repeat(16), system: { rulesElement: [{ name: 'code', value: '5' }] } },
+            source: {
+               _id: 'a'.repeat(16),
+               system: {
+                  rulesElement: [{
+                     name: 'code',
+                     value: '5',
+                  }],
+               },
+            },
          },
       ];
       const workbook = buildTables(envelopes, 'wide', 'Item', NO_SCHEMA);
@@ -188,7 +390,15 @@ describe('buildTables — untyped-bag string protection', () => {
       const envelopes = [
          {
             documentType: 'weapon',
-            source: { _id: 'a'.repeat(16), system: { rulesElement: [{ name: 'code', value: '5' }] } },
+            source: {
+               _id: 'a'.repeat(16),
+               system: {
+                  rulesElement: [{
+                     name: 'code',
+                     value: '5',
+                  }],
+               },
+            },
          },
       ];
       const workbook = buildTables(envelopes, 'relational', 'Item', NO_SCHEMA);
@@ -201,9 +411,23 @@ describe('buildTables — untyped-bag string protection', () => {
 
    it('leaves a schema-typed number field untouched (no quoting)', () => {
       const typeSchemas = {
-         weapon: { fieldTypes: { 'system.value': { type: 'number', nullable: false } }, fieldOrder: [] },
+         weapon: {
+            fieldTypes: {
+               'system.value': {
+                  type: 'number',
+                  nullable: false,
+               },
+            },
+            fieldOrder: [],
+         },
       };
-      const envelopes = [{ documentType: 'weapon', source: { _id: 'a'.repeat(16), system: { value: 5 } } }];
+      const envelopes = [{
+         documentType: 'weapon',
+         source: {
+            _id: 'a'.repeat(16),
+            system: { value: 5 },
+         },
+      }];
       const weaponSheet = buildTables(envelopes, 'wide', 'Item', typeSchemas).sheets.find((s) => s.name === 'weapon');
       expect(weaponSheet.rows[0]['system.value']).toBe(5);
    });
@@ -212,7 +436,15 @@ describe('buildTables — untyped-bag string protection', () => {
       const envelopes = [
          {
             documentType: 'weapon',
-            source: { _id: 'a'.repeat(16), system: { rulesElement: [{ name: 'code', value: 'Slashing' }] } },
+            source: {
+               _id: 'a'.repeat(16),
+               system: {
+                  rulesElement: [{
+                     name: 'code',
+                     value: 'Slashing',
+                  }],
+               },
+            },
          },
       ];
       const weaponSheet = buildTables(envelopes, 'wide', 'Item', NO_SCHEMA).sheets.find((s) => s.name === 'weapon');
@@ -223,7 +455,15 @@ describe('buildTables — untyped-bag string protection', () => {
       const envelopes = [
          {
             documentType: 'weapon',
-            source: { _id: 'a'.repeat(16), system: { rulesElement: [{ name: 'code', value: '"x"' }] } },
+            source: {
+               _id: 'a'.repeat(16),
+               system: {
+                  rulesElement: [{
+                     name: 'code',
+                     value: '"x"',
+                  }],
+               },
+            },
          },
       ];
       const workbook = buildTables(envelopes, 'wide', 'Item', NO_SCHEMA);
@@ -239,7 +479,15 @@ describe('buildTables — untyped-bag string protection', () => {
       const envelopes = [
          {
             documentType: 'weapon',
-            source: { _id: 'a'.repeat(16), system: { rulesElement: [{ name: 'code', value: '' }] } },
+            source: {
+               _id: 'a'.repeat(16),
+               system: {
+                  rulesElement: [{
+                     name: 'code',
+                     value: '',
+                  }],
+               },
+            },
          },
       ];
       const workbook = buildTables(envelopes, 'wide', 'Item', NO_SCHEMA);
@@ -255,31 +503,63 @@ describe('buildTables — untyped-bag string protection', () => {
 describe('buildArrayPathMatcher', () => {
    it('matches a primitive array element path with the reserved "_value" sub-field', () => {
       const matcher = buildArrayPathMatcher('statuses', ['statuses']);
-      expect(matcher('statuses.0')).toEqual({ index: '0', subField: '_value' });
+      expect(matcher('statuses.0')).toEqual({
+         index: '0',
+         subField: '_value',
+      });
    });
 
    it('only matches paths under its own array when two arrays are siblings, not nested', () => {
-      const allArrayPaths = ['attack', 'trait'];
+      const allArrayPaths = [
+         'attack',
+         'trait',
+      ];
       const attackMatcher = buildArrayPathMatcher('attack', allArrayPaths);
       const traitMatcher = buildArrayPathMatcher('trait', allArrayPaths);
 
-      expect(attackMatcher('attack.0.damage')).toEqual({ index: '0', subField: 'damage' });
+      expect(attackMatcher('attack.0.damage')).toEqual({
+         index: '0',
+         subField: 'damage',
+      });
       expect(attackMatcher('trait.0.name')).toBeNull();
-      expect(traitMatcher('trait.0.name')).toEqual({ index: '0', subField: 'name' });
+      expect(traitMatcher('trait.0.name')).toEqual({
+         index: '0',
+         subField: 'name',
+      });
       expect(traitMatcher('attack.0.damage')).toBeNull();
    });
 });
 
 describe('detectArrayPaths', () => {
    it('returns both a shallow and a nested array path, ordered outermost-first', () => {
-      expect(detectArrayPaths(['a.b.0.c.1.d'])).toEqual(['a.b', 'a.b.c']);
+      expect(detectArrayPaths(['a.b.0.c.1.d'])).toEqual([
+         'a.b',
+         'a.b.c',
+      ]);
    });
 });
 
 describe('buildTables — relational guards', () => {
    it('throws when a primitive array is nested directly inside another primitive array', () => {
       const envelopes = [
-         { documentType: 'weapon', source: { _id: 'a'.repeat(16), system: { matrix: [[1, 2], [3, 4]] } } },
+         {
+            documentType: 'weapon',
+            source: {
+               _id: 'a'.repeat(16),
+               system: {
+                  matrix: [
+                     [
+                        1,
+                        2,
+                     ],
+                     [
+                        3,
+                        4,
+                     ],
+                  ],
+               },
+            },
+         },
       ];
       expect(() => buildTables(envelopes, 'relational', 'Item', NO_SCHEMA)).toThrow(
          'Unsupported field shape: a primitive array nested directly inside a primitive array at "system.matrix.0.0"',
@@ -288,7 +568,18 @@ describe('buildTables — relational guards', () => {
 
    it('throws when an array-of-objects field has a sub-field named "_id"', () => {
       const envelopes = [
-         { documentType: 'weapon', source: { _id: 'a'.repeat(16), system: { trait: [{ _id: 'x', name: 'Reach' }] } } },
+         {
+            documentType: 'weapon',
+            source: {
+               _id: 'a'.repeat(16),
+               system: {
+                  trait: [{
+                     _id: 'x',
+                     name: 'Reach',
+                  }],
+               },
+            },
+         },
       ];
       expect(() => buildTables(envelopes, 'relational', 'Item', NO_SCHEMA)).toThrow(
          'Reserved column name "_id" used by a field under "system.trait"',
@@ -297,7 +588,18 @@ describe('buildTables — relational guards', () => {
 
    it('throws when an array-of-objects field has a sub-field named "_index"', () => {
       const envelopes = [
-         { documentType: 'weapon', source: { _id: 'a'.repeat(16), system: { trait: [{ _index: 0, name: 'Reach' }] } } },
+         {
+            documentType: 'weapon',
+            source: {
+               _id: 'a'.repeat(16),
+               system: {
+                  trait: [{
+                     _index: 0,
+                     name: 'Reach',
+                  }],
+               },
+            },
+         },
       ];
       expect(() => buildTables(envelopes, 'relational', 'Item', NO_SCHEMA)).toThrow(
          'Reserved column name "_index" used by a field under "system.trait"',
@@ -318,8 +620,15 @@ describe('buildTables — relational guards', () => {
                system: {
                   description: '',
                   check: [],
-                  customTrait: [{ name: 'Custom', description: 'x', uuid: 'u1' }],
-                  rulesElement: [{ name: 'code', value: 'v' }],
+                  customTrait: [{
+                     name: 'Custom',
+                     description: 'x',
+                     uuid: 'u1',
+                  }],
+                  rulesElement: [{
+                     name: 'code',
+                     value: 'v',
+                  }],
                   rarity: 'common',
                   value: 0,
                   equipped: false,
@@ -335,7 +644,11 @@ describe('buildTables — relational guards', () => {
                         damage: 5,
                         plusExtraSuccessDamage: true,
                         trait: [{ name: 'Heavy' }],
-                        customTrait: [{ name: 'Custom Trait', description: 'y', uuid: 'u2' }],
+                        customTrait: [{
+                           name: 'Custom Trait',
+                           description: 'y',
+                           uuid: 'u2',
+                        }],
                         uuid: 'u3',
                      },
                   ],
@@ -353,11 +666,21 @@ describe('buildTables — relational guards', () => {
                system: {
                   description: '',
                   check: [],
-                  customTrait: [{ name: 'Custom', description: 'x', uuid: 'u4' }],
-                  rulesElement: [{ name: 'code', value: 'v' }],
+                  customTrait: [{
+                     name: 'Custom',
+                     description: 'x',
+                     uuid: 'u4',
+                  }],
+                  rulesElement: [{
+                     name: 'code',
+                     value: 'v',
+                  }],
                   rarity: 'common',
                   value: 0,
-                  armor: { max: 1, value: 1 },
+                  armor: {
+                     max: 1,
+                     value: 1,
+                  },
                   trait: [{ name: 'Reach' }],
                },
             },
@@ -373,8 +696,15 @@ describe('buildTables — relational guards', () => {
                system: {
                   description: '',
                   check: [],
-                  customTrait: [{ name: 'Custom', description: 'x', uuid: 'u5' }],
-                  rulesElement: [{ name: 'code', value: 'v' }],
+                  customTrait: [{
+                     name: 'Custom',
+                     description: 'x',
+                     uuid: 'u5',
+                  }],
+                  rulesElement: [{
+                     name: 'code',
+                     value: 'v',
+                  }],
                   rarity: 'common',
                   value: 0,
                   defense: 0,
@@ -393,8 +723,15 @@ describe('buildTables — relational guards', () => {
                system: {
                   description: '',
                   check: [],
-                  customTrait: [{ name: 'Custom', description: 'x', uuid: 'u6' }],
-                  rulesElement: [{ name: 'code', value: 'v' }],
+                  customTrait: [{
+                     name: 'Custom',
+                     description: 'x',
+                     uuid: 'u6',
+                  }],
+                  rulesElement: [{
+                     name: 'code',
+                     value: 'v',
+                  }],
                   xpCost: 1,
                   rarity: 'common',
                   action: false,
@@ -414,7 +751,11 @@ describe('buildTables — relational guards', () => {
                system: {
                   description: '',
                   check: [],
-                  customTrait: [{ name: 'Custom', description: 'x', uuid: 'u7' }],
+                  customTrait: [{
+                     name: 'Custom',
+                     description: 'x',
+                     uuid: 'u7',
+                  }],
                   rarity: 'common',
                   xpCost: 1,
                   tradition: '',
@@ -426,8 +767,19 @@ describe('buildTables — relational guards', () => {
                      autoCalculateDC: true,
                   },
                   quantity: 1,
-                  aspect: [{ name: 'Damage', value: 'v', option: ['ignoreArmor', 'penetrating'] }],
-                  customAspect: [{ name: 'Custom Aspect', description: 'z', uuid: 'u8' }],
+                  aspect: [{
+                     name: 'Damage',
+                     value: 'v',
+                     option: [
+                        'ignoreArmor',
+                        'penetrating',
+                     ],
+                  }],
+                  customAspect: [{
+                     name: 'Custom Aspect',
+                     description: 'z',
+                     uuid: 'u8',
+                  }],
                },
             },
          },
@@ -442,8 +794,15 @@ describe('buildTables — relational guards', () => {
                system: {
                   description: '',
                   check: [],
-                  customTrait: [{ name: 'Custom', description: 'x', uuid: 'u9' }],
-                  rulesElement: [{ name: 'code', value: 'v' }],
+                  customTrait: [{
+                     name: 'Custom',
+                     description: 'x',
+                     uuid: 'u9',
+                  }],
+                  rulesElement: [{
+                     name: 'code',
+                     value: 'v',
+                  }],
                   rarity: 'common',
                   value: 0,
                   equipped: false,
@@ -477,9 +836,21 @@ describe('buildTables — relational guards', () => {
                img: 'i.svg',
                sort: 1,
                system: {
-                  duration: { type: 'turnStart', remaining: 1, initiative: 1, custom: '' },
-                  check: [{ name: 'Check', attribute: 'body' }],
-                  customTrait: [{ name: 'Custom', description: 'x', uuid: 'u10' }],
+                  duration: {
+                     type: 'turnStart',
+                     remaining: 1,
+                     initiative: 1,
+                     custom: '',
+                  },
+                  check: [{
+                     name: 'Check',
+                     attribute: 'body',
+                  }],
+                  customTrait: [{
+                     name: 'Custom',
+                     description: 'x',
+                     uuid: 'u10',
+                  }],
                },
             },
          },
@@ -489,7 +860,24 @@ describe('buildTables — relational guards', () => {
 
    it('does not throw in wide layout for a shape that throws in relational layout, and yields a flat column', () => {
       const envelopes = [
-         { documentType: 'weapon', source: { _id: 'a'.repeat(16), system: { matrix: [[1, 2], [3, 4]] } } },
+         {
+            documentType: 'weapon',
+            source: {
+               _id: 'a'.repeat(16),
+               system: {
+                  matrix: [
+                     [
+                        1,
+                        2,
+                     ],
+                     [
+                        3,
+                        4,
+                     ],
+                  ],
+               },
+            },
+         },
       ];
       expect(() => buildTables(envelopes, 'relational', 'Item', NO_SCHEMA)).toThrow();
       /** @type {object} */

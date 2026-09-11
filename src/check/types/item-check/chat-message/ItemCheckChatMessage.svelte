@@ -6,7 +6,7 @@
    import ChatDamageButtons from '~/document/types/chat-message/components/buttons/ChatMessageDamageButtons.svelte';
    import ChatHealingButton from '~/document/types/chat-message/components/buttons/ChatMessageHealingButton.svelte';
    import ChatAttributeCheckButton
-      from '~/document/types/chat-message/components/buttons/ChatMessageOpposedAttributeCheckButton.svelte';
+   from '~/document/types/chat-message/components/buttons/ChatMessageOpposedAttributeCheckButton.svelte';
    import ItemCheckChatItemTraits from '~/check/types/item-check/chat-message/ItemCheckChatItemTraits.svelte';
    import CheckChatMessages from '~/check/chat-message/CheckChatMessages.svelte';
    import ResistanceCheckButton from '~/helpers/svelte-components/button/ResistanceCheckButton.svelte';
@@ -73,7 +73,7 @@
                skill={document.data.system.parameters.opposedCheck.skill}
                complexity={document.data.system.results.extraSuccesses + 1}
                damageToReduce={document.data.system.parameters.isDamage &&
-               document.data.system.parameters.damageReducedBy === 'opposedCheck'
+                  document.data.system.parameters.damageReducedBy === 'opposedCheck'
                   ? document.data.system.results.damage
                   : 0}
             />
@@ -88,8 +88,8 @@
                complexity={document.data.system.results.extraSuccesses + 1}
                damageToReduce={
                   document.data.system.parameters.damageReducedBy === 'resistanceCheck' ?
-                  document.data.system.results.damage :
-                  0
+                     document.data.system.results.damage :
+                        0
                }
             />
          </div>

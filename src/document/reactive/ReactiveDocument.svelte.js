@@ -53,13 +53,34 @@ export default class ReactiveDocument {
          };
 
          const registered = [
-            [`update${name}`, Hooks.on(`update${name}`, onUpdate)],
-            ['createItem', Hooks.on('createItem', onEmbedded)],
-            ['updateItem', Hooks.on('updateItem', onEmbedded)],
-            ['deleteItem', Hooks.on('deleteItem', onEmbedded)],
-            ['createActiveEffect', Hooks.on('createActiveEffect', onEmbedded)],
-            ['updateActiveEffect', Hooks.on('updateActiveEffect', onEmbedded)],
-            ['deleteActiveEffect', Hooks.on('deleteActiveEffect', onEmbedded)],
+            [
+               `update${name}`,
+               Hooks.on(`update${name}`, onUpdate),
+            ],
+            [
+               'createItem',
+               Hooks.on('createItem', onEmbedded),
+            ],
+            [
+               'updateItem',
+               Hooks.on('updateItem', onEmbedded),
+            ],
+            [
+               'deleteItem',
+               Hooks.on('deleteItem', onEmbedded),
+            ],
+            [
+               'createActiveEffect',
+               Hooks.on('createActiveEffect', onEmbedded),
+            ],
+            [
+               'updateActiveEffect',
+               Hooks.on('updateActiveEffect', onEmbedded),
+            ],
+            [
+               'deleteActiveEffect',
+               Hooks.on('deleteActiveEffect', onEmbedded),
+            ],
          ];
 
          return () => registered.forEach(([hook, id]) => Hooks.off(hook, id));

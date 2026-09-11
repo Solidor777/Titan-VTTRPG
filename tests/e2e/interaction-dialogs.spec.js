@@ -84,7 +84,10 @@ test.describe('v14 interaction dialogs', () => {
          }
 
          // The fixture actor used as the source for every dialog trigger.
-         const actor = await Actor.create({ name: 'E2E Dialog Actor', type: 'player' });
+         const actor = await Actor.create({
+            name: 'E2E Dialog Actor',
+            type: 'player',
+         });
 
          // An owned equipment item that carries one custom trait (for the add/edit-trait dialogs)
          // and exists so it can be targeted by the confirm-delete dialog.
@@ -227,7 +230,9 @@ test.describe('v14 interaction dialogs', () => {
    // Edit-UUID dialog (reached through the Actors-directory "Edit UUID" context-menu action).
    test('edit-UUID dialog mounts', async () => {
       // Open the Actors sidebar tab so the directory entry is in the DOM.
-      await page.click('#sidebar-tabs [data-tab="actors"], #sidebar a[data-tab="actors"], nav#sidebar-tabs a[data-tab="actors"]');
+      await page.click(
+         '#sidebar-tabs [data-tab="actors"], #sidebar a[data-tab="actors"], nav#sidebar-tabs a[data-tab="actors"]',
+      );
 
       // Right-click the fixture actor's directory entry to open the context menu.
       const entry = page.locator('#actors .directory-item[data-entry-id]', { hasText: 'E2E Dialog Actor' }).first();

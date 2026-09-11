@@ -21,14 +21,14 @@ import moveArrayEntry from '~/helpers/utility-functions/MoveArrayEntry.js';
 export default function createSpellSheetState(item) {
    /** @type {import('svelte/store').Writable<SpellSheetData>} */
    const {
-            set,
-            update,
-            subscribe,
-            postAddCheck,
-            preDeleteCheck,
-            postMoveCheck,
-            postInsertCheck,
-         } = createTitanItemSheetState(item, createSpellSheetData(item));
+      set,
+      update,
+      subscribe,
+      postAddCheck,
+      preDeleteCheck,
+      postMoveCheck,
+      postInsertCheck,
+   } = createTitanItemSheetState(item, createSpellSheetData(item));
 
    /**
     * Adds a Custom Aspect to the reactive application state.

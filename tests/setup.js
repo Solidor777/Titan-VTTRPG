@@ -32,7 +32,10 @@ function randomID(length = 16) {
 
 globalThis.foundry = {
    abstract: { Document: MockDocument },
-   utils: { mergeObject, randomID },
+   utils: {
+      mergeObject,
+      randomID,
+   },
 };
 
 /** Minimal Hooks mock supporting on/off/call. */

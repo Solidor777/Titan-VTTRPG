@@ -11,9 +11,9 @@
     * @typedef {object} CheckTagsProps
     * @property {number} [idx] - The index of the check in the current document's `system.check` array.
     * @property {string} [attribute] - Optional actor-resolved attribute overriding the config attribute. Pass
-    *    `checkParameters.attribute` from actor-context consumers; omit on top-level document sheets.
+    * `checkParameters.attribute` from actor-context consumers; omit on top-level document sheets.
     * @property {boolean} [hideBasics] - Skips the attribute/skill/DC tag for consumers whose header
-    *    already shows those basics (the sidebar check panels).
+    * already shows those basics (the sidebar check panels).
     */
 
    /** @type {CheckTagsProps} */

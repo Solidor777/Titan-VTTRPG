@@ -50,7 +50,10 @@ test.describe('character sheet weapon row reactivity', () => {
          // Seed a fresh player actor with one weapon whose initial display state is known: rarity 'common'
          // (RarityTag class .common), value 0 (ValueTag absent via {#if item.system.value}), and a single
          // default attack whose label is 'Attack'.
-         const actor = await Actor.create({ name: actorName, type: 'player' });
+         const actor = await Actor.create({
+            name: actorName,
+            type: 'player',
+         });
          await actor.createEmbeddedDocuments('Item', [
             {
                name: 'E2E Reactive Weapon',

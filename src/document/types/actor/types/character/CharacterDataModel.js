@@ -458,7 +458,7 @@ export default class CharacterDataModel extends TitanActorDataModel {
     */
    _calculateBaseResources() {
       const totalBaseAttributeValue =
-               this.attribute.body.baseValue +
+         this.attribute.body.baseValue +
                this.attribute.mind.baseValue +
                this.attribute.soul.baseValue;
 
@@ -589,7 +589,10 @@ export default class CharacterDataModel extends TitanActorDataModel {
             }
 
             for (const key of keys) {
-               expanded.push({ ...element, key });
+               expanded.push({
+                  ...element,
+                  key,
+               });
             }
          }
          else {
@@ -4073,7 +4076,7 @@ export default class CharacterDataModel extends TitanActorDataModel {
                   woundsSuffered = 3;
                }
 
-                  // Otherwise, if the Character has a Stamina deficit >= 5, then.
+               // Otherwise, if the Character has a Stamina deficit >= 5, then.
                // they take 2 Wounds.
                else if (stamina.value + 2 <= damageTaken) {
                   woundsSuffered = 2;
@@ -5023,7 +5026,7 @@ export default class CharacterDataModel extends TitanActorDataModel {
             }
          }
 
-            // Otherwise, add expired effects to the report if we need to show a.
+         // Otherwise, add expired effects to the report if we need to show a.
          // button for removing them.
          else if (expiredEffects && autoRemoveExpiredEffectsSetting === 'showButton') {
             reportData.effects = {

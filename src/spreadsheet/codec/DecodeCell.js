@@ -63,9 +63,9 @@ export function forceStringCell(text) {
  * when `fieldSchema` is undefined (an untyped bag — rules elements, traits, `flags.*`, or any
  * array-of-objects field), a non-blank value follows the literal rules and a blank value is ABSENT.
  * @param {string|number|boolean|undefined} rawValue - The raw cell value (undefined for a blank cell;
- *    already typed for XLSX, always a string for CSV).
+ * already typed for XLSX, always a string for CSV).
  * @param {{type: 'string'|'number'|'boolean', nullable: boolean}|undefined} fieldSchema - The field's
- *    resolved schema type info, or undefined for an untyped bag.
+ * resolved schema type info, or undefined for an untyped bag.
  * @returns {string|number|boolean|null|symbol} The decoded value, or the ABSENT sentinel.
  */
 export function decodeCell(rawValue, fieldSchema) {
@@ -117,7 +117,7 @@ export function decodeCell(rawValue, fieldSchema) {
  * of them, else the schema-typed entry for its normalized (wildcarded) form, else undefined (untyped
  * bag).
  * @param {Object<string, {type:string,nullable:boolean}>} fieldTypes - The document subtype's resolved
- *    schema-typed field map (see resolveTypeSchemas), keyed by normalized path.
+ * schema-typed field map (see resolveTypeSchemas), keyed by normalized path.
  * @param {string} path - The concrete column path.
  * @returns {{type:string,nullable:boolean}|undefined} The resolved field schema, if any.
  */
@@ -130,9 +130,9 @@ export function lookupFieldSchema(fieldTypes, path) {
  * @param {Object<string,*>} row - The raw row (column name -> raw cell value).
  * @param {string[]} columns - The sheet's column names, in order.
  * @param {Object<string, {type:string,nullable:boolean}>} fieldTypes - The document subtype's resolved
- *    schema-typed field map.
+ * schema-typed field map.
  * @returns {Object<string,*>} The decoded flat map (ABSENT-valued entries retained; unflattenRow drops
- *    them appropriately).
+ * them appropriately).
  */
 export function decodeRow(row, columns, fieldTypes) {
    /** @type {Object<string,*>} */
