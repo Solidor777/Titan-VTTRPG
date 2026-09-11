@@ -41,14 +41,30 @@ test.describe('character sheet expand toggle reactivity', () => {
          if (stale) {
             await stale.delete();
          }
-         const actor = await Actor.create({ name: actorName, type: 'player' });
+         const actor = await Actor.create({
+            name: actorName,
+            type: 'player' 
+         });
          await actor.createEmbeddedDocuments('ActiveEffect', [
-            { name: 'E2E Expand Effect', type: 'effect', disabled: false },
+            {
+               name: 'E2E Expand Effect',
+               type: 'effect',
+               disabled: false 
+            },
          ]);
          await actor.createEmbeddedDocuments('Item', [
-            { name: 'E2E Expand Ability', type: 'ability' },
-            { name: 'E2E Expand Weapon', type: 'weapon' },
-            { name: 'E2E Expand Spell', type: 'spell' },
+            {
+               name: 'E2E Expand Ability',
+               type: 'ability' 
+            },
+            {
+               name: 'E2E Expand Weapon',
+               type: 'weapon' 
+            },
+            {
+               name: 'E2E Expand Spell',
+               type: 'spell' 
+            },
          ]);
          const app = await actor.sheet.render(true);
          await titanWait(

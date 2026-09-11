@@ -47,7 +47,10 @@ test.describe('rules-element add/delete reactivity', () => {
          if (stale) {
             await stale.delete();
          }
-         const item = await Item.create({ name, type: 'weapon' });
+         const item = await Item.create({
+            name,
+            type: 'weapon' 
+         });
          const app = await item.sheet.render(true);
          await titanWait(
             () => !!app?.element?.querySelector('.window-content')?.children.length,
@@ -107,7 +110,10 @@ test.describe('rules-element selector default key', () => {
          if (stale) {
             await stale.delete();
          }
-         const item = await Item.create({ name, type: 'weapon' });
+         const item = await Item.create({
+            name,
+            type: 'weapon' 
+         });
          const app = await item.sheet.render(true);
          await titanWait(
             () => !!app?.element?.querySelector('.window-content')?.children.length,
@@ -132,7 +138,11 @@ test.describe('rules-element selector default key', () => {
          .poll(
             () => page.evaluate((name) => {
                const el = game.items.getName(name).system.rulesElement[0];
-               return el ? { operation: el.operation, selector: el.selector, key: el.key } : null;
+               return el ? {
+                  operation: el.operation,
+                  selector: el.selector,
+                  key: el.key 
+               } : null;
             }, ITEM_NAME_SELECTOR),
             { message: 'seeded default flatModifier element persisted' },
          )

@@ -1,7 +1,7 @@
 <script>
    import { EXPERTISE_ICON, TRAINING_ICON } from '~/system/Icons.js';
    import CharacterSheetCondensedSkillCheckButton
-      from '~/document/types/actor/types/character/sheet/tabs/skills/CharacterSheetCondensedSkillCheckButton.svelte';
+   from '~/document/types/actor/types/character/sheet/tabs/skills/CharacterSheetCondensedSkillCheckButton.svelte';
    import DocumentAttributeSelect from '~/document/svelte-components/select/DocumentAttributeSelect.svelte';
    import DocumentIntegerInput from '~/document/svelte-components/input/DocumentIntegerInput.svelte';
    import { getContext } from 'svelte';
@@ -110,12 +110,15 @@
             <ModifiedValueLabel
                baseValue={
                   document.data.system.skill[key].training.baseValue +
-                  document.data.system.skill[key].training.mod.ability +
-                  document.data.system.skill[key].training.mod.equipment +
-                  checkParameters.trainingMod
+                     document.data.system.skill[key].training.mod.ability +
+                     document.data.system.skill[key].training.mod.equipment +
+                     checkParameters.trainingMod
                }
                currentValue={checkParameters.totalTrainingDice}
-               tooltip={{ text: totalTrainingTooltip, localize: false }}
+               tooltip={{
+                  text: totalTrainingTooltip,
+                  localize: false 
+               }}
             />
          </div>
       </div>
@@ -141,12 +144,15 @@
             <ModifiedValueLabel
                baseValue={
                   document.data.system.skill[key].expertise.baseValue +
-                  document.data.system.skill[key].expertise.mod.ability +
-                  document.data.system.skill[key].expertise.mod.equipment +
-                  checkParameters.expertiseMod
+                     document.data.system.skill[key].expertise.mod.ability +
+                     document.data.system.skill[key].expertise.mod.equipment +
+                     checkParameters.expertiseMod
                }
                currentValue={checkParameters.totalExpertise}
-               tooltip={{ text: totalExpertiseTooltip, localize: false }}
+               tooltip={{
+                  text: totalExpertiseTooltip,
+                  localize: false 
+               }}
             />
          </div>
       </div>
@@ -162,7 +168,8 @@
       align-items: center;
       gap: var(--titan-spacing-standard);
       width: 100%;
-      padding: var(--titan-spacing-standard) var(--titan-spacing-standard) var(--titan-spacing-standard) var(--titan-spacing-large);
+      padding: var(--titan-spacing-standard) var(--titan-spacing-standard) var(--titan-spacing-standard)
+         var(--titan-spacing-large);
 
       .attribute {
          @include flex-row;

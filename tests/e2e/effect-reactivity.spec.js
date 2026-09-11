@@ -45,7 +45,10 @@ test.describe('effect toggle reactivity', () => {
          if (stale) {
             await stale.delete();
          }
-         const actor = await Actor.create({ name: actorName, type: 'player' });
+         const actor = await Actor.create({
+            name: actorName,
+            type: 'player' 
+         });
          // A PERMANENT duration: the active toggle renders for permanent effects only.
          await actor.createEmbeddedDocuments('ActiveEffect', [
             {

@@ -181,11 +181,11 @@ export default class TitanActor extends Actor {
       )) {
          const item = this.items.get(id);
          if (assert(
-               item !== undefined,
-               'Item was not valid.',
-               this.name,
-               id,
-            )
+            item !== undefined,
+            'Item was not valid.',
+            this.name,
+            id,
+         )
             && assert(
                !item.isMarkedForDeletion,
                'Item is already marked for deletion.',

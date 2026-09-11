@@ -11,13 +11,13 @@
    import CheckDialogTotalDiceSummary from '~/check/dialog/CheckDialogTotalDiceSummary.svelte';
    import CheckDialogTotalExpertiseSummary from '~/check/dialog/CheckDialogTotalExpertiseSummary.svelte';
    import AttackCheckDialogAttackTypeField
-      from '~/check/types/attack-check/dialog/AttackCheckDialogAttackTypeField.svelte';
+   from '~/check/types/attack-check/dialog/AttackCheckDialogAttackTypeField.svelte';
    import AttackCheckDialogAccuracyField
-      from '~/check/types/attack-check/dialog/AttackCheckDialogAttackerAccuracyField.svelte';
+   from '~/check/types/attack-check/dialog/AttackCheckDialogAttackerAccuracyField.svelte';
    import AttackCheckDialogMeleeField
-      from '~/check/types/attack-check/dialog/AttackCheckDialogAttackerMeleeField.svelte';
+   from '~/check/types/attack-check/dialog/AttackCheckDialogAttackerMeleeField.svelte';
    import AttackCheckDialogDefenseField
-      from '~/check/types/attack-check/dialog/AttackCheckDialogTargetDefenseField.svelte';
+   from '~/check/types/attack-check/dialog/AttackCheckDialogTargetDefenseField.svelte';
    import localize from '~/helpers/utility-functions/Localize.js';
    import warn from '~/helpers/utility-functions/Warn.js';
    import getApplication from '~/helpers/utility-functions/GetApplication.js';
@@ -40,7 +40,10 @@
    /** @type {AttackCheckDialog} The Svelte Component's Application. */
    const application = getApplication();
 
-   /** @type {Array<typeof import('svelte').SvelteComponent>} Components for changing the options and displaying the parameters. */
+   /**
+    * @type {Array<typeof import('svelte').SvelteComponent>} Components for changing the options and
+    *    displaying the parameters.
+    */
    let rows = $state([
       AttackCheckDialogMeleeField,
       AttackCheckDialogDefenseField,

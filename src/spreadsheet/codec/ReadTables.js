@@ -8,7 +8,7 @@ import { unflattenRow } from '~/spreadsheet/codec/UnflattenRow.js';
  * @param {import('~/spreadsheet/codec/Workbook.js').Workbook} workbook - The decoded workbook.
  * @returns {{layout: 'wide'|'relational', packType: string, entries:
  *    Array<{sheet:string,documentType:string,arrayPath:string}>}} The manifest's layout/packType, plus
- *    one entry per data sheet.
+ * one entry per data sheet.
  */
 function readManifest(workbook) {
    /** @type {import('~/spreadsheet/codec/Workbook.js').Sheet|undefined} */
@@ -17,7 +17,11 @@ function readManifest(workbook) {
       return {
          layout: 'wide',
          packType: '',
-         entries: workbook.sheets.map((sheet) => ({ sheet: sheet.name, documentType: sheet.name, arrayPath: '' })),
+         entries: workbook.sheets.map((sheet) => ({
+            sheet: sheet.name,
+            documentType: sheet.name,
+            arrayPath: '' 
+         })),
       };
    }
 
@@ -35,10 +39,18 @@ function readManifest(workbook) {
          packType = row.value;
       }
       else if (row.key === 'sheet') {
-         entries.push({ sheet: row.value, documentType: row.documentType, arrayPath: row.arrayPath });
+         entries.push({
+            sheet: row.value,
+            documentType: row.documentType,
+            arrayPath: row.arrayPath 
+         });
       }
    }
-   return { layout, packType, entries };
+   return {
+      layout,
+      packType,
+      entries 
+   };
 }
 
 /**
@@ -75,7 +87,10 @@ function buildArrayPathExpander(arrayPath, allArrayPaths) {
             indexCursor += 1;
          }
       });
-      return subField === '_value' ? result.join('.') : [...result, subField].join('.');
+      return subField === '_value' ? result.join('.') : [
+         ...result,
+         subField
+      ].join('.');
    };
 }
 
@@ -84,7 +99,7 @@ function buildArrayPathExpander(arrayPath, allArrayPaths) {
  * by owning document id, ready to be merged into that document's own decoded flat row before
  * unflattening. Each cell decodes against the SAME schema `readTables` uses for the equivalent
  * wide-layout column: the expanded concrete path (indices spliced back in) is looked up in `fieldTypes`,
- * so a schema-typed array element (e.g. an ActiveEffect's `changes` field) decodes identically regardless
+ * so a schema-typed array element (e.g. An ActiveEffect's `changes` field) decodes identically regardless
  * of layout. A path with no schema entry still falls back to the untyped-bag literal rules (array-of-
  * object fields have no per-field schema type in this system — see resolveFieldSchema's ObjectField
  * handling).
@@ -93,7 +108,7 @@ function buildArrayPathExpander(arrayPath, allArrayPaths) {
  * @param {Array<{sheet:string,documentType:string,arrayPath:string}>} manifestEntries - Every manifest entry.
  * @param {Map<string, import('~/spreadsheet/codec/Workbook.js').Sheet>} sheetsByName - Sheets by name.
  * @param {Object<string, {type:string,nullable:boolean}>} fieldTypes - The document type's resolved
- *    schema-typed field map, used to decode each cell against its real field schema by expanded path.
+ * schema-typed field map, used to decode each cell against its real field schema by expanded path.
  * @returns {Map<string, Object<string,*>>} Document id -> additional flat entries from child sheets.
  */
 function collectChildFlatEntries(documentType, arrayPaths, manifestEntries, sheetsByName, fieldTypes) {
@@ -134,7 +149,7 @@ function collectChildFlatEntries(documentType, arrayPaths, manifestEntries, shee
  * envelopes ready for validation and import.
  * @param {import('~/spreadsheet/codec/Workbook.js').Workbook} workbook - The decoded workbook.
  * @param {Object<string, {fieldTypes: object, fieldOrder: string[]}>} typeSchemas - Per document-type
- *    schema info from resolveTypeSchemas, used for schema-driven decode of document-sheet columns.
+ * schema info from resolveTypeSchemas, used for schema-driven decode of document-sheet columns.
  * @returns {{layout:'wide'|'relational', packType:string, envelopes:
  *    Array<import('~/spreadsheet/codec/BuildTables.js').DocumentEnvelope & {sheetName:string,
  *    rowNumber:number}>}} The workbook's layout and pack type, plus one document envelope per data row.
@@ -159,10 +174,14 @@ export function readTables(workbook, typeSchemas) {
    }
 
    /** @type {Map<string, import('~/spreadsheet/codec/Workbook.js').Sheet>} */
-   const sheetsByName = new Map(workbook.sheets.map((s) => [s.name, s]));
+   const sheetsByName = new Map(workbook.sheets.map((s) => [
+      s.name,
+      s
+   ]));
 
-   /** @type {Array<import('~/spreadsheet/codec/BuildTables.js').DocumentEnvelope &
-    *    {sheetName:string,rowNumber:number}>} */
+   /**
+    * @type {Array<import('~/spreadsheet/codec/BuildTables.js').DocumentEnvelope &
+        {sheetName:string,rowNumber:number}>} */
    const envelopes = [];
    for (const entry of manifest.entries.filter((e) => !e.arrayPath)) {
       /** @type {import('~/spreadsheet/codec/Workbook.js').Sheet|undefined} */
@@ -235,5 +254,9 @@ export function readTables(workbook, typeSchemas) {
       });
    }
 
-   return { layout: manifest.layout, packType: manifest.packType, envelopes };
+   return {
+      layout: manifest.layout,
+      packType: manifest.packType,
+      envelopes 
+   };
 }

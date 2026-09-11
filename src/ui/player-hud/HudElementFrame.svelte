@@ -8,7 +8,8 @@
     * @property {string} elementKey - The layout key for this element.
     * @property {HudLayoutState} layoutState - Shared layout/UI state.
     * @property {string} minimizeIcon - Font Awesome classes for the minimized chip icon.
-    * @property {string} [chipCorner] - The minimize chip's corner: 'top-right' (the default), 'top-left', 'bottom-right', or 'bottom-left'.
+    * @property {string} [chipCorner] - The minimize chip's corner: 'top-right' (the default),
+    *    'top-left', 'bottom-right', or 'bottom-left'.
     * @property {boolean} [resizable] - Whether edit mode offers a resize handle (effects panel).
     * @property {string} [testId] - Optional data-testid forwarded to the frame root.
     * @property {Snippet} children - The element content.
@@ -41,7 +42,10 @@
    const point = $derived(
       dragPoint ?? resolvePosition(
          layoutState.positions[elementKey],
-         { width, height },
+         {
+            width,
+            height 
+         },
          layoutState.rect,
       ),
    );
@@ -58,7 +62,10 @@
       event.preventDefault();
 
       /** @type {{x: number, y: number}} The pointer offset inside the element. */
-      const grab = { x: event.clientX - point.x, y: event.clientY - point.y };
+      const grab = {
+         x: event.clientX - point.x,
+         y: event.clientY - point.y 
+      };
 
       /**
        * Tracks pointer movement, snapping to the drag grid and clamping into the canvas rect.
@@ -74,7 +81,10 @@
                x: Math.round((move.clientX - grab.x) / snap) * snap,
                y: Math.round((move.clientY - grab.y) / snap) * snap,
             },
-            { width, height },
+            {
+               width,
+               height 
+            },
             layoutState.rect,
          );
       };
@@ -87,7 +97,10 @@
          window.removeEventListener('pointermove', onMove);
          window.removeEventListener('pointerup', onUp);
          if (dragPoint) {
-            layoutState.positions[elementKey] = deriveAnchors(dragPoint, { width, height }, layoutState.rect);
+            layoutState.positions[elementKey] = deriveAnchors(dragPoint, {
+               width,
+               height 
+            }, layoutState.rect);
             layoutState.persist();
             dragPoint = null;
          }
@@ -107,10 +120,16 @@
       event.stopPropagation();
 
       /** @type {{width: number, height: number}} The size at drag start. */
-      const start = { width: layoutState.effectsPanelSize.width, height: layoutState.effectsPanelSize.height };
+      const start = {
+         width: layoutState.effectsPanelSize.width,
+         height: layoutState.effectsPanelSize.height 
+      };
 
       /** @type {{x: number, y: number}} The pointer at drag start. */
-      const origin = { x: event.clientX, y: event.clientY };
+      const origin = {
+         x: event.clientX,
+         y: event.clientY 
+      };
 
       /**
        * Tracks pointer movement into a clamped size.

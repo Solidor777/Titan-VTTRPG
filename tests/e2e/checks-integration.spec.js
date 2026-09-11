@@ -14,7 +14,11 @@ import { expectedCheckResults } from '../shared/checkOracle.js';
  */
 
 // The forced faces every test uses; a 3-dice check consumes all, the 1-die resistance check uses one.
-const FORCED_FACES = [6, 4, 1];
+const FORCED_FACES = [
+   6,
+   4,
+   1
+];
 
 // Per-check expectations for the E2E Roller fixture (see plan's fixture table for derivations).
 const CHECK_CASES = [
@@ -90,7 +94,10 @@ test.beforeEach(async () => {
       }
       const actor = await Actor.create(actorData);
       await actor.createEmbeddedDocuments('Item', itemData);
-   }, { actorData: buildE2ERollerActorData(), itemData: buildE2ERollerItemData() });
+   }, {
+      actorData: buildE2ERollerActorData(),
+      itemData: buildE2ERollerItemData() 
+   });
 });
 
 test.afterEach(async () => {
@@ -127,7 +134,10 @@ test.describe('v14 checks integration (forced dice)', () => {
             const beforeCount = game.messages.size;
             await new Function('actor', 'fixtures', `return (async () => { ${invokeSrc} })();`)(actor, fixtures);
             return beforeCount;
-         }, { actorLocate: ACTOR_LOCATE, invokeSrc: checkCase.invoke });
+         }, {
+            actorLocate: ACTOR_LOCATE,
+            invokeSrc: checkCase.invoke 
+         });
 
          const flags = await readNewestCheckFlags(page, before);
 
@@ -241,13 +251,20 @@ test.describe('check chat-card interactions (clone-then-update parity)', () => {
    test('die click applies expertise; reset restores the roll', async () => {
       // Difficulty 4, expertiseMod 2, forced [3, 1, 1]: roll-time auto-expertise raises the 3 to 4
       // (cheapest first) and leaves 1 expertise remaining with two clickable failure dice.
-      await forceDice(page, [3, 1, 1]);
+      await forceDice(page, [
+         3,
+         1,
+         1
+      ]);
 
       /** @type {string} The id of the freshly rolled attribute-check message under test. */
       const messageId = await page.evaluate(async () => {
          const actor = game.actors.getName('E2E Roller');
          const before = game.messages.size;
-         await actor.system.rollAttributeCheck({ attribute: 'body', expertiseMod: 2 });
+         await actor.system.rollAttributeCheck({
+            attribute: 'body',
+            expertiseMod: 2 
+         });
          await globalThis.titanWait(() => game.messages.size > before, { message: 'check message created' });
          return game.messages.contents.at(-1).id;
       });
@@ -255,9 +272,18 @@ test.describe('check chat-card interactions (clone-then-update parity)', () => {
       // Confirm the roll-time state the click test depends on (the raised 4 is the lone success).
       expect(await readCheckState(messageId)).toEqual({
          dice: [
-            { final: 4, expertiseApplied: 1 },
-            { final: 1, expertiseApplied: 0 },
-            { final: 1, expertiseApplied: 0 },
+            {
+               final: 4,
+               expertiseApplied: 1 
+            },
+            {
+               final: 1,
+               expertiseApplied: 0 
+            },
+            {
+               final: 1,
+               expertiseApplied: 0 
+            },
          ],
          expertiseRemaining: 1,
          successes: 1,
@@ -274,9 +300,18 @@ test.describe('check chat-card interactions (clone-then-update parity)', () => {
       // stays below difficulty, so the recalculated successes hold at 1.
       await expect.poll(() => readCheckState(messageId)).toEqual({
          dice: [
-            { final: 4, expertiseApplied: 1 },
-            { final: 2, expertiseApplied: 1 },
-            { final: 1, expertiseApplied: 0 },
+            {
+               final: 4,
+               expertiseApplied: 1 
+            },
+            {
+               final: 2,
+               expertiseApplied: 1 
+            },
+            {
+               final: 1,
+               expertiseApplied: 0 
+            },
          ],
          expertiseRemaining: 0,
          successes: 1,
@@ -290,9 +325,18 @@ test.describe('check chat-card interactions (clone-then-update parity)', () => {
       await card.locator('button:has(i.fa-rotate-left)').click();
       await expect.poll(() => readCheckState(messageId)).toEqual({
          dice: [
-            { final: 3, expertiseApplied: 0 },
-            { final: 1, expertiseApplied: 0 },
-            { final: 1, expertiseApplied: 0 },
+            {
+               final: 3,
+               expertiseApplied: 0 
+            },
+            {
+               final: 1,
+               expertiseApplied: 0 
+            },
+            {
+               final: 1,
+               expertiseApplied: 0 
+            },
          ],
          expertiseRemaining: 2,
          successes: 0,
@@ -328,7 +372,11 @@ test.describe('check chat-card interactions (clone-then-update parity)', () => {
       });
 
       // Force three successes (difficulty 4, complexity 1), banking two extra successes at roll time.
-      await forceDice(page, [6, 6, 6]);
+      await forceDice(page, [
+         6,
+         6,
+         6
+      ]);
 
       /** @type {string} The id of the freshly rolled casting-check message under test. */
       const messageId = await page.evaluate(async () => {

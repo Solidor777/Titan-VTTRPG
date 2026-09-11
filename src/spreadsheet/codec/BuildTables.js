@@ -40,14 +40,20 @@ function forceUntypedStringCells(flatRows, typeSchema) {
  * doesn't name (untyped bag contents, flags.*, and any unresolved field).
  * @param {string[]} paths - Every discovered concrete dotted path, in first-seen order.
  * @param {string[]} fieldOrder - The type's schema-declared paths, in schema order (wildcards for array
- *    elements, e.g. "system.attack.*.damage").
+ * elements, e.g. "system.attack.*.damage").
  * @returns {string[]} The paths, reordered.
  */
 export function orderColumns(paths, fieldOrder) {
    /** @type {Map<string, number>} Schema order index per normalized (wildcarded) path. */
-   const orderIndex = new Map(fieldOrder.map((path, i) => [path, i]));
+   const orderIndex = new Map(fieldOrder.map((path, i) => [
+      path,
+      i
+   ]));
    /** @type {Map<string, number>} First-seen index, used as the fallback and as the tiebreaker rank base. */
-   const seenIndex = new Map(paths.map((path, i) => [path, i]));
+   const seenIndex = new Map(paths.map((path, i) => [
+      path,
+      i
+   ]));
 
    return [...paths].sort((a, b) => {
       /** @type {number} */
@@ -90,7 +96,10 @@ export function detectArrayPaths(paths) {
             arrayPaths.add(prefix.join('.'));
          }
          else {
-            prefix = [...prefix, segment];
+            prefix = [
+               ...prefix,
+               segment
+            ];
          }
          priorSegmentIsNumeric = isNumeric;
       }
@@ -115,8 +124,8 @@ export function detectArrayPaths(paths) {
  * @param {string} arrayPath - The array path being matched, e.g. "system.attack.trait".
  * @param {string[]} allArrayPaths - Every array path detected for the document type.
  * @returns {(path: string) => {index: string, subField: string}|null} A matcher returning the dotted
- *    index and remaining sub-field path (or "_value" for a primitive array element) for a concrete path
- *    belonging to this array, or null.
+ * index and remaining sub-field path (or "_value" for a primitive array element) for a concrete path
+ * belonging to this array, or null.
  */
 export function buildArrayPathMatcher(arrayPath, allArrayPaths) {
    /** @type {string[]} */
@@ -151,14 +160,20 @@ export function buildArrayPathMatcher(arrayPath, allArrayPaths) {
       // array, e.g. "statuses.0"): matched with the reserved sentinel sub-field name "_value", distinct
       // from the "_id"/"_index" reserved columns every child sheet also carries.
       if (subFieldSegments.length === 0) {
-         return { index: indices.join('.'), subField: '_value' };
+         return {
+            index: indices.join('.'),
+            subField: '_value' 
+         };
       }
       // A remainder still containing a numeric segment belongs to a DEEPER nested array instead (that
       // array's own matcher pulls it into its own child sheet).
       if (subFieldSegments.some((seg) => /^\d+$/.test(seg))) {
          return null;
       }
-      return { index: indices.join('.'), subField: subFieldSegments.join('.') };
+      return {
+         index: indices.join('.'),
+         subField: subFieldSegments.join('.') 
+      };
    };
 }
 
@@ -172,12 +187,41 @@ export function buildArrayPathMatcher(arrayPath, allArrayPaths) {
 function buildManifestSheet(layout, packType, entries) {
    /** @type {Array<Object<string,string>>} */
    const rows = [
-      { key: 'layout', value: layout, documentType: '', arrayPath: '' },
-      { key: 'packType', value: packType, documentType: '', arrayPath: '' },
-      { key: 'version', value: '1', documentType: '', arrayPath: '' },
-      ...entries.map((e) => ({ key: 'sheet', value: e.sheet, documentType: e.documentType, arrayPath: e.arrayPath })),
+      {
+         key: 'layout',
+         value: layout,
+         documentType: '',
+         arrayPath: '' 
+      },
+      {
+         key: 'packType',
+         value: packType,
+         documentType: '',
+         arrayPath: '' 
+      },
+      {
+         key: 'version',
+         value: '1',
+         documentType: '',
+         arrayPath: '' 
+      },
+      ...entries.map((e) => ({
+         key: 'sheet',
+         value: e.sheet,
+         documentType: e.documentType,
+         arrayPath: e.arrayPath 
+      })),
    ];
-   return { name: '_manifest', columns: ['key', 'value', 'documentType', 'arrayPath'], rows };
+   return {
+      name: '_manifest',
+      columns: [
+         'key',
+         'value',
+         'documentType',
+         'arrayPath'
+      ],
+      rows 
+   };
 }
 
 /**
@@ -200,11 +244,18 @@ function buildWideSheet(documentType, flatRows, typeSchema) {
    }
    /** @type {string[]} */
    const rest = orderColumns([...discovered], typeSchema?.fieldOrder ?? []);
-   return { name: documentType, columns: [...FIXED_COLUMNS, ...rest], rows: flatRows };
+   return {
+      name: documentType,
+      columns: [
+         ...FIXED_COLUMNS,
+         ...rest
+      ],
+      rows: flatRows 
+   };
 }
 
 /**
- * Whether a discovered concrete path belongs to some array (i.e. some detected array path's matcher
+ * Whether a discovered concrete path belongs to some array (i.e. Some detected array path's matcher
  * accepts it), used to exclude array-derived columns from the document sheet's own scalar columns.
  * @param {string} path - A concrete discovered path.
  * @param {Array<(path:string)=>object|null>} matchers - One matcher per detected array path.
@@ -262,13 +313,25 @@ function buildChildSheet(documentType, arrayPath, allArrayPaths, flatRows) {
    const rows = [];
    for (const [id, elements] of byDocument) {
       for (const [index, fields] of elements) {
-         rows.push({ _id: id, _index: index, ...fields });
+         rows.push({
+            _id: id,
+            _index: index,
+            ...fields 
+         });
       }
    }
 
    return {
       arrayPath,
-      sheet: { name: `${documentType}.${arrayPath}`, columns: ['_id', '_index', ...subFields], rows },
+      sheet: {
+         name: `${documentType}.${arrayPath}`,
+         columns: [
+            '_id',
+            '_index',
+            ...subFields
+         ],
+         rows 
+      },
    };
 }
 
@@ -306,7 +369,10 @@ function buildRelationalSheets(documentType, flatRows, typeSchema) {
    const documentRows = flatRows.map((row) => {
       /** @type {Object<string,*>} */
       const picked = {};
-      for (const column of [...FIXED_COLUMNS, ...scalarColumns]) {
+      for (const column of [
+         ...FIXED_COLUMNS,
+         ...scalarColumns
+      ]) {
          picked[column] = row[column];
       }
       return picked;
@@ -316,7 +382,14 @@ function buildRelationalSheets(documentType, flatRows, typeSchema) {
    const childSheets = arrayPaths.map((arrayPath) => buildChildSheet(documentType, arrayPath, arrayPaths, flatRows));
 
    return {
-      documentSheet: { name: documentType, columns: [...FIXED_COLUMNS, ...scalarColumns], rows: documentRows },
+      documentSheet: {
+         name: documentType,
+         columns: [
+            ...FIXED_COLUMNS,
+            ...scalarColumns
+         ],
+         rows: documentRows 
+      },
       childSheets,
    };
 }
@@ -327,7 +400,7 @@ function buildRelationalSheets(documentType, flatRows, typeSchema) {
  * @param {'wide'|'relational'} layout - The array layout to use.
  * @param {'Actor'|'Item'|'ActiveEffect'} packType - The pack's document type, recorded in the manifest.
  * @param {Object<string, {fieldTypes: object, fieldOrder: string[]}>} typeSchemas - Per document-type
- *    schema info from resolveTypeSchemas, used only to order columns.
+ * schema info from resolveTypeSchemas, used only to order columns.
  * @returns {import('~/spreadsheet/codec/Workbook.js').Workbook} The built workbook, manifest first.
  */
 export function buildTables(envelopes, layout, packType, typeSchemas) {
@@ -358,16 +431,28 @@ export function buildTables(envelopes, layout, packType, typeSchemas) {
 
       if (layout === 'wide') {
          sheets.push(buildWideSheet(documentType, flatRows, typeSchema));
-         manifestEntries.push({ sheet: documentType, documentType, arrayPath: '' });
+         manifestEntries.push({
+            sheet: documentType,
+            documentType,
+            arrayPath: '' 
+         });
       }
       else {
          /** @type {{documentSheet: object, childSheets: Array<{sheet:object,arrayPath:string}>}} */
          const relational = buildRelationalSheets(documentType, flatRows, typeSchema);
          sheets.push(relational.documentSheet);
-         manifestEntries.push({ sheet: relational.documentSheet.name, documentType, arrayPath: '' });
+         manifestEntries.push({
+            sheet: relational.documentSheet.name,
+            documentType,
+            arrayPath: '' 
+         });
          for (const child of relational.childSheets) {
             sheets.push(child.sheet);
-            manifestEntries.push({ sheet: child.sheet.name, documentType, arrayPath: child.arrayPath });
+            manifestEntries.push({
+               sheet: child.sheet.name,
+               documentType,
+               arrayPath: child.arrayPath 
+            });
          }
       }
    }
@@ -382,5 +467,10 @@ export function buildTables(envelopes, layout, packType, typeSchemas) {
       manifestEntries[i].sheet = finalNames[i];
    });
 
-   return { sheets: [buildManifestSheet(layout, packType, manifestEntries), ...sheets] };
+   return {
+      sheets: [
+         buildManifestSheet(layout, packType, manifestEntries),
+         ...sheets
+      ] 
+   };
 }

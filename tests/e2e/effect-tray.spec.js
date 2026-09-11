@@ -141,14 +141,24 @@ test.describe('effect tray sidebar tab', () => {
          page.locator('[role="combobox"][data-testid="effect-tray-pack-select"]'),
          'titan.effects',
       );
-      for (const folderName of ['Actions', 'Circumstances', 'Death']) {
+      for (const folderName of [
+         'Actions',
+         'Circumstances',
+         'Death'
+      ]) {
          const folder = page.locator('[data-testid="effect-tray-folder"]', { hasText: folderName }).first();
          await expect(folder, `${folderName} folder is listed`).toBeVisible();
       }
       // Every folder starts expanded on first open; no toggling is needed to see all rows.
       const rows = page.locator('[data-testid="effect-tray-row"]');
       await expect(rows, 'every seeded standard effect row renders').toHaveCount(17);
-      for (const name of ['Dodging', 'Charging', 'Light Cover', 'Dying', 'Last Stand']) {
+      for (const name of [
+         'Dodging',
+         'Charging',
+         'Light Cover',
+         'Dying',
+         'Last Stand'
+      ]) {
          await expect(rows.filter({ hasText: name }).first(), `${name} is seeded`).toBeVisible();
       }
    });
@@ -192,9 +202,16 @@ test.describe('effect tray sidebar tab', () => {
          'titan.effects',
       );
 
-      const reopenedActions = page.locator('section.effect-tray-folder[data-folder-id]', { hasText: 'Actions' }).first();
-      const circumstances = page.locator('section.effect-tray-folder[data-folder-id]', { hasText: 'Circumstances' }).first();
-      await expect(reopenedActions.locator('[data-testid="effect-tray-row"]'), 'Actions stays collapsed').toHaveCount(0);
+      const reopenedActions = page
+         .locator('section.effect-tray-folder[data-folder-id]', { hasText: 'Actions' })
+         .first();
+      const circumstances = page
+         .locator('section.effect-tray-folder[data-folder-id]', { hasText: 'Circumstances' })
+         .first();
+      await expect(
+         reopenedActions.locator('[data-testid="effect-tray-row"]'),
+         'Actions stays collapsed',
+      ).toHaveCount(0);
       await expect(
          circumstances.locator('[data-testid="effect-tray-row"]').first(),
          'Circumstances is unaffected and still shows rows',
@@ -212,12 +229,22 @@ test.describe('effect tray sidebar tab', () => {
                await effect.delete();
             }
          }
-         for (const name of ['E2E Early Folder', 'E2E Late Folder']) {
+         for (const name of [
+            'E2E Early Folder',
+            'E2E Late Folder'
+         ]) {
             await pack.folders.find((f) => f.name === name)?.delete();
          }
-         const early = await Folder.create({ name: 'E2E Early Folder', type: 'ActiveEffect' }, { pack: pack.collection });
+         const early = await Folder.create({
+            name: 'E2E Early Folder',
+            type: 'ActiveEffect' 
+         }, { pack: pack.collection });
          await ActiveEffect.create(
-            { name: 'E2E Early Folder Effect', type: 'effect', folder: early.id },
+            {
+               name: 'E2E Early Folder Effect',
+               type: 'effect',
+               folder: early.id 
+            },
             { pack: pack.collection },
          );
 
@@ -238,9 +265,16 @@ test.describe('effect tray sidebar tab', () => {
       // Create the late folder and an effect inside it; the create hooks refresh the tray state.
       await page.evaluate(async () => {
          const pack = game.packs.get('world.e2e-tray-effects');
-         const late = await Folder.create({ name: 'E2E Late Folder', type: 'ActiveEffect' }, { pack: pack.collection });
+         const late = await Folder.create({
+            name: 'E2E Late Folder',
+            type: 'ActiveEffect' 
+         }, { pack: pack.collection });
          await ActiveEffect.create(
-            { name: 'E2E Late Folder Effect', type: 'effect', folder: late.id },
+            {
+               name: 'E2E Late Folder Effect',
+               type: 'effect',
+               folder: late.id 
+            },
             { pack: pack.collection },
          );
       });
@@ -270,7 +304,10 @@ test.describe('effect tray sidebar tab', () => {
                await effect.delete();
             }
          }
-         for (const name of ['E2E Early Folder', 'E2E Late Folder']) {
+         for (const name of [
+            'E2E Early Folder',
+            'E2E Late Folder'
+         ]) {
             await pack.folders.find((f) => f.name === name)?.delete();
          }
          await game.settings.set('titan', 'effectTrayCollapsedFolders', {});
@@ -280,7 +317,10 @@ test.describe('effect tray sidebar tab', () => {
    test('applying the seeded Dodging effect raises the token actor Defense and Reflexes by one', async () => {
       await deleteFixtureActor(page, 'E2E Tray Target');
       await page.evaluate(async () => {
-         await Actor.create({ name: 'E2E Tray Target', type: 'player' });
+         await Actor.create({
+            name: 'E2E Tray Target',
+            type: 'player' 
+         });
       });
       await controlFixtureActorToken(page, {
          actorName: 'E2E Tray Target',
@@ -288,7 +328,10 @@ test.describe('effect tray sidebar tab', () => {
       });
       const before = await page.evaluate(() => {
          const actor = game.actors.getName('E2E Tray Target');
-         return { defense: actor.system.rating.defense.value, reflexes: actor.system.resistance.reflexes.value };
+         return {
+            defense: actor.system.rating.defense.value,
+            reflexes: actor.system.resistance.reflexes.value 
+         };
       });
 
       await page.evaluate(async () => {
@@ -328,7 +371,11 @@ test.describe('effect tray sidebar tab', () => {
             }),
             { message: 'Dodging applies its +1 Defense and +1 Reflexes' },
          )
-         .toEqual({ applied: true, defense: before.defense + 1, reflexes: before.reflexes + 1 });
+         .toEqual({
+            applied: true,
+            defense: before.defense + 1,
+            reflexes: before.reflexes + 1 
+         });
    });
 
    test('Apply copies the effect onto the controlled token actor', async () => {
@@ -441,7 +488,10 @@ test.describe('effect tray sidebar tab', () => {
          if (stale) {
             await stale.delete();
          }
-         await Folder.create({ name: 'E2E Rename Folder', type: 'ActiveEffect' }, { pack: pack.collection });
+         await Folder.create({
+            name: 'E2E Rename Folder',
+            type: 'ActiveEffect' 
+         }, { pack: pack.collection });
 
          await ui.titanEffects.render(true);
          ui.titanEffects.activate();
@@ -487,7 +537,10 @@ test.describe('effect tray sidebar tab', () => {
       // Create an actor that owns an effect to stash, render the tray, and select the world pack.
       await deleteFixtureActor(page, 'E2E Stash Source');
       await page.evaluate(async () => {
-         const actor = await Actor.create({ name: 'E2E Stash Source', type: 'player' });
+         const actor = await Actor.create({
+            name: 'E2E Stash Source',
+            type: 'player' 
+         });
          await actor.createEmbeddedDocuments('ActiveEffect', [
             {
                name: 'E2E Stash Effect',
@@ -522,7 +575,11 @@ test.describe('effect tray sidebar tab', () => {
          const dataTransfer = new DataTransfer();
          dataTransfer.setData('text/plain', JSON.stringify(dragData));
 
-         tray.dispatchEvent(new DragEvent('drop', { bubbles: true, cancelable: true, dataTransfer }));
+         tray.dispatchEvent(new DragEvent('drop', {
+            bubbles: true,
+            cancelable: true,
+            dataTransfer 
+         }));
       });
 
       // The drop copies the effect into the selected pack asynchronously; poll until the copy lands.

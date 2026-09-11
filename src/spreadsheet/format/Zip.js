@@ -3,7 +3,7 @@ import { zipSync, strToU8, unzipSync, strFromU8 } from 'fflate';
 /**
  * Zips a set of named files into a single archive.
  * @param {Object<string, Uint8Array|string>} files - Map of archive-relative filename to its content;
- *    string values are UTF-8 encoded automatically.
+ * string values are UTF-8 encoded automatically.
  * @returns {Uint8Array} The zip archive bytes.
  */
 export function zipFiles(files) {

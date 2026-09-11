@@ -5,7 +5,7 @@
    import IconButton from '~/helpers/svelte-components/button/IconButton.svelte';
    import DocumentOwnerIconButton from '~/document/svelte-components/DocumentOwnerIconButton.svelte';
    import CharacterSheetEffectChecks
-      from '~/document/types/actor/types/character/sheet/items/effect/CharacterSheetEffectChecks.svelte';
+   from '~/document/types/actor/types/character/sheet/items/effect/CharacterSheetEffectChecks.svelte';
    import {
       DECREMENT_ICON,
       DELETE_ICON,

@@ -48,7 +48,10 @@ describe('CheckTags', () => {
    it('renders the attribute check tag from the config', () => {
       render(CheckTags, {
          props: { idx: 0 },
-         context: new Map([['document', makeBridge()]]),
+         context: new Map([[
+            'document',
+            makeBridge()
+         ]]),
       });
 
       expect(screen.getByTestId('check-tags-attribute')).toBeTruthy();
@@ -60,15 +63,18 @@ describe('CheckTags', () => {
    it('renders resolve cost, resisted-by, and opposed tags when configured', () => {
       render(CheckTags, {
          props: { idx: 0 },
-         context: new Map([['document', makeBridge({
-            resolveCost: 2,
-            resistanceCheck: 'reflexes',
-            opposedCheck: {
-               enabled: true,
-               attribute: 'mind',
-               skill: 'perception',
-            },
-         })]]),
+         context: new Map([[
+            'document',
+            makeBridge({
+               resolveCost: 2,
+               resistanceCheck: 'reflexes',
+               opposedCheck: {
+                  enabled: true,
+                  attribute: 'mind',
+                  skill: 'perception',
+               },
+            })
+         ]]),
       });
 
       expect(screen.getByTestId('check-tags-resolve-cost').querySelector('.value').textContent).toBe('2');
@@ -82,7 +88,10 @@ describe('CheckTags', () => {
             idx: 0,
             attribute: 'mind',
          },
-         context: new Map([['document', makeBridge({ attribute: 'default' })]]),
+         context: new Map([[
+            'document',
+            makeBridge({ attribute: 'default' })
+         ]]),
       });
 
       /** @type {string} The rendered attribute tag text. */
@@ -94,7 +103,10 @@ describe('CheckTags', () => {
    it('renders nothing for a missing check index', () => {
       const { container } = render(CheckTags, {
          props: { idx: 7 },
-         context: new Map([['document', makeBridge()]]),
+         context: new Map([[
+            'document',
+            makeBridge()
+         ]]),
       });
       expect(container.querySelector('.check-tags')).toBeNull();
    });
@@ -102,7 +114,10 @@ describe('CheckTags', () => {
    it('renders nothing during the deletion window when the bridge data is undefined', () => {
       const { container } = render(CheckTags, {
          props: { idx: 0 },
-         context: new Map([['document', { data: undefined }]]),
+         context: new Map([[
+            'document',
+            { data: undefined }
+         ]]),
       });
       expect(container.querySelector('.check-tags')).toBeNull();
    });

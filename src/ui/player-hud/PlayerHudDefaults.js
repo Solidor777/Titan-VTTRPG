@@ -1,5 +1,9 @@
 /** @type {Array<string>} The HUD element keys, in render order. */
-export const HUD_ELEMENT_KEYS = ['portrait', 'actionMenu', 'effectsPanel'];
+export const HUD_ELEMENT_KEYS = [
+   'portrait',
+   'actionMenu',
+   'effectsPanel'
+];
 
 /**
  * Creates the default per-user HUD options.

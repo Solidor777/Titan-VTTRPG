@@ -24,7 +24,7 @@
    } from '~/system/Icons.js';
    import Tag from '~/helpers/svelte-components/tag/Tag.svelte';
    import WeaponSheetAttackCustomTraitTag
-      from '~/document/types/item/types/weapon/sheet/WeaponSheetAttackCustomTraitTag.svelte';
+   from '~/document/types/item/types/weapon/sheet/WeaponSheetAttackCustomTraitTag.svelte';
    import CondensedAttackCheckButton from '~/document/svelte-components/check/CondensedAttackCheckButton.svelte';
    import DragHandle from '~/helpers/svelte-components/drag-reorder/DragHandle.svelte';
 
@@ -51,8 +51,10 @@
    /** @type {object} The attack data for this component. */
    const attack = $derived(document.data.system.attack[idx]);
 
-   /** @type {boolean} Whether this attack component is currently expanded. A freshly added attack
-    * renders before the state array grows, so the read falls back to the seeded default (expanded). */
+   /**
+    * @type {boolean} Whether this attack component is currently expanded. A freshly added attack
+    * renders before the state array grows, so the read falls back to the seeded default (expanded).
+    */
    const isExpanded = $derived($appState.tabs.attacks.isExpanded[idx] ?? true);
 
    /**

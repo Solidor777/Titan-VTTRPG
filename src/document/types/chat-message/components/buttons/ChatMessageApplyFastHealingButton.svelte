@@ -4,7 +4,7 @@
    import localize from '~/helpers/utility-functions/Localize.js';
    import { HEALING_ICON } from '~/system/Icons.js';
    import ChatMessageResourceModButton
-      from '~/document/types/chat-message/components/buttons/ChatMessageResourceModButton.svelte';
+   from '~/document/types/chat-message/components/buttons/ChatMessageResourceModButton.svelte';
    import assert from '~/helpers/utility-functions/Assert.js';
 
    /** @type {object} Reference to the reactive Document store. */
@@ -71,6 +71,9 @@
 <ChatMessageResourceModButton
    icon={HEALING_ICON}
    label={localize('healX%Damage').replace('X%', document.data.system.fastHealing.total)}
-   tooltip={{ text: getTooltip(), localize: false }}
+   tooltip={{
+      text: getTooltip(),
+      localize: false 
+   }}
    confirmFn={confirm}
 />

@@ -3,21 +3,21 @@
    import RichText from '~/helpers/svelte-components/RichText.svelte';
    import ItemStats from '~/document/types/item/components/ItemStats.svelte';
    import CharacterSheetItem
-      from '~/document/types/actor/types/character/sheet/items/CharacterSheetItem.svelte';
+   from '~/document/types/actor/types/character/sheet/items/CharacterSheetItem.svelte';
    import CharacterSheetItemSendToChatButton
-      from '~/document/types/actor/types/character/sheet/items/CharacterSheetItemSendToChatButton.svelte';
+   from '~/document/types/actor/types/character/sheet/items/CharacterSheetItemSendToChatButton.svelte';
    import CharacterSheetItemEditButton
-      from '~/document/types/actor/types/character/sheet/items/CharacterSheetItemEditButton.svelte';
+   from '~/document/types/actor/types/character/sheet/items/CharacterSheetItemEditButton.svelte';
    import CharacterSheetItemDeleteButton
-      from '~/document/types/actor/types/character/sheet/items/CharacterSheetItemDeleteButton.svelte';
+   from '~/document/types/actor/types/character/sheet/items/CharacterSheetItemDeleteButton.svelte';
    import CharacterSheetItemEquipButton
-      from '~/document/types/actor/types/character/sheet/items/CharacterSheetItemEquipButton.svelte';
+   from '~/document/types/actor/types/character/sheet/items/CharacterSheetItemEquipButton.svelte';
    import CharacterSheetItemChecks
-      from '~/document/types/actor/types/character/sheet/items/CharacterSheetItemChecks.svelte';
+   from '~/document/types/actor/types/character/sheet/items/CharacterSheetItemChecks.svelte';
    import CharacterSheetWeaponMultiAttackButton
-      from '~/document/types/actor/types/character/sheet/items/weapon/CharacterSheetWeaponMultiAttackButton.svelte';
+   from '~/document/types/actor/types/character/sheet/items/weapon/CharacterSheetWeaponMultiAttackButton.svelte';
    import CharacterSheetWeaponAttacks
-      from '~/document/types/actor/types/character/sheet/items/weapon/CharacterSheetWeaponAttacks.svelte';
+   from '~/document/types/actor/types/character/sheet/items/weapon/CharacterSheetWeaponAttacks.svelte';
    import CondensedAttackCheckButton from '~/document/svelte-components/check/CondensedAttackCheckButton.svelte';
 
    /**

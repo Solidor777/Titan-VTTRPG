@@ -21,8 +21,16 @@ describe('SelectList', () => {
       render(SelectList, {
          props: {
             options: [
-               { value: 'body', label: 'body', icon: 'fas fa-hand-fist' },
-               { value: 'mind', label: 'mind', icon: 'fas fa-brain' },
+               {
+                  value: 'body',
+                  label: 'body',
+                  icon: 'fas fa-hand-fist' 
+               },
+               {
+                  value: 'mind',
+                  label: 'mind',
+                  icon: 'fas fa-brain' 
+               },
             ],
             value: 'body',
             hoverIndex: 0,
@@ -46,8 +54,14 @@ describe('SelectList', () => {
       render(SelectList, {
          props: {
             options: [
-               { value: 'body', label: 'body' },
-               { value: 'mind', label: 'mind' },
+               {
+                  value: 'body',
+                  label: 'body' 
+               },
+               {
+                  value: 'mind',
+                  label: 'mind' 
+               },
             ],
             value: 'body',
             hoverIndex: 0,

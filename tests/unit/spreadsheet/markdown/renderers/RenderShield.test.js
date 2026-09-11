@@ -91,8 +91,14 @@ describe('renderShield', () => {
          name: 'Aegis',
          system: makeSystem({
             defense: 2,
-            trait: [{ name: 'magical', value: true }],
-            customTrait: [{ name: 'Blessed', description: '' }],
+            trait: [{
+               name: 'magical',
+               value: true 
+            }],
+            customTrait: [{
+               name: 'Blessed',
+               description: '' 
+            }],
             check: [{
                label: 'Ward',
                attribute: 'soul',

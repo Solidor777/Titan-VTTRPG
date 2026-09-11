@@ -2,7 +2,7 @@
  * Builds a pure slug generator with per-instance collision tracking, matching the compendium's anchor
  * convention: a repeated slug gets `-1`, `-2`, … suffixes in generation order.
  * @returns {function(string): string} `slugFor(text)`, returning a unique slug for this generator's
- *    lifetime.
+ * lifetime.
  */
 export function createSlugger() {
    /** @type {Map<string, number>} Count of prior uses per base slug, for collision suffixes. */

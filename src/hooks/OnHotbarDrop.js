@@ -55,10 +55,10 @@ export default function onHotbarDrop(hotbar, data, slot) {
       case 'weapon': {
          if (macroItem.system.attack.length > 0) {
             const dialog = new CreateItemMacroDialog(
-         macroItem,
-         slot,
-         data.uuid,
-      );
+               macroItem,
+               slot,
+               data.uuid,
+            );
             dialog.render(true);
 
             return false;
@@ -69,10 +69,10 @@ export default function onHotbarDrop(hotbar, data, slot) {
 
       case 'spell': {
          const dialog = new CreateItemMacroDialog(
-         macroItem,
-         slot,
-         data.uuid,
-      );
+            macroItem,
+            slot,
+            data.uuid,
+         );
          dialog.render(true);
 
          return false;

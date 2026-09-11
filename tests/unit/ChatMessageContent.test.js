@@ -13,13 +13,23 @@ describe('ChatMessageContent', () => {
    });
 
    it('renders the subtype component declared by system.component', () => {
-      const documentStore = { data: { blind: false, system: { component: StubChatMessage } } };
+      const documentStore = {
+         data: {
+            blind: false,
+            system: { component: StubChatMessage } 
+         } 
+      };
       render(ChatMessageContent, { props: { documentStore } });
       expect(screen.getByTestId('stub-chat-component')).toBeTruthy();
    });
 
    it('renders nothing when no component is available', () => {
-      const documentStore = { data: { blind: false, system: { component: undefined } } };
+      const documentStore = {
+         data: {
+            blind: false,
+            system: { component: undefined } 
+         } 
+      };
       const { container } = render(ChatMessageContent, { props: { documentStore } });
       expect(container.querySelector('[data-testid="stub-chat-component"]')).toBeNull();
    });

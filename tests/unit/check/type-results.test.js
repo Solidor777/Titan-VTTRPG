@@ -15,7 +15,11 @@ describe('attribute & resistance results — damageTaken', () => {
          extraFailureOnCritical: false,
          damageToReduce: 5,
       };
-      const r = calculateAttributeCheckResults(diceResults([5, 4, 2]), params);
+      const r = calculateAttributeCheckResults(diceResults([
+         5,
+         4,
+         2
+      ]), params);
       expect(r.succeeded).toBe(false);
       expect(r.successes).toBe(2);
       expect(r.damageTaken).toBe(3);
@@ -29,7 +33,11 @@ describe('attribute & resistance results — damageTaken', () => {
          extraFailureOnCritical: false,
          damageToReduce: 5,
       };
-      const r = calculateResistanceCheckResults(diceResults([5, 4, 2]), params);
+      const r = calculateResistanceCheckResults(diceResults([
+         5,
+         4,
+         2
+      ]), params);
       expect(r.succeeded).toBe(true);
       expect(r.damageTaken).toBe(0);
    });
@@ -46,7 +54,10 @@ describe('attack results — damage', () => {
          damageMod: 1,
          plusExtraSuccessDamage: false,
       };
-      const r = calculateAttackCheckResults(diceResults([5, 4]), params);
+      const r = calculateAttackCheckResults(diceResults([
+         5,
+         4
+      ]), params);
       expect(r.damage).toBe(4);
    });
 
@@ -60,7 +71,11 @@ describe('attack results — damage', () => {
          damageMod: 1,
          plusExtraSuccessDamage: true,
       };
-      const r = calculateAttackCheckResults(diceResults([5, 4, 5]), params);
+      const r = calculateAttackCheckResults(diceResults([
+         5,
+         4,
+         5
+      ]), params);
       expect(r.extraSuccesses).toBe(2);
       expect(r.damage).toBe(6);
    });
@@ -75,7 +90,10 @@ describe('attack results — damage', () => {
          damageMod: 1,
          plusExtraSuccessDamage: false,
       };
-      const r = calculateAttackCheckResults(diceResults([5, 4]), params);
+      const r = calculateAttackCheckResults(diceResults([
+         5,
+         4
+      ]), params);
       expect(r.damage).toBe(0);
    });
 });
@@ -91,9 +109,17 @@ describe('item results — damage scaling and opposed complexity', () => {
          damageMod: 1,
          healing: 0,
          scaling: true,
-         opposedCheck: { attribute: '', enabled: false, skill: '' },
+         opposedCheck: {
+            attribute: '',
+            enabled: false,
+            skill: '' 
+         },
       };
-      const r = calculateItemCheckResults(diceResults([5, 4, 5]), params);
+      const r = calculateItemCheckResults(diceResults([
+         5,
+         4,
+         5
+      ]), params);
       expect(r.extraSuccesses).toBe(2);
       expect(r.damage).toBe(5);
    });
@@ -108,9 +134,17 @@ describe('item results — damage scaling and opposed complexity', () => {
          damageMod: 0,
          healing: 0,
          scaling: false,
-         opposedCheck: { attribute: '', enabled: true, skill: '' },
+         opposedCheck: {
+            attribute: '',
+            enabled: true,
+            skill: '' 
+         },
       };
-      const r = calculateItemCheckResults(diceResults([5, 4, 5]), params);
+      const r = calculateItemCheckResults(diceResults([
+         5,
+         4,
+         5
+      ]), params);
       expect(r.opposedCheckComplexity).toBe(3);
    });
 });
@@ -128,7 +162,10 @@ describe('casting results — damage, healing, scaling aspect', () => {
          healingMod: 0,
          scalingAspect: [],
       };
-      const r = calculateCastingCheckResults(diceResults([5, 4]), params);
+      const r = calculateCastingCheckResults(diceResults([
+         5,
+         4
+      ]), params);
       expect(r.damage).toBe(4);
       expect(r.healing).toBe(0);
       expect(r.scalingAspect).toEqual([]);
@@ -154,7 +191,12 @@ describe('casting results — damage, healing, scaling aspect', () => {
             },
          ],
       };
-      const r = calculateCastingCheckResults(diceResults([5, 4, 5, 4]), params);
+      const r = calculateCastingCheckResults(diceResults([
+         5,
+         4,
+         5,
+         4
+      ]), params);
       expect(r.extraSuccesses).toBe(3);
       expect(r.damage).toBe(5);
       expect(r.scalingAspect[0].currentValue).toBe(4);
@@ -183,7 +225,12 @@ describe('casting results — damage, healing, scaling aspect', () => {
       };
       // Each purchase moves the aspect by its increment (max(initialValue, 1) = 2), so 3 purchases
       // grow value AND damage by 6 — matching the chat card's per-step decrease/increase math.
-      const r = calculateCastingCheckResults(diceResults([5, 4, 5, 4]), params);
+      const r = calculateCastingCheckResults(diceResults([
+         5,
+         4,
+         5,
+         4
+      ]), params);
       expect(r.extraSuccesses).toBe(3);
       expect(r.scalingAspect[0].currentValue).toBe(8);
       expect(r.damage).toBe(9);
@@ -202,7 +249,10 @@ describe('casting results — damage, healing, scaling aspect', () => {
          healingMod: 1,
          scalingAspect: [],
       };
-      const r = calculateCastingCheckResults(diceResults([5, 4]), params);
+      const r = calculateCastingCheckResults(diceResults([
+         5,
+         4
+      ]), params);
       expect(r.succeeded).toBe(false);
       expect(r.damage).toBe(0);
       expect(r.healing).toBe(0);

@@ -19,34 +19,94 @@
 
    /** @type {Array<{key: string, labelKey: string}>} The action-menu categories, in display order. */
    const categories = [
-      { key: 'skills', labelKey: 'skills' },
-      { key: 'resistances', labelKey: 'resistances' },
-      { key: 'weapons', labelKey: 'weapons' },
-      { key: 'inventory', labelKey: 'inventory' },
-      { key: 'abilities', labelKey: 'abilities' },
-      { key: 'spells', labelKey: 'spells' },
-      { key: 'effects', labelKey: 'effects' },
-      { key: 'utility', labelKey: 'utility' },
+      {
+         key: 'skills',
+         labelKey: 'skills' 
+      },
+      {
+         key: 'resistances',
+         labelKey: 'resistances' 
+      },
+      {
+         key: 'weapons',
+         labelKey: 'weapons' 
+      },
+      {
+         key: 'inventory',
+         labelKey: 'inventory' 
+      },
+      {
+         key: 'abilities',
+         labelKey: 'abilities' 
+      },
+      {
+         key: 'spells',
+         labelKey: 'spells' 
+      },
+      {
+         key: 'effects',
+         labelKey: 'effects' 
+      },
+      {
+         key: 'utility',
+         labelKey: 'utility' 
+      },
    ];
 
    /** @type {Array<{key: string, labelKey: string}>} The per-type sub-button gates. */
    const subButtons = [
-      { key: 'attacks', labelKey: 'attacks' },
-      { key: 'checks', labelKey: 'checks' },
-      { key: 'equipped', labelKey: 'equipped' },
-      { key: 'quantity', labelKey: 'quantity' },
-      { key: 'duration', labelKey: 'duration' },
-      { key: 'remove', labelKey: 'deleteEffect' },
-      { key: 'sendToChat', labelKey: 'sendToChat' },
-      { key: 'openSheet', labelKey: 'openSheet' },
+      {
+         key: 'attacks',
+         labelKey: 'attacks' 
+      },
+      {
+         key: 'checks',
+         labelKey: 'checks' 
+      },
+      {
+         key: 'equipped',
+         labelKey: 'equipped' 
+      },
+      {
+         key: 'quantity',
+         labelKey: 'quantity' 
+      },
+      {
+         key: 'duration',
+         labelKey: 'duration' 
+      },
+      {
+         key: 'remove',
+         labelKey: 'deleteEffect' 
+      },
+      {
+         key: 'sendToChat',
+         labelKey: 'sendToChat' 
+      },
+      {
+         key: 'openSheet',
+         labelKey: 'openSheet' 
+      },
    ];
 
    /** @type {Array<{key: string, labelKey: string}>} The content filters. */
    const filters = [
-      { key: 'weaponsWithActions', labelKey: 'filterWeaponsWithActions' },
-      { key: 'inventoryWithChecks', labelKey: 'filterInventoryWithChecks' },
-      { key: 'abilitiesWithChecks', labelKey: 'filterAbilitiesWithChecks' },
-      { key: 'effectsWithChecks', labelKey: 'filterEffectsWithChecks' },
+      {
+         key: 'weaponsWithActions',
+         labelKey: 'filterWeaponsWithActions' 
+      },
+      {
+         key: 'inventoryWithChecks',
+         labelKey: 'filterInventoryWithChecks' 
+      },
+      {
+         key: 'abilitiesWithChecks',
+         labelKey: 'filterAbilitiesWithChecks' 
+      },
+      {
+         key: 'effectsWithChecks',
+         labelKey: 'filterEffectsWithChecks' 
+      },
    ];
 
    /**

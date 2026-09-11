@@ -31,14 +31,14 @@
       die.final >= 6 ? 'critical-success' :
          die.final >= document.data.system.parameters.difficulty ? 'success' :
             die.final <= 1 ? 'critical-failure' :
-               'failure',
+            'failure',
    );
 
    /** @type {boolean} Whether applying Expertise to the die should be disabled. */
    const disabled = $derived(
       !document.data.isOwner ||
-      document.data.system.results.expertiseRemaining === 0 ||
-      die.final >= 6,
+         document.data.system.results.expertiseRemaining === 0 ||
+         die.final >= 6,
    );
 
    /** @type {string} Tooltip to show for the die. */

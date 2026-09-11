@@ -21,14 +21,14 @@ import moveArrayEntry from '~/helpers/utility-functions/MoveArrayEntry.js';
 export default function createWeaponSheetState(item) {
    /** @type {import('svelte/store').Writable<WeaponSheetData>} */
    const {
-            set,
-            update,
-            subscribe,
-            postAddCheck,
-            preDeleteCheck,
-            postMoveCheck,
-            postInsertCheck,
-         } = createRulesElementItemSheetState(item, createWeaponSheetData(item));
+      set,
+      update,
+      subscribe,
+      postAddCheck,
+      preDeleteCheck,
+      postMoveCheck,
+      postInsertCheck,
+   } = createRulesElementItemSheetState(item, createWeaponSheetData(item));
 
    /**
     * Updates the reactive state store in response to an Attack being added.

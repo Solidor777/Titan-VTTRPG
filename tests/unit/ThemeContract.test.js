@@ -15,11 +15,19 @@ import MACCHIATO from '~/theme/themes/Macchiato.js';
 const HEX_COLOR = /^#[0-9a-f]{6}$/;
 
 /** @type {object[]} Every built-in theme under test; every shipped built-in must be listed here. */
-const BUILT_IN_THEMES = [HERITAGE_DARK, MACCHIATO, HERITAGE_LIGHT, CLEAN_NEUTRAL_LIGHT];
+const BUILT_IN_THEMES = [
+   HERITAGE_DARK,
+   MACCHIATO,
+   HERITAGE_LIGHT,
+   CLEAN_NEUTRAL_LIGHT
+];
 
 describe('ThemeTokenContract', () => {
    it('contract token list is the union of color and font tokens with no duplicates', () => {
-      expect(THEME_TOKENS).toEqual([...THEME_COLOR_TOKENS, ...THEME_FONT_TOKENS]);
+      expect(THEME_TOKENS).toEqual([
+         ...THEME_COLOR_TOKENS,
+         ...THEME_FONT_TOKENS
+      ]);
       expect(new Set(THEME_TOKENS).size).toBe(THEME_TOKENS.length);
    });
 
@@ -30,9 +38,19 @@ describe('ThemeTokenContract', () => {
 
    it('built-in ids and modes are correct', () => {
       expect(BUILT_IN_THEMES.map((t) => t.id)).toEqual(
-         ['heritage-dark', 'macchiato', 'heritage-light', 'clean-neutral-light'],
+         [
+            'heritage-dark',
+            'macchiato',
+            'heritage-light',
+            'clean-neutral-light'
+         ],
       );
-      expect(BUILT_IN_THEMES.map((t) => t.dark)).toEqual([true, true, false, false]);
+      expect(BUILT_IN_THEMES.map((t) => t.dark)).toEqual([
+         true,
+         true,
+         false,
+         false
+      ]);
    });
 
    it('every pair references contract tokens', () => {

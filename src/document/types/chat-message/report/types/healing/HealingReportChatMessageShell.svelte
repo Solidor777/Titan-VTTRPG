@@ -2,7 +2,7 @@
    import ChatMessageStamina from '~/document/types/chat-message/components/resources/ChatMessageStamina.svelte';
    import ChatMessageWounds from '~/document/types/chat-message/components/resources/ChatMessageWounds.svelte';
    import HealingReportChatMessageHeader
-      from '~/document/types/chat-message/report/types/healing/HealingReportChatMessageHeader.svelte';
+   from '~/document/types/chat-message/report/types/healing/HealingReportChatMessageHeader.svelte';
    import ReportChatMessageBase from '~/document/types/chat-message/report/components/ReportChatMessageBase.svelte';
    import { getContext } from 'svelte';
 

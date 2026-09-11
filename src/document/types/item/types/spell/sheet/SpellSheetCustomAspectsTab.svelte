@@ -6,7 +6,7 @@
    import TopFilter from '~/helpers/svelte-components/input/TopFilter.svelte';
    import DocumentOwnerButton from '~/document/svelte-components/DocumentOwnerButton.svelte';
    import SpellSheetCustomAspectSettings
-      from '~/document/types/item/types/spell/sheet/SpellSheetCustomAspectSettings.svelte';
+   from '~/document/types/item/types/spell/sheet/SpellSheetCustomAspectSettings.svelte';
    import { CREATE_ICON } from '~/system/Icons.js';
    import InsertionLine from '~/helpers/svelte-components/drag-reorder/InsertionLine.svelte';
    import { draggableRow, reorderDropZone } from '~/helpers/svelte-components/drag-reorder/DragReorderActions.js';

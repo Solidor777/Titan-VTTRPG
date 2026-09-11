@@ -4,10 +4,22 @@ import { encodeCsv, decodeCsv } from '~/spreadsheet/format/Csv.js';
 describe('Csv', () => {
    const sheet = {
       name: 'weapon',
-      columns: ['_id', 'name', 'description'],
+      columns: [
+         '_id',
+         'name',
+         'description'
+      ],
       rows: [
-         { _id: 'a'.repeat(16), name: 'Sword', description: 'A "sharp", multi\nline blade.' },
-         { _id: 'b'.repeat(16), name: 'Bow', description: '' },
+         {
+            _id: 'a'.repeat(16),
+            name: 'Sword',
+            description: 'A "sharp", multi\nline blade.' 
+         },
+         {
+            _id: 'b'.repeat(16),
+            name: 'Bow',
+            description: '' 
+         },
       ],
    };
 
@@ -24,14 +36,25 @@ describe('Csv', () => {
          name: 'weapon',
          columns: sheet.columns,
          rows: [
-            { _id: 'a'.repeat(16), name: 'Sword', description: 'A "sharp", multi\nline blade.' },
-            { _id: 'b'.repeat(16), name: 'Bow', description: '' },
+            {
+               _id: 'a'.repeat(16),
+               name: 'Sword',
+               description: 'A "sharp", multi\nline blade.' 
+            },
+            {
+               _id: 'b'.repeat(16),
+               name: 'Bow',
+               description: '' 
+            },
          ],
       });
    });
 
    it('strips a leading byte-order mark on decode', () => {
       const decoded = decodeCsv('﻿a,b\r\n1,2\r\n', 'x');
-      expect(decoded.rows).toEqual([{ a: '1', b: '2' }]);
+      expect(decoded.rows).toEqual([{
+         a: '1',
+         b: '2' 
+      }]);
    });
 });

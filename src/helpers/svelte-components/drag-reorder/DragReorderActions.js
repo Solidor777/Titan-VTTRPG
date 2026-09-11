@@ -22,7 +22,7 @@ let activeDragNode = null;
 
 /**
  * Makes a list row draggable, but only when the press begins on the row's `[data-drag-handle]`.
- * @param {HTMLElement} node - The row element (e.g. an `<li>`).
+ * @param {HTMLElement} node - The row element (e.g. An `<li>`).
  * @param {object} params - Action parameters.
  * @param {string} params.kind - The element kind for this row.
  * @param {string} params.sourceKey - Identity of this row's list (document uuid + ':' + kind).
@@ -116,7 +116,7 @@ export function draggableRow(node, params) {
 /**
  * Turns a list container into a reorder/copy drop zone. Computes the insertion index from the
  * pointer position over its row children and reports it for the insertion-line render.
- * @param {HTMLElement} node - The list container (e.g. an `<ol>`).
+ * @param {HTMLElement} node - The list container (e.g. An `<ol>`).
  * @param {object} params - Action parameters.
  * @param {string} params.kind - The kind this zone accepts.
  * @param {string} params.sourceKey - Identity of this zone's own list (document uuid + ':' + kind).

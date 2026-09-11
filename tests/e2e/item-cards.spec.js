@@ -65,7 +65,11 @@ test.describe('item chat-message subtype cards', () => {
             const before = game.messages.size;
 
             // Create the temp item with a non-empty description so the chat snapshot includes it.
-            const item = await Item.create({ name: itemName, type, system: { description: itemDescription } });
+            const item = await Item.create({
+               name: itemName,
+               type,
+               system: { description: itemDescription } 
+            });
 
             // Ensure the description took (fall back to an explicit update if creation did not set it).
             if (item.system.description !== itemDescription) {
@@ -87,7 +91,11 @@ test.describe('item chat-message subtype cards', () => {
                messageId: message?.id,
                messageType: message?.type,
             };
-         }, { type, itemName, itemDescription });
+         }, {
+            type,
+            itemName,
+            itemDescription 
+         });
 
          // A new message must have been created with the expected subtype.
          expect(result.after, 'message count should increase after sendToChat').toBeGreaterThan(result.before);
@@ -150,7 +158,11 @@ test.describe('spell card tradition tag', () => {
       const result = await page.evaluate(async (name) => {
          const before = game.messages.size;
          const spell = game.items.getName(name)
-            ?? await Item.create({ name, type: 'spell', system: { tradition: '' } });
+            ?? await Item.create({
+               name,
+               type: 'spell',
+               system: { tradition: '' } 
+            });
          if (spell.system.tradition !== '') {
             await spell.update({ system: { tradition: '' } });
          }

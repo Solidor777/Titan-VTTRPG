@@ -7,7 +7,7 @@
  * under `resource` so the card can read the same `system.resource.*` path as the actor's own persisted
  * resources.
  * @returns {object} The turn-end-revert report shape: the fast-healing and persistent-damage revert
- *    offers, and the nested stamina and wounds resource snapshots.
+ * offers, and the nested stamina and wounds resource snapshots.
  */
 export default function createTurnEndRevertReportShape() {
    return {

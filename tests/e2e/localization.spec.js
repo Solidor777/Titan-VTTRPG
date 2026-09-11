@@ -5,7 +5,15 @@ import { closeAllApps, clearChat, attachPageErrors } from './world.js';
 import { buildE2ERollerItemData } from '../shared/builders.js';
 
 // The seven TITAN Item subtypes, all rendered through the shared item sheet.
-const ITEM_TYPES = ['ability', 'armor', 'commodity', 'equipment', 'shield', 'spell', 'weapon'];
+const ITEM_TYPES = [
+   'ability',
+   'armor',
+   'commodity',
+   'equipment',
+   'shield',
+   'spell',
+   'weapon'
+];
 
 /** @type {import('@playwright/test').Page} The file-shared, logged-in page (one world boot per file). */
 let page;
@@ -60,11 +68,17 @@ test.describe('no double-localized (LOCAL.) text in rendered UI', () => {
          let effect = actor.effects.find((e) => e.name === 'E2E Effect');
          if (!effect) {
             const [created] = await actor.createEmbeddedDocuments('ActiveEffect', [
-               { name: 'E2E Effect', type: 'effect' },
+               {
+                  name: 'E2E Effect',
+                  type: 'effect' 
+               },
             ]);
             effect = created;
          }
-         return { actorId: actor.id, effectId: effect.id };
+         return {
+            actorId: actor.id,
+            effectId: effect.id 
+         };
       });
       const locateSrc = `() => game.actors.get('${ids.actorId}')?.effects.get('${ids.effectId}')`;
       await renderSheet(page, locateSrc, '.titan-effect-sheet', errors);
@@ -76,11 +90,17 @@ test.describe('no double-localized (LOCAL.) text in rendered UI', () => {
       // Seed a spell with enabled range + duration aspects (string and numeric values) on a player.
       await page.evaluate(async () => {
          const actor = game.actors.find((a) => a.type === 'player' && a.name === 'E2E Player')
-            ?? await Actor.create({ name: 'E2E Player', type: 'player' });
+            ?? await Actor.create({
+               name: 'E2E Player',
+               type: 'player' 
+            });
          let spell = actor.items.find((i) => i.name === 'E2E Aspect Spell');
          if (!spell) {
             [spell] = await actor.createEmbeddedDocuments('Item', [
-               { name: 'E2E Aspect Spell', type: 'spell' },
+               {
+                  name: 'E2E Aspect Spell',
+                  type: 'spell' 
+               },
             ]);
          }
          await spell.update({
@@ -138,7 +158,10 @@ test.describe('no double-localized (LOCAL.) text in rendered UI', () => {
       await page.evaluate(async (items) => {
          // Always rebuild the roller so a stale fixture from an aborted run cannot mask a missing check.
          await game.actors.getName('E2E Dialog Roller')?.delete();
-         const actor = await Actor.create({ name: 'E2E Dialog Roller', type: 'player' });
+         const actor = await Actor.create({
+            name: 'E2E Dialog Roller',
+            type: 'player' 
+         });
          await actor.createEmbeddedDocuments('Item', items);
          await game.settings.set('titan', 'getCheckOptions', true);
       }, buildE2ERollerItemData());
@@ -147,9 +170,11 @@ test.describe('no double-localized (LOCAL.) text in rendered UI', () => {
       const requests = {
          attribute: 'actor.system.requestAttributeCheck({ attribute: "body", skill: "athletics" })',
          resistance: 'actor.system.requestResistanceCheck({ resistance: "resilience" })',
-         attack: 'actor.system.requestAttackCheck({ itemId: actor.items.find((i) => i.type === "weapon").id, attackIdx: 0 })',
+         attack: 'actor.system.requestAttackCheck({ itemId: actor.items.find((i) => i.type === "weapon").id, ' +
+            'attackIdx: 0 })',
          casting: 'actor.system.requestCastingCheck({ itemId: actor.items.find((i) => i.type === "spell").id })',
-         item: 'actor.system.requestItemCheck({ itemId: actor.items.find((i) => i.type === "ability").id, checkIdx: 0 })',
+         item: 'actor.system.requestItemCheck({ itemId: actor.items.find((i) => i.type === "ability").id, ' +
+            'checkIdx: 0 })',
       };
       const offendersByDialog = {};
       for (const [type, request] of Object.entries(requests)) {
@@ -177,12 +202,17 @@ test.describe('no double-localized (LOCAL.) text in rendered UI', () => {
          let pack = game.packs.get('world.e2e-tray-effects');
          if (!pack) {
             pack = await CompendiumCollection.createCompendium({
-               type: 'ActiveEffect', label: 'E2E Tray Effects', name: 'e2e-tray-effects',
+               type: 'ActiveEffect',
+               label: 'E2E Tray Effects',
+               name: 'e2e-tray-effects',
             });
          }
          const existing = (await pack.getDocuments()).find((e) => e.name === 'E2E Tray Effect');
          if (!existing) {
-            await ActiveEffect.create({ name: 'E2E Tray Effect', type: 'effect' }, { pack: pack.collection });
+            await ActiveEffect.create({
+               name: 'E2E Tray Effect',
+               type: 'effect' 
+            }, { pack: pack.collection });
          }
          await ui.titanEffects.render(true);
          ui.titanEffects.activate();

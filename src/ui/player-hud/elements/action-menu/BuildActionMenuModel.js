@@ -11,16 +11,39 @@ import {
 
 /** @type {Array<string>} The 18 skill keys, matching the character schema. */
 export const HUD_SKILLS = [
-   'arcana', 'athletics', 'deception', 'dexterity', 'diplomacy', 'engineering',
-   'intimidation', 'investigation', 'lore', 'medicine', 'meleeWeapons', 'metaphysics',
-   'nature', 'perception', 'performance', 'rangedWeapons', 'stealth', 'subterfuge',
+   'arcana',
+   'athletics',
+   'deception',
+   'dexterity',
+   'diplomacy',
+   'engineering',
+   'intimidation',
+   'investigation',
+   'lore',
+   'medicine',
+   'meleeWeapons',
+   'metaphysics',
+   'nature',
+   'perception',
+   'performance',
+   'rangedWeapons',
+   'stealth',
+   'subterfuge',
 ];
 
 /** @type {Array<string>} The resistance keys. */
-export const HUD_RESISTANCES = ['reflexes', 'resilience', 'willpower'];
+export const HUD_RESISTANCES = [
+   'reflexes',
+   'resilience',
+   'willpower'
+];
 
 /** @type {Array<string>} Item types equipped via the character's toggleEquipped path. */
-const EQUIPPABLE_TYPES = ['armor', 'shield', 'equipment'];
+const EQUIPPABLE_TYPES = [
+   'armor',
+   'shield',
+   'equipment'
+];
 
 /** @type {string} Icon classes for the equip/unequip sub-button. */
 const EQUIP_TOGGLE_ICON = 'fas fa-shield-halved';
@@ -87,7 +110,10 @@ function buildItemCheckSubButtons(actor, item, options) {
          key: `check-${checkIdx}`,
          label: check.label,
          icon: DICE_ICON,
-         action: () => actor.system.requestItemCheck({ itemId: item.id, checkIdx }),
+         action: () => actor.system.requestItemCheck({
+            itemId: item.id,
+            checkIdx 
+         }),
       };
    });
 }
@@ -139,13 +165,19 @@ function buildWeapons(primary, options) {
           */
          const mainAction = () => {
             if (equipped && attackCount > 0) {
-               primary.system.requestAttackCheck({ itemId: item.id, attackIdx: 0 });
+               primary.system.requestAttackCheck({
+                  itemId: item.id,
+                  attackIdx: 0 
+               });
             }
             else if (!equipped) {
                primary.system.toggleEquipped(item.id);
             }
             else if ((item.system.check?.length ?? 0) > 0) {
-               primary.system.requestItemCheck({ itemId: item.id, checkIdx: 0 });
+               primary.system.requestItemCheck({
+                  itemId: item.id,
+                  checkIdx: 0 
+               });
             }
             else {
                item.sheet.render(true);
@@ -159,7 +191,10 @@ function buildWeapons(primary, options) {
                   key: `attack-${attackIdx}`,
                   label: attack.label,
                   icon: attack.type === 'ranged' ? ACCURACY_ICON : MELEE_ICON,
-                  action: () => primary.system.requestAttackCheck({ itemId: item.id, attackIdx }),
+                  action: () => primary.system.requestAttackCheck({
+                     itemId: item.id,
+                     attackIdx 
+                  }),
                };
             })
             : [];
@@ -187,7 +222,11 @@ function buildWeapons(primary, options) {
  */
 function buildInventory(primary, options) {
    return primary.items
-      .filter((item) => !['weapon', 'spell', 'ability'].includes(item.type))
+      .filter((item) => ![
+         'weapon',
+         'spell',
+         'ability'
+      ].includes(item.type))
       .filter((item) => !options.filters.inventoryWithChecks || (item.system.check?.length ?? 0) > 0)
       .map((item) => {
          /** @type {boolean} Whether the item type participates in equipping. */
@@ -203,7 +242,10 @@ function buildInventory(primary, options) {
                primary.system.toggleEquipped(item.id);
             }
             else if ((item.system.check?.length ?? 0) > 0) {
-               primary.system.requestItemCheck({ itemId: item.id, checkIdx: 0 });
+               primary.system.requestItemCheck({
+                  itemId: item.id,
+                  checkIdx: 0 
+               });
             }
             else {
                item.sheet.render(true);
@@ -270,7 +312,10 @@ function buildCheckItemCategory(primary, options, type) {
                primary.system.requestCastingCheck({ itemId: item.id });
             }
             else if ((item.system.check?.length ?? 0) > 0) {
-               primary.system.requestItemCheck({ itemId: item.id, checkIdx: 0 });
+               primary.system.requestItemCheck({
+                  itemId: item.id,
+                  checkIdx: 0 
+               });
             }
             else {
                item.sheet.render(true);
@@ -312,7 +357,10 @@ function buildEffects(primary, options) {
           */
          const mainAction = () => {
             if (checkCount > 0) {
-               primary.system.requestItemCheck({ itemRollData: effect.getRollData(), checkIdx: 0 });
+               primary.system.requestItemCheck({
+                  itemRollData: effect.getRollData(),
+                  checkIdx: 0 
+               });
             }
             else {
                effect.sheet.render(true);
@@ -403,7 +451,11 @@ function buildUtility(actors) {
       });
    }
 
-   for (const key of ['shortRest', 'longRest', 'removeCombatEffects']) {
+   for (const key of [
+      'shortRest',
+      'longRest',
+      'removeCombatEffects'
+   ]) {
       subOptions.push({
          key,
          labelKey: key,
@@ -417,7 +469,12 @@ function buildUtility(actors) {
    }
 
    // The four apply actions prompt for an amount; the menu component owns the dialog wiring.
-   for (const key of ['applyDamage', 'applyHealing', 'applyRend', 'applyRepairs']) {
+   for (const key of [
+      'applyDamage',
+      'applyHealing',
+      'applyRend',
+      'applyRepairs'
+   ]) {
       subOptions.push({
          key,
          labelKey: key,
@@ -452,7 +509,10 @@ export default function buildActionMenuModel({ actors, primary, options }) {
                labelKey: skill,
                mainAction: () => {
                   for (const actor of actors) {
-                     actor.system.requestAttributeCheck({ attribute: 'default', skill });
+                     actor.system.requestAttributeCheck({
+                        attribute: 'default',
+                        skill 
+                     });
                   }
                },
                subButtons: [],
@@ -478,11 +538,31 @@ export default function buildActionMenuModel({ actors, primary, options }) {
       ...(group || !primary
          ? []
          : [
-            { key: 'weapons', labelKey: 'weapons', subOptions: buildWeapons(primary, options) },
-            { key: 'inventory', labelKey: 'inventory', subOptions: buildInventory(primary, options) },
-            { key: 'abilities', labelKey: 'abilities', subOptions: buildCheckItemCategory(primary, options, 'ability') },
-            { key: 'spells', labelKey: 'spells', subOptions: buildCheckItemCategory(primary, options, 'spell') },
-            { key: 'effects', labelKey: 'effects', subOptions: buildEffects(primary, options) },
+            {
+               key: 'weapons',
+               labelKey: 'weapons',
+               subOptions: buildWeapons(primary, options) 
+            },
+            {
+               key: 'inventory',
+               labelKey: 'inventory',
+               subOptions: buildInventory(primary, options) 
+            },
+            {
+               key: 'abilities',
+               labelKey: 'abilities',
+               subOptions: buildCheckItemCategory(primary, options, 'ability') 
+            },
+            {
+               key: 'spells',
+               labelKey: 'spells',
+               subOptions: buildCheckItemCategory(primary, options, 'spell') 
+            },
+            {
+               key: 'effects',
+               labelKey: 'effects',
+               subOptions: buildEffects(primary, options) 
+            },
          ]),
       {
          key: 'utility',

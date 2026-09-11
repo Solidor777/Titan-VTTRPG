@@ -95,7 +95,11 @@ function makeFakeActor({ items = [], effects = [] } = {}) {
       effects,
       calls,
       createEmbeddedDocuments: async (embeddedName, data) => {
-         calls.push(['create', embeddedName, data]);
+         calls.push([
+            'create',
+            embeddedName,
+            data
+         ]);
 
          // Resolve to pseudo-docs, mirroring the real API's array of actually-created documents.
          return data.map((entry, index) => ({
@@ -105,7 +109,11 @@ function makeFakeActor({ items = [], effects = [] } = {}) {
          }));
       },
       deleteEmbeddedDocuments: async (embeddedName, ids) => {
-         calls.push(['delete', embeddedName, ids]);
+         calls.push([
+            'delete',
+            embeddedName,
+            ids
+         ]);
       },
    };
 }
@@ -263,8 +271,16 @@ describe('convertActor (raw _source discovery)', () => {
       await convertActor(actor);
 
       expect(actor.calls).toEqual([
-         ['create', 'ActiveEffect', [buildEffectData(legacy)]],
-         ['delete', 'Item', ['legacyitem000001']],
+         [
+            'create',
+            'ActiveEffect',
+            [buildEffectData(legacy)]
+         ],
+         [
+            'delete',
+            'Item',
+            ['legacyitem000001']
+         ],
       ]);
    });
 
@@ -312,9 +328,21 @@ describe('convertActor (raw _source discovery)', () => {
       await convertActor(actor);
 
       expect(actor.calls).toEqual([
-         ['create', 'ActiveEffect', [buildEffectData(makeLegacyItemSource())]],
-         ['delete', 'Item', ['legacyitem000001']],
-         ['delete', 'ActiveEffect', ['mirrorfx00000001']],
+         [
+            'create',
+            'ActiveEffect',
+            [buildEffectData(makeLegacyItemSource())]
+         ],
+         [
+            'delete',
+            'Item',
+            ['legacyitem000001']
+         ],
+         [
+            'delete',
+            'ActiveEffect',
+            ['mirrorfx00000001']
+         ],
       ]);
    });
 
@@ -337,7 +365,11 @@ describe('convertActor (raw _source discovery)', () => {
       await convertActor(actor);
 
       expect(actor.calls).toEqual([
-         ['delete', 'ActiveEffect', ['mirrorfx00000001']],
+         [
+            'delete',
+            'ActiveEffect',
+            ['mirrorfx00000001']
+         ],
       ]);
    });
 
@@ -362,7 +394,11 @@ describe('convertActor (raw _source discovery)', () => {
       await convertActor(actor);
 
       expect(actor.calls).toEqual([
-         ['delete', 'Item', ['legacyitem000001']],
+         [
+            'delete',
+            'Item',
+            ['legacyitem000001']
+         ],
       ]);
    });
 
@@ -395,8 +431,19 @@ describe('convertActor (raw _source discovery)', () => {
       await convertActor(actor);
 
       expect(actor.calls).toEqual([
-         ['create', 'ActiveEffect', [buildEffectData(fresh)]],
-         ['delete', 'Item', ['legacyitem000001', 'legacyitem000002']],
+         [
+            'create',
+            'ActiveEffect',
+            [buildEffectData(fresh)]
+         ],
+         [
+            'delete',
+            'Item',
+            [
+               'legacyitem000001',
+               'legacyitem000002'
+            ]
+         ],
       ]);
    });
 
@@ -408,14 +455,22 @@ describe('convertActor (raw _source discovery)', () => {
 
       // Override the create stub with one that records but returns no documents, simulating a wholesale veto.
       actor.createEmbeddedDocuments = async (embeddedName, data) => {
-         actor.calls.push(['create', embeddedName, data]);
+         actor.calls.push([
+            'create',
+            embeddedName,
+            data
+         ]);
          return [];
       };
 
       await convertActor(actor);
 
       expect(actor.calls).toEqual([
-         ['create', 'ActiveEffect', [buildEffectData(makeLegacyItemSource())]],
+         [
+            'create',
+            'ActiveEffect',
+            [buildEffectData(makeLegacyItemSource())]
+         ],
       ]);
    });
 
@@ -437,7 +492,11 @@ describe('convertActor (raw _source discovery)', () => {
       // Override the create stub with one that returns a pseudo-doc for ONLY the first payload entry, simulating a
       // third-party veto of the second creation while keeping the stamp flags intact for verification.
       actor.createEmbeddedDocuments = async (embeddedName, data) => {
-         actor.calls.push(['create', embeddedName, data]);
+         actor.calls.push([
+            'create',
+            embeddedName,
+            data
+         ]);
          return data.slice(0, 1).map((entry, index) => ({
             id: `createdfx${String(index).padStart(8, '0')}`,
             type: entry.type,
@@ -448,8 +507,19 @@ describe('convertActor (raw _source discovery)', () => {
       await convertActor(actor);
 
       expect(actor.calls).toEqual([
-         ['create', 'ActiveEffect', [buildEffectData(makeLegacyItemSource()), buildEffectData(fresh)]],
-         ['delete', 'Item', ['legacyitem000001']],
+         [
+            'create',
+            'ActiveEffect',
+            [
+               buildEffectData(makeLegacyItemSource()),
+               buildEffectData(fresh)
+            ]
+         ],
+         [
+            'delete',
+            'Item',
+            ['legacyitem000001']
+         ],
       ]);
    });
 });
@@ -485,15 +555,24 @@ function makeFakePack({
       locked,
       calls,
       getIndex: async ({ fields } = {}) => {
-         calls.push(['getIndex', fields]);
+         calls.push([
+            'getIndex',
+            fields
+         ]);
          return indexEntries;
       },
       configure: async ({ locked: nextLocked }) => {
-         calls.push(['configure', nextLocked]);
+         calls.push([
+            'configure',
+            nextLocked
+         ]);
          pack.locked = nextLocked;
       },
       getDocument: async (id) => {
-         calls.push(['getDocument', id]);
+         calls.push([
+            'getDocument',
+            id
+         ]);
 
          /** @type {object|Error} - The configured result for this id. */
          const result = documents[id];
@@ -539,7 +618,10 @@ describe('convertPack (index gate + lock handling)', () => {
       await convertPack(pack);
 
       expect(pack.calls).toEqual([
-         ['getIndex', ['items']],
+         [
+            'getIndex',
+            ['items']
+         ],
       ]);
    });
 
@@ -561,14 +643,34 @@ describe('convertPack (index gate + lock handling)', () => {
       await convertPack(pack);
 
       expect(pack.calls).toEqual([
-         ['getIndex', ['items']],
-         ['configure', false],
-         ['getDocument', 'packedactor00001'],
-         ['configure', true],
+         [
+            'getIndex',
+            ['items']
+         ],
+         [
+            'configure',
+            false
+         ],
+         [
+            'getDocument',
+            'packedactor00001'
+         ],
+         [
+            'configure',
+            true
+         ],
       ]);
       expect(actor.calls).toEqual([
-         ['create', 'ActiveEffect', [buildEffectData(makeLegacyItemSource())]],
-         ['delete', 'Item', ['legacyitem000001']],
+         [
+            'create',
+            'ActiveEffect',
+            [buildEffectData(makeLegacyItemSource())]
+         ],
+         [
+            'delete',
+            'Item',
+            ['legacyitem000001']
+         ],
       ]);
    });
 
@@ -611,7 +713,10 @@ describe('convertPack (index gate + lock handling)', () => {
       await convertPack(pack);
 
       expect(survivor.calls.length).toBe(2);
-      expect(pack.calls.at(-1)).toEqual(['configure', true]);
+      expect(pack.calls.at(-1)).toEqual([
+         'configure',
+         true
+      ]);
    });
 
    it('restores the lock in the finally path when the unlock itself fails wholesale', async () => {
@@ -629,7 +734,10 @@ describe('convertPack (index gate + lock handling)', () => {
       // Replace configure with a stub that fails the unlock (a wholesale failure outside per-actor isolation)
       // while still recording and honoring the finally path's re-lock.
       pack.configure = async ({ locked: nextLocked }) => {
-         pack.calls.push(['configure', nextLocked]);
+         pack.calls.push([
+            'configure',
+            nextLocked
+         ]);
          if (nextLocked === false) {
             throw new Error('unlock failed');
          }
@@ -639,8 +747,14 @@ describe('convertPack (index gate + lock handling)', () => {
       await expect(convertPack(pack)).rejects.toThrow('unlock failed');
 
       expect(pack.calls.filter(([method]) => method === 'configure')).toEqual([
-         ['configure', false],
-         ['configure', true],
+         [
+            'configure',
+            false
+         ],
+         [
+            'configure',
+            true
+         ],
       ]);
    });
 
@@ -658,7 +772,10 @@ describe('convertPack (index gate + lock handling)', () => {
 
       // Replace configure with a stub that succeeds on unlock but fails the finally path's re-lock.
       pack.configure = async ({ locked: nextLocked }) => {
-         pack.calls.push(['configure', nextLocked]);
+         pack.calls.push([
+            'configure',
+            nextLocked
+         ]);
          if (nextLocked === true) {
             throw new Error('re-lock failed');
          }
@@ -681,7 +798,10 @@ describe('convertPack (index gate + lock handling)', () => {
       // The missing document fails its entry with a clear per-entry error; convertPack still resolves.
       await convertPack(pack);
 
-      expect(pack.calls.at(-1)).toEqual(['configure', true]);
+      expect(pack.calls.at(-1)).toEqual([
+         'configure',
+         true
+      ]);
       expect(uiErrors.some((message) => message.includes('Failed to convert legacy effect Items for packed actor')))
          .toBe(true);
    });
@@ -700,7 +820,10 @@ describe('convertPack (index gate + lock handling)', () => {
 
       // Replace configure with a stub that records then throws on both the unlock and the finally path's re-lock.
       pack.configure = async ({ locked: nextLocked }) => {
-         pack.calls.push(['configure', nextLocked]);
+         pack.calls.push([
+            'configure',
+            nextLocked
+         ]);
          throw new Error(nextLocked === false ? 'unlock failed' : 're-lock failed');
       };
 
@@ -733,7 +856,10 @@ describe('default export (wiring: the pack scan is reachable from the boot path)
       await convertEffectItemsToActiveEffects();
 
       expect(pack.calls).toEqual([
-         ['getIndex', ['items']],
+         [
+            'getIndex',
+            ['items']
+         ],
       ]);
    });
 
@@ -787,7 +913,10 @@ describe('convertWorldActorPacks (pack filtering + isolation)', () => {
       await convertWorldActorPacks();
 
       expect(worldActorPack.calls).toEqual([
-         ['getIndex', ['items']],
+         [
+            'getIndex',
+            ['items']
+         ],
       ]);
       expect(moduleActorPack.calls).toEqual([]);
       expect(worldItemPack.calls).toEqual([]);
@@ -813,7 +942,10 @@ describe('convertWorldActorPacks (pack filtering + isolation)', () => {
       await convertWorldActorPacks();
 
       expect(healthyPack.calls).toEqual([
-         ['getIndex', ['items']],
+         [
+            'getIndex',
+            ['items']
+         ],
       ]);
    });
 });

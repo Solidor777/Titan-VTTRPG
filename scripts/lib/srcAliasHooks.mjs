@@ -15,7 +15,7 @@ const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..'
  * @param {object} context - The resolution context (conditions, parent URL, import attributes).
  * @param {Function} nextResolve - The next resolve hook in the chain.
  * @returns {Promise<object>} The resolution result (`{ url, shortCircuit }` for `~/` specifiers,
- *    otherwise whatever `nextResolve` returns).
+ * otherwise whatever `nextResolve` returns).
  */
 export async function resolve(specifier, context, nextResolve) {
    if (specifier.startsWith('~/')) {

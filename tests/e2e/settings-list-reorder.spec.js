@@ -46,7 +46,10 @@ test.describe('settings-list reorder', () => {
          if (stale) {
             await stale.delete();
          }
-         const item = await Item.create({ name, type: 'weapon' });
+         const item = await Item.create({
+            name,
+            type: 'weapon' 
+         });
          await item.update({ system: { rulesElement: [] } });
          await item.system.addRulesElement();
          await item.system.addRulesElement();
@@ -54,11 +57,18 @@ test.describe('settings-list reorder', () => {
          const before = item.system.rulesElement.map((e) => e.uuid);
          await item.system.moveRulesElement(0, 3);
          const after = item.system.rulesElement.map((e) => e.uuid);
-         return { before, after };
+         return {
+            before,
+            after 
+         };
       }, WEAPON_NAME);
 
       expect(order.before.length).toBe(3);
-      expect(order.after).toEqual([order.before[1], order.before[2], order.before[0]]);
+      expect(order.after).toEqual([
+         order.before[1],
+         order.before[2],
+         order.before[0]
+      ]);
    });
 
    test('moveAttack reorders the array (first to end)', async () => {
@@ -67,7 +77,10 @@ test.describe('settings-list reorder', () => {
          if (stale) {
             await stale.delete();
          }
-         const item = await Item.create({ name, type: 'weapon' });
+         const item = await Item.create({
+            name,
+            type: 'weapon' 
+         });
          await item.update({ system: { attack: [] } });
          await item.system.addAttack();
          await item.system.addAttack();
@@ -75,11 +88,18 @@ test.describe('settings-list reorder', () => {
          const before = item.system.attack.map((e) => e.uuid);
          await item.system.moveAttack(0, 3);
          const after = item.system.attack.map((e) => e.uuid);
-         return { before, after };
+         return {
+            before,
+            after 
+         };
       }, WEAPON_NAME);
 
       expect(order.before.length).toBe(3);
-      expect(order.after).toEqual([order.before[1], order.before[2], order.before[0]]);
+      expect(order.after).toEqual([
+         order.before[1],
+         order.before[2],
+         order.before[0]
+      ]);
    });
 
    test('moveCheck reorders the array and keeps expansion state length aligned', async () => {
@@ -88,7 +108,10 @@ test.describe('settings-list reorder', () => {
          if (stale) {
             await stale.delete();
          }
-         const item = await Item.create({ name, type: 'weapon' });
+         const item = await Item.create({
+            name,
+            type: 'weapon' 
+         });
          await item.update({ system: { check: [] } });
 
          // Render first so the expansion store is seeded once, then add checks the way a user does —
@@ -114,11 +137,19 @@ test.describe('settings-list reorder', () => {
          });
          unsub();
 
-         return { before, after, expandedLength };
+         return {
+            before,
+            after,
+            expandedLength 
+         };
       }, WEAPON_NAME);
 
       expect(result.before.length).toBe(3);
-      expect(result.after).toEqual([result.before[1], result.before[2], result.before[0]]);
+      expect(result.after).toEqual([
+         result.before[1],
+         result.before[2],
+         result.before[0]
+      ]);
       expect(result.expandedLength).toBe(3);
    });
 
@@ -128,7 +159,10 @@ test.describe('settings-list reorder', () => {
          if (stale) {
             await stale.delete();
          }
-         const item = await Item.create({ name, type: 'spell' });
+         const item = await Item.create({
+            name,
+            type: 'spell' 
+         });
          await item.update({ system: { customAspect: [] } });
          await item.system.addCustomAspect();
          await item.system.addCustomAspect();
@@ -136,11 +170,18 @@ test.describe('settings-list reorder', () => {
          const before = item.system.customAspect.map((e) => e.uuid);
          await item.system.moveCustomAspect(0, 3);
          const after = item.system.customAspect.map((e) => e.uuid);
-         return { before, after };
+         return {
+            before,
+            after 
+         };
       }, SPELL_NAME);
 
       expect(order.before.length).toBe(3);
-      expect(order.after).toEqual([order.before[1], order.before[2], order.before[0]]);
+      expect(order.after).toEqual([
+         order.before[1],
+         order.before[2],
+         order.before[0]
+      ]);
    });
 
    test('the rules-element rows render a drag handle', async () => {
@@ -149,7 +190,10 @@ test.describe('settings-list reorder', () => {
          if (stale) {
             await stale.delete();
          }
-         const item = await Item.create({ name, type: 'weapon' });
+         const item = await Item.create({
+            name,
+            type: 'weapon' 
+         });
          await item.system.addRulesElement();
          const app = await item.sheet.render(true);
          await titanWait(

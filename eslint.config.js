@@ -91,7 +91,10 @@ export default [
                ignoreRegExpLiterals: true,
             },
          ],
-         curly: ['error', 'all'],
+         curly: [
+            'error',
+            'all'
+         ],
          // Scoped to ObjectExpression only: object literals with 2+ properties must break after `{`
          // and before `}`; destructuring patterns, imports, and exports are untouched. Verified with a
          // scratch fixture: a single-property object written multi-line is not an error, and a

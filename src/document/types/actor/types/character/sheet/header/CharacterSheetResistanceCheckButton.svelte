@@ -51,7 +51,10 @@
 <DocumentOwnerResistanceButton
    onclick={() => document.data.system.requestResistanceCheck({resistance: resistance})}
    {resistance}
-   tooltip={{ text: tooltip, localize: false }}>
+   tooltip={{
+      text: tooltip,
+      localize: false 
+   }}>
    <div class="button-inner">
       <!--Icon-->
       <i class={icon}></i>

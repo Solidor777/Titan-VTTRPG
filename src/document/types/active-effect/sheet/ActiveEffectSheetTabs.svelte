@@ -3,7 +3,7 @@
    import localize from '~/helpers/utility-functions/Localize.js';
    import ItemSheetChecksTab from '~/document/types/item/sheet/check/ItemSheetChecksTab.svelte';
    import ActiveEffectSheetDescriptionTab
-      from '~/document/types/active-effect/sheet/ActiveEffectSheetDescriptionTab.svelte';
+   from '~/document/types/active-effect/sheet/ActiveEffectSheetDescriptionTab.svelte';
    import ItemSheetRulesElementsTab from '~/document/types/item/sheet/rules-element/ItemSheetRulesElementsTab.svelte';
    import Tabs from '~/helpers/svelte-components/Tabs.svelte';
 

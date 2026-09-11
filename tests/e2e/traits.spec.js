@@ -66,7 +66,11 @@ test.describe('custom trait edit/delete on items', () => {
             type: 'weapon',
             system: {
                customTrait: [
-                  { name: traitName, description: description, uuid: 'e2e-trait-uuid-0' },
+                  {
+                     name: traitName,
+                     description: description,
+                     uuid: 'e2e-trait-uuid-0' 
+                  },
                ],
             },
          });
@@ -75,7 +79,11 @@ test.describe('custom trait edit/delete on items', () => {
             () => !!app?.element?.querySelector('.sidebar'),
             { message: 'sheet mounted' },
          );
-      }, { itemName: ITEM_NAME, traitName: ORIGINAL_NAME, description: DESCRIPTION_KEY });
+      }, {
+         itemName: ITEM_NAME,
+         traitName: ORIGINAL_NAME,
+         description: DESCRIPTION_KEY 
+      });
    });
 
    test('editing a custom trait persists the new name and re-renders the tag', async () => {
@@ -100,11 +108,17 @@ test.describe('custom trait edit/delete on items', () => {
          .poll(
             () => page.evaluate((itemName) => {
                const traits = game.items.getName(itemName)?.system?.customTrait ?? [];
-               return { count: traits.length, names: traits.map((t) => t.name) };
+               return {
+                  count: traits.length,
+                  names: traits.map((t) => t.name) 
+               };
             }, ITEM_NAME),
             { message: 'custom trait edited in place on the item' },
          )
-         .toEqual({ count: 1, names: [EDITED_NAME] });
+         .toEqual({
+            count: 1,
+            names: [EDITED_NAME] 
+         });
 
       // Re-rendered: the sidebar shows the new name and no longer the old one.
       await expect(

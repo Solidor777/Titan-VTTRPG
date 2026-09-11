@@ -3,7 +3,7 @@
    import localize from '~/helpers/utility-functions/Localize.js';
    import DocumentIntegerInput from '~/document/svelte-components/input/DocumentIntegerInput.svelte';
    import DocumentIntegerIncrementInput
-      from '~/document/svelte-components/input/DocumentIntegerIncrementInput.svelte';
+   from '~/document/svelte-components/input/DocumentIntegerIncrementInput.svelte';
    import { CURRENCY_ICON } from '~/system/Icons.js';
    import ItemSheetRaritySelect from '~/document/types/item/sheet/ItemSheetRaritySelect.svelte';
    import ItemSheetHeader from '~/document/types/item/sheet/ItemSheetHeader.svelte';

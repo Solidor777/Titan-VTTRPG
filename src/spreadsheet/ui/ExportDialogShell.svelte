@@ -40,16 +40,28 @@
 <div class="titan-export-dialog">
    <Select
       options={[
-         { value: 'xlsx', label: localize('xlsxFormat') },
-         { value: 'csv', label: localize('csvFormat') },
+         {
+            value: 'xlsx',
+            label: localize('xlsxFormat') 
+         },
+         {
+            value: 'csv',
+            label: localize('csvFormat') 
+         },
       ]}
       bind:value={format}
       testId="export-format-select"
    />
    <Select
       options={[
-         { value: 'wide', label: localize('wideLayout') },
-         { value: 'relational', label: localize('relationalLayout') },
+         {
+            value: 'wide',
+            label: localize('wideLayout') 
+         },
+         {
+            value: 'relational',
+            label: localize('relationalLayout') 
+         },
       ]}
       bind:value={layout}
       testId="export-layout-select"

@@ -4,13 +4,34 @@ import { createLabels, PLURAL_TYPE_LABELS, TYPE_ORDER } from '~/spreadsheet/mark
 describe('PLURAL_TYPE_LABELS and TYPE_ORDER', () => {
    it('lists the plural/capitalized fallback for every Item pack type', () => {
       expect(PLURAL_TYPE_LABELS).toEqual({
-         weapon: ['weapons', 'Weapons'],
-         armor: ['armor', 'Armor'],
-         shield: ['shields', 'Shields'],
-         equipment: ['equipment', 'Equipment'],
-         commodity: ['commodities', 'Commodities'],
-         ability: ['abilities', 'Abilities'],
-         spell: ['spells', 'Spells'],
+         weapon: [
+            'weapons',
+            'Weapons'
+         ],
+         armor: [
+            'armor',
+            'Armor'
+         ],
+         shield: [
+            'shields',
+            'Shields'
+         ],
+         equipment: [
+            'equipment',
+            'Equipment'
+         ],
+         commodity: [
+            'commodities',
+            'Commodities'
+         ],
+         ability: [
+            'abilities',
+            'Abilities'
+         ],
+         spell: [
+            'spells',
+            'Spells'
+         ],
       });
    });
 

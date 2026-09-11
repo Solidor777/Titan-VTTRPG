@@ -16,7 +16,10 @@ export default {
    cacheDir: '../.vite-cache',
 
    resolve: {
-      conditions: ['import', 'browser'],
+      conditions: [
+         'import',
+         'browser'
+      ],
       alias,
    },
 

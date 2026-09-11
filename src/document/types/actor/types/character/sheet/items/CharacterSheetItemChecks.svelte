@@ -1,7 +1,7 @@
 <script>
    import { getContext } from 'svelte';
    import CharacterSheetItemCheck
-      from '~/document/types/actor/types/character/sheet/items/CharacterSheetItemCheck.svelte';
+   from '~/document/types/actor/types/character/sheet/items/CharacterSheetItemCheck.svelte';
 
    /** @type {object} The embedded item bridge provided by EmbeddedDocumentProvider. */
    const document = getContext('document');

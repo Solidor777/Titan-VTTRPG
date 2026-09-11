@@ -50,7 +50,10 @@ test.describe('component probe — Tag', () => {
          props: {
             text: 'Ice Shard',
             // Use TextData form so processTextData emits the raw string without attempting localization.
-            tooltip: { text: 'A shard of magical ice.', localize: false },
+            tooltip: {
+               text: 'A shard of magical ice.',
+               localize: false 
+            },
          },
       });
       const content = await page.locator(`${selector} .tag`).evaluate((el) => el._tippy?.props?.content);
@@ -86,7 +89,10 @@ test.describe('component probe — IconTag', () => {
          props: {
             icon: 'fas fa-fire',
             label: 'Fire',
-            tooltip: { text: 'Burn everything.', localize: false },
+            tooltip: {
+               text: 'Burn everything.',
+               localize: false 
+            },
          },
       });
       const content = await page.locator(`${selector} .tag`).evaluate((el) => el._tippy?.props?.content);
@@ -125,7 +131,10 @@ test.describe('component probe — IconStatTag', () => {
             icon: 'fas fa-bolt',
             label: 'Speed',
             value: 30,
-            tooltip: { text: 'Movement speed in feet.', localize: false },
+            tooltip: {
+               text: 'Movement speed in feet.',
+               localize: false 
+            },
          },
       });
       const content = await page.locator(`${selector} .tag`).evaluate((el) => el._tippy?.props?.content);
@@ -161,7 +170,10 @@ test.describe('component probe — StatTag', () => {
          props: {
             label: 'Strength',
             value: 4,
-            tooltip: { text: 'Raw physical might.', localize: false },
+            tooltip: {
+               text: 'Raw physical might.',
+               localize: false 
+            },
          },
       });
       const content = await page.locator(`${selector} .tag`).evaluate((el) => el._tippy?.props?.content);
@@ -217,7 +229,10 @@ test.describe('component probe — RarityTag', () => {
       const { selector } = await mountProbe(page, 'RarityTag', {
          props: {
             rarity: 'rare',
-            tooltip: { text: 'Exceptionally hard to find.', localize: false },
+            tooltip: {
+               text: 'Exceptionally hard to find.',
+               localize: false 
+            },
          },
       });
       const content = await page.locator(`${selector} .tag`).evaluate((el) => el._tippy?.props?.content);
@@ -265,7 +280,10 @@ test.describe('component probe — DurationTag', () => {
          props: {
             type: 'turnStart',
             remaining: 2,
-            tooltip: { text: 'Expires on turn start.', localize: false },
+            tooltip: {
+               text: 'Expires on turn start.',
+               localize: false 
+            },
          },
       });
       const content = await page.locator(`${selector} .tag`).evaluate((el) => el._tippy?.props?.content);
@@ -300,7 +318,10 @@ test.describe('component probe — AttributeTag', () => {
          props: {
             attribute: 'mind',
             text: 'Focus',
-            tooltip: { text: 'A mental discipline.', localize: false },
+            tooltip: {
+               text: 'A mental discipline.',
+               localize: false 
+            },
          },
       });
       const content = await page.locator(`${selector} .tag`).evaluate((el) => el._tippy?.props?.content);
@@ -337,7 +358,10 @@ test.describe('component probe — AttributeCheckTag', () => {
          props: {
             attribute: 'soul',
             skill: 'persuasion',
-            tooltip: { text: 'A social contest.', localize: false },
+            tooltip: {
+               text: 'A social contest.',
+               localize: false 
+            },
          },
       });
       const content = await page.locator(`${selector} .tag`).evaluate((el) => el._tippy?.props?.content);
@@ -372,7 +396,10 @@ test.describe('component probe — OpposedCheckTag', () => {
          props: {
             attribute: 'mind',
             skill: 'deception',
-            tooltip: { text: 'A deception contest.', localize: false },
+            tooltip: {
+               text: 'A deception contest.',
+               localize: false 
+            },
          },
       });
       const content = await page.locator(`${selector} .tag`).evaluate((el) => el._tippy?.props?.content);
@@ -407,7 +434,10 @@ test.describe('component probe — ResistanceTag', () => {
          props: {
             resistance: 'willpower',
             text: 'Focus',
-            tooltip: { text: 'A mental barrier.', localize: false },
+            tooltip: {
+               text: 'A mental barrier.',
+               localize: false 
+            },
          },
       });
       const content = await page.locator(`${selector} .tag`).evaluate((el) => el._tippy?.props?.content);
@@ -442,7 +472,10 @@ test.describe('component probe — ResistedByTag', () => {
       const { selector } = await mountProbe(page, 'ResistedByTag', {
          props: {
             resistance: 'reflexes',
-            tooltip: { text: 'Dodged away.', localize: false },
+            tooltip: {
+               text: 'Dodged away.',
+               localize: false 
+            },
          },
       });
       const content = await page.locator(`${selector} .tag`).evaluate((el) => el._tippy?.props?.content);
@@ -599,7 +632,10 @@ test.describe('component probe — EditDeleteTag', () => {
             label: 'Fireball',
             testId: 'probe-edit-delete-tag',
          },
-         events: ['editFunction', 'deleteFunction'],
+         events: [
+            'editFunction',
+            'deleteFunction'
+         ],
       });
       await clearProbeEvents(page);
       await page.locator(`${selector} button[aria-label]`).first().click();
@@ -613,7 +649,10 @@ test.describe('component probe — EditDeleteTag', () => {
             label: 'Fireball',
             testId: 'probe-edit-delete-tag',
          },
-         events: ['editFunction', 'deleteFunction'],
+         events: [
+            'editFunction',
+            'deleteFunction'
+         ],
       });
       await clearProbeEvents(page);
       await page.locator(`${selector} button[aria-label]`).last().click();

@@ -5,11 +5,11 @@
    import DocumentIntegerInput from '~/document/svelte-components/input/DocumentIntegerInput.svelte';
    import DocumentNameInput from '~/document/svelte-components/input/DocumentNameInput.svelte';
    import CharacterSheetAttributes
-      from '~/document/types/actor/types/character/sheet/header/CharacterSheetAttributes.svelte';
+   from '~/document/types/actor/types/character/sheet/header/CharacterSheetAttributes.svelte';
    import CharacterSheetResistances
-      from '~/document/types/actor/types/character/sheet/header/CharacterSheetResistances.svelte';
+   from '~/document/types/actor/types/character/sheet/header/CharacterSheetResistances.svelte';
    import CharacterSheetInspiration
-      from '~/document/types/actor/types/character/types/player/PlayerSheetInspiration.svelte';
+   from '~/document/types/actor/types/character/types/player/PlayerSheetInspiration.svelte';
    import ModifiedValueLabel from '~/helpers/svelte-components/label/ModifiedValueLabel.svelte';
 
    /** @type {object} Reference to the reactive Document store. */

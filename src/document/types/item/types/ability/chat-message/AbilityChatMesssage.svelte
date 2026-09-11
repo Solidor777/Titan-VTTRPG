@@ -2,7 +2,7 @@
    import { getContext } from 'svelte';
    import RichText from '~/helpers/svelte-components/RichText.svelte';
    import ItemChatMessageItemChecks
-      from '~/document/types/item/chat-message/ItemChatMessageItemChecks.svelte';
+   from '~/document/types/item/chat-message/ItemChatMessageItemChecks.svelte';
    import ItemChatMessageShell from '~/document/types/item/chat-message/ItemChatMessageShell.svelte';
    import AbilityStats from '~/document/types/item/types/ability/components/AbilityStats.svelte';
 

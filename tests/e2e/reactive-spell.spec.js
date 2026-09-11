@@ -50,7 +50,10 @@ test.describe('character sheet spell row reactivity', () => {
          // Seed a fresh player actor with one spell whose initial display state is known: rarity 'common'
          // (RarityTag class .common), tradition 'Arcane' (StatTag value), and xpCost 0 (StatTag absent via
          // {#if item.system.xpCost}).
-         const actor = await Actor.create({ name: actorName, type: 'player' });
+         const actor = await Actor.create({
+            name: actorName,
+            type: 'player' 
+         });
          await actor.createEmbeddedDocuments('Item', [
             {
                name: 'E2E Reactive Spell',

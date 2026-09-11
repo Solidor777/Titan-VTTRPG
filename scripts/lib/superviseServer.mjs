@@ -42,11 +42,11 @@ function createLineLogger(logFile) {
 /**
  * @typedef {object} SuperviseHandle
  * @property {import('node:child_process').ChildProcess | null} child - The spawned server, or null when an
- *    existing listener was reused and nothing was spawned.
+ * existing listener was reused and nothing was spawned.
  * @property {() => void} stop - Kills the spawned server tree (no-op when nothing was spawned) and settles
- *    `done`.
+ * `done`.
  * @property {Promise<number>} done - Resolves with the exit code to report: the server's own code, 0 when
- *    the watched process died or `stop()` was called, and never (until `stop()`) in reuse mode.
+ * the watched process died or `stop()` was called, and never (until `stop()`) in reuse mode.
  */
 
 /**
@@ -75,7 +75,10 @@ export function isAlive(pid) {
 export function isPortInUse(host, port, timeoutMs = 1000) {
    return new Promise((resolve) => {
       /** @type {net.Socket} The probe socket, destroyed on every outcome. */
-      const socket = net.connect({ host, port });
+      const socket = net.connect({
+         host,
+         port 
+      });
 
       /**
        * Settles the probe once and releases the socket.
@@ -107,7 +110,12 @@ export function killTree(child) {
    }
 
    if (process.platform === 'win32') {
-      spawnSync('taskkill', ['/pid', String(child.pid), '/T', '/F'], { stdio: 'ignore' });
+      spawnSync('taskkill', [
+         '/pid',
+         String(child.pid),
+         '/T',
+         '/F'
+      ], { stdio: 'ignore' });
       return;
    }
 
@@ -139,9 +147,18 @@ export function getAncestors(pid, maxDepth = 8) {
       ].join('; ');
 
       /** @type {string} The raw PowerShell output. */
-      const output = execFileSync('powershell', ['-NoProfile', '-NonInteractive', '-Command', script], {
+      const output = execFileSync('powershell', [
+         '-NoProfile',
+         '-NonInteractive',
+         '-Command',
+         script
+      ], {
          encoding: 'utf8',
-         stdio: ['ignore', 'pipe', 'ignore'],
+         stdio: [
+            'ignore',
+            'pipe',
+            'ignore'
+         ],
       });
 
       return output
@@ -149,7 +166,10 @@ export function getAncestors(pid, maxDepth = 8) {
          .filter((line) => line.includes('\t'))
          .map((line) => {
             const [id, name] = line.split('\t');
-            return { pid: Number(id), name: name.trim() };
+            return {
+               pid: Number(id),
+               name: name.trim() 
+            };
          });
    }
 
@@ -163,9 +183,18 @@ export function getAncestors(pid, maxDepth = 8) {
       /** @type {string} `ppid comm` for the current process, empty when it no longer exists. */
       let line = '';
       try {
-         line = execFileSync('ps', ['-o', 'ppid=,comm=', '-p', String(current)], {
+         line = execFileSync('ps', [
+            '-o',
+            'ppid=,comm=',
+            '-p',
+            String(current)
+         ], {
             encoding: 'utf8',
-            stdio: ['ignore', 'pipe', 'ignore'],
+            stdio: [
+               'ignore',
+               'pipe',
+               'ignore'
+            ],
          }).trim();
       }
       catch {
@@ -181,16 +210,28 @@ export function getAncestors(pid, maxDepth = 8) {
       /** @type {string} The parent's command name. */
       let parentName = '';
       try {
-         parentName = execFileSync('ps', ['-o', 'comm=', '-p', String(parentPid)], {
+         parentName = execFileSync('ps', [
+            '-o',
+            'comm=',
+            '-p',
+            String(parentPid)
+         ], {
             encoding: 'utf8',
-            stdio: ['ignore', 'pipe', 'ignore'],
+            stdio: [
+               'ignore',
+               'pipe',
+               'ignore'
+            ],
          }).trim();
       }
       catch {
          break;
       }
 
-      ancestors.push({ pid: parentPid, name: parentName });
+      ancestors.push({
+         pid: parentPid,
+         name: parentName 
+      });
       current = parentPid;
    }
 
@@ -259,12 +300,19 @@ export async function superviseServer(options) {
    /** @type {((source: string, chunk: string) => void) | undefined} The timestamped file sink, when logging. */
    const logLine = logFile ? createLineLogger(logFile) : undefined;
 
-   /** @type {import('node:child_process').ChildProcess} The server, spawned without a shell so its pid is the server's. */
+   /**
+    * @type {import('node:child_process').ChildProcess} The server, spawned without a shell so its pid
+    *   is the server's.
+    */
    const child = spawn(command, args, {
       cwd,
       // Piped only when a log file is wanted: the pipes are mirrored to the console below, so the
       // console sees the same output either way.
-      stdio: logLine ? ['ignore', 'pipe', 'pipe'] : 'inherit',
+      stdio: logLine ? [
+         'ignore',
+         'pipe',
+         'pipe'
+      ] : 'inherit',
       windowsHide: true,
    });
 

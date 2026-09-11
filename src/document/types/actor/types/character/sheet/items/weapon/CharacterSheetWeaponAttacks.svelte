@@ -1,7 +1,7 @@
 <script>
    import { getContext } from 'svelte';
    import CharacterSheetWeaponAttack
-      from '~/document/types/actor/types/character/sheet/items/weapon/CharacterSheetWeaponAttack.svelte';
+   from '~/document/types/actor/types/character/sheet/items/weapon/CharacterSheetWeaponAttack.svelte';
 
    /** @type {object} The embedded weapon bridge provided by the list-level EmbeddedDocumentProvider. */
    const document = getContext('document');

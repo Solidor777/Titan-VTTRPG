@@ -61,7 +61,10 @@ test.describe('add custom trait on items', () => {
          }
 
          // A weapon carries the shared `customTrait` array from TitanItemDataModel.
-         const item = await Item.create({ name: itemName, type: 'weapon' });
+         const item = await Item.create({
+            name: itemName,
+            type: 'weapon' 
+         });
          const app = await item.sheet.render(true);
 
          // Allow the Svelte mount and ApplicationV2 render cycle to settle.
@@ -101,7 +104,10 @@ test.describe('add custom trait on items', () => {
             }, ITEM_NAME),
             { message: 'custom trait persisted to the item exactly once under the typed name' },
          )
-         .toEqual({ count: 1, names: [TRAIT_NAME] });
+         .toEqual({
+            count: 1,
+            names: [TRAIT_NAME] 
+         });
 
       // Assert: the trait renders as a tag in the sidebar carrying its name.
       await expect(

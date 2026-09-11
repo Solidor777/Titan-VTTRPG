@@ -7,12 +7,19 @@ describe('unflattenRow', () => {
          name: 'Sword',
          'system.rarity': ABSENT,
          'system.value': 5,
-      })).toEqual({ name: 'Sword', system: { value: 5 } });
+      })).toEqual({
+         name: 'Sword',
+         system: { value: 5 } 
+      });
    });
 
    it('preserves explicit null and empty-string values', () => {
-      expect(unflattenRow({ 'system.equipped.armor': null, name: '' })).toEqual({
-         system: { equipped: { armor: null } }, name: '',
+      expect(unflattenRow({
+         'system.equipped.armor': null,
+         name: '' 
+      })).toEqual({
+         system: { equipped: { armor: null } },
+         name: '',
       });
    });
 
@@ -27,8 +34,14 @@ describe('unflattenRow', () => {
       })).toEqual({
          system: {
             attack: [
-               { label: 'Slash', damage: 5 },
-               { label: 'Stab', damage: 3 },
+               {
+                  label: 'Slash',
+                  damage: 5 
+               },
+               {
+                  label: 'Stab',
+                  damage: 3 
+               },
             ],
          },
       });
@@ -40,7 +53,14 @@ describe('unflattenRow', () => {
          'system.attack.0.damage': ABSENT,
          'system.attack.1.label': 'Stab',
          'system.attack.1.damage': 3,
-      })).toEqual({ system: { attack: [{ label: 'Stab', damage: 3 }] } });
+      })).toEqual({
+         system: {
+            attack: [{
+               label: 'Stab',
+               damage: 3 
+            }] 
+         } 
+      });
    });
 
    it('rebuilds nested arrays (trait array inside an attack array)', () => {
@@ -48,11 +68,21 @@ describe('unflattenRow', () => {
          'system.attack.0.label': 'Slash',
          'system.attack.0.trait.0.name': 'Reach',
          'system.attack.0.trait.1.name': ABSENT,
-      })).toEqual({ system: { attack: [{ label: 'Slash', trait: [{ name: 'Reach' }] }] } });
+      })).toEqual({
+         system: {
+            attack: [{
+               label: 'Slash',
+               trait: [{ name: 'Reach' }] 
+            }] 
+         } 
+      });
    });
 
    it('returns an empty object for an all-ABSENT input', () => {
-      expect(unflattenRow({ name: ABSENT, 'system.rarity': ABSENT })).toEqual({});
+      expect(unflattenRow({
+         name: ABSENT,
+         'system.rarity': ABSENT 
+      })).toEqual({});
    });
 
    // Intentional asymmetry vs. the object-branch ABSENT-propagation rule above: the wide layout treats

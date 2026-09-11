@@ -104,14 +104,23 @@ test.describe('v14 interaction rolls', () => {
          }
 
          // The purpose-built, Gamemaster-owned player actor used as the roll source.
-         const actor = await Actor.create({ name: 'E2E Roller', type: 'player' });
+         const actor = await Actor.create({
+            name: 'E2E Roller',
+            type: 'player' 
+         });
 
          // Owned items: a weapon (attack check), a spell (casting check), and an ability carrying a
          // single check[] entry (item check). The weapon seeds a default attack[0]; the spell seeds
          // its castingCheck schema; the ability needs an explicit check[] entry.
          await actor.createEmbeddedDocuments('Item', [
-            { name: 'E2E Weapon', type: 'weapon' },
-            { name: 'E2E Spell', type: 'spell' },
+            {
+               name: 'E2E Weapon',
+               type: 'weapon' 
+            },
+            {
+               name: 'E2E Spell',
+               type: 'spell' 
+            },
             {
                name: 'E2E Ability',
                type: 'ability',
@@ -176,7 +185,10 @@ test.describe('v14 interaction rolls', () => {
                newestId: newest?.id,
                newestType: newest?.type,
             };
-         }, { actorLocate: ACTOR_LOCATE, invokeSrc: checkCase.invoke });
+         }, {
+            actorLocate: ACTOR_LOCATE,
+            invokeSrc: checkCase.invoke 
+         });
 
          // Assert: a new message was created with the expected titan flag type, error-free.
          expect(result.after, 'message count should increase after the roll').toBeGreaterThan(result.before);

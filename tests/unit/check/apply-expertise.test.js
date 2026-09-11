@@ -11,8 +11,16 @@ describe('_applyExpertise — crafted cases', () => {
          extraSuccessOnCritical: false,
          extraFailureOnCritical: false,
       });
-      const out = check._applyExpertise(dice([3, 3, 2]));
-      expect(out.dice.map((d) => d.final)).toEqual([4, 4, 2]);
+      const out = check._applyExpertise(dice([
+         3,
+         3,
+         2
+      ]));
+      expect(out.dice.map((d) => d.final)).toEqual([
+         4,
+         4,
+         2
+      ]);
       expect(out.expertiseRemaining).toBe(1);
    });
 
@@ -23,8 +31,16 @@ describe('_applyExpertise — crafted cases', () => {
          extraSuccessOnCritical: false,
          extraFailureOnCritical: true,
       });
-      const out = check._applyExpertise(dice([4, 1, 1]));
-      expect(out.dice.map((d) => d.final)).toEqual([4, 2, 2]);
+      const out = check._applyExpertise(dice([
+         4,
+         1,
+         1
+      ]));
+      expect(out.dice.map((d) => d.final)).toEqual([
+         4,
+         2,
+         2
+      ]);
       expect(out.expertiseRemaining).toBe(0);
    });
 });
@@ -33,9 +49,18 @@ describe('_applyExpertise — invariants', () => {
    it('conserves expertise, never lowers a die, and lands raised dice on difficulty/6/2', () => {
       fc.assert(
          fc.property(
-            fc.array(fc.integer({ min: 1, max: 6 }), { maxLength: 8 }),
-            fc.integer({ min: 0, max: 10 }),
-            fc.integer({ min: 2, max: 6 }),
+            fc.array(fc.integer({
+               min: 1,
+               max: 6 
+            }), { maxLength: 8 }),
+            fc.integer({
+               min: 0,
+               max: 10 
+            }),
+            fc.integer({
+               min: 2,
+               max: 6 
+            }),
             fc.boolean(),
             fc.boolean(),
             (finals, totalExpertise, difficulty, esoc, efoc) => {

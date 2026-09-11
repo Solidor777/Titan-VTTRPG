@@ -61,7 +61,10 @@ test.describe('v14 effect check rolling', () => {
          }
 
          // The roll-source actor.
-         const actor = await Actor.create({ name: actorName, type: 'player' });
+         const actor = await Actor.create({
+            name: actorName,
+            type: 'player' 
+         });
 
          // One effect with a description and a single COMPLETE check[] entry. The check object mirrors
          // createItemCheckTemplate() (src/check/types/item-check/ItemCheckTemplate.js) — the template
@@ -98,7 +101,11 @@ test.describe('v14 effect check rolling', () => {
                },
             },
          ]);
-      }, { actorName: ACTOR_NAME, effectName: EFFECT_NAME, effectDescription: EFFECT_DESCRIPTION });
+      }, {
+         actorName: ACTOR_NAME,
+         effectName: EFFECT_NAME,
+         effectDescription: EFFECT_DESCRIPTION 
+      });
    });
 
    test('effect roll data carries the effect description', async () => {
@@ -106,7 +113,10 @@ test.describe('v14 effect check rolling', () => {
          const actor = game.actors.getName(actorName);
          const effect = actor.effects.find((e) => e.name === effectName);
          return effect.getRollData().description;
-      }, { actorName: ACTOR_NAME, effectName: EFFECT_NAME });
+      }, {
+         actorName: ACTOR_NAME,
+         effectName: EFFECT_NAME 
+      });
 
       expect(description, 'effect roll data exposes the native description').toBe(EFFECT_DESCRIPTION);
    });
@@ -118,7 +128,10 @@ test.describe('v14 effect check rolling', () => {
          const effect = actor.effects.find((e) => e.name === effectName);
 
          const before = game.messages.size;
-         await actor.system.requestItemCheck({ itemRollData: effect.getRollData(), checkIdx: 0 });
+         await actor.system.requestItemCheck({
+            itemRollData: effect.getRollData(),
+            checkIdx: 0 
+         });
          await titanWait(() => game.messages.size > before, { message: 'new chat message' });
 
          const newest = game.messages.contents[game.messages.size - 1];
@@ -128,7 +141,10 @@ test.describe('v14 effect check rolling', () => {
             newestId: newest?.id,
             newestType: newest?.type,
          };
-      }, { actorName: ACTOR_NAME, effectName: EFFECT_NAME });
+      }, {
+         actorName: ACTOR_NAME,
+         effectName: EFFECT_NAME 
+      });
 
       expect(result.after, 'message count should increase after the roll').toBeGreaterThan(result.before);
       expect(result.newestType, 'newest message flag type').toBe('itemCheck');

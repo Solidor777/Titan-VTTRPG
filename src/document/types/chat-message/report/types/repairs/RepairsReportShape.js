@@ -4,7 +4,7 @@
  * conditionally-present armor resource snapshot is `null` so it becomes a nullable object field,
  * preserving the card's `if (armor)` presence guard.
  * @returns {object} The repairs report shape: the armor label fields, the armor repaired tally, and the
- *    armor resource snapshot.
+ * armor resource snapshot.
  */
 export default function createRepairsReportShape() {
    return {

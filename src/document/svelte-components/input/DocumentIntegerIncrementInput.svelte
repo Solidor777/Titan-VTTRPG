@@ -9,8 +9,10 @@
     * @property {number | boolean} [min] - The minimum value for this input, or false if there is none.
     * @property {number | boolean} [max] - The maximum value for this input, or false if there is none.
     * @property {boolean} [disabled] - Whether editing this input should be disabled.
-    * @property {number} [increment] - The increment by which to increase or decrease the value when clicking the buttons.
-    * @property {number} [modifierIncrement] - The increment used when clicking the buttons while the modifier key is pressed.
+    * @property {number} [increment] - The increment by which to increase or decrease the value when
+    *    clicking the buttons.
+    * @property {number} [modifierIncrement] - The increment used when clicking the buttons while the
+    *    modifier key is pressed.
     * @property {string | object} [tooltip] - The Tooltip to display for this element, if any.
     */
 

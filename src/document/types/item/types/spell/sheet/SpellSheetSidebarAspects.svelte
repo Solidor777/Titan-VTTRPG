@@ -2,9 +2,9 @@
    import { getContext } from 'svelte';
    import { slide } from 'svelte/transition';
    import SpellSheetSidebarCustomAspect
-      from '~/document/types/item/types/spell/sheet/SpellSheetSidebarCustomAspect.svelte';
+   from '~/document/types/item/types/spell/sheet/SpellSheetSidebarCustomAspect.svelte';
    import SpellSheetSidebarStandardAspect
-      from '~/document/types/item/types/spell/sheet/SpellSheetSidebarStandardAspect.svelte';
+   from '~/document/types/item/types/spell/sheet/SpellSheetSidebarStandardAspect.svelte';
 
    /** @type {object} Reference to the reactive Document store. */
    const document = getContext('document');

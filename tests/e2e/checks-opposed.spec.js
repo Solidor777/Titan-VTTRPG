@@ -18,14 +18,22 @@ import { expectedCheckResults } from '../shared/checkOracle.js';
  */
 
 // The forced faces every attack roll uses; the roller's attack rolls three dice.
-const FORCED_FACES = [6, 4, 1];
+const FORCED_FACES = [
+   6,
+   4,
+   1
+];
 
 // Flat boost to the roller's Melee and Accuracy ratings so the difficulty clamp can reach BOTH bounds
 // (a plain attacker's rating of 1 cannot drive the lower clamp, because Defense floors at 0).
 const ATTACKER_BOOST = 5;
 
 // The target Defense flat modifiers pre-created in the world (interior, clamp-high, clamp-low).
-const TARGET_MODS = [6, 8, -8];
+const TARGET_MODS = [
+   6,
+   8,
+   -8
+];
 
 /**
  * Resolves a target actor's world name for a given Defense flat modifier.
@@ -70,7 +78,10 @@ async function rollAttackWithTargets(page, targetNames) {
       let results;
       try {
          game.user.targets = fakeTargets;
-         await roller.system.rollAttackCheck({ itemId: weaponId, attackIdx: 0 });
+         await roller.system.rollAttackCheck({
+            itemId: weaponId,
+            attackIdx: 0 
+         });
          await titanWait(() => game.messages.size > before, { message: 'new chat message' });
          const newest = game.messages.contents[game.messages.size - 1];
          parameters = newest?.system?.parameters;
@@ -126,7 +137,10 @@ test.describe('v14 opposed checks (forced dice)', () => {
             await staleRoller.delete();
          }
          const roller = await Actor.create(rollerActor);
-         await roller.createEmbeddedDocuments('Item', [...rollerItems, attackerBoostItem]);
+         await roller.createEmbeddedDocuments('Item', [
+            ...rollerItems,
+            attackerBoostItem
+         ]);
 
          // Rebuild each target actor carrying its Defense flat-modifier ability.
          for (const target of targets) {
@@ -203,7 +217,10 @@ test.describe('v14 opposed checks (forced dice)', () => {
    });
 
    test('with multiple targets the first target Defense is used', async () => {
-      const flags = await rollAttackWithTargets(page, [targetName(6), targetName(8)]);
+      const flags = await rollAttackWithTargets(page, [
+         targetName(6),
+         targetName(8)
+      ]);
       const [firstDefense, secondDefense] = flags.targetDefenses;
 
       expect(firstDefense, 'fixture targets have distinct Defense').not.toBe(secondDefense);

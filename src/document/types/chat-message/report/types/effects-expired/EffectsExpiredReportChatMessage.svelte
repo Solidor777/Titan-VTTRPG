@@ -1,15 +1,15 @@
 <script>
    import ChatMessageExpiredEffectsTags
-      from '~/document/types/chat-message/components/tags/ChatMessageExpiredEffectsTags.svelte';
+   from '~/document/types/chat-message/components/tags/ChatMessageExpiredEffectsTags.svelte';
    import ChatMessageExpiredEffectsRemovedMessage
-      from '~/document/types/chat-message/components/messages/ChatMessageExpiredEffectsRemovedMessage.svelte';
+   from '~/document/types/chat-message/components/messages/ChatMessageExpiredEffectsRemovedMessage.svelte';
    import ReportChatMessageBase from '~/document/types/chat-message/report/components/ReportChatMessageBase.svelte';
    import autoRemoveExpiredEffects from '~/helpers/Settings/AutoRemoveExpiredEffects.js';
    import { getContext } from 'svelte';
    import EffectsExpiredReportChatMessageHeader
-      from '~/document/types/chat-message/report/types/effects-expired/EffectsExpiredReportChatMessageHeader.svelte';
+   from '~/document/types/chat-message/report/types/effects-expired/EffectsExpiredReportChatMessageHeader.svelte';
    import ChatMessageRemoveExpiredEffectsButton
-      from '~/document/types/chat-message/components/buttons/ChatMessageRemoveExpiredEffectsButton.svelte';
+   from '~/document/types/chat-message/components/buttons/ChatMessageRemoveExpiredEffectsButton.svelte';
 
    /** @type {object} Reference to the reactive Document store. */
    const document = getContext('document');

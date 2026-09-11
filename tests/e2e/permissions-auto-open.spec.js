@@ -69,7 +69,10 @@ test.describe('permissions — auto-open character sheets', () => {
             // performs strictly AFTER the auto-open branch, so the sheet's fate is already decided.
             await gm.waitForFunction(
                ({ combatId, combatantId }) => game.combats.get(combatId)?.combatant?.id === combatantId,
-               { combatId: ids.combatId, combatantId: ids.effectCombatantId },
+               {
+                  combatId: ids.combatId,
+                  combatantId: ids.effectCombatantId 
+               },
                { timeout: 1000 },
             );
             await gm.waitForFunction(

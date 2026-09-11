@@ -3,7 +3,11 @@ import ExportDialog from '~/spreadsheet/ui/ExportDialog.js';
 import ImportDialog from '~/spreadsheet/ui/ImportDialog.js';
 
 /** @type {string[]} Document types the spreadsheet export/import tool supports. */
-const SUPPORTED_PACK_TYPES = ['Actor', 'Item', 'ActiveEffect'];
+const SUPPORTED_PACK_TYPES = [
+   'Actor',
+   'Item',
+   'ActiveEffect'
+];
 
 /**
  * Resolves the CompendiumCollection for a compendium-directory entry element.

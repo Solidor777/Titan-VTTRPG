@@ -11,8 +11,18 @@ describe('readTables — wide layout', () => {
          {
             documentType: 'weapon',
             source: {
-               _id: 'a'.repeat(16), name: 'Sword', type: 'weapon', img: 'i.svg', sort: 1,
-               system: { rarity: 'common', attack: [{ label: 'Slash', damage: 5 }] },
+               _id: 'a'.repeat(16),
+               name: 'Sword',
+               type: 'weapon',
+               img: 'i.svg',
+               sort: 1,
+               system: {
+                  rarity: 'common',
+                  attack: [{
+                     label: 'Slash',
+                     damage: 5 
+                  }] 
+               },
             },
             parentId: '',
             folderPath: 'Loot',
@@ -28,8 +38,18 @@ describe('readTables — wide layout', () => {
          parentId: '',
          folderPath: 'Loot',
          source: {
-            _id: 'a'.repeat(16), name: 'Sword', type: 'weapon', img: 'i.svg', sort: 1,
-            system: { rarity: 'common', attack: [{ label: 'Slash', damage: 5 }] },
+            _id: 'a'.repeat(16),
+            name: 'Sword',
+            type: 'weapon',
+            img: 'i.svg',
+            sort: 1,
+            system: {
+               rarity: 'common',
+               attack: [{
+                  label: 'Slash',
+                  damage: 5 
+               }] 
+            },
          },
       });
    });
@@ -37,13 +57,26 @@ describe('readTables — wide layout', () => {
    it('falls back to first-seen-type-per-sheet when no _manifest sheet is present', () => {
       const handMade = {
          sheets: [
-            { name: 'weapon', columns: ['_id', 'name'], rows: [{ _id: 'a'.repeat(16), name: 'Axe' }] },
+            {
+               name: 'weapon',
+               columns: [
+                  '_id',
+                  'name'
+               ],
+               rows: [{
+                  _id: 'a'.repeat(16),
+                  name: 'Axe' 
+               }] 
+            },
          ],
       };
       const result = readTables(handMade, NO_SCHEMA);
       expect(result.envelopes[0]).toMatchObject({
          documentType: 'weapon',
-         source: { _id: 'a'.repeat(16), name: 'Axe' },
+         source: {
+            _id: 'a'.repeat(16),
+            name: 'Axe' 
+         },
       });
    });
 
@@ -51,7 +84,17 @@ describe('readTables — wide layout', () => {
       /** @type {{sheets: object[]}} A hand-trimmed file: no _folder column at all. */
       const noFolderColumn = {
          sheets: [
-            { name: 'weapon', columns: ['_id', 'name'], rows: [{ _id: 'a'.repeat(16), name: 'Axe' }] },
+            {
+               name: 'weapon',
+               columns: [
+                  '_id',
+                  'name'
+               ],
+               rows: [{
+                  _id: 'a'.repeat(16),
+                  name: 'Axe' 
+               }] 
+            },
          ],
       };
       expect(readTables(noFolderColumn, NO_SCHEMA).envelopes[0].folderPath).toBeUndefined();
@@ -61,8 +104,16 @@ describe('readTables — wide layout', () => {
          sheets: [
             {
                name: 'weapon',
-               columns: ['_id', 'name', '_folder'],
-               rows: [{ _id: 'a'.repeat(16), name: 'Axe', _folder: '' }],
+               columns: [
+                  '_id',
+                  'name',
+                  '_folder'
+               ],
+               rows: [{
+                  _id: 'a'.repeat(16),
+                  name: 'Axe',
+                  _folder: '' 
+               }],
             },
          ],
       };
@@ -78,7 +129,16 @@ describe('readTables — relational layout', () => {
             source: {
                _id: 'a'.repeat(16),
                system: {
-                  attack: [{ label: 'Slash', trait: [{ name: 'Reach' }, { name: 'Heavy' }] }, { label: 'Stab' }],
+                  attack: [
+                     {
+                        label: 'Slash',
+                        trait: [
+                           { name: 'Reach' },
+                           { name: 'Heavy' }
+                        ] 
+                     },
+                     { label: 'Stab' }
+                  ],
                },
             },
          },
@@ -87,7 +147,13 @@ describe('readTables — relational layout', () => {
       const result = readTables(workbook, NO_SCHEMA);
       expect(result.layout).toBe('relational');
       expect(result.envelopes[0].source.system.attack).toEqual([
-         { label: 'Slash', trait: [{ name: 'Reach' }, { name: 'Heavy' }] },
+         {
+            label: 'Slash',
+            trait: [
+               { name: 'Reach' },
+               { name: 'Heavy' }
+            ] 
+         },
          { label: 'Stab' },
       ]);
    });
@@ -96,7 +162,10 @@ describe('readTables — relational layout', () => {
       const envelopes = [
          {
             documentType: 'weapon',
-            source: { _id: 'a'.repeat(16), system: { statuses: ['prone'] } },
+            source: {
+               _id: 'a'.repeat(16),
+               system: { statuses: ['prone'] } 
+            },
          },
       ];
       const workbook = buildTables(envelopes, 'relational', 'Item', NO_SCHEMA);
@@ -108,7 +177,12 @@ describe('readTables — relational layout', () => {
       /** A synthetic per-type schema: "label" is a non-nullable string on each "attack" array element. */
       const typeSchemas = {
          weapon: {
-            fieldTypes: { 'system.attack.*.label': { type: 'string', nullable: false } },
+            fieldTypes: {
+               'system.attack.*.label': {
+                  type: 'string',
+                  nullable: false 
+               } 
+            },
             fieldOrder: [],
          },
       };
@@ -118,11 +192,22 @@ describe('readTables — relational layout', () => {
       const envelopes = [
          {
             documentType: 'weapon',
-            source: { _id: 'a'.repeat(16), system: { attack: [{ label: 'Slash', damage: 5 }] } },
+            source: {
+               _id: 'a'.repeat(16),
+               system: {
+                  attack: [{
+                     label: 'Slash',
+                     damage: 5 
+                  }] 
+               } 
+            },
          },
          {
             documentType: 'weapon',
-            source: { _id: 'b'.repeat(16), system: { attack: [{ damage: 3 }] } },
+            source: {
+               _id: 'b'.repeat(16),
+               system: { attack: [{ damage: 3 }] } 
+            },
          },
       ];
 
@@ -137,8 +222,30 @@ describe('readTables — relational layout', () => {
 
    it('rejects two blank-_id rows on a document sheet that has a relational child sheet', () => {
       const envelopes = [
-         { documentType: 'weapon', source: { _id: '', system: { rulesElement: [{ name: 'code', value: 'a' }] } } },
-         { documentType: 'weapon', source: { _id: '', system: { rulesElement: [{ name: 'code', value: 'b' }] } } },
+         {
+            documentType: 'weapon',
+            source: {
+               _id: '',
+               system: {
+                  rulesElement: [{
+                     name: 'code',
+                     value: 'a' 
+                  }] 
+               } 
+            } 
+         },
+         {
+            documentType: 'weapon',
+            source: {
+               _id: '',
+               system: {
+                  rulesElement: [{
+                     name: 'code',
+                     value: 'b' 
+                  }] 
+               } 
+            } 
+         },
       ];
       const workbook = buildTables(envelopes, 'relational', 'Item', NO_SCHEMA);
       expect(() => readTables(workbook, NO_SCHEMA)).toThrow(
@@ -149,8 +256,30 @@ describe('readTables — relational layout', () => {
 
    it('still imports two blank-_id rows in wide layout (no relational child sheets to collide)', () => {
       const envelopes = [
-         { documentType: 'weapon', source: { _id: '', system: { rulesElement: [{ name: 'code', value: 'a' }] } } },
-         { documentType: 'weapon', source: { _id: '', system: { rulesElement: [{ name: 'code', value: 'b' }] } } },
+         {
+            documentType: 'weapon',
+            source: {
+               _id: '',
+               system: {
+                  rulesElement: [{
+                     name: 'code',
+                     value: 'a' 
+                  }] 
+               } 
+            } 
+         },
+         {
+            documentType: 'weapon',
+            source: {
+               _id: '',
+               system: {
+                  rulesElement: [{
+                     name: 'code',
+                     value: 'b' 
+                  }] 
+               } 
+            } 
+         },
       ];
       const workbook = buildTables(envelopes, 'wide', 'Item', NO_SCHEMA);
       const result = readTables(workbook, NO_SCHEMA);
@@ -159,8 +288,20 @@ describe('readTables — relational layout', () => {
 
    it('still imports two blank-_id rows in relational layout for a document type with no child sheets', () => {
       const envelopes = [
-         { documentType: 'weapon', source: { _id: '', system: { rarity: 'common' } } },
-         { documentType: 'weapon', source: { _id: '', system: { rarity: 'rare' } } },
+         {
+            documentType: 'weapon',
+            source: {
+               _id: '',
+               system: { rarity: 'common' } 
+            } 
+         },
+         {
+            documentType: 'weapon',
+            source: {
+               _id: '',
+               system: { rarity: 'rare' } 
+            } 
+         },
       ];
       const workbook = buildTables(envelopes, 'relational', 'Item', NO_SCHEMA);
       const result = readTables(workbook, NO_SCHEMA);
@@ -171,7 +312,15 @@ describe('readTables — relational layout', () => {
       const envelopes = [
          {
             documentType: 'weapon',
-            source: { _id: '', system: { rulesElement: [{ name: 'code', value: 'a' }] } },
+            source: {
+               _id: '',
+               system: {
+                  rulesElement: [{
+                     name: 'code',
+                     value: 'a' 
+                  }] 
+               } 
+            },
          },
       ];
       const workbook = buildTables(envelopes, 'relational', 'Item', NO_SCHEMA);

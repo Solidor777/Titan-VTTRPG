@@ -4,7 +4,7 @@
    import sortAscending from '~/helpers/utility-functions/SortAscending.js';
    import EmbeddedDocumentProvider from '~/document/reactive/EmbeddedDocumentProvider.svelte';
    import CharacterSheetEffect
-      from '~/document/types/actor/types/character/sheet/items/effect/CharacterSheetEffect.svelte';
+   from '~/document/types/actor/types/character/sheet/items/effect/CharacterSheetEffect.svelte';
    import DragHandle from '~/helpers/svelte-components/drag-reorder/DragHandle.svelte';
    import InsertionLine from '~/helpers/svelte-components/drag-reorder/InsertionLine.svelte';
    import { draggableRow, reorderDropZone } from '~/helpers/svelte-components/drag-reorder/DragReorderActions.js';
@@ -67,11 +67,18 @@
       }
 
       /** @type {object[]} The minimal sort updates produced by the integer-sort helper. */
-      const updates = foundry.utils.performIntegerSort(source, { target, siblings, sortBefore });
+      const updates = foundry.utils.performIntegerSort(source, {
+         target,
+         siblings,
+         sortBefore 
+      });
       await document.data.updateEmbeddedDocuments(
          'ActiveEffect',
          updates.map((entry) => {
-            return { ...entry.update, _id: entry.target._id };
+            return {
+               ...entry.update,
+               _id: entry.target._id 
+            };
          }),
       );
    }

@@ -22,11 +22,18 @@ test.describe('permissions — sheet ownership levels', () => {
             const actor = await Actor.create({
                name: actorName,
                type: 'player',
-               ownership: { default: 0, [player.id]: level },
+               ownership: {
+                  default: 0,
+                  [player.id]: level 
+               },
             });
             return actor.id;
          },
-         { actorName, playerName, levelKey },
+         {
+            actorName,
+            playerName,
+            levelKey 
+         },
       );
    }
 
@@ -66,7 +73,10 @@ test.describe('permissions — sheet ownership levels', () => {
    }
 
    test('OWNER: player can view and edit', async ({ browser }) => {
-      await withClients(browser, { gm: 'E2E GM 1', player: 'E2E Player 1' }, async ({ gm, player }) => {
+      await withClients(browser, {
+         gm: 'E2E GM 1',
+         player: 'E2E Player 1' 
+      }, async ({ gm, player }) => {
          const id = await seedOwnedActor(gm, 'B1 Owner Actor', 'E2E Player 1', 'OWNER');
          try {
             await player.waitForFunction((id) => !!game.actors.get(id), id, { timeout: 1000 });
@@ -82,7 +92,10 @@ test.describe('permissions — sheet ownership levels', () => {
    });
 
    test('OBSERVER: player can view but not edit', async ({ browser }) => {
-      await withClients(browser, { gm: 'E2E GM 1', player: 'E2E Player 1' }, async ({ gm, player }) => {
+      await withClients(browser, {
+         gm: 'E2E GM 1',
+         player: 'E2E Player 1' 
+      }, async ({ gm, player }) => {
          const id = await seedOwnedActor(gm, 'B1 Observer Actor', 'E2E Player 1', 'OBSERVER');
          try {
             await player.waitForFunction((id) => !!game.actors.get(id), id, { timeout: 1000 });
@@ -98,7 +111,10 @@ test.describe('permissions — sheet ownership levels', () => {
    });
 
    test('LIMITED: player can view (limited) but not edit', async ({ browser }) => {
-      await withClients(browser, { gm: 'E2E GM 1', player: 'E2E Player 1' }, async ({ gm, player }) => {
+      await withClients(browser, {
+         gm: 'E2E GM 1',
+         player: 'E2E Player 1' 
+      }, async ({ gm, player }) => {
          const id = await seedOwnedActor(gm, 'B1 Limited Actor', 'E2E Player 1', 'LIMITED');
          try {
             await player.waitForFunction((id) => !!game.actors.get(id), id, { timeout: 1000 });
@@ -122,7 +138,10 @@ test.describe('permissions — sheet ownership levels', () => {
    });
 
    test('NONE: player has no view permission on the actor', async ({ browser }) => {
-      await withClients(browser, { gm: 'E2E GM 1', player: 'E2E Player 1' }, async ({ gm, player }) => {
+      await withClients(browser, {
+         gm: 'E2E GM 1',
+         player: 'E2E Player 1' 
+      }, async ({ gm, player }) => {
          const id = await seedOwnedActor(gm, 'B1 None Actor', 'E2E Player 1', 'NONE');
          try {
             // Foundry replicates the Actor document to ALL clients regardless of ownership — permission

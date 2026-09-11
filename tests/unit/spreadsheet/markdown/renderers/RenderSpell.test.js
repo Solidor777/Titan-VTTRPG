@@ -271,7 +271,10 @@ describe('renderSpell', () => {
       const document = {
          name: 'Scatter Bolt',
          system: makeSystem({
-            aspect: [damageAspect(), extraTargetsAspect()],
+            aspect: [
+               damageAspect(),
+               extraTargetsAspect()
+            ],
          }),
       };
 

@@ -5,7 +5,6 @@
  * scoped to literals only. Reports a missing line break after `[`, after any element's trailing
  * comma, and before `]`; the fixer inserts bare newlines and relies on a later `@stylistic/indent
  * --fix` pass to re-indent them.
- *
  * @type {import('eslint').Rule.RuleModule}
  */
 const arrayLiteralNewlineRule = {
@@ -21,7 +20,6 @@ const arrayLiteralNewlineRule = {
    },
    /**
     * Builds the rule's visitor.
-    *
     * @param {import('eslint').Rule.RuleContext} context - The rule's execution context.
     * @returns {import('eslint').Rule.RuleListener} Visitor that reports and fixes array-literal newlines.
     */
@@ -34,7 +32,6 @@ const arrayLiteralNewlineRule = {
           * Validates the opening-bracket, per-element, and closing-bracket line breaks of an array literal
           * with 2 or more elements. Sparse-array holes (`null` elements) are skipped since they have no
           * token to anchor a comma check.
-          *
           * @param {import('estree').ArrayExpression} node - The array literal being visited.
           * @returns {void}
           */

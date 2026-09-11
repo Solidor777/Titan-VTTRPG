@@ -31,24 +31,39 @@ const BUILT_IN_BASES = Object.freeze({
  * @param {object} data - The parsed import payload.
  * @param {object} [options] - Validation options.
  * @param {function(string): (object | undefined)} [options.getBaseTheme] - Resolves a base theme by id;
- *    defaults to the built-in themes, keyed by the payload's dark flag when no base is declared.
+ * defaults to the built-in themes, keyed by the payload's dark flag when no base is declared.
  * @returns {{ ok: boolean, theme?: object, error?: string }} The normalized theme or a failure reason.
  */
 export default function validateThemeData(data, { getBaseTheme } = {}) {
    if (typeof data !== 'object' || data === null) {
-      return { ok: false, error: 'Theme data is not an object.' };
+      return {
+         ok: false,
+         error: 'Theme data is not an object.' 
+      };
    }
    if (data.formatVersion !== THEME_FORMAT_VERSION) {
-      return { ok: false, error: `Unsupported theme format version: ${data.formatVersion}.` };
+      return {
+         ok: false,
+         error: `Unsupported theme format version: ${data.formatVersion}.` 
+      };
    }
    if (typeof data.name !== 'string' || data.name.trim().length === 0) {
-      return { ok: false, error: 'Theme name must be a non-empty string.' };
+      return {
+         ok: false,
+         error: 'Theme name must be a non-empty string.' 
+      };
    }
    if (typeof data.dark !== 'boolean') {
-      return { ok: false, error: 'Theme dark flag must be a boolean.' };
+      return {
+         ok: false,
+         error: 'Theme dark flag must be a boolean.' 
+      };
    }
    if (typeof data.tokens !== 'object' || data.tokens === null) {
-      return { ok: false, error: 'Theme tokens must be an object.' };
+      return {
+         ok: false,
+         error: 'Theme tokens must be an object.' 
+      };
    }
 
    // Resolve the fill-from base theme for tokens the payload omits.

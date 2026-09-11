@@ -4,26 +4,26 @@
    import localize from '~/helpers/utility-functions/Localize.js';
    import DocumentOwnerIconButton from '~/document/svelte-components/DocumentOwnerIconButton.svelte';
    import ItemSheetRulesElementOperationSelect
-      from '~/document/types/item/sheet/rules-element/ItemSheetRulesElementOperationSelect.svelte';
+   from '~/document/types/item/sheet/rules-element/ItemSheetRulesElementOperationSelect.svelte';
    import ItemSheetConditionalCheckModifierSettings
-      from '~/document/types/item/sheet/rules-element/ItemSheetConditionalCheckModifierSettings.svelte';
+   from '~/document/types/item/sheet/rules-element/ItemSheetConditionalCheckModifierSettings.svelte';
    import ItemSheetFastHealingSettings
-      from '~/document/types/item/sheet/rules-element/ItemSheetFastHealingSettings.svelte';
+   from '~/document/types/item/sheet/rules-element/ItemSheetFastHealingSettings.svelte';
    import ItemSheetConditionalRatingModifierSettings
-      from '~/document/types/item/sheet/rules-element/ItemSheetConditionalRatingModifierSettings.svelte';
+   from '~/document/types/item/sheet/rules-element/ItemSheetConditionalRatingModifierSettings.svelte';
    import ItemSheetFlatModifierSettings
-      from '~/document/types/item/sheet/rules-element/ItemSheetFlatModifierSettings.svelte';
+   from '~/document/types/item/sheet/rules-element/ItemSheetFlatModifierSettings.svelte';
    import ItemSheetMulBaseSettings from '~/document/types/item/sheet/rules-element/ItemSheetMulBaseSettings.svelte';
    import ItemSheetMulSumSettings from '~/document/types/item/sheet/rules-element/ItemSheetMulSumSettings.svelte';
    import ItemSheetSetSumSettings from '~/document/types/item/sheet/rules-element/ItemSheetSetSumSettings.svelte';
    import ItemSheetPersistentDamageSettings
-      from '~/document/types/item/sheet/rules-element/ItemSheetPersistentDamageSettings.svelte';
+   from '~/document/types/item/sheet/rules-element/ItemSheetPersistentDamageSettings.svelte';
    import ItemSheetRollMessageSettings
-      from '~/document/types/item/sheet/rules-element/ItemSheetRollMessageSettings.svelte';
+   from '~/document/types/item/sheet/rules-element/ItemSheetRollMessageSettings.svelte';
    import ItemSheetTurnMessageSettings
-      from '~/document/types/item/sheet/rules-element/ItemSheetTurnMessageSettings.svelte';
+   from '~/document/types/item/sheet/rules-element/ItemSheetTurnMessageSettings.svelte';
    import ItemSheetInvalidRulesElement
-      from '~/document/types/item/sheet/rules-element/ItemSheetInvalidRulesElement.svelte';
+   from '~/document/types/item/sheet/rules-element/ItemSheetInvalidRulesElement.svelte';
    import LabeledElement from '~/helpers/svelte-components/LabeledElement.svelte';
    import DragHandle from '~/helpers/svelte-components/drag-reorder/DragHandle.svelte';
 
@@ -101,8 +101,8 @@
                icon={DELETE_ICON}
                label={localize('delete')}
                onclick={() => {
-               document.data.system.deleteRulesElement(idx);
-            }}
+                  document.data.system.deleteRulesElement(idx);
+               }}
             />
          </div>
       </div>

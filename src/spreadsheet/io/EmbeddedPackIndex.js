@@ -6,8 +6,8 @@
  * embedded (depth 2) and so is invisible to `pack.getDocument`, which only finds top-level documents.
  * @param {CompendiumCollection} targetPack - The existing target pack.
  * @returns {Promise<Map<string, {document:object, parentId:string, depth:number}>>} Embedded-document id
- *    -> its real parent id, document instance, and nesting depth (1 = owned item or top-level document's
- *    own effect, 2 = an effect on an owned item).
+ * -> its real parent id, document instance, and nesting depth (1 = owned item or top-level document's
+ * own effect, 2 = an effect on an owned item).
  */
 export async function buildPackEmbeddedIndex(targetPack) {
    /** @type {Map<string, {document:object, parentId:string, depth:number}>} */
@@ -16,13 +16,25 @@ export async function buildPackEmbeddedIndex(targetPack) {
    const topLevelDocuments = await targetPack.getDocuments();
    for (const document of topLevelDocuments) {
       for (const item of document.items ?? []) {
-         index.set(item.id, { document: item, parentId: document.id, depth: 1 });
+         index.set(item.id, {
+            document: item,
+            parentId: document.id,
+            depth: 1 
+         });
          for (const effect of item.effects ?? []) {
-            index.set(effect.id, { document: effect, parentId: item.id, depth: 2 });
+            index.set(effect.id, {
+               document: effect,
+               parentId: item.id,
+               depth: 2 
+            });
          }
       }
       for (const effect of document.effects ?? []) {
-         index.set(effect.id, { document: effect, parentId: document.id, depth: 1 });
+         index.set(effect.id, {
+            document: effect,
+            parentId: document.id,
+            depth: 1 
+         });
       }
    }
    return index;

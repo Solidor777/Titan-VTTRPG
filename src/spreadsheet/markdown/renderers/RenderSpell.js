@@ -99,7 +99,11 @@ export function renderSpell(document, { labels, slugFor }) {
     *    sortOrder, paired with their computed cost.
     */
    const enabledStandardAspects = (system.aspect ?? [])
-      .map((aspect, idx) => ({ aspect, enabled: costResult.enabled[idx], cost: costResult.aspectCosts[idx] }))
+      .map((aspect, idx) => ({
+         aspect,
+         enabled: costResult.enabled[idx],
+         cost: costResult.aspectCosts[idx] 
+      }))
       .filter((entry) => entry.enabled)
       .sort((a, b) => SpellAspects[a.aspect.label].sortOrder - SpellAspects[b.aspect.label].sortOrder);
 

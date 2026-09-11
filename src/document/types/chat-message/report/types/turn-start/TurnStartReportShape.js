@@ -9,8 +9,8 @@
  * snapshots nest under `resource` so the card can read the same `system.resource.*` path as the actor's
  * own persisted resources.
  * @returns {object} The turn-start report object-field shape: the expired-effects flag and the
- *    conditionally-present effects, healing/damage offers, resolve-regain offer, and nested resource
- *    snapshots.
+ * conditionally-present effects, healing/damage offers, resolve-regain offer, and nested resource
+ * snapshots.
  */
 export default function createTurnStartReportShape() {
    return {

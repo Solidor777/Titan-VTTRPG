@@ -41,18 +41,24 @@ const EXPECTED = {
    // factory declares it null -> nullable ObjectField, preserving the cards' if (obj) guards. Each key's
    // nested resource sub-fields are asserted separately below (RESOURCE_FIELDS).
    damageReport: {
-      damageTaken: { type: 'NumberField' }, damageResisted: { type: 'NumberField' },
-      staminaLost: { type: 'NumberField' }, woundsSuffered: { type: 'NumberField' },
+      damageTaken: { type: 'NumberField' },
+      damageResisted: { type: 'NumberField' },
+      staminaLost: { type: 'NumberField' },
+      woundsSuffered: { type: 'NumberField' },
       ignoredArmor: { type: 'BooleanField' },
       resource: { type: 'SchemaField' },
-      tags: { type: 'ObjectField', nullable: true },
+      tags: {
+         type: 'ObjectField',
+         nullable: true 
+      },
    },
    healingReport: {
       staminaRestored: { type: 'NumberField' },
       resource: { type: 'SchemaField' },
    },
    spendResolveReport: {
-      resolveSpent: { type: 'NumberField' }, resolveShortage: { type: 'NumberField' },
+      resolveSpent: { type: 'NumberField' },
+      resolveShortage: { type: 'NumberField' },
       resource: { type: 'SchemaField' },
    },
    longRestReport: {
@@ -64,13 +70,23 @@ const EXPECTED = {
    // present, so the shape factory declares it null -> nullable ObjectField, preserving the cards'
    // if (armor) guards.
    rendReport: {
-      armorImg: { type: 'StringField' }, armorName: { type: 'StringField' },
+      armorImg: { type: 'StringField' },
+      armorName: { type: 'StringField' },
       rend: { type: 'NumberField' },
-      armorLost: { type: 'NumberField' }, armor: { type: 'ObjectField', nullable: true },
+      armorLost: { type: 'NumberField' },
+      armor: {
+         type: 'ObjectField',
+         nullable: true 
+      },
    },
    repairsReport: {
-      armorImg: { type: 'StringField' }, armorName: { type: 'StringField' },
-      armorRepaired: { type: 'NumberField' }, armor: { type: 'ObjectField', nullable: true },
+      armorImg: { type: 'StringField' },
+      armorName: { type: 'StringField' },
+      armorRepaired: { type: 'NumberField' },
+      armor: {
+         type: 'ObjectField',
+         nullable: true 
+      },
    },
 
    // Task 2c: header-only report leaves (remove-combat-effects, short-rest). These carry no payload
@@ -89,19 +105,40 @@ const EXPECTED = {
    // nullability), so the element type is not re-asserted here.
    turnStartReport: {
       expiredEffectsRemoved: { type: 'BooleanField' },
-      effects: { type: 'ObjectField', nullable: true },
-      fastHealing: { type: 'ObjectField', nullable: true },
-      persistentDamage: { type: 'ObjectField', nullable: true },
-      resolveRegain: { type: 'ObjectField', nullable: true },
+      effects: {
+         type: 'ObjectField',
+         nullable: true 
+      },
+      fastHealing: {
+         type: 'ObjectField',
+         nullable: true 
+      },
+      persistentDamage: {
+         type: 'ObjectField',
+         nullable: true 
+      },
+      resolveRegain: {
+         type: 'ObjectField',
+         nullable: true 
+      },
       resource: { type: 'SchemaField' },
       message: { type: 'ArrayField' },
       conditions: { type: 'ArrayField' },
    },
    turnEndReport: {
       expiredEffectsRemoved: { type: 'BooleanField' },
-      effects: { type: 'ObjectField', nullable: true },
-      fastHealing: { type: 'ObjectField', nullable: true },
-      persistentDamage: { type: 'ObjectField', nullable: true },
+      effects: {
+         type: 'ObjectField',
+         nullable: true 
+      },
+      fastHealing: {
+         type: 'ObjectField',
+         nullable: true 
+      },
+      persistentDamage: {
+         type: 'ObjectField',
+         nullable: true 
+      },
       resource: { type: 'SchemaField' },
       message: { type: 'ArrayField' },
    },
@@ -114,19 +151,37 @@ const EXPECTED = {
    // resolve snapshot (turn end never regains or reports resolve). The effects-expired report's only
    // always-present field is the boolean expired-effects flag.
    turnStartRevertReport: {
-      fastHealingRevert: { type: 'ObjectField', nullable: true },
-      persistentDamageRevert: { type: 'ObjectField', nullable: true },
-      resolveRegainRevert: { type: 'ObjectField', nullable: true },
+      fastHealingRevert: {
+         type: 'ObjectField',
+         nullable: true 
+      },
+      persistentDamageRevert: {
+         type: 'ObjectField',
+         nullable: true 
+      },
+      resolveRegainRevert: {
+         type: 'ObjectField',
+         nullable: true 
+      },
       resource: { type: 'SchemaField' },
    },
    turnEndRevertReport: {
-      fastHealingRevert: { type: 'ObjectField', nullable: true },
-      persistentDamageRevert: { type: 'ObjectField', nullable: true },
+      fastHealingRevert: {
+         type: 'ObjectField',
+         nullable: true 
+      },
+      persistentDamageRevert: {
+         type: 'ObjectField',
+         nullable: true 
+      },
       resource: { type: 'SchemaField' },
    },
    effectsExpiredReport: {
       expiredEffectsRemoved: { type: 'BooleanField' },
-      effects: { type: 'ObjectField', nullable: true },
+      effects: {
+         type: 'ObjectField',
+         nullable: true 
+      },
    },
 };
 
@@ -138,14 +193,34 @@ const EXPECTED = {
  * @type {Record<string, string[]>}
  */
 const RESOURCE_FIELDS = {
-   damageReport: ['stamina', 'wounds'],
-   healingReport: ['stamina', 'wounds'],
+   damageReport: [
+      'stamina',
+      'wounds'
+   ],
+   healingReport: [
+      'stamina',
+      'wounds'
+   ],
    spendResolveReport: ['resolve'],
    longRestReport: ['wounds'],
-   turnStartReport: ['stamina', 'wounds', 'resolve'],
-   turnEndReport: ['stamina', 'wounds'],
-   turnStartRevertReport: ['stamina', 'wounds', 'resolve'],
-   turnEndRevertReport: ['stamina', 'wounds'],
+   turnStartReport: [
+      'stamina',
+      'wounds',
+      'resolve'
+   ],
+   turnEndReport: [
+      'stamina',
+      'wounds'
+   ],
+   turnStartRevertReport: [
+      'stamina',
+      'wounds',
+      'resolve'
+   ],
+   turnEndRevertReport: [
+      'stamina',
+      'wounds'
+   ],
 };
 
 beforeAll(async () => {
@@ -182,12 +257,11 @@ beforeAll(async () => {
       await import('~/document/types/chat-message/report/types/repairs/RepairsReportChatMessageDataModel.js')
    ).default;
 
-   // Task 2c: the header-only report leaves (remove-combat-effects, short-rest).
-   models.removeCombatEffectsReport = (
-      await import(
-         '~/document/types/chat-message/report/types/remove-combat-effects/RemoveCombatEffectsReportChatMessageDataModel.js'
-      )
-   ).default;
+   // The header-only report leaves (remove-combat-effects, short-rest).
+   /** @type {string} Path held in a variable since the joined literal exceeds max-len. */
+   const removeCombatEffectsReportPath = '~/document/types/chat-message/report/types/remove-combat-effects/' +
+      'RemoveCombatEffectsReportChatMessageDataModel.js';
+   models.removeCombatEffectsReport = (await import(removeCombatEffectsReportPath)).default;
    models.shortRestReport = (
       await import(
          '~/document/types/chat-message/report/types/short-rest-report/ShortRestReportChatMessageDataModel.js'
@@ -237,7 +311,11 @@ describe('Report chat-message schema equivalence (golden master)', () => {
       expect(schema.documentVersion).toBeInstanceOf(MockNumberField);
 
       // No other fields should exist on the report family base.
-      expect(Object.keys(schema).sort()).toEqual(['actorImg', 'actorName', 'documentVersion']);
+      expect(Object.keys(schema).sort()).toEqual([
+         'actorImg',
+         'actorName',
+         'documentVersion'
+      ]);
    });
 
    for (const [key, fields] of Object.entries(EXPECTED)) {
@@ -256,7 +334,11 @@ describe('Report chat-message schema equivalence (golden master)', () => {
          }
 
          // No unexpected fields beyond the shared base label fields and the version field.
-         const ignore = new Set(['actorName', 'actorImg', 'documentVersion']);
+         const ignore = new Set([
+            'actorName',
+            'actorImg',
+            'documentVersion'
+         ]);
          const extra = Object.keys(schema).filter((field) => !ignore.has(field) && !(field in fields));
          expect(extra, `unexpected extra fields on ${key}`).toEqual([]);
       });

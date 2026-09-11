@@ -205,7 +205,7 @@
 
       <!--Key-->
       {#if element.selector !== 'multiAttack'
-      && element.selector !== 'any'}
+         && element.selector !== 'any'}
          <div class="field select">
             {#if getSelector()}
                {@const Selector = getSelector()}

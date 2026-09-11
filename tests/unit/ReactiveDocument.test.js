@@ -6,9 +6,18 @@ import DocumentProbe from '../components/DocumentProbe.svelte';
 
 describe('ReactiveDocument', () => {
    it('re-renders a reader when the wrapped document updates', () => {
-      const doc = { id: 'a1', documentName: 'Actor', system: { value: 1 } };
+      const doc = {
+         id: 'a1',
+         documentName: 'Actor',
+         system: { value: 1 } 
+      };
       const bridge = new ReactiveDocument(doc);
-      render(DocumentProbe, { context: new Map([['document', bridge]]) });
+      render(DocumentProbe, {
+         context: new Map([[
+            'document',
+            bridge
+         ]]) 
+      });
       expect(screen.getByTestId('value').textContent).toBe('1');
 
       // Mutate the live document and fire the corresponding update hook.

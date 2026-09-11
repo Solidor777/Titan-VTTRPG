@@ -9,7 +9,7 @@
    import CheckDialogTotalDiceSummary from '~/check/dialog/CheckDialogTotalDiceSummary.svelte';
    import CheckDialogTotalExpertiseSummary from '~/check/dialog/CheckDialogTotalExpertiseSummary.svelte';
    import CheckDialogResistanceField
-      from '~/check/types/resistance-check/dialog/ResistanceCheckDialogResistanceField.svelte';
+   from '~/check/types/resistance-check/dialog/ResistanceCheckDialogResistanceField.svelte';
    import getApplication from '~/helpers/utility-functions/GetApplication.js';
    import localize from '~/helpers/utility-functions/Localize.js';
    import warn from '~/helpers/utility-functions/Warn.js';
@@ -31,7 +31,10 @@
    /** @type {ResistanceCheckDialog} The Svelte Component's Application. */
    const application = getApplication();
 
-   /** @type {Array<typeof import('svelte').SvelteComponent>} Components for changing the options and displaying the parameters. */
+   /**
+    * @type {Array<typeof import('svelte').SvelteComponent>} Components for changing the options and
+    *    displaying the parameters.
+    */
    const rows = [
       CheckDialogResistanceField,
       CheckDialogDifficultyField,

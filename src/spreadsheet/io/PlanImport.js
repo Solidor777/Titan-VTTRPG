@@ -8,17 +8,17 @@ import { buildPackEmbeddedIndex } from '~/spreadsheet/io/EmbeddedPackIndex.js';
  * @typedef {object} PlanEntry
  * @property {string} documentType - The document's subtype name.
  * @property {'Actor'|'Item'|'ActiveEffect'} documentName - The document class the row is created or
- *    updated through, resolved from its depth, the pack type, and its subtype.
+ * updated through, resolved from its depth, the pack type, and its subtype.
  * @property {string} id - The document's (already-remapped) 16-character Foundry id.
  * @property {string} parentId - The parent document's id, or '' for a top-level pack document.
  * @property {number} depth - 0 = top-level pack document, 1 = an owned item or a direct effect, 2 = an
- *    effect on an owned item.
+ * effect on an owned item.
  * @property {object} [source] - The full document source (creates only).
  * @property {object} [changes] - The changed fields only, excluding `_id` (updates only).
  * @property {string} [folderPath] - The document's target folder path (creates always; updates only at
- *    depth 0, where a folder move is possible). Undefined means the sheet carried no `_folder` column at
- *    all (leave the folder untouched on update); `''` means a present-but-blank cell (move to the pack
- *    root).
+ * depth 0, where a folder move is possible). Undefined means the sheet carried no `_folder` column at
+ * all (leave the folder untouched on update); `''` means a present-but-blank cell (move to the pack
+ * root).
  */
 
 /**
@@ -28,7 +28,7 @@ import { buildPackEmbeddedIndex } from '~/spreadsheet/io/EmbeddedPackIndex.js';
  * @property {Array<{id:string}>} deletes - Top-level pack documents to delete.
  * @property {Array<{path:string}>} folders - Folder paths to ensure exist.
  * @property {Array<{sheet:string,row:number,column:string,message:string}>} errors - Row/file-level
- *    validation failures; a non-empty array means the plan is not safe to apply as-is.
+ * validation failures; a non-empty array means the plan is not safe to apply as-is.
  * @property {'Actor'|'Item'|'ActiveEffect'} packType - The pack type the plan targets.
  */
 
@@ -40,7 +40,10 @@ import { buildPackEmbeddedIndex } from '~/spreadsheet/io/EmbeddedPackIndex.js';
 async function decodeFiles(files) {
    /** @type {Array<{name: string, bytes: Uint8Array}>} */
    const entries = await Promise.all(
-      files.map(async (file) => ({ name: file.name, bytes: new Uint8Array(await file.arrayBuffer()) })),
+      files.map(async (file) => ({
+         name: file.name,
+         bytes: new Uint8Array(await file.arrayBuffer()) 
+      })),
    );
    return decodeSpreadsheetFiles(entries);
 }
@@ -76,7 +79,7 @@ function remapId(envelope, idRemap) {
  * chain does not exist in the uploaded file for `byId` to walk.
  * @param {import('~/spreadsheet/codec/BuildTables.js').DocumentEnvelope} envelope - The envelope.
  * @param {Map<string, import('~/spreadsheet/codec/BuildTables.js').DocumentEnvelope>} byId - Every
- *    envelope keyed by its (already-remapped) id.
+ * envelope keyed by its (already-remapped) id.
  * @returns {number} The nesting depth.
  */
 function depthOf(envelope, byId) {
@@ -152,14 +155,14 @@ async function resolveExistingDocument(id, context) {
  * (or against bare document construction for a new compendium), and returns a full ImportPlan without
  * writing anything.
  *
- * A malformed schema-typed cell anywhere in the file (e.g. non-numeric text in a number-typed field)
+ * A malformed schema-typed cell anywhere in the file (e.g. Non-numeric text in a number-typed field)
  * makes `readTables` throw; that failure is coarser than a per-row error — it aborts reading the whole
  * file rather than just the offending row — and is reported as a single file-level entry on the
  * `'_manifest'` sheet rather than propagating out of this function.
  * @param {File[]} files - The uploaded file(s): a single .xlsx, a single .csv, or a .zip/.csv set.
  * @param {CompendiumCollection|null} targetPack - The existing target pack, or null for a new compendium.
  * @param {boolean} deleteMissing - Whether top-level pack documents absent from the file should be
- *    planned for deletion (see this plan's Global Constraints for the embedded-document limitation).
+ * planned for deletion (see this plan's Global Constraints for the embedded-document limitation).
  * @returns {Promise<ImportPlan>} The validated plan.
  */
 export async function planImport(files, targetPack, deleteMissing) {
@@ -178,8 +181,16 @@ export async function planImport(files, targetPack, deleteMissing) {
       // A corrupt/unreadable upload (a malformed xlsx zip, an unparseable csv) fails before packType is
       // even known; report it as a single file-level error rather than crashing the import.
       return {
-         creates: [], updates: [], deletes: [], folders: [],
-         errors: [{ sheet: '_manifest', row: 0, column: '', message: `Failed to read the file: ${error.message}` }],
+         creates: [],
+         updates: [],
+         deletes: [],
+         folders: [],
+         errors: [{
+            sheet: '_manifest',
+            row: 0,
+            column: '',
+            message: `Failed to read the file: ${error.message}` 
+         }],
          packType: '',
       };
    }
@@ -188,9 +199,14 @@ export async function planImport(files, targetPack, deleteMissing) {
 
    if (targetPack && packType && targetPack.metadata.type !== packType) {
       return {
-         creates: [], updates: [], deletes: [], folders: [],
+         creates: [],
+         updates: [],
+         deletes: [],
+         folders: [],
          errors: [{
-            sheet: '_manifest', row: 0, column: 'packType',
+            sheet: '_manifest',
+            row: 0,
+            column: 'packType',
             message: `The file's document type (${packType}) does not match the target pack `
                + `(${targetPack.metadata.type}).`,
          }],
@@ -199,9 +215,14 @@ export async function planImport(files, targetPack, deleteMissing) {
    }
    if (!targetPack && !packType) {
       return {
-         creates: [], updates: [], deletes: [], folders: [],
+         creates: [],
+         updates: [],
+         deletes: [],
+         folders: [],
          errors: [{
-            sheet: '_manifest', row: 0, column: 'packType',
+            sheet: '_manifest',
+            row: 0,
+            column: 'packType',
             message: 'The file has no _manifest sheet naming its document type, and no target pack was selected '
                + 'to infer it from. Select an existing pack, or export from a pack that produced a manifest.',
          }],
@@ -223,8 +244,16 @@ export async function planImport(files, targetPack, deleteMissing) {
       // A malformed schema-typed cell anywhere in the file aborts the whole read; report it as a single
       // file-level error rather than crashing the import, at the cost of per-row precision.
       return {
-         creates: [], updates: [], deletes: [], folders: [],
-         errors: [{ sheet: '_manifest', row: 0, column: '', message: `Failed to read the file: ${error.message}` }],
+         creates: [],
+         updates: [],
+         deletes: [],
+         folders: [],
+         errors: [{
+            sheet: '_manifest',
+            row: 0,
+            column: '',
+            message: `Failed to read the file: ${error.message}` 
+         }],
          packType: resolvedPackType,
       };
    }
@@ -243,10 +272,18 @@ export async function planImport(files, targetPack, deleteMissing) {
    }
 
    /** @type {Map<string, object>} Envelope by its final id, for depth resolution. */
-   const byId = new Map(envelopes.map((e) => [e.source._id, e]));
+   const byId = new Map(envelopes.map((e) => [
+      e.source._id,
+      e
+   ]));
 
    /** @type {ExistingLookupContext} Shared across every row so each parent is fetched at most once. */
-   const lookupContext = { byId, targetPack, packType: resolvedPackType, cache: new Map() };
+   const lookupContext = {
+      byId,
+      targetPack,
+      packType: resolvedPackType,
+      cache: new Map() 
+   };
 
    // The target pack's embedded-document index, built at most once and only when a row actually needs it.
    /** @type {Promise<Map<string, {document:object, parentId:string, depth:number}>>|null} */
@@ -274,7 +311,14 @@ export async function planImport(files, targetPack, deleteMissing) {
    }
 
    /** @type {ImportPlan} */
-   const plan = { creates: [], updates: [], deletes: [], folders: [], errors: [], packType: resolvedPackType };
+   const plan = {
+      creates: [],
+      updates: [],
+      deletes: [],
+      folders: [],
+      errors: [],
+      packType: resolvedPackType 
+   };
    /** @type {Set<string>} Folder paths already queued. */
    const queuedFolders = new Set();
    /** @type {Set<string>} Every top-level id present in the file, for the delete-missing pass. */
@@ -310,7 +354,12 @@ export async function planImport(files, targetPack, deleteMissing) {
             const { _id, ...changes } = envelope.source;
             existing.updateSource(changes, { dryRun: true });
             plan.updates.push({
-               documentType: envelope.documentType, documentName, id, parentId, depth, changes,
+               documentType: envelope.documentType,
+               documentName,
+               id,
+               parentId,
+               depth,
+               changes,
                // Top-level only: an update row's folder move is applied separately from `changes`, since
                // the sheet's `_folder` path must be resolved to the TARGET pack's folder id, not reused
                // from `envelope.source` (which never carries a `folder` field at all — see
@@ -323,16 +372,25 @@ export async function planImport(files, targetPack, deleteMissing) {
             // weapon row in an Actor pack is an Item, not an Actor, and the Actor class rejects it.
             /** @type {typeof Actor|typeof Item|typeof ActiveEffect} */
             const DocumentClass = getDocumentClass(documentName);
-            // eslint-disable-next-line no-new -- constructed only to run full schema validation.
             new DocumentClass(envelope.source);
             plan.creates.push({
-               documentType: envelope.documentType, documentName, id, parentId, depth,
-               source: envelope.source, folderPath: envelope.folderPath,
+               documentType: envelope.documentType,
+               documentName,
+               id,
+               parentId,
+               depth,
+               source: envelope.source,
+               folderPath: envelope.folderPath,
             });
          }
       }
       catch (error) {
-         plan.errors.push({ sheet: envelope.sheetName, row: envelope.rowNumber, column: '', message: error.message });
+         plan.errors.push({
+            sheet: envelope.sheetName,
+            row: envelope.rowNumber,
+            column: '',
+            message: error.message 
+         });
       }
    }
 

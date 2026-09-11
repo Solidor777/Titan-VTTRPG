@@ -4,7 +4,7 @@
    import localize from '~/helpers/utility-functions/Localize.js';
    import { REGAIN_RESOLVE_ICON } from '~/system/Icons.js';
    import ChatMessageResourceModButton
-      from '~/document/types/chat-message/components/buttons/ChatMessageResourceModButton.svelte';
+   from '~/document/types/chat-message/components/buttons/ChatMessageResourceModButton.svelte';
    import assert from '~/helpers/utility-functions/Assert.js';
 
    /** @type {object} Reference to the reactive Document store. */
@@ -71,6 +71,9 @@
 <ChatMessageResourceModButton
    icon={REGAIN_RESOLVE_ICON}
    label={localize('regainX%Resolve').replace('X%', document.data.system.resolveRegain.total)}
-   tooltip={{ text: getTooltip(), localize: false }}
+   tooltip={{
+      text: getTooltip(),
+      localize: false 
+   }}
    confirmFn={confirm}
 />

@@ -3,15 +3,15 @@
    import IntegerIncrementInput from '~/helpers/svelte-components/input/IntegerIncrementInput.svelte';
    import CommodityStats from '~/document/types/item/types/commodity/components/CommodityStats.svelte';
    import CharacterSheetItem
-      from '~/document/types/actor/types/character/sheet/items/CharacterSheetItem.svelte';
+   from '~/document/types/actor/types/character/sheet/items/CharacterSheetItem.svelte';
    import CharacterSheetItemSendToChatButton
-      from '~/document/types/actor/types/character/sheet/items/CharacterSheetItemSendToChatButton.svelte';
+   from '~/document/types/actor/types/character/sheet/items/CharacterSheetItemSendToChatButton.svelte';
    import CharacterSheetItemEditButton
-      from '~/document/types/actor/types/character/sheet/items/CharacterSheetItemEditButton.svelte';
+   from '~/document/types/actor/types/character/sheet/items/CharacterSheetItemEditButton.svelte';
    import CharacterSheetItemDeleteButton
-      from '~/document/types/actor/types/character/sheet/items/CharacterSheetItemDeleteButton.svelte';
+   from '~/document/types/actor/types/character/sheet/items/CharacterSheetItemDeleteButton.svelte';
    import CharacterSheetItemChecks
-      from '~/document/types/actor/types/character/sheet/items/CharacterSheetItemChecks.svelte';
+   from '~/document/types/actor/types/character/sheet/items/CharacterSheetItemChecks.svelte';
    import { getContext } from 'svelte';
 
    /**

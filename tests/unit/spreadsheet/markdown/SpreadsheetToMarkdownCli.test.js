@@ -45,7 +45,15 @@ function fixtureEnvelopes() {
             type: 'weapon',
             img: 'i.svg',
             sort: 1,
-            system: { rarity: 'common', value: 5, attack: [], attackNotes: '', trait: [], check: [], description: '' },
+            system: {
+               rarity: 'common',
+               value: 5,
+               attack: [],
+               attackNotes: '',
+               trait: [],
+               check: [],
+               description: '' 
+            },
          },
          parentId: '',
          folderPath: '',
@@ -126,13 +134,24 @@ function writeFixtureXlsx(fileName) {
 function runCliProcess(args) {
    try {
       /** @type {string} Captured stdout. */
-      const stdout = execFileSync('node', ['scripts/spreadsheet-to-markdown.mjs', ...args], {
+      const stdout = execFileSync('node', [
+         'scripts/spreadsheet-to-markdown.mjs',
+         ...args
+      ], {
          cwd: repoRoot,
          encoding: 'utf8',
       });
-      return { status: 0, stdout, stderr: '' };
+      return {
+         status: 0,
+         stdout,
+         stderr: '' 
+      };
    } catch (error) {
-      return { status: error.status, stdout: error.stdout ?? '', stderr: error.stderr ?? '' };
+      return {
+         status: error.status,
+         stdout: error.stdout ?? '',
+         stderr: error.stderr ?? '' 
+      };
    }
 }
 
@@ -156,7 +175,10 @@ describe('spreadsheet-to-markdown CLI', () => {
       /** @type {string} The expected Markdown, rendered directly for byte comparison. */
       const expected = renderCompendiumMarkdown(
          workbookToDocuments(built),
-         { title: 'default-out', labels: createLabels(realLang) },
+         {
+            title: 'default-out',
+            labels: createLabels(realLang) 
+         },
       );
 
       expect(written).toBe(expected);
@@ -169,7 +191,13 @@ describe('spreadsheet-to-markdown CLI', () => {
       const outPath = path.join(sinkDir, 'custom-out-explicit.md');
 
       /** @type {{status: number, stdout: string, stderr: string}} The CLI process result. */
-      const result = runCliProcess([xlsxPath, '--title', 'Custom Title', '--out', outPath]);
+      const result = runCliProcess([
+         xlsxPath,
+         '--title',
+         'Custom Title',
+         '--out',
+         outPath
+      ]);
 
       expect(result.status).toBe(0);
       expect(result.stdout.trim()).toBe(`Wrote ${outPath} (3 documents)`);
@@ -181,7 +209,10 @@ describe('spreadsheet-to-markdown CLI', () => {
       /** @type {string} The expected Markdown, rendered directly with the explicit title. */
       const expected = renderCompendiumMarkdown(
          workbookToDocuments(built),
-         { title: 'Custom Title', labels: createLabels(realLang) },
+         {
+            title: 'Custom Title',
+            labels: createLabels(realLang) 
+         },
       );
 
       expect(written).toBe(expected);
@@ -208,7 +239,10 @@ describe('spreadsheet-to-markdown CLI', () => {
       /** @type {string} The expected Markdown, rendered directly with the directory-derived title. */
       const expected = renderCompendiumMarkdown(
          workbookToDocuments(built),
-         { title: 'dir-input', labels: createLabels(realLang) },
+         {
+            title: 'dir-input',
+            labels: createLabels(realLang) 
+         },
       );
 
       expect(written).toBe(expected);
@@ -219,7 +253,14 @@ describe('spreadsheet-to-markdown CLI', () => {
       const built = buildTables(
          [{
             documentType: 'npc',
-            source: { _id: 'a'.repeat(16), name: 'Goblin', type: 'npc', img: 'i.svg', sort: 1, system: {} },
+            source: {
+               _id: 'a'.repeat(16),
+               name: 'Goblin',
+               type: 'npc',
+               img: 'i.svg',
+               sort: 1,
+               system: {} 
+            },
             parentId: '',
             folderPath: '',
          }],
@@ -312,7 +353,11 @@ describe('spreadsheet-to-markdown CLI', () => {
       writeFileSync(outPath, sentinel, 'utf-8');
 
       /** @type {{status: number, stdout: string, stderr: string}} The CLI process result. */
-      const result = runCliProcess([xlsxPath, '--lang', missingLangPath]);
+      const result = runCliProcess([
+         xlsxPath,
+         '--lang',
+         missingLangPath
+      ]);
 
       expect(result.status).toBe(1);
       expect(result.stderr.trim().length).toBeGreaterThan(0);

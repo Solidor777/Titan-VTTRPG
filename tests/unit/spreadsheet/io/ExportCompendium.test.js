@@ -2,15 +2,31 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { exportCompendium } from '~/spreadsheet/io/ExportCompendium.js';
 import { unzipFilesAsText } from '~/spreadsheet/format/Zip.js';
 
-/** Minimal stand-in for an owned Item/ActiveEffect document. */
+/**
+ * Minimal stand-in for an owned Item/ActiveEffect document.
+ * @param type
+ * @param id
+ * @param system
+ * @param effects
+ */
 function makeDoc(type, id, system = {}, effects = []) {
-   return { type, id, effects, toObject: () => ({ _id: id, name: id, type, system }) };
+   return {
+      type,
+      id,
+      effects,
+      toObject: () => ({
+         _id: id,
+         name: id,
+         type,
+         system 
+      }) 
+   };
 }
 
 /** Minimal stand-in for a Foundry DataField, matching real DataField's own instance-property copying. */
 class MockField {
    /**
-    * @param {object} options - The field configuration (e.g. nullable).
+    * @param {object} options - The field configuration (e.g. Nullable).
     */
    constructor(options = {}) {
       Object.assign(this, options);
@@ -38,8 +54,15 @@ class MockSchemaField extends MockField {
 describe('exportCompendium', () => {
    beforeEach(() => {
       /** @type {object} Minimal per-document-type CONFIG entry resolveTypeSchemas reads. */
-      const emptyTypeConfig = { dataModels: {}, documentClass: { schema: { fields: {} } } };
-      globalThis.CONFIG = { Item: emptyTypeConfig, Actor: emptyTypeConfig, ActiveEffect: emptyTypeConfig };
+      const emptyTypeConfig = {
+         dataModels: {},
+         documentClass: { schema: { fields: {} } } 
+      };
+      globalThis.CONFIG = {
+         Item: emptyTypeConfig,
+         Actor: emptyTypeConfig,
+         ActiveEffect: emptyTypeConfig 
+      };
       globalThis.foundry.utils.saveDataToFile = vi.fn();
    });
 
@@ -53,11 +76,18 @@ describe('exportCompendium', () => {
          items: [weapon],
          effects: [],
          folder: null,
-         toObject: () => ({ _id: 'b'.repeat(16), name: 'Goblin', type: 'npc' }),
+         toObject: () => ({
+            _id: 'b'.repeat(16),
+            name: 'Goblin',
+            type: 'npc' 
+         }),
       };
       /** @type {object} A pack stand-in. */
       const pack = {
-         metadata: { type: 'Actor', label: 'Test Actors' },
+         metadata: {
+            type: 'Actor',
+            label: 'Test Actors' 
+         },
          folders: [],
          getDocuments: async () => [actor],
       };
@@ -85,11 +115,18 @@ describe('exportCompendium', () => {
          items: [weapon],
          effects: [actorEffect],
          folder: null,
-         toObject: () => ({ _id: 'b'.repeat(16), name: 'Goblin', type: 'npc' }),
+         toObject: () => ({
+            _id: 'b'.repeat(16),
+            name: 'Goblin',
+            type: 'npc' 
+         }),
       };
       /** @type {object} */
       const pack = {
-         metadata: { type: 'Actor', label: 'Test Actors' },
+         metadata: {
+            type: 'Actor',
+            label: 'Test Actors' 
+         },
          folders: [],
          getDocuments: async () => [actor],
       };
@@ -130,9 +167,15 @@ describe('exportCompendium', () => {
             });
          }
       }
-      globalThis.CONFIG.Item = { dataModels: { weapon: WeaponDataModel }, documentClass: { schema: { fields: {} } } };
+      globalThis.CONFIG.Item = {
+         dataModels: { weapon: WeaponDataModel },
+         documentClass: { schema: { fields: {} } } 
+      };
       /** @type {object} A weapon whose own field insertion order is value-then-rarity. */
-      const weapon = makeDoc('weapon', 'a'.repeat(16), { value: 5, rarity: 'common' });
+      const weapon = makeDoc('weapon', 'a'.repeat(16), {
+         value: 5,
+         rarity: 'common' 
+      });
       /** @type {object} An actor owning that weapon. */
       const actor = {
          type: 'npc',
@@ -140,11 +183,18 @@ describe('exportCompendium', () => {
          items: [weapon],
          effects: [],
          folder: null,
-         toObject: () => ({ _id: 'b'.repeat(16), name: 'Goblin', type: 'npc' }),
+         toObject: () => ({
+            _id: 'b'.repeat(16),
+            name: 'Goblin',
+            type: 'npc' 
+         }),
       };
       /** @type {object} */
       const pack = {
-         metadata: { type: 'Actor', label: 'Test Actors' },
+         metadata: {
+            type: 'Actor',
+            label: 'Test Actors' 
+         },
          folders: [],
          getDocuments: async () => [actor],
       };
@@ -162,10 +212,23 @@ describe('exportCompendium', () => {
 
    it('downloads a .zip containing only the manifest for a pack with zero documents', async () => {
       /** @type {object} Minimal per-document-type CONFIG entry resolveTypeSchemas reads. */
-      const emptyTypeConfig = { dataModels: {}, documentClass: { schema: { fields: {} } } };
-      globalThis.CONFIG = { Item: emptyTypeConfig, ActiveEffect: emptyTypeConfig };
+      const emptyTypeConfig = {
+         dataModels: {},
+         documentClass: { schema: { fields: {} } } 
+      };
+      globalThis.CONFIG = {
+         Item: emptyTypeConfig,
+         ActiveEffect: emptyTypeConfig 
+      };
       /** @type {object} */
-      const pack = { metadata: { type: 'Item', label: 'Empty Items' }, folders: [], getDocuments: async () => [] };
+      const pack = {
+         metadata: {
+            type: 'Item',
+            label: 'Empty Items' 
+         },
+         folders: [],
+         getDocuments: async () => [] 
+      };
       await exportCompendium(pack, 'csv', 'wide');
       /** @type {[Uint8Array|string, string, string]} */
       const [payload, mimeType, filename] = globalThis.foundry.utils.saveDataToFile.mock.calls[0];
@@ -178,7 +241,14 @@ describe('exportCompendium', () => {
 
    it('downloads a .xlsx for xlsx format', async () => {
       /** @type {object} */
-      const pack = { metadata: { type: 'Item', label: 'Weapons' }, folders: [], getDocuments: async () => [] };
+      const pack = {
+         metadata: {
+            type: 'Item',
+            label: 'Weapons' 
+         },
+         folders: [],
+         getDocuments: async () => [] 
+      };
       await exportCompendium(pack, 'xlsx', 'wide');
       /** @type {[Uint8Array|string, string, string]} */
       const [, mimeType, filename] = globalThis.foundry.utils.saveDataToFile.mock.calls[0];

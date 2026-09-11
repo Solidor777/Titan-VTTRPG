@@ -2,11 +2,11 @@
    import ChatMessageStamina from '~/document/types/chat-message/components/resources/ChatMessageStamina.svelte';
    import ChatMessageWounds from '~/document/types/chat-message/components/resources/ChatMessageWounds.svelte';
    import DamageReportChatMessageHeader
-      from '~/document/types/chat-message/report/types/damage/DamageReportChatMessageHeader.svelte';
+   from '~/document/types/chat-message/report/types/damage/DamageReportChatMessageHeader.svelte';
    import DamageReportChatMessageIneffectiveTag
-      from '~/document/types/chat-message/report/types/damage/DamageReportChatMessageIneffectiveTag.svelte';
+   from '~/document/types/chat-message/report/types/damage/DamageReportChatMessageIneffectiveTag.svelte';
    import DamageReportChatMessagePenetratingTag
-      from '~/document/types/chat-message/report/types/damage/DamageReportChatMessagePenetratingTag.svelte';
+   from '~/document/types/chat-message/report/types/damage/DamageReportChatMessagePenetratingTag.svelte';
    import ReportChatMessageBase from '~/document/types/chat-message/report/components/ReportChatMessageBase.svelte';
    import localize from '~/helpers/utility-functions/Localize.js';
    import { getContext } from 'svelte';

@@ -3,15 +3,29 @@ import { FIXED_COLUMNS, FIXED_COLUMN_TYPES, normalizePath, createEmptySheet } fr
 
 describe('Workbook constants and utilities', () => {
    it('lists the fixed leading columns in order', () => {
-      expect(FIXED_COLUMNS).toEqual(['_id', '_parentId', '_folder', 'name', 'type', 'img', 'sort']);
+      expect(FIXED_COLUMNS).toEqual([
+         '_id',
+         '_parentId',
+         '_folder',
+         'name',
+         'type',
+         'img',
+         'sort'
+      ]);
    });
 
    it('gives every fixed column a type entry', () => {
       for (const column of FIXED_COLUMNS) {
          expect(FIXED_COLUMN_TYPES[column]).toBeDefined();
       }
-      expect(FIXED_COLUMN_TYPES.sort).toEqual({ type: 'number', nullable: false });
-      expect(FIXED_COLUMN_TYPES._parentId).toEqual({ type: 'string', nullable: true });
+      expect(FIXED_COLUMN_TYPES.sort).toEqual({
+         type: 'number',
+         nullable: false 
+      });
+      expect(FIXED_COLUMN_TYPES._parentId).toEqual({
+         type: 'string',
+         nullable: true 
+      });
    });
 
    it('normalizePath replaces numeric segments with a wildcard', () => {
@@ -20,6 +34,10 @@ describe('Workbook constants and utilities', () => {
    });
 
    it('createEmptySheet builds an empty sheet with the given name', () => {
-      expect(createEmptySheet('weapon')).toEqual({ name: 'weapon', columns: [], rows: [] });
+      expect(createEmptySheet('weapon')).toEqual({
+         name: 'weapon',
+         columns: [],
+         rows: [] 
+      });
    });
 });

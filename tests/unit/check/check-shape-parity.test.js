@@ -62,11 +62,31 @@ const OPTIONS = {
 
 /** Parameter factory + shape pairs for all 5 check subtypes. */
 const PARAM_CASES = [
-   ['attribute', createAttributeCheckParameters, createAttributeCheckParametersShape],
-   ['resistance', createResistanceCheckParameters, createResistanceCheckParametersShape],
-   ['attack', createAttackCheckParameters, createAttackCheckParametersShape],
-   ['casting', createCastingCheckParameters, createCastingCheckParametersShape],
-   ['item', createItemCheckParameters, createItemCheckParametersShape],
+   [
+      'attribute',
+      createAttributeCheckParameters,
+      createAttributeCheckParametersShape
+   ],
+   [
+      'resistance',
+      createResistanceCheckParameters,
+      createResistanceCheckParametersShape
+   ],
+   [
+      'attack',
+      createAttackCheckParameters,
+      createAttackCheckParametersShape
+   ],
+   [
+      'casting',
+      createCastingCheckParameters,
+      createCastingCheckParametersShape
+   ],
+   [
+      'item',
+      createItemCheckParameters,
+      createItemCheckParametersShape
+   ],
 ];
 
 describe('check parameter shape ↔ factory parity', () => {
@@ -100,22 +120,51 @@ const RESULT_PARAMS = {
 
 /** Result factory + shape pairs for all 5 check subtypes. */
 const RESULT_CASES = [
-   ['attribute', calculateAttributeCheckResults, createAttributeCheckResultsShape],
-   ['resistance', calculateResistanceCheckResults, createResistanceCheckResultsShape],
-   ['attack', calculateAttackCheckResults, createAttackCheckResultsShape],
-   ['casting', calculateCastingCheckResults, createCastingCheckResultsShape],
-   ['item', calculateItemCheckResults, createItemCheckResultsShape],
+   [
+      'attribute',
+      calculateAttributeCheckResults,
+      createAttributeCheckResultsShape
+   ],
+   [
+      'resistance',
+      calculateResistanceCheckResults,
+      createResistanceCheckResultsShape
+   ],
+   [
+      'attack',
+      calculateAttackCheckResults,
+      createAttackCheckResultsShape
+   ],
+   [
+      'casting',
+      calculateCastingCheckResults,
+      createCastingCheckResultsShape
+   ],
+   [
+      'item',
+      calculateItemCheckResults,
+      createItemCheckResultsShape
+   ],
 ];
 
 describe('check result shape ↔ factory parity', () => {
    it('base results: shape keys === factory keys', () => {
-      const params = { difficulty: 4, complexity: 1, extraSuccessOnCritical: false, extraFailureOnCritical: false };
+      const params = {
+         difficulty: 4,
+         complexity: 1,
+         extraSuccessOnCritical: false,
+         extraFailureOnCritical: false 
+      };
       expect(Object.keys(calculateCheckResults(diceResults([6]), params)).sort())
          .toEqual(Object.keys(createCheckResultsShape()).sort());
    });
 
    it.each(RESULT_CASES)('%s results: shape keys === factory keys', (_name, factory, shape) => {
-      expect(Object.keys(factory(diceResults([6, 5, 4]), RESULT_PARAMS)).sort())
+      expect(Object.keys(factory(diceResults([
+         6,
+         5,
+         4
+      ]), RESULT_PARAMS)).sort())
          .toEqual(Object.keys(shape()).sort());
    });
 });

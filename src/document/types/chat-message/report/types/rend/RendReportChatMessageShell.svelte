@@ -1,7 +1,7 @@
 <script>
    import ChatMessageArmor from '~/document/types/chat-message/components/resources/ChatMessageArmor.svelte';
    import RendReportChatMessageHeader
-      from '~/document/types/chat-message/report/types/rend/RendReportChatMessageHeader.svelte';
+   from '~/document/types/chat-message/report/types/rend/RendReportChatMessageHeader.svelte';
    import ReportChatMessageBase from '~/document/types/chat-message/report/components/ReportChatMessageBase.svelte';
    import { getContext } from 'svelte';
 

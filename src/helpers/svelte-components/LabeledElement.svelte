@@ -7,7 +7,8 @@
     * @typedef {object} LabeledElementProps
     * @property {string} [label] - Label to display.
     * @property {string} [icon] - Optional icon to display.
-    * @property {string | import('~/helpers/svelte-actions/TooltipAction.js').TooltipAction} [tooltip] - The tooltip to display for this element, if any.
+    * @property {string | import('~/helpers/svelte-actions/TooltipAction.js').TooltipAction} [tooltip] -
+    *    The tooltip to display for this element, if any.
     * @property {import('svelte').Snippet} [children] - Content to render inside the element area.
     * @property {string} [testId] - Optional test identifier bound to the root element.
     */

@@ -62,7 +62,10 @@ test.describe('shared AttackTags across surfaces', () => {
          // Seed a fresh player actor owning one EQUIPPED weapon with a distinctive first attack:
          // damage 7 (intrinsic, no extra-success suffix so the tag text is exact), range 3 (so the
          // range tag renders), one standard trait, and one custom trait.
-         const actor = await Actor.create({ name: actorName, type: 'player' });
+         const actor = await Actor.create({
+            name: actorName,
+            type: 'player' 
+         });
          await actor.createEmbeddedDocuments('Item', [
             {
                name: weaponName,
@@ -100,7 +103,11 @@ test.describe('shared AttackTags across surfaces', () => {
                attack: attacks,
             },
          });
-      }, { actorName: ACTOR_NAME, weaponName: WEAPON_NAME, customTraitName: CUSTOM_TRAIT_NAME });
+      }, {
+         actorName: ACTOR_NAME,
+         weaponName: WEAPON_NAME,
+         customTraitName: CUSTOM_TRAIT_NAME 
+      });
    });
 
    // Unconditionally restore the check-options dialog gate: a mid-test failure after the gate is enabled
@@ -151,7 +158,10 @@ test.describe('shared AttackTags across surfaces', () => {
             () => !!app?.element?.querySelector('.window-content')?.children.length,
             { message: 'item sheet mounted' },
          );
-      }, { actorName: ACTOR_NAME, weaponName: WEAPON_NAME });
+      }, {
+         actorName: ACTOR_NAME,
+         weaponName: WEAPON_NAME 
+      });
 
       /** @type {import('@playwright/test').Locator} The weapon item-sheet application root (only app open). */
       const sheet = page.locator('.application.titan-document-sheet').first();
@@ -201,7 +211,10 @@ test.describe('shared AttackTags across surfaces', () => {
                attack: attacks,
             },
          });
-      }, { actorName: ACTOR_NAME, weaponName: WEAPON_NAME });
+      }, {
+         actorName: ACTOR_NAME,
+         weaponName: WEAPON_NAME 
+      });
 
       // The embedded bridge re-resolves through the actor subscription: the row updates in place.
       await expect(row.getByTestId('attack-tags-damage').locator('.value')).toHaveText('9');
@@ -242,7 +255,11 @@ test.describe('shared AttackTags across surfaces', () => {
                attackTraits,
                customTraits,
             );
-      }, { actorName: ACTOR_NAME, weaponName: WEAPON_NAME, customTraits: [CUSTOM_TRAIT_CAMELIZED] });
+      }, {
+         actorName: ACTOR_NAME,
+         weaponName: WEAPON_NAME,
+         customTraits: [CUSTOM_TRAIT_CAMELIZED] 
+      });
       await expect(row.getByTestId('attack-row-dice').locator('.value')).toHaveText(String(expectedDice));
 
       // Enable the dialog gate, then click the roll button (the equipped attack header button).
@@ -267,7 +284,10 @@ test.describe('shared AttackTags across surfaces', () => {
          const message = await weapon.sendToChat();
          await titanWait(() => game.messages.size > before, { message: 'weapon card posted' });
          return message.id;
-      }, { actorName: ACTOR_NAME, weaponName: WEAPON_NAME });
+      }, {
+         actorName: ACTOR_NAME,
+         weaponName: WEAPON_NAME 
+      });
 
       /** @type {import('@playwright/test').Locator} The mounted weapon card (first visible mount). */
       const card = page.locator(`#chat .message[data-message-id="${messageId}"] .item-chat-message`).first();
@@ -291,7 +311,10 @@ test.describe('shared AttackTags across surfaces', () => {
                attack: attacks,
             },
          });
-      }, { actorName: ACTOR_NAME, weaponName: WEAPON_NAME });
+      }, {
+         actorName: ACTOR_NAME,
+         weaponName: WEAPON_NAME 
+      });
       await expect(row.getByTestId('attack-tags-damage').locator('.value')).toHaveText('11');
 
       // Snapshot semantics: the chat card still shows the value at post time.

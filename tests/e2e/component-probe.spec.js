@@ -108,7 +108,10 @@ test.describe('component probe — TextInput', () => {
             value: '',
             testId: 'probe-text',
          },
-         events: ['onkeyup', 'onchange'],
+         events: [
+            'onkeyup',
+            'onchange'
+         ],
       });
       const input = page.locator(`${selector} input`);
       await input.fill('hello');
@@ -252,8 +255,14 @@ test.describe('component probe — Select', () => {
          props: {
             value: 'a',
             options: [
-               { value: 'a', label: 'Alpha' },
-               { value: 'b', label: 'Beta' },
+               {
+                  value: 'a',
+                  label: 'Alpha' 
+               },
+               {
+                  value: 'b',
+                  label: 'Beta' 
+               },
             ],
             testId: 'probe-select',
          },
@@ -274,8 +283,14 @@ test.describe('component probe — Select', () => {
             value: 'a',
             disabled: true,
             options: [
-               { value: 'a', label: 'Alpha' },
-               { value: 'b', label: 'Beta' },
+               {
+                  value: 'a',
+                  label: 'Alpha' 
+               },
+               {
+                  value: 'b',
+                  label: 'Beta' 
+               },
             ],
          },
       });

@@ -1,7 +1,7 @@
 <script>
    import { getContext } from 'svelte';
    import CheckChatScalingAspect
-      from '~/check/types/casting-check/chat-message/CastingCheckChatMessageScalingAspect.svelte';
+   from '~/check/types/casting-check/chat-message/CastingCheckChatMessageScalingAspect.svelte';
 
    /** @type {object} Reference to the reactive Document store. */
    const document = getContext('document');

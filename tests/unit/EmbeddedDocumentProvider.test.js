@@ -30,7 +30,10 @@ function makeActorWithWeapon() {
          value: 1,
       },
    };
-   actorDoc.items = new Map([['w1', weapon]]);
+   actorDoc.items = new Map([[
+      'w1',
+      weapon
+   ]]);
 
    return {
       actorDoc,
@@ -45,8 +48,14 @@ describe('EmbeddedDocumentProvider', () => {
       render(ProviderHarness, {
          props: { doc: weapon },
          context: new Map([
-            ['document', bridge],
-            ['sheetDocument', bridge],
+            [
+               'document',
+               bridge
+            ],
+            [
+               'sheetDocument',
+               bridge
+            ],
          ]),
       });
 
@@ -60,8 +69,14 @@ describe('EmbeddedDocumentProvider', () => {
       render(ProviderHarness, {
          props: { doc: weapon },
          context: new Map([
-            ['document', bridge],
-            ['sheetDocument', bridge],
+            [
+               'document',
+               bridge
+            ],
+            [
+               'sheetDocument',
+               bridge
+            ],
          ]),
       });
       expect(screen.getByTestId('document-value').textContent).toBe('1');
@@ -99,8 +114,14 @@ describe('EmbeddedDocumentProvider', () => {
          render(ProviderHarness, {
             props: { doc: stranger },
             context: new Map([
-               ['document', bridge],
-               ['sheetDocument', bridge],
+               [
+                  'document',
+                  bridge
+               ],
+               [
+                  'sheetDocument',
+                  bridge
+               ],
             ]),
          });
 

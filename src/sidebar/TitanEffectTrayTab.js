@@ -57,7 +57,10 @@ export default class TitanEffectTrayTab extends foundry.applications.sidebar.Abs
             props: {
                trayState: this.#trayState,
             },
-            context: new Map([['application', this]]),
+            context: new Map([[
+               'application',
+               this
+            ]]),
          });
       }
    }

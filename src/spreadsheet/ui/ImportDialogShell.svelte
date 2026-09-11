@@ -41,7 +41,10 @@
    const packOptions = $derived(
       game.packs
          .filter((pack) => !plan || pack.metadata.type === plan.packType)
-         .map((pack) => ({ value: pack.collection, label: pack.metadata.label })),
+         .map((pack) => ({
+            value: pack.collection,
+            label: pack.metadata.label 
+         })),
    );
 
    // A stored plan is only valid against the target pack and options it was computed with; Apply must stay
@@ -72,7 +75,7 @@
 
    /**
     * Runs planImport against the current selections and stores the resulting plan. A thrown planning
-    * error (e.g. a file whose manifest names a packType that is not a real document type) is reported
+    * error (e.g. A file whose manifest names a packType that is not a real document type) is reported
     * via ui.notifications.error rather than left to strand the dialog in its busy state.
     * @returns {Promise<void>} Resolves once the plan attempt (success or failure) has been handled.
     */
@@ -92,7 +95,7 @@
 
    /**
     * Applies the current plan, reporting the outcome and resetting the file selection on success. A
-    * thrown ApplyImport error (e.g. a genuinely missing embedded-document parent) is reported via
+    * thrown ApplyImport error (e.g. A genuinely missing embedded-document parent) is reported via
     * ui.notifications.error rather than left to leave the Apply button stuck disabled.
     * @returns {Promise<void>} Resolves once the apply attempt (success or failure) has been handled.
     */
@@ -130,8 +133,14 @@
 
    <Select
       options={[
-         { value: 'existing', label: localize('importIntoExisting') },
-         { value: 'new', label: localize('importIntoNew') },
+         {
+            value: 'existing',
+            label: localize('importIntoExisting') 
+         },
+         {
+            value: 'new',
+            label: localize('importIntoNew') 
+         },
       ]}
       bind:value={targetMode}
       testId="import-target-mode-select"

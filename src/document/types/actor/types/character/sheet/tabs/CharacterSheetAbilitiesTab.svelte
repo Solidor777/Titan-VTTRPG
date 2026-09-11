@@ -6,11 +6,11 @@
    import IconButton from '~/helpers/svelte-components/button/IconButton.svelte';
    import ScrollingContainer from '~/helpers/svelte-components/ScrollingContainer.svelte';
    import CharacterSheetItemList
-      from '~/document/types/actor/types/character/sheet/items/CharacterSheetItemList.svelte';
+   from '~/document/types/actor/types/character/sheet/items/CharacterSheetItemList.svelte';
    import CharacterSheetAbility
-      from '~/document/types/actor/types/character/sheet/items/ability/CharacterSheetAbility.svelte';
+   from '~/document/types/actor/types/character/sheet/items/ability/CharacterSheetAbility.svelte';
    import CharacterSheetTabHeaderButton
-      from '~/document/types/actor/types/character/sheet/tabs/CharacterSheetTabHeaderButton.svelte';
+   from '~/document/types/actor/types/character/sheet/tabs/CharacterSheetTabHeaderButton.svelte';
    import { CREATE_ICON, RESET_ICON } from '~/system/Icons.js';
 
    /** @type {CharacterSheetState} Reference to the Application State store. */
@@ -104,7 +104,7 @@
 
                   return !($appState.tabs.abilities.filterOptions.passive &&
                      !item.system.passive);
-                  }
+               }
                }
                tabKey={'abilities'}
                itemComponent={CharacterSheetAbility}

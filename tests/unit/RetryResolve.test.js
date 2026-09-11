@@ -27,7 +27,10 @@ describe('retryResolve', () => {
       const result = await retryResolve(() => {
          calls += 1;
          return null;
-      }, { attempts: 4, delayMs: 0 });
+      }, {
+         attempts: 4,
+         delayMs: 0 
+      });
       expect(result).toBeNull();
       expect(calls).toBe(4);
    });

@@ -6,19 +6,19 @@
    import TextInput from '~/helpers/svelte-components/input/TextInput.svelte';
    import IconButton from '~/helpers/svelte-components/button/IconButton.svelte';
    import CharacterSheetWeapon
-      from '~/document/types/actor/types/character/sheet/items/weapon/CharacterSheetWeapon.svelte';
+   from '~/document/types/actor/types/character/sheet/items/weapon/CharacterSheetWeapon.svelte';
    import CharacterSheetArmor
-      from '~/document/types/actor/types/character/sheet/items/armor/CharacterSheetArmor.svelte';
+   from '~/document/types/actor/types/character/sheet/items/armor/CharacterSheetArmor.svelte';
    import CharacterSheetEquipment
-      from '~/document/types/actor/types/character/sheet/items/equipment/CharacterSheetEquipment.svelte';
+   from '~/document/types/actor/types/character/sheet/items/equipment/CharacterSheetEquipment.svelte';
    import CharacterSheetCommodity
-      from '~/document/types/actor/types/character/sheet/items/commodity/CharacterSheetCommodity.svelte';
+   from '~/document/types/actor/types/character/sheet/items/commodity/CharacterSheetCommodity.svelte';
    import CharacterSheetShield
-      from '~/document/types/actor/types/character/sheet/items/shield/CharacterSheetShield.svelte';
+   from '~/document/types/actor/types/character/sheet/items/shield/CharacterSheetShield.svelte';
    import CharacterSheetMultiItemList
-      from '~/document/types/actor/types/character/sheet/items/CharacterSheetMultiItemList.svelte';
+   from '~/document/types/actor/types/character/sheet/items/CharacterSheetMultiItemList.svelte';
    import CharacterSheetTabHeaderButton
-      from '~/document/types/actor/types/character/sheet/tabs/CharacterSheetTabHeaderButton.svelte';
+   from '~/document/types/actor/types/character/sheet/tabs/CharacterSheetTabHeaderButton.svelte';
    import { CREATE_ICON, RESET_ICON } from '~/system/Icons.js';
 
    /** @type {object} Reference to the Application State store. */
@@ -38,10 +38,10 @@
    /** @type {boolean} True when no inventory filter options are enabled, meaning show all items. */
    const noOptions = $derived(
       $appState.tabs.inventory.filterOptions.weapon === false &&
-      $appState.tabs.inventory.filterOptions.armor === false &&
-      $appState.tabs.inventory.filterOptions.shield === false &&
-      $appState.tabs.inventory.filterOptions.equipment === false &&
-      $appState.tabs.inventory.filterOptions.commodity === false,
+         $appState.tabs.inventory.filterOptions.armor === false &&
+         $appState.tabs.inventory.filterOptions.shield === false &&
+         $appState.tabs.inventory.filterOptions.equipment === false &&
+         $appState.tabs.inventory.filterOptions.commodity === false,
    );
 </script>
 

@@ -8,7 +8,7 @@
  * reads sub-fields off. The resource snapshots nest under `resource` so the card can read the same
  * `system.resource.*` path as the actor's own persisted resources.
  * @returns {object} The turn-start-revert report shape: the fast-healing, persistent-damage, and
- *    resolve-regain revert offers, and the nested stamina, wounds, and resolve resource snapshots.
+ * resolve-regain revert offers, and the nested stamina, wounds, and resolve resource snapshots.
  */
 export default function createTurnStartRevertReportShape() {
    return {

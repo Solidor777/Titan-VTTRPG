@@ -38,10 +38,19 @@ test.describe('spells tab filter', () => {
          if (stale) {
             await stale.delete();
          }
-         const actor = await Actor.create({ name: actorName, type: 'player' });
+         const actor = await Actor.create({
+            name: actorName,
+            type: 'player' 
+         });
          await actor.createEmbeddedDocuments('Item', [
-            { name: 'Zzz Fireball', type: 'spell' },
-            { name: 'Qqq Frostbite', type: 'spell' },
+            {
+               name: 'Zzz Fireball',
+               type: 'spell' 
+            },
+            {
+               name: 'Qqq Frostbite',
+               type: 'spell' 
+            },
          ]);
          const app = await actor.sheet.render(true);
          await titanWait(
@@ -55,14 +64,20 @@ test.describe('spells tab filter', () => {
 
    test('typing in the spells filter narrows the spell list', async () => {
       // Both spells visible initially.
-      await expect(page.locator('.application.titan-document-sheet [data-item-id]'), 'both spells shown').toHaveCount(2);
+      await expect(
+         page.locator('.application.titan-document-sheet [data-item-id]'),
+         'both spells shown',
+      ).toHaveCount(2);
 
       // Type a distinctive substring of only one spell into the Spells tab filter input.
       const filterInput = page.locator('.tab .header .input input').first();
       await filterInput.fill('Fireball');
       await filterInput.dispatchEvent('keyup');
 
-      await expect(page.locator('.application.titan-document-sheet [data-item-id]'), 'narrowed to the matching spell').toHaveCount(1);
+      await expect(
+         page.locator('.application.titan-document-sheet [data-item-id]'),
+         'narrowed to the matching spell',
+      ).toHaveCount(1);
       await expect(page.getByText('Zzz Fireball')).toBeVisible();
    });
 });

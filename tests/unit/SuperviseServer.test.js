@@ -20,7 +20,10 @@ const spawned = [];
  * @returns {import('node:child_process').ChildProcess} The idle process.
  */
 function spawnIdle() {
-   const child = spawn(process.execPath, ['-e', IDLE_SCRIPT], { stdio: 'ignore' });
+   const child = spawn(process.execPath, [
+      '-e',
+      IDLE_SCRIPT
+   ], { stdio: 'ignore' });
    spawned.push(child);
    return child;
 }
@@ -49,7 +52,10 @@ async function waitFor(predicate, timeoutMs = 5000) {
 function listenEphemeral() {
    return new Promise((resolve) => {
       const server = net.createServer();
-      server.listen(0, '127.0.0.1', () => resolve({ server, port: server.address().port }));
+      server.listen(0, '127.0.0.1', () => resolve({
+         server,
+         port: server.address().port 
+      }));
    });
 }
 
@@ -69,7 +75,10 @@ describe('superviseServer', () => {
 
       const handle = await superviseServer({
          command: process.execPath,
-         args: ['-e', IDLE_SCRIPT],
+         args: [
+            '-e',
+            IDLE_SCRIPT
+         ],
          cwd: process.cwd(),
          port,
          watchPid: watched.pid,
@@ -95,7 +104,10 @@ describe('superviseServer', () => {
       try {
          const handle = await superviseServer({
             command: process.execPath,
-            args: ['-e', IDLE_SCRIPT],
+            args: [
+               '-e',
+               IDLE_SCRIPT
+            ],
             cwd: process.cwd(),
             port,
             log: () => {},
@@ -115,7 +127,10 @@ describe('superviseServer', () => {
 
       const handle = await superviseServer({
          command: process.execPath,
-         args: ['-e', 'process.exit(7)'],
+         args: [
+            '-e',
+            'process.exit(7)'
+         ],
          cwd: process.cwd(),
          port,
          log: () => {},
@@ -129,7 +144,10 @@ describe('superviseServer', () => {
 
       const handle = await superviseServer({
          command: process.execPath,
-         args: ['-e', IDLE_SCRIPT],
+         args: [
+            '-e',
+            IDLE_SCRIPT
+         ],
          cwd: process.cwd(),
          port,
          log: () => {},
@@ -161,10 +179,22 @@ describe('process helpers', () => {
 
    it('pickWatchPid skips shells and returns the first real ancestor', () => {
       expect(pickWatchPid([
-         { pid: 10, name: 'cmd.exe' },
-         { pid: 20, name: 'node.exe' },
-         { pid: 30, name: 'bash' },
+         {
+            pid: 10,
+            name: 'cmd.exe' 
+         },
+         {
+            pid: 20,
+            name: 'node.exe' 
+         },
+         {
+            pid: 30,
+            name: 'bash' 
+         },
       ])).toBe(20);
-      expect(pickWatchPid([{ pid: 10, name: 'sh' }])).toBeUndefined();
+      expect(pickWatchPid([{
+         pid: 10,
+         name: 'sh' 
+      }])).toBeUndefined();
    });
 });

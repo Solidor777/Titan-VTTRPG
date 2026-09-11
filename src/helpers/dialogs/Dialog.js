@@ -24,7 +24,10 @@ export default class TitanDialog extends ApplicationV2 {
     * `content: { class, props }` describing the Svelte component to mount.
     */
    constructor(options) {
-      const classes = ['titan', 'titan-dialog'];
+      const classes = [
+         'titan',
+         'titan-dialog'
+      ];
       options.classes = options.classes ? mergeArrays(classes, options.classes) : classes;
       options.id = options.id ? `${options.id}-${generateUUID()}` : `titan-dialog-${generateUUID()}`;
 
@@ -45,7 +48,7 @@ export default class TitanDialog extends ApplicationV2 {
 
    /**
     * The Svelte content descriptor (`{ class, props }`) mounted into this dialog's window content.
-    * Exposed read-only for introspection (e.g. unit tests verifying constructor wiring); the descriptor
+    * Exposed read-only for introspection (e.g. Unit tests verifying constructor wiring); the descriptor
     * itself is kept off `this.options` so it never passes through ApplicationV2's option merge/freeze.
     * @type {{ class: import('svelte').Component, props: object }}
     */
@@ -58,8 +61,14 @@ export default class TitanDialog extends ApplicationV2 {
     * @override
     */
    static DEFAULT_OPTIONS = {
-      position: { width: 320, height: 'auto' },
-      window: { resizable: false, minimizable: false },
+      position: {
+         width: 320,
+         height: 'auto' 
+      },
+      window: {
+         resizable: false,
+         minimizable: false 
+      },
       zIndex: Z_INDEX_APP,
    };
 
@@ -88,7 +97,10 @@ export default class TitanDialog extends ApplicationV2 {
          this.#mountHandle = mount(this.#content.class, {
             target: content,
             props: this.#content.props,
-            context: new Map([['application', this]]),
+            context: new Map([[
+               'application',
+               this
+            ]]),
          });
       }
    }

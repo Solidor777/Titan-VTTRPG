@@ -44,14 +44,23 @@ test.describe('cross-sheet element copy', () => {
 
    test('insertRulesElement copies with a fresh uuid and leaves the source intact', async () => {
       const result = await page.evaluate(async (names) => {
-         for (const name of [names.src, names.dst]) {
+         for (const name of [
+            names.src,
+            names.dst
+         ]) {
             const stale = game.items.getName(name);
             if (stale) {
                await stale.delete();
             }
          }
-         const source = await Item.create({ name: names.src, type: 'weapon' });
-         const target = await Item.create({ name: names.dst, type: 'weapon' });
+         const source = await Item.create({
+            name: names.src,
+            type: 'weapon' 
+         });
+         const target = await Item.create({
+            name: names.dst,
+            type: 'weapon' 
+         });
          await source.update({ system: { rulesElement: [] } });
          await target.update({ system: { rulesElement: [] } });
          await source.system.addRulesElement();
@@ -63,7 +72,10 @@ test.describe('cross-sheet element copy', () => {
             freshUuid: target.system.rulesElement[0].uuid !== element.uuid,
             sameOperation: target.system.rulesElement[0].operation === element.operation,
          };
-      }, { src: SRC_WEAPON, dst: DST_WEAPON });
+      }, {
+         src: SRC_WEAPON,
+         dst: DST_WEAPON 
+      });
 
       expect(result.targetCount).toBe(1);
       expect(result.sourceCount).toBe(1);
@@ -85,7 +97,10 @@ test.describe('cross-sheet element copy', () => {
             sourceCount: source.system.attack.length,
             freshUuid: target.system.attack[0].uuid !== element.uuid,
          };
-      }, { src: SRC_WEAPON, dst: DST_WEAPON });
+      }, {
+         src: SRC_WEAPON,
+         dst: DST_WEAPON 
+      });
 
       expect(result.targetCount).toBe(1);
       expect(result.sourceCount).toBe(1);
@@ -106,7 +121,10 @@ test.describe('cross-sheet element copy', () => {
             sourceCount: source.system.check.length,
             freshUuid: target.system.check[0].uuid !== element.uuid,
          };
-      }, { src: SRC_WEAPON, dst: DST_WEAPON });
+      }, {
+         src: SRC_WEAPON,
+         dst: DST_WEAPON 
+      });
 
       expect(result.targetCount).toBe(1);
       expect(result.sourceCount).toBe(1);
@@ -115,14 +133,23 @@ test.describe('cross-sheet element copy', () => {
 
    test('insertCustomAspect copies with a fresh uuid and leaves the source intact', async () => {
       const result = await page.evaluate(async (names) => {
-         for (const name of [names.src, names.dst]) {
+         for (const name of [
+            names.src,
+            names.dst
+         ]) {
             const stale = game.items.getName(name);
             if (stale) {
                await stale.delete();
             }
          }
-         const source = await Item.create({ name: names.src, type: 'spell' });
-         const target = await Item.create({ name: names.dst, type: 'spell' });
+         const source = await Item.create({
+            name: names.src,
+            type: 'spell' 
+         });
+         const target = await Item.create({
+            name: names.dst,
+            type: 'spell' 
+         });
          await source.system.addCustomAspect();
          const element = source.system.customAspect[0];
          await target.system.insertCustomAspect(element, 0);
@@ -131,7 +158,10 @@ test.describe('cross-sheet element copy', () => {
             sourceCount: source.system.customAspect.length,
             freshUuid: target.system.customAspect[0].uuid !== element.uuid,
          };
-      }, { src: SRC_SPELL, dst: DST_SPELL });
+      }, {
+         src: SRC_SPELL,
+         dst: DST_SPELL 
+      });
 
       expect(result.targetCount).toBe(1);
       expect(result.sourceCount).toBe(1);

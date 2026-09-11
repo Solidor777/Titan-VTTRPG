@@ -51,7 +51,10 @@ async function buildPacks() {
    for (const name of packs) {
       const dest = path.join(repoRoot, 'packs', name);
       await clearPack(dest);
-      await compilePack(path.join(sourceRoot, name), dest, { recursive: true, log: true });
+      await compilePack(path.join(sourceRoot, name), dest, {
+         recursive: true,
+         log: true 
+      });
       console.log(`Compiled packs/_source/${name} → packs/${name}`);
    }
 }

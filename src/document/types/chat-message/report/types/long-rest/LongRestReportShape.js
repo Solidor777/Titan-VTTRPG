@@ -5,7 +5,7 @@
  * field, preserving the card's `if (obj)` presence guard. The resource snapshot nests under `resource` so
  * the card can read the same `system.resource.*` path as the actor's own persisted resources.
  * @returns {object} The long-rest report shape: the wounds healed and the nested wounds resource
- *    snapshot.
+ * snapshot.
  */
 export default function createLongRestReportShape() {
    return {

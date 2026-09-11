@@ -46,7 +46,10 @@
       difficulty={checkParameters.difficulty}
       onclick={() => rollActor.data.system.requestItemCheck(checkOptions)}
       resolveCost={checkParameters.resolveCost}
-      tooltip={{ text: tooltip, localize: false }}
+      tooltip={{
+         text: tooltip,
+         localize: false 
+      }}
       totalDice={checkParameters.totalDice}
       totalExpertise={checkParameters.totalExpertise}
    />

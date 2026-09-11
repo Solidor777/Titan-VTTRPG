@@ -4,7 +4,7 @@
    import ItemSheetChecksTab from '~/document/types/item/sheet/check/ItemSheetChecksTab.svelte';
    import SpellSheetCastingCheckTab from '~/document/types/item/types/spell/sheet/SpellSheetCastingCheckTab.svelte';
    import SpellSheetStandardAspectsTab
-      from '~/document/types/item/types/spell/sheet/SpellSheetStandardAspectsTab.svelte';
+   from '~/document/types/item/types/spell/sheet/SpellSheetStandardAspectsTab.svelte';
    import SpellSheetCustomAspectsTab from '~/document/types/item/types/spell/sheet/SpellSheetCustomAspectsTab.svelte';
    import ItemSheetDescriptionTab from '~/document/types/item/sheet/ItemSheetDescriptionTab.svelte';
    import Tabs from '~/helpers/svelte-components/Tabs.svelte';

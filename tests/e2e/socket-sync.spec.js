@@ -11,7 +11,10 @@ import {
 
 test.describe('socket sync — replicated turn-effect state', () => {
    test('A1: persistent damage applied by the GM replicates to the player client', async ({ browser }) => {
-      await withClients(browser, { gm: 'E2E GM 1', player: 'E2E Player 1' }, async ({ gm, player }) => {
+      await withClients(browser, {
+         gm: 'E2E GM 1',
+         player: 'E2E Player 1' 
+      }, async ({ gm, player }) => {
          // Determinism: auto-apply persistent damage on the applying (GM) client.
          await setWorldSetting(gm, 'autoApplyPersistentDamage', 'enabled');
 
@@ -40,7 +43,10 @@ test.describe('socket sync — replicated turn-effect state', () => {
             // The PLAYER client observes the replicated stamina decrease (poll the document, no sleep).
             await player.waitForFunction(
                ({ id, expected }) => game.actors.get(id)?.system.resource.stamina.value === expected,
-               { id: ids.effectActorId, expected: before - 1 },
+               {
+                  id: ids.effectActorId,
+                  expected: before - 1 
+               },
                { timeout: 1000 },
             );
 
@@ -58,7 +64,10 @@ test.describe('socket sync — replicated turn-effect state', () => {
    });
 
    test('A2: fast healing applied by the GM replicates to the player client', async ({ browser }) => {
-      await withClients(browser, { gm: 'E2E GM 1', player: 'E2E Player 1' }, async ({ gm, player }) => {
+      await withClients(browser, {
+         gm: 'E2E GM 1',
+         player: 'E2E Player 1' 
+      }, async ({ gm, player }) => {
          await setWorldSetting(gm, 'autoApplyFastHealing', 'enabled');
 
          // Pre-seed stamina to 1 so a +2 heal is observable (heal is capped at max).
@@ -98,7 +107,10 @@ test.describe('socket sync — replicated turn-effect state', () => {
    });
 
    test('A3: resolve regain applied by the GM replicates to the player client', async ({ browser }) => {
-      await withClients(browser, { gm: 'E2E GM 1', player: 'E2E Player 1' }, async ({ gm, player }) => {
+      await withClients(browser, {
+         gm: 'E2E GM 1',
+         player: 'E2E Player 1' 
+      }, async ({ gm, player }) => {
          await setWorldSetting(gm, 'autoRegainResolve', 'enabled');
 
          // Pre-spend resolve to 0 so a regain is observable (regain only raises a below-cap resource).
@@ -133,7 +145,10 @@ test.describe('socket sync — replicated turn-effect state', () => {
             // Player observes the replicated resolve regain: 0 → 1 (clamped to resolve.max = 1).
             await player.waitForFunction(
                ({ id, expected }) => game.actors.get(id)?.system.resource.resolve.value === expected,
-               { id: ids.effectActorId, expected: expectedResolve },
+               {
+                  id: ids.effectActorId,
+                  expected: expectedResolve 
+               },
                { timeout: 1000 },
             );
          }
@@ -144,7 +159,10 @@ test.describe('socket sync — replicated turn-effect state', () => {
    });
 
    test('A4: previousTurn reverts the applied effect and replicates to the player client', async ({ browser }) => {
-      await withClients(browser, { gm: 'E2E GM 1', player: 'E2E Player 1' }, async ({ gm, player }) => {
+      await withClients(browser, {
+         gm: 'E2E GM 1',
+         player: 'E2E Player 1' 
+      }, async ({ gm, player }) => {
          await setWorldSetting(gm, 'autoApplyPersistentDamage', 'enabled');
          await setWorldSetting(gm, 'autoRevertPersistentDamage', 'enabled');
 
@@ -169,7 +187,10 @@ test.describe('socket sync — replicated turn-effect state', () => {
             await gm.evaluate((combatId) => game.combats.get(combatId).nextTurn(), ids.combatId);
             await player.waitForFunction(
                ({ id, expected }) => game.actors.get(id)?.system.resource.stamina.value === expected,
-               { id: ids.effectActorId, expected: before - 1 },
+               {
+                  id: ids.effectActorId,
+                  expected: before - 1 
+               },
                { timeout: 1000 },
             );
 
@@ -177,7 +198,10 @@ test.describe('socket sync — replicated turn-effect state', () => {
             await gm.evaluate((combatId) => game.combats.get(combatId).previousTurn(), ids.combatId);
             await player.waitForFunction(
                ({ id, expected }) => game.actors.get(id)?.system.resource.stamina.value === expected,
-               { id: ids.effectActorId, expected: before },
+               {
+                  id: ids.effectActorId,
+                  expected: before 
+               },
                { timeout: 1000 },
             );
          }
@@ -187,8 +211,13 @@ test.describe('socket sync — replicated turn-effect state', () => {
       });
    });
 
-   test('A5: a non-best-owner GM advancing the turn triggers exactly one apply by the best owner', async ({ browser }) => {
-      await withClients(browser, { gm1: 'E2E GM 1', gm2: 'E2E GM 2' }, async ({ gm1, gm2 }) => {
+   const a5Title = 'A5: a non-best-owner GM advancing the turn triggers exactly one apply by the best owner';
+
+   test(a5Title, async ({ browser }) => {
+      await withClients(browser, {
+         gm1: 'E2E GM 1',
+         gm2: 'E2E GM 2',
+      }, async ({ gm1, gm2 }) => {
          // GM 1 is the first active GM → the best owner / sole applier. Pin the setting on it.
          await setWorldSetting(gm1, 'autoApplyPersistentDamage', 'enabled');
 
@@ -220,7 +249,10 @@ test.describe('socket sync — replicated turn-effect state', () => {
             await gm2.evaluate(async (combatId) => {
                await titanWait(
                   () => !!game.combats.get(combatId),
-                  { message: 'the seeded combat replicates to GM 2', timeout: 1000 },
+                  {
+                     message: 'the seeded combat replicates to GM 2',
+                     timeout: 1000 
+                  },
                );
                await game.combats.get(combatId).nextTurn();
             }, ids.combatId);
@@ -228,7 +260,10 @@ test.describe('socket sync — replicated turn-effect state', () => {
             // The effect is applied exactly once (before - 1), observed on GM 2's client (replicated).
             await gm2.waitForFunction(
                ({ id, expected }) => game.actors.get(id)?.system.resource.stamina.value === expected,
-               { id: ids.effectActorId, expected: before - 1 },
+               {
+                  id: ids.effectActorId,
+                  expected: before - 1 
+               },
                { timeout: 1000 },
             );
 

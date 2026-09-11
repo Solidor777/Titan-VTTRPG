@@ -6,7 +6,7 @@
    import DocumentIntegerInput from '~/document/svelte-components/input/DocumentIntegerInput.svelte';
    import DocumentTextInput from '~/document/svelte-components/input/DocumentTextInput.svelte';
    import DocumentIntegerIncrementInput
-      from '~/document/svelte-components/input/DocumentIntegerIncrementInput.svelte';
+   from '~/document/svelte-components/input/DocumentIntegerIncrementInput.svelte';
    import CheckboxInput from '~/helpers/svelte-components/input/CheckboxInput.svelte';
    import ItemSheetHeader from '~/document/types/item/sheet/ItemSheetHeader.svelte';
 

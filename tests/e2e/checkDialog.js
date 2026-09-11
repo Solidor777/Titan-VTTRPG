@@ -160,7 +160,13 @@ export async function readNewestCheckFlags(page, baseline) {
       async () => {
          flags = await page.evaluate((base) => {
             // The five check subtypes created by the check engine.
-            const checkTypes = ['attributeCheck', 'resistanceCheck', 'attackCheck', 'castingCheck', 'itemCheck'];
+            const checkTypes = [
+               'attributeCheck',
+               'resistanceCheck',
+               'attackCheck',
+               'castingCheck',
+               'itemCheck'
+            ];
 
             // Only consider messages created after the baseline; return the newest check one.
             if (game.messages.size <= base) {

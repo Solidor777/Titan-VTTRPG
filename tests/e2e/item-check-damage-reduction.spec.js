@@ -93,7 +93,10 @@ test.describe('item-check damage-reduction propagation', () => {
          }
 
          // The purpose-built, Gamemaster-owned player actor used as the roll source.
-         const actor = await Actor.create({ name: actorName, type: 'player' });
+         const actor = await Actor.create({
+            name: actorName,
+            type: 'player' 
+         });
 
          // The ability item carrying the single configured item-check entry.
          await actor.createEmbeddedDocuments('Item', [
@@ -109,7 +112,10 @@ test.describe('item-check damage-reduction propagation', () => {
          // Roll the ability's check (index 0) through the dialog-bypassing API and await the new message.
          const abilityId = actor.items.find((item) => item.type === 'ability').id;
          const before = game.messages.size;
-         await actor.system.rollItemCheck({ itemId: abilityId, checkIdx: 0 });
+         await actor.system.rollItemCheck({
+            itemId: abilityId,
+            checkIdx: 0 
+         });
          await titanWait(() => game.messages.size > before, { message: 'new item-check chat message' });
 
          // The rolled item-check message is a first-class subtype; its config lives in system.parameters.
@@ -118,7 +124,10 @@ test.describe('item-check damage-reduction propagation', () => {
             created: game.messages.size > before,
             parameters: newest?.system?.parameters,
          };
-      }, { actorName: ACTOR_NAME, check: itemCheck });
+      }, {
+         actorName: ACTOR_NAME,
+         check: itemCheck 
+      });
    }
 
    // Precondition: the TITAN system must have initialized before any roll path can be exercised.

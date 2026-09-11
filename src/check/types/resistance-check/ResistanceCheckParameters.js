@@ -24,9 +24,18 @@
  */
 export function createResistanceCheckParametersShape() {
    return {
-      complexity: 0, damageToReduce: 0, diceMod: 0, difficulty: 0, doubleExpertise: false,
-      expertiseMod: 0, extraFailureOnCritical: false, extraSuccessOnCritical: false, resistance: '',
-      resistanceDice: 0, totalDice: 0, totalExpertise: 0,
+      complexity: 0,
+      damageToReduce: 0,
+      diceMod: 0,
+      difficulty: 0,
+      doubleExpertise: false,
+      expertiseMod: 0,
+      extraFailureOnCritical: false,
+      extraSuccessOnCritical: false,
+      resistance: '',
+      resistanceDice: 0,
+      totalDice: 0,
+      totalExpertise: 0,
    };
 }
 

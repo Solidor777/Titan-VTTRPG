@@ -15,7 +15,10 @@
    /** @type {object} Reference to the Application State store. */
    const appState = getContext('applicationState');
 
-   /** @type {object|undefined} The actor that can roll this weapon's attacks, or undefined when the current user cannot. */
+   /**
+    * @type {object|undefined} The actor that can roll this weapon's attacks, or undefined when the
+    *    current user cannot.
+    */
    const rollActor = getContext('rollActor');
 </script>
 

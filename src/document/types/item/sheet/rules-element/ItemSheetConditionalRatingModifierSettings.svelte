@@ -141,8 +141,8 @@
          bind:value={document.data.system.rulesElement[idx].selector}
          onchange={onSelectorChange}
          options={document.data.system.rulesElement[idx].rating === 'defense'
-                  ? defenseSelectorOptions
-                  : attackSelectorOptions}
+            ? defenseSelectorOptions
+            : attackSelectorOptions}
       />
    </div>
 

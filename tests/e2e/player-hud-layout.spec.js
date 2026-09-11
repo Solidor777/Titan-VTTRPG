@@ -51,7 +51,10 @@ test.afterAll(async () => {
 async function seedControlledActor(page) {
    await page.evaluate(async (name) => {
       if (!game.actors.getName(name)) {
-         await Actor.create({ name, type: 'player' });
+         await Actor.create({
+            name,
+            type: 'player' 
+         });
       }
    }, FIXTURE_NAME);
 
@@ -136,7 +139,10 @@ test('a dragged position persists across a reload', async () => {
 
    await page.reload();
    await page.evaluate(async () => {
-      await titanWait(() => game.ready === true, { message: 'world ready after reload', timeout: 30000 });
+      await titanWait(() => game.ready === true, {
+         message: 'world ready after reload',
+         timeout: 30000 
+      });
    });
    await seedControlledActor(page);
 
@@ -201,7 +207,10 @@ test('the HUD anchors to the expanded sidebar edge and stays put when the sideba
          const box = await menu.boundingBox();
          return box ? Math.abs(box.x - expanded.x) <= 2 : false;
       },
-      { message: 'the HUD stays put when the sidebar collapses', timeout: 1000 },
+      {
+         message: 'the HUD stays put when the sidebar collapses',
+         timeout: 1000 
+      },
    ).toBe(true);
 
    // Re-expanding must also leave it in place.
@@ -212,19 +221,27 @@ test('the HUD anchors to the expanded sidebar edge and stays put when the sideba
          const box = await menu.boundingBox();
          return box ? Math.abs(box.x - expanded.x) <= 2 : false;
       },
-      { message: 'the HUD stays put when the sidebar re-expands', timeout: 1000 },
+      {
+         message: 'the HUD stays put when the sidebar re-expands',
+         timeout: 1000 
+      },
    ).toBe(true);
 });
 
 test('a window resize clamps elements into the canvas rect', async () => {
    await seedControlledActor(page);
-   await page.setViewportSize({ width: 900, height: 600 });
+   await page.setViewportSize({
+      width: 900,
+      height: 600 
+   });
 
    await expect.poll(
       () => page.evaluate(() => {
          /** @type {number} The sidebar's current rendered width. */
          const sidebarWidth = ui.sidebar?.element?.getBoundingClientRect()?.width ?? 0;
-         return Array.from(document.querySelectorAll('#titan-player-hud .hud-element, #titan-player-hud [data-testid^="player-hud-"]'))
+         const selector = '#titan-player-hud .hud-element, #titan-player-hud [data-testid^="player-hud-"]';
+
+         return Array.from(document.querySelectorAll(selector))
             .filter((node) => node.dataset.testid?.match(/^player-hud-(portrait|action-menu|effects-panel)$/))
             .every((node) => {
                const box = node.getBoundingClientRect();
@@ -232,10 +249,16 @@ test('a window resize clamps elements into the canvas rect', async () => {
                   && box.right <= (900 - sidebarWidth) + 1 && box.bottom <= 601;
             });
       }),
-      { message: 'every HUD element clamps into the shrunken canvas rect', timeout: 1000 },
+      {
+         message: 'every HUD element clamps into the shrunken canvas rect',
+         timeout: 1000 
+      },
    ).toBe(true);
 
-   await page.setViewportSize({ width: 1280, height: 720 });
+   await page.setViewportSize({
+      width: 1280,
+      height: 720 
+   });
 });
 
 test('the action menu defaults to the right of the portrait with a right-opening flyout', async () => {
@@ -261,9 +284,17 @@ test('the action menu defaults to the right of the portrait with a right-opening
    const boxes = await page.evaluate(() => {
       const r = (sel) => {
          const b = document.querySelector(sel).getBoundingClientRect();
-         return { left: Math.round(b.left), right: Math.round(b.right), bottom: Math.round(b.bottom), width: Math.round(b.width) };
+         return {
+            left: Math.round(b.left),
+            right: Math.round(b.right),
+            bottom: Math.round(b.bottom),
+            width: Math.round(b.width) 
+         };
       };
-      return { portrait: r('[data-testid="player-hud-portrait"]'), menu: r('[data-testid="player-hud-action-menu"]') };
+      return {
+         portrait: r('[data-testid="player-hud-portrait"]'),
+         menu: r('[data-testid="player-hud-action-menu"]') 
+      };
    });
 
    // The menu's left edge sits just to the right of the portrait's right edge, bottoms aligned.
@@ -297,7 +328,11 @@ test('the edit toolbar reset restores default positions', async () => {
    await page.evaluate(() => game.titan.playerHud.toggleEditMode());
    await page.mouse.move(defaultBox.x + defaultBox.width / 2, defaultBox.y + defaultBox.height / 2);
    await page.mouse.down();
-   await page.mouse.move(defaultBox.x + defaultBox.width / 2 - 200, defaultBox.y + defaultBox.height / 2 - 100, { steps: 5 });
+   await page.mouse.move(
+      defaultBox.x + defaultBox.width / 2 - 200,
+      defaultBox.y + defaultBox.height / 2 - 100,
+      { steps: 5 },
+   );
    await page.mouse.up();
 
    await page.locator('[data-testid="player-hud-edit-reset"]').click();
@@ -339,7 +374,10 @@ test('the settings app reset-all restores options and layout', async () => {
          portraitDx: game.titan.playerHud.layoutState.positions.portrait.dx,
       })),
       { message: 'reset-all restores stored options and live layout' },
-   ).toEqual({ options: {}, portraitDx: 250 });
+   ).toEqual({
+      options: {},
+      portraitDx: 250 
+   });
 });
 
 test('the hotbar is hidden by default and the setting shows it', async () => {

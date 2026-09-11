@@ -6,7 +6,10 @@
  */
 export function encodeCsv(sheet) {
    /** @type {string[]} One encoded line per row, header first. */
-   const lines = [sheet.columns, ...sheet.rows.map((row) => sheet.columns.map((col) => row[col]))]
+   const lines = [
+      sheet.columns,
+      ...sheet.rows.map((row) => sheet.columns.map((col) => row[col]))
+   ]
       .map((cells) => cells.map(encodeCsvField).join(','));
    return `﻿${lines.join('\r\n')}\r\n`;
 }
@@ -45,7 +48,10 @@ export function decodeCsv(text, sheetName = 'Sheet1') {
       columns: header ?? [],
       rows: dataRecords
          .filter((record) => !(record.length === 1 && record[0] === ''))
-         .map((record) => Object.fromEntries((header ?? []).map((col, i) => [col, record[i]]))),
+         .map((record) => Object.fromEntries((header ?? []).map((col, i) => [
+            col,
+            record[i]
+         ]))),
    };
 }
 

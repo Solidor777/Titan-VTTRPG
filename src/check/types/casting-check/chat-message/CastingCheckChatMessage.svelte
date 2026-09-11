@@ -10,7 +10,7 @@
    import CheckChatMessages from '~/check/chat-message/CheckChatMessages.svelte';
    import ItemCheckChatItemTraits from '~/check/types/item-check/chat-message/ItemCheckChatItemTraits.svelte';
    import CastingCheckChatMessageResistanceCheckButtons
-      from '~/check/types/casting-check/chat-message/CastingCheckChatMessageResistanceCheckButtons.svelte';
+   from '~/check/types/casting-check/chat-message/CastingCheckChatMessageResistanceCheckButtons.svelte';
 
    /** @type {object} Reference to the reactive Document store. */
    const document = getContext('document');
@@ -18,9 +18,9 @@
    /** @type {boolean} Whether to show the scaling aspect controls. */
    const scalingAspect = $derived(
       document.data.system.results.scalingAspect &&
-      document.data.system.results.scalingAspect.length > 0 &&
-      document.data.system.results.extraSuccesses &&
-      document.data.constructor.getSpeakerActor(document.data.speaker)?.isOwner,
+         document.data.system.results.scalingAspect.length > 0 &&
+         document.data.system.results.extraSuccesses &&
+         document.data.constructor.getSpeakerActor(document.data.speaker)?.isOwner,
    );
 </script>
 
@@ -46,10 +46,10 @@
 
    <!--Description-->
    {#if document.data.system.results.succeeded &&
-   document.data.system.parameters.itemDescription !==
-   '' &&
-   document.data.system.parameters.itemDescription !==
-   '<p></p>'}
+      document.data.system.parameters.itemDescription !==
+      '' &&
+      document.data.system.parameters.itemDescription !==
+      '<p></p>'}
       <div class="section rich-text">
          <RichText value={document.data.system.parameters.itemDescription}/>
       </div>
@@ -92,8 +92,8 @@
       <!--Resistance Check Buttons-->
       {#if
          document.data.system.parameters.reflexesCheck ||
-         document.data.system.parameters.resilienceCheck ||
-         document.data.system.parameters.willpowerCheck
+            document.data.system.parameters.resilienceCheck ||
+            document.data.system.parameters.willpowerCheck
       }
          <div class="section tags">
             <CastingCheckChatMessageResistanceCheckButtons/>

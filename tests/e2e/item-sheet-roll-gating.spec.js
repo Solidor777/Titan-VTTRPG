@@ -25,7 +25,10 @@ test.describe('item-sheet roll-button gating (player)', () => {
    test('roll button shows only when the player owns the item\'s actor', async ({ browser }) => {
       await withClients(
          browser,
-         { gm: GM_USERS[0].name, player: PLAYER_USERS[0].name },
+         {
+            gm: GM_USERS[0].name,
+            player: PLAYER_USERS[0].name 
+         },
          async ({ gm, player }) => {
             /** @type {string[]} Uncaught errors on the player page (the surface under test). */
             const errors = attachPageErrors(player);
@@ -45,7 +48,10 @@ test.describe('item-sheet roll-button gating (player)', () => {
                const OWNER = CONST.DOCUMENT_OWNERSHIP_LEVELS.OWNER;
                const OBSERVER = CONST.DOCUMENT_OWNERSHIP_LEVELS.OBSERVER;
 
-               for (const name of [ownedName, observedName]) {
+               for (const name of [
+                  ownedName,
+                  observedName
+               ]) {
                   const stale = game.actors.getName(name);
                   if (stale) {
                      await stale.delete();
@@ -55,10 +61,17 @@ test.describe('item-sheet roll-button gating (player)', () => {
                const owned = await Actor.create({
                   name: ownedName,
                   type: 'player',
-                  ownership: { default: OBSERVER, [playerUser.id]: OWNER },
+                  ownership: {
+                     default: OBSERVER,
+                     [playerUser.id]: OWNER 
+                  },
                });
                const [ownedItem] = await owned.createEmbeddedDocuments('Item', [
-                  { name: 'E2E Owned Roll Equipment', type: 'equipment', system: { check: [itemCheck] } },
+                  {
+                     name: 'E2E Owned Roll Equipment',
+                     type: 'equipment',
+                     system: { check: [itemCheck] } 
+                  },
                ]);
 
                const observed = await Actor.create({
@@ -67,7 +80,11 @@ test.describe('item-sheet roll-button gating (player)', () => {
                   ownership: { default: OBSERVER },
                });
                const [observedItem] = await observed.createEmbeddedDocuments('Item', [
-                  { name: 'E2E Observed Roll Equipment', type: 'equipment', system: { check: [itemCheck] } },
+                  {
+                     name: 'E2E Observed Roll Equipment',
+                     type: 'equipment',
+                     system: { check: [itemCheck] } 
+                  },
                ]);
 
                return {
@@ -86,7 +103,10 @@ test.describe('item-sheet roll-button gating (player)', () => {
             // Wait until the player client has received both actors over the socket.
             await player.waitForFunction(
                (actorIds) => actorIds.every((id) => !!game.actors.get(id)),
-               [ids.ownedActorId, ids.observedActorId],
+               [
+                  ids.ownedActorId,
+                  ids.observedActorId
+               ],
                { timeout: 1000 },
             );
 
@@ -105,7 +125,10 @@ test.describe('item-sheet roll-button gating (player)', () => {
                      () => !!app?.element?.querySelector('.window-content')?.children.length,
                      { message: 'item sheet mounted' },
                   );
-               }, { aid: actorId, iid: itemId });
+               }, {
+                  aid: actorId,
+                  iid: itemId 
+               });
                return player.locator('.application.titan-document-sheet');
             }
 
@@ -135,13 +158,19 @@ test.describe('item-sheet roll-button gating (player)', () => {
 
             // GM removes the fixtures.
             await gm.evaluate(async ({ ownedName, observedName }) => {
-               for (const name of [ownedName, observedName]) {
+               for (const name of [
+                  ownedName,
+                  observedName
+               ]) {
                   const actor = game.actors.getName(name);
                   if (actor) {
                      await actor.delete();
                   }
                }
-            }, { ownedName: OWNED_ACTOR_NAME, observedName: OBSERVED_ACTOR_NAME });
+            }, {
+               ownedName: OWNED_ACTOR_NAME,
+               observedName: OBSERVED_ACTOR_NAME 
+            });
          },
       );
    });

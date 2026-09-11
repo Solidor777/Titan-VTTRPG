@@ -13,17 +13,26 @@ function fakeLabels(key, fallback) {
 
 describe('commonStatLines', () => {
    it('omits Rarity when common and Value when zero', () => {
-      expect(commonStatLines({ rarity: 'common', value: 0 }, fakeLabels)).toEqual([]);
+      expect(commonStatLines({
+         rarity: 'common',
+         value: 0 
+      }, fakeLabels)).toEqual([]);
    });
 
    it('renders Rarity when not common', () => {
-      expect(commonStatLines({ rarity: 'uncommon', value: 0 }, fakeLabels)).toEqual([
+      expect(commonStatLines({
+         rarity: 'uncommon',
+         value: 0 
+      }, fakeLabels)).toEqual([
          '**Rarity:** uncommon  ',
       ]);
    });
 
    it('renders Value when greater than zero', () => {
-      expect(commonStatLines({ rarity: 'common', value: 135 }, fakeLabels)).toEqual([
+      expect(commonStatLines({
+         rarity: 'common',
+         value: 135 
+      }, fakeLabels)).toEqual([
          '**Value:** 135  ',
       ]);
    });
@@ -75,12 +84,19 @@ describe('renderItemBlock', () => {
             {
                headingText: 'Strike (Melee)',
                slug: 'strike-melee',
-               statLines: ['**Damage:** 1 \\+ ES  ', '**Traits:** Flurry, Slashing  '],
+               statLines: [
+                  '**Damage:** 1 \\+ ES  ',
+                  '**Traits:** Flurry, Slashing  '
+               ],
             },
             {
                headingText: 'Throw (Ranged)',
                slug: 'throw-ranged',
-               statLines: ['**Damage:** 1 \\+ ES  ', '**Range:** 5 spaces  ', '**Traits:** Slashing  '],
+               statLines: [
+                  '**Damage:** 1 \\+ ES  ',
+                  '**Range:** 5 spaces  ',
+                  '**Traits:** Slashing  '
+               ],
             },
          ],
       })).toBe(

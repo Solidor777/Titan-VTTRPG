@@ -6,7 +6,8 @@
    /**
     * @typedef {object} DocumentSelectProps
     * @property {*} [value] - The value that this input should modify.
-    * @property {(import('~/helpers/svelte-components/input/select/Select.svelte').SelectOption | string | number)[]} [options] - Options for the Select component.
+    * @property {(import('~/helpers/svelte-components/input/select/Select.svelte').SelectOption
+    *    | string | number)[]} [options] - Options for the Select component.
     * @property {boolean} [disabled] - Whether the input should currently be disabled.
     * @property {string | object} [tooltip] - The Tooltip to display for this element, if any.
     * @property {() => void} [onchange] - Optional callback fired (as a pure mutation) before the document is persisted.

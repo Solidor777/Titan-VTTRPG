@@ -39,7 +39,11 @@ test('fast-check is injected and runs a property in the Foundry page', async () 
          fc.property(fc.integer(), (n) => n === n),
          { numRuns: 25 },
       );
-      return { available: typeof fc !== 'undefined', failed: report.failed, numRuns: report.numRuns };
+      return {
+         available: typeof fc !== 'undefined',
+         failed: report.failed,
+         numRuns: report.numRuns 
+      };
    });
 
    expect(result.available, 'fc global should be present in the page').toBe(true);

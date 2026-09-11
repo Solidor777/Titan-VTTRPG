@@ -38,15 +38,27 @@ describe('ReportChatMessageDataModel.migrateData', () => {
    it('hoists legacy top-level resource snapshots into the nested resource object', () => {
       /** @type {object} A legacy report source carrying top-level resource snapshots. */
       const source = {
-         stamina: { value: 1, max: 6 },
-         wounds: { value: 0, max: 2 },
+         stamina: {
+            value: 1,
+            max: 6 
+         },
+         wounds: {
+            value: 0,
+            max: 2 
+         },
       };
 
       const migrated = ReportChatMessageDataModel.migrateData(source);
 
       expect(migrated.resource).toEqual({
-         stamina: { value: 1, max: 6 },
-         wounds: { value: 0, max: 2 },
+         stamina: {
+            value: 1,
+            max: 6 
+         },
+         wounds: {
+            value: 0,
+            max: 2 
+         },
       });
       expect(migrated.stamina).toBeUndefined();
       expect(migrated.wounds).toBeUndefined();
@@ -55,15 +67,24 @@ describe('ReportChatMessageDataModel.migrateData', () => {
    it('does not overwrite an already-present nested resource value', () => {
       /** @type {object} A source carrying both a legacy top-level key and a nested value for the same key. */
       const source = {
-         stamina: { value: 1, max: 6 },
+         stamina: {
+            value: 1,
+            max: 6 
+         },
          resource: {
-            stamina: { value: 5, max: 6 },
+            stamina: {
+               value: 5,
+               max: 6 
+            },
          },
       };
 
       const migrated = ReportChatMessageDataModel.migrateData(source);
 
-      expect(migrated.resource.stamina).toEqual({ value: 5, max: 6 });
+      expect(migrated.resource.stamina).toEqual({
+         value: 5,
+         max: 6 
+      });
       expect(migrated.stamina).toBeUndefined();
    });
 
@@ -71,7 +92,10 @@ describe('ReportChatMessageDataModel.migrateData', () => {
       /** @type {object} A source already shaped per the current schema, with no legacy keys. */
       const source = {
          resource: {
-            resolve: { value: 2, max: 4 },
+            resolve: {
+               value: 2,
+               max: 4 
+            },
          },
       };
 
@@ -79,7 +103,10 @@ describe('ReportChatMessageDataModel.migrateData', () => {
 
       expect(migrated).toEqual({
          resource: {
-            resolve: { value: 2, max: 4 },
+            resolve: {
+               value: 2,
+               max: 4 
+            },
          },
       });
    });

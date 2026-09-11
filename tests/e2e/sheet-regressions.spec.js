@@ -25,7 +25,11 @@ test.afterEach(async () => {
    // Remove the per-test fixture documents so world state does not accumulate.
    await page.evaluate(async () => {
       await game.scenes.getName('E2E Regression Scene')?.delete();
-      for (const name of ['E2E Regression Actor', 'E2E Regression Weapon', 'E2E Regression Source']) {
+      for (const name of [
+         'E2E Regression Actor',
+         'E2E Regression Weapon',
+         'E2E Regression Source'
+      ]) {
          await game.actors.getName(name)?.delete();
          await game.items.getName(name)?.delete();
       }
@@ -41,9 +45,20 @@ test.afterAll(async () => {
 test.describe('v14 sheet regressions', () => {
    test('item sheet headers render the rarity label exactly once', async () => {
       // Every rarity-bearing item type shares ItemSheetRaritySelect, which carries its own label.
-      for (const type of ['ability', 'armor', 'commodity', 'equipment', 'shield', 'spell', 'weapon']) {
+      for (const type of [
+         'ability',
+         'armor',
+         'commodity',
+         'equipment',
+         'shield',
+         'spell',
+         'weapon'
+      ]) {
          await page.evaluate(async (type) => {
-            const item = await Item.create({ name: 'E2E Regression Rarity Item', type });
+            const item = await Item.create({
+               name: 'E2E Regression Rarity Item',
+               type 
+            });
             await item.sheet.render(true);
             await titanWait(() => !!item.sheet.element, { message: `${type} sheet rendered` });
          }, type);
@@ -60,7 +75,10 @@ test.describe('v14 sheet regressions', () => {
    test('createItemFromType adds an owned item to a world actor', async () => {
       const result = await page.evaluate(async () => {
          // A fresh world actor exercises the non-embedded document path.
-         const actor = await Actor.create({ name: 'E2E Regression Actor', type: 'player' });
+         const actor = await Actor.create({
+            name: 'E2E Regression Actor',
+            type: 'player' 
+         });
          const created = await actor.createItemFromType('ability');
          return {
             createdCount: created?.length ?? 0,
@@ -78,15 +96,28 @@ test.describe('v14 sheet regressions', () => {
    test('dropping a world item onto an open actor sheet creates an owned copy', async () => {
       const result = await page.evaluate(async () => {
          // The drop source item and the receiving actor with an open sheet.
-         const source = await Item.create({ name: 'E2E Regression Source', type: 'equipment' });
-         const actor = await Actor.create({ name: 'E2E Regression Actor', type: 'player' });
+         const source = await Item.create({
+            name: 'E2E Regression Source',
+            type: 'equipment' 
+         });
+         const actor = await Actor.create({
+            name: 'E2E Regression Actor',
+            type: 'player' 
+         });
          await actor.sheet.render(true);
          await titanWait(() => !!actor.sheet.element, { message: 'actor sheet rendered' });
 
          // A synthetic drop event carrying Foundry's standard drag payload.
          const dataTransfer = new DataTransfer();
-         dataTransfer.setData('text/plain', JSON.stringify({ type: 'Item', uuid: source.uuid }));
-         const dropEvent = new DragEvent('drop', { bubbles: true, cancelable: true, dataTransfer });
+         dataTransfer.setData('text/plain', JSON.stringify({
+            type: 'Item',
+            uuid: source.uuid 
+         }));
+         const dropEvent = new DragEvent('drop', {
+            bubbles: true,
+            cancelable: true,
+            dataTransfer 
+         });
          /** @type {boolean} Whether the drop controller bound a handler to the sheet element. */
          const handlerBound = typeof actor.sheet.element.ondrop === 'function';
          actor.sheet.element.dispatchEvent(dropEvent);
@@ -124,7 +155,10 @@ test.describe('v14 sheet regressions', () => {
    test('the weapon attacks tab renders its seeded attack without errors', async () => {
       const opened = await page.evaluate(async () => {
          // A fresh weapon seeds attack[0]; the attacks tab must render it on first open.
-         const weapon = await Item.create({ name: 'E2E Regression Weapon', type: 'weapon' });
+         const weapon = await Item.create({
+            name: 'E2E Regression Weapon',
+            type: 'weapon' 
+         });
          await weapon.sheet.render(true);
          await titanWait(() => !!weapon.sheet.element, { message: 'weapon sheet rendered' });
          return { attackCount: weapon.system.attack.length };
@@ -133,7 +167,10 @@ test.describe('v14 sheet regressions', () => {
 
       // Open the Attacks tab through the real tab strip and assert the attack settings mount.
       const sheet = page.locator('.titan-document-sheet:has-text("E2E Regression Weapon")');
-      await sheet.getByRole('button', { name: 'Attacks', exact: true }).first().click();
+      await sheet.getByRole('button', {
+         name: 'Attacks',
+         exact: true 
+      }).first().click();
       await expect(sheet.locator('.attack').first(), 'attack settings render').toBeVisible();
       expect(errors, `uncaught errors on the attacks tab:\n${errors.join('\n')}`).toEqual([]);
    });
@@ -146,8 +183,15 @@ test.describe('v14 sheet regressions', () => {
             type: 'player',
             prototypeToken: { actorLink: true },
          });
-         const scene = await Scene.create({ name: 'E2E Regression Scene', width: 1000, height: 1000 });
-         const tokenData = (await actor.getTokenDocument({ x: 100, y: 100 })).toObject();
+         const scene = await Scene.create({
+            name: 'E2E Regression Scene',
+            width: 1000,
+            height: 1000 
+         });
+         const tokenData = (await actor.getTokenDocument({
+            x: 100,
+            y: 100 
+         })).toObject();
          const [tokenDoc] = await scene.createEmbeddedDocuments('Token', [tokenData]);
 
          // Open the sheet the way the canvas double-click does: passing the originating token.
@@ -174,7 +218,10 @@ test.describe('v14 sheet regressions', () => {
    test('adding a check while the sheet is open renders the new check row', async () => {
       await page.evaluate(async () => {
          // A weapon sheet shows the checks sidebar; addCheck must not crash the fresh row bind.
-         const weapon = await Item.create({ name: 'E2E Regression Weapon', type: 'weapon' });
+         const weapon = await Item.create({
+            name: 'E2E Regression Weapon',
+            type: 'weapon' 
+         });
          await weapon.sheet.render(true);
          await titanWait(() => !!weapon.sheet.element, { message: 'weapon sheet rendered' });
          await weapon.addCheck();

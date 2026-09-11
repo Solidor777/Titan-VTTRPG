@@ -35,13 +35,48 @@ const ACTOR_NAME = 'E2E Condition Actor';
 // A boost ability covering every stat the condition tests read: ratings +5, all attributes +4, all
 // resistances +4, stride speed +6.
 const BOOST_ELEMENTS = [
-   { operation: 'flatModifier', selector: 'rating', key: 'melee', value: 5 },
-   { operation: 'flatModifier', selector: 'rating', key: 'accuracy', value: 5 },
-   { operation: 'flatModifier', selector: 'rating', key: 'defense', value: 5 },
-   { operation: 'flatModifier', selector: 'rating', key: 'awareness', value: 5 },
-   { operation: 'flatModifier', selector: 'attribute', key: 'all', value: 4 },
-   { operation: 'flatModifier', selector: 'resistance', key: 'all', value: 4 },
-   { operation: 'flatModifier', selector: 'speed', key: 'stride', value: 6 },
+   {
+      operation: 'flatModifier',
+      selector: 'rating',
+      key: 'melee',
+      value: 5 
+   },
+   {
+      operation: 'flatModifier',
+      selector: 'rating',
+      key: 'accuracy',
+      value: 5 
+   },
+   {
+      operation: 'flatModifier',
+      selector: 'rating',
+      key: 'defense',
+      value: 5 
+   },
+   {
+      operation: 'flatModifier',
+      selector: 'rating',
+      key: 'awareness',
+      value: 5 
+   },
+   {
+      operation: 'flatModifier',
+      selector: 'attribute',
+      key: 'all',
+      value: 4 
+   },
+   {
+      operation: 'flatModifier',
+      selector: 'resistance',
+      key: 'all',
+      value: 4 
+   },
+   {
+      operation: 'flatModifier',
+      selector: 'speed',
+      key: 'stride',
+      value: 6 
+   },
 ];
 
 test.describe('conditions — derived-stat mechanics', () => {
@@ -73,7 +108,10 @@ test.describe('conditions — derived-stat mechanics', () => {
          if (stale) {
             await stale.delete();
          }
-         const actor = await Actor.create({ name, type: 'player' });
+         const actor = await Actor.create({
+            name,
+            type: 'player' 
+         });
          await actor.createEmbeddedDocuments('Item', [abilityData]);
          // Wait until the boost ability is owned and its +4 has reached the derived Body value (base 1).
          await titanWait(() => actor.items.size > 0 && actor.system.attribute.body.value > 1, {
@@ -86,8 +124,14 @@ test.describe('conditions — derived-stat mechanics', () => {
             defense: actor.system.rating.defense.value,
             awareness: actor.system.rating.awareness.value,
             stride: actor.system.speed.stride.value,
-            attribute: Object.fromEntries(Object.entries(actor.system.attribute).map(([k, v]) => [k, v.value])),
-            resistance: Object.fromEntries(Object.entries(actor.system.resistance).map(([k, v]) => [k, v.value])),
+            attribute: Object.fromEntries(Object.entries(actor.system.attribute).map(([k, v]) => [
+               k,
+               v.value
+            ])),
+            resistance: Object.fromEntries(Object.entries(actor.system.resistance).map(([k, v]) => [
+               k,
+               v.value
+            ])),
          });
 
          const baseline = snapshot();
@@ -99,8 +143,15 @@ test.describe('conditions — derived-stat mechanics', () => {
          });
          const after = snapshot();
 
-         return { baseline, after };
-      }, { name: ACTOR_NAME, abilityData: buildRulesElementAbilityData('E2E Condition Boost', BOOST_ELEMENTS), statusId });
+         return {
+            baseline,
+            after 
+         };
+      }, {
+         name: ACTOR_NAME,
+         abilityData: buildRulesElementAbilityData('E2E Condition Boost', BOOST_ELEMENTS),
+         statusId 
+      });
    }
 
    test('blinded lowers melee, accuracy, and defense by 1', async () => {

@@ -12,7 +12,10 @@
    /** @type {object} Reference to the reactive Document store. */
    const document = getContext('document');
 
-   /** @type {object|undefined} The actor that can roll this spell's casting check, or undefined when the current user cannot. */
+   /**
+    * @type {object|undefined} The actor that can roll this spell's casting check, or undefined when
+    *    the current user cannot.
+    */
    const rollActor = getContext('rollActor');
 
    /**
@@ -35,7 +38,7 @@
    /** @type {boolean} True when the spell has any enabled aspect or at least one custom aspect. */
    const aspectsEnabled = $derived(
       areAspectsEnabled(document.data.system.aspect) ||
-      document.data.system.customAspect.length > 0,
+         document.data.system.customAspect.length > 0,
    );
 </script>
 

@@ -3,13 +3,13 @@
    import Text from '~/helpers/svelte-components/Text.svelte';
    import { slide } from 'svelte/transition';
    import ScrollingContainer
-      from '~/helpers/svelte-components/ScrollingContainer.svelte';
+   from '~/helpers/svelte-components/ScrollingContainer.svelte';
    import TopFilter from '~/helpers/svelte-components/input/TopFilter.svelte';
    import { CREATE_ICON } from '~/system/Icons.js';
    import ItemSheetRulesElementSettings
-      from '~/document/types/item/sheet/rules-element/ItemSheetRulesElementSettings.svelte';
+   from '~/document/types/item/sheet/rules-element/ItemSheetRulesElementSettings.svelte';
    import DocumentOwnerButton
-      from '~/document/svelte-components/DocumentOwnerButton.svelte';
+   from '~/document/svelte-components/DocumentOwnerButton.svelte';
    import InsertionLine from '~/helpers/svelte-components/drag-reorder/InsertionLine.svelte';
    import { draggableRow, reorderDropZone } from '~/helpers/svelte-components/drag-reorder/DragReorderActions.js';
 

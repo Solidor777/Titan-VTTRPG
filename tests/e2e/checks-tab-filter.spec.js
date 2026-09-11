@@ -32,7 +32,10 @@ test.afterAll(async () => {
 });
 
 // The two distinct check labels seeded onto the fixture ability.
-const CHECK_LABELS = ['AlphaCheck', 'BravoCheck'];
+const CHECK_LABELS = [
+   'AlphaCheck',
+   'BravoCheck'
+];
 
 test.describe('checks tab filter (live item sheet)', () => {
    test.beforeEach(async () => {

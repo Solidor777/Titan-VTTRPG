@@ -5,15 +5,15 @@ import { PLURAL_TYPE_LABELS, TYPE_ORDER } from '~/spreadsheet/markdown/Labels.js
  * @property {number} level - The heading level (1-3) this section renders at.
  * @property {string} text - The section's heading text (unescaped; rendering escapes it).
  * @property {import('./WorkbookToDocuments.js').RenderableDocument[]} documents - This section's own
- *    documents, rendered directly under its heading (alphabetical by name).
+ * documents, rendered directly under its heading (alphabetical by name).
  * @property {Section[]} children - Nested sections (type groups, spell traditions, or subfolders),
- *    rendered after `documents`.
+ * rendered after `documents`.
  */
 
 /**
  * @typedef {object} FolderNode
  * @property {import('./WorkbookToDocuments.js').RenderableDocument[]} documents - Documents whose
- *    folder path ends exactly at this node.
+ * folder path ends exactly at this node.
  * @property {Object<string, FolderNode>} children - Child folder nodes, keyed by folder segment name.
  */
 
@@ -31,9 +31,9 @@ function createFolderNode() {
 /**
  * Builds a folder trie from a set of foldered documents, keyed by each folder path segment.
  * @param {import('./WorkbookToDocuments.js').RenderableDocument[]} documents - Documents with a
- *    non-empty `folderPath`.
+ * non-empty `folderPath`.
  * @returns {FolderNode} The trie's root node (its own `documents` is always empty; callers only use
- *    `root.children`).
+ * `root.children`).
  */
 function buildFolderTree(documents) {
    /** @type {FolderNode} The trie root. */

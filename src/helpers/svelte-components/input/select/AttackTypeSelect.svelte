@@ -28,7 +28,10 @@
    };
 
    /** @type {object[]} Options for the Select component, each carrying its icon. */
-   const options = ATTACK_TYPES.map((type) => ({ value: type, icon: ATTACK_TYPE_ICONS[type] }));
+   const options = ATTACK_TYPES.map((type) => ({
+      value: type,
+      icon: ATTACK_TYPE_ICONS[type] 
+   }));
 </script>
 
 <Select

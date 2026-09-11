@@ -20,7 +20,11 @@ const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..'
 const DEFAULT_LANG_PATH = path.join(repoRoot, 'lang', 'en.json');
 
 /** @type {Set<string>} The spreadsheet file extensions collected from a directory input. */
-const SPREADSHEET_EXTENSIONS = new Set(['.csv', '.xlsx', '.zip']);
+const SPREADSHEET_EXTENSIONS = new Set([
+   '.csv',
+   '.xlsx',
+   '.zip'
+]);
 
 /**
  * @typedef {object} ParsedArgs
@@ -114,7 +118,10 @@ function groupFilesForDecoding(files) {
 
    for (const file of files) {
       /** @type {{name: string, bytes: Uint8Array}} The file's entry. */
-      const entry = { name: path.basename(file), bytes: readFileSync(file) };
+      const entry = {
+         name: path.basename(file),
+         bytes: readFileSync(file) 
+      };
       /** @type {string} The file's lowercased extension. */
       const ext = path.extname(file).toLowerCase();
 
@@ -203,7 +210,10 @@ export async function runCli(argv) {
       const out = args.out ?? defaultOutPath(args.inputs[0]);
 
       /** @type {string} The rendered Markdown document. */
-      const markdown = renderCompendiumMarkdown(documents, { title, labels: createLabels(langJson) });
+      const markdown = renderCompendiumMarkdown(documents, {
+         title,
+         labels: createLabels(langJson) 
+      });
 
       writeFileSync(out, markdown, 'utf-8');
       console.log(`Wrote ${out} (${documents.length} documents)`);

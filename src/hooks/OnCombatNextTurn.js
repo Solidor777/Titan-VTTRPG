@@ -17,7 +17,11 @@ export default async function onCombatNextTurn(currentCombatantId, previousComba
       const currentCombatant = combat?.combatants.get(currentCombatantId);
       const previousCombatant = combat?.combatants.get(previousCombatantId);
       return combat && currentCombatant && previousCombatant
-         ? { combat, currentCombatant, previousCombatant }
+         ? {
+            combat,
+            currentCombatant,
+            previousCombatant 
+         }
          : null;
    });
 

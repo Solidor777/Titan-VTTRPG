@@ -81,7 +81,10 @@ test.describe('v14 theme system', () => {
          async function probe(scheme, expected) {
             await game.settings.set('core', 'uiConfig', {
                ...original,
-               colorScheme: { ...original.colorScheme, applications: scheme },
+               colorScheme: {
+                  ...original.colorScheme,
+                  applications: scheme 
+               },
             });
             await titanWait(
                () => getComputedStyle(document.documentElement)
@@ -101,8 +104,14 @@ test.describe('v14 theme system', () => {
          return {
             light,
             dark,
-            expectedLight: { id: expectedLight.id, background: expectedLight.tokens['app-background'] },
-            expectedDark: { id: expectedDark.id, background: expectedDark.tokens['app-background'] },
+            expectedLight: {
+               id: expectedLight.id,
+               background: expectedLight.tokens['app-background'] 
+            },
+            expectedDark: {
+               id: expectedDark.id,
+               background: expectedDark.tokens['app-background'] 
+            },
          };
       });
 
@@ -159,7 +168,10 @@ test.describe('v14 theme system', () => {
          if (stale) {
             await stale.delete();
          }
-         const actor = await Actor.create({ name: 'E2E Theme Roller', type: 'player' });
+         const actor = await Actor.create({
+            name: 'E2E Theme Roller',
+            type: 'player' 
+         });
          const before = game.messages.size;
          await actor.system.rollAttributeCheck({ attribute: 'body' });
          await titanWait(() => game.messages.size > before, { message: 'blind check posted' });

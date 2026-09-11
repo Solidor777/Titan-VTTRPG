@@ -33,11 +33,17 @@
    >
       <div
          class="ring"
-         style:background={`conic-gradient(var(--titan-stamina-background) 0 ${pct('stamina')}%, var(--titan-panel-3-background) ${pct('stamina')}% 100%)`}
+         style:background={
+            `conic-gradient(var(--titan-stamina-background) 0 ${pct('stamina')}%, ` +
+               `var(--titan-panel-3-background) ${pct('stamina')}% 100%)`
+         }
       ></div>
       <div
          class="ring inner"
-         style:background={`conic-gradient(var(--titan-resolve-background) 0 ${pct('resolve')}%, var(--titan-panel-3-background) ${pct('resolve')}% 100%)`}
+         style:background={
+            `conic-gradient(var(--titan-resolve-background) 0 ${pct('resolve')}%, ` +
+               `var(--titan-panel-3-background) ${pct('resolve')}% 100%)`
+         }
       ></div>
       <img
          src={document.data.img}

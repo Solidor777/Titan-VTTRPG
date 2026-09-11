@@ -2,7 +2,20 @@
    import { onMount, untrack } from 'svelte';
    import tooltipAction from '~/helpers/svelte-actions/TooltipAction.js';
 
-   /** @type {{ value?: string, editable?: boolean, toggled?: boolean, enriched?: string, enrichedReady?: boolean, documentUUID?: string, tooltip?: (string | object), notOwner?: boolean, testId?: string }} */
+   /**
+    * @typedef {object} ProseMirrorEditorProps
+    * @property {string} [value] - The raw (unenriched) document field value, bound two-way.
+    * @property {boolean} [editable] - Whether the element accepts edits.
+    * @property {boolean} [toggled] - Whether the element renders in toggled (view/edit) mode.
+    * @property {string} [enriched] - The pre-enriched HTML to display while inactive.
+    * @property {boolean} [enrichedReady] - Whether `enriched` has finished its async computation.
+    * @property {string} [documentUUID] - The owning document's UUID, for content-link/relative-UUID resolution.
+    * @property {string | object} [tooltip] - The tooltip to display for the edit-pencil affordance, if any.
+    * @property {boolean} [notOwner] - Whether the current user lacks edit permission.
+    * @property {string} [testId] - Optional test identifier bound to the root element.
+    */
+
+   /** @type {ProseMirrorEditorProps} */
    let {
       value = $bindable(''),
       editable = true,

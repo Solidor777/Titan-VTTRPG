@@ -4,11 +4,11 @@
    import ScrollingContainer from '~/helpers/svelte-components/ScrollingContainer.svelte';
    import TextInput from '~/helpers/svelte-components/input/TextInput.svelte';
    import CharacterSheetSpell
-      from '~/document/types/actor/types/character/sheet/items/spell/CharacterSheetSpell.svelte';
+   from '~/document/types/actor/types/character/sheet/items/spell/CharacterSheetSpell.svelte';
    import CharacterSheetItemList
-      from '~/document/types/actor/types/character/sheet/items/CharacterSheetItemList.svelte';
+   from '~/document/types/actor/types/character/sheet/items/CharacterSheetItemList.svelte';
    import CharacterSheetTabHeaderButton
-      from '~/document/types/actor/types/character/sheet/tabs/CharacterSheetTabHeaderButton.svelte';
+   from '~/document/types/actor/types/character/sheet/tabs/CharacterSheetTabHeaderButton.svelte';
    import { CREATE_ICON } from '~/system/Icons.js';
 
    /** @type {object} Reference to the Application State store. */

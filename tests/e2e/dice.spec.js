@@ -37,7 +37,11 @@ test.describe('forced dice seam', () => {
 
    test('forceDice maps each queued face onto a real Roll', async () => {
       // Force three faces, then roll a real 3d6 inside the world and read the raw results.
-      await forceDice(page, [6, 4, 1]);
+      await forceDice(page, [
+         6,
+         4,
+         1
+      ]);
       const faces = await page.evaluate(async () => {
          const roll = new Roll('3d6');
          await roll.evaluate();
@@ -45,7 +49,11 @@ test.describe('forced dice seam', () => {
       });
 
       // The Roll consumes the queue in order; assert exact faces (order as produced, pre-sort).
-      expect(faces).toEqual([6, 4, 1]);
+      expect(faces).toEqual([
+         6,
+         4,
+         1
+      ]);
    });
 
    test('resetDice restores the original RNG', async () => {

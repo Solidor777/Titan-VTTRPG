@@ -75,7 +75,7 @@ function dataField(initial) {
 /**
  * Builds the golden fingerprint of the custom Titan duration SchemaField — the shape shared by the
  * live Active Effect schema and the effect chat-message snapshot schema (both sourced from
- * createEffectSystemTemplate()). createSchemaField passes no options, so no `required` option is
+ * createEffectSystemTemplate()). CreateSchemaField passes no options, so no `required` option is
  * declared and the fingerprint records the harness default `false`.
  * @returns {object} The fingerprint of the duration SchemaField.
  */

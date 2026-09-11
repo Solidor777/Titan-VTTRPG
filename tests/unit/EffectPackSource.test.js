@@ -9,7 +9,13 @@ const SOURCE_DIR = path.resolve(__dirname, '../../packs/_source/effects');
 const ID_PATTERN = /^[A-Za-z0-9]{16}$/;
 
 /** @type {string[]} The duration types `TitanActiveEffectDataModel` understands. */
-const DURATION_TYPES = ['turnStart', 'turnEnd', 'initiative', 'permanent', 'custom'];
+const DURATION_TYPES = [
+   'turnStart',
+   'turnEnd',
+   'initiative',
+   'permanent',
+   'custom'
+];
 
 /**
  * Stat vocabularies mirroring `CharacterDataModel._defineDocumentSchema()`; a seeded element that names a
@@ -17,19 +23,66 @@ const DURATION_TYPES = ['turnStart', 'turnEnd', 'initiative', 'permanent', 'cust
  * @type {Object<string, string[]>}
  */
 const STAT_KEYS = {
-   attribute: ['body', 'mind', 'soul', 'all'],
-   resistance: ['reflexes', 'resilience', 'willpower', 'all'],
-   rating: ['awareness', 'defense', 'melee', 'accuracy', 'initiative', 'all'],
-   resource: ['stamina', 'resolve', 'wounds', 'all'],
-   speed: ['stride', 'fly', 'climb', 'swim', 'burrow', 'all'],
-   mod: ['armor', 'damage', 'healing', 'resolveRegain', 'woundRegain', 'all'],
+   attribute: [
+      'body',
+      'mind',
+      'soul',
+      'all'
+   ],
+   resistance: [
+      'reflexes',
+      'resilience',
+      'willpower',
+      'all'
+   ],
+   rating: [
+      'awareness',
+      'defense',
+      'melee',
+      'accuracy',
+      'initiative',
+      'all'
+   ],
+   resource: [
+      'stamina',
+      'resolve',
+      'wounds',
+      'all'
+   ],
+   speed: [
+      'stride',
+      'fly',
+      'climb',
+      'swim',
+      'burrow',
+      'all'
+   ],
+   mod: [
+      'armor',
+      'damage',
+      'healing',
+      'resolveRegain',
+      'woundRegain',
+      'all'
+   ],
 };
 
 /** @type {string[]} The `modifierType` values `ItemSheetConditionalCheckModifierSettings` offers. */
-const CHECK_MODIFIER_TYPES = ['damage', 'dice', 'expertise', 'training', 'healing'];
+const CHECK_MODIFIER_TYPES = [
+   'damage',
+   'dice',
+   'expertise',
+   'training',
+   'healing'
+];
 
 /** @type {string[]} The `checkType` values `ItemSheetConditionalCheckModifierSettings` offers. */
-const CHECK_TYPES = ['any', 'attack', 'casting', 'item'];
+const CHECK_TYPES = [
+   'any',
+   'attack',
+   'casting',
+   'item'
+];
 
 /**
  * Reads every JSON document under the source directory, recursing into folder directories.
@@ -44,7 +97,10 @@ function readSource(dir) {
          entries.push(...readSource(full));
       }
       else if (name.endsWith('.json')) {
-         entries.push({ file: path.relative(SOURCE_DIR, full), doc: JSON.parse(readFileSync(full, 'utf8')) });
+         entries.push({
+            file: path.relative(SOURCE_DIR, full),
+            doc: JSON.parse(readFileSync(full, 'utf8')) 
+         });
       }
    }
    return entries;
@@ -121,7 +177,11 @@ describe('standard effects compendium source', () => {
                   expect(STAT_KEYS[element.selector], `${label} key`).toContain(element.key);
                   expect(Number.isInteger(element.value), `${label} value`).toBe(true);
                   if (element.operation === 'setSum') {
-                     expect(['set', 'min', 'max'], `${label} mode`).toContain(element.mode);
+                     expect([
+                        'set',
+                        'min',
+                        'max'
+                     ], `${label} mode`).toContain(element.mode);
                   }
                   break;
                }
@@ -152,26 +212,81 @@ describe('standard effects compendium source', () => {
          .map(({ uuid, ...rest }) => rest);
 
       expect(elementsOf('Dodging')).toEqual([
-         { operation: 'flatModifier', selector: 'rating', key: 'defense', value: 1 },
-         { operation: 'flatModifier', selector: 'resistance', key: 'reflexes', value: 1 },
+         {
+            operation: 'flatModifier',
+            selector: 'rating',
+            key: 'defense',
+            value: 1 
+         },
+         {
+            operation: 'flatModifier',
+            selector: 'resistance',
+            key: 'reflexes',
+            value: 1 
+         },
       ]);
       expect(elementsOf('Charging')).toEqual([
-         { operation: 'flatModifier', selector: 'rating', key: 'defense', value: -1 },
-         { operation: 'conditionalCheckModifier', modifierType: 'dice', checkType: 'attack', selector: 'any', key: '', value: 1 },
+         {
+            operation: 'flatModifier',
+            selector: 'rating',
+            key: 'defense',
+            value: -1 
+         },
+         {
+            operation: 'conditionalCheckModifier',
+            modifierType: 'dice',
+            checkType: 'attack',
+            selector: 'any',
+            key: '',
+            value: 1 
+         },
       ]);
       expect(elementsOf('Heavy Cover')).toEqual([
-         { operation: 'flatModifier', selector: 'rating', key: 'defense', value: 2 },
-         { operation: 'flatModifier', selector: 'resistance', key: 'reflexes', value: 2 },
+         {
+            operation: 'flatModifier',
+            selector: 'rating',
+            key: 'defense',
+            value: 2 
+         },
+         {
+            operation: 'flatModifier',
+            selector: 'resistance',
+            key: 'reflexes',
+            value: 2 
+         },
       ]);
       expect(elementsOf('Surprised')).toEqual([
-         { operation: 'setSum', selector: 'rating', key: 'defense', value: 0, mode: 'set' },
+         {
+            operation: 'setSum',
+            selector: 'rating',
+            key: 'defense',
+            value: 0,
+            mode: 'set' 
+         },
       ]);
       expect(elementsOf('Dying')).toEqual([
-         { operation: 'conditionalCheckModifier', modifierType: 'dice', checkType: 'any', selector: 'any', key: '', value: -1 },
+         {
+            operation: 'conditionalCheckModifier',
+            modifierType: 'dice',
+            checkType: 'any',
+            selector: 'any',
+            key: '',
+            value: -1 
+         },
       ]);
       expect(elementsOf('Last Stand')).toEqual([
-         { operation: 'flatModifier', selector: 'rating', key: 'melee', value: 1 },
-         { operation: 'flatModifier', selector: 'rating', key: 'accuracy', value: 1 },
+         {
+            operation: 'flatModifier',
+            selector: 'rating',
+            key: 'melee',
+            value: 1 
+         },
+         {
+            operation: 'flatModifier',
+            selector: 'rating',
+            key: 'accuracy',
+            value: 1 
+         },
       ]);
    });
 });

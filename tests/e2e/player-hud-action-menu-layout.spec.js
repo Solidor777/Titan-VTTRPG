@@ -25,7 +25,10 @@ test.beforeAll(async ({ browser }) => {
    await deleteOrphanedTokens(page);
 
    // Start from a clean slate: a crashed prior run can leave stale fixtures with duplicate items.
-   for (const name of ['HUD Layout Player', 'HUD Layout Player 2']) {
+   for (const name of [
+      'HUD Layout Player',
+      'HUD Layout Player 2'
+   ]) {
       await deleteFixtureActor(page, name);
    }
 });
@@ -62,7 +65,10 @@ async function seedControlledActor(page, { name, releaseOthers = true }) {
    }
    await page.evaluate(async ({ name }) => {
       if (!game.actors.getName(name)) {
-         await Actor.create({ name, type: 'player' });
+         await Actor.create({
+            name,
+            type: 'player' 
+         });
       }
    }, { name });
 
@@ -76,7 +82,10 @@ async function seedControlledActor(page, { name, releaseOthers = true }) {
          return true;
       }
       return false;
-   }, { name, releaseOthers });
+   }, {
+      name,
+      releaseOthers 
+   });
 
    if (!hasToken) {
       await controlFixtureActorToken(page, {
@@ -200,7 +209,10 @@ test('sub-options expand to the configured side and lanes never overlap', async 
    });
 
    // Vertical, sub-options left (pinned — the default is now 'right'): the flyout lane ends before the bar.
-   await setMenuOptions(page, { layout: 'vertical', directions: { vertical: { subOptions: 'left' } } });
+   await setMenuOptions(page, {
+      layout: 'vertical',
+      directions: { vertical: { subOptions: 'left' } } 
+   });
    await openCategory(page, 'skills');
    await expectBoxes(flyout, skills,
       (flyoutBox, barBox) => flyoutBox.x + flyoutBox.width <= barBox.x + 1,
@@ -216,7 +228,10 @@ test('sub-options expand to the configured side and lanes never overlap', async 
    // Horizontal, sub-options up: the flyout sits fully above the bar.
    await setMenuOptions(page, {
       layout: 'horizontal',
-      directions: { vertical: { subOptions: 'left' }, horizontal: { subOptions: 'up' } },
+      directions: {
+         vertical: { subOptions: 'left' },
+         horizontal: { subOptions: 'up' } 
+      },
    });
    await openCategory(page, 'skills');
    await expectBoxes(flyout, skills,
@@ -287,7 +302,10 @@ test('the vertical flyout anchors to the open category button and flows up or do
 test('sub-buttons form a third disjoint lane', async () => {
    const weaponId = await seedWeaponFixture(page);
    // Pin the left cascade (the default is now 'right') so the lanes run right-to-left.
-   await setMenuOptions(page, { layout: 'vertical', directions: { vertical: { subOptions: 'left' } } });
+   await setMenuOptions(page, {
+      layout: 'vertical',
+      directions: { vertical: { subOptions: 'left' } } 
+   });
    await openCategory(page, 'weapons');
    const subOption = page.locator(`[data-testid="player-hud-sub-option-weapons-${weaponId}"]`);
    await subOption.hover();
@@ -318,7 +336,10 @@ test('sub-buttons form a third disjoint lane', async () => {
 test('the configured direction is honored at the screen edge (no auto-flip)', async () => {
    await seedWeaponFixture(page);
    // Pin the left cascade (the default is now 'right').
-   await setMenuOptions(page, { layout: 'vertical', directions: { vertical: { subOptions: 'left' } } });
+   await setMenuOptions(page, {
+      layout: 'vertical',
+      directions: { vertical: { subOptions: 'left' } } 
+   });
 
    // Park the menu against the LEFT edge the way an edit-mode drag would. The configured direction
    // is authoritative, so the left cascade keeps opening left rather than flipping away.
@@ -352,7 +373,10 @@ test('the configured direction is honored at the screen edge (no auto-flip)', as
 test('long lists window and wheel-scroll', async () => {
    await seedControlledActor(page, { name: 'HUD Layout Player' });
    // Pin flow down so the scroll fades and wheel direction assert the natural top-to-bottom window.
-   await setMenuOptions(page, { windowSize: 5, directions: { vertical: { subOptionsFlow: 'down' } } });
+   await setMenuOptions(page, {
+      windowSize: 5,
+      directions: { vertical: { subOptionsFlow: 'down' } } 
+   });
    await openCategory(page, 'skills');
 
    const subOptions = page.locator('[data-testid^="player-hud-sub-option-skills-"]');
@@ -387,7 +411,10 @@ test('per-category disable removes the category', async () => {
 
 test('group mode shows only the three group categories', async () => {
    await seedWeaponFixture(page);
-   await seedControlledActor(page, { name: 'HUD Layout Player 2', releaseOthers: false });
+   await seedControlledActor(page, {
+      name: 'HUD Layout Player 2',
+      releaseOthers: false 
+   });
 
    await expect(page.locator('[data-testid="player-hud-category-skills"]')).toBeVisible();
    await expect(page.locator('[data-testid="player-hud-category-resistances"]')).toBeVisible();

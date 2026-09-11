@@ -11,7 +11,14 @@ describe('calculateCheckResults — crafted cases', () => {
          extraSuccessOnCritical: false,
          extraFailureOnCritical: false,
       };
-      const r = calculateCheckResults(diceResults([6, 5, 4, 3, 2, 1]), params);
+      const r = calculateCheckResults(diceResults([
+         6,
+         5,
+         4,
+         3,
+         2,
+         1
+      ]), params);
       expect(r.successes).toBe(3);
       expect(r.criticalSuccesses).toBe(1);
       expect(r.criticalFailures).toBe(1);
@@ -26,7 +33,14 @@ describe('calculateCheckResults — crafted cases', () => {
          extraSuccessOnCritical: true,
          extraFailureOnCritical: false,
       };
-      const r = calculateCheckResults(diceResults([6, 5, 4, 3, 2, 1]), params);
+      const r = calculateCheckResults(diceResults([
+         6,
+         5,
+         4,
+         3,
+         2,
+         1
+      ]), params);
       expect(r.successes).toBe(4);
       expect(r.extraSuccesses).toBe(2);
    });
@@ -38,7 +52,13 @@ describe('calculateCheckResults — crafted cases', () => {
          extraSuccessOnCritical: false,
          extraFailureOnCritical: true,
       };
-      const r = calculateCheckResults(diceResults([6, 5, 4, 1, 1]), params);
+      const r = calculateCheckResults(diceResults([
+         6,
+         5,
+         4,
+         1,
+         1
+      ]), params);
       expect(r.successes).toBe(1);
       expect(r.criticalFailures).toBe(2);
       expect(r.succeeded).toBe(false);
@@ -52,7 +72,11 @@ describe('calculateCheckResults — crafted cases', () => {
          extraSuccessOnCritical: false,
          extraFailureOnCritical: false,
       };
-      const r = calculateCheckResults(diceResults([6, 6, 6]), params);
+      const r = calculateCheckResults(diceResults([
+         6,
+         6,
+         6
+      ]), params);
       expect(r.successes).toBe(3);
       expect(r.succeeded).toBe(false);
    });
@@ -62,9 +86,18 @@ describe('calculateCheckResults — properties', () => {
    it('successes match the oracle; succeeded and extraSuccesses follow the rules', () => {
       fc.assert(
          fc.property(
-            fc.array(fc.integer({ min: 1, max: 6 }), { maxLength: 10 }),
-            fc.integer({ min: 2, max: 6 }),
-            fc.integer({ min: 0, max: 6 }),
+            fc.array(fc.integer({
+               min: 1,
+               max: 6 
+            }), { maxLength: 10 }),
+            fc.integer({
+               min: 2,
+               max: 6 
+            }),
+            fc.integer({
+               min: 0,
+               max: 6 
+            }),
             fc.boolean(),
             fc.boolean(),
             (finals, difficulty, complexity, esoc, efoc) => {

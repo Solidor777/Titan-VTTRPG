@@ -47,7 +47,10 @@ test.describe('character sheet effect row reactivity', () => {
          if (stale) {
             await stale.delete();
          }
-         const actor = await Actor.create({ name: actorName, type: 'player' });
+         const actor = await Actor.create({
+            name: actorName,
+            type: 'player' 
+         });
          await actor.createEmbeddedDocuments('ActiveEffect', [
             {
                name: 'E2E Reactive Effect Row',
@@ -174,7 +177,12 @@ test.describe('character sheet effect row reactivity', () => {
       await page.evaluate(async (actorName) => {
          const actor = game.actors.getName(actorName);
          await actor.effects.contents[0].update({
-            system: { duration: { type: 'initiative', initiative: 3 } },
+            system: {
+               duration: {
+                  type: 'initiative',
+                  initiative: 3 
+               } 
+            },
          });
       }, ACTOR_NAME);
 

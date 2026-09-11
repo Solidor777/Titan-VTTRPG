@@ -13,7 +13,7 @@ import createStringField from '~/helpers/utility-functions/CreateStringField.js'
  * - a value that is already a `foundry.data.fields.DataField` instance -> returned as-is (same object
  *   identity), at top level and nested. This is the only way a shape can express a nullable
  *   `StringField`: a `null` shape value builds a nullable `ObjectField` (see below), which rejects a
- *   string id, so a caller that needs a nullable string id (e.g. an equipped-item id defaulting to
+ *   string id, so a caller that needs a nullable string id (e.g. An equipped-item id defaulting to
  *   `null`) pre-builds the field itself and passes it through unconverted.
  * - `string` -> `createStringField(value)` (the representative value seeds the field's initial).
  * - `number` -> `createIntegerField(value)`. ALL numeric template values produce an integer-enforced
@@ -27,11 +27,11 @@ import createStringField from '~/helpers/utility-functions/CreateStringField.js'
  *   defaults to one attack, `check: []` defaults to empty). The element field is derived from the
  *   representative element (`value[0]`):
  *   - EMPTY array -> `createObjectField()` element (no representative element to type against);
- *   - representative element is a plain object (non-array) -> `createObjectField()` element, i.e. an
+ *   - representative element is a plain object (non-array) -> `createObjectField()` element, i.e. An
  *     UNTYPED object bag (NOT a typed `SchemaField`), matching how the item DataModels store object
  *     arrays;
  *   - representative element is a primitive -> `buildFieldFromValue(value[0])`, keeping a typed element
- *     (e.g. an array of strings yields a `StringField` element).
+ *     (e.g. An array of strings yields a `StringField` element).
  * - plain `object` (non-array) -> a `SchemaField` (via `createSchemaField`) whose sub-fields are the
  *   result of recursing into the object with `buildSchemaFromShape`, so nested read paths are mirrored
  *   exactly (this keeps `armor {max,value}` and `castingCheck {...}` typed).
@@ -107,7 +107,7 @@ function buildFieldFromValue(value) {
  * that is already a `foundry.data.fields.DataField` instance is returned as-is (same object identity),
  * at top level and nested — the only way a shape can express a field the type-dispatch below cannot
  * produce, such as a nullable `StringField` (a `null` shape value builds a nullable `ObjectField`
- * instead, which rejects the string ids this system stores, e.g. an equipped-item id defaulting to
+ * instead, which rejects the string ids this system stores, e.g. An equipped-item id defaulting to
  * `null`). Otherwise, `string`/`number`/`boolean` become the matching typed field (seeded with the
  * representative value),
  * where a `number` always becomes an integer-enforced field (the system has no non-integer schema
@@ -117,7 +117,7 @@ function buildFieldFromValue(value) {
  * [oneAttack]` defaults to one attack, `check: []` defaults to empty). Its element field is an UNTYPED
  * `ObjectField` when the array is empty or its representative element is an object (matching how the
  * item DataModels store object arrays — NOT a typed `SchemaField`), and a typed field when the
- * representative element is a primitive (e.g. an array of strings keeps a `StringField` element).
+ * representative element is a primitive (e.g. An array of strings keeps a `StringField` element).
  * A plain object (non-array) becomes a `SchemaField` built by recursing into the object. `null` /
  * `undefined` values become a nullable object field. The result deeply mirrors the shape's nesting so
  * the resulting schema's nested-object READ PATHS match the shape's paths (e.g. shape `{ armor:

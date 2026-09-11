@@ -6,7 +6,7 @@
  * snapshots nest under `resource` so the card can read the same `system.resource.*` path as the actor's
  * own persisted resources.
  * @returns {object} The healing report shape: the stamina restored and the nested stamina and wounds
- *    resource snapshots.
+ * resource snapshots.
  */
 export default function createHealingReportShape() {
    return {

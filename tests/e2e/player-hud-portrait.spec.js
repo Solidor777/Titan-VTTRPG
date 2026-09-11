@@ -53,13 +53,22 @@ async function seedControlledActor(page, { type = 'player' } = {}) {
    /** @type {boolean} Whether an actor of the requested type already exists under the fixture name. */
    const matches = await page.evaluate(({ name, type }) => {
       return game.actors.getName(name)?.type === type;
-   }, { name: FIXTURE_NAME, type });
+   }, {
+      name: FIXTURE_NAME,
+      type 
+   });
 
    if (!matches) {
       await deleteFixtureActor(page, FIXTURE_NAME);
       await page.evaluate(async ({ name, type }) => {
-         await Actor.create({ name, type });
-      }, { name: FIXTURE_NAME, type });
+         await Actor.create({
+            name,
+            type 
+         });
+      }, {
+         name: FIXTURE_NAME,
+         type 
+      });
    }
 
    /** @type {boolean} Whether the actor already has a drawn token on the viewed scene. */
@@ -112,7 +121,11 @@ test('the bar max value is as wide as the 2-digit current-value input', async ()
 
 test('all three portrait styles render', async () => {
    await seedControlledActor(page);
-   for (const style of ['panelCard', 'wideStrip', 'roundToken']) {
+   for (const style of [
+      'panelCard',
+      'wideStrip',
+      'roundToken'
+   ]) {
       await page.evaluate(async (style) => {
          await game.settings.set('titan', 'playerHudOptions', { portrait: { style } });
       }, style);
@@ -170,7 +183,12 @@ test('long rest restores stamina and resolve to max', async () => {
    const actorId = await seedControlledActor(page);
    await page.evaluate(async (id) => {
       await game.actors.get(id).update({
-         system: { resource: { stamina: { value: 1 }, resolve: { value: 0 } } },
+         system: {
+            resource: {
+               stamina: { value: 1 },
+               resolve: { value: 0 } 
+            } 
+         },
       });
    }, actorId);
    await page.locator('[data-testid="player-hud-long-rest"]').click();
@@ -190,7 +208,12 @@ test('remove combat effects deletes a turn-start effect', async () => {
       await game.actors.get(id).createEmbeddedDocuments('ActiveEffect', [{
          name: 'HUD Combat Effect',
          type: 'effect',
-         system: { duration: { type: 'turnStart', remaining: 2 } },
+         system: {
+            duration: {
+               type: 'turnStart',
+               remaining: 2 
+            } 
+         },
       }]);
    }, actorId);
    await expect.poll(

@@ -26,7 +26,11 @@ test.beforeAll(async ({ browser }) => {
    await deleteOrphanedTokens(page);
 
    // Start from a clean slate: a crashed prior run can leave stale fixtures with duplicate items.
-   for (const name of ['HUD Menu Player', 'HUD Menu Player 2', 'HUD Menu Empty']) {
+   for (const name of [
+      'HUD Menu Player',
+      'HUD Menu Player 2',
+      'HUD Menu Empty'
+   ]) {
       await deleteFixtureActor(page, name);
    }
 
@@ -72,7 +76,10 @@ async function seedControlledActor(page, { name, releaseOthers = true }) {
    }
    await page.evaluate(async ({ name }) => {
       if (!game.actors.getName(name)) {
-         await Actor.create({ name, type: 'player' });
+         await Actor.create({
+            name,
+            type: 'player' 
+         });
       }
    }, { name });
 
@@ -86,7 +93,10 @@ async function seedControlledActor(page, { name, releaseOthers = true }) {
          return true;
       }
       return false;
-   }, { name, releaseOthers });
+   }, {
+      name,
+      releaseOthers 
+   });
 
    if (!hasToken) {
       await controlFixtureActorToken(page, {
@@ -122,7 +132,10 @@ async function seedDocuments(page, actorId, docs) {
          itemIds: (docs.items ?? []).map((payload) => actor.items.getName(payload.name)?.id),
          effectIds: (docs.effects ?? []).map((payload) => actor.effects.getName(payload.name)?.id),
       };
-   }, { actorId, docs });
+   }, {
+      actorId,
+      docs 
+   });
 }
 
 /**
@@ -173,33 +186,43 @@ test('categories with no sub-options are hidden', async () => {
 
 test('equipped weapon main action rolls the first attack to chat', async () => {
    const actorId = await seedControlledActor(page, { name: 'HUD Menu Player' });
-   await seedDocuments(page, actorId, { items: [{
-      name: 'HUD Longsword',
-      type: 'weapon',
-      system: { equipped: true },
-   }] });
+   await seedDocuments(page, actorId, {
+      items: [{
+         name: 'HUD Longsword',
+         type: 'weapon',
+         system: { equipped: true },
+      }] 
+   });
    await page.locator('[data-testid="player-hud-category-weapons"]').click();
    const subOption = page.locator('[data-testid^="player-hud-sub-option-weapons-"]').first();
    await subOption.click();
    await expect.poll(
       () => page.evaluate(() => game.messages.contents.at(-1)?.type),
-      { message: 'an attack check chat message', timeout: 1000 },
+      {
+         message: 'an attack check chat message',
+         timeout: 1000 
+      },
    ).toBe('attackCheck');
 });
 
 test('unequipped weapon main action equips it', async () => {
    const actorId = await seedControlledActor(page, { name: 'HUD Menu Player' });
-   const { itemIds } = await seedDocuments(page, actorId, { items: [{
-      name: 'HUD Sidearm',
-      type: 'weapon',
-      system: { equipped: false },
-   }] });
+   const { itemIds } = await seedDocuments(page, actorId, {
+      items: [{
+         name: 'HUD Sidearm',
+         type: 'weapon',
+         system: { equipped: false },
+      }] 
+   });
    await page.locator('[data-testid="player-hud-category-weapons"]').click();
    await page.locator(`[data-testid="player-hud-sub-option-weapons-${itemIds[0]}"]`).click();
    await expect.poll(
       () => page.evaluate(({ actorId, itemId }) => {
          return game.actors.get(actorId).items.get(itemId).system.equipped;
-      }, { actorId, itemId: itemIds[0] }),
+      }, {
+         actorId,
+         itemId: itemIds[0] 
+      }),
       { message: 'the weapon equips via its main action' },
    ).toBe(true);
 });
@@ -220,7 +243,10 @@ test('weapon sub-buttons send to chat and open the sheet', async () => {
    await page.locator(`[data-testid="player-hud-sub-button-${weaponId}-send-to-chat"]`).click();
    await expect.poll(
       () => page.evaluate(() => game.messages.contents.at(-1)?.type),
-      { message: 'the weapon item card lands in chat', timeout: 1000 },
+      {
+         message: 'the weapon item card lands in chat',
+         timeout: 1000 
+      },
    ).toBe('weapon');
 
    await page.locator('[data-testid="player-hud-category-weapons"]').click();
@@ -237,7 +263,10 @@ test('weapon sub-buttons send to chat and open the sheet', async () => {
 
 test('skill roll for a group hits every selected actor', async () => {
    await seedControlledActor(page, { name: 'HUD Menu Player' });
-   await seedControlledActor(page, { name: 'HUD Menu Player 2', releaseOthers: false });
+   await seedControlledActor(page, {
+      name: 'HUD Menu Player 2',
+      releaseOthers: false 
+   });
    /** @type {number} The chat message count before the group roll. */
    const before = await messageCount(page);
 
@@ -248,13 +277,19 @@ test('skill roll for a group hits every selected actor', async () => {
          const fresh = game.messages.contents.slice(count);
          return fresh.filter((message) => message.type === 'attributeCheck').length;
       }, before),
-      { message: 'one skill check per selected actor', timeout: 1000 },
+      {
+         message: 'one skill check per selected actor',
+         timeout: 1000 
+      },
    ).toBe(2);
 });
 
 test('resistance roll rolls for all selected actors', async () => {
    await seedControlledActor(page, { name: 'HUD Menu Player' });
-   await seedControlledActor(page, { name: 'HUD Menu Player 2', releaseOthers: false });
+   await seedControlledActor(page, {
+      name: 'HUD Menu Player 2',
+      releaseOthers: false 
+   });
    const before = await messageCount(page);
 
    await page.locator('[data-testid="player-hud-category-resistances"]').click();
@@ -264,13 +299,19 @@ test('resistance roll rolls for all selected actors', async () => {
          const fresh = game.messages.contents.slice(count);
          return fresh.filter((message) => message.type === 'resistanceCheck').length;
       }, before),
-      { message: 'one resistance check per selected actor', timeout: 1000 },
+      {
+         message: 'one resistance check per selected actor',
+         timeout: 1000 
+      },
    ).toBe(2);
 });
 
 test('apply damage dialog applies the amount to all selected actors', async () => {
    const firstId = await seedControlledActor(page, { name: 'HUD Menu Player' });
-   const secondId = await seedControlledActor(page, { name: 'HUD Menu Player 2', releaseOthers: false });
+   const secondId = await seedControlledActor(page, {
+      name: 'HUD Menu Player 2',
+      releaseOthers: false 
+   });
 
    /** @type {{first: number, second: number}} Both actors' stamina, topped to max before the hit. */
    const before = await page.evaluate(async ({ firstId, secondId }) => {
@@ -282,7 +323,10 @@ test('apply damage dialog applies the amount to all selected actors', async () =
          first: first.system.resource.stamina.value,
          second: second.system.resource.stamina.value,
       };
-   }, { firstId, secondId });
+   }, {
+      firstId,
+      secondId 
+   });
 
    await page.locator('[data-testid="player-hud-category-utility"]').click();
    await page.locator('[data-testid="player-hud-sub-option-utility-applyDamage"]').click();
@@ -295,52 +339,79 @@ test('apply damage dialog applies the amount to all selected actors', async () =
             game.actors.get(firstId).system.resource.stamina.value,
             game.actors.get(secondId).system.resource.stamina.value,
          ];
-      }, { firstId, secondId }),
-      { message: 'both actors take the entered damage', timeout: 1000 },
-   ).toEqual([before.first - 3, before.second - 3]);
+      }, {
+         firstId,
+         secondId 
+      }),
+      {
+         message: 'both actors take the entered damage',
+         timeout: 1000 
+      },
+   ).toEqual([
+      before.first - 3,
+      before.second - 3
+   ]);
 });
 
 test('spell main action rolls a casting check', async () => {
    const actorId = await seedControlledActor(page, { name: 'HUD Menu Player' });
-   const { itemIds } = await seedDocuments(page, actorId, { items: [{
-      name: 'HUD Spark',
-      type: 'spell',
-   }] });
+   const { itemIds } = await seedDocuments(page, actorId, {
+      items: [{
+         name: 'HUD Spark',
+         type: 'spell',
+      }] 
+   });
    await page.locator('[data-testid="player-hud-category-spells"]').click();
    await page.locator(`[data-testid="player-hud-sub-option-spells-${itemIds[0]}"]`).click();
    await expect.poll(
       () => page.evaluate(() => game.messages.contents.at(-1)?.type),
-      { message: 'a casting check chat message', timeout: 1000 },
+      {
+         message: 'a casting check chat message',
+         timeout: 1000 
+      },
    ).toBe('castingCheck');
 });
 
 test('ability and effect main actions roll their first check', async () => {
    const actorId = await seedControlledActor(page, { name: 'HUD Menu Player' });
-   const { itemIds } = await seedDocuments(page, actorId, { items: [{
-      name: 'HUD Trick',
-      type: 'ability',
-      system: { check: [fullCheck('Trick Check')] },
-   }] });
+   const { itemIds } = await seedDocuments(page, actorId, {
+      items: [{
+         name: 'HUD Trick',
+         type: 'ability',
+         system: { check: [fullCheck('Trick Check')] },
+      }] 
+   });
    await page.locator('[data-testid="player-hud-category-abilities"]').click();
    await page.locator(`[data-testid="player-hud-sub-option-abilities-${itemIds[0]}"]`).click();
    await expect.poll(
       () => page.evaluate(() => game.messages.contents.at(-1)?.type),
-      { message: 'an item check from the ability', timeout: 1000 },
+      {
+         message: 'an item check from the ability',
+         timeout: 1000 
+      },
    ).toBe('itemCheck');
 
-   const { effectIds } = await seedDocuments(page, actorId, { effects: [{
-      name: 'HUD Burning',
-      type: 'effect',
-      system: {
-         check: [fullCheck('Burn Check')],
-         duration: { type: 'turnStart', remaining: 2 },
-      },
-   }] });
+   const { effectIds } = await seedDocuments(page, actorId, {
+      effects: [{
+         name: 'HUD Burning',
+         type: 'effect',
+         system: {
+            check: [fullCheck('Burn Check')],
+            duration: {
+               type: 'turnStart',
+               remaining: 2 
+            },
+         },
+      }] 
+   });
    await page.locator('[data-testid="player-hud-category-effects"]').click();
    await page.locator(`[data-testid="player-hud-sub-option-effects-${effectIds[0]}"]`).click();
    await expect.poll(
       () => page.evaluate(() => game.messages.contents.at(-1)?.type),
-      { message: 'an item check from the effect', timeout: 1000 },
+      {
+         message: 'an item check from the effect',
+         timeout: 1000 
+      },
    ).toBe('itemCheck');
 });
 
@@ -358,7 +429,10 @@ test('effect duration and remove sub-buttons update and delete the effect', asyn
    await expect.poll(
       () => page.evaluate(({ actorId, effectId }) => {
          return game.actors.get(actorId).effects.get(effectId).system.duration.remaining;
-      }, { actorId, effectId }),
+      }, {
+         actorId,
+         effectId 
+      }),
       { message: 'the duration increments in place' },
    ).toBe(3);
 
@@ -367,21 +441,26 @@ test('effect duration and remove sub-buttons update and delete the effect', asyn
    await expect.poll(
       () => page.evaluate(({ actorId, effectId }) => {
          return game.actors.get(actorId).effects.get(effectId) ?? null;
-      }, { actorId, effectId }),
+      }, {
+         actorId,
+         effectId 
+      }),
       { message: 'the effect is removed' },
    ).toBe(null);
 });
 
 test('commodity quantity sub-buttons step the quantity', async () => {
    const actorId = await seedControlledActor(page, { name: 'HUD Menu Player' });
-   const { itemIds } = await seedDocuments(page, actorId, { items: [{
-      name: 'HUD Rations',
-      type: 'commodity',
-      system: {
-         quantity: 2,
-         check: [fullCheck('Ration Check')],
-      },
-   }] });
+   const { itemIds } = await seedDocuments(page, actorId, {
+      items: [{
+         name: 'HUD Rations',
+         type: 'commodity',
+         system: {
+            quantity: 2,
+            check: [fullCheck('Ration Check')],
+         },
+      }] 
+   });
 
    await page.locator('[data-testid="player-hud-category-inventory"]').click();
    const subOption = page.locator(`[data-testid="player-hud-sub-option-inventory-${itemIds[0]}"]`);
@@ -390,7 +469,10 @@ test('commodity quantity sub-buttons step the quantity', async () => {
    await expect.poll(
       () => page.evaluate(({ actorId, itemId }) => {
          return game.actors.get(actorId).items.get(itemId).system.quantity;
-      }, { actorId, itemId: itemIds[0] }),
+      }, {
+         actorId,
+         itemId: itemIds[0] 
+      }),
       { message: 'the quantity increments in place' },
    ).toBe(3);
 
@@ -399,7 +481,10 @@ test('commodity quantity sub-buttons step the quantity', async () => {
    await expect.poll(
       () => page.evaluate(({ actorId, itemId }) => {
          return game.actors.get(actorId).items.get(itemId).system.quantity;
-      }, { actorId, itemId: itemIds[0] }),
+      }, {
+         actorId,
+         itemId: itemIds[0] 
+      }),
       { message: 'the quantity decrements in place' },
    ).toBe(2);
 });
@@ -409,18 +494,20 @@ test('the weapons filter hides action-less weapons until disabled', async () => 
 
    // Seed an action-less weapon AND a normal one: the category itself disappears when every
    // weapon is filtered, so the normal weapon keeps the category clickable in any test order.
-   const { itemIds } = await seedDocuments(page, actorId, { items: [
-      {
-         name: 'HUD Driftwood',
-         type: 'weapon',
-         system: { attack: [] },
-      },
-      {
-         name: 'HUD Filter Blade',
-         type: 'weapon',
-         system: { equipped: true },
-      },
-   ] });
+   const { itemIds } = await seedDocuments(page, actorId, {
+      items: [
+         {
+            name: 'HUD Driftwood',
+            type: 'weapon',
+            system: { attack: [] },
+         },
+         {
+            name: 'HUD Filter Blade',
+            type: 'weapon',
+            system: { equipped: true },
+         },
+      ] 
+   });
 
    await page.locator('[data-testid="player-hud-category-weapons"]').click();
    await expect(page.locator(`[data-testid="player-hud-sub-option-weapons-${itemIds[1]}"]`)).toBeVisible();
@@ -443,11 +530,13 @@ test('the weapons filter hides action-less weapons until disabled', async () => 
 
 test('a disabled sub-button gate removes that sub-button from the flyout', async () => {
    const actorId = await seedControlledActor(page, { name: 'HUD Menu Player' });
-   const { itemIds } = await seedDocuments(page, actorId, { items: [{
-      name: 'HUD Gate Blade',
-      type: 'weapon',
-      system: { equipped: true },
-   }] });
+   const { itemIds } = await seedDocuments(page, actorId, {
+      items: [{
+         name: 'HUD Gate Blade',
+         type: 'weapon',
+         system: { equipped: true },
+      }] 
+   });
 
    // A prior test can leave the weapons cascade open (the open category persists in layout state);
    // dismiss it first so clicking weapons OPENS the cascade rather than toggling it closed.

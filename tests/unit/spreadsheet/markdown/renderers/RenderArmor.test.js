@@ -55,8 +55,14 @@ describe('renderArmor', () => {
                value: 3,
             },
             trait: [
-               { name: 'loud', value: true },
-               { name: 'heavy', value: true },
+               {
+                  name: 'loud',
+                  value: true 
+               },
+               {
+                  name: 'heavy',
+                  value: true 
+               },
             ],
             description: '<p>Heavy armor is made from interlocking metal plates, often overlaid with itself to '
                + 'provide multiple layers of protection. It is cumbersome to wear, but offers the greatest '
@@ -98,8 +104,14 @@ describe('renderArmor', () => {
       const document = {
          name: 'Warded Plate',
          system: makeSystem({
-            trait: [{ name: 'magical', value: true }],
-            customTrait: [{ name: 'Warded', description: '' }],
+            trait: [{
+               name: 'magical',
+               value: true 
+            }],
+            customTrait: [{
+               name: 'Warded',
+               description: '' 
+            }],
             check: [{
                label: 'Reflect',
                attribute: 'body',

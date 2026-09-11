@@ -77,7 +77,7 @@ async function deleteScratchPackIfExists(page, packId) {
  * same-id pack left by a crashed prior run first.
  * @param {import('@playwright/test').Page} page - The shared page.
  * @param {{packId:string, packName:string, packLabel:string, documents:object[]}} fixture - The pack to
- *    create (`packId` is `world.<packName>`) and the Item create-data to seed it with.
+ * create (`packId` is `world.<packName>`) and the Item create-data to seed it with.
  * @returns {Promise<void>} Resolves once the pack exists and every document is created.
  */
 async function seedScratchPack(page, fixture) {
@@ -138,9 +138,9 @@ async function seedScratchPack(page, fixture) {
  * one fixture. Sweeps any same-id pack left by a crashed prior run first, mirroring `seedScratchPack`.
  * @param {import('@playwright/test').Page} page - The shared page.
  * @param {{packId:string, packName:string, packLabel:string}} fixture - The pack to create (`packId` is
- *    `world.<packName>`).
+ * `world.<packName>`).
  * @returns {Promise<{actorId:string, itemId:string, itemEffectId:string, actorEffectId:string}>} The ids
- *    of the four seeded documents.
+ * of the four seeded documents.
  */
 async function seedScratchActorPack(page, fixture) {
    await deleteScratchPackIfExists(page, fixture.packId);
@@ -158,7 +158,10 @@ async function seedScratchActorPack(page, fixture) {
       for (;;) {
          try {
             [actor] = await Actor.create(
-               [{ name: 'E2E Original NPC', type: 'npc' }],
+               [{
+                  name: 'E2E Original NPC',
+                  type: 'npc' 
+               }],
                { pack: `world.${packName}` },
             );
             break;
@@ -172,16 +175,25 @@ async function seedScratchActorPack(page, fixture) {
       }
 
       /** @type {object[]} */
-      const [item] = await actor.createEmbeddedDocuments('Item', [{ name: 'E2E Original Weapon', type: 'weapon' }]);
+      const [item] = await actor.createEmbeddedDocuments('Item', [{
+         name: 'E2E Original Weapon',
+         type: 'weapon' 
+      }]);
       /** @type {object[]} */
       const [itemEffect] = await item.createEmbeddedDocuments(
          'ActiveEffect',
-         [{ name: 'E2E Item Effect', type: 'condition' }],
+         [{
+            name: 'E2E Item Effect',
+            type: 'condition' 
+         }],
       );
       /** @type {object[]} */
       const [actorEffect] = await actor.createEmbeddedDocuments(
          'ActiveEffect',
-         [{ name: 'E2E Actor Effect', type: 'condition' }],
+         [{
+            name: 'E2E Actor Effect',
+            type: 'condition' 
+         }],
       );
 
       /** @type {CompendiumCollection} */
@@ -201,7 +213,12 @@ async function seedScratchActorPack(page, fixture) {
          }
       }
 
-      return { actorId: actor.id, itemId: item.id, itemEffectId: itemEffect.id, actorEffectId: actorEffect.id };
+      return {
+         actorId: actor.id,
+         itemId: item.id,
+         itemEffectId: itemEffect.id,
+         actorEffectId: actorEffect.id 
+      };
    }, fixture);
 }
 
@@ -265,7 +282,10 @@ test.describe('compendium spreadsheet export/import', () => {
             packId,
             packName: 'e2e-spreadsheet-update',
             packLabel: 'E2E Spreadsheet Update',
-            documents: [{ name: 'E2E Original Weapon', type: 'weapon' }],
+            documents: [{
+               name: 'E2E Original Weapon',
+               type: 'weapon' 
+            }],
          });
 
          await openPackContextMenu(page, packId);
@@ -393,8 +413,14 @@ test.describe('compendium spreadsheet export/import', () => {
             packName: 'e2e-spreadsheet-delete-missing',
             packLabel: 'E2E Spreadsheet Delete Missing',
             documents: [
-               { name: 'E2E Keep Weapon', type: 'weapon' },
-               { name: 'E2E Remove Weapon', type: 'weapon' },
+               {
+                  name: 'E2E Keep Weapon',
+                  type: 'weapon' 
+               },
+               {
+                  name: 'E2E Remove Weapon',
+                  type: 'weapon' 
+               },
             ],
          });
 
@@ -443,7 +469,10 @@ test.describe('compendium spreadsheet export/import', () => {
             /** @type {object} */
             const pack = game.packs.get(pid);
             return Boolean(await pack.getDocument(id));
-         }, { id: removedId, packId })).toBe(false);
+         }, {
+            id: removedId,
+            packId 
+         })).toBe(false);
       }
       finally {
          await deleteScratchPackIfExists(page, packId);
@@ -468,7 +497,10 @@ test.describe('compendium spreadsheet export/import', () => {
          const index = await game.packs.get('titan.effects').getIndex();
          /** @type {object} */
          const first = index.contents[0];
-         return { id: first._id, originalName: first.name };
+         return {
+            id: first._id,
+            originalName: first.name 
+         };
       });
 
       await page.evaluate(async () => {
@@ -530,7 +562,11 @@ test.describe('compendium spreadsheet export/import', () => {
          // The item's own effect and the actor's own effect share the "condition" subtype, so both land
          // on the same sheet (sheets are keyed by subtype, not by owning document class) — the exact
          // depth-1-vs-depth-2 ambiguity that Critical bug C2 mis-resolved.
-         expect(Object.keys(entries)).toEqual(expect.arrayContaining(['npc.csv', 'weapon.csv', 'condition.csv']));
+         expect(Object.keys(entries)).toEqual(expect.arrayContaining([
+            'npc.csv',
+            'weapon.csv',
+            'condition.csv'
+         ]));
          /** @type {string} */
          const weaponCsv = renameAllRows(strFromU8(entries['weapon.csv']), ' Renamed');
          /** @type {string} */
@@ -550,7 +586,11 @@ test.describe('compendium spreadsheet export/import', () => {
          /** @type {string} */
          const rezipPath = join(tmpdir(), 'titan-e2e-actor-embedded.zip');
          /** @type {Object<string,Uint8Array>} */
-         const rezipEntries = { ...entries, 'weapon.csv': strToU8(weaponCsv), 'condition.csv': strToU8(conditionCsv) };
+         const rezipEntries = {
+            ...entries,
+            'weapon.csv': strToU8(weaponCsv),
+            'condition.csv': strToU8(conditionCsv) 
+         };
          await writeFile(rezipPath, zipSync(rezipEntries));
 
          await page.locator('[data-testid="import-file-input"]').setInputFiles(rezipPath);
@@ -574,7 +614,11 @@ test.describe('compendium spreadsheet export/import', () => {
             /** @type {object} */
             const actor = await pack.getDocument(actorId);
             return actor.items.get(itemId)?.name ?? null;
-         }, { pid: packId, actorId: ids.actorId, itemId: ids.itemId })).toBe('E2E Original Weapon Renamed');
+         }, {
+            pid: packId,
+            actorId: ids.actorId,
+            itemId: ids.itemId 
+         })).toBe('E2E Original Weapon Renamed');
 
          // Verifies Critical bug C2 is fixed: the item's own effect landed in the ITEM's effects
          // collection and the actor's own effect landed in the ACTOR's effects collection, not both
@@ -593,8 +637,11 @@ test.describe('compendium spreadsheet export/import', () => {
                actorEffectName: actor?.effects.get(actorEffectId)?.name ?? null,
             };
          }, {
-            pid: packId, actorId: ids.actorId, itemId: ids.itemId,
-            itemEffectId: ids.itemEffectId, actorEffectId: ids.actorEffectId,
+            pid: packId,
+            actorId: ids.actorId,
+            itemId: ids.itemId,
+            itemEffectId: ids.itemEffectId,
+            actorEffectId: ids.actorEffectId,
          });
          expect(effectNames.itemEffectName).toBe('E2E Item Effect Renamed');
          expect(effectNames.actorEffectName).toBe('E2E Actor Effect Renamed');

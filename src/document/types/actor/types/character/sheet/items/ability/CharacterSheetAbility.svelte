@@ -2,16 +2,16 @@
    import RichText from '~/helpers/svelte-components/RichText.svelte';
    import AbilityStats from '~/document/types/item/types/ability/components/AbilityStats.svelte';
    import CharacterSheetItem
-      from '~/document/types/actor/types/character/sheet/items/CharacterSheetItem.svelte';
+   from '~/document/types/actor/types/character/sheet/items/CharacterSheetItem.svelte';
    import CharacterSheetItemSendToChatButton
-      from '~/document/types/actor/types/character/sheet/items/CharacterSheetItemSendToChatButton.svelte';
+   from '~/document/types/actor/types/character/sheet/items/CharacterSheetItemSendToChatButton.svelte';
    import CharacterSheetItemEditButton
-      from '~/document/types/actor/types/character/sheet/items/CharacterSheetItemEditButton.svelte';
+   from '~/document/types/actor/types/character/sheet/items/CharacterSheetItemEditButton.svelte';
    import CharacterSheetItemDeleteButton
-      from '~/document/types/actor/types/character/sheet/items/CharacterSheetItemDeleteButton.svelte';
+   from '~/document/types/actor/types/character/sheet/items/CharacterSheetItemDeleteButton.svelte';
    import CondensedItemCheckButton from '~/document/svelte-components/check/CondensedItemCheckButton.svelte';
    import CharacterSheetItemChecks
-      from '~/document/types/actor/types/character/sheet/items/CharacterSheetItemChecks.svelte';
+   from '~/document/types/actor/types/character/sheet/items/CharacterSheetItemChecks.svelte';
    import isHTMLBlank from '~/helpers/utility-functions/IsHTMLBlank.js';
    import { getContext } from 'svelte';
 

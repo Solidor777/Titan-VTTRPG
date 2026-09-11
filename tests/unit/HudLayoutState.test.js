@@ -8,7 +8,13 @@ import { createDefaultHudLayout } from '~/ui/player-hud/PlayerHudDefaults.js';
  */
 function build() {
    const onSave = vi.fn();
-   return { state: new HudLayoutState({ layout: createDefaultHudLayout(), onSave }), onSave };
+   return {
+      state: new HudLayoutState({
+         layout: createDefaultHudLayout(),
+         onSave 
+      }),
+      onSave 
+   };
 }
 
 describe('HudLayoutState', () => {
@@ -21,11 +27,21 @@ describe('HudLayoutState', () => {
 
    it('persists a snapshot on persist()', () => {
       const { state, onSave } = build();
-      state.positions.portrait = { anchorX: 'right', anchorY: 'top', dx: 1, dy: 2 };
+      state.positions.portrait = {
+         anchorX: 'right',
+         anchorY: 'top',
+         dx: 1,
+         dy: 2 
+      };
       state.persist();
       expect(onSave).toHaveBeenCalledWith(expect.objectContaining({
          positions: expect.objectContaining({
-            portrait: { anchorX: 'right', anchorY: 'top', dx: 1, dy: 2 },
+            portrait: {
+               anchorX: 'right',
+               anchorY: 'top',
+               dx: 1,
+               dy: 2 
+            },
          }),
       }));
    });

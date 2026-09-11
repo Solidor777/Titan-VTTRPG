@@ -47,17 +47,29 @@ function renderDocumentEntry(document, labels, slugFor) {
    function capturingSlugFor(text) {
       /** @type {string} The generated slug. */
       const slug = slugFor(text);
-      capturedSlugs.push({ text, slug });
+      capturedSlugs.push({
+         text,
+         slug 
+      });
       return slug;
    }
 
    /** @type {string} The rendered item block. */
-   const block = RENDERERS[document.type](document, { labels, slugFor: capturingSlugFor });
+   const block = RENDERERS[document.type](document, {
+      labels,
+      slugFor: capturingSlugFor 
+   });
 
    /** @type {TocEntry[]} The item's table-of-contents entries, in `slugFor` call order. */
-   const entries = capturedSlugs.map((entry) => ({ text: escapeText(entry.text), slug: entry.slug }));
+   const entries = capturedSlugs.map((entry) => ({
+      text: escapeText(entry.text),
+      slug: entry.slug 
+   }));
 
-   return { block, entries };
+   return {
+      block,
+      entries 
+   };
 }
 
 /**
@@ -74,7 +86,10 @@ function walkSection(section, labels, slugFor, tocEntries, bodyBlocks) {
    /** @type {string} This section's heading slug. */
    const slug = slugFor(section.text);
    bodyBlocks.push(heading(section.level, section.text, slug));
-   tocEntries.push({ text: escapeText(section.text), slug });
+   tocEntries.push({
+      text: escapeText(section.text),
+      slug 
+   });
 
    for (const document of section.documents) {
       /** @type {{block: string, entries: TocEntry[]}} The document's rendered block and TOC entries. */
@@ -94,7 +109,7 @@ function walkSection(section, labels, slugFor, tocEntries, bodyBlocks) {
  * section and its item blocks, each block separated by one blank line.
  * @param {import('./WorkbookToDocuments.js').RenderableDocument[]} documents - Every renderable document.
  * @param {{title: string, labels: function(string, string=): string}} options - The document title and
- *    label resolver.
+ * label resolver.
  * @returns {string} The rendered Markdown file, ending with a single `\n`.
  */
 export function renderCompendiumMarkdown(documents, { title, labels }) {
@@ -110,8 +125,14 @@ export function renderCompendiumMarkdown(documents, { title, labels }) {
 
    /** @type {TocEntry[]} The table-of-contents entries, in document order. */
    const tocEntries = [
-      { text: escapeText(title), slug: titleSlug },
-      { text: escapeText('Contents'), slug: contentsSlug },
+      {
+         text: escapeText(title),
+         slug: titleSlug 
+      },
+      {
+         text: escapeText('Contents'),
+         slug: contentsSlug 
+      },
    ];
    /** @type {string[]} The rendered section headings and item blocks, in document order. */
    const bodyBlocks = [];

@@ -12,9 +12,9 @@
    /**
     * @typedef {object} CastingCheckTagsProps
     * @property {object} [parameters] - Optional actor-resolved casting-check parameters
-    *    (getCastingCheckParameters output). Pass from actor-context consumers to render resolved
-    *    values plus dice/training/expertise stats; omit on document consumers (spell sheet, chat
-    *    card), which read the spell's castingCheck config through the nearest document context.
+    * (getCastingCheckParameters output). Pass from actor-context consumers to render resolved
+    * values plus dice/training/expertise stats; omit on document consumers (spell sheet, chat
+    * card), which read the spell's castingCheck config through the nearest document context.
     */
 
    /** @type {CastingCheckTagsProps} */

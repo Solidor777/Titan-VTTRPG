@@ -5,7 +5,7 @@
  * field, preserving the card's `if (obj)` presence guard. The resource snapshot nests under `resource` so
  * the card can read the same `system.resource.*` path as the actor's own persisted resources.
  * @returns {object} The spend-resolve report shape: the resolve spent, the resolve shortage, and the
- *    nested resolve resource snapshot.
+ * nested resolve resource snapshot.
  */
 export default function createSpendResolveReportShape() {
    return {
