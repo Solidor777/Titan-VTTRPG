@@ -1,5 +1,7 @@
 import { spawn, spawnSync, execFileSync } from 'node:child_process';
+import { createWriteStream, mkdirSync } from 'node:fs';
 import net from 'node:net';
+import path from 'node:path';
 
 /**
  * @typedef {object} SuperviseOptions
@@ -11,7 +13,31 @@ import net from 'node:net';
  * @property {number} [watchPid] - A process whose death must take the server down with it.
  * @property {number} [pollMs] - How often the watched process is checked for liveness (default 1000).
  * @property {(message: string) => void} [log] - Sink for status lines (default stderr).
+ * @property {string} [logFile] - When set, every line the spawned server writes to stdout/stderr is also
+ * appended here with an ISO timestamp prefix, plus a final exit line, so a server death mid-run can be
+ * correlated against the test timeline after the fact. The server's output still reaches the console.
  */
+
+/**
+ * Creates a sink that appends timestamped lines to a log file (directories created as needed).
+ * @param {string} logFile - The log file path.
+ * @returns {(source: string, chunk: string) => void} Writes each line of `chunk`, tagged with `source`.
+ */
+function createLineLogger(logFile) {
+   mkdirSync(path.dirname(logFile), { recursive: true });
+   /** @type {import('node:fs').WriteStream} The append-only log stream. */
+   const stream = createWriteStream(logFile, { flags: 'a' });
+   /** @type {{[source: string]: string}} Partial trailing line per source, carried into the next chunk. */
+   const remainders = {};
+   return (source, chunk) => {
+      /** @type {string[]} Complete lines in this chunk, the last entry being the unterminated remainder. */
+      const lines = ((remainders[source] ?? '') + chunk).split(/\r?\n/);
+      remainders[source] = lines.pop() ?? '';
+      for (const line of lines) {
+         stream.write(`${new Date().toISOString()} [${source}] ${line}\n`);
+      }
+   };
+}
 
 /**
  * @typedef {object} SuperviseHandle
@@ -201,6 +227,7 @@ export async function superviseServer(options) {
       watchPid,
       pollMs = 1000,
       log = (message) => console.error(message),
+      logFile,
    } = options;
 
    /** @type {(code: number) => void} Settles `done`; assigned inside the promise constructor. */
@@ -229,12 +256,32 @@ export async function superviseServer(options) {
 
    log(`[e2e-server] starting: ${command} ${args.join(' ')} (cwd ${cwd})`);
 
+   /** @type {((source: string, chunk: string) => void) | undefined} The timestamped file sink, when logging. */
+   const logLine = logFile ? createLineLogger(logFile) : undefined;
+
    /** @type {import('node:child_process').ChildProcess} The server, spawned without a shell so its pid is the server's. */
    const child = spawn(command, args, {
       cwd,
-      stdio: 'inherit',
+      // Piped only when a log file is wanted: the pipes are mirrored to the console below, so the
+      // console sees the same output either way.
+      stdio: logLine ? ['ignore', 'pipe', 'pipe'] : 'inherit',
       windowsHide: true,
    });
+
+   if (logLine) {
+      // Supervisor messages carry their own newline: the sink only emits complete lines.
+      logLine('supervisor', `started pid ${child.pid}: ${command} ${args.join(' ')}\n`);
+      child.stdout.setEncoding('utf8');
+      child.stderr.setEncoding('utf8');
+      child.stdout.on('data', (chunk) => {
+         process.stdout.write(chunk);
+         logLine('stdout', chunk);
+      });
+      child.stderr.on('data', (chunk) => {
+         process.stderr.write(chunk);
+         logLine('stderr', chunk);
+      });
+   }
 
    /** @type {NodeJS.Timeout | undefined} The liveness poll for the watched process. */
    let watchdog;
@@ -259,6 +306,9 @@ export async function superviseServer(options) {
          watchdog = undefined;
       }
       log(`[e2e-server] server exited (${signal ?? `code ${code}`})`);
+      if (logLine) {
+         logLine('supervisor', `server exited (${signal ?? `code ${code}`})\n`);
+      }
       finish(code ?? 0);
    });
 
