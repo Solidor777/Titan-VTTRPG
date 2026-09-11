@@ -1,6 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import { buildTables, buildArrayPathMatcher, detectArrayPaths } from '~/spreadsheet/codec/BuildTables.js';
 import { encodeXlsx, decodeXlsx } from '~/spreadsheet/format/Xlsx.js';
+import { encodeCsv, decodeCsv } from '~/spreadsheet/format/Csv.js';
 import { readTables } from '~/spreadsheet/codec/ReadTables.js';
 
 /** A minimal typeSchemas stand-in: no schema-typed fields, so column order falls back to first-seen. */
@@ -165,6 +166,59 @@ describe('buildTables — relational layout', () => {
       expect(readEnvelopes).toHaveLength(1);
       expect(readEnvelopes[0].documentType).toBe(documentType);
       expect(readEnvelopes[0].source.system.somethingreallylong).toEqual(['one', 'two']);
+   });
+});
+
+describe('buildTables — untyped-bag string protection', () => {
+   it('protects a number-like untyped-bag string through a wide-layout XLSX round trip', () => {
+      const envelopes = [
+         { documentType: 'weapon', source: { _id: 'a'.repeat(16), system: { rulesElement: [{ name: 'code', value: '5' }] } } },
+      ];
+      const workbook = buildTables(envelopes, 'wide', 'Item', NO_SCHEMA);
+      const decoded = decodeXlsx(encodeXlsx(workbook));
+      /** @type {{envelopes: Array<object>}} */
+      const { envelopes: readEnvelopes } = readTables(decoded, NO_SCHEMA);
+      expect(readEnvelopes[0].source.system.rulesElement[0].value).toBe('5');
+   });
+
+   it('protects a number-like untyped-bag string through a relational-layout CSV round trip', () => {
+      const envelopes = [
+         { documentType: 'weapon', source: { _id: 'a'.repeat(16), system: { rulesElement: [{ name: 'code', value: '5' }] } } },
+      ];
+      const workbook = buildTables(envelopes, 'relational', 'Item', NO_SCHEMA);
+      /** @type {import('~/spreadsheet/codec/Workbook.js').Workbook} Every sheet round-tripped through CSV text. */
+      const roundTripped = { sheets: workbook.sheets.map((sheet) => decodeCsv(encodeCsv(sheet), sheet.name)) };
+      /** @type {{envelopes: Array<object>}} */
+      const { envelopes: readEnvelopes } = readTables(roundTripped, NO_SCHEMA);
+      expect(readEnvelopes[0].source.system.rulesElement[0].value).toBe('5');
+   });
+
+   it('leaves a schema-typed number field untouched (no quoting)', () => {
+      const typeSchemas = { weapon: { fieldTypes: { 'system.value': { type: 'number', nullable: false } }, fieldOrder: [] } };
+      const envelopes = [{ documentType: 'weapon', source: { _id: 'a'.repeat(16), system: { value: 5 } } }];
+      const weaponSheet = buildTables(envelopes, 'wide', 'Item', typeSchemas).sheets.find((s) => s.name === 'weapon');
+      expect(weaponSheet.rows[0]['system.value']).toBe(5);
+   });
+
+   it('leaves a plain untyped-bag string untouched (no quoting)', () => {
+      const envelopes = [
+         { documentType: 'weapon', source: { _id: 'a'.repeat(16), system: { rulesElement: [{ name: 'code', value: 'Slashing' }] } } },
+      ];
+      const weaponSheet = buildTables(envelopes, 'wide', 'Item', NO_SCHEMA).sheets.find((s) => s.name === 'weapon');
+      expect(weaponSheet.rows[0]['system.rulesElement.0.value']).toBe('Slashing');
+   });
+
+   it('round-trips an already-quoted untyped-bag string', () => {
+      const envelopes = [
+         { documentType: 'weapon', source: { _id: 'a'.repeat(16), system: { rulesElement: [{ name: 'code', value: '"x"' }] } } },
+      ];
+      const workbook = buildTables(envelopes, 'wide', 'Item', NO_SCHEMA);
+      /** @type {object} */
+      const weaponSheet = workbook.sheets.find((s) => s.name === 'weapon');
+      expect(weaponSheet.rows[0]['system.rulesElement.0.value']).toBe('""x""');
+      /** @type {{envelopes: Array<object>}} */
+      const { envelopes: readEnvelopes } = readTables(workbook, NO_SCHEMA);
+      expect(readEnvelopes[0].source.system.rulesElement[0].value).toBe('"x"');
    });
 });
 

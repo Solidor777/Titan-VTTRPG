@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { decodeCell, lookupFieldSchema, decodeRow, ABSENT } from '~/spreadsheet/codec/DecodeCell.js';
+import { decodeCell, forceStringCell, lookupFieldSchema, decodeRow, ABSENT } from '~/spreadsheet/codec/DecodeCell.js';
 
 describe('decodeCell — typed (schema-known) fields', () => {
    const numberField = { type: 'number', nullable: false };
@@ -66,6 +66,30 @@ describe('lookupFieldSchema', () => {
 
    it('returns undefined for a path with no schema entry', () => {
       expect(lookupFieldSchema({}, 'system.rulesElement.0.value')).toBeUndefined();
+   });
+});
+
+describe('forceStringCell', () => {
+   it('quotes a numeral-looking, boolean-looking, or "null"-looking string so it decodes back to itself', () => {
+      expect(forceStringCell('5')).toBe('"5"');
+      expect(forceStringCell('true')).toBe('"true"');
+      expect(forceStringCell('false')).toBe('"false"');
+      expect(forceStringCell('null')).toBe('"null"');
+   });
+
+   it('adds a second quote layer around already-quoted text so decodeLiteral still unwraps to the original', () => {
+      expect(forceStringCell('"x"')).toBe('""x""');
+      expect(decodeCell(forceStringCell('"x"'), undefined)).toBe('"x"');
+   });
+
+   it('leaves an ordinary string untouched', () => {
+      expect(forceStringCell('Slashing')).toBe('Slashing');
+   });
+
+   it('round trips through decodeCell for every forced case', () => {
+      for (const text of ['5', 'true', 'false', 'null', '"x"', 'Slashing']) {
+         expect(decodeCell(forceStringCell(text), undefined)).toBe(text);
+      }
    });
 });
 

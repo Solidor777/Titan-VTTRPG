@@ -125,7 +125,11 @@ src/hooks/
   2. If the path lands inside an untyped object bag (rules elements, traits, aspects, custom traits,
      `flags.*`), literal rules apply: `true` / `false` → boolean; text that parses as a finite number →
      number; `null` → null; anything else → string. To force a string that looks like a number or boolean,
-     wrap it in double quotes in the cell: `"5"` decodes to the string `5`.
+     wrap it in double quotes in the cell: `"5"` decodes to the string `5`. `buildTables` applies this
+     quoting automatically on export (`forceStringCell`) to every untyped-bag string value that would
+     not otherwise decode back to itself — a numeral-looking, boolean-looking, or `null`-looking string,
+     or a string that is itself already wrapped in quotes — so such values round-trip without the
+     interpretation the first sentence of this section promises for typed XLSX cells.
   3. An empty cell decodes to null for a nullable field, the empty string for a non-nullable string field,
      and otherwise to ABSENT: absent leaves an existing value untouched on update and lets the schema
      default fill on create. Inside an array element an empty cell counts as blank for the element-existence

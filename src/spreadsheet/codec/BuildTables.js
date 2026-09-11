@@ -1,5 +1,30 @@
+import { forceStringCell, lookupFieldSchema } from '~/spreadsheet/codec/DecodeCell.js';
 import { flattenDocument } from '~/spreadsheet/codec/FlattenDocument.js';
 import { FIXED_COLUMNS, normalizePath, uniqueSheetNames } from '~/spreadsheet/codec/Workbook.js';
+
+/**
+ * Protects untyped-bag string values (rules elements, traits, `flags.*`, any array-of-objects field) so
+ * they survive `decodeLiteral`'s literal rules on the next import: applies `forceStringCell` to every
+ * string value whose column is neither a fixed column nor a schema-typed field. Mutates `flatRows` in
+ * place; shared by both layouts since relational child sheets are also built from these same flat rows.
+ * @param {Array<Object<string,*>>} flatRows - One flat row map per document (fixed columns included).
+ * @param {{fieldTypes: object, fieldOrder: string[]}} [typeSchema] - The type's resolved schema info.
+ * @returns {void}
+ */
+function forceUntypedStringCells(flatRows, typeSchema) {
+   /** @type {Object<string, {type:string,nullable:boolean}>} */
+   const fieldTypes = typeSchema?.fieldTypes ?? {};
+   for (const row of flatRows) {
+      for (const path of Object.keys(row)) {
+         if (FIXED_COLUMNS.includes(path) || typeof row[path] !== 'string') {
+            continue;
+         }
+         if (lookupFieldSchema(fieldTypes, path) === undefined) {
+            row[path] = forceStringCell(row[path]);
+         }
+      }
+   }
+}
 
 /**
  * @typedef {object} DocumentEnvelope
@@ -310,6 +335,7 @@ export function buildTables(envelopes, layout, packType, typeSchemas) {
       }));
       /** @type {{fieldTypes:object,fieldOrder:string[]}|undefined} */
       const typeSchema = typeSchemas[documentType];
+      forceUntypedStringCells(flatRows, typeSchema);
 
       if (layout === 'wide') {
          sheets.push(buildWideSheet(documentType, flatRows, typeSchema));

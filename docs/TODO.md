@@ -27,18 +27,6 @@ Completed items are deleted, not marked done.
   certain arrangements can be mis-split by `ApplyImport.js`'s `splitFolderPath`. Narrow edge case;
   pre-existing gap in the escaping scheme design.
 
-- String cells in an untyped bag (rules elements, traits, `flags.*`) that look like a number or boolean
-  are coerced on import (e.g. a literal string `"5"` decodes to the number `5`), contradicting the
-  spec's stated invariant that XLSX cells "carry native types... so values round-trip without
-  interpretation" for an already-typed XLSX value. `DecodeCell.js`'s `decodeLiteral` only skips
-  coercion for non-string runtime values, but an XLSX string cell decodes to a JS string regardless of
-  what a user typed — so this is currently reachable, not latent. The CSV path is also lossy here since
-  the exporter never emits the spec's documented double-quote-forcing form (`""5""`) to protect such
-  values on export. Needs either fixing `encodeXlsx`/`encodeCsv` to defensively quote/mark
-  numeric-looking or boolean-looking strings on write, or accepting and re-documenting the current
-  behavior if round-tripping such values isn't actually a real use case — a design call, not a
-  mechanical fix.
-
 - One checked-in XLSX test fixture is still needed from the user: a `.xlsx` exported by real Google
   Sheets, derived from this feature's real `titan.effects` export, added as
   `tests/fixtures/spreadsheet/google-sheets-edited.xlsx` with a matching test in `Xlsx.test.js` (see the
