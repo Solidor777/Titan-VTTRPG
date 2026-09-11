@@ -199,4 +199,13 @@ describe('htmlToMarkdown', () => {
       const html = '<ul><li>One<ul><li>Nested</ul><li>Two</ul>';
       expect(htmlToMarkdown(html)).toBe('* One\n  * Nested\n\n* Two');
    });
+
+   it('bounds the implicit paragraph close at table scope', () => {
+      const html = '<table><tr><p>Outer<td><p>Inner</p></td></tr></table>';
+      /** @type {string} The rendered table; a stray outer <p> must not swallow the cell's <p>. */
+      const result = htmlToMarkdown(html);
+      expect(result).toBe('|  |  |\n| --- | --- |\n| Outer | Inner |');
+      expect(result).toContain('Inner');
+      expect(result).toContain('Outer');
+   });
 });

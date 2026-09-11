@@ -33,15 +33,25 @@ const INLINE_TAGS = new Set(['strong', 'b', 'em', 'i', 's', 'del', 'strike', 'u'
 
 /**
  * Tags whose start tag implicitly closes an open ancestor `<p>`, per the HTML5 "optional tags"
- * rules (WHATWG 13.1.2, "An end tag whose tag name is p implied"). The search for the ancestor
- * `<p>` to close runs to the document root rather than stopping at scope-boundary elements
- * (e.g. a table cell); this is a deliberate simplification, not a spec-complete implementation.
+ * rules (WHATWG 13.1.2, "An end tag whose tag name is p implied"). Includes `tr`/`td`/`th` so a
+ * `<p>` left dangling open in a table row or cell is closed by the next row/cell rather than
+ * swallowing it as a child. The search for the ancestor `<p>` to close stops at a table/list scope
+ * boundary (see {@link P_CLOSING_BOUNDARIES}), per the "has a p element in button scope" rule -- an
+ * unclosed `<p>` in an outer table cell is never closed by a tag opened inside a nested cell.
  * @type {Set<string>}
  */
 const P_CLOSING_TAGS = new Set([
    'p', 'ul', 'ol', 'li', 'table', 'blockquote', 'pre',
    'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'hr', 'div', 'section',
+   'tr', 'td', 'th',
 ]);
+
+/**
+ * Scope-boundary tags that stop {@link closeAncestor}'s search for an open `<p>` to close, per the
+ * HTML5 "has a p element in button scope" rule.
+ * @type {string[]}
+ */
+const P_CLOSING_BOUNDARIES = ['table', 'tr', 'td', 'th', 'li'];
 
 /**
  * Matches a single HTML entity reference: a named entity, a decimal numeric reference, or a
@@ -122,16 +132,23 @@ function parseAttrs(attrString) {
 
 /**
  * Closes (pops) the nearest open ancestor with tag `target`, and everything open above it, from
- * the stack. Searches the full stack from the top down to (but not including) the root; a no-op
- * if no ancestor with that tag is currently open.
+ * the stack. The search stops (closing nothing) if it reaches a tag in `boundaries` before finding
+ * a match, per the HTML5 "has an element in scope" rule -- so a `<p>` left open in an outer table
+ * cell or list item is never closed by a tag opened inside a nested cell/item.
  * @param {object[]} stack - The current open-element stack (root-first).
  * @param {string} target - The tag name to close.
+ * @param {string[]} boundaries - The tag names that stop the search without closing anything.
  * @returns {void}
  */
-function closeAncestor(stack, target) {
+function closeAncestor(stack, target, boundaries) {
+   /** @type {number} The stack index under inspection, walking from the top down. */
    for (let i = stack.length - 1; i > 0; i--) {
       if (stack[i].tag === target) {
          stack.length = i;
+         return;
+      }
+
+      if (boundaries.includes(stack[i].tag)) {
          return;
       }
    }
@@ -149,6 +166,7 @@ function closeAncestor(stack, target) {
  * @returns {void}
  */
 function closeSibling(stack, targets, boundaries) {
+   /** @type {number} The stack index under inspection, walking from the top down. */
    for (let i = stack.length - 1; i > 0; i--) {
       if (targets.includes(stack[i].tag)) {
          stack.length = i;
@@ -173,7 +191,7 @@ function closeSibling(stack, targets, boundaries) {
  */
 function closeImplicit(stack, tag) {
    if (P_CLOSING_TAGS.has(tag)) {
-      closeAncestor(stack, 'p');
+      closeAncestor(stack, 'p', P_CLOSING_BOUNDARIES);
    }
 
    if (tag === 'li') {
@@ -473,14 +491,17 @@ function collectTableRows(node) {
 
 /**
  * Renders a `<table>` element as a GFM pipe table. The first row is the header when it is made of
- * `<th>` cells; otherwise a blank header row is synthesised.
+ * `<th>` cells; otherwise a blank header row is synthesised. Every direct element child of a `<tr>`
+ * becomes a cell, not only `<td>`/`<th>`: malformed markup can leave stray content (e.g. a `<p>`
+ * left open across a cell boundary) as a `<tr>` sibling of its cells, and that content is still
+ * rendered as a best-effort extra cell rather than silently dropped.
  * @param {object} node - The `<table>` element node.
  * @returns {string} The rendered table block, or `''` when the table has no rows.
  */
 function renderTable(node) {
    /** @type {{isHeader: boolean, text: string}[][]} Each row's rendered cells. */
    const rows = collectTableRows(node).map((tr) => tr.children
-      .filter((cell) => cell.type === 'element' && (cell.tag === 'td' || cell.tag === 'th'))
+      .filter((cell) => cell.type === 'element')
       .map((cell) => ({
          isHeader: cell.tag === 'th',
          text: renderInline(cell.children, { inTable: true }).trim(),
