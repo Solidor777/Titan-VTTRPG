@@ -58,12 +58,16 @@ Completed items are deleted, not marked done.
   behavior if round-tripping such values isn't actually a real use case — a design call, not a
   mechanical fix.
 
-- Two checked-in XLSX test fixtures are still needed from the user: one `.xlsx` file saved by real
-  Microsoft Excel, one exported by real Google Sheets, both derived from a real export this feature
-  produces, added under `tests/fixtures/spreadsheet/` with a follow-up unit test in `Xlsx.test.js`
-  reading them. The current `t="s"` shared-strings decode test uses a hand-built synthetic archive, not
-  a file any real spreadsheet application produced, so "Excel/Google Sheets can actually open and
-  round-trip our export" remains unverified by anything in the test suite.
+- One checked-in XLSX test fixture is still needed from the user: a `.xlsx` exported by real Google
+  Sheets, derived from this feature's real `titan.effects` export, added as
+  `tests/fixtures/spreadsheet/google-sheets-edited.xlsx` with a matching test in `Xlsx.test.js` (see the
+  existing "decodes an .xlsx file ... re-saved by real Microsoft Excel" test for the pattern to follow).
+  The Excel half is done: `tests/fixtures/spreadsheet/excel-edited.xlsx` was produced by exporting
+  titan.effects, editing one cell's value in real Excel 16.0 via COM automation, and re-saving, with a
+  passing round-trip test. Google Sheets requires a real Google account signed into a browser, which
+  this agent has no access to and should not be given credentials for; the user needs to do this step
+  themselves: open the exported .xlsx in Google Sheets, edit one cell's data (not the format), then
+  File > Download > Microsoft Excel (.xlsx), and hand the resulting file over.
 
 - The spec's Testing section also requires an e2e case for the 31-character-sheet-name-truncation
   fallback above (unit-level) and, separately, an actor-pack round trip with embedded items and

@@ -1,4 +1,5 @@
 import { describe, it, expect } from 'vitest';
+import { readFileSync } from 'node:fs';
 import { encodeXlsx, decodeXlsx, uniqueSheetNames } from '~/spreadsheet/format/Xlsx.js';
 import { zipFiles, unzipFilesAsText } from '~/spreadsheet/format/Zip.js';
 
@@ -84,6 +85,24 @@ describe('Xlsx', () => {
 
       const decoded = decodeXlsx(bytes);
       expect(decoded.sheets[0].rows[0]).toEqual({ name: 'Shared Value', formula: 'computed value' });
+   });
+
+   describe('real-application fixtures', () => {
+      it('decodes an .xlsx file this feature exported, then edited and re-saved by real Microsoft Excel', () => {
+         /** @type {Buffer} A real titan.effects export, opened, edited, and re-saved by Excel 16.0. */
+         const bytes = readFileSync('tests/fixtures/spreadsheet/excel-edited.xlsx');
+         /** @type {import('~/spreadsheet/codec/Workbook.js').Workbook} */
+         const decoded = decodeXlsx(new Uint8Array(bytes));
+         expect(decoded.sheets.map((s) => s.name)).toEqual(expect.arrayContaining(['_manifest', 'effect']));
+         /** @type {import('~/spreadsheet/codec/Workbook.js').Sheet} */
+         const effectSheet = decoded.sheets.find((s) => s.name === 'effect');
+         expect(effectSheet.columns).toContain('name');
+         expect(effectSheet.columns).toContain('_id');
+         // Excel is only expected to preserve the file's structure while changing the one edited cell's
+         // data — every row still decodes, and the edited row carries the marker Excel saved.
+         expect(effectSheet.rows.length).toBeGreaterThan(0);
+         expect(effectSheet.rows.some((row) => String(row.name).includes('(Excel Edited)'))).toBe(true);
+      });
    });
 
    describe('uniqueSheetNames', () => {
