@@ -42,10 +42,17 @@ function decodeLiteral(rawValue) {
  * `decodeLiteral` already unwraps) whenever `decodeLiteral(text)` would not hand back the identical
  * string — numbers, `true`/`false`, `null`, and already-quoted text all fail that check. A value
  * `decodeLiteral` already returns unchanged (an ordinary word like `'Slashing'`) needs no wrapping.
+ * An empty string is left unchanged rather than quoted: `decodeCell`'s untyped-bag blank rule treats
+ * `''` as ABSENT (see its header note), and `decodeLiteral('')` would otherwise coerce it to the number
+ * `0` (`Number('')` is `0`), which would wrongly trigger quoting and turn a dropped field into a
+ * literal empty-string one.
  * @param {string} text - The exported string value.
  * @returns {string} `text` as-is, or wrapped in double quotes to force literal-string decoding.
  */
 export function forceStringCell(text) {
+   if (text === '') {
+      return text;
+   }
    return decodeLiteral(text) === text ? text : `"${text}"`;
 }
 

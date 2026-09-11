@@ -77,6 +77,17 @@ describe('forceStringCell', () => {
       expect(forceStringCell('null')).toBe('"null"');
    });
 
+   it('quotes less-common numeral forms Number() accepts (exponent, leading space, hex)', () => {
+      expect(forceStringCell('1e3')).toBe('"1e3"');
+      expect(forceStringCell(' 5')).toBe('" 5"');
+      expect(forceStringCell('0x10')).toBe('"0x10"');
+   });
+
+   it('leaves the empty string unchanged (blank means ABSENT, not the literal empty string)', () => {
+      expect(forceStringCell('')).toBe('');
+      expect(decodeCell(forceStringCell(''), undefined)).toBe(ABSENT);
+   });
+
    it('adds a second quote layer around already-quoted text so decodeLiteral still unwraps to the original', () => {
       expect(forceStringCell('"x"')).toBe('""x""');
       expect(decodeCell(forceStringCell('"x"'), undefined)).toBe('"x"');

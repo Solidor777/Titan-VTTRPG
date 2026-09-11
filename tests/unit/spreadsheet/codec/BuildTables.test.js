@@ -172,7 +172,10 @@ describe('buildTables — relational layout', () => {
 describe('buildTables — untyped-bag string protection', () => {
    it('protects a number-like untyped-bag string through a wide-layout XLSX round trip', () => {
       const envelopes = [
-         { documentType: 'weapon', source: { _id: 'a'.repeat(16), system: { rulesElement: [{ name: 'code', value: '5' }] } } },
+         {
+            documentType: 'weapon',
+            source: { _id: 'a'.repeat(16), system: { rulesElement: [{ name: 'code', value: '5' }] } },
+         },
       ];
       const workbook = buildTables(envelopes, 'wide', 'Item', NO_SCHEMA);
       const decoded = decodeXlsx(encodeXlsx(workbook));
@@ -183,7 +186,10 @@ describe('buildTables — untyped-bag string protection', () => {
 
    it('protects a number-like untyped-bag string through a relational-layout CSV round trip', () => {
       const envelopes = [
-         { documentType: 'weapon', source: { _id: 'a'.repeat(16), system: { rulesElement: [{ name: 'code', value: '5' }] } } },
+         {
+            documentType: 'weapon',
+            source: { _id: 'a'.repeat(16), system: { rulesElement: [{ name: 'code', value: '5' }] } },
+         },
       ];
       const workbook = buildTables(envelopes, 'relational', 'Item', NO_SCHEMA);
       /** @type {import('~/spreadsheet/codec/Workbook.js').Workbook} Every sheet round-tripped through CSV text. */
@@ -194,7 +200,9 @@ describe('buildTables — untyped-bag string protection', () => {
    });
 
    it('leaves a schema-typed number field untouched (no quoting)', () => {
-      const typeSchemas = { weapon: { fieldTypes: { 'system.value': { type: 'number', nullable: false } }, fieldOrder: [] } };
+      const typeSchemas = {
+         weapon: { fieldTypes: { 'system.value': { type: 'number', nullable: false } }, fieldOrder: [] },
+      };
       const envelopes = [{ documentType: 'weapon', source: { _id: 'a'.repeat(16), system: { value: 5 } } }];
       const weaponSheet = buildTables(envelopes, 'wide', 'Item', typeSchemas).sheets.find((s) => s.name === 'weapon');
       expect(weaponSheet.rows[0]['system.value']).toBe(5);
@@ -202,7 +210,10 @@ describe('buildTables — untyped-bag string protection', () => {
 
    it('leaves a plain untyped-bag string untouched (no quoting)', () => {
       const envelopes = [
-         { documentType: 'weapon', source: { _id: 'a'.repeat(16), system: { rulesElement: [{ name: 'code', value: 'Slashing' }] } } },
+         {
+            documentType: 'weapon',
+            source: { _id: 'a'.repeat(16), system: { rulesElement: [{ name: 'code', value: 'Slashing' }] } },
+         },
       ];
       const weaponSheet = buildTables(envelopes, 'wide', 'Item', NO_SCHEMA).sheets.find((s) => s.name === 'weapon');
       expect(weaponSheet.rows[0]['system.rulesElement.0.value']).toBe('Slashing');
@@ -210,7 +221,10 @@ describe('buildTables — untyped-bag string protection', () => {
 
    it('round-trips an already-quoted untyped-bag string', () => {
       const envelopes = [
-         { documentType: 'weapon', source: { _id: 'a'.repeat(16), system: { rulesElement: [{ name: 'code', value: '"x"' }] } } },
+         {
+            documentType: 'weapon',
+            source: { _id: 'a'.repeat(16), system: { rulesElement: [{ name: 'code', value: '"x"' }] } },
+         },
       ];
       const workbook = buildTables(envelopes, 'wide', 'Item', NO_SCHEMA);
       /** @type {object} */
@@ -219,6 +233,22 @@ describe('buildTables — untyped-bag string protection', () => {
       /** @type {{envelopes: Array<object>}} */
       const { envelopes: readEnvelopes } = readTables(workbook, NO_SCHEMA);
       expect(readEnvelopes[0].source.system.rulesElement[0].value).toBe('"x"');
+   });
+
+   it('leaves an untyped-bag field holding an empty string blank (not a quoted "") and drops it as ABSENT', () => {
+      const envelopes = [
+         {
+            documentType: 'weapon',
+            source: { _id: 'a'.repeat(16), system: { rulesElement: [{ name: 'code', value: '' }] } },
+         },
+      ];
+      const workbook = buildTables(envelopes, 'wide', 'Item', NO_SCHEMA);
+      /** @type {object} */
+      const weaponSheet = workbook.sheets.find((s) => s.name === 'weapon');
+      expect(weaponSheet.rows[0]['system.rulesElement.0.value']).toBe('');
+      /** @type {{envelopes: Array<object>}} */
+      const { envelopes: readEnvelopes } = readTables(workbook, NO_SCHEMA);
+      expect(readEnvelopes[0].source.system.rulesElement[0].value).toBeUndefined();
    });
 });
 
