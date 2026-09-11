@@ -103,6 +103,7 @@ describe('calculateSpellAspectCosts', () => {
       const result = calculateSpellAspectCosts([aspect({ label: 'decreaseMod', option: [] })], []);
       expect(result.enabled).toEqual([false]);
       expect(result.aspectCosts).toEqual([0]);
+      expect(result.scalingCosts).toEqual([undefined]);
    });
 
    it('sums the cost of custom aspects into the total', () => {

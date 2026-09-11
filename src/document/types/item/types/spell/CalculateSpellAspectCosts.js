@@ -40,11 +40,12 @@ export default function calculateSpellAspectCosts(aspects, customAspects) {
       const settings = aspectSettings.settings;
       const template = aspectSettings.template;
 
-      // The aspect is disabled if it requires an option and has no options set.
+      // The aspect is disabled if it requires an option and has no options set. A disabled aspect
+      // reports no scaling cost: the original code path never read settings.scalingCost here.
       if (settings?.requireOption && aspect.option.length === 0 && !aspect.allOptions) {
          enabled.push(false);
          aspectCosts.push(0);
-         scalingCosts.push(settings?.scalingCost);
+         scalingCosts.push(undefined);
          continue;
       }
 
