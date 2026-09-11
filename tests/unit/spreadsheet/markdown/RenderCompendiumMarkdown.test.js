@@ -157,6 +157,56 @@ describe('renderCompendiumMarkdown', () => {
       expect(result).toContain('[Rope](#rope-1)');
    });
 
+   it('assigns headings in document order when an item name collides with a later attack heading', () => {
+      /**
+       * @type {object[]} An item literally named "Strike (Melee)" first, then a two-attack weapon whose
+       *    first attack is also labeled "Strike" (melee) — its heading text collides with the first
+       *    item's. Slugs must be assigned in document (call) order, not item-heading-before-attacks
+       *    order within a later document.
+       */
+      const documents = [
+         {
+            type: 'weapon',
+            name: 'Strike (Melee)',
+            folderPath: [],
+            system: {
+               rarity: 'common',
+               value: 1,
+               attack: [makeAttack({ label: 'Punch', type: 'melee' })],
+               attackNotes: '',
+               trait: [],
+               check: [],
+               description: '',
+            },
+         },
+         {
+            type: 'weapon',
+            name: 'Twin Blade',
+            folderPath: [],
+            system: {
+               rarity: 'common',
+               value: 1,
+               attack: [
+                  makeAttack({ label: 'Strike', type: 'melee' }),
+                  makeAttack({ label: 'Throw', type: 'ranged', attribute: 'body', skill: 'rangedWeapons' }),
+               ],
+               attackNotes: '',
+               trait: [],
+               check: [],
+               description: '',
+            },
+         },
+      ];
+
+      /** @type {string} The rendered file. */
+      const result = renderCompendiumMarkdown(documents, { title: 'Test Pack', labels });
+
+      expect(result).toContain('#### ***Strike (Melee)*** {#strike-melee}\n\n');
+      expect(result).toContain('##### ***Strike (Melee)*** {#strike-melee-1}\n\n');
+      expect(result).toContain('[Strike (Melee)](#strike-melee)');
+      expect(result).toContain('[Strike (Melee)](#strike-melee-1)');
+   });
+
    it('ends the file with a single trailing newline', () => {
       /** @type {object[]} A single root-level commodity. */
       const documents = [

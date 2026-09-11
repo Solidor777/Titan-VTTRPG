@@ -84,6 +84,10 @@ export function renderWeapon(document, { labels, slugFor }) {
    /** @type {import('./RenderItemBlock.js').AttackSection[]} The multi-attack H5 sections, if any. */
    const attackSections = [];
 
+   // Request the item's own H4 slug BEFORE any attack H5 slug: slugs are assigned in call order, and
+   // headings must be recorded in document order (the item's H4 always precedes its attack H5s).
+   const itemSlug = slugFor(document.name);
+
    if (attacks.length > 1) {
       for (const attack of attacks) {
          /** @type {string} This attack's heading text (e.g. `Strike (Melee)`). */
@@ -110,7 +114,7 @@ export function renderWeapon(document, { labels, slugFor }) {
 
    return renderItemBlock({
       headingText: document.name,
-      slug: slugFor(document.name),
+      slug: itemSlug,
       statLines,
       descriptionHtml: system.description,
       extraDescriptionHtml: system.attackNotes,

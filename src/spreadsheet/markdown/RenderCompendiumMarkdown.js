@@ -28,9 +28,8 @@ const RENDERERS = {
 
 /**
  * Renders one document to its item block, capturing every slug it requests (its own heading, then any
- * attack headings) so the table of contents can list them in the same order the file's slugger
- * assigned them. A renderer's own heading slug is identified by the captured call whose text matches
- * the document's name; every other captured call is a lower-level heading (a weapon attack, H5).
+ * attack headings, in document order — every renderer requests its own H4 slug before any attack H5
+ * slug) so the table of contents can list them in the same order the file's slugger assigned them.
  * @param {import('./WorkbookToDocuments.js').RenderableDocument} document - The document to render.
  * @param {function(string, string=): string} labels - The label resolver (`Labels.js`'s `label`).
  * @param {function(string): string} slugFor - The file's shared slugger.
@@ -55,18 +54,8 @@ function renderDocumentEntry(document, labels, slugFor) {
    /** @type {string} The rendered item block. */
    const block = RENDERERS[document.type](document, { labels, slugFor: capturingSlugFor });
 
-   /** @type {number} The captured call that produced the item's own H4 heading slug. */
-   const itemIndex = capturedSlugs.findIndex((entry) => entry.text === document.name);
-   /** @type {{text: string, slug: string}} The item's own heading capture. */
-   const itemCapture = capturedSlugs[itemIndex];
-   /** @type {{text: string, slug: string}[]} Every other capture, i.e. attack headings (H5), in order. */
-   const attackCaptures = capturedSlugs.filter((_entry, index) => index !== itemIndex);
-
-   /** @type {TocEntry[]} The item's table-of-contents entries: its own heading, then its attacks. */
-   const entries = [
-      { text: escapeText(itemCapture.text), slug: itemCapture.slug },
-      ...attackCaptures.map((entry) => ({ text: escapeText(entry.text), slug: entry.slug })),
-   ];
+   /** @type {TocEntry[]} The item's table-of-contents entries, in `slugFor` call order. */
+   const entries = capturedSlugs.map((entry) => ({ text: escapeText(entry.text), slug: entry.slug }));
 
    return { block, entries };
 }
