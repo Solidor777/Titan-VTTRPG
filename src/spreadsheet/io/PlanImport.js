@@ -155,7 +155,7 @@ async function resolveExistingDocument(id, context) {
  * (or against bare document construction for a new compendium), and returns a full ImportPlan without
  * writing anything.
  *
- * A malformed schema-typed cell anywhere in the file (e.g. Non-numeric text in a number-typed field)
+ * A malformed schema-typed cell anywhere in the file (e.g. non-numeric text in a number-typed field)
  * makes `readTables` throw; that failure is coarser than a per-row error — it aborts reading the whole
  * file rather than just the offending row — and is reported as a single file-level entry on the
  * `'_manifest'` sheet rather than propagating out of this function.

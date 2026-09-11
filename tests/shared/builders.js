@@ -84,7 +84,7 @@ export function buildFlatModifierAbilityData(name, values) {
 
 /**
  * Builds an ability item create-payload carrying a single mulBase rules element on the Body attribute,
- * optionally followed by flatModifier elements. MulBase adds `base * (value - 1)` to the attribute mod.
+ * optionally followed by flatModifier elements. `mulBase` adds `base * (value - 1)` to the attribute mod.
  * @param {string} name - The ability name.
  * @param {number} mulValue - The mulBase multiplier value.
  * @param {number[]} [flatValues] - Optional flatModifier values appended after the mulBase element.

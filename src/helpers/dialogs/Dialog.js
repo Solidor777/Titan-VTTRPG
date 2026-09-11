@@ -48,7 +48,7 @@ export default class TitanDialog extends ApplicationV2 {
 
    /**
     * The Svelte content descriptor (`{ class, props }`) mounted into this dialog's window content.
-    * Exposed read-only for introspection (e.g. Unit tests verifying constructor wiring); the descriptor
+    * Exposed read-only for introspection (e.g. unit tests verifying constructor wiring); the descriptor
     * itself is kept off `this.options` so it never passes through ApplicationV2's option merge/freeze.
     * @type {{ class: import('svelte').Component, props: object }}
     */

@@ -13,7 +13,7 @@ import { describe, it, expect, beforeAll, afterAll } from 'vitest';
 class MockField {
    /**
     * Stores the field options.
-    * @param {object} options - The field configuration (e.g. Initial, nullable).
+    * @param {object} options - The field configuration (e.g. initial, nullable).
     */
    constructor(options = {}) {
       /** @type {object} The field configuration. */

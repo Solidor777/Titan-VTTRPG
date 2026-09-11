@@ -6,7 +6,7 @@ import { fileURLToPath } from 'node:url';
 /** Minimal stand-in for a Foundry DataField, matching real DataField's own instance-property copying. */
 class MockField {
    /**
-    * @param {object} options - The field configuration (e.g. Nullable).
+    * @param {object} options - The field configuration (e.g. nullable).
     */
    constructor(options = {}) {
       Object.assign(this, options);

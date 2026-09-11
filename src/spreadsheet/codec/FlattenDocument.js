@@ -15,7 +15,7 @@ const EXCLUDED_TOP_LEVEL_KEYS = new Set([
 /**
  * Recursively flattens one value into the accumulator, dotting object keys and array indices onto the
  * given path. An empty array contributes no entries (there is nothing to index); `null` is preserved as
- * a real value (e.g. A cleared nullable id field).
+ * a real value (e.g. a cleared nullable id field).
  * @param {string} path - The dotted path accumulated so far.
  * @param {*} value - The value at that path.
  * @param {Object<string,*>} flat - The accumulator map (mutated).

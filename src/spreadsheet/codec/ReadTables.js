@@ -99,7 +99,7 @@ function buildArrayPathExpander(arrayPath, allArrayPaths) {
  * by owning document id, ready to be merged into that document's own decoded flat row before
  * unflattening. Each cell decodes against the SAME schema `readTables` uses for the equivalent
  * wide-layout column: the expanded concrete path (indices spliced back in) is looked up in `fieldTypes`,
- * so a schema-typed array element (e.g. An ActiveEffect's `changes` field) decodes identically regardless
+ * so a schema-typed array element (e.g. an ActiveEffect's `changes` field) decodes identically regardless
  * of layout. A path with no schema entry still falls back to the untyped-bag literal rules (array-of-
  * object fields have no per-field schema type in this system — see resolveFieldSchema's ObjectField
  * handling).

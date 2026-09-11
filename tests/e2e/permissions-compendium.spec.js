@@ -17,9 +17,9 @@ test.describe('permissions — compendium ownership', () => {
     *   getUserLevel(user = game.user) → number (CONST.DOCUMENT_OWNERSHIP_LEVELS value)
     *   NONE=0, LIMITED=1, OBSERVER=2, OWNER=3.
     *
-    * GetUserLevel iterates this.ownership and calls user.hasRole(role) (non-exact, i.e. Role >=),
+    * `getUserLevel` iterates this.ownership and calls user.hasRole(role) (non-exact, i.e. role >=),
     * so a GAMEMASTER user satisfies both PLAYER and ASSISTANT entries and takes the max → OWNER (3).
-    * TestUserPermission short-circuits for isGM users, but getUserLevel does not need that
+    * `testUserPermission` short-circuits for isGM users, but getUserLevel does not need that
     * short-circuit because the hierarchy arithmetic already resolves OWNER for GMs.
     */
    test(

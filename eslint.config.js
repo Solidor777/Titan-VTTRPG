@@ -56,7 +56,20 @@ export default [
          // 'jsdoc/no-undefined-types': 1, // Recommended
          'jsdoc/require-asterisk-prefix': 1,
          'jsdoc/require-description': 1,
-         'jsdoc/require-description-complete-sentence': 1,
+         'jsdoc/require-description-complete-sentence': [
+            1,
+            {
+               // Prevents the fixer from treating the word after these abbreviations as a new sentence
+               // and capitalizing it.
+               abbreviations: [
+                  'e.g.',
+                  'i.e.',
+                  'etc.',
+                  'vs.',
+                  'cf.',
+               ],
+            },
+         ],
          // 'jsdoc/require-example': 1,
          // 'jsdoc/require-file-overview': 1,
          'jsdoc/require-hyphen-before-param-description': 1,

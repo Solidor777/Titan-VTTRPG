@@ -117,7 +117,7 @@ export async function ensureDocument(page, documentType, subtype, name) {
  * common text-bearing attributes, and tippy tooltip content (read from `_tippy.props.content`, which
  * is populated at mount so no hover is required).
  * @param {import('@playwright/test').Page} page - The Playwright page to evaluate within.
- * @param {string} rootSelector - CSS selector for the root element to scan (e.g. An app element).
+ * @param {string} rootSelector - CSS selector for the root element to scan (e.g. an app element).
  * @returns {Promise<string[]>} The offending strings (deduplicated) found under the root.
  */
 export async function collectLocalizationOffenders(page, rootSelector) {
@@ -141,7 +141,7 @@ export async function collectLocalizationOffenders(page, rootSelector) {
       ];
 
       /**
-       * Records a candidate string as an offender when it embeds the LOCAL. Namespace.
+       * Records a candidate string as an offender when it embeds the `LOCAL.` namespace prefix.
        * @param {unknown} value - The candidate string (ignored when not a non-empty string).
        * @returns {void}
        */

@@ -255,7 +255,7 @@ function buildWideSheet(documentType, flatRows, typeSchema) {
 }
 
 /**
- * Whether a discovered concrete path belongs to some array (i.e. Some detected array path's matcher
+ * Whether a discovered concrete path belongs to some array (i.e. some detected array path's matcher
  * accepts it), used to exclude array-derived columns from the document sheet's own scalar columns.
  * @param {string} path - A concrete discovered path.
  * @param {Array<(path:string)=>object|null>} matchers - One matcher per detected array path.

@@ -13,7 +13,7 @@
 export class MockField {
    /**
     * Stores the field options.
-    * @param {object} options - The field configuration (e.g. Initial, nullable, integer).
+    * @param {object} options - The field configuration (e.g. initial, nullable, integer).
     */
    constructor(options = {}) {
       /** @type {object} The field configuration. */
