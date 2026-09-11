@@ -17,7 +17,14 @@ function fixtureEnvelopes() {
    return [
       {
          documentType: 'weapon',
-         source: { _id: 'a'.repeat(16), name: 'Sword', type: 'weapon', img: 'i.svg', sort: 1, system: { rarity: 'common' } },
+         source: {
+            _id: 'a'.repeat(16),
+            name: 'Sword',
+            type: 'weapon',
+            img: 'i.svg',
+            sort: 1,
+            system: { rarity: 'common' },
+         },
          parentId: '',
          folderPath: '',
       },
@@ -29,13 +36,27 @@ function fixtureEnvelopes() {
       },
       {
          documentType: 'armor',
-         source: { _id: 'b'.repeat(16), name: 'Plate', type: 'armor', img: 'i.svg', sort: 1, system: { rarity: 'common' } },
+         source: {
+            _id: 'b'.repeat(16),
+            name: 'Plate',
+            type: 'armor',
+            img: 'i.svg',
+            sort: 1,
+            system: { rarity: 'common' },
+         },
          parentId: '',
          folderPath: '',
       },
       {
          documentType: 'spell',
-         source: { _id: 'c'.repeat(16), name: 'Fireball', type: 'spell', img: 'i.svg', sort: 1, system: { tradition: 'evocation' } },
+         source: {
+            _id: 'c'.repeat(16),
+            name: 'Fireball',
+            type: 'spell',
+            img: 'i.svg',
+            sort: 1,
+            system: { tradition: 'evocation' },
+         },
          parentId: '',
          folderPath: 'Magic/Fire',
       },
@@ -72,7 +93,13 @@ describe('workbookToDocuments', () => {
       /** @type {object[]} Same fixture, but the weapon carries a nested array to exercise a child sheet. */
       const envelopes = fixtureEnvelopes().map((envelope) => (
          envelope.documentType === 'weapon'
-            ? { ...envelope, source: { ...envelope.source, system: { rarity: 'common', attack: [{ damage: 5 }, { damage: 3 }] } } }
+            ? {
+               ...envelope,
+               source: {
+                  ...envelope.source,
+                  system: { rarity: 'common', attack: [{ damage: 5 }, { damage: 3 }] },
+               },
+            }
             : envelope
       ));
       /** @type {import('~/spreadsheet/codec/Workbook.js').Workbook} */
@@ -89,7 +116,9 @@ describe('workbookToDocuments', () => {
       /** @type {Object<string, string>} */
       const csvFiles = Object.fromEntries(built.sheets.map((sheet) => [`${sheet.name}.csv`, encodeCsv(sheet)]));
       /** @type {import('~/spreadsheet/codec/Workbook.js').Workbook} */
-      const decoded = { sheets: Object.entries(csvFiles).map(([name, text]) => decodeCsv(text, name.replace(/\.csv$/, ''))) };
+      const decoded = {
+         sheets: Object.entries(csvFiles).map(([name, text]) => decodeCsv(text, name.replace(/\.csv$/, ''))),
+      };
 
       assertFixtureDocuments(workbookToDocuments(decoded));
    });
@@ -97,7 +126,12 @@ describe('workbookToDocuments', () => {
    it('refuses an Actor pack export', () => {
       /** @type {import('~/spreadsheet/codec/Workbook.js').Workbook} */
       const built = buildTables(
-         [{ documentType: 'npc', source: { _id: 'a'.repeat(16), name: 'Goblin', type: 'npc', system: {} }, parentId: '', folderPath: '' }],
+         [{
+            documentType: 'npc',
+            source: { _id: 'a'.repeat(16), name: 'Goblin', type: 'npc', system: {} },
+            parentId: '',
+            folderPath: '',
+         }],
          'wide',
          'Actor',
          NO_SCHEMA,
@@ -111,7 +145,12 @@ describe('workbookToDocuments', () => {
    it('refuses an ActiveEffect pack export', () => {
       /** @type {import('~/spreadsheet/codec/Workbook.js').Workbook} */
       const built = buildTables(
-         [{ documentType: 'effect', source: { _id: 'a'.repeat(16), name: 'Blessed', type: 'effect', system: {} }, parentId: '', folderPath: '' }],
+         [{
+            documentType: 'effect',
+            source: { _id: 'a'.repeat(16), name: 'Blessed', type: 'effect', system: {} },
+            parentId: '',
+            folderPath: '',
+         }],
          'wide',
          'ActiveEffect',
          NO_SCHEMA,

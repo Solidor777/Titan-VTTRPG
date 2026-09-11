@@ -45,7 +45,9 @@ export function workbookToDocuments(workbook) {
       /** @type {string|undefined} The first sheet name that isn't an Item subtype. */
       const unknownSheet = workbook.sheets.map((s) => s.name).find((name) => !ITEM_TYPES.has(name));
       if (unknownSheet !== undefined) {
-         throw new Error(`Only Item compendium exports can be rendered as Markdown (unknown sheet type: ${unknownSheet})`);
+         throw new Error(
+            `Only Item compendium exports can be rendered as Markdown (unknown sheet type: ${unknownSheet})`,
+         );
       }
    }
 
