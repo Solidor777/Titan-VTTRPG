@@ -504,7 +504,7 @@ when fixed.
   `untrack(...)`, matching the identical one-shot-capture-from-context pattern already established
   in `DocumentPathRaritySelect.svelte`.
 
-### 42. Dynamic-import-pattern unit tests intermittently time out under the full unit suite's parallel worker pool (was OPEN_BUGS #1)
+### 42. Dynamic-import unit tests intermittently time out under the full suite's parallel workers (was OPEN_BUGS #1)
 
 - **What:** `tests/unit/spreadsheet/ui/ExportDialog.test.js`, `ImportDialog.test.js`, and
   `tests/unit/hooks/OnGetCompendiumContextOptions.test.js` mocked a dialog shell with `vi.mock(...)`
