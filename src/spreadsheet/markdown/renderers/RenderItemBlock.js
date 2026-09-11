@@ -31,6 +31,24 @@ export function commonStatLines(system, labels) {
 }
 
 /**
+ * Strips a stat-line group's trailing hard-break from its last line. The compendium's two-space hard
+ * break marks a line continuing into the next *non-blank* line; a group immediately followed by a
+ * blank separator (rather than another stat line or `---`) carries no hard break on its last line.
+ * @param {string[]} statLines - A stat-line group, each line already carrying its own hard break.
+ * @returns {string[]} The same lines, with the last line's trailing hard-break removed.
+ */
+function stripTrailingHardBreak(statLines) {
+   if (statLines.length === 0) {
+      return statLines;
+   }
+
+   /** @type {string[]} A copy of the group, so the source array is left untouched. */
+   const lines = [...statLines];
+   lines[lines.length - 1] = lines[lines.length - 1].replace(/ {2}$/, '');
+   return lines;
+}
+
+/**
  * Assembles an item's rendered Markdown block per the compendium's item block format: an H4 heading,
  * a blank line, the item's stat lines followed by a `---` separator (or, when one or more attack
  * sections are supplied, the item's own stat lines with no separator, a blank line, then each attack
@@ -60,12 +78,15 @@ export function renderItemBlock({
 
    if (attackSections.length > 0) {
       if (statLines.length > 0) {
-         lines.push(...statLines, '');
+         lines.push(...stripTrailingHardBreak(statLines), '');
       }
 
       attackSections.forEach((section, index) => {
-         lines.push(heading(5, section.headingText, section.slug), '', ...section.statLines);
-         lines.push(index === attackSections.length - 1 ? '---' : '');
+         /** @type {boolean} Whether this is the final attack section, closed by `---` (not a blank line). */
+         const isLast = index === attackSections.length - 1;
+         lines.push(heading(5, section.headingText, section.slug), '');
+         lines.push(...(isLast ? section.statLines : stripTrailingHardBreak(section.statLines)));
+         lines.push(isLast ? '---' : '');
       });
    }
    else {

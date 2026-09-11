@@ -116,9 +116,9 @@ describe('renderWeapon', () => {
 
       expect(renderWeapon(document, realContext())).toBe(
          '#### ***Dagger*** {#dagger}\n\n'
-         + '**Value:** 20  \n\n'
+         + '**Value:** 20\n\n'
          + '##### ***Strike (Melee)*** {#strike-melee}\n\n'
-         + '**Damage:** 1 \\+ ES  \n**Traits:** Flurry, Slashing  \n\n'
+         + '**Damage:** 1 \\+ ES  \n**Traits:** Flurry, Slashing\n\n'
          + '##### ***Throw (Ranged)*** {#throw-ranged}\n\n'
          + '**Damage:** 1 \\+ ES  \n**Range:** 5 spaces  \n**Traits:** Slashing  \n---\n\n'
          + 'This small, bladed weapon is held in one hand and used to stab a creature in close combat. '
@@ -250,9 +250,9 @@ describe('renderWeapon', () => {
       const result = renderWeapon(document, realContext());
       expect(result).toBe(
          '#### ***Twin Fangs*** {#twin-fangs}\n\n'
-         + '**Poison:** Body (Melee Weapons) 4:1  \n\n'
+         + '**Poison:** Body (Melee Weapons) 4:1\n\n'
          + '##### ***Bite (Melee)*** {#bite-melee}\n\n'
-         + '**Damage:** 1 \\+ ES  \n\n'
+         + '**Damage:** 1 \\+ ES\n\n'
          + '##### ***Sting (Melee)*** {#sting-melee}\n\n'
          + '**Damage:** 1 \\+ ES  \n---\n\n---',
       );

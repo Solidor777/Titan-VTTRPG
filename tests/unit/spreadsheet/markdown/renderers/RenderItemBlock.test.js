@@ -85,9 +85,9 @@ describe('renderItemBlock', () => {
          ],
       })).toBe(
          '#### ***Dagger*** {#dagger}\n\n'
-         + '**Value:** 20  \n\n'
+         + '**Value:** 20\n\n'
          + '##### ***Strike (Melee)*** {#strike-melee}\n\n'
-         + '**Damage:** 1 \\+ ES  \n**Traits:** Flurry, Slashing  \n\n'
+         + '**Damage:** 1 \\+ ES  \n**Traits:** Flurry, Slashing\n\n'
          + '##### ***Throw (Ranged)*** {#throw-ranged}\n\n'
          + '**Damage:** 1 \\+ ES  \n**Range:** 5 spaces  \n**Traits:** Slashing  \n---\n\n'
          + 'A small blade.  \n---',
