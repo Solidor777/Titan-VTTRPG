@@ -3,6 +3,30 @@
 > Descriptive only. For the authoritative style/formatting/documentation rules, see
 > `.claude/CLAUDE.md` (summarized at the bottom of this file).
 
+## ESLint-enforced formatting rules
+
+Seven of the house formatting rules in `.claude/CLAUDE.md` are ESLint-enforced (`eslint.config.js`),
+not just documented — `npx eslint .` must report 0 errors:
+
+- **120-char wrap** — `@stylistic/max-len` (`code: 120`, `ignoreUrls`, `ignoreRegExpLiterals`).
+- **Braces on every conditional** — core `curly: ['error', 'all']`.
+- **Multi-line object literals with 2+ properties** — `@stylistic/object-curly-newline` +
+  `@stylistic/object-property-newline`, scoped to `ObjectExpression` so destructuring/imports/exports
+  are untouched.
+- **Multi-line array literals with 2+ elements** — a local rule, `titan/array-literal-newline`
+  (`eslint/rules/array-literal-newline.js`), written locally because
+  `@stylistic/array-bracket-newline`/`array-element-newline` cannot be scoped away from destructuring
+  patterns; unit-tested at `tests/unit/eslint/ArrayLiteralNewline.test.js`.
+- **Trailing commas on every multi-line literal/import/export/argument list** —
+  `@stylistic/comma-dangle: ['error', 'always-multiline']`.
+- **No trailing whitespace on any line** — `@stylistic/no-trailing-spaces`.
+- **Exactly one trailing newline per file** — `@stylistic/eol-last`.
+
+`@stylistic/indent` (3-space, `SwitchCase: 1`) covers `.js`/`.mjs`/`.cjs`; `svelte/indent` (same
+settings) covers `.svelte` files instead, since `@stylistic/indent` misjudges markup-nested mustache
+expressions (e.g. under `{#if}`) as JS continuation lines. Pre-existing `jsdoc/*` warnings are out of
+scope for this enforcement.
+
 ## Import maps
 
 There are no TyphonJS runtime imports in `src/` — the v14 migration removed
