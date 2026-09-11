@@ -17,7 +17,15 @@ export const PLURAL_TYPE_LABELS = {
  * The fixed rendering order for Item pack types (root type groups and spell aspect ordering).
  * @type {string[]}
  */
-export const TYPE_ORDER = ['weapon', 'armor', 'shield', 'equipment', 'commodity', 'ability', 'spell'];
+export const TYPE_ORDER = [
+   'weapon',
+   'armor',
+   'shield',
+   'equipment',
+   'commodity',
+   'ability',
+   'spell',
+];
 
 /**
  * Builds a pure label lookup over a Foundry language JSON's `LOCAL` map.

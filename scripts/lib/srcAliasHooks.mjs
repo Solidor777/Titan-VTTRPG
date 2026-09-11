@@ -19,6 +19,7 @@ const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..'
  */
 export async function resolve(specifier, context, nextResolve) {
    if (specifier.startsWith('~/')) {
+      /** @type {string} The resolved absolute filesystem path under `src/`. */
       const targetPath = path.join(repoRoot, 'src', specifier.slice(2));
       return {
          url: pathToFileURL(targetPath).href,

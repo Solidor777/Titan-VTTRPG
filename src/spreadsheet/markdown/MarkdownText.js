@@ -89,6 +89,7 @@ export function heading(level, text, slug) {
    /** @type {string} The escaped heading text. */
    const escaped = escapeText(text);
 
+   /** @type {string} The heading text with its level-specific emphasis applied. */
    let body;
    if (level === 3) {
       body = `**${escaped}**`;

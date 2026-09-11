@@ -15,7 +15,15 @@ describe('PLURAL_TYPE_LABELS and TYPE_ORDER', () => {
    });
 
    it('fixes the type rendering order', () => {
-      expect(TYPE_ORDER).toEqual(['weapon', 'armor', 'shield', 'equipment', 'commodity', 'ability', 'spell']);
+      expect(TYPE_ORDER).toEqual([
+         'weapon',
+         'armor',
+         'shield',
+         'equipment',
+         'commodity',
+         'ability',
+         'spell',
+      ]);
    });
 });
 
