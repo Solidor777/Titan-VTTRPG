@@ -87,23 +87,10 @@ describe('calculateSpellAspectCosts', () => {
       expect(result.aspectCosts).toEqual([1]);
    });
 
-   it('leaves scalingCosts undefined, matching original behaviour: no aspect settings block defines a ' +
-      'scalingCost (only templates do, and the source only ever reads settings.scalingCost)', () => {
-      const result = calculateSpellAspectCosts(
-         [
-            aspect({ label: 'duration', unit: 'rounds' }),
-            aspect({ label: 'range', initialValue: 'self' }),
-         ],
-         [],
-      );
-      expect(result.scalingCosts).toEqual([undefined, undefined]);
-   });
-
    it('disables an aspect requiring an option when no option is selected', () => {
       const result = calculateSpellAspectCosts([aspect({ label: 'decreaseMod', option: [] })], []);
       expect(result.enabled).toEqual([false]);
       expect(result.aspectCosts).toEqual([0]);
-      expect(result.scalingCosts).toEqual([undefined]);
    });
 
    it('sums the cost of custom aspects into the total', () => {

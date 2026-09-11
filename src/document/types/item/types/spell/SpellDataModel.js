@@ -39,9 +39,6 @@ export default class SpellDataModel extends TitanItemDataModel {
       this.aspect.forEach((aspect, idx) => {
          aspect.enabled = result.enabled[idx];
          aspect.cost = result.aspectCosts[idx];
-         if (result.scalingCosts[idx] !== undefined) {
-            aspect.scalingLost = result.scalingCosts[idx];
-         }
       });
 
       this.totalAspectCost = result.totalAspectCost;

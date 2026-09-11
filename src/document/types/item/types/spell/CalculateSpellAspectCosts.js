@@ -5,8 +5,6 @@ import SpellAspects from '~/document/types/item/types/spell/SpellAspects.js';
  * Index-aligned per-aspect results plus the spell-level totals derived from them.
  * @property {number[]} aspectCosts - The computed cost of each standard aspect.
  * @property {boolean[]} enabled - Whether each standard aspect is enabled.
- * @property {(number|undefined)[]} scalingCosts - Each aspect's `scalingCost` setting, or `undefined`
- * when the aspect has none.
  * @property {number} totalAspectCost - The sum of every enabled standard aspect's cost plus every
  * custom aspect's cost.
  * @property {number} difficulty - The suggested casting check difficulty derived from the total cost.
@@ -28,9 +26,6 @@ export default function calculateSpellAspectCosts(aspects, customAspects) {
    /** @type {boolean[]} */
    const enabled = [];
 
-   /** @type {(number|undefined)[]} */
-   const scalingCosts = [];
-
    // Total cost across every enabled standard aspect and every custom aspect.
    let totalAspectCost = 0;
 
@@ -40,12 +35,10 @@ export default function calculateSpellAspectCosts(aspects, customAspects) {
       const settings = aspectSettings.settings;
       const template = aspectSettings.template;
 
-      // The aspect is disabled if it requires an option and has no options set. A disabled aspect
-      // reports no scaling cost: the original code path never read settings.scalingCost here.
+      // The aspect is disabled if it requires an option and has no options set.
       if (settings?.requireOption && aspect.option.length === 0 && !aspect.allOptions) {
          enabled.push(false);
          aspectCosts.push(0);
-         scalingCosts.push(undefined);
          continue;
       }
 
@@ -91,7 +84,6 @@ export default function calculateSpellAspectCosts(aspects, customAspects) {
       }
 
       aspectCosts.push(aspectCost);
-      scalingCosts.push(settings?.scalingCost);
       totalAspectCost += aspectCost;
    }
 
@@ -114,7 +106,6 @@ export default function calculateSpellAspectCosts(aspects, customAspects) {
    return {
       aspectCosts,
       enabled,
-      scalingCosts,
       totalAspectCost,
       difficulty,
       complexity,
