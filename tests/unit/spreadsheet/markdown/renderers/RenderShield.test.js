@@ -93,11 +93,11 @@ describe('renderShield', () => {
             defense: 2,
             trait: [{
                name: 'magical',
-               value: true 
+               value: true,
             }],
             customTrait: [{
                name: 'Blessed',
-               description: '' 
+               description: '',
             }],
             check: [{
                label: 'Ward',

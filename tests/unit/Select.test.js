@@ -20,10 +20,10 @@ describe('Select', () => {
             options: [
                'body',
                'mind',
-               'soul'
+               'soul',
             ],
-            value: 'mind' 
-         } 
+            value: 'mind',
+         },
       });
       const trigger = screen.getByRole('combobox');
       expect(trigger.textContent).toContain('mind');
@@ -37,7 +37,7 @@ describe('Select', () => {
             options: [
                'body',
                'mind',
-               'soul'
+               'soul',
             ],
             value: 'body',
             onchange,
@@ -60,7 +60,7 @@ describe('Select', () => {
          props: {
             options: [
                'body',
-               'mind'
+               'mind',
             ],
             value: 'not-a-real-value',
             onchange,
@@ -76,8 +76,8 @@ describe('Select', () => {
          props: {
             options: ['body'],
             value: 'body',
-            disabled: true 
-         } 
+            disabled: true,
+         },
       });
       expect(screen.getByRole('combobox').disabled).toBe(true);
    });
@@ -86,8 +86,8 @@ describe('Select', () => {
       render(Select, {
          props: {
             options: [],
-            value: void 0 
-         } 
+            value: void 0,
+         },
       });
       const trigger = screen.getByRole('combobox');
 

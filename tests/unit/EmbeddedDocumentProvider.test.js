@@ -32,7 +32,7 @@ function makeActorWithWeapon() {
    };
    actorDoc.items = new Map([[
       'w1',
-      weapon
+      weapon,
    ]]);
 
    return {
@@ -50,11 +50,11 @@ describe('EmbeddedDocumentProvider', () => {
          context: new Map([
             [
                'document',
-               bridge
+               bridge,
             ],
             [
                'sheetDocument',
-               bridge
+               bridge,
             ],
          ]),
       });
@@ -71,11 +71,11 @@ describe('EmbeddedDocumentProvider', () => {
          context: new Map([
             [
                'document',
-               bridge
+               bridge,
             ],
             [
                'sheetDocument',
-               bridge
+               bridge,
             ],
          ]),
       });
@@ -116,11 +116,11 @@ describe('EmbeddedDocumentProvider', () => {
             context: new Map([
                [
                   'document',
-                  bridge
+                  bridge,
                ],
                [
                   'sheetDocument',
-                  bridge
+                  bridge,
                ],
             ]),
          });

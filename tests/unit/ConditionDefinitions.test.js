@@ -154,7 +154,7 @@ describe('buildConditionDefinitions', () => {
          'deafened',
          'frightened',
          'incapacitated',
-         'unconscious'
+         'unconscious',
       ]) {
          expect(def(id).system, `${id} should have no system.rulesElement`).toBeUndefined();
       }

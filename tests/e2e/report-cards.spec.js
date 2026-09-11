@@ -116,7 +116,7 @@ test.describe('report chat-message subtype cards', () => {
             // A base player has stamina max 3 and no equipped armor (so 5 damage lands in full).
             const actor = await Actor.create({
                name: `E2E Damage ${Date.now()}`,
-               type: 'player' 
+               type: 'player',
             });
 
             const before = game.messages.size;
@@ -151,7 +151,7 @@ test.describe('report chat-message subtype cards', () => {
          const result = await page.evaluate(async () => {
             const actor = await Actor.create({
                name: `E2E LegacyDamage ${Date.now()}`,
-               type: 'player' 
+               type: 'player',
             });
 
             // A pre-2026-09-10 damageReport message, shaped with the legacy top-level `stamina` key
@@ -165,7 +165,7 @@ test.describe('report chat-message subtype cards', () => {
                   damageTaken: 1,
                   stamina: {
                      value: 1,
-                     max: 6 
+                     max: 6,
                   },
                },
             });
@@ -194,7 +194,7 @@ test.describe('report chat-message subtype cards', () => {
             // Seed stamina below max so a heal moves it (healing of a full resource produces no report).
             const actor = await Actor.create({
                name: `E2E Healing ${Date.now()}`,
-               type: 'player' 
+               type: 'player',
             });
             await actor.update({ system: { resource: { stamina: { value: 0 } } } });
 
@@ -205,7 +205,7 @@ test.describe('report chat-message subtype cards', () => {
             const newest = game.messages.contents.at(-1);
             const out = {
                messageId: newest?.id,
-               messageType: newest?.type 
+               messageType: newest?.type,
             };
             await actor.delete();
             return out;
@@ -218,7 +218,7 @@ test.describe('report chat-message subtype cards', () => {
          const result = await page.evaluate(async () => {
             const actor = await Actor.create({
                name: `E2E Resolve ${Date.now()}`,
-               type: 'player' 
+               type: 'player',
             });
 
             const before = game.messages.size;
@@ -229,7 +229,7 @@ test.describe('report chat-message subtype cards', () => {
             const newest = game.messages.contents.at(-1);
             const out = {
                messageId: newest?.id,
-               messageType: newest?.type 
+               messageType: newest?.type,
             };
             await actor.delete();
             return out;
@@ -243,7 +243,7 @@ test.describe('report chat-message subtype cards', () => {
             // Rend requires an equipped armor with a positive armor value.
             const actor = await Actor.create({
                name: `E2E Rend ${Date.now()}`,
-               type: 'player' 
+               type: 'player',
             });
             const [armor] = await actor.createEmbeddedDocuments('Item', [
                {
@@ -252,9 +252,9 @@ test.describe('report chat-message subtype cards', () => {
                   system: {
                      armor: {
                         value: 4,
-                        max: 4 
-                     } 
-                  } 
+                        max: 4,
+                     },
+                  },
                },
             ]);
             await actor.update({ system: { equipped: { armor: armor.id } } });
@@ -266,7 +266,7 @@ test.describe('report chat-message subtype cards', () => {
             const newest = game.messages.contents.at(-1);
             const out = {
                messageId: newest?.id,
-               messageType: newest?.type 
+               messageType: newest?.type,
             };
             await actor.delete();
             return out;
@@ -280,7 +280,7 @@ test.describe('report chat-message subtype cards', () => {
             // Repairs requires an equipped armor whose value is below its max.
             const actor = await Actor.create({
                name: `E2E Repairs ${Date.now()}`,
-               type: 'player' 
+               type: 'player',
             });
             const [armor] = await actor.createEmbeddedDocuments('Item', [
                {
@@ -289,9 +289,9 @@ test.describe('report chat-message subtype cards', () => {
                   system: {
                      armor: {
                         value: 1,
-                        max: 4 
-                     } 
-                  } 
+                        max: 4,
+                     },
+                  },
                },
             ]);
             await actor.update({ system: { equipped: { armor: armor.id } } });
@@ -303,7 +303,7 @@ test.describe('report chat-message subtype cards', () => {
             const newest = game.messages.contents.at(-1);
             const out = {
                messageId: newest?.id,
-               messageType: newest?.type 
+               messageType: newest?.type,
             };
             await actor.delete();
             return out;
@@ -316,7 +316,7 @@ test.describe('report chat-message subtype cards', () => {
          const result = await page.evaluate(async () => {
             const actor = await Actor.create({
                name: `E2E RemoveFX ${Date.now()}`,
-               type: 'player' 
+               type: 'player',
             });
 
             const before = game.messages.size;
@@ -326,7 +326,7 @@ test.describe('report chat-message subtype cards', () => {
             const newest = game.messages.contents.at(-1);
             const out = {
                messageId: newest?.id,
-               messageType: newest?.type 
+               messageType: newest?.type,
             };
             await actor.delete();
             return out;
@@ -339,7 +339,7 @@ test.describe('report chat-message subtype cards', () => {
          const result = await page.evaluate(async () => {
             const actor = await Actor.create({
                name: `E2E ShortRest ${Date.now()}`,
-               type: 'player' 
+               type: 'player',
             });
 
             const before = game.messages.size;
@@ -349,7 +349,7 @@ test.describe('report chat-message subtype cards', () => {
             const newest = game.messages.contents.at(-1);
             const out = {
                messageId: newest?.id,
-               messageType: newest?.type 
+               messageType: newest?.type,
             };
             await actor.delete();
             return out;
@@ -362,7 +362,7 @@ test.describe('report chat-message subtype cards', () => {
          const result = await page.evaluate(async () => {
             const actor = await Actor.create({
                name: `E2E LongRest ${Date.now()}`,
-               type: 'player' 
+               type: 'player',
             });
 
             const before = game.messages.size;
@@ -372,7 +372,7 @@ test.describe('report chat-message subtype cards', () => {
             const newest = game.messages.contents.at(-1);
             const out = {
                messageId: newest?.id,
-               messageType: newest?.type 
+               messageType: newest?.type,
             };
             await actor.delete();
             return out;
@@ -399,7 +399,7 @@ test.describe('report chat-message subtype cards', () => {
          const result = await page.evaluate(async () => {
             const actor = await Actor.create({
                name: `E2E TurnStart ${Date.now()}`,
-               type: 'player' 
+               type: 'player',
             });
             // A turnStart fast-healing ability gives the start-of-turn report content.
             await actor.createEmbeddedDocuments('Item', [
@@ -412,7 +412,7 @@ test.describe('report chat-message subtype cards', () => {
                            operation: 'fastHealing',
                            selector: 'turnStart',
                            value: 2,
-                           uuid: 'e2e-fh-ts' 
+                           uuid: 'e2e-fh-ts',
                         },
                      ],
                   },
@@ -428,7 +428,7 @@ test.describe('report chat-message subtype cards', () => {
             const newest = game.messages.contents.at(-1);
             const out = {
                messageId: newest?.id,
-               messageType: newest?.type 
+               messageType: newest?.type,
             };
             await actor.delete();
             return out;
@@ -441,7 +441,7 @@ test.describe('report chat-message subtype cards', () => {
          const result = await page.evaluate(async () => {
             const actor = await Actor.create({
                name: `E2E TurnEnd ${Date.now()}`,
-               type: 'player' 
+               type: 'player',
             });
             // A turnEnd fast-healing ability gives the end-of-turn report content.
             await actor.createEmbeddedDocuments('Item', [
@@ -454,7 +454,7 @@ test.describe('report chat-message subtype cards', () => {
                            operation: 'fastHealing',
                            selector: 'turnEnd',
                            value: 2,
-                           uuid: 'e2e-fh-te' 
+                           uuid: 'e2e-fh-te',
                         },
                      ],
                   },
@@ -469,7 +469,7 @@ test.describe('report chat-message subtype cards', () => {
             const newest = game.messages.contents.at(-1);
             const out = {
                messageId: newest?.id,
-               messageType: newest?.type 
+               messageType: newest?.type,
             };
             await actor.delete();
             return out;
@@ -490,7 +490,7 @@ test.describe('report chat-message subtype cards', () => {
          const result = await page.evaluate(async () => {
             const actor = await Actor.create({
                name: `E2E RevertStart ${Date.now()}`,
-               type: 'player' 
+               type: 'player',
             });
             await actor.createEmbeddedDocuments('Item', [
                {
@@ -502,7 +502,7 @@ test.describe('report chat-message subtype cards', () => {
                            operation: 'fastHealing',
                            selector: 'turnStart',
                            value: 2,
-                           uuid: 'e2e-fh-rts' 
+                           uuid: 'e2e-fh-rts',
                         },
                      ],
                   },
@@ -516,7 +516,7 @@ test.describe('report chat-message subtype cards', () => {
             const newest = game.messages.contents.at(-1);
             const out = {
                messageId: newest?.id,
-               messageType: newest?.type 
+               messageType: newest?.type,
             };
             await actor.delete();
             return out;
@@ -529,7 +529,7 @@ test.describe('report chat-message subtype cards', () => {
          const result = await page.evaluate(async () => {
             const actor = await Actor.create({
                name: `E2E RevertEnd ${Date.now()}`,
-               type: 'player' 
+               type: 'player',
             });
             await actor.createEmbeddedDocuments('Item', [
                {
@@ -541,7 +541,7 @@ test.describe('report chat-message subtype cards', () => {
                            operation: 'fastHealing',
                            selector: 'turnEnd',
                            value: 2,
-                           uuid: 'e2e-fh-rte' 
+                           uuid: 'e2e-fh-rte',
                         },
                      ],
                   },
@@ -555,7 +555,7 @@ test.describe('report chat-message subtype cards', () => {
             const newest = game.messages.contents.at(-1);
             const out = {
                messageId: newest?.id,
-               messageType: newest?.type 
+               messageType: newest?.type,
             };
             await actor.delete();
             return out;
@@ -582,7 +582,7 @@ test.describe('report chat-message subtype cards', () => {
          const setup = await page.evaluate(async () => {
             const actor = await Actor.create({
                name: `E2E ApplyFH ${Date.now()}`,
-               type: 'player' 
+               type: 'player',
             });
             await actor.createEmbeddedDocuments('Item', [
                {
@@ -594,7 +594,7 @@ test.describe('report chat-message subtype cards', () => {
                            operation: 'fastHealing',
                            selector: 'turnStart',
                            value: 2,
-                           uuid: 'e2e-fh-apply' 
+                           uuid: 'e2e-fh-apply',
                         },
                      ],
                   },

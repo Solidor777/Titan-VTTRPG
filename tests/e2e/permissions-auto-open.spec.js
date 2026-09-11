@@ -71,7 +71,7 @@ test.describe('permissions — auto-open character sheets', () => {
                ({ combatId, combatantId }) => game.combats.get(combatId)?.combatant?.id === combatantId,
                {
                   combatId: ids.combatId,
-                  combatantId: ids.effectCombatantId 
+                  combatantId: ids.effectCombatantId,
                },
                { timeout: 1000 },
             );

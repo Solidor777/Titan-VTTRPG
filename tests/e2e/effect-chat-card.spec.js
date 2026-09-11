@@ -131,7 +131,7 @@ test.describe('effect chat-message subtype card', () => {
          };
       }, {
          actorName: ACTOR_NAME,
-         effectName: EFFECT_NAME 
+         effectName: EFFECT_NAME,
       });
 
       // A new message must have been created with the effect subtype.
@@ -204,7 +204,7 @@ test.describe('effect chat-message subtype card', () => {
 
          return {
             enabled,
-            disabled 
+            disabled,
          };
       });
 

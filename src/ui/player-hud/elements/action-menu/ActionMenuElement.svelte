@@ -13,7 +13,7 @@
     * @property {HudLayoutState} layoutState - Shared layout/UI state.
     * @property {object} options - The actionMenu options.
     * @property {string} chipCorner - The minimize-chip corner ('top-right' | 'top-left' |
-    *    'bottom-right' | 'bottom-left'), so the category bar reserves its gutter on the chip's side.
+    * 'bottom-right' | 'bottom-left'), so the category bar reserves its gutter on the chip's side.
     */
 
    /** @type {ActionMenuElementProps} */
@@ -35,7 +35,7 @@
       'equipped',
       'quantity-',
       'duration-',
-      'remove'
+      'remove',
    ];
 
    /** @type {HTMLElement | undefined} The element root, for click-away containment checks. */
@@ -64,7 +64,7 @@
       return buildActionMenuModel({
          actors,
          primary: document.data,
-         options 
+         options,
       }).map((entry) => {
          if (entry.key !== 'utility') {
             return entry;

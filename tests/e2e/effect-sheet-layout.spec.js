@@ -39,14 +39,14 @@ test('effect AE sheet renders with a non-collapsed content body', async () => {
       const actor = game.actors.find((a) => a.type === 'player')
          ?? await Actor.create({
             name: 'Layout Host',
-            type: 'player' 
+            type: 'player',
          });
       let effect = actor.effects.find((e) => e.type === 'effect');
       if (!effect) {
          const [created] = await actor.createEmbeddedDocuments('ActiveEffect', [
             {
                name: 'Layout Effect',
-               type: 'effect' 
+               type: 'effect',
             },
          ]);
          effect = created;
@@ -79,14 +79,14 @@ test('effect AE sheet renders the description in the inactive editor view', asyn
       const actor = game.actors.find((a) => a.type === 'player')
          ?? await Actor.create({
             name: 'Layout Host',
-            type: 'player' 
+            type: 'player',
          });
       await actor.effects.find((e) => e.name === 'Layout Described Effect')?.delete();
       const [effect] = await actor.createEmbeddedDocuments('ActiveEffect', [
          {
             name: 'Layout Described Effect',
             type: 'effect',
-            description: '<p>Blessed by the sun.</p>' 
+            description: '<p>Blessed by the sun.</p>',
          },
       ]);
       const app = await effect.sheet.render(true);

@@ -49,7 +49,7 @@ function renderDocumentEntry(document, labels, slugFor) {
       const slug = slugFor(text);
       capturedSlugs.push({
          text,
-         slug 
+         slug,
       });
       return slug;
    }
@@ -57,18 +57,18 @@ function renderDocumentEntry(document, labels, slugFor) {
    /** @type {string} The rendered item block. */
    const block = RENDERERS[document.type](document, {
       labels,
-      slugFor: capturingSlugFor 
+      slugFor: capturingSlugFor,
    });
 
    /** @type {TocEntry[]} The item's table-of-contents entries, in `slugFor` call order. */
    const entries = capturedSlugs.map((entry) => ({
       text: escapeText(entry.text),
-      slug: entry.slug 
+      slug: entry.slug,
    }));
 
    return {
       block,
-      entries 
+      entries,
    };
 }
 
@@ -88,7 +88,7 @@ function walkSection(section, labels, slugFor, tocEntries, bodyBlocks) {
    bodyBlocks.push(heading(section.level, section.text, slug));
    tocEntries.push({
       text: escapeText(section.text),
-      slug 
+      slug,
    });
 
    for (const document of section.documents) {
@@ -127,11 +127,11 @@ export function renderCompendiumMarkdown(documents, { title, labels }) {
    const tocEntries = [
       {
          text: escapeText(title),
-         slug: titleSlug 
+         slug: titleSlug,
       },
       {
          text: escapeText('Contents'),
-         slug: contentsSlug 
+         slug: contentsSlug,
       },
    ];
    /** @type {string[]} The rendered section headings and item blocks, in document order. */

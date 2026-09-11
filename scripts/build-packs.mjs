@@ -53,7 +53,7 @@ async function buildPacks() {
       await clearPack(dest);
       await compilePack(path.join(sourceRoot, name), dest, {
          recursive: true,
-         log: true 
+         log: true,
       });
       console.log(`Compiled packs/_source/${name} → packs/${name}`);
    }

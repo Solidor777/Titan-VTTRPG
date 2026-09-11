@@ -40,11 +40,11 @@ describe('ReportChatMessageDataModel.migrateData', () => {
       const source = {
          stamina: {
             value: 1,
-            max: 6 
+            max: 6,
          },
          wounds: {
             value: 0,
-            max: 2 
+            max: 2,
          },
       };
 
@@ -53,11 +53,11 @@ describe('ReportChatMessageDataModel.migrateData', () => {
       expect(migrated.resource).toEqual({
          stamina: {
             value: 1,
-            max: 6 
+            max: 6,
          },
          wounds: {
             value: 0,
-            max: 2 
+            max: 2,
          },
       });
       expect(migrated.stamina).toBeUndefined();
@@ -69,12 +69,12 @@ describe('ReportChatMessageDataModel.migrateData', () => {
       const source = {
          stamina: {
             value: 1,
-            max: 6 
+            max: 6,
          },
          resource: {
             stamina: {
                value: 5,
-               max: 6 
+               max: 6,
             },
          },
       };
@@ -83,7 +83,7 @@ describe('ReportChatMessageDataModel.migrateData', () => {
 
       expect(migrated.resource.stamina).toEqual({
          value: 5,
-         max: 6 
+         max: 6,
       });
       expect(migrated.stamina).toBeUndefined();
    });
@@ -94,7 +94,7 @@ describe('ReportChatMessageDataModel.migrateData', () => {
          resource: {
             resolve: {
                value: 2,
-               max: 4 
+               max: 4,
             },
          },
       };
@@ -105,7 +105,7 @@ describe('ReportChatMessageDataModel.migrateData', () => {
          resource: {
             resolve: {
                value: 2,
-               max: 4 
+               max: 4,
             },
          },
       });

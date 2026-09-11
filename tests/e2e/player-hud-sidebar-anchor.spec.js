@@ -58,7 +58,7 @@ test('HUD rect anchors to the expanded sidebar edge and does not move on collaps
          expandedRectRight,
          expandedSidebarLeft,
          collapsedRectRight,
-         collapsedSidebarLeft 
+         collapsedSidebarLeft,
       };
    });
 

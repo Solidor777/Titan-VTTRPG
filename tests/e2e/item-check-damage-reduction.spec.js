@@ -95,7 +95,7 @@ test.describe('item-check damage-reduction propagation', () => {
          // The purpose-built, Gamemaster-owned player actor used as the roll source.
          const actor = await Actor.create({
             name: actorName,
-            type: 'player' 
+            type: 'player',
          });
 
          // The ability item carrying the single configured item-check entry.
@@ -114,7 +114,7 @@ test.describe('item-check damage-reduction propagation', () => {
          const before = game.messages.size;
          await actor.system.rollItemCheck({
             itemId: abilityId,
-            checkIdx: 0 
+            checkIdx: 0,
          });
          await titanWait(() => game.messages.size > before, { message: 'new item-check chat message' });
 
@@ -126,7 +126,7 @@ test.describe('item-check damage-reduction propagation', () => {
          };
       }, {
          actorName: ACTOR_NAME,
-         check: itemCheck 
+         check: itemCheck,
       });
    }
 

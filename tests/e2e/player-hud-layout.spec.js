@@ -53,7 +53,7 @@ async function seedControlledActor(page) {
       if (!game.actors.getName(name)) {
          await Actor.create({
             name,
-            type: 'player' 
+            type: 'player',
          });
       }
    }, FIXTURE_NAME);
@@ -141,7 +141,7 @@ test('a dragged position persists across a reload', async () => {
    await page.evaluate(async () => {
       await titanWait(() => game.ready === true, {
          message: 'world ready after reload',
-         timeout: 30000 
+         timeout: 30000,
       });
    });
    await seedControlledActor(page);
@@ -209,7 +209,7 @@ test('the HUD anchors to the expanded sidebar edge and stays put when the sideba
       },
       {
          message: 'the HUD stays put when the sidebar collapses',
-         timeout: 1000 
+         timeout: 1000,
       },
    ).toBe(true);
 
@@ -223,7 +223,7 @@ test('the HUD anchors to the expanded sidebar edge and stays put when the sideba
       },
       {
          message: 'the HUD stays put when the sidebar re-expands',
-         timeout: 1000 
+         timeout: 1000,
       },
    ).toBe(true);
 });
@@ -232,7 +232,7 @@ test('a window resize clamps elements into the canvas rect', async () => {
    await seedControlledActor(page);
    await page.setViewportSize({
       width: 900,
-      height: 600 
+      height: 600,
    });
 
    await expect.poll(
@@ -251,13 +251,13 @@ test('a window resize clamps elements into the canvas rect', async () => {
       }),
       {
          message: 'every HUD element clamps into the shrunken canvas rect',
-         timeout: 1000 
+         timeout: 1000,
       },
    ).toBe(true);
 
    await page.setViewportSize({
       width: 1280,
-      height: 720 
+      height: 720,
    });
 });
 
@@ -288,12 +288,12 @@ test('the action menu defaults to the right of the portrait with a right-opening
             left: Math.round(b.left),
             right: Math.round(b.right),
             bottom: Math.round(b.bottom),
-            width: Math.round(b.width) 
+            width: Math.round(b.width),
          };
       };
       return {
          portrait: r('[data-testid="player-hud-portrait"]'),
-         menu: r('[data-testid="player-hud-action-menu"]') 
+         menu: r('[data-testid="player-hud-action-menu"]'),
       };
    });
 
@@ -376,7 +376,7 @@ test('the settings app reset-all restores options and layout', async () => {
       { message: 'reset-all restores stored options and live layout' },
    ).toEqual({
       options: {},
-      portraitDx: 250 
+      portraitDx: 250,
    });
 });
 

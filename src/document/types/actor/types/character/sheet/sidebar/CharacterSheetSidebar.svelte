@@ -19,16 +19,16 @@
       CharacterSheetResources,
       {
          component: CharacterSheetRatings,
-         label: 'ratings' 
+         label: 'ratings',
       },
       {
          component: CharacterSheetMods,
-         label: 'mods' 
+         label: 'mods',
       },
       {
          component: CharacterSheetSpeeds,
-         label: 'speeds' 
-      }
+         label: 'speeds',
+      },
    ];
 </script>
 

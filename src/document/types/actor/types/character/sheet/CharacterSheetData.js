@@ -105,8 +105,8 @@ export default function createCharacterSheetData(actor) {
             filter: '',
             isExpanded: {},
             scrollTop: 0,
-         }
-      }
+         },
+      },
    };
 
    // Initialize the expanded state map.

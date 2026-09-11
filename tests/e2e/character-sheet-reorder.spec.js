@@ -51,11 +51,11 @@ async function reorderFirstToEnd(actorName, embeddedName) {
       const updates = foundry.utils.performIntegerSort(source, {
          target,
          siblings,
-         sortBefore: false 
+         sortBefore: false,
       });
       await actor.updateEmbeddedDocuments(type, updates.map((u) => ({
          ...u.update,
-         _id: u.target._id 
+         _id: u.target._id,
       })));
 
       const after = (type === 'Item' ? actor.items : actor.effects).contents
@@ -63,11 +63,11 @@ async function reorderFirstToEnd(actorName, embeddedName) {
          .sort((a, b) => a.sort - b.sort);
       return {
          firstName: after[0].name,
-         lastName: after[after.length - 1].name 
+         lastName: after[after.length - 1].name,
       };
    }, {
       name: actorName,
-      type: embeddedName 
+      type: embeddedName,
    });
 }
 
@@ -84,40 +84,40 @@ test.describe('character-sheet reorder', () => {
          }
          const actor = await Actor.create({
             name,
-            type: 'player' 
+            type: 'player',
          });
          await actor.createEmbeddedDocuments('Item', [
             {
                name: 'Weapon A',
                type: 'weapon',
-               sort: 100 
+               sort: 100,
             },
             {
                name: 'Weapon B',
                type: 'weapon',
-               sort: 200 
+               sort: 200,
             },
             {
                name: 'Weapon C',
                type: 'weapon',
-               sort: 300 
+               sort: 300,
             },
          ]);
          await actor.createEmbeddedDocuments('ActiveEffect', [
             {
                name: 'Effect A',
                type: 'effect',
-               sort: 100 
+               sort: 100,
             },
             {
                name: 'Effect B',
                type: 'effect',
-               sort: 200 
+               sort: 200,
             },
             {
                name: 'Effect C',
                type: 'effect',
-               sort: 300 
+               sort: 300,
             },
          ]);
       }, ACTOR_NAME);

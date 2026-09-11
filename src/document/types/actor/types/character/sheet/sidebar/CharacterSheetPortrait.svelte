@@ -70,7 +70,7 @@
          class="button"
          use:tooltipAction={{
             text: 'spend{x}Resolve',
-            format: {x: 1}
+            format: {x: 1},
          }}
       >
          <DocumentOwnerIconButton

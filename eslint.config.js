@@ -93,7 +93,7 @@ export default [
          ],
          curly: [
             'error',
-            'all'
+            'all',
          ],
          // Scoped to ObjectExpression only: object literals with 2+ properties must break after `{`
          // and before `}`; destructuring patterns, imports, and exports are untouched. Verified with a
@@ -119,6 +119,16 @@ export default [
          ],
          // Array literals only (not destructuring patterns); see eslint/rules/array-literal-newline.js.
          'titan/array-literal-newline': 'error',
+         // Trailing commas on every multi-line object/array/import/export/function-arg list; matches
+         // the pre-existing codebase convention (verified 3,902 uses vs. 83 exceptions pre-lint).
+         '@stylistic/comma-dangle': [
+            'error',
+            'always-multiline',
+         ],
+         // No blank trailing whitespace on any line.
+         '@stylistic/no-trailing-spaces': 'error',
+         // Every file ends with exactly one trailing newline.
+         '@stylistic/eol-last': 'error',
       },
    },
    {

@@ -18,7 +18,7 @@ export default class EditUUIDDialog extends TitanDialog {
          content: {
             class: EditUUIDDialogShell,
             props: {
-               document: document
+               document: document,
             },
          },
          id: `edit-uuid-dialog-${document.id}`,

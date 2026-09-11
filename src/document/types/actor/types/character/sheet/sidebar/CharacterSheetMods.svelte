@@ -7,7 +7,7 @@
    entries={[
       {mod: 'armor'},
       {mod: 'damage'},
-      {mod: 'healing'}
+      {mod: 'healing'},
    ]}
    entryComponent={CharacterSheetMod}
 />

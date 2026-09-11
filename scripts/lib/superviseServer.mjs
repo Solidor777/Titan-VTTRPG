@@ -77,7 +77,7 @@ export function isPortInUse(host, port, timeoutMs = 1000) {
       /** @type {net.Socket} The probe socket, destroyed on every outcome. */
       const socket = net.connect({
          host,
-         port 
+         port,
       });
 
       /**
@@ -114,7 +114,7 @@ export function killTree(child) {
          '/pid',
          String(child.pid),
          '/T',
-         '/F'
+         '/F',
       ], { stdio: 'ignore' });
       return;
    }
@@ -151,13 +151,13 @@ export function getAncestors(pid, maxDepth = 8) {
          '-NoProfile',
          '-NonInteractive',
          '-Command',
-         script
+         script,
       ], {
          encoding: 'utf8',
          stdio: [
             'ignore',
             'pipe',
-            'ignore'
+            'ignore',
          ],
       });
 
@@ -168,7 +168,7 @@ export function getAncestors(pid, maxDepth = 8) {
             const [id, name] = line.split('\t');
             return {
                pid: Number(id),
-               name: name.trim() 
+               name: name.trim(),
             };
          });
    }
@@ -187,13 +187,13 @@ export function getAncestors(pid, maxDepth = 8) {
             '-o',
             'ppid=,comm=',
             '-p',
-            String(current)
+            String(current),
          ], {
             encoding: 'utf8',
             stdio: [
                'ignore',
                'pipe',
-               'ignore'
+               'ignore',
             ],
          }).trim();
       }
@@ -214,13 +214,13 @@ export function getAncestors(pid, maxDepth = 8) {
             '-o',
             'comm=',
             '-p',
-            String(parentPid)
+            String(parentPid),
          ], {
             encoding: 'utf8',
             stdio: [
                'ignore',
                'pipe',
-               'ignore'
+               'ignore',
             ],
          }).trim();
       }
@@ -230,7 +230,7 @@ export function getAncestors(pid, maxDepth = 8) {
 
       ancestors.push({
          pid: parentPid,
-         name: parentName 
+         name: parentName,
       });
       current = parentPid;
    }
@@ -311,7 +311,7 @@ export async function superviseServer(options) {
       stdio: logLine ? [
          'ignore',
          'pipe',
-         'pipe'
+         'pipe',
       ] : 'inherit',
       windowsHide: true,
    });

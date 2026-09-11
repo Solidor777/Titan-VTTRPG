@@ -43,7 +43,7 @@
          .filter((pack) => !plan || pack.metadata.type === plan.packType)
          .map((pack) => ({
             value: pack.collection,
-            label: pack.metadata.label 
+            label: pack.metadata.label,
          })),
    );
 
@@ -135,11 +135,11 @@
       options={[
          {
             value: 'existing',
-            label: localize('importIntoExisting') 
+            label: localize('importIntoExisting'),
          },
          {
             value: 'new',
-            label: localize('importIntoNew') 
+            label: localize('importIntoNew'),
          },
       ]}
       bind:value={targetMode}

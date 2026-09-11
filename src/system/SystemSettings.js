@@ -90,7 +90,7 @@ export default function registerSystemSettings() {
    game.keybindings.register('titan', 'togglePlayerHudEditMode', {
       editable: [{
          key: 'KeyH',
-         modifiers: ['Shift'] 
+         modifiers: ['Shift'],
       }],
       hint: 'SETTINGS.togglePlayerHudEditMode.hint',
       name: 'SETTINGS.togglePlayerHudEditMode.label',
@@ -155,7 +155,7 @@ export default function registerSystemSettings() {
       choices: Object.fromEntries(BUILT_IN_THEMES.filter((theme) => theme.dark)
          .map((theme) => [
             theme.id,
-            theme.name
+            theme.name,
          ])),
       config: true,
       default: 'heritage-dark',
@@ -172,7 +172,7 @@ export default function registerSystemSettings() {
       choices: Object.fromEntries(BUILT_IN_THEMES.filter((theme) => !theme.dark)
          .map((theme) => [
             theme.id,
-            theme.name
+            theme.name,
          ])),
       config: true,
       default: 'heritage-light',

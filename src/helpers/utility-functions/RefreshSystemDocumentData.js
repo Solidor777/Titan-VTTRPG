@@ -8,7 +8,7 @@ export default async function refreshSystemDocument(document, disabled) {
    if (!disabled && document?.isOwner) {
       return await document.update({
          system: structuredClone(document.system),
-         flags: structuredClone(document.flags)
+         flags: structuredClone(document.flags),
       });
    }
 }

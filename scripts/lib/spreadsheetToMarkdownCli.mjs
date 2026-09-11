@@ -23,7 +23,7 @@ const DEFAULT_LANG_PATH = path.join(repoRoot, 'lang', 'en.json');
 const SPREADSHEET_EXTENSIONS = new Set([
    '.csv',
    '.xlsx',
-   '.zip'
+   '.zip',
 ]);
 
 /**
@@ -120,7 +120,7 @@ function groupFilesForDecoding(files) {
       /** @type {{name: string, bytes: Uint8Array}} The file's entry. */
       const entry = {
          name: path.basename(file),
-         bytes: readFileSync(file) 
+         bytes: readFileSync(file),
       };
       /** @type {string} The file's lowercased extension. */
       const ext = path.extname(file).toLowerCase();
@@ -212,7 +212,7 @@ export async function runCli(argv) {
       /** @type {string} The rendered Markdown document. */
       const markdown = renderCompendiumMarkdown(documents, {
          title,
-         labels: createLabels(langJson) 
+         labels: createLabels(langJson),
       });
 
       writeFileSync(out, markdown, 'utf-8');

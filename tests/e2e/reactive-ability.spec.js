@@ -49,7 +49,7 @@ test.describe('character sheet ability row reactivity', () => {
          // rarity 'common' (RarityTag class .common) and xpCost 0 (StatTag absent via {#if xpCost}).
          const actor = await Actor.create({
             name: actorName,
-            type: 'player' 
+            type: 'player',
          });
          await actor.createEmbeddedDocuments('Item', [
             {

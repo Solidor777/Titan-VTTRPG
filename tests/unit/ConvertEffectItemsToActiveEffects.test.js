@@ -98,7 +98,7 @@ function makeFakeActor({ items = [], effects = [] } = {}) {
          calls.push([
             'create',
             embeddedName,
-            data
+            data,
          ]);
 
          // Resolve to pseudo-docs, mirroring the real API's array of actually-created documents.
@@ -112,7 +112,7 @@ function makeFakeActor({ items = [], effects = [] } = {}) {
          calls.push([
             'delete',
             embeddedName,
-            ids
+            ids,
          ]);
       },
    };
@@ -274,12 +274,12 @@ describe('convertActor (raw _source discovery)', () => {
          [
             'create',
             'ActiveEffect',
-            [buildEffectData(legacy)]
+            [buildEffectData(legacy)],
          ],
          [
             'delete',
             'Item',
-            ['legacyitem000001']
+            ['legacyitem000001'],
          ],
       ]);
    });
@@ -331,17 +331,17 @@ describe('convertActor (raw _source discovery)', () => {
          [
             'create',
             'ActiveEffect',
-            [buildEffectData(makeLegacyItemSource())]
+            [buildEffectData(makeLegacyItemSource())],
          ],
          [
             'delete',
             'Item',
-            ['legacyitem000001']
+            ['legacyitem000001'],
          ],
          [
             'delete',
             'ActiveEffect',
-            ['mirrorfx00000001']
+            ['mirrorfx00000001'],
          ],
       ]);
    });
@@ -368,7 +368,7 @@ describe('convertActor (raw _source discovery)', () => {
          [
             'delete',
             'ActiveEffect',
-            ['mirrorfx00000001']
+            ['mirrorfx00000001'],
          ],
       ]);
    });
@@ -397,7 +397,7 @@ describe('convertActor (raw _source discovery)', () => {
          [
             'delete',
             'Item',
-            ['legacyitem000001']
+            ['legacyitem000001'],
          ],
       ]);
    });
@@ -434,15 +434,15 @@ describe('convertActor (raw _source discovery)', () => {
          [
             'create',
             'ActiveEffect',
-            [buildEffectData(fresh)]
+            [buildEffectData(fresh)],
          ],
          [
             'delete',
             'Item',
             [
                'legacyitem000001',
-               'legacyitem000002'
-            ]
+               'legacyitem000002',
+            ],
          ],
       ]);
    });
@@ -458,7 +458,7 @@ describe('convertActor (raw _source discovery)', () => {
          actor.calls.push([
             'create',
             embeddedName,
-            data
+            data,
          ]);
          return [];
       };
@@ -469,7 +469,7 @@ describe('convertActor (raw _source discovery)', () => {
          [
             'create',
             'ActiveEffect',
-            [buildEffectData(makeLegacyItemSource())]
+            [buildEffectData(makeLegacyItemSource())],
          ],
       ]);
    });
@@ -495,7 +495,7 @@ describe('convertActor (raw _source discovery)', () => {
          actor.calls.push([
             'create',
             embeddedName,
-            data
+            data,
          ]);
          return data.slice(0, 1).map((entry, index) => ({
             id: `createdfx${String(index).padStart(8, '0')}`,
@@ -512,13 +512,13 @@ describe('convertActor (raw _source discovery)', () => {
             'ActiveEffect',
             [
                buildEffectData(makeLegacyItemSource()),
-               buildEffectData(fresh)
-            ]
+               buildEffectData(fresh),
+            ],
          ],
          [
             'delete',
             'Item',
-            ['legacyitem000001']
+            ['legacyitem000001'],
          ],
       ]);
    });
@@ -557,21 +557,21 @@ function makeFakePack({
       getIndex: async ({ fields } = {}) => {
          calls.push([
             'getIndex',
-            fields
+            fields,
          ]);
          return indexEntries;
       },
       configure: async ({ locked: nextLocked }) => {
          calls.push([
             'configure',
-            nextLocked
+            nextLocked,
          ]);
          pack.locked = nextLocked;
       },
       getDocument: async (id) => {
          calls.push([
             'getDocument',
-            id
+            id,
          ]);
 
          /** @type {object|Error} - The configured result for this id. */
@@ -620,7 +620,7 @@ describe('convertPack (index gate + lock handling)', () => {
       expect(pack.calls).toEqual([
          [
             'getIndex',
-            ['items']
+            ['items'],
          ],
       ]);
    });
@@ -645,31 +645,31 @@ describe('convertPack (index gate + lock handling)', () => {
       expect(pack.calls).toEqual([
          [
             'getIndex',
-            ['items']
+            ['items'],
          ],
          [
             'configure',
-            false
+            false,
          ],
          [
             'getDocument',
-            'packedactor00001'
+            'packedactor00001',
          ],
          [
             'configure',
-            true
+            true,
          ],
       ]);
       expect(actor.calls).toEqual([
          [
             'create',
             'ActiveEffect',
-            [buildEffectData(makeLegacyItemSource())]
+            [buildEffectData(makeLegacyItemSource())],
          ],
          [
             'delete',
             'Item',
-            ['legacyitem000001']
+            ['legacyitem000001'],
          ],
       ]);
    });
@@ -715,7 +715,7 @@ describe('convertPack (index gate + lock handling)', () => {
       expect(survivor.calls.length).toBe(2);
       expect(pack.calls.at(-1)).toEqual([
          'configure',
-         true
+         true,
       ]);
    });
 
@@ -736,7 +736,7 @@ describe('convertPack (index gate + lock handling)', () => {
       pack.configure = async ({ locked: nextLocked }) => {
          pack.calls.push([
             'configure',
-            nextLocked
+            nextLocked,
          ]);
          if (nextLocked === false) {
             throw new Error('unlock failed');
@@ -749,11 +749,11 @@ describe('convertPack (index gate + lock handling)', () => {
       expect(pack.calls.filter(([method]) => method === 'configure')).toEqual([
          [
             'configure',
-            false
+            false,
          ],
          [
             'configure',
-            true
+            true,
          ],
       ]);
    });
@@ -774,7 +774,7 @@ describe('convertPack (index gate + lock handling)', () => {
       pack.configure = async ({ locked: nextLocked }) => {
          pack.calls.push([
             'configure',
-            nextLocked
+            nextLocked,
          ]);
          if (nextLocked === true) {
             throw new Error('re-lock failed');
@@ -800,7 +800,7 @@ describe('convertPack (index gate + lock handling)', () => {
 
       expect(pack.calls.at(-1)).toEqual([
          'configure',
-         true
+         true,
       ]);
       expect(uiErrors.some((message) => message.includes('Failed to convert legacy effect Items for packed actor')))
          .toBe(true);
@@ -822,7 +822,7 @@ describe('convertPack (index gate + lock handling)', () => {
       pack.configure = async ({ locked: nextLocked }) => {
          pack.calls.push([
             'configure',
-            nextLocked
+            nextLocked,
          ]);
          throw new Error(nextLocked === false ? 'unlock failed' : 're-lock failed');
       };
@@ -858,7 +858,7 @@ describe('default export (wiring: the pack scan is reachable from the boot path)
       expect(pack.calls).toEqual([
          [
             'getIndex',
-            ['items']
+            ['items'],
          ],
       ]);
    });
@@ -915,7 +915,7 @@ describe('convertWorldActorPacks (pack filtering + isolation)', () => {
       expect(worldActorPack.calls).toEqual([
          [
             'getIndex',
-            ['items']
+            ['items'],
          ],
       ]);
       expect(moduleActorPack.calls).toEqual([]);
@@ -944,7 +944,7 @@ describe('convertWorldActorPacks (pack filtering + isolation)', () => {
       expect(healthyPack.calls).toEqual([
          [
             'getIndex',
-            ['items']
+            ['items'],
          ],
       ]);
    });

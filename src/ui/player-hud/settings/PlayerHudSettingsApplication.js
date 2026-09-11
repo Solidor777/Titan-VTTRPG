@@ -22,17 +22,17 @@ export default class PlayerHudSettingsApplication extends ApplicationV2 {
    static DEFAULT_OPTIONS = {
       classes: [
          'titan',
-         'titan-player-hud-settings'
+         'titan-player-hud-settings',
       ],
       id: 'titan-player-hud-settings',
       position: {
          width: 520,
-         height: 680 
+         height: 680,
       },
       window: {
          resizable: true,
          minimizable: true,
-         title: 'LOCAL.playerHudSettings.text' 
+         title: 'LOCAL.playerHudSettings.text',
       },
    };
 
@@ -62,7 +62,7 @@ export default class PlayerHudSettingsApplication extends ApplicationV2 {
             target: content,
             context: new Map([[
                'application',
-               this
+               this,
             ]]),
          });
       }

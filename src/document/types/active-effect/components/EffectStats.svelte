@@ -45,7 +45,7 @@
       <div class="stat">
          <Tag tooltip={{
             text: trait.description,
-            localize: false 
+            localize: false,
          }}>
             {trait.name}
          </Tag>

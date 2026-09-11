@@ -18,8 +18,8 @@ describe('buildTables — wide layout', () => {
                type: 'weapon',
                img: 'i.svg',
                sort: 1,
-               system: { rarity: 'common' } 
-            } 
+               system: { rarity: 'common' },
+            },
          },
       ];
       const workbook = buildTables(envelopes, 'wide', 'Item', NO_SCHEMA);
@@ -33,7 +33,7 @@ describe('buildTables — wide layout', () => {
          'name',
          'type',
          'img',
-         'sort'
+         'sort',
       ]);
       expect(weaponSheet.columns).toContain('system.rarity');
       expect(weaponSheet.rows[0]).toMatchObject({
@@ -41,7 +41,7 @@ describe('buildTables — wide layout', () => {
          name: 'Sword',
          'system.rarity': 'common',
          _parentId: '',
-         _folder: '' 
+         _folder: '',
       });
    });
 
@@ -51,8 +51,8 @@ describe('buildTables — wide layout', () => {
             documentType: 'weapon',
             source: {
                _id: 'a'.repeat(16),
-               system: { attack: [{ damage: 5 }] } 
-            } 
+               system: { attack: [{ damage: 5 }] },
+            },
          },
          {
             documentType: 'weapon',
@@ -61,10 +61,10 @@ describe('buildTables — wide layout', () => {
                system: {
                   attack: [
                      { damage: 1 },
-                     { damage: 2 }
-                  ] 
-               } 
-            } 
+                     { damage: 2 },
+                  ],
+               },
+            },
          },
       ];
       const workbook = buildTables(envelopes, 'wide', 'Item', NO_SCHEMA);
@@ -80,7 +80,7 @@ describe('buildTables — wide layout', () => {
             documentType: 'weapon',
             source: { _id: 'a'.repeat(16) },
             parentId: 'b'.repeat(16),
-            folderPath: 'Loot/Rare' 
+            folderPath: 'Loot/Rare',
          },
       ];
       const workbook = buildTables(envelopes, 'wide', 'Item', NO_SCHEMA);
@@ -95,9 +95,9 @@ describe('buildTables — wide layout', () => {
             fieldTypes: {},
             fieldOrder: [
                'system.value',
-               'system.rarity'
-            ] 
-         } 
+               'system.rarity',
+            ],
+         },
       };
       const envelopes = [
          {
@@ -107,9 +107,9 @@ describe('buildTables — wide layout', () => {
                system: {
                   rarity: 'common',
                   value: 5,
-                  extra: 'x' 
-               } 
-            } 
+                  extra: 'x',
+               },
+            },
          },
       ];
       const weaponSheet = buildTables(envelopes, 'wide', 'Item', typeSchemas).sheets.find((s) => s.name === 'weapon');
@@ -122,7 +122,7 @@ describe('buildTables — wide layout', () => {
    it('writes manifest rows naming layout, packType, and one entry per data sheet', () => {
       const envelopes = [{
          documentType: 'weapon',
-         source: { _id: 'a'.repeat(16) } 
+         source: { _id: 'a'.repeat(16) },
       }];
       const manifest = buildTables(envelopes, 'wide', 'Item', NO_SCHEMA).sheets.find((s) => s.name === '_manifest');
       expect(manifest.rows).toEqual(expect.arrayContaining([
@@ -130,19 +130,19 @@ describe('buildTables — wide layout', () => {
             key: 'layout',
             value: 'wide',
             documentType: '',
-            arrayPath: '' 
+            arrayPath: '',
          },
          {
             key: 'packType',
             value: 'Item',
             documentType: '',
-            arrayPath: '' 
+            arrayPath: '',
          },
          {
             key: 'sheet',
             value: 'weapon',
             documentType: 'weapon',
-            arrayPath: '' 
+            arrayPath: '',
          },
       ]));
    });
@@ -161,15 +161,15 @@ describe('buildTables — relational layout', () => {
                   attack: [
                      {
                         label: 'Slash',
-                        damage: 5 
+                        damage: 5,
                      },
                      {
                         label: 'Stab',
-                        damage: 3 
-                     }
-                  ] 
-               } 
-            } 
+                        damage: 3,
+                     },
+                  ],
+               },
+            },
          },
       ];
       const workbook = buildTables(envelopes, 'relational', 'Item', NO_SCHEMA);
@@ -184,20 +184,20 @@ describe('buildTables — relational layout', () => {
          '_id',
          '_index',
          'label',
-         'damage'
+         'damage',
       ]);
       expect(attackSheet.rows).toEqual([
          {
             _id: 'a'.repeat(16),
             _index: '0',
             label: 'Slash',
-            damage: 5 
+            damage: 5,
          },
          {
             _id: 'a'.repeat(16),
             _index: '1',
             label: 'Stab',
-            damage: 3 
+            damage: 3,
          },
       ]);
    });
@@ -213,11 +213,11 @@ describe('buildTables — relational layout', () => {
                      label: 'Slash',
                      trait: [
                         { name: 'Reach' },
-                        { name: 'Heavy' }
-                     ] 
-                  }] 
-               } 
-            } 
+                        { name: 'Heavy' },
+                     ],
+                  }],
+               },
+            },
          },
       ];
       const workbook = buildTables(envelopes, 'relational', 'Item', NO_SCHEMA);
@@ -226,7 +226,7 @@ describe('buildTables — relational layout', () => {
       expect(attackSheet.columns).toEqual([
          '_id',
          '_index',
-         'label'
+         'label',
       ]);
 
       /** @type {object} */
@@ -235,12 +235,12 @@ describe('buildTables — relational layout', () => {
          {
             _id: 'a'.repeat(16),
             _index: '0.0',
-            name: 'Reach' 
+            name: 'Reach',
          },
          {
             _id: 'a'.repeat(16),
             _index: '0.1',
-            name: 'Heavy' 
+            name: 'Heavy',
          },
       ]);
    });
@@ -250,8 +250,8 @@ describe('buildTables — relational layout', () => {
          documentType: 'weapon',
          source: {
             _id: 'a'.repeat(16),
-            system: { attack: [{ damage: 5 }] } 
-         } 
+            system: { attack: [{ damage: 5 }] },
+         },
       }];
       const tables = buildTables(envelopes, 'relational', 'Item', NO_SCHEMA);
       /** @type {object} */
@@ -261,7 +261,7 @@ describe('buildTables — relational layout', () => {
             key: 'sheet',
             value: 'weapon.system.attack',
             documentType: 'weapon',
-            arrayPath: 'system.attack' 
+            arrayPath: 'system.attack',
          },
       ]));
    });
@@ -275,10 +275,10 @@ describe('buildTables — relational layout', () => {
                system: {
                   statuses: [
                      'prone',
-                     'stunned'
-                  ] 
-               } 
-            } 
+                     'stunned',
+                  ],
+               },
+            },
          },
       ];
       const workbook = buildTables(envelopes, 'relational', 'Item', NO_SCHEMA);
@@ -291,18 +291,18 @@ describe('buildTables — relational layout', () => {
       expect(statusesSheet.columns).toEqual([
          '_id',
          '_index',
-         '_value'
+         '_value',
       ]);
       expect(statusesSheet.rows).toEqual([
          {
             _id: 'a'.repeat(16),
             _index: '0',
-            _value: 'prone' 
+            _value: 'prone',
          },
          {
             _id: 'a'.repeat(16),
             _index: '1',
-            _value: 'stunned' 
+            _value: 'stunned',
          },
       ]);
 
@@ -313,7 +313,7 @@ describe('buildTables — relational layout', () => {
             key: 'sheet',
             value: 'weapon.system.statuses',
             documentType: 'weapon',
-            arrayPath: 'system.statuses' 
+            arrayPath: 'system.statuses',
          },
       ]));
    });
@@ -331,9 +331,9 @@ describe('buildTables — relational layout', () => {
                system: {
                   somethingreallylong: [
                      'one',
-                     'two'
-                  ] 
-               } 
+                     'two',
+                  ],
+               },
             },
          },
       ];
@@ -358,7 +358,7 @@ describe('buildTables — relational layout', () => {
       expect(readEnvelopes[0].documentType).toBe(documentType);
       expect(readEnvelopes[0].source.system.somethingreallylong).toEqual([
          'one',
-         'two'
+         'two',
       ]);
    });
 });
@@ -373,9 +373,9 @@ describe('buildTables — untyped-bag string protection', () => {
                system: {
                   rulesElement: [{
                      name: 'code',
-                     value: '5' 
-                  }] 
-               } 
+                     value: '5',
+                  }],
+               },
             },
          },
       ];
@@ -395,9 +395,9 @@ describe('buildTables — untyped-bag string protection', () => {
                system: {
                   rulesElement: [{
                      name: 'code',
-                     value: '5' 
-                  }] 
-               } 
+                     value: '5',
+                  }],
+               },
             },
          },
       ];
@@ -415,18 +415,18 @@ describe('buildTables — untyped-bag string protection', () => {
             fieldTypes: {
                'system.value': {
                   type: 'number',
-                  nullable: false 
-               } 
+                  nullable: false,
+               },
             },
-            fieldOrder: [] 
+            fieldOrder: [],
          },
       };
       const envelopes = [{
          documentType: 'weapon',
          source: {
             _id: 'a'.repeat(16),
-            system: { value: 5 } 
-         } 
+            system: { value: 5 },
+         },
       }];
       const weaponSheet = buildTables(envelopes, 'wide', 'Item', typeSchemas).sheets.find((s) => s.name === 'weapon');
       expect(weaponSheet.rows[0]['system.value']).toBe(5);
@@ -441,9 +441,9 @@ describe('buildTables — untyped-bag string protection', () => {
                system: {
                   rulesElement: [{
                      name: 'code',
-                     value: 'Slashing' 
-                  }] 
-               } 
+                     value: 'Slashing',
+                  }],
+               },
             },
          },
       ];
@@ -460,9 +460,9 @@ describe('buildTables — untyped-bag string protection', () => {
                system: {
                   rulesElement: [{
                      name: 'code',
-                     value: '"x"' 
-                  }] 
-               } 
+                     value: '"x"',
+                  }],
+               },
             },
          },
       ];
@@ -484,9 +484,9 @@ describe('buildTables — untyped-bag string protection', () => {
                system: {
                   rulesElement: [{
                      name: 'code',
-                     value: '' 
-                  }] 
-               } 
+                     value: '',
+                  }],
+               },
             },
          },
       ];
@@ -505,26 +505,26 @@ describe('buildArrayPathMatcher', () => {
       const matcher = buildArrayPathMatcher('statuses', ['statuses']);
       expect(matcher('statuses.0')).toEqual({
          index: '0',
-         subField: '_value' 
+         subField: '_value',
       });
    });
 
    it('only matches paths under its own array when two arrays are siblings, not nested', () => {
       const allArrayPaths = [
          'attack',
-         'trait'
+         'trait',
       ];
       const attackMatcher = buildArrayPathMatcher('attack', allArrayPaths);
       const traitMatcher = buildArrayPathMatcher('trait', allArrayPaths);
 
       expect(attackMatcher('attack.0.damage')).toEqual({
          index: '0',
-         subField: 'damage' 
+         subField: 'damage',
       });
       expect(attackMatcher('trait.0.name')).toBeNull();
       expect(traitMatcher('trait.0.name')).toEqual({
          index: '0',
-         subField: 'name' 
+         subField: 'name',
       });
       expect(traitMatcher('attack.0.damage')).toBeNull();
    });
@@ -534,7 +534,7 @@ describe('detectArrayPaths', () => {
    it('returns both a shallow and a nested array path, ordered outermost-first', () => {
       expect(detectArrayPaths(['a.b.0.c.1.d'])).toEqual([
          'a.b',
-         'a.b.c'
+         'a.b.c',
       ]);
    });
 });
@@ -550,15 +550,15 @@ describe('buildTables — relational guards', () => {
                   matrix: [
                      [
                         1,
-                        2
+                        2,
                      ],
                      [
                         3,
-                        4
-                     ]
-                  ] 
-               } 
-            } 
+                        4,
+                     ],
+                  ],
+               },
+            },
          },
       ];
       expect(() => buildTables(envelopes, 'relational', 'Item', NO_SCHEMA)).toThrow(
@@ -575,10 +575,10 @@ describe('buildTables — relational guards', () => {
                system: {
                   trait: [{
                      _id: 'x',
-                     name: 'Reach' 
-                  }] 
-               } 
-            } 
+                     name: 'Reach',
+                  }],
+               },
+            },
          },
       ];
       expect(() => buildTables(envelopes, 'relational', 'Item', NO_SCHEMA)).toThrow(
@@ -595,10 +595,10 @@ describe('buildTables — relational guards', () => {
                system: {
                   trait: [{
                      _index: 0,
-                     name: 'Reach' 
-                  }] 
-               } 
-            } 
+                     name: 'Reach',
+                  }],
+               },
+            },
          },
       ];
       expect(() => buildTables(envelopes, 'relational', 'Item', NO_SCHEMA)).toThrow(
@@ -623,11 +623,11 @@ describe('buildTables — relational guards', () => {
                   customTrait: [{
                      name: 'Custom',
                      description: 'x',
-                     uuid: 'u1' 
+                     uuid: 'u1',
                   }],
                   rulesElement: [{
                      name: 'code',
-                     value: 'v' 
+                     value: 'v',
                   }],
                   rarity: 'common',
                   value: 0,
@@ -647,7 +647,7 @@ describe('buildTables — relational guards', () => {
                         customTrait: [{
                            name: 'Custom Trait',
                            description: 'y',
-                           uuid: 'u2' 
+                           uuid: 'u2',
                         }],
                         uuid: 'u3',
                      },
@@ -669,17 +669,17 @@ describe('buildTables — relational guards', () => {
                   customTrait: [{
                      name: 'Custom',
                      description: 'x',
-                     uuid: 'u4' 
+                     uuid: 'u4',
                   }],
                   rulesElement: [{
                      name: 'code',
-                     value: 'v' 
+                     value: 'v',
                   }],
                   rarity: 'common',
                   value: 0,
                   armor: {
                      max: 1,
-                     value: 1 
+                     value: 1,
                   },
                   trait: [{ name: 'Reach' }],
                },
@@ -699,11 +699,11 @@ describe('buildTables — relational guards', () => {
                   customTrait: [{
                      name: 'Custom',
                      description: 'x',
-                     uuid: 'u5' 
+                     uuid: 'u5',
                   }],
                   rulesElement: [{
                      name: 'code',
-                     value: 'v' 
+                     value: 'v',
                   }],
                   rarity: 'common',
                   value: 0,
@@ -726,11 +726,11 @@ describe('buildTables — relational guards', () => {
                   customTrait: [{
                      name: 'Custom',
                      description: 'x',
-                     uuid: 'u6' 
+                     uuid: 'u6',
                   }],
                   rulesElement: [{
                      name: 'code',
-                     value: 'v' 
+                     value: 'v',
                   }],
                   xpCost: 1,
                   rarity: 'common',
@@ -754,7 +754,7 @@ describe('buildTables — relational guards', () => {
                   customTrait: [{
                      name: 'Custom',
                      description: 'x',
-                     uuid: 'u7' 
+                     uuid: 'u7',
                   }],
                   rarity: 'common',
                   xpCost: 1,
@@ -772,13 +772,13 @@ describe('buildTables — relational guards', () => {
                      value: 'v',
                      option: [
                         'ignoreArmor',
-                        'penetrating'
-                     ] 
+                        'penetrating',
+                     ],
                   }],
                   customAspect: [{
                      name: 'Custom Aspect',
                      description: 'z',
-                     uuid: 'u8' 
+                     uuid: 'u8',
                   }],
                },
             },
@@ -797,11 +797,11 @@ describe('buildTables — relational guards', () => {
                   customTrait: [{
                      name: 'Custom',
                      description: 'x',
-                     uuid: 'u9' 
+                     uuid: 'u9',
                   }],
                   rulesElement: [{
                      name: 'code',
-                     value: 'v' 
+                     value: 'v',
                   }],
                   rarity: 'common',
                   value: 0,
@@ -840,16 +840,16 @@ describe('buildTables — relational guards', () => {
                      type: 'turnStart',
                      remaining: 1,
                      initiative: 1,
-                     custom: '' 
+                     custom: '',
                   },
                   check: [{
                      name: 'Check',
-                     attribute: 'body' 
+                     attribute: 'body',
                   }],
                   customTrait: [{
                      name: 'Custom',
                      description: 'x',
-                     uuid: 'u10' 
+                     uuid: 'u10',
                   }],
                },
             },
@@ -868,15 +868,15 @@ describe('buildTables — relational guards', () => {
                   matrix: [
                      [
                         1,
-                        2
+                        2,
                      ],
                      [
                         3,
-                        4
-                     ]
-                  ] 
-               } 
-            } 
+                        4,
+                     ],
+                  ],
+               },
+            },
          },
       ];
       expect(() => buildTables(envelopes, 'relational', 'Item', NO_SCHEMA)).toThrow();

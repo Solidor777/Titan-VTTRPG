@@ -50,7 +50,7 @@ describe('CheckTags', () => {
          props: { idx: 0 },
          context: new Map([[
             'document',
-            makeBridge()
+            makeBridge(),
          ]]),
       });
 
@@ -73,7 +73,7 @@ describe('CheckTags', () => {
                   attribute: 'mind',
                   skill: 'perception',
                },
-            })
+            }),
          ]]),
       });
 
@@ -90,7 +90,7 @@ describe('CheckTags', () => {
          },
          context: new Map([[
             'document',
-            makeBridge({ attribute: 'default' })
+            makeBridge({ attribute: 'default' }),
          ]]),
       });
 
@@ -105,7 +105,7 @@ describe('CheckTags', () => {
          props: { idx: 7 },
          context: new Map([[
             'document',
-            makeBridge()
+            makeBridge(),
          ]]),
       });
       expect(container.querySelector('.check-tags')).toBeNull();
@@ -116,7 +116,7 @@ describe('CheckTags', () => {
          props: { idx: 0 },
          context: new Map([[
             'document',
-            { data: undefined }
+            { data: undefined },
          ]]),
       });
       expect(container.querySelector('.check-tags')).toBeNull();

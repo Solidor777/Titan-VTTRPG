@@ -14,7 +14,7 @@ function chainFolders(names) {
    for (const name of names) {
       current = {
          name,
-         folder: current 
+         folder: current,
       };
    }
    return current;
@@ -27,12 +27,12 @@ describe('FolderPath round trip', () => {
             fc.array(
                fc.array(fc.constantFrom(...'ab\\/ '.split('')), {
                   minLength: 1,
-                  maxLength: 8 
+                  maxLength: 8,
                })
                   .map((chars) => chars.join('')),
                {
                   minLength: 1,
-                  maxLength: 5 
+                  maxLength: 5,
                },
             ),
             (names) => {
@@ -47,12 +47,12 @@ describe('FolderPath round trip', () => {
    it('splits a path with an escaped backslash then a real separator', () => {
       const path = resolveFolderPath(chainFolders([
          'a\\',
-         'b'
+         'b',
       ]));
       expect(path).toBe('a\\\\/b');
       expect(splitFolderPath(path).map(unescapeFolderName)).toEqual([
          'a\\',
-         'b'
+         'b',
       ]);
    });
 
@@ -64,11 +64,11 @@ describe('FolderPath round trip', () => {
    it('splits two segments joined on a real separator', () => {
       const path = resolveFolderPath(chainFolders([
          'a/b',
-         'c'
+         'c',
       ]));
       expect(splitFolderPath(path).map(unescapeFolderName)).toEqual([
          'a/b',
-         'c'
+         'c',
       ]);
    });
 

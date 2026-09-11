@@ -28,7 +28,7 @@ export default class TitanEquipmentSheet extends TitanItemSheet {
                   shell: EquipmentSheetShell,
                },
             },
-         }
+         },
       );
 
       // Initialize self object.

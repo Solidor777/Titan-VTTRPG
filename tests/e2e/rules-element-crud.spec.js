@@ -49,7 +49,7 @@ test.describe('rules-element add/delete reactivity', () => {
          }
          const item = await Item.create({
             name,
-            type: 'weapon' 
+            type: 'weapon',
          });
          const app = await item.sheet.render(true);
          await titanWait(
@@ -112,7 +112,7 @@ test.describe('rules-element selector default key', () => {
          }
          const item = await Item.create({
             name,
-            type: 'weapon' 
+            type: 'weapon',
          });
          const app = await item.sheet.render(true);
          await titanWait(
@@ -141,7 +141,7 @@ test.describe('rules-element selector default key', () => {
                return el ? {
                   operation: el.operation,
                   selector: el.selector,
-                  key: el.key 
+                  key: el.key,
                } : null;
             }, ITEM_NAME_SELECTOR),
             { message: 'seeded default flatModifier element persisted' },

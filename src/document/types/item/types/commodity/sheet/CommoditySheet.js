@@ -28,7 +28,7 @@ export default class TitanCommoditySheet extends TitanItemSheet {
                   shell: CommoditySheetShell,
                },
             },
-         }
+         },
       );
 
       // Initialize self object.

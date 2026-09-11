@@ -86,7 +86,7 @@ test.describe('v14 interaction dialogs', () => {
          // The fixture actor used as the source for every dialog trigger.
          const actor = await Actor.create({
             name: 'E2E Dialog Actor',
-            type: 'player' 
+            type: 'player',
          });
 
          // An owned equipment item that carries one custom trait (for the add/edit-trait dialogs)

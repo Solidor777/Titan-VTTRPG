@@ -9,7 +9,7 @@ export function diceResults(finals, expertiseRemaining = 0) {
       dice: finals.map((final) => ({
          base: final,
          expertiseApplied: 0,
-         final: final 
+         final: final,
       })),
       expertiseRemaining: expertiseRemaining,
    };
@@ -24,7 +24,7 @@ export function dice(finals) {
    return finals.map((final) => ({
       base: final,
       expertiseApplied: 0,
-      final: final 
+      final: final,
    }));
 }
 

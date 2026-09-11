@@ -26,7 +26,7 @@ export default class TitanDialog extends ApplicationV2 {
    constructor(options) {
       const classes = [
          'titan',
-         'titan-dialog'
+         'titan-dialog',
       ];
       options.classes = options.classes ? mergeArrays(classes, options.classes) : classes;
       options.id = options.id ? `${options.id}-${generateUUID()}` : `titan-dialog-${generateUUID()}`;
@@ -63,11 +63,11 @@ export default class TitanDialog extends ApplicationV2 {
    static DEFAULT_OPTIONS = {
       position: {
          width: 320,
-         height: 'auto' 
+         height: 'auto',
       },
       window: {
          resizable: false,
-         minimizable: false 
+         minimizable: false,
       },
       zIndex: Z_INDEX_APP,
    };
@@ -99,7 +99,7 @@ export default class TitanDialog extends ApplicationV2 {
             props: this.#content.props,
             context: new Map([[
                'application',
-               this
+               this,
             ]]),
          });
       }

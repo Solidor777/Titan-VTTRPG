@@ -43,27 +43,27 @@ test.describe('character sheet expand toggle reactivity', () => {
          }
          const actor = await Actor.create({
             name: actorName,
-            type: 'player' 
+            type: 'player',
          });
          await actor.createEmbeddedDocuments('ActiveEffect', [
             {
                name: 'E2E Expand Effect',
                type: 'effect',
-               disabled: false 
+               disabled: false,
             },
          ]);
          await actor.createEmbeddedDocuments('Item', [
             {
                name: 'E2E Expand Ability',
-               type: 'ability' 
+               type: 'ability',
             },
             {
                name: 'E2E Expand Weapon',
-               type: 'weapon' 
+               type: 'weapon',
             },
             {
                name: 'E2E Expand Spell',
-               type: 'spell' 
+               type: 'spell',
             },
          ]);
          const app = await actor.sheet.render(true);

@@ -27,7 +27,7 @@ test.describe('item-sheet roll-button gating (player)', () => {
          browser,
          {
             gm: GM_USERS[0].name,
-            player: PLAYER_USERS[0].name 
+            player: PLAYER_USERS[0].name,
          },
          async ({ gm, player }) => {
             /** @type {string[]} Uncaught errors on the player page (the surface under test). */
@@ -50,7 +50,7 @@ test.describe('item-sheet roll-button gating (player)', () => {
 
                for (const name of [
                   ownedName,
-                  observedName
+                  observedName,
                ]) {
                   const stale = game.actors.getName(name);
                   if (stale) {
@@ -63,14 +63,14 @@ test.describe('item-sheet roll-button gating (player)', () => {
                   type: 'player',
                   ownership: {
                      default: OBSERVER,
-                     [playerUser.id]: OWNER 
+                     [playerUser.id]: OWNER,
                   },
                });
                const [ownedItem] = await owned.createEmbeddedDocuments('Item', [
                   {
                      name: 'E2E Owned Roll Equipment',
                      type: 'equipment',
-                     system: { check: [itemCheck] } 
+                     system: { check: [itemCheck] },
                   },
                ]);
 
@@ -83,7 +83,7 @@ test.describe('item-sheet roll-button gating (player)', () => {
                   {
                      name: 'E2E Observed Roll Equipment',
                      type: 'equipment',
-                     system: { check: [itemCheck] } 
+                     system: { check: [itemCheck] },
                   },
                ]);
 
@@ -105,7 +105,7 @@ test.describe('item-sheet roll-button gating (player)', () => {
                (actorIds) => actorIds.every((id) => !!game.actors.get(id)),
                [
                   ids.ownedActorId,
-                  ids.observedActorId
+                  ids.observedActorId,
                ],
                { timeout: 1000 },
             );
@@ -127,7 +127,7 @@ test.describe('item-sheet roll-button gating (player)', () => {
                   );
                }, {
                   aid: actorId,
-                  iid: itemId 
+                  iid: itemId,
                });
                return player.locator('.application.titan-document-sheet');
             }
@@ -160,7 +160,7 @@ test.describe('item-sheet roll-button gating (player)', () => {
             await gm.evaluate(async ({ ownedName, observedName }) => {
                for (const name of [
                   ownedName,
-                  observedName
+                  observedName,
                ]) {
                   const actor = game.actors.getName(name);
                   if (actor) {
@@ -169,7 +169,7 @@ test.describe('item-sheet roll-button gating (player)', () => {
                }
             }, {
                ownedName: OWNED_ACTOR_NAME,
-               observedName: OBSERVED_ACTOR_NAME 
+               observedName: OBSERVED_ACTOR_NAME,
             });
          },
       );

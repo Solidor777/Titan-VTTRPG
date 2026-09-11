@@ -49,7 +49,7 @@ export function resolvePosition(position, size, rect) {
 
    return clampPoint({
       x,
-      y 
+      y,
    }, size, rect);
 }
 

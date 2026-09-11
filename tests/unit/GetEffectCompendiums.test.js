@@ -34,7 +34,7 @@ describe('getEffectCompendiums', () => {
          .toEqual([
             'titan.effects',
             'world.aeffects',
-            'world.zeffects'
+            'world.zeffects',
          ]);
    });
 

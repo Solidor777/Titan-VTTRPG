@@ -32,7 +32,7 @@ test('theme editor h3 uses the header token, and light-theme panel-1 is stepped'
          return {
             defaultColor,
             overriddenColor,
-            panel1 
+            panel1,
          };
       }
       finally {
@@ -87,7 +87,7 @@ test('theme editor preview shows the three stepped panels and per-level headers'
    expect(new Set([
       result.panel1Bg,
       result.panel2Bg,
-      result.panel3Bg
+      result.panel3Bg,
    ]).size).toBe(3);
    // The preview headers are driven by the per-level header tokens.
    expect(result.headerColorBefore).toBe('rgb(38, 38, 38)');

@@ -76,13 +76,13 @@ describe('renderCompendiumMarkdown', () => {
                attack: [
                   makeAttack({
                      label: 'Slash',
-                     type: 'melee' 
+                     type: 'melee',
                   }),
                   makeAttack({
                      label: 'Throw',
                      type: 'ranged',
                      attribute: 'body',
-                     skill: 'rangedWeapons' 
+                     skill: 'rangedWeapons',
                   }),
                ],
                attackNotes: '',
@@ -104,7 +104,7 @@ describe('renderCompendiumMarkdown', () => {
             system: makeSpellSystem({
                xpCost: 2,
                tradition: 'fire',
-               description: '<p>A burst of flame.</p>' 
+               description: '<p>A burst of flame.</p>',
             }),
          },
          {
@@ -114,14 +114,14 @@ describe('renderCompendiumMarkdown', () => {
             system: {
                rarity: 'common',
                value: 5,
-               description: '' 
+               description: '',
             },
          },
       ];
 
       expect(renderCompendiumMarkdown(documents, {
          title: 'Test Pack',
-         labels 
+         labels,
       })).toBe(
          '# Test Pack {#test-pack}\n\n'
          + '# Contents {#contents}\n\n'
@@ -170,8 +170,8 @@ describe('renderCompendiumMarkdown', () => {
             system: {
                rarity: 'common',
                value: 1,
-               description: '' 
-            } 
+               description: '',
+            },
          },
          {
             type: 'commodity',
@@ -180,15 +180,15 @@ describe('renderCompendiumMarkdown', () => {
             system: {
                rarity: 'common',
                value: 2,
-               description: '' 
-            } 
+               description: '',
+            },
          },
       ];
 
       /** @type {string} The rendered file. */
       const result = renderCompendiumMarkdown(documents, {
          title: 'Test Pack',
-         labels 
+         labels,
       });
 
       expect(result).toContain('#### ***Rope*** {#rope}\n\n**Value:** 1');
@@ -214,7 +214,7 @@ describe('renderCompendiumMarkdown', () => {
                value: 1,
                attack: [makeAttack({
                   label: 'Punch',
-                  type: 'melee' 
+                  type: 'melee',
                })],
                attackNotes: '',
                trait: [],
@@ -232,13 +232,13 @@ describe('renderCompendiumMarkdown', () => {
                attack: [
                   makeAttack({
                      label: 'Strike',
-                     type: 'melee' 
+                     type: 'melee',
                   }),
                   makeAttack({
                      label: 'Throw',
                      type: 'ranged',
                      attribute: 'body',
-                     skill: 'rangedWeapons' 
+                     skill: 'rangedWeapons',
                   }),
                ],
                attackNotes: '',
@@ -252,7 +252,7 @@ describe('renderCompendiumMarkdown', () => {
       /** @type {string} The rendered file. */
       const result = renderCompendiumMarkdown(documents, {
          title: 'Test Pack',
-         labels 
+         labels,
       });
 
       expect(result).toContain('#### ***Strike (Melee)*** {#strike-melee}\n\n');
@@ -271,15 +271,15 @@ describe('renderCompendiumMarkdown', () => {
             system: {
                rarity: 'common',
                value: 1,
-               description: '' 
-            } 
+               description: '',
+            },
          },
       ];
 
       /** @type {string} The rendered file. */
       const result = renderCompendiumMarkdown(documents, {
          title: 'Test Pack',
-         labels 
+         labels,
       });
 
       expect(result.endsWith('\n')).toBe(true);

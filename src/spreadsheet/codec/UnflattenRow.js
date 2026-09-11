@@ -45,7 +45,7 @@ function buildNode(entries) {
       }
       children.get(head).push({
          segments: rest,
-         value: entry.value 
+         value: entry.value,
       });
    }
 
@@ -59,7 +59,7 @@ function buildNode(entries) {
       const candidates = keys
          .map((key) => ({
             index: Number(key),
-            value: buildNode(children.get(key)) 
+            value: buildNode(children.get(key)),
          }))
          .sort((a, b) => a.index - b.index);
       // Keep only elements with at least one non-blank cell, then reindex densely (ascending order).
@@ -92,7 +92,7 @@ export function unflattenRow(flat) {
    /** @type {Array<{segments: string[], value: *}>} */
    const entries = Object.entries(flat).map(([path, value]) => ({
       segments: path.split('.'),
-      value 
+      value,
    }));
    /** @type {*} */
    const result = buildNode(entries);

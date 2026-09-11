@@ -105,14 +105,14 @@ test.describe('always-visible Svelte header buttons', () => {
          const actor = game.actors.find((a) => a.type === 'player')
             ?? await Actor.create({
                name: 'E2E Header Effect Host',
-               type: 'player' 
+               type: 'player',
             });
          let effect = actor.effects.find((e) => e.type === 'effect' && e.name === 'E2E Header Effect');
          if (!effect) {
             const [created] = await actor.createEmbeddedDocuments('ActiveEffect', [
                {
                   name: 'E2E Header Effect',
-                  type: 'effect' 
+                  type: 'effect',
                },
             ]);
             effect = created;

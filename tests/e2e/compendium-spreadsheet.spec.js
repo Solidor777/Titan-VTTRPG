@@ -160,7 +160,7 @@ async function seedScratchActorPack(page, fixture) {
             [actor] = await Actor.create(
                [{
                   name: 'E2E Original NPC',
-                  type: 'npc' 
+                  type: 'npc',
                }],
                { pack: `world.${packName}` },
             );
@@ -177,14 +177,14 @@ async function seedScratchActorPack(page, fixture) {
       /** @type {object[]} */
       const [item] = await actor.createEmbeddedDocuments('Item', [{
          name: 'E2E Original Weapon',
-         type: 'weapon' 
+         type: 'weapon',
       }]);
       /** @type {object[]} */
       const [itemEffect] = await item.createEmbeddedDocuments(
          'ActiveEffect',
          [{
             name: 'E2E Item Effect',
-            type: 'condition' 
+            type: 'condition',
          }],
       );
       /** @type {object[]} */
@@ -192,7 +192,7 @@ async function seedScratchActorPack(page, fixture) {
          'ActiveEffect',
          [{
             name: 'E2E Actor Effect',
-            type: 'condition' 
+            type: 'condition',
          }],
       );
 
@@ -217,7 +217,7 @@ async function seedScratchActorPack(page, fixture) {
          actorId: actor.id,
          itemId: item.id,
          itemEffectId: itemEffect.id,
-         actorEffectId: actorEffect.id 
+         actorEffectId: actorEffect.id,
       };
    }, fixture);
 }
@@ -284,7 +284,7 @@ test.describe('compendium spreadsheet export/import', () => {
             packLabel: 'E2E Spreadsheet Update',
             documents: [{
                name: 'E2E Original Weapon',
-               type: 'weapon' 
+               type: 'weapon',
             }],
          });
 
@@ -415,11 +415,11 @@ test.describe('compendium spreadsheet export/import', () => {
             documents: [
                {
                   name: 'E2E Keep Weapon',
-                  type: 'weapon' 
+                  type: 'weapon',
                },
                {
                   name: 'E2E Remove Weapon',
-                  type: 'weapon' 
+                  type: 'weapon',
                },
             ],
          });
@@ -471,7 +471,7 @@ test.describe('compendium spreadsheet export/import', () => {
             return Boolean(await pack.getDocument(id));
          }, {
             id: removedId,
-            packId 
+            packId,
          })).toBe(false);
       }
       finally {
@@ -499,7 +499,7 @@ test.describe('compendium spreadsheet export/import', () => {
          const first = index.contents[0];
          return {
             id: first._id,
-            originalName: first.name 
+            originalName: first.name,
          };
       });
 
@@ -565,7 +565,7 @@ test.describe('compendium spreadsheet export/import', () => {
          expect(Object.keys(entries)).toEqual(expect.arrayContaining([
             'npc.csv',
             'weapon.csv',
-            'condition.csv'
+            'condition.csv',
          ]));
          /** @type {string} */
          const weaponCsv = renameAllRows(strFromU8(entries['weapon.csv']), ' Renamed');
@@ -589,7 +589,7 @@ test.describe('compendium spreadsheet export/import', () => {
          const rezipEntries = {
             ...entries,
             'weapon.csv': strToU8(weaponCsv),
-            'condition.csv': strToU8(conditionCsv) 
+            'condition.csv': strToU8(conditionCsv),
          };
          await writeFile(rezipPath, zipSync(rezipEntries));
 
@@ -617,7 +617,7 @@ test.describe('compendium spreadsheet export/import', () => {
          }, {
             pid: packId,
             actorId: ids.actorId,
-            itemId: ids.itemId 
+            itemId: ids.itemId,
          })).toBe('E2E Original Weapon Renamed');
 
          // Verifies Critical bug C2 is fixed: the item's own effect landed in the ITEM's effects

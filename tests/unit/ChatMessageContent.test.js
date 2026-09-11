@@ -16,8 +16,8 @@ describe('ChatMessageContent', () => {
       const documentStore = {
          data: {
             blind: false,
-            system: { component: StubChatMessage } 
-         } 
+            system: { component: StubChatMessage },
+         },
       };
       render(ChatMessageContent, { props: { documentStore } });
       expect(screen.getByTestId('stub-chat-component')).toBeTruthy();
@@ -27,8 +27,8 @@ describe('ChatMessageContent', () => {
       const documentStore = {
          data: {
             blind: false,
-            system: { component: undefined } 
-         } 
+            system: { component: undefined },
+         },
       };
       const { container } = render(ChatMessageContent, { props: { documentStore } });
       expect(container.querySelector('[data-testid="stub-chat-component"]')).toBeNull();

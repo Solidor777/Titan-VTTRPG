@@ -264,7 +264,7 @@ export default class TitanMacros {
             flags: {
                titan: {
                   macroType: macroType,
-                  macroVersion: macroVersion
+                  macroVersion: macroVersion,
                },
             },
          });

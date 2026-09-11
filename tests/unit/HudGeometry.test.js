@@ -11,7 +11,7 @@ const RECT = {
    left: 0,
    top: 0,
    width: 1000,
-   height: 800 
+   height: 800,
 };
 
 describe('computeCanvasRect', () => {
@@ -19,13 +19,13 @@ describe('computeCanvasRect', () => {
       expect(computeCanvasRect({
          viewportWidth: 1300,
          viewportHeight: 800,
-         sidebarWidth: 300 
+         sidebarWidth: 300,
       }))
          .toEqual({
             left: 0,
             top: 0,
             width: 1000,
-            height: 800 
+            height: 800,
          });
    });
 });
@@ -36,14 +36,14 @@ describe('resolvePosition', () => {
          anchorX: 'left',
          anchorY: 'bottom',
          dx: 16,
-         dy: 16 
+         dy: 16,
       };
       expect(resolvePosition(position, {
          width: 100,
-         height: 50 
+         height: 50,
       }, RECT)).toEqual({
          x: 16,
-         y: 734 
+         y: 734,
       });
    });
 
@@ -52,14 +52,14 @@ describe('resolvePosition', () => {
          anchorX: 'right',
          anchorY: 'top',
          dx: 16,
-         dy: 16 
+         dy: 16,
       };
       expect(resolvePosition(position, {
          width: 100,
-         height: 50 
+         height: 50,
       }, RECT)).toEqual({
          x: 884,
-         y: 16 
+         y: 16,
       });
    });
 
@@ -68,11 +68,11 @@ describe('resolvePosition', () => {
          anchorX: 'right',
          anchorY: 'top',
          dx: -50,
-         dy: 16 
+         dy: 16,
       };
       expect(resolvePosition(position, {
          width: 100,
-         height: 50 
+         height: 50,
       }, RECT).x).toBe(900);
    });
 });
@@ -81,13 +81,13 @@ describe('clampPoint', () => {
    it('clamps a point so the element stays fully inside the rect', () => {
       expect(clampPoint({
          x: 980,
-         y: -20 
+         y: -20,
       }, {
          width: 100,
-         height: 50 
+         height: 50,
       }, RECT)).toEqual({
          x: 900,
-         y: 0 
+         y: 0,
       });
    });
 });
@@ -96,32 +96,32 @@ describe('deriveAnchors', () => {
    it('anchors to the nearest edges with non-negative offsets', () => {
       const anchors = deriveAnchors({
          x: 850,
-         y: 30 
+         y: 30,
       }, {
          width: 100,
-         height: 50 
+         height: 50,
       }, RECT);
       expect(anchors).toEqual({
          anchorX: 'right',
          anchorY: 'top',
          dx: 50,
-         dy: 30 
+         dy: 30,
       });
    });
 
    it('anchors left/bottom when the element center sits in that quadrant', () => {
       const anchors = deriveAnchors({
          x: 20,
-         y: 700 
+         y: 700,
       }, {
          width: 100,
-         height: 50 
+         height: 50,
       }, RECT);
       expect(anchors).toEqual({
          anchorX: 'left',
          anchorY: 'bottom',
          dx: 20,
-         dy: 50 
+         dy: 50,
       });
    });
 });

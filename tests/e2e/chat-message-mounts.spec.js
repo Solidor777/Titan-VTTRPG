@@ -55,7 +55,7 @@ function contentChildCount(rootSelector, messageId) {
       return content?.children.length ?? 0;
    }, {
       rootSelector,
-      messageId 
+      messageId,
    });
 }
 
@@ -74,7 +74,7 @@ async function rollCheckMessage() {
       /** @type {Actor} The rebuilt fixture actor that rolls the check. */
       const actor = await Actor.create({
          name: 'E2E Mount Roller',
-         type: 'player' 
+         type: 'player',
       });
       /** @type {number} The message count before the roll; the wait below detects the new message. */
       const before = game.messages.size;

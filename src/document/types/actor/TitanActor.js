@@ -162,7 +162,7 @@ export default class TitanActor extends Actor {
          // Create the active effect or effects.
          return  /** @type ActiveEffect[] */ this.createEmbeddedDocuments(
             'ActiveEffect',
-            activeEffectData
+            activeEffectData,
          );
 
       }

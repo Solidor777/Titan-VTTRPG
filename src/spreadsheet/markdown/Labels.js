@@ -6,31 +6,31 @@
 export const PLURAL_TYPE_LABELS = {
    weapon: [
       'weapons',
-      'Weapons'
+      'Weapons',
    ],
    armor: [
       'armor',
-      'Armor'
+      'Armor',
    ],
    shield: [
       'shields',
-      'Shields'
+      'Shields',
    ],
    equipment: [
       'equipment',
-      'Equipment'
+      'Equipment',
    ],
    commodity: [
       'commodities',
-      'Commodities'
+      'Commodities',
    ],
    ability: [
       'abilities',
-      'Abilities'
+      'Abilities',
    ],
    spell: [
       'spells',
-      'Spells'
+      'Spells',
    ],
 };
 

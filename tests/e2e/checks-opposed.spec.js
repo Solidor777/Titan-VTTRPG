@@ -21,7 +21,7 @@ import { expectedCheckResults } from '../shared/checkOracle.js';
 const FORCED_FACES = [
    6,
    4,
-   1
+   1,
 ];
 
 // Flat boost to the roller's Melee and Accuracy ratings so the difficulty clamp can reach BOTH bounds
@@ -32,7 +32,7 @@ const ATTACKER_BOOST = 5;
 const TARGET_MODS = [
    6,
    8,
-   -8
+   -8,
 ];
 
 /**
@@ -80,7 +80,7 @@ async function rollAttackWithTargets(page, targetNames) {
          game.user.targets = fakeTargets;
          await roller.system.rollAttackCheck({
             itemId: weaponId,
-            attackIdx: 0 
+            attackIdx: 0,
          });
          await titanWait(() => game.messages.size > before, { message: 'new chat message' });
          const newest = game.messages.contents[game.messages.size - 1];
@@ -139,7 +139,7 @@ test.describe('v14 opposed checks (forced dice)', () => {
          const roller = await Actor.create(rollerActor);
          await roller.createEmbeddedDocuments('Item', [
             ...rollerItems,
-            attackerBoostItem
+            attackerBoostItem,
          ]);
 
          // Rebuild each target actor carrying its Defense flat-modifier ability.
@@ -219,7 +219,7 @@ test.describe('v14 opposed checks (forced dice)', () => {
    test('with multiple targets the first target Defense is used', async () => {
       const flags = await rollAttackWithTargets(page, [
          targetName(6),
-         targetName(8)
+         targetName(8),
       ]);
       const [firstDefense, secondDefense] = flags.targetDefenses;
 

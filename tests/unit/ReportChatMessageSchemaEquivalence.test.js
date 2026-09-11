@@ -49,7 +49,7 @@ const EXPECTED = {
       resource: { type: 'SchemaField' },
       tags: {
          type: 'ObjectField',
-         nullable: true 
+         nullable: true,
       },
    },
    healingReport: {
@@ -76,7 +76,7 @@ const EXPECTED = {
       armorLost: { type: 'NumberField' },
       armor: {
          type: 'ObjectField',
-         nullable: true 
+         nullable: true,
       },
    },
    repairsReport: {
@@ -85,7 +85,7 @@ const EXPECTED = {
       armorRepaired: { type: 'NumberField' },
       armor: {
          type: 'ObjectField',
-         nullable: true 
+         nullable: true,
       },
    },
 
@@ -107,19 +107,19 @@ const EXPECTED = {
       expiredEffectsRemoved: { type: 'BooleanField' },
       effects: {
          type: 'ObjectField',
-         nullable: true 
+         nullable: true,
       },
       fastHealing: {
          type: 'ObjectField',
-         nullable: true 
+         nullable: true,
       },
       persistentDamage: {
          type: 'ObjectField',
-         nullable: true 
+         nullable: true,
       },
       resolveRegain: {
          type: 'ObjectField',
-         nullable: true 
+         nullable: true,
       },
       resource: { type: 'SchemaField' },
       message: { type: 'ArrayField' },
@@ -129,15 +129,15 @@ const EXPECTED = {
       expiredEffectsRemoved: { type: 'BooleanField' },
       effects: {
          type: 'ObjectField',
-         nullable: true 
+         nullable: true,
       },
       fastHealing: {
          type: 'ObjectField',
-         nullable: true 
+         nullable: true,
       },
       persistentDamage: {
          type: 'ObjectField',
-         nullable: true 
+         nullable: true,
       },
       resource: { type: 'SchemaField' },
       message: { type: 'ArrayField' },
@@ -153,26 +153,26 @@ const EXPECTED = {
    turnStartRevertReport: {
       fastHealingRevert: {
          type: 'ObjectField',
-         nullable: true 
+         nullable: true,
       },
       persistentDamageRevert: {
          type: 'ObjectField',
-         nullable: true 
+         nullable: true,
       },
       resolveRegainRevert: {
          type: 'ObjectField',
-         nullable: true 
+         nullable: true,
       },
       resource: { type: 'SchemaField' },
    },
    turnEndRevertReport: {
       fastHealingRevert: {
          type: 'ObjectField',
-         nullable: true 
+         nullable: true,
       },
       persistentDamageRevert: {
          type: 'ObjectField',
-         nullable: true 
+         nullable: true,
       },
       resource: { type: 'SchemaField' },
    },
@@ -180,7 +180,7 @@ const EXPECTED = {
       expiredEffectsRemoved: { type: 'BooleanField' },
       effects: {
          type: 'ObjectField',
-         nullable: true 
+         nullable: true,
       },
    },
 };
@@ -195,31 +195,31 @@ const EXPECTED = {
 const RESOURCE_FIELDS = {
    damageReport: [
       'stamina',
-      'wounds'
+      'wounds',
    ],
    healingReport: [
       'stamina',
-      'wounds'
+      'wounds',
    ],
    spendResolveReport: ['resolve'],
    longRestReport: ['wounds'],
    turnStartReport: [
       'stamina',
       'wounds',
-      'resolve'
+      'resolve',
    ],
    turnEndReport: [
       'stamina',
-      'wounds'
+      'wounds',
    ],
    turnStartRevertReport: [
       'stamina',
       'wounds',
-      'resolve'
+      'resolve',
    ],
    turnEndRevertReport: [
       'stamina',
-      'wounds'
+      'wounds',
    ],
 };
 
@@ -242,7 +242,7 @@ beforeAll(async () => {
    ).default;
    models.spendResolveReport = (
       await import(
-         '~/document/types/chat-message/report/types/spend-resolve/SpendResolveReportChatMessageDataModel.js'
+         '~/document/types/chat-message/report/types/spend-resolve/SpendResolveReportChatMessageDataModel.js',
       )
    ).default;
    models.longRestReport = (
@@ -264,7 +264,7 @@ beforeAll(async () => {
    models.removeCombatEffectsReport = (await import(removeCombatEffectsReportPath)).default;
    models.shortRestReport = (
       await import(
-         '~/document/types/chat-message/report/types/short-rest-report/ShortRestReportChatMessageDataModel.js'
+         '~/document/types/chat-message/report/types/short-rest-report/ShortRestReportChatMessageDataModel.js',
       )
    ).default;
 
@@ -279,17 +279,17 @@ beforeAll(async () => {
    // Task 2e: the revert + expired report leaves (turn-start-revert, turn-end-revert, effects-expired).
    models.turnStartRevertReport = (
       await import(
-         '~/document/types/chat-message/report/types/turn-start-revert/TurnStartRevertReportChatMessageDataModel.js'
+         '~/document/types/chat-message/report/types/turn-start-revert/TurnStartRevertReportChatMessageDataModel.js',
       )
    ).default;
    models.turnEndRevertReport = (
       await import(
-         '~/document/types/chat-message/report/types/turn-end-revert/TurnEndRevertReportChatMessageDataModel.js'
+         '~/document/types/chat-message/report/types/turn-end-revert/TurnEndRevertReportChatMessageDataModel.js',
       )
    ).default;
    models.effectsExpiredReport = (
       await import(
-         '~/document/types/chat-message/report/types/effects-expired/EffectsExpiredReportChatMessageDataModel.js'
+         '~/document/types/chat-message/report/types/effects-expired/EffectsExpiredReportChatMessageDataModel.js',
       )
    ).default;
 });
@@ -314,7 +314,7 @@ describe('Report chat-message schema equivalence (golden master)', () => {
       expect(Object.keys(schema).sort()).toEqual([
          'actorImg',
          'actorName',
-         'documentVersion'
+         'documentVersion',
       ]);
    });
 
@@ -337,7 +337,7 @@ describe('Report chat-message schema equivalence (golden master)', () => {
          const ignore = new Set([
             'actorName',
             'actorImg',
-            'documentVersion'
+            'documentVersion',
          ]);
          const extra = Object.keys(schema).filter((field) => !ignore.has(field) && !(field in fields));
          expect(extra, `unexpected extra fields on ${key}`).toEqual([]);

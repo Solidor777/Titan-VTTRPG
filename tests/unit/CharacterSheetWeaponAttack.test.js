@@ -108,11 +108,11 @@ function renderRow(weapon, actor) {
       context: new Map([
          [
             'document',
-            weapon
+            weapon,
          ],
          [
             'sheetDocument',
-            actor
+            actor,
          ],
       ]),
    });
@@ -147,7 +147,7 @@ describe('CharacterSheetWeaponAttack', () => {
          'dice',
          'training',
          'expertise',
-         'damage'
+         'damage',
       ]) {
          expect(getAttackCheckMod).toHaveBeenCalledWith(
             modifierType,

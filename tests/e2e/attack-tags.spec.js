@@ -64,7 +64,7 @@ test.describe('shared AttackTags across surfaces', () => {
          // range tag renders), one standard trait, and one custom trait.
          const actor = await Actor.create({
             name: actorName,
-            type: 'player' 
+            type: 'player',
          });
          await actor.createEmbeddedDocuments('Item', [
             {
@@ -106,7 +106,7 @@ test.describe('shared AttackTags across surfaces', () => {
       }, {
          actorName: ACTOR_NAME,
          weaponName: WEAPON_NAME,
-         customTraitName: CUSTOM_TRAIT_NAME 
+         customTraitName: CUSTOM_TRAIT_NAME,
       });
    });
 
@@ -160,7 +160,7 @@ test.describe('shared AttackTags across surfaces', () => {
          );
       }, {
          actorName: ACTOR_NAME,
-         weaponName: WEAPON_NAME 
+         weaponName: WEAPON_NAME,
       });
 
       /** @type {import('@playwright/test').Locator} The weapon item-sheet application root (only app open). */
@@ -213,7 +213,7 @@ test.describe('shared AttackTags across surfaces', () => {
          });
       }, {
          actorName: ACTOR_NAME,
-         weaponName: WEAPON_NAME 
+         weaponName: WEAPON_NAME,
       });
 
       // The embedded bridge re-resolves through the actor subscription: the row updates in place.
@@ -258,7 +258,7 @@ test.describe('shared AttackTags across surfaces', () => {
       }, {
          actorName: ACTOR_NAME,
          weaponName: WEAPON_NAME,
-         customTraits: [CUSTOM_TRAIT_CAMELIZED] 
+         customTraits: [CUSTOM_TRAIT_CAMELIZED],
       });
       await expect(row.getByTestId('attack-row-dice').locator('.value')).toHaveText(String(expectedDice));
 
@@ -286,7 +286,7 @@ test.describe('shared AttackTags across surfaces', () => {
          return message.id;
       }, {
          actorName: ACTOR_NAME,
-         weaponName: WEAPON_NAME 
+         weaponName: WEAPON_NAME,
       });
 
       /** @type {import('@playwright/test').Locator} The mounted weapon card (first visible mount). */
@@ -313,7 +313,7 @@ test.describe('shared AttackTags across surfaces', () => {
          });
       }, {
          actorName: ACTOR_NAME,
-         weaponName: WEAPON_NAME 
+         weaponName: WEAPON_NAME,
       });
       await expect(row.getByTestId('attack-tags-damage').locator('.value')).toHaveText('11');
 

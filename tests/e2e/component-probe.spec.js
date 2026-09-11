@@ -110,7 +110,7 @@ test.describe('component probe — TextInput', () => {
          },
          events: [
             'onkeyup',
-            'onchange'
+            'onchange',
          ],
       });
       const input = page.locator(`${selector} input`);
@@ -257,11 +257,11 @@ test.describe('component probe — Select', () => {
             options: [
                {
                   value: 'a',
-                  label: 'Alpha' 
+                  label: 'Alpha',
                },
                {
                   value: 'b',
-                  label: 'Beta' 
+                  label: 'Beta',
                },
             ],
             testId: 'probe-select',
@@ -285,11 +285,11 @@ test.describe('component probe — Select', () => {
             options: [
                {
                   value: 'a',
-                  label: 'Alpha' 
+                  label: 'Alpha',
                },
                {
                   value: 'b',
-                  label: 'Beta' 
+                  label: 'Beta',
                },
             ],
          },

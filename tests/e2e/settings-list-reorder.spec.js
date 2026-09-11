@@ -48,7 +48,7 @@ test.describe('settings-list reorder', () => {
          }
          const item = await Item.create({
             name,
-            type: 'weapon' 
+            type: 'weapon',
          });
          await item.update({ system: { rulesElement: [] } });
          await item.system.addRulesElement();
@@ -59,7 +59,7 @@ test.describe('settings-list reorder', () => {
          const after = item.system.rulesElement.map((e) => e.uuid);
          return {
             before,
-            after 
+            after,
          };
       }, WEAPON_NAME);
 
@@ -67,7 +67,7 @@ test.describe('settings-list reorder', () => {
       expect(order.after).toEqual([
          order.before[1],
          order.before[2],
-         order.before[0]
+         order.before[0],
       ]);
    });
 
@@ -79,7 +79,7 @@ test.describe('settings-list reorder', () => {
          }
          const item = await Item.create({
             name,
-            type: 'weapon' 
+            type: 'weapon',
          });
          await item.update({ system: { attack: [] } });
          await item.system.addAttack();
@@ -90,7 +90,7 @@ test.describe('settings-list reorder', () => {
          const after = item.system.attack.map((e) => e.uuid);
          return {
             before,
-            after 
+            after,
          };
       }, WEAPON_NAME);
 
@@ -98,7 +98,7 @@ test.describe('settings-list reorder', () => {
       expect(order.after).toEqual([
          order.before[1],
          order.before[2],
-         order.before[0]
+         order.before[0],
       ]);
    });
 
@@ -110,7 +110,7 @@ test.describe('settings-list reorder', () => {
          }
          const item = await Item.create({
             name,
-            type: 'weapon' 
+            type: 'weapon',
          });
          await item.update({ system: { check: [] } });
 
@@ -140,7 +140,7 @@ test.describe('settings-list reorder', () => {
          return {
             before,
             after,
-            expandedLength 
+            expandedLength,
          };
       }, WEAPON_NAME);
 
@@ -148,7 +148,7 @@ test.describe('settings-list reorder', () => {
       expect(result.after).toEqual([
          result.before[1],
          result.before[2],
-         result.before[0]
+         result.before[0],
       ]);
       expect(result.expandedLength).toBe(3);
    });
@@ -161,7 +161,7 @@ test.describe('settings-list reorder', () => {
          }
          const item = await Item.create({
             name,
-            type: 'spell' 
+            type: 'spell',
          });
          await item.update({ system: { customAspect: [] } });
          await item.system.addCustomAspect();
@@ -172,7 +172,7 @@ test.describe('settings-list reorder', () => {
          const after = item.system.customAspect.map((e) => e.uuid);
          return {
             before,
-            after 
+            after,
          };
       }, SPELL_NAME);
 
@@ -180,7 +180,7 @@ test.describe('settings-list reorder', () => {
       expect(order.after).toEqual([
          order.before[1],
          order.before[2],
-         order.before[0]
+         order.before[0],
       ]);
    });
 
@@ -192,7 +192,7 @@ test.describe('settings-list reorder', () => {
          }
          const item = await Item.create({
             name,
-            type: 'weapon' 
+            type: 'weapon',
          });
          await item.system.addRulesElement();
          const app = await item.sheet.render(true);

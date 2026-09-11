@@ -20,7 +20,7 @@ export default function createModifiableStatTooltip(
    equipmentMod,
    staticMod,
    extraMod,
-   baseTooltip
+   baseTooltip,
 ) {
    // Base label.
    let retVal = baseTooltip ? `<p>${baseTooltip}</p>` : '';

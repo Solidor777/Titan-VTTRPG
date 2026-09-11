@@ -57,7 +57,7 @@ async function seedActorWithItem(page, actorName, itemType, system) {
       // Seed a fresh player actor with one item whose initial display state is known.
       const actor = await Actor.create({
          name: actorName,
-         type: 'player' 
+         type: 'player',
       });
       await actor.createEmbeddedDocuments('Item', [
          {
@@ -76,7 +76,7 @@ async function seedActorWithItem(page, actorName, itemType, system) {
    }, {
       actorName,
       itemType,
-      system 
+      system,
    });
 }
 

@@ -21,7 +21,7 @@
             props: {
                tooltip: getArmorTraitDescription(document.data.system.trait[idx].name),
                label: localize(document.data.system.trait[idx].name),
-            }
+            },
          });
       }
       return result;

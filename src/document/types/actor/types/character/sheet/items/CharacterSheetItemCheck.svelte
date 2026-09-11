@@ -33,7 +33,7 @@
 
          // Update the check parameters.
          return sheetDocument.data.system.getItemCheckParameters(
-            sheetDocument.data.system.initializeItemCheckOptions(checkOptions)
+            sheetDocument.data.system.initializeItemCheckOptions(checkOptions),
          );
       }
       return undefined;

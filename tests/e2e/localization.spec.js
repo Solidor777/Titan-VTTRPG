@@ -12,7 +12,7 @@ const ITEM_TYPES = [
    'equipment',
    'shield',
    'spell',
-   'weapon'
+   'weapon',
 ];
 
 /** @type {import('@playwright/test').Page} The file-shared, logged-in page (one world boot per file). */
@@ -70,14 +70,14 @@ test.describe('no double-localized (LOCAL.) text in rendered UI', () => {
             const [created] = await actor.createEmbeddedDocuments('ActiveEffect', [
                {
                   name: 'E2E Effect',
-                  type: 'effect' 
+                  type: 'effect',
                },
             ]);
             effect = created;
          }
          return {
             actorId: actor.id,
-            effectId: effect.id 
+            effectId: effect.id,
          };
       });
       const locateSrc = `() => game.actors.get('${ids.actorId}')?.effects.get('${ids.effectId}')`;
@@ -92,14 +92,14 @@ test.describe('no double-localized (LOCAL.) text in rendered UI', () => {
          const actor = game.actors.find((a) => a.type === 'player' && a.name === 'E2E Player')
             ?? await Actor.create({
                name: 'E2E Player',
-               type: 'player' 
+               type: 'player',
             });
          let spell = actor.items.find((i) => i.name === 'E2E Aspect Spell');
          if (!spell) {
             [spell] = await actor.createEmbeddedDocuments('Item', [
                {
                   name: 'E2E Aspect Spell',
-                  type: 'spell' 
+                  type: 'spell',
                },
             ]);
          }
@@ -160,7 +160,7 @@ test.describe('no double-localized (LOCAL.) text in rendered UI', () => {
          await game.actors.getName('E2E Dialog Roller')?.delete();
          const actor = await Actor.create({
             name: 'E2E Dialog Roller',
-            type: 'player' 
+            type: 'player',
          });
          await actor.createEmbeddedDocuments('Item', items);
          await game.settings.set('titan', 'getCheckOptions', true);
@@ -211,7 +211,7 @@ test.describe('no double-localized (LOCAL.) text in rendered UI', () => {
          if (!existing) {
             await ActiveEffect.create({
                name: 'E2E Tray Effect',
-               type: 'effect' 
+               type: 'effect',
             }, { pack: pack.collection });
          }
          await ui.titanEffects.render(true);

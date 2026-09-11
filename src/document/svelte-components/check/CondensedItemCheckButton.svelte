@@ -48,7 +48,7 @@
       resolveCost={checkParameters.resolveCost}
       tooltip={{
          text: tooltip,
-         localize: false 
+         localize: false,
       }}
       totalDice={checkParameters.totalDice}
       totalExpertise={checkParameters.totalExpertise}

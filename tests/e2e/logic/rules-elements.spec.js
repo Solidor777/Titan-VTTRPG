@@ -68,7 +68,7 @@ test.describe('rules elements — derived attribute math', () => {
          }
          const actor = await Actor.create({
             name,
-            type: 'player' 
+            type: 'player',
          });
          await actor.createEmbeddedDocuments('Item', [abilityData]);
 
@@ -79,7 +79,7 @@ test.describe('rules elements — derived attribute math', () => {
          return actor.system.attribute.body.value;
       }, {
          name: ACTOR_NAME,
-         abilityData: buildFlatModifierAbilityData('E2E +2 Body', [2]) 
+         abilityData: buildFlatModifierAbilityData('E2E +2 Body', [2]),
       });
 
       // Base Body 1 + flat 2 = 3.
@@ -94,7 +94,7 @@ test.describe('rules elements — derived attribute math', () => {
          }
          const actor = await Actor.create({
             name,
-            type: 'player' 
+            type: 'player',
          });
          await actor.createEmbeddedDocuments('Item', [abilityData]);
          // Wait until the mulBase ability is owned and its boost has reached the derived Body value (base 1).
@@ -104,7 +104,7 @@ test.describe('rules elements — derived attribute math', () => {
          return actor.system.attribute.body.value;
       }, {
          name: ACTOR_NAME,
-         abilityData: buildMulBaseAbilityData('E2E x2 Body', 2) 
+         abilityData: buildMulBaseAbilityData('E2E x2 Body', 2),
       });
 
       // Base 1 + base*(2-1) = 1 + 1 = 2.
@@ -119,7 +119,7 @@ test.describe('rules elements — derived attribute math', () => {
          }
          const actor = await Actor.create({
             name,
-            type: 'player' 
+            type: 'player',
          });
          await actor.createEmbeddedDocuments('Item', [abilityData]);
          // Wait until the mulBase+flat ability is owned and its boost has reached derived Body (base 1).
@@ -129,7 +129,7 @@ test.describe('rules elements — derived attribute math', () => {
          return actor.system.attribute.body.value;
       }, {
          name: ACTOR_NAME,
-         abilityData: buildMulBaseAbilityData('E2E x2 +3 Body', 2, [3]) 
+         abilityData: buildMulBaseAbilityData('E2E x2 +3 Body', 2, [3]),
       });
 
       // Base 1 + base*(2-1) + 3 = 1 + 1 + 3 = 5.
@@ -160,7 +160,7 @@ test.describe('rules elements — all-key selector', () => {
          }
          const actor = await Actor.create({
             name,
-            type: 'player' 
+            type: 'player',
          });
          await actor.createEmbeddedDocuments('Item', [abilityData]);
          // Wait until the all-key ability is owned and its +2 has reached the derived Body value (base 1).
@@ -179,7 +179,7 @@ test.describe('rules elements — all-key selector', () => {
                operation: 'flatModifier',
                selector: 'attribute',
                key: 'all',
-               value: 2 
+               value: 2,
             },
          ]),
       });
@@ -187,7 +187,7 @@ test.describe('rules elements — all-key selector', () => {
       expect(attributes).toEqual({
          body: 3,
          mind: 3,
-         soul: 3 
+         soul: 3,
       });
    });
 });
@@ -220,12 +220,12 @@ test.describe('rules elements — stacking invariants (property-based)', () => {
          }
          const actor = await Actor.create({
             name: 'E2E Stacking Actor',
-            type: 'player' 
+            type: 'player',
          });
          const [ability] = await actor.createEmbeddedDocuments('Item', [
             {
                name: 'E2E Stacking Ability',
-               type: 'ability' 
+               type: 'ability',
             },
          ]);
 
@@ -234,7 +234,7 @@ test.describe('rules elements — stacking invariants (property-based)', () => {
             fc.asyncProperty(
                fc.array(fc.integer({
                   min: -10,
-                  max: 10 
+                  max: 10,
                }), { maxLength: 5 }),
                async (values) => {
                   // Replace the ability's rules elements with one flatModifier per generated value.
@@ -261,7 +261,7 @@ test.describe('rules elements — stacking invariants (property-based)', () => {
          return {
             failed: report.failed,
             counterexample: report.counterexample,
-            numRuns: report.numRuns 
+            numRuns: report.numRuns,
          };
       });
 
@@ -296,7 +296,7 @@ test.describe('rules elements — mulSum (multiply total)', () => {
          }
          const actor = await Actor.create({
             name,
-            type: 'player' 
+            type: 'player',
          });
          await actor.createEmbeddedDocuments('Item', [abilityData]);
          // Wait until the mulSum ability is owned and its boost has reached the derived Body value (base 1).
@@ -311,14 +311,14 @@ test.describe('rules elements — mulSum (multiply total)', () => {
                operation: 'flatModifier',
                selector: 'attribute',
                key: 'body',
-               value: 4 
+               value: 4,
             },
             {
                operation: 'mulSum',
                selector: 'attribute',
                key: 'body',
                value: 0.5,
-               rounding: 'up' 
+               rounding: 'up',
             },
          ]),
       });
@@ -334,7 +334,7 @@ test.describe('rules elements — mulSum (multiply total)', () => {
          }
          const actor = await Actor.create({
             name,
-            type: 'player' 
+            type: 'player',
          });
          await actor.createEmbeddedDocuments('Item', [abilityData]);
          // Wait until the stacked-mulSum ability is owned and its boost has reached derived Body (base 1).
@@ -349,21 +349,21 @@ test.describe('rules elements — mulSum (multiply total)', () => {
                operation: 'flatModifier',
                selector: 'attribute',
                key: 'body',
-               value: 7 
+               value: 7,
             },
             {
                operation: 'mulSum',
                selector: 'attribute',
                key: 'body',
                value: 0.5,
-               rounding: 'up' 
+               rounding: 'up',
             },
             {
                operation: 'mulSum',
                selector: 'attribute',
                key: 'body',
                value: 0.5,
-               rounding: 'up' 
+               rounding: 'up',
             },
          ]),
       });
@@ -396,7 +396,7 @@ test.describe('rules elements — setSum (set total)', () => {
             }
             const actor = await Actor.create({
                name,
-               type: 'player' 
+               type: 'player',
             });
             await actor.createEmbeddedDocuments('Item', [abilityData]);
             // setSum totals can land at 0, so wait on the monotonic fact that the ability is owned
@@ -410,7 +410,7 @@ test.describe('rules elements — setSum (set total)', () => {
          };
          return {
             zero: await read(zeroData),
-            two: await read(twoData) 
+            two: await read(twoData),
          };
       }, {
          name: ACTOR_NAME,
@@ -419,14 +419,14 @@ test.describe('rules elements — setSum (set total)', () => {
                operation: 'flatModifier',
                selector: 'attribute',
                key: 'body',
-               value: 4 
+               value: 4,
             },
             {
                operation: 'setSum',
                selector: 'attribute',
                key: 'body',
                value: 0,
-               mode: 'set' 
+               mode: 'set',
             },
          ]),
          twoData: buildRulesElementAbilityData('E2E SetSum 2', [
@@ -434,21 +434,21 @@ test.describe('rules elements — setSum (set total)', () => {
                operation: 'flatModifier',
                selector: 'attribute',
                key: 'body',
-               value: 4 
+               value: 4,
             },
             {
                operation: 'setSum',
                selector: 'attribute',
                key: 'body',
                value: 2,
-               mode: 'set' 
+               mode: 'set',
             },
          ]),
       });
 
       expect(results).toEqual({
          zero: 0,
-         two: 2 
+         two: 2,
       });
    });
 
@@ -460,7 +460,7 @@ test.describe('rules elements — setSum (set total)', () => {
          }
          const actor = await Actor.create({
             name,
-            type: 'player' 
+            type: 'player',
          });
          await actor.createEmbeddedDocuments('Item', [abilityData]);
          // Wait until the setSum-min ability is owned and its floor has reached derived Body (base 1).
@@ -476,7 +476,7 @@ test.describe('rules elements — setSum (set total)', () => {
                selector: 'attribute',
                key: 'body',
                value: 5,
-               mode: 'min' 
+               mode: 'min',
             },
          ]),
       });
@@ -493,7 +493,7 @@ test.describe('rules elements — setSum (set total)', () => {
          }
          const actor = await Actor.create({
             name,
-            type: 'player' 
+            type: 'player',
          });
          await actor.createEmbeddedDocuments('Item', [abilityData]);
          // Wait until the setSum-max ability is owned and its boost has reached derived Body (base 1).
@@ -508,14 +508,14 @@ test.describe('rules elements — setSum (set total)', () => {
                operation: 'flatModifier',
                selector: 'attribute',
                key: 'body',
-               value: 7 
+               value: 7,
             },
             {
                operation: 'setSum',
                selector: 'attribute',
                key: 'body',
                value: 5,
-               mode: 'max' 
+               mode: 'max',
             },
          ]),
       });
@@ -549,7 +549,7 @@ test.describe('rules elements — mulBase rounding', () => {
             }
             const actor = await Actor.create({
                name,
-               type: 'player' 
+               type: 'player',
             });
             await actor.createEmbeddedDocuments('Item', [abilityData]);
             // mulBase rounding lands Body at 0 or 1, so wait on the monotonic fact that the ability is
@@ -563,7 +563,7 @@ test.describe('rules elements — mulBase rounding', () => {
          };
          return {
             down: await read(downData),
-            up: await read(upData) 
+            up: await read(upData),
          };
       }, {
          name: ACTOR_NAME,
@@ -573,7 +573,7 @@ test.describe('rules elements — mulBase rounding', () => {
                selector: 'attribute',
                key: 'body',
                value: 0.5,
-               rounding: 'down' 
+               rounding: 'down',
             },
          ]),
          upData: buildRulesElementAbilityData('E2E MulBase Up', [
@@ -582,7 +582,7 @@ test.describe('rules elements — mulBase rounding', () => {
                selector: 'attribute',
                key: 'body',
                value: 0.5,
-               rounding: 'up' 
+               rounding: 'up',
             },
          ]),
       });
@@ -591,7 +591,7 @@ test.describe('rules elements — mulBase rounding', () => {
       // down -> floor(-0.5) = -1 -> Body 0. up -> ceil(-0.5) = 0 -> Body 1.
       expect(results).toEqual({
          down: 0,
-         up: 1 
+         up: 1,
       });
    });
 });

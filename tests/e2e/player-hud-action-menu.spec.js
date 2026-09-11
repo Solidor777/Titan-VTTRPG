@@ -29,7 +29,7 @@ test.beforeAll(async ({ browser }) => {
    for (const name of [
       'HUD Menu Player',
       'HUD Menu Player 2',
-      'HUD Menu Empty'
+      'HUD Menu Empty',
    ]) {
       await deleteFixtureActor(page, name);
    }
@@ -78,7 +78,7 @@ async function seedControlledActor(page, { name, releaseOthers = true }) {
       if (!game.actors.getName(name)) {
          await Actor.create({
             name,
-            type: 'player' 
+            type: 'player',
          });
       }
    }, { name });
@@ -95,7 +95,7 @@ async function seedControlledActor(page, { name, releaseOthers = true }) {
       return false;
    }, {
       name,
-      releaseOthers 
+      releaseOthers,
    });
 
    if (!hasToken) {
@@ -134,7 +134,7 @@ async function seedDocuments(page, actorId, docs) {
       };
    }, {
       actorId,
-      docs 
+      docs,
    });
 }
 
@@ -191,7 +191,7 @@ test('equipped weapon main action rolls the first attack to chat', async () => {
          name: 'HUD Longsword',
          type: 'weapon',
          system: { equipped: true },
-      }] 
+      }],
    });
    await page.locator('[data-testid="player-hud-category-weapons"]').click();
    const subOption = page.locator('[data-testid^="player-hud-sub-option-weapons-"]').first();
@@ -200,7 +200,7 @@ test('equipped weapon main action rolls the first attack to chat', async () => {
       () => page.evaluate(() => game.messages.contents.at(-1)?.type),
       {
          message: 'an attack check chat message',
-         timeout: 1000 
+         timeout: 1000,
       },
    ).toBe('attackCheck');
 });
@@ -212,7 +212,7 @@ test('unequipped weapon main action equips it', async () => {
          name: 'HUD Sidearm',
          type: 'weapon',
          system: { equipped: false },
-      }] 
+      }],
    });
    await page.locator('[data-testid="player-hud-category-weapons"]').click();
    await page.locator(`[data-testid="player-hud-sub-option-weapons-${itemIds[0]}"]`).click();
@@ -221,7 +221,7 @@ test('unequipped weapon main action equips it', async () => {
          return game.actors.get(actorId).items.get(itemId).system.equipped;
       }, {
          actorId,
-         itemId: itemIds[0] 
+         itemId: itemIds[0],
       }),
       { message: 'the weapon equips via its main action' },
    ).toBe(true);
@@ -245,7 +245,7 @@ test('weapon sub-buttons send to chat and open the sheet', async () => {
       () => page.evaluate(() => game.messages.contents.at(-1)?.type),
       {
          message: 'the weapon item card lands in chat',
-         timeout: 1000 
+         timeout: 1000,
       },
    ).toBe('weapon');
 
@@ -265,7 +265,7 @@ test('skill roll for a group hits every selected actor', async () => {
    await seedControlledActor(page, { name: 'HUD Menu Player' });
    await seedControlledActor(page, {
       name: 'HUD Menu Player 2',
-      releaseOthers: false 
+      releaseOthers: false,
    });
    /** @type {number} The chat message count before the group roll. */
    const before = await messageCount(page);
@@ -279,7 +279,7 @@ test('skill roll for a group hits every selected actor', async () => {
       }, before),
       {
          message: 'one skill check per selected actor',
-         timeout: 1000 
+         timeout: 1000,
       },
    ).toBe(2);
 });
@@ -288,7 +288,7 @@ test('resistance roll rolls for all selected actors', async () => {
    await seedControlledActor(page, { name: 'HUD Menu Player' });
    await seedControlledActor(page, {
       name: 'HUD Menu Player 2',
-      releaseOthers: false 
+      releaseOthers: false,
    });
    const before = await messageCount(page);
 
@@ -301,7 +301,7 @@ test('resistance roll rolls for all selected actors', async () => {
       }, before),
       {
          message: 'one resistance check per selected actor',
-         timeout: 1000 
+         timeout: 1000,
       },
    ).toBe(2);
 });
@@ -310,7 +310,7 @@ test('apply damage dialog applies the amount to all selected actors', async () =
    const firstId = await seedControlledActor(page, { name: 'HUD Menu Player' });
    const secondId = await seedControlledActor(page, {
       name: 'HUD Menu Player 2',
-      releaseOthers: false 
+      releaseOthers: false,
    });
 
    /** @type {{first: number, second: number}} Both actors' stamina, topped to max before the hit. */
@@ -325,7 +325,7 @@ test('apply damage dialog applies the amount to all selected actors', async () =
       };
    }, {
       firstId,
-      secondId 
+      secondId,
    });
 
    await page.locator('[data-testid="player-hud-category-utility"]').click();
@@ -341,15 +341,15 @@ test('apply damage dialog applies the amount to all selected actors', async () =
          ];
       }, {
          firstId,
-         secondId 
+         secondId,
       }),
       {
          message: 'both actors take the entered damage',
-         timeout: 1000 
+         timeout: 1000,
       },
    ).toEqual([
       before.first - 3,
-      before.second - 3
+      before.second - 3,
    ]);
 });
 
@@ -359,7 +359,7 @@ test('spell main action rolls a casting check', async () => {
       items: [{
          name: 'HUD Spark',
          type: 'spell',
-      }] 
+      }],
    });
    await page.locator('[data-testid="player-hud-category-spells"]').click();
    await page.locator(`[data-testid="player-hud-sub-option-spells-${itemIds[0]}"]`).click();
@@ -367,7 +367,7 @@ test('spell main action rolls a casting check', async () => {
       () => page.evaluate(() => game.messages.contents.at(-1)?.type),
       {
          message: 'a casting check chat message',
-         timeout: 1000 
+         timeout: 1000,
       },
    ).toBe('castingCheck');
 });
@@ -379,7 +379,7 @@ test('ability and effect main actions roll their first check', async () => {
          name: 'HUD Trick',
          type: 'ability',
          system: { check: [fullCheck('Trick Check')] },
-      }] 
+      }],
    });
    await page.locator('[data-testid="player-hud-category-abilities"]').click();
    await page.locator(`[data-testid="player-hud-sub-option-abilities-${itemIds[0]}"]`).click();
@@ -387,7 +387,7 @@ test('ability and effect main actions roll their first check', async () => {
       () => page.evaluate(() => game.messages.contents.at(-1)?.type),
       {
          message: 'an item check from the ability',
-         timeout: 1000 
+         timeout: 1000,
       },
    ).toBe('itemCheck');
 
@@ -399,10 +399,10 @@ test('ability and effect main actions roll their first check', async () => {
             check: [fullCheck('Burn Check')],
             duration: {
                type: 'turnStart',
-               remaining: 2 
+               remaining: 2,
             },
          },
-      }] 
+      }],
    });
    await page.locator('[data-testid="player-hud-category-effects"]').click();
    await page.locator(`[data-testid="player-hud-sub-option-effects-${effectIds[0]}"]`).click();
@@ -410,7 +410,7 @@ test('ability and effect main actions roll their first check', async () => {
       () => page.evaluate(() => game.messages.contents.at(-1)?.type),
       {
          message: 'an item check from the effect',
-         timeout: 1000 
+         timeout: 1000,
       },
    ).toBe('itemCheck');
 });
@@ -431,7 +431,7 @@ test('effect duration and remove sub-buttons update and delete the effect', asyn
          return game.actors.get(actorId).effects.get(effectId).system.duration.remaining;
       }, {
          actorId,
-         effectId 
+         effectId,
       }),
       { message: 'the duration increments in place' },
    ).toBe(3);
@@ -443,7 +443,7 @@ test('effect duration and remove sub-buttons update and delete the effect', asyn
          return game.actors.get(actorId).effects.get(effectId) ?? null;
       }, {
          actorId,
-         effectId 
+         effectId,
       }),
       { message: 'the effect is removed' },
    ).toBe(null);
@@ -459,7 +459,7 @@ test('commodity quantity sub-buttons step the quantity', async () => {
             quantity: 2,
             check: [fullCheck('Ration Check')],
          },
-      }] 
+      }],
    });
 
    await page.locator('[data-testid="player-hud-category-inventory"]').click();
@@ -471,7 +471,7 @@ test('commodity quantity sub-buttons step the quantity', async () => {
          return game.actors.get(actorId).items.get(itemId).system.quantity;
       }, {
          actorId,
-         itemId: itemIds[0] 
+         itemId: itemIds[0],
       }),
       { message: 'the quantity increments in place' },
    ).toBe(3);
@@ -483,7 +483,7 @@ test('commodity quantity sub-buttons step the quantity', async () => {
          return game.actors.get(actorId).items.get(itemId).system.quantity;
       }, {
          actorId,
-         itemId: itemIds[0] 
+         itemId: itemIds[0],
       }),
       { message: 'the quantity decrements in place' },
    ).toBe(2);
@@ -506,7 +506,7 @@ test('the weapons filter hides action-less weapons until disabled', async () => 
             type: 'weapon',
             system: { equipped: true },
          },
-      ] 
+      ],
    });
 
    await page.locator('[data-testid="player-hud-category-weapons"]').click();
@@ -535,7 +535,7 @@ test('a disabled sub-button gate removes that sub-button from the flyout', async
          name: 'HUD Gate Blade',
          type: 'weapon',
          system: { equipped: true },
-      }] 
+      }],
    });
 
    // A prior test can leave the weapons cascade open (the open category persists in layout state);

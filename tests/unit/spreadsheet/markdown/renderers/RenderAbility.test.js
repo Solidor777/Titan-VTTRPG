@@ -104,11 +104,11 @@ describe('renderAbility', () => {
             customTrait: [
                {
                   name: 'Path',
-                  description: '' 
+                  description: '',
                },
                {
                   name: 'Arbiter',
-                  description: '' 
+                  description: '',
                },
             ],
             check: [{

@@ -145,7 +145,7 @@ export default class TitanItem extends Item {
          await this.update({
             system: {
                check: structuredClone(this.system.check),
-            }
+            },
          });
 
          // Notify the sheet of the added check.
@@ -175,7 +175,7 @@ export default class TitanItem extends Item {
          await this.update({
             system: {
                check: structuredClone(this.system.check),
-            }
+            },
          });
       }
    }
@@ -200,7 +200,7 @@ export default class TitanItem extends Item {
          await this.update({
             system: {
                check: moveArrayEntry(this.system.check, fromIdx, toIdx),
-            }
+            },
          });
       }
    }
@@ -230,7 +230,7 @@ export default class TitanItem extends Item {
          await this.update({
             system: {
                check: next,
-            }
+            },
          });
       }
    }

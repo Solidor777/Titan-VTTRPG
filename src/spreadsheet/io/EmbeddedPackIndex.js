@@ -19,13 +19,13 @@ export async function buildPackEmbeddedIndex(targetPack) {
          index.set(item.id, {
             document: item,
             parentId: document.id,
-            depth: 1 
+            depth: 1,
          });
          for (const effect of item.effects ?? []) {
             index.set(effect.id, {
                document: effect,
                parentId: item.id,
-               depth: 2 
+               depth: 2,
             });
          }
       }
@@ -33,7 +33,7 @@ export async function buildPackEmbeddedIndex(targetPack) {
          index.set(effect.id, {
             document: effect,
             parentId: document.id,
-            depth: 1 
+            depth: 1,
          });
       }
    }

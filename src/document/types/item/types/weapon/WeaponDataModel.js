@@ -191,7 +191,7 @@ export default class WeaponDataModel extends RulesElementItemDataModel {
          await this.parent.update({
             system: {
                attack: structuredClone(this.attack),
-            }
+            },
          });
       }
    }
@@ -217,7 +217,7 @@ export default class WeaponDataModel extends RulesElementItemDataModel {
          await this.parent.update({
             system: {
                attack: moveArrayEntry(this.attack, fromIdx, toIdx),
-            }
+            },
          });
       }
    }
@@ -247,7 +247,7 @@ export default class WeaponDataModel extends RulesElementItemDataModel {
          await this.parent.update({
             system: {
                attack: next,
-            }
+            },
          });
       }
    }

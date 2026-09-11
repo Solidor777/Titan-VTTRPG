@@ -59,7 +59,7 @@ export default class TitanEffectTrayTab extends foundry.applications.sidebar.Abs
             },
             context: new Map([[
                'application',
-               this
+               this,
             ]]),
          });
       }

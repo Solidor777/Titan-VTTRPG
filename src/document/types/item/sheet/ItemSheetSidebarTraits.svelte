@@ -29,8 +29,8 @@
             id: document.data.system.customTrait[idx].uuid,
             component: ItemSheetCustomTraitTag,
             props: {
-               idx: idx
-            }
+               idx: idx,
+            },
          });
       }
       return result;

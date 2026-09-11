@@ -17,7 +17,7 @@
       value: pack.collection,
       label: {
          text: pack.metadata.label,
-         localize: false 
+         localize: false,
       },
    })));
 

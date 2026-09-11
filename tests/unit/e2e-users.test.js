@@ -14,11 +14,11 @@ describe('e2e user registry', () => {
    it('splits two GMs and two players by role', () => {
       expect(GM_USERS.map((u) => u.name)).toEqual([
          'E2E GM 1',
-         'E2E GM 2'
+         'E2E GM 2',
       ]);
       expect(PLAYER_USERS.map((u) => u.name)).toEqual([
          'E2E Player 1',
-         'E2E Player 2'
+         'E2E Player 2',
       ]);
    });
 

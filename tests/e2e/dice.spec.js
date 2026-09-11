@@ -40,7 +40,7 @@ test.describe('forced dice seam', () => {
       await forceDice(page, [
          6,
          4,
-         1
+         1,
       ]);
       const faces = await page.evaluate(async () => {
          const roll = new Roll('3d6');
@@ -52,7 +52,7 @@ test.describe('forced dice seam', () => {
       expect(faces).toEqual([
          6,
          4,
-         1
+         1,
       ]);
    });
 

@@ -273,7 +273,7 @@ test.describe('embedded-context item rows', () => {
 
          return Object.fromEntries(created.map((doc) => [
             doc.type,
-            doc.id
+            doc.id,
          ]));
       }, {
          actorName: ACTOR_NAME,

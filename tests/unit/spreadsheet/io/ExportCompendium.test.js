@@ -18,8 +18,8 @@ function makeDoc(type, id, system = {}, effects = []) {
          _id: id,
          name: id,
          type,
-         system 
-      }) 
+         system,
+      }),
    };
 }
 
@@ -56,12 +56,12 @@ describe('exportCompendium', () => {
       /** @type {object} Minimal per-document-type CONFIG entry resolveTypeSchemas reads. */
       const emptyTypeConfig = {
          dataModels: {},
-         documentClass: { schema: { fields: {} } } 
+         documentClass: { schema: { fields: {} } },
       };
       globalThis.CONFIG = {
          Item: emptyTypeConfig,
          Actor: emptyTypeConfig,
-         ActiveEffect: emptyTypeConfig 
+         ActiveEffect: emptyTypeConfig,
       };
       globalThis.foundry.utils.saveDataToFile = vi.fn();
    });
@@ -79,14 +79,14 @@ describe('exportCompendium', () => {
          toObject: () => ({
             _id: 'b'.repeat(16),
             name: 'Goblin',
-            type: 'npc' 
+            type: 'npc',
          }),
       };
       /** @type {object} A pack stand-in. */
       const pack = {
          metadata: {
             type: 'Actor',
-            label: 'Test Actors' 
+            label: 'Test Actors',
          },
          folders: [],
          getDocuments: async () => [actor],
@@ -118,14 +118,14 @@ describe('exportCompendium', () => {
          toObject: () => ({
             _id: 'b'.repeat(16),
             name: 'Goblin',
-            type: 'npc' 
+            type: 'npc',
          }),
       };
       /** @type {object} */
       const pack = {
          metadata: {
             type: 'Actor',
-            label: 'Test Actors' 
+            label: 'Test Actors',
          },
          folders: [],
          getDocuments: async () => [actor],
@@ -169,12 +169,12 @@ describe('exportCompendium', () => {
       }
       globalThis.CONFIG.Item = {
          dataModels: { weapon: WeaponDataModel },
-         documentClass: { schema: { fields: {} } } 
+         documentClass: { schema: { fields: {} } },
       };
       /** @type {object} A weapon whose own field insertion order is value-then-rarity. */
       const weapon = makeDoc('weapon', 'a'.repeat(16), {
          value: 5,
-         rarity: 'common' 
+         rarity: 'common',
       });
       /** @type {object} An actor owning that weapon. */
       const actor = {
@@ -186,14 +186,14 @@ describe('exportCompendium', () => {
          toObject: () => ({
             _id: 'b'.repeat(16),
             name: 'Goblin',
-            type: 'npc' 
+            type: 'npc',
          }),
       };
       /** @type {object} */
       const pack = {
          metadata: {
             type: 'Actor',
-            label: 'Test Actors' 
+            label: 'Test Actors',
          },
          folders: [],
          getDocuments: async () => [actor],
@@ -214,20 +214,20 @@ describe('exportCompendium', () => {
       /** @type {object} Minimal per-document-type CONFIG entry resolveTypeSchemas reads. */
       const emptyTypeConfig = {
          dataModels: {},
-         documentClass: { schema: { fields: {} } } 
+         documentClass: { schema: { fields: {} } },
       };
       globalThis.CONFIG = {
          Item: emptyTypeConfig,
-         ActiveEffect: emptyTypeConfig 
+         ActiveEffect: emptyTypeConfig,
       };
       /** @type {object} */
       const pack = {
          metadata: {
             type: 'Item',
-            label: 'Empty Items' 
+            label: 'Empty Items',
          },
          folders: [],
-         getDocuments: async () => [] 
+         getDocuments: async () => [],
       };
       await exportCompendium(pack, 'csv', 'wide');
       /** @type {[Uint8Array|string, string, string]} */
@@ -244,10 +244,10 @@ describe('exportCompendium', () => {
       const pack = {
          metadata: {
             type: 'Item',
-            label: 'Weapons' 
+            label: 'Weapons',
          },
          folders: [],
-         getDocuments: async () => [] 
+         getDocuments: async () => [],
       };
       await exportCompendium(pack, 'xlsx', 'wide');
       /** @type {[Uint8Array|string, string, string]} */

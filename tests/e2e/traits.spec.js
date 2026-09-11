@@ -69,7 +69,7 @@ test.describe('custom trait edit/delete on items', () => {
                   {
                      name: traitName,
                      description: description,
-                     uuid: 'e2e-trait-uuid-0' 
+                     uuid: 'e2e-trait-uuid-0',
                   },
                ],
             },
@@ -82,7 +82,7 @@ test.describe('custom trait edit/delete on items', () => {
       }, {
          itemName: ITEM_NAME,
          traitName: ORIGINAL_NAME,
-         description: DESCRIPTION_KEY 
+         description: DESCRIPTION_KEY,
       });
    });
 
@@ -110,14 +110,14 @@ test.describe('custom trait edit/delete on items', () => {
                const traits = game.items.getName(itemName)?.system?.customTrait ?? [];
                return {
                   count: traits.length,
-                  names: traits.map((t) => t.name) 
+                  names: traits.map((t) => t.name),
                };
             }, ITEM_NAME),
             { message: 'custom trait edited in place on the item' },
          )
          .toEqual({
             count: 1,
-            names: [EDITED_NAME] 
+            names: [EDITED_NAME],
          });
 
       // Re-rendered: the sidebar shows the new name and no longer the old one.

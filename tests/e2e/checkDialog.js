@@ -165,7 +165,7 @@ export async function readNewestCheckFlags(page, baseline) {
                'resistanceCheck',
                'attackCheck',
                'castingCheck',
-               'itemCheck'
+               'itemCheck',
             ];
 
             // Only consider messages created after the baseline; return the newest check one.

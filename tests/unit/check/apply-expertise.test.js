@@ -14,12 +14,12 @@ describe('_applyExpertise — crafted cases', () => {
       const out = check._applyExpertise(dice([
          3,
          3,
-         2
+         2,
       ]));
       expect(out.dice.map((d) => d.final)).toEqual([
          4,
          4,
-         2
+         2,
       ]);
       expect(out.expertiseRemaining).toBe(1);
    });
@@ -34,12 +34,12 @@ describe('_applyExpertise — crafted cases', () => {
       const out = check._applyExpertise(dice([
          4,
          1,
-         1
+         1,
       ]));
       expect(out.dice.map((d) => d.final)).toEqual([
          4,
          2,
-         2
+         2,
       ]);
       expect(out.expertiseRemaining).toBe(0);
    });
@@ -51,15 +51,15 @@ describe('_applyExpertise — invariants', () => {
          fc.property(
             fc.array(fc.integer({
                min: 1,
-               max: 6 
+               max: 6,
             }), { maxLength: 8 }),
             fc.integer({
                min: 0,
-               max: 10 
+               max: 10,
             }),
             fc.integer({
                min: 2,
-               max: 6 
+               max: 6,
             }),
             fc.boolean(),
             fc.boolean(),

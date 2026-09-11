@@ -29,7 +29,7 @@ test.beforeAll(async ({ browser }) => {
    // Start from a clean slate: a crashed prior run can leave stale fixtures behind.
    for (const name of [
       FIXTURE_NAME,
-      'HUD Effects Player 2'
+      'HUD Effects Player 2',
    ]) {
       await deleteFixtureActor(page, name);
    }
@@ -75,7 +75,7 @@ async function seedControlledActor(page, { name, releaseOthers = true }) {
       if (!game.actors.getName(name)) {
          await Actor.create({
             name,
-            type: 'player' 
+            type: 'player',
          });
       }
    }, { name });
@@ -92,7 +92,7 @@ async function seedControlledActor(page, { name, releaseOthers = true }) {
       return false;
    }, {
       name,
-      releaseOthers 
+      releaseOthers,
    });
 
    if (!hasToken) {
@@ -126,8 +126,8 @@ async function seedPanelFixture(page) {
             system: {
                duration: {
                   type: 'turnStart',
-                  remaining: 2 
-               } 
+                  remaining: 2,
+               },
             },
          }]);
       }
@@ -135,7 +135,7 @@ async function seedPanelFixture(page) {
    }, actorId);
    return {
       actorId,
-      effectId 
+      effectId,
    };
 }
 
@@ -165,7 +165,7 @@ test('the duration controls step the effect duration', async () => {
          return game.actors.get(actorId).effects.get(effectId).system.duration.remaining;
       }, {
          actorId,
-         effectId 
+         effectId,
       }),
       { message: 'the duration increments from the panel' },
    ).toBe(3);
@@ -176,7 +176,7 @@ test('the duration controls step the effect duration', async () => {
          return game.actors.get(actorId).effects.get(effectId).system.duration.remaining;
       }, {
          actorId,
-         effectId 
+         effectId,
       }),
       { message: 'the duration decrements from the panel' },
    ).toBe(2);
@@ -190,7 +190,7 @@ test('send to chat creates the effect card', async () => {
       () => page.evaluate(() => game.messages.contents.at(-1)?.type),
       {
          message: 'the effect card lands in chat',
-         timeout: 1000 
+         timeout: 1000,
       },
    ).toBe('effect');
 });
@@ -220,7 +220,7 @@ test('remove deletes the effect', async () => {
          return game.actors.get(actorId).effects.get(effectId) ?? null;
       }, {
          actorId,
-         effectId 
+         effectId,
       }),
       { message: 'the effect is deleted from the panel' },
    ).toBe(null);
@@ -258,7 +258,7 @@ test('the panel body scrolls when content exceeds its size', async () => {
          if (!actor.effects.getName(name)) {
             payloads.push({
                name,
-               type: 'effect' 
+               type: 'effect',
             });
          }
       }
@@ -322,7 +322,7 @@ test('group selection hides the panel', async () => {
 
    await seedControlledActor(page, {
       name: 'HUD Effects Player 2',
-      releaseOthers: false 
+      releaseOthers: false,
    });
    await expect(page.locator('[data-testid="player-hud-effects-panel"]')).toHaveCount(0);
 });

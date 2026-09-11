@@ -72,7 +72,7 @@ export function createItemCheckParametersShape() {
       opposedCheck: {
          attribute: '',
          enabled: false,
-         skill: '' 
+         skill: '',
       },
       resistanceCheck: 'none',
       resolveCost: 0,

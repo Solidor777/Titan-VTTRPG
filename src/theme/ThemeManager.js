@@ -12,7 +12,7 @@ export const BUILT_IN_THEMES = Object.freeze([
    HERITAGE_DARK,
    MACCHIATO,
    HERITAGE_LIGHT,
-   CLEAN_NEUTRAL_LIGHT
+   CLEAN_NEUTRAL_LIGHT,
 ]);
 
 /** @type {string} The DOM id of the injected theme stylesheet. */
@@ -38,7 +38,7 @@ export default class ThemeManager {
       this.#schemeObserver = new MutationObserver(() => this.apply());
       this.#schemeObserver.observe(document.body, {
          attributes: true,
-         attributeFilter: ['class'] 
+         attributeFilter: ['class'],
       });
    }
 
@@ -49,7 +49,7 @@ export default class ThemeManager {
    getAllThemes() {
       return [
          ...BUILT_IN_THEMES,
-         ...Object.values(getSetting('customThemes') ?? {})
+         ...Object.values(getSetting('customThemes') ?? {}),
       ];
    }
 
@@ -205,7 +205,7 @@ export default class ThemeManager {
       catch (error) {
          return {
             ok: false,
-            error: `Invalid JSON: ${error.message}` 
+            error: `Invalid JSON: ${error.message}`,
          };
       }
 

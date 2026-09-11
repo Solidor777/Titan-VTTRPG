@@ -60,20 +60,20 @@ test.describe('item-sheet check rolling (owner)', () => {
       ids = await page.evaluate(async ({ actorName, itemCheck }) => {
          const actor = await Actor.create({
             name: actorName,
-            type: 'player' 
+            type: 'player',
          });
          const [equipment] = await actor.createEmbeddedDocuments('Item', [
             {
                name: 'E2E Roll Equipment',
                type: 'equipment',
-               system: { check: [itemCheck] } 
+               system: { check: [itemCheck] },
             },
          ]);
          const [weapon] = await actor.createEmbeddedDocuments('Item', [
             {
                name: 'E2E Roll Weapon',
                type: 'weapon',
-               system: { equipped: true } 
+               system: { equipped: true },
             },
          ]);
 
@@ -97,7 +97,7 @@ test.describe('item-sheet check rolling (owner)', () => {
          const [spell] = await actor.createEmbeddedDocuments('Item', [
             {
                name: 'E2E Roll Spell',
-               type: 'spell' 
+               type: 'spell',
             },
          ]);
 
@@ -107,7 +107,7 @@ test.describe('item-sheet check rolling (owner)', () => {
          return {
             equipmentId: equipment.id,
             weaponId: weapon.id,
-            spellId: spell.id 
+            spellId: spell.id,
          };
       }, {
          actorName: ACTOR_NAME,
@@ -141,7 +141,7 @@ test.describe('item-sheet check rolling (owner)', () => {
          );
       }, {
          actorName: ACTOR_NAME,
-         id: itemId 
+         id: itemId,
       });
       return page.locator('.application.titan-document-sheet');
    }

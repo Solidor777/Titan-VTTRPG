@@ -39,7 +39,7 @@
       label={document.data.system.customTrait[idx].name}
       labelTooltip={{
          text: document.data.system.customTrait[idx].description,
-         localize: false 
+         localize: false,
       }}
    />
 {/if}

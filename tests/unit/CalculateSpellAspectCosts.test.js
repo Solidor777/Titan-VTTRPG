@@ -23,8 +23,8 @@ describe('calculateSpellAspectCosts', () => {
             label: 'inflictCondition',
             option: [
                'blinded',
-               'deafened'
-            ] 
+               'deafened',
+            ],
          })],
          [],
       );
@@ -37,23 +37,23 @@ describe('calculateSpellAspectCosts', () => {
          [
             aspect({
                label: 'range',
-               initialValue: 'self' 
+               initialValue: 'self',
             }),
             aspect({
                label: 'range',
-               initialValue: 'touch' 
+               initialValue: 'touch',
             }),
             aspect({
                label: 'range',
-               initialValue: 10 
+               initialValue: 10,
             }),
             aspect({
                label: 'range',
-               initialValue: 30 
+               initialValue: 30,
             }),
             aspect({
                label: 'range',
-               initialValue: 50 
+               initialValue: 50,
             }),
          ],
          [],
@@ -63,7 +63,7 @@ describe('calculateSpellAspectCosts', () => {
          1,
          2,
          3,
-         4
+         4,
       ]);
    });
 
@@ -72,18 +72,18 @@ describe('calculateSpellAspectCosts', () => {
          [
             aspect({
                label: 'duration',
-               unit: 'rounds' 
+               unit: 'rounds',
             }),
             aspect({
                label: 'duration',
-               unit: 'minutes' 
+               unit: 'minutes',
             }),
          ],
          [],
       );
       expect(result.aspectCosts).toEqual([
          1,
-         4
+         4,
       ]);
    });
 
@@ -93,8 +93,8 @@ describe('calculateSpellAspectCosts', () => {
             label: 'decreaseMod',
             option: [
                'armor',
-               'damage'
-            ] 
+               'damage',
+            ],
          })],
          [],
       );
@@ -106,7 +106,7 @@ describe('calculateSpellAspectCosts', () => {
          [aspect({
             label: 'removeCondition',
             allOptions: true,
-            option: [] 
+            option: [],
          })],
          [],
       );
@@ -118,7 +118,7 @@ describe('calculateSpellAspectCosts', () => {
          [aspect({
             label: 'inflictCondition',
             option: ['blinded'],
-            resistanceCheck: 'reflexes' 
+            resistanceCheck: 'reflexes',
          })],
          [],
       );
@@ -132,7 +132,7 @@ describe('calculateSpellAspectCosts', () => {
          [aspect({
             label: 'inflictCondition',
             option: ['deafened'],
-            resistanceCheck: 'reflexes' 
+            resistanceCheck: 'reflexes',
          })],
          [],
       );
@@ -144,7 +144,7 @@ describe('calculateSpellAspectCosts', () => {
    it('disables an aspect requiring an option when no option is selected', () => {
       const result = calculateSpellAspectCosts([aspect({
          label: 'decreaseMod',
-         option: [] 
+         option: [],
       })], []);
       expect(result.enabled).toEqual([false]);
       expect(result.aspectCosts).toEqual([0]);
@@ -154,11 +154,11 @@ describe('calculateSpellAspectCosts', () => {
       const result = calculateSpellAspectCosts(
          [aspect({
             label: 'range',
-            initialValue: 'self' 
+            initialValue: 'self',
          })],
          [
             { cost: 2 },
-            { cost: 3 }
+            { cost: 3 },
          ],
       );
       expect(result.totalAspectCost).toBe(5);

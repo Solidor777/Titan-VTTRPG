@@ -19,14 +19,14 @@ const BUILT_IN_THEMES = [
    HERITAGE_DARK,
    MACCHIATO,
    HERITAGE_LIGHT,
-   CLEAN_NEUTRAL_LIGHT
+   CLEAN_NEUTRAL_LIGHT,
 ];
 
 describe('ThemeTokenContract', () => {
    it('contract token list is the union of color and font tokens with no duplicates', () => {
       expect(THEME_TOKENS).toEqual([
          ...THEME_COLOR_TOKENS,
-         ...THEME_FONT_TOKENS
+         ...THEME_FONT_TOKENS,
       ]);
       expect(new Set(THEME_TOKENS).size).toBe(THEME_TOKENS.length);
    });
@@ -42,14 +42,14 @@ describe('ThemeTokenContract', () => {
             'heritage-dark',
             'macchiato',
             'heritage-light',
-            'clean-neutral-light'
+            'clean-neutral-light',
          ],
       );
       expect(BUILT_IN_THEMES.map((t) => t.dark)).toEqual([
          true,
          true,
          false,
-         false
+         false,
       ]);
    });
 

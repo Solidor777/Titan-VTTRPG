@@ -39,7 +39,7 @@
       // Each real attribute carries its icon; synthetic all/none entries are icon-less primitives.
       const list = ATTRIBUTES.map((attribute) => ({
          value: attribute,
-         icon: ATTRIBUTE_ICONS[attribute] 
+         icon: ATTRIBUTE_ICONS[attribute],
       }));
       if (allowAll) {
          list.unshift('all');

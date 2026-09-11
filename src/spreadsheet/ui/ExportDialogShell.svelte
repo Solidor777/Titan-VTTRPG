@@ -42,11 +42,11 @@
       options={[
          {
             value: 'xlsx',
-            label: localize('xlsxFormat') 
+            label: localize('xlsxFormat'),
          },
          {
             value: 'csv',
-            label: localize('csvFormat') 
+            label: localize('csvFormat'),
          },
       ]}
       bind:value={format}
@@ -56,11 +56,11 @@
       options={[
          {
             value: 'wide',
-            label: localize('wideLayout') 
+            label: localize('wideLayout'),
          },
          {
             value: 'relational',
-            label: localize('relationalLayout') 
+            label: localize('relationalLayout'),
          },
       ]}
       bind:value={layout}

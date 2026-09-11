@@ -73,14 +73,14 @@ test.describe('v14 render-smoke', () => {
             const [created] = await actor.createEmbeddedDocuments('ActiveEffect', [
                {
                   name: 'E2E Effect',
-                  type: 'effect' 
+                  type: 'effect',
                },
             ]);
             effect = created;
          }
          return {
             actorId: actor.id,
-            effectId: effect.id 
+            effectId: effect.id,
          };
       });
 

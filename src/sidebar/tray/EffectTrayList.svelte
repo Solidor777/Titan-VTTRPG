@@ -201,7 +201,7 @@
                   testId="effect-tray-folder-toggle"
                   tooltip={{
                      text: group.folder.name,
-                     localize: false 
+                     localize: false,
                   }}
                />
 

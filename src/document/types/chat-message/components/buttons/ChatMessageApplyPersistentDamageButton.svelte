@@ -77,7 +77,7 @@
    label={localize('applyX%Damage').replace('X%', document.data.system.persistentDamage.total)}
    tooltip={{
       text: getTooltip(),
-      localize: false 
+      localize: false,
    }}
    confirmFn={confirm}
 />

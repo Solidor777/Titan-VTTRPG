@@ -20,7 +20,7 @@ export default function resolveHudActors({ isGM, selected, owned, assigned }) {
    const result = (actors) => {
       return {
          actors,
-         primary: actors[0] ?? null 
+         primary: actors[0] ?? null,
       };
    };
 

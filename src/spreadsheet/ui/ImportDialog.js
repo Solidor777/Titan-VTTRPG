@@ -32,11 +32,11 @@ export default class ImportDialog extends TitanDialog {
    static DEFAULT_OPTIONS = {
       position: {
          width: 480,
-         height: 'auto' 
+         height: 'auto',
       },
       window: {
          resizable: true,
-         minimizable: false 
+         minimizable: false,
       },
    };
 }

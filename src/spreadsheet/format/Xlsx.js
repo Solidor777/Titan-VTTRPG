@@ -92,7 +92,7 @@ function buildSheetXml(sheet) {
    /** @type {Array<Array<string|number|boolean|undefined>>} Header row, then every data row's cells. */
    const allRows = [
       sheet.columns,
-      ...sheet.rows.map((row) => sheet.columns.map((col) => row[col]))
+      ...sheet.rows.map((row) => sheet.columns.map((col) => row[col])),
    ];
 
    /** @type {string[]} XML for each row. */
@@ -339,7 +339,7 @@ export function decodeXlsx(bytes) {
          columns: header ?? [],
          rows: dataRows.map((cells) => Object.fromEntries((header ?? []).map((col, c) => [
             col,
-            cells[c]
+            cells[c],
          ]))),
       };
    });

@@ -2,7 +2,7 @@
 export const HUD_ELEMENT_KEYS = [
    'portrait',
    'actionMenu',
-   'effectsPanel'
+   'effectsPanel',
 ];
 
 /**

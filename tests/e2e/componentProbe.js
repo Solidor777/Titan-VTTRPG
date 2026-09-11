@@ -64,7 +64,7 @@ export async function mountProbe(page, name, { props = {}, events = [], context 
          builtProps[ev] = (arg) => {
             globalThis.window.__titanProbeEvents.push({
                event: ev,
-               key: arg && arg.key 
+               key: arg && arg.key,
             });
          };
       }
@@ -74,7 +74,7 @@ export async function mountProbe(page, name, { props = {}, events = [], context 
       name,
       props,
       events,
-      context 
+      context,
    });
 }
 

@@ -7,8 +7,8 @@ describe('getApplication', () => {
       render(ApplicationProbe, {
          context: new Map([[
             'application',
-            { name: 'Sheet' }
-         ]]) 
+            { name: 'Sheet' },
+         ]]),
       });
       expect(screen.getByTestId('app').textContent).toBe('Sheet');
    });

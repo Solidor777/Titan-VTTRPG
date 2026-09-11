@@ -16,7 +16,7 @@ describe('applyImport', () => {
       const pack = {
          locked: false,
          collection: 'world.test',
-         metadata: { type: 'Item' } 
+         metadata: { type: 'Item' },
       };
       /** @type {object} */
       const plan = {
@@ -42,18 +42,18 @@ describe('applyImport', () => {
       expect(ItemClass.createDocuments).toHaveBeenCalledWith(
          [{
             _id: 'a'.repeat(16),
-            folder: null 
+            folder: null,
          }],
          {
             pack: 'world.test',
-            keepId: true 
+            keepId: true,
          },
       );
       expect(result).toEqual({
          pack,
          created: 1,
          updated: 0,
-         deleted: 0 
+         deleted: 0,
       });
    });
 
@@ -61,7 +61,7 @@ describe('applyImport', () => {
       /** @type {object[]} */
       const createdActors = [{
          id: 'p'.repeat(16),
-         items: { get: () => undefined } 
+         items: { get: () => undefined },
       }];
       /** @type {object[]} */
       const createdItems = [{ id: 'i'.repeat(16) }];
@@ -73,7 +73,7 @@ describe('applyImport', () => {
       const pack = {
          locked: false,
          collection: 'world.test',
-         metadata: { type: 'Actor' } 
+         metadata: { type: 'Actor' },
       };
       /** @type {object} */
       const plan = {
@@ -117,12 +117,12 @@ describe('applyImport', () => {
       /** @type {object[]} */
       const createdActors = [{
          id: 'p'.repeat(16),
-         items: { get: () => undefined } 
+         items: { get: () => undefined },
       }];
       /** @type {object[]} */
       const createdItems = [{
          id: 'i'.repeat(16),
-         effects: { get: () => undefined } 
+         effects: { get: () => undefined },
       }];
       /** @type {object[]} */
       const createdEffects = [{ id: 'e'.repeat(16) }];
@@ -135,7 +135,7 @@ describe('applyImport', () => {
       const pack = {
          locked: false,
          collection: 'world.test',
-         metadata: { type: 'Actor' } 
+         metadata: { type: 'Actor' },
       };
       /** @type {object} */
       const plan = {
@@ -217,7 +217,7 @@ describe('applyImport', () => {
 
       expect(existing.update).toHaveBeenCalledWith({
          name: 'New Name',
-         folder: null 
+         folder: null,
       });
       expect(result.updated).toBe(1);
    });
@@ -263,7 +263,7 @@ describe('applyImport', () => {
       const existingFolder = {
          id: 'f'.repeat(16),
          name: 'Weapons',
-         folder: null 
+         folder: null,
       };
       /** @type {object} */
       const pack = {
@@ -296,7 +296,7 @@ describe('applyImport', () => {
 
       expect(existing.update).toHaveBeenCalledWith({
          name: 'New Name',
-         folder: 'f'.repeat(16) 
+         folder: 'f'.repeat(16),
       });
    });
 
@@ -306,7 +306,7 @@ describe('applyImport', () => {
       /** @type {object} */
       const fetchedActor = {
          id: 'p'.repeat(16),
-         createEmbeddedDocuments: vi.fn(async () => createdItems) 
+         createEmbeddedDocuments: vi.fn(async () => createdItems),
       };
       /** @type {object} */
       const pack = {
@@ -350,13 +350,13 @@ describe('applyImport', () => {
       /** @type {object} */
       const ownedItem = {
          id: 'i'.repeat(16),
-         createEmbeddedDocuments: vi.fn(async () => createdEffects) 
+         createEmbeddedDocuments: vi.fn(async () => createdEffects),
       };
       /** @type {object} */
       const owningActor = {
          id: 'p'.repeat(16),
          items: [ownedItem],
-         effects: [] 
+         effects: [],
       };
       /** @type {object} */
       const pack = {
@@ -431,7 +431,7 @@ describe('applyImport', () => {
       const fetchedActor = {
          id: 'p'.repeat(16),
          updateEmbeddedDocuments: vi.fn(),
-         items: { get: () => undefined } 
+         items: { get: () => undefined },
       };
       /** @type {object} */
       const pack = {
@@ -465,7 +465,7 @@ describe('applyImport', () => {
          'Item',
          [{
             _id: 'i'.repeat(16),
-            name: 'New Name' 
+            name: 'New Name',
          }],
       );
       expect(result.updated).toBe(1);
@@ -481,13 +481,13 @@ describe('applyImport', () => {
       const ownedItem = {
          id: 'i'.repeat(16),
          updateEmbeddedDocuments: vi.fn(),
-         effects: ownedItemEffects 
+         effects: ownedItemEffects,
       };
       /** @type {object} */
       const owningActor = {
          id: 'p'.repeat(16),
          items: [ownedItem],
-         effects: [] 
+         effects: [],
       };
       /** @type {object} */
       const pack = {
@@ -522,7 +522,7 @@ describe('applyImport', () => {
          'ActiveEffect',
          [{
             _id: 'e'.repeat(16),
-            name: 'New Name' 
+            name: 'New Name',
          }],
       );
       expect(result.updated).toBe(1);
@@ -563,14 +563,14 @@ describe('applyImport', () => {
       /** @type {object} */
       const pack = {
          locked: true,
-         metadata: { label: 'Locked Pack' } 
+         metadata: { label: 'Locked Pack' },
       };
       await expect(applyImport({
          packType: 'Item',
          creates: [],
          updates: [],
          deletes: [],
-         folders: [] 
+         folders: [],
       }, pack))
          .rejects.toThrow(/locked/);
    });
@@ -583,7 +583,7 @@ describe('applyImport', () => {
       const pack = {
          locked: false,
          collection: 'world.test',
-         metadata: { type: 'Item' } 
+         metadata: { type: 'Item' },
       };
       /** @type {object} */
       const plan = {
@@ -591,7 +591,7 @@ describe('applyImport', () => {
          creates: [],
          updates: [],
          folders: [],
-         deletes: [{ id: 'z'.repeat(16) }] 
+         deletes: [{ id: 'z'.repeat(16) }],
       };
 
       const result = await applyImport(plan, pack);

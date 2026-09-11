@@ -20,7 +20,7 @@ const NAMED_ENTITIES = {
 const VOID_ELEMENTS = new Set([
    'br',
    'hr',
-   'img'
+   'img',
 ]);
 
 /**
@@ -40,7 +40,7 @@ const BLOCK_TAGS = new Set([
    'pre',
    'ul',
    'ol',
-   'table'
+   'table',
 ]);
 
 /**
@@ -59,7 +59,7 @@ const INLINE_TAGS = new Set([
    'code',
    'a',
    'br',
-   'img'
+   'img',
 ]);
 
 /**
@@ -103,7 +103,7 @@ const P_CLOSING_BOUNDARIES = [
    'tr',
    'td',
    'th',
-   'li'
+   'li',
 ];
 
 /**
@@ -250,19 +250,19 @@ function closeImplicit(stack, tag) {
    if (tag === 'li') {
       closeSibling(stack, ['li'], [
          'ul',
-         'ol'
+         'ol',
       ]);
    }
    else if (tag === 'td' || tag === 'th') {
       closeSibling(stack, [
          'td',
-         'th'
+         'th',
       ], [
          'tr',
          'table',
          'thead',
          'tbody',
-         'tfoot'
+         'tfoot',
       ]);
    }
    else if (tag === 'tr') {
@@ -270,13 +270,13 @@ function closeImplicit(stack, tag) {
          'table',
          'thead',
          'tbody',
-         'tfoot'
+         'tfoot',
       ]);
    }
    else if (tag === 'dt' || tag === 'dd') {
       closeSibling(stack, [
          'dt',
-         'dd'
+         'dd',
       ], ['dl']);
    }
 }
@@ -311,7 +311,7 @@ function parseHtml(html) {
       if (textBefore !== '') {
          stack[stack.length - 1].children.push({
             type: 'text',
-            value: textBefore 
+            value: textBefore,
          });
       }
 
@@ -357,7 +357,7 @@ function parseHtml(html) {
    if (trailingText !== '') {
       stack[stack.length - 1].children.push({
          type: 'text',
-         value: trailingText 
+         value: trailingText,
       });
    }
 

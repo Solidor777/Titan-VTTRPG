@@ -24,7 +24,7 @@ function makeDoc(type, name, folderPath = [], system = {}) {
       type,
       name,
       folderPath,
-      system 
+      system,
    };
 }
 
@@ -43,7 +43,7 @@ describe('buildCompendiumTree', () => {
       expect(tree.sections.map((s) => s.text)).toEqual([
          'Weapons',
          'Armor',
-         'Spells'
+         'Spells',
       ]);
       expect(tree.sections[0].level).toBe(1);
       expect(tree.sections[0].documents).toEqual([documents[1]]);
@@ -56,7 +56,7 @@ describe('buildCompendiumTree', () => {
       const documents = [makeDoc('weapon', 'Sword', [
          'Equipment',
          'Weapons',
-         'Melee Weapons'
+         'Melee Weapons',
       ])];
 
       /** @type {{sections: object[]}} The built tree. */
@@ -68,7 +68,7 @@ describe('buildCompendiumTree', () => {
       expect(equipmentSection).toMatchObject({
          level: 1,
          text: 'Equipment',
-         documents: [] 
+         documents: [],
       });
 
       /** @type {object} The `Weapons` subfolder section. */
@@ -76,7 +76,7 @@ describe('buildCompendiumTree', () => {
       expect(weaponsSection).toMatchObject({
          level: 2,
          text: 'Weapons',
-         documents: [] 
+         documents: [],
       });
 
       /** @type {object} The `Melee Weapons` leaf folder section. */
@@ -84,7 +84,7 @@ describe('buildCompendiumTree', () => {
       expect(meleeSection).toMatchObject({
          level: 3,
          text: 'Melee Weapons',
-         documents: [documents[0]] 
+         documents: [documents[0]],
       });
    });
 
@@ -104,22 +104,22 @@ describe('buildCompendiumTree', () => {
       expect(folderSection).toMatchObject({
          level: 1,
          text: 'Urderic Equipment',
-         documents: [] 
+         documents: [],
       });
       expect(folderSection.children.map((c) => ({
          level: c.level,
          text: c.text,
-         documents: c.documents 
+         documents: c.documents,
       }))).toEqual([
          {
             level: 2,
             text: 'Weapons',
-            documents: [documents[1]] 
+            documents: [documents[1]],
          },
          {
             level: 2,
             text: 'Armor',
-            documents: [documents[0]] 
+            documents: [documents[0]],
          },
       ]);
    });
@@ -141,22 +141,22 @@ describe('buildCompendiumTree', () => {
       expect(spellsSection).toMatchObject({
          level: 1,
          text: 'Spells',
-         documents: [documents[0]] 
+         documents: [documents[0]],
       });
       expect(spellsSection.children.map((c) => ({
          level: c.level,
          text: c.text,
-         documents: c.documents 
+         documents: c.documents,
       }))).toEqual([
          {
             level: 3,
             text: 'Air',
-            documents: [documents[2]] 
+            documents: [documents[2]],
          },
          {
             level: 3,
             text: 'Fire',
-            documents: [documents[1]] 
+            documents: [documents[1]],
          },
       ]);
    });
@@ -178,7 +178,7 @@ describe('buildCompendiumTree', () => {
          children: [],
          documents: [
             documents[1],
-            documents[0]
+            documents[0],
          ],
       });
    });
@@ -189,7 +189,7 @@ describe('buildCompendiumTree', () => {
          'A',
          'B',
          'C',
-         'D'
+         'D',
       ])];
 
       /** @type {{sections: object[]}} The built tree. */
@@ -200,7 +200,7 @@ describe('buildCompendiumTree', () => {
       expect(depth4Section).toMatchObject({
          level: 3,
          text: 'D',
-         documents: [documents[0]] 
+         documents: [documents[0]],
       });
    });
 });

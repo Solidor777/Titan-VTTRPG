@@ -6,7 +6,7 @@ import ImportDialog from '~/spreadsheet/ui/ImportDialog.js';
 const SUPPORTED_PACK_TYPES = [
    'Actor',
    'Item',
-   'ActiveEffect'
+   'ActiveEffect',
 ];
 
 /**

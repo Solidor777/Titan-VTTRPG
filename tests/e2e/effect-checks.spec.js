@@ -63,7 +63,7 @@ test.describe('v14 effect check rolling', () => {
          // The roll-source actor.
          const actor = await Actor.create({
             name: actorName,
-            type: 'player' 
+            type: 'player',
          });
 
          // One effect with a description and a single COMPLETE check[] entry. The check object mirrors
@@ -104,7 +104,7 @@ test.describe('v14 effect check rolling', () => {
       }, {
          actorName: ACTOR_NAME,
          effectName: EFFECT_NAME,
-         effectDescription: EFFECT_DESCRIPTION 
+         effectDescription: EFFECT_DESCRIPTION,
       });
    });
 
@@ -115,7 +115,7 @@ test.describe('v14 effect check rolling', () => {
          return effect.getRollData().description;
       }, {
          actorName: ACTOR_NAME,
-         effectName: EFFECT_NAME 
+         effectName: EFFECT_NAME,
       });
 
       expect(description, 'effect roll data exposes the native description').toBe(EFFECT_DESCRIPTION);
@@ -130,7 +130,7 @@ test.describe('v14 effect check rolling', () => {
          const before = game.messages.size;
          await actor.system.requestItemCheck({
             itemRollData: effect.getRollData(),
-            checkIdx: 0 
+            checkIdx: 0,
          });
          await titanWait(() => game.messages.size > before, { message: 'new chat message' });
 
@@ -143,7 +143,7 @@ test.describe('v14 effect check rolling', () => {
          };
       }, {
          actorName: ACTOR_NAME,
-         effectName: EFFECT_NAME 
+         effectName: EFFECT_NAME,
       });
 
       expect(result.after, 'message count should increase after the roll').toBeGreaterThan(result.before);

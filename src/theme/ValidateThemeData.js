@@ -38,31 +38,31 @@ export default function validateThemeData(data, { getBaseTheme } = {}) {
    if (typeof data !== 'object' || data === null) {
       return {
          ok: false,
-         error: 'Theme data is not an object.' 
+         error: 'Theme data is not an object.',
       };
    }
    if (data.formatVersion !== THEME_FORMAT_VERSION) {
       return {
          ok: false,
-         error: `Unsupported theme format version: ${data.formatVersion}.` 
+         error: `Unsupported theme format version: ${data.formatVersion}.`,
       };
    }
    if (typeof data.name !== 'string' || data.name.trim().length === 0) {
       return {
          ok: false,
-         error: 'Theme name must be a non-empty string.' 
+         error: 'Theme name must be a non-empty string.',
       };
    }
    if (typeof data.dark !== 'boolean') {
       return {
          ok: false,
-         error: 'Theme dark flag must be a boolean.' 
+         error: 'Theme dark flag must be a boolean.',
       };
    }
    if (typeof data.tokens !== 'object' || data.tokens === null) {
       return {
          ok: false,
-         error: 'Theme tokens must be an object.' 
+         error: 'Theme tokens must be an object.',
       };
    }
 

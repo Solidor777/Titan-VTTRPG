@@ -20,7 +20,7 @@ export default async function onCombatPreviousTurn(restoredCombatantId, displace
          ? {
             combat,
             restoredCombatant,
-            displacedCombatant 
+            displacedCombatant,
          }
          : null;
    });

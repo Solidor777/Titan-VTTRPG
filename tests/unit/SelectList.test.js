@@ -24,12 +24,12 @@ describe('SelectList', () => {
                {
                   value: 'body',
                   label: 'body',
-                  icon: 'fas fa-hand-fist' 
+                  icon: 'fas fa-hand-fist',
                },
                {
                   value: 'mind',
                   label: 'mind',
-                  icon: 'fas fa-brain' 
+                  icon: 'fas fa-brain',
                },
             ],
             value: 'body',
@@ -56,11 +56,11 @@ describe('SelectList', () => {
             options: [
                {
                   value: 'body',
-                  label: 'body' 
+                  label: 'body',
                },
                {
                   value: 'mind',
-                  label: 'mind' 
+                  label: 'mind',
                },
             ],
             value: 'body',

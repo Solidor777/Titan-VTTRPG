@@ -70,14 +70,14 @@
       const updates = foundry.utils.performIntegerSort(source, {
          target,
          siblings,
-         sortBefore 
+         sortBefore,
       });
       await document.data.updateEmbeddedDocuments(
          'ActiveEffect',
          updates.map((entry) => {
             return {
                ...entry.update,
-               _id: entry.target._id 
+               _id: entry.target._id,
             };
          }),
       );

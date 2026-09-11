@@ -14,7 +14,7 @@ const DURATION_TYPES = [
    'turnEnd',
    'initiative',
    'permanent',
-   'custom'
+   'custom',
 ];
 
 /**
@@ -27,13 +27,13 @@ const STAT_KEYS = {
       'body',
       'mind',
       'soul',
-      'all'
+      'all',
    ],
    resistance: [
       'reflexes',
       'resilience',
       'willpower',
-      'all'
+      'all',
    ],
    rating: [
       'awareness',
@@ -41,13 +41,13 @@ const STAT_KEYS = {
       'melee',
       'accuracy',
       'initiative',
-      'all'
+      'all',
    ],
    resource: [
       'stamina',
       'resolve',
       'wounds',
-      'all'
+      'all',
    ],
    speed: [
       'stride',
@@ -55,7 +55,7 @@ const STAT_KEYS = {
       'climb',
       'swim',
       'burrow',
-      'all'
+      'all',
    ],
    mod: [
       'armor',
@@ -63,7 +63,7 @@ const STAT_KEYS = {
       'healing',
       'resolveRegain',
       'woundRegain',
-      'all'
+      'all',
    ],
 };
 
@@ -73,7 +73,7 @@ const CHECK_MODIFIER_TYPES = [
    'dice',
    'expertise',
    'training',
-   'healing'
+   'healing',
 ];
 
 /** @type {string[]} The `checkType` values `ItemSheetConditionalCheckModifierSettings` offers. */
@@ -81,7 +81,7 @@ const CHECK_TYPES = [
    'any',
    'attack',
    'casting',
-   'item'
+   'item',
 ];
 
 /**
@@ -99,7 +99,7 @@ function readSource(dir) {
       else if (name.endsWith('.json')) {
          entries.push({
             file: path.relative(SOURCE_DIR, full),
-            doc: JSON.parse(readFileSync(full, 'utf8')) 
+            doc: JSON.parse(readFileSync(full, 'utf8')),
          });
       }
    }
@@ -180,7 +180,7 @@ describe('standard effects compendium source', () => {
                      expect([
                         'set',
                         'min',
-                        'max'
+                        'max',
                      ], `${label} mode`).toContain(element.mode);
                   }
                   break;
@@ -216,13 +216,13 @@ describe('standard effects compendium source', () => {
             operation: 'flatModifier',
             selector: 'rating',
             key: 'defense',
-            value: 1 
+            value: 1,
          },
          {
             operation: 'flatModifier',
             selector: 'resistance',
             key: 'reflexes',
-            value: 1 
+            value: 1,
          },
       ]);
       expect(elementsOf('Charging')).toEqual([
@@ -230,7 +230,7 @@ describe('standard effects compendium source', () => {
             operation: 'flatModifier',
             selector: 'rating',
             key: 'defense',
-            value: -1 
+            value: -1,
          },
          {
             operation: 'conditionalCheckModifier',
@@ -238,7 +238,7 @@ describe('standard effects compendium source', () => {
             checkType: 'attack',
             selector: 'any',
             key: '',
-            value: 1 
+            value: 1,
          },
       ]);
       expect(elementsOf('Heavy Cover')).toEqual([
@@ -246,13 +246,13 @@ describe('standard effects compendium source', () => {
             operation: 'flatModifier',
             selector: 'rating',
             key: 'defense',
-            value: 2 
+            value: 2,
          },
          {
             operation: 'flatModifier',
             selector: 'resistance',
             key: 'reflexes',
-            value: 2 
+            value: 2,
          },
       ]);
       expect(elementsOf('Surprised')).toEqual([
@@ -261,7 +261,7 @@ describe('standard effects compendium source', () => {
             selector: 'rating',
             key: 'defense',
             value: 0,
-            mode: 'set' 
+            mode: 'set',
          },
       ]);
       expect(elementsOf('Dying')).toEqual([
@@ -271,7 +271,7 @@ describe('standard effects compendium source', () => {
             checkType: 'any',
             selector: 'any',
             key: '',
-            value: -1 
+            value: -1,
          },
       ]);
       expect(elementsOf('Last Stand')).toEqual([
@@ -279,13 +279,13 @@ describe('standard effects compendium source', () => {
             operation: 'flatModifier',
             selector: 'rating',
             key: 'melee',
-            value: 1 
+            value: 1,
          },
          {
             operation: 'flatModifier',
             selector: 'rating',
             key: 'accuracy',
-            value: 1 
+            value: 1,
          },
       ]);
    });

@@ -51,7 +51,7 @@
          ? document.data.system.aspect.findIndex((aspect) => {
             return aspect.label === aspectOptions.template.label;
          })
-         : -1
+         : -1,
    );
 </script>
 

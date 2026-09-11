@@ -38,19 +38,19 @@ beforeAll(async () => {
    // those modules, and importing the compiled module does not execute the template, so the import
    // succeeds without rendering.
    models.attribute = (await import(
-      '~/check/types/attribute-check/chat-message/AttributeCheckChatMessageDataModel.js'
+      '~/check/types/attribute-check/chat-message/AttributeCheckChatMessageDataModel.js',
    )).default;
    models.resistance = (await import(
-      '~/check/types/resistance-check/chat-message/ResistanceCheckChatMessageDataModel.js'
+      '~/check/types/resistance-check/chat-message/ResistanceCheckChatMessageDataModel.js',
    )).default;
    models.attack = (await import(
-      '~/check/types/attack-check/chat-message/AttackCheckChatMessageDataModel.js'
+      '~/check/types/attack-check/chat-message/AttackCheckChatMessageDataModel.js',
    )).default;
    models.casting = (await import(
-      '~/check/types/casting-check/chat-message/CastingCheckChatMessageDataModel.js'
+      '~/check/types/casting-check/chat-message/CastingCheckChatMessageDataModel.js',
    )).default;
    models.item = (await import(
-      '~/check/types/item-check/chat-message/ItemCheckChatMessageDataModel.js'
+      '~/check/types/item-check/chat-message/ItemCheckChatMessageDataModel.js',
    )).default;
 });
 

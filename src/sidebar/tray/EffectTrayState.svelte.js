@@ -443,7 +443,7 @@ export default class EffectTrayState {
          const id = Hooks.on(hook, onChange);
          this.#hookIds.push({
             hook,
-            id 
+            id,
          });
       }
    }

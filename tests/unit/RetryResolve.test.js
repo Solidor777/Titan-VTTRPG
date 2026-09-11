@@ -29,7 +29,7 @@ describe('retryResolve', () => {
          return null;
       }, {
          attempts: 4,
-         delayMs: 0 
+         delayMs: 0,
       });
       expect(result).toBeNull();
       expect(calls).toBe(4);

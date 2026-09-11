@@ -22,7 +22,7 @@ export default class CreateItemMacroDialog extends TitanDialog {
             props: {
                item: item,
                slot: slot,
-               uuid: uuid
+               uuid: uuid,
             },
          },
          id: `titan-create-macro-dialog-${item._id}`,

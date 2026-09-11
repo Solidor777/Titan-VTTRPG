@@ -20,7 +20,7 @@ function collectStringValues(object, prefix = '') {
       if (typeof value === 'string') {
          pairs.push([
             keyPath,
-            value
+            value,
          ]);
       }
       else if (value && typeof value === 'object') {

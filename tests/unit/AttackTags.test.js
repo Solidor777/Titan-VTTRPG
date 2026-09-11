@@ -51,7 +51,7 @@ describe('AttackTags', () => {
          },
          context: new Map([[
             'document',
-            makeBridge()
+            makeBridge(),
          ]]),
       });
 
@@ -63,7 +63,7 @@ describe('AttackTags', () => {
          props: { idx: 0 },
          context: new Map([[
             'document',
-            makeBridge({ plusExtraSuccessDamage: true })
+            makeBridge({ plusExtraSuccessDamage: true }),
          ]]),
       });
 
@@ -78,7 +78,7 @@ describe('AttackTags', () => {
          props: { idx: 0 },
          context: new Map([[
             'document',
-            makeBridge()
+            makeBridge(),
          ]]),
       });
       expect(screen.queryByTestId('attack-tags-range')).toBeNull();
@@ -88,7 +88,7 @@ describe('AttackTags', () => {
          props: { idx: 0 },
          context: new Map([[
             'document',
-            makeBridge({ range: 4 })
+            makeBridge({ range: 4 }),
          ]]),
       });
       expect(screen.getByTestId('attack-tags-range').querySelector('.value').textContent).toBe('4');
@@ -99,7 +99,7 @@ describe('AttackTags', () => {
          props: { idx: 7 },
          context: new Map([[
             'document',
-            makeBridge()
+            makeBridge(),
          ]]),
       });
       expect(container.querySelector('.attack-tags')).toBeNull();
@@ -110,7 +110,7 @@ describe('AttackTags', () => {
          props: { idx: 0 },
          context: new Map([[
             'document',
-            { data: undefined }
+            { data: undefined },
          ]]),
       });
       expect(container.querySelector('.attack-tags')).toBeNull();

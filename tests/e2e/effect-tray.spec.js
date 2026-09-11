@@ -144,7 +144,7 @@ test.describe('effect tray sidebar tab', () => {
       for (const folderName of [
          'Actions',
          'Circumstances',
-         'Death'
+         'Death',
       ]) {
          const folder = page.locator('[data-testid="effect-tray-folder"]', { hasText: folderName }).first();
          await expect(folder, `${folderName} folder is listed`).toBeVisible();
@@ -157,7 +157,7 @@ test.describe('effect tray sidebar tab', () => {
          'Charging',
          'Light Cover',
          'Dying',
-         'Last Stand'
+         'Last Stand',
       ]) {
          await expect(rows.filter({ hasText: name }).first(), `${name} is seeded`).toBeVisible();
       }
@@ -231,19 +231,19 @@ test.describe('effect tray sidebar tab', () => {
          }
          for (const name of [
             'E2E Early Folder',
-            'E2E Late Folder'
+            'E2E Late Folder',
          ]) {
             await pack.folders.find((f) => f.name === name)?.delete();
          }
          const early = await Folder.create({
             name: 'E2E Early Folder',
-            type: 'ActiveEffect' 
+            type: 'ActiveEffect',
          }, { pack: pack.collection });
          await ActiveEffect.create(
             {
                name: 'E2E Early Folder Effect',
                type: 'effect',
-               folder: early.id 
+               folder: early.id,
             },
             { pack: pack.collection },
          );
@@ -267,13 +267,13 @@ test.describe('effect tray sidebar tab', () => {
          const pack = game.packs.get('world.e2e-tray-effects');
          const late = await Folder.create({
             name: 'E2E Late Folder',
-            type: 'ActiveEffect' 
+            type: 'ActiveEffect',
          }, { pack: pack.collection });
          await ActiveEffect.create(
             {
                name: 'E2E Late Folder Effect',
                type: 'effect',
-               folder: late.id 
+               folder: late.id,
             },
             { pack: pack.collection },
          );
@@ -306,7 +306,7 @@ test.describe('effect tray sidebar tab', () => {
          }
          for (const name of [
             'E2E Early Folder',
-            'E2E Late Folder'
+            'E2E Late Folder',
          ]) {
             await pack.folders.find((f) => f.name === name)?.delete();
          }
@@ -319,7 +319,7 @@ test.describe('effect tray sidebar tab', () => {
       await page.evaluate(async () => {
          await Actor.create({
             name: 'E2E Tray Target',
-            type: 'player' 
+            type: 'player',
          });
       });
       await controlFixtureActorToken(page, {
@@ -330,7 +330,7 @@ test.describe('effect tray sidebar tab', () => {
          const actor = game.actors.getName('E2E Tray Target');
          return {
             defense: actor.system.rating.defense.value,
-            reflexes: actor.system.resistance.reflexes.value 
+            reflexes: actor.system.resistance.reflexes.value,
          };
       });
 
@@ -374,7 +374,7 @@ test.describe('effect tray sidebar tab', () => {
          .toEqual({
             applied: true,
             defense: before.defense + 1,
-            reflexes: before.reflexes + 1 
+            reflexes: before.reflexes + 1,
          });
    });
 
@@ -490,7 +490,7 @@ test.describe('effect tray sidebar tab', () => {
          }
          await Folder.create({
             name: 'E2E Rename Folder',
-            type: 'ActiveEffect' 
+            type: 'ActiveEffect',
          }, { pack: pack.collection });
 
          await ui.titanEffects.render(true);
@@ -539,7 +539,7 @@ test.describe('effect tray sidebar tab', () => {
       await page.evaluate(async () => {
          const actor = await Actor.create({
             name: 'E2E Stash Source',
-            type: 'player' 
+            type: 'player',
          });
          await actor.createEmbeddedDocuments('ActiveEffect', [
             {
@@ -578,7 +578,7 @@ test.describe('effect tray sidebar tab', () => {
          tray.dispatchEvent(new DragEvent('drop', {
             bubbles: true,
             cancelable: true,
-            dataTransfer 
+            dataTransfer,
          }));
       });
 

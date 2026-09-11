@@ -64,7 +64,7 @@ export default function tooltipAction(element, textData) {
                   content: updatedTextData,
                   allowHTML: true,
                   duration: TOOLTIP_DURATION,
-                  delay: TOOLTIP_DELAY
+                  delay: TOOLTIP_DELAY,
                });
             }
 
@@ -88,7 +88,7 @@ export default function tooltipAction(element, textData) {
          if (tippyTooltip) {
             tippyTooltip.destroy();
          }
-      }
+      },
    };
 }
 
@@ -105,7 +105,7 @@ function initializeTippy(element, content) {
          content: content,
          allowHTML: true,
          duration: TOOLTIP_DURATION,
-         delay: TOOLTIP_DELAY
-      }
+         delay: TOOLTIP_DELAY,
+      },
    );
 }

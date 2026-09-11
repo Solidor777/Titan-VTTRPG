@@ -33,7 +33,7 @@ test.beforeEach(async () => {
 
       const actor = await Actor.create({
          name: actorName,
-         type: 'player' 
+         type: 'player',
       });
       await actor.update({
          'system.skill.athletics.training.baseValue': 2,

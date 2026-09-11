@@ -49,7 +49,7 @@ test.describe('character sheet effect row reactivity', () => {
          }
          const actor = await Actor.create({
             name: actorName,
-            type: 'player' 
+            type: 'player',
          });
          await actor.createEmbeddedDocuments('ActiveEffect', [
             {
@@ -180,8 +180,8 @@ test.describe('character sheet effect row reactivity', () => {
             system: {
                duration: {
                   type: 'initiative',
-                  initiative: 3 
-               } 
+                  initiative: 3,
+               },
             },
          });
       }, ACTOR_NAME);

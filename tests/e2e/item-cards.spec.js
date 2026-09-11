@@ -68,7 +68,7 @@ test.describe('item chat-message subtype cards', () => {
             const item = await Item.create({
                name: itemName,
                type,
-               system: { description: itemDescription } 
+               system: { description: itemDescription },
             });
 
             // Ensure the description took (fall back to an explicit update if creation did not set it).
@@ -94,7 +94,7 @@ test.describe('item chat-message subtype cards', () => {
          }, {
             type,
             itemName,
-            itemDescription 
+            itemDescription,
          });
 
          // A new message must have been created with the expected subtype.
@@ -161,7 +161,7 @@ test.describe('spell card tradition tag', () => {
             ?? await Item.create({
                name,
                type: 'spell',
-               system: { tradition: '' } 
+               system: { tradition: '' },
             });
          if (spell.system.tradition !== '') {
             await spell.update({ system: { tradition: '' } });

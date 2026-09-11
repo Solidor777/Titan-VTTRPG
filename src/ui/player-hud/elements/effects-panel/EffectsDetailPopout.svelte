@@ -26,7 +26,7 @@
    /** @type {{x: number, y: number}} The clamped popout point. */
    const point = $derived(clampPoint(anchor, {
       width,
-      height 
+      height,
    }, layoutState.rect));
 
    /**

@@ -8,19 +8,19 @@
 export const E2E_USERS = [
    {
       name: 'E2E GM 1',
-      role: 'gm' 
+      role: 'gm',
    },
    {
       name: 'E2E GM 2',
-      role: 'gm' 
+      role: 'gm',
    },
    {
       name: 'E2E Player 1',
-      role: 'player' 
+      role: 'player',
    },
    {
       name: 'E2E Player 2',
-      role: 'player' 
+      role: 'player',
    },
 ];
 

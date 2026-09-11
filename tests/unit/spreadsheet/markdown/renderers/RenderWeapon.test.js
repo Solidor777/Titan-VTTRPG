@@ -72,7 +72,7 @@ describe('renderWeapon', () => {
                plusExtraSuccessDamage: true,
                trait: [{
                   name: 'slashing',
-                  value: true 
+                  value: true,
                }],
             })],
             description: '<p>These axes are designed explicitly as weapons, rather than tools.</p>',
@@ -100,11 +100,11 @@ describe('renderWeapon', () => {
                   trait: [
                      {
                         name: 'flurry',
-                        value: true 
+                        value: true,
                      },
                      {
                         name: 'slashing',
-                        value: true 
+                        value: true,
                      },
                   ],
                }),
@@ -117,7 +117,7 @@ describe('renderWeapon', () => {
                   range: 5,
                   trait: [{
                      name: 'slashing',
-                     value: true 
+                     value: true,
                   }],
                }),
             ],
@@ -151,11 +151,11 @@ describe('renderWeapon', () => {
                trait: [
                   {
                      name: 'crushing',
-                     value: true 
+                     value: true,
                   },
                   {
                      name: 'flurry',
-                     value: true 
+                     value: true,
                   },
                ],
             })],
@@ -175,7 +175,7 @@ describe('renderWeapon', () => {
          system: makeSystem({
             attack: [makeAttack({
                damage: 3,
-               plusExtraSuccessDamage: false 
+               plusExtraSuccessDamage: false,
             })],
          }),
       };
@@ -190,7 +190,7 @@ describe('renderWeapon', () => {
          system: makeSystem({
             attack: [makeAttack({
                attribute: 'body',
-               skill: 'athletics' 
+               skill: 'athletics',
             })],
          }),
       };
@@ -205,7 +205,7 @@ describe('renderWeapon', () => {
          system: makeSystem({
             trait: [{
                name: 'twoHanded',
-               value: true 
+               value: true,
             }],
          }),
       };

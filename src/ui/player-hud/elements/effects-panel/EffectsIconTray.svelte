@@ -17,13 +17,13 @@
    /** @type {{x: number, y: number}} The clicked icon's viewport point, anchoring the popout. */
    let anchor = $state({
       x: 0,
-      y: 0 
+      y: 0,
    });
 
    /** @type {Array<TitanActiveEffect>} All entries, conditions first. */
    const entries = $derived([
       ...conditions,
-      ...effects
+      ...effects,
    ]);
 
    /** @type {TitanActiveEffect | null} The selected effect, when it still exists. */
@@ -40,7 +40,7 @@
       const box = event.currentTarget.getBoundingClientRect();
       anchor = {
          x: box.right + 6,
-         y: box.top 
+         y: box.top,
       };
       selectedId = selectedId === effect.id ? null : effect.id;
    }

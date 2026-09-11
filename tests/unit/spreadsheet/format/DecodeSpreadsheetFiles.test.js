@@ -19,13 +19,13 @@ describe('decodeSpreadsheetFiles', () => {
             name: 'weapon',
             columns: [
                '_id',
-               'name'
+               'name',
             ],
             rows: [{
                _id: 'a',
-               name: 'Sword' 
-            }] 
-         }] 
+               name: 'Sword',
+            }],
+         }],
       };
       /** @type {Uint8Array} */
       const bytes = encodeXlsx(workbook);
@@ -33,13 +33,13 @@ describe('decodeSpreadsheetFiles', () => {
       /** @type {import('~/spreadsheet/codec/Workbook.js').Workbook} */
       const decoded = decodeSpreadsheetFiles([{
          name: 'export.xlsx',
-         bytes 
+         bytes,
       }]);
 
       expect(decoded.sheets.map((s) => s.name)).toEqual(['weapon']);
       expect(decoded.sheets[0].rows[0]).toMatchObject({
          _id: 'a',
-         name: 'Sword' 
+         name: 'Sword',
       });
    });
 
@@ -58,12 +58,12 @@ describe('decodeSpreadsheetFiles', () => {
       /** @type {import('~/spreadsheet/codec/Workbook.js').Workbook} */
       const decoded = decodeSpreadsheetFiles([{
          name: 'export.zip',
-         bytes 
+         bytes,
       }]);
 
       expect(decoded.sheets.map((s) => s.name).sort()).toEqual([
          'armor',
-         'weapon'
+         'weapon',
       ]);
    });
 
@@ -72,28 +72,28 @@ describe('decodeSpreadsheetFiles', () => {
       const decoded = decodeSpreadsheetFiles([
          {
             name: 'weapon.csv',
-            bytes: strToU8('﻿_id,name\r\na,Sword\r\n') 
+            bytes: strToU8('﻿_id,name\r\na,Sword\r\n'),
          },
          {
             name: 'armor.csv',
-            bytes: strToU8('﻿_id,name\r\nb,Plate\r\n') 
+            bytes: strToU8('﻿_id,name\r\nb,Plate\r\n'),
          },
       ]);
 
       expect(decoded.sheets.map((s) => s.name)).toEqual([
          'weapon',
-         'armor'
+         'armor',
       ]);
       expect(decoded.sheets[0].rows[0]).toMatchObject({
          _id: 'a',
-         name: 'Sword' 
+         name: 'Sword',
       });
    });
 
    it('throws on an unsupported file extension among loose entries', () => {
       expect(() => decodeSpreadsheetFiles([{
          name: 'notes.txt',
-         bytes: strToU8('hello') 
+         bytes: strToU8('hello'),
       }]))
          .toThrow('Unsupported spreadsheet file: notes.txt');
    });

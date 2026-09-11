@@ -8,12 +8,12 @@ describe('moveArrayEntry', () => {
          'a',
          'b',
          'c',
-         'd'
+         'd',
       ], 0, 3)).toEqual([
          'b',
          'c',
          'a',
-         'd'
+         'd',
       ]);
    });
 
@@ -22,12 +22,12 @@ describe('moveArrayEntry', () => {
          'a',
          'b',
          'c',
-         'd'
+         'd',
       ], 2, 0)).toEqual([
          'c',
          'a',
          'b',
-         'd'
+         'd',
       ]);
    });
 
@@ -35,11 +35,11 @@ describe('moveArrayEntry', () => {
       expect(moveArrayEntry([
          'a',
          'b',
-         'c'
+         'c',
       ], 0, 3)).toEqual([
          'b',
          'c',
-         'a'
+         'a',
       ]);
    });
 
@@ -47,20 +47,20 @@ describe('moveArrayEntry', () => {
       expect(moveArrayEntry([
          'a',
          'b',
-         'c'
+         'c',
       ], 1, 1)).toEqual([
          'a',
          'b',
-         'c'
+         'c',
       ]);
       expect(moveArrayEntry([
          'a',
          'b',
-         'c'
+         'c',
       ], 1, 2)).toEqual([
          'a',
          'b',
-         'c'
+         'c',
       ]);
    });
 
@@ -68,13 +68,13 @@ describe('moveArrayEntry', () => {
       const input = [
          'a',
          'b',
-         'c'
+         'c',
       ];
       moveArrayEntry(input, 0, 2);
       expect(input).toEqual([
          'a',
          'b',
-         'c'
+         'c',
       ]);
    });
 });

@@ -13,7 +13,7 @@ describe('Xlsx', () => {
                'name',
                'damage',
                'equipped',
-               'notes'
+               'notes',
             ],
             rows: [
                {
@@ -21,14 +21,14 @@ describe('Xlsx', () => {
                   name: 'Sword & Shield',
                   damage: 5,
                   equipped: true,
-                  notes: undefined 
+                  notes: undefined,
                },
                {
                   _id: 'b'.repeat(16),
                   name: 'Bow',
                   damage: 0,
                   equipped: false,
-                  notes: '"5"' 
+                  notes: '"5"',
                },
             ],
          },
@@ -112,7 +112,7 @@ describe('Xlsx', () => {
       const decoded = decodeXlsx(bytes);
       expect(decoded.sheets[0].rows[0]).toEqual({
          name: 'Shared Value',
-         formula: 'computed value' 
+         formula: 'computed value',
       });
    });
 
@@ -124,7 +124,7 @@ describe('Xlsx', () => {
          const decoded = decodeXlsx(new Uint8Array(bytes));
          expect(decoded.sheets.map((s) => s.name)).toEqual(expect.arrayContaining([
             '_manifest',
-            'effect'
+            'effect',
          ]));
          /** @type {import('~/spreadsheet/codec/Workbook.js').Sheet} */
          const effectSheet = decoded.sheets.find((s) => s.name === 'effect');
@@ -146,7 +146,7 @@ describe('Xlsx', () => {
       it('de-duplicates collisions with a numeric suffix', () => {
          const names = uniqueSheetNames([
             'weapon',
-            'weapon'
+            'weapon',
          ]);
          expect(names[0]).toBe('weapon');
          expect(names[1]).not.toBe('weapon');

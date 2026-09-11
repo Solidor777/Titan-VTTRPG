@@ -147,7 +147,7 @@ export default class TitanPlayerHud {
          isGM: game.user.isGM,
          selected,
          owned,
-         assigned 
+         assigned,
       });
    }
 

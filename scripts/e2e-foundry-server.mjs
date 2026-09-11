@@ -39,7 +39,7 @@ const handle = await superviseServer({
    args: [
       'main.js',
       `--dataPath=${dataPath}`,
-      `--world=${world}`
+      `--world=${world}`,
    ],
    cwd: appDir,
    port,
@@ -51,7 +51,7 @@ for (const signal of [
    'SIGINT',
    'SIGTERM',
    'SIGHUP',
-   'SIGBREAK'
+   'SIGBREAK',
 ]) {
    process.on(signal, () => handle.stop());
 }

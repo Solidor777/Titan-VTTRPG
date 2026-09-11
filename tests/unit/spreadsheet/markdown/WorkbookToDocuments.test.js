@@ -36,7 +36,7 @@ function fixtureEnvelopes() {
             type: 'effect',
             img: 'i.svg',
             sort: 1,
-            system: {} 
+            system: {},
          },
          parentId: 'a'.repeat(16),
          folderPath: '',
@@ -79,11 +79,11 @@ function assertFixtureDocuments(documents) {
    expect(documents).toHaveLength(3);
    expect(documents.find((d) => d.type === 'weapon')).toMatchObject({
       name: 'Sword',
-      folderPath: [] 
+      folderPath: [],
    });
    expect(documents.find((d) => d.type === 'armor')).toMatchObject({
       name: 'Plate',
-      folderPath: [] 
+      folderPath: [],
    });
    /** @type {object} */
    const spell = documents.find((d) => d.type === 'spell');
@@ -91,8 +91,8 @@ function assertFixtureDocuments(documents) {
       name: 'Fireball',
       folderPath: [
          'Magic',
-         'Fire'
-      ] 
+         'Fire',
+      ],
    });
    expect(spell.system.tradition).toBe('evocation');
    expect(documents.some((d) => d.name === 'Sharp')).toBe(false);
@@ -120,8 +120,8 @@ describe('workbookToDocuments', () => {
                      rarity: 'common',
                      attack: [
                         { damage: 5 },
-                        { damage: 3 }
-                     ] 
+                        { damage: 3 },
+                     ],
                   },
                },
             }
@@ -141,7 +141,7 @@ describe('workbookToDocuments', () => {
       /** @type {Object<string, string>} */
       const csvFiles = Object.fromEntries(built.sheets.map((sheet) => [
          `${sheet.name}.csv`,
-         encodeCsv(sheet)
+         encodeCsv(sheet),
       ]));
       /** @type {import('~/spreadsheet/codec/Workbook.js').Workbook} */
       const decoded = {
@@ -160,7 +160,7 @@ describe('workbookToDocuments', () => {
                _id: 'a'.repeat(16),
                name: 'Goblin',
                type: 'npc',
-               system: {} 
+               system: {},
             },
             parentId: '',
             folderPath: '',
@@ -184,7 +184,7 @@ describe('workbookToDocuments', () => {
                _id: 'a'.repeat(16),
                name: 'Blessed',
                type: 'effect',
-               system: {} 
+               system: {},
             },
             parentId: '',
             folderPath: '',
@@ -207,12 +207,12 @@ describe('workbookToDocuments', () => {
                name: 'weapon',
                columns: [
                   '_id',
-                  'name'
+                  'name',
                ],
                rows: [{
                   _id: 'a'.repeat(16),
-                  name: 'Sword' 
-               }] 
+                  name: 'Sword',
+               }],
             },
          ],
       };
@@ -224,7 +224,7 @@ describe('workbookToDocuments', () => {
          type: 'weapon',
          name: 'Sword',
          folderPath: [],
-         system: undefined 
+         system: undefined,
       }]);
    });
 
@@ -237,12 +237,12 @@ describe('workbookToDocuments', () => {
                columns: [
                   '_id',
                   'name',
-                  '_folder'
+                  '_folder',
                ],
                rows: [{
                   _id: 'a'.repeat(16),
                   name: 'Sword',
-                  _folder: 'A\\\\B/C\\/D' 
+                  _folder: 'A\\\\B/C\\/D',
                }],
             },
          ],
@@ -253,7 +253,7 @@ describe('workbookToDocuments', () => {
 
       expect(documents[0].folderPath).toEqual([
          'A\\B',
-         'C/D'
+         'C/D',
       ]);
    });
 
@@ -265,12 +265,12 @@ describe('workbookToDocuments', () => {
                name: 'goblin',
                columns: [
                   '_id',
-                  'name'
+                  'name',
                ],
                rows: [{
                   _id: 'a'.repeat(16),
-                  name: 'Goblin' 
-               }] 
+                  name: 'Goblin',
+               }],
             },
          ],
       };

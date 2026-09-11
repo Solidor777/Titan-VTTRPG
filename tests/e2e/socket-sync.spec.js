@@ -13,7 +13,7 @@ test.describe('socket sync — replicated turn-effect state', () => {
    test('A1: persistent damage applied by the GM replicates to the player client', async ({ browser }) => {
       await withClients(browser, {
          gm: 'E2E GM 1',
-         player: 'E2E Player 1' 
+         player: 'E2E Player 1',
       }, async ({ gm, player }) => {
          // Determinism: auto-apply persistent damage on the applying (GM) client.
          await setWorldSetting(gm, 'autoApplyPersistentDamage', 'enabled');
@@ -45,7 +45,7 @@ test.describe('socket sync — replicated turn-effect state', () => {
                ({ id, expected }) => game.actors.get(id)?.system.resource.stamina.value === expected,
                {
                   id: ids.effectActorId,
-                  expected: before - 1 
+                  expected: before - 1,
                },
                { timeout: 1000 },
             );
@@ -66,7 +66,7 @@ test.describe('socket sync — replicated turn-effect state', () => {
    test('A2: fast healing applied by the GM replicates to the player client', async ({ browser }) => {
       await withClients(browser, {
          gm: 'E2E GM 1',
-         player: 'E2E Player 1' 
+         player: 'E2E Player 1',
       }, async ({ gm, player }) => {
          await setWorldSetting(gm, 'autoApplyFastHealing', 'enabled');
 
@@ -109,7 +109,7 @@ test.describe('socket sync — replicated turn-effect state', () => {
    test('A3: resolve regain applied by the GM replicates to the player client', async ({ browser }) => {
       await withClients(browser, {
          gm: 'E2E GM 1',
-         player: 'E2E Player 1' 
+         player: 'E2E Player 1',
       }, async ({ gm, player }) => {
          await setWorldSetting(gm, 'autoRegainResolve', 'enabled');
 
@@ -147,7 +147,7 @@ test.describe('socket sync — replicated turn-effect state', () => {
                ({ id, expected }) => game.actors.get(id)?.system.resource.resolve.value === expected,
                {
                   id: ids.effectActorId,
-                  expected: expectedResolve 
+                  expected: expectedResolve,
                },
                { timeout: 1000 },
             );
@@ -161,7 +161,7 @@ test.describe('socket sync — replicated turn-effect state', () => {
    test('A4: previousTurn reverts the applied effect and replicates to the player client', async ({ browser }) => {
       await withClients(browser, {
          gm: 'E2E GM 1',
-         player: 'E2E Player 1' 
+         player: 'E2E Player 1',
       }, async ({ gm, player }) => {
          await setWorldSetting(gm, 'autoApplyPersistentDamage', 'enabled');
          await setWorldSetting(gm, 'autoRevertPersistentDamage', 'enabled');
@@ -189,7 +189,7 @@ test.describe('socket sync — replicated turn-effect state', () => {
                ({ id, expected }) => game.actors.get(id)?.system.resource.stamina.value === expected,
                {
                   id: ids.effectActorId,
-                  expected: before - 1 
+                  expected: before - 1,
                },
                { timeout: 1000 },
             );
@@ -200,7 +200,7 @@ test.describe('socket sync — replicated turn-effect state', () => {
                ({ id, expected }) => game.actors.get(id)?.system.resource.stamina.value === expected,
                {
                   id: ids.effectActorId,
-                  expected: before 
+                  expected: before,
                },
                { timeout: 1000 },
             );
@@ -251,7 +251,7 @@ test.describe('socket sync — replicated turn-effect state', () => {
                   () => !!game.combats.get(combatId),
                   {
                      message: 'the seeded combat replicates to GM 2',
-                     timeout: 1000 
+                     timeout: 1000,
                   },
                );
                await game.combats.get(combatId).nextTurn();
@@ -262,7 +262,7 @@ test.describe('socket sync — replicated turn-effect state', () => {
                ({ id, expected }) => game.actors.get(id)?.system.resource.stamina.value === expected,
                {
                   id: ids.effectActorId,
-                  expected: before - 1 
+                  expected: before - 1,
                },
                { timeout: 1000 },
             );

@@ -15,7 +15,7 @@ const EFFECT_TYPES = [
    'initiative',
    'permanent',
    'turn-end',
-   'turn-start'
+   'turn-start',
 ];
 
 /**
@@ -78,12 +78,12 @@ export const THEME_TOKEN_GROUPS = Object.freeze({
    labels: [
       'label-background',
       'label-font-color',
-      'label-border-color'
+      'label-border-color',
    ],
    tags: [
       'tag-background',
       'tag-font-color',
-      'tag-border-color'
+      'tag-border-color',
    ],
    calculatedValues: [
       'calculated-value-background',
@@ -134,20 +134,20 @@ export const THEME_TOKEN_GROUPS = Object.freeze({
    ],
    checkResults: [
       'succeeded-font-color',
-      'failed-font-color'
+      'failed-font-color',
    ],
    mods: [
       'lesser-background',
       'lesser-color',
       'greater-background',
-      'greater-color'
+      'greater-color',
    ],
    meters: ['meter-background'],
    effects: EFFECT_TYPES.flatMap(
       (type) => [
          `${type}-effect-primary`,
          `${type}-effect-secondary`,
-         `${type}-effect-font-color`
+         `${type}-effect-font-color`,
       ],
    ),
    chat: [
@@ -166,7 +166,7 @@ export const THEME_TOKEN_GROUPS = Object.freeze({
    ],
    fonts: [
       'font-family-normal',
-      'font-family-rich-text'
+      'font-family-rich-text',
    ],
 });
 
@@ -183,7 +183,7 @@ export const THEME_COLOR_TOKENS = Object.freeze(
 /** @type {string[]} The complete themed token contract (colors then fonts). */
 export const THEME_TOKENS = Object.freeze([
    ...THEME_COLOR_TOKENS,
-   ...THEME_FONT_TOKENS
+   ...THEME_FONT_TOKENS,
 ]);
 
 /**
@@ -194,146 +194,146 @@ export const THEME_TOKENS = Object.freeze([
 export const THEME_TOKEN_PAIRS = Object.freeze([
    [
       'app-background',
-      'app-font-color'
+      'app-font-color',
    ],
    [
       'highlighted-background',
-      'highlighted-font-color'
+      'highlighted-font-color',
    ],
    [
       'panel-1-background',
-      'panel-1-color'
+      'panel-1-color',
    ],
    [
       'panel-2-background',
-      'panel-2-color'
+      'panel-2-color',
    ],
    [
       'panel-3-background',
-      'panel-3-color'
+      'panel-3-color',
    ],
    [
       'button-background',
-      'button-font-color'
+      'button-font-color',
    ],
    [
       'button-hover-background',
-      'button-hover-font-color'
+      'button-hover-font-color',
    ],
    [
       'button-disabled-background',
-      'button-disabled-font-color'
+      'button-disabled-font-color',
    ],
    [
       'input-background',
-      'input-font-color'
+      'input-font-color',
    ],
    [
       'input-hover-background',
-      'input-hover-font-color'
+      'input-hover-font-color',
    ],
    [
       'input-disabled-background',
-      'input-disabled-font-color'
+      'input-disabled-font-color',
    ],
    [
       'label-background',
-      'label-font-color'
+      'label-font-color',
    ],
    [
       'tag-background',
-      'tag-font-color'
+      'tag-font-color',
    ],
    [
       'calculated-value-background',
-      'calculated-value-font-color'
+      'calculated-value-font-color',
    ],
    [
       'body-background',
-      'body-font-color'
+      'body-font-color',
    ],
    [
       'mind-background',
-      'mind-font-color'
+      'mind-font-color',
    ],
    [
       'soul-background',
-      'soul-font-color'
+      'soul-font-color',
    ],
    [
       'reflexes-background',
-      'reflexes-font-color'
+      'reflexes-font-color',
    ],
    [
       'resilience-background',
-      'resilience-font-color'
+      'resilience-font-color',
    ],
    [
       'willpower-background',
-      'willpower-font-color'
+      'willpower-font-color',
    ],
    [
       'stamina-background',
-      'stamina-font-color'
+      'stamina-font-color',
    ],
    [
       'resolve-background',
-      'resolve-font-color'
+      'resolve-font-color',
    ],
    [
       'wounds-background',
-      'wounds-font-color'
+      'wounds-font-color',
    ],
    [
       'uncommon-background',
-      'uncommon-font-color'
+      'uncommon-font-color',
    ],
    [
       'rare-background',
-      'rare-font-color'
+      'rare-font-color',
    ],
    [
       'unique-background',
-      'unique-font-color'
+      'unique-font-color',
    ],
    [
       'critical-success-background',
-      'critical-success-font-color'
+      'critical-success-font-color',
    ],
    [
       'success-background',
-      'success-font-color'
+      'success-font-color',
    ],
    [
       'failure-background',
-      'failure-font-color'
+      'failure-font-color',
    ],
    [
       'critical-failure-background',
-      'critical-failure-font-color'
+      'critical-failure-font-color',
    ],
    [
       'lesser-background',
-      'lesser-color'
+      'lesser-color',
    ],
    [
       'greater-background',
-      'greater-color'
+      'greater-color',
    ],
    ...EFFECT_TYPES.map((type) => [
       `${type}-effect-primary`,
-      `${type}-effect-font-color`
+      `${type}-effect-font-color`,
    ]),
    [
       'chat-public-badge-background',
-      'chat-public-badge-font-color'
+      'chat-public-badge-font-color',
    ],
    [
       'chat-secret-badge-background',
-      'chat-secret-badge-font-color'
+      'chat-secret-badge-font-color',
    ],
    [
       'chat-gm-badge-background',
-      'chat-gm-badge-font-color'
+      'chat-gm-badge-font-color',
    ],
 ]);

@@ -22,7 +22,7 @@ const spawned = [];
 function spawnIdle() {
    const child = spawn(process.execPath, [
       '-e',
-      IDLE_SCRIPT
+      IDLE_SCRIPT,
    ], { stdio: 'ignore' });
    spawned.push(child);
    return child;
@@ -54,7 +54,7 @@ function listenEphemeral() {
       const server = net.createServer();
       server.listen(0, '127.0.0.1', () => resolve({
          server,
-         port: server.address().port 
+         port: server.address().port,
       }));
    });
 }
@@ -77,7 +77,7 @@ describe('superviseServer', () => {
          command: process.execPath,
          args: [
             '-e',
-            IDLE_SCRIPT
+            IDLE_SCRIPT,
          ],
          cwd: process.cwd(),
          port,
@@ -106,7 +106,7 @@ describe('superviseServer', () => {
             command: process.execPath,
             args: [
                '-e',
-               IDLE_SCRIPT
+               IDLE_SCRIPT,
             ],
             cwd: process.cwd(),
             port,
@@ -129,7 +129,7 @@ describe('superviseServer', () => {
          command: process.execPath,
          args: [
             '-e',
-            'process.exit(7)'
+            'process.exit(7)',
          ],
          cwd: process.cwd(),
          port,
@@ -146,7 +146,7 @@ describe('superviseServer', () => {
          command: process.execPath,
          args: [
             '-e',
-            IDLE_SCRIPT
+            IDLE_SCRIPT,
          ],
          cwd: process.cwd(),
          port,
@@ -181,20 +181,20 @@ describe('process helpers', () => {
       expect(pickWatchPid([
          {
             pid: 10,
-            name: 'cmd.exe' 
+            name: 'cmd.exe',
          },
          {
             pid: 20,
-            name: 'node.exe' 
+            name: 'node.exe',
          },
          {
             pid: 30,
-            name: 'bash' 
+            name: 'bash',
          },
       ])).toBe(20);
       expect(pickWatchPid([{
          pid: 10,
-         name: 'sh' 
+         name: 'sh',
       }])).toBeUndefined();
    });
 });

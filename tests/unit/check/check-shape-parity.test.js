@@ -65,27 +65,27 @@ const PARAM_CASES = [
    [
       'attribute',
       createAttributeCheckParameters,
-      createAttributeCheckParametersShape
+      createAttributeCheckParametersShape,
    ],
    [
       'resistance',
       createResistanceCheckParameters,
-      createResistanceCheckParametersShape
+      createResistanceCheckParametersShape,
    ],
    [
       'attack',
       createAttackCheckParameters,
-      createAttackCheckParametersShape
+      createAttackCheckParametersShape,
    ],
    [
       'casting',
       createCastingCheckParameters,
-      createCastingCheckParametersShape
+      createCastingCheckParametersShape,
    ],
    [
       'item',
       createItemCheckParameters,
-      createItemCheckParametersShape
+      createItemCheckParametersShape,
    ],
 ];
 
@@ -123,27 +123,27 @@ const RESULT_CASES = [
    [
       'attribute',
       calculateAttributeCheckResults,
-      createAttributeCheckResultsShape
+      createAttributeCheckResultsShape,
    ],
    [
       'resistance',
       calculateResistanceCheckResults,
-      createResistanceCheckResultsShape
+      createResistanceCheckResultsShape,
    ],
    [
       'attack',
       calculateAttackCheckResults,
-      createAttackCheckResultsShape
+      createAttackCheckResultsShape,
    ],
    [
       'casting',
       calculateCastingCheckResults,
-      createCastingCheckResultsShape
+      createCastingCheckResultsShape,
    ],
    [
       'item',
       calculateItemCheckResults,
-      createItemCheckResultsShape
+      createItemCheckResultsShape,
    ],
 ];
 
@@ -153,7 +153,7 @@ describe('check result shape ↔ factory parity', () => {
          difficulty: 4,
          complexity: 1,
          extraSuccessOnCritical: false,
-         extraFailureOnCritical: false 
+         extraFailureOnCritical: false,
       };
       expect(Object.keys(calculateCheckResults(diceResults([6]), params)).sort())
          .toEqual(Object.keys(createCheckResultsShape()).sort());
@@ -163,7 +163,7 @@ describe('check result shape ↔ factory parity', () => {
       expect(Object.keys(factory(diceResults([
          6,
          5,
-         4
+         4,
       ]), RESULT_PARAMS)).sort())
          .toEqual(Object.keys(shape()).sort());
    });

@@ -4,19 +4,19 @@ import { decodeCell, forceStringCell, lookupFieldSchema, decodeRow, ABSENT } fro
 describe('decodeCell — typed (schema-known) fields', () => {
    const numberField = {
       type: 'number',
-      nullable: false 
+      nullable: false,
    };
    const stringField = {
       type: 'string',
-      nullable: false 
+      nullable: false,
    };
    const nullableStringField = {
       type: 'string',
-      nullable: true 
+      nullable: true,
    };
    const booleanField = {
       type: 'boolean',
-      nullable: false 
+      nullable: false,
    };
 
    it('decodes a non-blank value per its declared type', () => {
@@ -70,7 +70,7 @@ describe('lookupFieldSchema', () => {
    it('matches a fixed column by its literal name', () => {
       expect(lookupFieldSchema({}, 'sort')).toEqual({
          type: 'number',
-         nullable: false 
+         nullable: false,
       });
    });
 
@@ -78,12 +78,12 @@ describe('lookupFieldSchema', () => {
       const fieldTypes = {
          'system.attack.*.range': {
             type: 'number',
-            nullable: false 
-         } 
+            nullable: false,
+         },
       };
       expect(lookupFieldSchema(fieldTypes, 'system.attack.2.range')).toEqual({
          type: 'number',
-         nullable: false 
+         nullable: false,
       });
    });
 
@@ -127,7 +127,7 @@ describe('forceStringCell', () => {
          'false',
          'null',
          '"x"',
-         'Slashing'
+         'Slashing',
       ]) {
          expect(decodeCell(forceStringCell(text), undefined)).toBe(text);
       }
@@ -139,18 +139,18 @@ describe('decodeRow', () => {
       const row = {
          _id: 'a'.repeat(16),
          sort: '100000',
-         'system.value': '5' 
+         'system.value': '5',
       };
       const fieldTypes = {
          'system.value': {
             type: 'number',
-            nullable: false 
-         } 
+            nullable: false,
+         },
       };
       expect(decodeRow(row, [
          '_id',
          'sort',
-         'system.value'
+         'system.value',
       ], fieldTypes)).toEqual({
          _id: 'a'.repeat(16),
          sort: 100000,

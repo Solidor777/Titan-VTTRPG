@@ -30,7 +30,7 @@
          // Roll the check.
          await actor.system.requestItemCheck({
             itemRollData: item,
-            checkIdx: idx
+            checkIdx: idx,
          });
       }
    }

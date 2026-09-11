@@ -42,7 +42,7 @@ test('fast-check is injected and runs a property in the Foundry page', async () 
       return {
          available: typeof fc !== 'undefined',
          failed: report.failed,
-         numRuns: report.numRuns 
+         numRuns: report.numRuns,
       };
    });
 

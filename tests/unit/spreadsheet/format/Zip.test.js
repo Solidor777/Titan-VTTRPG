@@ -5,11 +5,11 @@ describe('Zip', () => {
    it('round-trips text files through zipFiles/unzipFilesAsText', () => {
       const bytes = zipFiles({
          'a.txt': 'hello',
-         'b.txt': 'wörld' 
+         'b.txt': 'wörld',
       });
       expect(unzipFilesAsText(bytes)).toEqual({
          'a.txt': 'hello',
-         'b.txt': 'wörld' 
+         'b.txt': 'wörld',
       });
    });
 
@@ -18,7 +18,7 @@ describe('Zip', () => {
          1,
          2,
          3,
-         4
+         4,
       ]);
       const bytes = zipFiles({ 'raw.bin': original });
       expect(unzipFilesAsBytes(bytes)['raw.bin']).toEqual(original);

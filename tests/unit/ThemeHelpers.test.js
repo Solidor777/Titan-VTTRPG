@@ -33,19 +33,19 @@ describe('resolveActiveThemeId', () => {
          'heritage-dark',
          'heritage-light',
          'macchiato',
-         'custom-1'
+         'custom-1',
       ].includes(id),
    };
 
    it('explicit selection wins when the theme exists', () => {
       expect(resolveActiveThemeId({
          ...base,
-         selectedThemeId: 'macchiato' 
+         selectedThemeId: 'macchiato',
       })).toBe('macchiato');
       expect(resolveActiveThemeId({
          ...base,
          selectedThemeId: 'custom-1',
-         prefersDark: false 
+         prefersDark: false,
       })).toBe('custom-1');
    });
 
@@ -53,14 +53,14 @@ describe('resolveActiveThemeId', () => {
       expect(resolveActiveThemeId(base)).toBe('heritage-dark');
       expect(resolveActiveThemeId({
          ...base,
-         prefersDark: false 
+         prefersDark: false,
       })).toBe('heritage-light');
    });
 
    it('a missing selected theme falls through to auto resolution', () => {
       expect(resolveActiveThemeId({
          ...base,
-         selectedThemeId: 'deleted-custom' 
+         selectedThemeId: 'deleted-custom',
       })).toBe('heritage-dark');
    });
 
@@ -68,12 +68,12 @@ describe('resolveActiveThemeId', () => {
       const noDefaults = {
          ...base,
          defaultDarkThemeId: 'gone',
-         defaultLightThemeId: 'gone' 
+         defaultLightThemeId: 'gone',
       };
       expect(resolveActiveThemeId(noDefaults)).toBe('heritage-dark');
       expect(resolveActiveThemeId({
          ...noDefaults,
-         prefersDark: false 
+         prefersDark: false,
       })).toBe('heritage-light');
    });
 });
@@ -87,7 +87,7 @@ describe('validateThemeData', () => {
       base: 'heritage-dark',
       tokens: {
          ...HERITAGE_DARK.tokens,
-         'app-background': '#101018' 
+         'app-background': '#101018',
       },
    };
 
@@ -104,8 +104,8 @@ describe('validateThemeData', () => {
          ...valid,
          tokens: {
             'app-background': '#101018',
-            bogus: '#ffffff' 
-         } 
+            bogus: '#ffffff',
+         },
       };
       const result = validateThemeData(sparse);
       expect(result.ok).toBe(true);
@@ -117,30 +117,30 @@ describe('validateThemeData', () => {
       expect(validateThemeData(null).ok).toBe(false);
       expect(validateThemeData({
          ...valid,
-         formatVersion: 99 
+         formatVersion: 99,
       }).ok).toBe(false);
       expect(validateThemeData({
          ...valid,
-         name: '' 
+         name: '',
       }).ok).toBe(false);
       expect(validateThemeData({
          ...valid,
-         tokens: 'nope' 
+         tokens: 'nope',
       }).ok).toBe(false);
       const badColor = {
          ...valid,
          tokens: {
             ...valid.tokens,
-            'app-background': 'red' 
-         } 
+            'app-background': 'red',
+         },
       };
       expect(validateThemeData(badColor).ok).toBe(false);
       for (const result of [
          validateThemeData(null),
          validateThemeData({
             ...valid,
-            formatVersion: 99 
-         })
+            formatVersion: 99,
+         }),
       ]) {
          expect(typeof result.error).toBe('string');
          expect(result.error.length).toBeGreaterThan(0);
@@ -152,8 +152,8 @@ describe('validateThemeData', () => {
          ...valid,
          tokens: {
             ...valid.tokens,
-            'app-background': '#10101880' 
-         } 
+            'app-background': '#10101880',
+         },
       };
       expect(validateThemeData(alpha).ok).toBe(true);
    });

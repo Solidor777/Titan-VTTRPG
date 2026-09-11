@@ -40,7 +40,7 @@ export const seedCombatEncounter = async (opts) => {
    // Create the two actors and the effect actor's abilities.
    const effect = await Actor.create({
       ...effectActor,
-      ownership: ownership 
+      ownership: ownership,
    });
    if (effectAbilities && effectAbilities.length > 0) {
       await effect.createEmbeddedDocuments('Item', effectAbilities);
@@ -63,15 +63,15 @@ export const seedCombatEncounter = async (opts) => {
    const scene = await Scene.create({
       name: sceneName,
       width: 2000,
-      height: 2000 
+      height: 2000,
    });
    const effectTokenData = (await effect.getTokenDocument({
       x: 500,
-      y: 500 
+      y: 500,
    })).toObject();
    const otherTokenData = (await other.getTokenDocument({
       x: 1000,
-      y: 500 
+      y: 500,
    })).toObject();
    const [effectToken] = await scene.createEmbeddedDocuments('Token', [effectTokenData]);
    const [otherToken] = await scene.createEmbeddedDocuments('Token', [otherTokenData]);
@@ -88,14 +88,14 @@ export const seedCombatEncounter = async (opts) => {
       {
          tokenId: effectToken.id,
          sceneId: scene.id,
-         initiative: effectInitiative 
+         initiative: effectInitiative,
       },
    ]);
    await combat.createEmbeddedDocuments('Combatant', [
       {
          tokenId: otherToken.id,
          sceneId: scene.id,
-         initiative: otherInitiative 
+         initiative: otherInitiative,
       },
    ]);
 
@@ -107,7 +107,7 @@ export const seedCombatEncounter = async (opts) => {
       await combat.update({
          active: true,
          round: 1,
-         turn: 0 
+         turn: 0,
       });
    }
 
@@ -144,7 +144,7 @@ export const teardownCombatEncounter = async (ids) => {
    }
    for (const actorId of [
       ids.effectActorId,
-      ids.otherActorId
+      ids.otherActorId,
    ]) {
       const actor = game.actors.get(actorId);
       if (actor) {

@@ -6,7 +6,7 @@ describe('cloneElementWithNewUuid', () => {
       const source = {
          operation: 'flatModifier',
          value: 3,
-         uuid: 'original-uuid' 
+         uuid: 'original-uuid',
       };
       const clone = cloneElementWithNewUuid(source);
 
@@ -22,17 +22,17 @@ describe('cloneElementWithNewUuid', () => {
          nested: {
             list: [
                1,
-               2
-            ] 
+               2,
+            ],
          },
-         uuid: 'a' 
+         uuid: 'a',
       };
       const clone = cloneElementWithNewUuid(source);
       clone.nested.list.push(3);
 
       expect(source.nested.list).toEqual([
          1,
-         2
+         2,
       ]);
       expect(source.uuid).toBe('a');
    });

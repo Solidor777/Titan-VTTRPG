@@ -23,7 +23,7 @@ export const FIXED_COLUMNS = [
    'name',
    'type',
    'img',
-   'sort'
+   'sort',
 ];
 
 /**
@@ -34,31 +34,31 @@ export const FIXED_COLUMNS = [
 export const FIXED_COLUMN_TYPES = {
    _id: {
       type: 'string',
-      nullable: false 
+      nullable: false,
    },
    _parentId: {
       type: 'string',
-      nullable: true 
+      nullable: true,
    },
    _folder: {
       type: 'string',
-      nullable: true 
+      nullable: true,
    },
    name: {
       type: 'string',
-      nullable: false 
+      nullable: false,
    },
    type: {
       type: 'string',
-      nullable: false 
+      nullable: false,
    },
    img: {
       type: 'string',
-      nullable: false 
+      nullable: false,
    },
    sort: {
       type: 'number',
-      nullable: false 
+      nullable: false,
    },
 };
 
@@ -81,7 +81,7 @@ export function createEmptySheet(name) {
    return {
       name,
       columns: [],
-      rows: [] 
+      rows: [],
    };
 }
 

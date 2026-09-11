@@ -21,35 +21,35 @@
    const categories = [
       {
          key: 'skills',
-         labelKey: 'skills' 
+         labelKey: 'skills',
       },
       {
          key: 'resistances',
-         labelKey: 'resistances' 
+         labelKey: 'resistances',
       },
       {
          key: 'weapons',
-         labelKey: 'weapons' 
+         labelKey: 'weapons',
       },
       {
          key: 'inventory',
-         labelKey: 'inventory' 
+         labelKey: 'inventory',
       },
       {
          key: 'abilities',
-         labelKey: 'abilities' 
+         labelKey: 'abilities',
       },
       {
          key: 'spells',
-         labelKey: 'spells' 
+         labelKey: 'spells',
       },
       {
          key: 'effects',
-         labelKey: 'effects' 
+         labelKey: 'effects',
       },
       {
          key: 'utility',
-         labelKey: 'utility' 
+         labelKey: 'utility',
       },
    ];
 
@@ -57,35 +57,35 @@
    const subButtons = [
       {
          key: 'attacks',
-         labelKey: 'attacks' 
+         labelKey: 'attacks',
       },
       {
          key: 'checks',
-         labelKey: 'checks' 
+         labelKey: 'checks',
       },
       {
          key: 'equipped',
-         labelKey: 'equipped' 
+         labelKey: 'equipped',
       },
       {
          key: 'quantity',
-         labelKey: 'quantity' 
+         labelKey: 'quantity',
       },
       {
          key: 'duration',
-         labelKey: 'duration' 
+         labelKey: 'duration',
       },
       {
          key: 'remove',
-         labelKey: 'deleteEffect' 
+         labelKey: 'deleteEffect',
       },
       {
          key: 'sendToChat',
-         labelKey: 'sendToChat' 
+         labelKey: 'sendToChat',
       },
       {
          key: 'openSheet',
-         labelKey: 'openSheet' 
+         labelKey: 'openSheet',
       },
    ];
 
@@ -93,19 +93,19 @@
    const filters = [
       {
          key: 'weaponsWithActions',
-         labelKey: 'filterWeaponsWithActions' 
+         labelKey: 'filterWeaponsWithActions',
       },
       {
          key: 'inventoryWithChecks',
-         labelKey: 'filterInventoryWithChecks' 
+         labelKey: 'filterInventoryWithChecks',
       },
       {
          key: 'abilitiesWithChecks',
-         labelKey: 'filterAbilitiesWithChecks' 
+         labelKey: 'filterAbilitiesWithChecks',
       },
       {
          key: 'effectsWithChecks',
-         labelKey: 'filterEffectsWithChecks' 
+         labelKey: 'filterEffectsWithChecks',
       },
    ];
 

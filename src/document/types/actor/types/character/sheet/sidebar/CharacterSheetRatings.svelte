@@ -17,7 +17,7 @@
       {rating: 'awareness'},
       {rating: 'defense'},
       {rating: 'melee'},
-      {rating: 'accuracy'}
+      {rating: 'accuracy'},
    ]}
    entryComponent={CharacterSheetRating}
 />

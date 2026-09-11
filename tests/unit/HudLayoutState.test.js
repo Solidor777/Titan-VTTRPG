@@ -11,9 +11,9 @@ function build() {
    return {
       state: new HudLayoutState({
          layout: createDefaultHudLayout(),
-         onSave 
+         onSave,
       }),
-      onSave 
+      onSave,
    };
 }
 
@@ -31,7 +31,7 @@ describe('HudLayoutState', () => {
          anchorX: 'right',
          anchorY: 'top',
          dx: 1,
-         dy: 2 
+         dy: 2,
       };
       state.persist();
       expect(onSave).toHaveBeenCalledWith(expect.objectContaining({
@@ -40,7 +40,7 @@ describe('HudLayoutState', () => {
                anchorX: 'right',
                anchorY: 'top',
                dx: 1,
-               dy: 2 
+               dy: 2,
             },
          }),
       }));

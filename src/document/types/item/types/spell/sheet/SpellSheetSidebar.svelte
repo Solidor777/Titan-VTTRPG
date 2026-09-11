@@ -20,7 +20,7 @@
          : [
             ItemSheetSidebarTraits,
             SpellSheetSidebarCastingCheck,
-         ]
+         ],
    );
 </script>
 

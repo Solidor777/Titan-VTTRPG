@@ -58,7 +58,7 @@ async function seedActorWithItem(page, actorName, itemType) {
       // rarity 'common' (RarityTag class .common) and value 0 (ValueTag absent via {#if value}).
       const actor = await Actor.create({
          name: actorName,
-         type: 'player' 
+         type: 'player',
       });
       await actor.createEmbeddedDocuments('Item', [
          {
@@ -79,7 +79,7 @@ async function seedActorWithItem(page, actorName, itemType) {
       );
    }, {
       actorName,
-      itemType 
+      itemType,
    });
 }
 
@@ -147,13 +147,13 @@ test.describe('character sheet inventory row reactivity', () => {
          }
          const actor = await Actor.create({
             name: actorName,
-            type: 'player' 
+            type: 'player',
          });
          await actor.createEmbeddedDocuments('Item', [
             {
                name: 'E2E Reactive Commodity Qty',
                type: 'commodity',
-               system: { quantity: 2 } 
+               system: { quantity: 2 },
             },
          ]);
          const app = await actor.sheet.render(true);
@@ -213,13 +213,13 @@ test.describe('character sheet inventory row reactivity', () => {
          }
          const actor = await Actor.create({
             name: actorName,
-            type: 'player' 
+            type: 'player',
          });
          await actor.createEmbeddedDocuments('Item', [
             {
                name: 'E2E Math Commodity Qty',
                type: 'commodity',
-               system: { quantity: 4 } 
+               system: { quantity: 4 },
             },
          ]);
          const app = await actor.sheet.render(true);

@@ -14,7 +14,7 @@
    const resources = [
       'stamina',
       'resolve',
-      'wounds'
+      'wounds',
    ];
 </script>
 

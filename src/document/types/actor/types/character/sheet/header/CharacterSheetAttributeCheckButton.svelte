@@ -19,13 +19,13 @@
    /** @type {AttributeCheckParameters} Resolved dice and modifiers for the attribute check this button rolls. */
    let checkParameters = $derived(
       document.data.system.getAttributeCheckParameters(
-         document.data.system.initializeAttributeCheckOptions({ attribute: attribute }))
+         document.data.system.initializeAttributeCheckOptions({ attribute: attribute })),
    );
 
    /** @type {string} Hover text describing the attribute and its check modifiers. */
    let tooltip = $derived(
       localize(`${checkParameters.attribute}.desc`) +
-      getAttributeCheckParametersTooltip(checkParameters)
+         getAttributeCheckParametersTooltip(checkParameters),
    );
 
    // attribute is a fixed prop for this button's lifetime; capturing once for the icon is correct.
@@ -39,7 +39,7 @@
    onclick={() => document.data.system.requestAttributeCheck({attribute: attribute})}
    tooltip={{
       text: tooltip,
-      localize: false 
+      localize: false,
    }}>
    <div class="button-inner">
       <!--Icon-->

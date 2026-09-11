@@ -120,7 +120,7 @@ describe('getBestCharactersToUpdate — upgraded fallback ladder', () => {
          isGM: true,
          targets: [
             { actor: shared },
-            { actor: shared }
+            { actor: shared },
          ],
       });
       expect(getBestCharactersToUpdate().map((a) => a.id)).toEqual(['shared']);

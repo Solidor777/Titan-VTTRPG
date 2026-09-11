@@ -9,7 +9,7 @@
     * @property {HudLayoutState} layoutState - Shared layout/UI state.
     * @property {string} minimizeIcon - Font Awesome classes for the minimized chip icon.
     * @property {string} [chipCorner] - The minimize chip's corner: 'top-right' (the default),
-    *    'top-left', 'bottom-right', or 'bottom-left'.
+    * 'top-left', 'bottom-right', or 'bottom-left'.
     * @property {boolean} [resizable] - Whether edit mode offers a resize handle (effects panel).
     * @property {string} [testId] - Optional data-testid forwarded to the frame root.
     * @property {Snippet} children - The element content.
@@ -44,7 +44,7 @@
          layoutState.positions[elementKey],
          {
             width,
-            height 
+            height,
          },
          layoutState.rect,
       ),
@@ -64,7 +64,7 @@
       /** @type {{x: number, y: number}} The pointer offset inside the element. */
       const grab = {
          x: event.clientX - point.x,
-         y: event.clientY - point.y 
+         y: event.clientY - point.y,
       };
 
       /**
@@ -83,7 +83,7 @@
             },
             {
                width,
-               height 
+               height,
             },
             layoutState.rect,
          );
@@ -99,7 +99,7 @@
          if (dragPoint) {
             layoutState.positions[elementKey] = deriveAnchors(dragPoint, {
                width,
-               height 
+               height,
             }, layoutState.rect);
             layoutState.persist();
             dragPoint = null;
@@ -122,13 +122,13 @@
       /** @type {{width: number, height: number}} The size at drag start. */
       const start = {
          width: layoutState.effectsPanelSize.width,
-         height: layoutState.effectsPanelSize.height 
+         height: layoutState.effectsPanelSize.height,
       };
 
       /** @type {{x: number, y: number}} The pointer at drag start. */
       const origin = {
          x: event.clientX,
-         y: event.clientY 
+         y: event.clientY,
       };
 
       /**

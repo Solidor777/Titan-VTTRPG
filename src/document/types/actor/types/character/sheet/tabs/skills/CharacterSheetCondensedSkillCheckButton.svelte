@@ -18,7 +18,7 @@
    /** @type {string} Hover text describing the skill and its check modifiers. */
    let tooltip = $derived(
       localize(`${checkParameters.skill}.desc`) +
-      getAttributeCheckParametersTooltip(checkParameters)
+         getAttributeCheckParametersTooltip(checkParameters),
    );
 </script>
 
@@ -28,7 +28,7 @@
    onclick={() => document.data.system.requestAttributeCheck({skill: checkParameters.skill})}
    tooltip={{
       text: tooltip,
-      localize: false 
+      localize: false,
    }}
    totalDice={checkParameters.totalDice}
 />

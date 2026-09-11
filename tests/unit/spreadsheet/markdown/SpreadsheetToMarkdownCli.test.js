@@ -52,7 +52,7 @@ function fixtureEnvelopes() {
                attackNotes: '',
                trait: [],
                check: [],
-               description: '' 
+               description: '',
             },
          },
          parentId: '',
@@ -136,7 +136,7 @@ function runCliProcess(args) {
       /** @type {string} Captured stdout. */
       const stdout = execFileSync('node', [
          'scripts/spreadsheet-to-markdown.mjs',
-         ...args
+         ...args,
       ], {
          cwd: repoRoot,
          encoding: 'utf8',
@@ -144,13 +144,13 @@ function runCliProcess(args) {
       return {
          status: 0,
          stdout,
-         stderr: '' 
+         stderr: '',
       };
    } catch (error) {
       return {
          status: error.status,
          stdout: error.stdout ?? '',
-         stderr: error.stderr ?? '' 
+         stderr: error.stderr ?? '',
       };
    }
 }
@@ -177,7 +177,7 @@ describe('spreadsheet-to-markdown CLI', () => {
          workbookToDocuments(built),
          {
             title: 'default-out',
-            labels: createLabels(realLang) 
+            labels: createLabels(realLang),
          },
       );
 
@@ -196,7 +196,7 @@ describe('spreadsheet-to-markdown CLI', () => {
          '--title',
          'Custom Title',
          '--out',
-         outPath
+         outPath,
       ]);
 
       expect(result.status).toBe(0);
@@ -211,7 +211,7 @@ describe('spreadsheet-to-markdown CLI', () => {
          workbookToDocuments(built),
          {
             title: 'Custom Title',
-            labels: createLabels(realLang) 
+            labels: createLabels(realLang),
          },
       );
 
@@ -241,7 +241,7 @@ describe('spreadsheet-to-markdown CLI', () => {
          workbookToDocuments(built),
          {
             title: 'dir-input',
-            labels: createLabels(realLang) 
+            labels: createLabels(realLang),
          },
       );
 
@@ -259,7 +259,7 @@ describe('spreadsheet-to-markdown CLI', () => {
                type: 'npc',
                img: 'i.svg',
                sort: 1,
-               system: {} 
+               system: {},
             },
             parentId: '',
             folderPath: '',
@@ -356,7 +356,7 @@ describe('spreadsheet-to-markdown CLI', () => {
       const result = runCliProcess([
          xlsxPath,
          '--lang',
-         missingLangPath
+         missingLangPath,
       ]);
 
       expect(result.status).toBe(1);

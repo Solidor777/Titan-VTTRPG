@@ -47,12 +47,12 @@ export function orderColumns(paths, fieldOrder) {
    /** @type {Map<string, number>} Schema order index per normalized (wildcarded) path. */
    const orderIndex = new Map(fieldOrder.map((path, i) => [
       path,
-      i
+      i,
    ]));
    /** @type {Map<string, number>} First-seen index, used as the fallback and as the tiebreaker rank base. */
    const seenIndex = new Map(paths.map((path, i) => [
       path,
-      i
+      i,
    ]));
 
    return [...paths].sort((a, b) => {
@@ -98,7 +98,7 @@ export function detectArrayPaths(paths) {
          else {
             prefix = [
                ...prefix,
-               segment
+               segment,
             ];
          }
          priorSegmentIsNumeric = isNumeric;
@@ -162,7 +162,7 @@ export function buildArrayPathMatcher(arrayPath, allArrayPaths) {
       if (subFieldSegments.length === 0) {
          return {
             index: indices.join('.'),
-            subField: '_value' 
+            subField: '_value',
          };
       }
       // A remainder still containing a numeric segment belongs to a DEEPER nested array instead (that
@@ -172,7 +172,7 @@ export function buildArrayPathMatcher(arrayPath, allArrayPaths) {
       }
       return {
          index: indices.join('.'),
-         subField: subFieldSegments.join('.') 
+         subField: subFieldSegments.join('.'),
       };
    };
 }
@@ -191,25 +191,25 @@ function buildManifestSheet(layout, packType, entries) {
          key: 'layout',
          value: layout,
          documentType: '',
-         arrayPath: '' 
+         arrayPath: '',
       },
       {
          key: 'packType',
          value: packType,
          documentType: '',
-         arrayPath: '' 
+         arrayPath: '',
       },
       {
          key: 'version',
          value: '1',
          documentType: '',
-         arrayPath: '' 
+         arrayPath: '',
       },
       ...entries.map((e) => ({
          key: 'sheet',
          value: e.sheet,
          documentType: e.documentType,
-         arrayPath: e.arrayPath 
+         arrayPath: e.arrayPath,
       })),
    ];
    return {
@@ -218,9 +218,9 @@ function buildManifestSheet(layout, packType, entries) {
          'key',
          'value',
          'documentType',
-         'arrayPath'
+         'arrayPath',
       ],
-      rows 
+      rows,
    };
 }
 
@@ -248,9 +248,9 @@ function buildWideSheet(documentType, flatRows, typeSchema) {
       name: documentType,
       columns: [
          ...FIXED_COLUMNS,
-         ...rest
+         ...rest,
       ],
-      rows: flatRows 
+      rows: flatRows,
    };
 }
 
@@ -316,7 +316,7 @@ function buildChildSheet(documentType, arrayPath, allArrayPaths, flatRows) {
          rows.push({
             _id: id,
             _index: index,
-            ...fields 
+            ...fields,
          });
       }
    }
@@ -328,9 +328,9 @@ function buildChildSheet(documentType, arrayPath, allArrayPaths, flatRows) {
          columns: [
             '_id',
             '_index',
-            ...subFields
+            ...subFields,
          ],
-         rows 
+         rows,
       },
    };
 }
@@ -371,7 +371,7 @@ function buildRelationalSheets(documentType, flatRows, typeSchema) {
       const picked = {};
       for (const column of [
          ...FIXED_COLUMNS,
-         ...scalarColumns
+         ...scalarColumns,
       ]) {
          picked[column] = row[column];
       }
@@ -386,9 +386,9 @@ function buildRelationalSheets(documentType, flatRows, typeSchema) {
          name: documentType,
          columns: [
             ...FIXED_COLUMNS,
-            ...scalarColumns
+            ...scalarColumns,
          ],
-         rows: documentRows 
+         rows: documentRows,
       },
       childSheets,
    };
@@ -434,7 +434,7 @@ export function buildTables(envelopes, layout, packType, typeSchemas) {
          manifestEntries.push({
             sheet: documentType,
             documentType,
-            arrayPath: '' 
+            arrayPath: '',
          });
       }
       else {
@@ -444,14 +444,14 @@ export function buildTables(envelopes, layout, packType, typeSchemas) {
          manifestEntries.push({
             sheet: relational.documentSheet.name,
             documentType,
-            arrayPath: '' 
+            arrayPath: '',
          });
          for (const child of relational.childSheets) {
             sheets.push(child.sheet);
             manifestEntries.push({
                sheet: child.sheet.name,
                documentType,
-               arrayPath: child.arrayPath 
+               arrayPath: child.arrayPath,
             });
          }
       }
@@ -470,7 +470,7 @@ export function buildTables(envelopes, layout, packType, typeSchemas) {
    return {
       sheets: [
          buildManifestSheet(layout, packType, manifestEntries),
-         ...sheets
-      ] 
+         ...sheets,
+      ],
    };
 }

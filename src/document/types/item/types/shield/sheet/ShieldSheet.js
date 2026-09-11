@@ -28,7 +28,7 @@ export default class TitanShieldSheet extends TitanItemSheet {
                   shell: ShieldSheetShell,
                },
             },
-         }
+         },
       );
 
       // Initialize self object.

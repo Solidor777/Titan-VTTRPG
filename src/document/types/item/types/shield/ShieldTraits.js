@@ -16,7 +16,7 @@ export const SHIELD_TRAITS = deepFreeze([
  * @type {object}
  */
 export const SHIELD_TRAIT_DESCRIPTIONS = deepFreeze({
-   magical: 'armor.magical.desc'
+   magical: 'armor.magical.desc',
 });
 
 /**

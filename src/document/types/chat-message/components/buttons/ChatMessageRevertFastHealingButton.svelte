@@ -84,7 +84,7 @@
    label={localize('revertX%FastHealing').replace('X%', document.data.system.fastHealingRevert.total)}
    tooltip={{
       text: getTooltip(),
-      localize: false 
+      localize: false,
    }}
    confirmFn={confirm}
 />

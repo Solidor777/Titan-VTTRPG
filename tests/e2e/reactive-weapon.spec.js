@@ -52,7 +52,7 @@ test.describe('character sheet weapon row reactivity', () => {
          // default attack whose label is 'Attack'.
          const actor = await Actor.create({
             name: actorName,
-            type: 'player' 
+            type: 'player',
          });
          await actor.createEmbeddedDocuments('Item', [
             {

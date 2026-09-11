@@ -47,7 +47,7 @@ test.describe('custom trait edit/delete on effects', () => {
          }
          const actor = await Actor.create({
             name: actorName,
-            type: 'player' 
+            type: 'player',
          });
          const [effect] = await actor.createEmbeddedDocuments('ActiveEffect', [
             {
@@ -58,7 +58,7 @@ test.describe('custom trait edit/delete on effects', () => {
                      {
                         name: traitName,
                         description: 'seeded',
-                        uuid: 'e2e-eff-trait-0' 
+                        uuid: 'e2e-eff-trait-0',
                      },
                   ],
                },
@@ -71,7 +71,7 @@ test.describe('custom trait edit/delete on effects', () => {
          );
       }, {
          actorName: ACTOR_NAME,
-         traitName: ORIGINAL_NAME 
+         traitName: ORIGINAL_NAME,
       });
    });
 

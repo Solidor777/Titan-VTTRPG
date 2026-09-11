@@ -34,7 +34,7 @@ globalThis.foundry = {
    abstract: { Document: MockDocument },
    utils: {
       mergeObject,
-      randomID 
+      randomID,
    },
 };
 

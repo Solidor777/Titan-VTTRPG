@@ -69,7 +69,7 @@ beforeAll(async () => {
 
    // Dynamically import the two Character-subtype actor DataModels against the installed stand-ins.
    models.player = (await import(
-      '~/document/types/actor/types/character/types/player/PlayerDataModel.js'
+      '~/document/types/actor/types/character/types/player/PlayerDataModel.js',
    )).default;
    models.npc = (await import('~/document/types/actor/types/character/types/npc/NPCDataModel.js')).default;
 });

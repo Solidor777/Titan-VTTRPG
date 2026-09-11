@@ -52,7 +52,7 @@ test.describe('character sheet spell row reactivity', () => {
          // {#if item.system.xpCost}).
          const actor = await Actor.create({
             name: actorName,
-            type: 'player' 
+            type: 'player',
          });
          await actor.createEmbeddedDocuments('Item', [
             {

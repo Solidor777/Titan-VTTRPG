@@ -230,13 +230,13 @@ describe('item DataModel schema characterization (golden master)', () => {
          'armor',
          'ability',
          'shield',
-         'equipment'
+         'equipment',
       ]) {
          expect(models[type]._defineDocumentSchema().rulesElement).toBeInstanceOf(MockArrayField);
       }
       for (const type of [
          'spell',
-         'commodity'
+         'commodity',
       ]) {
          expect(models[type]._defineDocumentSchema().rulesElement).toBeUndefined();
       }

@@ -10,7 +10,7 @@ describe('Workbook constants and utilities', () => {
          'name',
          'type',
          'img',
-         'sort'
+         'sort',
       ]);
    });
 
@@ -20,11 +20,11 @@ describe('Workbook constants and utilities', () => {
       }
       expect(FIXED_COLUMN_TYPES.sort).toEqual({
          type: 'number',
-         nullable: false 
+         nullable: false,
       });
       expect(FIXED_COLUMN_TYPES._parentId).toEqual({
          type: 'string',
-         nullable: true 
+         nullable: true,
       });
    });
 
@@ -37,7 +37,7 @@ describe('Workbook constants and utilities', () => {
       expect(createEmptySheet('weapon')).toEqual({
          name: 'weapon',
          columns: [],
-         rows: [] 
+         rows: [],
       });
    });
 });

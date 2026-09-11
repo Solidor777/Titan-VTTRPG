@@ -63,7 +63,7 @@ test.describe('add custom trait on items', () => {
          // A weapon carries the shared `customTrait` array from TitanItemDataModel.
          const item = await Item.create({
             name: itemName,
-            type: 'weapon' 
+            type: 'weapon',
          });
          const app = await item.sheet.render(true);
 
@@ -106,7 +106,7 @@ test.describe('add custom trait on items', () => {
          )
          .toEqual({
             count: 1,
-            names: [TRAIT_NAME] 
+            names: [TRAIT_NAME],
          });
 
       // Assert: the trait renders as a tag in the sidebar carrying its name.

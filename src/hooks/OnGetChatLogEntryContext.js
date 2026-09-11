@@ -102,7 +102,7 @@ function getCheckData(li) {
    ) {
       return {
          type: message.type,
-         ...message.system.toObject() 
+         ...message.system.toObject(),
       };
    }
 

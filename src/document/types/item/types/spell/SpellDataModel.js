@@ -92,7 +92,7 @@ export default class SpellDataModel extends TitanItemDataModel {
          // Update the document.
          await this.parent.update({
             system: {
-               aspect: structuredClone(this.aspect)
+               aspect: structuredClone(this.aspect),
             },
          });
       }

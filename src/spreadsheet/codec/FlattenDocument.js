@@ -9,7 +9,7 @@ const EXCLUDED_TOP_LEVEL_KEYS = new Set([
    'ownership',
    'items',
    'effects',
-   'folder'
+   'folder',
 ]);
 
 /**

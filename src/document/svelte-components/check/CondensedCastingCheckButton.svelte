@@ -39,7 +39,7 @@
       onclick={() => rollActor.data.system.requestCastingCheck(checkOptions)}
       tooltip={{
          text: tooltip,
-         localize: false 
+         localize: false,
       }}
       totalDice={checkParameters.totalDice}
       totalExpertise={checkParameters.totalExpertise}

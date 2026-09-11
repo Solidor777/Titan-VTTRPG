@@ -7,14 +7,14 @@ describe('fixture builders', () => {
       const data = buildPlayerActorData('E2E Player Fixture');
       expect(data).toEqual({
          name: 'E2E Player Fixture',
-         type: 'player' 
+         type: 'player',
       });
    });
 
    it('builds an ability carrying flatModifier rules elements on Body', () => {
       const data = buildFlatModifierAbilityData('E2E Mod Ability', [
          2,
-         3
+         3,
       ]);
       expect(data.type).toBe('ability');
       expect(data.name).toBe('E2E Mod Ability');

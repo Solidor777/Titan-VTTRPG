@@ -13,7 +13,7 @@
    const enabledAspects = $derived(
       document.data.system.aspect.filter(
          (aspect) => aspect.enabled === true,
-      )
+      ),
    );
 </script>
 

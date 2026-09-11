@@ -76,7 +76,7 @@ export function renderItemBlock({
    /** @type {string[]} The block's lines, joined with `\n` at the end. */
    const lines = [
       heading(4, headingText, slug),
-      ''
+      '',
    ];
 
    if (attackSections.length > 0) {

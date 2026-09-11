@@ -29,7 +29,7 @@ export default class TitanSpellSheet extends TitanItemSheet {
                   shell: SpellSheetShell,
                },
             },
-         }
+         },
       );
 
       super(sheetDocument, options);

@@ -6,31 +6,31 @@ describe('PLURAL_TYPE_LABELS and TYPE_ORDER', () => {
       expect(PLURAL_TYPE_LABELS).toEqual({
          weapon: [
             'weapons',
-            'Weapons'
+            'Weapons',
          ],
          armor: [
             'armor',
-            'Armor'
+            'Armor',
          ],
          shield: [
             'shields',
-            'Shields'
+            'Shields',
          ],
          equipment: [
             'equipment',
-            'Equipment'
+            'Equipment',
          ],
          commodity: [
             'commodities',
-            'Commodities'
+            'Commodities',
          ],
          ability: [
             'abilities',
-            'Abilities'
+            'Abilities',
          ],
          spell: [
             'spells',
-            'Spells'
+            'Spells',
          ],
       });
    });

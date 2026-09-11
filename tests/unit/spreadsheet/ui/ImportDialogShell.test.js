@@ -13,8 +13,8 @@ vi.hoisted(() => {
    globalThis.ui = {
       notifications: {
          error: vi.fn(),
-         info: vi.fn() 
-      } 
+         info: vi.fn(),
+      },
    };
 });
 
@@ -29,16 +29,16 @@ const packA = {
    collection: 'world.a',
    metadata: {
       type: 'Item',
-      label: 'Pack A' 
-   } 
+      label: 'Pack A',
+   },
 };
 /** @type {object} The second stub pack offered by the target-pack Select. */
 const packB = {
    collection: 'world.b',
    metadata: {
       type: 'Item',
-      label: 'Pack B' 
-   } 
+      label: 'Pack B',
+   },
 };
 
 /**
@@ -51,7 +51,7 @@ function makePlan() {
       creates: [],
       updates: [],
       deletes: [],
-      errors: [] 
+      errors: [],
    };
 }
 
@@ -63,19 +63,19 @@ beforeEach(() => {
       },
       packs: Object.assign([
          packA,
-         packB
+         packB,
       ], {
          get: (id) => [
             packA,
-            packB
-         ].find((p) => p.collection === id) 
+            packB,
+         ].find((p) => p.collection === id),
       }),
    };
    globalThis.ui = {
       notifications: {
          error: vi.fn(),
-         info: vi.fn() 
-      } 
+         info: vi.fn(),
+      },
    };
    planImport.mockReset();
 });

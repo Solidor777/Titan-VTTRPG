@@ -14,7 +14,7 @@
             ArmorSheetSidebarTraits,
             ItemSheetSidebarChecks,
          ]
-         : [ArmorSheetSidebarTraits]
+         : [ArmorSheetSidebarTraits],
    );
 </script>
 

@@ -84,15 +84,15 @@ describe('resolveFieldSchema', () => {
       expect(resolveFieldSchema(schema, 'system', {})).toEqual({
          'system.rarity': {
             type: 'string',
-            nullable: false 
+            nullable: false,
          },
          'system.value': {
             type: 'number',
-            nullable: false 
+            nullable: false,
          },
          'system.equipped': {
             type: 'boolean',
-            nullable: false 
+            nullable: false,
          },
       });
    });
@@ -104,7 +104,7 @@ describe('resolveFieldSchema', () => {
       expect(resolveFieldSchema(schema, 'system', {})).toEqual({
          'system.statuses.*': {
             type: 'string',
-            nullable: false 
+            nullable: false,
          },
       });
    });
@@ -126,7 +126,7 @@ describe('resolveFieldSchema', () => {
       expect(resolveFieldSchema(schema, 'system', {})).toEqual({
          'system.castingCheck.difficulty': {
             type: 'number',
-            nullable: false 
+            nullable: false,
          },
       });
    });
@@ -136,7 +136,7 @@ describe('resolveFieldSchema', () => {
       expect(resolveFieldSchema(schema, 'system', {})).toEqual({
          'system.armor': {
             type: 'string',
-            nullable: true 
+            nullable: true,
          },
       });
    });
@@ -163,16 +163,16 @@ describe('resolveTypeSchemas', () => {
       expect(result.weapon.fieldTypes).toEqual({
          'system.rarity': {
             type: 'string',
-            nullable: false 
+            nullable: false,
          },
          'system.value': {
             type: 'number',
-            nullable: false 
+            nullable: false,
          },
       });
       expect(result.weapon.fieldOrder).toEqual([
          'system.rarity',
-         'system.value'
+         'system.value',
       ]);
    });
 
@@ -195,7 +195,7 @@ describe('resolveTypeSchemas', () => {
       const result = resolveTypeSchemas('Actor');
       expect(result.player.fieldTypes['prototypeToken.actorLink']).toEqual({
          type: 'boolean',
-         nullable: false 
+         nullable: false,
       });
    });
 });
@@ -236,19 +236,19 @@ describe('resolveTypeSchemasForPack', () => {
       expect(Object.keys(result).sort()).toEqual([
          'effect',
          'npc',
-         'weapon'
+         'weapon',
       ]);
       expect(result.weapon.fieldTypes).toEqual({
          'system.weaponField': {
             type: 'string',
-            nullable: false 
-         } 
+            nullable: false,
+         },
       });
       expect(result.effect.fieldTypes).toEqual({
          'system.effectField': {
             type: 'string',
-            nullable: false 
-         } 
+            nullable: false,
+         },
       });
    });
 
@@ -256,7 +256,7 @@ describe('resolveTypeSchemasForPack', () => {
       const result = resolveTypeSchemasForPack('Item');
       expect(Object.keys(result).sort()).toEqual([
          'effect',
-         'weapon'
+         'weapon',
       ]);
    });
 
@@ -280,7 +280,7 @@ describe('resolveTypeSchemasForPack', () => {
       const merged = new Set([
          ...actorTypes,
          ...itemTypes,
-         ...effectTypes
+         ...effectTypes,
       ]);
       expect(merged.size).toBe(actorTypes.length + itemTypes.length + effectTypes.length);
    });

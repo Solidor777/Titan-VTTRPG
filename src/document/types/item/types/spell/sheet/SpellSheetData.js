@@ -28,16 +28,16 @@ export default function createSpellSheetData(item) {
    const retVal = createTitanItemSheetData(item);
    retVal.sidebar.castingCheck = { isExpanded: true };
    retVal.tabs.castingCheck = {
-      scrollTop: 0
+      scrollTop: 0,
    };
    retVal.tabs.customAspects = {
       filter: '',
       isExpanded: [],
-      scrollTop: 0
+      scrollTop: 0,
    };
    retVal.tabs.standardAspects = {
       filter: '',
-      scrollTop: 0
+      scrollTop: 0,
    };
 
    // Initialize expanded state for custom aspects.

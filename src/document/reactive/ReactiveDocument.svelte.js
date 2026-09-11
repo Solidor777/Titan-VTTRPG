@@ -55,31 +55,31 @@ export default class ReactiveDocument {
          const registered = [
             [
                `update${name}`,
-               Hooks.on(`update${name}`, onUpdate)
+               Hooks.on(`update${name}`, onUpdate),
             ],
             [
                'createItem',
-               Hooks.on('createItem', onEmbedded)
+               Hooks.on('createItem', onEmbedded),
             ],
             [
                'updateItem',
-               Hooks.on('updateItem', onEmbedded)
+               Hooks.on('updateItem', onEmbedded),
             ],
             [
                'deleteItem',
-               Hooks.on('deleteItem', onEmbedded)
+               Hooks.on('deleteItem', onEmbedded),
             ],
             [
                'createActiveEffect',
-               Hooks.on('createActiveEffect', onEmbedded)
+               Hooks.on('createActiveEffect', onEmbedded),
             ],
             [
                'updateActiveEffect',
-               Hooks.on('updateActiveEffect', onEmbedded)
+               Hooks.on('updateActiveEffect', onEmbedded),
             ],
             [
                'deleteActiveEffect',
-               Hooks.on('deleteActiveEffect', onEmbedded)
+               Hooks.on('deleteActiveEffect', onEmbedded),
             ],
          ];
 

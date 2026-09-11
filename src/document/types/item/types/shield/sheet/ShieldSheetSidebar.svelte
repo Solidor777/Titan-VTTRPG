@@ -14,7 +14,7 @@
             ShieldSheetSidebarTraits,
             ItemSheetSidebarChecks,
          ]
-         : [ShieldSheetSidebarTraits]
+         : [ShieldSheetSidebarTraits],
    );
 </script>
 

@@ -14,14 +14,14 @@ describe('renderTraitList', () => {
    it('renders a boolean-true trait as its label alone', () => {
       expect(renderTraitList([{
          name: 'slashing',
-         value: true 
+         value: true,
       }], [], fakeLabels)).toBe('Slashing');
    });
 
    it('renders a numeric trait as "Label N"', () => {
       expect(renderTraitList([{
          name: 'blast',
-         value: 1 
+         value: 1,
       }], [], fakeLabels)).toBe('Blast 1');
    });
 
@@ -29,11 +29,11 @@ describe('renderTraitList', () => {
       expect(renderTraitList([
          {
             name: 'slashing',
-            value: false 
+            value: false,
          },
          {
             name: 'blast',
-            value: 0 
+            value: 0,
          },
       ], [], fakeLabels)).toBe('');
    });
@@ -42,7 +42,7 @@ describe('renderTraitList', () => {
       expect(renderTraitList(
          [{
             name: 'slashing',
-            value: true 
+            value: true,
          }],
          [{ name: 'My Trait' }],
          fakeLabels,
@@ -54,11 +54,11 @@ describe('renderTraitList', () => {
          [
             {
                name: 'flurry',
-               value: true 
+               value: true,
             },
             {
                name: 'slashing',
-               value: true 
+               value: true,
             },
          ],
          [],

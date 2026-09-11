@@ -34,7 +34,7 @@
    const BUNDLED_FONTS = [
       "'Lato'",
       "'Open Sans'",
-      "'Signika'"
+      "'Signika'",
    ];
 
    /** @type {HTMLInputElement | undefined} The hidden file input backing the import button. */

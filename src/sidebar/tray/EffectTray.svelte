@@ -72,7 +72,7 @@
          buildEffectRowContextMenu(trayState, openMoveToFolder),
          {
             jQuery: false,
-            fixed: true 
+            fixed: true,
          },
       );
 

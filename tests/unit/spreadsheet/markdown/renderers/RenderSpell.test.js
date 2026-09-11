@@ -273,7 +273,7 @@ describe('renderSpell', () => {
          system: makeSystem({
             aspect: [
                damageAspect(),
-               extraTargetsAspect()
+               extraTargetsAspect(),
             ],
          }),
       };

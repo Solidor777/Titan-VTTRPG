@@ -11,7 +11,7 @@ describe('flattenDocument', () => {
          sort: 100000,
          system: {
             rarity: 'common',
-            castingCheck: { difficulty: 4 } 
+            castingCheck: { difficulty: 4 },
          },
       };
       expect(flattenDocument(source)).toEqual({
@@ -31,7 +31,7 @@ describe('flattenDocument', () => {
             attack: [
                {
                   label: 'Slash',
-                  trait: [{ name: 'Reach' }] 
+                  trait: [{ name: 'Reach' }],
                },
             ],
          },

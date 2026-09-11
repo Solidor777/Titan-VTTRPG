@@ -20,7 +20,7 @@ function readManifest(workbook) {
          entries: workbook.sheets.map((sheet) => ({
             sheet: sheet.name,
             documentType: sheet.name,
-            arrayPath: '' 
+            arrayPath: '',
          })),
       };
    }
@@ -42,14 +42,14 @@ function readManifest(workbook) {
          entries.push({
             sheet: row.value,
             documentType: row.documentType,
-            arrayPath: row.arrayPath 
+            arrayPath: row.arrayPath,
          });
       }
    }
    return {
       layout,
       packType,
-      entries 
+      entries,
    };
 }
 
@@ -89,7 +89,7 @@ function buildArrayPathExpander(arrayPath, allArrayPaths) {
       });
       return subField === '_value' ? result.join('.') : [
          ...result,
-         subField
+         subField,
       ].join('.');
    };
 }
@@ -176,7 +176,7 @@ export function readTables(workbook, typeSchemas) {
    /** @type {Map<string, import('~/spreadsheet/codec/Workbook.js').Sheet>} */
    const sheetsByName = new Map(workbook.sheets.map((s) => [
       s.name,
-      s
+      s,
    ]));
 
    /**
@@ -257,6 +257,6 @@ export function readTables(workbook, typeSchemas) {
    return {
       layout: manifest.layout,
       packType: manifest.packType,
-      envelopes 
+      envelopes,
    };
 }

@@ -28,30 +28,30 @@ const FORCED_FACES = [
    4,
    3,
    2,
-   1
+   1,
 ];
 
 // The check types exercised by the uniform core test and their expected `flags.titan.type`.
 const CORE_CASES = [
    {
       type: 'attribute',
-      expectedType: 'attributeCheck' 
+      expectedType: 'attributeCheck',
    },
    {
       type: 'resistance',
-      expectedType: 'resistanceCheck' 
+      expectedType: 'resistanceCheck',
    },
    {
       type: 'attack',
-      expectedType: 'attackCheck' 
+      expectedType: 'attackCheck',
    },
    {
       type: 'casting',
-      expectedType: 'castingCheck' 
+      expectedType: 'castingCheck',
    },
    {
       type: 'item',
-      expectedType: 'itemCheck' 
+      expectedType: 'itemCheck',
    },
 ];
 
@@ -94,7 +94,7 @@ test.describe('v14 checks dialog (driven from Playwright)', () => {
          await actor.createEmbeddedDocuments('Item', itemData);
       }, {
          actorData: buildE2ERollerActorData(),
-         itemData: buildE2ERollerItemData() 
+         itemData: buildE2ERollerItemData(),
       });
    });
 

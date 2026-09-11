@@ -73,7 +73,7 @@
    label={localize('regainX%Resolve').replace('X%', document.data.system.resolveRegain.total)}
    tooltip={{
       text: getTooltip(),
-      localize: false 
+      localize: false,
    }}
    confirmFn={confirm}
 />

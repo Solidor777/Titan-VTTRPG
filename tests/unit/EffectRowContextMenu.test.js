@@ -11,7 +11,7 @@ describe('buildEffectRowContextMenu', () => {
       /** @type {object} A fake tray state: editable pack that supports folders. */
       const trayState = {
          canEdit: true,
-         selectedPack: { folders: {} } 
+         selectedPack: { folders: {} },
       };
       /** @type {object[]} The built context-menu entries. */
       const entries = buildEffectRowContextMenu(trayState, () => {});
@@ -29,7 +29,7 @@ describe('buildEffectRowContextMenu', () => {
       /** @type {object} A fake tray state: not editable. */
       const trayState = {
          canEdit: false,
-         selectedPack: { folders: {} } 
+         selectedPack: { folders: {} },
       };
       /** @type {object[]} The built context-menu entries. */
       const entries = buildEffectRowContextMenu(trayState, () => {});
@@ -46,7 +46,7 @@ describe('buildEffectRowContextMenu', () => {
       /** @type {object} A fake tray state: editable but folderless pack. */
       const trayState = {
          canEdit: true,
-         selectedPack: { folders: null } 
+         selectedPack: { folders: null },
       };
       /** @type {object[]} The built context-menu entries. */
       const entries = buildEffectRowContextMenu(trayState, () => {});
@@ -62,7 +62,7 @@ describe('buildEffectRowContextMenu', () => {
       const trayState = {
          canEdit: true,
          selectedPack: { folders: {} },
-         effects: [effect] 
+         effects: [effect],
       };
       /** @type {object[]} Effects captured by the injected opener spy. */
       const opened = [];
@@ -87,7 +87,7 @@ describe('buildEffectRowContextMenu', () => {
       const trayState = {
          canEdit: true,
          selectedPack: { folders: {} },
-         effects: [] 
+         effects: [],
       };
       /** @type {number} How many times the injected opener was called. */
       let callCount = 0;

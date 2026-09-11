@@ -48,7 +48,7 @@ describe('renderEquipment', () => {
             value: 15,
             customTrait: [{
                name: 'Weighted',
-               description: '' 
+               description: '',
             }],
             description: '<p>A hook on a length of rope.</p>',
          }),

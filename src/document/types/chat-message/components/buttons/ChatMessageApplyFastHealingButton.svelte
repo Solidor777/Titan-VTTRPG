@@ -73,7 +73,7 @@
    label={localize('healX%Damage').replace('X%', document.data.system.fastHealing.total)}
    tooltip={{
       text: getTooltip(),
-      localize: false 
+      localize: false,
    }}
    confirmFn={confirm}
 />

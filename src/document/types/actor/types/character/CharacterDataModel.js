@@ -591,7 +591,7 @@ export default class CharacterDataModel extends TitanActorDataModel {
             for (const key of keys) {
                expanded.push({
                   ...element,
-                  key 
+                  key,
                });
             }
          }

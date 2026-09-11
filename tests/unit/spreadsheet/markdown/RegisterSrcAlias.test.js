@@ -18,7 +18,7 @@ describe('registerSrcAlias', () => {
          ],
          {
             cwd: repoRoot,
-            encoding: 'utf8' 
+            encoding: 'utf8',
          },
       );
 

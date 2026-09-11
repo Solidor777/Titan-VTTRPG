@@ -102,7 +102,7 @@ export function renderSpell(document, { labels, slugFor }) {
       .map((aspect, idx) => ({
          aspect,
          enabled: costResult.enabled[idx],
-         cost: costResult.aspectCosts[idx] 
+         cost: costResult.aspectCosts[idx],
       }))
       .filter((entry) => entry.enabled)
       .sort((a, b) => SpellAspects[a.aspect.label].sortOrder - SpellAspects[b.aspect.label].sortOrder);

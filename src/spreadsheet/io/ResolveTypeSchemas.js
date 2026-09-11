@@ -47,7 +47,7 @@ export function resolveFieldSchema(field, prefix, into = {}) {
    if (primitiveType !== undefined) {
       into[prefix] = {
          type: primitiveType,
-         nullable: field.nullable === true 
+         nullable: field.nullable === true,
       };
    }
    return into;
@@ -79,7 +79,7 @@ export function resolveTypeSchemas(packType) {
       }
       result[subtype] = {
          fieldTypes,
-         fieldOrder: Object.keys(fieldTypes) 
+         fieldOrder: Object.keys(fieldTypes),
       };
    }
    return result;
@@ -103,11 +103,11 @@ export function resolveTypeSchemasForPack(packType) {
       Actor: [
          'Actor',
          'Item',
-         'ActiveEffect'
+         'ActiveEffect',
       ],
       Item: [
          'Item',
-         'ActiveEffect'
+         'ActiveEffect',
       ],
       ActiveEffect: ['ActiveEffect'],
    }[packType];

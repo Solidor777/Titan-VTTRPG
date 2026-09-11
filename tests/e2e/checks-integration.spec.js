@@ -17,7 +17,7 @@ import { expectedCheckResults } from '../shared/checkOracle.js';
 const FORCED_FACES = [
    6,
    4,
-   1
+   1,
 ];
 
 // Per-check expectations for the E2E Roller fixture (see plan's fixture table for derivations).
@@ -96,7 +96,7 @@ test.beforeEach(async () => {
       await actor.createEmbeddedDocuments('Item', itemData);
    }, {
       actorData: buildE2ERollerActorData(),
-      itemData: buildE2ERollerItemData() 
+      itemData: buildE2ERollerItemData(),
    });
 });
 
@@ -136,7 +136,7 @@ test.describe('v14 checks integration (forced dice)', () => {
             return beforeCount;
          }, {
             actorLocate: ACTOR_LOCATE,
-            invokeSrc: checkCase.invoke 
+            invokeSrc: checkCase.invoke,
          });
 
          const flags = await readNewestCheckFlags(page, before);
@@ -254,7 +254,7 @@ test.describe('check chat-card interactions (clone-then-update parity)', () => {
       await forceDice(page, [
          3,
          1,
-         1
+         1,
       ]);
 
       /** @type {string} The id of the freshly rolled attribute-check message under test. */
@@ -263,7 +263,7 @@ test.describe('check chat-card interactions (clone-then-update parity)', () => {
          const before = game.messages.size;
          await actor.system.rollAttributeCheck({
             attribute: 'body',
-            expertiseMod: 2 
+            expertiseMod: 2,
          });
          await globalThis.titanWait(() => game.messages.size > before, { message: 'check message created' });
          return game.messages.contents.at(-1).id;
@@ -274,15 +274,15 @@ test.describe('check chat-card interactions (clone-then-update parity)', () => {
          dice: [
             {
                final: 4,
-               expertiseApplied: 1 
+               expertiseApplied: 1,
             },
             {
                final: 1,
-               expertiseApplied: 0 
+               expertiseApplied: 0,
             },
             {
                final: 1,
-               expertiseApplied: 0 
+               expertiseApplied: 0,
             },
          ],
          expertiseRemaining: 1,
@@ -302,15 +302,15 @@ test.describe('check chat-card interactions (clone-then-update parity)', () => {
          dice: [
             {
                final: 4,
-               expertiseApplied: 1 
+               expertiseApplied: 1,
             },
             {
                final: 2,
-               expertiseApplied: 1 
+               expertiseApplied: 1,
             },
             {
                final: 1,
-               expertiseApplied: 0 
+               expertiseApplied: 0,
             },
          ],
          expertiseRemaining: 0,
@@ -327,15 +327,15 @@ test.describe('check chat-card interactions (clone-then-update parity)', () => {
          dice: [
             {
                final: 3,
-               expertiseApplied: 0 
+               expertiseApplied: 0,
             },
             {
                final: 1,
-               expertiseApplied: 0 
+               expertiseApplied: 0,
             },
             {
                final: 1,
-               expertiseApplied: 0 
+               expertiseApplied: 0,
             },
          ],
          expertiseRemaining: 2,
@@ -375,7 +375,7 @@ test.describe('check chat-card interactions (clone-then-update parity)', () => {
       await forceDice(page, [
          6,
          6,
-         6
+         6,
       ]);
 
       /** @type {string} The id of the freshly rolled casting-check message under test. */

@@ -72,7 +72,7 @@
    label={localize('revertX%PersistentDamage').replace('X%', document.data.system.persistentDamageRevert.total)}
    tooltip={{
       text: getTooltip(),
-      localize: false 
+      localize: false,
    }}
    confirmFn={confirm}
 />

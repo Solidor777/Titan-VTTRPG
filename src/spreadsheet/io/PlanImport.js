@@ -42,7 +42,7 @@ async function decodeFiles(files) {
    const entries = await Promise.all(
       files.map(async (file) => ({
          name: file.name,
-         bytes: new Uint8Array(await file.arrayBuffer()) 
+         bytes: new Uint8Array(await file.arrayBuffer()),
       })),
    );
    return decodeSpreadsheetFiles(entries);
@@ -189,7 +189,7 @@ export async function planImport(files, targetPack, deleteMissing) {
             sheet: '_manifest',
             row: 0,
             column: '',
-            message: `Failed to read the file: ${error.message}` 
+            message: `Failed to read the file: ${error.message}`,
          }],
          packType: '',
       };
@@ -252,7 +252,7 @@ export async function planImport(files, targetPack, deleteMissing) {
             sheet: '_manifest',
             row: 0,
             column: '',
-            message: `Failed to read the file: ${error.message}` 
+            message: `Failed to read the file: ${error.message}`,
          }],
          packType: resolvedPackType,
       };
@@ -274,7 +274,7 @@ export async function planImport(files, targetPack, deleteMissing) {
    /** @type {Map<string, object>} Envelope by its final id, for depth resolution. */
    const byId = new Map(envelopes.map((e) => [
       e.source._id,
-      e
+      e,
    ]));
 
    /** @type {ExistingLookupContext} Shared across every row so each parent is fetched at most once. */
@@ -282,7 +282,7 @@ export async function planImport(files, targetPack, deleteMissing) {
       byId,
       targetPack,
       packType: resolvedPackType,
-      cache: new Map() 
+      cache: new Map(),
    };
 
    // The target pack's embedded-document index, built at most once and only when a row actually needs it.
@@ -317,7 +317,7 @@ export async function planImport(files, targetPack, deleteMissing) {
       deletes: [],
       folders: [],
       errors: [],
-      packType: resolvedPackType 
+      packType: resolvedPackType,
    };
    /** @type {Set<string>} Folder paths already queued. */
    const queuedFolders = new Set();
@@ -389,7 +389,7 @@ export async function planImport(files, targetPack, deleteMissing) {
             sheet: envelope.sheetName,
             row: envelope.rowNumber,
             column: '',
-            message: error.message 
+            message: error.message,
          });
       }
    }

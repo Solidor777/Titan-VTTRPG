@@ -23,7 +23,7 @@ export default class TitanActiveEffectSheet extends TitanDocumentSheet {
       // Add sheet classes.
       const classes = [
          'titan-item-sheet',
-         'titan-effect-sheet'
+         'titan-effect-sheet',
       ];
       options.classes = options.classes
          ? mergeArrays(classes, options.classes)

@@ -23,7 +23,7 @@
    /** @type {AttributeCheckParameters} Resolved dice and modifiers for this skill's check. */
    let checkParameters = $derived(
       document.data.system.getAttributeCheckParameters(
-         document.data.system.initializeAttributeCheckOptions({ skill: key }))
+         document.data.system.initializeAttributeCheckOptions({ skill: key })),
    );
 
    /**
@@ -64,16 +64,16 @@
    let totalTrainingTooltip = $derived(
       getTotalValueTooltip(
          document.data.system.skill[key].training,
-         checkParameters.trainingMod
-      )
+         checkParameters.trainingMod,
+      ),
    );
 
    /** @type {string} Tooltip for the total Expertise value. */
    let totalExpertiseTooltip = $derived(
       getTotalValueTooltip(
          document.data.system.skill[key].expertise,
-         checkParameters.expertiseMod
-      )
+         checkParameters.expertiseMod,
+      ),
    );
 </script>
 
@@ -117,7 +117,7 @@
                currentValue={checkParameters.totalTrainingDice}
                tooltip={{
                   text: totalTrainingTooltip,
-                  localize: false 
+                  localize: false,
                }}
             />
          </div>
@@ -151,7 +151,7 @@
                currentValue={checkParameters.totalExpertise}
                tooltip={{
                   text: totalExpertiseTooltip,
-                  localize: false 
+                  localize: false,
                }}
             />
          </div>

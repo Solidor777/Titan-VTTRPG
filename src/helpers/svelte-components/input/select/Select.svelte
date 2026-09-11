@@ -77,7 +77,7 @@
       middleware: [
          offset(4),
          flip(),
-         shift({ padding: 4 })
+         shift({ padding: 4 }),
       ],
    });
 
@@ -93,14 +93,14 @@
             value: raw.value,
             label: raw.label ?? raw.value,
             tooltip: raw.tooltip,
-            icon: raw.icon 
+            icon: raw.icon,
          };
       }
       return {
          value: raw,
          label: raw,
          tooltip: void 0,
-         icon: void 0 
+         icon: void 0,
       };
    }
 

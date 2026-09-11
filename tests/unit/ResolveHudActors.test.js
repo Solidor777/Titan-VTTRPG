@@ -10,7 +10,7 @@ import resolveHudActors from '~/ui/player-hud/ResolveHudActors.js';
 function actor(id, isOwner = true) {
    return {
       id,
-      isOwner 
+      isOwner,
    };
 }
 
@@ -22,14 +22,14 @@ describe('resolveHudActors', () => {
          isGM: true,
          selected: [
             a,
-            b
+            b,
          ],
          owned: [],
-         assigned: null 
+         assigned: null,
       });
       expect(result.actors).toEqual([
          a,
-         b
+         b,
       ]);
       expect(result.primary).toBe(a);
    });
@@ -39,7 +39,7 @@ describe('resolveHudActors', () => {
          isGM: true,
          selected: [],
          owned: [actor('a')],
-         assigned: actor('b') 
+         assigned: actor('b'),
       });
       expect(result.actors).toEqual([]);
       expect(result.primary).toBe(null);
@@ -54,14 +54,14 @@ describe('resolveHudActors', () => {
          selected: [
             theirs,
             mine,
-            mine2
+            mine2,
          ],
          owned: [],
-         assigned: null 
+         assigned: null,
       });
       expect(result.actors).toEqual([
          mine,
-         mine2
+         mine2,
       ]);
       expect(result.primary).toBe(mine);
    });
@@ -73,14 +73,14 @@ describe('resolveHudActors', () => {
          isGM: false,
          selected: [
             other,
-            assigned
+            assigned,
          ],
          owned: [],
-         assigned 
+         assigned,
       });
       expect(result.actors).toEqual([
          assigned,
-         other
+         other,
       ]);
       expect(result.primary).toBe(assigned);
    });
@@ -92,9 +92,9 @@ describe('resolveHudActors', () => {
          selected: [],
          owned: [
             actor('x'),
-            assigned
+            assigned,
          ],
-         assigned 
+         assigned,
       });
       expect(result.actors).toEqual([assigned]);
    });
@@ -106,9 +106,9 @@ describe('resolveHudActors', () => {
          selected: [],
          owned: [
             first,
-            actor('b')
+            actor('b'),
          ],
-         assigned: null 
+         assigned: null,
       });
       expect(result.actors).toEqual([first]);
    });
@@ -119,7 +119,7 @@ describe('resolveHudActors', () => {
          isGM: false,
          selected: [],
          owned: [],
-         assigned 
+         assigned,
       });
       expect(result.actors).toEqual([assigned]);
    });
@@ -129,7 +129,7 @@ describe('resolveHudActors', () => {
          isGM: false,
          selected: [],
          owned: [],
-         assigned: null 
+         assigned: null,
       });
       expect(result.actors).toEqual([]);
       expect(result.primary).toBe(null);

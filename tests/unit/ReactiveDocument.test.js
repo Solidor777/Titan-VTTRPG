@@ -9,14 +9,14 @@ describe('ReactiveDocument', () => {
       const doc = {
          id: 'a1',
          documentName: 'Actor',
-         system: { value: 1 } 
+         system: { value: 1 },
       };
       const bridge = new ReactiveDocument(doc);
       render(DocumentProbe, {
          context: new Map([[
             'document',
-            bridge
-         ]]) 
+            bridge,
+         ]]),
       });
       expect(screen.getByTestId('value').textContent).toBe('1');
 

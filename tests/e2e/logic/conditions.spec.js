@@ -39,43 +39,43 @@ const BOOST_ELEMENTS = [
       operation: 'flatModifier',
       selector: 'rating',
       key: 'melee',
-      value: 5 
+      value: 5,
    },
    {
       operation: 'flatModifier',
       selector: 'rating',
       key: 'accuracy',
-      value: 5 
+      value: 5,
    },
    {
       operation: 'flatModifier',
       selector: 'rating',
       key: 'defense',
-      value: 5 
+      value: 5,
    },
    {
       operation: 'flatModifier',
       selector: 'rating',
       key: 'awareness',
-      value: 5 
+      value: 5,
    },
    {
       operation: 'flatModifier',
       selector: 'attribute',
       key: 'all',
-      value: 4 
+      value: 4,
    },
    {
       operation: 'flatModifier',
       selector: 'resistance',
       key: 'all',
-      value: 4 
+      value: 4,
    },
    {
       operation: 'flatModifier',
       selector: 'speed',
       key: 'stride',
-      value: 6 
+      value: 6,
    },
 ];
 
@@ -110,7 +110,7 @@ test.describe('conditions — derived-stat mechanics', () => {
          }
          const actor = await Actor.create({
             name,
-            type: 'player' 
+            type: 'player',
          });
          await actor.createEmbeddedDocuments('Item', [abilityData]);
          // Wait until the boost ability is owned and its +4 has reached the derived Body value (base 1).
@@ -126,11 +126,11 @@ test.describe('conditions — derived-stat mechanics', () => {
             stride: actor.system.speed.stride.value,
             attribute: Object.fromEntries(Object.entries(actor.system.attribute).map(([k, v]) => [
                k,
-               v.value
+               v.value,
             ])),
             resistance: Object.fromEntries(Object.entries(actor.system.resistance).map(([k, v]) => [
                k,
-               v.value
+               v.value,
             ])),
          });
 
@@ -145,12 +145,12 @@ test.describe('conditions — derived-stat mechanics', () => {
 
          return {
             baseline,
-            after 
+            after,
          };
       }, {
          name: ACTOR_NAME,
          abilityData: buildRulesElementAbilityData('E2E Condition Boost', BOOST_ELEMENTS),
-         statusId 
+         statusId,
       });
    }
 

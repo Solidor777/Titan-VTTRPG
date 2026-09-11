@@ -53,7 +53,7 @@
       .map((aspect, idx) => {
          return {
             idx: idx,
-            standardAspect: true
+            standardAspect: true,
          };
       })
       .concat(

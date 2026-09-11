@@ -125,7 +125,7 @@ export async function applyImport(plan, targetPack, newCompendiumLabel) {
    /** @type {number[]} Distinct create/update depths, ascending. */
    const depths = [...new Set([
       ...plan.creates,
-      ...plan.updates
+      ...plan.updates,
    ].map((e) => e.depth))].sort((a, b) => a - b);
 
    /** @type {number} */
@@ -157,7 +157,7 @@ export async function applyImport(plan, targetPack, newCompendiumLabel) {
          if (depth === 0) {
             docs = await getDocumentClass(documentName).createDocuments(data, {
                pack: pack.collection,
-               keepId: true 
+               keepId: true,
             });
          }
          else {
@@ -220,7 +220,7 @@ export async function applyImport(plan, targetPack, newCompendiumLabel) {
             }
             await parent.updateEmbeddedDocuments(documentName, group.map((u) => ({
                _id: u.id,
-               ...u.changes 
+               ...u.changes,
             })));
             /** @type {string} The parent's embedded-collection property name for this document class. */
             const collectionKey = documentName === 'Item' ? 'items' : 'effects';
@@ -240,6 +240,6 @@ export async function applyImport(plan, targetPack, newCompendiumLabel) {
       pack,
       created: createdCount,
       updated: updatedCount,
-      deleted: plan.deletes.length 
+      deleted: plan.deletes.length,
    };
 }

@@ -41,7 +41,7 @@ export default class ReportChatMessageDataModel extends TitanChatMessageDataMode
       for (const key of [
          'stamina',
          'wounds',
-         'resolve'
+         'resolve',
       ]) {
          if (source[key] !== undefined) {
             source.resource ??= {};

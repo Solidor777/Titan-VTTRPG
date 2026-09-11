@@ -43,7 +43,7 @@
             filterFunction(item) &&
             item.name.toLowerCase().indexOf(filter.toLowerCase()) !== -1
          );
-      }).sort((a, b) => sortAscending(a.sort, b.sort))
+      }).sort((a, b) => sortAscending(a.sort, b.sort)),
    );
 
    /**
@@ -77,14 +77,14 @@
       const updates = foundry.utils.performIntegerSort(source, {
          target,
          siblings,
-         sortBefore 
+         sortBefore,
       });
       await document.data.updateEmbeddedDocuments(
          'Item',
          updates.map((entry) => {
             return {
                ...entry.update,
-               _id: entry.target._id 
+               _id: entry.target._id,
             };
          }),
       );

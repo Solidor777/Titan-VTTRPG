@@ -55,7 +55,7 @@ async function seedControlledActor(page, { type = 'player' } = {}) {
       return game.actors.getName(name)?.type === type;
    }, {
       name: FIXTURE_NAME,
-      type 
+      type,
    });
 
    if (!matches) {
@@ -63,11 +63,11 @@ async function seedControlledActor(page, { type = 'player' } = {}) {
       await page.evaluate(async ({ name, type }) => {
          await Actor.create({
             name,
-            type 
+            type,
          });
       }, {
          name: FIXTURE_NAME,
-         type 
+         type,
       });
    }
 
@@ -124,7 +124,7 @@ test('all three portrait styles render', async () => {
    for (const style of [
       'panelCard',
       'wideStrip',
-      'roundToken'
+      'roundToken',
    ]) {
       await page.evaluate(async (style) => {
          await game.settings.set('titan', 'playerHudOptions', { portrait: { style } });
@@ -186,8 +186,8 @@ test('long rest restores stamina and resolve to max', async () => {
          system: {
             resource: {
                stamina: { value: 1 },
-               resolve: { value: 0 } 
-            } 
+               resolve: { value: 0 },
+            },
          },
       });
    }, actorId);
@@ -211,8 +211,8 @@ test('remove combat effects deletes a turn-start effect', async () => {
          system: {
             duration: {
                type: 'turnStart',
-               remaining: 2 
-            } 
+               remaining: 2,
+            },
          },
       }]);
    }, actorId);

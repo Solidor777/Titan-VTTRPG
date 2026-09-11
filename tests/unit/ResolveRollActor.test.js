@@ -71,7 +71,7 @@ describe('resolveRollActor', () => {
          isOwner: true,
          parent: {
             documentName: 'Actor',
-            system: {} 
+            system: {},
          },
       });
       expect(resolveRollActor(bridge)).toBeUndefined();
@@ -80,7 +80,7 @@ describe('resolveRollActor', () => {
    it('returns undefined for a non-character actor sheet', () => {
       const bridge = makeBridge({
          documentName: 'Actor',
-         system: {} 
+         system: {},
       });
       expect(resolveRollActor(bridge)).toBeUndefined();
    });

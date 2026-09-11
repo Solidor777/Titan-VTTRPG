@@ -96,13 +96,13 @@ export async function ensureDocument(page, documentType, subtype, name) {
          const cls = documentType === 'Actor' ? globalThis.Actor : globalThis.Item;
          await cls.create({
             name,
-            type: subtype 
+            type: subtype,
          });
       }
    }, {
       documentType,
       subtype,
-      name 
+      name,
    });
 
    // Prefer the named fixture (created here) and fall back to any of the subtype.
@@ -137,7 +137,7 @@ export async function collectLocalizationOffenders(page, rootSelector) {
          'title',
          'placeholder',
          'alt',
-         'data-tooltip'
+         'data-tooltip',
       ];
 
       /**
@@ -161,7 +161,7 @@ export async function collectLocalizationOffenders(page, rootSelector) {
       // Attributes and tippy content on every element (including the root).
       for (const element of [
          root,
-         ...root.querySelectorAll('*')
+         ...root.querySelectorAll('*'),
       ]) {
          for (const attribute of attributes) {
             consider(element.getAttribute(attribute));

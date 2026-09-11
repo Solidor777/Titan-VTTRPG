@@ -6,7 +6,7 @@
    /**
     * @typedef {object} CheckDialogBaseProps
     * @property {Array<typeof import('svelte').SvelteComponent>} [rows] Components for changing the
-    *    options and displaying the parameters.
+    * options and displaying the parameters.
     * @property {Function} [onroll] Callback invoked when the Roll button is clicked.
     */
 

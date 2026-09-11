@@ -7,18 +7,18 @@ describe('Csv', () => {
       columns: [
          '_id',
          'name',
-         'description'
+         'description',
       ],
       rows: [
          {
             _id: 'a'.repeat(16),
             name: 'Sword',
-            description: 'A "sharp", multi\nline blade.' 
+            description: 'A "sharp", multi\nline blade.',
          },
          {
             _id: 'b'.repeat(16),
             name: 'Bow',
-            description: '' 
+            description: '',
          },
       ],
    };
@@ -39,12 +39,12 @@ describe('Csv', () => {
             {
                _id: 'a'.repeat(16),
                name: 'Sword',
-               description: 'A "sharp", multi\nline blade.' 
+               description: 'A "sharp", multi\nline blade.',
             },
             {
                _id: 'b'.repeat(16),
                name: 'Bow',
-               description: '' 
+               description: '',
             },
          ],
       });
@@ -54,7 +54,7 @@ describe('Csv', () => {
       const decoded = decodeCsv('﻿a,b\r\n1,2\r\n', 'x');
       expect(decoded.rows).toEqual([{
          a: '1',
-         b: '2' 
+         b: '2',
       }]);
    });
 });

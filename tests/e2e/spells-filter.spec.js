@@ -40,16 +40,16 @@ test.describe('spells tab filter', () => {
          }
          const actor = await Actor.create({
             name: actorName,
-            type: 'player' 
+            type: 'player',
          });
          await actor.createEmbeddedDocuments('Item', [
             {
                name: 'Zzz Fireball',
-               type: 'spell' 
+               type: 'spell',
             },
             {
                name: 'Qqq Frostbite',
-               type: 'spell' 
+               type: 'spell',
             },
          ]);
          const app = await actor.sheet.render(true);

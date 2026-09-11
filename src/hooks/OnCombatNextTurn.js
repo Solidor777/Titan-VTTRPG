@@ -20,7 +20,7 @@ export default async function onCombatNextTurn(currentCombatantId, previousComba
          ? {
             combat,
             currentCombatant,
-            previousCombatant 
+            previousCombatant,
          }
          : null;
    });

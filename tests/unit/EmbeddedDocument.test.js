@@ -27,11 +27,11 @@ function makeParent() {
    const docShape = {
       items: new Map([[
          'w1',
-         weapon
+         weapon,
       ]]),
       effects: new Map([[
          'e1',
-         effect
+         effect,
       ]]),
    };
 
@@ -93,7 +93,7 @@ describe('EmbeddedDocument', () => {
       };
       weapon.effects = new Map([[
          'we1',
-         weaponEffect
+         weaponEffect,
       ]]);
 
       const itemBridge = new EmbeddedDocument(parent, 'items', 'w1');

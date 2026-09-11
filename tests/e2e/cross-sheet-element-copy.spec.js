@@ -46,7 +46,7 @@ test.describe('cross-sheet element copy', () => {
       const result = await page.evaluate(async (names) => {
          for (const name of [
             names.src,
-            names.dst
+            names.dst,
          ]) {
             const stale = game.items.getName(name);
             if (stale) {
@@ -55,11 +55,11 @@ test.describe('cross-sheet element copy', () => {
          }
          const source = await Item.create({
             name: names.src,
-            type: 'weapon' 
+            type: 'weapon',
          });
          const target = await Item.create({
             name: names.dst,
-            type: 'weapon' 
+            type: 'weapon',
          });
          await source.update({ system: { rulesElement: [] } });
          await target.update({ system: { rulesElement: [] } });
@@ -74,7 +74,7 @@ test.describe('cross-sheet element copy', () => {
          };
       }, {
          src: SRC_WEAPON,
-         dst: DST_WEAPON 
+         dst: DST_WEAPON,
       });
 
       expect(result.targetCount).toBe(1);
@@ -99,7 +99,7 @@ test.describe('cross-sheet element copy', () => {
          };
       }, {
          src: SRC_WEAPON,
-         dst: DST_WEAPON 
+         dst: DST_WEAPON,
       });
 
       expect(result.targetCount).toBe(1);
@@ -123,7 +123,7 @@ test.describe('cross-sheet element copy', () => {
          };
       }, {
          src: SRC_WEAPON,
-         dst: DST_WEAPON 
+         dst: DST_WEAPON,
       });
 
       expect(result.targetCount).toBe(1);
@@ -135,7 +135,7 @@ test.describe('cross-sheet element copy', () => {
       const result = await page.evaluate(async (names) => {
          for (const name of [
             names.src,
-            names.dst
+            names.dst,
          ]) {
             const stale = game.items.getName(name);
             if (stale) {
@@ -144,11 +144,11 @@ test.describe('cross-sheet element copy', () => {
          }
          const source = await Item.create({
             name: names.src,
-            type: 'spell' 
+            type: 'spell',
          });
          const target = await Item.create({
             name: names.dst,
-            type: 'spell' 
+            type: 'spell',
          });
          await source.system.addCustomAspect();
          const element = source.system.customAspect[0];
@@ -160,7 +160,7 @@ test.describe('cross-sheet element copy', () => {
          };
       }, {
          src: SRC_SPELL,
-         dst: DST_SPELL 
+         dst: DST_SPELL,
       });
 
       expect(result.targetCount).toBe(1);

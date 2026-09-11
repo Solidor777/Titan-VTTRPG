@@ -9,14 +9,14 @@ describe('unflattenRow', () => {
          'system.value': 5,
       })).toEqual({
          name: 'Sword',
-         system: { value: 5 } 
+         system: { value: 5 },
       });
    });
 
    it('preserves explicit null and empty-string values', () => {
       expect(unflattenRow({
          'system.equipped.armor': null,
-         name: '' 
+         name: '',
       })).toEqual({
          system: { equipped: { armor: null } },
          name: '',
@@ -36,11 +36,11 @@ describe('unflattenRow', () => {
             attack: [
                {
                   label: 'Slash',
-                  damage: 5 
+                  damage: 5,
                },
                {
                   label: 'Stab',
-                  damage: 3 
+                  damage: 3,
                },
             ],
          },
@@ -57,9 +57,9 @@ describe('unflattenRow', () => {
          system: {
             attack: [{
                label: 'Stab',
-               damage: 3 
-            }] 
-         } 
+               damage: 3,
+            }],
+         },
       });
    });
 
@@ -72,16 +72,16 @@ describe('unflattenRow', () => {
          system: {
             attack: [{
                label: 'Slash',
-               trait: [{ name: 'Reach' }] 
-            }] 
-         } 
+               trait: [{ name: 'Reach' }],
+            }],
+         },
       });
    });
 
    it('returns an empty object for an all-ABSENT input', () => {
       expect(unflattenRow({
          name: ABSENT,
-         'system.rarity': ABSENT 
+         'system.rarity': ABSENT,
       })).toEqual({});
    });
 

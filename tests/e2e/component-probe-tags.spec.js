@@ -52,7 +52,7 @@ test.describe('component probe — Tag', () => {
             // Use TextData form so processTextData emits the raw string without attempting localization.
             tooltip: {
                text: 'A shard of magical ice.',
-               localize: false 
+               localize: false,
             },
          },
       });
@@ -91,7 +91,7 @@ test.describe('component probe — IconTag', () => {
             label: 'Fire',
             tooltip: {
                text: 'Burn everything.',
-               localize: false 
+               localize: false,
             },
          },
       });
@@ -133,7 +133,7 @@ test.describe('component probe — IconStatTag', () => {
             value: 30,
             tooltip: {
                text: 'Movement speed in feet.',
-               localize: false 
+               localize: false,
             },
          },
       });
@@ -172,7 +172,7 @@ test.describe('component probe — StatTag', () => {
             value: 4,
             tooltip: {
                text: 'Raw physical might.',
-               localize: false 
+               localize: false,
             },
          },
       });
@@ -231,7 +231,7 @@ test.describe('component probe — RarityTag', () => {
             rarity: 'rare',
             tooltip: {
                text: 'Exceptionally hard to find.',
-               localize: false 
+               localize: false,
             },
          },
       });
@@ -282,7 +282,7 @@ test.describe('component probe — DurationTag', () => {
             remaining: 2,
             tooltip: {
                text: 'Expires on turn start.',
-               localize: false 
+               localize: false,
             },
          },
       });
@@ -320,7 +320,7 @@ test.describe('component probe — AttributeTag', () => {
             text: 'Focus',
             tooltip: {
                text: 'A mental discipline.',
-               localize: false 
+               localize: false,
             },
          },
       });
@@ -360,7 +360,7 @@ test.describe('component probe — AttributeCheckTag', () => {
             skill: 'persuasion',
             tooltip: {
                text: 'A social contest.',
-               localize: false 
+               localize: false,
             },
          },
       });
@@ -398,7 +398,7 @@ test.describe('component probe — OpposedCheckTag', () => {
             skill: 'deception',
             tooltip: {
                text: 'A deception contest.',
-               localize: false 
+               localize: false,
             },
          },
       });
@@ -436,7 +436,7 @@ test.describe('component probe — ResistanceTag', () => {
             text: 'Focus',
             tooltip: {
                text: 'A mental barrier.',
-               localize: false 
+               localize: false,
             },
          },
       });
@@ -474,7 +474,7 @@ test.describe('component probe — ResistedByTag', () => {
             resistance: 'reflexes',
             tooltip: {
                text: 'Dodged away.',
-               localize: false 
+               localize: false,
             },
          },
       });
@@ -634,7 +634,7 @@ test.describe('component probe — EditDeleteTag', () => {
          },
          events: [
             'editFunction',
-            'deleteFunction'
+            'deleteFunction',
          ],
       });
       await clearProbeEvents(page);
@@ -651,7 +651,7 @@ test.describe('component probe — EditDeleteTag', () => {
          },
          events: [
             'editFunction',
-            'deleteFunction'
+            'deleteFunction',
          ],
       });
       await clearProbeEvents(page);

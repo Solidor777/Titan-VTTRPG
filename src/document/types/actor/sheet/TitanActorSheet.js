@@ -348,7 +348,7 @@ export default class TitanActorSheet extends TitanDocumentSheet {
             // Perform the sort.
             const sortUpdates = SortingHelpers.performIntegerSort(source, {
                target,
-               siblings 
+               siblings,
             });
             const updateData = sortUpdates.map((entry) => {
                const update = entry.update;
@@ -359,7 +359,7 @@ export default class TitanActorSheet extends TitanDocumentSheet {
             // Perform the update.
             return /** @type Promise<TitanItem[]> */ this.actor.updateEmbeddedDocuments(
                'Item',
-               updateData
+               updateData,
             );
          }
       }

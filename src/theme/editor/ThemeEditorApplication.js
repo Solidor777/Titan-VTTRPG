@@ -21,17 +21,17 @@ export default class ThemeEditorApplication extends ApplicationV2 {
    static DEFAULT_OPTIONS = {
       classes: [
          'titan',
-         'titan-theme-editor'
+         'titan-theme-editor',
       ],
       id: 'titan-theme-editor',
       position: {
          width: 960,
-         height: 700 
+         height: 700,
       },
       window: {
          resizable: true,
          minimizable: true,
-         title: 'LOCAL.themeEditor.text' 
+         title: 'LOCAL.themeEditor.text',
       },
    };
 
@@ -61,7 +61,7 @@ export default class ThemeEditorApplication extends ApplicationV2 {
             target: content,
             context: new Map([[
                'application',
-               this
+               this,
             ]]),
          });
       }

@@ -23,13 +23,13 @@
    /** @type {ResistanceCheckParameters} Resolved dice and modifiers for the resistance check this button rolls. */
    let checkParameters = $derived(
       document.data.system.getResistanceCheckParameters(
-         document.data.system.initializeResistanceCheckOptions({ resistance: resistance }))
+         document.data.system.initializeResistanceCheckOptions({ resistance: resistance })),
    );
 
    /** @type {string} Hover text describing the resistance and its check modifiers. */
    let tooltip = $derived(
       localize(`${checkParameters.resistance}.desc`) +
-      getResistanceCheckParametersTooltip(checkParameters)
+         getResistanceCheckParametersTooltip(checkParameters),
    );
 
    /** @type {string} Font-icon class chosen to represent this resistance. */
@@ -53,7 +53,7 @@
    {resistance}
    tooltip={{
       text: tooltip,
-      localize: false 
+      localize: false,
    }}>
    <div class="button-inner">
       <!--Icon-->

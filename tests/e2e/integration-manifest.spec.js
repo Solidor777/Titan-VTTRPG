@@ -57,7 +57,7 @@ test.describe('integration manifest drift guard', () => {
          'Actor',
          'Item',
          'ActiveEffect',
-         'ChatMessage'
+         'ChatMessage',
       ]) {
          expect(
             registered[documentName].sort(),
@@ -80,11 +80,11 @@ test.describe('integration manifest drift guard', () => {
             ? {
                name: entry.name,
                type: pack.metadata.type,
-               packageName: pack.metadata.packageName 
+               packageName: pack.metadata.packageName,
             }
             : {
                name: entry.name,
-               missing: true 
+               missing: true,
             };
       }), declaredPacks);
 
@@ -139,7 +139,7 @@ test.describe('integration manifest drift guard', () => {
          'Item',
          'ActiveEffect',
          'ChatMessage',
-         'Combat'
+         'Combat',
       ]) {
          expect(result[documentName].overridden, `${documentName} documentClass overridden`).toBe(true);
          expect(result[documentName].subclass, `${documentName} documentClass subclasses the base`).toBe(true);
@@ -155,7 +155,7 @@ test.describe('integration manifest drift guard', () => {
       const subtypes = {
          Actor: [
             'player',
-            'npc'
+            'npc',
          ],
          Item: [
             'ability',
@@ -164,7 +164,7 @@ test.describe('integration manifest drift guard', () => {
             'equipment',
             'shield',
             'spell',
-            'weapon'
+            'weapon',
          ],
       };
 
@@ -185,7 +185,7 @@ test.describe('integration manifest drift guard', () => {
          const out = {
             Actor: {},
             Item: {},
-            ActiveEffect: {} 
+            ActiveEffect: {},
          };
          for (const subtype of subtypes.Actor) {
             out.Actor[subtype] = inspect('Actor', subtype);
@@ -201,7 +201,7 @@ test.describe('integration manifest drift guard', () => {
       // Every declared Actor/Item subtype: a titan-scoped sheet is registered AND is the default.
       for (const documentName of [
          'Actor',
-         'Item'
+         'Item',
       ]) {
          for (const subtype of subtypes[documentName]) {
             const r = result[documentName][subtype];

@@ -35,14 +35,14 @@ export const HUD_SKILLS = [
 export const HUD_RESISTANCES = [
    'reflexes',
    'resilience',
-   'willpower'
+   'willpower',
 ];
 
 /** @type {Array<string>} Item types equipped via the character's toggleEquipped path. */
 const EQUIPPABLE_TYPES = [
    'armor',
    'shield',
-   'equipment'
+   'equipment',
 ];
 
 /** @type {string} Icon classes for the equip/unequip sub-button. */
@@ -112,7 +112,7 @@ function buildItemCheckSubButtons(actor, item, options) {
          icon: DICE_ICON,
          action: () => actor.system.requestItemCheck({
             itemId: item.id,
-            checkIdx 
+            checkIdx,
          }),
       };
    });
@@ -167,7 +167,7 @@ function buildWeapons(primary, options) {
             if (equipped && attackCount > 0) {
                primary.system.requestAttackCheck({
                   itemId: item.id,
-                  attackIdx: 0 
+                  attackIdx: 0,
                });
             }
             else if (!equipped) {
@@ -176,7 +176,7 @@ function buildWeapons(primary, options) {
             else if ((item.system.check?.length ?? 0) > 0) {
                primary.system.requestItemCheck({
                   itemId: item.id,
-                  checkIdx: 0 
+                  checkIdx: 0,
                });
             }
             else {
@@ -193,7 +193,7 @@ function buildWeapons(primary, options) {
                   icon: attack.type === 'ranged' ? ACCURACY_ICON : MELEE_ICON,
                   action: () => primary.system.requestAttackCheck({
                      itemId: item.id,
-                     attackIdx 
+                     attackIdx,
                   }),
                };
             })
@@ -225,7 +225,7 @@ function buildInventory(primary, options) {
       .filter((item) => ![
          'weapon',
          'spell',
-         'ability'
+         'ability',
       ].includes(item.type))
       .filter((item) => !options.filters.inventoryWithChecks || (item.system.check?.length ?? 0) > 0)
       .map((item) => {
@@ -244,7 +244,7 @@ function buildInventory(primary, options) {
             else if ((item.system.check?.length ?? 0) > 0) {
                primary.system.requestItemCheck({
                   itemId: item.id,
-                  checkIdx: 0 
+                  checkIdx: 0,
                });
             }
             else {
@@ -314,7 +314,7 @@ function buildCheckItemCategory(primary, options, type) {
             else if ((item.system.check?.length ?? 0) > 0) {
                primary.system.requestItemCheck({
                   itemId: item.id,
-                  checkIdx: 0 
+                  checkIdx: 0,
                });
             }
             else {
@@ -359,7 +359,7 @@ function buildEffects(primary, options) {
             if (checkCount > 0) {
                primary.system.requestItemCheck({
                   itemRollData: effect.getRollData(),
-                  checkIdx: 0 
+                  checkIdx: 0,
                });
             }
             else {
@@ -454,7 +454,7 @@ function buildUtility(actors) {
    for (const key of [
       'shortRest',
       'longRest',
-      'removeCombatEffects'
+      'removeCombatEffects',
    ]) {
       subOptions.push({
          key,
@@ -473,7 +473,7 @@ function buildUtility(actors) {
       'applyDamage',
       'applyHealing',
       'applyRend',
-      'applyRepairs'
+      'applyRepairs',
    ]) {
       subOptions.push({
          key,
@@ -511,7 +511,7 @@ export default function buildActionMenuModel({ actors, primary, options }) {
                   for (const actor of actors) {
                      actor.system.requestAttributeCheck({
                         attribute: 'default',
-                        skill 
+                        skill,
                      });
                   }
                },
@@ -541,27 +541,27 @@ export default function buildActionMenuModel({ actors, primary, options }) {
             {
                key: 'weapons',
                labelKey: 'weapons',
-               subOptions: buildWeapons(primary, options) 
+               subOptions: buildWeapons(primary, options),
             },
             {
                key: 'inventory',
                labelKey: 'inventory',
-               subOptions: buildInventory(primary, options) 
+               subOptions: buildInventory(primary, options),
             },
             {
                key: 'abilities',
                labelKey: 'abilities',
-               subOptions: buildCheckItemCategory(primary, options, 'ability') 
+               subOptions: buildCheckItemCategory(primary, options, 'ability'),
             },
             {
                key: 'spells',
                labelKey: 'spells',
-               subOptions: buildCheckItemCategory(primary, options, 'spell') 
+               subOptions: buildCheckItemCategory(primary, options, 'spell'),
             },
             {
                key: 'effects',
                labelKey: 'effects',
-               subOptions: buildEffects(primary, options) 
+               subOptions: buildEffects(primary, options),
             },
          ]),
       {

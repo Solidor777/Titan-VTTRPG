@@ -20,8 +20,8 @@ describe('readTables — wide layout', () => {
                   rarity: 'common',
                   attack: [{
                      label: 'Slash',
-                     damage: 5 
-                  }] 
+                     damage: 5,
+                  }],
                },
             },
             parentId: '',
@@ -47,8 +47,8 @@ describe('readTables — wide layout', () => {
                rarity: 'common',
                attack: [{
                   label: 'Slash',
-                  damage: 5 
-               }] 
+                  damage: 5,
+               }],
             },
          },
       });
@@ -61,12 +61,12 @@ describe('readTables — wide layout', () => {
                name: 'weapon',
                columns: [
                   '_id',
-                  'name'
+                  'name',
                ],
                rows: [{
                   _id: 'a'.repeat(16),
-                  name: 'Axe' 
-               }] 
+                  name: 'Axe',
+               }],
             },
          ],
       };
@@ -75,7 +75,7 @@ describe('readTables — wide layout', () => {
          documentType: 'weapon',
          source: {
             _id: 'a'.repeat(16),
-            name: 'Axe' 
+            name: 'Axe',
          },
       });
    });
@@ -88,12 +88,12 @@ describe('readTables — wide layout', () => {
                name: 'weapon',
                columns: [
                   '_id',
-                  'name'
+                  'name',
                ],
                rows: [{
                   _id: 'a'.repeat(16),
-                  name: 'Axe' 
-               }] 
+                  name: 'Axe',
+               }],
             },
          ],
       };
@@ -107,12 +107,12 @@ describe('readTables — wide layout', () => {
                columns: [
                   '_id',
                   'name',
-                  '_folder'
+                  '_folder',
                ],
                rows: [{
                   _id: 'a'.repeat(16),
                   name: 'Axe',
-                  _folder: '' 
+                  _folder: '',
                }],
             },
          ],
@@ -134,10 +134,10 @@ describe('readTables — relational layout', () => {
                         label: 'Slash',
                         trait: [
                            { name: 'Reach' },
-                           { name: 'Heavy' }
-                        ] 
+                           { name: 'Heavy' },
+                        ],
                      },
-                     { label: 'Stab' }
+                     { label: 'Stab' },
                   ],
                },
             },
@@ -151,8 +151,8 @@ describe('readTables — relational layout', () => {
             label: 'Slash',
             trait: [
                { name: 'Reach' },
-               { name: 'Heavy' }
-            ] 
+               { name: 'Heavy' },
+            ],
          },
          { label: 'Stab' },
       ]);
@@ -164,7 +164,7 @@ describe('readTables — relational layout', () => {
             documentType: 'weapon',
             source: {
                _id: 'a'.repeat(16),
-               system: { statuses: ['prone'] } 
+               system: { statuses: ['prone'] },
             },
          },
       ];
@@ -180,8 +180,8 @@ describe('readTables — relational layout', () => {
             fieldTypes: {
                'system.attack.*.label': {
                   type: 'string',
-                  nullable: false 
-               } 
+                  nullable: false,
+               },
             },
             fieldOrder: [],
          },
@@ -197,16 +197,16 @@ describe('readTables — relational layout', () => {
                system: {
                   attack: [{
                      label: 'Slash',
-                     damage: 5 
-                  }] 
-               } 
+                     damage: 5,
+                  }],
+               },
             },
          },
          {
             documentType: 'weapon',
             source: {
                _id: 'b'.repeat(16),
-               system: { attack: [{ damage: 3 }] } 
+               system: { attack: [{ damage: 3 }] },
             },
          },
       ];
@@ -229,10 +229,10 @@ describe('readTables — relational layout', () => {
                system: {
                   rulesElement: [{
                      name: 'code',
-                     value: 'a' 
-                  }] 
-               } 
-            } 
+                     value: 'a',
+                  }],
+               },
+            },
          },
          {
             documentType: 'weapon',
@@ -241,10 +241,10 @@ describe('readTables — relational layout', () => {
                system: {
                   rulesElement: [{
                      name: 'code',
-                     value: 'b' 
-                  }] 
-               } 
-            } 
+                     value: 'b',
+                  }],
+               },
+            },
          },
       ];
       const workbook = buildTables(envelopes, 'relational', 'Item', NO_SCHEMA);
@@ -263,10 +263,10 @@ describe('readTables — relational layout', () => {
                system: {
                   rulesElement: [{
                      name: 'code',
-                     value: 'a' 
-                  }] 
-               } 
-            } 
+                     value: 'a',
+                  }],
+               },
+            },
          },
          {
             documentType: 'weapon',
@@ -275,10 +275,10 @@ describe('readTables — relational layout', () => {
                system: {
                   rulesElement: [{
                      name: 'code',
-                     value: 'b' 
-                  }] 
-               } 
-            } 
+                     value: 'b',
+                  }],
+               },
+            },
          },
       ];
       const workbook = buildTables(envelopes, 'wide', 'Item', NO_SCHEMA);
@@ -292,15 +292,15 @@ describe('readTables — relational layout', () => {
             documentType: 'weapon',
             source: {
                _id: '',
-               system: { rarity: 'common' } 
-            } 
+               system: { rarity: 'common' },
+            },
          },
          {
             documentType: 'weapon',
             source: {
                _id: '',
-               system: { rarity: 'rare' } 
-            } 
+               system: { rarity: 'rare' },
+            },
          },
       ];
       const workbook = buildTables(envelopes, 'relational', 'Item', NO_SCHEMA);
@@ -317,9 +317,9 @@ describe('readTables — relational layout', () => {
                system: {
                   rulesElement: [{
                      name: 'code',
-                     value: 'a' 
-                  }] 
-               } 
+                     value: 'a',
+                  }],
+               },
             },
          },
       ];

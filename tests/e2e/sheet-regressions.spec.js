@@ -28,7 +28,7 @@ test.afterEach(async () => {
       for (const name of [
          'E2E Regression Actor',
          'E2E Regression Weapon',
-         'E2E Regression Source'
+         'E2E Regression Source',
       ]) {
          await game.actors.getName(name)?.delete();
          await game.items.getName(name)?.delete();
@@ -52,12 +52,12 @@ test.describe('v14 sheet regressions', () => {
          'equipment',
          'shield',
          'spell',
-         'weapon'
+         'weapon',
       ]) {
          await page.evaluate(async (type) => {
             const item = await Item.create({
                name: 'E2E Regression Rarity Item',
-               type 
+               type,
             });
             await item.sheet.render(true);
             await titanWait(() => !!item.sheet.element, { message: `${type} sheet rendered` });
@@ -77,7 +77,7 @@ test.describe('v14 sheet regressions', () => {
          // A fresh world actor exercises the non-embedded document path.
          const actor = await Actor.create({
             name: 'E2E Regression Actor',
-            type: 'player' 
+            type: 'player',
          });
          const created = await actor.createItemFromType('ability');
          return {
@@ -98,11 +98,11 @@ test.describe('v14 sheet regressions', () => {
          // The drop source item and the receiving actor with an open sheet.
          const source = await Item.create({
             name: 'E2E Regression Source',
-            type: 'equipment' 
+            type: 'equipment',
          });
          const actor = await Actor.create({
             name: 'E2E Regression Actor',
-            type: 'player' 
+            type: 'player',
          });
          await actor.sheet.render(true);
          await titanWait(() => !!actor.sheet.element, { message: 'actor sheet rendered' });
@@ -111,12 +111,12 @@ test.describe('v14 sheet regressions', () => {
          const dataTransfer = new DataTransfer();
          dataTransfer.setData('text/plain', JSON.stringify({
             type: 'Item',
-            uuid: source.uuid 
+            uuid: source.uuid,
          }));
          const dropEvent = new DragEvent('drop', {
             bubbles: true,
             cancelable: true,
-            dataTransfer 
+            dataTransfer,
          });
          /** @type {boolean} Whether the drop controller bound a handler to the sheet element. */
          const handlerBound = typeof actor.sheet.element.ondrop === 'function';
@@ -157,7 +157,7 @@ test.describe('v14 sheet regressions', () => {
          // A fresh weapon seeds attack[0]; the attacks tab must render it on first open.
          const weapon = await Item.create({
             name: 'E2E Regression Weapon',
-            type: 'weapon' 
+            type: 'weapon',
          });
          await weapon.sheet.render(true);
          await titanWait(() => !!weapon.sheet.element, { message: 'weapon sheet rendered' });
@@ -169,7 +169,7 @@ test.describe('v14 sheet regressions', () => {
       const sheet = page.locator('.titan-document-sheet:has-text("E2E Regression Weapon")');
       await sheet.getByRole('button', {
          name: 'Attacks',
-         exact: true 
+         exact: true,
       }).first().click();
       await expect(sheet.locator('.attack').first(), 'attack settings render').toBeVisible();
       expect(errors, `uncaught errors on the attacks tab:\n${errors.join('\n')}`).toEqual([]);
@@ -186,11 +186,11 @@ test.describe('v14 sheet regressions', () => {
          const scene = await Scene.create({
             name: 'E2E Regression Scene',
             width: 1000,
-            height: 1000 
+            height: 1000,
          });
          const tokenData = (await actor.getTokenDocument({
             x: 100,
-            y: 100 
+            y: 100,
          })).toObject();
          const [tokenDoc] = await scene.createEmbeddedDocuments('Token', [tokenData]);
 
@@ -220,7 +220,7 @@ test.describe('v14 sheet regressions', () => {
          // A weapon sheet shows the checks sidebar; addCheck must not crash the fresh row bind.
          const weapon = await Item.create({
             name: 'E2E Regression Weapon',
-            type: 'weapon' 
+            type: 'weapon',
          });
          await weapon.sheet.render(true);
          await titanWait(() => !!weapon.sheet.element, { message: 'weapon sheet rendered' });

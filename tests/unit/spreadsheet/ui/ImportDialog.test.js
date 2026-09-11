@@ -25,7 +25,7 @@ describe('ImportDialog', () => {
       /** @type {object} */
       const pack = {
          metadata: { label: 'Test Weapons' },
-         collection: 'world.test' 
+         collection: 'world.test',
       };
 
       /** @type {object} */

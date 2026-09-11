@@ -83,7 +83,7 @@ test.describe('v14 theme system', () => {
                ...original,
                colorScheme: {
                   ...original.colorScheme,
-                  applications: scheme 
+                  applications: scheme,
                },
             });
             await titanWait(
@@ -106,11 +106,11 @@ test.describe('v14 theme system', () => {
             dark,
             expectedLight: {
                id: expectedLight.id,
-               background: expectedLight.tokens['app-background'] 
+               background: expectedLight.tokens['app-background'],
             },
             expectedDark: {
                id: expectedDark.id,
-               background: expectedDark.tokens['app-background'] 
+               background: expectedDark.tokens['app-background'],
             },
          };
       });
@@ -170,7 +170,7 @@ test.describe('v14 theme system', () => {
          }
          const actor = await Actor.create({
             name: 'E2E Theme Roller',
-            type: 'player' 
+            type: 'player',
          });
          const before = game.messages.size;
          await actor.system.rollAttributeCheck({ attribute: 'body' });
