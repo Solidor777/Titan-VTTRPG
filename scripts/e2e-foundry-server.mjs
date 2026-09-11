@@ -25,6 +25,14 @@ const world = process.env.FOUNDRY_WORLD ?? 'test-titan';
 /** @type {number | undefined} The Playwright runner: the nearest non-shell ancestor, or the parent when run by hand. */
 const watchPid = pickWatchPid(getAncestors(process.pid)) ?? process.ppid;
 
+/**
+ * Timestamped copy of everything the launched server prints, so a server death mid-suite can be lined up
+ * against the failing specs afterwards. Lives under the gitignored debug sink; `FOUNDRY_SERVER_LOG`
+ * relocates it.
+ * @type {string}
+ */
+const logFile = process.env.FOUNDRY_SERVER_LOG ?? path.join(repoRoot, 'debug', 'dumps', 'e2e-server.log');
+
 /** @type {import('./lib/superviseServer.mjs').SuperviseHandle} The supervised server. */
 const handle = await superviseServer({
    command: process.execPath,
@@ -32,6 +40,7 @@ const handle = await superviseServer({
    cwd: appDir,
    port,
    watchPid,
+   logFile,
 });
 
 for (const signal of ['SIGINT', 'SIGTERM', 'SIGHUP', 'SIGBREAK']) {
