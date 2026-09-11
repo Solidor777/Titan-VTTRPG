@@ -3,6 +3,7 @@ import buildSchemaFromShape from '~/helpers/utility-functions/BuildSchemaFromSha
 import createSpellSystemTemplate from '~/document/types/item/types/spell/SpellSystemTemplate.js';
 import createCustomAspectTemplate from '~/document/types/item/types/spell/SpellCustomAspect.js';
 import SpellAspects from '~/document/types/item/types/spell/SpellAspects.js';
+import calculateSpellAspectCosts from '~/document/types/item/types/spell/CalculateSpellAspectCosts.js';
 import { SPELL_IMAGE } from '~/system/DefaultImages.js';
 import localize from '~/helpers/utility-functions/Localize.js';
 import sortAscending from '~/helpers/utility-functions/SortAscending.js';
@@ -31,103 +32,24 @@ export default class SpellDataModel extends TitanItemDataModel {
 
    prepareDerivedData() {
 
-      // Update the spell's aspects.
-      /** @type {number} */
-      let totalAspectCost = 0;
+      // Calculate every standard/custom aspect's cost and the spell-level totals via the shared pure
+      // module, then write the results back onto the aspect objects exactly as before.
+      const result = calculateSpellAspectCosts(this.aspect, this.customAspect);
 
-      // For each standard aspect.
-      for (const aspect of this.aspect) {
-
-         // Determine whether the aspect is enabled.
-         const aspectSettings = SpellAspects[aspect.label];
-         const settings = aspectSettings.settings;
-         const template = aspectSettings.template;
-
-         // The aspect is disabled if it requires an option and has no options.
-         // set.
-         if (settings?.requireOption && aspect.option.length === 0 && !aspect.allOptions) {
-            aspect.enabled = false;
-            aspect.cost = 0;
+      this.aspect.forEach((aspect, idx) => {
+         aspect.enabled = result.enabled[idx];
+         aspect.cost = result.aspectCosts[idx];
+         if (result.scalingCosts[idx] !== undefined) {
+            aspect.scalingLost = result.scalingCosts[idx];
          }
+      });
 
-         // Otherwise, the aspect is enabled.
-         else {
-            aspect.enabled = true;
-
-            // Calculate the cost of the aspect.
-            let aspectCost = template.cost;
-            if (settings) {
-
-               // Initial value cost.
-               if (settings.initialValueCosts) {
-                  aspectCost = settings.initialValueCosts[aspect.initialValue];
-               }
-
-               // Unit Cost.
-               if (settings.unitCosts) {
-                  aspectCost = settings.unitCosts[aspect.unit];
-               }
-
-               // Add option costs.
-               // All options.
-               if (aspect.allOptions && settings.allOptionsCost) {
-                  aspectCost += settings.allOptionsCost;
-               }
-
-                  // Add the cost for each option when the cost of each option is.
-               // the same.
-               else if (settings.optionCost) {
-                  aspectCost += settings.optionCost * aspect.option.length;
-               }
-
-                  // Add the cost for each option when the cost of each option is.
-               // different.
-               else if (settings.optionCosts) {
-                  for (const option of aspect.option) {
-                     aspect.option.forEach((option) => {
-                        aspectCost += settings.optionCosts[option];
-                     });
-                  }
-               }
-
-               // Add scaling aspect cost.
-               if (settings.scalingCost) {
-                  aspect.scalingLost = settings.scalingCost;
-               }
-            }
-
-            // Halve the cost if the aspect has a Resistance Check.
-            if (aspect.resistanceCheck && aspect.resistanceCheck !== 'none') {
-               aspectCost = Math.max(Math.floor(aspectCost / 2), 1);
-            }
-
-            aspect.cost = aspectCost;
-            totalAspectCost += aspectCost;
-         }
-      }
-
-      // Add the cost of each custom aspect.
-      for (const aspect of this.customAspect) {
-         totalAspectCost += aspect.cost;
-      }
-      this.totalAspectCost = totalAspectCost;
-
-      // Calculate suggested complexity and difficulty.
-      let suggestedDifficulty = totalAspectCost;
-      /** @type {number} */
-      let suggestedComplexity = 1;
-      if (suggestedDifficulty > 5) {
-         suggestedComplexity = totalAspectCost - 4;
-         suggestedDifficulty = 5;
-      }
-      else {
-         suggestedDifficulty = Math.max(suggestedDifficulty, 4);
-      }
+      this.totalAspectCost = result.totalAspectCost;
 
       // Auto calculate difficulty and complexity if appropriate.
       if (this.castingCheck.autoCalculateDC) {
-         this.castingCheck.difficulty = suggestedDifficulty;
-         this.castingCheck.complexity = suggestedComplexity;
+         this.castingCheck.difficulty = result.difficulty;
+         this.castingCheck.complexity = result.complexity;
       }
    }
 
