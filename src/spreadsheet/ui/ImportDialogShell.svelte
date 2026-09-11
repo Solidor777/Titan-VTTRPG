@@ -1,4 +1,5 @@
 <script>
+   import { untrack } from 'svelte';
    import Select from '~/helpers/svelte-components/input/select/Select.svelte';
    import Button from '~/helpers/svelte-components/button/Button.svelte';
    import CheckboxInput from '~/helpers/svelte-components/input/CheckboxInput.svelte';
@@ -16,10 +17,10 @@
    const { initialPack } = $props();
 
    /** @type {'existing'|'new'} Whether to target an existing pack or create a new compendium. */
-   let targetMode = $state(initialPack ? 'existing' : 'new');
+   let targetMode = $state(untrack(() => (initialPack ? 'existing' : 'new')));
 
    /** @type {string} The collection id of the selected existing pack. */
-   let targetCollection = $state(initialPack?.collection ?? '');
+   let targetCollection = $state(untrack(() => initialPack?.collection ?? ''));
 
    /** @type {string} The label for a newly created compendium. */
    let newCompendiumLabel = $state('');
