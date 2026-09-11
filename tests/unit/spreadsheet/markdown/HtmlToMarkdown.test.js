@@ -100,6 +100,10 @@ describe('htmlToMarkdown', () => {
       expect(htmlToMarkdown('<p><img src="x.png"></p>')).toBe('');
    });
 
+   it('decodes entities in <img alt>', () => {
+      expect(htmlToMarkdown('<p><img src="x.png" alt="Tom &amp; Jerry"></p>')).toBe('Tom & Jerry');
+   });
+
    it('drops <section class="secret"> entirely', () => {
       expect(
          htmlToMarkdown('<p>Visible.</p><section class="secret"><p>GM only.</p></section>'),
@@ -176,5 +180,23 @@ describe('htmlToMarkdown', () => {
    it('escapes a pipe character inside a table cell', () => {
       const html = '<table><tr><th>A</th></tr><tr><td>a | b</td></tr></table>';
       expect(htmlToMarkdown(html)).toBe('| A |\n| --- |\n| a \\| b |');
+   });
+
+   it('implicitly closes an unclosed <p> on the next sibling <p>', () => {
+      expect(htmlToMarkdown('<p>A<p>B</p>')).toBe('A\n\nB');
+   });
+
+   it('implicitly closes an unclosed <li> on the next sibling <li>', () => {
+      expect(htmlToMarkdown('<ul><li>One<li>Two</ul>')).toBe('* One\n\n* Two');
+   });
+
+   it('implicitly closes unclosed <td> cells and <tr> rows into a two-row pipe table', () => {
+      const html = '<table><tr><td>a<td>b<tr><td>c<td>d</table>';
+      expect(htmlToMarkdown(html)).toBe('|  |  |\n| --- | --- |\n| a | b |\n| c | d |');
+   });
+
+   it('closes a nested list before resuming the outer list on the next sibling <li>', () => {
+      const html = '<ul><li>One<ul><li>Nested</ul><li>Two</ul>';
+      expect(htmlToMarkdown(html)).toBe('* One\n  * Nested\n\n* Two');
    });
 });

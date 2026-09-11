@@ -32,6 +32,18 @@ const BLOCK_TAGS = new Set(['p', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'hr', 'bloc
 const INLINE_TAGS = new Set(['strong', 'b', 'em', 'i', 's', 'del', 'strike', 'u', 'code', 'a', 'br', 'img']);
 
 /**
+ * Tags whose start tag implicitly closes an open ancestor `<p>`, per the HTML5 "optional tags"
+ * rules (WHATWG 13.1.2, "An end tag whose tag name is p implied"). The search for the ancestor
+ * `<p>` to close runs to the document root rather than stopping at scope-boundary elements
+ * (e.g. a table cell); this is a deliberate simplification, not a spec-complete implementation.
+ * @type {Set<string>}
+ */
+const P_CLOSING_TAGS = new Set([
+   'p', 'ul', 'ol', 'li', 'table', 'blockquote', 'pre',
+   'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'hr', 'div', 'section',
+]);
+
+/**
  * Matches a single HTML entity reference: a named entity, a decimal numeric reference, or a
  * hexadecimal numeric reference.
  * @type {RegExp}
@@ -109,8 +121,81 @@ function parseAttrs(attrString) {
 }
 
 /**
- * Parses an HTML fragment into a node tree. Unclosed or mismatched tags are handled best-effort
- * (a closing tag pops the stack up to its matching opener, or is ignored if none is open).
+ * Closes (pops) the nearest open ancestor with tag `target`, and everything open above it, from
+ * the stack. Searches the full stack from the top down to (but not including) the root; a no-op
+ * if no ancestor with that tag is currently open.
+ * @param {object[]} stack - The current open-element stack (root-first).
+ * @param {string} target - The tag name to close.
+ * @returns {void}
+ */
+function closeAncestor(stack, target) {
+   for (let i = stack.length - 1; i > 0; i--) {
+      if (stack[i].tag === target) {
+         stack.length = i;
+         return;
+      }
+   }
+}
+
+/**
+ * Closes the nearest open element whose tag is in `targets`, and everything open above it, from
+ * the stack -- used for the HTML5 sibling-implicit-close rules (e.g. a new `<li>` closes an open
+ * sibling `<li>`, and a new `<tr>` closes both a dangling open `<td>`/`<th>` cell and the previous
+ * `<tr>`). The search stops (closing nothing) if it reaches a tag in `boundaries` before finding a
+ * match, so a sibling in an enclosing list/table section is never closed by mistake.
+ * @param {object[]} stack - The current open-element stack (root-first).
+ * @param {string[]} targets - The tag names that count as a closable sibling.
+ * @param {string[]} boundaries - The tag names that stop the search without closing anything.
+ * @returns {void}
+ */
+function closeSibling(stack, targets, boundaries) {
+   for (let i = stack.length - 1; i > 0; i--) {
+      if (targets.includes(stack[i].tag)) {
+         stack.length = i;
+         return;
+      }
+
+      if (boundaries.includes(stack[i].tag)) {
+         return;
+      }
+   }
+}
+
+/**
+ * Applies the HTML5 implicit-end-tag rules for the tag about to be opened, closing whichever
+ * currently-open elements that tag's start implicitly ends. Covers: any {@link P_CLOSING_TAGS}
+ * member closing an open `<p>`; `<li>` closing a sibling `<li>`; `<td>`/`<th>` closing a sibling
+ * `<td>`/`<th>`; `<tr>` closing a dangling cell and a sibling `<tr>`; `<dt>`/`<dd>` closing a
+ * sibling `<dt>`/`<dd>`.
+ * @param {object[]} stack - The current open-element stack (root-first), mutated in place.
+ * @param {string} tag - The lower-cased tag name about to be opened.
+ * @returns {void}
+ */
+function closeImplicit(stack, tag) {
+   if (P_CLOSING_TAGS.has(tag)) {
+      closeAncestor(stack, 'p');
+   }
+
+   if (tag === 'li') {
+      closeSibling(stack, ['li'], ['ul', 'ol']);
+   }
+   else if (tag === 'td' || tag === 'th') {
+      closeSibling(stack, ['td', 'th'], ['tr', 'table', 'thead', 'tbody', 'tfoot']);
+   }
+   else if (tag === 'tr') {
+      closeSibling(stack, ['tr'], ['table', 'thead', 'tbody', 'tfoot']);
+   }
+   else if (tag === 'dt' || tag === 'dd') {
+      closeSibling(stack, ['dt', 'dd'], ['dl']);
+   }
+}
+
+/**
+ * Parses an HTML fragment into a node tree. Unclosed or mismatched tags are handled best-effort:
+ * an explicit closing tag pops the stack up to its matching opener (or is ignored if none is
+ * open), and an opening tag first applies the HTML5 implicit-end-tag rules (see
+ * {@link closeImplicit}) so that e.g. an unclosed `<p>`/`<li>`/`<td>`/`<tr>` is closed by the next
+ * sibling start tag rather than becoming its child.
  * @param {string} html - The HTML fragment to parse.
  * @returns {{type: 'element', tag: 'root', attrs: object, children: object[]}} The synthetic root node.
  */
@@ -156,6 +241,8 @@ function parseHtml(html) {
 
       /** @type {string} The lower-cased opening tag name. */
       const tag = match[2].toLowerCase();
+      closeImplicit(stack, tag);
+
       /** @type {boolean} Whether this tag has no children (void element or self-closing syntax). */
       const selfClosing = match[4] === '/' || VOID_ELEMENTS.has(tag);
       /** @type {object} The newly opened element node. */
@@ -225,6 +312,8 @@ function renderTextNode(rawText, ctx) {
    ENRICHER_RE.lastIndex = 0;
    let match;
    while ((match = ENRICHER_RE.exec(collapsed)) !== null) {
+      // Known limitation: escapeSegment treats each enricher-delimited segment as if it started
+      // the line, so the leading-hash/leading-dash-digit rules can misfire right after an enricher.
       out += escapeSegment(collapsed.slice(lastIndex, match.index), ctx);
       lastIndex = ENRICHER_RE.lastIndex;
 
@@ -241,6 +330,8 @@ function renderTextNode(rawText, ctx) {
       out += `*${escapeSegment(displayText, ctx)}*`;
    }
 
+   // Same per-segment limitation as above: this final segment is only the true line start when no
+   // enricher matched at all.
    out += escapeSegment(collapsed.slice(lastIndex), ctx);
    return out;
 }
@@ -293,7 +384,7 @@ function renderInline(nodes, ctx) {
             break;
 
          case 'img':
-            out += escapeSegment(node.attrs.alt ?? '', ctx);
+            out += escapeSegment(decodeEntities(node.attrs.alt ?? ''), ctx);
             break;
 
          default:
