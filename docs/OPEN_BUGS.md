@@ -2,27 +2,7 @@
 
 Deferred/known bugs. Todos (planned work) live in `docs/TODO.md`; this file is bugs only.
 
-### 1. Dynamic-import-pattern unit tests intermittently time out under the full unit suite's parallel worker pool
-
-- **What:** Any test file using this codebase's `vi.mock(...svelte shell...)` + per-test dynamic
-  `await import(...)` pattern can time out (5000ms, the import never resolves in time) when the full
-  `tests/unit` suite runs under Vitest's default parallel worker pool, while passing reliably
-  standalone or in small groups. Confirmed affecting `tests/unit/spreadsheet/ui/ExportDialog.test.js`,
-  `ImportDialog.test.js`, and `tests/unit/hooks/OnGetCompendiumContextOptions.test.js` — i.e. not
-  confined to the two dialog tests, but to the shared import pattern itself.
-- **Severity:** Low. Reproduces intermittently under full-suite parallel load only; every affected
-  test passes reliably in isolation and in every targeted run, so it doesn't indicate an actual
-  defect in the code under test.
-- **Found:** 2026-09-10, during the compendium-spreadsheet Task 15 review (`ExportDialog.test.js`,
-  reproduced twice consistently, confirmed pre-existing and unrelated to Task 15's new dialog by
-  reproducing the same timeout with `ImportDialog.test.js` removed from the tree entirely); the same
-  symptom recurred on the identical pattern during Task 16's review (`OnGetCompendiumContextOptions.test.js`).
-- **Fix direction:** Not yet diagnosed. Suspect worker-pool contention delaying the dynamic
-  `import()`'s cold Vite transform beyond the default per-test timeout under full-suite parallel
-  load; a per-file `testTimeout` override or moving these dynamic imports to a shared `beforeAll` are
-  candidate mitigations, not yet tried.
-
-### 2. Foundry server drops mid-run under the full throttled e2e suite, cascading into unrelated failures
+### 1. Foundry server drops mid-run under the full throttled e2e suite, cascading into unrelated failures
 
 - **What:** During a full `npm run test:e2e` (throttled) run, the server stopped answering
   `http://localhost:30000/join` (`net::ERR_CONNECTION_REFUSED`) partway through, failing 10 tests and
@@ -42,3 +22,26 @@ Deferred/known bugs. Todos (planned work) live in `docs/TODO.md`; this file is b
   run and correlate its death timestamp against the slow-operation log and system resource counters
   (matching the existing `pack-lock-and-server-restart` diagnostic approach) before assuming a specific
   cause.
+
+### 2. Full unit-suite runs time out under heavy concurrent machine load, unrelated to the tests themselves
+
+- **What:** Four consecutive `npx vitest run` (whole-suite) attempts during Task 1's verification
+  (`docs/superpowers/plans/2026-09-10-spreadsheet-backlog-closeout.md`) showed run duration climbing
+  run-over-run (48s → 89s → 99s → 100s, `transform` worker-time climbing from 375s to ~1300s
+  cumulative) and a growing, inconsistent set of `beforeAll` hook timeouts (60000ms) in the schema
+  golden-master suites (`ItemDataModelSchemaEquivalence.test.js`, `ReportChatMessageSchemaEquivalence.test.js`,
+  others varying run to run) plus one unrelated timeout in `SuperviseServer.test.js`
+  (`getAncestors starts with the real parent process`, a 5000ms process-inspection test with no
+  dynamic import). `tasklist` showed 5-6 `node.exe` processes already running before any of these
+  vitest invocations, with a new one appearing between runs, indicating concurrent external activity
+  on the machine rather than a defect in these tests: the same 4 files targeted by CLOSED_BUGS #42's
+  fix passed 3/3 (13/13 tests) even under this same load, in isolation, with only their own duration
+  rising (5s → 19s → 24s).
+- **Severity:** Low. Not reproduced against an idle machine; the affected suites already carry the
+  deliberate 60s `hookTimeout` headroom documented in `vitest.config.mjs`, and no test content changed.
+- **Found:** 2026-09-10, during Task 1 of the spreadsheet-backlog-closeout plan, while attempting the
+  plan's required "three clean full-suite runs" verification for CLOSED_BUGS #42.
+- **Fix direction:** Not yet diagnosed. Identify what else was running concurrently (`tasklist`
+  correlation, matching the `pack-lock-and-server-restart` and e2e-server-drop (#1) diagnostic
+  approach) before assuming a specific cause; re-run the full suite on an otherwise-idle machine to
+  confirm it is clean baseline behavior.

@@ -1,5 +1,30 @@
+import { forceStringCell, lookupFieldSchema } from '~/spreadsheet/codec/DecodeCell.js';
 import { flattenDocument } from '~/spreadsheet/codec/FlattenDocument.js';
-import { FIXED_COLUMNS, normalizePath } from '~/spreadsheet/codec/Workbook.js';
+import { FIXED_COLUMNS, normalizePath, uniqueSheetNames } from '~/spreadsheet/codec/Workbook.js';
+
+/**
+ * Protects untyped-bag string values (rules elements, traits, `flags.*`, any array-of-objects field) so
+ * they survive `decodeLiteral`'s literal rules on the next import: applies `forceStringCell` to every
+ * string value whose column is neither a fixed column nor a schema-typed field. Mutates `flatRows` in
+ * place; shared by both layouts since relational child sheets are also built from these same flat rows.
+ * @param {Array<Object<string,*>>} flatRows - One flat row map per document (fixed columns included).
+ * @param {{fieldTypes: object, fieldOrder: string[]}} [typeSchema] - The type's resolved schema info.
+ * @returns {void}
+ */
+function forceUntypedStringCells(flatRows, typeSchema) {
+   /** @type {Object<string, {type:string,nullable:boolean}>} */
+   const fieldTypes = typeSchema?.fieldTypes ?? {};
+   for (const row of flatRows) {
+      for (const path of Object.keys(row)) {
+         if (FIXED_COLUMNS.includes(path) || typeof row[path] !== 'string') {
+            continue;
+         }
+         if (lookupFieldSchema(fieldTypes, path) === undefined) {
+            row[path] = forceStringCell(row[path]);
+         }
+      }
+   }
+}
 
 /**
  * @typedef {object} DocumentEnvelope
@@ -41,6 +66,9 @@ export function orderColumns(paths, fieldOrder) {
  * has. Returned outermost-first (fewest segments) so parent arrays are laid out before nested ones.
  * @param {string[]} paths - Discovered concrete dotted paths (fixed columns already excluded).
  * @returns {string[]} Distinct array paths, e.g. ["system.attack", "system.attack.trait"].
+ * @throws {Error} When a path has two consecutive numeric segments: a primitive array nested directly
+ *    inside a primitive array has no field-name prefix to name its own array path/child sheet, so the
+ *    relational layout cannot represent it.
  */
 export function detectArrayPaths(paths) {
    /** @type {Set<string>} */
@@ -48,13 +76,23 @@ export function detectArrayPaths(paths) {
    for (const path of paths) {
       /** @type {string[]} Field-name segments accumulated so far (indices are never pushed here). */
       let prefix = [];
+      /** @type {boolean} Whether the segment immediately preceding the current one is a numeric index. */
+      let priorSegmentIsNumeric = false;
       for (const segment of path.split('.')) {
-         if (/^\d+$/.test(segment)) {
+         /** @type {boolean} Whether this segment is a numeric array index. */
+         const isNumeric = /^\d+$/.test(segment);
+         if (isNumeric && priorSegmentIsNumeric) {
+            throw new Error(
+               `Unsupported field shape: a primitive array nested directly inside a primitive array at "${path}"`,
+            );
+         }
+         if (isNumeric) {
             arrayPaths.add(prefix.join('.'));
          }
          else {
             prefix = [...prefix, segment];
          }
+         priorSegmentIsNumeric = isNumeric;
       }
    }
    return [...arrayPaths].sort((a, b) => a.split('.').length - b.split('.').length);
@@ -186,6 +224,9 @@ function isUnderAnyArrayPath(path, matchers) {
  * @param {string[]} allArrayPaths - Every array path detected for the document type.
  * @param {Array<Object<string,*>>} flatRows - Every document's full flat row map (`_id` included).
  * @returns {{sheet: import('~/spreadsheet/codec/Workbook.js').Sheet, arrayPath: string}} The child sheet.
+ * @throws {Error} When an array element's own sub-field is literally named "_id" or "_index": the child
+ *    sheet's row-spread (`{ _id: id, _index: index, ...fields }`) would let that sub-field silently
+ *    overwrite the owning document's id/index column.
  */
 function buildChildSheet(documentType, arrayPath, allArrayPaths, flatRows) {
    /** @type {(path:string) => {index:string,subField:string}|null} */
@@ -205,6 +246,9 @@ function buildChildSheet(documentType, arrayPath, allArrayPaths, flatRows) {
          const match = matcher(path);
          if (!match) {
             continue;
+         }
+         if (match.subField === '_id' || match.subField === '_index') {
+            throw new Error(`Reserved column name "${match.subField}" used by a field under "${arrayPath}"`);
          }
          subFields.add(match.subField);
          if (!elements.has(match.index)) {
@@ -310,6 +354,7 @@ export function buildTables(envelopes, layout, packType, typeSchemas) {
       }));
       /** @type {{fieldTypes:object,fieldOrder:string[]}|undefined} */
       const typeSchema = typeSchemas[documentType];
+      forceUntypedStringCells(flatRows, typeSchema);
 
       if (layout === 'wide') {
          sheets.push(buildWideSheet(documentType, flatRows, typeSchema));
@@ -326,6 +371,16 @@ export function buildTables(envelopes, layout, packType, typeSchemas) {
          }
       }
    }
+
+   // Truncates/de-duplicates every data sheet's name to Excel's 31-character limit ONCE, here, before the
+   // manifest is built, so the manifest's recorded sheet names and the sheets' own final names always
+   // agree in both formats; encodeXlsx's own call is then a no-op on these already-final names.
+   /** @type {string[]} Final sheet names, in the same order as `sheets`/`manifestEntries`. */
+   const finalNames = uniqueSheetNames(sheets.map((sheet) => sheet.name));
+   sheets.forEach((sheet, i) => {
+      sheet.name = finalNames[i];
+      manifestEntries[i].sheet = finalNames[i];
+   });
 
    return { sheets: [buildManifestSheet(layout, packType, manifestEntries), ...sheets] };
 }

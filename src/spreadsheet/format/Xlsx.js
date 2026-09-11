@@ -1,4 +1,10 @@
 import { zipFiles, unzipFilesAsText } from '~/spreadsheet/format/Zip.js';
+import { uniqueSheetNames } from '~/spreadsheet/codec/Workbook.js';
+
+// Re-exported for callers that historically imported the truncation/de-duplication helper from this
+// format module; the canonical implementation now lives in the codec so `buildTables` can apply it once
+// at the Workbook level before either format's encoder runs.
+export { uniqueSheetNames };
 
 /**
  * Escapes text for safe inclusion as XML element content or as a double-quoted attribute value.
@@ -96,32 +102,6 @@ function buildSheetXml(sheet) {
    return '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>'
       + '<worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">'
       + `<sheetData>${rowsXml.join('')}</sheetData></worksheet>`;
-}
-
-/**
- * Truncates and de-duplicates sheet names to Excel's 31-character limit, stripping the characters
- * Excel forbids in a sheet name (`[ ] : * ? / \`).
- * @param {string[]} names - The desired sheet names, in order.
- * @returns {string[]} The final sheet names, unique and each 31 characters or fewer.
- */
-export function uniqueSheetNames(names) {
-   /** @type {Set<string>} Names already assigned, to detect and resolve collisions. */
-   const used = new Set();
-   return names.map((rawName) => {
-      /** @type {string} The name with forbidden characters stripped. */
-      const cleaned = rawName.replace(/[[\]:*?/\\]/g, '');
-      /** @type {string} The candidate name, truncated and made unique below. */
-      let candidate = cleaned.slice(0, 31);
-      /** @type {number} The collision count seen so far for this candidate. */
-      let suffix = 1;
-      while (used.has(candidate)) {
-         /** @type {string} The numeric collision-breaking suffix, e.g. "~2". */
-         const tag = `~${(suffix += 1)}`;
-         candidate = `${cleaned.slice(0, 31 - tag.length)}${tag}`;
-      }
-      used.add(candidate);
-      return candidate;
-   });
 }
 
 /**

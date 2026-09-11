@@ -2,8 +2,9 @@ import { decodeXlsx } from '~/spreadsheet/format/Xlsx.js';
 import { decodeCsv } from '~/spreadsheet/format/Csv.js';
 import { unzipFilesAsText } from '~/spreadsheet/format/Zip.js';
 import { readTables } from '~/spreadsheet/codec/ReadTables.js';
-import { resolveTypeSchemas } from '~/spreadsheet/io/ResolveTypeSchemas.js';
+import { resolveTypeSchemasForPack } from '~/spreadsheet/io/ResolveTypeSchemas.js';
 import { resolveDocumentNameAtDepth } from '~/spreadsheet/io/DocumentNameAtDepth.js';
+import { buildPackEmbeddedIndex } from '~/spreadsheet/io/EmbeddedPackIndex.js';
 
 /**
  * @typedef {object} PlanEntry
@@ -92,12 +93,18 @@ function remapId(envelope, idRemap) {
 /**
  * Computes an envelope's nesting depth (0 = top-level pack document, 1 = its embedded item or direct
  * effect, 2 = an effect on an embedded item), following `parentId` links through the id -> envelope map.
+ * An envelope whose real parent was resolved from the target pack itself (a blank-parentId row that
+ * turned out to already exist embedded in the pack) carries an explicit `depthOverride`, since its parent
+ * chain does not exist in the uploaded file for `byId` to walk.
  * @param {import('~/spreadsheet/codec/BuildTables.js').DocumentEnvelope} envelope - The envelope.
  * @param {Map<string, import('~/spreadsheet/codec/BuildTables.js').DocumentEnvelope>} byId - Every
  *    envelope keyed by its (already-remapped) id.
  * @returns {number} The nesting depth.
  */
 function depthOf(envelope, byId) {
+   if (envelope.depthOverride !== undefined) {
+      return envelope.depthOverride;
+   }
    /** @type {number} */
    let depth = 0;
    /** @type {import('~/spreadsheet/codec/BuildTables.js').DocumentEnvelope} */
@@ -226,8 +233,8 @@ export async function planImport(files, targetPack, deleteMissing) {
 
    /** @type {string} The pack type driving schema resolution and document construction. */
    const resolvedPackType = packType || targetPack.metadata.type;
-   /** @type {object} Per-subtype schema info, used for validation and typed decode. */
-   const typeSchemas = resolveTypeSchemas(resolvedPackType);
+   /** @type {object} Per-subtype schema info (own type plus everything it can embed), for typed decode. */
+   const typeSchemas = resolveTypeSchemasForPack(resolvedPackType);
 
    /** @type {{layout:string, packType:string, envelopes: Array<object>}} */
    let readResult;
@@ -260,6 +267,34 @@ export async function planImport(files, targetPack, deleteMissing) {
    /** @type {Map<string, object>} Envelope by its final id, for depth resolution. */
    const byId = new Map(envelopes.map((e) => [e.source._id, e]));
 
+   /** @type {ExistingLookupContext} Shared across every row so each parent is fetched at most once. */
+   const lookupContext = { byId, targetPack, packType: resolvedPackType, cache: new Map() };
+
+   // The target pack's embedded-document index, built at most once and only when a row actually needs it.
+   /** @type {Promise<Map<string, {document:object, parentId:string, depth:number}>>|null} */
+   let packEmbeddedIndexPromise = null;
+   if (targetPack) {
+      for (const envelope of envelopes) {
+         if (envelope.parentId) {
+            continue;
+         }
+         // A blank/absent parentId means the file itself claims this row is top-level; confirm that
+         // against the target pack before trusting it, since the row may actually be an existing
+         // embedded document whose owning sheet was left out of this upload.
+         const existing = await resolveExistingDocument(envelope.source._id, lookupContext);
+         if (existing) {
+            continue;
+         }
+         packEmbeddedIndexPromise ??= buildPackEmbeddedIndex(targetPack);
+         const location = (await packEmbeddedIndexPromise).get(envelope.source._id);
+         if (location) {
+            envelope.parentId = location.parentId;
+            envelope.depthOverride = location.depth;
+            lookupContext.cache.set(envelope.source._id, Promise.resolve(location.document));
+         }
+      }
+   }
+
    /** @type {ImportPlan} */
    const plan = { creates: [], updates: [], deletes: [], folders: [], errors: [], packType: resolvedPackType };
    /** @type {Set<string>} Folder paths already queued. */
@@ -269,9 +304,6 @@ export async function planImport(files, targetPack, deleteMissing) {
 
    /** @type {Array<object>} Parents before children. */
    const ordered = [...envelopes].sort((a, b) => depthOf(a, byId) - depthOf(b, byId));
-
-   /** @type {ExistingLookupContext} Shared across every row so each parent is fetched at most once. */
-   const lookupContext = { byId, targetPack, packType: resolvedPackType, cache: new Map() };
 
    for (const envelope of ordered) {
       /** @type {string} */

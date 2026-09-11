@@ -134,4 +134,49 @@ describe('readTables — relational layout', () => {
       const relationalBlank = relationalResult.envelopes.find((e) => e.source._id === 'b'.repeat(16));
       expect(relationalBlank.source.system.attack[0].label).toBe('');
    });
+
+   it('rejects two blank-_id rows on a document sheet that has a relational child sheet', () => {
+      const envelopes = [
+         { documentType: 'weapon', source: { _id: '', system: { rulesElement: [{ name: 'code', value: 'a' }] } } },
+         { documentType: 'weapon', source: { _id: '', system: { rulesElement: [{ name: 'code', value: 'b' }] } } },
+      ];
+      const workbook = buildTables(envelopes, 'relational', 'Item', NO_SCHEMA);
+      expect(() => readTables(workbook, NO_SCHEMA)).toThrow(
+         'weapon: rows 2 and 3 both have a blank _id; give each new document a file-local key ' +
+         '(e.g. "new-goblin") so its relational rows can be matched',
+      );
+   });
+
+   it('still imports two blank-_id rows in wide layout (no relational child sheets to collide)', () => {
+      const envelopes = [
+         { documentType: 'weapon', source: { _id: '', system: { rulesElement: [{ name: 'code', value: 'a' }] } } },
+         { documentType: 'weapon', source: { _id: '', system: { rulesElement: [{ name: 'code', value: 'b' }] } } },
+      ];
+      const workbook = buildTables(envelopes, 'wide', 'Item', NO_SCHEMA);
+      const result = readTables(workbook, NO_SCHEMA);
+      expect(result.envelopes).toHaveLength(2);
+   });
+
+   it('still imports two blank-_id rows in relational layout for a document type with no child sheets', () => {
+      const envelopes = [
+         { documentType: 'weapon', source: { _id: '', system: { rarity: 'common' } } },
+         { documentType: 'weapon', source: { _id: '', system: { rarity: 'rare' } } },
+      ];
+      const workbook = buildTables(envelopes, 'relational', 'Item', NO_SCHEMA);
+      const result = readTables(workbook, NO_SCHEMA);
+      expect(result.envelopes).toHaveLength(2);
+   });
+
+   it('still imports a single blank-_id row in relational layout', () => {
+      const envelopes = [
+         {
+            documentType: 'weapon',
+            source: { _id: '', system: { rulesElement: [{ name: 'code', value: 'a' }] } },
+         },
+      ];
+      const workbook = buildTables(envelopes, 'relational', 'Item', NO_SCHEMA);
+      const result = readTables(workbook, NO_SCHEMA);
+      expect(result.envelopes).toHaveLength(1);
+      expect(result.envelopes[0].source.system.rulesElement[0].value).toBe('a');
+   });
 });

@@ -1,4 +1,7 @@
 import { describe, it, expect, beforeAll, afterAll } from 'vitest';
+import fs from 'node:fs';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 
 /** Minimal stand-in for a Foundry DataField, matching real DataField's own instance-property copying. */
 class MockField {
@@ -49,6 +52,8 @@ class MockSchemaField extends MockField {
 let resolveFieldSchema;
 /** @type {Function} */
 let resolveTypeSchemas;
+/** @type {Function} */
+let resolveTypeSchemasForPack;
 
 beforeAll(async () => {
    globalThis.foundry.data = {
@@ -61,7 +66,8 @@ beforeAll(async () => {
          SchemaField: MockSchemaField,
       },
    };
-   ({ resolveFieldSchema, resolveTypeSchemas } = await import('~/spreadsheet/io/ResolveTypeSchemas.js'));
+   ({ resolveFieldSchema, resolveTypeSchemas, resolveTypeSchemasForPack } =
+      await import('~/spreadsheet/io/ResolveTypeSchemas.js'));
 });
 
 afterAll(() => {
@@ -161,5 +167,70 @@ describe('resolveTypeSchemas', () => {
       };
       const result = resolveTypeSchemas('Actor');
       expect(result.player.fieldTypes['prototypeToken.actorLink']).toEqual({ type: 'boolean', nullable: false });
+   });
+});
+
+describe('resolveTypeSchemasForPack', () => {
+   /**
+    * Stand-in DataModel exposing a static schema with one string-typed field named after the class.
+    * @param {string} fieldName - The field's dotted path key under "system".
+    * @returns {Function} The stand-in DataModel class.
+    */
+   function makeDataModel(fieldName) {
+      return class {
+         static get schema() {
+            return new MockSchemaField({ [fieldName]: new MockStringField({ nullable: false }) });
+         }
+      };
+   }
+
+   beforeAll(() => {
+      globalThis.CONFIG = {
+         Actor: {
+            dataModels: { npc: makeDataModel('npcField') },
+            documentClass: { schema: new MockSchemaField({}) },
+         },
+         Item: {
+            dataModels: { weapon: makeDataModel('weaponField') },
+            documentClass: { schema: new MockSchemaField({}) },
+         },
+         ActiveEffect: {
+            dataModels: { effect: makeDataModel('effectField') },
+            documentClass: { schema: new MockSchemaField({}) },
+         },
+      };
+   });
+
+   it('merges Actor, Item, and ActiveEffect subtype schemas for an Actor pack', () => {
+      const result = resolveTypeSchemasForPack('Actor');
+      expect(Object.keys(result).sort()).toEqual(['effect', 'npc', 'weapon']);
+      expect(result.weapon.fieldTypes).toEqual({ 'system.weaponField': { type: 'string', nullable: false } });
+      expect(result.effect.fieldTypes).toEqual({ 'system.effectField': { type: 'string', nullable: false } });
+   });
+
+   it('merges Item and ActiveEffect subtype schemas for an Item pack, excluding Actor subtypes', () => {
+      const result = resolveTypeSchemasForPack('Item');
+      expect(Object.keys(result).sort()).toEqual(['effect', 'weapon']);
+   });
+
+   it('resolves only ActiveEffect subtype schemas for an ActiveEffect pack', () => {
+      const result = resolveTypeSchemasForPack('ActiveEffect');
+      expect(Object.keys(result)).toEqual(['effect']);
+   });
+
+   it('never sees a subtype name collide across Actor, Item, and ActiveEffect in the real system.json', () => {
+      /** @type {string} The absolute path to the checked-in system manifest. */
+      const here = path.dirname(fileURLToPath(import.meta.url));
+      /** @type {object} The shipped manifest's declared document subtypes, read from disk. */
+      const { documentTypes } = JSON.parse(fs.readFileSync(path.resolve(here, '../../../../system.json'), 'utf8'));
+      /** @type {string[]} Actor subtype names. */
+      const actorTypes = Object.keys(documentTypes.Actor);
+      /** @type {string[]} Item subtype names. */
+      const itemTypes = Object.keys(documentTypes.Item);
+      /** @type {string[]} ActiveEffect subtype names. */
+      const effectTypes = Object.keys(documentTypes.ActiveEffect);
+      /** @type {Set<string>} */
+      const merged = new Set([...actorTypes, ...itemTypes, ...effectTypes]);
+      expect(merged.size).toBe(actorTypes.length + itemTypes.length + effectTypes.length);
    });
 });

@@ -576,6 +576,16 @@ static `actions` map. To refresh a dynamic control's icon/label after a state ch
 golden-master suites' `beforeAll` dynamic imports are transform-heavy (Svelte compiles) and exceed the 10 s
 default under full parallelism. Tests live in `tests/unit/**/*.test.js`; there is NO test code under `src/`.
 
+**No dynamic `import()` inside a test body** — a module imported with `await import(...)` inside an
+`it(...)`/`test(...)` body pays a cold Vite transform under that test's own timeout, which can exceed it
+under full-suite parallel load. The established pattern is a static import plus a `vi.hoisted(() => {...})`
+block: Vitest hoists `vi.hoisted` (and `vi.mock`) above the static imports, so it runs before the imported
+module evaluates and can seed the module-evaluation-time Foundry globals the import reads (e.g.
+`foundry.applications.api.ApplicationV2`, `game.i18n`) — see `tests/unit/spreadsheet/ui/ExportDialog.test.js`.
+Per-test mutation of those globals (e.g. toggling `game.user.isGM`) still belongs in `beforeEach`/the test
+body, not in `vi.hoisted`. `beforeAll`-scoped dynamic imports (covered by the 60 s `hookTimeout`, mainly the
+schema golden-master suites) are the one place this pattern does not apply.
+
 **Foundry globals mock** — `tests/setup.js` (loaded as Vitest `setupFiles`) installs:
 - `globalThis.foundry = { abstract: { Document: MockDocument }, utils: { mergeObject } }` — a minimal
   `foundry.abstract.Document` stub (for `instanceof` checks) and a recursive `mergeObject` plain-object
@@ -928,6 +938,72 @@ wide-layout document sheet named after its type" when no manifest is present. CS
 untyped bag (rules elements, traits, `flags.*`) auto-detect booleans/numbers/null; wrap a cell in
 literal double quotes (e.g. `"5"`) to force a literal string. See
 `docs/superpowers/specs/2026-09-10-compendium-spreadsheet-design.md` for the full design.
+
+**Schema resolution merges embedded types** — `ResolveTypeSchemas.js`'s `resolveTypeSchemasForPack(packType)`
+returns the flat subtype -> schema-info map for a pack's ENTIRE embedded graph, not just its own document
+type: an Actor pack merges `Actor` + `Item` + `ActiveEffect` subtypes (owned items and their effects appear
+in export/import rows too), an Item pack merges `Item` + `ActiveEffect`, and an ActiveEffect pack is just
+`ActiveEffect`. Safe because `system.json`'s `documentTypes` never reuses a subtype name across those three
+document types, so `readTables`/`buildTables`/`planImport` can key the merged map by subtype name alone.
+`exportCompendium` and `planImport` both call it (not the single-type `resolveTypeSchemas`).
+
+**Sheet names are truncated once, at the Workbook level** — `uniqueSheetNames` (in
+`src/spreadsheet/codec/Workbook.js`, not `Xlsx.js`) strips Excel-forbidden characters (`[ ] : * ? / \`) and
+truncates/de-duplicates names to Excel's 31-character limit. `buildTables` applies it to the data-sheet
+names BEFORE writing the `_manifest` sheet, so the manifest's recorded `sheet` values and the actual
+`Sheet.name`s are always the same final names in both XLSX and CSV. `encodeXlsx` still calls it too, which
+is a no-op on already-final names but protects a hand-built Workbook that skipped `buildTables`.
+
+**`forceStringCell` protects number/boolean-looking strings in untyped bags** — `DecodeCell.js` exports
+`forceStringCell(text)`: wraps `text` in double quotes (the same convention `decodeLiteral` unwraps) whenever
+`decodeLiteral(text)` would not hand back the identical string (numbers, `true`/`false`/`null`, and
+already-quoted text all fail that check); an empty string is left unchanged (never quoted) since
+`decodeCell`'s untyped-bag blank rule already treats `''` as absent. `buildTables` applies it to every string
+value whose column is neither a fixed column (`FIXED_COLUMNS`) nor schema-typed
+(`lookupFieldSchema(typeSchema.fieldTypes, path) === undefined`), in both wide cells and relational
+child-sheet cells.
+
+**`FolderPath.js` owns folder-path splitting and escaping** — `resolveFolderPath`/`splitFolderPath` (moved
+out of `ApplyImport.js`, which still imports `splitFolderPath` from here) join/split a folder chain as a
+`/`-separated path of escaped names: a literal `\` is escaped to `\\` and a literal `/` to `\/` (backslashes
+escaped first, so the escape-introduced backslash is never mistaken for a literal one).  `splitFolderPath`
+parses with a single left-to-right scan honoring both escapes; `unescapeFolderName` reverses the per-segment
+escaping. The empty string is reserved for "no folder" (the pack root) and is never produced by a real,
+non-empty folder-name chain, since every escaped segment is non-empty — but `splitFolderPath('')` itself
+still returns `['']` (one empty segment), so callers must filter falsy paths before calling it, the way
+`ApplyImport.js`'s `resolveFolders` does.
+
+**Two loud guards reject unrepresentable relational shapes** — in `BuildTables.js`'s relational builder:
+`detectArrayPaths` throws when a concrete path has two consecutive numeric segments (a primitive array
+nested directly inside another primitive array has no relational representation); `buildChildSheet` throws
+when an array-of-objects sub-field is named `_id` or `_index` (both are reserved relational-layout column
+names). Neither shape exists in any current `src/document/types/**` shape template, so these guards are
+dead in shipped data and exist only to fail loudly if a future template introduces one.
+
+**Relational import rejects ambiguous blank-`_id` new documents** — `ReadTables.js`, relational layout only,
+when a document sheet with a child sheet (i.e. an array field exists for that type) has two or more rows
+with a blank `_id`: every relational child row is merged back onto its parent by raw `_id`, so two or more
+blank ids would collapse onto the same map key and cross-contaminate each other's array data. The importer
+throws instead, naming both row numbers and telling the user to give each new document a file-local key.
+Wide layout (no child sheets to merge) and a single blank-id row in relational layout both stay allowed.
+
+**`EmbeddedPackIndex.js` resolves embedded parents from the target pack** — `buildPackEmbeddedIndex(targetPack)`
+indexes every document already embedded in the pack (owned items, those items' effects, and top-level
+documents' own effects) by id, mapping to `{document, parentId, depth}` (depth 1 = an owned item or a
+top-level document's own effect; depth 2 = an effect on an owned item). Shared by `PlanImport.js` (resolves a
+row whose parent id is absent from the uploaded file but already exists in the pack — e.g. a file containing
+only a child-sheet row for an item embedded on an existing actor) and `ApplyImport.js` (resolves a row's
+actual parent document INSTANCE when that parent is itself embedded, since `pack.getDocument` only finds
+top-level documents).
+
+**Import preview invalidates on target/option change** — `ImportDialogShell.svelte` holds the last computed
+plan in `plan = $state(null)`; an `$effect` reading `targetCollection` and `deleteMissing` resets `plan` to
+`null` whenever either changes (Apply stays disabled until the user re-runs the preview against the new
+target/options), and choosing new files does the same in `onFilesChosen`.
+
+**CSV export always writes a zip** — the `_manifest` sheet is always present alongside the data sheet(s), so
+a CSV export always has 2+ sheets; `ExportCompendium.js` has no single-sheet bare-`.csv` branch, it always
+`zipFiles`s the per-sheet `.csv` files and calls `saveDataToFile` with `'application/zip'`.
 
 ## Style rules live in CLAUDE.md
 

@@ -78,3 +78,31 @@ export function resolveTypeSchemas(packType) {
    }
    return result;
 }
+
+/**
+ * Builds the merged per-document-subtype schema info for a pack export/import's ENTIRE embedded graph:
+ * an Actor pack's rows also include owned Item and ActiveEffect subtypes, and an Item pack's rows also
+ * include owned ActiveEffect subtypes. `readTables`/`buildTables` key their schema lookup by document
+ * subtype name alone (not by document class), which is safe because this system's `system.json`
+ * `documentTypes` never reuses a subtype name across Actor, Item, and ActiveEffect — so a single flat
+ * merged map has no collisions to resolve.
+ * @param {'Actor'|'Item'|'ActiveEffect'} packType - The pack's own top-level document type.
+ * @returns {Object<string, {fieldTypes: Object<string,{type:string,nullable:boolean}>, fieldOrder: string[]}>}
+ *    Map of document subtype name to its resolved schema info, covering the pack's own type and every
+ *    type it can embed.
+ */
+export function resolveTypeSchemasForPack(packType) {
+   /** @type {Array<'Actor'|'Item'|'ActiveEffect'>} Document types whose subtypes can appear in this pack. */
+   const embeddedTypes = {
+      Actor: ['Actor', 'Item', 'ActiveEffect'],
+      Item: ['Item', 'ActiveEffect'],
+      ActiveEffect: ['ActiveEffect'],
+   }[packType];
+
+   /** @type {Object<string, {fieldTypes: object, fieldOrder: string[]}>} */
+   const merged = {};
+   for (const documentType of embeddedTypes) {
+      Object.assign(merged, resolveTypeSchemas(documentType));
+   }
+   return merged;
+}

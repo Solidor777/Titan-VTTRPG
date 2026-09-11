@@ -6,6 +6,29 @@ function csvFile(name, text) {
    return { name, text: async () => text, arrayBuffer: async () => new TextEncoder().encode(text).buffer };
 }
 
+/** Minimal stand-in for SchemaField, matched via instanceof by resolveFieldSchema. */
+class MockSchemaField {
+   /**
+    * @param {object} fields - Map of sub-field name to a mock field (empty for the stand-ins below).
+    */
+   constructor(fields) {
+      /** @type {object} */
+      this.fields = fields;
+   }
+}
+
+/**
+ * An empty ActiveEffect subtype DataModel stand-in: no schema fields, just a registered subtype name.
+ * @returns {Function} The stand-in DataModel class.
+ */
+function makeEmptySchemaDataModel() {
+   return class {
+      static get schema() {
+         return new MockSchemaField({});
+      }
+   };
+}
+
 /** @type {string} The actor row's id in the embedded-graph fixture below (depth 0). */
 const ACTOR_ID = 'a'.repeat(16);
 
@@ -45,8 +68,12 @@ function actorGraphFiles() {
 
 describe('planImport', () => {
    beforeEach(() => {
+      // resolveTypeSchemasForPack always resolves ActiveEffect too (every pack type can embed one), which
+      // walks each registered subtype's static schema via instanceof checks against these field classes.
+      globalThis.foundry.data = { fields: { SchemaField: MockSchemaField } };
       globalThis.CONFIG = {
          Item: { dataModels: {}, documentClass: class { constructor(source) { Object.assign(this, source); } } },
+         ActiveEffect: { dataModels: {}, documentClass: { schema: {} } },
       };
       // A fresh, call-unique 16-char id per invocation: some scenarios (e.g. a blank _id AND a
       // file-local key both needing a generated id in the same import) need two distinct fresh ids,
@@ -65,7 +92,12 @@ describe('planImport', () => {
          + `${'a'.repeat(16)},,,Sword,weapon,i.svg,1\r\n`;
       const files = [csvFile('_manifest.csv', manifest), csvFile('weapon.csv', weapon)];
       /** @type {object} A target pack with no existing documents. */
-      const targetPack = { metadata: { type: 'Item' }, getDocument: async () => null, getIndex: async () => [] };
+      const targetPack = {
+         metadata: { type: 'Item' },
+         getDocument: async () => null,
+         getDocuments: async () => [],
+         getIndex: async () => [],
+      };
 
       const plan = await planImport(files, targetPack, false);
 
@@ -102,7 +134,12 @@ describe('planImport', () => {
       const weapon = `﻿_id,name\r\n${'a'.repeat(16)},Sword\r\n`;
       const files = [csvFile('_manifest.csv', manifest), csvFile('weapon.csv', weapon)];
       /** @type {object} */
-      const targetPack = { metadata: { type: 'Item' }, getDocument: async () => null, getIndex: async () => [] };
+      const targetPack = {
+         metadata: { type: 'Item' },
+         getDocument: async () => null,
+         getDocuments: async () => [],
+         getIndex: async () => [],
+      };
 
       const plan = await planImport(files, targetPack, false);
 
@@ -125,7 +162,12 @@ describe('planImport', () => {
       };
       const files = [csvFile('_manifest.csv', manifest), csvFile('npc.csv', npc), csvFile('weapon.csv', weapon)];
       /** @type {object} */
-      const targetPack = { metadata: { type: 'Actor' }, getDocument: async () => null, getIndex: async () => [] };
+      const targetPack = {
+         metadata: { type: 'Actor' },
+         getDocument: async () => null,
+         getDocuments: async () => [],
+         getIndex: async () => [],
+      };
 
       const plan = await planImport(files, targetPack, false);
 
@@ -154,7 +196,7 @@ describe('planImport', () => {
          Item: { dataModels: {}, documentClass: makeDocumentClass('Item') },
          // The subtype registry is what tells an actor's own effect apart from its owned item: both are
          // depth-1 children of the actor, so depth and pack type alone cannot route them.
-         ActiveEffect: { dataModels: { effect: class {} }, documentClass: makeDocumentClass('ActiveEffect') },
+         ActiveEffect: { dataModels: { effect: makeEmptySchemaDataModel() }, documentClass: makeDocumentClass('ActiveEffect') },
       };
       const files = actorGraphFiles();
 
@@ -178,11 +220,66 @@ describe('planImport', () => {
       expect(constructed.filter((c) => c.documentName === 'Actor')).toEqual([{ documentName: 'Actor', id: ACTOR_ID }]);
    });
 
+   it('decodes an embedded row\'s typed cell via resolveTypeSchemasForPack(\'Actor\') feeding the weapon\'s '
+      + 'own Item schema into readTables', async () => {
+      /** Stand-in for StringField, matched via instanceof by resolveFieldSchema. */
+      class MockStringField {
+         constructor(options = {}) {
+            Object.assign(this, options);
+         }
+      }
+      globalThis.foundry.data = {
+         fields: {
+            StringField: MockStringField,
+            NumberField: class MockNumberField {},
+            BooleanField: class MockBooleanField {},
+            ObjectField: class MockObjectField {},
+            ArrayField: class MockArrayField {},
+            SchemaField: MockSchemaField,
+         },
+      };
+      /** Stand-in DataModel exposing the weapon subtype's schema with one string-typed field. */
+      class WeaponDataModel {
+         static get schema() {
+            return new MockSchemaField({ rarity: new MockStringField({ nullable: false }) });
+         }
+      }
+      globalThis.CONFIG.Actor = { dataModels: {}, documentClass: class {} };
+      globalThis.CONFIG.Item.dataModels = { weapon: WeaponDataModel };
+
+      /** @type {string} */
+      const manifest = '﻿key,value,documentType,arrayPath\r\nlayout,wide,,\r\npackType,Actor,,\r\n'
+         + 'sheet,npc,npc,\r\nsheet,weapon,weapon,\r\n';
+      /** @type {string} */
+      const npc = `﻿_id,_parentId,name\r\n${ACTOR_ID},,Goblin\r\n`;
+      // A string-typed "system.rarity" cell carrying a numeral-looking value as CSV text. The untyped-bag
+      // literal fallback would coerce "007" to the number 7 (dropping the leading zero); schema resolution
+      // must keep it the literal string '007' instead, which is what actually discriminates this test from
+      // the fallback path.
+      /** @type {string} */
+      const weapon = `﻿_id,_parentId,name,system.rarity\r\n${ITEM_ID},${ACTOR_ID},Dagger,007\r\n`;
+      const files = [csvFile('_manifest.csv', manifest), csvFile('npc.csv', npc), csvFile('weapon.csv', weapon)];
+      /** @type {object} A target pack with no existing documents, so the weapon row plans as a create. */
+      const targetPack = {
+         metadata: { type: 'Actor' },
+         getDocument: async () => null,
+         getDocuments: async () => [],
+         getIndex: async () => [],
+      };
+
+      const plan = await planImport(files, targetPack, false);
+
+      expect(plan.errors).toEqual([]);
+      /** @type {object} */
+      const weaponCreate = plan.creates.find((c) => c.id === ITEM_ID);
+      expect(weaponCreate.source.system.rarity).toBe('007');
+   });
+
    it('plans updates for embedded rows that already exist in the target pack, at every depth', async () => {
       globalThis.CONFIG = {
          Actor: { dataModels: {}, documentClass: class {} },
          Item: { dataModels: {}, documentClass: class {} },
-         ActiveEffect: { dataModels: { effect: class {} }, documentClass: class {} },
+         ActiveEffect: { dataModels: { effect: makeEmptySchemaDataModel() }, documentClass: class {} },
       };
       /** @type {object} The effect already on the owned item (depth 2). */
       const existingItemEffect = { updateSource: vi.fn() };
@@ -223,6 +320,64 @@ describe('planImport', () => {
       expect(existingItemEffect.updateSource).toHaveBeenCalledWith({ name: 'Sharp' }, { dryRun: true });
    });
 
+   it('resolves a child-sheet-only row against its real out-of-file parent already in the target pack',
+      async () => {
+      globalThis.CONFIG.Actor = { dataModels: {}, documentClass: class {} };
+      /** @type {string} */
+      const manifest = '﻿key,value,documentType,arrayPath\r\nlayout,wide,,\r\npackType,Actor,,\r\n'
+         + 'sheet,weapon,weapon,\r\n';
+      // No _parentId column at all: the file itself has no idea this row is embedded.
+      /** @type {string} */
+      const weapon = `﻿_id,name\r\n${ITEM_ID},Dagger\r\n`;
+      const files = [csvFile('_manifest.csv', manifest), csvFile('weapon.csv', weapon)];
+      /** @type {object} The weapon already owned by the actor in the pack, matched by id. */
+      const existingWeapon = { id: ITEM_ID, updateSource: vi.fn(), effects: [] };
+      /** @type {object} The actor already in the pack, owning the weapon above. */
+      const existingActor = { id: ACTOR_ID, items: [existingWeapon], effects: [] };
+      /** @type {object} */
+      const targetPack = {
+         metadata: { type: 'Actor' }, getDocument: async () => null, getDocuments: async () => [existingActor],
+         getIndex: async () => [],
+      };
+
+      const plan = await planImport(files, targetPack, false);
+
+      expect(plan.errors).toEqual([]);
+      expect(plan.creates).toEqual([]);
+      expect(plan.updates).toHaveLength(1);
+      expect(plan.updates[0]).toMatchObject({
+         documentName: 'Item', id: ITEM_ID, parentId: ACTOR_ID, depth: 1,
+      });
+      expect(existingWeapon.updateSource).toHaveBeenCalledWith({ name: 'Dagger' }, { dryRun: true });
+   });
+
+   it('plans a create for a child-sheet-only row whose id matches no document anywhere in the target pack',
+      async () => {
+      globalThis.CONFIG.Actor = { dataModels: {}, documentClass: class {} };
+      /** @type {string} */
+      const manifest = '﻿key,value,documentType,arrayPath\r\nlayout,wide,,\r\npackType,Actor,,\r\n'
+         + 'sheet,weapon,weapon,\r\n';
+      /** @type {string} */
+      const weapon = `﻿_id,name\r\n${ITEM_ID},Dagger\r\n`;
+      const files = [csvFile('_manifest.csv', manifest), csvFile('weapon.csv', weapon)];
+      /** @type {object} An unrelated actor already in the pack, owning an unrelated item. */
+      const unrelatedActor = { id: ACTOR_ID, items: [{ id: 'e'.repeat(16), effects: [] }], effects: [] };
+      /** @type {object} */
+      const targetPack = {
+         metadata: { type: 'Actor' }, getDocument: async () => null, getDocuments: async () => [unrelatedActor],
+         getIndex: async () => [],
+      };
+
+      const plan = await planImport(files, targetPack, false);
+
+      expect(plan.errors).toEqual([]);
+      expect(plan.updates).toEqual([]);
+      expect(plan.creates).toHaveLength(1);
+      // With no matching parent anywhere (in the file or the pack), the row falls through unchanged to the
+      // pre-existing top-level create path (depth 0, no parent) rather than being misidentified as an update.
+      expect(plan.creates[0]).toMatchObject({ id: ITEM_ID, parentId: '', depth: 0 });
+   });
+
    it('plans a delete for every top-level pack index entry absent from the file when deleteMissing is true',
       async () => {
       /** @type {string} */
@@ -235,6 +390,7 @@ describe('planImport', () => {
       const targetPack = {
          metadata: { type: 'Item' },
          getDocument: async () => null,
+         getDocuments: async () => [],
          getIndex: async () => [{ _id: 'a'.repeat(16), type: 'weapon' }, { _id: 'z'.repeat(16), type: 'weapon' }],
       };
 

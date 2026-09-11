@@ -138,6 +138,9 @@ function collectChildFlatEntries(documentType, arrayPaths, manifestEntries, shee
  * @returns {{layout:'wide'|'relational', packType:string, envelopes:
  *    Array<import('~/spreadsheet/codec/BuildTables.js').DocumentEnvelope & {sheetName:string,
  *    rowNumber:number}>}} The workbook's layout and pack type, plus one document envelope per data row.
+ * @throws {Error} When a relational-layout document sheet with a child sheet has two or more rows
+ *    sharing a blank `_id`: they would collapse onto the same map key when child-sheet rows are merged
+ *    back in, cross-contaminating each other's relational array data.
  */
 export function readTables(workbook, typeSchemas) {
    /** @type {{layout:string,packType:string,entries:Array<{sheet:string,documentType:string,arrayPath:string}>}} */
@@ -170,6 +173,28 @@ export function readTables(workbook, typeSchemas) {
 
       /** @type {string[]} */
       const arrayPaths = arrayPathsByType.get(entry.documentType) ?? [];
+
+      // Relational child-sheet rows are merged back onto their parent by raw `_id` (see
+      // collectChildFlatEntries below). Two or more brand-new rows that all leave `_id` blank collapse
+      // onto the same blank-string map key, cross-contaminating each other's relational array data - so
+      // this shape is rejected outright rather than silently merged. Wide layout has no child sheets to
+      // merge, so a blank id there is unambiguous and stays allowed; so does a single blank-id row.
+      if (manifest.layout === 'relational' && arrayPaths.length > 0) {
+         /** @type {number[]} 1-based spreadsheet row numbers of every row with a blank _id. */
+         const blankIdRows = [];
+         sheet.rows.forEach((row, rowIndex) => {
+            if (!row._id) {
+               blankIdRows.push(rowIndex + 2); // +1 for the header row, +1 to present 1-indexed.
+            }
+         });
+         if (blankIdRows.length >= 2) {
+            throw new Error(
+               `${sheet.name}: rows ${blankIdRows[0]} and ${blankIdRows[1]} both have a blank _id; give each ` +
+               'new document a file-local key (e.g. "new-goblin") so its relational rows can be matched',
+            );
+         }
+      }
+
       /** @type {{fieldTypes:object}} */
       const typeSchema = typeSchemas[entry.documentType] ?? { fieldTypes: {} };
       /** @type {Map<string, Object<string,*>>} */

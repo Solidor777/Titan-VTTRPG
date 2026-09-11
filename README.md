@@ -21,7 +21,7 @@ GMs can export any Actor, Item, or ActiveEffect compendium to a spreadsheet, edi
 Sheets, or a text editor, and import it back. Right-click a pack in the Compendium sidebar for "Export
 to spreadsheet…" and "Import spreadsheet…", or use the matching header button on the Compendium tab.
 
-**Format and layout.** Export as an `.xlsx` workbook (one sheet per document type/tab) or a folder of
+**Format and layout.** Export as an `.xlsx` workbook (one sheet per document type/tab) or a `.zip` of
 `.csv` files (one file per sheet). Choose a layout when exporting:
 
 - **Wide** — every document is one row; a repeating field (e.g. a weapon's attacks) becomes numbered
@@ -32,7 +32,9 @@ to spreadsheet…" and "Import spreadsheet…", or use the matching header butto
 **Editing cells.** Most columns hold plain text or numbers. A few free-form columns (rules elements,
 traits, and custom flags) auto-detect the value you type: `true`/`false` become booleans, plain numbers
 become numbers, and an empty cell becomes nothing. To force a value to stay text (for example, a code
-that happens to look like a number), wrap it in double quotes, e.g. `"5"`.
+that happens to look like a number), wrap it in double quotes, e.g. `"5"`. Exporting already does this
+for you: a free-form string that looks like a number, `true`/`false`, or `null` is written back out
+already wrapped in quotes, so it stays text the next time you import the file.
 
 **Importing.** Import matches rows to existing documents by their id column and updates them in place
 (new rows with no matching id are created); nothing is deleted unless you turn on the optional "delete

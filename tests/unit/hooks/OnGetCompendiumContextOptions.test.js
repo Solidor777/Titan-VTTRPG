@@ -1,11 +1,15 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 
-// ExportDialog/ImportDialog transitively import Dialog.js, which reads foundry.applications.api at
-// module-evaluation time; the dialog shells are mocked and the module is imported dynamically inside each
-// test (after beforeEach sets up the stub) rather than statically, matching ExportDialog.test.js /
-// ImportDialog.test.js.
+vi.hoisted(() => {
+   // ExportDialog/ImportDialog transitively import Dialog.js, which reads foundry.applications.api at
+   // module-evaluation time; establish the stand-in before the static import below evaluates that graph.
+   globalThis.foundry.applications = { api: { ApplicationV2: class { constructor(o) { this.options = o; } } } };
+});
+
 vi.mock('~/spreadsheet/ui/ExportDialogShell.svelte', () => ({ default: class {} }));
 vi.mock('~/spreadsheet/ui/ImportDialogShell.svelte', () => ({ default: class {} }));
+
+import onGetCompendiumContextOptions from '~/hooks/OnGetCompendiumContextOptions.js';
 
 describe('onGetCompendiumContextOptions', () => {
    beforeEach(() => {
@@ -24,8 +28,7 @@ describe('onGetCompendiumContextOptions', () => {
       delete globalThis.game;
    });
 
-   it('adds an export entry visible only for a GM on a supported pack type', async () => {
-      const { default: onGetCompendiumContextOptions } = await import('~/hooks/OnGetCompendiumContextOptions.js');
+   it('adds an export entry visible only for a GM on a supported pack type', () => {
       /** @type {object[]} */
       const options = [];
       onGetCompendiumContextOptions({}, options);
@@ -39,8 +42,7 @@ describe('onGetCompendiumContextOptions', () => {
       expect(exportEntry.visible(li)).toBe(false);
    });
 
-   it('hides the export entry for an unsupported pack type', async () => {
-      const { default: onGetCompendiumContextOptions } = await import('~/hooks/OnGetCompendiumContextOptions.js');
+   it('hides the export entry for an unsupported pack type', () => {
       globalThis.game.packs.get = () => ({ metadata: { type: 'RollTable' } });
       /** @type {object[]} */
       const options = [];
@@ -50,8 +52,7 @@ describe('onGetCompendiumContextOptions', () => {
       expect(exportEntry.visible({ dataset: { pack: 'test.weapons' } })).toBe(false);
    });
 
-   it('adds an import entry visible only for a GM on a supported pack type', async () => {
-      const { default: onGetCompendiumContextOptions } = await import('~/hooks/OnGetCompendiumContextOptions.js');
+   it('adds an import entry visible only for a GM on a supported pack type', () => {
       /** @type {object[]} */
       const options = [];
       onGetCompendiumContextOptions({}, options);
@@ -65,8 +66,7 @@ describe('onGetCompendiumContextOptions', () => {
       expect(importEntry.visible(li)).toBe(false);
    });
 
-   it('hides the import entry for an unsupported pack type', async () => {
-      const { default: onGetCompendiumContextOptions } = await import('~/hooks/OnGetCompendiumContextOptions.js');
+   it('hides the import entry for an unsupported pack type', () => {
       globalThis.game.packs.get = () => ({ metadata: { type: 'RollTable' } });
       /** @type {object[]} */
       const options = [];
