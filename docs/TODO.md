@@ -32,14 +32,6 @@ Completed items are deleted, not marked done.
   spec's literal wording, but worth knowing a CSV export of any non-empty pack is always a `.zip` file,
   not a bare `.csv`.
 
-- `ReadTables.js` merges relational child-sheet rows into their parent by raw `_id`. Two or more brand
-  new documents in the same import that all leave `_id` blank (rather than using a file-local key like
-  `"new-goblin"`) collapse onto the same blank-string map key, cross-contaminating their relational
-  array data. Using a file-local key avoids this; a purely blank-id relational-layout import of
-  multiple new documents does not. Narrow edge case (most realistic imports either update existing ids
-  or use file-local keys for new rows), but worth a guard or a documented convention against blank ids
-  in relational-layout new-document imports.
-
 - Importing only a child sheet (e.g. just `weapon.csv`, omitting the owning `npc.csv`) for an embedded
   row whose parent already exists in the target pack still fails: `PlanImport.js`'s `depthOf` treats an
   id absent from the uploaded file's own envelopes as depth 0, so the row is looked up via
