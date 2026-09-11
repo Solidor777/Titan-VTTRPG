@@ -22,7 +22,7 @@ export default () => {
       resolve: {
          conditions: [
             'import',
-            'browser'
+            'browser',
          ],
          alias,
       },
@@ -50,7 +50,7 @@ export default () => {
             // Enable socket.io from main Foundry server.
             '/socket.io': {
                target: 'ws://localhost:30000',
-               ws: true 
+               ws: true,
             },
          },
       },

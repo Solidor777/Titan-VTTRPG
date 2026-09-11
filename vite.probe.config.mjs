@@ -18,7 +18,7 @@ export default {
    resolve: {
       conditions: [
          'import',
-         'browser'
+         'browser',
       ],
       alias,
    },
