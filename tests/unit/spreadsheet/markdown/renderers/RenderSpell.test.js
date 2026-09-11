@@ -203,6 +203,31 @@ describe('renderSpell', () => {
       expect(renderSpell(document, realContext())).toContain('**Mind (Arcana) 6:1**  \n');
    });
 
+   it('escapes Markdown specials in the tradition, custom trait, and custom aspect label', () => {
+      /** @type {object} The fixture, with a tradition, custom trait, and non-scaling custom aspect. */
+      const document = {
+         name: 'Wild Rite',
+         system: makeSystem({
+            tradition: 'Two+Handed*',
+            customTrait: [{ name: 'Two+Handed*' }],
+            customAspect: [{
+               label: 'Two+Handed*',
+               scaling: false,
+               initialValue: 1,
+               cost: 1,
+               resistanceCheck: 'none',
+               isDamage: false,
+               isHealing: false,
+            }],
+         }),
+      };
+
+      /** @type {string} The rendered block. */
+      const result = renderSpell(document, realContext());
+      expect(result).toContain('**Two\\+Handed\\*:** 1  \n');
+      expect(result).toContain('**Traits:** Two\\+Handed\\*, Two\\+Handed\\*  \n');
+   });
+
    it('omits Range/Area/Enhancements/Traits lines when the spell has none of them', () => {
       /** @type {object} The fixture. */
       const document = {

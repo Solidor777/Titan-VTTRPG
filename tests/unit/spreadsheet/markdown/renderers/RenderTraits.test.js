@@ -49,4 +49,8 @@ describe('renderTraitList', () => {
       expect(renderTraitList([], [], fakeLabels)).toBe('');
       expect(renderTraitList(undefined, undefined, fakeLabels)).toBe('');
    });
+
+   it('escapes Markdown specials in a custom trait name', () => {
+      expect(renderTraitList([], [{ name: 'Two+Handed*' }], fakeLabels)).toBe('Two\\+Handed\\*');
+   });
 });

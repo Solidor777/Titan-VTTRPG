@@ -1,3 +1,5 @@
+import { escapeText } from '~/spreadsheet/markdown/MarkdownText.js';
+
 /**
  * Renders a comma-separated trait list from a standard-trait array (`{name, value}`, per
  * `AttackTraits.js`/`ArmorTraits.js`/`ShieldTraits.js`) and a custom-trait array
@@ -23,7 +25,8 @@ export function renderTraitList(standardTraits, customTraits, labels) {
    }
 
    for (const trait of customTraits ?? []) {
-      parts.push(trait.name);
+      // Custom trait names are free-form, GM-authored text, unlike the localized standard-trait labels.
+      parts.push(escapeText(trait.name));
    }
 
    return parts.join(', ');

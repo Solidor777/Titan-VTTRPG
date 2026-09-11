@@ -1,4 +1,4 @@
-import { statLine } from '~/spreadsheet/markdown/MarkdownText.js';
+import { escapeText, statLine } from '~/spreadsheet/markdown/MarkdownText.js';
 import { commonStatLines, renderItemBlock } from './RenderItemBlock.js';
 import { renderTraitList } from './RenderTraits.js';
 import { renderItemCheckLines } from './RenderItemChecks.js';
@@ -18,7 +18,9 @@ export function renderShield(document, { labels, slugFor }) {
    const statLines = [...commonStatLines(system, labels)];
 
    if (system.defense !== 0) {
-      statLines.push(statLine(labels('defenseBonus', 'Defense Bonus'), `\\+${system.defense}`));
+      /** @type {string} The defense bonus, signed (e.g. `+2` or `-2`), escaped via {@link escapeText}. */
+      const signedDefense = escapeText(system.defense > 0 ? `+${system.defense}` : `${system.defense}`);
+      statLines.push(statLine(labels('defenseBonus', 'Defense Bonus'), signedDefense));
    }
 
    /** @type {string} The shield's rendered trait list (standard then custom). */

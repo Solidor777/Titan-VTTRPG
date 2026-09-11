@@ -97,4 +97,10 @@ describe('renderItemCheckLines', () => {
       expect(renderItemCheckLines([], fakeLabels)).toEqual([]);
       expect(renderItemCheckLines(undefined, fakeLabels)).toEqual([]);
    });
+
+   it('escapes Markdown specials in the check label', () => {
+      expect(renderItemCheckLines([makeCheck({ label: 'Two+Handed*' })], fakeLabels)).toEqual([
+         '**Two\\+Handed\\*:** Body (Athletics) 4:1  ',
+      ]);
+   });
 });

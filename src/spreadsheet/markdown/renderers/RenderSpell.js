@@ -1,6 +1,6 @@
 import calculateSpellAspectCosts from '~/document/types/item/types/spell/CalculateSpellAspectCosts.js';
 import SpellAspects from '~/document/types/item/types/spell/SpellAspects.js';
-import { statLine } from '~/spreadsheet/markdown/MarkdownText.js';
+import { escapeText, statLine } from '~/spreadsheet/markdown/MarkdownText.js';
 import { commonStatLines, renderItemBlock } from './RenderItemBlock.js';
 
 /**
@@ -32,7 +32,7 @@ function formatRangeValue(initialValue, labels) {
  */
 function formatEnhancement(aspect, cost, labels, isCustom = false) {
    /** @type {string} The enhancement's display name: the unit when present, else the label. */
-   const name = isCustom ? aspect.label : labels(aspect.unit ?? aspect.label);
+   const name = isCustom ? escapeText(aspect.label) : labels(aspect.unit ?? aspect.label);
 
    /** @type {string} The initial-value prefix, omitted (with its space) when 0/blank. */
    const valuePrefix = aspect.initialValue ? `${aspect.initialValue} ` : '';
@@ -135,7 +135,8 @@ export function renderSpell(document, { labels, slugFor }) {
          enhancementParts.push(formatEnhancement(customAspect, customAspect.cost, labels, true));
       }
       else {
-         otherLines.push(statLine(customAspect.label, customAspect.initialValue));
+         // customAspect.label is free-form, GM-authored text, unlike the localized standard-aspect labels.
+         otherLines.push(statLine(escapeText(customAspect.label), customAspect.initialValue));
       }
    }
 
@@ -153,10 +154,11 @@ export function renderSpell(document, { labels, slugFor }) {
    /** @type {string[]} The Traits line's parts: the tradition (as written) first, then custom traits. */
    const traitParts = [];
    if (system.tradition) {
-      traitParts.push(system.tradition);
+      // system.tradition and customTrait.name are free-form, GM-authored text.
+      traitParts.push(escapeText(system.tradition));
    }
    for (const customTrait of system.customTrait ?? []) {
-      traitParts.push(customTrait.name);
+      traitParts.push(escapeText(customTrait.name));
    }
    if (traitParts.length > 0) {
       statLines.push(statLine(labels('traits', 'Traits'), traitParts.join(', ')));

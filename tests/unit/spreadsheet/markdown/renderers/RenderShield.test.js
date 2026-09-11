@@ -73,6 +73,18 @@ describe('renderShield', () => {
       );
    });
 
+   it('renders a negative Defense Bonus with a minus sign', () => {
+      /** @type {object} The fixture. */
+      const document = {
+         name: 'Cursed Targe',
+         system: makeSystem({ defense: -2 }),
+      };
+
+      expect(renderShield(document, realContext())).toBe(
+         '#### ***Cursed Targe*** {#cursed-targe}\n\n**Defense Bonus:** \\-2  \n---\n\n---',
+      );
+   });
+
    it('combines standard and custom traits, and renders item checks', () => {
       /** @type {object} The fixture. */
       const document = {

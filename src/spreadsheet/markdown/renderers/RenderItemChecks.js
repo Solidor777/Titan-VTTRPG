@@ -1,4 +1,4 @@
-import { statLine } from '~/spreadsheet/markdown/MarkdownText.js';
+import { escapeText, statLine } from '~/spreadsheet/markdown/MarkdownText.js';
 
 /**
  * Renders an item's `system.check` array (`ItemCheckTemplate.js` entries) as stat lines: each entry
@@ -37,6 +37,7 @@ export function renderItemCheckLines(checks, labels) {
          segments.push(`${labels('resistedBy', 'resisted by')} ${labels(check.resistanceCheck)}`);
       }
 
-      return statLine(check.label, segments.join(', '));
+      // check.label is free-form, GM-authored text, unlike the localized attribute/skill/resistance labels.
+      return statLine(escapeText(check.label), segments.join(', '));
    });
 }
