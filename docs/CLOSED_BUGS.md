@@ -531,3 +531,34 @@ when fixed.
   of this fix's scope; not attempted). All other `await import(` hits found by grepping `tests/unit`
   live inside `beforeAll` in the schema golden-master suites (covered by the deliberate 60s
   `hookTimeout`) and were left untouched per the fix's own scope.
+
+### 43. Foundry server dropped mid-run under the full throttled e2e suite (was OPEN_BUGS #1)
+
+- **What:** One full `npm run test:e2e` run (2026-09-10) saw the server stop answering `/join`
+  (`net::ERR_CONNECTION_REFUSED`) partway through, failing 10 unrelated specs at `login()` and leaving 11
+  not run (494/515). The specs themselves were never implicated.
+- **Diagnosis:** Not reproduced. Two instrumented full throttled runs (`BelowNormal`, 12/24 cores) passed
+  515/515 (8.5 min with two concurrent vitest suites saturating the CPU; 5.0 min with one), with the
+  launched server alive to the end and its log carrying no error beyond the unrelated `dnd5e` metadata
+  warning at boot; minimum available memory across both runs was 9.5 GB. The original run's server
+  ownership is not recoverable from its (unsaved) output. One mechanism that produces exactly the reported
+  symptom without a code defect was demonstrated in the same session: a Foundry process started from an
+  agent tool call that has since returned is torn down about a minute later, while a separately started
+  Playwright run keeps going and every later login is refused (see memory
+  `long-runs-use-run-in-background`).
+- **Fixed:** 2026-09-10 on `campaign/e2e-server-drop` — `scripts/lib/superviseServer.mjs` gained an
+  optional `logFile`; `scripts/e2e-foundry-server.mjs` tees the launched server's stdout/stderr, with an
+  ISO timestamp per line and a final exit line, into `debug/dumps/e2e-server.log` (`FOUNDRY_SERVER_LOG`
+  overrides), so any recurrence carries the server-side timeline to correlate against the failing specs.
+
+### 44. Full unit-suite runs timed out under heavy concurrent machine load (was OPEN_BUGS #2)
+
+- **What:** Four consecutive `npx vitest run` attempts on 2026-09-10 showed climbing durations (48s to
+  100s) and a shifting set of 60000ms `beforeAll` timeouts in the schema golden-master suites, with 5-6
+  extra `node.exe` processes present before each run.
+- **Diagnosis:** Load artifact, not a test defect. The runs coincided with two other full vitest suites
+  and a throttled e2e suite executing on the same machine from parallel work trees. Re-run on the same
+  code once the concurrent workloads finished: 474/474 in 40.7s and 474/474 in 31.8s, no hook timeouts;
+  the two earlier clean baselines on sibling trees (474/474 at 40.1s and 40.9s, 514/514 on the markdown
+  tree) agree. No test content or timeout headroom changed.
+- **Fixed:** 2026-09-11, closed without a code change.
