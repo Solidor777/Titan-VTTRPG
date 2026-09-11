@@ -4,10 +4,6 @@ Work that has been intentionally parked. Each item should graduate into its own
 spec (`docs/superpowers/specs/`) and plan (`docs/superpowers/plans/`) when picked up.
 Completed items are deleted, not marked done.
 
-- Add a direct unit test for `ApplyImport.js`'s embedded-create parent-fallback path: falling back to
-  `pack.getDocument(parentId)` when the parent isn't in the in-run `resolved` map, and throwing a
-  descriptive Error if genuinely absent. Currently exercised only indirectly.
-
 - One checked-in XLSX test fixture is still needed from the user: a `.xlsx` exported by real Google
   Sheets, derived from this feature's real `titan.effects` export, added as
   `tests/fixtures/spreadsheet/google-sheets-edited.xlsx` with a matching test in `Xlsx.test.js` (see the

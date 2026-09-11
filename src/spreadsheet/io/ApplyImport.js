@@ -1,4 +1,5 @@
 import { resolveFolderPath, splitFolderPath, unescapeFolderName } from '~/spreadsheet/io/FolderPath.js';
+import { buildPackEmbeddedIndex } from '~/spreadsheet/io/EmbeddedPackIndex.js';
 
 /**
  * Groups an array by a key function, preserving first-seen key order.
@@ -62,6 +63,32 @@ async function resolveFolders(paths, pack) {
 }
 
 /**
+ * Resolves an embedded row's parent document instance. Tries one created or updated earlier in this same
+ * run first, then a top-level pack document, then a document already embedded in the pack (an item
+ * embedded on an actor, or an effect embedded on an item) via the pack's embedded-document index, since
+ * `pack.getDocument` only resolves top-level documents and so misses a depth-2 parent, such as an effect
+ * whose parent item is itself embedded on an actor, that was never touched by this import run.
+ * @param {string} parentId - The parent document's id.
+ * @param {Map<string, object>} resolved - Documents created or updated earlier in this same run.
+ * @param {CompendiumCollection} pack - The target pack.
+ * @param {{promise: Promise<Map<string,{document:object}>>|null}} embeddedIndexCache - Mutated in place
+ *    to memoize the pack's embedded-document index across every call within one `applyImport` run.
+ * @returns {Promise<object|undefined>} The parent instance, or undefined if it exists nowhere.
+ */
+async function resolveParent(parentId, resolved, pack, embeddedIndexCache) {
+   if (resolved.has(parentId)) {
+      return resolved.get(parentId);
+   }
+   /** @type {object|undefined} */
+   const topLevel = await pack.getDocument(parentId);
+   if (topLevel) {
+      return topLevel;
+   }
+   embeddedIndexCache.promise ??= buildPackEmbeddedIndex(pack);
+   return (await embeddedIndexCache.promise).get(parentId)?.document;
+}
+
+/**
  * Applies a validated ImportPlan: creates the target compendium if requested, creates missing folders,
  * then creates and updates documents depth-first (top-level before embedded, so a newly created or
  * fetched parent instance exists before embedding into it), then deletes top-level documents if planned.
@@ -89,6 +116,9 @@ export async function applyImport(plan, targetPack, newCompendiumLabel) {
    const folderIds = await resolveFolders(plan.folders.map((f) => f.path), pack);
    /** @type {Map<string, object>} Resolved document instances, keyed by id, filled in per depth. */
    const resolved = new Map();
+   /** @type {{promise: Promise<Map<string,{document:object}>>|null}} Memoizes the pack's embedded-document
+    * index (built lazily, at most once per run) for `resolveParent`'s depth-2 fallback. */
+   const embeddedIndexCache = { promise: null };
 
    /** @type {number[]} Distinct create/update depths, ascending. */
    const depths = [...new Set([...plan.creates, ...plan.updates].map((e) => e.depth))].sort((a, b) => a - b);
@@ -125,8 +155,9 @@ export async function applyImport(plan, targetPack, newCompendiumLabel) {
          else {
             /** @type {object|undefined} The parent instance: created or updated earlier this same run, or
              * fetched fresh when the parent wasn't itself touched by this import (e.g. an already-existing,
-             * unchanged Actor that owns newly created Items). */
-            const parent = resolved.get(parentId) ?? await pack.getDocument(parentId);
+             * unchanged Actor that owns newly created Items, or an already-existing embedded Item that
+             * owns a newly created Effect). */
+            const parent = await resolveParent(parentId, resolved, pack, embeddedIndexCache);
             if (!parent) {
                throw new Error(
                   `Cannot create ${documentName} documents under parent "${parentId}": `
@@ -165,9 +196,16 @@ export async function applyImport(plan, targetPack, newCompendiumLabel) {
             }
          }
          else {
-            /** @type {object} The resolved parent instance: created or updated earlier in this same pass, or
-             * fetched fresh when only its embedded child changed and its own fields did not. */
-            const parent = resolved.get(parentId) ?? await pack.getDocument(parentId);
+            /** @type {object|undefined} The resolved parent instance: created or updated earlier in this same
+             * pass, or fetched fresh when only its embedded child changed and its own fields did not
+             * (including a depth-2 parent that is itself embedded, via the pack's embedded-document index). */
+            const parent = await resolveParent(parentId, resolved, pack, embeddedIndexCache);
+            if (!parent) {
+               throw new Error(
+                  `Cannot update ${documentName} documents under parent "${parentId}": `
+                  + 'the parent document was not found in this import or in the target pack.',
+               );
+            }
             await parent.updateEmbeddedDocuments(documentName, group.map((u) => ({ _id: u.id, ...u.changes })));
             /** @type {string} The parent's embedded-collection property name for this document class. */
             const collectionKey = documentName === 'Item' ? 'items' : 'effects';
