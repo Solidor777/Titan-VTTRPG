@@ -14,9 +14,3 @@ Completed items are deleted, not marked done.
   this agent has no access to and should not be given credentials for; the user needs to do this step
   themselves: open the exported .xlsx in Google Sheets, edit one cell's data (not the format), then
   File > Download > Microsoft Excel (.xlsx), and hand the resulting file over.
-
-- `ExportCompendium.js`'s single-sheet CSV branch (skip the zip, write one bare `.csv` file) is
-  effectively dead code in practice: the manifest sheet is always emitted alongside the document
-  sheet(s), so `workbook.sheets.length === 1` only holds for a pack with zero documents. Matches the
-  spec's literal wording, but worth knowing a CSV export of any non-empty pack is always a `.zip` file,
-  not a bare `.csv`.

@@ -160,7 +160,7 @@ describe('exportCompendium', () => {
       delete globalThis.foundry.data;
    });
 
-   it('downloads a single .csv when the workbook has exactly one sheet', async () => {
+   it('downloads a .zip containing only the manifest for a pack with zero documents', async () => {
       /** @type {object} Minimal per-document-type CONFIG entry resolveTypeSchemas reads. */
       const emptyTypeConfig = { dataModels: {}, documentClass: { schema: { fields: {} } } };
       globalThis.CONFIG = { Item: emptyTypeConfig, ActiveEffect: emptyTypeConfig };
@@ -168,8 +168,12 @@ describe('exportCompendium', () => {
       const pack = { metadata: { type: 'Item', label: 'Empty Items' }, folders: [], getDocuments: async () => [] };
       await exportCompendium(pack, 'csv', 'wide');
       /** @type {[Uint8Array|string, string, string]} */
-      const [, , filename] = globalThis.foundry.utils.saveDataToFile.mock.calls[0];
-      expect(filename).toBe('Empty Items.csv');
+      const [payload, mimeType, filename] = globalThis.foundry.utils.saveDataToFile.mock.calls[0];
+      expect(filename).toBe('Empty Items.zip');
+      expect(mimeType).toBe('application/zip');
+      /** @type {Object<string,string>} The downloaded zip's CSV files, keyed by filename. */
+      const files = unzipFilesAsText(payload);
+      expect(Object.keys(files)).toEqual(['_manifest.csv']);
    });
 
    it('downloads a .xlsx for xlsx format', async () => {

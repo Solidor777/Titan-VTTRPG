@@ -21,7 +21,7 @@ GMs can export any Actor, Item, or ActiveEffect compendium to a spreadsheet, edi
 Sheets, or a text editor, and import it back. Right-click a pack in the Compendium sidebar for "Export
 to spreadsheet…" and "Import spreadsheet…", or use the matching header button on the Compendium tab.
 
-**Format and layout.** Export as an `.xlsx` workbook (one sheet per document type/tab) or a folder of
+**Format and layout.** Export as an `.xlsx` workbook (one sheet per document type/tab) or a `.zip` of
 `.csv` files (one file per sheet). Choose a layout when exporting:
 
 - **Wide** — every document is one row; a repeating field (e.g. a weapon's attacks) becomes numbered

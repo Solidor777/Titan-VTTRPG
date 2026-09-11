@@ -143,8 +143,8 @@ src/hooks/
    CSV) and layout (wide or relational).
 2. `ExportCompendium` loads every document with `pack.getDocuments()`, walks embedded items and effects
    (including effects on embedded items), and builds the Workbook from each document's `toObject()` source.
-3. XLSX downloads as `<pack label>.xlsx`. CSV downloads as a single `.csv` when the Workbook has one sheet,
-   otherwise as `<pack label>.zip` containing one `.csv` per sheet plus `_manifest.csv`.
+3. XLSX downloads as `<pack label>.xlsx`. CSV downloads as `<pack label>.zip` containing one `.csv` per
+   sheet plus `_manifest.csv` — the manifest sheet is always present, so a CSV export is always a zip.
 
 ## Import flow
 

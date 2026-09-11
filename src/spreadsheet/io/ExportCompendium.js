@@ -66,10 +66,6 @@ export async function exportCompendium(pack, format, layout) {
       foundry.utils.saveDataToFile(encodeXlsx(workbook), 'application/octet-stream', `${label}.xlsx`);
       return;
    }
-   if (workbook.sheets.length === 1) {
-      foundry.utils.saveDataToFile(encodeCsv(workbook.sheets[0]), 'text/csv', `${label}.csv`);
-      return;
-   }
    /** @type {Object<string, string>} One CSV file per sheet, keyed by filename. */
    const files = {};
    for (const sheet of workbook.sheets) {
