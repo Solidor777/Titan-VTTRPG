@@ -33,6 +33,12 @@
   sets the primary actor's `ReactiveDocument` bridge as the `document` context, so the reused effect leaf
   components (checks, description, owner-gated delete) resolve the actor exactly as they do inside the
   character sheet. See `data-flow.md` "Player HUD".
+- `src/spreadsheet/` — Compendium spreadsheet export/import: `codec/` (pure document <-> flat-path <->
+  Workbook transforms, no Foundry globals), `format/` (RFC 4180 CSV and a minimal from-scratch XLSX
+  reader/writer over `fflate`, the project's one spreadsheet dependency), `io/` (schema resolution from
+  `CONFIG.<Type>.dataModels`, pack export, and import planning/applying), and `ui/` (the Export/Import
+  `TitanDialog` Svelte shells). Reached from the Compendium sidebar's pack context menu and header
+  button (`OnGetCompendiumContextOptions.js`, `OnRenderCompendiumDirectory.js`).
 - `src/styles/` — Global SCSS: font imports (`Lato.scss`, `OpenSans.scss`), the STATIC structure tokens
   (`Variables.scss` — spacing, radii, border widths, font sizes; every color and font-family token is injected at
   runtime by the ThemeManager), global resets (`Global.scss`, incl. the chat visibility surface and badge), a
@@ -95,6 +101,9 @@
 - `OnGetChatLogEntryContext.js` adds custom entries to the chat-log context menu.
 - Directory-context hooks (`OnGetActorDirectoryEntryContext`, `OnGetItemDirectoryEntryContext`) add UUID
   management options via helpers in `src/helpers/utility-functions/`.
+- `OnGetCompendiumContextOptions.js` adds "Export to spreadsheet…" (Actor/Item/ActiveEffect packs, GM
+  only) and "Import spreadsheet…" (any pack, GM only) entries to the Compendium directory's context
+  menu; `OnRenderCompendiumDirectory.js` adds a matching header button to that sidebar tab.
 
 **`src/system/` provides to `hooks/` and `document/`:** Pure constants and registration functions — no runtime
 document state. `OnceInit.js` is the only consumer that calls its registrations at startup.

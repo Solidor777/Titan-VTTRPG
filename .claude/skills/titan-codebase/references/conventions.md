@@ -917,6 +917,18 @@ Per-subtype sheet entries are keyed by the full `<scope>.<SheetClass.name>` stri
 sheets), so iterating `Object.values(CONFIG[doc].sheetClasses[subtype])` and checking `.default` or
 the `titan.` prefix on `.id` is the robust pattern.
 
+## Compendium spreadsheet conventions
+
+Exported sheets always carry the fixed leading columns `_id, _parentId, _folder, name, type, img, sort`
+before type-specific `system.*`/`flags.*`/`prototypeToken.*` columns. Wide layout expands arrays into
+indexed dotted columns (`system.attack.0.damage`); relational layout puts each array in its own
+`<type>.<arrayPath>` child sheet keyed by `_id` + a dotted `_index`. A `_manifest` sheet records the
+layout, pack type, and sheet-to-type/array-path mapping; import falls back to "every sheet is a
+wide-layout document sheet named after its type" when no manifest is present. CSV cells inside an
+untyped bag (rules elements, traits, `flags.*`) auto-detect booleans/numbers/null; wrap a cell in
+literal double quotes (e.g. `"5"`) to force a literal string. See
+`docs/superpowers/specs/2026-09-10-compendium-spreadsheet-design.md` for the full design.
+
 ## Style rules live in CLAUDE.md
 
 `.claude/CLAUDE.md` is the single authority for all code-style, formatting, and documentation rules for this

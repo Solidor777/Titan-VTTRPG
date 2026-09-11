@@ -22,3 +22,25 @@ Deferred/known bugs. Todos (planned work) live in `docs/TODO.md`; this file is b
   load; a per-file `testTimeout` override or moving these dynamic imports to a shared `beforeAll` are
   candidate mitigations, not yet tried.
 
+### 2. `ImportDialogShell.svelte` fails `npm run eslint` with two `svelte/valid-compile` errors
+
+- **What:** `src/spreadsheet/ui/ImportDialogShell.svelte` initializes `targetMode` (line 19) and
+  `targetCollection` (line 22) with `$state(...)` expressions that read the `initialPack` prop
+  directly, which the Svelte 5 compiler flags as `state_referenced_locally` (promoted to a lint
+  ERROR, not a warning, by `eslint-plugin-svelte`'s compiler-diagnostic passthrough) — this is the
+  ONLY non-warning finding in the full `npm run eslint` run. The CI gate (`eslint` is one of its
+  steps) is currently red on this branch because of it.
+- **Severity:** Low-to-medium. Functionally, each `ImportDialogShell` instance is mounted fresh per
+  dialog open (`TitanDialog`'s standard mount/unmount lifecycle), so `initialPack` never changes
+  after mount in current usage — the one-shot capture is very likely correct behavior, not a live
+  bug. Not yet verified whether any call site re-renders the SAME shell instance with a new
+  `initialPack` value, which would make the capture stale.
+- **Found:** 2026-09-10, during Task 18's final `npm run eslint` gate run. Confirmed pre-existing
+  (reproduces identically with Task 18's documentation-only changes stashed out), introduced by an
+  earlier task in this plan (commit `0d9c114e`, "feat: add the compendium spreadsheet import
+  dialog") and not caught by that task's review.
+- **Fix direction:** Either move the reads inside a `$derived`/`$effect` (if `initialPack` is ever
+  expected to change post-mount) or silence the compiler diagnostic with a scoped
+  `<!-- svelte-ignore state_referenced_locally -->` comment (if the one-shot capture is confirmed
+  intentional) — needs the call-site verification above before choosing.
+
