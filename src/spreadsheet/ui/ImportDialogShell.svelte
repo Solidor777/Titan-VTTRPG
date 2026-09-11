@@ -44,6 +44,14 @@
          .map((pack) => ({ value: pack.collection, label: pack.metadata.label })),
    );
 
+   // A stored plan is only valid against the target pack and options it was computed with; Apply must stay
+   // disabled (plan cleared) whenever the target pack or delete-missing option no longer matches the plan.
+   $effect(() => {
+      targetCollection;
+      deleteMissing;
+      plan = null;
+   });
+
    /**
     * Reads the chosen files from the native file input into local state, clearing any stale plan.
     * @param {Event} event - The file input's change event.

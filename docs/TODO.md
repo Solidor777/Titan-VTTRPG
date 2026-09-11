@@ -15,13 +15,6 @@ Completed items are deleted, not marked done.
   themselves: open the exported .xlsx in Google Sheets, edit one cell's data (not the format), then
   File > Download > Microsoft Excel (.xlsx), and hand the resulting file over.
 
-- `ImportDialogShell.svelte`'s computed `plan` is invalidated when the selected files change
-  (`onFilesChosen`) but not when the target pack or the delete-missing checkbox changes, so clicking
-  Apply after changing either of those without re-previewing can run a plan computed against a
-  different pack/option than the one currently selected. Degrades to an import-time error notification
-  (ids won't resolve against the wrong pack) rather than silent corruption, but a one-line invalidation
-  guard would close it.
-
 - `ExportCompendium.js`'s single-sheet CSV branch (skip the zip, write one bare `.csv` file) is
   effectively dead code in practice: the manifest sheet is always emitted alongside the document
   sheet(s), so `workbook.sheets.length === 1` only holds for a pack with zero documents. Matches the
