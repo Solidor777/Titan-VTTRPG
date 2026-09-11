@@ -6,6 +6,43 @@ function csvFile(name, text) {
    return { name, text: async () => text, arrayBuffer: async () => new TextEncoder().encode(text).buffer };
 }
 
+/** @type {string} The actor row's id in the embedded-graph fixture below (depth 0). */
+const ACTOR_ID = 'a'.repeat(16);
+
+/** @type {string} The actor's owned weapon (depth 1). */
+const ITEM_ID = 'b'.repeat(16);
+
+/** @type {string} The effect on the actor itself (depth 1, the same depth as the owned weapon). */
+const ACTOR_EFFECT_ID = 'c'.repeat(16);
+
+/** @type {string} The effect on the owned weapon (depth 2). */
+const ITEM_EFFECT_ID = 'd'.repeat(16);
+
+/**
+ * Builds the CSV file set for a full Actor-pack graph: one npc owning one weapon, the weapon carrying
+ * its own effect, and the npc carrying a direct effect of its own — the depth 0/1/1/2 shape an actor
+ * pack export produces.
+ * @returns {object[]} The File-like CSV inputs, manifest first.
+ */
+function actorGraphFiles() {
+   /** @type {string} */
+   const manifest = '﻿key,value,documentType,arrayPath\r\nlayout,wide,,\r\npackType,Actor,,\r\n'
+      + 'sheet,npc,npc,\r\nsheet,weapon,weapon,\r\nsheet,effect,effect,\r\n';
+   /** @type {string} */
+   const npc = `﻿_id,_parentId,name\r\n${ACTOR_ID},,Goblin\r\n`;
+   /** @type {string} */
+   const weapon = `﻿_id,_parentId,name\r\n${ITEM_ID},${ACTOR_ID},Dagger\r\n`;
+   /** @type {string} Both effects share one sheet: sheets are per subtype, not per document class. */
+   const effect = `﻿_id,_parentId,name\r\n${ACTOR_EFFECT_ID},${ACTOR_ID},Blessed\r\n`
+      + `${ITEM_EFFECT_ID},${ITEM_ID},Sharp\r\n`;
+   return [
+      csvFile('_manifest.csv', manifest),
+      csvFile('npc.csv', npc),
+      csvFile('weapon.csv', weapon),
+      csvFile('effect.csv', effect),
+   ];
+}
+
 describe('planImport', () => {
    beforeEach(() => {
       globalThis.CONFIG = {
@@ -99,6 +136,91 @@ describe('planImport', () => {
       expect(npcCreate.id).toMatch(/^[a-zA-Z0-9]{16}$/);
       expect(weaponCreate.parentId).toBe(npcCreate.id);
       expect(weaponCreate.depth).toBe(1);
+   });
+
+   it('routes an actor pack\'s owned item, own effect, and item effect to their own document classes',
+      async () => {
+      /** @type {object[]} Every document-class construction planImport performs, in order. */
+      const constructed = [];
+      /** Builds a stand-in document class recording the class name each row is validated against. */
+      const makeDocumentClass = (documentName) => class {
+         constructor(source) {
+            constructed.push({ documentName, id: source._id });
+            Object.assign(this, source);
+         }
+      };
+      globalThis.CONFIG = {
+         Actor: { dataModels: {}, documentClass: makeDocumentClass('Actor') },
+         Item: { dataModels: {}, documentClass: makeDocumentClass('Item') },
+         // The subtype registry is what tells an actor's own effect apart from its owned item: both are
+         // depth-1 children of the actor, so depth and pack type alone cannot route them.
+         ActiveEffect: { dataModels: { effect: class {} }, documentClass: makeDocumentClass('ActiveEffect') },
+      };
+      const files = actorGraphFiles();
+
+      const plan = await planImport(files, null, false);
+
+      expect(plan.errors).toEqual([]);
+      expect(plan.creates).toHaveLength(4);
+      expect(plan.creates.find((c) => c.id === ACTOR_ID))
+         .toMatchObject({ documentName: 'Actor', depth: 0, parentId: '' });
+      expect(plan.creates.find((c) => c.id === ITEM_ID))
+         .toMatchObject({ documentName: 'Item', depth: 1, parentId: ACTOR_ID });
+      expect(plan.creates.find((c) => c.id === ACTOR_EFFECT_ID))
+         .toMatchObject({ documentName: 'ActiveEffect', depth: 1, parentId: ACTOR_ID });
+      expect(plan.creates.find((c) => c.id === ITEM_EFFECT_ID))
+         .toMatchObject({ documentName: 'ActiveEffect', depth: 2, parentId: ITEM_ID });
+      // Each row is validated through the class it will actually be created as: constructing the owned
+      // weapon as an Actor is what the real Foundry DocumentTypeField rejects.
+      expect(constructed).toContainEqual({ documentName: 'Item', id: ITEM_ID });
+      expect(constructed).toContainEqual({ documentName: 'ActiveEffect', id: ACTOR_EFFECT_ID });
+      expect(constructed).toContainEqual({ documentName: 'ActiveEffect', id: ITEM_EFFECT_ID });
+      expect(constructed.filter((c) => c.documentName === 'Actor')).toEqual([{ documentName: 'Actor', id: ACTOR_ID }]);
+   });
+
+   it('plans updates for embedded rows that already exist in the target pack, at every depth', async () => {
+      globalThis.CONFIG = {
+         Actor: { dataModels: {}, documentClass: class {} },
+         Item: { dataModels: {}, documentClass: class {} },
+         ActiveEffect: { dataModels: { effect: class {} }, documentClass: class {} },
+      };
+      /** @type {object} The effect already on the owned item (depth 2). */
+      const existingItemEffect = { updateSource: vi.fn() };
+      /** @type {object} The item already owned by the actor (depth 1). */
+      const existingItem = {
+         updateSource: vi.fn(),
+         effects: { get: (id) => (id === ITEM_EFFECT_ID ? existingItemEffect : undefined) },
+      };
+      /** @type {object} The effect already on the actor itself (depth 1). */
+      const existingActorEffect = { updateSource: vi.fn() };
+      /** @type {object} The actor already in the pack (depth 0). */
+      const existingActor = {
+         updateSource: vi.fn(),
+         items: { get: (id) => (id === ITEM_ID ? existingItem : undefined) },
+         effects: { get: (id) => (id === ACTOR_EFFECT_ID ? existingActorEffect : undefined) },
+      };
+      /** @type {object} */
+      const targetPack = {
+         metadata: { type: 'Actor' },
+         getDocument: async (id) => (id === ACTOR_ID ? existingActor : null),
+         getIndex: async () => [],
+      };
+
+      const plan = await planImport(actorGraphFiles(), targetPack, false);
+
+      expect(plan.errors).toEqual([]);
+      expect(plan.creates).toEqual([]);
+      expect(plan.updates).toHaveLength(4);
+      expect(plan.updates.find((u) => u.id === ITEM_ID))
+         .toMatchObject({ documentName: 'Item', depth: 1, parentId: ACTOR_ID });
+      expect(plan.updates.find((u) => u.id === ACTOR_EFFECT_ID))
+         .toMatchObject({ documentName: 'ActiveEffect', depth: 1, parentId: ACTOR_ID });
+      expect(plan.updates.find((u) => u.id === ITEM_EFFECT_ID))
+         .toMatchObject({ documentName: 'ActiveEffect', depth: 2, parentId: ITEM_ID });
+      // Every embedded row is dry-run validated against its OWN existing document, not the actor's.
+      expect(existingItem.updateSource).toHaveBeenCalledWith({ name: 'Dagger' }, { dryRun: true });
+      expect(existingActorEffect.updateSource).toHaveBeenCalledWith({ name: 'Blessed' }, { dryRun: true });
+      expect(existingItemEffect.updateSource).toHaveBeenCalledWith({ name: 'Sharp' }, { dryRun: true });
    });
 
    it('plans a delete for every top-level pack index entry absent from the file when deleteMissing is true',

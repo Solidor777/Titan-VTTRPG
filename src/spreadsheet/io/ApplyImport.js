@@ -1,24 +1,6 @@
 import { resolveFolderPath } from '~/spreadsheet/io/FolderPath.js';
 
 /**
- * Resolves which embedded document type a given nesting depth represents for a pack type: depth 0 is
- * the pack's own type; depth 1 is "Item" for an Actor pack (an owned item) or "ActiveEffect" otherwise
- * (a direct effect); depth 2 is always "ActiveEffect" (an effect on an owned item).
- * @param {'Actor'|'Item'|'ActiveEffect'} packType - The pack's document type.
- * @param {number} depth - The nesting depth.
- * @returns {'Actor'|'Item'|'ActiveEffect'} The document type at that depth.
- */
-function embeddedTypeAt(packType, depth) {
-   if (depth === 0) {
-      return packType;
-   }
-   if (depth === 1) {
-      return packType === 'Actor' ? 'Item' : 'ActiveEffect';
-   }
-   return 'ActiveEffect';
-}
-
-/**
  * Groups an array by a key function, preserving first-seen key order.
  * @template T
  * @param {T[]} items - The items to group.
@@ -113,6 +95,8 @@ async function resolveFolders(paths, pack) {
  * Applies a validated ImportPlan: creates the target compendium if requested, creates missing folders,
  * then creates and updates documents depth-first (top-level before embedded, so a newly created or
  * fetched parent instance exists before embedding into it), then deletes top-level documents if planned.
+ * Each plan entry names the document class it is written through (`documentName`, resolved during
+ * planning), so an actor's owned items and its own effects route to their own embedded collections.
  * @param {import('~/spreadsheet/io/PlanImport.js').ImportPlan} plan - The validated plan.
  * @param {CompendiumCollection|null} targetPack - The existing target pack, or null to create one.
  * @param {string} [newCompendiumLabel] - The label for a newly created compendium (required if
@@ -145,9 +129,19 @@ export async function applyImport(plan, targetPack, newCompendiumLabel) {
    let updatedCount = 0;
 
    for (const depth of depths) {
-      /** @type {Map<string, object[]>} Creates at this depth, grouped by parent id ('' for top-level). */
-      const createsByParent = groupBy(plan.creates.filter((c) => c.depth === depth), (c) => c.parentId ?? '');
-      for (const [parentId, group] of createsByParent) {
+      // Grouped by document class as well as parent, because one parent holds two embedded collections:
+      // an actor's owned items and its own effects are both depth-1 children and go through separate
+      // createEmbeddedDocuments / updateEmbeddedDocuments calls.
+      /** @type {Map<string, object[]>} Creates at this depth, grouped by document class and parent id. */
+      const createGroups = groupBy(
+         plan.creates.filter((c) => c.depth === depth),
+         (c) => `${c.documentName} ${c.parentId ?? ''}`,
+      );
+      for (const group of createGroups.values()) {
+         /** @type {'Actor'|'Item'|'ActiveEffect'} Shared by construction: it is part of the group key. */
+         const documentName = group[0].documentName;
+         /** @type {string} */
+         const parentId = group[0].parentId ?? '';
          /** @type {object[]} */
          const data = group.map((c) => ({
             ...c.source,
@@ -156,10 +150,7 @@ export async function applyImport(plan, targetPack, newCompendiumLabel) {
          /** @type {object[]} */
          let docs;
          if (depth === 0) {
-            docs = await getDocumentClass(embeddedTypeAt(plan.packType, depth)).createDocuments(
-               data,
-               { pack: pack.collection, keepId: true },
-            );
+            docs = await getDocumentClass(documentName).createDocuments(data, { pack: pack.collection, keepId: true });
          }
          else {
             /** @type {object|undefined} The parent instance: created or updated earlier this same run, or
@@ -168,24 +159,34 @@ export async function applyImport(plan, targetPack, newCompendiumLabel) {
             const parent = resolved.get(parentId) ?? await pack.getDocument(parentId);
             if (!parent) {
                throw new Error(
-                  `Cannot create ${embeddedTypeAt(plan.packType, depth)} documents under parent "${parentId}": `
+                  `Cannot create ${documentName} documents under parent "${parentId}": `
                   + 'the parent document was not found in this import or in the target pack.',
                );
             }
-            docs = await parent.createEmbeddedDocuments(embeddedTypeAt(plan.packType, depth), data, { keepId: true });
+            docs = await parent.createEmbeddedDocuments(documentName, data, { keepId: true });
          }
          docs.forEach((doc) => resolved.set(doc.id, doc));
          createdCount += docs.length;
       }
 
-      /** @type {Map<string, object[]>} Updates at this depth, grouped by parent id. */
-      const updatesByParent = groupBy(plan.updates.filter((u) => u.depth === depth), (u) => u.parentId ?? '');
-      for (const [parentId, group] of updatesByParent) {
+      /** @type {Map<string, object[]>} Updates at this depth, grouped by document class and parent id. */
+      const updateGroups = groupBy(
+         plan.updates.filter((u) => u.depth === depth),
+         (u) => `${u.documentName} ${u.parentId ?? ''}`,
+      );
+      for (const group of updateGroups.values()) {
+         /** @type {'Actor'|'Item'|'ActiveEffect'} */
+         const documentName = group[0].documentName;
+         /** @type {string} */
+         const parentId = group[0].parentId ?? '';
          if (depth === 0) {
             for (const update of group) {
                /** @type {object} */
                const document = await pack.getDocument(update.id);
-               await document.update(update.changes);
+               await document.update({
+                  ...update.changes,
+                  folder: update.folderPath ? folderIds.get(update.folderPath) ?? null : null,
+               });
                resolved.set(update.id, document);
             }
          }
@@ -193,12 +194,9 @@ export async function applyImport(plan, targetPack, newCompendiumLabel) {
             /** @type {object} The resolved parent instance: created or updated earlier in this same pass, or
              * fetched fresh when only its embedded child changed and its own fields did not. */
             const parent = resolved.get(parentId) ?? await pack.getDocument(parentId);
-            await parent.updateEmbeddedDocuments(
-               embeddedTypeAt(plan.packType, depth),
-               group.map((u) => ({ _id: u.id, ...u.changes })),
-            );
-            /** @type {string} The parent's embedded-collection property name at this depth. */
-            const collectionKey = embeddedTypeAt(plan.packType, depth) === 'Item' ? 'items' : 'effects';
+            await parent.updateEmbeddedDocuments(documentName, group.map((u) => ({ _id: u.id, ...u.changes })));
+            /** @type {string} The parent's embedded-collection property name for this document class. */
+            const collectionKey = documentName === 'Item' ? 'items' : 'effects';
             for (const update of group) {
                resolved.set(update.id, parent[collectionKey].get(update.id));
             }

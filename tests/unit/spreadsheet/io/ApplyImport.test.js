@@ -19,7 +19,7 @@ describe('applyImport', () => {
          packType: 'Item', folders: [],
          creates: [
             {
-               documentType: 'weapon', id: 'a'.repeat(16), parentId: '', depth: 0,
+               documentType: 'weapon', documentName: 'Item', id: 'a'.repeat(16), parentId: '', depth: 0,
                source: { _id: 'a'.repeat(16) }, folderPath: '',
             },
          ],
@@ -51,11 +51,11 @@ describe('applyImport', () => {
          packType: 'Actor', folders: [],
          creates: [
             {
-               documentType: 'npc', id: 'p'.repeat(16), parentId: '', depth: 0,
+               documentType: 'npc', documentName: 'Actor', id: 'p'.repeat(16), parentId: '', depth: 0,
                source: { _id: 'p'.repeat(16) }, folderPath: '',
             },
             {
-               documentType: 'weapon', id: 'i'.repeat(16), parentId: 'p'.repeat(16), depth: 1,
+               documentType: 'weapon', documentName: 'Item', id: 'i'.repeat(16), parentId: 'p'.repeat(16), depth: 1,
                source: { _id: 'i'.repeat(16) }, folderPath: '',
             },
          ],
@@ -91,16 +91,16 @@ describe('applyImport', () => {
          packType: 'Actor', folders: [],
          creates: [
             {
-               documentType: 'npc', id: 'p'.repeat(16), parentId: '', depth: 0,
+               documentType: 'npc', documentName: 'Actor', id: 'p'.repeat(16), parentId: '', depth: 0,
                source: { _id: 'p'.repeat(16) }, folderPath: '',
             },
             {
-               documentType: 'weapon', id: 'i'.repeat(16), parentId: 'p'.repeat(16), depth: 1,
+               documentType: 'weapon', documentName: 'Item', id: 'i'.repeat(16), parentId: 'p'.repeat(16), depth: 1,
                source: { _id: 'i'.repeat(16) }, folderPath: '',
             },
             {
-               documentType: 'condition', id: 'e'.repeat(16), parentId: 'i'.repeat(16), depth: 2,
-               source: { _id: 'e'.repeat(16) }, folderPath: '',
+               documentType: 'condition', documentName: 'ActiveEffect', id: 'e'.repeat(16),
+               parentId: 'i'.repeat(16), depth: 2, source: { _id: 'e'.repeat(16) }, folderPath: '',
             },
          ],
          updates: [], deletes: [],
@@ -129,16 +129,43 @@ describe('applyImport', () => {
          creates: [], deletes: [],
          updates: [
             {
-               documentType: 'weapon', id: 'a'.repeat(16), parentId: '', depth: 0,
-               changes: { name: 'New Name' },
+               documentType: 'weapon', documentName: 'Item', id: 'a'.repeat(16), parentId: '', depth: 0,
+               changes: { name: 'New Name' }, folderPath: '',
             },
          ],
       };
 
       const result = await applyImport(plan, pack);
 
-      expect(existing.update).toHaveBeenCalledWith({ name: 'New Name' });
+      expect(existing.update).toHaveBeenCalledWith({ name: 'New Name', folder: null });
       expect(result.updated).toBe(1);
+   });
+
+   it('moves an updated top-level document into its resolved target folder', async () => {
+      /** @type {object} */
+      const existing = { update: vi.fn() };
+      /** @type {object} */
+      const existingFolder = { id: 'f'.repeat(16), name: 'Weapons', folder: null };
+      /** @type {object} */
+      const pack = {
+         locked: false, collection: 'world.test', metadata: { type: 'Item' },
+         folders: [existingFolder], getDocument: async () => existing,
+      };
+      /** @type {object} */
+      const plan = {
+         packType: 'Item', folders: [{ path: 'Weapons' }], deletes: [],
+         creates: [],
+         updates: [
+            {
+               documentType: 'weapon', documentName: 'Item', id: 'a'.repeat(16), parentId: '', depth: 0,
+               changes: { name: 'New Name' }, folderPath: 'Weapons',
+            },
+         ],
+      };
+
+      await applyImport(plan, pack);
+
+      expect(existing.update).toHaveBeenCalledWith({ name: 'New Name', folder: 'f'.repeat(16) });
    });
 
    it('refuses to apply into a locked pack', async () => {

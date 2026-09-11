@@ -3,17 +3,21 @@ import { decodeCsv } from '~/spreadsheet/format/Csv.js';
 import { unzipFilesAsText } from '~/spreadsheet/format/Zip.js';
 import { readTables } from '~/spreadsheet/codec/ReadTables.js';
 import { resolveTypeSchemas } from '~/spreadsheet/io/ResolveTypeSchemas.js';
+import { resolveDocumentNameAtDepth } from '~/spreadsheet/io/DocumentNameAtDepth.js';
 
 /**
  * @typedef {object} PlanEntry
  * @property {string} documentType - The document's subtype name.
+ * @property {'Actor'|'Item'|'ActiveEffect'} documentName - The document class the row is created or
+ *    updated through, resolved from its depth, the pack type, and its subtype.
  * @property {string} id - The document's (already-remapped) 16-character Foundry id.
  * @property {string} parentId - The parent document's id, or '' for a top-level pack document.
  * @property {number} depth - 0 = top-level pack document, 1 = an owned item or a direct effect, 2 = an
  *    effect on an owned item.
  * @property {object} [source] - The full document source (creates only).
  * @property {object} [changes] - The changed fields only, excluding `_id` (updates only).
- * @property {string} [folderPath] - The document's target folder path (creates only).
+ * @property {string} [folderPath] - The document's target folder path (creates always; updates only at
+ *    depth 0, where a folder move is possible).
  */
 
 /**
@@ -104,6 +108,56 @@ function depthOf(envelope, byId) {
       }
    }
    return depth;
+}
+
+/**
+ * @typedef {object} ExistingLookupContext
+ * @property {Map<string, object>} byId - Every envelope keyed by its final id.
+ * @property {CompendiumCollection|null} targetPack - The pack existing documents are looked up in.
+ * @property {'Actor'|'Item'|'ActiveEffect'} packType - The target pack's document type.
+ * @property {Map<string, Promise<object|null>>} cache - Memoized lookups by id (mutated).
+ */
+
+/**
+ * Resolves the document a row already corresponds to in the target pack, or null when the row is new.
+ * A top-level row is fetched from the pack by id; an embedded row is read out of its (recursively
+ * resolved) parent's `items` or `effects` collection, so editing an owned item or effect and
+ * re-importing plans an update rather than a duplicate create. An unresolvable parent — importing into a
+ * brand-new compendium, or a parent that exists nowhere yet — yields null, and the row falls through to
+ * the create path. Lookups are memoized by id so one parent is fetched once for all of its children.
+ * @param {string} id - The (already-remapped) id to resolve.
+ * @param {ExistingLookupContext} context - The shared lookup context.
+ * @returns {Promise<object|null>} The existing document, or null.
+ */
+async function resolveExistingDocument(id, context) {
+   if (context.cache.has(id)) {
+      return context.cache.get(id);
+   }
+
+   /** @type {Promise<object|null>} The in-flight lookup, cached before it resolves to de-duplicate it. */
+   const lookup = (async () => {
+      /** @type {object|undefined} The row this id came from, absent when the id is only referenced. */
+      const envelope = context.byId.get(id);
+      /** @type {number} An id referenced but never declared in the file can only be a pack document. */
+      const depth = envelope ? depthOf(envelope, context.byId) : 0;
+      if (depth === 0) {
+         return (await context.targetPack.getDocument(id)) ?? null;
+      }
+
+      /** @type {object|null} */
+      const parent = await resolveExistingDocument(envelope.parentId, context);
+      if (!parent) {
+         return null;
+      }
+      /** @type {'Actor'|'Item'|'ActiveEffect'} */
+      const documentName = resolveDocumentNameAtDepth(context.packType, depth, envelope.documentType);
+      /** @type {object|undefined} The parent's embedded collection this row lives in. */
+      const collection = documentName === 'Item' ? parent.items : parent.effects;
+      return collection?.get(id) ?? null;
+   })();
+
+   context.cache.set(id, lookup);
+   return lookup;
 }
 
 /**
@@ -214,6 +268,9 @@ export async function planImport(files, targetPack, deleteMissing) {
    /** @type {Array<object>} Parents before children. */
    const ordered = [...envelopes].sort((a, b) => depthOf(a, byId) - depthOf(b, byId));
 
+   /** @type {ExistingLookupContext} Shared across every row so each parent is fetched at most once. */
+   const lookupContext = { byId, targetPack, packType: resolvedPackType, cache: new Map() };
+
    for (const envelope of ordered) {
       /** @type {string} */
       const id = envelope.source._id;
@@ -221,6 +278,8 @@ export async function planImport(files, targetPack, deleteMissing) {
       const depth = depthOf(envelope, byId);
       /** @type {string} */
       const parentId = envelope.parentId ?? '';
+      /** @type {'Actor'|'Item'|'ActiveEffect'} The document class this row is validated and written as. */
+      const documentName = resolveDocumentNameAtDepth(resolvedPackType, depth, envelope.documentType);
 
       if (depth === 0) {
          fileTopLevelIds.add(id);
@@ -230,23 +289,32 @@ export async function planImport(files, targetPack, deleteMissing) {
          }
       }
 
-      /** @type {object|null} */
-      const existing = (depth === 0 && targetPack) ? await targetPack.getDocument(id) : null;
+      /** @type {object|null} The pack document this row already corresponds to, at any depth. */
+      const existing = targetPack ? await resolveExistingDocument(id, lookupContext) : null;
 
       try {
          if (existing) {
             /** @type {object} The row's fields without the id (updateSource takes changes only). */
             const { _id, ...changes } = envelope.source;
             existing.updateSource(changes, { dryRun: true });
-            plan.updates.push({ documentType: envelope.documentType, id, parentId, depth, changes });
+            plan.updates.push({
+               documentType: envelope.documentType, documentName, id, parentId, depth, changes,
+               // Top-level only: an update row's folder move is applied separately from `changes`, since
+               // the sheet's `_folder` path must be resolved to the TARGET pack's folder id, not reused
+               // from `envelope.source` (which never carries a `folder` field at all — see
+               // FlattenDocument.js's EXCLUDED_TOP_LEVEL_KEYS).
+               folderPath: depth === 0 ? envelope.folderPath : undefined,
+            });
          }
          else {
+            // Validation runs against the class the row will actually be created through: an owned
+            // weapon row in an Actor pack is an Item, not an Actor, and the Actor class rejects it.
             /** @type {typeof Actor|typeof Item|typeof ActiveEffect} */
-            const DocumentClass = getDocumentClass(plan.packType);
+            const DocumentClass = getDocumentClass(documentName);
             // eslint-disable-next-line no-new -- constructed only to run full schema validation.
             new DocumentClass(envelope.source);
             plan.creates.push({
-               documentType: envelope.documentType, id, parentId, depth,
+               documentType: envelope.documentType, documentName, id, parentId, depth,
                source: envelope.source, folderPath: envelope.folderPath,
             });
          }

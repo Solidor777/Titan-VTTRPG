@@ -32,3 +32,62 @@ Completed items are deleted, not marked done.
   a folder name as `\/` for its path-joining scheme, but a folder name containing both `\` and `/` in
   certain arrangements can be mis-split by `ApplyImport.js`'s `splitFolderPath`. Narrow edge case;
   pre-existing gap in the escaping scheme design.
+
+- The spec's 31-character-sheet-name fallback (truncate + running-number suffix, with the manifest
+  recording the real mapping) is not implemented consistently: `BuildTables.js` writes the full,
+  untruncated sheet name into the manifest, while `Xlsx.js`'s `encodeXlsx` independently
+  truncates/de-duplicates names when writing the file (`uniqueSheetNames`, already exported for this
+  purpose, is never called from `BuildTables.js`). On import, a manifest lookup against the real
+  (truncated) sheet name misses and the document/child sheet is silently dropped with no error. No
+  current TITAN type name exceeds 31 chars, so this is latent, not reachable today. Needs an
+  architecture decision: either apply `uniqueSheetNames`-style truncation once, at the `Workbook`
+  level in `BuildTables.js`, before either format's encoder runs (so CSV and XLSX sheet names and the
+  manifest all agree), or teach `encodeXlsx` to write its truncated mapping back into the manifest sheet
+  it's given. Needs a unit test locking in whichever fix is chosen (the spec's Testing section requires
+  one; none exists yet).
+
+- String cells in an untyped bag (rules elements, traits, `flags.*`) that look like a number or boolean
+  are coerced on import (e.g. a literal string `"5"` decodes to the number `5`), contradicting the
+  spec's stated invariant that XLSX cells "carry native types... so values round-trip without
+  interpretation" for an already-typed XLSX value. `DecodeCell.js`'s `decodeLiteral` only skips
+  coercion for non-string runtime values, but an XLSX string cell decodes to a JS string regardless of
+  what a user typed — so this is currently reachable, not latent. The CSV path is also lossy here since
+  the exporter never emits the spec's documented double-quote-forcing form (`""5""`) to protect such
+  values on export. Needs either fixing `encodeXlsx`/`encodeCsv` to defensively quote/mark
+  numeric-looking or boolean-looking strings on write, or accepting and re-documenting the current
+  behavior if round-tripping such values isn't actually a real use case — a design call, not a
+  mechanical fix.
+
+- Two checked-in XLSX test fixtures are still needed from the user: one `.xlsx` file saved by real
+  Microsoft Excel, one exported by real Google Sheets, both derived from a real export this feature
+  produces, added under `tests/fixtures/spreadsheet/` with a follow-up unit test in `Xlsx.test.js`
+  reading them. The current `t="s"` shared-strings decode test uses a hand-built synthetic archive, not
+  a file any real spreadsheet application produced, so "Excel/Google Sheets can actually open and
+  round-trip our export" remains unverified by anything in the test suite.
+
+- The spec's Testing section also requires an e2e case for the 31-character-sheet-name-truncation
+  fallback above (unit-level) and, separately, an actor-pack round trip with embedded items and
+  effects — the latter surfaced 4 Critical defects when finally exercised by the final whole-branch
+  review's fix round; see `docs/CLOSED_BUGS.md` for that fix. Keep both spec-mandated test cases in
+  mind if this feature's test suite is revisited.
+
+- `ImportDialogShell.svelte`'s computed `plan` is invalidated when the selected files change
+  (`onFilesChosen`) but not when the target pack or the delete-missing checkbox changes, so clicking
+  Apply after changing either of those without re-previewing can run a plan computed against a
+  different pack/option than the one currently selected. Degrades to an import-time error notification
+  (ids won't resolve against the wrong pack) rather than silent corruption, but a one-line invalidation
+  guard would close it.
+
+- `ExportCompendium.js`'s single-sheet CSV branch (skip the zip, write one bare `.csv` file) is
+  effectively dead code in practice: the manifest sheet is always emitted alongside the document
+  sheet(s), so `workbook.sheets.length === 1` only holds for a pack with zero documents. Matches the
+  spec's literal wording, but worth knowing a CSV export of any non-empty pack is always a `.zip` file,
+  not a bare `.csv`.
+
+- `ReadTables.js` merges relational child-sheet rows into their parent by raw `_id`. Two or more brand
+  new documents in the same import that all leave `_id` blank (rather than using a file-local key like
+  `"new-goblin"`) collapse onto the same blank-string map key, cross-contaminating their relational
+  array data. Using a file-local key avoids this; a purely blank-id relational-layout import of
+  multiple new documents does not. Narrow edge case (most realistic imports either update existing ids
+  or use file-local keys for new rows), but worth a guard or a documented convention against blank ids
+  in relational-layout new-document imports.

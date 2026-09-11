@@ -50,13 +50,29 @@ describe('onGetCompendiumContextOptions', () => {
       expect(exportEntry.visible({ dataset: { pack: 'test.weapons' } })).toBe(false);
    });
 
-   it('adds an import entry visible for any GM regardless of pack type', async () => {
+   it('adds an import entry visible only for a GM on a supported pack type', async () => {
       const { default: onGetCompendiumContextOptions } = await import('~/hooks/OnGetCompendiumContextOptions.js');
       /** @type {object[]} */
       const options = [];
       onGetCompendiumContextOptions({}, options);
       /** @type {object} */
       const importEntry = options.find((o) => o.label === 'LOCAL.importSpreadsheet.text');
-      expect(importEntry.visible({ dataset: { pack: 'test.weapons' } })).toBe(true);
+      /** @type {object} A pack li stand-in. */
+      const li = { dataset: { pack: 'test.weapons' } };
+      expect(importEntry.visible(li)).toBe(true);
+
+      globalThis.game.user.isGM = false;
+      expect(importEntry.visible(li)).toBe(false);
+   });
+
+   it('hides the import entry for an unsupported pack type', async () => {
+      const { default: onGetCompendiumContextOptions } = await import('~/hooks/OnGetCompendiumContextOptions.js');
+      globalThis.game.packs.get = () => ({ metadata: { type: 'RollTable' } });
+      /** @type {object[]} */
+      const options = [];
+      onGetCompendiumContextOptions({}, options);
+      /** @type {object} */
+      const importEntry = options.find((o) => o.label === 'LOCAL.importSpreadsheet.text');
+      expect(importEntry.visible({ dataset: { pack: 'test.weapons' } })).toBe(false);
    });
 });

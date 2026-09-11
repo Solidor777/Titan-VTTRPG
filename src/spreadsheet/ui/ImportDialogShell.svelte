@@ -63,13 +63,22 @@
    }
 
    /**
-    * Runs planImport against the current selections and stores the resulting plan.
-    * @returns {Promise<void>} Resolves once the plan has been computed.
+    * Runs planImport against the current selections and stores the resulting plan. A thrown planning
+    * error (e.g. a file whose manifest names a packType that is not a real document type) is reported
+    * via ui.notifications.error rather than left to strand the dialog in its busy state.
+    * @returns {Promise<void>} Resolves once the plan attempt (success or failure) has been handled.
     */
    async function onPreview() {
       busy = true;
-      plan = await planImport(selectedFiles, resolveTargetPack(), deleteMissing);
-      busy = false;
+      try {
+         plan = await planImport(selectedFiles, resolveTargetPack(), deleteMissing);
+      }
+      catch (error) {
+         ui.notifications.error(`TITAN | ${error.message}`);
+      }
+      finally {
+         busy = false;
+      }
    }
 
    /**

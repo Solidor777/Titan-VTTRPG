@@ -6,8 +6,10 @@ import { resolveTypeSchemas } from '~/spreadsheet/io/ResolveTypeSchemas.js';
 import { resolveFolderPath } from '~/spreadsheet/io/FolderPath.js';
 
 /**
- * Recursively collects one document (and, for an actor, its embedded items and their effects) into
- * flat DocumentEnvelope entries.
+ * Recursively collects one document and every document embedded in it into flat DocumentEnvelope
+ * entries. Each level walks only its own direct `items` and `effects` collections; the recursive call
+ * covers everything below it, so an owned item's effects are collected exactly once — by the item's own
+ * recursion, not by the owner's.
  * @param {Actor|Item|ActiveEffect} document - The document to collect.
  * @param {string|null} parentId - The owning document's id, or null for a top-level document.
  * @param {import('~/spreadsheet/codec/BuildTables.js').DocumentEnvelope[]} envelopes - Accumulator (mutated).
@@ -21,9 +23,6 @@ function collectEnvelope(document, parentId, envelopes) {
    });
    for (const item of document.items ?? []) {
       collectEnvelope(item, document.id, envelopes);
-      for (const effect of item.effects ?? []) {
-         collectEnvelope(effect, item.id, envelopes);
-      }
    }
    for (const effect of document.effects ?? []) {
       collectEnvelope(effect, document.id, envelopes);
