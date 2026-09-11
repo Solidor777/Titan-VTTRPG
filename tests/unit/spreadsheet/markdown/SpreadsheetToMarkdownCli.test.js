@@ -263,6 +263,62 @@ describe('spreadsheet-to-markdown CLI', () => {
       expect(readFileSync(outPath, 'utf-8')).toBe(sentinel);
    });
 
+   it('exits 1 with a stderr message when a directory input has no spreadsheet files', () => {
+      /** @type {string} The directory input, containing no `.csv`/`.xlsx`/`.zip` files. */
+      const dirPath = path.join(sinkDir, 'empty-dir-input');
+      mkdirSync(dirPath, { recursive: true });
+      writeFileSync(path.join(dirPath, 'notes.txt'), 'not a spreadsheet', 'utf-8');
+      /** @type {string} The default output path a failed run must not touch. */
+      const outPath = path.join(dirPath, 'empty-dir-input.md');
+      /** @type {string} A sentinel written before the run, to prove the CLI leaves it untouched on error. */
+      const sentinel = 'sentinel: empty-dir-input must not overwrite this file';
+      writeFileSync(outPath, sentinel, 'utf-8');
+
+      /** @type {{status: number, stdout: string, stderr: string}} The CLI process result. */
+      const result = runCliProcess([dirPath]);
+
+      expect(result.status).toBe(1);
+      expect(result.stderr.trim().length).toBeGreaterThan(0);
+      expect(readFileSync(outPath, 'utf-8')).toBe(sentinel);
+   });
+
+   it('exits 1 with a stderr message for an undecodable input file and does not write the output file', () => {
+      /** @type {string} An `.xlsx`-named file that is not valid zip/xlsx data. */
+      const junkPath = path.join(sinkDir, 'junk.xlsx');
+      writeFileSync(junkPath, 'not a real xlsx file', 'utf-8');
+      /** @type {string} The default output path a failed run must not touch. */
+      const outPath = junkPath.replace(/\.xlsx$/, '.md');
+      /** @type {string} A sentinel written before the run, to prove the CLI leaves it untouched on error. */
+      const sentinel = 'sentinel: junk.xlsx must not overwrite this file';
+      writeFileSync(outPath, sentinel, 'utf-8');
+
+      /** @type {{status: number, stdout: string, stderr: string}} The CLI process result. */
+      const result = runCliProcess([junkPath]);
+
+      expect(result.status).toBe(1);
+      expect(result.stderr.trim().length).toBeGreaterThan(0);
+      expect(readFileSync(outPath, 'utf-8')).toBe(sentinel);
+   });
+
+   it('exits 1 with a stderr message when --lang points at a missing file', () => {
+      /** @type {string} The fixture `.xlsx` path. */
+      const xlsxPath = writeFixtureXlsx('missing-lang.xlsx');
+      /** @type {string} A `--lang` path that does not exist on disk. */
+      const missingLangPath = path.join(sinkDir, 'does-not-exist-lang.json');
+      /** @type {string} The default output path a failed run must not touch. */
+      const outPath = xlsxPath.replace(/\.xlsx$/, '.md');
+      /** @type {string} A sentinel written before the run, to prove the CLI leaves it untouched on error. */
+      const sentinel = 'sentinel: missing-lang run must not overwrite this file';
+      writeFileSync(outPath, sentinel, 'utf-8');
+
+      /** @type {{status: number, stdout: string, stderr: string}} The CLI process result. */
+      const result = runCliProcess([xlsxPath, '--lang', missingLangPath]);
+
+      expect(result.status).toBe(1);
+      expect(result.stderr.trim().length).toBeGreaterThan(0);
+      expect(readFileSync(outPath, 'utf-8')).toBe(sentinel);
+   });
+
    it('prints usage and exits 0 for --help', () => {
       /** @type {{status: number, stdout: string, stderr: string}} The CLI process result. */
       const result = runCliProcess(['--help']);
