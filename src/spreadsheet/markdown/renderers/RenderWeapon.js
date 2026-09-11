@@ -67,8 +67,9 @@ export function renderWeapon(document, { labels, slugFor }) {
    /** @type {object} The weapon's `system` data. */
    const system = document.system;
    /**
-    * @type {string[]} The item's own stat lines (common, weapon-level traits, and, for a single
-    *    attack, that attack's lines and the item checks).
+    * @type {string[]} The item's own stat lines: common, weapon-level traits, then either a single
+    *    attack's lines followed by item checks, or (for more than one attack) item checks alone —
+    *    the attack lines move into `attackSections` instead.
     */
    const statLines = [...commonStatLines(system, labels)];
 
@@ -93,18 +94,18 @@ export function renderWeapon(document, { labels, slugFor }) {
             statLines: renderAttackStatLines(attack, labels),
          });
       }
-   }
-   else if (attacks.length === 1) {
-      statLines.push(...renderAttackStatLines(attacks[0], labels));
-   }
 
-   /** @type {string[]} The item's checks, rendered after the attack lines. */
-   const checkLines = renderItemCheckLines(system.check, labels);
-   if (attackSections.length > 0) {
-      attackSections[attackSections.length - 1].statLines.push(...checkLines);
+      // A multi-attack weapon's item checks belong to the weapon's own stat block (after the
+      // weapon-level Traits, before the attack sections), not the last attack.
+      statLines.push(...renderItemCheckLines(system.check, labels));
    }
    else {
-      statLines.push(...checkLines);
+      if (attacks.length === 1) {
+         statLines.push(...renderAttackStatLines(attacks[0], labels));
+      }
+
+      // A single-attack weapon keeps the spec order: attack lines, then item checks.
+      statLines.push(...renderItemCheckLines(system.check, labels));
    }
 
    return renderItemBlock({

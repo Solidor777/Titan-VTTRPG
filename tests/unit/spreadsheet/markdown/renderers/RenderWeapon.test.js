@@ -220,7 +220,8 @@ describe('renderWeapon', () => {
       );
    });
 
-   it('renders item checks after the attack sections, appended to the last attack, on a multi-attack weapon', () => {
+   it('renders item checks in the weapon\'s own stat block, before the attack sections, on a multi-attack '
+      + 'weapon', () => {
       /** @type {object} The fixture with two attacks and one item check. */
       const document = {
          name: 'Twin Fangs',
@@ -249,10 +250,11 @@ describe('renderWeapon', () => {
       const result = renderWeapon(document, realContext());
       expect(result).toBe(
          '#### ***Twin Fangs*** {#twin-fangs}\n\n'
+         + '**Poison:** Body (Melee Weapons) 4:1  \n\n'
          + '##### ***Bite (Melee)*** {#bite-melee}\n\n'
          + '**Damage:** 1 \\+ ES  \n\n'
          + '##### ***Sting (Melee)*** {#sting-melee}\n\n'
-         + '**Damage:** 1 \\+ ES  \n**Poison:** Body (Melee Weapons) 4:1  \n---\n\n---',
+         + '**Damage:** 1 \\+ ES  \n---\n\n---',
       );
    });
 
