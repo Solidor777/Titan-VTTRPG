@@ -207,26 +207,26 @@ describe('planImport', () => {
 
    it('decodes an embedded row\'s typed cell via resolveTypeSchemasForPack(\'Actor\') feeding the weapon\'s '
       + 'own Item schema into readTables', async () => {
-      /** Stand-in for NumberField, matched via instanceof by resolveFieldSchema. */
-      class MockNumberField {
+      /** Stand-in for StringField, matched via instanceof by resolveFieldSchema. */
+      class MockStringField {
          constructor(options = {}) {
             Object.assign(this, options);
          }
       }
       globalThis.foundry.data = {
          fields: {
-            StringField: class MockStringField {},
-            NumberField: MockNumberField,
+            StringField: MockStringField,
+            NumberField: class MockNumberField {},
             BooleanField: class MockBooleanField {},
             ObjectField: class MockObjectField {},
             ArrayField: class MockArrayField {},
             SchemaField: MockSchemaField,
          },
       };
-      /** Stand-in DataModel exposing the weapon subtype's schema with one number-typed field. */
+      /** Stand-in DataModel exposing the weapon subtype's schema with one string-typed field. */
       class WeaponDataModel {
          static get schema() {
-            return new MockSchemaField({ value: new MockNumberField({ nullable: false }) });
+            return new MockSchemaField({ rarity: new MockStringField({ nullable: false }) });
          }
       }
       globalThis.CONFIG.Actor = { dataModels: {}, documentClass: class {} };
@@ -237,8 +237,12 @@ describe('planImport', () => {
          + 'sheet,npc,npc,\r\nsheet,weapon,weapon,\r\n';
       /** @type {string} */
       const npc = `﻿_id,_parentId,name\r\n${ACTOR_ID},,Goblin\r\n`;
-      /** @type {string} A number-typed "system.value" cell carried as CSV text, not a native number. */
-      const weapon = `﻿_id,_parentId,name,system.value\r\n${ITEM_ID},${ACTOR_ID},Dagger,12\r\n`;
+      // A string-typed "system.rarity" cell carrying a numeral-looking value as CSV text. The untyped-bag
+      // literal fallback would coerce "007" to the number 7 (dropping the leading zero); schema resolution
+      // must keep it the literal string '007' instead, which is what actually discriminates this test from
+      // the fallback path.
+      /** @type {string} */
+      const weapon = `﻿_id,_parentId,name,system.rarity\r\n${ITEM_ID},${ACTOR_ID},Dagger,007\r\n`;
       const files = [csvFile('_manifest.csv', manifest), csvFile('npc.csv', npc), csvFile('weapon.csv', weapon)];
       /** @type {object} A target pack with no existing documents, so the weapon row plans as a create. */
       const targetPack = { metadata: { type: 'Actor' }, getDocument: async () => null, getIndex: async () => [] };
@@ -248,7 +252,7 @@ describe('planImport', () => {
       expect(plan.errors).toEqual([]);
       /** @type {object} */
       const weaponCreate = plan.creates.find((c) => c.id === ITEM_ID);
-      expect(weaponCreate.source.system.value).toBe(12);
+      expect(weaponCreate.source.system.rarity).toBe('007');
    });
 
    it('plans updates for embedded rows that already exist in the target pack, at every depth', async () => {
