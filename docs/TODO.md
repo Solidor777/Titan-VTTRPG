@@ -18,12 +18,6 @@ Completed items are deleted, not marked done.
   overwrite the owning document's id column in that row. Needs a reserved-name collision check if a
   colliding field exists.
 
-- Mixed-type Actor-pack exports get unordered columns for embedded Item/ActiveEffect sheets.
-  `resolveTypeSchemas(pack.metadata.type)` in `src/spreadsheet/io/ExportCompendium.js` only resolves
-  schema/column-order info for the pack's own top-level type, so an Actor pack's embedded Item and
-  ActiveEffect sheets degrade to unordered (first-seen) column order. Not a data-loss bug — a
-  readability/consistency gap for GMs editing an Actor-pack export's embedded-item sheets.
-
 - Add a direct unit test for `ApplyImport.js`'s embedded-create parent-fallback path: falling back to
   `pack.getDocument(parentId)` when the parent isn't in the in-run `resolved` map, and throwing a
   descriptive Error if genuinely absent. Currently exercised only indirectly.

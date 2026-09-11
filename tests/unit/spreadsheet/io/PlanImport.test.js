@@ -6,6 +6,29 @@ function csvFile(name, text) {
    return { name, text: async () => text, arrayBuffer: async () => new TextEncoder().encode(text).buffer };
 }
 
+/** Minimal stand-in for SchemaField, matched via instanceof by resolveFieldSchema. */
+class MockSchemaField {
+   /**
+    * @param {object} fields - Map of sub-field name to a mock field (empty for the stand-ins below).
+    */
+   constructor(fields) {
+      /** @type {object} */
+      this.fields = fields;
+   }
+}
+
+/**
+ * An empty ActiveEffect subtype DataModel stand-in: no schema fields, just a registered subtype name.
+ * @returns {Function} The stand-in DataModel class.
+ */
+function makeEmptySchemaDataModel() {
+   return class {
+      static get schema() {
+         return new MockSchemaField({});
+      }
+   };
+}
+
 /** @type {string} The actor row's id in the embedded-graph fixture below (depth 0). */
 const ACTOR_ID = 'a'.repeat(16);
 
@@ -45,8 +68,12 @@ function actorGraphFiles() {
 
 describe('planImport', () => {
    beforeEach(() => {
+      // resolveTypeSchemasForPack always resolves ActiveEffect too (every pack type can embed one), which
+      // walks each registered subtype's static schema via instanceof checks against these field classes.
+      globalThis.foundry.data = { fields: { SchemaField: MockSchemaField } };
       globalThis.CONFIG = {
          Item: { dataModels: {}, documentClass: class { constructor(source) { Object.assign(this, source); } } },
+         ActiveEffect: { dataModels: {}, documentClass: { schema: {} } },
       };
       // A fresh, call-unique 16-char id per invocation: some scenarios (e.g. a blank _id AND a
       // file-local key both needing a generated id in the same import) need two distinct fresh ids,
@@ -154,7 +181,7 @@ describe('planImport', () => {
          Item: { dataModels: {}, documentClass: makeDocumentClass('Item') },
          // The subtype registry is what tells an actor's own effect apart from its owned item: both are
          // depth-1 children of the actor, so depth and pack type alone cannot route them.
-         ActiveEffect: { dataModels: { effect: class {} }, documentClass: makeDocumentClass('ActiveEffect') },
+         ActiveEffect: { dataModels: { effect: makeEmptySchemaDataModel() }, documentClass: makeDocumentClass('ActiveEffect') },
       };
       const files = actorGraphFiles();
 
@@ -182,7 +209,7 @@ describe('planImport', () => {
       globalThis.CONFIG = {
          Actor: { dataModels: {}, documentClass: class {} },
          Item: { dataModels: {}, documentClass: class {} },
-         ActiveEffect: { dataModels: { effect: class {} }, documentClass: class {} },
+         ActiveEffect: { dataModels: { effect: makeEmptySchemaDataModel() }, documentClass: class {} },
       };
       /** @type {object} The effect already on the owned item (depth 2). */
       const existingItemEffect = { updateSource: vi.fn() };

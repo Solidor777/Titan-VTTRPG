@@ -7,11 +7,39 @@ function makeDoc(type, id, system = {}, effects = []) {
    return { type, id, effects, toObject: () => ({ _id: id, name: id, type, system }) };
 }
 
+/** Minimal stand-in for a Foundry DataField, matching real DataField's own instance-property copying. */
+class MockField {
+   /**
+    * @param {object} options - The field configuration (e.g. nullable).
+    */
+   constructor(options = {}) {
+      Object.assign(this, options);
+   }
+}
+
+/** Stand-in for StringField. */
+class MockStringField extends MockField {}
+/** Stand-in for NumberField. */
+class MockNumberField extends MockField {}
+
+/** Stand-in for SchemaField, capturing its sub-fields map. */
+class MockSchemaField extends MockField {
+   /**
+    * @param {object} fields - Map of sub-field name to MockField.
+    * @param {object} [options] - Field options.
+    */
+   constructor(fields, options = {}) {
+      super(options);
+      /** @type {object} */
+      this.fields = fields;
+   }
+}
+
 describe('exportCompendium', () => {
    beforeEach(() => {
       /** @type {object} Minimal per-document-type CONFIG entry resolveTypeSchemas reads. */
       const emptyTypeConfig = { dataModels: {}, documentClass: { schema: { fields: {} } } };
-      globalThis.CONFIG = { Item: emptyTypeConfig, Actor: emptyTypeConfig };
+      globalThis.CONFIG = { Item: emptyTypeConfig, Actor: emptyTypeConfig, ActiveEffect: emptyTypeConfig };
       globalThis.foundry.utils.saveDataToFile = vi.fn();
    });
 
@@ -80,8 +108,62 @@ describe('exportCompendium', () => {
       expect(weaponRows).toHaveLength(1);
    });
 
+   it("orders an actor pack's embedded weapon sheet columns by the weapon's own schema, not first-seen", async () => {
+      globalThis.foundry.data = {
+         fields: {
+            StringField: MockStringField,
+            NumberField: MockNumberField,
+            SchemaField: MockSchemaField,
+            ArrayField: class {},
+            BooleanField: class {},
+         },
+      };
+      /**
+       * Stand-in DataModel declaring "rarity" before "value", the opposite of the document's own field
+       * insertion order below, so the assertion proves the order comes from the schema, not first-seen.
+       */
+      class WeaponDataModel {
+         static get schema() {
+            return new MockSchemaField({
+               rarity: new MockStringField({ nullable: false }),
+               value: new MockNumberField({ nullable: false }),
+            });
+         }
+      }
+      globalThis.CONFIG.Item = { dataModels: { weapon: WeaponDataModel }, documentClass: { schema: { fields: {} } } };
+      /** @type {object} A weapon whose own field insertion order is value-then-rarity. */
+      const weapon = makeDoc('weapon', 'a'.repeat(16), { value: 5, rarity: 'common' });
+      /** @type {object} An actor owning that weapon. */
+      const actor = {
+         type: 'npc',
+         id: 'b'.repeat(16),
+         items: [weapon],
+         effects: [],
+         folder: null,
+         toObject: () => ({ _id: 'b'.repeat(16), name: 'Goblin', type: 'npc' }),
+      };
+      /** @type {object} */
+      const pack = {
+         metadata: { type: 'Actor', label: 'Test Actors' },
+         folders: [],
+         getDocuments: async () => [actor],
+      };
+
+      await exportCompendium(pack, 'csv', 'wide');
+
+      /** @type {Object<string,string>} The downloaded zip's CSV files, keyed by filename. */
+      const files = unzipFilesAsText(globalThis.foundry.utils.saveDataToFile.mock.calls[0][0]);
+      /** @type {string} The weapon sheet's header row. */
+      const weaponHeader = files['weapon.csv'].replace(/^﻿/, '').split('\r\n')[0];
+      expect(weaponHeader.indexOf('system.rarity')).toBeLessThan(weaponHeader.indexOf('system.value'));
+
+      delete globalThis.foundry.data;
+   });
+
    it('downloads a single .csv when the workbook has exactly one sheet', async () => {
-      globalThis.CONFIG = { Item: { dataModels: {}, documentClass: { schema: { fields: {} } } } };
+      /** @type {object} Minimal per-document-type CONFIG entry resolveTypeSchemas reads. */
+      const emptyTypeConfig = { dataModels: {}, documentClass: { schema: { fields: {} } } };
+      globalThis.CONFIG = { Item: emptyTypeConfig, ActiveEffect: emptyTypeConfig };
       /** @type {object} */
       const pack = { metadata: { type: 'Item', label: 'Empty Items' }, folders: [], getDocuments: async () => [] };
       await exportCompendium(pack, 'csv', 'wide');

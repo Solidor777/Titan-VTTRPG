@@ -2,7 +2,7 @@ import { decodeXlsx } from '~/spreadsheet/format/Xlsx.js';
 import { decodeCsv } from '~/spreadsheet/format/Csv.js';
 import { unzipFilesAsText } from '~/spreadsheet/format/Zip.js';
 import { readTables } from '~/spreadsheet/codec/ReadTables.js';
-import { resolveTypeSchemas } from '~/spreadsheet/io/ResolveTypeSchemas.js';
+import { resolveTypeSchemasForPack } from '~/spreadsheet/io/ResolveTypeSchemas.js';
 import { resolveDocumentNameAtDepth } from '~/spreadsheet/io/DocumentNameAtDepth.js';
 
 /**
@@ -226,8 +226,8 @@ export async function planImport(files, targetPack, deleteMissing) {
 
    /** @type {string} The pack type driving schema resolution and document construction. */
    const resolvedPackType = packType || targetPack.metadata.type;
-   /** @type {object} Per-subtype schema info, used for validation and typed decode. */
-   const typeSchemas = resolveTypeSchemas(resolvedPackType);
+   /** @type {object} Per-subtype schema info (own type plus everything it can embed), for typed decode. */
+   const typeSchemas = resolveTypeSchemasForPack(resolvedPackType);
 
    /** @type {{layout:string, packType:string, envelopes: Array<object>}} */
    let readResult;

@@ -2,7 +2,7 @@ import { buildTables } from '~/spreadsheet/codec/BuildTables.js';
 import { encodeXlsx } from '~/spreadsheet/format/Xlsx.js';
 import { encodeCsv } from '~/spreadsheet/format/Csv.js';
 import { zipFiles } from '~/spreadsheet/format/Zip.js';
-import { resolveTypeSchemas } from '~/spreadsheet/io/ResolveTypeSchemas.js';
+import { resolveTypeSchemasForPack } from '~/spreadsheet/io/ResolveTypeSchemas.js';
 import { resolveFolderPath } from '~/spreadsheet/io/FolderPath.js';
 
 /**
@@ -55,8 +55,8 @@ export async function exportCompendium(pack, format, layout) {
       collectEnvelope(document, null, envelopes);
    }
 
-   /** @type {object} Per-subtype schema info, used for column ordering. */
-   const typeSchemas = resolveTypeSchemas(pack.metadata.type);
+   /** @type {object} Per-subtype schema info (own type plus everything it can embed), for column ordering. */
+   const typeSchemas = resolveTypeSchemasForPack(pack.metadata.type);
    /** @type {import('~/spreadsheet/codec/Workbook.js').Workbook} */
    const workbook = buildTables(envelopes, layout, pack.metadata.type, typeSchemas);
    /** @type {string} */
