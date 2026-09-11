@@ -91,3 +91,13 @@ Completed items are deleted, not marked done.
   multiple new documents does not. Narrow edge case (most realistic imports either update existing ids
   or use file-local keys for new rows), but worth a guard or a documented convention against blank ids
   in relational-layout new-document imports.
+
+- Importing only a child sheet (e.g. just `weapon.csv`, omitting the owning `npc.csv`) for an embedded
+  row whose parent already exists in the target pack still fails: `PlanImport.js`'s `depthOf` treats an
+  id absent from the uploaded file's own envelopes as depth 0, so the row is looked up via
+  `targetPack.getDocument(id)` (which returns null for an embedded id) rather than resolved as a child of
+  its real, out-of-file parent — it then falls to the create path and `ApplyImport.js` throws "the
+  parent document was not found". Pre-existing, not introduced by the C2-C4 embedded-routing fix; that
+  fix makes embedded re-import look more general than it is now that whole-graph re-imports genuinely
+  work. Needs `depthOf`/`resolveExistingDocument` to consult the target pack itself (not just the
+  uploaded file's own envelopes) when an id's parent is missing from the file.

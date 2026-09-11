@@ -185,7 +185,11 @@ export async function applyImport(plan, targetPack, newCompendiumLabel) {
                const document = await pack.getDocument(update.id);
                await document.update({
                   ...update.changes,
-                  folder: update.folderPath ? folderIds.get(update.folderPath) ?? null : null,
+                  // A row with no `_folder` column (folderPath undefined) leaves the folder untouched; a
+                  // present-but-blank cell (folderPath '') moves the document to the pack root.
+                  ...(update.folderPath !== undefined
+                     ? { folder: update.folderPath ? folderIds.get(update.folderPath) ?? null : null }
+                     : {}),
                });
                resolved.set(update.id, document);
             }

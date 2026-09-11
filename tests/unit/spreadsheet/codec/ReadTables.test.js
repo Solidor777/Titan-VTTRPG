@@ -46,6 +46,28 @@ describe('readTables — wide layout', () => {
          source: { _id: 'a'.repeat(16), name: 'Axe' },
       });
    });
+
+   it('reports folderPath as undefined when the sheet has no _folder column, distinct from a blank cell', () => {
+      /** @type {{sheets: object[]}} A hand-trimmed file: no _folder column at all. */
+      const noFolderColumn = {
+         sheets: [
+            { name: 'weapon', columns: ['_id', 'name'], rows: [{ _id: 'a'.repeat(16), name: 'Axe' }] },
+         ],
+      };
+      expect(readTables(noFolderColumn, NO_SCHEMA).envelopes[0].folderPath).toBeUndefined();
+
+      /** @type {{sheets: object[]}} The column is present but this row's cell is blank (pack root). */
+      const blankFolderCell = {
+         sheets: [
+            {
+               name: 'weapon',
+               columns: ['_id', 'name', '_folder'],
+               rows: [{ _id: 'a'.repeat(16), name: 'Axe', _folder: '' }],
+            },
+         ],
+      };
+      expect(readTables(blankFolderCell, NO_SCHEMA).envelopes[0].folderPath).toBe('');
+   });
 });
 
 describe('readTables — relational layout', () => {

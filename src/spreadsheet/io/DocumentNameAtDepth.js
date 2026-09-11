@@ -6,11 +6,12 @@
  * @returns {boolean} True when the subtype is an ActiveEffect subtype.
  */
 function isActiveEffectSubtype(documentType) {
-   if (CONFIG.ActiveEffect?.dataModels?.[documentType]) {
+   // `CONFIG`/`game` are absent outside a live client (unit tests import this module directly), so both
+   // are read off globalThis rather than as bare identifiers, which would throw a ReferenceError when
+   // undeclared.
+   if (globalThis.CONFIG?.ActiveEffect?.dataModels?.[documentType]) {
       return true;
    }
-   // `game` is absent outside a live client (unit tests import this module directly), so it is read off
-   // globalThis rather than as a bare identifier, which would throw a ReferenceError when undeclared.
    return (globalThis.game?.documentTypes?.ActiveEffect ?? []).includes(documentType);
 }
 

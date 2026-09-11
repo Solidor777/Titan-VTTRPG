@@ -17,7 +17,9 @@ import { resolveDocumentNameAtDepth } from '~/spreadsheet/io/DocumentNameAtDepth
  * @property {object} [source] - The full document source (creates only).
  * @property {object} [changes] - The changed fields only, excluding `_id` (updates only).
  * @property {string} [folderPath] - The document's target folder path (creates always; updates only at
- *    depth 0, where a folder move is possible).
+ *    depth 0, where a folder move is possible). Undefined means the sheet carried no `_folder` column at
+ *    all (leave the folder untouched on update); `''` means a present-but-blank cell (move to the pack
+ *    root).
  */
 
 /**

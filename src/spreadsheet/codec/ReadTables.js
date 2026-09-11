@@ -191,8 +191,12 @@ export function readTables(workbook, typeSchemas) {
          const source = unflattenRow(flat);
          /** @type {string} */
          const parentId = source._parentId || '';
-         /** @type {string} */
-         const folderPath = source._folder || '';
+         // Absent from the sheet's own columns (a hand-trimmed file) is distinct from a present-but-blank
+         // cell (`''`, meaning "pack root"): an update row with no `_folder` column must leave the
+         // document's existing folder untouched, not move it to the root, so callers see `undefined`
+         // rather than `''` for a column that was never there.
+         /** @type {string|undefined} */
+         const folderPath = sheet.columns.includes('_folder') ? (source._folder || '') : undefined;
          delete source._parentId;
          delete source._folder;
          envelopes.push({

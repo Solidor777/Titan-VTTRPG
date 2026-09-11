@@ -74,6 +74,7 @@
          plan = await planImport(selectedFiles, resolveTargetPack(), deleteMissing);
       }
       catch (error) {
+         plan = null;
          ui.notifications.error(`TITAN | ${error.message}`);
       }
       finally {

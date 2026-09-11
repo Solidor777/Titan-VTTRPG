@@ -141,6 +141,31 @@ describe('applyImport', () => {
       expect(result.updated).toBe(1);
    });
 
+   it('leaves the folder untouched when the imported row carried no _folder column at all', async () => {
+      /** @type {object} */
+      const existing = { update: vi.fn() };
+      /** @type {object} */
+      const pack = {
+         locked: false, collection: 'world.test', metadata: { type: 'Item' }, getDocument: async () => existing,
+      };
+      /** @type {object} */
+      const plan = {
+         packType: 'Item', folders: [],
+         creates: [], deletes: [],
+         updates: [
+            {
+               // No `folderPath` key at all: the sheet the row came from had no `_folder` column.
+               documentType: 'weapon', documentName: 'Item', id: 'a'.repeat(16), parentId: '', depth: 0,
+               changes: { name: 'New Name' },
+            },
+         ],
+      };
+
+      await applyImport(plan, pack);
+
+      expect(existing.update).toHaveBeenCalledWith({ name: 'New Name' });
+   });
+
    it('moves an updated top-level document into its resolved target folder', async () => {
       /** @type {object} */
       const existing = { update: vi.fn() };
