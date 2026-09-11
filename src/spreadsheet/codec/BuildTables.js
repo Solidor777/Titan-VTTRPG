@@ -66,6 +66,9 @@ export function orderColumns(paths, fieldOrder) {
  * has. Returned outermost-first (fewest segments) so parent arrays are laid out before nested ones.
  * @param {string[]} paths - Discovered concrete dotted paths (fixed columns already excluded).
  * @returns {string[]} Distinct array paths, e.g. ["system.attack", "system.attack.trait"].
+ * @throws {Error} When a path has two consecutive numeric segments: a primitive array nested directly
+ *    inside a primitive array has no field-name prefix to name its own array path/child sheet, so the
+ *    relational layout cannot represent it.
  */
 export function detectArrayPaths(paths) {
    /** @type {Set<string>} */
@@ -73,13 +76,23 @@ export function detectArrayPaths(paths) {
    for (const path of paths) {
       /** @type {string[]} Field-name segments accumulated so far (indices are never pushed here). */
       let prefix = [];
+      /** @type {boolean} Whether the segment immediately preceding the current one is a numeric index. */
+      let priorSegmentIsNumeric = false;
       for (const segment of path.split('.')) {
-         if (/^\d+$/.test(segment)) {
+         /** @type {boolean} Whether this segment is a numeric array index. */
+         const isNumeric = /^\d+$/.test(segment);
+         if (isNumeric && priorSegmentIsNumeric) {
+            throw new Error(
+               `Unsupported field shape: a primitive array nested directly inside a primitive array at "${path}"`,
+            );
+         }
+         if (isNumeric) {
             arrayPaths.add(prefix.join('.'));
          }
          else {
             prefix = [...prefix, segment];
          }
+         priorSegmentIsNumeric = isNumeric;
       }
    }
    return [...arrayPaths].sort((a, b) => a.split('.').length - b.split('.').length);
@@ -211,6 +224,9 @@ function isUnderAnyArrayPath(path, matchers) {
  * @param {string[]} allArrayPaths - Every array path detected for the document type.
  * @param {Array<Object<string,*>>} flatRows - Every document's full flat row map (`_id` included).
  * @returns {{sheet: import('~/spreadsheet/codec/Workbook.js').Sheet, arrayPath: string}} The child sheet.
+ * @throws {Error} When an array element's own sub-field is literally named "_id" or "_index": the child
+ *    sheet's row-spread (`{ _id: id, _index: index, ...fields }`) would let that sub-field silently
+ *    overwrite the owning document's id/index column.
  */
 function buildChildSheet(documentType, arrayPath, allArrayPaths, flatRows) {
    /** @type {(path:string) => {index:string,subField:string}|null} */
@@ -230,6 +246,9 @@ function buildChildSheet(documentType, arrayPath, allArrayPaths, flatRows) {
          const match = matcher(path);
          if (!match) {
             continue;
+         }
+         if (match.subField === '_id' || match.subField === '_index') {
+            throw new Error(`Reserved column name "${match.subField}" used by a field under "${arrayPath}"`);
          }
          subFields.add(match.subField);
          if (!elements.has(match.index)) {

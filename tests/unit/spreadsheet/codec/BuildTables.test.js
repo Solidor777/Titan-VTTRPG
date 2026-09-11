@@ -245,3 +245,215 @@ describe('detectArrayPaths', () => {
       expect(detectArrayPaths(['a.b.0.c.1.d'])).toEqual(['a.b', 'a.b.c']);
    });
 });
+
+describe('buildTables — relational guards', () => {
+   it('throws when a primitive array is nested directly inside another primitive array', () => {
+      const envelopes = [
+         { documentType: 'weapon', source: { _id: 'a'.repeat(16), system: { matrix: [[1, 2], [3, 4]] } } },
+      ];
+      expect(() => buildTables(envelopes, 'relational', 'Item', NO_SCHEMA)).toThrow(
+         'Unsupported field shape: a primitive array nested directly inside a primitive array at "system.matrix.0.0"',
+      );
+   });
+
+   it('throws when an array-of-objects field has a sub-field named "_id"', () => {
+      const envelopes = [
+         { documentType: 'weapon', source: { _id: 'a'.repeat(16), system: { trait: [{ _id: 'x', name: 'Reach' }] } } },
+      ];
+      expect(() => buildTables(envelopes, 'relational', 'Item', NO_SCHEMA)).toThrow(
+         'Reserved column name "_id" used by a field under "system.trait"',
+      );
+   });
+
+   it('throws when an array-of-objects field has a sub-field named "_index"', () => {
+      const envelopes = [
+         { documentType: 'weapon', source: { _id: 'a'.repeat(16), system: { trait: [{ _index: 0, name: 'Reach' }] } } },
+      ];
+      expect(() => buildTables(envelopes, 'relational', 'Item', NO_SCHEMA)).toThrow(
+         'Reserved column name "_index" used by a field under "system.trait"',
+      );
+   });
+
+   it('does not throw for any real TITAN shape (one representative envelope per shape template)', () => {
+      /** @type {object[]} One representative envelope per item/actor-item/effect shape template. */
+      const envelopes = [
+         {
+            documentType: 'weapon',
+            source: {
+               _id: 'a'.repeat(16),
+               name: 'Sword',
+               type: 'weapon',
+               img: 'i.svg',
+               sort: 1,
+               system: {
+                  description: '',
+                  check: [],
+                  customTrait: [{ name: 'Custom', description: 'x', uuid: 'u1' }],
+                  rulesElement: [{ name: 'code', value: 'v' }],
+                  rarity: 'common',
+                  value: 0,
+                  equipped: false,
+                  attackNotes: '',
+                  trait: [{ name: 'Reach' }],
+                  attack: [
+                     {
+                        label: 'Slash',
+                        type: 'melee',
+                        range: 1,
+                        attribute: 'body',
+                        skill: 'meleeWeapons',
+                        damage: 5,
+                        plusExtraSuccessDamage: true,
+                        trait: [{ name: 'Heavy' }],
+                        customTrait: [{ name: 'Custom Trait', description: 'y', uuid: 'u2' }],
+                        uuid: 'u3',
+                     },
+                  ],
+               },
+            },
+         },
+         {
+            documentType: 'armor',
+            source: {
+               _id: 'b'.repeat(16),
+               name: 'Plate',
+               type: 'armor',
+               img: 'i.svg',
+               sort: 1,
+               system: {
+                  description: '',
+                  check: [],
+                  customTrait: [{ name: 'Custom', description: 'x', uuid: 'u4' }],
+                  rulesElement: [{ name: 'code', value: 'v' }],
+                  rarity: 'common',
+                  value: 0,
+                  armor: { max: 1, value: 1 },
+                  trait: [{ name: 'Reach' }],
+               },
+            },
+         },
+         {
+            documentType: 'shield',
+            source: {
+               _id: 'c'.repeat(16),
+               name: 'Buckler',
+               type: 'shield',
+               img: 'i.svg',
+               sort: 1,
+               system: {
+                  description: '',
+                  check: [],
+                  customTrait: [{ name: 'Custom', description: 'x', uuid: 'u5' }],
+                  rulesElement: [{ name: 'code', value: 'v' }],
+                  rarity: 'common',
+                  value: 0,
+                  defense: 0,
+                  trait: [{ name: 'Reach' }],
+               },
+            },
+         },
+         {
+            documentType: 'ability',
+            source: {
+               _id: 'd'.repeat(16),
+               name: 'Feat of Strength',
+               type: 'ability',
+               img: 'i.svg',
+               sort: 1,
+               system: {
+                  description: '',
+                  check: [],
+                  customTrait: [{ name: 'Custom', description: 'x', uuid: 'u6' }],
+                  rulesElement: [{ name: 'code', value: 'v' }],
+                  xpCost: 1,
+                  rarity: 'common',
+                  action: false,
+                  reaction: false,
+                  passive: false,
+               },
+            },
+         },
+         {
+            documentType: 'spell',
+            source: {
+               _id: 'e'.repeat(16),
+               name: 'Fireball',
+               type: 'spell',
+               img: 'i.svg',
+               sort: 1,
+               system: {
+                  description: '',
+                  check: [],
+                  customTrait: [{ name: 'Custom', description: 'x', uuid: 'u7' }],
+                  rarity: 'common',
+                  xpCost: 1,
+                  tradition: '',
+                  castingCheck: {
+                     attribute: 'mind',
+                     skill: 'arcana',
+                     difficulty: 4,
+                     complexity: 1,
+                     autoCalculateDC: true,
+                  },
+                  quantity: 1,
+                  aspect: [{ name: 'Damage', value: 'v' }],
+                  customAspect: [{ name: 'Custom Aspect', description: 'z', uuid: 'u8' }],
+               },
+            },
+         },
+         {
+            documentType: 'equipment',
+            source: {
+               _id: 'f'.repeat(16),
+               name: 'Rope',
+               type: 'equipment',
+               img: 'i.svg',
+               sort: 1,
+               system: {
+                  description: '',
+                  check: [],
+                  customTrait: [{ name: 'Custom', description: 'x', uuid: 'u9' }],
+                  rulesElement: [{ name: 'code', value: 'v' }],
+                  rarity: 'common',
+                  value: 0,
+                  equipped: false,
+               },
+            },
+         },
+         {
+            documentType: 'commodity',
+            source: {
+               _id: 'g'.repeat(16),
+               name: 'Gold',
+               type: 'commodity',
+               img: 'i.svg',
+               sort: 1,
+               system: {
+                  description: '',
+                  check: [],
+                  customTrait: [],
+                  rarity: 'common',
+                  value: 0,
+                  quantity: 1,
+               },
+            },
+         },
+         {
+            documentType: 'effect',
+            source: {
+               _id: 'h'.repeat(16),
+               name: 'Burning',
+               type: 'effect',
+               img: 'i.svg',
+               sort: 1,
+               system: {
+                  duration: { type: 'turnStart', remaining: 1, initiative: 1, custom: '' },
+                  check: [{ name: 'Check', attribute: 'body' }],
+                  customTrait: [{ name: 'Custom', description: 'x', uuid: 'u10' }],
+               },
+            },
+         },
+      ];
+      expect(() => buildTables(envelopes, 'relational', 'Item', NO_SCHEMA)).not.toThrow();
+   });
+});
