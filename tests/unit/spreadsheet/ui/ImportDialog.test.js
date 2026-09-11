@@ -1,6 +1,14 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 
+vi.hoisted(() => {
+   // Stand-in for foundry.applications.api.ApplicationV2, destructured by ImportDialog at import time.
+   globalThis.foundry.applications = { api: { ApplicationV2: class { constructor(o) { this.options = o; } } } };
+   globalThis.game = { i18n: { localize: (key) => key } };
+});
+
 vi.mock('~/spreadsheet/ui/ImportDialogShell.svelte', () => ({ default: class {} }));
+
+import ImportDialog from '~/spreadsheet/ui/ImportDialog.js';
 
 beforeEach(() => {
    globalThis.foundry.applications = { api: { ApplicationV2: class { constructor(o) { this.options = o; } } } };
@@ -13,8 +21,7 @@ afterEach(() => {
 });
 
 describe('ImportDialog', () => {
-   it('preselects the given pack and titles the dialog generically when none is given', async () => {
-      const { default: ImportDialog } = await import('~/spreadsheet/ui/ImportDialog.js');
+   it('preselects the given pack and titles the dialog generically when none is given', () => {
       /** @type {object} */
       const pack = { metadata: { label: 'Test Weapons' }, collection: 'world.test' };
 

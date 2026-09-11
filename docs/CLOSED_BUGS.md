@@ -503,3 +503,31 @@ when fixed.
 - **Fixed:** 2026-09-10 on the `compendium-spreadsheet` branch — wrapped both prop reads in
   `untrack(...)`, matching the identical one-shot-capture-from-context pattern already established
   in `DocumentPathRaritySelect.svelte`.
+
+### 42. Dynamic-import-pattern unit tests intermittently time out under the full unit suite's parallel worker pool (was OPEN_BUGS #1)
+
+- **What:** `tests/unit/spreadsheet/ui/ExportDialog.test.js`, `ImportDialog.test.js`, and
+  `tests/unit/hooks/OnGetCompendiumContextOptions.test.js` mocked a dialog shell with `vi.mock(...)`
+  then, inside each `it(...)` body, ran `await import(...)` to pull in the module under test after
+  `beforeEach` had installed the `foundry.applications.api.ApplicationV2` stand-in it reads at
+  module-evaluation time. That dynamic `import()` pays the cold Vite transform of the module graph
+  under the 5000ms per-test timeout; under full-suite parallel worker load the transform could exceed
+  5s, timing the test out non-deterministically while passing reliably standalone.
+- **Severity:** Low. Reproduced intermittently under full-suite parallel load only.
+- **Found:** 2026-09-10, during the compendium-spreadsheet Task 15/16 reviews.
+- **Fixed:** 2026-09-10 on the `campaign/spreadsheet-backlog` branch — the three files now establish
+  the `ApplicationV2` stand-in in a `vi.hoisted(() => { ... })` block (which Vitest hoists above the
+  hoisted `vi.mock` calls and the file's static imports) and statically import the module under test,
+  removing the per-test dynamic import entirely; per-test global mutation stays in `beforeEach`/the
+  test body. `tests/unit/GetBestCharactersToUpdate.test.js` used a per-test `await import(...)` after
+  `vi.doMock(...)` + `vi.resetModules()` to swap the mocked `GetFocusedCharacterSheetActor` return
+  value; since the module under test is a pure function with no per-test state to isolate, it was
+  converted to a statically-imported `vi.mock(...)` with `getFocusedCharacterSheetActor.mockReturnValue(...)`
+  set per test instead, eliminating the dynamic import without needing module resets.
+  `tests/unit/ChatMessageMountRegistry.test.js` also dynamically imports inside `beforeEach`, but its
+  `vi.resetModules()` is load-bearing: the module under test holds private module-scope singleton
+  state (`mounts` Map, the notification `MutationObserver`) that must be fresh per test, which a
+  static import cannot provide without adding a test-only reset export to the production module (out
+  of this fix's scope; not attempted). All other `await import(` hits found by grepping `tests/unit`
+  live inside `beforeAll` in the schema golden-master suites (covered by the deliberate 60s
+  `hookTimeout`) and were left untouched per the fix's own scope.
