@@ -157,6 +157,16 @@ describe('readTables — relational layout', () => {
       expect(result.envelopes).toHaveLength(2);
    });
 
+   it('still imports two blank-_id rows in relational layout for a document type with no child sheets', () => {
+      const envelopes = [
+         { documentType: 'weapon', source: { _id: '', system: { rarity: 'common' } } },
+         { documentType: 'weapon', source: { _id: '', system: { rarity: 'rare' } } },
+      ];
+      const workbook = buildTables(envelopes, 'relational', 'Item', NO_SCHEMA);
+      const result = readTables(workbook, NO_SCHEMA);
+      expect(result.envelopes).toHaveLength(2);
+   });
+
    it('still imports a single blank-_id row in relational layout', () => {
       const envelopes = [
          {

@@ -426,7 +426,7 @@ describe('buildTables — relational guards', () => {
                      autoCalculateDC: true,
                   },
                   quantity: 1,
-                  aspect: [{ name: 'Damage', value: 'v' }],
+                  aspect: [{ name: 'Damage', value: 'v', option: ['ignoreArmor', 'penetrating'] }],
                   customAspect: [{ name: 'Custom Aspect', description: 'z', uuid: 'u8' }],
                },
             },
@@ -485,5 +485,17 @@ describe('buildTables — relational guards', () => {
          },
       ];
       expect(() => buildTables(envelopes, 'relational', 'Item', NO_SCHEMA)).not.toThrow();
+   });
+
+   it('does not throw in wide layout for a shape that throws in relational layout, and yields a flat column', () => {
+      const envelopes = [
+         { documentType: 'weapon', source: { _id: 'a'.repeat(16), system: { matrix: [[1, 2], [3, 4]] } } },
+      ];
+      expect(() => buildTables(envelopes, 'relational', 'Item', NO_SCHEMA)).toThrow();
+      /** @type {object} */
+      const workbook = buildTables(envelopes, 'wide', 'Item', NO_SCHEMA);
+      /** @type {object} */
+      const weaponSheet = workbook.sheets.find((s) => s.name === 'weapon');
+      expect(weaponSheet.columns).toContain('system.matrix.0.1');
    });
 });
