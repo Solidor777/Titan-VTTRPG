@@ -562,3 +562,26 @@ when fixed.
   the two earlier clean baselines on sibling trees (474/474 at 40.1s and 40.9s, 514/514 on the markdown
   tree) agree. No test content or timeout headroom changed.
 - **Fixed:** 2026-09-11, closed without a code change.
+
+### 45. Spell aspect cost double-counted per-option costs for `optionCosts` aspects with 2+ options
+
+- **What:** `SpellDataModel.prepareDerivedData`'s `optionCosts` branch (used by `inflictCondition`)
+  nested a `for...of` loop over `aspect.option` around an inner `aspect.option.forEach(...)` over the
+  same array, so every selected option's cost was added once per selected option — a 2-option
+  selection doubled every option's contribution (e.g. `blinded` (4) + `deafened` (1) summed to 10
+  instead of 5), and a 3-option selection tripled it. `range`/`radius`/`duration` (`initialValueCosts`/
+  `unitCosts`), `optionCost` (uniform per-option cost), and `allOptionsCost` aspects were unaffected.
+- **Severity:** Medium. Every spell using `inflictCondition` (the only aspect configured with
+  `optionCosts`, a per-option cost map — `blinded`, `contaminated`, `deafened`, etc. are its selectable
+  condition options, not separate aspects) with two or more selected options auto-calculated an
+  inflated casting DC and total aspect cost. `removeCondition` uses a uniform `optionCost` plus
+  `allOptionsCost` and was never affected.
+- **Found:** 2026-09-10, while designing the Markdown export (the renderer needed the same cost math,
+  which surfaced the nested-loop bug on read).
+- **Fixed:** extracted the cost math into a pure `calculateSpellAspectCosts(aspects, customAspects)`
+  in `CalculateSpellAspectCosts.js`, shared by `SpellDataModel.prepareDerivedData` and (later) the
+  Markdown spell renderer, with the nested loop collapsed to a single pass over `aspect.option`.
+  `CalculateSpellAspectCosts.test.js` asserts a two-option `inflictCondition` aspect costs `5`
+  (`4 + 1`), plus initial-value/unit/optionCost/allOptionsCost costs, resistance halving with the
+  minimum-1 floor, requireOption-with-no-options disabling, custom aspect cost summation, and the
+  difficulty/complexity thresholds (4→4:1, 5→5:1, 6→5:2, 8→5:4, 2→4:1 clamped).

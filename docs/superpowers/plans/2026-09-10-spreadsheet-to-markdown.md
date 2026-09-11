@@ -88,12 +88,11 @@ Standing rules for every task:
    custom aspect costs summed, difficulty/complexity: total 4 → 4:1, 5 → 5:1, 6 → 5:2, 8 → 5:4, and
    total 2 → 4:1 (minimum difficulty 4).
 3. Implement `calculateSpellAspectCosts(aspects, customAspects)` returning
-   `{ aspectCosts: number[], enabled: boolean[], scalingCosts: (number|undefined)[], totalAspectCost,
-   difficulty, complexity }` (arrays index-aligned with `aspects`). Pure: imports only `SpellAspects.js`.
+   `{ aspectCosts: number[], enabled: boolean[], totalAspectCost, difficulty, complexity }` (arrays
+   index-aligned with `aspects`). Pure: imports only `SpellAspects.js`.
 4. Rewire `prepareDerivedData` to call it and write back `aspect.enabled`, `aspect.cost`,
-   `aspect.scalingLost` (keep that existing property name — it is read elsewhere; grep before renaming
-   anything), `this.totalAspectCost`, and the auto-calculated DC. Behaviour must be identical except for
-   the fixed double count. Run the whole unit suite.
+   `this.totalAspectCost`, and the auto-calculated DC. Behaviour must be identical except for the fixed
+   double count. Run the whole unit suite.
 5. Append to `docs/CLOSED_BUGS.md` (next number) an entry: what (per-option cost double-counted for
    `optionCosts` aspects with 2+ options), severity, found 2026-09-10 while designing the Markdown export,
    fixed by the extraction + regression test.

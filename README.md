@@ -40,3 +40,32 @@ already wrapped in quotes, so it stays text the next time you import the file.
 (new rows with no matching id are created); nothing is deleted unless you turn on the optional "delete
 missing" setting, which only removes top-level documents that were in the pack but are absent from the
 sheet.
+
+## Publishing a spreadsheet as Markdown
+
+`npm run export:markdown -- <input> [<input>...] [--out <file.md>] [--title <text>] [--lang <file>]`
+renders an exported Item spreadsheet into a single Markdown reference document (headings, a table of
+contents, and one formatted block per item/attack), without opening Foundry.
+
+**Inputs.** One or more paths, each an `.xlsx` workbook, a `.zip` of `.csv` files, a loose `.csv` file,
+or a directory (every `.csv`/`.xlsx`/`.zip` file directly inside it, sorted by name). Multiple loose
+`.csv` files are read together as one workbook; each `.xlsx`/`.zip` is read on its own. Only **Item**
+compendium exports can be rendered — an Actor or ActiveEffect export exits with an error.
+
+**Defaults.** `--out` defaults to the first input's path with its extension replaced by `.md` (a
+directory input writes `<dir>/<dirname>.md`). `--title` defaults to the first input's file name without
+its extension (a directory's own name for a directory input). `--lang` defaults to the system's own
+`lang/en.json`.
+
+**Headings.** Documents with no folder render first, grouped by type (Weapons, Armor, Shields,
+Equipment, Commodities, Abilities, Spells, in that order); unfoldered Spells are further split into a
+tradition heading per non-blank `system.tradition` value, with blank-tradition spells listed directly
+under the Spells heading. Every root folder then renders alphabetically as its own heading (folder
+depth beyond 3 clamps to an H3); a folder holding more than one Item type splits into type-group
+headings one level below its own, but a folder's own spells are never split by tradition (the GM's
+folder wins). Every heading, item, and attack gets a table-of-contents entry, in the order it renders.
+
+**Rendering.** Rules elements are never rendered. A Spell's casting difficulty/complexity is
+recomputed from its aspects when `system.castingCheck.autoCalculateDC` is on, otherwise the stored
+values are used; its `**XP Cost:**` line always renders regardless of value. Item descriptions convert
+from the stored ProseMirror HTML to Markdown.

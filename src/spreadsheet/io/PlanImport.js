@@ -1,6 +1,4 @@
-import { decodeXlsx } from '~/spreadsheet/format/Xlsx.js';
-import { decodeCsv } from '~/spreadsheet/format/Csv.js';
-import { unzipFilesAsText } from '~/spreadsheet/format/Zip.js';
+import { decodeSpreadsheetFiles } from '~/spreadsheet/format/DecodeSpreadsheetFiles.js';
 import { readTables } from '~/spreadsheet/codec/ReadTables.js';
 import { resolveTypeSchemasForPack } from '~/spreadsheet/io/ResolveTypeSchemas.js';
 import { resolveDocumentNameAtDepth } from '~/spreadsheet/io/DocumentNameAtDepth.js';
@@ -35,36 +33,16 @@ import { buildPackEmbeddedIndex } from '~/spreadsheet/io/EmbeddedPackIndex.js';
  */
 
 /**
- * Derives a sheet name from an uploaded or archived filename by stripping its extension and any
- * directory prefix.
- * @param {string} filename - The archive-relative or uploaded filename.
- * @returns {string} The derived sheet name.
- */
-function sheetNameFromFilename(filename) {
-   return filename.split('/').pop().replace(/\.csv$/i, '');
-}
-
-/**
- * Decodes one or more uploaded files into a single Workbook: a lone `.xlsx`, a lone `.zip` of CSVs, or
- * one-or-more loose `.csv` files (each becomes one sheet, named after its filename).
- * @param {File[]} files - The uploaded file(s).
+ * Reads one or more uploaded browser `File`s into bytes and delegates to the pure spreadsheet decoder.
+ * @param {File[]} files - The uploaded file(s): a single .xlsx, a single .csv, or a .zip/.csv set.
  * @returns {Promise<import('~/spreadsheet/codec/Workbook.js').Workbook>} The decoded workbook.
  */
 async function decodeFiles(files) {
-   if (files.length === 1 && files[0].name.toLowerCase().endsWith('.xlsx')) {
-      return decodeXlsx(new Uint8Array(await files[0].arrayBuffer()));
-   }
-   if (files.length === 1 && files[0].name.toLowerCase().endsWith('.zip')) {
-      /** @type {Object<string,string>} filename -> csv text. */
-      const entries = unzipFilesAsText(new Uint8Array(await files[0].arrayBuffer()));
-      return { sheets: Object.entries(entries).map(([name, text]) => decodeCsv(text, sheetNameFromFilename(name))) };
-   }
-   /** @type {import('~/spreadsheet/codec/Workbook.js').Sheet[]} */
-   const sheets = [];
-   for (const file of files) {
-      sheets.push(decodeCsv(await file.text(), sheetNameFromFilename(file.name)));
-   }
-   return { sheets };
+   /** @type {Array<{name: string, bytes: Uint8Array}>} */
+   const entries = await Promise.all(
+      files.map(async (file) => ({ name: file.name, bytes: new Uint8Array(await file.arrayBuffer()) })),
+   );
+   return decodeSpreadsheetFiles(entries);
 }
 
 /**

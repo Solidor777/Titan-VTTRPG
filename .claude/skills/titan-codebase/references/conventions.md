@@ -29,6 +29,25 @@ import assert from '~/helpers/utility-functions/Assert.js';
 import localize from '~/helpers/utility-functions/Localize.js';
 ```
 
+## `~/` alias for Node scripts (outside the Vite build)
+
+`scripts/` CLI entry points (e.g. `spreadsheet-to-markdown.mjs`) are plain Node, not Vite-built, so they
+cannot rely on `vite.config.mjs`'s `resolve.alias` for `~/`-prefixed imports into `src/`. Instead,
+`scripts/lib/registerSrcAlias.mjs` calls Node's loader-registration API,
+`module.register(new URL('./srcAliasHooks.mjs', import.meta.url))`, which installs
+`scripts/lib/srcAliasHooks.mjs`'s `resolve(specifier, context, nextResolve)` hook — it resolves any
+`~/`-prefixed specifier to `src/` under the repo root and passes everything else to `nextResolve`
+unchanged. Because `module.register()` only affects imports resolved AFTER it runs, the entry script
+bootstraps in two steps: a static `import './lib/registerSrcAlias.mjs'` (registers the hook), followed by
+a **dynamic** `await import('./lib/spreadsheetToMarkdownCli.mjs')` for the module that itself imports
+`~/`-prefixed `src/` modules. This dynamic import is a Node-script bootstrap ordering requirement, not a
+shipping-build concern — `scripts/` is never bundled into `dist/`, so it does not violate the "no dynamic
+imports in shipping builds" rule.
+
+`src/spreadsheet/markdown/` (the Markdown-rendering layer this CLI drives) touches no Foundry globals,
+so it runs unmodified under plain Node via this alias hook — the same modules the in-Foundry Vite build
+also imports.
+
 ## Application & reactivity patterns
 
 **`DocumentSheetV2` mount lifecycle** — `TitanDocumentSheet` (`src/document/sheet/TitanDocumentSheet.js`)
