@@ -92,7 +92,12 @@ describe('planImport', () => {
          + `${'a'.repeat(16)},,,Sword,weapon,i.svg,1\r\n`;
       const files = [csvFile('_manifest.csv', manifest), csvFile('weapon.csv', weapon)];
       /** @type {object} A target pack with no existing documents. */
-      const targetPack = { metadata: { type: 'Item' }, getDocument: async () => null, getIndex: async () => [] };
+      const targetPack = {
+         metadata: { type: 'Item' },
+         getDocument: async () => null,
+         getDocuments: async () => [],
+         getIndex: async () => [],
+      };
 
       const plan = await planImport(files, targetPack, false);
 
@@ -129,7 +134,12 @@ describe('planImport', () => {
       const weapon = `﻿_id,name\r\n${'a'.repeat(16)},Sword\r\n`;
       const files = [csvFile('_manifest.csv', manifest), csvFile('weapon.csv', weapon)];
       /** @type {object} */
-      const targetPack = { metadata: { type: 'Item' }, getDocument: async () => null, getIndex: async () => [] };
+      const targetPack = {
+         metadata: { type: 'Item' },
+         getDocument: async () => null,
+         getDocuments: async () => [],
+         getIndex: async () => [],
+      };
 
       const plan = await planImport(files, targetPack, false);
 
@@ -152,7 +162,12 @@ describe('planImport', () => {
       };
       const files = [csvFile('_manifest.csv', manifest), csvFile('npc.csv', npc), csvFile('weapon.csv', weapon)];
       /** @type {object} */
-      const targetPack = { metadata: { type: 'Actor' }, getDocument: async () => null, getIndex: async () => [] };
+      const targetPack = {
+         metadata: { type: 'Actor' },
+         getDocument: async () => null,
+         getDocuments: async () => [],
+         getIndex: async () => [],
+      };
 
       const plan = await planImport(files, targetPack, false);
 
@@ -245,7 +260,12 @@ describe('planImport', () => {
       const weapon = `﻿_id,_parentId,name,system.rarity\r\n${ITEM_ID},${ACTOR_ID},Dagger,007\r\n`;
       const files = [csvFile('_manifest.csv', manifest), csvFile('npc.csv', npc), csvFile('weapon.csv', weapon)];
       /** @type {object} A target pack with no existing documents, so the weapon row plans as a create. */
-      const targetPack = { metadata: { type: 'Actor' }, getDocument: async () => null, getIndex: async () => [] };
+      const targetPack = {
+         metadata: { type: 'Actor' },
+         getDocument: async () => null,
+         getDocuments: async () => [],
+         getIndex: async () => [],
+      };
 
       const plan = await planImport(files, targetPack, false);
 
@@ -300,6 +320,64 @@ describe('planImport', () => {
       expect(existingItemEffect.updateSource).toHaveBeenCalledWith({ name: 'Sharp' }, { dryRun: true });
    });
 
+   it('resolves a child-sheet-only row against its real out-of-file parent already in the target pack',
+      async () => {
+      globalThis.CONFIG.Actor = { dataModels: {}, documentClass: class {} };
+      /** @type {string} */
+      const manifest = '﻿key,value,documentType,arrayPath\r\nlayout,wide,,\r\npackType,Actor,,\r\n'
+         + 'sheet,weapon,weapon,\r\n';
+      // No _parentId column at all: the file itself has no idea this row is embedded.
+      /** @type {string} */
+      const weapon = `﻿_id,name\r\n${ITEM_ID},Dagger\r\n`;
+      const files = [csvFile('_manifest.csv', manifest), csvFile('weapon.csv', weapon)];
+      /** @type {object} The weapon already owned by the actor in the pack, matched by id. */
+      const existingWeapon = { id: ITEM_ID, updateSource: vi.fn(), effects: [] };
+      /** @type {object} The actor already in the pack, owning the weapon above. */
+      const existingActor = { id: ACTOR_ID, items: [existingWeapon], effects: [] };
+      /** @type {object} */
+      const targetPack = {
+         metadata: { type: 'Actor' }, getDocument: async () => null, getDocuments: async () => [existingActor],
+         getIndex: async () => [],
+      };
+
+      const plan = await planImport(files, targetPack, false);
+
+      expect(plan.errors).toEqual([]);
+      expect(plan.creates).toEqual([]);
+      expect(plan.updates).toHaveLength(1);
+      expect(plan.updates[0]).toMatchObject({
+         documentName: 'Item', id: ITEM_ID, parentId: ACTOR_ID, depth: 1,
+      });
+      expect(existingWeapon.updateSource).toHaveBeenCalledWith({ name: 'Dagger' }, { dryRun: true });
+   });
+
+   it('plans a create for a child-sheet-only row whose id matches no document anywhere in the target pack',
+      async () => {
+      globalThis.CONFIG.Actor = { dataModels: {}, documentClass: class {} };
+      /** @type {string} */
+      const manifest = '﻿key,value,documentType,arrayPath\r\nlayout,wide,,\r\npackType,Actor,,\r\n'
+         + 'sheet,weapon,weapon,\r\n';
+      /** @type {string} */
+      const weapon = `﻿_id,name\r\n${ITEM_ID},Dagger\r\n`;
+      const files = [csvFile('_manifest.csv', manifest), csvFile('weapon.csv', weapon)];
+      /** @type {object} An unrelated actor already in the pack, owning an unrelated item. */
+      const unrelatedActor = { id: ACTOR_ID, items: [{ id: 'e'.repeat(16), effects: [] }], effects: [] };
+      /** @type {object} */
+      const targetPack = {
+         metadata: { type: 'Actor' }, getDocument: async () => null, getDocuments: async () => [unrelatedActor],
+         getIndex: async () => [],
+      };
+
+      const plan = await planImport(files, targetPack, false);
+
+      expect(plan.errors).toEqual([]);
+      expect(plan.updates).toEqual([]);
+      expect(plan.creates).toHaveLength(1);
+      // With no matching parent anywhere (in the file or the pack), the row falls through unchanged to the
+      // pre-existing top-level create path (depth 0, no parent) rather than being misidentified as an update.
+      expect(plan.creates[0]).toMatchObject({ id: ITEM_ID, parentId: '', depth: 0 });
+   });
+
    it('plans a delete for every top-level pack index entry absent from the file when deleteMissing is true',
       async () => {
       /** @type {string} */
@@ -312,6 +390,7 @@ describe('planImport', () => {
       const targetPack = {
          metadata: { type: 'Item' },
          getDocument: async () => null,
+         getDocuments: async () => [],
          getIndex: async () => [{ _id: 'a'.repeat(16), type: 'weapon' }, { _id: 'z'.repeat(16), type: 'weapon' }],
       };
 

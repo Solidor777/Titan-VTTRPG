@@ -21,7 +21,9 @@ export function unescapeFolderName(segment) {
 
 /**
  * Resolves a folder into a slash-separated path of escaped folder names from the pack root. Shared by
- * export (building the path to write) and import (rebuilding the same path to match folders).
+ * export (building the path to write) and import (rebuilding the same path to match folders). The empty
+ * string is reserved for "no folder" (the pack root); a real, non-empty folder-name chain never produces
+ * it, since every escaped segment is non-empty.
  * @param {Folder|null|undefined} folder - The folder to compute the path for, or nullish for the pack root.
  * @returns {string} The folder path, or an empty string for the pack root.
  */
@@ -44,7 +46,10 @@ export function resolveFolderPath(folder) {
  * Splits an escaped folder path into its raw segments with a single left-to-right scan, splitting only on
  * unescaped `/` (a `\/` or `\\` inside a segment stays part of that segment). Segments are returned still
  * escaped, matching the map keys built from {@link resolveFolderPath} joins, so callers must run a segment
- * through {@link unescapeFolderName} before using it as a folder name.
+ * through {@link unescapeFolderName} before using it as a folder name. The empty string is reserved for
+ * "no folder" at the caller level (see {@link resolveFolderPath}); `splitFolderPath('')` itself still
+ * returns `['']` (one empty segment), so callers must filter falsy paths before calling this, the way
+ * `ApplyImport.js`'s `resolveFolders` does.
  * @param {string} path - The escaped, slash-separated folder path.
  * @returns {string[]} The path's escaped segments, root to leaf.
  */

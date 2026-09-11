@@ -31,13 +31,3 @@ Completed items are deleted, not marked done.
   sheet(s), so `workbook.sheets.length === 1` only holds for a pack with zero documents. Matches the
   spec's literal wording, but worth knowing a CSV export of any non-empty pack is always a `.zip` file,
   not a bare `.csv`.
-
-- Importing only a child sheet (e.g. just `weapon.csv`, omitting the owning `npc.csv`) for an embedded
-  row whose parent already exists in the target pack still fails: `PlanImport.js`'s `depthOf` treats an
-  id absent from the uploaded file's own envelopes as depth 0, so the row is looked up via
-  `targetPack.getDocument(id)` (which returns null for an embedded id) rather than resolved as a child of
-  its real, out-of-file parent — it then falls to the create path and `ApplyImport.js` throws "the
-  parent document was not found". Pre-existing, not introduced by the C2-C4 embedded-routing fix; that
-  fix makes embedded re-import look more general than it is now that whole-graph re-imports genuinely
-  work. Needs `depthOf`/`resolveExistingDocument` to consult the target pack itself (not just the
-  uploaded file's own envelopes) when an id's parent is missing from the file.
