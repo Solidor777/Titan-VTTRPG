@@ -34,11 +34,39 @@
   components (checks, description, owner-gated delete) resolve the actor exactly as they do inside the
   character sheet. See `data-flow.md` "Player HUD".
 - `src/spreadsheet/` — Compendium spreadsheet export/import: `codec/` (pure document <-> flat-path <->
-  Workbook transforms, no Foundry globals), `format/` (RFC 4180 CSV and a minimal from-scratch XLSX
-  reader/writer over `fflate`, the project's one spreadsheet dependency), `io/` (schema resolution from
-  `CONFIG.<Type>.dataModels`, pack export, and import planning/applying), and `ui/` (the Export/Import
-  `TitanDialog` Svelte shells). Reached from the Compendium sidebar's pack context menu and header
-  button (`OnGetCompendiumContextOptions.js`, `OnRenderCompendiumDirectory.js`).
+  Workbook transforms, no Foundry globals), `format/` (RFC 4180 CSV, a minimal from-scratch XLSX
+  reader/writer over `fflate`, the project's one spreadsheet dependency, and `DecodeSpreadsheetFiles.js`
+  — the shared `.xlsx`/`.zip`/loose-`.csv` extraction over already-read bytes, consumed by both the
+  in-Foundry import UI (`io/PlanImport.js`) and the Node CLI), `io/` (schema resolution from
+  `CONFIG.<Type>.dataModels`, pack export, and import planning/applying), `ui/` (the Export/Import
+  `TitanDialog` Svelte shells), and `markdown/` (pure, no Foundry globals — publishes an exported Item
+  spreadsheet as a single Markdown reference document; runs under plain Node via the CLI or, in the
+  future, in-browser):
+  - `WorkbookToDocuments.js` — extracts renderable Item documents from a decoded workbook (rejects
+    Actor/ActiveEffect exports).
+  - `CompendiumTree.js` — builds the folder/type-group section tree per the heading rules (see
+    `README.md`, "Publishing a spreadsheet as Markdown").
+  - `RenderCompendiumMarkdown.js` — walks the tree, dispatches each document to its `renderers/`
+    entry, assigns heading/item/attack anchor slugs in render order, and assembles the title, table of
+    contents, and body into the final document text.
+  - `Slug.js` — a pure, collision-suffixing anchor-slug generator (`createSlugger()`).
+  - `MarkdownText.js` — inline text escaping and stat-line formatting shared by every renderer.
+  - `HtmlToMarkdown.js` — converts stored ProseMirror description HTML to Markdown.
+  - `Labels.js` — the plural/singular English fallback labels and fixed `TYPE_ORDER`, plus the
+    lang-JSON-backed label resolver renderers call for header/stat-line text.
+  - `renderers/` — one file per Item subtype (`RenderWeapon.js`, `RenderArmor.js`, `RenderShield.js`,
+    `RenderEquipment.js`, `RenderCommodity.js`, `RenderAbility.js`, `RenderSpell.js`), plus shared
+    helpers `RenderItemBlock.js` (the H4 heading + stat-lines + description block shell, and
+    multi-attack H5 sections), `RenderItemChecks.js` (check stat lines), and `RenderTraits.js` (trait
+    tag lines).
+  Reached from the Compendium sidebar's pack context menu and header button
+  (`OnGetCompendiumContextOptions.js`, `OnRenderCompendiumDirectory.js`) for export/import; the Markdown
+  layer is reached only from `scripts/spreadsheet-to-markdown.mjs` today.
+- `src/document/types/item/types/spell/CalculateSpellAspectCosts.js` — the pure, shared per-aspect and
+  spell-level cost/difficulty/complexity calculator (`calculateSpellAspectCosts(aspects, customAspects)`,
+  reads only `SpellAspects.js`, touches no documents). `SpellDataModel.prepareDerivedData` delegates to
+  it for the live sheet's derived stats, and `src/spreadsheet/markdown/renderers/RenderSpell.js`
+  delegates to the same function so a spell's rendered DC/enhancements match the sheet exactly.
 - `src/styles/` — Global SCSS: font imports (`Lato.scss`, `OpenSans.scss`), the STATIC structure tokens
   (`Variables.scss` — spacing, radii, border widths, font sizes; every color and font-family token is injected at
   runtime by the ThemeManager), global resets (`Global.scss`, incl. the chat visibility surface and badge), a
@@ -62,6 +90,12 @@
   holding `_Folder.json`). `scripts/build-packs.mjs` (`npm run build:packs`) compiles them into the untracked
   LevelDB directories `packs/<pack>/`; `scripts/extract-packs.mjs` (`npm run extract:packs`) round-trips edits
   made inside Foundry back to source. Both need the world returned to setup (Foundry locks open packs).
+- `scripts/spreadsheet-to-markdown.mjs` (`npm run export:markdown`) — the CLI entry point that publishes
+  an exported Item spreadsheet as Markdown (see `README.md`, "Publishing a spreadsheet as Markdown"): a
+  bootstrap that registers the `~/` alias Node loader hook, then dynamically imports and runs
+  `scripts/lib/spreadsheetToMarkdownCli.mjs`'s `runCli(argv)` (arg parsing, input resolution/grouping,
+  `src/spreadsheet/format/DecodeSpreadsheetFiles.js` decoding, and `renderCompendiumMarkdown` rendering).
+  Never bundled into the `dist/` system build — a Node-only CLI, not shipped system code.
 - `.github/workflows/ci.yml` runs ESLint, stylelint, the unit suite, the production build, and the pack
   compile on every push/PR; `release.yml` stamps the release tag into `system.json`, builds, compiles packs, and
   attaches `system.json` + `titan.zip` (`dist/ lang/ packs/ fonts/ LICENSE-MIT README.md CHANGELOG.md`).
