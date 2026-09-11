@@ -1,5 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import { buildTables, buildArrayPathMatcher, detectArrayPaths } from '~/spreadsheet/codec/BuildTables.js';
+import { encodeXlsx, decodeXlsx } from '~/spreadsheet/format/Xlsx.js';
+import { readTables } from '~/spreadsheet/codec/ReadTables.js';
 
 /** A minimal typeSchemas stand-in: no schema-typed fields, so column order falls back to first-seen. */
 const NO_SCHEMA = {};
@@ -131,6 +133,38 @@ describe('buildTables — relational layout', () => {
       expect(manifest.rows).toEqual(expect.arrayContaining([
          { key: 'sheet', value: 'weapon.system.statuses', documentType: 'weapon', arrayPath: 'system.statuses' },
       ]));
+   });
+
+   it('truncates/de-duplicates long sheet names once, keeping the manifest in agreement, and round-trips '
+      + 'through encodeXlsx/decodeXlsx', () => {
+      /** @type {string} A 33-character document type whose own sheet name already exceeds 31 characters. */
+      const documentType = 'averyveryverylongdocumenttypename';
+      const envelopes = [
+         {
+            documentType,
+            source: { _id: 'a'.repeat(16), name: 'Longname', system: { somethingreallylong: ['one', 'two'] } },
+         },
+      ];
+      const workbook = buildTables(envelopes, 'relational', 'Item', NO_SCHEMA);
+
+      /** @type {string[]} Every non-manifest sheet's final name. */
+      const dataSheetNames = workbook.sheets.filter((s) => s.name !== '_manifest').map((s) => s.name);
+      expect(dataSheetNames.every((name) => name.length <= 31)).toBe(true);
+      expect(new Set(dataSheetNames).size).toBe(dataSheetNames.length);
+
+      /** @type {object} */
+      const manifest = workbook.sheets.find((s) => s.name === '_manifest');
+      /** @type {string[]} The manifest's recorded 'sheet' row values. */
+      const manifestSheetNames = manifest.rows.filter((r) => r.key === 'sheet').map((r) => r.value);
+      expect([...manifestSheetNames].sort()).toEqual([...dataSheetNames].sort());
+
+      /** @type {import('~/spreadsheet/codec/Workbook.js').Workbook} The workbook after an XLSX round trip. */
+      const decoded = decodeXlsx(encodeXlsx(workbook));
+      /** @type {{envelopes: Array<object>}} */
+      const { envelopes: readEnvelopes } = readTables(decoded, NO_SCHEMA);
+      expect(readEnvelopes).toHaveLength(1);
+      expect(readEnvelopes[0].documentType).toBe(documentType);
+      expect(readEnvelopes[0].source.system.somethingreallylong).toEqual(['one', 'two']);
    });
 });
 

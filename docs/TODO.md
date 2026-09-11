@@ -27,19 +27,6 @@ Completed items are deleted, not marked done.
   certain arrangements can be mis-split by `ApplyImport.js`'s `splitFolderPath`. Narrow edge case;
   pre-existing gap in the escaping scheme design.
 
-- The spec's 31-character-sheet-name fallback (truncate + running-number suffix, with the manifest
-  recording the real mapping) is not implemented consistently: `BuildTables.js` writes the full,
-  untruncated sheet name into the manifest, while `Xlsx.js`'s `encodeXlsx` independently
-  truncates/de-duplicates names when writing the file (`uniqueSheetNames`, already exported for this
-  purpose, is never called from `BuildTables.js`). On import, a manifest lookup against the real
-  (truncated) sheet name misses and the document/child sheet is silently dropped with no error. No
-  current TITAN type name exceeds 31 chars, so this is latent, not reachable today. Needs an
-  architecture decision: either apply `uniqueSheetNames`-style truncation once, at the `Workbook`
-  level in `BuildTables.js`, before either format's encoder runs (so CSV and XLSX sheet names and the
-  manifest all agree), or teach `encodeXlsx` to write its truncated mapping back into the manifest sheet
-  it's given. Needs a unit test locking in whichever fix is chosen (the spec's Testing section requires
-  one; none exists yet).
-
 - String cells in an untyped bag (rules elements, traits, `flags.*`) that look like a number or boolean
   are coerced on import (e.g. a literal string `"5"` decodes to the number `5`), contradicting the
   spec's stated invariant that XLSX cells "carry native types... so values round-trip without
@@ -62,12 +49,6 @@ Completed items are deleted, not marked done.
   this agent has no access to and should not be given credentials for; the user needs to do this step
   themselves: open the exported .xlsx in Google Sheets, edit one cell's data (not the format), then
   File > Download > Microsoft Excel (.xlsx), and hand the resulting file over.
-
-- The spec's Testing section also requires an e2e case for the 31-character-sheet-name-truncation
-  fallback above (unit-level) and, separately, an actor-pack round trip with embedded items and
-  effects — the latter surfaced 4 Critical defects when finally exercised by the final whole-branch
-  review's fix round; see `docs/CLOSED_BUGS.md` for that fix. Keep both spec-mandated test cases in
-  mind if this feature's test suite is revisited.
 
 - `ImportDialogShell.svelte`'s computed `plan` is invalidated when the selected files change
   (`onFilesChosen`) but not when the target pack or the delete-missing checkbox changes, so clicking

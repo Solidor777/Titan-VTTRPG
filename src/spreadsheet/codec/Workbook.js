@@ -51,3 +51,32 @@ export function normalizePath(path) {
 export function createEmptySheet(name) {
    return { name, columns: [], rows: [] };
 }
+
+/**
+ * Truncates and de-duplicates sheet names to Excel's 31-character limit, stripping the characters
+ * Excel forbids in a sheet name (`[ ] : * ? / \`). Applied once at the Workbook level by `buildTables`
+ * before either format's encoder runs, so the `_manifest` sheet's recorded names and the actual sheet
+ * names always agree; `encodeXlsx` also calls it, which is a no-op on already-final names but still
+ * protects a hand-built Workbook that skipped `buildTables`.
+ * @param {string[]} names - The desired sheet names, in order.
+ * @returns {string[]} The final sheet names, unique and each 31 characters or fewer.
+ */
+export function uniqueSheetNames(names) {
+   /** @type {Set<string>} Names already assigned, to detect and resolve collisions. */
+   const used = new Set();
+   return names.map((rawName) => {
+      /** @type {string} The name with forbidden characters stripped. */
+      const cleaned = rawName.replace(/[[\]:*?/\\]/g, '');
+      /** @type {string} The candidate name, truncated and made unique below. */
+      let candidate = cleaned.slice(0, 31);
+      /** @type {number} The collision count seen so far for this candidate. */
+      let suffix = 1;
+      while (used.has(candidate)) {
+         /** @type {string} The numeric collision-breaking suffix, e.g. "~2". */
+         const tag = `~${(suffix += 1)}`;
+         candidate = `${cleaned.slice(0, 31 - tag.length)}${tag}`;
+      }
+      used.add(candidate);
+      return candidate;
+   });
+}

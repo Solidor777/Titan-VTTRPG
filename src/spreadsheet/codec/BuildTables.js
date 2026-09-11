@@ -1,5 +1,5 @@
 import { flattenDocument } from '~/spreadsheet/codec/FlattenDocument.js';
-import { FIXED_COLUMNS, normalizePath } from '~/spreadsheet/codec/Workbook.js';
+import { FIXED_COLUMNS, normalizePath, uniqueSheetNames } from '~/spreadsheet/codec/Workbook.js';
 
 /**
  * @typedef {object} DocumentEnvelope
@@ -326,6 +326,16 @@ export function buildTables(envelopes, layout, packType, typeSchemas) {
          }
       }
    }
+
+   // Truncates/de-duplicates every data sheet's name to Excel's 31-character limit ONCE, here, before the
+   // manifest is built, so the manifest's recorded sheet names and the sheets' own final names always
+   // agree in both formats; encodeXlsx's own call is then a no-op on these already-final names.
+   /** @type {string[]} Final sheet names, in the same order as `sheets`/`manifestEntries`. */
+   const finalNames = uniqueSheetNames(sheets.map((sheet) => sheet.name));
+   sheets.forEach((sheet, i) => {
+      sheet.name = finalNames[i];
+      manifestEntries[i].sheet = finalNames[i];
+   });
 
    return { sheets: [buildManifestSheet(layout, packType, manifestEntries), ...sheets] };
 }
