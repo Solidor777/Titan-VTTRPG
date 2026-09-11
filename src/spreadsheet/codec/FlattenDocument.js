@@ -39,7 +39,9 @@ export function flattenDocument(source) {
    /** @type {Object<string,*>} */
    const flat = {};
    for (const [key, value] of Object.entries(source)) {
-      if (EXCLUDED_TOP_LEVEL_KEYS.has(key)) continue;
+      if (EXCLUDED_TOP_LEVEL_KEYS.has(key)) {
+         continue;
+      }
       flattenValue(key, value, flat);
    }
    return flat;

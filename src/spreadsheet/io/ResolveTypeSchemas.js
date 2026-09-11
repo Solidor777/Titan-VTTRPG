@@ -6,9 +6,15 @@
  */
 function primitiveTypeOf(field) {
    const { fields } = foundry.data;
-   if (field instanceof fields.NumberField) return 'number';
-   if (field instanceof fields.BooleanField) return 'boolean';
-   if (field instanceof fields.StringField) return 'string';
+   if (field instanceof fields.NumberField) {
+      return 'number';
+   }
+   if (field instanceof fields.BooleanField) {
+      return 'boolean';
+   }
+   if (field instanceof fields.StringField) {
+      return 'string';
+   }
    return undefined;
 }
 
