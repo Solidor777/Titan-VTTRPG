@@ -2,7 +2,7 @@
    "id": "titan",
    "title": "Titan VTTRPG",
    "description": "A success based roll system designed for virtual tabletop.",
-   "version": "1.0.0",
+   "version": "2.0.0",
    "compatibility": {
       "minimum": "13",
       "verified": "14",
@@ -99,6 +99,6 @@
    "readme": "https://github.com/Solidor777/Titan-VTTRPG/releases/latest/download/README.md",
    "changelog": "https://github.com/Solidor777/Titan-VTTRPG/releases/latest/download/CHANGELOG.md",
    "manifest": "https://github.com/Solidor777/Titan-VTTRPG/releases/latest/download/system.json",
-   "download": "https://github.com/Solidor777/Titan-VTTRPG/releases/download/v1.0.0/titan.zip",
+   "download": "https://github.com/Solidor777/Titan-VTTRPG/releases/download/v2.0.0/titan.zip",
    "license": "LICENSE-MIT"
 }
