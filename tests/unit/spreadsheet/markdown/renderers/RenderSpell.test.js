@@ -216,10 +216,8 @@ describe('renderSpell', () => {
 
    it('escapes the Enhancements line\'s trailing digit-paren byte-equal to the compendium (Air Walk)', () => {
       // Compendium line 4647 (verified via `cat -A`): "**Enhancements:** Minutes (1 \+ ES), Fly Speed
-      // (5 \+ ES / 2\)  ". The standard `duration` aspect's `minutes` unit always costs 4 build points
-      // (SpellAspects.js's fixed unitCosts table), which would force an unwanted "/ 4" suffix; the
-      // compendium's "Minutes (1 \+ ES)" (no suffix, cost 1) is therefore authored as a custom aspect,
-      // not the standard `duration` aspect. Modeled that way here.
+      // (5 \+ ES / 2\)  ". "Minutes (1 \+ ES)" is modeled here as a cost-1 custom aspect; a standard
+      // minutes `duration` aspect with `scalingCost` 1 renders the same entry (see the scalingCost test).
       /** @type {object} The Air Walk document fixture, matching the compendium's actual Enhancements text. */
       const document = {
          name: 'Air Walk',
@@ -244,6 +242,33 @@ describe('renderSpell', () => {
 
       expect(renderSpell(document, realContext())).toContain(
          '**Enhancements:** Minutes (1 \\+ ES), Fly Speed (5 \\+ ES / 2\\)  \n',
+      );
+   });
+
+   it('renders a standard aspect\'s per-success cost from scalingCost when set, not its build cost', () => {
+      // A minutes duration costs 4 build points and an Ignore Armor damage aspect costs 2, but casting
+      // charges `scalingCost` extra successes per increment when it is present.
+      /** @type {object} The spell fixture with scalingCost overriding both build costs. */
+      const document = {
+         name: 'Scaling Cost Spell',
+         system: makeSystem({
+            aspect: [
+               {
+                  ...durationAspect('minutes', 1),
+                  scaling: true,
+                  scalingCost: 1,
+               },
+               damageAspect({
+                  scaling: true,
+                  option: ['ignoreArmor'],
+                  scalingCost: 1,
+               }),
+            ],
+         }),
+      };
+
+      expect(renderSpell(document, realContext())).toContain(
+         '**Enhancements:** Minutes (1 \\+ ES), Damage (1 \\+ ES)  \n',
       );
    });
 

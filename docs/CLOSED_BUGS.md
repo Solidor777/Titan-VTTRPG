@@ -585,3 +585,16 @@ when fixed.
   (`4 + 1`), plus initial-value/unit/optionCost/allOptionsCost costs, resistance halving with the
   minimum-1 floor, requireOption-with-no-options disabling, custom aspect cost summation, and the
   difficulty/complexity thresholds (4→4:1, 5→5:1, 6→5:2, 8→5:4, 2→4:1 clamped).
+
+### 46. Spell enhancement displays showed the build cost instead of the per-success `scalingCost`
+
+- **What:** `SpellAspectTag.svelte` and `RenderSpell.js`'s `formatEnhancement` rendered a scaling
+  aspect's `/ N` per-increment suffix from its computed build cost, while casting charges
+  `scalingCost ?? cost` extra successes per increment (`CharacterDataModel`). A spell with a
+  `scalingCost` of 1 and a build cost of 2 displayed `(1 + ES / 2)` but charged 1 ES per increment.
+- **Severity:** Low. Display only; casting math was correct.
+- **Found:** 2026-09-23, comparing rendered compendium spells against the rules source during the
+  `titan-vttrpg-compendium` module update.
+- **Fixed:** 2026-09-23 on branch `fix/spell-scaling-cost-display` — both displays use
+  `scalingCost ?? cost`, gated by a `RenderSpell.test.js` case ("renders a standard aspect's
+  per-success cost from scalingCost when set, not its build cost").

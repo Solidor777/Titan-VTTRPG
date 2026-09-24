@@ -66,7 +66,8 @@
   spell-level cost/difficulty/complexity calculator (`calculateSpellAspectCosts(aspects, customAspects)`,
   reads only `SpellAspects.js`, touches no documents). `SpellDataModel.prepareDerivedData` delegates to
   it for the live sheet's derived stats, and `src/spreadsheet/markdown/renderers/RenderSpell.js`
-  delegates to the same function so a spell's rendered DC/enhancements match the sheet exactly.
+  delegates to the same function so a spell's rendered DC/enhancements match the sheet exactly. Enhancement
+  `/ N` suffixes (renderer and `SpellAspectTag.svelte`) show `scalingCost ?? cost`, the per-increment ES charge.
 - `src/styles/` — Global SCSS: font imports (`Lato.scss`, `OpenSans.scss`), the STATIC structure tokens
   (`Variables.scss` — spacing, radii, border widths, font sizes; every color and font-family token is injected at
   runtime by the ThemeManager), global resets (`Global.scss`, incl. the chat visibility surface and badge), a

@@ -57,9 +57,9 @@
                {aspect.initialValue}
             {/if}
 
-            <!--The cost of the aspect-->
-            {#if aspect.cost > 1}
-               {`+ (${localize('extraSuccesses.short')} / ${aspect.cost})`}
+            <!--Extra successes per increment: scalingCost when set, else the build cost (as casting charges)-->
+            {#if (aspect.scalingCost ?? aspect.cost) > 1}
+               {`+ (${localize('extraSuccesses.short')} / ${aspect.scalingCost ?? aspect.cost})`}
             {:else}
                {`+ ${localize('extraSuccesses.short')}`}
             {/if}
