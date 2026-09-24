@@ -21,10 +21,12 @@ function formatRangeValue(initialValue, labels) {
 
 /**
  * Renders one scaling aspect's `Enhancements` entry, e.g. `Damage (1 \+ ES)` or
- * `Fly Speed (5 \+ ES / 2)`, mirroring `SpellAspectTag.svelte`'s display rule.
- * @param {{unit: (string|undefined), label: string, initialValue: (number|undefined)}} aspect - The
- * aspect (standard or custom).
- * @param {number} cost - The aspect's computed cost (its own `cost` for a custom aspect).
+ * `Fly Speed (5 \+ ES / 2)`, mirroring `SpellAspectTag.svelte`'s display rule. The per-increment cost is
+ * `scalingCost` when set, else the computed build cost — the same rule the casting check applies
+ * (`CharacterDataModel`'s `scalingCost ?? cost`).
+ * @param {{unit: (string|undefined), label: string, initialValue: (number|undefined),
+ * scalingCost: (number|undefined)}} aspect - The aspect (standard or custom).
+ * @param {number} cost - The aspect's computed build cost (its own `cost` for a custom aspect).
  * @param {function(string, string=): string} labels - The label resolver (`Labels.js`'s `label`).
  * @param {boolean} [isCustom] - Whether `aspect` is a custom aspect, whose label renders as written
  * rather than through the label resolver.
@@ -37,8 +39,11 @@ function formatEnhancement(aspect, cost, labels, isCustom = false) {
    /** @type {string} The initial-value prefix, omitted (with its space) when 0/blank. */
    const valuePrefix = aspect.initialValue ? `${aspect.initialValue} ` : '';
 
-   /** @type {string} The `/ cost` suffix, appended only when the computed cost is greater than 1. */
-   const costSuffix = cost > 1 ? ` / ${cost}` : '';
+   /** @type {number} The extra successes one increment costs when casting. */
+   const incrementCost = aspect.scalingCost ?? cost;
+
+   /** @type {string} The `/ cost` suffix, appended only when the increment cost is greater than 1. */
+   const costSuffix = incrementCost > 1 ? ` / ${incrementCost}` : '';
 
    return `${name} (${valuePrefix}\\+ ${labels('extraSuccesses.short', 'ES')}${costSuffix})`;
 }
