@@ -1,3 +1,7 @@
+## Version 2.0.1:
+Bug fix.
+- Portrait changes made from a character or item sheet are now saved; they previously reverted on reload.
+
 ## Version 2.0.0:
 Rewrite for Foundry VTT v13-v14.
 - All sheets, dialogs, and chat cards rebuilt on ApplicationV2 with Svelte 5; the TyphonJS dependency is removed.
