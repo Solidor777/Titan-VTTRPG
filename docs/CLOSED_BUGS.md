@@ -598,3 +598,17 @@ when fixed.
 - **Fixed:** 2026-09-23 on branch `fix/spell-scaling-cost-display` — both displays use
   `scalingCost ?? cost`, gated by a `RenderSpell.test.js` case ("renders a standard aspect's
   per-success cost from scalingCost when set, not its build cost").
+
+### 47. Character and item sheet portrait picks were not saved
+
+- **What:** `DocumentImagePicker.svelte` bound `document.data.img` (a plain assignment on the in-memory document)
+  and its `onchange` called `refreshSystemDocument`, which sends only `system` and `flags`. `img` never reached
+  the stored source, so a picked portrait showed until the sheet re-prepared or the page reloaded, then reverted.
+  Affected every sheet using `DocumentImagePicker` (actor portrait in `CharacterSheetPortrait.svelte`, item
+  portrait in `ItemSheetHeader.svelte`).
+- **Severity:** Medium. Every portrait change from a sheet was lost.
+- **Found:** 2026-09-26, user report; reproduced live on the `test-titan` world (in-memory `img` changed,
+  `_source.img` did not).
+- **Fixed:** 2026-09-26 — `DocumentImagePicker` now persists with `document.data.update({ img })`, as
+  `DocumentIconPicker` does. Gated by `tests/e2e/portrait-persistence.spec.js` (actor and item portrait picks
+  read back after a full page reload).

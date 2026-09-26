@@ -1,7 +1,6 @@
 <script>
    import { getContext } from 'svelte';
    import ImagePicker from '~/helpers/svelte-components/input/ImagePicker.svelte';
-   import refreshSystemDocument from '~/helpers/utility-functions/RefreshSystemDocumentData.js';
 
    /**
     * @typedef {object} DocumentImagePickerProps
@@ -21,12 +20,23 @@
 
    /** @type {object} Reference to the reactive Document store. */
    const document = getContext('document');
+
+   /**
+    * Persists the picked image path. The bound value is only assigned on the in-memory document, so it must be
+    * sent in an update to reach the stored source.
+    * @returns {Promise<void>} Resolves once the document update completes, or immediately if skipped.
+    */
+   async function updateDocument() {
+      if (!disabled && document.data?.isOwner) {
+         await document.data.update({ img: value });
+      }
+   }
 </script>
 
 <ImagePicker
    {alt}
    bind:value
    disabled={disabled || !document.data?.isOwner}
-   onchange={() => refreshSystemDocument(document.data, disabled)}
+   onchange={updateDocument}
    {tooltip}
 />
