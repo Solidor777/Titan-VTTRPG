@@ -194,7 +194,7 @@ export default class TitanActor extends Actor {
             )) {
 
             // Execute pre-delete operations.
-            this.system.preDeleteItem(item);
+            await this.system.preDeleteItem(item);
             this.sheet.preDeleteItem(item);
 
             // Cache the item type.

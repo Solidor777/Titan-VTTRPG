@@ -342,10 +342,10 @@ export default class CharacterDataModel extends TitanActorDataModel {
          'Cannot modify document %s if not owner.',
          this.parent.name,
       ) && assert(
-         !this.parent.uuid === item.parent?.uuid,
-         'Item is already owned by actor',
-         this.parent.name,
+         this.parent.uuid === item.parent?.uuid,
+         'Cannot delete item %s: it is not owned by actor %s.',
          item.name,
+         this.parent.name,
       )) {
 
          // Perform type specific deletion operations.
@@ -2900,7 +2900,7 @@ export default class CharacterDataModel extends TitanActorDataModel {
       // Expertise mod.
       if (options.expertiseMod === undefined) {
          checkOptions.expertiseMod = this.getCastingCheckMod(
-            'expertiseMod',
+            'expertise',
             checkOptions.attribute,
             checkOptions.skill,
             itemRollData.tradition,
@@ -3351,7 +3351,7 @@ export default class CharacterDataModel extends TitanActorDataModel {
       // Expertise mod.
       if (options.expertiseMod === undefined) {
          checkOptions.expertiseMod = this.getItemCheckMod(
-            'expertiseMod',
+            'expertise',
             checkOptions.attribute,
             checkOptions.skill,
             customTraits,
@@ -3666,7 +3666,7 @@ export default class CharacterDataModel extends TitanActorDataModel {
       let retVal = 0;
 
       // If there are Rules Elements for this selector.
-      const selectorMods = conditionalCheckModifier[selector];
+      const selectorMods = conditionalCheckModifiers[selector];
       if (selectorMods) {
 
          // Add the mods for each matching key.
