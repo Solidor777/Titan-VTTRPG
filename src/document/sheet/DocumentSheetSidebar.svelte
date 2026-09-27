@@ -45,6 +45,7 @@
 
       .section-label {
          @include section-label;
+         @include margin-bottom-standard;
       }
    }
 </style>

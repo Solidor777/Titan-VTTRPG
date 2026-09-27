@@ -1,5 +1,5 @@
 import { expect, test } from '@playwright/test';
-import { login } from './fixtures.js';
+import { login, openSheetTab } from './fixtures.js';
 import { attachPageErrors, clearChat, closeAllApps } from './world.js';
 
 /**
@@ -61,7 +61,7 @@ test.afterAll(async () => {
 });
 
 test('skill rows lay out on one compact line', async () => {
-   await page.getByText('Skills', { exact: true }).first().click();
+   await openSheetTab(page, 'Skills');
 
    const firstRow = page.locator('.skill').first();
    await expect(firstRow, 'first skill row rendered').toBeVisible();
@@ -89,4 +89,14 @@ test('sidebar sections carry uppercase labels', async () => {
    }
 
    expect(errors, `uncaught errors:\n${errors.join('\n')}`).toEqual([]);
+});
+
+test('sidebar section labels are spaced from the items they contain', async () => {
+   const gaps = await page.locator('.section-label').evaluateAll((labels) => labels.map((label) => {
+      return label.nextElementSibling.getBoundingClientRect().top - label.getBoundingClientRect().bottom;
+   }));
+   expect(gaps, 'one gap per labelled section').toHaveLength(3);
+   for (const gap of gaps) {
+      expect(gap, 'the section content starts at least the standard spacing below its label').toBeGreaterThanOrEqual(5);
+   }
 });
