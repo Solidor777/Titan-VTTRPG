@@ -583,3 +583,119 @@ test('Escape and click-away close the cascade', async () => {
    await page.locator('[data-testid="player-hud-portrait"]').click();
    await expect(page.locator('[data-testid="player-hud-flyout"]')).toHaveCount(0);
 });
+
+/**
+ * Reads whether a button's icon renders in the resolved accent color.
+ * @param {import('@playwright/test').Page} page - The Playwright page bound to the live world.
+ * @param {string} testId - The button's data-testid.
+ * @returns {Promise<boolean>} True when the icon's computed color equals the accent color.
+ */
+function iconUsesAccent(page, testId) {
+   return page.evaluate((id) => {
+      const button = document.querySelector(`[data-testid="${id}"]`);
+      const icon = button.querySelector('i');
+      // Resolve the accent token in the same cascade scope as the icon.
+      const probe = document.createElement('span');
+      probe.style.color = 'var(--titan-accent-color)';
+      button.appendChild(probe);
+      const accent = getComputedStyle(probe).color;
+      probe.remove();
+      return getComputedStyle(icon).color === accent;
+   }, testId);
+}
+
+/**
+ * Sets the athletics skill's default attribute on an actor.
+ * @param {string} actorId - The actor's id.
+ * @param {string} attribute - The attribute key.
+ * @returns {Promise<void>} Resolves once the update completes.
+ */
+function setAthleticsAttribute(actorId, attribute) {
+   return page.evaluate(({ id, value }) => {
+      return game.actors.get(id).update({ 'system.skill.athletics.defaultAttribute': value });
+   }, {
+      id: actorId,
+      value: attribute,
+   });
+}
+
+/**
+ * Opens an action-menu category. The open category persists in the HUD layout state across tests and
+ * clicking the open category closes it, so the click is skipped when that category is already open.
+ * @param {string} key - The category key.
+ * @returns {Promise<void>} Resolves once the category's flyout is visible.
+ */
+async function openCategory(key) {
+   /** @type {import('@playwright/test').Locator} The category button. */
+   const button = page.locator(`[data-testid="player-hud-category-${key}"]`);
+   await expect(button).toBeVisible();
+   if (!await button.evaluate((element) => element.classList.contains('active'))) {
+      await button.click();
+   }
+   await expect(page.locator('[data-testid="player-hud-flyout"]')).toBeVisible();
+}
+
+test('skill sub-options show the icon of the actor\'s current default attribute', async () => {
+   const actorId = await seedControlledActor(page, { name: 'HUD Menu Player' });
+   await setAthleticsAttribute(actorId, 'body');
+
+   await openCategory('skills');
+   const icon = page.locator('[data-testid="player-hud-sub-option-skills-athletics"] i');
+   await expect(icon).toHaveClass(/(?:^|\s)fas\sfa-hand-fist(?:\s|$)/);
+
+   // Changing the default attribute on the actor re-derives the icon in place.
+   await setAthleticsAttribute(actorId, 'mind');
+   await expect(icon).toHaveClass(/(?:^|\s)fas\sfa-brain(?:\s|$)/);
+
+   await setAthleticsAttribute(actorId, 'body');
+});
+
+test('resistance and utility sub-options carry icons', async () => {
+   await seedControlledActor(page, { name: 'HUD Menu Player' });
+   await openCategory('resistances');
+   await expect(page.locator('[data-testid="player-hud-sub-option-resistances-reflexes"] i'))
+      .toHaveClass(/(?:^|\s)fas\sfa-rabbit-running(?:\s|$)/);
+
+   await openCategory('utility');
+   for (const [key, icon] of [
+      [
+         'toggleInspiration',
+         /(?:^|\s)fas\sfa-sun(?:\s|$)/,
+      ],
+      [
+         'shortRest',
+         /(?:^|\s)fas\sfa-face-exhaling(?:\s|$)/,
+      ],
+      [
+         'applyRepairs',
+         /(?:^|\s)fas\sfa-screwdriver-wrench(?:\s|$)/,
+      ],
+   ]) {
+      await expect(page.locator(`[data-testid="player-hud-sub-option-utility-${key}"] i`)).toHaveClass(icon);
+   }
+});
+
+test('inspiration toggles show whether inspiration applies', async () => {
+   const actorId = await seedControlledActor(page, { name: 'HUD Menu Player' });
+   await page.evaluate((id) => game.actors.get(id).update({ 'system.inspiration': true }), actorId);
+
+   const portraitToggle = page.locator('[data-testid="player-hud-toggle-inspiration"]');
+   await openCategory('utility');
+   const menuToggle = page.locator('[data-testid="player-hud-sub-option-utility-toggleInspiration"]');
+
+   // Presence: both toggles report pressed and paint the icon in the accent color.
+   await expect(portraitToggle).toHaveAttribute('aria-pressed', 'true');
+   await expect(menuToggle).toHaveAttribute('aria-pressed', 'true');
+   expect(await iconUsesAccent(page, 'player-hud-toggle-inspiration')).toBe(true);
+   expect(await iconUsesAccent(page, 'player-hud-sub-option-utility-toggleInspiration')).toBe(true);
+
+   // Clicking the portrait toggle clears inspiration; both toggles follow. The click lands outside the flyout,
+   // which closes the cascade, so the utility category is reopened before reading the menu toggle.
+   await portraitToggle.click();
+   await expect(portraitToggle).toHaveAttribute('aria-pressed', 'false');
+   await openCategory('utility');
+   await expect(menuToggle).toHaveAttribute('aria-pressed', 'false');
+   expect(await iconUsesAccent(page, 'player-hud-sub-option-utility-toggleInspiration')).toBe(false);
+   expect(await iconUsesAccent(page, 'player-hud-toggle-inspiration')).toBe(false);
+   expect(await page.evaluate((id) => game.actors.get(id).system.inspiration, actorId)).toBe(false);
+});

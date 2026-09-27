@@ -20,12 +20,15 @@
    variant="sub-option"
    {active}
    {align}
+   pressed={sub.pressed}
    testId={`player-hud-sub-option-${categoryKey}-${sub.key}`}
    onclick={() => onAction('main', sub)}
    onpointermove={(event) => onreveal(sub, event)}
    onfocus={(event) => onreveal(sub, event)}
 >
-   {#if sub.img}
+   {#if sub.icon}
+      <i class={sub.icon}></i>
+   {:else if sub.img}
       <img
          src={sub.img}
          alt=""
@@ -35,6 +38,14 @@
 </HudButton>
 
 <style lang="scss">
+   // Icons take the same 20px box as item images so every row's label starts at the same x.
+   // Pressed toggles paint the icon in the accent color handed down by HudButton.
+   i {
+      width: 20px;
+      text-align: center;
+      color: var(--titan-hud-button-icon-color, inherit);
+   }
+
    img {
       width: 20px;
       height: 20px;

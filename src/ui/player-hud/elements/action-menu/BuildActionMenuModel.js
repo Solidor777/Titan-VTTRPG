@@ -1,13 +1,23 @@
 import {
    ACCURACY_ICON,
+   DAMAGE_ICON,
    DECREMENT_ICON,
    DELETE_ICON,
    DICE_ICON,
+   HEALING_ICON,
    INCREMENT_ICON,
+   INSPIRATION_ICON,
+   LONG_REST_ICON,
    MELEE_ICON,
+   REMOVE_TEMP_EFFECTS_ICON,
+   REND_ICON,
+   REPAIR_ICON,
    SEND_TO_CHAT_ICON,
    SHEET_ICON,
+   SHORT_REST_ICON,
+   getIcon,
 } from '~/system/Icons.js';
+import { DEFAULT_SKILL_ATTRIBUTES } from '~/system/DefaultSkillAttributes.js';
 
 /** @type {Array<string>} The 18 skill keys, matching the character schema. */
 export const HUD_SKILLS = [
@@ -438,10 +448,14 @@ function buildUtility(actors) {
    /** @type {Array<object>} The accumulated sub-options. */
    const subOptions = [];
 
-   if (actors.some((actor) => actor.type === 'player')) {
+   /** @type {object | undefined} The first player, whose inspiration state the toggle displays. */
+   const firstPlayer = actors.find((actor) => actor.type === 'player');
+   if (firstPlayer) {
       subOptions.push({
          key: 'toggleInspiration',
          labelKey: 'toggleInspiration',
+         icon: INSPIRATION_ICON,
+         pressed: firstPlayer.system.inspiration === true,
          mainAction: () => {
             for (const actor of actors.filter((entry) => entry.type === 'player')) {
                actor.system.toggleInspiration();
@@ -451,14 +465,24 @@ function buildUtility(actors) {
       });
    }
 
-   for (const key of [
-      'shortRest',
-      'longRest',
-      'removeCombatEffects',
+   for (const [key, icon] of [
+      [
+         'shortRest',
+         SHORT_REST_ICON,
+      ],
+      [
+         'longRest',
+         LONG_REST_ICON,
+      ],
+      [
+         'removeCombatEffects',
+         REMOVE_TEMP_EFFECTS_ICON,
+      ],
    ]) {
       subOptions.push({
          key,
          labelKey: key,
+         icon,
          mainAction: () => {
             for (const actor of actors) {
                actor.system[key]({});
@@ -469,15 +493,28 @@ function buildUtility(actors) {
    }
 
    // The four apply actions prompt for an amount; the menu component owns the dialog wiring.
-   for (const key of [
-      'applyDamage',
-      'applyHealing',
-      'applyRend',
-      'applyRepairs',
+   for (const [key, icon] of [
+      [
+         'applyDamage',
+         DAMAGE_ICON,
+      ],
+      [
+         'applyHealing',
+         HEALING_ICON,
+      ],
+      [
+         'applyRend',
+         REND_ICON,
+      ],
+      [
+         'applyRepairs',
+         REPAIR_ICON,
+      ],
    ]) {
       subOptions.push({
          key,
          labelKey: key,
+         icon,
          amountPrompt: true,
          subButtons: [],
       });
@@ -507,6 +544,8 @@ export default function buildActionMenuModel({ actors, primary, options }) {
             return {
                key: skill,
                labelKey: skill,
+               // The primary actor's current default attribute; the static default when there is none.
+               icon: getIcon(primary?.system.skill?.[skill]?.defaultAttribute ?? DEFAULT_SKILL_ATTRIBUTES[skill]),
                mainAction: () => {
                   for (const actor of actors) {
                      actor.system.requestAttributeCheck({
@@ -526,6 +565,7 @@ export default function buildActionMenuModel({ actors, primary, options }) {
             return {
                key: resistance,
                labelKey: resistance,
+               icon: getIcon(resistance),
                mainAction: () => {
                   for (const actor of actors) {
                      actor.system.requestResistanceCheck({ resistance });

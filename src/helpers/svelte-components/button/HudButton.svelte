@@ -9,6 +9,8 @@
     * accent bar on when active; omitted for no accent.
     * @property {'start' | 'end'} [align] - Horizontal content alignment for the text/icon variants;
     * 'end' right-aligns.
+    * @property {boolean | undefined} [pressed] - Toggle state for a toggle button (sets `aria-pressed` and the
+    * accent ring); undefined for a button that is not a toggle.
     * @property {boolean} [disabled] - Whether the button is disabled.
     * @property {string} [type] - The native button type.
     * @property {string | undefined} [ariaLabel] - The accessible label.
@@ -27,6 +29,7 @@
       active = false,
       accentEdge = undefined,
       align = 'start',
+      pressed = undefined,
       disabled = false,
       type = 'button',
       ariaLabel = undefined,
@@ -44,6 +47,7 @@
    class={`hud-button ${variant}`}
    class:active
    class:align-end={align === 'end'}
+   class:pressed
    class:accent-top={accentEdge === 'top'}
    class:accent-right={accentEdge === 'right'}
    class:accent-bottom={accentEdge === 'bottom'}
@@ -51,6 +55,7 @@
    {type}
    {disabled}
    aria-label={ariaLabel}
+   aria-pressed={pressed}
    data-testid={testId}
    {onclick}
    {onpointermove}
@@ -169,6 +174,15 @@
          --titan-button-hover-font-color: var(--titan-panel-2-color);
 
          padding: 0;
+      }
+
+      // A pressed toggle carries an accent ring, distinct from the revealed-row edge-bar. Icons come from the
+      // caller's snippet, which this component's scoped styles cannot reach, so the accent icon color is handed
+      // down through the inherited --titan-hud-button-icon-color property.
+      &.pressed {
+         --titan-hud-button-icon-color: var(--titan-accent-color);
+
+         box-shadow: inset 0 0 0 2px var(--titan-accent-color);
       }
 
       // The accent edge-bar marks an open/active button on the edge facing its flyout.

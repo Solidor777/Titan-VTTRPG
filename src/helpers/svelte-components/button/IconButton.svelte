@@ -6,6 +6,8 @@
     * @typedef {object} IconButtonProps Props for the IconButton component.
     * @property {string | undefined} [icon] - The icon class to display for this button.
     * @property {boolean} [disabled] - Whether this button is currently disabled.
+    * @property {boolean | undefined} [pressed] - Toggle state for a toggle button (sets `aria-pressed` and the
+    * accent ring); undefined for a button that is not a toggle.
     * @property {string} label - Accessible label for this icon-only button (required).
     * @property {string | object | undefined} [tooltip] - The tooltip to display for this element, if any.
     * @property {((event: MouseEvent) => void) | undefined} [onclick] - Callback invoked when the button is clicked.
@@ -16,6 +18,7 @@
    const {
       icon = void 0,
       disabled = false,
+      pressed = undefined,
       label,
       tooltip = void 0,
       onclick = void 0,
@@ -25,6 +28,8 @@
 
 <button
    aria-label={label}
+   aria-pressed={pressed}
+   class:pressed
    data-testid={testId}
    {disabled}
    {onclick}
@@ -39,6 +44,15 @@
 
       i {
          margin-right: 0;
+      }
+
+      // A pressed toggle carries an accent ring and an accent icon.
+      &.pressed {
+         box-shadow: inset 0 0 0 2px var(--titan-accent-color);
+
+         i {
+            color: var(--titan-accent-color);
+         }
       }
    }
 </style>

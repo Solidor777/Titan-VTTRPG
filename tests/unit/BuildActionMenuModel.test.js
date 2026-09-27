@@ -1,6 +1,20 @@
 import { describe, it, expect, vi } from 'vitest';
 import buildActionMenuModel from '~/ui/player-hud/elements/action-menu/BuildActionMenuModel.js';
 import { createDefaultHudOptions } from '~/ui/player-hud/PlayerHudDefaults.js';
+import {
+   DAMAGE_ICON,
+   HEALING_ICON,
+   INSPIRATION_ICON,
+   LONG_REST_ICON,
+   MIND_ICON,
+   REFLEXES_ICON,
+   REMOVE_TEMP_EFFECTS_ICON,
+   REND_ICON,
+   REPAIR_ICON,
+   RESILIENCE_ICON,
+   SHORT_REST_ICON,
+   WILLPOWER_ICON,
+} from '~/system/Icons.js';
 
 /**
  * Builds a mock character actor with spied engine methods.
@@ -124,6 +138,67 @@ describe('buildActionMenuModel', () => {
                skill: 'athletics',
             });
       }
+   });
+
+   it('gives each skill the icon of the primary actor\'s current default attribute', () => {
+      const primary = mockActor();
+      primary.system.skill = {
+         athletics: { defaultAttribute: 'mind' },
+      };
+      const model = buildActionMenuModel({
+         actors: [primary],
+         primary,
+         options: createDefaultHudOptions().actionMenu,
+      });
+      const skills = category(model, 'skills').subOptions;
+      expect(skills.find((s) => s.key === 'athletics').icon).toBe(MIND_ICON);
+
+      // A skill the actor has no entry for falls back to the static default map (arcana defaults to mind).
+      expect(skills.find((s) => s.key === 'arcana').icon).toBe(MIND_ICON);
+   });
+
+   it('gives each resistance its resistance icon', () => {
+      const model = buildActionMenuModel({
+         actors: [mockActor()],
+         primary: mockActor(),
+         options: createDefaultHudOptions().actionMenu,
+      });
+      expect(category(model, 'resistances').subOptions.map((s) => s.icon)).toEqual([
+         REFLEXES_ICON,
+         RESILIENCE_ICON,
+         WILLPOWER_ICON,
+      ]);
+   });
+
+   it('gives every utility an icon and marks inspiration pressed from the first player', () => {
+      const primary = mockActor();
+      primary.system.inspiration = true;
+      const model = buildActionMenuModel({
+         actors: [primary],
+         primary,
+         options: createDefaultHudOptions().actionMenu,
+      });
+      const utility = category(model, 'utility').subOptions;
+      expect(utility.map((s) => s.icon)).toEqual([
+         INSPIRATION_ICON,
+         SHORT_REST_ICON,
+         LONG_REST_ICON,
+         REMOVE_TEMP_EFFECTS_ICON,
+         DAMAGE_ICON,
+         HEALING_ICON,
+         REND_ICON,
+         REPAIR_ICON,
+      ]);
+      expect(utility.find((s) => s.key === 'toggleInspiration').pressed).toBe(true);
+
+      primary.system.inspiration = false;
+      const cleared = buildActionMenuModel({
+         actors: [primary],
+         primary,
+         options: createDefaultHudOptions().actionMenu,
+      });
+      expect(category(cleared, 'utility').subOptions.find((s) => s.key === 'toggleInspiration').pressed)
+         .toBe(false);
    });
 
    it('omits inspiration from utility when no actor is a player', () => {

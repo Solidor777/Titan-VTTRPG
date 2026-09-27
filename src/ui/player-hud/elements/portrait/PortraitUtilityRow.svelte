@@ -14,6 +14,9 @@
 
    /** @type {boolean} Whether the actor is a Player (inspiration is Player-only). */
    const isPlayer = $derived(document.data.type === 'player');
+
+   /** @type {boolean} Whether the Player currently has inspiration. */
+   const inspired = $derived(document.data.system.inspiration === true);
 </script>
 
 <div class="utility-row">
@@ -27,6 +30,7 @@
    {#if isPlayer}
       <IconButton
          icon={INSPIRATION_ICON}
+         pressed={inspired}
          label={localize('toggleInspiration')}
          tooltip={'toggleInspiration'}
          testId="player-hud-toggle-inspiration"
