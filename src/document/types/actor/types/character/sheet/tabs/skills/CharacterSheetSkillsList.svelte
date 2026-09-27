@@ -21,7 +21,7 @@
 
       // If no skill names match, look for skills with matching default attributes.
       if (result.length === 0) {
-         result = skillList.filter((skill) =>
+         result = skillList.filter(([, skill]) =>
             localize(skill.defaultAttribute).toLowerCase().includes(filter));
       }
 

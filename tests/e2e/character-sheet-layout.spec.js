@@ -60,14 +60,88 @@ test.afterAll(async () => {
    await page?.close();
 });
 
-test('skill rows lay out on one compact line', async () => {
+/**
+ * Measures every skill row: each part's offset and width relative to its row, and whether any part is clipped.
+ * @returns {Promise<object>} The per-part distinct offsets/widths across rows and the clipped part count.
+ */
+function measureSkillRows() {
+   return page.evaluate(() => {
+      const rows = [...document.querySelectorAll('.application.titan-document-sheet .skill')];
+      const parts = {
+         check: new Set(),
+         attribute: new Set(),
+         stats: new Set(),
+      };
+      let clipped = 0;
+      for (const row of rows) {
+         const rowBox = row.getBoundingClientRect();
+         for (const name of Object.keys(parts)) {
+            const box = row.querySelector(`:scope > .${name}`).getBoundingClientRect();
+            const left = Math.round(box.left - rowBox.left);
+            const top = Math.round(box.top - rowBox.top);
+            parts[name].add(`${left}/${top}/${Math.round(box.width)}`);
+            if (box.right > rowBox.right + 0.5 || box.left < rowBox.left - 0.5) {
+               clipped += 1;
+            }
+         }
+         // Content that overflows its own box is cut off.
+         for (const element of row.querySelectorAll('.check button, .attribute [role="combobox"]')) {
+            if (element.scrollWidth > element.clientWidth + 1) {
+               clipped += 1;
+            }
+         }
+      }
+      return {
+         rows: rows.length,
+         check: parts.check.size,
+         attribute: parts.attribute.size,
+         stats: parts.stats.size,
+         clipped,
+      };
+   });
+}
+
+test('every skill row places its parts identically and nothing is cut off', async () => {
    await openSheetTab(page, 'Skills');
+   await expect(page.locator('.skill').first(), 'first skill row rendered').toBeVisible();
 
-   const firstRow = page.locator('.skill').first();
-   await expect(firstRow, 'first skill row rendered').toBeVisible();
+   // At the default width and at a narrow width that forces the rows to wrap.
+   for (const width of [
+      850,
+      640,
+   ]) {
+      await page.evaluate(({ name, sheetWidth }) => {
+         game.actors.getName(name).sheet.setPosition({ width: sheetWidth });
+      }, {
+         name: ACTOR_NAME,
+         sheetWidth: width,
+      });
+      await expect.poll(() => page.evaluate(() => Math.round(
+         document.querySelector('.application.titan-document-sheet').getBoundingClientRect().width,
+      )), { message: `sheet resized to ${width}` }).toBe(width);
+      expect(await measureSkillRows(), `skill rows at ${width}px`).toEqual({
+         rows: 18,
+         check: 1,
+         attribute: 1,
+         stats: 1,
+         clipped: 0,
+      });
+   }
+});
 
-   const height = await firstRow.evaluate((el) => el.getBoundingClientRect().height);
-   expect(height, 'skill row height stays under the compact single-line budget').toBeLessThan(56);
+test('the skills filter falls back to matching the default attribute', async () => {
+   await openSheetTab(page, 'Skills');
+   const rows = page.locator('.application.titan-document-sheet .skill');
+   await expect(rows).toHaveCount(18);
+   await page.locator('.application.titan-document-sheet .skill-tab .header .filter input').fill('soul');
+
+   // No skill name contains "soul"; the fallback lists the skills whose default attribute is Soul.
+   const expected = await page.evaluate((name) => {
+      const skills = Object.values(game.actors.getName(name).system.skill);
+      return skills.filter((skill) => skill.defaultAttribute === 'soul').length;
+   }, ACTOR_NAME);
+   expect(expected, 'the seeded actor has Soul skills').toBeGreaterThan(0);
+   await expect(rows).toHaveCount(expected);
 });
 
 test('sidebar sections carry uppercase labels', async () => {

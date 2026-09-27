@@ -79,7 +79,9 @@
 
 <div class="skill">
    <!--Check button-->
-   <CharacterSheetCondensedSkillCheckButton {checkParameters}/>
+   <div class="check">
+      <CharacterSheetCondensedSkillCheckButton {checkParameters}/>
+   </div>
 
    <!--Default Attribute-->
    <div class="attribute" use:tooltipAction={'defaultAttribute.desc'}>
@@ -160,28 +162,40 @@
 </div>
 
 <style lang="scss">
+   // Every part has a fixed size, so every row places its parts identically. The check button grows into any
+   // spare width and never shrinks below its basis; the stats sit against the right edge. When the row is
+   // narrower than the full layout it wraps, and because wrapping depends only on the container width, every
+   // row wraps at the same point.
    .skill {
       @include flex-row;
-      @include flex-space-between;
       @include panel-2;
 
+      flex-wrap: wrap;
       align-items: center;
       gap: var(--titan-spacing-standard);
       width: 100%;
       padding: var(--titan-spacing-standard) var(--titan-spacing-standard) var(--titan-spacing-standard)
          var(--titan-spacing-large);
 
+      // Basis fits the widest English skill button ("Investigation", measured 161px with a one-digit dice
+      // count) plus room for a two-digit count. Grid stretches the button component to the column width.
+      .check {
+         display: grid;
+         flex: 1 0 172px;
+      }
+
+      // Fits the widest attribute select (icon, label and chevron, measured 97px).
       .attribute {
-         @include flex-row;
-         @include flex-group-center;
+         display: grid;
+         flex: 0 0 100px;
       }
 
       .stats {
          @include flex-row;
          @include flex-group-right;
 
-         // The two stat groups keep their full width; the check button and select absorb any squeeze.
-         flex-shrink: 0;
+         flex: 0 0 auto;
+         margin-left: auto;
 
          .stat {
             @include flex-row;
@@ -193,7 +207,11 @@
                @include margin-left-large;
             }
 
+            // Fixed glyph boxes keep both stat groups the same width whatever the glyph metrics.
             i {
+               width: 16px;
+               text-align: center;
+
                @include margin-right-standard;
             }
 
@@ -223,6 +241,7 @@
                @include flex-group-center;
 
                height: 100%;
+               width: 10px;
 
                @include margin-left-standard;
             }
