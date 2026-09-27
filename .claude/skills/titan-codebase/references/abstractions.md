@@ -414,6 +414,12 @@ appliers recompute the running total per element before computing a corrective d
 `computeSetSumDelta`) and writing it into the element's source mod bucket, so multiple sum ops on the same
 stat compound in order. Each applier records what it wrote under a same-named key on `rulesElementsCache`.
 
+Equipped gear is applied outside the rules-element pipeline, in the `equipment` mod buckets: the equipped
+shield adds its `defense` to the Defense rating, the equipped armor adds its armor value to `mod.armor`, and an
+armor trait named `heavy` subtracts 1 from each speed whose base plus mods-so-far is above 0. The character
+`mod.damage` and `mod.healing` stats are derived and displayed but read by no check (open bug); check damage and
+healing bonuses come only from `conditionalCheckModifier` elements.
+
 
 ## Sheets
 

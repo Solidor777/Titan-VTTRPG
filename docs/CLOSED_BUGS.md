@@ -704,3 +704,18 @@ when fixed.
 - **Fixed:** 2026-09-26 in the compendium module (`a6588af`, `031f612`): legacy elements removed, the path icon applied,
   and the Healer's Kit (commodity, value 100, common) added in a new Equipment pack. The live `packs/` still need
   compiling (`npm run packs:compile` with Foundry stopped).
+
+### 61. Heavy armor did not decrease speeds
+
+- **What:** the equipped-armor pass compared trait names against `'heavy.armor'`; the trait is named `'heavy'`, so the
+  -1 to all speeds never applied. Its zero-speed guard also read the not-yet-derived `speed.value`.
+- **Fixed:** 2026-09-27 — matches `'heavy'` and guards with `baseValue` plus mods. Gated by `armor-heavy-trait.spec.js`.
+
+### 62. Compendium: rules elements that disagreed with the rules text
+
+- **What:** a read-only audit of every compendium item and effect against the 2026-09-26 rules found wrong check
+  skills and resistances, missing or wrong speed values, half-stamina and halved-speed arithmetic errors, roll messages
+  on the wrong check type or naming the wrong ability, ranged weapons rolling as melee, stray armor traits, empty spell
+  aspects and label typos.
+- **Fixed:** 2026-09-27 in the compendium module (`4aecccc`), 52 documents; validated with `npm run validate` (0
+  errors). Findings that need a rules decision are listed in `docs/TODO.md`.
