@@ -1,5 +1,6 @@
 <script>
    import { getContext } from 'svelte';
+   import { CONDITIONAL_CHECK_MODIFIER_TYPES } from '~/system/ConditionalCheckModifierTypes.js';
    import localize from '~/helpers/utility-functions/Localize.js';
    import DocumentSelect from '~/document/svelte-components/select/DocumentSelect.svelte';
    import DocumentAttackTypeSelect from '~/document/svelte-components/select/DocumentAttackTypeSelect.svelte';
@@ -20,14 +21,8 @@
    /** @type {object} Reference to the reactive Document store. */
    const document = getContext('document');
 
-   /** @type {string[]} Options for the type of value the modifier applies to. */
-   const modifierTypeOptions = [
-      'damage',
-      'dice',
-      'expertise',
-      'training',
-      'healing',
-   ];
+   /** @type {readonly string[]} Options for the type of value the modifier applies to. */
+   const modifierTypeOptions = CONDITIONAL_CHECK_MODIFIER_TYPES;
 
    /** @type {{label: string, value: string}[]} Options for the type of check the modifier applies to. */
    const checkTypeOptions = [

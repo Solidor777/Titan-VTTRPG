@@ -178,3 +178,94 @@ test('the spell sheet sidebar labels the aspect resistance', async () => {
    await expect(tag).toBeVisible();
    await expect(tag).toHaveText('Resilience');
 });
+
+test('conditional dice and expertise apply to item checks and to tradition-keyed casting checks', async () => {
+   const mods = await page.evaluate(async (actorName) => {
+      const actor = game.actors.getName(actorName);
+      await actor.createEmbeddedDocuments('Item', [
+         {
+            name: 'E2E Fire Focus',
+            type: 'ability',
+            system: {
+               // Keys as a player types them: a capitalised tradition and a spaced custom trait.
+               rulesElement: [
+                  {
+                     operation: 'conditionalCheckModifier',
+                     modifierType: 'dice',
+                     checkType: 'casting',
+                     selector: 'spellTradition',
+                     key: 'Fire',
+                     value: 3,
+                     uuid: 'e2e00000-0000-4000-a000-000000000011',
+                  },
+                  {
+                     operation: 'conditionalCheckModifier',
+                     modifierType: 'dice',
+                     checkType: 'item',
+                     selector: 'customTrait',
+                     key: 'Field Medicine',
+                     value: 2,
+                     uuid: 'e2e00000-0000-4000-a000-000000000012',
+                  },
+               ],
+            },
+         },
+         {
+            name: 'E2E Fire Spell',
+            type: 'spell',
+            system: { tradition: 'Fire' },
+         },
+         {
+            name: 'E2E Field Kit',
+            type: 'ability',
+            system: {
+               customTrait: [
+                  {
+                     name: 'Field Medicine',
+                     description: '',
+                     uuid: 'e2e00000-0000-4000-a000-000000000013',
+                  },
+               ],
+               check: [
+                  {
+                     attribute: 'mind',
+                     complexity: 1,
+                     damageReducedBy: 'none',
+                     difficulty: 4,
+                     initialValue: 1,
+                     isDamage: false,
+                     isHealing: false,
+                     label: 'Treat',
+                     opposedCheck: {
+                        attribute: 'body',
+                        enabled: false,
+                        skill: 'athletics',
+                     },
+                     resistanceCheck: 'none',
+                     resolveCost: 0,
+                     scaling: false,
+                     skill: 'medicine',
+                     uuid: 'e2e00000-0000-4000-a000-000000000014',
+                  },
+               ],
+            },
+         },
+      ]);
+      const casting = actor.system.initializeCastingCheckOptions({ itemId: actor.items.getName('E2E Fire Spell').id });
+      const item = actor.system.initializeItemCheckOptions({
+         itemId: actor.items.getName('E2E Field Kit').id,
+         checkIdx: 0,
+      });
+      return {
+         // The Void Focus's +1 casting expertise from beforeEach also applies to the Fire spell.
+         castingDice: casting.diceMod,
+         castingExpertise: casting.expertiseMod,
+         itemDice: item.diceMod,
+      };
+   }, ACTOR_NAME);
+   expect(mods).toEqual({
+      castingDice: 3,
+      castingExpertise: 1,
+      itemDice: 2,
+   });
+});

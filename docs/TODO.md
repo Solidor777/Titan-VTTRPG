@@ -14,3 +14,7 @@ Completed items are deleted, not marked done.
   this agent has no access to and should not be given credentials for; the user needs to do this step
   themselves: open the exported .xlsx in Google Sheets, edit one cell's data (not the format), then
   File > Download > Microsoft Excel (.xlsx), and hand the resulting file over.
+
+- Clear the 10 pre-existing stylelint errors (`npx stylelint "src/**/*.{css,svelte,scss}"`): `font-weight-notation` in
+  `src/styles/Lato.scss` (8, auto-fixable) and `unit-disallowed-list` (`em`) in `src/styles/Global.scss` and
+  `src/styles/Mixins/FontMixins.scss`. CI does not run stylelint, so they are unguarded; add it to CI once clean.

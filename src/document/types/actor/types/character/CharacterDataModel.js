@@ -17,6 +17,10 @@ import ResistanceCheckDialog from '~/check/types/resistance-check/dialog/Resista
 import appendUnique from '~/helpers/utility-functions/AppendUnique.js';
 import appendUniqueByFunctionValue from '~/helpers/utility-functions/AppendUniqueByFunctionValue.js';
 import camelize from '~/helpers/utility-functions/Camelize.js';
+import {
+   CONDITIONAL_CHECK_MODIFIER_TYPES,
+   USER_KEYED_CHECK_MODIFIER_SELECTORS,
+} from '~/system/ConditionalCheckModifierTypes.js';
 import clamp from '~/helpers/utility-functions/Clamp.js';
 import computeMulSumDelta from '~/helpers/utility-functions/ComputeMulSumDelta.js';
 import computeSetSumDelta from '~/helpers/utility-functions/ComputeSetSumDelta.js';
@@ -1444,20 +1448,15 @@ export default class CharacterDataModel extends TitanActorDataModel {
 
                         // Sort the objects by key.
                         let keys;
-                        switch (selector) {
-                           // If the key can be determined by user input, sort by the camel-case keys.
-                           case 'customTrait':
-                           case 'spellTradition': {
-                              keys = sortObjectsIntoContainerByFunctionValue(
-                                 selectorElements,
-                                 (element) => camelize(element.key),
-                              );
-                              break;
-                           }
-                           default:
-                              // Otherwise, sort by the raw key.
-                              keys = sortObjectsIntoContainerByKeyValue(selectorElements, 'key');
-                              break;
+                        // User-typed keys are grouped by their normalized form, which lookups also use.
+                        if (USER_KEYED_CHECK_MODIFIER_SELECTORS.includes(selector)) {
+                           keys = sortObjectsIntoContainerByFunctionValue(
+                              selectorElements,
+                              (element) => this._normalizeConditionalCheckModKey(selector, element.key),
+                           );
+                        }
+                        else {
+                           keys = sortObjectsIntoContainerByKeyValue(selectorElements, 'key');
                         }
 
                         // For each key.
@@ -1840,7 +1839,7 @@ export default class CharacterDataModel extends TitanActorDataModel {
       let retVal = 0;
 
       // Check for conditional modifiers for this check type.
-      const checkMods = this.rulesElementsCache?.conditionalCheckModifier?.[modifierType];
+      const checkMods = this._getConditionalCheckModsForType(modifierType);
       if (checkMods) {
 
          // If mods for Attribute Checks exist.
@@ -2461,7 +2460,7 @@ export default class CharacterDataModel extends TitanActorDataModel {
       let retVal = 0;
 
       // If there are any conditional modifiers for this modifier type.
-      const checkMods = this.rulesElementsCache?.conditionalCheckModifier?.[modifierType];
+      const checkMods = this._getConditionalCheckModsForType(modifierType);
       if (checkMods) {
 
          // Get mods that apply to any type of check.
@@ -2964,7 +2963,7 @@ export default class CharacterDataModel extends TitanActorDataModel {
       let retVal = 0;
 
       // If there are any conditional modifiers for this modifier type.
-      const checkMods = this.rulesElementsCache?.conditionalCheckModifier?.[modifierType];
+      const checkMods = this._getConditionalCheckModsForType(modifierType);
       if (checkMods) {
 
          // Get mods that apply to any type of check.
@@ -3341,7 +3340,7 @@ export default class CharacterDataModel extends TitanActorDataModel {
       // Dice mod.
       if (options.diceMod === undefined) {
          checkOptions.diceMod = this.getItemCheckMod(
-            'diceMod',
+            'dice',
             checkOptions.attribute,
             checkOptions.skill,
             customTraits,
@@ -3409,7 +3408,7 @@ export default class CharacterDataModel extends TitanActorDataModel {
       let retVal = 0;
 
       // If there are any conditional modifiers for this modifier type.
-      const checkMods = this.rulesElementsCache?.conditionalCheckModifier?.[modifierType];
+      const checkMods = this._getConditionalCheckModsForType(modifierType);
       if (checkMods) {
 
          // Get mods that apply to any type of check.
@@ -3622,6 +3621,36 @@ export default class CharacterDataModel extends TitanActorDataModel {
    }
 
    /**
+    * Gets the cached conditional check modifiers of one modifier type. Every lookup goes through here so an unknown
+    * modifier type fails loudly instead of silently finding no modifiers.
+    * @param {string} modifierType - One of CONDITIONAL_CHECK_MODIFIER_TYPES.
+    * @returns {object | undefined} The cached modifiers for the type, keyed by check type, if any exist.
+    * @private
+    */
+   _getConditionalCheckModsForType(modifierType) {
+      if (!assert(
+         CONDITIONAL_CHECK_MODIFIER_TYPES.includes(modifierType),
+         'Unknown conditional check modifier type %s.',
+         modifierType,
+      )) {
+         return undefined;
+      }
+      return this.rulesElementsCache?.conditionalCheckModifier?.[modifierType];
+   }
+
+   /**
+    * Normalizes a conditional check modifier key. The cache builder and every lookup use this, so a user-typed key
+    * (a custom trait name or spell tradition, e.g. "Fire") matches the check's value regardless of case or spacing.
+    * @param {string} selector - The modifier's selector.
+    * @param {string} key - The raw key.
+    * @returns {string} The key used in the cache.
+    * @private
+    */
+   _normalizeConditionalCheckModKey(selector, key) {
+      return USER_KEYED_CHECK_MODIFIER_SELECTORS.includes(selector) ? camelize(String(key)) : key;
+   }
+
+   /**
     * Helper function for getting the conditional check modifiers for the inputted selector and key pair.
     * @param {object} conditionalCheckModifiers - The parent actor's Rules Element cache of mods for desire check and
     * modifier type.
@@ -3639,7 +3668,7 @@ export default class CharacterDataModel extends TitanActorDataModel {
       if (selectorMods) {
 
          // Return the key for this mod.
-         const keyMod = selectorMods[key];
+         const keyMod = selectorMods[this._normalizeConditionalCheckModKey(selector, key)];
          if (keyMod) {
             return keyMod;
          }
@@ -3671,7 +3700,7 @@ export default class CharacterDataModel extends TitanActorDataModel {
 
          // Add the mods for each matching key.
          keys.forEach((key) => {
-            const keyMod = selectorMods[key];
+            const keyMod = selectorMods[this._normalizeConditionalCheckModKey(selector, key)];
             if (keyMod) {
                retVal += keyMod;
             }
