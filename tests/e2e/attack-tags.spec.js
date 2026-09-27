@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test';
-import { login } from './fixtures.js';
+import { login, openSheetTab } from './fixtures.js';
 import { closeAllApps, clearChat, attachPageErrors, showChatLog } from './world.js';
 
 /**
@@ -134,7 +134,7 @@ test.describe('shared AttackTags across surfaces', () => {
       }, ACTOR_NAME);
 
       // Activate the Inventory tab; the row click below auto-waits for the rendered row.
-      await page.getByText('Inventory', { exact: true }).first().click();
+      await openSheetTab(page, 'Inventory');
 
       // The weapon's inventory row, then expand it (first button in the header label area).
       const row = page.locator('.application.titan-document-sheet [data-item-id]').first();

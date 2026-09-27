@@ -1,5 +1,5 @@
 import { expect, test } from '@playwright/test';
-import { login } from './fixtures.js';
+import { login, openSheetTab } from './fixtures.js';
 import {
    attachPageErrors,
    buildCheck,
@@ -170,7 +170,7 @@ test.describe('embedded-context effects family', () => {
       }, ACTOR_NAME);
 
       // Activate the Effects tab; the row click below auto-waits for the rendered row.
-      await page.getByText('Effects', { exact: true }).first().click();
+      await openSheetTab(page, 'Effects');
 
       // Scope under the open sheet root: the always-mounted effects tray also emits [data-effect-id]
       // rows, so a page-global locator would collide once the tray's compendium pack has content.

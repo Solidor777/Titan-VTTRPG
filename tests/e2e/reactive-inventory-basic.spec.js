@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test';
-import { login } from './fixtures.js';
+import { login, openSheetTab } from './fixtures.js';
 import { closeAllApps, clearChat, attachPageErrors } from './world.js';
 
 /**
@@ -91,7 +91,7 @@ async function seedActorWithItem(page, actorName, itemType) {
  */
 async function expectInventoryRowReactive(page, actorName) {
    // Activate the Inventory tab and let it settle.
-   await page.getByText('Inventory', { exact: true }).first().click();
+   await openSheetTab(page, 'Inventory');
 
    // The first inventory row.
    const row = page.locator('.application.titan-document-sheet [data-item-id]').first();
@@ -164,7 +164,7 @@ test.describe('character sheet inventory row reactivity', () => {
       }, ACTOR);
 
       // Activate the Inventory tab and locate the commodity row's quantity input.
-      await page.getByText('Inventory', { exact: true }).first().click();
+      await openSheetTab(page, 'Inventory');
       const row = page.locator('.application.titan-document-sheet [data-item-id]').first();
       const quantityInput = row.locator('input.titan-number-input').first();
 
@@ -230,7 +230,7 @@ test.describe('character sheet inventory row reactivity', () => {
       }, ACTOR);
 
       // Activate the Inventory tab and locate the commodity row's quantity input.
-      await page.getByText('Inventory', { exact: true }).first().click();
+      await openSheetTab(page, 'Inventory');
       const row = page.locator('.application.titan-document-sheet [data-item-id]').first();
       const quantityInput = row.locator('input.titan-number-input').first();
       await expect(quantityInput, 'initial quantity input value is 4').toHaveValue('4');

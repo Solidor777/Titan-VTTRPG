@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test';
-import { login } from './fixtures.js';
+import { login, openSheetTab } from './fixtures.js';
 import { closeAllApps, clearChat, attachPageErrors } from './world.js';
 
 /**
@@ -59,7 +59,7 @@ test.describe('spells tab filter', () => {
          );
       }, ACTOR_NAME);
 
-      await page.getByText('Spells', { exact: true }).first().click();
+      await openSheetTab(page, 'Spells');
    });
 
    test('typing in the spells filter narrows the spell list', async () => {

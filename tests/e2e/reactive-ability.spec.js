@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test';
-import { login } from './fixtures.js';
+import { login, openSheetTab } from './fixtures.js';
 import { closeAllApps, clearChat, attachPageErrors } from './world.js';
 
 /**
@@ -73,7 +73,7 @@ test.describe('character sheet ability row reactivity', () => {
 
    test('ability footer display values update in place after an in-place item update', async () => {
       // Activate the Abilities tab; the row click below auto-waits for the rendered row.
-      await page.getByText('Abilities', { exact: true }).first().click();
+      await openSheetTab(page, 'Abilities');
 
       // The first ability row.
       const row = page.locator('.application.titan-document-sheet [data-item-id]').first();

@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test';
-import { login } from './fixtures.js';
+import { login, openSheetTab } from './fixtures.js';
 import { closeAllApps, clearChat, attachPageErrors } from './world.js';
 
 /**
@@ -87,7 +87,7 @@ async function seedActorWithItem(page, actorName, itemType, system) {
  */
 async function openInventoryAndExpandFirstRow(page) {
    // Activate the Inventory tab; the row click below auto-waits for the rendered row.
-   await page.getByText('Inventory', { exact: true }).first().click();
+   await openSheetTab(page, 'Inventory');
 
    // The first inventory row.
    const row = page.locator('.application.titan-document-sheet [data-item-id]').first();

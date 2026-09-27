@@ -1,5 +1,5 @@
 import { expect, test } from '@playwright/test';
-import { login } from './fixtures.js';
+import { login, openSheetTab } from './fixtures.js';
 import { closeAllApps, clearChat, attachPageErrors } from './world.js';
 
 /** @type {import('@playwright/test').Page} The file-shared, logged-in page (one world boot per file). */
@@ -66,7 +66,7 @@ test.describe('effect toggle reactivity', () => {
       }, ACTOR_NAME);
 
       // Activate the Effects tab so the effect row and its toggle render.
-      await page.getByText('Effects', { exact: true }).first().click();
+      await openSheetTab(page, 'Effects');
    });
 
    test('clicking the active toggle flips the rendered checkmark without a tab switch', async () => {

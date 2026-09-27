@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test';
-import { login } from './fixtures.js';
+import { login, openSheetTab } from './fixtures.js';
 import { closeAllApps, clearChat, attachPageErrors } from './world.js';
 
 /**
@@ -77,7 +77,7 @@ test.describe('character sheet spell row reactivity', () => {
 
    test('spell footer display values update in place after an in-place item update', async () => {
       // Activate the Spells tab; the row click below auto-waits for the rendered row.
-      await page.getByText('Spells', { exact: true }).first().click();
+      await openSheetTab(page, 'Spells');
 
       // The first spell row.
       const row = page.locator('.application.titan-document-sheet [data-item-id]').first();

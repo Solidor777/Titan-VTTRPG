@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test';
-import { login } from './fixtures.js';
+import { login, openSheetTab } from './fixtures.js';
 import { closeAllApps, clearChat, attachPageErrors } from './world.js';
 
 /**
@@ -82,7 +82,7 @@ test.describe('character sheet expand toggle reactivity', () => {
     * @param {string} rowSelector - The row locator (e.g. '[data-effect-id]').
     */
    async function expectExpandInPlace(page, tabLabel, rowSelector) {
-      await page.getByText(tabLabel, { exact: true }).first().click();
+      await openSheetTab(page, tabLabel);
 
       const row = page.locator('.application.titan-document-sheet').locator(rowSelector).first();
       await expect(row.locator('.expandable-content'), `${tabLabel}: starts collapsed`).toHaveCount(0);

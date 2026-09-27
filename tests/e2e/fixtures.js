@@ -76,6 +76,22 @@ export async function renderSheet(page, locateSrc, expectedSelector, errors) {
 }
 
 /**
+ * Click a tab in the tab strip of the open TITAN document sheet. Scoped to the sheet because the sidebar
+ * Compendium directory keeps hidden elements whose text equals module pack labels such as "Effects",
+ * "Abilities" and "Spells", which a page-wide text locator can match first.
+ * @param {import('@playwright/test').Page} page - The Playwright page to drive.
+ * @param {string} label - The visible tab label.
+ * @returns {Promise<void>} Resolves once the tab button has been clicked.
+ */
+export async function openSheetTab(page, label) {
+   await page
+      .locator('.application.titan-document-sheet .tab-list')
+      .getByText(label, { exact: true })
+      .first()
+      .click();
+}
+
+/**
  * Ensure a document of the given type exists in the world, creating a minimal
  * one when absent, and return a stringified locator that finds it again.
  * @param {import('@playwright/test').Page} page - The Playwright page to drive.

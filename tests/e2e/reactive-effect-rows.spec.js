@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test';
-import { login } from './fixtures.js';
+import { login, openSheetTab } from './fixtures.js';
 import { closeAllApps, clearChat, attachPageErrors } from './world.js';
 
 /**
@@ -72,7 +72,7 @@ test.describe('character sheet effect row reactivity', () => {
       }, ACTOR_NAME);
 
       // Activate the Effects tab so the effect row renders.
-      await page.getByText('Effects', { exact: true }).first().click();
+      await openSheetTab(page, 'Effects');
    });
 
    test('effect footer duration + expired tags update in place after an in-place effect update', async () => {

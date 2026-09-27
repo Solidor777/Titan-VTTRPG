@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test';
-import { login } from './fixtures.js';
+import { login, openSheetTab } from './fixtures.js';
 import { closeAllApps, clearChat, attachPageErrors } from './world.js';
 
 /**
@@ -76,7 +76,7 @@ test.describe('character sheet weapon row reactivity', () => {
 
    test('weapon footer display values update in place after an in-place item update', async () => {
       // Activate the Inventory tab; the row click below auto-waits for the rendered row.
-      await page.getByText('Inventory', { exact: true }).first().click();
+      await openSheetTab(page, 'Inventory');
 
       // The first inventory row.
       const row = page.locator('.application.titan-document-sheet [data-item-id]').first();
@@ -116,7 +116,7 @@ test.describe('character sheet weapon row reactivity', () => {
 
    test('weapon attack label updates in place after an in-place item update', async () => {
       // Activate the Inventory tab; the row click below auto-waits for the rendered row.
-      await page.getByText('Inventory', { exact: true }).first().click();
+      await openSheetTab(page, 'Inventory');
 
       // The first inventory row.
       const row = page.locator('.application.titan-document-sheet [data-item-id]').first();
