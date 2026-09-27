@@ -43,8 +43,14 @@
 {/if}
 
 <style lang="scss">
+   // The sheet fills the window content (a flex column) and never grows past it: when the window is clamped
+   // shorter than the sheet's natural height (a zoomed-in or short viewport), the sidebar and the tab lists
+   // scroll instead of being clipped by the window.
    .titan-sheet {
       @include flex-row;
+
+      flex: 1 1 auto;
+      min-height: 0;
 
       // Rounded and clipped so square children cannot poke past the panel corners.
       .header {
@@ -54,14 +60,16 @@
          overflow: hidden;
       }
 
-      // Clipping zeroes the automatic flex minimum, so the fixed-width sidebar must not shrink.
+      // Clipping zeroes the automatic flex minimum, so the fixed-width sidebar must not shrink. It scrolls
+      // vertically when the window is shorter than its content; any non-visible overflow still clips the
+      // children to the rounded corners.
       .sidebar {
          @include panel-1;
          @include margin-right-large;
 
          border-radius: var(--titan-border-radius);
          flex: 0 0 auto;
-         overflow: hidden;
+         overflow: hidden auto;
       }
 
       // The body stays unfilled so the gap between the header and tab panels shows the sheet
@@ -70,11 +78,13 @@
          @include flex-column;
 
          flex-grow: 1;
+         min-height: 0;
 
          .tabs {
             @include margin-top-large;
 
             flex-grow: 1;
+            min-height: 0;
          }
       }
    }
