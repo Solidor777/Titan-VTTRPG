@@ -10,6 +10,7 @@ import CLEAN_NEUTRAL_LIGHT from '~/theme/themes/CleanNeutralLight.js';
 import HERITAGE_DARK from '~/theme/themes/HeritageDark.js';
 import HERITAGE_LIGHT from '~/theme/themes/HeritageLight.js';
 import MACCHIATO from '~/theme/themes/Macchiato.js';
+import { fillMissingThemeTokens } from '~/theme/ValidateThemeData.js';
 
 /** @type {RegExp} Matches a 6-digit hex color value. */
 const HEX_COLOR = /^#[0-9a-f]{6}$/;
@@ -88,5 +89,55 @@ describe.each(BUILT_IN_THEMES)('built-in theme $id', (theme) => {
          expect(theme.tokens[background], background).toBeDefined();
          expect(theme.tokens[foreground], foreground).toBeDefined();
       }
+   });
+});
+
+/**
+ * Computes the WCAG 2.x relative luminance of a 6-digit hex color.
+ * @param {string} hex - The color, e.g. '#1f2430'.
+ * @returns {number} The relative luminance, 0 to 1.
+ */
+function luminance(hex) {
+   const [r, g, b] = [
+      1,
+      3,
+      5,
+   ].map((index) => {
+      const channel = parseInt(hex.slice(index, index + 2), 16) / 255;
+      return channel <= 0.03928 ? channel / 12.92 : ((channel + 0.055) / 1.055) ** 2.4;
+   });
+   return (0.2126 * r) + (0.7152 * g) + (0.0722 * b);
+}
+
+describe.each(BUILT_IN_THEMES)('content links in built-in theme $id', (theme) => {
+   // Algorithm: WCAG 2.x contrast ratio, (L1 + 0.05) / (L2 + 0.05); 4.5 is the AA threshold for body text.
+   it('link text meets WCAG AA contrast against the link background', () => {
+      const fg = luminance(theme.tokens['content-link-font-color']);
+      const bg = luminance(theme.tokens['content-link-background']);
+      const ratio = (Math.max(fg, bg) + 0.05) / (Math.min(fg, bg) + 0.05);
+      expect(ratio).toBeGreaterThanOrEqual(4.5);
+   });
+});
+
+describe('fillMissingThemeTokens', () => {
+   it('fills tokens a saved custom theme predates from the built-in base for its scheme', () => {
+      const saved = {
+         id: 'custom-abc',
+         name: 'Old Custom',
+         dark: true,
+         tokens: { 'app-background': '#000000' },
+      };
+      const filled = fillMissingThemeTokens(saved);
+      expect(Object.keys(filled.tokens).sort()).toEqual([...THEME_TOKENS].sort());
+      expect(filled.tokens['app-background']).toBe('#000000');
+      expect(filled.tokens['content-link-background']).toBe(HERITAGE_DARK.tokens['content-link-background']);
+      expect(fillMissingThemeTokens({
+         ...saved,
+         dark: false,
+      }).tokens['content-link-background']).toBe(HERITAGE_LIGHT.tokens['content-link-background']);
+   });
+
+   it('returns a complete theme unchanged', () => {
+      expect(fillMissingThemeTokens(MACCHIATO)).toBe(MACCHIATO);
    });
 });

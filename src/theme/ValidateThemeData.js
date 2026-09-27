@@ -106,3 +106,32 @@ export default function validateThemeData(data, { getBaseTheme } = {}) {
 function defaultBaseResolver(id) {
    return BUILT_IN_BASES[id];
 }
+
+/**
+ * Completes a saved theme whose token map predates tokens added to the contract, taking each missing token
+ * from the built-in Heritage theme for the theme's scheme. Saved custom themes store every token at save time,
+ * so without this a later contract token would emit no CSS variable for them.
+ * @param {import('~/theme/ThemeTokenContract.js').TitanTheme} theme - The theme to complete.
+ * @returns {import('~/theme/ThemeTokenContract.js').TitanTheme} The theme itself when complete, else a copy with
+ * the missing tokens filled.
+ */
+export function fillMissingThemeTokens(theme) {
+   /** @type {string[]} Contract tokens the theme does not define. */
+   const missing = THEME_TOKENS.filter((token) => !(token in theme.tokens));
+   if (missing.length === 0) {
+      return theme;
+   }
+
+   /** @type {object} The built-in theme supplying the missing values. */
+   const base = BUILT_IN_BASES[theme.dark ? 'heritage-dark' : 'heritage-light'];
+   return {
+      ...theme,
+      tokens: {
+         ...Object.fromEntries(missing.map((token) => [
+            token,
+            base.tokens[token],
+         ])),
+         ...theme.tokens,
+      },
+   };
+}

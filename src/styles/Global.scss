@@ -34,8 +34,11 @@
       }
    }
 
-   // Fix content link colors
+   // Content links own their full color pair: Foundry supplies the background per color scheme (near-black in
+   // the dark scheme), which a text-only override leaves unreadable.
    .content-link {
+      background: var(--titan-content-link-background);
+      border-color: var(--titan-content-link-border-color);
       color: var(--titan-content-link-font-color);
 
       i {

@@ -30,6 +30,8 @@ export const THEME_TOKEN_GROUPS = Object.freeze({
       'border-color',
       'window-content-background',
       'content-link-font-color',
+      'content-link-background',
+      'content-link-border-color',
       'editor-menu-color',
       'scrollbar-color',
       'scrollbar-gutter-color',
@@ -195,6 +197,10 @@ export const THEME_TOKEN_PAIRS = Object.freeze([
    [
       'app-background',
       'app-font-color',
+   ],
+   [
+      'content-link-background',
+      'content-link-font-color',
    ],
    [
       'highlighted-background',

@@ -1,6 +1,6 @@
 import buildThemeStylesheetText from '~/theme/BuildThemeStylesheetText.js';
 import resolveActiveThemeId from '~/theme/ResolveActiveThemeId.js';
-import validateThemeData, { THEME_FORMAT_VERSION } from '~/theme/ValidateThemeData.js';
+import validateThemeData, { fillMissingThemeTokens, THEME_FORMAT_VERSION } from '~/theme/ValidateThemeData.js';
 import getSetting from '~/helpers/utility-functions/GetSetting.js';
 import CLEAN_NEUTRAL_LIGHT from '~/theme/themes/CleanNeutralLight.js';
 import HERITAGE_DARK from '~/theme/themes/HeritageDark.js';
@@ -43,13 +43,14 @@ export default class ThemeManager {
    }
 
    /**
-    * Returns every available theme (built-ins first, then customs).
+    * Returns every available theme (built-ins first, then customs). Saved customs are completed with any contract
+    * tokens added after they were saved.
     * @returns {object[]} All themes.
     */
    getAllThemes() {
       return [
          ...BUILT_IN_THEMES,
-         ...Object.values(getSetting('customThemes') ?? {}),
+         ...Object.values(getSetting('customThemes') ?? {}).map(fillMissingThemeTokens),
       ];
    }
 
