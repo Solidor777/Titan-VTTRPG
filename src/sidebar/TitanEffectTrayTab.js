@@ -19,7 +19,11 @@ export default class TitanEffectTrayTab extends foundry.applications.sidebar.Abs
     * @override
     */
    static DEFAULT_OPTIONS = {
-      classes: ['titan'],
+      classes: [
+         'titan',
+         'flexcol',
+         'titan-effect-tray-tab',
+      ],
    };
 
    /** @type {object | undefined} The mounted Svelte component handle, used to unmount on close. */

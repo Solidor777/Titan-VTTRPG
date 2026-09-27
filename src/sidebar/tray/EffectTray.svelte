@@ -101,8 +101,9 @@
       @include flex-column;
       @include flex-group-top;
 
+      flex: 1;
       width: 100%;
-      height: 100%;
+      min-height: 0;
       overflow: hidden;
    }
 </style>

@@ -728,4 +728,60 @@ test.describe('effect tray sidebar tab', () => {
          )
          .toBe(false);
    });
+
+   test('the tray list scrolls so its last row can be brought fully into view', async () => {
+      // A shorter window than the suite default makes the 17-row TITAN Effects pack overflow the sidebar.
+      await page.setViewportSize({
+         width: 1366,
+         height: 768,
+      });
+      await page.evaluate(() => game.settings.set('titan', 'effectTrayCollapsedFolders', {}));
+      await page.evaluate(async () => {
+         await ui.titanEffects.render(true);
+         ui.titanEffects.activate();
+         await titanWait(
+            () => !!ui.titanEffects.element?.querySelector('[data-testid="effect-tray-pack-select"]'),
+            { message: 'tray pack-select rendered' },
+         );
+      });
+      await selectTitanOption(
+         page,
+         page.locator('[role="combobox"][data-testid="effect-tray-pack-select"]'),
+         'titan.effects',
+      );
+      const rows = page.locator('[data-testid="effect-tray-row"]');
+      await expect(rows).toHaveCount(17);
+
+      // The list overflows its own bounded box instead of growing past the sidebar.
+      const list = page.locator('[data-testid="effect-tray-list"]');
+      const overflow = await list.evaluate((element) => {
+         const sidebar = document.getElementById('sidebar-content').getBoundingClientRect();
+         const box = element.getBoundingClientRect();
+         return {
+            overflows: element.scrollHeight > element.clientHeight,
+            withinSidebar: box.bottom <= sidebar.bottom + 1,
+         };
+      });
+      expect(overflow, 'the tray list is a bounded scroll container inside the sidebar').toEqual({
+         overflows: true,
+         withinSidebar: true,
+      });
+
+      // Scrolling the list to the end brings the last row fully inside the list's visible box.
+      await list.evaluate((element) => {
+         element.scrollTop = element.scrollHeight;
+      });
+      const lastVisible = await list.evaluate((element) => {
+         const all = element.querySelectorAll('[data-testid="effect-tray-row"]');
+         const last = all[all.length - 1].getBoundingClientRect();
+         const box = element.getBoundingClientRect();
+         return last.top >= box.top - 1 && last.bottom <= box.bottom + 1;
+      });
+      expect(lastVisible, 'the last row is fully visible after scrolling to the end').toBe(true);
+
+      await page.setViewportSize({
+         width: 1920,
+         height: 1080,
+      });
+   });
 });
