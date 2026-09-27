@@ -586,6 +586,9 @@ and one or more inner Svelte component trees.
   `options.isFirstRender`). It has NO backing document; instead it builds an `EffectTrayState` and sets it into
   Svelte context as `'trayState'`. Registered additively in `OnceInit.js` (`Sidebar.TABS.titanEffects` +
   `CONFIG.ui.titanEffects`); core instantiates `ui.titanEffects` and handles the tab strip / activation / popout.
+  The frameless tab root is the sidebar's flex item, so it carries `flexcol` plus `titan-effect-tray-tab`
+  (`Global.scss`: `min-height: 0; overflow: hidden`, as core directories clip) and `EffectTray` is a
+  `flex: 1; min-height: 0` child — without that bound the list grows to its content and never scrolls.
 - `EffectTrayState` (`src/sidebar/tray/EffectTrayState.svelte.js`) is a Svelte 5 runes class holding `compendiums`,
   `selectedPackId`, `effects`, `folders`, `filter`, `expandedFolders`, and `isLocked` (a reactive `$state` mirror of
   `pack.locked`). `getEffectCompendiums()` (`src/sidebar/tray/GetEffectCompendiums.js`) lists visible

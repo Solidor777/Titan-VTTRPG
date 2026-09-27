@@ -159,9 +159,14 @@ Sub-components likewise call `getContext` and read `document.data.*`. `DocumentS
 label }` descriptor; a `label` renders a `localize()`d, uppercase `.section-label` (the `section-label`
 font mixin, `src/styles/Mixins/FontMixins.scss`) above the component. `CharacterSheetSidebar` labels
 Ratings/Mods/Speeds this way; Portrait and Resources stay bare. Each `CharacterSheetSkill.svelte` row
-(`.../sheet/tabs/skills/`) lays the check button, `DocumentAttributeSelect`, and the training/expertise
-stat groups on a single flex row (no stacked sub-rows); the `TRAINING_ICON`/`EXPERTISE_ICON` labels carry
-their meaning via `use:tooltipAction` only (no visible text label).
+(`.../sheet/tabs/skills/`) is a wrapping flex row of fixed-size parts so every row places them identically: a
+`.check` column (basis 172px, grows into spare width), a 100px `.attribute` select, and the training/expertise
+`.stats` (fixed glyph/symbol boxes) pushed to the right edge. A row narrower than the full layout wraps the stats
+onto a second line, the same way for every row; at the 850px character sheet width every row wraps. The
+`TRAINING_ICON`/`EXPERTISE_ICON` labels carry their meaning via `use:tooltipAction` only (no visible text label).
+The character sheet root (`CharacterSheetBase` `.titan-sheet`) is a `flex: 1; min-height: 0` child of the window
+content (a flex column), so a window Foundry clamps shorter than the sheet (zoom, short viewport) scrolls its
+sidebar (`overflow: hidden auto`) and tab lists instead of clipping them.
 
 **5. ReactiveDocument reactivity**
 `ReactiveDocument.data` registers a `createSubscriber()` reader and returns the live Foundry document. Any
@@ -306,7 +311,13 @@ text, unchanged border) for dismiss actions (every dialog Cancel/close button us
 compete with a dialog's primary action. The flyout columns size to
 `max-content` so labels never clip. The open category keeps its `panel-3` fill plus a themed `accent-color`
 edge-bar on the side facing its flyout (via `HudButton`'s `accentEdge` prop), and the hovered/focused
-sub-option takes a `panel-3` fill with an inset `accent-color` bar (no row is highlighted by default). Main
+sub-option takes a `panel-3` fill with an inset `accent-color` bar (no row is highlighted by default). A toggle
+passes `pressed` to `HudButton` or `IconButton` (`aria-pressed` plus an inset `accent-color` ring); `HudButton`
+hands the accent icon color to caller-supplied icons through the inherited `--titan-hud-button-icon-color`
+property, since its scoped styles cannot reach snippet content. `buildActionMenuModel` gives sub-options an
+`icon` (skills: `getIcon` of the primary actor's `system.skill[key].defaultAttribute`, falling back to
+`DEFAULT_SKILL_ATTRIBUTES`; resistances and utilities: their `Icons.js` constant) and the inspiration utility a
+`pressed` flag from the first player's `system.inspiration`; `ActionMenuSubOption` renders `icon` before `img`. Main
 actions and roll/chat/sheet
 sub-buttons close the cascade; equip/quantity/duration/remove keep it open. Escape closes the cascade in the
 window capture phase and CONSUMES the event — otherwise Foundry's core Escape releases token control and

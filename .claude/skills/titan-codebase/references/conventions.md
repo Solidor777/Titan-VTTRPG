@@ -22,6 +22,11 @@ not just documented — `npx eslint .` must report 0 errors:
 - **No trailing whitespace on any line** — `@stylistic/no-trailing-spaces`.
 - **Exactly one trailing newline per file** — `@stylistic/eol-last`.
 
+**`no-undef` is an error everywhere.** No `globals` package is installed; `eslint.config.js` declares the real
+globals per file set (`BROWSER_GLOBALS` + `FOUNDRY_GLOBALS` for `src/` and `tests/` — e2e `page.evaluate` bodies
+run in-page, and vitest mocks Foundry globals; `NODE_GLOBALS` for configs, `scripts/`, `eslint/`, `tests/`;
+`SVELTE_RUNES` for `src/**/*.svelte.js`). A new global a file legitimately uses is added to its list.
+
 `@stylistic/indent` (3-space, `SwitchCase: 1`) covers `.js`/`.mjs`/`.cjs`; `svelte/indent` (same
 settings) covers `.svelte` files instead, since `@stylistic/indent` misjudges markup-nested mustache
 expressions (e.g. under `{#if}`) as JS continuation lines. Pre-existing `jsdoc/*` warnings are out of
@@ -88,6 +93,21 @@ v14 `TitanDialog` never calls `_getDialogClasses()` — that leftover de-TyphonJ
 `AddCustomTraitDialog` and `EditCustomTraitDialog` both use the correct `classes:` pattern. The stable
 per-type window identifier is the element **id** prefix `titan-<type>-check-dialog-<actorId>` (base
 ctor suffixes a generated UUID).
+
+**Non-owners and form controls** — `DocumentSheetV2._onRender` calls `_toggleDisabled(true)` when the viewer cannot
+edit, disabling every form control present at that render (controls mounted later are untouched).
+`TitanDocumentSheet._toggleDisabled` re-enables buttons inside any `[data-view-controls]` container — the `Tabs`
+strip, `CharacterSheetItemExpandButton`, and `SidebarCheck`'s toggle — so observers can navigate. A control
+that changes no document state goes in such a container; editing controls gate themselves on ownership
+(`DocumentOwner*` components).
+
+**Conditional check modifiers** — `CONDITIONAL_CHECK_MODIFIER_TYPES` (`src/system/ConditionalCheckModifierTypes.js`)
+is the single list of `modifierType` values: the rules-element editor's options and the actor cache keys.
+`CharacterDataModel.get{Attribute,Attack,Casting,Item}CheckMod` read the cache only through
+`_getConditionalCheckModsForType`, which asserts the type is in that list, and user-typed keys (selectors in
+`USER_KEYED_CHECK_MODIFIER_SELECTORS`: `customTrait`, `spellTradition`) go through
+`_normalizeConditionalCheckModKey` (camel case) in both the cache builder and the lookups. Resistance checks read
+no conditional modifiers.
 
 **`ReactiveDocument` bridge** — `src/document/reactive/ReactiveDocument.svelte.js` is the
 Foundry↔Svelte-5 reactivity bridge (it replaces TyphonJS `TJSDocument`). It wraps the live document;
@@ -385,7 +405,12 @@ client `theme` setting → `auto` follows Foundry's `theme-dark`/`theme-light` b
 MutationObserver re-applies on change) → GM world defaults (`defaultDarkTheme`/`defaultLightTheme`) →
 built-in heritage fallback. Custom themes live in the `customThemes` client setting (same data shape as
 built-ins) and are managed by the theme editor (`src/theme/editor/`, opened via `registerMenu`). Theme
-switching is live — no reload; settings `onChange` calls `apply()`.
+switching is live — no reload; settings `onChange` calls `apply()`. Saved customs store every token at save time,
+so `ThemeManager.getAllThemes` completes them with `fillMissingThemeTokens` (`ValidateThemeData.js`) from the
+Heritage theme for their scheme — adding a contract token needs no migration. Content links own their full
+color pair (`content-link-font-color`/`-background`/`-border-color`, the theme's panel-2 pair) because Foundry
+paints `.content-link` backgrounds per color scheme (near-black in the dark scheme); `THEME_TOKEN_PAIRS` lists
+the pair and `ThemeContract.test.js` enforces WCAG AA contrast for it.
 
 **Setting localization keys are `SETTINGS.<key>.label`** (plus `.hint` and per-choice children) —
 `lang/en.json` defines `label`, not `text`, for every setting; a `name: 'SETTINGS.x.text'` reference
@@ -828,6 +853,17 @@ raise `ChatLog.NOTIFY_DURATION` (stash/restore; it is read live each ticker tick
 reset by updates. Notification posting requires `core.uiConfig.chatNotifications === 'cards'` AND (a
 collapsed sidebar with sufficient viewport width, or the chat tab not visible) — a RENDERED popout
 suppresses posting entirely.
+
+**E2E: scope text locators to the sheet** — every sidebar tab is rendered at ready and hidden while inactive, and
+the Compendium directory renders each pack title as a `<strong>` (the compendium module's packs are labelled
+"Abilities", "Spells", "Effects", …), so a page-wide `getByText(label).first()` can resolve to a hidden element
+and time out. Sheet tabs are clicked with `openSheetTab(page, label)` (`tests/e2e/fixtures.js`, scoped to
+`.application.titan-document-sheet .tab-list`). A HUD category persists open across tests and clicking an open
+category closes it; Escape with no flyout open falls through to Foundry and releases token control.
+
+**E2E browser-zoom emulation** — `sheet-zoom.spec.js` emulates page zoom z through a CDP session:
+`Emulation.setDeviceMetricsOverride({ width: 1920 / z, height: 1080 / z, deviceScaleFactor: z })`. Foundry
+re-clamps and repositions open windows after the resize, so layout assertions poll until they settle.
 
 **E2E helpers must not blind-toggle expanders** — verify a row's mount default before clicking its
 expand/collapse toggle: weapon-sheet sidebar attacks mount EXPANDED (`WeaponSheetData` seeds `isExpanded`
