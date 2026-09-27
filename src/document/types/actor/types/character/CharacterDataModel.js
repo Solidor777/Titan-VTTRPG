@@ -1509,11 +1509,11 @@ export default class CharacterDataModel extends TitanActorDataModel {
          for (let idx = 0; idx < armorTraits.length; idx++) {
 
             // If heavy, decrease all speeds.
-            if (armorTraits[idx].name === 'heavy.armor') {
+            if (armorTraits[idx].name === 'heavy') {
                for (const speed of Object.values(this.speed)) {
 
-                  // Get the base speed.
-                  let totalSpeed = speed.value;
+                  // Sum the base speed and the mods applied so far; value is not derived until later.
+                  let totalSpeed = speed.baseValue;
 
                   // Add the mods.
                   for (const mod of Object.values(speed.mod)) {
