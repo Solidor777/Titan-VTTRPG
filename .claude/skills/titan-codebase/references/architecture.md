@@ -16,7 +16,8 @@
   specifics on which hooks are wired and when.
 - `src/sidebar/` — Custom sidebar-tab layer. `TitanEffectTrayTab.js` (extends `AbstractSidebarTab`, mounts Svelte
   like a sheet) plus a `tray/` folder of the Effect Tray UI (`EffectTrayState.svelte.js` runes state,
-  `GetEffectCompendiums.js`, and the shell/tray/header/list/row components). Registered in `OnceInit.js`. See
+  `GetEffectCompendiums.js`, `FilterEffectTree.js` search pruning, the row and folder context-menu builders, the
+  move-to-folder dialog, and the shell/tray/header/list/row components). Registered in `OnceInit.js`. See
   `abstractions.md` "Effect Tray sidebar tab".
 - `src/ui/` — Screen-level (non-sheet, non-sidebar) Svelte mounts. Currently holds `player-hud/` — the Player
   HUD: a `TitanPlayerHud` singleton controller (created on the `ready` hook, attached as `game.titan.playerHud`)

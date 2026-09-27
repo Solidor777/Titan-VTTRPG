@@ -1,6 +1,5 @@
 import { expect, test } from '@playwright/test';
 import { collectLocalizationOffenders, ensureDocument, login, renderSheet } from './fixtures.js';
-import { selectTitanOption } from './select.js';
 import { closeAllApps, clearChat, attachPageErrors } from './world.js';
 import { buildE2ERollerItemData } from '../shared/builders.js';
 
@@ -222,13 +221,9 @@ test.describe('no double-localized (LOCAL.) text in rendered UI', () => {
          );
       });
 
-      // Select the seeded world pack in the pack-select combobox (a role=combobox, not a native
-      // <select>); the seeded effect row then loads asynchronously.
-      await selectTitanOption(
-         page,
-         page.locator('[role="combobox"][data-testid="effect-tray-pack-select"]'),
-         'world.e2e-tray-effects',
-      );
+      // Select the seeded world pack in the tray's native pack select; the seeded effect row then loads
+      // asynchronously.
+      await page.selectOption('[data-testid="effect-tray-pack-select"]', 'world.e2e-tray-effects');
       await expect(page.locator('[data-testid="effect-tray-row"]').first()).toBeVisible();
 
       const trayOffenders = await collectLocalizationOffenders(page, '[data-testid="effect-tray"]');

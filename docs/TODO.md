@@ -54,3 +54,7 @@ Completed items are deleted, not marked done.
   - Hunger of Urdokai: description says "Range: 10 spaces"; the rules say Touch.
   - Stormcaller's Tempest: flagged as an action; The Dragon Awakens and Being of Urdokai, which work the same way, are
     passive.
+
+- Effect Tray parity gaps with the core directories (`src/sidebar/tray/`): folders cannot be dragged to reorder or nest
+  them (effects can be dragged into folders), and the folder context menu offers only Edit, Rename, and Delete — core's
+  Remove Folder / Delete All distinction, Configure Ownership, and Export entries are absent.

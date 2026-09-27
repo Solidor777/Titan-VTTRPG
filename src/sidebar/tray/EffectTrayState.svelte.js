@@ -3,23 +3,40 @@ import localize from '~/helpers/utility-functions/Localize.js';
 import getEffectCompendiums from '~/sidebar/tray/GetEffectCompendiums.js';
 
 /**
+ * @typedef {object} EffectTrayNode
+ * One folder of the tray's folder tree, mirroring a node of the pack's core `tree`.
+ * @property {Folder} folder - The folder document.
+ * @property {number} depth - The folder's nesting depth (1 for a top-level folder).
+ * @property {EffectTrayNode[]} children - The child folders, in the pack's sort order.
+ * @property {object[]} effects - The loaded effects directly inside this folder, in the pack's sort order.
+ */
+
+/**
+ * @typedef {object} EffectTrayTree
+ * The root of the tray's folder tree.
+ * @property {EffectTrayNode[]} children - The top-level folders.
+ * @property {object[]} effects - The loaded effects outside any folder.
+ */
+
+/**
  * @class EffectTrayState
  * Reactive state for the Effect Tray: the available compendiums, the selected pack, its loaded
- * effect documents, the search filter, and expanded-folder tracking. Lives in Svelte context and is
- * read by every tray component. Refreshes itself when the selected pack's contents change.
- * `expandedFolders` is derived per-pack on every `refresh()`: the pack's current folders minus the ids
- * persisted as collapsed in the `effectTrayCollapsedFolders` client setting. Absence from the stored
- * entry means expanded, so a folder created after the entry was saved opens expanded and a deleted
- * folder's id is never consulted. `toggleFolder` persists the collapsed set under the selected pack's
- * collection id.
+ * effect documents arranged in the pack's folder tree, the search filter and mode, and expanded-folder
+ * tracking. Lives in Svelte context and is read by every tray component. Refreshes itself when the
+ * selected pack's contents change.
+ *
+ * The tree mirrors the pack's core `tree` (`DirectoryCollectionMixin`), so folder nesting and sort order
+ * match the core compendium and sidebar directories, including the pack's alphabetical/manual sorting
+ * mode. Expanded folders follow core directory behavior: folders start collapsed, collapsing a folder
+ * collapses its descendants, and the set lasts for the life of the tray state (the session).
  *
  * Public interface (read by tray components via `getContext('trayState')`):
- * - `$state` fields: `compendiums`, `selectedPackId`, `effects`, `filter`, `expandedFolders`,
- *   `folders`, `isLocked`.
- * - Getters: `selectedPack`, `isOwner`, `canEdit`.
+ * - `$state` fields: `compendiums`, `selectedPackId`, `effects`, `tree`, `filter`, `expandedFolders`,
+ * `isLocked`, `searchMode`, `sortingMode`.
+ * - Getters: `selectedPack`, `isOwner`, `canEdit`, `supportsFolders`, `folderOptions`.
  * - Methods: `selectPack`, `refresh`, `createBlankEffect`, `duplicateEffect`, `requestDeleteEffect`,
- *   `renameEffect`, `stashFromDragData`, `createFolder`, `renameFolder`, `deleteFolder`,
- *   `moveEffectToFolder`, `toggleFolder`, `toggleLock`, `destroy`.
+ * `renameEffect`, `stashFromDragData`, `createFolder`, `renameFolder`, `deleteFolder`, `moveEffectToFolder`,
+ * `toggleFolder`, `collapseAllFolders`, `toggleSearchMode`, `toggleSortingMode`, `toggleLock`, `destroy`.
  */
 export default class EffectTrayState {
 
@@ -35,14 +52,26 @@ export default class EffectTrayState {
    /** @type {string} The current search filter text. */
    filter = $state('');
 
-   /** @type {Set<string>} The ids of folders currently expanded. */
+   /** @type {Set<string>} The uuids of folders currently expanded (empty until the user expands one). */
    expandedFolders = $state(new Set());
 
-   /** @type {Folder[]} The folders of the selected pack, mirrored for reactive folder grouping. */
-   folders = $state([]);
+   /**
+    * @type {EffectTrayTree} The selected pack's folder tree holding its loaded effects. Raw state: the
+    * nodes hold Foundry documents, and the tree is replaced wholesale on every refresh.
+    */
+   tree = $state.raw({
+      children: [],
+      effects: [],
+   });
 
    /** @type {boolean} Reactive mirror of the selected pack's locked state, so the UI reacts to it. */
    isLocked = $state(true);
+
+   /** @type {string} Reactive mirror of the selected pack's core search mode (name or full text). */
+   searchMode = $state(CONST.DIRECTORY_SEARCH_MODES.NAME);
+
+   /** @type {string} Reactive mirror of the selected pack's core sorting mode ('a' alphabetical, 'm' manual). */
+   sortingMode = $state('a');
 
    /** @type {{ hook: string, id: number }[]} The registered hook ids, removed on destroy. */
    #hookIds = [];
@@ -99,6 +128,39 @@ export default class EffectTrayState {
    }
 
    /**
+    * Whether the selected pack supports folders (compendium packs expose a folders collection).
+    * @returns {boolean} True when folders can be shown and created.
+    */
+   get supportsFolders() {
+      return !!this.selectedPack?.folders;
+   }
+
+   /**
+    * The selected pack's folders in tree order, each labelled with a depth prefix the way core formats
+    * folder select options (`─` per nesting level below the top).
+    * @returns {{ value: string, label: string }[]} The folder options for a folder picker.
+    */
+   get folderOptions() {
+      /** @type {{ value: string, label: string }[]} The options collected in depth-first tree order. */
+      const options = [];
+
+      /**
+       * Appends a node's folder and then its descendants.
+       * @param {EffectTrayNode} node - The folder node to visit.
+       * @returns {void}
+       */
+      const visit = (node) => {
+         options.push({
+            value: node.folder.id,
+            label: `${'─'.repeat(node.depth - 1)} ${node.folder.name}`.trim(),
+         });
+         node.children.forEach(visit);
+      };
+      this.tree.children.forEach(visit);
+      return options;
+   }
+
+   /**
     * Toggles the locked state of the selected pack. GM/owner only; persists via `pack.configure` and
     * updates the reactive `isLocked` mirror so the UI and `canEdit` react immediately.
     * @returns {Promise<void>}
@@ -128,8 +190,8 @@ export default class EffectTrayState {
    }
 
    /**
-    * Reloads the selected pack's documents into reactive state. TITAN system packs show only
-    * effect-subtype Active Effects; user (world/module) packs show all Active Effects.
+    * Reloads the selected pack's documents and folder tree into reactive state. TITAN system packs show
+    * only effect-subtype Active Effects; user (world/module) packs show all Active Effects.
     * @returns {Promise<void>}
     */
    async refresh() {
@@ -137,13 +199,17 @@ export default class EffectTrayState {
       const pack = this.selectedPack;
       if (!pack) {
          this.effects = [];
-         this.folders = [];
-         this.expandedFolders = new Set();
+         this.tree = {
+            children: [],
+            effects: [],
+         };
          this.isLocked = true;
          return;
       }
 
       this.isLocked = !!pack.locked;
+      this.searchMode = pack.searchMode;
+      this.sortingMode = pack.sortingMode;
 
       /** @type {object[]} The full documents in the selected pack. */
       const documents = await pack.getDocuments();
@@ -160,58 +226,58 @@ export default class EffectTrayState {
          ? documents.filter((effect) => effect.type === 'effect')
          : documents;
 
-      // Mirror the pack's folder documents for reactive grouping (empty when the pack lacks folders).
-      this.folders = pack.folders ? Array.from(pack.folders.values()) : [];
-
-      this.#deriveExpandedFolders();
+      this.#buildTree(pack);
    }
 
    /**
-    * Derives the expanded-folder set for the selected pack: every current folder except those whose ids
-    * are persisted as collapsed for this pack. Storing the collapsed ids (not the expanded ones) makes
-    * "expanded" the default for any folder the entry has never seen, so folders created after the entry
-    * was saved open expanded without a reconciliation pass.
+    * Rebuilds `tree` from the pack's core folder tree, swapping each index entry for its loaded effect.
+    * The core tree is rebuilt first because it does not yet include a created folder, a created effect, or
+    * an effect's move between folders when the create/update hooks that trigger this refresh fire. Entries
+    * without a loaded effect (the non-effect subtypes a system pack hides) are dropped.
+    * @param {CompendiumCollection} pack - The selected pack.
     * @returns {void}
     */
-   #deriveExpandedFolders() {
-      /** @type {Record<string, string[]>} Persisted collapsed-folder ids, keyed by pack collection id. */
-      const stored = game.settings.get('titan', 'effectTrayCollapsedFolders');
+   #buildTree(pack) {
+      pack.initializeTree();
 
-      /** @type {Set<string>} The collapsed folder ids stored for the selected pack (empty when none). */
-      const collapsed = new Set(stored[this.selectedPackId] ?? []);
+      /** @type {Map<string, object>} The displayed effects keyed by id. */
+      const byId = new Map(this.effects.map((effect) => [
+         effect.id,
+         effect,
+      ]));
 
-      this.expandedFolders = new Set(
-         this.folders.map((folder) => folder.id).filter((id) => !collapsed.has(id)),
-      );
-   }
+      /**
+       * Maps a core tree node's index entries to the loaded effects, preserving the core order.
+       * @param {object[]} entries - The core node's index entries.
+       * @returns {object[]} The matching loaded effects.
+       */
+      const toEffects = (entries) => entries.map((entry) => byId.get(entry._id)).filter(Boolean);
 
-   /**
-    * Persists the selected pack's collapsed folder ids (its current folders absent from `expandedFolders`)
-    * under the pack's collection id, leaving every other pack's stored entry untouched. Computing the set
-    * from the current folders drops the ids of folders that no longer exist.
-    * @returns {Promise<void>}
-    */
-   async #persistCollapsedFolders() {
-      /** @type {Record<string, string[]>} Persisted collapsed-folder ids, keyed by pack collection id. */
-      const stored = game.settings.get('titan', 'effectTrayCollapsedFolders');
-
-      /** @type {string[]} The ids of the selected pack's folders that are currently collapsed. */
-      const collapsed = this.folders
-         .map((folder) => folder.id)
-         .filter((id) => !this.expandedFolders.has(id));
-
-      await game.settings.set('titan', 'effectTrayCollapsedFolders', {
-         ...stored,
-         [this.selectedPackId]: collapsed,
+      /**
+       * Converts a core folder node (and its descendants) into a tray node.
+       * @param {object} node - The core tree node.
+       * @returns {EffectTrayNode} The tray node.
+       */
+      const toNode = (node) => ({
+         folder: node.folder,
+         depth: node.depth,
+         children: node.children.map(toNode),
+         effects: toEffects(node.entries),
       });
+
+      this.tree = {
+         children: pack.tree.children.map(toNode),
+         effects: toEffects(pack.tree.entries),
+      };
    }
 
    /**
-    * Creates a blank effect-subtype Active Effect in the selected pack and opens its sheet. No-ops
-    * when there is no selected pack or the current user cannot edit it.
+    * Creates a blank effect-subtype Active Effect in the selected pack, optionally inside a folder, and
+    * opens its sheet. No-ops when there is no selected pack or the current user cannot edit it.
+    * @param {string | null} [folderId] - The folder to create the effect in, or null for the pack root.
     * @returns {Promise<void>}
     */
-   async createBlankEffect() {
+   async createBlankEffect(folderId = null) {
       /** @type {CompendiumCollection | undefined} The selected pack. */
       const pack = this.selectedPack;
       if (!pack || !this.canEdit) {
@@ -224,6 +290,7 @@ export default class EffectTrayState {
             {
                name: game.i18n.localize('LOCAL.effectTrayNewName.text'),
                type: 'effect',
+               folder: folderId,
             },
          ],
          { pack: pack.collection },
@@ -323,12 +390,13 @@ export default class EffectTrayState {
    }
 
    /**
-    * Creates a new folder in the selected pack. No-ops when there is no selected pack, the pack does
-    * not support folders, or the current user cannot edit it.
+    * Creates a new folder in the selected pack, optionally nested inside a parent folder. No-ops when there
+    * is no selected pack, the pack does not support folders, or the current user cannot edit it.
+    * @param {Folder | null} [parent] - The parent folder, or null for a top-level folder.
     * @param {string} [name] - The folder name; defaults to the localized "New Folder" label.
     * @returns {Promise<void>}
     */
-   async createFolder(name = game.i18n.localize('LOCAL.effectTrayNewFolderName.text')) {
+   async createFolder(parent = null, name = game.i18n.localize('LOCAL.effectTrayNewFolderName.text')) {
       /** @type {CompendiumCollection | undefined} The selected pack. */
       const pack = this.selectedPack;
       if (!pack || !pack.folders || !this.canEdit) {
@@ -339,6 +407,7 @@ export default class EffectTrayState {
          {
             name,
             type: pack.documentName,
+            folder: parent?.id ?? null,
          },
          { pack: pack.collection },
       );
@@ -390,23 +459,74 @@ export default class EffectTrayState {
    }
 
    /**
-    * Toggles the expanded state of a folder by id, mutating the reactive expanded-folders set and
-    * persisting the resulting collapsed ids under the selected pack's collection id.
-    * @param {string} folderId - The id of the folder to expand or collapse.
-    * @returns {Promise<void>}
+    * Toggles a folder node open or closed. Collapsing also collapses every descendant folder, as the core
+    * directories do, so reopening a folder shows its subfolders closed.
+    * @param {EffectTrayNode} node - The folder node to expand or collapse.
+    * @returns {void}
     */
-   async toggleFolder(folderId) {
+   toggleFolder(node) {
       /** @type {Set<string>} A new set so the reactive assignment is observed by Svelte. */
       const next = new Set(this.expandedFolders);
-      if (next.has(folderId)) {
-         next.delete(folderId);
+      if (next.has(node.folder.uuid)) {
+
+         /**
+          * Removes a node's folder and every descendant folder from the expanded set.
+          * @param {EffectTrayNode} collapsed - The node being collapsed.
+          * @returns {void}
+          */
+         const collapse = (collapsed) => {
+            next.delete(collapsed.folder.uuid);
+            collapsed.children.forEach(collapse);
+         };
+         collapse(node);
       }
       else {
-         next.add(folderId);
+         next.add(node.folder.uuid);
       }
 
       this.expandedFolders = next;
-      await this.#persistCollapsedFolders();
+   }
+
+   /**
+    * Collapses every folder.
+    * @returns {void}
+    */
+   collapseAllFolders() {
+      this.expandedFolders = new Set();
+   }
+
+   /**
+    * Toggles the selected pack's core search mode between name-only and full-text search. The mode is
+    * stored by core per collection, so the compendium's own directory shares it.
+    * @returns {void}
+    */
+   toggleSearchMode() {
+      /** @type {CompendiumCollection | undefined} The selected pack. */
+      const pack = this.selectedPack;
+      if (!pack) {
+         return;
+      }
+
+      pack.toggleSearchMode();
+      this.searchMode = pack.searchMode;
+   }
+
+   /**
+    * Toggles the selected pack's core sorting mode between alphabetical and manual, then rebuilds the
+    * tree in the new order. The mode is stored by core per collection, so the compendium's own directory
+    * shares it.
+    * @returns {void}
+    */
+   toggleSortingMode() {
+      /** @type {CompendiumCollection | undefined} The selected pack. */
+      const pack = this.selectedPack;
+      if (!pack) {
+         return;
+      }
+
+      pack.toggleSortingMode();
+      this.sortingMode = pack.sortingMode;
+      this.#buildTree(pack);
    }
 
    /**

@@ -3,6 +3,7 @@
    import EffectTrayHeader from '~/sidebar/tray/EffectTrayHeader.svelte';
    import EffectTrayList from '~/sidebar/tray/EffectTrayList.svelte';
    import buildEffectRowContextMenu from '~/sidebar/tray/EffectRowContextMenu.js';
+   import buildEffectFolderContextMenu from '~/sidebar/tray/EffectFolderContextMenu.js';
    import MoveEffectToFolderDialog from '~/sidebar/tray/MoveEffectToFolderDialog.js';
 
    /**
@@ -48,10 +49,10 @@
    }
 
    /**
-    * Svelte action attaching a Foundry ContextMenu to the tray root, targeting effect rows by their
-    * `data-effect-id`. Entries read the live tray state for permission gating and effect resolution.
-    * Torn down with the component.
-    * @param {HTMLElement} node - The tray root element the menu delegates from.
+    * Svelte action attaching Foundry ContextMenus to the tray root: one targeting effect rows by their
+    * `data-effect-id`, one targeting folder headers. Entries read the live tray state for permission
+    * gating and document resolution. Torn down with the component.
+    * @param {HTMLElement} node - The tray root element the menus delegate from.
     * @returns {{ destroy: () => void }} The action lifecycle handle.
     */
    function effectContextMenu(node) {
@@ -76,9 +77,21 @@
          },
       );
 
+      /** @type {object} The Foundry context menu bound to the tray's folder headers. */
+      const folderMenu = new foundry.applications.ux.ContextMenu(
+         node,
+         '.folder-header',
+         buildEffectFolderContextMenu(trayState),
+         {
+            jQuery: false,
+            fixed: true,
+         },
+      );
+
       return {
          destroy() {
             menu.close?.({ animate: false });
+            folderMenu.close?.({ animate: false });
          },
       };
    }
@@ -97,9 +110,9 @@
 </div>
 
 <style lang="scss">
+   // A plain column like the core directory tab: children stretch to full width and keep core text alignment.
    .titan-effect-tray {
       @include flex-column;
-      @include flex-group-top;
 
       flex: 1;
       width: 100%;

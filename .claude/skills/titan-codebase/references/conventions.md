@@ -712,8 +712,8 @@ render, so each subsequent token create/delete crashes `PlaceableDirectory#_rend
 `CONFIG.ui`): it renders only during canvas draw, and `BasePlaceableHUD#_insertElement` and `ChatBubbles`
 re-query its DOM with no null guard, so closing it crashes the first later test that opens a token HUD or
 emits a chat bubble.
-Because every sidebar tab is mounted (hidden) from ready, the Effects tray's `[data-effect-id]` rows for the
-shipped `titan.effects` pack precede any sheet in document order; sheet row locators are therefore always
+Because every sidebar tab is mounted (hidden) from ready, the Effects tray's `[data-effect-id]` rows (root
+effects and those in expanded folders) precede any sheet in document order; sheet row locators are therefore always
 scoped to the open sheet — `page.locator('.application.titan-document-sheet [data-item-id]')` /
 `[data-effect-id]` — never bare `page.locator('[data-…-id]')`.
 `clearChat(page)` deletes all chat messages in `beforeAll` (per-file world reset — keeps the world lean so

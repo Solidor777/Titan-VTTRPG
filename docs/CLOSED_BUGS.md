@@ -719,3 +719,20 @@ when fixed.
   aspects and label typos.
 - **Fixed:** 2026-09-27 in the compendium module (`4aecccc`), 52 documents; validated with `npm run validate` (0
   errors). Findings that need a rules decision are listed in `docs/TODO.md`.
+
+### 63. Effect Tray listed nested folders flat ("Abilities 1", "Abilities 0")
+
+- **What:** the tray rendered every folder of the selected pack as one flat, name-sorted list, ignoring each folder's
+  parent, and printed the folder's direct effect count after its name. Nested packs such as the compendium module's
+  Effects (Sacred Arts → path → Abilities/Apex) showed a dozen indistinguishable "Abilities N" rows (the user-reported
+  "Abilitises" categories). Its look also differed from the core directories.
+- **Fixed:** 2026-09-27 — the tray mirrors the pack's core folder tree (`pack.tree`) in core directory markup styled by
+  core CSS, with core collapse, search, and sort behaviour. Gated by `effect-tray.spec.js` (nesting, collapse, search,
+  computed-style parity with the Items tab) and `FilterEffectTree.test.js`.
+
+### 64. Move-to-Folder dialog showed localization keys for folder names
+
+- **What:** the dialog passed folder names (and the already-localized root label) to the TITAN `Select` as plain
+  strings, which it runs through TITAN localization, so they displayed as `LOCAL.<name>.text`.
+- **Fixed:** 2026-09-27 — folder names pass as `{ text, localize: false }` and the root label as its key. Gated by
+  `effect-tray.spec.js` ("the move-to-folder dialog lists nested folders…").

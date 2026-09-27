@@ -1,6 +1,5 @@
 import { expect, test } from '@playwright/test';
 import { login } from './fixtures.js';
-import { selectTitanOption } from './select.js';
 import {
    attachPageErrors,
    clearChat,
@@ -11,15 +10,121 @@ import {
 } from './world.js';
 
 /**
- * Selects the seeded world pack in the tray's pack-select combobox (a `role="combobox"`, not a native
- * `<select>`). The seeded effect/folder rows then load asynchronously; callers wait on the row/folder
- * locator they act on next.
+ * Selects a pack in the tray's native pack select. The pack's folders and rows then load asynchronously;
+ * callers wait on the row/folder locator they act on next.
  * @param {import('@playwright/test').Page} page - The Playwright page.
- * @returns {Promise<void>} Resolves once the world pack option is committed.
+ * @param {string} [packId] - The pack collection id; defaults to the seeded world pack.
+ * @returns {Promise<void>} Resolves once the option is committed.
  */
-async function selectTrayPack(page) {
-   const trigger = page.locator('[role="combobox"][data-testid="effect-tray-pack-select"]');
-   await selectTitanOption(page, trigger, 'world.e2e-tray-effects');
+async function selectTrayPack(page, packId = 'world.e2e-tray-effects') {
+   await page.selectOption('[data-testid="effect-tray-pack-select"]', packId);
+}
+
+/**
+ * Mounts and activates the tray tab, waiting for its pack select.
+ * @param {import('@playwright/test').Page} page - The Playwright page.
+ * @returns {Promise<void>} Resolves once the tray is mounted.
+ */
+async function openTray(page) {
+   await page.evaluate(async () => {
+      await ui.titanEffects.render(true);
+      ui.titanEffects.activate();
+      await titanWait(
+         () => !!ui.titanEffects.element?.querySelector('[data-testid="effect-tray-pack-select"]'),
+         { message: 'tray pack-select rendered' },
+      );
+   });
+}
+
+/**
+ * Locates a tray folder item by its exact folder name.
+ * @param {import('@playwright/test').Page | import('@playwright/test').Locator} scope - Where to search.
+ * @param {string} name - The exact text of the folder header's name.
+ * @returns {import('@playwright/test').Locator} The folder `li` locator.
+ */
+function trayFolder(scope, name) {
+   /** @type {import('@playwright/test').Page} The page, needed to build the scope-free inner locator. */
+   const root = typeof scope.page === 'function' ? scope.page() : scope;
+   return scope.locator('[data-testid="effect-tray-folder"]', {
+      has: root.locator(':scope > [data-testid="effect-tray-folder-header"] .folder-name', {
+         hasText: new RegExp(`^${name}$`),
+      }),
+   }).first();
+}
+
+/**
+ * Expands a tray folder by clicking its header, unless it is already expanded.
+ * @param {import('@playwright/test').Locator} folder - The folder `li` locator.
+ * @returns {Promise<void>} Resolves once the folder shows as expanded.
+ */
+async function expandTrayFolder(folder) {
+   await expect(folder).toBeVisible();
+   if (!(await folder.evaluate((element) => element.classList.contains('expanded')))) {
+      await folder.locator(':scope > [data-testid="effect-tray-folder-header"]').click();
+   }
+   await expect(folder).toHaveClass(/(^|\s)expanded(\s|$)/);
+}
+
+/**
+ * Seeds a nested folder pair (parent holding a child holding one effect) in the world pack, replacing any
+ * left over from a previous run.
+ * @param {import('@playwright/test').Page} page - The Playwright page.
+ * @returns {Promise<void>} Resolves once the folders and effect exist.
+ */
+async function seedNestedFolders(page) {
+   await page.evaluate(async () => {
+      const pack = game.packs.get('world.e2e-tray-effects');
+      for (const effect of await pack.getDocuments()) {
+         if (effect.name === 'E2E Nested Effect') {
+            await effect.delete();
+         }
+      }
+      for (const name of [
+         'E2E Child Folder',
+         'E2E Parent Folder',
+      ]) {
+         await pack.folders.find((f) => f.name === name)?.delete();
+      }
+      const parent = await Folder.create({
+         name: 'E2E Parent Folder',
+         type: 'ActiveEffect',
+      }, { pack: pack.collection });
+      const child = await Folder.create({
+         name: 'E2E Child Folder',
+         type: 'ActiveEffect',
+         folder: parent.id,
+      }, { pack: pack.collection });
+      await ActiveEffect.create(
+         {
+            name: 'E2E Nested Effect',
+            type: 'effect',
+            folder: child.id,
+         },
+         { pack: pack.collection },
+      );
+   });
+}
+
+/**
+ * Removes the nested folder pair and its effect seeded by `seedNestedFolders`.
+ * @param {import('@playwright/test').Page} page - The Playwright page.
+ * @returns {Promise<void>} Resolves once they are gone.
+ */
+async function deleteNestedFolders(page) {
+   await page.evaluate(async () => {
+      const pack = game.packs.get('world.e2e-tray-effects');
+      for (const effect of await pack.getDocuments()) {
+         if (effect.name === 'E2E Nested Effect') {
+            await effect.delete();
+         }
+      }
+      for (const name of [
+         'E2E Child Folder',
+         'E2E Parent Folder',
+      ]) {
+         await pack.folders.find((f) => f.name === name)?.delete();
+      }
+   });
 }
 
 /** @type {import('@playwright/test').Page} The file-shared, logged-in page (one world boot per file). */
@@ -62,6 +167,9 @@ test.describe('effect tray sidebar tab', () => {
                name: 'e2e-tray-effects',
             });
          }
+         if (pack.locked) {
+            await pack.configure({ locked: false });
+         }
          const existing = (await pack.getDocuments()).find((e) => e.name === 'E2E Tray Effect');
          if (!existing) {
             await ActiveEffect.create(
@@ -98,59 +206,32 @@ test.describe('effect tray sidebar tab', () => {
    });
 
    test('the dropdown lists ActiveEffect packs and browsing shows seeded effects', async () => {
-      await page.evaluate(async () => {
-         await ui.titanEffects.render(true);
-         ui.titanEffects.activate();
-         await titanWait(
-            () => !!ui.titanEffects.element?.querySelector('[data-testid="effect-tray-pack-select"]'),
-            { message: 'tray pack-select rendered' },
-         );
-      });
+      await openTray(page);
 
-      // The pack select offers the seeded world pack; open the combobox and read its option labels.
-      const packTrigger = page.locator('[role="combobox"][data-testid="effect-tray-pack-select"]');
-      await packTrigger.click();
-      const options = await page.locator('[role="option"]').allTextContents();
+      // The pack select offers the seeded world pack.
+      const options = await page.locator('[data-testid="effect-tray-pack-select"] option').allTextContents();
       expect(options.join(' ')).toContain('E2E Tray Effects');
 
-      // Commit the seeded world pack from the open list.
-      await page.locator('[role="option"][data-value="world.e2e-tray-effects"]').click();
-
       // Selecting the world pack lists its seeded effect.
+      await selectTrayPack(page);
       await expect(
          page.locator('[data-testid="effect-tray-row"]', { hasText: 'E2E Tray Effect' }).first(),
       ).toBeVisible();
    });
 
    test('the shipped TITAN Effects pack lists the standard effects in their folders', async () => {
-      // Clear any persisted expansion so this run observes the default (first-open expands all).
-      await page.evaluate(() => game.settings.set('titan', 'effectTrayCollapsedFolders', {}));
+      await openTray(page);
 
-      await page.evaluate(async () => {
-         await ui.titanEffects.render(true);
-         ui.titanEffects.activate();
-         await titanWait(
-            () => !!ui.titanEffects.element?.querySelector('[data-testid="effect-tray-pack-select"]'),
-            { message: 'tray pack-select rendered' },
-         );
-      });
-
-      // The system pack is compiled from packs/_source/effects; browse it (folders default expanded).
-      await selectTitanOption(
-         page,
-         page.locator('[role="combobox"][data-testid="effect-tray-pack-select"]'),
-         'titan.effects',
-      );
+      // The system pack is compiled from packs/_source/effects; its folders start collapsed.
+      await selectTrayPack(page, 'titan.effects');
+      const rows = page.locator('[data-testid="effect-tray-row"]');
       for (const folderName of [
          'Actions',
          'Circumstances',
          'Death',
       ]) {
-         const folder = page.locator('[data-testid="effect-tray-folder"]', { hasText: folderName }).first();
-         await expect(folder, `${folderName} folder is listed`).toBeVisible();
+         await expandTrayFolder(trayFolder(page, folderName));
       }
-      // Every folder starts expanded on first open; no toggling is needed to see all rows.
-      const rows = page.locator('[data-testid="effect-tray-row"]');
       await expect(rows, 'every seeded standard effect row renders').toHaveCount(17);
       for (const name of [
          'Dodging',
@@ -163,155 +244,192 @@ test.describe('effect tray sidebar tab', () => {
       }
    });
 
-   test('folder collapse state is remembered per pack across re-renders', async () => {
-      // Start from the default (all expanded) so the toggle below is a genuine collapse.
-      await page.evaluate(() => game.settings.set('titan', 'effectTrayCollapsedFolders', {}));
-
-      await page.evaluate(async () => {
-         await ui.titanEffects.render(true);
-         ui.titanEffects.activate();
-         await titanWait(
-            () => !!ui.titanEffects.element?.querySelector('[data-testid="effect-tray-pack-select"]'),
-            { message: 'tray pack-select rendered' },
-         );
-      });
-      await selectTitanOption(
-         page,
-         page.locator('[role="combobox"][data-testid="effect-tray-pack-select"]'),
-         'titan.effects',
-      );
-
-      const actions = page.locator('section.effect-tray-folder[data-folder-id]', { hasText: 'Actions' }).first();
-      await expect(actions).toBeVisible();
-      await actions.locator('[data-testid="effect-tray-folder-toggle"]').click();
-      await expect(actions.locator('[data-testid="effect-tray-row"]'), 'Actions collapses').toHaveCount(0);
-
-      // Force a fresh mount of the tab (render(true) recreates the Svelte tree) and reselect the pack;
-      // the collapse must persist through the state's own re-initialization, not merely survive DOM reuse.
-      await page.evaluate(async () => {
-         await ui.titanEffects.render(true);
-         ui.titanEffects.activate();
-         await titanWait(
-            () => !!ui.titanEffects.element?.querySelector('[data-testid="effect-tray-pack-select"]'),
-            { message: 'tray pack-select re-rendered' },
-         );
-      });
-      await selectTitanOption(
-         page,
-         page.locator('[role="combobox"][data-testid="effect-tray-pack-select"]'),
-         'titan.effects',
-      );
-
-      const reopenedActions = page
-         .locator('section.effect-tray-folder[data-folder-id]', { hasText: 'Actions' })
-         .first();
-      const circumstances = page
-         .locator('section.effect-tray-folder[data-folder-id]', { hasText: 'Circumstances' })
-         .first();
-      await expect(
-         reopenedActions.locator('[data-testid="effect-tray-row"]'),
-         'Actions stays collapsed',
-      ).toHaveCount(0);
-      await expect(
-         circumstances.locator('[data-testid="effect-tray-row"]').first(),
-         'Circumstances is unaffected and still shows rows',
-      ).toBeVisible();
-   });
-
-   test('a folder created after the pack saved a collapse starts expanded', async () => {
-      // The stored entry lists COLLAPSED ids, so a folder the entry has never seen derives as expanded.
-      // Prove it on the world pack: collapse one seeded folder (persisting the entry), then create a second
-      // folder holding an effect and assert its row renders with no toggle while the first stays collapsed.
-      await page.evaluate(async () => {
-         const pack = game.packs.get('world.e2e-tray-effects');
-         for (const effect of await pack.getDocuments()) {
-            if (effect.name === 'E2E Early Folder Effect' || effect.name === 'E2E Late Folder Effect') {
-               await effect.delete();
-            }
-         }
-         for (const name of [
-            'E2E Early Folder',
-            'E2E Late Folder',
-         ]) {
-            await pack.folders.find((f) => f.name === name)?.delete();
-         }
-         const early = await Folder.create({
-            name: 'E2E Early Folder',
-            type: 'ActiveEffect',
-         }, { pack: pack.collection });
-         await ActiveEffect.create(
-            {
-               name: 'E2E Early Folder Effect',
-               type: 'effect',
-               folder: early.id,
-            },
-            { pack: pack.collection },
-         );
-
-         await ui.titanEffects.render(true);
-         ui.titanEffects.activate();
-         await titanWait(
-            () => !!ui.titanEffects.element?.querySelector('[data-testid="effect-tray"]'),
-            { message: 'tray panel mounted' },
-         );
-      });
+   test('nested folders render inside their parent folder, not at the top level', async () => {
+      await seedNestedFolders(page);
+      await openTray(page);
       await selectTrayPack(page);
 
-      const early = page.locator('section.effect-tray-folder[data-folder-id]', { hasText: 'E2E Early Folder' }).first();
-      await expect(early.locator('[data-testid="effect-tray-row"]'), 'Early folder starts expanded').toHaveCount(1);
-      await early.locator('[data-testid="effect-tray-folder-toggle"]').click();
-      await expect(early.locator('[data-testid="effect-tray-row"]'), 'Early folder collapses').toHaveCount(0);
-
-      // Create the late folder and an effect inside it; the create hooks refresh the tray state.
-      await page.evaluate(async () => {
-         const pack = game.packs.get('world.e2e-tray-effects');
-         const late = await Folder.create({
-            name: 'E2E Late Folder',
-            type: 'ActiveEffect',
-         }, { pack: pack.collection });
-         await ActiveEffect.create(
-            {
-               name: 'E2E Late Folder Effect',
-               type: 'effect',
-               folder: late.id,
-            },
-            { pack: pack.collection },
-         );
-      });
-
-      const late = page.locator('section.effect-tray-folder[data-folder-id]', { hasText: 'E2E Late Folder' }).first();
+      // The parent is a top-level folder item; the child is not.
+      const list = page.locator('[data-testid="effect-tray-list"]');
+      const parent = trayFolder(page, 'E2E Parent Folder');
+      await expect(parent).toBeVisible();
+      await expect(parent).toHaveAttribute('data-folder-depth', '1');
       await expect(
-         late.locator('[data-testid="effect-tray-row"]').first(),
-         'Late folder renders expanded without a toggle',
-      ).toBeVisible();
-      await expect(early.locator('[data-testid="effect-tray-row"]'), 'Early folder stays collapsed').toHaveCount(0);
+         list.locator(':scope > [data-testid="effect-tray-folder"]', { hasText: 'E2E Child Folder' }),
+         'the child folder is not listed at the top level',
+      ).toHaveCount(0);
+      await expect(parent, 'folders start collapsed').not.toHaveClass(/(^|\s)expanded(\s|$)/);
 
-      // The persisted entry for this pack is exactly the collapsed id list.
-      const stored = await page.evaluate(() => {
-         const pack = game.packs.get('world.e2e-tray-effects');
+      // Expanding the parent reveals the child inside the parent's subdirectory; expanding the child shows its effect.
+      await expandTrayFolder(parent);
+      const child = parent.locator(':scope > .subdirectory > [data-testid="effect-tray-folder"]');
+      await expect(child).toHaveCount(1);
+      await expect(child).toHaveAttribute('data-folder-depth', '2');
+      await expandTrayFolder(child);
+      await expect(child.locator('[data-testid="effect-tray-row"]', { hasText: 'E2E Nested Effect' })).toBeVisible();
+
+      await deleteNestedFolders(page);
+   });
+
+   test('collapsing a folder collapses its subfolders', async () => {
+      await seedNestedFolders(page);
+      await openTray(page);
+      await selectTrayPack(page);
+
+      const parent = trayFolder(page, 'E2E Parent Folder');
+      await expandTrayFolder(parent);
+      const child = trayFolder(parent, 'E2E Child Folder');
+      await expandTrayFolder(child);
+      await expect(child.locator('[data-testid="effect-tray-row"]')).toHaveCount(1);
+
+      // Collapse the parent, then reopen it: the child comes back collapsed.
+      await parent.locator(':scope > [data-testid="effect-tray-folder-header"]').click();
+      await expect(parent).not.toHaveClass(/(^|\s)expanded(\s|$)/);
+      await expandTrayFolder(parent);
+      await expect(trayFolder(parent, 'E2E Child Folder')).not.toHaveClass(/(^|\s)expanded(\s|$)/);
+      await expect(trayFolder(parent, 'E2E Child Folder').locator('[data-testid="effect-tray-row"]')).toHaveCount(0);
+
+      // Collapse-all closes every folder.
+      await expandTrayFolder(trayFolder(parent, 'E2E Child Folder'));
+      await page.locator('[data-testid="effect-tray-collapse-all"]').click();
+      await expect(page.locator('[data-testid="effect-tray-folder"].expanded')).toHaveCount(0);
+
+      await deleteNestedFolders(page);
+   });
+
+   test('searching shows matching effects inside their expanded folders', async () => {
+      await seedNestedFolders(page);
+      await openTray(page);
+      await selectTrayPack(page);
+
+      // Before the search, the collapsed parent hides the nested effect and the root effect is listed.
+      const nested = page.locator('[data-testid="effect-tray-row"]', { hasText: 'E2E Nested Effect' });
+      const rootEffect = page.locator('[data-testid="effect-tray-row"]', { hasText: 'E2E Tray Effect' });
+      await expect(trayFolder(page, 'E2E Parent Folder')).toBeVisible();
+      await expect(rootEffect).toBeVisible();
+      await expect(nested).toHaveCount(0);
+
+      // A search for the nested effect expands its folder chain and hides everything that does not match.
+      await page.locator('[data-testid="effect-tray-search"]').fill('nested effect');
+      await expect(nested).toBeVisible();
+      await expect(trayFolder(page, 'E2E Parent Folder')).toHaveClass(/(^|\s)expanded(\s|$)/);
+      await expect(trayFolder(page, 'E2E Child Folder')).toHaveClass(/(^|\s)expanded(\s|$)/);
+      await expect(rootEffect, 'a non-matching effect is hidden').toHaveCount(0);
+
+      // Clearing the search restores the collapsed tree.
+      await page.locator('[data-testid="effect-tray-search"]').fill('');
+      await expect(rootEffect).toBeVisible();
+      await expect(nested).toHaveCount(0);
+
+      await deleteNestedFolders(page);
+   });
+
+   test('tray folders and entries match the core Items sidebar tab styles', async () => {
+      // A folder and a root item in the core Items tab to compare against, under the active theme.
+      await page.evaluate(async () => {
+         await game.folders.find((f) => f.name === 'E2E Style Folder' && f.type === 'Item')?.delete();
+         await game.items.getName('E2E Style Item')?.delete();
+         await Folder.create({
+            name: 'E2E Style Folder',
+            type: 'Item',
+         });
+         await Item.create({
+            name: 'E2E Style Item',
+            type: 'ability',
+         });
+      });
+      await seedNestedFolders(page);
+
+      /**
+       * Reads the computed styles of a folder header and an entry name, both of which must be laid out.
+       * @param {{ folder: string, entry: string }} selectors - Selectors for the header and the entry name.
+       * @returns {Promise<{ folder: object, entry: object }>} The computed style values of each.
+       */
+      const readStyles = (selectors) => page.evaluate((targets) => {
+         const read = (selector) => {
+            const style = getComputedStyle(document.querySelector(selector));
+            return Object.fromEntries([
+               'background-color',
+               'color',
+               'font-family',
+               'font-size',
+               'font-weight',
+               'line-height',
+               'height',
+            ].map((property) => [
+               property,
+               style.getPropertyValue(property),
+            ]));
+         };
          return {
-            earlyId: pack.folders.find((f) => f.name === 'E2E Early Folder').id,
-            entry: game.settings.get('titan', 'effectTrayCollapsedFolders')[pack.collection],
+            folder: read(targets.folder),
+            entry: read(targets.entry),
+         };
+      }, selectors);
+
+      // Read the core Items tab while it is the active tab, so its elements are laid out.
+      const coreIds = await page.evaluate(async () => {
+         ui.items.activate();
+         await titanWait(
+            () => !!ui.items.element?.querySelector('.folder-header')?.offsetHeight,
+            { message: 'core Items tab laid out' },
+         );
+         return {
+            folder: game.folders.find((f) => f.name === 'E2E Style Folder' && f.type === 'Item').id,
+            entry: game.items.getName('E2E Style Item').id,
          };
       });
-      expect(stored.entry, 'the stored entry lists only the collapsed folder').toEqual([stored.earlyId]);
-
-      // Clean up so the shared world pack and the setting are left as later tests expect.
-      await page.evaluate(async () => {
-         const pack = game.packs.get('world.e2e-tray-effects');
-         for (const effect of await pack.getDocuments()) {
-            if (effect.name === 'E2E Early Folder Effect' || effect.name === 'E2E Late Folder Effect') {
-               await effect.delete();
-            }
-         }
-         for (const name of [
-            'E2E Early Folder',
-            'E2E Late Folder',
-         ]) {
-            await pack.folders.find((f) => f.name === name)?.delete();
-         }
-         await game.settings.set('titan', 'effectTrayCollapsedFolders', {});
+      const core = await readStyles({
+         folder: `#items [data-folder-id="${coreIds.folder}"] > .folder-header`,
+         entry: `#items [data-entry-id="${coreIds.entry}"] .entry-name`,
       });
+
+      await openTray(page);
+      await selectTrayPack(page);
+      await expect(trayFolder(page, 'E2E Parent Folder')).toBeVisible();
+      const trayIds = await page.evaluate(async () => {
+         const pack = game.packs.get('world.e2e-tray-effects');
+         return {
+            folder: pack.folders.find((f) => f.name === 'E2E Parent Folder').id,
+            entry: (await pack.getDocuments()).find((e) => e.name === 'E2E Tray Effect').id,
+         };
+      });
+      const tray = await readStyles({
+         folder: `#titanEffects [data-folder-id="${trayIds.folder}"] > .folder-header`,
+         entry: `#titanEffects [data-entry-id="${trayIds.entry}"] .entry-name`,
+      });
+
+      expect(tray.folder, 'the tray folder header matches the Items tab folder header').toEqual(core.folder);
+      expect(tray.entry, 'the tray entry name matches the Items tab entry name').toEqual(core.entry);
+
+      await page.evaluate(async () => {
+         await game.folders.find((f) => f.name === 'E2E Style Folder' && f.type === 'Item')?.delete();
+         await game.items.getName('E2E Style Item')?.delete();
+      });
+      await deleteNestedFolders(page);
+   });
+
+   test('the move-to-folder dialog lists nested folders by name under their parents', async () => {
+      await seedNestedFolders(page);
+      await openTray(page);
+      await selectTrayPack(page);
+
+      await page.locator('[data-testid="effect-tray-row"]', { hasText: 'E2E Tray Effect' })
+         .first()
+         .click({ button: 'right' });
+      const moveLabel = await page.evaluate(() => game.i18n.localize('LOCAL.effectTrayMoveToFolder.text'));
+      await page.locator('#context-menu li.context-item', { hasText: moveLabel }).first().click();
+
+      // Open the dialog's folder select and read its option labels.
+      await page.locator('[data-testid="move-effect-folder-select"]').click();
+      const labels = (await page.locator('[role="option"]').allTextContents()).map((label) => label.trim());
+      const rootLabel = await page.evaluate(() => game.i18n.localize('LOCAL.effectTrayRoot.text'));
+      expect(labels).toContain(rootLabel);
+      expect(labels).toContain('E2E Parent Folder');
+      expect(labels).toContain('─ E2E Child Folder');
+      expect(labels.filter((label) => label.includes('LOCAL.')), 'no unlocalized keys').toEqual([]);
+
+      await deleteNestedFolders(page);
    });
 
    test('applying the seeded Dodging effect raises the token actor Defense and Reflexes by one', async () => {
@@ -334,25 +452,11 @@ test.describe('effect tray sidebar tab', () => {
          };
       });
 
-      await page.evaluate(async () => {
-         await ui.titanEffects.render(true);
-         ui.titanEffects.activate();
-         await titanWait(
-            () => !!ui.titanEffects.element?.querySelector('[data-testid="effect-tray"]'),
-            { message: 'tray panel mounted' },
-         );
-      });
-      await selectTitanOption(
-         page,
-         page.locator('[role="combobox"][data-testid="effect-tray-pack-select"]'),
-         'titan.effects',
-      );
+      await openTray(page);
+      await selectTrayPack(page, 'titan.effects');
+
       // Expand the Actions folder (folders start collapsed) so its rows render.
-      const actions = page.locator('section.effect-tray-folder[data-folder-id]', { hasText: 'Actions' }).first();
-      await expect(actions).toBeVisible();
-      if ((await actions.locator('[data-testid="effect-tray-row"]').count()) === 0) {
-         await actions.locator('[data-testid="effect-tray-folder-toggle"]').click();
-      }
+      await expandTrayFolder(trayFolder(page, 'Actions'));
       await page.locator('[data-testid="effect-tray-row"]', { hasText: 'Dodging' })
          .locator('[data-testid="effect-tray-apply"]')
          .first()
@@ -392,17 +496,7 @@ test.describe('effect tray sidebar tab', () => {
          fallbackSceneName: 'E2E Tray Scene',
       });
 
-      // Mount and activate the tray over the controlled token.
-      await page.evaluate(async () => {
-         await ui.titanEffects.render(true);
-         ui.titanEffects.activate();
-         await titanWait(
-            () => !!ui.titanEffects.element?.querySelector('[data-testid="effect-tray"]'),
-            { message: 'tray panel mounted' },
-         );
-      });
-
-      // Select the seeded world pack in the pack-select combobox; rows then load asynchronously.
+      await openTray(page);
       await selectTrayPack(page);
 
       // Scope the Apply click to the seeded effect's own row so the assertion is independent of how
@@ -425,19 +519,10 @@ test.describe('effect tray sidebar tab', () => {
    });
 
    test('create, rename, and delete round-trip in the selected world pack', async () => {
-      await page.evaluate(async () => {
-         await ui.titanEffects.render(true);
-         ui.titanEffects.activate();
-         await titanWait(
-            () => !!ui.titanEffects.element?.querySelector('[data-testid="effect-tray"]'),
-            { message: 'tray panel mounted' },
-         );
-      });
-
-      // Select the seeded world pack in the pack-select combobox; rows then load asynchronously.
+      await openTray(page);
       await selectTrayPack(page);
 
-      // Create a blank effect via the header + New button.
+      // Create a blank effect via the header Create Effect button.
       await page.locator('[data-testid="effect-tray-new"]').click();
 
       // The create writes a blank "New Effect" into the pack asynchronously; poll until it lands.
@@ -453,7 +538,7 @@ test.describe('effect tray sidebar tab', () => {
 
       // Close any sheet the create opened so it does not block subsequent assertions.
       await page.evaluate(() => {
-         for (const app of Object.values(ui.windows)) {
+         for (const app of foundry.applications.instances.values()) {
             if (app?.document?.name === 'New Effect') {
                app.close();
             }
@@ -480,7 +565,7 @@ test.describe('effect tray sidebar tab', () => {
          .toBe(true);
    });
 
-   test('renaming a folder inline persists the new name to the pack', async () => {
+   test('renaming a folder from its context menu persists the new name to the pack', async () => {
       // Seed a folder in the world pack to rename, render the tray, and select the world pack.
       await page.evaluate(async () => {
          const pack = game.packs.get('world.e2e-tray-effects');
@@ -492,23 +577,16 @@ test.describe('effect tray sidebar tab', () => {
             name: 'E2E Rename Folder',
             type: 'ActiveEffect',
          }, { pack: pack.collection });
-
-         await ui.titanEffects.render(true);
-         ui.titanEffects.activate();
-         await titanWait(
-            () => !!ui.titanEffects.element?.querySelector('[data-testid="effect-tray"]'),
-            { message: 'tray panel mounted' },
-         );
       });
-
-      // Select the seeded world pack in the pack-select combobox; its folder then loads asynchronously.
+      await openTray(page);
       await selectTrayPack(page);
 
-      // Double-click the folder name to enter inline rename, type a new name, and commit with Enter.
-      await page.locator('[data-testid="effect-tray-folder"]', { hasText: 'E2E Rename Folder' })
-         .locator('.effect-tray-folder-name')
-         .first()
-         .dblclick();
+      // Right-click the folder header, choose Rename Folder, type a new name, and commit with Enter.
+      await trayFolder(page, 'E2E Rename Folder')
+         .locator(':scope > [data-testid="effect-tray-folder-header"]')
+         .click({ button: 'right' });
+      const renameLabel = await page.evaluate(() => game.i18n.localize('LOCAL.effectTrayRenameFolder.text'));
+      await page.locator('#context-menu li.context-item', { hasText: renameLabel }).first().click();
       const input = page.locator('[data-testid="effect-tray-folder-rename"]').first();
       await input.fill('E2E Renamed Folder');
       await input.press('Enter');
@@ -533,6 +611,43 @@ test.describe('effect tray sidebar tab', () => {
       });
    });
 
+   test('an expanded folder header creates a subfolder inside it', async () => {
+      await seedNestedFolders(page);
+      await openTray(page);
+      await selectTrayPack(page);
+
+      // Core shows a folder's create-subfolder control only while the folder is expanded.
+      const parent = trayFolder(page, 'E2E Parent Folder');
+      const createFolder = parent.locator(':scope > [data-testid="effect-tray-folder-header"]')
+         .locator('[data-testid="effect-tray-folder-create-folder"]');
+      await expect(createFolder).toBeHidden();
+      await expandTrayFolder(parent);
+      await parent.locator(':scope > [data-testid="effect-tray-folder-header"]')
+         .locator('[data-testid="effect-tray-folder-create-folder"]')
+         .click();
+
+      // The new folder is created under the parent, which stays expanded to show it.
+      const newName = await page.evaluate(() => game.i18n.localize('LOCAL.effectTrayNewFolderName.text'));
+      await expect
+         .poll(
+            () => page.evaluate((name) => {
+               const pack = game.packs.get('world.e2e-tray-effects');
+               const parentId = pack.folders.find((f) => f.name === 'E2E Parent Folder').id;
+               return pack.folders.some((f) => f.name === name && f.folder?.id === parentId);
+            }, newName),
+            { message: 'the subfolder is created inside the parent' },
+         )
+         .toBe(true);
+      await expect(parent).toHaveClass(/(^|\s)expanded(\s|$)/);
+      await expect(trayFolder(parent, newName)).toBeVisible();
+
+      await page.evaluate(async (name) => {
+         const pack = game.packs.get('world.e2e-tray-effects');
+         await pack.folders.find((f) => f.name === name)?.delete();
+      }, newName);
+      await deleteNestedFolders(page);
+   });
+
    test('stash-from-actor copies a dropped effect into the selected pack', async () => {
       // Create an actor that owns an effect to stash, render the tray, and select the world pack.
       await deleteFixtureActor(page, 'E2E Stash Source');
@@ -547,16 +662,8 @@ test.describe('effect tray sidebar tab', () => {
                type: 'effect',
             },
          ]);
-
-         await ui.titanEffects.render(true);
-         ui.titanEffects.activate();
-         await titanWait(
-            () => !!ui.titanEffects.element?.querySelector('[data-testid="effect-tray"]'),
-            { message: 'tray panel mounted' },
-         );
       });
-
-      // Select the seeded world pack in the pack-select combobox; rows then load asynchronously.
+      await openTray(page);
       await selectTrayPack(page);
 
       // Simulate a real drop of the actor's effect onto the tray container, dispatching a drop event
@@ -603,60 +710,26 @@ test.describe('effect tray sidebar tab', () => {
    });
 
    test('left-clicking a row opens the effect sheet', async () => {
-      await page.evaluate(async () => {
-         await ui.titanEffects.render(true);
-         ui.titanEffects.activate();
-         await titanWait(
-            () => !!ui.titanEffects.element?.querySelector('[data-testid="effect-tray"]'),
-            { message: 'tray panel mounted' },
-         );
-      });
-
-      // Select the seeded world pack in the pack-select combobox; rows then load asynchronously.
+      await openTray(page);
       await selectTrayPack(page);
 
       await page.locator('[data-testid="effect-tray-row"]', { hasText: 'E2E Tray Effect' })
-         .locator('.effect-tray-row-icon')
+         .locator('.thumbnail')
          .first()
          .click();
 
       // Left-clicking the row opens the effect sheet asynchronously; poll until the app appears.
       await expect
          .poll(
-            () => page.evaluate(() => {
-               // v14 sheets are ApplicationV2 (foundry.applications.instances), not legacy ui.windows.
-               const apps = [
-                  ...Object.values(ui.windows),
-                  ...(foundry.applications?.instances?.values?.() ?? []),
-               ];
-               return apps.some((app) => app?.document?.name === 'E2E Tray Effect');
-            }),
+            () => page.evaluate(() => [...foundry.applications.instances.values()]
+               .some((app) => app?.document?.name === 'E2E Tray Effect')),
             { message: 'left-clicking the row must open the effect sheet' },
          )
          .toBe(true);
-
-      await page.evaluate(() => {
-         const apps = [
-            ...Object.values(ui.windows),
-            ...(foundry.applications?.instances?.values?.() ?? []),
-         ];
-         for (const app of apps) {
-            if (app?.document?.name === 'E2E Tray Effect') { app.close(); }
-         }
-      });
    });
 
    test('right-click context menu opens the effect sheet', async () => {
-      await page.evaluate(async () => {
-         await ui.titanEffects.render(true);
-         ui.titanEffects.activate();
-         await titanWait(
-            () => !!ui.titanEffects.element?.querySelector('[data-testid="effect-tray"]'),
-            { message: 'tray panel mounted' },
-         );
-      });
-
-      // Select the seeded world pack in the pack-select combobox; rows then load asynchronously.
+      await openTray(page);
       await selectTrayPack(page);
 
       await page.locator('[data-testid="effect-tray-row"]', { hasText: 'E2E Tray Effect' })
@@ -670,43 +743,17 @@ test.describe('effect tray sidebar tab', () => {
       // The context-menu Open entry opens the effect sheet asynchronously; poll until it appears.
       await expect
          .poll(
-            () => page.evaluate(() => {
-               // v14 sheets are ApplicationV2 (foundry.applications.instances), not legacy ui.windows.
-               const apps = [
-                  ...Object.values(ui.windows),
-                  ...(foundry.applications?.instances?.values?.() ?? []),
-               ];
-               return apps.some((app) => app?.document?.name === 'E2E Tray Effect');
-            }),
+            () => page.evaluate(() => [...foundry.applications.instances.values()]
+               .some((app) => app?.document?.name === 'E2E Tray Effect')),
             { message: 'the context-menu Open Sheet entry must open the effect sheet' },
          )
          .toBe(true);
-
-      await page.evaluate(() => {
-         const apps = [
-            ...Object.values(ui.windows),
-            ...(foundry.applications?.instances?.values?.() ?? []),
-         ];
-         for (const app of apps) {
-            if (app?.document?.name === 'E2E Tray Effect') { app.close(); }
-         }
-      });
    });
 
-   test('GM lock toggle flips the pack locked state', async () => {
-      await page.evaluate(async () => {
-         const pack = game.packs.get('world.e2e-tray-effects');
-         if (pack.locked) { await pack.configure({ locked: false }); }
-         await ui.titanEffects.render(true);
-         ui.titanEffects.activate();
-         await titanWait(
-            () => !!ui.titanEffects.element?.querySelector('[data-testid="effect-tray"]'),
-            { message: 'tray panel mounted' },
-         );
-      });
-
-      // Select the seeded world pack in the pack-select combobox; rows then load asynchronously.
+   test('GM lock toggle flips the pack locked state and hides the create actions while locked', async () => {
+      await openTray(page);
       await selectTrayPack(page);
+      await expect(page.locator('[data-testid="effect-tray-new"]')).toBeVisible();
 
       await page.locator('[data-testid="effect-tray-lock"]').first().click();
 
@@ -717,6 +764,8 @@ test.describe('effect tray sidebar tab', () => {
             { message: 'clicking the lock toggle must lock the pack' },
          )
          .toBe(true);
+      await expect(page.locator('[data-testid="effect-tray-new"]'), 'create actions hide while locked')
+         .toHaveCount(0);
 
       await page.locator('[data-testid="effect-tray-lock"]').first().click();
 
@@ -727,6 +776,7 @@ test.describe('effect tray sidebar tab', () => {
             { message: 'clicking the lock toggle again must unlock the pack' },
          )
          .toBe(false);
+      await expect(page.locator('[data-testid="effect-tray-new"]')).toBeVisible();
    });
 
    test('the tray list scrolls so its last row can be brought fully into view', async () => {
@@ -735,20 +785,15 @@ test.describe('effect tray sidebar tab', () => {
          width: 1366,
          height: 768,
       });
-      await page.evaluate(() => game.settings.set('titan', 'effectTrayCollapsedFolders', {}));
-      await page.evaluate(async () => {
-         await ui.titanEffects.render(true);
-         ui.titanEffects.activate();
-         await titanWait(
-            () => !!ui.titanEffects.element?.querySelector('[data-testid="effect-tray-pack-select"]'),
-            { message: 'tray pack-select rendered' },
-         );
-      });
-      await selectTitanOption(
-         page,
-         page.locator('[role="combobox"][data-testid="effect-tray-pack-select"]'),
-         'titan.effects',
-      );
+      await openTray(page);
+      await selectTrayPack(page, 'titan.effects');
+      for (const folderName of [
+         'Actions',
+         'Circumstances',
+         'Death',
+      ]) {
+         await expandTrayFolder(trayFolder(page, folderName));
+      }
       const rows = page.locator('[data-testid="effect-tray-row"]');
       await expect(rows).toHaveCount(17);
 

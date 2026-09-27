@@ -1,9 +1,8 @@
 <script>
-   import { getContext, onDestroy } from 'svelte';
+   import { getContext } from 'svelte';
    import localize from '~/helpers/utility-functions/Localize.js';
    import applyEffectToTargets from '~/helpers/utility-functions/ApplyEffectToTargets.js';
    import focusOnMount from '~/helpers/svelte-actions/FocusOnMount.js';
-   import IconButton from '~/helpers/svelte-components/button/IconButton.svelte';
    import { TARGET_ICON } from '~/system/Icons.js';
 
    /**
@@ -32,41 +31,19 @@
    /** @type {boolean} Whether the current rename is being cancelled, so the blur commit is skipped. */
    let isCancellingRename = false;
 
-   /** @type {ReturnType<typeof setTimeout> | null} Pending single-click timer, cancelled by a dblclick. */
-   let openTimer = null;
-
    /**
-    * Opens the effect's sheet on a single left-click of the row. Debounced so a double-click (which
-    * starts an inline rename) does not also open the sheet. No-ops while renaming.
+    * Opens the effect's sheet, as clicking a core directory entry does. No-ops while renaming.
     * @returns {void}
     */
-   function onRowClick() {
-      if (isRenaming) {
-         return;
-      }
-
-      if (openTimer) {
-         clearTimeout(openTimer);
-      }
-
-      openTimer = setTimeout(() => {
-         openTimer = null;
+   function openSheet() {
+      if (!isRenaming) {
          effect.sheet.render(true);
-      }, 250);
-   }
-
-   // Cancel a pending open timer if the row unmounts mid-debounce (e.g. a hook-driven list refresh),
-   // so the sheet never opens after the row is gone.
-   onDestroy(() => {
-      if (openTimer) {
-         clearTimeout(openTimer);
-         openTimer = null;
       }
-   });
+   }
 
    /**
     * Svelte action: begins inline rename when the row receives the `titan-effect-rename` event the
-    * context menu dispatches. Lets the right-click "Rename" entry drive the existing inline-rename UX.
+    * context menu dispatches.
     * @param {HTMLElement} node - The row root element.
     * @returns {{ destroy: () => void }} The action lifecycle handle.
     */
@@ -90,11 +67,6 @@
     * @returns {void}
     */
    function beginRename() {
-      if (openTimer) {
-         clearTimeout(openTimer);
-         openTimer = null;
-      }
-
       if (!trayState.canEdit) {
          return;
       }
@@ -137,13 +109,16 @@
    }
 
    /**
-    * Handles keydown on the static name: Enter or F2 begins inline rename, mirroring the
-    * double-click affordance for keyboard users.
+    * Handles keydown on the name: Enter opens the sheet, F2 begins inline rename.
     * @param {KeyboardEvent} event - The keydown event.
     * @returns {void}
     */
    function onNameKeydown(event) {
-      if (event.key === 'Enter' || event.key === 'F2') {
+      if (event.key === 'Enter') {
+         event.preventDefault();
+         openSheet();
+      }
+      else if (event.key === 'F2') {
          event.preventDefault();
          beginRename();
       }
@@ -162,31 +137,31 @@
 </script>
 
 <!--
-   The row is click-to-open for pointer users; keyboard parity is provided by the focusable name
-   (`role="button"`, Enter/F2 to rename) and the row's right-click context menu (Open Sheet, etc.).
+   Core directory entry markup (`templates/sidebar/partials/document-partial.hbs`) so the core sidebar styles
+   apply. The whole row opens the sheet on click like a core entry; the name carries keyboard access.
 -->
 <!-- svelte-ignore a11y_click_events_have_key_events -->
 <!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
-<div
-   class="effect-tray-row"
+<li
+   class="directory-item entry document flexrow"
    data-effect-id={effect.id}
+   data-entry-id={effect.id}
    data-testid="effect-tray-row"
    draggable={true}
-   onclick={onRowClick}
+   onclick={openSheet}
    ondragstart={onDragStart}
-   role="listitem"
    use:renameOnEvent
 >
    <img
-      alt=""
-      class="effect-tray-row-icon"
+      class="thumbnail"
+      alt={effect.name}
+      loading="lazy"
       src={effect.img}
    />
 
-   <!--Name (double-click to rename when editable)-->
    {#if isRenaming}
       <input
-         class="effect-tray-row-rename"
+         class="entry-name"
          data-testid="effect-tray-rename"
          type="text"
          use:focusOnMount
@@ -197,66 +172,40 @@
       />
    {:else}
       <span
-         class="effect-tray-row-name"
-         role="button"
-         tabindex={trayState.canEdit ? 0 : -1}
-         ondblclick={beginRename}
+         class="entry-name ellipsis"
          onkeydown={onNameKeydown}
+         role="button"
+         tabindex="0"
       >
          {effect.name}
       </span>
    {/if}
 
-   <div class="effect-tray-row-controls">
-      <!--Apply to Target button (stops propagation so applying does not also open the sheet)-->
-      <IconButton
-         icon={TARGET_ICON}
-         label={applyLabel}
-         onclick={(event) => {
-            event.stopPropagation();
-            applyEffectToTargets(effect);
-         }}
-         testId="effect-tray-apply"
-         tooltip={'effectTrayApply'}
-      />
-   </div>
-</div>
+   <!--Apply to Target (stops propagation so applying does not also open the sheet)-->
+   <button
+      class="inline-control icon {TARGET_ICON}"
+      aria-label={applyLabel}
+      data-testid="effect-tray-apply"
+      data-tooltip=""
+      onclick={(event) => {
+         event.stopPropagation();
+         applyEffectToTargets(effect);
+      }}
+      type="button"
+   ></button>
+</li>
 
 <style lang="scss">
-   .effect-tray-row {
-      @include flex-row;
-      @include flex-group-left;
-      @include padding-standard;
+   .entry {
+      align-items: center;
 
-      width: 100%;
-
-      .effect-tray-row-icon {
-         width: 32px;
-         height: 32px;
-         border: none;
-         object-fit: contain;
-      }
-
-      .effect-tray-row-name {
-         @include margin-left-standard;
-
-         overflow: hidden;
-         text-overflow: ellipsis;
-         white-space: nowrap;
-      }
-
-      .effect-tray-row-rename {
-         @include input;
-         @include margin-left-standard;
-
+      .entry-name {
          flex: 1;
       }
 
-      .effect-tray-row-controls {
-         @include flex-row;
-         @include flex-group-right;
-
-         margin-left: auto;
+      .inline-control {
+         flex: none;
+         margin-right: 4px;
       }
    }
 </style>

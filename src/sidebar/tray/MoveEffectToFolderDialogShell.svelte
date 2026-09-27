@@ -8,7 +8,8 @@
    /**
     * @typedef {object} MoveEffectToFolderDialogShellProps
     * @property {string} effectName - The name of the effect being moved.
-    * @property {{ value: string, label: string }[]} folderOptions - The destination folder options.
+    * @property {{ value: string, label: import('~/helpers/ProcessTextData.js').TextData }[]} folderOptions -
+    * The destination folder options.
     * @property {string} initialValue - The id of the effect's current folder, or '' for the root.
     */
 

@@ -592,45 +592,65 @@ and one or more inner Svelte component trees.
   `options.isFirstRender`). It has NO backing document; instead it builds an `EffectTrayState` and sets it into
   Svelte context as `'trayState'`. Registered additively in `OnceInit.js` (`Sidebar.TABS.titanEffects` +
   `CONFIG.ui.titanEffects`); core instantiates `ui.titanEffects` and handles the tab strip / activation / popout.
-  The frameless tab root is the sidebar's flex item, so it carries `flexcol` plus `titan-effect-tray-tab`
-  (`Global.scss`: `min-height: 0; overflow: hidden`, as core directories clip) and `EffectTray` is a
-  `flex: 1; min-height: 0` child — without that bound the list grows to its content and never scrolls.
+  **The tray renders core sidebar directory markup and is styled by core CSS, not TITAN theme tokens**: the tab
+  root carries core's `directory` class (and deliberately NOT the TITAN `titan` surface class, whose background
+  and font would override core), and the components emit core's `templates/sidebar/directory/header.hbs`,
+  `partials/folder-partial.hbs`, and `partials/document-partial.hbs` structure (`directory-header`,
+  `header-actions`, `<search>`, `ol.directory-list`, `li.directory-item.folder[.expanded]` > `header.folder-header`
+  + `ol.subdirectory`, `li.directory-item.entry.document` > `img.thumbnail` + `.entry-name`). Core CSS then supplies
+  folder icons (open/closed via `:not(.expanded)`), nesting bars, sticky nested headers, folder colours, and hides a
+  collapsed folder's create-subfolder control. The frameless tab root is the sidebar's flex item (`flexcol` +
+  `titan-effect-tray-tab`, `Global.scss` `min-height: 0`; core `.directory` clips) and `EffectTray` is a plain
+  `flex: 1; min-height: 0` column — without that bound the list grows to its content and never scrolls.
 - `EffectTrayState` (`src/sidebar/tray/EffectTrayState.svelte.js`) is a Svelte 5 runes class holding `compendiums`,
-  `selectedPackId`, `effects`, `folders`, `filter`, `expandedFolders`, and `isLocked` (a reactive `$state` mirror of
-  `pack.locked`). `getEffectCompendiums()` (`src/sidebar/tray/GetEffectCompendiums.js`) lists visible
-  `ActiveEffect`-type packs (system/TITAN first, then alphabetical). `refresh()` loads `pack.getDocuments()` (TITAN/
-  system packs filtered to `type==='effect'`; user packs show all), sets `isLocked = !!pack.locked` before the await
-  (or resets it to `true` in the no-pack guard), with a post-await stale-selection guard. The last-selected pack
-  persists in the per-user `effectTrayLastPack` client setting. Every `refresh()` also derives
-  `expandedFolders` (`#deriveExpandedFolders()`) as the pack's current folder ids minus the ids stored in the
-  per-user `effectTrayCollapsedFolders` client setting (`{ [packCollectionId]: string[] }` of COLLAPSED ids) —
-  absence means expanded, so a pack with no entry and any folder created after the entry was saved render
-  expanded, and deleted folder ids are never consulted. `toggleFolder(folderId)` flips membership in the reactive
-  set and persists the current folders absent from it via `#persistCollapsedFolders()` (which thereby prunes
-  ids of deleted folders). The state registers create/update/delete hooks for
-  both `ActiveEffect` and `Folder`, refreshing only when `document.pack === selectedPackId`; `destroy()` (called from
-  the tab's `_onClose`) removes them. `isOwner` getter = `pack.getUserLevel(game.user) >= OWNER`. `canEdit` getter =
-  `!this.isLocked && this.isOwner` (reads the reactive mirror, so the UI reacts when the lock flips). `toggleLock()`
-  calls `await pack.configure({ locked: !pack.locked })` then updates the mirror; owner-gated. `requestDeleteEffect()`
-  prompts via `ConfirmationDialog` then calls `effect.delete()` on confirm; `canEdit`-gated.
-- `buildEffectRowContextMenu(trayState)` (`src/sidebar/tray/EffectRowContextMenu.js`) returns the six
-  right-click `ContextMenuEntry` objects for an effect-tray row. Entry shape: `{ label, icon, visible(), onClick() }`.
-  Apply and Open are always visible; Rename, Duplicate, and Delete are gated on `trayState.canEdit`; Move to Folder
-  is gated on `canEdit && !!selectedPack?.folders`. The Move-to-Folder `onClick` lazy-loads `MoveEffectToFolderDialog`
-  via a dynamic `import()` so this module stays importable in unit tests without stubbing
-  `foundry.applications.api`. `resolveEffect(target, trayState)` (module-private) looks up the effect by reading
-  `data-effect-id` off the closest ancestor element.
-- UI: `EffectTrayShell` → `EffectTray` (hosts the drag-in stash drop zone; attaches a Foundry `ContextMenu` to the
-  tray root via the `effectContextMenu` action, delegating on `[data-effect-id]` rows with `buildEffectRowContextMenu`)
-  → `EffectTrayHeader` (compendium `Select` dropdown, GM/owner-only lock toggle calling `toggleLock()`, owner-gated
-  New / New Folder, and an actor-sheet-style labelled **Filter** row bound to `trayState.filter`) + `EffectTrayList`
-  (folder-grouped or flat; folder headers carry owner-gated inline-rename mirroring the row, plus collapse toggle,
-  count, delete) of `EffectTrayRow` (icon, inline-rename, drag-out via `effect.toDragData()`, and a single
-  always-visible **Apply** button). **Left-click on a row opens the effect sheet**, debounced 250 ms so it does not
-  collide with double-click-to-rename; the row listens for a `titan-effect-rename` CustomEvent so the context menu's
-  Rename entry drives the inline rename. Open / Duplicate / Delete / Rename / Move-to-Folder live in the right-click
-  context menu; **Move to Folder** opens `MoveEffectToFolderDialog` (`src/sidebar/tray/MoveEffectToFolderDialog.js` +
-  `MoveEffectToFolderDialogShell.svelte`), a folder-picker that calls `trayState.moveEffectToFolder`. Apply uses
+  `selectedPackId`, `effects`, `tree` (`$state.raw`), `filter`, `expandedFolders` (folder uuids), `isLocked`,
+  `searchMode`, and `sortingMode` (reactive mirrors of `pack.locked`, `pack.searchMode`, `pack.sortingMode`).
+  `getEffectCompendiums()` (`src/sidebar/tray/GetEffectCompendiums.js`) lists visible `ActiveEffect`-type packs
+  (system/TITAN first, then alphabetical). `refresh()` loads `pack.getDocuments()` (TITAN/system packs filtered to
+  `type==='effect'`; user packs show all), with a post-await stale-selection guard, then `#buildTree(pack)`:
+  `pack.initializeTree()` (required — when the create/update hooks that trigger a refresh fire, core's tree does
+  not yet include a created folder or effect or an effect's move) and a mirror of `pack.tree` whose nodes are
+  `{ folder, depth, children, effects }` with each index entry swapped for its loaded effect (entries with no
+  loaded effect, i.e. hidden subtypes, are dropped). Nesting and order therefore match core, including the
+  per-collection alphabetical/manual `sortingMode`. `folderOptions` flattens the tree depth-first with core's
+  `─`-per-level prefix (used by the move dialog). Expansion follows core directories: folders start collapsed,
+  `toggleFolder(node)` collapsing a folder also collapses its descendants, `collapseAllFolders()` clears the set,
+  and the set lives only as long as the state (no setting). `toggleSearchMode()` / `toggleSortingMode()` call the
+  core collection toggles (stored by core per collection, shared with the compendium window). The last-selected
+  pack persists in the per-user `effectTrayLastPack` client setting. The state registers create/update/delete
+  hooks for both `ActiveEffect` and `Folder`, refreshing only when `document.pack === selectedPackId`; `destroy()`
+  (called from the tab's `_onClose`) removes them. `isOwner` getter = `pack.getUserLevel(game.user) >= OWNER`.
+  `canEdit` getter = `!this.isLocked && this.isOwner`. `toggleLock()` calls `await pack.configure({ locked })` then
+  updates the mirror; owner-gated. `createBlankEffect(folderId?)` / `createFolder(parent?)` create at the root or
+  inside a folder. `requestDeleteEffect()` prompts via `ConfirmationDialog`; `canEdit`-gated.
+- Search (`EffectTrayList` + `filterEffectTree` in `src/sidebar/tray/FilterEffectTree.js`) mirrors
+  `DocumentDirectory#_matchSearchFolders`/`#_matchSearchEntries`: the query is cleaned with
+  `SearchFilter.cleanQuery` and tested as an escaped case-insensitive regex; a folder whose name matches keeps its
+  direct effects but is not auto-expanded; a matching effect keeps and auto-expands its whole folder chain; in
+  full-text mode effect matches come from core's `pack.search({ query })`. Auto-expanded folders are shown open in
+  addition to `expandedFolders` while a query is active.
+- `buildEffectRowContextMenu(trayState, openMoveToFolder)` (`src/sidebar/tray/EffectRowContextMenu.js`) returns the
+  six right-click entries for an effect row (`{ label, icon, visible(), onClick() }`). Apply and Open are always
+  visible; Rename, Duplicate, and Delete are gated on `trayState.canEdit`; Move to Folder on
+  `canEdit && !!selectedPack?.folders`. The move-dialog opener is injected by `EffectTray` so the module carries no
+  AppV2 import and stays unit-testable. `buildEffectFolderContextMenu(trayState)`
+  (`src/sidebar/tray/EffectFolderContextMenu.js`) returns the folder-header entries, all `canEdit`-gated: Edit Folder
+  (core `folder.sheet`, which sets name, colour, and sorting), Rename Folder (dispatches `titan-folder-rename` on the
+  header, which `EffectTrayList` turns into an inline rename), and Delete Folder (`trayState.deleteFolder`).
+- UI: `EffectTrayShell` → `EffectTray` (hosts the drag-in stash drop zone; attaches two Foundry `ContextMenu`s to
+  the tray root via the `effectContextMenu` action: `[data-effect-id]` rows and `.folder-header`s) →
+  `EffectTrayHeader` (a pack row — native `<select>` plus the owner-only lock toggle — above core's header: the
+  `canEdit`-only Create Effect / Create Folder buttons, then the `<search>` row with the search-mode toggle, the
+  search input bound to `trayState.filter`, the sort-mode toggle, and collapse-all) + `EffectTrayList` (the
+  recursive folder snippet; folder headers toggle on click/Enter/Space and carry `canEdit`-gated create-subfolder
+  (below `CONST.FOLDER_MAX_DEPTH`) and create-effect controls; folder and root drops move an in-pack effect, other
+  drops fall through to the stash) of `EffectTrayRow` (core entry markup, drag-out via `effect.toDragData()`, and an
+  **Apply** inline control). **Clicking a row opens the effect sheet**, as a core entry does; the name is focusable
+  (Enter opens, F2 renames) and the row listens for a `titan-effect-rename` CustomEvent so the context menu's Rename
+  entry drives the inline rename. **Move to Folder** opens `MoveEffectToFolderDialog`
+  (`src/sidebar/tray/MoveEffectToFolderDialog.js` + `MoveEffectToFolderDialogShell.svelte`), whose TITAN `Select`
+  options pass folder names as `{ text, localize: false }` (a plain string label is run through TITAN
+  localization), and which calls `trayState.moveEffectToFolder`. Apply uses
   `applyEffectToTargets()`
   (`src/helpers/utility-functions/ApplyEffectToTargets.js`) → copies `effect.toObject()` onto each
   `getBestCharactersToUpdate()` target the user owns. Stash-in resolves the drop via

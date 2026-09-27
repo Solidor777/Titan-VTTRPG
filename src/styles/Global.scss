@@ -55,11 +55,10 @@
    }
 }
 
-// The Effect Tray tab root is a frameless flex item of the sidebar; clipping here lets its own list scroll
-// instead of growing to the content height (core sidebar directories clip the same way).
-.titan.titan-effect-tray-tab {
+// The Effect Tray tab root is a frameless flex item of the sidebar; letting it shrink below its content height
+// keeps the core `.directory` clipping in effect, so its own list scrolls instead of growing the tab.
+.titan-effect-tray-tab {
    min-height: 0;
-   overflow: hidden;
 }
 
 // Per-level heading color across TITAN surfaces (.titan) and the non-.titan Player HUD rich text.

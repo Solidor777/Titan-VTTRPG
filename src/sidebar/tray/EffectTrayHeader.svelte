@@ -1,137 +1,142 @@
 <script>
    import { getContext } from 'svelte';
    import localize from '~/helpers/utility-functions/Localize.js';
-   import Select from '~/helpers/svelte-components/input/select/Select.svelte';
-   import TextInput from '~/helpers/svelte-components/input/TextInput.svelte';
-   import IconButton from '~/helpers/svelte-components/button/IconButton.svelte';
-   import { CREATE_ICON, FOLDER_ICON, LOCK_ICON, UNLOCK_ICON } from '~/system/Icons.js';
+   import { LOCK_ICON, UNLOCK_ICON } from '~/system/Icons.js';
 
    /** @type {import('~/sidebar/tray/EffectTrayState.svelte.js').default} The reactive tray state from context. */
    const trayState = getContext('trayState');
 
-   // The dropdown options: one per visible ActiveEffect compendium. The pack label is already a
-   // resolved display name, so it is wrapped as non-localizing TextData to avoid the Text/tooltip
-   // layer re-localizing it into a `LOCAL.<name>.text` key.
-   /** @type {{ value: string, label: { text: string, localize: false } }[]} The pack-select options. */
-   const packOptions = $derived(trayState.compendiums.map((pack) => ({
-      value: pack.collection,
-      label: {
-         text: pack.metadata.label,
-         localize: false,
-      },
-   })));
+   /** @type {boolean} Whether the search matches names only (true) or also indexed text (false). */
+   const nameOnlySearch = $derived(trayState.searchMode === CONST.DIRECTORY_SEARCH_MODES.NAME);
 
-   /** @type {string} The localized aria-label for the New Effect button. */
-   const newLabel = localize('effectTrayNew');
-
-   /** @type {string} The localized aria-label for the New Folder button. */
-   const newFolderLabel = localize('effectTrayNewFolder');
-
-   /** @type {boolean} Whether the selected pack supports folders (compendium packs do). */
-   const supportsFolders = $derived(!!trayState.selectedPack?.folders);
-
-   /** @type {string} The localized aria-label for the lock/unlock toggle, reflecting current state. */
+   /** @type {string} The localized aria-label and tooltip for the lock/unlock toggle. */
    const lockLabel = $derived(trayState.isLocked ? localize('effectTrayUnlock') : localize('effectTrayLock'));
 
-   /** @type {string} The i18n key for the lock/unlock tooltip, localized once by the tooltip action. */
-   const lockTooltipKey = $derived(trayState.isLocked ? 'effectTrayUnlock' : 'effectTrayLock');
+   /** @type {string} The localized search placeholder, worded as the core directories word theirs. */
+   const searchPlaceholder = game.i18n.format('SIDEBAR.Search', { types: localize('effects') });
 </script>
 
-<div class="effect-tray-header">
-   <div class="effect-tray-header-row">
-      <Select
-         disabled={packOptions.length === 0}
+<!--
+   Core directory header markup (`templates/sidebar/directory/header.hbs`) so the core sidebar styles apply,
+   with the tray's pack row above it.
+-->
+<header class="directory-header flexcol">
+
+   <!--Pack selector and lock toggle-->
+   <div class="effect-tray-pack-row flexrow">
+      <select
+         aria-label={localize('effects')}
+         data-testid="effect-tray-pack-select"
+         disabled={trayState.compendiums.length === 0}
          onchange={() => trayState.selectPack(trayState.selectedPackId)}
-         options={packOptions}
-         testId="effect-tray-pack-select"
          bind:value={trayState.selectedPackId}
-      />
+      >
+         {#each trayState.compendiums as pack (pack.collection)}
+            <option value={pack.collection}>{pack.metadata.label}</option>
+         {/each}
+      </select>
 
-      <!--New Effect / New Folder / Lock toggle buttons-->
-      <div class="effect-tray-header-new">
-         <IconButton
-            disabled={!trayState.canEdit}
-            icon={CREATE_ICON}
-            label={newLabel}
+      {#if trayState.isOwner}
+         <button
+            class="inline-control icon {trayState.isLocked ? LOCK_ICON : UNLOCK_ICON}"
+            aria-label={lockLabel}
+            data-testid="effect-tray-lock"
+            data-tooltip=""
+            onclick={() => trayState.toggleLock()}
+            type="button"
+         ></button>
+      {/if}
+   </div>
+
+   <!--Create actions, shown only when the pack is editable, as core shows them only when creation is allowed-->
+   {#if trayState.canEdit}
+      <div class="header-actions action-buttons flexrow">
+         <button
+            class="create-entry"
+            data-testid="effect-tray-new"
             onclick={() => trayState.createBlankEffect()}
-            testId="effect-tray-new"
-            tooltip={'effectTrayNew'}
-         />
+            type="button"
+         >
+            <i
+               class="fa-solid fa-wand-sparkles"
+               inert
+            ></i>
+            <span>{localize('effectTrayNew')}</span>
+         </button>
 
-         {#if supportsFolders}
-            <IconButton
-               disabled={!trayState.canEdit}
-               icon={FOLDER_ICON}
-               label={newFolderLabel}
+         {#if trayState.supportsFolders}
+            <button
+               class="create-folder"
+               data-testid="effect-tray-new-folder"
                onclick={() => trayState.createFolder()}
-               testId="effect-tray-new-folder"
-               tooltip={'effectTrayNewFolder'}
-            />
-         {/if}
-
-         {#if trayState.isOwner}
-            <IconButton
-               icon={trayState.isLocked ? LOCK_ICON : UNLOCK_ICON}
-               label={lockLabel}
-               onclick={() => trayState.toggleLock()}
-               testId="effect-tray-lock"
-               tooltip={lockTooltipKey}
-            />
+               type="button"
+            >
+               <i
+                  class="fa-solid fa-folder"
+                  inert
+               ></i>
+               <span>{localize('effectTrayNewFolder')}</span>
+            </button>
          {/if}
       </div>
-   </div>
+   {/if}
 
-   <!--Filter row (mirrors the actor-sheet tab header)-->
-   <div class="effect-tray-filter-row">
-      <div class="label">
-         {localize('filter')}
-      </div>
-      <div class="input">
-         <TextInput
-            testId="effect-tray-search"
-            bind:value={trayState.filter}
-         />
-      </div>
-   </div>
-</div>
+   <!--Search mode, search input, sort mode, and collapse-all-->
+   <search>
+      <button
+         class="inline-control toggle-search-mode icon {nameOnlySearch
+            ? 'fa-solid fa-magnifying-glass'
+            : 'fa-solid fa-file-magnifying-glass'}"
+         aria-label={game.i18n.localize(nameOnlySearch ? 'SIDEBAR.SearchModeName' : 'SIDEBAR.SearchModeFull')}
+         data-testid="effect-tray-search-mode"
+         data-tooltip=""
+         onclick={() => trayState.toggleSearchMode()}
+         type="button"
+      ></button>
+      <input
+         aria-label={searchPlaceholder}
+         autocomplete="off"
+         data-testid="effect-tray-search"
+         name="search"
+         placeholder={searchPlaceholder}
+         type="search"
+         bind:value={trayState.filter}
+      />
+      <button
+         class="inline-control toggle-sort icon {trayState.sortingMode === 'a'
+            ? 'fa-solid fa-arrow-down-a-z'
+            : 'fa-solid fa-arrow-down-short-wide'}"
+         aria-label={game.i18n.localize(trayState.sortingMode === 'a'
+            ? 'SIDEBAR.SortModeAlpha'
+            : 'SIDEBAR.SortModeManual')}
+         data-testid="effect-tray-sort"
+         data-tooltip=""
+         onclick={() => trayState.toggleSortingMode()}
+         type="button"
+      ></button>
+      <button
+         class="inline-control collapse-all icon fa-duotone fa-folder-tree"
+         aria-label={game.i18n.localize('FOLDER.Collapse')}
+         data-testid="effect-tray-collapse-all"
+         data-tooltip=""
+         onclick={() => trayState.collapseAllFolders()}
+         type="button"
+      ></button>
+   </search>
+</header>
 
 <style lang="scss">
-   .effect-tray-header {
-      @include flex-column;
-      @include flex-group-top;
-      @include padding-standard;
+   .effect-tray-pack-row {
+      align-items: center;
+      gap: 8px;
+      padding-inline: 8px;
 
-      width: 100%;
-
-      .effect-tray-header-row {
-         @include flex-row;
-         @include flex-group-center;
-
-         width: 100%;
-
-         .effect-tray-header-new {
-            @include margin-left-standard;
-         }
+      select {
+         flex: 1;
       }
 
-      .effect-tray-filter-row {
-         @include flex-row;
-         @include flex-group-center;
-         @include margin-top-standard;
-
-         width: 100%;
-
-         .label {
-            font-weight: bold;
-
-            @include margin-right-standard;
-         }
-
-         .input {
-            @include flex-group-left;
-
-            flex: 1;
-         }
+      .inline-control {
+         flex: none;
       }
    }
 </style>

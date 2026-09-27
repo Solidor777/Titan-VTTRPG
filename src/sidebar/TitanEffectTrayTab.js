@@ -15,12 +15,14 @@ export default class TitanEffectTrayTab extends foundry.applications.sidebar.Abs
    static tabName = 'titanEffects';
 
    /**
-    * Default ApplicationV2 options.
+    * Default ApplicationV2 options. The `directory` class opts the tab into the core sidebar directory
+    * styles (header, search row, folders, entries), so the tray looks like the Actors and Items tabs; it
+    * deliberately omits the TITAN `titan` surface class, whose background and font would override them.
     * @override
     */
    static DEFAULT_OPTIONS = {
       classes: [
-         'titan',
+         'directory',
          'flexcol',
          'titan-effect-tray-tab',
       ],

@@ -652,13 +652,4 @@ export default function registerSystemSettings() {
       scope: 'client',
       type: String,
    });
-
-   // Collapsed folder ids per Effect Tray pack (per-user): { [packCollectionId]: string[] }. A folder absent
-   // from its pack's entry is expanded, so newly created folders open expanded by default.
-   game.settings.register('titan', 'effectTrayCollapsedFolders', {
-      config: false,
-      default: {},
-      scope: 'client',
-      type: Object,
-   });
 }
