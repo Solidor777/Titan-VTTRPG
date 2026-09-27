@@ -3,6 +3,106 @@ import jsdoc from 'eslint-plugin-jsdoc';
 import stylistic from '@stylistic/eslint-plugin';
 import arrayLiteralNewlineRule from './eslint/rules/array-literal-newline.js';
 
+/**
+ * Converts identifier names into an ESLint globals map of read-only entries.
+ * @param {string[]} names - The global identifier names.
+ * @returns {Record<string, 'readonly'>} The globals map.
+ */
+function readonlyGlobals(names) {
+   return Object.fromEntries(names.map((name) => [
+      name,
+      'readonly',
+   ]));
+}
+
+/** @type {string[]} Browser globals referenced by client code and in-page e2e callbacks. */
+const BROWSER_GLOBALS = [
+   'window',
+   'document',
+   'console',
+   'getComputedStyle',
+   'matchMedia',
+   'requestAnimationFrame',
+   'cancelAnimationFrame',
+   'setTimeout',
+   'clearTimeout',
+   'setInterval',
+   'clearInterval',
+   'structuredClone',
+   'queueMicrotask',
+   'MutationObserver',
+   'ResizeObserver',
+   'Element',
+   'HTMLElement',
+   'NodeFilter',
+   'Event',
+   'CustomEvent',
+   'DragEvent',
+   'DataTransfer',
+   'File',
+   'Blob',
+   'URL',
+   'TextEncoder',
+   'TextDecoder',
+   'CSS',
+   'navigator',
+   'localStorage',
+];
+
+/** @type {string[]} Globals the Foundry VTT client defines before system code runs. */
+const FOUNDRY_GLOBALS = [
+   'foundry',
+   'game',
+   'ui',
+   'canvas',
+   'CONFIG',
+   'CONST',
+   'Hooks',
+   'Actor',
+   'Item',
+   'ActiveEffect',
+   'ChatMessage',
+   'Combat',
+   'Folder',
+   'Macro',
+   'Scene',
+   'Roll',
+   'CompendiumCollection',
+   'SortingHelpers',
+   'fromUuid',
+   'fromUuidSync',
+   'getDocumentClass',
+];
+
+/** @type {string[]} Node.js globals used by build scripts, configs and unit tests. */
+const NODE_GLOBALS = [
+   'process',
+   'console',
+   'setTimeout',
+   'clearTimeout',
+   'setInterval',
+   'clearInterval',
+   'structuredClone',
+   'URL',
+   'TextEncoder',
+   'TextDecoder',
+   'File',
+   'Buffer',
+   '__dirname',
+   '__filename',
+];
+
+/** @type {string[]} Svelte 5 runes, which are compiler globals in `.svelte.js` modules. */
+const SVELTE_RUNES = [
+   '$state',
+   '$derived',
+   '$effect',
+   '$props',
+   '$bindable',
+   '$inspect',
+   '$host',
+];
+
 export default [
    // add more generic rule sets here, such as:
    // js.configs.recommended,
@@ -174,6 +274,59 @@ export default [
                switchCase: 1,
             },
          ],
+      },
+   },
+   {
+      // Undefined identifiers are errors everywhere; each environment declares the globals it really has.
+      rules: {
+         'no-undef': 'error',
+      },
+   },
+   {
+      files: [
+         'src/**/*.{js,svelte}',
+      ],
+      languageOptions: {
+         globals: readonlyGlobals([
+            ...BROWSER_GLOBALS,
+            ...FOUNDRY_GLOBALS,
+         ]),
+      },
+   },
+   {
+      files: [
+         'src/**/*.svelte.js',
+      ],
+      languageOptions: {
+         globals: readonlyGlobals(SVELTE_RUNES),
+      },
+   },
+   {
+      // Node-side scripts, configs and unit tests (jsdom supplies browser globals under vitest).
+      files: [
+         '*.{js,mjs,cjs}',
+         'scripts/**/*.{js,mjs}',
+         'eslint/**/*.js',
+         'tests/**/*.{js,mjs}',
+      ],
+      languageOptions: {
+         globals: readonlyGlobals(NODE_GLOBALS),
+      },
+   },
+   {
+      // E2E callbacks passed to `page.evaluate` (and the shared helpers they call) run inside the Foundry client,
+      // alongside the helpers the in-page init script installs (`titanWait`) and the fast-check bundle (`fc`).
+      // Unit tests run under jsdom with the Foundry globals mocked by the vitest setup.
+      files: [
+         'tests/**/*.{js,mjs}',
+      ],
+      languageOptions: {
+         globals: readonlyGlobals([
+            ...BROWSER_GLOBALS,
+            ...FOUNDRY_GLOBALS,
+            'titanWait',
+            'fc',
+         ]),
       },
    },
    {
