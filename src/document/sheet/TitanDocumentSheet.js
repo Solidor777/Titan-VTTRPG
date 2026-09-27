@@ -127,6 +127,24 @@ export default class TitanDocumentSheet extends DocumentSheetV2 {
    }
 
    /**
+    * Disable or re-enable the sheet's form controls. DocumentSheetV2 disables every control present at render when
+    * the viewer cannot edit the document; controls inside a `[data-view-controls]` container (tab strips, row
+    * expand toggles) change no document state, so they are re-enabled and a non-owner can still read the whole
+    * sheet. Editing controls gate themselves on ownership in their components.
+    * @override
+    * @param {boolean} disabled - Whether to disable the form controls.
+    * @protected
+    */
+   _toggleDisabled(disabled) {
+      super._toggleDisabled(disabled);
+      if (disabled) {
+         for (const control of this.element.querySelectorAll('[data-view-controls] button')) {
+            control.disabled = false;
+         }
+      }
+   }
+
+   /**
     * Mount the always-visible header-buttons Svelte tree into the window header on first render. The
     * tree is anchored before the controls (ellipsis) button and shares the application and reactive
     * document via context, mirroring the content shell mount.

@@ -31,8 +31,11 @@
    class={`tabs${border ? ' bordered' : ''}`}
    data-testid={testId}
 >
-   <!--Tab List-->
-   <div class="tab-list">
+   <!--Tab List (view controls: usable on sheets the viewer cannot edit)-->
+   <div
+      class="tab-list"
+      data-view-controls
+   >
       <!--For each tab-->
       {#each tabs as tab}
          <div class={`button${activeTab === tab.id ? ' active' : ''}`}>

@@ -16,7 +16,11 @@
    const document = getContext('document');
 </script>
 
-<div class="button">
+<!--View control: usable on sheets the viewer cannot edit-->
+<div
+   class="button"
+   data-view-controls
+>
    <Button
       onclick={() => {
          if (document.doc && !document.doc.isMarkedForDeletion) {

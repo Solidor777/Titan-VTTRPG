@@ -58,8 +58,11 @@
    </div>
 
    {#if hasDetails}
-      <!--Details Toggle-->
-      <div class="toggle">
+      <!--Details Toggle (view control: usable on sheets the viewer cannot edit)-->
+      <div
+         class="toggle"
+         data-view-controls
+      >
          <ExpandButton bind:expanded/>
       </div>
 
