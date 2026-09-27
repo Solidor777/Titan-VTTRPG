@@ -1,6 +1,6 @@
 <script>
    import { getContext } from 'svelte';
-   import DocumentOwnerButton from '~/document/svelte-components/DocumentOwnerButton.svelte';
+   import Button from '~/helpers/svelte-components/button/Button.svelte';
    import { COLLAPSED_ICON, EXPANDED_ICON } from '~/system/Icons.js';
 
    /**
@@ -17,7 +17,7 @@
 </script>
 
 <div class="button">
-   <DocumentOwnerButton
+   <Button
       onclick={() => {
          if (document.doc && !document.doc.isMarkedForDeletion) {
             isExpanded = !isExpanded;
@@ -31,7 +31,7 @@
          <!--Icon-->
          <i class={isExpanded ? EXPANDED_ICON : COLLAPSED_ICON}></i>
       </div>
-   </DocumentOwnerButton>
+   </Button>
 </div>
 
 <style lang="scss">
