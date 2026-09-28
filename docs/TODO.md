@@ -60,6 +60,13 @@ Completed items are deleted, not marked done.
   - Stormcaller's Tempest: flagged as an action; The Dragon Awakens and Being of Urdokai, which work the same way, are
     passive.
 
+- Apply effects to targets when a spell or ability is cast, with values derived from the caster and each target (user
+  ruling 2026-09-27). First consumer: Abjuration of the Arbiter's dice penalty, "your Soul minus the target's Soul, to a
+  minimum of 1" (rules 09_26 line 7696), which until then ships as a -1 default the GM edits per target.
+
+- Extend immunity beyond effects and conditions (user ruling 2026-09-27): immunity to abilities, damage and other
+  things by trait. The first cut covers effect/condition immunity by condition id or effect name only.
+
 - Effect Tray parity gaps with the core directories (`src/sidebar/tray/`): folders cannot be dragged to reorder or nest
   them (effects can be dragged into folders), and the folder context menu offers only Edit, Rename, and Delete — core's
   Remove Folder / Delete All distinction, Configure Ownership, and Export entries are absent.
