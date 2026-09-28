@@ -22,7 +22,7 @@ Closes the `docs/TODO.md` item "Conditions rework to the 2026-09-26 rules".
 - Rounding applies to the resulting value, the way the rules phrase it. `mulBase` gains a third rounding option,
   `nearest`, alongside `up` and `down`.
 - Frightened, Incapacitated and Unconscious may carry mechanics (superseding the 2026-06-01 inert ruling for those
-  three). Dead stays inert.
+  three). Deafened and Blinded auto-fail Awareness/Perception checks as a situational modifier. Dead stays inert.
 - Condition/effect immunity by condition id or effect name is in scope; trait-based immunity is logged in
   `docs/TODO.md`.
 
@@ -34,9 +34,9 @@ Closes the `docs/TODO.md` item "Conditions rework to the 2026-09-26 rules".
 
 | Condition | Rules elements |
 |---|---|
-| Blinded | `mulBase` 0.75 up on ratings melee, accuracy, defense; `conditionalCheckModifier` `automaticFailure`, checkType `any`, selector `situation`, key "Relies on Sight" |
+| Blinded | `mulBase` 0.75 up on ratings melee, accuracy, defense; `conditionalCheckModifier` `automaticFailure`, checkType `any`, selector `situation`, key "Relies on Sight", narrowed to skill `perception` (Awareness is a passive rating with no check of its own; Perception checks are the Awareness checks) |
 | Contaminated | `mulBase` 0.75 up on attribute `all` and resistance `all` (replaces flat −1) |
-| Deafened | `conditionalCheckModifier` `automaticFailure`, checkType `any`, selector `situation`, key "Relies on Hearing" |
+| Deafened | `conditionalCheckModifier` `automaticFailure`, checkType `any`, selector `situation`, key "Relies on Hearing", narrowed to skill `perception` (user ruling 2026-09-27) |
 | Frightened | `conditionalCheckModifier` `advantage` −1, checkType `any`, selector `any` |
 | Incapacitated | `conditionalCheckModifier` `automaticFailure`, checkType `resistance`, selector `resistance`, key `reflexes`; target-side: attacks against it have Difficulty 2 (§3) |
 | Off-Balance (new) | `mulBase` 0.75 up on ratings accuracy, awareness, melee, defense; icon `icons/svg/daze.svg` |

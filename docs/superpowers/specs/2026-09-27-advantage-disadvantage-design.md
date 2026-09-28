@@ -78,9 +78,12 @@ Rules often scope a modifier to a circumstance no check type or skill expresses 
 
 - Every check type's selector list gains `situation`, with a free-typed key (the circumstance's label). The key is
   user-typed and joins `USER_KEYED_CHECK_MODIFIER_SELECTORS`, so it is matched in camel case.
+- A situational element may optionally narrow itself to checks using one skill (`skill` field; `''` = any skill).
+  The editor shows a skill select (with "Any") when the selector is `situation`.
 - Situational elements never apply automatically. The actor exposes
-  `getSituationalCheckModifiers(checkType)` → a list of `{ key, label, modifierType, value, source }` entries that apply
-  to the check type (its own type plus `any`), where `source` is the owning item/effect name.
+  `getSituationalCheckModifiers(checkType, { skill })` → a list of `{ key, label, modifierType, value, source }`
+  entries that apply to the check type (its own type plus `any`) and, when narrowed, to the check's skill, where
+  `source` is the owning item/effect name.
 - Check options gain `situations` (string[] of ticked keys, default `[]`). The dialog lists the applicable situational
   entries as checkboxes (label, source, and the modifier it applies), unticked by default.
 - Parameters add the ticked situations' contributions on top of the options: `diceMod`, `trainingMod`,
@@ -89,6 +92,22 @@ Rules often scope a modifier to a circumstance no check type or skill expresses 
   unticking never double-counts.
 - Situational modifiers apply only through the dialog; a check rolled without the dialog applies none.
 - The chat card lists the ticked situations by label.
+
+### 4a. When the check dialog opens (user ruling 2026-09-27)
+
+The client setting `getCheckOptions` changes from a Boolean to a choice:
+
+| Value | Label | Behavior |
+|---|---|---|
+| `never` | Never | Roll without the dialog |
+| `situational` (default) | When Situational Modifiers Apply | Open the dialog only when `getSituationalCheckModifiers` returns at least one entry for the check |
+| `always` | Always | Always open the dialog |
+
+- `shouldGetCheckOptions(hasSituationalModifiers)` resolves the choice; the modifier key still inverts the result.
+- Every `request*Check` computes whether the check has situational entries (from the initialized options' check
+  type and skill) before deciding.
+- A stored legacy Boolean reads as `true` → `always` and `false` → `situational` (the old default was `false`, and
+  the new default is `situational`).
 
 ### 5. Resistance checks take conditional modifiers
 
@@ -109,7 +128,7 @@ adds synthetic `conditionalCheckModifier` elements for the equipped armor's trai
 
 | Trait | Synthetic elements (checkType `any`, selector `situation`) |
 |---|---|
-| Heavy | `advantage` −2, key "Swim, Fly, or Climb"; `automaticFailure`, key "Jump" |
+| Heavy | `advantage` −2, key "Swim, Fly, or Climb"; `automaticFailure`, key "Jump", narrowed to skill `acrobatics` (the system has no Jump action) |
 | Encumbering | `advantage` −1, key "Swim, Fly, or Climb" |
 | Loud | `advantage` −1, key "Remain Undetected by Hearing" |
 
@@ -128,6 +147,9 @@ tick together as one "Swim, Fly, or Climb" entry whose value is their sum (−3,
   levels; situational contributions never double-count across tick/untick; Resistance-check modifier resolution
   (`any`/`any`, `resistance`/`any`, `resistance`/named, and that `any`/`attribute` does not apply); automatic-failure
   results; armor-trait synthetic elements.
+- Unit: `shouldGetCheckOptions` for each setting value × situational presence × modifier key; legacy Boolean reads.
+- E2E: with the default setting, a check with no situational entries rolls straight to chat and a check with one
+  opens the dialog; Heavy armor's Jump entry appears on an Acrobatics check and not on an Athletics check.
 - E2E: an effect with Disadvantage raises a rolled check's Difficulty in chat; the dialog's Advantage select and
   situational checkbox change the displayed and rolled Difficulty; a Resistance check picks up an `any` dice penalty;
   Heavy armor's "Swim, Fly, or Climb" entry appears unticked and applies Greater Disadvantage when ticked; an

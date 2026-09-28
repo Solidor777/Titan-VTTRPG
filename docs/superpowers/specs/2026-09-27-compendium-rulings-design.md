@@ -38,18 +38,26 @@ training; R:8780 Awareness + ½ Metaphysics training, rounded up).
 
 Consumers: Force Speed (`existingOnly`), Parch (−5, `existingOnly`, `minimum` 1).
 
-### C3. Weapon-borne effects
+### C3. Weapon-targeted effects (user-directed, 2026-09-27)
 
-Rules grant effects to chosen weapons ("the chosen weapons deal +1 Damage and gain the Magical trait"). Effects become
-applicable to weapon items:
+Rules grant effects to chosen weapons ("the chosen weapons deal +1 Damage and gain the Magical trait"). The effect stays
+an ordinary actor effect and names the weapon it modifies, so durations, turn reports, the effects panel, and the
+rules-element pipeline need no second, per-item path. (Item-owned effects were rejected: they need a weapon Effects
+tab, per-weapon rules-element processing, and per-item duration ticking, duplicating the actor pipeline. The accepted
+cost: an effect stays with its holder if the weapon changes hands mid-duration; these effects last until the start of
+the caster's next turn.)
 
-- A weapon item can own `effect`-subtype Active Effects: dropping an effect (from the Effect Tray, a sheet, or the
-  compendium) onto a weapon row on a character sheet or onto a weapon sheet creates it on the weapon. The weapon sheet
-  and the character-sheet weapon row list the weapon's effects (name, duration, delete).
-- Attack checks with a weapon add the weapon's active effects' `conditionalCheckModifier` elements (checkType
-  `attack` / `any`) for that weapon's attacks only, and a new `grantAttackTrait` element (key: an attack trait)
-  adds the trait to that weapon's attacks for the check.
-- Weapon-effect durations tick with the owning actor's turn/initiative processing like actor effects.
+- `conditionalCheckModifier` (checkType `attack`) gains the selector `weapon`, whose key is a weapon **item id**. Ids are
+  stable across renames and distinguish same-named weapons; the editor and chat display the weapon's current name.
+  The attack-check modifier lookup adds `weapon`-selector modifiers keyed by the attacking weapon's id.
+- New operation `grantAttackTrait` (selector `weapon`, key: weapon item id, `trait`: an attack trait): the attack check
+  adds the trait to that weapon's attack for the check (trait-driven options such as `magical`, `penetrating`, `rend`
+  follow).
+- Dropping an effect onto a weapon row on a character sheet creates the effect on that actor and fills the weapon's id
+  into every element of the effect whose selector is `weapon` and whose key is empty. An effect with no such element
+  is simply added to the actor. Compendium effects ship those elements with empty keys.
+- The rules-element editor's `weapon` key is a select of the owning actor's weapons (by name), or a read-only name on an
+  unowned effect with a key, or "Chosen when applied" when empty.
 
 Consumers: Aether Blades (R:6305: +1 Damage, Magical, Penetrating), Inferno Blades (R:5408: +1 Damage, Magical),
 Radiant Blade (R:7338: +1 Damage, ignore Armor → Penetrating), Sacred Arms of the Arbiter (Weapon) (R:7880: +1 Damage,
@@ -109,7 +117,8 @@ module repo's `main`; release is a separate step for the user.
 - Unit: stat-referenced value resolution and cycle rejection; `existingOnly` and `minimum`; weapon-effect modifiers
   scoped to one weapon; `grantAttackTrait`.
 - E2E: Tough raises max Stamina by Resilience; Force Speed leaves a 0 Fly speed at 0; Parch floors at 1; an effect
-  dropped on a weapon adds +1 damage to that weapon's attack only; Metal Attunement blocks Contaminated.
+  dropped on a weapon row lands on the actor with that weapon's id filled in and adds +1 damage and its trait to that
+  weapon's attack only (a second weapon's attack is unchanged); Metal Attunement blocks Contaminated.
 - Module: `validate` passes with 0 errors; `check:links` passes.
 
 ## Documentation
