@@ -3,11 +3,12 @@ import reinitializeCheckOptions, {
    ACTOR_DERIVED_CHECK_OPTION_FIELDS,
    INITIALIZE_CHECK_OPTIONS_METHODS,
    rederiveActorCheckOptionFields,
+   seedTargetDefenseProvenance,
    seedTouchedFieldsFromCallerOptions,
 } from '~/check/dialog/ReinitializeCheckOptions.js';
 
 beforeAll(() => {
-   // reinitializeCheckOptions's targetDefense guard reads getTargetedCharacters(), which reads these globals.
+   // seedTargetDefenseProvenance reads getTargetedCharacters(), which reads these globals.
    globalThis.game = {
       user: {
          isGM: false,
@@ -96,6 +97,7 @@ describe('reinitializeCheckOptions', () => {
          automaticFailure: false,
          damageMod: 1,
          diceMod: 2,
+         doubleTraining: true,
          expertiseMod: 3,
          itemId: 'weapon1',
          situations: ['underwater'],
@@ -107,10 +109,10 @@ describe('reinitializeCheckOptions', () => {
       expect(reinitializeCheckOptions(checkOptions, new Set(), 'attack')).toEqual({
          attackIdx: 0,
          attribute: 'body',
+         doubleTraining: true,
          itemId: 'weapon1',
          situations: ['underwater'],
          skill: 'melee',
-         type: 'melee',
       });
    });
 
@@ -138,7 +140,10 @@ describe('rederiveActorCheckOptionFields', () => {
          trainingMod: 0,
       };
 
-      /** @type {(options: object) => object} Stands in for the live Actor: Advantage is now -2. */
+      /**
+       * Stands in for the live Actor's `initialize<Type>CheckOptions`: Advantage is now -2.
+       * @type {(options: object) => object}
+       */
       const initialize = (options) => ({
          ...currentOptions,
          ...options,
@@ -163,7 +168,10 @@ describe('rederiveActorCheckOptionFields', () => {
          trainingMod: 0,
       };
 
-      /** @type {(options: object) => object} Stands in for the live Actor: nothing about it changed. */
+      /**
+       * Stands in for the live Actor's `initialize<Type>CheckOptions`: nothing about it changed.
+       * @type {(options: object) => object}
+       */
       const initialize = (options) => ({
          ...currentOptions,
          ...options,
@@ -184,7 +192,10 @@ describe('rederiveActorCheckOptionFields', () => {
          trainingMod: 0,
       };
 
-      /** @type {(options: object) => object} Stands in for the live Actor: would derive Disadvantage (-1). */
+      /**
+       * Stands in for the live Actor's `initialize<Type>CheckOptions`: would derive Disadvantage (-1).
+       * @type {(options: object) => object}
+       */
       const initialize = (options) => ({
          ...currentOptions,
          ...options,
@@ -208,22 +219,24 @@ describe('Attack actor-derived fields (attackerMelee/attackerAccuracy/targetDefe
       ]));
    });
 
-   it('re-derives targetDefense when nothing is targeted (the no-target self-fallback)', () => {
-      /** @type {object} An Attack Check's current options; no target is selected. */
-      const checkOptions = {
-         attackerAccuracy: 3,
-         attackerMelee: 3,
-         itemId: 'weapon1',
-         targetDefense: 3,
-      };
-
-      globalThis.game.user.targets = new Set();
-
-      expect(reinitializeCheckOptions(checkOptions, new Set(), 'attack')).toEqual({ itemId: 'weapon1' });
+   it('includes the owned-weapon-derived defaults in the Attack field list', () => {
+      expect(ACTOR_DERIVED_CHECK_OPTION_FIELDS.attack).toEqual(expect.arrayContaining([
+         'multiAttack',
+         'plusExtraSuccessDamage',
+         'type',
+         'range',
+         'cleave',
+         'flurry',
+         'ineffective',
+         'magical',
+         'rend',
+         'penetrating',
+      ]));
    });
 
-   it('leaves a targeted character\'s Defense alone even when untouched', () => {
-      /** @type {object} An Attack Check's current options; a target is selected. */
+   it('has no per-pass targetDefense guard: an untouched field is always re-derived regardless of live ' +
+      'targeting', () => {
+      /** @type {object} An Attack Check's current options; a target happens to be selected right now. */
       const checkOptions = {
          attackerAccuracy: 3,
          attackerMelee: 3,
@@ -231,10 +244,83 @@ describe('Attack actor-derived fields (attackerMelee/attackerAccuracy/targetDefe
          targetDefense: 5,
       };
 
-      /** @type {Set} Stands in for a targeted token: only its length is read by getTargetedCharacters. */
+      // Live targeting state must not matter to reinitializeCheckOptions itself: provenance is decided once, at
+      // mount, by seedTargetDefenseProvenance (see the describe block below) — never re-checked here.
       globalThis.game.user.targets = new Set([{ actor: { system: { isCharacter: true } } }]);
 
-      expect(reinitializeCheckOptions(checkOptions, new Set(), 'attack')).toMatchObject({ targetDefense: 5 });
+      expect(reinitializeCheckOptions(checkOptions, new Set(), 'attack')).toEqual({ itemId: 'weapon1' });
+
+      globalThis.game.user.targets = new Set();
+   });
+});
+
+describe('seedTargetDefenseProvenance', () => {
+   it('marks targetDefense touched when something is targeted at mount, so removing the target afterward ' +
+      'keeps the target\'s Defense', () => {
+      /** @type {Set<string>} The dialog's touched-field set, seeded fresh. */
+      const touchedFields = new Set();
+
+      // A target is selected at dialog mount: targetDefense's resolved value came from that target's own Defense
+      // rating, not from the rolling Actor. getTargetedCharacters() filters on `target.actor?.system.isCharacter`,
+      // so the stand-in token needs that shape (not just Set membership/length).
+      globalThis.game.user.targets = new Set([{ actor: { system: { isCharacter: true } } }]);
+      seedTargetDefenseProvenance(touchedFields, {});
+      expect(touchedFields.has('targetDefense')).toBe(true);
+
+      // The target is removed after mount; targetDefense stays touched, so reinitializeCheckOptions keeps the
+      // target's Defense instead of overwriting it with the no-target self-fallback.
+      globalThis.game.user.targets = new Set();
+      /** @type {object} The dialog's current options, still carrying the target's Defense (5). */
+      const checkOptions = {
+         attackerAccuracy: 3,
+         attackerMelee: 3,
+         itemId: 'weapon1',
+         targetDefense: 5,
+      };
+      expect(reinitializeCheckOptions(checkOptions, touchedFields, 'attack')).toMatchObject({ targetDefense: 5 });
+   });
+
+   it('leaves targetDefense untouched when nothing is targeted at mount, so it keeps following once ' +
+      'something is targeted later', () => {
+      /** @type {Set<string>} The dialog's touched-field set, seeded fresh. */
+      const touchedFields = new Set();
+
+      // Nothing is targeted at mount: targetDefense's resolved value is the no-target self-fallback.
+      globalThis.game.user.targets = new Set();
+      seedTargetDefenseProvenance(touchedFields, {});
+      expect(touchedFields.has('targetDefense')).toBe(false);
+
+      // Something is targeted later, while the dialog is still open; targetDefense stays untouched (provenance
+      // was decided once, at mount), so it keeps re-deriving on every pass — including picking up the newly
+      // targeted character's own Defense.
+      globalThis.game.user.targets = new Set([{ actor: { system: { isCharacter: true } } }]);
+      /** @type {object} The dialog's current options, still carrying the earlier self-fallback value (3). */
+      const checkOptions = {
+         attackerAccuracy: 3,
+         attackerMelee: 3,
+         itemId: 'weapon1',
+         targetDefense: 3,
+      };
+      expect(reinitializeCheckOptions(checkOptions, touchedFields, 'attack')).toEqual({ itemId: 'weapon1' });
+
+      globalThis.game.user.targets = new Set();
+   });
+
+   it('defers to the caller\'s own explicit targetDefense instead of touching it a second time', () => {
+      /**
+       * The dialog's touched-field set: seeding from callerOptions already ran (elsewhere) and marked
+       * targetDefense touched, exactly as seedTouchedFieldsFromCallerOptions would.
+       * @type {Set<string>}
+       */
+      const touchedFields = new Set(['targetDefense']);
+      globalThis.game.user.targets = new Set([{ actor: { system: { isCharacter: true } } }]);
+
+      // The caller explicitly supplied targetDefense: this function must not need to (and does not) touch it
+      // itself — it only adds the key when the caller left it undefined and something is targeted.
+      seedTargetDefenseProvenance(touchedFields, { targetDefense: 7 });
+
+      expect(touchedFields.has('targetDefense')).toBe(true);
+      expect(touchedFields.size).toBe(1);
 
       globalThis.game.user.targets = new Set();
    });

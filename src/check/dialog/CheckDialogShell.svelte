@@ -4,6 +4,7 @@
    import {
       INITIALIZE_CHECK_OPTIONS_METHODS,
       rederiveActorCheckOptionFields,
+      seedTargetDefenseProvenance,
       seedTouchedFieldsFromCallerOptions,
    } from '~/check/dialog/ReinitializeCheckOptions.js';
 
@@ -45,19 +46,25 @@
    // svelte-ignore state_referenced_locally
    setContext('checkType', checkType);
 
-   // The actor-derived option fields (Dice/Training/Expertise/Damage/Healing Mod, Advantage, Automatic Failure,
-   // Attack's Melee/Accuracy/target Defense) the user has edited in this dialog; the re-derivation effect below
-   // skips a touched field so the user's (or the caller's) choice survives a later Actor change. Plain
-   // (non-reactive) Set: mutated imperatively by field components and this component, read imperatively by the
-   // effect below, never rendered from directly.
-   // svelte-ignore state_referenced_locally
+   // The actor-derived option fields (see ACTOR_DERIVED_CHECK_OPTION_FIELDS: Dice/Training/Expertise/Damage/Healing
+   // Mod, Advantage, Automatic Failure, and for Attack, Melee/Accuracy/target Defense and the owned-weapon defaults)
+   // the user has edited in this dialog; the re-derivation effect below skips a touched field so the user's (or the
+   // caller's) choice survives a later Actor change. Plain (non-reactive) Set: mutated imperatively by field
+   // components and this component, read imperatively by the effect below, never rendered from directly.
    const touchedFields = new Set();
    setContext('touchedCheckOptionFields', touchedFields);
 
    // Seed the touched set from the caller's raw request options: a field the caller explicitly set is not
-   // actor-derived and must not be overwritten by the first re-derivation pass below.
+   // actor-derived and must not be overwritten by the first re-derivation pass below. Runs once, at mount.
    // svelte-ignore state_referenced_locally
    seedTouchedFieldsFromCallerOptions(touchedFields, callerOptions);
+
+   // Attack's targetDefense: decide provenance once, here, at mount — see ReinitializeCheckOptions.js for why a
+   // later re-check (on every re-derivation pass) is wrong (it un-freezes/re-freezes on live targeting changes).
+   // svelte-ignore state_referenced_locally
+   if (checkType === 'attack') {
+      seedTargetDefenseProvenance(touchedFields, callerOptions);
+   }
 
    // Re-derive the check's actor-derived option fields (see ReinitializeCheckOptions.js) from the live Actor
    // whenever it (or one of its items or effects) changes, or the user changes another option that a derivation

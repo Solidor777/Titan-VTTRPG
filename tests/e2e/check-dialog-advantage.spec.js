@@ -53,7 +53,7 @@ test.afterAll(async () => {
 /**
  * Rebuilds the spec's actor with one "Underwater" situation (Disadvantage) and opens its Attribute Check dialog under
  * the situational setting.
- * @returns {Promise<import('@playwright/test').Locator>} The open dialog.
+ * @returns {Promise<import('@playwright/test').Locator>} The dialog's window-root locator, already visible.
  */
 async function openSituationalDialog() {
    await page.evaluate(async (actorName) => {
@@ -182,6 +182,9 @@ test('the Advantage select and a ticked situation change the displayed and rolle
    expect(styles.flexDirection).toBe('row');
    expect(styles.detailsFontSize).toBe(styles.smallFontSize);
    expect(styles.checkboxHeight).toBe(fieldInputHeight);
+   // Also pin the resolved value itself, not just the two sides' equality, so a change to the shared
+   // --titan-check-dialog-input-height token would fail this test rather than silently moving both sides together.
+   expect(styles.checkboxHeight).toBe('28px');
 
    /** @type {number} The chat-message count before the roll. */
    const baseline = await clickRoll(dialog, page);
@@ -323,7 +326,7 @@ test('a ticked situation does not survive its row\'s removal onto a same-key sit
 
 /**
  * Rebuilds the spec's actor plain (no effects) and opens its Attribute Check dialog under the "always" setting.
- * @returns {Promise<import('@playwright/test').Locator>} The open dialog.
+ * @returns {Promise<import('@playwright/test').Locator>} The dialog's window-root locator, already visible.
  */
 async function openAlwaysDialog() {
    await page.evaluate(async (actorName) => {
@@ -537,7 +540,8 @@ test('Automatic Failure follows an always-on Actor effect, presence→absence, p
    }, ACTOR_NAME);
    await expect(field.locator('i.fa-check')).toHaveCount(0);
 
-   // Re-adding it ticks it on again, setting up the next test's starting point for the override leg.
+   // Re-adding it ticks it back on (absence→presence a second time), confirming the follow behavior isn't a
+   // one-shot fluke of the first add.
    await page.evaluate(async (actorName) => {
       await game.actors.getName(actorName).createEmbeddedDocuments('ActiveEffect', [
          {
@@ -788,4 +792,155 @@ test('Attacker Melee follows an always-on rating-modifier Actor effect (presence
       await game.actors.getName(actorName).effects.getName('E2E Melee Rating Boost').delete();
    }, ACTOR_NAME);
    await expect(meleeField).toHaveValue(baselineMelee);
+});
+
+test('untouched owned-weapon-derived Attack fields (Type, with dialog UI; Cleave, without) follow an edit to the ' +
+   'owned weapon\'s attack, and the rolled check carries the re-derived values', async () => {
+   await page.evaluate(async (actorName) => {
+      await game.settings.set('titan', 'getCheckOptions', 'always');
+      await game.actors.getName(actorName)?.delete();
+
+      /** @type {TitanActor} The rebuilt actor. */
+      const actor = await Actor.create({
+         name: actorName,
+         type: 'player',
+      });
+      await actor.createEmbeddedDocuments('Item', [
+         {
+            name: 'E2E Attack Weapon',
+            type: 'weapon',
+         },
+      ]);
+
+      /** @type {TitanItem} The default weapon, whose default attack is Melee with no traits. */
+      const weapon = actor.items.find((item) => item.type === 'weapon');
+      await actor.system.requestAttackCheck({
+         attackIdx: 0,
+         itemId: weapon.id,
+      });
+   }, ACTOR_NAME);
+
+   /** @type {import('@playwright/test').Locator} The open Attack Check dialog. */
+   const dialog = page.locator('.application.titan-dialog[id^="titan-attack-check-dialog-"]');
+   await expect(dialog).toBeVisible();
+
+   /** @type {import('@playwright/test').Locator} The Type select's trigger. */
+   const typeSelect = dialog.getByTestId('check-field-type').locator('[role="combobox"]');
+   await expect(typeSelect).toHaveAttribute('data-value', 'melee');
+   await expect(dialog.getByTestId('check-field-attackerMelee')).toBeVisible();
+
+   // Flip the owned weapon's default attack from Melee to Ranged (a value transition, visible via both the Type
+   // select and the Melee/Accuracy field swap this Shell drives directly off checkOptions.type) and add the Cleave
+   // trait (no dialog UI — Cleave has none, so it is only observable on the rolled check's parameters below). Both
+   // fields are untouched, so both follow.
+   await page.evaluate(async (actorName) => {
+      const actor = game.actors.getName(actorName);
+      const weapon = actor.items.find((item) => item.type === 'weapon');
+      const attacks = foundry.utils.deepClone(weapon.system.attack);
+      attacks[0].type = 'ranged';
+      attacks[0].trait = [
+         {
+            name: 'cleave',
+            value: true,
+         },
+      ];
+      await weapon.update({
+         system: {
+            attack: attacks,
+         },
+      });
+   }, ACTOR_NAME);
+   await expect(typeSelect).toHaveAttribute('data-value', 'ranged');
+   await expect(dialog.getByTestId('check-field-attackerAccuracy')).toBeVisible();
+
+   /** @type {number} The chat-message count before the roll. */
+   const baseline = await clickRoll(dialog, page);
+   /** @type {{id: string, type: string, parameters: object, results: object}} The rolled check's message. */
+   const flags = await readNewestCheckFlags(page, baseline);
+   expect(flags.parameters.type).toBe('ranged');
+   expect(flags.parameters.cleave).toBe(true);
+});
+
+test('a user-set Attack Type is kept against a later owned-weapon edit (synced on a visible Total Dice ' +
+   'change)', async () => {
+   await page.evaluate(async (actorName) => {
+      await game.settings.set('titan', 'getCheckOptions', 'always');
+      await game.actors.getName(actorName)?.delete();
+
+      /** @type {TitanActor} The rebuilt actor. */
+      const actor = await Actor.create({
+         name: actorName,
+         type: 'player',
+      });
+      await actor.createEmbeddedDocuments('Item', [
+         {
+            name: 'E2E Attack Weapon',
+            type: 'weapon',
+         },
+      ]);
+
+      /** @type {TitanItem} The default weapon, whose default attack is Melee. */
+      const weapon = actor.items.find((item) => item.type === 'weapon');
+      await actor.system.requestAttackCheck({
+         attackIdx: 0,
+         itemId: weapon.id,
+      });
+   }, ACTOR_NAME);
+
+   /** @type {import('@playwright/test').Locator} The open Attack Check dialog. */
+   const dialog = page.locator('.application.titan-dialog[id^="titan-attack-check-dialog-"]');
+   await expect(dialog).toBeVisible();
+
+   /** @type {import('@playwright/test').Locator} The Type select's trigger. */
+   const typeSelect = dialog.getByTestId('check-field-type').locator('[role="combobox"]');
+   /** @type {import('@playwright/test').Locator} The Total Dice summary. */
+   const totalDice = dialog.getByTestId('check-summary-totalDice');
+   /** @type {number} The Total Dice before any effect is added. */
+   const baselineDice = await readSummary(dialog, 'totalDice');
+
+   // The user picks Ranged explicitly in the dialog (touches type).
+   await setSelectField(dialog, 'type', 'ranged');
+   await expect(typeSelect).toHaveAttribute('data-value', 'ranged');
+   await expect(dialog.getByTestId('check-field-attackerAccuracy')).toBeVisible();
+
+   // The owned weapon's attack flips back to Melee (which must not overwrite the user's Ranged override) AND an
+   // always-on Dice-modifier effect is added in the same pass (a visible, untouched field). Waiting for the Dice
+   // change first proves this pass was actually processed before asserting Type held its ground — a pass that
+   // silently failed to run would make the "still ranged" assertion pass for the wrong reason.
+   await page.evaluate(async (actorName) => {
+      const actor = game.actors.getName(actorName);
+      const weapon = actor.items.find((item) => item.type === 'weapon');
+      const attacks = foundry.utils.deepClone(weapon.system.attack);
+      attacks[0].type = 'melee';
+      await weapon.update({
+         system: {
+            attack: attacks,
+         },
+      });
+      await actor.createEmbeddedDocuments('ActiveEffect', [
+         {
+            name: 'E2E Attack Type Override Sync Dice',
+            type: 'effect',
+            system: {
+               rulesElement: [
+                  {
+                     checkType: 'any',
+                     key: '',
+                     modifierType: 'dice',
+                     operation: 'conditionalCheckModifier',
+                     selector: 'any',
+                     skill: '',
+                     uuid: 'e2e-dialog-attack-type-override-sync-dice',
+                     value: 3,
+                  },
+               ],
+            },
+         },
+      ]);
+   }, ACTOR_NAME);
+   await expect(totalDice).toHaveText(String(baselineDice + 3));
+
+   // Only now, having proven the pass was processed, assert the user's Type choice survived it.
+   await expect(typeSelect).toHaveAttribute('data-value', 'ranged');
+   await expect(dialog.getByTestId('check-field-attackerAccuracy')).toBeVisible();
 });

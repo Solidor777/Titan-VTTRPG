@@ -2,12 +2,20 @@ import getTargetedCharacters from '~/helpers/utility-functions/GetTargetedCharac
 
 /**
  * The actor-derived field keys each check type's dialog offers: every field `initialize<Type>CheckOptions` derives
- * from the live Actor whenever it is `undefined` in the options handed to it — `get<Type>CheckMod` (or its boolean
- * form for Automatic Failure) reading `conditionalCheckModifier` rules elements, `_getAttackRatingMod` reading
- * `conditionalRatingModifier` rules elements (Attack's Melee/Accuracy), or `targetDefense`'s no-target self-fallback
- * (mirrors Melee/Accuracy; a real target's Defense, or a caller override, is not actor-derived — see
- * `ACTOR_DERIVED_FIELD_GUARDS`). Training does not apply to Resistance Checks; Damage does not apply to Attribute or
- * Resistance Checks; Healing applies only to Casting and Item Checks.
+ * from the live Actor (or, for Attack, from its owned weapon) whenever the field is `undefined` in the options
+ * handed to it. `get<Type>CheckMod` (or its boolean form for Automatic Failure) reads `conditionalCheckModifier`
+ * rules elements for diceMod, expertiseMod, trainingMod, damageMod, healingMod, advantage, and automaticFailure.
+ * `_getAttackRatingMod` reads `conditionalRatingModifier` rules elements for Attack's attackerMelee and
+ * attackerAccuracy. Attack's targetDefense has its provenance decided once at dialog mount
+ * (`seedTargetDefenseProvenance`), not re-checked on every pass: a target-supplied or caller-supplied value is
+ * touched at mount and never re-derived; an untouched value is always the live no-target self-fallback (mirrors
+ * attackerMelee/attackerAccuracy) or, once something is targeted, that target's own Defense — whatever
+ * `initializeAttackCheckOptions` currently computes. Attack's owned-weapon defaults (multiAttack,
+ * plusExtraSuccessDamage, type, range, cleave, flurry, ineffective, magical, rend, penetrating) read from the
+ * equipped weapon's current attack data.
+ *
+ * Training does not apply to Resistance Checks; Damage does not apply to Attribute or Resistance Checks; Healing
+ * applies only to Casting and Item Checks.
  * @type {Readonly<Record<string, readonly string[]>>}
  */
 export const ACTOR_DERIVED_CHECK_OPTION_FIELDS = Object.freeze({
@@ -34,6 +42,16 @@ export const ACTOR_DERIVED_CHECK_OPTION_FIELDS = Object.freeze({
       'attackerMelee',
       'attackerAccuracy',
       'targetDefense',
+      'multiAttack',
+      'plusExtraSuccessDamage',
+      'type',
+      'range',
+      'cleave',
+      'flurry',
+      'ineffective',
+      'magical',
+      'rend',
+      'penetrating',
    ]),
    casting: Object.freeze([
       'diceMod',
@@ -53,20 +71,6 @@ export const ACTOR_DERIVED_CHECK_OPTION_FIELDS = Object.freeze({
       'advantage',
       'automaticFailure',
    ]),
-});
-
-/**
- * Additional per-field eligibility guards beyond the touched-field check. A derived field re-derives when it is
- * untouched AND (if it has a guard here) the guard returns true. `targetDefense` is actor-derived only through its
- * no-target self-fallback (`initializeAttackCheckOptions` mirrors Melee/Accuracy when nothing is targeted); a
- * currently targeted character's Defense is not actor-derived (it belongs to the target, not the roller) and must
- * never be overwritten by this mechanism. `targetDefense` also has ordinary touch tracking (its field component
- * calls `touchCheckOptionField`) — every check-option edit re-runs the re-derivation pass (see `CheckDialogShell`),
- * so without touch tracking the user's own edit to this field would immediately be reverted by that same pass.
- * @type {Readonly<Record<string, () => boolean>>}
- */
-const ACTOR_DERIVED_FIELD_GUARDS = Object.freeze({
-   targetDefense: () => getTargetedCharacters().length === 0,
 });
 
 /**
@@ -110,21 +114,38 @@ export function seedTouchedFieldsFromCallerOptions(touchedFields, callerOptions)
 }
 
 /**
+ * Decides Attack's `targetDefense` provenance once, at dialog mount — never re-checked on later re-derivation
+ * passes, which is what makes the field behave correctly as targeting changes while the dialog stays open: if the
+ * caller didn't supply it explicitly and something is targeted right now, the value `initializeAttackCheckOptions`
+ * resolved came from that target's own Defense rating, not from the rolling Actor, so it is marked touched and
+ * never re-derived — even if the target is later removed. If nothing is targeted at mount, the value is the
+ * no-target self-fallback (mirrors attackerMelee/attackerAccuracy): left untouched, so it keeps re-deriving on
+ * every pass — including picking up a target's real Defense once something is targeted later.
+ * @param {Set<string>} touchedFields - The dialog's shared touched-field set, mutated in place.
+ * @param {object} [callerOptions] - The raw options object the caller passed to `requestAttackCheck`.
+ * @returns {void}
+ */
+export function seedTargetDefenseProvenance(touchedFields, callerOptions) {
+   if (callerOptions?.targetDefense === undefined && getTargetedCharacters().length > 0) {
+      touchedFields.add('targetDefense');
+   }
+}
+
+/**
  * Builds the options object to hand to a check's `initialize<Type>CheckOptions`: every field the dialog currently
- * holds, except the check type's actor-derived fields the user has not edited in this dialog (and whose guard, if
- * any, allows re-deriving them right now), which are omitted so the initializer re-derives them from the live
- * Actor. Fields the user has touched keep their dialog value, since `initialize<Type>CheckOptions` only derives a
- * field when it is `undefined`.
+ * holds, except the check type's actor-derived fields the user has not edited in this dialog, which are omitted so
+ * the initializer re-derives them from the live Actor. Fields the user has touched keep their dialog value, since
+ * `initialize<Type>CheckOptions` only derives a field when it is `undefined`.
  * @param {object} checkOptions - The dialog's current, fully-resolved Check Options.
  * @param {Set<string>} touchedFields - The actor-derived field keys the user has edited in this dialog.
  * @param {string} checkType - The check type: attribute, resistance, attack, casting, or item.
  * @returns {object} The options object to pass to `initialize<Type>CheckOptions`.
  */
 export default function reinitializeCheckOptions(checkOptions, touchedFields, checkType) {
-   /** @type {object} A shallow copy of the current options; untouched, guard-eligible derived fields are deleted. */
+   /** @type {object} A shallow copy of the current options; untouched derived fields are deleted below. */
    const options = { ...checkOptions };
    for (const field of ACTOR_DERIVED_CHECK_OPTION_FIELDS[checkType] ?? []) {
-      if (!touchedFields.has(field) && (ACTOR_DERIVED_FIELD_GUARDS[field]?.() ?? true)) {
+      if (!touchedFields.has(field)) {
          delete options[field];
       }
    }
