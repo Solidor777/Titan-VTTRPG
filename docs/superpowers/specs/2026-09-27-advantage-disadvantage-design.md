@@ -103,7 +103,15 @@ The client setting `getCheckOptions` changes from a Boolean to a choice:
 | `situational` (default) | When Situational Modifiers Apply | Open the dialog only when `getSituationalCheckModifiers` returns at least one entry for the check |
 | `always` | Always | Always open the dialog |
 
-- `shouldGetCheckOptions(hasSituationalModifiers)` resolves the choice; the modifier key still inverts the result.
+- `shouldGetCheckOptions(hasSituationalModifiers)` resolves the choice. The modifier key treats `situational` as
+  "no dialog" and inverts from there, but a check with situational modifiers always hedges toward showing the dialog
+  (user ruling 2026-09-27):
+
+  | Setting | No modifier key | Modifier key held |
+  |---|---|---|
+  | `never` | no dialog | dialog |
+  | `situational` | dialog only if situational modifiers apply | dialog |
+  | `always` | dialog | dialog only if situational modifiers apply |
 - Every `request*Check` computes whether the check has situational entries (from the initialized options' check
   type and skill) before deciding.
 - A stored legacy Boolean reads as `true` → `always` and `false` → `situational` (the old default was `false`, and
