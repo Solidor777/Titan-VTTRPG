@@ -34,7 +34,7 @@ verbatim:**
 > Invoke the core skill immediately. The iron rule is no deferrals of existing work, or new work as it comes up - we fix this now unless I give my EXPRESS authorization. The only exception is if a bug or to-do has a genuine blocker that is already logged in a milestone in PLAN.md that has not been started yet. Another iron clad is rule is that when faced with a design fork, determine the best long term shape in keeping with our plans and goals, and implement accordingly. You only need to ask me if the question "what is the best long term shape in keeping with our plans and goals?" is not able to answer the question. Churn is not a concern. This paragraph must be copied verbatim to any agents dispatched in this campaign.
 
 "The core skill" is the `titan-codebase` skill (`.claude/skills/titan-codebase/SKILL.md` + `references/*.md`).
-Every dispatch also loads `foundry-vtt`; Tasks 6, 7, and 8 (Svelte) also load `svelte-5` and `foundry-svelte`.
+Every dispatch also loads `foundry-vtt`; Tasks 2, 6, 7, and 8 (Svelte) also load `svelte-5` and `foundry-svelte`.
 
 ---
 
@@ -55,8 +55,8 @@ Every dispatch also loads `foundry-vtt`; Tasks 6, 7, and 8 (Svelte) also load `s
   below 2; `net < 0` → `min(6, difficulty - net)` unless already above 6; `net === 0` → unchanged.
 - Check-type names used as modifier check types and in `getSituationalCheckModifiers`: `attribute`, `resistance`,
   `attack`, `casting`, `item` (the editor offers `any`, `attack`, `casting`, `item`, `resistance`).
-- Setting `titan.getCheckOptions` (client scope): `never` | `situational` (default) | `always`; a stored legacy
-  Boolean reads `true` → `always`, `false` → `situational`.
+- Setting `titan.getCheckOptions` (client scope): `never` | `situational` (default) | `always`; a stored Boolean
+  reads `true` → `always`, `false` → `situational`, and any other value outside the choices reads `situational`.
 - Localization: TITAN strings are flat `"<key>.text"` entries inside `lang/en.json` → `LOCAL`, inserted in
   alphabetical order; settings strings live under `SETTINGS.getCheckOptions`. Every new visible label gets an entry
   in the task that first renders it.
@@ -81,19 +81,18 @@ Every dispatch also loads `foundry-vtt`; Tasks 6, 7, and 8 (Svelte) also load `s
 
 ## Spec-versus-code resolutions (decided under the iron rule's best-long-term-shape clause)
 
-1. **No `acrobatics` skill exists** (`src/system/Skills.js`). Heavy's Jump Automatic Failure is narrowed to
-   `athletics` (rules line 2300: a Jump is a Body (Athletics) check). The spec's e2e "appears on an Acrobatics check
-   and not on an Athletics check" becomes "appears on an Athletics check and not on a Dexterity check". Every
-   armor-trait situation is narrowed the same way (controller ruling 2026-09-28): Swim, Fly, or Climb to Athletics
-   (line 3150), Remain Undetected by Hearing to Stealth, so armor never opens the dialog on unrelated checks.
+1. **No `acrobatics` skill exists** (`src/system/Skills.js`): the armor-trait situations are narrowed to Athletics
+   and Stealth, matching spec §6.
 2. **`sources: string[]` replaces the spec's `source` string** on `SituationalCheckModifier`: same-key entries sum
    across owners (Heavy + Encumbering on one armor, or armor + an effect), so one entry can have several sources.
 3. **`parameters.situations` is `{ key, label }[]`**, not `string[]`. `buildSchemaFromShape` maps an empty array to an
    `ArrayField(ObjectField)`, which rejects strings; objects also let the card show labels without an actor lookup.
    `options.situations` stays `string[]` (ticked keys), as the spec says.
 4. **Modifier types are filtered per check type** (`CHECK_TYPE_MODIFIER_TYPES`): an `any`-check situational Damage
-   modifier is not offered on an Attribute Check, which has no Damage. The same table drives the editor's check-type
-   options, replacing the hand-written `healingCheckTypeOptions` list.
+   modifier is not offered on an Attribute Check, which has no Damage. The same table drives the editor in both
+   directions (spec §5): the check-type options offer only check types that read the element's modifier type
+   (replacing the hand-written `healingCheckTypeOptions` list), and the modifier-type options offer only the types
+   the element's check type reads (every type for `any`), so the editor cannot build a combination no check reads.
 5. **The editor's check-type/selector reset becomes a membership test** (`selectorOptions[checkType].includes(...)`).
    The old condition kept `attribute` when switching to a check type without it (would break `resistance`) and
    dropped `skill` when switching to `any`, which offers it.
@@ -105,21 +104,43 @@ Every dispatch also loads `foundry-vtt`; Tasks 6, 7, and 8 (Svelte) also load `s
    unused" even for hand-authored pack data.
 9. **Automatic Failure keeps the dice and the critical counts**; only `successes`, `extraSuccesses`, and `succeeded`
    are forced (the spec defines only those).
-10. **The check dialog gains an effective-Difficulty summary** (`check-summary-difficulty`): the spec's e2e requires
-    the displayed Difficulty to change, and Attack dialogs show no Difficulty at all today.
+10. **The check dialog gains an effective-Difficulty summary** (`check-summary-difficulty`, labeled "Effective
+    Difficulty"): the spec's e2e requires the displayed Difficulty to change, and Attack dialogs show no Difficulty
+    at all today.
+11. **A caller-supplied `options.situations` is honored on every roll path.** Nothing is applied automatically — a
+    situational entry applies only when a caller names its key — and the check dialog is the only UI that ticks them;
+    a macro or module that passes `situations` to `roll<Type>Check` or `request<Type>Check` has them applied like any
+    other option it passes. Spec A §4 ("a check rolled without the dialog applies none") is amended in Task 10.
+12. **An automatically failed card offers no action that could change its outcome.** The chat log's Re-roll
+    Failures, Double Training, and Double Expertise entries, the reset-Expertise button, and per-die Expertise are
+    withheld on it, and no die is styled as a success (Task 2). Recalculation still keeps the result forced (spec §3)
+    for every path that reaches it.
+13. **The editor's Skill narrowing is offered only for non-Resistance situations.** A Resistance Check has no Skill,
+    so a Skill-narrowed Resistance situation would never be offered; the Skill select is hidden for check type
+    `resistance` and the stored `skill` is cleared when the check type becomes `resistance`, and every selector
+    change clears it (Task 8).
 
 ## Review Focus
 
 1. A situation ticked in the dialog, then made inapplicable by changing the dialog's Skill, must not apply to the roll
    or appear on the card (unit test in Task 3, e2e in Task 9).
-2. Opposing sources that net to zero (+1 and -1) leave the Difficulty unchanged and show no tag (unit test in Task 3,
-   e2e in Task 3).
-3. Re-rolling failures or resetting Expertise on an automatically failed card keeps it at 0 successes, and a Resistance
-   card still reduces no damage (unit test in Task 2).
+2. Opposing sources that net to zero (+1 and -1) leave the Difficulty unchanged (unit test and parameter e2e in
+   Task 3) and show no Advantage tag on the card (card e2e in Task 7, anchored after the DC renders).
+3. Recalculating an automatically failed card (the re-roll and Expertise paths) keeps it at 0 successes, and a
+   Resistance card still reduces no damage (unit test in Task 2); the card itself withholds those actions and styles
+   no die as a success (e2e in Task 2, against a normal card).
 4. Partial chat-message update diffs (a results-only or advantage-only update) must not gain an `undefined`
    `baseDifficulty` from `migrateData` (unit test in Task 2).
-5. An Attack Check's rating-derived Difficulty already at 6 stays 6 under Disadvantage, and one at 2 stays 2 under
-   Advantage (unit tests in Tasks 1 and 2).
+5. A Difficulty already at 6 stays 6 under Disadvantage and one at 2 stays 2 under Advantage (`applyAdvantage` table
+   in Task 1; `_applyCheckAdvantage` in Task 2). Through `getAttackCheckParameters`, Advantage applies after the
+   rating clamp (a rating Difficulty of 9 clamps to 6, then Advantage makes it 5), and `getCastingCheckParameters`
+   and `getItemCheckParameters` apply it too (unit tests in Task 2).
+6. The rules-element editor never writes a value the four-level select cannot show (a stored 0 or ±3 displays as its
+   normalized level and is not rewritten), and modifier types and check types filter each other (e2e in Task 8).
+7. The check dialog follows the Actor while open: removing the effect behind a ticked situation removes its row and
+   its contribution to the displayed Difficulty (e2e in Task 6).
+8. Every label the plan adds exists in `lang/en.json` (`tests/unit/CheckModifierLocalizationKeys.test.js`, extended
+   by each task that adds keys).
 
 ## Model/Effort directives
 
@@ -139,13 +160,10 @@ Every dispatch also loads `foundry-vtt`; Tasks 6, 7, and 8 (Svelte) also load `s
 
 ## Buddy-check directives
 
-- The user directed that this plan receives a buddy check before execution: two blind reviewers (the
-  `buddy-checking` skill) review this plan independently against the spec and the code, then a brokered debate runs
-  until they converge or stalemate. Stalemates go to the user; the orchestrator never casts the deciding vote.
-- Both reviewer prompts carry the iron-rule paragraph verbatim.
-- Seed the reviewers with: the Spec-versus-code resolutions, the Review Focus list, the setting migration (Task 5),
-  the chat-schema legacy path (Task 2), and the cache split (Task 3).
-- No task is dispatched until the accepted findings are folded into this plan and committed on `todo-closeout`.
+- Plan buddy check: done 2026-09-28, two Opus reviewers, converged in 3 rounds with no unresolved disagreements; 24
+  agreed findings (5 Important, 19 Minor) folded in.
+- Flagged tasks: none — the per-task reviews follow the Model/Effort directives.
+- Unflagged tasks showing risk signals: ask.
 
 ---
 
@@ -163,6 +181,7 @@ Create:
   `tests/unit/CheckChatMessageDataModel.test.js`, `tests/unit/CharacterCheckModifiers.test.js`,
   `tests/unit/ConditionalCheckModifierTypes.test.js`, `tests/unit/ShouldGetCheckOptions.test.js`,
   `tests/unit/check/group-situational-modifiers.test.js`, `tests/unit/ArmorTraitCheckModifiers.test.js`,
+  `tests/unit/CheckModifierLocalizationKeys.test.js`,
   `tests/e2e/check-advantage.spec.js`, `tests/e2e/resistance-check-modifiers.spec.js`,
   `tests/e2e/check-options-setting.spec.js`, `tests/e2e/check-dialog-advantage.spec.js`,
   `tests/e2e/rules-element-check-modifier-editor.spec.js`, `tests/e2e/armor-trait-situations.spec.js`.
@@ -170,7 +189,8 @@ Create:
 Modify:
 
 - `src/check/Check.js`, `src/check/CheckResults.js`, `src/check/chat-message/CheckChatMessageDataModel.js`,
-  `src/check/chat-message/CheckChatResults.svelte`, `src/check/dialog/CheckDialogShell.svelte`,
+  `src/check/chat-message/CheckChatResults.svelte`, `src/check/chat-message/CheckChatMessageDie.svelte`,
+  `src/hooks/OnGetChatLogEntryContext.js`, `src/check/dialog/CheckDialogShell.svelte`,
   `src/check/dialog/CheckDialogBase.svelte`.
 - `src/check/types/{attribute,resistance,attack,casting,item}-check/*CheckOptions.js`, `*CheckParameters.js`,
   `dialog/*CheckDialog.js`, `dialog/*CheckDialogShell.svelte`.
@@ -180,7 +200,8 @@ Modify:
 - `src/document/types/item/rules-element/ConditionalCheckModifier.js`,
   `src/document/types/item/sheet/rules-element/ItemSheetConditionalCheckModifierSettings.svelte`,
   `src/document/svelte-components/select/DocumentSelect.svelte`.
-- `lang/en.json`; existing tests named per task; `docs/TODO.md`, `docs/POST_WORK_FINDINGS.md`,
+- `lang/en.json`; existing tests named per task (including the `tests/e2e/checkDialog.js` helpers); `docs/TODO.md`,
+  `docs/POST_WORK_FINDINGS.md`, `docs/superpowers/specs/2026-09-27-advantage-disadvantage-design.md` (spec A),
   `.claude/skills/titan-codebase/references/*.md`.
 
 ---
@@ -467,14 +488,17 @@ EOF
   `src/check/types/attack-check/AttackCheckParameters.js`, `src/check/types/casting-check/CastingCheckParameters.js`,
   `src/check/types/item-check/ItemCheckParameters.js`
 - Modify: `src/check/CheckResults.js`, `src/check/chat-message/CheckChatMessageDataModel.js`
+- Modify: `src/check/chat-message/CheckChatMessageDie.svelte`, `src/check/chat-message/CheckChatResults.svelte`,
+  `src/hooks/OnGetChatLogEntryContext.js`
 - Modify: `src/document/types/actor/types/character/CharacterDataModel.js`
 - Modify tests: `tests/unit/CheckChatMessageSchemaEquivalence.test.js`, `tests/unit/check/check-shape-parity.test.js`,
-  `tests/unit/check/calculate-check-results.test.js`, `tests/unit/check/type-results.test.js`
+  `tests/unit/check/calculate-check-results.test.js`, `tests/unit/check/type-results.test.js`,
+  `tests/e2e/checkDialog.js`
 - Create tests: `tests/unit/check/check-options-defaults.test.js`, `tests/unit/CheckChatMessageDataModel.test.js`,
   `tests/unit/CharacterCheckModifiers.test.js`, `tests/e2e/check-advantage.spec.js`
 
 **Interfaces:**
-- Consumes: `applyAdvantage` (Task 1).
+- Consumes: `applyAdvantage` (Task 1); `showChatLog(page)` (`tests/e2e/world.js`).
 - Produces: every `create<Type>CheckOptions` returns `advantage: number` (default 0), `automaticFailure: boolean`
   (default false), `situations: string[]` (default []). Every `create<Type>CheckParametersShape` gains
   `advantage: 0`, `automaticFailure: false`, `baseDifficulty: 0` (attack: 4), `situations: []`; every
@@ -482,9 +506,13 @@ EOF
   `calculateCheckResults` honors `parameters.automaticFailure`. `CheckChatMessageDataModel.migrateData(source)`.
   `CharacterDataModel._applyCheckAdvantage(parameters): void` (sets `baseDifficulty`, then the post-Advantage
   `difficulty`), called last in all five `get<Type>CheckParameters`. Typedef `SituationLabel` (`{ key, label }`) in
-  `src/check/Check.js`. Test helper `createModel(rulesElementsCache)` in `tests/unit/CharacterCheckModifiers.test.js`.
-  E2E helpers `rollAttributeCheck(targetPage, options)` and `seedEffect(targetPage, rulesElement)` in
-  `tests/e2e/check-advantage.spec.js`.
+  `src/check/Check.js`. An automatically failed card withholds the chat-log Re-roll Failures / Double Training /
+  Double Expertise entries, the reset-Expertise button, and per-die Expertise, and styles every die as a failure (a 1
+  as a critical failure). Test helpers `createModel(rulesElementsCache)` and `createItemModel(itemRollData)` in
+  `tests/unit/CharacterCheckModifiers.test.js`. `readNewestCheckFlags(page, baseline, type?)` in
+  `tests/e2e/checkDialog.js` gains the optional subtype filter and returns `{ id, type, parameters, results }`. E2E
+  helpers `rollAttributeCheck(targetPage, options)`, `seedEffect(targetPage, rulesElement)`,
+  `checkModifierElement(overrides)`, and `readChatContextMenu(card)` in `tests/e2e/check-advantage.spec.js`.
 
 - [ ] **Step 1: Write the failing unit tests**
 
@@ -542,6 +570,7 @@ The `resistance` golden has no `attributeDice`; place `automaticFailure` and `ba
 ```js
 describe('calculateCheckResults — automatic failure', () => {
    it('keeps the dice and critical counts but reports no successes and a failure', () => {
+      /** @type {object} An automatically failed 4:1 check. */
       const params = {
          automaticFailure: true,
          complexity: 1,
@@ -549,6 +578,7 @@ describe('calculateCheckResults — automatic failure', () => {
          extraFailureOnCritical: false,
          extraSuccessOnCritical: false,
       };
+      /** @type {object} The calculated results. */
       const r = calculateCheckResults(diceResults([
          6,
          5,
@@ -567,6 +597,7 @@ describe('calculateCheckResults — automatic failure', () => {
    });
 
    it('stays forced when a stored Resistance Check card is recalculated', () => {
+      /** @type {object} The recalculated results. */
       const r = recalculateCheckResults({
          type: 'resistanceCheck',
          parameters: {
@@ -594,6 +625,7 @@ describe('calculateCheckResults — automatic failure', () => {
 ```js
 describe('automatic failure in type results', () => {
    it('deals no attack damage', () => {
+      /** @type {object} An automatically failed attack dealing 2 + 1 Damage. */
       const params = {
          automaticFailure: true,
          complexity: 1,
@@ -604,6 +636,7 @@ describe('automatic failure in type results', () => {
          extraSuccessOnCritical: false,
          plusExtraSuccessDamage: true,
       };
+      /** @type {object} The calculated results. */
       const r = calculateAttackCheckResults(diceResults([
          6,
          6,
@@ -613,6 +646,7 @@ describe('automatic failure in type results', () => {
    });
 
    it('reduces no damage on a Resistance Check', () => {
+      /** @type {object} An automatically failed Resistance Check against 4 Damage. */
       const params = {
          automaticFailure: true,
          complexity: 1,
@@ -621,6 +655,7 @@ describe('automatic failure in type results', () => {
          extraFailureOnCritical: false,
          extraSuccessOnCritical: false,
       };
+      /** @type {object} The calculated results. */
       const r = calculateResistanceCheckResults(diceResults([
          6,
          5,
@@ -693,9 +728,10 @@ describe('check options — Advantage, Automatic Failure, situations', () => {
 ```js
 import { describe, it, expect, beforeAll, afterAll } from 'vitest';
 
-// CheckChatMessageDataModel.migrateData fills the pre-Advantage Difficulty of check messages stored before Advantage
-// existed. A pass-through TypeDataModel stand-in terminates the migrateData super-chain. Dynamic import is permitted in
-// tests (the no-dynamic-import rule governs the shipping bundle only).
+// CheckChatMessageDataModel.migrateData fills `baseDifficulty` from `difficulty` on check-message sources whose
+// parameters carry a Difficulty but no base Difficulty. A pass-through TypeDataModel stand-in terminates the
+// migrateData super-chain. Dynamic import is permitted in tests (the no-dynamic-import rule governs the shipping bundle
+// only).
 
 /** Minimal stand-in for foundry.abstract.TypeDataModel: a pass-through static migrateData. */
 class MockTypeDataModel {
@@ -722,7 +758,8 @@ afterAll(() => {
 });
 
 describe('CheckChatMessageDataModel.migrateData', () => {
-   it('reads a legacy message\'s stored Difficulty as its base Difficulty', () => {
+   it('reads the stored Difficulty as the base Difficulty of a source that has none', () => {
+      /** @type {object} The migrated source. */
       const migrated = CheckChatMessageDataModel.migrateData({
          parameters: {
             difficulty: 5,
@@ -732,6 +769,7 @@ describe('CheckChatMessageDataModel.migrateData', () => {
    });
 
    it('leaves a present base Difficulty unchanged', () => {
+      /** @type {object} The migrated source. */
       const migrated = CheckChatMessageDataModel.migrateData({
          parameters: {
             baseDifficulty: 4,
@@ -742,6 +780,7 @@ describe('CheckChatMessageDataModel.migrateData', () => {
    });
 
    it('leaves a results-only update diff untouched', () => {
+      /** @type {object} The migrated diff. */
       const migrated = CheckChatMessageDataModel.migrateData({
          results: {
             successes: 1,
@@ -751,6 +790,7 @@ describe('CheckChatMessageDataModel.migrateData', () => {
    });
 
    it('adds no base Difficulty to a parameters diff that carries no Difficulty', () => {
+      /** @type {object} The migrated diff. */
       const migrated = CheckChatMessageDataModel.migrateData({
          parameters: {
             advantage: 0,
@@ -765,7 +805,10 @@ describe('CheckChatMessageDataModel.migrateData', () => {
 
 ```js
 import { describe, it, expect, beforeAll, afterAll } from 'vitest';
+import createAttackCheckOptions from '~/check/types/attack-check/AttackCheckOptions.js';
 import createAttributeCheckOptions from '~/check/types/attribute-check/AttributeCheckOptions.js';
+import createCastingCheckOptions from '~/check/types/casting-check/CastingCheckOptions.js';
+import createItemCheckOptions from '~/check/types/item-check/ItemCheckOptions.js';
 import { installSchemaMocks, restoreSchemaMocks } from './helpers/schemaFingerprint.js';
 
 // Check-modifier behavior of CharacterDataModel, exercised on a bare instance (Object.create over the prototype) whose
@@ -868,6 +911,7 @@ describe('CharacterDataModel._applyCheckAdvantage', () => {
 
 describe('CharacterDataModel.getAttributeCheckParameters — Advantage', () => {
    it('applies the options Advantage after the Difficulty is set', () => {
+      /** @type {object} The derived Attribute Check parameters. */
       const parameters = createModel().getAttributeCheckParameters(createAttributeCheckOptions({
          advantage: 2,
          attribute: 'body',
@@ -879,13 +923,124 @@ describe('CharacterDataModel.getAttributeCheckParameters — Advantage', () => {
       expect(parameters.situations).toEqual([]);
    });
 });
+
+/**
+ * Creates a bare model whose every owned item returns the given roll data.
+ * @param {object} itemRollData - The roll data each owned item's `system.getRollData()` returns.
+ * @returns {object} The model instance.
+ */
+function createItemModel(itemRollData) {
+   /** @type {object} The bare model. */
+   const model = createModel();
+   model.parent.items = {
+      get: () => ({
+         system: {
+            getRollData: () => structuredClone(itemRollData),
+         },
+      }),
+   };
+   return model;
+}
+
+describe('Advantage on item-based check parameters', () => {
+   it('applies Advantage to an Attack Check after the rating-derived Difficulty is clamped', () => {
+      /** @type {object} A weapon with one plain attack. */
+      const weaponRollData = {
+         attack: [
+            {
+               customTrait: [],
+               damage: 1,
+               label: 'x',
+               trait: [],
+            },
+         ],
+         attackNotes: '',
+         customTrait: [],
+         img: '',
+         name: 'W',
+      };
+
+      // Defense 5 against Melee 0 rates a Difficulty of 9, clamped to 6; Advantage then lowers it to 5.
+      /** @type {object} The derived Attack Check parameters. */
+      const parameters = createItemModel(weaponRollData).getAttackCheckParameters(createAttackCheckOptions({
+         advantage: 1,
+         attackerMelee: 0,
+         attribute: 'body',
+         itemId: 'w',
+         skill: 'athletics',
+         targetDefense: 5,
+         type: 'melee',
+      }));
+      expect(parameters.baseDifficulty).toBe(6);
+      expect(parameters.difficulty).toBe(5);
+   });
+
+   it('applies Disadvantage to a Casting Check', () => {
+      /** @type {object} A spell with no aspects. */
+      const spellRollData = {
+         aspect: [],
+         customAspect: [],
+         customTrait: [],
+         description: '',
+         img: '',
+         name: 'S',
+         tradition: '',
+      };
+
+      /** @type {object} The derived Casting Check parameters. */
+      const parameters = createItemModel(spellRollData).getCastingCheckParameters(createCastingCheckOptions({
+         advantage: -1,
+         attribute: 'body',
+         itemId: 's',
+         skill: 'athletics',
+      }));
+      expect(parameters.baseDifficulty).toBe(4);
+      expect(parameters.difficulty).toBe(5);
+   });
+
+   it('applies Greater Advantage to an Item Check', () => {
+      /** @type {object} An item with one check that deals no damage or healing. */
+      const itemRollData = {
+         check: [
+            {
+               isDamage: false,
+               isHealing: false,
+               label: 'C',
+               opposedCheck: {
+                  attribute: 'body',
+                  enabled: false,
+                  skill: 'none',
+               },
+               resistanceCheck: 'none',
+               resolveCost: 0,
+            },
+         ],
+         customTrait: [],
+         description: '',
+         img: '',
+         name: 'I',
+      };
+
+      /** @type {object} The derived Item Check parameters. */
+      const parameters = createModel().getItemCheckParameters(createItemCheckOptions({
+         advantage: 2,
+         attribute: 'body',
+         difficulty: 4,
+         itemRollData,
+         skill: 'athletics',
+      }));
+      expect(parameters.baseDifficulty).toBe(4);
+      expect(parameters.difficulty).toBe(2);
+   });
+});
 ```
 
 - [ ] **Step 2: Run the new and changed unit tests to verify they fail**
 
 Run: `npx vitest run tests/unit/CheckChatMessageSchemaEquivalence.test.js tests/unit/check tests/unit/CheckChatMessageDataModel.test.js tests/unit/CharacterCheckModifiers.test.js`
 Expected: FAIL — goldens lack the four fields; options lack `advantage`; auto-fail cases report successes;
-`migrateData` does not set `baseDifficulty`; `_applyCheckAdvantage` is not a function.
+`migrateData` does not set `baseDifficulty`; `_applyCheckAdvantage` is not a function; the Attribute, Attack,
+Casting, and Item parameters carry no `baseDifficulty` and an unchanged `difficulty`.
 
 - [ ] **Step 3: Update the check typedefs in `src/check/Check.js`**
 
@@ -1088,10 +1243,13 @@ Append inside the class, after `_defineCheckDataSchema`:
 
 ```js
    /**
-    * Fills the pre-Advantage Difficulty of a check message stored before Advantage existed. INVARIANT: such a message
-    * rolled with no Advantage, so its stored `difficulty` is its base Difficulty. Its other Advantage-era parameters
-    * (`advantage`, `automaticFailure`, `situations`) take their schema initials (0, false, []). A partial update diff
-    * that carries no Difficulty is left untouched.
+    * Fills `baseDifficulty` on a check message whose stored parameters carry a `difficulty` but no `baseDifficulty`.
+    * Such a message rolled with no Advantage, so its stored `difficulty` is its base Difficulty; its `advantage`,
+    * `automaticFailure`, and `situations` take their schema initials (0, false, []). A partial update diff that
+    * carries no Difficulty is left untouched.
+    * INVARIANT: every parameter update carries `baseDifficulty` whenever it carries `difficulty`; a diff carrying only
+    * `difficulty` would have its base overwritten with the post-Advantage value. The fill is not gated on
+    * `advantage`, because a diff need not carry it.
     * @override
     * @param {object} source - The source data for the check chat message.
     * @returns {object} The migrated source data.
@@ -1122,8 +1280,8 @@ Add this method directly after `_initializeAttributeBasedCheck` (in the `/* === 
 ```js
    /**
     * Applies the check's summed Advantage to its Difficulty, keeping the pre-Advantage value as `baseDifficulty`.
-    * INVARIANT: runs after every other Difficulty rule (an Attack Check's rating-derived Difficulty included), since
-    * Advantage adjusts the final Difficulty.
+    * INVARIANT: runs after the rating-derived and option Difficulty (an Attack Check's rating clamp included);
+    * target-condition overrides may follow it.
     * @param {CheckParameters} parameters - The check parameters. Modified in place.
     * @private
     */
@@ -1149,20 +1307,189 @@ Call it last in each `get<Type>CheckParameters`:
   (the one ending with `parameters.scaling = checkData.scaling;`) insert a blank line,
   `      // Advantage adjusts the final Difficulty.` and `      this._applyCheckAdvantage(parameters);`.
 
-- [ ] **Step 9: Run the unit tests to verify they pass**
+- [ ] **Step 9: Withhold outcome-changing actions on an automatically failed card**
+
+One decision covers the card (resolution #12): an automatically failed check has no Successes to gain, so nothing on
+its card offers to change the outcome, and no die looks successful.
+
+In `src/hooks/OnGetChatLogEntryContext.js`, replace the body of `canReRollFailures` (everything between its opening
+`{` and closing `}`) with:
+
+```js
+   /** @type {object|false} The check data, or false when the message is not an owned, visible check. */
+   const checkData = getCheckData(li);
+   if (checkData) {
+
+      // Offer the re-roll on a check that did not fail automatically and has not re-rolled its failures, or to a GM.
+      if (
+         isCheck(checkData.type) &&
+         !checkData.parameters.automaticFailure &&
+         (checkData.failuresReRolled === false || game.user.isGM)
+      ) {
+
+         // Return true if the check has any failures.
+         for (const die of checkData.results.dice) {
+            if (die.base < checkData.parameters.difficulty) {
+               return true;
+            }
+         }
+      }
+   }
+
+   return false;
+```
+
+Replace the body of `canDoubleTraining` with:
+
+```js
+   // Offer the option on a check with Training that has not been doubled and did not fail automatically.
+   /** @type {object|false} The check data, or false when the message is not an owned, visible check. */
+   const checkData = getCheckData(li);
+   return (checkData &&
+      isCheck(checkData.type) &&
+      !checkData.parameters.automaticFailure &&
+      checkData.parameters.totalTrainingDice > 0 &&
+      (checkData.parameters.doubleTraining === false));
+```
+
+Replace the body of `canDoubleExpertise` with:
+
+```js
+   // Offer the option on a check with Expertise that has not been doubled and did not fail automatically.
+   /** @type {object|false} The check data, or false when the message is not an owned, visible check. */
+   const checkData = getCheckData(li);
+   return (checkData &&
+      isCheck(checkData.type) &&
+      !checkData.parameters.automaticFailure &&
+      checkData.parameters.totalExpertise > 0 &&
+      (checkData.parameters.doubleExpertise === false));
+```
+
+In `src/check/chat-message/CheckChatMessageDie.svelte`, replace the `result` and `disabled` declarations (from
+`/** @type {string} The class to affect the appearance of the die. */` through the `disabled` `$derived(...)`'s
+closing `);`) with:
+
+```js
+   /**
+    * @type {string} The class to affect the appearance of the die. An automatically failed check has no successful
+    * die, so each shows as a failure (a 1 as a critical failure).
+    */
+   const result = $derived.by(() => {
+      if (document.data.system.parameters.automaticFailure) {
+         return die.final <= 1 ? 'critical-failure' : 'failure';
+      }
+
+      return die.final >= 6 ? 'critical-success' :
+         die.final >= document.data.system.parameters.difficulty ? 'success' :
+            die.final <= 1 ? 'critical-failure' :
+            'failure';
+   });
+
+   /**
+    * @type {boolean} Whether applying Expertise to the die should be disabled. Expertise cannot change an
+    * automatically failed check.
+    */
+   const disabled = $derived(
+      !document.data.isOwner ||
+         document.data.system.parameters.automaticFailure ||
+         document.data.system.results.expertiseRemaining === 0 ||
+         die.final >= 6,
+   );
+```
+
+In `src/check/chat-message/CheckChatResults.svelte`, replace
+
+```svelte
+         <!--Reset Button-->
+         {#if document.data.constructor.getSpeakerActor(document.data.speaker)?.isOwner}
+```
+
+with
+
+```svelte
+         <!--Reset Button: Expertise cannot change an automatically failed check.-->
+         {#if !document.data.system.parameters.automaticFailure &&
+            document.data.constructor.getSpeakerActor(document.data.speaker)?.isOwner}
+```
+
+- [ ] **Step 10: Run the unit tests to verify they pass**
 
 Run: `npx vitest run tests/unit/CheckChatMessageSchemaEquivalence.test.js tests/unit/check tests/unit/CheckChatMessageDataModel.test.js tests/unit/CharacterCheckModifiers.test.js`
 Expected: PASS.
 
-- [ ] **Step 10: Write the e2e spec**
+- [ ] **Step 11: Extend the check-message helper and write the e2e spec**
+
+In `tests/e2e/checkDialog.js`, replace `readNewestCheckFlags` (its JSDoc and function) with:
+
+```js
+/**
+ * Polls for the newest check chat message created after the given baseline count and returns its id, subtype,
+ * parameters, and results. The wait is bounded by the message actually appearing, and a message created before the
+ * roll is never read.
+ * @param {import('@playwright/test').Page} page - The Playwright page bound to the live world.
+ * @param {number} baseline - The chat-message count captured immediately before the roll.
+ * @param {string} [type] - The check subtype to wait for (e.g. `attributeCheck`); any check subtype when omitted.
+ * @returns {Promise<{ id: string, type: string, parameters: object, results: object }>} The newest check message's
+ * data.
+ */
+export async function readNewestCheckFlags(page, baseline, type = undefined) {
+   /** @type {{ id: string, type: string, parameters: object, results: object } | null} The resolved message data. */
+   let flags = null;
+   await expect.poll(
+      async () => {
+         flags = await page.evaluate(({ base, subtype }) => {
+            /** @type {string[]} The accepted subtypes: the requested one, or all five check subtypes. */
+            const checkTypes = subtype ?
+               [subtype] :
+               [
+                  'attributeCheck',
+                  'resistanceCheck',
+                  'attackCheck',
+                  'castingCheck',
+                  'itemCheck',
+               ];
+
+            // Only consider messages created after the baseline; return the newest accepted one.
+            if (game.messages.size <= base) {
+               return null;
+            }
+
+            /** @type {ChatMessage[]} The messages created after the baseline. */
+            const created = game.messages.contents.slice(base);
+
+            /** @type {ChatMessage|null} The newest accepted check message, if any. */
+            const message = [...created].reverse().find((msg) => checkTypes.includes(msg?.type)) ?? null;
+            return message ?
+               {
+                  id: message.id,
+                  type: message.type,
+                  parameters: message.system.parameters,
+                  results: message.system.results,
+               } :
+               null;
+         }, {
+            base: baseline,
+            subtype: type,
+         });
+         return flags?.type ?? null;
+      },
+      {
+         message: 'a titan check chat message should be created after the roll',
+         timeout: 1000,
+      },
+   ).not.toBeNull();
+   return flags;
+}
+```
 
 Create `tests/e2e/check-advantage.spec.js`:
 
 ```js
 import { expect, test } from '@playwright/test';
 import { login } from './fixtures.js';
-import { attachPageErrors, clearChat, closeAllApps, deleteFixtureActor } from './world.js';
+import { attachPageErrors, clearChat, closeAllApps, deleteFixtureActor, showChatLog } from './world.js';
 import { forceDice, resetDice } from './dice.js';
+import { readNewestCheckFlags } from './checkDialog.js';
 
 /**
  * Advantage, Disadvantage, and Automatic Failure on rolled checks: the parameters the check engine stores, the
@@ -1211,7 +1538,8 @@ test.afterAll(async () => {
  * Rolls an Attribute Check for the spec's actor without the dialog and returns the created message.
  * @param {import('@playwright/test').Page} targetPage - The logged-in page.
  * @param {object} options - The Attribute Check options.
- * @returns {Promise<{id: string, parameters: object, results: object}>} The new message's id, parameters, results.
+ * @returns {Promise<{id: string, type: string, parameters: object, results: object}>} The new message's id, subtype,
+ * parameters, and results.
  */
 async function rollAttributeCheck(targetPage, options) {
    /** @type {number} The chat-message count before the roll. */
@@ -1223,26 +1551,26 @@ async function rollAttributeCheck(targetPage, options) {
       checkOptions: options,
    });
 
-   /** @type {{id: string, parameters: object, results: object}|null} The created message, once found. */
-   let message = null;
-   await expect.poll(async () => {
-      message = await targetPage.evaluate((base) => {
-         const created = game.messages.contents.slice(base).find((entry) => entry.type === 'attributeCheck');
-         return created ?
-            {
-               id: created.id,
-               parameters: created.system.parameters,
-               results: created.system.results,
-            } :
-            null;
-      }, baseline);
-      return message !== null;
-   }, {
-      message: 'the Attribute Check message is created',
-      timeout: 1000,
-   }).toBe(true);
+   return readNewestCheckFlags(targetPage, baseline, 'attributeCheck');
+}
 
-   return message;
+/**
+ * Opens the chat log's context menu on a card, returns its entries' labels, and closes it again.
+ * @param {import('@playwright/test').Locator} card - The card's list item in the chat log.
+ * @returns {Promise<string[]>} The trimmed label of each menu entry.
+ */
+async function readChatContextMenu(card) {
+   await card.locator('.message-header').click({ button: 'right' });
+
+   /** @type {import('@playwright/test').Locator} The open menu's entries. */
+   const entries = page.locator('#context-menu li.context-item');
+   await expect(entries.first()).toBeVisible();
+
+   /** @type {string[]} The entries' labels. */
+   const labels = (await entries.allInnerTexts()).map((text) => text.trim());
+   await page.evaluate(() => ui.context?.close({ animate: false }));
+   await expect(page.locator('#context-menu')).toHaveCount(0);
+   return labels;
 }
 
 /**
@@ -1291,6 +1619,7 @@ function checkModifierElement(overrides) {
 
 test.describe('Advantage and Automatic Failure in check options', () => {
    test('options Advantage moves the rolled Difficulty and keeps the base', async () => {
+      /** @type {{id: string, parameters: object, results: object}} The check rolled with Advantage. */
       const advantaged = await rollAttributeCheck(page, {
          advantage: 1,
          attribute: 'body',
@@ -1301,6 +1630,7 @@ test.describe('Advantage and Automatic Failure in check options', () => {
          difficulty: 3,
       });
 
+      /** @type {{id: string, parameters: object, results: object}} The check rolled with a -3 Advantage sum. */
       const disadvantaged = await rollAttributeCheck(page, {
          advantage: -3,
          attribute: 'body',
@@ -1315,6 +1645,7 @@ test.describe('Advantage and Automatic Failure in check options', () => {
    test('an automatically failed check rolls its dice but has no successes', async () => {
       // Positive control: the same forced die succeeds without Automatic Failure.
       await forceDice(page, [6]);
+      /** @type {{id: string, parameters: object, results: object}} The check rolled without Automatic Failure. */
       const control = await rollAttributeCheck(page, {
          attribute: 'body',
          complexity: 1,
@@ -1325,6 +1656,7 @@ test.describe('Advantage and Automatic Failure in check options', () => {
       });
 
       await forceDice(page, [6]);
+      /** @type {{id: string, parameters: object, results: object}} The check rolled with Automatic Failure. */
       const failed = await rollAttributeCheck(page, {
          attribute: 'body',
          automaticFailure: true,
@@ -1339,9 +1671,96 @@ test.describe('Advantage and Automatic Failure in check options', () => {
       });
    });
 
-   test('a check message stored before Advantage existed initializes and renders from its source', async () => {
+   test('an automatically failed card offers no outcome-changing action and styles no die as a success', async () => {
+      /** @type {Record<string, string>} The localized labels of the actions a failed card withholds. */
+      const labels = await page.evaluate(() => ({
+         doubleExpertise: game.i18n.localize('LOCAL.doubleExpertise.text'),
+         doubleExpertiseSpendResolve: game.i18n.localize('LOCAL.doubleExpertiseSpendResolve.text'),
+         doubleTraining: game.i18n.localize('LOCAL.doubleTraining.text'),
+         doubleTrainingSpendResolve: game.i18n.localize('LOCAL.doubleTrainingSpendResolve.text'),
+         expertiseRemaining: game.i18n.localize('LOCAL.expertiseRemaining.text'),
+         reRollFailures: game.i18n.localize('LOCAL.reRollFailures.text'),
+         reRollFailuresSpendResolve: game.i18n.localize('LOCAL.reRollFailuresSpendResolve.text'),
+         resetExpertise: game.i18n.localize('LOCAL.resetExpertise.text'),
+      }));
+
+      /** @type {string[]} Every context-menu label a failed card withholds (a GM sees both forms of each). */
+      const withheld = [
+         labels.reRollFailures,
+         labels.reRollFailuresSpendResolve,
+         labels.doubleExpertise,
+         labels.doubleExpertiseSpendResolve,
+         labels.doubleTraining,
+         labels.doubleTrainingSpendResolve,
+      ];
+
+      /** @type {object} Two dice (Body 1 + Training 1), 1 Expertise, and a 4:1 check, so every action applies. */
+      const checkOptions = {
+         attribute: 'body',
+         complexity: 1,
+         expertiseMod: 1,
+         trainingMod: 1,
+      };
+      await showChatLog(page);
+
+      // Positive control: without Automatic Failure the card offers every action and styles the 6 a critical success.
+      await forceDice(page, [
+         6,
+         2,
+      ]);
+      /** @type {{id: string, parameters: object, results: object}} The normal card's message. */
+      const control = await rollAttributeCheck(page, checkOptions);
+
+      /** @type {import('@playwright/test').Locator} The normal card in the chat log. */
+      const controlCard = page.locator(`#chat .chat-log li[data-message-id="${control.id}"]`);
+      await expect(controlCard.locator('.die.critical-success')).toHaveCount(1);
+      await expect(controlCard.getByRole('button', { name: labels.resetExpertise })).toBeVisible();
+      expect(await readChatContextMenu(controlCard)).toEqual(expect.arrayContaining(withheld));
+
+      // The same roll with Automatic Failure: the card renders its dice and Expertise row but withholds the actions.
+      await forceDice(page, [
+         6,
+         2,
+      ]);
+      /** @type {{id: string, parameters: object, results: object}} The automatically failed card's message. */
+      const failed = await rollAttributeCheck(page, {
+         ...checkOptions,
+         automaticFailure: true,
+      });
+
+      /** @type {import('@playwright/test').Locator} The automatically failed card in the chat log. */
+      const failedCard = page.locator(`#chat .chat-log li[data-message-id="${failed.id}"]`);
+      await expect(failedCard.locator('.die')).toHaveCount(2);
+      await expect(failedCard.getByText(labels.expertiseRemaining)).toBeVisible();
+      await expect(failedCard.locator('.die.success, .die.critical-success')).toHaveCount(0);
+      await expect(failedCard.getByRole('button', { name: labels.resetExpertise })).toHaveCount(0);
+
+      /** @type {string[]} The failed card's context-menu labels. */
+      const failedMenu = await readChatContextMenu(failedCard);
+      for (const label of withheld) {
+         expect(failedMenu).not.toContain(label);
+      }
+
+      // The rolled 6 renders in the resolved failure color.
+      await expect.poll(() => failedCard.locator('.die', { hasText: '6' }).evaluate((element) => {
+         /** @type {HTMLSpanElement} A probe resolving the failure token to computed rgb() form. */
+         const probe = document.createElement('span');
+         probe.style.backgroundColor = 'var(--titan-failure-background)';
+         element.appendChild(probe);
+
+         /** @type {string} The resolved failure background. */
+         const failure = getComputedStyle(probe).backgroundColor;
+         probe.remove();
+         return getComputedStyle(element.querySelector('button')).backgroundColor === failure;
+      }), { message: 'the failed card\'s 6 shows the failure background' }).toBe(true);
+   });
+
+   test('a check message without the Advantage fields initializes and renders from its source', async () => {
+      /** @type {{messageId: string, parameters: object}} The created card's id and the in-memory document's fields. */
       const result = await page.evaluate(async () => {
-         // A complete Attribute Check payload as the engine wrote it before the Advantage-era fields existed.
+         // A complete Attribute Check payload without `advantage`, `automaticFailure`, `baseDifficulty`, and
+         // `situations`.
+         /** @type {object} The message's system data. */
          const legacySystem = {
             failuresReRolled: false,
             parameters: {
@@ -1382,11 +1801,14 @@ test.describe('Advantage and Automatic Failure in check options', () => {
             },
          };
 
-         // An in-memory document built from the legacy source takes the initialization path a loaded one takes.
+         // An in-memory document built from the source takes the initialization path a loaded one takes.
+         /** @type {ChatMessage} The in-memory document. */
          const legacy = new ChatMessage.implementation({
             type: 'attributeCheck',
             system: legacySystem,
          });
+
+         /** @type {ChatMessage} The created message, rendered in the chat log. */
          const created = await ChatMessage.create({
             type: 'attributeCheck',
             speaker: ChatMessage.getSpeaker(),
@@ -1409,6 +1831,8 @@ test.describe('Advantage and Automatic Failure in check options', () => {
          baseDifficulty: 4,
          situations: [],
       });
+
+      /** @type {import('@playwright/test').Locator} The rendered card's check content. */
       const card = page.locator(`#chat .message[data-message-id="${result.messageId}"] .check-chat-message`);
       await expect(card).toBeAttached();
       await expect(card).toContainText('4:1');
@@ -1416,18 +1840,20 @@ test.describe('Advantage and Automatic Failure in check options', () => {
 });
 ```
 
-- [ ] **Step 11: Lint, unit, build, e2e**
+- [ ] **Step 12: Lint, unit, build, e2e**
 
-Run: `npm run eslint`; `npm test`; `npm run build`;
-`npm run test:e2e -- tests/e2e/check-advantage.spec.js tests/e2e/checks-dialog.spec.js tests/e2e/checks-integration.spec.js tests/e2e/interaction-rolls.spec.js`
-Expected: 0 lint errors; all unit tests pass; build succeeds; every listed spec passes.
+Run: `npm run eslint`; `npm run stylelint`; `npm test`; `npm run build`;
+`npm run test:e2e -- tests/e2e/check-advantage.spec.js tests/e2e/checks-dialog.spec.js tests/e2e/checks-integration.spec.js tests/e2e/interaction-rolls.spec.js tests/e2e/chat-message-mounts.spec.js`
+Expected: 0 lint and stylelint errors; all unit tests pass; build succeeds; every listed spec passes.
 
-- [ ] **Step 12: Commit**
+- [ ] **Step 13: Commit**
 
 ```bash
 git branch --show-current
 git status --short
 git add src/check/Check.js src/check/CheckResults.js src/check/chat-message/CheckChatMessageDataModel.js \
+   src/check/chat-message/CheckChatMessageDie.svelte src/check/chat-message/CheckChatResults.svelte \
+   src/hooks/OnGetChatLogEntryContext.js tests/e2e/checkDialog.js \
    src/check/types/attribute-check/AttributeCheckOptions.js src/check/types/attribute-check/AttributeCheckParameters.js \
    src/check/types/resistance-check/ResistanceCheckOptions.js \
    src/check/types/resistance-check/ResistanceCheckParameters.js \
@@ -1463,7 +1889,7 @@ EOF
 - Modify: `lang/en.json`
 - Modify tests: `tests/unit/CharacterCheckModifiers.test.js`, `tests/unit/RulesElementFactories.test.js`,
   `tests/e2e/check-advantage.spec.js`
-- Create test: `tests/unit/ConditionalCheckModifierTypes.test.js`
+- Create tests: `tests/unit/ConditionalCheckModifierTypes.test.js`, `tests/unit/CheckModifierLocalizationKeys.test.js`
 
 **Interfaces:**
 - Consumes: `_applyCheckAdvantage`, the options/parameters fields from Task 2.
@@ -1477,7 +1903,9 @@ EOF
   `SituationalCheckModifier = { key, label, modifierType, value, sources: string[] }`;
   `_applySituationalModifiers(parameters, checkType: string, situations: string[]): void`. Rules elements gathered by
   `_applyRulesElements` carry `sourceName` (owning item/effect name). The four attribute-based
-  `initialize<Type>CheckOptions` read `advantage` and `automaticFailure` from the cache.
+  `initialize<Type>CheckOptions` read `advantage` and `automaticFailure` from the cache. A caller-supplied
+  `options.situations` is honored on every roll path (resolution #11). `LOCAL_KEYS` in
+  `tests/unit/CheckModifierLocalizationKeys.test.js`, which Tasks 6, 8, and 9 extend.
 
 - [ ] **Step 1: Write the failing unit tests**
 
@@ -1618,6 +2046,7 @@ describe('conditional check modifier cache — Advantage and Automatic Failure',
             value: -1,
          }),
       ]);
+      /** @type {object} The initialized Attribute Check options. */
       const options = model.initializeAttributeCheckOptions({
          attribute: 'body',
          skill: 'athletics',
@@ -1793,16 +2222,20 @@ describe('situational check modifiers', () => {
             value: -1,
          }),
       ]);
+      /** @type {object} Options with the situation ticked. */
       const options = createAttributeCheckOptions({
          attribute: 'body',
          situations: ['underwater'],
          skill: 'athletics',
       });
+      /** @type {object} The parameters with the situation ticked. */
       const ticked = model.getAttributeCheckParameters(options);
+      /** @type {object} The parameters after unticking it. */
       const unticked = model.getAttributeCheckParameters({
          ...options,
          situations: [],
       });
+      /** @type {object} The parameters after ticking it again. */
       const reticked = model.getAttributeCheckParameters(options);
 
       expect(options.diceMod).toBe(0);
@@ -1839,6 +2272,7 @@ describe('situational check modifiers', () => {
             skill: 'athletics',
          }),
       ]);
+      /** @type {object} Dexterity-check parameters with the Athletics-only situation ticked. */
       const parameters = model.getAttributeCheckParameters(createAttributeCheckOptions({
          attribute: 'body',
          situations: ['jump'],
@@ -1854,11 +2288,44 @@ describe('situational check modifiers', () => {
 });
 ```
 
+(d) Create `tests/unit/CheckModifierLocalizationKeys.test.js` (`tests/unit/LocalizationKeys.test.js` only rejects
+values that contain `LOCAL.`; this suite proves each key the plan adds exists):
+
+```js
+import { describe, expect, it } from 'vitest';
+import { readFileSync } from 'node:fs';
+import { fileURLToPath } from 'node:url';
+import path from 'node:path';
+
+/** @type {string} This test file's directory. */
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+
+/** @type {object} The parsed English localization file. */
+const lang = JSON.parse(readFileSync(path.resolve(__dirname, '../../lang/en.json'), 'utf-8'));
+
+/**
+ * The flat `LOCAL` keys the Advantage, Automatic Failure, situational-modifier, and check-dialog labels render through,
+ * in alphabetical order.
+ * @type {string[]}
+ */
+const LOCAL_KEYS = [
+   'advantage.text',
+   'automaticFailure.text',
+];
+
+describe('check-modifier localization keys', () => {
+   it.each(LOCAL_KEYS)('LOCAL defines %s', (key) => {
+      expect(lang.LOCAL[key]).toBeTypeOf('string');
+      expect(lang.LOCAL[key].length).toBeGreaterThan(0);
+   });
+});
+```
+
 - [ ] **Step 2: Run the unit tests to verify they fail**
 
-Run: `npx vitest run tests/unit/ConditionalCheckModifierTypes.test.js tests/unit/RulesElementFactories.test.js tests/unit/CharacterCheckModifiers.test.js`
+Run: `npx vitest run tests/unit/ConditionalCheckModifierTypes.test.js tests/unit/RulesElementFactories.test.js tests/unit/CharacterCheckModifiers.test.js tests/unit/CheckModifierLocalizationKeys.test.js`
 Expected: FAIL — missing exports, no `skill` on the factory, `_applySituationalCheckModifierElements` undefined,
-`advantage` rejected by the modifier-type assert.
+`advantage` rejected by the modifier-type assert, `LOCAL` lacks `advantage.text` and `automaticFailure.text`.
 
 - [ ] **Step 3: Replace `src/system/ConditionalCheckModifierTypes.js`**
 
@@ -1982,6 +2449,7 @@ Replace the inner `processElements` function and its JSDoc with:
        * @param {string} sourceName - The name of the owning item or effect.
        */
       function processElements(sourceElements, type, sourceName) {
+         /** @type {object[]} Copies of the source elements, safe to tag. */
          const copiedElements = structuredClone(sourceElements);
          for (const element of copiedElements) {
             element.type = type;
@@ -2044,7 +2512,7 @@ Add these two methods directly after `_applyConditionalCheckModifierElements`:
     * Caches the situational (`situation`-selector) Conditional Check Modifier Rules Elements apart from the summed
     * modifiers, because they never apply automatically. Each cached entry is `{ checkType, key, label, modifierType,
     * skill, source, value }`: `key` is the camel-case form of the typed `label`, `skill` narrows the entry to checks
-    * using one Skill (`''` = any; elements authored before the field existed carry none), and `source` names the owning
+    * using one Skill (`''` = any; an element without a `skill` field is cached as `''`), and `source` names the owning
     * item or effect.
     * @param {ConditionalCheckModifierElement[]} elements - The situational elements, each tagged with its `sourceName`.
     * @private
@@ -2141,12 +2609,13 @@ Add these two methods directly after `_getConditionalCheckModsForType`:
    }
 
    /**
-    * Adds the ticked situational modifiers to a check's parameters and records them for the chat card. Options hold
-    * only the always-on values, so recomputing the parameters after a tick or untick never double-counts. A ticked key
-    * that no longer applies (the dialog's Skill changed) is ignored.
+    * Adds the situational modifiers named in `options.situations` to a check's parameters and records them for the
+    * chat card. The keys come from the dialog's ticks or from a caller that names them; nothing applies
+    * automatically. Options hold only the always-on values, so recomputing the parameters after a tick or untick
+    * never double-counts. A named key that no longer applies (the dialog's Skill changed) is ignored.
     * @param {CheckParameters} parameters - The check parameters, before any total is derived. Modified in place.
     * @param {string} checkType - The check type: attribute, resistance, attack, casting, or item.
-    * @param {string[]} situations - The camel-case keys of the ticked situations.
+    * @param {string[]} situations - The camel-case keys of the situations to apply.
     * @private
     */
    _applySituationalModifiers(parameters, checkType, situations) {
@@ -2179,19 +2648,20 @@ Add these two methods directly after `_getConditionalCheckModsForType`:
 
 - [ ] **Step 8: Read Advantage and Automatic Failure into options, and apply situations to parameters**
 
-In `getAttributeCheckMod`, replace the stale comment block (from `// Contaminated creatures have -1 to all dice rolls.`
-through `// Those, all simple Attribute Check modifiers are stored under 'any'.`) so the method opens:
+In `getAttributeCheckMod`, replace everything from `// Contaminated creatures have -1 to all dice rolls.` through
+`const anyCheckMods = checkMods.any;` (the stale comment block and the declarations it annotates) with:
 
 ```js
-   getAttributeCheckMod(modifierType, attribute, skill) {
       /** @type {number} The summed modifier. */
       let retVal = 0;
 
       // Check for conditional modifiers for this check type.
+      /** @type {object|undefined} The cached modifiers of this type, keyed by check type. */
       const checkMods = this._getConditionalCheckModsForType(modifierType);
       if (checkMods) {
 
          // The editor has no Attribute Check type, so Attribute Checks read only `any`-check-type modifiers.
+         /** @type {object|undefined} The `any`-check-type modifiers, keyed by selector. */
          const anyCheckMods = checkMods.any;
 ```
 
@@ -2296,7 +2766,7 @@ In each of `getAttributeCheckParameters`, `getAttackCheckParameters`, `getCastin
 
 ```js
 
-      // Add the situations ticked in the dialog before any total is derived.
+      // Add the situations the options name (the dialog's ticks) before any total is derived.
       this._applySituationalModifiers(parameters, 'attribute', options.situations);
 ```
 
@@ -2311,7 +2781,7 @@ In `lang/en.json` → `LOCAL`, insert alphabetically:
 
 - [ ] **Step 10: Run the unit tests to verify they pass**
 
-Run: `npx vitest run tests/unit/ConditionalCheckModifierTypes.test.js tests/unit/RulesElementFactories.test.js tests/unit/CharacterCheckModifiers.test.js tests/unit/LocalizationKeys.test.js`
+Run: `npx vitest run tests/unit/ConditionalCheckModifierTypes.test.js tests/unit/RulesElementFactories.test.js tests/unit/CharacterCheckModifiers.test.js tests/unit/CheckModifierLocalizationKeys.test.js tests/unit/LocalizationKeys.test.js`
 Expected: PASS.
 
 - [ ] **Step 11: Extend the e2e spec**
@@ -2327,6 +2797,7 @@ test.describe('Advantage and Automatic Failure from conditional modifiers', () =
             value: -1,
          }),
       ]);
+      /** @type {{id: string, parameters: object, results: object}} The rolled check's message. */
       const message = await rollAttributeCheck(page, { attribute: 'body' });
       expect(message.parameters).toMatchObject({
          advantage: -1,
@@ -2346,6 +2817,7 @@ test.describe('Advantage and Automatic Failure from conditional modifiers', () =
             value: -1,
          }),
       ]);
+      /** @type {{id: string, parameters: object, results: object}} The rolled check's message. */
       const message = await rollAttributeCheck(page, { attribute: 'body' });
       expect(message.parameters).toMatchObject({
          advantage: 0,
@@ -2361,6 +2833,7 @@ test.describe('Advantage and Automatic Failure from conditional modifiers', () =
          }),
       ]);
       await forceDice(page, [6]);
+      /** @type {{id: string, parameters: object, results: object}} The rolled check's message. */
       const message = await rollAttributeCheck(page, {
          attribute: 'body',
          complexity: 1,
@@ -2388,7 +2861,8 @@ git status --short
 git add src/system/ConditionalCheckModifierTypes.js src/document/types/item/rules-element/ConditionalCheckModifier.js \
    src/document/types/actor/types/character/CharacterDataModel.js lang/en.json \
    tests/unit/ConditionalCheckModifierTypes.test.js tests/unit/RulesElementFactories.test.js \
-   tests/unit/CharacterCheckModifiers.test.js tests/e2e/check-advantage.spec.js
+   tests/unit/CharacterCheckModifiers.test.js tests/unit/CheckModifierLocalizationKeys.test.js \
+   tests/e2e/check-advantage.spec.js
 git commit -F - <<'EOF'
 feat(rules-element): advantage, automatic failure, and situational check modifiers
 
@@ -2412,7 +2886,7 @@ EOF
 
 **Interfaces:**
 - Consumes: `_getConditionalCheckModsForType`, `_getConditionalCheckModsForSelectorKey`, `_applySituationalModifiers`,
-  `_applyCheckAdvantage`.
+  `_applyCheckAdvantage`; `readNewestCheckFlags(page, baseline, type)` (`tests/e2e/checkDialog.js`, Task 2).
 - Produces: `getResistanceCheckMod(modifierType: string, resistance: string): number`;
   `initializeResistanceCheckOptions` fills `diceMod`, `expertiseMod`, `advantage`, `automaticFailure` when absent;
   `getResistanceCheckParameters` applies ticked situations. Spec B's Incapacitated/Restrained elements (checkType
@@ -2512,6 +2986,7 @@ describe('Resistance Check conditional modifiers', () => {
             value: 1,
          }),
       ]);
+      /** @type {object} Reflexes-check parameters with Advantage and the situation ticked. */
       const parameters = model.getResistanceCheckParameters(createResistanceCheckOptions({
          advantage: 1,
          resistance: 'reflexes',
@@ -2545,6 +3020,7 @@ Replace `initializeResistanceCheckOptions` (method and JSDoc) with:
     * @returns {ResistanceCheckOptions} The new, fully-populated Resistance Check Options.
     */
    initializeResistanceCheckOptions(options) {
+      /** @type {ResistanceCheckOptions} The options, with every unset field at its default. */
       const checkOptions = createResistanceCheckOptions(options);
 
       // Dice mod.
@@ -2583,6 +3059,7 @@ Replace `initializeResistanceCheckOptions` (method and JSDoc) with:
       let retVal = 0;
 
       // If there are any conditional modifiers for this modifier type.
+      /** @type {object|undefined} The cached modifiers of this type, keyed by check type. */
       const checkMods = this._getConditionalCheckModsForType(modifierType);
       if (checkMods) {
 
@@ -2592,6 +3069,7 @@ Replace `initializeResistanceCheckOptions` (method and JSDoc) with:
          }
 
          // Get mods that apply to Resistance Checks.
+         /** @type {object|undefined} The `resistance`-check-type modifiers, keyed by selector. */
          const resistanceCheckMods = checkMods.resistance;
          if (resistanceCheckMods) {
 
@@ -2613,7 +3091,7 @@ In `getResistanceCheckParameters`, directly after `const parameters = createResi
 
 ```js
 
-      // Add the situations ticked in the dialog before any total is derived.
+      // Add the situations the options name (the dialog's ticks) before any total is derived.
       this._applySituationalModifiers(parameters, 'resistance', options.situations);
 ```
 
@@ -2631,6 +3109,7 @@ import { expect, test } from '@playwright/test';
 import { login } from './fixtures.js';
 import { attachPageErrors, clearChat, closeAllApps, deleteFixtureActor } from './world.js';
 import { forceDice, resetDice } from './dice.js';
+import { readNewestCheckFlags } from './checkDialog.js';
 
 /**
  * Resistance Checks read conditional check modifiers: `any`-check penalties (Abjuration of the Arbiter's dice
@@ -2673,6 +3152,8 @@ test.afterAll(async () => {
 async function seedActor(rulesElement) {
    await page.evaluate(async ({ actorName, elements }) => {
       await game.actors.getName(actorName)?.delete();
+
+      /** @type {TitanActor} The rebuilt actor. */
       const actor = await Actor.create({
          name: actorName,
          type: 'player',
@@ -2703,9 +3184,10 @@ async function seedActor(rulesElement) {
 }
 
 /**
- * Rolls a Resistance Check without the dialog and returns the created message's system data.
+ * Rolls a Resistance Check without the dialog and returns the created message.
  * @param {object} options - The Resistance Check options.
- * @returns {Promise<{parameters: object, results: object}>} The new message's parameters and results.
+ * @returns {Promise<{id: string, type: string, parameters: object, results: object}>} The new message's id, subtype,
+ * parameters, and results.
  */
 async function rollResistanceCheck(options) {
    /** @type {number} The chat-message count before the roll. */
@@ -2717,25 +3199,7 @@ async function rollResistanceCheck(options) {
       checkOptions: options,
    });
 
-   /** @type {{parameters: object, results: object}|null} The created message's system data, once found. */
-   let message = null;
-   await expect.poll(async () => {
-      message = await page.evaluate((base) => {
-         const created = game.messages.contents.slice(base).find((entry) => entry.type === 'resistanceCheck');
-         return created ?
-            {
-               parameters: created.system.parameters,
-               results: created.system.results,
-            } :
-            null;
-      }, baseline);
-      return message !== null;
-   }, {
-      message: 'the Resistance Check message is created',
-      timeout: 1000,
-   }).toBe(true);
-
-   return message;
+   return readNewestCheckFlags(page, baseline, 'resistanceCheck');
 }
 
 test('a Resistance Check picks up an any-check dice penalty and a penalty keyed to its Resistance', async () => {
@@ -2760,7 +3224,9 @@ test('a Resistance Check picks up an any-check dice penalty and a penalty keyed 
       },
    ]);
 
+   /** @type {{reflexes: number, willpower: number}} The initialized Dice mod per Resistance. */
    const diceMods = await page.evaluate((actorName) => {
+      /** @type {TitanActor} The seeded actor. */
       const actor = game.actors.getName(actorName);
       return {
          reflexes: actor.system.initializeResistanceCheckOptions({ resistance: 'reflexes' }).diceMod,
@@ -2772,6 +3238,7 @@ test('a Resistance Check picks up an any-check dice penalty and a penalty keyed 
       willpower: -1,
    });
 
+   /** @type {{id: string, parameters: object, results: object}} The rolled Reflexes check's message. */
    const message = await rollResistanceCheck({ resistance: 'reflexes' });
    expect(message.parameters.resistanceDice).toBeGreaterThan(2);
    expect(message.parameters.diceMod).toBe(-2);
@@ -2798,6 +3265,7 @@ test('an Automatic Failure on Reflexes fails a rolled Reflexes check and reduces
       6,
       6,
    ]);
+   /** @type {{id: string, parameters: object, results: object}} The rolled Reflexes check's message. */
    const message = await rollResistanceCheck({
       complexity: 1,
       damageToReduce: 3,
@@ -2851,17 +3319,19 @@ EOF
   `tests/e2e/embedded-context-effects.spec.js`, `tests/e2e/embedded-context-items.spec.js`,
   `tests/e2e/interaction-dialogs.spec.js`, `tests/e2e/item-sheet-roll.spec.js`, `tests/e2e/localization.spec.js`,
   `tests/e2e/player-hud-action-menu.spec.js`
+- Modify test: `tests/unit/CheckModifierLocalizationKeys.test.js`
 - Create tests: `tests/unit/ShouldGetCheckOptions.test.js`, `tests/e2e/check-options-setting.spec.js`
 
 **Interfaces:**
 - Consumes: `getSituationalCheckModifiers` (Task 3), the `initialize<Type>CheckOptions` methods.
-- Produces: `resolveCheckOptionsMode(value: unknown): string`;
+- Produces: `resolveCheckOptionsMode(value: unknown): string` (`true`/`'true'` → `always`; `never`, `situational`,
+  `always` → themselves; any other value, `undefined` included → `situational`);
   `shouldGetCheckOptions(hasSituationalModifiers: boolean): boolean`. Setting `titan.getCheckOptions` is a String
   choice with default `situational`. Every `request<Type>Check` returns early on invalid options.
 
-- [ ] **Step 1: Write the failing unit test**
+- [ ] **Step 1: Write the failing unit tests**
 
-Create `tests/unit/ShouldGetCheckOptions.test.js`:
+(a) Create `tests/unit/ShouldGetCheckOptions.test.js`:
 
 ```js
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
@@ -2974,7 +3444,7 @@ describe('shouldGetCheckOptions', () => {
       expect(shouldGetCheckOptions(situational)).toBe(dialog);
    });
 
-   it('reads a legacy true as always and a legacy false as situational', () => {
+   it('reads a stored Boolean true as always and a stored false as situational', () => {
       vi.mocked(isModifierActive).mockReturnValue(false);
       storedMode = true;
       expect(shouldGetCheckOptions(false)).toBe(true);
@@ -3014,16 +3484,60 @@ describe('resolveCheckOptionsMode', () => {
          value: 'always',
          mode: 'always',
       },
+      {
+         value: undefined,
+         mode: 'situational',
+      },
+      {
+         value: null,
+         mode: 'situational',
+      },
+      {
+         value: '',
+         mode: 'situational',
+      },
+      {
+         value: 'sometimes',
+         mode: 'situational',
+      },
+      {
+         value: 1,
+         mode: 'situational',
+      },
    ])('$value resolves to $mode', ({ value, mode }) => {
       expect(resolveCheckOptionsMode(value)).toBe(mode);
    });
 });
 ```
 
-- [ ] **Step 2: Run the test to verify it fails**
+(b) In `tests/unit/CheckModifierLocalizationKeys.test.js`, append:
 
-Run: `npx vitest run tests/unit/ShouldGetCheckOptions.test.js`
-Expected: FAIL — cannot resolve `ResolveCheckOptionsMode.js`.
+```js
+/**
+ * The `SETTINGS.getCheckOptions` entries the setting's name, hint, and three choices render through.
+ * @type {string[]}
+ */
+const CHECK_OPTIONS_SETTING_KEYS = [
+   'label',
+   'hint',
+   'never',
+   'situational',
+   'always',
+];
+
+describe('check-options setting localization keys', () => {
+   it.each(CHECK_OPTIONS_SETTING_KEYS)('SETTINGS.getCheckOptions defines %s', (key) => {
+      expect(lang.SETTINGS.getCheckOptions[key]).toBeTypeOf('string');
+      expect(lang.SETTINGS.getCheckOptions[key].length).toBeGreaterThan(0);
+   });
+});
+```
+
+- [ ] **Step 2: Run the tests to verify they fail**
+
+Run: `npx vitest run tests/unit/ShouldGetCheckOptions.test.js tests/unit/CheckModifierLocalizationKeys.test.js`
+Expected: FAIL — cannot resolve `ResolveCheckOptionsMode.js`; `SETTINGS.getCheckOptions` lacks `never`,
+`situational`, and `always`.
 
 - [ ] **Step 3: Implement the resolver and the decision**
 
@@ -3031,9 +3545,20 @@ Create `src/helpers/utility-functions/ResolveCheckOptionsMode.js`:
 
 ```js
 /**
- * Resolves the stored `getCheckOptions` setting to one of its choices. The setting was a Boolean before it became a
- * choice: the old default `false` (no dialog unless the modifier key was held) maps to the new default `situational`,
- * and `true` maps to `always`. A String-typed setting returns a stored Boolean as its JSON text, so both forms map.
+ * The choices the `getCheckOptions` setting offers.
+ * @type {readonly string[]}
+ */
+const CHECK_OPTIONS_MODES = Object.freeze([
+   'never',
+   'situational',
+   'always',
+]);
+
+/**
+ * Resolves the stored `getCheckOptions` value to one of its choices. Client storage can hold a Boolean for this
+ * setting, and a String-typed setting returns a stored Boolean as its JSON text: `true` (or `'true'`) maps to
+ * `always`, and every other value outside the three choices — `false`, `'false'`, `undefined`, or an unknown string —
+ * maps to the default `situational`, so a caller always receives a valid choice.
  * @param {*} value - The stored setting value.
  * @returns {string} The check-options mode: `never`, `situational`, or `always`.
  */
@@ -3041,11 +3566,8 @@ export default function resolveCheckOptionsMode(value) {
    if (value === true || value === 'true') {
       return 'always';
    }
-   if (value === false || value === 'false') {
-      return 'situational';
-   }
 
-   return value;
+   return CHECK_OPTIONS_MODES.includes(value) ? value : 'situational';
 }
 ```
 
@@ -3090,9 +3612,9 @@ export default function shouldGetCheckOptions(hasSituationalModifiers) {
 - [ ] **Step 4: Run the test to verify it passes**
 
 Run: `npx vitest run tests/unit/ShouldGetCheckOptions.test.js`
-Expected: PASS.
+Expected: PASS. (`CheckModifierLocalizationKeys.test.js` passes after Step 5.)
 
-- [ ] **Step 5: Register the choice setting and rewrite legacy values**
+- [ ] **Step 5: Register the choice setting and rewrite stored values outside the choices**
 
 In `src/system/SystemSettings.js` add `import resolveCheckOptionsMode from
 '~/helpers/utility-functions/ResolveCheckOptionsMode.js';` after the existing imports, and replace the
@@ -3114,9 +3636,9 @@ In `src/system/SystemSettings.js` add `import resolveCheckOptionsMode from
       type: String,
    });
 
-   // A value stored while the setting was a Boolean is rewritten to its choice, so the settings window shows a valid
-   // option.
-   /** @type {*} The stored setting value, possibly a legacy Boolean. */
+   // A stored value outside the three choices (client storage can hold a Boolean) is rewritten to the choice it
+   // resolves to, so the settings window shows a valid option.
+   /** @type {*} The stored setting value, possibly a Boolean or an unknown string. */
    const storedCheckOptionsMode = game.settings.get('titan', 'getCheckOptions');
 
    /** @type {string} The choice the stored value resolves to. */
@@ -3131,7 +3653,7 @@ In `lang/en.json`, replace the `SETTINGS.getCheckOptions` object with:
 ```json
       "getCheckOptions": {
          "label": "Show the Check Options Dialog",
-         "hint": "When to show the options dialog before rolling a Check. Hold Shift to invert this; a Check with situational modifiers still shows the dialog.",
+         "hint": "When to show the options dialog before rolling a Check. Hold Shift to invert this; while Shift is held, a Check with situational modifiers still shows the dialog.",
          "never": "Never",
          "situational": "When Situational Modifiers Apply",
          "always": "Always"
@@ -3224,7 +3746,7 @@ import { attachPageErrors, clearChat, closeAllApps, deleteFixtureActor } from '.
 
 /**
  * The `getCheckOptions` choice: under the default `situational` a check opens its dialog only when a situational
- * modifier applies, and a Boolean stored before the setting became a choice is rewritten when the world loads.
+ * modifier applies, and a Boolean held in client storage is rewritten to its choice when the world loads.
  */
 
 /** @type {string} Name of the throwaway player actor seeded for this spec. */
@@ -3260,10 +3782,13 @@ test.afterAll(async () => {
 });
 
 test('the situational setting opens the dialog only for a check with a situational modifier', async () => {
-   // Seed one situational modifier, choose the situational setting, and request a check.
+   // Seed one situational modifier, choose the situational setting, and request a check. The effect is permanent:
+   // a timed effect's `disabled` follows its remaining duration, so disabling it below would not take.
    await page.evaluate(async (actorName) => {
       await game.settings.set('titan', 'getCheckOptions', 'situational');
       await game.actors.getName(actorName)?.delete();
+
+      /** @type {TitanActor} The rebuilt actor. */
       const actor = await Actor.create({
          name: actorName,
          type: 'player',
@@ -3273,6 +3798,9 @@ test('the situational setting opens the dialog only for a check with a situation
             name: 'E2E Underwater',
             type: 'effect',
             system: {
+               duration: {
+                  type: 'permanent',
+               },
                rulesElement: [
                   {
                      checkType: 'any',
@@ -3292,19 +3820,24 @@ test('the situational setting opens the dialog only for a check with a situation
    }, ACTOR_NAME);
 
    // With a situational modifier the dialog opens.
+   /** @type {import('@playwright/test').Locator} The Attribute Check dialog window. */
    const dialog = page.locator(DIALOG_SELECTOR);
    await expect(dialog).toBeVisible();
    await closeAllApps(page);
    await expect(dialog).toHaveCount(0);
 
    // Disable the effect: no situational modifier remains, so the same request rolls straight to chat.
+   /** @type {number} The chat-message count before the second request. */
    const baseline = await page.evaluate(async (actorName) => {
+      /** @type {TitanActor} The seeded actor. */
       const actor = game.actors.getName(actorName);
       await actor.effects.getName('E2E Underwater').update({ disabled: true });
       await titanWait(
          () => actor.system.getSituationalCheckModifiers('attribute', { skill: 'none' }).length === 0,
          { message: 'the situational modifier is gone' },
       );
+
+      /** @type {number} The chat-message count before the request. */
       const size = game.messages.size;
       await actor.system.requestAttributeCheck({ attribute: 'body' });
       return size;
@@ -3321,15 +3854,17 @@ test('the situational setting opens the dialog only for a check with a situation
    await expect(dialog).toHaveCount(0);
 });
 
-test('a stored legacy Boolean is rewritten to its choice when the world loads', async ({ browser }) => {
-   /** @type {import('@playwright/test').Page} A second client whose storage holds the pre-choice Boolean. */
+test('a stored Boolean is rewritten to its choice when the world loads', async ({ browser }) => {
+   /** @type {import('@playwright/test').Page} A second client whose storage holds a Boolean for the setting. */
    const legacyPage = await browser.newPage();
    try {
-      // Seed the pre-choice value before Foundry's scripts run on each navigation of this client.
+      // Seed the Boolean before Foundry's scripts run on each navigation of this client.
       await legacyPage.addInitScript(() => {
          localStorage.setItem('titan.getCheckOptions', 'true');
       });
       await login(legacyPage, GM_USERS[1].name);
+
+      /** @type {{raw: string|null, value: string}} The raw stored text and the setting's resolved value. */
       const stored = await legacyPage.evaluate(() => ({
          raw: localStorage.getItem('titan.getCheckOptions'),
          value: game.settings.get('titan', 'getCheckOptions'),
@@ -3358,7 +3893,8 @@ git branch --show-current
 git status --short
 git add src/helpers/utility-functions/ResolveCheckOptionsMode.js src/helpers/utility-functions/ShouldGetCheckOptions.js \
    src/system/SystemSettings.js src/document/types/actor/types/character/CharacterDataModel.js lang/en.json \
-   tests/unit/ShouldGetCheckOptions.test.js tests/e2e/check-options-setting.spec.js tests/e2e/attack-tags.spec.js \
+   tests/unit/ShouldGetCheckOptions.test.js tests/unit/CheckModifierLocalizationKeys.test.js \
+   tests/e2e/check-options-setting.spec.js tests/e2e/attack-tags.spec.js \
    tests/e2e/checkDialog.js tests/e2e/checks-dialog.spec.js tests/e2e/embedded-context-check-parity.spec.js \
    tests/e2e/embedded-context-effects.spec.js tests/e2e/embedded-context-items.spec.js \
    tests/e2e/interaction-dialogs.spec.js tests/e2e/item-sheet-roll.spec.js tests/e2e/localization.spec.js \
@@ -3368,8 +3904,8 @@ feat(settings): the check-options dialog setting is never, situational, or alway
 
 The default opens the dialog only when a situational modifier applies; the
 modifier key inverts the choice but hedges toward the dialog for situational
-checks; a legacy Boolean reads true as always and false as situational and is
-rewritten at init.
+checks; a stored true reads as always, any other value outside the choices as
+situational, and such a value is rewritten at init.
 
 Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
 Claude-Session: https://claude.ai/code/session_01SPVZ3AXCPn5Bo41aemiJZc
@@ -3391,18 +3927,23 @@ EOF
   `src/check/types/casting-check/dialog/CastingCheckDialog.js` and `CastingCheckDialogShell.svelte`,
   `src/check/types/item-check/dialog/ItemCheckDialog.js` and `ItemCheckDialogShell.svelte`
 - Modify: `lang/en.json`
+- Modify test: `tests/unit/CheckModifierLocalizationKeys.test.js`
 - Create tests: `tests/unit/check/group-situational-modifiers.test.js`, `tests/e2e/check-dialog-advantage.spec.js`
 
 **Interfaces:**
 - Consumes: `ADVANTAGE_LEVEL_OPTIONS`, `clampAdvantage`, `getAdvantageLabel` (Task 1); `getSituationalCheckModifiers`
-  and `SituationalCheckModifier` (Task 3); the e2e helpers `openCheckDialog`, `setSelectField`, `setCheckbox`,
-  `readSummary`, `clickRoll`, `readNewestCheckFlags` (`tests/e2e/checkDialog.js`).
+  and `SituationalCheckModifier` (Task 3); `ReactiveDocument` (`src/document/reactive/ReactiveDocument.svelte.js`);
+  the e2e helpers `openCheckDialog`, `setSelectField`, `setCheckbox`, `readSummary`, `clickRoll`,
+  `readNewestCheckFlags` (`tests/e2e/checkDialog.js`).
 - Produces: `groupSituationalModifiers(modifiers): SituationGroup[]` and
   `describeSituationalModifier(modifierType, value): string`. `CheckDialogShell` takes a `checkType` prop and sets
-  contexts `'checkActor'` and `'checkType'`. Test ids: `check-field-advantage`, `check-field-automaticFailure`,
-  `check-summary-difficulty`, `check-field-situations`, `situation-row-<key>`, `situation-toggle-<key>`.
+  contexts `'checkActor'` (a `ReactiveDocument` bridge over the rolling Actor, `undefined` without one) and
+  `'checkType'`. The situational list (`CheckDialogBase`) and every shell's parameter recompute read the Actor through
+  that bridge, so the dialog follows the Actor's own updates and its item and effect changes while open. Test ids:
+  `check-field-advantage`, `check-field-automaticFailure`, `check-summary-difficulty` (labeled "Effective
+  Difficulty", key `effectiveDifficulty`), `check-field-situations`, `situation-row-<key>`, `situation-toggle-<key>`.
 
-- [ ] **Step 1: Write the failing unit test**
+- [ ] **Step 1: Write the failing unit tests**
 
 Create `tests/unit/check/group-situational-modifiers.test.js`:
 
@@ -3485,10 +4026,28 @@ describe('groupSituationalModifiers', () => {
 });
 ```
 
-- [ ] **Step 2: Run the test to verify it fails**
+In `tests/unit/CheckModifierLocalizationKeys.test.js`, replace the `LOCAL_KEYS` array with:
 
-Run: `npx vitest run tests/unit/check/group-situational-modifiers.test.js`
-Expected: FAIL — cannot resolve `GroupSituationalModifiers.js`.
+```js
+const LOCAL_KEYS = [
+   'advantage.text',
+   'automaticFailure.text',
+   'check.advantage.desc.text',
+   'check.automaticFailure.desc.text',
+   'check.effectiveDifficulty.desc.text',
+   'disadvantage.text',
+   'effectiveDifficulty.text',
+   'greaterAdvantage.text',
+   'greaterDisadvantage.text',
+   'noAdvantage.text',
+   'situationalModifiers.text',
+];
+```
+
+- [ ] **Step 2: Run the tests to verify they fail**
+
+Run: `npx vitest run tests/unit/check/group-situational-modifiers.test.js tests/unit/CheckModifierLocalizationKeys.test.js`
+Expected: FAIL — cannot resolve `GroupSituationalModifiers.js`; `LOCAL` lacks the nine dialog keys.
 
 - [ ] **Step 3: Implement the grouping helper**
 
@@ -3562,7 +4121,7 @@ export default function groupSituationalModifiers(modifiers) {
 - [ ] **Step 4: Run the test to verify it passes**
 
 Run: `npx vitest run tests/unit/check/group-situational-modifiers.test.js`
-Expected: PASS.
+Expected: PASS. (`CheckModifierLocalizationKeys.test.js` passes after Step 9.)
 
 - [ ] **Step 5: Create the dialog rows**
 
@@ -3633,7 +4192,7 @@ Create `src/check/dialog/CheckDialogDifficultySummary.svelte`:
 </script>
 
 <CheckDialogSummary
-   label={'difficulty'}
+   label={'effectiveDifficulty'}
    testId={'check-summary-difficulty'}
    tooltip={'check.effectiveDifficulty.desc'}
    value={$checkParameters.difficulty}
@@ -3742,6 +4301,7 @@ Replace `src/check/dialog/CheckDialogShell.svelte`'s script with:
 ```svelte
 <script>
    import { setContext } from 'svelte';
+   import ReactiveDocument from '~/document/reactive/ReactiveDocument.svelte.js';
 
    /**
     * @typedef {object} CheckDialogShellProps
@@ -3768,8 +4328,12 @@ Replace `src/check/dialog/CheckDialogShell.svelte`'s script with:
    setContext('checkOptions', checkOptions);
    // svelte-ignore state_referenced_locally
    setContext('checkParameters', checkParameters);
+
+   // The Actor's reactive bridge: a reader of `.data` re-runs when the Actor, or one of its items or effects, changes,
+   // so the situational list and the parameters follow the Actor while the dialog is open. Its hooks tear down when
+   // the dialog unmounts.
    // svelte-ignore state_referenced_locally
-   setContext('checkActor', actor);
+   setContext('checkActor', actor ? new ReactiveDocument(actor) : undefined);
    // svelte-ignore state_referenced_locally
    setContext('checkType', checkType);
 </script>
@@ -3787,7 +4351,7 @@ In the script, add `import { getContext } from 'svelte';` and
 `const application = getApplication();` add:
 
 ```js
-   /** @type {TitanActor|undefined} The Actor that will roll the check. */
+   /** @type {ReactiveDocument|undefined} The reactive bridge of the Actor that will roll the check. */
    const checkActor = getContext('checkActor');
 
    /** @type {string|undefined} The check type, which selects the situational modifiers offered. */
@@ -3796,9 +4360,12 @@ In the script, add `import { getContext } from 'svelte';` and
    /** @type {import('svelte/store').Writable} Reference to the Check Options store. */
    const checkOptions = getContext('checkOptions');
 
-   /** @type {SituationalCheckModifier[]} The situational modifiers that apply to the check's current Skill. */
+   /**
+    * @type {SituationalCheckModifier[]} The situational modifiers that apply to the check's current Skill. Read
+    * through the Actor's bridge, so the list follows the Actor's item and effect changes while the dialog is open.
+    */
    const situationalModifiers = $derived(
-      checkActor?.system.getSituationalCheckModifiers(checkType, { skill: $checkOptions.skill }) ?? [],
+      checkActor?.data.system.getSituationalCheckModifiers(checkType, { skill: $checkOptions.skill }) ?? [],
    );
 ```
 
@@ -3813,7 +4380,7 @@ In the markup, between the `{#each rows as Row}…{/each}` block and `<!--Button
    {/if}
 ```
 
-- [ ] **Step 8: Add the rows to the five shells**
+- [ ] **Step 8: Add the rows to the five shells and recompute their parameters when the Actor changes**
 
 In each shell import the three new rows:
 
@@ -3828,6 +4395,35 @@ order) immediately before `CheckDialogTotalDiceSummary` in the row list — `row
 `ResistanceCheckDialogShell`, `ItemCheckDialogShell`; the `$state([...])` `rows` in `AttackCheckDialogShell`;
 `baseRows` in `CastingCheckDialogShell` (its damage/healing splice index 4 is unchanged, still after Complexity).
 
+Then make each shell's parameter recompute follow the Actor. In each of the five shells, replace the block
+
+```js
+   // Update the parameters whenever the check options change.
+   $effect(() => {
+      if (actor?.system.validate<Type>CheckOptions($checkOptions)) {
+         $checkParameters = actor.system.get<Type>CheckParameters($checkOptions);
+      }
+```
+
+with the block below, where `<Type>` is `Attribute`, `Resistance`, `Attack`, `Casting`, or `Item` to match the shell
+(the `else { onCheckInvalid(); }` branch and the effect's closing `});` stay as they are):
+
+```js
+   /** @type {ReactiveDocument|undefined} The reactive bridge of the Actor that will roll the check. */
+   const checkActor = getContext('checkActor');
+
+   // Update the parameters whenever the check options or the Actor (its items and effects included) change; a
+   // change that invalidates the check closes the dialog.
+   $effect(() => {
+      /** @type {TitanActor|undefined} The live Actor, read through its bridge so this effect tracks it. */
+      const liveActor = checkActor?.data;
+      if (liveActor?.system.validate<Type>CheckOptions($checkOptions)) {
+         $checkParameters = liveActor.system.get<Type>CheckParameters($checkOptions);
+      }
+```
+
+Each shell already imports `getContext` from `svelte`. Its `actor` prop stays: `onRoll` and `onCheckInvalid` read it.
+
 - [ ] **Step 9: Localize the dialog labels**
 
 In `lang/en.json` → `LOCAL`, insert alphabetically:
@@ -3837,6 +4433,7 @@ In `lang/en.json` → `LOCAL`, insert alphabetically:
       "check.automaticFailure.desc.text": "The Check fails automatically: its dice are rolled, but it achieves no Successes.",
       "check.effectiveDifficulty.desc.text": "The Difficulty of the Check after Advantage and Disadvantage.",
       "disadvantage.text": "Disadvantage",
+      "effectiveDifficulty.text": "Effective Difficulty",
       "greaterAdvantage.text": "Greater Advantage",
       "greaterDisadvantage.text": "Greater Disadvantage",
       "noAdvantage.text": "None",
@@ -3909,6 +4506,8 @@ async function openSituationalDialog() {
    await page.evaluate(async (actorName) => {
       await game.settings.set('titan', 'getCheckOptions', 'situational');
       await game.actors.getName(actorName)?.delete();
+
+      /** @type {TitanActor} The rebuilt actor. */
       const actor = await Actor.create({
          name: actorName,
          type: 'player',
@@ -3945,6 +4544,8 @@ async function openSituationalDialog() {
 test('every check dialog offers Advantage, Automatic Failure, and the effective Difficulty', async () => {
    await page.evaluate(async ({ actorData, itemData }) => {
       await game.actors.getName('E2E Roller')?.delete();
+
+      /** @type {TitanActor} The rebuilt E2E Roller. */
       const actor = await Actor.create(actorData);
       await actor.createEmbeddedDocuments('Item', itemData);
    }, {
@@ -3959,6 +4560,7 @@ test('every check dialog offers Advantage, Automatic Failure, and the effective 
       'casting',
       'item',
    ]) {
+      /** @type {import('@playwright/test').Locator} The open dialog of this check type. */
       const dialog = await openCheckDialog(page, type);
       await expect(dialog.getByTestId('check-field-advantage')).toBeVisible();
       await expect(dialog.getByTestId('check-field-automaticFailure')).toBeVisible();
@@ -3968,13 +4570,19 @@ test('every check dialog offers Advantage, Automatic Failure, and the effective 
 });
 
 test('the Advantage select and a ticked situation change the displayed and rolled Difficulty', async () => {
+   /** @type {import('@playwright/test').Locator} The open Attribute Check dialog. */
    const dialog = await openSituationalDialog();
+
+   /** @type {import('@playwright/test').Locator} The effective-Difficulty summary. */
    const difficulty = dialog.getByTestId('check-summary-difficulty');
    await expect(difficulty).toHaveText('4');
 
    // The situation row lists its label, what it does, and its source; its check icon tracks the tick.
+   /** @type {import('@playwright/test').Locator} The Underwater situation row. */
    const row = dialog.locator('[data-testid^="situation-row-"]').filter({ hasText: 'Underwater' });
    await expect(row).toContainText('E2E Deep Water');
+
+   /** @type {import('@playwright/test').Locator} The row's checkbox. */
    const toggle = row.locator('[data-testid^="situation-toggle-"]');
    await toggle.click();
    await expect(row.locator('i.fa-check')).toHaveCount(1);
@@ -3991,10 +4599,14 @@ test('the Advantage select and a ticked situation change the displayed and rolle
    expect(await readSummary(dialog, 'difficulty')).toBe(3);
 
    // The row is a flex row whose details use the small font token.
+   /** @type {{detailsFontSize: string, display: string, flexDirection: string, smallFontSize: string}} Row styles. */
    const styles = await row.evaluate((element) => {
+      /** @type {HTMLSpanElement} A probe resolving the small font token to computed px form. */
       const probe = document.createElement('span');
       probe.style.fontSize = 'var(--titan-font-size-small)';
       element.appendChild(probe);
+
+      /** @type {string} The resolved small font size. */
       const smallFontSize = getComputedStyle(probe).fontSize;
       probe.remove();
       return {
@@ -4008,7 +4620,10 @@ test('the Advantage select and a ticked situation change the displayed and rolle
    expect(styles.flexDirection).toBe('row');
    expect(styles.detailsFontSize).toBe(styles.smallFontSize);
 
+   /** @type {number} The chat-message count before the roll. */
    const baseline = await clickRoll(dialog, page);
+
+   /** @type {{id: string, type: string, parameters: object, results: object}} The rolled check's message. */
    const flags = await readNewestCheckFlags(page, baseline);
    expect(flags.parameters).toMatchObject({
       advantage: 1,
@@ -4024,21 +4639,72 @@ test('the Advantage select and a ticked situation change the displayed and rolle
 });
 
 test('the Automatic Failure checkbox fails the rolled check', async () => {
+   /** @type {import('@playwright/test').Locator} The open Attribute Check dialog. */
    const dialog = await openSituationalDialog();
    await setCheckbox(dialog, 'automaticFailure', true);
    await forceDice(page, [6]);
+
+   /** @type {number} The chat-message count before the roll. */
    const baseline = await clickRoll(dialog, page);
+
+   /** @type {{id: string, type: string, parameters: object, results: object}} The rolled check's message. */
    const flags = await readNewestCheckFlags(page, baseline);
    expect(flags.parameters.automaticFailure).toBe(true);
    expect(flags.results.successes).toBe(0);
+});
+
+test('the open dialog follows the Actor\'s effects', async () => {
+   /** @type {import('@playwright/test').Locator} The open Attribute Check dialog. */
+   const dialog = await openSituationalDialog();
+
+   /** @type {import('@playwright/test').Locator} The effective-Difficulty summary. */
+   const difficulty = dialog.getByTestId('check-summary-difficulty');
+
+   /** @type {import('@playwright/test').Locator} The Underwater situation row. */
+   const row = dialog.locator('[data-testid^="situation-row-"]').filter({ hasText: 'Underwater' });
+   await row.locator('[data-testid^="situation-toggle-"]').click();
+   await expect(difficulty).toHaveText('5');
+
+   // Deleting the effect behind the ticked situation removes its row and its Disadvantage from the open dialog.
+   await page.evaluate(async (actorName) => {
+      await game.actors.getName(actorName).effects.getName('E2E Deep Water').delete();
+   }, ACTOR_NAME);
+   await expect(row).toHaveCount(0);
+   await expect(difficulty).toHaveText('4');
+
+   // A new situational effect appears in the same open dialog.
+   await page.evaluate(async (actorName) => {
+      await game.actors.getName(actorName).createEmbeddedDocuments('ActiveEffect', [
+         {
+            name: 'E2E Strong Current',
+            type: 'effect',
+            system: {
+               rulesElement: [
+                  {
+                     checkType: 'any',
+                     key: 'Strong Current',
+                     modifierType: 'advantage',
+                     operation: 'conditionalCheckModifier',
+                     selector: 'situation',
+                     skill: '',
+                     uuid: 'e2e-dialog-strong-current',
+                     value: -1,
+                  },
+               ],
+            },
+         },
+      ]);
+   }, ACTOR_NAME);
+   await expect(dialog.locator('[data-testid^="situation-row-"]').filter({ hasText: 'Strong Current' }))
+      .toContainText('E2E Strong Current');
 });
 ```
 
 - [ ] **Step 11: Lint, unit, build, e2e**
 
 Run: `npm run eslint`; `npm run stylelint`; `npm test`; `npm run build`;
-`npm run test:e2e -- tests/e2e/check-dialog-advantage.spec.js tests/e2e/checks-dialog.spec.js tests/e2e/interaction-dialogs.spec.js tests/e2e/localization.spec.js tests/e2e/attack-tags.spec.js`
-Expected: all pass.
+`npm run test:e2e -- tests/e2e/check-dialog-advantage.spec.js tests/e2e/checks-dialog.spec.js tests/e2e/interaction-dialogs.spec.js tests/e2e/localization.spec.js tests/e2e/attack-tags.spec.js tests/e2e/check-options-setting.spec.js`
+Expected: all pass (`CheckModifierLocalizationKeys.test.js` included).
 
 - [ ] **Step 12: Commit**
 
@@ -4058,13 +4724,14 @@ git add src/check/dialog/CheckDialogAdvantageField.svelte src/check/dialog/Check
    src/check/types/casting-check/dialog/CastingCheckDialog.js \
    src/check/types/casting-check/dialog/CastingCheckDialogShell.svelte \
    src/check/types/item-check/dialog/ItemCheckDialog.js src/check/types/item-check/dialog/ItemCheckDialogShell.svelte \
-   lang/en.json tests/unit/check/group-situational-modifiers.test.js tests/e2e/check-dialog-advantage.spec.js
+   lang/en.json tests/unit/check/group-situational-modifiers.test.js tests/unit/CheckModifierLocalizationKeys.test.js \
+   tests/e2e/check-dialog-advantage.spec.js
 git commit -F - <<'EOF'
 feat(check-dialog): Advantage, Automatic Failure, Difficulty, and situations in dialogs
 
 Every check dialog offers an Advantage level select, an Automatic Failure
-checkbox, and the effective Difficulty, and lists the check's situational
-modifiers as unticked checkboxes.
+checkbox, and the effective Difficulty, lists the check's situational
+modifiers as unticked checkboxes, and follows the Actor's changes while open.
 
 Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
 Claude-Session: https://claude.ai/code/session_01SPVZ3AXCPn5Bo41aemiJZc
@@ -4098,16 +4765,23 @@ test.describe('chat card tags', () => {
             value: -1,
          }),
       ]);
+      /** @type {{id: string, parameters: object, results: object}} The rolled check's message. */
       const message = await rollAttributeCheck(page, { attribute: 'body' });
+
+      /** @type {import('@playwright/test').Locator} The rolled check's card. */
       const card = page.locator(`#chat .message[data-message-id="${message.id}"]`);
       await expect(card.locator('.check-chat-message')).toBeAttached();
       await expect(card.getByTestId('check-chat-dc')).toHaveText('DC 5:0');
 
+      /** @type {import('@playwright/test').Locator} The Advantage tag. */
       const tag = card.getByTestId('check-chat-advantage');
+
+      /** @type {string} The localized Disadvantage label. */
       const label = await page.evaluate(() => game.i18n.localize('LOCAL.disadvantage.text'));
       await expect(tag).toHaveText(label);
 
       // The tag's computed colors are the resolved tag tokens.
+      /** @type {{background: string, color: string, tagBackground: string, tagFont: string}} Computed colors. */
       const colors = await tag.evaluate((element) => {
          /**
           * Resolves a color token through a throwaway child so the value normalizes to computed rgb() form.
@@ -4115,13 +4789,18 @@ test.describe('chat card tags', () => {
           * @returns {string} The computed color.
           */
          const resolve = (token) => {
+            /** @type {HTMLSpanElement} The probe carrying the token. */
             const probe = document.createElement('span');
             probe.style.color = `var(${token})`;
             element.appendChild(probe);
+
+            /** @type {string} The resolved color. */
             const value = getComputedStyle(probe).color;
             probe.remove();
             return value;
          };
+
+         /** @type {CSSStyleDeclaration} The tag's computed style. */
          const computed = getComputedStyle(element);
          return {
             background: computed.backgroundColor,
@@ -4135,12 +4814,37 @@ test.describe('chat card tags', () => {
 
       // Clearing the stored Advantage removes the tag from the same card.
       await page.evaluate(async (id) => {
+         /** @type {ChatMessage} The rolled check's message. */
          const chatMessage = game.messages.get(id);
+
+         /** @type {object} A detached copy of its system data. */
          const system = chatMessage.system.toObject();
          system.parameters.advantage = 0;
          await chatMessage.update({ system });
       }, message.id);
       await expect(tag).toHaveCount(0);
+   });
+
+   test('opposing Advantage sources show no tag beside the unchanged DC', async () => {
+      await seedEffect(page, [
+         checkModifierElement({
+            modifierType: 'advantage',
+            value: 1,
+         }),
+         checkModifierElement({
+            modifierType: 'advantage',
+            value: -1,
+         }),
+      ]);
+      /** @type {{id: string, parameters: object, results: object}} The rolled check's message. */
+      const message = await rollAttributeCheck(page, { attribute: 'body' });
+
+      /** @type {import('@playwright/test').Locator} The rolled check's card. */
+      const card = page.locator(`#chat .message[data-message-id="${message.id}"]`);
+
+      // The DC renders first at the unchanged Difficulty; the tag beside it is absent.
+      await expect(card.getByTestId('check-chat-dc')).toHaveText('DC 4:0');
+      await expect(card.getByTestId('check-chat-advantage')).toHaveCount(0);
    });
 
    test('an automatically failed card shows the Automatic Failure tag and no successes', async () => {
@@ -4150,11 +4854,16 @@ test.describe('chat card tags', () => {
          }),
       ]);
       await forceDice(page, [6]);
+      /** @type {{id: string, parameters: object, results: object}} The rolled check's message. */
       const message = await rollAttributeCheck(page, {
          attribute: 'body',
          complexity: 1,
       });
+
+      /** @type {import('@playwright/test').Locator} The rolled check's card. */
       const card = page.locator(`#chat .message[data-message-id="${message.id}"]`);
+
+      /** @type {{automaticFailure: string, successes: string}} The localized labels. */
       const labels = await page.evaluate(() => ({
          automaticFailure: game.i18n.localize('LOCAL.automaticFailure.text'),
          successes: game.i18n.localize('LOCAL.successes.text'),
@@ -4171,11 +4880,15 @@ test.describe('chat card tags', () => {
             value: -1,
          }),
       ]);
+      // A caller names the situation directly (resolution #11); the dialog is not involved.
+      /** @type {{id: string, parameters: object, results: object}} The rolled check's message. */
       const message = await rollAttributeCheck(page, {
          attribute: 'body',
          situations: ['underwater'],
       });
       expect(message.parameters.diceMod).toBe(-1);
+
+      /** @type {import('@playwright/test').Locator} The rolled check's card. */
       const card = page.locator(`#chat .message[data-message-id="${message.id}"]`);
       await expect(card.getByTestId('check-chat-situation')).toHaveText(['Underwater']);
    });
@@ -4185,7 +4898,7 @@ test.describe('chat card tags', () => {
 - [ ] **Step 2: Build and run to verify they fail**
 
 Run: `npm run build` then `npm run test:e2e -- tests/e2e/check-advantage.spec.js`
-Expected: the three new tests FAIL (no `check-chat-dc`/tag test ids); earlier tests pass.
+Expected: the four new tests FAIL (no `check-chat-dc`/tag test ids); earlier tests pass.
 
 - [ ] **Step 3: Render the tags in `CheckChatResults.svelte`**
 
@@ -4296,14 +5009,19 @@ EOF
 - Modify: `src/document/types/item/sheet/rules-element/ItemSheetConditionalCheckModifierSettings.svelte`
 - Modify: `src/document/svelte-components/select/DocumentSelect.svelte`
 - Modify: `lang/en.json`
+- Modify test: `tests/unit/CheckModifierLocalizationKeys.test.js`
 - Create test: `tests/e2e/rules-element-check-modifier-editor.spec.js`
 
 **Interfaces:**
 - Consumes: `CHECK_TYPE_MODIFIER_TYPES`, `CONDITIONAL_CHECK_MODIFIER_TYPES` (Task 3);
-  `ADVANTAGE_ELEMENT_LEVEL_OPTIONS` (Task 1); `SKILLS`.
+  `ADVANTAGE_ELEMENT_LEVEL_OPTIONS`, `clampAdvantage` (Task 1); `SKILLS`.
 - Produces: `DocumentSelect` accepts `testId` (forwarded to the `Select` combobox trigger). Editor test ids
   `ccm-modifier-type`, `ccm-check-type`, `ccm-selector`, `ccm-situation-skill`, `ccm-advantage-level`, `ccm-value`.
-  Spec C extends `selectorOptions.attack` with `weapon` in this file.
+  The modifier-type options are filtered by the check type and the check-type options by the modifier type
+  (resolution #4). The level select binds through `clampAdvantage(Number(value)) || 1`: a stored value outside the
+  four levels displays as its normalized level (0 or a non-number as Advantage, ±3 as Greater) and is written only
+  when the user picks a level, so `Select`'s out-of-set rewrite never fires on it. The Skill narrowing shows only for
+  a non-Resistance situation (resolution #13). Spec C extends `selectorOptions.attack` with `weapon` in this file.
 
 - [ ] **Step 1: Write the failing e2e spec**
 
@@ -4316,8 +5034,9 @@ import { attachPageErrors, closeAllApps } from './world.js';
 import { selectTitanOption, titanSelectOptionValues } from './select.js';
 
 /**
- * The conditional check modifier editor: the Advantage level select writes the signed level into `value`, Automatic
- * Failure hides the value and stores 1, Resistance checks offer their selectors, and a situation offers a Skill
+ * The conditional check modifier editor: the Advantage level select writes the signed level into `value` and never
+ * rewrites a stored value it cannot show, Automatic Failure hides the value and stores 1, modifier types and check
+ * types filter each other, Resistance checks offer their selectors, and a non-Resistance situation offers a Skill
  * narrowing.
  */
 
@@ -4339,6 +5058,8 @@ test.beforeEach(async () => {
    // Rebuild the item with one Dice +3 modifier and open its Rules Elements tab.
    await page.evaluate(async (name) => {
       await game.items.getName(name)?.delete();
+
+      /** @type {TitanItem} The rebuilt ability. */
       const item = await Item.create({
          name,
          type: 'ability',
@@ -4357,12 +5078,15 @@ test.beforeEach(async () => {
             ],
          },
       });
+      /** @type {TitanItemSheet} The rendered item sheet. */
       const app = await item.sheet.render(true);
       await titanWait(
          () => !!app?.element?.querySelector('.window-content')?.children.length,
          { message: 'sheet mounted' },
       );
    }, ITEM_NAME);
+
+   /** @type {string} The localized Rules Elements tab label. */
    const label = await page.evaluate(() => game.i18n.localize('LOCAL.rulesElements.text'));
    await openSheetTab(page, label);
    await expect(sheet().getByTestId('ccm-modifier-type')).toBeVisible();
@@ -4393,6 +5117,7 @@ function sheet() {
  */
 function readElement() {
    return page.evaluate((name) => {
+      /** @type {object} The edited rules element. */
       const element = game.items.getName(name).system.rulesElement[0];
       return {
          checkType: element.checkType,
@@ -4439,7 +5164,42 @@ test('Automatic Failure hides the value and stores 1', async () => {
    await expect(sheet().getByTestId('ccm-advantage-level')).toHaveCount(0);
 });
 
-test('Resistance checks offer their selectors and drop modifier types they do not read', async () => {
+test('a stored Advantage value outside the four levels displays normalized and is not rewritten', async () => {
+   // Store an Advantage element whose value (3) no level option carries, as hand-authored data can.
+   await page.evaluate(async (name) => {
+      /** @type {TitanItem} The edited ability. */
+      const item = game.items.getName(name);
+      await item.update({
+         system: {
+            rulesElement: [
+               {
+                  ...item.system.rulesElement[0],
+                  modifierType: 'advantage',
+                  value: 3,
+               },
+            ],
+         },
+      });
+   }, ITEM_NAME);
+
+   /** @type {import('@playwright/test').Locator} The level select's trigger. */
+   const level = sheet().getByTestId('ccm-advantage-level');
+   await expect(level).toHaveAttribute('data-value', '2');
+   expect((await readElement()).value).toBe(3);
+});
+
+test('Resistance checks offer their selectors and only the modifier types they read', async () => {
+   // The Dice element's check types include Resistance; its modifier types are every type.
+   expect(await titanSelectOptionValues(page, sheet().getByTestId('ccm-modifier-type'))).toEqual([
+      'damage',
+      'dice',
+      'expertise',
+      'training',
+      'healing',
+      'advantage',
+      'automaticFailure',
+   ]);
+
    await selectTitanOption(page, sheet().getByTestId('ccm-check-type'), 'resistance');
    await expect.poll(async () => (await readElement()).checkType).toBe('resistance');
    expect(await titanSelectOptionValues(page, sheet().getByTestId('ccm-selector'))).toEqual([
@@ -4448,19 +5208,30 @@ test('Resistance checks offer their selectors and drop modifier types they do no
       'situation',
    ]);
 
+   // Resistance Checks read no Damage, Training, or Healing, so the modifier-type select no longer offers them.
+   expect(await titanSelectOptionValues(page, sheet().getByTestId('ccm-modifier-type'))).toEqual([
+      'dice',
+      'expertise',
+      'advantage',
+      'automaticFailure',
+   ]);
+
    await selectTitanOption(page, sheet().getByTestId('ccm-selector'), 'resistance');
    await expect.poll(readElement, { message: 'the Resistance selector defaults its key' }).toMatchObject({
       key: 'reflexes',
       selector: 'resistance',
    });
 
-   // Training is not read by Resistance Checks: switching to it resets the check type and selector.
-   await selectTitanOption(page, sheet().getByTestId('ccm-modifier-type'), 'training');
-   await expect.poll(readElement, { message: 'Training resets the check type' }).toMatchObject({
+   // Back on any check type the Resistance selector resets, and Training is offered again.
+   await selectTitanOption(page, sheet().getByTestId('ccm-check-type'), 'any');
+   await expect.poll(readElement, { message: 'the any check type resets the selector' }).toMatchObject({
       checkType: 'any',
-      modifierType: 'training',
       selector: 'any',
    });
+
+   // A Training element's check types drop Resistance.
+   await selectTitanOption(page, sheet().getByTestId('ccm-modifier-type'), 'training');
+   await expect.poll(async () => (await readElement()).modifierType).toBe('training');
    expect(await titanSelectOptionValues(page, sheet().getByTestId('ccm-check-type'))).toEqual([
       'any',
       'attack',
@@ -4469,8 +5240,10 @@ test('Resistance checks offer their selectors and drop modifier types they do no
    ]);
 });
 
-test('a situation takes a typed label and an optional Skill narrowing', async () => {
+test('a situation takes a typed label and an optional Skill narrowing, except on Resistance checks', async () => {
    await selectTitanOption(page, sheet().getByTestId('ccm-selector'), 'situation');
+
+   /** @type {string} The localized default situation label. */
    const situationLabel = await page.evaluate(() => game.i18n.localize('LOCAL.situation.text'));
    await expect.poll(readElement, { message: 'the situation selector defaults its key and Skill' }).toMatchObject({
       key: situationLabel,
@@ -4478,21 +5251,42 @@ test('a situation takes a typed label and an optional Skill narrowing', async ()
       skill: '',
    });
 
+   /** @type {import('@playwright/test').Locator} The Skill narrowing select. */
    const skillSelect = sheet().getByTestId('ccm-situation-skill');
    await expect(skillSelect).toBeVisible();
    await selectTitanOption(page, skillSelect, 'athletics');
    await expect.poll(async () => (await readElement()).skill).toBe('athletics');
 
-   // Leaving the situation selector hides the Skill narrowing.
+   // A Resistance Check has no Skill: the situation stays, the narrowing hides, and the stored Skill clears.
+   await selectTitanOption(page, sheet().getByTestId('ccm-check-type'), 'resistance');
+   await expect.poll(readElement, { message: 'a Resistance situation clears its Skill' }).toMatchObject({
+      checkType: 'resistance',
+      selector: 'situation',
+      skill: '',
+   });
+   await expect(skillSelect).toHaveCount(0);
+
+   // Back on any check type the narrowing shows again; narrow it, then leave the situation selector.
+   await selectTitanOption(page, sheet().getByTestId('ccm-check-type'), 'any');
+   await expect(skillSelect).toBeVisible();
+   await selectTitanOption(page, skillSelect, 'athletics');
+   await expect.poll(async () => (await readElement()).skill).toBe('athletics');
+
+   // Leaving the situation selector hides the Skill narrowing and clears the stored Skill.
    await selectTitanOption(page, sheet().getByTestId('ccm-selector'), 'any');
    await expect(skillSelect).toHaveCount(0);
+   await expect.poll(async () => (await readElement()).skill).toBe('');
 });
 ```
 
-- [ ] **Step 2: Build and run to verify it fails**
+In `tests/unit/CheckModifierLocalizationKeys.test.js`, add `'situation.text',` to `LOCAL_KEYS` directly after
+`'noAdvantage.text',` (before `'situationalModifiers.text',`).
 
-Run: `npm run build` then `npm run test:e2e -- tests/e2e/rules-element-check-modifier-editor.spec.js`
-Expected: FAIL — no `ccm-*` test ids.
+- [ ] **Step 2: Build and run to verify they fail**
+
+Run: `npx vitest run tests/unit/CheckModifierLocalizationKeys.test.js`, then `npm run build` and
+`npm run test:e2e -- tests/e2e/rules-element-check-modifier-editor.spec.js`
+Expected: FAIL — `LOCAL` lacks `situation.text`; no `ccm-*` test ids.
 
 - [ ] **Step 3: Forward `testId` in `DocumentSelect.svelte`**
 
@@ -4510,7 +5304,7 @@ attributes after `{options}`.
       CHECK_TYPE_MODIFIER_TYPES,
       CONDITIONAL_CHECK_MODIFIER_TYPES,
    } from '~/system/ConditionalCheckModifierTypes.js';
-   import { ADVANTAGE_ELEMENT_LEVEL_OPTIONS } from '~/check/ApplyAdvantage.js';
+   import { ADVANTAGE_ELEMENT_LEVEL_OPTIONS, clampAdvantage } from '~/check/ApplyAdvantage.js';
    import { SKILLS } from '~/system/Skills.js';
    import localize from '~/helpers/utility-functions/Localize.js';
    import DocumentSelect from '~/document/svelte-components/select/DocumentSelect.svelte';
@@ -4533,8 +5327,13 @@ attributes after `{options}`.
    /** @type {object} Reference to the reactive Document store. */
    const document = getContext('document');
 
-   /** @type {readonly string[]} Options for the type of value the modifier applies to. */
-   const modifierTypeOptions = CONDITIONAL_CHECK_MODIFIER_TYPES;
+   /**
+    * @type {string[]} The modifier types this element's check type reads, in CONDITIONAL_CHECK_MODIFIER_TYPES order;
+    * every type for `any`.
+    */
+   const modifierTypeOptions = $derived(CONDITIONAL_CHECK_MODIFIER_TYPES.filter(
+      (modifierType) => isCheckTypeAllowed(document.data.system.rulesElement[idx].checkType, modifierType),
+   ));
 
    /** @type {{label: string, value: string}[]} Every check type a modifier can target. */
    const allCheckTypeOptions = [
@@ -4616,7 +5415,8 @@ attributes after `{options}`.
    ));
 
    /**
-    * Whether a check type reads a modifier type. `any` targets every check, so it allows every type.
+    * Whether a check type reads a modifier type. `any` targets every check, so it allows every type. The modifier-type
+    * and check-type options both filter through this, so the editor cannot build a combination no check reads.
     * @param {string} checkType - The element's check type.
     * @param {string} modifierType - The element's modifier type.
     * @returns {boolean} Whether the combination can apply to a check.
@@ -4626,9 +5426,8 @@ attributes after `{options}`.
    }
 
    /**
-    * Updates the value and the check type when the modifier type changes. Advantage starts at Advantage (1) and
-    * Automatic Failure stores 1; a check type that does not read the new modifier type resets to 'any' and cascades
-    * the change to the selector.
+    * Updates the value when the modifier type changes: Advantage starts at Advantage (1) and Automatic Failure stores
+    * 1. The check type needs no reset, because the modifier-type options offer only types it reads.
     * @returns {void}
     */
    function onModifierTypeChanged() {
@@ -4637,14 +5436,11 @@ attributes after `{options}`.
       if (element.modifierType === 'advantage' || element.modifierType === 'automaticFailure') {
          element.value = 1;
       }
-      if (!isCheckTypeAllowed(element.checkType, element.modifierType)) {
-         element.checkType = 'any';
-         onCheckTypeChange();
-      }
    }
 
    /**
-    * Resets the selector to 'any' when the new check type does not offer it, cascading the change to the key.
+    * Resets the selector to 'any' when the new check type does not offer it, cascading the change to the key and
+    * Skill. A Resistance Check has no Skill, so a Resistance situation clears its Skill narrowing.
     * @returns {void}
     */
    function onCheckTypeChange() {
@@ -4654,15 +5450,20 @@ attributes after `{options}`.
          element.selector = 'any';
          onSelectorChange();
       }
+      if (element.checkType === 'resistance') {
+         element.skill = '';
+      }
    }
 
    /**
-    * Updates the element key to a default value when the selector changes; a situation also clears its Skill narrowing.
+    * Updates the element key to a default value when the selector changes, and clears the Skill narrowing: only a
+    * situation takes one, and a newly chosen situation starts unnarrowed.
     * @returns {void}
     */
    function onSelectorChange() {
       /** @type {object} The edited element. */
       const element = document.data.system.rulesElement[idx];
+      element.skill = '';
       switch (element.selector) {
          case 'attribute': {
             element.key = 'body';
@@ -4687,7 +5488,6 @@ attributes after `{options}`.
          }
          case 'situation': {
             element.key = localize('situation');
-            element.skill = '';
             break;
          }
          case 'skill': {
@@ -4780,8 +5580,9 @@ attributes after `{options}`.
       </div>
    {/if}
 
-   <!--Skill narrowing: a situation may offer itself only on checks using one Skill.-->
-   {#if document.data.system.rulesElement[idx].selector === 'situation'}
+   <!--Skill narrowing: a situation may offer itself only on checks using one Skill; Resistance Checks have none.-->
+   {#if document.data.system.rulesElement[idx].selector === 'situation' &&
+      document.data.system.rulesElement[idx].checkType !== 'resistance'}
       <div class="field select">
          <DocumentSelect
             bind:value={
@@ -4798,9 +5599,16 @@ attributes after `{options}`.
 
    <!--Value: Advantage stores a level, Automatic Failure stores none, every other type stores an integer.-->
    {#if document.data.system.rulesElement[idx].modifierType === 'advantage'}
+      <!--The level shows normalized (0 or a non-number as Advantage, ±3 as Greater), so the select never rewrites a
+         stored value it cannot show; the stored value changes only when the user picks a level.-->
       <div class="field select">
          <DocumentSelect
-            bind:value={document.data.system.rulesElement[idx].value}
+            bind:value={
+               () => clampAdvantage(Number(document.data.system.rulesElement[idx].value)) || 1,
+               (level) => {
+                  document.data.system.rulesElement[idx].value = level;
+               }
+            }
             options={ADVANTAGE_ELEMENT_LEVEL_OPTIONS}
             testId={'ccm-advantage-level'}
          />
@@ -4852,7 +5660,7 @@ git branch --show-current
 git status --short
 git add src/document/types/item/sheet/rules-element/ItemSheetConditionalCheckModifierSettings.svelte \
    src/document/svelte-components/select/DocumentSelect.svelte lang/en.json \
-   tests/e2e/rules-element-check-modifier-editor.spec.js
+   tests/unit/CheckModifierLocalizationKeys.test.js tests/e2e/rules-element-check-modifier-editor.spec.js
 git commit -F - <<'EOF'
 feat(rules-element): edit Advantage levels, Automatic Failure, Resistance checks, and situations
 
@@ -4869,6 +5677,7 @@ EOF
 - Create: `src/document/types/item/types/armor/ArmorTraitCheckModifiers.js`
 - Modify: `src/document/types/actor/types/character/CharacterDataModel.js`
 - Modify: `lang/en.json`
+- Modify test: `tests/unit/CheckModifierLocalizationKeys.test.js`
 - Create tests: `tests/unit/ArmorTraitCheckModifiers.test.js`, `tests/e2e/armor-trait-situations.spec.js`
 
 **Interfaces:**
@@ -4876,7 +5685,7 @@ EOF
   `getEquippedArmor()`, `getSituationalCheckModifiers`, the dialog test ids (Task 6).
 - Produces: `createArmorTraitCheckModifiers(traits: StandardTrait[]): ConditionalCheckModifierElement[]`.
 
-- [ ] **Step 1: Write the failing unit test**
+- [ ] **Step 1: Write the failing unit tests**
 
 Create `tests/unit/ArmorTraitCheckModifiers.test.js`:
 
@@ -4907,6 +5716,7 @@ afterAll(() => {
  * @returns {object} The expected element.
  */
 function expected(trait, modifierType, value, labelKey, skill) {
+   // The stand-in localize() returns the key, so the label is the LOCAL key itself.
    return {
       checkType: 'any',
       key: `LOCAL.${labelKey}.text`,
@@ -4975,10 +5785,19 @@ describe('createArmorTraitCheckModifiers', () => {
 });
 ```
 
-- [ ] **Step 2: Run the test to verify it fails**
+In `tests/unit/CheckModifierLocalizationKeys.test.js`, add these entries to `LOCAL_KEYS` directly after
+`'situation.text',` (before `'situationalModifiers.text',`):
 
-Run: `npx vitest run tests/unit/ArmorTraitCheckModifiers.test.js`
-Expected: FAIL — cannot resolve the module.
+```js
+   'situationJump.text',
+   'situationRemainUndetectedByHearing.text',
+   'situationSwimFlyClimb.text',
+```
+
+- [ ] **Step 2: Run the tests to verify they fail**
+
+Run: `npx vitest run tests/unit/ArmorTraitCheckModifiers.test.js tests/unit/CheckModifierLocalizationKeys.test.js`
+Expected: FAIL — cannot resolve the module; `LOCAL` lacks the three situation labels.
 
 - [ ] **Step 3: Implement the synthetic elements**
 
@@ -5014,8 +5833,9 @@ function createSituationalElement(trait, modifierType, value, labelKey, skill) {
  * (09_26_2026), lines 2765-2775. Situation keys are localized labels, so traits sharing a situation ("Swim, Fly, or
  * Climb") merge into one dialog entry whose value is their sum. Each situation is narrowed to the Skill its checks use,
  * so it is offered (and opens the dialog) only there: Jumping and Climbing are Body (Athletics) checks (lines 2300,
- * 3150), swimming and flying follow them, and remaining undetected is a Stealth check. Heavy's "cannot Jump" is
- * therefore an Automatic Failure offered on Athletics checks.
+ * 3150), and remaining undetected is a Stealth check. The rules name no Skill for swimming or flying: narrowing them to
+ * Athletics alongside climbing is a design choice, not a rules citation, made because the three share one situation.
+ * Heavy's "cannot Jump" is therefore an Automatic Failure offered on Athletics checks.
  * @param {StandardTrait[]} traits - The armor's traits.
  * @returns {ConditionalCheckModifierElement[]} The synthetic elements, in trait order Heavy, Encumbering, Loud.
  */
@@ -5047,7 +5867,7 @@ export default function createArmorTraitCheckModifiers(traits) {
 - [ ] **Step 4: Run the test to verify it passes**
 
 Run: `npx vitest run tests/unit/ArmorTraitCheckModifiers.test.js`
-Expected: PASS.
+Expected: PASS. (`CheckModifierLocalizationKeys.test.js` passes after Step 6.)
 
 - [ ] **Step 5: Gather the synthetic elements in `_applyRulesElements`**
 
@@ -5141,10 +5961,14 @@ async function seedArmoredActor(traits) {
    await page.evaluate(async ({ actorName, armorName, armorTraits }) => {
       await game.settings.set('titan', 'getCheckOptions', 'situational');
       await game.actors.getName(actorName)?.delete();
+
+      /** @type {TitanActor} The rebuilt actor. */
       const actor = await Actor.create({
          name: actorName,
          type: 'player',
       });
+
+      /** @type {TitanItem[]} The created armor, alone in the array. */
       const [armor] = await actor.createEmbeddedDocuments('Item', [
          {
             name: armorName,
@@ -5192,8 +6016,14 @@ function situationRow(dialog, label) {
 
 test('Heavy armor offers Jump and Swim, Fly, or Climb only on Athletics checks', async () => {
    await seedArmoredActor(['heavy']);
+
+   /** @type {import('@playwright/test').Locator} The open Athletics dialog. */
    const dialog = await openAthleticsDialog();
+
+   /** @type {import('@playwright/test').Locator} The Jump situation row. */
    const jump = situationRow(dialog, labels.jump);
+
+   /** @type {import('@playwright/test').Locator} The Swim, Fly, or Climb situation row. */
    const swim = situationRow(dialog, labels.swim);
    await expect(jump).toBeVisible();
    await expect(swim).toBeVisible();
@@ -5209,11 +6039,16 @@ test('Heavy armor offers Jump and Swim, Fly, or Climb only on Athletics checks',
 
 test('ticking Swim, Fly, or Climb applies Greater Disadvantage', async () => {
    await seedArmoredActor(['heavy']);
+
+   /** @type {import('@playwright/test').Locator} The open Athletics dialog. */
    const dialog = await openAthleticsDialog();
    await situationRow(dialog, labels.swim).locator('[data-testid^="situation-toggle-"]').click();
    await expect(dialog.getByTestId('check-summary-difficulty')).toHaveText('6');
 
+   /** @type {number} The chat-message count before the roll. */
    const baseline = await clickRoll(dialog, page);
+
+   /** @type {{id: string, type: string, parameters: object, results: object}} The rolled check's message. */
    const flags = await readNewestCheckFlags(page, baseline);
    expect(flags.parameters).toMatchObject({
       advantage: -2,
@@ -5225,12 +6060,17 @@ test('ticking Swim, Fly, or Climb applies Greater Disadvantage', async () => {
 
 test('a ticked Jump does not apply once the check\'s Skill changes', async () => {
    await seedArmoredActor(['heavy']);
+
+   /** @type {import('@playwright/test').Locator} The open Athletics dialog. */
    const dialog = await openAthleticsDialog();
    await situationRow(dialog, labels.jump).locator('[data-testid^="situation-toggle-"]').click();
    await setSelectField(dialog, 'skill', 'dexterity');
    await expect(situationRow(dialog, labels.jump)).toHaveCount(0);
 
+   /** @type {number} The chat-message count before the roll. */
    const baseline = await clickRoll(dialog, page);
+
+   /** @type {{id: string, type: string, parameters: object, results: object}} The rolled check's message. */
    const flags = await readNewestCheckFlags(page, baseline);
    expect(flags.parameters.automaticFailure).toBe(false);
    expect(flags.parameters.situations).toEqual([]);
@@ -5244,7 +6084,14 @@ test('Heavy and Encumbering merge into one Athletics entry, and Loud offers its 
    ]);
    /** @type {{athletics: object[], stealth: object[]}} The Advantage-type situational modifiers per Skill. */
    const modifiers = await page.evaluate((actorName) => {
+      /** @type {CharacterDataModel} The seeded actor's data model. */
       const system = game.actors.getName(actorName).system;
+
+      /**
+       * Lists an Attribute Check's Advantage-type situational modifiers for one Skill.
+       * @param {string} skill - The check's Skill.
+       * @returns {object[]} The Advantage-type entries.
+       */
       const advantageOnly = (skill) => system.getSituationalCheckModifiers('attribute', { skill })
          .filter((modifier) => modifier.modifierType === 'advantage');
       return {
@@ -5298,7 +6145,8 @@ git branch --show-current
 git status --short
 git add src/document/types/item/types/armor/ArmorTraitCheckModifiers.js \
    src/document/types/actor/types/character/CharacterDataModel.js lang/en.json \
-   tests/unit/ArmorTraitCheckModifiers.test.js tests/e2e/armor-trait-situations.spec.js
+   tests/unit/ArmorTraitCheckModifiers.test.js tests/unit/CheckModifierLocalizationKeys.test.js \
+   tests/e2e/armor-trait-situations.spec.js
 git commit -F - <<'EOF'
 feat(armor): Heavy, Encumbering, and Loud apply their check rules as situations
 
@@ -5313,6 +6161,7 @@ EOF
 
 **Files:**
 - Modify: `docs/TODO.md`, `docs/POST_WORK_FINDINGS.md`
+- Modify: `docs/superpowers/specs/2026-09-27-advantage-disadvantage-design.md` (spec A: as-built interfaces)
 - Modify: `.claude/skills/titan-codebase/references/conventions.md`, `data-flow.md`, `abstractions.md`,
   `architecture.md`
 - Verify: `lang/en.json` (no new edits expected), `docs/CLOSED_BUGS.md` / `docs/OPEN_BUGS.md` per task reports
@@ -5326,10 +6175,10 @@ Delete the whole bullet beginning `- Conditional check modifiers on Resistance c
 `- Heavy armor's remaining rules`. In the bullet beginning `- Conditions rework to the 2026-09-26 rules`, replace
 `Open design questions: how a rules element expresses "-1/4 of base, rounded up", and that the system has no
 Advantage/Disadvantage mechanic at all.` with `Open design question: how a rules element expresses "-1/4 of base,
-rounded up".` In the audit bullet list, replace
-`  - Abjuration of the Arbiter: the dice penalty misses Resistance checks (see the Resistance-check item above).` with
-`  - Abjuration of the Arbiter: the -1 dice default reaches Resistance checks; its description does not yet say the GM
-    sets the value per target.`
+rounded up".` In the "Compendium audit findings awaiting a rules decision" list, delete the line
+`  - Abjuration of the Arbiter: the dice penalty misses Resistance checks (see the Resistance-check item above).`: its
+Resistance half is fixed by Task 4, it awaits no rules decision, and its remaining description note (the GM sets the
+value per target) is owned by spec C (`docs/superpowers/specs/2026-09-27-compendium-rulings-design.md`, rulings row 4).
 
 - [ ] **Step 2: Record the armor-situation narrowing in `docs/POST_WORK_FINDINGS.md`**
 
@@ -5345,7 +6194,56 @@ Stealth. Unnarrowed, they would make every check a situational check, so under t
 narrowing lives in `createArmorTraitCheckModifiers` (`src/document/types/item/types/armor/ArmorTraitCheckModifiers.js`).
 ```
 
-- [ ] **Step 3: Update `conventions.md`**
+- [ ] **Step 3: Amend spec A to the as-built interfaces**
+
+In `docs/superpowers/specs/2026-09-27-advantage-disadvantage-design.md` (resolutions #2, #3, #10, #11):
+
+(a) In §2, directly after the bullet that ends `the stored option keeps the raw sum.`, insert:
+
+```markdown
+- Every check dialog shows the effective (post-Advantage) Difficulty as a summary labeled "Effective Difficulty"
+  (`check-summary-difficulty`), so a change to the Advantage select or a ticked situation is visible before rolling;
+  Attack dialogs show no other Difficulty.
+```
+
+(b) In §4, replace the bullet
+
+```markdown
+- Situational elements never apply automatically. The actor exposes
+  `getSituationalCheckModifiers(checkType, { skill })` → a list of `{ key, label, modifierType, value, source }`
+  entries that apply to the check type (its own type plus `any`) and, when narrowed, to the check's skill, where
+  `source` is the owning item/effect name.
+```
+
+with
+
+```markdown
+- Situational elements never apply automatically. The actor exposes
+  `getSituationalCheckModifiers(checkType, { skill })` → a list of `{ key, label, modifierType, value, sources }`
+  entries that apply to the check type (its own type plus `any`) and, when narrowed, to the check's skill. Entries
+  sharing a key and a modifier type sum across owners (Heavy and Encumbering on one armor, or armor and an effect), so
+  `sources` is a `string[]` of the owning items' and effects' names.
+```
+
+(c) In §4, replace
+
+```markdown
+- Situational modifiers apply only through the dialog; a check rolled without the dialog applies none.
+- The chat card lists the ticked situations by label.
+```
+
+with
+
+```markdown
+- Situational modifiers never apply automatically: a check applies only the situations its `options.situations`
+  names. The check dialog is the only UI that ticks them; a caller (a macro or module) that passes `situations`
+  directly has them applied like any other option it passes.
+- Parameters record the applied situations as `situations: { key, label }[]`: `buildSchemaFromShape` maps an empty
+  array to an `ArrayField(ObjectField)`, which rejects strings, and the label lets the card render without an actor
+  lookup. The chat card lists them by label.
+```
+
+- [ ] **Step 4: Update `conventions.md`**
 
 Replace the paragraph beginning `**Conditional check modifiers** — \`CONDITIONAL_CHECK_MODIFIER_TYPES\`` (through
 `Resistance checks read\nno conditional modifiers.`) with:
@@ -5370,7 +6268,8 @@ apply to them, and Training never does.
 into `rulesElementsCache.situationalCheckModifier` (`{ checkType, key, label, modifierType, skill, source, value }`)
 instead of the summed cache. `getSituationalCheckModifiers(checkType, { skill })` returns the entries of the check type
 plus `any`, of modifier types the check reads, narrowed by `skill` (`''` = any Skill), with one entry per key +
-modifier type summed across owners (`sources`). Check options carry `situations` (ticked camel-case keys); every
+modifier type summed across owners (`sources`). Check options carry `situations` (camel-case keys the dialog ticks or
+a caller names; nothing applies automatically); every
 `get<Type>CheckParameters` adds the ticked entries on top of the options through `_applySituationalModifiers` (options
 keep only always-on values, so recomputing never double-counts; a tick that no longer applies is ignored) and records
 `{ key, label }` in `parameters.situations`. The equipped armor's Heavy/Encumbering/Loud traits add synthetic
@@ -5378,14 +6277,14 @@ situation elements (`createArmorTraitCheckModifiers`, `src/document/types/item/t
 Heavy's Jump Automatic Failure is narrowed to Athletics).
 ```
 
-In the `**\`data-testid\` convention**` paragraph append: `The Advantage-era dialog rows use
-\`check-field-advantage\`, \`check-field-automaticFailure\`, \`check-summary-difficulty\` (the post-Advantage
+In the `**\`data-testid\` convention**` paragraph append: `The Advantage, Automatic Failure, and situation dialog rows
+use \`check-field-advantage\`, \`check-field-automaticFailure\`, \`check-summary-difficulty\` (the post-Advantage
 Difficulty), \`check-field-situations\`, and per situation \`situation-row-<key>\` / \`situation-toggle-<key>\`; check
 cards use \`check-chat-dc\`, \`check-chat-advantage\`, \`check-chat-automatic-failure\`, \`check-chat-situations\`, and
 \`check-chat-situation\`; the conditional-check-modifier editor uses \`ccm-*\` ids (\`DocumentSelect\` forwards
 \`testId\`).`
 
-- [ ] **Step 4: Update `data-flow.md`**
+- [ ] **Step 5: Update `data-flow.md`**
 
 Replace the step-1 paragraph (from `A sheet button or macro calls \`requestAttributeCheck(options)\`` through
 `otherwise it calls \`rollAttributeCheck\` directly.`) with:
@@ -5395,17 +6294,21 @@ A sheet button or macro calls `requestAttributeCheck(options)` (or the equivalen
 item / casting checks). The request validates the options, asks `getSituationalCheckModifiers` whether any situational
 modifier applies (from the initialized options' Skill), and passes that to `shouldGetCheckOptions(
 hasSituationalModifiers)`. The helper reads the `titan.getCheckOptions` choice — `never`, `situational` (default), or
-`always`; a legacy Boolean reads `true` → `always`, `false` → `situational` (`resolveCheckOptionsMode`) and is rewritten
-to its choice at init — and inverts it when the modifier key is held, except that a check with situational modifiers
-always hedges toward the dialog. If the dialog is needed it creates an `AttributeCheckDialog`; otherwise it calls
-`rollAttributeCheck` directly.
+`always`; `resolveCheckOptionsMode` reads a stored `true` as `always` and any other value outside the choices as
+`situational`, and such a value is rewritten to its choice at init — and inverts it when the modifier key is held,
+except that a check with situational modifiers always hedges toward the dialog. If the dialog is needed it creates an
+`AttributeCheckDialog`; otherwise it calls `rollAttributeCheck` directly. A caller may pass `options.situations` on
+either path; the named situations apply like any other option.
 ```
 
 In step 2, after the sentence ending `delegates rendering\nto the type-specific shell (\`AttributeCheckDialogShell\`).`
-add: `\`CheckDialogShell\` also sets \`checkActor\` and \`checkType\` into context; \`CheckDialogBase\` lists the check's
-situational modifiers below the rows (\`CheckDialogSituationsField\`, one unticked checkbox per key; ticking writes
-\`options.situations\`). Every shell offers the Advantage select (\`CheckDialogAdvantageField\`, which shows the raw
-sum clamped to ±2), the Automatic Failure checkbox, and the effective-Difficulty summary.`
+add: `\`CheckDialogShell\` also sets \`checkType\` and \`checkActor\` (a \`ReactiveDocument\` bridge over the rolling
+Actor) into context; \`CheckDialogBase\` lists the check's situational modifiers below the rows
+(\`CheckDialogSituationsField\`, one unticked checkbox per key; ticking writes \`options.situations\`). The situational
+list and each shell's parameter \`$effect\` read the Actor through the bridge, so the open dialog follows the Actor's
+updates and its item and effect changes, and closes when a change invalidates the check. Every shell offers the
+Advantage select (\`CheckDialogAdvantageField\`, which shows the raw sum clamped to ±2), the Automatic Failure
+checkbox, and the Effective Difficulty summary.`
 
 At the end of the step-3 "Parameter derivation" paragraph append: `Before the attribute-based totals,
 \`_applySituationalModifiers\` adds the ticked situations. After the Difficulty is final (an Attack Check's
@@ -5417,9 +6320,12 @@ past the bound is left alone. Options initialize \`advantage\` and \`automaticFa
 
 At the end of step 4 append: `\`calculateCheckResults\` honors \`parameters.automaticFailure\`: the dice and critical
 counts stay, but successes are 0 and the check fails, so no type-specific damage or healing lands and Resistance and
-opposed checks reduce no damage; recalculation re-reads the flag from the stored parameters.`
+opposed checks reduce no damage; recalculation re-reads the flag from the stored parameters. An automatically failed
+card withholds every action that could change its outcome — the chat-log Re-roll Failures, Double Training, and Double
+Expertise entries (\`src/hooks/OnGetChatLogEntryContext.js\`), the reset-Expertise button, and per-die Expertise — and
+\`CheckChatMessageDie\` styles each die as a failure (a 1 as a critical failure).`
 
-- [ ] **Step 5: Update `abstractions.md`**
+- [ ] **Step 6: Update `abstractions.md`**
 
 Replace the rules-element table row
 `| \`createConditionalCheckModifier\` | \`conditionalCheckModifier\`   | Modify a check's damage, bonus dice, etc. when a   |`
@@ -5441,10 +6347,10 @@ mod buckets): the equipped shield adds its `defense` to the Defense rating, the 
 Inside it, `_applyRulesElements` gathers the equipped armor's trait check rules as synthetic situational
 `conditionalCheckModifier` elements sourced as the armor (`createArmorTraitCheckModifiers`): Heavy → Greater
 Disadvantage on "Swim, Fly, or Climb" and Automatic Failure on "Jump", both narrowed to Athletics; Encumbering →
-Disadvantage on "Swim, Fly, or Climb" (Athletics); Loud → Disadvantage on "Remain Undetected by Hearing" (Stealth). The character `mod` stats are only
-`armor`, `resolveRegain`, and `woundRegain` (`src/system/Mods.js`); check damage and healing bonuses are not mods —
-they come only from `conditionalCheckModifier` elements with `modifierType` `damage`/`healing`, where check type `any`
-+ selector `any` applies to every attack, casting, and item check.
+Disadvantage on "Swim, Fly, or Climb" (Athletics); Loud → Disadvantage on "Remain Undetected by Hearing" (Stealth).
+The character `mod` stats are only `armor`, `resolveRegain`, and `woundRegain` (`src/system/Mods.js`); check damage
+and healing bonuses are not mods — they come only from `conditionalCheckModifier` elements with `modifierType`
+`damage`/`healing`, where check type `any` + selector `any` applies to every attack, casting, and item check.
 ```
 
 At the end of the Checks "**Results**" paragraph append: `\`calculateCheckResults\` honors
@@ -5454,31 +6360,34 @@ calculator inherits it. \`src/check/ApplyAdvantage.js\` holds \`applyAdvantage\`
 \`automaticFailure\`, \`baseDifficulty\`, and \`situations\` (\`{ key, label }[]\`).`
 
 In the `CheckChatMessageDataModel` bullet append: `Its \`migrateData(source)\` fills \`parameters.baseDifficulty\` from
-\`parameters.difficulty\` on messages stored before Advantage existed (skipping diffs that carry no Difficulty); the
-other Advantage-era parameters take their schema initials.`
+\`parameters.difficulty\` when the parameters carry a Difficulty but no base Difficulty (a diff without a Difficulty is
+skipped); \`advantage\`, \`automaticFailure\`, and \`situations\` take their schema initials. INVARIANT: every
+parameter update carries \`baseDifficulty\` whenever it carries \`difficulty\`.`
 
 Replace the bullet `- \`CheckChatResults.svelte\` — success/failure summary.` with
 `- \`CheckChatResults.svelte\` — success/failure summary, the Advantage level tag beside the DC, the Automatic Failure
-tag, and the applied situation labels.`
+tag, and the applied situation labels; the reset-Expertise button is withheld on an automatically failed card.`
 
-- [ ] **Step 6: Update `architecture.md`**
+- [ ] **Step 7: Update `architecture.md`**
 
 In the `src/check/` bullet, after `a shared dialog and chat-message shell,` insert
 `the pure \`ApplyAdvantage.js\` Difficulty helper,`.
 
-- [ ] **Step 7: Sync bug logs and localization**
+- [ ] **Step 8: Sync bug logs and localization**
 
 Read every task report. For each bug a task fixed on the way, add an entry to `docs/CLOSED_BUGS.md` (next number,
-mechanism, fix, commit) and delete it from `docs/OPEN_BUGS.md` if it was logged there; log any bug found but not fixed
-in `docs/OPEN_BUGS.md`. Confirm every label added by Tasks 3, 5, 6, 8, and 9 exists in `lang/en.json` by running
-`npx vitest run tests/unit/LocalizationKeys.test.js` (PASS) and the localization e2e below.
+mechanism, fix, commit) and delete it from `docs/OPEN_BUGS.md` if it was logged there. Any bug found is fixed in the
+task that found it; it goes to `docs/OPEN_BUGS.md` only with the user's express authorization, recorded in that task's
+report. Confirm every label added by Tasks 3, 5, 6, 8, and 9 exists in `lang/en.json` and none double-localizes by
+running `npx vitest run tests/unit/CheckModifierLocalizationKeys.test.js tests/unit/LocalizationKeys.test.js` (PASS)
+and the localization e2e in the full run below.
 
-- [ ] **Step 8: Refresh the knowledge graph**
+- [ ] **Step 9: Refresh the knowledge graph**
 
 Run: `graphify update .`
 Expected: completes without error.
 
-- [ ] **Step 9: Full verification**
+- [ ] **Step 10: Full verification**
 
 Run: `npm run eslint`; `npm run stylelint`; `npm test`; `npm run build`. Then run the full e2e suite with the Bash
 tool's `run_in_background: true`:
@@ -5486,27 +6395,31 @@ tool's `run_in_background: true`:
 debug/dumps/e2e-full-advantage.log` must print 0, `grep "failed" debug/dumps/e2e-full-advantage.log` must print
 nothing, and the final `passed` count must equal the `Running N tests` count. Then `trash debug/dumps/e2e-full-advantage.log`.
 
-- [ ] **Step 10: Commit**
+- [ ] **Step 11: Commit**
 
 ```bash
 git branch --show-current
 git status --short
-git add docs/TODO.md docs/POST_WORK_FINDINGS.md .claude/skills/titan-codebase/references/conventions.md \
+git add docs/TODO.md docs/POST_WORK_FINDINGS.md docs/superpowers/specs/2026-09-27-advantage-disadvantage-design.md \
+   .claude/skills/titan-codebase/references/conventions.md \
    .claude/skills/titan-codebase/references/data-flow.md .claude/skills/titan-codebase/references/abstractions.md \
    .claude/skills/titan-codebase/references/architecture.md
 git commit -F - <<'EOF'
 docs: advantage, situational modifiers, and Resistance-check modifiers close-out
 
 Deletes the Resistance-check and Heavy-armor TODO items, corrects the two
-backlog lines they made stale, records the armor-dialog consequence, and
-updates the titan-codebase skill to the current check flow.
+backlog lines they made stale, records the armor-dialog consequence, amends
+spec A to the as-built interfaces, and updates the titan-codebase skill to
+the current check flow.
 
 Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
 Claude-Session: https://claude.ai/code/session_01SPVZ3AXCPn5Bo41aemiJZc
 EOF
 ```
 
-(Add `docs/CLOSED_BUGS.md` / `docs/OPEN_BUGS.md` to `git add` only if Step 7 changed them.)
+(Add `docs/CLOSED_BUGS.md` to `git add` when Step 8 logged a fixed bug, and `docs/OPEN_BUGS.md` when Step 8 deleted a
+fixed bug from it or logged one the user expressly authorized deferring; a bug is never logged open without that
+authorization.)
 
 ---
 
@@ -5515,14 +6428,19 @@ EOF
 - **Spec coverage:** §1 advantage type + editor level select + reset to 1 → Tasks 3, 8. §2 `applyAdvantage` → Task 1;
   options/parameters/`baseDifficulty`/attack ordering → Task 2; dialog select → Task 6; chat tag → Task 7; chat
   shapes → Task 2. §3 `automaticFailure` type → Task 3; options/parameters/dialog checkbox → Tasks 2, 3, 6; results
-  forced and recalculation → Task 2; chat tag → Task 7. §4 `situation` selector, user-keyed, skill narrowing,
-  `getSituationalCheckModifiers`, dialog checkboxes, parameter-time contributions, no double count, dialog-only,
-  chat list → Tasks 3, 6, 7, 8. §4a setting, table, legacy reads, per-request lookup → Task 5. §5 Resistance
-  modifiers → Task 4; editor `resistance` check type and hidden types → Task 8. §6 armor traits → Task 9. Error
-  handling (assert kept; legacy messages) → Tasks 2, 3. Testing list → every task's tests. Documentation → Task 10.
+  forced and recalculation → Task 2 (the card withholds outcome-changing actions, resolution #12); chat tag → Task 7.
+  §4 `situation` selector, user-keyed, skill narrowing, `getSituationalCheckModifiers`, dialog checkboxes,
+  parameter-time contributions, no double count, never automatic (caller-supplied keys honored, resolution #11, spec
+  amended in Task 10), chat list → Tasks 3, 6, 7, 8. §4a setting, table, stored-Boolean reads, per-request lookup →
+  Task 5. §5 Resistance modifiers → Task 4; editor `resistance` check type and hidden types (both filter directions)
+  → Task 8. §6 armor traits → Task 9. Error handling (assert kept; messages without the new fields) → Tasks 2, 3.
+  Testing list → every task's tests. Documentation → Task 10 (TODO, POST_WORK_FINDINGS, spec A as-built notes, skill).
 - **Placeholders:** none; every code step carries complete code or an exact edit anchor.
 - **Type consistency:** `getSituationalCheckModifiers(checkType, { skill })` → `SituationalCheckModifier` with
   `sources: string[]` (Tasks 3, 6, 9); `options.situations: string[]` vs `parameters.situations: SituationLabel[]`
   (Tasks 2, 3, 6, 7); `_applyCheckAdvantage` (Task 2) runs after `_applySituationalModifiers` (Task 3);
   `processElements(sourceElements, type, sourceName)` (Task 3) consumed by Task 9; `ADVANTAGE_LEVEL_OPTIONS` (Task 6)
-  and `ADVANTAGE_ELEMENT_LEVEL_OPTIONS` (Task 8) from Task 1.
+  and `ADVANTAGE_ELEMENT_LEVEL_OPTIONS` + `clampAdvantage` (Task 8) from Task 1; `readNewestCheckFlags(page, baseline,
+  type?)` → `{ id, type, parameters, results }` (Task 2) consumed by Tasks 4, 6, 9; context `'checkActor'` is a
+  `ReactiveDocument` (Task 6) read as `checkActor?.data` by `CheckDialogBase` and the five shells;
+  `CheckModifierLocalizationKeys.test.js` (Task 3) extended by Tasks 5, 6, 8, 9.
