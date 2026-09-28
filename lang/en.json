@@ -70,7 +70,7 @@
       "attack.ineffective.desc.text": "<strong>Armor</strong> is doubled against <strong>Ineffective</strong> attacks, and <strong>Ineffective</strong> attacks can only inflict <strong>1 Wound</strong> per attack.",
       "attack.loud.desc.text": "An attack with the <strong>Loud</strong> trait alerts everyone within hearing range when it is used.",
       "attack.magical.desc.text": "<strong>Magical</strong> attacks are effective against magical defenses, and can destroy <strong>Magical</strong> items.",
-      "attack.penetrating.desc.text": "<strong>Penetrating</strong> attacks ignore <strong>1</strong> point of <strong>Armor</strong>.",
+      "attack.penetrating.desc.text": "<strong>Penetrating</strong> attacks ignore <strong>½</strong> of the target's <strong>Armor</strong>.",
       "attack.piercing.desc.text": "<strong>Piercing</strong> attacks use a sharp point or tip to stab and skewer enemies.",
       "attack.push.desc.text": "If you hit and deal damage on an attack with the <strong>Push</strong> trait, you may move the target <strong>1 space</strong> away from you, provided it is no more than <strong>1 Size</strong> larger than you.",
       "attack.reload.desc.text": "Attacks with the <strong>Reload</strong> trait require an <strong>Action</strong> to be reloaded after an attack before they can be used again.",

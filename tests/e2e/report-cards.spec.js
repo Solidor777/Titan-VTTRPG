@@ -111,6 +111,40 @@ test.describe('report chat-message subtype cards', () => {
     * is deleted inside the page after the report is posted; the posted message persists for assertions.
     */
    test.describe('direct-method reports', () => {
+      test('Penetrating damage is resisted by half the Armor, rounded up', async () => {
+         const result = await page.evaluate(async () => {
+            const actor = await Actor.create({
+               name: `E2E Penetrating ${Date.now()}`,
+               type: 'player',
+            });
+            const [armor] = await actor.createEmbeddedDocuments('Item', [{
+               name: 'E2E Armor 5',
+               type: 'armor',
+               system: { armor: { value: 5 } },
+            }]);
+            await actor.system.equipArmor(armor.id);
+            const armorValue = actor.system.mod.armor.value;
+            const plain = await actor.system.applyDamage(4, { report: false });
+            const penetrating = await actor.system.applyDamage(4, {
+               penetrating: true,
+               report: false,
+            });
+            await actor.delete();
+            return {
+               armorValue,
+               plainResisted: plain?.damageResisted,
+               penetratingResisted: penetrating?.damageResisted,
+               penetratingTaken: penetrating?.damageTaken,
+            };
+         });
+
+         // Armor 5 resists all 4 damage normally; Penetrating leaves ceil(5 / 2) = 3 Armor, so 1 lands.
+         expect(result.armorValue).toBe(5);
+         expect(result.plainResisted).toBe(4);
+         expect(result.penetratingResisted).toBe(3);
+         expect(result.penetratingTaken).toBe(1);
+      });
+
       test('applyDamage posts a damageReport card', async () => {
          const result = await page.evaluate(async () => {
             // A base player has stamina max 3 and no equipped armor (so 5 damage lands in full).

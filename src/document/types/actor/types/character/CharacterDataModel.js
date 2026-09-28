@@ -22,6 +22,7 @@ import {
    USER_KEYED_CHECK_MODIFIER_SELECTORS,
 } from '~/system/ConditionalCheckModifierTypes.js';
 import clamp from '~/helpers/utility-functions/Clamp.js';
+import computeDamageResistance from '~/helpers/utility-functions/ComputeDamageResistance.js';
 import computeMulSumDelta from '~/helpers/utility-functions/ComputeMulSumDelta.js';
 import computeSetSumDelta from '~/helpers/utility-functions/ComputeSetSumDelta.js';
 import roundDirectional from '~/helpers/utility-functions/RoundDirectional.js';
@@ -4063,24 +4064,8 @@ export default class CharacterDataModel extends TitanActorDataModel {
          this.parent.name,
       ) && damage > 0) {
 
-         // If the damage ignores armor then no damage is resisted.
-         // Otherwise, resist damage equal to the Characters armor.
-         let damageResistance = options?.ignoreArmor ? 0 : this.mod.armor.value;
-
-         // If damage would be resisted and there are options to apply.
-         if (damageResistance > 0 && options) {
-
-            // If the damage is ineffective, then damage resistance is doubled.
-            if (options.ineffective) {
-               damageResistance *= 2;
-            }
-
-            // If the damage is penetrating, then damage resistance is reduced.
-            // by 1.
-            if (options.penetrating) {
-               damageResistance -= 1;
-            }
-         }
+         /** @type {number} The Damage the Character's Armor resists, after Ignore Armor and attack traits. */
+         const damageResistance = computeDamageResistance(this.mod.armor.value, options);
 
          // Cache values for the report if appropriate.
          /** @type {number} */
