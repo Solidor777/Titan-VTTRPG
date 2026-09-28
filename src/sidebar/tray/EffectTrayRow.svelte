@@ -126,13 +126,16 @@
 
    /**
     * Writes the effect's standard Foundry drag data onto the drag event so dropping the row onto an
-    * actor sheet or token applies the effect natively, and dropping it on another tray pack stashes
-    * it there.
+    * actor sheet or token applies the effect natively, dropping it in the tray moves or sorts it within the
+    * pack, and dropping it on another tray pack stashes it there. Closes any open context menu and stops
+    * the event, as core's directory does, so the enclosing folder item does not overwrite the data.
     * @param {DragEvent} event - The dragstart event.
     * @returns {void}
     */
    function onDragStart(event) {
+      ui.context?.close({ animate: false });
       event.dataTransfer.setData('text/plain', JSON.stringify(effect.toDragData()));
+      event.stopPropagation();
    }
 </script>
 

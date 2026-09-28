@@ -127,6 +127,128 @@ async function deleteNestedFolders(page) {
    });
 }
 
+/**
+ * @typedef {object} SeedFolderSpec
+ * One folder to seed in the world pack.
+ * @property {string} name - The folder name.
+ * @property {string} [parent] - The name of an earlier-seeded parent folder; omitted for a top-level folder.
+ * @property {number} [sort] - An explicit manual sort value.
+ * @property {string[]} [effects] - Names of effects to create inside the folder.
+ */
+
+/**
+ * Deletes every world-pack effect and folder whose name starts with the prefix, deepest folders first.
+ * @param {import('@playwright/test').Page} page - The Playwright page.
+ * @param {string} prefix - The shared name prefix of the seeded documents.
+ * @returns {Promise<void>} Resolves once they are gone.
+ */
+async function deletePrefixed(page, prefix) {
+   await page.evaluate(async (namePrefix) => {
+      const pack = game.packs.get('world.e2e-tray-effects');
+      const effectIds = (await pack.getDocuments())
+         .filter((effect) => effect.name.startsWith(namePrefix))
+         .map((effect) => effect.id);
+      if (effectIds.length) {
+         await ActiveEffect.deleteDocuments(effectIds, { pack: pack.collection });
+      }
+      const depth = (folder) => (folder.folder ? 1 + depth(folder.folder) : 0);
+      const folders = pack.folders.filter((folder) => folder.name.startsWith(namePrefix))
+         .sort((a, b) => depth(b) - depth(a));
+      for (const folder of folders) {
+         await pack.folders.get(folder.id)?.delete();
+      }
+   }, prefix);
+}
+
+/**
+ * Seeds folders (and effects inside them) in the world pack, in order, after deleting any documents left
+ * over from a previous run under the same prefix.
+ * @param {import('@playwright/test').Page} page - The Playwright page.
+ * @param {string} prefix - The shared name prefix of the seeded documents.
+ * @param {SeedFolderSpec[]} specs - The folders to create, parents before children.
+ * @returns {Promise<void>} Resolves once every folder and effect exists.
+ */
+async function seedFolders(page, prefix, specs) {
+   await deletePrefixed(page, prefix);
+   await page.evaluate(async (folderSpecs) => {
+      const pack = game.packs.get('world.e2e-tray-effects');
+      const created = new Map();
+      for (const spec of folderSpecs) {
+         const folder = await Folder.create({
+            name: spec.name,
+            type: 'ActiveEffect',
+            folder: spec.parent ? created.get(spec.parent).id : null,
+            ...(spec.sort === undefined ? {} : { sort: spec.sort }),
+         }, { pack: pack.collection });
+         created.set(spec.name, folder);
+         for (const effectName of spec.effects ?? []) {
+            await ActiveEffect.create({
+               name: effectName,
+               type: 'effect',
+               folder: folder.id,
+            }, { pack: pack.collection });
+         }
+      }
+   }, specs);
+}
+
+/**
+ * Reads a world-pack folder's parent folder name, or null for a top-level folder.
+ * @param {import('@playwright/test').Page} page - The Playwright page.
+ * @param {string} name - The exact name of the folder to look up.
+ * @returns {Promise<string | null | undefined>} The parent's name, null at the top level, or undefined when
+ * the folder does not exist.
+ */
+function folderParentName(page, name) {
+   return page.evaluate((folderName) => {
+      const folder = game.packs.get('world.e2e-tray-effects').folders.find((f) => f.name === folderName);
+      return folder ? (folder.folder?.name ?? null) : undefined;
+   }, name);
+}
+
+/**
+ * Locates a tray folder header by folder name.
+ * @param {import('@playwright/test').Page | import('@playwright/test').Locator} scope - Where to search.
+ * @param {string} name - The exact folder name.
+ * @returns {import('@playwright/test').Locator} The folder header locator.
+ */
+function trayFolderHeader(scope, name) {
+   return trayFolder(scope, name).locator(':scope > [data-testid="effect-tray-folder-header"]');
+}
+
+/**
+ * Opens a tray folder's context menu and returns the menu's entry labels.
+ * @param {import('@playwright/test').Page} page - The Playwright page.
+ * @param {string} name - The exact name of the folder whose header is right-clicked.
+ * @returns {Promise<string[]>} The trimmed labels of the visible menu entries.
+ */
+async function openFolderMenu(page, name) {
+   await trayFolderHeader(page, name).click({ button: 'right' });
+   const items = page.locator('#context-menu li.context-item');
+   await expect(items.first()).toBeVisible();
+   return (await items.allInnerTexts()).map((text) => text.trim());
+}
+
+/**
+ * Localizes a list of core or system keys in the page.
+ * @param {import('@playwright/test').Page} page - The Playwright page.
+ * @param {string[]} keys - The localization keys.
+ * @returns {Promise<string[]>} The localized strings, in key order.
+ */
+function localizeAll(page, keys) {
+   return page.evaluate((list) => list.map((key) => game.i18n.localize(key)), keys);
+}
+
+/**
+ * Reads the names of the tray's top-level folders in display order.
+ * @param {import('@playwright/test').Page} page - The Playwright page.
+ * @returns {Promise<string[]>} The names, top to bottom.
+ */
+function topLevelFolderNames(page) {
+   return page.locator('[data-testid="effect-tray-list"] > [data-testid="effect-tray-folder"] '
+      + '> [data-testid="effect-tray-folder-header"] .folder-name').allInnerTexts();
+}
+
 /** @type {import('@playwright/test').Page} The file-shared, logged-in page (one world boot per file). */
 let page;
 /** @type {string[]} Uncaught page errors collected during the current test (cleared each afterEach). */
@@ -646,6 +768,402 @@ test.describe('effect tray sidebar tab', () => {
          await pack.folders.find((f) => f.name === name)?.delete();
       }, newName);
       await deleteNestedFolders(page);
+   });
+
+   test('dragging a folder onto an expanded folder nests it inside that folder', async () => {
+      await seedFolders(page, 'E2E DnD', [
+         { name: 'E2E DnD Target' },
+         { name: 'E2E DnD Mover' },
+      ]);
+      await openTray(page);
+      await selectTrayPack(page);
+
+      // The mover starts as a top-level folder.
+      await expect(trayFolder(page, 'E2E DnD Mover')).toBeVisible();
+      expect(await topLevelFolderNames(page)).toContain('E2E DnD Mover');
+      expect(await folderParentName(page, 'E2E DnD Mover')).toBeNull();
+
+      // Core nests a folder dropped on an expanded folder; expand the target first.
+      const target = trayFolder(page, 'E2E DnD Target');
+      await expandTrayFolder(target);
+
+      // A drag entering a folder highlights it with core's drop-target style; the drag ending clears it.
+      const targetName = trayFolderHeader(page, 'E2E DnD Target').locator('.folder-name');
+      /**
+       * Reads the folder name's computed font size and 120% of its header's (core's drop-target size).
+       * @param {HTMLElement} element - The folder name element.
+       * @returns {{ name: number, highlighted: number }} The current and the drop-target font sizes in px.
+       */
+      const readSizes = (element) => ({
+         name: parseFloat(getComputedStyle(element).fontSize),
+         highlighted: parseFloat(getComputedStyle(element.parentElement).fontSize) * 1.2,
+      });
+      const resting = await targetName.evaluate(readSizes);
+      expect(resting.name, 'the resting name is not already at the drop-target size').not.toBeCloseTo(
+         resting.highlighted,
+         1,
+      );
+      await trayFolderHeader(page, 'E2E DnD Target').dispatchEvent('dragenter');
+      await expect(target).toHaveClass(/(^|\s)droptarget(\s|$)/);
+      const highlighted = await targetName.evaluate(readSizes);
+      expect(highlighted.name, 'core scales the drop target name to 120%').toBeCloseTo(highlighted.highlighted, 1);
+      await page.evaluate(() => window.dispatchEvent(new DragEvent('dragend')));
+      await expect(target).not.toHaveClass(/(^|\s)droptarget(\s|$)/);
+
+      await trayFolderHeader(page, 'E2E DnD Mover').dragTo(trayFolderHeader(page, 'E2E DnD Target'));
+
+      await expect
+         .poll(() => folderParentName(page, 'E2E DnD Mover'), { message: 'the mover is nested in the target' })
+         .toBe('E2E DnD Target');
+      await expect
+         .poll(() => topLevelFolderNames(page), { message: 'the mover leaves the top level' })
+         .not.toContain('E2E DnD Mover');
+      const nested = trayFolder(target.locator(':scope > .subdirectory'), 'E2E DnD Mover');
+      await expect(nested).toBeVisible();
+      await expect(nested).toHaveAttribute('data-folder-depth', '2');
+
+      await deletePrefixed(page, 'E2E DnD');
+   });
+
+   test('dragging a folder onto a collapsed folder sorts it before that folder', async () => {
+      // Top-level folders follow the pack's sorting mode; manual mode shows the sort order being changed.
+      const initialMode = await page.evaluate(() => game.packs.get('world.e2e-tray-effects').sortingMode);
+      if (initialMode !== 'm') {
+         await page.evaluate(() => game.packs.get('world.e2e-tray-effects').toggleSortingMode());
+      }
+      await seedFolders(page, 'E2E Sort', [
+         {
+            name: 'E2E Sort Alpha',
+            sort: 100000,
+         },
+         {
+            name: 'E2E Sort Beta',
+            sort: 200000,
+         },
+      ]);
+      await openTray(page);
+      await selectTrayPack(page);
+
+      // Beta starts after Alpha.
+      await expect(trayFolder(page, 'E2E Sort Beta')).toBeVisible();
+      /** @type {string[]} The seeded folders in their initial display order. */
+      const before = (await topLevelFolderNames(page)).filter((name) => name.startsWith('E2E Sort'));
+      expect(before).toEqual([
+         'E2E Sort Alpha',
+         'E2E Sort Beta',
+      ]);
+
+      await trayFolderHeader(page, 'E2E Sort Beta').dragTo(trayFolderHeader(page, 'E2E Sort Alpha'));
+
+      // Beta now sorts before Alpha and stays at the top level.
+      await expect
+         .poll(
+            async () => (await topLevelFolderNames(page)).filter((name) => name.startsWith('E2E Sort')),
+            { message: 'the dropped folder sorts before the collapsed target' },
+         )
+         .toEqual([
+            'E2E Sort Beta',
+            'E2E Sort Alpha',
+         ]);
+      expect(await folderParentName(page, 'E2E Sort Beta')).toBeNull();
+
+      await deletePrefixed(page, 'E2E Sort');
+      if (initialMode !== 'm') {
+         await page.evaluate(() => game.packs.get('world.e2e-tray-effects').toggleSortingMode());
+      }
+   });
+
+   test('folder nesting stops at the pack folder depth limit', async () => {
+      // Compendium packs allow one level less than world directories.
+      await seedFolders(page, 'E2E Depth', [
+         { name: 'E2E Depth One' },
+         {
+            name: 'E2E Depth Two',
+            parent: 'E2E Depth One',
+         },
+         {
+            name: 'E2E Depth Three',
+            parent: 'E2E Depth Two',
+         },
+         { name: 'E2E Depth Tall' },
+         {
+            name: 'E2E Depth Tall Child',
+            parent: 'E2E Depth Tall',
+         },
+      ]);
+      expect(await page.evaluate(() => game.packs.get('world.e2e-tray-effects').maxFolderDepth)).toBe(3);
+      await openTray(page);
+      await selectTrayPack(page);
+      for (const name of [
+         'E2E Depth One',
+         'E2E Depth Two',
+         'E2E Depth Three',
+      ]) {
+         await expandTrayFolder(trayFolder(page, name));
+      }
+
+      // A depth-2 folder offers a subfolder; a folder at the depth limit does not.
+      await expect(trayFolderHeader(page, 'E2E Depth Two').locator('[data-testid="effect-tray-folder-create-folder"]'))
+         .toBeVisible();
+      await expect(trayFolder(page, 'E2E Depth Three')).toHaveAttribute('data-folder-depth', '3');
+      await expect(trayFolderHeader(page, 'E2E Depth Three')
+         .locator('[data-testid="effect-tray-folder-create-folder"]')).toHaveCount(0);
+
+      // Nesting a two-level folder under depth 2 would reach depth 4: core refuses with an error.
+      const message = await page.evaluate(() => game.i18n.format('FOLDER.ExceededMaxDepth', { depth: 3 }));
+      await trayFolderHeader(page, 'E2E Depth Tall').dragTo(trayFolderHeader(page, 'E2E Depth Two'));
+      await expect(page.locator('#notifications .notification.error', { hasText: message })).toBeVisible();
+      expect(await folderParentName(page, 'E2E Depth Tall')).toBeNull();
+
+      await deletePrefixed(page, 'E2E Depth');
+   });
+
+   test('the folder context menu offers the core compendium folder entries, gated by the pack lock', async () => {
+      await seedFolders(page, 'E2E Menu', [{ name: 'E2E Menu Folder' }]);
+      await openTray(page);
+      await selectTrayPack(page);
+
+      const [
+         edit,
+         createTable,
+         remove,
+         deleteAll,
+         ownership,
+         exportLabel,
+      ] = await localizeAll(page, [
+         'FOLDER.Edit',
+         'FOLDER.CreateTable',
+         'FOLDER.Remove',
+         'FOLDER.Delete',
+         'OWNERSHIP.Configure',
+         'FOLDER.Export',
+      ]);
+      const rename = await page.evaluate(() => game.i18n.localize('LOCAL.effectTrayRenameFolder.text'));
+
+      // Unlocked: every core compendium folder entry plus Rename; never Configure Ownership or Export.
+      const unlocked = await openFolderMenu(page, 'E2E Menu Folder');
+      expect(unlocked).toEqual([
+         edit,
+         rename,
+         createTable,
+         remove,
+         deleteAll,
+      ]);
+      expect(unlocked).not.toContain(ownership);
+      expect(unlocked).not.toContain(exportLabel);
+      await page.evaluate(() => ui.context?.close({ animate: false }));
+      await expect(page.locator('#context-menu')).toHaveCount(0);
+
+      // Locked: only the entry that changes no pack data remains.
+      await page.locator('[data-testid="effect-tray-lock"]').first().click();
+      await expect
+         .poll(() => page.evaluate(() => game.packs.get('world.e2e-tray-effects').locked))
+         .toBe(true);
+      expect(await openFolderMenu(page, 'E2E Menu Folder')).toEqual([createTable]);
+      await page.evaluate(() => ui.context?.close({ animate: false }));
+      await page.locator('[data-testid="effect-tray-lock"]').first().click();
+      await expect
+         .poll(() => page.evaluate(() => game.packs.get('world.e2e-tray-effects').locked))
+         .toBe(false);
+
+      await deletePrefixed(page, 'E2E Menu');
+   });
+
+   test('Remove Folder deletes the folder and moves its contents up a level', async () => {
+      await seedFolders(page, 'E2E Remove', [
+         {
+            name: 'E2E Remove Parent',
+            effects: ['E2E Remove Effect'],
+         },
+         {
+            name: 'E2E Remove Child',
+            parent: 'E2E Remove Parent',
+         },
+      ]);
+      await openTray(page);
+      await selectTrayPack(page);
+      expect(await folderParentName(page, 'E2E Remove Child')).toBe('E2E Remove Parent');
+
+      await openFolderMenu(page, 'E2E Remove Parent');
+      const [removeLabel] = await localizeAll(page, ['FOLDER.Remove']);
+      await page.locator('#context-menu li.context-item', { hasText: removeLabel }).click();
+      await page.locator('.application.dialog button[data-action="yes"]').click();
+
+      // The folder is gone; its subfolder and its effect now sit at the pack root.
+      await expect(trayFolder(page, 'E2E Remove Parent')).toHaveCount(0);
+      await expect
+         .poll(() => folderParentName(page, 'E2E Remove Child'), { message: 'the subfolder moves up a level' })
+         .toBeNull();
+      await expect
+         .poll(() => page.evaluate(async () => {
+            const pack = game.packs.get('world.e2e-tray-effects');
+            const effect = (await pack.getDocuments()).find((e) => e.name === 'E2E Remove Effect');
+            return effect ? (effect.folder?.id ?? effect.folder ?? null) : 'missing';
+         }), { message: 'the effect survives and moves up a level' })
+         .toBeNull();
+      await expect(page.locator('[data-testid="effect-tray-list"] > [data-testid="effect-tray-row"]', {
+         hasText: 'E2E Remove Effect',
+      })).toBeVisible();
+
+      await deletePrefixed(page, 'E2E Remove');
+   });
+
+   test('Delete All deletes the folder with its subfolders and effects', async () => {
+      await seedFolders(page, 'E2E Purge', [
+         {
+            name: 'E2E Purge Parent',
+            effects: ['E2E Purge Effect'],
+         },
+         {
+            name: 'E2E Purge Child',
+            parent: 'E2E Purge Parent',
+            effects: ['E2E Purge Nested Effect'],
+         },
+      ]);
+      await openTray(page);
+      await selectTrayPack(page);
+      await expect(trayFolder(page, 'E2E Purge Parent')).toBeVisible();
+
+      await openFolderMenu(page, 'E2E Purge Parent');
+      const [deleteLabel] = await localizeAll(page, ['FOLDER.Delete']);
+      await page.locator('#context-menu li.context-item', { hasText: deleteLabel }).click();
+      await page.locator('.application.dialog button[data-action="yes"]').click();
+
+      await expect(trayFolder(page, 'E2E Purge Parent')).toHaveCount(0);
+      await expect
+         .poll(() => page.evaluate(async () => {
+            const pack = game.packs.get('world.e2e-tray-effects');
+            return {
+               folders: pack.folders.filter((f) => f.name.startsWith('E2E Purge')).length,
+               effects: (await pack.getDocuments()).filter((e) => e.name.startsWith('E2E Purge')).length,
+            };
+         }), { message: 'the folder, its subfolder, and both effects are deleted' })
+         .toEqual({
+            folders: 0,
+            effects: 0,
+         });
+   });
+
+   test('Create Rollable Table builds a world table from the folder effects', async () => {
+      await page.evaluate(async () => {
+         for (const table of game.tables.filter((t) => t.name === 'E2E Table Folder')) {
+            await table.delete();
+         }
+      });
+      await seedFolders(page, 'E2E Table', [
+         {
+            name: 'E2E Table Folder',
+            effects: [
+               'E2E Table Effect A',
+               'E2E Table Effect B',
+            ],
+         },
+      ]);
+      await openTray(page);
+      await selectTrayPack(page);
+      expect(await page.evaluate(() => game.tables.some((t) => t.name === 'E2E Table Folder'))).toBe(false);
+
+      await openFolderMenu(page, 'E2E Table Folder');
+      const [createLabel] = await localizeAll(page, ['FOLDER.CreateTable']);
+      await page.locator('#context-menu li.context-item', { hasText: createLabel }).click();
+      await page.locator('.application.dialog button[data-action="yes"]').click();
+
+      await expect
+         .poll(() => page.evaluate(() => {
+            const table = game.tables.find((t) => t.name === 'E2E Table Folder');
+            return table ? table.results.map((r) => r.name).sort() : null;
+         }), { message: 'the table holds one result per folder effect' })
+         .toEqual([
+            'E2E Table Effect A',
+            'E2E Table Effect B',
+         ]);
+
+      await page.evaluate(async () => {
+         for (const table of game.tables.filter((t) => t.name === 'E2E Table Folder')) {
+            await table.delete();
+         }
+      });
+      await deletePrefixed(page, 'E2E Table');
+   });
+
+   test('dragging an effect onto a folder moves it into that folder', async () => {
+      await seedFolders(page, 'E2E Move', [{ name: 'E2E Move Folder' }]);
+      await page.evaluate(async () => {
+         await ActiveEffect.create(
+            {
+               name: 'E2E Move Effect',
+               type: 'effect',
+            },
+            { pack: 'world.e2e-tray-effects' },
+         );
+      });
+      await openTray(page);
+      await selectTrayPack(page);
+
+      const rootRow = page.locator('[data-testid="effect-tray-list"] > [data-testid="effect-tray-row"]', {
+         hasText: 'E2E Move Effect',
+      });
+      await expect(rootRow).toBeVisible();
+      await rootRow.dragTo(trayFolderHeader(page, 'E2E Move Folder'));
+
+      await expect(rootRow).toHaveCount(0);
+      await expandTrayFolder(trayFolder(page, 'E2E Move Folder'));
+      await expect(trayFolder(page, 'E2E Move Folder').locator('[data-testid="effect-tray-row"]', {
+         hasText: 'E2E Move Effect',
+      })).toBeVisible();
+
+      await deletePrefixed(page, 'E2E Move');
+   });
+
+   test('stashing an actor effect onto a folder copies it into that folder', async () => {
+      await deleteFixtureActor(page, 'E2E Folder Stash Source');
+      await seedFolders(page, 'E2E Stash', [{ name: 'E2E Stash Folder' }]);
+      await page.evaluate(async () => {
+         const actor = await Actor.create({
+            name: 'E2E Folder Stash Source',
+            type: 'player',
+         });
+         await actor.createEmbeddedDocuments('ActiveEffect', [
+            {
+               name: 'E2E Stash Folder Effect',
+               type: 'effect',
+            },
+         ]);
+      });
+      await openTray(page);
+      await selectTrayPack(page);
+      await expect(trayFolder(page, 'E2E Stash Folder')).toBeVisible();
+
+      // Drop the actor's effect drag data on the folder header.
+      await page.evaluate(() => {
+         const actor = game.actors.getName('E2E Folder Stash Source');
+         const effect = [...actor.effects].find((e) => e.name === 'E2E Stash Folder Effect');
+         const folderId = game.packs.get('world.e2e-tray-effects').folders.find((f) => f.name === 'E2E Stash Folder')
+            .id;
+         const header = ui.titanEffects.element.querySelector(`[data-folder-id="${folderId}"] > .folder-header`);
+         const dataTransfer = new DataTransfer();
+         dataTransfer.setData('text/plain', JSON.stringify(effect.toDragData()));
+         header.dispatchEvent(new DragEvent('drop', {
+            bubbles: true,
+            cancelable: true,
+            dataTransfer,
+         }));
+      });
+
+      await expect
+         .poll(() => page.evaluate(async () => {
+            const pack = game.packs.get('world.e2e-tray-effects');
+            const copy = (await pack.getDocuments()).find((e) => e.name === 'E2E Stash Folder Effect');
+            if (!copy) {
+               return 'missing';
+            }
+            const folderId = copy.folder?.id ?? copy.folder ?? null;
+            return folderId ? pack.folders.get(folderId)?.name : null;
+         }), { message: 'the copy lands in the folder it was dropped on' })
+         .toBe('E2E Stash Folder');
+
+      await deletePrefixed(page, 'E2E Stash');
+      await deleteFixtureActor(page, 'E2E Folder Stash Source');
    });
 
    test('stash-from-actor copies a dropped effect into the selected pack', async () => {

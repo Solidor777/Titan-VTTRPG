@@ -33,9 +33,10 @@ import getEffectCompendiums from '~/sidebar/tray/GetEffectCompendiums.js';
  * Public interface (read by tray components via `getContext('trayState')`):
  * - `$state` fields: `compendiums`, `selectedPackId`, `effects`, `tree`, `filter`, `expandedFolders`,
  * `isLocked`, `searchMode`, `sortingMode`.
- * - Getters: `selectedPack`, `isOwner`, `canEdit`, `supportsFolders`, `folderOptions`.
+ * - Getters: `selectedPack`, `isOwner`, `canEdit`, `supportsFolders`, `maxFolderDepth`, `folderOptions`.
  * - Methods: `selectPack`, `refresh`, `createBlankEffect`, `duplicateEffect`, `requestDeleteEffect`,
- * `renameEffect`, `stashFromDragData`, `createFolder`, `renameFolder`, `deleteFolder`, `moveEffectToFolder`,
+ * `renameEffect`, `stashFromDragData`, `createFolder`, `renameFolder`, `requestRemoveFolder`,
+ * `requestDeleteFolderAll`, `requestCreateTableFromFolder`, `dropOnDirectory`, `moveEffectToFolder`,
  * `toggleFolder`, `collapseAllFolders`, `toggleSearchMode`, `toggleSortingMode`, `toggleLock`, `destroy`.
  */
 export default class EffectTrayState {
@@ -133,6 +134,14 @@ export default class EffectTrayState {
     */
    get supportsFolders() {
       return !!this.selectedPack?.folders;
+   }
+
+   /**
+    * The deepest folder nesting the selected pack allows (core's `FOLDER_MAX_DEPTH` less one for packs).
+    * @returns {number} The maximum folder depth, or 0 when no pack is selected.
+    */
+   get maxFolderDepth() {
+      return this.selectedPack?.maxFolderDepth ?? 0;
    }
 
    /**
@@ -358,13 +367,14 @@ export default class EffectTrayState {
    }
 
    /**
-    * Copies an effect described by Foundry drag data into the selected pack. Used by the tray's
-    * drop zone to stash an actor's (or another pack's) effect. No-ops when there is no selected
-    * pack, the current user cannot edit it, or the drag data is not an Active Effect.
+    * Copies an effect described by Foundry drag data into the selected pack, optionally inside a folder.
+    * Used by the tray's drop handling to stash an actor's (or another pack's) effect. No-ops when there is
+    * no selected pack, the current user cannot edit it, or the drag data is not an Active Effect.
     * @param {object} dragData - Foundry drag data (expects type 'ActiveEffect' with a uuid).
+    * @param {string | null} [folderId] - The folder to stash the copy in, or null for the pack root.
     * @returns {Promise<void>}
     */
-   async stashFromDragData(dragData) {
+   async stashFromDragData(dragData, folderId = null) {
       /** @type {CompendiumCollection | undefined} The selected pack. */
       const pack = this.selectedPack;
       if (!pack || !this.canEdit || dragData?.type !== 'ActiveEffect') {
@@ -385,6 +395,7 @@ export default class EffectTrayState {
       /** @type {object} The serialized effect data, stripped of its source id for a fresh create. */
       const data = source.toObject();
       delete data._id;
+      data.folder = folderId;
 
       await pack.documentClass.createDocuments([data], { pack: pack.collection });
    }
@@ -429,18 +440,117 @@ export default class EffectTrayState {
    }
 
    /**
-    * Deletes a folder from the selected pack, leaving its effects at the pack root. No-ops when the
-    * current user cannot edit the pack.
-    * @param {Folder} folder - The folder to delete.
-    * @returns {Promise<void>}
+    * Opens core's confirmation for removing a folder, as the core directory's Remove Folder entry does.
+    * On confirm the server deletes the folder and moves its effects and every descendant folder up to the
+    * folder's parent (or the pack root). No-ops when the current user cannot edit the selected pack.
+    * @param {Folder} folder - The folder to remove.
+    * @returns {Promise<unknown>} The dialog result, or undefined when the pack is not editable.
     */
-   async deleteFolder(folder) {
+   async requestRemoveFolder(folder) {
       if (!this.canEdit) {
-         return;
+         return void 0;
       }
 
       // The registered `deleteFolder` hook drives the reload once the deletion completes.
-      await folder.delete();
+      return folder.deleteDialog({
+         content: `<p><strong>${game.i18n.localize('COMMON.AreYouSure')}</strong> `
+            + `${game.i18n.localize('FOLDER.RemoveWarning')}</p>`,
+         window: {
+            title: game.i18n.format('FOLDER.RemoveName', { name: folder.name }),
+            icon: 'fa-solid fa-trash',
+         },
+      });
+   }
+
+   /**
+    * Opens core's confirmation for deleting a folder with everything in it, as the core directory's
+    * Delete All entry does. On confirm the server deletes the folder, every descendant folder, and every
+    * effect inside them. No-ops when the current user cannot edit the selected pack.
+    * @param {Folder} folder - The folder to delete with its contents.
+    * @returns {Promise<unknown>} The dialog result, or undefined when the pack is not editable.
+    */
+   async requestDeleteFolderAll(folder) {
+      if (!this.canEdit) {
+         return void 0;
+      }
+
+      return folder.deleteDialog(
+         {
+            content: `<p><strong>${game.i18n.localize('COMMON.AreYouSure')}</strong> `
+               + `${game.i18n.localize('FOLDER.DeleteWarning')}</p>`,
+            window: {
+               title: game.i18n.format('FOLDER.DeleteName', { name: folder.name }),
+               icon: 'fa-solid fa-dumpster',
+            },
+         },
+         {
+            deleteSubfolders: true,
+            deleteContents: true,
+         },
+      );
+   }
+
+   /**
+    * Opens core's confirmation for creating a world Rollable Table whose results are the folder's
+    * effects, as the core directory's Create Rollable Table entry does. Creates no pack data, so it is
+    * available on a locked pack; the table creation itself is permission-checked by core.
+    * @param {Folder} folder - The folder whose contents become the table results.
+    * @returns {Promise<unknown>} The dialog result.
+    */
+   requestCreateTableFromFolder(folder) {
+      return foundry.applications.api.DialogV2.confirm({
+         window: { title: game.i18n.format('FOLDER.CreateTableConfirm.Title', { folder: folder.name }) },
+         content: `<p>${game.i18n.localize('FOLDER.CreateTableConfirm.Question')}</p>`,
+         yes: {
+            callback: () => getDocumentClass('RollTable').fromFolder(folder),
+            default: true,
+         },
+      });
+   }
+
+   /**
+    * Handles a drop on the tray the way the pack's core directory handles a drop on its list. A folder
+    * (from this pack or elsewhere) and an effect already in this pack go to the pack's core directory
+    * application, which nests, reorders, or imports them relative to the drop target exactly as the core
+    * compendium window does. Any other Active Effect (an actor's, or another pack's) is stashed as a copy
+    * in the target's folder. No-ops when the current user cannot edit the selected pack.
+    *
+    * Implicit coupling: core's handlers read the tray's core directory markup — `.directory-item`,
+    * `.folder`, `.expanded`, `data-folder-id`, `data-uuid`, and `data-entry-id` — off `target`.
+    * @param {HTMLElement | null} target - The `.directory-item` under the drop, or null for the list root.
+    * @param {object} data - The parsed Foundry drag data.
+    * @returns {Promise<void>}
+    */
+   async dropOnDirectory(target, data) {
+      /** @type {CompendiumCollection | undefined} The selected pack. */
+      const pack = this.selectedPack;
+      if (!pack || !this.canEdit) {
+         return;
+      }
+
+      /**
+       * @type {foundry.applications.sidebar.DocumentDirectory | undefined} The pack's core directory
+       * application, created by core for every pack at game setup.
+       */
+      const directory = pack.apps.find((app) => app instanceof foundry.applications.sidebar.DocumentDirectory);
+
+      if (data?.type === 'Folder') {
+         await directory?._handleDroppedFolder(target, data);
+         return;
+      }
+
+      if (data?.type !== 'ActiveEffect') {
+         return;
+      }
+
+      /** @type {{ collection?: object, embedded?: string[] } | null} The dragged effect's parsed uuid. */
+      const parsed = data.uuid ? foundry.utils.parseUuid(data.uuid) : null;
+      if (directory && parsed?.collection === pack && !parsed.embedded?.length) {
+         await directory._handleDroppedEntry(target, data);
+         return;
+      }
+
+      await this.stashFromDragData(data, target?.closest('.directory-item.folder')?.dataset.folderId ?? null);
    }
 
    /**

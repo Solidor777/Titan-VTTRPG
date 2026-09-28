@@ -748,3 +748,14 @@ when fixed.
   actors and the compendium's Astral Assassin had only the default `static: 0` values, which were stripped directly;
   no rules element anywhere targeted them. Damage/healing conditional modifiers are gated by
   `conditional-damage-healing-mods.spec.js`.
+
+### 66. Effect Tray offered Create Folder on folders already at the pack's depth limit
+
+- **What:** `EffectTrayList.svelte` showed a folder header's create-subfolder control below `CONST.FOLDER_MAX_DEPTH`
+  (4), but compendium packs allow one level less (`CompendiumCollection#maxFolderDepth`, 3; the server rejects a
+  fourth level with "You may not nest Folders more than 3 levels deep"). A depth-3 folder offered a control that always
+  failed.
+- **Found:** 2026-09-27 while bringing the tray's folders to parity with core's compendium directory.
+- **Fixed:** 2026-09-27 — the control is gated on `trayState.maxFolderDepth` (`pack.maxFolderDepth`), as core's folder
+  partial gates it on the collection's `maxFolderDepth`. Gated by `effect-tray.spec.js` ("folder nesting stops at the
+  pack folder depth limit").

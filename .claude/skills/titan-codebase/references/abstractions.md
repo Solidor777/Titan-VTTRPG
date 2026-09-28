@@ -623,7 +623,24 @@ and one or more inner Svelte component trees.
   (called from the tab's `_onClose`) removes them. `isOwner` getter = `pack.getUserLevel(game.user) >= OWNER`.
   `canEdit` getter = `!this.isLocked && this.isOwner`. `toggleLock()` calls `await pack.configure({ locked })` then
   updates the mirror; owner-gated. `createBlankEffect(folderId?)` / `createFolder(parent?)` create at the root or
-  inside a folder. `requestDeleteEffect()` prompts via `ConfirmationDialog`; `canEdit`-gated.
+  inside a folder. `requestDeleteEffect()` prompts via `ConfirmationDialog`; `canEdit`-gated. `maxFolderDepth` =
+  `pack.maxFolderDepth` (core's `FOLDER_MAX_DEPTH` less one for packs, i.e. 3). Folder deletion uses core's
+  `folder.deleteDialog` with core's strings: `requestRemoveFolder()` (plain delete — the server moves the folder's
+  effects AND every descendant folder, flattened, to the folder's parent) and `requestDeleteFolderAll()` (operation
+  `{ deleteSubfolders: true, deleteContents: true }`); both `canEdit`-gated. `requestCreateTableFromFolder()` wraps
+  core's `DialogV2.confirm` + `RollTable.fromFolder` (a world table; not lock-gated).
+- **Drag and drop delegates to the pack's core directory**: `EffectTray`'s root `drop` handler parses
+  `TextEditor.getDragEventData` and calls `trayState.dropOnDirectory(event.target.closest('.directory-item'), data)`.
+  `dropOnDirectory` (`canEdit`-gated) finds the pack's core `Compendium` app (`pack.apps`, created by core for every
+  pack at setup, never rendered here) and calls its `_handleDroppedFolder` (nest into an `.expanded` folder, sort
+  before a collapsed one, depth/cycle checks with core's error notification, foreign-folder import) or, for an effect
+  already in the pack (`parseUuid(...).collection === pack`, not embedded), `_handleDroppedEntry` (move into the
+  target's folder + `sortRelative`). Other Active Effects go to `stashFromDragData(data, folderId)` into the drop
+  target's closest folder. **Implicit coupling**: core reads `.directory-item`, `.folder`, `.expanded`,
+  `data-folder-id`, `data-uuid`, and `data-entry-id` off the tray markup. Folder `li`s are `draggable` (except while
+  renaming inline) and write `folder.toDragData()`; folder and row `dragstart` close `ui.context` and stop
+  propagation (as core's `DragDrop` does) so an enclosing folder does not overwrite the data. `EffectTrayList`
+  mirrors core's `_onDragHighlight` with a reactive `droptarget` class (styled by core CSS), cleared on drop/dragend.
 - Search (`EffectTrayList` + `filterEffectTree` in `src/sidebar/tray/FilterEffectTree.js`) mirrors
   `DocumentDirectory#_matchSearchFolders`/`#_matchSearchEntries`: the query is cleaned with
   `SearchFilter.cleanQuery` and tested as an escaped case-insensitive regex; a folder whose name matches keeps its
@@ -635,17 +652,21 @@ and one or more inner Svelte component trees.
   visible; Rename, Duplicate, and Delete are gated on `trayState.canEdit`; Move to Folder on
   `canEdit && !!selectedPack?.folders`. The move-dialog opener is injected by `EffectTray` so the module carries no
   AppV2 import and stays unit-testable. `buildEffectFolderContextMenu(trayState)`
-  (`src/sidebar/tray/EffectFolderContextMenu.js`) returns the folder-header entries, all `canEdit`-gated: Edit Folder
-  (core `folder.sheet`, which sets name, colour, and sorting), Rename Folder (dispatches `titan-folder-rename` on the
-  header, which `EffectTrayList` turns into an inline rename), and Delete Folder (`trayState.deleteFolder`).
-- UI: `EffectTrayShell` → `EffectTray` (hosts the drag-in stash drop zone; attaches two Foundry `ContextMenu`s to
+  (`src/sidebar/tray/EffectFolderContextMenu.js`) returns core's Compendium-directory folder menu
+  (`DocumentDirectory._getFolderContextOptions` less Configure Ownership and Export, which `Compendium` filters out)
+  plus TITAN's inline Rename: Edit Folder (core `folder.sheet`: name, colour, sorting), Rename Folder (dispatches
+  `titan-folder-rename` on the header, which `EffectTrayList` turns into an inline rename), Create Rollable Table,
+  Remove Folder, and Delete All. All but Create Rollable Table are `canEdit`-gated (core gates on GM and leaves the
+  lock to the server); Create Rollable Table shows as core shows it (folder type in `COMPENDIUM_DOCUMENT_TYPES`).
+  The core `getFolderContextOptions` hook is not fired for the tray's menu (the tray is not a `DocumentDirectory`).
+- UI: `EffectTrayShell` → `EffectTray` (hosts the drop handler; attaches two Foundry `ContextMenu`s to
   the tray root via the `effectContextMenu` action: `[data-effect-id]` rows and `.folder-header`s) →
   `EffectTrayHeader` (a pack row — native `<select>` plus the owner-only lock toggle — above core's header: the
   `canEdit`-only Create Effect / Create Folder buttons, then the `<search>` row with the search-mode toggle, the
   search input bound to `trayState.filter`, the sort-mode toggle, and collapse-all) + `EffectTrayList` (the
   recursive folder snippet; folder headers toggle on click/Enter/Space and carry `canEdit`-gated create-subfolder
-  (below `CONST.FOLDER_MAX_DEPTH`) and create-effect controls; folder and root drops move an in-pack effect, other
-  drops fall through to the stash) of `EffectTrayRow` (core entry markup, drag-out via `effect.toDragData()`, and an
+  (below `trayState.maxFolderDepth`) and create-effect controls; folders are draggable) of `EffectTrayRow` (core
+  entry markup, drag-out via `effect.toDragData()`, and an
   **Apply** inline control). **Clicking a row opens the effect sheet**, as a core entry does; the name is focusable
   (Enter opens, F2 renames) and the row listens for a `titan-effect-rename` CustomEvent so the context menu's Rename
   entry drives the inline rename. **Move to Folder** opens `MoveEffectToFolderDialog`
@@ -655,8 +676,9 @@ and one or more inner Svelte component trees.
   `applyEffectToTargets()`
   (`src/helpers/utility-functions/ApplyEffectToTargets.js`) → copies `effect.toObject()` onto each
   `getBestCharactersToUpdate()` target the user owns. Stash-in resolves the drop via
-  `getDocumentClass('ActiveEffect').fromDropData(...)` and creates a copy in the selected pack (guarding against
-  re-stashing an effect already in that pack). The system ships the `titan.effects` compendium, compiled by `npm run build:packs`
+  `getDocumentClass('ActiveEffect').fromDropData(...)` and creates a fresh-id copy in the selected pack, in the drop
+  target's folder (guarding against re-stashing an effect already in that pack). The system ships the
+  `titan.effects` compendium, compiled by `npm run build:packs`
   (`scripts/build-packs.mjs`, foundryvtt-cli `compilePack` after a classic-level `clear()`) from
   `packs/_source/effects/` — 17 standard effects (rulebook actions, circumstances, cover, death states) in
   three folders (Actions, Circumstances, Death), each `type: 'effect'` with `system.rulesElement` where the

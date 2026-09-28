@@ -22,10 +22,45 @@ function headerTarget(folderId) {
    };
 }
 
+/**
+ * Builds a fake tray state whose selected pack holds one folder under id `f1`.
+ * @param {boolean} canEdit - Whether the selected pack is editable.
+ * @returns {{ trayState: object, folder: object }} The tray state and the folder it holds.
+ */
+function fakeTrayState(canEdit) {
+   /** @type {object} The Active Effect folder the menu resolves from the header. */
+   const folder = {
+      type: 'ActiveEffect',
+      sheet: { render: vi.fn() },
+   };
+   return {
+      folder,
+      trayState: {
+         canEdit,
+         requestCreateTableFromFolder: vi.fn(),
+         requestDeleteFolderAll: vi.fn(),
+         requestRemoveFolder: vi.fn(),
+         selectedPack: {
+            folders: new Map([[
+               'f1',
+               folder,
+            ]]),
+         },
+      },
+   };
+}
+
 describe('buildEffectFolderContextMenu', () => {
    beforeEach(() => {
       // localize() resolves `LOCAL.${key}.text`; mock i18n to echo the key for readable assertions.
       globalThis.game = { i18n: { localize: (key) => key } };
+      globalThis.CONFIG = { RollTable: { sidebarIcon: 'fa-solid fa-table-list' } };
+      globalThis.CONST = {
+         COMPENDIUM_DOCUMENT_TYPES: [
+            'ActiveEffect',
+            'Item',
+         ],
+      };
       globalThis.CustomEvent = class {
          /**
           * Records the event type.
@@ -37,50 +72,83 @@ describe('buildEffectFolderContextMenu', () => {
       };
    });
 
-   it('lists Edit, Rename, and Delete in order', () => {
+   it('lists the core compendium folder entries in core order, with Rename after Edit Folder', () => {
       /** @type {object[]} The built context-menu entries. */
-      const entries = buildEffectFolderContextMenu({ canEdit: true });
+      const entries = buildEffectFolderContextMenu(fakeTrayState(true).trayState);
       expect(entries.map((entry) => entry.label)).toEqual([
          'FOLDER.Edit',
          'LOCAL.effectTrayRenameFolder.text',
-         'LOCAL.effectTrayDeleteFolder.text',
+         'FOLDER.CreateTable',
+         'FOLDER.Remove',
+         'FOLDER.Delete',
       ]);
    });
 
-   it('shows no entry when the pack is not editable', () => {
-      /** @type {object[]} The built context-menu entries. */
-      const entries = buildEffectFolderContextMenu({ canEdit: false });
-      expect(entries.map((entry) => entry.visible())).toEqual([
-         false,
-         false,
-         false,
-      ]);
+   it('omits the entries the core Compendium directory removes from folder menus', () => {
+      /** @type {string[]} The built entry labels. */
+      const labels = buildEffectFolderContextMenu(fakeTrayState(true).trayState).map((entry) => entry.label);
+      expect(labels).not.toContain('OWNERSHIP.Configure');
+      expect(labels).not.toContain('FOLDER.Export');
    });
 
-   it('Edit opens the resolved folder configuration and Delete deletes it through the tray state', () => {
-      /** @type {object} The folder the menu resolves from the header. */
-      const folder = { sheet: { render: vi.fn() } };
-      /** @type {object} A fake tray state holding the folder in its selected pack. */
-      const trayState = {
-         canEdit: true,
-         deleteFolder: vi.fn(),
-         selectedPack: {
-            folders: new Map([[
-               'f1',
-               folder,
-            ]]),
-         },
-      };
-      const [edit, , remove] = buildEffectFolderContextMenu(trayState);
+   it('shows every entry on an editable pack', () => {
+      const { trayState } = fakeTrayState(true);
       const { target } = headerTarget('f1');
-      edit.onClick(null, target);
-      remove.onClick(null, target);
+      expect(buildEffectFolderContextMenu(trayState).map((entry) => entry.visible(target))).toEqual([
+         true,
+         true,
+         true,
+         true,
+         true,
+      ]);
+   });
+
+   it('shows only Create Rollable Table when the pack is not editable', () => {
+      const { trayState } = fakeTrayState(false);
+      const { target } = headerTarget('f1');
+      expect(buildEffectFolderContextMenu(trayState).map((entry) => entry.visible(target))).toEqual([
+         false,
+         false,
+         true,
+         false,
+         false,
+      ]);
+   });
+
+   it('Edit opens the resolved folder configuration', () => {
+      const { trayState, folder } = fakeTrayState(true);
+      const [edit] = buildEffectFolderContextMenu(trayState);
+      edit.onClick(null, headerTarget('f1').target);
       expect(folder.sheet.render).toHaveBeenCalledWith(true);
-      expect(trayState.deleteFolder).toHaveBeenCalledWith(folder);
+   });
+
+   it('Create Rollable Table, Remove Folder, and Delete All route the resolved folder to the tray state', () => {
+      const { trayState, folder } = fakeTrayState(true);
+      const [, , createTable, remove, deleteAll] = buildEffectFolderContextMenu(trayState);
+      const { target } = headerTarget('f1');
+      createTable.onClick(null, target);
+      remove.onClick(null, target);
+      deleteAll.onClick(null, target);
+      expect(trayState.requestCreateTableFromFolder).toHaveBeenCalledWith(folder);
+      expect(trayState.requestRemoveFolder).toHaveBeenCalledWith(folder);
+      expect(trayState.requestDeleteFolderAll).toHaveBeenCalledWith(folder);
+   });
+
+   it('folder actions no-op when the header resolves no folder', () => {
+      const { trayState } = fakeTrayState(true);
+      const [, , createTable, remove, deleteAll] = buildEffectFolderContextMenu(trayState);
+      const { target } = headerTarget('missing');
+      createTable.onClick(null, target);
+      remove.onClick(null, target);
+      deleteAll.onClick(null, target);
+      expect(createTable.visible(target)).toBe(false);
+      expect(trayState.requestCreateTableFromFolder).not.toHaveBeenCalled();
+      expect(trayState.requestRemoveFolder).not.toHaveBeenCalled();
+      expect(trayState.requestDeleteFolderAll).not.toHaveBeenCalled();
    });
 
    it('Rename dispatches the inline-rename event on the folder header', () => {
-      const [, rename] = buildEffectFolderContextMenu({ canEdit: true });
+      const [, rename] = buildEffectFolderContextMenu(fakeTrayState(true).trayState);
       const { target, header } = headerTarget('f1');
       rename.onClick(null, target);
       expect(header.dispatchEvent).toHaveBeenCalledTimes(1);

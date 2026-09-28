@@ -22,30 +22,24 @@
    }
 
    /**
-    * Stashes a dropped effect into the selected pack. Parses the standard Foundry drag data from the
-    * transfer and forwards it to the tray state, which guards editability and the data type.
-    * @param {DragEvent} event - The drop event.
+    * Handles a drop anywhere on the tray as core's directory `_onDrop` does: parses the Foundry drag data
+    * and hands it to the tray state with the `.directory-item` under the pointer (null over the list root
+    * or the header), which moves, sorts, imports, or stashes the dropped folder or effect.
+    * @param {DragEvent} event - The drop on the tray or any element inside it.
     * @returns {void}
     */
    function onDrop(event) {
       event.preventDefault();
 
-      /** @type {string} The raw drag-data payload from the transfer. */
-      const raw = event.dataTransfer?.getData('text/plain');
-      if (!raw) {
+      /** @type {object} The parsed Foundry drag data (an empty object when the payload is not JSON). */
+      const data = foundry.applications.ux.TextEditor.implementation.getDragEventData(event);
+      if (!data?.type) {
          return;
       }
 
-      /** @type {object | undefined} The parsed Foundry drag data, or undefined when malformed. */
-      let dragData = void 0;
-      try {
-         dragData = JSON.parse(raw);
-      }
-      catch {
-         return;
-      }
-
-      void trayState.stashFromDragData(dragData);
+      /** @type {HTMLElement | null} The folder or effect item under the drop, or null for the root. */
+      const target = event.target.closest('.directory-item') ?? null;
+      void trayState.dropOnDirectory(target, data);
    }
 
    /**

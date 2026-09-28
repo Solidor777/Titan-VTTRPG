@@ -66,7 +66,3 @@ Completed items are deleted, not marked done.
 
 - Extend immunity beyond effects and conditions (user ruling 2026-09-27): immunity to abilities, damage and other
   things by trait. The first cut covers effect/condition immunity by condition id or effect name only.
-
-- Effect Tray parity gaps with the core directories (`src/sidebar/tray/`): folders cannot be dragged to reorder or nest
-  them (effects can be dragged into folders), and the folder context menu offers only Edit, Rename, and Delete — core's
-  Remove Folder / Delete All distinction, Configure Ownership, and Export entries are absent.

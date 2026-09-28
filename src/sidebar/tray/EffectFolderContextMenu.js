@@ -1,5 +1,5 @@
 import localize from '~/helpers/utility-functions/Localize.js';
-import { DELETE_ICON, RENAME_ICON } from '~/system/Icons.js';
+import { RENAME_ICON } from '~/system/Icons.js';
 
 /**
  * Resolves the pack Folder for a context-menu target header from its enclosing `data-folder-id`.
@@ -15,12 +15,22 @@ function resolveFolder(target, trayState) {
 }
 
 /**
- * Builds the right-click context-menu entries for an effect-tray folder header, following the core folder
- * menu: Edit Folder opens the core folder configuration (name, color, sorting), Rename edits the name
- * inline, and Delete removes the folder. Every entry requires edit permission on the selected pack. Entry
- * shape matches the effect-row menu (`{ label, icon, visible(target), onClick(event, target) }`).
+ * Builds the right-click context-menu entries for an effect-tray folder header, matching the folder menu
+ * core's Compendium directory shows for a pack's folders (DocumentDirectory's folder entries less
+ * Configure Ownership and Export to Compendium, which the Compendium directory removes), plus an inline
+ * Rename after Edit Folder:
+ * - Edit Folder opens the core folder configuration (name, color, sorting).
+ * - Rename edits the name inline in the header.
+ * - Create Rollable Table builds a world table from the folder's effects.
+ * - Remove Folder deletes the folder and moves its contents up a level.
+ * - Delete All deletes the folder, its subfolders, and every effect inside them.
+ *
+ * Every entry that changes the pack requires edit permission on the selected pack (owned and unlocked),
+ * where core requires a GM and leaves the lock to the server. Create Rollable Table changes no pack data,
+ * so it shows whenever core shows it: for every folder, since Active Effect is a compendium document type.
+ * Entry shape matches the effect-row menu (`{ label, icon, visible(target), onClick(event, target) }`).
  * @param {import('~/sidebar/tray/EffectTrayState.svelte.js').default} trayState - Reactive tray state
- * read by the entries for permission gating and folder resolution.
+ * read by the entries for permission gating, folder resolution, and the folder actions.
  * @returns {object[]} The ContextMenuEntry array.
  */
 export default function buildEffectFolderContextMenu(trayState) {
@@ -44,14 +54,38 @@ export default function buildEffectFolderContextMenu(trayState) {
          },
       },
       {
-         label: localize('effectTrayDeleteFolder'),
-         icon: `<i class="${DELETE_ICON}"></i>`,
+         label: game.i18n.localize('FOLDER.CreateTable'),
+         icon: `<i class="${CONFIG.RollTable.sidebarIcon}"></i>`,
+         visible: (target) => CONST.COMPENDIUM_DOCUMENT_TYPES.includes(resolveFolder(target, trayState)?.type),
+         onClick: (event, target) => {
+            /** @type {Folder | undefined} The folder for the clicked header. */
+            const folder = resolveFolder(target, trayState);
+            if (folder) {
+               void trayState.requestCreateTableFromFolder(folder);
+            }
+         },
+      },
+      {
+         label: game.i18n.localize('FOLDER.Remove'),
+         icon: '<i class="fa-solid fa-trash"></i>',
          visible: () => trayState.canEdit,
          onClick: (event, target) => {
             /** @type {Folder | undefined} The folder for the clicked header. */
             const folder = resolveFolder(target, trayState);
             if (folder) {
-               void trayState.deleteFolder(folder);
+               void trayState.requestRemoveFolder(folder);
+            }
+         },
+      },
+      {
+         label: game.i18n.localize('FOLDER.Delete'),
+         icon: '<i class="fa-solid fa-dumpster"></i>',
+         visible: () => trayState.canEdit,
+         onClick: (event, target) => {
+            /** @type {Folder | undefined} The folder for the clicked header. */
+            const folder = resolveFolder(target, trayState);
+            if (folder) {
+               void trayState.requestDeleteFolderAll(folder);
             }
          },
       },

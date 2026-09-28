@@ -20,6 +20,9 @@
    /** @type {boolean} Whether the current folder rename is being cancelled, so the blur commit is skipped. */
    let isCancellingFolderRename = false;
 
+   /** @type {string | null} The uuid of the folder highlighted as the current drop target, or null. */
+   let dropTargetUuid = $state(null);
+
    /** @type {string} The search text with surrounding whitespace and diacritics removed, as core cleans it. */
    const query = $derived(foundry.applications.ux.SearchFilter.cleanQuery(trayState.filter));
 
@@ -181,67 +184,72 @@
    }
 
    /**
-    * Reads the dragged effect's uuid from a drop event's transfer.
-    * @param {DragEvent} event - The drop event.
-    * @returns {string | undefined} The dragged effect uuid, or undefined when absent or malformed.
+    * Writes a folder's Foundry drag data onto the drag event, as core's directory does for a folder item:
+    * closes any open context menu and stops the event so an enclosing folder does not overwrite the data.
+    * The tray's drop handling then nests or reorders the folder; other directories import it.
+    * @param {DragEvent} event - The dragstart event on the folder item.
+    * @param {Folder} folder - The dragged folder.
+    * @returns {void}
     */
-   function readDraggedUuid(event) {
-      /** @type {string} The raw drag-data payload. */
-      const raw = event.dataTransfer?.getData('text/plain');
-      if (!raw) {
-         return void 0;
+   function onFolderDragStart(event, folder) {
+      ui.context?.close({ animate: false });
+      event.dataTransfer.setData('text/plain', JSON.stringify(folder.toDragData()));
+      event.stopPropagation();
+   }
+
+   /**
+    * Highlights the folder under a drag as the drop target, following core's directory drag highlight:
+    * entering a folder makes it the only highlighted folder, and leaving it clears the highlight unless the
+    * pointer is still over that folder's own area (not a nested folder). The event is stopped so enclosing
+    * folders do not also react.
+    * @param {DragEvent} event - The dragenter or dragleave event on the folder item.
+    * @param {Folder} folder - The folder the item belongs to.
+    * @returns {void}
+    */
+   function onFolderDragHighlight(event, folder) {
+      event.stopPropagation();
+      if (event.type === 'dragenter') {
+         dropTargetUuid = folder.uuid;
+         return;
       }
 
-      try {
-         /** @type {object} The parsed Foundry drag data. */
-         const dragData = JSON.parse(raw);
-         return dragData?.type === 'ActiveEffect' ? dragData.uuid : void 0;
+      /** @type {Element | null} The element now under the pointer (event.target is the element left). */
+      const hovered = document.elementFromPoint(event.clientX, event.clientY);
+      if (hovered?.closest('.folder') === event.currentTarget) {
+         return;
       }
-      catch {
-         return void 0;
+
+      if (dropTargetUuid === folder.uuid) {
+         dropTargetUuid = null;
       }
    }
 
    /**
-    * Moves a dropped effect into the given folder (or to the pack root when folderId is null), but
-    * only when the dragged effect already belongs to the selected pack. Cross-pack drops fall
-    * through to the tray's stash handler instead.
-    * @param {DragEvent} event - The drop event.
-    * @param {string | null} folderId - The destination folder id, or null for the pack root.
+    * Clears the drop-target highlight once a drag ends in a drop or is cancelled.
     * @returns {void}
     */
-   function onFolderDrop(event, folderId) {
-      /** @type {string | undefined} The dragged effect uuid. */
-      const uuid = readDraggedUuid(event);
-      if (!uuid) {
-         return;
-      }
-
-      /** @type {object | undefined} The pack effect matching the dragged uuid. */
-      const effect = trayState.effects.find((candidate) => candidate.uuid === uuid);
-      if (!effect) {
-         return;
-      }
-
-      // Intercept the drop so enclosing folders and the tray's stash handler do not also handle it.
-      event.preventDefault();
-      event.stopPropagation();
-      void trayState.moveEffectToFolder(effect, folderId);
+   function clearDropTarget() {
+      dropTargetUuid = null;
    }
 </script>
+
+<svelte:window ondragend={clearDropTarget} />
 
 {#snippet folderItem(node)}
    {@const expanded = isExpanded(node)}
    {@const color = node.folder.color?.css}
    <li
       class="directory-item folder flexcol"
+      class:droptarget={dropTargetUuid === node.folder.uuid}
       class:expanded
       data-folder-depth={node.depth}
       data-folder-id={node.folder.id}
       data-testid="effect-tray-folder"
       data-uuid={node.folder.uuid}
-      ondragover={(event) => event.preventDefault()}
-      ondrop={(event) => onFolderDrop(event, node.folder.id)}
+      draggable={renamingFolderUuid !== node.folder.uuid}
+      ondragenter={(event) => onFolderDragHighlight(event, node.folder)}
+      ondragleave={(event) => onFolderDragHighlight(event, node.folder)}
+      ondragstart={(event) => onFolderDragStart(event, node.folder)}
    >
       <!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
       <header
@@ -274,7 +282,7 @@
             <span class="folder-name ellipsis">{node.folder.name}</span>
          {/if}
 
-         {#if trayState.canEdit && node.depth < CONST.FOLDER_MAX_DEPTH}
+         {#if trayState.canEdit && node.depth < trayState.maxFolderDepth}
             <button
                class="create-button create-folder icon icon-plus fa-solid fa-folder"
                aria-label={game.i18n.localize('SIDEBAR.ACTIONS.CREATE.Folder')}
@@ -331,8 +339,7 @@
    <ol
       class="directory-list plain"
       data-testid="effect-tray-list"
-      ondragover={(event) => event.preventDefault()}
-      ondrop={(event) => onFolderDrop(event, null)}
+      ondrop={clearDropTarget}
    >
       {#each displayed.children as node (node.folder.id)}
          {@render folderItem(node)}
