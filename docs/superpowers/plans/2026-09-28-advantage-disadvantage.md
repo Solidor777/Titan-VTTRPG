@@ -6196,7 +6196,7 @@ narrowing lives in `createArmorTraitCheckModifiers` (`src/document/types/item/ty
 
 - [ ] **Step 3: Amend spec A to the as-built interfaces**
 
-In `docs/superpowers/specs/2026-09-27-advantage-disadvantage-design.md` (resolutions #2, #3, #10, #11):
+In `docs/superpowers/specs/2026-09-27-advantage-disadvantage-design.md` (resolutions #2, #3, #10, #11, #12, #13):
 
 (a) In §2, directly after the bullet that ends `the stored option keeps the raw sum.`, insert:
 
@@ -6241,6 +6241,23 @@ with
 - Parameters record the applied situations as `situations: { key, label }[]`: `buildSchemaFromShape` maps an empty
   array to an `ArrayField(ObjectField)`, which rejects strings, and the label lets the card render without an actor
   lookup. The chat card lists them by label.
+```
+
+(d) In §3 (resolution #12), after the bullet that ends `(the flag is read from the stored parameters).`, insert:
+
+```markdown
+- An automatically failed card offers no action that could change its outcome: the chat log's Re-roll Failures,
+  Double Training, and Double Expertise entries, the reset-Expertise button, and per-die Expertise are withheld, and
+  no die is styled as a success.
+```
+
+(e) In §4 (resolution #13), directly after the bullet that begins `- A situational element may optionally narrow
+itself to checks using one skill`, insert:
+
+```markdown
+- Skill narrowing applies only to non-Resistance situations: a Resistance check has no Skill, so the editor hides the
+  skill select for check type `resistance` and clears the stored `skill` when the check type becomes `resistance` or
+  the selector changes.
 ```
 
 - [ ] **Step 4: Update `conventions.md`**
