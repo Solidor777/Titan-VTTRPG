@@ -1,6 +1,7 @@
 /**
  * Calculated parameters for the creation of a new Attack Check, based off an Actor's data.
  * @typedef {CheckParameters} AttackCheckParameters
+ * @property {boolean} automaticFailure - Whether the check fails automatically; its dice still roll.
  * @property {boolean} cleave - Whether this check is a Cleave attack.
  * @property {boolean} doubleExpertise - Whether to double the Expertise applied.
  * @property {boolean} doubleTraining - Whether to double the Training applied.
@@ -13,15 +14,17 @@
  * @property {boolean} penetrating - Whether this Attack is a Penetrating attack.
  * @property {boolean} plusExtraSuccessDamage - Whether to increase the damage for each extra success.
  * @property {boolean} rend - Whether this check is a Rend attack.
+ * @property {number} advantage - The summed Advantage (+) and Disadvantage (-), ticked situations included.
  * @property {number} attackerAccuracy - The attacker's accuracy rating.
  * @property {number} attackerMelee - The attacker's melee rating.
  * @property {number} attackerRating - The attacker's rating used for the attack.
  * @property {number} attributeDice - The number of dice granted by the attribute.
+ * @property {number} baseDifficulty - The Difficulty before Advantage is applied.
  * @property {number} complexity - The minimum number of Successes needed to succeed at the Check.
  * @property {number} damage - The minimum Damage to apply on a successful check.
  * @property {number} damageMod - Modifier for the amount of Damage to be inflicted.
  * @property {number} diceMod - Modifier for the number of Dice being rolled.
- * @property {number} difficulty - The minimum roll on a die to achieve a Success.
+ * @property {number} difficulty - The minimum roll on a die to achieve a Success, after Advantage.
  * @property {number} expertiseMod - Modifier for the amount of Expertise to be applied.
  * @property {number} range - The Range of the Attack.
  * @property {number} skillExpertise - The amount of expertise granted by the skill.
@@ -31,6 +34,7 @@
  * @property {number} totalExpertise - The total amount of expertise to apply.
  * @property {number} totalTrainingDice - The total number of training dice to be rolled.
  * @property {number} trainingMod - Modifier for the amount of Training to be applied.
+ * @property {SituationLabel[]} situations - The situational modifiers applied to the check.
  * @property {string[]} attackTrait - Array of standard attack traits applied to this attack.
  * @property {string[]} customTrait - Array of custom traits applied to this attack.
  * @property {string} attackName - The display name of the attack.
@@ -45,11 +49,12 @@
 /**
  * Builds the zero-value shape of an Attack Check's parameters.
  * All numeric fields default to 0, boolean fields to false, string fields to '', and arrays to [].
- * Factory constants `complexity: 1` and `difficulty: 4` are kept at their canonical values.
+ * Factory constants `complexity: 1`, `difficulty: 4`, and `baseDifficulty: 4` are kept at their canonical values.
  * @returns {AttackCheckParameters} The attack check-parameters shape (with factory constants).
  */
 export function createAttackCheckParametersShape() {
    return {
+      advantage: 0,
       attackNotes: '',
       attackerAccuracy: 0,
       attackerMelee: 0,
@@ -58,6 +63,8 @@ export function createAttackCheckParametersShape() {
       attackTrait: [],
       attribute: '',
       attributeDice: 0,
+      automaticFailure: false,
+      baseDifficulty: 4,
       cleave: false,
       complexity: 1,
       customTrait: [],
@@ -80,6 +87,7 @@ export function createAttackCheckParametersShape() {
       plusExtraSuccessDamage: false,
       range: 0,
       rend: false,
+      situations: [],
       skill: '',
       skillExpertise: 0,
       skillTrainingDice: 0,
@@ -102,9 +110,11 @@ export function createAttackCheckParametersShape() {
 export default function createAttackCheckParameters(options) {
    return {
       ...createAttackCheckParametersShape(),
+      advantage: options.advantage,
       attackerAccuracy: options.attackerAccuracy,
       attackerMelee: options.attackerMelee,
       attribute: options.attribute,
+      automaticFailure: options.automaticFailure,
       cleave: options.cleave,
       damageMod: options.damageMod,
       diceMod: options.diceMod,

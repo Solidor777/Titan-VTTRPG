@@ -4,17 +4,20 @@
  * @property {OpposedCheckBase} opposedCheck - The opposed check data (enabled/attribute/skill).
  * @property {boolean} isDamage - Whether the check inflicts damage.
  * @property {boolean} isHealing - Whether the check heals damage.
+ * @property {boolean} automaticFailure - Whether the check fails automatically; its dice still roll.
  * @property {boolean} doubleExpertise - Whether to double the Expertise applied.
  * @property {boolean} doubleTraining - Whether to double the Training applied.
  * @property {boolean} extraFailureOnCritical - Whether a roll of 1 equals a negative success.
  * @property {boolean} extraSuccessOnCritical - Whether a roll of 6 equals an extra success.
  * @property {boolean} scaling - Whether subsequent successes should scale the initial value.
+ * @property {number} advantage - The summed Advantage (+) and Disadvantage (-), ticked situations included.
  * @property {number} attributeDice - The number of dice granted by the attribute.
+ * @property {number} baseDifficulty - The Difficulty before Advantage is applied.
  * @property {number} complexity - The minimum number of Successes needed to succeed at the Check.
  * @property {number} damage - The minimum Damage to apply on a successful check.
  * @property {number} damageMod - Modifier for the amount of Damage to be inflicted.
  * @property {number} diceMod - Modifier for the number of Dice being rolled.
- * @property {number} difficulty - The minimum roll on a die to achieve a Success.
+ * @property {number} difficulty - The minimum roll on a die to achieve a Success, after Advantage.
  * @property {number} expertiseMod - Modifier for the amount of Expertise to be applied.
  * @property {number} healing - The minimum Healing to apply on a successful check.
  * @property {number} healingMod - Modifier for the amount of healing to be applied.
@@ -25,6 +28,7 @@
  * @property {number} totalExpertise - The total amount of expertise to apply.
  * @property {number} totalTrainingDice - The total number of training dice to be rolled.
  * @property {number} trainingMod - Modifier for the amount of Training to be applied.
+ * @property {SituationLabel[]} situations - The situational modifiers applied to the check.
  * @property {string[]} customTrait - Array of custom traits applied to the item.
  * @property {string} attribute - The Attribute to use for the Check.
  * @property {string} checkLabel - The display name of the check.
@@ -47,8 +51,11 @@
  */
 export function createItemCheckParametersShape() {
    return {
+      advantage: 0,
       attribute: '',
       attributeDice: 0,
+      automaticFailure: false,
+      baseDifficulty: 0,
       checkLabel: '',
       complexity: 0,
       customTrait: [],
@@ -77,6 +84,7 @@ export function createItemCheckParametersShape() {
       resistanceCheck: 'none',
       resolveCost: 0,
       scaling: false,
+      situations: [],
       skill: '',
       skillExpertise: 0,
       skillTrainingDice: 0,
@@ -97,7 +105,9 @@ export function createItemCheckParametersShape() {
 export default function createItemCheckParameters(options) {
    return {
       ...createItemCheckParametersShape(),
+      advantage: options.advantage,
       attribute: options.attribute,
+      automaticFailure: options.automaticFailure,
       complexity: options.complexity,
       damageMod: options.damageMod,
       diceMod: options.diceMod,

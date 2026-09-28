@@ -11,6 +11,7 @@
 /**
  * Calculated parameters for the creation of a new Casting Check, based off an Actor's data.
  * @typedef {CheckParameters} CastingCheckParameters
+ * @property {boolean} automaticFailure - Whether the check fails automatically; its dice still roll.
  * @property {boolean} doubleExpertise - Whether to double the Expertise applied.
  * @property {boolean} doubleTraining - Whether to double the Training applied.
  * @property {boolean} extraFailureOnCritical - Whether a roll of 1 equals a negative success.
@@ -18,12 +19,14 @@
  * @property {boolean} reflexesCheck - Whether the effects can be resisted with a Reflexes check.
  * @property {boolean} resilienceCheck - Whether the effects can be resisted with a Resilience check.
  * @property {boolean} willpowerCheck - Whether the effects can be resisted with a Willpower check.
+ * @property {number} advantage - The summed Advantage (+) and Disadvantage (-), ticked situations included.
  * @property {number} attributeDice - The number of dice granted by the attribute.
+ * @property {number} baseDifficulty - The Difficulty before Advantage is applied.
  * @property {number} complexity - The minimum number of Successes needed to succeed at the Check.
  * @property {number} damage - The minimum Damage to apply on a successful check.
  * @property {number} damageMod - Modifier for the amount of Damage to be inflicted.
  * @property {number} diceMod - Modifier for the number of Dice being rolled.
- * @property {number} difficulty - The minimum roll on a die to achieve a Success.
+ * @property {number} difficulty - The minimum roll on a die to achieve a Success, after Advantage.
  * @property {number} expertiseMod - Modifier for the amount of Expertise to be applied.
  * @property {number} healing - The minimum Healing to apply on a successful check.
  * @property {number} healingMod - Modifier for the amount of healing to be applied.
@@ -34,6 +37,7 @@
  * @property {number} totalTrainingDice - The total number of training dice to be rolled.
  * @property {number} trainingMod - Modifier for the amount of Training to be applied.
  * @property {ScalingAspectBase[]} scalingAspect - Array of scaling spell aspects.
+ * @property {SituationLabel[]} situations - The situational modifiers applied to the check.
  * @property {string[]} customTrait - Array of custom traits applied to the item.
  * @property {string} attribute - The Attribute to use for the Check.
  * @property {string} img - The image to display with the check.
@@ -52,8 +56,11 @@
  */
 export function createCastingCheckParametersShape() {
    return {
+      advantage: 0,
       attribute: '',
       attributeDice: 0,
+      automaticFailure: false,
+      baseDifficulty: 0,
       complexity: 0,
       customTrait: [],
       damage: 0,
@@ -73,6 +80,7 @@ export function createCastingCheckParametersShape() {
       reflexesCheck: false,
       resilienceCheck: false,
       scalingAspect: [],
+      situations: [],
       skill: '',
       skillExpertise: 0,
       skillTrainingDice: 0,
@@ -94,7 +102,9 @@ export function createCastingCheckParametersShape() {
 export default function createCastingCheckParameters(options) {
    return {
       ...createCastingCheckParametersShape(),
+      advantage: options.advantage,
       attribute: options.attribute,
+      automaticFailure: options.automaticFailure,
       complexity: options.complexity,
       damageMod: options.damageMod,
       diceMod: options.diceMod,

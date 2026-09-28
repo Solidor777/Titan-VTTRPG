@@ -26,17 +26,28 @@
       die.expertiseApplied > 0 ? `${die.base} + ${die.expertiseApplied}` : die.base.toString(),
    );
 
-   /** @type {string} The class to affect the appearance of the die. */
-   const result = $derived(
-      die.final >= 6 ? 'critical-success' :
+   /**
+    * @type {string} The class to affect the appearance of the die. An automatically failed check has no successful
+    * die, so each shows as a failure (a 1 as a critical failure).
+    */
+   const result = $derived.by(() => {
+      if (document.data.system.parameters.automaticFailure) {
+         return die.final <= 1 ? 'critical-failure' : 'failure';
+      }
+
+      return die.final >= 6 ? 'critical-success' :
          die.final >= document.data.system.parameters.difficulty ? 'success' :
             die.final <= 1 ? 'critical-failure' :
-            'failure',
-   );
+            'failure';
+   });
 
-   /** @type {boolean} Whether applying Expertise to the die should be disabled. */
+   /**
+    * @type {boolean} Whether applying Expertise to the die should be disabled. Expertise cannot change an
+    * automatically failed check.
+    */
    const disabled = $derived(
       !document.data.isOwner ||
+         document.data.system.parameters.automaticFailure ||
          document.data.system.results.expertiseRemaining === 0 ||
          die.final >= 6,
    );

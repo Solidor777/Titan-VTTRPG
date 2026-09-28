@@ -4,27 +4,42 @@ import rollCheckDice from '~/helpers/utility-functions/RollCheckDice.js';
 /**
  * Options for a check in the Titan system.
  * @typedef {object} CheckOptions
+ * @property {boolean} [automaticFailure] - Whether the check fails automatically; its dice still roll.
  * @property {boolean} [doubleExpertise] - Whether to double the Expertise applied.
  * @property {boolean} [extraFailureOnCritical] - Whether a roll of 1 equals a negative success.
  * @property {boolean} [extraSuccessOnCritical] - Whether a roll of 6 equals an extra success.
+ * @property {number} [advantage] - The summed Advantage (+) and Disadvantage (-) from always-on sources and the dialog.
  * @property {number} [complexity] - The minimum number of Successes needed to succeed at the Check.
  * @property {number} [diceMod] - Modifier for the number of Dice being rolled.
- * @property {number} [difficulty] - The minimum roll on a die to achieve a Success.
+ * @property {number} [difficulty] - The Difficulty before Advantage.
  * @property {number} [expertiseMod] - Modifier for the amount of Expertise to be applied.
+ * @property {string[]} [situations] - The camel-case keys of the situational modifiers ticked in the check dialog.
  */
 
 /**
  * Base parameters of a check in the Titan system.
  * @typedef {object} CheckParameters
+ * @property {boolean} automaticFailure - Whether the check fails automatically; its dice still roll.
  * @property {boolean} doubleExpertise - Whether to double the Expertise applied.
  * @property {boolean} extraFailureOnCritical - Whether a roll of 1 equals a negative success.
  * @property {boolean} extraSuccessOnCritical - Whether a roll of 6 equals an extra success.
+ * @property {number} advantage - The summed Advantage (+) and Disadvantage (-), ticked situations included; clamped
+ * to ±2 when applied.
+ * @property {number} baseDifficulty - The Difficulty before Advantage is applied.
  * @property {number} complexity - The minimum number of Successes needed to succeed at the Check.
  * @property {number} diceMod - Modifier for the number of Dice being rolled.
- * @property {number} difficulty - The minimum roll on a die to achieve a Success.
+ * @property {number} difficulty - The minimum roll on a die to achieve a Success, after Advantage.
  * @property {number} expertiseMod - Modifier for the amount of Expertise to be applied.
  * @property {number} totalDice - The total number of dice to be rolled.
  * @property {number} totalExpertise - The total amount of expertise to apply.
+ * @property {SituationLabel[]} situations - The situational modifiers applied to the check.
+ */
+
+/**
+ * A situational modifier applied to a check, as its chat card lists it.
+ * @typedef {object} SituationLabel
+ * @property {string} key - The camel-case situation key.
+ * @property {string} label - The situation's display label.
  */
 
 /**

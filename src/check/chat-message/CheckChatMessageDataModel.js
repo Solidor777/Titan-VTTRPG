@@ -38,4 +38,28 @@ export default class CheckChatMessageDataModel extends TitanChatMessageDataModel
          results: createSchemaField(buildSchemaFromShape(resultsShape)),
       };
    }
+
+   /**
+    * Fills `baseDifficulty` on a check message whose stored parameters carry a `difficulty` but no `baseDifficulty`.
+    * Such a message rolled with no Advantage, so its stored `difficulty` is its base Difficulty; its `advantage`,
+    * `automaticFailure`, and `situations` take their schema initials (0, false, []). A partial update diff that
+    * carries no Difficulty is left untouched.
+    * INVARIANT: every parameter update carries `baseDifficulty` whenever it carries `difficulty`; a diff carrying only
+    * `difficulty` would have its base overwritten with the post-Advantage value. The fill is not gated on
+    * `advantage`, because a diff need not carry it.
+    * @override
+    * @param {object} source - The source data for the check chat message.
+    * @returns {object} The migrated source data.
+    */
+   static migrateData(source) {
+      if (
+         source.parameters &&
+         source.parameters.baseDifficulty === undefined &&
+         source.parameters.difficulty !== undefined
+      ) {
+         source.parameters.baseDifficulty = source.parameters.difficulty;
+      }
+
+      return super.migrateData(source);
+   }
 }

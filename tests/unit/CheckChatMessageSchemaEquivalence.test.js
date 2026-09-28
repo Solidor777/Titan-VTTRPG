@@ -12,19 +12,14 @@ import {
    stringField,
 } from './helpers/schemaFingerprint.js';
 
-// Characterization (golden-master) gate for the five check chat-message DataModel schemas, authored as
-// a RED test for follow-up D / Task 9. Task 10 will rebuild each subtype's _defineDocumentSchema() so
-// that parameters and results are TYPED SchemaFields built from the shared check parameter/result shape
-// templates via buildSchemaFromShape(); this suite freezes the byte-exact fingerprint of those TARGET
-// typed schemas. It MUST FAIL against the current code, where CheckChatMessageDataModel stores both
-// parameters and results as untyped ObjectField bags (createObjectField()). The check chat DataModels
-// chain through CheckChatMessageDataModel -> TitanChatMessageDataModel -> TitanDataModel ->
+// Characterization (golden-master) gate for the five check chat-message DataModel schemas: parameters and results are
+// typed SchemaFields built from the shared check parameter/result shape templates via buildSchemaFromShape(). The check
+// chat DataModels chain through CheckChatMessageDataModel -> TitanChatMessageDataModel -> TitanDataModel ->
 // foundry.abstract.TypeDataModel, define their schema via the create*Field helpers (which call
-// foundry.data.fields.*), and expose a component getter that imports a .svelte component. This suite
-// installs stand-ins for TypeDataModel, the data-field classes, i18n, and ApplicationV2 before
-// dynamically importing the real data models, then fingerprints each schema and asserts it deep-equals
-// the committed golden written inline below. Dynamic import is permitted in tests (the
-// no-dynamic-import rule governs the shipping bundle only).
+// foundry.data.fields.*), and expose a component getter that imports a .svelte component. This suite installs
+// stand-ins for TypeDataModel, the data-field classes, i18n, and ApplicationV2 before dynamically importing the real
+// data models, then fingerprints each schema and asserts it deep-equals the committed golden written inline below.
+// Dynamic import is permitted in tests (the no-dynamic-import rule governs the shipping bundle only).
 
 /** @type {object} Holds the dynamically imported check chat-message DataModel classes keyed by type. */
 const models = {};
@@ -84,12 +79,10 @@ function checkBaseFields() {
 }
 
 /**
- * The committed golden fingerprints for each check chat-message DataModel schema, hand-authored as the
- * TARGET typed schemas: parameters and results become SchemaFields whose sub-fields fingerprint each
- * field of the corresponding check parameter/result shape under the buildSchemaFromShape rules
- * (string -> StringField, number -> integer NumberField, boolean -> BooleanField, [] -> ObjectField
- * array, nested object -> SchemaField). This suite is RED against the current code, which stores
- * parameters and results as untyped ObjectFields.
+ * The committed golden fingerprints for each check chat-message DataModel schema: parameters and results are
+ * SchemaFields whose sub-fields fingerprint each field of the corresponding check parameter/result shape under the
+ * buildSchemaFromShape rules (string -> StringField, number -> integer NumberField, boolean -> BooleanField, [] ->
+ * ObjectField array, nested object -> SchemaField).
  * @type {object}
  */
 const GOLDENS = {
@@ -97,8 +90,11 @@ const GOLDENS = {
    attribute: {
       ...checkBaseFields(),
       parameters: schemaField({
+         advantage: integerField(0),
          attribute: stringField(''),
          attributeDice: integerField(0),
+         automaticFailure: booleanField(false),
+         baseDifficulty: integerField(0),
          complexity: integerField(0),
          damageToReduce: integerField(0),
          diceMod: integerField(0),
@@ -108,6 +104,7 @@ const GOLDENS = {
          expertiseMod: integerField(0),
          extraFailureOnCritical: booleanField(false),
          extraSuccessOnCritical: booleanField(false),
+         situations: emptyObjectArray(),
          skill: stringField(''),
          skillExpertise: integerField(0),
          skillTrainingDice: integerField(0),
@@ -132,6 +129,9 @@ const GOLDENS = {
    resistance: {
       ...checkBaseFields(),
       parameters: schemaField({
+         advantage: integerField(0),
+         automaticFailure: booleanField(false),
+         baseDifficulty: integerField(0),
          complexity: integerField(0),
          damageToReduce: integerField(0),
          diceMod: integerField(0),
@@ -142,6 +142,7 @@ const GOLDENS = {
          extraSuccessOnCritical: booleanField(false),
          resistance: stringField(''),
          resistanceDice: integerField(0),
+         situations: emptyObjectArray(),
          totalDice: integerField(0),
          totalExpertise: integerField(0),
       }),
@@ -162,6 +163,7 @@ const GOLDENS = {
    attack: {
       ...checkBaseFields(),
       parameters: schemaField({
+         advantage: integerField(0),
          attackNotes: stringField(''),
          attackerAccuracy: integerField(0),
          attackerMelee: integerField(0),
@@ -170,6 +172,8 @@ const GOLDENS = {
          attackTrait: emptyObjectArray(),
          attribute: stringField(''),
          attributeDice: integerField(0),
+         automaticFailure: booleanField(false),
+         baseDifficulty: integerField(4),
          cleave: booleanField(false),
          complexity: integerField(1),
          customTrait: emptyObjectArray(),
@@ -192,6 +196,7 @@ const GOLDENS = {
          plusExtraSuccessDamage: booleanField(false),
          range: integerField(0),
          rend: booleanField(false),
+         situations: emptyObjectArray(),
          skill: stringField(''),
          skillExpertise: integerField(0),
          skillTrainingDice: integerField(0),
@@ -219,8 +224,11 @@ const GOLDENS = {
    casting: {
       ...checkBaseFields(),
       parameters: schemaField({
+         advantage: integerField(0),
          attribute: stringField(''),
          attributeDice: integerField(0),
+         automaticFailure: booleanField(false),
+         baseDifficulty: integerField(0),
          complexity: integerField(0),
          customTrait: emptyObjectArray(),
          damage: integerField(0),
@@ -240,6 +248,7 @@ const GOLDENS = {
          reflexesCheck: booleanField(false),
          resilienceCheck: booleanField(false),
          scalingAspect: emptyObjectArray(),
+         situations: emptyObjectArray(),
          skill: stringField(''),
          skillExpertise: integerField(0),
          skillTrainingDice: integerField(0),
@@ -271,8 +280,11 @@ const GOLDENS = {
    item: {
       ...checkBaseFields(),
       parameters: schemaField({
+         advantage: integerField(0),
          attribute: stringField(''),
          attributeDice: integerField(0),
+         automaticFailure: booleanField(false),
+         baseDifficulty: integerField(0),
          checkLabel: stringField(''),
          complexity: integerField(0),
          customTrait: emptyObjectArray(),
@@ -301,6 +313,7 @@ const GOLDENS = {
          resistanceCheck: stringField('none'),
          resolveCost: integerField(0),
          scaling: booleanField(false),
+         situations: emptyObjectArray(),
          skill: stringField(''),
          skillExpertise: integerField(0),
          skillTrainingDice: integerField(0),

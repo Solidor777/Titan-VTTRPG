@@ -1,6 +1,7 @@
 /**
  * Options for requesting an Attack Check from an Actor.
  * @typedef {CheckOptions} AttackCheckOptions
+ * @property {boolean} [automaticFailure] - Whether the check fails automatically; its dice still roll.
  * @property {boolean} [cleave] - Whether this Attack is a Cleave attack.
  * @property {boolean} [doubleExpertise] - Whether to double the Expertise applied.
  * @property {boolean} [doubleTraining] - Whether to double the Training applied.
@@ -13,6 +14,7 @@
  * @property {boolean} [penetrating] - Whether this Attack is a Penetrating attack.
  * @property {boolean} [plusExtraSuccessDamage] - Whether to increase the damage for each extra success.
  * @property {boolean} [rend] - Whether this check is a Rend attack.
+ * @property {number} [advantage] - The summed Advantage (+) and Disadvantage (-) from always-on sources and the dialog.
  * @property {number} [attackIdx] - The index of the weapon's Attack being rolled.
  * @property {number} [attackerAccuracy] - The Accuracy rating of the attacker.
  * @property {number} [attackerMelee] - The Melee rating of the attacker.
@@ -26,6 +28,7 @@
  * @property {string} itemId - The ID of the weapon being used for the attack.
  * @property {string} [skill] - The Skill to use for the Check.
  * @property {string} [type] - The Type of Attack being performed (Melee or Ranged).
+ * @property {string[]} [situations] - The camel-case keys of the situational modifiers ticked in the check dialog.
  */
 
 /**
@@ -35,10 +38,12 @@
  */
 export default function createAttackCheckOptions(options) {
    return {
+      advantage: options.advantage ?? 0,
       attackIdx: options.attackIdx ?? 0,
       attackerAccuracy: options.attackerAccuracy,
       attackerMelee: options.attackerMelee,
       attribute: options.attribute ?? 'default',
+      automaticFailure: options.automaticFailure ?? false,
       cleave: options.cleave ?? false,
       damageMod: options.damageMod ?? 0,
       diceMod: options.diceMod ?? 0,
@@ -56,6 +61,7 @@ export default function createAttackCheckOptions(options) {
       plusExtraSuccessDamage: options.plusExtraSuccessDamage ?? true,
       range: options.range ?? 1,
       rend: options.rend ?? false,
+      situations: options.situations ?? [],
       skill: options.skill ?? 'default',
       targetDefense: options.targetDefense ?? 0,
       trainingMod: options.trainingMod ?? 0,

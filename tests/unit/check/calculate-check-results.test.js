@@ -1,6 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import fc from 'fast-check';
 import calculateCheckResults from '~/check/CheckResults.js';
+import recalculateCheckResults from '~/check/chat-message/RecalculateCheckResults.js';
 import { diceResults, expectedSuccesses } from './check-test-helpers.js';
 
 describe('calculateCheckResults — crafted cases', () => {
@@ -115,5 +116,56 @@ describe('calculateCheckResults — properties', () => {
             },
          ),
       );
+   });
+});
+
+describe('calculateCheckResults — automatic failure', () => {
+   it('keeps the dice and critical counts but reports no successes and a failure', () => {
+      /** @type {object} An automatically failed 4:1 check. */
+      const params = {
+         automaticFailure: true,
+         complexity: 1,
+         difficulty: 4,
+         extraFailureOnCritical: false,
+         extraSuccessOnCritical: false,
+      };
+      /** @type {object} The calculated results. */
+      const r = calculateCheckResults(diceResults([
+         6,
+         5,
+         1,
+      ]), params);
+      expect(r.dice.map((die) => die.final)).toEqual([
+         6,
+         5,
+         1,
+      ]);
+      expect(r.criticalSuccesses).toBe(1);
+      expect(r.criticalFailures).toBe(1);
+      expect(r.successes).toBe(0);
+      expect(r.extraSuccesses).toBe(0);
+      expect(r.succeeded).toBe(false);
+   });
+
+   it('stays forced when a stored Resistance Check card is recalculated', () => {
+      /** @type {object} The recalculated results. */
+      const r = recalculateCheckResults({
+         type: 'resistanceCheck',
+         parameters: {
+            automaticFailure: true,
+            complexity: 1,
+            damageToReduce: 3,
+            difficulty: 4,
+            extraFailureOnCritical: false,
+            extraSuccessOnCritical: false,
+         },
+         results: diceResults([
+            6,
+            6,
+         ]),
+      });
+      expect(r.successes).toBe(0);
+      expect(r.succeeded).toBe(false);
+      expect(r.damageTaken).toBe(3);
    });
 });

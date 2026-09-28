@@ -146,42 +146,54 @@ export async function clickRoll(dialog, page) {
 }
 
 /**
- * Polls for the newest titan-flagged chat message created after the given baseline count and
- * returns its flags. Replaces a fixed settle delay + global-newest read so the wait is bounded
- * by the message actually appearing, and never reads a message created before this roll.
+ * Polls for the newest check chat message created after the given baseline count and returns its id, subtype,
+ * parameters, and results. The wait is bounded by the message actually appearing, and a message created before the
+ * roll is never read.
  * @param {import('@playwright/test').Page} page - The Playwright page bound to the live world.
  * @param {number} baseline - The chat-message count captured immediately before the roll.
- * @returns {Promise<{ type: string, parameters: object, results: object }>} The newest message flags.
+ * @param {string} [type] - The check subtype to wait for (e.g. `attributeCheck`); any check subtype when omitted.
+ * @returns {Promise<{ id: string, type: string, parameters: object, results: object }>} The newest check message's
+ * data.
  */
-export async function readNewestCheckFlags(page, baseline) {
-   /** @type {{ type: string, parameters: object, results: object } | null} The resolved flags. */
+export async function readNewestCheckFlags(page, baseline, type = undefined) {
+   /** @type {{ id: string, type: string, parameters: object, results: object } | null} The resolved message data. */
    let flags = null;
    await expect.poll(
       async () => {
-         flags = await page.evaluate((base) => {
-            // The five check subtypes created by the check engine.
-            const checkTypes = [
-               'attributeCheck',
-               'resistanceCheck',
-               'attackCheck',
-               'castingCheck',
-               'itemCheck',
-            ];
+         flags = await page.evaluate(({ base, subtype }) => {
+            /** @type {string[]} The accepted subtypes: the requested one, or all five check subtypes. */
+            const checkTypes = subtype ?
+               [subtype] :
+               [
+                  'attributeCheck',
+                  'resistanceCheck',
+                  'attackCheck',
+                  'castingCheck',
+                  'itemCheck',
+               ];
 
-            // Only consider messages created after the baseline; return the newest check one.
+            // Only consider messages created after the baseline; return the newest accepted one.
             if (game.messages.size <= base) {
                return null;
             }
+
+            /** @type {ChatMessage[]} The messages created after the baseline. */
             const created = game.messages.contents.slice(base);
+
+            /** @type {ChatMessage|null} The newest accepted check message, if any. */
             const message = [...created].reverse().find((msg) => checkTypes.includes(msg?.type)) ?? null;
-            return message
-               ? {
+            return message ?
+               {
+                  id: message.id,
                   type: message.type,
                   parameters: message.system.parameters,
                   results: message.system.results,
-               }
-               : null;
-         }, baseline);
+               } :
+               null;
+         }, {
+            base: baseline,
+            subtype: type,
+         });
          return flags?.type ?? null;
       },
       {

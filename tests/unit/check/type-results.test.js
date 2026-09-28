@@ -258,3 +258,45 @@ describe('casting results — damage, healing, scaling aspect', () => {
       expect(r.healing).toBe(0);
    });
 });
+
+describe('automatic failure in type results', () => {
+   it('deals no attack damage', () => {
+      /** @type {object} An automatically failed attack dealing 2 + 1 Damage. */
+      const params = {
+         automaticFailure: true,
+         complexity: 1,
+         damage: 2,
+         damageMod: 1,
+         difficulty: 4,
+         extraFailureOnCritical: false,
+         extraSuccessOnCritical: false,
+         plusExtraSuccessDamage: true,
+      };
+      /** @type {object} The calculated results. */
+      const r = calculateAttackCheckResults(diceResults([
+         6,
+         6,
+      ]), params);
+      expect(r.succeeded).toBe(false);
+      expect(r.damage).toBe(0);
+   });
+
+   it('reduces no damage on a Resistance Check', () => {
+      /** @type {object} An automatically failed Resistance Check against 4 Damage. */
+      const params = {
+         automaticFailure: true,
+         complexity: 1,
+         damageToReduce: 4,
+         difficulty: 4,
+         extraFailureOnCritical: false,
+         extraSuccessOnCritical: false,
+      };
+      /** @type {object} The calculated results. */
+      const r = calculateResistanceCheckResults(diceResults([
+         6,
+         5,
+      ]), params);
+      expect(r.successes).toBe(0);
+      expect(r.damageTaken).toBe(4);
+   });
+});

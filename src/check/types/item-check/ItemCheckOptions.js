@@ -1,15 +1,17 @@
 /**
  * Options for requesting an Item Check from an Actor.
  * @typedef {CheckOptions} ItemCheckOptions
+ * @property {boolean} [automaticFailure] - Whether the check fails automatically; its dice still roll.
  * @property {boolean} [doubleExpertise] - Whether to double the Expertise applied.
  * @property {boolean} [doubleTraining] - Whether to double the Training applied.
  * @property {boolean} [extraFailureOnCritical] - Whether a roll of 1 equals a negative success.
  * @property {boolean} [extraSuccessOnCritical] - Whether a roll of 6 equals an extra success.
+ * @property {number} [advantage] - The summed Advantage (+) and Disadvantage (-) from always-on sources and the dialog.
  * @property {number} [checkIdx] - The index of the item's Check being rolled.
  * @property {number} [complexity] - The minimum number of Successes needed to succeed at the Check.
  * @property {number} [damageMod] - Modifier for the amount of Damage to be inflicted.
  * @property {number} [diceMod] - Modifier for the number of Dice being rolled.
- * @property {number} [difficulty] - The minimum roll on a die to achieve a Success.
+ * @property {number} [difficulty] - The Difficulty before Advantage.
  * @property {number} [expertiseMod] - Modifier for the amount of Expertise to be applied.
  * @property {number} [healingMod] - Modifier for the amount of Healing to be applied.
  * @property {number} [resolveCost] - The Resolve Cost for performing the check, if any.
@@ -18,6 +20,7 @@
  * @property {string} [itemId] - The ID of the item being used for the check.
  * @property {object} [itemRollData] - The roll data for the item being used for the check.
  * @property {string} [skill] - The Skill to use for the Check.
+ * @property {string[]} [situations] - The camel-case keys of the situational modifiers ticked in the check dialog.
  */
 
 /**
@@ -27,7 +30,9 @@
  */
 export default function createItemCheckOptions(options) {
    return {
+      advantage: options.advantage ?? 0,
       attribute: options.attribute ?? 'default',
+      automaticFailure: options.automaticFailure ?? false,
       checkIdx: options.checkIdx ?? 0,
       complexity: options.complexity ?? 1,
       damageMod: options.damageMod ?? 0,
@@ -42,6 +47,7 @@ export default function createItemCheckOptions(options) {
       itemId: options.itemId ?? '',
       itemRollData: options.itemRollData,
       resolveCost: options.resolveCost ?? 0,
+      situations: options.situations ?? [],
       skill: options.skill ?? 'default',
       trainingMod: options.trainingMod ?? 0,
    };

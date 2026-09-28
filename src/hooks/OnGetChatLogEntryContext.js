@@ -115,13 +115,16 @@ function getCheckData(li) {
  * @returns {boolean} Whether to display the Re-Roll Failures contextual option for a Chat Message in the Chat Log.
  */
 function canReRollFailures(li) {
-   // Get the check data.
+   /** @type {object|false} The check data, or false when the message is not an owned, visible check. */
    const checkData = getCheckData(li);
    if (checkData) {
 
-      // If this is a check AND it has not re-rolled failures OR the current.
-      // user is a GM.
-      if (isCheck(checkData.type) && (checkData.failuresReRolled === false || game.user.isGM)) {
+      // Offer the re-roll on a check that did not fail automatically and has not re-rolled its failures, or to a GM.
+      if (
+         isCheck(checkData.type) &&
+         !checkData.parameters.automaticFailure &&
+         (checkData.failuresReRolled === false || game.user.isGM)
+      ) {
 
          // Return true if the check has any failures.
          for (const die of checkData.results.dice) {
@@ -208,11 +211,12 @@ async function reRollFailures(li, spendResolve) {
  * @returns {boolean} Whether to display the Double Training contextual option for a Chat Message in the Chat Log.
  */
 function canDoubleTraining(li) {
-   // Return true if the message is a check with Training that has not yet been.
-   // doubled.
+   // Offer the option on a check with Training that has not been doubled and did not fail automatically.
+   /** @type {object|false} The check data, or false when the message is not an owned, visible check. */
    const checkData = getCheckData(li);
    return (checkData &&
       isCheck(checkData.type) &&
+      !checkData.parameters.automaticFailure &&
       checkData.parameters.totalTrainingDice > 0 &&
       (checkData.parameters.doubleTraining === false));
 }
@@ -268,11 +272,12 @@ async function doubleTraining(li, spendResolve) {
  * @returns {boolean} Whether to display the Double Expertise contextual option for a Chat Message in the Chat Log.
  */
 function canDoubleExpertise(li) {
-   // Return true if the message is a check with Expertise that has not yet been.
-   // doubled.
+   // Offer the option on a check with Expertise that has not been doubled and did not fail automatically.
+   /** @type {object|false} The check data, or false when the message is not an owned, visible check. */
    const checkData = getCheckData(li);
    return (checkData &&
       isCheck(checkData.type) &&
+      !checkData.parameters.automaticFailure &&
       checkData.parameters.totalExpertise > 0 &&
       (checkData.parameters.doubleExpertise === false));
 }

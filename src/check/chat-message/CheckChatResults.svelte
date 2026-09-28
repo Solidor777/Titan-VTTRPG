@@ -65,8 +65,9 @@
          {localize('expertiseRemaining')}:
          {document.data.system.results.expertiseRemaining}
 
-         <!--Reset Button-->
-         {#if document.data.constructor.getSpeakerActor(document.data.speaker)?.isOwner}
+         <!--Reset Button: Expertise cannot change an automatically failed check.-->
+         {#if !document.data.system.parameters.automaticFailure &&
+            document.data.constructor.getSpeakerActor(document.data.speaker)?.isOwner}
             <div class="button">
                <CheckChatResetExpertiseButton/>
             </div>

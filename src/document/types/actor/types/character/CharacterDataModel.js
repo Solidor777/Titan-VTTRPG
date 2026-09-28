@@ -26,6 +26,7 @@ import computeDamageResistance from '~/helpers/utility-functions/ComputeDamageRe
 import computeMulSumDelta from '~/helpers/utility-functions/ComputeMulSumDelta.js';
 import computeSetSumDelta from '~/helpers/utility-functions/ComputeSetSumDelta.js';
 import roundDirectional from '~/helpers/utility-functions/RoundDirectional.js';
+import applyAdvantage from '~/check/ApplyAdvantage.js';
 import createAttackCheckOptions from '~/check/types/attack-check/AttackCheckOptions.js';
 import createAttackCheckParameters from '~/check/types/attack-check/AttackCheckParameters.js';
 import createAttributeCheckOptions from '~/check/types/attribute-check/AttributeCheckOptions.js';
@@ -1879,6 +1880,9 @@ export default class CharacterDataModel extends TitanActorDataModel {
       const actorRollData = this.getRollData();
       this._initializeAttributeBasedCheck(parameters, actorRollData);
 
+      // Advantage adjusts the final Difficulty.
+      this._applyCheckAdvantage(parameters);
+
       return parameters;
    }
 
@@ -2066,6 +2070,9 @@ export default class CharacterDataModel extends TitanActorDataModel {
 
       // Calculate the total expertise.
       parameters.totalExpertise = parameters.expertiseMod * (parameters.doubleExpertise === true ? 2 : 1);
+
+      // Advantage adjusts the final Difficulty.
+      this._applyCheckAdvantage(parameters);
 
       return parameters;
    }
@@ -2637,6 +2644,9 @@ export default class CharacterDataModel extends TitanActorDataModel {
       // Difficulty = 4 + (defense rating - attacker rating), min 2, max 6.
       parameters.difficulty = clamp(parameters.targetDefense - parameters.attackerRating + 4, 2, 6);
 
+      // Advantage adjusts the rating-derived Difficulty.
+      this._applyCheckAdvantage(parameters);
+
       // Cache the item and attack stats from the item roll data.
       const itemRollData = this.parent.items.get(options.itemId).system.getRollData();
       const attackData = itemRollData.attack[options.attackIdx];
@@ -3110,6 +3120,9 @@ export default class CharacterDataModel extends TitanActorDataModel {
       processAspects(standardAspects);
       processAspects(itemRollData.customAspect);
 
+      // Advantage adjusts the final Difficulty.
+      this._applyCheckAdvantage(parameters);
+
       return parameters;
    }
 
@@ -3527,6 +3540,9 @@ export default class CharacterDataModel extends TitanActorDataModel {
          parameters.scaling = checkData.scaling;
       }
 
+      // Advantage adjusts the final Difficulty.
+      this._applyCheckAdvantage(parameters);
+
       return parameters;
    }
 
@@ -3619,6 +3635,18 @@ export default class CharacterDataModel extends TitanActorDataModel {
 
       // Calculate the total dice.
       parameters.totalDice = parameters.attributeDice + parameters.totalTrainingDice + parameters.diceMod;
+   }
+
+   /**
+    * Applies the check's summed Advantage to its Difficulty, keeping the pre-Advantage value as `baseDifficulty`.
+    * INVARIANT: runs after the rating-derived and option Difficulty (an Attack Check's rating clamp included);
+    * target-condition overrides may follow it.
+    * @param {CheckParameters} parameters - The check parameters. Modified in place.
+    * @private
+    */
+   _applyCheckAdvantage(parameters) {
+      parameters.baseDifficulty = parameters.difficulty;
+      parameters.difficulty = applyAdvantage(parameters.baseDifficulty, parameters.advantage);
    }
 
    /**

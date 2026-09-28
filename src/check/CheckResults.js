@@ -77,6 +77,12 @@ export default function calculateCheckResults(diceResults, parameters) {
       }
    }
 
+   // An automatically failed check keeps its rolled dice and critical counts but reports no Successes and fails.
+   if (parameters.automaticFailure) {
+      retVal.successes = 0;
+      return retVal;
+   }
+
    // Calculate whether the Check Succeeded.
    const complexity = parameters.complexity;
    if (complexity > 0) {

@@ -29,9 +29,11 @@ import { diceResults } from './check-test-helpers.js';
  * structurally to the shape — the key sets must be identical.
  */
 const OPTIONS = {
+   advantage: 0,
    attribute: 'body',
    attackerAccuracy: 0,
    attackerMelee: 0,
+   automaticFailure: false,
    cleave: false,
    complexity: 0,
    damageMod: 0,

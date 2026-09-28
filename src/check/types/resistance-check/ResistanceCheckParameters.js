@@ -1,17 +1,21 @@
 /**
  * Calculated parameters for the creation of a new Resistance Check, based off an Actor's data.
  * @typedef {CheckParameters} ResistanceCheckParameters
+ * @property {boolean} automaticFailure - Whether the check fails automatically; its dice still roll.
  * @property {boolean} doubleExpertise - Whether to double the Expertise applied.
  * @property {boolean} extraFailureOnCritical - Whether a roll of 1 equals a negative success.
  * @property {boolean} extraSuccessOnCritical - Whether a roll of 6 equals an extra success.
+ * @property {number} advantage - The summed Advantage (+) and Disadvantage (-), ticked situations included.
+ * @property {number} baseDifficulty - The Difficulty before Advantage is applied.
  * @property {number} complexity - The minimum number of Successes needed to succeed at the Check.
  * @property {number} damageToReduce - Base amount of damage to be reduced by this check if any.
  * @property {number} diceMod - Modifier for the number of Dice being rolled.
- * @property {number} difficulty - The minimum roll on a die to achieve a Success.
+ * @property {number} difficulty - The minimum roll on a die to achieve a Success, after Advantage.
  * @property {number} expertiseMod - Modifier for the amount of Expertise to be applied.
  * @property {number} resistanceDice - The number of dice granted by the Resistance.
  * @property {number} totalDice - The total number of dice to be rolled.
  * @property {number} totalExpertise - The total amount of expertise to apply.
+ * @property {SituationLabel[]} situations - The situational modifiers applied to the check.
  * @property {string} resistance - The Resistance to roll for the Check.
  */
 
@@ -24,6 +28,9 @@
  */
 export function createResistanceCheckParametersShape() {
    return {
+      advantage: 0,
+      automaticFailure: false,
+      baseDifficulty: 0,
       complexity: 0,
       damageToReduce: 0,
       diceMod: 0,
@@ -34,6 +41,7 @@ export function createResistanceCheckParametersShape() {
       extraSuccessOnCritical: false,
       resistance: '',
       resistanceDice: 0,
+      situations: [],
       totalDice: 0,
       totalExpertise: 0,
    };
@@ -48,6 +56,8 @@ export function createResistanceCheckParametersShape() {
 export default function createResistanceCheckParameters(options) {
    return {
       ...createResistanceCheckParametersShape(),
+      advantage: options.advantage,
+      automaticFailure: options.automaticFailure,
       complexity: options.complexity,
       damageToReduce: options.damageToReduce,
       diceMod: options.diceMod,
