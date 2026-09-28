@@ -83,7 +83,9 @@ Every dispatch also loads `foundry-vtt`; Tasks 6, 7, and 8 (Svelte) also load `s
 
 1. **No `acrobatics` skill exists** (`src/system/Skills.js`). Heavy's Jump Automatic Failure is narrowed to
    `athletics` (rules line 2300: a Jump is a Body (Athletics) check). The spec's e2e "appears on an Acrobatics check
-   and not on an Athletics check" becomes "appears on an Athletics check and not on a Dexterity check".
+   and not on an Athletics check" becomes "appears on an Athletics check and not on a Dexterity check". Every
+   armor-trait situation is narrowed the same way (controller ruling 2026-09-28): Swim, Fly, or Climb to Athletics
+   (line 3150), Remain Undetected by Hearing to Stealth, so armor never opens the dialog on unrelated checks.
 2. **`sources: string[]` replaces the spec's `source` string** on `SituationalCheckModifier`: same-key entries sum
    across owners (Heavy + Encumbering on one armor, or armor + an effect), so one entry can have several sources.
 3. **`parameters.situations` is `{ key, label }[]`**, not `string[]`. `buildSchemaFromShape` maps an empty array to an
@@ -4918,34 +4920,34 @@ function expected(trait, modifierType, value, labelKey, skill) {
 }
 
 describe('createArmorTraitCheckModifiers', () => {
-   it('gives Heavy Greater Disadvantage to Swim, Fly, or Climb and an Automatic Failure on Athletics Jumps', () => {
+   it('gives Heavy Athletics Greater Disadvantage to Swim, Fly, or Climb and Automatic Failure on Jumps', () => {
       expect(createArmorTraitCheckModifiers([
          {
             name: 'heavy',
             value: true,
          },
       ])).toEqual([
-         expected('heavy', 'advantage', -2, 'situationSwimFlyClimb', ''),
+         expected('heavy', 'advantage', -2, 'situationSwimFlyClimb', 'athletics'),
          expected('heavy', 'automaticFailure', 1, 'situationJump', 'athletics'),
       ]);
    });
 
-   it('gives Encumbering Disadvantage to Swim, Fly, or Climb', () => {
+   it('gives Encumbering Athletics-narrowed Disadvantage to Swim, Fly, or Climb', () => {
       expect(createArmorTraitCheckModifiers([
          {
             name: 'encumbering',
             value: true,
          },
-      ])).toEqual([expected('encumbering', 'advantage', -1, 'situationSwimFlyClimb', '')]);
+      ])).toEqual([expected('encumbering', 'advantage', -1, 'situationSwimFlyClimb', 'athletics')]);
    });
 
-   it('gives Loud Disadvantage to remaining undetected by hearing', () => {
+   it('gives Loud Stealth-narrowed Disadvantage to remaining undetected by hearing', () => {
       expect(createArmorTraitCheckModifiers([
          {
             name: 'loud',
             value: true,
          },
-      ])).toEqual([expected('loud', 'advantage', -1, 'situationRemainUndetectedByHearing', '')]);
+      ])).toEqual([expected('loud', 'advantage', -1, 'situationRemainUndetectedByHearing', 'stealth')]);
    });
 
    it('adds nothing for armor without check traits, and orders Heavy, Encumbering, Loud', () => {
@@ -5010,8 +5012,10 @@ function createSituationalElement(trait, modifierType, value, labelKey, skill) {
 /**
  * Builds the situational check modifiers an equipped armor's traits impose. Source: TITAN Rules Compendium
  * (09_26_2026), lines 2765-2775. Situation keys are localized labels, so traits sharing a situation ("Swim, Fly, or
- * Climb") merge into one dialog entry whose value is their sum. A Jump is a Body (Athletics) check (line 2300), so
- * Heavy's "cannot Jump" is an Automatic Failure offered on Athletics checks.
+ * Climb") merge into one dialog entry whose value is their sum. Each situation is narrowed to the Skill its checks use,
+ * so it is offered (and opens the dialog) only there: Jumping and Climbing are Body (Athletics) checks (lines 2300,
+ * 3150), swimming and flying follow them, and remaining undetected is a Stealth check. Heavy's "cannot Jump" is
+ * therefore an Automatic Failure offered on Athletics checks.
  * @param {StandardTrait[]} traits - The armor's traits.
  * @returns {ConditionalCheckModifierElement[]} The synthetic elements, in trait order Heavy, Encumbering, Loud.
  */
@@ -5023,15 +5027,17 @@ export default function createArmorTraitCheckModifiers(traits) {
    const elements = [];
    if (traitNames.includes('heavy')) {
       elements.push(
-         createSituationalElement('heavy', 'advantage', -2, 'situationSwimFlyClimb', ''),
+         createSituationalElement('heavy', 'advantage', -2, 'situationSwimFlyClimb', 'athletics'),
          createSituationalElement('heavy', 'automaticFailure', 1, 'situationJump', 'athletics'),
       );
    }
    if (traitNames.includes('encumbering')) {
-      elements.push(createSituationalElement('encumbering', 'advantage', -1, 'situationSwimFlyClimb', ''));
+      elements.push(createSituationalElement('encumbering', 'advantage', -1, 'situationSwimFlyClimb', 'athletics'));
    }
    if (traitNames.includes('loud')) {
-      elements.push(createSituationalElement('loud', 'advantage', -1, 'situationRemainUndetectedByHearing', ''));
+      elements.push(
+         createSituationalElement('loud', 'advantage', -1, 'situationRemainUndetectedByHearing', 'stealth'),
+      );
    }
 
    return elements;
@@ -5083,7 +5089,8 @@ import { clickRoll, readNewestCheckFlags, setSelectField } from './checkDialog.j
 
 /**
  * Equipped Heavy, Encumbering, and Loud armor offer their check rules as situational modifiers: Heavy's Greater
- * Disadvantage to Swim, Fly, or Climb on every check and its Jump Automatic Failure on Athletics checks only.
+ * Disadvantage to Swim, Fly, or Climb and its Jump Automatic Failure on Athletics checks only, and Loud's Disadvantage
+ * to remain undetected on Stealth checks only.
  */
 
 /** @type {string} Name of the throwaway player actor seeded for this spec. */
@@ -5183,7 +5190,7 @@ function situationRow(dialog, label) {
    return dialog.locator('[data-testid^="situation-row-"]').filter({ hasText: label });
 }
 
-test('Heavy armor offers Jump only on Athletics checks and Swim, Fly, or Climb on every check', async () => {
+test('Heavy armor offers Jump and Swim, Fly, or Climb only on Athletics checks', async () => {
    await seedArmoredActor(['heavy']);
    const dialog = await openAthleticsDialog();
    const jump = situationRow(dialog, labels.jump);
@@ -5194,10 +5201,10 @@ test('Heavy armor offers Jump only on Athletics checks and Swim, Fly, or Climb o
    // Swim, Fly, or Climb starts unticked: the Difficulty is the base 4.
    await expect(dialog.getByTestId('check-summary-difficulty')).toHaveText('4');
 
-   // A Dexterity check does not offer the Athletics-only Jump.
+   // A Dexterity check offers neither Athletics-narrowed situation.
    await setSelectField(dialog, 'skill', 'dexterity');
    await expect(jump).toHaveCount(0);
-   await expect(swim).toBeVisible();
+   await expect(swim).toHaveCount(0);
 });
 
 test('ticking Swim, Fly, or Climb applies Greater Disadvantage', async () => {
@@ -5229,21 +5236,30 @@ test('a ticked Jump does not apply once the check\'s Skill changes', async () =>
    expect(flags.parameters.situations).toEqual([]);
 });
 
-test('Heavy and Encumbering merge into one Swim, Fly, or Climb entry, and Loud offers its own', async () => {
+test('Heavy and Encumbering merge into one Athletics entry, and Loud offers its own on Stealth', async () => {
    await seedArmoredActor([
       'heavy',
       'encumbering',
       'loud',
    ]);
-   const modifiers = await page.evaluate((actorName) => game.actors.getName(actorName).system
-      .getSituationalCheckModifiers('attribute', { skill: 'athletics' })
-      .filter((modifier) => modifier.modifierType === 'advantage'), ACTOR_NAME);
-   expect(modifiers).toEqual([
+   /** @type {{athletics: object[], stealth: object[]}} The Advantage-type situational modifiers per Skill. */
+   const modifiers = await page.evaluate((actorName) => {
+      const system = game.actors.getName(actorName).system;
+      const advantageOnly = (skill) => system.getSituationalCheckModifiers('attribute', { skill })
+         .filter((modifier) => modifier.modifierType === 'advantage');
+      return {
+         athletics: advantageOnly('athletics'),
+         stealth: advantageOnly('stealth'),
+      };
+   }, ACTOR_NAME);
+   expect(modifiers.athletics).toEqual([
       expect.objectContaining({
          label: labels.swim,
          sources: [ARMOR_NAME],
          value: -3,
       }),
+   ]);
+   expect(modifiers.stealth).toEqual([
       expect.objectContaining({
          label: labels.undetected,
          sources: [ARMOR_NAME],
@@ -5315,19 +5331,18 @@ rounded up".` In the audit bullet list, replace
 `  - Abjuration of the Arbiter: the -1 dice default reaches Resistance checks; its description does not yet say the GM
     sets the value per target.`
 
-- [ ] **Step 2: Record the armor-dialog consequence in `docs/POST_WORK_FINDINGS.md`**
+- [ ] **Step 2: Record the armor-situation narrowing in `docs/POST_WORK_FINDINGS.md`**
 
 Insert after the intro paragraph:
 
 ```markdown
-### Armor traits make every check situational under the default dialog setting (2026-09-28)
+### Armor-trait situations are narrowed to the Skill their checks use (2026-09-28)
 
-Heavy and Encumbering add an unnarrowed "Swim, Fly, or Climb" situation and Loud an unnarrowed "Remain Undetected by
-Hearing" situation (checkType `any`, no Skill), as the advantage spec's §6 prescribes. Under the default
-`getCheckOptions` choice `situational`, a character wearing such armor therefore opens the check options dialog on
-every check, Resistance checks included. This is the spec's intended hedge toward showing the dialog. Narrowing those
-situations to Skills is a change to `createArmorTraitCheckModifiers`
-(`src/document/types/item/types/armor/ArmorTraitCheckModifiers.js`), not to the engine.
+Heavy and Encumbering's "Swim, Fly, or Climb" situation and Heavy's "Jump" are narrowed to Athletics (rules lines
+2300 and 3150: jumping and climbing are Body (Athletics) checks); Loud's "Remain Undetected by Hearing" is narrowed to
+Stealth. Unnarrowed, they would make every check a situational check, so under the default `getCheckOptions` choice
+`situational` an armored character would open the check dialog on every roll, Resistance checks included. The
+narrowing lives in `createArmorTraitCheckModifiers` (`src/document/types/item/types/armor/ArmorTraitCheckModifiers.js`).
 ```
 
 - [ ] **Step 3: Update `conventions.md`**
@@ -5425,8 +5440,8 @@ mod buckets): the equipped shield adds its `defense` to the Defense rating, the 
 `mod.armor`, and an armor trait named `heavy` subtracts 1 from each speed whose base plus mods-so-far is above 0.
 Inside it, `_applyRulesElements` gathers the equipped armor's trait check rules as synthetic situational
 `conditionalCheckModifier` elements sourced as the armor (`createArmorTraitCheckModifiers`): Heavy → Greater
-Disadvantage on "Swim, Fly, or Climb" and Automatic Failure on "Jump" narrowed to Athletics; Encumbering → Disadvantage
-on "Swim, Fly, or Climb"; Loud → Disadvantage on "Remain Undetected by Hearing". The character `mod` stats are only
+Disadvantage on "Swim, Fly, or Climb" and Automatic Failure on "Jump", both narrowed to Athletics; Encumbering →
+Disadvantage on "Swim, Fly, or Climb" (Athletics); Loud → Disadvantage on "Remain Undetected by Hearing" (Stealth). The character `mod` stats are only
 `armor`, `resolveRegain`, and `woundRegain` (`src/system/Mods.js`); check damage and healing bonuses are not mods —
 they come only from `conditionalCheckModifier` elements with `modifierType` `damage`/`healing`, where check type `any`
 + selector `any` applies to every attack, casting, and item check.

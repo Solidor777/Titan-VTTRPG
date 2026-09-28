@@ -136,9 +136,13 @@ adds synthetic `conditionalCheckModifier` elements for the equipped armor's trai
 
 | Trait | Synthetic elements (checkType `any`, selector `situation`) |
 |---|---|
-| Heavy | `advantage` −2, key "Swim, Fly, or Climb"; `automaticFailure`, key "Jump", narrowed to skill `acrobatics` (the system has no Jump action) |
-| Encumbering | `advantage` −1, key "Swim, Fly, or Climb" |
-| Loud | `advantage` −1, key "Remain Undetected by Hearing" |
+| Heavy | `advantage` −2, key "Swim, Fly, or Climb"; `automaticFailure`, key "Jump"; both narrowed to skill `athletics` |
+| Encumbering | `advantage` −1, key "Swim, Fly, or Climb", narrowed to `athletics` |
+| Loud | `advantage` −1, key "Remain Undetected by Hearing", narrowed to `stealth` |
+
+The system has no Jump action and no Acrobatics skill; a Jump is a Body (Athletics) check (rules line 2300) and so is
+a Climb (line 3150), so the armor situations are narrowed to Athletics, and Loud's to Stealth. Unnarrowed, armor would
+make every check situational and open the dialog on every roll under the default setting.
 
 Situation keys are localized labels, so their camel-cased keys match across traits: Heavy and Encumbering on one armor
 tick together as one "Swim, Fly, or Climb" entry whose value is their sum (−3, clamped to Greater Disadvantage).
@@ -157,7 +161,7 @@ tick together as one "Swim, Fly, or Climb" entry whose value is their sum (−3,
   results; armor-trait synthetic elements.
 - Unit: `shouldGetCheckOptions` for each setting value × situational presence × modifier key; legacy Boolean reads.
 - E2E: with the default setting, a check with no situational entries rolls straight to chat and a check with one
-  opens the dialog; Heavy armor's Jump entry appears on an Acrobatics check and not on an Athletics check.
+  opens the dialog; Heavy armor's Jump entry appears on an Athletics check and not on a Dexterity check.
 - E2E: an effect with Disadvantage raises a rolled check's Difficulty in chat; the dialog's Advantage select and
   situational checkbox change the displayed and rolled Difficulty; a Resistance check picks up an `any` dice penalty;
   Heavy armor's "Swim, Fly, or Climb" entry appears unticked and applies Greater Disadvantage when ticked; an
