@@ -75,6 +75,8 @@
 
          width: 100%;
 
+         // Matches CheckDialogField's own `.input` height override, so this checkbox aligns with the dialog's
+         // other input fields rather than the smaller default height (Variables.scss).
          --titan-input-height: 28px;
 
          .text {

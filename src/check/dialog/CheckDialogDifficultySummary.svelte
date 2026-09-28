@@ -4,7 +4,6 @@
 
    /** @type {object} Reference to the Check Parameters store. */
    const checkParameters = getContext('checkParameters');
-
 </script>
 
 <CheckDialogSummary

@@ -35,6 +35,12 @@
    setContext('checkActor', actor ? new ReactiveDocument(actor) : undefined);
    // svelte-ignore state_referenced_locally
    setContext('checkType', checkType);
+
+   // The actor-derived option fields (Dice/Training/Expertise/Damage/Healing Mod, Advantage, Automatic Failure) the
+   // user has edited in this dialog; the shell's re-derivation effect skips a touched field so the user's choice
+   // survives a later Actor change. Plain (non-reactive) Set: mutated imperatively by field components on user edit
+   // and read imperatively by the shell's effect, never rendered from directly.
+   setContext('touchedCheckOptionFields', new Set());
 </script>
 
 {#if shell}

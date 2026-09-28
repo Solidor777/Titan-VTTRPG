@@ -17,7 +17,8 @@
    import getApplication from '~/helpers/utility-functions/GetApplication.js';
    import localize from '~/helpers/utility-functions/Localize.js';
    import warn from '~/helpers/utility-functions/Warn.js';
-   import { getContext } from 'svelte';
+   import { rederiveActorCheckOptionFields } from '~/check/dialog/ReinitializeCheckOptions.js';
+   import { getContext, untrack } from 'svelte';
 
    /**
     * @typedef {object} ItemCheckDialogShellProps
@@ -38,6 +39,9 @@
 
    /** @type {ReactiveDocument|undefined} The reactive bridge of the Actor that will roll the check. */
    const checkActor = getContext('checkActor');
+
+   /** @type {Set<string>} The actor-derived fields the user has edited in this dialog. */
+   const touchedFields = getContext('touchedCheckOptionFields');
 
    /**
     * @type {Array<typeof import('svelte').SvelteComponent>} Components for changing the options and
@@ -85,8 +89,30 @@
       }
    }
 
-   // Update the parameters whenever the check options or the Actor (its items and effects included) change; a
-   // change that invalidates the check closes the dialog.
+   // Re-derive the actor-derived option fields (Dice/Training/Expertise/Damage/Healing Mod, Advantage, Automatic
+   // Failure) from the live Actor whenever it, or one of its items or effects, changes; a field the user has
+   // touched in the dialog is preserved. Reads the current options untracked so this effect reacts only to the
+   // Actor, never to its own write back into the store below (which would otherwise retrigger it).
+   $effect(() => {
+      /** @type {TitanActor|undefined} The live Actor, read through its bridge so this effect tracks it. */
+      const liveActor = checkActor?.data;
+      if (!liveActor) {
+         return;
+      }
+
+      /** @type {object|undefined} The re-derived options, or undefined if nothing actually changed. */
+      const nextOptions = rederiveActorCheckOptionFields(
+         untrack(() => $checkOptions),
+         touchedFields,
+         'item',
+         (options) => liveActor.system.initializeItemCheckOptions(options),
+      );
+      if (nextOptions) {
+         $checkOptions = nextOptions;
+      }
+   });
+
+   // Update the parameters whenever the check options change; a change that invalidates the check closes the dialog.
    $effect(() => {
       /** @type {TitanActor|undefined} The live Actor, read through its bridge so this effect tracks it. */
       const liveActor = checkActor?.data;
