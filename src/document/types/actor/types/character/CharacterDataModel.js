@@ -2116,14 +2116,76 @@ export default class CharacterDataModel extends TitanActorDataModel {
    }
 
    /**
-    * Populates Resistance Check Options with this Character's specific data, unless specific overrides were applied.
+    * Populates Resistance Check Options with this Character's conditional modifiers, unless specific overrides were
+    * applied. Training does not apply to Resistance Checks.
     * @param {object} options - Options for the Check.
     * @returns {ResistanceCheckOptions} The new, fully-populated Resistance Check Options.
     */
    initializeResistanceCheckOptions(options) {
-      // For now, there are no actor specific resistance check modifiers,.
-      // so we only need to fill out the options object.
-      return createResistanceCheckOptions(options);
+      /** @type {ResistanceCheckOptions} The options, with every unset field at its default. */
+      const checkOptions = createResistanceCheckOptions(options);
+
+      // Dice mod.
+      if (options.diceMod === undefined) {
+         checkOptions.diceMod = this.getResistanceCheckMod('dice', checkOptions.resistance);
+      }
+
+      // Expertise mod.
+      if (options.expertiseMod === undefined) {
+         checkOptions.expertiseMod = this.getResistanceCheckMod('expertise', checkOptions.resistance);
+      }
+
+      // Advantage.
+      if (options.advantage === undefined) {
+         checkOptions.advantage = this.getResistanceCheckMod('advantage', checkOptions.resistance);
+      }
+
+      // Automatic failure.
+      if (options.automaticFailure === undefined) {
+         checkOptions.automaticFailure = this.getResistanceCheckMod('automaticFailure', checkOptions.resistance) > 0;
+      }
+
+      return checkOptions;
+   }
+
+   /**
+    * Gets the modifier for a specific aspect of a Resistance Check. A Resistance Check has no Attribute or Skill, so
+    * of the `any`-check-type modifiers only the `any` selector applies; `resistance`-check-type modifiers apply
+    * through the `any` selector and through the `resistance` selector keyed by the rolled Resistance.
+    * @param {string} modifierType - The modifier type to check for.
+    * @param {string} resistance - The Resistance being rolled (reflexes, resilience, or willpower).
+    * @returns {number} The modifier to apply to this aspect of the check.
+    */
+   getResistanceCheckMod(modifierType, resistance) {
+      /** @type {number} The summed modifier. */
+      let retVal = 0;
+
+      // If there are any conditional modifiers for this modifier type.
+      /** @type {object|undefined} The cached modifiers of this type, keyed by check type. */
+      const checkMods = this._getConditionalCheckModsForType(modifierType);
+      if (checkMods) {
+
+         // Get mods that apply to any check.
+         if (checkMods.any?.any) {
+            retVal += checkMods.any.any;
+         }
+
+         // Get mods that apply to Resistance Checks.
+         /** @type {object|undefined} The `resistance`-check-type modifiers, keyed by selector. */
+         const resistanceCheckMods = checkMods.resistance;
+         if (resistanceCheckMods) {
+
+            // Get mods that apply to the rolled Resistance.
+            retVal += this._getConditionalCheckModsForSelectorKey(resistanceCheckMods, 'resistance', resistance);
+
+            // Get mods that apply to any Resistance Check.
+            if (resistanceCheckMods.any) {
+               retVal += resistanceCheckMods.any;
+            }
+         }
+      }
+
+      return retVal;
    }
 
    /**
@@ -2134,6 +2196,10 @@ export default class CharacterDataModel extends TitanActorDataModel {
    getResistanceCheckParameters(options) {
       // Initialize check parameters.
       const parameters = createResistanceCheckParameters(options);
+
+      // Add the situations the options name (the dialog's ticks) before any total is derived.
+      this._applySituationalModifiers(parameters, 'resistance', options.situations);
+
       const actorRollData = this.getRollData();
 
       // Get the resistance dice.

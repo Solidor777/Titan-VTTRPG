@@ -3,6 +3,7 @@ import createAttackCheckOptions from '~/check/types/attack-check/AttackCheckOpti
 import createAttributeCheckOptions from '~/check/types/attribute-check/AttributeCheckOptions.js';
 import createCastingCheckOptions from '~/check/types/casting-check/CastingCheckOptions.js';
 import createItemCheckOptions from '~/check/types/item-check/ItemCheckOptions.js';
+import createResistanceCheckOptions from '~/check/types/resistance-check/ResistanceCheckOptions.js';
 import { installSchemaMocks, restoreSchemaMocks } from './helpers/schemaFingerprint.js';
 import camelize from '~/helpers/utility-functions/Camelize.js';
 
@@ -586,5 +587,109 @@ describe('situational check modifiers', () => {
             label: 'Flanking',
          },
       ]);
+   });
+});
+
+describe('Resistance Check conditional modifiers', () => {
+   /**
+    * Builds a model caching the Resistance-relevant and irrelevant Dice penalties used below.
+    * @returns {object} The model instance.
+    */
+   function resistanceModel() {
+      /** @type {object} The model under test. */
+      const model = createModel();
+      model._applyConditionalCheckModifierElements([
+         checkModifier({
+            value: -1,
+         }),
+         checkModifier({
+            checkType: 'resistance',
+            value: -1,
+         }),
+         checkModifier({
+            checkType: 'resistance',
+            key: 'reflexes',
+            selector: 'resistance',
+            value: -2,
+         }),
+         checkModifier({
+            key: 'body',
+            selector: 'attribute',
+            value: -5,
+         }),
+         checkModifier({
+            key: 'athletics',
+            selector: 'skill',
+            value: -7,
+         }),
+      ]);
+      return model;
+   }
+
+   it('reads any/any, resistance/any, and resistance keyed by the rolled Resistance, never attribute or skill', () => {
+      /** @type {object} The model under test. */
+      const model = resistanceModel();
+      expect(model.getResistanceCheckMod('dice', 'reflexes')).toBe(-4);
+      expect(model.getResistanceCheckMod('dice', 'willpower')).toBe(-2);
+   });
+
+   it('initializes Resistance Check options from the cache unless they are provided', () => {
+      /** @type {object} The model under test. */
+      const model = createModel();
+      model._applyConditionalCheckModifierElements([
+         checkModifier({
+            value: -1,
+         }),
+         checkModifier({
+            checkType: 'resistance',
+            key: 'reflexes',
+            modifierType: 'automaticFailure',
+            selector: 'resistance',
+         }),
+         checkModifier({
+            modifierType: 'expertise',
+            value: 2,
+         }),
+         checkModifier({
+            modifierType: 'advantage',
+            value: -1,
+         }),
+      ]);
+      expect(model.initializeResistanceCheckOptions({ resistance: 'reflexes' })).toMatchObject({
+         advantage: -1,
+         automaticFailure: true,
+         diceMod: -1,
+         expertiseMod: 2,
+      });
+      expect(model.initializeResistanceCheckOptions({ resistance: 'willpower' }).automaticFailure).toBe(false);
+      expect(model.initializeResistanceCheckOptions({
+         diceMod: 3,
+         resistance: 'reflexes',
+      }).diceMod).toBe(3);
+   });
+
+   it('applies ticked situations and Advantage to the Resistance Check parameters', () => {
+      /** @type {object} The model under test. */
+      const model = situationalModel([
+         checkModifier({
+            checkType: 'resistance',
+            key: 'Braced',
+            selector: 'situation',
+            value: 1,
+         }),
+      ]);
+      /** @type {object} Reflexes-check parameters with Advantage and the situation ticked. */
+      const parameters = model.getResistanceCheckParameters(createResistanceCheckOptions({
+         advantage: 1,
+         resistance: 'reflexes',
+         situations: ['braced'],
+      }));
+      expect(parameters).toMatchObject({
+         baseDifficulty: 4,
+         diceMod: 1,
+         difficulty: 3,
+         resistanceDice: 4,
+         totalDice: 5,
+      });
    });
 });
