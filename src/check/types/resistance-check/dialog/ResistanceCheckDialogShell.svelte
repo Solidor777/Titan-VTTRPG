@@ -1,8 +1,11 @@
 <script>
+   import CheckDialogAdvantageField from '~/check/dialog/CheckDialogAdvantageField.svelte';
+   import CheckDialogAutomaticFailureField from '~/check/dialog/CheckDialogAutomaticFailureField.svelte';
    import CheckDialogBase from '~/check/dialog/CheckDialogBase.svelte';
    import { getContext } from 'svelte';
    import CheckDialogComplexityField from '~/check/dialog/CheckDialogComplexityField.svelte';
    import CheckDialogDifficultyField from '~/check/dialog/CheckDialogDifficultyField.svelte';
+   import CheckDialogDifficultySummary from '~/check/dialog/CheckDialogDifficultySummary.svelte';
    import CheckDialogDiceModField from '~/check/dialog/CheckDialogDiceModField.svelte';
    import CheckDialogExpertiseModField from '~/check/dialog/CheckDialogExpertiseModField.svelte';
    import CheckDialogDoubleExpertiseField from '~/check/dialog/CheckDialogDoubleExpertiseField.svelte';
@@ -31,6 +34,9 @@
    /** @type {ResistanceCheckDialog} The Svelte Component's Application. */
    const application = getApplication();
 
+   /** @type {ReactiveDocument|undefined} The reactive bridge of the Actor that will roll the check. */
+   const checkActor = getContext('checkActor');
+
    /**
     * @type {Array<typeof import('svelte').SvelteComponent>} Components for changing the options and
     *    displaying the parameters.
@@ -42,6 +48,9 @@
       CheckDialogDiceModField,
       CheckDialogExpertiseModField,
       CheckDialogDoubleExpertiseField,
+      CheckDialogAdvantageField,
+      CheckDialogAutomaticFailureField,
+      CheckDialogDifficultySummary,
       CheckDialogTotalDiceSummary,
       CheckDialogTotalExpertiseSummary,
    ];
@@ -71,10 +80,13 @@
       }
    }
 
-   // Update the parameters whenever the check options change.
+   // Update the parameters whenever the check options or the Actor (its items and effects included) change; a
+   // change that invalidates the check closes the dialog.
    $effect(() => {
-      if (actor?.system.validateResistanceCheckOptions($checkOptions)) {
-         $checkParameters = actor.system.getResistanceCheckParameters($checkOptions);
+      /** @type {TitanActor|undefined} The live Actor, read through its bridge so this effect tracks it. */
+      const liveActor = checkActor?.data;
+      if (liveActor?.system.validateResistanceCheckOptions($checkOptions)) {
+         $checkParameters = liveActor.system.getResistanceCheckParameters($checkOptions);
       }
       else {
          onCheckInvalid();

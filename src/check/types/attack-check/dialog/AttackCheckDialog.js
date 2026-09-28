@@ -25,6 +25,7 @@ export default class AttackCheckDialog extends TitanDialog {
             props: {
                shell: AttackCheckDialogShell,
                actor: actor,
+               checkType: 'attack',
                checkOptions: writable(checkOptions),
                checkParameters: writable(checkParameters),
             },

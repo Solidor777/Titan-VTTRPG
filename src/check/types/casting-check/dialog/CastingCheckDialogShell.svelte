@@ -1,10 +1,13 @@
 <script>
+   import CheckDialogAdvantageField from '~/check/dialog/CheckDialogAdvantageField.svelte';
    import CheckDialogAttributeField from '~/check/dialog/CheckDialogAttributeField.svelte';
+   import CheckDialogAutomaticFailureField from '~/check/dialog/CheckDialogAutomaticFailureField.svelte';
    import CheckDialogBase from '~/check/dialog/CheckDialogBase.svelte';
    import CheckDialogComplexityField from '~/check/dialog/CheckDialogComplexityField.svelte';
    import CheckDialogDamageModField from '~/check/dialog/CheckDialogDamageModField.svelte';
    import CheckDialogDiceModField from '~/check/dialog/CheckDialogDiceModField.svelte';
    import CheckDialogDifficultyField from '~/check/dialog/CheckDialogDifficultyField.svelte';
+   import CheckDialogDifficultySummary from '~/check/dialog/CheckDialogDifficultySummary.svelte';
    import CheckDialogDoubleExpertiseField from '~/check/dialog/CheckDialogDoubleExpertiseField.svelte';
    import CheckDialogDoubleTrainingField from '~/check/dialog/CheckDialogDoubleTrainingField.svelte';
    import CheckDialogExpertiseModField from '~/check/dialog/CheckDialogExpertiseModField.svelte';
@@ -35,6 +38,9 @@
    /** @type {CastingCheckDialog} The Svelte Component's Application. */
    const application = getApplication();
 
+   /** @type {ReactiveDocument|undefined} The reactive bridge of the Actor that will roll the check. */
+   const checkActor = getContext('checkActor');
+
    /** @type {Array<typeof import('svelte').SvelteComponent>} Base template for the component rows. */
    const baseRows = [
       CheckDialogAttributeField,
@@ -46,6 +52,9 @@
       CheckDialogExpertiseModField,
       CheckDialogDoubleTrainingField,
       CheckDialogDoubleExpertiseField,
+      CheckDialogAdvantageField,
+      CheckDialogAutomaticFailureField,
+      CheckDialogDifficultySummary,
       CheckDialogTotalDiceSummary,
       CheckDialogTotalExpertiseSummary,
    ];
@@ -81,10 +90,13 @@
       }
    }
 
-   // Update the parameters whenever the check options change.
+   // Update the parameters whenever the check options or the Actor (its items and effects included) change; a
+   // change that invalidates the check closes the dialog.
    $effect(() => {
-      if (actor?.system.validateCastingCheckOptions($checkOptions)) {
-         $checkParameters = actor.system.getCastingCheckParameters($checkOptions);
+      /** @type {TitanActor|undefined} The live Actor, read through its bridge so this effect tracks it. */
+      const liveActor = checkActor?.data;
+      if (liveActor?.system.validateCastingCheckOptions($checkOptions)) {
+         $checkParameters = liveActor.system.getCastingCheckParameters($checkOptions);
       }
       else {
          onCheckInvalid();

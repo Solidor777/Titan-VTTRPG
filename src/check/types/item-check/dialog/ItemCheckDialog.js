@@ -24,6 +24,7 @@ export default class ItemCheckDialog extends TitanDialog {
             props: {
                shell: ItemCheckDialogShell,
                actor: actor,
+               checkType: 'item',
                checkOptions: writable(checkOptions),
                checkParameters: writable(checkParameters),
             },

@@ -1,7 +1,9 @@
 <script>
+   import { getContext } from 'svelte';
    import Text from '~/helpers/svelte-components/Text.svelte';
    import Button from '~/helpers/svelte-components/button/Button.svelte';
    import getApplication from '~/helpers/utility-functions/GetApplication.js';
+   import CheckDialogSituationsField from '~/check/dialog/CheckDialogSituationsField.svelte';
 
    /**
     * @typedef {object} CheckDialogBaseProps
@@ -18,6 +20,23 @@
 
    /** @type {SvelteApp} The Svelte Component's Application. */
    const application = getApplication();
+
+   /** @type {ReactiveDocument|undefined} The reactive bridge of the Actor that will roll the check. */
+   const checkActor = getContext('checkActor');
+
+   /** @type {string|undefined} The check type, which selects the situational modifiers offered. */
+   const checkType = getContext('checkType');
+
+   /** @type {import('svelte/store').Writable} Reference to the Check Options store. */
+   const checkOptions = getContext('checkOptions');
+
+   /**
+    * @type {SituationalCheckModifier[]} The situational modifiers that apply to the check's current Skill. Read
+    * through the Actor's bridge, so the list follows the Actor's item and effect changes while the dialog is open.
+    */
+   const situationalModifiers = $derived(
+      checkActor?.data.system.getSituationalCheckModifiers(checkType, { skill: $checkOptions.skill }) ?? [],
+   );
 
    /**
     * Rolls the check and closes the application.
@@ -43,6 +62,13 @@
          <Row/>
       </div>
    {/each}
+
+   <!--Situational Modifiers-->
+   {#if situationalModifiers.length > 0}
+      <div class="row">
+         <CheckDialogSituationsField modifiers={situationalModifiers}/>
+      </div>
+   {/if}
 
    <!--Buttons-->
    <div class="row">

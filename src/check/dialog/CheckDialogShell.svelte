@@ -1,5 +1,6 @@
 <script>
    import { setContext } from 'svelte';
+   import ReactiveDocument from '~/document/reactive/ReactiveDocument.svelte.js';
 
    /**
     * @typedef {object} CheckDialogShellProps
@@ -7,6 +8,8 @@
     * @property {import('svelte/store').Writable} [checkParameters] Store for the Check Parameters.
     * @property {typeof import('svelte').SvelteComponent} [shell] Svelte component to attach to this dialog.
     * @property {TitanActor} [actor] The actor that will roll the check.
+    * @property {string} [checkType] The check type (attribute, resistance, attack, casting, or item), which selects the
+    * situational modifiers the dialog offers.
     */
 
    /** @type {CheckDialogShellProps} */
@@ -15,14 +18,23 @@
       checkParameters = undefined,
       shell = undefined,
       actor = undefined,
+      checkType = undefined,
    } = $props();
 
    // Setup context objects.
-   // These captures are intentional: both stores are stable for the dialog's lifetime.
+   // These captures are intentional: the stores, actor, and check type are stable for the dialog's lifetime.
    // svelte-ignore state_referenced_locally
    setContext('checkOptions', checkOptions);
    // svelte-ignore state_referenced_locally
    setContext('checkParameters', checkParameters);
+
+   // The Actor's reactive bridge: a reader of `.data` re-runs when the Actor, or one of its items or effects, changes,
+   // so the situational list and the parameters follow the Actor while the dialog is open. Its hooks tear down when
+   // the dialog unmounts.
+   // svelte-ignore state_referenced_locally
+   setContext('checkActor', actor ? new ReactiveDocument(actor) : undefined);
+   // svelte-ignore state_referenced_locally
+   setContext('checkType', checkType);
 </script>
 
 {#if shell}

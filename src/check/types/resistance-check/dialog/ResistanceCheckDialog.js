@@ -25,6 +25,7 @@ export default class ResistanceCheckDialog extends TitanDialog {
             props: {
                shell: ResistanceCheckDialogShell,
                actor: actor,
+               checkType: 'resistance',
                checkOptions: writable(checkOptions),
                checkParameters: writable(checkParameters),
             },

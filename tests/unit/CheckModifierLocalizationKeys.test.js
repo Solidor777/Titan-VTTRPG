@@ -17,6 +17,15 @@ const lang = JSON.parse(readFileSync(path.resolve(__dirname, '../../lang/en.json
 const LOCAL_KEYS = [
    'advantage.text',
    'automaticFailure.text',
+   'check.advantage.desc.text',
+   'check.automaticFailure.desc.text',
+   'check.effectiveDifficulty.desc.text',
+   'disadvantage.text',
+   'effectiveDifficulty.text',
+   'greaterAdvantage.text',
+   'greaterDisadvantage.text',
+   'noAdvantage.text',
+   'situationalModifiers.text',
 ];
 
 describe('check-modifier localization keys', () => {

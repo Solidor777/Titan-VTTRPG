@@ -25,6 +25,7 @@ export default class CastingCheckDialog extends TitanDialog {
             props: {
                shell: CastingCheckDialogShell,
                actor: actor,
+               checkType: 'casting',
                checkOptions: writable(checkOptions),
                checkParameters: writable(checkParameters),
             },
