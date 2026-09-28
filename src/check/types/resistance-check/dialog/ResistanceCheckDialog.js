@@ -16,8 +16,10 @@ export default class ResistanceCheckDialog extends TitanDialog {
     * @param {ResistanceCheckParameters} checkParameters - The initial
     * parameters for the check, calculated from the options.
     * @param {TitanActor} actor - The Actor that will roll the check.
+    * @param {ResistanceCheckOptions} [callerOptions] - The raw options passed to `requestResistanceCheck`; a field
+    * present there (not `undefined`) is treated as caller-set, not actor-derived.
     */
-   constructor(checkOptions, checkParameters, actor) {
+   constructor(checkOptions, checkParameters, actor, callerOptions) {
       super({
          title: `${localize('resistanceCheck')} (${actor.name})`,
          content: {
@@ -25,6 +27,7 @@ export default class ResistanceCheckDialog extends TitanDialog {
             props: {
                shell: ResistanceCheckDialogShell,
                actor: actor,
+               callerOptions: callerOptions,
                checkType: 'resistance',
                checkOptions: writable(checkOptions),
                checkParameters: writable(checkParameters),

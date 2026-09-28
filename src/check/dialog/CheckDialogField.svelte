@@ -64,7 +64,7 @@
 
          @include margin-left-large;
 
-         --titan-input-height: 28px;
+         --titan-input-height: var(--titan-check-dialog-input-height);
          --titan-input-padding: 0 8px;
       }
    }

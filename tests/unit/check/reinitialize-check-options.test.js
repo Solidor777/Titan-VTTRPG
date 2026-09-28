@@ -1,8 +1,26 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, beforeAll, afterAll } from 'vitest';
 import reinitializeCheckOptions, {
    ACTOR_DERIVED_CHECK_OPTION_FIELDS,
+   INITIALIZE_CHECK_OPTIONS_METHODS,
    rederiveActorCheckOptionFields,
+   seedTouchedFieldsFromCallerOptions,
 } from '~/check/dialog/ReinitializeCheckOptions.js';
+
+beforeAll(() => {
+   // reinitializeCheckOptions's targetDefense guard reads getTargetedCharacters(), which reads these globals.
+   globalThis.game = {
+      user: {
+         isGM: false,
+         targets: new Set(),
+      },
+   };
+   globalThis.canvas = { tokens: { controlled: [] } };
+});
+
+afterAll(() => {
+   delete globalThis.game;
+   delete globalThis.canvas;
+});
 
 describe('ACTOR_DERIVED_CHECK_OPTION_FIELDS', () => {
    it('omits Training for Resistance Checks and Damage/Healing where they do not apply', () => {
@@ -178,5 +196,82 @@ describe('rederiveActorCheckOptionFields', () => {
 
       expect(rederiveActorCheckOptionFields(currentOptions, touchedFields, 'attribute', initialize))
          .toBeUndefined();
+   });
+});
+
+describe('Attack actor-derived fields (attackerMelee/attackerAccuracy/targetDefense)', () => {
+   it('includes Melee, Accuracy, and target Defense in the Attack field list', () => {
+      expect(ACTOR_DERIVED_CHECK_OPTION_FIELDS.attack).toEqual(expect.arrayContaining([
+         'attackerMelee',
+         'attackerAccuracy',
+         'targetDefense',
+      ]));
+   });
+
+   it('re-derives targetDefense when nothing is targeted (the no-target self-fallback)', () => {
+      /** @type {object} An Attack Check's current options; no target is selected. */
+      const checkOptions = {
+         attackerAccuracy: 3,
+         attackerMelee: 3,
+         itemId: 'weapon1',
+         targetDefense: 3,
+      };
+
+      globalThis.game.user.targets = new Set();
+
+      expect(reinitializeCheckOptions(checkOptions, new Set(), 'attack')).toEqual({ itemId: 'weapon1' });
+   });
+
+   it('leaves a targeted character\'s Defense alone even when untouched', () => {
+      /** @type {object} An Attack Check's current options; a target is selected. */
+      const checkOptions = {
+         attackerAccuracy: 3,
+         attackerMelee: 3,
+         itemId: 'weapon1',
+         targetDefense: 5,
+      };
+
+      /** @type {Set} Stands in for a targeted token: only its length is read by getTargetedCharacters. */
+      globalThis.game.user.targets = new Set([{ actor: { system: { isCharacter: true } } }]);
+
+      expect(reinitializeCheckOptions(checkOptions, new Set(), 'attack')).toMatchObject({ targetDefense: 5 });
+
+      globalThis.game.user.targets = new Set();
+   });
+});
+
+describe('seedTouchedFieldsFromCallerOptions', () => {
+   it('marks every field the caller explicitly set (not undefined) as touched', () => {
+      /** @type {Set<string>} The dialog's touched-field set, seeded fresh. */
+      const touchedFields = new Set();
+
+      seedTouchedFieldsFromCallerOptions(touchedFields, {
+         attribute: 'body',
+         automaticFailure: undefined,
+         diceMod: 3,
+      });
+
+      expect(touchedFields.has('diceMod')).toBe(true);
+      expect(touchedFields.has('attribute')).toBe(true);
+      expect(touchedFields.has('automaticFailure')).toBe(false);
+   });
+
+   it('is a no-op when the caller supplied no options', () => {
+      /** @type {Set<string>} The dialog's touched-field set, seeded fresh. */
+      const touchedFields = new Set();
+      seedTouchedFieldsFromCallerOptions(touchedFields, undefined);
+      expect(touchedFields.size).toBe(0);
+   });
+});
+
+describe('INITIALIZE_CHECK_OPTIONS_METHODS', () => {
+   it('names the live Actor\'s initializer method for every check type', () => {
+      expect(INITIALIZE_CHECK_OPTIONS_METHODS).toEqual({
+         attack: 'initializeAttackCheckOptions',
+         attribute: 'initializeAttributeCheckOptions',
+         casting: 'initializeCastingCheckOptions',
+         item: 'initializeItemCheckOptions',
+         resistance: 'initializeResistanceCheckOptions',
+      });
    });
 });

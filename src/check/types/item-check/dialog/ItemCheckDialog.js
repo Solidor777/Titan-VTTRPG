@@ -15,8 +15,10 @@ export default class ItemCheckDialog extends TitanDialog {
     * @param {ItemCheckOptions} checkOptions - The initial options for the check to be adjusted.
     * @param {ItemCheckParameters} checkParameters - The initial parameters for the check calculated from the options.
     * @param {TitanActor} actor - The Actor that will roll the check.
+    * @param {ItemCheckOptions} [callerOptions] - The raw options passed to `requestItemCheck`; a field present
+    * there (not `undefined`) is treated as caller-set, not actor-derived.
     */
-   constructor(checkOptions, checkParameters, actor) {
+   constructor(checkOptions, checkParameters, actor, callerOptions) {
       super({
          title: `${localize('itemCheck')} (${actor.name})`,
          content: {
@@ -24,6 +26,7 @@ export default class ItemCheckDialog extends TitanDialog {
             props: {
                shell: ItemCheckDialogShell,
                actor: actor,
+               callerOptions: callerOptions,
                checkType: 'item',
                checkOptions: writable(checkOptions),
                checkParameters: writable(checkParameters),

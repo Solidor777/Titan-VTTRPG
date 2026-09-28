@@ -29,6 +29,10 @@
    --titan-input-width: 100%;
    --titan-input-digit-width: 10px;
 
+   // Check dialog: every field row (CheckDialogField.svelte) and the situations checkbox
+   // (CheckDialogSituationsField.svelte) share this input height, one definition for both.
+   --titan-check-dialog-input-height: 28px;
+
    // Button
    --titan-button-border-style: solid;
    --titan-button-border-radius: 10px;

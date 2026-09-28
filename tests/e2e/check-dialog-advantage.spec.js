@@ -266,13 +266,66 @@ test('the open dialog follows the Actor\'s effects', async () => {
    const strongCurrentRow = dialog.locator('[data-testid^="situation-row-"]').filter({ hasText: 'Strong Current' });
    await expect(strongCurrentRow).toContainText('E2E Strong Current');
 
-   // The new situation starts unticked and does not affect the Difficulty (guards a ticked situation's key
-   // surviving its row's removal and appearing pre-ticked on a later situation).
+   // A brand new situation (a different key from the one just removed) starts unticked and does not affect the
+   // Difficulty. This does NOT guard a same-key reuse — see the dedicated test below for that.
    await expect(strongCurrentRow.locator('i.fa-check')).toHaveCount(0);
    await expect(difficulty).toHaveText('4');
 });
 
-test('Advantage follows an always-on Actor effect and keeps a user override', async () => {
+test('a ticked situation does not survive its row\'s removal onto a same-key situation', async () => {
+   /** @type {import('@playwright/test').Locator} The open Attribute Check dialog. */
+   const dialog = await openSituationalDialog();
+
+   /** @type {import('@playwright/test').Locator} The effective-Difficulty summary. */
+   const difficulty = dialog.getByTestId('check-summary-difficulty');
+
+   /** @type {import('@playwright/test').Locator} The Underwater situation row. */
+   const row = dialog.locator('[data-testid^="situation-row-"]').filter({ hasText: 'Underwater' });
+   await row.locator('[data-testid^="situation-toggle-"]').click();
+   await expect(row.locator('i.fa-check')).toHaveCount(1);
+   await expect(difficulty).toHaveText('5');
+
+   // Deleting the effect behind the ticked situation removes its row (presence→absence).
+   await page.evaluate(async (actorName) => {
+      await game.actors.getName(actorName).effects.getName('E2E Deep Water').delete();
+   }, ACTOR_NAME);
+   await expect(row).toHaveCount(0);
+   await expect(difficulty).toHaveText('4');
+
+   // A different effect that resolves to the SAME situation key ("underwater") must start unticked, not inherit
+   // the tick left behind in options.situations by the deleted effect's row.
+   await page.evaluate(async (actorName) => {
+      await game.actors.getName(actorName).createEmbeddedDocuments('ActiveEffect', [
+         {
+            name: 'E2E Deep Water 2',
+            type: 'effect',
+            system: {
+               rulesElement: [
+                  {
+                     checkType: 'any',
+                     key: 'Underwater',
+                     modifierType: 'advantage',
+                     operation: 'conditionalCheckModifier',
+                     selector: 'situation',
+                     skill: '',
+                     uuid: 'e2e-dialog-underwater-2',
+                     value: -1,
+                  },
+               ],
+            },
+         },
+      ]);
+   }, ACTOR_NAME);
+   await expect(row).toHaveCount(1);
+   await expect(row.locator('i.fa-check')).toHaveCount(0);
+   await expect(difficulty).toHaveText('4');
+});
+
+/**
+ * Rebuilds the spec's actor plain (no effects) and opens its Attribute Check dialog under the "always" setting.
+ * @returns {Promise<import('@playwright/test').Locator>} The open dialog.
+ */
+async function openAlwaysDialog() {
    await page.evaluate(async (actorName) => {
       await game.settings.set('titan', 'getCheckOptions', 'always');
       await game.actors.getName(actorName)?.delete();
@@ -285,9 +338,16 @@ test('Advantage follows an always-on Actor effect and keeps a user override', as
       await actor.system.requestAttributeCheck({ attribute: 'body' });
    }, ACTOR_NAME);
 
-   /** @type {import('@playwright/test').Locator} The open dialog. */
+   /** @type {import('@playwright/test').Locator} The dialog window. */
    const dialog = page.locator(DIALOG_SELECTOR);
    await expect(dialog).toBeVisible();
+   return dialog;
+}
+
+test('Advantage follows an always-on Actor effect, presence→absence, and the rolled check carries the ' +
+   're-derived value', async () => {
+   /** @type {import('@playwright/test').Locator} The open Attribute Check dialog. */
+   const dialog = await openAlwaysDialog();
 
    /** @type {import('@playwright/test').Locator} The Advantage select's trigger. */
    const advantageSelect = dialog.getByTestId('check-field-advantage').locator('[role="combobox"]');
@@ -323,23 +383,28 @@ test('Advantage follows an always-on Actor effect and keeps a user override', as
    await expect(advantageSelect).toHaveAttribute('data-value', '-1');
    await expect(difficulty).toHaveText('5');
 
-   // Removing the effect returns both to their prior state (presence→absence on the same locators).
-   await page.evaluate(async (actorName) => {
-      await game.actors.getName(actorName).effects.getName('E2E Always Disadvantage').delete();
-   }, ACTOR_NAME);
-   await expect(advantageSelect).toHaveAttribute('data-value', '0');
-   await expect(difficulty).toHaveText('4');
+   // Rolling now carries the re-derived value, not the stale value the dialog opened with (m4).
+   /** @type {number} The chat-message count before the roll. */
+   const baseline = await clickRoll(dialog, page);
+   /** @type {{id: string, type: string, parameters: object, results: object}} The rolled check's message. */
+   const flags = await readNewestCheckFlags(page, baseline);
+   expect(flags.parameters.advantage).toBe(-1);
+   expect(flags.parameters.difficulty).toBe(5);
+});
 
-   // The user picks Greater Advantage in the dialog.
-   await setSelectField(dialog, 'advantage', 2);
-   await expect(advantageSelect).toHaveAttribute('data-value', '2');
-   await expect(difficulty).toHaveText('2');
+test('Advantage follows removing an always-on Actor effect (presence→absence on the same locator)', async () => {
+   /** @type {import('@playwright/test').Locator} The open Attribute Check dialog. */
+   const dialog = await openAlwaysDialog();
 
-   // A further always-on Disadvantage effect does not overwrite the user's choice.
+   /** @type {import('@playwright/test').Locator} The Advantage select's trigger. */
+   const advantageSelect = dialog.getByTestId('check-field-advantage').locator('[role="combobox"]');
+   /** @type {import('@playwright/test').Locator} The effective-Difficulty summary. */
+   const difficulty = dialog.getByTestId('check-summary-difficulty');
+
    await page.evaluate(async (actorName) => {
       await game.actors.getName(actorName).createEmbeddedDocuments('ActiveEffect', [
          {
-            name: 'E2E Always Disadvantage 2',
+            name: 'E2E Always Disadvantage',
             type: 'effect',
             system: {
                rulesElement: [
@@ -350,7 +415,7 @@ test('Advantage follows an always-on Actor effect and keeps a user override', as
                      operation: 'conditionalCheckModifier',
                      selector: 'any',
                      skill: '',
-                     uuid: 'e2e-dialog-always-disadvantage-2',
+                     uuid: 'e2e-dialog-always-disadvantage-remove',
                      value: -1,
                   },
                ],
@@ -358,32 +423,89 @@ test('Advantage follows an always-on Actor effect and keeps a user override', as
          },
       ]);
    }, ACTOR_NAME);
+   await expect(advantageSelect).toHaveAttribute('data-value', '-1');
+   await expect(difficulty).toHaveText('5');
+
+   // Removing the effect returns both to their prior state (presence→absence on the same locators).
+   await page.evaluate(async (actorName) => {
+      await game.actors.getName(actorName).effects.getName('E2E Always Disadvantage').delete();
+   }, ACTOR_NAME);
+   await expect(advantageSelect).toHaveAttribute('data-value', '0');
+   await expect(difficulty).toHaveText('4');
+});
+
+test('Advantage keeps a user override against a later always-on Actor effect (synced on a visible Total ' +
+   'Dice change)', async () => {
+   /** @type {import('@playwright/test').Locator} The open Attribute Check dialog. */
+   const dialog = await openAlwaysDialog();
+
+   /** @type {import('@playwright/test').Locator} The Advantage select's trigger. */
+   const advantageSelect = dialog.getByTestId('check-field-advantage').locator('[role="combobox"]');
+   /** @type {import('@playwright/test').Locator} The effective-Difficulty summary. */
+   const difficulty = dialog.getByTestId('check-summary-difficulty');
+   /** @type {import('@playwright/test').Locator} The Total Dice summary. */
+   const totalDice = dialog.getByTestId('check-summary-totalDice');
+   /** @type {number} The Total Dice before any effect is added. */
+   const baselineDice = await readSummary(dialog, 'totalDice');
+
+   // The user picks Greater Advantage in the dialog.
+   await setSelectField(dialog, 'advantage', 2);
+   await expect(advantageSelect).toHaveAttribute('data-value', '2');
+   await expect(difficulty).toHaveText('2');
+
+   // A further always-on effect carries BOTH a Disadvantage modifier (which must not overwrite the user's
+   // Advantage) and a Dice modifier (a visible, untouched field). Waiting for the Dice change first proves this
+   // effect was actually processed by the re-derivation pass before asserting Advantage held its ground — an
+   // effect that silently failed to run would make the "still 2" assertion pass for the wrong reason.
+   await page.evaluate(async (actorName) => {
+      await game.actors.getName(actorName).createEmbeddedDocuments('ActiveEffect', [
+         {
+            name: 'E2E Always Disadvantage And Dice',
+            type: 'effect',
+            system: {
+               rulesElement: [
+                  {
+                     checkType: 'any',
+                     key: '',
+                     modifierType: 'advantage',
+                     operation: 'conditionalCheckModifier',
+                     selector: 'any',
+                     skill: '',
+                     uuid: 'e2e-dialog-always-disadvantage-sync',
+                     value: -1,
+                  },
+                  {
+                     checkType: 'any',
+                     key: '',
+                     modifierType: 'dice',
+                     operation: 'conditionalCheckModifier',
+                     selector: 'any',
+                     skill: '',
+                     uuid: 'e2e-dialog-always-dice-sync',
+                     value: 3,
+                  },
+               ],
+            },
+         },
+      ]);
+   }, ACTOR_NAME);
+   await expect(totalDice).toHaveText(String(baselineDice + 3));
+
+   // Only now, having proven the effect was processed, assert the user's Advantage choice survived it.
    await expect(advantageSelect).toHaveAttribute('data-value', '2');
    await expect(difficulty).toHaveText('2');
 });
 
-test('Automatic Failure follows an always-on Actor effect and keeps a user override', async () => {
-   await page.evaluate(async (actorName) => {
-      await game.settings.set('titan', 'getCheckOptions', 'always');
-      await game.actors.getName(actorName)?.delete();
-
-      /** @type {TitanActor} The rebuilt actor, with no effects yet. */
-      const actor = await Actor.create({
-         name: actorName,
-         type: 'player',
-      });
-      await actor.system.requestAttributeCheck({ attribute: 'body' });
-   }, ACTOR_NAME);
-
-   /** @type {import('@playwright/test').Locator} The open dialog. */
-   const dialog = page.locator(DIALOG_SELECTOR);
-   await expect(dialog).toBeVisible();
+test('Automatic Failure follows an always-on Actor effect, presence→absence, presence again', async () => {
+   /** @type {import('@playwright/test').Locator} The open Attribute Check dialog. */
+   const dialog = await openAlwaysDialog();
 
    /** @type {import('@playwright/test').Locator} The Automatic Failure field wrapper. */
    const field = dialog.getByTestId('check-field-automaticFailure');
    await expect(field.locator('i.fa-check')).toHaveCount(0);
 
-   // An always-on Automatic Failure effect is added while the dialog is open: the checkbox follows it.
+   // An always-on Automatic Failure effect is added while the dialog is open: the checkbox follows it (absence→
+   // presence).
    await page.evaluate(async (actorName) => {
       await game.actors.getName(actorName).createEmbeddedDocuments('ActiveEffect', [
          {
@@ -408,14 +530,18 @@ test('Automatic Failure follows an always-on Actor effect and keeps a user overr
    }, ACTOR_NAME);
    await expect(field.locator('i.fa-check')).toHaveCount(1);
 
-   // The user unticks it; a further Actor change does not re-tick it against the user's choice.
-   await setCheckbox(dialog, 'automaticFailure', false);
+   // I5's remove leg: deleting it before the user edits anything ticks it back off (presence→absence on the same
+   // subject), proving the follow behavior works in both directions, not only add.
+   await page.evaluate(async (actorName) => {
+      await game.actors.getName(actorName).effects.getName('E2E Always Auto-Fail').delete();
+   }, ACTOR_NAME);
    await expect(field.locator('i.fa-check')).toHaveCount(0);
 
+   // Re-adding it ticks it on again, setting up the next test's starting point for the override leg.
    await page.evaluate(async (actorName) => {
       await game.actors.getName(actorName).createEmbeddedDocuments('ActiveEffect', [
          {
-            name: 'E2E Always Auto-Fail 2',
+            name: 'E2E Always Auto-Fail',
             type: 'effect',
             system: {
                rulesElement: [
@@ -426,7 +552,7 @@ test('Automatic Failure follows an always-on Actor effect and keeps a user overr
                      operation: 'conditionalCheckModifier',
                      selector: 'any',
                      skill: '',
-                     uuid: 'e2e-dialog-always-autofail-2',
+                     uuid: 'e2e-dialog-always-autofail-readd',
                      value: 1,
                   },
                ],
@@ -434,5 +560,232 @@ test('Automatic Failure follows an always-on Actor effect and keeps a user overr
          },
       ]);
    }, ACTOR_NAME);
+   await expect(field.locator('i.fa-check')).toHaveCount(1);
+});
+
+test('Automatic Failure keeps a user override against a later always-on Actor effect (synced on a ' +
+   'visible Total Dice change)', async () => {
+   /** @type {import('@playwright/test').Locator} The open Attribute Check dialog. */
+   const dialog = await openAlwaysDialog();
+
+   /** @type {import('@playwright/test').Locator} The Automatic Failure field wrapper. */
+   const field = dialog.getByTestId('check-field-automaticFailure');
+   /** @type {import('@playwright/test').Locator} The Total Dice summary. */
+   const totalDice = dialog.getByTestId('check-summary-totalDice');
+   /** @type {number} The Total Dice before any effect is added. */
+   const baselineDice = await readSummary(dialog, 'totalDice');
+
+   // An always-on effect ticks the checkbox on; the user unticks it (an override against the live derivation).
+   await page.evaluate(async (actorName) => {
+      await game.actors.getName(actorName).createEmbeddedDocuments('ActiveEffect', [
+         {
+            name: 'E2E Always Auto-Fail',
+            type: 'effect',
+            system: {
+               rulesElement: [
+                  {
+                     checkType: 'any',
+                     key: '',
+                     modifierType: 'automaticFailure',
+                     operation: 'conditionalCheckModifier',
+                     selector: 'any',
+                     skill: '',
+                     uuid: 'e2e-dialog-always-autofail-3',
+                     value: 1,
+                  },
+               ],
+            },
+         },
+      ]);
+   }, ACTOR_NAME);
+   await expect(field.locator('i.fa-check')).toHaveCount(1);
+   await setCheckbox(dialog, 'automaticFailure', false);
    await expect(field.locator('i.fa-check')).toHaveCount(0);
+
+   // A further always-on effect carries both another Automatic Failure source (which must not re-tick the
+   // checkbox) and a Dice modifier (a visible, untouched field). Waiting for the Dice change first proves this
+   // effect was actually processed before asserting the checkbox held its override.
+   await page.evaluate(async (actorName) => {
+      await game.actors.getName(actorName).createEmbeddedDocuments('ActiveEffect', [
+         {
+            name: 'E2E Always Auto-Fail And Dice',
+            type: 'effect',
+            system: {
+               rulesElement: [
+                  {
+                     checkType: 'any',
+                     key: '',
+                     modifierType: 'automaticFailure',
+                     operation: 'conditionalCheckModifier',
+                     selector: 'any',
+                     skill: '',
+                     uuid: 'e2e-dialog-always-autofail-sync',
+                     value: 1,
+                  },
+                  {
+                     checkType: 'any',
+                     key: '',
+                     modifierType: 'dice',
+                     operation: 'conditionalCheckModifier',
+                     selector: 'any',
+                     skill: '',
+                     uuid: 'e2e-dialog-always-dice-sync-2',
+                     value: 3,
+                  },
+               ],
+            },
+         },
+      ]);
+   }, ACTOR_NAME);
+   await expect(totalDice).toHaveText(String(baselineDice + 3));
+
+   // Only now, having proven the effect was processed, assert the user's override survived it.
+   await expect(field.locator('i.fa-check')).toHaveCount(0);
+});
+
+test('an untouched derived field re-derives immediately when the user changes a derivation input (Skill)', async () => {
+   await page.evaluate(async (actorName) => {
+      await game.settings.set('titan', 'getCheckOptions', 'always');
+      await game.actors.getName(actorName)?.delete();
+
+      /** @type {TitanActor} The rebuilt actor, with a Skill-narrowed always-on Dice modifier. */
+      const actor = await Actor.create({
+         name: actorName,
+         type: 'player',
+      });
+      await actor.createEmbeddedDocuments('ActiveEffect', [
+         {
+            name: 'E2E Athletics Dice Boost',
+            type: 'effect',
+            system: {
+               rulesElement: [
+                  {
+                     checkType: 'any',
+                     key: 'athletics',
+                     modifierType: 'dice',
+                     operation: 'conditionalCheckModifier',
+                     selector: 'skill',
+                     skill: '',
+                     uuid: 'e2e-dialog-skill-dice',
+                     value: 2,
+                  },
+               ],
+            },
+         },
+      ]);
+      await actor.system.requestAttributeCheck({ attribute: 'body' });
+   }, ACTOR_NAME);
+
+   /** @type {import('@playwright/test').Locator} The open dialog. */
+   const dialog = page.locator(DIALOG_SELECTOR);
+   await expect(dialog).toBeVisible();
+
+   /** @type {import('@playwright/test').Locator} The diceMod field's number input. */
+   const diceModField = dialog.getByTestId('check-field-diceMod').locator('input');
+   await expect(diceModField).toHaveValue('0');
+
+   // Setting the Skill to Athletics narrows the always-on Dice modifier onto this check. diceMod is untouched, so
+   // it re-derives immediately from the check-options change alone — no Actor mutation is involved in this step.
+   await setSelectField(dialog, 'skill', 'athletics');
+   await expect(diceModField).toHaveValue('2');
+});
+
+test('a caller-supplied override survives dialog mount and rolls with its value', async () => {
+   await page.evaluate(async (actorName) => {
+      await game.settings.set('titan', 'getCheckOptions', 'always');
+      await game.actors.getName(actorName)?.delete();
+
+      /** @type {TitanActor} The rebuilt actor. */
+      const actor = await Actor.create({
+         name: actorName,
+         type: 'player',
+      });
+
+      // requestAttributeCheck's raw options carry an explicit diceMod: 3, which must survive dialog mount (I3)
+      // rather than being overwritten by the first re-derivation pass (diceMod is otherwise actor-derived).
+      await actor.system.requestAttributeCheck({
+         attribute: 'body',
+         diceMod: 3,
+      });
+   }, ACTOR_NAME);
+
+   /** @type {import('@playwright/test').Locator} The open dialog. */
+   const dialog = page.locator(DIALOG_SELECTOR);
+   await expect(dialog).toBeVisible();
+
+   /** @type {import('@playwright/test').Locator} The diceMod field's number input. */
+   const diceModField = dialog.getByTestId('check-field-diceMod').locator('input');
+   await expect(diceModField).toHaveValue('3');
+
+   /** @type {number} The chat-message count before the roll. */
+   const baseline = await clickRoll(dialog, page);
+   /** @type {{id: string, type: string, parameters: object, results: object}} The rolled check's message. */
+   const flags = await readNewestCheckFlags(page, baseline);
+   expect(flags.parameters.diceMod).toBe(3);
+});
+
+test('Attacker Melee follows an always-on rating-modifier Actor effect (presence→absence on the same ' +
+   'locator)', async () => {
+   await page.evaluate(async (actorName) => {
+      await game.settings.set('titan', 'getCheckOptions', 'always');
+      await game.actors.getName(actorName)?.delete();
+
+      /** @type {TitanActor} The rebuilt actor. */
+      const actor = await Actor.create({
+         name: actorName,
+         type: 'player',
+      });
+      await actor.createEmbeddedDocuments('Item', [
+         {
+            name: 'E2E Attack Weapon',
+            type: 'weapon',
+         },
+      ]);
+
+      /** @type {TitanItem} The default weapon, whose default attack is Melee. */
+      const weapon = actor.items.find((item) => item.type === 'weapon');
+      await actor.system.requestAttackCheck({
+         attackIdx: 0,
+         itemId: weapon.id,
+      });
+   }, ACTOR_NAME);
+
+   /** @type {import('@playwright/test').Locator} The open Attack Check dialog. */
+   const dialog = page.locator('.application.titan-dialog[id^="titan-attack-check-dialog-"]');
+   await expect(dialog).toBeVisible();
+
+   /** @type {import('@playwright/test').Locator} The Melee field's number input. */
+   const meleeField = dialog.getByTestId('check-field-attackerMelee').locator('input');
+   /** @type {string} The Melee rating before any rating-modifier effect is added. */
+   const baselineMelee = await meleeField.inputValue();
+
+   // An always-on conditionalRatingModifier effect (applies to every Melee attack, "attackType"/"melee") is added
+   // while the dialog is open: the untouched Melee field follows it.
+   await page.evaluate(async (actorName) => {
+      await game.actors.getName(actorName).createEmbeddedDocuments('ActiveEffect', [
+         {
+            name: 'E2E Melee Rating Boost',
+            type: 'effect',
+            system: {
+               rulesElement: [
+                  {
+                     key: 'melee',
+                     operation: 'conditionalRatingModifier',
+                     rating: 'melee',
+                     selector: 'attackType',
+                     uuid: 'e2e-dialog-melee-rating-boost',
+                     value: 2,
+                  },
+               ],
+            },
+         },
+      ]);
+   }, ACTOR_NAME);
+   await expect(meleeField).toHaveValue(String(Number(baselineMelee) + 2));
+
+   // Removing the effect returns Melee to its prior value (presence→absence on the same locator).
+   await page.evaluate(async (actorName) => {
+      await game.actors.getName(actorName).effects.getName('E2E Melee Rating Boost').delete();
+   }, ACTOR_NAME);
+   await expect(meleeField).toHaveValue(baselineMelee);
 });

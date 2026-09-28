@@ -1829,6 +1829,7 @@ export default class CharacterDataModel extends TitanActorDataModel {
             checkOptions,
             checkParameters,
             this.parent,
+            options,
          ).render(true);
       }
    }
@@ -2094,6 +2095,7 @@ export default class CharacterDataModel extends TitanActorDataModel {
             checkOptions,
             checkParameters,
             this.parent,
+            options,
          ).render(true);
       }
    }
@@ -2345,6 +2347,7 @@ export default class CharacterDataModel extends TitanActorDataModel {
             checkOptions,
             checkParameters,
             this.parent,
+            options,
          ).render(true);
       }
    }
@@ -2997,6 +3000,7 @@ export default class CharacterDataModel extends TitanActorDataModel {
             checkOptions,
             checkParameters,
             this.parent,
+            options,
          ).render(true);
       }
    }
@@ -3478,6 +3482,7 @@ export default class CharacterDataModel extends TitanActorDataModel {
             checkOptions,
             checkParameters,
             this.parent,
+            options,
          ).render(true);
       }
    }

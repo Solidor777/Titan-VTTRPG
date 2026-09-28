@@ -16,8 +16,10 @@ export default class AttackCheckDialog extends TitanDialog {
     * @param {AttackCheckParameters} checkParameters - The initial parameters
     * for the check, calculated from the options.
     * @param {TitanActor} actor - The Actor that will roll the check.
+    * @param {AttackCheckOptions} [callerOptions] - The raw options passed to `requestAttackCheck`; a field present
+    * there (not `undefined`) is treated as caller-set, not actor-derived.
     */
-   constructor(checkOptions, checkParameters, actor) {
+   constructor(checkOptions, checkParameters, actor, callerOptions) {
       super({
          title: `${localize('attackCheck')} (${actor.name})`,
          content: {
@@ -25,6 +27,7 @@ export default class AttackCheckDialog extends TitanDialog {
             props: {
                shell: AttackCheckDialogShell,
                actor: actor,
+               callerOptions: callerOptions,
                checkType: 'attack',
                checkOptions: writable(checkOptions),
                checkParameters: writable(checkParameters),

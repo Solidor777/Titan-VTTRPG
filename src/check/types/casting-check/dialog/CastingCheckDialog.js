@@ -16,8 +16,10 @@ export default class CastingCheckDialog extends TitanDialog {
     * @param {CastingCheckParameters} checkParameters - The initial parameters
     * for the check, calculated from the options.
     * @param {TitanActor} actor - The Actor that will roll the check.
+    * @param {CastingCheckOptions} [callerOptions] - The raw options passed to `requestCastingCheck`; a field
+    * present there (not `undefined`) is treated as caller-set, not actor-derived.
     */
-   constructor(checkOptions, checkParameters, actor) {
+   constructor(checkOptions, checkParameters, actor, callerOptions) {
       super({
          title: `${localize('castingCheck')} (${actor.name})`,
          content: {
@@ -25,6 +27,7 @@ export default class CastingCheckDialog extends TitanDialog {
             props: {
                shell: CastingCheckDialogShell,
                actor: actor,
+               callerOptions: callerOptions,
                checkType: 'casting',
                checkOptions: writable(checkOptions),
                checkParameters: writable(checkParameters),

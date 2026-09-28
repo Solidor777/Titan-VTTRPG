@@ -9,7 +9,6 @@
 
    /** @type {Set<string>} The actor-derived fields the user has edited in this dialog. */
    const touchedFields = getContext('touchedCheckOptionFields');
-
 </script>
 
 <CheckDialogField
