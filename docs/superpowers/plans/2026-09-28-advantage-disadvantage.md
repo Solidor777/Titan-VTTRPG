@@ -163,7 +163,7 @@ Every dispatch also loads `foundry-vtt`; Tasks 2, 6, 7, and 8 (Svelte) also load
 - Plan buddy check: done 2026-09-28, two Opus reviewers, converged in 3 rounds with no unresolved disagreements; 24
   agreed findings (5 Important, 19 Minor) folded in.
 - Flagged tasks: none — the per-task reviews follow the Model/Effort directives.
-- Unflagged tasks showing risk signals: ask.
+- Unflagged tasks showing risk signals: single-review (the user chose "buddy-check plan A only"; tasks get the standard per-task review).
 
 ---
 
