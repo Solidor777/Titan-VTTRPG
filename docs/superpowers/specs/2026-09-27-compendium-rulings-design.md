@@ -51,16 +51,20 @@ the caster's next turn.)
   in camel case like `customTrait` keys (user ruling 2026-09-27: users edit names, not ids). Every weapon whose name
   matches is affected, so two same-named weapons both gain the modifier. The attack-check modifier lookup adds
   `weapon`-selector modifiers keyed by the attacking weapon's name.
-- New operation `grantAttackTrait` (selector `weapon`, key: weapon name, `trait`: an attack trait): the attack check
-  adds the trait to a matching weapon's attack for the check (trait-driven options such as `magical`, `penetrating`,
-  `rend` follow).
+- New operation `grantAttackProperty` (selector `weapon`, key: weapon name, `property`: an attack trait or
+  `ignoreArmor`): the attack check adds the property to a matching weapon's attack for the check. A trait makes its
+  trait-driven options follow (`magical`, `penetrating`, `rend`, …).
+- Ignore Armor is not Penetrating (user, 2026-09-28): it ignores all of the target's Armor, as the chat card's Apply
+  Damage (Ignore Armor) button does. Attack checks gain an `ignoreArmor` option and parameter (default `false`, set by
+  a granted `ignoreArmor` property, editable as a dialog checkbox). When it is set, the attack card's primary Apply
+  Damage button applies with `ignoreArmor: true`, and the card shows an "Ignores Armor" tag.
 - Dropping an effect onto a weapon row on a character sheet creates the effect on that actor and fills the weapon's name
   into every element of the effect whose selector is `weapon` and whose key is empty. An effect with no such element
   is simply added to the actor. Compendium effects ship those elements with empty keys.
 - The rules-element editor's `weapon` key is a free-text name input (placeholder "Chosen when applied").
 
 Consumers: Aether Blades (R:6305: +1 Damage, Magical, Penetrating), Inferno Blades (R:5408: +1 Damage, Magical),
-Radiant Blade (R:7338: +1 Damage, ignore Armor → Penetrating), Sacred Arms of the Arbiter (Weapon) (R:7880: +1 Damage,
+Radiant Blade (R:7338: +1 Damage, Ignore Armor), Sacred Arms of the Arbiter (Weapon) (R:7880: +1 Damage,
 Magical, Rend).
 
 ### C4. Spell aspects
@@ -104,7 +108,7 @@ Consumers: Metal Attunement (R:5637, immune to Contaminated), Effulgent Gaze (R:
   Grasping Earth duration (until the start of your next turn); Infiltrate Dreams Willpower resistance; Abyssal Darkness
   redundant Reflexes roll message removed (the effect already carries +2 Defense/Reflexes) and Greater Advantage on
   Stealth checks to remain unseen as a situational `advantage` +2 (via A).
-- Radiant Blade's "ignore Armor" becomes the Penetrating trait grant (C3).
+- Radiant Blade's "ignore Armor" becomes an `ignoreArmor` property grant (C3); Ignore Armor is not Penetrating.
 
 ## Module workflow
 
@@ -115,7 +119,8 @@ module repo's `main`; release is a separate step for the user.
 ## Testing
 
 - Unit: stat-referenced value resolution and cycle rejection; `existingOnly` and `minimum`; weapon-effect modifiers
-  scoped to one weapon; `grantAttackTrait`.
+  scoped to one weapon; `grantAttackProperty` for a trait and for `ignoreArmor`; an Ignore Armor
+  attack's primary Apply Damage ignores all Armor.
 - E2E: Tough raises max Stamina by Resilience; Force Speed leaves a 0 Fly speed at 0; Parch floors at 1; an effect
   dropped on a weapon row lands on the actor with that weapon's name filled in and adds +1 damage and its trait to that
   weapon's attack only (a differently named weapon's attack is unchanged); Metal Attunement blocks Contaminated.
