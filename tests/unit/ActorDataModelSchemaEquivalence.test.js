@@ -216,8 +216,6 @@ function characterFields() {
       }),
       mod: schemaField({
          armor: derivedStatField(),
-         damage: derivedStatField(),
-         healing: derivedStatField(),
          resolveRegain: derivedStatField(),
          woundRegain: derivedStatField(),
       }),

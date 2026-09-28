@@ -156,11 +156,10 @@ export default function createCharacterSystemTemplate() {
          burrow: createBaseStatShape(),
       },
 
-      // Mods: derived stats computed from equipment and rules elements in prepareDerivedData.
+      // Mods: derived stats computed from equipment and rules elements in prepareDerivedData. Check damage and
+      // healing bonuses are not mods; they come from damage/healing conditional check modifiers.
       mod: {
          armor: createDerivedStatShape(),
-         damage: createDerivedStatShape(),
-         healing: createDerivedStatShape(),
          resolveRegain: createDerivedStatShape(),
          woundRegain: createDerivedStatShape(),
       },

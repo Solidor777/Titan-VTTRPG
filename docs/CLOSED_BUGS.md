@@ -736,3 +736,15 @@ when fixed.
   strings, which it runs through TITAN localization, so they displayed as `LOCAL.<name>.text`.
 - **Fixed:** 2026-09-27 — folder names pass as `{ text, localize: false }` and the root label as its key. Gated by
   `effect-tray.spec.js` ("the move-to-folder dialog lists nested folders…").
+
+### 65. Character `mod.damage` and `mod.healing` were never applied
+
+- **What:** the two character mods were settable by a `flatModifier` and shown in the sidebar, but no check read them.
+  Since the 2023 conditional-modifier work, check damage and healing bonuses come only from `conditionalCheckModifier`
+  elements (the `any` check type with the `any` selector covers "all checks"); the 2024 data-model rebuild dropped the
+  last fallback read.
+- **Fixed:** 2026-09-28 — removed as vestigial: the schema fields, the `MODS` entries (so the flat-modifier key
+  select no longer offers them), and the sidebar rows. No migration (first release): the soresokai world's 56
+  actors and the compendium's Astral Assassin had only the default `static: 0` values, which were stripped directly;
+  no rules element anywhere targeted them. Damage/healing conditional modifiers are gated by
+  `conditional-damage-healing-mods.spec.js`.

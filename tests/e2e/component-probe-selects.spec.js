@@ -532,7 +532,7 @@ test.describe('component probe — SpeedSelect', () => {
 });
 
 // ---------------------------------------------------------------------------
-// ModSelect — MODS constant: armor, damage, healing, resolveRegain, woundRegain; optional allowNone.
+// ModSelect — MODS constant: armor, resolveRegain, woundRegain; optional allowNone.
 // Bare Select. testId lands on the <select> element.
 // ---------------------------------------------------------------------------
 test.describe('component probe — ModSelect', () => {
@@ -556,15 +556,14 @@ test.describe('component probe — ModSelect', () => {
 
       /** @type {string[]} */
       const optionValues = await titanSelectOptionValues(page, trigger);
-      expect(optionValues).toContain('armor');
-      expect(optionValues).toContain('damage');
-      expect(optionValues).toContain('healing');
-      expect(optionValues).toContain('resolveRegain');
-      expect(optionValues).toContain('woundRegain');
-      expect(optionValues).toHaveLength(5);
+      expect(optionValues).toEqual([
+         'armor',
+         'resolveRegain',
+         'woundRegain',
+      ]);
 
-      await selectTitanOption(page, trigger, 'damage');
-      expect(await readTitanSelectValue(trigger)).toBe('damage');
+      await selectTitanOption(page, trigger, 'resolveRegain');
+      expect(await readTitanSelectValue(trigger)).toBe('resolveRegain');
 
       const events = await readProbeEvents(page);
       expect(events.filter((e) => e.event === 'onchange')).toHaveLength(1);
@@ -583,7 +582,7 @@ test.describe('component probe — ModSelect', () => {
       /** @type {string[]} */
       const optionValues = await titanSelectOptionValues(page, trigger);
       expect(optionValues).toContain('none');
-      expect(optionValues).toHaveLength(6);
+      expect(optionValues).toHaveLength(4);
    });
 
    test('disabled blocks selection', async () => {

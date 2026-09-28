@@ -59,8 +59,6 @@ const STAT_KEYS = {
    ],
    mod: [
       'armor',
-      'damage',
-      'healing',
       'resolveRegain',
       'woundRegain',
       'all',

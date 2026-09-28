@@ -4,10 +4,6 @@
 </script>
 
 <BorderedColumnList
-   entries={[
-      {mod: 'armor'},
-      {mod: 'damage'},
-      {mod: 'healing'},
-   ]}
+   entries={[{mod: 'armor'}]}
    entryComponent={CharacterSheetMod}
 />
