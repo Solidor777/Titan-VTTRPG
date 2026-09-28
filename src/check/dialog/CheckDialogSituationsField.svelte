@@ -15,6 +15,9 @@
    /** @type {import('svelte/store').Writable} Reference to the Check Options store. */
    const checkOptions = getContext('checkOptions');
 
+   /** @type {(field: string, value: *) => void} The dialog's tracked Check Options setter. */
+   const setCheckOption = getContext('setCheckOption');
+
    /** @type {SituationGroup[]} One checkbox per situation key. */
    const groups = $derived(groupSituationalModifiers(modifiers));
 
@@ -24,12 +27,12 @@
     * @param {boolean} ticked - Whether the situation applies.
     */
    function setTicked(key, ticked) {
-      $checkOptions.situations = ticked ?
+      setCheckOption('situations', ticked ?
          [
             ...$checkOptions.situations,
             key,
          ] :
-            $checkOptions.situations.filter((situation) => situation !== key);
+            $checkOptions.situations.filter((situation) => situation !== key));
    }
 </script>
 

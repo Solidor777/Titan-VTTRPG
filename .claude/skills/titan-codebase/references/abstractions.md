@@ -157,14 +157,13 @@ management). Data model classes hold the schema, field validation, and derived-d
   engine** with no effect-specific path: each reads the embedded effect from the provider-shadowed
   `'document'` bridge (`const effect = document.data`) and calls
   `getItemCheckParameters` / `requestItemCheck` with `{ itemRollData: effect.getRollData(), checkIdx }`.
-  The engine's `validateItemCheckOptions` / `initializeItemCheckOptions` / `getItemCheckParameters` all
-  branch on `options.itemRollData` and skip `actor.items.get(id)` when it is supplied (and
-  `createItemCheckOptions` preserves `itemRollData` through the chain), so the same path serves items,
-  the effect chat card, and effect sheet rows. `itemRollData` uses the literal `false` as its
-  absent-sentinel (`createItemCheckOptions` defaults it to `false`), so all three resolutions must
-  fall back to the item lookup **truthily** (`options.itemRollData || …` / a `?` ternary), never with
-  `??` — `??` treats the `false` sentinel as present and skips the lookup, which made the item
-  options dialog self-close until the validate path was corrected.
+  An `itemId` names the check's source: `validateItemCheckOptions` / `initializeItemCheckOptions` read
+  roll data from the owned item it names and use `options.itemRollData` only when no `itemId` is given
+  (`createItemCheckOptions` defaults `itemId` to `''` and passes `itemRollData` through, `undefined`
+  when absent), so the same path serves owned items, the effect chat card, and effect sheet rows.
+  `initializeItemCheckOptions` stores the resolved roll data on the options for
+  `getItemCheckParameters`; validation reads the item an `itemId` names, not that stored copy, so an
+  open Item Check dialog closes when its item is deleted.
 
 
 ## Checks
@@ -200,7 +199,9 @@ only the option/computed fields. That SAME shape feeds the typed chat-message sc
 `buildSchemaFromShape`, so the factory output and the chat schema cannot drift (a key-parity gate is
 `tests/unit/check/check-shape-parity.test.js`). The `create<Name>CheckOptions` factories default each
 optional field with `?? <default>` (e.g. `damageMod: options.damageMod ?? 0` — a missing default there
-once produced `NaN` damage that the typed schema rejects). Dialogs (`AttackCheckDialog`,
+once produced `NaN` damage that the typed schema rejects), except Casting and Item `complexity` /
+`difficulty`, which stay `undefined` when unset so the initializer derives them from the spell or item
+(`=== undefined`) while a supplied 0 is kept. Dialogs (`AttackCheckDialog`,
 `AttributeCheckDialog`, etc.) collect user options before constructing parameters.
 
 **Results**

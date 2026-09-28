@@ -16,8 +16,8 @@ export default class AttackCheckDialog extends TitanDialog {
     * @param {AttackCheckParameters} checkParameters - The initial parameters
     * for the check, calculated from the options.
     * @param {TitanActor} actor - The Actor that will roll the check.
-    * @param {AttackCheckOptions} [callerOptions] - The raw options passed to `requestAttackCheck`; a field present
-    * there (not `undefined`) is treated as caller-set, not actor-derived.
+    * @param {AttackCheckOptions} [callerOptions] - The options passed to `requestAttackCheck`, plus a target's Defense
+    * resolved at open; a field present there (not `undefined`) is treated as caller-set, not actor-derived.
     */
    constructor(checkOptions, checkParameters, actor, callerOptions) {
       super({

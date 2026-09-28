@@ -30,6 +30,9 @@
    /** @type {import('svelte/store').Writable} Reference to the Check Options store. */
    const checkOptions = getContext('checkOptions');
 
+   /** @type {(field: string, value: *) => void} The dialog's tracked Check Options setter. */
+   const setCheckOption = getContext('setCheckOption');
+
    /**
     * @type {SituationalCheckModifier[]} The situational modifiers that apply to the check's current Skill. Read
     * through the Actor's bridge, so the list follows the Actor's item and effect changes while the dialog is open.
@@ -39,12 +42,13 @@
    );
 
    // Prune ticked situations that are no longer offered (e.g. the effect behind one was removed while the dialog
-   // was open), so a later situation that reuses the same key does not appear pre-ticked.
+   // was open), so a later situation that reuses the same key does not appear pre-ticked. The ticks are user edits,
+   // so the pruned list is written as one.
    $effect(() => {
       /** @type {Set<string>} The situation keys currently offered to this check. */
       const offeredKeys = new Set(situationalModifiers.map((modifier) => modifier.key));
       if ($checkOptions.situations.some((key) => !offeredKeys.has(key))) {
-         $checkOptions.situations = $checkOptions.situations.filter((key) => offeredKeys.has(key));
+         setCheckOption('situations', $checkOptions.situations.filter((key) => offeredKeys.has(key)));
       }
    });
 

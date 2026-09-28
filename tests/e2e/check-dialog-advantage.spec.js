@@ -861,8 +861,8 @@ test('untouched owned-weapon-derived Attack fields (Type, with dialog UI; Cleave
    expect(flags.parameters.cleave).toBe(true);
 });
 
-test('a user-set Attack Type is kept against a later owned-weapon edit (synced on a visible Total Dice ' +
-   'change)', async () => {
+test('a user-set Attack Type is kept against a later owned-weapon edit to its Type (synced on the untouched ' +
+   'Attribute)', async () => {
    await page.evaluate(async (actorName) => {
       await game.settings.set('titan', 'getCheckOptions', 'always');
       await game.actors.getName(actorName)?.delete();
@@ -893,54 +893,246 @@ test('a user-set Attack Type is kept against a later owned-weapon edit (synced o
 
    /** @type {import('@playwright/test').Locator} The Type select's trigger. */
    const typeSelect = dialog.getByTestId('check-field-type').locator('[role="combobox"]');
-   /** @type {import('@playwright/test').Locator} The Total Dice summary. */
-   const totalDice = dialog.getByTestId('check-summary-totalDice');
-   /** @type {number} The Total Dice before any effect is added. */
-   const baselineDice = await readSummary(dialog, 'totalDice');
+   /** @type {import('@playwright/test').Locator} The Attribute select's trigger. */
+   const attributeSelect = dialog.getByTestId('check-field-attribute').locator('[role="combobox"]');
+   await expect(attributeSelect).toHaveAttribute('data-value', 'body');
 
-   // The user picks Ranged explicitly in the dialog (touches type).
+   // The user picks Ranged explicitly in the dialog.
    await setSelectField(dialog, 'type', 'ranged');
    await expect(typeSelect).toHaveAttribute('data-value', 'ranged');
    await expect(dialog.getByTestId('check-field-attackerAccuracy')).toBeVisible();
 
-   // The owned weapon's attack flips back to Melee (which must not overwrite the user's Ranged override) AND an
-   // always-on Dice-modifier effect is added in the same pass (a visible, untouched field). Waiting for the Dice
-   // change first proves this pass was actually processed before asserting Type held its ground — a pass that
-   // silently failed to run would make the "still ranged" assertion pass for the wrong reason.
+   // Two real edits to the weapon's attack: to Ranged, then back to Melee with a Mind Attribute. The second edit
+   // would set an untouched Type to Melee; the Attribute is untouched and derived from the attack, so it follows.
    await page.evaluate(async (actorName) => {
-      const actor = game.actors.getName(actorName);
-      const weapon = actor.items.find((item) => item.type === 'weapon');
+      const weapon = game.actors.getName(actorName).items.find((item) => item.type === 'weapon');
+
+      /** @type {object[]} The weapon's attacks, edited in two updates. */
       const attacks = foundry.utils.deepClone(weapon.system.attack);
-      attacks[0].type = 'melee';
+      attacks[0].type = 'ranged';
       await weapon.update({
          system: {
             attack: attacks,
          },
       });
+      attacks[0].type = 'melee';
+      attacks[0].attribute = 'mind';
+      await weapon.update({
+         system: {
+            attack: attacks,
+         },
+      });
+   }, ACTOR_NAME);
+
+   // The Attribute's change proves the second edit was processed before the user's Type is asserted.
+   await expect(attributeSelect).toHaveAttribute('data-value', 'mind');
+   await expect(typeSelect).toHaveAttribute('data-value', 'ranged');
+   await expect(dialog.getByTestId('check-field-attackerAccuracy')).toBeVisible();
+});
+
+/**
+ * Rebuilds the spec's actor with the E2E Roller's owned weapon, spell, and ability (whose one check is Body/Arcana,
+ * Difficulty 4, Complexity 1) and opens the Check dialog of the given type for the owned item of the given type.
+ * @param {string} checkType - The check type: attack, casting, or item.
+ * @param {string} itemType - The owned item's type: weapon, spell, or ability.
+ * @returns {Promise<import('@playwright/test').Locator>} The dialog's window-root locator, already visible.
+ */
+async function openOwnedItemDialog(checkType, itemType) {
+   await page.evaluate(async ({ actorName, itemData, kind, method }) => {
+      await game.settings.set('titan', 'getCheckOptions', 'always');
+      await game.actors.getName(actorName)?.delete();
+
+      /** @type {TitanActor} The rebuilt actor. */
+      const actor = await Actor.create({
+         name: actorName,
+         type: 'player',
+      });
+      await actor.createEmbeddedDocuments('Item', itemData);
+
+      /** @type {TitanItem} The owned item whose check the dialog rolls. */
+      const item = actor.items.find((owned) => owned.type === kind);
+      await actor.system[method]({
+         attackIdx: 0,
+         checkIdx: 0,
+         itemId: item.id,
+      });
+   }, {
+      actorName: ACTOR_NAME,
+      itemData: buildE2ERollerItemData(),
+      kind: itemType,
+      method: `request${checkType[0].toUpperCase()}${checkType.slice(1)}Check`,
+   });
+
+   /** @type {import('@playwright/test').Locator} The dialog window. */
+   const dialog = page.locator(`.application.titan-dialog[id^="titan-${checkType}-check-dialog-"]`);
+   await expect(dialog).toBeVisible();
+   return dialog;
+}
+
+/**
+ * Edits the first check of the spec actor's owned ability.
+ * @param {object} changes - The check fields to change.
+ * @returns {Promise<void>}
+ */
+async function editAbilityCheck(changes) {
+   await page.evaluate(async ({ actorName, changes: fields }) => {
+      const ability = game.actors.getName(actorName).items.find((item) => item.type === 'ability');
+
+      /** @type {object[]} The ability's checks, with the first one edited. */
+      const checks = foundry.utils.deepClone(ability.system.check);
+      Object.assign(checks[0], fields);
+      await ability.update({
+         system: {
+            check: checks,
+         },
+      });
+   }, {
+      actorName: ACTOR_NAME,
+      changes,
+   });
+}
+
+test('an untouched Item Check Difficulty and Skill follow an edit to the owned item\'s check, and the rolled ' +
+   'check carries them', async () => {
+   /** @type {import('@playwright/test').Locator} The open Item Check dialog. */
+   const dialog = await openOwnedItemDialog('item', 'ability');
+
+   /** @type {import('@playwright/test').Locator} The Difficulty select's trigger. */
+   const difficultySelect = dialog.getByTestId('check-field-difficulty').locator('[role="combobox"]');
+   /** @type {import('@playwright/test').Locator} The Skill select's trigger. */
+   const skillSelect = dialog.getByTestId('check-field-skill').locator('[role="combobox"]');
+   await expect(difficultySelect).toHaveAttribute('data-value', '4');
+   await expect(skillSelect).toHaveAttribute('data-value', 'arcana');
+
+   await editAbilityCheck({
+      difficulty: 5,
+      skill: 'athletics',
+   });
+   await expect(difficultySelect).toHaveAttribute('data-value', '5');
+   await expect(skillSelect).toHaveAttribute('data-value', 'athletics');
+
+   /** @type {number} The chat-message count before the roll. */
+   const baseline = await clickRoll(dialog, page);
+   /** @type {{id: string, type: string, parameters: object, results: object}} The rolled check's message. */
+   const flags = await readNewestCheckFlags(page, baseline);
+   expect(flags.parameters.difficulty).toBe(5);
+   expect(flags.parameters.skill).toBe('athletics');
+});
+
+test('a user-set Skill is kept against a later edit to the owned item\'s check (synced on the untouched ' +
+   'Difficulty)', async () => {
+   /** @type {import('@playwright/test').Locator} The open Item Check dialog. */
+   const dialog = await openOwnedItemDialog('item', 'ability');
+
+   /** @type {import('@playwright/test').Locator} The Difficulty select's trigger. */
+   const difficultySelect = dialog.getByTestId('check-field-difficulty').locator('[role="combobox"]');
+   /** @type {import('@playwright/test').Locator} The Skill select's trigger. */
+   const skillSelect = dialog.getByTestId('check-field-skill').locator('[role="combobox"]');
+   await expect(difficultySelect).toHaveAttribute('data-value', '4');
+
+   // The user picks Athletics; the item's check then moves to Melee Weapons, which an untouched Skill would follow.
+   await setSelectField(dialog, 'skill', 'athletics');
+   await expect(skillSelect).toHaveAttribute('data-value', 'athletics');
+   await editAbilityCheck({
+      difficulty: 5,
+      skill: 'meleeWeapons',
+   });
+
+   // The Difficulty's change proves the edit was processed before the user's Skill is asserted.
+   await expect(difficultySelect).toHaveAttribute('data-value', '5');
+   await expect(skillSelect).toHaveAttribute('data-value', 'athletics');
+
+   /** @type {number} The chat-message count before the roll. */
+   const baseline = await clickRoll(dialog, page);
+   /** @type {{id: string, type: string, parameters: object, results: object}} The rolled check's message. */
+   const flags = await readNewestCheckFlags(page, baseline);
+   expect(flags.parameters.skill).toBe('athletics');
+});
+
+test('Skill "None" on a Skill-opened Attribute Check keeps the displayed Attribute until a real Skill supplies ' +
+   'one', async () => {
+   await page.evaluate(async (actorName) => {
+      await game.settings.set('titan', 'getCheckOptions', 'always');
+      await game.actors.getName(actorName)?.delete();
+
+      /** @type {TitanActor} The rebuilt actor, with an always-on Dice modifier for Arcana Checks. */
+      const actor = await Actor.create({
+         name: actorName,
+         type: 'player',
+      });
       await actor.createEmbeddedDocuments('ActiveEffect', [
          {
-            name: 'E2E Attack Type Override Sync Dice',
+            name: 'E2E Arcana Dice Boost',
             type: 'effect',
             system: {
                rulesElement: [
                   {
                      checkType: 'any',
-                     key: '',
+                     key: 'arcana',
                      modifierType: 'dice',
                      operation: 'conditionalCheckModifier',
-                     selector: 'any',
+                     selector: 'skill',
                      skill: '',
-                     uuid: 'e2e-dialog-attack-type-override-sync-dice',
-                     value: 3,
+                     uuid: 'e2e-dialog-arcana-dice',
+                     value: 2,
                   },
                ],
             },
          },
       ]);
-   }, ACTOR_NAME);
-   await expect(totalDice).toHaveText(String(baselineDice + 3));
 
-   // Only now, having proven the pass was processed, assert the user's Type choice survived it.
-   await expect(typeSelect).toHaveAttribute('data-value', 'ranged');
-   await expect(dialog.getByTestId('check-field-attackerAccuracy')).toBeVisible();
+      // Opened from Arcana, so the Attribute comes from the Skill's default (Mind).
+      await actor.system.requestAttributeCheck({ skill: 'arcana' });
+   }, ACTOR_NAME);
+
+   /** @type {import('@playwright/test').Locator} The open dialog. */
+   const dialog = page.locator(DIALOG_SELECTOR);
+   await expect(dialog).toBeVisible();
+
+   /** @type {import('@playwright/test').Locator} The Attribute select's trigger. */
+   const attributeSelect = dialog.getByTestId('check-field-attribute').locator('[role="combobox"]');
+   /** @type {import('@playwright/test').Locator} The diceMod field's number input. */
+   const diceModField = dialog.getByTestId('check-field-diceMod').locator('input');
+   await expect(attributeSelect).toHaveAttribute('data-value', 'mind');
+   await expect(diceModField).toHaveValue('2');
+
+   // Skill "None" leaves the Attribute without a source; the Arcana Dice modifier stops applying, which proves the
+   // options were rebuilt before the Attribute is asserted.
+   await setSelectField(dialog, 'skill', 'none');
+   await expect(diceModField).toHaveValue('0');
+   await expect(attributeSelect).toHaveAttribute('data-value', 'mind');
+
+   // A real Skill supplies the Attribute again.
+   await setSelectField(dialog, 'skill', 'athletics');
+   await expect(attributeSelect).toHaveAttribute('data-value', 'body');
 });
+
+for (const [checkType, itemType] of [
+   [
+      'attack',
+      'weapon',
+   ],
+   [
+      'casting',
+      'spell',
+   ],
+   [
+      'item',
+      'ability',
+   ],
+]) {
+   test(`deleting the owned ${itemType} while its ${checkType} dialog is open closes the dialog without a page ` +
+      'error', async () => {
+      /** @type {import('@playwright/test').Locator} The open dialog. */
+      const dialog = await openOwnedItemDialog(checkType, itemType);
+
+      await page.evaluate(async ({ actorName, kind }) => {
+         await game.actors.getName(actorName).items.find((item) => item.type === kind).delete();
+      }, {
+         actorName: ACTOR_NAME,
+         kind: itemType,
+      });
+      await expect(dialog).toHaveCount(0);
+      expect(errors, `uncaught page errors:\n${errors.join('\n')}`).toEqual([]);
+   });
+}

@@ -2,14 +2,13 @@
    import CheckDialogField from '~/check/dialog/CheckDialogField.svelte';
    import Select from '~/helpers/svelte-components/input/select/Select.svelte';
    import { ADVANTAGE_LEVEL_OPTIONS, clampAdvantage } from '~/check/ApplyAdvantage.js';
-   import { touchCheckOptionField } from '~/check/dialog/ReinitializeCheckOptions.js';
    import { getContext } from 'svelte';
 
    /** @type {import('svelte/store').Writable} Reference to the Check Options store. */
    const checkOptions = getContext('checkOptions');
 
-   /** @type {Set<string>} The actor-derived fields the user has edited in this dialog. */
-   const touchedFields = getContext('touchedCheckOptionFields');
+   /** @type {(field: string, value: *) => void} The dialog's tracked Check Options setter. */
+   const setCheckOption = getContext('setCheckOption');
 
    /** @type {object} Properties for the level select. */
    const inputProps = { options: ADVANTAGE_LEVEL_OPTIONS };
@@ -19,10 +18,7 @@
 <CheckDialogField
    bind:value={
       () => clampAdvantage($checkOptions.advantage),
-      (level) => {
-         $checkOptions.advantage = level;
-         touchCheckOptionField(touchedFields, 'advantage');
-      }
+      (level) => setCheckOption('advantage', level)
    }
    input={Select}
    {inputProps}

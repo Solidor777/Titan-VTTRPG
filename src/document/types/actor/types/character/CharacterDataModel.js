@@ -1837,23 +1837,31 @@ export default class CharacterDataModel extends TitanActorDataModel {
    /**
     * Validates the options for an Attribute check.
     * @param {object} options - Options for the Check.
+    * @param {boolean} [report] - Whether to report a failed validation as an error; an open check dialog tests
+    * speculative options silently.
     * @returns {boolean} Whether the check options were valid.
     */
-   validateAttributeCheckOptions(options) {
+   validateAttributeCheckOptions(options, report = true) {
       // Ensure options were provided.
       if (!options) {
-         game.titan.error(
-            'Attribute Check failed before construction. No Check Options were provided.',
-            this);
+         if (report) {
+            game.titan.error(
+               'Attribute Check failed before construction. No Check Options were provided.',
+               this);
+         }
+
+         return false;
       }
 
       // Ensure an attribute or skill were provided.
       if ((!options.attribute || options.attribute === 'default') &&
          (!options.skill || options.skill === 'none')) {
-         game.titan.error(
-            'Attribute Check failed before construction. No Attribute or Skill provided.',
-            options,
-            this);
+         if (report) {
+            game.titan.error(
+               'Attribute Check failed before construction. No Attribute or Skill provided.',
+               options,
+               this);
+         }
 
          return false;
       }
@@ -2103,22 +2111,30 @@ export default class CharacterDataModel extends TitanActorDataModel {
    /**
     * Validates the options for a Resistance check.
     * @param {object} options - Initial options for the check.
+    * @param {boolean} [report] - Whether to report a failed validation as an error; an open check dialog tests
+    * speculative options silently.
     * @returns {boolean} Whether the check options were valid.
     */
-   validateResistanceCheckOptions(options) {
+   validateResistanceCheckOptions(options, report = true) {
       // Ensure options were provided.
       if (!options) {
-         game.titan.error(
-            'Resistance Check failed before construction. No Check Options were provided.',
-            this);
+         if (report) {
+            game.titan.error(
+               'Resistance Check failed before construction. No Check Options were provided.',
+               this);
+         }
+
+         return false;
       }
 
       // Ensure a resistance is set.
       if (!options.resistance) {
-         game.titan.error(
-            'Resistance Check failed before construction. No Resistance provided.',
-            options,
-            this);
+         if (report) {
+            game.titan.error(
+               'Resistance Check failed before construction. No Resistance provided.',
+               options,
+               this);
+         }
 
          return false;
       }
@@ -2342,12 +2358,22 @@ export default class CharacterDataModel extends TitanActorDataModel {
          // Calculate the parameters.
          const checkParameters = this.getAttackCheckParameters(checkOptions);
 
+         // A target's Defense resolved now is fixed for the dialog's lifetime, like a caller's value; without a target
+         // the Defense stays derived, following the attacker's fallback rating and picking up a later target.
+         /** @type {object} The options the dialog keeps through its rebuilds. */
+         const callerOptions = options.targetDefense === undefined && getTargetedCharacters().length > 0 ?
+            {
+               ...options,
+               targetDefense: checkOptions.targetDefense,
+            } :
+            options;
+
          // Create and display the check dialog.
          new AttackCheckDialog(
             checkOptions,
             checkParameters,
             this.parent,
-            options,
+            callerOptions,
          ).render(true);
       }
    }
@@ -2355,22 +2381,30 @@ export default class CharacterDataModel extends TitanActorDataModel {
    /**
     * Validates the options for an Attack Check.
     * @param {object} options - Options for the Check.
+    * @param {boolean} [report] - Whether to report a failed validation as an error; an open check dialog tests
+    * speculative options silently.
     * @returns {boolean} Whether the check options were valid.
     */
-   validateAttackCheckOptions(options) {
+   validateAttackCheckOptions(options, report = true) {
       // Ensure options were provided.
       if (!options) {
-         game.titan.error(
-            'Attack Check failed before construction. No Check Options were provided.',
-            this);
+         if (report) {
+            game.titan.error(
+               'Attack Check failed before construction. No Check Options were provided.',
+               this);
+         }
+
+         return false;
       }
 
       // Ensure an item ID  was provided.
       if (!options.itemId) {
-         game.titan.error(
-            'Attack Check failed before construction. No Item ID was provided.',
-            options,
-            this);
+         if (report) {
+            game.titan.error(
+               'Attack Check failed before construction. No Item ID was provided.',
+               options,
+               this);
+         }
 
          return false;
       }
@@ -2378,22 +2412,25 @@ export default class CharacterDataModel extends TitanActorDataModel {
       // Ensure the item exists in the parent actor.
       const item = this.parent.items.get(options.itemId);
       if (!item) {
-         game.titan.error(
-            'Attack Check failed before construction. Item ID was invalid.',
-            options,
-            this);
+         if (report) {
+            game.titan.error(
+               'Attack Check failed before construction. Item ID was invalid.',
+               options,
+               this);
+         }
 
          return false;
       }
 
-      // Ensure the attack index is in a valid range.
+      // Ensure the attack index names one of the weapon's attacks.
       const numAttacks = item.system.attack.length;
-      if ((options.attackIdx && options.attackIdx > numAttacks) ||
-         numAttacks === 0) {
-         game.titan.error(
-            'Attack Check failed before construction. Attack Idx was out of range.',
-            options,
-            this);
+      if ((options.attackIdx ?? 0) >= numAttacks) {
+         if (report) {
+            game.titan.error(
+               'Attack Check failed before construction. Attack Idx was out of range.',
+               options,
+               this);
+         }
 
          return false;
       }
@@ -3008,22 +3045,30 @@ export default class CharacterDataModel extends TitanActorDataModel {
    /**
     * Validates the options for a Casting Check.
     * @param {object} options - Options for the Check.
+    * @param {boolean} [report] - Whether to report a failed validation as an error; an open check dialog tests
+    * speculative options silently.
     * @returns {boolean} Whether the check options were valid.
     */
-   validateCastingCheckOptions(options) {
+   validateCastingCheckOptions(options, report = true) {
       // Ensure options were provided.
       if (!options) {
-         game.titan.error(
-            'Casting Check failed before construction. No Check Options were provided.',
-            this);
+         if (report) {
+            game.titan.error(
+               'Casting Check failed before construction. No Check Options were provided.',
+               this);
+         }
+
+         return false;
       }
 
       // Ensure an item ID  was provided.
       if (!options.itemId) {
-         game.titan.error(
-            'Casting Check failed before construction. No Item ID was provided.',
-            options,
-            this);
+         if (report) {
+            game.titan.error(
+               'Casting Check failed before construction. No Item ID was provided.',
+               options,
+               this);
+         }
 
          return false;
       }
@@ -3031,10 +3076,12 @@ export default class CharacterDataModel extends TitanActorDataModel {
       // Ensure the item exists in the parent actor.
       const item = this.parent.items.get(options.itemId);
       if (!item) {
-         game.titan.error(
-            'Casting Check failed before construction. Item ID was invalid.',
-            options,
-            this);
+         if (report) {
+            game.titan.error(
+               'Casting Check failed before construction. Item ID was invalid.',
+               options,
+               this);
+         }
 
          return false;
       }
@@ -3068,17 +3115,17 @@ export default class CharacterDataModel extends TitanActorDataModel {
          checkOptions.skill = checkData.skill;
       }
 
-      // If complexity is not set.
-      if (!options.complexity) {
+      // If complexity is not set; an explicit 0 is a real Complexity.
+      if (options.complexity === undefined) {
 
          // Set the complexity to the value stored in the item.
          checkOptions.complexity = checkData.complexity;
       }
 
       // If difficulty is not set.
-      if (!options.difficulty) {
+      if (options.difficulty === undefined) {
 
-         // Set the complexity to the value stored in the item.
+         // Set the difficulty to the value stored in the item.
          checkOptions.difficulty = checkData.difficulty;
       }
 
@@ -3490,34 +3537,49 @@ export default class CharacterDataModel extends TitanActorDataModel {
    /**
     * Validates the options for an Item Check.
     * @param {object} options - Options for the Check.
+    * @param {boolean} [report] - Whether to report a failed validation as an error; an open check dialog tests
+    * speculative options silently.
     * @returns {boolean} Whether the check options were valid.
     */
-   validateItemCheckOptions(options) {
+   validateItemCheckOptions(options, report = true) {
       // Ensure options were provided.
       if (!options) {
-         game.titan.error(
-            'Item Check failed before construction. No Check Options were provided.',
-            this);
-      }
+         if (report) {
+            game.titan.error(
+               'Item Check failed before construction. No Check Options were provided.',
+               this);
+         }
 
-      // Ensure an item ID or Item Roll Data was provided.
-      let itemRollData = options.itemRollData || this.parent.items.get(options.itemId)?.getRollData();
-      if (!itemRollData) {
-         game.titan.error(
-            'Item Check failed before construction. No valid Item ID or Item Roll Data was provided.',
-            options,
-            this);
          return false;
       }
 
-      // Ensure the check index is in a valid range.
+      // Ensure the owned item an item ID names exists, or Item Roll Data was provided. An item ID names the check's
+      // source, so roll data derived from that item earlier cannot stand in for it once the item is gone.
+      /** @type {object|undefined} The roll data of the item whose check is rolled. */
+      const itemRollData = options.itemId ?
+         this.parent.items.get(options.itemId)?.getRollData() :
+         options.itemRollData;
+      if (!itemRollData) {
+         if (report) {
+            game.titan.error(
+               'Item Check failed before construction. No valid Item ID or Item Roll Data was provided.',
+               options,
+               this);
+         }
+
+         return false;
+      }
+
+      // Ensure the check index names one of the item's checks.
       const numChecks = itemRollData.check.length;
-      if ((options.checkIdx && options.checkIdx > numChecks) ||
-         numChecks === 0) {
-         game.titan.error(
-            'Item Check failed before construction. Check Idx was out of range.',
-            options,
-            this);
+      if ((options.checkIdx ?? 0) >= numChecks) {
+         if (report) {
+            game.titan.error(
+               'Item Check failed before construction. Check Idx was out of range.',
+               options,
+               this);
+         }
+
          return false;
       }
 
@@ -3532,10 +3594,10 @@ export default class CharacterDataModel extends TitanActorDataModel {
    initializeItemCheckOptions(options) {
       const checkOptions = createItemCheckOptions(options);
 
-      // Cache the item and roll data.
-      const itemRollData = options.itemRollData ?
-         options.itemRollData :
-         this.parent.items.get(checkOptions.itemId).system.getRollData();
+      // Cache the roll data: the owned item an item ID names, or the roll data the caller supplied.
+      const itemRollData = checkOptions.itemId ?
+         this.parent.items.get(checkOptions.itemId).system.getRollData() :
+         options.itemRollData;
       const checkData = itemRollData.check[checkOptions.checkIdx];
 
       // Persist the resolved roll data into checkOptions so post-initialization readers see the real object.
@@ -3555,17 +3617,17 @@ export default class CharacterDataModel extends TitanActorDataModel {
          checkOptions.skill = checkData.skill;
       }
 
-      // If complexity is not set.
-      if (!options.complexity) {
+      // If complexity is not set; an explicit 0 is a real Complexity.
+      if (options.complexity === undefined) {
 
          // Set the complexity to the value stored in the item.
          checkOptions.complexity = checkData.complexity;
       }
 
       // If difficulty is not set.
-      if (!options.difficulty) {
+      if (options.difficulty === undefined) {
 
-         // Set the complexity to the value stored in the item.
+         // Set the difficulty to the value stored in the item.
          checkOptions.difficulty = checkData.difficulty;
       }
 

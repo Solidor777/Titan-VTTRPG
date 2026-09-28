@@ -3,13 +3,18 @@
    import CheckboxInput from '~/helpers/svelte-components/input/CheckboxInput.svelte';
    import { getContext } from 'svelte';
 
-   /** @type {object} Reference to the Check Options store. */
+   /** @type {import('svelte/store').Writable} Reference to the Check Options store. */
    const checkOptions = getContext('checkOptions');
 
+   /** @type {(field: string, value: *) => void} The dialog's tracked Check Options setter. */
+   const setCheckOption = getContext('setCheckOption');
 </script>
 
 <CheckDialogField
-   bind:value={$checkOptions.doubleExpertise}
+   bind:value={
+      () => $checkOptions.doubleExpertise,
+      (value) => setCheckOption('doubleExpertise', value)
+   }
    input={CheckboxInput}
    label={'doubleExpertise'}
    testId={'check-field-doubleExpertise'}

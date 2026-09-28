@@ -21,19 +21,20 @@
  */
 
 /**
- * Creates a Casting Check Options object, based off the provided input.
+ * Creates a Casting Check Options object, based off the provided input. Complexity and Difficulty stay `undefined`
+ * when not supplied, so `initializeCastingCheckOptions` reads them from the spell while a supplied 0 is kept.
  * @param {object} options - Object containing the initial options.
- * @returns {CastingCheckOptions} The new, fully-populated Casting Check Options.
+ * @returns {CastingCheckOptions} The new Casting Check Options, with every other unset field at its default.
  */
 export default function createCastingCheckOptions(options) {
    return {
       advantage: options.advantage ?? 0,
       attribute: options.attribute ?? 'default',
       automaticFailure: options.automaticFailure ?? false,
-      complexity: options.complexity ?? 1,
+      complexity: options.complexity,
       damageMod: options.damageMod ?? 0,
       diceMod: options.diceMod ?? 0,
-      difficulty: options.difficulty ?? 4,
+      difficulty: options.difficulty,
       doubleExpertise: options.doubleExpertise ?? false,
       doubleTraining: options.doubleTraining ?? false,
       expertiseMod: options.expertiseMod ?? 0,

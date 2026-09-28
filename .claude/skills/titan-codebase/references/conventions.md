@@ -261,9 +261,14 @@ path DO still compile to a store-write. The `tabKey` prop on `CharacterSheetItem
 for exactly this reason.
 
 **Dialog data passing** — check dialogs (e.g. `AttributeCheckDialog`) construct with
-`content: { class: CheckDialogShell, props: { shell, actor, checkOptions: writable(...),
-checkParameters: writable(...) } }` and the shell distributes those stores to children via
-`setContext`.
+`content: { class: CheckDialogShell, props: { shell, actor, checkType, callerOptions,
+checkOptions: writable(...), checkParameters: writable(...) } }` and the shell distributes those stores to
+children via `setContext`. Dialog fields never write `$checkOptions` directly: they write through the
+`'setCheckOption'` context (`createCheckOptionSetter` in `src/check/dialog/ReinitializeCheckOptions.js`),
+which records the write as a user edit. On every Actor change or edit, `CheckDialogShell` rebuilds the
+options as `initialize<Type>CheckOptions({ ...callerOptions, ...userEdits })`, so every other field follows
+the live Actor. `tests/unit/check/check-dialog-option-writes.test.js` fails on a direct bind or assignment
+in any `src/check/**/dialog/*.svelte`.
 
 **Dynamic component dispatch** — `<svelte:component this={...}>` is gone (deprecated in Svelte 5
 runes mode). Shells select a component class and render it with `{@const}`:

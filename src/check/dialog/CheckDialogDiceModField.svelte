@@ -1,23 +1,19 @@
 <script>
    import CheckDialogField from '~/check/dialog/CheckDialogField.svelte';
    import IntegerInput from '~/helpers/svelte-components/input/IntegerInput.svelte';
-   import { touchCheckOptionField } from '~/check/dialog/ReinitializeCheckOptions.js';
    import { getContext } from 'svelte';
 
    /** @type {import('svelte/store').Writable} Reference to the Check Options store. */
    const checkOptions = getContext('checkOptions');
 
-   /** @type {Set<string>} The actor-derived fields the user has edited in this dialog. */
-   const touchedFields = getContext('touchedCheckOptionFields');
+   /** @type {(field: string, value: *) => void} The dialog's tracked Check Options setter. */
+   const setCheckOption = getContext('setCheckOption');
 </script>
 
 <CheckDialogField
    bind:value={
       () => $checkOptions.diceMod,
-      (value) => {
-         $checkOptions.diceMod = value;
-         touchCheckOptionField(touchedFields, 'diceMod');
-      }
+      (value) => setCheckOption('diceMod', value)
    }
    input={IntegerInput}
    label={'diceMod'}

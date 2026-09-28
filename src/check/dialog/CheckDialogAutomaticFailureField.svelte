@@ -1,23 +1,19 @@
 <script>
    import CheckDialogField from '~/check/dialog/CheckDialogField.svelte';
    import CheckboxInput from '~/helpers/svelte-components/input/CheckboxInput.svelte';
-   import { touchCheckOptionField } from '~/check/dialog/ReinitializeCheckOptions.js';
    import { getContext } from 'svelte';
 
    /** @type {import('svelte/store').Writable} Reference to the Check Options store. */
    const checkOptions = getContext('checkOptions');
 
-   /** @type {Set<string>} The actor-derived fields the user has edited in this dialog. */
-   const touchedFields = getContext('touchedCheckOptionFields');
+   /** @type {(field: string, value: *) => void} The dialog's tracked Check Options setter. */
+   const setCheckOption = getContext('setCheckOption');
 </script>
 
 <CheckDialogField
    bind:value={
       () => $checkOptions.automaticFailure,
-      (value) => {
-         $checkOptions.automaticFailure = value;
-         touchCheckOptionField(touchedFields, 'automaticFailure');
-      }
+      (value) => setCheckOption('automaticFailure', value)
    }
    input={CheckboxInput}
    label={'automaticFailure'}

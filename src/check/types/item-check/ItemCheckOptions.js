@@ -24,9 +24,10 @@
  */
 
 /**
- * Creates an Item Check Options object, based off the provided input.
+ * Creates an Item Check Options object, based off the provided input. Complexity and Difficulty stay `undefined`
+ * when not supplied, so `initializeItemCheckOptions` reads them from the item's check while a supplied 0 is kept.
  * @param {object} options - Object containing the initial options.
- * @returns {ItemCheckOptions} The new, fully-populated Item Check Options.
+ * @returns {ItemCheckOptions} The new Item Check Options, with every other unset field at its default.
  */
 export default function createItemCheckOptions(options) {
    return {
@@ -34,10 +35,10 @@ export default function createItemCheckOptions(options) {
       attribute: options.attribute ?? 'default',
       automaticFailure: options.automaticFailure ?? false,
       checkIdx: options.checkIdx ?? 0,
-      complexity: options.complexity ?? 1,
+      complexity: options.complexity,
       damageMod: options.damageMod ?? 0,
       diceMod: options.diceMod ?? 0,
-      difficulty: options.difficulty ?? 0,
+      difficulty: options.difficulty,
       doubleExpertise: options.doubleExpertise ?? false,
       doubleTraining: options.doubleTraining ?? false,
       expertiseMod: options.expertiseMod ?? 0,

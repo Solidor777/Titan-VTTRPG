@@ -187,6 +187,7 @@ describe('Advantage on item-based check parameters', () => {
       const parameters = createItemModel(spellRollData).getCastingCheckParameters(createCastingCheckOptions({
          advantage: -1,
          attribute: 'body',
+         difficulty: 4,
          itemId: 's',
          skill: 'athletics',
       }));

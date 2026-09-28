@@ -1,176 +1,156 @@
-import getTargetedCharacters from '~/helpers/utility-functions/GetTargetedCharacters.js';
+import createAttackCheckOptions from '~/check/types/attack-check/AttackCheckOptions.js';
+import createAttributeCheckOptions from '~/check/types/attribute-check/AttributeCheckOptions.js';
+import createCastingCheckOptions from '~/check/types/casting-check/CastingCheckOptions.js';
+import createItemCheckOptions from '~/check/types/item-check/ItemCheckOptions.js';
+import createResistanceCheckOptions from '~/check/types/resistance-check/ResistanceCheckOptions.js';
 
 /**
- * The actor-derived field keys each check type's dialog offers: every field `initialize<Type>CheckOptions` derives
- * from the live Actor (or, for Attack, from its owned weapon) whenever the field is `undefined` in the options
- * handed to it. `get<Type>CheckMod` (or its boolean form for Automatic Failure) reads `conditionalCheckModifier`
- * rules elements for diceMod, expertiseMod, trainingMod, damageMod, healingMod, advantage, and automaticFailure.
- * `_getAttackRatingMod` reads `conditionalRatingModifier` rules elements for Attack's attackerMelee and
- * attackerAccuracy. Attack's targetDefense has its provenance decided once at dialog mount
- * (`seedTargetDefenseProvenance`), not re-checked on every pass: a target-supplied or caller-supplied value is
- * touched at mount and never re-derived; an untouched value is always the live no-target self-fallback (mirrors
- * attackerMelee/attackerAccuracy) or, once something is targeted, that target's own Defense — whatever
- * `initializeAttackCheckOptions` currently computes. Attack's owned-weapon defaults (multiAttack,
- * plusExtraSuccessDamage, type, range, cleave, flurry, ineffective, magical, rend, penetrating) read from the
- * equipped weapon's current attack data.
+ * Rebuilds an open check dialog's Check Options from their two sources of truth: the options the caller passed to
+ * `request<Type>Check` (`callerOptions`, which for an Attack also carry a target's Defense resolved at open) and the
+ * fields the user wrote in the dialog (`userEdits`, recorded by the tracked setter). The live Actor's
+ * `initialize<Type>CheckOptions` derives every other field on every pass, so each of its derivation branches (an
+ * `undefined` test, a `=== undefined` Complexity or Difficulty, the `'default'` Attribute and Skill sentinels, a read
+ * of the owned weapon, spell, or item, and conditional rules elements) follows the Actor with no list of derived
+ * fields to maintain. User edits override caller values, and caller values override derivation.
  *
- * Training does not apply to Resistance Checks; Damage does not apply to Attribute or Resistance Checks; Healing
- * applies only to Casting and Item Checks.
- * @type {Readonly<Record<string, readonly string[]>>}
+ * Two guards keep the rebuild safe while the dialog is open. A `'default'`-sentinel field the input leaves unset
+ * keeps its displayed value when the input is otherwise invalid (e.g. an Attribute Check whose user picked Skill
+ * "None" keeps the Attribute the old Skill supplied). An input that stays invalid (its owned weapon, spell, or item
+ * is gone) yields no rebuild, so the type shell's own validation decides the dialog's fate.
  */
-export const ACTOR_DERIVED_CHECK_OPTION_FIELDS = Object.freeze({
-   attribute: Object.freeze([
-      'diceMod',
-      'expertiseMod',
-      'trainingMod',
-      'advantage',
-      'automaticFailure',
-   ]),
-   resistance: Object.freeze([
-      'diceMod',
-      'expertiseMod',
-      'advantage',
-      'automaticFailure',
-   ]),
-   attack: Object.freeze([
-      'diceMod',
-      'expertiseMod',
-      'trainingMod',
-      'damageMod',
-      'advantage',
-      'automaticFailure',
-      'attackerMelee',
-      'attackerAccuracy',
-      'targetDefense',
-      'multiAttack',
-      'plusExtraSuccessDamage',
-      'type',
-      'range',
-      'cleave',
-      'flurry',
-      'ineffective',
-      'magical',
-      'rend',
-      'penetrating',
-   ]),
-   casting: Object.freeze([
-      'diceMod',
-      'expertiseMod',
-      'trainingMod',
-      'damageMod',
-      'healingMod',
-      'advantage',
-      'automaticFailure',
-   ]),
-   item: Object.freeze([
-      'diceMod',
-      'expertiseMod',
-      'trainingMod',
-      'damageMod',
-      'healingMod',
-      'advantage',
-      'automaticFailure',
-   ]),
+
+/**
+ * The Check Options functions each check type's rebuild uses: the pure `create<Type>CheckOptions` (whose
+ * `'default'` values mark the sentinel fields) and the live Actor's `initialize<Type>CheckOptions` and
+ * `validate<Type>CheckOptions` method names.
+ * @type {Readonly<Record<string, Readonly<{create: (options: object) => object, initialize: string, validate:
+ * string}>>>}
+ */
+export const CHECK_OPTIONS_METHODS = Object.freeze({
+   attribute: Object.freeze({
+      create: createAttributeCheckOptions,
+      initialize: 'initializeAttributeCheckOptions',
+      validate: 'validateAttributeCheckOptions',
+   }),
+   resistance: Object.freeze({
+      create: createResistanceCheckOptions,
+      initialize: 'initializeResistanceCheckOptions',
+      validate: 'validateResistanceCheckOptions',
+   }),
+   attack: Object.freeze({
+      create: createAttackCheckOptions,
+      initialize: 'initializeAttackCheckOptions',
+      validate: 'validateAttackCheckOptions',
+   }),
+   casting: Object.freeze({
+      create: createCastingCheckOptions,
+      initialize: 'initializeCastingCheckOptions',
+      validate: 'validateCastingCheckOptions',
+   }),
+   item: Object.freeze({
+      create: createItemCheckOptions,
+      initialize: 'initializeItemCheckOptions',
+      validate: 'validateItemCheckOptions',
+   }),
 });
 
 /**
- * The live Actor's `initialize<Type>CheckOptions` method name for each check type, so a single re-derivation
- * mechanism (`CheckDialogShell.svelte`) can resolve and call the right one without a per-type copy.
- * @type {Readonly<Record<string, string>>}
+ * Creates the dialog's one tracked setter for Check Options: it records the write as a user edit, so every later
+ * rebuild keeps it, and applies it to the options at once, so the field shows the new value before the rebuild runs.
+ * @param {import('svelte/store').Writable} checkOptions - The dialog's Check Options store.
+ * @param {import('svelte/store').Writable} userEdits - The dialog's user-edit record (field → value).
+ * @returns {(field: string, value: *) => void} The setter, provided to the dialog as context `'setCheckOption'`.
  */
-export const INITIALIZE_CHECK_OPTIONS_METHODS = Object.freeze({
-   attribute: 'initializeAttributeCheckOptions',
-   resistance: 'initializeResistanceCheckOptions',
-   attack: 'initializeAttackCheckOptions',
-   casting: 'initializeCastingCheckOptions',
-   item: 'initializeItemCheckOptions',
-});
-
-/**
- * Records that the user edited an actor-derived Check Option field in the dialog, so the shell's re-derivation
- * effect preserves it instead of overwriting it with a value read from the live Actor.
- * @param {Set<string>} touchedFields - The dialog's shared touched-field set (context `'touchedCheckOptionFields'`).
- * @param {string} field - The actor-derived field key the user just edited, e.g. `'advantage'`.
- * @returns {void}
- */
-export function touchCheckOptionField(touchedFields, field) {
-   touchedFields.add(field);
+export function createCheckOptionSetter(checkOptions, userEdits) {
+   return (field, value) => {
+      userEdits.update((edits) => ({
+         ...edits,
+         [field]: value,
+      }));
+      checkOptions.update((options) => ({
+         ...options,
+         [field]: value,
+      }));
+   };
 }
 
 /**
- * Seeds the touched-field set from the raw options a caller passed to `request<Type>Check`: a field present there
- * (not `undefined`) was set by the caller, not derived from the Actor, so it must survive dialog mount rather than
- * being overwritten by the first re-derivation pass.
- * @param {Set<string>} touchedFields - The dialog's shared touched-field set, mutated in place.
- * @param {object} [callerOptions] - The raw options object the caller passed to `request<Type>Check`.
- * @returns {void}
+ * Tests two Check Options values for structural equality: primitives by identity, arrays and plain objects by
+ * their entries. The rebuild produces fresh `situations` arrays and a fresh Item `itemRollData` on every pass, so an
+ * identity test would never settle.
+ * @param {*} a - The first value.
+ * @param {*} b - The second value.
+ * @returns {boolean} Whether the values are structurally equal.
  */
-export function seedTouchedFieldsFromCallerOptions(touchedFields, callerOptions) {
-   for (const [field, value] of Object.entries(callerOptions ?? {})) {
-      if (value !== undefined) {
-         touchedFields.add(field);
+function isStructurallyEqual(a, b) {
+   if (a === b) {
+      return true;
+   }
+   if (a === null || b === null || typeof a !== 'object' || typeof b !== 'object' ||
+      Array.isArray(a) !== Array.isArray(b)) {
+      return false;
+   }
+
+   /** @type {string[]} The first value's own keys. */
+   const keys = Object.keys(a);
+   return keys.length === Object.keys(b).length &&
+      keys.every((key) => Object.hasOwn(b, key) && isStructurallyEqual(a[key], b[key]));
+}
+
+/**
+ * Pins each `'default'`-sentinel field the rebuild input leaves unset to the value the dialog currently shows.
+ * @param {object} input - The rebuild input: the caller's options overlaid with the user's edits.
+ * @param {(options: object) => object} create - The check type's `create<Type>CheckOptions`.
+ * @param {object} currentOptions - The dialog's current Check Options.
+ * @returns {object} A copy of the input with its unset sentinel fields pinned.
+ */
+function pinSentinelFields(input, create, currentOptions) {
+   /** @type {object} The pinned copy of the input. */
+   const pinned = { ...input };
+   for (const [field, value] of Object.entries(create({}))) {
+      if (value === 'default' && (pinned[field] === undefined || pinned[field] === 'default')) {
+         pinned[field] = currentOptions[field];
       }
    }
+   return pinned;
 }
 
 /**
- * Decides Attack's `targetDefense` provenance once, at dialog mount — never re-checked on later re-derivation
- * passes, which is what makes the field behave correctly as targeting changes while the dialog stays open: if the
- * caller didn't supply it explicitly and something is targeted right now, the value `initializeAttackCheckOptions`
- * resolved came from that target's own Defense rating, not from the rolling Actor, so it is marked touched and
- * never re-derived — even if the target is later removed. If nothing is targeted at mount, the value is the
- * no-target self-fallback (mirrors attackerMelee/attackerAccuracy): left untouched, so it keeps re-deriving on
- * every pass — including picking up a target's real Defense once something is targeted later.
- * @param {Set<string>} touchedFields - The dialog's shared touched-field set, mutated in place.
- * @param {object} [callerOptions] - The raw options object the caller passed to `requestAttackCheck`.
- * @returns {void}
+ * @typedef {object} RebuildCheckOptionsArguments
+ * @property {string} checkType - The check type: attribute, resistance, attack, casting, or item.
+ * @property {object} system - The live Actor's CharacterDataModel.
+ * @property {object} [callerOptions] - The options the caller passed to `request<Type>Check`, plus any open-time
+ * provenance (an Attack's target Defense).
+ * @property {object} userEdits - The fields the user wrote in the dialog (field → value).
+ * @property {object} currentOptions - The dialog's current Check Options.
  */
-export function seedTargetDefenseProvenance(touchedFields, callerOptions) {
-   if (callerOptions?.targetDefense === undefined && getTargetedCharacters().length > 0) {
-      touchedFields.add('targetDefense');
-   }
-}
 
 /**
- * Builds the options object to hand to a check's `initialize<Type>CheckOptions`: every field the dialog currently
- * holds, except the check type's actor-derived fields the user has not edited in this dialog, which are omitted so
- * the initializer re-derives them from the live Actor. Fields the user has touched keep their dialog value, since
- * `initialize<Type>CheckOptions` only derives a field when it is `undefined`.
- * @param {object} checkOptions - The dialog's current, fully-resolved Check Options.
- * @param {Set<string>} touchedFields - The actor-derived field keys the user has edited in this dialog.
- * @param {string} checkType - The check type: attribute, resistance, attack, casting, or item.
- * @returns {object} The options object to pass to `initialize<Type>CheckOptions`.
+ * Rebuilds a dialog's Check Options from the caller's options and the user's edits, deriving every other field from
+ * the live Actor.
+ * @param {RebuildCheckOptionsArguments} args - The check type, Actor, sources, and current options.
+ * @returns {object|undefined} The rebuilt options, or `undefined` when they equal the current options (so the
+ * dialog's rebuild effect writes nothing and settles) or when the check is no longer valid.
  */
-export default function reinitializeCheckOptions(checkOptions, touchedFields, checkType) {
-   /** @type {object} A shallow copy of the current options; untouched derived fields are deleted below. */
-   const options = { ...checkOptions };
-   for (const field of ACTOR_DERIVED_CHECK_OPTION_FIELDS[checkType] ?? []) {
-      if (!touchedFields.has(field)) {
-         delete options[field];
+export default function rebuildCheckOptions({ checkType, system, callerOptions, userEdits, currentOptions }) {
+   /** @type {{create: (options: object) => object, initialize: string, validate: string}} The type's functions. */
+   const methods = CHECK_OPTIONS_METHODS[checkType];
+
+   /** @type {object} The rebuild input: the user's edits over the caller's options. */
+   let input = {
+      ...callerOptions,
+      ...userEdits,
+   };
+
+   // Validate silently: an invalid input here is an expected dialog state, not a reportable error.
+   if (!system[methods.validate](input, false)) {
+      input = pinSentinelFields(input, methods.create, currentOptions);
+      if (!system[methods.validate](input, false)) {
+         return undefined;
       }
    }
-   return options;
-}
 
-/**
- * Re-derives a check's actor-derived option fields from the live Actor, skipping every field the user has already
- * touched in the dialog. The single shared mechanism the dialog shell's re-derivation effect calls, so "re-derive
- * unless touched" is implemented once rather than once per check type.
- * @param {object} currentOptions - The dialog's current, fully-resolved Check Options.
- * @param {Set<string>} touchedFields - The actor-derived field keys the user has edited in this dialog.
- * @param {string} checkType - The check type: attribute, resistance, attack, casting, or item.
- * @param {(options: object) => object} initialize - The live Actor's bound `initialize<Type>CheckOptions` method.
- * @returns {object|undefined} The re-derived options, or `undefined` if no derived field actually changed (so the
- * caller can skip writing back to the store — this is also what stops the effect from looping: writing back only on
- * a real change means the next run of an effect that reads the same store settles with `changed === false`).
- */
-export function rederiveActorCheckOptionFields(currentOptions, touchedFields, checkType, initialize) {
-   /** @type {object} The options re-derived from the live Actor. */
-   const nextOptions = initialize(reinitializeCheckOptions(currentOptions, touchedFields, checkType));
-
-   /** @type {boolean} Whether any of the check type's actor-derived fields actually changed. */
-   const changed = (ACTOR_DERIVED_CHECK_OPTION_FIELDS[checkType] ?? [])
-      .some((field) => nextOptions[field] !== currentOptions[field]);
-
-   return changed ? nextOptions : undefined;
+   /** @type {object} The options derived from the input and the live Actor. */
+   const rebuilt = system[methods.initialize](input);
+   return isStructurallyEqual(rebuilt, currentOptions) ? undefined : rebuilt;
 }

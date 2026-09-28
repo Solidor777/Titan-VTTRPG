@@ -1,363 +1,871 @@
-import { describe, it, expect, beforeAll, afterAll } from 'vitest';
-import reinitializeCheckOptions, {
-   ACTOR_DERIVED_CHECK_OPTION_FIELDS,
-   INITIALIZE_CHECK_OPTIONS_METHODS,
-   rederiveActorCheckOptionFields,
-   seedTargetDefenseProvenance,
-   seedTouchedFieldsFromCallerOptions,
+import { describe, it, expect, beforeAll, afterAll, afterEach, vi } from 'vitest';
+import { get, writable } from 'svelte/store';
+import rebuildCheckOptions, {
+   CHECK_OPTIONS_METHODS,
+   createCheckOptionSetter,
 } from '~/check/dialog/ReinitializeCheckOptions.js';
+import { installSchemaMocks, restoreSchemaMocks } from '../helpers/schemaFingerprint.js';
 
-beforeAll(() => {
-   // seedTargetDefenseProvenance reads getTargetedCharacters(), which reads these globals.
-   globalThis.game = {
-      user: {
-         isGM: false,
-         targets: new Set(),
+// The rebuild runs the real `initialize<Type>CheckOptions` and `validate<Type>CheckOptions` of a bare
+// CharacterDataModel (Object.create over the prototype) whose parent carries a rules-elements cache and owned items,
+// so every derivation branch the initializers use is exercised as written, with no list of derived fields.
+
+/**
+ * The Attack Check dialogs `_createAttackCheckDialog` constructs, captured with their arguments.
+ * @type {object[][]}
+ */
+const dialogCalls = vi.hoisted(() => []);
+
+vi.mock('~/check/types/attack-check/dialog/AttackCheckDialog.js', () => ({
+   default: class {
+      /**
+       * Captures the dialog's constructor arguments.
+       * @param {...*} args - The checkOptions, checkParameters, actor, and callerOptions.
+       */
+      constructor(...args) {
+         dialogCalls.push(args);
+      }
+
+      /**
+       * Stands in for rendering the dialog.
+       * @returns {void}
+       */
+      render() {}
+   },
+}));
+
+/** @type {Function} The dynamically imported CharacterDataModel class. */
+let CharacterDataModel;
+
+/**
+ * Stubbed actor roll data: Body 3, Mind 2, Soul 1; Reflexes 4; Athletics and Arcana untrained.
+ * @type {object}
+ */
+const ROLL_DATA = {
+   attribute: {
+      body: { value: 3 },
+      mind: { value: 2 },
+      soul: { value: 1 },
+   },
+   resistance: {
+      reflexes: { value: 4 },
+   },
+   skill: {
+      arcana: {
+         defaultAttribute: 'mind',
+         expertise: { value: 0 },
+         training: { value: 0 },
       },
+      athletics: {
+         defaultAttribute: 'body',
+         expertise: { value: 0 },
+         training: { value: 0 },
+      },
+   },
+};
+
+beforeAll(async () => {
+   installSchemaMocks();
+   globalThis.game.settings = {
+      get: () => 1,
+   };
+   globalThis.game.titan = {
+      error: vi.fn(),
+   };
+   globalThis.game.user = {
+      isGM: false,
+      targets: new Set(),
    };
    globalThis.canvas = { tokens: { controlled: [] } };
+   globalThis.ui = {
+      notifications: {
+         error: vi.fn(),
+      },
+   };
+   globalThis.Actor = class {};
+   globalThis.CONST = {
+      TOKEN_DISPLAY_MODES: { OWNER_HOVER: 50 },
+      TOKEN_DISPOSITIONS: { FRIENDLY: 1 },
+   };
+   CharacterDataModel = (await import('~/document/types/actor/types/character/CharacterDataModel.js')).default;
+});
+
+afterEach(() => {
+   // Targeting, reported errors, and captured dialogs are per-test state; reset them even when a test fails.
+   globalThis.game.user.targets = new Set();
+   globalThis.game.titan.error.mockClear();
+   globalThis.ui.notifications.error.mockClear();
+   dialogCalls.length = 0;
 });
 
 afterAll(() => {
-   delete globalThis.game;
+   restoreSchemaMocks();
    delete globalThis.canvas;
+   delete globalThis.ui;
+   delete globalThis.Actor;
+   delete globalThis.CONST;
 });
 
-describe('ACTOR_DERIVED_CHECK_OPTION_FIELDS', () => {
-   it('omits Training for Resistance Checks and Damage/Healing where they do not apply', () => {
-      expect(ACTOR_DERIVED_CHECK_OPTION_FIELDS.resistance).not.toContain('trainingMod');
-      expect(ACTOR_DERIVED_CHECK_OPTION_FIELDS.resistance).not.toContain('damageMod');
-      expect(ACTOR_DERIVED_CHECK_OPTION_FIELDS.attribute).not.toContain('damageMod');
-      expect(ACTOR_DERIVED_CHECK_OPTION_FIELDS.attack).not.toContain('healingMod');
-      expect(ACTOR_DERIVED_CHECK_OPTION_FIELDS.casting).toEqual(expect.arrayContaining([
-         'damageMod',
-         'healingMod',
-      ]));
-   });
+/**
+ * Builds an owned item whose roll data the test can replace, standing in for an item edited while a dialog is open.
+ * @param {object} rollData - The item's initial roll data.
+ * @returns {object} The item; assign `item.rollData` to edit it.
+ */
+function createItem(rollData) {
+   /** @type {object} The stand-in item. */
+   const item = {
+      rollData,
 
-   it('always includes Advantage and Automatic Failure', () => {
-      for (const fields of Object.values(ACTOR_DERIVED_CHECK_OPTION_FIELDS)) {
-         expect(fields).toContain('advantage');
-         expect(fields).toContain('automaticFailure');
-      }
-   });
-});
+      /**
+       * Returns a copy of the item's current roll data, as `TitanItem#getRollData` does.
+       * @returns {object} A fresh copy of `item.rollData`.
+       */
+      getRollData: () => structuredClone(item.rollData),
+      system: {
+         /**
+          * The item's attacks, which `validateAttackCheckOptions` counts.
+          * @returns {object[]} The attacks.
+          */
+         get attack() {
+            return item.rollData.attack ?? [];
+         },
 
-describe('reinitializeCheckOptions', () => {
-   it('omits untouched actor-derived fields so the initializer re-derives them', () => {
-      /** @type {object} A fully-resolved options object, as the dialog store holds it. */
-      const checkOptions = {
-         advantage: 1,
-         attribute: 'body',
-         automaticFailure: false,
-         diceMod: 2,
-         expertiseMod: 3,
-         skill: 'none',
-         trainingMod: 4,
+         /**
+          * Returns a copy of the item's current roll data, as the item data models do.
+          * @returns {object} A fresh copy of `item.rollData`.
+          */
+         getRollData: () => structuredClone(item.rollData),
+      },
+   };
+   return item;
+}
+
+/**
+ * Builds a bare Character whose parent holds an empty rules-elements cache and the given owned items.
+ * @param {Record<string, object>} [items] - The owned items keyed by id.
+ * @returns {object} The model instance.
+ */
+function createCharacter(items = {}) {
+   /** @type {object} The bare model. */
+   const model = Object.create(CharacterDataModel.prototype);
+   model.parent = {
+      isOwner: true,
+      items: new Map(Object.entries(items)),
+      name: 'Rebuild Test Character',
+      rulesElementsCache: {},
+   };
+   model.getRollData = () => structuredClone(ROLL_DATA);
+   model.skill = structuredClone(ROLL_DATA.skill);
+   model.rating = {
+      accuracy: { value: 1 },
+      melee: { value: 2 },
+   };
+   return model;
+}
+
+/**
+ * Builds a conditional check modifier element: any check type, any selector, Dice +1 unless overridden.
+ * @param {object} overrides - Fields replacing the defaults.
+ * @returns {object} The element.
+ */
+function checkModifier(overrides) {
+   return {
+      checkType: 'any',
+      key: '',
+      modifierType: 'dice',
+      operation: 'conditionalCheckModifier',
+      selector: 'any',
+      skill: '',
+      sourceName: 'Source',
+      value: 1,
+      ...overrides,
+   };
+}
+
+/**
+ * Builds a weapon's roll data with one plain Body/Athletics Melee attack.
+ * @returns {object} A fresh weapon roll-data object, safe to edit.
+ */
+function weaponRollData() {
+   return {
+      attack: [
+         {
+            attribute: 'body',
+            customTrait: [],
+            damage: 1,
+            label: 'Strike',
+            plusExtraSuccessDamage: true,
+            range: 1,
+            skill: 'athletics',
+            trait: [],
+            type: 'melee',
+         },
+      ],
+      attackNotes: '',
+      customTrait: [],
+      img: '',
+      multiAttack: false,
+      name: 'Weapon',
+   };
+}
+
+/**
+ * Builds a character-targeting token whose actor has the given Defense rating.
+ * @param {number} defense - The target's Defense rating.
+ * @returns {object} A stand-in token for `game.user.targets`.
+ */
+function targetToken(defense) {
+   return {
+      actor: {
+         system: {
+            getRollData: () => ({ rating: { defense: { value: defense } } }),
+            isCharacter: true,
+         },
+      },
+   };
+}
+
+describe('rebuildCheckOptions — keeps user edits and caller values, re-derives everything else', () => {
+   it('Attribute: follows a conditional rules element (undefined test) and the Skill\'s default Attribute ' +
+      '(\'default\' sentinel), keeping the caller\'s Dice and the user\'s Advantage and Skill', () => {
+      /** @type {object} The Character rolling the check. */
+      const system = createCharacter();
+
+      /** @type {object} The raw request options: opened from Athletics with an explicit Dice modifier. */
+      const callerOptions = {
+         diceMod: 3,
+         skill: 'athletics',
       };
 
-      expect(reinitializeCheckOptions(checkOptions, new Set(), 'attribute')).toEqual({
-         attribute: 'body',
-         skill: 'none',
-      });
-   });
+      /** @type {object} The options the dialog opened with. */
+      const currentOptions = system.initializeAttributeCheckOptions(callerOptions);
+      expect(currentOptions.attribute).toBe('body');
 
-   it('keeps a touched field at its dialog value', () => {
-      /** @type {object} A fully-resolved options object, as the dialog store holds it. */
-      const checkOptions = {
-         advantage: 2,
-         attribute: 'body',
-         automaticFailure: true,
-         diceMod: 2,
-         expertiseMod: 3,
-         skill: 'none',
-         trainingMod: 4,
-      };
-
-      /** @type {Set<string>} The user has edited Advantage and Automatic Failure. */
-      const touchedFields = new Set([
-         'advantage',
-         'automaticFailure',
+      // The Actor gains always-on Dice, Expertise, and Disadvantage modifiers while the dialog is open.
+      system._applyConditionalCheckModifierElements([
+         checkModifier({ value: 2 }),
+         checkModifier({ modifierType: 'expertise' }),
+         checkModifier({
+            modifierType: 'advantage',
+            value: -1,
+         }),
       ]);
 
-      expect(reinitializeCheckOptions(checkOptions, touchedFields, 'attribute')).toEqual({
+      expect(rebuildCheckOptions({
+         callerOptions,
+         checkType: 'attribute',
+         currentOptions,
+         system,
+         userEdits: {
+            advantage: 2,
+            skill: 'arcana',
+         },
+      })).toMatchObject({
          advantage: 2,
-         attribute: 'body',
-         automaticFailure: true,
-         skill: 'none',
-      });
-   });
-
-   it('leaves non-derived fields (identity, item data, situations) untouched', () => {
-      /** @type {object} A fully-resolved options object for an Attack Check. */
-      const checkOptions = {
-         advantage: 0,
-         attackIdx: 0,
-         attribute: 'body',
-         automaticFailure: false,
-         damageMod: 1,
-         diceMod: 2,
-         doubleTraining: true,
-         expertiseMod: 3,
-         itemId: 'weapon1',
-         situations: ['underwater'],
-         skill: 'melee',
-         trainingMod: 4,
-         type: 'melee',
-      };
-
-      expect(reinitializeCheckOptions(checkOptions, new Set(), 'attack')).toEqual({
-         attackIdx: 0,
-         attribute: 'body',
-         doubleTraining: true,
-         itemId: 'weapon1',
-         situations: ['underwater'],
-         skill: 'melee',
-      });
-   });
-
-   it('is a no-op for an unknown check type', () => {
-      /** @type {object} An options object without a recognized check type. */
-      const checkOptions = {
-         advantage: 1,
-         diceMod: 2,
-      };
-
-      expect(reinitializeCheckOptions(checkOptions, new Set(), 'unknown')).toEqual(checkOptions);
-   });
-});
-
-describe('rederiveActorCheckOptionFields', () => {
-   it('returns the re-derived options when an untouched derived field changed', () => {
-      /** @type {object} The current, fully-resolved options: an always-on Disadvantage was active at dialog open. */
-      const currentOptions = {
-         advantage: -1,
-         attribute: 'body',
-         automaticFailure: false,
-         diceMod: 0,
-         expertiseMod: 0,
-         skill: 'none',
-         trainingMod: 0,
-      };
-
-      /**
-       * Stands in for the live Actor's `initialize<Type>CheckOptions`: Advantage is now -2.
-       * @type {(options: object) => object}
-       */
-      const initialize = (options) => ({
-         ...currentOptions,
-         ...options,
-         advantage: options.advantage ?? -2,
-      });
-
-      expect(rederiveActorCheckOptionFields(currentOptions, new Set(), 'attribute', initialize)).toEqual({
-         ...currentOptions,
-         advantage: -2,
-      });
-   });
-
-   it('returns undefined when nothing actually changed', () => {
-      /** @type {object} The current, fully-resolved options. */
-      const currentOptions = {
-         advantage: 0,
-         attribute: 'body',
-         automaticFailure: false,
-         diceMod: 0,
-         expertiseMod: 0,
-         skill: 'none',
-         trainingMod: 0,
-      };
-
-      /**
-       * Stands in for the live Actor's `initialize<Type>CheckOptions`: nothing about it changed.
-       * @type {(options: object) => object}
-       */
-      const initialize = (options) => ({
-         ...currentOptions,
-         ...options,
-      });
-
-      expect(rederiveActorCheckOptionFields(currentOptions, new Set(), 'attribute', initialize)).toBeUndefined();
-   });
-
-   it('keeps a touched field even when the live Actor would derive something else', () => {
-      /** @type {object} The current options: the user picked Greater Advantage (2) in the dialog. */
-      const currentOptions = {
-         advantage: 2,
-         attribute: 'body',
-         automaticFailure: false,
-         diceMod: 0,
-         expertiseMod: 0,
-         skill: 'none',
-         trainingMod: 0,
-      };
-
-      /**
-       * Stands in for the live Actor's `initialize<Type>CheckOptions`: would derive Disadvantage (-1).
-       * @type {(options: object) => object}
-       */
-      const initialize = (options) => ({
-         ...currentOptions,
-         ...options,
-         advantage: options.advantage ?? -1,
-      });
-
-      /** @type {Set<string>} The user has edited Advantage. */
-      const touchedFields = new Set(['advantage']);
-
-      expect(rederiveActorCheckOptionFields(currentOptions, touchedFields, 'attribute', initialize))
-         .toBeUndefined();
-   });
-});
-
-describe('Attack actor-derived fields (attackerMelee/attackerAccuracy/targetDefense)', () => {
-   it('includes Melee, Accuracy, and target Defense in the Attack field list', () => {
-      expect(ACTOR_DERIVED_CHECK_OPTION_FIELDS.attack).toEqual(expect.arrayContaining([
-         'attackerMelee',
-         'attackerAccuracy',
-         'targetDefense',
-      ]));
-   });
-
-   it('includes the owned-weapon-derived defaults in the Attack field list', () => {
-      expect(ACTOR_DERIVED_CHECK_OPTION_FIELDS.attack).toEqual(expect.arrayContaining([
-         'multiAttack',
-         'plusExtraSuccessDamage',
-         'type',
-         'range',
-         'cleave',
-         'flurry',
-         'ineffective',
-         'magical',
-         'rend',
-         'penetrating',
-      ]));
-   });
-
-   it('has no per-pass targetDefense guard: an untouched field is always re-derived regardless of live ' +
-      'targeting', () => {
-      /** @type {object} An Attack Check's current options; a target happens to be selected right now. */
-      const checkOptions = {
-         attackerAccuracy: 3,
-         attackerMelee: 3,
-         itemId: 'weapon1',
-         targetDefense: 5,
-      };
-
-      // Live targeting state must not matter to reinitializeCheckOptions itself: provenance is decided once, at
-      // mount, by seedTargetDefenseProvenance (see the describe block below) — never re-checked here.
-      globalThis.game.user.targets = new Set([{ actor: { system: { isCharacter: true } } }]);
-
-      expect(reinitializeCheckOptions(checkOptions, new Set(), 'attack')).toEqual({ itemId: 'weapon1' });
-
-      globalThis.game.user.targets = new Set();
-   });
-});
-
-describe('seedTargetDefenseProvenance', () => {
-   it('marks targetDefense touched when something is targeted at mount, so removing the target afterward ' +
-      'keeps the target\'s Defense', () => {
-      /** @type {Set<string>} The dialog's touched-field set, seeded fresh. */
-      const touchedFields = new Set();
-
-      // A target is selected at dialog mount: targetDefense's resolved value came from that target's own Defense
-      // rating, not from the rolling Actor. getTargetedCharacters() filters on `target.actor?.system.isCharacter`,
-      // so the stand-in token needs that shape (not just Set membership/length).
-      globalThis.game.user.targets = new Set([{ actor: { system: { isCharacter: true } } }]);
-      seedTargetDefenseProvenance(touchedFields, {});
-      expect(touchedFields.has('targetDefense')).toBe(true);
-
-      // The target is removed after mount; targetDefense stays touched, so reinitializeCheckOptions keeps the
-      // target's Defense instead of overwriting it with the no-target self-fallback.
-      globalThis.game.user.targets = new Set();
-      /** @type {object} The dialog's current options, still carrying the target's Defense (5). */
-      const checkOptions = {
-         attackerAccuracy: 3,
-         attackerMelee: 3,
-         itemId: 'weapon1',
-         targetDefense: 5,
-      };
-      expect(reinitializeCheckOptions(checkOptions, touchedFields, 'attack')).toMatchObject({ targetDefense: 5 });
-   });
-
-   it('leaves targetDefense untouched when nothing is targeted at mount, so it keeps following once ' +
-      'something is targeted later', () => {
-      /** @type {Set<string>} The dialog's touched-field set, seeded fresh. */
-      const touchedFields = new Set();
-
-      // Nothing is targeted at mount: targetDefense's resolved value is the no-target self-fallback.
-      globalThis.game.user.targets = new Set();
-      seedTargetDefenseProvenance(touchedFields, {});
-      expect(touchedFields.has('targetDefense')).toBe(false);
-
-      // Something is targeted later, while the dialog is still open; targetDefense stays untouched (provenance
-      // was decided once, at mount), so it keeps re-deriving on every pass — including picking up the newly
-      // targeted character's own Defense.
-      globalThis.game.user.targets = new Set([{ actor: { system: { isCharacter: true } } }]);
-      /** @type {object} The dialog's current options, still carrying the earlier self-fallback value (3). */
-      const checkOptions = {
-         attackerAccuracy: 3,
-         attackerMelee: 3,
-         itemId: 'weapon1',
-         targetDefense: 3,
-      };
-      expect(reinitializeCheckOptions(checkOptions, touchedFields, 'attack')).toEqual({ itemId: 'weapon1' });
-
-      globalThis.game.user.targets = new Set();
-   });
-
-   it('defers to the caller\'s own explicit targetDefense instead of touching it a second time', () => {
-      /**
-       * The dialog's touched-field set: seeding from callerOptions already ran (elsewhere) and marked
-       * targetDefense touched, exactly as seedTouchedFieldsFromCallerOptions would.
-       * @type {Set<string>}
-       */
-      const touchedFields = new Set(['targetDefense']);
-      globalThis.game.user.targets = new Set([{ actor: { system: { isCharacter: true } } }]);
-
-      // The caller explicitly supplied targetDefense: this function must not need to (and does not) touch it
-      // itself — it only adds the key when the caller left it undefined and something is targeted.
-      seedTargetDefenseProvenance(touchedFields, { targetDefense: 7 });
-
-      expect(touchedFields.has('targetDefense')).toBe(true);
-      expect(touchedFields.size).toBe(1);
-
-      globalThis.game.user.targets = new Set();
-   });
-});
-
-describe('seedTouchedFieldsFromCallerOptions', () => {
-   it('marks every field the caller explicitly set (not undefined) as touched', () => {
-      /** @type {Set<string>} The dialog's touched-field set, seeded fresh. */
-      const touchedFields = new Set();
-
-      seedTouchedFieldsFromCallerOptions(touchedFields, {
-         attribute: 'body',
-         automaticFailure: undefined,
+         attribute: 'mind',
          diceMod: 3,
+         expertiseMod: 1,
+         skill: 'arcana',
       });
-
-      expect(touchedFields.has('diceMod')).toBe(true);
-      expect(touchedFields.has('attribute')).toBe(true);
-      expect(touchedFields.has('automaticFailure')).toBe(false);
    });
 
-   it('is a no-op when the caller supplied no options', () => {
-      /** @type {Set<string>} The dialog's touched-field set, seeded fresh. */
-      const touchedFields = new Set();
-      seedTouchedFieldsFromCallerOptions(touchedFields, undefined);
-      expect(touchedFields.size).toBe(0);
+   it('Resistance: follows conditional rules elements (undefined test), keeping the caller\'s Resistance and ' +
+      'the user\'s Dice', () => {
+      /** @type {object} The Character rolling the check. */
+      const system = createCharacter();
+
+      /** @type {object} The raw request options. */
+      const callerOptions = { resistance: 'reflexes' };
+
+      /** @type {object} The options the dialog opened with. */
+      const currentOptions = system.initializeResistanceCheckOptions(callerOptions);
+      system._applyConditionalCheckModifierElements([
+         checkModifier({
+            modifierType: 'expertise',
+            value: 2,
+         }),
+         checkModifier({ modifierType: 'automaticFailure' }),
+         checkModifier({ value: 4 }),
+      ]);
+
+      expect(rebuildCheckOptions({
+         callerOptions,
+         checkType: 'resistance',
+         currentOptions,
+         system,
+         userEdits: { diceMod: 1 },
+      })).toMatchObject({
+         automaticFailure: true,
+         diceMod: 1,
+         expertiseMod: 2,
+         resistance: 'reflexes',
+      });
+   });
+
+   it('Attack: follows the owned weapon (undefined tests, \'default\' sentinel), a conditional rating modifier, ' +
+      'and the no-target Defense fallback, keeping the caller\'s Damage and the user\'s Accuracy', () => {
+      /** @type {object} The owned weapon. */
+      const weapon = createItem(weaponRollData());
+
+      /** @type {object} The Character rolling the check. */
+      const system = createCharacter({ w: weapon });
+
+      /** @type {object} The raw request options, with an explicit Damage modifier. */
+      const callerOptions = {
+         attackIdx: 0,
+         damageMod: 2,
+         itemId: 'w',
+      };
+
+      /** @type {object} The options the dialog opened with. */
+      const currentOptions = system.initializeAttackCheckOptions(callerOptions);
+      expect(currentOptions).toMatchObject({
+         attackerMelee: 2,
+         attribute: 'body',
+         cleave: false,
+         multiAttack: false,
+         targetDefense: 2,
+      });
+
+      // The weapon's attack becomes a Mind, Cleave, Multi-Attack; a +2 Melee rating modifier and a Damage modifier
+      // arrive on the Actor.
+      /** @type {object} The edited roll data. */
+      const edited = weaponRollData();
+      edited.attack[0].attribute = 'mind';
+      edited.attack[0].trait = [{ name: 'cleave' }];
+      edited.multiAttack = true;
+      weapon.rollData = edited;
+      system._applyConditionalRatingModifierElements([
+         {
+            key: 'melee',
+            rating: 'melee',
+            selector: 'attackType',
+            value: 2,
+         },
+      ]);
+      system._applyConditionalCheckModifierElements([checkModifier({ modifierType: 'damage' })]);
+
+      expect(rebuildCheckOptions({
+         callerOptions,
+         checkType: 'attack',
+         currentOptions,
+         system,
+         userEdits: { attackerAccuracy: 9 },
+      })).toMatchObject({
+         attackerAccuracy: 9,
+         attackerMelee: 4,
+         attribute: 'mind',
+         cleave: true,
+         damageMod: 2,
+         multiAttack: true,
+         targetDefense: 4,
+      });
+   });
+
+   it('Casting: follows the owned spell (falsy tests, \'default\' sentinel) and a conditional rules element, ' +
+      'keeping the user\'s Complexity', () => {
+      /** @type {object} The owned spell. */
+      const spell = createItem({
+         castingCheck: {
+            attribute: 'mind',
+            complexity: 2,
+            difficulty: 4,
+            skill: 'arcana',
+         },
+         customTrait: [],
+         tradition: '',
+      });
+
+      /** @type {object} The Character rolling the check. */
+      const system = createCharacter({ s: spell });
+
+      /** @type {object} The raw request options. */
+      const callerOptions = { itemId: 's' };
+
+      /** @type {object} The options the dialog opened with. */
+      const currentOptions = system.initializeCastingCheckOptions(callerOptions);
+      expect(currentOptions).toMatchObject({
+         complexity: 2,
+         difficulty: 4,
+         skill: 'arcana',
+      });
+
+      // The spell's Difficulty, Complexity, and Skill are edited; a Healing modifier arrives on the Actor.
+      spell.rollData = {
+         ...spell.rollData,
+         castingCheck: {
+            attribute: 'mind',
+            complexity: 1,
+            difficulty: 5,
+            skill: 'athletics',
+         },
+      };
+      system._applyConditionalCheckModifierElements([checkModifier({ modifierType: 'healing' })]);
+
+      expect(rebuildCheckOptions({
+         callerOptions,
+         checkType: 'casting',
+         currentOptions,
+         system,
+         userEdits: { complexity: 3 },
+      })).toMatchObject({
+         complexity: 3,
+         difficulty: 5,
+         healingMod: 1,
+         skill: 'athletics',
+      });
+   });
+
+   it('Item: follows the owned item\'s check data (falsy test, \'default\' sentinel, roll data), keeping the ' +
+      'caller\'s Difficulty and the user\'s Double Training', () => {
+      /** @type {object} The owned item. */
+      const item = createItem({
+         check: [
+            {
+               attribute: 'body',
+               complexity: 1,
+               difficulty: 4,
+               skill: 'arcana',
+            },
+         ],
+         customTrait: [],
+      });
+
+      /** @type {object} The Character rolling the check. */
+      const system = createCharacter({ i: item });
+
+      /** @type {object} The raw request options, with an explicit Difficulty. */
+      const callerOptions = {
+         checkIdx: 0,
+         difficulty: 3,
+         itemId: 'i',
+      };
+
+      /** @type {object} The options the dialog opened with. */
+      const currentOptions = system.initializeItemCheckOptions(callerOptions);
+      item.rollData = {
+         ...item.rollData,
+         check: [
+            {
+               attribute: 'soul',
+               complexity: 2,
+               difficulty: 6,
+               skill: 'arcana',
+            },
+         ],
+      };
+
+      /** @type {object} The rebuilt options. */
+      const rebuilt = rebuildCheckOptions({
+         callerOptions,
+         checkType: 'item',
+         currentOptions,
+         system,
+         userEdits: { doubleTraining: true },
+      });
+      expect(rebuilt).toMatchObject({
+         attribute: 'soul',
+         complexity: 2,
+         difficulty: 3,
+         doubleTraining: true,
+      });
+      expect(rebuilt.itemRollData.check[0].complexity).toBe(2);
    });
 });
 
-describe('INITIALIZE_CHECK_OPTIONS_METHODS', () => {
-   it('names the live Actor\'s initializer method for every check type', () => {
-      expect(INITIALIZE_CHECK_OPTIONS_METHODS).toEqual({
-         attack: 'initializeAttackCheckOptions',
-         attribute: 'initializeAttributeCheckOptions',
-         casting: 'initializeCastingCheckOptions',
-         item: 'initializeItemCheckOptions',
-         resistance: 'initializeResistanceCheckOptions',
+describe('rebuildCheckOptions — no-op, lost sources, and vanished checks', () => {
+   it('returns undefined when the rebuild equals the current options, fresh arrays and roll data included', () => {
+      /** @type {object} The owned item, whose roll data is a fresh object on every read. */
+      const item = createItem({
+         check: [
+            {
+               attribute: 'body',
+               complexity: 1,
+               difficulty: 4,
+               skill: 'arcana',
+            },
+         ],
+         customTrait: [],
       });
+
+      /** @type {object} The Character rolling the check. */
+      const system = createCharacter({ i: item });
+
+      /** @type {object} The raw request options. */
+      const callerOptions = { itemId: 'i' };
+
+      expect(rebuildCheckOptions({
+         callerOptions,
+         checkType: 'item',
+         currentOptions: system.initializeItemCheckOptions(callerOptions),
+         system,
+         userEdits: {},
+      })).toBeUndefined();
+   });
+
+   it('keeps the displayed Attribute while the user\'s Skill of None leaves the \'default\' sentinel without a ' +
+      'source, then follows the next Skill, reporting nothing', () => {
+      /** @type {object} The Character rolling the check. */
+      const system = createCharacter();
+
+      /** @type {object} The raw request options: opened from Arcana, so the Attribute comes from the Skill. */
+      const callerOptions = { skill: 'arcana' };
+
+      /** @type {object} The options after the user picks Skill "None". */
+      const noSkill = rebuildCheckOptions({
+         callerOptions,
+         checkType: 'attribute',
+         currentOptions: system.initializeAttributeCheckOptions(callerOptions),
+         system,
+         userEdits: { skill: 'none' },
+      });
+      expect(noSkill).toMatchObject({
+         attribute: 'mind',
+         skill: 'none',
+      });
+
+      expect(rebuildCheckOptions({
+         callerOptions,
+         checkType: 'attribute',
+         currentOptions: noSkill,
+         system,
+         userEdits: { skill: 'athletics' },
+      })).toMatchObject({
+         attribute: 'body',
+         skill: 'athletics',
+      });
+      expect(globalThis.game.titan.error).not.toHaveBeenCalled();
+   });
+
+   it('returns undefined without reporting when the owned weapon is gone, leaving the dialog to close', () => {
+      /** @type {object} The Character rolling the check. */
+      const system = createCharacter({ w: createItem(weaponRollData()) });
+
+      /** @type {object} The raw request options. */
+      const callerOptions = {
+         attackIdx: 0,
+         itemId: 'w',
+      };
+
+      /** @type {object} The options the dialog opened with. */
+      const currentOptions = system.initializeAttackCheckOptions(callerOptions);
+      system.parent.items.delete('w');
+
+      expect(rebuildCheckOptions({
+         callerOptions,
+         checkType: 'attack',
+         currentOptions,
+         system,
+         userEdits: {},
+      })).toBeUndefined();
+      expect(globalThis.game.titan.error).not.toHaveBeenCalled();
+   });
+
+   it('invalidates an Item Check whose owned item is gone, though its options carry the item\'s roll data', () => {
+      /** @type {object} The Character rolling the check. */
+      const system = createCharacter({
+         i: createItem({
+            check: [{ attribute: 'body' }],
+            customTrait: [],
+         }),
+      });
+
+      /** @type {object} The raw request options. */
+      const callerOptions = { itemId: 'i' };
+
+      /** @type {object} The options the dialog opened with, carrying the item's roll data. */
+      const currentOptions = system.initializeItemCheckOptions(callerOptions);
+      system.parent.items.delete('i');
+
+      expect(rebuildCheckOptions({
+         callerOptions,
+         checkType: 'item',
+         currentOptions,
+         system,
+         userEdits: {},
+      })).toBeUndefined();
+      expect(system.validateItemCheckOptions(currentOptions, false)).toBe(false);
+   });
+
+   it('reads an Item Check\'s roll data from the owned item its item ID names', () => {
+      /** @type {object} The owned item. */
+      const item = createItem({
+         check: [{ difficulty: 4 }],
+         customTrait: [],
+      });
+
+      /** @type {object} The options the dialog opened with, carrying the item's roll data. */
+      const currentOptions = createCharacter({ i: item }).initializeItemCheckOptions({ itemId: 'i' });
+      item.rollData = {
+         ...item.rollData,
+         check: [{ difficulty: 6 }],
+      };
+
+      expect(createCharacter({ i: item }).initializeItemCheckOptions(currentOptions).itemRollData.check[0].difficulty)
+         .toBe(6);
+   });
+});
+
+describe('Casting and Item Complexity and Difficulty', () => {
+   /**
+    * Builds a Character owning a spell (`s`) and an item (`i`) whose checks carry Complexity 2 and Difficulty 5.
+    * @returns {object} The model instance.
+    */
+   function createCaster() {
+      return createCharacter({
+         i: createItem({
+            check: [
+               {
+                  attribute: 'body',
+                  complexity: 2,
+                  difficulty: 5,
+                  skill: 'arcana',
+               },
+            ],
+            customTrait: [],
+         }),
+         s: createItem({
+            castingCheck: {
+               attribute: 'mind',
+               complexity: 2,
+               difficulty: 5,
+               skill: 'arcana',
+            },
+            customTrait: [],
+            tradition: '',
+         }),
+      });
+   }
+
+   it.each([
+      [
+         'Casting',
+         'initializeCastingCheckOptions',
+         { itemId: 's' },
+      ],
+      [
+         'Item',
+         'initializeItemCheckOptions',
+         { itemId: 'i' },
+      ],
+   ])('%s: keeps an explicit Complexity of 0 and derives an omitted one from the check data', (_type, method,
+      options) => {
+      /** @type {object} The Character rolling the check. */
+      const system = createCaster();
+      expect(system[method]({
+         ...options,
+         complexity: 0,
+      }).complexity).toBe(0);
+      expect(system[method](options)).toMatchObject({
+         complexity: 2,
+         difficulty: 5,
+      });
+   });
+
+   it('Item: keeps an explicit Difficulty of 0 rather than replacing it with the check data', () => {
+      expect(createCaster().initializeItemCheckOptions({
+         difficulty: 0,
+         itemId: 'i',
+      }).difficulty).toBe(0);
+   });
+});
+
+describe('check index validation', () => {
+   it('rejects, without reporting, an Attack index one past the weapon\'s last attack', () => {
+      /** @type {object} The Character, whose weapon has one attack. */
+      const system = createCharacter({ w: createItem(weaponRollData()) });
+      expect(system.validateAttackCheckOptions({
+         attackIdx: 1,
+         itemId: 'w',
+      }, false)).toBe(false);
+      expect(system.validateAttackCheckOptions({
+         attackIdx: 0,
+         itemId: 'w',
+      }, false)).toBe(true);
+      expect(globalThis.game.titan.error).not.toHaveBeenCalled();
+   });
+
+   it('rejects, without reporting, an Item check index one past the item\'s last check', () => {
+      /** @type {object} The Character, whose item has one check. */
+      const system = createCharacter({
+         i: createItem({
+            check: [{ attribute: 'body' }],
+            customTrait: [],
+         }),
+      });
+      expect(system.validateItemCheckOptions({
+         checkIdx: 1,
+         itemId: 'i',
+      }, false)).toBe(false);
+      expect(system.validateItemCheckOptions({
+         checkIdx: 0,
+         itemId: 'i',
+      }, false)).toBe(true);
+      expect(globalThis.game.titan.error).not.toHaveBeenCalled();
+   });
+
+   it('rejects missing options for every check type', () => {
+      /** @type {object} The Character. */
+      const system = createCharacter();
+      for (const methods of Object.values(CHECK_OPTIONS_METHODS)) {
+         expect(system[methods.validate](undefined, false)).toBe(false);
+      }
+      expect(globalThis.game.titan.error).not.toHaveBeenCalled();
+   });
+});
+
+describe('Attack targetDefense provenance (_createAttackCheckDialog)', () => {
+   it('records a target\'s Defense resolved at open as a caller value, kept after the target is removed', () => {
+      /** @type {object} The Character rolling the check. */
+      const system = createCharacter({ w: createItem(weaponRollData()) });
+      globalThis.game.user.targets = new Set([targetToken(5)]);
+
+      system._createAttackCheckDialog({
+         attackIdx: 0,
+         itemId: 'w',
+      });
+
+      /** @type {object} The caller options the dialog received. */
+      const callerOptions = dialogCalls[0][3];
+      expect(callerOptions.targetDefense).toBe(5);
+
+      // Untargeting while the dialog is open keeps the target's Defense.
+      globalThis.game.user.targets = new Set();
+      /** @type {object} The options after a +2 Melee rating modifier arrives. */
+      const rebuilt = rebuildCheckOptions({
+         callerOptions,
+         checkType: 'attack',
+         currentOptions: dialogCalls[0][0],
+         system: withMeleeBonus(system),
+         userEdits: {},
+      });
+      expect(rebuilt).toMatchObject({
+         attackerMelee: 4,
+         targetDefense: 5,
+      });
+   });
+
+   it('keeps the caller\'s own targetDefense over a live target\'s Defense', () => {
+      /** @type {object} The Character rolling the check. */
+      const system = createCharacter({ w: createItem(weaponRollData()) });
+      globalThis.game.user.targets = new Set([targetToken(5)]);
+
+      system._createAttackCheckDialog({
+         attackIdx: 0,
+         itemId: 'w',
+         targetDefense: 7,
+      });
+
+      // A different target and a +2 Melee rating modifier arrive while the dialog is open.
+      globalThis.game.user.targets = new Set([targetToken(6)]);
+      expect(rebuildCheckOptions({
+         callerOptions: dialogCalls[0][3],
+         checkType: 'attack',
+         currentOptions: dialogCalls[0][0],
+         system: withMeleeBonus(system),
+         userEdits: {},
+      })).toMatchObject({
+         attackerMelee: 4,
+         targetDefense: 7,
+      });
+   });
+
+   it('records nothing when untargeted at open, so the fallback follows and a later target is picked up', () => {
+      /** @type {object} The Character rolling the check. */
+      const system = createCharacter({ w: createItem(weaponRollData()) });
+
+      system._createAttackCheckDialog({
+         attackIdx: 0,
+         itemId: 'w',
+      });
+
+      /** @type {object} The caller options the dialog received. */
+      const callerOptions = dialogCalls[0][3];
+      expect(callerOptions.targetDefense).toBeUndefined();
+
+      // The fallback (the attacker's own Melee) follows a +2 Melee rating modifier.
+      /** @type {object} The options after the rating modifier arrives. */
+      const followed = rebuildCheckOptions({
+         callerOptions,
+         checkType: 'attack',
+         currentOptions: dialogCalls[0][0],
+         system: withMeleeBonus(system),
+         userEdits: {},
+      });
+      expect(followed.targetDefense).toBe(4);
+
+      // A target selected later supplies its Defense.
+      globalThis.game.user.targets = new Set([targetToken(6)]);
+      expect(rebuildCheckOptions({
+         callerOptions,
+         checkType: 'attack',
+         currentOptions: followed,
+         system,
+         userEdits: {},
+      }).targetDefense).toBe(6);
+   });
+});
+
+/**
+ * Gives a Character an always-on +2 Melee rating modifier for Melee attacks.
+ * @param {object} system - The Character.
+ * @returns {object} The same Character.
+ */
+function withMeleeBonus(system) {
+   system._applyConditionalRatingModifierElements([
+      {
+         key: 'melee',
+         rating: 'melee',
+         selector: 'attackType',
+         value: 2,
+      },
+   ]);
+   return system;
+}
+
+describe('createCheckOptionSetter', () => {
+   it('records the write as a user edit and applies it to the options', () => {
+      /** @type {import('svelte/store').Writable} The dialog's options. */
+      const checkOptions = writable({
+         advantage: 0,
+         skill: 'none',
+      });
+
+      /** @type {import('svelte/store').Writable} The dialog's user edits. */
+      const userEdits = writable({});
+
+      /** @type {(field: string, value: *) => void} The tracked setter. */
+      const setCheckOption = createCheckOptionSetter(checkOptions, userEdits);
+      setCheckOption('skill', 'arcana');
+      setCheckOption('advantage', -1);
+
+      expect(get(userEdits)).toEqual({
+         advantage: -1,
+         skill: 'arcana',
+      });
+      expect(get(checkOptions)).toEqual({
+         advantage: -1,
+         skill: 'arcana',
+      });
+   });
+});
+
+describe('CHECK_OPTIONS_METHODS', () => {
+   it('names the live Actor\'s initializer and validator for every check type', () => {
+      for (const [checkType, methods] of Object.entries(CHECK_OPTIONS_METHODS)) {
+         /** @type {string} The capitalized check type in the method names. */
+         const type = `${checkType[0].toUpperCase()}${checkType.slice(1)}`;
+         expect(methods.initialize).toBe(`initialize${type}CheckOptions`);
+         expect(methods.validate).toBe(`validate${type}CheckOptions`);
+         expect(typeof CharacterDataModel.prototype[methods.initialize]).toBe('function');
+         expect(typeof CharacterDataModel.prototype[methods.validate]).toBe('function');
+      }
+      expect(Object.keys(CHECK_OPTIONS_METHODS).sort()).toEqual([
+         'attack',
+         'attribute',
+         'casting',
+         'item',
+         'resistance',
+      ]);
    });
 });
