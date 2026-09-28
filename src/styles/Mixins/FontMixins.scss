@@ -18,7 +18,7 @@
    @include font-size-small;
 
    font-weight: bold;
-   letter-spacing: 0.06em;
+   letter-spacing: calc(var(--titan-font-size-small) * 0.06);
    text-transform: uppercase;
    color: var(--titan-header-6-font-color);
 }

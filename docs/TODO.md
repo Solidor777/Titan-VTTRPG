@@ -15,9 +15,14 @@ Completed items are deleted, not marked done.
   themselves: open the exported .xlsx in Google Sheets, edit one cell's data (not the format), then
   File > Download > Microsoft Excel (.xlsx), and hand the resulting file over.
 
-- Clear the 10 pre-existing stylelint errors (`npx stylelint "src/**/*.{css,svelte,scss}"`): `font-weight-notation` in
-  `src/styles/Lato.scss` (8, auto-fixable) and `unit-disallowed-list` (`em`) in `src/styles/Global.scss` and
-  `src/styles/Mixins/FontMixins.scss`. CI does not run stylelint, so they are unguarded; add it to CI once clean.
+- Conditions rework to the 2026-09-26 rules (`src/system/Conditions.js`; the compendium Rules journal already has the
+  new text). Blinded, Contaminated, Prone, Restrained and Stunned move from a flat -1 to "-1/4 of base value, rounded
+  up" (Prone: attackers within 1 space get +1/4, beyond 10 spaces -1/4 per 10 spaces; Prone/Sleeping speed and
+  Awareness use "1/2, rounded up"). Frightened becomes Disadvantage on all checks, and Off-Balance is a new condition
+  (-1/4 of base Accuracy, Awareness, Melee, Defense, rounded up) that needs a definition, icon and localization.
+  Open design questions: how a rules element expresses "-1/4 of base, rounded up", and that the system has no
+  Advantage/Disadvantage mechanic at all. The journal text also has an unfixed source typo (Blinded reads "--1/4 of
+  their total" instead of "-1/4 of their base value").
 
 - Conditional check modifiers on Resistance checks. `initializeResistanceCheckOptions` reads no actor modifiers, and the
   rules-element editor offers no `resistance` check type, so "all checks" penalties such as Abjuration of the Arbiter's
