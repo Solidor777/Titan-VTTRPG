@@ -987,7 +987,18 @@ test.describe('effect tray sidebar tab', () => {
       await openFolderMenu(page, 'E2E Remove Parent');
       const [removeLabel] = await localizeAll(page, ['FOLDER.Remove']);
       await page.locator('#context-menu li.context-item', { hasText: removeLabel }).click();
-      await page.locator('.application.dialog button[data-action="yes"]').click();
+
+      // The dialog opens where core's directory opens it: 770px left of the viewport's right edge.
+      /** @type {import('@playwright/test').Locator} The Remove Folder confirmation dialog. */
+      const dialog = page.locator('.application.dialog');
+      await expect(dialog).toBeVisible();
+      /** @type {{left: number, viewport: number}} The dialog's left edge and the viewport width. */
+      const placement = await dialog.evaluate((element) => ({
+         left: element.getBoundingClientRect().left,
+         viewport: window.innerWidth,
+      }));
+      expect(placement.left).toBe(placement.viewport - 770);
+      await dialog.locator('button[data-action="yes"]').click();
 
       // The folder is gone; its subfolder and its effect now sit at the pack root.
       await expect(trayFolder(page, 'E2E Remove Parent')).toHaveCount(0);

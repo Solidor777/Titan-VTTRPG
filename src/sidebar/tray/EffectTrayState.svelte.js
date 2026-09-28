@@ -444,9 +444,10 @@ export default class EffectTrayState {
     * On confirm the server deletes the folder and moves its effects and every descendant folder up to the
     * folder's parent (or the pack root). No-ops when the current user cannot edit the selected pack.
     * @param {Folder} folder - The folder to remove.
+    * @param {{top: number, left: number}} [position] - Where to open the dialog.
     * @returns {Promise<unknown>} The dialog result, or undefined when the pack is not editable.
     */
-   async requestRemoveFolder(folder) {
+   async requestRemoveFolder(folder, position) {
       if (!this.canEdit) {
          return void 0;
       }
@@ -459,6 +460,7 @@ export default class EffectTrayState {
             title: game.i18n.format('FOLDER.RemoveName', { name: folder.name }),
             icon: 'fa-solid fa-trash',
          },
+         position,
       });
    }
 
@@ -467,9 +469,10 @@ export default class EffectTrayState {
     * Delete All entry does. On confirm the server deletes the folder, every descendant folder, and every
     * effect inside them. No-ops when the current user cannot edit the selected pack.
     * @param {Folder} folder - The folder to delete with its contents.
+    * @param {{top: number, left: number}} [position] - Where to open the dialog.
     * @returns {Promise<unknown>} The dialog result, or undefined when the pack is not editable.
     */
-   async requestDeleteFolderAll(folder) {
+   async requestDeleteFolderAll(folder, position) {
       if (!this.canEdit) {
          return void 0;
       }
@@ -482,6 +485,7 @@ export default class EffectTrayState {
                title: game.i18n.format('FOLDER.DeleteName', { name: folder.name }),
                icon: 'fa-solid fa-dumpster',
             },
+            position,
          },
          {
             deleteSubfolders: true,
@@ -495,10 +499,12 @@ export default class EffectTrayState {
     * effects, as the core directory's Create Rollable Table entry does. Creates no pack data, so it is
     * available on a locked pack; the table creation itself is permission-checked by core.
     * @param {Folder} folder - The folder whose contents become the table results.
+    * @param {{top: number, left: number}} [position] - Where to open the dialog.
     * @returns {Promise<unknown>} The dialog result.
     */
-   requestCreateTableFromFolder(folder) {
+   requestCreateTableFromFolder(folder, position) {
       return foundry.applications.api.DialogV2.confirm({
+         position,
          window: { title: game.i18n.format('FOLDER.CreateTableConfirm.Title', { folder: folder.name }) },
          content: `<p>${game.i18n.localize('FOLDER.CreateTableConfirm.Question')}</p>`,
          yes: {

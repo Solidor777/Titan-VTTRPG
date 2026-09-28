@@ -16,6 +16,9 @@ function headerTarget(folderId) {
             if (selector === '[data-folder-id]') {
                return { dataset: { folderId } };
             }
+            if (selector === '.directory-item') {
+               return { offsetTop: 120 };
+            }
             return selector === '.folder-header' ? header : null;
          },
       },
@@ -54,6 +57,10 @@ describe('buildEffectFolderContextMenu', () => {
    beforeEach(() => {
       // localize() resolves `LOCAL.${key}.text`; mock i18n to echo the key for readable assertions.
       globalThis.game = { i18n: { localize: (key) => key } };
+      globalThis.window = {
+         innerHeight: 1000,
+         innerWidth: 1920,
+      };
       globalThis.CONFIG = { RollTable: { sidebarIcon: 'fa-solid fa-table-list' } };
       globalThis.CONST = {
          COMPENDIUM_DOCUMENT_TYPES: [
@@ -122,16 +129,25 @@ describe('buildEffectFolderContextMenu', () => {
       expect(folder.sheet.render).toHaveBeenCalledWith(true);
    });
 
-   it('Create Rollable Table, Remove Folder, and Delete All route the resolved folder to the tray state', () => {
+   it('Create Rollable Table, Remove Folder, and Delete All route the folder with the core dialog position', () => {
       const { trayState, folder } = fakeTrayState(true);
       const [, , createTable, remove, deleteAll] = buildEffectFolderContextMenu(trayState);
       const { target } = headerTarget('f1');
       createTable.onClick(null, target);
       remove.onClick(null, target);
       deleteAll.onClick(null, target);
-      expect(trayState.requestCreateTableFromFolder).toHaveBeenCalledWith(folder);
-      expect(trayState.requestRemoveFolder).toHaveBeenCalledWith(folder);
-      expect(trayState.requestDeleteFolderAll).toHaveBeenCalledWith(folder);
+      expect(trayState.requestCreateTableFromFolder).toHaveBeenCalledWith(folder, {
+         top: 120,
+         left: 1180,
+      });
+      expect(trayState.requestRemoveFolder).toHaveBeenCalledWith(folder, {
+         top: 120,
+         left: 1150,
+      });
+      expect(trayState.requestDeleteFolderAll).toHaveBeenCalledWith(folder, {
+         top: 120,
+         left: 1150,
+      });
    });
 
    it('folder actions no-op when the header resolves no folder', () => {

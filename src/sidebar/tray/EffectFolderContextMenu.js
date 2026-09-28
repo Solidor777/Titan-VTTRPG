@@ -15,6 +15,23 @@ function resolveFolder(target, trayState) {
 }
 
 /**
+ * Builds the dialog position core's directory uses for its folder confirmations: level with the folder's
+ * directory entry (clamped so the dialog fits the viewport) and offset left of the sidebar by a fixed width.
+ * @param {HTMLElement} target - The folder header the menu was opened on.
+ * @param {number} leftOffset - Pixels from the viewport's right edge to the dialog's left edge (core uses 740
+ * for Create Rollable Table and 770 for Remove Folder and Delete All).
+ * @returns {{top: number, left: number}} The dialog position.
+ */
+function getDialogPosition(target, leftOffset) {
+   /** @type {HTMLElement | null} The folder's directory entry, whose offset core measures. */
+   const entry = target?.closest('.directory-item');
+   return {
+      top: Math.min(entry?.offsetTop ?? 0, window.innerHeight - 350),
+      left: window.innerWidth - leftOffset,
+   };
+}
+
+/**
  * Builds the right-click context-menu entries for an effect-tray folder header, matching the folder menu
  * core's Compendium directory shows for a pack's folders (DocumentDirectory's folder entries less
  * Configure Ownership and Export to Compendium, which the Compendium directory removes), plus an inline
@@ -61,7 +78,7 @@ export default function buildEffectFolderContextMenu(trayState) {
             /** @type {Folder | undefined} The folder for the clicked header. */
             const folder = resolveFolder(target, trayState);
             if (folder) {
-               void trayState.requestCreateTableFromFolder(folder);
+               void trayState.requestCreateTableFromFolder(folder, getDialogPosition(target, 740));
             }
          },
       },
@@ -73,7 +90,7 @@ export default function buildEffectFolderContextMenu(trayState) {
             /** @type {Folder | undefined} The folder for the clicked header. */
             const folder = resolveFolder(target, trayState);
             if (folder) {
-               void trayState.requestRemoveFolder(folder);
+               void trayState.requestRemoveFolder(folder, getDialogPosition(target, 770));
             }
          },
       },
@@ -85,7 +102,7 @@ export default function buildEffectFolderContextMenu(trayState) {
             /** @type {Folder | undefined} The folder for the clicked header. */
             const folder = resolveFolder(target, trayState);
             if (folder) {
-               void trayState.requestDeleteFolderAll(folder);
+               void trayState.requestDeleteFolderAll(folder, getDialogPosition(target, 770));
             }
          },
       },
