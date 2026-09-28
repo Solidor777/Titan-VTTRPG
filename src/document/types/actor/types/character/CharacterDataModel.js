@@ -1748,22 +1748,28 @@ export default class CharacterDataModel extends TitanActorDataModel {
    }
 
    /**
-    * Requests an Attribute Check from this Character.
+    * Requests an Attribute Check from this Character. Rolls straight to chat or opens the options dialog, as the
+    * `getCheckOptions` setting, the modifier key, and the check's situational modifiers decide.
     * @param {AttributeCheckOptions} options - Options for the Check.
     * @returns {Promise<void>}
     */
    async requestAttributeCheck(options) {
-      // If we do not need to confirm the parameters.
-      if (!shouldGetCheckOptions()) {
-
-         // Get and roll the check.
-         await this.rollAttributeCheck(options);
+      // Invalid options fail here, before the situational lookup reads them.
+      if (!this.validateAttributeCheckOptions(options)) {
+         return;
       }
 
-      // If we need to confirm the parameters, the options are valid, and we are an owner.
-      else {
+      /** @type {boolean} Whether any situational modifier applies to the check. */
+      const hasSituationalModifiers = this.getSituationalCheckModifiers(
+         'attribute',
+         { skill: this.initializeAttributeCheckOptions(options).skill },
+      ).length > 0;
 
-         // Create a dialog for adjusting the check.
+      // Roll straight to chat, or open the dialog for adjusting the check.
+      if (!shouldGetCheckOptions(hasSituationalModifiers)) {
+         await this.rollAttributeCheck(options);
+      }
+      else {
          this._createAttributeCheckDialog(options);
       }
    }
@@ -2010,22 +2016,25 @@ export default class CharacterDataModel extends TitanActorDataModel {
    }
 
    /**
-    * Requests an Attribute Check from this Character.
+    * Requests a Resistance Check from this Character. Rolls straight to chat or opens the options dialog, as the
+    * `getCheckOptions` setting, the modifier key, and the check's situational modifiers decide.
     * @param {ResistanceCheckOptions} options - Options for the Check.
     * @returns {Promise<void>}
     */
    async requestResistanceCheck(options) {
-      // If we do not need to confirm the parameters.
-      if (!shouldGetCheckOptions()) {
-
-         // Get and roll the check.
-         await this.rollResistanceCheck(options);
+      // Invalid options fail here, before the situational lookup reads them.
+      if (!this.validateResistanceCheckOptions(options)) {
+         return;
       }
 
-      // If we need to confirm the parameters, the options are valid, and we are an owner.
-      else {
+      /** @type {boolean} Whether any situational modifier applies to the check. */
+      const hasSituationalModifiers = this.getSituationalCheckModifiers('resistance').length > 0;
 
-         // Create a dialog for adjusting the check.
+      // Roll straight to chat, or open the dialog for adjusting the check.
+      if (!shouldGetCheckOptions(hasSituationalModifiers)) {
+         await this.rollResistanceCheck(options);
+      }
+      else {
          this._createResistanceCheckDialog(options);
       }
    }
@@ -2255,22 +2264,28 @@ export default class CharacterDataModel extends TitanActorDataModel {
    }
 
    /**
-    * Requests an Attack Check from this Character.
+    * Requests an Attack Check from this Character. Rolls straight to chat or opens the options dialog, as the
+    * `getCheckOptions` setting, the modifier key, and the check's situational modifiers decide.
     * @param {AttackCheckOptions} options - Options for the Check.
     * @returns {Promise<void>}
     */
    async requestAttackCheck(options) {
-      // If we do not need to confirm the parameters.
-      if (!shouldGetCheckOptions()) {
-
-         // Get and roll the check.
-         await this.rollAttackCheck(options);
+      // Invalid options fail here, before the situational lookup reads them.
+      if (!this.validateAttackCheckOptions(options)) {
+         return;
       }
 
-      // If we need to confirm the parameters, the options are valid, and we are an owner.
-      else {
+      /** @type {boolean} Whether any situational modifier applies to the check. */
+      const hasSituationalModifiers = this.getSituationalCheckModifiers(
+         'attack',
+         { skill: this.initializeAttackCheckOptions(options).skill },
+      ).length > 0;
 
-         // Create a dialog for adjusting the check.
+      // Roll straight to chat, or open the dialog for adjusting the check.
+      if (!shouldGetCheckOptions(hasSituationalModifiers)) {
+         await this.rollAttackCheck(options);
+      }
+      else {
          this._createAttackCheckDialog(options);
       }
    }
@@ -2901,22 +2916,28 @@ export default class CharacterDataModel extends TitanActorDataModel {
    }
 
    /**
-    * Requests a Casting Check from this Character.
+    * Requests a Casting Check from this Character. Rolls straight to chat or opens the options dialog, as the
+    * `getCheckOptions` setting, the modifier key, and the check's situational modifiers decide.
     * @param {CastingCheckOptions} options - Options for the Check.
     * @returns {Promise<void>}
     */
    async requestCastingCheck(options) {
-      // If we do not need to confirm the parameters.
-      if (!shouldGetCheckOptions()) {
-
-         // Get and roll the check.
-         await this.rollCastingCheck(options);
+      // Invalid options fail here, before the situational lookup reads them.
+      if (!this.validateCastingCheckOptions(options)) {
+         return;
       }
 
-      // If we need to confirm the parameters, the options are valid, and we are an owner.
-      else {
+      /** @type {boolean} Whether any situational modifier applies to the check. */
+      const hasSituationalModifiers = this.getSituationalCheckModifiers(
+         'casting',
+         { skill: this.initializeCastingCheckOptions(options).skill },
+      ).length > 0;
 
-         // Create a dialog for adjusting the check.
+      // Roll straight to chat, or open the dialog for adjusting the check.
+      if (!shouldGetCheckOptions(hasSituationalModifiers)) {
+         await this.rollCastingCheck(options);
+      }
+      else {
          this._createCastingCheckDialog(options);
       }
    }
@@ -3376,22 +3397,28 @@ export default class CharacterDataModel extends TitanActorDataModel {
    }
 
    /**
-    * Requests an Item Check from this Character.
+    * Requests an Item Check from this Character. Rolls straight to chat or opens the options dialog, as the
+    * `getCheckOptions` setting, the modifier key, and the check's situational modifiers decide.
     * @param {ItemCheckOptions} options - Options for the Check.
     * @returns {Promise<void>}
     */
    async requestItemCheck(options) {
-      // If we do not need to confirm the parameters.
-      if (!shouldGetCheckOptions()) {
-
-         // Get and roll the check.
-         await this.rollItemCheck(options);
+      // Invalid options fail here, before the situational lookup reads them.
+      if (!this.validateItemCheckOptions(options)) {
+         return;
       }
 
-      // If we need to confirm the parameters, the options are valid, and we are an owner.
-      else {
+      /** @type {boolean} Whether any situational modifier applies to the check. */
+      const hasSituationalModifiers = this.getSituationalCheckModifiers(
+         'item',
+         { skill: this.initializeItemCheckOptions(options).skill },
+      ).length > 0;
 
-         // Create a dialog for adjusting the check.
+      // Roll straight to chat, or open the dialog for adjusting the check.
+      if (!shouldGetCheckOptions(hasSituationalModifiers)) {
+         await this.rollItemCheck(options);
+      }
+      else {
          this._createItemCheckDialog(options);
       }
    }

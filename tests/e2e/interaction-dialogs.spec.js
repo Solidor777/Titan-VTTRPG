@@ -116,7 +116,7 @@ test.describe('v14 interaction dialogs', () => {
          ]);
 
          // Default the gating settings to off; each test flips the one it needs.
-         await game.settings.set('titan', 'getCheckOptions', false);
+         await game.settings.set('titan', 'getCheckOptions', 'never');
          await game.settings.set('titan', 'confirmDeletingItems', false);
          await game.settings.set('titan', 'confirmDeletingEffects', false);
       });
@@ -147,7 +147,7 @@ test.describe('v14 interaction dialogs', () => {
    test('check-options dialog mounts', async () => {
       const errors = await triggerInWorld(page, `
          const actor = game.actors.getName('E2E Dialog Actor');
-         await game.settings.set('titan', 'getCheckOptions', true);
+         await game.settings.set('titan', 'getCheckOptions', 'always');
          await actor.system.requestAttributeCheck({ attribute: 'body' });
       `);
 

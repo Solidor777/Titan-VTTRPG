@@ -140,7 +140,7 @@ test.describe('cross-surface check-tag parity', () => {
          ]);
 
          // Default the gating setting off so roll clicks post straight to chat.
-         await game.settings.set('titan', 'getCheckOptions', false);
+         await game.settings.set('titan', 'getCheckOptions', 'never');
 
          return {
             itemId: item.id,
@@ -159,7 +159,7 @@ test.describe('cross-surface check-tag parity', () => {
    // into later tests or spec files (house pattern per embedded-context-items.spec.js).
    test.afterEach(async () => {
       await page.evaluate(async () => {
-         await game.settings.set('titan', 'getCheckOptions', false);
+         await game.settings.set('titan', 'getCheckOptions', 'never');
       });
    });
 
@@ -169,7 +169,7 @@ test.describe('cross-surface check-tag parity', () => {
    // Inner-scope after-hooks run before the file-level page close, so `page` is still open.
    test.afterAll(async () => {
       await page.evaluate(async () => {
-         await game.settings.set('titan', 'getCheckOptions', false);
+         await game.settings.set('titan', 'getCheckOptions', 'never');
       });
       await deleteFixtureActor(page, ACTOR_NAME);
 

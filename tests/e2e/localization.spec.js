@@ -139,7 +139,7 @@ test.describe('no double-localized (LOCAL.) text in rendered UI', () => {
 
       // The casting-check options dialog (gated by the getCheckOptions setting).
       await page.evaluate(async () => {
-         await game.settings.set('titan', 'getCheckOptions', true);
+         await game.settings.set('titan', 'getCheckOptions', 'always');
          const actor = game.actors.find((a) => a.type === 'player' && a.name === 'E2E Player');
          const spell = actor.items.find((i) => i.name === 'E2E Aspect Spell');
          actor.system.requestCastingCheck({ itemId: spell.id });
@@ -147,7 +147,7 @@ test.describe('no double-localized (LOCAL.) text in rendered UI', () => {
       await expect(page.locator('.titan-dialog')).toBeVisible();
       const dialogOffenders = await collectLocalizationOffenders(page, '.titan-dialog');
       await page.evaluate(async () => {
-         await game.settings.set('titan', 'getCheckOptions', false);
+         await game.settings.set('titan', 'getCheckOptions', 'never');
       });
       expect(dialogOffenders, `LOCAL. text in casting dialog:\n${dialogOffenders.join('\n')}`).toEqual([]);
    });
@@ -162,7 +162,7 @@ test.describe('no double-localized (LOCAL.) text in rendered UI', () => {
             type: 'player',
          });
          await actor.createEmbeddedDocuments('Item', items);
-         await game.settings.set('titan', 'getCheckOptions', true);
+         await game.settings.set('titan', 'getCheckOptions', 'always');
       }, buildE2ERollerItemData());
 
       // Each request opens its options dialog (gated by getCheckOptions); scan every dialog once mounted.
@@ -188,7 +188,7 @@ test.describe('no double-localized (LOCAL.) text in rendered UI', () => {
       }
 
       await page.evaluate(async () => {
-         await game.settings.set('titan', 'getCheckOptions', false);
+         await game.settings.set('titan', 'getCheckOptions', 'never');
          await game.actors.getName('E2E Dialog Roller')?.delete();
       });
       for (const [type, offenders] of Object.entries(offendersByDialog)) {

@@ -102,7 +102,7 @@ test.describe('item-sheet check rolling (owner)', () => {
          ]);
 
          // Roll straight to chat: no options dialog.
-         await game.settings.set('titan', 'getCheckOptions', false);
+         await game.settings.set('titan', 'getCheckOptions', 'never');
 
          return {
             equipmentId: equipment.id,
@@ -117,7 +117,7 @@ test.describe('item-sheet check rolling (owner)', () => {
 
    test.afterEach(async () => {
       await page.evaluate(async () => {
-         await game.settings.set('titan', 'getCheckOptions', false);
+         await game.settings.set('titan', 'getCheckOptions', 'never');
       });
    });
 

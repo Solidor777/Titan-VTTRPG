@@ -102,7 +102,7 @@ test.describe('v14 checks dialog (driven from Playwright)', () => {
    test.afterEach(async () => {
       await resetDice(page);
       await page.evaluate(async () => {
-         await game.settings.set('titan', 'getCheckOptions', false);
+         await game.settings.set('titan', 'getCheckOptions', 'never');
          const instances = foundry.applications?.instances;
          if (instances) {
             for (const app of instances.values()) {

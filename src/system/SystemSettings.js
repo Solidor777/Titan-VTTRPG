@@ -1,4 +1,5 @@
 import { BUILT_IN_THEMES, buildThemeChoices } from '~/theme/ThemeManager.js';
+import resolveCheckOptionsMode from '~/helpers/utility-functions/ResolveCheckOptionsMode.js';
 import ThemeEditorApplication from '~/theme/editor/ThemeEditorApplication.js';
 import PlayerHudSettingsApplication from '~/ui/player-hud/settings/PlayerHudSettingsApplication.js';
 
@@ -7,15 +8,31 @@ import PlayerHudSettingsApplication from '~/ui/player-hud/settings/PlayerHudSett
  */
 export default function registerSystemSettings() {
 
-   // Get Check Options.
+   // Get Check Options: when a check opens its options dialog before rolling.
    game.settings.register('titan', 'getCheckOptions', {
+      choices: {
+         never: 'SETTINGS.getCheckOptions.never',
+         situational: 'SETTINGS.getCheckOptions.situational',
+         always: 'SETTINGS.getCheckOptions.always',
+      },
       config: true,
-      default: false,
+      default: 'situational',
       hint: 'SETTINGS.getCheckOptions.hint',
       name: 'SETTINGS.getCheckOptions.label',
       scope: 'client',
-      type: Boolean,
+      type: String,
    });
+
+   // A stored value outside the three choices (client storage can hold a Boolean) is rewritten to the choice it
+   // resolves to, so the settings window shows a valid option.
+   /** @type {*} The stored setting value, possibly a Boolean or an unknown string. */
+   const storedCheckOptionsMode = game.settings.get('titan', 'getCheckOptions');
+
+   /** @type {string} The choice the stored value resolves to. */
+   const checkOptionsMode = resolveCheckOptionsMode(storedCheckOptionsMode);
+   if (checkOptionsMode !== storedCheckOptionsMode) {
+      game.settings.set('titan', 'getCheckOptions', checkOptionsMode);
+   }
 
    // Confirm Deleting Items.
    game.settings.register('titan', 'confirmDeletingItems', {

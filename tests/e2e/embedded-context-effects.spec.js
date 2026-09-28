@@ -112,7 +112,7 @@ test.describe('embedded-context effects family', () => {
          ]);
 
          // Default the gating settings off; the cases that need a gate flip it explicitly.
-         await game.settings.set('titan', 'getCheckOptions', false);
+         await game.settings.set('titan', 'getCheckOptions', 'never');
          await game.settings.set('titan', 'confirmDeletingEffects', false);
       }, {
          actorName: ACTOR_NAME,
@@ -135,7 +135,7 @@ test.describe('embedded-context effects family', () => {
    // attack-tags.spec.js).
    test.afterEach(async () => {
       await page.evaluate(async () => {
-         await game.settings.set('titan', 'getCheckOptions', false);
+         await game.settings.set('titan', 'getCheckOptions', 'never');
          await game.settings.set('titan', 'confirmDeletingEffects', false);
       });
    });
@@ -147,7 +147,7 @@ test.describe('embedded-context effects family', () => {
    // (true). Inner-scope after-hooks run before the file-level page close, so `page` is still open.
    test.afterAll(async () => {
       await page.evaluate(async () => {
-         await game.settings.set('titan', 'getCheckOptions', false);
+         await game.settings.set('titan', 'getCheckOptions', 'never');
          await game.settings.set('titan', 'confirmDeletingEffects', false);
       });
       await deleteFixtureActor(page, ACTOR_NAME);

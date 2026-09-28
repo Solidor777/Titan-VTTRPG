@@ -754,8 +754,11 @@
    },
    "SETTINGS": {
       "getCheckOptions": {
-         "label": "Ask for Check Options by Default",
-         "hint": "If true, an options dialog will pop up when rolling a Check. Hold Shift to toggle this setting."
+         "label": "Show the Check Options Dialog",
+         "hint": "When to show the options dialog before rolling a Check. Hold Shift to invert this; while Shift is held, a Check with situational modifiers still shows the dialog.",
+         "never": "Never",
+         "situational": "When Situational Modifiers Apply",
+         "always": "Always"
       },
       "confirmDeletingItems": {
          "label": "Confirm Deleting Items from Actors",

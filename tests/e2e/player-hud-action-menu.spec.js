@@ -13,7 +13,7 @@ import {
 let page;
 /** @type {string[]} Uncaught page errors collected during the current test (cleared each afterEach). */
 let errors;
-/** @type {boolean} The world's getCheckOptions value before this file forced direct rolls. */
+/** @type {string} The client's getCheckOptions choice before this file forced direct rolls. */
 let priorGetCheckOptions;
 /** @type {string[]} Fixture actor names created by this file, deleted in afterAll. */
 const fixtureNames = [];
@@ -38,7 +38,7 @@ test.beforeAll(async ({ browser }) => {
    // otherwise intercept the menu actions under test.
    priorGetCheckOptions = await page.evaluate(async () => {
       const prior = game.settings.get('titan', 'getCheckOptions');
-      await game.settings.set('titan', 'getCheckOptions', false);
+      await game.settings.set('titan', 'getCheckOptions', 'never');
       await game.settings.set('titan', 'confirmDeletingEffects', false);
       return prior;
    });

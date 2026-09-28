@@ -3,7 +3,7 @@ import { expect } from '@playwright/test';
 /**
  * Page-object helpers for driving the rendered Svelte check-option dialogs from Playwright.
  *
- * Each `request<Type>Check` opens its dialog when the `titan.getCheckOptions` setting is on (and no
+ * Each `request<Type>Check` opens its dialog when the `titan.getCheckOptions` setting is `always` (and no
  * modifier key inverts it — headless Playwright never holds one). Every dialog extends `TitanDialog`
  * (ApplicationV2) so its window root carries `.application.titan-dialog`; the per-type window is
  * identified by its element id prefix `titan-<type>-check-dialog-<actorId>...` (the actor id is
@@ -57,7 +57,7 @@ export async function openCheckDialog(page, type) {
 
    // Turn the dialog gate on, resolve the roller's owned-item ids, and fire the gated request.
    await page.evaluate(async (requestSrc) => {
-      await game.settings.set('titan', 'getCheckOptions', true);
+      await game.settings.set('titan', 'getCheckOptions', 'always');
       const actor = game.actors.getName('E2E Roller');
       const fixtures = {
          weaponId: actor.items.find((i) => i.type === 'weapon')?.id,

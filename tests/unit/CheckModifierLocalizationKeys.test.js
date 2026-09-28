@@ -25,3 +25,22 @@ describe('check-modifier localization keys', () => {
       expect(lang.LOCAL[key].length).toBeGreaterThan(0);
    });
 });
+
+/**
+ * The `SETTINGS.getCheckOptions` entries the setting's name, hint, and three choices render through.
+ * @type {string[]}
+ */
+const CHECK_OPTIONS_SETTING_KEYS = [
+   'label',
+   'hint',
+   'never',
+   'situational',
+   'always',
+];
+
+describe('check-options setting localization keys', () => {
+   it.each(CHECK_OPTIONS_SETTING_KEYS)('SETTINGS.getCheckOptions defines %s', (key) => {
+      expect(lang.SETTINGS.getCheckOptions[key]).toBeTypeOf('string');
+      expect(lang.SETTINGS.getCheckOptions[key].length).toBeGreaterThan(0);
+   });
+});

@@ -110,12 +110,12 @@ test.describe('shared AttackTags across surfaces', () => {
       });
    });
 
-   // Unconditionally restore the check-options dialog gate: a mid-test failure after the gate is enabled
-   // must not leak `getCheckOptions: true` into specs that rely on the default-off setting (house pattern
-   // per checks-dialog.spec.js).
+   // Unconditionally restore the check-options dialog gate: a mid-test failure after the gate is set to always
+   // must not leak `getCheckOptions: 'always'` into specs that rely on the no-dialog setting (house pattern per
+   // checks-dialog.spec.js).
    test.afterEach(async () => {
       await page.evaluate(async () => {
-         await game.settings.set('titan', 'getCheckOptions', false);
+         await game.settings.set('titan', 'getCheckOptions', 'never');
       });
    });
 
@@ -264,7 +264,7 @@ test.describe('shared AttackTags across surfaces', () => {
 
       // Enable the dialog gate, then click the roll button (the equipped attack header button).
       await page.evaluate(async () => {
-         await game.settings.set('titan', 'getCheckOptions', true);
+         await game.settings.set('titan', 'getCheckOptions', 'always');
       });
       await row.locator('.attack .header button').first().click();
 
