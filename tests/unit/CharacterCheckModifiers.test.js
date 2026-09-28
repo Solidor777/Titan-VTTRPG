@@ -4,6 +4,7 @@ import createAttributeCheckOptions from '~/check/types/attribute-check/Attribute
 import createCastingCheckOptions from '~/check/types/casting-check/CastingCheckOptions.js';
 import createItemCheckOptions from '~/check/types/item-check/ItemCheckOptions.js';
 import { installSchemaMocks, restoreSchemaMocks } from './helpers/schemaFingerprint.js';
+import camelize from '~/helpers/utility-functions/Camelize.js';
 
 // Check-modifier behavior of CharacterDataModel, exercised on a bare instance (Object.create over the prototype) whose
 // parent carries only a rules-elements cache and whose roll data is stubbed. The model is imported after the Foundry
@@ -225,5 +226,365 @@ describe('Advantage on item-based check parameters', () => {
       }));
       expect(parameters.baseDifficulty).toBe(4);
       expect(parameters.difficulty).toBe(2);
+   });
+});
+
+/**
+ * Builds a conditional check modifier element tagged with its source name, as `_applyRulesElements` passes it on.
+ * @param {object} overrides - Fields replacing the defaults (any check type, any selector, Dice +1).
+ * @returns {object} The element.
+ */
+function checkModifier(overrides) {
+   return {
+      checkType: 'any',
+      key: '',
+      modifierType: 'dice',
+      operation: 'conditionalCheckModifier',
+      selector: 'any',
+      skill: '',
+      sourceName: 'Source',
+      value: 1,
+      ...overrides,
+   };
+}
+
+/**
+ * Builds a model whose cache holds the given situational elements.
+ * @param {object[]} elements - The situational elements.
+ * @returns {object} The model instance.
+ */
+function situationalModel(elements) {
+   /** @type {object} The model under test. */
+   const model = createModel();
+   model._applySituationalCheckModifierElements(elements);
+   return model;
+}
+
+describe('conditional check modifier cache — Advantage and Automatic Failure', () => {
+   it('sums mixed Advantage levels per check type, selector, and key', () => {
+      /** @type {object} The model under test. */
+      const model = createModel();
+      model._applyConditionalCheckModifierElements([
+         checkModifier({
+            modifierType: 'advantage',
+            value: 2,
+         }),
+         checkModifier({
+            modifierType: 'advantage',
+            value: -1,
+         }),
+         checkModifier({
+            key: 'athletics',
+            modifierType: 'advantage',
+            selector: 'skill',
+            value: 1,
+         }),
+      ]);
+      expect(model.getAttributeCheckMod('advantage', 'body', 'athletics')).toBe(2);
+      expect(model.getAttributeCheckMod('advantage', 'body', 'dexterity')).toBe(1);
+   });
+
+   it('nets opposing sources to no Advantage and leaves the Difficulty unchanged', () => {
+      /** @type {object} The model under test. */
+      const model = createModel();
+      model._applyConditionalCheckModifierElements([
+         checkModifier({
+            modifierType: 'advantage',
+            value: 1,
+         }),
+         checkModifier({
+            modifierType: 'advantage',
+            value: -1,
+         }),
+      ]);
+      /** @type {object} The initialized Attribute Check options. */
+      const options = model.initializeAttributeCheckOptions({
+         attribute: 'body',
+         skill: 'athletics',
+      });
+      expect(options.advantage).toBe(0);
+      expect(model.getAttributeCheckParameters(options).difficulty).toBe(4);
+   });
+
+   it('counts an Automatic Failure element as 1 whatever its stored value', () => {
+      /** @type {object} The model under test. */
+      const model = createModel();
+      model._applyConditionalCheckModifierElements([
+         checkModifier({
+            modifierType: 'automaticFailure',
+            value: 0,
+         }),
+      ]);
+      expect(model.getAttributeCheckMod('automaticFailure', 'body', 'none')).toBe(1);
+   });
+
+   it('initializes Attribute Check options from the cache unless they are provided', () => {
+      /** @type {object} The model under test. */
+      const model = createModel();
+      model._applyConditionalCheckModifierElements([
+         checkModifier({
+            modifierType: 'advantage',
+            value: -1,
+         }),
+         checkModifier({
+            modifierType: 'automaticFailure',
+         }),
+      ]);
+      expect(model.initializeAttributeCheckOptions({
+         attribute: 'body',
+         skill: 'athletics',
+      })).toMatchObject({
+         advantage: -1,
+         automaticFailure: true,
+      });
+      expect(model.initializeAttributeCheckOptions({
+         advantage: 2,
+         attribute: 'body',
+         automaticFailure: false,
+         skill: 'athletics',
+      })).toMatchObject({
+         advantage: 2,
+         automaticFailure: false,
+      });
+   });
+});
+
+describe('situational check modifiers', () => {
+   it('offers a check its own type and any, filtered to the modifier types it reads', () => {
+      /** @type {object} The model under test. */
+      const model = situationalModel([
+         checkModifier({
+            key: 'Underwater',
+            selector: 'situation',
+            sourceName: 'Pool',
+            value: -1,
+         }),
+         checkModifier({
+            checkType: 'casting',
+            key: 'Chanting',
+            selector: 'situation',
+         }),
+         checkModifier({
+            key: 'Charging',
+            modifierType: 'damage',
+            selector: 'situation',
+         }),
+         checkModifier({
+            checkType: 'resistance',
+            key: 'Braced',
+            modifierType: 'advantage',
+            selector: 'situation',
+         }),
+      ]);
+      /**
+       * Lists the offered keys for a check type.
+       * @param {string} checkType - The check type.
+       * @returns {string[]} The offered situation keys.
+       */
+      const keysFor = (checkType) => model.getSituationalCheckModifiers(checkType, { skill: 'athletics' })
+         .map((modifier) => modifier.key);
+      expect(keysFor('attribute')).toEqual(['underwater']);
+      expect(keysFor('casting')).toEqual([
+         'underwater',
+         'chanting',
+         'charging',
+      ]);
+      expect(keysFor('resistance')).toEqual([
+         'underwater',
+         'braced',
+      ]);
+      expect(model.getSituationalCheckModifiers('attribute', { skill: 'athletics' })[0]).toEqual({
+         key: 'underwater',
+         label: 'Underwater',
+         modifierType: 'dice',
+         sources: ['Pool'],
+         value: -1,
+      });
+   });
+
+   it('offers an element narrowed to a Skill only on checks using that Skill', () => {
+      /** @type {object} The model under test. */
+      const model = situationalModel([
+         checkModifier({
+            key: 'Jump',
+            modifierType: 'automaticFailure',
+            selector: 'situation',
+            skill: 'athletics',
+         }),
+      ]);
+      expect(model.getSituationalCheckModifiers('attribute', { skill: 'athletics' })).toHaveLength(1);
+      expect(model.getSituationalCheckModifiers('attribute', { skill: 'dexterity' })).toHaveLength(0);
+      expect(model.getSituationalCheckModifiers('resistance')).toHaveLength(0);
+   });
+
+   it('sums one key and modifier type across sources and lists every source once', () => {
+      /** @type {string} A situation label shared by several sources. */
+      const label = 'Swim, Fly, or Climb';
+      /** @type {object} The model under test. */
+      const model = situationalModel([
+         checkModifier({
+            key: label,
+            modifierType: 'advantage',
+            selector: 'situation',
+            sourceName: 'Plate',
+            value: -2,
+         }),
+         checkModifier({
+            key: label,
+            modifierType: 'advantage',
+            selector: 'situation',
+            sourceName: 'Plate',
+            value: -1,
+         }),
+         checkModifier({
+            key: label,
+            modifierType: 'advantage',
+            selector: 'situation',
+            sourceName: 'Cloak',
+            value: -1,
+         }),
+      ]);
+      expect(model.getSituationalCheckModifiers('attribute', { skill: 'athletics' })).toEqual([
+         {
+            key: camelize(label),
+            label,
+            modifierType: 'advantage',
+            sources: [
+               'Plate',
+               'Cloak',
+            ],
+            value: -4,
+         },
+      ]);
+   });
+
+   it('adds ticked situations on top of the options without double counting', () => {
+      /** @type {object} The model under test. */
+      const model = situationalModel([
+         checkModifier({
+            key: 'Underwater',
+            selector: 'situation',
+            value: -1,
+         }),
+         checkModifier({
+            key: 'Underwater',
+            modifierType: 'advantage',
+            selector: 'situation',
+            value: -1,
+         }),
+      ]);
+      /** @type {object} Options with the situation ticked. */
+      const options = createAttributeCheckOptions({
+         attribute: 'body',
+         situations: ['underwater'],
+         skill: 'athletics',
+      });
+      /** @type {object} The parameters with the situation ticked. */
+      const ticked = model.getAttributeCheckParameters(options);
+      /** @type {object} The parameters after unticking it. */
+      const unticked = model.getAttributeCheckParameters({
+         ...options,
+         situations: [],
+      });
+      /** @type {object} The parameters after ticking it again. */
+      const reticked = model.getAttributeCheckParameters(options);
+
+      expect(options.diceMod).toBe(0);
+      expect(options.advantage).toBe(0);
+      expect(ticked).toMatchObject({
+         advantage: -1,
+         diceMod: -1,
+         difficulty: 5,
+         situations: [
+            {
+               key: 'underwater',
+               label: 'Underwater',
+            },
+         ],
+         totalDice: 3,
+      });
+      expect(unticked).toMatchObject({
+         advantage: 0,
+         diceMod: 0,
+         difficulty: 4,
+         situations: [],
+         totalDice: 4,
+      });
+      expect(reticked).toEqual(ticked);
+   });
+
+   it('ignores a ticked situation that no longer applies to the check\'s Skill', () => {
+      /** @type {object} The model under test. */
+      const model = situationalModel([
+         checkModifier({
+            key: 'Jump',
+            modifierType: 'automaticFailure',
+            selector: 'situation',
+            skill: 'athletics',
+         }),
+      ]);
+      /** @type {object} Dexterity-check parameters with the Athletics-only situation ticked. */
+      const parameters = model.getAttributeCheckParameters(createAttributeCheckOptions({
+         attribute: 'body',
+         situations: ['jump'],
+         skill: 'dexterity',
+      }));
+      expect(parameters.automaticFailure).toBe(false);
+      expect(parameters.situations).toEqual([]);
+   });
+
+   it('offers nothing when the actor has no rules elements', () => {
+      expect(createModel(false).getSituationalCheckModifiers('attribute', { skill: 'athletics' })).toEqual([]);
+   });
+
+   it('applies an attack-type situational element through getAttackCheckParameters, excluded from Attribute', () => {
+      /** @type {object} A weapon with one plain attack. */
+      const weaponRollData = {
+         attack: [
+            {
+               customTrait: [],
+               damage: 1,
+               label: 'x',
+               trait: [],
+            },
+         ],
+         attackNotes: '',
+         customTrait: [],
+         img: '',
+         name: 'W',
+      };
+
+      /** @type {object} The model under test, carrying both the weapon and the situational cache. */
+      const model = createItemModel(weaponRollData);
+      model._applySituationalCheckModifierElements([
+         checkModifier({
+            checkType: 'attack',
+            key: 'Flanking',
+            modifierType: 'advantage',
+            selector: 'situation',
+            value: 1,
+         }),
+      ]);
+
+      // Not offered to an Attribute Check: the element's checkType is 'attack', not 'any'.
+      expect(model.getSituationalCheckModifiers('attribute', { skill: 'athletics' })).toEqual([]);
+
+      /** @type {object} The derived Attack Check parameters with the situation ticked. */
+      const parameters = model.getAttackCheckParameters(createAttackCheckOptions({
+         attackerMelee: 0,
+         attribute: 'body',
+         itemId: 'w',
+         situations: ['flanking'],
+         skill: 'athletics',
+         targetDefense: 5,
+         type: 'melee',
+      }));
+      expect(parameters.advantage).toBe(1);
+      expect(parameters.situations).toEqual([
+         {
+            key: 'flanking',
+            label: 'Flanking',
+         },
+      ]);
    });
 });

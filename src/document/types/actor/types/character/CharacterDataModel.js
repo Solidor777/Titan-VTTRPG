@@ -18,7 +18,9 @@ import appendUnique from '~/helpers/utility-functions/AppendUnique.js';
 import appendUniqueByFunctionValue from '~/helpers/utility-functions/AppendUniqueByFunctionValue.js';
 import camelize from '~/helpers/utility-functions/Camelize.js';
 import {
+   CHECK_TYPE_MODIFIER_TYPES,
    CONDITIONAL_CHECK_MODIFIER_TYPES,
+   MODIFIER_TYPE_PARAMETER_KEYS,
    USER_KEYED_CHECK_MODIFIER_SELECTORS,
 } from '~/system/ConditionalCheckModifierTypes.js';
 import clamp from '~/helpers/utility-functions/Clamp.js';
@@ -254,6 +256,16 @@ import assert from '~/helpers/utility-functions/Assert.js';
  * @property {string} [description] - The description of the Effect item, if appropriate.
  * @property {number} remaining - The remaining turns for the Effect item.
  * @property {string} custom - Custom duration of the Effect item.
+ */
+
+/**
+ * A situational check modifier a check offers in its dialog.
+ * @typedef {object} SituationalCheckModifier
+ * @property {string} key - The camel-case situation key, as `options.situations` stores it.
+ * @property {string} label - The situation's display label, as its first source typed it.
+ * @property {string} modifierType - One of CONDITIONAL_CHECK_MODIFIER_TYPES.
+ * @property {number} value - The summed value of every source sharing this key and modifier type.
+ * @property {string[]} sources - The names of the items and effects the modifier comes from.
  */
 
 /**
@@ -619,15 +631,20 @@ export default class CharacterDataModel extends TitanActorDataModel {
       const rulesElements = [];
 
       /**
-       * Copies a source array of Rules Elements into the shared Rules Elements array, tagging each with the
-       * provided category type. Shared by the owned-item pass and the effect Active Effect pass.
+       * Copies a source array of Rules Elements into the shared Rules Elements array, tagging each with the provided
+       * category type and the name of the item or effect that owns it (situational modifiers list their sources).
+       * Shared by the owned-item pass and the Active Effect passes.
        * @param {object[]} sourceElements - The source Rules Elements array to copy from.
-       * @param {string} type - The type by which to categorize the Rules Elements (ability, equipment, or effect).
+       * @param {string} type - The type by which to categorize the Rules Elements (ability, equipment, effect, or
+       * condition).
+       * @param {string} sourceName - The name of the owning item or effect.
        */
-      function processElements(sourceElements, type) {
+      function processElements(sourceElements, type, sourceName) {
+         /** @type {object[]} Copies of the source elements, safe to tag. */
          const copiedElements = structuredClone(sourceElements);
          for (const element of copiedElements) {
             element.type = type;
+            element.sourceName = sourceName;
          }
          rulesElements.push(...copiedElements);
       }
@@ -639,7 +656,7 @@ export default class CharacterDataModel extends TitanActorDataModel {
        * effect).
        */
       function processItemElements(item, type) {
-         processElements(item.system.rulesElement, type);
+         processElements(item.system.rulesElement, type, item.name);
       }
 
       this.parent.items.forEach((item) => {
@@ -688,7 +705,7 @@ export default class CharacterDataModel extends TitanActorDataModel {
             effect.system.rulesElement &&
             effect.system.rulesElement.length > 0
          ) {
-            processElements(effect.system.rulesElement, 'effect');
+            processElements(effect.system.rulesElement, 'effect', effect.name);
          }
       });
 
@@ -701,7 +718,7 @@ export default class CharacterDataModel extends TitanActorDataModel {
             effect.system.rulesElement &&
             effect.system.rulesElement.length > 0
          ) {
-            processElements(effect.system.rulesElement, 'condition');
+            processElements(effect.system.rulesElement, 'condition', effect.name);
          }
       });
 
@@ -732,6 +749,8 @@ export default class CharacterDataModel extends TitanActorDataModel {
          const conditionalRatingModifierElements = [];
          /** @type {*[]} */
          const conditionalCheckModifierElements = [];
+         /** @type {object[]} Situational (`situation`-selector) conditional check modifiers, cached apart. */
+         const situationalCheckModifierElements = [];
          allElements.forEach((element) => {
             switch (element.operation) {
                case 'mulBase': {
@@ -771,7 +790,13 @@ export default class CharacterDataModel extends TitanActorDataModel {
                   break;
                }
                case 'conditionalCheckModifier': {
-                  conditionalCheckModifierElements.push(element);
+                  // Situational modifiers never apply automatically, so they are cached apart from the summed ones.
+                  if (element.selector === 'situation') {
+                     situationalCheckModifierElements.push(element);
+                  }
+                  else {
+                     conditionalCheckModifierElements.push(element);
+                  }
                   break;
                }
                default: {
@@ -794,6 +819,7 @@ export default class CharacterDataModel extends TitanActorDataModel {
          this._applyRollMessageElements(rollMessageElements);
          this._applyConditionalRatingModifierElements(conditionalRatingModifierElements);
          this._applyConditionalCheckModifierElements(conditionalCheckModifierElements);
+         this._applySituationalCheckModifierElements(situationalCheckModifierElements);
       }
 
       // Otherwise, set the Rules Elements cache to null.
@@ -1438,7 +1464,7 @@ export default class CharacterDataModel extends TitanActorDataModel {
                      case 'multiAttack': {
                         checkTypeMap[selector] = 0;
                         for (const element of selectorElements) {
-                           checkTypeMap[selector] += element.value;
+                           checkTypeMap[selector] += this._getConditionalCheckModifierValue(element);
                         }
                         break;
                      }
@@ -1470,7 +1496,7 @@ export default class CharacterDataModel extends TitanActorDataModel {
                               for (const element of keyElements) {
 
                                  // Add to the key value.
-                                 selectorMap[key] += element.value;
+                                 selectorMap[key] += this._getConditionalCheckModifierValue(element);
                               }
                            }
                         }
@@ -1487,6 +1513,43 @@ export default class CharacterDataModel extends TitanActorDataModel {
       }
 
       this.rulesElementsCache.conditionalCheckModifier = false;
+   }
+
+   /**
+    * Gets the value a Conditional Check Modifier element contributes to a cache. An Automatic Failure element counts
+    * as 1 whatever its stored value, so any matching element makes a lookup positive.
+    * @param {ConditionalCheckModifierElement} element - The element.
+    * @returns {number} The element's contribution.
+    * @private
+    */
+   _getConditionalCheckModifierValue(element) {
+      return element.modifierType === 'automaticFailure' ? 1 : element.value;
+   }
+
+   /**
+    * Caches the situational (`situation`-selector) Conditional Check Modifier Rules Elements apart from the summed
+    * modifiers, because they never apply automatically. Each cached entry is `{ checkType, key, label, modifierType,
+    * skill, source, value }`: `key` is the camel-case form of the typed `label`, `skill` narrows the entry to checks
+    * using one Skill (`''` = any; an element without a `skill` field is cached as `''`), and `source` names the owning
+    * item or effect.
+    * @param {ConditionalCheckModifierElement[]} elements - The situational elements, each tagged with its `sourceName`.
+    * @private
+    */
+   _applySituationalCheckModifierElements(elements) {
+      if (elements.length > 0) {
+         this.rulesElementsCache.situationalCheckModifier = elements.map((element) => ({
+            checkType: element.checkType,
+            key: this._normalizeConditionalCheckModKey('situation', element.key),
+            label: element.key,
+            modifierType: element.modifierType,
+            skill: element.skill ?? '',
+            source: element.sourceName,
+            value: this._getConditionalCheckModifierValue(element),
+         }));
+         return;
+      }
+
+      this.rulesElementsCache.situationalCheckModifier = false;
    }
 
    /**
@@ -1825,6 +1888,17 @@ export default class CharacterDataModel extends TitanActorDataModel {
             this.getAttributeCheckMod('training', checkOptions.attribute, checkOptions.skill);
       }
 
+      // Advantage.
+      if (options.advantage === undefined) {
+         checkOptions.advantage = this.getAttributeCheckMod('advantage', checkOptions.attribute, checkOptions.skill);
+      }
+
+      // Automatic failure.
+      if (options.automaticFailure === undefined) {
+         checkOptions.automaticFailure =
+            this.getAttributeCheckMod('automaticFailure', checkOptions.attribute, checkOptions.skill) > 0;
+      }
+
       return checkOptions;
    }
 
@@ -1836,19 +1910,16 @@ export default class CharacterDataModel extends TitanActorDataModel {
     * @returns {number} The modifier to apply to this aspect of the check.
     */
    getAttributeCheckMod(modifierType, attribute, skill) {
-      // Contaminated creatures have -1 to all dice rolls.
-      /** @type {number} */
+      /** @type {number} The summed modifier. */
       let retVal = 0;
 
       // Check for conditional modifiers for this check type.
+      /** @type {object|undefined} The cached modifiers of this type, keyed by check type. */
       const checkMods = this._getConditionalCheckModsForType(modifierType);
       if (checkMods) {
 
-         // If mods for Attribute Checks exist.
-         // There are currently no conditional Resistance Check modifier.
-         // elements,.
-         // So all conditional check elements are Attribute Checks by default.
-         // Those, all simple Attribute Check modifiers are stored under 'any'.
+         // The editor has no Attribute Check type, so Attribute Checks read only `any`-check-type modifiers.
+         /** @type {object|undefined} The `any`-check-type modifiers, keyed by selector. */
          const anyCheckMods = checkMods.any;
          if (anyCheckMods) {
 
@@ -1875,6 +1946,9 @@ export default class CharacterDataModel extends TitanActorDataModel {
    getAttributeCheckParameters(options) {
       // Initialize check parameters.
       const parameters = createAttributeCheckParameters(options);
+
+      // Add the situations the options name (the dialog's ticks) before any total is derived.
+      this._applySituationalModifiers(parameters, 'attribute', options.situations);
 
       // Initialize common attribute based check parameters.
       const actorRollData = this.getRollData();
@@ -2406,6 +2480,32 @@ export default class CharacterDataModel extends TitanActorDataModel {
          );
       }
 
+      // Advantage.
+      if (options.advantage === undefined) {
+         checkOptions.advantage = this.getAttackCheckMod(
+            'advantage',
+            checkOptions.attribute,
+            checkOptions.skill,
+            checkOptions.multiAttack,
+            checkOptions.type,
+            attackTraits,
+            customTraits,
+         );
+      }
+
+      // Automatic failure.
+      if (options.automaticFailure === undefined) {
+         checkOptions.automaticFailure = this.getAttackCheckMod(
+            'automaticFailure',
+            checkOptions.attribute,
+            checkOptions.skill,
+            checkOptions.multiAttack,
+            checkOptions.type,
+            attackTraits,
+            customTraits,
+         ) > 0;
+      }
+
       // Melee.
       if (options.attackerMelee === undefined) {
          checkOptions.attackerMelee = this.rating.melee.value + this._getAttackRatingMod(
@@ -2615,6 +2715,9 @@ export default class CharacterDataModel extends TitanActorDataModel {
    getAttackCheckParameters(options) {
       // Initialize check parameters.
       const parameters = createAttackCheckParameters(options);
+
+      // Add the situations the options name (the dialog's ticks) before any total is derived.
+      this._applySituationalModifiers(parameters, 'attack', options.situations);
 
       // Initialize common attribute based check parameters.
       const actorRollData = this.getRollData();
@@ -2951,6 +3054,28 @@ export default class CharacterDataModel extends TitanActorDataModel {
          );
       }
 
+      // Advantage.
+      if (options.advantage === undefined) {
+         checkOptions.advantage = this.getCastingCheckMod(
+            'advantage',
+            checkOptions.attribute,
+            checkOptions.skill,
+            itemRollData.tradition,
+            customTraits,
+         );
+      }
+
+      // Automatic failure.
+      if (options.automaticFailure === undefined) {
+         checkOptions.automaticFailure = this.getCastingCheckMod(
+            'automaticFailure',
+            checkOptions.attribute,
+            checkOptions.skill,
+            itemRollData.tradition,
+            customTraits,
+         ) > 0;
+      }
+
       return checkOptions;
    }
 
@@ -3046,6 +3171,9 @@ export default class CharacterDataModel extends TitanActorDataModel {
    getCastingCheckParameters(options) {
       // Initialize check parameters.
       const parameters = createCastingCheckParameters(options);
+
+      // Add the situations the options name (the dialog's ticks) before any total is derived.
+      this._applySituationalModifiers(parameters, 'casting', options.situations);
 
       // Initialize common attribute based check parameters.
       const actorRollData = this.getRollData();
@@ -3401,6 +3529,26 @@ export default class CharacterDataModel extends TitanActorDataModel {
          );
       }
 
+      // Advantage.
+      if (options.advantage === undefined) {
+         checkOptions.advantage = this.getItemCheckMod(
+            'advantage',
+            checkOptions.attribute,
+            checkOptions.skill,
+            customTraits,
+         );
+      }
+
+      // Automatic failure.
+      if (options.automaticFailure === undefined) {
+         checkOptions.automaticFailure = this.getItemCheckMod(
+            'automaticFailure',
+            checkOptions.attribute,
+            checkOptions.skill,
+            customTraits,
+         ) > 0;
+      }
+
       return checkOptions;
    }
 
@@ -3488,6 +3636,9 @@ export default class CharacterDataModel extends TitanActorDataModel {
    getItemCheckParameters(options) {
       // Initialize check parameters.
       const parameters = createItemCheckParameters(options);
+
+      // Add the situations the options name (the dialog's ticks) before any total is derived.
+      this._applySituationalModifiers(parameters, 'item', options.situations);
 
       // Initialize common attribute based check parameters.
       const actorRollData = this.getRollData();
@@ -3665,6 +3816,97 @@ export default class CharacterDataModel extends TitanActorDataModel {
          return undefined;
       }
       return this.rulesElementsCache?.conditionalCheckModifier?.[modifierType];
+   }
+
+   /**
+    * Gets the situational check modifiers a check offers in its dialog: those of the check's own type and of `any`,
+    * whose modifier type the check reads (CHECK_TYPE_MODIFIER_TYPES), and, for an element narrowed to a Skill, only
+    * when the check uses that Skill. Elements sharing a key and a modifier type sum into one entry.
+    * @param {string} checkType - The check type: attribute, resistance, attack, casting, or item.
+    * @param {object} [options] - Options for the lookup.
+    * @param {string} [options.skill] - The Skill the check uses, if any.
+    * @returns {SituationalCheckModifier[]} The applicable entries, in the order their sources were gathered.
+    */
+   getSituationalCheckModifiers(checkType, { skill } = {}) {
+      /** @type {object[]|boolean|undefined} The cached situational elements, if any. */
+      const elements = this.rulesElementsCache?.situationalCheckModifier;
+      if (!elements) {
+         return [];
+      }
+
+      /** @type {readonly string[]} The modifier types this check type reads. */
+      const modifierTypes = CHECK_TYPE_MODIFIER_TYPES[checkType];
+
+      /** @type {Map<string, SituationalCheckModifier>} The entries keyed by situation key and modifier type. */
+      const entries = new Map();
+      for (const element of elements) {
+         // Skip elements for another check type, a modifier type this check does not read, or another Skill.
+         if (
+            (element.checkType !== 'any' && element.checkType !== checkType) ||
+            !modifierTypes.includes(element.modifierType) ||
+            (element.skill !== '' && element.skill !== skill)
+         ) {
+            continue;
+         }
+
+         /** @type {string} The entry identity: one entry per situation key and modifier type. */
+         const entryId = `${element.key}.${element.modifierType}`;
+
+         /** @type {SituationalCheckModifier|undefined} The entry already started for this identity, if any. */
+         const entry = entries.get(entryId);
+         if (entry) {
+            entry.value += element.value;
+            pushUnique(entry.sources, element.source);
+         }
+         else {
+            entries.set(entryId, {
+               key: element.key,
+               label: element.label,
+               modifierType: element.modifierType,
+               sources: [element.source],
+               value: element.value,
+            });
+         }
+      }
+
+      return [...entries.values()];
+   }
+
+   /**
+    * Adds the situational modifiers named in `options.situations` to a check's parameters and records them for the
+    * chat card. The keys come from the dialog's ticks or from a caller that names them; nothing applies
+    * automatically. Options hold only the always-on values, so recomputing the parameters after a tick or untick
+    * never double-counts. A named key that no longer applies (the dialog's Skill changed) is ignored.
+    * @param {CheckParameters} parameters - The check parameters, before any total is derived. Modified in place.
+    * @param {string} checkType - The check type: attribute, resistance, attack, casting, or item.
+    * @param {string[]} situations - The camel-case keys of the situations to apply.
+    * @private
+    */
+   _applySituationalModifiers(parameters, checkType, situations) {
+      /** @type {Map<string, SituationLabel>} The applied situations keyed by situation key, in first-applied order. */
+      const applied = new Map();
+      for (const modifier of this.getSituationalCheckModifiers(checkType, { skill: parameters.skill })) {
+         if (!situations.includes(modifier.key)) {
+            continue;
+         }
+
+         // Automatic Failure is a flag; every other type adds to its parameter.
+         if (modifier.modifierType === 'automaticFailure') {
+            parameters.automaticFailure = true;
+         }
+         else {
+            parameters[MODIFIER_TYPE_PARAMETER_KEYS[modifier.modifierType]] += modifier.value;
+         }
+
+         if (!applied.has(modifier.key)) {
+            applied.set(modifier.key, {
+               key: modifier.key,
+               label: modifier.label,
+            });
+         }
+      }
+
+      parameters.situations = [...applied.values()];
    }
 
    /**

@@ -351,3 +351,60 @@ test.describe('Advantage and Automatic Failure in check options', () => {
       await expect(card).toContainText('4:1');
    });
 });
+
+test.describe('Advantage and Automatic Failure from conditional modifiers', () => {
+   test('an effect with Disadvantage raises a rolled check\'s Difficulty', async () => {
+      await seedEffect(page, [
+         checkModifierElement({
+            modifierType: 'advantage',
+            value: -1,
+         }),
+      ]);
+      /** @type {{id: string, parameters: object, results: object}} The rolled check's message. */
+      const message = await rollAttributeCheck(page, { attribute: 'body' });
+      expect(message.parameters).toMatchObject({
+         advantage: -1,
+         baseDifficulty: 4,
+         difficulty: 5,
+      });
+   });
+
+   test('opposing Advantage sources cancel', async () => {
+      await seedEffect(page, [
+         checkModifierElement({
+            modifierType: 'advantage',
+            value: 1,
+         }),
+         checkModifierElement({
+            modifierType: 'advantage',
+            value: -1,
+         }),
+      ]);
+      /** @type {{id: string, parameters: object, results: object}} The rolled check's message. */
+      const message = await rollAttributeCheck(page, { attribute: 'body' });
+      expect(message.parameters).toMatchObject({
+         advantage: 0,
+         baseDifficulty: 4,
+         difficulty: 4,
+      });
+   });
+
+   test('an effect with Automatic Failure fails a rolled check', async () => {
+      await seedEffect(page, [
+         checkModifierElement({
+            modifierType: 'automaticFailure',
+         }),
+      ]);
+      await forceDice(page, [6]);
+      /** @type {{id: string, parameters: object, results: object}} The rolled check's message. */
+      const message = await rollAttributeCheck(page, {
+         attribute: 'body',
+         complexity: 1,
+      });
+      expect(message.parameters.automaticFailure).toBe(true);
+      expect(message.results).toMatchObject({
+         successes: 0,
+         succeeded: false,
+      });
+   });
+});

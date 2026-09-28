@@ -2,6 +2,7 @@ import { describe, it, expect } from 'vitest';
 import createMulSumElement from '~/document/types/item/rules-element/MulSum.js';
 import createSetSumElement from '~/document/types/item/rules-element/SetSum.js';
 import createMulBaseElement from '~/document/types/item/rules-element/MulBase.js';
+import createConditionalCheckModifierElement from '~/document/types/item/rules-element/ConditionalCheckModifier.js';
 
 describe('rules-element factory defaults', () => {
    it('createMulSumElement returns the mulSum defaults with a uuid', () => {
@@ -46,5 +47,15 @@ describe('rules-element factory defaults', () => {
       expect(createMulSumElement({ uuid: 'fixed-uuid' }).uuid).toBe('fixed-uuid');
       expect(createSetSumElement({ uuid: 'fixed-uuid' }).uuid).toBe('fixed-uuid');
       expect(createMulBaseElement({ uuid: 'fixed-uuid' }).uuid).toBe('fixed-uuid');
+   });
+
+   it('createConditionalCheckModifierElement narrows to no Skill by default', () => {
+      expect(createConditionalCheckModifierElement()).toMatchObject({
+         checkType: 'any',
+         modifierType: 'damage',
+         operation: 'conditionalCheckModifier',
+         selector: 'any',
+         skill: '',
+      });
    });
 });

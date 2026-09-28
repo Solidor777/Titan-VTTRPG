@@ -4,9 +4,13 @@ import generateUUID from '~/helpers/utility-functions/GenerateUUID.js';
  * A Rules Element for conditionally modifying a Check made by a Character.
  * @typedef {object} ConditionalCheckModifierElement
  * @property {string} operation - The operation to be performed by the Rules Element (conditionalCheckModifier).
- * @property {string} modifierType - The part of the check to modify (damage, bonus dice, etc.).
- * @property {string} selector - The type of condition for modifying the rating (any, attribute, trait, etc.).
- * @property {string} key - The specific result of the condition for modifying the check (body, melee, etc.).
+ * @property {string} modifierType - The part of the check to modify (damage, dice, advantage, etc.).
+ * @property {string} checkType - The type of check modified (any, attack, casting, item, or resistance).
+ * @property {string} selector - The condition for modifying the check (any, attribute, trait, situation, etc.).
+ * @property {string} key - The specific result of the condition for modifying the check (body, melee, a situation
+ * label, etc.).
+ * @property {string} skill - For the `situation` selector, the one Skill whose checks offer the modifier ('' = any).
+ * @property {number} value - The modifier's amount; for `advantage` its level (±1, ±2); unused by `automaticFailure`.
  * @property {string} uuid - Unique identifier for the Rules Element, used to track the element across type changes.
  */
 
@@ -22,6 +26,7 @@ export default function createConditionalCheckModifierElement(options) {
       checkType: 'any',
       selector: 'any',
       key: '',
+      skill: '',
       value: 1,
       uuid: options?.uuid ?? generateUUID(),
    };
