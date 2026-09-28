@@ -3,7 +3,10 @@ import { get, writable } from 'svelte/store';
 import rebuildCheckOptions, {
    CHECK_OPTIONS_METHODS,
    createCheckOptionSetter,
+   freezeCheckOptions,
 } from '~/check/dialog/ReinitializeCheckOptions.js';
+import createCastingCheckOptions from '~/check/types/casting-check/CastingCheckOptions.js';
+import createItemCheckOptions from '~/check/types/item-check/ItemCheckOptions.js';
 import { installSchemaMocks, restoreSchemaMocks } from '../helpers/schemaFingerprint.js';
 
 // The rebuild runs the real `initialize<Type>CheckOptions` and `validate<Type>CheckOptions` of a bare
@@ -141,14 +144,28 @@ function createItem(rollData) {
 }
 
 /**
- * Builds a bare Character whose parent holds an empty rules-elements cache and the given owned items.
+ * Builds a bare Character whose parent holds an empty rules-elements cache, the given owned items, and the given
+ * effects, which its `allApplicableEffects` yields as Foundry's Actor does.
  * @param {Record<string, object>} [items] - The owned items keyed by id.
+ * @param {Record<string, object>} [effects] - The applicable effects keyed by id.
  * @returns {object} The model instance.
  */
-function createCharacter(items = {}) {
+function createCharacter(items = {}, effects = {}) {
    /** @type {object} The bare model. */
    const model = Object.create(CharacterDataModel.prototype);
    model.parent = {
+      /**
+       * Yields every effect that applies to the Actor.
+       * @returns {Generator<object, void, void>} A generator over `effects`, each stamped with its map key as `id`.
+       * @yields {object} An applicable effect.
+       */
+      *allApplicableEffects() {
+         for (const [id, effect] of model.parent.effects) {
+            effect.id = id;
+            yield effect;
+         }
+      },
+      effects: new Map(Object.entries(effects)),
       isOwner: true,
       items: new Map(Object.entries(items)),
       name: 'Rebuild Test Character',
@@ -362,7 +379,7 @@ describe('rebuildCheckOptions — keeps user edits and caller values, re-derives
       });
    });
 
-   it('Casting: follows the owned spell (falsy tests, \'default\' sentinel) and a conditional rules element, ' +
+   it('Casting: follows the owned spell (=== undefined tests, \'default\' sentinel) and a conditional rules element, ' +
       'keeping the user\'s Complexity', () => {
       /** @type {object} The owned spell. */
       const spell = createItem({
@@ -416,7 +433,7 @@ describe('rebuildCheckOptions — keeps user edits and caller values, re-derives
       });
    });
 
-   it('Item: follows the owned item\'s check data (falsy test, \'default\' sentinel, roll data), keeping the ' +
+   it('Item: follows the owned item\'s check data (=== undefined test, \'default\' sentinel, roll data), keeping the ' +
       'caller\'s Difficulty and the user\'s Double Training', () => {
       /** @type {object} The owned item. */
       const item = createItem({
@@ -587,6 +604,66 @@ describe('rebuildCheckOptions — no-op, lost sources, and vanished checks', () 
       expect(system.validateItemCheckOptions(currentOptions, false)).toBe(false);
    });
 
+   it('follows an effect-sourced Item Check\'s live effect, and invalidates it once the effect is gone', () => {
+      /** @type {object} The Actor's effect carrying a check. */
+      const effect = createItem({
+         check: [
+            {
+               attribute: 'body',
+               complexity: 1,
+               difficulty: 4,
+               skill: 'arcana',
+            },
+         ],
+         customTrait: [],
+      });
+
+      /** @type {object} The Character rolling the check. */
+      const system = createCharacter({}, { e: effect });
+
+      /** @type {object} The raw request options: the effect's first check. */
+      const callerOptions = {
+         checkIdx: 0,
+         effectId: 'e',
+      };
+
+      /** @type {object} The options the dialog opened with. */
+      const currentOptions = system.initializeItemCheckOptions(callerOptions);
+      expect(currentOptions.difficulty).toBe(4);
+
+      // The effect's check Difficulty is edited while the dialog is open.
+      effect.rollData = {
+         ...effect.rollData,
+         check: [
+            {
+               ...effect.rollData.check[0],
+               difficulty: 6,
+            },
+         ],
+      };
+
+      /** @type {object} The rebuilt options. */
+      const rebuilt = rebuildCheckOptions({
+         callerOptions,
+         checkType: 'item',
+         currentOptions,
+         system,
+         userEdits: {},
+      });
+      expect(rebuilt.difficulty).toBe(6);
+
+      system.parent.effects.delete('e');
+      expect(rebuildCheckOptions({
+         callerOptions,
+         checkType: 'item',
+         currentOptions: rebuilt,
+         system,
+         userEdits: {},
+      })).toBeUndefined();
+      expect(system.validateItemCheckOptions(rebuilt, false)).toBe(false);
+      expect(globalThis.game.titan.error).not.toHaveBeenCalled();
+   });
+
    it('reads an Item Check\'s roll data from the owned item its item ID names', () => {
       /** @type {object} The owned item. */
       const item = createItem({
@@ -662,11 +739,40 @@ describe('Casting and Item Complexity and Difficulty', () => {
       });
    });
 
-   it('Item: keeps an explicit Difficulty of 0 rather than replacing it with the check data', () => {
-      expect(createCaster().initializeItemCheckOptions({
+   it.each([
+      [
+         'Casting',
+         'initializeCastingCheckOptions',
+         's',
+      ],
+      [
+         'Item',
+         'initializeItemCheckOptions',
+         'i',
+      ],
+   ])('%s: keeps an explicit Difficulty of 0 rather than replacing it with the check data', (_type, method,
+      itemId) => {
+      expect(createCaster()[method]({
          difficulty: 0,
-         itemId: 'i',
+         itemId,
       }).difficulty).toBe(0);
+   });
+
+   it.each([
+      [
+         'Casting',
+         createCastingCheckOptions,
+      ],
+      [
+         'Item',
+         createItemCheckOptions,
+      ],
+   ])('%s: the options factory leaves an unsupplied Complexity and Difficulty undefined', (_type, create) => {
+      expect(create({})).toMatchObject({
+         complexity: undefined,
+         difficulty: undefined,
+      });
+      expect(Object.hasOwn(create({}), 'complexity')).toBe(true);
    });
 });
 
@@ -847,6 +953,59 @@ describe('createCheckOptionSetter', () => {
          advantage: -1,
          skill: 'arcana',
       });
+   });
+});
+
+describe('freezeCheckOptions', () => {
+   it('copies and freezes plain objects and arrays at every depth, keeping other objects by reference', () => {
+      /** @type {object} A non-plain object standing in for a caller's data model. */
+      const model = new (class {
+         /** @type {number} A field the model owns. */
+         value = 1;
+      })();
+
+      /** @type {object} Check Options with nested plain data and a data model. */
+      const options = {
+         itemRollData: {
+            check: [{ difficulty: 4 }],
+         },
+         model,
+         situations: ['underwater'],
+         skill: 'arcana',
+      };
+
+      /** @type {object} The frozen copy. */
+      const frozen = freezeCheckOptions(options);
+      expect(frozen).toEqual(options);
+      expect(frozen).not.toBe(options);
+      expect(Object.isFrozen(frozen)).toBe(true);
+      expect(Object.isFrozen(frozen.situations)).toBe(true);
+      expect(Object.isFrozen(frozen.itemRollData.check[0])).toBe(true);
+      expect(frozen.model).toBe(model);
+      expect(Object.isFrozen(model)).toBe(false);
+      expect(Object.isFrozen(options.situations)).toBe(false);
+   });
+
+   it('holds the rebuild\'s result and the tracked setter\'s writes frozen', () => {
+      /** @type {object} The Character rolling the check. */
+      const system = createCharacter();
+
+      /** @type {object} The rebuilt options after the user picks Arcana. */
+      const rebuilt = rebuildCheckOptions({
+         callerOptions: { attribute: 'body' },
+         checkType: 'attribute',
+         currentOptions: system.initializeAttributeCheckOptions({ attribute: 'body' }),
+         system,
+         userEdits: { skill: 'arcana' },
+      });
+      expect(Object.isFrozen(rebuilt)).toBe(true);
+      expect(Object.isFrozen(rebuilt.situations)).toBe(true);
+
+      /** @type {import('svelte/store').Writable} The dialog's options. */
+      const checkOptions = writable(rebuilt);
+      createCheckOptionSetter(checkOptions, writable({}))('situations', ['underwater']);
+      expect(Object.isFrozen(get(checkOptions))).toBe(true);
+      expect(Object.isFrozen(get(checkOptions).situations)).toBe(true);
    });
 });
 

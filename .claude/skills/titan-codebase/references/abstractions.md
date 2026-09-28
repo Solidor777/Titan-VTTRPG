@@ -156,14 +156,15 @@ management). Data model classes hold the schema, field validation, and derived-d
   of the item `CharacterSheetItemChecks` / `CharacterSheetItemCheck`. They reuse the **item-check
   engine** with no effect-specific path: each reads the embedded effect from the provider-shadowed
   `'document'` bridge (`const effect = document.data`) and calls
-  `getItemCheckParameters` / `requestItemCheck` with `{ itemRollData: effect.getRollData(), checkIdx }`.
-  An `itemId` names the check's source: `validateItemCheckOptions` / `initializeItemCheckOptions` read
-  roll data from the owned item it names and use `options.itemRollData` only when no `itemId` is given
-  (`createItemCheckOptions` defaults `itemId` to `''` and passes `itemRollData` through, `undefined`
-  when absent), so the same path serves owned items, the effect chat card, and effect sheet rows.
-  `initializeItemCheckOptions` stores the resolved roll data on the options for
-  `getItemCheckParameters`; validation reads the item an `itemId` names, not that stored copy, so an
-  open Item Check dialog closes when its item is deleted.
+  `getItemCheckParameters` / `requestItemCheck` with `{ effectId: effect.id, checkIdx }` (the Player HUD
+  action menu's effect checks pass the same). `CharacterDataModel._getItemCheckRollData` resolves an Item
+  Check's source for both `validateItemCheckOptions` and `initializeItemCheckOptions`: an `itemId` names an
+  owned item, an `effectId` names an effect among `actor.allApplicableEffects()` (the Actor's own and those
+  its items transfer), and `options.itemRollData` is used only when neither is given — the item chat card's
+  snapshot path (`createItemCheckOptions` defaults both IDs to `''` and passes `itemRollData` through,
+  `undefined` when absent). `initializeItemCheckOptions` stores the resolved roll data on the options for
+  `getItemCheckParameters`; validation reads the item or effect an ID names, not that stored copy, so an
+  open Item Check dialog follows edits to its item or effect and closes when it is deleted.
 
 
 ## Checks
@@ -543,8 +544,8 @@ and one or more inner Svelte component trees.
   deletion window), two-context (owner-gate via `'document'`, `spendResolve` via `'sheetDocument'`), and
   reads the `autoSpendResolveChecks` setting to pick combined vs split check/spend-resolve buttons. The two
   consumers keep only their options-building scripts and roll handlers: `CharacterSheetItemCheck.svelte`
-  (static `itemId` capture; provider instances are id-keyed) and `CharacterSheetEffectCheck.svelte` (fresh
-  `itemRollData` from the effect at derive/roll time — the engine's effect passthrough). The Player HUD's
+  (static `itemId` capture; provider instances are id-keyed) and `CharacterSheetEffectCheck.svelte`
+  (`effectId` of the live effect; the engine reads the effect itself). The Player HUD's
   effects panel inherits via `CharacterSheetEffectCheck` reuse.
 - `CastingCheckTags.svelte` (`src/document/svelte-components/check/CastingCheckTags.svelte`) — the ONE
   shared casting-check tag display. Optional prop `{ parameters }`: when passed

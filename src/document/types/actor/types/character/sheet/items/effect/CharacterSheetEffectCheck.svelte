@@ -17,9 +17,9 @@
    const { checkIdx = undefined } = $props();
 
    /**
-    * Builds the Check Options for this effect check, resolving fresh roll data from the effect.
-    * The shared item-check engine cannot resolve an effect from the item collection, so the
-    * effect's roll data is supplied directly via the engine's itemRollData passthrough branch.
+    * Builds the Check Options for this effect check. The effect ID names the source, so the shared item-check engine
+    * reads the live effect from the Actor's applicable effects: an open check dialog follows edits to the effect and
+    * closes when it is deleted.
     * @returns {ItemCheckOptions | undefined} The check options, or undefined if the effect or check is invalid.
     */
    function getCheckOptions() {
@@ -27,8 +27,8 @@
       const effect = document.data;
       if (effect?.system.check.length > checkIdx) {
          return {
-            itemRollData: effect.getRollData(),
             checkIdx: checkIdx,
+            effectId: effect.id,
          };
       }
       return undefined;

@@ -3553,16 +3553,14 @@ export default class CharacterDataModel extends TitanActorDataModel {
          return false;
       }
 
-      // Ensure the owned item an item ID names exists, or Item Roll Data was provided. An item ID names the check's
-      // source, so roll data derived from that item earlier cannot stand in for it once the item is gone.
-      /** @type {object|undefined} The roll data of the item whose check is rolled. */
-      const itemRollData = options.itemId ?
-         this.parent.items.get(options.itemId)?.getRollData() :
-         options.itemRollData;
+      // Ensure the check's source exists: the owned item or applicable effect an ID names, or the Item Roll Data the
+      // caller supplied. Roll data derived from an item or effect earlier cannot stand in for it once it is gone.
+      /** @type {object|undefined} The roll data of the item or effect whose check is rolled. */
+      const itemRollData = this._getItemCheckRollData(options);
       if (!itemRollData) {
          if (report) {
             game.titan.error(
-               'Item Check failed before construction. No valid Item ID or Item Roll Data was provided.',
+               'Item Check failed before construction. No valid Item ID, Effect ID, or Item Roll Data was provided.',
                options,
                this);
          }
@@ -3587,6 +3585,30 @@ export default class CharacterDataModel extends TitanActorDataModel {
    }
 
    /**
+    * Resolves the roll data of an Item Check's source. An item ID names an owned item and an effect ID names an effect
+    * among the Actor's applicable effects (its own and those its items transfer); either is read live, so an open
+    * dialog follows edits to it and loses its source when it is deleted. Only without either ID is the caller's
+    * `itemRollData` snapshot used (e.g. a chat card's item).
+    * @param {object} options - The Item Check Options naming the source.
+    * @returns {object|undefined} The source's roll data, or undefined if the named item or effect is gone.
+    * @private
+    */
+   _getItemCheckRollData(options) {
+      if (options.itemId) {
+         return this.parent.items.get(options.itemId)?.getRollData();
+      }
+      if (options.effectId) {
+         for (const effect of this.parent.allApplicableEffects()) {
+            if (effect.id === options.effectId) {
+               return effect.getRollData();
+            }
+         }
+         return undefined;
+      }
+      return options.itemRollData;
+   }
+
+   /**
     * Populates Item Check Options with this Character's specific data, unless specific overrides were applied.
     * @param {object} options - Options for the Check.
     * @returns {ItemCheckOptions} The new, fully-populated Item Check Options.
@@ -3594,10 +3616,8 @@ export default class CharacterDataModel extends TitanActorDataModel {
    initializeItemCheckOptions(options) {
       const checkOptions = createItemCheckOptions(options);
 
-      // Cache the roll data: the owned item an item ID names, or the roll data the caller supplied.
-      const itemRollData = checkOptions.itemId ?
-         this.parent.items.get(checkOptions.itemId).system.getRollData() :
-         options.itemRollData;
+      /** @type {object} The roll data of the check's source: the named item or effect, or the caller's roll data. */
+      const itemRollData = this._getItemCheckRollData(checkOptions);
       const checkData = itemRollData.check[checkOptions.checkIdx];
 
       // Persist the resolved roll data into checkOptions so post-initialization readers see the real object.

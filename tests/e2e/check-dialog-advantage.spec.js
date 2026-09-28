@@ -1136,3 +1136,133 @@ for (const [checkType, itemType] of [
       expect(errors, `uncaught page errors:\n${errors.join('\n')}`).toEqual([]);
    });
 }
+
+/** @type {string} Label of the spec actor's effect check, shown on its roll button in the effect row. */
+const EFFECT_CHECK_LABEL = 'E2E Dialog Effect Check';
+
+/**
+ * Rebuilds the spec's actor with one effect carrying a Body/Arcana, Difficulty 4 check, then opens that check's
+ * dialog from the character sheet's effect row (the effect-sourced caller).
+ * @returns {Promise<import('@playwright/test').Locator>} The Item Check dialog's window-root locator, already visible.
+ */
+async function openEffectCheckDialog() {
+   /** @type {string} The rebuilt effect's ID. */
+   const effectId = await page.evaluate(async ({ actorName, label }) => {
+      await game.settings.set('titan', 'getCheckOptions', 'always');
+      await game.actors.getName(actorName)?.delete();
+
+      /** @type {TitanActor} The rebuilt actor. */
+      const actor = await Actor.create({
+         name: actorName,
+         type: 'player',
+      });
+
+      // One COMPLETE check entry, mirroring createItemCheckTemplate().
+      const [effect] = await actor.createEmbeddedDocuments('ActiveEffect', [
+         {
+            name: 'E2E Dialog Check Effect',
+            type: 'effect',
+            system: {
+               check: [
+                  {
+                     attribute: 'body',
+                     complexity: 1,
+                     damageReducedBy: 'none',
+                     difficulty: 4,
+                     initialValue: 1,
+                     isDamage: false,
+                     isHealing: false,
+                     label,
+                     opposedCheck: {
+                        attribute: 'body',
+                        enabled: false,
+                        skill: 'athletics',
+                     },
+                     resistanceCheck: 'none',
+                     resolveCost: 0,
+                     scaling: true,
+                     skill: 'arcana',
+                     uuid: 'e2e-dialog-effect-check',
+                  },
+               ],
+            },
+         },
+      ]);
+      await actor.sheet.render(true);
+      return effect.id;
+   }, {
+      actorName: ACTOR_NAME,
+      label: EFFECT_CHECK_LABEL,
+   });
+
+   /** @type {import('@playwright/test').Locator} The character sheet. */
+   const sheet = page.locator('.application.titan-document-sheet');
+   await expect(sheet).toBeVisible();
+   await sheet.getByText('Effects', { exact: true }).first().click();
+
+   /** @type {import('@playwright/test').Locator} The effect's row, expanded to show its check. */
+   const row = sheet.locator(`[data-effect-id="${effectId}"]`);
+   await expect(row).toBeVisible();
+   await row.locator('.header .label .button button').first().click();
+   await row.getByRole('button').filter({ hasText: EFFECT_CHECK_LABEL }).first().click();
+
+   /** @type {import('@playwright/test').Locator} The Item Check dialog. */
+   const dialog = page.locator('.application.titan-dialog[id^="titan-item-check-dialog-"]');
+   await expect(dialog).toBeVisible();
+   return dialog;
+}
+
+/**
+ * Edits or deletes the spec actor's check effect.
+ * @param {object|undefined} changes - The check fields to change, or undefined to delete the effect.
+ * @returns {Promise<void>}
+ */
+async function changeCheckEffect(changes) {
+   await page.evaluate(async ({ actorName, changes: fields }) => {
+      const effect = game.actors.getName(actorName).effects.getName('E2E Dialog Check Effect');
+      if (!fields) {
+         await effect.delete();
+         return;
+      }
+
+      /** @type {object[]} The effect's checks, with the first one edited. */
+      const checks = foundry.utils.deepClone(effect.system.check);
+      Object.assign(checks[0], fields);
+      await effect.update({
+         system: {
+            check: checks,
+         },
+      });
+   }, {
+      actorName: ACTOR_NAME,
+      changes,
+   });
+}
+
+test('an effect-sourced Item Check dialog\'s untouched Difficulty follows an edit to the effect\'s check, and the ' +
+   'rolled check carries it', async () => {
+   /** @type {import('@playwright/test').Locator} The open Item Check dialog. */
+   const dialog = await openEffectCheckDialog();
+
+   /** @type {import('@playwright/test').Locator} The Difficulty select's trigger. */
+   const difficultySelect = dialog.getByTestId('check-field-difficulty').locator('[role="combobox"]');
+   await expect(difficultySelect).toHaveAttribute('data-value', '4');
+
+   await changeCheckEffect({ difficulty: 5 });
+   await expect(difficultySelect).toHaveAttribute('data-value', '5');
+
+   /** @type {number} The chat-message count before the roll. */
+   const baseline = await clickRoll(dialog, page);
+   /** @type {{id: string, type: string, parameters: object, results: object}} The rolled check's message. */
+   const flags = await readNewestCheckFlags(page, baseline);
+   expect(flags.parameters.difficulty).toBe(5);
+});
+
+test('deleting the effect while its Item Check dialog is open closes the dialog without a page error', async () => {
+   /** @type {import('@playwright/test').Locator} The open Item Check dialog. */
+   const dialog = await openEffectCheckDialog();
+
+   await changeCheckEffect(undefined);
+   await expect(dialog).toHaveCount(0);
+   expect(errors, `uncaught page errors:\n${errors.join('\n')}`).toEqual([]);
+});

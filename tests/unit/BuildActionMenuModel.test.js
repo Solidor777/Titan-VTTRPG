@@ -380,7 +380,7 @@ describe('buildActionMenuModel', () => {
       expect(actor.system.requestCastingCheck).toHaveBeenCalledWith({ itemId: 's1' });
    });
 
-   it('effect sub-options roll via itemRollData and offer duration/remove sub-buttons', () => {
+   it('effect sub-options roll the live effect by id and offer duration/remove sub-buttons', () => {
       const effect = {
          id: 'e1',
          type: 'effect',
@@ -407,8 +407,14 @@ describe('buildActionMenuModel', () => {
       const sub = category(model, 'effects').subOptions[0];
       sub.mainAction();
       expect(actor.system.requestItemCheck).toHaveBeenCalledWith({
-         itemRollData: { rolled: true },
          checkIdx: 0,
+         effectId: 'e1',
+      });
+      actor.system.requestItemCheck.mockClear();
+      sub.subButtons.find((b) => b.key === 'check-0').action();
+      expect(actor.system.requestItemCheck).toHaveBeenCalledWith({
+         checkIdx: 0,
+         effectId: 'e1',
       });
       sub.subButtons.find((b) => b.key === 'duration-increase').action();
       expect(effect.update).toHaveBeenCalledWith({ system: { duration: { remaining: 3 } } });

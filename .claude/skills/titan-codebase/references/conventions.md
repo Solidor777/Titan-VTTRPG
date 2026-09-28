@@ -263,12 +263,21 @@ for exactly this reason.
 **Dialog data passing** — check dialogs (e.g. `AttributeCheckDialog`) construct with
 `content: { class: CheckDialogShell, props: { shell, actor, checkType, callerOptions,
 checkOptions: writable(...), checkParameters: writable(...) } }` and the shell distributes those stores to
-children via `setContext`. Dialog fields never write `$checkOptions` directly: they write through the
-`'setCheckOption'` context (`createCheckOptionSetter` in `src/check/dialog/ReinitializeCheckOptions.js`),
-which records the write as a user edit. On every Actor change or edit, `CheckDialogShell` rebuilds the
-options as `initialize<Type>CheckOptions({ ...callerOptions, ...userEdits })`, so every other field follows
-the live Actor. `tests/unit/check/check-dialog-option-writes.test.js` fails on a direct bind or assignment
-in any `src/check/**/dialog/*.svelte`.
+children via `setContext`. The `'checkOptions'` context is a read-only view (`{ subscribe }` only) of a store
+whose every value is frozen (`freezeCheckOptions`: plain objects and arrays copied and frozen at every depth,
+documents and data models kept by reference), so a bind, assignment, in-place mutation, or store-method write
+from a component throws. Dialog fields write through the `'setCheckOption'` context (`createCheckOptionSetter`
+in `src/check/dialog/ReinitializeCheckOptions.js`), which records the write as a user edit. On every Actor
+change or edit, `CheckDialogShell` rebuilds the options (`rebuildCheckOptions`): the input
+`{ ...callerOptions, ...userEdits }` is validated quietly (`validate<Type>CheckOptions(options, false)` reports
+nothing); if it is invalid, each `'default'`-sentinel field it leaves unset (e.g. the Attribute after Skill
+"None") is pinned to its displayed value and validated again; if it is still invalid (its item or effect is
+gone), nothing is written and the type shell's own validation closes the dialog; otherwise
+`initialize<Type>CheckOptions(input)` derives every other field from the live Actor and is written only when
+structurally different. `tests/unit/check/check-dialog-option-writes.test.js` is the backstop scan: it reads
+every `.svelte`, `.js`, and `.svelte.js` under any `dialog` directory of `src/check` whole (exempting only
+`CheckDialogShell.svelte` and `ReinitializeCheckOptions.js`) and fails on any write form through the store or
+an alias bound from `getContext('checkOptions')`.
 
 **Dynamic component dispatch** — `<svelte:component this={...}>` is gone (deprecated in Svelte 5
 runes mode). Shells select a component class and render it with `{@const}`:

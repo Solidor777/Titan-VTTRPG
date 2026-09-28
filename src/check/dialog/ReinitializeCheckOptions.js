@@ -10,13 +10,16 @@ import createResistanceCheckOptions from '~/check/types/resistance-check/Resista
  * fields the user wrote in the dialog (`userEdits`, recorded by the tracked setter). The live Actor's
  * `initialize<Type>CheckOptions` derives every other field on every pass, so each of its derivation branches (an
  * `undefined` test, a `=== undefined` Complexity or Difficulty, the `'default'` Attribute and Skill sentinels, a read
- * of the owned weapon, spell, or item, and conditional rules elements) follows the Actor with no list of derived
- * fields to maintain. User edits override caller values, and caller values override derivation.
+ * of the owned weapon, spell, item, or effect, and conditional rules elements) follows the Actor with no list of
+ * derived fields to maintain. User edits override caller values, and caller values override derivation.
  *
  * Two guards keep the rebuild safe while the dialog is open. A `'default'`-sentinel field the input leaves unset
  * keeps its displayed value when the input is otherwise invalid (e.g. an Attribute Check whose user picked Skill
- * "None" keeps the Attribute the old Skill supplied). An input that stays invalid (its owned weapon, spell, or item
- * is gone) yields no rebuild, so the type shell's own validation decides the dialog's fate.
+ * "None" keeps the Attribute the old Skill supplied). An input that stays invalid (its owned weapon, spell, item, or
+ * effect is gone) yields no rebuild, so the type shell's own validation decides the dialog's fate.
+ *
+ * Every value the dialog's store holds is frozen (`freezeCheckOptions`), and the dialog's components see the store
+ * only as a read-only view, so the tracked setter is the only way a component changes an option.
  */
 
 /**
@@ -55,19 +58,59 @@ export const CHECK_OPTIONS_METHODS = Object.freeze({
 });
 
 /**
+ * Tests whether a value is plain data: an array, or an object whose prototype is `Object.prototype` or `null`.
+ * @param {*} value - The value to test.
+ * @returns {boolean} Whether the value is a plain array or object.
+ */
+function isPlainContainer(value) {
+   if (Array.isArray(value)) {
+      return true;
+   }
+   if (value === null || typeof value !== 'object') {
+      return false;
+   }
+
+   /** @type {object|null} The value's prototype. */
+   const prototype = Object.getPrototypeOf(value);
+   return prototype === Object.prototype || prototype === null;
+}
+
+/**
+ * Copies Check Options into an immutable value, so a component holding the dialog's read-only view cannot change
+ * them in place: every plain object and array is copied and frozen at every depth. Any other object (a document or
+ * data model a caller passed as roll data) is kept by reference and left unfrozen, since freezing it would freeze
+ * live document data.
+ * @param {*} value - The options, or a value inside them.
+ * @returns {*} The frozen copy; a primitive or non-plain object is returned as given.
+ */
+export function freezeCheckOptions(value) {
+   if (Array.isArray(value)) {
+      return Object.freeze(value.map(freezeCheckOptions));
+   }
+   if (isPlainContainer(value)) {
+      return Object.freeze(Object.fromEntries(Object.entries(value).map(([key, entry]) => [
+         key,
+         freezeCheckOptions(entry),
+      ])));
+   }
+   return value;
+}
+
+/**
  * Creates the dialog's one tracked setter for Check Options: it records the write as a user edit, so every later
  * rebuild keeps it, and applies it to the options at once, so the field shows the new value before the rebuild runs.
+ * Both stores hold frozen values.
  * @param {import('svelte/store').Writable} checkOptions - The dialog's Check Options store.
  * @param {import('svelte/store').Writable} userEdits - The dialog's user-edit record (field → value).
  * @returns {(field: string, value: *) => void} The setter, provided to the dialog as context `'setCheckOption'`.
  */
 export function createCheckOptionSetter(checkOptions, userEdits) {
    return (field, value) => {
-      userEdits.update((edits) => ({
+      userEdits.update((edits) => freezeCheckOptions({
          ...edits,
          [field]: value,
       }));
-      checkOptions.update((options) => ({
+      checkOptions.update((options) => freezeCheckOptions({
          ...options,
          [field]: value,
       }));
@@ -75,19 +118,19 @@ export function createCheckOptionSetter(checkOptions, userEdits) {
 }
 
 /**
- * Tests two Check Options values for structural equality: primitives by identity, arrays and plain objects by
- * their entries. The rebuild produces fresh `situations` arrays and a fresh Item `itemRollData` on every pass, so an
- * identity test would never settle.
+ * Tests two Check Options values for structural equality. Plain arrays and objects (see `isPlainContainer`) are
+ * equal when they share a prototype and their own enumerable keys hold structurally equal values; every other value
+ * (primitives, documents, data models) is compared with `Object.is`. The rebuild produces fresh `situations` arrays
+ * and a fresh Item `itemRollData` on every pass, so an identity test alone would never settle.
  * @param {*} a - The first value.
  * @param {*} b - The second value.
  * @returns {boolean} Whether the values are structurally equal.
  */
 function isStructurallyEqual(a, b) {
-   if (a === b) {
+   if (Object.is(a, b)) {
       return true;
    }
-   if (a === null || b === null || typeof a !== 'object' || typeof b !== 'object' ||
-      Array.isArray(a) !== Array.isArray(b)) {
+   if (!isPlainContainer(a) || !isPlainContainer(b) || Object.getPrototypeOf(a) !== Object.getPrototypeOf(b)) {
       return false;
    }
 
@@ -129,8 +172,8 @@ function pinSentinelFields(input, create, currentOptions) {
  * Rebuilds a dialog's Check Options from the caller's options and the user's edits, deriving every other field from
  * the live Actor.
  * @param {RebuildCheckOptionsArguments} args - The check type, Actor, sources, and current options.
- * @returns {object|undefined} The rebuilt options, or `undefined` when they equal the current options (so the
- * dialog's rebuild effect writes nothing and settles) or when the check is no longer valid.
+ * @returns {object|undefined} The rebuilt options, frozen (`freezeCheckOptions`), or `undefined` when they equal the
+ * current options (so the dialog's rebuild effect writes nothing and settles) or when the check is no longer valid.
  */
 export default function rebuildCheckOptions({ checkType, system, callerOptions, userEdits, currentOptions }) {
    /** @type {{create: (options: object) => object, initialize: string, validate: string}} The type's functions. */
@@ -152,5 +195,5 @@ export default function rebuildCheckOptions({ checkType, system, callerOptions, 
 
    /** @type {object} The options derived from the input and the live Actor. */
    const rebuilt = system[methods.initialize](input);
-   return isStructurallyEqual(rebuilt, currentOptions) ? undefined : rebuilt;
+   return isStructurallyEqual(rebuilt, currentOptions) ? undefined : freezeCheckOptions(rebuilt);
 }

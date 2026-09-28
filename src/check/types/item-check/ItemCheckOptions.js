@@ -17,8 +17,9 @@
  * @property {number} [resolveCost] - The Resolve Cost for performing the check, if any.
  * @property {number} [trainingMod] - Modifier for the amount of Training to be applied.
  * @property {string} [attribute] - The Attribute to use for the Check.
- * @property {string} [itemId] - The ID of the item being used for the check.
- * @property {object} [itemRollData] - The roll data for the item being used for the check.
+ * @property {string} [effectId] - The ID of the Actor's applicable effect whose check is rolled, read live.
+ * @property {string} [itemId] - The ID of the owned item whose check is rolled, read live.
+ * @property {object} [itemRollData] - Roll data for the check, used only when neither an item nor an effect ID is set.
  * @property {string} [skill] - The Skill to use for the Check.
  * @property {string[]} [situations] - The camel-case keys of the situational modifiers ticked in the check dialog.
  */
@@ -41,6 +42,7 @@ export default function createItemCheckOptions(options) {
       difficulty: options.difficulty,
       doubleExpertise: options.doubleExpertise ?? false,
       doubleTraining: options.doubleTraining ?? false,
+      effectId: options.effectId ?? '',
       expertiseMod: options.expertiseMod ?? 0,
       extraFailureOnCritical: options.extraFailureOnCritical ?? false,
       extraSuccessOnCritical: options.extraSuccessOnCritical ?? false,

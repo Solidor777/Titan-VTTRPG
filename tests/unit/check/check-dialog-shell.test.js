@@ -144,6 +144,54 @@ function changeActor(actor, { check = [], rating = [] }) {
 }
 
 describe('CheckDialogShell', () => {
+   it('gives the dialog\'s components a read-only Check Options view, so a write outside the setter throws', () => {
+      /** @type {object} The Actor rolling the check. */
+      const actor = createActor();
+      mountShell(actor, 'attribute', { attribute: 'body' });
+
+      expect(Object.keys(captured.checkOptions)).toEqual(['subscribe']);
+      expect(() => captured.writeThroughContext('skill', 'athletics')).toThrow(TypeError);
+      expect(() => captured.pushThroughContext('situations', 'underwater')).toThrow(TypeError);
+      expect(get(captured.checkOptions)).toMatchObject({
+         situations: [],
+         skill: 'none',
+      });
+
+      // The tracked setter still writes.
+      captured.setCheckOption('skill', 'athletics');
+      flushSync();
+      expect(get(captured.checkOptions).skill).toBe('athletics');
+   });
+
+   it('keeps the user\'s edit over the caller\'s value for the same field through an Actor change', () => {
+      /** @type {object} The Actor rolling the check. */
+      const actor = createActor();
+      mountShell(actor, 'attribute', {
+         attribute: 'body',
+         diceMod: 3,
+      });
+
+      // The user lowers the caller's Dice modifier.
+      captured.setCheckOption('diceMod', 1);
+      flushSync();
+
+      changeActor(actor, {
+         check: [
+            {
+               checkType: 'any',
+               modifierType: 'expertise',
+               selector: 'any',
+               value: 1,
+            },
+         ],
+      });
+
+      expect(get(captured.checkOptions)).toMatchObject({
+         diceMod: 1,
+         expertiseMod: 1,
+      });
+   });
+
    it('keeps the caller\'s values and the user\'s edits through an Actor change, re-deriving the rest', () => {
       /** @type {object} The Actor rolling the check. */
       const actor = createActor();

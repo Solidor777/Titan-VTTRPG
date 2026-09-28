@@ -2,7 +2,10 @@
    import { setContext } from 'svelte';
    import { writable } from 'svelte/store';
    import ReactiveDocument from '~/document/reactive/ReactiveDocument.svelte.js';
-   import rebuildCheckOptions, { createCheckOptionSetter } from '~/check/dialog/ReinitializeCheckOptions.js';
+   import rebuildCheckOptions, {
+      createCheckOptionSetter,
+      freezeCheckOptions,
+   } from '~/check/dialog/ReinitializeCheckOptions.js';
 
    /**
     * @typedef {object} CheckDialogShellProps
@@ -27,10 +30,16 @@
    } = $props();
 
    // Setup context objects.
-   // These captures are intentional: the stores, actor, check type, and caller options are stable for the dialog's
+   // These captures are intentional: the two stores, the actor, and the check type are stable for the dialog's
    // lifetime.
+   // The dialog's components receive a read-only view of the Check Options: the writable store stays private to this
+   // shell and the tracked setter, and every value it holds is frozen, so a bind, assignment, in-place mutation, or
+   // store-method write from a component throws. The dialog's initial options are frozen before any component reads
+   // them.
    // svelte-ignore state_referenced_locally
-   setContext('checkOptions', checkOptions);
+   checkOptions.update(freezeCheckOptions);
+   // svelte-ignore state_referenced_locally
+   setContext('checkOptions', { subscribe: checkOptions.subscribe });
    // svelte-ignore state_referenced_locally
    setContext('checkParameters', checkParameters);
 

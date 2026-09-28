@@ -368,8 +368,8 @@ function buildEffects(primary, options) {
          const mainAction = () => {
             if (checkCount > 0) {
                primary.system.requestItemCheck({
-                  itemRollData: effect.getRollData(),
                   checkIdx: 0,
+                  effectId: effect.id,
                });
             }
             else {
@@ -377,7 +377,7 @@ function buildEffects(primary, options) {
             }
          };
 
-         /** @type {Array<object>} Check sub-buttons rolled through the effect's roll data. */
+         /** @type {Array<object>} Check sub-buttons rolled from the live effect, named by its ID. */
          const checkButtons = options.subButtons.checks
             ? (effect.system?.check ?? []).map((check, checkIdx) => {
                return {
@@ -385,8 +385,8 @@ function buildEffects(primary, options) {
                   label: check.label,
                   icon: DICE_ICON,
                   action: () => primary.system.requestItemCheck({
-                     itemRollData: effect.getRollData(),
                      checkIdx,
+                     effectId: effect.id,
                   }),
                };
             })
