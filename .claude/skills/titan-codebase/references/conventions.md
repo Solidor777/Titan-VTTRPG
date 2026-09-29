@@ -267,7 +267,7 @@ children via `setContext`. The `'checkOptions'` context is a read-only view (`{ 
 whose every value is frozen (`freezeCheckOptions`: plain objects and arrays copied and frozen at every depth,
 documents and data models kept by reference), so a bind, assignment, in-place mutation, or store-method write
 from a component throws. Dialog fields write through the `'setCheckOption'` context (`createCheckOptionSetter`
-in `src/check/dialog/ReinitializeCheckOptions.js`), which records the write as a user edit. On every Actor
+in `src/check/dialog/RebuildCheckOptions.js`), which records the write as a user edit. On every Actor
 change or edit, `CheckDialogShell` rebuilds the options (`rebuildCheckOptions`): the input
 `{ ...callerOptions, ...userEdits }` is validated quietly (`validate<Type>CheckOptions(options, false)` reports
 nothing); if it is invalid, each `'default'`-sentinel field it leaves unset (e.g. the Attribute after Skill
@@ -276,7 +276,7 @@ gone), nothing is written and the type shell's own validation closes the dialog;
 `initialize<Type>CheckOptions(input)` derives every other field from the live Actor and is written only when
 structurally different. `tests/unit/check/check-dialog-option-writes.test.js` is the backstop scan: it reads
 every `.svelte`, `.js`, and `.svelte.js` under any `dialog` directory of `src/check` whole (exempting only
-`CheckDialogShell.svelte` and `ReinitializeCheckOptions.js`) and fails on any write form through the store or
+`CheckDialogShell.svelte` and `RebuildCheckOptions.js`) and fails on any write form through the store or
 an alias bound from `getContext('checkOptions')`.
 
 **Dynamic component dispatch** — `<svelte:component this={...}>` is gone (deprecated in Svelte 5

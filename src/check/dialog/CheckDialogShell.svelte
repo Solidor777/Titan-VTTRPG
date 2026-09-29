@@ -5,7 +5,7 @@
    import rebuildCheckOptions, {
       createCheckOptionSetter,
       freezeCheckOptions,
-   } from '~/check/dialog/ReinitializeCheckOptions.js';
+   } from '~/check/dialog/RebuildCheckOptions.js';
 
    /**
     * @typedef {object} CheckDialogShellProps

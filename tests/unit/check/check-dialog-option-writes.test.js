@@ -14,7 +14,7 @@ const CHECK_DIR = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..
 /** @type {string[]} The sources allowed to write the store: the shell that owns it and the tracked-setter module. */
 const EXEMPT_SOURCES = [
    path.join('dialog', 'CheckDialogShell.svelte'),
-   path.join('dialog', 'ReinitializeCheckOptions.js'),
+   path.join('dialog', 'RebuildCheckOptions.js'),
 ];
 
 /** @type {string} An assignment operator: plain, compound, or logical (never a comparison). */

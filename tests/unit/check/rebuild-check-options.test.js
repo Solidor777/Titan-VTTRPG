@@ -4,7 +4,7 @@ import rebuildCheckOptions, {
    CHECK_OPTIONS_METHODS,
    createCheckOptionSetter,
    freezeCheckOptions,
-} from '~/check/dialog/ReinitializeCheckOptions.js';
+} from '~/check/dialog/RebuildCheckOptions.js';
 import createCastingCheckOptions from '~/check/types/casting-check/CastingCheckOptions.js';
 import createItemCheckOptions from '~/check/types/item-check/ItemCheckOptions.js';
 import { installSchemaMocks, restoreSchemaMocks } from '../helpers/schemaFingerprint.js';
