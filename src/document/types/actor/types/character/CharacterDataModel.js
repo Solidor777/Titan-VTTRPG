@@ -4005,6 +4005,11 @@ export default class CharacterDataModel extends TitanActorDataModel {
     * @returns {SituationalCheckModifier[]} The applicable entries, in the order their sources were gathered.
     */
    getSituationalCheckModifiers(checkType, { skill } = {}) {
+      // An unknown check type fails loudly instead of silently offering nothing.
+      if (!assert(Object.hasOwn(CHECK_TYPE_MODIFIER_TYPES, checkType), `Unknown check type "${checkType}".`)) {
+         return [];
+      }
+
       /** @type {object[]|boolean|undefined} The cached situational elements, if any. */
       const elements = this.rulesElementsCache?.situationalCheckModifier;
       if (!elements) {

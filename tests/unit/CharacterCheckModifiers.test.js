@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeAll, afterAll } from 'vitest';
+import { describe, it, expect, beforeAll, afterAll, vi } from 'vitest';
 import createAttackCheckOptions from '~/check/types/attack-check/AttackCheckOptions.js';
 import createAttributeCheckOptions from '~/check/types/attribute-check/AttributeCheckOptions.js';
 import createCastingCheckOptions from '~/check/types/casting-check/CastingCheckOptions.js';
@@ -615,6 +615,37 @@ describe('situational check modifiers', () => {
 
    it('offers nothing when the actor has no rules elements', () => {
       expect(createModel(false).getSituationalCheckModifiers('attribute', { skill: 'athletics' })).toEqual([]);
+   });
+
+   it('reports an unknown check type by name and offers nothing, with or without situational elements', () => {
+      /** @type {Function} The stubbed error notification. */
+      const notify = vi.fn();
+      globalThis.ui = { notifications: { error: notify } };
+      vi.spyOn(console, 'assert').mockImplementation(() => {});
+      try {
+         /** @type {object} A cache holding one situational element. */
+         const cache = {
+            situationalCheckModifier: [
+               {
+                  checkType: 'any',
+                  key: 'underwater',
+                  label: 'Underwater',
+                  modifierType: 'dice',
+                  skill: '',
+                  source: 'Effect',
+                  value: -1,
+               },
+            ],
+         };
+         expect(createModel(cache).getSituationalCheckModifiers('spellcasting')).toEqual([]);
+         expect(createModel(false).getSituationalCheckModifiers('spellcasting')).toEqual([]);
+         expect(notify).toHaveBeenCalledTimes(2);
+         expect(notify).toHaveBeenCalledWith(expect.stringContaining('Unknown check type "spellcasting"'));
+      }
+      finally {
+         delete globalThis.ui;
+         vi.restoreAllMocks();
+      }
    });
 
    it('applies an attack-type situational element through getAttackCheckParameters, excluded from Attribute', () => {
