@@ -409,6 +409,28 @@ test.describe('Advantage and Automatic Failure from conditional modifiers', () =
    });
 });
 
+/**
+ * Overwrites stored parameters on a rolled check's message.
+ * @param {import('@playwright/test').Page} targetPage - The logged-in page.
+ * @param {string} id - The message's id.
+ * @param {object} changes - The parameter fields to overwrite.
+ * @returns {Promise<void>} Resolves once the message is updated.
+ */
+async function updateStoredParameters(targetPage, id, changes) {
+   await targetPage.evaluate(async ({ messageId, parameterChanges }) => {
+      /** @type {ChatMessage} The rolled check's message. */
+      const chatMessage = game.messages.get(messageId);
+
+      /** @type {object} A detached copy of its system data. */
+      const system = chatMessage.system.toObject();
+      Object.assign(system.parameters, parameterChanges);
+      await chatMessage.update({ system });
+   }, {
+      messageId: id,
+      parameterChanges: changes,
+   });
+}
+
 test.describe('chat card tags', () => {
    test('a Disadvantage tag sits beside the DC, is styled as a tag, and follows the stored level', async () => {
       await seedEffect(page, [
@@ -423,7 +445,10 @@ test.describe('chat card tags', () => {
       /** @type {import('@playwright/test').Locator} The rolled check's card. */
       const card = page.locator(`#chat .message[data-message-id="${message.id}"]`);
       await expect(card.locator('.check-chat-message')).toBeAttached();
-      await expect(card.getByTestId('check-chat-dc')).toHaveText('DC 5:0');
+
+      /** @type {string} The localized DC label. */
+      const dcLabel = await page.evaluate(() => game.i18n.localize('LOCAL.dc.text'));
+      await expect(card.getByTestId('check-chat-dc')).toHaveText(`${dcLabel} 5:0`);
 
       /** @type {import('@playwright/test').Locator} The Advantage tag. */
       const tag = card.getByTestId('check-chat-advantage');
@@ -461,19 +486,13 @@ test.describe('chat card tags', () => {
             tagFont: resolve('--titan-tag-font-color'),
          };
       });
+      expect(colors.background).not.toBe('rgba(0, 0, 0, 0)');
+      expect(colors.background).not.toBe('transparent');
       expect(colors.background).toBe(colors.tagBackground);
       expect(colors.color).toBe(colors.tagFont);
 
       // Clearing the stored Advantage removes the tag from the same card.
-      await page.evaluate(async (id) => {
-         /** @type {ChatMessage} The rolled check's message. */
-         const chatMessage = game.messages.get(id);
-
-         /** @type {object} A detached copy of its system data. */
-         const system = chatMessage.system.toObject();
-         system.parameters.advantage = 0;
-         await chatMessage.update({ system });
-      }, message.id);
+      await updateStoredParameters(page, message.id, { advantage: 0 });
       await expect(tag).toHaveCount(0);
    });
 
@@ -495,8 +514,19 @@ test.describe('chat card tags', () => {
       const card = page.locator(`#chat .message[data-message-id="${message.id}"]`);
 
       // The DC renders first at the unchanged Difficulty; the tag beside it is absent.
-      await expect(card.getByTestId('check-chat-dc')).toHaveText('DC 4:0');
-      await expect(card.getByTestId('check-chat-advantage')).toHaveCount(0);
+      /** @type {string} The localized DC label. */
+      const dcLabel = await page.evaluate(() => game.i18n.localize('LOCAL.dc.text'));
+      await expect(card.getByTestId('check-chat-dc')).toHaveText(`${dcLabel} 4:0`);
+
+      /** @type {import('@playwright/test').Locator} The Advantage tag. */
+      const tag = card.getByTestId('check-chat-advantage');
+
+      // The tag is absent on the net-zero card, appears when the stored level becomes +1, and leaves again at 0.
+      await expect(tag).toHaveCount(0);
+      await updateStoredParameters(page, message.id, { advantage: 1 });
+      await expect(tag).toHaveCount(1);
+      await updateStoredParameters(page, message.id, { advantage: 0 });
+      await expect(tag).toHaveCount(0);
    });
 
    test('an automatically failed card shows the Automatic Failure tag and no successes', async () => {
@@ -520,8 +550,15 @@ test.describe('chat card tags', () => {
          automaticFailure: game.i18n.localize('LOCAL.automaticFailure.text'),
          successes: game.i18n.localize('LOCAL.successes.text'),
       }));
-      await expect(card.getByTestId('check-chat-automatic-failure')).toHaveText(labels.automaticFailure);
+
+      /** @type {import('@playwright/test').Locator} The Automatic Failure tag. */
+      const tag = card.getByTestId('check-chat-automatic-failure');
+      await expect(tag).toHaveText(labels.automaticFailure);
       await expect(card.locator('.results')).toContainText(`0 ${labels.successes}`);
+
+      // Clearing the stored flag removes the tag from the same card.
+      await updateStoredParameters(page, message.id, { automaticFailure: false });
+      await expect(tag).toHaveCount(0);
    });
 
    test('the card lists the ticked situations by label', async () => {
@@ -543,5 +580,9 @@ test.describe('chat card tags', () => {
       /** @type {import('@playwright/test').Locator} The rolled check's card. */
       const card = page.locator(`#chat .message[data-message-id="${message.id}"]`);
       await expect(card.getByTestId('check-chat-situation')).toHaveText(['Underwater']);
+
+      // Clearing the stored situations removes the block from the same card.
+      await updateStoredParameters(page, message.id, { situations: [] });
+      await expect(card.getByTestId('check-chat-situations')).toHaveCount(0);
    });
 });
