@@ -811,6 +811,13 @@ process before spawning anything, so npx, node, Foundry, and every Chromium inhe
   every operation over budget at end of run and dumps the full record to `debug/dumps/`. It reads
   Playwright's own step stream, so no spec needs instrumenting, and it never fails a test.
 
+**Core context-menu entries are chosen through `chooseContextMenuEntry(page, entry)`** (`tests/e2e/contextMenu.js`),
+never a bare `entry.click()`: it clicks, then waits for `#context-menu` to detach. Core `ContextMenu#close()` removes
+the instance's CURRENT menu element after its 200 ms collapse, and every document click while `ui.context` is set
+queues another close, so clicks made during the collapse leave closes pending that remove the instance's next menu
+(a re-opened pack or folder menu never shows). Dismissing an open menu without choosing uses
+`ui.context?.close({ animate: false })`, which closes synchronously.
+
 **No e2e operation may exceed 1 second**, and wait ceilings are set to that budget so a breach fails
 loudly instead of silently absorbing 15s: explicit `timeout:` values are `1000`. Six waits are
 deliberately exempt because they are inherently multi-second — `game.ready` world boot

@@ -1,4 +1,5 @@
 import { expect, test } from '@playwright/test';
+import { chooseContextMenuEntry } from './contextMenu.js';
 import { login } from './fixtures.js';
 import {
    attachPageErrors,
@@ -540,7 +541,7 @@ test.describe('effect tray sidebar tab', () => {
          .first()
          .click({ button: 'right' });
       const moveLabel = await page.evaluate(() => game.i18n.localize('LOCAL.effectTrayMoveToFolder.text'));
-      await page.locator('#context-menu li.context-item', { hasText: moveLabel }).first().click();
+      await chooseContextMenuEntry(page, page.locator('#context-menu li.context-item', { hasText: moveLabel }).first());
 
       // Open the dialog's folder select and read its option labels.
       await page.locator('[data-testid="move-effect-folder-select"]').click();
@@ -708,7 +709,10 @@ test.describe('effect tray sidebar tab', () => {
          .locator(':scope > [data-testid="effect-tray-folder-header"]')
          .click({ button: 'right' });
       const renameLabel = await page.evaluate(() => game.i18n.localize('LOCAL.effectTrayRenameFolder.text'));
-      await page.locator('#context-menu li.context-item', { hasText: renameLabel }).first().click();
+      await chooseContextMenuEntry(
+         page,
+         page.locator('#context-menu li.context-item', { hasText: renameLabel }).first(),
+      );
       const input = page.locator('[data-testid="effect-tray-folder-rename"]').first();
       await input.fill('E2E Renamed Folder');
       await input.press('Enter');
@@ -986,7 +990,7 @@ test.describe('effect tray sidebar tab', () => {
 
       await openFolderMenu(page, 'E2E Remove Parent');
       const [removeLabel] = await localizeAll(page, ['FOLDER.Remove']);
-      await page.locator('#context-menu li.context-item', { hasText: removeLabel }).click();
+      await chooseContextMenuEntry(page, page.locator('#context-menu li.context-item', { hasText: removeLabel }));
 
       // The dialog opens where core's directory opens it: 770px left of the viewport's right edge.
       /** @type {import('@playwright/test').Locator} The Remove Folder confirmation dialog. */
@@ -1037,7 +1041,7 @@ test.describe('effect tray sidebar tab', () => {
 
       await openFolderMenu(page, 'E2E Purge Parent');
       const [deleteLabel] = await localizeAll(page, ['FOLDER.Delete']);
-      await page.locator('#context-menu li.context-item', { hasText: deleteLabel }).click();
+      await chooseContextMenuEntry(page, page.locator('#context-menu li.context-item', { hasText: deleteLabel }));
       await page.locator('.application.dialog button[data-action="yes"]').click();
 
       await expect(trayFolder(page, 'E2E Purge Parent')).toHaveCount(0);
@@ -1076,7 +1080,7 @@ test.describe('effect tray sidebar tab', () => {
 
       await openFolderMenu(page, 'E2E Table Folder');
       const [createLabel] = await localizeAll(page, ['FOLDER.CreateTable']);
-      await page.locator('#context-menu li.context-item', { hasText: createLabel }).click();
+      await chooseContextMenuEntry(page, page.locator('#context-menu li.context-item', { hasText: createLabel }));
       await page.locator('.application.dialog button[data-action="yes"]').click();
 
       await expect
@@ -1267,7 +1271,7 @@ test.describe('effect tray sidebar tab', () => {
       await expect(page.locator('#context-menu')).toBeVisible();
 
       const openLabel = await page.evaluate(() => game.i18n.localize('LOCAL.effectTrayOpen.text'));
-      await page.locator('#context-menu li.context-item', { hasText: openLabel }).first().click();
+      await chooseContextMenuEntry(page, page.locator('#context-menu li.context-item', { hasText: openLabel }).first());
 
       // The context-menu Open entry opens the effect sheet asynchronously; poll until it appears.
       await expect

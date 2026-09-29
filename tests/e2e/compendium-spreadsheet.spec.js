@@ -3,6 +3,7 @@ import { strFromU8, strToU8, unzipSync, zipSync } from 'fflate';
 import { readFile, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
+import { chooseContextMenuEntry } from './contextMenu.js';
 import { login } from './fixtures.js';
 import { selectTitanOption } from './select.js';
 import { attachPageErrors, closeAllApps } from './world.js';
@@ -52,6 +53,17 @@ async function openPackContextMenu(page, packId) {
    await page.locator('#sidebar-tabs [data-tab="compendium"]').click();
    await page.locator(`.directory-item[data-pack="${packId}"]`).click({ button: 'right' });
    await page.locator('#context-menu').waitFor();
+}
+
+/**
+ * Chooses the labelled entry from the open pack context menu and waits for the menu to finish closing, so
+ * no pending core close can remove the pack's next context menu (see `chooseContextMenuEntry`).
+ * @param {import('@playwright/test').Page} page - The shared page.
+ * @param {string} label - The entry's visible label, e.g. "Export to Spreadsheet".
+ * @returns {Promise<void>} Resolves once the menu has closed.
+ */
+async function choosePackMenuEntry(page, label) {
+   await chooseContextMenuEntry(page, page.locator('#context-menu .context-item', { hasText: label }));
 }
 
 /**
@@ -255,7 +267,7 @@ test.describe('compendium spreadsheet export/import', () => {
       await openPackContextMenu(page, 'titan.effects');
       /** @type {Promise<import('@playwright/test').Download>} */
       const downloadPromise = page.waitForEvent('download');
-      await page.locator('#context-menu .context-item', { hasText: 'Export to Spreadsheet' }).click();
+      await choosePackMenuEntry(page, 'Export to Spreadsheet');
       // Default format/layout (xlsx/wide) exports as a single .xlsx with no dialog interaction needed —
       // the context-menu action opens the dialog; accept its defaults by clicking the confirm button.
       await page.locator('[data-testid="export-confirm-button"]').click();
@@ -291,7 +303,7 @@ test.describe('compendium spreadsheet export/import', () => {
          await openPackContextMenu(page, packId);
          /** @type {Promise<import('@playwright/test').Download>} */
          const downloadPromise = page.waitForEvent('download');
-         await page.locator('#context-menu .context-item', { hasText: 'Export to Spreadsheet' }).click();
+         await choosePackMenuEntry(page, 'Export to Spreadsheet');
          await selectTitanOption(page, page.locator('[data-testid="export-format-select"]'), 'csv');
          await page.locator('[data-testid="export-confirm-button"]').click();
          /** @type {string} */
@@ -321,7 +333,7 @@ test.describe('compendium spreadsheet export/import', () => {
          await writeFile(tmpPath, rewritten);
 
          await openPackContextMenu(page, packId);
-         await page.locator('#context-menu .context-item', { hasText: 'Import Spreadsheet' }).click();
+         await choosePackMenuEntry(page, 'Import Spreadsheet');
          await page.locator('[data-testid="import-file-input"]').setInputFiles(tmpPath);
          await page.locator('[data-testid="import-preview-button"]').click();
          /** @type {import('@playwright/test').Locator} */
@@ -357,7 +369,7 @@ test.describe('compendium spreadsheet export/import', () => {
          await openPackContextMenu(page, 'titan.effects');
          /** @type {Promise<import('@playwright/test').Download>} */
          const downloadPromise = page.waitForEvent('download');
-         await page.locator('#context-menu .context-item', { hasText: 'Export to Spreadsheet' }).click();
+         await choosePackMenuEntry(page, 'Export to Spreadsheet');
          await selectTitanOption(page, page.locator('[data-testid="export-format-select"]'), 'csv');
          await page.locator('[data-testid="export-confirm-button"]').click();
          /** @type {import('@playwright/test').Download} */
@@ -427,7 +439,7 @@ test.describe('compendium spreadsheet export/import', () => {
          await openPackContextMenu(page, packId);
          /** @type {Promise<import('@playwright/test').Download>} */
          const downloadPromise = page.waitForEvent('download');
-         await page.locator('#context-menu .context-item', { hasText: 'Export to Spreadsheet' }).click();
+         await choosePackMenuEntry(page, 'Export to Spreadsheet');
          await selectTitanOption(page, page.locator('[data-testid="export-format-select"]'), 'csv');
          await page.locator('[data-testid="export-confirm-button"]').click();
          /** @type {string} */
@@ -456,7 +468,7 @@ test.describe('compendium spreadsheet export/import', () => {
          await writeFile(tmpPath, rewritten);
 
          await openPackContextMenu(page, packId);
-         await page.locator('#context-menu .context-item', { hasText: 'Import Spreadsheet' }).click();
+         await choosePackMenuEntry(page, 'Import Spreadsheet');
          await page.locator('[data-testid="import-file-input"]').setInputFiles(tmpPath);
          await page.locator('[data-testid="import-delete-missing-checkbox"]').click();
          await page.locator('[data-testid="import-preview-button"]').click();
@@ -509,7 +521,7 @@ test.describe('compendium spreadsheet export/import', () => {
 
       try {
          await openPackContextMenu(page, 'titan.effects');
-         await page.locator('#context-menu .context-item', { hasText: 'Import Spreadsheet' }).click();
+         await choosePackMenuEntry(page, 'Import Spreadsheet');
          /** @type {string} */
          const tmpPath = join(tmpdir(), 'titan-e2e-locked.csv');
          await writeFile(tmpPath, `﻿_id,name\r\n${existingEffect.id},E2E Should Not Be Renamed\r\n`);
@@ -551,7 +563,7 @@ test.describe('compendium spreadsheet export/import', () => {
          await openPackContextMenu(page, packId);
          /** @type {Promise<import('@playwright/test').Download>} */
          const downloadPromise = page.waitForEvent('download');
-         await page.locator('#context-menu .context-item', { hasText: 'Export to Spreadsheet' }).click();
+         await choosePackMenuEntry(page, 'Export to Spreadsheet');
          await selectTitanOption(page, page.locator('[data-testid="export-format-select"]'), 'csv');
          await page.locator('[data-testid="export-confirm-button"]').click();
          /** @type {string} */
@@ -580,7 +592,7 @@ test.describe('compendium spreadsheet export/import', () => {
          await writeFile(conditionPath, conditionCsv);
 
          await openPackContextMenu(page, packId);
-         await page.locator('#context-menu .context-item', { hasText: 'Import Spreadsheet' }).click();
+         await choosePackMenuEntry(page, 'Import Spreadsheet');
          // The manifest/npc sheets are unchanged; only the two mutated sheets need re-uploading alongside
          // it, so the whole zip is re-uploaded to keep the manifest and all sheets consistent.
          /** @type {string} */

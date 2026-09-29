@@ -3,6 +3,23 @@
 Living record of post-work review issues — gotchas, accepted limitations, and issues that deserve
 attention. NOT a to-do list (deferred work goes to `docs/TODO.md`; bugs go to `docs/OPEN_BUGS.md`).
 
+### Foundry v14 core: a pending ContextMenu close removes the instance's next menu (2026-09-28)
+
+Core's `ContextMenu#close()` (`client/applications/ux/context-menu.mjs:273-291`) awaits a 200 ms collapse animation and
+then calls `_close()`, which removes `this.#element` as it stands at that moment. The global
+`document` click listener (`ContextMenu.activateListeners`) calls `ui.context?.close()` on every click, and
+`ui.context` stays set until the first close resolves, so each click in that window queues another close. If the same
+instance re-renders (a right-click on the same directory) before those closes resolve, they remove the new menu: no
+menu shows, and a click on one of its entries retries on a detached node until the test times out. Too fast for a
+human to hit; Playwright hits it. Measured with an in-page trace of `render`/`close`/`_close`: the Export dialog's
+format-select, option, and confirm clicks queued three closes whose `_close` ran after the next pack right-click's
+`render`, removing its menu. It broke three `compendium-spreadsheet.spec.js` tests (re-open the pack's menu after an
+export) under the 09-28 branch head AND under the `e95f064f` (09-27) source, and the spec is unchanged since 09-11,
+so the failure predates the 09-28 work; it is a race whose outcome varies run to run. Core bug, not ours (no engine fork). Harness rule: choose core context-menu entries
+through `chooseContextMenuEntry` (`tests/e2e/contextMenu.js`), which waits for the menu to detach before any further
+click, so no close is left pending. The `ERR_CONNECTION_REFUSED` console errors seen in the same runs are the Wiretap
+module retrying its sidecar on `localhost:31416` (backing off to ~7 s) from login onward; they are unrelated.
+
 ### Armor-trait situations are narrowed to the Skill their checks use (2026-09-28)
 
 Heavy and Encumbering's "Swim, Fly, or Climb" situation and Heavy's "Jump" are narrowed to Athletics; Loud's "Remain

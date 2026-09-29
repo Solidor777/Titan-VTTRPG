@@ -1,4 +1,5 @@
 import { expect, test } from '@playwright/test';
+import { chooseContextMenuEntry } from './contextMenu.js';
 import { login } from './fixtures.js';
 import { attachPageErrors, clearChat, closeAllApps } from './world.js';
 
@@ -242,9 +243,11 @@ test.describe('v14 interaction dialogs', () => {
       // Click the Edit-UUID entry in the context menu. The TITAN `getActorContextOptions` hook
       // (OnGetActorDirectoryEntryContext.js) labels it via the `editUUID` localization, which
       // resolves to "Edit Unique ID" in lang/en.json - not the literal "Edit UUID".
-      await page.locator('#context-menu li.context-item, .context-menu .context-item', { hasText: 'Edit Unique ID' })
-         .first()
-         .click();
+      await chooseContextMenuEntry(
+         page,
+         page.locator('#context-menu li.context-item, .context-menu .context-item', { hasText: 'Edit Unique ID' })
+            .first(),
+      );
 
       // The dialog window appears once the AppV2 render + Svelte mount settle (auto-retried).
       await expect(page.locator(DIALOG_SELECTOR).first()).toBeVisible();
