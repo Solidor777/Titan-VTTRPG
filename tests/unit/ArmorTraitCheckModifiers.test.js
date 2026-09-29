@@ -128,10 +128,16 @@ describe('createArmorTraitCheckModifiers', () => {
       const original = i18n.localize;
       /** @type {object[]} The elements built under English. */
       const english = createArmorTraitCheckModifiers(HEAVY);
-      i18n.localize = (key) => `translated ${key}`;
+
       /** @type {object[]} The elements built under a stand-in translation. */
-      const translated = createArmorTraitCheckModifiers(HEAVY);
-      i18n.localize = original;
+      let translated;
+      try {
+         i18n.localize = (key) => `translated ${key}`;
+         translated = createArmorTraitCheckModifiers(HEAVY);
+      }
+      finally {
+         i18n.localize = original;
+      }
       expect(translated.map((element) => camelize(element.key))).toEqual(
          english.map((element) => camelize(element.key)),
       );

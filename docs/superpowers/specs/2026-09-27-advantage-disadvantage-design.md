@@ -140,8 +140,8 @@ adds synthetic `conditionalCheckModifier` elements for the equipped armor's trai
 | Encumbering | `advantage` −1, key "Swim, Fly, or Climb", narrowed to `athletics` |
 | Loud | `advantage` −1, key "Remain Undetected by Hearing", narrowed to `stealth` |
 
-The system has no Jump action and no Acrobatics skill; a Jump is a Body (Athletics) check (rules line 2300) and so is
-a Climb (line 3150), so the armor situations are narrowed to Athletics, and Loud's to Stealth. Unnarrowed, armor would
+The system has no Jump action and no Acrobatics skill; a Jump is a Body (Athletics) check (the "Jumping" section) and so
+is a Climb (the Athlete ability and the fissure check), so the armor situations are narrowed to Athletics, and Loud's to Stealth. Unnarrowed, armor would
 make every check situational and open the dialog on every roll under the default setting.
 
 As built: each system situation has a fixed canonical English source string defined in code ("Swim, Fly, or Climb",

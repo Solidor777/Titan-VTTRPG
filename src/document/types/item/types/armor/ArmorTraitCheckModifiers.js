@@ -42,10 +42,11 @@ function createSituationalElement(trait, modifierType, value, labelKey, skill) {
  * Builds the situational check modifiers an equipped armor's traits impose. Source: TITAN Rules Compendium, "Armor and
  * Shields" (the Encumbering, Loud, and Heavy traits) and "Jumping". Traits sharing a situation ("Swim, Fly, or Climb")
  * share its canonical key, so they merge into one dialog entry whose value is their sum. Each situation is narrowed to
- * the Skill its checks use, so it is offered (and opens the dialog) only there: Jumping is determined by Body, and
- * remaining undetected is a Stealth check. The rules name no Skill for swimming, flying, or climbing: narrowing them to
- * Athletics is a design choice, made because the three share one situation and an unnarrowed armor situation would
- * open the dialog on every check. Heavy's "cannot Jump" is therefore an Automatic Failure offered on Athletics checks.
+ * the Skill its checks use, so it is offered (and opens the dialog) only there: Jumping (the "Jumping" section) and
+ * Climbing (the Athlete ability and the fissure check) are Body (Athletics) checks, and remaining undetected is a
+ * Stealth check. The rules name no Skill for swimming or flying: narrowing them to Athletics is a design choice, made
+ * because Swim, Fly, and Climb share one situation and an unnarrowed armor situation would open the dialog on every
+ * check. Heavy's "cannot Jump" is therefore an Automatic Failure offered on Athletics checks.
  * @param {StandardTrait[]} traits - The armor's traits.
  * @returns {ConditionalCheckModifierElement[]} The synthetic elements, in trait order Heavy, Encumbering, Loud.
  */
