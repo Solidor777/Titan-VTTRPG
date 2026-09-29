@@ -1,8 +1,9 @@
 <script>
-   import localize from '~/helpers/utility-functions/Localize.js';
    import { getContext } from 'svelte';
-   import tooltipAction from '~/helpers/svelte-actions/TooltipAction.js';
+   import { clampAdvantage, getAdvantageLabel } from '~/check/ApplyAdvantage.js';
    import CheckChatResetExpertiseButton from '~/check/chat-message/CheckChatResetExpertiseButton.svelte';
+   import tooltipAction from '~/helpers/svelte-actions/TooltipAction.js';
+   import localize from '~/helpers/utility-functions/Localize.js';
    import {
       CLEAVE_ICON,
       DAMAGE_ICON,
@@ -12,7 +13,6 @@
       REND_ICON,
       TRAINING_ICON,
    } from '~/system/Icons.js';
-   import { clampAdvantage, getAdvantageLabel } from '~/check/ApplyAdvantage.js';
 
    /** @type {object} Reference to the reactive Document store. */
    const document = getContext('document');
