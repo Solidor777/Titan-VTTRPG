@@ -28,8 +28,10 @@ export const USER_KEYED_CHECK_MODIFIER_SELECTORS = Object.freeze([
 
 /**
  * The modifier types each check type reads. A situational modifier is offered to a check only for a type it reads (an
- * Attribute Check has no Damage), and the rules-element editor offers a check type only for the modifier types it
- * reads. Attribute Checks read only `any`-check-type modifiers, so the editor has no `attribute` check type.
+ * Attribute Check has no Damage). The rules-element editor filters both selects through this map: a check type's
+ * options are the ones that read the element's modifier type, and a modifier type's options are the ones the element's
+ * check type reads (`any` reads every type). Attribute Checks read only `any`-check-type modifiers, so the editor has
+ * no `attribute` check type.
  * @type {Readonly<Record<string, readonly string[]>>}
  */
 export const CHECK_TYPE_MODIFIER_TYPES = Object.freeze({

@@ -25,6 +25,7 @@ const LOCAL_KEYS = [
    'greaterAdvantage.text',
    'greaterDisadvantage.text',
    'noAdvantage.text',
+   'situation.text',
    'situationalModifiers.text',
 ];
 

@@ -210,6 +210,10 @@ Consumers use it for pure in-memory mutations that must land in the persisted sn
 rules-element settings components (`src/document/types/item/sheet/rules-element/ItemSheet*Settings.svelte`)
 reset a sensible-default `key` when the `selector`/`checkType`/`rating` changes, then let
 `DocumentSelect` persist once. Those handlers are pure key-setters; they do not call `update()` themselves.
+`DocumentSelect` also forwards an optional `testId` to the inner `Select` trigger. The conditional-check-modifier editor
+(`ItemSheetConditionalCheckModifierSettings.svelte`) filters its modifier-type and check-type options through
+`CHECK_TYPE_MODIFIER_TYPES`, shows a level select (`clampAdvantage` display, written only on user pick) for `advantage`,
+hides the value for `automaticFailure`, and offers a Skill narrowing for non-Resistance `situation` elements.
 
 *Direct document.update calls through the embedded bridge* (e.g. `CharacterSheetCommodity.svelte`,
 `CharacterSheetEffect.svelte`): row inputs that edit an embedded document use a function binding whose

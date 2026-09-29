@@ -587,7 +587,8 @@ export default class CharacterDataModel extends TitanActorDataModel {
    /**
     * Expands any rules element whose key is 'all' into one element per concrete key under its selector,
     * leaving every other element untouched. Operates on the gathered element list before bucketing, so
-    * 'all' works uniformly for every operation that carries a key.
+    * 'all' works uniformly for every operation that carries a key. A `situation` selector's key is a typed label, not
+    * a stat key, so a situation labelled "all" stays as it is.
     * @param {object[]} elements - The gathered rules elements (already tagged with a type).
     * @returns {object[]} A new array with 'all'-key elements expanded.
     * @private
@@ -596,7 +597,7 @@ export default class CharacterDataModel extends TitanActorDataModel {
       /** @type {object[]} */
       const expanded = [];
       for (const element of elements) {
-         if (element.key === 'all') {
+         if (element.key === 'all' && element.selector !== 'situation') {
             // Resolve the concrete keys under this selector; an empty result means the element would be
             // silently dropped, so warn naming the offending selector.
             /** @type {string[]} */

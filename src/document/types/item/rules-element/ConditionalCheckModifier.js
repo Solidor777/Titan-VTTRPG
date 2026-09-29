@@ -10,6 +10,7 @@ import generateUUID from '~/helpers/utility-functions/GenerateUUID.js';
  * @property {string} key - The specific result of the condition for modifying the check (body, melee, a situation
  * label, etc.).
  * @property {string} skill - For the `situation` selector, the one Skill whose checks offer the modifier ('' = any).
+ * The editor clears it on any other selector and on Resistance Checks, which use no Skill.
  * @property {number} value - The modifier's amount; for `advantage` its level (±1, ±2); unused by `automaticFailure`.
  * @property {string} uuid - Unique identifier for the Rules Element, used to track the element across type changes.
  */

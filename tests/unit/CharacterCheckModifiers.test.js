@@ -694,3 +694,32 @@ describe('Resistance Check conditional modifiers', () => {
       });
    });
 });
+
+describe('CharacterDataModel._expandAllKeyElements', () => {
+   it('keeps a situation labelled "all" as a literal label instead of expanding or dropping it', () => {
+      /** @type {object} A situation element whose typed label is the reserved word. */
+      const situation = checkModifier({
+         key: 'all',
+         selector: 'situation',
+      });
+      expect(createModel()._expandAllKeyElements([situation])).toEqual([situation]);
+   });
+
+   it('still expands an "all" key under a stat selector into one element per key', () => {
+      /** @type {object} The model under test, with two attributes. */
+      const model = createModel();
+      model.attribute = {
+         body: {},
+         mind: {},
+      };
+      expect(model._expandAllKeyElements([
+         checkModifier({
+            key: 'all',
+            selector: 'attribute',
+         }),
+      ]).map((element) => element.key)).toEqual([
+         'body',
+         'mind',
+      ]);
+   });
+});

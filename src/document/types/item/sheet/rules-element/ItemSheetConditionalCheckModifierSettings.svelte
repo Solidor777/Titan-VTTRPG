@@ -1,6 +1,11 @@
 <script>
    import { getContext } from 'svelte';
-   import { CONDITIONAL_CHECK_MODIFIER_TYPES } from '~/system/ConditionalCheckModifierTypes.js';
+   import {
+      CHECK_TYPE_MODIFIER_TYPES,
+      CONDITIONAL_CHECK_MODIFIER_TYPES,
+   } from '~/system/ConditionalCheckModifierTypes.js';
+   import { ADVANTAGE_ELEMENT_LEVEL_OPTIONS, clampAdvantage } from '~/check/ApplyAdvantage.js';
+   import { SKILLS } from '~/system/Skills.js';
    import localize from '~/helpers/utility-functions/Localize.js';
    import DocumentSelect from '~/document/svelte-components/select/DocumentSelect.svelte';
    import DocumentAttackTypeSelect from '~/document/svelte-components/select/DocumentAttackTypeSelect.svelte';
@@ -8,6 +13,7 @@
    import DocumentTextInput from '~/document/svelte-components/input/DocumentTextInput.svelte';
    import DocumentIntegerInput from '~/document/svelte-components/input/DocumentIntegerInput.svelte';
    import DocumentAttributeSelect from '~/document/svelte-components/select/DocumentAttributeSelect.svelte';
+   import DocumentResistanceSelect from '~/document/svelte-components/select/DocumentResistanceSelect.svelte';
    import DocumentSkillSelect from '~/document/svelte-components/select/DocumentSkillSelect.svelte';
 
    /**
@@ -21,11 +27,16 @@
    /** @type {object} Reference to the reactive Document store. */
    const document = getContext('document');
 
-   /** @type {readonly string[]} Options for the type of value the modifier applies to. */
-   const modifierTypeOptions = CONDITIONAL_CHECK_MODIFIER_TYPES;
+   /**
+    * @type {string[]} The modifier types this element's check type reads, in CONDITIONAL_CHECK_MODIFIER_TYPES order;
+    * every type for `any`.
+    */
+   const modifierTypeOptions = $derived(CONDITIONAL_CHECK_MODIFIER_TYPES.filter(
+      (modifierType) => isCheckTypeAllowed(document.data.system.rulesElement[idx].checkType, modifierType),
+   ));
 
-   /** @type {{label: string, value: string}[]} Options for the type of check the modifier applies to. */
-   const checkTypeOptions = [
+   /** @type {{label: string, value: string}[]} Every check type a modifier can target. */
+   const allCheckTypeOptions = [
       {
          label: 'anyCheck',
          value: 'any',
@@ -42,24 +53,9 @@
          label: 'itemCheck',
          value: 'item',
       },
-   ];
-
-   /**
-    * @type {{label: string, value: string}[]}
-    * Check type options when healing is selected. Excludes attack checks, because attacks cannot heal.
-    */
-   const healingCheckTypeOptions = [
       {
-         label: 'anyCheck',
-         value: 'any',
-      },
-      {
-         label: 'castingCheck',
-         value: 'casting',
-      },
-      {
-         label: 'itemCheck',
-         value: 'item',
+         label: 'resistanceCheck',
+         value: 'resistance',
       },
    ];
 
@@ -70,6 +66,7 @@
          'attribute',
          'skill',
          'customTrait',
+         'situation',
       ],
       attack: [
          'any',
@@ -79,6 +76,7 @@
          'customTrait',
          'multiAttack',
          'skill',
+         'situation',
       ],
       casting: [
          'any',
@@ -86,77 +84,118 @@
          'customTrait',
          'spellTradition',
          'skill',
+         'situation',
       ],
       item: [
          'any',
          'attribute',
          'customTrait',
          'skill',
+         'situation',
+      ],
+      resistance: [
+         'any',
+         'resistance',
+         'situation',
       ],
    };
 
+   /** @type {Array<{label: string, value: string}|string>} A situation's Skill narrowing; '' offers every Skill. */
+   const situationSkillOptions = [
+      {
+         label: 'any',
+         value: '',
+      },
+      ...SKILLS,
+   ];
+
+   /** @type {{label: string, value: string}[]} The check types that read this element's modifier type. */
+   const checkTypeOptions = $derived(allCheckTypeOptions.filter(
+      (option) => isCheckTypeAllowed(option.value, document.data.system.rulesElement[idx].modifierType),
+   ));
+
    /**
-    * Updates the check type if necessary when the modifier type changes.
-    * If the modifier type is 'healing' and the check type is 'attack',
-    * resets the check type to 'any' and cascades the change to the selector.
+    * Whether a check type reads a modifier type. `any` targets every check, so it allows every type. The modifier-type
+    * and check-type options both filter through this, so the editor cannot build a combination no check reads.
+    * @param {string} checkType - The element's check type.
+    * @param {string} modifierType - The element's modifier type.
+    * @returns {boolean} Whether the combination can apply to a check.
+    */
+   function isCheckTypeAllowed(checkType, modifierType) {
+      return checkType === 'any' || CHECK_TYPE_MODIFIER_TYPES[checkType].includes(modifierType);
+   }
+
+   /**
+    * Updates the value when the modifier type changes: Advantage starts at Advantage (1) and Automatic Failure stores
+    * 1. The check type needs no reset, because the modifier-type options offer only types it reads.
     * @returns {void}
     */
    function onModifierTypeChanged() {
-      if (
-         document.data.system.rulesElement[idx].modifierType === 'healing' &&
-         document.data.system.rulesElement[idx].checkType === 'attack'
-      ) {
-         document.data.system.rulesElement[idx].checkType = 'any';
-         onCheckTypeChange();
+      /** @type {object} The edited element. */
+      const element = document.data.system.rulesElement[idx];
+      if (element.modifierType === 'advantage' || element.modifierType === 'automaticFailure') {
+         element.value = 1;
       }
    }
 
    /**
-    * Updates the selector when the check type changes.
-    * Resets the selector to 'any' unless it is 'customTrait', 'attribute', or a valid 'skill' selector.
+    * Resets the selector to 'any' when the new check type does not offer it, cascading the change to the key and
+    * Skill. A Resistance Check has no Skill, so a Resistance situation clears its Skill narrowing.
     * @returns {void}
     */
    function onCheckTypeChange() {
-      if (
-         document.data.system.rulesElement[idx].selector !== 'customTrait' &&
-         document.data.system.rulesElement[idx].selector !== 'attribute' &&
-         !(document.data.system.rulesElement[idx].checkType !== 'any' &&
-            document.data.system.rulesElement[idx].selector === 'skill')
-      ) {
-         document.data.system.rulesElement[idx].selector = 'any';
+      /** @type {object} The edited element. */
+      const element = document.data.system.rulesElement[idx];
+      if (!selectorOptions[element.checkType].includes(element.selector)) {
+         element.selector = 'any';
          onSelectorChange();
+      }
+      if (element.checkType === 'resistance') {
+         element.skill = '';
       }
    }
 
    /**
-    * Updates the element key to a default value when the selector changes.
+    * Updates the element key to a default value when the selector changes, and clears the Skill narrowing: only a
+    * situation takes one, and a newly chosen situation starts unnarrowed.
     * @returns {void}
     */
    function onSelectorChange() {
-      switch (document.data.system.rulesElement[idx].selector) {
+      /** @type {object} The edited element. */
+      const element = document.data.system.rulesElement[idx];
+      element.skill = '';
+      switch (element.selector) {
          case 'attribute': {
-            document.data.system.rulesElement[idx].key = 'body';
+            element.key = 'body';
             break;
          }
          case 'attackTrait': {
-            document.data.system.rulesElement[idx].key = 'blast';
+            element.key = 'blast';
             break;
          }
          case 'attackType': {
-            document.data.system.rulesElement[idx].key = 'melee';
+            element.key = 'melee';
             break;
          }
          case 'customTrait':
          case 'multiAttack': {
-            document.data.system.rulesElement[idx].key = '';
+            element.key = '';
+            break;
+         }
+         case 'resistance': {
+            element.key = 'reflexes';
+            break;
+         }
+         case 'situation': {
+            element.key = localize('situation');
             break;
          }
          case 'skill': {
-            document.data.system.rulesElement[idx].key = 'arcana';
+            element.key = 'arcana';
             break;
          }
          case 'spellTradition': {
-            document.data.system.rulesElement[idx].key = localize('any');
+            element.key = localize('any');
             break;
          }
          default: {
@@ -166,8 +205,8 @@
    }
 
    /**
-    * Returns the appropriate Svelte component for the current selector type.
-    * @returns {object | undefined} The selector input component, or undefined if there is no valid case.
+    * Returns the key input component for the current selector.
+    * @returns {object | undefined} The key input component, or undefined when the selector takes no key.
     */
    function getSelector() {
       switch (document.data.system.rulesElement[idx].selector) {
@@ -180,14 +219,16 @@
          case 'attackType': {
             return DocumentAttackTypeSelect;
          }
-         case 'customTrait': {
+         case 'customTrait':
+         case 'situation':
+         case 'spellTradition': {
             return DocumentTextInput;
+         }
+         case 'resistance': {
+            return DocumentResistanceSelect;
          }
          case 'skill': {
             return DocumentSkillSelect;
-         }
-         case 'spellTradition': {
-            return DocumentTextInput;
          }
          default: {
             break;
@@ -205,6 +246,7 @@
          bind:value={document.data.system.rulesElement[idx].modifierType}
          onchange={onModifierTypeChanged}
          options={modifierTypeOptions}
+         testId={'ccm-modifier-type'}
       />
    </div>
 
@@ -213,9 +255,8 @@
       <DocumentSelect
          bind:value={document.data.system.rulesElement[idx].checkType}
          onchange={onCheckTypeChange}
-         options={document.data.system.rulesElement[idx].modifierType === 'healing'
-            ? healingCheckTypeOptions
-            : checkTypeOptions}
+         options={checkTypeOptions}
+         testId={'ccm-check-type'}
       />
    </div>
 
@@ -225,6 +266,7 @@
          bind:value={document.data.system.rulesElement[idx].selector}
          onchange={onSelectorChange}
          options={selectorOptions[document.data.system.rulesElement[idx].checkType]}
+         testId={'ccm-selector'}
       />
    </div>
 
@@ -238,10 +280,47 @@
       </div>
    {/if}
 
-   <!--Value-->
-   <div class="field number">
-      <DocumentIntegerInput bind:value={document.data.system.rulesElement[idx].value}/>
-   </div>
+   <!--Skill narrowing: a situation may offer itself only on checks using one Skill; Resistance Checks have none.-->
+   {#if document.data.system.rulesElement[idx].selector === 'situation' &&
+      document.data.system.rulesElement[idx].checkType !== 'resistance'}
+      <div class="field select">
+         <DocumentSelect
+            bind:value={
+               () => document.data.system.rulesElement[idx].skill ?? '',
+               (skill) => {
+                  document.data.system.rulesElement[idx].skill = skill;
+               }
+            }
+            options={situationSkillOptions}
+            testId={'ccm-situation-skill'}
+         />
+      </div>
+   {/if}
+
+   <!--Value: Advantage stores a level, Automatic Failure stores none, every other type stores an integer.-->
+   {#if document.data.system.rulesElement[idx].modifierType === 'advantage'}
+      <!--The level shows normalized (0 or a non-number as Advantage, ±3 as Greater), so the select never rewrites a
+         stored value it cannot show; the stored value changes only when the user picks a level.-->
+      <div class="field select">
+         <DocumentSelect
+            bind:value={
+               () => clampAdvantage(Number(document.data.system.rulesElement[idx].value)) || 1,
+               (level) => {
+                  document.data.system.rulesElement[idx].value = level;
+               }
+            }
+            options={ADVANTAGE_ELEMENT_LEVEL_OPTIONS}
+            testId={'ccm-advantage-level'}
+         />
+      </div>
+   {:else if document.data.system.rulesElement[idx].modifierType !== 'automaticFailure'}
+      <div class="field number">
+         <DocumentIntegerInput
+            bind:value={document.data.system.rulesElement[idx].value}
+            testId={'ccm-value'}
+         />
+      </div>
+   {/if}
 </div>
 
 <style lang="scss">

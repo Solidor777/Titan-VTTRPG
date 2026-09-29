@@ -11,6 +11,7 @@
     * @property {boolean} [disabled] - Whether the input should currently be disabled.
     * @property {string | object} [tooltip] - The Tooltip to display for this element, if any.
     * @property {() => void} [onchange] - Optional callback fired (as a pure mutation) before the document is persisted.
+    * @property {string} [testId] - Optional stable selector forwarded to the inner Select's combobox trigger.
     */
 
    /** @type {DocumentSelectProps} */
@@ -20,6 +21,7 @@
       disabled = false,
       tooltip = void 0,
       onchange = void 0,
+      testId = void 0,
    } = $props();
 
    /** @type {object} Reference to the reactive Document store. */
@@ -34,5 +36,6 @@
       refreshSystemDocument(document.data, disabled);
    }}
    {options}
+   {testId}
    {tooltip}
 />
