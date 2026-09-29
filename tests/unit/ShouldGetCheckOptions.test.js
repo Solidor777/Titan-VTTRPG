@@ -108,11 +108,21 @@ describe('shouldGetCheckOptions', () => {
       expect(shouldGetCheckOptions(situational)).toBe(dialog);
    });
 
-   it('reads a stored Boolean true as always and a stored false as situational', () => {
+   it.each([
+      true,
+      'true',
+   ])('reads a stored %j as always', (stored) => {
       vi.mocked(isModifierActive).mockReturnValue(false);
-      storedMode = true;
+      storedMode = stored;
       expect(shouldGetCheckOptions(false)).toBe(true);
-      storedMode = 'false';
+   });
+
+   it.each([
+      false,
+      'false',
+   ])('reads a stored %j as situational', (stored) => {
+      vi.mocked(isModifierActive).mockReturnValue(false);
+      storedMode = stored;
       expect(shouldGetCheckOptions(false)).toBe(false);
       expect(shouldGetCheckOptions(true)).toBe(true);
    });
