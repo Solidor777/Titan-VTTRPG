@@ -652,8 +652,7 @@ export default class CharacterDataModel extends TitanActorDataModel {
       /**
        * Copies the Rules Elements from an item to the Rules Elements array.
        * @param {TitanItem} item - The Item to copy the Rules Elements from.
-       * @param {string} type - The type by which to categorize the items Rules Elements (ability, equipment, or
-       * effect).
+       * @param {string} type - The type by which to categorize the item's Rules Elements (ability or equipment).
        */
       function processItemElements(item, type) {
          processElements(item.system.rulesElement, type, item.name);
@@ -663,7 +662,7 @@ export default class CharacterDataModel extends TitanActorDataModel {
          if (item.system.rulesElement && item.system.rulesElement.length > 0) {
 
             // Equipment, armor, shields, and weapons only apply elements if they are equipped.
-            // Abilities and effects should apply their Rules Elements as normal.
+            // Abilities always apply their Rules Elements.
             switch (item.type) {
                case 'ability': {
                   processItemElements(item, 'ability');
@@ -830,7 +829,7 @@ export default class CharacterDataModel extends TitanActorDataModel {
          this._applySituationalCheckModifierElements(situationalCheckModifierElements);
       }
 
-      // Otherwise, set the Rules Elements cache to null.
+      // Otherwise, set the Rules Elements cache to false.
       else {
          this.parent.rulesElementsCache = false;
       }
@@ -3737,8 +3736,7 @@ export default class CharacterDataModel extends TitanActorDataModel {
 
    /**
     * Applies the check's summed Advantage to its Difficulty, keeping the pre-Advantage value as `baseDifficulty`.
-    * INVARIANT: runs after the rating-derived and option Difficulty (an Attack Check's rating clamp included);
-    * target-condition overrides may follow it.
+    * INVARIANT: runs after the rating-derived and option Difficulty (an Attack Check's rating clamp included).
     * @param {CheckParameters} parameters - The check parameters. Modified in place.
     * @private
     */
