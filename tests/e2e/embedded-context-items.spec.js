@@ -312,9 +312,10 @@ test.describe('embedded-context item rows', () => {
 
    // In-file final-state hygiene (house pattern): re-assert the suite's test-default settings and
    // remove the fixture actor once the describe completes. The settings are client-scope and this
-   // spec's browser context is file-local, so nothing crosses spec files — note the test default
-   // for confirmDeletingItems (false) differs from its registered default (true). Inner-scope
-   // after-hooks run before the file-level page close, so `page` is still open.
+   // spec's browser context is file-local, so nothing crosses spec files — note both test defaults
+   // differ from the registered defaults: getCheckOptions is `never` (registered `situational`) and
+   // confirmDeletingItems is false (registered true). Inner-scope after-hooks run before the
+   // file-level page close, so `page` is still open.
    test.afterAll(async () => {
       await page.evaluate(async () => {
          await game.settings.set('titan', 'getCheckOptions', 'never');
