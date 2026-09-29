@@ -407,7 +407,8 @@ hardcoded condition `switch`; the old `_applyConditions` method was retired. All
 stats. Before bucketing, `_expandAllKeyElements` rewrites every element whose `key === 'all'`
 into one element per concrete key under its selector (keys resolved by `_getSelectorKeys`, which maps
 `training`/`expertise` to `Object.keys(this.skill)` and otherwise reads `Object.keys(this[selector])`); an
-`'all'` selector that resolves to no keys is dropped with a `warn`. Any operation carrying a key supports
+element whose selector resolves to no keys (a typed custom trait, spell tradition, or situation label, or any
+non-stat selector) passes through unchanged with its key as typed. Any operation carrying a key supports
 `'all'` at the engine level (`flatModifier`/`mulSum`/`setSum` are the additive/sum ops that use it), but the
 settings UI only exposes the `'all'` option (`allowAll` on the key select) for `mulSum` and `setSum`.
 

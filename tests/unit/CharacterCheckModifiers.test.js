@@ -724,7 +724,7 @@ describe('CharacterDataModel._expandAllKeyElements', () => {
    });
 });
 
-describe('CharacterDataModel._expandAllKeyElements — user-typed keys', () => {
+describe('CharacterDataModel._expandAllKeyElements — selectors with no stat map', () => {
    it.each([
       [
          'conditionalCheckModifier',
@@ -750,7 +750,15 @@ describe('CharacterDataModel._expandAllKeyElements — user-typed keys', () => {
          'rollMessage',
          'customTrait',
       ],
-   ])('keeps a %s element with a typed %s key "all" as a literal key', (operation, selector) => {
+      [
+         'rollMessage',
+         'spellTradition',
+      ],
+      [
+         'flatModifier',
+         'noStatMapSelector',
+      ],
+   ])('keeps a %s element with the stat-map-less %s selector, key "all" included, unchanged', (operation, selector) => {
       /** @type {object} An element whose typed key is the reserved word. */
       const element = {
          key: 'all',

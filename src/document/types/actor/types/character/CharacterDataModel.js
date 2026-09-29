@@ -22,7 +22,6 @@ import {
    CONDITIONAL_CHECK_MODIFIER_TYPES,
    MODIFIER_TYPE_PARAMETER_KEYS,
    USER_KEYED_CHECK_MODIFIER_SELECTORS,
-   USER_TYPED_KEY_SELECTORS,
 } from '~/system/ConditionalCheckModifierTypes.js';
 import clamp from '~/helpers/utility-functions/Clamp.js';
 import computeDamageResistance from '~/helpers/utility-functions/ComputeDamageResistance.js';
@@ -84,7 +83,6 @@ import sortAscending from '~/helpers/utility-functions/SortAscending.js';
 import sortObjectsIntoContainerByFunctionValue
    from '~/helpers/utility-functions/SortObjectsIntoContainerByFunctionValue.js';
 import sortObjectsIntoContainerByKeyValue from '~/helpers/utility-functions/SortObjectsIntoContainerByKeyValue.js';
-import warn from '~/helpers/utility-functions/Warn.js';
 import AddInventoryItemDialog from '~/document/types/actor/dialogs/AddInventoryItemDialog.js';
 import assert from '~/helpers/utility-functions/Assert.js';
 
@@ -588,8 +586,9 @@ export default class CharacterDataModel extends TitanActorDataModel {
    /**
     * Expands any rules element whose key is 'all' into one element per concrete key under its selector,
     * leaving every other element untouched. Operates on the gathered element list before bucketing, so
-    * 'all' works uniformly for every operation that carries a key. A user-typed selector's key (a custom trait, spell
-    * tradition, or situation label) names no stat under the Character, so a typed "all" stays a literal key.
+    * 'all' works uniformly for every operation that carries a key. Only a selector that names a stat map on the
+    * Character (see `_getSelectorKeys`) expands; any other selector's element, such as a typed custom trait or
+    * situation labelled "all", passes through unchanged.
     * @param {object[]} elements - The gathered rules elements (already tagged with a type).
     * @returns {object[]} A new array with 'all'-key elements expanded.
     * @private
@@ -598,25 +597,21 @@ export default class CharacterDataModel extends TitanActorDataModel {
       /** @type {object[]} */
       const expanded = [];
       for (const element of elements) {
-         if (element.key === 'all' && !USER_TYPED_KEY_SELECTORS.includes(element.selector)) {
-            // Resolve the concrete keys under this selector; an empty result means the element would be
-            // silently dropped, so warn naming the offending selector.
-            /** @type {string[]} */
-            const keys = this._getSelectorKeys(element.selector);
-            if (keys.length === 0) {
-               warn(`Rules element selector "${element.selector}" has no keys to expand for key "all".`);
-               continue;
-            }
-
-            for (const key of keys) {
-               expanded.push({
-                  ...element,
-                  key,
-               });
-            }
-         }
-         else {
+         // Resolve the concrete keys under this selector; a selector that names no stat map (a typed custom trait,
+         // spell tradition, or situation label, or any other non-stat selector) yields none, and its element passes
+         // through with its key as typed.
+         /** @type {string[]} */
+         const keys = element.key === 'all' ? this._getSelectorKeys(element.selector) : [];
+         if (keys.length === 0) {
             expanded.push(element);
+            continue;
+         }
+
+         for (const key of keys) {
+            expanded.push({
+               ...element,
+               key,
+            });
          }
       }
 

@@ -27,19 +27,6 @@ export const USER_KEYED_CHECK_MODIFIER_SELECTORS = Object.freeze([
 ]);
 
 /**
- * Every rules-element selector, across all operations, whose key the user types free-form rather than picks from a
- * stat list: the check-modifier selectors above plus the conditional rating modifier's custom item traits. Such a key
- * names no stat under the Character, so the `all` key expansion leaves it alone.
- * @type {readonly string[]}
- */
-export const USER_TYPED_KEY_SELECTORS = Object.freeze([
-   ...USER_KEYED_CHECK_MODIFIER_SELECTORS,
-   'customArmorTrait',
-   'customShieldTrait',
-   'customWeaponTrait',
-]);
-
-/**
  * The modifier types each check type reads. A situational modifier is offered to a check only for a type it reads (an
  * Attribute Check has no Damage). The rules-element editor filters both selects through this map: a check type's
  * options are the ones that read the element's modifier type, and a modifier type's options are the ones the element's

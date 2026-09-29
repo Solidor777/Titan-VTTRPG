@@ -124,6 +124,10 @@ test('the Advantage level select replaces the value and writes the signed level'
 });
 
 test('Automatic Failure hides the level select and the value and stores 1', async () => {
+   // A value-bearing type first, so the value input is present before Automatic Failure removes it.
+   await selectTitanOption(page, sheet().getByTestId('ccm-modifier-type'), 'damage');
+   await expect(sheet().getByTestId('ccm-value')).toBeVisible();
+
    // Advantage first, so the level select is present before Automatic Failure removes it.
    await selectTitanOption(page, sheet().getByTestId('ccm-modifier-type'), 'advantage');
    await selectTitanOption(page, sheet().getByTestId('ccm-advantage-level'), -2);
@@ -196,7 +200,7 @@ test('a stored Advantage value outside the four levels displays normalized and i
    }
 });
 
-test('Healing skips Attack checks, and an unknown stored check type does not break the editor', async () => {
+test('Healing skips Attack checks', async () => {
    await selectTitanOption(page, sheet().getByTestId('ccm-modifier-type'), 'healing');
    await expect.poll(async () => (await readElement()).modifierType).toBe('healing');
    expect(await titanSelectOptionValues(page, sheet().getByTestId('ccm-check-type'))).toEqual([
@@ -204,41 +208,53 @@ test('Healing skips Attack checks, and an unknown stored check type does not bre
       'casting',
       'item',
    ]);
-
-   // A hand-authored check type no editor option carries: the editor still renders, offering every modifier type.
-   await page.evaluate(async (name) => {
-      /** @type {TitanItem} The edited ability. */
-      const item = game.items.getName(name);
-      await item.update({
-         system: {
-            rulesElement: [
-               {
-                  ...item.system.rulesElement[0],
-                  checkType: 'unknownCheck',
-                  modifierType: 'dice',
-               },
-            ],
-         },
-      });
-   }, ITEM_NAME);
-   await expect(sheet().getByTestId('ccm-modifier-type')).toHaveAttribute('data-value', 'dice');
-   expect(await titanSelectOptionValues(page, sheet().getByTestId('ccm-modifier-type'))).toEqual([
-      'damage',
-      'dice',
-      'expertise',
-      'training',
-      'healing',
-      'advantage',
-      'automaticFailure',
-   ]);
-   expect(await titanSelectOptionValues(page, sheet().getByTestId('ccm-selector'))).toEqual([
-      'any',
-      'attribute',
-      'skill',
-      'customTrait',
-      'situation',
-   ]);
 });
+
+// Hand-authored check types no editor option carries; 'toString' is an inherited property name, not an own key.
+for (const checkType of [
+   'unknownCheck',
+   'toString',
+]) {
+   test(`an unknown stored check type "${checkType}" does not break the editor`, async () => {
+      await page.evaluate(async ({ name, stored }) => {
+         /** @type {TitanItem} The edited ability. */
+         const item = game.items.getName(name);
+         await item.update({
+            system: {
+               rulesElement: [
+                  {
+                     ...item.system.rulesElement[0],
+                     checkType: stored,
+                     modifierType: 'healing',
+                  },
+               ],
+            },
+         });
+      }, {
+         name: ITEM_NAME,
+         stored: checkType,
+      });
+
+      // The editor keeps rendering the element and offers every modifier type and the `any` selectors.
+      await expect(sheet().getByTestId('ccm-modifier-type')).toHaveAttribute('data-value', 'healing');
+      expect(await titanSelectOptionValues(page, sheet().getByTestId('ccm-modifier-type'))).toEqual([
+         'damage',
+         'dice',
+         'expertise',
+         'training',
+         'healing',
+         'advantage',
+         'automaticFailure',
+      ]);
+      expect(await titanSelectOptionValues(page, sheet().getByTestId('ccm-selector'))).toEqual([
+         'any',
+         'attribute',
+         'skill',
+         'customTrait',
+         'situation',
+      ]);
+   });
+}
 
 test('Resistance checks offer their selectors and only the modifier types they read', async () => {
    // The Dice element's check types include Resistance; its modifier types are every type.

@@ -105,9 +105,12 @@ that changes no document state goes in such a container; editing controls gate t
 is the single list of `modifierType` values: the rules-element editor's options and the actor cache keys.
 `CharacterDataModel.get{Attribute,Attack,Casting,Item}CheckMod` read the cache only through
 `_getConditionalCheckModsForType`, which asserts the type is in that list, and user-typed keys (selectors in
-`USER_KEYED_CHECK_MODIFIER_SELECTORS`: `customTrait`, `spellTradition`) go through
-`_normalizeConditionalCheckModKey` (camel case) in both the cache builder and the lookups. Resistance checks read
-no conditional modifiers.
+`USER_KEYED_CHECK_MODIFIER_SELECTORS`: `customTrait`, `spellTradition`, `situation`) go through
+`_normalizeConditionalCheckModKey` (camel case) in both the cache builder and the lookups. The constant is the single
+source for typed check-modifier selectors: a unit test scans the rules-element editors' text-input selector cases and
+fails when they drift from it. Resistance checks read only the modifier types in
+`CHECK_TYPE_MODIFIER_TYPES.resistance` (`dice`, `expertise`, `advantage`, `automaticFailure`) via
+`getResistanceCheckMod`.
 
 **`ReactiveDocument` bridge** — `src/document/reactive/ReactiveDocument.svelte.js` is the
 Foundry↔Svelte-5 reactivity bridge (it replaces TyphonJS `TJSDocument`). It wraps the live document;

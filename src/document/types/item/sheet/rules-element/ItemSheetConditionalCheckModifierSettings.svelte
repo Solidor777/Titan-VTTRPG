@@ -125,7 +125,9 @@
     */
    function isCheckTypeAllowed(checkType, modifierType) {
       /** @type {readonly string[] | undefined} The modifier types the check type reads; undefined when unknown. */
-      const readTypes = CHECK_TYPE_MODIFIER_TYPES[checkType];
+      const readTypes = Object.hasOwn(CHECK_TYPE_MODIFIER_TYPES, checkType)
+         ? CHECK_TYPE_MODIFIER_TYPES[checkType]
+         : void 0;
       return checkType === 'any' || !readTypes || readTypes.includes(modifierType);
    }
 
@@ -135,7 +137,7 @@
     * @returns {string[]} The selectors the check type offers, led by `any`.
     */
    function getSelectorOptions(checkType) {
-      return selectorOptions[checkType] ?? selectorOptions.any;
+      return Object.hasOwn(selectorOptions, checkType) ? selectorOptions[checkType] : selectorOptions.any;
    }
 
    /**
