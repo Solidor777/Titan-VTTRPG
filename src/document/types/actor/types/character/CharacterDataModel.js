@@ -21,7 +21,7 @@ import {
    CHECK_TYPE_MODIFIER_TYPES,
    CONDITIONAL_CHECK_MODIFIER_TYPES,
    MODIFIER_TYPE_PARAMETER_KEYS,
-   USER_KEYED_CHECK_MODIFIER_SELECTORS,
+   TYPED_KEY_SELECTORS,
 } from '~/system/ConditionalCheckModifierTypes.js';
 import clamp from '~/helpers/utility-functions/Clamp.js';
 import computeDamageResistance from '~/helpers/utility-functions/ComputeDamageResistance.js';
@@ -1190,20 +1190,15 @@ export default class CharacterDataModel extends TitanActorDataModel {
 
                   // Sort elements by key.
                   let keys;
-                  switch (selector) {
-                     // If the key is determined by using input, sort by camel-case keys.
-                     case 'customTrait':
-                     case 'spellTradition': {
-                        keys = sortObjectsIntoContainerByFunctionValue(
-                           selectorElements,
-                           (element) => camelize(element.key));
-                        break;
-                     }
-                     // Otherwise, sort by raw kay.
-                     default: {
-                        keys = sortObjectsIntoContainerByKeyValue(selectorElements, 'key');
-                        break;
-                     }
+                  // A typed key is sorted by its camel-case form; any other key by its raw value.
+                  if (TYPED_KEY_SELECTORS.rollMessage.includes(selector)) {
+                     keys = sortObjectsIntoContainerByFunctionValue(
+                        selectorElements,
+                        (element) => camelize(element.key),
+                     );
+                  }
+                  else {
+                     keys = sortObjectsIntoContainerByKeyValue(selectorElements, 'key');
                   }
 
                   // For each key.
@@ -1293,22 +1288,15 @@ export default class CharacterDataModel extends TitanActorDataModel {
 
                      // Sort elements by key.
                      let keys;
-                     switch (selector) {
-                        // If the key can be determined by user input, sort by the camel-case keys.
-                        case 'customWeaponTrait':
-                        case 'customArmorTrait':
-                        case 'customShieldTrait': {
-                           keys = sortObjectsIntoContainerByFunctionValue(
-                              selectorElements,
-                              (element) => camelize(element.key),
-                           );
-                           break;
-                        }
-                        default: {
-                           // Other, sort by the raw key.
-                           keys = sortObjectsIntoContainerByKeyValue(selectorElements, 'key');
-                           break;
-                        }
+                     // A typed key is sorted by its camel-case form; any other key by its raw value.
+                     if (TYPED_KEY_SELECTORS.conditionalRatingModifier.includes(selector)) {
+                        keys = sortObjectsIntoContainerByFunctionValue(
+                           selectorElements,
+                           (element) => camelize(element.key),
+                        );
+                     }
+                     else {
+                        keys = sortObjectsIntoContainerByKeyValue(selectorElements, 'key');
                      }
 
                      // For each key.
@@ -1474,7 +1462,7 @@ export default class CharacterDataModel extends TitanActorDataModel {
                         // Sort the objects by key.
                         let keys;
                         // User-typed keys are grouped by their normalized form, which lookups also use.
-                        if (USER_KEYED_CHECK_MODIFIER_SELECTORS.includes(selector)) {
+                        if (TYPED_KEY_SELECTORS.conditionalCheckModifier.includes(selector)) {
                            keys = sortObjectsIntoContainerByFunctionValue(
                               selectorElements,
                               (element) => this._normalizeConditionalCheckModKey(selector, element.key),
@@ -4094,7 +4082,7 @@ export default class CharacterDataModel extends TitanActorDataModel {
     * @private
     */
    _normalizeConditionalCheckModKey(selector, key) {
-      return USER_KEYED_CHECK_MODIFIER_SELECTORS.includes(selector) ? camelize(String(key)) : key;
+      return TYPED_KEY_SELECTORS.conditionalCheckModifier.includes(selector) ? camelize(String(key)) : key;
    }
 
    /**

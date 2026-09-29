@@ -3,14 +3,14 @@ import {
    CHECK_TYPE_MODIFIER_TYPES,
    CONDITIONAL_CHECK_MODIFIER_TYPES,
    MODIFIER_TYPE_PARAMETER_KEYS,
-   USER_KEYED_CHECK_MODIFIER_SELECTORS,
+   TYPED_KEY_SELECTORS,
 } from '~/system/ConditionalCheckModifierTypes.js';
 
 describe('conditional check modifier type tables', () => {
-   it('lists Advantage and Automatic Failure as modifier types and situation as a user-keyed selector', () => {
+   it('lists Advantage and Automatic Failure as modifier types and situation as a typed check selector', () => {
       expect(CONDITIONAL_CHECK_MODIFIER_TYPES).toContain('advantage');
       expect(CONDITIONAL_CHECK_MODIFIER_TYPES).toContain('automaticFailure');
-      expect(USER_KEYED_CHECK_MODIFIER_SELECTORS).toContain('situation');
+      expect(TYPED_KEY_SELECTORS.conditionalCheckModifier).toContain('situation');
    });
 
    it('maps every check type only to known modifier types', () => {

@@ -123,27 +123,32 @@ test('the Advantage level select replaces the value and writes the signed level'
    }
 });
 
-test('Automatic Failure hides the level select and the value and stores 1', async () => {
-   // A value-bearing type first, so the value input is present before Automatic Failure removes it.
+test('Automatic Failure replaces the value input and stores 1', async () => {
+   /** @type {import('@playwright/test').Locator} The value input, present on a value-bearing type. */
+   const value = sheet().getByTestId('ccm-value');
    await selectTitanOption(page, sheet().getByTestId('ccm-modifier-type'), 'damage');
-   await expect(sheet().getByTestId('ccm-value')).toBeVisible();
-
-   // Advantage first, so the level select is present before Automatic Failure removes it.
-   await selectTitanOption(page, sheet().getByTestId('ccm-modifier-type'), 'advantage');
-   await selectTitanOption(page, sheet().getByTestId('ccm-advantage-level'), -2);
-   await expect.poll(readElement, { message: 'Greater Disadvantage is stored' }).toMatchObject({
-      modifierType: 'advantage',
-      value: -2,
-   });
-   await expect(sheet().getByTestId('ccm-advantage-level')).toBeVisible();
+   await expect(value).toBeVisible();
 
    await selectTitanOption(page, sheet().getByTestId('ccm-modifier-type'), 'automaticFailure');
+   await expect(value).toHaveCount(0);
    await expect.poll(readElement, { message: 'Automatic Failure stores 1' }).toMatchObject({
       modifierType: 'automaticFailure',
       value: 1,
    });
-   await expect(sheet().getByTestId('ccm-advantage-level')).toHaveCount(0);
-   await expect(sheet().getByTestId('ccm-value')).toHaveCount(0);
+});
+
+test('Automatic Failure replaces the Advantage level select and stores 1', async () => {
+   /** @type {import('@playwright/test').Locator} The level select, present on Advantage. */
+   const level = sheet().getByTestId('ccm-advantage-level');
+   await selectTitanOption(page, sheet().getByTestId('ccm-modifier-type'), 'advantage');
+   await expect(level).toBeVisible();
+
+   await selectTitanOption(page, sheet().getByTestId('ccm-modifier-type'), 'automaticFailure');
+   await expect(level).toHaveCount(0);
+   await expect.poll(readElement, { message: 'Automatic Failure stores 1' }).toMatchObject({
+      modifierType: 'automaticFailure',
+      value: 1,
+   });
 });
 
 test('a stored Advantage value outside the four levels displays normalized and is not rewritten', async () => {

@@ -104,11 +104,14 @@ that changes no document state goes in such a container; editing controls gate t
 **Conditional check modifiers** — `CONDITIONAL_CHECK_MODIFIER_TYPES` (`src/system/ConditionalCheckModifierTypes.js`)
 is the single list of `modifierType` values: the rules-element editor's options and the actor cache keys.
 `CharacterDataModel.get{Attribute,Attack,Casting,Item}CheckMod` read the cache only through
-`_getConditionalCheckModsForType`, which asserts the type is in that list, and user-typed keys (selectors in
-`USER_KEYED_CHECK_MODIFIER_SELECTORS`: `customTrait`, `spellTradition`, `situation`) go through
-`_normalizeConditionalCheckModKey` (camel case) in both the cache builder and the lookups. The constant is the single
-source for typed check-modifier selectors: a unit test scans the rules-element editors' text-input selector cases and
-fails when they drift from it. Resistance checks read only the modifier types in
+`_getConditionalCheckModsForType`, which asserts the type is in that list. Typed keys (free-typed in the editor) are
+grouped and matched in camel case; the one source is the frozen `TYPED_KEY_SELECTORS` map in the same module, keyed by
+operation: `conditionalCheckModifier` (`customTrait`, `spellTradition`, `situation`), `conditionalRatingModifier`
+(`customArmorTrait`, `customShieldTrait`, `customWeaponTrait`), and `rollMessage` (`customTrait`, `spellTradition`).
+The check-modifier cache builder and lookups (`_normalizeConditionalCheckModKey`), the rating-modifier builder, and the
+roll-message builder each read their own entry, and `tests/unit/TypedKeySelectorEditors.test.js` asserts every editor's
+text-input selectors equal its entry. `_expandAllKeyElements` does not use the map: it expands `'all'` only for a
+selector that `_getSelectorKeys` resolves to keys. Resistance checks read only the modifier types in
 `CHECK_TYPE_MODIFIER_TYPES.resistance` (`dice`, `expertise`, `advantage`, `automaticFailure`) via
 `getResistanceCheckMod`.
 

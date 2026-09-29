@@ -16,15 +16,28 @@ export const CONDITIONAL_CHECK_MODIFIER_TYPES = Object.freeze([
 ]);
 
 /**
- * Conditional check modifier selectors whose keys the user types free-form (a custom trait name, a spell tradition, a
- * situation label). Their keys are compared in camel case, so "Field Medicine" matches "fieldMedicine".
- * @type {readonly string[]}
+ * The selectors whose keys the user types free-form (a custom trait name, a spell tradition, a situation label), keyed
+ * by the rules-element operation that carries them. The single source for the cache builders in `CharacterDataModel`:
+ * typed keys are grouped and matched in camel case, so "Field Medicine" matches "fieldMedicine". A unit test pins each
+ * entry to the text inputs of that operation's rules-element editor.
+ * @type {Readonly<Record<string, readonly string[]>>}
  */
-export const USER_KEYED_CHECK_MODIFIER_SELECTORS = Object.freeze([
-   'customTrait',
-   'spellTradition',
-   'situation',
-]);
+export const TYPED_KEY_SELECTORS = Object.freeze({
+   conditionalCheckModifier: Object.freeze([
+      'customTrait',
+      'spellTradition',
+      'situation',
+   ]),
+   conditionalRatingModifier: Object.freeze([
+      'customArmorTrait',
+      'customShieldTrait',
+      'customWeaponTrait',
+   ]),
+   rollMessage: Object.freeze([
+      'customTrait',
+      'spellTradition',
+   ]),
+});
 
 /**
  * The modifier types each check type reads. A situational modifier is offered to a check only for a type it reads (an

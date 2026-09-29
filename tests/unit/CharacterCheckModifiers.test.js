@@ -6,6 +6,7 @@ import createItemCheckOptions from '~/check/types/item-check/ItemCheckOptions.js
 import createResistanceCheckOptions from '~/check/types/resistance-check/ResistanceCheckOptions.js';
 import { installSchemaMocks, restoreSchemaMocks } from './helpers/schemaFingerprint.js';
 import camelize from '~/helpers/utility-functions/Camelize.js';
+import { TYPED_KEY_SELECTORS } from '~/system/ConditionalCheckModifierTypes.js';
 
 // Check-modifier behavior of CharacterDataModel, exercised on a bare instance (Object.create over the prototype) whose
 // parent carries only a rules-elements cache and whose roll data is stubbed. The model is imported after the Foundry
@@ -767,4 +768,78 @@ describe('CharacterDataModel._expandAllKeyElements — selectors with no stat ma
       };
       expect(createModel()._expandAllKeyElements([element])).toEqual([element]);
    });
+});
+
+describe('typed-key builders camel-case through TYPED_KEY_SELECTORS', () => {
+   it.each(TYPED_KEY_SELECTORS.rollMessage)('the roll message cache groups %s keys in camel case', (selector) => {
+      /** @type {object} The model under test. */
+      const model = createModel();
+      model._applyRollMessageElements([
+         {
+            checkType: 'any',
+            key: 'Field Medicine',
+            message: 'First',
+            selector,
+         },
+         {
+            checkType: 'any',
+            key: 'fieldMedicine',
+            message: 'Second',
+            selector,
+         },
+      ]);
+      expect(model.parent.rulesElementsCache.rollMessage.any[selector]).toEqual({
+         fieldMedicine: [
+            'First',
+            'Second',
+         ],
+      });
+   });
+
+   it.each(TYPED_KEY_SELECTORS.conditionalRatingModifier)(
+      'the rating modifier cache groups %s keys in camel case',
+      (selector) => {
+         /** @type {object} The model under test. */
+         const model = createModel();
+         model._applyConditionalRatingModifierElements([
+            {
+               key: 'Field Medicine',
+               rating: 'melee',
+               selector,
+               type: 'ability',
+               value: 1,
+            },
+            {
+               key: 'fieldMedicine',
+               rating: 'melee',
+               selector,
+               type: 'ability',
+               value: 2,
+            },
+         ]);
+         expect(model.parent.rulesElementsCache.conditionalRatingModifier.melee[selector]).toEqual({
+            fieldMedicine: { ability: 3 },
+         });
+      },
+   );
+
+   it.each(TYPED_KEY_SELECTORS.conditionalCheckModifier)(
+      'the check modifier cache groups %s keys in camel case',
+      (selector) => {
+         /** @type {object} The model under test. */
+         const model = createModel();
+         model._applyConditionalCheckModifierElements([
+            checkModifier({
+               key: 'Field Medicine',
+               selector,
+            }),
+            checkModifier({
+               key: 'fieldMedicine',
+               selector,
+            }),
+         ]);
+         expect(Object.keys(model.parent.rulesElementsCache.conditionalCheckModifier.dice.any[selector]))
+            .toEqual(['fieldMedicine']);
+      },
+   );
 });
