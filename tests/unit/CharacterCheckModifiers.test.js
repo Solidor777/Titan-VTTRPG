@@ -461,6 +461,83 @@ describe('situational check modifiers', () => {
       ]);
    });
 
+   it('lists a system situation under its canonical key with its localized label, merged with a typed one', () => {
+      /** @type {string} The canonical source string of a system situation. */
+      const canonical = 'Swim, Fly, or Climb';
+      /** @type {object} The model under test. */
+      const model = situationalModel([
+         checkModifier({
+            key: canonical,
+            label: 'Nadar, Volar o Trepar',
+            labelKey: 'situationSwimFlyClimb',
+            modifierType: 'advantage',
+            selector: 'situation',
+            sourceName: 'Plate',
+            value: -2,
+         }),
+         checkModifier({
+            key: canonical,
+            modifierType: 'advantage',
+            selector: 'situation',
+            sourceName: 'Cloak',
+            value: -1,
+         }),
+      ]);
+      expect(model.getSituationalCheckModifiers('attribute', { skill: 'athletics' })).toEqual([
+         {
+            key: camelize(canonical),
+            label: 'Nadar, Volar o Trepar',
+            labelKey: 'situationSwimFlyClimb',
+            modifierType: 'advantage',
+            sources: [
+               'Plate',
+               'Cloak',
+            ],
+            value: -3,
+         },
+      ]);
+   });
+
+   it('records the labelKey of a system situation on the applied situation, and none for a typed one', () => {
+      /** @type {object} The model under test. */
+      const model = situationalModel([
+         checkModifier({
+            key: 'Jump',
+            label: 'Saltar',
+            labelKey: 'situationJump',
+            modifierType: 'automaticFailure',
+            selector: 'situation',
+         }),
+         checkModifier({
+            key: 'Underwater',
+            modifierType: 'advantage',
+            selector: 'situation',
+            value: -1,
+         }),
+      ]);
+      /** @type {object} The parameters the situations are applied to. */
+      const parameters = {
+         advantage: 0,
+         automaticFailure: false,
+         skill: 'athletics',
+      };
+      model._applySituationalModifiers(parameters, 'attribute', [
+         'jump',
+         'underwater',
+      ]);
+      expect(parameters.situations).toEqual([
+         {
+            key: 'jump',
+            label: 'Saltar',
+            labelKey: 'situationJump',
+         },
+         {
+            key: 'underwater',
+            label: 'Underwater',
+         },
+      ]);
+   });
+
    it('adds ticked situations on top of the options without double counting', () => {
       /** @type {object} The model under test. */
       const model = situationalModel([

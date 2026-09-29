@@ -1,18 +1,27 @@
 import { describe, it, expect, beforeAll, afterAll } from 'vitest';
+import camelize from '~/helpers/utility-functions/Camelize.js';
 import createArmorTraitCheckModifiers from '~/document/types/item/types/armor/ArmorTraitCheckModifiers.js';
 
+/** @type {object} The stand-in game.i18n whose localize() each test swaps. */
+const i18n = {
+   localize: (key) => key,
+};
+
 beforeAll(() => {
-   // localize() reads game.i18n at call time; the pass-through stand-in makes each label its LOCAL key.
-   globalThis.game = {
-      i18n: {
-         localize: (key) => key,
-      },
-   };
+   // localize() reads game.i18n at call time.
+   globalThis.game = { i18n };
 });
 
 afterAll(() => {
    delete globalThis.game;
 });
+
+/** @type {Record<string, string>} The canonical, locale-independent situation source strings by label key. */
+const CANONICAL = {
+   situationJump: 'Jump',
+   situationRemainUndetectedByHearing: 'Remain Undetected by Hearing',
+   situationSwimFlyClimb: 'Swim, Fly, or Climb',
+};
 
 /**
  * Builds the expected synthetic element.
@@ -24,10 +33,12 @@ afterAll(() => {
  * @returns {object} The expected element.
  */
 function expected(trait, modifierType, value, labelKey, skill) {
-   // The stand-in localize() returns the key, so the label is the LOCAL key itself.
+   // The stand-in localize() returns the LOCAL key, so the label is that key itself.
    return {
       checkType: 'any',
-      key: `LOCAL.${labelKey}.text`,
+      key: CANONICAL[labelKey],
+      label: `LOCAL.${labelKey}.text`,
+      labelKey,
       modifierType,
       operation: 'conditionalCheckModifier',
       selector: 'situation',
@@ -36,6 +47,14 @@ function expected(trait, modifierType, value, labelKey, skill) {
       value,
    };
 }
+
+/** @type {object[]} A Heavy-only trait list. */
+const HEAVY = [
+   {
+      name: 'heavy',
+      value: true,
+   },
+];
 
 describe('createArmorTraitCheckModifiers', () => {
    it('gives Heavy Athletics Greater Disadvantage to Swim, Fly, or Climb and Automatic Failure on Jumps', () => {
@@ -89,5 +108,33 @@ describe('createArmorTraitCheckModifiers', () => {
          'armor-trait-heavy-situationJump',
          'armor-trait-loud-situationRemainUndetectedByHearing',
       ]);
+   });
+
+   it('yields one element pair for a repeated trait entry', () => {
+      expect(createArmorTraitCheckModifiers([
+         {
+            name: 'heavy',
+            value: true,
+         },
+         {
+            name: 'heavy',
+            value: true,
+         },
+      ])).toHaveLength(2);
+   });
+
+   it('keeps keys identical across languages while the label follows the language', () => {
+      /** @type {Function} The localize stand-in restored after the test. */
+      const original = i18n.localize;
+      /** @type {object[]} The elements built under English. */
+      const english = createArmorTraitCheckModifiers(HEAVY);
+      i18n.localize = (key) => `translated ${key}`;
+      /** @type {object[]} The elements built under a stand-in translation. */
+      const translated = createArmorTraitCheckModifiers(HEAVY);
+      i18n.localize = original;
+      expect(translated.map((element) => camelize(element.key))).toEqual(
+         english.map((element) => camelize(element.key)),
+      );
+      expect(translated.map((element) => element.label)).not.toEqual(english.map((element) => element.label));
    });
 });

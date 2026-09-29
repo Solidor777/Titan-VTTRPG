@@ -262,7 +262,8 @@ import assert from '~/helpers/utility-functions/Assert.js';
  * A situational check modifier a check offers in its dialog.
  * @typedef {object} SituationalCheckModifier
  * @property {string} key - The camel-case situation key, as `options.situations` stores it.
- * @property {string} label - The situation's display label, as its first source typed it.
+ * @property {string} label - The situation's display label, as its first source typed it or localized it.
+ * @property {string} [labelKey] - The localization key of a system situation's label, when the first source has one.
  * @property {string} modifierType - One of CONDITIONAL_CHECK_MODIFIER_TYPES.
  * @property {number} value - The summed value of every source sharing this key and modifier type.
  * @property {string[]} sources - The names of the items and effects the modifier comes from.
@@ -1522,10 +1523,12 @@ export default class CharacterDataModel extends TitanActorDataModel {
 
    /**
     * Caches the situational (`situation`-selector) Conditional Check Modifier Rules Elements apart from the summed
-    * modifiers, because they never apply automatically. Each cached entry is `{ checkType, key, label, modifierType,
-    * skill, source, value }`: `key` is the camel-case form of the typed `label`, `skill` narrows the entry to checks
-    * using one Skill (`''` = any; an element without a `skill` field is cached as `''`), and `source` names the owning
-    * item or effect.
+    * modifiers, because they never apply automatically. Each cached entry is `{ checkType, key, label, [labelKey],
+    * modifierType, skill, source, value }`: `key` is the camel-case form of the element's key (the typed text, or a
+    * system situation's canonical string), `label` is the element's own `label` when it has one (a system situation,
+    * localized) and its key otherwise, `labelKey` is present only for a system situation, `skill` narrows the entry to
+    * checks using one Skill (`''` = any; an element without a `skill` field is cached as `''`), and `source` names the
+    * owning item or effect.
     * @param {ConditionalCheckModifierElement[]} elements - The situational elements, each tagged with its `sourceName`.
     * @private
     */
@@ -1534,7 +1537,8 @@ export default class CharacterDataModel extends TitanActorDataModel {
          this.rulesElementsCache.situationalCheckModifier = elements.map((element) => ({
             checkType: element.checkType,
             key: this._normalizeConditionalCheckModKey('situation', element.key),
-            label: element.key,
+            label: element.label ?? element.key,
+            ...(element.labelKey ? { labelKey: element.labelKey } : {}),
             modifierType: element.modifierType,
             skill: element.skill ?? '',
             source: element.sourceName,
@@ -4035,6 +4039,7 @@ export default class CharacterDataModel extends TitanActorDataModel {
             entries.set(entryId, {
                key: element.key,
                label: element.label,
+               ...(element.labelKey ? { labelKey: element.labelKey } : {}),
                modifierType: element.modifierType,
                sources: [element.source],
                value: element.value,
@@ -4075,6 +4080,7 @@ export default class CharacterDataModel extends TitanActorDataModel {
             applied.set(modifier.key, {
                key: modifier.key,
                label: modifier.label,
+               ...(modifier.labelKey ? { labelKey: modifier.labelKey } : {}),
             });
          }
       }

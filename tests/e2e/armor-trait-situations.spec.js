@@ -18,6 +18,13 @@ const ARMOR_NAME = 'E2E Trait Armor';
 /** @type {string} Selector for the Attribute Check dialog window. */
 const DIALOG_SELECTOR = '.application.titan-dialog[id^="titan-attribute-check-dialog-"]';
 
+/** @type {{jump: string, swim: string, undetected: string}} The stable, locale-independent situation keys. */
+const KEYS = {
+   jump: 'jump',
+   swim: 'swim,Fly,OrClimb',
+   undetected: 'remainUndetectedByHearing',
+};
+
 /** @type {import('@playwright/test').Page} The file-shared, logged-in page (one world boot per file). */
 let page;
 /** @type {string[]} Uncaught page errors collected during the current test (cleared each afterEach). */
@@ -101,13 +108,13 @@ async function openAthleticsDialog() {
 }
 
 /**
- * Locates a situation row in a dialog by its label.
+ * Locates a situation row in a dialog by its stable key.
  * @param {import('@playwright/test').Locator} dialog - The dialog window.
- * @param {string} label - The situation label.
+ * @param {string} key - The situation's stable key.
  * @returns {import('@playwright/test').Locator} The row.
  */
-function situationRow(dialog, label) {
-   return dialog.locator('[data-testid^="situation-row-"]').filter({ hasText: label });
+function situationRow(dialog, key) {
+   return dialog.getByTestId(`situation-row-${key}`);
 }
 
 test('Heavy armor offers Jump and Swim, Fly, or Climb only on Athletics checks', async () => {
@@ -117,10 +124,10 @@ test('Heavy armor offers Jump and Swim, Fly, or Climb only on Athletics checks',
    const dialog = await openAthleticsDialog();
 
    /** @type {import('@playwright/test').Locator} The Jump situation row. */
-   const jump = situationRow(dialog, labels.jump);
+   const jump = situationRow(dialog, KEYS.jump);
 
    /** @type {import('@playwright/test').Locator} The Swim, Fly, or Climb situation row. */
-   const swim = situationRow(dialog, labels.swim);
+   const swim = situationRow(dialog, KEYS.swim);
    await expect(jump).toBeVisible();
    await expect(swim).toBeVisible();
 
@@ -138,7 +145,7 @@ test('ticking Swim, Fly, or Climb applies Greater Disadvantage', async () => {
 
    /** @type {import('@playwright/test').Locator} The open Athletics dialog. */
    const dialog = await openAthleticsDialog();
-   await situationRow(dialog, labels.swim).locator('[data-testid^="situation-toggle-"]').click();
+   await situationRow(dialog, KEYS.swim).locator('[data-testid^="situation-toggle-"]').click();
    await expect(dialog.getByTestId('check-summary-difficulty')).toHaveText('6');
 
    /** @type {number} The chat-message count before the roll. */
@@ -159,9 +166,9 @@ test('a ticked Jump does not apply once the check\'s Skill changes', async () =>
 
    /** @type {import('@playwright/test').Locator} The open Athletics dialog. */
    const dialog = await openAthleticsDialog();
-   await situationRow(dialog, labels.jump).locator('[data-testid^="situation-toggle-"]').click();
+   await situationRow(dialog, KEYS.jump).locator('[data-testid^="situation-toggle-"]').click();
    await setSelectField(dialog, 'skill', 'dexterity');
-   await expect(situationRow(dialog, labels.jump)).toHaveCount(0);
+   await expect(situationRow(dialog, KEYS.jump)).toHaveCount(0);
 
    /** @type {number} The chat-message count before the roll. */
    const baseline = await clickRoll(dialog, page);
@@ -218,12 +225,77 @@ test('unequipping the armor removes its situational modifiers', async () => {
    const dialog = await openAthleticsDialog();
 
    /** @type {import('@playwright/test').Locator} The Jump situation row. */
-   const jump = situationRow(dialog, labels.jump);
+   const jump = situationRow(dialog, KEYS.jump);
+
+   /** @type {import('@playwright/test').Locator} The Swim, Fly, or Climb situation row. */
+   const swim = situationRow(dialog, KEYS.swim);
    await expect(jump).toBeVisible();
+   await expect(swim).toBeVisible();
 
    await page.evaluate(async (actorName) => {
       await game.actors.getName(actorName).system.unEquipArmor();
    }, ACTOR_NAME);
    await expect(jump).toHaveCount(0);
-   await expect(situationRow(dialog, labels.swim)).toHaveCount(0);
+   await expect(swim).toHaveCount(0);
 });
+
+test('a chat card re-localizes a system situation from its stored labelKey', async () => {
+   await seedArmoredActor(['heavy']);
+
+   /** @type {import('@playwright/test').Locator} The open Athletics dialog. */
+   const dialog = await openAthleticsDialog();
+   await situationRow(dialog, KEYS.swim).locator('[data-testid^="situation-toggle-"]').click();
+
+   /** @type {number} The chat-message count before the roll. */
+   const baseline = await clickRoll(dialog, page);
+
+   /** @type {{id: string, type: string, parameters: object, results: object}} The rolled check's message. */
+   const flags = await readNewestCheckFlags(page, baseline);
+   expect(flags.parameters.situations).toEqual([
+      {
+         key: KEYS.swim,
+         label: labels.swim,
+         labelKey: 'situationSwimFlyClimb',
+      },
+   ]);
+
+   /** @type {import('@playwright/test').Locator} The rolled check's situation tag. */
+   const tag = page.locator(`#chat .message[data-message-id="${flags.id}"]`).getByTestId('check-chat-situation');
+   await expect(tag).toHaveText([labels.swim]);
+
+   // Without a labelKey the stored label renders, so the tag text follows the stored label.
+   await setStoredSituation(flags.id, {
+      key: KEYS.swim,
+      label: 'Stored In Another Language',
+   });
+   await expect(tag).toHaveText(['Stored In Another Language']);
+
+   // With a labelKey the current language's text renders and the stored label is ignored.
+   await setStoredSituation(flags.id, {
+      key: KEYS.swim,
+      label: 'Stored In Another Language',
+      labelKey: 'situationSwimFlyClimb',
+   });
+   await expect(tag).toHaveText([labels.swim]);
+});
+
+/**
+ * Overwrites a rolled check message's stored situations with one entry.
+ * @param {string} messageId - The chat message id.
+ * @param {object} situation - The stored situation entry.
+ * @returns {Promise<void>} Resolves once the message is updated.
+ */
+async function setStoredSituation(messageId, situation) {
+   await page.evaluate(async ({ id, entry }) => {
+      /** @type {ChatMessage} The rolled check's message. */
+      const chatMessage = game.messages.get(id);
+
+      /** @type {object} A detached copy of its system data. */
+      const system = chatMessage.system.toObject();
+      system.parameters.situations = [entry];
+      await chatMessage.update({ system });
+   }, {
+      id: messageId,
+      entry: situation,
+   });
+}

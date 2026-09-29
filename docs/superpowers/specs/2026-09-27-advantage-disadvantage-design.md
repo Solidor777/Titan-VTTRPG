@@ -144,8 +144,17 @@ The system has no Jump action and no Acrobatics skill; a Jump is a Body (Athleti
 a Climb (line 3150), so the armor situations are narrowed to Athletics, and Loud's to Stealth. Unnarrowed, armor would
 make every check situational and open the dialog on every roll under the default setting.
 
-Situation keys are localized labels, so their camel-cased keys match across traits: Heavy and Encumbering on one armor
-tick together as one "Swim, Fly, or Climb" entry whose value is their sum (−3, clamped to Greater Disadvantage).
+As built: each system situation has a fixed canonical English source string defined in code ("Swim, Fly, or Climb",
+"Jump", "Remain Undetected by Hearing"), and its camel-cased form is the situation key on every client, so keys never
+depend on the client's language (the macro API's `options.situations` is stable) and a user-typed situation with the
+same English text merges with it. The label is localized separately: the synthetic element carries `label` (the
+localized text) and `labelKey` (its LOCAL key, `situationJump` etc.). The situational cache uses
+`label: element.label ?? element.key` and keeps `labelKey`; `parameters.situations[]` on a chat card stores `labelKey`
+(optional) and the card renders `localize(labelKey)` when present, else the stored `label`, so every client reads a
+system situation in its own language. User-typed situations have no `labelKey`.
+
+Traits sharing a situation share its key: Heavy and Encumbering on one armor tick together as one "Swim, Fly, or
+Climb" entry whose value is their sum (−3, clamped to Greater Disadvantage).
 
 ## Error handling
 

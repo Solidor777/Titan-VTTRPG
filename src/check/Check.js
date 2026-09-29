@@ -39,7 +39,9 @@ import rollCheckDice from '~/helpers/utility-functions/RollCheckDice.js';
  * A situational modifier applied to a check, as its chat card lists it.
  * @typedef {object} SituationLabel
  * @property {string} key - The camel-case situation key.
- * @property {string} label - The situation's display label.
+ * @property {string} label - The situation's display label, as it was localized when the check was rolled.
+ * @property {string} [labelKey] - The localization key of a system situation's label; a card localizes it in place
+ * of `label` so every client reads it in its own language.
  */
 
 /**

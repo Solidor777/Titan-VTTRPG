@@ -84,7 +84,7 @@
       <div class="stat situations" data-testid="check-chat-situations">
          {#each document.data.system.parameters.situations as situation (situation.key)}
             <div class="tag" data-testid="check-chat-situation">
-               {situation.label}
+               {situation.labelKey ? localize(situation.labelKey) : situation.label}
             </div>
          {/each}
       </div>
