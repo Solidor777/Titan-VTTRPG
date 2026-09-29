@@ -18,6 +18,7 @@ import appendUnique from '~/helpers/utility-functions/AppendUnique.js';
 import appendUniqueByFunctionValue from '~/helpers/utility-functions/AppendUniqueByFunctionValue.js';
 import camelize from '~/helpers/utility-functions/Camelize.js';
 import {
+   CHECK_TYPE_CONDITIONAL_SELECTORS,
    CHECK_TYPE_MODIFIER_TYPES,
    CONDITIONAL_CHECK_MODIFIER_TYPES,
    MODIFIER_TYPE_PARAMETER_KEYS,
@@ -1924,32 +1925,10 @@ export default class CharacterDataModel extends TitanActorDataModel {
     * @returns {number} The modifier to apply to this aspect of the check.
     */
    getAttributeCheckMod(modifierType, attribute, skill) {
-      /** @type {number} The summed modifier. */
-      let retVal = 0;
-
-      // Check for conditional modifiers for this check type.
-      /** @type {object|undefined} The cached modifiers of this type, keyed by check type. */
-      const checkMods = this._getConditionalCheckModsForType(modifierType);
-      if (checkMods) {
-
-         // The editor has no Attribute Check type, so Attribute Checks read only `any`-check-type modifiers.
-         /** @type {object|undefined} The `any`-check-type modifiers, keyed by selector. */
-         const anyCheckMods = checkMods.any;
-         if (anyCheckMods) {
-
-            // Get mods for this attribute.
-            retVal += this._getConditionalCheckModsForSelectorKey(anyCheckMods, 'attribute', attribute);
-
-            // Get mods for this skill.
-            retVal += this._getConditionalCheckModsForSelectorKey(anyCheckMods, 'skill', skill);
-
-            // Get mods for any checks.
-            if (anyCheckMods.any) {
-               retVal += anyCheckMods.any;
-            }
-         }
-      }
-      return retVal;
+      return this._sumConditionalCheckMods(modifierType, 'attribute', {
+         attribute,
+         skill,
+      });
    }
 
    /**
@@ -2183,35 +2162,7 @@ export default class CharacterDataModel extends TitanActorDataModel {
     * @returns {number} The modifier to apply to this aspect of the check.
     */
    getResistanceCheckMod(modifierType, resistance) {
-      /** @type {number} The summed modifier. */
-      let retVal = 0;
-
-      // If there are any conditional modifiers for this modifier type.
-      /** @type {object|undefined} The cached modifiers of this type, keyed by check type. */
-      const checkMods = this._getConditionalCheckModsForType(modifierType);
-      if (checkMods) {
-
-         // Get mods that apply to any check.
-         if (checkMods.any?.any) {
-            retVal += checkMods.any.any;
-         }
-
-         // Get mods that apply to Resistance Checks.
-         /** @type {object|undefined} The `resistance`-check-type modifiers, keyed by selector. */
-         const resistanceCheckMods = checkMods.resistance;
-         if (resistanceCheckMods) {
-
-            // Get mods that apply to the rolled Resistance.
-            retVal += this._getConditionalCheckModsForSelectorKey(resistanceCheckMods, 'resistance', resistance);
-
-            // Get mods that apply to any Resistance Check.
-            if (resistanceCheckMods.any) {
-               retVal += resistanceCheckMods.any;
-            }
-         }
-      }
-
-      return retVal;
+      return this._sumConditionalCheckMods(modifierType, 'resistance', { resistance });
    }
 
    /**
@@ -2684,82 +2635,14 @@ export default class CharacterDataModel extends TitanActorDataModel {
       attackTraits,
       customTraits,
    ) {
-      /** @type {number} */
-      let retVal = 0;
-
-      // If there are any conditional modifiers for this modifier type.
-      const checkMods = this._getConditionalCheckModsForType(modifierType);
-      if (checkMods) {
-
-         // Get mods that apply to any type of check.
-         const anyCheckMods = checkMods.any;
-         if (anyCheckMods) {
-
-            // Get mods that apply to the check's Attribute.
-            retVal += this._getConditionalCheckModsForSelectorKey(anyCheckMods, 'attribute', attribute);
-
-            // Get mods that apply to the check's Skill.
-            retVal += this._getConditionalCheckModsForSelectorKey(anyCheckMods, 'skill', skill);
-
-            // Get mods that apply to the check's Custom Traits.
-            if (customTraits.length > 0) {
-               retVal += this._getConditionalCheckModsForSelectorKeys(
-                  anyCheckMods,
-                  'customTrait',
-                  customTraits,
-               );
-            }
-
-            // Get mods that apply to any check.
-            if (anyCheckMods.any) {
-               retVal += anyCheckMods.any;
-            }
-         }
-
-         // Get mods that apply to attack checks.
-         const attackCheckMods = checkMods.attack;
-         if (attackCheckMods) {
-
-            // Get mods that apply to the attack attribute.
-            retVal += this._getConditionalCheckModsForSelectorKey(attackCheckMods, 'attribute', attribute);
-
-            // Get mods that apply to the attack skill.
-            retVal += this._getConditionalCheckModsForSelectorKey(attackCheckMods, 'skill', skill);
-
-            // Get mods that apply to the attack type.
-            retVal += this._getConditionalCheckModsForSelectorKey(attackCheckMods, 'attackType', type);
-
-            // Get mods that apply to attack traits.
-            if (attackTraits.length > 0) {
-               retVal += this._getConditionalCheckModsForSelectorKeys(
-                  attackCheckMods,
-                  'attackTrait',
-                  attackTraits,
-               );
-            }
-
-            // Get mods that apply to the check's Custom Traits.
-            if (customTraits.length > 0) {
-               retVal += this._getConditionalCheckModsForSelectorKeys(
-                  attackCheckMods,
-                  'customTrait',
-                  customTraits,
-               );
-            }
-
-            // Get mods that apply to multi-attacks.
-            if (multiAttack && attackCheckMods.multiAttack) {
-               retVal += attackCheckMods.multiAttack;
-            }
-
-            // Get mods that apply to any attack check.
-            if (attackCheckMods.any) {
-               retVal += attackCheckMods.any;
-            }
-         }
-      }
-
-      return retVal;
+      return this._sumConditionalCheckMods(modifierType, 'attack', {
+         attackTrait: attackTraits,
+         attackType: type,
+         attribute,
+         customTrait: customTraits,
+         multiAttack,
+         skill,
+      });
    }
 
    /**
@@ -3232,72 +3115,12 @@ export default class CharacterDataModel extends TitanActorDataModel {
       tradition,
       customTraits,
    ) {
-      /** @type {number} */
-      let retVal = 0;
-
-      // If there are any conditional modifiers for this modifier type.
-      const checkMods = this._getConditionalCheckModsForType(modifierType);
-      if (checkMods) {
-
-         // Get mods that apply to any type of check.
-         const anyCheckMods = checkMods.any;
-         if (anyCheckMods) {
-
-            // Get mods that apply to the check's Attribute.
-            retVal += this._getConditionalCheckModsForSelectorKey(anyCheckMods, 'attribute', attribute);
-
-            // Get mods that apply to the check's Skill.
-            retVal += this._getConditionalCheckModsForSelectorKey(anyCheckMods, 'skill', skill);
-
-            // Get mods that apply to the check's Custom Traits.
-            if (customTraits.length > 0) {
-               retVal += this._getConditionalCheckModsForSelectorKeys(
-                  anyCheckMods,
-                  'customTrait',
-                  customTraits,
-               );
-            }
-
-            // Get mods that apply to any check.
-            if (anyCheckMods.any) {
-               retVal += anyCheckMods.any;
-            }
-         }
-
-         // Get mods that apply to Casting Checks.
-         const castingCheckMods = checkMods.casting;
-         if (castingCheckMods) {
-
-            // Get mods that apply to the check's Attribute.
-            retVal += this._getConditionalCheckModsForSelectorKey(castingCheckMods, 'attribute', attribute);
-
-            // Get mods that apply to the check's Skill.
-            retVal += this._getConditionalCheckModsForSelectorKey(castingCheckMods, 'skill', skill);
-
-            // Get mods that apply to the spell's tradition.
-            retVal += this._getConditionalCheckModsForSelectorKey(
-               castingCheckMods,
-               'spellTradition',
-               tradition,
-            );
-
-            // Get mods that apply to the check's Custom Traits.
-            if (customTraits.length > 0) {
-               retVal += this._getConditionalCheckModsForSelectorKeys(
-                  castingCheckMods,
-                  'customTrait',
-                  customTraits,
-               );
-            }
-
-            // Get mods that apply to any Casting Check.
-            if (castingCheckMods.any) {
-               retVal += castingCheckMods.any;
-            }
-         }
-      }
-
-      return retVal;
+      return this._sumConditionalCheckMods(modifierType, 'casting', {
+         attribute,
+         customTrait: customTraits,
+         skill,
+         spellTradition: tradition,
+      });
    }
 
    /**
@@ -3745,65 +3568,11 @@ export default class CharacterDataModel extends TitanActorDataModel {
       skill,
       customTraits,
    ) {
-      /** @type {number} */
-      let retVal = 0;
-
-      // If there are any conditional modifiers for this modifier type.
-      const checkMods = this._getConditionalCheckModsForType(modifierType);
-      if (checkMods) {
-
-         // Get mods that apply to any type of check.
-         const anyCheckMods = checkMods.any;
-         if (anyCheckMods) {
-
-            // Get mods that apply to the check's Attribute.
-            retVal += this._getConditionalCheckModsForSelectorKey(anyCheckMods, 'attribute', attribute);
-
-            // Get mods that apply to the check's Skill.
-            retVal += this._getConditionalCheckModsForSelectorKey(anyCheckMods, 'skill', skill);
-
-            // Get mods that apply to the check's Custom Traits.
-            if (customTraits.length > 0) {
-               retVal += this._getConditionalCheckModsForSelectorKeys(
-                  anyCheckMods,
-                  'customTrait',
-                  customTraits,
-               );
-            }
-
-            // Get mods that apply to any check.
-            if (anyCheckMods.any) {
-               retVal += anyCheckMods.any;
-            }
-         }
-
-         // Get mods that apply to Item Checks.
-         const itemCheckMods = checkMods.item;
-         if (itemCheckMods) {
-
-            // Get mods that apply to the check's Attribute.
-            retVal += this._getConditionalCheckModsForSelectorKey(itemCheckMods, 'attribute', attribute);
-
-            // Get mods that apply to the check's Skill.
-            retVal += this._getConditionalCheckModsForSelectorKey(itemCheckMods, 'skill', skill);
-
-            // Get mods that apply to the check's Custom Traits.
-            if (customTraits.length > 0) {
-               retVal += this._getConditionalCheckModsForSelectorKeys(
-                  itemCheckMods,
-                  'customTrait',
-                  customTraits,
-               );
-            }
-
-            // Get mods that apply to any Item Check.
-            if (itemCheckMods.any) {
-               retVal += itemCheckMods.any;
-            }
-         }
-      }
-
-      return retVal;
+      return this._sumConditionalCheckMods(modifierType, 'item', {
+         attribute,
+         customTrait: customTraits,
+         skill,
+      });
    }
 
    /**
@@ -3997,6 +3766,70 @@ export default class CharacterDataModel extends TitanActorDataModel {
    }
 
    /**
+    * Sums the cached conditional check modifiers of one modifier type that apply to a check: each cell
+    * `CHECK_TYPE_CONDITIONAL_SELECTORS` lists for the check type, where the check matches the cell's selector.
+    * @param {string} modifierType - One of CONDITIONAL_CHECK_MODIFIER_TYPES.
+    * @param {string} checkType - The check type: attribute, resistance, attack, casting, or item.
+    * @param {Record<string, string|string[]|boolean>} selectorKeys - The check's key (or keys) under each keyed
+    * selector it reads, and `multiAttack` (whether an Attack Check is a multi-attack). `any` always applies.
+    * @returns {number} The summed modifier.
+    * @private
+    */
+   _sumConditionalCheckMods(modifierType, checkType, selectorKeys) {
+      if (!assert(Object.hasOwn(CHECK_TYPE_CONDITIONAL_SELECTORS, checkType), `Unknown check type "${checkType}".`)) {
+         return 0;
+      }
+
+      /** @type {object|undefined} The cached modifiers of this type, keyed by check type. */
+      const checkMods = this._getConditionalCheckModsForType(modifierType);
+      if (!checkMods) {
+         return 0;
+      }
+
+      /** @type {number} The summed modifier. */
+      let retVal = 0;
+      for (const [cachedCheckType, selectors] of Object.entries(CHECK_TYPE_CONDITIONAL_SELECTORS[checkType])) {
+         /** @type {object|undefined} The cached modifiers of this check type, keyed by selector. */
+         const checkTypeMods = checkMods[cachedCheckType];
+         if (!checkTypeMods) {
+            continue;
+         }
+         for (const selector of selectors) {
+            retVal += this._getConditionalCheckModsForSelector(
+               checkTypeMods,
+               selector,
+               selector === 'any' || selectorKeys[selector],
+            );
+         }
+      }
+      return retVal;
+   }
+
+   /**
+    * Gets the cached modifier one selector contributes to a check.
+    * @param {object} checkTypeMods - The cached modifiers of one modifier type and check type, keyed by selector.
+    * @param {string} selector - The cell's selector (e.g. `skill`, `customTrait`, `any`).
+    * @param {string|string[]|boolean|undefined} keys - For a keyed selector, the check's key or keys; for `any` and
+    * `multiAttack`, whose cache is one sum, whether the selector applies.
+    * @returns {number} The selector's modifier for the check.
+    * @private
+    */
+   _getConditionalCheckModsForSelector(checkTypeMods, selector, keys) {
+      /** @type {object|number|undefined} The selector's cached sum, or its sums keyed by key. */
+      const selectorMods = checkTypeMods[selector];
+      if (!selectorMods || !keys) {
+         return 0;
+      }
+      if (typeof selectorMods === 'number') {
+         return keys === true ? selectorMods : 0;
+      }
+      return [keys].flat().reduce(
+         (sum, key) => sum + (selectorMods[this._normalizeConditionalCheckModKey(selector, key)] || 0),
+         0,
+      );
+   }
+
+   /**
     * Gets the situational check modifiers a check offers in its dialog: those of the check's own type and of `any`,
     * whose modifier type the check reads (CHECK_TYPE_MODIFIER_TYPES), and, for an element narrowed to a Skill, only
     * when the check uses that Skill. Elements sharing a key and a modifier type sum into one entry.
@@ -4104,66 +3937,6 @@ export default class CharacterDataModel extends TitanActorDataModel {
     */
    _normalizeConditionalCheckModKey(selector, key) {
       return TYPED_KEY_SELECTORS.conditionalCheckModifier.includes(selector) ? camelize(String(key)) : key;
-   }
-
-   /**
-    * Helper function for getting the conditional check modifiers for the inputted selector and key pair.
-    * @param {object} conditionalCheckModifiers - The parent actor's Rules Element cache of mods for desire check and
-    * modifier type.
-    * @param {string} selector - The type of condition for modifying the check (any, attribute, trait, etc.).
-    * @param {string} key - The specific result of the condition for modifying the check (body, melee, etc.).
-    * @returns {number} The mod to apply to the requested check.
-    * @private
-    */
-   _getConditionalCheckModsForSelectorKey(
-      conditionalCheckModifiers,
-      selector,
-      key) {
-      // If there are mods for this selector.
-      const selectorMods = conditionalCheckModifiers[selector];
-      if (selectorMods) {
-
-         // Return the key for this mod.
-         const keyMod = selectorMods[this._normalizeConditionalCheckModKey(selector, key)];
-         if (keyMod) {
-            return keyMod;
-         }
-      }
-
-      return 0;
-   }
-
-   /**
-    * Helper function for getting the sum conditional check modifiers for the inputted selector and an array of keys.
-    * @param {object} conditionalCheckModifiers - The parent actor's Rules Element cache of mods for desire check and
-    * modifier type.
-    * @param {string} selector - The type of condition for modifying the check (trait, customTrait.).
-    * @param {*[]} keys - Array of keys to test against.
-    * @returns {number} The mod to apply to the requested check.
-    * @private
-    */
-   _getConditionalCheckModsForSelectorKeys(
-      conditionalCheckModifiers,
-      selector,
-      keys,
-   ) {
-      /** @type {number} */
-      let retVal = 0;
-
-      // If there are Rules Elements for this selector.
-      const selectorMods = conditionalCheckModifiers[selector];
-      if (selectorMods) {
-
-         // Add the mods for each matching key.
-         keys.forEach((key) => {
-            const keyMod = selectorMods[this._normalizeConditionalCheckModKey(selector, key)];
-            if (keyMod) {
-               retVal += keyMod;
-            }
-         });
-      }
-
-      return retVal;
    }
 
    /**

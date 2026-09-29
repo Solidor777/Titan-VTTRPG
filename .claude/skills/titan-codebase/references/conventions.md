@@ -108,8 +108,13 @@ check type to the modifier types it reads (an Attribute Check has no Damage; a R
 editor offers a check type only for those, and `getSituationalCheckModifiers` offers only those.
 `MODIFIER_TYPE_PARAMETER_KEYS` maps each summable type to the parameter a ticked situation adds to. `advantage` stores
 its level (±1, ±2) in `value` and sums across sources; `automaticFailure` counts as 1 whatever its `value`
-(`_getConditionalCheckModifierValue`). `CharacterDataModel.get{Attribute,Attack,Casting,Item}CheckMod` read the cache
-only through `_getConditionalCheckModsForType`, which asserts the type is in that list. Typed keys (free-typed in the
+(`_getConditionalCheckModifierValue`). `CharacterDataModel.get{Attribute,Resistance,Attack,Casting,Item}CheckMod` are
+thin wrappers over one table-driven helper, `_sumConditionalCheckMods(modifierType, checkType, selectorKeys)`: it
+reads the cache only through `_getConditionalCheckModsForType` (which asserts the modifier type is in that list) and
+sums each cell the frozen `CHECK_TYPE_CONDITIONAL_SELECTORS` table (same module) lists for the check type — element
+check type → selectors — where the check matches the selector (`any` always; `multiAttack` for a multi-attack; a
+keyed selector by the check's key or keys). `tests/unit/CharacterCheckModifiers.test.js` pins each check type's cells
+against a cache holding a distinct power of two per cell. Typed keys (free-typed in the
 editor) are grouped and matched in camel case; the one source is the frozen `TYPED_KEY_SELECTORS` map in the same
 module, keyed by operation: `conditionalCheckModifier` (`customTrait`, `spellTradition`, `situation`),
 `conditionalRatingModifier` (`customArmorTrait`, `customShieldTrait`, `customWeaponTrait`), and `rollMessage`
@@ -118,7 +123,8 @@ the rating-modifier builder, and the roll-message builder each read their own en
 `tests/unit/TypedKeySelectorEditors.test.js` asserts every editor's text-input selectors equal its entry.
 `_expandAllKeyElements` does not use the map: it expands `'all'` only for a selector that `_getSelectorKeys` resolves
 to keys. Resistance checks read only the modifier types in `CHECK_TYPE_MODIFIER_TYPES.resistance` (`dice`,
-`expertise`, `advantage`, `automaticFailure`) via `getResistanceCheckMod`: checkType `any` + selector `any`,
+`expertise`, `advantage`, `automaticFailure`) via `getResistanceCheckMod`, whose table entry is checkType `any` +
+selector `any`,
 checkType `resistance` + selector `any`, and checkType `resistance` + selector `resistance` keyed by the rolled
 Resistance; `any`-type `attribute`/`skill` selectors never apply to them.
 
@@ -128,7 +134,8 @@ automatically. `_applyRulesElements` tags every gathered element with its owner'
 (`{ checkType, key, label, [labelKey], modifierType, skill, source, value }`) instead of the summed cache.
 `getSituationalCheckModifiers(checkType, { skill })` returns the entries of the check type plus `any`, of modifier
 types the check reads, narrowed by `skill` (`''` = any Skill), one entry per key + modifier type summed across owners
-(`sources: string[]`). Check options carry `situations` (camel-case keys the dialog ticks or a caller names); every
+(`sources: string[]`); a check type outside `CHECK_TYPE_MODIFIER_TYPES` is asserted by name and offers nothing.
+Check options carry `situations` (camel-case keys the dialog ticks or a caller names); every
 `get<Type>CheckParameters` adds the named entries on top of the options through `_applySituationalModifiers` (options
 keep only always-on values, so recomputing never double-counts; a key that no longer applies is ignored) and records
 `{ key, label, [labelKey] }` in `parameters.situations`. The equipped armor's Heavy/Encumbering/Loud traits add

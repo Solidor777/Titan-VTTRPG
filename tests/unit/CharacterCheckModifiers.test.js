@@ -700,6 +700,167 @@ describe('situational check modifiers', () => {
    });
 });
 
+/**
+ * The key each keyed selector matches in the table tests below; `any` and `multiAttack` hold a sum with no key.
+ * @type {Record<string, string>}
+ */
+const TABLE_KEYS = {
+   attackTrait: 'rend',
+   attackType: 'melee',
+   attribute: 'body',
+   customTrait: 'glowing',
+   resistance: 'reflexes',
+   skill: 'athletics',
+   spellTradition: 'fire',
+};
+
+/** @type {string[]} Every cached check type an element can name. */
+const TABLE_CHECK_TYPES = [
+   'any',
+   'attack',
+   'casting',
+   'item',
+   'resistance',
+];
+
+/** @type {string[]} Every selector a conditional check modifier can name, keyed or not. */
+const TABLE_SELECTORS = [
+   'any',
+   'multiAttack',
+   ...Object.keys(TABLE_KEYS),
+];
+
+/**
+ * Builds a Dice cache holding a distinct power of two in every check-type and selector cell, so a lookup's sum names
+ * exactly the cells it read.
+ * @returns {{cache: object, cellValue: (checkType: string, selector: string) => number}} The cache and each cell's
+ * value.
+ */
+function createFullDiceCache() {
+   /** @type {Record<string, number>} Each cell's value, keyed `checkType.selector`. */
+   const values = {};
+   /** @type {object} The Dice modifiers keyed by check type, then selector. */
+   const dice = {};
+   /** @type {number} The next cell's power of two. */
+   let next = 1;
+   for (const checkType of TABLE_CHECK_TYPES) {
+      dice[checkType] = {};
+      for (const selector of TABLE_SELECTORS) {
+         values[`${checkType}.${selector}`] = next;
+         dice[checkType][selector] = TABLE_KEYS[selector] ? { [TABLE_KEYS[selector]]: next } : next;
+         next *= 2;
+      }
+   }
+   return {
+      cache: { conditionalCheckModifier: { dice } },
+      cellValue: (checkType, selector) => values[`${checkType}.${selector}`],
+   };
+}
+
+describe('conditional check modifier lookups — the cells each check type reads', () => {
+   it.each([
+      {
+         checkType: 'attribute',
+         read: (model) => model.getAttributeCheckMod('dice', 'body', 'athletics'),
+         cells: {
+            any: [
+               'any',
+               'attribute',
+               'skill',
+            ],
+         },
+      },
+      {
+         checkType: 'resistance',
+         read: (model) => model.getResistanceCheckMod('dice', 'reflexes'),
+         cells: {
+            any: ['any'],
+            resistance: [
+               'any',
+               'resistance',
+            ],
+         },
+      },
+      {
+         checkType: 'attack',
+         read: (model) => model.getAttackCheckMod('dice', 'body', 'athletics', true, 'melee', ['rend'], ['glowing']),
+         cells: {
+            any: [
+               'any',
+               'attribute',
+               'skill',
+               'customTrait',
+            ],
+            attack: [
+               'any',
+               'attribute',
+               'skill',
+               'attackType',
+               'attackTrait',
+               'customTrait',
+               'multiAttack',
+            ],
+         },
+      },
+      {
+         checkType: 'casting',
+         read: (model) => model.getCastingCheckMod('dice', 'body', 'athletics', 'fire', ['glowing']),
+         cells: {
+            any: [
+               'any',
+               'attribute',
+               'skill',
+               'customTrait',
+            ],
+            casting: [
+               'any',
+               'attribute',
+               'skill',
+               'spellTradition',
+               'customTrait',
+            ],
+         },
+      },
+      {
+         checkType: 'item',
+         read: (model) => model.getItemCheckMod('dice', 'body', 'athletics', ['glowing']),
+         cells: {
+            any: [
+               'any',
+               'attribute',
+               'skill',
+               'customTrait',
+            ],
+            item: [
+               'any',
+               'attribute',
+               'skill',
+               'customTrait',
+            ],
+         },
+      },
+   ])('a $checkType check sums exactly its cells', ({ read, cells }) => {
+      /** @type {{cache: object, cellValue: Function}} The full cache and its cell values. */
+      const { cache, cellValue } = createFullDiceCache();
+
+      /** @type {number} The sum of the cells the check type reads. */
+      const expected = Object.entries(cells).reduce((sum, [cachedCheckType, selectors]) => sum +
+         selectors.reduce((cellSum, selector) => cellSum + cellValue(cachedCheckType, selector), 0), 0);
+      expect(read(createModel(cache))).toBe(expected);
+   });
+
+   it('reads a multi-attack cell only for a multi-attack', () => {
+      /** @type {{cache: object, cellValue: Function}} The full cache and its cell values. */
+      const { cache, cellValue } = createFullDiceCache();
+
+      /** @type {object} The Character. */
+      const model = createModel(cache);
+      expect(model.getAttackCheckMod('dice', 'body', 'athletics', true, 'melee', [], []) -
+         model.getAttackCheckMod('dice', 'body', 'athletics', false, 'melee', [], [])).toBe(cellValue('attack',
+         'multiAttack'));
+   });
+});
+
 describe('CharacterDataModel.requestAttributeCheck — situational lookup', () => {
    it('looks up situations for the options\' Skill without initializing the options', async () => {
       globalThis.game.keyboard = { isModifierActive: () => false };

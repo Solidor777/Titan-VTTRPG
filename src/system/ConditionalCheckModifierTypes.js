@@ -74,6 +74,77 @@ export const CHECK_TYPE_MODIFIER_TYPES = Object.freeze({
 });
 
 /**
+ * The cached conditional check modifiers each check type sums: the element check types it reads (`any` and its own)
+ * and, under each, the selectors it matches. `any` and `multiAttack` cache one sum (`any` always applies,
+ * `multiAttack` only to a multi-attack); every other selector caches a sum per key, matched against the check's value.
+ * A Resistance Check has no Attribute or Skill, so of the `any` check type it reads only the `any` selector. Attribute
+ * Checks have no check type of their own in the editor, so they read only `any`.
+ * @type {Readonly<Record<string, Readonly<Record<string, readonly string[]>>>>}
+ */
+export const CHECK_TYPE_CONDITIONAL_SELECTORS = Object.freeze({
+   attack: Object.freeze({
+      any: Object.freeze([
+         'any',
+         'attribute',
+         'skill',
+         'customTrait',
+      ]),
+      attack: Object.freeze([
+         'any',
+         'attribute',
+         'skill',
+         'attackType',
+         'attackTrait',
+         'customTrait',
+         'multiAttack',
+      ]),
+   }),
+   attribute: Object.freeze({
+      any: Object.freeze([
+         'any',
+         'attribute',
+         'skill',
+      ]),
+   }),
+   casting: Object.freeze({
+      any: Object.freeze([
+         'any',
+         'attribute',
+         'skill',
+         'customTrait',
+      ]),
+      casting: Object.freeze([
+         'any',
+         'attribute',
+         'skill',
+         'spellTradition',
+         'customTrait',
+      ]),
+   }),
+   item: Object.freeze({
+      any: Object.freeze([
+         'any',
+         'attribute',
+         'skill',
+         'customTrait',
+      ]),
+      item: Object.freeze([
+         'any',
+         'attribute',
+         'skill',
+         'customTrait',
+      ]),
+   }),
+   resistance: Object.freeze({
+      any: Object.freeze(['any']),
+      resistance: Object.freeze([
+         'any',
+         'resistance',
+      ]),
+   }),
+});
+
+/**
  * The check parameter each summable modifier type adds to when a situational modifier is ticked. Automatic Failure is
  * a flag, not a sum, so it has no entry.
  * @type {Readonly<Record<string, string>>}
