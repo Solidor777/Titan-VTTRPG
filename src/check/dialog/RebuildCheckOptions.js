@@ -77,46 +77,103 @@ function isPlainContainer(value) {
 }
 
 /**
- * Copies Check Options into an immutable value that shares nothing with its source, so a component holding the
- * dialog's read-only view can change neither the options nor anything they were built from. Every plain array and
- * object (see `isPlainContainer`) is copied with its prototype kept and frozen at every depth. Any other object (a
- * document or data model a caller passed as roll data) is first converted to a plain snapshot, through its
- * `toObject()` when it provides one and otherwise a structured clone, and that snapshot is frozen the same way. A
- * structured clone that is still not plain (e.g. a `Date`) is frozen as the copy it is. Primitives are returned as
- * given.
- * @param {*} value - The options, or a value inside them.
- * @returns {*} The frozen copy.
+ * Rejects a Check Options value that is not plain data.
+ * @param {string} path - The field's path inside the options (e.g. `itemRollData.check[0]`); empty for the options.
+ * @param {string} reason - What the value is.
+ * @returns {never} Never returns.
+ * @throws {TypeError} Always, naming the field and the reason.
  */
-export function freezeCheckOptions(value) {
-   if (Array.isArray(value)) {
-      return Object.freeze(value.map(freezeCheckOptions));
+function rejectCheckOption(path, reason) {
+   throw new TypeError(`Check option "${path || '(options)'}" is not plain data: ${reason}.`);
+}
+
+/**
+ * Converts an object that is not plain data (a document or data model a caller passed as roll data) into its plain
+ * snapshot: its `toObject()` when it provides one, otherwise a structured clone.
+ * @param {object} value - The object to convert.
+ * @param {string} path - The field's path inside the options, for the error.
+ * @returns {object} The snapshot, a plain array or object.
+ * @throws {TypeError} When the object cannot be cloned, or its snapshot is not a plain array or object (e.g. a
+ * `Map`, `Set`, `Date`, or typed array, which a structured clone keeps as such).
+ */
+function snapshotCheckOption(value, path) {
+   /** @type {*} The object's snapshot. */
+   let snapshot;
+   if (typeof value.toObject === 'function') {
+      snapshot = value.toObject();
+   }
+   else {
+      try {
+         snapshot = structuredClone(value);
+      }
+      catch (error) {
+         rejectCheckOption(path, `a ${value.constructor?.name ?? 'value'} that cannot be cloned (${error.message})`);
+      }
+   }
+   if (!isPlainContainer(snapshot)) {
+      rejectCheckOption(path, `a ${Object.prototype.toString.call(snapshot).slice(8, -1)}`);
+   }
+   return snapshot;
+}
+
+/**
+ * Copies and freezes one Check Options value at every depth (see `freezeCheckOptions`).
+ * @param {*} value - The value to copy.
+ * @param {string} path - The value's path inside the options; empty for the options themselves.
+ * @param {Set<object>} ancestors - The arrays and objects being copied on the path to this value, so a cycle is
+ * detected where it closes. A value two fields share is not an ancestor and is copied into each.
+ * @returns {*} The frozen copy.
+ * @throws {TypeError} When the value, or any value inside it, is not plain data.
+ */
+function freezeCheckOptionValue(value, path, ancestors) {
+   if (typeof value === 'function' || typeof value === 'symbol') {
+      rejectCheckOption(path, `a ${typeof value}`);
    }
    if (value === null || typeof value !== 'object') {
       return value;
    }
    if (!isPlainContainer(value)) {
-      /** @type {*} The object's plain snapshot. */
-      const snapshot = typeof value.toObject === 'function' ? value.toObject() : structuredClone(value);
-      if (isPlainContainer(snapshot)) {
-         return freezeCheckOptions(snapshot);
-      }
-
-      /** @type {*} A structured clone of a snapshot that is still not plain. */
-      const clone = structuredClone(snapshot);
-      return isPlainContainer(clone) ? freezeCheckOptions(clone) : Object.freeze(clone);
+      return freezeCheckOptionValue(snapshotCheckOption(value, path), path, ancestors);
    }
-   return Object.freeze(Object.create(
-      Object.getPrototypeOf(value),
-      Object.fromEntries(Object.entries(value).map(([key, entry]) => [
-         key,
-         {
-            configurable: true,
-            enumerable: true,
-            value: freezeCheckOptions(entry),
-            writable: true,
-         },
-      ])),
-   ));
+   if (ancestors.has(value)) {
+      rejectCheckOption(path, 'a cyclic reference');
+   }
+
+   ancestors.add(value);
+
+   /** @type {object|*[]} The frozen copy. */
+   const copy = Array.isArray(value) ?
+      Object.freeze(value.map((entry, index) => freezeCheckOptionValue(entry, `${path}[${index}]`, ancestors))) :
+      Object.freeze(Object.create(
+         Object.getPrototypeOf(value),
+         Object.fromEntries(Object.entries(value).map(([key, entry]) => [
+            key,
+            {
+               configurable: true,
+               enumerable: true,
+               value: freezeCheckOptionValue(entry, path ? `${path}.${key}` : key, ancestors),
+               writable: true,
+            },
+         ])),
+      ));
+   ancestors.delete(value);
+   return copy;
+}
+
+/**
+ * Copies Check Options into an immutable value that shares nothing with its source, so a component holding the
+ * dialog's read-only view can change neither the options nor anything they were built from. Check Options are plain
+ * data: every plain array and object (see `isPlainContainer`) is copied with its prototype kept and frozen at every
+ * depth. Any other object (a document or data model a caller passed as roll data) is first converted to a plain
+ * snapshot, through its `toObject()` when it provides one and otherwise a structured clone, and that snapshot is
+ * copied the same way. Primitives are returned as given. Anything else is rejected, never partly frozen.
+ * @param {*} value - The options, or a value inside them.
+ * @returns {*} The frozen copy.
+ * @throws {TypeError} Naming the field, when a value is a function or symbol, cannot be cloned, has a snapshot that
+ * is not a plain array or object (a `Map`, `Set`, `Date`, typed array, and the like), or closes a cycle.
+ */
+export function freezeCheckOptions(value) {
+   return freezeCheckOptionValue(value, '', new Set());
 }
 
 /**

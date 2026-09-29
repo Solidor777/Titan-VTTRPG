@@ -1157,6 +1157,88 @@ describe('freezeCheckOptions', () => {
       })).toBeUndefined();
    });
 
+   it.each([
+      [
+         'Map',
+         () => new Map([
+            [
+               'a',
+               1,
+            ],
+         ]),
+      ],
+      [
+         'Set',
+         () => new Set([1]),
+      ],
+      [
+         'Uint8Array',
+         () => new Uint8Array([1]),
+      ],
+      [
+         'Date',
+         () => new Date(0),
+      ],
+   ])('rejects a %s, naming the field, and leaves the source untouched', (typeName, create) => {
+      /** @type {object} Check Options whose roll data holds a value that is not plain data. */
+      const options = {
+         itemRollData: {
+            lookup: create(),
+         },
+      };
+      expect(() => freezeCheckOptions(options)).toThrow(new RegExp(`"itemRollData\\.lookup".*${typeName}`));
+      expect(Object.isFrozen(options.itemRollData)).toBe(false);
+   });
+
+   it('rejects a function, naming the field', () => {
+      expect(() => freezeCheckOptions({ onRoll: () => 1 })).toThrow(/"onRoll".*function/);
+   });
+
+   it('rejects a class instance that cannot be cloned, naming the field', () => {
+      /** Roll data carrying a function field and no `toObject`, so it has no plain snapshot. */
+      class CallbackHolder {
+         /**
+          * Stores a callback as an own field.
+          */
+         constructor() {
+            /**
+             * A callback no structured clone can copy.
+             * @type {Function}
+             * @returns {number} A constant.
+             */
+            this.callback = () => 1;
+         }
+      }
+      expect(() => freezeCheckOptions({ itemRollData: new CallbackHolder() }))
+         .toThrow(/"itemRollData".*CallbackHolder/);
+   });
+
+   it('rejects a cyclic object or array, naming the field that closes the cycle', () => {
+      /** @type {object} Roll data that contains itself. */
+      const loop = { name: 'Loop' };
+      loop.self = loop;
+      expect(() => freezeCheckOptions({ itemRollData: loop })).toThrow(/"itemRollData\.self".*cycl/);
+
+      /** @type {*[]} An array that contains itself. */
+      const situations = [];
+      situations.push(situations);
+      expect(() => freezeCheckOptions({ situations })).toThrow(/"situations\[0\]".*cycl/);
+   });
+
+   it('copies a value shared by two fields into each without calling it a cycle', () => {
+      /** @type {object[]} Custom Traits two fields share. */
+      const shared = [{ name: 'Glowing' }];
+
+      /** @type {object} The frozen copy. */
+      const frozen = freezeCheckOptions({
+         customTrait: shared,
+         itemRollData: { customTrait: shared },
+      });
+      expect(frozen.customTrait).toEqual(shared);
+      expect(frozen.itemRollData.customTrait).toEqual(shared);
+      expect(Object.isFrozen(frozen.itemRollData.customTrait[0])).toBe(true);
+   });
+
    it('holds the rebuild\'s result and the tracked setter\'s writes frozen', () => {
       /** @type {object} The Character rolling the check. */
       const system = createCharacter();
