@@ -26,6 +26,9 @@ const LOCAL_KEYS = [
    'greaterDisadvantage.text',
    'noAdvantage.text',
    'situation.text',
+   'situationJump.text',
+   'situationRemainUndetectedByHearing.text',
+   'situationSwimFlyClimb.text',
    'situationalModifiers.text',
 ];
 

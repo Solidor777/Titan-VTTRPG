@@ -41,6 +41,7 @@ import createResistanceCheckOptions from '~/check/types/resistance-check/Resista
 import createResistanceCheckParameters from '~/check/types/resistance-check/ResistanceCheckParameters.js';
 import buildSchemaFromShape from '~/helpers/utility-functions/BuildSchemaFromShape.js';
 import createCharacterSystemTemplate from '~/document/types/actor/types/character/CharacterSystemTemplate.js';
+import createArmorTraitCheckModifiers from '~/document/types/item/types/armor/ArmorTraitCheckModifiers.js';
 import getBestPlayerOwner from '~/helpers/utility-functions/GetBestPlayerOwner.js';
 import getOwners from '~/helpers/utility-functions/GetOwners.js';
 import autoDecreaseEffectDuration from '~/helpers/Settings/AutoDecreaseEffectDuration.js';
@@ -691,6 +692,14 @@ export default class CharacterDataModel extends TitanActorDataModel {
             }
          }
       });
+
+      // The equipped armor's traits add synthetic situational check modifiers, sourced as the armor. They join the
+      // gathered elements here because the conditional-check caches are built below, before _applyArmorAndShields runs.
+      /** @type {TitanItem|boolean} The equipped armor, or false when none is equipped. */
+      const equippedArmor = this.getEquippedArmor();
+      if (equippedArmor) {
+         processElements(createArmorTraitCheckModifiers(equippedArmor.system.trait), 'equipment', equippedArmor.name);
+      }
 
       // Process Rules Elements from the actor's Active Effects: the 'effect' subtype (tagged 'effect') and
       // the 'condition' subtype (tagged 'condition') both contribute; disabled effects and other subtypes
