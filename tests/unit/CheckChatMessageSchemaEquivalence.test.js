@@ -158,8 +158,8 @@ const GOLDENS = {
       }),
    },
 
-   // Attack check: parameters carry factory constants complexity:1 and difficulty:4, two object arrays
-   // (attackTrait, customTrait), and the attack metadata; results add a damage field.
+   // Attack check: parameters carry factory constants complexity:1, difficulty:4, and baseDifficulty:4, two object
+   // arrays (attackTrait, customTrait), and the attack metadata; results add a damage field.
    attack: {
       ...checkBaseFields(),
       parameters: schemaField({

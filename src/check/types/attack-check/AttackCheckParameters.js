@@ -102,8 +102,8 @@ export function createAttackCheckParametersShape() {
 
 /**
  * Creates an Attack Check Parameters object, based off the provided input.
- * Spreads the zero-value shape first (which includes factory constants `complexity: 1` and
- * `difficulty: 4`), then re-assigns every option-derived field.
+ * Spreads the zero-value shape first (which includes factory constants `complexity: 1`, `difficulty: 4`, and
+ * `baseDifficulty: 4`), then re-assigns every option-derived field.
  * @param {AttackCheckOptions} options - Fully populated Attack Check Options.
  * @returns {AttackCheckParameters} The new Attack Check Parameters.
  */
