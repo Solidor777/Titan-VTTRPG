@@ -700,6 +700,59 @@ describe('situational check modifiers', () => {
    });
 });
 
+describe('CharacterDataModel.requestAttributeCheck — situational lookup', () => {
+   it('looks up situations for the options\' Skill without initializing the options', async () => {
+      globalThis.game.keyboard = { isModifierActive: () => false };
+      globalThis.foundry.helpers = {
+         interaction: {
+            KeyboardManager: { MODIFIER_KEYS: { SHIFT: 'Shift' } },
+         },
+      };
+      try {
+         /** @type {object} A Character with one situation narrowed to Athletics. */
+         const model = createModel({
+            situationalCheckModifier: [
+               {
+                  checkType: 'any',
+                  key: 'underwater',
+                  label: 'Underwater',
+                  modifierType: 'dice',
+                  skill: 'athletics',
+                  source: 'Effect',
+                  value: -1,
+               },
+            ],
+         });
+         model.rollAttributeCheck = vi.fn();
+         model._createAttributeCheckDialog = vi.fn();
+         vi.spyOn(model, 'initializeAttributeCheckOptions');
+         vi.spyOn(model, 'getSituationalCheckModifiers');
+
+         // An Athletics check has the situation, so it opens the dialog; a Body check (Skill None) rolls.
+         await model.requestAttributeCheck({ skill: 'athletics' });
+         await model.requestAttributeCheck({ attribute: 'body' });
+         expect(model.getSituationalCheckModifiers.mock.calls).toEqual([
+            [
+               'attribute',
+               { skill: 'athletics' },
+            ],
+            [
+               'attribute',
+               { skill: 'none' },
+            ],
+         ]);
+         expect(model._createAttributeCheckDialog).toHaveBeenCalledWith({ skill: 'athletics' });
+         expect(model.rollAttributeCheck).toHaveBeenCalledWith({ attribute: 'body' });
+         expect(model.initializeAttributeCheckOptions).not.toHaveBeenCalled();
+      }
+      finally {
+         delete globalThis.game.keyboard;
+         delete globalThis.foundry.helpers;
+         vi.restoreAllMocks();
+      }
+   });
+});
+
 describe('Resistance Check conditional modifiers', () => {
    /**
     * Builds a model caching the Resistance-relevant and irrelevant Dice penalties used below.

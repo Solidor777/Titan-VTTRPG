@@ -1757,10 +1757,11 @@ export default class CharacterDataModel extends TitanActorDataModel {
          return;
       }
 
+      // The Skill comes from the options alone (`none` when unset), so no Actor-derived field is computed here.
       /** @type {boolean} Whether any situational modifier applies to the check. */
       const hasSituationalModifiers = this.getSituationalCheckModifiers(
          'attribute',
-         { skill: this.initializeAttributeCheckOptions(options).skill },
+         { skill: createAttributeCheckOptions(options).skill },
       ).length > 0;
 
       // Roll straight to chat, or open the dialog for adjusting the check.
