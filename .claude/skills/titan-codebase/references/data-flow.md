@@ -65,7 +65,8 @@ modifiers like `diceMod`; Resistance Checks do so through `getResistanceCheckMod
 **4. Roll & evaluate — `TitanCheck.evaluateCheck` (src/check/Check.js)**
 `_rollCheck` optionally spends Resolve via `_expendCheckResolve`, then calls `check.sendToChat()`.
 `sendToChat` calls `evaluateCheck()` if needed. `evaluateCheck` calls `rollCheckDice(totalDice)`
-(src/helpers/utility-functions/RollCheckDice.js) to get dice results, runs `_applyExpertise`, then calls
+(src/helpers/utility-functions/RollCheckDice.js) to get dice results, runs `_applyExpertise` (skipped when
+`parameters.automaticFailure` is set: the dice stay as rolled and all Expertise remains), then calls
 `_calculateResults` which delegates to `calculateCheckResults` (src/check/CheckResults.js) (or the
 type-specific override, e.g. `calculateAttributeCheckResults` via `AttributeCheck._calculateResults`).
 The resulting `CheckResults` object is stored on `check.results`. `calculateCheckResults` honors

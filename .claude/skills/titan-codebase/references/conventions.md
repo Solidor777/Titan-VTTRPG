@@ -300,9 +300,12 @@ for exactly this reason.
 `content: { class: CheckDialogShell, props: { shell, actor, checkType, callerOptions,
 checkOptions: writable(...), checkParameters: writable(...) } }` and the shell distributes those stores to
 children via `setContext`. The `'checkOptions'` context is a read-only view (`{ subscribe }` only) of a store
-whose every value is a frozen snapshot sharing nothing with its sources (`freezeCheckOptions`: plain objects and
-arrays are copied with their prototype and frozen at every depth; any other object, such as a document or data
-model, is first converted to a plain snapshot through its `toObject()` or a structured clone and then frozen), so a
+whose every value is a frozen snapshot sharing nothing with its sources (`freezeCheckOptions`: Check Options are plain
+data — plain objects and arrays are copied with their prototype and frozen at every depth; any other object, such as
+a document or data model, is first converted to a plain snapshot through its `toObject()` or a structured clone; a
+function, symbol, uncloneable object, non-plain snapshot (`Map`, `Set`, `Date`, typed array), or cycle — tracked
+through the ancestors on the copy path, so a shared value is copied into each field — throws a `TypeError` naming the
+field, never a partial freeze), so a
 bind, assignment, in-place mutation, or store-method write from a component throws and changes nothing. Dialog
 fields write through the `'setCheckOption'` context (`createCheckOptionSetter`
 in `src/check/dialog/RebuildCheckOptions.js`), which records the write as a user edit. On every Actor

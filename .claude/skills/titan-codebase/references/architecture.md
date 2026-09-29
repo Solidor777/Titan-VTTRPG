@@ -83,7 +83,11 @@
   `editor/` (the ApplicationV2 + Svelte theme editor opened from the settings menu).
 - `src/system/` — System-wide constants and registrations: constant and registration modules covering attributes,
   skills, conditions, icons, settings registration (`SystemSettings.js`), initiative formula (`Initiative.js`),
-  macros (`Macros.js`), trackable attributes (`TrackableAttributes.js`), and enumeration files (roles, resistances,
+  macros (`Macros.js`: `TitanMacros`, exposed as `game.titan.macros`; its `get<Kind>Macro` methods write script
+  commands calling its own `roll{Attack,Casting,Item}Check(id, idMethod[, idx])`, which request the check for each
+  controlled Character, or `foundry.applications.ui.Hotbar.toggleDocumentSheet`; `idMethod` is `uuid` — the Item's
+  `flags.titan.uuid` —, `name`, or `documentId`; `tests/unit/Macros.test.js` executes every generated command),
+  trackable attributes (`TrackableAttributes.js`), and enumeration files (roles, resistances,
   resources, speeds, etc.).
 
 ## Non-src build inputs

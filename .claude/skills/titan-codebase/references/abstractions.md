@@ -162,8 +162,8 @@ management). Data model classes hold the schema, field validation, and derived-d
   owned item, an `effectId` names an effect among `actor.allApplicableEffects()` (the Actor's own and those
   its items transfer), and `options.itemRollData` is used only when neither is given — the item chat card's
   snapshot path, where `ItemChatMessageItemChecks` passes `createItemCheckRollData(item)`
-  (`src/check/types/item-check/ItemCheckRollData.js`: a plain deep copy of exactly the fields an Item Check
-  reads — `check`, `customTrait`, `description`, `img`, `name`), never the message's live data model.
+  (`src/check/types/item-check/ItemCheckRollData.js`: a deep copy of the card item's whole plain `toObject()`
+  data, so every field an Item Check reads is present), never the message's live data model.
   `createItemCheckOptions` defaults both IDs to `''` and passes `itemRollData` through (`undefined` when absent).
   `getItemCheckParameters` resolves its source through `_getItemCheckRollData` too, and `initializeItemCheckOptions`
   stores the resolved roll data on the options, so an open dialog's rebuild sees an edit to the item or effect as
