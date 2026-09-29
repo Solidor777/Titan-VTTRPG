@@ -5,17 +5,21 @@ import { fileURLToPath } from 'url';
 
 // A check dialog's components receive a read-only, frozen view of the Check Options (CheckDialogShell.svelte), so a
 // write outside the tracked setter throws by construction. This scan is the backstop: it reads every source under a
-// `dialog` directory of `src/check` whole (so a write split across lines is still one match) and fails on any write
-// form through the `'checkOptions'` store, under its own name or an alias bound from `getContext('checkOptions')`.
+// `dialog` directory of `src/check`, and every source in `src` that reads `getContext('checkOptions')`, whole (so a
+// write split across lines is still one match). It fails on any write form through the `'checkOptions'` store, under
+// its own name or an alias bound from the context, and on any context read not typed as the read-only view.
 
-/** @type {string} The repository's `src/check` directory. */
-const CHECK_DIR = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../../src/check');
+/** @type {string} The repository's `src` directory. */
+const SRC_DIR = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../../src');
 
 /** @type {string[]} The sources allowed to write the store: the shell that owns it and the tracked-setter module. */
 const EXEMPT_SOURCES = [
-   path.join('dialog', 'CheckDialogShell.svelte'),
-   path.join('dialog', 'RebuildCheckOptions.js'),
+   path.join('check', 'dialog', 'CheckDialogShell.svelte'),
+   path.join('check', 'dialog', 'RebuildCheckOptions.js'),
 ];
+
+/** @type {RegExp} A read of the `'checkOptions'` context, in any quote style. */
+const CHECK_OPTIONS_CONTEXT = /getContext\(\s*(['"`])checkOptions\1\s*\)/;
 
 /** @type {string} An assignment operator: plain, compound, or logical (never a comparison). */
 const ASSIGNMENT = String.raw`(?:\*\*|<<|>>>?|\?\?|&&|\|\||[-+*/%&|^])?=(?!=)`;
@@ -65,18 +69,62 @@ function writeForms(name) {
 }
 
 /**
- * Lists the sources under every `dialog` directory of `src/check` (`.svelte`, `.js`, and `.svelte.js`).
- * @returns {string[]} The source paths relative to `src/check`, exempt sources included.
+ * Reads every `.svelte`, `.js`, and `.svelte.js` source under a directory.
+ * @param {string} rootDir - The directory to read recursively.
+ * @returns {{path: string, source: string}[]} Each source's path relative to the directory and its text.
  */
-function listDialogSources() {
-   return readdirSync(CHECK_DIR, { recursive: true })
+function readSources(rootDir) {
+   return readdirSync(rootDir, { recursive: true })
       .map((entry) => String(entry))
-      .filter((entry) => /\.(?:svelte|js)$/.test(entry) && entry.split(path.sep).includes('dialog'));
+      .filter((entry) => /\.(?:svelte|js)$/.test(entry))
+      .map((entry) => ({
+         path: entry,
+         source: readFileSync(path.join(rootDir, entry), 'utf8'),
+      }));
+}
+
+/**
+ * Selects the sources both guards scan: every source under a `dialog` directory of `check`, plus every source
+ * anywhere that reads the `'checkOptions'` context.
+ * @param {{path: string, source: string}[]} sources - Sources with paths relative to `src`.
+ * @returns {{path: string, source: string}[]} The scanned sources, exempt sources included.
+ */
+function selectScannedSources(sources) {
+   return sources.filter((entry) => {
+      /** @type {string[]} The path's directory and file segments. */
+      const segments = entry.path.split(path.sep);
+      return (segments[0] === 'check' && segments.includes('dialog')) || CHECK_OPTIONS_CONTEXT.test(entry.source);
+   });
+}
+
+/**
+ * Finds each Check Options context read whose declaration is not typed as the read-only `Readable` view.
+ * @param {{path: string, source: string}[]} sources - Sources with paths relative to `src`.
+ * @returns {string[]} One `path:line` entry per mistyped context read in the scanned sources.
+ */
+function findMistypedConsumers(sources) {
+   return selectScannedSources(sources).flatMap((entry) => {
+      /** @type {string[]} The source's lines. */
+      const lines = entry.source.split(/\r?\n/);
+      return lines.flatMap((line, index) => (CHECK_OPTIONS_CONTEXT.test(line) &&
+         !lines[index - 1]?.includes('@type {import(\'svelte/store\').Readable}') ?
+         [`${entry.path}:${index + 1}`] :
+         []));
+   });
+}
+
+/**
+ * Finds every forbidden Check Options write in the scanned sources.
+ * @param {{path: string, source: string}[]} sources - Sources with paths relative to `src`.
+ * @returns {string[]} One `path:line — kind: text` entry per forbidden write.
+ */
+function findAllForbiddenWrites(sources) {
+   return selectScannedSources(sources).flatMap((entry) => findForbiddenWrites(entry.path, entry.source));
 }
 
 /**
  * Finds the forbidden Check Options writes in a source, through the store's own name and every alias of it.
- * @param {string} relativePath - The source path relative to `src/check`.
+ * @param {string} relativePath - The source path relative to `src`.
  * @param {string} source - The source text.
  * @returns {string[]} One `path:line — kind: text` entry per forbidden write; none for an exempt source.
  */
@@ -106,15 +154,18 @@ function findForbiddenWrites(relativePath, source) {
 }
 
 describe('check dialog Check Options writes', () => {
+   /** @type {{path: string, source: string}[]} Every source under `src`. */
+   const srcSources = readSources(SRC_DIR);
+
    it('finds the dialog sources to scan', () => {
-      /** @type {string[]} The scanned sources. */
-      const sources = listDialogSources();
-      expect(sources).toContain(path.join('dialog', 'CheckDialogSkillField.svelte'));
-      expect(sources).toContain(path.join('dialog', 'GroupSituationalModifiers.js'));
-      expect(sources).toContain(
-         path.join('types', 'resistance-check', 'dialog', 'ResistanceCheckDialogResistanceField.svelte'),
+      /** @type {string[]} The scanned sources' paths. */
+      const scanned = selectScannedSources(srcSources).map((entry) => entry.path);
+      expect(scanned).toContain(path.join('check', 'dialog', 'CheckDialogSkillField.svelte'));
+      expect(scanned).toContain(path.join('check', 'dialog', 'GroupSituationalModifiers.js'));
+      expect(scanned).toContain(
+         path.join('check', 'types', 'resistance-check', 'dialog', 'ResistanceCheckDialogResistanceField.svelte'),
       );
-      expect(sources).toContain(path.join('types', 'attack-check', 'dialog', 'AttackCheckDialog.js'));
+      expect(scanned).toContain(path.join('check', 'types', 'attack-check', 'dialog', 'AttackCheckDialog.js'));
    });
 
    it('flags every forbidden write form', () => {
@@ -170,25 +221,40 @@ describe('check dialog Check Options writes', () => {
       expect(findForbiddenWrites('x.svelte', 'a\nb\n$checkOptions\n   .skill = 1;')[0]).toMatch(/^x\.svelte:3 /);
    });
 
+   it('scans every source that reads the Check Options context, inside or outside a dialog directory', () => {
+      /** @type {{path: string, source: string}[]} A dialog field, an outside consumer, and an unrelated source. */
+      const sources = [
+         {
+            path: path.join('check', 'dialog', 'TypedField.svelte'),
+            source: '/** @type {import(\'svelte/store\').Readable} The options. */\n' +
+               'const checkOptions = getContext(\'checkOptions\');',
+         },
+         {
+            path: path.join('document', 'sheet', 'OptionsConsumer.svelte'),
+            source: 'const options = getContext("checkOptions");\n$options.skill = \'arcana\';',
+         },
+         {
+            path: path.join('document', 'sheet', 'Unrelated.svelte'),
+            source: 'const options = getContext(\'document\');',
+         },
+      ];
+      expect(selectScannedSources(sources).map((entry) => entry.path)).toEqual([
+         path.join('check', 'dialog', 'TypedField.svelte'),
+         path.join('document', 'sheet', 'OptionsConsumer.svelte'),
+      ]);
+      expect(findMistypedConsumers(sources)).toEqual([`${path.join('document', 'sheet', 'OptionsConsumer.svelte')}:1`]);
+      expect(findAllForbiddenWrites(sources)).toHaveLength(1);
+   });
+
    it('types every Check Options context consumer as the read-only view', () => {
       /** @type {string[]} Each consumer whose declaration is not typed `Readable`. */
-      const mistyped = listDialogSources().flatMap((relativePath) => {
-         /** @type {string[]} The source's lines. */
-         const lines = readFileSync(path.join(CHECK_DIR, relativePath), 'utf8').split(/\r?\n/);
-         return lines.flatMap((line, index) => (/getContext\(\s*(['"`])checkOptions\1\s*\)/.test(line) &&
-            !lines[index - 1]?.includes('@type {import(\'svelte/store\').Readable}') ?
-            [`${relativePath}:${index + 1}`] :
-            []));
-      });
+      const mistyped = findMistypedConsumers(srcSources);
       expect(mistyped, mistyped.join('\n')).toEqual([]);
    });
 
    it('writes Check Options only through the tracked setter', () => {
-      /** @type {string[]} Every forbidden write in the dialog sources. */
-      const found = listDialogSources().flatMap((relativePath) => findForbiddenWrites(
-         relativePath,
-         readFileSync(path.join(CHECK_DIR, relativePath), 'utf8'),
-      ));
+      /** @type {string[]} Every forbidden write in the scanned sources. */
+      const found = findAllForbiddenWrites(srcSources);
       expect(found, found.join('\n')).toEqual([]);
    });
 });

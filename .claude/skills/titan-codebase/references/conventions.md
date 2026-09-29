@@ -316,9 +316,10 @@ nothing); if it is invalid, each `'default'`-sentinel field it leaves unset (e.g
 gone), nothing is written and the type shell's own validation closes the dialog; otherwise
 `initialize<Type>CheckOptions(input)` derives every other field from the live Actor and is written only when
 structurally different. `tests/unit/check/check-dialog-option-writes.test.js` is the backstop scan: it reads
-every `.svelte`, `.js`, and `.svelte.js` under any `dialog` directory of `src/check` whole (exempting only
-`CheckDialogShell.svelte` and `RebuildCheckOptions.js`) and fails on any write form through the store or
-an alias bound from `getContext('checkOptions')`.
+every `.svelte`, `.js`, and `.svelte.js` under any `dialog` directory of `src/check`, plus every source in `src`
+that reads `getContext('checkOptions')`, whole (exempting only `CheckDialogShell.svelte` and
+`RebuildCheckOptions.js`) and fails on any write form through the store or an alias bound from the context, and on
+any context read whose declaration is not typed `import('svelte/store').Readable`.
 
 **Dynamic component dispatch** — `<svelte:component this={...}>` is gone (deprecated in Svelte 5
 runes mode). Shells select a component class and render it with `{@const}`:
