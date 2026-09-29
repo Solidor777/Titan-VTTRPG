@@ -832,7 +832,10 @@ never a bare `entry.click()`: it clicks, then waits for `#context-menu` to detac
 the instance's CURRENT menu element after its 200 ms collapse, and every document click while `ui.context` is set
 queues another close, so clicks made during the collapse leave closes pending that remove the instance's next menu
 (a re-opened pack or folder menu never shows). Dismissing an open menu without choosing uses
-`ui.context?.close({ animate: false })`, which closes synchronously.
+`ui.context?.close({ animate: false })`, which closes synchronously. `tests/unit/E2eContextMenuClicks.test.js` scans
+every `.js` under `tests/e2e` except `contextMenu.js` and fails on a direct context-menu entry click: a
+`click`/`dblclick`/`tap`/click-`dispatchEvent` whose receiver chain or `page.click` selector names `#context-menu`,
+`.context-menu`, or `context-item`, or starts from a variable or function (file-wide, no scopes) holding or returning one.
 
 **No e2e operation may exceed 1 second**, and wait ceilings are set to that budget so a breach fails
 loudly instead of silently absorbing 15s: explicit `timeout:` values are `1000`. Six waits are
