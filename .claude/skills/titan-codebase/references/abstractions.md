@@ -218,7 +218,10 @@ successes from sorted dice and parameters). Each check type's `calculate<Name>Ch
 spreads its own `create<Name>CheckResultsShape()` (which composes the base shape + per-type extras)
 and extends the base output. `recalculateCheckResults`
 (`src/check/chat-message/RecalculateCheckResults.js`) re-runs the appropriate calculator from
-stored chat-message data.
+stored chat-message data. `calculateCheckResults` honors `parameters.automaticFailure` (dice and critical counts kept,
+0 successes, failed), so every type-specific calculator inherits it. `src/check/ApplyAdvantage.js` holds
+`applyAdvantage`, `clampAdvantage`, `getAdvantageLabel`, and the dialog/editor level options; every parameters shape
+carries `advantage`, `automaticFailure`, `baseDifficulty`, and `situations` (`{ key, label, [labelKey] }[]`).
 
 
 ## Chat messages & reports
@@ -259,7 +262,10 @@ cards, the 13 report cards, and the effect card are all registered and active; t
   `failuresReRolled` (BooleanField, default `false`) and `message` (ArrayField of StringField). It
   exposes a static helper `_defineCheckDataSchema(parametersShape, resultsShape)` returning TYPED
   `parameters`/`results` SchemaFields via `createSchemaField(buildSchemaFromShape(...))` — the
-  per-subtype parameters/results are typed, NOT untyped ObjectField bags.
+  per-subtype parameters/results are typed, NOT untyped ObjectField bags. Its `migrateData(source)` fills
+  `parameters.baseDifficulty` from `parameters.difficulty` when the parameters carry a Difficulty but no base
+  Difficulty (a diff without a Difficulty is skipped); `advantage`, `automaticFailure`, and `situations` take their
+  schema initials. INVARIANT: every parameter update carries `baseDifficulty` whenever it carries `difficulty`.
 - Five leaf models, each colocated with its Svelte component under
   `src/check/types/<name>/chat-message/`. Each overrides `_defineDocumentSchema()` as
   `{ ...super._defineDocumentSchema(), ...CheckChatMessageDataModel._defineCheckDataSchema(
@@ -334,7 +340,9 @@ subtyped TITAN chat message (checks, item cards, reports, effect); it reads the 
 Svelte components that render an evaluated check in chat:
 - `CheckChatMessages.svelte` — outer frame.
 - `CheckChatMessageDice.svelte` / `CheckChatMessageDie.svelte` — dice grid.
-- `CheckChatResults.svelte` — success/failure summary.
+- `CheckChatResults.svelte` — success/failure summary, the Advantage level tag beside the DC, the Automatic Failure
+  tag, and the applied situation labels (a system situation is localized from its `labelKey`); the reset-Expertise
+  button is withheld on an automatically failed card.
 - `CheckChatMessageItemHeader.svelte` — item name/image header.
 - `CheckChatResetExpertiseButton.svelte` / `CheckChatScalingAspects.svelte` — interactive
   controls for casting/item checks.
@@ -381,8 +389,10 @@ functions in `src/document/types/item/rules-element/` create default instances:
 |                                  |                              | (base plus all mod buckets); rounding-directional. |
 | `createSetSumElement`            | `setSum`                     | Force a stat's post-additive running total to a    |
 |                                  |                              | value via `mode` (`set`/`min`/`max`).              |
-| `createConditionalCheckModifier` | `conditionalCheckModifier`   | Modify a check's damage, bonus dice, etc. when a   |
-|                                  |                              | condition (attribute, trait, etc.) is met.         |
+| `createConditionalCheckModifier` | `conditionalCheckModifier`   | Modify a check's damage, healing, dice, training,  |
+|                                  |                              | expertise, Advantage (±1/±2), or force an Automatic|
+|                                  |                              | Failure; selector `situation` makes it an opt-in   |
+|                                  |                              | dialog checkbox (optionally narrowed to a Skill).  |
 | `createConditionalRatingModifier`| `conditionalRatingModifier`  | Modify accuracy, melee, or defense conditionally.  |
 | `createFastHealingElement`       | `fastHealing`                | Heal the character at turn start or end.           |
 | `createPersistentDamageElement`  | `persistentDamage`           | Damage the character at turn start or end.         |
@@ -421,10 +431,14 @@ appliers recompute the running total per element before computing a corrective d
 `computeSetSumDelta`) and writing it into the element's source mod bucket, so multiple sum ops on the same
 stat compound in order. Each applier records what it wrote under a same-named key on `rulesElementsCache`.
 
-Equipped gear is applied outside the rules-element pipeline, in the `equipment` mod buckets: the equipped
-shield adds its `defense` to the Defense rating, the equipped armor adds its armor value to `mod.armor`, and an
-armor trait named `heavy` subtracts 1 from each speed whose base plus mods-so-far is above 0. The character `mod`
-stats are only `armor`, `resolveRegain`, and `woundRegain` (`src/system/Mods.js`); check damage and healing bonuses
+Equipped gear is applied in two places. Outside the rules-element pipeline (`_applyArmorAndShields`, the
+`equipment` mod buckets): the equipped shield adds its `defense` to the Defense rating, the equipped armor adds its
+armor value to `mod.armor`, and an armor trait named `heavy` subtracts 1 from each speed whose base plus mods-so-far
+is above 0. Inside it, `_applyRulesElements` gathers the equipped armor's trait check rules as synthetic situational
+`conditionalCheckModifier` elements sourced as the armor (`createArmorTraitCheckModifiers`): Heavy → Greater
+Disadvantage on "Swim, Fly, or Climb" and Automatic Failure on "Jump", both narrowed to Athletics; Encumbering →
+Disadvantage on "Swim, Fly, or Climb" (Athletics); Loud → Disadvantage on "Remain Undetected by Hearing" (Stealth).
+The character `mod` stats are only `armor`, `resolveRegain`, and `woundRegain` (`src/system/Mods.js`); check damage and healing bonuses
 are not mods — they come only from `conditionalCheckModifier` elements with `modifierType` `damage`/`healing`, where
 check type `any` + selector `any` applies to every attack, casting, and item check.
 

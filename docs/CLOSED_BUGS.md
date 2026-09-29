@@ -759,3 +759,25 @@ when fixed.
 - **Fixed:** 2026-09-27 — the control is gated on `trayState.maxFolderDepth` (`pack.maxFolderDepth`), as core's folder
   partial gates it on the collection's `maxFolderDepth`. Gated by `effect-tray.spec.js` ("folder nesting stops at the
   pack folder depth limit").
+
+### 67. An open Item Check dialog kept rolling its source after the item or effect was deleted
+
+- **What:** an Item Check's dialog validated and initialized from `options.itemRollData`, a copy of the item's data
+  taken when the dialog opened, so deleting the item (or, for a check opened from an effect row or the Effect HUD, the
+  effect) left the dialog open and its Roll button rolled the deleted source from the stale copy.
+- **Found:** 2026-09-28 while making check dialogs follow the live Actor.
+- **Fixed:** 2026-09-28 — `_getItemCheckRollData` resolves an Item Check's source live: `itemId` names an owned item
+  and `effectId` an effect among `actor.allApplicableEffects()`; `itemRollData` is used only when neither is given (the
+  item chat card's snapshot). A deleted source fails validation and the dialog closes without a page error. Commits
+  `15f35020` (items) and `23b33c46` (effects). Gated by `check-dialog-advantage.spec.js` (deleting the owned item, or
+  the effect, while its Item Check dialog is open) and `rebuild-check-options.test.js`.
+
+### 68. An explicit Complexity or Difficulty of 0 on a Casting or Item Check was replaced by the derived value
+
+- **What:** `initializeCastingCheckOptions` and `initializeItemCheckOptions` tested `!options.complexity` and
+  `!options.difficulty`, and the option factories defaulted them to 0, so a 0 the caller or the dialog user supplied
+  was indistinguishable from "unset" and snapped back to the spell's or item's value.
+- **Found:** 2026-09-28 while rebuilding dialog options from caller options and user edits.
+- **Fixed:** 2026-09-28 — the factories leave both `undefined` when unset and the initializers derive them only when
+  `=== undefined`, so a supplied 0 is kept. Commit `15f35020`. Gated by `rebuild-check-options.test.js`
+  ("Casting and Item Complexity and Difficulty").

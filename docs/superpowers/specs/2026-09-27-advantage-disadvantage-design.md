@@ -56,6 +56,9 @@ Reflexes, Blinded/Deafened auto-failing sight/hearing checks).
 - Check dialogs gain an Advantage field: a select with the five levels Greater Disadvantage … Greater Advantage
   (`-2`…`2`), bound to `options.advantage`, for GM-granted circumstances. A conditional sum outside ±2 displays as the
   clamped level; the stored option keeps the raw sum.
+- Every check dialog shows the effective (post-Advantage) Difficulty as a summary labeled "Effective Difficulty"
+  (`check-summary-difficulty`), so a change to the Advantage select or a ticked situation is visible before rolling;
+  Attack dialogs show no other Difficulty.
 - Chat cards show a tag for a non-zero effective level ("Advantage", "Greater Advantage", "Disadvantage",
   "Greater Disadvantage"), next to the Difficulty display.
 - The check chat data models gain `advantage` and `baseDifficulty` in their parameter shapes (built from the shared
@@ -70,6 +73,9 @@ Reflexes, Blinded/Deafened auto-failing sight/hearing checks).
 - An automatically failed check still rolls (the dice appear in chat), but its results report 0 successes and the
   check as failed; for Resistance checks, no damage is reduced. The chat card shows an "Automatic Failure" tag.
   Re-roll/expertise recalculation keeps the result forced (the flag is read from the stored parameters).
+- An automatically failed card offers no action that could change its outcome: the chat log's Re-roll Failures,
+  Double Training, and Double Expertise entries, the reset-Expertise button, and per-die Expertise are withheld, and
+  no die is styled as a success.
 
 ### 4. Situational modifiers (the `situation` selector)
 
@@ -77,21 +83,59 @@ Rules often scope a modifier to a circumstance no check type or skill expresses 
 "checks to track a creature"). These become opt-in modifiers.
 
 - Every check type's selector list gains `situation`, with a free-typed key (the circumstance's label). The key is
-  user-typed and joins `USER_KEYED_CHECK_MODIFIER_SELECTORS`, so it is matched in camel case.
+  user-typed and joins the `conditionalCheckModifier` entry of `TYPED_KEY_SELECTORS`
+  (`src/system/ConditionalCheckModifierTypes.js`), so it is matched in camel case. As built, that frozen map is keyed
+  by rules-element operation (`conditionalCheckModifier`, `conditionalRatingModifier`, `rollMessage`); the check
+  modifier, rating modifier, and roll message builders each read their own entry, and
+  `tests/unit/TypedKeySelectorEditors.test.js` asserts every editor's text-input selectors equal its entry. A typed
+  key of exactly `all` stays literal: `_expandAllKeyElements` expands `all` only for a selector that
+  `_getSelectorKeys` resolves to keys.
 - A situational element may optionally narrow itself to checks using one skill (`skill` field; `''` = any skill).
   The editor shows a skill select (with "Any") when the selector is `situation`.
+- Skill narrowing applies only to non-Resistance situations: a Resistance check has no Skill, so the editor hides the
+  skill select for check type `resistance` and clears the stored `skill` when the check type becomes `resistance` or
+  the selector changes.
 - Situational elements never apply automatically. The actor exposes
-  `getSituationalCheckModifiers(checkType, { skill })` → a list of `{ key, label, modifierType, value, source }`
-  entries that apply to the check type (its own type plus `any`) and, when narrowed, to the check's skill, where
-  `source` is the owning item/effect name.
+  `getSituationalCheckModifiers(checkType, { skill })` → a list of
+  `{ key, label, [labelKey], modifierType, value, sources }` entries that apply to the check type (its own type plus
+  `any`) and, when narrowed, to the check's skill. Entries sharing a key and a modifier type sum across owners (Heavy
+  and Encumbering on one armor, or armor and an effect), so `sources` is a `string[]` of the owning items' and
+  effects' names.
 - Check options gain `situations` (string[] of ticked keys, default `[]`). The dialog lists the applicable situational
   entries as checkboxes (label, source, and the modifier it applies), unticked by default.
 - Parameters add the ticked situations' contributions on top of the options: `diceMod`, `trainingMod`,
   `expertiseMod`, `damageMod`, `healingMod`, `advantage`, and `automaticFailure` each include the sum (or, for
   `automaticFailure`, any) of the ticked entries of their type. Options keep only the always-on values, so ticking and
   unticking never double-counts.
-- Situational modifiers apply only through the dialog; a check rolled without the dialog applies none.
-- The chat card lists the ticked situations by label.
+- Situational modifiers never apply automatically: a check applies only the situations its `options.situations`
+  names. The check dialog is the only UI that ticks them; a caller (a macro or module) that passes `situations`
+  directly has them applied like any other option it passes.
+- Parameters record the applied situations as `situations: { key, label, [labelKey] }[]`: `buildSchemaFromShape` maps
+  an empty array to an `ArrayField(ObjectField)`, which rejects strings, and the label lets the card render without
+  an actor lookup. The chat card lists them by label.
+
+### 4b. The check dialog as built
+
+- `CheckDialogShell` keeps the Check Options store private and gives its children a read-only view (`'checkOptions'`:
+  `{ subscribe }` over deep-frozen snapshots, so a write from a component throws) plus a tracked setter
+  (`'setCheckOption'`); it also sets `'checkParameters'`, `'checkActor'` (a `ReactiveDocument` over the rolling
+  Actor), and `'checkType'`. Every field writes through the setter, which records the write as a user edit.
+- On every Actor change or edit, the shell rebuilds the options (`src/check/dialog/RebuildCheckOptions.js`) from the
+  caller's options plus the user's edits through `validate<Type>CheckOptions(options, false)` (quiet mode: it reports
+  nothing) and `initialize<Type>CheckOptions`, so every actor-derived field follows the live Actor and every field
+  the caller or user set is kept. A field left at the `'default'` sentinel by the input (the Attribute after the user
+  picks Skill "None") is pinned to its displayed value first. A source that vanished (a deleted weapon, item, or
+  effect) makes the rebuild write nothing, and the type shell's validation closes the dialog.
+- An Item Check resolves its source live: `itemId` names an owned item and `effectId` an effect among
+  `actor.allApplicableEffects()`; `itemRollData` is used only when neither is given (the item chat card's snapshot,
+  built by `createItemCheckRollData` in `src/check/types/item-check/ItemCheckRollData.js`).
+- Casting and Item `complexity` and `difficulty` are derived from the spell or item only when `undefined`; an
+  explicit 0 is kept.
+- An Attack dialog decides `targetDefense` provenance in `_createAttackCheckDialog`: a targeted token's Defense
+  counts as caller-supplied; with no target, the no-target fallback re-derives as the rating changes.
+- `CheckDialogBase` lists the check's situational modifiers below the field rows (`CheckDialogSituationsField`, one
+  unticked checkbox per key). It reads them through the Actor bridge, so the list follows the Actor and drops ticks
+  that are no longer offered.
 
 ### 4a. When the check dialog opens (user ruling 2026-09-27)
 
@@ -115,7 +159,8 @@ The client setting `getCheckOptions` changes from a Boolean to a choice:
 - Every `request*Check` computes whether the check has situational entries (from the initialized options' check
   type and skill) before deciding.
 - A stored legacy Boolean reads as `true` → `always` and `false` → `situational` (the old default was `false`, and
-  the new default is `situational`).
+  the new default is `situational`); `resolveCheckOptionsMode` maps any other value outside the three choices to
+  `situational`, and `registerSystemSettings` rewrites such a stored value to its resolved choice.
 
 ### 5. Resistance checks take conditional modifiers
 

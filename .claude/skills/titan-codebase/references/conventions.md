@@ -102,18 +102,41 @@ that changes no document state goes in such a container; editing controls gate t
 (`DocumentOwner*` components).
 
 **Conditional check modifiers** — `CONDITIONAL_CHECK_MODIFIER_TYPES` (`src/system/ConditionalCheckModifierTypes.js`)
-is the single list of `modifierType` values: the rules-element editor's options and the actor cache keys.
-`CharacterDataModel.get{Attribute,Attack,Casting,Item}CheckMod` read the cache only through
-`_getConditionalCheckModsForType`, which asserts the type is in that list. Typed keys (free-typed in the editor) are
-grouped and matched in camel case; the one source is the frozen `TYPED_KEY_SELECTORS` map in the same module, keyed by
-operation: `conditionalCheckModifier` (`customTrait`, `spellTradition`, `situation`), `conditionalRatingModifier`
-(`customArmorTrait`, `customShieldTrait`, `customWeaponTrait`), and `rollMessage` (`customTrait`, `spellTradition`).
-The check-modifier cache builder and lookups (`_normalizeConditionalCheckModKey`), the rating-modifier builder, and the
-roll-message builder each read their own entry, and `tests/unit/TypedKeySelectorEditors.test.js` asserts every editor's
-text-input selectors equal its entry. `_expandAllKeyElements` does not use the map: it expands `'all'` only for a
-selector that `_getSelectorKeys` resolves to keys. Resistance checks read only the modifier types in
-`CHECK_TYPE_MODIFIER_TYPES.resistance` (`dice`, `expertise`, `advantage`, `automaticFailure`) via
-`getResistanceCheckMod`.
+is the single list of `modifierType` values (`damage`, `dice`, `expertise`, `training`, `healing`, `advantage`,
+`automaticFailure`): the rules-element editor's options and the actor cache keys. `CHECK_TYPE_MODIFIER_TYPES` maps each
+check type to the modifier types it reads (an Attribute Check has no Damage; a Resistance Check has no Training); the
+editor offers a check type only for those, and `getSituationalCheckModifiers` offers only those.
+`MODIFIER_TYPE_PARAMETER_KEYS` maps each summable type to the parameter a ticked situation adds to. `advantage` stores
+its level (±1, ±2) in `value` and sums across sources; `automaticFailure` counts as 1 whatever its `value`
+(`_getConditionalCheckModifierValue`). `CharacterDataModel.get{Attribute,Attack,Casting,Item}CheckMod` read the cache
+only through `_getConditionalCheckModsForType`, which asserts the type is in that list. Typed keys (free-typed in the
+editor) are grouped and matched in camel case; the one source is the frozen `TYPED_KEY_SELECTORS` map in the same
+module, keyed by operation: `conditionalCheckModifier` (`customTrait`, `spellTradition`, `situation`),
+`conditionalRatingModifier` (`customArmorTrait`, `customShieldTrait`, `customWeaponTrait`), and `rollMessage`
+(`customTrait`, `spellTradition`). The check-modifier cache builder and lookups (`_normalizeConditionalCheckModKey`),
+the rating-modifier builder, and the roll-message builder each read their own entry, and
+`tests/unit/TypedKeySelectorEditors.test.js` asserts every editor's text-input selectors equal its entry.
+`_expandAllKeyElements` does not use the map: it expands `'all'` only for a selector that `_getSelectorKeys` resolves
+to keys. Resistance checks read only the modifier types in `CHECK_TYPE_MODIFIER_TYPES.resistance` (`dice`,
+`expertise`, `advantage`, `automaticFailure`) via `getResistanceCheckMod`: checkType `any` + selector `any`,
+checkType `resistance` + selector `any`, and checkType `resistance` + selector `resistance` keyed by the rolled
+Resistance; `any`-type `attribute`/`skill` selectors never apply to them.
+
+**Situational check modifiers** — a `conditionalCheckModifier` with selector `situation` never applies
+automatically. `_applyRulesElements` tags every gathered element with its owner's name (`sourceName`), and
+`_applySituationalCheckModifierElements` caches the situation elements in `rulesElementsCache.situationalCheckModifier`
+(`{ checkType, key, label, [labelKey], modifierType, skill, source, value }`) instead of the summed cache.
+`getSituationalCheckModifiers(checkType, { skill })` returns the entries of the check type plus `any`, of modifier
+types the check reads, narrowed by `skill` (`''` = any Skill), one entry per key + modifier type summed across owners
+(`sources: string[]`). Check options carry `situations` (camel-case keys the dialog ticks or a caller names); every
+`get<Type>CheckParameters` adds the named entries on top of the options through `_applySituationalModifiers` (options
+keep only always-on values, so recomputing never double-counts; a key that no longer applies is ignored) and records
+`{ key, label, [labelKey] }` in `parameters.situations`. The equipped armor's Heavy/Encumbering/Loud traits add
+synthetic situation elements (`createArmorTraitCheckModifiers`,
+`src/document/types/item/types/armor/ArmorTraitCheckModifiers.js`): each carries a canonical English `key` (its
+camel-case form is the situation key on every client), a localized `label`, and a `labelKey` that the chat card
+localizes again for the reading client; user-typed situations have no `labelKey`. Each is narrowed to the Skill its
+checks use (Athletics; Loud's is Stealth).
 
 **`ReactiveDocument` bridge** — `src/document/reactive/ReactiveDocument.svelte.js` is the
 Foundry↔Svelte-5 reactivity bridge (it replaces TyphonJS `TJSDocument`). It wraps the live document;
@@ -273,7 +296,8 @@ children via `setContext`. The `'checkOptions'` context is a read-only view (`{ 
 whose every value is a frozen snapshot sharing nothing with its sources (`freezeCheckOptions`: plain objects and
 arrays are copied with their prototype and frozen at every depth; any other object, such as a document or data
 model, is first converted to a plain snapshot through its `toObject()` or a structured clone and then frozen), so a
-bind, assignment, in-place mutation, or store-method write from a component throws and changes nothing. Dialog fields write through the `'setCheckOption'` context (`createCheckOptionSetter`
+bind, assignment, in-place mutation, or store-method write from a component throws and changes nothing. Dialog
+fields write through the `'setCheckOption'` context (`createCheckOptionSetter`
 in `src/check/dialog/RebuildCheckOptions.js`), which records the write as a user edit. On every Actor
 change or edit, `CheckDialogShell` rebuilds the options (`rebuildCheckOptions`): the input
 `{ ...callerOptions, ...userEdits }` is validated quietly (`validate<Type>CheckOptions(options, false)` reports
@@ -690,9 +714,14 @@ tags attach tippy tooltips) with no tippy or tooltip mocking required.
 wrappers. `CheckDialogField` (`src/check/dialog/CheckDialogField.svelte`) forwards its `testId` prop
 to the wrapper `<div class="field" data-testid={testId}>`. `CheckDialogSummary` forwards `testId` to
 the inner `<div class="tag" data-testid={testId}>`. `CheckDialogBase` passes `testId={'check-dialog-roll'}` and
-`testId={'check-dialog-cancel'}` to the two `Button` components. Each of the 16 concrete `CheckDialogField`
-users and 2 `CheckDialogSummary` users supplies a static string literal such as `testId={'check-field-attribute'}` or
-`testId={'check-summary-totalDice'}`. Playwright specs select these with `page.locator('[data-testid="..."]')`.
+`testId={'check-dialog-cancel'}` to the two `Button` components. Each concrete `CheckDialogField` and
+`CheckDialogSummary` user supplies a static string literal such as `testId={'check-field-attribute'}` or
+`testId={'check-summary-totalDice'}`. Playwright specs select these with `page.locator('[data-testid="..."]')`. The
+Advantage, Automatic Failure, and situation dialog rows use `check-field-advantage`, `check-field-automaticFailure`,
+`check-summary-difficulty` (the post-Advantage Difficulty), `check-field-situations`, and per situation
+`situation-row-<key>` / `situation-toggle-<key>`; check cards use `check-chat-dc`, `check-chat-advantage`,
+`check-chat-automatic-failure`, `check-chat-situations`, and `check-chat-situation`; the conditional-check-modifier
+editor uses `ccm-*` ids (`DocumentSelect` forwards `testId`).
 Essentially every base primitive in `src/helpers/svelte-components/**` now carries an optional `testId`
 (`data-testid` passthrough on its root element, or forwarded to its inner primitive's root for wrappers) —
 the lone exception is `Text` (no root element). See the component-probe harness entry below for the full

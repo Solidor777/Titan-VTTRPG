@@ -20,17 +20,8 @@ Completed items are deleted, not marked done.
   up" (Prone: attackers within 1 space get +1/4, beyond 10 spaces -1/4 per 10 spaces; Prone/Sleeping speed and
   Awareness use "1/2, rounded up"). Frightened becomes Disadvantage on all checks, and Off-Balance is a new condition
   (-1/4 of base Accuracy, Awareness, Melee, Defense, rounded up) that needs a definition, icon and localization.
-  Open design questions: how a rules element expresses "-1/4 of base, rounded up", and that the system has no
-  Advantage/Disadvantage mechanic at all. The journal text also has an unfixed source typo (Blinded reads "--1/4 of
-  their total" instead of "-1/4 of their base value").
-
-- Conditional check modifiers on Resistance checks. `initializeResistanceCheckOptions` reads no actor modifiers, and the
-  rules-element editor offers no `resistance` check type, so "all checks" penalties such as Abjuration of the Arbiter's
-  -1 dice skip Resistance checks. Needs a `resistance` check type (selector: any or a named resistance) in
-  `ItemSheetConditionalCheckModifierSettings.svelte`, the cache builder, and the Resistance check options.
-
-- Heavy armor's remaining rules (Greater Disadvantage on Swim, Fly and Climb checks; no Jump). The -1 to all speeds is
-  applied; the rest needs the Advantage/Disadvantage mechanic the system does not have.
+  Open design question: how a rules element expresses "-1/4 of base, rounded up". The journal text also has an
+  unfixed source typo (Blinded reads "--1/4 of their total" instead of "-1/4 of their base value").
 
 - Compendium audit findings awaiting a rules decision (2026-09-27; module `src/packs`, rules 2026-09-26):
   - Force Slow: `mulBase` halves only the base speed and rounds down; the text gives no rounding.
@@ -40,7 +31,6 @@ Completed items are deleted, not marked done.
     without them; no operation can condition on a non-zero speed.
   - Aether Blades, Inferno Blades, Radiant Blade, Sacred Arms of the Arbiter (Weapon): "+1 Damage" to chosen weapons
     has no element; a conditional modifier would apply to every attack.
-  - Abjuration of the Arbiter: the dice penalty misses Resistance checks (see the Resistance-check item above).
   - Jade Perception: Awareness +1/2 Metaphysics Training has no element.
   - Lord of Black Flames: roll message keyed to a custom trait "Unarmed" that no item carries.
   - Empower Soul: roll message carries Aether Blades text.

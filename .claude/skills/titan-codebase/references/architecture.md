@@ -3,8 +3,8 @@
 ## Top-level src/ layout
 
 - `src/index.js` — Build and module entry point; imports global SCSS and registers Foundry hooks.
-- `src/check/` — Dice-check engine: base `Check.js` + `CheckResults.js`, a shared dialog and chat-message shell, and
-  five concrete check types (`attack-check`, `attribute-check`, `casting-check`, `item-check`, `resistance-check`),
+- `src/check/` — Dice-check engine: base `Check.js` + `CheckResults.js`, the pure `ApplyAdvantage.js` Difficulty helper, a shared dialog and
+  chat-message shell, and five concrete check types (`attack-check`, `attribute-check`, `casting-check`, `item-check`, `resistance-check`),
   each owning its own dialog and chat-message subcomponents.
 - `src/document/` — All Foundry document classes, data models, and sheets. Contains a shared base layer
   (`data-model/`, `sheet/`, `dialog/`, `svelte-components/`) plus per-type implementations under `types/`

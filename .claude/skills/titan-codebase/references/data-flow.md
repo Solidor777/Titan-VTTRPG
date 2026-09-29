@@ -6,9 +6,14 @@ The full path from user intent to actor mutation:
 
 **1. Trigger — `CharacterDataModel` (src/document/types/actor/types/character/CharacterDataModel.js)**
 A sheet button or macro calls `requestAttributeCheck(options)` (or the equivalent for attack / resistance /
-item / casting checks). This method calls the `shouldGetCheckOptions()` helper, which reads the
-`titan.getCheckOptions` setting (and inverts it when a modifier key is held). If the setting requires
-user confirmation it creates an `AttributeCheckDialog`; otherwise it calls `rollAttributeCheck` directly.
+item / casting checks). The request validates the options, asks `getSituationalCheckModifiers` whether any situational
+modifier applies (from the initialized options' Skill; a Resistance Check has none), and passes that to
+`shouldGetCheckOptions(hasSituationalModifiers)`. The helper reads the `titan.getCheckOptions` choice — `never`,
+`situational` (default), or `always`; `resolveCheckOptionsMode` reads a stored `true` as `always` and any other value
+outside the choices as `situational`, and `registerSystemSettings` rewrites such a stored value to its choice — and
+inverts it when the modifier key is held, except that a check with situational modifiers always hedges toward the
+dialog. If the dialog is needed it creates an `AttributeCheckDialog`; otherwise it calls `rollAttributeCheck` directly.
+A caller may pass `options.situations` on either path; the named situations apply like any other option.
 
 **2. Dialog (optional) — `AttributeCheckDialog` + `CheckDialogShell.svelte` +
 `AttributeCheckDialogShell.svelte`**
@@ -25,7 +30,12 @@ store), `'checkActor'` (a `ReactiveDocument` bridge over the Actor), and `'check
 options from the caller's options and the user's edits whenever the Actor or an edit changes (see conventions.md,
 Dialog data passing). It delegates rendering to the type-specific shell (`AttributeCheckDialogShell`), which
 recomputes the displayed totals from `actor.system.getAttributeCheckParameters($checkOptions)` whenever the options
-or the Actor change and closes the dialog when the options stop validating. When the Roll
+or the Actor change and closes the dialog when the options stop validating. `CheckDialogBase` lists the check's
+situational modifiers below the rows (`CheckDialogSituationsField`, one checkbox per situation key, unticked by
+default; ticking writes `options.situations`), reading them through the `'checkActor'` bridge so the list follows the
+Actor's item and effect changes. Every shell offers the Advantage select (`CheckDialogAdvantageField`, which shows the
+raw sum clamped to ±2), the Automatic Failure checkbox, and the Effective Difficulty summary
+(`CheckDialogDifficultySummary`). When the Roll
 button fires, the inner shell calls `actor.system.rollAttributeCheck($checkOptions)` directly on the actor's
 data model, and the dialog closes.
 
@@ -45,6 +55,12 @@ Parameter derivation (attribute/attack/casting/item checks share `_initializeAtt
 attacker's own rating, yielding difficulty 4. Gotcha: resistances/ratings are derived from attribute
 **baseValues** (computed before mods), so a `flatModifier` on an attribute's `.value` does NOT propagate into
 resistance or rating dice — boost a resistance via a `resistance`-selector element, not an `attribute` one.
+Before the attribute-based totals, `_applySituationalModifiers` adds the situations `options.situations` names. After
+the Difficulty is final (an Attack Check's rating-derived one included), `_applyCheckAdvantage` stores it as
+`baseDifficulty` and applies `applyAdvantage(difficulty, advantage)` (`src/check/ApplyAdvantage.js`): the net level is
+clamped to ±2; Advantage lowers the Difficulty to a floor of 2, Disadvantage raises it to a ceiling of 6, and a
+Difficulty already past the bound is left alone. Options initialize `advantage` and `automaticFailure` from conditional
+modifiers like `diceMod`; Resistance Checks do so through `getResistanceCheckMod`.
 
 **4. Roll & evaluate — `TitanCheck.evaluateCheck` (src/check/Check.js)**
 `_rollCheck` optionally spends Resolve via `_expendCheckResolve`, then calls `check.sendToChat()`.
@@ -52,7 +68,13 @@ resistance or rating dice — boost a resistance via a `resistance`-selector ele
 (src/helpers/utility-functions/RollCheckDice.js) to get dice results, runs `_applyExpertise`, then calls
 `_calculateResults` which delegates to `calculateCheckResults` (src/check/CheckResults.js) (or the
 type-specific override, e.g. `calculateAttributeCheckResults` via `AttributeCheck._calculateResults`).
-The resulting `CheckResults` object is stored on `check.results`.
+The resulting `CheckResults` object is stored on `check.results`. `calculateCheckResults` honors
+`parameters.automaticFailure`: the dice and critical counts stay, but successes are 0 and the check fails, so no
+type-specific damage or healing lands and Resistance and opposed checks reduce no damage; recalculation re-reads the
+flag from the stored parameters. An automatically failed card withholds every action that could change its outcome —
+the chat-log Re-roll Failures, Double Training, and Double Expertise entries (`src/hooks/OnGetChatLogEntryContext.js`),
+the reset-Expertise button, and per-die Expertise — and `CheckChatMessageDie` styles each die as a failure (a 1 as a
+critical failure).
 
 Casting-check roll-time auto-max: `calculateCastingCheckResults`
 (src/check/types/casting-check/CastingCheckResults.js) auto-maximizes the SINGLE affordable scaling aspect

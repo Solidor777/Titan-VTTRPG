@@ -3,6 +3,17 @@
 Living record of post-work review issues — gotchas, accepted limitations, and issues that deserve
 attention. NOT a to-do list (deferred work goes to `docs/TODO.md`; bugs go to `docs/OPEN_BUGS.md`).
 
+### Armor-trait situations are narrowed to the Skill their checks use (2026-09-28)
+
+Heavy and Encumbering's "Swim, Fly, or Climb" situation and Heavy's "Jump" are narrowed to Athletics; Loud's "Remain
+Undetected by Hearing" is narrowed to Stealth. The rules name Athletics for jumping (line 2300) and climbing (lines
+3150 and 5019) but name no Skill for swimming or flying: narrowing them to Athletics is a design choice, made because
+Swim, Fly, and Climb share one situation. Unnarrowed, the situations would make every check a situational check, so
+under the default `getCheckOptions` choice `situational` an armored character would open the check dialog on every
+roll, Resistance checks included. The narrowing lives in `createArmorTraitCheckModifiers`
+(`src/document/types/item/types/armor/ArmorTraitCheckModifiers.js`). Line numbers are those of
+`docs/TITAN Rules Compendium - Source - 09_26_2026.md`.
+
 ### Player HUD: the shell's `options` prop is a mount-time snapshot (2026-06-11)
 
 `TitanPlayerHud.#mountActors` passes `playerHudOptions()` as a plain prop into `PlayerHudShell`;
