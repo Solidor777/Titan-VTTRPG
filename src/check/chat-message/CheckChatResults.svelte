@@ -12,19 +12,31 @@
       REND_ICON,
       TRAINING_ICON,
    } from '~/system/Icons.js';
+   import { clampAdvantage, getAdvantageLabel } from '~/check/ApplyAdvantage.js';
 
    /** @type {object} Reference to the reactive Document store. */
    const document = getContext('document');
+
+   /** @type {number} The applied Advantage level, clamped to ±2. */
+   const advantageLevel = $derived(clampAdvantage(document.data.system.parameters.advantage));
 </script>
 
 <div class="results">
    <!--Successes-->
    <div class="stat">
-      <div class="border-right">
+      <div class="border-right" data-testid="check-chat-dc">
          {`${localize('dc')} ${document.data.system.parameters.difficulty}:${
             document.data.system.parameters.complexity
          }`}
       </div>
+
+      <!--Advantage level beside the Difficulty it changed-->
+      {#if advantageLevel !== 0}
+         <div class="tag advantage" data-testid="check-chat-advantage">
+            {localize(getAdvantageLabel(advantageLevel))}
+         </div>
+      {/if}
+
       <div>
          {`${document.data.system.results.successes} ${localize('successes')}`}
       </div>
@@ -55,6 +67,26 @@
       <!--Failed-->
       <div class="result failed">
          {localize('failed')}
+      </div>
+   {/if}
+
+   <!--Automatic Failure-->
+   {#if document.data.system.parameters.automaticFailure}
+      <div class="stat">
+         <div class="tag" data-testid="check-chat-automatic-failure">
+            {localize('automaticFailure')}
+         </div>
+      </div>
+   {/if}
+
+   <!--Ticked situational modifiers-->
+   {#if document.data.system.parameters.situations.length}
+      <div class="stat situations" data-testid="check-chat-situations">
+         {#each document.data.system.parameters.situations as situation (situation.key)}
+            <div class="tag" data-testid="check-chat-situation">
+               {situation.label}
+            </div>
+         {/each}
       </div>
    {/if}
 
@@ -191,6 +223,19 @@
 
          &.extra {
             @include font-size-small;
+         }
+
+         &.situations {
+            flex-wrap: wrap;
+            gap: var(--titan-spacing-standard);
+         }
+
+         .tag {
+            @include tag;
+         }
+
+         .advantage {
+            @include margin-right-large;
          }
 
          i {

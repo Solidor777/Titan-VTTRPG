@@ -408,3 +408,140 @@ test.describe('Advantage and Automatic Failure from conditional modifiers', () =
       });
    });
 });
+
+test.describe('chat card tags', () => {
+   test('a Disadvantage tag sits beside the DC, is styled as a tag, and follows the stored level', async () => {
+      await seedEffect(page, [
+         checkModifierElement({
+            modifierType: 'advantage',
+            value: -1,
+         }),
+      ]);
+      /** @type {{id: string, parameters: object, results: object}} The rolled check's message. */
+      const message = await rollAttributeCheck(page, { attribute: 'body' });
+
+      /** @type {import('@playwright/test').Locator} The rolled check's card. */
+      const card = page.locator(`#chat .message[data-message-id="${message.id}"]`);
+      await expect(card.locator('.check-chat-message')).toBeAttached();
+      await expect(card.getByTestId('check-chat-dc')).toHaveText('DC 5:0');
+
+      /** @type {import('@playwright/test').Locator} The Advantage tag. */
+      const tag = card.getByTestId('check-chat-advantage');
+
+      /** @type {string} The localized Disadvantage label. */
+      const label = await page.evaluate(() => game.i18n.localize('LOCAL.disadvantage.text'));
+      await expect(tag).toHaveText(label);
+
+      // The tag's computed colors are the resolved tag tokens.
+      /** @type {{background: string, color: string, tagBackground: string, tagFont: string}} Computed colors. */
+      const colors = await tag.evaluate((element) => {
+         /**
+          * Resolves a color token through a throwaway child so the value normalizes to computed rgb() form.
+          * @param {string} token - The custom property name.
+          * @returns {string} The computed color.
+          */
+         const resolve = (token) => {
+            /** @type {HTMLSpanElement} The probe carrying the token. */
+            const probe = document.createElement('span');
+            probe.style.color = `var(${token})`;
+            element.appendChild(probe);
+
+            /** @type {string} The resolved color. */
+            const value = getComputedStyle(probe).color;
+            probe.remove();
+            return value;
+         };
+
+         /** @type {CSSStyleDeclaration} The tag's computed style. */
+         const computed = getComputedStyle(element);
+         return {
+            background: computed.backgroundColor,
+            color: computed.color,
+            tagBackground: resolve('--titan-tag-background'),
+            tagFont: resolve('--titan-tag-font-color'),
+         };
+      });
+      expect(colors.background).toBe(colors.tagBackground);
+      expect(colors.color).toBe(colors.tagFont);
+
+      // Clearing the stored Advantage removes the tag from the same card.
+      await page.evaluate(async (id) => {
+         /** @type {ChatMessage} The rolled check's message. */
+         const chatMessage = game.messages.get(id);
+
+         /** @type {object} A detached copy of its system data. */
+         const system = chatMessage.system.toObject();
+         system.parameters.advantage = 0;
+         await chatMessage.update({ system });
+      }, message.id);
+      await expect(tag).toHaveCount(0);
+   });
+
+   test('opposing Advantage sources show no tag beside the unchanged DC', async () => {
+      await seedEffect(page, [
+         checkModifierElement({
+            modifierType: 'advantage',
+            value: 1,
+         }),
+         checkModifierElement({
+            modifierType: 'advantage',
+            value: -1,
+         }),
+      ]);
+      /** @type {{id: string, parameters: object, results: object}} The rolled check's message. */
+      const message = await rollAttributeCheck(page, { attribute: 'body' });
+
+      /** @type {import('@playwright/test').Locator} The rolled check's card. */
+      const card = page.locator(`#chat .message[data-message-id="${message.id}"]`);
+
+      // The DC renders first at the unchanged Difficulty; the tag beside it is absent.
+      await expect(card.getByTestId('check-chat-dc')).toHaveText('DC 4:0');
+      await expect(card.getByTestId('check-chat-advantage')).toHaveCount(0);
+   });
+
+   test('an automatically failed card shows the Automatic Failure tag and no successes', async () => {
+      await seedEffect(page, [
+         checkModifierElement({
+            modifierType: 'automaticFailure',
+         }),
+      ]);
+      await forceDice(page, [6]);
+      /** @type {{id: string, parameters: object, results: object}} The rolled check's message. */
+      const message = await rollAttributeCheck(page, {
+         attribute: 'body',
+         complexity: 1,
+      });
+
+      /** @type {import('@playwright/test').Locator} The rolled check's card. */
+      const card = page.locator(`#chat .message[data-message-id="${message.id}"]`);
+
+      /** @type {{automaticFailure: string, successes: string}} The localized labels. */
+      const labels = await page.evaluate(() => ({
+         automaticFailure: game.i18n.localize('LOCAL.automaticFailure.text'),
+         successes: game.i18n.localize('LOCAL.successes.text'),
+      }));
+      await expect(card.getByTestId('check-chat-automatic-failure')).toHaveText(labels.automaticFailure);
+      await expect(card.locator('.results')).toContainText(`0 ${labels.successes}`);
+   });
+
+   test('the card lists the ticked situations by label', async () => {
+      await seedEffect(page, [
+         checkModifierElement({
+            key: 'Underwater',
+            selector: 'situation',
+            value: -1,
+         }),
+      ]);
+      // A caller names the situation directly; the dialog is not involved.
+      /** @type {{id: string, parameters: object, results: object}} The rolled check's message. */
+      const message = await rollAttributeCheck(page, {
+         attribute: 'body',
+         situations: ['underwater'],
+      });
+      expect(message.parameters.diceMod).toBe(-1);
+
+      /** @type {import('@playwright/test').Locator} The rolled check's card. */
+      const card = page.locator(`#chat .message[data-message-id="${message.id}"]`);
+      await expect(card.getByTestId('check-chat-situation')).toHaveText(['Underwater']);
+   });
+});
