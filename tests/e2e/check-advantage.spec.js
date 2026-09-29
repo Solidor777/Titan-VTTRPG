@@ -184,6 +184,42 @@ test.describe('Advantage and Automatic Failure in check options', () => {
       });
    });
 
+   test('an automatically failed check spends no Expertise and its card shows no die raised by it', async () => {
+      /** @type {object} One die and 1 Expertise on a 4:1 check, so a rolled 3 takes the Expertise. */
+      const checkOptions = {
+         attribute: 'body',
+         complexity: 1,
+         expertiseMod: 1,
+      };
+      await showChatLog(page);
+
+      // Positive control: without Automatic Failure the Expertise raises the 3, and the card shows "3 + 1".
+      await forceDice(page, [3]);
+      /** @type {{id: string, parameters: object, results: object}} The normal check's message. */
+      const control = await rollAttributeCheck(page, checkOptions);
+      expect(control.results.expertiseRemaining).toBe(0);
+      expect(control.results.dice.map((die) => die.expertiseApplied)).toEqual([1]);
+
+      /** @type {import('@playwright/test').Locator} The normal card in the chat log. */
+      const controlCard = page.locator(`#chat .chat-log li[data-message-id="${control.id}"]`);
+      await expect(controlCard.locator('.die', { hasText: '+' })).toHaveCount(1);
+
+      // The same roll with Automatic Failure spends nothing: the Expertise remains and the die shows its face alone.
+      await forceDice(page, [3]);
+      /** @type {{id: string, parameters: object, results: object}} The automatically failed check's message. */
+      const failed = await rollAttributeCheck(page, {
+         ...checkOptions,
+         automaticFailure: true,
+      });
+      expect(failed.results.expertiseRemaining).toBe(1);
+      expect(failed.results.dice.map((die) => die.expertiseApplied)).toEqual([0]);
+
+      /** @type {import('@playwright/test').Locator} The automatically failed card in the chat log. */
+      const failedCard = page.locator(`#chat .chat-log li[data-message-id="${failed.id}"]`);
+      await expect(failedCard.locator('.die')).toHaveText(['3']);
+      await expect(failedCard.locator('.die', { hasText: '+' })).toHaveCount(0);
+   });
+
    test('an automatically failed card offers no outcome-changing action and styles no die as a success', async () => {
       /** @type {Record<string, string>} The localized labels of the actions a failed card withholds. */
       const labels = await page.evaluate(() => ({

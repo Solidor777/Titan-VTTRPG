@@ -70,12 +70,22 @@ export default class TitanCheck {
    }
 
    /**
-    * Runs evaluation for the check.
+    * Runs evaluation for the check. An automatically failed check spends no Expertise, so all of it remains.
+    * @returns {Promise<void>}
     */
    async evaluateCheck() {
       // Calculate the results of the check.
+      /** @type {CheckDie[]} The rolled dice, sorted from largest to smallest. */
       const dice = await rollCheckDice(this.parameters.totalDice);
-      this.results = this._calculateResults(this._applyExpertise(dice));
+
+      /** @type {CheckDiceResults} The dice with Expertise applied, or untouched on an automatic failure. */
+      const diceResults = this.parameters.automaticFailure ?
+         {
+            dice: dice,
+            expertiseRemaining: this.parameters.totalExpertise ?? 0,
+         } :
+         this._applyExpertise(dice);
+      this.results = this._calculateResults(diceResults);
 
       // Mark the check as evaluated.
       this.isEvaluated = true;
