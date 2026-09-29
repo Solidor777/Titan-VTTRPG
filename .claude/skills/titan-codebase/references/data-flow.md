@@ -324,11 +324,12 @@ follow the sub-option direction. In a horizontal layout the flyout lane stays in
 category via a measured `margin-left`. In a vertical layout the flyout lane is lifted out of flow and
 absolutely anchored beside the category column at the open button's row — its top to the button (flow down) or
 its bottom to the button (flow up), measured from the active button's `offsetTop`/`offsetHeight` — so opening a
-category never reflows the bar. The per-user `directions.vertical.subOptionsFlow` (`down`/`up`, default `up` — matching the default
-bottom-anchored dock so the flyout grows on-screen) chooses the stacking direction; flow up renders the visible
-window reversed so the first logical option is the bottom-most row, on the button. `.categories` reserves a gutter on the chip's edge so the minimize chip never
-overlaps the buttons. Sub-options window to `windowSize` entries with wheel scrolling (non-passive listener via
-a `use:` action) and gradient scroll fades; the whole flyout lane swooshes in with a directional `in:fly`
+category never reflows the bar. The per-user `directions.vertical.subOptionsFlow` (`down`/`up`, default `up` — matching
+the default bottom-anchored dock so the flyout grows on-screen) chooses the stacking direction; flow up renders the
+visible window reversed so the first logical option is the bottom-most row, on the button. `.categories` reserves a
+gutter on the chip's edge so the minimize chip never overlaps the buttons. Sub-options window to `windowSize` entries
+with wheel scrolling (non-passive listener via a `use:` action) and gradient scroll fades; the whole flyout lane
+swooshes in with a directional `in:fly`
 from the open category toward the sub-options (horizontal slide in a vertical layout, vertical in a
 horizontal one). The sub-option moved-over (`onpointermove`, NOT `onpointerenter`, so a flyout swooshing in
 under a stationary cursor never auto-opens a sub-option) or keyboard-focused reveals its sub-buttons in an

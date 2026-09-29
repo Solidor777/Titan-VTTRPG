@@ -607,10 +607,10 @@ AppV2 render hook signature: `(application, element: HTMLElement, context, optio
 **ContextMenuEntry shape (v14)** — `{ label, icon, visible(li: HTMLElement), onClick(event, li: HTMLElement) }`.
 The old v13 shape used `name`, `condition`, and `callback(entry)` (one argument); v14 renames them to
 `label` / `visible` / `onClick` (passing two arguments to `onClick`). The v13 names still work via a
-deprecation shim (removed in v16); TITAN's hooks use the v14 names. Directory entry `li` elements carry `li.dataset.entryId`; chat message
-`li` elements carry `li.dataset.messageId` (confirmed in `document-directory.mjs` line 237 and
-`chat.mjs` line 338). `li.closest('[data-entry-id]')?.dataset.entryId` is the safe accessor pattern
-(same as used in `_getEntryContextOptions` at `document-directory.mjs:237`).
+deprecation shim (removed in v16); TITAN's hooks use the v14 names. Directory entry `li` elements carry
+`li.dataset.entryId`; chat message `li` elements carry `li.dataset.messageId` (confirmed in `document-directory.mjs`
+line 237 and `chat.mjs` line 338). `li.closest('[data-entry-id]')?.dataset.entryId` is the safe accessor pattern (same
+as used in `_getEntryContextOptions` at `document-directory.mjs:237`).
 
 **AppV2 header controls (no `_getHeaderButtons`)** — v14 `ApplicationV2` has no `_getHeaderButtons`;
 sheet header actions are returned from `_getHeaderControls()` (runs on every frame render). Each entry
@@ -1026,10 +1026,11 @@ preparation to settle, and asserts `actor.system.attribute.body.value === 3`. Ab
 rules elements on mere ownership (no equip), making them the canonical fixture type for derived-stat
 assertions. The spec uses `test.afterEach` to delete the fixture actor so world state does not accumulate.
 
-**`buildFlatModifierAbilityData` builder** — `tests/shared/builders.js` exports `buildFlatModifierAbilityData(name, values)`:
-accepts a `string` name and a `number[]` of modifier values; returns an `Item.create` payload of type `'ability'`
-with one flatModifier rules element per value, each targeting `selector: 'attribute'`, `key: 'body'`, and
-`uuid: 'e2e-flatmod-{index}'`. The companion Vitest unit test lives in `tests/unit/builders.test.js`.
+**`buildFlatModifierAbilityData` builder** — `tests/shared/builders.js` exports
+`buildFlatModifierAbilityData(name, values)`: accepts a `string` name and a `number[]` of modifier values; returns an
+`Item.create` payload of type `'ability'` with one flatModifier rules element per value, each targeting
+`selector: 'attribute'`, `key: 'body'`, and `uuid: 'e2e-flatmod-{index}'`. The companion Vitest unit test lives in
+`tests/unit/builders.test.js`.
 
 ## Integration manifest drift guard
 

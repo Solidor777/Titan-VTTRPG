@@ -438,9 +438,9 @@ is above 0. Inside it, `_applyRulesElements` gathers the equipped armor's trait 
 `conditionalCheckModifier` elements sourced as the armor (`createArmorTraitCheckModifiers`): Heavy → Greater
 Disadvantage on "Swim, Fly, or Climb" and Automatic Failure on "Jump", both narrowed to Athletics; Encumbering →
 Disadvantage on "Swim, Fly, or Climb" (Athletics); Loud → Disadvantage on "Remain Undetected by Hearing" (Stealth).
-The character `mod` stats are only `armor`, `resolveRegain`, and `woundRegain` (`src/system/Mods.js`); check damage and healing bonuses
-are not mods — they come only from `conditionalCheckModifier` elements with `modifierType` `damage`/`healing`, where
-check type `any` + selector `any` applies to every attack, casting, and item check.
+The character `mod` stats are only `armor`, `resolveRegain`, and `woundRegain` (`src/system/Mods.js`); check damage
+and healing bonuses are not mods — they come only from `conditionalCheckModifier` elements with `modifierType`
+`damage`/`healing`, where check type `any` + selector `any` applies to every attack, casting, and item check.
 
 
 ## Sheets

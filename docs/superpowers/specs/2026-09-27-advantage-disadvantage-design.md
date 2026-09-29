@@ -144,7 +144,7 @@ The client setting `getCheckOptions` changes from a Boolean to a choice:
 | Value | Label | Behavior |
 |---|---|---|
 | `never` | Never | Roll without the dialog |
-| `situational` (default) | When Situational Modifiers Apply | Open the dialog only when `getSituationalCheckModifiers` returns at least one entry for the check |
+| `situational` (default) | When Situational Modifiers Apply | Open the dialog only when situational modifiers apply |
 | `always` | Always | Always open the dialog |
 
 - `shouldGetCheckOptions(hasSituationalModifiers)` resolves the choice. The modifier key treats `situational` as
@@ -181,13 +181,14 @@ adds synthetic `conditionalCheckModifier` elements for the equipped armor's trai
 
 | Trait | Synthetic elements (checkType `any`, selector `situation`) |
 |---|---|
-| Heavy | `advantage` −2, key "Swim, Fly, or Climb"; `automaticFailure`, key "Jump"; both narrowed to skill `athletics` |
+| Heavy | `advantage` −2, key "Swim, Fly, or Climb"; `automaticFailure`, key "Jump"; both narrowed to `athletics` |
 | Encumbering | `advantage` −1, key "Swim, Fly, or Climb", narrowed to `athletics` |
 | Loud | `advantage` −1, key "Remain Undetected by Hearing", narrowed to `stealth` |
 
 The system has no Jump action and no Acrobatics skill; a Jump is a Body (Athletics) check (the "Jumping" section) and so
-is a Climb (the Athlete ability and the fissure check), so the armor situations are narrowed to Athletics, and Loud's to Stealth. Unnarrowed, armor would
-make every check situational and open the dialog on every roll under the default setting.
+is a Climb (the Athlete ability and the fissure check), so the armor situations are narrowed to Athletics, and Loud's
+to Stealth. Unnarrowed, armor would make every check situational and open the dialog on every roll under the default
+setting.
 
 As built: each system situation has a fixed canonical English source string defined in code ("Swim, Fly, or Climb",
 "Jump", "Remain Undetected by Hearing"), and its camel-cased form is the situation key on every client, so keys never
