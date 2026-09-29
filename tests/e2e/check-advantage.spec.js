@@ -50,7 +50,7 @@ test.afterAll(async () => {
 /**
  * Rolls an Attribute Check for the spec's actor without the dialog and returns the created message.
  * @param {import('@playwright/test').Page} targetPage - The logged-in page.
- * @param {object} options - The Attribute Check options.
+ * @param {object} options - Attribute, Skill, and modifier fields passed to `rollAttributeCheck`.
  * @returns {Promise<{id: string, type: string, parameters: object, results: object}>} The new message's id, subtype,
  * parameters, and results.
  */
@@ -494,7 +494,10 @@ test.describe('chat card tags', () => {
       await expect(tag).toHaveText(label);
 
       // The tag's computed colors are the resolved tag tokens.
-      /** @type {{background: string, color: string, tagBackground: string, tagFont: string}} Computed colors. */
+      /**
+       * @type {{background: string, color: string, tagBackground: string, tagFont: string}} The tag's rendered
+       * colors beside its resolved token colors.
+       */
       const colors = await tag.evaluate((element) => {
          /**
           * Resolves a color token through a throwaway child so the value normalizes to computed rgb() form.

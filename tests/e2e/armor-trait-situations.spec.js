@@ -111,7 +111,7 @@ async function openAthleticsDialog() {
  * Locates a situation row in a dialog by its stable key.
  * @param {import('@playwright/test').Locator} dialog - The dialog window.
  * @param {string} key - The situation's stable key.
- * @returns {import('@playwright/test').Locator} The row.
+ * @returns {import('@playwright/test').Locator} The dialog's situation entry carrying that key.
  */
 function situationRow(dialog, key) {
    return dialog.getByTestId(`situation-row-${key}`);

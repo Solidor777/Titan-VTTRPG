@@ -78,7 +78,7 @@ async function seedActor(rulesElement) {
 
 /**
  * Rolls a Resistance Check without the dialog and returns the created message.
- * @param {object} options - The Resistance Check options.
+ * @param {object} options - Resistance and modifier fields passed to `rollResistanceCheck`.
  * @returns {Promise<{id: string, type: string, parameters: object, results: object}>} The new message's id, subtype,
  * parameters, and results.
  */

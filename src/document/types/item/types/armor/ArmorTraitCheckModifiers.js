@@ -47,7 +47,7 @@ function createSituationalElement(trait, modifierType, value, labelKey, skill) {
  * Stealth check. The rules name no Skill for swimming or flying: narrowing them to Athletics is a design choice, made
  * because Swim, Fly, and Climb share one situation and an unnarrowed armor situation would open the dialog on every
  * check. Heavy's "cannot Jump" is therefore an Automatic Failure offered on Athletics checks.
- * @param {StandardTrait[]} traits - The armor's traits.
+ * @param {StandardTrait[]} traits - The armor's Standard Traits; only Heavy, Encumbering, and Loud contribute.
  * @returns {ConditionalCheckModifierElement[]} The synthetic elements, in trait order Heavy, Encumbering, Loud.
  */
 export default function createArmorTraitCheckModifiers(traits) {

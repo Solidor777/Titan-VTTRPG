@@ -5,10 +5,9 @@ import resolveCheckOptionsMode from '~/helpers/utility-functions/ResolveCheckOpt
  * Determines whether a check opens its options dialog before rolling. The `getCheckOptions` setting chooses never,
  * situational (only when a situational modifier applies to the check), or always. Holding the modifier key inverts the
  * choice, treating `situational` as "no dialog", but a check with situational modifiers always hedges toward showing
- * the dialog:
- * never — no key: no dialog; key: dialog.
- * situational — no key: dialog only if situational modifiers apply; key: dialog.
- * always — no key: dialog; key: dialog only if situational modifiers apply.
+ * the dialog. With `never`, the dialog opens only while the key is held. With `situational`, it opens when the key is
+ * held or situational modifiers apply. With `always`, it opens without the key, and with the key only when situational
+ * modifiers apply.
  * @param {boolean} hasSituationalModifiers - Whether any situational modifier applies to the check.
  * @returns {boolean} Whether to open the check options dialog.
  */

@@ -20,7 +20,7 @@ function resolveFolder(target, trayState) {
  * @param {HTMLElement} target - The folder header the menu was opened on.
  * @param {number} leftOffset - Pixels from the viewport's right edge to the dialog's left edge (core uses 740
  * for Create Rollable Table and 770 for Remove Folder and Delete All).
- * @returns {{top: number, left: number}} The dialog position.
+ * @returns {{top: number, left: number}} The viewport pixel coordinates of the dialog's top-left corner.
  */
 function getDialogPosition(target, leftOffset) {
    /** @type {HTMLElement | null} The folder's directory entry, whose offset core measures. */

@@ -1514,7 +1514,7 @@ export default class CharacterDataModel extends TitanActorDataModel {
    /**
     * Gets the value a Conditional Check Modifier element contributes to a cache. An Automatic Failure element counts
     * as 1 whatever its stored value, so any matching element makes a lookup positive.
-    * @param {ConditionalCheckModifierElement} element - The element.
+    * @param {ConditionalCheckModifierElement} element - The rules element being added to the cache.
     * @returns {number} The element's contribution.
     * @private
     */

@@ -253,7 +253,7 @@ function checkModifier(overrides) {
 
 /**
  * Builds a model whose cache holds the given situational elements.
- * @param {object[]} elements - The situational elements.
+ * @param {object[]} elements - Conditional Check Modifier elements with the `situation` selector to cache.
  * @returns {object} The model instance.
  */
 function situationalModel(elements) {
@@ -381,7 +381,7 @@ describe('situational check modifiers', () => {
       ]);
       /**
        * Lists the offered keys for a check type.
-       * @param {string} checkType - The check type.
+       * @param {string} checkType - The check type to query (e.g. `attribute` or `casting`).
        * @returns {string[]} The offered situation keys.
        */
       const keysFor = (checkType) => model.getSituationalCheckModifiers(checkType, { skill: 'athletics' })
