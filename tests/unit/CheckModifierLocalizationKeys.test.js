@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import path from 'node:path';
+import { CANONICAL_SITUATIONS } from '~/document/types/item/types/armor/ArmorTraitCheckModifiers.js';
 
 /** @type {string} This test file's directory. */
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -26,9 +27,6 @@ const LOCAL_KEYS = [
    'greaterDisadvantage.text',
    'noAdvantage.text',
    'situation.text',
-   'situationJump.text',
-   'situationRemainUndetectedByHearing.text',
-   'situationSwimFlyClimb.text',
    'situationalModifiers.text',
 ];
 
@@ -36,6 +34,11 @@ describe('check-modifier localization keys', () => {
    it.each(LOCAL_KEYS)('LOCAL defines %s', (key) => {
       expect(lang.LOCAL[key]).toBeTypeOf('string');
       expect(lang.LOCAL[key].length).toBeGreaterThan(0);
+   });
+
+   it.each(Object.keys(CANONICAL_SITUATIONS))('LOCAL defines the label of system situation %s', (labelKey) => {
+      expect(lang.LOCAL[`${labelKey}.text`]).toBeTypeOf('string');
+      expect(lang.LOCAL[`${labelKey}.text`].length).toBeGreaterThan(0);
    });
 });
 

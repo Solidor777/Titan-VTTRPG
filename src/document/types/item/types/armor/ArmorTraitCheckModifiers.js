@@ -3,14 +3,15 @@ import localize from '~/helpers/utility-functions/Localize.js';
 /**
  * The canonical source string of each system situation, by localization key. The camel-case form of the string is the
  * situation key on every client, so it never depends on the client's language and equals the key a user-typed situation
- * with the same English text gets. The displayed label is localized separately.
- * @type {Record<string, string>}
+ * with the same English text gets. The displayed label is localized separately; a unit test requires every key's
+ * `LOCAL.<key>.text` entry in the English localization.
+ * @type {Readonly<Record<string, string>>}
  */
-const CANONICAL_SITUATIONS = {
+export const CANONICAL_SITUATIONS = Object.freeze({
    situationJump: 'Jump',
    situationRemainUndetectedByHearing: 'Remain Undetected by Hearing',
    situationSwimFlyClimb: 'Swim, Fly, or Climb',
-};
+});
 
 /**
  * Builds one synthetic situational Conditional Check Modifier element for an armor trait. Its `key` is the canonical
