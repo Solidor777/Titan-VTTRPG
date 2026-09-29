@@ -781,3 +781,17 @@ when fixed.
 - **Fixed:** 2026-09-28 — the factories leave both `undefined` when unset and the initializers derive them only when
   `=== undefined`, so a supplied 0 is kept. Commit `15f35020`. Gated by `rebuild-check-options.test.js`
   ("Casting and Item Complexity and Difficulty").
+
+### 69. Hotbar macros: Attack Check and document-ID macros did nothing; sheet-toggle macros used a deprecated global
+
+- **What:** `TitanMacros#getAttackCheckMacro` (`src/system/Macros.js`) wrote the command
+  `game.titan.macros.requestAttackCheck(...)`, but `TitanMacros` has only `rollAttackCheck`, so every Attack Check
+  macro threw "not a function". `getMacroID` matched the ID method `'id'` while the Create Macro dialog and
+  `getMacroItemFromID` use `'documentId'`, so a document-ID macro stored the Item's TITAN uuid and looked it up as a
+  document ID, finding nothing. Sheet-toggle macros called the bare `Hotbar` global, a v13-deprecated alias.
+- **Found:** 2026-09-28 by the plan A final whole-branch review (attack command); the document-ID and `Hotbar`
+  defects while verifying every generated command.
+- **Fixed:** 2026-09-29 — the Attack command calls `rollAttackCheck`, `getMacroID` matches `'documentId'`, and the
+  sheet toggle calls `foundry.applications.ui.Hotbar.toggleDocumentSheet`. Gated by `tests/unit/Macros.test.js`
+  (executes every generated command under each ID method) and `tests/e2e/macros.spec.js` (creates and executes each
+  macro kind in the live world). Macros created before the fix keep their stored command.

@@ -98,8 +98,8 @@ export default class TitanMacros {
          const id = this.getMacroID(item, idMethod);
 
          // Create the command.
-         /** @type {string} */
-         const command = `game.titan.macros.requestAttackCheck('${id}', '${idMethod}', ${attackIdx})`;
+         /** @type {string} The script the Macro runs. */
+         const command = `game.titan.macros.rollAttackCheck('${id}', '${idMethod}', ${attackIdx})`;
 
          // Get or create the macro.
          return this.getOrCreateMacro(name, img, command, 'attackCheck', ATTACK_CHECK_MACRO_VERSION);
@@ -122,7 +122,7 @@ export default class TitanMacros {
          const id = this.getMacroID(item, idMethod);
 
          // Create the command.
-         /** @type {string} */
+         /** @type {string} The script the Macro runs. */
          const command = `game.titan.macros.rollCastingCheck('${id}', '${idMethod}')`;
 
          // Get or create the macro.
@@ -147,7 +147,7 @@ export default class TitanMacros {
          const id = this.getMacroID(item, idMethod);
 
          // Create the command.
-         /** @type {string} */
+         /** @type {string} The script the Macro runs. */
          const command = `game.titan.macros.rollItemCheck('${id}', '${idMethod}', ${checkIdx})`;
 
          // Get or create the macro.
@@ -163,9 +163,9 @@ export default class TitanMacros {
     * @returns {Macro} The newly created Macro.
     */
    async getToggleDocumentSheetMacro(name, img, uuid) {
-      // Create the command.
-      /** @type {string} */
-      const command = `Hotbar.toggleDocumentSheet('${uuid}')`;
+      // Create the command. v14 namespaces the Hotbar; its bare global is a deprecated alias.
+      /** @type {string} The script the Macro runs. */
+      const command = `foundry.applications.ui.Hotbar.toggleDocumentSheet('${uuid}')`;
 
       // Get or create the macro.
       return this.getOrCreateMacro(
@@ -176,7 +176,7 @@ export default class TitanMacros {
     * Gets the ID to be used with the provided ID method to retrieve the document when executing the macro.
     * @param {Document} document - The Document to get the ID for.
     * @param {string} idMethod - The method that will be used to get the
-    * Document from the ID (uuid, name, or document ID).
+    * Document from the ID (uuid, name, or documentId).
     * @returns {string} The ID to be used with the provided ID method to retrieve the document when executing the macro.
     */
    getMacroID(document, idMethod) {
@@ -184,7 +184,7 @@ export default class TitanMacros {
          case 'name': {
             return document.name;
          }
-         case 'id': {
+         case 'documentId': {
             return document.id;
          }
          default: {
