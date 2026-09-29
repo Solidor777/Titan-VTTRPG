@@ -114,7 +114,12 @@ reads the cache only through `_getConditionalCheckModsForType` (which asserts th
 sums each cell the frozen `CHECK_TYPE_CONDITIONAL_SELECTORS` table (same module) lists for the check type — element
 check type → selectors — where the check matches the selector (`any` always; `multiAttack` for a multi-attack; a
 keyed selector by the check's key or keys). `tests/unit/CharacterCheckModifiers.test.js` pins each check type's cells
-against a cache holding a distinct power of two per cell. Typed keys (free-typed in the
+against a cache holding a distinct power of two per cell. The editor's check-type and selector options are the frozen
+`CONDITIONAL_CHECK_MODIFIER_CHECK_TYPE_OPTIONS` and `CONDITIONAL_CHECK_MODIFIER_SELECTOR_OPTIONS` (same module, display
+order); `tests/unit/ConditionalCheckModifierTypes.test.js` pins them to the element check types and selectors the
+table reads (plus `situation`), and `tests/unit/check/rebuild-check-options.test.js` requires `CHECK_OPTIONS_METHODS`,
+`CHECK_TYPE_MODIFIER_TYPES`, and the editor's own check types to name the same check types, so a sixth check type fails
+until every list has it. Typed keys (free-typed in the
 editor) are grouped and matched in camel case; the one source is the frozen `TYPED_KEY_SELECTORS` map in the same
 module, keyed by operation: `conditionalCheckModifier` (`customTrait`, `spellTradition`, `situation`),
 `conditionalRatingModifier` (`customArmorTrait`, `customShieldTrait`, `customWeaponTrait`), and `rollMessage`

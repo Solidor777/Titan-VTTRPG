@@ -2,6 +2,8 @@
    import { getContext } from 'svelte';
    import {
       CHECK_TYPE_MODIFIER_TYPES,
+      CONDITIONAL_CHECK_MODIFIER_CHECK_TYPE_OPTIONS,
+      CONDITIONAL_CHECK_MODIFIER_SELECTOR_OPTIONS,
       CONDITIONAL_CHECK_MODIFIER_TYPES,
    } from '~/system/ConditionalCheckModifierTypes.js';
    import { ADVANTAGE_ELEMENT_LEVEL_OPTIONS, clampAdvantage } from '~/check/ApplyAdvantage.js';
@@ -35,71 +37,6 @@
       (modifierType) => isCheckTypeAllowed(document.data.system.rulesElement[idx].checkType, modifierType),
    ));
 
-   /** @type {{label: string, value: string}[]} Every check type a modifier can target. */
-   const allCheckTypeOptions = [
-      {
-         label: 'anyCheck',
-         value: 'any',
-      },
-      {
-         label: 'attackCheck',
-         value: 'attack',
-      },
-      {
-         label: 'castingCheck',
-         value: 'casting',
-      },
-      {
-         label: 'itemCheck',
-         value: 'item',
-      },
-      {
-         label: 'resistanceCheck',
-         value: 'resistance',
-      },
-   ];
-
-   /** @type {Record<string, string[]>} Selector options keyed by check type. */
-   const selectorOptions = {
-      any: [
-         'any',
-         'attribute',
-         'skill',
-         'customTrait',
-         'situation',
-      ],
-      attack: [
-         'any',
-         'attribute',
-         'attackTrait',
-         'attackType',
-         'customTrait',
-         'multiAttack',
-         'skill',
-         'situation',
-      ],
-      casting: [
-         'any',
-         'attribute',
-         'customTrait',
-         'spellTradition',
-         'skill',
-         'situation',
-      ],
-      item: [
-         'any',
-         'attribute',
-         'customTrait',
-         'skill',
-         'situation',
-      ],
-      resistance: [
-         'any',
-         'resistance',
-         'situation',
-      ],
-   };
-
    /** @type {Array<{label: string, value: string}|string>} A situation's Skill narrowing; '' offers every Skill. */
    const situationSkillOptions = [
       {
@@ -110,7 +47,7 @@
    ];
 
    /** @type {{label: string, value: string}[]} The check types that read this element's modifier type. */
-   const checkTypeOptions = $derived(allCheckTypeOptions.filter(
+   const checkTypeOptions = $derived(CONDITIONAL_CHECK_MODIFIER_CHECK_TYPE_OPTIONS.filter(
       (option) => isCheckTypeAllowed(option.value, document.data.system.rulesElement[idx].modifierType),
    ));
 
@@ -134,10 +71,12 @@
    /**
     * Gets the selectors a check type offers; a stored check type the editor does not know offers the `any` selectors.
     * @param {string} checkType - The stored check type, known to the editor or not.
-    * @returns {string[]} The selectors the check type offers, led by `any`.
+    * @returns {readonly string[]} The selectors the check type offers, led by `any`.
     */
    function getSelectorOptions(checkType) {
-      return Object.hasOwn(selectorOptions, checkType) ? selectorOptions[checkType] : selectorOptions.any;
+      return Object.hasOwn(CONDITIONAL_CHECK_MODIFIER_SELECTOR_OPTIONS, checkType)
+         ? CONDITIONAL_CHECK_MODIFIER_SELECTOR_OPTIONS[checkType]
+         : CONDITIONAL_CHECK_MODIFIER_SELECTOR_OPTIONS.any;
    }
 
    /**

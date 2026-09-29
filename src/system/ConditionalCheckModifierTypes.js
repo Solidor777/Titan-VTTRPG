@@ -145,6 +145,81 @@ export const CHECK_TYPE_CONDITIONAL_SELECTORS = Object.freeze({
 });
 
 /**
+ * The check types the rules-element editor offers a conditional check modifier, as select options in display order.
+ * `any` targets every check; Attribute Checks read only `any`, so they have no option of their own. A unit test pins
+ * the values to the element check types CHECK_TYPE_CONDITIONAL_SELECTORS reads.
+ * @type {ReadonlyArray<Readonly<{label: string, value: string}>>}
+ */
+export const CONDITIONAL_CHECK_MODIFIER_CHECK_TYPE_OPTIONS = Object.freeze([
+   Object.freeze({
+      label: 'anyCheck',
+      value: 'any',
+   }),
+   Object.freeze({
+      label: 'attackCheck',
+      value: 'attack',
+   }),
+   Object.freeze({
+      label: 'castingCheck',
+      value: 'casting',
+   }),
+   Object.freeze({
+      label: 'itemCheck',
+      value: 'item',
+   }),
+   Object.freeze({
+      label: 'resistanceCheck',
+      value: 'resistance',
+   }),
+]);
+
+/**
+ * The selectors the rules-element editor offers under each element check type, in display order. A unit test pins
+ * each list to the selectors CHECK_TYPE_CONDITIONAL_SELECTORS reads under that check type, plus `situation` (cached
+ * apart from the summed cells), so the editor offers every selector a check reads and nothing else.
+ * @type {Readonly<Record<string, readonly string[]>>}
+ */
+export const CONDITIONAL_CHECK_MODIFIER_SELECTOR_OPTIONS = Object.freeze({
+   any: Object.freeze([
+      'any',
+      'attribute',
+      'skill',
+      'customTrait',
+      'situation',
+   ]),
+   attack: Object.freeze([
+      'any',
+      'attribute',
+      'attackTrait',
+      'attackType',
+      'customTrait',
+      'multiAttack',
+      'skill',
+      'situation',
+   ]),
+   casting: Object.freeze([
+      'any',
+      'attribute',
+      'customTrait',
+      'spellTradition',
+      'skill',
+      'situation',
+   ]),
+   item: Object.freeze([
+      'any',
+      'attribute',
+      'customTrait',
+      'skill',
+      'situation',
+   ]),
+   resistance: Object.freeze([
+      'any',
+      'resistance',
+      'situation',
+   ]),
+});
+
+/**
  * The check parameter each summable modifier type adds to when a situational modifier is ticked. Automatic Failure is
  * a flag, not a sum, so it has no entry.
  * @type {Readonly<Record<string, string>>}

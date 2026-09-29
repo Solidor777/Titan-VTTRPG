@@ -7,6 +7,11 @@ import rebuildCheckOptions, {
 } from '~/check/dialog/RebuildCheckOptions.js';
 import createCastingCheckOptions from '~/check/types/casting-check/CastingCheckOptions.js';
 import createItemCheckOptions from '~/check/types/item-check/ItemCheckOptions.js';
+import {
+   CHECK_TYPE_CONDITIONAL_SELECTORS,
+   CHECK_TYPE_MODIFIER_TYPES,
+   CONDITIONAL_CHECK_MODIFIER_CHECK_TYPE_OPTIONS,
+} from '~/system/ConditionalCheckModifierTypes.js';
 import { installSchemaMocks, restoreSchemaMocks } from '../helpers/schemaFingerprint.js';
 
 // The rebuild runs the real `initialize<Type>CheckOptions` and `validate<Type>CheckOptions` of a bare
@@ -1272,12 +1277,22 @@ describe('CHECK_OPTIONS_METHODS', () => {
          expect(typeof CharacterDataModel.prototype[methods.initialize]).toBe('function');
          expect(typeof CharacterDataModel.prototype[methods.validate]).toBe('function');
       }
-      expect(Object.keys(CHECK_OPTIONS_METHODS).sort()).toEqual([
-         'attack',
-         'attribute',
-         'casting',
-         'item',
-         'resistance',
-      ]);
+   });
+
+   it('covers exactly the check types the modifier lookups and the rules-element editor know', () => {
+      /** @type {string[]} The check types the conditional-modifier lookups are keyed by. */
+      const lookupTypes = Object.keys(CHECK_TYPE_MODIFIER_TYPES).sort();
+      expect(Object.keys(CHECK_OPTIONS_METHODS).sort()).toEqual(lookupTypes);
+
+      // The editor offers `any` plus each check type that reads an element check type of its own.
+      /** @type {string[]} The check types with an element check type of their own. */
+      const ownTypes = lookupTypes.filter((checkType) => Object.hasOwn(
+         CHECK_TYPE_CONDITIONAL_SELECTORS[checkType],
+         checkType,
+      ));
+      expect(CONDITIONAL_CHECK_MODIFIER_CHECK_TYPE_OPTIONS
+         .map((option) => option.value)
+         .filter((value) => value !== 'any')
+         .sort()).toEqual(ownTypes);
    });
 });
