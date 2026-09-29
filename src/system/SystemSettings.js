@@ -1,4 +1,5 @@
 import { BUILT_IN_THEMES, buildThemeChoices } from '~/theme/ThemeManager.js';
+import error from '~/helpers/utility-functions/Error.js';
 import resolveCheckOptionsMode from '~/helpers/utility-functions/ResolveCheckOptionsMode.js';
 import ThemeEditorApplication from '~/theme/editor/ThemeEditorApplication.js';
 import PlayerHudSettingsApplication from '~/ui/player-hud/settings/PlayerHudSettingsApplication.js';
@@ -31,7 +32,10 @@ export default function registerSystemSettings() {
    /** @type {string} The choice the stored value resolves to. */
    const checkOptionsMode = resolveCheckOptionsMode(storedCheckOptionsMode);
    if (checkOptionsMode !== storedCheckOptionsMode) {
-      game.settings.set('titan', 'getCheckOptions', checkOptionsMode);
+      // Registration stays synchronous; a failed write is reported rather than left an unhandled rejection.
+      game.settings.set('titan', 'getCheckOptions', checkOptionsMode).catch((reason) => {
+         error(`Could not rewrite the stored getCheckOptions value to "${checkOptionsMode}".`, reason);
+      });
    }
 
    // Confirm Deleting Items.
