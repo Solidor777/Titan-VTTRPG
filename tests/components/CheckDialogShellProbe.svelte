@@ -5,6 +5,8 @@
     * @property {(field: string, value: *) => void} [setCheckOption] The shell's tracked setter.
     * @property {(field: string, value: *) => void} [writeThroughContext] Assigns a field through the context.
     * @property {(field: string, value: *) => void} [pushThroughContext] Pushes onto an array field through the context.
+    * @property {(value: number) => void} [writeRollDataThroughContext] Assigns a roll-data Difficulty through the
+    * context.
     */
 
    /**
@@ -43,5 +45,14 @@
     */
    captured.pushThroughContext = (field, value) => {
       $checkOptions[field].push(value);
+   };
+
+   /**
+    * Assigns the first check's Difficulty inside the options' Item roll data through the store context.
+    * @param {number} value - The Difficulty to assign.
+    * @returns {void}
+    */
+   captured.writeRollDataThroughContext = (value) => {
+      $checkOptions.itemRollData.check[0].difficulty = value;
    };
 </script>

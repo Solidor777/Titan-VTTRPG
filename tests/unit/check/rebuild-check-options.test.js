@@ -155,14 +155,24 @@ function createCharacter(items = {}, effects = {}) {
    const model = Object.create(CharacterDataModel.prototype);
    model.parent = {
       /**
-       * Yields every effect that applies to the Actor.
-       * @returns {Generator<object, void, void>} A generator over `effects`, each stamped with its map key as `id`.
+       * Yields every effect that applies to the Actor, as Foundry's Actor does: its own effects, then each owned
+       * item's effects that transfer to it.
+       * @returns {Generator<object, void, void>} A generator over the applicable effects, each stamped with its map key
+       * as `id`.
        * @yields {object} An applicable effect.
        */
       *allApplicableEffects() {
          for (const [id, effect] of model.parent.effects) {
             effect.id = id;
             yield effect;
+         }
+         for (const item of model.parent.items.values()) {
+            for (const [id, effect] of item.effects ?? []) {
+               if (effect.transfer) {
+                  effect.id = id;
+                  yield effect;
+               }
+            }
          }
       },
       effects: new Map(Object.entries(effects)),
@@ -664,6 +674,78 @@ describe('rebuildCheckOptions — no-op, lost sources, and vanished checks', () 
       expect(globalThis.game.titan.error).not.toHaveBeenCalled();
    });
 
+   it('resolves an effect ID through an owned item\'s transferred effects, and not through untransferred ones', () => {
+      /** @type {object} The owned item, carrying one transferred and one untransferred effect. */
+      const item = createItem({
+         check: [],
+         customTrait: [],
+      });
+      item.effects = new Map([
+         [
+            'transferred',
+            Object.assign(createItem({
+               check: [{ difficulty: 5 }],
+               customTrait: [],
+            }), { transfer: true }),
+         ],
+         [
+            'kept',
+            Object.assign(createItem({
+               check: [{ difficulty: 6 }],
+               customTrait: [],
+            }), { transfer: false }),
+         ],
+      ]);
+
+      /** @type {object} The Character owning the item. */
+      const system = createCharacter({ i: item });
+      expect(system.initializeItemCheckOptions({ effectId: 'transferred' }).difficulty).toBe(5);
+      expect(system.validateItemCheckOptions({ effectId: 'kept' }, false)).toBe(false);
+   });
+
+   it('reads Item Check parameters from the live effect when the options name it only by effect ID', () => {
+      /** @type {object} The Actor's effect carrying a complete check. */
+      const effect = createItem({
+         check: [
+            {
+               attribute: 'body',
+               complexity: 1,
+               difficulty: 4,
+               isDamage: false,
+               isHealing: false,
+               label: 'Effect Check',
+               opposedCheck: {
+                  attribute: 'body',
+                  enabled: false,
+                  skill: 'athletics',
+               },
+               resistanceCheck: 'none',
+               resolveCost: 0,
+               skill: 'arcana',
+            },
+         ],
+         customTrait: [],
+         description: 'An effect.',
+         img: 'effect.svg',
+         name: 'Live Effect',
+      });
+
+      /** @type {object} Options built by the factory but never initialized, so they carry no roll data. */
+      const options = createItemCheckOptions({
+         attribute: 'body',
+         checkIdx: 0,
+         complexity: 1,
+         difficulty: 4,
+         effectId: 'e',
+         skill: 'arcana',
+      });
+      expect(createCharacter({}, { e: effect }).getItemCheckParameters(options)).toMatchObject({
+         checkLabel: 'Effect Check',
+         img: 'effect.svg',
+         itemName: 'Live Effect',
+      });
+   });
+
    it('reads an Item Check\'s roll data from the owned item its item ID names', () => {
       /** @type {object} The owned item. */
       const item = createItem({
@@ -956,20 +1038,40 @@ describe('createCheckOptionSetter', () => {
    });
 });
 
-describe('freezeCheckOptions', () => {
-   it('copies and freezes plain objects and arrays at every depth, keeping other objects by reference', () => {
-      /** @type {object} A non-plain object standing in for a caller's data model. */
-      const model = new (class {
-         /** @type {number} A field the model owns. */
-         value = 1;
-      })();
+/**
+ * Builds a class instance standing in for a live data model passed as roll data: nested arrays, and optionally a
+ * `toObject` that returns a plain snapshot as Foundry's data models do.
+ * @param {boolean} hasToObject - Whether the instance provides `toObject`.
+ * @returns {object} The instance.
+ */
+function createLiveModel(hasToObject) {
+   /** A class whose instances are not plain objects. */
+   class LiveModel {
+      /** @type {object[]} The model's checks. */
+      check = [{ difficulty: 4 }];
 
-      /** @type {object} Check Options with nested plain data and a data model. */
+      /** @type {string} A display name the snapshot must carry over. */
+      name = 'Live Item';
+   }
+   if (hasToObject) {
+      /**
+       * Returns a plain snapshot of the model's data.
+       * @returns {object} A structured clone of the model's fields.
+       */
+      LiveModel.prototype.toObject = function toObject() {
+         return structuredClone({ ...this });
+      };
+   }
+   return new LiveModel();
+}
+
+describe('freezeCheckOptions', () => {
+   it('copies and freezes plain objects and arrays at every depth, leaving the source unfrozen', () => {
+      /** @type {object} Check Options with nested plain data. */
       const options = {
          itemRollData: {
             check: [{ difficulty: 4 }],
          },
-         model,
          situations: ['underwater'],
          skill: 'arcana',
       };
@@ -981,9 +1083,78 @@ describe('freezeCheckOptions', () => {
       expect(Object.isFrozen(frozen)).toBe(true);
       expect(Object.isFrozen(frozen.situations)).toBe(true);
       expect(Object.isFrozen(frozen.itemRollData.check[0])).toBe(true);
-      expect(frozen.model).toBe(model);
-      expect(Object.isFrozen(model)).toBe(false);
       expect(Object.isFrozen(options.situations)).toBe(false);
+   });
+
+   it.each([
+      [
+         'with toObject (a data model)',
+         true,
+      ],
+      [
+         'without toObject',
+         false,
+      ],
+   ])('converts a class instance %s into a frozen plain snapshot, leaving the instance untouched', (_label,
+      hasToObject) => {
+      /** @type {object} A live-model-like roll data object with nested arrays. */
+      const model = createLiveModel(hasToObject);
+
+      /** @type {object} The frozen copy of options carrying the model. */
+      const frozen = freezeCheckOptions({ itemRollData: model });
+      expect(frozen.itemRollData).not.toBe(model);
+      expect(Object.getPrototypeOf(frozen.itemRollData)).toBe(Object.prototype);
+      expect(frozen.itemRollData).toEqual({
+         check: [{ difficulty: 4 }],
+         name: 'Live Item',
+      });
+      expect(Object.isFrozen(frozen.itemRollData.check[0])).toBe(true);
+      expect(() => {
+         frozen.itemRollData.check[0].difficulty = 6;
+      }).toThrow(TypeError);
+      expect(model.check[0].difficulty).toBe(4);
+      expect(Object.isFrozen(model.check)).toBe(false);
+   });
+
+   it('keeps a null-prototype object\'s prototype, so its rebuild settles on the second pass', () => {
+      /** @type {object} The Character rolling the check. */
+      const system = createCharacter();
+
+      /** @type {object} Item roll data built without a prototype. */
+      const itemRollData = Object.assign(Object.create(null), {
+         check: [
+            {
+               attribute: 'body',
+               complexity: 1,
+               difficulty: 4,
+               skill: 'arcana',
+            },
+         ],
+         customTrait: [],
+      });
+
+      /** @type {object} The raw request options, carrying the roll data. */
+      const callerOptions = {
+         checkIdx: 0,
+         itemRollData,
+      };
+
+      /** @type {object} The first rebuild, from options that lack the roll data's derived fields. */
+      const first = rebuildCheckOptions({
+         callerOptions,
+         checkType: 'item',
+         currentOptions: {},
+         system,
+         userEdits: {},
+      });
+      expect(Object.getPrototypeOf(first.itemRollData)).toBe(null);
+      expect(rebuildCheckOptions({
+         callerOptions,
+         checkType: 'item',
+         currentOptions: first,
+         system,
+         userEdits: {},
+      })).toBeUndefined();
    });
 
    it('holds the rebuild\'s result and the tracked setter\'s writes frozen', () => {

@@ -4,6 +4,7 @@
    import SpendResolveButton from '~/helpers/svelte-components/button/SpendResolveButton.svelte';
    import getControlledCharacters from '~/helpers/utility-functions/GetControlledCharacters.js';
    import CheckTags from '~/document/svelte-components/check/CheckTags.svelte';
+   import createItemCheckRollData from '~/check/types/item-check/ItemCheckRollData.js';
 
    /**
     * @typedef {object} ItemChatMessageItemChecksProps
@@ -17,7 +18,8 @@
    const autoSpendResolve = autoSpendResolveChecks();
 
    /**
-    * Rolls a Check from the Item's roll data.
+    * Rolls a Check from a plain snapshot of the card's item data, so the check never holds the message's live data
+    * model.
     * @param {number} idx - The index of the Check in the Item's check array.
     * @returns {Promise<void>}
     */
@@ -29,8 +31,8 @@
 
          // Roll the check.
          await actor.system.requestItemCheck({
-            itemRollData: item,
             checkIdx: idx,
+            itemRollData: createItemCheckRollData(item),
          });
       }
    }

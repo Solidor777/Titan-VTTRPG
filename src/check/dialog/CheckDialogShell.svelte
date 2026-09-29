@@ -33,9 +33,10 @@
    // These captures are intentional: the two stores, the actor, and the check type are stable for the dialog's
    // lifetime.
    // The dialog's components receive a read-only view of the Check Options: the writable store stays private to this
-   // shell and the tracked setter, and every value it holds is frozen, so a bind, assignment, in-place mutation, or
-   // store-method write from a component throws. The dialog's initial options are frozen before any component reads
-   // them.
+   // shell and the tracked setter, and every value it holds is a frozen snapshot sharing nothing with its sources (a
+   // caller's data model is snapshotted, not referenced; see freezeCheckOptions), so a bind, assignment, in-place
+   // mutation, or store-method write from a component throws and changes nothing. The dialog's initial options are
+   // frozen before any component reads them.
    // svelte-ignore state_referenced_locally
    checkOptions.update(freezeCheckOptions);
    // svelte-ignore state_referenced_locally

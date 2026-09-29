@@ -4,7 +4,7 @@
    import { ADVANTAGE_LEVEL_OPTIONS, clampAdvantage } from '~/check/ApplyAdvantage.js';
    import { getContext } from 'svelte';
 
-   /** @type {import('svelte/store').Writable} Reference to the Check Options store. */
+   /** @type {import('svelte/store').Readable} The dialog's read-only Check Options view. */
    const checkOptions = getContext('checkOptions');
 
    /** @type {(field: string, value: *) => void} The dialog's tracked Check Options setter. */

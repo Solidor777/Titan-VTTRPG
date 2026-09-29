@@ -37,7 +37,7 @@
    /** @type {ItemCheckParameters | undefined} Calculated item check parameters. */
    let checkParameters = $derived.by(() => {
 
-      // Build the options from current effect roll data, then calculate the display parameters.
+      // Name the effect by ID (the engine reads the live effect), then calculate the display parameters.
       const checkOptions = getCheckOptions();
       if (checkOptions) {
          return sheetDocument.data.system.getItemCheckParameters(
@@ -52,7 +52,7 @@
     * @returns {void}
     */
    function rollEffectCheck() {
-      // Build options fresh at roll time so the roll captures the effect's current state.
+      // Request the check by effect ID; the engine and any open dialog read the live effect.
       const checkOptions = getCheckOptions();
       if (checkOptions) {
          sheetDocument.data.system.requestItemCheck(checkOptions);

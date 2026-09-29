@@ -3824,10 +3824,9 @@ export default class CharacterDataModel extends TitanActorDataModel {
       const actorRollData = this.getRollData();
       this._initializeAttributeBasedCheck(parameters, actorRollData);
 
-      // Cache the item stats from the item roll data.
-      const itemRollData = options.itemRollData ?
-         options.itemRollData :
-         this.parent.items.get(options.itemId).system.getRollData();
+      // Cache the stats of the check's source: the named item or effect, or the caller's roll data.
+      /** @type {object} The roll data of the item or effect whose check is rolled. */
+      const itemRollData = this._getItemCheckRollData(options);
       const checkData = itemRollData.check[options.checkIdx];
       parameters.img = itemRollData.img;
       parameters.itemName = itemRollData.name;

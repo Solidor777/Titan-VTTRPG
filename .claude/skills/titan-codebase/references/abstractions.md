@@ -161,10 +161,14 @@ management). Data model classes hold the schema, field validation, and derived-d
   Check's source for both `validateItemCheckOptions` and `initializeItemCheckOptions`: an `itemId` names an
   owned item, an `effectId` names an effect among `actor.allApplicableEffects()` (the Actor's own and those
   its items transfer), and `options.itemRollData` is used only when neither is given — the item chat card's
-  snapshot path (`createItemCheckOptions` defaults both IDs to `''` and passes `itemRollData` through,
-  `undefined` when absent). `initializeItemCheckOptions` stores the resolved roll data on the options for
-  `getItemCheckParameters`; validation reads the item or effect an ID names, not that stored copy, so an
-  open Item Check dialog follows edits to its item or effect and closes when it is deleted.
+  snapshot path, where `ItemChatMessageItemChecks` passes `createItemCheckRollData(item)`
+  (`src/check/types/item-check/ItemCheckRollData.js`: a plain deep copy of exactly the fields an Item Check
+  reads — `check`, `customTrait`, `description`, `img`, `name`), never the message's live data model.
+  `createItemCheckOptions` defaults both IDs to `''` and passes `itemRollData` through (`undefined` when absent).
+  `getItemCheckParameters` resolves its source through `_getItemCheckRollData` too, and `initializeItemCheckOptions`
+  stores the resolved roll data on the options, so an open dialog's rebuild sees an edit to the item or effect as
+  an options change; validation reads the item or effect an ID names, not that stored copy, so the dialog follows
+  edits to its item or effect and closes when it is deleted.
 
 
 ## Checks

@@ -16,11 +16,16 @@ user confirmation it creates an `AttributeCheckDialog`; otherwise it calls `roll
 src/check/dialog/CheckDialogShell.svelte,
 src/check/types/attribute-check/dialog/AttributeCheckDialogShell.svelte)
 `AttributeCheckDialog` extends `TitanDialog` (a `foundry.applications.api.ApplicationV2`); it passes
-`content: { class: CheckDialogShell, props: { shell, actor, checkOptions: writable(...),
-checkParameters: writable(...) } }`. On first render `TitanDialog._replaceHTML` mounts `CheckDialogShell`
-with Svelte 5 `mount()`. `CheckDialogShell` sets the two stores into Svelte context and delegates rendering
-to the type-specific shell (`AttributeCheckDialogShell`). The inner shell recomputes the displayed totals
-from `actor.system.getAttributeCheckParameters($checkOptions)` whenever the options change. When the Roll
+`content: { class: CheckDialogShell, props: { shell, actor, checkType, callerOptions,
+checkOptions: writable(...), checkParameters: writable(...) } }`. On first render `TitanDialog._replaceHTML`
+mounts `CheckDialogShell` with Svelte 5 `mount()`. `CheckDialogShell` keeps the Check Options writable private
+and sets these contexts: `'checkOptions'` (a read-only `{ subscribe }` view whose values are frozen snapshots),
+`'setCheckOption'` (the tracked setter every field writes through), `'checkParameters'` (the writable parameters
+store), `'checkActor'` (a `ReactiveDocument` bridge over the Actor), and `'checkType'`. Its one effect rebuilds the
+options from the caller's options and the user's edits whenever the Actor or an edit changes (see conventions.md,
+Dialog data passing). It delegates rendering to the type-specific shell (`AttributeCheckDialogShell`), which
+recomputes the displayed totals from `actor.system.getAttributeCheckParameters($checkOptions)` whenever the options
+or the Actor change and closes the dialog when the options stop validating. When the Roll
 button fires, the inner shell calls `actor.system.rollAttributeCheck($checkOptions)` directly on the actor's
 data model, and the dialog closes.
 

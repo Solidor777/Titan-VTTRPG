@@ -264,9 +264,10 @@ for exactly this reason.
 `content: { class: CheckDialogShell, props: { shell, actor, checkType, callerOptions,
 checkOptions: writable(...), checkParameters: writable(...) } }` and the shell distributes those stores to
 children via `setContext`. The `'checkOptions'` context is a read-only view (`{ subscribe }` only) of a store
-whose every value is frozen (`freezeCheckOptions`: plain objects and arrays copied and frozen at every depth,
-documents and data models kept by reference), so a bind, assignment, in-place mutation, or store-method write
-from a component throws. Dialog fields write through the `'setCheckOption'` context (`createCheckOptionSetter`
+whose every value is a frozen snapshot sharing nothing with its sources (`freezeCheckOptions`: plain objects and
+arrays are copied with their prototype and frozen at every depth; any other object, such as a document or data
+model, is first converted to a plain snapshot through its `toObject()` or a structured clone and then frozen), so a
+bind, assignment, in-place mutation, or store-method write from a component throws and changes nothing. Dialog fields write through the `'setCheckOption'` context (`createCheckOptionSetter`
 in `src/check/dialog/RebuildCheckOptions.js`), which records the write as a user edit. On every Actor
 change or edit, `CheckDialogShell` rebuilds the options (`rebuildCheckOptions`): the input
 `{ ...callerOptions, ...userEdits }` is validated quietly (`validate<Type>CheckOptions(options, false)` reports

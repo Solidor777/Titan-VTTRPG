@@ -18,8 +18,9 @@ import createResistanceCheckOptions from '~/check/types/resistance-check/Resista
  * "None" keeps the Attribute the old Skill supplied). An input that stays invalid (its owned weapon, spell, item, or
  * effect is gone) yields no rebuild, so the type shell's own validation decides the dialog's fate.
  *
- * Every value the dialog's store holds is frozen (`freezeCheckOptions`), and the dialog's components see the store
- * only as a read-only view, so the tracked setter is the only way a component changes an option.
+ * Every value the dialog's store holds is a frozen snapshot that shares nothing with its sources
+ * (`freezeCheckOptions`; a data model is snapshotted, never kept by reference), and the dialog's components see the
+ * store only as a read-only view, so the tracked setter is the only way a component changes an option.
  */
 
 /**
@@ -76,24 +77,46 @@ function isPlainContainer(value) {
 }
 
 /**
- * Copies Check Options into an immutable value, so a component holding the dialog's read-only view cannot change
- * them in place: every plain object and array is copied and frozen at every depth. Any other object (a document or
- * data model a caller passed as roll data) is kept by reference and left unfrozen, since freezing it would freeze
- * live document data.
+ * Copies Check Options into an immutable value that shares nothing with its source, so a component holding the
+ * dialog's read-only view can change neither the options nor anything they were built from. Every plain array and
+ * object (see `isPlainContainer`) is copied with its prototype kept and frozen at every depth. Any other object (a
+ * document or data model a caller passed as roll data) is first converted to a plain snapshot, through its
+ * `toObject()` when it provides one and otherwise a structured clone, and that snapshot is frozen the same way. A
+ * structured clone that is still not plain (e.g. a `Date`) is frozen as the copy it is. Primitives are returned as
+ * given.
  * @param {*} value - The options, or a value inside them.
- * @returns {*} The frozen copy; a primitive or non-plain object is returned as given.
+ * @returns {*} The frozen copy.
  */
 export function freezeCheckOptions(value) {
    if (Array.isArray(value)) {
       return Object.freeze(value.map(freezeCheckOptions));
    }
-   if (isPlainContainer(value)) {
-      return Object.freeze(Object.fromEntries(Object.entries(value).map(([key, entry]) => [
-         key,
-         freezeCheckOptions(entry),
-      ])));
+   if (value === null || typeof value !== 'object') {
+      return value;
    }
-   return value;
+   if (!isPlainContainer(value)) {
+      /** @type {*} The object's plain snapshot. */
+      const snapshot = typeof value.toObject === 'function' ? value.toObject() : structuredClone(value);
+      if (isPlainContainer(snapshot)) {
+         return freezeCheckOptions(snapshot);
+      }
+
+      /** @type {*} A structured clone of a snapshot that is still not plain. */
+      const clone = structuredClone(snapshot);
+      return isPlainContainer(clone) ? freezeCheckOptions(clone) : Object.freeze(clone);
+   }
+   return Object.freeze(Object.create(
+      Object.getPrototypeOf(value),
+      Object.fromEntries(Object.entries(value).map(([key, entry]) => [
+         key,
+         {
+            configurable: true,
+            enumerable: true,
+            value: freezeCheckOptions(entry),
+            writable: true,
+         },
+      ])),
+   ));
 }
 
 /**
@@ -193,7 +216,8 @@ export default function rebuildCheckOptions({ checkType, system, callerOptions, 
       }
    }
 
-   /** @type {object} The options derived from the input and the live Actor. */
-   const rebuilt = system[methods.initialize](input);
-   return isStructurallyEqual(rebuilt, currentOptions) ? undefined : freezeCheckOptions(rebuilt);
+   // Frozen before the compare: the current options are a frozen snapshot, so a caller's data model settles.
+   /** @type {object} The options derived from the input and the live Actor, frozen. */
+   const rebuilt = freezeCheckOptions(system[methods.initialize](input));
+   return isStructurallyEqual(rebuilt, currentOptions) ? undefined : rebuilt;
 }

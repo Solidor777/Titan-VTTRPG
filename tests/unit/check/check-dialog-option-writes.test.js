@@ -170,6 +170,19 @@ describe('check dialog Check Options writes', () => {
       expect(findForbiddenWrites('x.svelte', 'a\nb\n$checkOptions\n   .skill = 1;')[0]).toMatch(/^x\.svelte:3 /);
    });
 
+   it('types every Check Options context consumer as the read-only view', () => {
+      /** @type {string[]} Each consumer whose declaration is not typed `Readable`. */
+      const mistyped = listDialogSources().flatMap((relativePath) => {
+         /** @type {string[]} The source's lines. */
+         const lines = readFileSync(path.join(CHECK_DIR, relativePath), 'utf8').split(/\r?\n/);
+         return lines.flatMap((line, index) => (/getContext\(\s*(['"`])checkOptions\1\s*\)/.test(line) &&
+            !lines[index - 1]?.includes('@type {import(\'svelte/store\').Readable}') ?
+            [`${relativePath}:${index + 1}`] :
+            []));
+      });
+      expect(mistyped, mistyped.join('\n')).toEqual([]);
+   });
+
    it('writes Check Options only through the tracked setter', () => {
       /** @type {string[]} Every forbidden write in the dialog sources. */
       const found = listDialogSources().flatMap((relativePath) => findForbiddenWrites(

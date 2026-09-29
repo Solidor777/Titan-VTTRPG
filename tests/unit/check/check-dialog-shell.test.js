@@ -163,6 +163,48 @@ describe('CheckDialogShell', () => {
       expect(get(captured.checkOptions).skill).toBe('athletics');
    });
 
+   it('snapshots and freezes a live model passed as Item roll data, so a write through the context changes ' +
+      'neither the options nor the model', () => {
+      /** A class whose instances stand in for a chat message's live data model. */
+      class LiveModel {
+         /** @type {object[]} The model's checks. */
+         check = [
+            {
+               attribute: 'body',
+               complexity: 1,
+               difficulty: 4,
+               skill: 'athletics',
+            },
+         ];
+
+         /** @type {object[]} The model's custom traits. */
+         customTrait = [];
+      }
+
+      /** @type {LiveModel} The live model the caller passes. */
+      const model = new LiveModel();
+
+      /** @type {object} The Actor rolling the check. */
+      const actor = createActor();
+      mountShell(actor, 'item', {
+         checkIdx: 0,
+         itemRollData: model,
+      });
+
+      /** @type {object} The options the shell holds. */
+      const options = get(captured.checkOptions);
+      expect(options.itemRollData).not.toBe(model);
+      expect(Object.isFrozen(options.itemRollData.check[0])).toBe(true);
+      expect(() => captured.writeRollDataThroughContext(6)).toThrow(TypeError);
+      expect(get(captured.checkOptions).itemRollData.check[0].difficulty).toBe(4);
+      expect(model.check[0].difficulty).toBe(4);
+      expect(Object.isFrozen(model.check[0])).toBe(false);
+
+      // An Actor change rebuilds from the same model and settles on an equal snapshot.
+      changeActor(actor, {});
+      expect(get(captured.checkOptions).itemRollData.check[0].difficulty).toBe(4);
+   });
+
    it('keeps the user\'s edit over the caller\'s value for the same field through an Actor change', () => {
       /** @type {object} The Actor rolling the check. */
       const actor = createActor();

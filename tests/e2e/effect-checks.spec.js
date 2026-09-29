@@ -3,15 +3,11 @@ import { login } from './fixtures.js';
 import { attachPageErrors, clearChat, closeAllApps, showChatLog } from './world.js';
 
 /**
- * Effect check-rolling path: an effect that carries a check[] entry can be rolled through the shared
- * item-check engine via the itemRollData passthrough branch, and its roll data exposes the effect's
- * description for the resulting check card.
- *
- * Confirmed against source:
- * TitanActiveEffectDataModel.getRollData() returns { description, duration, check, customTrait, ... };
- * CharacterDataModel.requestItemCheck/getItemCheckParameters branch on options.itemRollData and never touch
- * actor.items.get(id) when roll data is supplied;
- * flags.titan.type for an item check is 'itemCheck'; the mounted card root is '.check-chat-message'.
+ * Effect check-rolling path, as the product rolls it (character-sheet effect rows, the Effect HUD, and the Player HUD
+ * action menu): `requestItemCheck({ effectId, checkIdx })`, which the shared item-check engine resolves through the
+ * Actor's applicable effects and reads live. The posted check is the `itemCheck` chat-message subtype, whose
+ * parameters (in `message.system.parameters`) carry the effect's check label and description, and whose mounted card
+ * root is `.check-chat-message`. The item chat card's roll-data snapshot path is covered by effect-chat-card.spec.js.
  */
 
 /** @type {import('@playwright/test').Page} The file-shared, logged-in page (one world boot per file). */
@@ -121,16 +117,17 @@ test.describe('v14 effect check rolling', () => {
       expect(description, 'effect roll data exposes the native description').toBe(EFFECT_DESCRIPTION);
    });
 
-   test('effect check rolls, posts an itemCheck message, and renders its card', async () => {
-      // Roll the effect's check through the shared engine using the itemRollData passthrough.
+   test('effect check requested by effect ID rolls the live effect, posts an itemCheck message, and renders its ' +
+      'card', async () => {
+      // Roll the effect's check the way the product does: by effect ID, resolved live by the engine.
       const result = await page.evaluate(async ({ actorName, effectName }) => {
          const actor = game.actors.getName(actorName);
          const effect = actor.effects.find((e) => e.name === effectName);
 
          const before = game.messages.size;
          await actor.system.requestItemCheck({
-            itemRollData: effect.getRollData(),
             checkIdx: 0,
+            effectId: effect.id,
          });
          await titanWait(() => game.messages.size > before, { message: 'new chat message' });
 
@@ -138,6 +135,8 @@ test.describe('v14 effect check rolling', () => {
          return {
             before,
             after: game.messages.size,
+            checkLabel: newest?.system.parameters?.checkLabel,
+            itemDescription: newest?.system.parameters?.itemDescription,
             newestId: newest?.id,
             newestType: newest?.type,
          };
@@ -147,7 +146,9 @@ test.describe('v14 effect check rolling', () => {
       });
 
       expect(result.after, 'message count should increase after the roll').toBeGreaterThan(result.before);
-      expect(result.newestType, 'newest message flag type').toBe('itemCheck');
+      expect(result.newestType, 'newest message subtype').toBe('itemCheck');
+      expect(result.checkLabel, 'the rolled check is the effect\'s check').toBe('E2E Effect Check');
+      expect(result.itemDescription, 'the rolled check carries the effect\'s description').toBe(EFFECT_DESCRIPTION);
 
       // Creating the ChatMessage document does not render it: the log entry mounts asynchronously, so
       // the one-shot DOM read below is gated on the mounted card rather than racing the mount.

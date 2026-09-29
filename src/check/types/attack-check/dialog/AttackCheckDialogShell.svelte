@@ -34,7 +34,7 @@
    /** @type {AttackCheckDialogShellProps} */
    const { actor = undefined } = $props();
 
-   /** @type {import('svelte/store').Writable} Reference to the Check Options store. */
+   /** @type {import('svelte/store').Readable} The dialog's read-only Check Options view. */
    const checkOptions = getContext('checkOptions');
 
    /** @type {import('svelte/store').Writable} Reference to calculated Check Parameters Store. */
@@ -48,7 +48,7 @@
 
    /**
     * @type {Array<typeof import('svelte').SvelteComponent>} Components for changing the options and
-    *    displaying the parameters.
+    * displaying the parameters.
     */
    let rows = $state([
       AttackCheckDialogMeleeField,
