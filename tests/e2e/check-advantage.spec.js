@@ -73,16 +73,18 @@ async function rollAttributeCheck(targetPage, options) {
  * @returns {Promise<string[]>} The trimmed label of each menu entry.
  */
 async function readChatContextMenu(card) {
+   /** @type {import('@playwright/test').Page} The page the card is rendered on. */
+   const cardPage = card.page();
    await card.locator('.message-header').click({ button: 'right' });
 
    /** @type {import('@playwright/test').Locator} The open menu's entries. */
-   const entries = page.locator('#context-menu li.context-item');
+   const entries = cardPage.locator('#context-menu li.context-item');
    await expect(entries.first()).toBeVisible();
 
    /** @type {string[]} The entries' labels. */
    const labels = (await entries.allInnerTexts()).map((text) => text.trim());
-   await page.evaluate(() => ui.context?.close({ animate: false }));
-   await expect(page.locator('#context-menu')).toHaveCount(0);
+   await cardPage.evaluate(() => ui.context?.close({ animate: false }));
+   await expect(cardPage.locator('#context-menu')).toHaveCount(0);
    return labels;
 }
 
