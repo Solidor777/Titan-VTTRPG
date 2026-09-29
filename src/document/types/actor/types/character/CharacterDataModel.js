@@ -22,6 +22,7 @@ import {
    CONDITIONAL_CHECK_MODIFIER_TYPES,
    MODIFIER_TYPE_PARAMETER_KEYS,
    USER_KEYED_CHECK_MODIFIER_SELECTORS,
+   USER_TYPED_KEY_SELECTORS,
 } from '~/system/ConditionalCheckModifierTypes.js';
 import clamp from '~/helpers/utility-functions/Clamp.js';
 import computeDamageResistance from '~/helpers/utility-functions/ComputeDamageResistance.js';
@@ -587,8 +588,8 @@ export default class CharacterDataModel extends TitanActorDataModel {
    /**
     * Expands any rules element whose key is 'all' into one element per concrete key under its selector,
     * leaving every other element untouched. Operates on the gathered element list before bucketing, so
-    * 'all' works uniformly for every operation that carries a key. A `situation` selector's key is a typed label, not
-    * a stat key, so a situation labelled "all" stays as it is.
+    * 'all' works uniformly for every operation that carries a key. A user-typed selector's key (a custom trait, spell
+    * tradition, or situation label) names no stat under the Character, so a typed "all" stays a literal key.
     * @param {object[]} elements - The gathered rules elements (already tagged with a type).
     * @returns {object[]} A new array with 'all'-key elements expanded.
     * @private
@@ -597,7 +598,7 @@ export default class CharacterDataModel extends TitanActorDataModel {
       /** @type {object[]} */
       const expanded = [];
       for (const element of elements) {
-         if (element.key === 'all' && element.selector !== 'situation') {
+         if (element.key === 'all' && !USER_TYPED_KEY_SELECTORS.includes(element.selector)) {
             // Resolve the concrete keys under this selector; an empty result means the element would be
             // silently dropped, so warn naming the offending selector.
             /** @type {string[]} */

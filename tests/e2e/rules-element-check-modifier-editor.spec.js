@@ -123,20 +123,32 @@ test('the Advantage level select replaces the value and writes the signed level'
    }
 });
 
-test('Automatic Failure hides the value and stores 1', async () => {
-   await expect(sheet().getByTestId('ccm-value')).toBeVisible();
+test('Automatic Failure hides the level select and the value and stores 1', async () => {
+   // Advantage first, so the level select is present before Automatic Failure removes it.
+   await selectTitanOption(page, sheet().getByTestId('ccm-modifier-type'), 'advantage');
+   await selectTitanOption(page, sheet().getByTestId('ccm-advantage-level'), -2);
+   await expect.poll(readElement, { message: 'Greater Disadvantage is stored' }).toMatchObject({
+      modifierType: 'advantage',
+      value: -2,
+   });
+   await expect(sheet().getByTestId('ccm-advantage-level')).toBeVisible();
+
    await selectTitanOption(page, sheet().getByTestId('ccm-modifier-type'), 'automaticFailure');
    await expect.poll(readElement, { message: 'Automatic Failure stores 1' }).toMatchObject({
       modifierType: 'automaticFailure',
       value: 1,
    });
-   await expect(sheet().getByTestId('ccm-value')).toHaveCount(0);
    await expect(sheet().getByTestId('ccm-advantage-level')).toHaveCount(0);
+   await expect(sheet().getByTestId('ccm-value')).toHaveCount(0);
 });
 
 test('a stored Advantage value outside the four levels displays normalized and is not rewritten', async () => {
-   // Store an Advantage element whose value (3) no level option carries, as hand-authored data can.
-   await page.evaluate(async (name) => {
+   /**
+    * Stores an Advantage element with the given value, as hand-authored data can.
+    * @param {number} value - The stored value.
+    * @returns {Promise<void>} Resolves once the item is updated.
+    */
+   const store = (value) => page.evaluate(async ({ name, stored }) => {
       /** @type {TitanItem} The edited ability. */
       const item = game.items.getName(name);
       await item.update({
@@ -145,17 +157,87 @@ test('a stored Advantage value outside the four levels displays normalized and i
                {
                   ...item.system.rulesElement[0],
                   modifierType: 'advantage',
-                  value: 3,
+                  value: stored,
+               },
+            ],
+         },
+      });
+   }, {
+      name: ITEM_NAME,
+      stored: value,
+   });
+
+   /** @type {import('@playwright/test').Locator} The level select's trigger. */
+   const level = sheet().getByTestId('ccm-advantage-level');
+
+   // A level the options carry starts the select, so each out-of-set value is a displayed transition off it.
+   await store(2);
+   await expect(level).toHaveAttribute('data-value', '2');
+
+   for (const [stored, shown] of [
+      [
+         0,
+         '1',
+      ],
+      [
+         -3,
+         '-2',
+      ],
+      [
+         3,
+         '2',
+      ],
+   ]) {
+      await store(stored);
+
+      // The displayed level changing proves the sheet rendered the stored value before the persisted read.
+      await expect(level).toHaveAttribute('data-value', shown);
+      expect((await readElement()).value, `stored ${stored} is not rewritten`).toBe(stored);
+   }
+});
+
+test('Healing skips Attack checks, and an unknown stored check type does not break the editor', async () => {
+   await selectTitanOption(page, sheet().getByTestId('ccm-modifier-type'), 'healing');
+   await expect.poll(async () => (await readElement()).modifierType).toBe('healing');
+   expect(await titanSelectOptionValues(page, sheet().getByTestId('ccm-check-type'))).toEqual([
+      'any',
+      'casting',
+      'item',
+   ]);
+
+   // A hand-authored check type no editor option carries: the editor still renders, offering every modifier type.
+   await page.evaluate(async (name) => {
+      /** @type {TitanItem} The edited ability. */
+      const item = game.items.getName(name);
+      await item.update({
+         system: {
+            rulesElement: [
+               {
+                  ...item.system.rulesElement[0],
+                  checkType: 'unknownCheck',
+                  modifierType: 'dice',
                },
             ],
          },
       });
    }, ITEM_NAME);
-
-   /** @type {import('@playwright/test').Locator} The level select's trigger. */
-   const level = sheet().getByTestId('ccm-advantage-level');
-   await expect(level).toHaveAttribute('data-value', '2');
-   expect((await readElement()).value).toBe(3);
+   await expect(sheet().getByTestId('ccm-modifier-type')).toHaveAttribute('data-value', 'dice');
+   expect(await titanSelectOptionValues(page, sheet().getByTestId('ccm-modifier-type'))).toEqual([
+      'damage',
+      'dice',
+      'expertise',
+      'training',
+      'healing',
+      'advantage',
+      'automaticFailure',
+   ]);
+   expect(await titanSelectOptionValues(page, sheet().getByTestId('ccm-selector'))).toEqual([
+      'any',
+      'attribute',
+      'skill',
+      'customTrait',
+      'situation',
+   ]);
 });
 
 test('Resistance checks offer their selectors and only the modifier types they read', async () => {
@@ -246,4 +328,22 @@ test('a situation takes a typed label and an optional Skill narrowing, except on
    await selectTitanOption(page, sheet().getByTestId('ccm-selector'), 'any');
    await expect(skillSelect).toHaveCount(0);
    await expect.poll(async () => (await readElement()).skill).toBe('');
+
+   // Switching between two selectors also clears a narrowed Skill: a returning situation starts unnarrowed.
+   await selectTitanOption(page, sheet().getByTestId('ccm-selector'), 'situation');
+   await expect(skillSelect).toBeVisible();
+   await selectTitanOption(page, skillSelect, 'athletics');
+   await expect.poll(async () => (await readElement()).skill).toBe('athletics');
+   await selectTitanOption(page, sheet().getByTestId('ccm-selector'), 'customTrait');
+   await expect(skillSelect).toHaveCount(0);
+   await expect.poll(readElement, { message: 'the custom trait selector clears the Skill' }).toMatchObject({
+      selector: 'customTrait',
+      skill: '',
+   });
+   await selectTitanOption(page, sheet().getByTestId('ccm-selector'), 'situation');
+   await expect(skillSelect).toBeVisible();
+   await expect.poll(readElement, { message: 'a returning situation is unnarrowed' }).toMatchObject({
+      selector: 'situation',
+      skill: '',
+   });
 });

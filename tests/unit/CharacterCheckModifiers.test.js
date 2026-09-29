@@ -723,3 +723,40 @@ describe('CharacterDataModel._expandAllKeyElements', () => {
       ]);
    });
 });
+
+describe('CharacterDataModel._expandAllKeyElements — user-typed keys', () => {
+   it.each([
+      [
+         'conditionalCheckModifier',
+         'customTrait',
+      ],
+      [
+         'conditionalCheckModifier',
+         'spellTradition',
+      ],
+      [
+         'conditionalRatingModifier',
+         'customArmorTrait',
+      ],
+      [
+         'conditionalRatingModifier',
+         'customWeaponTrait',
+      ],
+      [
+         'conditionalRatingModifier',
+         'customShieldTrait',
+      ],
+      [
+         'rollMessage',
+         'customTrait',
+      ],
+   ])('keeps a %s element with a typed %s key "all" as a literal key', (operation, selector) => {
+      /** @type {object} An element whose typed key is the reserved word. */
+      const element = {
+         key: 'all',
+         operation,
+         selector,
+      };
+      expect(createModel()._expandAllKeyElements([element])).toEqual([element]);
+   });
+});

@@ -115,14 +115,27 @@
    ));
 
    /**
-    * Whether a check type reads a modifier type. `any` targets every check, so it allows every type. The modifier-type
-    * and check-type options both filter through this, so the editor cannot build a combination no check reads.
+    * Whether a check type reads a modifier type. `any` targets every check, so it allows every type, and so does a
+    * stored check type the editor does not know (rules elements are schemaless objects, so hand-authored data can carry
+    * one). The modifier-type and check-type options both filter through this, so the editor cannot build a combination
+    * no check reads.
     * @param {string} checkType - The element's check type.
     * @param {string} modifierType - The element's modifier type.
     * @returns {boolean} Whether the combination can apply to a check.
     */
    function isCheckTypeAllowed(checkType, modifierType) {
-      return checkType === 'any' || CHECK_TYPE_MODIFIER_TYPES[checkType].includes(modifierType);
+      /** @type {readonly string[] | undefined} The modifier types the check type reads; undefined when unknown. */
+      const readTypes = CHECK_TYPE_MODIFIER_TYPES[checkType];
+      return checkType === 'any' || !readTypes || readTypes.includes(modifierType);
+   }
+
+   /**
+    * Gets the selectors a check type offers; a stored check type the editor does not know offers the `any` selectors.
+    * @param {string} checkType - The stored check type, known to the editor or not.
+    * @returns {string[]} The selectors the check type offers, led by `any`.
+    */
+   function getSelectorOptions(checkType) {
+      return selectorOptions[checkType] ?? selectorOptions.any;
    }
 
    /**
@@ -146,7 +159,7 @@
    function onCheckTypeChange() {
       /** @type {object} The edited element. */
       const element = document.data.system.rulesElement[idx];
-      if (!selectorOptions[element.checkType].includes(element.selector)) {
+      if (!getSelectorOptions(element.checkType).includes(element.selector)) {
          element.selector = 'any';
          onSelectorChange();
       }
@@ -265,7 +278,7 @@
       <DocumentSelect
          bind:value={document.data.system.rulesElement[idx].selector}
          onchange={onSelectorChange}
-         options={selectorOptions[document.data.system.rulesElement[idx].checkType]}
+         options={getSelectorOptions(document.data.system.rulesElement[idx].checkType)}
          testId={'ccm-selector'}
       />
    </div>
