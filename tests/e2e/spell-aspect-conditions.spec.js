@@ -85,12 +85,12 @@ function sheet() {
 
 /**
  * Reads one of the spell's aspects: its derived cost and its chosen options.
- * @param {number} index - The aspect's index.
- * @returns {Promise<{cost: number, option: string[]}>} The aspect's cost and options.
+ * @param {number} index - The position of the aspect in the spell's `system.aspect` array.
+ * @returns {Promise<{cost: number, option: string[]}>} The derived cost and the selected condition ids.
  */
 function readAspect(index) {
    return page.evaluate(({ name, aspectIndex }) => {
-      /** @type {object} The aspect. */
+      /** @type {object} The spell aspect entry at the given index. */
       const aspect = game.items.getName(name).system.aspect[aspectIndex];
       return {
          cost: aspect.cost,

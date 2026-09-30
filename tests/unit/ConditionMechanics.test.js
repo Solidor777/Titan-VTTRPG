@@ -31,8 +31,8 @@ afterAll(() => {
 
 /**
  * Returns the condition definition with the given id.
- * @param {string} id - The condition id.
- * @returns {object} The definition.
+ * @param {string} id - The condition id, such as `blinded` or `offBalance`.
+ * @returns {object} The definition, carrying its `system.rulesElement` when the condition has stat mechanics.
  */
 function definition(id) {
    return buildConditionDefinitions().find((condition) => condition.id === id);
@@ -40,8 +40,8 @@ function definition(id) {
 
 /**
  * Builds a stat at the given base with every mod bucket at 0.
- * @param {number} base - The stat's base value.
- * @returns {{baseValue: number, mod: Record<string, number>}} The stat.
+ * @param {number} base - The value stored as the stat's `baseValue`.
+ * @returns {{baseValue: number, mod: Record<string, number>}} The stat, with a 0 in each mod bucket.
  */
 function stat(base) {
    return {
@@ -164,8 +164,8 @@ describe('quarter-of-base condition penalties', () => {
       ]).rating.defense.value).toBe(4);
    });
 
-   // User ruling 2026-09-30: stacked quarter penalties round per element (each condition's resulting value rounded in
-   // sequence). Rounding the summed penalty once would leave 3 on base 6 and 4 on base 7.
+   // Stacked quarter penalties round per element (each condition's resulting value is rounded in sequence), so the
+   // expected values differ from rounding the summed penalty once, which would leave 3 on base 6 and 4 on base 7.
    it.each([
       [
          6,

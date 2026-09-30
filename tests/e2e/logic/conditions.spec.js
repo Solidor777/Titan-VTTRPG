@@ -131,9 +131,10 @@ test.describe('conditions — derived-stat mechanics', () => {
     * Creates the boosted actor, captures a baseline snapshot, applies the conditions, and returns
     * `{ baseline, after }` snapshots (`{ base, value }` per attribute, resistance, and rating, plus the stride value).
     * @param {string[]} statusIds - The status effect ids to apply.
+    * @param {object} [baseData] - The actor system data that sets the stat bases; defaults to `BASE_DATA`.
     * @returns {Promise<{baseline: object, after: object}>} Before and after derived-stat snapshots.
     */
-   async function applyConditions(statusIds) {
+   async function applyConditions(statusIds, baseData = BASE_DATA) {
       return page.evaluate(async ({ name, abilityData, baseData, ids }) => {
          await game.actors.getName(name)?.delete();
 
@@ -163,7 +164,8 @@ test.describe('conditions — derived-stat mechanics', () => {
 
          /**
           * Snapshots the derived stats the condition tests compare.
-          * @returns {{attribute: object, rating: object, resistance: object, stride: number}} The snapshot.
+          * @returns {{attribute: object, rating: object, resistance: object, stride: number}} The `{base, value}` maps
+          * per attribute, rating, and resistance, plus the stride speed value.
           */
          const snapshot = () => ({
             attribute: read(actor.system.attribute),
@@ -189,15 +191,15 @@ test.describe('conditions — derived-stat mechanics', () => {
       }, {
          name: ACTOR_NAME,
          abilityData: buildRulesElementAbilityData('E2E Condition Boost', BOOST_ELEMENTS),
-         baseData: BASE_DATA,
+         baseData,
          ids: statusIds,
       });
    }
 
    /**
     * Asserts that each named rating dropped by one quarter-of-base penalty (times `count`).
-    * @param {{baseline: object, after: object}} snapshots - The before and after snapshots.
-    * @param {string[]} keys - The rating keys.
+    * @param {{baseline: object, after: object}} snapshots - The derived stats before and after the conditions applied.
+    * @param {string[]} keys - The rating keys (`melee`, `defense`, and so on) checked against the penalty.
     * @param {number} [count] - How many quarter penalties apply.
     */
    function expectRatingPenalty({ baseline, after }, keys, count = 1) {
@@ -268,6 +270,38 @@ test.describe('conditions — derived-stat mechanics', () => {
          'offBalance',
       ]), ['defense'], 2);
    });
+
+   // Defense base = ceil((Body + Dexterity Training) / 2): Body 8 with Training 4 gives 6 and with Training 6 gives 7.
+   // Rounding the summed penalty once would leave 3 and 4; rounding per element leaves 4 and 5.
+   for (const [training, base, expected] of [
+      [
+         4,
+         6,
+         4,
+      ],
+      [
+         6,
+         7,
+         5,
+      ],
+   ]) {
+      test(`blinded + off-balance round each penalty alone: base-${base} defense becomes ${expected}`, async () => {
+         /** @type {{baseline: object, after: object}} The stats before and after both conditions. */
+         const { baseline, after } = await applyConditions([
+            'blinded',
+            'offBalance',
+         ], {
+            ...BASE_DATA,
+            skill: {
+               ...BASE_DATA.skill,
+               dexterity: { training: { baseValue: training } },
+            },
+         });
+         expect(baseline.rating.defense.base, 'defense base').toBe(base);
+         expect(after.rating.defense.value - baseline.rating.defense.value, 'defense change')
+            .toBe(expected - base);
+      });
+   }
 
    test('sleeping halves awareness (round up)', async () => {
       /** @type {{baseline: object, after: object}} The stats before and after Sleeping. */

@@ -2,6 +2,7 @@ import { test, expect } from '@playwright/test';
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { buildConditionDefinitions } from '~/system/Conditions.js';
 import { login } from './fixtures.js';
 import { closeAllApps, clearChat, attachPageErrors } from './world.js';
 
@@ -240,14 +241,8 @@ test.describe('integration manifest drift guard', () => {
    // The system pushes its conditions onto CONFIG.statusEffects (OnceSetup) and registers its settings
    // (OnceInit). Assert the titan conditions are present and a representative set of settings is registered.
    test('system conditions and settings are registered', async () => {
-      // The condition ids the system pushes onto CONFIG.statusEffects, read from their single source so a condition
-      // added to buildConditionDefinitions is expected here too.
-      /** @type {string[]} The `id:` values of src/system/Conditions.js. */
-      const expectedConditions = [
-         ...fs.readFileSync(fileURLToPath(new URL('../../src/system/Conditions.js', import.meta.url)), 'utf-8')
-            .matchAll(/^\s+id: '(\w+)',$/gm),
-      ].map((match) => match[1]);
-      expect(expectedConditions).toContain('offBalance');
+      /** @type {string[]} The condition ids the system pushes onto CONFIG.statusEffects, from their single source. */
+      const expectedConditions = buildConditionDefinitions().map((condition) => condition.id).sort();
       // A representative sample of registered setting keys (mix of scopes and value kinds).
       const expectedSettings = [
          'titan.migrationMode',
@@ -265,10 +260,9 @@ test.describe('integration manifest drift guard', () => {
          missingSettings: expectedSettings.filter((key) => !game.settings.settings.has(key)),
       }), { expectedSettings });
 
-      // Every titan condition is present among the status effects.
-      for (const id of expectedConditions) {
-         expect(result.statusIds, `status effect ${id} registered`).toContain(id);
-      }
+      // The status effects are exactly the titan conditions: each defined condition is registered, and none else is.
+      expect([...result.statusIds].sort(), 'registered status effects match the condition definitions')
+         .toEqual(expectedConditions);
 
       // Every sampled setting key is registered.
       expect(result.missingSettings, 'all sampled settings registered').toEqual([]);

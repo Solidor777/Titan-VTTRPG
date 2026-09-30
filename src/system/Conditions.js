@@ -6,8 +6,7 @@ import sortAscending from '~/helpers/utility-functions/SortAscending.js';
  * and rounding the resulting value up (base 4 → 3, base 5 → 4; bases 1-3 keep their value). `mulBase` adds
  * `base × (value − 1)` per element, rounded per element, so two such conditions on one stat each subtract their own
  * rounded quarter of the base (base 8 → 4, base 6 → 4, base 7 → 5), the same as rounding each condition's resulting
- * value in sequence (user ruling 2026-09-30).
- * Source: TITAN Rules Compendium (09_26_2026), "Conditions".
+ * value in sequence. Source: TITAN Rules Compendium, "Conditions" ("-¼ of base value, rounded up").
  * @param {string} conditionId - The condition id, which names the element's uuid (`condition-<id>-<uuidSuffix>`).
  * @param {string} selector - The stat type (`rating`, `attribute`, or `resistance`).
  * @param {string} key - The stat key, or `all` for every stat under the selector.
