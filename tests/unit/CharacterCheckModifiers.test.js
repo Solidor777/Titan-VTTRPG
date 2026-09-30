@@ -1192,6 +1192,97 @@ describe('conditional check modifier lookups — blank keys and non-Boolean mult
       expect(model.parent.rulesElementsCache.rollMessage.any.customTrait).toEqual({ glowing: ['Real'] });
    });
 
+   it('a whitespace-only single key never matches, even a cell stored under it', () => {
+      /** @type {object} The model, whose Tradition cell exists only under a whitespace key. */
+      const model = createModel({
+         conditionalCheckModifier: {
+            dice: {
+               casting: {
+                  spellTradition: {
+                     '  ': 8,
+                     fire: 2,
+                  },
+               },
+            },
+         },
+      });
+      expect(model.getCastingCheckMod('dice', 'body', 'athletics', '  ', [])).toBe(0);
+      expect(model.getCastingCheckMod('dice', 'body', 'athletics', 'fire', [])).toBe(2);
+   });
+
+   it('a whitespace-only key inside an array key never matches while its siblings do', () => {
+      /** @type {object} The model, whose Custom Trait cell holds a whitespace key beside a real one. */
+      const model = createModel({
+         conditionalCheckModifier: {
+            dice: {
+               item: {
+                  customTrait: {
+                     '  ': 8,
+                     glowing: 2,
+                  },
+               },
+            },
+         },
+      });
+      expect(model.getItemCheckMod('dice', 'body', 'athletics', [
+         '  ',
+         'glowing',
+      ])).toBe(2);
+      expect(model.getItemCheckMod('dice', 'body', 'athletics', ['  '])).toBe(0);
+   });
+
+   it('the three keyed cache builders store nothing under a whitespace-only key', () => {
+      /** @type {object} The model under test. */
+      const model = createModel();
+      model._applyConditionalCheckModifierElements([
+         checkModifier({
+            key: '  ',
+            selector: 'spellTradition',
+         }),
+         checkModifier({
+            key: 'Fire',
+            selector: 'spellTradition',
+         }),
+      ]);
+      expect(model.parent.rulesElementsCache.conditionalCheckModifier.dice.any).toEqual({
+         spellTradition: { fire: 1 },
+      });
+      model._applyConditionalRatingModifierElements([
+         {
+            key: '  ',
+            rating: 'melee',
+            selector: 'attackTrait',
+            type: 'ability',
+            value: 1,
+         },
+         {
+            key: 'rend',
+            rating: 'melee',
+            selector: 'attackTrait',
+            type: 'ability',
+            value: 2,
+         },
+      ]);
+      expect(model.parent.rulesElementsCache.conditionalRatingModifier.melee.attackTrait).toEqual({
+         rend: { ability: 2 },
+      });
+      model._applyRollMessageElements([
+         {
+            checkType: 'any',
+            key: '  ',
+            message: 'Blank',
+            selector: 'customTrait',
+         },
+         {
+            checkType: 'any',
+            key: 'glowing',
+            message: 'Real',
+            selector: 'customTrait',
+         },
+      ]);
+      expect(model.parent.rulesElementsCache.rollMessage.any.customTrait).toEqual({ glowing: ['Real'] });
+   });
+
    it('the situational cache builder skips blank-key situations and offers only the real one', () => {
       /** @type {object} The model under test. */
       const model = createModel();
