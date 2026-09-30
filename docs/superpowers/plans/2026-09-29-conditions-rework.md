@@ -26,7 +26,7 @@ Executors read spec B alongside this plan.
 **Branch:** `conditions-and-rulings` (system repo, based on `main` @ `f3d7e66a`). Do not switch branches. The working
 tree carries unrelated user changes (`.claude/*`, deleted `CLAUDE.md` and `TITAN Rules Compendium.md`, two
 `Gemini_Generated_Image_*` images, untracked `docs/TITAN Rules Compendium*.md`): never stage them. Stage only the files
-each task lists. Task 13 works in the compendium module repo on its own branch.
+each task lists. Tasks 14 and 15 work in the compendium module repo on its own branch.
 
 **Iron rule — every implementer, reviewer, and fix dispatch prompt the executor writes MUST contain this paragraph
 verbatim:**
@@ -34,32 +34,27 @@ verbatim:**
 > Invoke the core skill immediately. The iron rule is no deferrals of existing work, or new work as it comes up - we fix this now unless I give my EXPRESS authorization. The only exception is if a bug or to-do has a genuine blocker that is already logged in a milestone in PLAN.md that has not been started yet. Another iron clad is rule is that when faced with a design fork, determine the best long term shape in keeping with our plans and goals, and implement accordingly. You only need to ask me if the question "what is the best long term shape in keeping with our plans and goals?" is not able to answer the question. Churn is not a concern. This paragraph must be copied verbatim to any agents dispatched in this campaign.
 
 "The core skill" is the `titan-codebase` skill (`.claude/skills/titan-codebase/SKILL.md` + `references/*.md`).
-Every dispatch also loads `foundry-vtt`; Tasks 1, 3, 8, and 11 (Svelte) also load `svelte-5` and `foundry-svelte`.
+Every dispatch also loads `foundry-vtt`; Tasks 1, 2, 3, 8, 10, and 12 (Svelte) also load `svelte-5` and
+`foundry-svelte`.
 
 ---
 
-## Open questions for the user
+## User rulings (2026-09-29)
 
-These are genuine gaps the "best long-term shape" question cannot settle. The plan does not guess; the controller asks
-the user before Task 14 and adds any resulting work as new tasks (or logs a user-authorized deferral).
+The user answered the plan's three open questions on 2026-09-29. Each answer is a task below.
 
-1. **Off-Balance in the spell-aspect condition lists.** `SPELL_ASPECTS.inflictCondition` and `removeCondition`
-   (`src/document/types/item/types/spell/SpellAspects.js:436-509`) list the conditions a custom spell can inflict or
-   remove, with a per-condition Inflict cost (Blinded 4, Prone 2, ...). The 09_26 rules have no spell-aspect table, so
-   no rule gives Off-Balance a cost. Should Off-Balance be offered, and at what Inflict cost? Recommendation: add it to
-   Remove Condition (uniform cost 2) and to Inflict Condition at cost 3 (between Prone 2 and Blinded/Stunned 4, as a
-   Prone-like physical penalty without the speed loss).
-2. **How a suppressed effect or condition is shown.** Spec B §5 suppresses an immune actor's existing
-   conditions/effects (they stop applying) but says nothing about display. Core already drops a suppressed condition
-   from `actor.statuses` (the token HUD shows it off), but the character sheet's effect rows and the Player HUD
-   effects panel still list it as active. Should they mark it (e.g. a "Suppressed: <immunity source>" tag and a muted
-   row)? Recommendation: yes — a tag on the effect row and HUD panel entry naming the immunity's source, reusing
-   `getImmunitySources`.
-3. **Module items that grant condition immunity.** The `docs/TODO.md` compendium audit lists "Metal Attunement and
-   Effulgent Gaze: `removeCondition` where the rules grant immunity" as awaiting a rules decision. Task 8 creates the
-   `immunity` element those items need. Should this campaign convert them (module `src/packs`), or does the item
-   stay with the rest of the audit? Recommendation: convert them in this campaign as a module task after Task 13,
-   since the missing mechanic was the blocker; the rest of the audit is unrelated.
+1. **Off-Balance in the spell-aspect condition lists: yes.** `SpellAspects.inflictCondition` and `removeCondition`
+   (`src/document/types/item/types/spell/SpellAspects.js`) offer Off-Balance: Remove Condition at its uniform cost 2,
+   Inflict Condition at cost 3. The 09_26 rules publish no spell-aspect costs (no "Inflict"/"Remove Condition" text in
+   the source), so the cost is this ruling. Implemented in **Task 2** (Steps 9-13), with a guard test pinning both
+   lists to the condition definitions and a spell-sheet e2e.
+2. **Suppressed display: yes.** A "Suppressed: <immunity source>" tag, with a muted row, on the character sheet's
+   effect rows and the Player HUD effects panel entries, reusing `getImmunitySources` (Task 9) through
+   `getSuppressingImmunitySources`. Implemented in **Task 10**.
+3. **Metal Attunement and Effulgent Gaze: convert them in this campaign.** Their effects gain `immunity` condition
+   elements (Contaminated, Blinded) and their spells drop the `removeCondition` aspect (spec C pack ruling 8, user
+   ruling 2026-09-27), in the module's `src/packs` sources only. Implemented in **Task 15**; its live-packs recompile
+   joins Task 14 Step 5's controller checkpoint, and Task 16 deletes the audit bullet from `docs/TODO.md`.
 
 ---
 
@@ -107,9 +102,9 @@ the user before Task 14 and adds any resulting work as new tasks (or logs a user
   against a real (non-test) world.
 - Serial execution: tasks share one working tree, one git index, one build output, one live Foundry. Never
   parallelize implementers.
-- Commits: before each commit run `git branch --show-current` (must print `conditions-and-rulings`, or the module
-  branch in Task 13) and `git status --short` (stage only the task's listed files; never `packs/**`). Every commit
-  message ends with exactly:
+- Commits: before each commit run `git branch --show-current` (must print `conditions-and-rulings`, which is also the
+  module branch in Tasks 14 and 15) and `git status --short` (stage only the task's listed files; never `packs/**`).
+  Every commit message ends with exactly:
 
   ```
   Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
@@ -160,7 +155,7 @@ the user before Task 14 and adds any resulting work as new tasks (or logs a user
     when an element carries no `label`. The canonical situation strings move from the armor module to
     `src/system/CanonicalSituations.js`, shared by armor and conditions.
 13. **Off-Balance's id is `offBalance`** (camel case, like every other LOCAL key), its name `LOCAL.offBalance.text`.
-14. **The module's Stunned typo is already fixed** in `src/packs/rules/Rules_Reference_mczts3I29Q5vaopp.json`; Task 13
+14. **The module's Stunned typo is already fixed** in `src/packs/rules/Rules_Reference_mczts3I29Q5vaopp.json`; Task 14
     fixes Blinded's and the same page's split `<strong>1 spac</strong>e` in Prone.
 15. **The spec's "sheet's ratings" e2e** asserts both the derived values (every changed condition) and the rendered
     sheet (Task 3: the Defense label and its tooltip).
@@ -172,14 +167,28 @@ the user before Task 14 and adds any resulting work as new tasks (or logs a user
 17. **Condition sync matches a condition effect to its definition by `effect.statuses`**, the first
     `CONFIG.statusEffects` entry whose id the effect's statuses hold; an effect whose statuses name no system
     condition (a custom status) is left alone.
+18. **The spell-aspect condition lists stay hand-written and are pinned by a guard** (user ruling 1, Task 2). Inflict
+    costs have no rule source to derive from, so `SpellAspects.js` keeps its literal lists; the guard requires both
+    aspects to offer every condition in definition order except the two they already omit (Dead, Sleeping) and every
+    Inflict option to carry a cost. A condition added later fails the guard until it is offered or listed as omitted.
+19. **The suppressed marker reads the immunity's sources, not core's `isSuppressed`** (user ruling 2, Task 10). The tag
+    must name the source, which `isSuppressed` does not carry; `getSuppressingImmunitySources(effect)` (the Character
+    gate plus `getImmunitySources`) serves both the marker and `isSuppressedByImmunity`, so the two never disagree.
+20. **The character sheet marks suppressed `effect`-subtype rows only.** `CharacterSheetEffectList` lists only
+    `type === 'effect'` Active Effects (conditions have no sheet row), so a suppressed condition is marked in the Player
+    HUD effects panel. The HUD's icon tray has no text per entry: a suppressed icon is dimmed and its popout carries
+    the tag.
+21. **The module conversion drops the spells' `removeCondition` aspect** (user ruling 3, Task 15, following spec C
+    pack ruling 8): the rules grant immunity while the spell lasts, which the linked effect now carries; the spells'
+    `autoCalculateDC` is `false`, so their casting DC is unchanged.
 
 ## Review Focus
 
 1. A Prone target exactly 10 spaces away gives no Accuracy penalty and one 11 spaces away gives one step; an attacker
    whose Accuracy is already 0 (or whose quarter-base rounds to 0) gets no entry and never goes negative (table in
-   Task 10; e2e at 1 and 21 spaces in Task 11).
+   Task 11; e2e at 1 and 21 spaces in Task 12).
 2. A GM who targets nothing but controls the attacker's own token must not read the attacker's conditions or Defense
-   as the target's (unit test in Task 11).
+   as the target's (unit test in Task 12).
 3. Toggling a condition the actor is immune to from the token HUD refuses it with a notification naming the source,
    and removing the immunity restores a suppressed condition's penalties without re-creating it (unit tests in Task 9;
    e2e in Task 9).
@@ -187,11 +196,16 @@ the user before Task 14 and adds any resulting work as new tasks (or logs a user
    statuses name no system condition untouched, and reaches token-only conditions on unlinked tokens (unit tests and
    e2e in Task 5).
 5. Applying Unconscious to an actor already Prone creates no second Prone, and removing Unconscious leaves Prone and
-   Incapacitated (unit test and e2e in Task 12).
+   Incapacitated (unit test and e2e in Task 13).
 6. An attack chat message created before this change (no `targetConditions`) renders, and an Incapacitated target
-   shows Difficulty 2 even with Disadvantage (schema golden in Task 11; unit test in Task 11).
+   shows Difficulty 2 even with Disadvantage (schema golden in Task 12; unit test in Task 12).
 7. Two quarter-base penalties on one stat subtract two quarters of the base, not a quarter of a quarter (base 8 → 4),
    and `nearest` rounds a half up the same way for the element's contribution and the resulting value (Tasks 1, 2).
+8. A suppressed entry's tag names the immunity's source and leaves (with the dimming) when the immunity ends, on the
+   sheet's effect row, the HUD list row, and the HUD tray popout, while the granting ward itself is never tagged
+   (unit tests and e2e in Task 10).
+9. A condition added to `buildConditionDefinitions` without a spell-aspect decision fails the spell-aspect guard, and
+   Off-Balance prices at 3 (Inflict) and 2 (Remove) on the live sheet (unit test and e2e in Task 2).
 
 ## Model/Effort directives
 
@@ -201,13 +215,14 @@ the user before Task 14 and adds any resulting work as new tasks (or logs a user
 - Implementer default: `sdd-implementer` (Sonnet, medium). Escalation ladder when an implementer reports BLOCKED or
   DONE_WITH_CONCERNS citing complexity: `sdd-implementer-highthink` → `sdd-implementer-opus` → the human. Never skip a
   rung. A fix dispatch reuses the tier that produced the task.
-- Per-task implementer suggestions: Tasks 1, 6, 10, 13 → `sdd-implementer` (Task 13 may use `sdd-implementer-haiku`:
-  two string replacements plus validation). Tasks 2, 3, 4, 7, 8, 12, 14 → `sdd-implementer`. Tasks 5, 9, 11 (migration,
-  suppression timing, attack option provenance) → start at `sdd-implementer-highthink`.
-- Per-task reviewer: `sdd-reviewer`. Escalate to `sdd-reviewer-opus` for Tasks 5, 7, 9, and 11 (migration, the
+- Per-task implementer suggestions: Tasks 1, 6, 11, 14, 15 → `sdd-implementer` (Tasks 14 and 15 may use
+  `sdd-implementer-haiku`: exact JSON string replacements plus validation). Tasks 2, 3, 4, 7, 8, 10, 13, 16 →
+  `sdd-implementer`. Tasks 5, 9, 12 (migration, suppression timing, attack option provenance) → start at
+  `sdd-implementer-highthink`.
+- Per-task reviewer: `sdd-reviewer`. Escalate to `sdd-reviewer-opus` for Tasks 5, 7, 9, and 12 (migration, the
   behaviour-preserving pipeline refactor, suppression, and attack provenance), and for any task whose `sdd-reviewer`
   findings read shallow or uncertain.
-- Final whole-branch review: `sdd-final-reviewer`, once, after Task 14.
+- Final whole-branch review: `sdd-final-reviewer`, once, after Task 16.
 - Dispatch without `name:` (the subagent's final plain-text message is the report). Each prompt names the task, this
   plan's path, the spec's path, the iron-rule paragraph verbatim, and the skills to load.
 
@@ -229,20 +244,25 @@ Create:
 - `src/helpers/svelte-components/input/select/ConditionSelect.svelte`,
   `src/document/svelte-components/select/DocumentConditionSelect.svelte`,
   `src/document/types/item/sheet/rules-element/ItemSheetImmunitySettings.svelte` — immunity editor (Task 8).
-- `src/document/types/active-effect/IsSuppressedByImmunity.js` — shared `isSuppressed` logic (Task 9).
+- `src/document/types/active-effect/IsSuppressedByImmunity.js` — shared `isSuppressed` logic (Task 9) and
+  `getSuppressingImmunitySources` (Task 10).
+- `src/helpers/svelte-components/tag/effects/SuppressedEffectTag.svelte` — the "Suppressed: <sources>" tag (Task 10).
 - `src/helpers/utility-functions/GetTargetedCharacterTokens.js`, `src/helpers/utility-functions/MeasureTokenDistance.js`,
-  `src/check/types/attack-check/TargetConditionModifiers.js` — targeting helpers (Task 10).
+  `src/check/types/attack-check/TargetConditionModifiers.js` — targeting helpers (Task 11).
 - `src/check/types/attack-check/dialog/AttackCheckDialogTargetConditionsField.svelte`,
-  `src/check/types/attack-check/chat-message/AttackCheckChatTargetConditions.svelte` — dialog row and card (Task 11).
+  `src/check/types/attack-check/chat-message/AttackCheckChatTargetConditions.svelte` — dialog row and card (Task 12).
 - Tests: `tests/unit/RoundingDirections.test.js`, `tests/unit/ConditionMechanics.test.js`,
+  `tests/unit/SpellAspectConditions.test.js`,
   `tests/unit/ModBuckets.test.js`, `tests/unit/SyncConditionEffects.test.js`, `tests/unit/MigrationAction.test.js`,
   `tests/unit/RulesElementOperationRegistry.test.js`, `tests/unit/RulesElementSources.test.js`,
-  `tests/unit/Immunity.test.js`, `tests/unit/ApplyEffectToTargets.test.js`, `tests/unit/GetTargetedCharacters.test.js`,
+  `tests/unit/Immunity.test.js`, `tests/unit/ApplyEffectToTargets.test.js`, `tests/unit/SuppressedEffectTag.test.js`,
+  `tests/unit/GetTargetedCharacters.test.js`,
   `tests/unit/MeasureTokenDistance.test.js`, `tests/unit/TargetConditionModifiers.test.js`,
   `tests/unit/Unconscious.test.js`, `tests/unit/ConditionDefinitions.test.js` (rewritten),
-  `tests/e2e/rules-element-rounding-editor.spec.js`, `tests/e2e/stat-breakdown-conditions.spec.js`,
+  `tests/e2e/rules-element-rounding-editor.spec.js`, `tests/e2e/spell-aspect-conditions.spec.js`,
+  `tests/e2e/stat-breakdown-conditions.spec.js`,
   `tests/e2e/condition-checks.spec.js`, `tests/e2e/condition-migration.spec.js`,
-  `tests/e2e/rules-element-immunity-editor.spec.js`, `tests/e2e/immunity.spec.js`,
+  `tests/e2e/rules-element-immunity-editor.spec.js`, `tests/e2e/immunity.spec.js`, `tests/e2e/immunity-display.spec.js`,
   `tests/e2e/target-conditions.spec.js`, `tests/e2e/unconscious.spec.js`.
 
 Modify:
@@ -263,9 +283,19 @@ Modify:
 - `src/check/types/attack-check/AttackCheckOptions.js`, `AttackCheckParameters.js`,
   `dialog/AttackCheckDialogShell.svelte`, `chat-message/AttackCheckChatMessage.svelte`.
 - `src/helpers/migration/MigrateWorld.js`, `src/hooks/OnceReady.js`.
+- `src/document/types/item/types/spell/SpellAspects.js`,
+  `src/document/types/item/types/spell/sheet/SpellSheetStandardAspectSettings.svelte` (Task 2).
+- `src/system/Icons.js`, `src/document/types/actor/types/character/sheet/items/CharacterSheetItem.svelte`,
+  `src/document/types/actor/types/character/sheet/items/effect/CharacterSheetEffect.svelte`,
+  `src/ui/player-hud/elements/effects-panel/EffectsListRow.svelte`, `EffectsIconTray.svelte`,
+  `EffectsDetailPopout.svelte` (Task 10).
 - `lang/en.json`, `CHANGELOG.md`; existing tests named per task; `docs/TODO.md`, `docs/CLOSED_BUGS.md`,
-  `docs/POST_WORK_FINDINGS.md`, spec B, `.claude/skills/titan-codebase/references/*.md`.
-- Module repo (`Data/modules/titan-vttrpg-compendium`): `src/packs/rules/Rules_Reference_mczts3I29Q5vaopp.json`.
+  `docs/POST_WORK_FINDINGS.md`, spec B, spec C (`docs/superpowers/specs/2026-09-27-compendium-rulings-design.md`),
+  `.claude/skills/titan-codebase/references/*.md`.
+- Module repo (`Data/modules/titan-vttrpg-compendium`): `src/packs/rules/Rules_Reference_mczts3I29Q5vaopp.json`
+  (Task 14); `src/packs/effects/Metal_Attunement_CNzUcoakHX0WMxo5.json`,
+  `src/packs/effects/Effulgent_Gaze_XrDcA89TI6GA6OIq.json`, `src/packs/spells/Metal_Attunement_Om0Y1sDROHUR2Yjg.json`,
+  `src/packs/spells/Effulgent_Gaze_kkG7krqlTItaexXH.json` (Task 15).
 
 ---
 ### Task 1: `nearest` rounding and one rounding-direction list
@@ -665,14 +695,21 @@ EOF
 
 **Files:**
 - Modify: `src/system/Conditions.js`, `lang/en.json`, `CHANGELOG.md`
+- Modify: `src/document/types/item/types/spell/SpellAspects.js`,
+  `src/document/types/item/types/spell/sheet/SpellSheetStandardAspectSettings.svelte` (user ruling 1)
 - Test: `tests/unit/ConditionDefinitions.test.js` (rewrite), `tests/unit/ConditionMechanics.test.js` (create),
-  `tests/e2e/logic/conditions.spec.js` (rewrite), `tests/e2e/integration-manifest.spec.js`
+  `tests/unit/SpellAspectConditions.test.js` (create), `tests/e2e/logic/conditions.spec.js` (rewrite),
+  `tests/e2e/integration-manifest.spec.js`, `tests/e2e/spell-aspect-conditions.spec.js` (create)
 
 **Interfaces:**
-- Consumes: `mulBase` with `rounding: 'up'` (existing `_applyMulBaseElements`).
+- Consumes: `mulBase` with `rounding: 'up'` (existing `_applyMulBaseElements`); `calculateSpellAspectCosts` (existing,
+  `src/document/types/item/types/spell/CalculateSpellAspectCosts.js`).
 - Produces: condition definitions (`buildConditionDefinitions()`) for Blinded, Contaminated, Off-Balance (`offBalance`),
   Prone, Restrained, Stunned per the table below; the module-private `createQuarterBasePenalty(conditionId, selector,
-  key, uuidSuffix = key)`.
+  key, uuidSuffix = key)`. `SpellAspects.inflictCondition.settings.option` and `removeCondition.settings.option` list
+  `offBalance` (between `incapacitated` and `prone`); `SpellAspects.inflictCondition.settings.optionCosts.offBalance`
+  is `3` (Remove Condition keeps its uniform `optionCost` 2). The spell sheet's standard-aspect option toggles carry
+  test id `spell-aspect-option-<aspect label>-<option>`.
 
 | Condition | Rules elements after this task |
 |---|---|
@@ -1504,19 +1541,302 @@ and the eleven-entry array literal that follows (through its closing `];`) with:
 
 (`fs` and `fileURLToPath` are already imported at the top of that file.)
 
-- [ ] **Step 9: Lint, full unit suite, build, e2e**
+- [ ] **Step 9: Write the failing spell-aspect tests (user ruling 1)**
 
-Run: `npm run eslint` → 0 errors; `npm test` → all pass; `npm run build` → succeeds;
+The Inflict Condition and Remove Condition spell aspects list the conditions a spell can inflict or remove. They are
+hand lists standing in for "every condition a spell can apply", so this guard ties them to `buildConditionDefinitions`
+(resolution 18).
+
+Create `tests/unit/SpellAspectConditions.test.js`:
+
+```js
+import { describe, it, expect } from 'vitest';
+import SpellAspects from '~/document/types/item/types/spell/SpellAspects.js';
+import calculateSpellAspectCosts from '~/document/types/item/types/spell/CalculateSpellAspectCosts.js';
+import { buildConditionDefinitions } from '~/system/Conditions.js';
+
+/**
+ * The conditions the Inflict Condition and Remove Condition spell aspects do not offer. A condition added to
+ * `buildConditionDefinitions` fails this file until both aspects offer it (Inflict with a cost) or it is listed here.
+ * @type {string[]}
+ */
+const OMITTED_CONDITIONS = [
+   'dead',
+   'sleeping',
+];
+
+/** @type {string[]} Every condition id, in definition order. */
+const CONDITION_IDS = buildConditionDefinitions().map((condition) => condition.id);
+
+/** @type {string[]} The condition ids both spell aspects must offer, in definition order. */
+const OFFERED_CONDITIONS = CONDITION_IDS.filter((id) => !OMITTED_CONDITIONS.includes(id));
+
+/**
+ * Builds a standard-aspect entry selecting one condition, with no resistance check.
+ * @param {string} label - The aspect label (`inflictCondition` or `removeCondition`).
+ * @param {string} condition - The selected condition id.
+ * @returns {object} The aspect entry, as `calculateSpellAspectCosts` reads it.
+ */
+function conditionAspect(label, condition) {
+   return {
+      allOptions: false,
+      label,
+      option: [condition],
+      resistanceCheck: 'none',
+   };
+}
+
+describe('spell-aspect condition lists', () => {
+   it.each(OMITTED_CONDITIONS)('omits %s, which is a defined condition', (id) => {
+      expect(CONDITION_IDS).toContain(id);
+   });
+
+   it.each([
+      'inflictCondition',
+      'removeCondition',
+   ])('%s offers every condition but the omitted ones, in definition order', (label) => {
+      expect(SpellAspects[label].settings.option).toEqual(OFFERED_CONDITIONS);
+   });
+
+   it('prices every Inflict Condition option with a positive whole cost, and nothing else', () => {
+      /** @type {object} The Inflict Condition settings. */
+      const settings = SpellAspects.inflictCondition.settings;
+      expect(Object.keys(settings.optionCosts).sort()).toEqual([...settings.option].sort());
+      for (const [id, cost] of Object.entries(settings.optionCosts)) {
+         expect(Number.isInteger(cost) && cost > 0, `${id} costs ${cost}`).toBe(true);
+      }
+   });
+
+   it('inflicting Off-Balance costs 3 and removing it costs 2', () => {
+      expect(calculateSpellAspectCosts([
+         conditionAspect('inflictCondition', 'offBalance'),
+         conditionAspect('removeCondition', 'offBalance'),
+      ], []).aspectCosts).toEqual([
+         3,
+         2,
+      ]);
+   });
+});
+```
+
+- [ ] **Step 10: Run the tests to verify they fail**
+
+Run: `npx vitest run tests/unit/SpellAspectConditions.test.js`
+Expected: FAIL — both option lists lack `offBalance`, and inflicting Off-Balance costs `NaN` (no `optionCosts` entry).
+
+- [ ] **Step 11: Offer Off-Balance in both condition aspects**
+
+In `src/document/types/item/types/spell/SpellAspects.js`:
+
+(a) In `inflictCondition.settings.option` and in `removeCondition.settings.option`, insert `'offBalance',` between
+`'incapacitated',` and `'prone',` (both lists then read blinded, contaminated, deafened, frightened, incapacitated,
+offBalance, prone, restrained, stunned, unconscious).
+
+(b) Replace the `inflictCondition.settings.optionCosts` object with:
+
+```js
+         // Per-condition Inflict costs. The rules text publishes no spell-aspect costs, so this scale is the system's
+         // own; Off-Balance (3) sits with Frightened, between Prone (2) and Blinded, Contaminated, and Stunned (4).
+         optionCosts: {
+            blinded: 4,
+            contaminated: 4,
+            deafened: 1,
+            frightened: 3,
+            incapacitated: 6,
+            offBalance: 3,
+            prone: 2,
+            restrained: 5,
+            stunned: 4,
+            unconscious: 7,
+         },
+```
+
+In `CHANGELOG.md`, append to the `## Unreleased:` list:
+
+```markdown
+- Spells can inflict Off-Balance (cost 3) and remove it (cost 2).
+```
+
+- [ ] **Step 12: Run the unit tests to verify they pass**
+
+Run: `npx vitest run tests/unit/SpellAspectConditions.test.js tests/unit/CalculateSpellAspectCosts.test.js`
+Expected: PASS.
+
+- [ ] **Step 13: Tag the option toggles and write the spell-sheet e2e**
+
+In `src/document/types/item/types/spell/sheet/SpellSheetStandardAspectSettings.svelte`, in the `<!--Option Toggles-->`
+block, replace
+
+```svelte
+                        <ToggleOptionButton
+                           label={localize(option)}
+```
+
+with
+
+```svelte
+                        <ToggleOptionButton
+                           label={localize(option)}
+                           testId={`spell-aspect-option-${aspectOptions.template.label}-${option}`}
+```
+
+(`ToggleOptionButton` already forwards `testId` to its wrapper `div` as `data-testid`; no element is added.)
+
+Create `tests/e2e/spell-aspect-conditions.spec.js`:
+
+```js
+import { expect, test } from '@playwright/test';
+import { login, openSheetTab } from './fixtures.js';
+import { attachPageErrors, closeAllApps } from './world.js';
+
+/**
+ * The spell sheet's Inflict Condition and Remove Condition aspects offer Off-Balance: toggling it on stores the option
+ * and prices the aspect (Inflict 3, Remove 2).
+ */
+
+/** @type {string} Name of the world spell this spec edits. */
+const SPELL_NAME = 'E2E Condition Aspects';
+
+/** @type {import('@playwright/test').Page} The file-shared, logged-in page (one world boot per file). */
+let page;
+/** @type {string[]} Uncaught page errors collected during the current test (cleared each afterEach). */
+let errors;
+
+test.beforeAll(async ({ browser }) => {
+   page = await browser.newPage();
+   errors = attachPageErrors(page);
+   await login(page);
+});
+
+test.beforeEach(async () => {
+   // Rebuild the spell with both condition aspects enabled and no condition chosen, and open its Standard Aspects tab.
+   await page.evaluate(async (name) => {
+      await game.items.getName(name)?.delete();
+
+      /** @type {TitanItem} The rebuilt spell. */
+      const item = await Item.create({
+         name,
+         type: 'spell',
+         system: {
+            aspect: [
+               {
+                  cost: 0,
+                  enabled: true,
+                  label: 'inflictCondition',
+                  option: [],
+                  resistanceCheck: 'none',
+               },
+               {
+                  allOptions: false,
+                  cost: 0,
+                  enabled: true,
+                  label: 'removeCondition',
+                  option: [],
+               },
+            ],
+         },
+      });
+
+      /** @type {TitanItemSheet} The rendered spell sheet. */
+      const app = await item.sheet.render(true);
+      await titanWait(
+         () => !!app?.element?.querySelector('.window-content')?.children.length,
+         { message: 'sheet mounted' },
+      );
+   }, SPELL_NAME);
+
+   /** @type {string} The localized Standard Aspects tab label. */
+   const label = await page.evaluate(() => game.i18n.localize('LOCAL.standardAspects.text'));
+   await openSheetTab(page, label);
+   await expect(sheet().getByTestId('spell-aspect-option-inflictCondition-offBalance')).toBeVisible();
+});
+
+test.afterEach(async () => {
+   await closeAllApps(page);
+   expect(errors, `uncaught page errors:\n${errors.join('\n')}`).toEqual([]);
+   errors.length = 0;
+});
+
+test.afterAll(async () => {
+   await page.evaluate((name) => game.items.getName(name)?.delete(), SPELL_NAME);
+   await page?.close();
+});
+
+/**
+ * Locates the open spell sheet.
+ * @returns {import('@playwright/test').Locator} The sheet window.
+ */
+function sheet() {
+   return page.locator('.application.titan-document-sheet');
+}
+
+/**
+ * Reads one of the spell's aspects: its derived cost and its chosen options.
+ * @param {number} index - The aspect's index.
+ * @returns {Promise<{cost: number, option: string[]}>} The aspect's cost and options.
+ */
+function readAspect(index) {
+   return page.evaluate(({ name, aspectIndex }) => {
+      /** @type {object} The aspect. */
+      const aspect = game.items.getName(name).system.aspect[aspectIndex];
+      return {
+         cost: aspect.cost,
+         option: [...aspect.option],
+      };
+   }, {
+      aspectIndex: index,
+      name: SPELL_NAME,
+   });
+}
+
+for (const [label, index, cost] of [
+   [
+      'inflictCondition',
+      0,
+      3,
+   ],
+   [
+      'removeCondition',
+      1,
+      2,
+   ],
+]) {
+   test(`the ${label} aspect offers Off-Balance and prices it at ${cost}`, async () => {
+      /** @type {import('@playwright/test').Locator} The Off-Balance option toggle. */
+      const toggle = sheet().getByTestId(`spell-aspect-option-${label}-offBalance`);
+
+      /** @type {string} The localized Off-Balance name. */
+      const offBalance = await page.evaluate(() => game.i18n.localize('LOCAL.offBalance.text'));
+      await expect(toggle).toContainText(offBalance);
+      await expect(toggle).toHaveClass(/(^|\s)not-enabled(\s|$)/);
+
+      await toggle.locator('button').click();
+      await expect.poll(() => readAspect(index), { message: 'Off-Balance is stored and priced' }).toEqual({
+         cost,
+         option: ['offBalance'],
+      });
+      await expect(toggle).toHaveClass(/(^|\s)enabled(\s|$)/);
+   });
+}
+```
+
+- [ ] **Step 14: Lint, full unit suite, build, e2e**
+
+Run: `npm run eslint` → 0 errors; `npm run stylelint` → 0 errors; `npm test` → all pass; `npm run build` → succeeds;
 `npm run test:e2e -- tests/e2e/logic/conditions.spec.js tests/e2e/integration-manifest.spec.js
-tests/e2e/player-hud-effects-panel.spec.js` → all pass.
+tests/e2e/player-hud-effects-panel.spec.js tests/e2e/spell-aspect-conditions.spec.js tests/e2e/reactive-spell.spec.js
+tests/e2e/spell-rules-regressions.spec.js` → all pass.
 
-- [ ] **Step 10: Commit**
+- [ ] **Step 15: Commit**
 
 ```bash
 git branch --show-current
 git status --short
 git add src/system/Conditions.js lang/en.json CHANGELOG.md tests/unit/ConditionDefinitions.test.js \
-   tests/unit/ConditionMechanics.test.js tests/e2e/logic/conditions.spec.js tests/e2e/integration-manifest.spec.js
+   tests/unit/ConditionMechanics.test.js tests/e2e/logic/conditions.spec.js tests/e2e/integration-manifest.spec.js \
+   src/document/types/item/types/spell/SpellAspects.js \
+   src/document/types/item/types/spell/sheet/SpellSheetStandardAspectSettings.svelte \
+   tests/unit/SpellAspectConditions.test.js tests/e2e/spell-aspect-conditions.spec.js
 git commit -F - <<'EOF'
 feat(conditions): quarter-of-base penalties and the Off-Balance condition
 
@@ -1524,6 +1844,9 @@ Blinded, Contaminated, Prone, Restrained, and Stunned apply mulBase 0.75
 rounded up (the 09_26 "-1/4 of base value, rounded up"); Off-Balance joins
 with the daze icon. The integration manifest reads the condition ids from
 Conditions.js instead of a hand list.
+
+Spells can inflict Off-Balance (cost 3) and remove it (cost 2); a guard
+test pins both spell-aspect condition lists to the condition definitions.
 
 Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
 Claude-Session: https://claude.ai/code/session_01SPVZ3AXCPn5Bo41aemiJZc
@@ -1534,7 +1857,7 @@ EOF
 
 ### Task 3: Stat breakdowns list every modifier bucket, conditions included
 
-Bug fix (logged as `docs/CLOSED_BUGS.md` #75 in Task 14): no stat breakdown tooltip (sheet attributes, resistances,
+Bug fix (logged as `docs/CLOSED_BUGS.md` #75 in Task 16): no stat breakdown tooltip (sheet attributes, resistances,
 ratings, resources, speeds, mods, skill Training/Expertise, Player HUD bars) lists condition modifiers, and the Speed
 and Mod rows omit Abilities, because each call site hand-passes per-bucket props.
 
@@ -2819,7 +3142,7 @@ EOF
 
 ### Task 5: Condition-effect sync migration and the Migration Mode fix
 
-Bug fix (logged as `docs/CLOSED_BUGS.md` #74 in Task 14): Migration Mode "Disabled" ran `migrateWorld()` (the `else`
+Bug fix (logged as `docs/CLOSED_BUGS.md` #74 in Task 16): Migration Mode "Disabled" ran `migrateWorld()` (the `else`
 branch of `onceReady`), contradicting its hint "Disabled: skips migration entirely".
 
 **Files:**
@@ -6234,7 +6557,810 @@ EOF
 
 ---
 
-### Task 10: Targeting, distance, and target-condition helpers
+### Task 10: Suppressed conditions and effects are marked on the sheet and the Player HUD
+
+User ruling 2 (2026-09-29): a condition or effect suppressed by an immunity shows a "Suppressed: <immunity source>"
+tag and a muted row on the character sheet's effect rows and the Player HUD effects panel entries. The sheet lists
+only `effect`-subtype rows; the HUD's icon tray dims the icon and tags its popout (resolutions 19 and 20).
+
+**Files:**
+- Create: `src/helpers/svelte-components/tag/effects/SuppressedEffectTag.svelte`
+- Modify: `src/document/types/active-effect/IsSuppressedByImmunity.js`, `src/system/Icons.js`,
+  `src/document/types/actor/types/character/sheet/items/CharacterSheetItem.svelte`,
+  `src/document/types/actor/types/character/sheet/items/effect/CharacterSheetEffect.svelte`,
+  `src/ui/player-hud/elements/effects-panel/EffectsListRow.svelte`,
+  `src/ui/player-hud/elements/effects-panel/EffectsIconTray.svelte`,
+  `src/ui/player-hud/elements/effects-panel/EffectsDetailPopout.svelte`, `lang/en.json`, `CHANGELOG.md`
+- Test: `tests/unit/Immunity.test.js` (extend), `tests/unit/SuppressedEffectTag.test.js` (create),
+  `tests/e2e/immunity-display.spec.js` (create)
+
+**Interfaces:**
+- Consumes: `CharacterDataModel#getImmunitySources(effect)`, `ImmunitySource`, and `isSuppressedByImmunity` (Task 9).
+- Produces: `getSuppressingImmunitySources(effect?): ImmunitySource[]` (named export of `IsSuppressedByImmunity.js`;
+  `[]` for a missing effect or a non-Character parent), to which `isSuppressedByImmunity` now delegates;
+  `SUPPRESSED_ICON = 'fas fa-ban'` (`src/system/Icons.js`); `SuppressedEffectTag.svelte` props
+  `{ sources: string[], testId?: string }` (always renders; callers mount it only for a non-empty list);
+  `CharacterSheetItem` prop `muted?: boolean` (dims the header's image and name); `EffectsDetailPopout` prop
+  `suppressingSources?: string[]`; `data-effect-id` on HUD list rows and tray icons; test ids
+  `character-sheet-effect-suppressed-tag`, `player-hud-effect-suppressed-tag`,
+  `player-hud-effect-popout-suppressed-tag`; LOCAL keys `suppressedBy.text` ("Suppressed: {sources}") and
+  `suppressedBy.desc.text`.
+
+- [ ] **Step 1: Write the failing tests**
+
+In `tests/unit/Immunity.test.js`, replace the import line
+
+```js
+import isSuppressedByImmunity from '~/document/types/active-effect/IsSuppressedByImmunity.js';
+```
+
+with
+
+```js
+import isSuppressedByImmunity, {
+   getSuppressingImmunitySources,
+} from '~/document/types/active-effect/IsSuppressedByImmunity.js';
+```
+
+and append after the `describe('suppression', ...)` block:
+
+```js
+describe('getSuppressingImmunitySources', () => {
+   it('names an effect\'s suppressing sources; none when unsuppressed, missing, or not on a Character', () => {
+      /** @type {object} The Blinded effect. */
+      const blinded = conditionEffect('blinded');
+
+      /** @type {object} The Prone effect. */
+      const prone = conditionEffect('prone');
+      createCharacter({
+         effects: [
+            blinded,
+            prone,
+         ],
+         items: [item('ward', [immunity('condition', 'blinded')])],
+      }).prepareBaseData();
+
+      expect(getSuppressingImmunitySources(blinded)).toEqual([
+         {
+            id: 'ward',
+            name: 'ward name',
+         },
+      ]);
+      expect(getSuppressingImmunitySources(prone)).toEqual([]);
+      expect(getSuppressingImmunitySources(undefined)).toEqual([]);
+      expect(getSuppressingImmunitySources({
+         parent: { system: { isCharacter: false } },
+         statuses: new Set(['blinded']),
+         type: 'condition',
+      })).toEqual([]);
+   });
+
+   it('never names the effect granting the immunity as suppressing itself', () => {
+      /** @type {object} The self-naming ward. */
+      const ward = activeEffect({
+         id: 'wardEffect',
+         name: 'Ward',
+         rulesElement: [immunity('effect', 'Ward')],
+         type: 'effect',
+      });
+      createCharacter({ effects: [ward] }).prepareBaseData();
+      expect(getSuppressingImmunitySources(ward)).toEqual([]);
+   });
+});
+```
+
+Create `tests/unit/SuppressedEffectTag.test.js`:
+
+```js
+import { beforeEach, describe, it, expect } from 'vitest';
+import { render, screen } from '@testing-library/svelte';
+import SuppressedEffectTag from '~/helpers/svelte-components/tag/effects/SuppressedEffectTag.svelte';
+
+describe('SuppressedEffectTag', () => {
+   beforeEach(() => {
+      // The label and the tooltip route through game.i18n; echo the key and the formatted sources.
+      globalThis.game = {
+         i18n: {
+            format: (key, data) => `${key} ${data.sources}`,
+            localize: (key) => key,
+         },
+      };
+   });
+
+   it('names every suppressing immunity in one label', () => {
+      render(SuppressedEffectTag, {
+         props: {
+            sources: [
+               'Ward',
+               'Charm',
+            ],
+            testId: 'suppressed-tag',
+         },
+      });
+      expect(screen.getByTestId('suppressed-tag').textContent).toContain('LOCAL.suppressedBy.text Ward, Charm');
+   });
+
+   it('draws the suppressed icon', () => {
+      render(SuppressedEffectTag, {
+         props: {
+            sources: ['Ward'],
+            testId: 'suppressed-tag',
+         },
+      });
+      expect(screen.getByTestId('suppressed-tag').querySelector('i').classList.contains('fa-ban')).toBe(true);
+   });
+});
+```
+
+- [ ] **Step 2: Run the tests to verify they fail**
+
+Run: `npx vitest run tests/unit/Immunity.test.js tests/unit/SuppressedEffectTag.test.js`
+Expected: FAIL — `getSuppressingImmunitySources` is not exported, and `SuppressedEffectTag.svelte` does not exist.
+
+- [ ] **Step 3: Share the suppressing sources and add the tag**
+
+Replace the whole of `src/document/types/active-effect/IsSuppressedByImmunity.js` with:
+
+```js
+/**
+ * Gets the immunities suppressing an Active Effect: the sources of its Character's immunities to it. A suppressed
+ * effect is inactive (core leaves it out of `actor.statuses`) and its rules elements stop applying; it returns
+ * untouched when the immunity ends. The sheet's effect rows and the Player HUD effects panel name these sources.
+ * @param {TitanActiveEffect} [effect] - The Active Effect; undefined in a row's mid-deletion frame.
+ * @returns {ImmunitySource[]} The sources suppressing it, each once; empty when the effect is missing, its parent
+ * is not a Character, or the Character is not immune to it.
+ */
+export function getSuppressingImmunitySources(effect) {
+   /** @type {object|undefined} The owning document's system data. */
+   const system = effect?.parent?.system;
+   if (!system?.isCharacter) {
+      return [];
+   }
+   return system.getImmunitySources(effect);
+}
+
+/**
+ * Decides whether an Active Effect is suppressed by its Character's immunities. Core's
+ * `ActiveEffect#isSuppressed` returns `!!(this.system.isSuppressed ?? this.duration.expired)`, so returning undefined
+ * when not immune leaves core's expiry test in charge.
+ * @param {TitanActiveEffect} effect - The Active Effect.
+ * @returns {true|undefined} True while the effect's Character is immune to it; otherwise undefined.
+ */
+export default function isSuppressedByImmunity(effect) {
+   return getSuppressingImmunitySources(effect).length > 0 ? true : undefined;
+}
+```
+
+In `src/system/Icons.js`, insert after `export const STAMINA_ICON = 'fas fa-heart';`:
+
+```js
+export const SUPPRESSED_ICON = 'fas fa-ban';
+```
+
+Create `src/helpers/svelte-components/tag/effects/SuppressedEffectTag.svelte`:
+
+```svelte
+<script>
+   import IconTag from '~/helpers/svelte-components/tag/IconTag.svelte';
+   import { SUPPRESSED_ICON } from '~/system/Icons.js';
+
+   /**
+    * @typedef {object} SuppressedEffectTagProps
+    * @property {string[]} [sources] - The names of the immunities suppressing the effect, in source order.
+    * @property {string} [testId] - Optional test identifier bound to `data-testid` on the tag.
+    */
+
+   /** @type {SuppressedEffectTagProps} */
+   const { sources = [], testId = void 0 } = $props();
+
+   /** @type {string} The tag's label naming every suppressing immunity ("Suppressed: Ward, Charm"). */
+   const label = $derived(game.i18n.format('LOCAL.suppressedBy.text', { sources: sources.join(', ') }));
+</script>
+
+<!--Names the immunities suppressing an effect; callers mount it only while that list is non-empty.-->
+<IconTag
+   icon={SUPPRESSED_ICON}
+   {label}
+   {testId}
+   tooltip={'suppressedBy.desc'}
+/>
+```
+
+In `lang/en.json` (`LOCAL`), insert in alphabetical key order:
+
+```json
+      "suppressedBy.desc.text": "<p>An immunity suppresses this effect: it stays on the character but applies nothing until the immunity ends.</p>",
+      "suppressedBy.text": "Suppressed: {sources}",
+```
+
+- [ ] **Step 4: Run the unit tests to verify they pass**
+
+Run: `npx vitest run tests/unit/Immunity.test.js tests/unit/SuppressedEffectTag.test.js`
+Expected: PASS.
+
+- [ ] **Step 5: Mark suppressed rows on the character sheet**
+
+In `src/document/types/actor/types/character/sheet/items/CharacterSheetItem.svelte`:
+(a) in the `CharacterSheetItemProps` typedef, add after the `isExpanded` property:
+
+```js
+    * @property {boolean} [muted] Whether the header's image and name are dimmed (the row applies nothing, e.g. an
+    * effect suppressed by an immunity).
+```
+
+(b) replace the props line with:
+
+```js
+   let { isExpanded = $bindable(undefined), muted = false, controls, children } = $props();
+```
+
+(c) replace `<div class="item">` with `<div class="item" class:muted>`;
+(d) in the `<style>` block, add as the last rule inside `.item { ... }` (after the `.expandable-content` rule):
+
+```scss
+
+      // A muted row dims its image and name; its controls stay legible.
+      &.muted .header .label {
+         opacity: 0.5;
+      }
+```
+
+In `src/document/types/actor/types/character/sheet/items/effect/CharacterSheetEffect.svelte`:
+(a) add after the two-line `CharacterSheetEffectChecks` import (before the `Icons.js` import):
+
+```js
+   import SuppressedEffectTag from '~/helpers/svelte-components/tag/effects/SuppressedEffectTag.svelte';
+   import { getSuppressingImmunitySources } from '~/document/types/active-effect/IsSuppressedByImmunity.js';
+```
+
+(b) add after the `checkLength` derived:
+
+```js
+
+   /**
+    * The names of the immunities suppressing this effect; empty while nothing suppresses it. Reading the embedded
+    * bridge subscribes to the actor's update and embedded-document hooks, so a ward added or removed re-derives it.
+    * @type {string[]}
+    */
+   const suppressingSources = $derived(
+      getSuppressingImmunitySources(document.data).map((source) => source.name),
+   );
+```
+
+(c) replace `<CharacterSheetItem bind:isExpanded>` with:
+
+```svelte
+<CharacterSheetItem
+   bind:isExpanded
+   muted={suppressingSources.length > 0}
+>
+```
+
+(d) insert at the top of the `{#snippet controls()}` body, before `<!--Duration-->`:
+
+```svelte
+      <!--Suppressed tag (an immunity suppresses this effect)-->
+      {#if suppressingSources.length > 0}
+         <div class="suppressed-tag">
+            <SuppressedEffectTag
+               sources={suppressingSources}
+               testId="character-sheet-effect-suppressed-tag"
+            />
+         </div>
+      {/if}
+
+```
+
+(e) add to the `<style>` block, after the `.button:not(:first-child)` rule:
+
+```scss
+
+   .suppressed-tag {
+      @include margin-right-standard;
+   }
+```
+
+- [ ] **Step 6: Mark suppressed entries in the Player HUD effects panel**
+
+In `src/ui/player-hud/elements/effects-panel/EffectsListRow.svelte`:
+(a) add after the `EffectsDetailBody` import:
+
+```js
+   import SuppressedEffectTag from '~/helpers/svelte-components/tag/effects/SuppressedEffectTag.svelte';
+   import { getSuppressingImmunitySources } from '~/document/types/active-effect/IsSuppressedByImmunity.js';
+```
+
+(b) replace the stale comment `/** @type {boolean} Whether this entry is a full effect (vs an inert condition). */`
+with `/** @type {boolean} Whether this entry is an effect (vs a condition, which carries no duration). */`;
+(c) add after the `durationRemaining` derived:
+
+```js
+
+   /**
+    * The names of the immunities suppressing this entry; empty while nothing suppresses it. Reading the embedded
+    * bridge subscribes to the actor's update and embedded-document hooks, so a ward added or removed re-derives it.
+    * @type {string[]}
+    */
+   const suppressingSources = $derived(
+      getSuppressingImmunitySources(document.data).map((source) => source.name),
+   );
+```
+
+(d) replace the root element's opening tag
+
+```svelte
+<div
+   class="row"
+   class:expanded={isExpanded}
+   data-testid="player-hud-effect-row"
+>
+```
+
+with
+
+```svelte
+<div
+   class="row"
+   class:expanded={isExpanded}
+   class:suppressed={suppressingSources.length > 0}
+   data-effect-id={document.data?.id}
+   data-testid="player-hud-effect-row"
+>
+```
+
+(e) insert between `</HudButton>` and `{#if isExpanded}`:
+
+```svelte
+
+   <!--Suppressed tag (an immunity suppresses this entry)-->
+   {#if suppressingSources.length > 0}
+      <div class="suppressed-tag">
+         <SuppressedEffectTag
+            sources={suppressingSources}
+            testId="player-hud-effect-suppressed-tag"
+         />
+      </div>
+   {/if}
+```
+
+(f) add inside the `.row { ... }` style rule, after the `.detail` rule:
+
+```scss
+
+      // A suppressed entry dims its icon and name; its tag names the immunity.
+      &.suppressed {
+         .icon,
+         .name {
+            opacity: 0.5;
+         }
+      }
+
+      .suppressed-tag {
+         @include margin-top-standard;
+
+         width: 100%;
+      }
+```
+
+In `src/ui/player-hud/elements/effects-panel/EffectsIconTray.svelte`:
+(a) add after the `EffectsDetailPopout` import:
+
+```js
+   import { getSuppressingImmunitySources } from '~/document/types/active-effect/IsSuppressedByImmunity.js';
+```
+
+(b) add after the `entries` derived:
+
+```js
+
+   /**
+    * The names of the immunities suppressing each suppressed entry, keyed by effect id. It re-derives with
+    * `entries`, whose source arrays the panel derives from the actor bridge, so any actor or embedded-document change
+    * refreshes it.
+    * @type {Map<string, string[]>}
+    */
+   const suppressingSources = $derived(new Map(entries
+      .map((effect) => [
+         effect.id,
+         getSuppressingImmunitySources(effect).map((source) => source.name),
+      ])
+      .filter(([, names]) => names.length > 0)));
+```
+
+(c) replace the icon button's opening tag
+
+```svelte
+      <button
+         class="grid-icon"
+         type="button"
+         title={effect.name}
+         aria-label={effect.name}
+         data-testid="player-hud-effect-icon"
+         onclick={(event) => select(effect, event)}
+      >
+```
+
+with
+
+```svelte
+      <button
+         class="grid-icon"
+         class:suppressed={suppressingSources.has(effect.id)}
+         type="button"
+         title={effect.name}
+         aria-label={effect.name}
+         data-effect-id={effect.id}
+         data-testid="player-hud-effect-icon"
+         onclick={(event) => select(effect, event)}
+      >
+```
+
+(d) replace the popout mount
+
+```svelte
+   <EffectsDetailPopout
+      effect={selected}
+      {anchor}
+      {layoutState}
+      onClose={() => selectedId = null}
+   />
+```
+
+with
+
+```svelte
+   <EffectsDetailPopout
+      effect={selected}
+      {anchor}
+      {layoutState}
+      onClose={() => selectedId = null}
+      suppressingSources={suppressingSources.get(selected.id) ?? []}
+   />
+```
+
+(e) add inside the `.grid-icon { ... }` style rule, after the `.badge` rule:
+
+```scss
+
+         // A suppressed entry's icon is dimmed; its popout names the immunity.
+         &.suppressed img {
+            opacity: 0.5;
+         }
+```
+
+In `src/ui/player-hud/elements/effects-panel/EffectsDetailPopout.svelte`:
+(a) add after the `EffectsDetailBody` import:
+
+```js
+   import SuppressedEffectTag from '~/helpers/svelte-components/tag/effects/SuppressedEffectTag.svelte';
+```
+
+(b) in the `EffectsDetailPopoutProps` typedef, add after `onClose`:
+
+```js
+    * @property {string[]} [suppressingSources] - The names of the immunities suppressing the effect; empty when none
+    * does.
+```
+
+(c) replace the props line with:
+
+```js
+   const { effect, anchor, layoutState, onClose, suppressingSources = [] } = $props();
+```
+
+(d) insert between the title `</div>` and `<EmbeddedDocumentProvider doc={effect}>`:
+
+```svelte
+   {#if suppressingSources.length > 0}
+      <div class="suppressed-tag">
+         <SuppressedEffectTag
+            sources={suppressingSources}
+            testId="player-hud-effect-popout-suppressed-tag"
+         />
+      </div>
+   {/if}
+```
+
+(e) add inside the `.popout { ... }` style rule, after the `.title` rule:
+
+```scss
+
+      .suppressed-tag {
+         @include margin-top-standard;
+
+         width: 100%;
+      }
+```
+
+In `CHANGELOG.md`, append to the `## Unreleased:` list:
+
+```markdown
+- A condition or effect suppressed by an immunity shows a "Suppressed" tag naming the immunity, and a dimmed row, on
+  the character sheet and in the Player HUD effects panel.
+```
+
+- [ ] **Step 7: Write the display e2e**
+
+Create `tests/e2e/immunity-display.spec.js`:
+
+```js
+import { expect, test } from '@playwright/test';
+import { login, openSheetTab } from './fixtures.js';
+import {
+   attachPageErrors,
+   closeAllApps,
+   controlFixtureActorToken,
+   deleteFixtureActor,
+   deleteOrphanedTokens,
+} from './world.js';
+
+/**
+ * A condition or effect suppressed by an immunity shows a "Suppressed: <source>" tag and a dimmed row on the character
+ * sheet's effect rows and in the Player HUD effects panel (list rows; the icon tray dims the icon and tags the
+ * popout), and loses both when the immunity ends.
+ */
+
+/** @type {string} Name of the throwaway player actor seeded for this spec. */
+const ACTOR_NAME = 'E2E Immunity Display Actor';
+
+/** @type {string} Name of the Active Effect granting the immunity. */
+const WARD_NAME = 'E2E Immunity Display Ward';
+
+/** @type {string} Name of the effect the effect immunity suppresses. */
+const BLADE_NAME = 'E2E Poisoned Blade';
+
+/** @type {import('@playwright/test').Page} The file-shared, logged-in page (one world boot per file). */
+let page;
+/** @type {string[]} Uncaught page errors collected during the current test (cleared each afterEach). */
+let errors;
+
+test.beforeAll(async ({ browser }) => {
+   page = await browser.newPage();
+   errors = attachPageErrors(page);
+   await login(page);
+   await deleteOrphanedTokens(page);
+   await deleteFixtureActor(page, ACTOR_NAME);
+   await page.evaluate(async (name) => {
+      await Actor.create({
+         name,
+         type: 'player',
+      });
+   }, ACTOR_NAME);
+   await controlFixtureActorToken(page, {
+      actorName: ACTOR_NAME,
+      fallbackSceneName: 'E2E Player HUD Scene',
+   });
+});
+
+test.beforeEach(async () => {
+   // Each test starts with no Active Effects on the actor, its token controlled, and the list-style effects panel.
+   await page.evaluate(async (name) => {
+      await game.settings.set('titan', 'playerHudOptions', {});
+
+      /** @type {TitanActor} The fixture actor. */
+      const actor = game.actors.getName(name);
+      await actor.deleteEmbeddedDocuments('ActiveEffect', actor.effects.map((effect) => effect.id));
+      canvas.tokens.placeables.find((placeable) => placeable.actor?.id === actor.id)?.control({ releaseOthers: true });
+      game.titan.playerHud?.refresh();
+   }, ACTOR_NAME);
+});
+
+test.afterEach(async () => {
+   await closeAllApps(page);
+   expect(errors, `uncaught page errors:\n${errors.join('\n')}`).toEqual([]);
+   errors.length = 0;
+});
+
+test.afterAll(async () => {
+   await page.evaluate(async () => {
+      await game.settings.set('titan', 'playerHudOptions', {});
+   });
+   await deleteFixtureActor(page, ACTOR_NAME);
+   await page?.close();
+});
+
+/**
+ * Creates an Active Effect on the fixture actor.
+ * @param {object} data - The effect's creation data.
+ * @returns {Promise<string>} The created effect's id.
+ */
+function createEffect(data) {
+   return page.evaluate(async ({ name, effectData }) => {
+      const [effect] = await game.actors.getName(name).createEmbeddedDocuments('ActiveEffect', [effectData]);
+      return effect.id;
+   }, {
+      effectData: data,
+      name: ACTOR_NAME,
+   });
+}
+
+/**
+ * Adds the permanent ward effect granting one immunity.
+ * @param {string} selector - 'condition' or 'effect'.
+ * @param {string} key - The condition id or effect name.
+ * @returns {Promise<string>} The ward's id.
+ */
+function addWard(selector, key) {
+   return createEffect({
+      name: WARD_NAME,
+      system: {
+         duration: { type: 'permanent' },
+         rulesElement: [
+            {
+               key,
+               operation: 'immunity',
+               selector,
+               uuid: 'e2e-immunity-display-ward',
+            },
+         ],
+      },
+      type: 'effect',
+   });
+}
+
+/**
+ * Deletes the ward, ending the immunity.
+ * @returns {Promise<void>} Resolves once the ward is deleted.
+ */
+async function removeWard() {
+   await page.evaluate(async ({ name, wardName }) => {
+      await game.actors.getName(name).effects.getName(wardName).delete();
+   }, {
+      name: ACTOR_NAME,
+      wardName: WARD_NAME,
+   });
+}
+
+/**
+ * Applies Contaminated to the fixture actor.
+ * @returns {Promise<string>} The Contaminated effect's id.
+ */
+function applyContaminated() {
+   return page.evaluate(async (name) => {
+      /** @type {TitanActor} The fixture actor. */
+      const actor = game.actors.getName(name);
+      await actor.toggleStatusEffect('contaminated', { active: true });
+      return actor.effects.find((effect) => effect.statuses.has('contaminated')).id;
+   }, ACTOR_NAME);
+}
+
+/**
+ * Reads an element's computed opacity.
+ * @param {import('@playwright/test').Locator} locator - The element.
+ * @returns {Promise<string>} Its computed `opacity`.
+ */
+function readOpacity(locator) {
+   return locator.evaluate((element) => getComputedStyle(element).opacity);
+}
+
+test('a suppressed effect row on the sheet is tagged and dimmed until the immunity ends', async () => {
+   /** @type {string} The blade effect's id. */
+   const bladeId = await createEffect({
+      name: BLADE_NAME,
+      system: { duration: { type: 'permanent' } },
+      type: 'effect',
+   });
+   await page.evaluate(async (name) => {
+      /** @type {TitanActorSheet} The rendered actor sheet. */
+      const app = await game.actors.getName(name).sheet.render(true);
+      await titanWait(
+         () => !!app?.element?.querySelector('.window-content')?.children.length,
+         { message: 'sheet mounted' },
+      );
+   }, ACTOR_NAME);
+   await openSheetTab(page, await page.evaluate(() => game.i18n.localize('LOCAL.effects.text')));
+
+   /** @type {import('@playwright/test').Locator} The blade's effect row. */
+   const row = page.locator(`.application.titan-document-sheet li.effect[data-effect-id="${bladeId}"]`);
+   /** @type {import('@playwright/test').Locator} The row's image and name. */
+   const label = row.locator('.item > .header > .label');
+   /** @type {import('@playwright/test').Locator} The row's suppressed tag. */
+   const tag = row.getByTestId('character-sheet-effect-suppressed-tag');
+   await expect(row).toBeVisible();
+
+   /** @type {string} The ward's id. */
+   const wardId = await addWard('effect', BLADE_NAME);
+   await expect(tag).toContainText(WARD_NAME);
+   await expect.poll(() => readOpacity(label), { message: 'the suppressed row is dimmed' }).toBe('0.5');
+
+   // The ward's row rendered in the same pass as the blade's tag; the ward never suppresses itself.
+   /** @type {import('@playwright/test').Locator} The ward's effect row. */
+   const wardRow = page.locator(`.application.titan-document-sheet li.effect[data-effect-id="${wardId}"]`);
+   await expect(wardRow).toBeVisible();
+   await expect(wardRow.getByTestId('character-sheet-effect-suppressed-tag')).toHaveCount(0);
+
+   await removeWard();
+   await expect(tag).toHaveCount(0);
+   await expect.poll(() => readOpacity(label), { message: 'the row is no longer dimmed' }).toBe('1');
+});
+
+test('a suppressed condition in the HUD list is tagged and dimmed until the immunity ends', async () => {
+   /** @type {string} The Contaminated effect's id. */
+   const conditionId = await applyContaminated();
+
+   /** @type {import('@playwright/test').Locator} The Contaminated row. */
+   const row = page.locator(`[data-testid="player-hud-effect-row"][data-effect-id="${conditionId}"]`);
+   /** @type {import('@playwright/test').Locator} The row's name. */
+   const name = row.locator('.name');
+   /** @type {import('@playwright/test').Locator} The row's suppressed tag. */
+   const tag = row.getByTestId('player-hud-effect-suppressed-tag');
+   await expect(row).toBeVisible();
+
+   await addWard('condition', 'contaminated');
+   await expect(tag).toContainText(WARD_NAME);
+   await expect.poll(() => readOpacity(name), { message: 'the suppressed row is dimmed' }).toBe('0.5');
+
+   await removeWard();
+   await expect(tag).toHaveCount(0);
+   await expect.poll(() => readOpacity(name), { message: 'the row is no longer dimmed' }).toBe('1');
+});
+
+test('a suppressed condition in the HUD tray is dimmed and its popout tagged until the immunity ends', async () => {
+   /** @type {string} The Contaminated effect's id. */
+   const conditionId = await applyContaminated();
+   await page.evaluate(async () => {
+      await game.settings.set('titan', 'playerHudOptions', { effectsPanel: { style: 'tray' } });
+   });
+
+   /** @type {import('@playwright/test').Locator} The Contaminated icon. */
+   const icon = page.locator(`[data-testid="player-hud-effect-icon"][data-effect-id="${conditionId}"]`);
+   /** @type {import('@playwright/test').Locator} The icon's image. */
+   const image = icon.locator('img');
+   await expect(icon).toBeVisible();
+
+   await addWard('condition', 'contaminated');
+   await expect.poll(() => readOpacity(image), { message: 'the suppressed icon is dimmed' }).toBe('0.5');
+   await icon.click();
+
+   /** @type {import('@playwright/test').Locator} The popout's suppressed tag. */
+   const tag = page.getByTestId('player-hud-effect-popout-suppressed-tag');
+   await expect(tag).toContainText(WARD_NAME);
+
+   await removeWard();
+   await expect(tag).toHaveCount(0);
+   await expect.poll(() => readOpacity(image), { message: 'the icon is no longer dimmed' }).toBe('1');
+
+   await page.keyboard.press('Escape');
+   await expect(page.getByTestId('player-hud-effect-popout')).toHaveCount(0);
+});
+```
+
+- [ ] **Step 8: Lint, full unit suite, build, e2e**
+
+Run: `npm run eslint` → 0 errors; `npm run stylelint` → 0 errors; `npm test` → all pass; `npm run build` → succeeds;
+`npm run test:e2e -- tests/e2e/immunity-display.spec.js tests/e2e/immunity.spec.js
+tests/e2e/player-hud-effects-panel.spec.js tests/e2e/reactive-effect-rows.spec.js tests/e2e/localization.spec.js` →
+all pass.
+
+- [ ] **Step 9: Commit**
+
+```bash
+git branch --show-current
+git status --short
+git add src/helpers/svelte-components/tag/effects/SuppressedEffectTag.svelte \
+   src/document/types/active-effect/IsSuppressedByImmunity.js src/system/Icons.js \
+   src/document/types/actor/types/character/sheet/items/CharacterSheetItem.svelte \
+   src/document/types/actor/types/character/sheet/items/effect/CharacterSheetEffect.svelte \
+   src/ui/player-hud/elements/effects-panel/EffectsListRow.svelte \
+   src/ui/player-hud/elements/effects-panel/EffectsIconTray.svelte \
+   src/ui/player-hud/elements/effects-panel/EffectsDetailPopout.svelte lang/en.json CHANGELOG.md \
+   tests/unit/Immunity.test.js tests/unit/SuppressedEffectTag.test.js tests/e2e/immunity-display.spec.js
+git commit -F - <<'EOF'
+feat(immunity): tag and dim suppressed conditions and effects
+
+The sheet's effect rows and the Player HUD effects panel (list rows, and
+the tray's icon and popout) show "Suppressed: <sources>" and dim the entry
+while an immunity suppresses it, read from getSuppressingImmunitySources,
+which isSuppressedByImmunity now shares.
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+Claude-Session: https://claude.ai/code/session_01SPVZ3AXCPn5Bo41aemiJZc
+EOF
+```
+
+---
+
+### Task 11: Targeting, distance, and target-condition helpers
 
 **Files:**
 - Create: `src/helpers/utility-functions/GetTargetedCharacterTokens.js`,
@@ -6997,7 +8123,7 @@ EOF
 
 ---
 
-### Task 11: Target-aware attack checks (options, parameters, dialog, card)
+### Task 12: Target-aware attack checks (options, parameters, dialog, card)
 
 **Files:**
 - Create: `src/check/types/attack-check/dialog/AttackCheckDialogTargetConditionsField.svelte`,
@@ -7011,7 +8137,7 @@ EOF
   `tests/unit/CharacterCheckModifiers.test.js`, `tests/e2e/target-conditions.spec.js` (create)
 
 **Interfaces:**
-- Consumes: Task 10's helpers.
+- Consumes: Task 11's helpers.
 - Produces: `AttackCheckOptions.targetConditions: TargetConditionModifier[]` (both ratings and the Difficulty; default
   `[]` from `createAttackCheckOptions`, derived from the target in `initializeAttackCheckOptions` when the caller
   omits it); `AttackCheckParameters.targetConditions: TargetConditionModifier[]` (the attack's rating and the
@@ -8067,7 +9193,7 @@ EOF
 ```
 
 ---
-### Task 12: Unconscious applies Prone and Incapacitated and drops held gear
+### Task 13: Unconscious applies Prone and Incapacitated and drops held gear
 
 **Files:**
 - Modify: `src/system/Conditions.js`, `src/document/types/actor/types/character/CharacterDataModel.js`,
@@ -8580,7 +9706,7 @@ EOF
 
 ---
 
-### Task 13: Rules journal typos (compendium module)
+### Task 14: Rules journal typos (compendium module)
 
 Works in `C:\FoundryVTT\V14\dev\foundryuserdata\Data\modules\titan-vttrpg-compendium`. `packs/**` there is the live
 LevelDB that Foundry holds open: never stage, revert, or compile into it while Foundry runs.
@@ -8667,21 +9793,308 @@ Claude-Session: https://claude.ai/code/session_01SPVZ3AXCPn5Bo41aemiJZc
 EOF
 ```
 
-- [ ] **Step 5: Controller checkpoint — live packs**
+- [ ] **Step 5: Controller checkpoint — live packs (runs after Task 15's commit)**
 
-The live `packs/` still carries the old journal text until it is recompiled, which needs Foundry stopped (the world
-locks every pack LevelDB, and stopping the server is not available to agents). The controller asks the user to either
-stop Foundry so `npm run packs:compile` (default `src/packs → packs`) can run and be verified in the test world, or to
-authorize logging "recompile the module's live packs from `src/packs`" in `docs/TODO.md`. Nothing is deferred without
-that answer.
+The live `packs/` carries neither this task's journal text nor Task 15's immunity conversion until it is recompiled,
+which needs Foundry stopped (the world locks every pack LevelDB, and stopping the server is not available to agents).
+One recompile covers both tasks, so the controller holds this checkpoint until Task 15's commit lands, then asks the
+user once to either stop Foundry so `npm run packs:compile` (default `src/packs → packs`) can run, or to authorize
+logging "recompile the module's live packs from `src/packs`" in `docs/TODO.md`. Nothing is deferred without that
+answer.
+
+After a recompile and Foundry restart, the controller verifies in the test world (the module enabled there; if it is
+not, ask the user which world to verify in), logged in as `E2E GM 1`: the Rules journal page reads "decrease by -¼ of
+their base value" for Blinded and "within 1 space increases" for Prone, and this snippet, run through a Playwright
+`page.evaluate`, returns `{ blinded: true, contaminated: true }`:
+
+```js
+async () => {
+   /** @type {TitanActor} A throwaway actor for the check. */
+   const actor = await Actor.create({
+      name: 'E2E Module Immunity Check',
+      type: 'player',
+   });
+
+   /** @type {Record<string, boolean>} Whether each condition was refused while its granting effect was present. */
+   const refused = {};
+   for (const [uuid, status] of [
+      [
+         'Compendium.titan-vttrpg-compendium.effects.ActiveEffect.CNzUcoakHX0WMxo5',
+         'contaminated',
+      ],
+      [
+         'Compendium.titan-vttrpg-compendium.effects.ActiveEffect.XrDcA89TI6GA6OIq',
+         'blinded',
+      ],
+   ]) {
+      /** @type {ActiveEffect} The compendium effect granting the immunity. */
+      const source = await fromUuid(uuid);
+      const [granted] = await actor.createEmbeddedDocuments('ActiveEffect', [source.toObject()]);
+      await actor.toggleStatusEffect(status, { active: true });
+      refused[status] = !actor.effects.some((effect) => effect.statuses.has(status));
+      await granted.delete();
+   }
+   await actor.delete();
+   return refused;
+}
+```
 
 ---
 
-### Task 14: Documentation, skill, memory, and full verification
+### Task 15: Metal Attunement and Effulgent Gaze grant condition immunity (compendium module)
+
+User ruling 3 (2026-09-29). Works in `C:\FoundryVTT\V14\dev\foundryuserdata\Data\modules\titan-vttrpg-compendium` on
+the `conditions-and-rulings` branch Task 14 created. Edits `src/packs/**` source JSON only; `packs/**` is the live
+LevelDB Foundry holds open: never stage, revert, or compile into it. The rules (`docs/TITAN Rules Compendium - Source -
+09_26_2026.md` in the system repo) say Metal Attunement makes you "immune to being **Contaminated**" (line 5637) and
+Effulgent Gaze that "you cannot be **Blinded**" (line 7212). Each effect gains the Task 8 `immunity` element for its
+condition, and each spell drops its `removeCondition` aspect (spec C pack ruling 8; resolution 21). Nothing else in the
+four documents changes (the Attunement trait for Metal Attunement stays with spec C ruling 10).
+
+**Files (module repo):**
+- Modify: `src/packs/effects/Metal_Attunement_CNzUcoakHX0WMxo5.json`,
+  `src/packs/effects/Effulgent_Gaze_XrDcA89TI6GA6OIq.json`, `src/packs/spells/Metal_Attunement_Om0Y1sDROHUR2Yjg.json`,
+  `src/packs/spells/Effulgent_Gaze_kkG7krqlTItaexXH.json`
+- Test (scratch, not committed): `.work/check-immunity-conversion.mjs` (git-ignored `.work/`)
+
+**Interfaces:**
+- Consumes: the `ImmunityElement` shape (Task 8): `{ operation: 'immunity', selector: 'condition', key: <condition id>,
+  uuid }`, which Task 9's engine and `tests/e2e/immunity.spec.js` already exercise with `key: 'contaminated'`.
+- Produces: effect `CNzUcoakHX0WMxo5` (Metal Attunement) immune to `contaminated`
+  (uuid `96f80616-5714-4aa0-a036-b494245ef3a4`); effect `XrDcA89TI6GA6OIq` (Effulgent Gaze) immune to `blinded`
+  (uuid `84d6a207-5c45-4d2d-8d7a-5594036b5cd2`); spells `Om0Y1sDROHUR2Yjg` and `kkG7krqlTItaexXH` without a
+  `removeCondition` aspect.
+
+- [ ] **Step 1: Confirm the module branch**
+
+```bash
+cd /c/FoundryVTT/V14/dev/foundryuserdata/Data/modules/titan-vttrpg-compendium
+git branch --show-current
+git log --oneline -1
+git status --short -- . ':(exclude)packs'
+```
+
+Expected: branch `conditions-and-rulings`, head = Task 14's commit ("fix(rules): Blinded reads ..."), no non-`packs/`
+changes. If not, stop and report it to the controller.
+
+- [ ] **Step 2: Write the failing conversion check**
+
+With the Write tool (never a shell heredoc), create
+`C:\FoundryVTT\V14\dev\foundryuserdata\Data\modules\titan-vttrpg-compendium\.work\check-immunity-conversion.mjs`:
+
+```js
+// Asserts the Metal Attunement and Effulgent Gaze conversion: each effect keeps its other rules elements and carries
+// exactly one condition immunity, and each spell keeps every aspect but Remove Condition.
+import assert from 'node:assert/strict';
+import fs from 'node:fs';
+
+/**
+ * The converted documents, with the expected result of each.
+ * @type {{condition: string, effect: string, elementCount: number, spell: string, aspects: string[]}[]}
+ */
+const CONVERSIONS = [
+   {
+      aspects: [
+         'range',
+         'duration',
+         'increaseRating',
+         'increaseMod',
+      ],
+      condition: 'contaminated',
+      effect: 'src/packs/effects/Metal_Attunement_CNzUcoakHX0WMxo5.json',
+      elementCount: 3,
+      spell: 'src/packs/spells/Metal_Attunement_Om0Y1sDROHUR2Yjg.json',
+   },
+   {
+      aspects: [
+         'range',
+         'duration',
+      ],
+      condition: 'blinded',
+      effect: 'src/packs/effects/Effulgent_Gaze_XrDcA89TI6GA6OIq.json',
+      elementCount: 1,
+      spell: 'src/packs/spells/Effulgent_Gaze_kkG7krqlTItaexXH.json',
+   },
+];
+
+for (const { aspects, condition, effect, elementCount, spell } of CONVERSIONS) {
+   /** @type {object} The effect's source. */
+   const effectData = JSON.parse(fs.readFileSync(effect, 'utf8'));
+
+   /** @type {object[]} The effect's immunity elements. */
+   const immunities = effectData.system.rulesElement.filter((element) => element.operation === 'immunity');
+   assert.equal(effectData.system.rulesElement.length, elementCount, `${effect}: rules element count`);
+   assert.equal(immunities.length, 1, `${effect}: one immunity element`);
+   assert.deepEqual(Object.keys(immunities[0]), [
+      'operation',
+      'selector',
+      'key',
+      'uuid',
+   ], `${effect}: immunity element fields`);
+   assert.equal(immunities[0].selector, 'condition', `${effect}: condition immunity`);
+   assert.equal(immunities[0].key, condition, `${effect}: immune to ${condition}`);
+   assert.match(immunities[0].uuid, /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/,
+      `${effect}: v4 uuid`);
+
+   /** @type {object} The spell's source. */
+   const spellData = JSON.parse(fs.readFileSync(spell, 'utf8'));
+   assert.deepEqual(spellData.system.aspect.map((aspect) => aspect.label), aspects, `${spell}: aspects`);
+}
+console.log('immunity conversion ok');
+```
+
+- [ ] **Step 3: Run the check to verify it fails**
+
+```bash
+cd /c/FoundryVTT/V14/dev/foundryuserdata/Data/modules/titan-vttrpg-compendium
+node .work/check-immunity-conversion.mjs
+```
+
+Expected: FAIL — `AssertionError` with message `src/packs/effects/Metal_Attunement_CNzUcoakHX0WMxo5.json: rules
+element count` (the effect holds 2 elements before the conversion).
+
+- [ ] **Step 4: Convert the two effects and the two spells**
+
+Use the Edit tool (never a shell substitution) for each replacement; each old string occurs exactly once in its file
+(verified 2026-09-29), so the Edit tool fails if a file differs.
+
+In `src/packs/effects/Metal_Attunement_CNzUcoakHX0WMxo5.json`, replace
+
+```json
+        "uuid": "ee90f54a-42e5-43a8-afa5-253485fa923d"
+      }
+    ],
+```
+
+with
+
+```json
+        "uuid": "ee90f54a-42e5-43a8-afa5-253485fa923d"
+      },
+      {
+        "operation": "immunity",
+        "selector": "condition",
+        "key": "contaminated",
+        "uuid": "96f80616-5714-4aa0-a036-b494245ef3a4"
+      }
+    ],
+```
+
+In `src/packs/effects/Effulgent_Gaze_XrDcA89TI6GA6OIq.json`, replace
+
+```json
+    "rulesElement": [],
+```
+
+with
+
+```json
+    "rulesElement": [
+      {
+        "operation": "immunity",
+        "selector": "condition",
+        "key": "blinded",
+        "uuid": "84d6a207-5c45-4d2d-8d7a-5594036b5cd2"
+      }
+    ],
+```
+
+In `src/packs/spells/Metal_Attunement_Om0Y1sDROHUR2Yjg.json`, replace
+
+```json
+      },
+      {
+        "label": "removeCondition",
+        "cost": 2,
+        "allOptions": false,
+        "option": [
+          "contaminated"
+        ],
+        "enabled": true
+      }
+    ],
+```
+
+with
+
+```json
+      }
+    ],
+```
+
+In `src/packs/spells/Effulgent_Gaze_kkG7krqlTItaexXH.json`, replace
+
+```json
+      },
+      {
+        "label": "removeCondition",
+        "cost": 2,
+        "allOptions": false,
+        "option": [
+          "blinded"
+        ],
+        "enabled": true
+      }
+    ],
+```
+
+with
+
+```json
+      }
+    ],
+```
+
+- [ ] **Step 5: Validate**
+
+```bash
+cd /c/FoundryVTT/V14/dev/foundryuserdata/Data/modules/titan-vttrpg-compendium
+node .work/check-immunity-conversion.mjs
+node -e "for (const f of process.argv.slice(1)) { JSON.parse(require('fs').readFileSync(f, 'utf8')); console.log('json ok', f); }" \
+   src/packs/effects/Metal_Attunement_CNzUcoakHX0WMxo5.json src/packs/effects/Effulgent_Gaze_XrDcA89TI6GA6OIq.json \
+   src/packs/spells/Metal_Attunement_Om0Y1sDROHUR2Yjg.json src/packs/spells/Effulgent_Gaze_kkG7krqlTItaexXH.json
+npm run check:links
+npm run packs:compile -- src/packs .work/compiled-immunity
+```
+
+Expected: `immunity conversion ok`; four `json ok` lines; `check:links` reports no broken links; the scratch compile
+finishes without errors (it writes only under `.work/`, never the live `packs/`). Then move the scratch output and the
+check to the recycle bin: `trash .work/compiled-immunity .work/check-immunity-conversion.mjs`.
+
+- [ ] **Step 6: Commit (source only)**
+
+```bash
+cd /c/FoundryVTT/V14/dev/foundryuserdata/Data/modules/titan-vttrpg-compendium
+git branch --show-current
+git status --short -- . ':(exclude)packs'
+git add src/packs/effects/Metal_Attunement_CNzUcoakHX0WMxo5.json \
+   src/packs/effects/Effulgent_Gaze_XrDcA89TI6GA6OIq.json src/packs/spells/Metal_Attunement_Om0Y1sDROHUR2Yjg.json \
+   src/packs/spells/Effulgent_Gaze_kkG7krqlTItaexXH.json
+git commit -F - <<'EOF'
+feat(packs): Metal Attunement and Effulgent Gaze grant condition immunity
+
+The effects carry an immunity element (Contaminated, Blinded), as the rules
+grant immunity rather than removal; the spells no longer offer Remove
+Condition.
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+Claude-Session: https://claude.ai/code/session_01SPVZ3AXCPn5Bo41aemiJZc
+EOF
+```
+
+- [ ] **Step 7: Controller checkpoint — live packs**
+
+Run Task 14 Step 5 now: one recompile of `src/packs` covers Task 14's journal fix and this task's conversion, and its
+test-world check confirms both effects refuse their condition.
+
+---
+
+### Task 16: Documentation, skill, memory, and full verification
 
 **Files:**
 - Modify: `docs/TODO.md`, `docs/CLOSED_BUGS.md`, `docs/POST_WORK_FINDINGS.md`,
-  `docs/superpowers/specs/2026-09-27-conditions-rework-design.md`, `CHANGELOG.md`,
+  `docs/superpowers/specs/2026-09-27-conditions-rework-design.md`,
+  `docs/superpowers/specs/2026-09-27-compendium-rulings-design.md`, `CHANGELOG.md`,
   `.claude/skills/titan-codebase/references/abstractions.md`, `.claude/skills/titan-codebase/references/architecture.md`,
   `.claude/skills/titan-codebase/references/data-flow.md`, `.claude/skills/titan-codebase/references/conventions.md`
 - Modify (auto-memory, not in git): `C:\Users\emper\.claude\projects\C--FoundryVTT-V14-dev-foundryuserdata-Data-systems-titan\memory\five-conditions-inert.md`
@@ -8689,10 +10102,12 @@ that answer.
 
 - [ ] **Step 1: Backlog and bug records**
 
-In `docs/TODO.md`, delete the whole "Conditions rework to the 2026-09-26 rules" bullet. Keep every other bullet
-(the Google Sheets fixture, the compendium audit findings, applying caster/target-derived effects, and extending
-immunity by trait). Add any item the user authorized deferring during this campaign (Task 13 Step 5, the open
-questions), each with its authorization date.
+In `docs/TODO.md`, delete the whole "Conditions rework to the 2026-09-26 rules" bullet, and from the "Compendium audit
+findings awaiting a rules decision" bullet delete only its sub-bullet
+"Metal Attunement and Effulgent Gaze: `removeCondition` where the rules grant immunity." (Task 15 converted them).
+Keep every other bullet and sub-bullet (the Google Sheets fixture, the rest of the compendium audit findings, applying
+caster/target-derived effects, and extending immunity by trait). Add any item the user authorized deferring during
+this campaign (Task 14 Step 5), with its authorization date.
 
 Append to `docs/CLOSED_BUGS.md`:
 
@@ -8740,8 +10155,10 @@ GM confirms.
 
 An immunity suppresses a condition or effect through the data models' `isSuppressed` (core then drops it from
 `actor.statuses`), and `_applyRulesElements` skips only `system.isSuppressed` sources: `disabled` stays the gate for an
-effect's own state, and core's duration expiry does not start suppressing TITAN effects. The sheet's effect rows and
-the Player HUD effects panel still list a suppressed effect as active.
+effect's own state, and core's duration expiry does not start suppressing TITAN effects. A suppressed entry stays in
+the actor's effects: the character sheet's effect rows (which list only `effect`-subtype effects) and the Player HUD
+effects panel (list rows; tray icons dim and the popout carries the tag) dim it and show "Suppressed: <sources>", read
+from `getSuppressingImmunitySources`, not from `isSuppressed`, which carries no source.
 
 ### Target distance is measured between the nearest occupied spaces (2026-09-29)
 
@@ -8777,6 +10194,22 @@ Append to `docs/superpowers/specs/2026-09-27-conditions-rework-design.md`:
   Prone penalty beyond 10 spaces applies to Accuracy only.
 - The module's Stunned text was already correct; Prone's split `<strong>1 spac</strong>e` was fixed with Blinded's.
 - Stat breakdowns list condition modifiers (bug #75).
+- User rulings (2026-09-29): Off-Balance joins the Inflict Condition (cost 3) and Remove Condition (cost 2) spell
+  aspects, and a guard test pins both lists to every condition except Dead and Sleeping; a suppressed condition or
+  effect shows a "Suppressed: <sources>" tag and a dimmed row on the sheet's effect rows and in the Player HUD effects
+  panel; the module's Metal Attunement and Effulgent Gaze effects carry `immunity` elements (Contaminated, Blinded) and
+  their spells no longer offer Remove Condition.
+```
+
+Append to `docs/superpowers/specs/2026-09-27-compendium-rulings-design.md`:
+
+```markdown
+## Delivered by the conditions rework (2026-09-29)
+
+Pack ruling 8 and C5 (Metal Attunement and Effulgent Gaze immunity) shipped with the conditions rework (spec B's
+plan) by user ruling on 2026-09-29: the effects carry `immunity` condition elements (`contaminated`, `blinded`) and
+the spells no longer offer the `removeCondition` aspect. Ruling 10 (the Attunement trait on Metal Attunement) and the
+rest of this spec are unchanged.
 ```
 
 - [ ] **Step 4: titan-codebase skill (current state, not history)**
@@ -8820,7 +10253,11 @@ effect by its camel-cased name, never the effect granting the immunity. `Conditi
 `TitanActiveEffectDataModel` expose `isSuppressed` (`isSuppressedByImmunity`: true while immune, else undefined so
 core's expiry test decides); core's `ActiveEffect#isSuppressed` reads it, so a suppressed condition leaves
 `actor.statuses`. `TitanActiveEffect._preCreate` refuses an immune creation with `LOCAL.immuneToEffect` naming the
-sources. Deferred: immunity by trait (docs/TODO.md).
+sources. `getSuppressingImmunitySources(effect)` (same module as `isSuppressedByImmunity`, which delegates to it;
+`[]` for a missing effect or a non-Character parent) feeds the suppressed marker: `SuppressedEffectTag.svelte`
+("Suppressed: <sources>", `SUPPRESSED_ICON`) plus a dimmed row — `CharacterSheetItem`'s `muted` prop on the sheet's
+effect rows, the `suppressed` class on `EffectsListRow` and on `EffectsIconTray`'s icons (the tray's
+`EffectsDetailPopout` takes `suppressingSources` and carries the tag). Deferred: immunity by trait (docs/TODO.md).
 
 **Unconscious.** `TitanActiveEffect._onCreate`, on the creating client, calls `CharacterDataModel.fallUnconscious()`
 for an Unconscious condition: `UNCONSCIOUS_COMPANION_CONDITIONS` (Prone, Incapacitated) are toggled active, equipped
@@ -8833,8 +10270,12 @@ with "`roundDirectional(value, rounding)` ceils on `'up'`, rounds on `'nearest'`
 (e) in the "Labels" bullet, add after `ModifiableStatValueLabel`: "(takes the stat's `mod` object; its tooltip,
 `createModifiableStatTooltip`, walks `MOD_BUCKET_LABELS`)".
 
-In `.claude/skills/titan-codebase/references/architecture.md`, replace the `OnceSetup.js` and `OnceReady.js` bullets
-with:
+In `.claude/skills/titan-codebase/references/architecture.md`, append to the
+`src/document/types/item/types/spell/CalculateSpellAspectCosts.js` bullet: "`SpellAspects.inflictCondition` and
+`removeCondition` offer every condition but Dead and Sleeping (Inflict prices each in `optionCosts`; Remove charges a
+uniform `optionCost`); `tests/unit/SpellAspectConditions.test.js` pins both lists to `buildConditionDefinitions`, so a
+new condition fails until it is offered or listed as omitted." Then replace the `OnceSetup.js` and `OnceReady.js`
+bullets with:
 
 ```markdown
 - `OnceSetup.js` (Foundry `setup` hook) calls `setupConditions()` from `src/system/Conditions.js`. That module
@@ -8849,11 +10290,14 @@ with:
 ```
 
 In `.claude/skills/titan-codebase/references/data-flow.md`:
-(a) in the Migration system "Where it lives" list, add
+(a) in the "Effects panel — `EffectsPanelElement` → list or tray" paragraph, insert before "The outer panel has a
+fixed user-resizable width": "An entry an immunity suppresses stays listed, dimmed, with a "Suppressed: <sources>"
+tag (`SuppressedEffectTag`): under the list row's header, or in the tray's popout (the tray icon is dimmed)."
+(b) in the Migration system "Where it lives" list, add
 "- `SyncConditionEffects.js` — `syncConditionEffects()` rewrites every stale condition Active Effect (world actors and
 unlinked token actors) from `CONFIG.statusEffects` (rules elements and description); `conditionEffectsNeedSync()`
 feeds `worldNeedsMigration()`."
-(b) replace the "What triggers it" numbered item 2 (and its two sub-bullets) with:
+(c) replace the "What triggers it" numbered item 2 (and its two sub-bullets) with:
 
 ```markdown
 2. It then acts on `resolveMigrationAction(game.settings.get('titan', 'migrationMode'), worldNeedsMigration())`
@@ -8863,7 +10307,7 @@ feeds `worldNeedsMigration()`."
    - `'none'` (Disabled mode, or nothing pending) → no migration.
 ```
 
-(c) replace "Attack difficulty is `clamp(targetDefense - attackerRating + 4, 2, 6)`; with no target selected
+(d) replace "Attack difficulty is `clamp(targetDefense - attackerRating + 4, 2, 6)`; with no target selected
 `targetDefense` defaults to the attacker's own rating, yielding difficulty 4." with:
 
 ```markdown
@@ -8926,7 +10370,8 @@ unit and e2e counts in the task report, then `trash debug/dumps/e2e-full.log`.
 git branch --show-current
 git status --short
 git add docs/TODO.md docs/CLOSED_BUGS.md docs/POST_WORK_FINDINGS.md \
-   docs/superpowers/specs/2026-09-27-conditions-rework-design.md CHANGELOG.md \
+   docs/superpowers/specs/2026-09-27-conditions-rework-design.md \
+   docs/superpowers/specs/2026-09-27-compendium-rulings-design.md CHANGELOG.md \
    .claude/skills/titan-codebase/references/abstractions.md .claude/skills/titan-codebase/references/architecture.md \
    .claude/skills/titan-codebase/references/data-flow.md .claude/skills/titan-codebase/references/conventions.md
 git commit -F - <<'EOF'
@@ -8951,48 +10396,65 @@ nothing.)
 |---|---|
 | §1 Blinded/Contaminated/Off-Balance/Prone/Restrained/Stunned stat rules; Off-Balance definition, icon, localization; `.desc` text | 2 |
 | §1 Blinded/Deafened sense situations, Frightened, Incapacitated/Restrained Reflexes | 4 |
-| §1 Incapacitated/Prone target-side | 10, 11 |
-| §1 Unconscious | 12 |
+| §1 Incapacitated/Prone target-side | 11, 12 |
+| §1 Unconscious | 13 |
 | §1 uuids `condition-<id>-<stat>` | 2, 4 (guard test) |
 | §2 `nearest` rounding, editors, `down` default | 1 |
-| §3 target statuses, distance, Prone ±, Incapacitated Difficulty 2 after Advantage, recorded + card + dialog | 10, 11 |
-| §4 Unconscious on creating client, Prone/Incapacitated if absent, unequip weapons/shield, removal keeps them | 12 |
+| §3 target statuses, distance, Prone ±, Incapacitated Difficulty 2 after Advantage, recorded + card + dialog | 11, 12 |
+| §4 Unconscious on creating client, Prone/Incapacitated if absent, unequip weapons/shield, removal keeps them | 13 |
 | §5 `immunity` operation, condition/effect selectors, camel-case names | 8 |
 | §5 pre-pass, refusal notification, suppression, never self-suppress | 7, 9 |
 | §5 editor `ItemSheetImmunitySettings.svelte` | 8 |
 | §6 migration, world + unlinked token actors | 5 |
-| §7 module journal typos | 13 |
-| Testing: definitions per condition, mulBase 0.75 bases 1-8, stacked Blinded + Off-Balance, nearest, immunity, Prone table | 1, 2, 9, 10 |
-| Testing e2e: ratings per condition, Frightened Difficulty, Incapacitated attack Difficulty 2, Unconscious, immunity effect, migration | 2, 3, 4, 5, 9, 11, 12 |
-| Documentation: TODO, skill, memory | 14 |
+| §7 module journal typos | 14 |
+| Testing: definitions per condition, mulBase 0.75 bases 1-8, stacked Blinded + Off-Balance, nearest, immunity, Prone table | 1, 2, 9, 11 |
+| Testing e2e: ratings per condition, Frightened Difficulty, Incapacitated attack Difficulty 2, Unconscious, immunity effect, migration | 2, 3, 4, 5, 9, 12, 13 |
+| Documentation: TODO, skill, memory | 16 |
+
+**User rulings (2026-09-29) → task:**
+
+| Ruling | Task |
+|---|---|
+| 1. Off-Balance in Inflict Condition (cost 3) and Remove Condition (cost 2); guard on both lists; spell-sheet e2e | 2 (Steps 9-13) |
+| 2. "Suppressed: <immunity source>" tag and muted row on the sheet's effect rows and the HUD effects panel entries, reusing `getImmunitySources`; unit + e2e (presence→absence on the same row); Task 16's POST_WORK_FINDINGS text matches | 10, 16 |
+| 3. Metal Attunement / Effulgent Gaze effects gain `immunity`, spells drop `removeCondition` (module `src/packs` only); JSON parse, `check:links`, scratch compile + `trash`; recompile folded into Task 14 Step 5; audit bullet deleted from `docs/TODO.md` | 15, 14 (Step 5), 16 |
 
 Additions beyond spec B's text, each required by it or found while planning: bug #74 (Migration Mode Disabled, Task 5,
 blocks the spec's migration from obeying the setting), bug #75 (condition bucket missing from breakdowns, Task 3, the
 spec's "sheet's ratings" check), the operation registry (Task 6, so the new operation cannot drift from its four
-lists), the source list (Task 7, so immunity and application read the same sources), and the effect-tray count fix
-(Task 9, refused copies were reported as applied).
+lists), the source list (Task 7, so immunity and application read the same sources), the effect-tray count fix
+(Task 9, refused copies were reported as applied), and the three 2026-09-29 user rulings (Tasks 2, 10, 15).
 
 **Placeholder scan:** every step names exact files and carries the complete code or the exact text to replace; no
-"TBD", "similar to", or unwritten tests. Task 13 Step 5 and the open questions are controller checkpoints that ask
-the user; they defer nothing.
+"TBD", "similar to", or unwritten tests. Task 14 Step 5 (run after Task 15's commit) is a controller checkpoint that
+asks the user; it defers nothing without the user's answer.
 
 **Type consistency:** `ROUNDING_DIRECTIONS` (Task 1) is read by both editors and the rounding e2e.
 `createQuarterBasePenalty` / `createSenseAutomaticFailure` / `createReflexesAutomaticFailure` are module-private in
-`Conditions.js`; `CONDITION_IDS` (Task 8) and `UNCONSCIOUS_COMPANION_CONDITIONS` (Task 12) are its exports.
+`Conditions.js`; `CONDITION_IDS` (Task 8) and `UNCONSCIOUS_COMPANION_CONDITIONS` (Task 13) are its exports.
+`tests/unit/SpellAspectConditions.test.js` (Task 2) reads `buildConditionDefinitions` directly (it runs before Task 8
+adds `CONDITION_IDS`) and `calculateSpellAspectCosts`; the toggle test id
+`spell-aspect-option-<label>-<option>` (Task 2) is read only by `tests/e2e/spell-aspect-conditions.spec.js`.
 `DYNAMIC_MOD_BUCKETS` / `MOD_BUCKET_LABELS` / `getInnateModTotal` (Task 3) are used by `_resetDynamicMods`, the tooltip,
 the label, and the skill row. `CANONICAL_SITUATIONS` moves in Task 4 and is imported by the armor module, Conditions.js,
 and the localization test. `RULES_ELEMENT_FACTORIES` (Task 6) gains `immunity` in Task 8. `RulesElementSource` /
 `_getRulesElementSources` (Task 7) feed `_applyRulesElements` (Task 7) and `_getImmunities` (Task 9); Task 9 adds the
 `source.effect?.system.isSuppressed` skip. `ImmunitySource` / `Immunities` / `getImmunitySources` /
 `isSuppressedByImmunity` (Task 9) are used by both data models and `TitanActiveEffect._preCreate`.
-`TargetConditionModifier` and its helpers (Task 10) are used by `AttackCheckOptions`/`AttackCheckParameters`,
-`initializeAttackCheckOptions`, `getAttackCheckParameters`, and both Svelte components (Task 11).
-`getTargetedCharacterTokens` (Task 10) replaces the last `getTargetedCharacters` use in `CharacterDataModel`
-(Task 11); `GetBestCharactersToUpdate` keeps `getTargetedCharacters`. `fallUnconscious` (Task 12) is called only by
-`TitanActiveEffect._onCreate`.
+`getSuppressingImmunitySources` (Task 10, `IsSuppressedByImmunity.js`) wraps the Character gate and
+`getImmunitySources`; `isSuppressedByImmunity`, `CharacterSheetEffect`, `EffectsListRow`, and `EffectsIconTray` call it,
+and the tray passes `suppressingSources` (`string[]`) to `EffectsDetailPopout`. `SuppressedEffectTag` (props
+`sources: string[]`, `testId`) and `SUPPRESSED_ICON` (Task 10) are used by those three row surfaces;
+`CharacterSheetItem`'s `muted` prop is set only by `CharacterSheetEffect`. `TargetConditionModifier` and its helpers (Task 11) are used by
+`AttackCheckOptions`/`AttackCheckParameters`, `initializeAttackCheckOptions`, `getAttackCheckParameters`, and both
+Svelte components (Task 12). `getTargetedCharacterTokens` (Task 11) replaces the last `getTargetedCharacters` use in
+`CharacterDataModel` (Task 12); `GetBestCharactersToUpdate` keeps `getTargetedCharacters`. `fallUnconscious`
+(Task 13) is called only by `TitanActiveEffect._onCreate`. Task 15's module elements use the Task 8
+`ImmunityElement` field set (`operation`, `selector`, `key`, `uuid`), which its conversion check pins.
 
-**Review Focus mapping:** 1 → Tasks 10 (table: 10 vs 11 spaces, Accuracy 0, rounds-to-0) and 11 (e2e 1 and 21
-spaces); 2 → Task 11 unit test "never reads the attacker's own controlled token"; 3 → Task 9 unit and e2e; 4 → Task 5
-unit (idempotence, key order, custom status, token actors) and e2e; 5 → Task 12 unit and e2e; 6 → Task 11 schema golden
+**Review Focus mapping:** 1 → Tasks 11 (table: 10 vs 11 spaces, Accuracy 0, rounds-to-0) and 12 (e2e 1 and 21
+spaces); 2 → Task 12 unit test "never reads the attacker's own controlled token"; 3 → Task 9 unit and e2e; 4 → Task 5
+unit (idempotence, key order, custom status, token actors) and e2e; 5 → Task 13 unit and e2e; 6 → Task 12 schema golden
 and Incapacitated-with-Disadvantage unit and e2e; 7 → Tasks 2 (stacked Defense 8 → 4) and 1 (contribution vs result
-rounding).
+rounding); 8 → Task 10 unit (`getSuppressingImmunitySources`, self-naming ward) and e2e (sheet row, HUD list row, tray
+popout; ward row untagged); 9 → Task 2 guard test and spell-sheet e2e.
