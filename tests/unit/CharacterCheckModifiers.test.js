@@ -139,6 +139,71 @@ function createItemModel(itemRollData) {
    return model;
 }
 
+/** @type {object} A weapon with one plain Body (Athletics) melee attack. */
+const WEAPON_ROLL_DATA = {
+   attack: [
+      {
+         attribute: 'body',
+         customTrait: [],
+         damage: 1,
+         label: 'x',
+         plusExtraSuccessDamage: false,
+         range: 1,
+         skill: 'athletics',
+         trait: [],
+         type: 'melee',
+      },
+   ],
+   attackNotes: '',
+   customTrait: [],
+   img: '',
+   multiAttack: false,
+   name: 'W',
+};
+
+/** @type {object} A spell with a Body (Athletics) 4:1 Casting Check and no aspects. */
+const SPELL_ROLL_DATA = {
+   aspect: [],
+   castingCheck: {
+      attribute: 'body',
+      complexity: 1,
+      difficulty: 4,
+      skill: 'athletics',
+   },
+   customAspect: [],
+   customTrait: [],
+   description: '',
+   img: '',
+   name: 'S',
+   tradition: '',
+};
+
+/** @type {object} An item with one Body (Athletics) 4:1 check that deals no damage or healing. */
+const ITEM_ROLL_DATA = {
+   check: [
+      {
+         attribute: 'body',
+         complexity: 1,
+         difficulty: 4,
+         isDamage: false,
+         isHealing: false,
+         label: 'C',
+         opposedCheck: {
+            attribute: 'body',
+            enabled: false,
+            skill: 'none',
+         },
+         resistanceCheck: 'none',
+         resolveCost: 0,
+         skill: 'athletics',
+      },
+   ],
+   customTrait: [],
+   description: '',
+   img: '',
+   name: 'I',
+};
+
 describe('Advantage on item-based check parameters', () => {
    it('applies Advantage to an Attack Check after the rating-derived Difficulty is clamped', () => {
       /** @type {object} A weapon with one plain attack. */
@@ -697,6 +762,165 @@ describe('situational check modifiers', () => {
             label: 'Flanking',
          },
       ]);
+   });
+
+   it('applies a casting-type situation through getCastingCheckParameters and not to an Item Check', () => {
+      /** @type {object} The model under test, carrying a spell and a casting-type situation. */
+      const model = createItemModel(SPELL_ROLL_DATA);
+      model._applySituationalCheckModifierElements([
+         checkModifier({
+            checkType: 'casting',
+            key: 'Chanting',
+            selector: 'situation',
+            value: 2,
+         }),
+      ]);
+
+      /** @type {object} The derived Casting Check parameters with the situation ticked. */
+      const casting = model.getCastingCheckParameters(createCastingCheckOptions({
+         attribute: 'body',
+         difficulty: 4,
+         itemId: 's',
+         situations: ['chanting'],
+         skill: 'athletics',
+      }));
+      expect(casting.diceMod).toBe(2);
+      expect(casting.situations).toEqual([
+         {
+            key: 'chanting',
+            label: 'Chanting',
+         },
+      ]);
+
+      /** @type {object} The derived Item Check parameters with the same situation ticked. */
+      const item = model.getItemCheckParameters(createItemCheckOptions({
+         attribute: 'body',
+         difficulty: 4,
+         itemRollData: ITEM_ROLL_DATA,
+         situations: ['chanting'],
+         skill: 'athletics',
+      }));
+      expect(item.diceMod).toBe(0);
+      expect(item.situations).toEqual([]);
+   });
+
+   it('applies an item-type situation through getItemCheckParameters and not to a Casting Check', () => {
+      /** @type {object} The model under test, carrying a spell and an item-type situation. */
+      const model = createItemModel(SPELL_ROLL_DATA);
+      model._applySituationalCheckModifierElements([
+         checkModifier({
+            checkType: 'item',
+            key: 'Darkness',
+            modifierType: 'advantage',
+            selector: 'situation',
+            value: -1,
+         }),
+      ]);
+
+      /** @type {object} The derived Item Check parameters with the situation ticked. */
+      const item = model.getItemCheckParameters(createItemCheckOptions({
+         attribute: 'body',
+         difficulty: 4,
+         itemRollData: ITEM_ROLL_DATA,
+         situations: ['darkness'],
+         skill: 'athletics',
+      }));
+      expect(item.advantage).toBe(-1);
+      expect(item.difficulty).toBe(5);
+      expect(item.situations).toEqual([
+         {
+            key: 'darkness',
+            label: 'Darkness',
+         },
+      ]);
+
+      /** @type {object} The derived Casting Check parameters with the same situation ticked. */
+      const casting = model.getCastingCheckParameters(createCastingCheckOptions({
+         attribute: 'body',
+         difficulty: 4,
+         itemId: 's',
+         situations: ['darkness'],
+         skill: 'athletics',
+      }));
+      expect(casting.advantage).toBe(0);
+      expect(casting.situations).toEqual([]);
+   });
+});
+
+describe('item-based check options take Advantage and Automatic Failure from the cache unless provided', () => {
+   /**
+    * Builds a model whose conditional cache holds a Disadvantage of the given check type and an `any` Automatic
+    * Failure, and whose one owned item returns the given roll data.
+    * @param {string} checkType - The element check type of the Disadvantage (`attack`, `casting`, or `item`).
+    * @param {object} itemRollData - The owned item's roll data.
+    * @returns {object} The model instance.
+    */
+   function cachedModel(checkType, itemRollData) {
+      /** @type {object} The model under test. */
+      const model = createItemModel(itemRollData);
+      model._applyConditionalCheckModifierElements([
+         checkModifier({
+            checkType,
+            modifierType: 'advantage',
+            value: -1,
+         }),
+         checkModifier({
+            modifierType: 'automaticFailure',
+         }),
+      ]);
+      return model;
+   }
+
+   /** @type {object} The provided values that override the cache. */
+   const PROVIDED = {
+      advantage: 2,
+      automaticFailure: false,
+   };
+
+   it('initializes Attack Check options', () => {
+      /** @type {object} The model under test. */
+      const model = cachedModel('attack', WEAPON_ROLL_DATA);
+      /** @type {object} Attack options that need no rating or target lookup. */
+      const options = {
+         attackerAccuracy: 0,
+         attackerMelee: 0,
+         itemId: 'w',
+         targetDefense: 3,
+      };
+      expect(model.initializeAttackCheckOptions(options)).toMatchObject({
+         advantage: -1,
+         automaticFailure: true,
+      });
+      expect(model.initializeAttackCheckOptions({
+         ...options,
+         ...PROVIDED,
+      })).toMatchObject(PROVIDED);
+   });
+
+   it('initializes Casting Check options', () => {
+      /** @type {object} The model under test. */
+      const model = cachedModel('casting', SPELL_ROLL_DATA);
+      expect(model.initializeCastingCheckOptions({ itemId: 's' })).toMatchObject({
+         advantage: -1,
+         automaticFailure: true,
+      });
+      expect(model.initializeCastingCheckOptions({
+         itemId: 's',
+         ...PROVIDED,
+      })).toMatchObject(PROVIDED);
+   });
+
+   it('initializes Item Check options', () => {
+      /** @type {object} The model under test. */
+      const model = cachedModel('item', ITEM_ROLL_DATA);
+      expect(model.initializeItemCheckOptions({ itemRollData: ITEM_ROLL_DATA })).toMatchObject({
+         advantage: -1,
+         automaticFailure: true,
+      });
+      expect(model.initializeItemCheckOptions({
+         itemRollData: ITEM_ROLL_DATA,
+         ...PROVIDED,
+      })).toMatchObject(PROVIDED);
    });
 });
 
