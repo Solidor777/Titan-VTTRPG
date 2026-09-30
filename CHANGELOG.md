@@ -4,6 +4,8 @@ Conditions follow the 2026-09-26 rules.
 - Blinded, Contaminated, Prone, Restrained, and Stunned lower their stats by a quarter of the base value, rounded up,
   instead of by 1. The new Off-Balance condition lowers Accuracy, Awareness, Melee, and Defense the same way.
 - Spells can inflict Off-Balance (cost 3) and remove it (cost 2).
+- Stat tooltips on the character sheet and Player HUD list condition modifiers, and speed and mod tooltips list
+  abilities; skill Training and Expertise tooltips use the same breakdown.
 
 ## Version 2.1.0:
 Advantage and Disadvantage, situational modifiers, and bug fixes.

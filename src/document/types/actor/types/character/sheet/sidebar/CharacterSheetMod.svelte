@@ -57,9 +57,7 @@
          <ModifiableStatValueLabel
             baseTooltip={localize(`${mod}.baseValue`)}
             baseValue={0}
-            effectMod={document.data.system.mod[mod].mod.effect}
-            equipmentMod={document.data.system.mod[mod].mod.equipment}
-            staticMod={document.data.system.mod[mod].mod.static}
+            mod={document.data.system.mod[mod].mod}
             value={document.data.system.mod[mod].value}
          />
       </div>

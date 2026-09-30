@@ -268,7 +268,7 @@ test.describe('component probe — ModifiableStatValueLabel', () => {
    });
 
    test('renders the value and applies no modifier class when base equals value', async () => {
-      // normalValue = baseValue (no abilityMod/equipmentMod); realValue = value = 5 — equal, so .label only.
+      // normalValue = baseValue (no mod); realValue = value = 5 — equal, so .label only.
       const { selector } = await mountProbe(page, 'ModifiableStatValueLabel', {
          props: {
             baseValue: 5,
@@ -329,15 +329,17 @@ test.describe('component probe — ModifiableStatValueLabel', () => {
       await expect(root).toHaveClass(/bonus/);
    });
 
-   test('abilityMod and equipmentMod shift normalValue and affect the class', async () => {
-      // normalValue = baseValue (5) + abilityMod (2) + equipmentMod (1) = 8; realValue = value (5).
+   test('the mod object\'s ability and equipment buckets shift normalValue and affect the class', async () => {
+      // normalValue = baseValue (5) + mod.ability (2) + mod.equipment (1) = 8; realValue = value (5).
       // 8 > 5 → penalty class.
       const { selector } = await mountProbe(page, 'ModifiableStatValueLabel', {
          props: {
             baseValue: 5,
             value: 5,
-            abilityMod: 2,
-            equipmentMod: 1,
+            mod: {
+               ability: 2,
+               equipment: 1,
+            },
             testId: 'probe-stat-value-mods',
          },
       });

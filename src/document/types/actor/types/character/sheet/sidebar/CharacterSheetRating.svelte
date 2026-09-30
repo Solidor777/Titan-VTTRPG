@@ -70,12 +70,10 @@
       <!--Total Value-->
       <div class="value">
          <ModifiableStatValueLabel
-            abilityMod={document.data.system.rating[rating].mod.ability}
             baseTooltip={localize(`${rating}.baseValue`)}
             baseValue={document.data.system.rating[rating].baseValue}
-            effectMod={document.data.system.rating[rating].mod.effect}
-            equipmentMod={document.data.system.rating[rating].mod.equipment}
-            staticMod={document.data.system.rating[rating].mod.static}
+            mod={document.data.system.rating[rating].mod}
+            testId={`sheet-rating-${rating}`}
             value={document.data.system.rating[rating].value}
          />
       </div>

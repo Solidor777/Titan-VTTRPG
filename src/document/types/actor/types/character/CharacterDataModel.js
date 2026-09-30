@@ -85,6 +85,7 @@ import sortAscending from '~/helpers/utility-functions/SortAscending.js';
 import sortObjectsIntoContainerByFunctionValue
    from '~/helpers/utility-functions/SortObjectsIntoContainerByFunctionValue.js';
 import sortObjectsIntoContainerByKeyValue from '~/helpers/utility-functions/SortObjectsIntoContainerByKeyValue.js';
+import { DYNAMIC_MOD_BUCKETS } from '~/system/ModBuckets.js';
 import AddInventoryItemDialog from '~/document/types/actor/dialogs/AddInventoryItemDialog.js';
 import assert from '~/helpers/utility-functions/Assert.js';
 
@@ -534,14 +535,13 @@ export default class CharacterDataModel extends TitanActorDataModel {
     */
    _resetDynamicMods() {
       /**
-       * Resets the Mods of a mod object to 0.
+       * Zeroes a mod object's dynamic buckets, adding any it lacks in DYNAMIC_MOD_BUCKETS order.
        * @param {object} mods - Mod object to reset.
        */
       function resetMods(mods) {
-         mods.equipment = 0;
-         mods.effect = 0;
-         mods.ability = 0;
-         mods.condition = 0;
+         for (const bucket of DYNAMIC_MOD_BUCKETS) {
+            mods[bucket] = 0;
+         }
       }
 
       // Attributes.

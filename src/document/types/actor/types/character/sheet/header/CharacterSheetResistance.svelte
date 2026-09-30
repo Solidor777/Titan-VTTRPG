@@ -51,12 +51,9 @@
       <!--Total Value-->
       <div class="number">
          <ModifiableStatValueLabel
-            abilityMod={document.data.system.resistance[resistance].mod.ability}
             baseTooltip={localize(`${resistance}.baseValue`)}
             baseValue={document.data.system.resistance[resistance].baseValue}
-            effectMod={document.data.system.resistance[resistance].mod.effect}
-            equipmentMod={document.data.system.resistance[resistance].mod.equipment}
-            staticMod={document.data.system.resistance[resistance].mod.static}
+            mod={document.data.system.resistance[resistance].mod}
             value={document.data.system.resistance[resistance].value}
          />
       </div>

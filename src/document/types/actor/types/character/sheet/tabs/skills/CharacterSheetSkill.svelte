@@ -6,8 +6,9 @@
    import DocumentIntegerInput from '~/document/svelte-components/input/DocumentIntegerInput.svelte';
    import { getContext } from 'svelte';
    import tooltipAction from '~/helpers/svelte-actions/TooltipAction.js';
-   import localize from '~/helpers/utility-functions/Localize.js';
    import ModifiedValueLabel from '~/helpers/svelte-components/label/ModifiedValueLabel.svelte';
+   import createModifiableStatTooltip from '~/helpers/utility-functions/CreateModifiableStatTooltip.js';
+   import { getInnateModTotal } from '~/system/ModBuckets.js';
 
    /**
     * @typedef {object} CharacterSheetSkillProps
@@ -27,37 +28,13 @@
    );
 
    /**
-    * Calculates the tooltipAction for the total Training or Expertise value.
+    * Calculates the breakdown tooltip for the total Training or Expertise value.
     * @param {object} valueObject - The Training or Expertise object.
-    * @param {number} mod - Modifier for the total value or expertise.
-    * @returns {string} The tooltipAction for the total Training or Expertise value.
+    * @param {number} mod - The check's conditional modifier to the total Training or Expertise.
+    * @returns {string} The breakdown tooltip.
     */
    function getTotalValueTooltip(valueObject, mod) {
-      // Base value label.
-      /** @type {string} */
-      let retVal = `<p>${localize('base')}: ${valueObject.baseValue}</p>`;
-
-      // Equipment mod.
-      if (valueObject.mod.equipment) {
-         retVal += `<p>${localize('equipment')}: ${valueObject.mod.equipment}</p>`;
-      }
-
-      // Ability mod.
-      if (valueObject.mod.ability) {
-         retVal += `<p>${localize('abilities')}: ${valueObject.mod.ability}</p>`;
-      }
-
-      // Effects mod.
-      if (valueObject.mod.effect) {
-         retVal += `<p>${localize('effects')}: ${valueObject.mod.effect}</p>`;
-      }
-
-      // Static mod.
-      if (valueObject.mod.static + mod !== 0) {
-         retVal += `<p>${localize('mod')}: ${valueObject.mod.static + mod}</p>`;
-      }
-
-      return retVal;
+      return createModifiableStatTooltip(valueObject.baseValue, valueObject.mod, mod);
    }
 
    /** @type {string} Tooltip for the total Training value. */
@@ -112,8 +89,7 @@
             <ModifiedValueLabel
                baseValue={
                   document.data.system.skill[key].training.baseValue +
-                     document.data.system.skill[key].training.mod.ability +
-                     document.data.system.skill[key].training.mod.equipment +
+                     getInnateModTotal(document.data.system.skill[key].training.mod) +
                      checkParameters.trainingMod
                }
                currentValue={checkParameters.totalTrainingDice}
@@ -146,8 +122,7 @@
             <ModifiedValueLabel
                baseValue={
                   document.data.system.skill[key].expertise.baseValue +
-                     document.data.system.skill[key].expertise.mod.ability +
-                     document.data.system.skill[key].expertise.mod.equipment +
+                     getInnateModTotal(document.data.system.skill[key].expertise.mod) +
                      checkParameters.expertiseMod
                }
                currentValue={checkParameters.totalExpertise}

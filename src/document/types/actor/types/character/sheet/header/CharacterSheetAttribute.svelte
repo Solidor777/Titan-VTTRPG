@@ -49,11 +49,8 @@
       <!--Total Value-->
       <div class="value">
          <ModifiableStatValueLabel
-            abilityMod={document.data.system.attribute[attribute].mod.ability}
             baseValue={document.data.system.attribute[attribute].baseValue}
-            effectMod={document.data.system.attribute[attribute].mod.effect}
-            equipmentMod={document.data.system.attribute[attribute].mod.equipment}
-            staticMod={document.data.system.attribute[attribute].mod.static}
+            mod={document.data.system.attribute[attribute].mod}
             value={document.data.system.attribute[attribute].value}
          />
       </div>

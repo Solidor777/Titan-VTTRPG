@@ -1,16 +1,14 @@
 <script>
    import tooltipAction from '~/helpers/svelte-actions/TooltipAction.js';
    import createModifiableStatTooltip from '~/helpers/utility-functions/CreateModifiableStatTooltip.js';
+   import { getInnateModTotal } from '~/system/ModBuckets.js';
 
    /**
     * @typedef {object} ModifiableStatValueLabelProps
     * @property {number} [baseValue] - The base value of the stat before any modifiers are applied.
     * @property {number} [value] - The value of the stat after any modifiers are applied.
     * @property {number} [valueOverride] - Override for the value of the stat after any modifiers are applied.
-    * @property {number} [abilityMod] - Bonuses and penalties from Abilities.
-    * @property {number} [effectMod] - Bonuses and penalties from Effects.
-    * @property {number} [equipmentMod] - Bonuses and penalties from Equipment.
-    * @property {number} [staticMod] - Bonuses and penalties from Static modifiers.
+    * @property {Record<string, number>} [mod] - The stat's modifier buckets (see MOD_BUCKET_LABELS).
     * @property {string} [baseTooltip] - Label for the base value of the stat in the tooltip.
     * @property {string | undefined} [testId] - Optional data-testid for automated probing.
     */
@@ -20,28 +18,21 @@
       baseValue = void 0,
       value = void 0,
       valueOverride = void 0,
-      abilityMod = void 0,
-      effectMod = void 0,
-      equipmentMod = void 0,
-      staticMod = void 0,
+      mod = void 0,
       baseTooltip = void 0,
       testId = void 0,
    } = $props();
 
    /**
-    * The class to use for styling the label, derived reactively from prop values.
+    * The class to use for styling the label: a bonus or penalty when the value differs from the base plus the stat's
+    * innate (ability and equipment) modifiers.
     * @type {string}
     */
    let styleClass = $derived.by(() => {
-      // Calculate the normal value by adding the ability and equipment mods to the base value.
-      let normalValue = baseValue;
-      if (abilityMod) {
-         normalValue += abilityMod;
-      }
-      if (equipmentMod) {
-         normalValue += equipmentMod;
-      }
+      /** @type {number} The stat's normal value. */
+      const normalValue = baseValue + getInnateModTotal(mod);
 
+      /** @type {number} The value compared against it. */
       const realValue = valueOverride ?? value;
 
       // Add a bonus class if normal value < current value.
@@ -63,11 +54,7 @@
     */
    let tooltip = $derived.by(() => createModifiableStatTooltip(
       baseValue,
-      value,
-      abilityMod,
-      effectMod,
-      equipmentMod,
-      staticMod,
+      mod,
       valueOverride ? valueOverride - value : 0,
       baseTooltip,
    ));

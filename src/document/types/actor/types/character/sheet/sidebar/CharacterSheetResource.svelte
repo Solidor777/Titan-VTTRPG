@@ -74,12 +74,9 @@
       <!--Max Value-->
       <div class="side">
          <ModifiableStatValueLabel
-            abilityMod={document.data.system.resource[resource].mod.ability}
             baseTooltip={localize(`${resource}.maxValue`)}
             baseValue={document.data.system.resource[resource].maxBase}
-            effectMod={document.data.system.resource[resource].mod.effect}
-            equipmentMod={document.data.system.resource[resource].mod.equipment}
-            staticMod={document.data.system.resource[resource].mod.static}
+            mod={document.data.system.resource[resource].mod}
             value={document.data.system.resource[resource].max}
          />
       </div>
