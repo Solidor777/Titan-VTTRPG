@@ -18,7 +18,7 @@
 
    /** @type {DocumentIntegerIncrementInputProps} */
    let {
-      value = $bindable(void 0),
+      value = $bindable(),
       min = false,
       max = false,
       disabled = false,

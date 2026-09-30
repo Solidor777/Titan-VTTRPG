@@ -14,7 +14,7 @@
 
    /** @type {LabeledTextInputProps} */
    let {
-      value    = $bindable(undefined),
+      value    = $bindable(),
       label    = void 0,
       icon     = void 0,
       disabled = false,

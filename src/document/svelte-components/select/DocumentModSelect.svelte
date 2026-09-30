@@ -13,7 +13,7 @@
 
    /** @type {DocumentModSelectProps} */
    let {
-      value = $bindable(void 0),
+      value = $bindable(),
       allowNone = false,
       disabled = false,
       tooltip = void 0,

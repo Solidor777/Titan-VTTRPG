@@ -21,7 +21,7 @@
     */
 
    /** @type {CharacterSheetAbilityProps} */
-   let { isExpanded = $bindable(undefined) } = $props();
+   let { isExpanded = $bindable() } = $props();
 
    /** @type {object} The embedded ability bridge provided by EmbeddedDocumentProvider. */
    const document = getContext('document');

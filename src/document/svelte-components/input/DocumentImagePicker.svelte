@@ -12,7 +12,7 @@
 
    /** @type {DocumentImagePickerProps} */
    let {
-      value = $bindable(void 0),
+      value = $bindable(),
       alt = 'img',
       disabled = false,
       tooltip = void 0,

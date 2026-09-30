@@ -14,7 +14,7 @@
 
    /** @type {DocumentDamageReducedBySelectProps} */
    let {
-      value = $bindable(void 0),
+      value = $bindable(),
       allowOpposedCheck = true,
       allowResistanceCheck = true,
       disabled = false,

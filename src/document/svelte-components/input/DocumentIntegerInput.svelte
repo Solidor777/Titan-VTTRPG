@@ -16,7 +16,7 @@
 
    /** @type {DocumentIntegerInputProps} */
    let {
-      value = $bindable(void 0),
+      value = $bindable(),
       min = false,
       max = false,
       maxDigits = false,

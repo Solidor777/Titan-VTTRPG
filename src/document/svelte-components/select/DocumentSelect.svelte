@@ -16,7 +16,7 @@
 
    /** @type {DocumentSelectProps} */
    let {
-      value = $bindable(void 0),
+      value = $bindable(),
       options = void 0,
       disabled = false,
       tooltip = void 0,

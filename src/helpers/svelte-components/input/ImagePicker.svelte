@@ -14,7 +14,7 @@
 
    /** @type {ImagePickerProps} */
    let {
-      value = $bindable(void 0),
+      value = $bindable(),
       alt = 'img',
       disabled = false,
       tooltip = void 0,

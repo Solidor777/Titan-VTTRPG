@@ -12,6 +12,13 @@ describe('roundDirectional', () => {
       expect(roundDirectional(-0.5, 'down')).toBe(-1);
    });
 
+   it('rounds to the nearest integer, a half toward positive infinity, when rounding is "nearest"', () => {
+      expect(roundDirectional(2.4, 'nearest')).toBe(2);
+      expect(roundDirectional(2.5, 'nearest')).toBe(3);
+      expect(roundDirectional(-1.5, 'nearest')).toBe(-1);
+      expect(roundDirectional(-1.6, 'nearest')).toBe(-2);
+   });
+
    it('defaults to floor when rounding is missing or unrecognized', () => {
       expect(roundDirectional(2.9, undefined)).toBe(2);
       expect(roundDirectional(2.9, 'sideways')).toBe(2);

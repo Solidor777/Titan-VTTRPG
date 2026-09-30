@@ -12,7 +12,7 @@
 
    /** @type {DocumentTextInputProps} */
    let {
-      value = $bindable(void 0),
+      value = $bindable(),
       disabled = false,
       tooltip = void 0,
    } = $props();

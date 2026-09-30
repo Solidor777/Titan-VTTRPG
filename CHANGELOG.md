@@ -1,3 +1,7 @@
+## Unreleased:
+Conditions follow the 2026-09-26 rules.
+- Multiply Base and Multiply Sum rules elements can round to the nearest whole number.
+
 ## Version 2.1.0:
 Advantage and Disadvantage, situational modifiers, and bug fixes.
 - **Re-create hotbar macros made before this version:** every hotbar macro created before this version no longer

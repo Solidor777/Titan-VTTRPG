@@ -31,7 +31,7 @@
    /** @type {SelectProps} */
    let {
       options = void 0,
-      value = $bindable(void 0),
+      value = $bindable(),
       disabled = false,
       tooltip = void 0,
       onchange,

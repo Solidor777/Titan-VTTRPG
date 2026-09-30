@@ -760,7 +760,9 @@ domain:
   then returns the truthy result or `null`; default budget is 5 attempts at 50 ms each. First attempt
   is immediate (no leading delay), so the success path has no wall-clock cost.
 - **Rules-element math** — pure delta helpers for the multiplicative/sum appliers: `RoundDirectional.js`
-  (`roundDirectional(value, rounding)` ceils on `'up'`, floors otherwise), `ComputeMulSumDelta.js`
+  (`roundDirectional(value, rounding)` ceils on `'up'`, rounds on `'nearest'`, floors otherwise; the named export
+  `ROUNDING_DIRECTIONS` (`down`, `up`, `nearest`) feeds both the mulBase and mulSum editors' rounding select),
+  `ComputeMulSumDelta.js`
   (`computeMulSumDelta(total, value, rounding)` returns `roundDirectional(total * value, rounding) - total`,
   or `0` when `total <= 0` so a zero stat is never pushed negative), and `ComputeSetSumDelta.js`
   (`computeSetSumDelta(total, value, mode)` returns the delta forcing the total to `value` under `set`, raising

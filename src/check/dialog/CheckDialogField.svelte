@@ -15,7 +15,7 @@
    /** @type {CheckDialogFieldProps} */
    let {
       label = undefined,
-      value = $bindable(undefined),
+      value = $bindable(),
       input = undefined,
       tooltip = undefined,
       inputProps = undefined,

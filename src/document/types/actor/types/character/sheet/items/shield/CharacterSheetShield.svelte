@@ -22,7 +22,7 @@
     */
 
    /** @type {CharacterSheetShieldProps} */
-   let { isExpanded = $bindable(undefined) } = $props();
+   let { isExpanded = $bindable() } = $props();
 
    /** @type {object} The embedded shield bridge provided by EmbeddedDocumentProvider. */
    const document = getContext('document');

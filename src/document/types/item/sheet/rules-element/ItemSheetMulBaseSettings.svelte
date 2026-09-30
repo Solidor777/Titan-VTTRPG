@@ -9,6 +9,7 @@
    import DocumentResourceSelect from '~/document/svelte-components/select/DocumentResourceSelect.svelte';
    import DocumentSpeedSelect from '~/document/svelte-components/select/DocumentSpeedSelect.svelte';
    import DocumentNumberInput from '~/document/svelte-components/input/DocumentNumberInput.svelte';
+   import { ROUNDING_DIRECTIONS } from '~/helpers/utility-functions/RoundDirectional.js';
 
    /**
     * @typedef {object} ItemSheetMulBaseSettingsProps
@@ -30,12 +31,6 @@
       'resource',
       'speed',
       'training',
-   ];
-
-   /** @type {string[]} Options for the rounding direction. */
-   const roundingOptions = [
-      'up',
-      'down',
    ];
 
    /**
@@ -145,7 +140,8 @@
    <div class="field select">
       <DocumentSelect
          bind:value={document.data.system.rulesElement[idx].rounding}
-         options={roundingOptions}
+         options={ROUNDING_DIRECTIONS}
+         testId={'mulbase-rounding'}
       />
    </div>
 </div>

@@ -10,7 +10,8 @@ import generateUUID from '~/helpers/utility-functions/GenerateUUID.js';
  * @property {string} key - The key of the stat being modified (body, stride, etc.), or 'all' for every
  * key under the selector.
  * @property {number} value - The fractional multiplier applied to the running total (0.5 to halve).
- * @property {string} rounding - The rounding direction applied to the scaled total ('up' or 'down').
+ * @property {string} rounding - The rounding direction applied to the scaled total: 'down', 'up', or 'nearest'
+ * (ROUNDING_DIRECTIONS).
  * @property {string} uuid - Unique identifier for the Rules Element, used to track the element across type changes.
  */
 

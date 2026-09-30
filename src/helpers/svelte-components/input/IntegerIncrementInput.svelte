@@ -22,7 +22,7 @@
 
    /** @type {IntegerIncrementInputProps} */
    let {
-      value             = $bindable(undefined),
+      value             = $bindable(),
       min               = false,
       max               = false,
       disabled          = false,

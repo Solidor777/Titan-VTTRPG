@@ -15,7 +15,7 @@
    let {
       label   = 'filter',
       icon    = void 0,
-      value   = $bindable(undefined),
+      value   = $bindable(),
       tooltip = void 0,
       testId  = void 0,
    } = $props();

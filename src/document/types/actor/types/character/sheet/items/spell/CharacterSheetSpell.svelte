@@ -23,7 +23,7 @@
     */
 
    /** @type {CharacterSheetSpellProps} */
-   let { isExpanded = $bindable(undefined) } = $props();
+   let { isExpanded = $bindable() } = $props();
 
    /** @type {object} The embedded spell bridge provided by EmbeddedDocumentProvider. */
    const document = getContext('document');

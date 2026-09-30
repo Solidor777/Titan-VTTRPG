@@ -20,7 +20,7 @@
    /** @type {TabsProps} */
    let {
       tabs = [],
-      activeTab = $bindable(undefined),
+      activeTab = $bindable(),
       border = false,
       testId = void 0,
    } = $props();

@@ -20,7 +20,7 @@
     */
 
    /** @type {CharacterSheetCommodityProps} */
-   let { isExpanded = $bindable(undefined) } = $props();
+   let { isExpanded = $bindable() } = $props();
 
    /** @type {object} The embedded commodity bridge provided by EmbeddedDocumentProvider. */
    const document = getContext('document');

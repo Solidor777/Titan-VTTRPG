@@ -12,7 +12,7 @@
 
    /** @type {DocumentCheckboxInputProps} */
    let {
-      value = $bindable(void 0),
+      value = $bindable(),
       tooltip = void 0,
       disabled = false,
    } = $props();

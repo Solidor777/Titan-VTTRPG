@@ -8,6 +8,7 @@
    import DocumentResistanceSelect from '~/document/svelte-components/select/DocumentResistanceSelect.svelte';
    import DocumentResourceSelect from '~/document/svelte-components/select/DocumentResourceSelect.svelte';
    import DocumentSpeedSelect from '~/document/svelte-components/select/DocumentSpeedSelect.svelte';
+   import { ROUNDING_DIRECTIONS } from '~/helpers/utility-functions/RoundDirectional.js';
 
    /**
     * @typedef {object} ItemSheetMulSumSettingsProps
@@ -29,12 +30,6 @@
       'resource',
       'speed',
       'training',
-   ];
-
-   /** @type {string[]} Options for the rounding direction. */
-   const roundingOptions = [
-      'up',
-      'down',
    ];
 
    /**
@@ -140,7 +135,8 @@
    <div class="field select">
       <DocumentSelect
          bind:value={document.data.system.rulesElement[idx].rounding}
-         options={roundingOptions}
+         options={ROUNDING_DIRECTIONS}
+         testId={'mulsum-rounding'}
       />
    </div>
 </div>

@@ -14,7 +14,7 @@
 
    /** @type {DocumentRatingSelectProps} */
    let {
-      value = $bindable(void 0),
+      value = $bindable(),
       allowAll = false,
       allowNone = false,
       disabled = false,

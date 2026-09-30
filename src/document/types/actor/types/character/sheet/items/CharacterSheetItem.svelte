@@ -13,7 +13,7 @@
     */
 
    /** @type {CharacterSheetItemProps} */
-   let { isExpanded = $bindable(undefined), controls, children } = $props();
+   let { isExpanded = $bindable(), controls, children } = $props();
 </script>
 
 <div class="item">

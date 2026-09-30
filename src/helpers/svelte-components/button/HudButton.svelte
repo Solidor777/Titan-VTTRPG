@@ -34,7 +34,7 @@
       type = 'button',
       ariaLabel = undefined,
       testId = undefined,
-      element = $bindable(undefined),
+      element = $bindable(),
       onclick = undefined,
       onpointermove = undefined,
       onfocus = undefined,

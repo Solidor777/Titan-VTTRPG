@@ -13,7 +13,7 @@
 
    /** @type {TextInputProps} */
    let {
-      value    = $bindable(undefined),
+      value    = $bindable(),
       disabled = false,
       tooltip  = undefined,
       onchange = undefined,

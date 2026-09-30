@@ -18,8 +18,8 @@
    /** @type {EditTraitsDialogBaseProps} */
    let {
       item = undefined,
-      documentTraits = $bindable(undefined),
-      traitOptions = $bindable(undefined),
+      documentTraits = $bindable(),
+      traitOptions = $bindable(),
       traitDescriptions = undefined,
    } = $props();
 

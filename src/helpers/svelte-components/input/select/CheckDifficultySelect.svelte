@@ -12,7 +12,7 @@
 
    /** @type {CheckDifficultySelectProps} */
    let {
-      value = $bindable(void 0),
+      value = $bindable(),
       disabled = void 0,
       tooltip = void 0,
       onchange = void 0,

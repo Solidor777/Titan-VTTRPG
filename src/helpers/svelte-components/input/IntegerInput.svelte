@@ -16,7 +16,7 @@
 
    /** @type {IntegerInputProps} */
    let {
-      value     = $bindable(undefined),
+      value     = $bindable(),
       min       = false,
       max       = false,
       maxDigits = false,

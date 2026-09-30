@@ -10,7 +10,7 @@
     */
 
    /** @type {CharacterSheetItemExpandButtonProps} */
-   let { isExpanded = $bindable(undefined), name = false } = $props();
+   let { isExpanded = $bindable(), name = false } = $props();
 
    /** @type {object} The embedded document bridge provided by EmbeddedDocumentProvider. */
    const document = getContext('document');
