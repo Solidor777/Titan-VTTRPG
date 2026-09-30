@@ -239,3 +239,49 @@ describe('quarter-of-base condition penalties', () => {
       expect(model.rating.defense.value).toBe(6);
    });
 });
+
+describe('condition check rules', () => {
+   it('Frightened gives Attribute and Resistance checks Disadvantage', () => {
+      /** @type {object} The Frightened character. */
+      const model = createConditionedCharacter(['frightened']);
+      expect(model.getAttributeCheckMod('advantage', 'body', 'athletics')).toBe(-1);
+      expect(model.getResistanceCheckMod('advantage', 'willpower')).toBe(-1);
+   });
+
+   it.each([
+      'incapacitated',
+      'restrained',
+   ])('%s automatically fails Reflexes checks and no other Resistance check', (id) => {
+      /** @type {object} The conditioned character. */
+      const model = createConditionedCharacter([id]);
+      expect(model.getResistanceCheckMod('automaticFailure', 'reflexes')).toBeGreaterThan(0);
+      expect(model.getResistanceCheckMod('automaticFailure', 'resilience')).toBe(0);
+   });
+
+   it.each([
+      [
+         'blinded',
+         'reliesOnSight',
+         'situationReliesOnSight',
+      ],
+      [
+         'deafened',
+         'reliesOnHearing',
+         'situationReliesOnHearing',
+      ],
+   ])('%s offers the %s Automatic Failure on Perception checks only', (id, key, labelKey) => {
+      /** @type {object} The conditioned character. */
+      const model = createConditionedCharacter([id]);
+      expect(model.getSituationalCheckModifiers('attribute', { skill: 'perception' })).toEqual([
+         {
+            key,
+            label: `LOCAL.${labelKey}.text`,
+            labelKey,
+            modifierType: 'automaticFailure',
+            sources: [id],
+            value: 1,
+         },
+      ]);
+      expect(model.getSituationalCheckModifiers('attribute', { skill: 'athletics' })).toEqual([]);
+   });
+});

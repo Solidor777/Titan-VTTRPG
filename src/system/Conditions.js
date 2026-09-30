@@ -1,5 +1,6 @@
 import localize from '~/helpers/utility-functions/Localize.js';
 import sortAscending from '~/helpers/utility-functions/SortAscending.js';
+import { CANONICAL_SITUATIONS } from '~/system/CanonicalSituations.js';
 
 /**
  * Builds a condition's "-¼ of their base value, rounded up" penalty: a `mulBase` element scaling the stat's base by ¾
@@ -25,9 +26,54 @@ function createQuarterBasePenalty(conditionId, selector, key, uuidSuffix = key) 
 }
 
 /**
+ * Builds a condition's "automatically fails any Awareness and Perception checks that rely on <sense>" rule: a
+ * situational Automatic Failure offered on Perception checks. Awareness is a passive rating with no check of its own,
+ * so Perception checks are the Awareness checks. The element stores `labelKey` and no `label`: a condition's rules
+ * elements persist on its Active Effect, and the situational cache localizes `labelKey` on each client.
+ * Source: TITAN Rules Compendium (09_26_2026), "Blinded" and "Deafened".
+ * @param {string} conditionId - The condition id, which names the element's uuid.
+ * @param {string} labelKey - The situation's CANONICAL_SITUATIONS key.
+ * @param {string} uuidSuffix - The uuid's last segment.
+ * @returns {ConditionalCheckModifierElement} The element.
+ */
+function createSenseAutomaticFailure(conditionId, labelKey, uuidSuffix) {
+   return {
+      checkType: 'any',
+      key: CANONICAL_SITUATIONS[labelKey],
+      labelKey,
+      modifierType: 'automaticFailure',
+      operation: 'conditionalCheckModifier',
+      selector: 'situation',
+      skill: 'perception',
+      uuid: `condition-${conditionId}-${uuidSuffix}`,
+      value: 1,
+   };
+}
+
+/**
+ * Builds a condition's "automatically fails Reflexes checks" rule: an always-on Automatic Failure on Reflexes
+ * Resistance Checks. Source: TITAN Rules Compendium (09_26_2026), "Incapacitated" and "Restrained".
+ * @param {string} conditionId - The condition id, which names the element's uuid.
+ * @returns {ConditionalCheckModifierElement} The element.
+ */
+function createReflexesAutomaticFailure(conditionId) {
+   return {
+      checkType: 'resistance',
+      key: 'reflexes',
+      modifierType: 'automaticFailure',
+      operation: 'conditionalCheckModifier',
+      selector: 'resistance',
+      skill: '',
+      uuid: `condition-${conditionId}-reflexes`,
+      value: 1,
+   };
+}
+
+/**
  * Builds the static list of TITAN condition definitions for CONFIG.statusEffects. Every condition is the
- * 'condition' Active Effect subtype; the mechanically-active conditions also carry a `system.rulesElement`
- * array expressing their stat effects (applied through the shared rules-element pipeline). This function is
+ * 'condition' Active Effect subtype; every condition with mechanics carries a `system.rulesElement` array
+ * expressing its stat and check rules (applied through the shared rules-element pipeline). Dead and Unconscious
+ * carry none. This function is
  * pure (no game/localization access) so it can be unit-tested.
  * @returns {object[]} The condition definitions, each with id, name (localization key), img, type, and —
  * for mechanically-active conditions — system.rulesElement.
@@ -44,6 +90,7 @@ export function buildConditionDefinitions() {
                createQuarterBasePenalty('blinded', 'rating', 'melee'),
                createQuarterBasePenalty('blinded', 'rating', 'accuracy'),
                createQuarterBasePenalty('blinded', 'rating', 'defense'),
+               createSenseAutomaticFailure('blinded', 'situationReliesOnSight', 'sight'),
             ],
          },
       },
@@ -70,18 +117,44 @@ export function buildConditionDefinitions() {
          name: 'LOCAL.deafened.text',
          img: 'icons/svg/deaf.svg',
          type: 'condition',
+         system: {
+            rulesElement: [
+               createSenseAutomaticFailure('deafened', 'situationReliesOnHearing', 'hearing'),
+            ],
+         },
       },
       {
          id: 'frightened',
          name: 'LOCAL.frightened.text',
          img: 'icons/svg/terror.svg',
          type: 'condition',
+         system: {
+            rulesElement: [
+               // Disadvantage on every check. The rules scope it to while the creature can detect the source of its
+               // fear; the condition is applied only while that holds.
+               {
+                  checkType: 'any',
+                  key: '',
+                  modifierType: 'advantage',
+                  operation: 'conditionalCheckModifier',
+                  selector: 'any',
+                  skill: '',
+                  uuid: 'condition-frightened-checks',
+                  value: -1,
+               },
+            ],
+         },
       },
       {
          id: 'incapacitated',
          name: 'LOCAL.incapacitated.text',
          img: 'icons/svg/paralysis.svg',
          type: 'condition',
+         system: {
+            rulesElement: [
+               createReflexesAutomaticFailure('incapacitated'),
+            ],
+         },
       },
       {
          id: 'offBalance',
@@ -135,6 +208,7 @@ export function buildConditionDefinitions() {
                   mode: 'set',
                   uuid: 'condition-restrained-speed',
                },
+               createReflexesAutomaticFailure('restrained'),
             ],
          },
       },

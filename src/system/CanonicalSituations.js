@@ -8,6 +8,8 @@
  */
 export const CANONICAL_SITUATIONS = Object.freeze({
    situationJump: 'Jump',
+   situationReliesOnHearing: 'Relies on Hearing',
+   situationReliesOnSight: 'Relies on Sight',
    situationRemainUndetectedByHearing: 'Remain Undetected by Hearing',
    situationSwimFlyClimb: 'Swim, Fly, or Climb',
 });

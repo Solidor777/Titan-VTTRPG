@@ -6,6 +6,8 @@ Conditions follow the 2026-09-26 rules.
 - Spells can inflict Off-Balance (cost 3) and remove it (cost 2).
 - Stat tooltips on the character sheet and Player HUD list condition modifiers, and speed and mod tooltips list
   abilities; skill Training and Expertise tooltips use the same breakdown.
+- Frightened gives Disadvantage on every check; Incapacitated and Restrained automatically fail Reflexes checks;
+  Blinded and Deafened offer "Relies on Sight" / "Relies on Hearing" Automatic Failures on Perception checks.
 
 ## Version 2.1.0:
 Advantage and Disadvantage, situational modifiers, and bug fixes.

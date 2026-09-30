@@ -1521,10 +1521,11 @@ export default class CharacterDataModel extends TitanActorDataModel {
     * Caches the situational (`situation`-selector) Conditional Check Modifier Rules Elements apart from the summed
     * modifiers, because they never apply automatically. Each cached entry is `{ checkType, key, label, [labelKey],
     * modifierType, skill, source, value }`: `key` is the camel-case form of the element's key (the typed text, or a
-    * system situation's canonical string), `label` is the element's own `label` when it has one (a system situation,
-    * localized) and its key otherwise, `labelKey` is present only for a system situation, `skill` narrows the entry to
-    * checks using one Skill (`''` = any; an element without a `skill` field is cached as `''`), and `source` names the
-    * owning item or effect.
+    * system situation's canonical string), `label` is the element's own `label` when it has one (an armor-trait
+    * situation, localized when built), else its `labelKey` localized on this client (a condition's situation, whose
+    * stored element carries no label), else its key, `labelKey` is present only for a system situation, `skill`
+    * narrows the entry to checks using one Skill (`''` = any; an element without a `skill` field is cached as `''`),
+    * and `source` names the owning item or effect.
     * Elements with a blank key are skipped.
     * @param {ConditionalCheckModifierElement[]} elements - The situational elements, each tagged with its `sourceName`.
     * @private
@@ -1537,7 +1538,7 @@ export default class CharacterDataModel extends TitanActorDataModel {
          this.rulesElementsCache.situationalCheckModifier = keyedElements.map((element) => ({
             checkType: element.checkType,
             key: this._normalizeConditionalCheckModKey('situation', element.key),
-            label: element.label ?? element.key,
+            label: element.label ?? (element.labelKey ? localize(element.labelKey) : element.key),
             ...(element.labelKey ? { labelKey: element.labelKey } : {}),
             modifierType: element.modifierType,
             skill: element.skill ?? '',

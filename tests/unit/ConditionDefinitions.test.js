@@ -3,6 +3,7 @@ import { readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import path from 'node:path';
 import { buildConditionDefinitions } from '~/system/Conditions.js';
+import { CANONICAL_SITUATIONS } from '~/system/CanonicalSituations.js';
 
 /** @type {object} The parsed English localization file. */
 const lang = JSON.parse(readFileSync(
@@ -38,6 +39,45 @@ function quarterPenalty(id, selector, key, uuidSuffix = key) {
    };
 }
 
+/**
+ * Builds the expected "automatically fails Perception checks that rely on <sense>" situation.
+ * @param {string} id - The condition id.
+ * @param {string} labelKey - The situation's localization key (a CANONICAL_SITUATIONS key).
+ * @param {string} uuidSuffix - The uuid's last segment.
+ * @returns {object} The expected element.
+ */
+function senseFailure(id, labelKey, uuidSuffix) {
+   return {
+      checkType: 'any',
+      key: CANONICAL_SITUATIONS[labelKey],
+      labelKey,
+      modifierType: 'automaticFailure',
+      operation: 'conditionalCheckModifier',
+      selector: 'situation',
+      skill: 'perception',
+      uuid: `condition-${id}-${uuidSuffix}`,
+      value: 1,
+   };
+}
+
+/**
+ * Builds the expected "automatically fails Reflexes checks" element.
+ * @param {string} id - The condition id.
+ * @returns {object} The expected element.
+ */
+function reflexesFailure(id) {
+   return {
+      checkType: 'resistance',
+      key: 'reflexes',
+      modifierType: 'automaticFailure',
+      operation: 'conditionalCheckModifier',
+      selector: 'resistance',
+      skill: '',
+      uuid: `condition-${id}-reflexes`,
+      value: 1,
+   };
+}
+
 describe('buildConditionDefinitions', () => {
    it('marks every condition as the condition subtype named by its LOCAL key', () => {
       for (const condition of buildConditionDefinitions()) {
@@ -65,12 +105,49 @@ describe('buildConditionDefinitions', () => {
       expect(new Set(uuids).size).toBe(uuids.length);
    });
 
-   it('seeds blinded with -¼ of base melee, accuracy, and defense', () => {
+   it('seeds blinded with -¼ of base melee, accuracy, and defense and a sight-reliant Perception failure', () => {
       expect(def('blinded').system.rulesElement).toEqual([
          quarterPenalty('blinded', 'rating', 'melee'),
          quarterPenalty('blinded', 'rating', 'accuracy'),
          quarterPenalty('blinded', 'rating', 'defense'),
+         senseFailure('blinded', 'situationReliesOnSight', 'sight'),
       ]);
+   });
+
+   it('seeds deafened with a hearing-reliant Perception failure', () => {
+      expect(def('deafened').system.rulesElement).toEqual([
+         senseFailure('deafened', 'situationReliesOnHearing', 'hearing'),
+      ]);
+   });
+
+   it('seeds frightened with Disadvantage on every check', () => {
+      expect(def('frightened').system.rulesElement).toEqual([
+         {
+            checkType: 'any',
+            key: '',
+            modifierType: 'advantage',
+            operation: 'conditionalCheckModifier',
+            selector: 'any',
+            skill: '',
+            uuid: 'condition-frightened-checks',
+            value: -1,
+         },
+      ]);
+   });
+
+   it('seeds incapacitated with a Reflexes check failure', () => {
+      expect(def('incapacitated').system.rulesElement).toEqual([reflexesFailure('incapacitated')]);
+   });
+
+   it('keys every condition situation by its canonical string', () => {
+      for (const condition of buildConditionDefinitions()) {
+         for (const element of condition.system?.rulesElement ?? []) {
+            if (element.selector === 'situation') {
+               expect(element.key, element.uuid).toBe(CANONICAL_SITUATIONS[element.labelKey]);
+               expect(element.label, `${element.uuid} stores no client-localized label`).toBeUndefined();
+            }
+         }
+      }
    });
 
    it('seeds contaminated with -¼ of every base attribute and resistance', () => {
@@ -109,7 +186,7 @@ describe('buildConditionDefinitions', () => {
       ]);
    });
 
-   it('seeds restrained with -¼ of base melee, accuracy, and defense and speed set to 0', () => {
+   it('seeds restrained with -¼ of base melee, accuracy, and defense, speed 0, and a Reflexes check failure', () => {
       expect(def('restrained').system.rulesElement).toEqual([
          quarterPenalty('restrained', 'rating', 'melee'),
          quarterPenalty('restrained', 'rating', 'accuracy'),
@@ -122,6 +199,7 @@ describe('buildConditionDefinitions', () => {
             mode: 'set',
             uuid: 'condition-restrained-speed',
          },
+         reflexesFailure('restrained'),
       ]);
    });
 
@@ -144,12 +222,9 @@ describe('buildConditionDefinitions', () => {
       ]);
    });
 
-   it('leaves the conditions without stat mechanics without rules elements', () => {
+   it('leaves dead and unconscious without rules elements', () => {
       for (const id of [
          'dead',
-         'deafened',
-         'frightened',
-         'incapacitated',
          'unconscious',
       ]) {
          expect(def(id).system, `${id} should have no system.rulesElement`).toBeUndefined();
