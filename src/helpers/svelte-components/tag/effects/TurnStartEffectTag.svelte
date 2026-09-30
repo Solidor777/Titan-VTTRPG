@@ -7,7 +7,11 @@
 </script>
 
 <div class="tag" data-testid={testId}>
-   <EffectTag {effect} icon={TURN_START_ICON}/>
+   <EffectTag
+      {effect}
+      icon={TURN_START_ICON}
+      leadKey="effect.turnStart.desc"
+   />
 </div>
 
 <style lang="scss">

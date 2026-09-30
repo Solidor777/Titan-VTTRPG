@@ -7,7 +7,11 @@
 </script>
 
 <div class="tag" data-testid={testId}>
-   <EffectTag {effect} icon={INITIATIVE_ICON}/>
+   <EffectTag
+      {effect}
+      icon={INITIATIVE_ICON}
+      leadKey="effect.initiative.desc"
+   />
 </div>
 
 <style lang="scss">

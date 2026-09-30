@@ -13,8 +13,9 @@ unlinked tokens to the new rules (as the Migration Mode setting allows).**
 - Existing conditions update to the current rules through the world migration, which also clears the description text
   older conditions stored, and a condition's description always shows the current text in the reader's language, in
   the Player HUD and in turn-start reports.
-- Turn-start reports list the actor's conditions even when it has no other effect, and report entries' tooltips show
-  their text instead of an untranslated key.
+- Turn-start reports list the actor's conditions even when it has no other effect. Report entries' tooltips show
+  their text instead of an untranslated key, each effect's tooltip leads with its own duration (a condition's shows
+  only its description), and turn-start effects show the Turn Start tag instead of the Turn End one.
 - The Migration Mode setting's "Disabled" choice skips migration, as its description says, and a failed migration no
   longer stops the Player HUD from loading.
 

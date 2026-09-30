@@ -890,8 +890,21 @@ when fixed.
   entry's tooltip read "LOCAL.Effect lasts ….text".
 - **Found:** 2026-09-30 while folding the report's condition-description key into the conditions rework plan.
 - **Fixed:** 2026-09-30 — `EffectTag` passes its tooltip as `TextData` with `localize: false` (Task 5). Gated by
-  `tests/unit/EffectTag.test.js` (the tooltip is localized exactly once) and `tests/e2e/condition-description.spec.js`
-  (a live report tag's tooltip holds no `LOCAL.`).
+  `tests/unit/BuildEffectTagTooltip.test.js` (the tooltip is localized exactly once) and
+  `tests/e2e/condition-description.spec.js` (a live report tag's tooltip holds no `LOCAL.`).
+
+### 80. Every report tag tooltip led with the Custom-duration text
+
+- **What:** `EffectTag.svelte` prefixed every tooltip with `effect.custom.desc` ("Effect lasts for a Custom duration."),
+  so condition tags and Permanent, Turn Start, Turn End, Initiative, and Expired effect tags all claimed a Custom
+  duration. The per-type `effect.*.desc` keys had no reader since the six tag components were merged into `EffectTag`.
+- **Found:** 2026-09-30 by the Task 5 buddy check (plan B).
+- **Fixed:** 2026-09-30 — each duration tag passes its own `leadKey` (`effect.<type>.desc`) and a condition entry has
+  none; `buildEffectTagTooltip` (`src/helpers/utility-functions/BuildEffectTagTooltip.js`) builds the tooltip. Gated by
+  `tests/unit/BuildEffectTagTooltip.test.js` (the builder, plus scans deriving the duration types from the
+  `effect.<type>.desc` keys: every duration tag passes its own key and every report list renders through its own tag),
+  `tests/e2e/component-probe-context.spec.js` (each tag's live tooltip leads with its own text), and
+  `tests/e2e/condition-description.spec.js` (a condition tag's tooltip is its description alone).
 
 ### 86. A two-way-bound prop whose parent bound an undefined value crashed with Svelte `props_invalid_value`
 
@@ -943,3 +956,14 @@ when fixed.
 - **Found:** 2026-09-30 (Task 1 fix round 5, detected in the same sort test with a custom aspect having
   `resistanceCheck: 'none'`).
 - **Fixed:** 2026-09-30 — size calculation guards with `&& aspect.resistanceCheck !== 'none'`. Gated by same as #89.
+
+### 91. Turn-start report effects were drawn with the Turn End tag
+
+- **What:** `ChatMessageEffectsTags.svelte` rendered a report's `effects.turnStart` list with `TurnEndEffectTag`, so
+  turn-start effects showed the Turn End icon and colors; `TurnStartEffectTag` had no reader outside the component
+  probe.
+- **Found:** 2026-09-30 while planning the fix for #80.
+- **Fixed:** 2026-09-30 — the list renders through `TurnStartEffectTag`. Gated by the report-list scan in
+  `tests/unit/BuildEffectTagTooltip.test.js` and `tests/e2e/condition-description.spec.js` (a live turn-start report
+  tags a turn-start effect with the Turn Start icon, not the Turn End one, and its tooltip leads with the Turn Start
+  text).

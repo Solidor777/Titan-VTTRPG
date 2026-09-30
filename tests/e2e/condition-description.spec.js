@@ -11,10 +11,10 @@ import {
 
 /**
  * A condition's description comes from its definition, localized on the reading client, never from text stored on the
- * effect: the Player HUD shows the current text for a condition carrying a stale stored description, and a turn-start
- * report stores the description's localization key and shows the localized text in its tooltip (once localized, and
- * for an actor with conditions and no other effect). A report posted before conditions stored keys shows its stored
- * text.
+ * effect: the Player HUD shows the current text for a condition carrying a stale stored description, a turn-start
+ * report stores the description's localization key and its condition tag's tooltip shows that text alone, localized
+ * once (also for an actor with conditions and no other effect), and a turn-start effect is tagged with the Turn Start
+ * tag, whose tooltip leads with its duration. A report posted before conditions stored keys shows its stored text.
  */
 
 /** @type {string} Name of the throwaway player actor seeded for this spec. */
@@ -151,8 +151,7 @@ test('a turn-start report stores the description key and its tooltip shows the t
       const message = game.messages.contents.at(-1);
       return {
          conditions: message.system.toObject().conditions,
-         expected: `${game.i18n.localize('LOCAL.effect.custom.desc.text')}` +
-            `${game.i18n.localize('LOCAL.blinded.desc.text')}`,
+         expected: game.i18n.localize('LOCAL.blinded.desc.text'),
          id: message.id,
          label: game.i18n.localize('LOCAL.blinded.text'),
       };
@@ -212,6 +211,52 @@ test('a turn-start report posted before conditions stored keys shows its stored 
    const tag = page.locator(`#chat .message[data-message-id="${report.id}"] .report .effects .tag`).first();
    await expect(tag).toContainText(report.label);
    await expect.poll(() => readReportTagTooltip(report.id), { message: 'the tag\'s tooltip is the stored text' })
-      .toContain(LEGACY_REPORT_TEXT);
+      .toBe(LEGACY_REPORT_TEXT);
    expect(await readReportTagTooltip(report.id)).not.toContain('LOCAL.');
+});
+
+test('a turn-start report tags a turn-start effect with the Turn Start tag and its duration lead', async () => {
+   /** @type {{expected: string, id: string, labels: string[]}} The report, and its turn-start tag's expected lead. */
+   const report = await page.evaluate(async (name) => {
+      /** @type {TitanActor} The fixture actor, reset to one turn-start effect. */
+      const actor = game.actors.getName(name);
+      await actor.deleteEmbeddedDocuments('ActiveEffect', actor.effects.map((effect) => effect.id));
+      await actor.createEmbeddedDocuments('ActiveEffect', [
+         {
+            name: 'E2E Turn Start Effect',
+            system: {
+               duration: {
+                  remaining: 3,
+                  type: 'turnStart',
+               },
+            },
+            type: 'effect',
+         },
+      ]);
+
+      /** @type {number} The chat-message count before the turn start. */
+      const before = game.messages.size;
+      await actor.system.onTurnStart();
+      await titanWait(() => game.messages.size > before, { message: 'turn-start report posted' });
+
+      /** @type {ChatMessage} The report. */
+      const message = game.messages.contents.at(-1);
+      return {
+         expected: game.i18n.localize('LOCAL.effect.turnStart.desc.text'),
+         id: message.id,
+         labels: (message.system.toObject().effects?.turnStart ?? []).map((entry) => entry.label),
+      };
+   }, ACTOR_NAME);
+   expect(report.labels).toEqual(['E2E Turn Start Effect']);
+
+   /** @type {import('@playwright/test').Locator} The report's turn-start effect entry. */
+   const entry = page.locator(`#chat .message[data-message-id="${report.id}"] .report .effects .effect`, {
+      hasText: 'E2E Turn Start Effect',
+   });
+   await expect(entry.locator('i.fa-hourglass-start')).toHaveCount(1);
+
+   // The Turn Start icon rendered above (the positive edge); the Turn End icon had to be absent from the same entry.
+   await expect(entry.locator('i.fa-hourglass-end')).toHaveCount(0);
+   await expect.poll(() => entry.locator('.tag .tag').evaluate((element) => element._tippy?.props?.content))
+      .toBe(report.expected);
 });

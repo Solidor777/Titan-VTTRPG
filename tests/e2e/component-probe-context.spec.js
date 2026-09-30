@@ -9,6 +9,23 @@ import {
 } from './componentProbe.js';
 import { closeAllApps, clearChat, attachPageErrors } from './world.js';
 
+/**
+ * Reads a duration tag's tooltip and the text it should hold: the duration lead text, then the entry's description.
+ * @param {import('@playwright/test').Locator} tag - The duration tag's root (the wrapper around its EffectTag).
+ * @param {string} leadKey - The lead text's localization key.
+ * @param {string} description - The entry's stored description.
+ * @returns {Promise<{content: string|undefined, expected: string}>} The tooltip tippy holds, and the expected text.
+ */
+function readLeadTooltip(tag, leadKey, description) {
+   return tag.locator(':scope > .tag').evaluate((element, { key, text }) => ({
+      content: element._tippy?.props?.content,
+      expected: game.i18n.localize(`LOCAL.${key}.text`) + text,
+   }), {
+      key: leadKey,
+      text: description,
+   });
+}
+
 /** @type {import('@playwright/test').Page} The file-shared, logged-in page (one world boot per file). */
 let page;
 /** @type {string[]} Uncaught page errors collected during the current test (cleared each afterEach). */
@@ -82,6 +99,9 @@ test.describe('component probe — EffectTag (plain effect data)', () => {
       await expect(tag).toContainText('Burning');
       await expect(tag.locator('.time')).toContainText('3 (rounds)');
       await expect(tag.locator('img')).toHaveAttribute('src', 'icons/svg/fire.svg');
+
+      // A tag given no lead key (a condition entry) shows only the entry's description.
+      expect(await tag.evaluate((element) => element._tippy?.props?.content)).toBe('<p>On fire.</p>');
    });
 });
 
@@ -108,6 +128,10 @@ test.describe('component probe — CustomEffectTag', () => {
       await expect(tag).toContainText('Inspired');
       await expect(tag.locator('.time')).toContainText('2 (scenes)');
       await expect(tag.locator('i.fa-star')).toHaveCount(1);
+
+      /** @type {{content: string|undefined, expected: string}} The tag's tooltip and the text it should hold. */
+      const tooltip = await readLeadTooltip(tag, 'effect.custom.desc', '<p>Custom.</p>');
+      expect(tooltip.content).toBe(tooltip.expected);
    });
 });
 
@@ -132,6 +156,10 @@ test.describe('component probe — ExpiredEffectTag', () => {
       await expect(tag).toContainText('Faded');
       await expect(tag.locator('.time')).toHaveCount(0);
       await expect(tag.locator('i.fa-trash-clock')).toHaveCount(1);
+
+      /** @type {{content: string|undefined, expected: string}} The tag's tooltip and the text it should hold. */
+      const tooltip = await readLeadTooltip(tag, 'effect.expired.desc', '<p>Expired.</p>');
+      expect(tooltip.content).toBe(tooltip.expected);
    });
 });
 
@@ -158,6 +186,10 @@ test.describe('component probe — InitiativeEffectTag', () => {
       await expect(tag).toContainText('Bleeding');
       await expect(tag.locator('.time')).toContainText('4 (12)');
       await expect(tag.locator('i.fa-clock')).toHaveCount(1);
+
+      /** @type {{content: string|undefined, expected: string}} The tag's tooltip and the text it should hold. */
+      const tooltip = await readLeadTooltip(tag, 'effect.initiative.desc', '<p>Initiative.</p>');
+      expect(tooltip.content).toBe(tooltip.expected);
    });
 });
 
@@ -182,6 +214,10 @@ test.describe('component probe — PermanentEffectTag', () => {
       await expect(tag).toContainText('Blessed');
       await expect(tag.locator('.time')).toHaveCount(0);
       await expect(tag.locator('i.fa-infinity')).toHaveCount(1);
+
+      /** @type {{content: string|undefined, expected: string}} The tag's tooltip and the text it should hold. */
+      const tooltip = await readLeadTooltip(tag, 'effect.permanent.desc', '<p>Permanent.</p>');
+      expect(tooltip.content).toBe(tooltip.expected);
    });
 });
 
@@ -207,6 +243,10 @@ test.describe('component probe — TurnEndEffectTag', () => {
       await expect(tag).toContainText('Regenerating');
       await expect(tag.locator('.time')).toHaveText('5');
       await expect(tag.locator('i.fa-hourglass-end')).toHaveCount(1);
+
+      /** @type {{content: string|undefined, expected: string}} The tag's tooltip and the text it should hold. */
+      const tooltip = await readLeadTooltip(tag, 'effect.turnEnd.desc', '<p>Turn end.</p>');
+      expect(tooltip.content).toBe(tooltip.expected);
    });
 });
 
@@ -232,6 +272,10 @@ test.describe('component probe — TurnStartEffectTag', () => {
       await expect(tag).toContainText('Burning Aura');
       await expect(tag.locator('.time')).toHaveText('6');
       await expect(tag.locator('i.fa-hourglass-start')).toHaveCount(1);
+
+      /** @type {{content: string|undefined, expected: string}} The tag's tooltip and the text it should hold. */
+      const tooltip = await readLeadTooltip(tag, 'effect.turnStart.desc', '<p>Turn start.</p>');
+      expect(tooltip.content).toBe(tooltip.expected);
    });
 });
 

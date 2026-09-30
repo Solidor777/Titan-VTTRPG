@@ -2,15 +2,6 @@
 
 Deferred/known bugs. Todos (planned work) live in `docs/TODO.md`; this file is bugs only.
 
-### 80. Every report tag tooltip leads with the Custom-duration text
-
-- **What:** `EffectTag.svelte` always prefixes `effect.custom.desc` ("Effect lasts for a Custom duration."), so condition
-  tags and Permanent / Turn Start / Turn End / Initiative / Expired effect tags all claim a Custom duration. The
-  per-type `effect.*.desc` keys in `lang/en.json` have no reader since the six tag components were merged into
-  `EffectTag`.
-- **Found:** 2026-09-30 by the Task 5 buddy check (plan B).
-- **Status:** being fixed in plan B Task 5's fix round.
-
 ### 81. Legacy base-type condition effects are inert and never migrated
 
 - **What:** condition Active Effects created before the conditions became the `condition` subtype are `base`-type

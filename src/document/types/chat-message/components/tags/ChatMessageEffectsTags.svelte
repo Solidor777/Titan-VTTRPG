@@ -2,6 +2,7 @@
    import { getContext } from 'svelte';
    import PermanentEffectTag from '~/helpers/svelte-components/tag/effects/PermanentEffectTag.svelte';
    import TurnEndEffectTag from '~/helpers/svelte-components/tag/effects/TurnEndEffectTag.svelte';
+   import TurnStartEffectTag from '~/helpers/svelte-components/tag/effects/TurnStartEffectTag.svelte';
    import ExpiredEffectTag from '~/helpers/svelte-components/tag/effects/ExpiredEffectTag.svelte';
    import InitiativeEffectTag from '~/helpers/svelte-components/tag/effects/InitiativeEffectTag.svelte';
    import CustomEffectTag from '~/helpers/svelte-components/tag/effects/CustomEffectTag.svelte';
@@ -33,7 +34,7 @@
    {#if document.data.system.effects?.turnStart}
       {#each document.data.system.effects.turnStart as effect}
          <div class="effect">
-            <TurnEndEffectTag {effect}/>
+            <TurnStartEffectTag {effect}/>
          </div>
       {/each}
    {/if}

@@ -7,7 +7,11 @@
 </script>
 
 <div class="tag" data-testid={testId}>
-   <EffectTag {effect} icon={EXPIRED_ICON}/>
+   <EffectTag
+      {effect}
+      icon={EXPIRED_ICON}
+      leadKey="effect.expired.desc"
+   />
 </div>
 
 <style lang="scss">

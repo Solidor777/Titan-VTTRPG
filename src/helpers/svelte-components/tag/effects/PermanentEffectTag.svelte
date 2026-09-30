@@ -7,7 +7,11 @@
 </script>
 
 <div class="tag" data-testid={testId}>
-   <EffectTag {effect} icon={PERMANENT_ICON}/>
+   <EffectTag
+      {effect}
+      icon={PERMANENT_ICON}
+      leadKey="effect.permanent.desc"
+   />
 </div>
 
 <style lang="scss">

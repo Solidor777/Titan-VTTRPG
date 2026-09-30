@@ -1,7 +1,6 @@
 <script>
    import checkAddDarkSVGClass from '~/helpers/utility-functions/CheckAddDarkSVGClass.js';
-   import localize from '~/helpers/utility-functions/Localize.js';
-   import isHTMLBlank from '~/helpers/utility-functions/IsHTMLBlank.js';
+   import buildEffectTagTooltip from '~/helpers/utility-functions/BuildEffectTagTooltip.js';
    import tooltipAction from '~/helpers/svelte-actions/TooltipAction.js';
 
    /**
@@ -54,9 +53,9 @@
     * Data object for a standard Condition Effect.
     * @property {string} label - The label to display for the effect.
     * @property {string} img - The image to display for the effect.
-    * @property {string} description - The description of the effect.
-    * @property {string} [descriptionKey] - The localization key of the condition's description, localized at render;
-    * an entry from a report posted before conditions stored keys carries `description` text instead.
+    * @property {string} [descriptionKey] - The localization key of the condition's description, localized at render.
+    * @property {string} [description] - The condition's localized description, which only an entry from a report
+    * posted before conditions stored keys carries.
     */
 
    /**
@@ -68,28 +67,16 @@
     * @typedef {object} EffectTagProps
     * @property {EffectTagEffectData} effect - The effect data this tag displays.
     * @property {string} [icon] - Optional font-icon class shown alongside the effect.
+    * @property {string} [leadKey] - The localization key of the duration text the tooltip leads with
+    * (`effect.<type>.desc`, passed by each duration's tag); a condition entry has none.
     * @property {string} [testId] - Optional test id bound to the root element for probing.
     */
 
    /** @type {EffectTagProps} */
-   let { effect = void 0, icon = void 0, testId = void 0 } = $props();
+   let { effect = void 0, icon = void 0, leadKey = void 0, testId = void 0 } = $props();
 
-   /**
-    * The entry's description HTML: a condition's localized on this client from its key, otherwise the text the entry
-    * stores (an effect's own description, or a condition's in a report posted before conditions stored keys).
-    * @type {string|undefined}
-    */
-   const description = $derived(effect.descriptionKey ? localize(effect.descriptionKey) : effect.description);
-
-   /**
-    * The tooltip: the lead text, then the description when it is not blank. Both are already localized, so the
-    * tooltip action is told not to localize them again (it localizes a plain string as a key).
-    * @type {TextData}
-    */
-   const tooltip = $derived({
-      localize: false,
-      text: localize('effect.custom.desc') + (isHTMLBlank(description) ? '' : description),
-   });
+   /** @type {TextData} The tooltip: the duration lead text, then the entry's description. */
+   const tooltip = $derived(buildEffectTagTooltip(effect, leadKey));
 </script>
 
 <div class="tag" data-testid={testId} use:tooltipAction={tooltip}>
