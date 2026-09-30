@@ -1525,12 +1525,16 @@ export default class CharacterDataModel extends TitanActorDataModel {
     * localized) and its key otherwise, `labelKey` is present only for a system situation, `skill` narrows the entry to
     * checks using one Skill (`''` = any; an element without a `skill` field is cached as `''`), and `source` names the
     * owning item or effect.
+    * Elements with a blank key are skipped.
     * @param {ConditionalCheckModifierElement[]} elements - The situational elements, each tagged with its `sourceName`.
     * @private
     */
    _applySituationalCheckModifierElements(elements) {
-      if (elements.length > 0) {
-         this.rulesElementsCache.situationalCheckModifier = elements.map((element) => ({
+      // A blank key never matches, so a blank-key situation is never offered.
+      /** @type {ConditionalCheckModifierElement[]} The elements with a usable key. */
+      const keyedElements = elements.filter((element) => !isBlankSelectorKey(element.key));
+      if (keyedElements.length > 0) {
+         this.rulesElementsCache.situationalCheckModifier = keyedElements.map((element) => ({
             checkType: element.checkType,
             key: this._normalizeConditionalCheckModKey('situation', element.key),
             label: element.label ?? element.key,

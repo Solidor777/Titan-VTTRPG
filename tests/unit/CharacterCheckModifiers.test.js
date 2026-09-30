@@ -1192,6 +1192,47 @@ describe('conditional check modifier lookups — blank keys and non-Boolean mult
       expect(model.parent.rulesElementsCache.rollMessage.any.customTrait).toEqual({ glowing: ['Real'] });
    });
 
+   it('the situational cache builder skips blank-key situations and offers only the real one', () => {
+      /** @type {object} The model under test. */
+      const model = createModel();
+      model._applySituationalCheckModifierElements([
+         checkModifier({
+            key: '',
+            modifierType: 'advantage',
+            selector: 'situation',
+         }),
+         checkModifier({
+            key: '   ',
+            modifierType: 'advantage',
+            selector: 'situation',
+         }),
+         checkModifier({
+            key: 'Flanking',
+            modifierType: 'advantage',
+            selector: 'situation',
+         }),
+      ]);
+      expect(model.parent.rulesElementsCache.situationalCheckModifier.map((entry) => entry.key)).toEqual([
+         'flanking',
+      ]);
+      expect(model.getSituationalCheckModifiers('attribute', { skill: 'athletics' }).map((entry) => entry.key))
+         .toEqual(['flanking']);
+   });
+
+   it('the situational cache is false when every situation key is blank', () => {
+      /** @type {object} The model under test. */
+      const model = createModel();
+      model._applySituationalCheckModifierElements([
+         checkModifier({
+            key: '',
+            modifierType: 'advantage',
+            selector: 'situation',
+         }),
+      ]);
+      expect(model.parent.rulesElementsCache.situationalCheckModifier).toBe(false);
+      expect(model.getSituationalCheckModifiers('attribute', { skill: 'athletics' })).toEqual([]);
+   });
+
    it('createAttackCheckOptions stores multiAttack as a Boolean', () => {
       expect(createAttackCheckOptions({ multiAttack: 1 }).multiAttack).toBe(true);
       expect(createAttackCheckOptions({ multiAttack: 'yes' }).multiAttack).toBe(true);
