@@ -351,13 +351,15 @@ test('the spell sheet Casting Check tab lists the aspects that make up the total
          range: String(system.aspect.find((aspect) => aspect.label === 'range').cost),
          damage: String(system.aspect.find((aspect) => aspect.label === 'damage').cost),
          custom: String(system.customAspect[0].cost),
+         rangeLabel: game.i18n.localize('LOCAL.range.text'),
+         damageLabel: game.i18n.localize('LOCAL.damage.text'),
          disabledLabel: game.i18n.localize('LOCAL.decreaseMod.text'),
       };
    }, PANEL_SPELL_NAME);
    await expect(costs.locator('.tag')).toHaveCount(3);
    await expect(costs.locator('.tag .label')).toHaveText([
-      'Range',
-      'Damage',
+      expected.rangeLabel,
+      expected.damageLabel,
       'E2E Custom 0',
    ]);
    await expect(costs.locator('.tag .value')).toHaveText([
@@ -368,6 +370,27 @@ test('the spell sheet Casting Check tab lists the aspects that make up the total
 
    // With the listed siblings resolved, the disabled aspect is absent.
    await expect(costs.getByText(expected.disabledLabel, { exact: true })).toHaveCount(0);
+});
+
+test('the spell sheet Casting Check tab re-prices an aspect while it is open', async () => {
+   const appId = await openPanelSpell(1);
+   const costs = page.locator(`[id="${appId}"] .aspect-costs`);
+   const rangeLabel = await page.evaluate(() => game.i18n.localize('LOCAL.range.text'));
+   const rangeValue = costs.locator('.tag', { hasText: rangeLabel }).locator('.value');
+
+   // A self-range aspect costs nothing.
+   await expect(rangeValue).toHaveText('0');
+
+   // Widening the range to 50 re-prices it through the shared cost calculation; the open panel follows the document.
+   const repriced = await page.evaluate(async (name) => {
+      const item = game.items.getName(name);
+      const aspects = foundry.utils.deepClone(item._source.system.aspect);
+      aspects.find((aspect) => aspect.label === 'range').initialValue = 50;
+      await item.update({ 'system.aspect': aspects });
+      return String(item.system.aspect.find((aspect) => aspect.label === 'range').cost);
+   }, PANEL_SPELL_NAME);
+   expect(repriced, 'the document re-prices the aspect').not.toBe('0');
+   await expect.poll(() => rangeValue.textContent()).toBe(repriced);
 });
 
 test('the spell sheet Casting Check tab keeps its aspect list scroll position across tab switches', async () => {

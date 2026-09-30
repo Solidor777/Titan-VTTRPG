@@ -4,6 +4,7 @@
    import { CASTING_ICON } from '~/system/Icons.js';
    import SidebarCheck from '~/document/svelte-components/check/SidebarCheck.svelte';
    import SpellSheetSidebarAspects from '~/document/types/item/types/spell/sheet/SpellSheetSidebarAspects.svelte';
+   import selectDisplayedSpellAspects from '~/document/types/item/types/spell/SelectDisplayedSpellAspects.js';
    import CondensedCastingCheckButton from '~/document/svelte-components/check/CondensedCastingCheckButton.svelte';
 
    /** @type {object} Reference to the Application State store. */
@@ -18,27 +19,12 @@
     */
    const rollActor = getContext('rollActor');
 
-   /**
-    * Determines whether any aspect in the supplied list is currently enabled.
-    * @param {Array<{enabled: boolean}>} aspects - The spell aspects to inspect.
-    * @returns {boolean} True if at least one aspect is enabled, otherwise false.
-    */
-   function areAspectsEnabled(aspects) {
-      for (let idx = 0; idx < aspects.length; idx++) {
-         if (aspects[idx].enabled) {
-            return true;
-         }
-      }
-      return false;
-   }
-
    /** @type {object} The spell's casting-check configuration, read reactively through the bridge. */
    const castingCheck = $derived(document.data.system.castingCheck);
 
-   /** @type {boolean} True when the spell has any enabled aspect or at least one custom aspect. */
+   /** @type {boolean} True when the spell displays any aspect: an enabled standard aspect or a custom aspect. */
    const aspectsEnabled = $derived(
-      areAspectsEnabled(document.data.system.aspect) ||
-         document.data.system.customAspect.length > 0,
+      selectDisplayedSpellAspects(document.data.system.aspect, document.data.system.customAspect).length > 0,
    );
 </script>
 

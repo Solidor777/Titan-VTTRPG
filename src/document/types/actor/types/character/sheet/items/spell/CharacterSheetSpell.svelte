@@ -16,6 +16,7 @@
    import CharacterSheetSpellCastingCheck
    from '~/document/types/actor/types/character/sheet/items/spell/CharacterSheetSpellCastingCheck.svelte';
    import CondensedCastingCheckButton from '~/document/svelte-components/check/CondensedCastingCheckButton.svelte';
+   import selectDisplayedSpellAspects from '~/document/types/item/types/spell/SelectDisplayedSpellAspects.js';
 
    /**
     * @typedef {object} CharacterSheetSpellProps
@@ -40,8 +41,13 @@
    /** @type {string} Rich-text description, read reactively through the embedded bridge. */
    const description = $derived(document.data?.system.description);
 
-   /** @type {SpellAspect[]} List of enabled Spell Aspects. */
-   const enabledAspects = $derived(aspect.filter((aspect) => aspect.enabled));
+   /** @type {object[]} The Spell Aspects that make up the spell's total cost, in display order. */
+   const displayedAspects = $derived(selectDisplayedSpellAspects(aspect, customAspect));
+
+   /** @type {SpellAspect[]} The standard Spell Aspects that make up the spell's total cost. */
+   const displayedStandardAspects = $derived(
+      displayedAspects.filter((entry) => !entry.isCustom).map((entry) => entry.aspect),
+   );
 </script>
 
 <CharacterSheetItem bind:isExpanded>
@@ -73,10 +79,10 @@
    </div>
 
    <!--Spell Aspects-->
-   {#if enabledAspects.length > 0 || customAspect.length > 0}
+   {#if displayedAspects.length > 0}
       <div class="section tags">
          <SpellAspectTags
-            standardAspects={enabledAspects}
+            standardAspects={displayedStandardAspects}
             customAspects={customAspect}
          />
       </div>

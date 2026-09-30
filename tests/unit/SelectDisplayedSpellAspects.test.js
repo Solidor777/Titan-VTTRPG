@@ -67,6 +67,99 @@ describe('selectDisplayedSpellAspects', () => {
       ]);
    });
 
+   it('indexes each custom aspect within the custom list and keeps their order', () => {
+      /** @type {object[]} Three custom aspects. */
+      const customAspects = [
+         {
+            uuid: 'custom-a',
+            label: 'First',
+            cost: 1,
+         },
+         {
+            uuid: 'custom-b',
+            label: 'Second',
+            cost: 2,
+         },
+         {
+            uuid: 'custom-c',
+            label: 'Third',
+            cost: 3,
+         },
+      ];
+
+      /** @type {object[]} One enabled standard aspect ahead of them. */
+      const aspects = [
+         {
+            label: 'damage',
+            enabled: true,
+            cost: 4,
+         },
+      ];
+
+      expect(selectDisplayedSpellAspects(aspects, customAspects).map((entry) => ({
+         key: entry.key,
+         isCustom: entry.isCustom,
+         index: entry.index,
+      }))).toEqual([
+         {
+            key: 'damage',
+            isCustom: false,
+            index: 0,
+         },
+         {
+            key: 'custom-a',
+            isCustom: true,
+            index: 0,
+         },
+         {
+            key: 'custom-b',
+            isCustom: true,
+            index: 1,
+         },
+         {
+            key: 'custom-c',
+            isCustom: true,
+            index: 2,
+         },
+      ]);
+   });
+
+   it('lists custom aspects when no standard aspect is enabled', () => {
+      /** @type {object[]} Standard aspects, all disabled. */
+      const aspects = [
+         {
+            label: 'damage',
+            enabled: false,
+            cost: 0,
+         },
+         {
+            label: 'range',
+            enabled: false,
+            cost: 0,
+         },
+      ];
+
+      /** @type {object[]} Custom aspects. */
+      const customAspects = [
+         {
+            uuid: 'custom-a',
+            label: 'Only',
+            cost: 2,
+         },
+         {
+            uuid: 'custom-b',
+            label: 'Other',
+            cost: 3,
+         },
+      ];
+
+      expect(selectDisplayedSpellAspects(aspects, customAspects).map((entry) => entry.label)).toEqual([
+         'Only',
+         'Other',
+      ]);
+      expect(selectDisplayedSpellAspects([], customAspects)).toHaveLength(2);
+   });
+
    it('returns the source aspect objects and an empty list when nothing is enabled', () => {
       /** @type {object} A disabled aspect. */
       const disabled = {

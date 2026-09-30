@@ -483,15 +483,32 @@ the pair and `ThemeContract.test.js` enforces WCAG AA contrast for it.
 renders as the raw key in the settings window. The settings-menu button label key is
 `SETTINGS.themeEditor.button`.
 
+**Every `$appState` path must exist in the sheet's initial-state factory.** A path outside the factory's
+object silently creates a new key on write (a misspelled `scrollTop` loses the initialised state, and the
+behavioural test still passes). `tests/unit/SheetStatePaths.test.js` derives each sheet's components by
+following `.svelte` imports from its `*SheetShell.svelte` and walks every `$appState.a.b.c` (and
+`tabs[tabKey]`) path against that sheet's factory (`createCharacterSheetData`,
+`createRulesElementItemSheetData`, `createSpellSheetData`, `createWeaponSheetData`); a new shell must be
+added to its registry, and a state-reading component no registered sheet mounts fails the suite.
+
+**Spell aspect display is one selector.** `selectDisplayedSpellAspects(aspects, customAspects)`
+(`spell/SelectDisplayedSpellAspects.js`) returns the enabled standard aspects then the custom aspects —
+the set that makes up `totalAspectCost`; the sheet sidebar, Casting Check tab panel, character-sheet spell
+row and spell chat card all use it. `tests/unit/SpellAspectSelectorUse.test.js` fails on a hand-rolled
+`aspect.filter(… .enabled)` in any `.svelte`. `aspect.enabled` and `aspect.cost` are derived in
+`SpellDataModel#prepareDerivedData`, not stored.
+
 **AppV2 sheets must bind their own DragDrop** — ApplicationV2 wires no drag-drop handlers;
 `TitanActorSheet._onRender` creates a `foundry.applications.ux.DragDrop.implementation` (drop
 permission = `isEditable`) and binds it to `this.element` every render. Without that, `_onDrop` is
 dead code and sheet drops silently no-op.
 
-**Never `bind:` a possibly-undefined value into a defaulted `$bindable` prop** — Svelte 5 throws
-`props_invalid_value` at runtime. The recurring case is a per-index sheet-state read for a row the
-document just gained (the state array grows AFTER the document update renders the row). Use a function
-binding with the seeded default as fallback:
+**No `$bindable` prop declares a fallback** (`tests/unit/BindableNoFallback.test.js` fails on
+`$bindable(<anything>)`): Svelte 5 throws `props_invalid_value` when a parent `bind:`s an undefined value
+to a bindable prop that has a fallback. Components apply defaults at the read site
+(`$derived(value ?? default)`). The recurring undefined-bound case is a per-index sheet-state read for a
+row the document just gained (the state array grows AFTER the document update renders the row); use a
+function binding with the seeded default as fallback:
 `bind:expanded={() => $appState...isExpanded[idx] ?? true, (v) => $appState...isExpanded[idx] = v}`
 (`ItemSheetSidebarCheck`, `WeaponSheetSidebarAttacks`).
 

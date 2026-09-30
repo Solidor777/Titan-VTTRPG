@@ -1,9 +1,10 @@
 <script>
    import SpellAspectTags from '~/helpers/svelte-components/tag/SpellAspectTags.svelte';
+   import selectDisplayedSpellAspects from '~/document/types/item/types/spell/SelectDisplayedSpellAspects.js';
 
    /**
     * @typedef {object} SpellChatAspectsProps
-    * @property {object} [item] - The titan flags data for the item.
+    * @property {object} [item] - The Spell's chat-message system snapshot.
     */
 
    /** @type {SpellChatAspectsProps} */
@@ -11,11 +12,13 @@
 
    // item is a static chat-message system snapshot — it never changes after mount.
    // svelte-ignore state_referenced_locally
-   /** @type {object[]} List of enabled Spell Aspects. */
-   const enabledAspects = item.aspect.filter((aspect) => aspect.enabled);
+   /** @type {object[]} The standard Spell Aspects that make up the spell's total cost. */
+   const displayedStandardAspects = selectDisplayedSpellAspects(item.aspect, item.customAspect)
+      .filter((entry) => !entry.isCustom)
+      .map((entry) => entry.aspect);
 </script>
 
 <SpellAspectTags
-   standardAspects={enabledAspects}
+   standardAspects={displayedStandardAspects}
    customAspects={item.customAspect}
 />

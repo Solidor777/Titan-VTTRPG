@@ -6,6 +6,7 @@
    import SpellChatAspects from '~/document/types/item/types/spell/chat-message/SpellChatAspects.svelte';
    import SpellStats from '~/document/types/item/types/spell/components/SpellStats.svelte';
    import CastingCheckTags from '~/document/svelte-components/check/CastingCheckTags.svelte';
+   import selectDisplayedSpellAspects from '~/document/types/item/types/spell/SelectDisplayedSpellAspects.js';
 
    /** @type {object} Reference to the reactive Document store. */
    const document = getContext('document');
@@ -21,7 +22,7 @@
    </div>
 
    <!--Aspects-->
-   {#if item.aspect.some((aspect) => aspect.enabled) || item.customAspect.length > 0}
+   {#if selectDisplayedSpellAspects(item.aspect, item.customAspect).length > 0}
       <div class="section">
          <SpellChatAspects {item}/>
       </div>
