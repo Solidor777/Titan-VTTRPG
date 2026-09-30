@@ -26,7 +26,7 @@ const CANONICAL = {
 /**
  * Builds the expected synthetic element.
  * @param {string} trait - The armor trait.
- * @param {string} modifierType - What the element changes (e.g. `difficulty` or `automaticFailure`).
+ * @param {string} modifierType - What the element changes (`advantage` or `automaticFailure`).
  * @param {number} value - The element value.
  * @param {string} labelKey - The situation label's localization key.
  * @param {string} skill - The Skill narrowing ('' = any).
