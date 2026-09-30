@@ -97,9 +97,10 @@ export default class TitanMacros {
          // Get the id depending on the id method.
          const id = this.getMacroID(item, idMethod);
 
-         // Create the command.
+         // Create the command; every string argument is JSON-encoded so names with quotes or backslashes stay literals.
          /** @type {string} The script the Macro runs. */
-         const command = `game.titan.macros.rollAttackCheck('${id}', '${idMethod}', ${attackIdx})`;
+         const command = `game.titan.macros.rollAttackCheck(` +
+            `${JSON.stringify(id)}, ${JSON.stringify(idMethod)}, ${attackIdx})`;
 
          // Get or create the macro.
          return this.getOrCreateMacro(name, img, command, 'attackCheck', ATTACK_CHECK_MACRO_VERSION);
@@ -121,9 +122,9 @@ export default class TitanMacros {
          // Get the id depending on the id method.
          const id = this.getMacroID(item, idMethod);
 
-         // Create the command.
+         // Create the command; every string argument is JSON-encoded so names with quotes or backslashes stay literals.
          /** @type {string} The script the Macro runs. */
-         const command = `game.titan.macros.rollCastingCheck('${id}', '${idMethod}')`;
+         const command = `game.titan.macros.rollCastingCheck(${JSON.stringify(id)}, ${JSON.stringify(idMethod)})`;
 
          // Get or create the macro.
          return this.getOrCreateMacro(name, img, command, 'castingCheck', CASTING_CHECK_MACRO_VERSION);
@@ -146,9 +147,10 @@ export default class TitanMacros {
          // Get the id depending on the id method.
          const id = this.getMacroID(item, idMethod);
 
-         // Create the command.
+         // Create the command; every string argument is JSON-encoded so names with quotes or backslashes stay literals.
          /** @type {string} The script the Macro runs. */
-         const command = `game.titan.macros.rollItemCheck('${id}', '${idMethod}', ${checkIdx})`;
+         const command = `game.titan.macros.rollItemCheck(` +
+            `${JSON.stringify(id)}, ${JSON.stringify(idMethod)}, ${checkIdx})`;
 
          // Get or create the macro.
          return this.getOrCreateMacro(name, img, command, 'itemCheck', ITEM_CHECK_MACRO_VERSION);
@@ -165,7 +167,7 @@ export default class TitanMacros {
    async getToggleDocumentSheetMacro(name, img, uuid) {
       // Create the command. v14 namespaces the Hotbar; its bare global is a deprecated alias.
       /** @type {string} The script the Macro runs. */
-      const command = `foundry.applications.ui.Hotbar.toggleDocumentSheet('${uuid}')`;
+      const command = `foundry.applications.ui.Hotbar.toggleDocumentSheet(${JSON.stringify(uuid)})`;
 
       // Get or create the macro.
       return this.getOrCreateMacro(

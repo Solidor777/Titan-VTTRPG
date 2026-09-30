@@ -145,6 +145,54 @@ describe('TitanMacros — every generated command runs', () => {
       });
    });
 
+   describe.each([
+      'Bob\'s Sword',
+      'Back\\slash',
+      'Say "hi"',
+      'Mix\'d \\ "all"',
+   ])('a Document named %s', (itemName) => {
+      it.each([
+         'attack',
+         'casting',
+         'item',
+      ])('has a name-identified %s macro that compiles and passes the exact name through', async (kind) => {
+         /** @type {object} The Item the macro rolls. */
+         const item = createItem(kind === 'casting' ? 'spell' : 'weapon');
+         item.name = itemName;
+         /** @type {object} The controlled Character. */
+         const actor = createActor([item]);
+         vi.mocked(getControlledCharacters).mockReturnValue([actor]);
+         /** @type {object} The spy standing in for the macro entry point. */
+         const spy = vi.spyOn(game.titan.macros, 'getMacroItemFromID');
+
+         /** @type {object} The created Macro. */
+         let macro;
+         if (kind === 'attack') {
+            macro = await game.titan.macros.getAttackCheckMacro(item, 'M', 'm.svg', 'name', 0);
+         } else if (kind === 'casting') {
+            macro = await game.titan.macros.getCastingCheckMacro(item, 'M', 'm.svg', 'name');
+         } else {
+            macro = await game.titan.macros.getItemCheckMacro(item, 'M', 'm.svg', 'name', 0);
+         }
+
+         await executeMacro(macro);
+         expect(spy).toHaveBeenCalledWith(actor, itemName, 'name');
+      });
+   });
+
+   it('a sheet-toggle macro whose uuid contains a quote compiles and passes the exact uuid through', async () => {
+      /** @type {Function} The stand-in for the v14 Hotbar's sheet toggle. */
+      const toggleDocumentSheet = vi.fn();
+      globalThis.foundry.applications = {
+         ui: {
+            Hotbar: { toggleDocumentSheet },
+         },
+      };
+
+      await executeMacro(await game.titan.macros.getToggleDocumentSheetMacro('Sheet', 'sheet.svg', 'It\'s\\"x'));
+      expect(toggleDocumentSheet).toHaveBeenCalledWith('It\'s\\"x');
+   });
+
    it('a sheet-toggle macro toggles the Document\'s sheet through the namespaced Hotbar', async () => {
       /** @type {Function} The stand-in for the v14 Hotbar's sheet toggle. */
       const toggleDocumentSheet = vi.fn();
