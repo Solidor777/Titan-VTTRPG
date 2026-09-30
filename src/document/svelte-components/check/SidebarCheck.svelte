@@ -26,10 +26,13 @@
       difficulty = undefined,
       complexity = undefined,
       hasDetails = false,
-      expanded = $bindable(true),
+      expanded = $bindable(),
       rollButton = undefined,
       children,
    } = $props();
+
+   /** @type {boolean} Whether the details panel shows; an unbound `expanded` defaults to expanded. */
+   const isExpanded = $derived(expanded ?? true);
 </script>
 
 <div class="sidebar-check">
@@ -63,11 +66,11 @@
          class="toggle"
          data-view-controls
       >
-         <ExpandButton bind:expanded/>
+         <ExpandButton bind:expanded={() => isExpanded, (next) => (expanded = next)}/>
       </div>
 
       <!--Details Panel-->
-      {#if expanded}
+      {#if isExpanded}
          <div class="details" transition:slide|local>
             {@render children?.()}
          </div>

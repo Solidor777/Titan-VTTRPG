@@ -1,8 +1,7 @@
 import { expect, test } from '@playwright/test';
-import { readFileSync } from 'node:fs';
-import { fileURLToPath } from 'node:url';
 import { login, openSheetTab } from './fixtures.js';
 import { attachPageErrors, closeAllApps } from './world.js';
+import { ROUNDING_DIRECTIONS } from '../../src/helpers/utility-functions/RoundDirectional.js';
 import { readTitanSelectValue, selectTitanOption, titanSelectOptionValues } from './select.js';
 
 /**
@@ -14,16 +13,12 @@ import { readTitanSelectValue, selectTitanOption, titanSelectOptionValues } from
 /** @type {string} Name of the world ability item this spec edits. */
 const ITEM_NAME = 'E2E Rounding Editor';
 
-/**
- * The rounding directions, read from their single source (`ROUNDING_DIRECTIONS`) so the expectation follows the code.
- * @type {string[]}
- */
-const ROUNDING_DIRECTIONS = [
-   ...readFileSync(fileURLToPath(new URL('../../src/helpers/utility-functions/RoundDirectional.js', import.meta.url)),
-      'utf-8')
-      .match(/ROUNDING_DIRECTIONS = Object\.freeze\(\[([\s\S]*?)\]\)/)[1]
-      .matchAll(/'(\w+)'/g),
-].map((match) => match[1]);
+/** @type {string[]} The localized labels the rounding select shows for each direction, in display order. */
+const ROUNDING_LABELS = [
+   'Round Down',
+   'Round Up',
+   'Round to Nearest',
+];
 
 /** @type {import('@playwright/test').Page} The file-shared, logged-in page (one world boot per file). */
 let page;
@@ -136,6 +131,11 @@ for (const [testId, index] of [
       /** @type {import('@playwright/test').Locator} The rounding select's trigger. */
       const trigger = sheet().getByTestId(testId);
       expect(await titanSelectOptionValues(page, trigger)).toEqual(ROUNDING_DIRECTIONS);
+
+      // The rows read the localized labels, not the raw direction keys.
+      await trigger.click();
+      await expect(page.locator('[role="option"]')).toHaveText(ROUNDING_LABELS);
+      await page.keyboard.press('Escape');
 
       await selectTitanOption(page, trigger, 'nearest');
       await expect.poll(() => readRounding(index), { message: 'nearest is stored' }).toBe('nearest');

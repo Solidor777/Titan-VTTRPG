@@ -13,16 +13,19 @@
 
    /** @type {CheckboxInputProps} */
    let {
-      value = $bindable(false),
+      value = $bindable(),
       disabled = false,
       tooltip = void 0,
       onchange = void 0,
       testId = void 0,
    } = $props();
 
+   /** @type {boolean} Whether the box is checked; an unbound `value` defaults to unchecked. */
+   const isChecked = $derived(value ?? false);
+
    /** Toggles the value and invokes the onchange callback. */
    function onClick() {
-      value = !value;
+      value = !isChecked;
       onchange?.();
    }
 </script>
@@ -34,7 +37,7 @@
    onmousedown={preventDefault}
    use:tooltipAction={tooltip}
 >
-   {#if value === true}
+   {#if isChecked === true}
       <i class="fas fa-check"></i>
    {/if}
 </button>

@@ -17,7 +17,7 @@
 
    /** @type {ProseMirrorEditorProps} */
    let {
-      value = $bindable(''),
+      value = $bindable(),
       editable = true,
       toggled = true,
       enriched = void 0,
@@ -51,7 +51,7 @@
       // Assemble the configuration for the native element.
       /** @type {{ value: string, toggled: boolean, enriched?: string, documentUUID?: string }} */
       const config = {
-         value,
+         value: value ?? '',
          toggled,
       };
       if (enriched !== void 0) {

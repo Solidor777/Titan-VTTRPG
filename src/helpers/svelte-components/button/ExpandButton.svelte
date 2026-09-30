@@ -14,21 +14,24 @@
 
    /** @type {ExpandButtonProps} */
    let {
-      expanded = $bindable(false),
+      expanded = $bindable(),
       disabled = false,
       tooltip = void 0,
       testId = void 0,
    } = $props();
+
+   /** @type {boolean} Whether the button shows expanded; an unbound `expanded` defaults to collapsed. */
+   const isExpanded = $derived(expanded ?? false);
 </script>
 
 <button
-   aria-label={expanded ? localize('collapse') : localize('expand')}
+   aria-label={isExpanded ? localize('collapse') : localize('expand')}
    data-testid={testId}
    {disabled}
-   onclick={() => (expanded = !expanded)}
+   onclick={() => (expanded = !isExpanded)}
    onmousedown={preventDefault}
    use:tooltipAction={tooltip}>
-   <i class={expanded ? EXPANDED_ICON : COLLAPSED_ICON}></i>
+   <i class={isExpanded ? EXPANDED_ICON : COLLAPSED_ICON}></i>
 </button>
 
 <style lang="scss">

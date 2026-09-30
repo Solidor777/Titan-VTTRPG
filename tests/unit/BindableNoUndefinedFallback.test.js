@@ -29,19 +29,34 @@ function listSvelteFiles(directory) {
 /** @type {string[]} Every Svelte component in `src`. */
 const SVELTE_FILES = listSvelteFiles(SOURCE_DIRECTORY);
 
+/** @type {RegExp} A `$bindable(` call, capturing its argument text up to the first closing parenthesis. */
+const BINDABLE_CALL = /\$bindable\(([^)]*)\)/g;
+
 describe('bindable props', () => {
-   it('finds the components', () => {
+   it('finds the components and their bindable declarations', () => {
       expect(SVELTE_FILES.length).toBeGreaterThan(100);
+
+      /** @type {number} How many `$bindable(` declarations exist across the components. */
+      const declarations = SVELTE_FILES.reduce(
+         (count, file) => count + (readFileSync(file, 'utf-8').match(/\$bindable\(/g) ?? []).length,
+         0,
+      );
+      expect(declarations).toBeGreaterThan(50);
    });
 
-   // A bindable prop with any fallback argument, even `undefined`, makes Svelte throw `props_invalid_value` when a
-   // parent binds it to a value that is currently undefined (e.g. a rules element with no stored `rounding`).
+   // Svelte throws `props_invalid_value` (reactivity/props.js, the `fallback !== undefined` check) when a parent binds
+   // an undefined value to a bindable prop whose fallback is not `undefined`. `void 0` counts: the compiler wraps it in
+   // a function. A bindable declares no fallback at all, so the throw is structurally impossible; the default lives
+   // where the value is read.
    it.each(SVELTE_FILES.map((file) => path.relative(SOURCE_DIRECTORY, file)))(
-      '%s declares no bindable fallback of undefined',
+      '%s declares no bindable fallback',
       (relativePath) => {
          /** @type {string} The component source. */
          const source = readFileSync(path.join(SOURCE_DIRECTORY, relativePath), 'utf-8');
-         expect(source).not.toMatch(/\$bindable\(\s*(void 0|undefined)\s*\)/);
+
+         /** @type {string[]} The argument text of every bindable declaration. */
+         const args = [...source.matchAll(BINDABLE_CALL)].map((match) => match[1].trim());
+         expect(args.filter((arg) => arg !== '')).toEqual([]);
       },
    );
 });

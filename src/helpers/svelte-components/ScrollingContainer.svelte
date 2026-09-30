@@ -8,7 +8,7 @@
 
    /** @type {ScrollingContainerProps} */
    let {
-      scrollTop = $bindable(0),
+      scrollTop = $bindable(),
       children,
       testId = void 0,
    } = $props();
@@ -41,7 +41,7 @@
     */
    function initialScroll(element) {
       // Initialize the element's scroll top.
-      element.scrollTop = scrollTop;
+      element.scrollTop = scrollTop ?? 0;
 
       // Styling code for a blur at the top and bottom of an overflowing element.
       updateOverflowingState(element);

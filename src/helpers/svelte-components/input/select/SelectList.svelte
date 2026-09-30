@@ -21,7 +21,7 @@
    let {
       options,
       value,
-      hoverIndex = $bindable(0),
+      hoverIndex = $bindable(),
       listId,
       testId = void 0,
       listEl = $bindable(),
@@ -30,6 +30,9 @@
       onselect,
       onhover,
    } = $props();
+
+   /** @type {number} The highlighted row index; an unbound `hoverIndex` highlights the first row. */
+   const activeIndex = $derived(hoverIndex ?? 0);
 
    /** @type {boolean} Hides the list for the first frame so floating-ui positions before paint. */
    let prefloat = $state(true);
@@ -46,7 +49,7 @@
    // Scroll the highlighted row into view as keyboard navigation moves it.
    $effect(() => {
       // The currently highlighted option row, resolved by its generated id.
-      const active = listEl?.querySelector(`#${CSS.escape(`${listId}-option-${hoverIndex}`)}`);
+      const active = listEl?.querySelector(`#${CSS.escape(`${listId}-option-${activeIndex}`)}`);
       active?.scrollIntoView({ block: 'nearest' });
    });
 </script>
@@ -67,7 +70,7 @@
       <!-- svelte-ignore a11y_click_events_have_key_events -->
       <div
          class="option"
-         class:hover={i === hoverIndex}
+         class:hover={i === activeIndex}
          class:selected={opt.value === value}
          id={`${listId}-option-${i}`}
          role="option"

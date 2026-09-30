@@ -7,7 +7,7 @@
    const documentBridge = getContext('document');
 
    /** @type {{ value?: string, disabled?: boolean, tooltip?: (string | object) }} */
-   let { value = $bindable(''), disabled = false, tooltip = void 0 } = $props();
+   let { value = $bindable(), disabled = false, tooltip = void 0 } = $props();
 
    /** @type {boolean} Whether the current user owns the document and may edit its content. */
    const isOwner = $derived(documentBridge.data.isOwner);
@@ -25,7 +25,7 @@
    // This only writes `enriched`, never `value`, so it cannot re-trigger the persist effect below.
    $effect(() => {
       // Read the current value so the effect re-runs on change.
-      const currentValue = value;
+      const currentValue = value ?? '';
 
       // Enrich asynchronously, ignoring stale resolutions if the value changed in the meantime.
       let cancelled = false;
