@@ -501,8 +501,10 @@ factory's output; every `*SheetData.js` factory must yield a distinct state for 
 the set that makes up `totalAspectCost`; the sheet sidebar, Casting Check tab panel, character-sheet spell
 row and spell chat card all use it. `SpellAspectTags` takes that array unchanged (`aspects` prop) and
 orders the tags by approximate size (scaling, options, a non-`'none'` resistance check), stable for ties.
-`tests/unit/SpellAspectSelectorUse.test.js` fails when any `.svelte` mentioning aspects reads `enabled`
-(`.enabled`, `['enabled']`, or an `enabled` destructuring key); `SpellSheetEnableAspectButton`'s
+`tests/unit/SpellAspectSelectorUse.test.js` parses every `.svelte` mentioning aspects with
+`svelte/compiler`'s `parse` (styles blanked by `preprocess`, since they are SCSS) and walks the AST: any
+`MemberExpression` on `enabled` or `enabled` key in an `ObjectPattern` at any depth fails it (an `enabled=`
+attribute passed to a child is allowed); `SpellSheetEnableAspectButton`'s
 "aspect is on the spell" prop is therefore `isAdded`. `aspect.enabled` and `aspect.cost` are derived in
 `SpellDataModel#prepareDerivedData`, not stored.
 

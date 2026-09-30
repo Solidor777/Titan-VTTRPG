@@ -2,30 +2,13 @@ import { describe, it, expect } from 'vitest';
 import { readdirSync, readFileSync, statSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import path from 'node:path';
+import { parse, preprocess } from 'svelte/compiler';
 
 /** @type {string} The absolute `src/` directory. */
 const SOURCE_DIRECTORY = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../src');
 
 /** @type {RegExp} Marks a component that deals with Spell Aspects: it mentions aspects in any casing. */
 const ASPECT_MARKER = /aspect/i;
-
-/** @type {RegExp} Matches a member read of `enabled`: `x.enabled`, `x?.enabled`, or `x['enabled']`. */
-const MEMBER_READ = /\??\.\s*enabled\b|\[\s*(['"`])enabled\1\s*\]/g;
-
-/**
- * Matches a brace group in a destructuring (binding) position. Group 1 is the pattern's content. Covered positions:
- * a declaration or assignment (`{ … } =`), a `for … of`/`in` head, an arrow-function parameter (`({ … }) =>`,
- * `({ … }, idx) =>`), a function or method parameter (`({ … }) {`), a Svelte `{#each … as { … }}` item,
- * `{:then { … }}`/`{:catch { … }}`, and `{#snippet name({ … })}`.
- * @type {RegExp}
- */
-const DESTRUCTURING_PATTERN = new RegExp([
-   String.raw`(?:\bas\s*|\{:(?:then|catch)\s*|\{#snippet\s+[\w$]+\s*\(\s*)\{([^{}]*)\}`,
-   String.raw`\{([^{}]*)\}(?=\s*=(?![=>])|\s+(?:of|in)\b|\s*(?:,[^(){}]*)?\)\s*(?:=>|\{))`,
-].join('|'), 'g');
-
-/** @type {RegExp} Matches `enabled` as a key of a destructuring pattern's content (plain, renamed, or defaulted). */
-const ENABLED_KEY = /(?:^|[\s,])enabled\s*(?:[,:=]|$)/;
 
 /**
  * Lists every `.svelte` file below a directory.
@@ -44,71 +27,118 @@ function listComponents(directory) {
 }
 
 /**
- * Removes the parts of a component that are not script or markup code: `<style>` blocks, HTML comments, and
- * JavaScript block and line comments. A CSS class or a comment that names `enabled` is not a read.
- * @param {string} source - A component's source text.
- * @returns {string} The source without styles and comments.
+ * Tests whether a property key names `enabled`: a non-computed identifier or a string literal.
+ * @param {object} key - The ESTree key or property node.
+ * @param {boolean} computed - Whether the key is written in brackets.
+ * @returns {boolean} True when the key is `enabled`.
  */
-function stripNonCode(source) {
-   return source
-      .replace(/<style[\s\S]*?<\/style>/g, '')
-      .replace(/<!--[\s\S]*?-->/g, '')
-      .replace(/\/\*[\s\S]*?\*\//g, '')
-      .replace(/(^|[^:\w])\/\/.*$/gm, '$1');
+function isEnabledKey(key, computed) {
+   return (!computed && key.type === 'Identifier' && key.name === 'enabled')
+      || (key.type === 'Literal' && key.value === 'enabled');
 }
 
 /**
- * Finds every read of an `enabled` field or binding in a component: a member read (`a.enabled`, `a?.enabled`,
- * `a['enabled']`) or an `enabled` key in a destructuring pattern. Which Spell Aspects are displayed is decided by
- * `selectDisplayedSpellAspects` alone, so a component that deals with aspects reads none of these.
- * @param {string} source - A component's source text.
- * @returns {string[]} The offending snippets.
+ * Finds every read of an `enabled` field in a component by walking its Svelte AST (instance and module scripts, and
+ * every template expression and binding pattern): a member read (`a.enabled`, `a?.enabled`, `a['enabled']`) or an
+ * `enabled` key in an object destructuring pattern at any depth, including patterns nested in arrays and patterns in
+ * `{#each}`, `{#snippet}`, `{:then}` and `{@const}`. Passing an `enabled=` attribute to a child is a value in, not a
+ * read, and strings and comments are not code, so none of those match. Which Spell Aspects are displayed is decided
+ * by `selectDisplayedSpellAspects` alone, so a component that deals with aspects reads none of these. `<style>`
+ * contents are blanked to spaces by a Svelte style preprocessor before parsing: they are SCSS, which the CSS parser
+ * rejects, and hold no script reads; blanking keeps every offset, so reported lines match the file.
+ * @param {string} componentSource - A component's source text.
+ * @returns {Promise<string[]>} One description per read, with its line.
  */
-function findEnabledReads(source) {
-   /** @type {string} The component's script and markup code. */
-   const code = stripNonCode(source);
+async function findEnabledReads(componentSource) {
+   /** @type {string} The component with every `<style>` block's content blanked to spaces, line breaks kept. */
+   const source = (await preprocess(componentSource, {
+      style: ({ content }) => ({ code: content.replace(/[^\n]/g, ' ') }),
+   })).code;
 
-   /** @type {string[]} Each `.enabled`, `?.enabled` or `['enabled']` access in the code. */
-   const memberReads = [...code.matchAll(MEMBER_READ)].map((match) => match[0]);
+   /** @type {string[]} The reads found. */
+   const found = [];
 
-   /** @type {string[]} The destructuring patterns that bind `enabled`. */
-   const destructured = [...code.matchAll(DESTRUCTURING_PATTERN)]
-      .filter((match) => ENABLED_KEY.test(match[1] ?? match[2]))
-      .map((match) => match[0]);
+   /**
+    * Describes a node's position as a line number.
+    * @param {object} node - An AST node with a `start` offset.
+    * @returns {string} The one-based line of the node.
+    */
+   const lineOf = (node) => `line ${source.slice(0, node.start).split('\n').length}`;
 
-   return [
-      ...memberReads,
-      ...destructured,
-   ];
+   /** @type {Set<object>} The AST objects already visited; guards against shared or cyclic references. */
+   const visited = new Set();
+
+   /** @type {unknown[]} The AST values still to visit. */
+   const pending = [parse(source, { modern: true })];
+   while (pending.length > 0) {
+      /** @type {unknown} The value to visit next. */
+      const node = pending.pop();
+      if (node === null || typeof node !== 'object' || visited.has(node)) {
+         continue;
+      }
+      visited.add(node);
+
+      if (node.type === 'MemberExpression' && isEnabledKey(node.property, node.computed)) {
+         found.push(`member read of enabled at ${lineOf(node)}`);
+      }
+      if (node.type === 'ObjectPattern') {
+         for (const property of node.properties) {
+            if (property.type === 'Property' && isEnabledKey(property.key, property.computed)) {
+               found.push(`destructured enabled at ${lineOf(property)}`);
+            }
+         }
+      }
+
+      pending.push(...Object.values(node));
+   }
+
+   return found;
+}
+
+/**
+ * Wraps script code in an instance `<script>` block so it parses as a component.
+ * @param {string} code - The script body.
+ * @returns {string} The component source.
+ */
+function script(code) {
+   return `<script>\n${code}\n</script>`;
 }
 
 describe('findEnabledReads', () => {
-   it('flags member reads in markup, loops and list callbacks', () => {
-      expect(findEnabledReads('{#each aspects as a}{#if a.enabled}<Tag/>{/if}{/each}')).toHaveLength(1);
-      expect(findEnabledReads('for (const a of aspects) {\n   if (a.enabled) {\n      count++;\n   }\n}'))
+   it('flags member reads in markup, loops and list callbacks', async () => {
+      expect(await findEnabledReads('{#each aspects as a}{#if a.enabled}<Tag/>{/if}{/each}')).toHaveLength(1);
+      expect(await findEnabledReads(script('for (const a of aspects) {\n   if (a.enabled) {\n      count++;\n   }\n}')))
          .toHaveLength(1);
-      expect(findEnabledReads('const first = aspects.find((a) => a.enabled);')).toHaveLength(1);
-      expect(findEnabledReads('aspects.filter((a) => a?.enabled)')).toHaveLength(1);
-      expect(findEnabledReads('if (aspect[idx][\'enabled\']) {')).toHaveLength(1);
+      expect(await findEnabledReads(script('const first = aspects.find((a) => a.enabled);'))).toHaveLength(1);
+      expect(await findEnabledReads(script('aspects.filter((a) => a?.enabled);'))).toHaveLength(1);
+      expect(await findEnabledReads(script('const on = a[\'enabled\'];'))).toHaveLength(1);
+      expect(await findEnabledReads('{#each aspects as a}{@const on = a.enabled}{on}{/each}')).toHaveLength(1);
    });
 
-   it('flags enabled bound by a destructuring pattern', () => {
-      expect(findEnabledReads('const { enabled } = aspect;')).toHaveLength(1);
-      expect(findEnabledReads('const { label, enabled: isOn = false } = aspect;')).toHaveLength(1);
-      expect(findEnabledReads('for (const { enabled, cost } of aspects) {')).toHaveLength(1);
-      expect(findEnabledReads('aspects.filter(({ enabled }) => enabled)')).toHaveLength(1);
-      expect(findEnabledReads('aspects.map(({ enabled }, idx) => idx)')).toHaveLength(1);
-      expect(findEnabledReads('function isShown({ enabled }) {\n   return true;\n}')).toHaveLength(1);
-      expect(findEnabledReads('{#each aspects as { enabled, label }}{label}{/each}')).toHaveLength(1);
-      expect(findEnabledReads('{#snippet row({ enabled })}{/snippet}')).toHaveLength(1);
+   it('flags enabled bound by a destructuring pattern at any depth', async () => {
+      expect(await findEnabledReads(script('const { enabled } = aspect;'))).toHaveLength(1);
+      expect(await findEnabledReads(script('const { label, enabled: isOn = false } = aspect;'))).toHaveLength(1);
+      expect(await findEnabledReads(script('for (const { enabled, cost } of aspects) {\n}'))).toHaveLength(1);
+      expect(await findEnabledReads(script('aspects.filter(({ enabled }) => enabled);'))).toHaveLength(1);
+      expect(await findEnabledReads(script('function isShown({ enabled }) {\n   return enabled;\n}'))).toHaveLength(1);
+      expect(await findEnabledReads('{#each aspects as { enabled, label }}{label}{/each}')).toHaveLength(1);
+      expect(await findEnabledReads('{#snippet row({ enabled })}{/snippet}')).toHaveLength(1);
+      expect(await findEnabledReads('{#await load()}{:then { enabled }}{/await}')).toHaveLength(1);
+      expect(await findEnabledReads(script('const { aspect: { enabled } } = entry;'))).toHaveLength(1);
+      expect(await findEnabledReads('{#each list as { aspect: { enabled } }}{/each}')).toHaveLength(1);
+      expect(await findEnabledReads(script('list.filter(({ aspect: { enabled } }) => enabled);'))).toHaveLength(1);
+      expect(await findEnabledReads(script('const [{ enabled }] = aspects;'))).toHaveLength(1);
+      expect(await findEnabledReads(script('const { \'enabled\': isOn } = aspect;'))).toHaveLength(1);
    });
 
-   it('ignores child props, object literals, look-alike names, styles and comments', () => {
-      expect(findEnabledReads('<ToggleOptionButton enabled={isOn}/>')).toEqual([]);
-      expect(findEnabledReads('toggle({ enabled: true });')).toEqual([]);
-      expect(findEnabledReads('const shown = aspect.isEnabled || aspect.enabledCount > 0;')).toEqual([]);
-      expect(findEnabledReads('<style lang="scss">\n   .tag.enabled {\n      color: red;\n   }\n</style>')).toEqual([]);
-      expect(findEnabledReads('<!--Hides a.enabled aspects-->\n// a.enabled\n/** a.enabled */')).toEqual([]);
+   it('ignores a child enabled attribute, object literals, look-alikes, strings, styles and comments', async () => {
+      expect(await findEnabledReads('<ToggleOptionButton enabled={isOn}/>')).toEqual([]);
+      expect(await findEnabledReads(script('toggle({ enabled: true });'))).toEqual([]);
+      expect(await findEnabledReads(script('const shown = aspect.isEnabled || aspect.enabledCount > 0;'))).toEqual([]);
+      expect(await findEnabledReads(script('const text = \'a.enabled\';\nconst key = "enabled";'))).toEqual([]);
+      expect(await findEnabledReads('<style>\n   .tag.enabled {\n      color: red;\n   }\n</style>')).toEqual([]);
+      expect(await findEnabledReads(`<!--Hides a.enabled aspects-->${script('// a.enabled\n/** a.enabled */')}`))
+         .toEqual([]);
    });
 });
 
@@ -134,13 +164,13 @@ describe('Spell Aspect display selection', () => {
       expect([...aspectComponents.keys()]).toContain('helpers/svelte-components/tag/SpellAspectTags.svelte');
    });
 
-   it('keeps every component that deals with aspects from reading enabled', () => {
+   it('keeps every component that deals with aspects from reading enabled', async () => {
       /** @type {string[]} One message per offending component. */
-      const offenders = [...aspectComponents.entries()]
-         .map(([file, source]) => ({
+      const offenders = (await Promise.all([...aspectComponents.entries()]
+         .map(async ([file, source]) => ({
             file,
-            reads: findEnabledReads(source),
-         }))
+            reads: await findEnabledReads(source),
+         }))))
          .filter(({ reads }) => reads.length > 0)
          .map(({ file, reads }) => `${file}: ${reads.join(' | ')}`);
 

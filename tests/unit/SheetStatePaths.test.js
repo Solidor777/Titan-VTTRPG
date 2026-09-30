@@ -357,7 +357,7 @@ function traceStateFactory(classFile) {
       file = parentImport.file;
    }
 
-   return { problem: `${path.relative(SOURCE_DIRECTORY, file)} is not a source module` };
+   return { problem: `${path.relative(SOURCE_DIRECTORY, file).replaceAll('\\', '/')} is not a source module` };
 }
 
 /** @type {string[]} Every initial-state data factory module (`*SheetData.js`) under `src/`. */

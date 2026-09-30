@@ -3,7 +3,12 @@ import { render, cleanup } from '@testing-library/svelte';
 import SpellAspectTags from '~/helpers/svelte-components/tag/SpellAspectTags.svelte';
 import selectDisplayedSpellAspects from '~/document/types/item/types/spell/SelectDisplayedSpellAspects.js';
 
+/** @type {object | undefined} The `game` global in place before each test, restored after it. */
+let previousGame;
+
 beforeEach(() => {
+   previousGame = globalThis.game;
+
    // localize() routes through game.i18n; unwrap the `LOCAL.<key>.text` shape back to the key.
    globalThis.game = {
       i18n: {
@@ -12,7 +17,10 @@ beforeEach(() => {
    };
 });
 
-afterEach(() => cleanup());
+afterEach(() => {
+   cleanup();
+   globalThis.game = previousGame;
+});
 
 /**
  * Reads the label of every rendered aspect tag, in document order.

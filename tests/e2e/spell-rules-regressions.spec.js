@@ -576,10 +576,14 @@ test('the character sheet spell row and the spell chat card list the displayed a
       spellId: seeded.spellId,
    });
 
-   /** @type {import('@playwright/test').Locator} The mounted spell card. */
-   const card = page.locator(`#chat .message[data-message-id="${messageId}"] .item-chat-message`).first();
-   await expect(card.locator('.tag-container > .tag .label')).toHaveText(seeded.labels);
-   expect(errors, `uncaught errors:\n${errors.join('\n')}`).toEqual([]);
-
-   await page.evaluate((id) => game.messages.get(id)?.delete(), messageId);
+   // The card is deleted even when an assertion fails, so a failed run leaves no message behind.
+   try {
+      /** @type {import('@playwright/test').Locator} The mounted spell card. */
+      const card = page.locator(`#chat .message[data-message-id="${messageId}"] .item-chat-message`).first();
+      await expect(card.locator('.tag-container > .tag .label')).toHaveText(seeded.labels);
+      expect(errors, `uncaught errors:\n${errors.join('\n')}`).toEqual([]);
+   }
+   finally {
+      await page.evaluate((id) => game.messages.get(id)?.delete(), messageId);
+   }
 });

@@ -23,7 +23,7 @@ describe('selectDisplayedSpellAspects', () => {
          },
       ];
 
-      /** @type {object[]} Custom aspects. */
+      /** @type {object[]} One custom aspect, which always counts and follows the standard aspects. */
       const customAspects = [
          {
             uuid: 'custom-1',
@@ -68,7 +68,7 @@ describe('selectDisplayedSpellAspects', () => {
    });
 
    it('indexes each custom aspect within the custom list and keeps their order', () => {
-      /** @type {object[]} Three custom aspects. */
+      /** @type {object[]} Three custom aspects, each expected at its own index within the custom list. */
       const customAspects = [
          {
             uuid: 'custom-a',
@@ -139,7 +139,7 @@ describe('selectDisplayedSpellAspects', () => {
          },
       ];
 
-      /** @type {object[]} Custom aspects. */
+      /** @type {object[]} Two custom aspects, listed although no standard aspect is enabled. */
       const customAspects = [
          {
             uuid: 'custom-a',

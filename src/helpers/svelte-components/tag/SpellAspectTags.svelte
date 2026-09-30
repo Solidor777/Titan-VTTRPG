@@ -60,7 +60,7 @@
 <div class="tag-container" data-testid={testId}>
 
    <!--Each Aspect-->
-   {#each sortedAspects as entry}
+   {#each sortedAspects as entry (entry.key)}
       {#if entry.isCustom}
          <!--Custom Aspect-->
          <div class="tag">
