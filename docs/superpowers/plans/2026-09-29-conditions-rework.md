@@ -12,7 +12,9 @@ immunity, and existing condition effects rewritten to the new definitions.
 (`buildConditionDefinitions`) drive every mechanic through the existing rules-element pipeline; the check rules use
 spec A's `advantage`/`automaticFailure` modifier types and `situation` selector. A new `immunity` rules element is read
 in a `prepareBaseData` pre-pass (`_getImmunities`) that core's Active Effect application and every rules-element pass
-consult through the data models' `isSuppressed`; `TitanActiveEffect._preCreate` refuses an immune creation. Attack
+consult through the data models' `isSuppressed`; `TitanActiveEffect._preCreate` refuses an immune creation, and a
+condition or effect the actor already has when it gains an immunity is deleted on the initiating client (world
+setting Immunity Handling: Remove, the default) or kept suppressed (Suppress). Attack
 checks derive `targetConditions` from the first target token (conditions + grid distance) through pure helpers and fold
 them into the derived ratings and the final Difficulty. A condition-effect sync joins the migration system so every
 GM world load (per Migration Mode) rewrites stale condition effects.
@@ -26,7 +28,7 @@ Executors read spec B alongside this plan.
 **Branch:** `conditions-and-rulings` (system repo, based on `main` @ `f3d7e66a`). Do not switch branches. The working
 tree carries unrelated user changes (`.claude/*`, deleted `CLAUDE.md` and `TITAN Rules Compendium.md`, two
 `Gemini_Generated_Image_*` images, untracked `docs/TITAN Rules Compendium*.md`): never stage them. Stage only the files
-each task lists. Tasks 14 and 15 work in the compendium module repo on its own branch.
+each task lists. Tasks 15 and 16 work in the compendium module repo on its own branch.
 
 **Iron rule — every implementer, reviewer, and fix dispatch prompt the executor writes MUST contain this paragraph
 verbatim:**
@@ -34,7 +36,7 @@ verbatim:**
 > Invoke the core skill immediately. The iron rule is no deferrals of existing work, or new work as it comes up - we fix this now unless I give my EXPRESS authorization. The only exception is if a bug or to-do has a genuine blocker that is already logged in a milestone in PLAN.md that has not been started yet. Another iron clad is rule is that when faced with a design fork, determine the best long term shape in keeping with our plans and goals, and implement accordingly. You only need to ask me if the question "what is the best long term shape in keeping with our plans and goals?" is not able to answer the question. Churn is not a concern. This paragraph must be copied verbatim to any agents dispatched in this campaign.
 
 "The core skill" is the `titan-codebase` skill (`.claude/skills/titan-codebase/SKILL.md` + `references/*.md`).
-Every dispatch also loads `foundry-vtt`; Tasks 1, 2, 3, 8, 10, and 12 (Svelte) also load `svelte-5` and
+Every dispatch also loads `foundry-vtt`; Tasks 1, 2, 3, 5, 8, 10, and 13 (Svelte) also load `svelte-5` and
 `foundry-svelte`.
 
 ---
@@ -53,8 +55,27 @@ The user answered the plan's three open questions on 2026-09-29. Each answer is 
    `getSuppressingImmunitySources`. Implemented in **Task 10**.
 3. **Metal Attunement and Effulgent Gaze: convert them in this campaign.** Their effects gain `immunity` condition
    elements (Contaminated, Blinded) and their spells drop the `removeCondition` aspect (spec C pack ruling 8, user
-   ruling 2026-09-27), in the module's `src/packs` sources only. Implemented in **Task 15**; its live-packs recompile
-   joins Task 14 Step 5's controller checkpoint, and Task 16 deletes the audit bullet from `docs/TODO.md`.
+   ruling 2026-09-27), in the module's `src/packs` sources only. Implemented in **Task 16**; its live-packs recompile
+   joins Task 15 Step 5's controller checkpoint, and Task 17 deletes the audit bullet from `docs/TODO.md`.
+
+## User rulings (2026-09-30)
+
+The user ruled on four questions the plan buddy check raised. Each is implemented below.
+
+1. **Stacked `mulBase` elements round per element.** Each element adds its own rounded `base × (value − 1)`, which is
+   each condition's resulting value rounded in sequence (`ceil(n + x) = n + ceil(x)` for an integer `n`, and the rule
+   stays defined for mixed rounding directions). Blinded and Off-Balance on a base-6 Defense leave 4 (rounding the
+   summed penalty once would leave 3); on base 7 they leave 5 (not 4). No engine change: `_applyMulBaseElements`
+   already rounds each element. Resolution 22; Review Focus 7; pinned in **Task 2** (Step 1).
+2. **Immunity against an existing condition or effect: "By default applying an effect that suppresses another should
+   remove it. This can be a system setting."** A world setting, Immunity Handling (GM-only), chooses **Remove**
+   (default: the existing condition or effect is deleted) or **Suppress** (it stays, suppressed, as Task 9 builds).
+   Creating a condition or effect the actor is immune to is refused in both modes. Resolution 23; implemented in
+   **Task 11**.
+3. **In Suppress mode a suppressed effect's duration keeps ticking.** The turn and Initiative duration decreases reach
+   a suppressed effect like any other. Resolution 24; pinned in **Task 9** (unit) and **Task 10** (e2e).
+4. **Turn-start and turn-end reports list suppressed conditions and effects with the same "Suppressed: <sources>"
+   marker** as the sheet and the Player HUD. Resolution 25; implemented in **Task 10**.
 
 ---
 
@@ -93,7 +114,9 @@ The user answered the plan's three open questions on 2026-09-29. Each answer is 
   pipe. Commit as soon as the task's focused tests are green and those checks pass.
 - E2E rules: log in only as `E2E GM 1`/`E2E GM 2`/`E2E Player 1`/`E2E Player 2` (never `Gamemaster`; one live session
   per user); every absence assertion is a presence→absence transition on the same resolved subject with a sync point
-  (or follows a happens-after positive edge); context-menu entry clicks go through `chooseContextMenuEntry`
+  (or, where a presence→absence transition is impossible by design, the subject is first proven resolved/present and
+  the absence follows a happens-after positive edge, per `conventions.md`); context-menu entry clicks go through
+  `chooseContextMenuEntry`
   (`tests/e2e/contextMenu.js`; `tests/unit/E2eContextMenuClicks.test.js` enforces it); no fixed sleeps
   (`expect.poll`, web-first assertions, `titanWait`); chat locators are scoped to
   `#chat .message[data-message-id="…"]`; sheet locators to `.application.titan-document-sheet`.
@@ -103,7 +126,7 @@ The user answered the plan's three open questions on 2026-09-29. Each answer is 
 - Serial execution: tasks share one working tree, one git index, one build output, one live Foundry. Never
   parallelize implementers.
 - Commits: before each commit run `git branch --show-current` (must print `conditions-and-rulings`, which is also the
-  module branch in Tasks 14 and 15) and `git status --short` (stage only the task's listed files; never `packs/**`).
+  module branch in Tasks 15 and 16) and `git status --short` (stage only the task's listed files; never `packs/**`).
   Every commit message ends with exactly:
 
   ```
@@ -125,14 +148,31 @@ The user answered the plan's three open questions on 2026-09-29. Each answer is 
    core's expiry test in charge). `_applyRulesElements` skips a suppressed Active Effect.
 4. **The immunity pre-pass and `_applyRulesElements` read one source list** (`_getRulesElementSources`, Task 7), so
    they can never disagree about which items and effects apply. Immunities are gathered from enabled sources whether
-   suppressed or not (suppression depends on them).
+   suppressed or not (suppression depends on them). **Exception to spec §5's fourth bullet (spec lines 88-89):** a
+   suppressed effect's modifiers stop applying; immunities it grants still apply. Two effects each immune to the
+   other (mutual immunity) therefore end, in Suppress mode, with both effects' modifiers stopped, both immunities in
+   force, and each one's "Suppressed" tag naming the other. The reason: suppressing only what an unsuppressed effect
+   grants immunity to has two fixed points ({A applies, B suppressed} and {B applies, A suppressed}) and the rules
+   supply no tiebreak between them; a naive simultaneous iteration oscillates (both apply, then both are suppressed,
+   then both apply). Reading every enabled
+   source is the one well-defined rule. Remove mode's handling of the same pair is resolution 23.
 5. **The condition migration is an idempotent sync inside the migration system, not a version-chain step.** The
    version chain compares `system.documentVersion`, which an unlinked token Actor inherits from its base Actor, so a
    version step cannot reach token-only conditions (spec §6 names unlinked token actors). `worldNeedsMigration()`
    reports stale condition effects and `migrateWorld()` runs `syncConditionEffects()`, so Migration Mode (prompt /
-   automatic / disabled) governs it like any migration. The sync also rewrites `flags.titan.description`, which the
-   Player HUD (`EffectsDetailBody.svelte:30`) and turn reports (`CharacterDataModel.js:5283`) read from the effect, so
-   the new condition text reaches existing conditions.
+   automatic / disabled) governs it like any migration; Disabled resolves before any scan, so it reads nothing. The
+   sync compares and rewrites only `system.rulesElement`. **Condition descriptions are not stored on effects:**
+   `setupConditions` no longer puts `flags.titan.description` on `CONFIG.statusEffects` entries (it keeps
+   `flags.titan.type`), and the two readers — the Player HUD (`EffectsDetailBody.svelte:30`) and the turn-start report
+   (`CharacterDataModel.js:5283`) — call `getConditionDescription(effect)`, which looks the text up from the
+   condition's definition by its status id and localizes it on the reading client (the HUD at render; the report when
+   it builds its chat snapshot, as it does the effect's name). A stored localized description would freeze one
+   client's language and make a multi-language table's sync rewrite every condition on every load, breaking
+   idempotence (Review Focus 4). A legacy `flags.titan.description` left on an existing effect is ignored.
+   The token pass reads only the effects an unlinked token's delta manages (`token._source.delta?.effects`) and
+   touches `token.actor` only for a token whose own stored condition effect is stale, so a clean token's synthetic
+   actor is never materialized; effects a token inherits from its base actor are synced by the world-actor pass, so a
+   failed base-actor update never writes a shadow copy into a token's delta.
 6. **Migration Mode "Disabled" now skips migration** (bug, fixed in Task 5): `onceReady` ran `migrateWorld()` in its
    `else` branch for `disabled`, contradicting the setting's hint ("Disabled: skips migration entirely").
 7. **Stat tooltips list condition modifiers** (bug, fixed in Task 3): `ModifiableStatValueLabel` and
@@ -147,7 +187,10 @@ The user answered the plan's three open questions on 2026-09-29. Each answer is 
 10. **`options.targetConditions` holds the modifiers for both ratings; `parameters.targetConditions` keeps only the
     attack's rating and the Difficulty.** The dialog's attack-type field can switch Melee/Ranged after open, so the
     options keep both; the card lists only what applied. A target's conditions resolved at open are pinned as caller
-    values (like `targetDefense`), so untargeting while the dialog is open changes neither.
+    values (like `targetDefense`), so untargeting while the dialog is open changes neither. A rating the user edits or
+    the caller supplies replaces the derived value, target conditions included, so `initializeAttackCheckOptions`
+    drops that rating's `targetConditions` entries (the other rating's and the Difficulty's stay); the card never lists
+    "Prone: Melee +2" for a Melee the user typed.
 11. **The Prone >10 penalty applies only to Accuracy** ("decreases their Accuracy"); a Melee attack at that range gets
     no entry.
 12. **Condition situations store `labelKey`, not a localized `label`.** A condition's rules elements persist on its
@@ -155,7 +198,7 @@ The user answered the plan's three open questions on 2026-09-29. Each answer is 
     when an element carries no `label`. The canonical situation strings move from the armor module to
     `src/system/CanonicalSituations.js`, shared by armor and conditions.
 13. **Off-Balance's id is `offBalance`** (camel case, like every other LOCAL key), its name `LOCAL.offBalance.text`.
-14. **The module's Stunned typo is already fixed** in `src/packs/rules/Rules_Reference_mczts3I29Q5vaopp.json`; Task 14
+14. **The module's Stunned typo is already fixed** in `src/packs/rules/Rules_Reference_mczts3I29Q5vaopp.json`; Task 15
     fixes Blinded's and the same page's split `<strong>1 spac</strong>e` in Prone.
 15. **The spec's "sheet's ratings" e2e** asserts both the derived values (every changed condition) and the rendered
     sheet (Task 3: the Defense label and its tooltip).
@@ -164,9 +207,11 @@ The user answered the plan's three open questions on 2026-09-29. Each answer is 
     (`Select.svelte:114-121`). With `up` first, opening the editor of a `mulBase` element that has no stored
     `rounding` (engine default `down`) silently persists `up`. Listing `down` first keeps the editor and the engine in
     agreement.
-17. **Condition sync matches a condition effect to its definition by `effect.statuses`**, the first
-    `CONFIG.statusEffects` entry whose id the effect's statuses hold; an effect whose statuses name no system
-    condition (a custom status) is left alone.
+17. **Condition sync matches a condition effect to its definition by its single status** against the system's own
+    `buildConditionDefinitions()` (`findConditionDefinition` in `Conditions.js`), never the mutable
+    `CONFIG.statusEffects`. Following core's `Actor#toggleStatusEffect` (an effect is a status's effect only when its
+    statuses hold exactly that one id), an effect with several statuses, or whose status names no system condition (a
+    custom status), is left alone, so no second status's elements are ever dropped.
 18. **The spell-aspect condition lists stay hand-written and are pinned by a guard** (user ruling 1, Task 2). Inflict
     costs have no rule source to derive from, so `SpellAspects.js` keeps its literal lists; the guard requires both
     aspects to offer every condition in definition order except the two they already omit (Dead, Sleeping) and every
@@ -178,34 +223,96 @@ The user answered the plan's three open questions on 2026-09-29. Each answer is 
     `type === 'effect'` Active Effects (conditions have no sheet row), so a suppressed condition is marked in the Player
     HUD effects panel. The HUD's icon tray has no text per entry: a suppressed icon is dimmed and its popout carries
     the tag.
-21. **The module conversion drops the spells' `removeCondition` aspect** (user ruling 3, Task 15, following spec C
+21. **The module conversion drops the spells' `removeCondition` aspect** (user ruling 3, Task 16, following spec C
     pack ruling 8): the rules grant immunity while the spell lasts, which the linked effect now carries; the spells'
     `autoCalculateDC` is `false`, so their casting DC is unchanged.
+22. **Stacked `mulBase` elements round per element** (user ruling 2026-09-30 #1). `_applyMulBaseElements` adds
+    `roundDirectional(base × (value − 1), rounding)` for each element, which equals rounding each condition's resulting
+    value in sequence; it is also defined when two elements round in different directions, where rounding a sum once
+    is not. Base 6 with Blinded and Off-Balance → 4, base 7 → 5 (Task 2).
+23. **Immunity Handling setting: Remove (default) or Suppress** (user ruling 2026-09-30 #2; Task 11).
+    - *Setting.* `titan.immunityHandling`, world scope, GM-only (`restricted`), choices `remove` / `suppress`, default
+      `remove`, registered in `SystemSettings.js` with localized name, hint, and choices under
+      `SETTINGS.immunityHandling`.
+    - *Refusal is mode-independent.* `TitanActiveEffect._preCreate` refuses a condition or effect the actor is immune
+      to in both modes (Task 9), so Remove mode only ever handles effects that existed before the immunity.
+    - *Suppression is mode-independent.* `isSuppressed` (Task 9) stays true for every immune effect in both modes, so
+      an effect Remove mode is about to delete applies no modifiers in the frames before its deletion lands.
+    - *Where removal runs.* Deleting world data must happen once, on one client that may write it, never in data
+      preparation (which runs on every client). `TitanActor` overrides `_onUpdate`, `_onCreateDescendantDocuments`,
+      and `_onUpdateDescendantDocuments` (Foundry dispatches the last two to an unlinked token's synthetic actor too)
+      and, only on the client whose user made the change (`userId === game.user.id`), calls
+      `removeImmuneEffectsWithDependents(actor)`. That client is connected, owns the actor (it just wrote to it), and
+      is the one Foundry already treats as the initiator, as `TitanActiveEffect._onCreate` does for Unconscious
+      (Task 14); the user who caused the removal sees its notification.
+    - *What triggers it.* Every change that can grant an immunity is an actor update or an embedded create/update:
+      an immunity source created (item or effect), enabled (`disabled` cleared, including a timed effect's duration
+      restored), equipped (an item's `system.equipped` or the actor's armor/shield slot), or its rules element edited.
+      The removal re-derives everything from the prepared actor on each call, so the trigger needs no list of which
+      field changed; deletions are not a trigger (a deletion can only end an immunity).
+    - *What is removed.* `resolveImmuneEffectRemovals` labels the actor's Active Effects with the grounded labelling of
+      an abstract argumentation framework (Dung 1995; labelling form, Caminada 2006), an immunity source "attacking"
+      each effect it covers: an effect covered by an item, or by an effect that is itself kept, is removed; an effect
+      whose every covering effect is removed is kept (its immunity ends with them); effects left undecided lie on an
+      immunity cycle and stay, suppressed. So a **mutually immune pair (or longer ring) is never deleted in Remove
+      mode: it falls back to suppression** (reversible, and already specified by resolution 4, with each tag naming
+      the other). Removing every immune effect would delete both members of the pair, and any ordering tiebreak is
+      unsupported by the rules while a deletion is irreversible. A pair can arrive together through a batch create,
+      enabling both, or switching Suppress → Remove.
+    - *Token actors.* A world actor's change also reconciles its unlinked tokens whose deltas hold their own effects or
+      items (after the world actor's own deletions land, so an inherited effect is deleted once, at its source); a
+      token actor's own change reconciles that token.
+    - *Serial per actor.* Overlapping removals on one actor run one after another (a per-actor promise chain), so two
+      quick changes never delete the same effect twice.
+    - *Mode switch.* Changing the setting to Remove makes the active GM (`game.user.isActiveGM`; the setting is GM-only)
+      run the same removal over every world actor and its dependent tokens, so no suppressed effect outlives the switch.
+      Switching to Suppress changes nothing.
+    - *Notification.* One `ui.notifications.info` per removed effect on the removing client:
+      `LOCAL.immunityRemovedEffect.text` "{effect} was removed from {actor}, who is immune to it ({sources})." — the
+      same actor/effect/sources fields as the refusal's `LOCAL.immuneToEffect.text`.
+24. **In Suppress mode a suppressed effect's duration keeps ticking** (user ruling 2026-09-30 #3). The turn-start,
+    turn-end, and Initiative decreases select effects by type and duration only, so suppression never pauses a
+    duration; an effect can expire while suppressed. Pinned by a Task 9 unit test and a Task 10 e2e.
+25. **Turn reports mark suppressed entries** (user ruling 2026-09-30 #4). Every reported condition and effect goes
+    through `_getEffectReportEntry`, which adds `suppressedBy` (the suppressing sources' names) when an immunity
+    suppresses it; `EffectTag.svelte`, the one leaf every turn-start, turn-end, and effects-expired report entry renders
+    through, shows the same `SuppressedEffectTag` and dims the entry. The report entries are `ObjectField` contents, so
+    no schema changes.
 
 ## Review Focus
 
 1. A Prone target exactly 10 spaces away gives no Accuracy penalty and one 11 spaces away gives one step; an attacker
    whose Accuracy is already 0 (or whose quarter-base rounds to 0) gets no entry and never goes negative (table in
-   Task 11; e2e at 1 and 21 spaces in Task 12).
+   Task 12; e2e at 1 and 21 spaces in Task 13).
 2. A GM who targets nothing but controls the attacker's own token must not read the attacker's conditions or Defense
-   as the target's (unit test in Task 12).
-3. Toggling a condition the actor is immune to from the token HUD refuses it with a notification naming the source,
-   and removing the immunity restores a suppressed condition's penalties without re-creating it (unit tests in Task 9;
-   e2e in Task 9).
-4. The condition sync is idempotent and key-order-insensitive (a second load writes nothing), leaves a condition whose
-   statuses name no system condition untouched, and reaches token-only conditions on unlinked tokens (unit tests and
-   e2e in Task 5).
+   as the target's (unit test in Task 13).
+3. Toggling a condition the actor is immune to from the token HUD refuses it with a notification naming the source
+   (both Immunity Handling modes), and in Suppress mode removing the immunity restores a suppressed condition's
+   penalties without re-creating it (unit tests in Task 9; e2e in Tasks 9 and 11).
+4. The condition sync is idempotent and key-order-insensitive (a second load writes nothing), compares only rules
+   elements (a stored description never makes a condition stale), leaves a condition whose statuses name no system
+   condition or several statuses untouched, reaches token-only conditions on unlinked tokens without reading a clean
+   token's `actor`, scans nothing in Disabled mode, and never writes a token copy of an inherited effect (unit tests
+   and e2e in Task 5).
 5. Applying Unconscious to an actor already Prone creates no second Prone, and removing Unconscious leaves Prone and
-   Incapacitated (unit test and e2e in Task 13).
-6. An attack chat message created before this change (no `targetConditions`) renders, and an Incapacitated target
-   shows Difficulty 2 even with Disadvantage (schema golden in Task 12; unit test in Task 12).
-7. Two quarter-base penalties on one stat subtract two quarters of the base, not a quarter of a quarter (base 8 → 4),
-   and `nearest` rounds a half up the same way for the element's contribution and the resulting value (Tasks 1, 2).
+   Incapacitated (unit test and e2e in Task 14).
+6. An attack chat message created before this change (no `targetConditions`) loads it as `[]` and renders, and an
+   Incapacitated target shows Difficulty 2 even with Disadvantage (e2e "an attack message without targetConditions
+   loads it as none and renders" and unit test in Task 13).
+7. Two quarter-base penalties on one stat each subtract their own rounded quarter of the base, not a quarter of a
+   quarter (base 8 → 4, base 6 → 4, base 7 → 5), and `nearest` rounds a half up the same way for the element's
+   contribution and the resulting value (Tasks 1, 2).
 8. A suppressed entry's tag names the immunity's source and leaves (with the dimming) when the immunity ends, on the
    sheet's effect row, the HUD list row, and the HUD tray popout, while the granting ward itself is never tagged
    (unit tests and e2e in Task 10).
 9. A condition added to `buildConditionDefinitions` without a spell-aspect decision fails the spell-aspect guard, and
    Off-Balance prices at 3 (Inflict) and 2 (Remove) on the live sheet (unit test and e2e in Task 2).
+10. In Remove mode (the default) gaining an immunity deletes an existing condition or effect exactly once, on the
+    client that made the change, with a notification naming the source; a mutually immune pair is never deleted and
+    stays suppressed; switching Suppress → Remove removes what was suppressed; Suppress mode deletes nothing (unit
+    tests and e2e in Task 11).
+11. A turn-start or turn-end report lists a suppressed condition or effect with its "Suppressed: <sources>" tag, and a
+    suppressed timed effect's duration still decreases (unit tests in Tasks 9 and 10; e2e in Task 10).
 
 ## Model/Effort directives
 
@@ -215,20 +322,22 @@ The user answered the plan's three open questions on 2026-09-29. Each answer is 
 - Implementer default: `sdd-implementer` (Sonnet, medium). Escalation ladder when an implementer reports BLOCKED or
   DONE_WITH_CONCERNS citing complexity: `sdd-implementer-highthink` → `sdd-implementer-opus` → the human. Never skip a
   rung. A fix dispatch reuses the tier that produced the task.
-- Per-task implementer suggestions: Tasks 1, 6, 11, 14, 15 → `sdd-implementer` (Tasks 14 and 15 may use
-  `sdd-implementer-haiku`: exact JSON string replacements plus validation). Tasks 2, 3, 4, 7, 8, 10, 13, 16 →
-  `sdd-implementer`. Tasks 5, 9, 12 (migration, suppression timing, attack option provenance) → start at
-  `sdd-implementer-highthink`.
-- Per-task reviewer: `sdd-reviewer`. Escalate to `sdd-reviewer-opus` for Tasks 5, 7, 9, and 12 (migration, the
-  behaviour-preserving pipeline refactor, suppression, and attack provenance), and for any task whose `sdd-reviewer`
-  findings read shallow or uncertain.
-- Final whole-branch review: `sdd-final-reviewer`, once, after Task 16.
+- Per-task implementer suggestions: Tasks 1, 6, 12, 15, 16 → `sdd-implementer` (Tasks 15 and 16 may use
+  `sdd-implementer-haiku`: exact JSON string replacements plus validation). Tasks 2, 3, 4, 7, 8, 10, 14, 17 →
+  `sdd-implementer`. Tasks 5, 9, 11, 13 (migration, suppression timing, world-data deletion, attack option
+  provenance) → start at `sdd-implementer-highthink`.
+- Per-task reviewer: `sdd-reviewer`. Escalate to `sdd-reviewer-opus` for Tasks 5, 7, 9, 11, and 13 (migration, the
+  behaviour-preserving pipeline refactor, suppression, immunity removal, and attack provenance), and for any task whose
+  `sdd-reviewer` findings read shallow or uncertain.
+- Final whole-branch review: `sdd-final-reviewer`, once, after Task 17.
 - Dispatch without `name:` (the subagent's final plain-text message is the report). Each prompt names the task, this
   plan's path, the spec's path, the iron-rule paragraph verbatim, and the skills to load.
 
 ## Buddy-check directives
 
-To be filled in by the controller after asking the user.
+- Plan buddy check: accepted 2026-09-29; running
+- Flagged tasks: 5, 9 — buddy check replaces both review stages
+- Unflagged tasks showing risk signals: ask
 
 ---
 
@@ -247,22 +356,29 @@ Create:
 - `src/document/types/active-effect/IsSuppressedByImmunity.js` — shared `isSuppressed` logic (Task 9) and
   `getSuppressingImmunitySources` (Task 10).
 - `src/helpers/svelte-components/tag/effects/SuppressedEffectTag.svelte` — the "Suppressed: <sources>" tag (Task 10).
+- `src/helpers/Settings/ImmunityHandling.js` — the Immunity Handling setting's reader (Task 11).
+- `src/document/types/actor/types/character/ImmuneEffectRemoval.js` — Remove mode: which immune effects are deleted,
+  and the per-actor, dependent-token, and world-wide removal passes (Task 11).
 - `src/helpers/utility-functions/GetTargetedCharacterTokens.js`, `src/helpers/utility-functions/MeasureTokenDistance.js`,
-  `src/check/types/attack-check/TargetConditionModifiers.js` — targeting helpers (Task 11).
+  `src/check/types/attack-check/TargetConditionModifiers.js` — targeting helpers (Task 12).
 - `src/check/types/attack-check/dialog/AttackCheckDialogTargetConditionsField.svelte`,
-  `src/check/types/attack-check/chat-message/AttackCheckChatTargetConditions.svelte` — dialog row and card (Task 12).
+  `src/check/types/attack-check/chat-message/AttackCheckChatTargetConditions.svelte` — dialog row and card (Task 13).
 - Tests: `tests/unit/RoundingDirections.test.js`, `tests/unit/ConditionMechanics.test.js`,
   `tests/unit/SpellAspectConditions.test.js`,
   `tests/unit/ModBuckets.test.js`, `tests/unit/SyncConditionEffects.test.js`, `tests/unit/MigrationAction.test.js`,
+  `tests/unit/OnceReady.test.js`, `tests/unit/ConditionDescription.test.js`, `tests/unit/ConditionReportData.test.js`,
   `tests/unit/RulesElementOperationRegistry.test.js`, `tests/unit/RulesElementSources.test.js`,
   `tests/unit/Immunity.test.js`, `tests/unit/ApplyEffectToTargets.test.js`, `tests/unit/SuppressedEffectTag.test.js`,
+  `tests/unit/ImmuneEffectRemoval.test.js`, `tests/unit/TitanActorImmunityTriggers.test.js`,
   `tests/unit/GetTargetedCharacters.test.js`,
   `tests/unit/MeasureTokenDistance.test.js`, `tests/unit/TargetConditionModifiers.test.js`,
   `tests/unit/Unconscious.test.js`, `tests/unit/ConditionDefinitions.test.js` (rewritten),
   `tests/e2e/rules-element-rounding-editor.spec.js`, `tests/e2e/spell-aspect-conditions.spec.js`,
   `tests/e2e/stat-breakdown-conditions.spec.js`,
   `tests/e2e/condition-checks.spec.js`, `tests/e2e/condition-migration.spec.js`,
+  `tests/e2e/condition-description.spec.js`,
   `tests/e2e/rules-element-immunity-editor.spec.js`, `tests/e2e/immunity.spec.js`, `tests/e2e/immunity-display.spec.js`,
+  `tests/e2e/immunity-handling.spec.js`,
   `tests/e2e/target-conditions.spec.js`, `tests/e2e/unconscious.spec.js`.
 
 Modify:
@@ -275,6 +391,7 @@ Modify:
   `CharacterSheetResource`, `CharacterSheetSpeed`, `PortraitBars`); `CharacterSheetSkill.svelte`.
 - `src/document/types/actor/types/character/CharacterDataModel.js`.
 - `src/document/types/active-effect/TitanActiveEffect.js`, `ConditionDataModel.js`, `TitanActiveEffectDataModel.js`.
+- `src/document/types/actor/TitanActor.js`, `src/system/SystemSettings.js` (Task 11).
 - `src/document/types/item/rules-element/MulBase.js`, `MulSum.js`;
   `src/document/types/item/types/armor/ArmorTraitCheckModifiers.js`.
 - `src/document/types/item/sheet/rules-element/ItemSheetMulBaseSettings.svelte`, `ItemSheetMulSumSettings.svelte`,
@@ -282,20 +399,21 @@ Modify:
   `src/document/svelte-components/input/DocumentTextInput.svelte`.
 - `src/check/types/attack-check/AttackCheckOptions.js`, `AttackCheckParameters.js`,
   `dialog/AttackCheckDialogShell.svelte`, `chat-message/AttackCheckChatMessage.svelte`.
-- `src/helpers/migration/MigrateWorld.js`, `src/hooks/OnceReady.js`.
+- `src/helpers/migration/MigrateWorld.js`, `src/hooks/OnceReady.js`,
+  `src/ui/player-hud/elements/effects-panel/EffectsDetailBody.svelte` (Task 5).
 - `src/document/types/item/types/spell/SpellAspects.js`,
   `src/document/types/item/types/spell/sheet/SpellSheetStandardAspectSettings.svelte` (Task 2).
 - `src/system/Icons.js`, `src/document/types/actor/types/character/sheet/items/CharacterSheetItem.svelte`,
   `src/document/types/actor/types/character/sheet/items/effect/CharacterSheetEffect.svelte`,
   `src/ui/player-hud/elements/effects-panel/EffectsListRow.svelte`, `EffectsIconTray.svelte`,
-  `EffectsDetailPopout.svelte` (Task 10).
+  `EffectsDetailPopout.svelte`, `src/helpers/svelte-components/tag/effects/EffectTag.svelte` (Task 10).
 - `lang/en.json`, `CHANGELOG.md`; existing tests named per task; `docs/TODO.md`, `docs/CLOSED_BUGS.md`,
   `docs/POST_WORK_FINDINGS.md`, spec B, spec C (`docs/superpowers/specs/2026-09-27-compendium-rulings-design.md`),
   `.claude/skills/titan-codebase/references/*.md`.
 - Module repo (`Data/modules/titan-vttrpg-compendium`): `src/packs/rules/Rules_Reference_mczts3I29Q5vaopp.json`
-  (Task 14); `src/packs/effects/Metal_Attunement_CNzUcoakHX0WMxo5.json`,
+  (Task 15); `src/packs/effects/Metal_Attunement_CNzUcoakHX0WMxo5.json`,
   `src/packs/effects/Effulgent_Gaze_XrDcA89TI6GA6OIq.json`, `src/packs/spells/Metal_Attunement_Om0Y1sDROHUR2Yjg.json`,
-  `src/packs/spells/Effulgent_Gaze_kkG7krqlTItaexXH.json` (Task 15).
+  `src/packs/spells/Effulgent_Gaze_kkG7krqlTItaexXH.json` (Task 16).
 
 ---
 ### Task 1: `nearest` rounding and one rounding-direction list
@@ -500,10 +618,11 @@ Make the same three edits in `ItemSheetMulSumSettings.svelte` (its import block 
 
 - [ ] **Step 5: Localize the new direction and start the changelog**
 
-In `lang/en.json`, inside `LOCAL`, insert in alphabetical key order:
+In `lang/en.json`, inside `LOCAL`, insert in alphabetical key order (matching the existing `"down.text": "Round Down"`
+and `"up.text": "Round Up"`):
 
 ```json
-      "nearest.text": "Nearest",
+      "nearest.text": "Round to Nearest",
 ```
 
 At the top of `CHANGELOG.md`, above `## Version 2.1.0:`, insert:
@@ -533,7 +652,9 @@ import { attachPageErrors, closeAllApps } from './world.js';
 import { readTitanSelectValue, selectTitanOption, titanSelectOptionValues } from './select.js';
 
 /**
- * The mulBase and mulSum editors' rounding select offers every rounding direction and stores the chosen one.
+ * The mulBase and mulSum editors' rounding select offers every rounding direction and stores the chosen one, and an
+ * element with no stored rounding opens as `down`, the engine's default, so opening the editor never changes what the
+ * engine applies.
  */
 
 /** @type {string} Name of the world ability item this spec edits. */
@@ -565,9 +686,7 @@ test.beforeEach(async () => {
    // Rebuild the item with one mulBase and one mulSum element and open its Rules Elements tab.
    await page.evaluate(async (name) => {
       await game.items.getName(name)?.delete();
-
-      /** @type {TitanItem} The rebuilt ability. */
-      const item = await Item.create({
+      await Item.create({
          name,
          type: 'ability',
          system: {
@@ -591,17 +710,8 @@ test.beforeEach(async () => {
             ],
          },
       });
-      /** @type {TitanItemSheet} The rendered item sheet. */
-      const app = await item.sheet.render(true);
-      await titanWait(
-         () => !!app?.element?.querySelector('.window-content')?.children.length,
-         { message: 'sheet mounted' },
-      );
    }, ITEM_NAME);
-
-   /** @type {string} The localized Rules Elements tab label. */
-   const label = await page.evaluate(() => game.i18n.localize('LOCAL.rulesElements.text'));
-   await openSheetTab(page, label);
+   await openRulesElements();
    await expect(sheet().getByTestId('mulbase-rounding')).toBeVisible();
 });
 
@@ -615,6 +725,25 @@ test.afterAll(async () => {
    await page.evaluate((name) => game.items.getName(name)?.delete(), ITEM_NAME);
    await page?.close();
 });
+
+/**
+ * Renders the item's sheet and opens its Rules Elements tab.
+ * @returns {Promise<void>} Resolves once the tab is open.
+ */
+async function openRulesElements() {
+   await page.evaluate(async (name) => {
+      /** @type {TitanItemSheet} The rendered item sheet. */
+      const app = await game.items.getName(name).sheet.render(true);
+      await titanWait(
+         () => !!app?.element?.querySelector('.window-content')?.children.length,
+         { message: 'sheet mounted' },
+      );
+   }, ITEM_NAME);
+
+   /** @type {string} The localized Rules Elements tab label. */
+   const label = await page.evaluate(() => game.i18n.localize('LOCAL.rulesElements.text'));
+   await openSheetTab(page, label);
+}
 
 /**
  * Locates the open item sheet.
@@ -659,6 +788,46 @@ for (const [testId, index] of [
       expect(await readTitanSelectValue(trigger)).toBe('nearest');
    });
 }
+
+for (const [testId, element] of [
+   [
+      'mulbase-rounding',
+      {
+         key: 'body',
+         operation: 'mulBase',
+         selector: 'attribute',
+         uuid: 'e2e-rounding-default',
+         value: 2,
+      },
+   ],
+   [
+      'mulsum-rounding',
+      {
+         key: 'stride',
+         operation: 'mulSum',
+         selector: 'speed',
+         uuid: 'e2e-rounding-default',
+         value: 0.5,
+      },
+   ],
+]) {
+   test(`a ${element.operation} element with no stored rounding opens and stays down, the engine default`, async () => {
+      // With the sheet closed nothing writes the element, so its missing rounding is observed before the editor opens.
+      await closeAllApps(page);
+      await page.evaluate(async ({ name, rulesElement }) => {
+         await game.items.getName(name).update({ system: { rulesElement: [rulesElement] } });
+      }, {
+         name: ITEM_NAME,
+         rulesElement: element,
+      });
+      expect(await readRounding(0)).toBeUndefined();
+
+      // Opening the editor clamps the unlisted value to the first option, down, and persists it.
+      await openRulesElements();
+      await expect.poll(() => readRounding(0), { message: 'the editor keeps the engine default' }).toBe('down');
+      expect(await readTitanSelectValue(sheet().getByTestId(testId))).toBe('down');
+   });
+}
 ```
 
 - [ ] **Step 8: Lint, full unit suite, build, e2e**
@@ -682,7 +851,8 @@ feat(rules-elements): nearest rounding for mulBase and mulSum
 
 Both editors read one ROUNDING_DIRECTIONS list, led by down (the engine
 default for a missing rounding), and a guard test keeps every editor that
-binds rounding on it.
+binds rounding on it. Opening either editor for an element with no stored
+rounding no longer persists up.
 
 Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
 Claude-Session: https://claude.ai/code/session_01SPVZ3AXCPn5Bo41aemiJZc
@@ -1066,6 +1236,27 @@ describe('quarter-of-base condition penalties', () => {
       ]).rating.defense)).toBe(4);
    });
 
+   // User ruling 2026-09-30: stacked quarter penalties round per element (each condition's resulting value rounded in
+   // sequence). Rounding the summed penalty once would leave 3 on base 6 and 4 on base 7.
+   it.each([
+      [
+         6,
+         4,
+      ],
+      [
+         7,
+         5,
+      ],
+   ])('rounds each stacked quarter penalty on its own: Blinded + Off-Balance leave base-%i Defense at %i', (
+      base,
+      expected,
+   ) => {
+      expect(total(createConditionedCharacter([
+         'blinded',
+         'offBalance',
+      ], base).rating.defense)).toBe(expected);
+   });
+
    it('Blinded lowers base-8 Melee, Accuracy, and Defense to 6 and leaves Awareness', () => {
       /** @type {object} The Blinded character. */
       const model = createConditionedCharacter(['blinded']);
@@ -1136,8 +1327,9 @@ In `src/system/Conditions.js`, insert after the two import lines:
 /**
  * Builds a condition's "-¼ of their base value, rounded up" penalty: a `mulBase` element scaling the stat's base by ¾
  * and rounding the resulting value up (base 4 → 3, base 5 → 4; bases 1-3 keep their value). `mulBase` adds
- * `base × (value − 1)` per element, so two such conditions on one stat each subtract a quarter of the base
- * (base 8 → 4).
+ * `base × (value − 1)` per element, rounded per element, so two such conditions on one stat each subtract their own
+ * rounded quarter of the base (base 8 → 4, base 6 → 4, base 7 → 5), the same as rounding each condition's resulting
+ * value in sequence (user ruling 2026-09-30).
  * Source: TITAN Rules Compendium (09_26_2026), "Conditions".
  * @param {string} conditionId - The condition id, which names the element's uuid (`condition-<id>-<uuidSuffix>`).
  * @param {string} selector - The stat type (`rating`, `attribute`, or `resistance`).
@@ -1857,7 +2049,7 @@ EOF
 
 ### Task 3: Stat breakdowns list every modifier bucket, conditions included
 
-Bug fix (logged as `docs/CLOSED_BUGS.md` #75 in Task 16): no stat breakdown tooltip (sheet attributes, resistances,
+Bug fix (logged as `docs/CLOSED_BUGS.md` #75 in Task 17): no stat breakdown tooltip (sheet attributes, resistances,
 ratings, resources, speeds, mods, skill Training/Expertise, Player HUD bars) lists condition modifiers, and the Speed
 and Mod rows omit Abilities, because each call site hand-passes per-bucket props.
 
@@ -2341,6 +2533,11 @@ and the Expertise label's with:
                      checkParameters.expertiseMod
                }
 ```
+
+(d) delete the import line `import localize from '~/helpers/utility-functions/Localize.js';`: the replaced
+`getTotalValueTooltip` was its only caller (the file's other `localize` occurrences are `localize: false` object
+properties), so it is dead code on contact. ESLint would not flag it (`no-unused-vars` is not enabled;
+`eslint.config.js` leaves `js.configs.recommended` commented out), so the deletion is by hand.
 
 In `CHANGELOG.md`, append to the `## Unreleased:` list:
 
@@ -3140,27 +3337,187 @@ EOF
 
 ---
 
-### Task 5: Condition-effect sync migration and the Migration Mode fix
+### Task 5: Condition-effect sync migration, the Migration Mode fix, and definition-sourced condition descriptions
 
-Bug fix (logged as `docs/CLOSED_BUGS.md` #74 in Task 16): Migration Mode "Disabled" ran `migrateWorld()` (the `else`
+Bug fix (logged as `docs/CLOSED_BUGS.md` #74 in Task 17): Migration Mode "Disabled" ran `migrateWorld()` (the `else`
 branch of `onceReady`), contradicting its hint "Disabled: skips migration entirely".
+
+Resolutions 5 and 17: the sync compares and rewrites only `system.rulesElement`, matched by an effect's single status
+against `buildConditionDefinitions()`; condition descriptions stop being stored on effects and are looked up by status
+id and localized by their readers; the sync reads stored data only and touches an unlinked token's actor only when that
+token's own stored condition effect is stale; Disabled scans nothing; a failed migration never blocks the load.
 
 **Files:**
 - Create: `src/helpers/migration/SyncConditionEffects.js`
-- Modify: `src/helpers/migration/MigrateWorld.js`, `src/hooks/OnceReady.js`, `CHANGELOG.md`
-- Test: `tests/unit/SyncConditionEffects.test.js`, `tests/unit/MigrationAction.test.js` (create),
-  `tests/e2e/condition-migration.spec.js` (create)
+- Modify: `src/system/Conditions.js` (`findConditionDefinition`, `getConditionDescription`; `setupConditions` stops
+  storing the description), `src/helpers/migration/MigrateWorld.js`, `src/hooks/OnceReady.js`,
+  `src/ui/player-hud/elements/effects-panel/EffectsDetailBody.svelte`,
+  `src/document/types/actor/types/character/CharacterDataModel.js` (the turn-start report's conditions),
+  `CHANGELOG.md`
+- Test: `tests/unit/ConditionDescription.test.js`, `tests/unit/ConditionReportData.test.js`,
+  `tests/unit/SyncConditionEffects.test.js`, `tests/unit/MigrationAction.test.js`, `tests/unit/OnceReady.test.js`,
+  `tests/e2e/condition-migration.spec.js`, `tests/e2e/condition-description.spec.js` (all created)
 
 **Interfaces:**
-- Consumes: `CONFIG.statusEffects` (built by `setupConditions`, carrying `flags.titan.description`).
-- Produces: `toCanonicalJson(value): string`; `getConditionEffectUpdate(effect, statusEffects): object|null`
-  (`{ _id, 'system.rulesElement', 'flags.titan.description' }`); `getConditionEffectUpdates(actor, statusEffects):
-  object[]`; `getSyncedActors(): Generator<TitanActor>` (world actors, then every unlinked token's actor on every
-  scene); `conditionEffectsNeedSync(): boolean`; default `syncConditionEffects(): Promise<number>` (actors updated;
-  GM-only); `resolveMigrationAction(mode, needsMigration): 'none'|'migrate'|'prompt'` (named export of
-  `MigrateWorld.js`). `worldNeedsMigration()` also reports stale condition effects; `migrateWorld()` also syncs them.
+- Produces: `findConditionDefinition(statuses: Iterable<string>): object|undefined` and
+  `getConditionDescription(effect?): string` (named exports of `Conditions.js`); `setupConditions` flags each
+  `CONFIG.statusEffects` entry with `flags.titan.type` only; `toCanonicalJson(value): string`;
+  `getConditionEffectUpdate(source): ConditionEffectUpdate|null` (`{ _id, 'system.rulesElement' }`, from an effect's
+  stored source); `getConditionEffectUpdates(sources): ConditionEffectUpdate[]`; `getConditionEffectSyncs():
+  Generator<ConditionEffectSync>` (`{ name, getActor, updates }`: world actors from `actor._source.effects`, then
+  unlinked tokens from `token._source.delta?.effects`); `conditionEffectsNeedSync(): boolean`; default
+  `syncConditionEffects(): Promise<number>` (actors updated; GM-only); `resolveMigrationAction(mode, needsMigration:
+  () => boolean): 'none'|'migrate'|'prompt'` (named export of `MigrateWorld.js`; calls `needsMigration` only when the
+  mode is not `disabled`); `CharacterDataModel#_getConditionReportData(conditions): EffectReportData[]`.
+  `worldNeedsMigration()` also reports stale condition effects; `migrateWorld()` also syncs them.
 
-- [ ] **Step 1: Write the failing sync tests**
+- [ ] **Step 1: Write the failing tests**
+
+Create `tests/unit/ConditionDescription.test.js`:
+
+```js
+import { describe, it, expect, beforeEach, afterEach } from 'vitest';
+import setupConditions, {
+   buildConditionDefinitions,
+   findConditionDefinition,
+   getConditionDescription,
+} from '~/system/Conditions.js';
+
+beforeEach(() => {
+   // Localization echoes the key with a marker, so a test can tell a localized lookup from stored text.
+   globalThis.game = {
+      i18n: {
+         localize: (key) => `localized ${key}`,
+      },
+   };
+});
+
+afterEach(() => {
+   delete globalThis.game;
+   delete globalThis.CONFIG;
+});
+
+describe('findConditionDefinition', () => {
+   it('finds the system condition a single-status effect applies, from a Set or an array', () => {
+      expect(findConditionDefinition(new Set(['blinded']))).toEqual(buildConditionDefinitions()
+         .find((condition) => condition.id === 'blinded'));
+      expect(findConditionDefinition(['prone'])?.id).toBe('prone');
+   });
+
+   it('finds nothing for a custom status, several statuses, or none', () => {
+      expect(findConditionDefinition(['customStatus'])).toBeUndefined();
+      expect(findConditionDefinition([
+         'blinded',
+         'prone',
+      ])).toBeUndefined();
+      expect(findConditionDefinition([])).toBeUndefined();
+   });
+});
+
+describe('getConditionDescription', () => {
+   it('localizes the definition\'s description on this client and ignores a stored description', () => {
+      expect(getConditionDescription({
+         flags: {
+            titan: {
+               description: 'stale stored text',
+            },
+         },
+         statuses: new Set(['blinded']),
+      })).toBe('localized LOCAL.blinded.desc.text');
+   });
+
+   it('is empty for a missing effect or an effect applying no system condition', () => {
+      expect(getConditionDescription(undefined)).toBe('');
+      expect(getConditionDescription({ statuses: new Set(['customStatus']) })).toBe('');
+   });
+});
+
+describe('setupConditions', () => {
+   it('flags every status effect as a condition and stores no description', () => {
+      globalThis.CONFIG = {};
+      setupConditions();
+      expect(CONFIG.statusEffects.map((condition) => condition.id).sort())
+         .toEqual(buildConditionDefinitions().map((condition) => condition.id).sort());
+      for (const condition of CONFIG.statusEffects) {
+         expect(condition.flags, condition.id).toEqual({
+            titan: {
+               type: 'condition',
+            },
+         });
+      }
+   });
+});
+```
+
+Create `tests/unit/ConditionReportData.test.js`:
+
+```js
+import { describe, it, expect, beforeAll, afterAll } from 'vitest';
+import { installSchemaMocks, restoreSchemaMocks } from './helpers/schemaFingerprint.js';
+
+// The turn-start report's condition entries on a bare CharacterDataModel. The model is imported after the Foundry
+// stand-ins are installed; dynamic import in beforeAll is permitted in tests.
+
+/** @type {Function} The dynamically imported CharacterDataModel class. */
+let CharacterDataModel;
+
+beforeAll(async () => {
+   installSchemaMocks();
+   globalThis.game.settings = {
+      get: () => 1,
+   };
+   globalThis.Actor = class {};
+   globalThis.CONST = {
+      TOKEN_DISPLAY_MODES: { OWNER_HOVER: 50 },
+      TOKEN_DISPOSITIONS: { FRIENDLY: 1 },
+   };
+   CharacterDataModel = (await import('~/document/types/actor/types/character/CharacterDataModel.js')).default;
+});
+
+afterAll(() => {
+   restoreSchemaMocks();
+   delete globalThis.Actor;
+   delete globalThis.CONST;
+});
+
+describe('_getConditionReportData', () => {
+   it('lists conditions by name with their definitions\' descriptions, never a stored one', () => {
+      /** @type {object} A bare Character. */
+      const model = Object.create(CharacterDataModel.prototype);
+      expect(model._getConditionReportData([
+         {
+            flags: {
+               titan: {
+                  description: 'stale stored text',
+               },
+            },
+            img: 'prone.svg',
+            name: 'Prone',
+            statuses: new Set(['prone']),
+            type: 'condition',
+         },
+         {
+            flags: {},
+            img: 'blinded.svg',
+            name: 'Blinded',
+            statuses: new Set(['blinded']),
+            type: 'condition',
+         },
+      ])).toEqual([
+         {
+            description: 'LOCAL.blinded.desc.text',
+            img: 'blinded.svg',
+            label: 'Blinded',
+         },
+         {
+            description: 'LOCAL.prone.desc.text',
+            img: 'prone.svg',
+            label: 'Prone',
+         },
+      ]);
+   });
+});
+```
 
 Create `tests/unit/SyncConditionEffects.test.js`:
 
@@ -3169,25 +3526,14 @@ import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { buildConditionDefinitions } from '~/system/Conditions.js';
 import syncConditionEffects, {
    conditionEffectsNeedSync,
+   getConditionEffectSyncs,
    getConditionEffectUpdate,
    getConditionEffectUpdates,
-   getSyncedActors,
    toCanonicalJson,
 } from '~/helpers/migration/SyncConditionEffects.js';
 
-/**
- * The condition definitions as `setupConditions` registers them: each with a description flag.
- * @type {object[]}
- */
-const STATUS_EFFECTS = buildConditionDefinitions().map((condition) => ({
-   ...condition,
-   flags: {
-      titan: {
-         description: `${condition.id} description`,
-         type: 'condition',
-      },
-   },
-}));
+/** @type {object[]} The system condition definitions, the sync's only source of truth. */
+const DEFINITIONS = buildConditionDefinitions();
 
 /**
  * Returns a condition definition's rules elements.
@@ -3195,7 +3541,7 @@ const STATUS_EFFECTS = buildConditionDefinitions().map((condition) => ({
  * @returns {object[]} The definition's rules elements (empty for a condition with none).
  */
 function currentElements(id) {
-   return STATUS_EFFECTS.find((condition) => condition.id === id).system?.rulesElement ?? [];
+   return DEFINITIONS.find((condition) => condition.id === id).system?.rulesElement ?? [];
 }
 
 /**
@@ -3273,57 +3619,41 @@ const OLD_FORMS = {
 };
 
 /**
- * Builds a fake Active Effect whose `toObject()` returns its stored source.
+ * Builds a stored Active Effect source, as `actor._source.effects` and an unlinked token's `_source.delta.effects`
+ * hold it.
  * @param {object} data - The effect's data.
  * @param {string} [data.id] - The effect id.
  * @param {string} [data.type] - The effect subtype.
  * @param {string[]} data.statuses - The effect's status ids.
  * @param {object[]} data.rulesElement - The stored rules elements.
- * @param {string} data.description - The stored description flag.
- * @returns {object} The fake effect.
+ * @param {string} [data.description] - A legacy stored description flag.
+ * @returns {object} The stored source.
  */
-function createEffect({ id = 'effect0', type = 'condition', statuses, rulesElement, description }) {
-   /** @type {object} The stored source. */
-   const source = {
-      flags: {
-         titan: {
-            description,
+function effectSource({ id = 'effect0', type = 'condition', statuses, rulesElement, description }) {
+   return {
+      _id: id,
+      flags: description === undefined ?
+         {} :
+         {
+            titan: {
+               description,
+            },
          },
-      },
+      statuses,
       system: {
          rulesElement,
       },
-   };
-   return {
-      id,
-      statuses: new Set(statuses),
-      toObject: () => structuredClone(source),
       type,
    };
 }
 
 /**
- * Builds a fake actor holding the given effects.
- * @param {string} name - The actor's name.
- * @param {object[]} effects - The actor's effects.
- * @returns {object} The fake actor, whose `updateEmbeddedDocuments` is a spy.
- */
-function createActor(name, effects) {
-   return {
-      effects,
-      name,
-      updateEmbeddedDocuments: vi.fn(async () => []),
-   };
-}
-
-/**
- * Builds a fake Blinded effect in its v2.1.0 form.
+ * Builds a stored Blinded effect in its v2.1.0 form.
  * @param {string} id - The effect id.
- * @returns {object} The stale effect.
+ * @returns {object} The stale source.
  */
 function staleBlinded(id) {
-   return createEffect({
-      description: 'old text',
+   return effectSource({
       id,
       rulesElement: OLD_FORMS.blinded,
       statuses: ['blinded'],
@@ -3347,106 +3677,190 @@ describe('toCanonicalJson', () => {
 
 describe('getConditionEffectUpdate', () => {
    it.each(Object.entries(OLD_FORMS))('rewrites a %s effect created from the old definition', (id, oldElements) => {
-      expect(getConditionEffectUpdate(createEffect({
-         description: 'old text',
+      expect(getConditionEffectUpdate(effectSource({
          rulesElement: oldElements,
          statuses: [id],
-      }), STATUS_EFFECTS)).toEqual({
+      }))).toEqual({
          _id: 'effect0',
-         'flags.titan.description': `${id} description`,
          'system.rulesElement': currentElements(id),
       });
    });
 
-   it.each(STATUS_EFFECTS.map((condition) => condition.id))('leaves an up-to-date %s effect alone', (id) => {
-      expect(getConditionEffectUpdate(createEffect({
-         description: `${id} description`,
+   it.each(DEFINITIONS.map((condition) => condition.id))('leaves an up-to-date %s effect alone', (id) => {
+      expect(getConditionEffectUpdate(effectSource({
          rulesElement: structuredClone(currentElements(id)),
          statuses: [id],
-      }), STATUS_EFFECTS)).toBeNull();
+      }))).toBeNull();
    });
 
    it('ignores the key order of stored elements', () => {
       /** @type {object[]} Blinded's current elements with every element's keys reversed. */
       const reordered = currentElements('blinded').map((element) => Object.fromEntries(Object.entries(element)
          .reverse()));
-      expect(getConditionEffectUpdate(createEffect({
-         description: 'blinded description',
+      expect(getConditionEffectUpdate(effectSource({
          rulesElement: reordered,
          statuses: ['blinded'],
-      }), STATUS_EFFECTS)).toBeNull();
+      }))).toBeNull();
    });
 
-   it('refreshes a stale description alone', () => {
-      expect(getConditionEffectUpdate(createEffect({
-         description: 'old text',
-         rulesElement: structuredClone(currentElements('dead')),
-         statuses: ['dead'],
-      }), STATUS_EFFECTS)).toEqual({
-         _id: 'effect0',
-         'flags.titan.description': 'dead description',
-         'system.rulesElement': [],
-      });
+   it('never compares a stored description: another language\'s text leaves a current effect alone', () => {
+      expect(getConditionEffectUpdate(effectSource({
+         description: 'texte dans une autre langue',
+         rulesElement: structuredClone(currentElements('blinded')),
+         statuses: ['blinded'],
+      }))).toBeNull();
    });
 
-   it('leaves an effect-subtype effect and a condition naming no system condition alone', () => {
-      expect(getConditionEffectUpdate(createEffect({
-         description: 'old text',
+   it('leaves an effect-subtype effect, a custom status, and a multi-status effect alone', () => {
+      expect(getConditionEffectUpdate(effectSource({
          rulesElement: OLD_FORMS.blinded,
          statuses: ['blinded'],
          type: 'effect',
-      }), STATUS_EFFECTS)).toBeNull();
-      expect(getConditionEffectUpdate(createEffect({
-         description: 'custom',
+      }))).toBeNull();
+      expect(getConditionEffectUpdate(effectSource({
          rulesElement: [],
          statuses: ['customStatus'],
-      }), STATUS_EFFECTS)).toBeNull();
+      }))).toBeNull();
+      expect(getConditionEffectUpdate(effectSource({
+         rulesElement: OLD_FORMS.blinded,
+         statuses: [
+            'blinded',
+            'prone',
+         ],
+      }))).toBeNull();
    });
 
    it('is idempotent: applying its update leaves nothing to update', () => {
-      /** @type {object} The update for a stale Blinded. */
-      const update = getConditionEffectUpdate(staleBlinded('effect0'), STATUS_EFFECTS);
-      expect(getConditionEffectUpdate(createEffect({
-         description: update['flags.titan.description'],
+      /** @type {ConditionEffectUpdate} The update for a stale Blinded. */
+      const update = getConditionEffectUpdate(staleBlinded('effect0'));
+      expect(getConditionEffectUpdate(effectSource({
          rulesElement: update['system.rulesElement'],
          statuses: ['blinded'],
-      }), STATUS_EFFECTS)).toBeNull();
+      }))).toBeNull();
    });
 
-   it('returns a copy the caller may not share with CONFIG', () => {
-      /** @type {object} The update for a stale Blinded. */
-      const update = getConditionEffectUpdate(staleBlinded('effect0'), STATUS_EFFECTS);
-      expect(update['system.rulesElement']).not.toBe(currentElements('blinded'));
+   it('returns elements the caller may change without changing a later update', () => {
+      /** @type {ConditionEffectUpdate} The update for a stale Blinded, changed by its caller. */
+      const update = getConditionEffectUpdate(staleBlinded('effect0'));
+      update['system.rulesElement'].length = 0;
+      expect(getConditionEffectUpdate(staleBlinded('effect0'))['system.rulesElement'])
+         .toEqual(currentElements('blinded'));
    });
 });
 
 describe('getConditionEffectUpdates', () => {
-   it('collects one update per stale condition effect', () => {
-      expect(getConditionEffectUpdates(createActor('A', [
+   it('collects one update per stale condition effect and skips delta tombstones', () => {
+      expect(getConditionEffectUpdates([
          staleBlinded('effect1'),
-         createEffect({
-            description: 'dead description',
+         effectSource({
             id: 'effect2',
             rulesElement: [],
             statuses: ['dead'],
          }),
-      ]), STATUS_EFFECTS).map((update) => update._id)).toEqual(['effect1']);
+         {
+            _id: 'effect3',
+            _tombstone: true,
+         },
+      ]).map((update) => update._id)).toEqual(['effect1']);
    });
 });
 
 describe('world sync', () => {
-   /** @type {object} The world actor with a stale Blinded. */
+   /** @type {object} The world actor with a stored stale Blinded. */
    let worldActor;
-   /** @type {object} The unlinked token's actor with a stale Blinded. */
-   let tokenActor;
-   /** @type {object} A linked token's actor (the world actor's twin), which the sync reaches as a world actor. */
-   let linkedActor;
+   /** @type {object} The unlinked token whose delta holds its own stale Blinded, with its actor and read spy. */
+   let staleToken;
+   /** @type {object} The unlinked token holding no effect of its own (it inherits the world actor's Blinded). */
+   let cleanToken;
+   /** @type {object} The linked token of the world actor. */
+   let linkedToken;
+   /** @type {object} The unlinked token whose base actor was deleted, with a stale delta effect. */
+   let orphanToken;
+
+   /**
+    * Builds a fake world actor whose stored effects are the given sources.
+    * @param {string} name - The actor's name.
+    * @param {object[]} sources - The stored effect sources.
+    * @returns {object} The fake actor, whose `updateEmbeddedDocuments` is a spy.
+    */
+   function createWorldActor(name, sources) {
+      return {
+         _source: {
+            effects: sources,
+         },
+         name,
+         updateEmbeddedDocuments: vi.fn(async () => []),
+      };
+   }
+
+   /**
+    * Builds a fake token whose delta holds the given effect sources; reading its `actor` is recorded.
+    * @param {object} data - The token's data.
+    * @param {string} data.name - The token's name.
+    * @param {boolean} data.actorLink - Whether the token is linked to its base actor.
+    * @param {object|null} data.baseActor - The base world actor.
+    * @param {object[]} data.deltaEffects - The effect sources the token's delta manages.
+    * @returns {{token: object, actor: object, actorRead: Function}} The token, its actor, and the read spy.
+    */
+   function createToken({ name, actorLink, baseActor, deltaEffects }) {
+      /** @type {object} The token's actor, whose `updateEmbeddedDocuments` is a spy. */
+      const actor = {
+         name,
+         updateEmbeddedDocuments: vi.fn(async () => []),
+      };
+
+      /** @type {Function} Records each read of `token.actor` (a read materializes a lazy synthetic actor). */
+      const actorRead = vi.fn(() => actor);
+      return {
+         actor,
+         actorRead,
+         token: {
+            _source: {
+               delta: {
+                  effects: deltaEffects,
+               },
+            },
+            actorLink,
+            baseActor,
+            name,
+
+            /**
+             * The token's actor, read through the spy.
+             * @returns {object} The actor.
+             */
+            get actor() {
+               return actorRead();
+            },
+         },
+      };
+   }
 
    beforeEach(() => {
-      worldActor = createActor('World', [staleBlinded('effect1')]);
-      tokenActor = createActor('Token', [staleBlinded('effect2')]);
-      linkedActor = createActor('Linked', [staleBlinded('effect3')]);
-      globalThis.CONFIG = { statusEffects: STATUS_EFFECTS };
+      worldActor = createWorldActor('World', [staleBlinded('effect1')]);
+      staleToken = createToken({
+         actorLink: false,
+         baseActor: worldActor,
+         deltaEffects: [staleBlinded('effect2')],
+         name: 'Stale Token',
+      });
+      cleanToken = createToken({
+         actorLink: false,
+         baseActor: worldActor,
+         deltaEffects: [],
+         name: 'Clean Token',
+      });
+      linkedToken = createToken({
+         actorLink: true,
+         baseActor: worldActor,
+         deltaEffects: [staleBlinded('effect3')],
+         name: 'Linked Token',
+      });
+      orphanToken = createToken({
+         actorLink: false,
+         baseActor: null,
+         deltaEffects: [staleBlinded('effect4')],
+         name: 'Orphan Token',
+      });
       globalThis.ui = {
          notifications: {
             error: vi.fn(),
@@ -3457,18 +3871,10 @@ describe('world sync', () => {
          scenes: [
             {
                tokens: [
-                  {
-                     actor: tokenActor,
-                     actorLink: false,
-                  },
-                  {
-                     actor: linkedActor,
-                     actorLink: true,
-                  },
-                  {
-                     actor: null,
-                     actorLink: false,
-                  },
+                  staleToken.token,
+                  cleanToken.token,
+                  linkedToken.token,
+                  orphanToken.token,
                ],
             },
          ],
@@ -3477,20 +3883,34 @@ describe('world sync', () => {
    });
 
    afterEach(() => {
-      delete globalThis.CONFIG;
       delete globalThis.ui;
       delete globalThis.game;
    });
 
-   it('visits world actors, then unlinked token actors, and skips linked and actorless tokens', () => {
-      expect([...getSyncedActors()]).toEqual([
-         worldActor,
-         tokenActor,
+   it('finds the stale world actor, then the unlinked token whose own delta effect is stale', () => {
+      expect([...getConditionEffectSyncs()].map((sync) => sync.name)).toEqual([
+         'World',
+         'Stale Token',
       ]);
    });
 
-   it('reports a stale condition effect and reports nothing once none is stale', () => {
+   it('reads no token actor while scanning, and only the stale token\'s while syncing', async () => {
       expect(conditionEffectsNeedSync()).toBe(true);
+      expect([...getConditionEffectSyncs()]).toHaveLength(2);
+      expect(staleToken.actorRead).not.toHaveBeenCalled();
+
+      await syncConditionEffects();
+      expect(staleToken.actorRead).toHaveBeenCalledTimes(1);
+      for (const token of [
+         cleanToken,
+         linkedToken,
+         orphanToken,
+      ]) {
+         expect(token.actorRead, token.token.name).not.toHaveBeenCalled();
+      }
+   });
+
+   it('reports nothing once no stored condition effect is stale', () => {
       game.actors = [];
       game.scenes = [];
       expect(conditionEffectsNeedSync()).toBe(false);
@@ -3499,28 +3919,30 @@ describe('world sync', () => {
    it('updates each stale actor once with its effects\' updates', async () => {
       expect(await syncConditionEffects()).toBe(2);
       expect(worldActor.updateEmbeddedDocuments).toHaveBeenCalledWith('ActiveEffect', [
-         getConditionEffectUpdate(staleBlinded('effect1'), STATUS_EFFECTS),
+         getConditionEffectUpdate(staleBlinded('effect1')),
       ]);
-      expect(tokenActor.updateEmbeddedDocuments).toHaveBeenCalledWith('ActiveEffect', [
-         getConditionEffectUpdate(staleBlinded('effect2'), STATUS_EFFECTS),
+      expect(staleToken.actor.updateEmbeddedDocuments).toHaveBeenCalledWith('ActiveEffect', [
+         getConditionEffectUpdate(staleBlinded('effect2')),
       ]);
-      expect(linkedActor.updateEmbeddedDocuments).not.toHaveBeenCalled();
+   });
+
+   it('writes no token copy of an inherited effect when the base actor\'s update fails', async () => {
+      /** @type {Function} The console.error spy, silencing the expected error output. */
+      const consoleError = vi.spyOn(console, 'error').mockImplementation(() => {});
+      worldActor.updateEmbeddedDocuments.mockRejectedValueOnce(new Error('write refused'));
+      expect(await syncConditionEffects()).toBe(1);
+      expect(ui.notifications.error).toHaveBeenCalledTimes(1);
+      expect(cleanToken.actorRead).not.toHaveBeenCalled();
+      expect(cleanToken.actor.updateEmbeddedDocuments).not.toHaveBeenCalled();
+      expect(staleToken.actor.updateEmbeddedDocuments).toHaveBeenCalledTimes(1);
+      consoleError.mockRestore();
    });
 
    it('does nothing for a non-GM', async () => {
       game.user.isGM = false;
       expect(await syncConditionEffects()).toBe(0);
       expect(worldActor.updateEmbeddedDocuments).not.toHaveBeenCalled();
-   });
-
-   it('reports a failing actor and still syncs the rest', async () => {
-      /** @type {Function} The console.error spy, silencing the expected error output. */
-      const consoleError = vi.spyOn(console, 'error').mockImplementation(() => {});
-      worldActor.updateEmbeddedDocuments.mockRejectedValueOnce(new Error('write refused'));
-      expect(await syncConditionEffects()).toBe(1);
-      expect(tokenActor.updateEmbeddedDocuments).toHaveBeenCalledTimes(1);
-      expect(ui.notifications.error).toHaveBeenCalledTimes(1);
-      consoleError.mockRestore();
+      expect(staleToken.actorRead).not.toHaveBeenCalled();
    });
 });
 ```
@@ -3528,21 +3950,11 @@ describe('world sync', () => {
 Create `tests/unit/MigrationAction.test.js`:
 
 ```js
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, vi } from 'vitest';
 import { resolveMigrationAction } from '~/helpers/migration/MigrateWorld.js';
 
 describe('resolveMigrationAction', () => {
    it.each([
-      [
-         'disabled',
-         true,
-         'none',
-      ],
-      [
-         'disabled',
-         false,
-         'none',
-      ],
       [
          'automatic',
          true,
@@ -3564,30 +3976,293 @@ describe('resolveMigrationAction', () => {
          'none',
       ],
    ])('mode %s with pending migration %s resolves to %s', (mode, needsMigration, action) => {
-      expect(resolveMigrationAction(mode, needsMigration)).toBe(action);
+      expect(resolveMigrationAction(mode, () => needsMigration)).toBe(action);
+   });
+
+   it('Disabled resolves to none without scanning the world', () => {
+      /** @type {Function} The world scan, which Disabled must not run. */
+      const needsMigration = vi.fn(() => true);
+      expect(resolveMigrationAction('disabled', needsMigration)).toBe('none');
+      expect(needsMigration).not.toHaveBeenCalled();
+   });
+});
+```
+
+Create `tests/unit/OnceReady.test.js`:
+
+```js
+import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
+
+// onceReady with its collaborators replaced: the converter, the migration, the world scan, and the Player HUD are
+// spies, so a failure can be injected at each step of the GM's migration attempt.
+
+/** @type {object} The spies the module mocks share. */
+const spies = vi.hoisted(() => ({
+   convert: vi.fn(async () => {}),
+   hudInit: vi.fn(),
+   migrate: vi.fn(async () => {}),
+   needsMigration: vi.fn(() => true),
+}));
+
+vi.mock('~/hooks/OnHotbarDrop.js', () => ({ default: vi.fn() }));
+vi.mock('~/helpers/utility-functions/Error.js', () => ({ default: vi.fn() }));
+vi.mock('~/helpers/migration/ConvertEffectItemsToActiveEffects.js', () => ({ default: spies.convert }));
+vi.mock('~/helpers/migration/MigrateWorld.js', async (importOriginal) => ({
+   ...(await importOriginal()),
+   migrateWorld: spies.migrate,
+   worldNeedsMigration: spies.needsMigration,
+}));
+vi.mock('~/helpers/migration/ConfirmMigrateWorldDialog.js', () => ({
+   default: class {
+      /**
+       * Stands in for the dialog's render.
+       * @returns {void}
+       */
+      render() {}
+   },
+}));
+vi.mock('~/ui/player-hud/TitanPlayerHud.js', () => ({
+   default: class {
+      /**
+       * Records the HUD's initialization.
+       * @returns {void}
+       */
+      init() {
+         spies.hudInit();
+      }
+   },
+}));
+vi.mock('~/ui/player-hud/settings/PlayerHudSettingsApplication.js', () => ({ default: class {} }));
+
+import onHotbarDrop from '~/hooks/OnHotbarDrop.js';
+import error from '~/helpers/utility-functions/Error.js';
+import onceReady from '~/hooks/OnceReady.js';
+
+beforeEach(() => {
+   globalThis.Hooks = { on: vi.fn() };
+   globalThis.game = {
+      settings: {
+         get: () => 'automatic',
+      },
+      titan: {},
+      user: { isGM: true },
+   };
+});
+
+afterEach(() => {
+   delete globalThis.Hooks;
+   delete globalThis.game;
+   vi.clearAllMocks();
+});
+
+/**
+ * Asserts the load finished for every user: the hot-bar drop hook is registered and the Player HUD is built.
+ * @returns {void}
+ */
+function expectLoadFinished() {
+   expect(Hooks.on).toHaveBeenCalledWith('hotbarDrop', onHotbarDrop);
+   expect(spies.hudInit).toHaveBeenCalledTimes(1);
+   expect(game.titan.playerHud).toBeDefined();
+}
+
+describe('onceReady', () => {
+   it('reports a failed converter and still registers the hook and builds the HUD', async () => {
+      spies.convert.mockRejectedValueOnce(new Error('converter failed'));
+      await onceReady();
+      expect(error).toHaveBeenCalledTimes(1);
+      expect(spies.migrate).not.toHaveBeenCalled();
+      expectLoadFinished();
+   });
+
+   it('reports a failed migration and still registers the hook and builds the HUD', async () => {
+      spies.migrate.mockRejectedValueOnce(new Error('migration failed'));
+      await onceReady();
+      expect(error).toHaveBeenCalledTimes(1);
+      expectLoadFinished();
+   });
+
+   it('scans nothing in Disabled mode', async () => {
+      game.settings.get = () => 'disabled';
+      await onceReady();
+      expect(spies.needsMigration).not.toHaveBeenCalled();
+      expect(spies.migrate).not.toHaveBeenCalled();
+      expect(error).not.toHaveBeenCalled();
+      expectLoadFinished();
    });
 });
 ```
 
 - [ ] **Step 2: Run the tests to verify they fail**
 
-Run: `npx vitest run tests/unit/SyncConditionEffects.test.js tests/unit/MigrationAction.test.js`
-Expected: FAIL — `SyncConditionEffects.js` does not exist and `resolveMigrationAction` is not exported.
+Run: `npx vitest run tests/unit/ConditionDescription.test.js tests/unit/ConditionReportData.test.js
+tests/unit/SyncConditionEffects.test.js tests/unit/MigrationAction.test.js tests/unit/OnceReady.test.js`
+Expected: FAIL — `findConditionDefinition`, `getConditionDescription`, `_getConditionReportData`, and
+`SyncConditionEffects.js` do not exist; `setupConditions` stores a description; `resolveMigrationAction` is not
+exported; a throwing converter aborts `onceReady` before the HUD is built.
 
-- [ ] **Step 3: Implement the sync**
+- [ ] **Step 3: Look condition descriptions up by status id**
+
+In `src/system/Conditions.js`, add directly after `buildConditionDefinitions`:
+
+```js
+/**
+ * Finds the system condition an Active Effect applies, from the system's own definitions (never the mutable
+ * CONFIG.statusEffects). Following core's `Actor#toggleStatusEffect`, an effect is a status's effect only when its
+ * statuses hold exactly that one id, so an effect with several statuses, or with a status naming no system condition,
+ * applies none.
+ * @param {Iterable<string>} statuses - The effect's status ids (a Set on a document, an array in stored data).
+ * @returns {object|undefined} A fresh copy of the condition's definition, or undefined when the effect applies no
+ * system condition.
+ */
+export function findConditionDefinition(statuses) {
+   /** @type {string[]} The status ids. */
+   const ids = [...statuses];
+   if (ids.length !== 1) {
+      return undefined;
+   }
+   return buildConditionDefinitions().find((condition) => condition.id === ids[0]);
+}
+
+/**
+ * Gets the description of the system condition an Active Effect applies, localized on this client. Condition effects
+ * store no description: a stored copy would freeze its creator's language and go stale when the rules text changes.
+ * @param {TitanActiveEffect} [effect] - The condition Active Effect; undefined in a row's mid-deletion frame.
+ * @returns {string} The localized description HTML, or an empty string when the effect applies no system condition.
+ */
+export function getConditionDescription(effect) {
+   /** @type {object|undefined} The condition's definition. */
+   const definition = effect ? findConditionDefinition(effect.statuses ?? []) : undefined;
+   return definition ? localize(`${definition.id}.desc`) : '';
+}
+```
+
+Replace the whole `setupConditions` function (JSDoc and body) with:
+
+```js
+/**
+ * Sets up the system conditions, registering each as a CONFIG.statusEffects entry flagged with its subtype. A
+ * condition's description is not copied onto its entry, so the Active Effects core creates from the entry store none;
+ * readers look it up by status id through getConditionDescription and localize it on their own client.
+ * @returns {void}
+ */
+export default function setupConditions() {
+   /** @type {object[]} The static condition definitions. */
+   const conditions = buildConditionDefinitions();
+
+   // Sort conditions by localized name.
+   conditions.sort((a, b) => sortAscending(game.i18n.localize(a.name), game.i18n.localize(b.name)));
+
+   // Flag each condition with its subtype.
+   for (const condition of conditions) {
+      condition.flags = {
+         titan: {
+            type: 'condition',
+         },
+      };
+   }
+   CONFIG.statusEffects = conditions;
+}
+```
+
+In `src/ui/player-hud/elements/effects-panel/EffectsDetailBody.svelte`:
+(a) add after the `Localize.js` import:
+
+```js
+   import { getConditionDescription } from '~/system/Conditions.js';
+```
+
+(b) replace the stale comment `/** @type {boolean} Whether this entry is a full effect (vs an inert condition). */`
+with `/** @type {boolean} Whether this entry is an effect (vs a condition, which has no checks of its own). */`;
+(c) replace the `description` derived (its comment and declaration) with:
+
+```js
+   /** @type {string} The entry's description HTML: an effect's own, or a condition's from its definition. */
+   const description = $derived(
+      isEffect
+         ? (document.data?.description ?? '')
+         : getConditionDescription(document.data),
+   );
+```
+
+In `CharacterDataModel.js`:
+(a) add the import (after the `ModBuckets` import):
+
+```js
+import { getConditionDescription } from '~/system/Conditions.js';
+```
+
+(b) in `onTurnStart`, replace
+
+```js
+            // Get conditions.
+            let conditions = this.getConditions();
+            if (conditions) {
+
+               // Add conditions to the report.
+               conditions = conditions.sort((a, b) => sortAscending(a.name, b.name));
+               reportData.conditions = conditions.map((condition) => {
+                  return {
+                     label: condition.name,
+                     img: condition.img,
+                     description: condition.flags.titan.description,
+                  };
+               });
+            }
+```
+
+with
+
+```js
+            // Get conditions.
+            /** @type {ActiveEffect[]|null} The condition Active Effects, or null when there are none. */
+            const conditions = this.getConditions();
+            if (conditions) {
+               reportData.conditions = this._getConditionReportData(conditions);
+            }
+```
+
+(c) add directly above `_getEffectReportData`:
+
+```js
+   /**
+    * Retrieves the Report Data for this Character's condition Active Effects, sorted by name. A condition's
+    * description is its definition's, localized when the report is built (getConditionDescription), like the
+    * condition's name the report also snapshots; condition effects store no description.
+    * @param {ActiveEffect[]} conditions - The condition Active Effects to get report data for.
+    * @returns {EffectReportData[]} Array of objects containing the report data for each condition.
+    */
+   _getConditionReportData(conditions) {
+      return conditions.sort((a, b) => sortAscending(a.name, b.name)).map((condition) => ({
+         description: getConditionDescription(condition),
+         img: condition.img,
+         label: condition.name,
+      }));
+   }
+```
+
+- [ ] **Step 4: Implement the sync**
 
 Create `src/helpers/migration/SyncConditionEffects.js`:
 
 ```js
 import error from '~/helpers/utility-functions/Error.js';
 import log from '~/helpers/utility-functions/Log.js';
+import { findConditionDefinition } from '~/system/Conditions.js';
 
 /**
- * An update bringing one condition Active Effect in line with its system definition.
+ * An update bringing one condition Active Effect's rules elements in line with its system definition.
  * @typedef {object} ConditionEffectUpdate
  * @property {string} _id - The Active Effect's id.
  * @property {object[]} system.rulesElement - The definition's rules elements (key `system.rulesElement`).
- * @property {string} flags.titan.description - The definition's description (key `flags.titan.description`).
+ */
+
+/**
+ * One actor's pending condition sync.
+ * @typedef {object} ConditionEffectSync
+ * @property {string} name - The world actor's or the token's name, for reports.
+ * @property {() => TitanActor|null} getActor - Resolves the actor to update. For an unlinked token it reads
+ * `token.actor`, which materializes a lazy synthetic actor, so it runs only for a token with a stale effect.
+ * @property {ConditionEffectUpdate[]} updates - The updates for the actor's stale condition effects.
  */
 
 /**
@@ -3610,58 +4285,54 @@ export function toCanonicalJson(value) {
 }
 
 /**
- * Builds the update that brings a condition Active Effect in line with its system definition. A condition's rules
- * elements and description are copied onto its effect at creation, so a changed definition reaches existing effects
- * only through this update. The definition is the first status effect whose id the effect's statuses hold.
- * @param {TitanActiveEffect} effect - The Active Effect to check.
- * @param {object[]} statusEffects - The system condition definitions (CONFIG.statusEffects).
- * @returns {ConditionEffectUpdate|null} The update, or null when the effect is not a system condition or is current.
+ * Builds the update that brings a stored condition Active Effect's rules elements in line with its system definition.
+ * A condition's rules elements are copied onto its effect at creation, so a changed definition reaches existing effects
+ * only through this update. Only rules elements are compared and written: condition descriptions are not stored
+ * (getConditionDescription), so a legacy `flags.titan.description` never makes an effect stale.
+ * @param {object} source - The Active Effect's stored data (an entry of `actor._source.effects` or of an unlinked
+ * token's `_source.delta.effects`).
+ * @returns {ConditionEffectUpdate|null} The update, or null when the effect applies no single system condition or is
+ * current.
  */
-export function getConditionEffectUpdate(effect, statusEffects) {
-   if (effect.type !== 'condition') {
+export function getConditionEffectUpdate(source) {
+   if (source.type !== 'condition') {
       return null;
    }
 
-   /** @type {object|undefined} The system condition this effect applies. */
-   const definition = statusEffects.find((condition) => effect.statuses.has(condition.id));
+   /** @type {object|undefined} The system condition the effect applies (a fresh copy the update may own). */
+   const definition = findConditionDefinition(source.statuses ?? []);
    if (!definition) {
       return null;
    }
 
    /** @type {object[]} The definition's rules elements. */
    const rulesElement = definition.system?.rulesElement ?? [];
-
-   /** @type {string} The definition's description. */
-   const description = definition.flags?.titan?.description ?? '';
-
-   /** @type {object} The effect's stored data. */
-   const source = effect.toObject();
-   if (
-      toCanonicalJson(source.system?.rulesElement ?? []) === toCanonicalJson(rulesElement) &&
-      (source.flags?.titan?.description ?? '') === description
-   ) {
+   if (toCanonicalJson(source.system?.rulesElement ?? []) === toCanonicalJson(rulesElement)) {
       return null;
    }
 
    return {
-      _id: effect.id,
-      'flags.titan.description': description,
-      'system.rulesElement': structuredClone(rulesElement),
+      _id: source._id,
+      'system.rulesElement': rulesElement,
    };
 }
 
 /**
- * Builds the updates that bring an actor's condition Active Effects in line with their definitions.
- * @param {TitanActor} actor - The actor to check.
- * @param {object[]} statusEffects - The system condition definitions (CONFIG.statusEffects).
+ * Builds the updates for the stale condition effects among stored Active Effect sources. An ActorDelta tombstone (a
+ * deleted inherited effect, `{ _id, _tombstone: true }`) is skipped.
+ * @param {object[]} sources - The stored Active Effect data.
  * @returns {ConditionEffectUpdate[]} One update per stale condition effect.
  */
-export function getConditionEffectUpdates(actor, statusEffects) {
+export function getConditionEffectUpdates(sources) {
    /** @type {ConditionEffectUpdate[]} The updates. */
    const updates = [];
-   for (const effect of actor.effects) {
+   for (const source of sources) {
+      if (source._tombstone) {
+         continue;
+      }
+
       /** @type {ConditionEffectUpdate|null} The effect's update, if it is stale. */
-      const update = getConditionEffectUpdate(effect, statusEffects);
+      const update = getConditionEffectUpdate(source);
       if (update) {
          updates.push(update);
       }
@@ -3670,39 +4341,57 @@ export function getConditionEffectUpdates(actor, statusEffects) {
 }
 
 /**
- * Yields every actor whose condition effects the sync covers: each world actor, then the actor of each unlinked token
- * on every scene. A linked token's actor is its world actor, so it is covered once. An unlinked token's actor holds its
- * own (delta) effects, which its world actor's update never reaches.
- * @yields {TitanActor} The next actor.
- * @returns {Generator<TitanActor>} The actors.
+ * Yields the pending condition sync of every actor with a stale stored condition effect: each world actor (from its
+ * stored effects), then each unlinked token on every scene (from the effects its delta manages). Effects a token
+ * inherits from its base actor are the base actor's and are synced there, so a failed base-actor update never writes a
+ * token copy of an inherited effect. A linked token's actor is its world actor, and a token whose base actor is gone
+ * has no actor to update. Only stored data is scanned: `token.actor` is read through `getActor`, for a stale token
+ * only.
+ * @yields {ConditionEffectSync} The next stale actor's sync.
+ * @returns {Generator<ConditionEffectSync>} The syncs.
  */
-export function* getSyncedActors() {
-   yield* game.actors;
+export function* getConditionEffectSyncs() {
+   for (const actor of game.actors) {
+      /** @type {ConditionEffectUpdate[]} The world actor's updates. */
+      const updates = getConditionEffectUpdates(actor._source.effects ?? []);
+      if (updates.length > 0) {
+         yield {
+            getActor: () => actor,
+            name: actor.name,
+            updates,
+         };
+      }
+   }
    for (const scene of game.scenes) {
       for (const token of scene.tokens) {
-         if (!token.actorLink && token.actor) {
-            yield token.actor;
+         if (token.actorLink || !token.baseActor) {
+            continue;
+         }
+
+         /** @type {ConditionEffectUpdate[]} The updates for the effects the token's delta manages. */
+         const updates = getConditionEffectUpdates(token._source.delta?.effects ?? []);
+         if (updates.length > 0) {
+            yield {
+               getActor: () => token.actor,
+               name: token.name,
+               updates,
+            };
          }
       }
    }
 }
 
 /**
- * Checks whether any condition Active Effect in the world differs from its system definition.
+ * Checks whether any stored condition Active Effect in the world differs from its system definition.
  * @returns {boolean} Whether any condition effect needs the sync.
  */
 export function conditionEffectsNeedSync() {
-   for (const actor of getSyncedActors()) {
-      if (getConditionEffectUpdates(actor, CONFIG.statusEffects).length > 0) {
-         return true;
-      }
-   }
-   return false;
+   return !getConditionEffectSyncs().next().done;
 }
 
 /**
- * Rewrites every stale condition Active Effect (world actors and unlinked token actors) from its system definition:
- * its rules elements and its description. Idempotent: a synced effect produces no update. GM-only. An actor whose
+ * Rewrites the rules elements of every stale condition Active Effect (world actors and the effects unlinked tokens hold
+ * themselves) from its system definition. Idempotent: a synced effect produces no update. GM-only. An actor whose
  * update fails is reported and the rest still sync.
  * @returns {Promise<number>} The number of actors updated.
  */
@@ -3713,18 +4402,13 @@ export default async function syncConditionEffects() {
 
    /** @type {number} The actors updated. */
    let updated = 0;
-   for (const actor of getSyncedActors()) {
-      /** @type {ConditionEffectUpdate[]} The actor's condition updates. */
-      const updates = getConditionEffectUpdates(actor, CONFIG.statusEffects);
-      if (updates.length === 0) {
-         continue;
-      }
+   for (const sync of [...getConditionEffectSyncs()]) {
       try {
-         await actor.updateEmbeddedDocuments('ActiveEffect', updates);
+         await sync.getActor().updateEmbeddedDocuments('ActiveEffect', sync.updates);
          updated++;
       }
       catch (err) {
-         error(`Failed to sync the conditions of Actor "${actor.name}".`, err);
+         error(`Failed to sync the conditions of "${sync.name}".`, err);
       }
    }
 
@@ -3735,7 +4419,7 @@ export default async function syncConditionEffects() {
 }
 ```
 
-- [ ] **Step 4: Join the sync to the migration system and fix Disabled**
+- [ ] **Step 5: Join the sync to the migration system, fix Disabled, and keep the load alive**
 
 In `src/helpers/migration/MigrateWorld.js`:
 (a) add after the `weaponMigrations` import:
@@ -3747,12 +4431,13 @@ import syncConditionEffects, { conditionEffectsNeedSync } from '~/helpers/migrat
 (b) in `worldNeedsMigration`, replace the final `return false;` with:
 
 ```js
-   // Condition effects hold copies of their definitions, which a system update may change.
+   // Condition effects hold copies of their definitions' rules elements, which a system update may change.
    return conditionEffectsNeedSync();
 ```
 
 and update its JSDoc summary to: "Checks whether any Actor or Item in the world, including items embedded within
-actors, needs a version migration, or any condition Active Effect differs from its system definition."
+actors, needs a version migration, or any stored condition Active Effect's rules elements differ from its system
+definition."
 
 (c) in `migrateWorld`, insert before `log('World migration complete.');`:
 
@@ -3762,9 +4447,9 @@ actors, needs a version migration, or any condition Active Effect differs from i
 ```
 
 and replace its JSDoc summary with: "Migrates all Actor and Item documents in the world to the latest schema version,
-including items embedded within actors, then syncs every condition Active Effect (world actors and unlinked token
-actors) to its system definition. Only runs for the GM. Skips documents that are already up to date. The one-shot
-legacy-effect converter is run separately from the Ready hook."
+including items embedded within actors, then syncs the rules elements of every stored condition Active Effect (world
+actors and the effects unlinked tokens hold themselves) to its system definition. Only runs for the GM. Skips
+documents that are already up to date. The one-shot legacy-effect converter is run separately from the Ready hook."
 
 (d) append:
 
@@ -3772,13 +4457,14 @@ legacy-effect converter is run separately from the Ready hook."
 /**
  * Resolves what a GM world load does about migration. Source: the `migrationMode` setting's hint ("Prompt: displays a
  * confirmation dialog before migrating. Automatic: migrates immediately without prompting. Disabled: skips migration
- * entirely.").
+ * entirely."). Disabled resolves before the world is scanned, so a Disabled load reads no document.
  * @param {string} mode - The `migrationMode` setting ('prompt', 'automatic', or 'disabled').
- * @param {boolean} needsMigration - Whether the world has a pending migration (worldNeedsMigration()).
+ * @param {() => boolean} needsMigration - Scans the world for a pending migration (worldNeedsMigration); called only
+ * when the mode can act on its answer.
  * @returns {'none'|'migrate'|'prompt'} Nothing, migrate now, or ask the GM first.
  */
 export function resolveMigrationAction(mode, needsMigration) {
-   if (mode === 'disabled' || !needsMigration) {
+   if (mode === 'disabled' || !needsMigration()) {
       return 'none';
    }
    if (mode === 'automatic') {
@@ -3792,6 +4478,7 @@ Replace the whole of `src/hooks/OnceReady.js` with:
 
 ```js
 import onHotbarDrop from '~/hooks/OnHotbarDrop.js';
+import error from '~/helpers/utility-functions/Error.js';
 import { migrateWorld, resolveMigrationAction, worldNeedsMigration } from '~/helpers/migration/MigrateWorld.js';
 import convertEffectItemsToActiveEffects from '~/helpers/migration/ConvertEffectItemsToActiveEffects.js';
 import ConfirmMigrateWorldDialog from '~/helpers/migration/ConfirmMigrateWorldDialog.js';
@@ -3802,27 +4489,33 @@ import PlayerHudSettingsApplication from '~/ui/player-hud/settings/PlayerHudSett
  * Attached to the Ready hook.
  * For the GM, runs the one-shot legacy-effect-to-Active-Effect converter unconditionally (it self-guards on GM and is
  * idempotent), then acts on any pending migration (version chains and condition-effect sync) as the migration mode
- * setting decides: prompt asks the GM through a dialog, automatic migrates now, disabled skips migration. The Player
- * HUD is built after the migration, so its existence marks a finished load. Finally registers the hot-bar drop hook
- * for all users.
+ * setting decides: prompt asks the GM through a dialog, automatic migrates now, disabled skips migration without
+ * scanning the world. A failure anywhere in that migration attempt is reported and never stops the load. Then, for
+ * every user, registers the hot-bar drop hook and builds the Player HUD; on the GM's client both happen after the
+ * migration attempt, whether or not it succeeded.
  * @returns {Promise<void>}
  */
 export default async function onceReady() {
    if (game.user.isGM) {
-      await convertEffectItemsToActiveEffects();
+      try {
+         await convertEffectItemsToActiveEffects();
 
-      switch (resolveMigrationAction(game.settings.get('titan', 'migrationMode'), worldNeedsMigration())) {
-         case 'prompt': {
-            new ConfirmMigrateWorldDialog().render(true);
-            break;
+         switch (resolveMigrationAction(game.settings.get('titan', 'migrationMode'), worldNeedsMigration)) {
+            case 'prompt': {
+               new ConfirmMigrateWorldDialog().render(true);
+               break;
+            }
+            case 'migrate': {
+               await migrateWorld();
+               break;
+            }
+            default: {
+               break;
+            }
          }
-         case 'migrate': {
-            await migrateWorld();
-            break;
-         }
-         default: {
-            break;
-         }
+      }
+      catch (reason) {
+         error('The world migration failed; the world loads without it.', reason);
       }
    }
 
@@ -3846,16 +4539,19 @@ unlinked tokens to the new rules (as the Migration Mode setting allows).**
 and append to the list:
 
 ```markdown
-- Existing conditions update to the current rules and descriptions through the world migration.
-- The Migration Mode setting's "Disabled" choice skips migration, as its description says.
+- Existing conditions update to the current rules through the world migration, and a condition's description always
+  shows the current text in the reader's language.
+- The Migration Mode setting's "Disabled" choice skips migration, as its description says, and a failed migration no
+  longer stops the Player HUD from loading.
 ```
 
-- [ ] **Step 5: Run the unit tests to verify they pass**
+- [ ] **Step 6: Run the unit tests to verify they pass**
 
-Run: `npx vitest run tests/unit/SyncConditionEffects.test.js tests/unit/MigrationAction.test.js`
+Run: `npx vitest run tests/unit/ConditionDescription.test.js tests/unit/ConditionReportData.test.js
+tests/unit/SyncConditionEffects.test.js tests/unit/MigrationAction.test.js tests/unit/OnceReady.test.js`
 Expected: PASS.
 
-- [ ] **Step 6: Write the migration e2e**
+- [ ] **Step 7: Write the migration and description e2e**
 
 Check the test world's pending state first (read-only), so a prompt-mode dialog at login is expected rather than a
 surprise: in a logged-in E2E GM page run
@@ -3872,7 +4568,7 @@ import { attachPageErrors, closeAllApps, deleteFixtureActor } from './world.js';
 
 /**
  * The condition-effect sync on a GM world load: Disabled leaves a stale condition, Prompt asks and leaves it until
- * confirmed, and Automatic rewrites it on a world actor and on an unlinked token's actor.
+ * confirmed, and Automatic rewrites it on a world actor and on an unlinked token's own effect.
  */
 
 /** @type {string} Name of the world actor carrying a stale Blinded. */
@@ -3954,7 +4650,6 @@ function seedStaleConditions() {
       });
       await worldActor.toggleStatusEffect('blinded', { active: true });
       await worldActor.effects.find((effect) => effect.statuses.has('blinded')).update({
-         'flags.titan.description': 'stale',
          'system.rulesElement': staleBlinded,
       });
 
@@ -3980,7 +4675,6 @@ function seedStaleConditions() {
       ]);
       await token.actor.toggleStatusEffect('deafened', { active: true });
       await token.actor.effects.find((effect) => effect.statuses.has('deafened')).update({
-         'flags.titan.description': 'stale',
          'system.rulesElement': [],
       });
       return {
@@ -3996,9 +4690,9 @@ function seedStaleConditions() {
 }
 
 /**
- * Reads whether each seeded condition matches its current definition.
- * @returns {Promise<{blinded: boolean, deafened: boolean}>} Whether each condition's rules elements and description
- * equal CONFIG.statusEffects'.
+ * Reads whether each seeded condition's rules elements match its current definition.
+ * @returns {Promise<{blinded: boolean, deafened: boolean}>} Whether each condition's rules elements equal those of
+ * its CONFIG.statusEffects entry.
  */
 function readSynced() {
    return page.evaluate(({ worldActorName, sceneId, tokenId }) => {
@@ -4018,7 +4712,7 @@ function readSynced() {
       });
 
       /**
-       * Compares a condition effect with its definition.
+       * Compares a condition effect's rules elements with its definition's.
        * @param {TitanActor} actor - The actor carrying the effect.
        * @param {string} id - The condition id.
        * @returns {boolean} Whether the effect matches.
@@ -4029,8 +4723,7 @@ function readSynced() {
 
          /** @type {object} The condition's definition. */
          const definition = CONFIG.statusEffects.find((condition) => condition.id === id);
-         return canonical(effect.toObject().system.rulesElement) === canonical(definition.system?.rulesElement ?? []) &&
-            effect.flags.titan.description === definition.flags.titan.description;
+         return canonical(effect.toObject().system.rulesElement) === canonical(definition.system?.rulesElement ?? []);
       };
       return {
          blinded: matches(game.actors.getName(worldActorName), 'blinded'),
@@ -4044,8 +4737,8 @@ function readSynced() {
 }
 
 /**
- * Sets the migration mode and reloads the world as the same GM, returning once the load has passed its migration step
- * (onceReady builds the Player HUD after it).
+ * Sets the migration mode and reloads the world as the same GM, returning once the load has passed its migration
+ * attempt (onceReady builds the Player HUD after it, whether or not it succeeded).
  * @param {string} mode - The migration mode.
  * @returns {Promise<void>} Resolves once the reloaded world finished onceReady.
  */
@@ -4095,29 +4788,134 @@ test('Disabled and Prompt leave stale conditions; Automatic rewrites world and t
 });
 ```
 
-- [ ] **Step 7: Lint, full unit suite, build, e2e**
+Create `tests/e2e/condition-description.spec.js`:
 
-Run: `npm run eslint` → 0 errors; `npm test` → all pass; `npm run build` → succeeds;
+```js
+import { expect, test } from '@playwright/test';
+import { login } from './fixtures.js';
+import {
+   attachPageErrors,
+   closeAllApps,
+   controlFixtureActorToken,
+   deleteFixtureActor,
+   deleteOrphanedTokens,
+} from './world.js';
+
+/**
+ * A condition's description in the Player HUD comes from its definition, localized on this client, never from text
+ * stored on the effect: a condition carrying a stale stored description still shows the current one.
+ */
+
+/** @type {string} Name of the throwaway player actor seeded for this spec. */
+const ACTOR_NAME = 'E2E Condition Description Actor';
+
+/** @type {string} A stale description stored on the condition effect, which the HUD must not show. */
+const STALE_TEXT = 'E2E stale stored description';
+
+/** @type {import('@playwright/test').Page} The file-shared, logged-in page (one world boot per file). */
+let page;
+/** @type {string[]} Uncaught page errors collected during the current test (cleared each afterEach). */
+let errors;
+
+test.beforeAll(async ({ browser }) => {
+   page = await browser.newPage();
+   errors = attachPageErrors(page);
+   await login(page);
+   await deleteOrphanedTokens(page);
+   await deleteFixtureActor(page, ACTOR_NAME);
+   await page.evaluate(async (name) => {
+      await game.settings.set('titan', 'playerHudOptions', {});
+      await Actor.create({
+         name,
+         type: 'player',
+      });
+   }, ACTOR_NAME);
+   await controlFixtureActorToken(page, {
+      actorName: ACTOR_NAME,
+      fallbackSceneName: 'E2E Player HUD Scene',
+   });
+});
+
+test.afterEach(async () => {
+   await closeAllApps(page);
+   expect(errors, `uncaught page errors:\n${errors.join('\n')}`).toEqual([]);
+   errors.length = 0;
+});
+
+test.afterAll(async () => {
+   await page.evaluate(async () => {
+      await game.settings.set('titan', 'playerHudOptions', {});
+   });
+   await deleteFixtureActor(page, ACTOR_NAME);
+   await page?.close();
+});
+
+test('the HUD shows a condition\'s definition text, not a stale stored description', async () => {
+   /** @type {{name: string, text: string}} Blinded's localized name and its description's plain text. */
+   const blinded = await page.evaluate(async ({ name, staleText }) => {
+      /** @type {TitanActor} The fixture actor. */
+      const actor = game.actors.getName(name);
+      await actor.toggleStatusEffect('blinded', { active: true });
+      await actor.effects.find((effect) => effect.statuses.has('blinded')).update({
+         'flags.titan.description': `<p>${staleText}</p>`,
+      });
+
+      /** @type {HTMLDivElement} A detached element that turns the description HTML into plain text. */
+      const holder = document.createElement('div');
+      holder.innerHTML = game.i18n.localize('LOCAL.blinded.desc.text');
+      return {
+         name: game.i18n.localize('LOCAL.blinded.text'),
+         text: holder.textContent.trim(),
+      };
+   }, {
+      name: ACTOR_NAME,
+      staleText: STALE_TEXT,
+   });
+
+   /** @type {import('@playwright/test').Locator} The Blinded row. */
+   const row = page.locator('[data-testid="player-hud-effect-row"]', { hasText: blinded.name });
+   await row.click();
+
+   /** @type {import('@playwright/test').Locator} The row's expanded detail. */
+   const detail = row.locator('.detail');
+   await expect(detail).toContainText(blinded.text);
+
+   // The detail rendered its description above (the positive edge); the stored text had to appear in that same render.
+   await expect(detail).not.toContainText(STALE_TEXT);
+});
+```
+
+- [ ] **Step 8: Lint, full unit suite, build, e2e**
+
+Run: `npm run eslint` → 0 errors; `npm run stylelint` → 0 errors; `npm test` → all pass; `npm run build` → succeeds;
 `npm run test:e2e -- tests/e2e/condition-migration.spec.js` → pass; then
-`npm run test:e2e -- tests/e2e/pack-conversion.spec.js tests/e2e/logic/conditions.spec.js` → all pass (the converter
-still runs on every load and conditions still apply).
+`npm run test:e2e -- tests/e2e/condition-description.spec.js tests/e2e/player-hud-effects-panel.spec.js
+tests/e2e/report-cards.spec.js tests/e2e/pack-conversion.spec.js tests/e2e/logic/conditions.spec.js` → all pass (the
+HUD and the turn report read descriptions from the definitions, the converter still runs on every load, and
+conditions still apply).
 
-- [ ] **Step 8: Commit**
+- [ ] **Step 9: Commit**
 
 ```bash
 git branch --show-current
 git status --short
-git add src/helpers/migration/SyncConditionEffects.js src/helpers/migration/MigrateWorld.js src/hooks/OnceReady.js \
-   CHANGELOG.md tests/unit/SyncConditionEffects.test.js tests/unit/MigrationAction.test.js \
-   tests/e2e/condition-migration.spec.js
+git add src/system/Conditions.js src/helpers/migration/SyncConditionEffects.js src/helpers/migration/MigrateWorld.js \
+   src/hooks/OnceReady.js src/ui/player-hud/elements/effects-panel/EffectsDetailBody.svelte \
+   src/document/types/actor/types/character/CharacterDataModel.js CHANGELOG.md \
+   tests/unit/ConditionDescription.test.js tests/unit/ConditionReportData.test.js \
+   tests/unit/SyncConditionEffects.test.js tests/unit/MigrationAction.test.js tests/unit/OnceReady.test.js \
+   tests/e2e/condition-migration.spec.js tests/e2e/condition-description.spec.js
 git commit -F - <<'EOF'
 feat(migration): sync condition effects to their definitions on world load
 
-worldNeedsMigration reports condition Active Effects (world actors and
-unlinked token actors) whose rules elements or description differ from
-CONFIG.statusEffects, and migrateWorld rewrites them, so Migration Mode
-governs the sync. Migration Mode Disabled now skips migration as its hint
-says.
+worldNeedsMigration reports stored condition Active Effects (world actors
+and the effects unlinked tokens hold themselves) whose rules elements differ
+from buildConditionDefinitions, and migrateWorld rewrites them, so Migration
+Mode governs the sync. The scan reads stored data only and materializes a
+token's actor only to update it. Condition descriptions are no longer stored
+on effects: the Player HUD and the turn-start report look them up by status
+id. Migration Mode Disabled now skips migration, without scanning, as its
+hint says, and a failed migration no longer blocks the load.
 
 Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
 Claude-Session: https://claude.ai/code/session_01SPVZ3AXCPn5Bo41aemiJZc
@@ -4942,13 +5740,34 @@ EOF
 - Produces: `CONDITION_IDS: readonly string[]` (definition order); `IMMUNITY_SELECTORS: readonly ['condition',
   'effect']`; typedef `ImmunityElement` `{ operation: 'immunity', selector: 'condition'|'effect', key: string, uuid:
   string }`; `createImmunityElement(options?)` → `{ operation: 'immunity', selector: 'condition', key:
-  CONDITION_IDS[0], uuid }`; `TYPED_KEY_SELECTORS.immunity = ['effect']`; editor test ids `immunity-selector`,
-  `immunity-key`; `DocumentTextInput` / `ConditionSelect` / `DocumentConditionSelect` accept `testId`.
+  CONDITION_IDS[0], uuid }`; `createEmptyImmunities(): Record<string, Map>` (one empty `Map` per
+  `IMMUNITY_SELECTORS` entry, the single source of an `Immunities` object's keys); `TYPED_KEY_SELECTORS.immunity =
+  ['effect']`; editor test ids `immunity-selector`, `immunity-key`; `DocumentTextInput` / `ConditionSelect` /
+  `DocumentConditionSelect` accept `testId`.
 
 - [ ] **Step 1: Write the failing tests**
 
-In `tests/unit/RulesElementOperationRegistry.test.js`, append `'immunity',` as the last entry of the pinned list in
-`'lists the operations in editor display order'`.
+In `tests/unit/RulesElementOperationRegistry.test.js`:
+(a) append `'immunity',` as the last entry of the pinned list in `'lists the operations in editor display order'`;
+(b) add to the top import block:
+
+```js
+import { IMMUNITY_SELECTORS } from '~/document/types/item/rules-element/Immunity.js';
+```
+
+(c) append inside `describe('rules-element operations', ...)`:
+
+```js
+   it.each([
+      'function onSelectorChange()',
+      'function getKeyInput()',
+   ])('the immunity editor\'s %s switch handles exactly the immunity selectors', (switchStart) => {
+      expect(readSwitchCases(
+         'src/document/types/item/sheet/rules-element/ItemSheetImmunitySettings.svelte',
+         switchStart,
+      )).toEqual([...IMMUNITY_SELECTORS].sort());
+   });
+```
 
 In `tests/unit/TypedKeySelectorEditors.test.js`, add to `EDITORS` (alphabetical position):
 
@@ -4959,7 +5778,10 @@ In `tests/unit/TypedKeySelectorEditors.test.js`, add to `EDITORS` (alphabetical 
 In `tests/unit/RulesElementFactories.test.js`, add the import
 
 ```js
-import createImmunityElement, { IMMUNITY_SELECTORS } from '~/document/types/item/rules-element/Immunity.js';
+import createImmunityElement, {
+   createEmptyImmunities,
+   IMMUNITY_SELECTORS,
+} from '~/document/types/item/rules-element/Immunity.js';
 import { CONDITION_IDS, buildConditionDefinitions } from '~/system/Conditions.js';
 ```
 
@@ -4985,11 +5807,23 @@ and append inside the `describe` block:
    it('lists every condition id in definition order', () => {
       expect(CONDITION_IDS).toEqual(buildConditionDefinitions().map((condition) => condition.id));
    });
+
+   it('builds empty immunities with one fresh Map per immunity selector', () => {
+      /** @type {Record<string, Map>} One empty immunities object. */
+      const immunities = createEmptyImmunities();
+      expect(Object.keys(immunities)).toEqual([...IMMUNITY_SELECTORS]);
+      for (const selector of IMMUNITY_SELECTORS) {
+         expect(immunities[selector]).toBeInstanceOf(Map);
+         expect(immunities[selector].size).toBe(0);
+      }
+      expect(createEmptyImmunities().condition).not.toBe(immunities.condition);
+   });
 ```
 
 Run: `npx vitest run tests/unit/RulesElementOperationRegistry.test.js tests/unit/TypedKeySelectorEditors.test.js
 tests/unit/RulesElementFactories.test.js`
-Expected: FAIL — `Immunity.js` does not exist; the operation list lacks `immunity`.
+Expected: FAIL — `Immunity.js` and `ItemSheetImmunitySettings.svelte` do not exist; the operation list lacks
+`immunity`.
 
 - [ ] **Step 2: Add the element, its selectors, and the typed key**
 
@@ -5011,8 +5845,8 @@ import { CONDITION_IDS } from '~/system/Conditions.js';
 
 /**
  * A Rules Element making a Character immune to a condition or to an effect. While it applies, creating a matching
- * condition or effect on the Character is refused, and an existing one is suppressed (its rules elements stop
- * applying) until the immunity ends. An immunity never suppresses the effect granting it.
+ * condition or effect on the Character is refused, and an existing one is suppressed until the immunity ends: its
+ * modifiers stop applying; immunities it grants still apply. An immunity never suppresses the effect granting it.
  * @typedef {object} ImmunityElement
  * @property {string} operation - The operation to be performed by the Rules Element (immunity).
  * @property {string} selector - What the immunity blocks: 'condition' or 'effect'.
@@ -5029,6 +5863,20 @@ export const IMMUNITY_SELECTORS = Object.freeze([
    'condition',
    'effect',
 ]);
+
+/**
+ * Creates an empty set of immunities: one Map per immunity selector, each mapping a key (a condition id, or a
+ * camel-case effect name) to the sources granting that immunity. Every immunities object is built here, so the
+ * selector list has one source.
+ * @returns {Record<string, Map<string, {id: string, name: string}[]>>} The empty immunities, keyed by
+ * IMMUNITY_SELECTORS; each source is the granting document's id and name.
+ */
+export function createEmptyImmunities() {
+   return Object.fromEntries(IMMUNITY_SELECTORS.map((selector) => [
+      selector,
+      new Map(),
+   ]));
+}
 
 /**
  * Creates a Rules Element making a Character immune to a condition.
@@ -5923,6 +6771,38 @@ describe('suppression', () => {
       model._applyRulesElements();
       expect(model.rating.defense.mod.condition).toBe(-2);
    });
+
+   it('a suppressed timed effect\'s duration keeps ticking (user ruling 2026-09-30)', async () => {
+      /** @type {object} A turn-start timed effect the ward suppresses. */
+      const blade = activeEffect({
+         id: 'blade',
+         name: 'Poisoned Blade',
+         type: 'effect',
+      });
+      blade.system.duration = {
+         remaining: 2,
+         type: 'turnStart',
+      };
+      blade.update = vi.fn(async () => {});
+
+      /** @type {object} The model, its effects filterable as core's Collection is. */
+      const model = createCharacter({
+         effects: [blade],
+         items: [item('ward', [immunity('effect', 'Poisoned Blade')])],
+      });
+      model.parent.effects.filter = (predicate) => [...model.parent.effects.values()].filter(predicate);
+      model.prepareBaseData();
+      expect(blade.system.isSuppressed).toBe(true);
+
+      await model._decreaseTurnEffectDuration({}, 'turnStart');
+      expect(blade.update).toHaveBeenCalledWith({
+         system: {
+            duration: {
+               remaining: 1,
+            },
+         },
+      });
+   });
 });
 
 describe('TitanActiveEffect#_preCreate', () => {
@@ -6076,7 +6956,13 @@ Expected: FAIL — `IsSuppressedByImmunity.js` does not exist; `applyEffectToTar
 - [ ] **Step 3: Derive immunities before core applies Active Effects**
 
 In `CharacterDataModel.js`:
-(a) add after the `RulesElementSource` typedef:
+(a) add the import (after the `ArmorTraitCheckModifiers` import):
+
+```js
+import { createEmptyImmunities } from '~/document/types/item/rules-element/Immunity.js';
+```
+
+and after the `RulesElementSource` typedef:
 
 ```js
 /**
@@ -6087,7 +6973,8 @@ In `CharacterDataModel.js`:
  */
 
 /**
- * A Character's immunities, each key mapped to the sources granting it.
+ * A Character's immunities, each key mapped to the sources granting it: one Map per `IMMUNITY_SELECTORS` entry, built
+ * by `createEmptyImmunities`.
  * @typedef {object} Immunities
  * @property {Map<string, ImmunitySource[]>} condition - Condition immunities, keyed by condition id.
  * @property {Map<string, ImmunitySource[]>} effect - Effect immunities, keyed by camel-case effect name.
@@ -6113,10 +7000,7 @@ In `CharacterDataModel.js`:
     * @returns {Immunities} The immunities.
     */
    get immunities() {
-      return this.parent.immunities ?? {
-         condition: new Map(),
-         effect: new Map(),
-      };
+      return this.parent.immunities ?? createEmptyImmunities();
    }
 ```
 
@@ -6134,10 +7018,7 @@ In `CharacterDataModel.js`:
     */
    _getImmunities() {
       /** @type {Immunities} The immunities. */
-      const immunities = {
-         condition: new Map(),
-         effect: new Map(),
-      };
+      const immunities = createEmptyImmunities();
       for (const source of this._getRulesElementSources()) {
          for (const element of source.elements) {
             if (
@@ -6196,8 +7077,9 @@ In `CharacterDataModel.js`:
 (d) in `_applyRulesElements`, at the top of the `for (const source of this._getRulesElementSources())` loop body, add:
 
 ```js
-         // An Active Effect suppressed by an immunity applies nothing until the immunity ends. Only the immunity
-         // suppression is read here: `disabled` is the gate for an effect's own state.
+         // A suppressed Active Effect's modifiers stop applying until the immunity ends; immunities it grants still
+         // apply (the prepareBaseData pre-pass reads every enabled source). Only the immunity suppression is read
+         // here: `disabled` is the gate for an effect's own state.
          if (source.effect?.system.isSuppressed) {
             continue;
          }
@@ -6219,7 +7101,8 @@ Create `src/document/types/active-effect/IsSuppressedByImmunity.js`:
  * Decides whether an Active Effect is suppressed by its Character's immunities. Core's
  * `ActiveEffect#isSuppressed` returns `!!(this.system.isSuppressed ?? this.duration.expired)`, so returning undefined
  * when not immune leaves core's expiry test in charge. A suppressed effect is inactive (core leaves it out of
- * `actor.statuses`) and its rules elements stop applying; it returns untouched when the immunity ends.
+ * `actor.statuses`): its modifiers stop applying; immunities it grants still apply. It returns untouched when the
+ * immunity ends, and its duration keeps running meanwhile.
  * @param {TitanActiveEffect} effect - The Active Effect.
  * @returns {true|undefined} True while the effect's Character is immune to it; otherwise undefined.
  */
@@ -6307,7 +7190,8 @@ In `CHANGELOG.md`, append to the `## Unreleased:` list:
 
 ```markdown
 - New Immunity rules element: an item or effect can make a character immune to a condition or to an effect by name.
-  Applying it is refused with a notification, and an existing one stops applying until the immunity ends.
+  Applying it is refused with a notification, and an existing one is suppressed until the immunity ends: its
+  modifiers stop applying; immunities it grants still apply.
 ```
 
 - [ ] **Step 5: Run the unit tests to verify they pass**
@@ -6546,9 +7430,10 @@ feat(immunity): derive, suppress, and refuse immune conditions and effects
 
 The Character derives its immunities in prepareBaseData from the same
 source list as every rules-element pass; the Active Effect data models
-report isSuppressed while immune, so core drops the status and the rules
-elements stop applying; _preCreate refuses an immune creation with a
-notification naming the source. The effect tray counts only accepted copies.
+report isSuppressed while immune, so core drops the status and the
+suppressed effect's modifiers stop applying; immunities it grants still
+apply. _preCreate refuses an immune creation with a notification naming
+the source. The effect tray counts only accepted copies.
 
 Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
 Claude-Session: https://claude.ai/code/session_01SPVZ3AXCPn5Bo41aemiJZc
@@ -6557,11 +7442,13 @@ EOF
 
 ---
 
-### Task 10: Suppressed conditions and effects are marked on the sheet and the Player HUD
+### Task 10: Suppressed conditions and effects are marked on the sheet, the Player HUD, and turn reports
 
 User ruling 2 (2026-09-29): a condition or effect suppressed by an immunity shows a "Suppressed: <immunity source>"
 tag and a muted row on the character sheet's effect rows and the Player HUD effects panel entries. The sheet lists
-only `effect`-subtype rows; the HUD's icon tray dims the icon and tags its popout (resolutions 19 and 20).
+only `effect`-subtype rows; the HUD's icon tray dims the icon and tags its popout (resolutions 19 and 20). User
+rulings 3 and 4 (2026-09-30): turn-start and turn-end reports list a suppressed condition or effect with the same tag
+(resolution 25), and a suppressed effect's duration keeps ticking (resolution 24; this task's e2e pins it live).
 
 **Files:**
 - Create: `src/helpers/svelte-components/tag/effects/SuppressedEffectTag.svelte`
@@ -6570,9 +7457,12 @@ only `effect`-subtype rows; the HUD's icon tray dims the icon and tags its popou
   `src/document/types/actor/types/character/sheet/items/effect/CharacterSheetEffect.svelte`,
   `src/ui/player-hud/elements/effects-panel/EffectsListRow.svelte`,
   `src/ui/player-hud/elements/effects-panel/EffectsIconTray.svelte`,
-  `src/ui/player-hud/elements/effects-panel/EffectsDetailPopout.svelte`, `lang/en.json`, `CHANGELOG.md`
+  `src/ui/player-hud/elements/effects-panel/EffectsDetailPopout.svelte`,
+  `src/document/types/actor/types/character/CharacterDataModel.js` (report entries),
+  `src/helpers/svelte-components/tag/effects/EffectTag.svelte`, `lang/en.json`, `CHANGELOG.md`
 - Test: `tests/unit/Immunity.test.js` (extend), `tests/unit/SuppressedEffectTag.test.js` (create),
-  `tests/e2e/immunity-display.spec.js` (create)
+  `tests/e2e/immunity-display.spec.js` (create); `tests/unit/ConditionReportData.test.js` (Task 5) must stay green
+  unchanged (an entry nothing suppresses carries no `suppressedBy`)
 
 **Interfaces:**
 - Consumes: `CharacterDataModel#getImmunitySources(effect)`, `ImmunitySource`, and `isSuppressedByImmunity` (Task 9).
@@ -6583,8 +7473,11 @@ only `effect`-subtype rows; the HUD's icon tray dims the icon and tags its popou
   `CharacterSheetItem` prop `muted?: boolean` (dims the header's image and name); `EffectsDetailPopout` prop
   `suppressingSources?: string[]`; `data-effect-id` on HUD list rows and tray icons; test ids
   `character-sheet-effect-suppressed-tag`, `player-hud-effect-suppressed-tag`,
-  `player-hud-effect-popout-suppressed-tag`; LOCAL keys `suppressedBy.text` ("Suppressed: {sources}") and
-  `suppressedBy.desc.text`.
+  `player-hud-effect-popout-suppressed-tag`, `report-effect-suppressed-tag`; LOCAL keys `suppressedBy.text`
+  ("Suppressed: {sources}") and `suppressedBy.desc.text`; `CharacterDataModel#_getEffectReportEntry(effect):
+  EffectReportData` (label, img, description when not blank, `suppressedBy?: string[]`), which
+  `_getConditionReportData` and the four `_get*EffectReportData` builders share; report entries' optional
+  `suppressedBy: string[]`, rendered by `EffectTag`.
 
 - [ ] **Step 1: Write the failing tests**
 
@@ -6647,25 +7540,150 @@ describe('getSuppressingImmunitySources', () => {
       expect(getSuppressingImmunitySources(ward)).toEqual([]);
    });
 });
+
+describe('turn report entries', () => {
+   it('mark a suppressed condition with its suppressing sources and leave an unsuppressed one unmarked', () => {
+      /** @type {object} The Blinded effect. */
+      const blinded = Object.assign(conditionEffect('blinded'), { img: 'blinded.svg' });
+
+      /** @type {object} The Prone effect. */
+      const prone = Object.assign(conditionEffect('prone'), { img: 'prone.svg' });
+
+      /** @type {object} The model. */
+      const model = createCharacter({
+         effects: [
+            blinded,
+            prone,
+         ],
+         items: [item('ward', [immunity('condition', 'blinded')])],
+      });
+      model.prepareBaseData();
+      expect(model._getConditionReportData([
+         prone,
+         blinded,
+      ])).toEqual([
+         {
+            description: 'LOCAL.blinded.desc.text',
+            img: 'blinded.svg',
+            label: 'blinded',
+            suppressedBy: ['ward name'],
+         },
+         {
+            description: 'LOCAL.prone.desc.text',
+            img: 'prone.svg',
+            label: 'prone',
+         },
+      ]);
+   });
+
+   it('mark a suppressed timed effect in every duration builder, keeping its own fields', () => {
+      /** @type {object} A suppressed turn-start effect. */
+      const blade = Object.assign(activeEffect({
+         id: 'blade',
+         name: 'Poisoned Blade',
+         type: 'effect',
+      }), { img: 'blade.webp' });
+      blade.system.duration = {
+         custom: 'hours',
+         initiative: 12,
+         remaining: 2,
+         type: 'turnStart',
+      };
+
+      /** @type {object} The model. */
+      const model = createCharacter({
+         effects: [blade],
+         items: [item('ward', [immunity('effect', 'Poisoned Blade')])],
+      });
+      model.prepareBaseData();
+
+      /** @type {object} The fields every builder shares for the blade. */
+      const shared = {
+         img: 'blade.webp',
+         label: 'Poisoned Blade',
+         suppressedBy: ['ward name'],
+      };
+      expect(model._getEffectReportData([blade])).toEqual([shared]);
+      expect(model._getTurnEffectReportData([blade])).toEqual([
+         {
+            ...shared,
+            remaining: 2,
+         },
+      ]);
+      expect(model._getInitiativeEffectReportData([blade])).toEqual([
+         {
+            ...shared,
+            initiative: 12,
+            remaining: 2,
+         },
+      ]);
+      expect(model._getCustomEffectReportData([blade])).toEqual([
+         {
+            ...shared,
+            custom: 'hours',
+            remaining: 2,
+         },
+      ]);
+   });
+});
 ```
 
 Create `tests/unit/SuppressedEffectTag.test.js`:
 
 ```js
-import { beforeEach, describe, it, expect } from 'vitest';
-import { render, screen } from '@testing-library/svelte';
+import { afterEach, beforeEach, describe, it, expect } from 'vitest';
+import { cleanup, render, screen } from '@testing-library/svelte';
+import EffectTag from '~/helpers/svelte-components/tag/effects/EffectTag.svelte';
 import SuppressedEffectTag from '~/helpers/svelte-components/tag/effects/SuppressedEffectTag.svelte';
 
-describe('SuppressedEffectTag', () => {
-   beforeEach(() => {
-      // The label and the tooltip route through game.i18n; echo the key and the formatted sources.
-      globalThis.game = {
-         i18n: {
-            format: (key, data) => `${key} ${data.sources}`,
-            localize: (key) => key,
+afterEach(() => cleanup());
+
+beforeEach(() => {
+   // The labels and the tooltips route through game.i18n; echo the key and the formatted sources.
+   globalThis.game = {
+      i18n: {
+         format: (key, data) => `${key} ${data.sources}`,
+         localize: (key) => key,
+      },
+   };
+});
+
+describe('EffectTag (turn report entries)', () => {
+   it('tags a suppressed entry with its suppressing sources and dims it', () => {
+      render(EffectTag, {
+         props: {
+            effect: {
+               img: 'blade.webp',
+               label: 'Poisoned Blade',
+               suppressedBy: ['Ward'],
+            },
+            testId: 'report-entry',
          },
-      };
+      });
+      expect(screen.getByTestId('report-effect-suppressed-tag').textContent)
+         .toContain('LOCAL.suppressedBy.text Ward');
+      expect(screen.getByTestId('report-entry').classList.contains('suppressed')).toBe(true);
    });
+
+   it('leaves an unsuppressed entry untagged', () => {
+      render(EffectTag, {
+         props: {
+            effect: {
+               img: 'blade.webp',
+               label: 'Poisoned Blade',
+            },
+            testId: 'report-entry',
+         },
+      });
+
+      // The entry rendered (the positive edge) in the same pass that would have drawn its tag.
+      expect(screen.getByTestId('report-entry').textContent).toContain('Poisoned Blade');
+      expect(screen.queryByTestId('report-effect-suppressed-tag')).toBeNull();
+      expect(screen.getByTestId('report-entry').classList.contains('suppressed')).toBe(false);
+   });
+});
+
+describe('SuppressedEffectTag', () => {
 
    it('names every suppressing immunity in one label', () => {
       render(SuppressedEffectTag, {
@@ -6695,17 +7713,19 @@ describe('SuppressedEffectTag', () => {
 - [ ] **Step 2: Run the tests to verify they fail**
 
 Run: `npx vitest run tests/unit/Immunity.test.js tests/unit/SuppressedEffectTag.test.js`
-Expected: FAIL — `getSuppressingImmunitySources` is not exported, and `SuppressedEffectTag.svelte` does not exist.
+Expected: FAIL — `getSuppressingImmunitySources` is not exported, `SuppressedEffectTag.svelte` does not exist, the
+report builders carry no `suppressedBy`, and `EffectTag` draws no suppressed tag.
 
-- [ ] **Step 3: Share the suppressing sources and add the tag**
+- [ ] **Step 3: Share the suppressing sources, add the tag, and mark report entries**
 
 Replace the whole of `src/document/types/active-effect/IsSuppressedByImmunity.js` with:
 
 ```js
 /**
  * Gets the immunities suppressing an Active Effect: the sources of its Character's immunities to it. A suppressed
- * effect is inactive (core leaves it out of `actor.statuses`) and its rules elements stop applying; it returns
- * untouched when the immunity ends. The sheet's effect rows and the Player HUD effects panel name these sources.
+ * effect is inactive (core leaves it out of `actor.statuses`): its modifiers stop applying; immunities it grants still
+ * apply. It returns untouched when the immunity ends, and its duration keeps running meanwhile. The sheet's effect
+ * rows, the Player HUD effects panel, and the turn reports name these sources.
  * @param {TitanActiveEffect} [effect] - The Active Effect; undefined in a row's mid-deletion frame.
  * @returns {ImmunitySource[]} The sources suppressing it, each once; empty when the effect is missing, its parent
  * is not a Character, or the Character is not immune to it.
@@ -6769,13 +7789,195 @@ Create `src/helpers/svelte-components/tag/effects/SuppressedEffectTag.svelte`:
 In `lang/en.json` (`LOCAL`), insert in alphabetical key order:
 
 ```json
-      "suppressedBy.desc.text": "<p>An immunity suppresses this effect: it stays on the character but applies nothing until the immunity ends.</p>",
+      "suppressedBy.desc.text": "<p>An immunity suppresses this effect: it stays on the character and its modifiers stop applying until the immunity ends; immunities it grants still apply.</p>",
       "suppressedBy.text": "Suppressed: {sources}",
+```
+
+In `CharacterDataModel.js`:
+(a) add the import (after the `Conditions.js` import Task 5 added):
+
+```js
+import { getSuppressingImmunitySources } from '~/document/types/active-effect/IsSuppressedByImmunity.js';
+```
+
+(b) in each of the typedefs `EffectReportData`, `TurnEffectReportData`, `InitiativeEffectReportData`, and
+`CustomEffectReportData`, add after its `description` property:
+
+```js
+ * @property {string[]} [suppressedBy] - The names of the immunities suppressing it, when any do.
+```
+
+(c) replace `_getConditionReportData` (Task 5), `_getEffectReportData`, `_getTurnEffectReportData`,
+`_getInitiativeEffectReportData`, and `_getCustomEffectReportData` (each JSDoc and body) with:
+
+```js
+   /**
+    * Builds the report fields every reported condition and effect shares: its name and image, its description when
+    * not blank (a condition's from its definition through getConditionDescription, an effect's own), and, while an
+    * immunity suppresses it, the names of the suppressing immunities, which the report's tag shows as
+    * "Suppressed: <sources>" (user ruling 2026-09-30).
+    * @param {ActiveEffect} effect - The condition or effect Active Effect.
+    * @returns {EffectReportData} The shared report fields.
+    */
+   _getEffectReportEntry(effect) {
+      /** @type {EffectReportData} The entry. */
+      const entry = {
+         label: effect.name,
+         img: effect.img,
+      };
+
+      /** @type {string|undefined} The description HTML. */
+      const description = effect.type === 'condition' ? getConditionDescription(effect) : effect.description;
+      if (!isHTMLBlank(description)) {
+         entry.description = description;
+      }
+
+      /** @type {string[]} The names of the immunities suppressing it. */
+      const suppressedBy = getSuppressingImmunitySources(effect).map((source) => source.name);
+      if (suppressedBy.length > 0) {
+         entry.suppressedBy = suppressedBy;
+      }
+      return entry;
+   }
+
+   /**
+    * Retrieves the Report Data for this Character's condition Active Effects, sorted by name.
+    * @param {ActiveEffect[]} conditions - The condition Active Effects to get report data for.
+    * @returns {EffectReportData[]} Array of objects containing the report data for each condition.
+    */
+   _getConditionReportData(conditions) {
+      return conditions.sort((a, b) => sortAscending(a.name, b.name))
+         .map((condition) => this._getEffectReportEntry(condition));
+   }
+
+   /**
+    * Retrieves the Effect Report Data for an array of Effect Active Effects.
+    * @param {ActiveEffect[]} effects - The Effect Active Effects to get report data for.
+    * @returns {EffectReportData[]} Array of objects containing the report data for the effect.
+    */
+   _getEffectReportData(effects) {
+      return effects.sort((a, b) => sortAscending(a.name, b.name)).map((effect) => this._getEffectReportEntry(effect));
+   }
+
+   /**
+    * Retrieves the Effect Report Data for an array of Turn Start or Turn End Effect Active Effects.
+    * @param {ActiveEffect[]} effects - The Effect Active Effects to get report data for.
+    * @returns {TurnEffectReportData[]} Array of objects containing the report data for the effect.
+    */
+   _getTurnEffectReportData(effects) {
+      return effects.sort((a, b) => sortAscending(a.name, b.name)).map((effect) => ({
+         ...this._getEffectReportEntry(effect),
+         remaining: effect.system.duration.remaining,
+      }));
+   }
+
+   /**
+    * Retrieves the Effect Report Data for an array of Initiative Effect Active Effects.
+    * @param {ActiveEffect[]} effects - The Effect Active Effects to get report data for.
+    * @returns {InitiativeEffectReportData[]} Array of objects containing the report data for the effect.
+    */
+   _getInitiativeEffectReportData(effects) {
+      return effects.sort((a, b) => sortAscending(a.name, b.name)).map((effect) => ({
+         ...this._getEffectReportEntry(effect),
+         remaining: effect.system.duration.remaining,
+         initiative: effect.system.duration.initiative,
+      }));
+   }
+
+   /**
+    * Retrieves the Effect Report Data for an array of Custom Effect Active Effects.
+    * @param {ActiveEffect[]} effects - The Effect Active Effects to get report data for.
+    * @returns {CustomEffectReportData[]} Array of objects containing the report data for the effect.
+    */
+   _getCustomEffectReportData(effects) {
+      return effects.sort((a, b) => sortAscending(a.name, b.name)).map((effect) => ({
+         ...this._getEffectReportEntry(effect),
+         remaining: effect.system.duration.remaining,
+         custom: effect.system.duration.custom,
+      }));
+   }
+```
+
+In `src/helpers/svelte-components/tag/effects/EffectTag.svelte` (the one leaf every turn-start, turn-end, and
+effects-expired report entry renders through):
+(a) add after the `TooltipAction.js` import:
+
+```js
+   import SuppressedEffectTag from '~/helpers/svelte-components/tag/effects/SuppressedEffectTag.svelte';
+```
+
+(b) in each of the six data typedefs (`CustomEffectData`, `ExpiredEffectData`, `InitiativeEffectData`,
+`PermanentEffectData`, `TurnEffectData`, `ConditionEffectData`), add after its `description` property:
+
+```js
+    * @property {string[]} [suppressedBy] - The names of the immunities suppressing the effect, when any do.
+```
+
+(c) replace the root element's opening tag `<div class="tag" data-testid={testId} use:tooltipAction={tooltip}>` with:
+
+```svelte
+<div
+   class="tag"
+   class:suppressed={effect.suppressedBy?.length > 0}
+   data-testid={testId}
+   use:tooltipAction={tooltip}
+>
+```
+
+(d) replace the label block
+
+```svelte
+   <!--Label-->
+   <div>
+      {effect.label}
+   </div>
+```
+
+with
+
+```svelte
+   <!--Label-->
+   <div class="label">
+      {effect.label}
+   </div>
+```
+
+(e) insert after the `<!--Icon-->` block (before the root's closing `</div>`):
+
+```svelte
+
+   <!--Suppressed tag (an immunity suppresses this entry)-->
+   {#if effect.suppressedBy?.length > 0}
+      <div class="suppressed-tag">
+         <SuppressedEffectTag
+            sources={effect.suppressedBy}
+            testId="report-effect-suppressed-tag"
+         />
+      </div>
+   {/if}
+```
+
+(f) add inside the `.tag { ... }` style rule, after the `i` rule:
+
+```scss
+
+      // A suppressed entry dims its image and label; its tag names the immunity.
+      &.suppressed {
+         > img,
+         > .label {
+            opacity: 0.5;
+         }
+      }
+
+      .suppressed-tag {
+         @include margin-left-standard;
+      }
 ```
 
 - [ ] **Step 4: Run the unit tests to verify they pass**
 
-Run: `npx vitest run tests/unit/Immunity.test.js tests/unit/SuppressedEffectTag.test.js`
+Run: `npx vitest run tests/unit/Immunity.test.js tests/unit/SuppressedEffectTag.test.js
+tests/unit/ConditionReportData.test.js`
 Expected: PASS.
 
 - [ ] **Step 5: Mark suppressed rows on the character sheet**
@@ -6784,8 +7986,8 @@ In `src/document/types/actor/types/character/sheet/items/CharacterSheetItem.svel
 (a) in the `CharacterSheetItemProps` typedef, add after the `isExpanded` property:
 
 ```js
-    * @property {boolean} [muted] Whether the header's image and name are dimmed (the row applies nothing, e.g. an
-    * effect suppressed by an immunity).
+    * @property {boolean} [muted] Whether the header's image and name are dimmed (e.g. an effect suppressed by an
+    * immunity: its modifiers stop applying; immunities it grants still apply).
 ```
 
 (b) replace the props line with:
@@ -7076,7 +8278,8 @@ In `CHANGELOG.md`, append to the `## Unreleased:` list:
 
 ```markdown
 - A condition or effect suppressed by an immunity shows a "Suppressed" tag naming the immunity, and a dimmed row, on
-  the character sheet and in the Player HUD effects panel.
+  the character sheet, in the Player HUD effects panel, and in turn-start and turn-end reports; its duration keeps
+  running while suppressed.
 ```
 
 - [ ] **Step 7: Write the display e2e**
@@ -7092,13 +8295,26 @@ import {
    controlFixtureActorToken,
    deleteFixtureActor,
    deleteOrphanedTokens,
+   showChatLog,
 } from './world.js';
 
 /**
  * A condition or effect suppressed by an immunity shows a "Suppressed: <source>" tag and a dimmed row on the character
  * sheet's effect rows and in the Player HUD effects panel (list rows; the icon tray dims the icon and tags the
- * popout), and loses both when the immunity ends.
+ * popout), and loses both when the immunity ends. Turn-start and turn-end reports tag a suppressed condition or effect
+ * the same way, and a suppressed effect's duration keeps ticking.
  */
+
+/**
+ * The world settings this spec pins while it runs: turn reports list effects, turn durations decrease, and expired
+ * effects stay on the actor so the turn-end report lists them.
+ * @type {Record<string, *>}
+ */
+const PINNED_SETTINGS = {
+   autoDecreaseEffectDuration: true,
+   autoRemoveExpiredEffects: 'disabled',
+   reportEffects: true,
+};
 
 /** @type {string} Name of the throwaway player actor seeded for this spec. */
 const ACTOR_NAME = 'E2E Immunity Display Actor';
@@ -7113,19 +8329,32 @@ const BLADE_NAME = 'E2E Poisoned Blade';
 let page;
 /** @type {string[]} Uncaught page errors collected during the current test (cleared each afterEach). */
 let errors;
+/** @type {Record<string, *>} The pinned settings' values before this spec. */
+let originalSettings;
 
 test.beforeAll(async ({ browser }) => {
    page = await browser.newPage();
    errors = attachPageErrors(page);
    await login(page);
+   await showChatLog(page);
    await deleteOrphanedTokens(page);
    await deleteFixtureActor(page, ACTOR_NAME);
-   await page.evaluate(async (name) => {
+   originalSettings = await page.evaluate(async ({ name, pinned }) => {
+      /** @type {Record<string, *>} The values the pinned settings held. */
+      const original = {};
+      for (const [key, value] of Object.entries(pinned)) {
+         original[key] = game.settings.get('titan', key);
+         await game.settings.set('titan', key, value);
+      }
       await Actor.create({
          name,
          type: 'player',
       });
-   }, ACTOR_NAME);
+      return original;
+   }, {
+      name: ACTOR_NAME,
+      pinned: PINNED_SETTINGS,
+   });
    await controlFixtureActorToken(page, {
       actorName: ACTOR_NAME,
       fallbackSceneName: 'E2E Player HUD Scene',
@@ -7152,9 +8381,12 @@ test.afterEach(async () => {
 });
 
 test.afterAll(async () => {
-   await page.evaluate(async () => {
+   await page.evaluate(async (original) => {
       await game.settings.set('titan', 'playerHudOptions', {});
-   });
+      for (const [key, value] of Object.entries(original)) {
+         await game.settings.set('titan', key, value);
+      }
+   }, originalSettings);
    await deleteFixtureActor(page, ACTOR_NAME);
    await page?.close();
 });
@@ -7323,14 +8555,134 @@ test('a suppressed condition in the HUD tray is dimmed and its popout tagged unt
    await page.keyboard.press('Escape');
    await expect(page.getByTestId('player-hud-effect-popout')).toHaveCount(0);
 });
+
+/**
+ * Runs the fixture actor's turn start or turn end and reads the report it posts and the blade's remaining duration.
+ * @param {'onTurnStart'|'onTurnEnd'} method - The CharacterDataModel turn method.
+ * @returns {Promise<{id: string, type: string, system: object, remaining: number}>} The report and the duration.
+ */
+function runTurnReport(method) {
+   return page.evaluate(async ({ name, bladeName, turnMethod }) => {
+      /** @type {TitanActor} The fixture actor. */
+      const actor = game.actors.getName(name);
+
+      /** @type {number} The chat-message count before the turn. */
+      const before = game.messages.size;
+      await actor.system[turnMethod]();
+      await titanWait(() => game.messages.size > before, { message: 'turn report posted' });
+
+      /** @type {ChatMessage} The report. */
+      const message = game.messages.contents.at(-1);
+      return {
+         id: message.id,
+         remaining: actor.effects.getName(bladeName).system.duration.remaining,
+         system: message.system.toObject(),
+         type: message.type,
+      };
+   }, {
+      bladeName: BLADE_NAME,
+      name: ACTOR_NAME,
+      turnMethod: method,
+   });
+}
+
+/**
+ * Locates the suppressed tags on a chat message's report card.
+ * @param {string} messageId - The chat message id.
+ * @returns {import('@playwright/test').Locator} The tags.
+ */
+function reportSuppressedTags(messageId) {
+   return page.locator(`#chat .message[data-message-id="${messageId}"] [data-testid="report-effect-suppressed-tag"]`);
+}
+
+test('a turn-start report tags a suppressed condition and a suppressed effect whose duration still ticks', async () => {
+   await applyContaminated();
+   await createEffect({
+      name: BLADE_NAME,
+      system: {
+         duration: {
+            remaining: 3,
+            type: 'turnStart',
+         },
+      },
+      type: 'effect',
+   });
+   await createEffect({
+      name: WARD_NAME,
+      system: {
+         duration: { type: 'permanent' },
+         rulesElement: [
+            {
+               key: 'contaminated',
+               operation: 'immunity',
+               selector: 'condition',
+               uuid: 'e2e-immunity-display-report-condition',
+            },
+            {
+               key: BLADE_NAME,
+               operation: 'immunity',
+               selector: 'effect',
+               uuid: 'e2e-immunity-display-report-effect',
+            },
+         ],
+      },
+      type: 'effect',
+   });
+
+   /** @type {{id: string, type: string, system: object, remaining: number}} The turn-start report. */
+   const report = await runTurnReport('onTurnStart');
+   expect(report.type).toBe('turnStartReport');
+   expect(report.remaining, 'the suppressed blade still ticked').toBe(2);
+   expect(report.system.conditions).toEqual([
+      expect.objectContaining({ suppressedBy: [WARD_NAME] }),
+   ]);
+   expect(report.system.effects.turnStart).toEqual([
+      expect.objectContaining({
+         label: BLADE_NAME,
+         remaining: 2,
+         suppressedBy: [WARD_NAME],
+      }),
+   ]);
+
+   // The condition and the blade are tagged; the ward's own permanent entry is not.
+   await expect(reportSuppressedTags(report.id)).toHaveCount(2);
+   await expect(reportSuppressedTags(report.id).first()).toContainText(WARD_NAME);
+});
+
+test('a turn-end report tags a suppressed effect that expired while suppressed', async () => {
+   await createEffect({
+      name: BLADE_NAME,
+      system: {
+         duration: {
+            remaining: 1,
+            type: 'turnEnd',
+         },
+      },
+      type: 'effect',
+   });
+   await addWard('effect', BLADE_NAME);
+
+   /** @type {{id: string, type: string, system: object, remaining: number}} The turn-end report. */
+   const report = await runTurnReport('onTurnEnd');
+   expect(report.type).toBe('turnEndReport');
+   expect(report.remaining, 'the suppressed blade ticked to expiry').toBe(0);
+   expect(report.system.effects.expired).toEqual([
+      expect.objectContaining({
+         label: BLADE_NAME,
+         suppressedBy: [WARD_NAME],
+      }),
+   ]);
+   await expect(reportSuppressedTags(report.id)).toHaveCount(1);
+   await expect(reportSuppressedTags(report.id)).toContainText(WARD_NAME);
+});
 ```
 
 - [ ] **Step 8: Lint, full unit suite, build, e2e**
 
 Run: `npm run eslint` → 0 errors; `npm run stylelint` → 0 errors; `npm test` → all pass; `npm run build` → succeeds;
 `npm run test:e2e -- tests/e2e/immunity-display.spec.js tests/e2e/immunity.spec.js
-tests/e2e/player-hud-effects-panel.spec.js tests/e2e/reactive-effect-rows.spec.js tests/e2e/localization.spec.js` →
-all pass.
+tests/e2e/player-hud-effects-panel.spec.js tests/e2e/reactive-effect-rows.spec.js tests/e2e/localization.spec.js
+tests/e2e/report-cards.spec.js` → all pass.
 
 - [ ] **Step 9: Commit**
 
@@ -7343,15 +8695,19 @@ git add src/helpers/svelte-components/tag/effects/SuppressedEffectTag.svelte \
    src/document/types/actor/types/character/sheet/items/effect/CharacterSheetEffect.svelte \
    src/ui/player-hud/elements/effects-panel/EffectsListRow.svelte \
    src/ui/player-hud/elements/effects-panel/EffectsIconTray.svelte \
-   src/ui/player-hud/elements/effects-panel/EffectsDetailPopout.svelte lang/en.json CHANGELOG.md \
+   src/ui/player-hud/elements/effects-panel/EffectsDetailPopout.svelte \
+   src/document/types/actor/types/character/CharacterDataModel.js \
+   src/helpers/svelte-components/tag/effects/EffectTag.svelte lang/en.json CHANGELOG.md \
    tests/unit/Immunity.test.js tests/unit/SuppressedEffectTag.test.js tests/e2e/immunity-display.spec.js
 git commit -F - <<'EOF'
 feat(immunity): tag and dim suppressed conditions and effects
 
-The sheet's effect rows and the Player HUD effects panel (list rows, and
-the tray's icon and popout) show "Suppressed: <sources>" and dim the entry
-while an immunity suppresses it, read from getSuppressingImmunitySources,
-which isSuppressedByImmunity now shares.
+The sheet's effect rows, the Player HUD effects panel (list rows, and the
+tray's icon and popout), and the turn-start and turn-end reports show
+"Suppressed: <sources>" and dim the entry while an immunity suppresses it,
+read from getSuppressingImmunitySources, which isSuppressedByImmunity now
+shares. Every report entry is built by _getEffectReportEntry and drawn by
+EffectTag.
 
 Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
 Claude-Session: https://claude.ai/code/session_01SPVZ3AXCPn5Bo41aemiJZc
@@ -7360,7 +8716,1346 @@ EOF
 
 ---
 
-### Task 11: Targeting, distance, and target-condition helpers
+### Task 11: Immunity Handling setting — Remove (default) or Suppress
+
+User ruling 2 (2026-09-30): "By default applying an effect that suppresses another should remove it. This can be a
+system setting." A GM-only world setting chooses what happens to a condition or effect a Character already has when it
+gains an immunity to it: **Remove** (default) deletes it, **Suppress** keeps Task 9's suppression. The design is
+resolution 23: removal runs once, on the client whose user made the change, from `TitanActor`'s update and
+descendant-create/update handlers (never in data preparation); refusal (`_preCreate`) and suppression (`isSuppressed`)
+stay mode-independent; a mutually immune pair or longer ring is never deleted and falls back to suppression (grounded
+labelling); switching the setting to Remove makes the active GM clear what Suppress kept. Tasks 9 and 10's e2e specs
+exercise suppression, so this task pins them to Suppress.
+
+**Files:**
+- Create: `src/helpers/Settings/ImmunityHandling.js`,
+  `src/document/types/actor/types/character/ImmuneEffectRemoval.js`
+- Modify: `src/system/SystemSettings.js`, `src/document/types/actor/TitanActor.js`,
+  `src/document/types/item/rules-element/Immunity.js` (typedef JSDoc), `lang/en.json`, `CHANGELOG.md`
+- Test: `tests/unit/ImmuneEffectRemoval.test.js`, `tests/unit/TitanActorImmunityTriggers.test.js`,
+  `tests/e2e/immunity-handling.spec.js` (create); `tests/unit/SystemSettings.test.js` (extend);
+  `tests/e2e/immunity.spec.js`, `tests/e2e/immunity-display.spec.js` (pin Suppress)
+
+**Interfaces:**
+- Consumes: `CharacterDataModel#getImmunitySources(effect)` and `ImmunitySource` (Task 9); the Suppress-mode display
+  (Task 10), which also marks a mutually immune pair in Remove mode.
+- Produces: world setting `titan.immunityHandling` (`'remove'` | `'suppress'`, default `'remove'`, `restricted`);
+  `immunityHandling(): string` (default export of `src/helpers/Settings/ImmunityHandling.js`); named exports of
+  `ImmuneEffectRemoval.js`: `resolveImmuneEffectRemovals(effects, getSources): TitanActiveEffect[]`,
+  `removeImmuneEffects(actor): Promise<number>`, `removeImmuneEffectsWithDependents(actor): Promise<void>`,
+  `removeImmuneEffectsFromWorld(): Promise<void>`; `TitanActor#_onUpdate`, `#_onCreateDescendantDocuments`,
+  `#_onUpdateDescendantDocuments` (overrides) and `#_removeImmuneEffectsAfterChange(userId): void`; LOCAL key
+  `immunityRemovedEffect.text`; SETTINGS keys `immunityHandling.label`, `.hint`, `.remove`, `.suppress`.
+
+- [ ] **Step 1: Write the failing tests**
+
+Create `tests/unit/ImmuneEffectRemoval.test.js`:
+
+```js
+import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
+import { readFileSync } from 'node:fs';
+import { fileURLToPath } from 'node:url';
+import path from 'node:path';
+import {
+   removeImmuneEffects,
+   removeImmuneEffectsFromWorld,
+   removeImmuneEffectsWithDependents,
+   resolveImmuneEffectRemovals,
+} from '~/document/types/actor/types/character/ImmuneEffectRemoval.js';
+
+/** @type {object} The parsed English localization file. */
+const lang = JSON.parse(readFileSync(
+   path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../lang/en.json'),
+   'utf-8',
+));
+
+/** @type {string} The Immunity Handling mode the fake settings report. */
+let mode;
+
+beforeEach(() => {
+   mode = 'remove';
+   globalThis.game = {
+      actors: [],
+      i18n: {
+         format: (key, data) => `${key} ${JSON.stringify(data)}`,
+      },
+      settings: {
+         get: (namespace, key) => (key === 'immunityHandling' ? mode : undefined),
+      },
+      user: { isActiveGM: true },
+   };
+   globalThis.ui = {
+      notifications: {
+         error: vi.fn(),
+         info: vi.fn(),
+      },
+   };
+});
+
+afterEach(() => {
+   delete globalThis.game;
+   delete globalThis.ui;
+});
+
+/**
+ * Builds fake Active Effects named after their ids.
+ * @param {...string} ids - The effect ids.
+ * @returns {object[]} The effects.
+ */
+function effects(...ids) {
+   return ids.map((id) => ({
+      id,
+      name: `${id} name`,
+   }));
+}
+
+/**
+ * Builds an immunity lookup from a coverage table.
+ * @param {Record<string, string[]>} coverage - Effect id → the ids of the items or effects granting it an immunity.
+ * @returns {(effect: object) => ImmunitySource[]} The lookup.
+ */
+function sourcesFrom(coverage) {
+   return (effect) => (coverage[effect.id] ?? []).map((id) => ({
+      id,
+      name: `${id} name`,
+   }));
+}
+
+/**
+ * Lists the ids of the effects Remove mode deletes.
+ * @param {object[]} effectList - The actor's effects.
+ * @param {Record<string, string[]>} coverage - Effect id → the ids granting it an immunity.
+ * @returns {string[]} The deleted effects' ids.
+ */
+function removedIds(effectList, coverage) {
+   return resolveImmuneEffectRemovals(effectList, sourcesFrom(coverage)).map((effect) => effect.id);
+}
+
+/**
+ * Builds a fake Character whose immunity lookup counts only the items and effects it still holds, as preparation
+ * does after a deletion.
+ * @param {object} data - The Character's contents.
+ * @param {string[]} data.effectIds - Its Active Effects' ids.
+ * @param {string[]} [data.itemIds] - Its immunity-granting items' ids.
+ * @param {Record<string, string[]>} data.coverage - Effect id → the ids granting it an immunity.
+ * @param {boolean} [data.isToken] - Whether it is an unlinked token's synthetic actor.
+ * @returns {object} The fake actor; `deleteEmbeddedDocuments` is a spy that removes the effects.
+ */
+function createActor({ effectIds, itemIds = [], coverage, isToken = false }) {
+   /** @type {object} The fake actor. */
+   const actor = {
+      effects: effects(...effectIds),
+      getDependentTokens: () => [],
+      isToken,
+      name: 'Ward Bearer',
+      system: {
+         isCharacter: true,
+
+         /**
+          * Lists the sources covering an effect among the items and effects the actor still holds.
+          * @param {object} effect - The effect.
+          * @returns {ImmunitySource[]} The covering sources.
+          */
+         getImmunitySources: (effect) => (coverage[effect.id] ?? [])
+            .filter((id) => itemIds.includes(id) || actor.effects.some((entry) => entry.id === id))
+            .map((id) => ({
+               id,
+               name: `${id} name`,
+            })),
+      },
+   };
+   actor.deleteEmbeddedDocuments = vi.fn(async (documentName, ids) => {
+      actor.effects = actor.effects.filter((effect) => !ids.includes(effect.id));
+      return [];
+   });
+   return actor;
+}
+
+/**
+ * Builds a fake Character holding Contaminated, which its ward item makes it immune to.
+ * @param {boolean} [isToken] - Whether it is an unlinked token's synthetic actor.
+ * @returns {object} The fake actor.
+ */
+function createContaminatedActor(isToken = false) {
+   return createActor({
+      coverage: { contaminated: ['ward'] },
+      effectIds: ['contaminated'],
+      isToken,
+      itemIds: ['ward'],
+   });
+}
+
+describe('resolveImmuneEffectRemovals', () => {
+   it('removes an effect an item grants immunity to', () => {
+      expect(removedIds(effects('contaminated'), { contaminated: ['wardItem'] })).toEqual(['contaminated']);
+   });
+
+   it('removes nothing no immunity covers', () => {
+      expect(removedIds(effects('a', 'b'), {})).toEqual([]);
+   });
+
+   it('removes an effect covered by an effect nothing covers', () => {
+      expect(removedIds(effects('ward', 'blade'), { blade: ['ward'] })).toEqual(['blade']);
+   });
+
+   it('keeps a mutually immune pair: neither is deleted, both stay suppressed', () => {
+      expect(removedIds(effects('a', 'b'), {
+         a: ['b'],
+         b: ['a'],
+      })).toEqual([]);
+   });
+
+   it('keeps every effect of a longer immunity ring', () => {
+      expect(removedIds(effects('a', 'b', 'c'), {
+         a: ['c'],
+         b: ['a'],
+         c: ['b'],
+      })).toEqual([]);
+   });
+
+   it('keeps an effect whose only cover is removed: its immunity ends with the cover', () => {
+      // wardItem → x → y: an item covers x, so x goes, and y's only immunity goes with it.
+      expect(removedIds(effects('x', 'y'), {
+         x: ['wardItem'],
+         y: ['x'],
+      })).toEqual(['x']);
+   });
+
+   it('decides a pair an item breaks: the covered member goes and the other stays', () => {
+      expect(removedIds(effects('a', 'b'), {
+         a: [
+            'b',
+            'wardItem',
+         ],
+         b: ['a'],
+      })).toEqual(['a']);
+   });
+});
+
+describe('removeImmuneEffects', () => {
+   it('Remove deletes the immune effect and names it, the actor, and the source', async () => {
+      /** @type {object} The actor. */
+      const actor = createContaminatedActor();
+      expect(await removeImmuneEffects(actor)).toBe(1);
+      expect(actor.deleteEmbeddedDocuments).toHaveBeenCalledWith('ActiveEffect', ['contaminated']);
+      expect(ui.notifications.info).toHaveBeenCalledWith(`LOCAL.immunityRemovedEffect.text ${JSON.stringify({
+         actor: 'Ward Bearer',
+         effect: 'contaminated name',
+         sources: 'ward name',
+      })}`);
+   });
+
+   it('Suppress deletes nothing', async () => {
+      mode = 'suppress';
+
+      /** @type {object} The actor. */
+      const actor = createContaminatedActor();
+      expect(await removeImmuneEffects(actor)).toBe(0);
+      expect(actor.deleteEmbeddedDocuments).not.toHaveBeenCalled();
+      expect(ui.notifications.info).not.toHaveBeenCalled();
+   });
+
+   it('Remove keeps a mutually immune pair', async () => {
+      /** @type {object} The actor. */
+      const actor = createActor({
+         coverage: {
+            a: ['b'],
+            b: ['a'],
+         },
+         effectIds: [
+            'a',
+            'b',
+         ],
+      });
+      expect(await removeImmuneEffects(actor)).toBe(0);
+      expect(actor.deleteEmbeddedDocuments).not.toHaveBeenCalled();
+   });
+
+   it('runs overlapping removals on one actor one after another, deleting once', async () => {
+      /** @type {object} The actor. */
+      const actor = createContaminatedActor();
+      expect(await Promise.all([
+         removeImmuneEffects(actor),
+         removeImmuneEffects(actor),
+      ])).toEqual([
+         1,
+         0,
+      ]);
+      expect(actor.deleteEmbeddedDocuments).toHaveBeenCalledTimes(1);
+   });
+
+   it('lets the next removal on an actor run after one failed', async () => {
+      /** @type {object} The actor. */
+      const actor = createContaminatedActor();
+      actor.deleteEmbeddedDocuments.mockRejectedValueOnce(new Error('delete refused'));
+      await expect(removeImmuneEffects(actor)).rejects.toThrow('delete refused');
+      expect(await removeImmuneEffects(actor)).toBe(1);
+   });
+
+   it('ignores a non-Character', async () => {
+      /** @type {object} The actor. */
+      const actor = createContaminatedActor();
+      actor.system.isCharacter = false;
+      expect(await removeImmuneEffects(actor)).toBe(0);
+      expect(actor.deleteEmbeddedDocuments).not.toHaveBeenCalled();
+   });
+});
+
+describe('removeImmuneEffectsWithDependents', () => {
+   it('reconciles a world actor, then each unlinked token holding effects or items of its own', async () => {
+      /** @type {string[]} The order the actors deleted in. */
+      const order = [];
+
+      /** @type {object} The world actor. */
+      const base = createContaminatedActor();
+      base.deleteEmbeddedDocuments.mockImplementation(async () => {
+         order.push('base');
+         base.effects = [];
+         return [];
+      });
+
+      /** @type {object} A token actor holding its own immune effect. */
+      const effectToken = createContaminatedActor(true);
+      effectToken.deleteEmbeddedDocuments.mockImplementation(async () => {
+         order.push('effect token');
+         return [];
+      });
+
+      /** @type {object} A token actor whose own item makes it immune to an effect. */
+      const itemToken = createContaminatedActor(true);
+      itemToken.deleteEmbeddedDocuments.mockImplementation(async () => {
+         order.push('item token');
+         return [];
+      });
+
+      /** @type {Function} Records reads of the clean and the linked token's actor. */
+      const skippedRead = vi.fn();
+      base.getDependentTokens = () => [
+         {
+            _source: {
+               delta: {
+                  effects: [{ _id: 'contaminated' }],
+                  items: [],
+               },
+            },
+            actor: effectToken,
+            actorLink: false,
+         },
+         {
+            _source: {
+               delta: {
+                  effects: [],
+                  items: [{ _id: 'ward' }],
+               },
+            },
+            actor: itemToken,
+            actorLink: false,
+         },
+         {
+            _source: {
+               delta: {
+                  effects: [],
+                  items: [],
+               },
+            },
+            actorLink: false,
+
+            /**
+             * The clean token's actor, which the pass must not materialize.
+             * @returns {null} Nothing.
+             */
+            get actor() {
+               skippedRead();
+               return null;
+            },
+         },
+         {
+            _source: { delta: null },
+            actorLink: true,
+
+            /**
+             * The linked token's actor (its world actor), which the pass must not read again.
+             * @returns {object} The world actor.
+             */
+            get actor() {
+               skippedRead();
+               return base;
+            },
+         },
+      ];
+
+      await removeImmuneEffectsWithDependents(base);
+      expect(order).toEqual([
+         'base',
+         'effect token',
+         'item token',
+      ]);
+      expect(skippedRead).not.toHaveBeenCalled();
+   });
+
+   it('reconciles a token actor alone', async () => {
+      /** @type {object} The token actor. */
+      const tokenActor = createContaminatedActor(true);
+      tokenActor.getDependentTokens = vi.fn(() => []);
+      await removeImmuneEffectsWithDependents(tokenActor);
+      expect(tokenActor.deleteEmbeddedDocuments).toHaveBeenCalledTimes(1);
+      expect(tokenActor.getDependentTokens).not.toHaveBeenCalled();
+   });
+});
+
+describe('removeImmuneEffectsFromWorld', () => {
+   it('runs on the active GM over every world actor, reporting a failure and continuing', async () => {
+      /** @type {Function} The console.error spy, silencing the expected error output. */
+      const consoleError = vi.spyOn(console, 'error').mockImplementation(() => {});
+
+      /** @type {object} A world actor whose deletion fails. */
+      const failing = createContaminatedActor();
+      failing.deleteEmbeddedDocuments.mockRejectedValueOnce(new Error('delete refused'));
+
+      /** @type {object} A world actor that syncs. */
+      const actor = createContaminatedActor();
+      game.actors = [
+         failing,
+         actor,
+      ];
+      await removeImmuneEffectsFromWorld();
+      expect(ui.notifications.error).toHaveBeenCalledTimes(1);
+      expect(actor.deleteEmbeddedDocuments).toHaveBeenCalledTimes(1);
+      consoleError.mockRestore();
+   });
+
+   it('does nothing on any other client', async () => {
+      game.user.isActiveGM = false;
+
+      /** @type {object} A world actor. */
+      const actor = createContaminatedActor();
+      game.actors = [actor];
+      await removeImmuneEffectsFromWorld();
+      expect(actor.deleteEmbeddedDocuments).not.toHaveBeenCalled();
+   });
+});
+
+describe('localization', () => {
+   it.each([
+      'label',
+      'hint',
+      'remove',
+      'suppress',
+   ])('SETTINGS.immunityHandling defines %s', (key) => {
+      expect(lang.SETTINGS.immunityHandling[key]).toBeTypeOf('string');
+      expect(lang.SETTINGS.immunityHandling[key].length).toBeGreaterThan(0);
+   });
+
+   it('the removal notice names the effect, the actor, and the sources', () => {
+      for (const field of [
+         '{effect}',
+         '{actor}',
+         '{sources}',
+      ]) {
+         expect(lang.LOCAL['immunityRemovedEffect.text']).toContain(field);
+      }
+   });
+});
+```
+
+Create `tests/unit/TitanActorImmunityTriggers.test.js`:
+
+```js
+import { describe, it, expect, beforeAll, afterAll, beforeEach, vi } from 'vitest';
+
+vi.mock('~/document/types/actor/types/character/ImmuneEffectRemoval.js', () => ({
+   removeImmuneEffectsWithDependents: vi.fn(async () => {}),
+}));
+vi.mock('~/helpers/utility-functions/Error.js', () => ({ default: vi.fn() }));
+
+import { removeImmuneEffectsWithDependents } from '~/document/types/actor/types/character/ImmuneEffectRemoval.js';
+import error from '~/helpers/utility-functions/Error.js';
+
+// TitanActor's change handlers on a bare instance: core's Actor handlers are no-ops and the removal is a spy. The
+// class extends the global Actor, so it is imported after the stand-in is installed; dynamic import in beforeAll is
+// permitted in tests.
+
+/** @type {Function} The dynamically imported TitanActor class. */
+let TitanActor;
+
+beforeAll(async () => {
+   globalThis.Actor = class {
+      /**
+       * Stands in for core's update handler.
+       * @returns {void}
+       */
+      _onUpdate() {}
+
+      /**
+       * Stands in for core's descendant-creation handler.
+       * @returns {void}
+       */
+      _onCreateDescendantDocuments() {}
+
+      /**
+       * Stands in for core's descendant-update handler.
+       * @returns {void}
+       */
+      _onUpdateDescendantDocuments() {}
+   };
+   globalThis.game = { user: { id: 'me' } };
+   TitanActor = (await import('~/document/types/actor/TitanActor.js')).default;
+});
+
+afterAll(() => {
+   delete globalThis.Actor;
+   delete globalThis.game;
+});
+
+beforeEach(() => {
+   vi.mocked(removeImmuneEffectsWithDependents).mockClear();
+   vi.mocked(error).mockClear();
+});
+
+/**
+ * Builds a bare TitanActor.
+ * @param {boolean} [isCharacter] - Whether its system data is a Character's.
+ * @returns {object} The actor.
+ */
+function createActor(isCharacter = true) {
+   /** @type {object} The actor. */
+   const actor = Object.create(TitanActor.prototype);
+   Object.assign(actor, {
+      name: 'Ward Bearer',
+      system: { isCharacter },
+   });
+   return actor;
+}
+
+/**
+ * Each change handler, called with its argument shape and the given user id.
+ * @type {Record<string, (actor: object, userId: string) => void>}
+ */
+const HANDLERS = {
+   _onUpdate: (actor, userId) => actor._onUpdate({}, {}, userId),
+   _onCreateDescendantDocuments: (actor, userId) => actor._onCreateDescendantDocuments(actor, 'effects', [], [], {},
+      userId),
+   _onUpdateDescendantDocuments: (actor, userId) => actor._onUpdateDescendantDocuments(actor, 'items', [], [], {},
+      userId),
+};
+
+describe('TitanActor immunity triggers', () => {
+   it.each(Object.keys(HANDLERS))('%s removes immune effects on the changing client only', (handler) => {
+      /** @type {object} The actor. */
+      const actor = createActor();
+      HANDLERS[handler](actor, 'someone-else');
+      expect(removeImmuneEffectsWithDependents).not.toHaveBeenCalled();
+      HANDLERS[handler](actor, 'me');
+      expect(removeImmuneEffectsWithDependents).toHaveBeenCalledWith(actor);
+   });
+
+   it('ignores a non-Character', () => {
+      HANDLERS._onUpdate(createActor(false), 'me');
+      expect(removeImmuneEffectsWithDependents).not.toHaveBeenCalled();
+   });
+
+   it('reports a failed removal through the project logger', async () => {
+      vi.mocked(removeImmuneEffectsWithDependents).mockRejectedValueOnce(new Error('delete refused'));
+      HANDLERS._onUpdate(createActor(), 'me');
+
+      // The rejection settles on a later microtask.
+      await vi.waitFor(() => {
+         expect(error).toHaveBeenCalledWith(expect.stringContaining('Ward Bearer'), expect.any(Error));
+      });
+   });
+});
+```
+
+In `tests/unit/SystemSettings.test.js`:
+(a) add after the `Error.js` mock line:
+
+```js
+vi.mock('~/document/types/actor/types/character/ImmuneEffectRemoval.js', () => ({
+   removeImmuneEffectsFromWorld: vi.fn(async () => {}),
+}));
+```
+
+and after the `error` import:
+
+```js
+import { removeImmuneEffectsFromWorld } from '~/document/types/actor/types/character/ImmuneEffectRemoval.js';
+```
+
+(b) in `afterEach`, add after `vi.mocked(error).mockReset();`:
+
+```js
+   vi.mocked(removeImmuneEffectsFromWorld).mockClear();
+```
+
+(c) append:
+
+```js
+describe('registerSystemSettings — immunity handling', () => {
+   it('registers a GM world choice, Remove by default, whose switch to Remove clears immune effects', () => {
+      registerSystemSettings();
+
+      /** @type {object} The setting's registration. */
+      const config = game.settings.register.mock.calls.find(([, key]) => key === 'immunityHandling')[2];
+      expect(config).toMatchObject({
+         choices: {
+            remove: 'SETTINGS.immunityHandling.remove',
+            suppress: 'SETTINGS.immunityHandling.suppress',
+         },
+         config: true,
+         default: 'remove',
+         hint: 'SETTINGS.immunityHandling.hint',
+         name: 'SETTINGS.immunityHandling.label',
+         restricted: true,
+         scope: 'world',
+         type: String,
+      });
+
+      config.onChange('suppress');
+      expect(removeImmuneEffectsFromWorld).not.toHaveBeenCalled();
+      config.onChange('remove');
+      expect(removeImmuneEffectsFromWorld).toHaveBeenCalledTimes(1);
+   });
+});
+```
+
+- [ ] **Step 2: Run the tests to verify they fail**
+
+Run: `npx vitest run tests/unit/ImmuneEffectRemoval.test.js tests/unit/TitanActorImmunityTriggers.test.js
+tests/unit/SystemSettings.test.js`
+Expected: FAIL — `ImmuneEffectRemoval.js` does not exist, `TitanActor` has no change handlers, and no
+`immunityHandling` setting is registered.
+
+- [ ] **Step 3: Add the setting and the removal**
+
+Create `src/helpers/Settings/ImmunityHandling.js`:
+
+```js
+import getSetting from '~/helpers/utility-functions/GetSetting.js';
+
+/**
+ * Returns the Immunity Handling setting value: what happens to a condition or effect a Character already has when it
+ * gains an immunity to it.
+ * @returns {string} 'remove' (the default: it is deleted) or 'suppress' (it stays, suppressed).
+ */
+export default function immunityHandling() {
+   return getSetting('immunityHandling');
+}
+```
+
+Create `src/document/types/actor/types/character/ImmuneEffectRemoval.js`:
+
+```js
+import error from '~/helpers/utility-functions/Error.js';
+import immunityHandling from '~/helpers/Settings/ImmunityHandling.js';
+
+/**
+ * The removal each actor has in flight, so removals on one actor run one after another and each reads the effects its
+ * predecessor left; two overlapping removals would otherwise both delete the same effect.
+ * @type {WeakMap<TitanActor, Promise<number>>}
+ */
+const pendingRemovals = new WeakMap();
+
+/**
+ * Decides which of an actor's immune Active Effects Remove mode deletes. Algorithm: grounded labelling of an abstract
+ * argumentation framework, an immunity source "attacking" each effect it covers. Source: [Dung 1995], "On the
+ * acceptability of arguments and its fundamental role in nonmonotonic reasoning, logic programming and n-person
+ * games"; labelling form [Caminada 2006], "On the issue of reinstatement in argumentation". An effect covered by an
+ * item (items are never immunity targets, so they always stand), or by an effect that is itself kept, is removed; an
+ * effect whose every covering effect is removed is kept, because its immunity ends with them; an effect left
+ * undecided lies on an immunity cycle (two effects each immune to the other, or a longer ring) and stays, suppressed.
+ * Chosen over removing every immune effect, which would delete both members of a mutually immune pair, and over an
+ * ordering tiebreak, which the rules do not supply: a deletion is irreversible, a suppression is not.
+ * @param {TitanActiveEffect[]} effects - The actor's Active Effects.
+ * @param {(effect: TitanActiveEffect) => ImmunitySource[]} getSources - The immunity sources covering an effect.
+ * @returns {TitanActiveEffect[]} The effects to delete, in the given order.
+ */
+export function resolveImmuneEffectRemovals(effects, getSources) {
+   /** @type {Set<string>} The ids of the actor's Active Effects; a source id outside it is an item's. */
+   const effectIds = new Set(effects.map((effect) => effect.id));
+
+   /** @type {Map<string, ImmunitySource[]>} The covering sources of each immune effect, by effect id. */
+   const coveredBy = new Map();
+   for (const effect of effects) {
+      /** @type {ImmunitySource[]} The sources covering this effect. */
+      const sources = getSources(effect);
+      if (sources.length > 0) {
+         coveredBy.set(effect.id, sources);
+      }
+   }
+
+   /** @type {Set<string>} The effects that stay: those no immunity covers, then those whose covers are all removed. */
+   const kept = new Set([...effectIds].filter((id) => !coveredBy.has(id)));
+
+   /** @type {Set<string>} The effects to delete. */
+   const removed = new Set();
+
+   // Label until a pass decides nothing; each deciding pass labels at least one more effect, so the loop ends.
+   /** @type {boolean} Whether the last pass decided an effect. */
+   let changed = true;
+   while (changed) {
+      changed = false;
+      for (const [id, sources] of coveredBy) {
+         if (kept.has(id) || removed.has(id)) {
+            continue;
+         }
+         if (sources.some((source) => !effectIds.has(source.id) || kept.has(source.id))) {
+            removed.add(id);
+            changed = true;
+         }
+         else if (sources.every((source) => removed.has(source.id))) {
+            kept.add(id);
+            changed = true;
+         }
+      }
+   }
+   return effects.filter((effect) => removed.has(effect.id));
+}
+
+/**
+ * Deletes the Active Effects a Character is immune to now, when the Immunity Handling setting is Remove, notifying
+ * once per deleted effect.
+ * @param {TitanActor} actor - The actor.
+ * @returns {Promise<number>} The number of Active Effects deleted.
+ */
+async function removeImmuneEffectsNow(actor) {
+   if (immunityHandling() !== 'remove' || !actor.system?.isCharacter) {
+      return 0;
+   }
+
+   /** @type {TitanActiveEffect[]} The effects to delete. */
+   const effects = resolveImmuneEffectRemovals([...actor.effects], (effect) => actor.system.getImmunitySources(effect));
+   if (effects.length === 0) {
+      return 0;
+   }
+
+   // The notices are composed before the deletion, after which a deleted effect's sources are no longer derived.
+   /** @type {string[]} One notice per deleted effect. */
+   const notices = effects.map((effect) => game.i18n.format('LOCAL.immunityRemovedEffect.text', {
+      actor: actor.name,
+      effect: effect.name,
+      sources: actor.system.getImmunitySources(effect).map((source) => source.name).join(', '),
+   }));
+   await actor.deleteEmbeddedDocuments('ActiveEffect', effects.map((effect) => effect.id));
+   for (const notice of notices) {
+      ui.notifications.info(notice);
+   }
+   return effects.length;
+}
+
+/**
+ * Deletes the Active Effects a Character is immune to when the Immunity Handling setting is Remove; a mutually immune
+ * pair or ring stays, suppressed (resolveImmuneEffectRemovals). Queued behind any removal already running on the same
+ * actor, so it reads the effects that removal left; a failed predecessor does not stop it.
+ * @param {TitanActor} actor - The actor.
+ * @returns {Promise<number>} The number of Active Effects deleted.
+ */
+export function removeImmuneEffects(actor) {
+   /** @type {Promise<number>} This removal, run once the actor's pending one settles. */
+   const removal = (pendingRemovals.get(actor) ?? Promise.resolve(0))
+      .catch(() => 0)
+      .then(() => removeImmuneEffectsNow(actor));
+   pendingRemovals.set(actor, removal);
+   return removal;
+}
+
+/**
+ * Removes the Active Effects an actor is immune to, then, for a world actor, those of each of its unlinked tokens
+ * whose delta holds effects or items of its own. The token pass runs after the world actor's deletions land, so an
+ * effect a token inherits is deleted once, from its world actor; a token's own effects, and inherited effects its own
+ * items make it immune to, are the token's to remove. A token whose delta holds nothing of its own mirrors its world
+ * actor, so its synthetic actor is never materialized.
+ * @param {TitanActor} actor - The changed actor.
+ * @returns {Promise<void>}
+ */
+export async function removeImmuneEffectsWithDependents(actor) {
+   await removeImmuneEffects(actor);
+   if (actor.isToken) {
+      return;
+   }
+   for (const token of actor.getDependentTokens()) {
+      /** @type {object|null} The token's stored delta. */
+      const delta = token.actorLink ? null : token._source.delta;
+      if (!(delta?.effects?.length > 0 || delta?.items?.length > 0)) {
+         continue;
+      }
+
+      /** @type {TitanActor|null} The token's synthetic actor. */
+      const tokenActor = token.actor;
+      if (tokenActor) {
+         await removeImmuneEffects(tokenActor);
+      }
+   }
+}
+
+/**
+ * Removes, across the world, the Active Effects Characters are immune to: every world actor, with its unlinked tokens
+ * holding effects or items of their own. Runs on the active GM only, when the Immunity Handling setting changes to
+ * Remove, so no effect Suppress mode kept outlives the switch. An actor whose removal fails is reported and the rest
+ * still run.
+ * @returns {Promise<void>}
+ */
+export async function removeImmuneEffectsFromWorld() {
+   if (!game.user.isActiveGM) {
+      return;
+   }
+   for (const actor of game.actors) {
+      try {
+         await removeImmuneEffectsWithDependents(actor);
+      }
+      catch (reason) {
+         error(`Could not remove the effects "${actor.name}" is immune to.`, reason);
+      }
+   }
+}
+```
+
+In `src/system/SystemSettings.js`:
+(a) add after the `error` import:
+
+```js
+import { removeImmuneEffectsFromWorld } from '~/document/types/actor/types/character/ImmuneEffectRemoval.js';
+```
+
+(b) insert directly after the `autoRemoveExpiredEffects` registration:
+
+```js
+
+   // Immunity Handling: what happens to a condition or effect a Character already has when it gains an immunity to it.
+   game.settings.register('titan', 'immunityHandling', {
+      choices: {
+         remove: 'SETTINGS.immunityHandling.remove',
+         suppress: 'SETTINGS.immunityHandling.suppress',
+      },
+      config: true,
+      default: 'remove',
+      hint: 'SETTINGS.immunityHandling.hint',
+      name: 'SETTINGS.immunityHandling.label',
+      restricted: true,
+      scope: 'world',
+      type: String,
+      onChange: (value) => {
+         // Switching to Remove deletes what Suppress kept; removeImmuneEffectsFromWorld runs on the active GM only.
+         if (value === 'remove') {
+            removeImmuneEffectsFromWorld().catch((reason) => {
+               error('Could not remove the effects characters are immune to.', reason);
+            });
+         }
+      },
+   });
+```
+
+- [ ] **Step 4: Trigger the removal from the changing client**
+
+In `src/document/types/actor/TitanActor.js`:
+(a) add after the `assert` import:
+
+```js
+import error from '~/helpers/utility-functions/Error.js';
+import { removeImmuneEffectsWithDependents } from '~/document/types/actor/types/character/ImmuneEffectRemoval.js';
+```
+
+(b) add directly after `_preCreate`:
+
+```js
+   /**
+    * Performs follow-up logic after this Actor is updated, on every client. The changing client removes the Active
+    * Effects an immunity the update granted covers (equipping armor or a shield in its slot can grant one).
+    * @override
+    * @param {object} changed - The differential data that was changed relative to the document's prior values.
+    * @param {object} options - Additional options which modify the update request.
+    * @param {string} userId - The id of the User who requested the update.
+    * @protected
+    */
+   _onUpdate(changed, options, userId) {
+      super._onUpdate(changed, options, userId);
+      this._removeImmuneEffectsAfterChange(userId);
+   }
+
+   /**
+    * Performs follow-up logic after descendant documents (items, Active Effects) are created, on every client. The
+    * changing client removes the Active Effects a new immunity source covers.
+    * @override
+    * @param {Document} parent - The direct parent of the created documents.
+    * @param {string} collection - The collection within which the documents were created.
+    * @param {Document[]} documents - The created documents.
+    * @param {object[]} data - The source data of the created documents.
+    * @param {object} options - Options which modified the creation operation.
+    * @param {string} userId - The id of the User who triggered the operation.
+    * @protected
+    */
+   _onCreateDescendantDocuments(parent, collection, documents, data, options, userId) {
+      super._onCreateDescendantDocuments(parent, collection, documents, data, options, userId);
+      this._removeImmuneEffectsAfterChange(userId);
+   }
+
+   /**
+    * Performs follow-up logic after descendant documents (items, Active Effects) are updated, on every client. The
+    * changing client removes the Active Effects an enabled, equipped, or edited immunity source now covers.
+    * @override
+    * @param {Document} parent - The direct parent of the updated documents.
+    * @param {string} collection - The collection within which the documents were updated.
+    * @param {Document[]} documents - The updated documents.
+    * @param {object[]} changes - The differential changes applied to the documents.
+    * @param {object} options - Options which modified the update operation.
+    * @param {string} userId - The id of the User who triggered the operation.
+    * @protected
+    */
+   _onUpdateDescendantDocuments(parent, collection, documents, changes, options, userId) {
+      super._onUpdateDescendantDocuments(parent, collection, documents, changes, options, userId);
+      this._removeImmuneEffectsAfterChange(userId);
+   }
+
+   /**
+    * Removes the Active Effects this Character's immunities now cover (Immunity Handling: Remove), on the client whose
+    * user made the change only: deleting world data must happen once, and that client is connected and may write this
+    * Actor. Every change that can grant an immunity (a source created, enabled, equipped, or its rules element edited)
+    * is an Actor update or a descendant create or update, which Foundry also dispatches to an unlinked token's
+    * synthetic actor; the removal re-derives everything from the prepared Actor, so it needs no list of which fields
+    * changed. A deletion only ends immunities, so it triggers nothing.
+    * @param {string} userId - The id of the User who made the change.
+    * @returns {void}
+    * @private
+    */
+   _removeImmuneEffectsAfterChange(userId) {
+      if (userId !== game.user.id || !this.system?.isCharacter) {
+         return;
+      }
+
+      // The handlers are synchronous; the removal runs after they return and reports its own failure.
+      removeImmuneEffectsWithDependents(this).catch((reason) => {
+         error(`Could not remove the effects "${this.name}" is immune to.`, reason);
+      });
+   }
+```
+
+- [ ] **Step 5: Localize, describe the element's two outcomes, and log the change**
+
+In `lang/en.json`:
+(a) inside `SETTINGS`, insert directly after the `autoRemoveExpiredEffects` object (settings strings are nested per
+setting, as every other TITAN setting's are):
+
+```json
+      "immunityHandling": {
+         "label": "Existing Effects on Gaining Immunity",
+         "hint": "What happens to a condition or effect a character already has when the character gains an immunity to it. Remove: it is deleted (two effects each immune to the other cannot be ordered, so they stay, suppressed). Suppress: it stays on the character and its modifiers stop applying until the immunity ends; immunities it grants still apply, and its duration keeps running. Applying a condition or effect a character is immune to is refused in both modes.",
+         "remove": "Remove",
+         "suppress": "Suppress"
+      },
+```
+
+(b) inside `LOCAL`, insert in alphabetical key order:
+
+```json
+      "immunityRemovedEffect.text": "{effect} was removed from {actor}, who is immune to it ({sources}).",
+```
+
+In `src/document/types/item/rules-element/Immunity.js`, replace the `ImmunityElement` typedef's description (its
+first three lines, from "A Rules Element making a Character immune" through "never suppresses the effect granting
+it.") with:
+
+```js
+ * A Rules Element making a Character immune to a condition or to an effect. While it applies, creating a matching
+ * condition or effect on the Character is refused, and an existing one is removed or suppressed as the Immunity
+ * Handling setting chooses: Remove (the default) deletes it, except that effects each immune to another in a ring
+ * stay suppressed; Suppress keeps it until the immunity ends, its modifiers stop applying, and immunities it grants
+ * still apply. An immunity never covers the effect granting it.
+```
+
+In `CHANGELOG.md`, replace the Immunity bullet Task 9 added (from "- New Immunity rules element:" through
+"immunities it grants still apply.") with:
+
+```markdown
+- New Immunity rules element: an item or effect can make a character immune to a condition or to an effect by name.
+  Applying it is refused with a notification. A condition or effect the character already has is removed when the
+  immunity arrives (new world setting "Existing Effects on Gaining Immunity": Remove, the default; two effects each
+  immune to the other stay, suppressed) or kept suppressed until the immunity ends (Suppress: its modifiers stop
+  applying; immunities it grants still apply).
+```
+
+- [ ] **Step 6: Run the unit tests to verify they pass**
+
+Run: `npx vitest run tests/unit/ImmuneEffectRemoval.test.js tests/unit/TitanActorImmunityTriggers.test.js
+tests/unit/SystemSettings.test.js tests/unit/Immunity.test.js`
+Expected: PASS.
+
+- [ ] **Step 7: Pin the suppression specs to Suppress and write the Remove e2e**
+
+Tasks 9 and 10's specs exercise suppression, which is no longer the default.
+
+In `tests/e2e/immunity.spec.js`:
+(a) replace its header comment's first sentence "Immunity on the live pipeline:" with "Immunity on the live pipeline,
+Immunity Handling pinned to Suppress (`immunity-handling.spec.js` covers Remove):";
+(b) add after the `errors` declaration:
+
+```js
+/** @type {string} The Immunity Handling mode in force before this spec. */
+let originalHandling;
+```
+
+(c) in `beforeAll`, add after `await login(page);`:
+
+```js
+   originalHandling = await page.evaluate(async () => {
+      /** @type {string} The mode before this spec. */
+      const original = game.settings.get('titan', 'immunityHandling');
+      await game.settings.set('titan', 'immunityHandling', 'suppress');
+      return original;
+   });
+```
+
+(d) in `afterAll`, add before `await deleteFixtureActor(page, ACTOR_NAME);`:
+
+```js
+   await page.evaluate((mode) => game.settings.set('titan', 'immunityHandling', mode), originalHandling);
+```
+
+In `tests/e2e/immunity-display.spec.js`, add to `PINNED_SETTINGS` (alphabetical, after `autoRemoveExpiredEffects`):
+
+```js
+   immunityHandling: 'suppress',
+```
+
+and extend the `PINNED_SETTINGS` JSDoc's first sentence to "The world settings this spec pins while it runs:
+immunities suppress (the display under test), turn reports list effects, turn durations decrease, and expired
+effects stay on the actor so the turn-end report lists them."
+
+Create `tests/e2e/immunity-handling.spec.js` (switching the setting to Remove reconciles every world actor of the test
+world; that is the setting's defined behaviour):
+
+```js
+import { expect, test } from '@playwright/test';
+import { login } from './fixtures.js';
+import { attachPageErrors, closeAllApps, deleteFixtureActor } from './world.js';
+
+/**
+ * The Immunity Handling setting on the live pipeline. Remove (the default) deletes a condition the actor already has
+ * when an immunity to it arrives, on a new effect or on an item being equipped, and notifies with the immunity's
+ * source; a mutually immune pair of effects is never deleted and stays suppressed. Suppress keeps the condition,
+ * suppressed, and switching the setting to Remove then deletes it. The settings window lists the setting localized.
+ */
+
+/** @type {string} Name of the throwaway player actor seeded for this spec. */
+const ACTOR_NAME = 'E2E Immunity Handling Actor';
+
+/** @type {string} Name of the Active Effect granting the Contaminated immunity. */
+const WARD_NAME = 'E2E Immunity Handling Ward';
+
+/** @type {string} Name of the weapon whose rules elements grant the Contaminated immunity while equipped. */
+const BLADE_NAME = 'E2E Warding Blade';
+
+/**
+ * An immunity to Contaminated.
+ * @type {ImmunityElement}
+ */
+const CONTAMINATED_IMMUNITY = {
+   key: 'contaminated',
+   operation: 'immunity',
+   selector: 'condition',
+   uuid: 'e2e-immunity-handling-contaminated',
+};
+
+/** @type {import('@playwright/test').Page} The file-shared, logged-in page (one world boot per file). */
+let page;
+/** @type {string[]} Uncaught page errors collected during the current test (cleared each afterEach). */
+let errors;
+/** @type {string} The Immunity Handling mode in force before this spec. */
+let originalHandling;
+
+test.beforeAll(async ({ browser }) => {
+   page = await browser.newPage();
+   errors = attachPageErrors(page);
+   await login(page);
+   originalHandling = await page.evaluate(() => game.settings.get('titan', 'immunityHandling'));
+});
+
+test.beforeEach(async () => {
+   // A fresh actor with Body 8, and a record of the info notifications raised from here on.
+   await page.evaluate(async (name) => {
+      await game.actors.getName(name)?.delete();
+      await Actor.create({
+         name,
+         system: {
+            attribute: { body: { baseValue: 8 } },
+         },
+         type: 'player',
+      });
+
+      /** @type {string[]} The info notifications raised during this test. */
+      globalThis.titanE2eInfoNotices = [];
+
+      /** @type {Function} The original info method, restored after the test. */
+      globalThis.titanE2eOriginalInfo = ui.notifications.info;
+      ui.notifications.info = (message, options) => {
+         globalThis.titanE2eInfoNotices.push(message);
+         return globalThis.titanE2eOriginalInfo.call(ui.notifications, message, options);
+      };
+   }, ACTOR_NAME);
+});
+
+test.afterEach(async () => {
+   await page.evaluate(() => {
+      ui.notifications.info = globalThis.titanE2eOriginalInfo;
+      delete globalThis.titanE2eOriginalInfo;
+      delete globalThis.titanE2eInfoNotices;
+   });
+   await closeAllApps(page);
+   expect(errors, `uncaught page errors:\n${errors.join('\n')}`).toEqual([]);
+   errors.length = 0;
+});
+
+test.afterAll(async () => {
+   await page.evaluate((mode) => game.settings.set('titan', 'immunityHandling', mode), originalHandling);
+   await deleteFixtureActor(page, ACTOR_NAME);
+   await page?.close();
+});
+
+/**
+ * Sets the Immunity Handling mode.
+ * @param {string} mode - 'remove' or 'suppress'.
+ * @returns {Promise<void>} Resolves once the setting is written.
+ */
+async function setHandling(mode) {
+   await page.evaluate((value) => game.settings.set('titan', 'immunityHandling', value), mode);
+}
+
+/**
+ * Reads the info notifications raised during the current test.
+ * @returns {Promise<string[]>} The notifications.
+ */
+function readInfoNotices() {
+   return page.evaluate(() => [...(globalThis.titanE2eInfoNotices ?? [])]);
+}
+
+/**
+ * Reads the actor's Body value, whether it holds a Contaminated effect, and whether Contaminated is an active status.
+ * @returns {Promise<{body: number, hasEffect: boolean, active: boolean}>} The snapshot.
+ */
+function readContaminated() {
+   return page.evaluate((name) => {
+      /** @type {TitanActor} The actor. */
+      const actor = game.actors.getName(name);
+      return {
+         active: actor.statuses.has('contaminated'),
+         body: actor.system.attribute.body.value,
+         hasEffect: actor.effects.some((effect) => effect.statuses.has('contaminated')),
+      };
+   }, ACTOR_NAME);
+}
+
+/**
+ * Applies Contaminated and waits until its penalty applies.
+ * @returns {Promise<void>} Resolves once Contaminated is active.
+ */
+async function applyContaminated() {
+   await page.evaluate((name) => game.actors.getName(name).toggleStatusEffect('contaminated', { active: true }),
+      ACTOR_NAME);
+   await expect.poll(readContaminated, { message: 'Contaminated applies' }).toEqual({
+      active: true,
+      body: 6,
+      hasEffect: true,
+   });
+}
+
+/**
+ * Adds the permanent ward effect granting the Contaminated immunity.
+ * @returns {Promise<void>} Resolves once the ward exists.
+ */
+async function addWard() {
+   await page.evaluate(async ({ name, wardName, immunity }) => {
+      await game.actors.getName(name).createEmbeddedDocuments('ActiveEffect', [
+         {
+            name: wardName,
+            system: {
+               duration: { type: 'permanent' },
+               rulesElement: [immunity],
+            },
+            type: 'effect',
+         },
+      ]);
+   }, {
+      immunity: CONTAMINATED_IMMUNITY,
+      name: ACTOR_NAME,
+      wardName: WARD_NAME,
+   });
+}
+
+test('Remove (default) deletes an existing condition when an immunity effect arrives, naming its source', async () => {
+   expect(await page.evaluate(() => game.settings.settings.get('titan.immunityHandling').default)).toBe('remove');
+   await setHandling('remove');
+   await applyContaminated();
+
+   await addWard();
+   await expect.poll(readContaminated, { message: 'removed: the effect and its penalty are gone' }).toEqual({
+      active: false,
+      body: 8,
+      hasEffect: false,
+   });
+   await expect.poll(readInfoNotices, { message: 'one notice names the ward' })
+      .toEqual([expect.stringContaining(WARD_NAME)]);
+});
+
+test('Remove deletes an existing condition when an item granting the immunity is equipped', async () => {
+   await setHandling('remove');
+   await page.evaluate(async ({ name, bladeName, immunity }) => {
+      await game.actors.getName(name).createEmbeddedDocuments('Item', [
+         {
+            name: bladeName,
+            system: {
+               equipped: false,
+               rulesElement: [immunity],
+            },
+            type: 'weapon',
+         },
+      ]);
+   }, {
+      bladeName: BLADE_NAME,
+      immunity: CONTAMINATED_IMMUNITY,
+      name: ACTOR_NAME,
+   });
+
+   // The unequipped blade grants nothing, so Contaminated applies.
+   await applyContaminated();
+
+   await page.evaluate(async ({ name, bladeName }) => {
+      await game.actors.getName(name).items.getName(bladeName).update({ 'system.equipped': true });
+   }, {
+      bladeName: BLADE_NAME,
+      name: ACTOR_NAME,
+   });
+   await expect.poll(readContaminated, { message: 'equipping the blade removed Contaminated' }).toEqual({
+      active: false,
+      body: 8,
+      hasEffect: false,
+   });
+});
+
+test('Remove never deletes a mutually immune pair: both stay, suppressed', async () => {
+   await setHandling('remove');
+   await page.evaluate(async (name) => {
+      await game.actors.getName(name).createEmbeddedDocuments('ActiveEffect', [
+         'A',
+         'B',
+      ].map((letter) => ({
+         name: `E2E Rival Ward ${letter}`,
+         system: {
+            duration: { type: 'permanent' },
+            rulesElement: [
+               {
+                  key: `E2E Rival Ward ${letter === 'A' ? 'B' : 'A'}`,
+                  operation: 'immunity',
+                  selector: 'effect',
+                  uuid: `e2e-rival-ward-${letter}`,
+               },
+            ],
+         },
+         type: 'effect',
+      })));
+   }, ACTOR_NAME);
+
+   // A later removal pass deleting Contaminated is the positive edge: every pass re-reads the whole actor, so the pair
+   // survived a pass that ran after both existed.
+   await applyContaminated();
+   await addWard();
+   await expect.poll(readContaminated, { message: 'the later pass removed Contaminated' }).toEqual({
+      active: false,
+      body: 8,
+      hasEffect: false,
+   });
+   expect(await page.evaluate((name) => game.actors.getName(name).effects
+      .filter((effect) => effect.name.startsWith('E2E Rival Ward'))
+      .map((effect) => ({
+         active: effect.active,
+         name: effect.name,
+      })), ACTOR_NAME)).toEqual([
+      {
+         active: false,
+         name: 'E2E Rival Ward A',
+      },
+      {
+         active: false,
+         name: 'E2E Rival Ward B',
+      },
+   ]);
+});
+
+test('Suppress keeps an existing condition suppressed, and switching to Remove deletes it', async () => {
+   await setHandling('suppress');
+   await applyContaminated();
+
+   await addWard();
+   await expect.poll(readContaminated, { message: 'suppressed: the effect stays, its penalty and status go' })
+      .toEqual({
+         active: false,
+         body: 8,
+         hasEffect: true,
+      });
+
+   await setHandling('remove');
+   await expect.poll(readContaminated, { message: 'the switch to Remove deleted it' }).toEqual({
+      active: false,
+      body: 8,
+      hasEffect: false,
+   });
+});
+
+test('the settings window lists the setting with its localized name and choices', async () => {
+   /** @type {{label: string, remove: string, suppress: string}} The setting's localized strings. */
+   const strings = await page.evaluate(() => ({
+      label: game.i18n.localize('SETTINGS.immunityHandling.label'),
+      remove: game.i18n.localize('SETTINGS.immunityHandling.remove'),
+      suppress: game.i18n.localize('SETTINGS.immunityHandling.suppress'),
+   }));
+   expect(strings.label).not.toBe('SETTINGS.immunityHandling.label');
+
+   await page.evaluate(() => new foundry.applications.settings.SettingsConfig().render({ force: true }));
+
+   /** @type {import('@playwright/test').Locator} The setting's select (its category tab may be hidden). */
+   const select = page.locator('#settings-config select[name="titan.immunityHandling"]');
+   await expect(select).toBeAttached();
+   await expect(select.locator('option')).toHaveText([
+      strings.remove,
+      strings.suppress,
+   ]);
+   await expect(page.locator('#settings-config .form-group', { has: select })).toContainText(strings.label);
+});
+```
+
+- [ ] **Step 8: Lint, full unit suite, build, e2e**
+
+Run: `npm run eslint` → 0 errors; `npm test` → all pass; `npm run build` → succeeds;
+`npm run test:e2e -- tests/e2e/immunity-handling.spec.js tests/e2e/immunity.spec.js
+tests/e2e/immunity-display.spec.js tests/e2e/effect-tray.spec.js tests/e2e/logic/conditions.spec.js` → all pass.
+
+- [ ] **Step 9: Commit**
+
+```bash
+git branch --show-current
+git status --short
+git add src/helpers/Settings/ImmunityHandling.js src/document/types/actor/types/character/ImmuneEffectRemoval.js \
+   src/system/SystemSettings.js src/document/types/actor/TitanActor.js \
+   src/document/types/item/rules-element/Immunity.js lang/en.json CHANGELOG.md \
+   tests/unit/ImmuneEffectRemoval.test.js tests/unit/TitanActorImmunityTriggers.test.js \
+   tests/unit/SystemSettings.test.js tests/e2e/immunity-handling.spec.js tests/e2e/immunity.spec.js \
+   tests/e2e/immunity-display.spec.js
+git commit -F - <<'EOF'
+feat(immunity): Immunity Handling setting, Remove by default
+
+A new GM world setting chooses what happens to a condition or effect a
+character already has when it gains an immunity to it: Remove (default)
+deletes it, Suppress keeps it suppressed. The removal runs once, on the
+client that made the change, from TitanActor's update and descendant
+create/update handlers, and re-derives everything from the prepared actor.
+A mutually immune pair or ring is never deleted: grounded labelling leaves
+it undecided and it stays suppressed. Switching to Remove makes the active
+GM clear what Suppress kept. Refusing an immune creation is unchanged.
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+Claude-Session: https://claude.ai/code/session_01SPVZ3AXCPn5Bo41aemiJZc
+EOF
+```
+
+---
+### Task 12: Targeting, distance, and target-condition helpers
 
 **Files:**
 - Create: `src/helpers/utility-functions/GetTargetedCharacterTokens.js`,
@@ -8123,7 +10818,7 @@ EOF
 
 ---
 
-### Task 12: Target-aware attack checks (options, parameters, dialog, card)
+### Task 13: Target-aware attack checks (options, parameters, dialog, card)
 
 **Files:**
 - Create: `src/check/types/attack-check/dialog/AttackCheckDialogTargetConditionsField.svelte`,
@@ -8137,7 +10832,7 @@ EOF
   `tests/unit/CharacterCheckModifiers.test.js`, `tests/e2e/target-conditions.spec.js` (create)
 
 **Interfaces:**
-- Consumes: Task 11's helpers.
+- Consumes: Task 12's helpers.
 - Produces: `AttackCheckOptions.targetConditions: TargetConditionModifier[]` (both ratings and the Difficulty; default
   `[]` from `createAttackCheckOptions`, derived from the target in `initializeAttackCheckOptions` when the caller
   omits it); `AttackCheckParameters.targetConditions: TargetConditionModifier[]` (the attack's rating and the
@@ -8419,14 +11114,26 @@ describe('Attack target conditions', () => {
       }
    });
 
-   it('keeps a caller\'s rating and a caller\'s target conditions', () => {
+   it('keeps a caller\'s rating and target conditions, dropping that rating\'s target entries', () => {
       /** @type {object} The Character. */
       const system = attackTarget(['prone']);
+
+      // The supplied Melee replaces the derived one, Prone bonus included, so only Accuracy's entry stays.
       expect(system.initializeAttackCheckOptions({
          attackIdx: 0,
          attackerMelee: 3,
          itemId: 'w',
-      }).attackerMelee).toBe(3);
+      })).toMatchObject({
+         attackerAccuracy: 10,
+         attackerMelee: 3,
+         targetConditions: [
+            {
+               condition: 'prone',
+               modifier: 'accuracy',
+               value: 2,
+            },
+         ],
+      });
       expect(system.initializeAttackCheckOptions({
          attackIdx: 0,
          itemId: 'w',
@@ -8447,17 +11154,39 @@ describe('Attack target conditions', () => {
 
       /** @type {object} The caller options the dialog received. */
       const callerOptions = dialogCalls[0][3];
-      expect(callerOptions.targetConditions).toEqual(dialogCalls[0][0].targetConditions);
 
+      /** @type {TargetConditionModifier[]} The target conditions resolved at open. */
+      const pinned = dialogCalls[0][0].targetConditions;
+      expect(callerOptions.targetConditions).toEqual(pinned);
+      expect(pinned).toHaveLength(2);
+
+      // Untargeted, then a +2 Melee rating modifier arrives: the rebuild keeps the pinned Prone bonus and Defense.
       globalThis.game.user.targets = new Set();
       expect(rebuildCheckOptions({
          callerOptions,
+         checkType: 'attack',
+         currentOptions: dialogCalls[0][0],
+         system: withMeleeBonus(system),
+         userEdits: {},
+      })).toMatchObject({
+         attackerMelee: 12,
+         targetConditions: pinned,
+         targetDefense: 5,
+      });
+
+      // Without the pinned conditions the same rebuild derives none from the absent target.
+      /** @type {object} The caller options without the pinned target conditions. */
+      const unpinned = { ...callerOptions };
+      delete unpinned.targetConditions;
+      expect(rebuildCheckOptions({
+         callerOptions: unpinned,
          checkType: 'attack',
          currentOptions: dialogCalls[0][0],
          system,
          userEdits: {},
       })).toMatchObject({
          attackerMelee: 10,
+         targetConditions: [],
          targetDefense: 5,
       });
    });
@@ -8564,6 +11293,13 @@ block (just before `return checkOptions;`) with:
             }) :
             [];
       }
+
+      // A rating the user or the caller supplies replaces the derived one, target conditions included, so that
+      // rating's entries leave the list and the card never lists a bonus the typed value does not carry; the other
+      // rating's entries and the Difficulty's stay.
+      checkOptions.targetConditions = checkOptions.targetConditions.filter((entry) =>
+         !(entry.modifier === 'melee' && options.attackerMelee !== undefined) &&
+         !(entry.modifier === 'accuracy' && options.attackerAccuracy !== undefined));
 
       // Melee.
       if (options.attackerMelee === undefined) {
@@ -8830,7 +11566,9 @@ In `CHANGELOG.md`, append to the `## Unreleased:` list:
 ```markdown
 - Attack checks read the target's conditions: a Prone target within 1 space raises the attacker's Melee or Accuracy
   by a quarter of its base, one beyond 10 spaces lowers Accuracy by a quarter per 10 spaces, and an Incapacitated
-  target's Difficulty is 2. The dialog and the chat card list them.
+  target's Difficulty is 2. The dialog and the chat card list them; a Melee or Accuracy typed into the dialog
+  replaces the rating, bonus included, and drops its entry. A GM who targets nothing no longer has the attacker's own
+  controlled token read as the target.
 ```
 
 - [ ] **Step 7: Write the target e2e**
@@ -8841,12 +11579,13 @@ Create `tests/e2e/target-conditions.spec.js`:
 import { expect, test } from '@playwright/test';
 import { login } from './fixtures.js';
 import { attachPageErrors, clearChat, closeAllApps, deleteFixtureActor, showChatLog } from './world.js';
-import { readNewestCheckFlags } from './checkDialog.js';
+import { readNewestCheckFlags, setNumberField } from './checkDialog.js';
 
 /**
  * Attack checks against a targeted token's conditions on a live 1-unit-per-space grid: an adjacent Prone target raises
  * Melee, a Prone target 21 spaces away lowers a ranged attack's Accuracy, and an Incapacitated target fixes the
- * Difficulty at 2. The dialog and the chat card list the applied modifiers.
+ * Difficulty at 2. The dialog and the chat card list the applied modifiers, and the dialog keeps them through a rebuild
+ * after untargeting. An attack message stored without target conditions loads them as none and renders.
  */
 
 /** @type {string} Name of the attacking player actor. */
@@ -9150,9 +11889,61 @@ test('the dialog lists the target\'s conditions and keeps them after untargeting
    const expected = await label('prone', 'melee', '+2');
    await expect(dialog.getByTestId('attack-target-condition')).toHaveText([expected]);
 
-   // The target's conditions were fixed at open: untargeting leaves the entry.
+   /** @type {import('@playwright/test').Locator} The Melee field's input. */
+   const melee = dialog.getByTestId('check-field-attackerMelee').locator('input');
+   /** @type {import('@playwright/test').Locator} The Defense field's input. */
+   const defense = dialog.getByTestId('check-field-targetDefense').locator('input');
+   /** @type {import('@playwright/test').Locator} The total-dice summary. */
+   const totalDice = dialog.getByTestId('check-summary-totalDice');
+   await expect(melee).toHaveValue('10');
+
+   /** @type {string} The target's Defense shown at open. */
+   const defenseAtOpen = await defense.inputValue();
+
+   /** @type {string} The total dice before the forced rebuild. */
+   const diceBefore = (await totalDice.textContent()).trim();
+
+   // The dialog rebuilds only when an option or the actor changes, never on a target change, so untargeting alone
+   // proves nothing: untarget, then force a rebuild through a field that is not a rating (the dice modifier).
    await clearTargets();
+   await setNumberField(dialog, 'diceMod', 1);
+   await expect.poll(async () => (await totalDice.textContent()).trim(), {
+      message: 'the forced rebuild ran',
+   }).not.toBe(diceBefore);
+
+   // The target's conditions and Defense were fixed at open, so the rebuilt options keep them.
    await expect(dialog.getByTestId('attack-target-condition')).toHaveText([expected]);
+   await expect(melee).toHaveValue('10');
+   await expect(defense).toHaveValue(defenseAtOpen);
+});
+
+test('an attack message without targetConditions loads it as none and renders', async () => {
+   await setTarget(['prone'], 100);
+
+   /** @type {{id: string}} An attack rolled against a Prone target, the source of the legacy copy. */
+   const rolled = await rollAttack();
+
+   /** @type {{id: string, targetConditions: object[]}} The copy created without the field, as before this change. */
+   const legacy = await page.evaluate(async (sourceId) => {
+      /** @type {object} The rolled message's data without `system.parameters.targetConditions`. */
+      const data = game.messages.get(sourceId).toObject();
+      delete data._id;
+      delete data.system.parameters.targetConditions;
+
+      /** @type {ChatMessage} The legacy-shaped message. */
+      const message = await ChatMessage.create(data);
+      return {
+         id: message.id,
+         targetConditions: message.system.parameters.targetConditions,
+      };
+   }, rolled.id);
+   expect(legacy.targetConditions).toEqual([]);
+
+   // The card rendered its results (the positive edge), in the same pass that would have drawn the conditions row.
+   /** @type {import('@playwright/test').Locator} The legacy message's card. */
+   const card = page.locator(`#chat .message[data-message-id="${legacy.id}"]`);
+   await expect(card.getByTestId('check-chat-dc').first()).toBeVisible();
+   await expect(card.getByTestId('check-chat-target-conditions')).toHaveCount(0);
 });
 ```
 
@@ -9185,7 +11976,9 @@ other than the attacker's own: its conditions and the grid distance give
 Prone's close bonus and far penalty to the attacker's ratings, and
 Incapacitated fixes the Difficulty at 2 after Advantage. The dialog pins
 them at open like the target's Defense; the dialog and the chat card list
-the applied modifiers.
+the applied modifiers, and a rating the user or caller supplies drops its
+own entries. The attacker's own controlled token is never read as a GM's
+target.
 
 Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
 Claude-Session: https://claude.ai/code/session_01SPVZ3AXCPn5Bo41aemiJZc
@@ -9193,7 +11986,7 @@ EOF
 ```
 
 ---
-### Task 13: Unconscious applies Prone and Incapacitated and drops held gear
+### Task 14: Unconscious applies Prone and Incapacitated and drops held gear
 
 **Files:**
 - Modify: `src/system/Conditions.js`, `src/document/types/actor/types/character/CharacterDataModel.js`,
@@ -9371,16 +12164,16 @@ describe('TitanActiveEffect#_onCreate', () => {
     * @param {string} data.type - The effect subtype.
     * @param {string[]} data.statuses - The effect's status ids.
     * @param {string} data.userId - The creating user's id.
+    * @param {Function} [data.fallUnconscious] - The Character's fallUnconscious spy; by default it resolves, as the
+    * real method does.
     * @returns {Function} The fallUnconscious spy.
     */
-   function create({ type, statuses, userId }) {
-      /** @type {Function} The spy. */
-      const fallUnconscious = vi.fn();
-
+   function create({ type, statuses, userId, fallUnconscious = vi.fn(async () => {}) }) {
       /** @type {object} The created effect. */
       const effect = Object.create(TitanActiveEffect.prototype);
       Object.assign(effect, {
          parent: {
+            name: 'Sleeper',
             system: {
                fallUnconscious,
                isCharacter: true,
@@ -9418,6 +12211,26 @@ describe('TitanActiveEffect#_onCreate', () => {
          userId: 'creator',
       })).not.toHaveBeenCalled();
    });
+
+   it('reports a failed fall through the project logger instead of leaving the rejection unhandled', async () => {
+      /** @type {Function} The console.error spy, silencing the expected error output. */
+      const consoleError = vi.spyOn(console, 'error').mockImplementation(() => {});
+      ui.notifications.error.mockClear();
+      create({
+         fallUnconscious: vi.fn(async () => {
+            throw new Error('update refused');
+         }),
+         statuses: ['unconscious'],
+         type: 'condition',
+         userId: 'creator',
+      });
+
+      // The rejection settles on a later microtask.
+      await vi.waitFor(() => {
+         expect(ui.notifications.error).toHaveBeenCalledWith(expect.stringContaining('Sleeper'));
+      });
+      consoleError.mockRestore();
+   });
 });
 ```
 
@@ -9444,10 +12257,10 @@ export const UNCONSCIOUS_COMPANION_CONDITIONS = Object.freeze([
 ```
 
 In `CharacterDataModel.js`:
-(a) add the import (after the `ModBuckets` import):
+(a) replace the `~/system/Conditions.js` import Task 5 added with:
 
 ```js
-import { UNCONSCIOUS_COMPANION_CONDITIONS } from '~/system/Conditions.js';
+import { getConditionDescription, UNCONSCIOUS_COMPANION_CONDITIONS } from '~/system/Conditions.js';
 ```
 
 (b) fix the stale JSDoc summary of `unEquipShield` ("Un-equips the currently equipped Armor item from the Character.")
@@ -9491,7 +12304,13 @@ to "Un-equips the currently equipped Shield from the Character.", and add direct
    }
 ```
 
-In `TitanActiveEffect.js`, add after `_preUpdate`:
+In `TitanActiveEffect.js`, add the import (after the `assert` import):
+
+```js
+import error from '~/helpers/utility-functions/Error.js';
+```
+
+and add after `_preUpdate`:
 
 ```js
    /**
@@ -9512,8 +12331,10 @@ In `TitanActiveEffect.js`, add after `_preUpdate`:
          this.statuses.has('unconscious') &&
          this.parent?.system?.isCharacter
       ) {
-         // _onCreate is synchronous; the follow-up updates run after it returns.
-         this.parent.system.fallUnconscious();
+         // _onCreate is synchronous; the follow-up updates run after it returns and report their own failure.
+         this.parent.system.fallUnconscious().catch((reason) => {
+            error(`Could not apply falling Unconscious to "${this.parent.name}".`, reason);
+         });
       }
    }
 ```
@@ -9706,7 +12527,7 @@ EOF
 
 ---
 
-### Task 14: Rules journal typos (compendium module)
+### Task 15: Rules journal typos (compendium module)
 
 Works in `C:\FoundryVTT\V14\dev\foundryuserdata\Data\modules\titan-vttrpg-compendium`. `packs/**` there is the live
 LevelDB that Foundry holds open: never stage, revert, or compile into it while Foundry runs.
@@ -9793,11 +12614,11 @@ Claude-Session: https://claude.ai/code/session_01SPVZ3AXCPn5Bo41aemiJZc
 EOF
 ```
 
-- [ ] **Step 5: Controller checkpoint — live packs (runs after Task 15's commit)**
+- [ ] **Step 5: Controller checkpoint — live packs (runs after Task 16's commit)**
 
-The live `packs/` carries neither this task's journal text nor Task 15's immunity conversion until it is recompiled,
+The live `packs/` carries neither this task's journal text nor Task 16's immunity conversion until it is recompiled,
 which needs Foundry stopped (the world locks every pack LevelDB, and stopping the server is not available to agents).
-One recompile covers both tasks, so the controller holds this checkpoint until Task 15's commit lands, then asks the
+One recompile covers both tasks, so the controller holds this checkpoint until Task 16's commit lands, then asks the
 user once to either stop Foundry so `npm run packs:compile` (default `src/packs → packs`) can run, or to authorize
 logging "recompile the module's live packs from `src/packs`" in `docs/TODO.md`. Nothing is deferred without that
 answer.
@@ -9841,10 +12662,10 @@ async () => {
 
 ---
 
-### Task 15: Metal Attunement and Effulgent Gaze grant condition immunity (compendium module)
+### Task 16: Metal Attunement and Effulgent Gaze grant condition immunity (compendium module)
 
 User ruling 3 (2026-09-29). Works in `C:\FoundryVTT\V14\dev\foundryuserdata\Data\modules\titan-vttrpg-compendium` on
-the `conditions-and-rulings` branch Task 14 created. Edits `src/packs/**` source JSON only; `packs/**` is the live
+the `conditions-and-rulings` branch Task 15 created. Edits `src/packs/**` source JSON only; `packs/**` is the live
 LevelDB Foundry holds open: never stage, revert, or compile into it. The rules (`docs/TITAN Rules Compendium - Source -
 09_26_2026.md` in the system repo) say Metal Attunement makes you "immune to being **Contaminated**" (line 5637) and
 Effulgent Gaze that "you cannot be **Blinded**" (line 7212). Each effect gains the Task 8 `immunity` element for its
@@ -9874,7 +12695,7 @@ git log --oneline -1
 git status --short -- . ':(exclude)packs'
 ```
 
-Expected: branch `conditions-and-rulings`, head = Task 14's commit ("fix(rules): Blinded reads ..."), no non-`packs/`
+Expected: branch `conditions-and-rulings`, head = Task 15's commit ("fix(rules): Blinded reads ..."), no non-`packs/`
 changes. If not, stop and report it to the controller.
 
 - [ ] **Step 2: Write the failing conversion check**
@@ -10084,12 +12905,12 @@ EOF
 
 - [ ] **Step 7: Controller checkpoint — live packs**
 
-Run Task 14 Step 5 now: one recompile of `src/packs` covers Task 14's journal fix and this task's conversion, and its
+Run Task 15 Step 5 now: one recompile of `src/packs` covers Task 15's journal fix and this task's conversion, and its
 test-world check confirms both effects refuse their condition.
 
 ---
 
-### Task 16: Documentation, skill, memory, and full verification
+### Task 17: Documentation, skill, memory, and full verification
 
 **Files:**
 - Modify: `docs/TODO.md`, `docs/CLOSED_BUGS.md`, `docs/POST_WORK_FINDINGS.md`,
@@ -10104,10 +12925,10 @@ test-world check confirms both effects refuse their condition.
 
 In `docs/TODO.md`, delete the whole "Conditions rework to the 2026-09-26 rules" bullet, and from the "Compendium audit
 findings awaiting a rules decision" bullet delete only its sub-bullet
-"Metal Attunement and Effulgent Gaze: `removeCondition` where the rules grant immunity." (Task 15 converted them).
+"Metal Attunement and Effulgent Gaze: `removeCondition` where the rules grant immunity." (Task 16 converted them).
 Keep every other bullet and sub-bullet (the Google Sheets fixture, the rest of the compendium audit findings, applying
 caster/target-derived effects, and extending immunity by trait). Add any item the user authorized deferring during
-this campaign (Task 14 Step 5), with its authorization date.
+this campaign (Task 15 Step 5), with its authorization date.
 
 Append to `docs/CLOSED_BUGS.md`:
 
@@ -10132,6 +12953,27 @@ Append to `docs/CLOSED_BUGS.md`:
   (`src/system/ModBuckets.js`), whose dynamic buckets `_resetDynamicMods` also reads. Gated by
   `tests/unit/ModBuckets.test.js` (bucket order, tooltip, and a scan rejecting any Svelte source that names a bucket)
   and `tests/e2e/stat-breakdown-conditions.spec.js`.
+
+### 76. A GM targeting nothing had the attacker's own Defense read as the target's
+
+- **What:** `getTargetedCharacters` falls back to a GM's controlled tokens when nothing is targeted, and the attack
+  check read `targets[0]` (`CharacterDataModel.js` `_createAttackCheckDialog` and `initializeAttackCheckOptions`), so a
+  GM rolling from the attacker's own controlled token used the attacker's Defense as the target's.
+- **Found:** 2026-09-29 by the plan buddy check of the conditions rework.
+- **Fixed:** 2026-09-29 — `_getAttackTargetToken()` takes the first targeted Character token other than the
+  attacker's own (Task 13). Gated by the unit test "never reads the attacker's own controlled token as a GM's target"
+  (`tests/unit/check/rebuild-check-options.test.js`).
+
+### 77. Opening a Multiply Base or Multiply Sum editor saved "up" for an element with no stored rounding
+
+- **What:** the rounding select listed `up` first; `Select`'s clamp effect writes its first option into an unlisted
+  bound value and fires `onchange`, which `DocumentSelect` persists (`Select.svelte:114-121`), so merely opening
+  `ItemSheetMulBaseSettings` or `ItemSheetMulSumSettings` for an element without `rounding` (engine default `down`)
+  silently stored `up` and changed what the element applied.
+- **Found:** 2026-09-29 while planning the `nearest` rounding option.
+- **Fixed:** 2026-09-29 — both editors read `ROUNDING_DIRECTIONS`, led by `down` (Task 1). Gated by
+  `tests/unit/RoundingDirections.test.js` (the list order and every rounding editor on it) and
+  `tests/e2e/rules-element-rounding-editor.spec.js` (an element with no stored rounding opens and stays `down`).
 ```
 
 - [ ] **Step 2: Post-work findings**
@@ -10141,24 +12983,52 @@ Append to `docs/POST_WORK_FINDINGS.md`:
 ```markdown
 ### Condition effects are synced to their definitions on every GM load (2026-09-29)
 
-A condition Active Effect keeps the rules elements and description copied at creation, so a changed definition in
+A condition Active Effect keeps the rules elements copied at creation, so a changed definition in
 `src/system/Conditions.js` reaches existing conditions only through `syncConditionEffects`
-(`src/helpers/migration/SyncConditionEffects.js`), which the migration system runs. It matches an effect to its
-definition by `effect.statuses`, compares with sorted-key JSON, and rewrites `system.rulesElement` and
-`flags.titan.description`; an effect whose statuses name no system condition is left alone, and a GM who edits a
-condition effect's rules elements by hand has that edit replaced on the next load. It covers world actors and
-unlinked token actors (a version-chain step could not: an unlinked token inherits its base actor's
-`documentVersion`). In Prompt mode a world with stale conditions shows the migration dialog on each GM load until the
-GM confirms.
+(`src/helpers/migration/SyncConditionEffects.js`), which the migration system runs. It matches a stored effect to its
+definition by its single status against `buildConditionDefinitions()` (`findConditionDefinition`, core's
+`toggleStatusEffect` rule; never the mutable `CONFIG.statusEffects`), compares with sorted-key JSON, and rewrites
+`system.rulesElement` only; an effect with several statuses or a status naming no system condition is left alone, and
+a GM who edits a condition effect's rules elements by hand has that edit replaced on the next load. It reads stored
+data only: world actors' `_source.effects`, then the effects each unlinked token's delta manages
+(`_source.delta.effects`), so a clean token's synthetic actor is never materialized and a failed base-actor update
+never writes a token copy of an inherited effect. A version-chain step could not reach token-only conditions (an
+unlinked token inherits its base actor's `documentVersion`). Disabled resolves before any scan. In Prompt mode a
+world with stale conditions shows the migration dialog on each GM load until the GM confirms. A failed converter or
+migration is reported and the Player HUD and hot-bar drops load regardless.
+
+### Condition descriptions are read from the definitions, never stored (2026-09-30)
+
+`setupConditions` flags `CONFIG.statusEffects` entries with `flags.titan.type` only, so the condition Active Effects
+core creates carry no description; `getConditionDescription(effect)` looks the text up by the effect's single status
+and localizes it on the reading client (the Player HUD at render, the turn-start report when it builds its chat
+snapshot). A `flags.titan.description` left on an effect created before this change is ignored and not removed: the
+sync writes only rules elements.
 
 ### Immunity suppression is separate from `disabled` (2026-09-29)
 
 An immunity suppresses a condition or effect through the data models' `isSuppressed` (core then drops it from
 `actor.statuses`), and `_applyRulesElements` skips only `system.isSuppressed` sources: `disabled` stays the gate for an
-effect's own state, and core's duration expiry does not start suppressing TITAN effects. A suppressed entry stays in
-the actor's effects: the character sheet's effect rows (which list only `effect`-subtype effects) and the Player HUD
-effects panel (list rows; tray icons dim and the popout carries the tag) dim it and show "Suppressed: <sources>", read
-from `getSuppressingImmunitySources`, not from `isSuppressed`, which carries no source.
+effect's own state, and core's duration expiry does not start suppressing TITAN effects. A suppressed effect's
+modifiers stop applying; immunities it grants still apply (`_getImmunities` reads every enabled source), so two
+effects each immune to the other are both suppressed, both immunities stay, and each one's tag names the other; the
+alternative has two fixed points and no rules-grounded tiebreak. A suppressed effect's duration keeps ticking. A
+suppressed entry stays in the actor's effects: the character sheet's effect rows (which list only `effect`-subtype
+effects), the Player HUD effects panel (list rows; tray icons dim and the popout carries the tag), and the turn-start
+and turn-end reports (`EffectTag`) dim it and show "Suppressed: <sources>", read from `getSuppressingImmunitySources`,
+not from `isSuppressed`, which carries no source.
+
+### Immunity removal runs on the changing client, and a mutual pair is never deleted (2026-09-30)
+
+In Immunity Handling's Remove mode (the default) the deletion of an effect an immunity covers runs once, on the client
+whose user made the change, from `TitanActor#_onUpdate`, `_onCreateDescendantDocuments`, and
+`_onUpdateDescendantDocuments` (Foundry dispatches the last two to an unlinked token's synthetic actor too). The
+removal re-derives everything from the prepared actor, runs serially per actor, and follows a world actor's change
+into its unlinked tokens that hold effects or items of their own, after the world actor's deletions land.
+`resolveImmuneEffectRemovals` is the grounded labelling of the effects' immunity graph (Dung 1995): an effect in an
+immunity cycle is undecided and stays suppressed instead of being deleted. Switching the setting to Remove makes the
+active GM run the removal over every world actor. Anything that makes an effect immune without an actor update or a
+descendant create/update (none exists today) would bypass the removal until the actor's next change.
 
 ### Target distance is measured between the nearest occupied spaces (2026-09-29)
 
@@ -10173,25 +13043,47 @@ scene: with no canvas or no attacker token there, no distance-based Prone modifi
 Append to `docs/superpowers/specs/2026-09-27-conditions-rework-design.md`:
 
 ```markdown
-## As built (2026-09-29)
+## As built (2026-09-29, amended 2026-09-30)
 
 - Immunities are `{ condition: Map, effect: Map }` of source lists (`{ id, name }`), not Sets: the refusal names the
   source and an immunity must skip the effect granting it. They are derived in `CharacterDataModel.prepareBaseData`,
   before core's `applyActiveEffects` reads `isSuppressed`, from the same source list as `_applyRulesElements`
-  (`_getRulesElementSources`).
+  (`_getRulesElementSources`); every immunities object is built by `createEmptyImmunities` from `IMMUNITY_SELECTORS`.
 - Suppression is the data models' `isSuppressed` (true while immune, undefined otherwise so core's expiry test
   decides).
+- **Amends §5's fourth bullet (lines 88-89).** What happens to an existing matching condition or effect is a GM world
+  setting, "Existing Effects on Gaining Immunity" (`immunityHandling`; user ruling 2026-09-30): **Remove** (default)
+  deletes it once, on the client that made the change, with a notification naming the immunity's source; **Suppress**
+  keeps §5's suppression. A suppressed effect's modifiers stop applying; immunities it grants still apply — an
+  exception the bullet did not state: reading every enabled source is the only well-defined rule,
+  because suppressing only what an unsuppressed effect grants has two fixed points (either member of a mutually
+  immune pair applying) and the rules supply no tiebreak (a naive simultaneous iteration oscillates). So in Suppress
+  mode two effects each immune to the other both have their modifiers stopped, both immunities stay, and each one's
+  tag names the other; in Remove mode such a pair (or a longer ring) is never deleted and falls back to that same
+  suppression (grounded labelling, Dung 1995). A suppressed effect returns untouched when the immunity ends, and its
+  duration keeps ticking meanwhile. Refusing an immune creation (`_preCreate`) applies in both modes. Switching the
+  setting to Remove removes, world-wide, what Suppress kept.
+- The Testing section's "an immunity effect blocks Contaminated and suppresses an existing one" is, as built: blocks
+  Contaminated in both modes, removes an existing one in Remove mode (the default), and suppresses it in Suppress mode.
+- Turn-start and turn-end reports list a suppressed condition or effect with the same "Suppressed: <sources>" tag as
+  the sheet and the Player HUD (user ruling 2026-09-30).
+- Stacked `mulBase` elements round per element: each condition's resulting value is rounded in sequence (base 6 with
+  Blinded and Off-Balance → 4, base 7 → 5; user ruling 2026-09-30).
 - The migration is an idempotent sync inside the migration system (`syncConditionEffects`), not a version-chain step,
-  so Migration Mode governs it and unlinked token actors are covered; it also refreshes `flags.titan.description`.
-  Migration Mode "Disabled" now skips migration (bug #74).
+  so Migration Mode governs it and unlinked token actors are covered. It rewrites only `system.rulesElement`, matched
+  by an effect's single status against `buildConditionDefinitions()`, and reads stored data only (a token's actor is
+  read only to update its own stale effect). Condition descriptions are not stored on effects: the Player HUD and the
+  turn-start report look them up by status id and localize them. Migration Mode "Disabled" now skips migration without
+  scanning (bug #74), and a failed migration never blocks the load.
 - Condition situations store `labelKey` without a localized `label`; the canonical situation strings live in
   `src/system/CanonicalSituations.js`.
 - Off-Balance's id is `offBalance`.
 - The rounding select lists `down`, `up`, `nearest`, so an element without a stored `rounding` shows and keeps the
-  engine's default.
-- The attack's target excludes the attacker's own token; distance is measured between the nearest occupied spaces;
-  `options.targetConditions` carries both ratings' modifiers and `parameters.targetConditions` the applied ones; the
-  Prone penalty beyond 10 spaces applies to Accuracy only.
+  engine's default (bug #77).
+- The attack's target excludes the attacker's own token (bug #76); distance is measured between the nearest occupied
+  spaces; `options.targetConditions` carries both ratings' modifiers and `parameters.targetConditions` the applied
+  ones; a rating the user or caller supplies drops that rating's entries; the Prone penalty beyond 10 spaces applies
+  to Accuracy only.
 - The module's Stunned text was already correct; Prone's split `<strong>1 spac</strong>e` was fixed with Blinded's.
 - Stat breakdowns list condition modifiers (bug #75).
 - User rulings (2026-09-29): Off-Balance joins the Inflict Condition (cost 3) and Remove Condition (cost 2) spell
@@ -10247,17 +13139,32 @@ Sight"/"Relies on Hearing" on Perception checks, stored with `labelKey` only). T
 the persisted `static`.
 
 **Immunity.** `CharacterDataModel.prepareBaseData` sets `actor.immunities` (`_getImmunities`, read through the
-`immunities` getter): `{ condition: Map<id, ImmunitySource[]>, effect: Map<camelName, ImmunitySource[]> }` gathered
-from the same sources' `immunity` elements. `getImmunitySources(effect)` matches a condition by its statuses and an
+`immunities` getter): `{ condition: Map<id, ImmunitySource[]>, effect: Map<camelName, ImmunitySource[]> }`, built by
+`createEmptyImmunities()` (one Map per `IMMUNITY_SELECTORS` entry, `Immunity.js`) and gathered from the same sources'
+`immunity` elements, suppressed or not. `getImmunitySources(effect)` matches a condition by its statuses and an
 effect by its camel-cased name, never the effect granting the immunity. `ConditionDataModel` and
 `TitanActiveEffectDataModel` expose `isSuppressed` (`isSuppressedByImmunity`: true while immune, else undefined so
 core's expiry test decides); core's `ActiveEffect#isSuppressed` reads it, so a suppressed condition leaves
-`actor.statuses`. `TitanActiveEffect._preCreate` refuses an immune creation with `LOCAL.immuneToEffect` naming the
-sources. `getSuppressingImmunitySources(effect)` (same module as `isSuppressedByImmunity`, which delegates to it;
-`[]` for a missing effect or a non-Character parent) feeds the suppressed marker: `SuppressedEffectTag.svelte`
+`actor.statuses`. A suppressed effect's modifiers stop applying; immunities it grants still apply, so two effects
+each immune to the other are both suppressed; its duration keeps ticking. `TitanActiveEffect._preCreate` refuses an
+immune creation with `LOCAL.immuneToEffect` naming the sources, whatever the Immunity Handling mode.
+`getSuppressingImmunitySources(effect)` (same module as `isSuppressedByImmunity`, which delegates to it; `[]` for a
+missing effect or a non-Character parent) feeds the suppressed marker: `SuppressedEffectTag.svelte`
 ("Suppressed: <sources>", `SUPPRESSED_ICON`) plus a dimmed row — `CharacterSheetItem`'s `muted` prop on the sheet's
 effect rows, the `suppressed` class on `EffectsListRow` and on `EffectsIconTray`'s icons (the tray's
-`EffectsDetailPopout` takes `suppressingSources` and carries the tag). Deferred: immunity by trait (docs/TODO.md).
+`EffectsDetailPopout` takes `suppressingSources` and carries the tag), and `EffectTag`'s `suppressed` class and tag
+for a turn-report entry's `suppressedBy`. Deferred: immunity by trait (docs/TODO.md).
+
+**Immunity Handling (Remove / Suppress).** The GM world setting `immunityHandling` (`remove` default, `suppress`;
+reader `src/helpers/Settings/ImmunityHandling.js`) decides what happens to an effect the actor already has when an
+immunity to it arrives. `TitanActor#_onUpdate`, `_onCreateDescendantDocuments`, and `_onUpdateDescendantDocuments`
+call `_removeImmuneEffectsAfterChange(userId)`, which on the changing client only runs
+`removeImmuneEffectsWithDependents(actor)` (`src/document/types/actor/types/character/ImmuneEffectRemoval.js`): the
+actor's removal, then its unlinked tokens whose deltas hold effects or items of their own. `removeImmuneEffects`
+is serialized per actor (a WeakMap of pending promises), no-ops in Suppress mode, deletes what
+`resolveImmuneEffectRemovals` returns (grounded labelling of the immunity graph: a mutually immune pair or ring is
+never deleted and stays suppressed), and posts `LOCAL.immunityRemovedEffect` per deleted effect. The setting's
+`onChange` to `remove` runs `removeImmuneEffectsFromWorld()` on the active GM.
 
 **Unconscious.** `TitanActiveEffect._onCreate`, on the creating client, calls `CharacterDataModel.fallUnconscious()`
 for an Unconscious condition: `UNCONSCIOUS_COMPANION_CONDITIONS` (Prone, Incapacitated) are toggled active, equipped
@@ -10269,6 +13176,14 @@ with "`roundDirectional(value, rounding)` ceils on `'up'`, rounds on `'nearest'`
 `ROUNDING_DIRECTIONS` lists the editor options, `down` first".
 (e) in the "Labels" bullet, add after `ModifiableStatValueLabel`: "(takes the stat's `mod` object; its tooltip,
 `createModifiableStatTooltip`, walks `MOD_BUCKET_LABELS`)".
+(f) in the `CharacterDataModel` bullet, replace "The four report-data builders (`_getEffectReportData`,
+`_getTurnEffectReportData`, `_getInitiativeEffectReportData`, `_getCustomEffectReportData`) read effect AEs (including
+the native `description`) into the turn/expiry report payloads." with "The report-data builders
+(`_getConditionReportData`, `_getEffectReportData`, `_getTurnEffectReportData`, `_getInitiativeEffectReportData`,
+`_getCustomEffectReportData`) all start from `_getEffectReportEntry(effect)` (label, image, description when not
+blank — a condition's from `getConditionDescription`, an effect's native `description` — and `suppressedBy` while an
+immunity suppresses it) and add their duration fields; the duration methods select effects by type and duration
+only, so a suppressed effect's duration keeps ticking."
 
 In `.claude/skills/titan-codebase/references/architecture.md`, append to the
 `src/document/types/item/types/spell/CalculateSpellAspectCosts.js` bullet: "`SpellAspects.inflictCondition` and
@@ -10281,33 +13196,51 @@ bullets with:
 - `OnceSetup.js` (Foundry `setup` hook) calls `setupConditions()` from `src/system/Conditions.js`. That module
   exports a pure `buildConditionDefinitions()` (no `game`/localize access, unit-tested) returning the static
   condition list (every entry `type: 'condition'`; every condition but Dead and Unconscious carries a
-  `system.rulesElement` array), `CONDITION_IDS`, and `UNCONSCIOUS_COMPANION_CONDITIONS`; `setupConditions()`
-  localize-sorts the definitions, adds `flags.titan.description`/`type`, and sets `CONFIG.statusEffects`.
+  `system.rulesElement` array), `CONDITION_IDS`, `UNCONSCIOUS_COMPANION_CONDITIONS`,
+  `findConditionDefinition(statuses)` (the system condition a single-status effect applies, from the definitions,
+  never `CONFIG.statusEffects`), and `getConditionDescription(effect)` (that condition's description, localized on the
+  reading client; condition effects store none); `setupConditions()` localize-sorts the definitions, flags each with
+  `flags.titan.type`, and sets `CONFIG.statusEffects`.
 - `OnceReady.js` (Foundry `ready` hook), for the GM, runs the one-shot effect-item→Active-Effect converter, then acts
-  on `resolveMigrationAction(migrationMode, worldNeedsMigration())`: prompt → `ConfirmMigrateWorldDialog`, migrate →
-  `migrateWorld()` (version chains, then the condition-effect sync), none → nothing (Disabled, or nothing pending).
-  It then builds the Player HUD (so `game.titan.playerHud` marks a finished load) and registers `hotbarDrop`.
+  on `resolveMigrationAction(migrationMode, worldNeedsMigration)` (the scan is passed as a function and runs only
+  when the mode is not Disabled): prompt → `ConfirmMigrateWorldDialog`, migrate → `migrateWorld()` (version chains,
+  then the condition-effect sync), none → nothing. A failure anywhere in that migration attempt is reported through
+  `error()` and never stops the load: it then registers `hotbarDrop` and builds the Player HUD for every user, after
+  the migration attempt whether or not it succeeded.
 ```
 
 In `.claude/skills/titan-codebase/references/data-flow.md`:
 (a) in the "Effects panel — `EffectsPanelElement` → list or tray" paragraph, insert before "The outer panel has a
 fixed user-resizable width": "An entry an immunity suppresses stays listed, dimmed, with a "Suppressed: <sources>"
-tag (`SuppressedEffectTag`): under the list row's header, or in the tray's popout (the tray icon is dimmed)."
+tag (`SuppressedEffectTag`): under the list row's header, or in the tray's popout (the tray icon is dimmed).", and in
+the same paragraph replace "description per subtype (conditions render `flags.titan.description`, effects the native
+`description`)" with "description per subtype (a condition's from its definition through `getConditionDescription`,
+localized at render; an effect's native `description`)".
 (b) in the Migration system "Where it lives" list, add
-"- `SyncConditionEffects.js` — `syncConditionEffects()` rewrites every stale condition Active Effect (world actors and
-unlinked token actors) from `CONFIG.statusEffects` (rules elements and description); `conditionEffectsNeedSync()`
-feeds `worldNeedsMigration()`."
+"- `SyncConditionEffects.js` — `syncConditionEffects()` rewrites the `system.rulesElement` of every stale condition
+Active Effect from `buildConditionDefinitions()` (matched by the effect's single status). `getConditionEffectSyncs()`
+scans stored data only — world actors' `_source.effects`, then the effects each unlinked token's delta manages — and
+reads a token's `actor` only to update its own stale effect; `conditionEffectsNeedSync()` feeds
+`worldNeedsMigration()`."
 (c) replace the "What triggers it" numbered item 2 (and its two sub-bullets) with:
 
 ```markdown
-2. It then acts on `resolveMigrationAction(game.settings.get('titan', 'migrationMode'), worldNeedsMigration())`
-   (`worldNeedsMigration()` is true for a pending version-chain step or a stale condition effect):
+2. It then acts on `resolveMigrationAction(game.settings.get('titan', 'migrationMode'), worldNeedsMigration)`; the
+   world scan (`worldNeedsMigration`, true for a pending version-chain step or a stale condition effect) runs only
+   when the mode is not Disabled:
    - `'prompt'` → renders `ConfirmMigrateWorldDialog`, which calls `migrateWorld()` on GM confirmation.
    - `'migrate'` (Automatic mode) → awaits `migrateWorld()`: the version chains, then `syncConditionEffects()`.
    - `'none'` (Disabled mode, or nothing pending) → no migration.
+3. Steps 1-2 run inside one `try`; a failure is reported through `error()` and `onceReady` still registers
+   `hotbarDrop` and builds the Player HUD.
 ```
 
-(d) replace "Attack difficulty is `clamp(targetDefense - attackerRating + 4, 2, 6)`; with no target selected
+(d) in "4. Turn reports", append: "Every reported condition and effect entry comes from
+`_getEffectReportEntry`, which adds `suppressedBy` (the suppressing immunities' names) while an immunity suppresses
+it; `EffectTag`, the leaf every report entry renders through, then shows the `SuppressedEffectTag` and dims the
+entry."
+
+(e) replace "Attack difficulty is `clamp(targetDefense - attackerRating + 4, 2, 6)`; with no target selected
 `targetDefense` defaults to the attacker's own rating, yielding difficulty 4." with:
 
 ```markdown
@@ -10317,9 +13250,10 @@ With no target, `targetDefense` defaults to the attacker's own rating (difficult
 `initializeAttackCheckOptions` also derives `targetConditions` (`TargetConditionModifiers.js`) from the target's
 statuses and `measureTokenDistance` (nearest occupied spaces, scene grid rule): a Prone target within 1 space adds
 `ceil(base × ¼)` to Melee and Accuracy, beyond 10 spaces subtracts `floor(base × ¼ × floor(d / 10))` from Accuracy
-(never below 0), and an Incapacitated target fixes the Difficulty at 2 after `_applyCheckAdvantage`. The dialog pins a
-target's Defense and conditions at open; `parameters.targetConditions` keeps the attack's rating's entries and the
-Difficulty for the dialog row and the chat card.
+(never below 0), and an Incapacitated target fixes the Difficulty at 2 after `_applyCheckAdvantage`. A rating the user
+or the caller supplies drops that rating's entries. The dialog pins a target's Defense and conditions at open;
+`parameters.targetConditions` keeps the attack's rating's entries and the Difficulty for the dialog row and the chat
+card; a message stored without the field loads it as `[]`.
 ```
 
 In `.claude/skills/titan-codebase/references/conventions.md`, in the typed-key paragraph listing the
@@ -10375,7 +13309,7 @@ git add docs/TODO.md docs/CLOSED_BUGS.md docs/POST_WORK_FINDINGS.md \
    .claude/skills/titan-codebase/references/abstractions.md .claude/skills/titan-codebase/references/architecture.md \
    .claude/skills/titan-codebase/references/data-flow.md .claude/skills/titan-codebase/references/conventions.md
 git commit -F - <<'EOF'
-docs: conditions rework — backlog, bugs 74-75, findings, spec as-built, skill
+docs: conditions rework — backlog, bugs 74-77, findings, spec as-built, skill
 
 Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
 Claude-Session: https://claude.ai/code/session_01SPVZ3AXCPn5Bo41aemiJZc
@@ -10396,65 +13330,103 @@ nothing.)
 |---|---|
 | §1 Blinded/Contaminated/Off-Balance/Prone/Restrained/Stunned stat rules; Off-Balance definition, icon, localization; `.desc` text | 2 |
 | §1 Blinded/Deafened sense situations, Frightened, Incapacitated/Restrained Reflexes | 4 |
-| §1 Incapacitated/Prone target-side | 11, 12 |
-| §1 Unconscious | 13 |
+| §1 Incapacitated/Prone target-side | 12, 13 |
+| §1 Unconscious | 14 |
 | §1 uuids `condition-<id>-<stat>` | 2, 4 (guard test) |
 | §2 `nearest` rounding, editors, `down` default | 1 |
-| §3 target statuses, distance, Prone ±, Incapacitated Difficulty 2 after Advantage, recorded + card + dialog | 11, 12 |
-| §4 Unconscious on creating client, Prone/Incapacitated if absent, unequip weapons/shield, removal keeps them | 13 |
+| §3 target statuses, distance, Prone ±, Incapacitated Difficulty 2 after Advantage, recorded + card + dialog | 12, 13 |
+| §4 Unconscious on creating client, Prone/Incapacitated if absent, unequip weapons/shield, removal keeps them | 14 |
 | §5 `immunity` operation, condition/effect selectors, camel-case names | 8 |
 | §5 pre-pass, refusal notification, suppression, never self-suppress | 7, 9 |
+| §5 existing matching conditions/effects (amended by user ruling 2026-09-30: Remove default, Suppress optional) | 9, 10, 11 |
 | §5 editor `ItemSheetImmunitySettings.svelte` | 8 |
 | §6 migration, world + unlinked token actors | 5 |
-| §7 module journal typos | 14 |
-| Testing: definitions per condition, mulBase 0.75 bases 1-8, stacked Blinded + Off-Balance, nearest, immunity, Prone table | 1, 2, 9, 11 |
-| Testing e2e: ratings per condition, Frightened Difficulty, Incapacitated attack Difficulty 2, Unconscious, immunity effect, migration | 2, 3, 4, 5, 9, 12, 13 |
-| Documentation: TODO, skill, memory | 16 |
+| §7 module journal typos | 15 |
+| Testing: definitions per condition, mulBase 0.75 bases 1-8, stacked Blinded + Off-Balance, nearest, immunity, Prone table | 1, 2, 9, 11, 12 |
+| Testing e2e: ratings per condition, Frightened Difficulty, Incapacitated attack Difficulty 2, Unconscious, immunity effect, migration | 2, 3, 4, 5, 9, 11, 13, 14 |
+| Documentation: TODO, skill, memory | 17 |
 
-**User rulings (2026-09-29) → task:**
+**User rulings → task:**
 
 | Ruling | Task |
 |---|---|
-| 1. Off-Balance in Inflict Condition (cost 3) and Remove Condition (cost 2); guard on both lists; spell-sheet e2e | 2 (Steps 9-13) |
-| 2. "Suppressed: <immunity source>" tag and muted row on the sheet's effect rows and the HUD effects panel entries, reusing `getImmunitySources`; unit + e2e (presence→absence on the same row); Task 16's POST_WORK_FINDINGS text matches | 10, 16 |
-| 3. Metal Attunement / Effulgent Gaze effects gain `immunity`, spells drop `removeCondition` (module `src/packs` only); JSON parse, `check:links`, scratch compile + `trash`; recompile folded into Task 14 Step 5; audit bullet deleted from `docs/TODO.md` | 15, 14 (Step 5), 16 |
+| 2026-09-29 #1. Off-Balance in Inflict Condition (cost 3) and Remove Condition (cost 2); guard on both lists; spell-sheet e2e | 2 (Steps 9-13) |
+| 2026-09-29 #2. "Suppressed: <immunity source>" tag and muted row on the sheet's effect rows and the HUD effects panel entries, reusing `getImmunitySources`; unit + e2e (presence→absence on the same row); Task 17's POST_WORK_FINDINGS text matches | 10, 17 |
+| 2026-09-29 #3. Metal Attunement / Effulgent Gaze effects gain `immunity`, spells drop `removeCondition` (module `src/packs` only); JSON parse, `check:links`, scratch compile + `trash`; recompile folded into Task 15 Step 5; audit bullet deleted from `docs/TODO.md` | 16, 15 (Step 5), 17 |
+| 2026-09-30 #1. Stacked `mulBase` round per element; resolution 22; Review Focus 7; unit tests at base 6 → 4 and base 7 → 5 | 2 (Step 1) |
+| 2026-09-30 #2. Immunity Handling setting (Remove default, Suppress); removal on the changing client; refusal in both modes; notification; mutual immunity falls back to suppression; unit + e2e both modes; as-built, CHANGELOG, skill | 11, 17 |
+| 2026-09-30 #3. A suppressed effect's duration keeps ticking; resolution 24; pinned | 9 (unit), 10 (e2e) |
+| 2026-09-30 #4. Turn-start/turn-end reports tag suppressed entries; resolution 25; unit + e2e | 10 |
+
+**Buddy-check findings → task** (verified against the code before planning; see the report for the evidence):
+condition sync reads stored data only and scans nothing when Disabled — 5; no stored/synced condition description,
+readers look it up — 5 (resolution 5, POST_WORK, as-built, skill); immunity selectors derived and the editor's switches
+pinned — 8, 9; untargeting e2e forces a rebuild — 13 (Step 7); rebuild unit test uses `withMeleeBonus` with the paired
+unpinned case — 13 (Step 1); bugs #76 and #77 logged — 17; dead `localize` import — 3 (Step 7); sync matches single
+statuses against `buildConditionDefinitions()` — 5 (resolution 17); a supplied rating drops its entries — 13
+(resolution 10); legacy attack message e2e — 13 (Review Focus 6); `onceReady` try/catch and JSDoc — 5 (Step 5);
+`fallUnconscious().catch` — 14; "Round to Nearest" — 1; Global Constraints e2e wording — Global Constraints;
+suppressed-effect wording — 8, 9, 10, 11, 17 (resolution 4); Remove-mode mutual immunity — 11 (resolution 23).
 
 Additions beyond spec B's text, each required by it or found while planning: bug #74 (Migration Mode Disabled, Task 5,
 blocks the spec's migration from obeying the setting), bug #75 (condition bucket missing from breakdowns, Task 3, the
-spec's "sheet's ratings" check), the operation registry (Task 6, so the new operation cannot drift from its four
-lists), the source list (Task 7, so immunity and application read the same sources), the effect-tray count fix
-(Task 9, refused copies were reported as applied), and the three 2026-09-29 user rulings (Tasks 2, 10, 15).
+spec's "sheet's ratings" check), bugs #76 and #77 (found by the plan buddy check; Tasks 13 and 1), the operation
+registry (Task 6, so the new operation cannot drift from its four lists), the source list (Task 7, so immunity and
+application read the same sources), the effect-tray count fix (Task 9, refused copies were reported as applied), the
+three 2026-09-29 user rulings (Tasks 2, 10, 16), and the four 2026-09-30 user rulings (Tasks 2, 9, 10, 11).
 
 **Placeholder scan:** every step names exact files and carries the complete code or the exact text to replace; no
-"TBD", "similar to", or unwritten tests. Task 14 Step 5 (run after Task 15's commit) is a controller checkpoint that
+"TBD", "similar to", or unwritten tests. Task 15 Step 5 (run after Task 16's commit) is a controller checkpoint that
 asks the user; it defers nothing without the user's answer.
+
+**Wording sweep (item 15 of the 2026-09-30 buddy fold):** the multiline, case-insensitive pattern
+`stops?[\s*/#>-]+applying|appl(y|ies)[\s*/#>-]+nothing` over this plan returns only statements scoped to a suppressed
+effect's modifiers (the prescribed "its modifiers stop applying; immunities it grants still apply", which the pattern
+itself matches), Task 9's unit-test title about a suppressed condition (conditions grant no immunities), and this
+paragraph; none describes a suppressed effect as a whole.
 
 **Type consistency:** `ROUNDING_DIRECTIONS` (Task 1) is read by both editors and the rounding e2e.
 `createQuarterBasePenalty` / `createSenseAutomaticFailure` / `createReflexesAutomaticFailure` are module-private in
-`Conditions.js`; `CONDITION_IDS` (Task 8) and `UNCONSCIOUS_COMPANION_CONDITIONS` (Task 13) are its exports.
-`tests/unit/SpellAspectConditions.test.js` (Task 2) reads `buildConditionDefinitions` directly (it runs before Task 8
-adds `CONDITION_IDS`) and `calculateSpellAspectCosts`; the toggle test id
+`Conditions.js`; `findConditionDefinition` and `getConditionDescription` (Task 5), `CONDITION_IDS` (Task 8), and
+`UNCONSCIOUS_COMPANION_CONDITIONS` (Task 14) are its exports; `CharacterDataModel` imports `getConditionDescription`
+(Task 5) and adds `UNCONSCIOUS_COMPANION_CONDITIONS` to that import (Task 14); `SyncConditionEffects.js` imports
+`findConditionDefinition`. `tests/unit/SpellAspectConditions.test.js` (Task 2) reads `buildConditionDefinitions`
+directly (it runs before Task 8 adds `CONDITION_IDS`) and `calculateSpellAspectCosts`; the toggle test id
 `spell-aspect-option-<label>-<option>` (Task 2) is read only by `tests/e2e/spell-aspect-conditions.spec.js`.
 `DYNAMIC_MOD_BUCKETS` / `MOD_BUCKET_LABELS` / `getInnateModTotal` (Task 3) are used by `_resetDynamicMods`, the tooltip,
 the label, and the skill row. `CANONICAL_SITUATIONS` moves in Task 4 and is imported by the armor module, Conditions.js,
-and the localization test. `RULES_ELEMENT_FACTORIES` (Task 6) gains `immunity` in Task 8. `RulesElementSource` /
-`_getRulesElementSources` (Task 7) feed `_applyRulesElements` (Task 7) and `_getImmunities` (Task 9); Task 9 adds the
-`source.effect?.system.isSuppressed` skip. `ImmunitySource` / `Immunities` / `getImmunitySources` /
-`isSuppressedByImmunity` (Task 9) are used by both data models and `TitanActiveEffect._preCreate`.
-`getSuppressingImmunitySources` (Task 10, `IsSuppressedByImmunity.js`) wraps the Character gate and
-`getImmunitySources`; `isSuppressedByImmunity`, `CharacterSheetEffect`, `EffectsListRow`, and `EffectsIconTray` call it,
-and the tray passes `suppressingSources` (`string[]`) to `EffectsDetailPopout`. `SuppressedEffectTag` (props
-`sources: string[]`, `testId`) and `SUPPRESSED_ICON` (Task 10) are used by those three row surfaces;
-`CharacterSheetItem`'s `muted` prop is set only by `CharacterSheetEffect`. `TargetConditionModifier` and its helpers (Task 11) are used by
-`AttackCheckOptions`/`AttackCheckParameters`, `initializeAttackCheckOptions`, `getAttackCheckParameters`, and both
-Svelte components (Task 12). `getTargetedCharacterTokens` (Task 11) replaces the last `getTargetedCharacters` use in
-`CharacterDataModel` (Task 12); `GetBestCharactersToUpdate` keeps `getTargetedCharacters`. `fallUnconscious`
-(Task 13) is called only by `TitanActiveEffect._onCreate`. Task 15's module elements use the Task 8
-`ImmunityElement` field set (`operation`, `selector`, `key`, `uuid`), which its conversion check pins.
+and the localization test. `resolveMigrationAction(mode, needsMigration)` (Task 5) takes the scan as a function;
+`onceReady` passes `worldNeedsMigration` uncalled. `_getConditionReportData` (Task 5) is rewritten onto
+`_getEffectReportEntry` (Task 10) with the same output for an unsuppressed condition, so
+`tests/unit/ConditionReportData.test.js` stays green. `RULES_ELEMENT_FACTORIES` (Task 6) gains `immunity` in Task 8.
+`RulesElementSource` / `_getRulesElementSources` (Task 7) feed `_applyRulesElements` (Task 7) and `_getImmunities`
+(Task 9); Task 9 adds the `source.effect?.system.isSuppressed` skip. `IMMUNITY_SELECTORS` and `createEmptyImmunities`
+(Task 8) build `_getImmunities`' result and the `immunities` getter's default (Task 9), and
+`tests/unit/RulesElementOperationRegistry.test.js` pins the immunity editor's two switches to `IMMUNITY_SELECTORS`
+(Task 8). `ImmunitySource` / `Immunities` / `getImmunitySources` / `isSuppressedByImmunity` (Task 9) are used by both
+data models and `TitanActiveEffect._preCreate`. `getSuppressingImmunitySources` (Task 10, `IsSuppressedByImmunity.js`)
+wraps the Character gate and `getImmunitySources`; `isSuppressedByImmunity`, `CharacterSheetEffect`, `EffectsListRow`,
+`EffectsIconTray`, and `_getEffectReportEntry` call it, and the tray passes `suppressingSources` (`string[]`) to
+`EffectsDetailPopout`. `SuppressedEffectTag` (props `sources: string[]`, `testId`) and `SUPPRESSED_ICON` (Task 10) are
+used by the three row surfaces and `EffectTag` (report entries' `suppressedBy: string[]`); `CharacterSheetItem`'s
+`muted` prop is set only by `CharacterSheetEffect`. `immunityHandling()` (Task 11) is read only by
+`removeImmuneEffects`; `resolveImmuneEffectRemovals`, `removeImmuneEffects`, `removeImmuneEffectsWithDependents`, and
+`removeImmuneEffectsFromWorld` (Task 11, `ImmuneEffectRemoval.js`) are called by `TitanActor`'s three change handlers
+(through `_removeImmuneEffectsAfterChange`) and the setting's `onChange`. `TargetConditionModifier` and its helpers
+(Task 12) are used by `AttackCheckOptions`/`AttackCheckParameters`, `initializeAttackCheckOptions`,
+`getAttackCheckParameters`, and both Svelte components (Task 13). `getTargetedCharacterTokens` (Task 12) replaces the
+last `getTargetedCharacters` use in `CharacterDataModel` (Task 13); `GetBestCharactersToUpdate` keeps
+`getTargetedCharacters`. `fallUnconscious` (Task 14) is called only by `TitanActiveEffect._onCreate`, which catches
+its rejection through `error()`. Task 16's module elements use the Task 8 `ImmunityElement` field set (`operation`,
+`selector`, `key`, `uuid`), which its conversion check pins.
 
-**Review Focus mapping:** 1 → Tasks 11 (table: 10 vs 11 spaces, Accuracy 0, rounds-to-0) and 12 (e2e 1 and 21
-spaces); 2 → Task 12 unit test "never reads the attacker's own controlled token"; 3 → Task 9 unit and e2e; 4 → Task 5
-unit (idempotence, key order, custom status, token actors) and e2e; 5 → Task 13 unit and e2e; 6 → Task 12 schema golden
-and Incapacitated-with-Disadvantage unit and e2e; 7 → Tasks 2 (stacked Defense 8 → 4) and 1 (contribution vs result
-rounding); 8 → Task 10 unit (`getSuppressingImmunitySources`, self-naming ward) and e2e (sheet row, HUD list row, tray
-popout; ward row untagged); 9 → Task 2 guard test and spell-sheet e2e.
+**Review Focus mapping:** 1 → Tasks 12 (table: 10 vs 11 spaces, Accuracy 0, rounds-to-0) and 13 (e2e 1 and 21
+spaces); 2 → Task 13 unit test "never reads the attacker's own controlled token"; 3 → Task 9 unit and e2e, Task 11
+e2e; 4 → Task 5 unit (idempotence, key order, stored description ignored, custom and multi-status effects, token
+actors, clean token never read, no shadow copy, Disabled scans nothing) and e2e; 5 → Task 14 unit and e2e; 6 → Task 13
+e2e "an attack message without targetConditions loads it as none and renders" and the Incapacitated-with-Disadvantage
+unit and e2e; 7 → Tasks 2 (stacked Defense at bases 8, 6, 7) and 1 (contribution vs result rounding); 8 → Task 10
+unit (`getSuppressingImmunitySources`, self-naming ward) and e2e (sheet row, HUD list row, tray popout; ward row
+untagged); 9 → Task 2 guard test and spell-sheet e2e; 10 → Task 11 unit (`resolveImmuneEffectRemovals`,
+`removeImmuneEffects`, triggers, setting) and e2e (both modes, equip trigger, mutual pair, switch); 11 → Tasks 9 and 10
+unit and Task 10 e2e (turn-start and turn-end reports).
