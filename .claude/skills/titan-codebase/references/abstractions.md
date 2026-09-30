@@ -787,8 +787,9 @@ Reusable Svelte UI primitives consumed by sheet and chat-message components. Cat
 
 **`svelte-actions/`** (`src/helpers/svelte-actions/`)
 
-Svelte `use:` actions: `TooltipAction` (tippy.js tooltip on any element) and `PreventDefault`
-(blocks default browser event). `AutoScroll` scrolls a container to the bottom on content change.
+Svelte `use:` actions: `TooltipAction` (tippy.js tooltip on any element; its content is cleaned with
+`foundry.utils.cleanHTML` before tippy renders it as HTML) and `PreventDefault` (blocks default browser event).
+`AutoScroll` scrolls a container to the bottom on content change.
 
 
 ## How they wire together

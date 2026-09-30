@@ -367,9 +367,10 @@ Two user styles: the sectioned list (`EffectsListPanel` → id-keyed `EmbeddedDo
 `EffectsDetailPopout` clamped into the rect, Escape-consuming dismissal). Each list row is its own `panel-2`
 sub-panel (icon left, name-over-duration right, name ellipsis, controls that wrap), so expanding one row grows
 only that sub-panel and pushes its neighbours down rather than overlapping. Both expanded surfaces share
-`EffectsDetailBody`: description per subtype (conditions render `flags.titan.description`, effects the native
-`description`), embedded checks via `CharacterSheetEffectChecks`, duration −/+ steppers, send-to-chat
-(effect-only), open-sheet, and the owner-gated delete (`sheetDocument.data.system.requestEffectDeletion`). The
+`EffectsDetailBody`: description per subtype (conditions render `getConditionDescription(effect)` — the
+definition's description looked up by status id and localized on the reading client; effects the native
+`description`), embedded checks via `CharacterSheetEffectChecks`, duration −/+ steppers, send-to-chat (effect-only),
+open-sheet, and the owner-gated delete (`sheetDocument.data.system.requestEffectDeletion`). The
 outer panel has a fixed user-resizable width AND height (both persisted via the edit-mode handle); the header is
 pinned and the row list is a bounded `.body` (`flex: 1; min-height: 0; overflow-y: auto`) that scrolls
 internally when the effects exceed the panel height. The edit-mode mount is retained across token-selection
@@ -381,68 +382,120 @@ module flag is no longer stamped on effects or conditions — this HUD replaces 
 ## Migration system
 
 **Where it lives:** `src/helpers/migration/`
-- `MigrateWorld.js` — orchestration functions `worldNeedsMigration()` and `migrateWorld()`.
-- `actor/` — `ActorMigrations.js`, `CharacterMigrations.js`, `PlayerMigrations.js`, `NpcMigrations.js`.
-- `item/` — one file per item type (`WeaponMigrations.js`, `SpellMigrations.js`, etc.).
-- `ConfirmMigrateWorldDialog.js` — prompt dialog that calls `migrateWorld` on confirm.
-- `ConvertEffectItemsToActiveEffects.js` — one-shot, idempotent converter that turns legacy `effect`-type Items into
-  native `effect`-subtype Active Effects. It is fully decoupled from `migrateWorld()` (which is purely the
-  version-chain migrator) and is awaited directly from `onceReady` for the GM, unconditionally, before the
-  version-chain step.
+- `MigrateWorld.js` — `worldNeedsMigration()` (async), `migrateWorld()`, `resolveMigrationAction()`, and the version
+  chains (`ACTOR_MIGRATION_CHAINS`, `ITEM_MIGRATION_CHAINS`, `migrateDocument`).
+- `MigrateStoredActors.js` — the stored-actor pass: `storedActorNeedsMigration(source)`, `storedActorsNeedMigration()`,
+  `migrateStoredActors()`.
+- `StoredActorSources.js` — `walkStoredActorSources()`, the one walker over every stored actor
+  (`STORED_ACTOR_LOCATIONS`, `PACK_PROJECTION_FIELDS`), and the write targets its sources open.
+- `ConvertEffectItemsToActiveEffects.js` — legacy effect Items → `effect` Active Effects (`buildEffectData`,
+  `needsEffectItemConversion`, `convertStoredActor`).
+- `SyncConditionEffects.js` — condition effects → their definitions (`getConditionEffectUpdate(s)`,
+  `syncStoredActorConditions`).
+- `actor/`, `item/` — the per-type version-chain migration arrays (`ActorMigrations.js`, `WeaponMigrations.js`, …; all
+  empty today).
+- `ConfirmMigrateWorldDialog.js` — the Prompt-mode dialog; confirming calls `migrateWorld()`.
 
 **What triggers it — `onceReady` (src/hooks/OnceReady.js)**
-Registered with `Hooks.once('ready', onceReady)` in `src/index.js`. On the `ready` hook, for the GM only:
-1. It first `await`s `convertEffectItemsToActiveEffects()` unconditionally — the one-shot effect converter always
-   runs on load, independent of migration mode and the version chain (the converter self-guards on GM and is
-   idempotent).
-2. It then reads the `titan.migrationMode` system setting and gates only the version chain:
-   - `'prompt'` mode AND `worldNeedsMigration()` is `true` → renders a `ConfirmMigrateWorldDialog` which calls
-     `migrateWorld()` on GM confirmation (deferring the version chain to the prompt).
-   - Otherwise (`'automatic'` mode, or `'prompt'` with no pending version migration) → awaits `migrateWorld()`
-     directly.
+Registered with `Hooks.once('ready', onceReady)` in `src/index.js`. Only the active GM's client migrates
+(`game.users.activeGM?.isSelf`: one GM, however many are connected). It awaits
+`resolveMigrationAction(game.settings.get('titan', 'migrationMode'), worldNeedsMigration)`:
+- `'disabled'` → `'none'` before any scan: nothing is read or written.
+- `'prompt'` (the default) → scans; when anything needs migration, renders `ConfirmMigrateWorldDialog`, whose confirm
+  calls `migrateWorld()`. Nothing is written before the confirmation; the dialog returns on each GM load until the GM
+  confirms.
+- `'automatic'` → scans; when anything needs migration, awaits `migrateWorld()`.
+A failure anywhere in that attempt is reported (`error`) and never stops the load. Every client then registers the
+`hotbarDrop` hook and builds the Player HUD (`game.titan.playerHud`); on the active GM's client that happens after the
+migration attempt, so e2e specs wait for `game.titan.playerHud` as the "boot migration finished" signal.
 
-**Effect Item → Active Effect conversion — `convertEffectItemsToActiveEffects`**
-GM-only. Iterates `game.actors` and the actors of unlinked tokens across `game.scenes`, calling `convertActor` on
-each. For each `effect`-type Item, `convertActor` builds AE creation data via `buildEffectData` (native
-`name`/`img`/`description`, `disabled` mapped as `duration.type === 'permanent' ? !active : false`, deep-cloned
-`system.rulesElement`/`duration`/`check`/`customTrait`); it creates the replacement AEs first, then batch-deletes the
-source Items, then batch-deletes any stale cosmetic "mirror" AEs (base subtype, `flags.titan.type === 'effect'`) last
-(create-before-delete, so no effect data is lost if creation fails). The migrated `duration.initiative` is carried
-through, so `TitanActiveEffect._preCreate` does not override combat initiative.
-`buildEffectData` does NOT set `showIcon` — `TitanActiveEffect._preCreate` seeds it (the Visual Active Effects
-flag is gone entirely). Each actor's
-conversion is wrapped in its own try/catch (`convertActorIsolated`), so a failure on one actor is logged and the
-remaining actors still process. Idempotent once no `effect` Items remain.
-Discovery reads raw `actor._source.items` (NOT `actor.items`): the
-`effect` subtype is unregistered, so legacy items are invalid documents excluded from collection iteration but
-present in raw source and deletable by id. Replacement AEs are stamped `flags.titan.convertedFromItem = <item _id>`;
-creation skips already-stamped sources AND deletion is stamp-verified (a source is deleted only when its replacement
-verifiably exists — a pre-existing stamp or a document returned by the create call), so an interrupted or
-hook-vetoed conversion finishes cleanly on a later load instead of duplicating or losing effects. `buildEffectData`
-normalizes the uncast raw `active` value (template-era source persisted strings). World Actor compendium packs are
-also converted (`convertWorldActorPacks` → `convertPack`): index-gated via `pack.getIndex({ fields: ['items'] })` —
-a summary projection (`compendiumIndexFields` + `_id` per item, no `system`, no document construction for clean
-packs) that the client index retains for the session; locked packs are unlocked and their lock state restored in a
-`finally` (a restore failure logs its own pack-naming error and never masks a conversion error), per-actor and
-per-pack failures are isolated. Module/system packs are never touched. The conversion load emits two expected
-red-error classes per legacy item (invalid-doc init + temp-doc `Failed data preparation` during deletion); the
-following load is silent.
+**The scan — `worldNeedsMigration()`**
+True when any world Actor or Item (items embedded in actors included) is behind its version chain, or
+`storedActorsNeedMigration()` finds a stored actor needing the stored-actor pass (it stops at the first). A stored actor
+needs it when it holds, itself: a legacy `effect`-subtype Item; or a `condition` effect whose `system.rulesElement`
+differs from its definition (sorted-key JSON, `toCanonicalJson`) or that stores `flags.titan.description`. ActorDelta
+tombstones are skipped. `migrateWorld()` scans again itself: Prompt calls it later, after the world may have changed.
+
+**Base-type Active Effects are not handled.** `OnceInit` registers only the `effect` and `condition` Active Effect
+types (`CONFIG.ActiveEffect.dataModels`, replacing core's `base`), so the client cannot construct a base-type effect:
+creating one silently creates nothing, a world actor holding one stops the world from loading, and a packed one loads
+as an invalid document that cannot be deleted (OPEN_BUGS #92). By user decision the migration has no code for them
+(stale "mirror" copies of legacy effect Items and pre-subtype base-type conditions are removed from the user's worlds
+by a one-off cleanup outside the code), and no test seeds one.
+
+**Stored actors — `walkStoredActorSources()`**
+An async generator yielding one `StoredActorSource` (`{ location, name, items, effects, open }`) per stored actor, in
+`STORED_ACTOR_LOCATIONS` order (a unit test pins the list): `worldActor`; `sceneToken` (unlinked tokens on world scenes
+whose base actor exists, read from `token._source.delta` — an inherited effect is the base actor's and migrates there,
+so a token never gains a copy of one); `actorPack`; `scenePackToken` (unlinked tokens whose base world actor exists);
+`adventureActor`; `adventureSceneToken`. Only world-package packs are read. The scan reads stored data only —
+`actor._source`, a token's stored delta, and each pack's server projection (`PACK_PROJECTION_FIELDS`, read with
+`documentClass.database.get(documentClass, { index: true, indexFields, pack, query: {} })`, which loads no document).
+`CompendiumCollection#getIndex` is not used: its cached index re-indexes a loaded document through `getProperty`,
+which cannot read a dotted field through an embedded array. The server keeps a projected embedded array whole and
+expands a projected Scene token fully, delta included; an Adventure's `actors`/`scenes` are inline data, read whole
+(all verified live by `tests/e2e/condition-migration.spec.js`). `source.open()` resolves a `StoredActorTarget` —
+`readItems`/`readEffects` (what the actor holds itself), `readHeldEffects` (every effect it has, an unlinked token's
+inherited ones included), `createEffects`, `updateEffects`, `deleteItems` (each resolves what it changed) — or null
+when nothing is left to write to. Opening a packed source unlocks its locked pack, logging `Unlocked world pack
+"<label>" to migrate it.`; a scan that writes nothing never touches a lock, and the walk locks the pack again when it
+leaves it (also when its consumer stops early), reporting a restore failure without throwing. A projection that fails
+is reported and the walk goes on. World actors, tokens, and packed actors and scenes are written through their
+documents (a token through its synthetic actor, which writes its delta); an Adventure's actors and scenes are data
+(`SetField` of `EmbeddedDataField`), so its source target edits a working copy and persists the whole field with
+`adventure.update({ actors })` or `({ scenes })` after each write.
+
+**The stored-actor pass — `migrateStoredActors()`**
+For each source `storedActorNeedsMigration` flags: `open()`, then `convertStoredActor(target)`, then
+`syncStoredActorConditions(target)`. Each actor is isolated: a thrown step is reported with the actor's name. Resolves
+`{ updated, skipped, failed }` — `skipped` counts a source with nothing left to write to or whose writes changed
+nothing (a hook veto).
+
+**Legacy effect Items — `convertStoredActor(target)`**
+Converts the legacy `effect`-subtype Items the actor holds itself into `effect`-subtype Active Effects, from stored Item
+data: the subtype is unregistered, so legacy Items are invalid documents absent from `actor.items` but present in
+stored data and deletable by id (an invalid Item's deletion returns no document, so the document target reads it back
+from the stored items). `buildEffectData` maps native `name`/`img`/`description`, `disabled` as
+`duration.type === 'permanent' ? !active : false` (the raw `active` normalized; template-era source stored strings),
+and deep-cloned `system.rulesElement`/`duration`/`check`/`customTrait` (the migrated `duration.initiative` keeps
+`TitanActiveEffect._preCreate` from overriding combat initiative; `_preCreate` seeds `showIcon`), and stamps
+`flags.titan.convertedFromItem = <item _id>`. Create first, then delete the source Items. Creation skips a source whose
+stamp the actor already has (`readHeldEffects`, inherited included), and deletion is stamp-verified (a pre-existing
+stamp or one on an effect the create returned), so an interrupted or hook-vetoed conversion finishes on a later load
+without duplicating or losing effects. A load that converts emits two expected red-error classes per legacy Item
+(invalid-document init, and `Failed data preparation` on the temporary document during deletion); the next load is
+silent.
+
+**Condition sync — `syncStoredActorConditions(target)`**
+A condition Active Effect keeps the rules elements copied at creation; the sync keeps them on the definitions
+(`buildConditionDefinitions()`, matched by the effect's single status — `findConditionDefinition`, core's
+`toggleStatusEffect` rule; never the mutable `CONFIG.statusEffects`). One `updateEffects` call per actor rewrites each
+stale `system.rulesElement` and deletes a stored `flags.titan.description` with `_del` (v14's `ForcedDeletion`; the
+`-=` key form is deprecated). A synced actor has no work, so the pass is idempotent. A GM's hand edit of a condition
+effect's rules elements is replaced on the next migrating load.
+
+**`migrateWorld()`**
+Active GM only; returns when `worldNeedsMigration()` finds nothing; notifies `migrationStarted`; runs the stored-actor
+pass first (legacy effect Items become Active Effects before anything reads items), then the version chains (every
+world Actor, its Items, and every world Item through `migrateDocument`, each isolated — a failed migration step or
+write counts as a failure). With failures it warns `migrationFailedX%` (the count) instead of announcing
+`migrationComplete`.
 
 **Version comparison — `documentNeedsMigration`**
 Each document stores its current schema version in `system.documentVersion` (a numeric field defined in
 `TitanDataModel._defineDocumentSchema` using `createNumberField(this.latestVersion)`). The migration check
 compares `document.system.documentVersion` against the highest `version` number found across all levels of
 that document type's migration chain. If any document in `game.actors` or `game.items` (including embedded
-items on actors) is behind the chain's latest version, `worldNeedsMigration()` returns `true`.
+items on actors) is behind the chain's latest version, `worldNeedsMigration()` resolves `true`.
 
 **Migration chains**
 `ACTOR_MIGRATION_CHAINS` and `ITEM_MIGRATION_CHAINS` in `MigrateWorld.js` map actor/item type strings (e.g.
 `'player'`, `'weapon'`) to an ordered array of arrays (levels). For a player actor the chain is
 `[actorMigrations, characterMigrations, playerMigrations]`. For each pending version, `migrateDocument`
 runs the `migrate(document, updateData)` function from every matching entry across all levels in order
-(base → specific), accumulating changes in `updateData`. After all pending versions are applied without
-error, it calls `document.update({ 'system.documentVersion': migratedVersion, ...updateData })` in a
-single write.
+(base → specific), accumulating changes in `updateData`. After the pending versions are applied (stopping at the last
+fully completed one if a step throws), it calls `document.update({ 'system.documentVersion': migratedVersion,
+...updateData })` in a single write and resolves whether every pending version migrated.
 
 **Adding a migration step**
 Add a `{ version: N, migrate(doc, data) { ...; return data; } }` entry to the appropriate migration array

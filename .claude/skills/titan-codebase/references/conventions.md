@@ -552,6 +552,10 @@ and renders `LOCAL.<text>.text` to the user. Fixes: drop the redundant `localize
 not display text. A comprehensive e2e guard, `tests/e2e/localization.spec.js`, renders every actor/item/
 effect sheet and the effects sidebar and fails on any rendered text/tippy-tooltip containing `LOCAL.`;
 `tests/unit/LocalizationKeys.test.js` guards `lang/en.json` values against embedded `LOCAL.` keys.
+`tooltipAction` cleans every non-blank tooltip with `foundry.utils.cleanHTML` (the cleaner core's `TooltipManager`
+applies) before tippy renders it as HTML, when created and on update, so tooltip text built from document or chat
+data may carry user-written HTML. A report effect tag's tooltip comes from `buildEffectTagTooltip(effect, leadKey)`:
+each duration tag passes its own `effect.<type>.desc` lead key, a condition entry none.
 
 **Where mixins live:** `src/styles/Mixins/` contains per-domain files (see `architecture.md`,
 `src/styles/` section, for the full mixin file list).
@@ -688,7 +692,9 @@ static `actions` map. To refresh a dynamic control's icon/label after a state ch
 - **`TextEditor.enrichHTML` is always async in v14** — The `async: false` option was removed; the method is
   declared `static async` and always returns a `Promise<string>`. The canonical call pattern is
   `foundry.applications.ux.TextEditor.implementation.enrichHTML(value, { secrets: true })`. `RichText.svelte`
-  populates a `$state('')` variable from a `$effect` that awaits this promise (with a cancellation guard).
+  cleans its value with `foundry.utils.cleanHTML` first (`enrichHTML` assigns its input to a live element's
+  `innerHTML`, where an event-handler attribute fires), then populates a `$state('')` variable from a `$effect` that
+  awaits the promise (with a cancellation guard).
 
 - **`FilePicker` constructor** — use `new foundry.applications.apps.FilePicker.implementation({...})` (honors
   `CONFIG.ux` override); `new foundry.applications.apps.FilePicker({...})` is not the canonical v14 path.
@@ -754,9 +760,11 @@ schema golden-master suites) are the one place this pattern does not apply.
 - `globalThis.Hooks` — a `HooksMock` instance reinstalled fresh `beforeEach` test so hook registrations
   never leak across tests. Supports `on(name, fn)`, `off(name, fn)`, and `call(name, ...args)`.
 
-**Tooltip-bearing tags render fine under happy-dom** — components using the tippy `tooltipAction` (e.g.
-`TraitTag`) mount cleanly in Vitest's happy-dom environment; unit tests can seed real trait names (whose
-tags attach tippy tooltips) with no tippy or tooltip mocking required.
+**Tooltip-bearing tags under happy-dom** — components using the tippy `tooltipAction` (e.g. `TraitTag`) mount in
+Vitest's happy-dom environment with no tippy mocking. Non-blank tooltip content (and `RichText` values) pass through
+`foundry.utils.cleanHTML`, which only the Foundry client defines; the shared `tests/setup.js` defines a pass-through
+stand-in beside its other `foundry.utils` stand-ins. Sanitization itself is verified live
+(`tests/e2e/html-sanitization.spec.js`), never against that stand-in.
 
 **`data-testid` convention** — Stable E2E selectors are wired via `testId` props on shared dialog
 wrappers. `CheckDialogField` (`src/check/dialog/CheckDialogField.svelte`) forwards its `testId` prop
@@ -940,9 +948,10 @@ next. A test that clicks the SAME category the previous test left open TOGGLES i
 open flyout first (`Escape` when `player-hud-flyout` is present), as the `openCategory` helper in
 `player-hud-action-menu-layout.spec.js` does.
 
-**Mid-file `page.reload()` idiom** (first used in `tests/e2e/pack-conversion.spec.js`): `page.on('console')` and
-`attachPageErrors` listeners survive reloads (they attach to the Page object). Sequence: (1) PROVE the first
-boot's converter/async ready-work finished via a positive console-line poll BEFORE clearing the capture buffer
+**Mid-file `page.reload()` idiom** (`tests/e2e/pack-conversion.spec.js`, `tests/e2e/condition-migration.spec.js`):
+`page.on('console')` and `attachPageErrors` listeners survive reloads (they attach to the Page object). Sequence:
+(1) PROVE the first boot's ready work finished BEFORE clearing the capture buffer —
+`waitForFunction(() => !!game.titan?.playerHud)`, since the Player HUD is built after the GM's migration attempt
 (`game.ready` is set before the un-awaited ready hooks finish, so login resolving proves nothing about them);
 (2) clear the buffer; (3) `await page.reload()`; (4) `await page.waitForURL('**/game', { timeout: 15_000 })` so a
 lost session fails crisply; (5) `waitForFunction(() => globalThis.game?.ready === true && ..., null,

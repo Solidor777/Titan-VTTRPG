@@ -128,9 +128,11 @@
   condition list — every entry is `type: 'condition'`, and the six mechanically-active conditions (blinded,
   contaminated, prone, restrained, stunned, sleeping) carry a `system.rulesElement` array; `setupConditions()`
   consumes it, localize-sorts, enriches each with `flags`, and pushes to `CONFIG.statusEffects`.
-- `OnceReady.js` (Foundry `ready` hook), for the GM, unconditionally runs the one-shot effect-item→Active-Effect
-  converter, then runs the version-chain migration if needed (both from `src/helpers/migration/`); for all users it
-  registers the `hotbarDrop` sub-hook via `OnHotbarDrop.js`.
+- `OnceReady.js` (Foundry `ready` hook): on the active GM's client it resolves the Migration Mode
+  (`resolveMigrationAction`) and, as the mode allows, scans and runs `migrateWorld()` — the stored-actor pass (legacy
+  effect-Item conversion and condition sync over every stored actor), then the version chains — all from
+  `src/helpers/migration/`; for all users it registers the `hotbarDrop` sub-hook via `OnHotbarDrop.js` and builds the
+  Player HUD.
 - `OnCombatNextTurn.js` / `OnCombatPreviousTurn.js` delegate to actor system methods (`onTurnStart`, `onTurnEnd`,
   `onInitiativeAdvanced`) on `TitanActor`.
 - There is NO `renderChatMessageHTML` hook: every TITAN chat message (checks, item cards, reports, effect) is a
