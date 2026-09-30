@@ -113,27 +113,43 @@ test('the situational setting opens the dialog only for a check with a situation
    await expect(dialog).toHaveCount(0);
 });
 
-test('a stored Boolean is rewritten to its choice when the world loads', async ({ browser }) => {
-   /** @type {import('@playwright/test').Page} A second client whose storage holds a Boolean for the setting. */
-   const legacyPage = await browser.newPage();
-   try {
-      // Seed the Boolean before Foundry's scripts run on each navigation of this client.
-      await legacyPage.addInitScript(() => {
-         localStorage.setItem('titan.getCheckOptions', 'true');
-      });
-      await login(legacyPage, GM_USERS[1].name);
+/** @type {{stored: string, choice: string}[]} Each legacy Boolean's stored text and the choice it resolves to. */
+const LEGACY_BOOLEANS = [
+   {
+      stored: 'true',
+      choice: 'always',
+   },
+   {
+      stored: 'false',
+      choice: 'situational',
+   },
+];
 
-      /** @type {{raw: string|null, value: string}} The raw stored text and the setting's resolved value. */
-      const stored = await legacyPage.evaluate(() => ({
-         raw: localStorage.getItem('titan.getCheckOptions'),
-         value: game.settings.get('titan', 'getCheckOptions'),
-      }));
-      expect(stored).toEqual({
-         raw: '"always"',
-         value: 'always',
-      });
-   }
-   finally {
-      await legacyPage.close();
-   }
-});
+for (const { stored, choice } of LEGACY_BOOLEANS) {
+   test(`a stored Boolean ${stored} resolves to ${choice} and is rewritten on load`, async ({ browser }) => {
+      /** @type {import('@playwright/test').Page} A second client whose storage holds a Boolean for the setting. */
+      const legacyPage = await browser.newPage();
+      try {
+         // Seed the Boolean before Foundry's scripts run on each navigation of this client.
+         await legacyPage.addInitScript((text) => {
+            localStorage.setItem('titan.getCheckOptions', text);
+         }, stored);
+         await login(legacyPage, GM_USERS[1].name);
+
+         // The rewrite is not awaited by registration, so poll the stored text until it holds the choice.
+         await expect.poll(
+            () => legacyPage.evaluate(() => ({
+               raw: localStorage.getItem('titan.getCheckOptions'),
+               value: game.settings.get('titan', 'getCheckOptions'),
+            })),
+            { message: `the stored ${stored} is rewritten to "${choice}"` },
+         ).toEqual({
+            raw: JSON.stringify(choice),
+            value: choice,
+         });
+      }
+      finally {
+         await legacyPage.close();
+      }
+   });
+}
