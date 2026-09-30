@@ -10,9 +10,10 @@ import generateUUID from '~/helpers/utility-functions/GenerateUUID.js';
  * @property {string} key - The specific result of the condition for modifying the check (body, melee, etc.). For the
  * `situation` selector: the typed situation text for a user situation, or the canonical English string for a system
  * situation.
- * @property {string} [label] - For a system situation, its display text localized for this client; a user situation
- * has none and displays its key.
- * @property {string} [labelKey] - For a system situation, the localization key of its label.
+ * @property {string} [label] - For a system situation, its display text localized for this client (user situations
+ * have none and display their key instead).
+ * @property {string} [labelKey] - For a system situation, the localization key that the situational cache localizes
+ * per client. A system situation carries either `label` or `labelKey`, never both.
  * @property {string} skill - For the `situation` selector, the one Skill whose checks offer the modifier ('' = any).
  * The editor clears it on any other selector and on Resistance Checks, which use no Skill.
  * @property {number} value - The modifier's amount; for `advantage` its level (±1, ±2); unused by `automaticFailure`.

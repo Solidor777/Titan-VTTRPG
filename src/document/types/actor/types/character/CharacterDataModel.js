@@ -1519,13 +1519,16 @@ export default class CharacterDataModel extends TitanActorDataModel {
 
    /**
     * Caches the situational (`situation`-selector) Conditional Check Modifier Rules Elements apart from the summed
-    * modifiers, because they never apply automatically. Each cached entry is `{ checkType, key, label, [labelKey],
-    * modifierType, skill, source, value }`: `key` is the camel-case form of the element's key (the typed text, or a
-    * system situation's canonical string), `label` is the element's own `label` when it has one (an armor-trait
-    * situation, localized when built), else its `labelKey` localized on this client (a condition's situation, whose
-    * stored element carries no label), else its key, `labelKey` is present only for a system situation, `skill`
-    * narrows the entry to checks using one Skill (`''` = any; an element without a `skill` field is cached as `''`),
-    * and `source` names the owning item or effect.
+    * modifiers, because they never apply automatically.
+    * Each cached entry is `{ checkType, key, label, [labelKey], modifierType, skill, source, value }`.
+    * `key` is the camel-case form of the element's key (the typed text, or a system situation's canonical string).
+    * `label` is the element's own `label` when it has one (an armor-trait situation, localized when built), else its
+    * `labelKey` localized on this client (a condition's situation, whose stored element carries no label), else its
+    * key.
+    * `labelKey` is present only for a system situation.
+    * `skill` narrows the entry to checks using one Skill (`''` = any; an element without a `skill` field is cached as
+    * `''`).
+    * `source` names the owning item or effect.
     * Elements with a blank key are skipped.
     * @param {ConditionalCheckModifierElement[]} elements - The situational elements, each tagged with its `sourceName`.
     * @private

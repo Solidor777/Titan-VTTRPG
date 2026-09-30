@@ -241,10 +241,13 @@ describe('quarter-of-base condition penalties', () => {
 });
 
 describe('condition check rules', () => {
-   it('Frightened gives Attribute and Resistance checks Disadvantage', () => {
+   it('Frightened gives all five check types Disadvantage', () => {
       /** @type {object} The Frightened character. */
       const model = createConditionedCharacter(['frightened']);
+      expect(model.getAttackCheckMod('advantage', 'body', 'melee')).toBe(-1);
       expect(model.getAttributeCheckMod('advantage', 'body', 'athletics')).toBe(-1);
+      expect(model.getCastingCheckMod('advantage', 'mind', 'elementalism')).toBe(-1);
+      expect(model.getItemCheckMod('advantage', 'body', 'acrobatics')).toBe(-1);
       expect(model.getResistanceCheckMod('advantage', 'willpower')).toBe(-1);
    });
 

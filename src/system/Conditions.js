@@ -73,8 +73,7 @@ function createReflexesAutomaticFailure(conditionId) {
  * Builds the static list of TITAN condition definitions for CONFIG.statusEffects. Every condition is the
  * 'condition' Active Effect subtype; every condition with mechanics carries a `system.rulesElement` array
  * expressing its stat and check rules (applied through the shared rules-element pipeline). Dead and Unconscious
- * carry none. This function is
- * pure (no game/localization access) so it can be unit-tested.
+ * carry none. This function is pure (no game/localization access) so it can be unit-tested.
  * @returns {object[]} The condition definitions, each with id, name (localization key), img, type, and —
  * for mechanically-active conditions — system.rulesElement.
  */
