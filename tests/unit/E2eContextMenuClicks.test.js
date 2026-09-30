@@ -9,6 +9,11 @@ import path from 'node:path';
 // clicks the entry and waits for the menu to detach. This scan fails on any context-menu entry clicked directly
 // anywhere else under tests/e2e: a click whose receiver chain (or `page.click` selector) names a context-menu selector,
 // or starts from a variable or function that holds or returns one.
+//
+// Known limits of the scan: a locator passed into a helper as a function parameter is not traced back to its call
+// site, so a context-menu locator handed to such a helper and clicked there is not seen; and a regular-expression
+// literal containing a quote character is masked as the start of a string, which hides the text up to the next
+// matching quote from the scan.
 
 /** @type {string} The e2e test directory. */
 const E2E_DIRECTORY = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../e2e');
@@ -228,8 +233,9 @@ function findContextMenuNames(source, masked) {
    while (added) {
       added = false;
       for (const { name, text } of declarations) {
-         if (!names.has(name) && (CONTEXT_MENU_SELECTOR.test(text) ||
-            [...names].some((known) => new RegExp(`(?<![\\w$.])${known.replace(/\$/g, '\\$')}(?![\\w$])`).test(text)))) {
+         if (!names.has(name) && (CONTEXT_MENU_SELECTOR.test(text) || [...names].some((known) => {
+            return new RegExp(`(?<![\\w$.])${known.replace(/\$/g, '\\$')}(?![\\w$])`).test(text);
+         }))) {
             names.add(name);
             added = true;
          }
@@ -275,7 +281,9 @@ function findDirectContextMenuClicks(relativePath, source) {
       if (CONTEXT_MENU_SELECTOR.test(chain) || CONTEXT_MENU_SELECTOR.test(argument) || names.has(root?.[0])) {
          /** @type {number} The 1-based line the chain starts on. */
          const line = source.slice(0, start).split('\n').length;
-         found.push(`${relativePath}:${line} — ${source.slice(start, match.index + match[0].length).replace(/\s+/g, ' ')}`);
+         /** @type {string} The offending click, whitespace collapsed. */
+         const click = source.slice(start, match.index + match[0].length).replace(/\s+/g, ' ');
+         found.push(`${relativePath}:${line} — ${click}`);
       }
    }
    return found;
