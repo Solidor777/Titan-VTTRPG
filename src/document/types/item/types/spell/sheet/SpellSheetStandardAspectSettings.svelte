@@ -148,6 +148,7 @@
                      <div class="option">
                         <ToggleOptionButton
                            label={localize(option)}
+                           testId={`spell-aspect-option-${aspectOptions.template.label}-${option}`}
                            enabled={document.data.system.aspect[idx].option.indexOf(
                               option,
                            ) !== -1}

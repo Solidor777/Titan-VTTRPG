@@ -1,6 +1,9 @@
 ## Unreleased:
 Conditions follow the 2026-09-26 rules.
 - Multiply Base and Multiply Sum rules elements can round to the nearest whole number.
+- Blinded, Contaminated, Prone, Restrained, and Stunned lower their stats by a quarter of the base value, rounded up,
+  instead of by 1. The new Off-Balance condition lowers Accuracy, Awareness, Melee, and Defense the same way.
+- Spells can inflict Off-Balance (cost 3) and remove it (cost 2).
 
 ## Version 2.1.0:
 Advantage and Disadvantage, situational modifiers, and bug fixes.

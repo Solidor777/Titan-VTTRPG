@@ -240,20 +240,14 @@ test.describe('integration manifest drift guard', () => {
    // The system pushes its conditions onto CONFIG.statusEffects (OnceSetup) and registers its settings
    // (OnceInit). Assert the titan conditions are present and a representative set of settings is registered.
    test('system conditions and settings are registered', async () => {
-      // The condition ids the system pushes onto CONFIG.statusEffects.
+      // The condition ids the system pushes onto CONFIG.statusEffects, read from their single source so a condition
+      // added to buildConditionDefinitions is expected here too.
+      /** @type {string[]} The `id:` values of src/system/Conditions.js. */
       const expectedConditions = [
-         'blinded',
-         'contaminated',
-         'dead',
-         'deafened',
-         'frightened',
-         'incapacitated',
-         'prone',
-         'restrained',
-         'stunned',
-         'sleeping',
-         'unconscious',
-      ];
+         ...fs.readFileSync(fileURLToPath(new URL('../../src/system/Conditions.js', import.meta.url)), 'utf-8')
+            .matchAll(/^\s+id: '(\w+)',$/gm),
+      ].map((match) => match[1]);
+      expect(expectedConditions).toContain('offBalance');
       // A representative sample of registered setting keys (mix of scopes and value kinds).
       const expectedSettings = [
          'titan.migrationMode',
