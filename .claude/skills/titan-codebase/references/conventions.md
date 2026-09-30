@@ -122,7 +122,8 @@ table reads (plus `situation`), and `tests/unit/check/rebuild-check-options.test
 options (beyond `any`) to be exactly the check types whose `CHECK_TYPE_CONDITIONAL_SELECTORS` row has a cell of the
 check type's own name (attribute reads `any` only, so the editor does not list it), so a sixth check type fails until
 each list has it. A blank selector key never matches: the keyed cache builders (`_sortElementsByKey`) store nothing
-under it and the check-modifier lookup skips it, for a single key and inside an array of keys. `multiAttack` is a
+under it (a missing key is blank), the situational cache builder skips blank-key situations, and the check-modifier
+lookup skips it, for a single key and inside an array of keys. `multiAttack` is a
 Boolean from `createAttackCheckOptions` onward. Typed keys (free-typed in the
 editor) are grouped and matched in camel case; the one source is the frozen `TYPED_KEY_SELECTORS` map in the same
 module, keyed by operation: `conditionalCheckModifier` (`customTrait`, `spellTradition`, `situation`),

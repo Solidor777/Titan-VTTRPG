@@ -833,6 +833,7 @@ when fixed.
 - **Found:** 2026-09-29 by the plan A fix-wave verification.
 - **Fixed:** 2026-09-29 — a blank selector key never matches: the three keyed cache builders (roll messages,
   conditional rating modifiers, conditional check modifiers) group through `_sortElementsByKey` and store nothing under
-  a blank key, and the check modifier lookup skips a blank key (single and inside arrays). `multiAttack` is a Boolean
-  from `createAttackCheckOptions` and from the weapon-derived default. Gated by the blank-key and multiAttack cases in
-  `tests/unit/CharacterCheckModifiers.test.js`.
+  a blank key, and the check modifier lookup skips a blank key (single and inside arrays). The situational cache
+  builder skips blank-key situations too, and `_sortElementsByKey` treats a missing key as blank. `multiAttack` is a
+  Boolean from `createAttackCheckOptions` and from the weapon-derived default. Gated by the blank-key, whitespace-key,
+  and multiAttack cases in `tests/unit/CharacterCheckModifiers.test.js`.
