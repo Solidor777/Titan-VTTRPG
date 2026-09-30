@@ -837,3 +837,14 @@ when fixed.
   builder skips blank-key situations too, and `_sortElementsByKey` treats a missing key as blank. `multiAttack` is a
   Boolean from `createAttackCheckOptions` and from the weapon-derived default. Gated by the blank-key, whitespace-key,
   and multiAttack cases in `tests/unit/CharacterCheckModifiers.test.js`.
+
+### 73. camelize dropped every literal 0, so keys such as "Level 0 Ward" lost their digit
+
+- **What:** `camelize` (`src/helpers/utility-functions/Camelize.js`) removed a regex match when `+match === 0`,
+  which is true for the string `'0'` as well as for whitespace runs. A 0 at the start of a word was deleted and
+  `camelize('0')` returned an empty (blank) key. `_sortElementsByKey` carried a post-group blank check only to absorb
+  that case.
+- **Fixed:** 2026-09-29 - only whitespace matches are removed; every digit is kept. A string with any non-whitespace
+  character now camelizes to a non-blank string, so the post-group blank check in `_sortElementsByKey` is removed.
+  Every caller builds and looks up through `camelize` in memory; no camelized value is persisted to documents or
+  flags. Gated by `tests/unit/Camelize.test.js`.
