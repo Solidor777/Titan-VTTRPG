@@ -13,11 +13,11 @@
 /**
  * Selects the aspects that make up a Spell's total aspect cost, in display order: every enabled standard aspect, then
  * every custom aspect. Mirrors `calculateSpellAspectCosts`: a disabled standard aspect costs nothing and is omitted,
- * and custom aspects always count. The Spell sheet sidebar and Casting Check tab both list this selection so they
- * cannot drift from the total.
+ * and custom aspects always count. Every component that lists a Spell's aspects, or shows or hides a section by
+ * whether any exist, reads this selection instead of an aspect's `enabled` flag, so none can drift from the total.
  * @param {object[]} aspects - The Spell's standard aspects (`system.aspect`).
  * @param {object[]} customAspects - The Spell's custom aspects (`system.customAspect`).
- * @returns {DisplayedSpellAspect[]} The displayed aspects.
+ * @returns {DisplayedSpellAspect[]} One entry per aspect that counts toward the total cost, in display order.
  */
 export default function selectDisplayedSpellAspects(aspects, customAspects) {
    /** @type {DisplayedSpellAspect[]} The entries collected in display order. */

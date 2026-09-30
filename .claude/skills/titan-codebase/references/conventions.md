@@ -489,13 +489,21 @@ behavioural test still passes). `tests/unit/SheetStatePaths.test.js` derives eac
 following `.svelte` imports from its `*SheetShell.svelte` and walks every `$appState.a.b.c` (and
 `tabs[tabKey]`) path against that sheet's factory (`createCharacterSheetData`,
 `createRulesElementItemSheetData`, `createSpellSheetData`, `createWeaponSheetData`); a new shell must be
-added to its registry, and a state-reading component no registered sheet mounts fails the suite.
+added to its registry, and a state-reading component no registered sheet mounts fails the suite. The same
+file ties each registry factory to the sheet class: it finds the class importing the shell, follows the
+`extends` chain to the nearest `_createReactiveState` (which must be a single
+`return createXSheetState(this.document);`), and checks that store's initial value equals the registered
+factory's output; every `*SheetData.js` factory must yield a distinct state for its stand-in document.
 
 **Spell aspect display is one selector.** `selectDisplayedSpellAspects(aspects, customAspects)`
-(`spell/SelectDisplayedSpellAspects.js`) returns the enabled standard aspects then the custom aspects —
+(`spell/SelectDisplayedSpellAspects.js`) returns `DisplayedSpellAspect` entries (`key`, `isCustom`,
+`index`, `label`, `isLocalized`, `cost`, `aspect`): the enabled standard aspects then the custom aspects —
 the set that makes up `totalAspectCost`; the sheet sidebar, Casting Check tab panel, character-sheet spell
-row and spell chat card all use it. `tests/unit/SpellAspectSelectorUse.test.js` fails on a hand-rolled
-`aspect.filter(… .enabled)` in any `.svelte`. `aspect.enabled` and `aspect.cost` are derived in
+row and spell chat card all use it. `SpellAspectTags` takes that array unchanged (`aspects` prop) and
+orders the tags by approximate size (scaling, options, a non-`'none'` resistance check), stable for ties.
+`tests/unit/SpellAspectSelectorUse.test.js` fails when any `.svelte` mentioning aspects reads `enabled`
+(`.enabled`, `['enabled']`, or an `enabled` destructuring key); `SpellSheetEnableAspectButton`'s
+"aspect is on the spell" prop is therefore `isAdded`. `aspect.enabled` and `aspect.cost` are derived in
 `SpellDataModel#prepareDerivedData`, not stored.
 
 **AppV2 sheets must bind their own DragDrop** — ApplicationV2 wires no drag-drop handlers;

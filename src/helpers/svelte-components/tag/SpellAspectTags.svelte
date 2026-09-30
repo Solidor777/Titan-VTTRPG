@@ -5,13 +5,13 @@
 
    /**
     * @typedef {object} SpellAspectTagsProps
-    * @property {SpellAspect[]} [standardAspects] - Standard spell aspects to render as SpellAspectTag entries.
-    * @property {SpellCustomAspect[]} [customAspects] - Custom spell aspects to render as SpellCustomAspectTag entries.
+    * @property {DisplayedSpellAspect[]} [aspects] - The displayed Spell Aspects, as `selectDisplayedSpellAspects`
+    * returns them. Standard entries render as SpellAspectTag, custom entries as SpellCustomAspectTag.
     * @property {string} [testId] - Optional test identifier bound to `data-testid` on the root container element.
     */
 
    /** @type {SpellAspectTagsProps} */
-   let { standardAspects = void 0, customAspects = void 0, testId = void 0 } = $props();
+   let { aspects = void 0, testId = void 0 } = $props();
 
    /**
     * Calculates a number representing the approximate relative size of an Aspect Tag.
@@ -37,8 +37,8 @@
          retVal += aspect.option.length;
       }
 
-      // Add +2 if the Aspect has an opposed Resistance Check.
-      if (aspect.resistanceCheck) {
+      // Add +2 if the Aspect has an opposed Resistance Check; `'none'` renders no Resistance Check stat.
+      if (aspect.resistanceCheck && aspect.resistanceCheck !== 'none') {
          retVal += 2;
       }
 
@@ -46,46 +46,30 @@
    }
 
    /**
-    * @type {object[]}
-    * List of all Aspects with a mapping of their index in their corresponding array, sorted from smallest to largest.
+    * @type {DisplayedSpellAspect[]}
+    * The displayed aspects sorted by tag size from smallest to largest. `Array.prototype.sort` is stable, so aspects of
+    * equal size keep their display order.
     */
-   const aspectSizeMap = $derived(standardAspects
-      .map((aspect, idx) => {
-         return {
-            idx: idx,
-            standardAspect: true,
-         };
-      })
-      .concat(
-         customAspects.map((aspect, idx) => {
-            return {
-               idx: idx,
-               standardAspect: false,
-            };
-         }),
-      )
-      .sort((a, b) => sortAscending(
-         calculateAspectTagSize(a),
-         calculateAspectTagSize(b),
-      )));
+   const sortedAspects = $derived([...aspects].sort((a, b) => sortAscending(
+      calculateAspectTagSize(a.aspect),
+      calculateAspectTagSize(b.aspect),
+   )));
 </script>
 
 <!--Aspect Tag Container-->
 <div class="tag-container" data-testid={testId}>
 
    <!--Each Aspect-->
-   {#each aspectSizeMap as aspect}
-      {#if aspect?.standardAspect === true}
-         <!--Standard Aspect-->
-         <div class="tag">
-            <SpellAspectTag
-               aspect={standardAspects[aspect.idx]}
-            />
-         </div>
-      {:else}
+   {#each sortedAspects as entry}
+      {#if entry.isCustom}
          <!--Custom Aspect-->
          <div class="tag">
-            <SpellCustomAspectTag aspect={customAspects[aspect.idx]}/>
+            <SpellCustomAspectTag aspect={entry.aspect}/>
+         </div>
+      {:else}
+         <!--Standard Aspect-->
+         <div class="tag">
+            <SpellAspectTag aspect={entry.aspect}/>
          </div>
       {/if}
    {/each}

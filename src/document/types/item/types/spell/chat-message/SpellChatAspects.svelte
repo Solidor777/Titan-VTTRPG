@@ -12,13 +12,8 @@
 
    // item is a static chat-message system snapshot — it never changes after mount.
    // svelte-ignore state_referenced_locally
-   /** @type {object[]} The standard Spell Aspects that make up the spell's total cost. */
-   const displayedStandardAspects = selectDisplayedSpellAspects(item.aspect, item.customAspect)
-      .filter((entry) => !entry.isCustom)
-      .map((entry) => entry.aspect);
+   /** @type {DisplayedSpellAspect[]} The Spell Aspects that make up the spell's total cost, in display order. */
+   const displayedAspects = selectDisplayedSpellAspects(item.aspect, item.customAspect);
 </script>
 
-<SpellAspectTags
-   standardAspects={displayedStandardAspects}
-   customAspects={item.customAspect}
-/>
+<SpellAspectTags aspects={displayedAspects}/>

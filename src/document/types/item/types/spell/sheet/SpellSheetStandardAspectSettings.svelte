@@ -35,7 +35,7 @@
     */
    function toggleAspect(idx) {
       if (document.data?.isOwner) {
-         // If disabled, add the aspect.
+         // If the Spell does not include the aspect, add it.
          if (idx === -1) {
             document.data.system.addStandardAspect(aspectOptions.template);
          }
@@ -45,7 +45,7 @@
       }
    }
 
-   /** @type {number} The index of the aspect in the document's aspect array, or -1 if not enabled. */
+   /** @type {number} The index of the aspect in the document's aspect array, or -1 if the Spell does not include it. */
    const idx = $derived(
       document.data
          ? document.data.system.aspect.findIndex((aspect) => {
@@ -59,7 +59,7 @@
    <!--Header Button-->
    <SpellSheetEnableAspectButton
       cost={idx === -1 ? 0 : document.data.system.aspect[idx].cost}
-      enabled={idx !== -1}
+      isAdded={idx !== -1}
       label={localize(aspectOptions.template.label)}
       onclick={() => {
          toggleAspect(idx);

@@ -41,13 +41,8 @@
    /** @type {string} Rich-text description, read reactively through the embedded bridge. */
    const description = $derived(document.data?.system.description);
 
-   /** @type {object[]} The Spell Aspects that make up the spell's total cost, in display order. */
+   /** @type {DisplayedSpellAspect[]} The Spell Aspects that make up the spell's total cost, in display order. */
    const displayedAspects = $derived(selectDisplayedSpellAspects(aspect, customAspect));
-
-   /** @type {SpellAspect[]} The standard Spell Aspects that make up the spell's total cost. */
-   const displayedStandardAspects = $derived(
-      displayedAspects.filter((entry) => !entry.isCustom).map((entry) => entry.aspect),
-   );
 </script>
 
 <CharacterSheetItem bind:isExpanded>
@@ -81,10 +76,7 @@
    <!--Spell Aspects-->
    {#if displayedAspects.length > 0}
       <div class="section tags">
-         <SpellAspectTags
-            standardAspects={displayedStandardAspects}
-            customAspects={customAspect}
-         />
+         <SpellAspectTags aspects={displayedAspects}/>
       </div>
    {/if}
 

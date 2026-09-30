@@ -5,14 +5,15 @@
 
    /**
     * @typedef {object} SpellSheetEnableAspectButtonProps
-    * @property {boolean} [enabled] Value to toggle.
+    * @property {boolean} [isAdded] Whether the Spell includes the standard aspect; drives the checked icon. Distinct
+    * from an aspect's derived `enabled` flag.
     * @property {string} [label] Label to display.
     * @property {number} [cost] Cost of the aspect.
     * @property {Function | undefined} [onclick] Callback invoked when the button is clicked.
     */
 
    /** @type {SpellSheetEnableAspectButtonProps} */
-   const { enabled = undefined, label = undefined, cost = undefined, onclick = undefined } = $props();
+   const { isAdded = undefined, label = undefined, cost = undefined, onclick = undefined } = $props();
 </script>
 
 <DocumentOwnerButton {onclick}>
@@ -22,7 +23,7 @@
          {label}
          <!--Icon-->
          <div class="icon">
-            <i class={enabled ? CHECKED_ICON : UNCHECKED_ICON}></i>
+            <i class={isAdded ? CHECKED_ICON : UNCHECKED_ICON}></i>
          </div>
       </div>
 

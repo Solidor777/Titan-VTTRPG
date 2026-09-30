@@ -585,30 +585,48 @@ test.describe('component probe — SpellAspectTags', () => {
    });
 
    test('renders one tag per aspect entry and resolves testId', async () => {
+      /** @type {{ selector: string }} The mounted probe, addressed by its root selector. */
       const { selector } = await mountProbe(page, 'SpellAspectTags', {
          props: {
-            standardAspects: [
+            // Displayed-aspect entries in the shape selectDisplayedSpellAspects returns.
+            aspects: [
                {
+                  key: 'damage',
+                  isCustom: false,
+                  index: 0,
                   label: 'damage',
-                  initialValue: 2,
-                  scaling: false,
-                  resistanceCheck: '',
+                  isLocalized: true,
+                  cost: 1,
+                  aspect: {
+                     label: 'damage',
+                     initialValue: 2,
+                     scaling: false,
+                     resistanceCheck: '',
+                  },
                },
-            ],
-            customAspects: [
                {
+                  key: 'e2e00000-0000-4000-a000-000000000201',
+                  isCustom: true,
+                  index: 0,
                   label: 'Surge',
-                  isDamage: false,
-                  isHealing: false,
-                  initialValue: 1,
-                  scaling: false,
-                  resistanceCheck: '',
+                  isLocalized: false,
+                  cost: 1,
+                  aspect: {
+                     label: 'Surge',
+                     isDamage: false,
+                     isHealing: false,
+                     initialValue: 1,
+                     scaling: false,
+                     resistanceCheck: '',
+                     uuid: 'e2e00000-0000-4000-a000-000000000201',
+                  },
                },
             ],
             testId: 'probe-spell-aspect-tags',
          },
       });
       // SpellAspectTags renders its own .tag-container div; testId goes there.
+      /** @type {import('@playwright/test').Locator} The tag container carrying the testId. */
       const container = page.locator(`${selector} .tag-container[data-testid="probe-spell-aspect-tags"]`);
       await expect(container).toBeVisible();
       // Two entries — one standard, one custom — produce two direct-child .tag wrappers inside the container.
