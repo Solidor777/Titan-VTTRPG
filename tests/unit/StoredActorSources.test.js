@@ -94,10 +94,8 @@ function makeFakeActor({ effects = [], id, items = [], name }) {
          }),
       }))),
       deleteEmbeddedDocuments: vi.fn(async (embeddedName, ids) => {
-         /** @type {string} The stored collection the deletion removes from. */
-         const collection = embeddedName === 'Item' ? 'items' : 'effects';
-         actor._source[collection] = actor._source[collection].filter((entry) => !ids.includes(entry._id));
-         return embeddedName === 'Item' ? [] : ids.map((effectId) => ({ id: effectId }));
+         actor._source.items = actor._source.items.filter((entry) => !ids.includes(entry._id));
+         return [];
       }),
       effects: new FakeCollection(effects.map((effect) => ({
          id: effect._id,
@@ -647,10 +645,8 @@ describe('stored actor targets', () => {
                'system.rulesElement': [],
             },
          ]);
-         expect(await target.deleteEffects(['effect0'])).toEqual(['effect0']);
       });
       expect(worldActor.updateEmbeddedDocuments).toHaveBeenCalledTimes(1);
-      expect(worldActor.deleteEmbeddedDocuments).toHaveBeenCalledWith('ActiveEffect', ['effect0']);
    });
 
    it('reads an invalid Item\'s deletion back from the stored items', async () => {
@@ -695,10 +691,8 @@ describe('stored actor targets', () => {
                'system.rulesElement': [{ operation: 'flatModifier' }],
             },
          ])).toHaveLength(1);
-         expect(await target.deleteEffects(['newEffect'])).toEqual(['newEffect']);
       });
       expect(adventure.updates.map((data) => Object.keys(data))).toEqual([
-         ['actors'],
          ['actors'],
          ['actors'],
       ]);
@@ -706,7 +700,7 @@ describe('stored actor targets', () => {
          'adventureEffect',
          'newEffect',
       ]);
-      expect(adventure.updates[2].actors[0].effects).toEqual([
+      expect(adventure.updates[1].actors[0].effects).toEqual([
          {
             ...EFFECT,
             _id: 'adventureEffect',
@@ -717,6 +711,10 @@ describe('stored actor targets', () => {
                rulesElement: [{ operation: 'flatModifier' }],
             },
          },
+         {
+            _id: 'newEffect',
+            name: 'Created',
+         },
       ]);
    });
 
@@ -724,9 +722,21 @@ describe('stored actor targets', () => {
       const { adventure } = makeWorld();
       await walkAll((source) => source.location === 'adventureSceneToken', async (target) => {
          expect(target.readEffects()).toEqual([EFFECT]);
-         expect(await target.deleteEffects(['effect0'])).toEqual(['effect0']);
+         expect(await target.updateEffects([
+            {
+               _id: 'effect0',
+               'system.rulesElement': [{ operation: 'flatModifier' }],
+            },
+         ])).toHaveLength(1);
       });
       expect(adventure.updates).toHaveLength(1);
-      expect(adventure.updates[0].scenes[0].tokens[0].delta.effects).toEqual([]);
+      expect(adventure.updates[0].scenes[0].tokens[0].delta.effects).toEqual([
+         {
+            ...EFFECT,
+            system: {
+               rulesElement: [{ operation: 'flatModifier' }],
+            },
+         },
+      ]);
    });
 });

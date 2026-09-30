@@ -1,42 +1,22 @@
-import { describe, it, expect, beforeAll, afterAll, afterEach } from 'vitest';
-import convertEffectItemsToActiveEffects, {
+import { describe, it, expect, beforeAll, afterAll } from 'vitest';
+import {
    buildEffectData,
-   convertActor,
-   convertPack,
-   convertWorldActorPacks,
+   convertStoredActor,
+   needsEffectItemConversion,
 } from '~/helpers/migration/ConvertEffectItemsToActiveEffects.js';
 
-// The converter module imports only log/error at module scope, so a static import is safe. The shared test setup
-// (tests/setup.js) provides a minimal globalThis.foundry without utils.deepClone, and no ui global; this suite
-// installs scoped stand-ins for both (deepClone backs buildEffectData's field copies; ui.notifications.error backs
-// the error() helper exercised by the isolation tests) and removes them so later suites keep the shared minimal mock.
-
-/** @type {string[]} - Messages recorded by the ui.notifications.error stand-in (reset after each test). */
-const uiErrors = [];
+// The converter module imports nothing at module scope. The shared test setup (tests/setup.js) provides a minimal
+// globalThis.foundry without utils.deepClone; this suite installs a scoped stand-in (deepClone backs buildEffectData's
+// field copies) and removes it so later suites keep the shared minimal mock.
 
 beforeAll(() => {
    // Stand-in for foundry.utils.deepClone, used by buildEffectData to copy the four migrated system fields.
    globalThis.foundry.utils.deepClone = (value) => structuredClone(value);
-
-   // Recording stand-in for the ui global, used by the error() helper on the isolation paths.
-   globalThis.ui = {
-      notifications: {
-         error: (message) => {
-            uiErrors.push(message);
-         },
-      },
-   };
-});
-
-afterEach(() => {
-   // Reset the recorded error messages so assertions never see another test's errors.
-   uiErrors.length = 0;
 });
 
 afterAll(() => {
-   // Remove the stand-ins so later suites keep the shared minimal mock.
+   // Remove the stand-in so later suites keep the shared minimal mock.
    delete globalThis.foundry.utils.deepClone;
-   delete globalThis.ui;
 });
 
 /**
@@ -71,50 +51,40 @@ function makeLegacyItemSource(overrides = {}) {
    };
 }
 
-// Shared scaffolding for the convertActor and pack-path suites.
 /**
- * Builds a fake actor exposing only what convertActor reads: raw _source.items, the effects array, and recording
- * embedded-CRUD stubs. The create stub mirrors the real createEmbeddedDocuments contract by resolving to the array
- * of created documents (pseudo-docs carrying each payload's type and flags), so stamp verification sees them.
+ * Builds a fake stored-actor target exposing what convertStoredActor reads and recording its writes in order. The
+ * create stub resolves the created effects' data, as a StoredActorTarget does, so stamp verification sees them.
  * @param {object} [options] - The fake's contents.
- * @param {object[]} [options.items] - Raw item source entries for _source.items.
- * @param {object[]} [options.effects] - Active Effect stand-ins for the actor.effects array.
- * @returns {object} The fake actor; its calls array records [method, embeddedName, payload] triples in order, and
- * its create stub resolves to pseudo-docs mirroring the actually-created documents.
+ * @param {object[]} [options.items] - The Item data the actor holds itself.
+ * @param {object[]} [options.effects] - The Active Effect data the actor holds itself.
+ * @param {object[]} [options.heldEffects] - Every Active Effect's data the actor has; defaults to `effects`.
+ * @returns {object} The fake target; its calls array records [method, payload] pairs in order.
  */
-function makeFakeActor({ items = [], effects = [] } = {}) {
-   /** @type {Array<[string, string, *]>} - Recorded embedded-CRUD calls as [method, embeddedName, payload]. */
+function makeFakeTarget({ items = [], effects = [], heldEffects = effects } = {}) {
+   /** @type {Array<[string, *]>} Recorded writes as [method, payload]. */
    const calls = [];
-
    return {
-      name: 'Fake Actor',
-      id: 'fakeactor0000001',
-      _source: {
-         items,
-      },
-      effects,
       calls,
-      createEmbeddedDocuments: async (embeddedName, data) => {
+      createEffects: async (data) => {
          calls.push([
-            'create',
-            embeddedName,
+            'createEffects',
             data,
          ]);
-
-         // Resolve to pseudo-docs, mirroring the real API's array of actually-created documents.
          return data.map((entry, index) => ({
-            id: `createdfx${String(index).padStart(8, '0')}`,
-            type: entry.type,
+            _id: `createdfx${String(index).padStart(8, '0')}`,
             flags: entry.flags,
+            type: entry.type,
          }));
       },
-      deleteEmbeddedDocuments: async (embeddedName, ids) => {
+      deleteItems: async (ids) => {
          calls.push([
-            'delete',
-            embeddedName,
+            'deleteItems',
             ids,
          ]);
+         return ids;
       },
+      readHeldEffects: () => heldEffects,
+      readItems: () => items,
    };
 }
 
@@ -249,196 +219,136 @@ describe('buildEffectData (raw active normalization + provenance)', () => {
    });
 });
 
-describe('convertActor (raw _source discovery)', () => {
-   it('converts only legacy effect entries: creates replacement AEs, then deletes source items by _id', async () => {
-      /** @type {object} - A legacy effect item source expected to convert. */
+/**
+ * Builds a converted effect's stored data, stamped with its source Item.
+ * @param {string} itemId - The source Item id.
+ * @returns {object} The converted effect.
+ */
+function makeConverted(itemId) {
+   return {
+      _id: 'convertedfx00001',
+      flags: {
+         titan: {
+            convertedFromItem: itemId,
+         },
+      },
+      type: 'effect',
+   };
+}
+
+describe('needsEffectItemConversion', () => {
+   it('reports a legacy effect Item the actor holds itself', () => {
+      expect(needsEffectItemConversion([makeLegacyItemSource()])).toBe(true);
+   });
+
+   it('reports nothing for modern Items', () => {
+      expect(needsEffectItemConversion([
+         makeLegacyItemSource({
+            _id: 'weaponitem000001',
+            type: 'weapon',
+         }),
+      ])).toBe(false);
+   });
+});
+
+describe('convertStoredActor', () => {
+   it('converts only legacy effect entries: creates replacement effects, then deletes the source Items', async () => {
+      /** @type {object} A legacy effect Item expected to convert. */
       const legacy = makeLegacyItemSource();
 
-      /** @type {object} - A registered-subtype item source expected to be ignored. */
-      const weapon = makeLegacyItemSource({
-         _id: 'weaponitem000001',
-         type: 'weapon',
-      });
-
-      /** @type {object} - The fake actor carrying one legacy and one modern item. */
-      const actor = makeFakeActor({
+      /** @type {object} The fake target carrying one legacy and one modern Item. */
+      const target = makeFakeTarget({
          items: [
             legacy,
-            weapon,
+            makeLegacyItemSource({
+               _id: 'weaponitem000001',
+               type: 'weapon',
+            }),
          ],
       });
-
-      await convertActor(actor);
-
-      expect(actor.calls).toEqual([
+      expect(await convertStoredActor(target)).toBe(true);
+      expect(target.calls).toEqual([
          [
-            'create',
-            'ActiveEffect',
+            'createEffects',
             [buildEffectData(legacy)],
          ],
          [
-            'delete',
-            'Item',
+            'deleteItems',
             ['legacyitem000001'],
          ],
       ]);
    });
 
-   it('is a no-op when there are no legacy items and no stale mirrors', async () => {
-      /** @type {object} - A fake actor with only modern content. */
-      const actor = makeFakeActor({
+   it('writes nothing and reports no change when there are no legacy Items', async () => {
+      /** @type {object} A fake target with only modern content. */
+      const target = makeFakeTarget({
+         effects: [makeConverted('legacyitem000009')],
          items: [
             makeLegacyItemSource({
                _id: 'weaponitem000001',
                type: 'weapon',
             }),
          ],
-         effects: [
-            {
-               id: 'modernfx00000001',
-               type: 'effect',
-               flags: {},
-            },
-         ],
       });
-
-      await convertActor(actor);
-
-      expect(actor.calls).toEqual([]);
+      expect(await convertStoredActor(target)).toBe(false);
+      expect(target.calls).toEqual([]);
    });
 
-   it('deletes stale mirror AEs last, after item conversion', async () => {
-      /** @type {object} - A stale cosmetic mirror AE (base subtype, titan effect flag). */
-      const mirror = {
-         id: 'mirrorfx00000001',
-         type: 'base',
-         flags: {
-            titan: {
-               type: 'effect',
-            },
-         },
-      };
+   it('skips creating a replacement whose source already has a converted effect, but still deletes the Item',
+      async () => {
+         /** @type {object} The fake target stuck mid-conversion: replacement exists, legacy Item still present. */
+         const target = makeFakeTarget({
+            effects: [makeConverted('legacyitem000001')],
+            items: [makeLegacyItemSource()],
+         });
+         await convertStoredActor(target);
+         expect(target.calls).toEqual([
+            [
+               'deleteItems',
+               ['legacyitem000001'],
+            ],
+         ]);
+      });
 
-      /** @type {object} - The fake actor carrying one legacy item and one stale mirror. */
-      const actor = makeFakeActor({
+   it('counts a converted effect an unlinked token inherits as the replacement', async () => {
+      /** @type {object} A token target whose delta holds the legacy Item and whose base actor holds the replacement. */
+      const target = makeFakeTarget({
+         effects: [],
+         heldEffects: [makeConverted('legacyitem000001')],
          items: [makeLegacyItemSource()],
-         effects: [mirror],
       });
-
-      await convertActor(actor);
-
-      expect(actor.calls).toEqual([
+      await convertStoredActor(target);
+      expect(target.calls).toEqual([
          [
-            'create',
-            'ActiveEffect',
-            [buildEffectData(makeLegacyItemSource())],
-         ],
-         [
-            'delete',
-            'Item',
-            ['legacyitem000001'],
-         ],
-         [
-            'delete',
-            'ActiveEffect',
-            ['mirrorfx00000001'],
-         ],
-      ]);
-   });
-
-   it('removes stale mirrors even when no legacy items remain', async () => {
-      /** @type {object} - The fake actor carrying only a stale mirror. */
-      const actor = makeFakeActor({
-         effects: [
-            {
-               id: 'mirrorfx00000001',
-               type: 'base',
-               flags: {
-                  titan: {
-                     type: 'effect',
-                  },
-               },
-            },
-         ],
-      });
-
-      await convertActor(actor);
-
-      expect(actor.calls).toEqual([
-         [
-            'delete',
-            'ActiveEffect',
-            ['mirrorfx00000001'],
-         ],
-      ]);
-   });
-
-   it('skips creating a replacement whose source already has a converted AE, but still deletes the item', async () => {
-      /** @type {object} - A surviving converted AE stamped with the legacy source id (interrupted prior run). */
-      const survivor = {
-         id: 'convertedfx00001',
-         type: 'effect',
-         flags: {
-            titan: {
-               convertedFromItem: 'legacyitem000001',
-            },
-         },
-      };
-
-      /** @type {object} - The fake actor stuck mid-conversion: replacement exists, legacy item still present. */
-      const actor = makeFakeActor({
-         items: [makeLegacyItemSource()],
-         effects: [survivor],
-      });
-
-      await convertActor(actor);
-
-      expect(actor.calls).toEqual([
-         [
-            'delete',
-            'Item',
+            'deleteItems',
             ['legacyitem000001'],
          ],
       ]);
    });
 
    it('creates only the not-yet-converted sources when some replacements already exist', async () => {
-      /** @type {object} - A second legacy source with no surviving replacement. */
+      /** @type {object} A second legacy source with no surviving replacement. */
       const fresh = makeLegacyItemSource({
          _id: 'legacyitem000002',
          name: 'Second Legacy Effect',
       });
 
-      /** @type {object} - The fake actor with one converted and one unconverted legacy item. */
-      const actor = makeFakeActor({
+      /** @type {object} The fake target with one converted and one unconverted legacy Item. */
+      const target = makeFakeTarget({
+         effects: [makeConverted('legacyitem000001')],
          items: [
             makeLegacyItemSource(),
             fresh,
          ],
-         effects: [
-            {
-               id: 'convertedfx00001',
-               type: 'effect',
-               flags: {
-                  titan: {
-                     convertedFromItem: 'legacyitem000001',
-                  },
-               },
-            },
-         ],
       });
-
-      await convertActor(actor);
-
-      expect(actor.calls).toEqual([
+      await convertStoredActor(target);
+      expect(target.calls).toEqual([
          [
-            'create',
-            'ActiveEffect',
+            'createEffects',
             [buildEffectData(fresh)],
          ],
          [
-            'delete',
-            'Item',
+            'deleteItems',
             [
                'legacyitem000001',
                'legacyitem000002',
@@ -447,504 +357,62 @@ describe('convertActor (raw _source discovery)', () => {
       ]);
    });
 
-   it('retains a legacy source when its creation is vetoed (no verified replacement)', async () => {
-      /** @type {object} - The fake actor carrying one legacy source whose creation will be vetoed. */
-      const actor = makeFakeActor({
-         items: [makeLegacyItemSource()],
-      });
-
-      // Override the create stub with one that records but returns no documents, simulating a wholesale veto.
-      actor.createEmbeddedDocuments = async (embeddedName, data) => {
-         actor.calls.push([
-            'create',
-            embeddedName,
+   it('keeps a legacy source whose creation is vetoed and reports no change', async () => {
+      /** @type {object} The fake target carrying one legacy source whose creation will be vetoed. */
+      const target = makeFakeTarget({ items: [makeLegacyItemSource()] });
+      target.createEffects = async (data) => {
+         target.calls.push([
+            'createEffects',
             data,
          ]);
          return [];
       };
-
-      await convertActor(actor);
-
-      expect(actor.calls).toEqual([
+      expect(await convertStoredActor(target)).toBe(false);
+      expect(target.calls).toEqual([
          [
-            'create',
-            'ActiveEffect',
+            'createEffects',
             [buildEffectData(makeLegacyItemSource())],
          ],
       ]);
    });
 
-   it('deletes only the sources whose replacements were actually created (partial veto)', async () => {
-      /** @type {object} - A second fresh legacy source alongside the default one. */
+   it('deletes only the sources whose replacements were created (partial veto)', async () => {
+      /** @type {object} A second fresh legacy source alongside the default one. */
       const fresh = makeLegacyItemSource({
          _id: 'legacyitem000002',
          name: 'Second Legacy Effect',
       });
 
-      /** @type {object} - The fake actor carrying two fresh legacy sources. */
-      const actor = makeFakeActor({
+      /** @type {object} The fake target carrying two fresh legacy sources. */
+      const target = makeFakeTarget({
          items: [
             makeLegacyItemSource(),
             fresh,
          ],
       });
-
-      // Override the create stub with one that returns a pseudo-doc for ONLY the first payload entry, simulating a
-      // third-party veto of the second creation while keeping the stamp flags intact for verification.
-      actor.createEmbeddedDocuments = async (embeddedName, data) => {
-         actor.calls.push([
-            'create',
-            embeddedName,
+      target.createEffects = async (data) => {
+         target.calls.push([
+            'createEffects',
             data,
          ]);
-         return data.slice(0, 1).map((entry, index) => ({
-            id: `createdfx${String(index).padStart(8, '0')}`,
-            type: entry.type,
+         return data.slice(0, 1).map((entry) => ({
+            _id: 'createdfx00000000',
             flags: entry.flags,
+            type: entry.type,
          }));
       };
-
-      await convertActor(actor);
-
-      expect(actor.calls).toEqual([
+      await convertStoredActor(target);
+      expect(target.calls).toEqual([
          [
-            'create',
-            'ActiveEffect',
+            'createEffects',
             [
                buildEffectData(makeLegacyItemSource()),
                buildEffectData(fresh),
             ],
          ],
          [
-            'delete',
-            'Item',
+            'deleteItems',
             ['legacyitem000001'],
-         ],
-      ]);
-   });
-});
-
-/**
- * Builds a fake compendium pack exposing only what the pack path reads: metadata, the locked flag, and recording
- * getIndex/configure/getDocument stubs.
- * @param {object} [options] - The fake's contents.
- * @param {object[]} [options.indexEntries] - Projected index entries returned by getIndex.
- * @param {boolean} [options.locked] - The initial lock state.
- * @param {object} [options.documents] - Map of id → fake actor (or Error instance to throw) for getDocument.
- * @param {string} [options.type] - The pack's document type metadata.
- * @param {string} [options.packageType] - The pack's owning package type metadata.
- * @returns {object} The fake pack; its calls array records [method, payload] pairs in order.
- */
-function makeFakePack({
-   indexEntries = [],
-   locked = false,
-   documents = {},
-   type = 'Actor',
-   packageType = 'world',
-} = {}) {
-   /** @type {Array<[string, *]>} - Recorded pack-API calls as [method, payload] pairs. */
-   const calls = [];
-
-   /** @type {object} - The fake pack under construction (self-referenced by configure). */
-   const pack = {
-      metadata: {
-         type,
-         packageType,
-         label: 'Fake Pack',
-      },
-      locked,
-      calls,
-      getIndex: async ({ fields } = {}) => {
-         calls.push([
-            'getIndex',
-            fields,
-         ]);
-         return indexEntries;
-      },
-      configure: async ({ locked: nextLocked }) => {
-         calls.push([
-            'configure',
-            nextLocked,
-         ]);
-         pack.locked = nextLocked;
-      },
-      getDocument: async (id) => {
-         calls.push([
-            'getDocument',
-            id,
-         ]);
-
-         /** @type {object|Error} - The configured result for this id. */
-         const result = documents[id];
-         if (result instanceof Error) {
-            throw result;
-         }
-         return result;
-      },
-   };
-   return pack;
-}
-
-/**
- * Builds a pack-index entry whose items array uses the REAL server projection: each embedded item is filtered to
- * the Item compendiumIndexFields plus _id ({ _id, name, img, type, sort, folder }) — never a system bag.
- * @param {string} id - The entry's _id.
- * @param {string[]} itemTypes - The type string of each projected embedded item.
- * @returns {object} The index-entry fixture.
- */
-function makeIndexEntry(id, itemTypes) {
-   return {
-      _id: id,
-      name: 'Packed Actor',
-      items: itemTypes.map((itemType, index) => ({
-         _id: `projecteditem${String(index).padStart(3, '0')}`,
-         name: 'Projected Item',
-         img: 'icons/projected.webp',
-         type: itemType,
-         sort: 0,
-         folder: null,
-      })),
-   };
-}
-
-describe('convertPack (index gate + lock handling)', () => {
-   it('leaves clean packs completely untouched (no configure, no document loads)', async () => {
-      /** @type {object} - A locked pack whose only entry carries no legacy items. */
-      const pack = makeFakePack({
-         indexEntries: [makeIndexEntry('cleanactor000001', ['weapon'])],
-         locked: true,
-      });
-
-      await convertPack(pack);
-
-      expect(pack.calls).toEqual([
-         [
-            'getIndex',
-            ['items'],
-         ],
-      ]);
-   });
-
-   it('unlocks a locked needy pack, converts, and restores the lock in order', async () => {
-      /** @type {object} - The packed fake actor carrying one legacy item. */
-      const actor = makeFakeActor({
-         items: [makeLegacyItemSource()],
-      });
-
-      /** @type {object} - A locked pack with one needy entry. */
-      const pack = makeFakePack({
-         indexEntries: [makeIndexEntry('packedactor00001', ['effect'])],
-         locked: true,
-         documents: {
-            packedactor00001: actor,
-         },
-      });
-
-      await convertPack(pack);
-
-      expect(pack.calls).toEqual([
-         [
-            'getIndex',
-            ['items'],
-         ],
-         [
-            'configure',
-            false,
-         ],
-         [
-            'getDocument',
-            'packedactor00001',
-         ],
-         [
-            'configure',
-            true,
-         ],
-      ]);
-      expect(actor.calls).toEqual([
-         [
-            'create',
-            'ActiveEffect',
-            [buildEffectData(makeLegacyItemSource())],
-         ],
-         [
-            'delete',
-            'Item',
-            ['legacyitem000001'],
-         ],
-      ]);
-   });
-
-   it('never toggles the lock on an already-unlocked pack', async () => {
-      /** @type {object} - An unlocked pack with one needy entry. */
-      const pack = makeFakePack({
-         indexEntries: [makeIndexEntry('packedactor00001', ['effect'])],
-         locked: false,
-         documents: {
-            packedactor00001: makeFakeActor({
-               items: [makeLegacyItemSource()],
-            }),
-         },
-      });
-
-      await convertPack(pack);
-
-      expect(pack.calls.filter(([method]) => method === 'configure')).toEqual([]);
-   });
-
-   it('isolates a per-actor failure and still converts the rest of the pack, restoring the lock', async () => {
-      /** @type {object} - The healthy packed fake actor. */
-      const survivor = makeFakeActor({
-         items: [makeLegacyItemSource()],
-      });
-
-      /** @type {object} - A locked pack where the first entry's document load fails. */
-      const pack = makeFakePack({
-         indexEntries: [
-            makeIndexEntry('brokenactor00001', ['effect']),
-            makeIndexEntry('packedactor00001', ['effect']),
-         ],
-         locked: true,
-         documents: {
-            brokenactor00001: new Error('load failed'),
-            packedactor00001: survivor,
-         },
-      });
-
-      await convertPack(pack);
-
-      expect(survivor.calls.length).toBe(2);
-      expect(pack.calls.at(-1)).toEqual([
-         'configure',
-         true,
-      ]);
-   });
-
-   it('restores the lock in the finally path when the unlock itself fails wholesale', async () => {
-      /** @type {object} - A locked pack with one needy entry whose unlock call fails. */
-      const pack = makeFakePack({
-         indexEntries: [makeIndexEntry('packedactor00001', ['effect'])],
-         locked: true,
-         documents: {
-            packedactor00001: makeFakeActor({
-               items: [makeLegacyItemSource()],
-            }),
-         },
-      });
-
-      // Replace configure with a stub that fails the unlock (a wholesale failure outside per-actor isolation)
-      // while still recording and honoring the finally path's re-lock.
-      pack.configure = async ({ locked: nextLocked }) => {
-         pack.calls.push([
-            'configure',
-            nextLocked,
-         ]);
-         if (nextLocked === false) {
-            throw new Error('unlock failed');
-         }
-         pack.locked = nextLocked;
-      };
-
-      await expect(convertPack(pack)).rejects.toThrow('unlock failed');
-
-      expect(pack.calls.filter(([method]) => method === 'configure')).toEqual([
-         [
-            'configure',
-            false,
-         ],
-         [
-            'configure',
-            true,
-         ],
-      ]);
-   });
-
-   it('logs a restore-specific error and resolves when only the re-lock fails', async () => {
-      /** @type {object} - A locked pack with one needy entry whose re-lock call fails. */
-      const pack = makeFakePack({
-         indexEntries: [makeIndexEntry('packedactor00001', ['effect'])],
-         locked: true,
-         documents: {
-            packedactor00001: makeFakeActor({
-               items: [makeLegacyItemSource()],
-            }),
-         },
-      });
-
-      // Replace configure with a stub that succeeds on unlock but fails the finally path's re-lock.
-      pack.configure = async ({ locked: nextLocked }) => {
-         pack.calls.push([
-            'configure',
-            nextLocked,
-         ]);
-         if (nextLocked === true) {
-            throw new Error('re-lock failed');
-         }
-         pack.locked = nextLocked;
-      };
-
-      // The restore failure is caught inside the finally: conversion still resolves (it succeeded).
-      await convertPack(pack);
-
-      expect(uiErrors.some((message) => message.includes('Failed to restore the lock'))).toBe(true);
-   });
-
-   it('isolates a missing pack document and still restores the lock', async () => {
-      /** @type {object} - A locked pack whose only needy entry no longer resolves to a document. */
-      const pack = makeFakePack({
-         indexEntries: [makeIndexEntry('vanishedactor001', ['effect'])],
-         locked: true,
-      });
-
-      // The missing document fails its entry with a clear per-entry error; convertPack still resolves.
-      await convertPack(pack);
-
-      expect(pack.calls.at(-1)).toEqual([
-         'configure',
-         true,
-      ]);
-      expect(uiErrors.some((message) => message.includes('Failed to convert legacy effect Items for packed actor')))
-         .toBe(true);
-   });
-
-   it('surfaces the original unlock error even when the re-lock also fails', async () => {
-      /** @type {object} - A locked pack with one needy entry whose configure call fails in BOTH directions. */
-      const pack = makeFakePack({
-         indexEntries: [makeIndexEntry('packedactor00001', ['effect'])],
-         locked: true,
-         documents: {
-            packedactor00001: makeFakeActor({
-               items: [makeLegacyItemSource()],
-            }),
-         },
-      });
-
-      // Replace configure with a stub that records then throws on both the unlock and the finally path's re-lock.
-      pack.configure = async ({ locked: nextLocked }) => {
-         pack.calls.push([
-            'configure',
-            nextLocked,
-         ]);
-         throw new Error(nextLocked === false ? 'unlock failed' : 're-lock failed');
-      };
-
-      // The finally's inner catch swallows the re-lock failure, so the ORIGINAL unlock error must surface.
-      await expect(convertPack(pack)).rejects.toThrow('unlock failed');
-
-      expect(uiErrors.some((message) => message.includes('Failed to restore the lock'))).toBe(true);
-   });
-});
-
-describe('default export (wiring: the pack scan is reachable from the boot path)', () => {
-   afterEach(() => {
-      // Remove the game stand-in so later suites keep the shared minimal mock.
-      delete globalThis.game;
-   });
-
-   it('reaches the world Actor pack scan when run as the GM', async () => {
-      /** @type {object} - An eligible world Actor pack that must receive the index scan. */
-      const pack = makeFakePack({});
-
-      globalThis.game = {
-         user: {
-            isGM: true,
-         },
-         actors: [],
-         scenes: [],
-         packs: [pack],
-      };
-
-      await convertEffectItemsToActiveEffects();
-
-      expect(pack.calls).toEqual([
-         [
-            'getIndex',
-            ['items'],
-         ],
-      ]);
-   });
-
-   it('does nothing for non-GM users', async () => {
-      /** @type {object} - A pack that must never be scanned by a non-GM client. */
-      const pack = makeFakePack({});
-
-      globalThis.game = {
-         user: {
-            isGM: false,
-         },
-         actors: [],
-         scenes: [],
-         packs: [pack],
-      };
-
-      await convertEffectItemsToActiveEffects();
-
-      expect(pack.calls).toEqual([]);
-   });
-});
-
-describe('convertWorldActorPacks (pack filtering + isolation)', () => {
-   afterEach(() => {
-      // Remove the game stand-in so later suites keep the shared minimal mock.
-      delete globalThis.game;
-   });
-
-   it('processes only world-package Actor packs', async () => {
-      /** @type {object} - An eligible world Actor pack. */
-      const worldActorPack = makeFakePack({});
-
-      /** @type {object} - A module-owned Actor pack (ineligible). */
-      const moduleActorPack = makeFakePack({
-         packageType: 'module',
-      });
-
-      /** @type {object} - A world Item pack (ineligible). */
-      const worldItemPack = makeFakePack({
-         type: 'Item',
-      });
-
-      globalThis.game = {
-         packs: [
-            worldActorPack,
-            moduleActorPack,
-            worldItemPack,
-         ],
-      };
-
-      await convertWorldActorPacks();
-
-      expect(worldActorPack.calls).toEqual([
-         [
-            'getIndex',
-            ['items'],
-         ],
-      ]);
-      expect(moduleActorPack.calls).toEqual([]);
-      expect(worldItemPack.calls).toEqual([]);
-   });
-
-   it('isolates a pack failure and still processes the remaining packs', async () => {
-      /** @type {object} - A pack whose index read fails. */
-      const brokenPack = makeFakePack({});
-      brokenPack.getIndex = async () => {
-         throw new Error('index read failed');
-      };
-
-      /** @type {object} - A healthy pack processed after the failure. */
-      const healthyPack = makeFakePack({});
-
-      globalThis.game = {
-         packs: [
-            brokenPack,
-            healthyPack,
-         ],
-      };
-
-      await convertWorldActorPacks();
-
-      expect(healthyPack.calls).toEqual([
-         [
-            'getIndex',
-            ['items'],
          ],
       ]);
    });

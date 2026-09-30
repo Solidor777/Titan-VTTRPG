@@ -25,7 +25,6 @@ import log from '~/helpers/utility-functions/Log.js';
  * effects' data (a creation a hook vetoed is absent).
  * @property {(updates: object[]) => Promise<object[]>} updateEffects - Updates Active Effects; resolves the updated
  * effects' data.
- * @property {(ids: string[]) => Promise<string[]>} deleteEffects - Deletes Active Effects; resolves the deleted ids.
  * @property {(ids: string[]) => Promise<string[]>} deleteItems - Deletes Items; resolves the ids no longer stored.
  */
 
@@ -203,8 +202,6 @@ function createDocumentTarget(actor, readSource) {
    return {
       createEffects: async (data) => (await actor.createEmbeddedDocuments('ActiveEffect', data))
          .map((effect) => effect.toObject()),
-      deleteEffects: async (ids) => (await actor.deleteEmbeddedDocuments('ActiveEffect', ids))
-         .map((effect) => effect.id),
       deleteItems: async (ids) => {
          await actor.deleteEmbeddedDocuments('Item', ids);
 
@@ -242,13 +239,6 @@ function createSourceTarget(holder, persist) {
          holder.effects.push(...created);
          await persist();
          return created;
-      },
-      deleteEffects: async (ids) => {
-         /** @type {string[]} The ids of the effects removed. */
-         const deleted = holder.effects.filter((effect) => ids.includes(effect._id)).map((effect) => effect._id);
-         holder.effects = holder.effects.filter((effect) => !ids.includes(effect._id));
-         await persist();
-         return deleted;
       },
       deleteItems: async (ids) => {
          /** @type {string[]} The ids of the Items removed. */

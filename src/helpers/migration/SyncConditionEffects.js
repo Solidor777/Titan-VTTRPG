@@ -1,5 +1,3 @@
-import error from '~/helpers/utility-functions/Error.js';
-import log from '~/helpers/utility-functions/Log.js';
 import { findConditionDefinition } from '~/system/Conditions.js';
 
 /**
@@ -8,15 +6,6 @@ import { findConditionDefinition } from '~/system/Conditions.js';
  * stored ones differ, and `flags.titan.description` holds `_del`, deleting a stored description that nothing reads.
  * @typedef {object} ConditionEffectUpdate
  * @property {string} _id - The Active Effect's id; the other keys are dotted update paths, present only when needed.
- */
-
-/**
- * One actor's pending condition sync.
- * @typedef {object} ConditionEffectSync
- * @property {string} name - The world actor's or the token's name, for reports.
- * @property {() => TitanActor|null} getActor - Resolves the actor to update. For an unlinked token it reads
- * `token.actor`, which materializes a lazy synthetic actor, so it runs only for a token with a stale effect.
- * @property {ConditionEffectUpdate[]} updates - The updates for the actor's stale condition effects.
  */
 
 /**
@@ -46,8 +35,7 @@ export function toCanonicalJson(value) {
  * The deletion uses Foundry v14's `_del` (the global ForcedDeletion operator instance); the `-=` key form is
  * deprecated and logs a compatibility warning on every use. Once applied, the update leaves nothing to update, so the
  * sync stays idempotent.
- * @param {object} source - The Active Effect's stored data (an entry of `actor._source.effects` or of an unlinked
- * token's `_source.delta.effects`).
+ * @param {object} source - The Active Effect's stored data, as a stored actor holds it.
  * @returns {ConditionEffectUpdate|null} The update, or null when the effect applies no single system condition or its
  * rules elements are current and it stores no description.
  */
@@ -111,81 +99,17 @@ export function getConditionEffectUpdates(sources) {
 }
 
 /**
- * Yields the pending condition sync of every actor with a stale stored condition effect: each world actor (from its
- * stored effects), then each unlinked token on every scene (from the effects its delta manages). Effects a token
- * inherits from its base actor are the base actor's and are synced there, so a failed base-actor update never writes a
- * token copy of an inherited effect. A linked token's actor is its world actor, and a token whose base actor is gone
- * has no actor to update. Only stored data is scanned: `token.actor` is read through `getActor`, for a stale token
- * only.
- * @returns {Generator<ConditionEffectSync>} A generator over the stale actors' syncs.
- * @yields {ConditionEffectSync} The next stale actor's sync.
+ * Syncs one stored actor's stale condition effects to their definitions in one update: differing rules elements are
+ * rewritten and a stored description is deleted. Only the effects the actor holds itself are read, so an unlinked
+ * token never gains a copy of an effect it inherits. Idempotent: a synced effect produces no update.
+ * @param {StoredActorTarget} target - The stored actor, opened for writing.
+ * @returns {Promise<boolean>} Whether the update changed any effect.
  */
-export function* getConditionEffectSyncs() {
-   for (const actor of game.actors) {
-      /** @type {ConditionEffectUpdate[]} The world actor's updates. */
-      const updates = getConditionEffectUpdates(actor._source.effects ?? []);
-      if (updates.length > 0) {
-         yield {
-            getActor: () => actor,
-            name: actor.name,
-            updates,
-         };
-      }
+export async function syncStoredActorConditions(target) {
+   /** @type {ConditionEffectUpdate[]} The updates for the actor's stale condition effects. */
+   const updates = getConditionEffectUpdates(target.readEffects());
+   if (updates.length === 0) {
+      return false;
    }
-   for (const scene of game.scenes) {
-      for (const token of scene.tokens) {
-         if (token.actorLink || !token.baseActor) {
-            continue;
-         }
-
-         /** @type {ConditionEffectUpdate[]} The updates for the effects the token's delta manages. */
-         const updates = getConditionEffectUpdates(token._source.delta?.effects ?? []);
-         if (updates.length > 0) {
-            yield {
-               getActor: () => token.actor,
-               name: token.name,
-               updates,
-            };
-         }
-      }
-   }
-}
-
-/**
- * Checks whether any stored condition Active Effect in the world differs from its system definition or still stores a
- * description.
- * @returns {boolean} Whether any condition effect needs the sync.
- */
-export function conditionEffectsNeedSync() {
-   return !getConditionEffectSyncs().next().done;
-}
-
-/**
- * Syncs every stale condition Active Effect (world actors and the effects unlinked tokens hold themselves) to its
- * system definition: rewrites differing rules elements and deletes a stored description, in one update per actor.
- * Idempotent: a synced effect produces no update. GM-only. An actor whose update fails is reported and the rest still
- * sync.
- * @returns {Promise<number>} The number of actors updated.
- */
-export default async function syncConditionEffects() {
-   if (!game.user.isGM) {
-      return 0;
-   }
-
-   /** @type {number} The actors updated. */
-   let updated = 0;
-   for (const sync of [...getConditionEffectSyncs()]) {
-      try {
-         await sync.getActor().updateEmbeddedDocuments('ActiveEffect', sync.updates);
-         updated++;
-      }
-      catch (err) {
-         error(`Failed to sync the conditions of "${sync.name}".`, err);
-      }
-   }
-
-   if (updated > 0) {
-      log(`Synced the conditions of ${updated} actors.`);
-   }
-   return updated;
+   return (await target.updateEffects(updates)).length > 0;
 }

@@ -3,35 +3,34 @@ import { login } from './fixtures.js';
 import { attachPageErrors, closeAllApps } from './world.js';
 
 /**
- * Pack effect-item conversion lock (safe plumbing): the every-load converter scans world Actor packs through a raw
- * index projection and must leave a clean pack completely untouched — no unlock, no writes, no errors. Deep
- * conversion (legacy items present) cannot be seeded at runtime because the 'effect' Item subtype is unregistered
- * and server-side validation rejects creation; that path is unit-covered
- * (tests/unit/ConvertEffectItemsToActiveEffects.test.js) and manually verified against a pre-conversion world copy.
+ * The boot migration's world-pack gate: an Automatic GM load that finds a stale actor in a locked world Actor pack
+ * unlocks that pack to migrate it and locks it again, and leaves a clean locked world Actor pack untouched: never
+ * unlocked, never written. The stale actor carries a Blinded condition in its v2.1.0 form (flat -1 rules elements and
+ * a stored description); legacy effect Items cannot be seeded at runtime (the server rejects their unregistered
+ * `effect` subtype) and are unit-covered (tests/unit/ConvertEffectItemsToActiveEffects.test.js,
+ * tests/unit/StoredActorSources.test.js). Both packs are read from stored data (`_source`): an embedded collection
+ * omits invalid documents, so it cannot show what is stored.
  */
 
-/** @type {string} The fixture pack's collection id (world-package compendium). */
-const PACK_ID = 'world.e2e-pack-conversion';
+/** @type {{label: string, name: string}} The clean fixture pack. */
+const CLEAN_PACK = {
+   label: 'E2E Clean Pack',
+   name: 'e2e-clean-pack',
+};
 
-/** @type {string} The fixture pack's manifest name. */
-const PACK_NAME = 'e2e-pack-conversion';
-
-/** @type {string} The fixture pack's display label. */
-const PACK_LABEL = 'E2E Pack Conversion';
-
-/** @type {string} Name of the clean packed fixture actor. */
-const ACTOR_NAME = 'E2E Packed Clean Actor';
-
-/** @type {string} The converter's completion log line (positive signal that the boot-path conversion finished). */
-const CONVERTER_DONE_LINE = 'Conversion of legacy effect Items to Active Effects complete.';
+/** @type {{label: string, name: string}} The stale fixture pack. */
+const STALE_PACK = {
+   label: 'E2E Stale Pack',
+   name: 'e2e-stale-pack',
+};
 
 /** @type {import('@playwright/test').Page} The file-shared, logged-in page (one world boot per file). */
 let page;
-
 /** @type {string[]} Uncaught page errors collected during the current test (cleared each afterEach). */
 let errors;
-
-/** @type {string[]} Console message texts collected on the shared page (survives reloads; cleared before reload). */
+/** @type {string} The migration mode in force before this spec. */
+let originalMode;
+/** @type {string[]} Console message texts collected on the shared page (survives reloads). */
 const consoleLines = [];
 
 test.beforeAll(async ({ browser }) => {
@@ -41,6 +40,10 @@ test.beforeAll(async ({ browser }) => {
       consoleLines.push(message.text());
    });
    await login(page);
+
+   // The login's own migration attempt finished once the Player HUD is built.
+   await page.waitForFunction(() => !!game.titan?.playerHud, null, { timeout: 60_000 });
+   originalMode = await page.evaluate(() => game.settings.get('titan', 'migrationMode'));
 });
 
 test.afterEach(async () => {
@@ -50,131 +53,190 @@ test.afterEach(async () => {
 
 test.afterAll(async () => {
    try {
-      // Remove the fixture pack so reruns and other files see a clean world (unlock first — the test locks it).
-      await page?.evaluate(async (packId) => {
-         /** @type {CompendiumCollection|undefined} The fixture pack, if it survived to teardown. */
-         const pack = game?.packs?.get(packId);
-         if (pack) {
-            await pack.configure({ locked: false });
-            await pack.deleteCompendium();
+      await page?.evaluate(async ({ mode, names }) => {
+         await game.settings.set('titan', 'migrationMode', mode);
+         for (const name of names) {
+            /** @type {CompendiumCollection|undefined} A fixture pack, if it survived. */
+            const pack = game?.packs?.get(`world.${name}`);
+            if (pack) {
+               await pack.configure({ locked: false });
+               await pack.deleteCompendium();
+            }
          }
-      }, PACK_ID);
+      }, {
+         mode: originalMode,
+         names: [
+            CLEAN_PACK.name,
+            STALE_PACK.name,
+         ],
+      });
    }
    finally {
       await page?.close();
    }
 });
 
-test.describe('pack effect-item conversion (clean-pack safety)', () => {
-   test('boot-path converter leaves a clean locked world Actor pack untouched', async () => {
-      test.setTimeout(120_000);
+test('an Automatic load migrates a stale locked pack and never unlocks or writes a clean one', async () => {
+   test.setTimeout(120_000);
 
-      // Precondition: the TITAN system must have initialized before any pack manipulation.
-      /** @type {boolean} Whether the TITAN system finished initializing in the shared page. */
-      const systemReady = await page.evaluate(() => typeof game.titan !== 'undefined'
-         && !!CONFIG.Actor?.dataModels?.player);
-      expect(
-         systemReady,
-         `TITAN system failed to initialize before the pack walk. Captured page errors:\n${errors.join('\n')}`,
-      ).toBe(true);
-
-      // Remove any stale fixture pack from a prior run (unlocking it first), then seed a fresh locked pack
-      // with one clean actor.
-      await page.evaluate(async ({ packId, packName, packLabel, actorName }) => {
-         /** @type {CompendiumCollection|undefined} A stale fixture pack left by a prior run, if any. */
-         const stalePack = game.packs.get(packId);
-         if (stalePack) {
-            await stalePack.configure({ locked: false });
-            await stalePack.deleteCompendium();
+   /**
+    * The seeded actors, and how many stored effects of the stale one hold a description.
+    * @type {{cleanActorId: string, cleanModifiedTime: number, staleActorId: string, staleDescriptions: number}}
+    */
+   const seeded = await page.evaluate(async ({ clean, stale }) => {
+      for (const { name } of [
+         clean,
+         stale,
+      ]) {
+         /** @type {CompendiumCollection|undefined} A fixture pack a previous run left. */
+         const existing = game.packs.get(`world.${name}`);
+         if (existing) {
+            await existing.configure({ locked: false });
+            await existing.deleteCompendium();
          }
-
+      }
+      for (const { label, name } of [
+         clean,
+         stale,
+      ]) {
          await foundry.documents.collections.CompendiumCollection.createCompendium({
-            name: packName,
-            label: packLabel,
+            label,
+            name,
             type: 'Actor',
          });
+      }
 
-         // A clean actor with one modern item proves the index gate ignores non-legacy item types.
-         await Actor.create(
+      /** @type {TitanActor} A clean actor with one modern Item. */
+      const cleanActor = await Actor.create({
+         items: [
             {
-               name: actorName,
-               type: 'player',
-               items: [
-                  {
-                     name: 'E2E Packed Weapon',
-                     type: 'weapon',
-                  },
-               ],
+               name: 'E2E Packed Weapon',
+               type: 'weapon',
             },
-            { pack: packId },
-         );
+         ],
+         name: 'E2E Packed Clean Actor',
+         type: 'player',
+      }, { pack: `world.${clean.name}` });
 
-         await game.packs.get(packId).configure({ locked: true });
-      }, {
-         packId: PACK_ID,
-         packName: PACK_NAME,
-         packLabel: PACK_LABEL,
-         actorName: ACTOR_NAME,
-      });
-
-      // The first boot's converter is un-awaited by the ready gate; prove it finished BEFORE clearing, so any
-      // post-clear done line is unambiguously from the post-reload boot.
-      await expect.poll(() => consoleLines.some((line) => line.includes(CONVERTER_DONE_LINE))).toBe(true);
-
-      // Reload: the every-load converter (including the pack scan) runs again on the boot path. NOTE: this is the
-      // suite's FIRST mid-file reload of the shared page (a new harness idiom) — the waitForURL guard makes a lost
-      // session fail crisply instead of timing out opaquely downstream.
-      consoleLines.length = 0;
-      await page.reload();
-      await page.waitForURL('**/game', { timeout: 15_000 });
-      await page.waitForFunction(
-         () => globalThis.game?.ready === true && typeof game.titan !== 'undefined',
-         null,
-         { timeout: 60_000 },
-      );
-
-      // Positive completion signal first: the converter's finish line proves the boot-path conversion finished.
-      await expect
-         .poll(() => consoleLines.some((line) => line.includes(CONVERTER_DONE_LINE)), { timeout: 30_000 })
-         .toBe(true);
-
-      // Lock-state symmetry cannot distinguish "gate skipped" from "unlocked and re-locked", so assert the absence
-      // of every per-pack line for the fixture: no conversion line, no per-pack failure, no failed lock-restore.
-      // The failure-line check is deliberately world-wide (fail-conservative): any converter error anywhere fails
-      // this test.
-      expect(consoleLines.some((line) => line.includes(`in world pack "${PACK_LABEL}"`))).toBe(false);
-      expect(consoleLines.some((line) => line.includes('Failed to convert legacy effect Items'))).toBe(false);
-      expect(consoleLines.some((line) => line.includes('Failed to restore the lock'))).toBe(false);
-
-      // The clean pack survived untouched: still locked, one entry, one modern item, zero Active Effects.
-      /** @type {{locked: boolean, size: number, itemTypes: string[], effectCount: number}} Post-boot pack state. */
-      const state = await page.evaluate(async (packId) => {
-         /** @type {CompendiumCollection} The fixture pack after the reload boot. */
-         const pack = game.packs.get(packId);
-
-         /** @type {Collection<object>} The pack index with raw items and effects projected. */
-         const index = await pack.getIndex({
-            fields: [
-               'items',
-               'effects',
-            ],
-         });
-
-         /** @type {object|undefined} The single packed actor's index entry. */
-         const entry = index.contents[0];
-
-         return {
-            locked: pack.locked,
-            size: index.size,
-            itemTypes: entry?.items?.map((item) => item.type) ?? [],
-            effectCount: entry?.effects?.length ?? 0,
-         };
-      }, PACK_ID);
-
-      expect(state.locked).toBe(true);
-      expect(state.size).toBe(1);
-      expect(state.itemTypes).toEqual(['weapon']);
-      expect(state.effectCount).toBe(0);
-      expect(errors).toEqual([]);
+      /** @type {TitanActor} A stale actor holding a Blinded condition in its v2.1.0 form. */
+      const staleActor = await Actor.create({
+         effects: [
+            {
+               flags: {
+                  titan: {
+                     description: '<p>E2E legacy stored description</p>',
+                     type: 'condition',
+                  },
+               },
+               img: 'icons/svg/blind.svg',
+               name: 'Blinded',
+               statuses: ['blinded'],
+               system: {
+                  rulesElement: [
+                     'melee',
+                     'accuracy',
+                     'defense',
+                  ].map((key) => ({
+                     key,
+                     operation: 'flatModifier',
+                     selector: 'rating',
+                     uuid: `condition-blinded-${key}`,
+                     value: -1,
+                  })),
+               },
+               type: 'condition',
+            },
+         ],
+         name: 'E2E Packed Stale Actor',
+         type: 'npc',
+      }, { pack: `world.${stale.name}` });
+      for (const { name } of [
+         clean,
+         stale,
+      ]) {
+         await game.packs.get(`world.${name}`).configure({ locked: true });
+      }
+      await game.settings.set('titan', 'migrationMode', 'automatic');
+      return {
+         cleanActorId: cleanActor.id,
+         cleanModifiedTime: cleanActor._stats.modifiedTime,
+         staleActorId: staleActor.id,
+         staleDescriptions: staleActor._source.effects
+            .filter((effect) => effect.flags?.titan?.description !== undefined).length,
+      };
+   }, {
+      clean: CLEAN_PACK,
+      stale: STALE_PACK,
    });
+
+   expect(seeded.staleDescriptions).toBe(1);
+
+   consoleLines.length = 0;
+   await page.reload();
+   await page.waitForURL('**/game', { timeout: 15_000 });
+   await page.waitForFunction(
+      () => globalThis.game?.ready === true && !!game.titan?.playerHud,
+      null,
+      { timeout: 60_000 },
+   );
+
+   // Presence: the migration reached the world packs and unlocked the stale one to write it.
+   expect(consoleLines.some((line) => line.includes(`Unlocked world pack "${STALE_PACK.label}"`))).toBe(true);
+
+   /** @type {{clean: object, stale: object}} Both packs' state after the load. */
+   const state = await page.evaluate(async ({ cleanActorId, cleanName, staleActorId, staleName }) => {
+      /** @type {CompendiumCollection} The pack seeded with nothing to migrate. */
+      const cleanPack = game.packs.get(`world.${cleanName}`);
+
+      /** @type {CompendiumCollection} The pack seeded with a stale condition. */
+      const stalePack = game.packs.get(`world.${staleName}`);
+
+      /** @type {TitanActor} The clean pack's actor, loaded after the reload. */
+      const cleanActor = await cleanPack.getDocument(cleanActorId);
+
+      /** @type {TitanActor} The stale pack's actor, loaded after the reload. */
+      const staleActor = await stalePack.getDocument(staleActorId);
+
+      /** @type {object[]} The stale actor's stored Active Effect data. */
+      const staleEffects = staleActor._source.effects;
+
+      /** @type {object[]} Blinded's current rules elements. */
+      const blindedElements = CONFIG.statusEffects.find((condition) => condition.id === 'blinded').system.rulesElement;
+      return {
+         clean: {
+            effectCount: cleanActor._source.effects.length,
+            itemTypes: cleanActor._source.items.map((item) => item.type),
+            locked: cleanPack.locked,
+            modifiedTime: cleanActor._stats.modifiedTime,
+         },
+         stale: {
+            current: staleEffects.every((effect) => foundry.utils.equals(effect.system?.rulesElement ?? null,
+               blindedElements)),
+            descriptions: staleEffects.filter((effect) => effect.flags?.titan?.description !== undefined).length,
+            effectCount: staleEffects.length,
+            locked: stalePack.locked,
+         },
+      };
+   }, {
+      cleanActorId: seeded.cleanActorId,
+      cleanName: CLEAN_PACK.name,
+      staleActorId: seeded.staleActorId,
+      staleName: STALE_PACK.name,
+   });
+   expect(state.stale).toEqual({
+      current: true,
+      descriptions: 0,
+      effectCount: 1,
+      locked: true,
+   });
+
+   // Absence, after the presence above in the same load: the clean pack was never unlocked or written.
+   expect(consoleLines.some((line) => line.includes(`"${CLEAN_PACK.label}"`))).toBe(false);
+   expect(state.clean).toEqual({
+      effectCount: 0,
+      itemTypes: ['weapon'],
+      locked: true,
+      modifiedTime: seeded.cleanModifiedTime,
+   });
+   expect(errors).toEqual([]);
 });

@@ -1,27 +1,25 @@
 import onHotbarDrop from '~/hooks/OnHotbarDrop.js';
 import error from '~/helpers/utility-functions/Error.js';
 import { migrateWorld, resolveMigrationAction, worldNeedsMigration } from '~/helpers/migration/MigrateWorld.js';
-import convertEffectItemsToActiveEffects from '~/helpers/migration/ConvertEffectItemsToActiveEffects.js';
 import ConfirmMigrateWorldDialog from '~/helpers/migration/ConfirmMigrateWorldDialog.js';
 import TitanPlayerHud from '~/ui/player-hud/TitanPlayerHud.js';
 import PlayerHudSettingsApplication from '~/ui/player-hud/settings/PlayerHudSettingsApplication.js';
 
 /**
  * Attached to the Ready hook.
- * For the GM, runs the one-shot legacy-effect-to-Active-Effect converter unconditionally (it self-guards on GM and is
- * idempotent), then acts on any pending migration (version chains and condition-effect sync) as the migration mode
- * setting decides: prompt asks the GM through a dialog, automatic migrates now, disabled skips migration without
- * scanning the world. A failure anywhere in that migration attempt is reported and never stops the load. Then, for
- * every user, registers the hot-bar drop hook and builds the Player HUD; on the GM's client both happen after the
- * migration attempt, whether or not it succeeded.
+ * On the active GM's client (one GM migrates, however many are connected), acts on any pending migration as the
+ * migration mode setting decides: disabled scans and writes nothing; prompt scans the world and, when anything needs
+ * migration, shows a dialog that migrates only on confirmation; automatic scans and migrates now. The migration
+ * (migrateWorld) converts legacy effect Items and syncs condition effects in every stored actor, then runs the version
+ * chains. A failure anywhere in that attempt is reported and never stops the load. Then, for every user, registers the
+ * hot-bar drop hook and builds the Player HUD; on the active GM's client both happen after the migration attempt,
+ * whether or not it succeeded.
  * @returns {Promise<void>}
  */
 export default async function onceReady() {
-   if (game.user.isGM) {
+   if (game.users.activeGM?.isSelf) {
       try {
-         await convertEffectItemsToActiveEffects();
-
-         switch (resolveMigrationAction(game.settings.get('titan', 'migrationMode'), worldNeedsMigration)) {
+         switch (await resolveMigrationAction(game.settings.get('titan', 'migrationMode'), worldNeedsMigration)) {
             case 'prompt': {
                new ConfirmMigrateWorldDialog().render(true);
                break;

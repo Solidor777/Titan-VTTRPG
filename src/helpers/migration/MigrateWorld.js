@@ -13,7 +13,7 @@ import equipmentMigrations from '~/helpers/migration/item/EquipmentMigrations.js
 import shieldMigrations from '~/helpers/migration/item/ShieldMigrations.js';
 import spellMigrations from '~/helpers/migration/item/SpellMigrations.js';
 import weaponMigrations from '~/helpers/migration/item/WeaponMigrations.js';
-import syncConditionEffects, { conditionEffectsNeedSync } from '~/helpers/migration/SyncConditionEffects.js';
+import { migrateStoredActors, storedActorsNeedMigration } from '~/helpers/migration/MigrateStoredActors.js';
 
 /**
  * A migration entry describing how to upgrade a document's schema to a specific system version.
@@ -116,11 +116,10 @@ function documentNeedsMigration(document, chain) {
 }
 
 /**
- * Checks whether any Actor or Item in the world, including items embedded within actors, needs a version migration, or
- * any stored condition Active Effect's rules elements differ from its system definition.
- * @returns {boolean} Whether any document in the world needs migration.
+ * Checks whether any Actor or Item in the world, including items embedded within actors, is behind its version chain.
+ * @returns {boolean} Whether any document needs a version-chain migration.
  */
-export function worldNeedsMigration() {
+function versionChainsNeedMigration() {
    for (const actor of game.actors) {
       if (documentNeedsMigration(actor, ACTOR_MIGRATION_CHAINS[actor.type])) {
          return true;
@@ -137,9 +136,21 @@ export function worldNeedsMigration() {
          return true;
       }
    }
+   return false;
+}
 
-   // Condition effects hold copies of their definitions' rules elements, which a system update may change.
-   return conditionEffectsNeedSync();
+/**
+ * Checks whether the world needs migration: any Actor or Item (items embedded in actors included) behind its version
+ * chain, or any stored actor needing the stored-actor migration (a legacy effect Item to convert, or a condition
+ * effect whose rules elements differ from its definition or which still stores a description) in any location
+ * walkStoredActorSources reads.
+ * @returns {Promise<boolean>} Whether anything in the world needs migration.
+ */
+export async function worldNeedsMigration() {
+   if (versionChainsNeedMigration()) {
+      return true;
+   }
+   return storedActorsNeedMigration();
 }
 
 /**
@@ -148,11 +159,11 @@ export function worldNeedsMigration() {
  * last fully completed version if any migration throws an error.
  * @param {foundry.abstract.Document} document - The document to migrate.
  * @param {Array<TitanMigration[]> | undefined} chain - The ordered migration chain for this document type.
- * @returns {Promise<void>}
+ * @returns {Promise<boolean>} Whether every pending version migrated (true when none was pending).
  */
 async function migrateDocument(document, chain) {
    if (!chain) {
-      return;
+      return true;
    }
 
    /** @type {number} - The document's current schema version. */
@@ -161,7 +172,7 @@ async function migrateDocument(document, chain) {
    /** @type {number} - The highest version defined in the migration chain. */
    const latestVersion = getChainLatestVersion(chain);
    if (latestVersion === 0 || currentVersion >= latestVersion) {
-      return;
+      return true;
    }
 
    /** @type {number[]} - All unique versions in the chain newer than currentVersion, sorted ascending. */
@@ -175,10 +186,10 @@ async function migrateDocument(document, chain) {
    /** @type {number} - The version the document has been successfully migrated to so far. */
    let migratedVersion = currentVersion;
 
-   for (const version of pendingVersions) {
-      /** @type {boolean} - Whether any migration for the current version has failed. */
-      let versionFailed = false;
+   /** @type {boolean} - Whether a migration for some pending version failed. */
+   let versionFailed = false;
 
+   for (const version of pendingVersions) {
       for (const level of chain) {
          for (const migration of level.filter((m) => m.version === version)) {
             try {
@@ -210,40 +221,85 @@ async function migrateDocument(document, chain) {
          ...updateData,
       });
    }
+   return !versionFailed;
 }
 
 /**
- * Migrates all Actor and Item documents in the world to the latest schema version, including items embedded within
- * actors, then syncs the rules elements of every stored condition Active Effect (world actors and the effects unlinked
- * tokens hold themselves) to its system definition. Only runs for the GM. Skips documents that are already up to date.
- * The one-shot legacy-effect converter is run separately from the Ready hook.
+ * Migrates a single document through its version chain, isolating a failed write so the rest of the world still
+ * migrates. A failed migration step is reported by migrateDocument; a failed write is reported here.
+ * @param {foundry.abstract.Document} document - The document to migrate.
+ * @param {Array<TitanMigration[]> | undefined} chain - The ordered migration chain for this document type.
+ * @returns {Promise<boolean>} Whether the document migrated fully.
+ */
+async function migrateDocumentIsolated(document, chain) {
+   try {
+      return await migrateDocument(document, chain);
+   }
+   catch (err) {
+      error(`Failed to write the migration of ${document.documentName} "${document.name}" (${document.id}).`, err);
+      return false;
+   }
+}
+
+/**
+ * Migrates every world Actor, the Items embedded in each, and every world Item through their version chains.
+ * @returns {Promise<number>} The number of documents that did not migrate fully.
+ */
+async function migrateVersionChains() {
+   /** @type {number} The documents that did not migrate fully. */
+   let failed = 0;
+   for (const actor of game.actors) {
+      if (!(await migrateDocumentIsolated(actor, ACTOR_MIGRATION_CHAINS[actor.type]))) {
+         failed += 1;
+      }
+      for (const item of actor.items) {
+         if (!(await migrateDocumentIsolated(item, ITEM_MIGRATION_CHAINS[item.type]))) {
+            failed += 1;
+         }
+      }
+   }
+
+   for (const item of game.items) {
+      if (!(await migrateDocumentIsolated(item, ITEM_MIGRATION_CHAINS[item.type]))) {
+         failed += 1;
+      }
+   }
+   return failed;
+}
+
+/**
+ * Migrates the world. Runs only on the active GM's client (one GM migrates, however many are connected) and only when
+ * worldNeedsMigration reports work; it scans again itself because the Prompt dialog calls it after the world may have
+ * changed. The stored-actor migration runs first, so legacy effect Items are Active Effects before anything reads
+ * items: it walks every stored actor (world actors, unlinked tokens, and the actors and tokens in world Actor, Scene,
+ * and Adventure packs), converts legacy effect Items into Active Effects, then syncs each stale condition effect to
+ * its definition (rules elements rewritten, a stored description deleted). Then every
+ * world Actor, its Items, and every world Item migrate through their version chains. Each actor and document is
+ * isolated, and the final notification reports how many failed instead of announcing completion over failures.
  * @returns {Promise<void>}
  */
 export async function migrateWorld() {
-   if (!game.user.isGM) {
+   if (!game.users.activeGM?.isSelf) {
       return;
    }
 
-   if (!worldNeedsMigration()) {
+   if (!(await worldNeedsMigration())) {
       return;
    }
 
    log('Starting world migration.');
    ui.notifications.info(localize('migrationStarted'));
 
-   for (const actor of game.actors) {
-      await migrateDocument(actor, ACTOR_MIGRATION_CHAINS[actor.type]);
-      for (const item of actor.items) {
-         await migrateDocument(item, ITEM_MIGRATION_CHAINS[item.type]);
-      }
-   }
+   /** @type {StoredActorMigrationCounts} The stored-actor pass's outcome. */
+   const counts = await migrateStoredActors();
 
-   for (const item of game.items) {
-      await migrateDocument(item, ITEM_MIGRATION_CHAINS[item.type]);
+   /** @type {number} The stored actors and documents that did not migrate. */
+   const failed = counts.failed + (await migrateVersionChains());
+   if (failed > 0) {
+      log(`World migration finished; ${failed} documents failed to migrate.`);
+      ui.notifications.warn(localize('migrationFailedX%').replace('X%', failed));
+      return;
    }
-
-   // Rewrite stale condition effects from the current definitions.
-   await syncConditionEffects();
 
    log('World migration complete.');
    ui.notifications.info(localize('migrationComplete'));
@@ -254,12 +310,12 @@ export async function migrateWorld() {
  * confirmation dialog before migrating. Automatic: migrates immediately without prompting. Disabled: skips migration
  * entirely."). Disabled resolves before the world is scanned, so a Disabled load reads no document.
  * @param {string} mode - The `migrationMode` setting ('prompt', 'automatic', or 'disabled').
- * @param {() => boolean} needsMigration - Scans the world for a pending migration (worldNeedsMigration); called only
- * when the mode can act on its answer.
- * @returns {'none'|'migrate'|'prompt'} Nothing, migrate now, or ask the GM first.
+ * @param {() => Promise<boolean>} needsMigration - Scans the world for a pending migration (worldNeedsMigration);
+ * awaited only when the mode can act on its answer.
+ * @returns {Promise<'none'|'migrate'|'prompt'>} Nothing, migrate now, or ask the GM first.
  */
-export function resolveMigrationAction(mode, needsMigration) {
-   if (mode === 'disabled' || !needsMigration()) {
+export async function resolveMigrationAction(mode, needsMigration) {
+   if (mode === 'disabled' || !(await needsMigration())) {
       return 'none';
    }
    if (mode === 'automatic') {

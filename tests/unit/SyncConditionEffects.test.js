@@ -1,10 +1,9 @@
-import { describe, it, expect, beforeAll, afterAll, beforeEach, afterEach, vi } from 'vitest';
+import { describe, it, expect, beforeAll, afterAll } from 'vitest';
 import { buildConditionDefinitions } from '~/system/Conditions.js';
-import syncConditionEffects, {
-   conditionEffectsNeedSync,
-   getConditionEffectSyncs,
+import {
    getConditionEffectUpdate,
    getConditionEffectUpdates,
+   syncStoredActorConditions,
    toCanonicalJson,
 } from '~/helpers/migration/SyncConditionEffects.js';
 
@@ -110,8 +109,7 @@ const OLD_FORMS = {
 };
 
 /**
- * Builds a stored Active Effect source, as `actor._source.effects` and an unlinked token's `_source.delta.effects`
- * hold it.
+ * Builds a stored Active Effect source, as a stored actor holds it.
  * @param {object} data - The fields of the stored effect.
  * @param {string} [data.id] - The id stored on the effect; defaults to `effect0`.
  * @param {string} [data.type] - The effect subtype.
@@ -315,205 +313,60 @@ describe('getConditionEffectUpdates', () => {
    });
 });
 
-describe('world sync', () => {
-   /** @type {object} The world actor with a stored stale Blinded. */
-   let worldActor;
-   /** @type {object} The unlinked token whose delta holds its own stale Blinded, with its actor and read spy. */
-   let staleToken;
-   /** @type {object} The unlinked token holding no effect of its own (it inherits the world actor's Blinded). */
-   let cleanToken;
-   /** @type {object} The linked token of the world actor. */
-   let linkedToken;
-   /** @type {object} The unlinked token whose base actor was deleted, with a stale delta effect. */
-   let orphanToken;
+/**
+ * Builds an in-memory stored-actor target over a copy of the given effect data, recording each update.
+ * @param {object[]} effects - The effect data the actor holds.
+ * @param {object} [options] - How the target answers.
+ * @param {boolean} [options.refuseUpdates] - Whether updates resolve nothing, as a hook veto does.
+ * @returns {object} The target; `state.calls` records its writes and `state.updates` each update's payload.
+ */
+function makeMemoryTarget(effects, { refuseUpdates = false } = {}) {
+   /** @type {{calls: string[], effects: object[], updates: object[][]}} The target's state. */
+   const state = {
+      calls: [],
+      effects: structuredClone(effects),
+      updates: [],
+   };
+   return {
+      readEffects: () => state.effects,
+      state,
+      updateEffects: async (updates) => {
+         state.calls.push('update');
+         state.updates.push(updates);
+         return refuseUpdates ? [] : updates;
+      },
+   };
+}
 
-   /**
-    * Builds a fake world actor whose stored effects are the given sources.
-    * @param {string} name - The name the actor reports.
-    * @param {object[]} sources - The stored effect sources.
-    * @returns {object} The fake actor, whose `updateEmbeddedDocuments` is a spy.
-    */
-   function createWorldActor(name, sources) {
-      return {
-         _source: {
-            effects: sources,
-         },
-         name,
-         updateEmbeddedDocuments: vi.fn(async () => []),
-      };
-   }
-
-   /**
-    * Builds a fake token whose delta holds the given effect sources; reading its `actor` is recorded.
-    * @param {object} data - The fields of the fake token.
-    * @param {string} data.name - The name the token reports.
-    * @param {boolean} data.actorLink - Whether the token is linked to its base actor.
-    * @param {object|null} data.baseActor - The base world actor.
-    * @param {object[]} data.deltaEffects - The effect sources the token's delta manages.
-    * @returns {{token: object, actor: object, actorRead: Function}} The token, its actor, and the read spy.
-    */
-   function createToken({ name, actorLink, baseActor, deltaEffects }) {
-      /** @type {object} The token's actor, whose `updateEmbeddedDocuments` is a spy. */
-      const actor = {
-         name,
-         updateEmbeddedDocuments: vi.fn(async () => []),
-      };
-
-      /** @type {Function} Records each read of `token.actor` (a read materializes a lazy synthetic actor). */
-      const actorRead = vi.fn(() => actor);
-      return {
-         actor,
-         actorRead,
-         token: {
-            _source: {
-               delta: {
-                  effects: deltaEffects,
-               },
-            },
-            actorLink,
-            baseActor,
-            name,
-
-            /**
-             * The token's actor, read through the spy.
-             * @returns {object} The fake actor the token resolves to.
-             */
-            get actor() {
-               return actorRead();
-            },
-         },
-      };
-   }
-
-   beforeEach(() => {
-      worldActor = createWorldActor('World', [staleBlinded('effect1')]);
-      staleToken = createToken({
-         actorLink: false,
-         baseActor: worldActor,
-         deltaEffects: [staleBlinded('effect2')],
-         name: 'Stale Token',
-      });
-      cleanToken = createToken({
-         actorLink: false,
-         baseActor: worldActor,
-         deltaEffects: [],
-         name: 'Clean Token',
-      });
-      linkedToken = createToken({
-         actorLink: true,
-         baseActor: worldActor,
-         deltaEffects: [staleBlinded('effect3')],
-         name: 'Linked Token',
-      });
-      orphanToken = createToken({
-         actorLink: false,
-         baseActor: null,
-         deltaEffects: [staleBlinded('effect4')],
-         name: 'Orphan Token',
-      });
-      globalThis.ui = {
-         notifications: {
-            error: vi.fn(),
-         },
-      };
-      globalThis.game = {
-         actors: [worldActor],
-         scenes: [
-            {
-               tokens: [
-                  staleToken.token,
-                  cleanToken.token,
-                  linkedToken.token,
-                  orphanToken.token,
-               ],
-            },
-         ],
-         user: { isGM: true },
-      };
-   });
-
-   afterEach(() => {
-      delete globalThis.ui;
-      delete globalThis.game;
-   });
-
-   it('finds the stale world actor, then the unlinked token whose own delta effect is stale', () => {
-      expect([...getConditionEffectSyncs()].map((sync) => sync.name)).toEqual([
-         'World',
-         'Stale Token',
-      ]);
-   });
-
-   it('reads no token actor while scanning, and only the stale token\'s while syncing', async () => {
-      expect(conditionEffectsNeedSync()).toBe(true);
-      expect([...getConditionEffectSyncs()]).toHaveLength(2);
-      expect(staleToken.actorRead).not.toHaveBeenCalled();
-
-      await syncConditionEffects();
-      expect(staleToken.actorRead).toHaveBeenCalledTimes(1);
-      for (const token of [
-         cleanToken,
-         linkedToken,
-         orphanToken,
-      ]) {
-         expect(token.actorRead, token.token.name).not.toHaveBeenCalled();
-      }
-   });
-
-   it('reports nothing once no stored condition effect is stale', () => {
-      game.actors = [];
-      game.scenes = [];
-      expect(conditionEffectsNeedSync()).toBe(false);
-   });
-
-   it('reports and syncs an actor whose only stale condition still holds a stored description', async () => {
-      /** @type {object} A world actor whose Prone has current rules elements and a stored description. */
-      const flaggedActor = createWorldActor('Flagged', [
+describe('syncStoredActorConditions', () => {
+   it('updates the stale condition effects the actor holds itself, in one write', async () => {
+      /** @type {object} A target holding a stale Blinded and a current Prone. */
+      const target = makeMemoryTarget([
+         staleBlinded('effect1'),
          effectSource({
-            description: 'stale stored text',
-            id: 'effect5',
+            id: 'effect2',
             rulesElement: structuredClone(currentElements('prone')),
             statuses: ['prone'],
          }),
       ]);
-      game.actors = [flaggedActor];
-      game.scenes = [];
-      expect(conditionEffectsNeedSync()).toBe(true);
-      expect(await syncConditionEffects()).toBe(1);
-      expect(flaggedActor.updateEmbeddedDocuments).toHaveBeenCalledWith('ActiveEffect', [
-         {
-            _id: 'effect5',
-            'flags.titan.description': FORCED_DELETION,
-         },
-      ]);
+      expect(await syncStoredActorConditions(target)).toBe(true);
+      expect(target.state.updates).toEqual([[getConditionEffectUpdate(staleBlinded('effect1'))]]);
    });
 
-   it('updates each stale actor once with its effects\' updates', async () => {
-      expect(await syncConditionEffects()).toBe(2);
-      expect(worldActor.updateEmbeddedDocuments).toHaveBeenCalledWith('ActiveEffect', [
-         getConditionEffectUpdate(staleBlinded('effect1')),
+   it('writes nothing when every condition effect is current', async () => {
+      /** @type {object} A target holding only a current Prone. */
+      const target = makeMemoryTarget([
+         effectSource({
+            rulesElement: structuredClone(currentElements('prone')),
+            statuses: ['prone'],
+         }),
       ]);
-      expect(staleToken.actor.updateEmbeddedDocuments).toHaveBeenCalledWith('ActiveEffect', [
-         getConditionEffectUpdate(staleBlinded('effect2')),
-      ]);
+      expect(await syncStoredActorConditions(target)).toBe(false);
+      expect(target.state.calls).toEqual([]);
    });
 
-   it('writes no token copy of an inherited effect when the base actor\'s update fails', async () => {
-      /** @type {Function} The console.error spy, silencing the expected error output. */
-      const consoleError = vi.spyOn(console, 'error').mockImplementation(() => {});
-      worldActor.updateEmbeddedDocuments.mockRejectedValueOnce(new Error('write refused'));
-      expect(await syncConditionEffects()).toBe(1);
-      expect(ui.notifications.error).toHaveBeenCalledTimes(1);
-      expect(cleanToken.actorRead).not.toHaveBeenCalled();
-      expect(cleanToken.actor.updateEmbeddedDocuments).not.toHaveBeenCalled();
-      expect(staleToken.actor.updateEmbeddedDocuments).toHaveBeenCalledTimes(1);
-      consoleError.mockRestore();
-   });
-
-   it('does nothing for a non-GM', async () => {
-      game.user.isGM = false;
-      expect(await syncConditionEffects()).toBe(0);
-      expect(worldActor.updateEmbeddedDocuments).not.toHaveBeenCalled();
-      expect(staleToken.actorRead).not.toHaveBeenCalled();
+   it('reports no change when the update is refused', async () => {
+      expect(await syncStoredActorConditions(makeMemoryTarget([staleBlinded('effect1')], { refuseUpdates: true })))
+         .toBe(false);
    });
 });

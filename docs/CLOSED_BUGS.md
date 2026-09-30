@@ -849,6 +849,18 @@ when fixed.
   Every caller builds and looks up through `camelize` in memory; no camelized value is persisted to documents or
   flags. Gated by `tests/unit/Camelize.test.js`.
 
+### 74. Migration Mode "Disabled" still ran the world migration
+
+- **What:** `onceReady` ran `migrateWorld()` in the `else` branch of its prompt-mode test, so the "Disabled" choice
+  migrated exactly like "Automatic", contradicting the setting's hint ("Disabled: skips migration entirely"); the
+  legacy effect-Item converter also ran before the mode was read (see #82).
+- **Found:** 2026-09-29 while planning the condition-effect sync (spec B, conditions rework).
+- **Fixed:** 2026-09-29 (the version chain) and 2026-09-30 (the converter) — `resolveMigrationAction(mode,
+  needsMigration)` (`src/helpers/migration/MigrateWorld.js`) maps the mode to none / migrate / prompt before any scan,
+  and every migration step runs inside `migrateWorld` (#82). Gated by `tests/unit/MigrationAction.test.js`,
+  `tests/unit/OnceReady.test.js` (Disabled scans and converts nothing), and `tests/e2e/condition-migration.spec.js` (a
+  Disabled reload leaves every seeded stale condition untouched in every location).
+
 ### 75. Stat breakdowns never listed condition modifiers
 
 - **What:** `ModifiableStatValueLabel` and `createModifiableStatTooltip` took one prop per modifier bucket and had no
@@ -905,6 +917,42 @@ when fixed.
   `effect.<type>.desc` keys: every duration tag passes its own key and every report list renders through its own tag),
   `tests/e2e/component-probe-context.spec.js` (each tag's live tooltip leads with its own text), and
   `tests/e2e/condition-description.spec.js` (a condition tag's tooltip is its description alone).
+
+### 81. Legacy base-type condition effects were inert and never migrated
+
+- **What:** condition Active Effects created before conditions became the `condition` subtype are `base`-type effects
+  flagged `flags.titan.type: 'condition'`; the condition sync skipped them.
+- **Found:** 2026-09-30 by the Task 5 buddy check (plan B).
+- **Resolved:** won't fix in code (user decision 2026-09-30): base-type condition effects are removed from the user's
+  worlds by a one-off cleanup; TITAN does not load base-type Active Effects (see #92).
+
+### 82. The legacy effect-item converter ran on every GM load regardless of Migration Mode
+
+- **What:** `onceReady` ran `convertEffectItemsToActiveEffects()` before the Migration Mode was resolved, so "Disabled"
+  still scanned and could write world data, "Prompt" wrote before its dialog appeared, and every unlinked token's actor
+  was materialized on each load.
+- **Found:** 2026-09-30 by the Task 5 buddy check (plan B).
+- **Fixed:** 2026-09-30 — the converter runs only inside `migrateWorld`, per stored actor in `migrateStoredActors`
+  (`src/helpers/migration/MigrateStoredActors.js`) before the version chains, and `worldNeedsMigration` reports legacy
+  effect Items, so all three modes govern it; only the active GM migrates, a token's actor is read only to write it,
+  and the final notification counts failures. Gated by `tests/unit/OnceReady.test.js`,
+  `tests/unit/MigrateStoredActors.test.js`, `tests/unit/MigrateWorld.test.js`, `tests/e2e/condition-migration.spec.js`
+  (stale conditions survive Disabled and Prompt loads and are synced by Automatic), and
+  `tests/e2e/pack-conversion.spec.js`.
+
+### 83. Condition sync and effect-item converter missed actors stored in world Scene and Adventure packs
+
+- **What:** the condition sync covered world actors and scene tokens; the converter also covered world Actor packs.
+  Neither reached unlinked-token deltas in world Scene packs or the actors and scenes in world Adventure packs, and the
+  sync did not reach world Actor packs, so stored copies stayed stale and re-imported stale data.
+- **Found:** 2026-09-30 by the Task 5 buddy check (plan B).
+- **Fixed:** 2026-09-30 — `walkStoredActorSources` (`src/helpers/migration/StoredActorSources.js`) lists every stored
+  actor (world actors, unlinked world-scene tokens, world Actor packs, unlinked tokens in world Scene packs, and the
+  actors and unlinked scene tokens in world Adventure packs), reading packs through a server projection that loads no
+  document; the converter, the condition sync, and the migration scan all walk it, and a pack is unlocked only to write
+  and locked again. Gated by `tests/unit/StoredActorSources.test.js` (the location list is pinned and walked in order)
+  and `tests/e2e/condition-migration.spec.js` (every location, packs locked, migrates on an Automatic load and not
+  again on the next).
 
 ### 84. Report text reached tooltips and rich text as unsanitized HTML
 

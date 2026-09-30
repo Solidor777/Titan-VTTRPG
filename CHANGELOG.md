@@ -1,7 +1,8 @@
 ## Unreleased:
 Conditions follow the 2026-09-26 rules.
-**Back up your world before updating. The first GM login rewrites every existing condition on world actors and
-unlinked tokens to the new rules (as the Migration Mode setting allows).**
+**Back up your world before updating. The active GM's first login rewrites every existing condition on world actors,
+unlinked tokens, and the actors and tokens in the world's Actor, Scene, and Adventure compendium packs to the new rules
+(as the Migration Mode setting allows).**
 - Multiply Base and Multiply Sum rules elements can round to the nearest whole number.
 - Blinded, Contaminated, Prone, Restrained, and Stunned lower their stats by a quarter of the base value, rounded up,
   instead of by 1. The new Off-Balance condition lowers Accuracy, Awareness, Melee, and Defense the same way.
@@ -10,17 +11,20 @@ unlinked tokens to the new rules (as the Migration Mode setting allows).**
   abilities; skill Training and Expertise tooltips use the same breakdown.
 - Frightened gives Disadvantage on every check; Incapacitated and Restrained automatically fail Reflexes checks;
   Blinded and Deafened offer "Relies on Sight" / "Relies on Hearing" Automatic Failures on Perception checks.
-- Existing conditions update to the current rules through the world migration, which also clears the description text
-  older conditions stored, and a condition's description always shows the current text in the reader's language, in
-  the Player HUD and in turn-start reports.
+- Existing conditions update to the current rules through the world migration, in world actors, unlinked tokens, and
+  the world's Actor, Scene, and Adventure compendium packs, which also clears the description text older conditions
+  stored, and a condition's description always shows the current text in the reader's language, in the Player HUD and
+  in turn-start reports.
 - Turn-start reports list the actor's conditions even when it has no other effect. Report entries' tooltips show
   their text instead of an untranslated key, each effect's tooltip leads with its own duration (a condition's shows
   only its description), and turn-start effects show the Turn Start tag instead of the Turn End one.
 - Rules-element messages on turn-start and turn-end reports show their text (they rendered blank), and HTML in
   tooltips and rich text is cleaned before it displays, so text stored in a chat message cannot run script in other
   players' clients.
-- The Migration Mode setting's "Disabled" choice skips migration, as its description says, and a failed migration no
-  longer stops the Player HUD from loading.
+- The Migration Mode setting governs every migration step: "Disabled" skips all of it, as its description says,
+  including the conversion of legacy effect items, and "Prompt" changes nothing until the GM confirms. Only the active
+  GM migrates, a failed migration no longer stops the Player HUD from loading, and a migration with failures reports
+  how many documents failed instead of announcing completion.
 
 ## Version 2.1.0:
 Advantage and Disadvantage, situational modifiers, and bug fixes.

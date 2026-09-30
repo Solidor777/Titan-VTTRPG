@@ -446,6 +446,7 @@
       "metaphysics.desc.text": "<p><strong>Metaphysics</strong> measures your overall understanding of spiritual concepts and creatures.</p>",
       "metaphysics.text": "Metaphysics",
       "migrationComplete.text": "Titan world data migration complete.",
+      "migrationFailedX%.text": "Titan world data migration finished, but X% documents could not be migrated. The console lists them.",
       "migrationStarted.text": "Migrating Titan world data. Please do not close the game.",
       "minValue.text": "Min Value",
       "mind.desc.text": "<p><strong>Mind</strong> represents your intelligence, your awareness, and your ability to think on your feet. Characters with a high <strong>Mind</strong> are often inquisitive, quick witted, and adept at thinking their way around a problem.</p><p><strong>Mind</strong> affects your <strong>Accuracy</strong> (your ability with ranged weapons), your <strong>Initiative</strong> (how quickly your turn comes in combat), and your <strong>Awareness</strong> of your surroundings.</p><p><strong>Mind</strong> also greatly affects your <strong>Reflexes</strong> (your ability to duck, dodge, and avoid sudden danger) and slightly affects your <strong>Willpower</strong> (your ability to resist mental attacks).</p>",

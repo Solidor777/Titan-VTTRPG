@@ -23,14 +23,14 @@ describe('resolveMigrationAction', () => {
          false,
          'none',
       ],
-   ])('mode %s with pending migration %s resolves to %s', (mode, needsMigration, action) => {
-      expect(resolveMigrationAction(mode, () => needsMigration)).toBe(action);
+   ])('mode %s with pending migration %s resolves to %s', async (mode, needsMigration, action) => {
+      expect(await resolveMigrationAction(mode, async () => needsMigration)).toBe(action);
    });
 
-   it('Disabled resolves to none without scanning the world', () => {
+   it('Disabled resolves to none without scanning the world', async () => {
       /** @type {Function} The world scan, which Disabled must not run. */
-      const needsMigration = vi.fn(() => true);
-      expect(resolveMigrationAction('disabled', needsMigration)).toBe('none');
+      const needsMigration = vi.fn(async () => true);
+      expect(await resolveMigrationAction('disabled', needsMigration)).toBe('none');
       expect(needsMigration).not.toHaveBeenCalled();
    });
 });
