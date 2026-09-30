@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import path from 'node:path';
-import { CANONICAL_SITUATIONS } from '~/document/types/item/types/armor/ArmorTraitCheckModifiers.js';
+import { CANONICAL_SITUATIONS } from '~/system/CanonicalSituations.js';
 
 /** @type {string} This test file's directory. */
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
