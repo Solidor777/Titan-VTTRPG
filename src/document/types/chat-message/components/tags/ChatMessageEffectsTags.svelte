@@ -21,7 +21,7 @@
    {/if}
 
    <!--Permanent Effects-->
-   {#if document.data.system.effects.permanent}
+   {#if document.data.system.effects?.permanent}
       {#each document.data.system.effects.permanent as effect}
          <div class="effect">
             <PermanentEffectTag {effect}/>
@@ -30,7 +30,7 @@
    {/if}
 
    <!--Turn Start Effects-->
-   {#if document.data.system.effects.turnStart}
+   {#if document.data.system.effects?.turnStart}
       {#each document.data.system.effects.turnStart as effect}
          <div class="effect">
             <TurnEndEffectTag {effect}/>
@@ -39,7 +39,7 @@
    {/if}
 
    <!--Turn End Effects-->
-   {#if document.data.system.effects.turnEnd}
+   {#if document.data.system.effects?.turnEnd}
       {#each document.data.system.effects.turnEnd as effect}
          <div class="effect">
             <TurnEndEffectTag {effect}/>
@@ -48,7 +48,7 @@
    {/if}
 
    <!--Initiative Effects-->
-   {#if document.data.system.effects.initiative}
+   {#if document.data.system.effects?.initiative}
       {#each document.data.system.effects.initiative as effect}
          <div class="effect">
             <InitiativeEffectTag {effect}/>
@@ -57,7 +57,7 @@
    {/if}
 
    <!--Custom Effects-->
-   {#if document.data.system.effects.custom}
+   {#if document.data.system.effects?.custom}
       {#each document.data.system.effects.custom as effect}
          <div class="effect">
             <CustomEffectTag {effect}/>
@@ -66,7 +66,7 @@
    {/if}
 
    <!--Expired Effects-->
-   {#if document.data.system.effects.expired}
+   {#if document.data.system.effects?.expired}
       {#each document.data.system.effects.expired as effect}
          <div class="effect">
             <ExpiredEffectTag {effect}/>

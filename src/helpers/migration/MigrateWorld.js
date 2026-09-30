@@ -13,6 +13,7 @@ import equipmentMigrations from '~/helpers/migration/item/EquipmentMigrations.js
 import shieldMigrations from '~/helpers/migration/item/ShieldMigrations.js';
 import spellMigrations from '~/helpers/migration/item/SpellMigrations.js';
 import weaponMigrations from '~/helpers/migration/item/WeaponMigrations.js';
+import syncConditionEffects, { conditionEffectsNeedSync } from '~/helpers/migration/SyncConditionEffects.js';
 
 /**
  * A migration entry describing how to upgrade a document's schema to a specific system version.
@@ -115,7 +116,8 @@ function documentNeedsMigration(document, chain) {
 }
 
 /**
- * Checks whether any Actor or Item in the world, including items embedded within actors, needs migration.
+ * Checks whether any Actor or Item in the world, including items embedded within actors, needs a version migration, or
+ * any stored condition Active Effect's rules elements differ from its system definition.
  * @returns {boolean} Whether any document in the world needs migration.
  */
 export function worldNeedsMigration() {
@@ -136,7 +138,8 @@ export function worldNeedsMigration() {
       }
    }
 
-   return false;
+   // Condition effects hold copies of their definitions' rules elements, which a system update may change.
+   return conditionEffectsNeedSync();
 }
 
 /**
@@ -211,8 +214,9 @@ async function migrateDocument(document, chain) {
 
 /**
  * Migrates all Actor and Item documents in the world to the latest schema version, including items embedded within
- * actors. Only runs for the GM. Skips documents that are already up to date. This is purely the version-chain
- * migrator; the one-shot legacy-effect converter is run separately from the Ready hook.
+ * actors, then syncs the rules elements of every stored condition Active Effect (world actors and the effects unlinked
+ * tokens hold themselves) to its system definition. Only runs for the GM. Skips documents that are already up to date.
+ * The one-shot legacy-effect converter is run separately from the Ready hook.
  * @returns {Promise<void>}
  */
 export async function migrateWorld() {
@@ -238,6 +242,28 @@ export async function migrateWorld() {
       await migrateDocument(item, ITEM_MIGRATION_CHAINS[item.type]);
    }
 
+   // Rewrite stale condition effects from the current definitions.
+   await syncConditionEffects();
+
    log('World migration complete.');
    ui.notifications.info(localize('migrationComplete'));
+}
+
+/**
+ * Resolves what a GM world load does about migration. Source: the `migrationMode` setting's hint ("Prompt: displays a
+ * confirmation dialog before migrating. Automatic: migrates immediately without prompting. Disabled: skips migration
+ * entirely."). Disabled resolves before the world is scanned, so a Disabled load reads no document.
+ * @param {string} mode - The `migrationMode` setting ('prompt', 'automatic', or 'disabled').
+ * @param {() => boolean} needsMigration - Scans the world for a pending migration (worldNeedsMigration); called only
+ * when the mode can act on its answer.
+ * @returns {'none'|'migrate'|'prompt'} Nothing, migrate now, or ask the GM first.
+ */
+export function resolveMigrationAction(mode, needsMigration) {
+   if (mode === 'disabled' || !needsMigration()) {
+      return 'none';
+   }
+   if (mode === 'automatic') {
+      return 'migrate';
+   }
+   return 'prompt';
 }

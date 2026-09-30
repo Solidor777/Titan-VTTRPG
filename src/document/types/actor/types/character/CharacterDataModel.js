@@ -86,6 +86,7 @@ import sortObjectsIntoContainerByFunctionValue
    from '~/helpers/utility-functions/SortObjectsIntoContainerByFunctionValue.js';
 import sortObjectsIntoContainerByKeyValue from '~/helpers/utility-functions/SortObjectsIntoContainerByKeyValue.js';
 import { DYNAMIC_MOD_BUCKETS } from '~/system/ModBuckets.js';
+import { getConditionDescriptionKey } from '~/system/Conditions.js';
 import AddInventoryItemDialog from '~/document/types/actor/dialogs/AddInventoryItemDialog.js';
 import assert from '~/helpers/utility-functions/Assert.js';
 
@@ -229,6 +230,8 @@ import assert from '~/helpers/utility-functions/Assert.js';
  * @property {string} label - The name of the Effect item.
  * @property {string} img - The image used by the Effect item.
  * @property {string} [description] - The description of the Effect item, if any.
+ * @property {string} [descriptionKey] - For a condition, the localization key of its description, which the report
+ * localizes when it renders (EffectTag); a condition entry stores no description text.
  */
 
 /**
@@ -5275,18 +5278,10 @@ export default class CharacterDataModel extends TitanActorDataModel {
             }
 
             // Get conditions.
-            let conditions = this.getConditions();
+            /** @type {ActiveEffect[]|null} The condition Active Effects, or null when there are none. */
+            const conditions = this.getConditions();
             if (conditions) {
-
-               // Add conditions to the report.
-               conditions = conditions.sort((a, b) => sortAscending(a.name, b.name));
-               reportData.conditions = conditions.map((condition) => {
-                  return {
-                     label: condition.name,
-                     img: condition.img,
-                     description: condition.flags.titan.description,
-                  };
-               });
+               reportData.conditions = this._getConditionReportData(conditions);
             }
          }
 
@@ -5582,6 +5577,31 @@ export default class CharacterDataModel extends TitanActorDataModel {
             await this._whisperOwners(reportData, this._getTurnReportUserID(), true);
          }
       }
+   }
+
+   /**
+    * Retrieves the Report Data for this Character's condition Active Effects, sorted by name. A condition's entry
+    * stores its description's localization key (getConditionDescriptionKey), not text: the chat snapshot is read on
+    * every client, and EffectTag localizes the key in each reader's language. A condition applying no system condition
+    * (a custom status) has no key.
+    * @param {ActiveEffect[]} conditions - The condition Active Effects to get report data for.
+    * @returns {EffectReportData[]} Array of objects containing the report data for each condition.
+    */
+   _getConditionReportData(conditions) {
+      return conditions.sort((a, b) => sortAscending(a.name, b.name)).map((condition) => {
+         /** @type {EffectReportData} The condition's entry. */
+         const entry = {
+            img: condition.img,
+            label: condition.name,
+         };
+
+         /** @type {string} The localization key of the condition's description; empty for a custom status. */
+         const descriptionKey = getConditionDescriptionKey(condition);
+         if (descriptionKey) {
+            entry.descriptionKey = descriptionKey;
+         }
+         return entry;
+      });
    }
 
    /**

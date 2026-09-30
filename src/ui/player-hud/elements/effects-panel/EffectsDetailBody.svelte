@@ -1,6 +1,7 @@
 <script>
    import { getContext } from 'svelte';
    import localize from '~/helpers/utility-functions/Localize.js';
+   import { getConditionDescription } from '~/system/Conditions.js';
    import RichText from '~/helpers/svelte-components/RichText.svelte';
    import IconButton from '~/helpers/svelte-components/button/IconButton.svelte';
    import DocumentOwnerIconButton from '~/document/svelte-components/DocumentOwnerIconButton.svelte';
@@ -20,14 +21,14 @@
    /** @type {object} The HUD's top-level actor bridge (never shadowed by providers). */
    const sheetDocument = getContext('sheetDocument');
 
-   /** @type {boolean} Whether this entry is a full effect (vs an inert condition). */
+   /** @type {boolean} Whether this entry is an effect (vs a condition, which has no checks of its own). */
    const isEffect = $derived(document.data?.type === 'effect');
 
-   /** @type {string} The entry's description HTML, sourced per subtype. */
+   /** @type {string} The entry's description HTML: an effect's own, or a condition's from its definition. */
    const description = $derived(
       isEffect
          ? (document.data?.description ?? '')
-         : (document.data?.flags?.titan?.description ?? ''),
+         : getConditionDescription(document.data),
    );
 
    /** @type {number} The effect's embedded-check count (conditions have none). */

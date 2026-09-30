@@ -55,6 +55,8 @@
     * @property {string} label - The label to display for the effect.
     * @property {string} img - The image to display for the effect.
     * @property {string} description - The description of the effect.
+    * @property {string} [descriptionKey] - The localization key of the condition's description, localized at render;
+    * an entry from a report posted before conditions stored keys carries `description` text instead.
     */
 
    /**
@@ -72,10 +74,22 @@
    /** @type {EffectTagProps} */
    let { effect = void 0, icon = void 0, testId = void 0 } = $props();
 
-   /** @type {string} Calculated tooltip depending on whether the effect has a description. */
-   const tooltip = $derived(!isHTMLBlank(effect.description) ?
-      `${localize('effect.custom.desc')}${effect.description}` :
-         localize('effect.custom.desc'));
+   /**
+    * The entry's description HTML: a condition's localized on this client from its key, otherwise the text the entry
+    * stores (an effect's own description, or a condition's in a report posted before conditions stored keys).
+    * @type {string|undefined}
+    */
+   const description = $derived(effect.descriptionKey ? localize(effect.descriptionKey) : effect.description);
+
+   /**
+    * The tooltip: the lead text, then the description when it is not blank. Both are already localized, so the
+    * tooltip action is told not to localize them again (it localizes a plain string as a key).
+    * @type {TextData}
+    */
+   const tooltip = $derived({
+      localize: false,
+      text: localize('effect.custom.desc') + (isHTMLBlank(description) ? '' : description),
+   });
 </script>
 
 <div class="tag" data-testid={testId} use:tooltipAction={tooltip}>

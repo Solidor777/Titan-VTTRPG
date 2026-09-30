@@ -72,6 +72,7 @@ const FOUNDRY_GLOBALS = [
    'fromUuid',
    'fromUuidSync',
    'getDocumentClass',
+   '_del',
 ];
 
 /** @type {string[]} Node.js globals used by build scripts, configs and unit tests. */

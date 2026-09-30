@@ -250,28 +250,64 @@ export function buildConditionDefinitions() {
 }
 
 /**
- * Sets up the system conditions, registering each as a CONFIG.statusEffects entry with its localized
- * description.
+ * Finds the system condition an Active Effect applies, from the system's own definitions (never the mutable
+ * CONFIG.statusEffects). Following core's `Actor#toggleStatusEffect`, an effect is a status's effect only when its
+ * statuses hold exactly that one id, so an effect with several statuses, or with a status naming no system condition,
+ * applies none.
+ * @param {Iterable<string>} statuses - The effect's status ids (a Set on a document, an array in stored data).
+ * @returns {object|undefined} A fresh copy of the condition's definition, or undefined when the effect applies no
+ * system condition.
+ */
+export function findConditionDefinition(statuses) {
+   /** @type {string[]} The status ids. */
+   const ids = [...statuses];
+   if (ids.length !== 1) {
+      return undefined;
+   }
+   return buildConditionDefinitions().find((condition) => condition.id === ids[0]);
+}
+
+/**
+ * Gets the localization key of the description of the system condition an Active Effect applies, for `localize()`.
+ * Condition effects store no description: a stored copy would freeze its creator's language and go stale when the
+ * rules text changes. A chat snapshot stores this key and each reader localizes it (the turn-start report).
+ * @param {TitanActiveEffect} [effect] - The condition Active Effect; undefined in a row's mid-deletion frame.
+ * @returns {string} The key (`<id>.desc`), or an empty string when the effect applies no system condition.
+ */
+export function getConditionDescriptionKey(effect) {
+   /** @type {object|undefined} The condition's definition. */
+   const definition = effect ? findConditionDefinition(effect.statuses ?? []) : undefined;
+   return definition ? `${definition.id}.desc` : '';
+}
+
+/**
+ * Gets the description of the system condition an Active Effect applies, localized on this client.
+ * @param {TitanActiveEffect} [effect] - The condition Active Effect; undefined in a row's mid-deletion frame.
+ * @returns {string} The localized description HTML, or an empty string when the effect applies no system condition
+ * (`localize` returns an empty string for an empty key).
+ */
+export function getConditionDescription(effect) {
+   return localize(getConditionDescriptionKey(effect));
+}
+
+/**
+ * Sets up the system conditions, registering each as a CONFIG.statusEffects entry flagged with its subtype. A
+ * condition's description is not copied onto its entry, so the Active Effects core creates from the entry store none;
+ * readers look it up by status id (getConditionDescription, getConditionDescriptionKey) and localize it on their own
+ * client.
  * @returns {void}
  */
 export default function setupConditions() {
-   // Get the static condition definitions.
+   /** @type {object[]} The static condition definitions. */
    const conditions = buildConditionDefinitions();
 
    // Sort conditions by localized name.
    conditions.sort((a, b) => sortAscending(game.i18n.localize(a.name), game.i18n.localize(b.name)));
 
-   // For each condition.
+   // Flag each condition with its subtype.
    for (const condition of conditions) {
-
-      // Set the description.
-      const description = localize(`${condition.id}.desc`);
-
-      // Set the titan flags carrying the condition's description and subtype. The HUD reads
-      // flags.titan.description for conditions (which have no native description field).
       condition.flags = {
          titan: {
-            description: description,
             type: 'condition',
          },
       };

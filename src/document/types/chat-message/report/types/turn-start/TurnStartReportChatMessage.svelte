@@ -51,12 +51,17 @@
       sections.push(ChatMessageResolve);
    }
 
-   // Add effects.
-   if (document.data.system.effects) {
+   // Add the effect and condition tags when either is reported. The conditions ArrayField has an initial [] (truthy
+   // when empty), so guard on length.
+   if (document.data.system.effects || document.data.system.conditions?.length) {
       sections.push({
          component: ChatMessageEffectsTags,
          isTags: true,
       });
+   }
+
+   // Add the expired-effects message or button when effects are reported.
+   if (document.data.system.effects) {
 
       // Add message if the expired effects were removed.
       if (document.data.system.expiredEffectsRemoved === true) {

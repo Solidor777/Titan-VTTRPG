@@ -1,5 +1,7 @@
 ## Unreleased:
 Conditions follow the 2026-09-26 rules.
+**Back up your world before updating. The first GM login rewrites every existing condition on world actors and
+unlinked tokens to the new rules (as the Migration Mode setting allows).**
 - Multiply Base and Multiply Sum rules elements can round to the nearest whole number.
 - Blinded, Contaminated, Prone, Restrained, and Stunned lower their stats by a quarter of the base value, rounded up,
   instead of by 1. The new Off-Balance condition lowers Accuracy, Awareness, Melee, and Defense the same way.
@@ -8,6 +10,13 @@ Conditions follow the 2026-09-26 rules.
   abilities; skill Training and Expertise tooltips use the same breakdown.
 - Frightened gives Disadvantage on every check; Incapacitated and Restrained automatically fail Reflexes checks;
   Blinded and Deafened offer "Relies on Sight" / "Relies on Hearing" Automatic Failures on Perception checks.
+- Existing conditions update to the current rules through the world migration, which also clears the description text
+  older conditions stored, and a condition's description always shows the current text in the reader's language, in
+  the Player HUD and in turn-start reports.
+- Turn-start reports list the actor's conditions even when it has no other effect, and report entries' tooltips show
+  their text instead of an untranslated key.
+- The Migration Mode setting's "Disabled" choice skips migration, as its description says, and a failed migration no
+  longer stops the Player HUD from loading.
 
 ## Version 2.1.0:
 Advantage and Disadvantage, situational modifiers, and bug fixes.
