@@ -98,6 +98,7 @@ test.afterEach(async () => {
 });
 
 test.afterAll(async () => {
+   await page.evaluate((name) => game.items.getName(name)?.delete(), PANEL_SPELL_NAME);
    await deleteFixtureActor(page, ACTOR_NAME);
    await page?.close();
 });
@@ -270,19 +271,122 @@ test('conditional dice and expertise apply to item checks and to tradition-keyed
    });
 });
 
-test('the spell sheet Casting Check tab lists the spell aspect costs', async () => {
-   const appId = await page.evaluate(async (actorName) => {
-      const app = await game.actors.getName(actorName).items.getName('E2E Void Spell').sheet.render(true);
+/** @type {string} Name of the world spell the Casting Check tab specs render. */
+const PANEL_SPELL_NAME = 'E2E Aspect Panel Spell';
+
+/**
+ * Creates the world spell with the given custom aspects alongside a range, a damage, and a disabled (option-less)
+ * decrease-mod standard aspect, then renders its sheet on the Casting Check tab.
+ * @param {number} customCount - How many custom aspects to give the spell.
+ * @returns {Promise<string>} The rendered sheet's application id.
+ */
+async function openPanelSpell(customCount) {
+   const appId = await page.evaluate(async ({ name, count }) => {
+      await game.items.getName(name)?.delete();
+      const item = await Item.create({
+         name,
+         type: 'spell',
+         system: {
+            aspect: [
+               {
+                  label: 'range',
+                  initialValue: 'self',
+                  cost: 0,
+                  enabled: true,
+               },
+               {
+                  label: 'damage',
+                  scaling: true,
+                  initialValue: 1,
+                  cost: 1,
+                  resistanceCheck: 'none',
+                  isDamage: true,
+                  option: [],
+                  enabled: true,
+               },
+               {
+                  label: 'decreaseMod',
+                  initialValue: 1,
+                  cost: 0,
+                  option: [],
+                  resistanceCheck: 'none',
+                  scaling: true,
+                  enabled: false,
+               },
+            ],
+            customAspect: Array.from({ length: count }, (unused, index) => ({
+               label: `E2E Custom ${index}`,
+               scaling: true,
+               initialValue: 1,
+               cost: index + 1,
+               resistanceCheck: 'none',
+               isDamage: false,
+               isHealing: false,
+               uuid: `e2e00000-0000-4000-a000-0000000001${String(index).padStart(2, '0')}`,
+            })),
+         },
+      });
+      const app = await item.sheet.render(true);
       await titanWait(
          () => !!app?.element?.querySelector('.window-content')?.children.length,
          { message: 'spell sheet mounted' },
       );
       return app.id;
-   }, ACTOR_NAME);
+   }, {
+      name: PANEL_SPELL_NAME,
+      count: customCount,
+   });
    await openSheetTab(page, await page.evaluate(() => game.i18n.localize('LOCAL.castingCheck.text')));
+   return appId;
+}
 
-   // The aspect costs panel mounts inside the scrolling container, with one cost tag per aspect.
+test('the spell sheet Casting Check tab lists the aspects that make up the total cost', async () => {
+   const appId = await openPanelSpell(1);
+
+   // The panel lists each enabled standard aspect by its localized label and computed cost, then the custom aspect.
    const costs = page.locator(`[id="${appId}"] .aspect-costs`);
-   await expect(costs).toBeVisible();
-   await expect(costs.locator('.cost')).toHaveCount(1);
+   const expected = await page.evaluate((name) => {
+      const system = game.items.getName(name).system;
+      return {
+         range: String(system.aspect.find((aspect) => aspect.label === 'range').cost),
+         damage: String(system.aspect.find((aspect) => aspect.label === 'damage').cost),
+         custom: String(system.customAspect[0].cost),
+         disabledLabel: game.i18n.localize('LOCAL.decreaseMod.text'),
+      };
+   }, PANEL_SPELL_NAME);
+   await expect(costs.locator('.tag')).toHaveCount(3);
+   await expect(costs.locator('.tag .label')).toHaveText([
+      'Range',
+      'Damage',
+      'E2E Custom 0',
+   ]);
+   await expect(costs.locator('.tag .value')).toHaveText([
+      expected.range,
+      expected.damage,
+      expected.custom,
+   ]);
+
+   // With the listed siblings resolved, the disabled aspect is absent.
+   await expect(costs.getByText(expected.disabledLabel, { exact: true })).toHaveCount(0);
+});
+
+test('the spell sheet Casting Check tab keeps its aspect list scroll position across tab switches', async () => {
+   const appId = await openPanelSpell(40);
+   const content = page.locator(`[id="${appId}"] .aspect-costs .content`);
+   await expect(content.locator('.tag')).toHaveCount(42);
+
+   // Scroll the overflowing list and wait for the scroll event to be recorded.
+   const maxScroll = await content.evaluate((element) => element.scrollHeight - element.clientHeight);
+   expect(maxScroll, 'the list overflows its container').toBeGreaterThan(40);
+   await content.evaluate((element) => {
+      element.scrollTop = 40;
+   });
+   await expect.poll(() => content.evaluate((element) => element.scrollTop)).toBe(40);
+
+   // Tabs are lazy-mounted, so leaving and returning re-mounts the container from the bound state.
+   await openSheetTab(page, await page.evaluate(() => game.i18n.localize('LOCAL.standardAspects.text')));
+   await expect(content).toHaveCount(0);
+   await openSheetTab(page, await page.evaluate(() => game.i18n.localize('LOCAL.castingCheck.text')));
+   await expect(content).toBeVisible();
+   await expect.poll(() => content.evaluate((element) => element.scrollTop)).toBe(40);
 });

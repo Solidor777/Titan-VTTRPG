@@ -5,29 +5,26 @@
    from '~/document/types/item/types/spell/sheet/SpellSheetSidebarCustomAspect.svelte';
    import SpellSheetSidebarStandardAspect
    from '~/document/types/item/types/spell/sheet/SpellSheetSidebarStandardAspect.svelte';
+   import selectDisplayedSpellAspects from '~/document/types/item/types/spell/SelectDisplayedSpellAspects.js';
 
    /** @type {object} Reference to the reactive Document store. */
    const document = getContext('document');
 
-   /** @type {object[]} The enabled standard aspects. */
-   const enabledAspects = $derived(
-      document.data.system.aspect.filter(
-         (aspect) => aspect.enabled === true,
-      ),
+   /** @type {object[]} The aspects that make up the spell's total cost, in display order. */
+   const displayedAspects = $derived(
+      selectDisplayedSpellAspects(document.data.system.aspect, document.data.system.customAspect),
    );
 </script>
 
 <ol>
    <!--Each Aspect-->
-   {#each enabledAspects as aspect, idx (aspect.label)}
+   {#each displayedAspects as entry (entry.key)}
       <li transition:slide|local>
-         <SpellSheetSidebarStandardAspect {aspect}/>
-      </li>
-   {/each}
-
-   {#each document.data.system.customAspect as aspect, idx (aspect.uuid)}
-      <li transition:slide|local>
-         <SpellSheetSidebarCustomAspect {idx}/>
+         {#if entry.isCustom}
+            <SpellSheetSidebarCustomAspect idx={entry.index}/>
+         {:else}
+            <SpellSheetSidebarStandardAspect aspect={entry.aspect}/>
+         {/if}
       </li>
    {/each}
 </ol>

@@ -10,6 +10,7 @@
    import DocumentCheckDifficultySelect from '~/document/svelte-components/select/DocumentCheckDifficultySelect.svelte';
    import StatTag from '~/helpers/svelte-components/tag/StatTag.svelte';
    import CondensedCastingCheckButton from '~/document/svelte-components/check/CondensedCastingCheckButton.svelte';
+   import selectDisplayedSpellAspects from '~/document/types/item/types/spell/SelectDisplayedSpellAspects.js';
 
    /** @type {object} Reference to the reactive Document store. */
    const document = getContext('document');
@@ -22,6 +23,11 @@
     *    current user cannot.
     */
    const rollActor = getContext('rollActor');
+
+   /** @type {object[]} The aspects that make up the spell's total cost, in display order. */
+   const displayedAspects = $derived(
+      selectDisplayedSpellAspects(document.data.system.aspect, document.data.system.customAspect),
+   );
 </script>
 
 <div class="casting-check-tab">
@@ -138,7 +144,7 @@
    </div>
 
    <!--Aspect Costs-->
-   {#if document.data.system.aspect?.length > 0}
+   {#if displayedAspects.length > 0}
       <div class="aspect-costs" transition:slide|local>
          <!--Header-->
          <div class="header">
@@ -149,9 +155,9 @@
             <!--Container-->
             <div class="costs-container" transition:slide|local>
                <!--Each Cost-->
-               {#each document.data.system.aspect as aspect}
+               {#each displayedAspects as entry (entry.key)}
                   <div class="cost">
-                     <StatTag label={aspect.label} value={aspect.cost}/>
+                     <StatTag label={entry.isLocalized ? localize(entry.label) : entry.label} value={entry.cost}/>
                   </div>
                {/each}
             </div>
