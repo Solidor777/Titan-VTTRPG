@@ -181,7 +181,10 @@ export default class TitanMacros {
     */
    _buildRollCommand(rollMethod, id, idMethod, idx) {
       /** @type {string} The arguments, in call order. */
-      const args = [JSON.stringify(id), JSON.stringify(idMethod)];
+      const args = [
+         JSON.stringify(id),
+         JSON.stringify(idMethod),
+      ];
       if (idx !== undefined) {
          args.push(String(idx));
       }
