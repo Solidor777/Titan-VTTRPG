@@ -1,3 +1,24 @@
+## Unreleased:
+Advantage and Disadvantage, situational modifiers, and bug fixes.
+- **Re-create hotbar macros made before this version:** drag the item to the hotbar again for Attack Check macros,
+  macros that find their item by document ID, and sheet-toggle macros. Older copies of these macros fail or use a
+  deprecated command; they are not updated automatically.
+- Conditional check modifiers can grant Advantage (Difficulty −1), Greater Advantage (−2), Disadvantage (+1), or
+  Greater Disadvantage (+2), summed across sources, or force an Automatic Failure. Check dialogs show the Advantage,
+  Automatic Failure, and resulting Difficulty, and check cards tag them.
+- Situational modifiers: a conditional check modifier with the Situation selector applies only when ticked in the
+  check dialog, and can be limited to one Skill. The card lists the ticked situations.
+- Heavy, Encumbering, and Loud armor apply their check rules as situations (swimming, flying, climbing, jumping, and
+  staying unheard).
+- Resistance Checks read conditional check modifiers.
+- The "Show the Check Options Dialog" setting is Never, When Situational Modifiers Apply (the default), or Always;
+  the previous on/off choice carries over as Always or When Situational Modifiers Apply.
+- An open check dialog follows changes to the character (effects, items) for every field you have not edited.
+- An automatically failed check spends no Expertise.
+- Penetrating attacks ignore half of the target's Armor; the remaining Armor rounds up.
+- Effect Tray folders drag to nest or reorder, and the folder menu offers core's compendium folder entries; its
+  folder dialogs open where core's do.
+
 ## Version 2.0.2:
 Bug fixes and an Effect Tray refresh.
 - The Effect Tray matches the Actors and Items sidebar: nested folders, core folder styling, search, sort, and

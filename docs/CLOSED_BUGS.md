@@ -615,9 +615,10 @@ when fixed.
 
 ### 48. E2E tab clicks matched hidden compendium pack labels (12 timeouts)
 
-- **What:** 12 specs clicked sheet tabs with `page.getByText('Effects' | 'Abilities' | 'Spells', { exact: true }).first()`.
-  The sidebar Compendium directory renders each pack title as a hidden `<strong>`, and the compendium module's packs are
-  labelled "Abilities", "Spells" and "Effects", so `.first()` resolved to the hidden label and the click timed out.
+- **What:** 12 specs clicked sheet tabs with `page.getByText('Effects' | 'Abilities' | 'Spells', { exact: true
+  }).first()`. The sidebar Compendium directory renders each pack title as a hidden `<strong>`, and the compendium
+  module's packs are labelled "Abilities", "Spells" and "Effects", so `.first()` resolved to the hidden label and the
+  click timed out.
 - **Found:** 2026-09-26 full e2e run (505 passed / 12 failed) after the compendium module update.
 - **Fixed:** 2026-09-26 — `openSheetTab()` in `tests/e2e/fixtures.js` scopes the click to the open sheet's `.tab-list`;
   all 15 unscoped tab clicks use it.
@@ -625,36 +626,36 @@ when fixed.
 ### 49. `conditionalCheckModifier is not defined` on casting, attack and item checks
 
 - **What:** `CharacterDataModel._getConditionalCheckModsForSelectorKeys` read `conditionalCheckModifier` (undefined)
-  instead of its `conditionalCheckModifiers` parameter. Any check on an item with custom traits threw once the actor had a
-  conditional check modifier from an ability or effect; spell rows on the Spells tab failed to render. The spells
+  instead of its `conditionalCheckModifiers` parameter. Any check on an item with custom traits threw once the actor had
+  a conditional check modifier from an ability or effect; spell rows on the Spells tab failed to render. The spells
   themselves carry no rules elements.
 - **Fixed:** 2026-09-26, gated by `spell-rules-regressions.spec.js`. `no-undef` is now enforced by ESLint.
 
 ### 50. Conditional expertise modifiers never applied to casting or item checks
 
-- **What:** casting and item checks looked up conditional modifiers under `'expertiseMod'`; the rules-element sheet stores
-  `'expertise'`, so bonuses such as Spellcasting Specialization's +1 expertise never applied.
+- **What:** casting and item checks looked up conditional modifiers under `'expertiseMod'`; the rules-element sheet
+  stores `'expertise'`, so bonuses such as Spellcasting Specialization's +1 expertise never applied.
 - **Fixed:** 2026-09-26, gated by `spell-rules-regressions.spec.js`.
 
 ### 51. Deleting an item showed "Item is already owned by actor" and left armor equipped
 
-- **What:** `CharacterDataModel.preDeleteItem` asserted `!this.parent.uuid === item.parent?.uuid` (always false), raising an
-  error toast on every confirmed delete and skipping the armor/shield un-equip branch.
+- **What:** `CharacterDataModel.preDeleteItem` asserted `!this.parent.uuid === item.parent?.uuid` (always false),
+  raising an error toast on every confirmed delete and skipping the armor/shield un-equip branch.
 - **Fixed:** 2026-09-26 — the assertion compares ownership correctly and `TitanActor.deleteItem` awaits `preDeleteItem`.
   Gated by `spell-rules-regressions.spec.js`.
 
 ### 52. Spell sheet "resisted by" tag rendered empty
 
-- **What:** `SpellSheetSidebarStandardAspect.svelte` passed a `label` prop `ResistanceTag` no longer accepts, so the tag had
-  no text.
+- **What:** `SpellSheetSidebarStandardAspect.svelte` passed a `label` prop `ResistanceTag` no longer accepts, so the tag
+  had no text.
 - **Fixed:** 2026-09-26 — the text is child content. Gated by `spell-rules-regressions.spec.js`.
 
 ### 53. Effect Tray list could not scroll
 
 - **What:** the frameless sidebar tab root had no height bound, so the list grew to its content height and the sidebar
   clipped it.
-- **Fixed:** 2026-09-26 — the tab root clips like core directories and the tray is a `min-height: 0` flex child. Gated by
-  `effect-tray.spec.js`.
+- **Fixed:** 2026-09-26 — the tab root clips like core directories and the tray is a `min-height: 0` flex child. Gated
+  by `effect-tray.spec.js`.
 
 ### 54. Sheet content links unreadable in dark themes
 
@@ -698,9 +699,9 @@ when fixed.
 
 ### 60. Compendium: legacy rules elements, Mystwalker icon, Healer's Kit
 
-- **What:** three "Specialization (Choose)" abilities and Rending Blow carried unregistered legacy operations (Spellcasting
-  Specialization's showed as invalid rows); Rending Blow also had a roll message its rules text does not support.
-  Mystwalker abilities and effects used a placeholder icon. The Healer's Kit was missing.
+- **What:** three "Specialization (Choose)" abilities and Rending Blow carried unregistered legacy operations
+  (Spellcasting Specialization's showed as invalid rows); Rending Blow also had a roll message its rules text does not
+  support. Mystwalker abilities and effects used a placeholder icon. The Healer's Kit was missing.
 - **Fixed:** 2026-09-26 in the compendium module (`a6588af`, `031f612`): legacy elements removed, the path icon applied,
   and the Healer's Kit (commodity, value 100, common) added in a new Equipment pack. The live `packs/` still need
   compiling (`npm run packs:compile` with Foundry stopped).
@@ -794,7 +795,8 @@ when fixed.
 - **Fixed:** 2026-09-29 — the Attack command calls `rollAttackCheck`, `getMacroID` matches `'documentId'`, and the
   sheet toggle calls `foundry.applications.ui.Hotbar.toggleDocumentSheet`. Gated by `tests/unit/Macros.test.js`
   (executes every generated command under each ID method) and `tests/e2e/macros.spec.js` (creates and executes each
-  macro kind in the live world). Macros created before the fix keep their stored command.
+  macro kind in the live world). Macros created before the fix keep their stored command and are not migrated (user
+  decision); CHANGELOG.md tells users to re-create them by dragging the item to the hotbar again.
 
 ### 70. Rolling an item chat card's check through the check dialog raised a page error and posted nothing
 
