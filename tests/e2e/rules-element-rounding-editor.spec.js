@@ -13,7 +13,11 @@ import { readTitanSelectValue, selectTitanOption, titanSelectOptionValues } from
 /** @type {string} Name of the world ability item this spec edits. */
 const ITEM_NAME = 'E2E Rounding Editor';
 
-/** @type {string[]} The localized labels the rounding select shows for each direction, in display order. */
+/**
+ * The localized labels the rounding select shows for each direction, in display order: `down.text`, `up.text`, and
+ * `nearest.text` under `LOCAL` in `lang/en.json`.
+ * @type {string[]}
+ */
 const ROUNDING_LABELS = [
    'Round Down',
    'Round Up',

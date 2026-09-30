@@ -18,6 +18,7 @@ afterEach(() => cleanup());
 describe('CheckboxInput defaults', () => {
    it('renders unchecked when unbound and checks on click', async () => {
       render(CheckboxInput);
+      /** @type {HTMLElement} The rendered button. */
       const button = screen.getByRole('button');
       expect(button.querySelector('i.fa-check')).toBeNull();
 
@@ -32,6 +33,7 @@ describe('CheckboxInput defaults', () => {
             prop: 'value',
          },
       });
+      /** @type {HTMLElement} The rendered button. */
       const button = screen.getByRole('button');
       expect(button.querySelector('i.fa-check')).toBeNull();
       expect(screen.getByTestId('field').textContent).toBe('undefined');
@@ -45,6 +47,7 @@ describe('CheckboxInput defaults', () => {
 describe('ExpandButton defaults', () => {
    it('renders collapsed when unbound and expands on click', async () => {
       render(ExpandButton);
+      /** @type {HTMLElement} The rendered button. */
       const button = screen.getByRole('button');
       expect(button.getAttribute('aria-label')).toBe('expand');
 
@@ -59,6 +62,7 @@ describe('ExpandButton defaults', () => {
             prop: 'expanded',
          },
       });
+      /** @type {HTMLElement} The rendered button. */
       const button = screen.getByRole('button');
       expect(button.getAttribute('aria-label')).toBe('expand');
 

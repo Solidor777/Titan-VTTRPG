@@ -29,8 +29,12 @@ function listSvelteFiles(directory) {
 /** @type {string[]} Every Svelte component in `src`. */
 const SVELTE_FILES = listSvelteFiles(SOURCE_DIRECTORY);
 
-/** @type {RegExp} A `$bindable(` call, capturing its argument text up to the first closing parenthesis. */
-const BINDABLE_CALL = /\$bindable\(([^)]*)\)/g;
+/**
+ * A `$bindable(` call, whitespace before the parenthesis allowed, capturing its argument text up to the first closing
+ * parenthesis.
+ * @type {RegExp}
+ */
+const BINDABLE_CALL = /\$bindable\s*\(([^)]*)\)/g;
 
 describe('bindable props', () => {
    it('finds the components and their bindable declarations', () => {
@@ -38,7 +42,7 @@ describe('bindable props', () => {
 
       /** @type {number} How many `$bindable(` declarations exist across the components. */
       const declarations = SVELTE_FILES.reduce(
-         (count, file) => count + (readFileSync(file, 'utf-8').match(/\$bindable\(/g) ?? []).length,
+         (count, file) => count + (readFileSync(file, 'utf-8').match(/\$bindable\s*\(/g) ?? []).length,
          0,
       );
       expect(declarations).toBeGreaterThan(50);

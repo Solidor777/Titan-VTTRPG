@@ -37,7 +37,7 @@ describe('rounding directions', () => {
       expect(lang.LOCAL[`${direction}.text`].length).toBeGreaterThan(0);
    });
 
-   it.each(ROUNDING_DIRECTIONS)('rounding a mulBase contribution %s rounds the resulting value %s', (direction) => {
+   it.each(ROUNDING_DIRECTIONS)('rounding a mulBase contribution %s rounds the result the same way', (direction) => {
       for (let base = 1; base <= 8; base++) {
          expect(base + roundDirectional(base * (0.75 - 1), direction), `base ${base}`)
             .toBe(roundDirectional(base * 0.75, direction));

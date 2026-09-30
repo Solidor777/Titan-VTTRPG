@@ -269,3 +269,20 @@ test('conditional dice and expertise apply to item checks and to tradition-keyed
       itemDice: 2,
    });
 });
+
+test('the spell sheet Casting Check tab lists the spell aspect costs', async () => {
+   const appId = await page.evaluate(async (actorName) => {
+      const app = await game.actors.getName(actorName).items.getName('E2E Void Spell').sheet.render(true);
+      await titanWait(
+         () => !!app?.element?.querySelector('.window-content')?.children.length,
+         { message: 'spell sheet mounted' },
+      );
+      return app.id;
+   }, ACTOR_NAME);
+   await openSheetTab(page, await page.evaluate(() => game.i18n.localize('LOCAL.castingCheck.text')));
+
+   // The aspect costs panel mounts inside the scrolling container, with one cost tag per aspect.
+   const costs = page.locator(`[id="${appId}"] .aspect-costs`);
+   await expect(costs).toBeVisible();
+   await expect(costs.locator('.cost')).toHaveCount(1);
+});

@@ -138,18 +138,18 @@
    </div>
 
    <!--Aspect Costs-->
-   {#if document.data.aspect && document.data.aspect.length > 0}
+   {#if document.data.system.aspect?.length > 0}
       <div class="aspect-costs" transition:slide|local>
          <!--Header-->
          <div class="header">
             {localize('aspectCosts')}
          </div>
 
-         <ScrollingContainer bind:scrollTop={$appState.tabs.castingCheck.ScrollTop}>
+         <ScrollingContainer bind:scrollTop={$appState.tabs.castingCheck.scrollTop}>
             <!--Container-->
             <div class="costs-container" transition:slide|local>
                <!--Each Cost-->
-               {#each document.data.aspect as aspect}
+               {#each document.data.system.aspect as aspect}
                   <div class="cost">
                      <StatTag label={aspect.label} value={aspect.cost}/>
                   </div>

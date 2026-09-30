@@ -23,7 +23,10 @@
    /** @type {boolean} Whether the box is checked; an unbound `value` defaults to unchecked. */
    const isChecked = $derived(value ?? false);
 
-   /** Toggles the value and invokes the onchange callback. */
+   /**
+    * Toggles the value and invokes the onchange callback.
+    * @returns {void}
+    */
    function onClick() {
       value = !isChecked;
       onchange?.();
