@@ -848,3 +848,98 @@ when fixed.
   character now camelizes to a non-blank string, so the post-group blank check in `_sortElementsByKey` is removed.
   Every caller builds and looks up through `camelize` in memory; no camelized value is persisted to documents or
   flags. Gated by `tests/unit/Camelize.test.js`.
+
+### 75. Stat breakdowns never listed condition modifiers
+
+- **What:** `ModifiableStatValueLabel` and `createModifiableStatTooltip` took one prop per modifier bucket and had no
+  `condition` bucket, so no sheet or Player HUD stat tooltip showed a condition's penalty; the Speed and Mod rows also
+  omitted Abilities, and the skill Training/Expertise tooltip hand-rolled its own partial breakdown.
+- **Found:** 2026-09-29 while planning spec B's sheet-rating checks.
+- **Fixed:** 2026-09-29 — the label takes the stat's `mod` object and the tooltip walks `MOD_BUCKET_LABELS`
+  (`src/system/ModBuckets.js`), whose dynamic buckets `_resetDynamicMods` also reads. Gated by
+  `tests/unit/ModBuckets.test.js` (bucket order, tooltip, and a scan rejecting any Svelte source that names a bucket)
+  and `tests/e2e/stat-breakdown-conditions.spec.js`.
+
+### 77. Opening a Multiply Base or Multiply Sum editor saved "up" for an element with no stored rounding
+
+- **What:** the rounding select listed `up` first; `Select`'s clamp effect writes its first option into an unlisted
+  bound value and fires `onchange`, which `DocumentSelect` persists, so merely opening `ItemSheetMulBaseSettings` or
+  `ItemSheetMulSumSettings` for an element without `rounding` (engine default `down`) silently stored `up` and changed
+  what the element applied.
+- **Found:** 2026-09-29 while planning the `nearest` rounding option.
+- **Fixed:** 2026-09-29 — both editors read `ROUNDING_DIRECTIONS`, led by `down` (Task 1). Gated by
+  `tests/unit/RoundingDirections.test.js` (the list order and every rounding editor on it) and
+  `tests/e2e/rules-element-rounding-editor.spec.js` (an element with no stored rounding opens and stays `down`).
+
+### 78. A turn-start report never showed the conditions of an actor with no other effect
+
+- **What:** `onTurnStart` stored `conditions` in the report but set `effects` only when the actor had an
+  `effect`-subtype Active Effect, and `TurnStartReportChatMessage` mounted the effect-and-condition tags only when
+  `system.effects` was set, so an actor with conditions and no effect got a report that stored its conditions and
+  never drew them.
+- **Found:** 2026-09-30 while folding the report's condition-description key into the conditions rework plan.
+- **Fixed:** 2026-09-30 — the card mounts `ChatMessageEffectsTags` when effects or conditions are reported, and
+  `ChatMessageEffectsTags` reads each duration list through `effects?.` (Task 5). Gated by
+  `tests/e2e/condition-description.spec.js` (a Blinded-only actor's turn-start report shows Blinded, and an older
+  report holding only a condition renders it).
+
+### 79. Report effect tags showed "LOCAL.….text" tooltips
+
+- **What:** `EffectTag` built its tooltip from already-localized text and passed the string to `tooltipAction`, whose
+  `processTextData` localizes a string as a key again, so every turn-start, turn-end, and effects-expired report
+  entry's tooltip read "LOCAL.Effect lasts ….text".
+- **Found:** 2026-09-30 while folding the report's condition-description key into the conditions rework plan.
+- **Fixed:** 2026-09-30 — `EffectTag` passes its tooltip as `TextData` with `localize: false` (Task 5). Gated by
+  `tests/unit/EffectTag.test.js` (the tooltip is localized exactly once) and `tests/e2e/condition-description.spec.js`
+  (a live report tag's tooltip holds no `LOCAL.`).
+
+### 86. A two-way-bound prop whose parent bound an undefined value crashed with Svelte `props_invalid_value`
+
+- **What:** `$bindable(void 0)` compiles to a fallback thunk, and Svelte throws when a parent `bind:`s an undefined
+  value to a bindable prop with any fallback (40 components with `$bindable(void 0)`, and 7 with `false`/`0`/`''`
+  defaults). The component rendered with a `props_invalid_value` error, then failed to render until re-mounted.
+- **Found:** 2026-09-30 (Task 1 fix round 1; diagnosed when the e2e `no stored rounding` tests failed RED-after-GREEN).
+- **Fixed:** 2026-09-30 — all 62 `$bindable(void 0)` / `$bindable(undefined)` declarations in `src/**/*.svelte` became
+  `$bindable()`, with defaults applied at read sites via `$derived(x ?? default)`. Gated by
+  `tests/unit/BindableNoFallback.test.js` (scans rejecting any `$bindable(` with a non-empty argument) and
+  `tests/unit/BindablePropDefaults.test.js` (CheckboxInput and ExpandButton unbound and bound to `undefined`).
+
+### 87. The spell sheet's Casting Check tab never showed its Aspect Costs panel
+
+- **What:** `SpellSheetCastingCheckTab.svelte` gated the Aspect Costs panel on `document.data.aspect` (undefined on the
+  Item; the aspects are in `system.aspect`), so the panel and its ScrollingContainer never mounted. The `{#each}` also
+  read the wrong path, and the scroll binding wrote to a misspelled `tabs.castingCheck.ScrollTop`.
+- **Found:** 2026-09-30 (Task 1 fix round 2; e2e "lists the spell aspect costs" failed with `.aspect-costs` not found).
+- **Fixed:** 2026-09-30 — the panel gates on `displayedAspects.length > 0` (output of a shared selector), the `{#each}`
+  reads the correct path, and scroll binding uses `scrollTop`. Gated by `tests/e2e/spell-rules-regressions.spec.js`
+  and `tests/unit/SheetStatePaths.test.js` (checks every `$appState` dotted path against the initial state factory).
+
+### 88. That tab's scroll position was bound to a misspelled state key (`ScrollTop`)
+
+- **What:** `SpellSheetCastingCheckTab.svelte` bound the scroll container to `tabs.castingCheck.ScrollTop` (capital S)
+  instead of the defined state key `scrollTop`. The misspelled key was created on first write and read back on remount,
+  so retention appeared to work behaviourally despite the typo; the e2e passed under the broken key and failed with
+  `SheetStatePaths.test.js`.
+- **Severity:** Low / latent. Correcting the key broke no behaviour; the typo was a stale data artifact.
+- **Found:** 2026-09-30 (Task 1 fix round 2/3, detected by `SheetStatePaths.test.js` path validation).
+- **Fixed:** 2026-09-30 — scroll binding uses `scrollTop`. Gated by `tests/unit/SheetStatePaths.test.js`.
+
+### 89. Spell aspect tags never sorted by size
+
+- **What:** `SpellAspectTags.svelte` computed `calculateAspectTagSize` on the `{idx, standardAspect}` index entries, so
+  every size was 0 and the tags stayed in input order instead of sorting by cost (range 0, damage 1,
+  inflictCondition 3, etc.).
+- **Found:** 2026-09-30 (Task 1 fix round 5; new e2e assertion comparing rendered order against expected).
+- **Fixed:** 2026-09-30 — `sortedAspects` derives via `[...aspects].sort(...)` by
+  `calculateAspectTagSize(entry.aspect)`, operating on the aspect objects themselves (not index entries). Gated by
+  `tests/unit/SpellAspectTags.test.js` (multiple aspect set with known sizes asserts order) and
+  `tests/e2e/spell-rules-regressions.spec.js` (character-sheet row and chat card both list aspects by size).
+
+### 90. A `'none'` resistance check added 2 to an aspect tag's size though no resistance stat renders
+
+- **What:** `calculateAspectTagSize` in `SpellAspectTags.svelte` counted a resistance check's size contribution
+  whenever `aspect.resistanceCheck` was truthy; the value `'none'` is truthy but `SpellAspectTag` and
+  `SpellCustomAspectTag` render no resistance stat for `'none'`, inflating the tag's size and breaking sort order.
+- **Found:** 2026-09-30 (Task 1 fix round 5, detected in the same sort test with a custom aspect having
+  `resistanceCheck: 'none'`).
+- **Fixed:** 2026-09-30 — size calculation guards with `&& aspect.resistanceCheck !== 'none'`. Gated by same as #89.
