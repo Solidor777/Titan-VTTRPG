@@ -1,8 +1,10 @@
 ## Unreleased:
 Advantage and Disadvantage, situational modifiers, and bug fixes.
-- **Re-create hotbar macros made before this version:** drag the item to the hotbar again for Attack Check macros,
-  macros that find their item by document ID, and sheet-toggle macros. Older copies of these macros fail or use a
-  deprecated command; they are not updated automatically.
+- **Re-create hotbar macros made before this version:** every hotbar macro created before this version no longer
+  matches when you drag it again. Dragging creates a new macro; the old macros still run, so delete an old one by hand
+  if it duplicates. Attack Check macros, macros that find their item by document ID, and sheet-toggle macros must be
+  re-created because the old ones fail.
+- Item names containing apostrophes, backslashes, or double quotes now work in name-identified macros.
 - Conditional check modifiers can grant Advantage (Difficulty −1), Greater Advantage (−2), Disadvantage (+1), or
   Greater Disadvantage (+2), summed across sources, or force an Automatic Failure. Check dialogs show the Advantage,
   Automatic Failure, and resulting Difficulty, and check cards tag them.
