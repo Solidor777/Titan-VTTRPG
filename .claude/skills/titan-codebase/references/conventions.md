@@ -117,9 +117,13 @@ keyed selector by the check's key or keys). `tests/unit/CharacterCheckModifiers.
 against a cache holding a distinct power of two per cell. The editor's check-type and selector options are the frozen
 `CONDITIONAL_CHECK_MODIFIER_CHECK_TYPE_OPTIONS` and `CONDITIONAL_CHECK_MODIFIER_SELECTOR_OPTIONS` (same module, display
 order); `tests/unit/ConditionalCheckModifierTypes.test.js` pins them to the element check types and selectors the
-table reads (plus `situation`), and `tests/unit/check/rebuild-check-options.test.js` requires `CHECK_OPTIONS_METHODS`,
-`CHECK_TYPE_MODIFIER_TYPES`, and the editor's own check types to name the same check types, so a sixth check type fails
-until every list has it. Typed keys (free-typed in the
+table reads (plus `situation`), and `tests/unit/check/rebuild-check-options.test.js` requires
+`CHECK_OPTIONS_METHODS` and `CHECK_TYPE_MODIFIER_TYPES` to name the same check types, and the editor's check-type
+options (beyond `any`) to be exactly the check types whose `CHECK_TYPE_CONDITIONAL_SELECTORS` row has a cell of the
+check type's own name (attribute reads `any` only, so the editor does not list it), so a sixth check type fails until
+each list has it. A blank selector key never matches: the keyed cache builders (`_sortElementsByKey`) store nothing
+under it and the check-modifier lookup skips it, for a single key and inside an array of keys. `multiAttack` is a
+Boolean from `createAttackCheckOptions` onward. Typed keys (free-typed in the
 editor) are grouped and matched in camel case; the one source is the frozen `TYPED_KEY_SELECTORS` map in the same
 module, keyed by operation: `conditionalCheckModifier` (`customTrait`, `spellTradition`, `situation`),
 `conditionalRatingModifier` (`customArmorTrait`, `customShieldTrait`, `customWeaponTrait`), and `rollMessage`

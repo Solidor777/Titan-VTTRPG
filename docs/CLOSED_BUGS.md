@@ -811,3 +811,28 @@ when fixed.
   shares no array or object with the check. Gated by `tests/unit/check/check-send-to-chat.test.js` (a stub `create`
   that cleans arrays in place, fed frozen parameters) and `tests/e2e/item-card-check-dialog.spec.js` (rolls a deleted
   item's card check through the shown dialog and asserts the created message).
+
+### 71. Name-identified hotbar macros broke on names containing an apostrophe, backslash, or double quote
+
+- **What:** `TitanMacros` (`src/system/Macros.js`) wrote each generated command with the item name or uuid inside
+  single quotes (`rollAttackCheck('${id}', ...)`). A name such as `Bob's Sword` ended the string early
+  ("missing ) after argument list"), and a backslash was consumed as an escape. Pre-existing; affected every
+  macro kind (Attack, Casting, Item, sheet toggle).
+- **Found:** 2026-09-29 by the plan A fix-wave verification.
+- **Fixed:** 2026-09-29 — every string argument is `JSON.stringify`-encoded. Gated by `tests/unit/Macros.test.js`
+  (names with `'`, `\`, and `"` compile through `AsyncFunction` and pass the exact name through). The command text
+  now uses double quotes, so `getOrCreateMacro` does not match a macro dragged before this version and a re-drag
+  creates a new one; the older macros still run.
+
+### 72. A blank selector key matched inconsistently, and a truthy non-Boolean multiAttack read differently per consumer
+
+- **What:** Conditional check modifier lookups accepted a blank key inside an array key but not as a single key, and
+  the cache builders stored blank-key elements under `''`. `multiAttack` reached the lookups as whatever the caller
+  passed, so a truthy non-Boolean value applied the rating and roll-message consumers (truthiness) but not the check
+  modifier lookup (`=== true`).
+- **Found:** 2026-09-29 by the plan A fix-wave verification.
+- **Fixed:** 2026-09-29 — a blank selector key never matches: the three keyed cache builders (roll messages,
+  conditional rating modifiers, conditional check modifiers) group through `_sortElementsByKey` and store nothing under
+  a blank key, and the check modifier lookup skips a blank key (single and inside arrays). `multiAttack` is a Boolean
+  from `createAttackCheckOptions` and from the weapon-derived default. Gated by the blank-key and multiAttack cases in
+  `tests/unit/CharacterCheckModifiers.test.js`.

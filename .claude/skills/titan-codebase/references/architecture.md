@@ -85,8 +85,9 @@
   skills, conditions, icons, settings registration (`SystemSettings.js`), initiative formula (`Initiative.js`),
   macros (`Macros.js`: `TitanMacros`, exposed as `game.titan.macros`; its `get<Kind>Macro` methods write script
   commands calling its own `roll{Attack,Casting,Item}Check(id, idMethod[, idx])`, which request the check for each
-  controlled Character, or `foundry.applications.ui.Hotbar.toggleDocumentSheet`; `idMethod` is `uuid` — the Item's
-  `flags.titan.uuid` —, `name`, or `documentId`; `tests/unit/Macros.test.js` executes every generated command),
+  controlled Character, or `foundry.applications.ui.Hotbar.toggleDocumentSheet`; `idMethod` is `uuid` (the Item's
+  `flags.titan.uuid`), `name`, or `documentId`; every string argument is `JSON.stringify`-encoded, so names with
+  quotes or backslashes compile; `tests/unit/Macros.test.js` executes every generated command),
   trackable attributes (`TrackableAttributes.js`), and enumeration files (roles, resistances,
   resources, speeds, etc.).
 
