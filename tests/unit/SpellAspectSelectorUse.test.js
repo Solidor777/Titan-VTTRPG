@@ -27,14 +27,17 @@ function listComponents(directory) {
 }
 
 /**
- * Tests whether a property key names `enabled`: a non-computed identifier or a string literal.
+ * Tests whether a property key names `enabled`: a non-computed identifier, a string literal, or a template literal
+ * with no expressions.
  * @param {object} key - The ESTree key or property node.
  * @param {boolean} computed - Whether the key is written in brackets.
  * @returns {boolean} True when the key is `enabled`.
  */
 function isEnabledKey(key, computed) {
    return (!computed && key.type === 'Identifier' && key.name === 'enabled')
-      || (key.type === 'Literal' && key.value === 'enabled');
+      || (key.type === 'Literal' && key.value === 'enabled')
+      || (key.type === 'TemplateLiteral' && key.quasis.length === 1
+         && key.quasis[0].value.cooked === 'enabled');
 }
 
 /**
@@ -112,6 +115,7 @@ describe('findEnabledReads', () => {
       expect(await findEnabledReads(script('const first = aspects.find((a) => a.enabled);'))).toHaveLength(1);
       expect(await findEnabledReads(script('aspects.filter((a) => a?.enabled);'))).toHaveLength(1);
       expect(await findEnabledReads(script('const on = a[\'enabled\'];'))).toHaveLength(1);
+      expect(await findEnabledReads(script('const on = a[`enabled`];'))).toHaveLength(1);
       expect(await findEnabledReads('{#each aspects as a}{@const on = a.enabled}{on}{/each}')).toHaveLength(1);
    });
 
@@ -129,6 +133,8 @@ describe('findEnabledReads', () => {
       expect(await findEnabledReads(script('list.filter(({ aspect: { enabled } }) => enabled);'))).toHaveLength(1);
       expect(await findEnabledReads(script('const [{ enabled }] = aspects;'))).toHaveLength(1);
       expect(await findEnabledReads(script('const { \'enabled\': isOn } = aspect;'))).toHaveLength(1);
+      const constDestructFixture = '{#each items as item}{@const { enabled } = item}{enabled}{/each}';
+      expect(await findEnabledReads(constDestructFixture)).toHaveLength(1);
    });
 
    it('ignores a child enabled attribute, object literals, look-alikes, strings, styles and comments', async () => {
@@ -139,6 +145,25 @@ describe('findEnabledReads', () => {
       expect(await findEnabledReads('<style>\n   .tag.enabled {\n      color: red;\n   }\n</style>')).toEqual([]);
       expect(await findEnabledReads(`<!--Hides a.enabled aspects-->${script('// a.enabled\n/** a.enabled */')}`))
          .toEqual([]);
+   });
+
+   it('keeps line numbers correct when blanking SCSS comments in <style> blocks', async () => {
+      /** @type {string} A multi-line component with an SCSS-commented line before a script read. */
+      const fixture = `<style lang="scss">
+   // some scss comment here
+   .tag {
+      color: red;
+   }
+</style>
+<script>
+   const x = y.enabled;
+</script>`;
+
+      /** @type {string[]} The reported reads. */
+      const reads = await findEnabledReads(fixture);
+
+      expect(reads).toHaveLength(1);
+      expect(reads[0]).toBe('member read of enabled at line 8');
    });
 });
 

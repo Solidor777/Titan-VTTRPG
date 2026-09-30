@@ -19,7 +19,11 @@ beforeEach(() => {
 
 afterEach(() => {
    cleanup();
-   globalThis.game = previousGame;
+   if (previousGame === undefined) {
+      delete globalThis.game;
+   } else {
+      globalThis.game = previousGame;
+   }
 });
 
 /**
