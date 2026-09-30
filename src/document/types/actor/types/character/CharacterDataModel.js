@@ -3930,7 +3930,9 @@ export default class CharacterDataModel extends TitanActorDataModel {
    /**
     * Groups keyed selector elements by key for a rules-elements cache. A blank key never matches (an element with no
     * key is incomplete data, and a spell with no Tradition is not "the blank Tradition"), so elements with one are
-    * left out and nothing is cached under a blank key. Every keyed cache builder and lookup shares this rule.
+    * left out and nothing is cached under a blank key. The element's own `key` is tested before grouping, so a missing
+    * key is blank and `getKey` never sees it; the grouped key is tested again because `getKey` can normalize a
+    * non-blank key to blank. Every keyed cache builder and lookup shares this rule.
     * @param {object[]} elements - The elements of one selector.
     * @param {(element: object) => string} [getKey] - Gets the key an element is grouped by; defaults to `element.key`.
     * @returns {Record<string, object[]>} The non-blank-keyed elements, grouped by key.
@@ -3938,7 +3940,10 @@ export default class CharacterDataModel extends TitanActorDataModel {
     */
    _sortElementsByKey(elements, getKey = (element) => element.key) {
       /** @type {Record<string, object[]>} The elements grouped by key. */
-      const retVal = sortObjectsIntoContainerByFunctionValue(elements, getKey);
+      const retVal = sortObjectsIntoContainerByFunctionValue(
+         elements.filter((element) => !isBlankSelectorKey(element.key)),
+         getKey,
+      );
       for (const key of Object.keys(retVal)) {
          if (isBlankSelectorKey(key)) {
             delete retVal[key];

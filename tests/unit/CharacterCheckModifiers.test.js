@@ -1192,6 +1192,32 @@ describe('conditional check modifier lookups — blank keys and non-Boolean mult
       expect(model.parent.rulesElementsCache.rollMessage.any.customTrait).toEqual({ glowing: ['Real'] });
    });
 
+   it('_sortElementsByKey drops elements with a missing key and groups the rest', () => {
+      /** @type {object} The model under test. */
+      const model = createModel();
+      /** @type {object[]} Elements whose keys are missing, null, blank, whitespace, and real. */
+      const elements = [
+         { name: 'missing' },
+         {
+            key: null,
+            name: 'null',
+         },
+         {
+            key: '',
+            name: 'empty',
+         },
+         {
+            key: '  ',
+            name: 'space',
+         },
+         {
+            key: 'a',
+            name: 'real',
+         },
+      ];
+      expect(Object.keys(model._sortElementsByKey(elements))).toEqual(['a']);
+   });
+
    it('a whitespace-only single key never matches, even a cell stored under it', () => {
       /** @type {object} The model, whose Tradition cell exists only under a whitespace key. */
       const model = createModel({
