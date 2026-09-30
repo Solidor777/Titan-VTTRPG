@@ -56,7 +56,7 @@ export default function createAttackCheckOptions(options) {
       ineffective: options.ineffective ?? false,
       itemId: options.itemId,
       magical: options.magical ?? false,
-      multiAttack: options.multiAttack ?? false,
+      multiAttack: Boolean(options.multiAttack),
       penetrating: options.penetrating ?? false,
       plusExtraSuccessDamage: options.plusExtraSuccessDamage ?? true,
       range: options.range ?? 1,

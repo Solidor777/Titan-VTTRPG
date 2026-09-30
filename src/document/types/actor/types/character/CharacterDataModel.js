@@ -271,6 +271,16 @@ import assert from '~/helpers/utility-functions/Assert.js';
  */
 
 /**
+ * Whether a selector key is blank. A blank key never matches a check: the rules-elements cache builders skip it and
+ * the lookups ignore it, for a single key and inside an array of keys.
+ * @param {*} key - The key to test.
+ * @returns {boolean} True if the key is missing or only whitespace.
+ */
+function isBlankSelectorKey(key) {
+   return String(key ?? '').trim() === '';
+}
+
+/**
  * Actor data model with extra functionality for Characters.
  * @property {TitanActor} parent - The Actor that owns this data model.
  * @extends {TitanActorDataModel}
@@ -1199,17 +1209,13 @@ export default class CharacterDataModel extends TitanActorDataModel {
                   const selectorMessages = {};
 
                   // Sort elements by key.
-                  let keys;
                   // A typed key is sorted by its camel-case form; any other key by its raw value.
-                  if (TYPED_KEY_SELECTORS.rollMessage.includes(selector)) {
-                     keys = sortObjectsIntoContainerByFunctionValue(
-                        selectorElements,
-                        (element) => camelize(element.key),
-                     );
-                  }
-                  else {
-                     keys = sortObjectsIntoContainerByKeyValue(selectorElements, 'key');
-                  }
+                  const keys = this._sortElementsByKey(
+                     selectorElements,
+                     TYPED_KEY_SELECTORS.rollMessage.includes(selector) ?
+                        (element) => camelize(element.key) :
+                        undefined,
+                  );
 
                   // For each key.
                   for (const [key, keyElements] of Object.entries(keys)) {
@@ -1297,17 +1303,13 @@ export default class CharacterDataModel extends TitanActorDataModel {
                      const selectorMap = ratingMap[selector];
 
                      // Sort elements by key.
-                     let keys;
                      // A typed key is sorted by its camel-case form; any other key by its raw value.
-                     if (TYPED_KEY_SELECTORS.conditionalRatingModifier.includes(selector)) {
-                        keys = sortObjectsIntoContainerByFunctionValue(
-                           selectorElements,
-                           (element) => camelize(element.key),
-                        );
-                     }
-                     else {
-                        keys = sortObjectsIntoContainerByKeyValue(selectorElements, 'key');
-                     }
+                     const keys = this._sortElementsByKey(
+                        selectorElements,
+                        TYPED_KEY_SELECTORS.conditionalRatingModifier.includes(selector) ?
+                           (element) => camelize(element.key) :
+                           undefined,
+                     );
 
                      // For each key.
                      for (const [key, keyElements] of Object.entries(keys)) {
@@ -1470,17 +1472,11 @@ export default class CharacterDataModel extends TitanActorDataModel {
                         const selectorMap = checkTypeMap[selector];
 
                         // Sort the objects by key.
-                        let keys;
                         // User-typed keys are grouped by their normalized form, which lookups also use.
-                        if (TYPED_KEY_SELECTORS.conditionalCheckModifier.includes(selector)) {
-                           keys = sortObjectsIntoContainerByFunctionValue(
-                              selectorElements,
-                              (element) => this._normalizeConditionalCheckModKey(selector, element.key),
-                           );
-                        }
-                        else {
-                           keys = sortObjectsIntoContainerByKeyValue(selectorElements, 'key');
-                        }
+                        const keys = this._sortElementsByKey(
+                           selectorElements,
+                           (element) => this._normalizeConditionalCheckModKey(selector, element.key),
+                        );
 
                         // For each key.
                         for (const [key, keyElements] of Object.entries(keys)) {
@@ -2417,7 +2413,7 @@ export default class CharacterDataModel extends TitanActorDataModel {
       if (options.multiAttack === undefined) {
 
          // Set multi-attack to the value stored in item.
-         checkOptions.multiAttack = itemRollData.multiAttack;
+         checkOptions.multiAttack = Boolean(itemRollData.multiAttack);
       }
 
       // If plus extra successes damage is not set.
@@ -3821,10 +3817,12 @@ export default class CharacterDataModel extends TitanActorDataModel {
       if (typeof selectorMods === 'number') {
          return keys === true ? selectorMods : 0;
       }
-      return [keys].flat().reduce(
-         (sum, key) => sum + (selectorMods[this._normalizeConditionalCheckModKey(selector, key)] || 0),
-         0,
-      );
+      return [keys].flat().reduce((sum, key) => {
+         if (isBlankSelectorKey(key)) {
+            return sum;
+         }
+         return sum + (selectorMods[this._normalizeConditionalCheckModKey(selector, key)] || 0);
+      }, 0);
    }
 
    /**
@@ -3923,6 +3921,26 @@ export default class CharacterDataModel extends TitanActorDataModel {
       }
 
       parameters.situations = [...applied.values()];
+   }
+
+   /**
+    * Groups keyed selector elements by key for a rules-elements cache. A blank key never matches (an element with no
+    * key is incomplete data, and a spell with no Tradition is not "the blank Tradition"), so elements with one are
+    * left out and nothing is cached under a blank key. Every keyed cache builder and lookup shares this rule.
+    * @param {object[]} elements - The elements of one selector.
+    * @param {(element: object) => string} [getKey] - Gets the key an element is grouped by; defaults to `element.key`.
+    * @returns {Record<string, object[]>} The non-blank-keyed elements, grouped by key.
+    * @private
+    */
+   _sortElementsByKey(elements, getKey = (element) => element.key) {
+      /** @type {Record<string, object[]>} The elements grouped by key. */
+      const retVal = sortObjectsIntoContainerByFunctionValue(elements, getKey);
+      for (const key of Object.keys(retVal)) {
+         if (isBlankSelectorKey(key)) {
+            delete retVal[key];
+         }
+      }
+      return retVal;
    }
 
    /**

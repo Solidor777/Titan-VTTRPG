@@ -1085,6 +1085,148 @@ describe('conditional check modifier lookups — the cells each check type reads
    });
 });
 
+describe('conditional check modifier lookups — blank keys and non-Boolean multiAttack', () => {
+   it('a blank single key never matches, even a cell stored under the blank key', () => {
+      /** @type {object} The model, whose Tradition cell exists only under the blank key. */
+      const model = createModel({
+         conditionalCheckModifier: {
+            dice: {
+               casting: {
+                  spellTradition: {
+                     '': 8,
+                     fire: 2,
+                  },
+               },
+            },
+         },
+      });
+      expect(model.getCastingCheckMod('dice', 'body', 'athletics', '', [])).toBe(0);
+      expect(model.getCastingCheckMod('dice', 'body', 'athletics', 'fire', [])).toBe(2);
+   });
+
+   it('a blank key inside an array key never matches while its siblings do', () => {
+      /** @type {object} The model, whose Custom Trait cell holds a blank key beside a real one. */
+      const model = createModel({
+         conditionalCheckModifier: {
+            dice: {
+               item: {
+                  customTrait: {
+                     '': 8,
+                     glowing: 2,
+                  },
+               },
+            },
+         },
+      });
+      expect(model.getItemCheckMod('dice', 'body', 'athletics', [
+         '',
+         'glowing',
+      ])).toBe(2);
+      expect(model.getItemCheckMod('dice', 'body', 'athletics', [''])).toBe(0);
+   });
+
+   it('the check modifier cache builder stores nothing under a blank key', () => {
+      /** @type {object} The model under test. */
+      const model = createModel();
+      model._applyConditionalCheckModifierElements([
+         checkModifier({
+            key: '',
+            selector: 'spellTradition',
+         }),
+         checkModifier({
+            key: 'Fire',
+            selector: 'spellTradition',
+         }),
+         checkModifier({
+            key: '',
+            selector: 'skill',
+         }),
+      ]);
+      expect(model.parent.rulesElementsCache.conditionalCheckModifier.dice.any).toEqual({
+         skill: {},
+         spellTradition: { fire: 1 },
+      });
+   });
+
+   it('the rating modifier cache builder stores nothing under a blank key', () => {
+      /** @type {object} The model under test. */
+      const model = createModel();
+      model._applyConditionalRatingModifierElements([
+         {
+            key: '',
+            rating: 'melee',
+            selector: 'attackTrait',
+            type: 'ability',
+            value: 1,
+         },
+         {
+            key: 'rend',
+            rating: 'melee',
+            selector: 'attackTrait',
+            type: 'ability',
+            value: 2,
+         },
+      ]);
+      expect(model.parent.rulesElementsCache.conditionalRatingModifier.melee.attackTrait).toEqual({
+         rend: { ability: 2 },
+      });
+   });
+
+   it('the roll message cache builder stores nothing under a blank key', () => {
+      /** @type {object} The model under test. */
+      const model = createModel();
+      model._applyRollMessageElements([
+         {
+            checkType: 'any',
+            key: '',
+            message: 'Blank',
+            selector: 'customTrait',
+         },
+         {
+            checkType: 'any',
+            key: 'glowing',
+            message: 'Real',
+            selector: 'customTrait',
+         },
+      ]);
+      expect(model.parent.rulesElementsCache.rollMessage.any.customTrait).toEqual({ glowing: ['Real'] });
+   });
+
+   it('createAttackCheckOptions stores multiAttack as a Boolean', () => {
+      expect(createAttackCheckOptions({ multiAttack: 1 }).multiAttack).toBe(true);
+      expect(createAttackCheckOptions({ multiAttack: 'yes' }).multiAttack).toBe(true);
+      expect(createAttackCheckOptions({ multiAttack: 0 }).multiAttack).toBe(false);
+      expect(createAttackCheckOptions({}).multiAttack).toBe(false);
+   });
+
+   it('an Attack Check initialized from a weapon carries the weapon\'s multiAttack as a Boolean', () => {
+      /** @type {object} The initialized options for a weapon whose multiAttack is truthy but not a Boolean. */
+      const options = createItemModel({
+         ...WEAPON_ROLL_DATA,
+         multiAttack: 1,
+      }).initializeAttackCheckOptions({
+         attackerAccuracy: 0,
+         attackerMelee: 0,
+         itemId: 'w',
+         targetDefense: 3,
+      });
+      expect(options.multiAttack).toBe(true);
+   });
+
+   it('a truthy non-Boolean multiAttack reads the multiAttack cell like true does', () => {
+      /** @type {{cache: object, cellValue: Function}} The full cache and its cell values. */
+      const { cache, cellValue } = createFullDiceCache();
+
+      /** @type {object} The Character. */
+      const model = createModel(cache);
+      /** @type {object} The Attack Check options an Attack Check reads its mods from. */
+      const options = createAttackCheckOptions({ multiAttack: 1 });
+      expect(model.getAttackCheckMod('dice', 'body', 'athletics', options.multiAttack, 'melee', [], []) -
+         model.getAttackCheckMod('dice', 'body', 'athletics', false, 'melee', [], [])).toBe(cellValue('attack',
+         'multiAttack'));
+   });
+});
+
 describe('CharacterDataModel.requestAttributeCheck — situational lookup', () => {
    it('looks up situations for the options\' Skill without initializing the options', async () => {
       globalThis.game.keyboard = { isModifierActive: () => false };
