@@ -216,10 +216,13 @@ export default class TitanCheck {
          await this.evaluateCheck();
       }
 
-      // Build the typed system data for the chat message.
+      // Build the typed system data for the chat message from copies. INVARIANT: core cleans creation data in place
+      // (`ArrayField#_cleanType` assigns each element back into the given array), so the message must share no array
+      // or object with the check, whose parameters can alias a dialog's frozen Check Options.
+      /** @type {object} The message's system data. */
       const system = {
-         parameters: this.parameters,
-         results: this.results,
+         parameters: structuredClone(this.parameters),
+         results: structuredClone(this.results),
          failuresReRolled: false,
       };
 

@@ -795,3 +795,17 @@ when fixed.
   sheet toggle calls `foundry.applications.ui.Hotbar.toggleDocumentSheet`. Gated by `tests/unit/Macros.test.js`
   (executes every generated command under each ID method) and `tests/e2e/macros.spec.js` (creates and executes each
   macro kind in the live world). Macros created before the fix keep their stored command.
+
+### 70. Rolling an item chat card's check through the check dialog raised a page error and posted nothing
+
+- **What:** with the check options dialog shown, an item (or effect) chat card's check button opened the Item Check
+  dialog, but Roll threw "Cannot assign to read only property '0' of object '[object Array]'" and no message was
+  created. The dialog holds its Check Options frozen, the card's snapshot `itemRollData` among them, and
+  `getItemCheckParameters` copies `itemRollData.customTrait` into the parameters by reference; `TitanCheck#sendToChat`
+  handed the parameters to `ChatMessage.create`, whose `ArrayField#_cleanType` assigns each element back into the
+  given array (read in `common/data/fields.mjs`), which a frozen array rejects.
+- **Found:** 2026-09-29 by the plan A final-wave e2e for the item card → dialog → Roll path (V1).
+- **Fixed:** 2026-09-29 — `sendToChat` passes `structuredClone` copies of `parameters` and `results`, so the message
+  shares no array or object with the check. Gated by `tests/unit/check/check-send-to-chat.test.js` (a stub `create`
+  that cleans arrays in place, fed frozen parameters) and `tests/e2e/item-card-check-dialog.spec.js` (rolls a deleted
+  item's card check through the shown dialog and asserts the created message).

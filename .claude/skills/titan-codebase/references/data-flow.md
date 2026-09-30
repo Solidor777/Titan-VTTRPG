@@ -89,7 +89,11 @@ refunding ALL spent successes — NOT the auto-maxed roll-time state.
 Creates the message as a typed check subtype: a top-level `type` (`this._getCheckType()`, one of
 `attributeCheck`/`resistanceCheck`/`attackCheck`/`castingCheck`/`itemCheck`) plus a `system` payload
 `{ parameters, results, failuresReRolled, message }` (no `type` field inside `system`). All check data
-travels in `message.system` (a `CheckChatMessageDataModel` subclass), NOT `flags.titan`.
+travels in `message.system` (a `CheckChatMessageDataModel` subclass), NOT `flags.titan`. `parameters` and `results`
+are `structuredClone` copies: core cleans creation data in place (`ArrayField#_cleanType` assigns each element back),
+and a dialog-rolled check's parameters can alias its frozen Check Options (an Item Check's snapshot Custom Traits), so
+handing them over by reference throws "Cannot assign to read only property".
+`tests/unit/check/check-send-to-chat.test.js` and `tests/e2e/item-card-check-dialog.spec.js` cover it.
 
 **6. Chat render — `TitanChatMessage#renderHTML` (the only TITAN chat render path)**
 
