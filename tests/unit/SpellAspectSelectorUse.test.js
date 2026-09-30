@@ -133,6 +133,7 @@ describe('findEnabledReads', () => {
       expect(await findEnabledReads(script('list.filter(({ aspect: { enabled } }) => enabled);'))).toHaveLength(1);
       expect(await findEnabledReads(script('const [{ enabled }] = aspects;'))).toHaveLength(1);
       expect(await findEnabledReads(script('const { \'enabled\': isOn } = aspect;'))).toHaveLength(1);
+      /** @type {string} A template that destructures `enabled` in an `{@const}` tag. */
       const constDestructFixture = '{#each items as item}{@const { enabled } = item}{enabled}{/each}';
       expect(await findEnabledReads(constDestructFixture)).toHaveLength(1);
    });
