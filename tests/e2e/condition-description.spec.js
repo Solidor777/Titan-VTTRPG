@@ -151,7 +151,7 @@ test('a turn-start report stores the description key and its tooltip shows the t
       const message = game.messages.contents.at(-1);
       return {
          conditions: message.system.toObject().conditions,
-         expected: game.i18n.localize('LOCAL.blinded.desc.text'),
+         expected: foundry.utils.cleanHTML(game.i18n.localize('LOCAL.blinded.desc.text')),
          id: message.id,
          label: game.i18n.localize('LOCAL.blinded.text'),
       };
@@ -211,7 +211,7 @@ test('a turn-start report posted before conditions stored keys shows its stored 
    const tag = page.locator(`#chat .message[data-message-id="${report.id}"] .report .effects .tag`).first();
    await expect(tag).toContainText(report.label);
    await expect.poll(() => readReportTagTooltip(report.id), { message: 'the tag\'s tooltip is the stored text' })
-      .toBe(LEGACY_REPORT_TEXT);
+      .toBe(await page.evaluate((text) => foundry.utils.cleanHTML(text), LEGACY_REPORT_TEXT));
    expect(await readReportTagTooltip(report.id)).not.toContain('LOCAL.');
 });
 
@@ -242,7 +242,7 @@ test('a turn-start report tags a turn-start effect with the Turn Start tag and i
       /** @type {ChatMessage} The report. */
       const message = game.messages.contents.at(-1);
       return {
-         expected: game.i18n.localize('LOCAL.effect.turnStart.desc.text'),
+         expected: foundry.utils.cleanHTML(game.i18n.localize('LOCAL.effect.turnStart.desc.text')),
          id: message.id,
          labels: (message.system.toObject().effects?.turnStart ?? []).map((entry) => entry.label),
       };

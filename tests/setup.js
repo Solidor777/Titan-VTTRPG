@@ -30,9 +30,21 @@ function randomID(length = 16) {
    return Math.random().toString(36).slice(2, 2 + length);
 }
 
+/**
+ * Pass-through stand-in for foundry.utils.cleanHTML, which only the Foundry client defines: tooltip and rich-text
+ * content passes through it, so components using them can mount. Unit tests do not verify sanitization;
+ * tests/e2e/html-sanitization.spec.js verifies it live against core's cleaner.
+ * @param {string} html - The HTML to clean.
+ * @returns {string} The same HTML, unchanged.
+ */
+function cleanHTML(html) {
+   return html;
+}
+
 globalThis.foundry = {
    abstract: { Document: MockDocument },
    utils: {
+      cleanHTML,
       mergeObject,
       randomID,
    },

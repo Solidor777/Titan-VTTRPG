@@ -3,7 +3,7 @@
 
    /**
     * @typedef {object} RichTextProps
-    * @property {string} [value] - The raw HTML to display.
+    * @property {string} [value] - The HTML to display; it is cleaned, then enriched.
     */
 
    /** @type {RichTextProps} */
@@ -18,8 +18,10 @@
    $effect(() => {
       /** @type {boolean} - Guards against applying a stale enrich result. */
       let cancelled = false;
+      // Cleaned before enrichment: enrichHTML assigns its input to a live element's innerHTML, where an event-handler
+      // attribute fires, and the value can be text a user wrote (a report's rules-element message).
       foundry.applications.ux.TextEditor.implementation
-         .enrichHTML(value, { secrets: true })
+         .enrichHTML(value ? foundry.utils.cleanHTML(value) : '', { secrets: true })
          .then((html) => {
             if (!cancelled) {
                displayText = html;

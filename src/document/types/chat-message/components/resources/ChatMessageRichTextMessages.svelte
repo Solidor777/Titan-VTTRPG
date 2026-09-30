@@ -9,7 +9,7 @@
 <div class="messages">
    {#each document.data.system.message as message}
       <div class="message">
-         <RichText text={message}/>
+         <RichText value={message}/>
       </div>
    {/each}
 </div>

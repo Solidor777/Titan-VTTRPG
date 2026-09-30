@@ -906,6 +906,27 @@ when fixed.
   `tests/e2e/component-probe-context.spec.js` (each tag's live tooltip leads with its own text), and
   `tests/e2e/condition-description.spec.js` (a condition tag's tooltip is its description alone).
 
+### 84. Report text reached tooltips and rich text as unsanitized HTML
+
+- **What:** report chat data stores HTML in `StringField` / `ObjectField` values (a turn report's `message` entries, an
+  older report's condition `description`), which bypass core's `HTMLField` sanitization. `tooltipAction` handed its
+  content to tippy with `allowHTML: true`, and `RichText.svelte` passed its value to `enrichHTML` (which assigns it to
+  a live element's `innerHTML`) and then `{@html}`, so a message author could run script in every reader's client.
+- **Found:** 2026-09-30 by the Task 5 buddy check (plan B).
+- **Fixed:** 2026-09-30 — `tooltipAction` cleans every non-blank tooltip with `foundry.utils.cleanHTML` (the cleaner
+  core's TooltipManager applies) before tippy receives it, on creation and on update, and `RichText` cleans its value
+  before `enrichHTML`. Gated by `tests/e2e/html-sanitization.spec.js` (a report message and a report tag tooltip
+  carrying an `onerror` payload render their text and markup with no handler, a live custom-trait tooltip updated to
+  the payload is cleaned, and icon markup survives).
+
+### 85. Turn-start and turn-end report messages rendered blank
+
+- **What:** `ChatMessageRichTextMessages.svelte` passed `text={message}` to `RichText`, which reads only `value`, so
+  every rules-element turn message rendered `enrichHTML(undefined)`, an empty string.
+- **Found:** 2026-09-30 by the Task 5 buddy check (plan B), by reading the code.
+- **Fixed:** 2026-09-30 — the component passes `value={message}`, together with #84 (the prop fix enables the rich-text
+  sink). Gated by `tests/e2e/html-sanitization.spec.js` (a turn-start report's message renders its text).
+
 ### 86. A two-way-bound prop whose parent bound an undefined value crashed with Svelte `props_invalid_value`
 
 - **What:** `$bindable(void 0)` compiles to a fallback thunk, and Svelte throws when a parent `bind:`s an undefined

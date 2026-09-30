@@ -31,14 +31,15 @@ const TOOLTIP_DURATION = [
  */
 
 /**
- * Svelte action for adding a hovering tooltip to an element.
+ * Svelte action for adding a hovering tooltip to an element. The tooltip's HTML is cleaned with core's HTML cleaner
+ * before tippy renders it, when the action is created and on every update.
  * @param {Element} element - The node to add the tooltip to.
  * @param {string|TextData} textData - The data for the tooltip.
  * @returns {TooltipAction} The newly created tooltip.
  */
 export default function tooltipAction(element, textData) {
    // Calculate the initial content.
-   let initialContent = processTextData(textData);
+   let initialContent = buildTooltipContent(textData);
 
    // Initialize a tippy object if the content is valid.
    let tippyTooltip = isHTMLBlank(initialContent)
@@ -53,7 +54,7 @@ export default function tooltipAction(element, textData) {
       update: (newTextData) => {
 
          // If the new content is valid.
-         let updatedTextData = processTextData(newTextData);
+         let updatedTextData = buildTooltipContent(newTextData);
          if (!isHTMLBlank(updatedTextData)) {
 
             // If the tippy object already exists, update it with the new content.
@@ -93,9 +94,23 @@ export default function tooltipAction(element, textData) {
 }
 
 /**
+ * Builds a tooltip's content from its text data and cleans it with core's HTML cleaner (`foundry.utils.cleanHTML`, the
+ * cleaner core's TooltipManager applies to its own tooltips). Tooltip text can come from data any user may write (a
+ * report's stored description, a custom trait's description) and tippy renders its content as HTML (`allowHTML`), so
+ * every tooltip is cleaned before tippy receives it. Blank content is returned unchanged: it shows no tooltip.
+ * @param {string|number|TextData} textData - The data for the tooltip.
+ * @returns {string} The cleaned tooltip HTML, or the blank content.
+ */
+function buildTooltipContent(textData) {
+   /** @type {string} The tooltip's text, localized and formatted as its text data asks. */
+   const content = processTextData(textData);
+   return isHTMLBlank(content) ? content : foundry.utils.cleanHTML(content);
+}
+
+/**
  * Initializes a tippy tooltipAction object.
  * @param {Element} element - The node to add the tooltipAction to.
- * @param {string} content - The content of the tooltipAction. May be formatted as HTML.
+ * @param {string} content - The cleaned content of the tooltip, which tippy renders as HTML.
  * @returns {tippy} The new tooltipAction object.
  */
 function initializeTippy(element, content) {

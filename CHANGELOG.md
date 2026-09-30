@@ -16,6 +16,9 @@ unlinked tokens to the new rules (as the Migration Mode setting allows).**
 - Turn-start reports list the actor's conditions even when it has no other effect. Report entries' tooltips show
   their text instead of an untranslated key, each effect's tooltip leads with its own duration (a condition's shows
   only its description), and turn-start effects show the Turn Start tag instead of the Turn End one.
+- Rules-element messages on turn-start and turn-end reports show their text (they rendered blank), and HTML in
+  tooltips and rich text is cleaned before it displays, so text stored in a chat message cannot run script in other
+  players' clients.
 - The Migration Mode setting's "Disabled" choice skips migration, as its description says, and a failed migration no
   longer stops the Player HUD from loading.
 

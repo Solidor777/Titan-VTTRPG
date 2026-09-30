@@ -19,7 +19,7 @@ import { closeAllApps, clearChat, attachPageErrors } from './world.js';
 function readLeadTooltip(tag, leadKey, description) {
    return tag.locator(':scope > .tag').evaluate((element, { key, text }) => ({
       content: element._tippy?.props?.content,
-      expected: game.i18n.localize(`LOCAL.${key}.text`) + text,
+      expected: foundry.utils.cleanHTML(game.i18n.localize(`LOCAL.${key}.text`) + text),
    }), {
       key: leadKey,
       text: description,
@@ -100,8 +100,13 @@ test.describe('component probe — EffectTag (plain effect data)', () => {
       await expect(tag.locator('.time')).toContainText('3 (rounds)');
       await expect(tag.locator('img')).toHaveAttribute('src', 'icons/svg/fire.svg');
 
-      // A tag given no lead key (a condition entry) shows only the entry's description.
-      expect(await tag.evaluate((element) => element._tippy?.props?.content)).toBe('<p>On fire.</p>');
+      // A tag given no lead key (a condition entry) shows only the entry's description, cleaned.
+      /** @type {{content: string|undefined, expected: string}} The tag's tooltip and the text it should hold. */
+      const tooltip = await tag.evaluate((element) => ({
+         content: element._tippy?.props?.content,
+         expected: foundry.utils.cleanHTML('<p>On fire.</p>'),
+      }));
+      expect(tooltip.content).toBe(tooltip.expected);
    });
 });
 
