@@ -335,8 +335,8 @@ The user ruled on four questions the plan buddy check raised. Each is implemente
 
 ## Buddy-check directives
 
-- Plan buddy check: accepted 2026-09-29; running
-- Flagged tasks: 5, 9 — buddy check replaces both review stages
+- Plan buddy check: done 2026-09-30, findings folded in (`16a07464`)
+- Flagged tasks: 5, 9, 11 — buddy check replaces both review stages (Task 11 added by the user 2026-09-30)
 - Unflagged tasks showing risk signals: ask
 
 ---
