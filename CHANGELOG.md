@@ -1,4 +1,4 @@
-## Unreleased:
+## Version 2.1.0:
 Advantage and Disadvantage, situational modifiers, and bug fixes.
 - **Re-create hotbar macros made before this version:** every hotbar macro created before this version no longer
   matches when you drag it again. Dragging creates a new macro; the old macros still run, so delete an old one by hand
