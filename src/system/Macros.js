@@ -97,10 +97,8 @@ export default class TitanMacros {
          // Get the id depending on the id method.
          const id = this.getMacroID(item, idMethod);
 
-         // Create the command; every string argument is JSON-encoded so names with quotes or backslashes stay literals.
          /** @type {string} The script the Macro runs. */
-         const command = `game.titan.macros.rollAttackCheck(` +
-            `${JSON.stringify(id)}, ${JSON.stringify(idMethod)}, ${attackIdx})`;
+         const command = this._buildRollCommand('rollAttackCheck', id, idMethod, attackIdx);
 
          // Get or create the macro.
          return this.getOrCreateMacro(name, img, command, 'attackCheck', ATTACK_CHECK_MACRO_VERSION);
@@ -122,9 +120,8 @@ export default class TitanMacros {
          // Get the id depending on the id method.
          const id = this.getMacroID(item, idMethod);
 
-         // Create the command; every string argument is JSON-encoded so names with quotes or backslashes stay literals.
          /** @type {string} The script the Macro runs. */
-         const command = `game.titan.macros.rollCastingCheck(${JSON.stringify(id)}, ${JSON.stringify(idMethod)})`;
+         const command = this._buildRollCommand('rollCastingCheck', id, idMethod);
 
          // Get or create the macro.
          return this.getOrCreateMacro(name, img, command, 'castingCheck', CASTING_CHECK_MACRO_VERSION);
@@ -147,10 +144,8 @@ export default class TitanMacros {
          // Get the id depending on the id method.
          const id = this.getMacroID(item, idMethod);
 
-         // Create the command; every string argument is JSON-encoded so names with quotes or backslashes stay literals.
          /** @type {string} The script the Macro runs. */
-         const command = `game.titan.macros.rollItemCheck(` +
-            `${JSON.stringify(id)}, ${JSON.stringify(idMethod)}, ${checkIdx})`;
+         const command = this._buildRollCommand('rollItemCheck', id, idMethod, checkIdx);
 
          // Get or create the macro.
          return this.getOrCreateMacro(name, img, command, 'itemCheck', ITEM_CHECK_MACRO_VERSION);
@@ -172,6 +167,25 @@ export default class TitanMacros {
       // Get or create the macro.
       return this.getOrCreateMacro(
          name, img, command, 'toggleDocumentSheet', TOGGLE_DOCUMENT_SHEET_MACRO_VERSION);
+   }
+
+   /**
+    * Builds the script of a roll Macro. Every string argument is JSON-encoded so names containing quotes or
+    * backslashes stay string literals.
+    * @param {string} rollMethod - The name of the `game.titan.macros` method the script calls.
+    * @param {string} id - The ID that identifies the Item.
+    * @param {string} idMethod - The method used to identify the Item (uuid, name, or documentId).
+    * @param {number} [idx] - The idx of the Attack or Check; omitted for rolls that take none.
+    * @returns {string} The script the Macro runs.
+    * @private
+    */
+   _buildRollCommand(rollMethod, id, idMethod, idx) {
+      /** @type {string} The arguments, in call order. */
+      const args = [JSON.stringify(id), JSON.stringify(idMethod)];
+      if (idx !== undefined) {
+         args.push(String(idx));
+      }
+      return `game.titan.macros.${rollMethod}(${args.join(', ')})`;
    }
 
    /**
