@@ -1040,3 +1040,15 @@ when fixed.
   `tests/unit/BuildEffectTagTooltip.test.js` and `tests/e2e/condition-description.spec.js` (a live turn-start report
   tags a turn-start effect with the Turn Start icon, not the Turn End one, and its tooltip leads with the Turn Start
   text).
+
+### 97. A failed version migration stored part-migrated data under the previous version
+
+- **What:** `migrateDocument` in `src/helpers/migration/MigrateWorld.js` accumulated changes across the levels of a
+  version. When a later level threw, it wrote the earlier levels' changes together with the previous
+  `documentVersion`, so a retry re-ran migrations on data they had already changed. Latent: no version migrations
+  exist yet.
+- **Found:** 2026-09-30 by the buddy check of the Task 5 fix round (plan B).
+- **Fixed:** 2026-09-30 — `migrateDocument` copies the update data after each fully completed version
+  (`foundry.utils.deepClone`, which keeps an update operator such as `_del` by reference) and writes that copy, so no
+  part of a failed version is stored. Gated by `tests/unit/MigrateWorld.test.js` (a version whose second level throws
+  after its first changed the data in place stores only the previous version's data, its operator intact).

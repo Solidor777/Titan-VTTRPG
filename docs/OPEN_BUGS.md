@@ -51,15 +51,6 @@ Deferred/known bugs. Todos (planned work) live in `docs/TODO.md`; this file is b
 - **Found:** 2026-09-30 by the buddy check of the Task 5 fix round (plan B).
 - **Status:** Open; fixed in Task 5 fix round 2.
 
-### 97. A failed version migration stores part-migrated data under the previous version
-
-- **What:** `migrateDocument` in `src/helpers/migration/MigrateWorld.js` accumulates changes across the levels of a
-  version. When a later level throws, it writes the earlier levels' changes together with the previous
-  `documentVersion`, so a retry re-runs migrations on data they already changed. Latent: no version migrations exist
-  yet.
-- **Found:** 2026-09-30 by the buddy check of the Task 5 fix round (plan B).
-- **Status:** Open; fixed in Task 5 fix round 2.
-
 ### 98. A stored actor whose migration write a hook vetoed counts as skipped
 
 - **What:** `migrateStoredActors` counts an actor whose writes changed nothing as skipped, so a `preCreate`,

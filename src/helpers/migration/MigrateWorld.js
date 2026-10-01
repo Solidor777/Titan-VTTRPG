@@ -155,8 +155,10 @@ export async function worldNeedsMigration() {
 
 /**
  * Migrates a single document through all pending versions in its migration chain. For each pending version, runs
- * migrations from each chain level in order (base to specific) before advancing to the next version. Stops at the
- * last fully completed version if any migration throws an error.
+ * migrations from each chain level in order (base to specific) before advancing to the next version. When a migration
+ * throws, it stops and writes the update data as it stood after the last fully completed version, under that version:
+ * no part of the failed version is stored, so a later load runs that version again from its start. Writes nothing when
+ * no version completed.
  * @param {foundry.abstract.Document} document - The document to migrate.
  * @param {Array<TitanMigration[]> | undefined} chain - The ordered migration chain for this document type.
  * @returns {Promise<boolean>} Whether every pending version migrated (true when none was pending).
@@ -180,8 +182,11 @@ async function migrateDocument(document, chain) {
       ...new Set(chain.flat().map((m) => m.version).filter((v) => v > currentVersion)),
    ].sort((a, b) => a - b);
 
-   /** @type {object} - Accumulated document update data built up across all pending migrations. */
+   /** @type {object} - Update data accumulated across the pending versions, a partly migrated version included. */
    let updateData = {};
+
+   /** @type {object} - A copy of updateData as it stood after the last fully completed version: the data written. */
+   let completedData = {};
 
    /** @type {number} - The version the document has been successfully migrated to so far. */
    let migratedVersion = currentVersion;
@@ -213,12 +218,16 @@ async function migrateDocument(document, chain) {
          break;
       }
       migratedVersion = version;
+
+      // foundry.utils.deepClone keeps an update operator (`_del`) by reference; structuredClone would turn it into a
+      // plain object, which the database would store instead of applying.
+      completedData = foundry.utils.deepClone(updateData);
    }
 
    if (migratedVersion > currentVersion) {
       await document.update({
          'system.documentVersion': migratedVersion,
-         ...updateData,
+         ...completedData,
       });
    }
    return !versionFailed;
