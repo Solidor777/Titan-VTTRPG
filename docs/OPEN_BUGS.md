@@ -14,7 +14,7 @@ Deferred/known bugs. Todos (planned work) live in `docs/TODO.md`; this file is b
 - **Found:** 2026-09-30 by the Task 5 fix round (plan B), measured live.
 - **Status:** Not handled in code by user decision 2026-09-30 (local worlds cleaned one-off).
 
-### 102. Removals on an unlinked token did not survive a reload (unconfirmed; probe used raw-data tokens)
+### 102. Clearing expired effects on an unlinked token with no stored delta does not survive a reload
 
 - **Reported:** On an unlinked token, removing an Item the token inherits from its base actor did not persist across
   a reload, even with Migration Mode Disabled. The user confirmed it is a bug.
@@ -27,13 +27,26 @@ Deferred/known bugs. Todos (planned work) live in `docs/TODO.md`; this file is b
 - **Read in core, not run:** `client/documents/token.mjs:1657` gives a newly created unlinked token a delta only when
   its name differs from the base actor's. Changing `actorLink` on an existing token goes through `:2032` instead.
 - **Contradicting observation (user):** on real tokens, bulk Clear Expired Effects and single-value edits persist.
+- **Real-path token repro, measured (one complete run, `test-titan`, E2E GM 1):**
+  - **Synthetic part:** the base actors and their two expired effects (`duration.remaining: 0`) were made through the
+    document API. Under the no-synthetic-documents rule (`docs/TODO.md`) the repro is not yet fully valid.
+  - **Tokens, made through the UI:**
+    - token A: the actor dragged onto a viewed canvas, with an unlinked prototype token and the default name;
+    - token B: a linked drop, unlinked with the token config toggle, and the sheet reopened.
+  - **Before the clear:** both tokens stored `delta: null`.
+  - **The clear:** Clear Expired Effects was run from the sheet's Effects tab and its dialog confirmed. The tab
+    emptied, and the client delta held two effect tombstones.
+  - **After a reload:** the server held `delta: null`, and both effects were back on the token and the sheet.
+  - **Not measured:** the server state between the clear and the reload.
+  - **Evidence:** logs and screenshots in `.superpowers/sdd/2026-09-29-conditions-rework/repro102/`
+    (`run3.log`, `shots/`).
 - **Cause:** unknown. Not attributed to Foundry core or to TITAN.
-- **Next measurement:** a real-path repro in `test-titan`. Make the unlinked token both ways: a canvas drop of an
-  actor whose prototype token is unlinked, and a placed linked token unlinked with the toggle, then the sheet
-  reopened. Give the base actor two expired effects, run Clear Expired Effects from the UI, then reload and read what
-  was stored. Only if that loses data, run the same steps in `test-pf2e`, which does not load TITAN.
+- **Next measurements:**
+  - Repeat with the base actor and its effects also made through the UI, with effects expired through combat turns.
+  - Read the server between the clear and the reload.
+  - If the loss holds, run the same steps in `test-pf2e`, which does not load TITAN.
 - **Found:** 2026-10-01 while the Task 5 fix round 2 identity e2e (plan B) was seeding its tokens.
-- **Status:** Open; unconfirmed until the real-path repro.
+- **Status:** Open. Reproduced once with real-path tokens; cause not yet located.
 
 ### 103. Deleting an item or effect without confirmation still tries to open the confirmation dialog
 
@@ -61,3 +74,12 @@ Deferred/known bugs. Todos (planned work) live in `docs/TODO.md`; this file is b
   A leaked orphan with pending migration work would count as a migration failure in later specs (#105).
 - **Found:** 2026-10-01 by an orphan census after the Task 5 fix round 3 full e2e (654 passed).
 - **Status:** Open. Fixed together with the conversion of the e2e specs to real Foundry data (`docs/TODO.md`).
+
+### 107. Dropping an Item folder on an actor sheet creates nothing
+
+- **What:** `TitanActorSheet#_onDropFolder` (`src/document/types/actor/sheet/TitanActorSheet.js:383`) reads
+  `if (folder && folder.type !== 'Item')`. The condition is inverted, so it turns away every Item folder and handles
+  only folders of other types. Dropping an Item folder from the Items sidebar onto an actor or token sheet creates no
+  Item, with no notification and no error. This was measured on two token sheets in the #102 repro.
+- **Found:** 2026-10-01 during the #102 real-path repro.
+- **Status:** Open.

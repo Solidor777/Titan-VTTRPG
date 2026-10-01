@@ -50,15 +50,22 @@ Completed items are deleted, not marked done.
   - Stormcaller's Tempest: flagged as an action; The Dragon Awakens and Being of Urdokai, which work the same way, are
     passive.
 
-- Real Foundry data in every test (user rule 2026-10-01, retroactive). A test that touches Foundry-derived state
-  must get that state from the real path, never from hand-built data. Foundry-derived state covers tokens and their
-  deltas, link and unlink (click unlink, then reopen the sheet), synthetic actors, and data from older versions; the
-  real path is a canvas drop, the UI, or real stored worlds and packs. Plain fixture documents made through the
-  document API stay. Convert first the specs that build tokens from raw data: `condition-migration`,
-  `converted-effect-identity` and `sheet-regressions` (e2e), plus the `tests/e2e/world.js` helper. Then audit the
-  rest of the e2e suite, and the unit-test fakes of Foundry-derived state, which must match data captured from real
-  Foundry. Results that rest only on raw-data tokens are unconfirmed until re-run: OPEN_BUGS #102, and the live gates
-  for #96, #99-#101 and #105.
+- No synthetic documents in tests (user rule 2026-10-01, retroactive to every test). Foundry changes and processes
+  documents during and after creation, so every document a test needs must be made through the real Foundry user
+  flow and deleted when the test is done. Documents include actors, items, effects, tokens, scenes and folders. Real
+  flows include the sidebar create, sheet edits, a canvas drop, the unlink toggle with the sheet reopened, and combat
+  turns to expire effects. Document-API fixtures (`Actor.create`, `createEmbeddedDocuments`, raw token data) are not
+  allowed. Synthetic data is allowed only for tests of UI elements or document-agnostic operations, such as
+  localization. Scope:
+  - the whole e2e suite, including the `tests/e2e/world.js` fixture helpers;
+  - unit-test fakes of Foundry documents.
+
+  Every result gated by a synthetic-document test is unconfirmed until it is re-run the real way. That covers the
+  live gates in `docs/CLOSED_BUGS.md`, and #102 in `docs/OPEN_BUGS.md`.
+
+- Report world documents that fail to load (user ruling 2026-10-01: no systemic fix now). Foundry leaves an invalid
+  actor, scene or item out of its world collection (`invalidDocumentIds`), so the migration scan never sees one that
+  holds pending work. A token whose base actor is invalid is reported as orphaned ("its base actor is gone").
 
 - Apply effects to targets when a spell or ability is cast, with values derived from the caster and each target (user
   ruling 2026-09-27). First consumer: Abjuration of the Arbiter's dice penalty, "your Soul minus the target's Soul, to a
