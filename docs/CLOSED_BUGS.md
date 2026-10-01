@@ -1250,16 +1250,3 @@ when fixed.
     unchanged, the pack stays locked, and once the tokens are deleted the next load starts no migration.
   - The legacy-Item orphan case is unit-gated only: the server rejects the unregistered `effect` Item subtype, so no
     e2e can seed a legacy effect Item.
-
-### 110. A condition effect whose rules elements a GM edited may be overwritten by migration (unconfirmed)
-
-- **What, read, not run:** the Active Effect sheet's Rules Elements tab
-  (`src/document/types/active-effect/sheet/ActiveEffectSheetTabs.svelte:28`) does not gate on effect
-  type. `getConditionEffectUpdate` (`src/helpers/migration/SyncConditionEffects.js:41-71`) marks a condition effect
-  stale when its stored rules elements differ from the condition's definition. `storedActorNeedsMigration` includes
-  that check. So a hand-edited condition effect may make every Prompt or Automatic GM load prompt for migration, and
-  then have its edits overwritten. No document says this is intended.
-- **Found:** 2026-10-01 by a plan reviewer reading the code (Task 5 fix round 4 plan review).
-- **Resolution:** Closed without a change by user decision on 2026-10-01 ("For now this is fine"). GMs may edit a
-  condition's rules elements. No migration runs live under the project scope rule (`.claude/claude.md`), and the
-  overwrite was never reproduced.

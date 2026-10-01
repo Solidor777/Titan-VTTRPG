@@ -112,3 +112,15 @@ Deferred/known bugs. Todos (planned work) live in `docs/TODO.md`; this file is b
   is a real defect or screenshot timing.
 - **Found:** 2026-10-01 during the #102 real-flow repro.
 - **Status:** Open; unconfirmed until reproduced.
+
+### 110. A condition effect whose rules elements a GM edited may be overwritten by migration (unconfirmed)
+
+- **What, read, not run:** the Active Effect sheet's Rules Elements tab
+  (`src/document/types/active-effect/sheet/ActiveEffectSheetTabs.svelte:28`) does not gate on effect
+  type. `getConditionEffectUpdate` (`src/helpers/migration/SyncConditionEffects.js:41-71`) marks a condition effect
+  stale when its stored rules elements differ from the condition's definition. `storedActorNeedsMigration` includes
+  that check. So a hand-edited condition effect may make every Prompt or Automatic GM load prompt for migration, and
+  then have its edits overwritten. No document says this is intended.
+- **Found:** 2026-10-01 by a plan reviewer reading the code (Task 5 fix round 4 plan review).
+- **Status:** Open. The user deferred it on 2026-10-01 to a future document inheritance campaign
+  (`docs/TODO.md`). For now GMs may edit a condition's rules elements.
