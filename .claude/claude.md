@@ -25,9 +25,11 @@
 
 ## Project Scope (non-negotiable)
 
-* **No migrations yet.** Only the user's existing world exists, and no other world will run this system. Data changes
-  are made by fixing that existing world directly, with a backup first and the user's knowledge. Do not build,
-  extend, or test migration paths for other worlds, older versions, packs, or Adventures unless the user asks for it.
+* **No migrations yet.** Only the user's existing world exists, and no other world runs this system yet. Data changes
+  are made by fixing that existing world directly, with a backup first and the user's knowledge. The migration system
+  (`MigrateWorld`, version chains, the stored-actor walker) stays for future public releases, with its generic tests.
+  Do not build or extend specific migrations, run them live, or write tests of specific migrations unless the user
+  asks for it.
 * **Tests use genuine live documents.** Any test of a change to a document runs on documents made through real
   Foundry user flows, and deletes them when it is done. Cleanup may use the API `delete`. Synthetic data is allowed
   only for UI elements, document-agnostic operations such as localization, and intermediate computations on given
