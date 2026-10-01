@@ -2,9 +2,10 @@
 
 Deferred/known bugs. Todos (planned work) live in `docs/TODO.md`; this file is bugs only.
 
-### 92. A world actor, token or pack holding a base-type Active Effect fails to load (TITAN registers only the `effect` and `condition` AE types)
+### 92. A world actor, token or pack holding a base-type Active Effect fails to load
 
-- **What:** `src/hooks/OnceInit.js` sets `CONFIG.ActiveEffect.dataModels` to `{ effect, condition }`, replacing core's
+- **What:** TITAN registers only the `effect` and `condition` Active Effect types.
+  `src/hooks/OnceInit.js` sets `CONFIG.ActiveEffect.dataModels` to `{ effect, condition }`, replacing core's
   `{ base: ActiveEffectTypeDataModel }`, so the client cannot construct a base-type Active Effect (`changes is not
   iterable` in core's `_shimChanges`). Measured live: `createEmbeddedDocuments` with a base-type effect creates
   nothing and raises no error; a world actor holding one stops the world from loading (`game.ready` never set, page
@@ -13,7 +14,7 @@ Deferred/known bugs. Todos (planned work) live in `docs/TODO.md`; this file is b
 - **Found:** 2026-09-30 by the Task 5 fix round (plan B), measured live.
 - **Status:** Not handled in code by user decision 2026-09-30 (local worlds cleaned one-off).
 
-### 102. A multi-document create or delete on an unlinked token that has no stored delta is lost, along with every later write to that token
+### 102. A multi-document create or delete on an unlinked token with no stored delta is lost
 
 - **What:** An unlinked token whose stored `delta` is `null` loses a create or delete of two or more embedded
   documents through its synthetic actor. Core stores a `null` delta when the token is named like its base actor,

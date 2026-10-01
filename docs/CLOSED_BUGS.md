@@ -1219,9 +1219,9 @@ when fixed.
   `tests/unit/StoredActorSources.test.js` (the removed Item's conversion and older-id conversions hidden, an unclaimed
   one left), `tests/unit/MigrateStoredActors.test.js`, and `tests/e2e/converted-effect-identity.spec.js` (live, for an
   unlinked token on a world scene, one in a locked world Scene pack (both named apart from their base actors, so core
-  stores their deltas, #102), and one in an Adventure in a locked world Adventure pack: an Automatic load hides the conversions of Items the token removed or converted itself, older-id
-  ones included, leaves an unclaimed one, and the next load writes nothing; the imported Adventure token no longer
-  shows the hidden conversions).
+  stores their deltas, #102), and one in an Adventure in a locked world Adventure pack: an Automatic load hides the
+  conversions of Items the token removed or converted itself, older-id ones included, leaves an unclaimed one, and the
+  next load writes nothing; the imported Adventure token no longer shows the hidden conversions).
 
 ### 105. Orphaned tokens with pending migration work were skipped silently
 

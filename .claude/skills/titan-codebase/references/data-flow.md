@@ -384,7 +384,7 @@ module flag is no longer stamped on effects or conditions — this HUD replaces 
 **Where it lives:** `src/helpers/migration/`
 - `MigrateWorld.js` — `worldNeedsMigration()` (async), `migrateWorld()`, `resolveMigrationAction()`, and the version
   chains (`ACTOR_MIGRATION_CHAINS`, `ITEM_MIGRATION_CHAINS`, `migrateDocument`).
-- `MigrateStoredActors.js` — the stored-actor pass: `storedActorNeedsMigration(source)`, `storedActorsNeedMigration()`,
+- `MigrateStoredActors.js` — the stored-actor pass: `storedActorNeedsMigration(data)`, `storedActorsNeedMigration()`,
   `migrateStoredActors()`.
 - `StoredActorSources.js` — `walkStoredActorSources(failures)`, the one walker over every stored actor
   (`STORED_ACTOR_LOCATIONS`, `PACK_PROJECTION_FIELDS`), and the write targets its sources open.

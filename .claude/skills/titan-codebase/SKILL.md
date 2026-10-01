@@ -1,6 +1,12 @@
 ---
 name: titan-codebase
-description: Orientation map of the TITAN Foundry VTT system codebase — load this BEFORE building, adding, or modifying anything under systems/titan to learn what already exists, where it lives, the core abstractions and how they relate, and how new work should fit in. Covers the src/ layout, key classes (Check, TitanActor, DataModels, chat-message reports, rules-elements, sheets), data/control flow, and conventions (the `~/` import alias, SCSS mixins, assert()). This skill is descriptive — a map, not a rulebook — and self-updating: reconcile its knowledge against what you learned at the end of each task.
+description: >-
+  Orientation map of the TITAN Foundry VTT system codebase — load this BEFORE building, adding, or modifying anything
+  under systems/titan to learn what already exists, where it lives, the core abstractions and how they relate, and how
+  new work should fit in. Covers the src/ layout, key classes (Check, TitanActor, DataModels, chat-message reports,
+  rules-elements, sheets), data/control flow, and conventions (the `~/` import alias, SCSS mixins, assert()). This skill
+  is descriptive — a map, not a rulebook — and self-updating: reconcile its knowledge against what you learned at the
+  end of each task.
 ---
 
 # TITAN Codebase Map
