@@ -62,7 +62,7 @@ const LEGACY_ITEM = {
 const uiErrors = [];
 
 /**
- * A Foundry-like collection: a Map keyed by document id that iterates and maps its documents.
+ * A Foundry-like collection: a Map keyed by document id that iterates its documents.
  * @extends {Map}
  */
 class FakeCollection extends Map {
@@ -84,15 +84,6 @@ class FakeCollection extends Map {
    [Symbol.iterator]() {
       return this.values();
    }
-
-   /**
-    * Maps the documents.
-    * @param {Function} transform - The mapping function.
-    * @returns {Array} The mapped values.
-    */
-   map(transform) {
-      return [...this.values()].map(transform);
-   }
 }
 
 /**
@@ -101,9 +92,9 @@ class FakeCollection extends Map {
  * @param {object} data - The fake's contents.
  * @param {string} data.id - The id the fake's `id` returns.
  * @param {string} data.name - The name the fake's `name` returns.
- * @param {object[]} [data.effects] - The stored Active Effect data; each becomes an effect document too.
+ * @param {object[]} [data.effects] - The stored Active Effect data.
  * @param {object[]} [data.items] - The stored Item data.
- * @returns {object} A fake with `_source`, an `effects` collection, and spied embedded writes.
+ * @returns {object} A fake with `_source` and spied embedded writes.
  */
 function makeFakeActor({ effects = [], id, items = [], name }) {
    /** @type {object} The fake actor, referenced by its own spies. */
@@ -122,10 +113,6 @@ function makeFakeActor({ effects = [], id, items = [], name }) {
          actor._source.items = actor._source.items.filter((entry) => !ids.includes(entry._id));
          return [];
       }),
-      effects: new FakeCollection(effects.map((effect) => ({
-         id: effect._id,
-         toObject: () => structuredClone(effect),
-      }))),
       id,
       name,
       updateEmbeddedDocuments: vi.fn(async (embeddedName, updates) => updates.map((update) => ({
@@ -143,13 +130,11 @@ function makeFakeActor({ effects = [], id, items = [], name }) {
  * @param {boolean} [data.actorLink] - Whether the token is linked.
  * @param {object|null} data.baseActor - The base world actor.
  * @param {object} [data.delta] - The token's stored delta.
- * @param {object[]} [data.heldEffects] - The effect data its synthetic actor has, inherited ones included.
  * @returns {{actor: object, actorRead: Function, token: object}} The token, its actor, and the read spy.
  */
-function makeFakeToken({ actorLink = false, baseActor, delta, heldEffects = [], id, name }) {
+function makeFakeToken({ actorLink = false, baseActor, delta, id, name }) {
    /** @type {object} The token's synthetic actor. */
    const actor = makeFakeActor({
-      effects: heldEffects,
       id: `${id}Actor`,
       name,
    });
@@ -402,7 +387,6 @@ function makeWorld() {
          effects: [EFFECT],
          items: [],
       },
-      heldEffects: [EFFECT],
       id: 'worldToken',
       name: 'World Token',
    });
@@ -637,17 +621,6 @@ function makeStoredDelta(id, data) {
          stored._source.items = stored._source.items.filter((entry) => !ids.includes(entry._id));
          return [];
       }),
-      effects: {
-         /**
-          * Maps the document's effects (its stored effects, tombstones excluded).
-          * @param {Function} transform - The mapping function.
-          * @returns {Array} The mapped values.
-          */
-         map: (transform) => stored._source.effects
-            .filter((effect) => !effect._tombstone)
-            .map((effect) => ({ toObject: () => structuredClone(effect) }))
-            .map(transform),
-      },
       id,
       updateEmbeddedDocuments: vi.fn(async (embeddedName, updates) => {
          for (const update of updates) {
