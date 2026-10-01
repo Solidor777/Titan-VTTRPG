@@ -659,15 +659,15 @@ function applyStoredUpdate(stored, update) {
 }
 
 /**
- * Builds a fake actor document whose embedded writes change its stored data as core stores them: a creation stores
- * the effects, an update applies its dotted paths, and a deletion of Items or Active Effects (by `embeddedName`)
- * removes the entries the data holds and resolves no document (core splices a deleted invalid Item from the client
- * source). Given a base actor, the fake is a token's delta, and a deletion leaves a tombstone (`{_id, _tombstone:
- * true}`) where the base actor holds a valid entry with the id, as core stores a token's deletion (measured after a
- * reload: a tombstone over a valid base Item, none for an id the base actor lacks). A legacy effect Item of the base
- * actor takes no tombstone: it is an invalid document, which core's base collection never holds, and core's client
- * deletion tombstones only an id its base collection holds; that case is not measured, because the server refuses a
- * legacy Item, so none can be seeded.
+ * Builds a fake actor document whose embedded writes change its stored data as core stores them: a creation stores the
+ * effects, an update applies its dotted paths, and a deletion of Items or Active Effects (by `embeddedName`) removes
+ * the entries the data holds and resolves no document (core splices a deleted invalid Item from the client source).
+ * Given a base actor, the fake is a token's delta, and a deletion leaves a tombstone (`{_id, _tombstone: true}`) where
+ * the base actor holds a valid entry with the id, as core stores a token's deletion (read back after a reload: a
+ * tombstone over a valid base Item, none for an id the base actor lacks; live with a raw-data token, pending real-path
+ * re-run). A legacy effect Item of the base actor takes no tombstone: it is an invalid document, which core's base
+ * collection never holds, and core's client deletion tombstones only an id its base collection holds; that case is not
+ * measured, because the server refuses a legacy Item, so none can be seeded.
  * @param {string} id - The document id.
  * @param {object} data - The stored data: its `effects` and `items`.
  * @param {object|null} [base] - The token's base actor (a fake holding `_source`); null for any other actor.
@@ -1418,8 +1418,8 @@ describe('stored actor targets', () => {
          });
 
          // Core stores a tombstone over the base actor's valid Item and none for the Item the base actor lacks
-         // (measured after a reload). The base actor's legacy Item is an invalid document, which core's base
-         // collection never holds, so its id takes no tombstone either.
+         // (read back after a reload; live with a raw-data token, pending real-path re-run). The base actor's legacy
+         // Item is an invalid document, which core's base collection never holds, so its id takes no tombstone either.
          expect(adventure.updates[0].scenes[0].tokens[0].delta.items).toEqual([
             {
                _id: 'commodity0',

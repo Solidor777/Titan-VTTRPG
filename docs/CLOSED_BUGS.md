@@ -1126,11 +1126,12 @@ when fixed.
 
   The write limitation comes from Foundry v14 core: core cannot create or delete entries in an orphaned token's
   delta, and the conversion needs both (`docs/POST_WORK_FINDINGS.md`, 2026-10-01).
-  - Measured live on a world-scene and a Scene-pack token, with a second GM connected and a reload read-back: a parent
-    Token or Scene update that adds an entry is rejected by the client's dry run
-    (`EmbeddedCollectionDelta#_prepareDeltaUpdate`); one that drops an entry, or deletes it with an update operator,
-    stores nothing; one that updates an entry the delta already holds is stored, and tombstones survive.
-  - Measured live on the Scene-pack token only: an embedded create through the token's ActorDelta threw on the client.
+  - Measured live with raw-data tokens, pending real-path re-run, on a world-scene and a Scene-pack token, with a second
+    GM connected and a reload read-back: a parent Token or Scene update that adds an entry is rejected by the client's
+    dry run (`EmbeddedCollectionDelta#_prepareDeltaUpdate`); one that drops an entry, or deletes it with an update
+    operator, stores nothing; one that updates an entry the delta already holds is stored, and tombstones survive.
+  - Measured live with a raw-data token, pending real-path re-run, on the Scene-pack token only: an embedded create
+    through the token's ActorDelta threw on the client.
   - Read in core, not run: the throw site, `TokenDocument#_onRelatedUpdate` (`client/documents/token.mjs:3809`),
     which dereferences the token's null actor; the same create on the world-scene token; and the embedded update and
     delete, which reach the same line.
@@ -1139,7 +1140,7 @@ when fixed.
     `docs/TODO.md` and done 2026-10-01.
   - The walker comments state the reasons, and CLOSED_BUGS #83 states the exception.
   - An Adventure's scene tokens are inline data written through the Adventure, which core writes cleanly whatever the
-    base actor (measured live), so they are migrated.
+    base actor (live with a raw-data token, pending real-path re-run), so they are migrated.
   - Gated by `tests/unit/StoredActorSources.test.js`: orphaned tokens on a world scene and in a Scene pack are
     never opened or written (#105 lists the reporting gates); an Adventure token whose actor id names no actor is
     walked and written.
@@ -1195,16 +1196,17 @@ when fixed.
 - **Found:** 2026-09-30 while planning the fix for #99.
 - **Fixed:** 2026-10-01 — the identity change of #99: both conversions take the Item's id, so whichever side converts
   first, and whether or not the other side's write is stored, the token's own effect overrides the base actor's. A
-  token's Item deletion in an Adventure stores what core stores for a world token's deletion: a tombstone where the
-  base actor holds a valid Item with the id, and none for an Item the base actor lacks (both measured live after a
-  reload). A legacy `effect` Item of the base actor takes no tombstone: it is an invalid document, which core's base
-  collection never holds, and core's client deletion tombstones only an id its base collection holds. That case
-  follows core's client deletion and is not measured: the server refuses a legacy Item, so none can be seeded. Gated
-  by `tests/unit/StoredActorSources.test.js`: "keeps one effect on an Adventure token whose base actor converts only
-  on a later load" (the first load's `actors` write is not stored) and "keeps one effect on a world token whose base
-  actor's conversion is stored only on a later load" (the base actor's creation is not stored); in both the next load
-  converts the base actor, and the token keeps one effect and takes no write. "stores an Adventure token's Item
-  deletion as core stores a token's" gates the tombstones. Unit-gated only: no e2e can seed a legacy effect Item.
+  token's Item deletion in an Adventure stores what core stores for a world token's deletion: a tombstone where the base
+  actor holds a valid Item with the id, and none for an Item the base actor lacks (both read back after a reload; live
+  with a raw-data token, pending real-path re-run). A legacy `effect` Item of the base actor takes no tombstone: it is
+  an invalid document, which core's base collection never holds, and core's client deletion tombstones only an id its
+  base collection holds. That case follows core's client deletion and is not measured: the server refuses a legacy Item,
+  so none can be seeded. Gated by `tests/unit/StoredActorSources.test.js`: "keeps one effect on an Adventure token whose
+  base actor converts only on a later load" (the first load's `actors` write is not stored) and "keeps one effect on a
+  world token whose base actor's conversion is stored only on a later load" (the base actor's creation is not stored);
+  in both the next load converts the base actor, and the token keeps one effect and takes no write. "stores an Adventure
+  token's Item deletion as core stores a token's" gates the tombstones. Unit-gated only: no e2e can seed a legacy effect
+  Item.
 
 ### 101. An inherited legacy Item a token removed came back as a converted effect
 
@@ -1242,9 +1244,9 @@ when fixed.
     never opened and none of its writers is called; the Scene pack is only projected, `configure` is never called,
     and it stays locked; an orphan with nothing pending is silent. Also gated by
     `tests/unit/MigrateStoredActors.test.js` (the scan and the pass over orphan sources).
-  - Gated live by `tests/e2e/condition-migration.spec.js` with a stale condition in each orphan's own delta, on a
-    world scene and in a locked world Scene pack: an Automatic load reports both with their console lines and
-    `World migration finished with failures: 2.`, both stored deltas read back unchanged, the pack stays locked, and
-    once the tokens are deleted the next load starts no migration.
+  - Gated by `tests/e2e/condition-migration.spec.js` (live with raw-data tokens, pending real-path re-run) with a stale
+    condition in each orphan's own delta, on a world scene and in a locked world Scene pack: an Automatic load reports
+    both with their console lines and `World migration finished with failures: 2.`, both stored deltas read back
+    unchanged, the pack stays locked, and once the tokens are deleted the next load starts no migration.
   - The legacy-Item orphan case is unit-gated only: the server rejects the unregistered `effect` Item subtype, so no
     e2e can seed a legacy effect Item.
