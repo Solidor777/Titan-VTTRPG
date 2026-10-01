@@ -879,10 +879,14 @@ every `.js` under `tests/e2e` except `contextMenu.js` and fails on a direct cont
 one.
 
 **No e2e operation may exceed 1 second**, and wait ceilings are set to that budget so a breach fails
-loudly instead of silently absorbing 15s: explicit `timeout:` values are `1000`. Six waits are
-deliberately exempt because they are inherently multi-second — `game.ready` world boot
-(`fixtures.js`, `player-hud-layout.spec.js`), a second browser context finishing login
-(`multiClient.js`), and login navigation plus bulk conversion (`pack-conversion.spec.js`). Do not
+loudly instead of silently absorbing 15s: explicit `timeout:` values are `1000`. Inherently
+multi-second waits are deliberately exempt — a `game.ready` world boot (`fixtures.js`,
+`player-hud-layout.spec.js`, and the Player HUD wait in the `beforeAll` of `pack-conversion.spec.js`,
+`condition-migration.spec.js`, and `converted-effect-identity.spec.js`), a mid-file reload (`world.js`
+`reloadWithMode`, used by `pack-conversion.spec.js`, `condition-migration.spec.js`, and
+`converted-effect-identity.spec.js`), a second browser context finishing login (`multiClient.js`), and a
+migration confirmed from the Prompt dialog, a full pass over every stored actor
+(`condition-migration.spec.js`, 60 s). The same specs raise `test.setTimeout` for their reloads. Do not
 sweep those to 1s. A ceiling is a failure bound, not a duration: a `waitForFunction` returns the
 moment its predicate holds. **`titanWait`'s default timeout is also 1000ms** (`tests/e2e/poll.js`), so
 the budget is the default everywhere and the exceptions are the few explicit overrides — pass an
@@ -948,7 +952,11 @@ next. A test that clicks the SAME category the previous test left open TOGGLES i
 open flyout first (`Escape` when `player-hud-flyout` is present), as the `openCategory` helper in
 `player-hud-action-menu-layout.spec.js` does.
 
-**Mid-file `page.reload()` idiom** (`tests/e2e/pack-conversion.spec.js`, `tests/e2e/condition-migration.spec.js`):
+**Mid-file `page.reload()` idiom** (`tests/e2e/world.js` `reloadWithMode(page, mode)`, used by
+`pack-conversion.spec.js`, `condition-migration.spec.js`, and `converted-effect-identity.spec.js`): it sets the
+`migrationMode` setting, runs steps (3)-(5) below, and then `expectActiveGM(page)` (also in `world.js`) asserts
+`game.users.activeGM?.isSelf`, because only the active GM migrates and core's `getDesignatedUser` makes the active GM
+with the highest role that GM.
 `page.on('console')` and `attachPageErrors` listeners survive reloads (they attach to the Page object). Sequence:
 (1) PROVE the first boot's ready work finished BEFORE clearing the capture buffer —
 `waitForFunction(() => !!game.titan?.playerHud)`, since the Player HUD is built after the GM's migration attempt
