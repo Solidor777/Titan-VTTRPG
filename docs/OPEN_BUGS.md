@@ -59,3 +59,21 @@ Deferred/known bugs. Todos (planned work) live in `docs/TODO.md`; this file is b
   yet.
 - **Found:** 2026-09-30 by the buddy check of the Task 5 fix round (plan B).
 - **Status:** Open; fixed in Task 5 fix round 2.
+
+### 98. A stored actor whose migration write a hook vetoed counts as skipped
+
+- **What:** `migrateStoredActors` counts an actor whose writes changed nothing as skipped, so a `preCreate`,
+  `preUpdate`, or `preDelete` hook that vetoes a migration write leaves the actor's work pending while the migration
+  announces completion, and the next GM load finds the same work again.
+- **Found:** 2026-09-30 while planning the fix for #93 (read in code).
+- **Status:** Open; fixed in Task 5 fix round 2.
+
+### 99. An Adventure token whose legacy Item overrides its base actor's legacy Item ends up with two converted effects
+
+- **What:** The Adventure walk reads only a scene token's own delta effects, so when the delta holds a legacy `effect`
+  Item with the same id as a legacy Item on its base actor (an override, for example an effect toggled on the token),
+  the token converts its own copy while the base actor converts the base copy; after import the token holds both
+  effects. World tokens avoid this because their synthetic actor reads inherited effects, so creation is skipped by
+  stamp. Read in code only: legacy Items cannot be seeded at runtime.
+- **Found:** 2026-09-30 while planning the fix for #93.
+- **Status:** Open; fixed in Task 5 fix round 2.
