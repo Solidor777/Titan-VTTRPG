@@ -23,6 +23,19 @@
 * **Project Precedence.** The project `CLAUDE.md` SUPERCEDES any other.
 * **Documentation:**  No unlogged todos — every bug is logged to `docs/OPEN_BUGs.md`. Every other deferred item is logged to `docs/TODO.md`. 
 
+## Project Scope (non-negotiable)
+
+* **No migrations yet.** Only the user's existing world exists, and no other world will run this system. Data changes
+  are made by fixing that existing world directly, with a backup first and the user's knowledge. Do not build,
+  extend, or test migration paths for other worlds, older versions, packs, or Adventures unless the user asks for it.
+* **Tests use genuine live documents.** Any test of a change to a document runs on documents made through real
+  Foundry user flows, and deletes them when it is done. Cleanup may use the API `delete`. Synthetic data is allowed
+  only for UI elements, document-agnostic operations such as localization, and intermediate computations on given
+  inputs. World settings may be set through the API. Mid-test document edits go through sheet and HUD controls, with
+  a direct update only for a field that has no control.
+* **Never make unverified claims.** Docs, comments and reports state only what was measured (with the command or log)
+  or read (with the source location). Anything inferred is labelled as such.
+
 ## Fable-class models
 
 On Fable-class models (`claude-fable-5`, `claude-mythos-5`), follow the global `## Working style (Fable-class models)` section in `~/.claude/CLAUDE.md` in addition to these project rules. Where they conflict, that section governs on Fable-class models — specifically, **Context management** above is overridden by its §Context budget (do not pause for context). All other project rules remain in force, including **Consent required** (still pause before architecture, dependency, layout, naming, or public-API decisions) and **No unilateral spec/plan changes**. On all other models this section is inert.
