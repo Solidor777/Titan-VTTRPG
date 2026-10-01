@@ -27,26 +27,30 @@ Deferred/known bugs. Todos (planned work) live in `docs/TODO.md`; this file is b
 - **Read in core, not run:** `client/documents/token.mjs:1657` gives a newly created unlinked token a delta only when
   its name differs from the base actor's. Changing `actorLink` on an existing token goes through `:2032` instead.
 - **Contradicting observation (user):** on real tokens, bulk Clear Expired Effects and single-value edits persist.
-- **Real-path token repro, measured (one complete run, `test-titan`, E2E GM 1):**
-  - **Synthetic part:** the base actors and their two expired effects (`duration.remaining: 0`) were made through the
-    document API. Under the no-synthetic-documents rule (`docs/TODO.md`) the repro is not yet fully valid.
-  - **Tokens, made through the UI:**
-    - token A: the actor dragged onto a viewed canvas, with an unlinked prototype token and the default name;
-    - token B: a linked drop, unlinked with the token config toggle, and the sheet reopened.
+- **Real-flow repro, measured (`test-titan`, E2E GM 1, 4 runs, no synthetic documents):**
+  - **How the documents were made:**
+    - The scene, the actors and their effects were made through the UI.
+    - Each effect had a "Turn Start" duration with 1 remaining, and was expired by running a Combat Tracker combat on
+      linked tokens.
+    - Token (a) was a canvas drop of an actor whose prototype token was set unlinked, with the default name.
+    - Token (b) was a linked token unlinked with the Token config toggle, with its sheet reopened.
   - **Before the clear:** both tokens stored `delta: null`.
-  - **The clear:** Clear Expired Effects was run from the sheet's Effects tab and its dialog confirmed. The tab
-    emptied, and the client delta held two effect tombstones.
-  - **After a reload:** the server held `delta: null`, and both effects were back on the token and the sheet.
-  - **Not measured:** the server state between the clear and the reload.
-  - **Evidence:** logs and screenshots in `.superpowers/sdd/2026-09-29-conditions-rework/repro102/`
-    (`run3.log`, `shots/`).
-- **Cause:** unknown. Not attributed to Foundry core or to TITAN.
+  - **The clear:** Clear Expired Effects, run from the sheet, sent one `modifyDocument` ActiveEffect `delete` of both
+    ids with parent `Scene.<id>.Token.<id>.ActorDelta.<id>`.
+  - **The server reply:** `result` held both ids, with no error (websocket capture, run 4).
+  - **What was stored:** the token's `delta` was still `null` on reads right after the clear and 2 s later, and after
+    a reload. The client showed the effects removed until the reload, then both were back. The base actor kept both
+    effects throughout.
+  - **Evidence:** `.superpowers/sdd/2026-09-29-conditions-rework/repro102b/` (`run1.log` to `run4.log`, `shots/`).
+  - An earlier run whose actors and effects were made through the document API gave the same result (`repro102/`).
+- **Cause:** unknown. Not attributed to Foundry core or to TITAN. TITAN's clear is one batch
+  `deleteEmbeddedDocuments('ActiveEffect', ids)` on the token's actor (`CharacterDataModel.js:4870-4883`, read).
 - **Next measurements:**
-  - Repeat with the base actor and its effects also made through the UI, with effects expired through combat turns.
-  - Read the server between the clear and the reload.
-  - If the loss holds, run the same steps in `test-pf2e`, which does not load TITAN.
+  - The same clear in `test-pf2e`, which does not load TITAN.
+  - A single effect deleted with the row button on a `delta: null` token.
+  - The clear on a token whose delta already exists.
 - **Found:** 2026-10-01 while the Task 5 fix round 2 identity e2e (plan B) was seeding its tokens.
-- **Status:** Open. Reproduced once with real-path tokens; cause not yet located.
+- **Status:** Open. Reproduced through real flows; cause not yet located.
 
 ### 103. Deleting an item or effect without confirmation still tries to open the confirmation dialog
 
@@ -83,3 +87,21 @@ Deferred/known bugs. Todos (planned work) live in `docs/TODO.md`; this file is b
   Item, with no notification and no error. This was measured on two token sheets in the #102 repro.
 - **Found:** 2026-10-01 during the #102 real-path repro.
 - **Status:** Open.
+
+### 108. `TitanActor#getCombatant` uses a core API that is deprecated and removed in v15
+
+- **What:** `src/document/types/actor/TitanActor.js:83` calls `game.combat?.getCombatantByActor(this.id)`. Foundry
+  logs a deprecation warning: deprecated since v14 and removed in v15 (measured console warning in the #102 repro).
+  The call passes `this.id`; for a token's synthetic actor that is the base actor's id (read), the same identity
+  pattern as #104. Whether it then finds the wrong combatant has not been measured.
+- **Found:** 2026-10-01 during the #102 real-flow repro.
+- **Status:** Open.
+
+### 109. A token sheet may highlight the Skills tab while showing the Effects tab (unconfirmed)
+
+- **What:** screenshots from the #102 real-flow repro show the tab strip still highlighting "Skills" after
+  Effects was clicked, while the Effects content shows (`repro102b/shots/run1-*-after-reload.png`,
+  `run3-*-A-before-clear.png`). A later re-render highlights Effects correctly. It has not been determined whether this
+  is a real defect or screenshot timing.
+- **Found:** 2026-10-01 during the #102 real-flow repro.
+- **Status:** Open; unconfirmed until reproduced.
