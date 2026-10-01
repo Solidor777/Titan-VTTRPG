@@ -63,6 +63,18 @@ Completed items are deleted, not marked done.
   Every result gated by a synthetic-document test is unconfirmed until it is re-run the real way. That covers the
   live gates in `docs/CLOSED_BUGS.md`, and #102 in `docs/OPEN_BUGS.md`.
 
+- Plan B Task 5 fix round 4, parked by the user on 2026-10-01 until the test-suite rewrite is done. The plan
+  (`.superpowers/sdd/2026-09-29-conditions-rework/task-5-fix4-plan.md`, revision 2) and its unreconciled reviews
+  (`buddy-task5-fix4-plan-*.md`) are in that directory. It covers these items, from
+  `buddy-task5-fix3-code-agreed.md`:
+  - **D1:** orphan comments, and a `token.baseActor` guard in `createTokenTarget` for the Scene-pack race.
+  - **D4, D5, D8, D9:** evidence wording.
+  - **D6:** a truthful message when a base actor failed to load.
+  - **A single record per core fact, with a check that enforces it.**
+
+  These go to the test rewrite: the unit-fake fixes D2, D7 and D10; the inventory of earlier results to re-run (D3);
+  and the orphan e2e's precondition comment (D11).
+
 - Report world documents that fail to load (user ruling 2026-10-01: no systemic fix now). Foundry leaves an invalid
   actor, scene or item out of its world collection (`invalidDocumentIds`), so the migration scan never sees one that
   holds pending work. A token whose base actor is invalid is reported as orphaned ("its base actor is gone").
