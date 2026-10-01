@@ -936,9 +936,11 @@ when fixed.
   (`src/helpers/migration/MigrateStoredActors.js`) before the version chains, and `worldNeedsMigration` reports legacy
   effect Items, so all three modes govern it; only the active GM migrates, a token's actor is read only to write it,
   and the final notification counts failures. Gated by `tests/unit/OnceReady.test.js`,
-  `tests/unit/MigrateStoredActors.test.js`, `tests/unit/MigrateWorld.test.js`, `tests/e2e/condition-migration.spec.js`
-  (stale conditions survive Disabled and Prompt loads and are synced by Automatic), and
-  `tests/e2e/pack-conversion.spec.js`.
+  `tests/unit/MigrateStoredActors.test.js`, and `tests/unit/MigrateWorld.test.js` (the routing), and by
+  `tests/e2e/condition-migration.spec.js` and `tests/e2e/pack-conversion.spec.js` (the same routing live, through
+  stale conditions). The converter itself is unit-gated only (`tests/unit/ConvertEffectItemsToActiveEffects.test.js`,
+  `tests/unit/StoredActorSources.test.js`): the server rejects the unregistered `effect` Item subtype, so no e2e can
+  seed a legacy effect Item.
 
 ### 83. Condition sync and effect-item converter missed actors stored in world Scene and Adventure packs
 
@@ -946,13 +948,15 @@ when fixed.
   Neither reached unlinked-token deltas in world Scene packs or the actors and scenes in world Adventure packs, and the
   sync did not reach world Actor packs, so stored copies stayed stale and re-imported stale data.
 - **Found:** 2026-09-30 by the Task 5 buddy check (plan B).
-- **Fixed:** 2026-09-30 — `walkStoredActorSources` (`src/helpers/migration/StoredActorSources.js`) lists every stored
-  actor (world actors, unlinked world-scene tokens, world Actor packs, unlinked tokens in world Scene packs, and the
-  actors and unlinked scene tokens in world Adventure packs), reading packs through a server projection that loads no
-  document; the converter, the condition sync, and the migration scan all walk it, and a pack is unlocked only to write
-  and locked again. Gated by `tests/unit/StoredActorSources.test.js` (the location list is pinned and walked in order)
-  and `tests/e2e/condition-migration.spec.js` (every location, packs locked, migrates on an Automatic load and not
-  again on the next).
+- **Fixed:** 2026-09-30 — `walkStoredActorSources` (`src/helpers/migration/StoredActorSources.js`) lists the stored
+  actors in world actors, unlinked world-scene tokens whose base actor exists, world Actor packs, unlinked tokens in
+  world Scene packs whose base world actor exists, and the actors and unlinked scene tokens in world Adventure packs,
+  reading packs through a server projection that loads no document; the converter, the condition sync, and the
+  migration scan all walk it, and a pack is unlocked only to write and locked again. Unlinked tokens whose base actor
+  is gone are not walked (OPEN_BUGS #96). Gated by `tests/unit/StoredActorSources.test.js` (the location list is pinned
+  and walked in order) and `tests/e2e/condition-migration.spec.js` (the condition sync in every location, packs
+  locked, on an Automatic load and not again on the next). The converter over these locations is unit-gated only: the
+  server rejects the unregistered `effect` Item subtype, so no e2e can seed a legacy effect Item.
 
 ### 84. Report text reached tooltips and rich text as unsanitized HTML
 

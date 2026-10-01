@@ -3,6 +3,19 @@
 Living record of post-work review issues — gotchas, accepted limitations, and issues that deserve
 attention. NOT a to-do list (deferred work goes to `docs/TODO.md`; bugs go to `docs/OPEN_BUGS.md`).
 
+### Adventure packs are read whole on every Prompt or Automatic GM load (2026-09-30)
+
+The stored-actor scan (`storedActorsNeedMigration`, `src/helpers/migration/MigrateStoredActors.js`) reads the full
+`actors` and `scenes` of every world Adventure pack on each Prompt- or Automatic-mode load of the active GM whenever no
+earlier location has pending work, a clean world included; a migrating load reads them up to three times (the load's
+scan, `migrateWorld`'s own scan, and the pass). The server cannot narrow them: a pack projection
+(`PACK_PROJECTION_FIELDS`) projects a dotted field per record only inside a document's embedded collections (its
+`hierarchy`, built from `EmbeddedCollectionField` and `EmbeddedDocumentField`), and otherwise filters with
+`filterObject`, which keeps an array value whole (Foundry v14 `common/utils/helpers.mjs:622-642`); an Adventure's
+`actors` and `scenes` are `SetField`s of `EmbeddedDataField` (`common/documents/adventure.mjs:41,45`), not embedded
+collections. Only world-package packs are read. A cache of packs found clean at a modification time was rejected: a
+stale record would silently skip a needed migration. The cost scales with the size of the world's Adventure packs.
+
 ### Foundry v14 core: a pending ContextMenu close removes the instance's next menu (2026-09-28)
 
 Core's `ContextMenu#close()` (`client/applications/ux/context-menu.mjs:273-291`) awaits a 200 ms collapse animation and

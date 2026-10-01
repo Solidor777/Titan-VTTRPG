@@ -70,7 +70,10 @@ export const STORED_ACTOR_LOCATIONS = Object.freeze([
  * `dist/database/backend/server-backend.mjs` index projection, `common/utils/helpers.mjs` `filterObject`), and
  * expands a projected Scene token fully, its delta's items and effects included (`server-document.mjs`
  * `expandEmbedded`). An Adventure stores its actors and scenes inline (`SetField` of `EmbeddedDataField`, no embedded
- * collection), so they are read whole.
+ * collection), so they are read whole, and nothing narrows them: `filterObject` keeps an array whole, and only an
+ * embedded collection is projected per record. Every Prompt- or Automatic-mode load of the active GM therefore reads
+ * the full `actors` and `scenes` of every world Adventure pack whenever the scan reaches them, a clean world included,
+ * and a migrating load reads them up to three times (the load's scan, `migrateWorld`'s scan, and the pass).
  * @type {Readonly<Record<string, string[]>>}
  */
 export const PACK_PROJECTION_FIELDS = Object.freeze({
