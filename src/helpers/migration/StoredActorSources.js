@@ -11,6 +11,9 @@ import { isLegacyEffectItem } from '~/helpers/migration/ConvertEffectItemsToActi
  * @property {object[]} items - The Item data the actor holds itself (an unlinked token: its delta's own).
  * @property {object[]} effects - The Active Effect data the actor holds itself (an unlinked token: its delta's own,
  * tombstones included).
+ * @property {object[]} inheritedEffects - The Active Effect data an unlinked token inherits from its base actor and
+ * does not override (inheritedEntriesOf); none for any other actor, and none for an Adventure token whose base actor
+ * neither the Adventure nor the world holds.
  * @property {() => Promise<StoredActorTarget|null>} open - Opens the actor for writing: unlocks its pack, loads its
  * pack document, or materializes its token's actor as needed. Resolves null when nothing is left to write to.
  */
@@ -21,12 +24,15 @@ import { isLegacyEffectItem } from '~/helpers/migration/ConvertEffectItemsToActi
  * @typedef {object} StoredActorTarget
  * @property {() => object[]} readItems - Reads the Item data the actor holds itself.
  * @property {() => object[]} readEffects - Reads the Active Effect data the actor holds itself, tombstones included.
- * @property {() => object[]} readHeldEffects - Reads the data of every Active Effect the actor has, an unlinked
- * token's inherited ones included.
- * @property {(data: object[]) => Promise<object[]>} createEffects - Creates Active Effects; resolves the created
- * effects' data (a creation a hook vetoed is absent).
+ * @property {() => object[]} readInheritedEffects - Reads the Active Effect data an unlinked token inherits from its
+ * base actor and does not override (inheritedEntriesOf); none for any other actor.
+ * @property {(data: object[]) => Promise<object[]>} createEffects - Creates Active Effects, each keeping the `_id` its
+ * data gives (core's `keepId`); resolves the created effects' data (a creation a hook vetoed is absent).
  * @property {(updates: object[]) => Promise<object[]>} updateEffects - Updates Active Effects; resolves the updated
  * effects' data.
+ * @property {(ids: string[]) => Promise<string[]>} deleteEffects - Deletes Active Effects the actor shows; an inherited
+ * one is hidden by an ActorDelta tombstone, as core deletes it from a synthetic actor. Resolves the ids no longer
+ * shown.
  * @property {(ids: string[]) => Promise<string[]>} deleteItems - Deletes Items; resolves the ids no longer stored.
  * @property {() => Promise<void>} stored - Resolves once the target's writes are stored; rejects when they were not.
  * A document's writes are stored as they are made; an Adventure's actors and scene tokens are stored by one write of
@@ -62,6 +68,7 @@ import { isLegacyEffectItem } from '~/helpers/migration/ConvertEffectItemsToActi
  * The working copy lives for one walk: the next walk copies the stored field again, so a write that was not stored
  * never reaches a later one.
  * @typedef {object} AdventureContent
+ * @property {Adventure} adventure - The packed Adventure, whose stored `actors` hold its scene tokens' base actors.
  * @property {object[]} entries - The working copy of the field's data.
  * @property {() => void} markWritten - Records that a target changed the working copy.
  * @property {() => Promise<void>} stored - Resolves once the changed working copy is stored (at once when nothing
@@ -112,7 +119,9 @@ export const STORED_ACTOR_LOCATIONS = Object.freeze([
  * collection), so they are read whole, and nothing narrows them: `filterObject` keeps an array whole, and only an
  * embedded collection is projected per record. Every Prompt- or Automatic-mode load of the active GM therefore reads
  * the full `actors` and `scenes` of every world Adventure pack whenever the scan reaches them, a clean world included,
- * and a migrating load reads them up to three times (the load's scan, `migrateWorld`'s scan, and the pass).
+ * and a migrating load reads them up to three times (the load's scan, `migrateWorld`'s scan, and the pass). The
+ * scene-token location reads `actors` again with `scenes`: an unlinked scene token inherits its base actor's effects,
+ * and the Adventure may hold that actor (readAdventureBaseSource).
  * @type {Readonly<Record<string, string[]>>}
  */
 export const PACK_PROJECTION_FIELDS = Object.freeze({
@@ -133,6 +142,7 @@ export const PACK_PROJECTION_FIELDS = Object.freeze({
    adventureSceneToken: [
       '_id',
       'name',
+      'actors',
       'scenes',
    ],
    scenePackToken: [
@@ -238,29 +248,104 @@ function applyEffectUpdate(effect, update) {
 }
 
 /**
+ * Selects the entries of a base actor's embedded collection that an unlinked token inherits: each base entry whose id
+ * the token's delta does not hold. A delta entry, a tombstone included, replaces the base entry with its id, exactly as
+ * core builds a synthetic actor (Foundry v14 `common/documents/actor-delta.mjs` `#mergeEmbeddedCollection`).
+ * @param {object[]} deltaEntries - The delta's stored entries of the collection, tombstones included.
+ * @param {object[]} baseEntries - The base actor's stored entries of the collection.
+ * @returns {object[]} The base entries the token shows through its delta.
+ */
+function inheritedEntriesOf(deltaEntries, baseEntries) {
+   /** @type {Set<string>} The ids the delta holds, its tombstones included. */
+   const deltaIds = new Set(deltaEntries.map((entry) => entry._id));
+   return baseEntries.filter((entry) => !deltaIds.has(entry._id));
+}
+
+/**
+ * Deletes entries from stored embedded data the way core deletes them from an ActorDelta's collection (Foundry v14
+ * `common/abstract/embedded-collection-delta.mjs` `_delete`): the entry the data holds itself is removed, and when the
+ * base actor holds an entry with the id, a tombstone (`{_id, _tombstone: true}`) takes its place so the base entry
+ * stays hidden. Data without a base actor (an Adventure's actor) only loses the entry. Only an entry the data shows
+ * is deleted: one it holds itself, or one it inherits.
+ * @param {object[]} entries - The stored entries of the collection, changed in place, tombstones included.
+ * @param {string[]} ids - The ids to delete.
+ * @param {Set<string>} baseIds - The ids of the base actor's entries of the collection; empty without a base actor.
+ * @returns {string[]} The ids deleted.
+ */
+function deleteFromData(entries, ids, baseIds) {
+   /** @type {string[]} The ids deleted. */
+   const deleted = [];
+   for (const id of ids) {
+      /** @type {number} The index of the entry the data holds with the id, or -1. */
+      const index = entries.findIndex((entry) => entry._id === id);
+
+      /** @type {boolean} Whether the data shows an entry with the id: its own, or an inherited one. */
+      const shown = index >= 0 ? !entries[index]._tombstone : baseIds.has(id);
+      if (!shown) {
+         continue;
+      }
+      if (index >= 0) {
+         entries.splice(index, 1);
+      }
+      if (baseIds.has(id)) {
+         entries.push({
+            _id: id,
+            _tombstone: true,
+         });
+      }
+      deleted.push(id);
+   }
+   return deleted;
+}
+
+/**
  * Creates the write target of an actor document: a world actor, a packed actor, or an unlinked token's synthetic
- * actor, whose embedded writes Foundry routes to the token's delta. Its writes are stored as they are made: each
- * writer resolves what core stored, so `stored` resolves at once.
+ * actor, whose embedded writes core routes to the token's ActorDelta (Foundry v14 `client/data/client-backend.mjs`
+ * `#adjustActorDeltaRequest`). Its writes are stored as they are made: each writer resolves what core stored, so
+ * `stored` resolves at once. Created effects keep their ids (`keepId`): a converted effect takes its legacy Item's id,
+ * the identity core relates a token's delta to its base actor by. A deletion of an inherited effect is core's own: on
+ * a synthetic actor core stores an ActorDelta tombstone for it (`common/abstract/embedded-collection-delta.mjs`
+ * `_delete`). A deletion is read back from `readSource`: core splices a deleted invalid Item from the client source
+ * itself (`client/data/client-backend.mjs` `#handleDeleteDocuments`), and on a synthetic actor a tombstone takes the
+ * place of a deleted entry whose id the base actor holds too, which reads as deleted.
  * @param {TitanActor} actor - The document whose embedded Items and Active Effects are written.
  * @param {() => object} readSource - Reads the stored data the actor holds itself (`actor._source`, or an unlinked
  * token's `delta._source`).
+ * @param {() => object|null} [readBaseSource] - Reads an unlinked token's base actor's stored data; null for any other
+ * actor.
  * @returns {StoredActorTarget} Readers of the stored data and writers through the document.
  */
-function createDocumentTarget(actor, readSource) {
+function createDocumentTarget(actor, readSource, readBaseSource = () => null) {
+   /**
+    * Reads the Active Effect data the actor inherits and does not override.
+    * @returns {object[]} The inherited effects' data.
+    */
+   const readInheritedEffects = () => inheritedEntriesOf(readSource().effects ?? [], readBaseSource()?.effects ?? []);
    return {
-      createEffects: async (data) => (await actor.createEmbeddedDocuments('ActiveEffect', data))
+      createEffects: async (data) => (await actor.createEmbeddedDocuments('ActiveEffect', data, { keepId: true }))
          .map((effect) => effect.toObject()),
+      deleteEffects: async (ids) => {
+         await actor.deleteEmbeddedDocuments('ActiveEffect', ids);
+
+         // The deletion is read back from the stored data, as for Items: an effect no longer shown is deleted.
+         /** @type {Set<string>} The ids of the effects the actor still shows. */
+         const shown = new Set([
+            ...(readSource().effects ?? []).filter((effect) => !effect._tombstone).map((effect) => effect._id),
+            ...readInheritedEffects().map((effect) => effect._id),
+         ]);
+         return ids.filter((id) => !shown.has(id));
+      },
       deleteItems: async (ids) => {
          await actor.deleteEmbeddedDocuments('Item', ids);
 
          // An invalid Item (a legacy effect Item, whose subtype is unregistered) is deleted without being returned
          // (Foundry v14 client-backend.mjs #handleDeleteDocuments), so the deletion is read back from the stored items.
          /** @type {Set<string>} The ids of the Items still stored. */
-         const stored = new Set((readSource().items ?? []).map((item) => item._id));
+         const stored = new Set((readSource().items ?? []).filter((item) => !item._tombstone).map((item) => item._id));
          return ids.filter((id) => !stored.has(id));
       },
       readEffects: () => readSource().effects ?? [],
-      readHeldEffects: () => actor.effects.map((effect) => effect.toObject()),
+      readInheritedEffects,
       readItems: () => readSource().items ?? [],
       stored: async () => {},
       updateEffects: async (updates) => (await actor.updateEmbeddedDocuments('ActiveEffect', updates))
@@ -321,6 +406,7 @@ function createAdventureContent(adventure, field) {
    /** @type {object[]} The working copy of the field's data. */
    const entries = structuredClone(adventure._source[field] ?? []);
    return {
+      adventure,
       commit: async () => {
          if (!written) {
             settle();
@@ -364,44 +450,88 @@ function createAdventureContent(adventure, field) {
 /**
  * Creates the write target of stored actor data that is not a document: an Adventure's actor, or the delta of an
  * Adventure scene's token. Each write edits the Adventure's working copy; the walk stores the working copy in one
- * write when it leaves the Adventure (AdventureContent), so the target's writes are stored, or not, together. A
- * created effect is built by `TitanActiveEffect.buildCreationSource`, so it stores what a created document stores. A
- * deleted Item is removed from the data, never replaced by an ActorDelta tombstone: an Adventure token's delta is
- * migrated from what it stores itself, and its base actor's own Items migrate where that actor is stored.
+ * write when it leaves the Adventure (AdventureContent), so the target's writes are stored, or not, together. The
+ * writes follow core's ActorDelta rules, so the stored data is what core's own writes would store. A created effect is
+ * built by `TitanActiveEffect.buildCreationSource`, so it stores what a created document stores, and keeps the `_id`
+ * its data gives (core's `keepId`; a new id only when it gives none); it replaces a tombstone with its id, and an id
+ * the token already shows is refused, as the server refuses one its parent collection holds (Foundry v14
+ * `dist/database/backend/server-backend.mjs` `_createDocuments`). A deletion removes the entry the data holds and,
+ * when the token's base actor holds the id, leaves a tombstone (deleteFromData).
  * @param {object} holder - The working copy's data holding `items` and `effects`.
  * @param {AdventureContent} content - The Adventure field the working copy belongs to.
+ * @param {() => object|null} [readBaseSource] - Reads an Adventure token's base actor's stored data
+ * (readAdventureBaseSource); null for an Adventure's actor, and for a token without a base actor.
  * @returns {StoredActorTarget} Readers and writers of the working copy.
  */
-function createSourceTarget(holder, content) {
+function createSourceTarget(holder, content, readBaseSource = () => null) {
    holder.items ??= [];
    holder.effects ??= [];
+
+   /**
+    * Reads the Active Effect data the token inherits and does not override.
+    * @returns {object[]} The inherited effects' data.
+    */
+   const readInheritedEffects = () => inheritedEntriesOf(holder.effects, readBaseSource()?.effects ?? []);
+
+   /**
+    * Reads the ids of the base actor's entries of one collection.
+    * @param {'effects'|'items'} collection - Which embedded collection: `effects` or `items`.
+    * @returns {Set<string>} The ids; empty without a base actor.
+    */
+   const readBaseIds = (collection) => new Set((readBaseSource()?.[collection] ?? []).map((entry) => entry._id));
    return {
       createEffects: async (data) => {
          /** @type {typeof TitanActiveEffect} The Active Effect document class, which builds a created effect's data. */
          const effectClass = CONFIG.ActiveEffect.documentClass;
 
-         /** @type {object[]} The created effects' data, each with a new id, as a created document stores it. */
+         /** @type {object[]} The created effects' data, each keeping its id, as a created document stores it. */
          const created = data.map((entry) => effectClass.buildCreationSource({
             ...entry,
-            _id: foundry.utils.randomID(),
+            _id: entry._id ?? foundry.utils.randomID(),
          }));
+
+         /** @type {Set<string>} The ids of the effects the token inherits. */
+         const inheritedIds = new Set(readInheritedEffects().map((effect) => effect._id));
+         for (const effect of created) {
+            /** @type {number} The index of the entry the data holds with the effect's id, or -1. */
+            const index = holder.effects.findIndex((entry) => entry._id === effect._id);
+            if ((index >= 0 && !holder.effects[index]._tombstone) || inheritedIds.has(effect._id)) {
+               throw new Error(`The _id [${effect._id}] already exists within the parent collection.`);
+            }
+         }
+         for (const effect of created) {
+            /** @type {number} The index of the tombstone with the effect's id, or -1. */
+            const index = holder.effects.findIndex((entry) => entry._id === effect._id);
+            if (index >= 0) {
+               holder.effects.splice(index, 1, effect);
+            }
+            else {
+               holder.effects.push(effect);
+            }
+         }
          if (created.length > 0) {
-            holder.effects.push(...created);
             content.markWritten();
          }
          return created;
       },
-      deleteItems: async (ids) => {
-         /** @type {string[]} The ids of the Items removed. */
-         const deleted = holder.items.filter((item) => ids.includes(item._id)).map((item) => item._id);
+      deleteEffects: async (ids) => {
+         /** @type {string[]} The ids of the effects deleted. */
+         const deleted = deleteFromData(holder.effects, ids, readBaseIds('effects'));
          if (deleted.length > 0) {
-            holder.items = holder.items.filter((item) => !ids.includes(item._id));
+            content.markWritten();
+         }
+         return deleted;
+      },
+      deleteItems: async (ids) => {
+         /** @type {string[]} The ids of the Items deleted. */
+         const deleted = deleteFromData(holder.items, ids, readBaseIds('items'));
+         if (deleted.length > 0) {
             content.markWritten();
          }
          return deleted;
       },
       readEffects: () => holder.effects,
-      readHeldEffects: () => holder.effects.filter((effect) => !effect._tombstone),
+      readInheritedEffects,
       readItems: () => holder.items,
       stored: () => content.stored(),
       updateEffects: async (updates) => {
@@ -424,6 +554,23 @@ function createSourceTarget(holder, content) {
 }
 
 /**
+ * Reads the stored data of an Adventure scene token's base actor: the Adventure's actor with the token's actor id, else
+ * the world actor with it. Core's Adventure import keeps each document's id and replaces the world document with the
+ * same id (Foundry v14 `client/documents/adventure.mjs` `prepareImport`, `importContent`), and a token's base actor is
+ * the world actor with its actor id (`client/documents/token.mjs` `baseActor`), so after import the base is the
+ * Adventure's actor when the Adventure holds one.
+ * @param {object[]} actors - The Adventure's stored actors: a projected record's, or the stored Adventure's.
+ * @param {string|null|undefined} actorId - The token's actor id.
+ * @returns {object|null} The base actor's stored data; null when the token has no base actor.
+ */
+function readAdventureBaseSource(actors, actorId) {
+   if (!actorId) {
+      return null;
+   }
+   return actors.find((actor) => actor._id === actorId) ?? game.actors.get(actorId)?._source ?? null;
+}
+
+/**
  * Creates the write target of a world or packed actor document.
  * @param {TitanActor} actor - The world or packed actor, which holds its stored data in `_source`.
  * @returns {StoredActorTarget} Readers of the actor's source and writers through the actor.
@@ -433,7 +580,9 @@ function createActorTarget(actor) {
 }
 
 /**
- * Creates the write target of an unlinked token: its synthetic actor, holding the token's delta.
+ * Creates the write target of an unlinked token: its synthetic actor, holding the token's delta, whose inherited
+ * effects are read from the base actor's stored data (`TokenDocument#baseActor`); core routes its embedded writes to
+ * the token's ActorDelta (Foundry v14 `client/data/client-backend.mjs` `#adjustActorDeltaRequest`).
  * @param {TokenDocument} token - The unlinked token.
  * @returns {StoredActorTarget|null} The target, or null when the token has no actor (its base actor was deleted
  * since the scan; the walk skips a token already orphaned, walkSceneTokens).
@@ -441,7 +590,9 @@ function createActorTarget(actor) {
 function createTokenTarget(token) {
    /** @type {TitanActor|null} The token's synthetic actor; reading it materializes the token's delta. */
    const actor = token.actor;
-   return actor ? createDocumentTarget(actor, () => token.delta._source) : null;
+   return actor
+      ? createDocumentTarget(actor, () => token.delta._source, () => token.baseActor?._source ?? null)
+      : null;
 }
 
 /**
@@ -485,6 +636,7 @@ function* walkWorldActors() {
    for (const actor of game.actors) {
       yield {
          effects: actor._source.effects ?? [],
+         inheritedEffects: [],
          items: actor._source.items ?? [],
          location: 'worldActor',
          name: actor.name,
@@ -494,18 +646,20 @@ function* walkWorldActors() {
 }
 
 /**
- * Walks the unlinked tokens on world scenes, from each token's stored delta. The effects and items a token inherits
- * from its base actor are the base actor's and migrate there, so a token never gains a copy of an inherited one. A
- * linked token's actor is its world actor. An orphaned token (an unlinked token whose base actor is gone) is skipped:
- * Foundry v14 core cannot create or delete entries in its delta, which the conversion needs. Every embedded create,
- * update, or delete on the delta ends in `TokenDocument#_onRelatedUpdate` (`client/documents/token.mjs:3809`), which
- * reads `this.actor.tokenActiveEffectChanges` while the orphaned token's actor is null, so the client throws after the
- * server write; a Token or Scene update that adds an entry to the delta fails the client's dry run in
- * `EmbeddedCollectionDelta#_prepareDeltaUpdate` (`common/abstract/embedded-collection-delta.mjs:201`: no base
- * collection), and one that drops an entry from the array or deletes it with an update operator stores nothing (all
- * measured live on world-scene and Scene-pack tokens). Only a parent update of entries the delta already holds stores
- * cleanly, so the token is skipped whole rather than migrated in part; orphaned tokens are deleted from worlds by hand,
- * outside the migration. A token's actor is read only when its source is opened.
+ * Walks the unlinked tokens on world scenes, from each token's stored delta and its base actor's stored effects. The
+ * legacy Items a token inherits from its base actor are the base actor's and convert there; the token converts the ones
+ * its delta holds itself, and hides an inherited conversion of an Item its delta overrides or removed
+ * (convertStoredActor). A linked token's actor is its world actor. An orphaned token (an unlinked token whose base
+ * actor is gone) is skipped: Foundry v14 core cannot create or delete entries in its delta, which the conversion
+ * needs. Every embedded create, update, or delete on the delta ends in `TokenDocument#_onRelatedUpdate`
+ * (`client/documents/token.mjs:3809`), which reads `this.actor.tokenActiveEffectChanges` while the orphaned token's
+ * actor is null, so the client throws after the server write; a Token or Scene update that adds an entry to the delta
+ * fails the client's dry run in `EmbeddedCollectionDelta#_prepareDeltaUpdate`
+ * (`common/abstract/embedded-collection-delta.mjs:201`: no base collection), and one that drops an entry from the
+ * array or deletes it with an update operator stores nothing (all measured live on world-scene and Scene-pack tokens).
+ * Only a parent update of entries the delta already holds stores cleanly, so the token is skipped whole rather than
+ * migrated in part; orphaned tokens are deleted from worlds by hand, outside the migration. A token's actor is read
+ * only when its source is opened.
  * @returns {Generator<StoredActorSource>} A generator over the unlinked tokens.
  * @yields {StoredActorSource} The next unlinked token.
  */
@@ -517,6 +671,10 @@ function* walkSceneTokens() {
          }
          yield {
             effects: token._source.delta?.effects ?? [],
+            inheritedEffects: inheritedEntriesOf(
+               token._source.delta?.effects ?? [],
+               token.baseActor._source.effects ?? [],
+            ),
             items: token._source.delta?.items ?? [],
             location: 'sceneToken',
             name: token.name,
@@ -538,6 +696,7 @@ function* walkSceneTokens() {
 function* walkActorPackRecord(pack, record, access) {
    yield {
       effects: record.effects ?? [],
+      inheritedEffects: [],
       items: record.items ?? [],
       location: 'actorPack',
       name: `${pack.metadata.label}: ${record.name}`,
@@ -552,9 +711,10 @@ function* walkActorPackRecord(pack, record, access) {
 }
 
 /**
- * Walks the unlinked tokens of one projected record of a world Scene pack, from each token's stored delta. A linked
- * token's actor is a world actor. A token without a base world actor (an orphaned token) is skipped: core cannot
- * create or delete entries in an orphaned token's delta, in a pack as on a world scene (walkSceneTokens).
+ * Walks the unlinked tokens of one projected record of a world Scene pack, from each token's stored delta and its
+ * base world actor's stored effects (createTokenTarget). A linked token's actor is a world actor. A token without a
+ * base world actor (an orphaned token) is skipped: core cannot create or delete entries in an orphaned token's delta,
+ * in a pack as on a world scene (walkSceneTokens).
  * @param {CompendiumCollection} pack - The world pack the record was projected from.
  * @param {object} record - The projected scene.
  * @param {PackWriteAccess} access - The pack's write access.
@@ -568,6 +728,10 @@ function* walkScenePackRecord(pack, record, access) {
       }
       yield {
          effects: token.delta?.effects ?? [],
+         inheritedEffects: inheritedEntriesOf(
+            token.delta?.effects ?? [],
+            game.actors.get(token.actorId)._source.effects ?? [],
+         ),
          items: token.delta?.items ?? [],
          location: 'scenePackToken',
          name: `${pack.metadata.label}: ${record.name}: ${token.name}`,
@@ -601,6 +765,7 @@ async function* walkAdventureActorRecord(pack, record, access) {
       for (const actor of record.actors ?? []) {
          yield {
             effects: actor.effects ?? [],
+            inheritedEffects: [],
             items: actor.items ?? [],
             location: 'adventureActor',
             name: `${pack.metadata.label}: ${record.name}: ${actor.name}`,
@@ -621,13 +786,15 @@ async function* walkAdventureActorRecord(pack, record, access) {
 }
 
 /**
- * Walks the unlinked scene tokens of one projected record of a world Adventure pack, from each token's stored delta,
- * and stores their changes in one write of the Adventure's `scenes` once the walk leaves the record, also when the
- * consumer stops early. A token whose actor id names no actor is walked like any other: an Adventure's scene tokens
- * are inline data written with the whole `scenes` field (createSourceTarget), never as token documents, so the core
- * limitation that skips an orphaned token on a world scene or in a Scene pack (walkSceneTokens) does not apply
- * (measured live: one `adventure.update({ scenes })` that removed an Item from such a token's delta, updated one
- * effect, and added another was stored, with no client error).
+ * Walks the unlinked scene tokens of one projected record of a world Adventure pack, from each token's stored delta
+ * and its base actor's stored effects (readAdventureBaseSource), and stores their changes in one write of the
+ * Adventure's `scenes` once the walk leaves the record, also when the consumer stops early. The record's `actors` are
+ * projected after the Adventure's actors were walked and stored (STORED_ACTOR_LOCATIONS order), so they hold the base
+ * actors' conversions of this walk. A token whose actor id names no actor is walked like any other, inheriting
+ * nothing: an Adventure's scene tokens are inline data written with the whole `scenes` field (createSourceTarget),
+ * never as token documents, so the core limitation that skips an orphaned token on a world scene or in a Scene pack
+ * (walkSceneTokens) does not apply (measured live: one `adventure.update({ scenes })` that removed an Item from such a
+ * token's delta, updated one effect, and added another was stored, with no client error).
  * @param {CompendiumCollection} pack - The world pack the record was projected from.
  * @param {object} record - The projected Adventure.
  * @param {PackWriteAccess} access - The pack's write access.
@@ -645,6 +812,10 @@ async function* walkAdventureSceneRecord(pack, record, access) {
             }
             yield {
                effects: token.delta?.effects ?? [],
+               inheritedEffects: inheritedEntriesOf(
+                  token.delta?.effects ?? [],
+                  readAdventureBaseSource(record.actors ?? [], token.actorId)?.effects ?? [],
+               ),
                items: token.delta?.items ?? [],
                location: 'adventureSceneToken',
                name: `${pack.metadata.label}: ${record.name}: ${scene.name}: ${token.name}`,
@@ -655,7 +826,14 @@ async function* walkAdventureSceneRecord(pack, record, access) {
                   /** @type {object|undefined} The token's delta in the working copy. */
                   const delta = content?.entries.find((entry) => entry._id === scene._id)?.tokens
                      ?.find((entry) => entry._id === token._id)?.delta;
-                  return delta ? createSourceTarget(delta, content) : null;
+                  if (!delta) {
+                     return null;
+                  }
+                  return createSourceTarget(
+                     delta,
+                     content,
+                     () => readAdventureBaseSource(content.adventure._source.actors ?? [], token.actorId),
+                  );
                },
             };
          }

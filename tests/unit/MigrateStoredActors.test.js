@@ -63,38 +63,67 @@ const LEGACY_ITEM = {
    type: 'effect',
 };
 
+/** @type {object} A conversion of the legacy Item, with the Item's id, as a token inherits it from its base actor. */
+const INHERITED_CONVERSION = {
+   _id: 'legacy0',
+   flags: {
+      titan: {
+         convertedFromItem: 'legacy0',
+      },
+   },
+   type: 'effect',
+};
+
+/** @type {object} A tombstone of the legacy Item in a token's delta: the token removed the inherited Item. */
+const REMOVED_ITEM = {
+   _id: 'legacy0',
+   _tombstone: true,
+};
+
 /**
  * Builds a write target whose writes are spies that change its stored data as a stored write does: a creation stores
- * the effects, a deletion removes the Items, and an update applies its rules elements and description deletion. A
- * target given `updated` resolves that from every update and stores nothing, as a write a hook vetoed.
+ * the effects with their ids, an effect deletion hides an inherited effect behind a tombstone, an Item deletion
+ * removes the Items, and an update applies its rules elements and description deletion. A target given `updated`
+ * resolves that from every update and stores nothing, as a write a hook vetoed; one given `vetoHide` hides nothing.
  * @param {object} [data] - The target's contents.
  * @param {object[]} [data.effects] - The effect data it holds.
+ * @param {object[]} [data.inheritedEffects] - The effect data it inherits and does not override.
  * @param {object[]} [data.items] - The Item data it holds.
  * @param {object[]} [data.updated] - What its updates resolve when they store nothing.
+ * @param {boolean} [data.vetoHide] - Whether its effect deletions store nothing.
  * @returns {object} A stored-actor target with spied writes.
  */
-function makeTarget({ effects = [], items = [], updated } = {}) {
-   /** @type {{effects: object[], items: object[]}} The target's stored data. */
+function makeTarget({ effects = [], inheritedEffects = [], items = [], updated, vetoHide = false } = {}) {
+   /** @type {{effects: object[], inherited: object[], items: object[]}} The target's stored data. */
    const held = {
       effects: structuredClone(effects),
+      inherited: structuredClone(inheritedEffects),
       items: structuredClone(items),
    };
    return {
       createEffects: vi.fn(async (data) => {
-         /** @type {object[]} The created effects' data, each with an id. */
-         const created = data.map((entry, index) => ({
-            ...structuredClone(entry),
-            _id: `created${index}`,
-         }));
+         /** @type {object[]} The created effects' data, each keeping the id its data gives. */
+         const created = data.map((entry) => structuredClone(entry));
          held.effects.push(...created);
          return created;
+      }),
+      deleteEffects: vi.fn(async (ids) => {
+         if (vetoHide) {
+            return [];
+         }
+         held.inherited = held.inherited.filter((effect) => !ids.includes(effect._id));
+         held.effects.push(...ids.map((id) => ({
+            _id: id,
+            _tombstone: true,
+         })));
+         return ids;
       }),
       deleteItems: vi.fn(async (ids) => {
          held.items = held.items.filter((item) => !ids.includes(item._id));
          return ids;
       }),
       readEffects: () => held.effects,
-      readHeldEffects: () => held.effects,
+      readInheritedEffects: () => held.inherited,
       readItems: () => held.items,
       stored: vi.fn(async () => {}),
       updateEffects: vi.fn(async (updates) => {
@@ -121,13 +150,15 @@ function makeTarget({ effects = [], items = [], updated } = {}) {
  * @param {string} name - The name the walk records for the source.
  * @param {object} [data] - The source's contents.
  * @param {object[]} [data.effects] - Its stored effect data.
+ * @param {object[]} [data.inheritedEffects] - The stored effect data it inherits and does not override.
  * @param {object[]} [data.items] - Its stored Item data.
  * @param {object|null} [data.target] - What opening it resolves.
  * @returns {object} A worldActor-location source with a spied `open`.
  */
-function makeSource(name, { effects = [], items = [], target = null } = {}) {
+function makeSource(name, { effects = [], inheritedEffects = [], items = [], target = null } = {}) {
    return {
       effects,
+      inheritedEffects,
       items,
       location: 'worldActor',
       name,
@@ -173,6 +204,24 @@ describe('storedActorNeedsMigration', () => {
             items: [LEGACY_ITEM],
          },
          true,
+      ],
+      [
+         'an inherited conversion of an Item its delta removed',
+         {
+            effects: [],
+            inheritedEffects: [INHERITED_CONVERSION],
+            items: [REMOVED_ITEM],
+         },
+         true,
+      ],
+      [
+         'an inherited conversion of an Item it does not claim',
+         {
+            effects: [],
+            inheritedEffects: [INHERITED_CONVERSION],
+            items: [],
+         },
+         false,
       ],
       [
          'nothing stale',
@@ -388,5 +437,46 @@ describe('migrateStoredActors', () => {
          skipped: 0,
          updated: 0,
       });
+   });
+
+   it('hides an inherited conversion of an Item a token removed, and counts the token updated', async () => {
+      /** @type {object} The token's target. */
+      const target = makeTarget({
+         inheritedEffects: [INHERITED_CONVERSION],
+         items: [REMOVED_ITEM],
+      });
+      walk.sources = [
+         makeSource('Token', {
+            inheritedEffects: [INHERITED_CONVERSION],
+            items: [REMOVED_ITEM],
+            target,
+         }),
+      ];
+      expect(await migrateStoredActors()).toEqual({
+         failed: 0,
+         skipped: 0,
+         updated: 1,
+      });
+      expect(target.deleteEffects).toHaveBeenCalledWith(['legacy0']);
+   });
+
+   it('counts a token whose inherited conversion stays shown as failed: its work is left', async () => {
+      walk.sources = [
+         makeSource('Vetoed Hide', {
+            inheritedEffects: [INHERITED_CONVERSION],
+            items: [REMOVED_ITEM],
+            target: makeTarget({
+               inheritedEffects: [INHERITED_CONVERSION],
+               items: [REMOVED_ITEM],
+               vetoHide: true,
+            }),
+         }),
+      ];
+      expect(await migrateStoredActors()).toEqual({
+         failed: 1,
+         skipped: 0,
+         updated: 0,
+      });
+      expect(ui.notifications.error.mock.calls[0][0]).toContain('"Vetoed Hide"');
    });
 });

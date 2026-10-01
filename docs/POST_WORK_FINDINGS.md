@@ -33,10 +33,11 @@ tokens until those tokens are deleted.
 
 The stored-actor scan (`storedActorsNeedMigration`, `src/helpers/migration/MigrateStoredActors.js`) reads the full
 `actors` and `scenes` of every world Adventure pack on each Prompt- or Automatic-mode load of the active GM whenever no
-earlier location has pending work, a clean world included; a migrating load reads them up to three times (the load's
-scan, `migrateWorld`'s own scan, and the pass). The server cannot narrow them: a pack projection
-(`PACK_PROJECTION_FIELDS`) projects a dotted field per record only inside a document's embedded collections (its
-`hierarchy`, built from `EmbeddedCollectionField` and `EmbeddedDocumentField`), and otherwise filters with
+earlier location has pending work, a clean world included, and reads the `actors` a second time with the `scenes` (an
+unlinked scene token inherits its base actor's effects, and the Adventure may hold that actor); a migrating load reads
+them up to three times (the load's scan, `migrateWorld`'s own scan, and the pass). The server cannot narrow them: a pack
+projection (`PACK_PROJECTION_FIELDS`) projects a dotted field per record only inside a document's embedded collections
+(its `hierarchy`, built from `EmbeddedCollectionField` and `EmbeddedDocumentField`), and otherwise filters with
 `filterObject`, which keeps an array value whole (Foundry v14 `common/utils/helpers.mjs:622-642`); an Adventure's
 `actors` and `scenes` are `SetField`s of `EmbeddedDataField` (`common/documents/adventure.mjs:41,45`), not embedded
 collections. Only world-package packs are read. A cache of packs found clean at a modification time was rejected: a

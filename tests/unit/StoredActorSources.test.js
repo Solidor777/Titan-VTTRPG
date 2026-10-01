@@ -37,6 +37,27 @@ const ITEM = {
    type: 'effect',
 };
 
+/** @type {object} A legacy effect Item with the stored system data the converter reads. */
+const LEGACY_ITEM = {
+   _id: 'legacy0',
+   img: 'icons/legacy.webp',
+   name: 'Legacy Effect',
+   system: {
+      active: true,
+      check: [],
+      customTrait: [],
+      description: '',
+      duration: {
+         custom: '',
+         initiative: 0,
+         remaining: 1,
+         type: 'turnStart',
+      },
+      rulesElement: [],
+   },
+   type: 'effect',
+};
+
 /** @type {string[]} Messages recorded by the ui.notifications.error stand-in. */
 const uiErrors = [];
 
@@ -265,8 +286,73 @@ function makeAdventureScenes() {
 }
 
 /**
- * Builds a fake packed Adventure whose updates are recorded as snapshots. An update resolves the Adventure, as core
- * resolves a stored write; a test makes one resolve undefined (not stored) or reject.
+ * The scenes of a fake Adventure holding one unlinked token with the given actor id and stored delta.
+ * @param {string} actorId - The id of the base actor the token names.
+ * @param {object} delta - The token's stored delta.
+ * @returns {object[]} The scenes' data.
+ */
+function makeTokenScenes(actorId, delta) {
+   return [
+      {
+         _id: 'adventureScene',
+         name: 'Adventure Scene',
+         tokens: [
+            {
+               _id: 'inheritingToken',
+               actorId,
+               actorLink: false,
+               delta,
+               name: 'Inheriting Token',
+            },
+         ],
+      },
+   ];
+}
+
+/**
+ * Builds a converted effect's stored data, stamped with its source Item.
+ * @param {string} id - The effect's id: its Item's id for a conversion of this version, another for an older one.
+ * @param {string} itemId - The source Item's id.
+ * @param {string} [name] - The effect's name.
+ * @returns {object} The converted effect.
+ */
+function makeConversion(id, itemId, name = `Converted ${itemId}`) {
+   return {
+      _id: id,
+      flags: {
+         titan: {
+            convertedFromItem: itemId,
+         },
+      },
+      name,
+      type: 'effect',
+   };
+}
+
+/**
+ * Summarizes stored Active Effect data for comparison.
+ * @param {object} effect - The stored Active Effect data.
+ * @returns {object} Its id, name, and conversion stamp; a tombstone's id and `tombstone: true`.
+ */
+function summarizeEffect(effect) {
+   if (effect._tombstone) {
+      return {
+         id: effect._id,
+         tombstone: true,
+      };
+   }
+   return {
+      id: effect._id,
+      name: effect.name,
+      stamp: effect.flags?.titan?.convertedFromItem,
+   };
+}
+
+/**
+ * Builds a fake packed Adventure whose updates are recorded as snapshots. An update stores its data in the
+ * Adventure's `_source` and resolves the Adventure, as core does for a stored write (Foundry v14
+ * `client/data/client-backend.mjs` `#handleUpdateDocuments`); a test makes one resolve undefined (not stored) or
+ * reject.
  * @param {object} [content] - The actors and scenes the Adventure stores inline.
  * @param {object[]} [content.actors] - Its actors' data (makeAdventureActors by default).
  * @param {object[]} [content.scenes] - Its scenes' data (makeAdventureScenes by default).
@@ -287,6 +373,7 @@ function makeFakeAdventure({ actors = makeAdventureActors(), scenes = makeAdvent
       name: 'Adventure',
       update: vi.fn(async (data) => {
          updates.push(structuredClone(data));
+         Object.assign(adventure._source, structuredClone(data));
          return adventure;
       }),
       updates,
@@ -466,7 +553,8 @@ function makeWorld() {
 }
 
 /**
- * Installs a world whose only stored actors are in one locked world Adventure pack.
+ * Installs a world whose only stored actors are in one locked world Adventure pack. The pack's projection reads the
+ * Adventure's current stored data, as the server reads it on each walk.
  * @param {object} adventure - The fake Adventure.
  * @returns {object} The fake Adventure pack.
  */
@@ -477,7 +565,7 @@ function installAdventureWorld(adventure) {
          [adventure._source._id]: adventure,
       },
       label: 'Adventures',
-      records: [structuredClone(adventure._source)],
+      records: [adventure._source],
       type: 'Adventure',
    });
    globalThis.game = {
@@ -487,6 +575,88 @@ function installAdventureWorld(adventure) {
       user: { id: 'gm0' },
    };
    return pack;
+}
+
+/**
+ * Applies an update's dotted paths to stored data, `_del` deleting the key, as the database applies it.
+ * @param {object} stored - The stored data, changed in place.
+ * @param {object} update - The update: `_id` and dotted paths.
+ * @returns {void}
+ */
+function applyStoredUpdate(stored, update) {
+   for (const [path, value] of Object.entries(update)) {
+      if (path === '_id') {
+         continue;
+      }
+
+      /** @type {string[]} The path's keys. */
+      const keys = path.split('.');
+
+      /** @type {string} The last key, which the value is written to. */
+      const last = keys.pop();
+
+      /** @type {object} The object holding the last key. */
+      let parent = stored;
+      for (const key of keys) {
+         parent[key] ??= {};
+         parent = parent[key];
+      }
+      if (value === FORCED_DELETION) {
+         delete parent[last];
+      }
+      else {
+         parent[last] = structuredClone(value);
+      }
+   }
+}
+
+/**
+ * Builds a fake actor document whose embedded writes change its stored data the way the client's source shows them: a
+ * creation stores the effects, a deletion removes the Items (core splices a deleted invalid Item from the client
+ * source and resolves no document), and an update applies its dotted paths. A token's synthetic actor stores its
+ * writes in the token's delta, where the server also keeps a tombstone for a deleted Item its base actor holds too;
+ * the fake does not model that tombstone, so the tests pin the client-visible outcome.
+ * @param {string} id - The document id.
+ * @param {object} data - The stored data: its `effects` and `items`.
+ * @returns {object} The fake document; `_source` holds its stored data.
+ */
+function makeStoredDelta(id, data) {
+   /** @type {object} The fake document, referenced by its own spies. */
+   const stored = {
+      _source: structuredClone(data),
+      createEmbeddedDocuments: vi.fn(async (embeddedName, entries, options = {}) => {
+         /** @type {object[]} The created effects' data, each keeping its id under `keepId`, as core creates them. */
+         const created = entries.map((entry, index) => ({
+            ...structuredClone(entry),
+            _id: options.keepId && entry._id ? entry._id : `${id}Created${index}`,
+         }));
+         stored._source.effects.push(...created);
+         return created.map((entry) => ({ toObject: () => structuredClone(entry) }));
+      }),
+      deleteEmbeddedDocuments: vi.fn(async (embeddedName, ids) => {
+         stored._source.items = stored._source.items.filter((entry) => !ids.includes(entry._id));
+         return [];
+      }),
+      effects: {
+         /**
+          * Maps the document's effects (its stored effects, tombstones excluded).
+          * @param {Function} transform - The mapping function.
+          * @returns {Array} The mapped values.
+          */
+         map: (transform) => stored._source.effects
+            .filter((effect) => !effect._tombstone)
+            .map((effect) => ({ toObject: () => structuredClone(effect) }))
+            .map(transform),
+      },
+      id,
+      updateEmbeddedDocuments: vi.fn(async (embeddedName, updates) => {
+         for (const update of updates) {
+            applyStoredUpdate(stored._source.effects.find((entry) => entry._id === update._id), update);
+         }
+         return updates.map((update) => ({ toObject: () => structuredClone(update) }));
+      }),
+   };
+   return stored;
 }
 
 /**
@@ -536,6 +706,9 @@ beforeEach(() => {
          },
       },
    };
+
+   // Stand-in for foundry.utils.deepClone, used by buildEffectData to copy the migrated system fields.
+   globalThis.foundry.utils.deepClone = (value) => structuredClone(value);
    vi.spyOn(console, 'error').mockImplementation(() => {});
 });
 
@@ -543,6 +716,7 @@ afterEach(() => {
    uiErrors.length = 0;
    delete globalThis.ui;
    delete globalThis.CONFIG;
+   delete globalThis.foundry.utils.deepClone;
    delete globalThis.game;
    vi.restoreAllMocks();
    vi.clearAllMocks();
@@ -792,6 +966,93 @@ describe('walkStoredActorSources', () => {
       expect(sources.find((source) => source.location === 'actorPack').target).toBeNull();
       expect(sources.find((source) => source.location === 'sceneToken').target).toBeNull();
    });
+
+   it('yields each token\'s inherited effects from its base actor\'s stored data, and none for any other actor',
+      async () => {
+         const { worldActor } = makeWorld();
+         worldActor._source.effects.push(makeConversion('baseOnly', 'item0'));
+
+         /** @type {object[]} The walked sources. */
+         const sources = await walkAll();
+         expect(Object.fromEntries(sources.map((source) => [
+            source.name,
+            source.inheritedEffects.map((effect) => effect._id),
+         ]))).toEqual({
+            'Actors: Packed Actor': [],
+            'Adventures: Adventure: Adventure Actor': [],
+            'Adventures: Adventure: Adventure Scene: Adventure Token': [],
+            'Scenes: Packed Scene: Packed Token': ['baseOnly'],
+            'World Actor': [],
+            'World Token': ['baseOnly'],
+         });
+      });
+
+   it('yields an Adventure token\'s inherited effects from its Adventure actor, else from the world actor',
+      async () => {
+         /** @type {object} An Adventure with one token on an Adventure actor and one on a world actor. */
+         const adventure = makeFakeAdventure({
+            actors: [
+               {
+                  _id: 'baseActor',
+                  effects: [makeConversion('adventureOnly', 'adventureItem')],
+                  items: [],
+                  name: 'Base Actor',
+               },
+            ],
+            scenes: [
+               {
+                  _id: 'adventureScene',
+                  name: 'Adventure Scene',
+                  tokens: [
+                     {
+                        _id: 'adventureBased',
+                        actorId: 'baseActor',
+                        actorLink: false,
+                        delta: {
+                           effects: [],
+                           items: [],
+                        },
+                        name: 'Adventure Based',
+                     },
+                     {
+                        _id: 'worldBased',
+                        actorId: 'worldBase',
+                        actorLink: false,
+                        delta: {
+                           effects: [],
+                           items: [],
+                        },
+                        name: 'World Based',
+                     },
+                  ],
+               },
+            ],
+         });
+         installAdventureWorld(adventure);
+         game.actors = new FakeCollection([
+            makeFakeActor({
+               effects: [makeConversion('worldOnly', 'worldItem')],
+               id: 'worldBase',
+               name: 'World Base',
+            }),
+         ]);
+
+         /** @type {object[]} The walked sources. */
+         const sources = await walkAll();
+         expect(sources.filter((source) => source.location === 'adventureSceneToken').map((source) => [
+            source.name,
+            source.inheritedEffects.map((effect) => effect._id),
+         ])).toEqual([
+            [
+               'Adventures: Adventure: Adventure Scene: Adventure Based',
+               ['adventureOnly'],
+            ],
+            [
+               'Adventures: Adventure: Adventure Scene: World Based',
+               ['worldOnly'],
+            ],
+         ]);
+      });
 });
 
 describe('stored actor targets', () => {
@@ -800,7 +1061,7 @@ describe('stored actor targets', () => {
       await walkAll((source) => source.location === 'worldActor', async (target) => {
          expect(target.readEffects()).toBe(worldActor._source.effects);
          expect(target.readItems()).toBe(worldActor._source.items);
-         expect(target.readHeldEffects()).toEqual([EFFECT]);
+         expect(target.readInheritedEffects()).toEqual([]);
          expect(await target.updateEffects([
             {
                _id: 'effect0',
@@ -828,11 +1089,122 @@ describe('stored actor targets', () => {
       const { worldToken } = makeWorld();
       await walkAll((source) => source.location === 'sceneToken', async (target) => {
          expect(target.readEffects()).toBe(worldToken.token.delta._source.effects);
-         expect(target.readHeldEffects()).toEqual([EFFECT]);
+         expect(target.readInheritedEffects()).toEqual([]);
          await target.createEffects([{ name: 'Created' }]);
       });
       expect(worldToken.actorRead).toHaveBeenCalledTimes(1);
-      expect(worldToken.actor.createEmbeddedDocuments).toHaveBeenCalledWith('ActiveEffect', [{ name: 'Created' }]);
+      expect(worldToken.actor.createEmbeddedDocuments).toHaveBeenCalledWith('ActiveEffect', [{ name: 'Created' }], {
+         keepId: true,
+      });
+   });
+
+   it('reads a token\'s inherited effects from its base actor\'s stored data and hides one through core\'s deletion',
+      async () => {
+         const { worldActor, worldToken } = makeWorld();
+         worldActor._source.effects.push(makeConversion('baseOnly', 'item0'));
+         worldToken.actor.deleteEmbeddedDocuments.mockImplementationOnce(async (embeddedName, ids) => {
+            // Core stores a tombstone in the token's delta for each inherited effect it deletes.
+            worldToken.token.delta._source.effects.push(...ids.map((id) => ({
+               _id: id,
+               _tombstone: true,
+            })));
+            return [];
+         });
+
+         /** @type {object[]} The walked sources. */
+         const sources = await walkAll((source) => source.name === 'World Token', async (target) => {
+            expect(target.readInheritedEffects()).toEqual([makeConversion('baseOnly', 'item0')]);
+            expect(await target.deleteEffects(['baseOnly'])).toEqual(['baseOnly']);
+            expect(target.readInheritedEffects()).toEqual([]);
+         });
+         expect(sources.find((source) => source.name === 'World Token').target).not.toBeNull();
+         expect(worldToken.actor.deleteEmbeddedDocuments).toHaveBeenCalledWith('ActiveEffect', ['baseOnly']);
+      });
+
+   it('reads a token\'s Item deletion back as done when core leaves a tombstone for its base actor\'s Item',
+      async () => {
+         const { worldToken } = makeWorld();
+         worldToken.token.delta._source.items = [structuredClone(ITEM)];
+         worldToken.actor.deleteEmbeddedDocuments.mockImplementationOnce(async (embeddedName, ids) => {
+            // The base actor holds an Item with the id too, so core replaces the token's Item with a tombstone.
+            worldToken.token.delta._source.items = ids.map((id) => ({
+               _id: id,
+               _tombstone: true,
+            }));
+            return [];
+         });
+         await walkAll((source) => source.name === 'World Token', async (target) => {
+            expect(await target.deleteItems(['item0'])).toEqual(['item0']);
+         });
+         expect(worldToken.actorRead).toHaveBeenCalledTimes(1);
+      });
+
+   it('writes an Adventure token\'s deletions and creations as core writes an ActorDelta\'s', async () => {
+      /** @type {object} An Adventure whose token's base actor holds a conversion and an Item the token holds too. */
+      const adventure = makeFakeAdventure({
+         actors: [
+            {
+               _id: 'baseActor',
+               effects: [makeConversion('item0', 'item0')],
+               items: [structuredClone(ITEM)],
+               name: 'Base Actor',
+            },
+         ],
+         scenes: makeTokenScenes('baseActor', {
+            effects: [],
+            items: [
+               structuredClone(ITEM),
+               {
+                  ...structuredClone(ITEM),
+                  _id: 'ownItem',
+               },
+            ],
+         }),
+      });
+      installAdventureWorld(adventure);
+
+      /** @type {object[]} The walked sources. */
+      const sources = await walkAll((source) => source.location === 'adventureSceneToken', async (target) => {
+         expect(target.readInheritedEffects()).toEqual([makeConversion('item0', 'item0')]);
+         await expect(target.createEffects([{ _id: 'item0' }])).rejects.toThrow('already exists');
+         expect(await target.deleteEffects(['item0'])).toEqual(['item0']);
+         expect(await target.deleteItems([
+            'item0',
+            'ownItem',
+         ])).toEqual([
+            'item0',
+            'ownItem',
+         ]);
+         expect(await target.createEffects([
+            {
+               _id: 'item0',
+               name: 'Own',
+            },
+         ])).toEqual([
+            {
+               _id: 'item0',
+               built: true,
+               name: 'Own',
+            },
+         ]);
+         await expect(target.createEffects([{ _id: 'item0' }])).rejects.toThrow('already exists');
+      });
+      expect(sources.find((source) => source.location === 'adventureSceneToken').target).not.toBeNull();
+      expect(adventure.updates.at(-1).scenes[0].tokens[0].delta).toEqual({
+         effects: [
+            {
+               _id: 'item0',
+               built: true,
+               name: 'Own',
+            },
+         ],
+         items: [
+            {
+               _id: 'item0',
+               _tombstone: true,
+            },
+         ],
+      });
    });
 });
 
@@ -1208,5 +1580,337 @@ describe('the stored-actor pass over the walk', () => {
          skipped: 0,
          updated: 0,
       });
+   });
+
+   it('converts a legacy Item an Adventure token overrides into the token\'s own effect over its base actor\'s',
+      async () => {
+         /** @type {object} An Adventure whose token's delta overrides its base actor's legacy Item. */
+         const adventure = makeFakeAdventure({
+            actors: [
+               {
+                  _id: 'baseActor',
+                  effects: [],
+                  items: [structuredClone(LEGACY_ITEM)],
+                  name: 'Base Actor',
+               },
+            ],
+            scenes: makeTokenScenes('baseActor', {
+               effects: [],
+               items: [
+                  {
+                     ...structuredClone(LEGACY_ITEM),
+                     name: 'Token Override',
+                  },
+               ],
+            }),
+         });
+         installAdventureWorld(adventure);
+         expect(await migrateStoredActors()).toEqual({
+            failed: 0,
+            skipped: 0,
+            updated: 2,
+         });
+         expect(adventure.updates.map((data) => Object.keys(data))).toEqual([
+            ['actors'],
+            ['scenes'],
+         ]);
+         expect(adventure.updates[0].actors[0].items).toEqual([]);
+         expect(adventure.updates[0].actors[0].effects.map(summarizeEffect)).toEqual([
+            {
+               id: 'legacy0',
+               name: 'Legacy Effect',
+               stamp: 'legacy0',
+            },
+         ]);
+
+         // The token's own effect takes the slot of the base actor's conversion, so core's merge shows the token's.
+         expect(adventure.updates[1].scenes[0].tokens[0].delta.items).toEqual([]);
+         expect(adventure.updates[1].scenes[0].tokens[0].delta.effects.map(summarizeEffect)).toEqual([
+            {
+               id: 'legacy0',
+               name: 'Token Override',
+               stamp: 'legacy0',
+            },
+         ]);
+      });
+
+   it('converts an Adventure token\'s own legacy Item on the token when its base actor holds none with its id',
+      async () => {
+         /** @type {object} An Adventure whose token and base actor each hold a different legacy Item. */
+         const adventure = makeFakeAdventure({
+            actors: [
+               {
+                  _id: 'baseActor',
+                  effects: [],
+                  items: [structuredClone(LEGACY_ITEM)],
+                  name: 'Base Actor',
+               },
+            ],
+            scenes: makeTokenScenes('baseActor', {
+               effects: [],
+               items: [
+                  {
+                     ...structuredClone(LEGACY_ITEM),
+                     _id: 'tokenItem',
+                     name: 'Token Effect',
+                  },
+               ],
+            }),
+         });
+         installAdventureWorld(adventure);
+         expect(await migrateStoredActors()).toEqual({
+            failed: 0,
+            skipped: 0,
+            updated: 2,
+         });
+         expect(adventure.updates[1].scenes[0].tokens[0].delta.items).toEqual([]);
+         expect(adventure.updates[1].scenes[0].tokens[0].delta.effects.map(summarizeEffect)).toEqual([
+            {
+               id: 'tokenItem',
+               name: 'Token Effect',
+               stamp: 'tokenItem',
+            },
+         ]);
+      });
+
+   it('keeps one effect on an Adventure token whose base actor converts only on a later load', async () => {
+      /** @type {object} An Adventure whose token's delta overrides its base actor's legacy Item. */
+      const adventure = makeFakeAdventure({
+         actors: [
+            {
+               _id: 'baseActor',
+               effects: [],
+               items: [structuredClone(LEGACY_ITEM)],
+               name: 'Base Actor',
+            },
+         ],
+         scenes: makeTokenScenes('baseActor', {
+            effects: [],
+            items: [
+               {
+                  ...structuredClone(LEGACY_ITEM),
+                  name: 'Token Override',
+               },
+            ],
+         }),
+      });
+      installAdventureWorld(adventure);
+
+      // The first load's write of the actors is not stored; the token still converts its own Item.
+      adventure.update.mockResolvedValueOnce(undefined);
+      expect(await migrateStoredActors()).toEqual({
+         failed: 1,
+         skipped: 0,
+         updated: 1,
+      });
+
+      /** @type {object} The token's stored delta after the first load. */
+      const delta = structuredClone(adventure._source.scenes[0].tokens[0].delta);
+      expect(delta.effects.map(summarizeEffect)).toEqual([
+         {
+            id: 'legacy0',
+            name: 'Token Override',
+            stamp: 'legacy0',
+         },
+      ]);
+
+      // The base actor still held the Item, so the deletion left a tombstone: core's rule for an inherited document.
+      expect(delta.items).toEqual([
+         {
+            _id: 'legacy0',
+            _tombstone: true,
+         },
+      ]);
+
+      // The next load converts the base actor; its conversion takes the slot the token's own effect overrides.
+      expect(await migrateStoredActors()).toEqual({
+         failed: 0,
+         skipped: 0,
+         updated: 1,
+      });
+      expect(adventure.updates.map((data) => Object.keys(data))).toEqual([
+         ['scenes'],
+         ['actors'],
+      ]);
+      expect(adventure._source.actors[0].effects.map(summarizeEffect)).toEqual([
+         {
+            id: 'legacy0',
+            name: 'Legacy Effect',
+            stamp: 'legacy0',
+         },
+      ]);
+      expect(adventure._source.scenes[0].tokens[0].delta).toEqual(delta);
+   });
+
+   it('keeps one effect on a world token whose base actor\'s conversion is stored only on a later load', async () => {
+      /** @type {object} The base world actor, holding a legacy effect Item; its first creation is not stored. */
+      const base = Object.assign(makeStoredDelta('baseActor', {
+         effects: [],
+         items: [structuredClone(LEGACY_ITEM)],
+      }), { name: 'Base Actor' });
+      base.createEmbeddedDocuments.mockResolvedValueOnce([]);
+
+      /** @type {object} The token's delta, whose own legacy Item overrides its base actor's. */
+      const tokenDelta = makeStoredDelta('tokenDelta', {
+         effects: [],
+         items: [
+            {
+               ...structuredClone(LEGACY_ITEM),
+               name: 'Token Override',
+            },
+         ],
+      });
+      globalThis.game = {
+         actors: new FakeCollection([base]),
+         packs: [],
+         scenes: [
+            {
+               tokens: [
+                  {
+                     _source: {
+                        delta: tokenDelta._source,
+                     },
+                     actor: tokenDelta,
+                     actorId: 'baseActor',
+                     actorLink: false,
+                     baseActor: base,
+                     delta: tokenDelta,
+                     id: 'worldToken',
+                     name: 'World Token',
+                  },
+               ],
+            },
+         ],
+         user: { id: 'gm0' },
+      };
+
+      // The first load: the base actor's creation is not stored (its Item is kept); the token converts its own Item.
+      expect(await migrateStoredActors()).toEqual({
+         failed: 1,
+         skipped: 0,
+         updated: 1,
+      });
+
+      /** @type {object} The token's stored delta after the first load. */
+      const delta = structuredClone(tokenDelta._source);
+      expect(delta.effects.map(summarizeEffect)).toEqual([
+         {
+            id: 'legacy0',
+            name: 'Token Override',
+            stamp: 'legacy0',
+         },
+      ]);
+      expect(delta.items).toEqual([]);
+
+      // The next load stores the base actor's conversion in the slot the token's own effect overrides, and finds no
+      // work on the token: it keeps its one effect, and nothing is written to it.
+      expect(await migrateStoredActors()).toEqual({
+         failed: 0,
+         skipped: 0,
+         updated: 1,
+      });
+      expect(base._source.effects.map(summarizeEffect)).toEqual([
+         {
+            id: 'legacy0',
+            name: 'Legacy Effect',
+            stamp: 'legacy0',
+         },
+      ]);
+      expect(base._source.items).toEqual([]);
+      expect(tokenDelta._source).toEqual(delta);
+      expect(tokenDelta.createEmbeddedDocuments).toHaveBeenCalledTimes(1);
+      expect(tokenDelta.deleteEmbeddedDocuments).toHaveBeenCalledTimes(1);
+   });
+
+   it('hides the base actor\'s conversion of a legacy Item an Adventure token removed', async () => {
+      /** @type {object} An Adventure whose token removed its base actor's legacy Item. */
+      const adventure = makeFakeAdventure({
+         actors: [
+            {
+               _id: 'baseActor',
+               effects: [],
+               items: [structuredClone(LEGACY_ITEM)],
+               name: 'Base Actor',
+            },
+         ],
+         scenes: makeTokenScenes('baseActor', {
+            effects: [],
+            items: [
+               {
+                  _id: 'legacy0',
+                  _tombstone: true,
+               },
+            ],
+         }),
+      });
+      installAdventureWorld(adventure);
+      expect(await migrateStoredActors()).toEqual({
+         failed: 0,
+         skipped: 0,
+         updated: 2,
+      });
+      expect(adventure.updates[1].scenes[0].tokens[0].delta).toEqual({
+         effects: [
+            {
+               _id: 'legacy0',
+               _tombstone: true,
+            },
+         ],
+         items: [
+            {
+               _id: 'legacy0',
+               _tombstone: true,
+            },
+         ],
+      });
+   });
+
+   it('hides older-id conversions an Adventure token\'s own data claims, and leaves an unclaimed one', async () => {
+      /** @type {object} An Adventure whose base actor holds conversions an older version created with random ids. */
+      const adventure = makeFakeAdventure({
+         actors: [
+            {
+               _id: 'baseActor',
+               effects: [
+                  makeConversion('olderRemoved', 'removedItem'),
+                  makeConversion('olderOverridden', 'overriddenItem'),
+                  makeConversion('olderUnclaimed', 'unclaimedItem'),
+               ],
+               items: [],
+               name: 'Base Actor',
+            },
+         ],
+         scenes: makeTokenScenes('baseActor', {
+            effects: [makeConversion('tokenOwn', 'overriddenItem', 'Token Own')],
+            items: [
+               {
+                  _id: 'removedItem',
+                  _tombstone: true,
+               },
+            ],
+         }),
+      });
+      installAdventureWorld(adventure);
+      expect(await migrateStoredActors()).toEqual({
+         failed: 0,
+         skipped: 0,
+         updated: 1,
+      });
+      expect(adventure.updates.map((data) => Object.keys(data))).toEqual([['scenes']]);
+      expect(adventure.updates[0].scenes[0].tokens[0].delta.effects.map(summarizeEffect)).toEqual([
+         {
+            id: 'tokenOwn',
+            name: 'Token Own',
+            stamp: 'overriddenItem',
+         },
+         {
+            id: 'olderRemoved',
+            tombstone: true,
+         },
+         {
+            id: 'olderOverridden',
+            tombstone: true,
+         },
+      ]);
    });
 });

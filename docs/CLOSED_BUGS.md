@@ -1148,3 +1148,56 @@ when fixed.
 - **Fixed:** 2026-09-30 — after its writes, each actor's data is checked again (`storedActorNeedsMigration`); an
   actor with work left counts as failed and is reported. Gated by `tests/unit/MigrateStoredActors.test.js` (a vetoed
   update counts as failed; an actor that holds no work once opened counts as skipped).
+
+### 99. An Adventure token whose legacy Item overrode its base actor's legacy Item ended up with two converted effects
+
+- **What:** The Adventure walk read only a scene token's own delta effects, so when the delta held a legacy `effect`
+  Item with the same id as a legacy Item on its base actor (an override, for example an effect toggled on the token),
+  the token converted its own copy while the base actor converted the base copy; after import the token held both
+  effects.
+- **Found:** 2026-09-30 while planning the fix for #93.
+- **Fixed:** 2026-10-01 — with #100 and #101, by one change of identity: a converted effect takes its legacy Item's
+  `_id` (`buildEffectData`; `keepId` on documents), the id core relates a token's delta to its base actor by
+  (`common/documents/actor-delta.mjs` `#mergeEmbeddedCollection`). The token's own Item converts into the token's own
+  effect in the base conversion's slot (hidden by a tombstone first, then created over it), so core's merge shows one
+  effect, the token's. An Adventure token's base actor is the Adventure's actor with its actor id, else the world
+  actor. Gated by `tests/unit/StoredActorSources.test.js` (an overriding legacy Item converts into the token's own
+  effect over the base actor's; a token's own non-overriding Item converts on the token) and
+  `tests/unit/ConvertEffectItemsToActiveEffects.test.js`; the core behaviour it rests on is gated live by
+  `tests/e2e/converted-effect-identity.spec.js` (`keepId` beside an Item; a tombstone, then a `keepId` create over it,
+  overriding the base actor's effect; an imported Adventure token showing its own effect over its Adventure actor's,
+  hiding the one its delta tombstones, and inheriting from a world actor when no Adventure actor has its actor id).
+  Converting a legacy Item is unit-gated only: no e2e can seed one.
+
+### 100. A token's overriding legacy Item converted into a duplicate when its base actor's conversion was not stored
+
+- **What:** When a base actor's conversion write was vetoed or not stored, an unlinked token whose delta overrode one
+  of the base actor's legacy `effect` Items converted its own copy; when the base actor converted on a later load, the
+  token held both effects. Converted effects got fresh random ids, so core's delta merge (by `_id`) could not tell the
+  token's copy overrode the base's. Affected world tokens and Adventure tokens.
+- **Found:** 2026-09-30 while planning the fix for #99.
+- **Fixed:** 2026-10-01 — the identity change of #99: both conversions take the Item's id, so whichever side converts
+  first, and whether or not the other side's write is stored, the token's own effect overrides the base actor's. A
+  token's Item deletion in an Adventure leaves a tombstone where its base actor still holds the Item (core's rule for a
+  deleted inherited document). Gated by `tests/unit/StoredActorSources.test.js`: "keeps one effect on an Adventure
+  token whose base actor converts only on a later load" (the first load's `actors` write is not stored) and "keeps one
+  effect on a world token whose base actor's conversion is stored only on a later load" (the base actor's creation is
+  not stored); in both the next load converts the base actor, and the token keeps one effect and takes no write.
+  Unit-gated only: no e2e can seed a legacy effect Item.
+
+### 101. An inherited legacy Item a token removed came back as a converted effect
+
+- **What:** An unlinked token that removed an inherited legacy `effect` Item held a tombstone for that Item's id. The
+  base actor's conversion created the replacement effect with a fresh random id, which the tombstone did not hide, so
+  the token regained the effect. Affected world tokens and Adventure tokens.
+- **Found:** 2026-09-30 while planning the fix for #99.
+- **Fixed:** 2026-10-01 — a token's inherited conversion of an Item its own data claims (an Item entry of its delta,
+  a tombstone included, or a conversion it holds itself) is hidden with an effects tombstone, as core deletes an
+  inherited effect from a synthetic actor; every walked source carries the effects it inherits, so the scan finds such
+  a token, and the stamp also finds the conversions older versions created under random ids. Gated by
+  `tests/unit/StoredActorSources.test.js` (the removed Item's conversion and older-id conversions hidden, an unclaimed
+  one left), `tests/unit/MigrateStoredActors.test.js`, and `tests/e2e/converted-effect-identity.spec.js` (live, for an
+  unlinked token on a world scene, one in a locked world Scene pack (both named apart from their base actors, so core
+  stores their deltas, #102), and one in an Adventure in a locked world Adventure pack: an Automatic load hides the conversions of Items the token removed or converted itself, older-id
+  ones included, leaves an unclaimed one, and the next load writes nothing; the imported Adventure token no longer
+  shows the hidden conversions).

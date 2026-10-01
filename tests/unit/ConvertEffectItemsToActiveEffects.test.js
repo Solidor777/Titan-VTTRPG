@@ -3,6 +3,7 @@ import {
    buildEffectData,
    convertStoredActor,
    needsEffectItemConversion,
+   needsInheritedConversionHidden,
 } from '~/helpers/migration/ConvertEffectItemsToActiveEffects.js';
 
 // The converter module imports nothing at module scope. The shared test setup (tests/setup.js) provides a minimal
@@ -52,39 +53,65 @@ function makeLegacyItemSource(overrides = {}) {
 }
 
 /**
- * Builds a fake stored-actor target exposing what convertStoredActor reads and recording its writes in order. The
- * create stub resolves the created effects' data, as a StoredActorTarget does, so stamp verification sees them.
+ * Builds a fake stored-actor target exposing what convertStoredActor reads and recording its writes in order. Its
+ * writes change its data as a stored write does: a creation keeps each effect's id, the deletion of an inherited
+ * effect leaves a tombstone in its place, and an Item deletion removes the Item.
  * @param {object} [options] - The fake's contents.
- * @param {object[]} [options.items] - The Item data the actor holds itself.
- * @param {object[]} [options.effects] - The Active Effect data the actor holds itself.
- * @param {object[]} [options.heldEffects] - Every Active Effect's data the actor has; defaults to `effects`.
+ * @param {object[]} [options.items] - The Item data the actor holds itself, tombstones included.
+ * @param {object[]} [options.effects] - The Active Effect data the actor holds itself, tombstones included.
+ * @param {object[]} [options.inheritedEffects] - The Active Effect data the actor inherits and does not override.
  * @returns {object} The fake target; its calls array records [method, payload] pairs in order.
  */
-function makeFakeTarget({ items = [], effects = [], heldEffects = effects } = {}) {
+function makeFakeTarget({ effects = [], inheritedEffects = [], items = [] } = {}) {
    /** @type {Array<[string, *]>} Recorded writes as [method, payload]. */
    const calls = [];
+
+   /** @type {{effects: object[], inherited: object[], items: object[]}} The fake's current data. */
+   const data = {
+      effects: [...effects],
+      inherited: [...inheritedEffects],
+      items: [...items],
+   };
    return {
       calls,
-      createEffects: async (data) => {
+      createEffects: async (entries) => {
          calls.push([
             'createEffects',
-            data,
+            entries,
          ]);
-         return data.map((entry, index) => ({
-            _id: `createdfx${String(index).padStart(8, '0')}`,
+
+         /** @type {object[]} The created effects, each keeping its id. */
+         const created = entries.map((entry) => ({
+            _id: entry._id,
             flags: entry.flags,
             type: entry.type,
          }));
+         data.effects.push(...created);
+         return created;
+      },
+      deleteEffects: async (ids) => {
+         calls.push([
+            'deleteEffects',
+            ids,
+         ]);
+         data.inherited = data.inherited.filter((effect) => !ids.includes(effect._id));
+         data.effects.push(...ids.map((id) => ({
+            _id: id,
+            _tombstone: true,
+         })));
+         return ids;
       },
       deleteItems: async (ids) => {
          calls.push([
             'deleteItems',
             ids,
          ]);
+         data.items = data.items.filter((item) => !ids.includes(item._id));
          return ids;
       },
-      readHeldEffects: () => heldEffects,
-      readItems: () => items,
+      readEffects: () => data.effects,
+      readInheritedEffects: () => data.inherited,
+      readItems: () => data.items,
    };
 }
 
@@ -208,10 +235,11 @@ describe('buildEffectData (raw active normalization + provenance)', () => {
       expect(result.system.customTrait).toBeUndefined();
    });
 
-   it('stamps the source item id as the convertedFromItem provenance flag', () => {
+   it('gives the effect its source item id and stamps that id as the convertedFromItem provenance flag', () => {
       /** @type {object} - The Active Effect creation data produced by buildEffectData. */
       const result = buildEffectData(makeLegacyItemSource());
 
+      expect(result._id).toBe('legacyitem000001');
       expect(result.flags).toEqual({
          titan: {
             convertedFromItem: 'legacyitem000001',
@@ -223,11 +251,13 @@ describe('buildEffectData (raw active normalization + provenance)', () => {
 /**
  * Builds a converted effect's stored data, stamped with its source Item.
  * @param {string} itemId - The source Item id.
+ * @param {string} [id] - The effect's id: an older version's random id by default, its Item's id for a conversion of
+ * this version.
  * @returns {object} The converted effect.
  */
-function makeConverted(itemId) {
+function makeConverted(itemId, id = 'convertedfx00001') {
    return {
-      _id: 'convertedfx00001',
+      _id: id,
       flags: {
          titan: {
             convertedFromItem: itemId,
@@ -236,6 +266,12 @@ function makeConverted(itemId) {
       type: 'effect',
    };
 }
+
+/** @type {object} A tombstone of the default legacy Item in a token's delta: the token removed the inherited Item. */
+const REMOVED_ITEM = {
+   _id: 'legacyitem000001',
+   _tombstone: true,
+};
 
 describe('needsEffectItemConversion', () => {
    it('reports a legacy effect Item the actor holds itself', () => {
@@ -249,6 +285,44 @@ describe('needsEffectItemConversion', () => {
             type: 'weapon',
          }),
       ])).toBe(false);
+   });
+});
+
+describe('needsInheritedConversionHidden', () => {
+   it('reports an inherited conversion of an Item the token removed', () => {
+      expect(needsInheritedConversionHidden({
+         effects: [],
+         inheritedEffects: [makeConverted('legacyitem000001', 'legacyitem000001')],
+         items: [REMOVED_ITEM],
+      })).toBe(true);
+   });
+
+   it('reports an inherited conversion of an Item the token overrides', () => {
+      expect(needsInheritedConversionHidden({
+         effects: [],
+         inheritedEffects: [makeConverted('legacyitem000001')],
+         items: [makeLegacyItemSource()],
+      })).toBe(true);
+   });
+
+   it('reports an inherited conversion of an Item whose conversion the token holds itself', () => {
+      expect(needsInheritedConversionHidden({
+         effects: [makeConverted('legacyitem000001', 'legacyitem000001')],
+         inheritedEffects: [makeConverted('legacyitem000001')],
+         items: [],
+      })).toBe(true);
+   });
+
+   it('reports nothing for an inherited conversion the token does not claim, nor without inherited effects', () => {
+      expect(needsInheritedConversionHidden({
+         effects: [],
+         inheritedEffects: [makeConverted('otheritem0000001')],
+         items: [REMOVED_ITEM],
+      })).toBe(false);
+      expect(needsInheritedConversionHidden({
+         effects: [],
+         items: [REMOVED_ITEM],
+      })).toBe(false);
    });
 });
 
@@ -311,21 +385,165 @@ describe('convertStoredActor', () => {
          ]);
       });
 
-   it('counts a converted effect an unlinked token inherits as the replacement', async () => {
-      /** @type {object} A token target whose delta holds the legacy Item and whose base actor holds the replacement. */
+   it('converts a legacy Item a token overrides into its own effect, hiding the base actor\'s conversion first',
+      async () => {
+         /** @type {object} A token target whose delta overrides an Item its base actor already converted. */
+         const target = makeFakeTarget({
+            inheritedEffects: [makeConverted('legacyitem000001', 'legacyitem000001')],
+            items: [makeLegacyItemSource()],
+         });
+         expect(await convertStoredActor(target)).toBe(true);
+         expect(target.calls).toEqual([
+            [
+               'deleteEffects',
+               ['legacyitem000001'],
+            ],
+            [
+               'createEffects',
+               [buildEffectData(makeLegacyItemSource())],
+            ],
+            [
+               'deleteItems',
+               ['legacyitem000001'],
+            ],
+         ]);
+      });
+
+   it('hides an older version\'s conversion (another id) of an Item the token overrides', async () => {
+      /** @type {object} A token target whose base actor converted the overridden Item with a random id. */
       const target = makeFakeTarget({
-         effects: [],
-         heldEffects: [makeConverted('legacyitem000001')],
+         inheritedEffects: [makeConverted('legacyitem000001')],
          items: [makeLegacyItemSource()],
       });
       await convertStoredActor(target);
       expect(target.calls).toEqual([
+         [
+            'deleteEffects',
+            ['convertedfx00001'],
+         ],
+         [
+            'createEffects',
+            [buildEffectData(makeLegacyItemSource())],
+         ],
          [
             'deleteItems',
             ['legacyitem000001'],
          ],
       ]);
    });
+
+   it('hides the inherited conversion of an Item the token removed, creating nothing', async () => {
+      /** @type {object} A token target that removed an inherited Item its base actor converted. */
+      const target = makeFakeTarget({
+         inheritedEffects: [
+            makeConverted('legacyitem000001', 'legacyitem000001'),
+            makeConverted('otheritem0000001', 'otherfx000000001'),
+         ],
+         items: [REMOVED_ITEM],
+      });
+      expect(await convertStoredActor(target)).toBe(true);
+      expect(target.calls).toEqual([
+         [
+            'deleteEffects',
+            ['legacyitem000001'],
+         ],
+      ]);
+   });
+
+   it('hides an inherited conversion of an Item whose conversion the token holds itself', async () => {
+      /** @type {object} A token target holding its own conversion beside an older-id inherited one. */
+      const target = makeFakeTarget({
+         effects: [makeConverted('legacyitem000001', 'legacyitem000001')],
+         inheritedEffects: [makeConverted('legacyitem000001')],
+      });
+      expect(await convertStoredActor(target)).toBe(true);
+      expect(target.calls).toEqual([
+         [
+            'deleteEffects',
+            ['convertedfx00001'],
+         ],
+      ]);
+   });
+
+   it('converts nothing over an inherited conversion whose hide a hook vetoed, keeping the Item', async () => {
+      /** @type {object} A token target whose deletion of the inherited conversion is vetoed. */
+      const target = makeFakeTarget({
+         inheritedEffects: [makeConverted('legacyitem000001', 'legacyitem000001')],
+         items: [makeLegacyItemSource()],
+      });
+      target.deleteEffects = async (ids) => {
+         target.calls.push([
+            'deleteEffects',
+            ids,
+         ]);
+         return [];
+      };
+      expect(await convertStoredActor(target)).toBe(false);
+      expect(target.calls).toEqual([
+         [
+            'deleteEffects',
+            ['legacyitem000001'],
+         ],
+      ]);
+   });
+
+   it('converts nothing over an older version\'s inherited conversion whose hide a hook vetoed, keeping the Item',
+      async () => {
+         /** @type {object} A token target whose deletion of the older-id inherited conversion is vetoed. */
+         const target = makeFakeTarget({
+            inheritedEffects: [makeConverted('legacyitem000001')],
+            items: [makeLegacyItemSource()],
+         });
+         target.deleteEffects = async (ids) => {
+            target.calls.push([
+               'deleteEffects',
+               ids,
+            ]);
+            return [];
+         };
+         expect(await convertStoredActor(target)).toBe(false);
+         expect(target.calls).toEqual([
+            [
+               'deleteEffects',
+               ['convertedfx00001'],
+            ],
+         ]);
+      });
+
+   it('keeps a legacy Item whose id an effect that is not its conversion takes, and throws after the rest',
+      async () => {
+         /** @type {object} A second legacy source, free to convert. */
+         const fresh = makeLegacyItemSource({
+            _id: 'legacyitem000002',
+            name: 'Second Legacy Effect',
+         });
+
+         /** @type {object} The fake target holding an unstamped effect with the first source's id. */
+         const target = makeFakeTarget({
+            effects: [
+               {
+                  _id: 'legacyitem000001',
+                  flags: {},
+                  type: 'effect',
+               },
+            ],
+            items: [
+               makeLegacyItemSource(),
+               fresh,
+            ],
+         });
+         await expect(convertStoredActor(target)).rejects.toThrow('[legacyitem000001]');
+         expect(target.calls).toEqual([
+            [
+               'createEffects',
+               [buildEffectData(fresh)],
+            ],
+            [
+               'deleteItems',
+               ['legacyitem000002'],
+            ],
+         ]);
+      });
 
    it('creates only the not-yet-converted sources when some replacements already exist', async () => {
       /** @type {object} A second legacy source with no surviving replacement. */

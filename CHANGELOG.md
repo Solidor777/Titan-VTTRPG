@@ -1,8 +1,8 @@
 ## Unreleased:
 Conditions follow the 2026-09-26 rules.
 **Back up your world before updating. The active GM's first login rewrites every existing condition on world actors,
-unlinked tokens, and the actors and tokens in the world's Actor, Scene, and Adventure compendium packs to the new rules
-(as the Migration Mode setting allows).**
+unlinked tokens, and the actors and tokens in the world's Actor, Scene, and Adventure compendium packs to the new rules,
+and hides from unlinked tokens the converted effects their own changes replace (as the Migration Mode setting allows).**
 - Multiply Base and Multiply Sum rules elements can round to the nearest whole number.
 - Blinded, Contaminated, Prone, Restrained, and Stunned lower their stats by a quarter of the base value, rounded up,
   instead of by 1. The new Off-Balance condition lowers Accuracy, Awareness, Melee, and Defense the same way.
@@ -27,6 +27,10 @@ unlinked tokens, and the actors and tokens in the world's Actor, Scene, and Adve
   GM migrates, a failed migration no longer stops the Player HUD from loading, and a migration with failures reports
   how many failed instead of announcing completion, counting writes the world did not store and compendium packs it
   could not read or lock again.
+- Legacy effect items convert into effects that keep the item's ID, so an unlinked token's own changes to its actor's
+  effect items carry over to the converted effects. The migration hides an actor's converted effect from each unlinked
+  token that removed or replaced the original item, or already holds its own converted copy, including effects earlier
+  versions converted: such a token no longer shows a removed effect or a second copy.
 
 ## Version 2.1.0:
 Advantage and Disadvantage, situational modifiers, and bug fixes.

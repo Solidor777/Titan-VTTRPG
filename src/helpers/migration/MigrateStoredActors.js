@@ -4,6 +4,7 @@ import { walkStoredActorSources } from '~/helpers/migration/StoredActorSources.j
 import {
    convertStoredActor,
    needsEffectItemConversion,
+   needsInheritedConversionHidden,
 } from '~/helpers/migration/ConvertEffectItemsToActiveEffects.js';
 import {
    getConditionEffectUpdates,
@@ -23,14 +24,17 @@ import {
  */
 
 /**
- * Whether stored actor data needs the stored-actor migration: a legacy effect Item to convert, or a condition effect
+ * Whether stored actor data needs the stored-actor migration: a legacy effect Item to convert, an inherited conversion
+ * of an Item an unlinked token's own data claims, to hide (needsInheritedConversionHidden), or a condition effect
  * whose rules elements differ from its definition or which still stores a description.
- * @param {{items: object[], effects: object[]}} data - The Item and Active Effect data the actor holds itself: a
- * walked source, or an opened target's current data.
+ * @param {{items: object[], effects: object[], inheritedEffects?: object[]}} data - The Item and Active Effect data
+ * the actor holds itself, and the Active Effects it inherits and does not override (none when omitted): a walked
+ * source, or an opened target's current data.
  * @returns {boolean} Whether the actor needs the migration.
  */
 export function storedActorNeedsMigration(data) {
    return needsEffectItemConversion(data.items)
+      || needsInheritedConversionHidden(data)
       || getConditionEffectUpdates(data.effects).length > 0;
 }
 
@@ -52,14 +56,14 @@ export async function storedActorsNeedMigration() {
 }
 
 /**
- * Migrates every stored actor that needs it: opens it, converts its legacy effect Items (convertStoredActor), syncs
- * its condition effects (syncStoredActorConditions), then checks its data again, so an actor with work left after
- * its writes (a write vetoed or not applied) fails instead of passing as done. Each actor is isolated: a failure is
- * reported with the actor's name and the rest still migrate. A changed actor counts as updated only once its writes
- * are stored; an Adventure's actors and scene tokens are stored by one write when the walk leaves the Adventure, so
- * every changed actor's stored outcome is read once the walk is over (reading it during the walk would wait on a write
- * that happens only after the walk moves on). Each failure of the walk itself (a world pack it could not read, or a
- * pack lock it could not restore) counts as one more failure.
+ * Migrates every stored actor that needs it: opens it, converts its legacy effect Items and hides the inherited
+ * conversions its own data claims (convertStoredActor), syncs its condition effects (syncStoredActorConditions), then
+ * checks its data again, so an actor with work left after its writes (a write vetoed or not applied) fails instead of
+ * passing as done. Each actor is isolated: a failure is reported with the actor's name and the rest still migrate. A
+ * changed actor counts as updated only once its writes are stored; an Adventure's actors and scene tokens are stored
+ * by one write when the walk leaves the Adventure, so every changed actor's stored outcome is read once the walk is
+ * over (reading it during the walk would wait on a write that happens only after the walk moves on). Each failure of
+ * the walk itself (a world pack it could not read, or a pack lock it could not restore) counts as one more failure.
  * @returns {Promise<StoredActorMigrationCounts>} How many stored actors were updated, skipped, and failed.
  */
 export async function migrateStoredActors() {
@@ -94,6 +98,7 @@ export async function migrateStoredActors() {
          const synced = await syncStoredActorConditions(target);
          if (storedActorNeedsMigration({
             effects: target.readEffects(),
+            inheritedEffects: target.readInheritedEffects(),
             items: target.readItems(),
          })) {
             throw new Error('Its stored data still needs migration after its writes: a write was vetoed or not '
