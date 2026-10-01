@@ -56,3 +56,14 @@ Completed items are deleted, not marked done.
 
 - Extend immunity beyond effects and conditions (user ruling 2026-09-27): immunity to abilities, damage and other
   things by trait. The first cut covers effect/condition immunity by condition id or effect name only.
+
+- One-off world maintenance that needs the Foundry server stopped, because a running world locks its LevelDB stores
+  and pack stores:
+  - Delete orphaned tokens from the user's worlds (`soresokai`, `soresekai-season-2`, `test-titan`). An orphaned token
+    is an unlinked token whose base actor no longer exists, found in world scenes, world Scene packs and world
+    Adventure packs. The user decided on 2026-09-30 to remove them one-off. Migration skips them, because Foundry
+    core cannot write to an orphaned token's delta: `TokenDocument#_onRelatedUpdate` dereferences the null actor, and
+    every parent-level write that creates or deletes entries is rejected. Back up first, as for the base-type effect
+    cleanup.
+  - Remove the base-type Active Effect "Test Effect" from `test-titan`'s world pack `titan-effects-copy`, and find
+    which e2e spec creates base-type Active Effects.
