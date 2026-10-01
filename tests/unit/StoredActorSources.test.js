@@ -577,6 +577,60 @@ describe('walkStoredActorSources', () => {
          ]);
       });
 
+   it('skips an unlinked token whose base actor is gone, on a world scene and in a Scene pack', async () => {
+      const { packs } = makeWorld();
+
+      // Presence first: the world holds an orphaned token on its scene and one in its Scene pack.
+      expect(game.scenes[0].tokens.some((token) => token.name === 'Orphan Token' && !token.baseActor)).toBe(true);
+      expect((await packs.scene.documentClass.database.get(packs.scene.documentClass, {
+         indexFields: [],
+      }))[0].tokens.some((token) => token.name === 'Packed Orphan' && !game.actors.has(token.actorId))).toBe(true);
+
+      /** @type {string[]} The walked sources' names. */
+      const names = (await walkAll()).map((source) => source.name);
+      expect(names).not.toContain('Orphan Token');
+      expect(names).not.toContain('Scenes: Packed Scene: Packed Orphan');
+   });
+
+   it('walks an Adventure scene token whose actor id names no actor, and writes it as data', async () => {
+      /** @type {object} An Adventure whose scene token's actor id names no actor, in the Adventure or the world. */
+      const adventure = makeFakeAdventure({
+         scenes: [
+            {
+               _id: 'adventureScene',
+               name: 'Adventure Scene',
+               tokens: [
+                  {
+                     _id: 'orphanToken',
+                     actorId: 'goneActor',
+                     actorLink: false,
+                     delta: {
+                        effects: [structuredClone(EFFECT)],
+                        items: [],
+                     },
+                     name: 'Orphan Token',
+                  },
+               ],
+            },
+         ],
+      });
+      installAdventureWorld(adventure);
+
+      /** @type {object[]} The walked sources. */
+      const sources = await walkAll((source) => source.location === 'adventureSceneToken', async (target) => {
+         expect(await target.updateEffects([
+            {
+               _id: 'effect0',
+               'system.rulesElement': [{ operation: 'flatModifier' }],
+            },
+         ])).toHaveLength(1);
+      });
+      expect(sources.filter((source) => source.location === 'adventureSceneToken').map((source) => source.name))
+         .toEqual(['Adventures: Adventure: Adventure Scene: Orphan Token']);
+      expect(adventure.updates[0].scenes[0].tokens[0].delta.effects[0].system.rulesElement)
+         .toEqual([{ operation: 'flatModifier' }]);
+   });
+
    it('reads stored data only: each pack through its server projection, a token through its stored delta',
       async () => {
          const { packs, worldToken } = makeWorld();

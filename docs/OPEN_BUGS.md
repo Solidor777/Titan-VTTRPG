@@ -13,14 +13,6 @@ Deferred/known bugs. Todos (planned work) live in `docs/TODO.md`; this file is b
 - **Found:** 2026-09-30 by the Task 5 fix round (plan B), measured live.
 - **Status:** Not handled in code by user decision 2026-09-30 (local worlds cleaned one-off).
 
-### 96. Unlinked tokens whose base actor is gone are never migrated in world scenes and Scene packs
-
-- **What:** The stored-actor walker skips an unlinked token without a base actor in world scenes and world Scene packs,
-  so its delta keeps legacy `effect` Items and stale condition effects, while the Adventure path migrates such a
-  token's delta as data. CLOSED_BUGS #83 says every stored actor is walked, which is not true for these tokens.
-- **Found:** 2026-09-30 by the buddy check of the Task 5 fix round (plan B).
-- **Status:** Open; fixed in Task 5 fix round 2.
-
 ### 99. An Adventure token whose legacy Item overrides its base actor's legacy Item ends up with two converted effects
 
 - **What:** The Adventure walk reads only a scene token's own delta effects, so when the delta holds a legacy `effect`

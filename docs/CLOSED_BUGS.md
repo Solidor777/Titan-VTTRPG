@@ -952,8 +952,10 @@ when fixed.
   actors in world actors, unlinked world-scene tokens whose base actor exists, world Actor packs, unlinked tokens in
   world Scene packs whose base world actor exists, and the actors and unlinked scene tokens in world Adventure packs,
   reading packs through a server projection that loads no document; the converter, the condition sync, and the
-  migration scan all walk it, and a pack is unlocked only to write and locked again. Unlinked tokens whose base actor
-  is gone are not walked (OPEN_BUGS #96). Gated by `tests/unit/StoredActorSources.test.js` (the location list is pinned
+  migration scan all walk it, and a pack is unlocked only to write and locked again. One exception, by design: an
+  orphaned token (an unlinked token whose base actor is gone) on a world scene or in a world Scene pack is not walked,
+  because Foundry v14 core cannot create or delete entries in its delta (#96). An Adventure's scene tokens are data,
+  and are walked whatever their base actor. Gated by `tests/unit/StoredActorSources.test.js` (the location list is pinned
   and walked in order) and `tests/e2e/condition-migration.spec.js` (the condition sync in every location, packs
   locked, on an Automatic load and not again on the next). The converter over these locations is unit-gated only: the
   server rejects the unregistered `effect` Item subtype, so no e2e can seed a legacy effect Item.
@@ -1101,6 +1103,29 @@ when fixed.
   counts as one failure. Gated by `tests/unit/StoredActorSources.test.js` (both failures recorded; an unreadable
   Adventure pack read once and recorded once; an unreadable pack makes the scan report work and the pass count a
   failure) and `tests/unit/MigrateStoredActors.test.js` (walk failures are counted, and make the scan report work).
+
+### 96. Unlinked tokens whose base actor is gone were never migrated in world scenes and Scene packs
+
+- **What:** The stored-actor walker skipped an unlinked token without a base actor (an orphaned token) in world scenes
+  and world Scene packs, so its delta kept legacy `effect` Items and stale condition effects, while the Adventure path
+  migrated such a token's delta as data. CLOSED_BUGS #83 said every stored actor was walked, which was not true for
+  these tokens.
+- **Found:** 2026-09-30 by the buddy check of the Task 5 fix round (plan B).
+- **Resolved:** 2026-10-01. The skip is kept by design, because of a Foundry v14 core limitation. Core cannot create
+  or delete entries in an orphaned token's delta, and the conversion needs both.
+  - Embedded writes through the token's ActorDelta throw on the client after the server write:
+    `TokenDocument#_onRelatedUpdate` (`client/documents/token.mjs:3809`) dereferences the token's null actor.
+  - A parent Token or Scene update that adds an entry is rejected by the client's dry run
+    (`EmbeddedCollectionDelta#_prepareDeltaUpdate`).
+  - One that drops or operator-deletes an entry stores nothing.
+  - All of this was measured live (`docs/POST_WORK_FINDINGS.md`, 2026-10-01).
+  - Orphaned tokens were removed from the user's worlds by a one-off cleanup outside the code: logged in
+    `docs/TODO.md` and done 2026-10-01.
+  - The walker comments state the reason, and CLOSED_BUGS #83 states the exception.
+  - An Adventure's scene tokens are inline data written through the Adventure, which core writes cleanly whatever the
+    base actor (measured live), so they are migrated.
+  - Gated by `tests/unit/StoredActorSources.test.js`: orphaned tokens on a world scene and in a Scene pack are
+    skipped; an Adventure token whose actor id names no actor is walked and written.
 
 ### 97. A failed version migration stored part-migrated data under the previous version
 

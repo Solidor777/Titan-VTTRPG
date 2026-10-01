@@ -14,7 +14,8 @@ unlinked tokens, and the actors and tokens in the world's Actor, Scene, and Adve
 - Existing conditions update to the current rules through the world migration, in world actors, unlinked tokens, and
   the world's Actor, Scene, and Adventure compendium packs, which also clears the description text older conditions
   stored, and a condition's description always shows the current text in the reader's language, in the Player HUD and
-  in turn-start reports.
+  in turn-start reports. An unlinked token whose actor was deleted, on a scene or in a Scene compendium, is not
+  migrated: Foundry cannot update it, so delete such tokens.
 - Turn-start reports list the actor's conditions even when it has no other effect. Report entries' tooltips show
   their text instead of an untranslated key, each effect's tooltip leads with its own duration (a condition's shows
   only its description), and turn-start effects show the Turn Start tag instead of the Turn End one.

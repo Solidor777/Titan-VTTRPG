@@ -3,6 +3,32 @@
 Living record of post-work review issues — gotchas, accepted limitations, and issues that deserve
 attention. NOT a to-do list (deferred work goes to `docs/TODO.md`; bugs go to `docs/OPEN_BUGS.md`).
 
+### Foundry v14 core: an orphaned token's delta cannot be written to (2026-10-01)
+
+An orphaned token is an unlinked token whose base actor is gone. Core cannot create or delete entries in its
+ActorDelta, so the stored-actor migration skips such tokens on world scenes and in world Scene packs
+(`walkSceneTokens`, `walkScenePackRecord` in `src/helpers/migration/StoredActorSources.js`). Measured live on a
+world-scene token and a Scene-pack token, with a second GM connected and a reload read-back:
+
+- Embedded writes on the delta (`token.delta.createEmbeddedDocuments`): the client throws
+  `Cannot read properties of null (reading 'tokenActiveEffectChanges')` after the server write.
+  `TokenDocument#_onRelatedUpdate` (`client/documents/token.mjs:3809`) reads `this.actor` while the token's actor is
+  null (:253-257). Every embedded create, update and delete reaches that line (:3755-3774); the update and delete
+  were read in core, not run.
+- A parent write that adds an entry fails the client's dry run, and nothing is stored. This held for a Token update
+  (default options, `recursive: false`, and `diff: false, recursive: false`) and for `scene.update({ tokens })`. The
+  error is in `EmbeddedCollectionDelta#_prepareDeltaUpdate` (`common/abstract/embedded-collection-delta.mjs:195-207`),
+  which reads the missing base collection for an id the delta does not manage.
+- A parent write that leaves an entry out of the array, or deletes it with a `-=` key or `_del` inside
+  `delta.items`, stores nothing and logs nothing.
+- A parent update of an entry the delta already holds is stored with no error, and tombstones survive every write.
+
+An Adventure's scene tokens are inline data, written with `adventure.update({ scenes })`. One such write stored a
+create, an update and a delete on a token whose actor id names no actor, with no client error, so Adventure tokens
+are migrated whatever their base actor. Orphaned tokens were removed from the user's worlds by a one-off cleanup
+outside the code (2026-10-01). Any other world keeps the stale conditions and legacy effect Items of its orphaned
+tokens until those tokens are deleted.
+
 ### Adventure packs are read whole on every Prompt or Automatic GM load (2026-09-30)
 
 The stored-actor scan (`storedActorsNeedMigration`, `src/helpers/migration/MigrateStoredActors.js`) reads the full

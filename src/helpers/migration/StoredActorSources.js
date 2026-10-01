@@ -435,7 +435,8 @@ function createActorTarget(actor) {
 /**
  * Creates the write target of an unlinked token: its synthetic actor, holding the token's delta.
  * @param {TokenDocument} token - The unlinked token.
- * @returns {StoredActorTarget|null} The target, or null when the token has no actor (its base actor is gone).
+ * @returns {StoredActorTarget|null} The target, or null when the token has no actor (its base actor was deleted
+ * since the scan; the walk skips a token already orphaned, walkSceneTokens).
  */
 function createTokenTarget(token) {
    /** @type {TitanActor|null} The token's synthetic actor; reading it materializes the token's delta. */
@@ -495,8 +496,16 @@ function* walkWorldActors() {
 /**
  * Walks the unlinked tokens on world scenes, from each token's stored delta. The effects and items a token inherits
  * from its base actor are the base actor's and migrate there, so a token never gains a copy of an inherited one. A
- * linked token's actor is its world actor, and a token whose base actor is gone has no actor to write to. A token's
- * actor is read only when its source is opened.
+ * linked token's actor is its world actor. An orphaned token (an unlinked token whose base actor is gone) is skipped:
+ * Foundry v14 core cannot create or delete entries in its delta, which the conversion needs. Every embedded create,
+ * update, or delete on the delta ends in `TokenDocument#_onRelatedUpdate` (`client/documents/token.mjs:3809`), which
+ * reads `this.actor.tokenActiveEffectChanges` while the orphaned token's actor is null, so the client throws after the
+ * server write; a Token or Scene update that adds an entry to the delta fails the client's dry run in
+ * `EmbeddedCollectionDelta#_prepareDeltaUpdate` (`common/abstract/embedded-collection-delta.mjs:201`: no base
+ * collection), and one that drops an entry from the array or deletes it with an update operator stores nothing (all
+ * measured live on world-scene and Scene-pack tokens). Only a parent update of entries the delta already holds stores
+ * cleanly, so the token is skipped whole rather than migrated in part; orphaned tokens are deleted from worlds by hand,
+ * outside the migration. A token's actor is read only when its source is opened.
  * @returns {Generator<StoredActorSource>} A generator over the unlinked tokens.
  * @yields {StoredActorSource} The next unlinked token.
  */
@@ -543,8 +552,9 @@ function* walkActorPackRecord(pack, record, access) {
 }
 
 /**
- * Walks the unlinked tokens of one projected record of a world Scene pack, from each token's stored delta. A token
- * without a base world actor has no synthetic actor to write through, and a linked token's actor is a world actor.
+ * Walks the unlinked tokens of one projected record of a world Scene pack, from each token's stored delta. A linked
+ * token's actor is a world actor. A token without a base world actor (an orphaned token) is skipped: core cannot
+ * create or delete entries in an orphaned token's delta, in a pack as on a world scene (walkSceneTokens).
  * @param {CompendiumCollection} pack - The world pack the record was projected from.
  * @param {object} record - The projected scene.
  * @param {PackWriteAccess} access - The pack's write access.
@@ -613,7 +623,11 @@ async function* walkAdventureActorRecord(pack, record, access) {
 /**
  * Walks the unlinked scene tokens of one projected record of a world Adventure pack, from each token's stored delta,
  * and stores their changes in one write of the Adventure's `scenes` once the walk leaves the record, also when the
- * consumer stops early.
+ * consumer stops early. A token whose actor id names no actor is walked like any other: an Adventure's scene tokens
+ * are inline data written with the whole `scenes` field (createSourceTarget), never as token documents, so the core
+ * limitation that skips an orphaned token on a world scene or in a Scene pack (walkSceneTokens) does not apply
+ * (measured live: one `adventure.update({ scenes })` that removed an Item from such a token's delta, updated one
+ * effect, and added another was stored, with no client error).
  * @param {CompendiumCollection} pack - The world pack the record was projected from.
  * @param {object} record - The projected Adventure.
  * @param {PackWriteAccess} access - The pack's write access.
