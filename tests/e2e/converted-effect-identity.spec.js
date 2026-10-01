@@ -133,26 +133,26 @@ async function reloadCapturingConsole(mode) {
 }
 
 /**
- * Reads the updated counts the captured `Stored actors migrated:` summary lines report. The stored-actor pass logs one
- * summary per run, and its counts cover every stored actor it walked in the world, not this spec's alone; a load whose
- * scan finds nothing to migrate runs no pass and logs none.
+ * Reads the updated counts the captured `Stored-actor migration finished:` summary lines report. The stored-actor pass
+ * logs one summary per run, and its counts cover every stored actor it walked in the world, not this spec's alone; a
+ * load whose scan finds nothing to migrate runs no pass and logs none.
  * @returns {number[]} The updated counts, one per summary line, in capture order.
  */
 function readUpdatedCounts() {
    return consoleLines
-      .map((line) => line.match(/Stored actors migrated: (\d+) updated/))
+      .map((line) => line.match(/Stored-actor migration finished: (\d+) updated/))
       .filter(Boolean)
       .map((match) => Number(match[1]));
 }
 
 /**
- * Reads the failed counts the captured `Stored actors migrated:` summary lines report; like the updated counts, they
- * cover every stored actor the pass walked in the world.
- * @returns {number[]} The failed counts, one per summary line, in capture order.
+ * Reads the failure counts the captured `Stored-actor migration finished:` summary lines report; like the updated
+ * counts, they cover the whole pass over the world.
+ * @returns {number[]} The failure counts, one per summary line, in capture order.
  */
 function readFailedCounts() {
    return consoleLines
-      .map((line) => line.match(/Stored actors migrated: \d+ updated, \d+ skipped, (\d+) failed\./))
+      .map((line) => line.match(/Stored-actor migration finished: \d+ updated, \d+ skipped; failures: (\d+)\./))
       .filter(Boolean)
       .map((match) => Number(match[1]));
 }
@@ -643,14 +643,14 @@ test('an Automatic load hides the inherited conversions a token\'s own data clai
    expect(secondCounts.filter((count) => count > 0), 'world-wide updated counts of the second load, any stored actor')
       .toEqual([]);
 
-   /** @type {number[]} The failed counts the second load's summary lines report; none when it ran no pass. */
+   /** @type {number[]} The failure counts the second load's summary lines report; none when it ran no pass. */
    const secondFailed = readFailedCounts();
 
    /** @type {string} The second load's captured failure lines, named in the assertion's message. */
    const failureLines = consoleLines.filter((line) => line.includes('TITAN | Failed')).join('\n');
    expect(
       secondFailed.filter((count) => count > 0),
-      `world-wide failed counts of the second load, any stored actor; its failure lines:\n${failureLines}`,
+      `world-wide failure counts of the second load; its failure lines:\n${failureLines}`,
    ).toEqual([]);
 });
 

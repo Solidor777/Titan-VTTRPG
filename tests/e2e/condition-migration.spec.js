@@ -497,7 +497,7 @@ test('an Adventure write a hook vetoes counts as failed, and the migration does 
    await expect.poll(() => consoleLines.find((line) => line.startsWith('TITAN | World migration')) ?? null, {
       message: 'the confirmed migration finished',
       timeout: 60_000,
-   }).toBe('TITAN | World migration finished; 2 documents failed to migrate.');
+   }).toBe('TITAN | World migration finished with failures: 2.');
    await page.evaluate(() => {
       Hooks.off('preUpdateAdventure', globalThis.__titanAdventureVeto);
       delete globalThis.__titanAdventureVeto;

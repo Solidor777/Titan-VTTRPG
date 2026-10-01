@@ -286,9 +286,9 @@ async function migrateVersionChains() {
  * converts legacy effect Items into Active Effects that take their Items' ids, hides from each unlinked token the
  * inherited conversions its own data claims, then syncs each stale condition effect to its definition (rules elements
  * rewritten, a stored description deleted). Then every world Actor, its Items, and every world Item migrate through
- * their version chains. Each actor and document is isolated, and the final notification reports how many failed (a
- * world pack the stored-actor walk could not read or lock again counts as one) instead of announcing completion over
- * failures.
+ * their version chains. Each actor and document is isolated, and the final notification reports the number of
+ * failures (one per stored actor or document that did not migrate, and one per world pack the stored-actor walk could
+ * not read or lock again) instead of announcing completion over failures; the console lists each failure.
  * @returns {Promise<void>}
  */
 export async function migrateWorld() {
@@ -306,10 +306,10 @@ export async function migrateWorld() {
    /** @type {StoredActorMigrationCounts} The stored-actor pass's outcome. */
    const counts = await migrateStoredActors();
 
-   /** @type {number} The stored actors and documents that did not migrate. */
+   /** @type {number} The migration's failures: the stored-actor pass's, and the documents the version chains failed. */
    const failed = counts.failed + (await migrateVersionChains());
    if (failed > 0) {
-      log(`World migration finished; ${failed} documents failed to migrate.`);
+      log(`World migration finished with failures: ${failed}.`);
       ui.notifications.warn(localize('migrationFailedX%').replace('X%', failed));
       return;
    }

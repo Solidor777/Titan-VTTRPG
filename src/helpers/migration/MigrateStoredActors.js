@@ -17,10 +17,10 @@ import {
  * @property {number} updated - Stored actors whose writes changed them, left no work, and are stored.
  * @property {number} skipped - Stored actors with pending work that had nothing left to write to (a pack entry or a
  * token's base actor deleted since the scan) or that held no work once opened (changed since the scan).
- * @property {number} failed - Stored actors whose migration threw, whose work was left after their writes (a write
- * vetoed or not applied), or whose writes were not stored (an Adventure write core did not store), plus each failure
- * of the walk itself (a world pack it could not read, or a pack lock it could not restore); each is reported as it
- * happens.
+ * @property {number} failed - The pass's failures, each reported as it happens: one per stored actor whose migration
+ * threw, whose work was left after its writes (a write vetoed or not applied), or whose writes were not stored (an
+ * Adventure write core did not store), and one per failure of the walk itself (a world pack it could not read, or a
+ * pack lock it could not restore).
  */
 
 /**
@@ -130,6 +130,7 @@ export async function migrateStoredActors() {
       }
    }
    counts.failed += walkFailures.length;
-   log(`Stored actors migrated: ${counts.updated} updated, ${counts.skipped} skipped, ${counts.failed} failed.`);
+   log(`Stored-actor migration finished: ${counts.updated} updated, ${counts.skipped} skipped; failures: `
+      + `${counts.failed}.`);
    return counts;
 }
