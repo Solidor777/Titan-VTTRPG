@@ -7,14 +7,10 @@ attention. NOT a to-do list (deferred work goes to `docs/TODO.md`; bugs go to `d
 
 An orphaned token is an unlinked token whose base actor is gone. Core cannot create or delete entries in its
 ActorDelta, so the stored-actor migration skips such tokens on world scenes and in world Scene packs
-(`walkSceneTokens`, `walkScenePackRecord` in `src/helpers/migration/StoredActorSources.js`). Measured live on a
-world-scene token and a Scene-pack token, with a second GM connected and a reload read-back:
+(`walkSceneTokens`, `walkScenePackRecord` in `src/helpers/migration/StoredActorSources.js`).
 
-- Embedded writes on the delta (`token.delta.createEmbeddedDocuments`): the client throws
-  `Cannot read properties of null (reading 'tokenActiveEffectChanges')` after the server write.
-  `TokenDocument#_onRelatedUpdate` (`client/documents/token.mjs:3809`) reads `this.actor` while the token's actor is
-  null (:253-257). Every embedded create, update and delete reaches that line (:3755-3774); the update and delete
-  were read in core, not run.
+Measured live on a world-scene token and a Scene-pack token, with a second GM connected and a reload read-back:
+
 - A parent write that adds an entry fails the client's dry run, and nothing is stored. This held for a Token update
   (default options, `recursive: false`, and `diff: false, recursive: false`) and for `scene.update({ tokens })`. The
   error is in `EmbeddedCollectionDelta#_prepareDeltaUpdate` (`common/abstract/embedded-collection-delta.mjs:195-207`),
@@ -22,6 +18,17 @@ world-scene token and a Scene-pack token, with a second GM connected and a reloa
 - A parent write that leaves an entry out of the array, or deletes it with a `-=` key or `_del` inside
   `delta.items`, stores nothing and logs nothing.
 - A parent update of an entry the delta already holds is stored with no error, and tombstones survive every write.
+
+Measured live on the Scene-pack token only, without a read-back (the run stopped at the throw): an embedded create on
+the delta (`token.delta.createEmbeddedDocuments`) threw `Cannot read properties of null (reading
+'tokenActiveEffectChanges')` on the client, from `#handleCreateDocuments`.
+
+Read in core, not run: the throw site is `TokenDocument#_onRelatedUpdate` (`client/documents/token.mjs:3809`), which
+reads `this.actor` while the token's actor is null (:253-257). The same create on the world-scene token, and every
+embedded update and delete, reach that line (:3755-3774).
+
+Inferred, not read back: the throw comes after the server write, because `#handleCreateDocuments` handles the
+server's response.
 
 An Adventure's scene tokens are inline data, written with `adventure.update({ scenes })`. One such write stored a
 create, an update and a delete on a token whose actor id names no actor, with no client error, so Adventure tokens

@@ -1112,13 +1112,17 @@ when fixed.
   these tokens.
 - **Found:** 2026-09-30 by the buddy check of the Task 5 fix round (plan B).
 - **Resolved:** 2026-10-01. The skip is kept by design, because of a Foundry v14 core limitation. Core cannot create
-  or delete entries in an orphaned token's delta, and the conversion needs both.
-  - Embedded writes through the token's ActorDelta throw on the client after the server write:
-    `TokenDocument#_onRelatedUpdate` (`client/documents/token.mjs:3809`) dereferences the token's null actor.
-  - A parent Token or Scene update that adds an entry is rejected by the client's dry run
-    (`EmbeddedCollectionDelta#_prepareDeltaUpdate`).
-  - One that drops or operator-deletes an entry stores nothing.
-  - All of this was measured live (`docs/POST_WORK_FINDINGS.md`, 2026-10-01).
+  or delete entries in an orphaned token's delta, and the conversion needs both (`docs/POST_WORK_FINDINGS.md`,
+  2026-10-01).
+  - Measured live on a world-scene and a Scene-pack token, with a second GM connected and a reload read-back: a parent
+    Token or Scene update that adds an entry is rejected by the client's dry run
+    (`EmbeddedCollectionDelta#_prepareDeltaUpdate`); one that drops an entry, or deletes it with an update operator,
+    stores nothing; one that updates an entry the delta already holds is stored, and tombstones survive.
+  - Measured live on the Scene-pack token only: an embedded create through the token's ActorDelta threw on the client.
+  - Read in core, not run: the throw site, `TokenDocument#_onRelatedUpdate` (`client/documents/token.mjs:3809`),
+    which dereferences the token's null actor; the same create on the world-scene token; and the embedded update and
+    delete, which reach the same line.
+  - Inferred, not read back: the throw comes after the server write.
   - Orphaned tokens were removed from the user's worlds by a one-off cleanup outside the code: logged in
     `docs/TODO.md` and done 2026-10-01.
   - The walker comments state the reason, and CLOSED_BUGS #83 states the exception.

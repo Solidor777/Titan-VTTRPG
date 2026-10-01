@@ -437,11 +437,14 @@ tokens on world scenes whose base actor exists, read from `token._source.delta`,
 actor's `_source` as core's `#mergeEmbeddedCollection` merges them — the base actor's legacy Items convert there);
 `actorPack`; `scenePackToken` (unlinked tokens whose base world actor exists); `adventureActor`; `adventureSceneToken`
 (every unlinked scene token, whatever its base actor). An orphaned token (an unlinked token whose base actor is gone) on
-a world scene or in a Scene pack is skipped: Foundry v14 core cannot create or delete entries in its delta (every
-embedded write ends in `TokenDocument#_onRelatedUpdate`, `client/documents/token.mjs:3809`, which reads the token's
-null actor; a parent update that adds an entry fails the dry run in `EmbeddedCollectionDelta#_prepareDeltaUpdate`, and
-one that drops an entry stores nothing — measured live, recorded in `docs/POST_WORK_FINDINGS.md`), so orphaned tokens
-are deleted from worlds by hand (CLOSED_BUGS #96). An Adventure's scene tokens are inline data written with the whole
+a world scene or in a Scene pack is skipped: Foundry v14 core cannot create or delete entries in its delta (recorded in
+`docs/POST_WORK_FINDINGS.md`). Measured live on both, with a second GM and a reload read-back: a parent update that adds
+an entry fails the dry run in `EmbeddedCollectionDelta#_prepareDeltaUpdate`, one that drops or operator-deletes an entry
+stores nothing, and one that updates an entry the delta holds is stored. Measured on the Scene-pack token only: an
+embedded create on the delta threw. Read in core, not run: the throw site, `TokenDocument#_onRelatedUpdate`
+(`client/documents/token.mjs:3809`), which reads the token's null actor and which every embedded write reaches.
+Inferred, not read back: the throw comes after the server write. Orphaned tokens are deleted from worlds by hand
+(CLOSED_BUGS #96). An Adventure's scene tokens are inline data written with the whole
 `scenes` field, which core stores whatever the base actor (measured live), so they are walked; one whose actor id names
 no actor inherits nothing. Only world-package packs are read. The scan reads stored data only — `actor._source`, a
 token's stored delta, and each pack's server projection (`PACK_PROJECTION_FIELDS`, read with

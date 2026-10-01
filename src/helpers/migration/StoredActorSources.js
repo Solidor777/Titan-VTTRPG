@@ -661,15 +661,17 @@ function* walkWorldActors() {
  * its delta holds itself, and hides an inherited conversion of an Item its delta overrides or removed
  * (convertStoredActor). A linked token's actor is its world actor. An orphaned token (an unlinked token whose base
  * actor is gone) is skipped: Foundry v14 core cannot create or delete entries in its delta, which the conversion
- * needs. Every embedded create, update, or delete on the delta ends in `TokenDocument#_onRelatedUpdate`
- * (`client/documents/token.mjs:3809`), which reads `this.actor.tokenActiveEffectChanges` while the orphaned token's
- * actor is null, so the client throws after the server write; a Token or Scene update that adds an entry to the delta
- * fails the client's dry run in `EmbeddedCollectionDelta#_prepareDeltaUpdate`
- * (`common/abstract/embedded-collection-delta.mjs:201`: no base collection), and one that drops an entry from the
- * array or deletes it with an update operator stores nothing (all measured live on world-scene and Scene-pack tokens).
- * Only a parent update of entries the delta already holds stores cleanly, so the token is skipped whole rather than
- * migrated in part; orphaned tokens are deleted from worlds by hand, outside the migration. A token's actor is read
- * only when its source is opened.
+ * needs. Measured live on a world-scene and a Scene-pack token, with a second GM connected and a reload read-back: a
+ * Token or Scene update that adds an entry to the delta fails the client's dry run in
+ * `EmbeddedCollectionDelta#_prepareDeltaUpdate` (`common/abstract/embedded-collection-delta.mjs:201`: no base
+ * collection) and stores nothing; one that drops an entry from the array, or deletes it with an update operator,
+ * stores nothing; and one that updates an entry the delta already holds is stored, its tombstones kept. Measured live
+ * on the Scene-pack token only: an embedded create on the delta (`token.delta.createEmbeddedDocuments`) throws on the
+ * client. Read in core, not run: the throw site, `TokenDocument#_onRelatedUpdate` (`client/documents/token.mjs:3809`),
+ * which reads `this.actor.tokenActiveEffectChanges` while the token's actor is null, and which the world-scene token's
+ * embedded create and every embedded update and delete reach too. Inferred, not read back: the throw comes after the
+ * server write. The token is skipped whole rather than migrated in part; orphaned tokens are deleted from worlds by
+ * hand, outside the migration. A token's actor is read only when its source is opened.
  * @returns {Generator<StoredActorSource>} A generator over the unlinked tokens.
  * @yields {StoredActorSource} The next unlinked token.
  */
