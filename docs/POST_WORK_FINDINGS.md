@@ -3,6 +3,26 @@
 Living record of post-work review issues — gotchas, accepted limitations, and issues that deserve
 attention. NOT a to-do list (deferred work goes to `docs/TODO.md`; bugs go to `docs/OPEN_BUGS.md`).
 
+### Foundry v14 core: a token's deletion stores a tombstone only where its base actor holds the id (2026-10-01)
+
+Measured live 3 times, as the active GM with Migration Mode Disabled, on an unlinked world-scene token named apart from
+its base actor (so its delta is stored, OPEN_BUGS #102). Each deletion was a one-id `deleteEmbeddedDocuments` through
+the token's synthetic actor, read back after a reload from `token._source.delta` and from a server fetch
+(`Scene.database.get`):
+
+- the token's own Item, which the base actor lacks: no tombstone stored;
+- the token's own Active Effect, which the base actor lacks: no tombstone stored;
+- the token's override of a valid Item the base actor holds: `{_id, _tombstone: true}` stored.
+
+Read in core, not run: the client's `EmbeddedCollectionDelta#_delete`
+(`common/abstract/embedded-collection-delta.mjs:242-253`) tombstones only an id its base collection holds, which
+matches. The server's `EmbeddedDeltaMixin#batchDelete` (minified `dist/database/backend/embedded-delta.mjs`) reads as
+writing a `TombstoneData` for every deletion, which the measurement contradicts; where that record is dropped was not
+diagnosed. The measured stored outcome governs: the Adventure path (`deleteFromData` in
+`src/helpers/migration/StoredActorSources.js`) stores what was measured. A legacy `effect` Item of the base actor could
+not be seeded (the server refuses the subtype, even through a raw socket create), so a deletion over one follows the
+client's `_delete` (an invalid document is never in a base collection) and is not measured.
+
 ### Foundry v14 core: an orphaned token's delta cannot be written to (2026-10-01)
 
 An orphaned token is an unlinked token whose base actor is gone. Core cannot create or delete entries in its
