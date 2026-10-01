@@ -50,6 +50,16 @@ Completed items are deleted, not marked done.
   - Stormcaller's Tempest: flagged as an action; The Dragon Awakens and Being of Urdokai, which work the same way, are
     passive.
 
+- Real Foundry data in every test (user rule 2026-10-01, retroactive). A test that touches Foundry-derived state
+  must get that state from the real path, never from hand-built data. Foundry-derived state covers tokens and their
+  deltas, link and unlink (click unlink, then reopen the sheet), synthetic actors, and data from older versions; the
+  real path is a canvas drop, the UI, or real stored worlds and packs. Plain fixture documents made through the
+  document API stay. Convert first the specs that build tokens from raw data: `condition-migration`,
+  `converted-effect-identity` and `sheet-regressions` (e2e), plus the `tests/e2e/world.js` helper. Then audit the
+  rest of the e2e suite, and the unit-test fakes of Foundry-derived state, which must match data captured from real
+  Foundry. Results that rest only on raw-data tokens are unconfirmed until re-run: OPEN_BUGS #102, and the live gates
+  for #96, #99-#101 and #105.
+
 - Apply effects to targets when a spell or ability is cast, with values derived from the caster and each target (user
   ruling 2026-09-27). First consumer: Abjuration of the Arbiter's dice penalty, "your Soul minus the target's Soul, to a
   minimum of 1" (rules 09_26 line 7696), which until then ships as a -1 default the GM edits per target.
