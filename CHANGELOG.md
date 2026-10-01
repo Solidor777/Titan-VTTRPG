@@ -15,7 +15,9 @@ and hides from unlinked tokens the converted effects their own changes replace (
   the world's Actor, Scene, and Adventure compendium packs, which also clears the description text older conditions
   stored, and a condition's description always shows the current text in the reader's language, in the Player HUD and
   in turn-start reports. An unlinked token whose actor was deleted, on a scene or in a Scene compendium, is not
-  migrated: Foundry cannot update it, so delete such tokens.
+  migrated: Foundry cannot update it. If it holds an outdated condition or legacy effect item, the migration reports
+  it as a failure that names its scene and says to delete the token, and the migration prompt or the failure returns
+  on every load until the token is deleted.
 - Turn-start reports list the actor's conditions even when it has no other effect. Report entries' tooltips show
   their text instead of an untranslated key, each effect's tooltip leads with its own duration (a condition's shows
   only its description), and turn-start effects show the Turn Start tag instead of the Turn End one.
@@ -25,8 +27,8 @@ and hides from unlinked tokens the converted effects their own changes replace (
 - The Migration Mode setting governs every migration step: "Disabled" skips all of it, as its description says,
   including the conversion of legacy effect items, and "Prompt" changes nothing until the GM confirms. Only the active
   GM migrates, a failed migration no longer stops the Player HUD from loading, and a migration with failures reports
-  how many failed instead of announcing completion, counting writes the world did not store and compendium packs it
-  could not read or lock again.
+  how many failures it had instead of announcing completion, counting writes the world did not store, compendium
+  packs it could not read or lock again, and unlinked tokens whose actor was deleted that still hold work.
 - Legacy effect items convert into effects that keep the item's ID, so an unlinked token's own changes to its actor's
   effect items carry over to the converted effects. The migration hides an actor's converted effect from each unlinked
   token that removed or replaced the original item, or already holds its own converted copy, including effects earlier

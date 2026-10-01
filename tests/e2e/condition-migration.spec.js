@@ -5,6 +5,7 @@ import {
    attachPageErrors,
    closeAllApps,
    deleteFixtureActor,
+   deleteOrphanedTokens,
    expectActiveGM,
    reloadWithMode,
 } from './world.js';
@@ -17,9 +18,12 @@ import {
  * condition in its v2.1.0 form (flat -1 rules elements and a stored description). Disabled leaves everything; Prompt
  * asks and leaves everything until confirmed; Automatic syncs the condition in every location and locks each pack
  * again; a second Automatic load writes nothing. Disabled and Prompt loads (the Prompt dialog dismissed) write nothing
- * and unlock no pack. The spec's GM must be the active GM, the one client that migrates, and each load asserts it.
- * No base-type Active Effect is seeded: TITAN registers only the `effect` and `condition` types, and a world actor
- * holding a base-type effect stops the world from loading.
+ * and unlock no pack. An orphaned token (an unlinked token whose base actor is gone) holding the stale condition in its
+ * own delta, on a world scene and in a locked world Scene pack, is reported as a failure on an Automatic load and
+ * never written, and once the tokens are deleted the next load finds nothing to migrate. The spec's GM must be the
+ * active GM, the one client that migrates, and each load asserts it. No base-type Active Effect is seeded: TITAN
+ * registers only the `effect` and `condition` types, and a world actor holding a base-type effect stops the world
+ * from loading.
  */
 
 /** @type {string} The description text a condition created before this change stores in `flags.titan.description`. */
@@ -33,6 +37,28 @@ const TOKEN_ACTOR_NAME = 'E2E Migration Token Actor';
 
 /** @type {string} Name of the world scene holding the unlinked token. */
 const SCENE_NAME = 'E2E Migration Scene';
+
+/** @type {string} Name of the deleted base actor of the orphaned tokens. */
+const ORPHAN_ACTOR_NAME = 'E2E Migration Orphan Base Actor';
+
+/** @type {string} Name of the orphaned tokens, apart from their base actor's so core stores their deltas (#102). */
+const ORPHAN_TOKEN_NAME = 'E2E Migration Orphan Token';
+
+/** @type {string} Name of the world scene holding an orphaned token. */
+const ORPHAN_SCENE_NAME = 'E2E Migration Orphan Scene';
+
+/** @type {string} Name of the scene in the orphan Scene pack holding the other orphaned token. */
+const ORPHAN_PACKED_SCENE_NAME = 'E2E Migration Orphan Packed Scene';
+
+/**
+ * The world Scene pack holding an orphaned token, locked once seeded.
+ * @type {{label: string, name: string, type: string}}
+ */
+const ORPHAN_PACK = {
+   label: 'E2E Migration Orphan Scenes',
+   name: 'e2e-migration-orphan-scenes',
+   type: 'Scene',
+};
 
 /**
  * The world packs the spec creates, each locked once seeded.
@@ -170,10 +196,22 @@ test.afterEach(async () => {
 });
 
 test.afterAll(async () => {
-   await page.evaluate(async ({ mode, packs, sceneName }) => {
-      await game.settings.set('titan', 'migrationMode', mode);
-      await game.scenes.getName(sceneName)?.delete();
-      for (const { name } of Object.values(packs)) {
+   await page.evaluate((mode) => game.settings.set('titan', 'migrationMode', mode), originalMode);
+   await deleteSpecFixtures();
+   await page?.close();
+});
+
+/**
+ * Deletes every document the spec seeds, where it exists: its world scenes, its packs, and its actors (with their
+ * tokens on the active scene).
+ * @returns {Promise<void>} Resolves once they are deleted.
+ */
+async function deleteSpecFixtures() {
+   await page.evaluate(async ({ packs, sceneNames }) => {
+      for (const sceneName of sceneNames) {
+         await game.scenes.getName(sceneName)?.delete();
+      }
+      for (const { name } of packs) {
          /** @type {CompendiumCollection|undefined} A spec pack, if it exists. */
          const pack = game.packs.get(`world.${name}`);
          if (pack) {
@@ -182,32 +220,27 @@ test.afterAll(async () => {
          }
       }
    }, {
-      mode: originalMode,
-      packs: PACKS,
-      sceneName: SCENE_NAME,
+      packs: [
+         ...Object.values(PACKS),
+         ORPHAN_PACK,
+      ],
+      sceneNames: [
+         SCENE_NAME,
+         ORPHAN_SCENE_NAME,
+      ],
    });
    await deleteFixtureActor(page, WORLD_ACTOR_NAME);
    await deleteFixtureActor(page, TOKEN_ACTOR_NAME);
-   await page?.close();
-});
+   await deleteFixtureActor(page, ORPHAN_ACTOR_NAME);
+}
 
 /**
- * Seeds the effects in every location and locks the packs.
+ * Seeds the effects in every location and locks the packs, after deleting what a previous test or run left.
  * @returns {Promise<object>} The ids of the seeded documents.
  */
-function seedStoredActors() {
+async function seedStoredActors() {
+   await deleteSpecFixtures();
    return page.evaluate(async ({ packs, sceneName, seedEffects, tokenActorName, worldActorName }) => {
-      await game.actors.getName(worldActorName)?.delete();
-      await game.actors.getName(tokenActorName)?.delete();
-      await game.scenes.getName(sceneName)?.delete();
-      for (const { name } of Object.values(packs)) {
-         /** @type {CompendiumCollection|undefined} A pack a previous run left. */
-         const stalePack = game.packs.get(`world.${name}`);
-         if (stalePack) {
-            await stalePack.configure({ locked: false });
-            await stalePack.deleteCompendium();
-         }
-      }
       for (const { label, name, type } of Object.values(packs)) {
          await foundry.documents.collections.CompendiumCollection.createCompendium({
             label,
@@ -519,4 +552,236 @@ test('an Adventure write a hook vetoes counts as failed, and the migration does 
       expect(consoleLines.some((line) => line.includes(`Failed to migrate the stored actor "${name}"`)), name)
          .toBe(true);
    }
+});
+
+/**
+ * Seeds an orphaned token on a world scene and one in a locked world Scene pack, each holding the stale condition in
+ * its own delta: the condition is created on the token while its base actor exists, the scene is copied into the
+ * pack, and the base actor is deleted last. Orphan status is read as the walk reads it: a world token's
+ * `baseActor`, and whether the world holds a packed token's actor id (`TokenDocument#actor` keeps its cached
+ * synthetic actor until the next reload).
+ * @returns {Promise<{hadBase: object, packEntry: string, sceneId: string, tokenId: string}>} Whether each token had
+ * its base actor right before the deletion, keyed by location, and the ids of the seeded documents.
+ */
+function seedOrphanedTokens() {
+   return page.evaluate(async ({ actorName, pack, packedSceneName, sceneName, seedEffects, tokenName }) => {
+      /** @type {TitanActor} The base actor of both tokens, deleted once they are seeded. */
+      const actor = await Actor.create({
+         name: actorName,
+         prototypeToken: { actorLink: false },
+         type: 'npc',
+      });
+
+      /** @type {Scene} The world scene. */
+      const scene = await Scene.create({ name: sceneName });
+
+      /** @type {TokenDocument[]} The unlinked token, alone in the array. */
+      const [token] = await scene.createEmbeddedDocuments('Token', [
+         {
+            actorId: actor.id,
+            actorLink: false,
+            name: tokenName,
+            x: 0,
+            y: 0,
+         },
+      ]);
+      await token.actor.createEmbeddedDocuments('ActiveEffect', seedEffects);
+      await foundry.documents.collections.CompendiumCollection.createCompendium({
+         label: pack.label,
+         name: pack.name,
+         type: pack.type,
+      });
+
+      /** @type {object} The world scene's data, its token's delta included. */
+      const packedSceneData = scene.toObject();
+      delete packedSceneData._id;
+      packedSceneData.name = packedSceneName;
+
+      /** @type {Scene} The scene in the world Scene pack. */
+      const packedScene = await Scene.create(packedSceneData, { pack: `world.${pack.name}` });
+      await game.packs.get(`world.${pack.name}`).configure({ locked: true });
+
+      /** @type {Record<string, boolean>} Whether each token has its base actor before the deletion, by location. */
+      const hadBase = {
+         sceneToken: token.baseActor !== null,
+         scenePackToken: game.actors.has(packedScene.tokens.contents[0].actorId),
+      };
+      await actor.delete();
+      return {
+         hadBase,
+         packEntry: packedScene.id,
+         sceneId: scene.id,
+         tokenId: token.id,
+      };
+   }, {
+      actorName: ORPHAN_ACTOR_NAME,
+      pack: ORPHAN_PACK,
+      packedSceneName: ORPHAN_PACKED_SCENE_NAME,
+      sceneName: ORPHAN_SCENE_NAME,
+      seedEffects: SEED_EFFECTS,
+      tokenName: ORPHAN_TOKEN_NAME,
+   });
+}
+
+/**
+ * Reads both orphaned tokens' stored deltas, whether each has its base actor (read as the walk reads it), their seeded
+ * conditions' state, and the orphan pack's lock.
+ * @param {{packEntry: string, sceneId: string, tokenId: string}} entries - The ids of the seeded documents.
+ * @returns {Promise<{deltas: object, hasBase: object, locked: boolean, summaries: object}>} Each token's stored
+ * delta, whether it has its base actor, and its Blinded condition's state, keyed by location; and the pack's lock.
+ */
+function readOrphanedTokens(entries) {
+   return page.evaluate(async ({ ids, packName }) => {
+      /** @type {object} Blinded's CONFIG.statusEffects entry, whose rules elements are current. */
+      const blindedDefinition = CONFIG.statusEffects.find((condition) => condition.id === 'blinded');
+
+      /** @type {CompendiumCollection} The orphan Scene pack. */
+      const pack = game.packs.get(`world.${packName}`);
+
+      /** @type {Scene} The scene in the orphan Scene pack, holding the other orphaned token. */
+      const packedScene = await pack.getDocument(ids.packEntry);
+
+      /** @type {Record<string, TokenDocument>} The orphaned tokens, keyed by location. */
+      const tokens = {
+         sceneToken: game.scenes.get(ids.sceneId).tokens.get(ids.tokenId),
+         scenePackToken: packedScene.tokens.contents[0],
+      };
+      return {
+         deltas: Object.fromEntries(Object.entries(tokens).map(([location, token]) => [
+            location,
+            token.toObject().delta,
+         ])),
+         hasBase: {
+            sceneToken: tokens.sceneToken.baseActor !== null,
+            scenePackToken: game.actors.has(tokens.scenePackToken.actorId),
+         },
+         locked: pack.locked,
+         summaries: Object.fromEntries(Object.entries(tokens).map(([location, token]) => {
+            /** @type {object|undefined} The Blinded condition the token's delta stores. */
+            const blinded = (token.toObject().delta?.effects ?? []).find((effect) => !effect._tombstone
+               && effect.type === 'condition' && effect.statuses?.length === 1 && effect.statuses[0] === 'blinded');
+            return [
+               location,
+               {
+                  blinded: {
+                     current: foundry.utils.equals(blinded?.system?.rulesElement ?? null,
+                        blindedDefinition.system.rulesElement),
+                     storesDescription: blinded?.flags?.titan?.description !== undefined,
+                  },
+               },
+            ];
+         })),
+      };
+   }, {
+      ids: entries,
+      packName: ORPHAN_PACK.name,
+   });
+}
+
+/**
+ * Deletes both orphaned tokens: the world scene's from the scene, and the packed scene's from the pack, which is
+ * unlocked for it and locked again.
+ * @param {{packEntry: string, sceneId: string, tokenId: string}} entries - The ids of the seeded documents.
+ * @returns {Promise<{packedTokens: number, sceneTokens: number}>} How many tokens each scene holds afterwards.
+ */
+function deleteOrphanedTokenFixtures(entries) {
+   return page.evaluate(async ({ ids, packName }) => {
+      /** @type {Scene} The world scene. */
+      const scene = game.scenes.get(ids.sceneId);
+      await scene.deleteEmbeddedDocuments('Token', [ids.tokenId]);
+
+      /** @type {CompendiumCollection} The orphan Scene pack. */
+      const pack = game.packs.get(`world.${packName}`);
+      await pack.configure({ locked: false });
+
+      /** @type {Scene} The scene in the orphan Scene pack, holding the other orphaned token. */
+      const packedScene = await pack.getDocument(ids.packEntry);
+      await packedScene.deleteEmbeddedDocuments('Token', packedScene.tokens.map((token) => token.id));
+      await pack.configure({ locked: true });
+      return {
+         packedTokens: (await pack.getDocument(ids.packEntry)).tokens.size,
+         sceneTokens: scene.tokens.size,
+      };
+   }, {
+      ids: entries,
+      packName: ORPHAN_PACK.name,
+   });
+}
+
+test('an orphaned token with pending work is reported, never written, and clean once deleted', async () => {
+   test.setTimeout(300_000);
+
+   // The earlier tests' fixtures hold pending work of their own (the vetoed Adventure), and earlier specs can leave
+   // world-scene tokens whose actor is gone; either would add failures to the exact count below.
+   await deleteSpecFixtures();
+   await deleteOrphanedTokens(page);
+
+   /** @type {{hadBase: object, packEntry: string, sceneId: string, tokenId: string}} The seeded documents. */
+   const entries = await seedOrphanedTokens();
+
+   // Presence before absence: each token had its base actor right before the deletion, and has none after it.
+   expect(entries.hadBase).toEqual({
+      sceneToken: true,
+      scenePackToken: true,
+   });
+
+   /** @type {{deltas: object, hasBase: object, locked: boolean, summaries: object}} The seeded orphans. */
+   const seededState = await readOrphanedTokens(entries);
+   expect(seededState.hasBase).toEqual({
+      sceneToken: false,
+      scenePackToken: false,
+   });
+   expect(seededState.summaries).toEqual({
+      sceneToken: UNSYNCED,
+      scenePackToken: UNSYNCED,
+   });
+   expect(seededState.locked).toBe(true);
+
+   // Automatic: the scan finds the orphans' pending work, and the pass reports each one as a failure, naming its scene
+   // and the token and telling the GM to delete it, and writes neither.
+   consoleLines.length = 0;
+   await reloadWithMode(page, 'automatic');
+   expect(consoleLines.some((line) => line.includes('TITAN | Starting Titan VTTRPG System')), 'this load is captured')
+      .toBe(true);
+   expect(consoleLines.filter((line) => line === 'TITAN | Starting world migration.')).toHaveLength(1);
+   /** @type {string[]} The failure each orphaned token reports, naming its scene and the token. */
+   const expectedFailures = [
+      `TITAN | Failed to migrate the unlinked token "${ORPHAN_TOKEN_NAME}" on scene "${ORPHAN_SCENE_NAME}": its base `
+      + 'actor is gone, so the migration does not write to it. Delete the token.',
+      `TITAN | Failed to migrate the unlinked token "${ORPHAN_TOKEN_NAME}" on scene "${ORPHAN_PACKED_SCENE_NAME}" in `
+      + `pack "${ORPHAN_PACK.label}": its base actor is gone, so the migration does not write to it. Delete the `
+      + 'token.',
+   ];
+   for (const expected of expectedFailures) {
+      expect(consoleLines.some((line) => line.startsWith(expected)), expected).toBe(true);
+   }
+
+   // Each failure reaches the console twice: TITAN's own console.error, and core's echo of the error notification
+   // (client/applications/ui/notifications.mjs logs every shown notification). The count is the summary's.
+   expect(consoleLines.filter((line) => line.startsWith('TITAN | Failed')
+      && !expectedFailures.some((expected) => line.startsWith(expected))), 'other failure lines').toEqual([]);
+   expect(consoleLines.find((line) => line.startsWith('TITAN | World migration'))).toBe(
+      'TITAN | World migration finished with failures: 2.',
+   );
+
+   // Never written: both stored deltas read back unchanged (the condition still stale), and the pack was never
+   // unlocked.
+   /** @type {{deltas: object, hasBase: object, locked: boolean, summaries: object}} The orphans after the load. */
+   const reported = await readOrphanedTokens(entries);
+   expect(reported.deltas).toEqual(seededState.deltas);
+   expect(reported.summaries).toEqual(seededState.summaries);
+   expect(reported.locked).toBe(true);
+   expect(consoleLines.filter((line) => line.includes(`Unlocked world pack "${ORPHAN_PACK.label}"`))).toEqual([]);
+
+   // Once the GM deletes the tokens, the next load finds nothing to migrate.
+   expect(await deleteOrphanedTokenFixtures(entries)).toEqual({
+      packedTokens: 0,
+      sceneTokens: 0,
+   });
+   consoleLines.length = 0;
+   await reloadWithMode(page, 'automatic');
+   expect(consoleLines.some((line) => line.includes('TITAN | Starting Titan VTTRPG System')), 'this load is captured')
+      .toBe(true);
+   expect(consoleLines.filter((line) => line.startsWith('TITAN | Starting world migration'))).toEqual([]);
+   expect(consoleLines.filter((line) => line.startsWith('TITAN | Failed'))).toEqual([]);
 });

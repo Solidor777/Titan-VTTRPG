@@ -146,25 +146,34 @@ function makeTarget({ effects = [], inheritedEffects = [], items = [], updated, 
 }
 
 /**
- * Builds a stored actor source whose `open` is a spy.
+ * Builds a stored actor source whose `open` is a spy, or an orphaned token's source, which has no `open`.
  * @param {string} name - The name the walk records for the source.
  * @param {object} [data] - The source's contents.
  * @param {object[]} [data.effects] - Its stored effect data.
  * @param {object[]} [data.inheritedEffects] - The stored effect data it inherits and does not override.
  * @param {object[]} [data.items] - Its stored Item data.
+ * @param {object|null} [data.orphan] - The orphaned token's names; null for any other stored actor.
  * @param {object|null} [data.target] - What opening it resolves.
- * @returns {object} A worldActor-location source with a spied `open`.
+ * @returns {object} A worldActor-location source with a spied `open`, or a sceneToken-location orphan.
  */
-function makeSource(name, { effects = [], inheritedEffects = [], items = [], target = null } = {}) {
+function makeSource(name, { effects = [], inheritedEffects = [], items = [], orphan = null, target = null } = {}) {
    return {
       effects,
       inheritedEffects,
       items,
-      location: 'worldActor',
+      location: orphan ? 'sceneToken' : 'worldActor',
       name,
-      open: vi.fn(async () => target),
+      open: orphan ? null : vi.fn(async () => target),
+      orphan,
    };
 }
+
+/** @type {object} The names of an orphaned token on a world scene. */
+const ORPHAN = {
+   pack: null,
+   scene: 'Orphan Scene',
+   token: 'Orphan',
+};
 
 beforeEach(() => {
    walk.sources = [];
@@ -272,6 +281,19 @@ describe('storedActorsNeedMigration', () => {
       walk.sources = [makeSource('Clean')];
       expect(await storedActorsNeedMigration()).toBe(true);
    });
+
+   it('reports work for an orphaned token whose own data holds a stale condition, and none for a clean one',
+      async () => {
+         walk.sources = [makeSource('Orphan', { orphan: ORPHAN })];
+         expect(await storedActorsNeedMigration()).toBe(false);
+         walk.sources = [
+            makeSource('Orphan', {
+               effects: [STALE_BLINDED],
+               orphan: ORPHAN,
+            }),
+         ];
+         expect(await storedActorsNeedMigration()).toBe(true);
+      });
 });
 
 describe('migrateStoredActors', () => {
@@ -438,6 +460,43 @@ describe('migrateStoredActors', () => {
          updated: 0,
       });
    });
+
+   it('counts an orphaned token with pending work as one failure, names its scene and pack, and opens nothing',
+      async () => {
+         /** @type {object} The source of a stale actor after the orphans, which still migrates. */
+         const stale = makeSource('Stale', {
+            effects: [STALE_BLINDED],
+            target: makeTarget({ effects: [STALE_BLINDED] }),
+         });
+         walk.sources = [
+            makeSource('Orphan', {
+               effects: [STALE_BLINDED],
+               orphan: ORPHAN,
+            }),
+            makeSource('Packed Orphan', {
+               items: [LEGACY_ITEM],
+               orphan: {
+                  pack: 'Scenes',
+                  scene: 'Packed Scene',
+                  token: 'Packed Orphan',
+               },
+            }),
+            makeSource('Clean Orphan', { orphan: ORPHAN }),
+            stale,
+         ];
+         expect(await migrateStoredActors()).toEqual({
+            failed: 2,
+            skipped: 0,
+            updated: 1,
+         });
+         expect(console.error.mock.calls.map(([message]) => message)).toEqual([
+            'TITAN | Failed to migrate the unlinked token "Orphan" on scene "Orphan Scene": its base actor is gone, so '
+               + 'the migration does not write to it. Delete the token.',
+            'TITAN | Failed to migrate the unlinked token "Packed Orphan" on scene "Packed Scene" in pack "Scenes": '
+               + 'its base actor is gone, so the migration does not write to it. Delete the token.',
+         ]);
+         expect(stale.open).toHaveBeenCalledTimes(1);
+      });
 
    it('hides an inherited conversion of an Item a token removed, and counts the token updated', async () => {
       /** @type {object} The token's target. */

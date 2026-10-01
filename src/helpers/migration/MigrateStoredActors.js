@@ -19,8 +19,8 @@ import {
  * token's base actor deleted since the scan) or that held no work once opened (changed since the scan).
  * @property {number} failed - The pass's failures, each reported as it happens: one per stored actor whose migration
  * threw, whose work was left after its writes (a write vetoed or not applied), or whose writes were not stored (an
- * Adventure write core did not store), and one per failure of the walk itself (a world pack it could not read, or a
- * pack lock it could not restore).
+ * Adventure write core did not store), one per orphaned token with pending work (reported and never written), and one
+ * per failure of the walk itself (a world pack it could not read, or a pack lock it could not restore).
  */
 
 /**
@@ -39,9 +39,24 @@ export function storedActorNeedsMigration(data) {
 }
 
 /**
+ * Describes an orphaned token the pass reports as a failure instead of writing it (OrphanedToken): it names the token
+ * and its scene, and tells the GM to delete the token.
+ * @param {OrphanedToken} orphan - The orphaned token's names.
+ * @returns {string} The failure's message.
+ */
+function describeOrphanFailure({ pack, scene, token }) {
+   /** @type {string} Where the scene lives: nothing for a world scene, its pack for a packed one. */
+   const where = pack ? ` in pack "${pack}"` : '';
+   return `Failed to migrate the unlinked token "${token}" on scene "${scene}"${where}: its base actor is gone, so the `
+      + 'migration does not write to it. Delete the token.';
+}
+
+/**
  * Checks whether any stored actor needs the stored-actor migration, stopping at the first. Reads stored data only. A
  * world pack the walk could not read counts as needing it: its actors went unchecked, and the migration reports the
  * pack as a failure, so a pack that stays unreadable is reported on every migrating load instead of hiding its work.
+ * An orphaned token whose own data holds work counts too: the migration reports it as a failure and never writes it,
+ * so it is reported on every load until the GM deletes it.
  * @returns {Promise<boolean>} Whether any stored actor needs the migration, or a world pack could not be read.
  */
 export async function storedActorsNeedMigration() {
@@ -62,9 +77,11 @@ export async function storedActorsNeedMigration() {
  * passing as done. Each actor is isolated: a failure is reported with the actor's name and the rest still migrate. A
  * changed actor counts as updated only once its writes are stored; an Adventure's actors and scene tokens are stored
  * by one write when the walk leaves the Adventure, so every changed actor's stored outcome is read once the walk is
- * over (reading it during the walk would wait on a write that happens only after the walk moves on). Each failure of
- * the walk itself (a world pack it could not read, or a pack lock it could not restore) counts as one more failure.
- * @returns {Promise<StoredActorMigrationCounts>} How many stored actors were updated, skipped, and failed.
+ * over (reading it during the walk would wait on a write that happens only after the walk moves on). An orphaned token
+ * with work is never opened: it counts as one failure, reported with its scene and the token's name and the remedy,
+ * deleting the token (describeOrphanFailure); one with no work is silent. Each failure of the walk itself (a world pack
+ * it could not read, or a pack lock it could not restore) counts as one more failure.
+ * @returns {Promise<StoredActorMigrationCounts>} How many stored actors were updated and skipped, and the failures.
  */
 export async function migrateStoredActors() {
    /** @type {StoredActorMigrationCounts} The pass's outcome so far. */
@@ -81,6 +98,11 @@ export async function migrateStoredActors() {
    const walkFailures = [];
    for await (const source of walkStoredActorSources(walkFailures)) {
       if (!storedActorNeedsMigration(source)) {
+         continue;
+      }
+      if (source.orphan) {
+         counts.failed += 1;
+         error(describeOrphanFailure(source.orphan));
          continue;
       }
       try {

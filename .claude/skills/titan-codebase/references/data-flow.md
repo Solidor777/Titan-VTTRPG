@@ -413,7 +413,9 @@ migration attempt, so e2e specs wait for `game.titan.playerHud` as the "boot mig
 True when any world Actor or Item (items embedded in actors included) is behind its version chain, or
 `storedActorsNeedMigration()` finds a stored actor needing the stored-actor pass (it stops at the first) or a world
 pack it could not read (its actors went unchecked; the pass reports the pack as a failure, so an unreadable pack fails
-every migrating load instead of hiding its work). A stored actor needs the pass when it holds, itself: a legacy
+every migrating load instead of hiding its work). An orphaned token whose own delta holds work counts too: the pass
+reports it as a failure and never writes it, so the GM sees the prompt or the failure on every load until the token is
+deleted. A stored actor needs the pass when it holds, itself: a legacy
 `effect`-subtype Item; or a `condition` effect whose `system.rulesElement` differs from its definition (sorted-key
 JSON, `toCanonicalJson`) or that stores `flags.titan.description` — or, as an unlinked token, shows an inherited
 conversion (its `flags.titan.convertedFromItem` stamp) of an Item its own data claims: an Item entry of its delta
@@ -431,23 +433,30 @@ as an invalid document that cannot be deleted (OPEN_BUGS #92). By user decision 
 by a one-off cleanup outside the code), and no test seeds one.
 
 **Stored actors — `walkStoredActorSources(failures)`**
-An async generator yielding one `StoredActorSource` (`{ location, name, items, effects, inheritedEffects, open }`) per
-stored actor, in `STORED_ACTOR_LOCATIONS` order (a unit test pins the list): `worldActor`; `sceneToken` (unlinked
-tokens on world scenes whose base actor exists, read from `token._source.delta`, with `inheritedEffects` from the base
-actor's `_source` as core's `#mergeEmbeddedCollection` merges them — the base actor's legacy Items convert there);
-`actorPack`; `scenePackToken` (unlinked tokens whose base world actor exists); `adventureActor`; `adventureSceneToken`
-(every unlinked scene token, whatever its base actor). An orphaned token (an unlinked token whose base actor is gone) on
-a world scene or in a Scene pack is skipped: Foundry v14 core cannot create or delete entries in its delta (recorded in
-`docs/POST_WORK_FINDINGS.md`). Measured live on both, with a second GM and a reload read-back: a parent update that adds
-an entry fails the dry run in `EmbeddedCollectionDelta#_prepareDeltaUpdate`, one that drops or operator-deletes an entry
-stores nothing, and one that updates an entry the delta holds is stored. Measured on the Scene-pack token only: an
-embedded create on the delta threw. Read in core, not run: the throw site, `TokenDocument#_onRelatedUpdate`
-(`client/documents/token.mjs:3809`), which reads the token's null actor and which every embedded write reaches.
-Inferred, not read back: the throw comes after the server write. Orphaned tokens are deleted from worlds by hand
-(CLOSED_BUGS #96). An Adventure's scene tokens are inline data written with the whole
-`scenes` field, which core stores whatever the base actor (measured live), so they are walked; one whose actor id names
-no actor inherits nothing. Only world-package packs are read. The scan reads stored data only — `actor._source`, a
-token's stored delta, and each pack's server projection (`PACK_PROJECTION_FIELDS`, read with
+An async generator yielding one `StoredActorSource`
+(`{ location, name, items, effects, inheritedEffects, open, orphan }`) per stored actor, in `STORED_ACTOR_LOCATIONS`
+order (a unit test pins the list): `worldActor`; `sceneToken` (unlinked tokens on world scenes whose base actor exists,
+read from `token._source.delta`, with `inheritedEffects` from the base actor's `_source` as core's
+`#mergeEmbeddedCollection` merges them — the base actor's legacy Items convert there); `actorPack`; `scenePackToken`
+(unlinked tokens whose base world actor exists); `adventureActor`; `adventureSceneToken` (every unlinked scene token,
+whatever its base actor). An orphaned token (an unlinked token whose base actor is gone) on a world scene or in a Scene
+pack is yielded in its location from its own stored delta, inheriting nothing, with `open: null` and
+`orphan: { token, scene, pack }` (`createOrphanSource`; every other source has `orphan: null`): the migration never
+opens or writes it, and never unlocks its Scene pack (CLOSED_BUGS #96, #105). Reasons, a token holding only a stale
+condition included: it has no actor in the game; deleting it is the remedy; removing a key inside an entry through a
+parent update is unmeasured; and the scan runs on every load, so it keeps being reported. Foundry v14 core cannot create
+or delete entries in its delta (recorded in `docs/POST_WORK_FINDINGS.md`). Measured live on both, with a second GM and a
+reload read-back: a parent update that adds an entry fails the dry run in `EmbeddedCollectionDelta#_prepareDeltaUpdate`,
+one that drops or operator-deletes an entry stores nothing, and one that updates an entry the delta holds is stored.
+Measured on the Scene-pack token only: an embedded create on the delta threw. Read in core, not run: the throw site,
+`TokenDocument#_onRelatedUpdate` (`client/documents/token.mjs:3809`), which reads the token's null actor and which every
+embedded write reaches. Inferred, not read back: the throw comes after the server write. Orphaned tokens are deleted
+from worlds by hand. A token's cached synthetic actor (`TokenDocument#actor`) stays readable in the session its base
+actor is deleted, until a reload; `token.baseActor` and `game.actors.has(actorId)`, which the walk reads, are null and
+false at once (measured). An Adventure's scene tokens are inline data written with the whole `scenes` field, which core
+stores whatever the base actor (measured live), so they are walked; one whose actor id names no actor inherits nothing.
+Only world-package packs are read. The scan reads stored data only — `actor._source`, a token's stored delta, and each
+pack's server projection (`PACK_PROJECTION_FIELDS`, read with
 `documentClass.database.get(documentClass, { index: true, indexFields, pack, query: {} })`, which loads no document).
 `CompendiumCollection#getIndex` is not used: its cached index re-indexes a loaded document through `getProperty`, which
 cannot read a dotted field through an embedded array. The server keeps a projected embedded array whole and expands a
@@ -462,39 +471,42 @@ given `_id`: `keepId`), `updateEffects`, `deleteEffects` (an inherited effect is
 core deletes it from a synthetic actor), `deleteItems` (each resolves what it changed, read back from stored data: core
 splices a deleted invalid Item from the client source, and on a synthetic actor a tombstone takes the place of an entry
 whose id the base actor holds, which counts as deleted), and `stored()` — or null when nothing is left to write to (a
-pack entry, or a token's base actor, gone since the scan).
-Opening a packed source unlocks its locked pack, logging `Unlocked world pack "<label>" to migrate it.`; a scan that
-writes nothing never touches a lock, and the walk locks the pack again when it leaves it (also when its consumer stops
-early).
-Write paths: world and packed actors through their documents; an unlinked token through its synthetic actor (core routes
-its embedded writes to the token's ActorDelta). These writes are stored as made (`stored()` resolves at once). A token
-named like its base actor is stored with no delta, and core's server loses a multi-document create or delete on such a
-token (OPEN_BUGS #102); a token the pass has work on always holds delta entries, so its delta exists. An Adventure's
-actors and scene tokens are data (`SetField` of `EmbeddedDataField`): their targets edit a per-walk working copy of the
-field (`AdventureContent`), and the walk stores it in one `adventure.update({ actors })` or `({ scenes })` when it
-leaves the Adventure — one write per field, because core validates every element of a replaced array on each write, so a
-legacy `effect` Item (unregistered subtype) left in any actor fails the write. The write is checked (core resolves
-`undefined` for a write it did not store), and `stored()` of every target of that Adventure settles with it; a failed
-write's error names the entries still holding a legacy `effect` Item (`describeLegacyHolders`), the ones to fix for the
-Adventure to migrate. Created effects are built by `TitanActiveEffect.buildCreationSource` and keep their ids. An
-Adventure target follows core's ActorDelta rules (`deleteFromData`): a deletion removes the entry the data holds and
-leaves a tombstone where the base actor's collection holds the id, as core stores a world token's deletion (measured
-after a reload: a tombstone over a valid base Item, none for an Item the base lacks); a base actor's legacy `effect`
-Item is an invalid document, which core keeps out of a collection, so its id takes no tombstone (core's client
-`_delete`; not measured, as no legacy Item can be seeded); a creation replaces a tombstone with its id and refuses an id
-the token already shows. An Adventure scene token's base actor is the Adventure's actor with the token's `actorId` (core's
-Adventure import keeps ids), else the world actor (`readAdventureBaseSource`); the scene-token projection includes
-`actors` for it, read after the walk stored the Adventure's actors.
+pack entry, or a token's base actor, gone since the scan). Opening a packed source unlocks its locked pack, logging
+`Unlocked world pack "<label>" to migrate it.`; a scan that writes nothing never touches a lock, and the walk locks the
+pack again when it leaves it (also when its consumer stops early). Write paths: world and packed actors through their
+documents; an unlinked token through its synthetic actor (core routes its embedded writes to the token's ActorDelta).
+These writes are stored as made (`stored()` resolves at once). A token named like its base actor is stored with no
+delta, and core's server loses a multi-document create or delete on such a token (OPEN_BUGS #102); a token the pass has
+work on always holds delta entries, so its delta exists. An Adventure's actors and scene tokens are data (`SetField` of
+`EmbeddedDataField`): their targets edit a per-walk working copy of the field (`AdventureContent`), and the walk stores
+it in one `adventure.update({ actors })` or `({ scenes })` when it leaves the Adventure — one write per field, because
+core validates every element of a replaced array on each write, so a legacy `effect` Item (unregistered subtype) left in
+any actor fails the write. The write is checked (core resolves `undefined` for a write it did not store), and `stored()`
+of every target of that Adventure settles with it; a failed write's error names the entries still holding a legacy
+`effect` Item (`describeLegacyHolders`), the ones to fix for the Adventure to migrate. Created effects are built by
+`TitanActiveEffect.buildCreationSource` and keep their ids. An Adventure target follows core's ActorDelta rules
+(`deleteFromData`): a deletion removes the entry the data holds and leaves a tombstone where the base actor's collection
+holds the id, as core stores a world token's deletion (measured after a reload: a tombstone over a valid base Item, none
+for an Item the base lacks); a base actor's legacy `effect` Item is an invalid document, which core keeps out of a
+collection, so its id takes no tombstone (core's client `_delete`; not measured, as no legacy Item can be seeded); a
+creation replaces a tombstone with its id and refuses an id the token already shows. An Adventure scene token's base
+actor is the Adventure's actor with the token's `actorId` (core's Adventure import keeps ids), else the world actor
+(`readAdventureBaseSource`); the scene-token projection includes `actors` for it, read after the walk stored the
+Adventure's actors.
 
 **The stored-actor pass — `migrateStoredActors()`**
-For each source `storedActorNeedsMigration` flags: `open()`, then `convertStoredActor(target)`, then
+For each source `storedActorNeedsMigration` flags: an orphaned token counts as one failure, logged (`error()`, so core's
+notification echoes it to the console too) as `Failed to migrate the unlinked token "<token>" on scene "<scene>"[ in
+pack "<label>"]: its base actor is gone, so the migration does not write to it. Delete the token.`
+(`describeOrphanFailure`), and is never opened; any other source: `open()`, then `convertStoredActor(target)`, then
 `syncStoredActorConditions(target)`, then the target's current data is checked again — work left after its writes (a
 write vetoed or not applied) fails the actor with "Its stored data still needs migration after its writes: a write was
 vetoed or not applied." Each actor is isolated: a thrown step is reported with the actor's name. After the walk, each
 changed actor's `stored()` is awaited (an Adventure's write happens only when the walk leaves it, so awaiting it
 mid-walk would wait forever). Resolves `{ updated, skipped, failed }` — `updated` only once stored; `skipped` for a
-source with nothing left to write to or no work once opened; `failed` for a thrown step, work left, or writes not
-stored, plus each walk failure (an unreadable pack, an unrestored lock).
+source with nothing left to write to or no work once opened; `failed` counts failures: a thrown step, work left, or
+writes not stored, an orphaned token with work, plus each walk failure (an unreadable pack, an unrestored lock). It
+logs `Stored-actor migration finished: U updated, S skipped; failures: F.`
 
 **Legacy effect Items — `convertStoredActor(target)`**
 Converts the legacy `effect`-subtype Items the actor holds itself into `effect`-subtype Active Effects, from stored Item
@@ -534,8 +546,9 @@ effect's rules elements is replaced on the next migrating load.
 Active GM only; returns when `worldNeedsMigration()` finds nothing; notifies `migrationStarted`; runs the stored-actor
 pass first (legacy effect Items become Active Effects before anything reads items), then the version chains (every
 world Actor, its Items, and every world Item through `migrateDocument`, each isolated — a failed migration step or
-write counts as a failure). With failures (stored actors, walk failures, and version-chain documents) it warns
-`migrationFailedX%` (the count) instead of announcing `migrationComplete`.
+write counts as a failure). With failures (the stored-actor pass's, orphaned tokens and walk failures included, and
+the version-chain documents') it logs `World migration finished with failures: N.` and warns `migrationFailedX%` (the
+count; the console lists each failure) instead of announcing `migrationComplete`.
 
 **Version comparison — `documentNeedsMigration`**
 Each document stores its current schema version in `system.documentVersion` (a numeric field defined in

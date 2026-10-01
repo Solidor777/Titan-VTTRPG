@@ -374,8 +374,8 @@ function makeFakeAdventure({ actors = makeAdventureActors(), scenes = makeAdvent
 }
 
 /**
- * Builds a world holding one stored actor in every location, plus linked and orphaned tokens and a module pack the
- * walk must skip, and installs it as `game`.
+ * Builds a world holding one stored actor in every location, linked tokens and a module pack the walk must skip, and
+ * an orphaned token on its scene and in its Scene pack, each holding a stale condition, and installs it as `game`.
  * @returns {object} The world's fakes.
  */
 function makeWorld() {
@@ -414,6 +414,17 @@ function makeWorld() {
       },
       id: 'packedToken',
       name: 'Packed Token',
+   });
+
+   /** @type {object} The orphaned world token: unlinked, its base actor gone, its delta holding a stale condition. */
+   const orphanToken = makeFakeToken({
+      baseActor: null,
+      delta: {
+         effects: [EFFECT],
+         items: [],
+      },
+      id: 'orphanToken',
+      name: 'Orphan Token',
    });
 
    /** @type {object} The packed Adventure. */
@@ -507,6 +518,7 @@ function makeWorld() {
       ],
       scenes: [
          {
+            name: 'World Scene',
             tokens: [
                worldToken.token,
                makeFakeToken({
@@ -519,15 +531,7 @@ function makeWorld() {
                   id: 'linkedToken',
                   name: 'Linked Token',
                }).token,
-               makeFakeToken({
-                  baseActor: null,
-                  delta: {
-                     effects: [EFFECT],
-                     items: [],
-                  },
-                  id: 'orphanToken',
-                  name: 'Orphan Token',
-               }).token,
+               orphanToken.token,
             ],
          },
       ],
@@ -535,11 +539,64 @@ function makeWorld() {
    };
    return {
       adventure,
+      orphanToken,
       packedActor,
       packedToken,
       packs,
       worldActor,
       worldToken,
+   };
+}
+
+/**
+ * Installs a world whose only stored actors are two orphaned tokens with the given stored delta: one on a world scene,
+ * and one in a locked world Scene pack whose base world actor is gone.
+ * @param {object} delta - The stored delta both tokens hold.
+ * @returns {{orphan: object, pack: object}} The world-scene orphan's fakes and the fake Scene pack.
+ */
+function installOrphanWorld(delta) {
+   /** @type {object} The orphaned token on the world scene. */
+   const orphan = makeFakeToken({
+      baseActor: null,
+      delta: structuredClone(delta),
+      id: 'orphanToken',
+      name: 'Orphan Token',
+   });
+
+   /** @type {object} The world Scene pack holding a scene with the other orphaned token. */
+   const pack = makeFakePack({
+      label: 'Scenes',
+      records: [
+         {
+            _id: 'packedScene',
+            name: 'Packed Scene',
+            tokens: [
+               {
+                  _id: 'packedOrphan',
+                  actorId: 'goneActor',
+                  actorLink: false,
+                  delta: structuredClone(delta),
+                  name: 'Packed Orphan',
+               },
+            ],
+         },
+      ],
+      type: 'Scene',
+   });
+   globalThis.game = {
+      actors: new FakeCollection(),
+      packs: [pack],
+      scenes: [
+         {
+            name: 'World Scene',
+            tokens: [orphan.token],
+         },
+      ],
+      user: { id: 'gm0' },
+   };
+   return {
+      orphan,
+      pack,
    };
 }
 
@@ -732,37 +789,130 @@ describe('walkStoredActorSources', () => {
       ]);
    });
 
-   it('walks one stored actor per location in that order, skipping linked and orphaned tokens and module packs',
+   it('walks every location in that order, skipping linked tokens and module packs', async () => {
+      makeWorld();
+
+      /** @type {object[]} The walked sources. */
+      const sources = await walkAll();
+      expect(sources.map((source) => [
+         source.location,
+         source.name,
+      ])).toEqual([
+         [
+            'worldActor',
+            'World Actor',
+         ],
+         [
+            'sceneToken',
+            'World Token',
+         ],
+         [
+            'sceneToken',
+            'Orphan Token',
+         ],
+         [
+            'actorPack',
+            'Actors: Packed Actor',
+         ],
+         [
+            'scenePackToken',
+            'Scenes: Packed Scene: Packed Token',
+         ],
+         [
+            'scenePackToken',
+            'Scenes: Packed Scene: Packed Orphan',
+         ],
+         [
+            'adventureActor',
+            'Adventures: Adventure: Adventure Actor',
+         ],
+         [
+            'adventureSceneToken',
+            'Adventures: Adventure: Adventure Scene: Adventure Token',
+         ],
+      ]);
+   });
+
+   it('yields an orphaned token on a world scene and in a Scene pack from its own delta, with no way to open it',
       async () => {
          makeWorld();
 
          /** @type {object[]} The walked sources. */
          const sources = await walkAll();
-         expect(sources.map((source) => source.location)).toEqual(STORED_ACTOR_LOCATIONS);
-         expect(sources.map((source) => source.name)).toEqual([
-            'World Actor',
-            'World Token',
-            'Actors: Packed Actor',
-            'Scenes: Packed Scene: Packed Token',
-            'Adventures: Adventure: Adventure Actor',
-            'Adventures: Adventure: Adventure Scene: Adventure Token',
+         expect(sources.map((source) => [
+            source.name,
+            source.orphan,
+            source.open === null,
+         ])).toEqual([
+            [
+               'World Actor',
+               null,
+               false,
+            ],
+            [
+               'World Token',
+               null,
+               false,
+            ],
+            [
+               'Orphan Token',
+               {
+                  pack: null,
+                  scene: 'World Scene',
+                  token: 'Orphan Token',
+               },
+               true,
+            ],
+            [
+               'Actors: Packed Actor',
+               null,
+               false,
+            ],
+            [
+               'Scenes: Packed Scene: Packed Token',
+               null,
+               false,
+            ],
+            [
+               'Scenes: Packed Scene: Packed Orphan',
+               {
+                  pack: 'Scenes',
+                  scene: 'Packed Scene',
+                  token: 'Packed Orphan',
+               },
+               true,
+            ],
+            [
+               'Adventures: Adventure: Adventure Actor',
+               null,
+               false,
+            ],
+            [
+               'Adventures: Adventure: Adventure Scene: Adventure Token',
+               null,
+               false,
+            ],
+         ]);
+
+         /** @type {object[]} The orphaned tokens' sources. */
+         const orphans = sources.filter((source) => source.orphan);
+         expect(orphans.map((source) => [
+            source.effects,
+            source.items,
+            source.inheritedEffects,
+         ])).toEqual([
+            [
+               [EFFECT],
+               [],
+               [],
+            ],
+            [
+               [EFFECT],
+               [],
+               [],
+            ],
          ]);
       });
-
-   it('skips an unlinked token whose base actor is gone, on a world scene and in a Scene pack', async () => {
-      const { packs } = makeWorld();
-
-      // Presence first: the world holds an orphaned token on its scene and one in its Scene pack.
-      expect(game.scenes[0].tokens.some((token) => token.name === 'Orphan Token' && !token.baseActor)).toBe(true);
-      expect((await packs.scene.documentClass.database.get(packs.scene.documentClass, {
-         indexFields: [],
-      }))[0].tokens.some((token) => token.name === 'Packed Orphan' && !game.actors.has(token.actorId))).toBe(true);
-
-      /** @type {string[]} The walked sources' names. */
-      const names = (await walkAll()).map((source) => source.name);
-      expect(names).not.toContain('Orphan Token');
-      expect(names).not.toContain('Scenes: Packed Scene: Packed Orphan');
-   });
 
    it('walks an Adventure scene token whose actor id names no actor, and writes it as data', async () => {
       /** @type {object} An Adventure whose scene token's actor id names no actor, in the Adventure or the world. */
@@ -907,7 +1057,15 @@ describe('walkStoredActorSources', () => {
       for await (const source of walkStoredActorSources(failures)) {
          locations.push(source.location);
       }
-      expect(locations).toEqual(STORED_ACTOR_LOCATIONS.filter((location) => location !== 'actorPack'));
+      expect(locations).toEqual([
+         'worldActor',
+         'sceneToken',
+         'sceneToken',
+         'scenePackToken',
+         'scenePackToken',
+         'adventureActor',
+         'adventureSceneToken',
+      ]);
       expect(uiErrors.some((message) => message.includes('Failed to read world pack "Actors"'))).toBe(true);
       expect(failures).toEqual([
          {
@@ -958,11 +1116,11 @@ describe('walkStoredActorSources', () => {
 
       /** @type {object[]} The walked sources. */
       const sources = await walkAll((source) => [
-         'actorPack',
-         'sceneToken',
-      ].includes(source.location));
-      expect(sources.find((source) => source.location === 'actorPack').target).toBeNull();
-      expect(sources.find((source) => source.location === 'sceneToken').target).toBeNull();
+         'Actors: Packed Actor',
+         'World Token',
+      ].includes(source.name));
+      expect(sources.find((source) => source.name === 'Actors: Packed Actor').target).toBeNull();
+      expect(sources.find((source) => source.name === 'World Token').target).toBeNull();
    });
 
    it('yields each token\'s inherited effects from its base actor\'s stored data, and none for any other actor',
@@ -979,6 +1137,8 @@ describe('walkStoredActorSources', () => {
             'Actors: Packed Actor': [],
             'Adventures: Adventure: Adventure Actor': [],
             'Adventures: Adventure: Adventure Scene: Adventure Token': [],
+            'Orphan Token': [],
+            'Scenes: Packed Scene: Packed Orphan': [],
             'Scenes: Packed Scene: Packed Token': ['baseOnly'],
             'World Actor': [],
             'World Token': ['baseOnly'],
@@ -1085,7 +1245,7 @@ describe('stored actor targets', () => {
 
    it('writes an unlinked token through its synthetic actor and reads the delta it holds itself', async () => {
       const { worldToken } = makeWorld();
-      await walkAll((source) => source.location === 'sceneToken', async (target) => {
+      await walkAll((source) => source.name === 'World Token', async (target) => {
          expect(target.readEffects()).toBe(worldToken.token.delta._source.effects);
          expect(target.readInheritedEffects()).toEqual([]);
          await target.createEffects([{ name: 'Created' }]);
@@ -2025,5 +2185,94 @@ describe('the stored-actor pass over the walk', () => {
             tombstone: true,
          },
       ]);
+   });
+});
+
+describe('orphaned tokens', () => {
+   /** @type {Array<[string, object]>} Stored deltas with pending work: the labels and the deltas. */
+   const PENDING_DELTAS = [
+      [
+         'a stale condition',
+         {
+            effects: [EFFECT],
+            items: [],
+         },
+      ],
+      [
+         'a legacy effect Item',
+         {
+            effects: [],
+            items: [LEGACY_ITEM],
+         },
+      ],
+   ];
+
+   /** @type {Array<[string, string]>} The lines the pass logs for the two orphans, without the TITAN prefix. */
+   const ORPHAN_LINES = [
+      'Failed to migrate the unlinked token "Orphan Token" on scene "World Scene": its base actor is gone, so the '
+         + 'migration does not write to it. Delete the token.',
+      'Failed to migrate the unlinked token "Packed Orphan" on scene "Packed Scene" in pack "Scenes": its base actor '
+         + 'is gone, so the migration does not write to it. Delete the token.',
+   ];
+
+   it.each(PENDING_DELTAS)('reports an orphan whose own delta holds %s as pending work, in each location',
+      async (label, delta) => {
+         installOrphanWorld(delta);
+         expect(await storedActorsNeedMigration()).toBe(true);
+
+         // The Scene-pack orphan alone.
+         game.scenes = [];
+         expect(await storedActorsNeedMigration()).toBe(true);
+      });
+
+   it.each(PENDING_DELTAS)('counts an orphan whose own delta holds %s as one failure in each location, names it, and '
+      + 'never opens it, writes it, or touches its pack\'s lock', async (label, delta) => {
+      const { orphan, pack } = installOrphanWorld(delta);
+      expect(await migrateStoredActors()).toEqual({
+         failed: 2,
+         skipped: 0,
+         updated: 0,
+      });
+      expect(console.error.mock.calls.map(([message]) => message))
+         .toEqual(ORPHAN_LINES.map((line) => `TITAN | ${line}`));
+
+      // Never opened: the world-scene orphan's actor is never read, and the Scene pack is only projected.
+      expect(orphan.actorRead).not.toHaveBeenCalled();
+      expect(orphan.actor.createEmbeddedDocuments).not.toHaveBeenCalled();
+      expect(orphan.actor.updateEmbeddedDocuments).not.toHaveBeenCalled();
+      expect(orphan.actor.deleteEmbeddedDocuments).not.toHaveBeenCalled();
+      expect(orphan.token._source.delta).toEqual(delta);
+      expect(pack.getDocument).not.toHaveBeenCalled();
+      expect(pack.configure).not.toHaveBeenCalled();
+      expect(pack.calls).toEqual([`project ${PACK_PROJECTION_FIELDS.scenePackToken.join(',')}`]);
+      expect(pack.locked).toBe(true);
+   });
+
+   it('is silent about an orphan with nothing pending, in each location', async () => {
+      const { orphan, pack } = installOrphanWorld({
+         effects: [
+            {
+               _id: 'plainEffect',
+               flags: {},
+               type: 'effect',
+            },
+         ],
+         items: [structuredClone(COMMODITY)],
+      });
+
+      // Presence first: the world holds both orphans, and the walk yields them.
+      expect((await walkAll()).filter((source) => source.orphan).map((source) => source.name)).toEqual([
+         'Orphan Token',
+         'Scenes: Packed Scene: Packed Orphan',
+      ]);
+      expect(await storedActorsNeedMigration()).toBe(false);
+      expect(await migrateStoredActors()).toEqual({
+         failed: 0,
+         skipped: 0,
+         updated: 0,
+      });
+      expect(console.error).not.toHaveBeenCalled();
+      expect(orphan.actorRead).not.toHaveBeenCalled();
+      expect(pack.configure).not.toHaveBeenCalled();
    });
 });

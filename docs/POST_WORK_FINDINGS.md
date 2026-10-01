@@ -6,8 +6,10 @@ attention. NOT a to-do list (deferred work goes to `docs/TODO.md`; bugs go to `d
 ### Foundry v14 core: an orphaned token's delta cannot be written to (2026-10-01)
 
 An orphaned token is an unlinked token whose base actor is gone. Core cannot create or delete entries in its
-ActorDelta, so the stored-actor migration skips such tokens on world scenes and in world Scene packs
-(`walkSceneTokens`, `walkScenePackRecord` in `src/helpers/migration/StoredActorSources.js`).
+ActorDelta, so the stored-actor migration never writes such tokens on world scenes and in world Scene packs
+(`walkSceneTokens`, `walkScenePackRecord` in `src/helpers/migration/StoredActorSources.js`). It reports one whose own
+delta holds pending work as a failure that names its scene and the token and says to delete the token (CLOSED_BUGS
+#105).
 
 Measured live on a world-scene token and a Scene-pack token, with a second GM connected and a reload read-back:
 
@@ -34,7 +36,8 @@ An Adventure's scene tokens are inline data, written with `adventure.update({ sc
 create, an update and a delete on a token whose actor id names no actor, with no client error, so Adventure tokens
 are migrated whatever their base actor. Orphaned tokens were removed from the user's worlds by a one-off cleanup
 outside the code (2026-10-01). Any other world keeps the stale conditions and legacy effect Items of its orphaned
-tokens until those tokens are deleted.
+tokens until those tokens are deleted, and its GM sees a migration prompt (Prompt) or a reported failure (Automatic)
+on every load until then.
 
 ### Adventure packs are read whole on every Prompt or Automatic GM load (2026-09-30)
 

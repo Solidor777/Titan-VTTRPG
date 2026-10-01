@@ -13,9 +13,22 @@ import { isLegacyEffectItem } from '~/helpers/migration/ConvertEffectItemsToActi
  * tombstones included).
  * @property {object[]} inheritedEffects - The Active Effect data an unlinked token inherits from its base actor and
  * does not override (inheritedEntriesOf); none for any other actor, and none for an Adventure token whose base actor
- * neither the Adventure nor the world holds.
- * @property {() => Promise<StoredActorTarget|null>} open - Opens the actor for writing: unlocks its pack, loads its
- * pack document, or materializes its token's actor as needed. Resolves null when nothing is left to write to.
+ * neither the Adventure nor the world holds, or for an orphaned token.
+ * @property {(() => Promise<StoredActorTarget|null>)|null} open - Opens the actor for writing: unlocks its pack, loads
+ * its pack document, or materializes its token's actor as needed. Resolves null when nothing is left to write to. Null
+ * for an orphaned token, which the migration never opens.
+ * @property {OrphanedToken|null} orphan - Names an orphaned token, which the migration reports and never writes; null
+ * for every other stored actor.
+ */
+
+/**
+ * An orphaned token: an unlinked token on a world scene or in a world Scene pack whose base actor is gone
+ * (walkSceneTokens gives the reasons the migration never writes one). Its source carries the data its own delta
+ * stores, so the scan finds its pending work and the pass reports it as a failure, named for the GM to delete.
+ * @typedef {object} OrphanedToken
+ * @property {string} token - The token's name.
+ * @property {string} scene - The name of the token's scene.
+ * @property {string|null} pack - The label of the world Scene pack holding the scene; null for a world scene.
  */
 
 /**
@@ -595,7 +608,7 @@ function createActorTarget(actor) {
  * the token's ActorDelta (Foundry v14 `client/data/client-backend.mjs` `#adjustActorDeltaRequest`).
  * @param {TokenDocument} token - The unlinked token.
  * @returns {StoredActorTarget|null} The target, or null when the token has no actor (its base actor was deleted
- * since the scan; the walk skips a token already orphaned, walkSceneTokens).
+ * since the scan; the walk never opens a token already orphaned, walkSceneTokens).
  */
 function createTokenTarget(token) {
    /** @type {TitanActor|null} The token's synthetic actor; reading it materializes the token's delta. */
@@ -651,18 +664,53 @@ function* walkWorldActors() {
          location: 'worldActor',
          name: actor.name,
          open: async () => createActorTarget(actor),
+         orphan: null,
       };
    }
+}
+
+/**
+ * Builds the source of an orphaned token (OrphanedToken) from its stored delta: it inherits nothing, since its base
+ * actor is gone, and it cannot be opened.
+ * @param {string} location - The token's location: `sceneToken` or `scenePackToken`.
+ * @param {string} name - The token's name for reports, as the walk names a token in its location.
+ * @param {object|null|undefined} delta - The token's stored delta.
+ * @param {OrphanedToken} orphan - The token's names.
+ * @returns {StoredActorSource} The token's source.
+ */
+function createOrphanSource(location, name, delta, orphan) {
+   return {
+      effects: delta?.effects ?? [],
+      inheritedEffects: [],
+      items: delta?.items ?? [],
+      location,
+      name,
+      open: null,
+      orphan,
+   };
 }
 
 /**
  * Walks the unlinked tokens on world scenes, from each token's stored delta and its base actor's stored effects. The
  * legacy Items a token inherits from its base actor are the base actor's and convert there; the token converts the ones
  * its delta holds itself, and hides an inherited conversion of an Item its delta overrides or removed
- * (convertStoredActor). A linked token's actor is its world actor. An orphaned token (an unlinked token whose base
- * actor is gone) is skipped: Foundry v14 core cannot create or delete entries in its delta, which the conversion
- * needs. Measured live on a world-scene and a Scene-pack token, with a second GM connected and a reload read-back: a
- * Token or Scene update that adds an entry to the delta fails the client's dry run in
+ * (convertStoredActor). A linked token's actor is its world actor. A token's actor is read only when its source is
+ * opened.
+ *
+ * An orphaned token (an unlinked token whose base actor is gone) is yielded from its own stored delta with no way to
+ * open it (createOrphanSource): the migration never writes to it, so the scan reports its pending work (a legacy
+ * effect Item or a stale condition in its own delta), and the pass counts it as a failure and names its scene and the
+ * token, telling the GM to delete the token. The scan reads stored data on every Prompt or Automatic load, so the GM
+ * sees the migration prompt or the reported failure on every load until the token is deleted. The token is never
+ * written, a token holding only a stale condition included, because:
+ * - it has no actor in the game (`TokenDocument#actor` is null);
+ * - deleting the token is the remedy;
+ * - Foundry v14 core cannot create or delete entries in its delta, which the conversion needs, and the condition
+ * sync's removal of a key inside an entry through a parent update has not been measured;
+ * - the scan runs on every load, so a token left unwritten keeps being reported.
+ *
+ * The core evidence. Measured live on a world-scene and a Scene-pack token, with a second GM connected and a reload
+ * read-back: a Token or Scene update that adds an entry to the delta fails the client's dry run in
  * `EmbeddedCollectionDelta#_prepareDeltaUpdate` (`common/abstract/embedded-collection-delta.mjs:201`: no base
  * collection) and stores nothing; one that drops an entry from the array, or deletes it with an update operator,
  * stores nothing; and one that updates an entry the delta already holds is stored, its tombstones kept. Measured live
@@ -670,15 +718,22 @@ function* walkWorldActors() {
  * client. Read in core, not run: the throw site, `TokenDocument#_onRelatedUpdate` (`client/documents/token.mjs:3809`),
  * which reads `this.actor.tokenActiveEffectChanges` while the token's actor is null, and which the world-scene token's
  * embedded create and every embedded update and delete reach too. Inferred, not read back: the throw comes after the
- * server write. The token is skipped whole rather than migrated in part; orphaned tokens are deleted from worlds by
- * hand, outside the migration. A token's actor is read only when its source is opened.
+ * server write.
  * @returns {Generator<StoredActorSource>} A generator over the unlinked tokens.
  * @yields {StoredActorSource} The next unlinked token.
  */
 function* walkSceneTokens() {
    for (const scene of game.scenes) {
       for (const token of scene.tokens) {
-         if (token.actorLink || !token.baseActor) {
+         if (token.actorLink) {
+            continue;
+         }
+         if (!token.baseActor) {
+            yield createOrphanSource('sceneToken', token.name, token._source.delta, {
+               pack: null,
+               scene: scene.name,
+               token: token.name,
+            });
             continue;
          }
          yield {
@@ -691,6 +746,7 @@ function* walkSceneTokens() {
             location: 'sceneToken',
             name: token.name,
             open: async () => createTokenTarget(token),
+            orphan: null,
          };
       }
    }
@@ -719,14 +775,15 @@ function* walkActorPackRecord(pack, record, access) {
          const actor = await pack.getDocument(record._id);
          return actor ? createActorTarget(actor) : null;
       },
+      orphan: null,
    };
 }
 
 /**
  * Walks the unlinked tokens of one projected record of a world Scene pack, from each token's stored delta and its
  * base world actor's stored effects (createTokenTarget). A linked token's actor is a world actor. A token without a
- * base world actor (an orphaned token) is skipped: core cannot create or delete entries in an orphaned token's delta,
- * in a pack as on a world scene (walkSceneTokens).
+ * base world actor (an orphaned token) is yielded from its own stored delta with no way to open it, as on a world
+ * scene (walkSceneTokens gives the reasons): the migration never unlocks its pack or loads its scene for it.
  * @param {CompendiumCollection} pack - The world pack the record was projected from.
  * @param {object} record - The projected scene.
  * @param {PackWriteAccess} access - The pack's write access.
@@ -735,7 +792,18 @@ function* walkActorPackRecord(pack, record, access) {
  */
 function* walkScenePackRecord(pack, record, access) {
    for (const token of record.tokens ?? []) {
-      if (token.actorLink || !game.actors.has(token.actorId)) {
+      if (token.actorLink) {
+         continue;
+      }
+
+      /** @type {string} The token's name for reports. */
+      const name = `${pack.metadata.label}: ${record.name}: ${token.name}`;
+      if (!game.actors.has(token.actorId)) {
+         yield createOrphanSource('scenePackToken', name, token.delta, {
+            pack: pack.metadata.label,
+            scene: record.name,
+            token: token.name,
+         });
          continue;
       }
       yield {
@@ -746,7 +814,7 @@ function* walkScenePackRecord(pack, record, access) {
          ),
          items: token.delta?.items ?? [],
          location: 'scenePackToken',
-         name: `${pack.metadata.label}: ${record.name}: ${token.name}`,
+         name,
          open: async () => {
             await access.unlock();
 
@@ -757,6 +825,7 @@ function* walkScenePackRecord(pack, record, access) {
             const tokenDocument = scene?.tokens.get(token._id);
             return tokenDocument ? createTokenTarget(tokenDocument) : null;
          },
+         orphan: null,
       };
    }
 }
@@ -789,6 +858,7 @@ async function* walkAdventureActorRecord(pack, record, access) {
                const source = content?.entries.find((entry) => entry._id === actor._id);
                return source ? createSourceTarget(source, content) : null;
             },
+            orphan: null,
          };
       }
    }
@@ -804,9 +874,9 @@ async function* walkAdventureActorRecord(pack, record, access) {
  * projected after the Adventure's actors were walked and stored (STORED_ACTOR_LOCATIONS order), so they hold the base
  * actors' conversions of this walk. A token whose actor id names no actor is walked like any other, inheriting
  * nothing: an Adventure's scene tokens are inline data written with the whole `scenes` field (createSourceTarget),
- * never as token documents, so the core limitation that skips an orphaned token on a world scene or in a Scene pack
- * (walkSceneTokens) does not apply (measured live: one `adventure.update({ scenes })` that removed an Item from such a
- * token's delta, updated one effect, and added another was stored, with no client error).
+ * never as token documents, so the core limitation that keeps the migration from writing an orphaned token on a world
+ * scene or in a Scene pack (walkSceneTokens) does not apply (measured live: one `adventure.update({ scenes })` that
+ * removed an Item from such a token's delta, updated one effect, and added another was stored, with no client error).
  * @param {CompendiumCollection} pack - The world pack the record was projected from.
  * @param {object} record - The projected Adventure.
  * @param {PackWriteAccess} access - The pack's write access.
@@ -847,6 +917,7 @@ async function* walkAdventureSceneRecord(pack, record, access) {
                      () => readAdventureBaseSource(content.adventure._source.actors ?? [], token.actorId),
                   );
                },
+               orphan: null,
             };
          }
       }
@@ -953,7 +1024,8 @@ const LOCATION_WALKS = Object.freeze({
 /**
  * Walks every stored actor, in STORED_ACTOR_LOCATIONS order: world actors, unlinked tokens on world scenes, actors in
  * world Actor packs, unlinked tokens in world Scene packs, and the actors and unlinked scene tokens in world Adventure
- * packs. The walk reads stored data only; a source's `open` does the loading and unlocking a write needs. A failure
+ * packs. An orphaned token on a world scene or in a world Scene pack is yielded with no `open` (OrphanedToken). The
+ * walk reads stored data only; a source's `open` does the loading and unlocking a write needs. A failure
  * outside the yielded actors (a world pack the walk cannot read, or a pack lock it cannot restore) is reported and
  * recorded in `failures`, and the walk goes on; a pack the walk cannot read is read and recorded once.
  * @param {StoredActorWalkFailure[]} [failures] - Receives the walk's failures, for its consumer to count.
