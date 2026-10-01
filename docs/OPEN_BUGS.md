@@ -77,3 +77,22 @@ Deferred/known bugs. Todos (planned work) live in `docs/TODO.md`; this file is b
   stamp. Read in code only: legacy Items cannot be seeded at runtime.
 - **Found:** 2026-09-30 while planning the fix for #93.
 - **Status:** Open; fixed in Task 5 fix round 2.
+
+### 100. A token's overriding legacy Item converts into a duplicate effect when its base actor's conversion is not stored
+
+- **What:** When a base actor's conversion write is vetoed or not stored, an unlinked token whose delta overrides one of
+  the base actor's legacy `effect` Items converts its own copy; when the base actor converts on a later load, the token
+  holds both effects. Converted effects get fresh random ids, so core's delta merge (by `_id`,
+  `common/documents/actor-delta.mjs` `#mergeEmbeddedCollection`) cannot tell the token's copy overrides the base's.
+  Affects world tokens and Adventure tokens. Read in code only: legacy Items cannot be seeded at runtime.
+- **Found:** 2026-09-30 while planning the fix for #99.
+- **Status:** Open; fixed in Task 5 fix round 2.
+
+### 101. An inherited legacy Item a token removed comes back as a converted effect
+
+- **What:** An unlinked token that removed an inherited legacy `effect` Item holds a tombstone for that Item's id. The
+  base actor's conversion creates the replacement effect with a fresh random id, which the tombstone does not hide, so
+  the token regains the effect. Affects world tokens and Adventure tokens. Read in code only: legacy Items cannot be
+  seeded at runtime.
+- **Found:** 2026-09-30 while planning the fix for #99.
+- **Status:** Open; fixed in Task 5 fix round 2.
