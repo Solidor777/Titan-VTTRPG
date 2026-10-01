@@ -77,7 +77,7 @@ Deferred/known bugs. Todos (planned work) live in `docs/TODO.md`; this file is b
 
 ### 107. Dropping an Item folder on an actor sheet creates nothing
 
-- **What:** `TitanActorSheet#_onDropFolder` (`src/document/types/actor/sheet/TitanActorSheet.js:383`) reads
+- **What:** `TitanActorSheet#_onDropFolder` (`src/document/types/actor/sheet/TitanActorSheet.js:382`) reads
   `if (folder && folder.type !== 'Item')`. The condition is inverted, so it turns away every Item folder and handles
   only folders of other types. Dropping an Item folder from the Items sidebar onto an actor or token sheet creates no
   Item, with no notification and no error. This was measured on two token sheets in the #102 repro.
