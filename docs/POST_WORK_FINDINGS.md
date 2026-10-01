@@ -221,3 +221,12 @@ it ever bites in play, the principled fix is a per-message serial queue around
   alive is indistinguishable from a long run and is still not caught — stop the runner and the server follows.
 - **A Playwright-launched Foundry now opens `test-titan` directly (`--world=`).** Without it a fresh server
   lands on the setup screen, where the `login` fixture cannot join.
+
+## 2026-10-01 — Created documents do not come back in input order
+
+- **`createEmbeddedDocuments` returns its documents in the order core assigns their ids, not in input order.** The
+  server's `_createDocuments` (`dist/database/backend/server-backend.mjs`) builds its result inside a
+  `Promise.all`. Entries that keep their own `_id` are pushed at once; entries needing a generated id are pushed
+  when their `createNewId()` resolves. Measured in `test-titan` (Task 5 fix round 2): entries with their own `_id`
+  came first in 3 of 3 runs, and generated ones came back reordered (for example `[C1, C3, C2]`) in 2 of 3 runs. Code
+  and tests that pair created documents with their inputs must match them by id or name, never by position.
