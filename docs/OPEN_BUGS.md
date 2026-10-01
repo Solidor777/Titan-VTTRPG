@@ -41,3 +41,15 @@ Deferred/known bugs. Todos (planned work) live in `docs/TODO.md`; this file is b
   seeded at runtime.
 - **Found:** 2026-09-30 while planning the fix for #99.
 - **Status:** Open; fixed in Task 5 fix round 2.
+
+### 102. Removing an inherited Item from an unlinked token does not survive a reload, and can take the token's own effects with it
+
+- **What:** On an unlinked token, deleting an Item the token inherits from its base actor (through the token's
+  synthetic actor) shows the Item removed, but after a reload the token has the Item again: the stored delta holds no
+  tombstone for it. When the delta holds such tombstones, an effect the token owns itself is also missing after the
+  reload, although the same effect survives a reload when no tombstone is involved. Measured live in `test-titan` with
+  Migration Mode Disabled, so the migration pass is not the cause. Whether the loss is in Foundry core or in TITAN
+  code, and whether it is never stored or stored then overwritten, is not yet known.
+- **Found:** 2026-10-01 while the Task 5 fix round 2 identity e2e (plan B) was seeding its tokens; confirmed a bug by
+  the user.
+- **Status:** Open; root-cause diagnosis in progress.
