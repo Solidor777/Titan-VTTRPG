@@ -13,21 +13,24 @@ import {
 /**
  * The outcome of one stored-actor migration pass.
  * @typedef {object} StoredActorMigrationCounts
- * @property {number} updated - Stored actors a write changed.
+ * @property {number} updated - Stored actors whose writes changed them, left no work, and are stored.
  * @property {number} skipped - Stored actors with pending work that had nothing left to write to (a pack entry or a
- * token's base actor deleted since the scan) or whose writes changed nothing (vetoed by a hook).
- * @property {number} failed - Stored actors whose migration threw; each is reported with its name.
+ * token's base actor deleted since the scan) or that held no work once opened (changed since the scan).
+ * @property {number} failed - Stored actors whose migration threw, whose work was left after their writes (a write
+ * vetoed or not applied), or whose writes were not stored (an Adventure write core did not store); each is reported
+ * with its name.
  */
 
 /**
- * Whether a stored actor needs the stored-actor migration: a legacy effect Item to convert, or a condition effect whose
- * rules elements differ from its definition or which still stores a description.
- * @param {StoredActorSource} source - The walked actor, whose stored Items and Active Effects are checked.
+ * Whether stored actor data needs the stored-actor migration: a legacy effect Item to convert, or a condition effect
+ * whose rules elements differ from its definition or which still stores a description.
+ * @param {{items: object[], effects: object[]}} data - The Item and Active Effect data the actor holds itself: a
+ * walked source, or an opened target's current data.
  * @returns {boolean} Whether the actor needs the migration.
  */
-export function storedActorNeedsMigration(source) {
-   return needsEffectItemConversion(source.items)
-      || getConditionEffectUpdates(source.effects).length > 0;
+export function storedActorNeedsMigration(data) {
+   return needsEffectItemConversion(data.items)
+      || getConditionEffectUpdates(data.effects).length > 0;
 }
 
 /**
@@ -44,9 +47,13 @@ export async function storedActorsNeedMigration() {
 }
 
 /**
- * Migrates every stored actor that needs it: opens it, converts its legacy effect Items (convertStoredActor), then
- * syncs its condition effects (syncStoredActorConditions). Each actor is isolated: a failure is reported with the
- * actor's name and the rest still migrate.
+ * Migrates every stored actor that needs it: opens it, converts its legacy effect Items (convertStoredActor), syncs
+ * its condition effects (syncStoredActorConditions), then checks its data again, so an actor with work left after
+ * its writes (a write vetoed or not applied) fails instead of passing as done. Each actor is isolated: a failure is
+ * reported with the actor's name and the rest still migrate. A changed actor counts as updated only once its writes
+ * are stored; an Adventure's actors and scene tokens are stored by one write when the walk leaves the Adventure, so
+ * every changed actor's stored outcome is read once the walk is over (reading it during the walk would wait on a write
+ * that happens only after the walk moves on).
  * @returns {Promise<StoredActorMigrationCounts>} How many stored actors were updated, skipped, and failed.
  */
 export async function migrateStoredActors() {
@@ -56,6 +63,9 @@ export async function migrateStoredActors() {
       skipped: 0,
       updated: 0,
    };
+
+   /** @type {Array<{name: string, target: StoredActorTarget}>} The changed actors; their outcome is read last. */
+   const changed = [];
    for await (const source of walkStoredActorSources()) {
       if (!storedActorNeedsMigration(source)) {
          continue;
@@ -73,8 +83,18 @@ export async function migrateStoredActors() {
 
          /** @type {boolean} Whether the condition sync changed the actor. */
          const synced = await syncStoredActorConditions(target);
+         if (storedActorNeedsMigration({
+            effects: target.readEffects(),
+            items: target.readItems(),
+         })) {
+            throw new Error('Its stored data still needs migration after its writes: a write was vetoed or not '
+               + 'applied.');
+         }
          if (converted || synced) {
-            counts.updated += 1;
+            changed.push({
+               name: source.name,
+               target,
+            });
          }
          else {
             counts.skipped += 1;
@@ -83,6 +103,16 @@ export async function migrateStoredActors() {
       catch (err) {
          counts.failed += 1;
          error(`Failed to migrate the stored actor "${source.name}".`, err);
+      }
+   }
+   for (const { name, target } of changed) {
+      try {
+         await target.stored();
+         counts.updated += 1;
+      }
+      catch (err) {
+         counts.failed += 1;
+         error(`Failed to migrate the stored actor "${name}".`, err);
       }
    }
    log(`Stored actors migrated: ${counts.updated} updated, ${counts.skipped} skipped, ${counts.failed} failed.`);

@@ -8,6 +8,7 @@ import {
    STORED_ACTOR_LOCATIONS,
    walkStoredActorSources,
 } from '~/helpers/migration/StoredActorSources.js';
+import { migrateStoredActors } from '~/helpers/migration/MigrateStoredActors.js';
 
 /**
  * Stands in for Foundry's `_del` (the client's global ForcedDeletion operator instance).
@@ -206,62 +207,88 @@ function makeFakePack({ documents = {}, label, locked = true, packageType = 'wor
 }
 
 /**
- * Builds a fake packed Adventure whose updates are recorded as snapshots.
- * @returns {object} The fake Adventure; `updates` lists each update's data.
+ * The default actors of a fake Adventure: one actor holding a condition effect that is stale and stores a description.
+ * @returns {object[]} The actors' data.
  */
-function makeFakeAdventure() {
-   /** @type {object[]} Snapshots of each update's data. */
-   const updates = [];
-   return {
-      _source: {
-         _id: 'adventure0',
-         actors: [
+function makeAdventureActors() {
+   return [
+      {
+         _id: 'adventureActor',
+         effects: [
             {
-               _id: 'adventureActor',
-               effects: [
-                  {
-                     ...structuredClone(EFFECT),
-                     _id: 'adventureEffect',
-                     flags: {
-                        titan: {
-                           description: 'stale stored text',
-                        },
-                     },
+               ...structuredClone(EFFECT),
+               _id: 'adventureEffect',
+               flags: {
+                  titan: {
+                     description: 'stale stored text',
                   },
-               ],
-               items: [],
-               name: 'Adventure Actor',
+               },
             },
          ],
-         name: 'Adventure',
-         scenes: [
+         items: [],
+         name: 'Adventure Actor',
+      },
+   ];
+}
+
+/**
+ * The default scenes of a fake Adventure: one scene with an unlinked token whose delta holds a stale condition effect,
+ * and a linked token.
+ * @returns {object[]} The scenes' data.
+ */
+function makeAdventureScenes() {
+   return [
+      {
+         _id: 'adventureScene',
+         name: 'Adventure Scene',
+         tokens: [
             {
-               _id: 'adventureScene',
-               name: 'Adventure Scene',
-               tokens: [
-                  {
-                     _id: 'adventureToken',
-                     actorLink: false,
-                     delta: {
-                        effects: [structuredClone(EFFECT)],
-                        items: [],
-                     },
-                     name: 'Adventure Token',
-                  },
-                  {
-                     _id: 'adventureLinked',
-                     actorLink: true,
-                     name: 'Adventure Linked',
-                  },
-               ],
+               _id: 'adventureToken',
+               actorLink: false,
+               delta: {
+                  effects: [structuredClone(EFFECT)],
+                  items: [],
+               },
+               name: 'Adventure Token',
+            },
+            {
+               _id: 'adventureLinked',
+               actorLink: true,
+               name: 'Adventure Linked',
             },
          ],
       },
+   ];
+}
+
+/**
+ * Builds a fake packed Adventure whose updates are recorded as snapshots. An update resolves the Adventure, as core
+ * resolves a stored write; a test makes one resolve undefined (not stored) or reject.
+ * @param {object} [content] - The actors and scenes the Adventure stores inline.
+ * @param {object[]} [content.actors] - Its actors' data (makeAdventureActors by default).
+ * @param {object[]} [content.scenes] - Its scenes' data (makeAdventureScenes by default).
+ * @returns {object} The fake Adventure; `updates` lists each update's data.
+ */
+function makeFakeAdventure({ actors = makeAdventureActors(), scenes = makeAdventureScenes() } = {}) {
+   /** @type {object[]} Snapshots of each update's data. */
+   const updates = [];
+
+   /** @type {object} The fake Adventure, referenced by its own update spy. */
+   const adventure = {
+      _source: {
+         _id: 'adventure0',
+         actors,
+         name: 'Adventure',
+         scenes,
+      },
+      name: 'Adventure',
       update: vi.fn(async (data) => {
          updates.push(structuredClone(data));
+         return adventure;
       }),
       updates,
    };
+   return adventure;
 }
 
 /**
@@ -433,6 +460,30 @@ function makeWorld() {
       worldActor,
       worldToken,
    };
+}
+
+/**
+ * Installs a world whose only stored actors are in one locked world Adventure pack.
+ * @param {object} adventure - The fake Adventure.
+ * @returns {object} The fake Adventure pack.
+ */
+function installAdventureWorld(adventure) {
+   /** @type {object} The world Adventure pack holding the Adventure. */
+   const pack = makeFakePack({
+      documents: {
+         [adventure._source._id]: adventure,
+      },
+      label: 'Adventures',
+      records: [structuredClone(adventure._source)],
+      type: 'Adventure',
+   });
+   globalThis.game = {
+      actors: new FakeCollection(),
+      packs: [pack],
+      scenes: [],
+      user: { id: 'gm0' },
+   };
+   return pack;
 }
 
 /**
@@ -679,80 +730,61 @@ describe('stored actor targets', () => {
       expect(worldToken.actorRead).toHaveBeenCalledTimes(1);
       expect(worldToken.actor.createEmbeddedDocuments).toHaveBeenCalledWith('ActiveEffect', [{ name: 'Created' }]);
    });
+});
 
-   it('edits an Adventure actor\'s data and persists the Adventure\'s actors whole after each write', async () => {
-      const { adventure } = makeWorld();
+describe('Adventure writes', () => {
+   it('edits an Adventure actor\'s working copy and stores the actors in one write once the walk leaves the Adventure',
+      async () => {
+         const { adventure } = makeWorld();
 
-      /** @type {Function} The shared setup's id generator, restored after this test. */
-      const originalRandomID = globalThis.foundry.utils.randomID;
-      globalThis.foundry.utils.randomID = () => 'newEffect';
-      onTestFinished(() => {
-         globalThis.foundry.utils.randomID = originalRandomID;
-      });
-      await walkAll((source) => source.location === 'adventureActor', async (target) => {
-         expect(await target.createEffects([{ name: 'Created' }])).toEqual([
+         /** @type {Function} The shared setup's id generator, restored after this test. */
+         const originalRandomID = globalThis.foundry.utils.randomID;
+         globalThis.foundry.utils.randomID = () => 'newEffect';
+         onTestFinished(() => {
+            globalThis.foundry.utils.randomID = originalRandomID;
+         });
+
+         /** @type {object[]} The walked sources. */
+         const sources = await walkAll((source) => source.location === 'adventureActor', async (target) => {
+            expect(await target.createEffects([{ name: 'Created' }])).toEqual([
+               {
+                  _id: 'newEffect',
+                  built: true,
+                  name: 'Created',
+               },
+            ]);
+            expect(await target.updateEffects([
+               {
+                  _id: 'adventureEffect',
+                  'flags.titan.description': FORCED_DELETION,
+                  'system.rulesElement': [{ operation: 'flatModifier' }],
+               },
+            ])).toHaveLength(1);
+
+            // Nothing is written while the walk is on the Adventure.
+            expect(adventure.updates).toEqual([]);
+         });
+         expect(adventure.updates.map((data) => Object.keys(data))).toEqual([['actors']]);
+         expect(adventure.updates[0].actors[0].effects).toEqual([
+            {
+               ...EFFECT,
+               _id: 'adventureEffect',
+               flags: {
+                  titan: {},
+               },
+               system: {
+                  rulesElement: [{ operation: 'flatModifier' }],
+               },
+            },
             {
                _id: 'newEffect',
                built: true,
                name: 'Created',
             },
          ]);
-         expect(await target.updateEffects([
-            {
-               _id: 'adventureEffect',
-               'flags.titan.description': FORCED_DELETION,
-               'system.rulesElement': [{ operation: 'flatModifier' }],
-            },
-         ])).toHaveLength(1);
+         await expect(sources.find((source) => source.location === 'adventureActor').target.stored())
+            .resolves.toBeUndefined();
       });
-      expect(adventure.updates.map((data) => Object.keys(data))).toEqual([
-         ['actors'],
-         ['actors'],
-      ]);
-      expect(adventure.updates[0].actors[0].effects.map((effect) => effect._id)).toEqual([
-         'adventureEffect',
-         'newEffect',
-      ]);
-      expect(adventure.updates[1].actors[0].effects).toEqual([
-         {
-            ...EFFECT,
-            _id: 'adventureEffect',
-            flags: {
-               titan: {},
-            },
-            system: {
-               rulesElement: [{ operation: 'flatModifier' }],
-            },
-         },
-         {
-            _id: 'newEffect',
-            built: true,
-            name: 'Created',
-         },
-      ]);
-   });
-
-   it('edits an Adventure scene token\'s delta and persists the Adventure\'s scenes whole', async () => {
-      const { adventure } = makeWorld();
-      await walkAll((source) => source.location === 'adventureSceneToken', async (target) => {
-         expect(target.readEffects()).toEqual([EFFECT]);
-         expect(await target.updateEffects([
-            {
-               _id: 'effect0',
-               'system.rulesElement': [{ operation: 'flatModifier' }],
-            },
-         ])).toHaveLength(1);
-      });
-      expect(adventure.updates).toHaveLength(1);
-      expect(adventure.updates[0].scenes[0].tokens[0].delta.effects).toEqual([
-         {
-            ...EFFECT,
-            system: {
-               rulesElement: [{ operation: 'flatModifier' }],
-            },
-         },
-      ]);
-   });
 
    it('builds each effect an Adventure target creates through the Active Effect class, with a new id', async () => {
       const { adventure } = makeWorld();
@@ -776,11 +808,287 @@ describe('stored actor targets', () => {
          name: 'Expired',
          type: 'effect',
       });
-      expect(adventure.updates.at(-1).actors[0].effects.at(-1)).toEqual({
+      expect(adventure.updates[0].actors[0].effects.at(-1)).toEqual({
          _id: 'newEffect',
          built: true,
          name: 'Expired',
          type: 'effect',
       });
+   });
+
+   it('edits an Adventure scene token\'s delta and stores the scenes in one write', async () => {
+      const { adventure } = makeWorld();
+      await walkAll((source) => source.location === 'adventureSceneToken', async (target) => {
+         expect(target.readEffects()).toEqual([EFFECT]);
+         expect(await target.updateEffects([
+            {
+               _id: 'effect0',
+               'system.rulesElement': [{ operation: 'flatModifier' }],
+            },
+         ])).toHaveLength(1);
+      });
+      expect(adventure.updates.map((data) => Object.keys(data))).toEqual([['scenes']]);
+      expect(adventure.updates[0].scenes[0].tokens[0].delta.effects).toEqual([
+         {
+            ...EFFECT,
+            system: {
+               rulesElement: [{ operation: 'flatModifier' }],
+            },
+         },
+      ]);
+   });
+
+   it('stores the conversion of every Adventure actor in one write that holds no legacy Item', async () => {
+      /** @type {object} An Adventure whose two actors each hold a legacy effect Item. */
+      const adventure = makeFakeAdventure({
+         actors: [
+            'first',
+            'second',
+         ].map((key) => ({
+            _id: `${key}Actor`,
+            effects: [],
+            items: [
+               {
+                  ...ITEM,
+                  _id: `${key}Item`,
+               },
+            ],
+            name: `${key} Actor`,
+         })),
+      });
+      installAdventureWorld(adventure);
+      await walkAll((source) => source.location === 'adventureActor', async (target) => {
+         /** @type {string} The id of the actor's legacy Item. */
+         const itemId = target.readItems()[0]._id;
+         await target.createEffects([
+            {
+               flags: {
+                  titan: {
+                     convertedFromItem: itemId,
+                  },
+               },
+               name: 'Converted',
+               type: 'effect',
+            },
+         ]);
+         expect(await target.deleteItems([itemId])).toEqual([itemId]);
+      });
+      expect(adventure.updates).toHaveLength(1);
+      expect(adventure.updates[0].actors.map((actor) => ({
+         converted: actor.effects.map((effect) => effect.flags.titan.convertedFromItem),
+         items: actor.items,
+      }))).toEqual([
+         {
+            converted: ['firstItem'],
+            items: [],
+         },
+         {
+            converted: ['secondItem'],
+            items: [],
+         },
+      ]);
+   });
+
+   it('removes a deleted Item from an Adventure token\'s delta without leaving a tombstone', async () => {
+      /** @type {object} An Adventure whose scene token's delta holds a legacy effect Item. */
+      const adventure = makeFakeAdventure({
+         scenes: [
+            {
+               _id: 'adventureScene',
+               name: 'Adventure Scene',
+               tokens: [
+                  {
+                     _id: 'adventureToken',
+                     actorLink: false,
+                     delta: {
+                        effects: [],
+                        items: [structuredClone(ITEM)],
+                     },
+                     name: 'Adventure Token',
+                  },
+               ],
+            },
+         ],
+      });
+      installAdventureWorld(adventure);
+      await walkAll((source) => source.location === 'adventureSceneToken', async (target) => {
+         expect(await target.deleteItems(['item0'])).toEqual(['item0']);
+      });
+      expect(adventure.updates[0].scenes[0].tokens[0].delta.items).toEqual([]);
+   });
+
+   it('writes nothing for an Adventure whose opened targets changed nothing, and their writes count as stored',
+      async () => {
+         const { adventure } = makeWorld();
+
+         /** @type {object[]} The walked sources. */
+         const sources = await walkAll((source) => source.location === 'adventureActor', async (target) => {
+            expect(await target.updateEffects([
+               {
+                  _id: 'missingEffect',
+                  'system.rulesElement': [],
+               },
+            ])).toEqual([]);
+            expect(await target.deleteItems(['missingItem'])).toEqual([]);
+         });
+         expect(adventure.update).not.toHaveBeenCalled();
+         await expect(sources.find((source) => source.location === 'adventureActor').target.stored())
+            .resolves.toBeUndefined();
+      });
+
+   it('rejects the stored outcome of an Adventure\'s targets when core stores no write', async () => {
+      const { adventure } = makeWorld();
+      adventure.update.mockResolvedValueOnce(undefined);
+
+      /** @type {object[]} The walked sources. */
+      const sources = await walkAll((source) => source.location === 'adventureActor', async (target) => {
+         await target.createEffects([{ name: 'Created' }]);
+      });
+      await expect(sources.find((source) => source.location === 'adventureActor').target.stored())
+         .rejects.toThrow('was not stored');
+   });
+
+   it('rejects the stored outcome with the error of an Adventure write that throws', async () => {
+      const { adventure } = makeWorld();
+      adventure.update.mockRejectedValueOnce(new Error('server refused'));
+
+      /** @type {object[]} The walked sources. */
+      const sources = await walkAll((source) => source.location === 'adventureActor', async (target) => {
+         await target.createEffects([{ name: 'Created' }]);
+      });
+      await expect(sources.find((source) => source.location === 'adventureActor').target.stored())
+         .rejects.toThrow('server refused');
+   });
+
+   it('names the Adventure actors still holding a legacy effect Item when the actors write is not stored', async () => {
+      /** @type {object} An Adventure whose first actor holds a legacy effect Item and whose second is stale. */
+      const adventure = makeFakeAdventure({
+         actors: [
+            {
+               _id: 'holderActor',
+               effects: [],
+               items: [structuredClone(ITEM)],
+               name: 'Legacy Holder',
+            },
+            {
+               ...makeAdventureActors()[0],
+               name: 'Clean Actor',
+            },
+         ],
+      });
+      adventure.update.mockResolvedValueOnce(undefined);
+      installAdventureWorld(adventure);
+
+      /** @type {object[]} The walked sources. */
+      const sources = await walkAll((source) => source.name.endsWith('Clean Actor'), async (target) => {
+         await target.updateEffects([
+            {
+               _id: 'adventureEffect',
+               'system.rulesElement': [{ operation: 'flatModifier' }],
+            },
+         ]);
+      });
+      await expect(sources.find((source) => source.name.endsWith('Clean Actor')).target.stored()).rejects.toThrow(
+         'The write of the actors of Adventure "Adventure" was not stored. Still holding a legacy effect Item: '
+            + '"Legacy Holder".',
+      );
+   });
+
+   it('names the Adventure scene tokens still holding a legacy effect Item when the scenes write throws', async () => {
+      /** @type {Error} The error the Adventure write throws. */
+      const refusal = new Error('server refused');
+
+      /** @type {object} An Adventure whose scene token's delta holds a legacy effect Item and a stale condition. */
+      const adventure = makeFakeAdventure({
+         scenes: [
+            {
+               _id: 'adventureScene',
+               name: 'Adventure Scene',
+               tokens: [
+                  {
+                     _id: 'holderToken',
+                     actorLink: false,
+                     delta: {
+                        effects: [structuredClone(EFFECT)],
+                        items: [structuredClone(ITEM)],
+                     },
+                     name: 'Holder Token',
+                  },
+               ],
+            },
+         ],
+      });
+      adventure.update.mockRejectedValueOnce(refusal);
+      installAdventureWorld(adventure);
+
+      /** @type {object[]} The walked sources. */
+      const sources = await walkAll((source) => source.location === 'adventureSceneToken', async (target) => {
+         await target.updateEffects([
+            {
+               _id: 'effect0',
+               'system.rulesElement': [{ operation: 'flatModifier' }],
+            },
+         ]);
+      });
+
+      /** @type {Error} The error the token's stored outcome rejects with. */
+      const failure = await sources.find((source) => source.location === 'adventureSceneToken').target.stored()
+         .catch((err) => err);
+      expect(failure.message).toBe('The write of the scenes of Adventure "Adventure" failed (server refused). Still '
+         + 'holding a legacy effect Item: "Adventure Scene: Holder Token".');
+      expect(failure.cause).toBe(refusal);
+   });
+
+   it('starts the next walk from the stored Adventure, not from a working copy whose write was not stored',
+      async () => {
+         const { adventure } = makeWorld();
+         adventure.update.mockResolvedValueOnce(undefined);
+         await walkAll((source) => source.location === 'adventureActor', async (target) => {
+            await target.createEffects([{ name: 'Unstored' }]);
+         });
+         await walkAll((source) => source.location === 'adventureActor', async (target) => {
+            await target.updateEffects([
+               {
+                  _id: 'adventureEffect',
+                  'system.rulesElement': [{ operation: 'flatModifier' }],
+               },
+            ]);
+         });
+         expect(adventure.update).toHaveBeenCalledTimes(2);
+         expect(adventure.updates).toHaveLength(1);
+         expect(adventure.updates[0].actors[0].effects.map((effect) => effect._id)).toEqual(['adventureEffect']);
+      });
+});
+
+describe('the stored-actor pass over the walk', () => {
+   it('counts every actor an Adventure write carried as updated once the write is stored', async () => {
+      /** @type {object} An Adventure with a stale actor and a stale scene token. */
+      const adventure = makeFakeAdventure();
+      installAdventureWorld(adventure);
+      expect(await migrateStoredActors()).toEqual({
+         failed: 0,
+         skipped: 0,
+         updated: 2,
+      });
+      expect(adventure.updates.map((data) => Object.keys(data))).toEqual([
+         ['actors'],
+         ['scenes'],
+      ]);
+   });
+
+   it('counts every actor an Adventure write carried as failed when core stores no write', async () => {
+      /** @type {object} An Adventure whose every write core does not store. */
+      const adventure = makeFakeAdventure();
+      adventure.update.mockResolvedValue(undefined);
+      installAdventureWorld(adventure);
+      expect(await migrateStoredActors()).toEqual({
+         failed: 2,
+         skipped: 0,
+         updated: 0,
+      });
+      expect(uiErrors.filter((message) => message.includes('Failed to migrate the stored actor'))).toEqual([
+         'TITAN | Failed to migrate the stored actor "Adventures: Adventure: Adventure Actor".',
+         'TITAN | Failed to migrate the stored actor "Adventures: Adventure: Adventure Scene: Adventure Token".',
+      ]);
    });
 });

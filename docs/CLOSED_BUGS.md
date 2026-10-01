@@ -1041,6 +1041,33 @@ when fixed.
   tags a turn-start effect with the Turn Start icon, not the Turn End one, and its tooltip leads with the Turn Start
   text).
 
+### 93. Migration writes into an Adventure pack counted as stored when Foundry rejected them
+
+- **What:** The Adventure write target in `src/helpers/migration/StoredActorSources.js` never checked what
+  `adventure.update` returned. Core resolves `undefined`, without throwing, when the dry-run validation fails or a
+  `preUpdate` hook vetoes the write, so the migration counted the actor as updated and could announce "complete" over
+  writes that were never stored. Each actor's write also sent the Adventure's whole actor (or scene) list, which core
+  validates element by element (`ArrayField#_updateDiff`): while any actor in it still held a legacy `effect` Item, an
+  unregistered Item subtype, every write of that list failed, including the converter's own save between creating the
+  new effects and removing the legacy Items (read in core source; legacy Items cannot be seeded live). A rejected
+  working copy was never reset.
+- **Found:** 2026-09-30 by the buddy check of the Task 5 fix round (plan B), read in core source.
+- **Fixed:** 2026-09-30 — an Adventure's actors and scene tokens edit a working copy that the walk stores in one
+  `Adventure#update` per field when it leaves the Adventure, so the conversion of every actor in it (the created
+  effects and the removed legacy Items) lands in one write that holds no legacy Item. The write is checked (an
+  `undefined` result throws); each actor it carried counts as updated only once it is stored and as failed when it is
+  not; the working copy lives for one walk. Scope: one actor or scene token whose conversion cannot complete still
+  fails the write of its whole Adventure field, because core validates every element of the field; the failure names
+  each entry still holding a legacy effect Item. The cure is to resolve the failure the pass reports for that entry by
+  name (its conversion's own error), or to remove the entry from the Adventure; the next migrating GM load then stores
+  the field. Gated by `tests/unit/StoredActorSources.test.js` (one
+  write per field once the walk leaves the Adventure, every actor's conversion in it, no write when nothing changed, a
+  write core did not store or that throws rejects its targets and names the entries still holding a legacy effect
+  Item, the next walk starts from the stored field, and the pass counts those actors as failed),
+  `tests/unit/MigrateStoredActors.test.js` (an actor counts as updated only once stored, read after
+  the walk), and `tests/e2e/condition-migration.spec.js` (a `preUpdateAdventure` veto makes the confirmed migration
+  report 2 failures and leaves both Adventure locations unmigrated).
+
 ### 94. Legacy timed effects converted inside an Adventure were stored enabled after they expired
 
 - **What:** `TitanActiveEffect._preCreate` shows an effect's status icon and disables a timed effect with no time
@@ -1071,3 +1098,13 @@ when fixed.
   (`foundry.utils.deepClone`, which keeps an update operator such as `_del` by reference) and writes that copy, so no
   part of a failed version is stored. Gated by `tests/unit/MigrateWorld.test.js` (a version whose second level throws
   after its first changed the data in place stores only the previous version's data, its operator intact).
+
+### 98. A stored actor whose migration write a hook vetoed counted as skipped
+
+- **What:** `migrateStoredActors` counted an actor whose writes changed nothing as skipped, so a `preCreate`,
+  `preUpdate`, or `preDelete` hook that vetoed a migration write left the actor's work pending while the migration
+  announced completion, and the next GM load found the same work again.
+- **Found:** 2026-09-30 while planning the fix for #93.
+- **Fixed:** 2026-09-30 — after its writes, each actor's data is checked again (`storedActorNeedsMigration`); an
+  actor with work left counts as failed and is reported. Gated by `tests/unit/MigrateStoredActors.test.js` (a vetoed
+  update counts as failed; an actor that holds no work once opened counts as skipped).

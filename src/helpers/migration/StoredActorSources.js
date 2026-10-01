@@ -1,5 +1,6 @@
 import error from '~/helpers/utility-functions/Error.js';
 import log from '~/helpers/utility-functions/Log.js';
+import { isLegacyEffectItem } from '~/helpers/migration/ConvertEffectItemsToActiveEffects.js';
 
 /**
  * A stored actor found by a walk, read from stored data only: a world actor's source, an unlinked token's stored
@@ -15,7 +16,8 @@ import log from '~/helpers/utility-functions/Log.js';
  */
 
 /**
- * A stored actor opened for writing. The readers return the live stored data, so each step sees the steps before it.
+ * A stored actor opened for writing. The readers return the live stored data (an Adventure's: its working copy), so
+ * each step sees the steps before it.
  * @typedef {object} StoredActorTarget
  * @property {() => object[]} readItems - Reads the Item data the actor holds itself.
  * @property {() => object[]} readEffects - Reads the Active Effect data the actor holds itself, tombstones included.
@@ -26,6 +28,9 @@ import log from '~/helpers/utility-functions/Log.js';
  * @property {(updates: object[]) => Promise<object[]>} updateEffects - Updates Active Effects; resolves the updated
  * effects' data.
  * @property {(ids: string[]) => Promise<string[]>} deleteItems - Deletes Items; resolves the ids no longer stored.
+ * @property {() => Promise<void>} stored - Resolves once the target's writes are stored; rejects when they were not.
+ * A document's writes are stored as they are made; an Adventure's actors and scene tokens are stored by one write of
+ * the Adventure's field when the walk leaves the Adventure, so their outcome is known only after that.
  */
 
 /**
@@ -37,15 +42,40 @@ import log from '~/helpers/utility-functions/Log.js';
  */
 
 /**
- * A packed Adventure's content during one walk: the Adventure, and a working copy of one content field.
+ * One content field (`actors` or `scenes`) of a packed Adventure during one walk over the Adventure. Its actors and
+ * scene tokens are data, not documents, so their targets edit a working copy of the whole field, and the walk stores
+ * the working copy in one `Adventure#update` when it leaves the Adventure. One write per field is required: core
+ * validates every element of a replaced array field on each write (Foundry v14 `common/data/fields.mjs`
+ * `ArrayField#_updateDiff`), and a legacy effect Item is an unregistered Item subtype, so a write of the field fails
+ * while any actor in it still holds one; one write carries every actor's conversion at once. A write that still holds
+ * a legacy Item (an actor whose conversion failed) fails whole, every actor it carried counts as failed, and its error
+ * names the entries still holding one (describeLegacyHolders), the ones the GM must fix for the Adventure to migrate.
+ * The working copy lives for one walk: the next walk copies the stored field again, so a write that was not stored
+ * never reaches a later one.
  * @typedef {object} AdventureContent
- * @property {Adventure} adventure - The packed Adventure document.
- * @property {object[]} entries - The working copy of its `actors` or `scenes` data, which each write persists whole.
+ * @property {object[]} entries - The working copy of the field's data.
+ * @property {() => void} markWritten - Records that a target changed the working copy.
+ * @property {() => Promise<void>} stored - Resolves once the changed working copy is stored (at once when nothing
+ * changed); rejects when it was not.
+ * @property {() => Promise<void>} commit - Writes the changed working copy and settles `stored`; never throws.
+ */
+
+/**
+ * Loads one content field of a packed Adventure on the first open of one of its actors or scene tokens.
+ * @typedef {object} AdventureContentLoader
+ * @property {() => Promise<AdventureContent|null>} load - Unlocks the pack and loads the Adventure on the first call;
+ * resolves null when the Adventure is gone.
+ * @property {() => Promise<void>} commit - Stores the field's changes when it was loaded; never throws.
+ */
+
+/**
+ * Stored actors yielded in walk order, by a synchronous or an asynchronous generator.
+ * @typedef {Iterable<StoredActorSource>|AsyncIterable<StoredActorSource>} StoredActorSourceIterable
  */
 
 /**
  * Yields the stored actors in one projected record of a world pack.
- * @typedef {(pack: CompendiumCollection, record: object, access: PackWriteAccess) => Iterable<StoredActorSource>}
+ * @typedef {(pack: CompendiumCollection, record: object, access: PackWriteAccess) => StoredActorSourceIterable}
  * PackRecordWalker
  */
 
@@ -195,7 +225,8 @@ function applyEffectUpdate(effect, update) {
 
 /**
  * Creates the write target of an actor document: a world actor, a packed actor, or an unlinked token's synthetic
- * actor, whose embedded writes Foundry routes to the token's delta.
+ * actor, whose embedded writes Foundry routes to the token's delta. Its writes are stored as they are made: each
+ * writer resolves what core stored, so `stored` resolves at once.
  * @param {TitanActor} actor - The document whose embedded Items and Active Effects are written.
  * @param {() => object} readSource - Reads the stored data the actor holds itself (`actor._source`, or an unlinked
  * token's `delta._source`).
@@ -217,21 +248,117 @@ function createDocumentTarget(actor, readSource) {
       readEffects: () => readSource().effects ?? [],
       readHeldEffects: () => actor.effects.map((effect) => effect.toObject()),
       readItems: () => readSource().items ?? [],
+      stored: async () => {},
       updateEffects: async (updates) => (await actor.updateEmbeddedDocuments('ActiveEffect', updates))
          .map((effect) => effect.toObject()),
    };
 }
 
 /**
- * Creates the write target of stored actor data that is not a document (an Adventure's actor, or the delta of an
- * Adventure scene's token): each write edits the data in place and then persists it. A created effect is built by
- * `TitanActiveEffect.buildCreationSource`, so it stores what creation stores except `start`, which records a creation
- * moment that inline data lacks.
- * @param {object} holder - The stored data holding `items` and `effects` (a working copy the persist call writes).
- * @param {() => Promise<void>} persist - Writes the working copy back to its document.
+ * Names the entries of an Adventure field's working copy that still hold a legacy effect Item, whose unregistered
+ * subtype fails every write of the field (AdventureContent).
+ * @param {object[]} entries - The working copy of the field's data.
+ * @param {'actors'|'scenes'} field - The content field.
+ * @returns {string} A sentence naming them (an actor by its name, a scene token by its scene's name and its own), or
+ * an empty string when none does.
+ */
+function describeLegacyHolders(entries, field) {
+   /** @type {string[]} The names of the entries holding a legacy effect Item. */
+   const names = field === 'actors'
+      ? entries.filter((actor) => (actor.items ?? []).some(isLegacyEffectItem)).map((actor) => actor.name)
+      : entries.flatMap((scene) => (scene.tokens ?? [])
+         .filter((token) => (token.delta?.items ?? []).some(isLegacyEffectItem))
+         .map((token) => `${scene.name}: ${token.name}`));
+   return names.length > 0
+      ? ` Still holding a legacy effect Item: ${names.map((name) => `"${name}"`).join(', ')}.`
+      : '';
+}
+
+/**
+ * Creates one content field of a packed Adventure for one walk: a working copy of the field and the one write that
+ * stores it (AdventureContent).
+ * @param {Adventure} adventure - The packed Adventure.
+ * @param {'actors'|'scenes'} field - Which Adventure array the working copy holds: its actors or its scenes.
+ * @returns {AdventureContent} The field's working copy and its write.
+ */
+function createAdventureContent(adventure, field) {
+   /** @type {boolean} Whether a target changed the working copy. */
+   let written = false;
+
+   /** @type {(err?: Error) => void} Settles `stored`: rejects it with the given error, or resolves it without one. */
+   let settle;
+
+   /** @type {Promise<void>} Settles once the commit ran: resolved when stored or unchanged, rejected if not stored. */
+   const stored = new Promise((resolve, reject) => {
+      settle = (err) => {
+         if (err) {
+            reject(err);
+         }
+         else {
+            resolve();
+         }
+      };
+   });
+
+   // A walk whose consumer reads no outcome leaves a rejection unread; it is reported where it is read (the pass),
+   // never as an unhandled rejection.
+   stored.catch(() => {});
+
+   /** @type {object[]} The working copy of the field's data. */
+   const entries = structuredClone(adventure._source[field] ?? []);
+   return {
+      commit: async () => {
+         if (!written) {
+            settle();
+            return;
+         }
+
+         /** @type {string} Names the entries still holding a legacy effect Item, which fail the write. */
+         const holders = describeLegacyHolders(entries, field);
+
+         /** @type {Adventure|undefined} The updated Adventure. */
+         let updated;
+         try {
+            updated = await adventure.update({ [field]: entries });
+         }
+         catch (err) {
+            settle(holders
+               ? new Error(
+                  `The write of the ${field} of Adventure "${adventure.name}" failed (${err.message}).${holders}`,
+                  { cause: err },
+               )
+               : err);
+            return;
+         }
+
+         // Core resolves undefined, without throwing, for a write it did not store: a failed validation dry run or a
+         // `preUpdateAdventure` veto (Foundry v14 `client/data/client-backend.mjs` `#preUpdateDocumentArray`).
+         if (!updated) {
+            settle(new Error(`The write of the ${field} of Adventure "${adventure.name}" was not stored.${holders}`));
+            return;
+         }
+         settle();
+      },
+      entries,
+      markWritten: () => {
+         written = true;
+      },
+      stored: () => stored,
+   };
+}
+
+/**
+ * Creates the write target of stored actor data that is not a document: an Adventure's actor, or the delta of an
+ * Adventure scene's token. Each write edits the Adventure's working copy; the walk stores the working copy in one
+ * write when it leaves the Adventure (AdventureContent), so the target's writes are stored, or not, together. A
+ * created effect is built by `TitanActiveEffect.buildCreationSource`, so it stores what a created document stores. A
+ * deleted Item is removed from the data, never replaced by an ActorDelta tombstone: an Adventure token's delta is
+ * migrated from what it stores itself, and its base actor's own Items migrate where that actor is stored.
+ * @param {object} holder - The working copy's data holding `items` and `effects`.
+ * @param {AdventureContent} content - The Adventure field the working copy belongs to.
  * @returns {StoredActorTarget} Readers and writers of the working copy.
  */
-function createSourceTarget(holder, persist) {
+function createSourceTarget(holder, content) {
    holder.items ??= [];
    holder.effects ??= [];
    return {
@@ -244,20 +371,25 @@ function createSourceTarget(holder, persist) {
             ...entry,
             _id: foundry.utils.randomID(),
          }));
-         holder.effects.push(...created);
-         await persist();
+         if (created.length > 0) {
+            holder.effects.push(...created);
+            content.markWritten();
+         }
          return created;
       },
       deleteItems: async (ids) => {
          /** @type {string[]} The ids of the Items removed. */
          const deleted = holder.items.filter((item) => ids.includes(item._id)).map((item) => item._id);
-         holder.items = holder.items.filter((item) => !ids.includes(item._id));
-         await persist();
+         if (deleted.length > 0) {
+            holder.items = holder.items.filter((item) => !ids.includes(item._id));
+            content.markWritten();
+         }
          return deleted;
       },
       readEffects: () => holder.effects,
       readHeldEffects: () => holder.effects.filter((effect) => !effect._tombstone),
       readItems: () => holder.items,
+      stored: () => content.stored(),
       updateEffects: async (updates) => {
          /** @type {object[]} The updated effects' data. */
          const updated = [];
@@ -269,7 +401,9 @@ function createSourceTarget(holder, persist) {
                updated.push(effect);
             }
          }
-         await persist();
+         if (updated.length > 0) {
+            content.markWritten();
+         }
          return updated;
       },
    };
@@ -296,33 +430,34 @@ function createTokenTarget(token) {
 }
 
 /**
- * Creates the loader of one packed Adventure's content for one walk: it loads the Adventure on the first write and
- * holds a working copy of one content field. An Adventure's actors and scenes are data, not embedded documents, so a
- * write persists the whole field through `Adventure#update`.
+ * Creates the loader of one packed Adventure's content field for one walk: it loads the Adventure on the first open
+ * of one of the field's actors or scene tokens, and stores the field's changes when the walk leaves the Adventure.
  * @param {CompendiumCollection} pack - The world Adventure pack holding the Adventure.
  * @param {string} id - The id of the Adventure within its pack.
  * @param {PackWriteAccess} access - The pack's write access.
  * @param {'actors'|'scenes'} field - The content field.
- * @returns {() => Promise<AdventureContent|null>} Loads the content; resolves null when the Adventure is gone.
+ * @returns {AdventureContentLoader} Loads the content, and stores its changes.
  */
 function createAdventureLoader(pack, id, access, field) {
    /** @type {AdventureContent|null} The loaded content, once loaded. */
    let content = null;
-   return async () => {
-      if (!content) {
-         await access.unlock();
+   return {
+      commit: async () => {
+         await content?.commit();
+      },
+      load: async () => {
+         if (!content) {
+            await access.unlock();
 
-         /** @type {Adventure|null} The packed Adventure. */
-         const adventure = await pack.getDocument(id);
-         if (!adventure) {
-            return null;
+            /** @type {Adventure|null} The packed Adventure. */
+            const adventure = await pack.getDocument(id);
+            if (!adventure) {
+               return null;
+            }
+            content = createAdventureContent(adventure, field);
          }
-         content = {
-            adventure,
-            entries: structuredClone(adventure._source[field] ?? []),
-         };
-      }
-      return content;
+         return content;
+      },
    };
 }
 
@@ -427,77 +562,87 @@ function* walkScenePackRecord(pack, record, access) {
 }
 
 /**
- * Walks the actors of one projected record of a world Adventure pack.
+ * Walks the actors of one projected record of a world Adventure pack, and stores their changes in one write of the
+ * Adventure's `actors` once the walk leaves the record, also when the consumer stops early.
  * @param {CompendiumCollection} pack - The world pack the record was projected from.
  * @param {object} record - The projected Adventure.
  * @param {PackWriteAccess} access - The pack's write access.
- * @returns {Generator<StoredActorSource>} A generator over the Adventure's actors.
+ * @returns {AsyncGenerator<StoredActorSource>} A generator over the Adventure's actors.
  * @yields {StoredActorSource} The next actor.
  */
-function* walkAdventureActorRecord(pack, record, access) {
-   /** @type {() => Promise<AdventureContent|null>} Loads the Adventure's actors. */
-   const loadActors = createAdventureLoader(pack, record._id, access, 'actors');
-   for (const actor of record.actors ?? []) {
-      yield {
-         effects: actor.effects ?? [],
-         items: actor.items ?? [],
-         location: 'adventureActor',
-         name: `${pack.metadata.label}: ${record.name}: ${actor.name}`,
-         open: async () => {
-            /** @type {AdventureContent|null} The Adventure's actors. */
-            const content = await loadActors();
+async function* walkAdventureActorRecord(pack, record, access) {
+   /** @type {AdventureContentLoader} The Adventure's actors, loaded on the first open. */
+   const actors = createAdventureLoader(pack, record._id, access, 'actors');
+   try {
+      for (const actor of record.actors ?? []) {
+         yield {
+            effects: actor.effects ?? [],
+            items: actor.items ?? [],
+            location: 'adventureActor',
+            name: `${pack.metadata.label}: ${record.name}: ${actor.name}`,
+            open: async () => {
+               /** @type {AdventureContent|null} The Adventure's actors. */
+               const content = await actors.load();
 
-            /** @type {object|undefined} The actor's working copy. */
-            const source = content?.entries.find((entry) => entry._id === actor._id);
-            return source
-               ? createSourceTarget(source, () => content.adventure.update({ actors: content.entries }))
-               : null;
-         },
-      };
+               /** @type {object|undefined} The actor's working copy. */
+               const source = content?.entries.find((entry) => entry._id === actor._id);
+               return source ? createSourceTarget(source, content) : null;
+            },
+         };
+      }
+   }
+   finally {
+      await actors.commit();
    }
 }
 
 /**
- * Walks the unlinked scene tokens of one projected record of a world Adventure pack, from each token's stored delta.
+ * Walks the unlinked scene tokens of one projected record of a world Adventure pack, from each token's stored delta,
+ * and stores their changes in one write of the Adventure's `scenes` once the walk leaves the record, also when the
+ * consumer stops early.
  * @param {CompendiumCollection} pack - The world pack the record was projected from.
  * @param {object} record - The projected Adventure.
  * @param {PackWriteAccess} access - The pack's write access.
- * @returns {Generator<StoredActorSource>} A generator over the Adventure's unlinked scene tokens.
+ * @returns {AsyncGenerator<StoredActorSource>} A generator over the Adventure's unlinked scene tokens.
  * @yields {StoredActorSource} The next unlinked token.
  */
-function* walkAdventureSceneRecord(pack, record, access) {
-   /** @type {() => Promise<AdventureContent|null>} Loads the Adventure's scenes. */
-   const loadScenes = createAdventureLoader(pack, record._id, access, 'scenes');
-   for (const scene of record.scenes ?? []) {
-      for (const token of scene.tokens ?? []) {
-         if (token.actorLink) {
-            continue;
-         }
-         yield {
-            effects: token.delta?.effects ?? [],
-            items: token.delta?.items ?? [],
-            location: 'adventureSceneToken',
-            name: `${pack.metadata.label}: ${record.name}: ${scene.name}: ${token.name}`,
-            open: async () => {
-               /** @type {AdventureContent|null} The Adventure's scenes. */
-               const content = await loadScenes();
+async function* walkAdventureSceneRecord(pack, record, access) {
+   /** @type {AdventureContentLoader} The Adventure's scenes, loaded on the first open. */
+   const scenes = createAdventureLoader(pack, record._id, access, 'scenes');
+   try {
+      for (const scene of record.scenes ?? []) {
+         for (const token of scene.tokens ?? []) {
+            if (token.actorLink) {
+               continue;
+            }
+            yield {
+               effects: token.delta?.effects ?? [],
+               items: token.delta?.items ?? [],
+               location: 'adventureSceneToken',
+               name: `${pack.metadata.label}: ${record.name}: ${scene.name}: ${token.name}`,
+               open: async () => {
+                  /** @type {AdventureContent|null} The Adventure's scenes. */
+                  const content = await scenes.load();
 
-               /** @type {object|undefined} The token's delta in the working copy. */
-               const delta = content?.entries.find((entry) => entry._id === scene._id)?.tokens
-                  ?.find((entry) => entry._id === token._id)?.delta;
-               return delta
-                  ? createSourceTarget(delta, () => content.adventure.update({ scenes: content.entries }))
-                  : null;
-            },
-         };
+                  /** @type {object|undefined} The token's delta in the working copy. */
+                  const delta = content?.entries.find((entry) => entry._id === scene._id)?.tokens
+                     ?.find((entry) => entry._id === token._id)?.delta;
+                  return delta ? createSourceTarget(delta, content) : null;
+               },
+            };
+         }
       }
+   }
+   finally {
+      await scenes.commit();
    }
 }
 
 /**
  * Walks the world packs of one document type for one location. Each pack is read through its server projection; a
  * pack whose projection fails is reported and the walk goes on. A pack a source unlocked to write is locked again
- * once the walk leaves it, also when the consumer stops early.
+ * once the walk leaves it, also when the consumer stops early; an Adventure's field is stored before its pack is
+ * locked again.
  * @param {string} documentName - The packs' document type.
  * @param {string} location - The location walked, which names its projection fields.
  * @param {PackRecordWalker} walkRecord - Yields the stored actors in one record.
@@ -535,7 +680,7 @@ async function* walkWorldPacks(documentName, location, walkRecord) {
 
 /**
  * The walk of each location.
- * @type {Readonly<Record<string, () => (Iterable<StoredActorSource>|AsyncIterable<StoredActorSource>)>>}
+ * @type {Readonly<Record<string, () => StoredActorSourceIterable>>}
  */
 const LOCATION_WALKS = Object.freeze({
    actorPack: () => walkWorldPacks('Actor', 'actorPack', walkActorPackRecord),

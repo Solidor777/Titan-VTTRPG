@@ -13,18 +13,6 @@ Deferred/known bugs. Todos (planned work) live in `docs/TODO.md`; this file is b
 - **Found:** 2026-09-30 by the Task 5 fix round (plan B), measured live.
 - **Status:** Not handled in code by user decision 2026-09-30 (local worlds cleaned one-off).
 
-### 93. Migration writes into an Adventure pack count as stored when Foundry rejected them
-
-- **What:** The Adventure write target in `src/helpers/migration/StoredActorSources.js` (`createSourceTarget`) never
-  checks what `adventure.update` returns. Core resolves `undefined`, without throwing, when the dry-run validation
-  fails or a `preUpdate` hook vetoes the write, so the migration counts the actor as updated and can announce
-  "complete" over writes that were never stored. The legacy-item converter also saves the actor list between creating
-  the new effects and removing the legacy `effect` Items, so that intermediate save still holds an unregistered Item
-  subtype, which core validation likely rejects (inferred from core source, not reproduced live). A rejected working
-  copy is never reset, so later saves for the same Adventure carry it.
-- **Found:** 2026-09-30 by the buddy check of the Task 5 fix round (plan B), read in core source.
-- **Status:** Open; fixed in Task 5 fix round 2.
-
 ### 95. Migration shows "complete" when a world pack could not be read or re-locked
 
 - **What:** `walkWorldPacks` reports a pack whose projection fails and skips it, and the lock restore logs and swallows
@@ -39,14 +27,6 @@ Deferred/known bugs. Todos (planned work) live in `docs/TODO.md`; this file is b
   so its delta keeps legacy `effect` Items and stale condition effects, while the Adventure path migrates such a
   token's delta as data. CLOSED_BUGS #83 says every stored actor is walked, which is not true for these tokens.
 - **Found:** 2026-09-30 by the buddy check of the Task 5 fix round (plan B).
-- **Status:** Open; fixed in Task 5 fix round 2.
-
-### 98. A stored actor whose migration write a hook vetoed counts as skipped
-
-- **What:** `migrateStoredActors` counts an actor whose writes changed nothing as skipped, so a `preCreate`,
-  `preUpdate`, or `preDelete` hook that vetoes a migration write leaves the actor's work pending while the migration
-  announces completion, and the next GM load finds the same work again.
-- **Found:** 2026-09-30 while planning the fix for #93 (read in code).
 - **Status:** Open; fixed in Task 5 fix round 2.
 
 ### 99. An Adventure token whose legacy Item overrides its base actor's legacy Item ends up with two converted effects

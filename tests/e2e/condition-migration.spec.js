@@ -460,3 +460,63 @@ test('Disabled and Prompt leave every stored actor; Automatic migrates each loca
    expect(again.times).toEqual(migrated.times);
    expect(consoleLines.filter((line) => line.includes('Unlocked world pack "E2E Migration'))).toEqual([]);
 });
+
+test('an Adventure write a hook vetoes counts as failed, and the migration does not announce completion', async () => {
+   test.setTimeout(300_000);
+   seeded = await seedStoredActors();
+
+   /** @type {{locked: object, summaries: object, times: object}} The state before any reload. */
+   const seededState = await readState();
+   expect(seededState.summaries).toEqual(everyLocation(UNSYNCED));
+
+   consoleLines.length = 0;
+   await reloadWithMode(page, 'prompt');
+
+   /** @type {{description: string, migrate: string}} The migration dialog's description and confirm label. */
+   const labels = await page.evaluate(() => ({
+      description: game.i18n.localize('LOCAL.confirmMigrateWorld.desc.text'),
+      migrate: game.i18n.localize('LOCAL.migrateWorld.text'),
+   }));
+
+   /** @type {import('@playwright/test').Locator} The migration dialog. */
+   const dialog = page.locator('.application.titan-dialog').filter({ hasText: labels.description });
+   await expect(dialog).toBeVisible();
+
+   // A preUpdateAdventure hook returning false vetoes every Adventure write on this client; core then resolves the
+   // update to undefined without throwing (client/data/client-backend.mjs #preUpdateDocumentArray).
+   await page.evaluate(() => {
+      globalThis.__titanAdventureVeto = Hooks.on('preUpdateAdventure', () => false);
+   });
+   consoleLines.length = 0;
+   await dialog.getByRole('button', {
+      exact: true,
+      name: labels.migrate,
+   }).click();
+
+   // A confirmed migration is a full pass over every location and pack: a multi-second operation, like a world load.
+   await expect.poll(() => consoleLines.find((line) => line.startsWith('TITAN | World migration')) ?? null, {
+      message: 'the confirmed migration finished',
+      timeout: 60_000,
+   }).toBe('TITAN | World migration finished; 2 documents failed to migrate.');
+   await page.evaluate(() => {
+      Hooks.off('preUpdateAdventure', globalThis.__titanAdventureVeto);
+      delete globalThis.__titanAdventureVeto;
+   });
+
+   /** @type {{locked: object, summaries: object, times: object}} The state after the confirmed migration. */
+   const state = await readState();
+   expect(state.summaries).toEqual({
+      ...everyLocation(SYNCED),
+      adventureActor: UNSYNCED,
+      adventureSceneToken: UNSYNCED,
+   });
+   expect(state.times.adventure).toBe(seededState.times.adventure);
+   expect(state.locked).toEqual(ALL_LOCKED);
+   for (const name of [
+      'E2E Migration Adventures: E2E Migration Adventure: E2E Migration Adventure Actor',
+      `E2E Migration Adventures: E2E Migration Adventure: E2E Migration Adventure Scene: ${TOKEN_ACTOR_NAME}`,
+   ]) {
+      expect(consoleLines.some((line) => line.includes(`Failed to migrate the stored actor "${name}"`)), name)
+         .toBe(true);
+   }
+});

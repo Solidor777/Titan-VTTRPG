@@ -61,24 +61,55 @@ const LEGACY_ITEM = {
 };
 
 /**
- * Builds a write target whose writes are spies resolving what they were given.
+ * Builds a write target whose writes are spies that change its stored data as a stored write does: a creation stores
+ * the effects, a deletion removes the Items, and an update applies its rules elements and description deletion. A
+ * target given `updated` resolves that from every update and stores nothing, as a write a hook vetoed.
  * @param {object} [data] - The target's contents.
  * @param {object[]} [data.effects] - The effect data it holds.
  * @param {object[]} [data.items] - The Item data it holds.
- * @param {object[]} [data.updated] - What its updates resolve, when not the updates themselves.
+ * @param {object[]} [data.updated] - What its updates resolve when they store nothing.
  * @returns {object} A stored-actor target with spied writes.
  */
 function makeTarget({ effects = [], items = [], updated } = {}) {
+   /** @type {{effects: object[], items: object[]}} The target's stored data. */
+   const held = {
+      effects: structuredClone(effects),
+      items: structuredClone(items),
+   };
    return {
-      createEffects: vi.fn(async (data) => data.map((entry, index) => ({
-         ...entry,
-         _id: `created${index}`,
-      }))),
-      deleteItems: vi.fn(async (ids) => ids),
-      readEffects: () => effects,
-      readHeldEffects: () => effects,
-      readItems: () => items,
-      updateEffects: vi.fn(async (updates) => updated ?? updates),
+      createEffects: vi.fn(async (data) => {
+         /** @type {object[]} The created effects' data, each with an id. */
+         const created = data.map((entry, index) => ({
+            ...structuredClone(entry),
+            _id: `created${index}`,
+         }));
+         held.effects.push(...created);
+         return created;
+      }),
+      deleteItems: vi.fn(async (ids) => {
+         held.items = held.items.filter((item) => !ids.includes(item._id));
+         return ids;
+      }),
+      readEffects: () => held.effects,
+      readHeldEffects: () => held.effects,
+      readItems: () => held.items,
+      stored: vi.fn(async () => {}),
+      updateEffects: vi.fn(async (updates) => {
+         if (updated) {
+            return updated;
+         }
+         for (const update of updates) {
+            /** @type {object} The effect the update names. */
+            const effect = held.effects.find((entry) => entry._id === update._id);
+            if ('system.rulesElement' in update) {
+               effect.system.rulesElement = structuredClone(update['system.rulesElement']);
+            }
+            if ('flags.titan.description' in update) {
+               delete effect.flags.titan.description;
+            }
+         }
+         return updates;
+      }),
    };
 }
 
@@ -112,6 +143,7 @@ beforeEach(() => {
          error: vi.fn(),
       },
    };
+   vi.spyOn(console, 'error').mockImplementation(() => {});
 });
 
 afterEach(() => {
@@ -179,34 +211,36 @@ describe('storedActorsNeedMigration', () => {
 });
 
 describe('migrateStoredActors', () => {
-   it('opens only the stored actors needing work, converting then syncing each', async () => {
-      /** @type {object} The stale actor's target. */
-      const target = makeTarget({
-         effects: [STALE_BLINDED],
-         items: [LEGACY_ITEM],
-      });
-
-      /** @type {object} A source needing no work. */
-      const clean = makeSource('Clean');
-      walk.sources = [
-         clean,
-         makeSource('Stale', {
+   it('opens only the stored actors needing work, converting then syncing each, and counts them once stored',
+      async () => {
+         /** @type {object} The stale actor's target. */
+         const target = makeTarget({
             effects: [STALE_BLINDED],
             items: [LEGACY_ITEM],
-            target,
-         }),
-      ];
-      expect(await migrateStoredActors()).toEqual({
-         failed: 0,
-         skipped: 0,
-         updated: 1,
+         });
+
+         /** @type {object} A source needing no work. */
+         const clean = makeSource('Clean');
+         walk.sources = [
+            clean,
+            makeSource('Stale', {
+               effects: [STALE_BLINDED],
+               items: [LEGACY_ITEM],
+               target,
+            }),
+         ];
+         expect(await migrateStoredActors()).toEqual({
+            failed: 0,
+            skipped: 0,
+            updated: 1,
+         });
+         expect(clean.open).not.toHaveBeenCalled();
+         expect(target.deleteItems).toHaveBeenCalledWith(['legacy0']);
+         expect(target.updateEffects).toHaveBeenCalledWith([getConditionEffectUpdate(STALE_BLINDED)]);
+         expect(target.createEffects.mock.invocationCallOrder[0])
+            .toBeLessThan(target.updateEffects.mock.invocationCallOrder[0]);
+         expect(target.stored).toHaveBeenCalledTimes(1);
       });
-      expect(clean.open).not.toHaveBeenCalled();
-      expect(target.deleteItems).toHaveBeenCalledWith(['legacy0']);
-      expect(target.updateEffects).toHaveBeenCalledWith([getConditionEffectUpdate(STALE_BLINDED)]);
-      expect(target.createEffects.mock.invocationCallOrder[0])
-         .toBeLessThan(target.updateEffects.mock.invocationCallOrder[0]);
-   });
 
    it('skips a stored actor with nothing left to write to, reporting no error', async () => {
       walk.sources = [makeSource('Gone', { effects: [STALE_BLINDED] })];
@@ -218,7 +252,22 @@ describe('migrateStoredActors', () => {
       expect(ui.notifications.error).not.toHaveBeenCalled();
    });
 
-   it('counts a stored actor whose writes changed nothing as skipped', async () => {
+   it('skips a stored actor that holds no work once opened', async () => {
+      walk.sources = [
+         makeSource('Changed Since The Scan', {
+            effects: [STALE_BLINDED],
+            target: makeTarget(),
+         }),
+      ];
+      expect(await migrateStoredActors()).toEqual({
+         failed: 0,
+         skipped: 1,
+         updated: 0,
+      });
+      expect(ui.notifications.error).not.toHaveBeenCalled();
+   });
+
+   it('counts a stored actor whose write a hook vetoed as failed: its work is left', async () => {
       walk.sources = [
          makeSource('Vetoed', {
             effects: [STALE_BLINDED],
@@ -229,15 +278,58 @@ describe('migrateStoredActors', () => {
          }),
       ];
       expect(await migrateStoredActors()).toEqual({
-         failed: 0,
-         skipped: 1,
+         failed: 1,
+         skipped: 0,
          updated: 0,
       });
+      expect(ui.notifications.error).toHaveBeenCalledTimes(1);
+      expect(ui.notifications.error.mock.calls[0][0]).toContain('"Vetoed"');
+   });
+
+   it('counts a stored actor whose writes were not stored as failed, not updated', async () => {
+      /** @type {object} A target whose writes the database did not store. */
+      const unstored = makeTarget({ effects: [STALE_BLINDED] });
+      unstored.stored.mockRejectedValueOnce(new Error('not stored'));
+      walk.sources = [
+         makeSource('Unstored', {
+            effects: [STALE_BLINDED],
+            target: unstored,
+         }),
+      ];
+      expect(await migrateStoredActors()).toEqual({
+         failed: 1,
+         skipped: 0,
+         updated: 0,
+      });
+      expect(ui.notifications.error.mock.calls[0][0]).toContain('"Unstored"');
+   });
+
+   it('reads the stored outcome of every changed actor only once the walk is over', async () => {
+      /** @type {number[]} How many sources the walk had yielded when each stored outcome was read. */
+      const walkedAtRead = [];
+
+      /** @type {object[]} Two stale actors' targets. */
+      const targets = [
+         makeTarget({ effects: [STALE_BLINDED] }),
+         makeTarget({ effects: [STALE_BLINDED] }),
+      ];
+      for (const target of targets) {
+         target.stored.mockImplementation(async () => {
+            walkedAtRead.push(walk.walked.length);
+         });
+      }
+      walk.sources = targets.map((target, index) => makeSource(`Stale ${index}`, {
+         effects: [STALE_BLINDED],
+         target,
+      }));
+      await migrateStoredActors();
+      expect(walkedAtRead).toEqual([
+         2,
+         2,
+      ]);
    });
 
    it('reports a failed actor\'s update and still syncs the rest', async () => {
-      vi.spyOn(console, 'error').mockImplementation(() => {});
-
       /** @type {object} A target whose update is refused. */
       const refused = makeTarget({ effects: [STALE_BLINDED] });
       refused.updateEffects.mockRejectedValueOnce(new Error('write refused'));
