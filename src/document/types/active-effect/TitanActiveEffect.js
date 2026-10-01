@@ -2,6 +2,7 @@ import AddCustomTraitDialog from '~/document/types/item/dialog/AddCustomTraitDia
 import EditCustomTraitDialog from '~/document/types/item/dialog/EditCustomTraitDialog.js';
 import createItemCheckTemplate from '~/check/types/item-check/ItemCheckTemplate.js';
 import assert from '~/helpers/utility-functions/Assert.js';
+import getEffectCreationChanges from '~/helpers/utility-functions/GetEffectCreationChanges.js';
 
 /**
  * Extends the base ActiveEffect class to implement system-specific logic for Titan.
@@ -13,8 +14,34 @@ import assert from '~/helpers/utility-functions/Assert.js';
 export default class TitanActiveEffect extends foundry.documents.ActiveEffect {
 
    /**
+    * Builds the source data an Active Effect created from the given data stores, for an effect written as data instead
+    * of created as a document (the stored-actor migration writes an Adventure's actors and scene tokens as data, and
+    * core's Adventure import runs no embedded `_preCreate`). The effect is constructed, so its schema cleans the data
+    * as creation cleans it (a string `remaining` cast, a missing one defaulted), and then takes the creation changes
+    * `_preCreate` applies (getEffectCreationChanges) and the `transfer: false` core's `_preCreate` stores for an
+    * actor-owned effect (Foundry v14 `common/documents/active-effect.mjs` `_preCreate`). So the data path stores what
+    * creation stores except `start`, which records a creation moment (world time, combat round) that inline data
+    * lacks; core sets it when an Actor-owned effect is created (`client/documents/active-effect.mjs` `_preCreate`). The
+    * initial-data capture of `_preCreate` (the owning actor's combat initiative) does not apply either: data written
+    * inline has no actor.
+    * @param {object} data - The Active Effect creation data, with its `_id`.
+    * @returns {object} The source data the effect stores.
+    */
+   static buildCreationSource(data) {
+      /** @type {TitanActiveEffect} The effect, constructed outside any collection. */
+      const effect = new this(foundry.utils.deepClone(data));
+      effect.updateSource({
+         ...getEffectCreationChanges(effect),
+         transfer: false,
+      });
+      return effect.toObject();
+   }
+
+   /**
     * Performs initialization logic before document creation.
-    * For the 'effect' subtype, captures initial document data and forces the status icon to always display.
+    * For the 'effect' subtype, captures initial document data, then applies the creation changes
+    * (getEffectCreationChanges): the status icon always shows, and a timed effect is disabled exactly when no time
+    * remains.
     * @override
     * @param {object} data - The initial data object provided to the document creation request.
     * @param {object} options - Additional options which modify the creation request.
@@ -37,20 +64,8 @@ export default class TitanActiveEffect extends foundry.documents.ActiveEffect {
             this.system.onPreCreate(data);
          }
 
-         /** @type {object} - The pre-create source updates to apply in a single pass. */
-         const updateData = {};
-
-         // Force the status icon to always display for effects.
-         if (this.showIcon !== CONST.ACTIVE_EFFECT_SHOW_ICON.ALWAYS) {
-            updateData.showIcon = CONST.ACTIVE_EFFECT_SHOW_ICON.ALWAYS;
-         }
-
-         // Timed effects derive their active state from their duration: active while time remains.
-         if (this.system.duration.type !== 'permanent') {
-            updateData.disabled = this.system.duration.remaining <= 0;
-         }
-
-         this.updateSource(updateData);
+         // The creation changes, read from the data as captured above.
+         this.updateSource(getEffectCreationChanges(this));
       }
 
       return retVal;

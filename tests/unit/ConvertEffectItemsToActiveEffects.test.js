@@ -98,6 +98,7 @@ describe('buildEffectData (raw source contract)', () => {
       expect(result.type).toBe('effect');
       expect(result.description).toBe('<p>Legacy.</p>');
       expect(result.disabled).toBe(false);
+      expect(result.transfer).toBe(false);
       expect(result.system).toEqual({
          rulesElement: [
             {

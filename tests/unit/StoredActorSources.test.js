@@ -471,12 +471,24 @@ beforeEach(() => {
          },
       },
    };
+   // Stand-in for the Active Effect document class: builds a created effect's data, marked so a test sees it was built.
+   globalThis.CONFIG = {
+      ActiveEffect: {
+         documentClass: {
+            buildCreationSource: vi.fn((data) => ({
+               ...structuredClone(data),
+               built: true,
+            })),
+         },
+      },
+   };
    vi.spyOn(console, 'error').mockImplementation(() => {});
 });
 
 afterEach(() => {
    uiErrors.length = 0;
    delete globalThis.ui;
+   delete globalThis.CONFIG;
    delete globalThis.game;
    vi.restoreAllMocks();
    vi.clearAllMocks();
@@ -681,6 +693,7 @@ describe('stored actor targets', () => {
          expect(await target.createEffects([{ name: 'Created' }])).toEqual([
             {
                _id: 'newEffect',
+               built: true,
                name: 'Created',
             },
          ]);
@@ -713,6 +726,7 @@ describe('stored actor targets', () => {
          },
          {
             _id: 'newEffect',
+            built: true,
             name: 'Created',
          },
       ]);
@@ -738,5 +752,35 @@ describe('stored actor targets', () => {
             },
          },
       ]);
+   });
+
+   it('builds each effect an Adventure target creates through the Active Effect class, with a new id', async () => {
+      const { adventure } = makeWorld();
+
+      /** @type {Function} The shared setup's id generator, restored after this test. */
+      const originalRandomID = globalThis.foundry.utils.randomID;
+      globalThis.foundry.utils.randomID = () => 'newEffect';
+      onTestFinished(() => {
+         globalThis.foundry.utils.randomID = originalRandomID;
+      });
+      await walkAll((source) => source.location === 'adventureActor', async (target) => {
+         await target.createEffects([
+            {
+               name: 'Expired',
+               type: 'effect',
+            },
+         ]);
+      });
+      expect(CONFIG.ActiveEffect.documentClass.buildCreationSource).toHaveBeenCalledWith({
+         _id: 'newEffect',
+         name: 'Expired',
+         type: 'effect',
+      });
+      expect(adventure.updates.at(-1).actors[0].effects.at(-1)).toEqual({
+         _id: 'newEffect',
+         built: true,
+         name: 'Expired',
+         type: 'effect',
+      });
    });
 });

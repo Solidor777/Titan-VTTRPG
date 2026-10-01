@@ -1041,6 +1041,25 @@ when fixed.
   tags a turn-start effect with the Turn Start icon, not the Turn End one, and its tooltip leads with the Turn Start
   text).
 
+### 94. Legacy timed effects converted inside an Adventure were stored enabled after they expired
+
+- **What:** `TitanActiveEffect._preCreate` shows an effect's status icon and disables a timed effect with no time
+  remaining. Neither the migration's Adventure write path nor `Adventure#importContent` runs `_preCreate` for embedded
+  effects, and `buildEffectData` stores every timed effect with `disabled: false`, so an expired timed legacy effect
+  converted inside an Adventure applied its rules once the Adventure was imported, while the same effect converted on
+  an actor was disabled.
+- **Found:** 2026-09-30 by the buddy check of the Task 5 fix round (plan B), read in core source.
+- **Fixed:** 2026-09-30 — one rule, `getEffectCreationChanges`
+  (`src/helpers/utility-functions/GetEffectCreationChanges.js`), gives an `effect`-subtype effect's creation changes;
+  `_preCreate` applies it, and the Adventure write path builds every created effect with
+  `TitanActiveEffect.buildCreationSource`, which constructs the effect (so its schema cleans the data as creation does)
+  and applies the same rule and core's `transfer: false`. The data path stores what creation stores except `start`,
+  which records a creation moment that inline data lacks. Gated by `tests/unit/GetEffectCreationChanges.test.js` (the
+  rule), `tests/unit/StoredActorSources.test.js` (the Adventure path builds each created effect through it), and
+  `tests/e2e/effect-creation-source.spec.js` (live: for string, missing, expired, and running durations, permanent
+  effects, a condition, and a legacy-shaped effect as `buildEffectData` builds it, the data built for an Adventure
+  stores the `disabled`, `showIcon`, and `transfer` a created document stores, and no input fails data preparation).
+
 ### 97. A failed version migration stored part-migrated data under the previous version
 
 - **What:** `migrateDocument` in `src/helpers/migration/MigrateWorld.js` accumulated changes across the levels of a

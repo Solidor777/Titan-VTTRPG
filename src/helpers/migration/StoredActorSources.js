@@ -224,7 +224,9 @@ function createDocumentTarget(actor, readSource) {
 
 /**
  * Creates the write target of stored actor data that is not a document (an Adventure's actor, or the delta of an
- * Adventure scene's token): each write edits the data in place and then persists it.
+ * Adventure scene's token): each write edits the data in place and then persists it. A created effect is built by
+ * `TitanActiveEffect.buildCreationSource`, so it stores what creation stores except `start`, which records a creation
+ * moment that inline data lacks.
  * @param {object} holder - The stored data holding `items` and `effects` (a working copy the persist call writes).
  * @param {() => Promise<void>} persist - Writes the working copy back to its document.
  * @returns {StoredActorTarget} Readers and writers of the working copy.
@@ -234,9 +236,12 @@ function createSourceTarget(holder, persist) {
    holder.effects ??= [];
    return {
       createEffects: async (data) => {
-         /** @type {object[]} The created effects' data, each with a new id. */
-         const created = data.map((entry) => ({
-            ...structuredClone(entry),
+         /** @type {typeof TitanActiveEffect} The Active Effect document class, which builds a created effect's data. */
+         const effectClass = CONFIG.ActiveEffect.documentClass;
+
+         /** @type {object[]} The created effects' data, each with a new id, as a created document stores it. */
+         const created = data.map((entry) => effectClass.buildCreationSource({
+            ...entry,
             _id: foundry.utils.randomID(),
          }));
          holder.effects.push(...created);

@@ -1,10 +1,13 @@
 /**
  * Builds Active Effect creation data from a legacy effect Item's raw source data.
  * Maps the legacy item's native and system fields onto the 'effect' Active Effect subtype. The old item used a
- * split active/duration model; under the new universal-disabled model an effect starts ENABLED unless it was an
- * explicitly-deactivated permanent effect. The migrated duration (including its captured initiative) is carried
- * through so the document's _preCreate handler will not override the combat initiative. The status icon is
- * intentionally NOT set here; TitanActiveEffect._preCreate seeds it.
+ * split active/duration model; under the universal-disabled model an effect starts enabled unless it was an
+ * explicitly deactivated permanent effect. The migrated duration (including its captured initiative) is carried
+ * through so the document's _preCreate handler will not override the combat initiative. The status icon and a timed
+ * effect's disabled state are set at creation (getEffectCreationChanges: `TitanActiveEffect._preCreate` for a created
+ * document, `TitanActiveEffect.buildCreationSource` for an effect written as data), so an expired timed effect is
+ * stored disabled. The data sets `transfer: false`, the value core's `_preCreate` stores for an effect whose parent is
+ * an Actor (Foundry v14 `common/documents/active-effect.mjs` `_preCreate`), so the data matches a created document.
  * Operates on stored Item data rather than Item instances, because the 'effect' Item subtype is no longer registered:
  * legacy items fail strict construction, land in invalidDocumentIds, and are invisible to actor.items iteration.
  * Stored data bypasses schema casting, so the active value is normalized here (template-era source persisted
@@ -23,7 +26,7 @@ export function buildEffectData(itemSource) {
    /** @type {boolean} - The normalized active state, mirroring BooleanField casting for template-era strings. */
    const active = typeof rawActive === 'string' ? rawActive === 'true' : Boolean(rawActive);
 
-   /** @type {boolean} - Whether the new effect should start disabled (explicitly-deactivated permanent only). */
+   /** @type {boolean} - Whether a permanent effect starts deactivated; creation sets a timed effect's state. */
    const disabled = system.duration?.type === 'permanent' ? !active : false;
 
    return {
@@ -32,6 +35,7 @@ export function buildEffectData(itemSource) {
       type: 'effect',
       description: system.description ?? '',
       disabled,
+      transfer: false,
       flags: {
          titan: {
             convertedFromItem: itemSource._id,
@@ -72,12 +76,11 @@ export function needsEffectItemConversion(items) {
  * replacements exist: the replacement Active Effects are created first, then the source Items are deleted. Base-type
  * Active Effects (the cosmetic copies older versions kept beside legacy Items) are not handled: TITAN registers only
  * the `effect` and `condition` Active Effect types, so the client cannot construct or delete one. Creation skips a
- * source whose id
- * already has a converted Active Effect the actor has (its `flags.titan.convertedFromItem` stamp, an unlinked token's
- * inherited effects included), so a conversion interrupted between creation and deletion finishes on a later load
- * instead of duplicating effects. Deletion is stamp-verified: only sources whose replacement verifiably exists (a stamp
- * the actor already had, or one on an effect the create returned) are deleted, so a hook's veto of a creation keeps
- * its source for the next load.
+ * source whose id already stamps one of the actor's Active Effects (`flags.titan.convertedFromItem`, an unlinked
+ * token's inherited effects included), so a conversion interrupted between creation and deletion finishes on a later
+ * load instead of duplicating effects. Deletion is stamp-verified: only sources whose replacement verifiably exists (a
+ * stamp the actor already had, or one on an effect the create returned) are deleted, so a hook's veto of a creation
+ * keeps its source for the next load.
  * @param {StoredActorTarget} target - The stored actor, opened for writing.
  * @returns {Promise<boolean>} Whether any write changed the actor.
  */

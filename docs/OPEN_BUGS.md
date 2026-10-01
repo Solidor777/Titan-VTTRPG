@@ -25,16 +25,6 @@ Deferred/known bugs. Todos (planned work) live in `docs/TODO.md`; this file is b
 - **Found:** 2026-09-30 by the buddy check of the Task 5 fix round (plan B), read in core source.
 - **Status:** Open; fixed in Task 5 fix round 2.
 
-### 94. Legacy timed effects converted inside an Adventure are stored enabled after they expired
-
-- **What:** `TitanActiveEffect._preCreate` sets `showIcon` and disables a timed effect whose remaining duration is 0.
-  Neither the migration's Adventure write path nor `Adventure#importContent` runs `_preCreate` for embedded effects,
-  and `buildEffectData` stores every timed effect with `disabled: false`. An expired timed legacy effect converted
-  inside an Adventure therefore applies its rules once the Adventure is imported, while the same effect converted on an
-  actor is disabled.
-- **Found:** 2026-09-30 by the buddy check of the Task 5 fix round (plan B), read in core source.
-- **Status:** Open; fixed in Task 5 fix round 2.
-
 ### 95. Migration shows "complete" when a world pack could not be read or re-locked
 
 - **What:** `walkWorldPacks` reports a pack whose projection fails and skips it, and the lock restore logs and swallows
