@@ -45,10 +45,17 @@ Deferred/known bugs. Todos (planned work) live in `docs/TODO.md`; this file is b
   - An earlier run whose actors and effects were made through the document API gave the same result (`repro102/`).
 - **Cause:** unknown. Not attributed to Foundry core or to TITAN. TITAN's clear is one batch
   `deleteEmbeddedDocuments('ActiveEffect', ids)` on the token's actor (`CharacterDataModel.js:4870-4883`, read).
-- **Next measurements:**
-  - The same clear in `test-pf2e`, which does not load TITAN.
-  - A single effect deleted with the row button on a `delta: null` token.
-  - The clear on a token whose delta already exists.
+- **Follow-up, measured the same way (3 runs each, websocket frames in all; `repro102b/c1.log`-`c3.log`):**
+  - **One effect deleted** with its row button on a `delta: null` token is stored: a delta with one tombstone,
+    present right after the delete and after a reload.
+  - **The clear on a token whose delta already exists** is stored. The delta was created first by a real edit, a
+    Stamina change on the token sheet. Both tombstones were present right after the clear and after a reload.
+  - **The request shape is the same in all three cases:** one `ActiveEffect` `delete` with the same parent and a
+    success reply. Only the number of ids and whether a delta already existed differ.
+  - **Inferred, not proven:** only a delete of two or more documents on a token with no stored delta is lost. This
+    fits the user's report that bulk clears persist on tokens that have been edited.
+- **Next measurement:** the same steps in `test-pf2e`, which does not load TITAN, to separate a TITAN cause from a
+  Foundry one.
 - **Found:** 2026-10-01 while the Task 5 fix round 2 identity e2e (plan B) was seeding its tokens.
 - **Status:** Open. Reproduced through real flows; cause not yet located.
 
