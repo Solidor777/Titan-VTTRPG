@@ -37,6 +37,13 @@ const ITEM = {
    type: 'effect',
 };
 
+/** @type {object} A stored Item of a registered subtype: a valid document, which core's base collection holds. */
+const COMMODITY = {
+   _id: 'commodity0',
+   name: 'Commodity',
+   type: 'commodity',
+};
+
 /** @type {object} A legacy effect Item with the stored system data the converter reads. */
 const LEGACY_ITEM = {
    _id: 'legacy0',
@@ -595,16 +602,21 @@ function applyStoredUpdate(stored, update) {
 }
 
 /**
- * Builds a fake actor document whose embedded writes change its stored data the way the client's source shows them: a
- * creation stores the effects, a deletion removes the Items (core splices a deleted invalid Item from the client
- * source and resolves no document), and an update applies its dotted paths. A token's synthetic actor stores its
- * writes in the token's delta, where the server also keeps a tombstone for a deleted Item its base actor holds too;
- * the fake does not model that tombstone, so the tests pin the client-visible outcome.
+ * Builds a fake actor document whose embedded writes change its stored data as core stores them: a creation stores
+ * the effects, an update applies its dotted paths, and a deletion of Items or Active Effects (by `embeddedName`)
+ * removes the entries the data holds and resolves no document (core splices a deleted invalid Item from the client
+ * source). Given a base actor, the fake is a token's delta, and a deletion leaves a tombstone (`{_id, _tombstone:
+ * true}`) where the base actor holds a valid entry with the id, as core stores a token's deletion (measured after a
+ * reload: a tombstone over a valid base Item, none for an id the base actor lacks). A legacy effect Item of the base
+ * actor takes no tombstone: it is an invalid document, which core's base collection never holds, and core's client
+ * deletion tombstones only an id its base collection holds; that case is not measured, because the server refuses a
+ * legacy Item, so none can be seeded.
  * @param {string} id - The document id.
  * @param {object} data - The stored data: its `effects` and `items`.
+ * @param {object|null} [base] - The token's base actor (a fake holding `_source`); null for any other actor.
  * @returns {object} The fake document; `_source` holds its stored data.
  */
-function makeStoredDelta(id, data) {
+function makeStoredDelta(id, data, base = null) {
    /** @type {object} The fake document, referenced by its own spies. */
    const stored = {
       _source: structuredClone(data),
@@ -618,7 +630,20 @@ function makeStoredDelta(id, data) {
          return created.map((entry) => ({ toObject: () => structuredClone(entry) }));
       }),
       deleteEmbeddedDocuments: vi.fn(async (embeddedName, ids) => {
-         stored._source.items = stored._source.items.filter((entry) => !ids.includes(entry._id));
+         /** @type {'effects'|'items'} The stored collection the deletion changes. */
+         const collection = embeddedName === 'Item' ? 'items' : 'effects';
+
+         /** @type {Set<string>} The ids of the base actor's valid entries of the collection. */
+         const baseIds = new Set((base?._source[collection] ?? [])
+            .filter((entry) => collection !== 'items' || entry.type !== 'effect')
+            .map((entry) => entry._id));
+         stored._source[collection] = [
+            ...stored._source[collection].filter((entry) => !ids.includes(entry._id)),
+            ...ids.filter((entryId) => baseIds.has(entryId)).map((entryId) => ({
+               _id: entryId,
+               _tombstone: true,
+            })),
+         ];
          return [];
       }),
       id,
@@ -1113,13 +1138,18 @@ describe('stored actor targets', () => {
       });
 
    it('writes an Adventure token\'s deletions and creations as core writes an ActorDelta\'s', async () => {
-      /** @type {object} An Adventure whose token's base actor holds a conversion and an Item the token holds too. */
+      /** @type {object} An Adventure whose token's base actor holds a conversion and a valid Item the token holds. */
       const adventure = makeFakeAdventure({
          actors: [
             {
                _id: 'baseActor',
                effects: [makeConversion('item0', 'item0')],
-               items: [structuredClone(ITEM)],
+               items: [
+                  {
+                     ...structuredClone(COMMODITY),
+                     _id: 'item0',
+                  },
+               ],
                name: 'Base Actor',
             },
          ],
@@ -1179,6 +1209,64 @@ describe('stored actor targets', () => {
          ],
       });
    });
+
+   it('stores an Adventure token\'s Item deletion as core stores a token\'s: a tombstone only over a valid base Item',
+      async () => {
+         /** @type {object} An Adventure whose token holds Items over a valid and a legacy base Item, and its own. */
+         const adventure = makeFakeAdventure({
+            actors: [
+               {
+                  _id: 'baseActor',
+                  effects: [],
+                  items: [
+                     structuredClone(COMMODITY),
+                     structuredClone(LEGACY_ITEM),
+                  ],
+                  name: 'Base Actor',
+               },
+            ],
+            scenes: makeTokenScenes('baseActor', {
+               effects: [],
+               items: [
+                  {
+                     ...structuredClone(COMMODITY),
+                     name: 'Token Override',
+                  },
+                  {
+                     ...structuredClone(LEGACY_ITEM),
+                     name: 'Token Legacy Override',
+                  },
+                  {
+                     ...structuredClone(COMMODITY),
+                     _id: 'ownItem',
+                     name: 'Own Item',
+                  },
+               ],
+            }),
+         });
+         installAdventureWorld(adventure);
+         await walkAll((source) => source.location === 'adventureSceneToken', async (target) => {
+            expect(await target.deleteItems([
+               'commodity0',
+               'legacy0',
+               'ownItem',
+            ])).toEqual([
+               'commodity0',
+               'legacy0',
+               'ownItem',
+            ]);
+         });
+
+         // Core stores a tombstone over the base actor's valid Item and none for the Item the base actor lacks
+         // (measured after a reload). The base actor's legacy Item is an invalid document, which core's base
+         // collection never holds, so its id takes no tombstone either.
+         expect(adventure.updates[0].scenes[0].tokens[0].delta.items).toEqual([
+            {
+               _id: 'commodity0',
+               _tombstone: true,
+            },
+         ]);
+      });
 });
 
 describe('Adventure writes', () => {
@@ -1687,13 +1775,9 @@ describe('the stored-actor pass over the walk', () => {
          },
       ]);
 
-      // The base actor still held the Item, so the deletion left a tombstone: core's rule for an inherited document.
-      expect(delta.items).toEqual([
-         {
-            _id: 'legacy0',
-            _tombstone: true,
-         },
-      ]);
+      // The base actor's Item is a legacy Item, an invalid document core's base collection never holds, so the
+      // deletion left no tombstone.
+      expect(delta.items).toEqual([]);
 
       // The next load converts the base actor; its conversion takes the slot the token's own effect overrides.
       expect(await migrateStoredActors()).toEqual({
@@ -1732,7 +1816,7 @@ describe('the stored-actor pass over the walk', () => {
                name: 'Token Override',
             },
          ],
-      });
+      }, base);
       globalThis.game = {
          actors: new FakeCollection([base]),
          packs: [],
@@ -1794,6 +1878,62 @@ describe('the stored-actor pass over the walk', () => {
       expect(tokenDelta.createEmbeddedDocuments).toHaveBeenCalledTimes(1);
       expect(tokenDelta.deleteEmbeddedDocuments).toHaveBeenCalledTimes(1);
    });
+
+   it('hides the base actor\'s conversion of a legacy Item a world token removed behind an effect tombstone',
+      async () => {
+         /** @type {object} The base world actor, holding the conversion of a legacy Item. */
+         const base = Object.assign(makeStoredDelta('baseActor', {
+            effects: [makeConversion('legacy0', 'legacy0')],
+            items: [],
+         }), { name: 'Base Actor' });
+
+         /** @type {object} The token's delta, which removed the base actor's legacy Item before it converted. */
+         const tokenDelta = makeStoredDelta('tokenDelta', {
+            effects: [],
+            items: [
+               {
+                  _id: 'legacy0',
+                  _tombstone: true,
+               },
+            ],
+         }, base);
+         globalThis.game = {
+            actors: new FakeCollection([base]),
+            packs: [],
+            scenes: [
+               {
+                  tokens: [
+                     {
+                        _source: {
+                           delta: tokenDelta._source,
+                        },
+                        actor: tokenDelta,
+                        actorId: 'baseActor',
+                        actorLink: false,
+                        baseActor: base,
+                        delta: tokenDelta,
+                        id: 'worldToken',
+                        name: 'World Token',
+                     },
+                  ],
+               },
+            ],
+            user: { id: 'gm0' },
+         };
+         expect(await migrateStoredActors()).toEqual({
+            failed: 0,
+            skipped: 0,
+            updated: 1,
+         });
+         expect(tokenDelta.deleteEmbeddedDocuments).toHaveBeenCalledWith('ActiveEffect', ['legacy0']);
+         expect(tokenDelta._source.effects).toEqual([
+            {
+               _id: 'legacy0',
+               _tombstone: true,
+            },
+         ]);
+         expect(await storedActorsNeedMigration()).toBe(false);
+      });
 
    it('hides the base actor\'s conversion of a legacy Item an Adventure token removed', async () => {
       /** @type {object} An Adventure whose token removed its base actor's legacy Item. */

@@ -1178,12 +1178,16 @@ when fixed.
 - **Found:** 2026-09-30 while planning the fix for #99.
 - **Fixed:** 2026-10-01 — the identity change of #99: both conversions take the Item's id, so whichever side converts
   first, and whether or not the other side's write is stored, the token's own effect overrides the base actor's. A
-  token's Item deletion in an Adventure leaves a tombstone where its base actor still holds the Item (core's rule for a
-  deleted inherited document). Gated by `tests/unit/StoredActorSources.test.js`: "keeps one effect on an Adventure
-  token whose base actor converts only on a later load" (the first load's `actors` write is not stored) and "keeps one
-  effect on a world token whose base actor's conversion is stored only on a later load" (the base actor's creation is
-  not stored); in both the next load converts the base actor, and the token keeps one effect and takes no write.
-  Unit-gated only: no e2e can seed a legacy effect Item.
+  token's Item deletion in an Adventure stores what core stores for a world token's deletion: a tombstone where the
+  base actor holds a valid Item with the id, and none for an Item the base actor lacks (both measured live after a
+  reload). A legacy `effect` Item of the base actor takes no tombstone: it is an invalid document, which core's base
+  collection never holds, and core's client deletion tombstones only an id its base collection holds. That case
+  follows core's client deletion and is not measured: the server refuses a legacy Item, so none can be seeded. Gated
+  by `tests/unit/StoredActorSources.test.js`: "keeps one effect on an Adventure token whose base actor converts only
+  on a later load" (the first load's `actors` write is not stored) and "keeps one effect on a world token whose base
+  actor's conversion is stored only on a later load" (the base actor's creation is not stored); in both the next load
+  converts the base actor, and the token keeps one effect and takes no write. "stores an Adventure token's Item
+  deletion as core stores a token's" gates the tombstones. Unit-gated only: no e2e can seed a legacy effect Item.
 
 ### 101. An inherited legacy Item a token removed came back as a converted effect
 

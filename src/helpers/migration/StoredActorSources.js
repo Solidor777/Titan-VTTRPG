@@ -264,12 +264,13 @@ function inheritedEntriesOf(deltaEntries, baseEntries) {
 /**
  * Deletes entries from stored embedded data the way core deletes them from an ActorDelta's collection (Foundry v14
  * `common/abstract/embedded-collection-delta.mjs` `_delete`): the entry the data holds itself is removed, and when the
- * base actor holds an entry with the id, a tombstone (`{_id, _tombstone: true}`) takes its place so the base entry
- * stays hidden. Data without a base actor (an Adventure's actor) only loses the entry. Only an entry the data shows
- * is deleted: one it holds itself, or one it inherits.
+ * base actor's collection holds an entry with the id, a tombstone (`{_id, _tombstone: true}`) takes its place so the
+ * base entry stays hidden. Data without a base actor (an Adventure's actor) only loses the entry. Only an entry the
+ * data shows is deleted: one it holds itself, or one it inherits.
  * @param {object[]} entries - The stored entries of the collection, changed in place, tombstones included.
  * @param {string[]} ids - The ids to delete.
- * @param {Set<string>} baseIds - The ids of the base actor's entries of the collection; empty without a base actor.
+ * @param {Set<string>} baseIds - The ids of the entries the base actor's collection holds (readBaseIds); empty without
+ * a base actor.
  * @returns {string[]} The ids deleted.
  */
 function deleteFromData(entries, ids, baseIds) {
@@ -451,12 +452,18 @@ function createAdventureContent(adventure, field) {
  * Creates the write target of stored actor data that is not a document: an Adventure's actor, or the delta of an
  * Adventure scene's token. Each write edits the Adventure's working copy; the walk stores the working copy in one
  * write when it leaves the Adventure (AdventureContent), so the target's writes are stored, or not, together. The
- * writes follow core's ActorDelta rules, so the stored data is what core's own writes would store. A created effect is
- * built by `TitanActiveEffect.buildCreationSource`, so it stores what a created document stores, and keeps the `_id`
- * its data gives (core's `keepId`; a new id only when it gives none); it replaces a tombstone with its id, and an id
- * the token already shows is refused, as the server refuses one its parent collection holds (Foundry v14
- * `dist/database/backend/server-backend.mjs` `_createDocuments`). A deletion removes the entry the data holds and,
- * when the token's base actor holds the id, leaves a tombstone (deleteFromData).
+ * writes follow core's ActorDelta rules. A created effect is built by `TitanActiveEffect.buildCreationSource`, so it
+ * stores what a created document stores, and keeps the `_id` its data gives (core's `keepId`; a new id only when it
+ * gives none); it replaces a tombstone with its id, and an id the token already shows is refused, as the server
+ * refuses one its parent collection holds (Foundry v14 `dist/database/backend/server-backend.mjs` `_createDocuments`).
+ * A deletion removes the entry the data holds and, when the token's base actor holds the id, leaves a tombstone
+ * (deleteFromData): what core stores for a world token's deletion, measured after a reload (a tombstone over a valid
+ * base Item, none for an Item the base actor lacks). A legacy effect Item of the base actor takes no tombstone: its
+ * subtype is unregistered, so it is an invalid document, which core never holds in a base collection
+ * (`common/abstract/embedded-collection.mjs` `_initializeDocument`), and core's client deletion tombstones only an id
+ * its base collection holds (`common/abstract/embedded-collection-delta.mjs` `_delete`). That case follows core's
+ * client deletion; its stored outcome is not measured, because the server refuses a legacy Item, so none can be
+ * seeded. A base entry invalid for any other reason is not detected, and its id still takes a tombstone.
  * @param {object} holder - The working copy's data holding `items` and `effects`.
  * @param {AdventureContent} content - The Adventure field the working copy belongs to.
  * @param {() => object|null} [readBaseSource] - Reads an Adventure token's base actor's stored data
@@ -474,11 +481,14 @@ function createSourceTarget(holder, content, readBaseSource = () => null) {
    const readInheritedEffects = () => inheritedEntriesOf(holder.effects, readBaseSource()?.effects ?? []);
 
    /**
-    * Reads the ids of the base actor's entries of one collection.
+    * Reads the ids of the entries the base actor's collection holds: its stored entries of the collection, except its
+    * legacy effect Items, which are invalid documents core keeps out of a collection.
     * @param {'effects'|'items'} collection - Which embedded collection: `effects` or `items`.
     * @returns {Set<string>} The ids; empty without a base actor.
     */
-   const readBaseIds = (collection) => new Set((readBaseSource()?.[collection] ?? []).map((entry) => entry._id));
+   const readBaseIds = (collection) => new Set((readBaseSource()?.[collection] ?? [])
+      .filter((entry) => collection !== 'items' || !isLegacyEffectItem(entry))
+      .map((entry) => entry._id));
    return {
       createEffects: async (data) => {
          /** @type {typeof TitanActiveEffect} The Active Effect document class, which builds a created effect's data. */

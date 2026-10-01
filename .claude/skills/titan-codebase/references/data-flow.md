@@ -475,8 +475,11 @@ legacy `effect` Item (unregistered subtype) left in any actor fails the write. T
 write's error names the entries still holding a legacy `effect` Item (`describeLegacyHolders`), the ones to fix for the
 Adventure to migrate. Created effects are built by `TitanActiveEffect.buildCreationSource` and keep their ids. An
 Adventure target follows core's ActorDelta rules (`deleteFromData`): a deletion removes the entry the data holds and
-leaves a tombstone where the base actor holds the id; a creation replaces a tombstone with its id and refuses an id the
-token already shows. An Adventure scene token's base actor is the Adventure's actor with the token's `actorId` (core's
+leaves a tombstone where the base actor's collection holds the id, as core stores a world token's deletion (measured
+after a reload: a tombstone over a valid base Item, none for an Item the base lacks); a base actor's legacy `effect`
+Item is an invalid document, which core keeps out of a collection, so its id takes no tombstone (core's client
+`_delete`; not measured, as no legacy Item can be seeded); a creation replaces a tombstone with its id and refuses an id
+the token already shows. An Adventure scene token's base actor is the Adventure's actor with the token's `actorId` (core's
 Adventure import keeps ids), else the world actor (`readAdventureBaseSource`); the scene-token projection includes
 `actors` for it, read after the walk stored the Adventure's actors.
 
