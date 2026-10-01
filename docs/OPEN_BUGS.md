@@ -42,14 +42,43 @@ Deferred/known bugs. Todos (planned work) live in `docs/TODO.md`; this file is b
 - **Found:** 2026-09-30 while planning the fix for #99.
 - **Status:** Open; fixed in Task 5 fix round 2.
 
-### 102. Removing an inherited Item from an unlinked token does not survive a reload, and can take the token's own effects with it
+### 102. A multi-document create or delete on an unlinked token that has no stored delta is lost, along with every later write to that token
 
-- **What:** On an unlinked token, deleting an Item the token inherits from its base actor (through the token's
-  synthetic actor) shows the Item removed, but after a reload the token has the Item again: the stored delta holds no
-  tombstone for it. When the delta holds such tombstones, an effect the token owns itself is also missing after the
-  reload, although the same effect survives a reload when no tombstone is involved. Measured live in `test-titan` with
-  Migration Mode Disabled, so the migration pass is not the cause. Whether the loss is in Foundry core or in TITAN
-  code, and whether it is never stored or stored then overwritten, is not yet known.
-- **Found:** 2026-10-01 while the Task 5 fix round 2 identity e2e (plan B) was seeding its tokens; confirmed a bug by
-  the user.
-- **Status:** Open; root-cause diagnosis in progress.
+- **What:** An unlinked token whose stored `delta` is `null` loses a create or delete of two or more embedded
+  documents through its synthetic actor. Core stores a `null` delta when the token is named like its base actor,
+  which is core's default name. Examples are a two-effect create, or a two-id delete of inherited Items or effects.
+  The client shows the change, and the server replies that every id succeeded, but nothing is stored. Every later
+  delta write to that token is lost too, until something writes the Token record itself, for example moving the
+  token. One-document calls, updates, and any call once the delta exists are stored. TITAN calls that send such a
+  multi-document request:
+  - `removeExpiredEffects` (`CharacterDataModel.js:4881`);
+  - combat-effect cleanup (`:4908`);
+  - turn-start expired-effect removal (`:5716`);
+  - dropping several Items onto a token's sheet (`TitanActor.js:103` via `TitanActorSheet.js:393`).
+
+  The sheet itself writes to the right document, the token's ActorDelta (measured). Cause, read in minified core
+  `dist/database/backend/server-backend.mjs` and `embedded-delta.mjs` (not instrumented): `_createDocuments` and
+  `_deleteDocuments` share one `writeParent` options object across documents processed concurrently. The first
+  document's walk returns the Token, because the delta must be created. The second document's walk overwrites that
+  with the ActorDelta, so only the delta is written and the Token keeps `delta: null`.
+- **Found:** 2026-10-01 while the Task 5 fix round 2 identity e2e (plan B) was seeding its tokens. The user confirmed
+  it is a bug. Measured live in `test-titan` with Migration Mode Disabled.
+- **Status:** Open. The Foundry core defect needs a TITAN-side mitigation and an upstream report.
+
+### 103. Deleting an item or effect without confirmation still tries to open the confirmation dialog
+
+- **What:** `requestItemDeletion` and `requestEffectDeletion` (`CharacterDataModel.js:6331-6351`, `:6375-6396`)
+  delete at once when confirmation is off. They then fall through to the "Otherwise, confirm" branch: there is no
+  `else`. The document is normally already gone, so no dialog opens. If the delete was vetoed or failed, the
+  confirmation dialog opens after the user turned confirmation off.
+- **Found:** 2026-10-01 while diagnosing #102 (read in code).
+- **Status:** Open.
+
+### 104. Open sheets re-render on changes to a different actor that shares their id
+
+- **What:** `ReactiveDocument.svelte.js` invalidates on `update<Document>` and on embedded Item/ActiveEffect hooks
+  when the changed document's `id`, or its parent's, equals the bridged document's `id`. An unlinked token's synthetic
+  actor has its base actor's id, so changes to any token's synthetic actor invalidate an open base-actor sheet, and
+  the reverse. It should compare document identity, or `uuid`.
+- **Found:** 2026-10-01 while diagnosing #102 (read in code).
+- **Status:** Open.
