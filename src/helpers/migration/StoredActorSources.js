@@ -34,11 +34,20 @@ import { isLegacyEffectItem } from '~/helpers/migration/ConvertEffectItemsToActi
  */
 
 /**
+ * A failure the walk met outside the stored actors it yields: a world pack it could not read (its actors went
+ * unchecked), or a pack whose lock it could not restore. The walk reports each one as it happens and records it, so
+ * its consumer counts it (migrateStoredActors) or treats an unread pack as pending work (storedActorsNeedMigration).
+ * @typedef {object} StoredActorWalkFailure
+ * @property {string} subject - What failed, for the log: `pack "<label>"` or `the lock of pack "<label>"`.
+ * @property {Error} error - What the walk caught.
+ */
+
+/**
  * A world pack's write access during one walk.
  * @typedef {object} PackWriteAccess
  * @property {() => Promise<void>} unlock - Unlocks the pack when it is locked, before a write.
  * @property {() => Promise<void>} restore - Locks the pack again when this walk tried to unlock it; a failure is
- * reported, never thrown, so it cannot mask an error from the pack's writes.
+ * reported and recorded as a walk failure, never thrown, so it cannot mask an error from the pack's writes.
  */
 
 /**
@@ -161,9 +170,10 @@ function readPackProjection(pack, fields) {
  * Creates a world pack's write access for one walk: the pack is unlocked only before a write, so a walk that writes
  * nothing never touches its lock, and the lock is restored once the walk leaves the pack.
  * @param {CompendiumCollection} pack - The world pack.
+ * @param {StoredActorWalkFailure[]} failures - Receives a failure to restore the lock.
  * @returns {PackWriteAccess} The unlock and restore calls of this walk over the pack.
  */
-function createPackWriteAccess(pack) {
+function createPackWriteAccess(pack, failures) {
    /** @type {boolean} Whether this walk tried to unlock the pack, so its lock must be restored. */
    let unlockTried = false;
    return {
@@ -176,6 +186,10 @@ function createPackWriteAccess(pack) {
          }
          catch (err) {
             error(`Failed to restore the lock on pack "${pack.metadata.label}"; the pack is left unlocked.`, err);
+            failures.push({
+               error: err,
+               subject: `the lock of pack "${pack.metadata.label}"`,
+            });
          }
       },
       unlock: async () => {
@@ -640,18 +654,23 @@ async function* walkAdventureSceneRecord(pack, record, access) {
 
 /**
  * Walks the world packs of one document type for one location. Each pack is read through its server projection; a
- * pack whose projection fails is reported and the walk goes on. A pack a source unlocked to write is locked again
- * once the walk leaves it, also when the consumer stops early; an Adventure's field is stored before its pack is
- * locked again.
+ * pack whose projection fails is reported and recorded as a walk failure, and the walk goes on. A pack one location
+ * of this walk could not read is not read again by the next (an Adventure pack is walked for its actors and for its
+ * scene tokens), so each unreadable pack is one failure. A pack a source unlocked to write is locked again once the
+ * walk leaves it, also when the consumer stops early; an Adventure's field is stored before its pack is locked again.
  * @param {string} documentName - The packs' document type.
  * @param {string} location - The location walked, which names its projection fields.
  * @param {PackRecordWalker} walkRecord - Yields the stored actors in one record.
+ * @param {StoredActorWalkFailure[]} failures - Receives the unreadable packs and the locks that cannot be restored.
+ * @param {Set<string>} unreadablePacks - The collection ids of the packs this walk could not read; receives each new
+ * one.
  * @returns {AsyncGenerator<StoredActorSource>} A generator over the location's stored actors.
  * @yields {StoredActorSource} The next stored actor.
  */
-async function* walkWorldPacks(documentName, location, walkRecord) {
+async function* walkWorldPacks(documentName, location, walkRecord, failures, unreadablePacks) {
    for (const pack of game.packs) {
-      if (pack.metadata.packageType !== 'world' || pack.metadata.type !== documentName) {
+      if (pack.metadata.packageType !== 'world' || pack.metadata.type !== documentName
+         || unreadablePacks.has(pack.collection)) {
          continue;
       }
 
@@ -662,11 +681,16 @@ async function* walkWorldPacks(documentName, location, walkRecord) {
       }
       catch (err) {
          error(`Failed to read world pack "${pack.metadata.label}".`, err);
+         unreadablePacks.add(pack.collection);
+         failures.push({
+            error: err,
+            subject: `pack "${pack.metadata.label}"`,
+         });
          continue;
       }
 
       /** @type {PackWriteAccess} The pack's write access for this walk. */
-      const access = createPackWriteAccess(pack);
+      const access = createPackWriteAccess(pack, failures);
       try {
          for (const record of records) {
             yield* walkRecord(pack, record, access);
@@ -679,27 +703,63 @@ async function* walkWorldPacks(documentName, location, walkRecord) {
 }
 
 /**
+ * Walks one location. A pack location's walk records its failures in `failures`, and skips and extends the walk's
+ * `unreadablePacks` (the collection ids of the packs it could not read).
+ * @typedef {(failures: StoredActorWalkFailure[], unreadablePacks: Set<string>) => StoredActorSourceIterable}
+ * LocationWalk
+ */
+
+/**
  * The walk of each location.
- * @type {Readonly<Record<string, () => StoredActorSourceIterable>>}
+ * @type {Readonly<Record<string, LocationWalk>>}
  */
 const LOCATION_WALKS = Object.freeze({
-   actorPack: () => walkWorldPacks('Actor', 'actorPack', walkActorPackRecord),
-   adventureActor: () => walkWorldPacks('Adventure', 'adventureActor', walkAdventureActorRecord),
-   adventureSceneToken: () => walkWorldPacks('Adventure', 'adventureSceneToken', walkAdventureSceneRecord),
+   actorPack: (failures, unreadablePacks) => walkWorldPacks(
+      'Actor',
+      'actorPack',
+      walkActorPackRecord,
+      failures,
+      unreadablePacks,
+   ),
+   adventureActor: (failures, unreadablePacks) => walkWorldPacks(
+      'Adventure',
+      'adventureActor',
+      walkAdventureActorRecord,
+      failures,
+      unreadablePacks,
+   ),
+   adventureSceneToken: (failures, unreadablePacks) => walkWorldPacks(
+      'Adventure',
+      'adventureSceneToken',
+      walkAdventureSceneRecord,
+      failures,
+      unreadablePacks,
+   ),
    sceneToken: walkSceneTokens,
-   scenePackToken: () => walkWorldPacks('Scene', 'scenePackToken', walkScenePackRecord),
+   scenePackToken: (failures, unreadablePacks) => walkWorldPacks(
+      'Scene',
+      'scenePackToken',
+      walkScenePackRecord,
+      failures,
+      unreadablePacks,
+   ),
    worldActor: walkWorldActors,
 });
 
 /**
  * Walks every stored actor, in STORED_ACTOR_LOCATIONS order: world actors, unlinked tokens on world scenes, actors in
  * world Actor packs, unlinked tokens in world Scene packs, and the actors and unlinked scene tokens in world Adventure
- * packs. The walk reads stored data only; a source's `open` does the loading and unlocking a write needs.
+ * packs. The walk reads stored data only; a source's `open` does the loading and unlocking a write needs. A failure
+ * outside the yielded actors (a world pack the walk cannot read, or a pack lock it cannot restore) is reported and
+ * recorded in `failures`, and the walk goes on; a pack the walk cannot read is read and recorded once.
+ * @param {StoredActorWalkFailure[]} [failures] - Receives the walk's failures, for its consumer to count.
  * @returns {AsyncGenerator<StoredActorSource>} A generator over every stored actor.
  * @yields {StoredActorSource} The next stored actor.
  */
-export async function* walkStoredActorSources() {
+export async function* walkStoredActorSources(failures = []) {
+   /** @type {Set<string>} The collection ids of the world packs this walk could not read. */
+   const unreadablePacks = new Set();
    for (const location of STORED_ACTOR_LOCATIONS) {
-      yield* LOCATION_WALKS[location]();
+      yield* LOCATION_WALKS[location](failures, unreadablePacks);
    }
 }

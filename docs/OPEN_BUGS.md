@@ -13,14 +13,6 @@ Deferred/known bugs. Todos (planned work) live in `docs/TODO.md`; this file is b
 - **Found:** 2026-09-30 by the Task 5 fix round (plan B), measured live.
 - **Status:** Not handled in code by user decision 2026-09-30 (local worlds cleaned one-off).
 
-### 95. Migration shows "complete" when a world pack could not be read or re-locked
-
-- **What:** `walkWorldPacks` reports a pack whose projection fails and skips it, and the lock restore logs and swallows
-  its own failure. Neither failure is counted, so `migrateWorld` still shows "migration complete". When the only
-  pending work sits in an unreadable pack, the scan answers "nothing to migrate" and no failure is ever shown.
-- **Found:** 2026-09-30 by the buddy check of the Task 5 fix round (plan B).
-- **Status:** Open; fixed in Task 5 fix round 2.
-
 ### 96. Unlinked tokens whose base actor is gone are never migrated in world scenes and Scene packs
 
 - **What:** The stored-actor walker skips an unlinked token without a base actor in world scenes and world Scene packs,

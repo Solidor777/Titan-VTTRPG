@@ -1,18 +1,21 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-/** @type {{sources: object[], walked: string[]}} The sources the mocked walker yields, and the names it walked. */
+/** @type {{failures: object[], sources: object[], walked: string[]}} The walk's failures, sources, and record. */
 const walk = vi.hoisted(() => ({
+   failures: [],
    sources: [],
    walked: [],
 }));
 
 vi.mock('~/helpers/migration/StoredActorSources.js', () => ({
    /**
-    * Yields the test's sources, recording each one walked.
+    * Records the test's walk failures, then yields the test's sources, recording each one walked.
+    * @param {object[]} [failures] - Receives the walk's failures.
     * @returns {AsyncGenerator<object>} A generator over the sources.
     * @yields {object} The next source.
     */
-   async* walkStoredActorSources() {
+   async* walkStoredActorSources(failures = []) {
+      failures.push(...walk.failures);
       for (const source of walk.sources) {
          walk.walked.push(source.name);
          yield source;
@@ -135,6 +138,7 @@ function makeSource(name, { effects = [], items = [], target = null } = {}) {
 beforeEach(() => {
    walk.sources = [];
    walk.walked.length = 0;
+   walk.failures = [];
 
    // Stand-in for foundry.utils.deepClone, used by buildEffectData to copy the migrated system fields.
    globalThis.foundry.utils.deepClone = (value) => structuredClone(value);
@@ -207,6 +211,17 @@ describe('storedActorsNeedMigration', () => {
          'Clean',
          'Stale',
       ]);
+   });
+
+   it('reports work when the walk could not read a pack, even with every readable actor clean', async () => {
+      walk.failures = [
+         {
+            error: new Error('projection failed'),
+            subject: 'pack "Actors"',
+         },
+      ];
+      walk.sources = [makeSource('Clean')];
+      expect(await storedActorsNeedMigration()).toBe(true);
    });
 });
 
@@ -354,5 +369,24 @@ describe('migrateStoredActors', () => {
       expect(ui.notifications.error).toHaveBeenCalledTimes(1);
       expect(ui.notifications.error.mock.calls[0][0]).toContain('Refused');
       expect(healthy.updateEffects).toHaveBeenCalledTimes(1);
+   });
+
+   it('adds each failure of the walk itself to the failed count', async () => {
+      walk.failures = [
+         {
+            error: new Error('projection failed'),
+            subject: 'pack "Actors"',
+         },
+         {
+            error: new Error('re-lock failed'),
+            subject: 'the lock of pack "Scenes"',
+         },
+      ];
+      walk.sources = [makeSource('Clean')];
+      expect(await migrateStoredActors()).toEqual({
+         failed: 2,
+         skipped: 0,
+         updated: 0,
+      });
    });
 });

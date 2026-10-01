@@ -8,7 +8,10 @@ import {
    STORED_ACTOR_LOCATIONS,
    walkStoredActorSources,
 } from '~/helpers/migration/StoredActorSources.js';
-import { migrateStoredActors } from '~/helpers/migration/MigrateStoredActors.js';
+import {
+   migrateStoredActors,
+   storedActorsNeedMigration,
+} from '~/helpers/migration/MigrateStoredActors.js';
 
 /**
  * Stands in for Foundry's `_del` (the client's global ForcedDeletion operator instance).
@@ -641,7 +644,7 @@ describe('walkStoredActorSources', () => {
       ]);
    });
 
-   it('reports a failed lock restore without throwing', async () => {
+   it('reports and records a failed lock restore without throwing', async () => {
       const { packs } = makeWorld();
       packs.actor.configure.mockImplementation(async ({ locked }) => {
          if (locked) {
@@ -649,19 +652,66 @@ describe('walkStoredActorSources', () => {
          }
          packs.actor.locked = locked;
       });
-      await walkAll((source) => source.location === 'actorPack');
+
+      /** @type {object[]} The walk's failures. */
+      const failures = [];
+      for await (const source of walkStoredActorSources(failures)) {
+         if (source.location === 'actorPack') {
+            await source.open();
+         }
+      }
       expect(uiErrors.some((message) => message.includes('Failed to restore the lock on pack "Actors"'))).toBe(true);
+      expect(failures).toEqual([
+         {
+            error: new Error('re-lock failed'),
+            subject: 'the lock of pack "Actors"',
+         },
+      ]);
    });
 
-   it('reports a pack whose projection fails and walks on', async () => {
+   it('reports and records a pack whose projection fails, and walks on', async () => {
       const { packs } = makeWorld();
       packs.actor.documentClass.database.get.mockRejectedValueOnce(new Error('projection failed'));
 
-      /** @type {object[]} The walked sources. */
-      const sources = await walkAll();
-      expect(sources.map((source) => source.location))
-         .toEqual(STORED_ACTOR_LOCATIONS.filter((location) => location !== 'actorPack'));
+      /** @type {object[]} The walk's failures. */
+      const failures = [];
+
+      /** @type {string[]} The walked locations. */
+      const locations = [];
+      for await (const source of walkStoredActorSources(failures)) {
+         locations.push(source.location);
+      }
+      expect(locations).toEqual(STORED_ACTOR_LOCATIONS.filter((location) => location !== 'actorPack'));
       expect(uiErrors.some((message) => message.includes('Failed to read world pack "Actors"'))).toBe(true);
+      expect(failures).toEqual([
+         {
+            error: new Error('projection failed'),
+            subject: 'pack "Actors"',
+         },
+      ]);
+   });
+
+   it('reads an unreadable Adventure pack once per walk and records it as one failure', async () => {
+      /** @type {object} The world Adventure pack, whose projection fails. */
+      const pack = installAdventureWorld(makeFakeAdventure());
+      pack.documentClass.database.get.mockRejectedValue(new Error('projection failed'));
+
+      /** @type {object[]} The walk's failures. */
+      const failures = [];
+
+      /** @type {string[]} The walked sources' names. */
+      const names = [];
+      for await (const source of walkStoredActorSources(failures)) {
+         names.push(source.name);
+      }
+      expect(names).toEqual([]);
+      expect(pack.documentClass.database.get).toHaveBeenCalledTimes(1);
+      expect(failures).toEqual([
+         {
+            error: new Error('projection failed'),
+            subject: 'pack "Adventures"',
+         },
+      ]);
    });
 
    it('restores a pack\'s lock when the consumer stops early', async () => {
@@ -1090,5 +1140,19 @@ describe('the stored-actor pass over the walk', () => {
          'TITAN | Failed to migrate the stored actor "Adventures: Adventure: Adventure Actor".',
          'TITAN | Failed to migrate the stored actor "Adventures: Adventure: Adventure Scene: Adventure Token".',
       ]);
+   });
+
+   it('counts a world pack the walk cannot read as a failure, and the scan reports work for it', async () => {
+      const { packs } = makeWorld();
+      packs.actor.documentClass.database.get.mockRejectedValue(new Error('projection failed'));
+      game.actors = new FakeCollection();
+      game.packs = [packs.actor];
+      game.scenes = [];
+      expect(await storedActorsNeedMigration()).toBe(true);
+      expect(await migrateStoredActors()).toEqual({
+         failed: 1,
+         skipped: 0,
+         updated: 0,
+      });
    });
 });

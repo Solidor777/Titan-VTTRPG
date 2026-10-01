@@ -1087,6 +1087,21 @@ when fixed.
   effects, a condition, and a legacy-shaped effect as `buildEffectData` builds it, the data built for an Adventure
   stores the `disabled`, `showIcon`, and `transfer` a created document stores, and no input fails data preparation).
 
+### 95. Migration showed "complete" when a world pack could not be read or re-locked
+
+- **What:** `walkWorldPacks` reported a pack whose projection failed and skipped it, and the lock restore logged and
+  swallowed its own failure. Neither failure was counted, so `migrateWorld` still showed "migration complete", and
+  when the only pending work sat in an unreadable pack, the scan answered "nothing to migrate" and no failure was ever
+  shown.
+- **Found:** 2026-09-30 by the buddy check of the Task 5 fix round (plan B).
+- **Fixed:** 2026-09-30 — `walkStoredActorSources(failures)` records each pack it cannot read and each lock it cannot
+  restore; `migrateStoredActors` adds them to `failed`, and `storedActorsNeedMigration` reports work when a pack could
+  not be read, so a pack that stays unreadable is reported as a failure on every migrating load. A pack the walk
+  could not read is not read again in the same walk, so an Adventure pack, walked for its actors and its scene tokens,
+  counts as one failure. Gated by `tests/unit/StoredActorSources.test.js` (both failures recorded; an unreadable
+  Adventure pack read once and recorded once; an unreadable pack makes the scan report work and the pass count a
+  failure) and `tests/unit/MigrateStoredActors.test.js` (walk failures are counted, and make the scan report work).
+
 ### 97. A failed version migration stored part-migrated data under the previous version
 
 - **What:** `migrateDocument` in `src/helpers/migration/MigrateWorld.js` accumulated changes across the levels of a

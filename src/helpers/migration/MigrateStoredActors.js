@@ -17,8 +17,9 @@ import {
  * @property {number} skipped - Stored actors with pending work that had nothing left to write to (a pack entry or a
  * token's base actor deleted since the scan) or that held no work once opened (changed since the scan).
  * @property {number} failed - Stored actors whose migration threw, whose work was left after their writes (a write
- * vetoed or not applied), or whose writes were not stored (an Adventure write core did not store); each is reported
- * with its name.
+ * vetoed or not applied), or whose writes were not stored (an Adventure write core did not store), plus each failure
+ * of the walk itself (a world pack it could not read, or a pack lock it could not restore); each is reported as it
+ * happens.
  */
 
 /**
@@ -34,16 +35,20 @@ export function storedActorNeedsMigration(data) {
 }
 
 /**
- * Checks whether any stored actor needs the stored-actor migration, stopping at the first. Reads stored data only.
- * @returns {Promise<boolean>} Whether any stored actor needs the migration.
+ * Checks whether any stored actor needs the stored-actor migration, stopping at the first. Reads stored data only. A
+ * world pack the walk could not read counts as needing it: its actors went unchecked, and the migration reports the
+ * pack as a failure, so a pack that stays unreadable is reported on every migrating load instead of hiding its work.
+ * @returns {Promise<boolean>} Whether any stored actor needs the migration, or a world pack could not be read.
  */
 export async function storedActorsNeedMigration() {
-   for await (const source of walkStoredActorSources()) {
+   /** @type {StoredActorWalkFailure[]} The walk's failures; a scan writes nothing, so only unread packs. */
+   const failures = [];
+   for await (const source of walkStoredActorSources(failures)) {
       if (storedActorNeedsMigration(source)) {
          return true;
       }
    }
-   return false;
+   return failures.length > 0;
 }
 
 /**
@@ -53,7 +58,8 @@ export async function storedActorsNeedMigration() {
  * reported with the actor's name and the rest still migrate. A changed actor counts as updated only once its writes
  * are stored; an Adventure's actors and scene tokens are stored by one write when the walk leaves the Adventure, so
  * every changed actor's stored outcome is read once the walk is over (reading it during the walk would wait on a write
- * that happens only after the walk moves on).
+ * that happens only after the walk moves on). Each failure of the walk itself (a world pack it could not read, or a
+ * pack lock it could not restore) counts as one more failure.
  * @returns {Promise<StoredActorMigrationCounts>} How many stored actors were updated, skipped, and failed.
  */
 export async function migrateStoredActors() {
@@ -66,7 +72,10 @@ export async function migrateStoredActors() {
 
    /** @type {Array<{name: string, target: StoredActorTarget}>} The changed actors; their outcome is read last. */
    const changed = [];
-   for await (const source of walkStoredActorSources()) {
+
+   /** @type {StoredActorWalkFailure[]} The failures the walk met outside the actors it yielded. */
+   const walkFailures = [];
+   for await (const source of walkStoredActorSources(walkFailures)) {
       if (!storedActorNeedsMigration(source)) {
          continue;
       }
@@ -115,6 +124,7 @@ export async function migrateStoredActors() {
          error(`Failed to migrate the stored actor "${name}".`, err);
       }
    }
+   counts.failed += walkFailures.length;
    log(`Stored actors migrated: ${counts.updated} updated, ${counts.skipped} skipped, ${counts.failed} failed.`);
    return counts;
 }

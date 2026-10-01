@@ -24,7 +24,8 @@ unlinked tokens, and the actors and tokens in the world's Actor, Scene, and Adve
 - The Migration Mode setting governs every migration step: "Disabled" skips all of it, as its description says,
   including the conversion of legacy effect items, and "Prompt" changes nothing until the GM confirms. Only the active
   GM migrates, a failed migration no longer stops the Player HUD from loading, and a migration with failures reports
-  how many documents failed instead of announcing completion.
+  how many failed instead of announcing completion, counting writes the world did not store and compendium packs it
+  could not read or lock again.
 
 ## Version 2.1.0:
 Advantage and Disadvantage, situational modifiers, and bug fixes.

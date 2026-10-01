@@ -141,9 +141,10 @@ function versionChainsNeedMigration() {
 
 /**
  * Checks whether the world needs migration: any Actor or Item (items embedded in actors included) behind its version
- * chain, or any stored actor needing the stored-actor migration (a legacy effect Item to convert, or a condition
- * effect whose rules elements differ from its definition or which still stores a description) in any location
- * walkStoredActorSources reads.
+ * chain, any stored actor needing the stored-actor migration (a legacy effect Item to convert, or a condition effect
+ * whose rules elements differ from its definition or which still stores a description) in any location
+ * walkStoredActorSources reads, or a world pack that walk could not read, which the migration reports as a failure
+ * (storedActorsNeedMigration).
  * @returns {Promise<boolean>} Whether anything in the world needs migration.
  */
 export async function worldNeedsMigration() {
@@ -282,9 +283,10 @@ async function migrateVersionChains() {
  * changed. The stored-actor migration runs first, so legacy effect Items are Active Effects before anything reads
  * items: it walks every stored actor (world actors, unlinked tokens, and the actors and tokens in world Actor, Scene,
  * and Adventure packs), converts legacy effect Items into Active Effects, then syncs each stale condition effect to
- * its definition (rules elements rewritten, a stored description deleted). Then every
- * world Actor, its Items, and every world Item migrate through their version chains. Each actor and document is
- * isolated, and the final notification reports how many failed instead of announcing completion over failures.
+ * its definition (rules elements rewritten, a stored description deleted). Then every world Actor, its Items, and
+ * every world Item migrate through their version chains. Each actor and document is isolated, and the final
+ * notification reports how many failed (a world pack the stored-actor walk could not read or lock again counts as
+ * one) instead of announcing completion over failures.
  * @returns {Promise<void>}
  */
 export async function migrateWorld() {
