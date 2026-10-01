@@ -1,6 +1,11 @@
 import { expect, test } from '@playwright/test';
 import { login } from './fixtures.js';
-import { attachPageErrors, closeAllApps } from './world.js';
+import {
+   attachPageErrors,
+   closeAllApps,
+   expectActiveGM,
+   reloadWithMode,
+} from './world.js';
 
 /**
  * The boot migration's world-pack gate: an Automatic GM load that finds a stale actor in a locked world Actor pack
@@ -9,7 +14,8 @@ import { attachPageErrors, closeAllApps } from './world.js';
  * a stored description); legacy effect Items cannot be seeded at runtime (the server rejects their unregistered
  * `effect` subtype) and are unit-covered (tests/unit/ConvertEffectItemsToActiveEffects.test.js,
  * tests/unit/StoredActorSources.test.js). Both packs are read from stored data (`_source`): an embedded collection
- * omits invalid documents, so it cannot show what is stored.
+ * omits invalid documents, so it cannot show what is stored. The spec's GM must be the active GM, the one client that
+ * migrates, and each load asserts it.
  */
 
 /** @type {{label: string, name: string}} The clean fixture pack. */
@@ -43,6 +49,7 @@ test.beforeAll(async ({ browser }) => {
 
    // The login's own migration attempt finished once the Player HUD is built.
    await page.waitForFunction(() => !!game.titan?.playerHud, null, { timeout: 60_000 });
+   await expectActiveGM(page);
    originalMode = await page.evaluate(() => game.settings.get('titan', 'migrationMode'));
 });
 
@@ -156,7 +163,6 @@ test('an Automatic load migrates a stale locked pack and never unlocks or writes
       ]) {
          await game.packs.get(`world.${name}`).configure({ locked: true });
       }
-      await game.settings.set('titan', 'migrationMode', 'automatic');
       return {
          cleanActorId: cleanActor.id,
          cleanModifiedTime: cleanActor._stats.modifiedTime,
@@ -172,13 +178,7 @@ test('an Automatic load migrates a stale locked pack and never unlocks or writes
    expect(seeded.staleDescriptions).toBe(1);
 
    consoleLines.length = 0;
-   await page.reload();
-   await page.waitForURL('**/game', { timeout: 15_000 });
-   await page.waitForFunction(
-      () => globalThis.game?.ready === true && !!game.titan?.playerHud,
-      null,
-      { timeout: 60_000 },
-   );
+   await reloadWithMode(page, 'automatic');
 
    // Presence: the migration reached the world packs and unlocked the stale one to write it.
    expect(consoleLines.some((line) => line.includes(`Unlocked world pack "${STALE_PACK.label}"`))).toBe(true);

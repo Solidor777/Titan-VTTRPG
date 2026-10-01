@@ -1,7 +1,13 @@
 import { expect, test } from '@playwright/test';
 import { STORED_ACTOR_LOCATIONS } from '~/helpers/migration/StoredActorSources.js';
 import { login } from './fixtures.js';
-import { attachPageErrors, closeAllApps, deleteFixtureActor } from './world.js';
+import {
+   attachPageErrors,
+   closeAllApps,
+   deleteFixtureActor,
+   expectActiveGM,
+   reloadWithMode,
+} from './world.js';
 
 /**
  * The stored-actor migration on a GM world load, in every location a stored actor lives (STORED_ACTOR_LOCATIONS): a
@@ -10,7 +16,8 @@ import { attachPageErrors, closeAllApps, deleteFixtureActor } from './world.js';
  * the test world at runtime (`CompendiumCollection.createCompendium`) and deleted afterwards. Each location holds a
  * condition in its v2.1.0 form (flat -1 rules elements and a stored description). Disabled leaves everything; Prompt
  * asks and leaves everything until confirmed; Automatic syncs the condition in every location and locks each pack
- * again; a second Automatic load writes nothing. The only GM logged in must be the spec's (the active GM migrates).
+ * again; a second Automatic load writes nothing. Disabled and Prompt loads (the Prompt dialog dismissed) write nothing
+ * and unlock no pack. The spec's GM must be the active GM, the one client that migrates, and each load asserts it.
  * No base-type Active Effect is seeded: TITAN registers only the `effect` and `condition` types, and a world actor
  * holding a base-type effect stops the world from loading.
  */
@@ -151,6 +158,7 @@ test.beforeAll(async ({ browser }) => {
 
    // The login's own migration attempt finished once the Player HUD is built.
    await page.waitForFunction(() => !!game.titan?.playerHud, null, { timeout: 60_000 });
+   await expectActiveGM(page);
    await closeAllApps(page);
    originalMode = await page.evaluate(() => game.settings.get('titan', 'migrationMode'));
 });
@@ -381,20 +389,23 @@ function readState() {
 }
 
 /**
- * Sets the migration mode and reloads the world as the same GM, returning once the load has passed its migration
- * attempt (onceReady builds the Player HUD after it, whether or not it succeeded).
- * @param {string} mode - The migration mode.
- * @returns {Promise<void>} Resolves once the reloaded world finished onceReady.
+ * Asserts that the load just finished wrote nothing and unlocked no pack: every seeded stored actor holds its seeded
+ * state with its seeded modification time, every spec pack is locked, and the console shows no spec-pack unlock line.
+ * The capture is first shown to hold this load's lines (the system's start-up line), so the missing unlock line is an
+ * absence on a capture whose presence is proven.
+ * @param {{locked: object, summaries: object, times: object}} seededState - The state read right after seeding.
+ * @returns {Promise<void>}
  */
-async function reloadWithMode(mode) {
-   await page.evaluate((value) => game.settings.set('titan', 'migrationMode', value), mode);
-   await page.reload();
-   await page.waitForURL('**/game', { timeout: 15_000 });
-   await page.waitForFunction(
-      () => globalThis.game?.ready === true && !!game.titan?.playerHud,
-      null,
-      { timeout: 60_000 },
-   );
+async function expectNothingWritten(seededState) {
+   expect(consoleLines.some((line) => line.includes('TITAN | Starting Titan VTTRPG System')), 'this load is captured')
+      .toBe(true);
+
+   /** @type {{locked: object, summaries: object, times: object}} The state after the load. */
+   const state = await readState();
+   expect(state.summaries).toEqual(seededState.summaries);
+   expect(state.times).toEqual(seededState.times);
+   expect(state.locked).toEqual(ALL_LOCKED);
+   expect(consoleLines.filter((line) => line.includes('Unlocked world pack "E2E Migration'))).toEqual([]);
 }
 
 test('Disabled and Prompt leave every stored actor; Automatic migrates each location once', async () => {
@@ -406,22 +417,26 @@ test('Disabled and Prompt leave every stored actor; Automatic migrates each loca
    expect(seededState.summaries).toEqual(everyLocation(UNSYNCED));
    expect(seededState.locked).toEqual(ALL_LOCKED);
 
-   // Disabled: the load passed its migration step without reading or writing anything.
-   await reloadWithMode('disabled');
-   expect((await readState()).summaries).toEqual(everyLocation(UNSYNCED));
+   // Disabled: the load wrote nothing and unlocked no pack. That it also reads nothing (Disabled resolves before the
+   // scan) is gated by tests/unit/OnceReady.test.js ("scans and converts nothing in Disabled mode").
+   consoleLines.length = 0;
+   await reloadWithMode(page, 'disabled');
+   await expectNothingWritten(seededState);
 
-   // Prompt: the migration dialog asks first; nothing is written until the GM confirms.
-   await reloadWithMode('prompt');
+   // Prompt: the migration dialog asks first; the load writes nothing before the GM confirms, and dismissing the
+   // dialog writes nothing.
+   consoleLines.length = 0;
+   await reloadWithMode(page, 'prompt');
 
    /** @type {string} The migration dialog's localized description. */
    const promptText = await page.evaluate(() => game.i18n.localize('LOCAL.confirmMigrateWorld.desc.text'));
    await expect(page.locator('.application.titan-dialog').filter({ hasText: promptText })).toBeVisible();
-   expect((await readState()).summaries).toEqual(everyLocation(UNSYNCED));
    await closeAllApps(page);
+   await expectNothingWritten(seededState);
 
    // Automatic: every location migrates, and each pack is unlocked to write it and locked again.
    consoleLines.length = 0;
-   await reloadWithMode('automatic');
+   await reloadWithMode(page, 'automatic');
 
    /** @type {{locked: object, summaries: object, times: object}} The migrated state. */
    const migrated = await readState();
@@ -437,7 +452,7 @@ test('Disabled and Prompt leave every stored actor; Automatic migrates each loca
    // A second Automatic load finds nothing to write: no spec pack is unlocked (each was on the load above) and no
    // seeded effect or Adventure is modified.
    consoleLines.length = 0;
-   await reloadWithMode('automatic');
+   await reloadWithMode(page, 'automatic');
 
    /** @type {{locked: object, summaries: object, times: object}} The state after the second load. */
    const again = await readState();

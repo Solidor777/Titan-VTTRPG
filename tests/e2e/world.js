@@ -1,3 +1,5 @@
+import { expect } from '@playwright/test';
+
 /**
  * Close every open *transient* Foundry application so sheets, dialogs, HUDs, and tooltips do not leak
  * into the next test on the shared page. Closes both ApplicationV2 instances
@@ -324,4 +326,34 @@ export async function showChatLog(page) {
          { message: 'chat log within the viewport' },
       );
    });
+}
+
+/**
+ * Asserts that the page's GM is the active GM, the one client that migrates: `game.users.activeGM` is the designated
+ * active GM, the one with the highest role (Foundry v14 `client/documents/collections/users.mjs`
+ * `getDesignatedUser`).
+ * @param {import('@playwright/test').Page} page - The logged-in page.
+ * @returns {Promise<void>} Resolves once asserted.
+ */
+export async function expectActiveGM(page) {
+   expect(await page.evaluate(() => game.users.activeGM?.isSelf), 'the spec GM is the active GM').toBe(true);
+}
+
+/**
+ * Sets the migration mode and reloads the world as the same GM, returning once the load has passed its migration
+ * attempt (onceReady builds the Player HUD after it, whether or not it succeeded) and its GM is the active GM.
+ * @param {import('@playwright/test').Page} page - The logged-in page.
+ * @param {string} mode - The migration mode.
+ * @returns {Promise<void>} Resolves once the reloaded world finished onceReady.
+ */
+export async function reloadWithMode(page, mode) {
+   await page.evaluate((value) => game.settings.set('titan', 'migrationMode', value), mode);
+   await page.reload();
+   await page.waitForURL('**/game', { timeout: 15_000 });
+   await page.waitForFunction(
+      () => globalThis.game?.ready === true && !!game.titan?.playerHud,
+      null,
+      { timeout: 60_000 },
+   );
+   await expectActiveGM(page);
 }
