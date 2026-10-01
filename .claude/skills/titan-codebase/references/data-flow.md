@@ -477,9 +477,10 @@ pack entry, or a token's base actor, gone since the scan). Opening a packed sour
 `Unlocked world pack "<label>" to migrate it.`; a scan that writes nothing never touches a lock, and the walk locks the
 pack again when it leaves it (also when its consumer stops early). Write paths: world and packed actors through their
 documents; an unlinked token through its synthetic actor (core routes its embedded writes to the token's ActorDelta).
-These writes are stored as made (`stored()` resolves at once). A token named like its base actor is stored with no
-delta, and core's server loses a multi-document create or delete on such a token (OPEN_BUGS #102); a token the pass has
-work on always holds delta entries, so its delta exists. An Adventure's actors and scene tokens are data (`SetField` of
+These writes are stored as made (`stored()` resolves at once). Core gives a newly created unlinked token a delta only
+when its name differs from its base actor's (`client/documents/token.mjs:1657`). OPEN_BUGS #102, an unconfirmed loss of
+multi-document writes on such a token, awaits a real-path repro. A token the pass has work on always holds delta
+entries, so its delta exists. An Adventure's actors and scene tokens are data (`SetField` of
 `EmbeddedDataField`): their targets edit a per-walk working copy of the field (`AdventureContent`), and the walk stores
 it in one `adventure.update({ actors })` or `({ scenes })` when it leaves the Adventure — one write per field, because
 core validates every element of a replaced array on each write, so a legacy `effect` Item (unregistered subtype) left in

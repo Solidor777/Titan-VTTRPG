@@ -14,28 +14,26 @@ Deferred/known bugs. Todos (planned work) live in `docs/TODO.md`; this file is b
 - **Found:** 2026-09-30 by the Task 5 fix round (plan B), measured live.
 - **Status:** Not handled in code by user decision 2026-09-30 (local worlds cleaned one-off).
 
-### 102. A multi-document create or delete on an unlinked token with no stored delta is lost
+### 102. Removals on an unlinked token did not survive a reload (unconfirmed; probe used raw-data tokens)
 
-- **What:** An unlinked token whose stored `delta` is `null` loses a create or delete of two or more embedded
-  documents through its synthetic actor. Core stores a `null` delta when the token is named like its base actor,
-  which is core's default name. Examples are a two-effect create, or a two-id delete of inherited Items or effects.
-  The client shows the change, and the server replies that every id succeeded, but nothing is stored. Every later
-  delta write to that token is lost too, until something writes the Token record itself, for example moving the
-  token. One-document calls, updates, and any call once the delta exists are stored. TITAN calls that send such a
-  multi-document request:
-  - `removeExpiredEffects` (`CharacterDataModel.js:4881`);
-  - combat-effect cleanup (`:4908`);
-  - turn-start expired-effect removal (`:5716`);
-  - dropping several Items onto a token's sheet (`TitanActor.js:103` via `TitanActorSheet.js:393`).
-
-  The sheet itself writes to the right document, the token's ActorDelta (measured). Cause, read in minified core
-  `dist/database/backend/server-backend.mjs` and `embedded-delta.mjs` (not instrumented): `_createDocuments` and
-  `_deleteDocuments` share one `writeParent` options object across documents processed concurrently. The first
-  document's walk returns the Token, because the delta must be created. The second document's walk overwrites that
-  with the ActorDelta, so only the delta is written and the Token keeps `delta: null`.
-- **Found:** 2026-10-01 while the Task 5 fix round 2 identity e2e (plan B) was seeding its tokens. The user confirmed
-  it is a bug. Measured live in `test-titan` with Migration Mode Disabled.
-- **Status:** Open. The Foundry core defect needs a TITAN-side mitigation and an upstream report.
+- **Reported:** On an unlinked token, removing an Item the token inherits from its base actor did not persist across
+  a reload, even with Migration Mode Disabled. The user confirmed it is a bug.
+- **Measured, with tokens built from raw data only:** probes in `test-titan` created each scene and token in code.
+  The scene was never viewed, there was no canvas drop and no unlink click, and every write ran in one scripted
+  burst. A token named like its base actor stored `delta: null`. On such a token, a create or delete of two or more
+  embedded documents through `token.actor` was missing after a reload, and so was every later delta write until the
+  Token record was written. One-document calls, updates, and calls after the delta existed were stored. Under the
+  real-data rule (`docs/TODO.md`) none of this is evidence about Foundry's behaviour until it is re-run the real way.
+- **Read in core, not run:** `client/documents/token.mjs:1657` gives a newly created unlinked token a delta only when
+  its name differs from the base actor's. Changing `actorLink` on an existing token goes through `:2032` instead.
+- **Contradicting observation (user):** on real tokens, bulk Clear Expired Effects and single-value edits persist.
+- **Cause:** unknown. Not attributed to Foundry core or to TITAN.
+- **Next measurement:** a real-path repro in `test-titan`. Make the unlinked token both ways: a canvas drop of an
+  actor whose prototype token is unlinked, and a placed linked token unlinked with the toggle, then the sheet
+  reopened. Give the base actor two expired effects, run Clear Expired Effects from the UI, then reload and read what
+  was stored. Only if that loses data, run the same steps in `test-pf2e`, which does not load TITAN.
+- **Found:** 2026-10-01 while the Task 5 fix round 2 identity e2e (plan B) was seeding its tokens.
+- **Status:** Open; unconfirmed until the real-path repro.
 
 ### 103. Deleting an item or effect without confirmation still tries to open the confirmation dialog
 
@@ -54,3 +52,12 @@ Deferred/known bugs. Todos (planned work) live in `docs/TODO.md`; this file is b
   the reverse. It should compare document identity, or `uuid`.
 - **Found:** 2026-10-01 while diagnosing #102 (read in code).
 - **Status:** Open.
+
+### 106. `player-hud-visibility.spec.js` leaves tokens whose actors it deleted
+
+- **What:** After the spec runs (also when it runs alone), the world still holds the unlinked `HUD Vis NPC` token and
+  three linked tokens, all on scenes, whose actors are gone. `deleteFixtureActor` alone does remove a placed token
+  (measured), so the leak comes from another part of the spec's setup or cleanup. The cause has not been diagnosed.
+  A leaked orphan with pending migration work would count as a migration failure in later specs (#105).
+- **Found:** 2026-10-01 by an orphan census after the Task 5 fix round 3 full e2e (654 passed).
+- **Status:** Open. Fixed together with the conversion of the e2e specs to real Foundry data (`docs/TODO.md`).
