@@ -27,9 +27,10 @@
 
 * **No migrations yet.** Only the user's existing world exists, and no other world runs this system yet. Data changes
   are made by fixing that existing world directly, with a backup first and the user's knowledge. The migration system
-  (`MigrateWorld`, version chains, the stored-actor walker) stays for future public releases, with its generic tests.
-  Do not build or extend specific migrations, run them live, or write tests of specific migrations unless the user
-  asks for it.
+  (`MigrateWorld`, version chains, the stored-actor walker, `migrateData` hooks) stays in the code for future public
+  releases. While no migration is active there are no migration tests, generic or specific, and no code is added only to
+  make migrations testable. A one-off test may confirm the system works, and is then reverted. Do not build or extend
+  specific migrations, or run them live, unless the user asks for it.
 * **Tests use genuine live documents.** Any test of a change to a document runs on documents made through real Foundry
   user flows. Tests may share documents; the suite keeps a running list and deletes every test document when it is done.
   Cleanup may use the API `delete`. Records from the user's world are never checked in as test data. Synthetic data is
