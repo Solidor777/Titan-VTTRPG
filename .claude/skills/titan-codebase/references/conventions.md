@@ -887,18 +887,25 @@ and faked gestures (`Actor.create(` and the other named classes, any other `<ali
 (action prefixes `request`, `roll`, `apply`, `spend`, `equip`, `unEquip`, `onTurn`, `shortRest`, `longRest`,
 `removeCombatEffects`, `toggleInspiration`, `add`, `move`, `delete`). A `.update(`/`.system.<action>(` site is
 permitted when it matches a `{ file, pattern, field, reason }` entry of `tests/e2e/direct-updates.allowlist.json`
-(`pattern` is a regex over the site's source line; an entry permitting no site fails); deletion calls in
-`e2e/global-teardown.js` and `e2e/registry.js` are allowed by file. The offender set must equal
+(`pattern` is a regex over the site's source line; an entry permitting no site fails). In `e2e/global-teardown.js`
+and `e2e/registry.js` a match whose text contains `delete` is exempt; of the patterns only `.system.delete…(` can
+produce one (`.delete(`, `deleteEmbeddedDocuments(` and `deleteCompendium(` are not banned anywhere). The offender set
+must equal
 `tests/e2e/burn-down.json` as a multiset of `{ file, match, source }` (file relative to `tests`, the matched text, the
 trimmed source line — no line numbers, so unrelated edits do not churn it); the failure message prints the missing or
 extra entries as JSON. Once `tests/unit/phase.json` exceeds 6 the burn-down file must be gone and the set empty.
 `tests/unit/UnitFakeDocuments.test.js` scans `tests/unit` (except itself) for a fake write surface — an object-literal
-key or method (after `{` or `,`), a member assignment, or a `vi.spyOn` named `create`, `createDocuments`, `update`,
+key (after `{` or `,`) whose value is not a boolean, `null`, `undefined`, number, string, object or array; an
+object-literal or class method (after `{`, `,`, `}`, `;` or at a line start, its body opening on the line that closes
+the parameters); a member assignment; or a `vi.spyOn` — named `create`, `createDocuments`, `update`,
 `delete`, `createEmbeddedDocuments`, `deleteEmbeddedDocuments`, `updateEmbeddedDocuments`, `createEffects`,
 `updateEffects`, `deleteEffects`, `deleteItems`, or an object-literal `_source` key. Every matching file must be listed
 in `tests/unit/fake-documents.allowlist.json`: `permitted` (`{ file, clause }`) or `burnDown`
 (`{ file, removedInPhase }`); a listed file that is gone or no longer matches fails, and a burn-down file fails once
-`phase.json`'s `phase` exceeds its `removedInPhase`.
+`phase.json`'s `phase` exceeds its `removedInPhase`. Both guards and `E2eContextMenuClicks.test.js` mask sources
+through `tests/unit/helpers/maskSource.js` (`maskSource(source, { strings })`: comments always blanked, string
+contents replaced only with `strings: true`; every index and line break kept; regular-expression literals are not
+recognized).
 
 **E2E census** — `tests/e2e/census.js` exports `takeCensus(page, { since? })` (per kind: `E2E `-prefixed actors,
 items, scenes, folders, macros, roll tables, journal entries, playlists, cards and world compendia; tokens on any scene
