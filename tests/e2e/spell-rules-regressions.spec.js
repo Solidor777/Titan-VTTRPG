@@ -581,6 +581,11 @@ test('the character sheet spell row and the spell chat card list the displayed a
       /** @type {import('@playwright/test').Locator} The mounted spell card. */
       const card = page.locator(`#chat .message[data-message-id="${messageId}"] .item-chat-message`).first();
       await expect(card.locator('.tag-container > .tag .label')).toHaveText(seeded.labels);
+
+      // Core's ChatLog posts the card's notification asynchronously and re-queries it by message id when done; a
+      // deletion before the notification is shown makes that query return null and raises an error in core.
+      await expect(page.locator(`#chat-notifications .message[data-message-id="${messageId}"]:not([hidden])`))
+         .toBeVisible();
       expect(errors, `uncaught errors:\n${errors.join('\n')}`).toEqual([]);
    }
    finally {

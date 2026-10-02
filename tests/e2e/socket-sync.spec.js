@@ -1,7 +1,7 @@
 import { expect, test } from './harness.js';
-import { withClients } from './multiClient.js';
+import { seedEncounterForClients, withClients } from './multiClient.js';
 import { setWorldSetting } from './settings.js';
-import { seedCombatEncounter, teardownCombatEncounter } from '../shared/combat.js';
+import { teardownCombatEncounter } from '../shared/combat.js';
 import {
    buildTurnEffectActorData,
    buildPersistentDamageAbilityData,
@@ -28,7 +28,7 @@ test.describe('socket sync — replicated turn-effect state', () => {
             otherInitiative: 20,
             observerUserName: 'E2E Player 1',
          };
-         const ids = await gm.evaluate(seedCombatEncounter, seed);
+         const ids = await seedEncounterForClients(gm, [player], seed);
 
          try {
             // Stamina starts at its full default (3 for a base player) — record the pre value on the GM.
@@ -81,7 +81,7 @@ test.describe('socket sync — replicated turn-effect state', () => {
             staminaValue: 1,
             observerUserName: 'E2E Player 1',
          };
-         const ids = await gm.evaluate(seedCombatEncounter, seed);
+         const ids = await seedEncounterForClients(gm, [player], seed);
 
          try {
             // Confirm the pre-seed landed on the player client.
@@ -129,7 +129,7 @@ test.describe('socket sync — replicated turn-effect state', () => {
             resolveValue: 0,
             observerUserName: 'E2E Player 1',
          };
-         const ids = await gm.evaluate(seedCombatEncounter, seed);
+         const ids = await seedEncounterForClients(gm, [player], seed);
 
          try {
             // Confirm the pre-seed (resolve = 0) has replicated to the player client.
@@ -175,7 +175,7 @@ test.describe('socket sync — replicated turn-effect state', () => {
             otherInitiative: 20,
             observerUserName: 'E2E Player 1',
          };
-         const ids = await gm.evaluate(seedCombatEncounter, seed);
+         const ids = await seedEncounterForClients(gm, [player], seed);
 
          try {
             const before = await gm.evaluate(
@@ -236,7 +236,7 @@ test.describe('socket sync — replicated turn-effect state', () => {
             effectInitiative: 10,
             otherInitiative: 20,
          };
-         const ids = await gm1.evaluate(seedCombatEncounter, seed);
+         const ids = await seedEncounterForClients(gm1, [gm2], seed);
 
          try {
             const before = await gm1.evaluate(

@@ -12,6 +12,9 @@
  * @param {number} [opts.staminaValue] - If set, the effect actor's stamina is pre-seeded to this value.
  * @param {number} [opts.resolveValue] - If set, the effect actor's resolve is pre-seeded to this value.
  * @param {string} [opts.observerUserName] - If set, this user is granted OWNER on the effect actor.
+ * @param {boolean} [opts.start] - Whether to start the encounter (round 1, turn 0). Defaults to true. A test with
+ *    other clients passes false, makes each client view the combat (`viewCombat`), then starts it
+ *    (`startCombatEncounter`).
  * @returns {Promise<{sceneId: string, combatId: string, effectActorId: string, otherActorId: string,
  *    effectCombatantId: string}>} The created document ids.
  */
@@ -26,6 +29,7 @@ export const seedCombatEncounter = async (opts) => {
       staminaValue,
       resolveValue,
       observerUserName,
+      start = true,
    } = opts;
 
    // Grant the observer OWNER on the effect actor so a non-GM client can read its resources.
@@ -59,11 +63,15 @@ export const seedCombatEncounter = async (opts) => {
       await effect.update({ system: { resource: resource } });
    }
 
-   // Create a scene and place a token for each actor (required for Combatant.actor to resolve).
+   // Create a scene and place a token for each actor (required for Combatant.actor to resolve). The scene is created
+   // inactive: with no active scene, core activates a new scene unless its data names `active`
+   // (`Scene._preCreateOperation`), and an activated scene draws its canvas on every client while this helper is
+   // already creating tokens (and later updating actors) on it, which raises errors inside core's token drawing.
    const scene = await Scene.create({
       name: sceneName,
       width: 2000,
       height: 2000,
+      active: false,
    });
    const effectTokenData = (await effect.getTokenDocument({
       x: 500,
@@ -79,10 +87,10 @@ export const seedCombatEncounter = async (opts) => {
    // Create combat bound to the scene with explicit (deterministic) initiative.
    const combat = await Combat.create({ scene: scene.id });
 
-   // View the seeded combat in the tracker (the posture of a GM actually running the encounter).
-   // Foundry v14's CombatTracker._onRender does `renderData.find(d => d._id === this.viewed?.id)`
-   // and then `"turn" in <result>` — for a NON-viewed combat the find returns undefined and the
-   // render throws an uncaught TypeError on every round/turn update, polluting page-error checks.
+   // View the seeded combat in this client's tracker (the posture of a GM actually running the encounter). A tracker
+   // keeps viewing the combat it has until it is told otherwise, and the world's own combat is viewed from the first
+   // render; core's `CombatTracker#_onRender` then throws a TypeError on every round or turn update of another combat
+   // (`"turn" in <undefined>`). Every other client calls `viewCombat` before the encounter starts.
    ui.combat.viewed = combat;
    const [effectCombatant] = await combat.createEmbeddedDocuments('Combatant', [
       {
@@ -99,16 +107,8 @@ export const seedCombatEncounter = async (opts) => {
       },
    ]);
 
-   // Start the encounter at round 1, turn 0 (highest initiative first = the OTHER actor).
-   if (typeof combat.startCombat === 'function') {
+   if (start) {
       await combat.startCombat();
-   }
-   else {
-      await combat.update({
-         active: true,
-         round: 1,
-         turn: 0,
-      });
    }
 
    return {
@@ -118,6 +118,34 @@ export const seedCombatEncounter = async (opts) => {
       otherActorId: other.id,
       effectCombatantId: effectCombatant.id,
    };
+};
+
+/**
+ * Makes this client's combat tracker view a combat. Core's `CombatTracker#_onRender` throws a TypeError on every round
+ * or turn update of a combat the tracker is not viewing, so each client that stays connected while the combat advances
+ * calls this before the combat starts. Designed to be passed to page.evaluate — references only in-page globals.
+ * @param {string} combatId - The id of the combat to view; it must already have replicated to this client.
+ * @returns {Promise<void>} Resolves once the combat is the viewed one.
+ */
+export const viewCombat = async (combatId) => {
+   await titanWait(
+      () => !!game.combats.get(combatId),
+      {
+         message: 'the seeded combat replicates to this client',
+         timeout: 1000,
+      },
+   );
+   ui.combat.viewed = game.combats.get(combatId);
+};
+
+/**
+ * Starts a seeded encounter at round 1, turn 0 (highest initiative first = the OTHER actor). Designed to be passed to
+ * page.evaluate — references only in-page globals.
+ * @param {string} combatId - The id of the combat `seedCombatEncounter` returned.
+ * @returns {Promise<void>} Resolves once the combat has started.
+ */
+export const startCombatEncounter = async (combatId) => {
+   await game.combats.get(combatId).startCombat();
 };
 
 /**
