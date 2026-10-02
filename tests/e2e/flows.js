@@ -1219,9 +1219,10 @@ function sharedItem(type, label, shape) {
  * (`.superpowers/sdd/test-suite-rewrite/phase-3/entry-count-measure-12.log`, local): the Abilities tab's scroll area is
  * 563 px high at 100% zoom and holds 788 px (225 px, 3.4 rows of 66 px, to scroll; the least of any zoom), the Checks
  * tab's area is 412 px and holds 4346 px, and the rules elements list's is 412 px and holds 1790 px. With 10 entries
- * the Abilities tab had 93 px (1.4 rows) to scroll at 100% zoom (`entry-count-measure-10.log`). The sidebar's
- * sections are not bulk entries: 5 sections hold 872 px in an 855 px area (17 px) at 100% zoom and more at higher
- * zooms (the same logs, `sidebar` rows).
+ * the Abilities tab had 93 px (1.4 rows) to scroll at 100% zoom (`entry-count-measure-10.log`); 12 was chosen over 10
+ * for the margin: 225 px (3.4 rows) against 93 px (1.4 rows) at the tightest zoom. The sidebar's sections are not bulk
+ * entries: 5 sections hold 872 px in an 855 px area (17 px) at 100% zoom and more at higher zooms (the same logs,
+ * `sidebar` rows).
  * @type {number}
  */
 export const BULK_COUNT = 12;

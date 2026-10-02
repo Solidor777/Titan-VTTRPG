@@ -72,15 +72,20 @@ function expectedDifficulty(targetDefense, attackerRating) {
 async function rollAttackWithTargets(page, targetNames) {
    await forceDice(page, FORCED_FACES);
    return page.evaluate(async (names) => {
+      /** @type {object} The roller actor. */
       const roller = game.actors.getName('E2E Roller');
+      /** @type {string} The id of the roller's weapon. */
       const weaponId = roller.items.find((item) => item.type === 'weapon').id;
+      /** @type {object[]} The target actors whose Defense ratings are read. */
       const targetActors = names.map((name) => game.actors.getName(name));
+      /** @type {number} The world message count before the roll. */
       const before = game.messages.size;
       await roller.system.rollAttackCheck({
          itemId: weaponId,
          attackIdx: 0,
       });
       await titanWait(() => game.messages.size > before, { message: 'new chat message' });
+      /** @type {object} The newest chat message. */
       const newest = game.messages.contents[game.messages.size - 1];
       return {
          created: game.messages.size > before,
@@ -138,16 +143,19 @@ test.describe('v14 opposed checks (forced dice)', () => {
       test.setTimeout(120_000);
 
       // Precondition: the TITAN system must have initialized.
+      /** @type {boolean} Whether the TITAN system finished initializing. */
       const systemReady = await page.evaluate(() => typeof game.titan !== 'undefined'
          && !!CONFIG.Actor?.dataModels?.player);
       expect(systemReady, 'TITAN system failed to initialize before opposed-checks walk').toBe(true);
 
       await page.evaluate(async ({ rollerActor, rollerItems, attackerBoostItem, targets }) => {
          // Build the roller with a boosted attack rating so both difficulty clamps are reachable.
+         /** @type {object|undefined} The roller left by an earlier run. */
          const staleRoller = game.actors.getName('E2E Roller');
          if (staleRoller) {
             await staleRoller.delete();
          }
+         /** @type {object} The new roller actor. */
          const roller = await Actor.create(rollerActor);
          await roller.createEmbeddedDocuments('Item', [
             ...rollerItems,
@@ -156,10 +164,12 @@ test.describe('v14 opposed checks (forced dice)', () => {
 
          // Build each target actor carrying its Defense flat-modifier ability.
          for (const target of targets) {
+            /** @type {object|undefined} The target actor left by an earlier run. */
             const stale = game.actors.getName(target.actor.name);
             if (stale) {
                await stale.delete();
             }
+            /** @type {object} The new target actor. */
             const actor = await Actor.create(target.actor);
             await actor.createEmbeddedDocuments('Item', [target.item]);
          }
@@ -175,6 +185,7 @@ test.describe('v14 opposed checks (forced dice)', () => {
 
       await viewScene(page, await shared(page, 'scene'));
       for (const mod of TARGET_MODS) {
+         /** @type {string} The id of the target actor. */
          const actorId = await page.evaluate((name) => game.actors.getName(name).id, targetName(mod));
          tokenIds.set(targetName(mod), await placeToken(page, actorId));
       }

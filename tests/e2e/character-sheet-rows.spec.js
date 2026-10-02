@@ -10,6 +10,7 @@ import {
    shared,
    viewScene,
 } from './flows.js';
+import { withClients } from './multiClient.js';
 import { selectTitanOption } from './select.js';
 import { setClientSetting } from './settings.js';
 import { attachPageErrors, closeAllApps, newestMessageType } from './world.js';
@@ -942,10 +943,17 @@ test.describe('effect check list', () => {
    });
 
    test('dragging a check above another on the effect sheet reorders the checks', async () => {
+      /** @type {import('@playwright/test').Locator} The effect sheet. */
       const sheet = await openSheetByUuid(page, effectUuid);
       await sheet.locator('.tab-list').getByText('Checks', { exact: true }).first().click();
+      /** @type {import('@playwright/test').Locator} The check rows of the effect sheet. */
       const rows = sheet.locator('li.reorder-row');
       await expect(rows, 'both checks render').toHaveCount(2);
+
+      // The first check is collapsed, so the two rows differ in expansion state and a misaligned state shows.
+      await rows.nth(0).getByRole('button', { name: 'Collapse' }).click();
+      await expect(rows.nth(0).locator('.expandable-content'), 'the first check is collapsed').toHaveCount(0);
+      await expect(rows.nth(1).locator('.expandable-content'), 'the second check is expanded').toHaveCount(1);
       await rows.nth(1).locator('[data-drag-handle]').dragTo(rows.nth(0), {
          targetPosition: {
             x: 20,
@@ -956,16 +964,28 @@ test.describe('effect check list', () => {
          'E2E Rows List Check B',
          'E2E Rows List Check A',
       ]);
+
+      // The expansion state moved with the checks: B (expanded) is first, A (collapsed) is second.
+      await expect(rows.nth(0).locator('.header .label input'), 'the moved check is first').toHaveValue(
+         'E2E Rows List Check B',
+      );
+      await expect(rows.nth(0).locator('.expandable-content'), 'the moved check stays expanded').toHaveCount(1);
+      await expect(rows.nth(1).locator('.expandable-content'), 'the collapsed check stays collapsed').toHaveCount(0);
       expect(errors, `uncaught errors:\n${errors.join('\n')}`).toEqual([]);
    });
 
    test('dropping a check from an equipment sheet onto the effect sheet copies it in', async () => {
+      /** @type {import('@playwright/test').Locator} The effect sheet. */
       const sheet = await openSheetByUuid(page, effectUuid);
       await sheet.locator('.tab-list').getByText('Checks', { exact: true }).first().click();
+      /** @type {import('@playwright/test').Locator} The check rows of the effect sheet. */
       const rows = sheet.locator('li.reorder-row');
       await expect(rows, 'both checks render').toHaveCount(2);
+      await rows.nth(0).getByRole('button', { name: 'Collapse' }).click();
+      await expect(rows.nth(0).locator('.expandable-content'), 'the first check is collapsed').toHaveCount(0);
 
       // The two windows open on top of each other, so they are moved apart (a window position is not a document).
+      /** @type {import('@playwright/test').Locator} The equipment's sheet. */
       const itemSheet = await openSheetByUuid(page, `${actorUuid}.Item.${itemIds.parity}`);
       await itemSheet.locator('.tab-list').getByText('Checks', { exact: true }).first().click();
       await page.evaluate(([itemSheetId, effectSheetId]) => {
@@ -986,6 +1006,12 @@ test.describe('effect check list', () => {
          'E2E Rows List Check A',
          'E2E Rows List Check B',
       ]);
+
+      // The inserted check is expanded and the collapsed check kept its state at its new index.
+      await expect(rows, 'the copy renders as a third row').toHaveCount(3);
+      await expect(rows.nth(0).locator('.expandable-content'), 'the inserted check is expanded').toHaveCount(1);
+      await expect(rows.nth(1).locator('.expandable-content'), 'the collapsed check stays collapsed').toHaveCount(0);
+      await expect(rows.nth(2).locator('.expandable-content'), 'the last check stays expanded').toHaveCount(1);
       expect(errors, `uncaught errors:\n${errors.join('\n')}`).toEqual([]);
    });
 });
@@ -1226,9 +1252,13 @@ test.describe('deleting rows', () => {
    });
 
    test('a refused delete of an equipped armor leaves it equipped and its row expanded', async () => {
+      /** @type {string} The new armor's id. */
       const id = await createOwnedItem(page, actorId, 'armor', 'E2E Rows Refused Worn Armor');
+      /** @type {string} The armor's uuid. */
       const uuid = `${actorUuid}.Item.${id}`;
+      /** @type {import('@playwright/test').Locator} The actor's sheet on the Inventory tab. */
       const sheet = await openActorTab('Inventory');
+      /** @type {import('@playwright/test').Locator} The armor's row. */
       const row = itemRow(sheet, id);
       await expandRow(row);
       await setEquipped(row, 'armor', uuid, true);
@@ -1245,6 +1275,7 @@ test.describe('deleting rows', () => {
          ).toBe(id);
          // The sheet keeps each row's expanded state, so a reopened sheet shows whether the delete cleared it.
          await closeAllApps(page);
+         /** @type {import('@playwright/test').Locator} The armor's row on the reopened sheet. */
          const reopened = itemRow(await openActorTab('Inventory'), id);
          await expect.soft(reopened.locator('.expandable-content'), 'the refused delete left the row expanded')
             .toBeVisible();
@@ -1261,6 +1292,70 @@ test.describe('deleting rows', () => {
          { message: 'the deleted armor is no longer equipped' },
       ).toBeFalsy();
       expect(errors, `uncaught errors:\n${errors.join('\n')}`).toEqual([]);
+   });
+
+   /**
+    * Reads the id the actor holds in its armor slot.
+    * @param {import('@playwright/test').Page} client - The client whose world copy of the actor is read.
+    * @returns {Promise<string|null>} The id of the equipped armor, or null.
+    */
+   function equippedArmorOn(client) {
+      return client.evaluate((actorId) => game.actors.get(actorId).system.equipped.armor, actorId);
+   }
+
+   test('an equipped armor deleted outside the sheet, as a macro deletes it, is un-equipped', async () => {
+      /** @type {string} The new armor's id. */
+      const id = await createOwnedItem(page, actorId, 'armor', 'E2E Rows Macro Armor');
+      /** @type {string} The armor's uuid. */
+      const uuid = `${actorUuid}.Item.${id}`;
+      /** @type {import('@playwright/test').Locator} The armor's row. */
+      const row = itemRow(await openActorTab('Inventory'), id);
+      await expandRow(row);
+      await setEquipped(row, 'armor', uuid, true);
+
+      // There is no control but the row's delete button, so the delete is the document operation a macro makes.
+      await page.evaluate(async ({ actorId, id }) => game.actors.get(actorId).items.get(id).delete(), {
+         actorId,
+         id,
+      });
+      await expect.poll(() => actorHas('items', id), { message: 'the delete removed the armor' }).toBe(false);
+      await expect.poll(() => equippedArmorOn(page), { message: 'the deleted armor is no longer equipped' })
+         .toBeFalsy();
+      expect(errors, `uncaught errors:\n${errors.join('\n')}`).toEqual([]);
+   });
+
+   test('only the client that deletes an equipped armor writes the un-equip', async ({ browser }) => {
+      /** @type {string} The new armor's id. */
+      const id = await createOwnedItem(page, actorId, 'armor', 'E2E Rows Shared Armor');
+      /** @type {string} The armor's uuid. */
+      const uuid = `${actorUuid}.Item.${id}`;
+      /** @type {import('@playwright/test').Locator} The armor's row. */
+      const row = itemRow(await openActorTab('Inventory'), id);
+      await expandRow(row);
+      await setEquipped(row, 'armor', uuid, true);
+      await withClients(browser, { observer: 'E2E GM 2' }, async ({ observer }) => {
+         await expect.poll(() => equippedArmorOn(observer), { message: 'the observer sees the armor equipped' })
+            .toBe(id);
+
+         // `preUpdateActor` runs only on the client that makes an update, so it counts the observer's own writes.
+         await observer.evaluate(() => {
+            window.__e2eActorWrites = 0;
+            Hooks.on('preUpdateActor', () => {
+               window.__e2eActorWrites += 1;
+            });
+         });
+         await page.evaluate(async ({ actorId, id }) => game.actors.get(actorId).items.get(id).delete(), {
+            actorId,
+            id,
+         });
+         await expect.poll(() => equippedArmorOn(observer), { message: 'the observer sees the slot emptied' })
+            .toBeFalsy();
+         expect(
+            await observer.evaluate(() => window.__e2eActorWrites),
+            'the observer made no actor update of its own',
+         ).toBe(0);
+      });
+      expect(await equippedArmorOn(page), 'the deleting client emptied the slot').toBeFalsy();
    });
 
    test('with confirmation on, a refused confirmed item delete leaves the item deletable', async () => {

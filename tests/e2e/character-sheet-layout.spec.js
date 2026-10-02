@@ -272,19 +272,20 @@ test.describe('browser zoom', () => {
          /** @type {Element} The last list entry. */
          const last = rows[rows.length - 1];
 
-         // Only containers a user can scroll (overflow auto/scroll) are scrolled. `overflows` records whether any of
-         // them has more content than it shows, measured before scrolling: without that, the test would pass on a list
-         // that fits.
-         /** @type {boolean} Whether a scrollable ancestor of the last entry holds more than it shows. */
-         let overflows = false;
+         // Only containers a user can scroll (overflow auto/scroll) are scrolled. `overflows` records whether the
+         // list's own scroller, the nearest scrollable ancestor of the last entry, holds more than it shows, measured
+         // before scrolling: without that, the test would pass on a list that fits.
+         /** @type {boolean|null} Whether the list's own scroller holds more than it shows; null until it is found. */
+         let overflows = null;
          for (let element = last.parentElement; element && element !== document.body; element = element.parentElement) {
             /** @type {string} The element's vertical overflow setting. */
             const overflow = getComputedStyle(element).overflowY;
             if (overflow === 'auto' || overflow === 'scroll') {
-               overflows ||= element.scrollHeight > element.clientHeight;
+               overflows ??= element.scrollHeight > element.clientHeight;
                element.scrollTop = element.scrollHeight;
             }
          }
+         overflows ??= false;
 
          /** @type {DOMRect} The measured element's box. */
          const box = last.getBoundingClientRect();
@@ -417,6 +418,8 @@ test.describe('browser zoom', () => {
    });
 
    test('the character sheet sidebar reaches its last section at 50-150% zoom', async () => {
+      // The sidebar's overflow does not depend on BULK_COUNT: its 5 sections hold 872 px in an 855 px area, 17 px to
+      // scroll at 100% zoom (`entry-count-measure-12.log`, `sidebar` rows), more at the higher zooms.
       /** @type {string} The sheet application's element id. */
       const appId = await openSheetAtFullZoom(`Actor.${bulkId}`);
       /** @type {import('@playwright/test').Locator} The sidebar sections. */
