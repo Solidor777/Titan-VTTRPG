@@ -1,4 +1,5 @@
 import { expect, test } from './harness.js';
+import { clickSheetTab } from './actions.js';
 import { login, openSheetByUuid } from './fixtures.js';
 import { addAttack, addCustomTrait, addEffect, createActor, createWorldItem } from './flows.js';
 import { attachPageErrors, closeAllApps } from './world.js';
@@ -338,7 +339,7 @@ test.describe('custom traits on a weapon attack', () => {
 
       /** @type {import('@playwright/test').Locator} The weapon's sheet. */
       const sheet = await openSheetByUuid(page, uuid);
-      await sheet.locator('.tab-list').getByText('Attacks', { exact: true }).first().click();
+      await clickSheetTab(sheet, 'Attacks');
       return {
          uuid: uuid,
          sheet: sheet,

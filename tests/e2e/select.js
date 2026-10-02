@@ -1,3 +1,6 @@
+import { expect } from '@playwright/test';
+import { settle } from './settle.js';
+
 /**
  * Page-object helpers for driving the TITAN custom Select (a `role="combobox"` button that opens a
  * `role="listbox"` portaled to `document.body`). Only one list is open at a time, so option rows can
@@ -5,19 +8,24 @@
  */
 
 /**
- * Opens the given Select trigger and clicks the option carrying the target value.
+ * Opens the given Select trigger, clicks the option carrying the target value, and waits until the trigger shows that
+ * value, the list has closed and the operations the choice started have finished.
  * @param {import('@playwright/test').Page} page - The Playwright page.
  * @param {import('@playwright/test').Locator} trigger - The Select trigger (role=combobox).
  * @param {string|number} value - The `data-value` of the option to choose.
- * @returns {Promise<void>} Resolves once the option is clicked.
+ * @returns {Promise<void>} Resolves once the choice has taken effect.
  */
 export async function selectTitanOption(page, trigger, value) {
    await trigger.click();
    await page.locator(`[role="option"][data-value="${value}"]`).click();
+   await expect(trigger, `the select shows ${value}`).toHaveAttribute('data-value', String(value));
+   await expect(page.locator('[role="option"]'), 'the option list closed').toHaveCount(0);
+   await settle(page);
 }
 
 /**
- * Opens the given Select trigger and returns every visible option's `data-value`, then closes the list.
+ * Opens the given Select trigger and returns every visible option's `data-value`, then closes the list and waits
+ * until it has closed.
  * @param {import('@playwright/test').Page} page - The Playwright page.
  * @param {import('@playwright/test').Locator} trigger - The Select trigger (role=combobox).
  * @returns {Promise<string[]>} The option values in DOM order.
@@ -30,6 +38,7 @@ export async function titanSelectOptionValues(page, trigger) {
       (rows) => rows.map((row) => row.getAttribute('data-value')),
    );
    await page.keyboard.press('Escape');
+   await expect(page.locator('[role="option"]'), 'the option list closed').toHaveCount(0);
    return values;
 }
 

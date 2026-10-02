@@ -11,6 +11,7 @@ import {
    setCheckbox,
    setSelectField,
 } from './checkDialog.js';
+import { settle } from './settle.js';
 
 /**
  * The check dialog's Advantage select, Automatic Failure checkbox, effective Difficulty, and situational checkboxes.
@@ -990,6 +991,7 @@ async function editAbilityCheck(changes) {
       actorName: ACTOR_NAME,
       changes,
    });
+   await settle(page);
 }
 
 test('an untouched Item Check Difficulty and Skill follow an edit to the owned item\'s check, and the rolled ' +
@@ -1237,6 +1239,7 @@ async function changeCheckEffect(changes) {
       actorName: ACTOR_NAME,
       changes,
    });
+   await settle(page);
 }
 
 test('an effect-sourced Item Check dialog\'s untouched Difficulty follows an edit to the effect\'s check, and the ' +

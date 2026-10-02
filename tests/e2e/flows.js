@@ -1,9 +1,11 @@
 import path from 'node:path';
 import { expect, test } from './harness.js';
+import { clickSheetTab, commitText } from './actions.js';
 import { chooseContextMenuEntry } from './contextMenu.js';
 import { openSheetByUuid } from './fixtures.js';
 import { readRegistry, record, writeRegistry } from './registry.js';
 import { selectTitanOption } from './select.js';
+import { settle } from './settle.js';
 import { closeAllApps } from './world.js';
 
 // One exported async function per real Foundry user flow. Each flow drives the DOM the way a user does (sidebar
@@ -184,10 +186,10 @@ export async function createScene(page, { name }) {
  * is never clicked.
  * @param {import('@playwright/test').Locator} sheet - The sheet's window element.
  * @param {string} label - The tab's visible label.
- * @returns {Promise<void>} Resolves once the tab button has been clicked.
+ * @returns {Promise<void>} Resolves once the tab is the active one.
  */
 async function openTab(sheet, label) {
-   await sheet.locator('.tab-list').getByText(label, { exact: true }).first().click();
+   await clickSheetTab(sheet, label);
 }
 
 /**
@@ -265,8 +267,7 @@ export async function createOwnedItem(page, actorId, type, name) {
    /** @type {import('@playwright/test').Locator} The item sheet's element. */
    const itemSheet = page.locator(`.application[id$="Item-${id}"]`);
    await expect(itemSheet).toBeVisible();
-   await itemSheet.locator('.document-name input').fill(name);
-   await itemSheet.locator('.document-name input').blur();
+   await commitText(itemSheet.locator('.document-name input'), name);
    await expect.poll(
       () => page.evaluate(({ actorId, id }) => game.actors.get(actorId).items.get(id).name, {
          actorId,
@@ -759,6 +760,7 @@ export async function pickPortrait(page, sheet, fileName) {
    await picker.locator(`[data-action="pickFile"][data-name="${fileName}"]`).click();
    await picker.locator('button[type="submit"]').click();
    await expect(picker).toHaveCount(0);
+   await settle(page);
 }
 
 /**
@@ -854,8 +856,7 @@ export async function addEffect(page, actorId, name, { duration } = {}) {
    /** @type {import('@playwright/test').Locator} The effect sheet's element. */
    const effectSheet = page.locator(`.application[id$="ActiveEffect-${id}"]`);
    await expect(effectSheet).toBeVisible();
-   await effectSheet.locator('.document-name input').fill(name);
-   await effectSheet.locator('.document-name input').blur();
+   await commitText(effectSheet.locator('.document-name input'), name);
    await expect.poll(
       () => page.evaluate(({ actorId, id }) => game.actors.get(actorId).effects.get(id).name, {
          actorId,
@@ -933,8 +934,7 @@ export async function addCheck(page, documentUuid, { label, resolveCost, resista
    if (label !== undefined) {
       /** @type {import('@playwright/test').Locator} The new row's label input. */
       const input = row.locator('.header .label input');
-      await input.fill(label);
-      await input.blur();
+      await commitText(input, label);
       await expect.poll(() => stored('label'), { message: 'the label input stored the check label' }).toBe(label);
    }
 
@@ -948,8 +948,7 @@ export async function addCheck(page, documentUuid, { label, resolveCost, resista
    if (resolveCost !== undefined) {
       /** @type {import('@playwright/test').Locator} The Resolve Cost input. */
       const input = field('Resolve Cost').locator('input');
-      await input.fill(String(resolveCost));
-      await input.blur();
+      await commitText(input, String(resolveCost));
       await expect.poll(() => stored('resolveCost'), { message: 'the input stored the resolve cost' })
          .toBe(resolveCost);
    }
@@ -1048,8 +1047,7 @@ export async function addRulesElement(page, documentUuid, element) {
    if (element.value !== undefined) {
       /** @type {import('@playwright/test').Locator} The value input. */
       const input = row.getByTestId('ccm-value');
-      await input.fill(String(element.value));
-      await input.blur();
+      await commitText(input, String(element.value));
       await expect.poll(() => stored('value'), { message: 'the value input stored the value' }).toBe(element.value);
    }
 }
@@ -1103,6 +1101,8 @@ export async function addAttack(page, weaponUuid) {
       () => page.evaluate(async (uuid) => (await fromUuid(uuid)).system.attack.length, weaponUuid),
       { message: 'the add button created one attack' },
    ).toBe(before + 1);
+   await expect(sheet.locator('li.reorder-row'), 'the Attacks tab rendered the new row').toHaveCount(before + 1);
+   await settle(page);
 }
 
 /**
@@ -1179,6 +1179,8 @@ export async function addCustomAspect(page, spellUuid) {
       () => page.evaluate(async (uuid) => (await fromUuid(uuid)).system.customAspect.length, spellUuid),
       { message: 'the add button created one custom aspect' },
    ).toBe(before + 1);
+   await expect(sheet.locator('li.reorder-row'), 'the Custom Aspects tab rendered the new row').toHaveCount(before + 1);
+   await settle(page);
 }
 
 /**
@@ -1226,8 +1228,7 @@ export async function createTrayEffect(page, packId, name) {
    /** @type {import('@playwright/test').Locator} The effect's sheet window. */
    const effectSheet = page.locator(`.application[id$="ActiveEffect-${id}"]`);
    await expect(effectSheet).toBeVisible();
-   await effectSheet.locator('.document-name input').fill(name);
-   await effectSheet.locator('.document-name input').blur();
+   await commitText(effectSheet.locator('.document-name input'), name);
    await expect.poll(
       () => page.evaluate(async ({ packId, id }) => (await game.packs.get(packId).getDocument(id)).name, {
          packId,

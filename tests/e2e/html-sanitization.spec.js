@@ -104,14 +104,15 @@ test('a report tag tooltip holds the cleaned HTML and renders it without the eve
    await expect(tag).toContainText('E2E Sanitized Condition');
    await expect.poll(() => tag.evaluate((element) => element._tippy?.props?.content)).toBe(expected);
 
-   // The tooltip is shown through tippy's `show`, which skips the hover delay: `TooltipAction.js` delays a hover's show
-   // by 1000 ms and animates it for 400 ms, longer than the suite's 1 s ceiling on a wait inside a loaded page. The
-   // image is inserted and its failed load settles without a handler.
-   await tag.evaluate((element) => element._tippy.show());
+   // The one real-hover test, exempt from the 1 s ceiling: a hover shows the tooltip only after `TOOLTIP_DELAY[0]`
+   // (1000 ms) and animates it for `TOOLTIP_DURATION[0]` (400 ms), both set in
+   // `src/helpers/svelte-actions/TooltipAction.js` and passed to tippy as `delay` and `duration`. The wait is those
+   // timers (1400 ms) plus 1100 ms of margin. The image is inserted and its failed load settles without a handler.
+   await tag.hover();
 
    /** @type {import('@playwright/test').Locator} The rendered tooltip's image. */
    const tooltipImage = page.locator('.tippy-box img[src="e2e-missing-image.png"]');
-   await expect(tooltipImage).toHaveCount(1);
+   await expect(tooltipImage, 'the hover timers elapsed and the tooltip rendered').toHaveCount(1, { timeout: 2500 });
    await expect.poll(() => tooltipImage.evaluate((element) => element.complete)).toBe(true);
    expect(await tooltipImage.getAttribute('onerror')).toBeNull();
    expect(await page.evaluate(() => window.__titanXss)).toBeUndefined();

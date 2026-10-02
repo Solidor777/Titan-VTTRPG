@@ -1,4 +1,5 @@
 import { expect, test } from './harness.js';
+import { commitText } from './actions.js';
 import { login, openSheetByUuid } from './fixtures.js';
 import { createActor, placeToken, shared, sharedUuid, unlinkPlacedToken, viewScene } from './flows.js';
 import { attachPageErrors, closeAllApps, newestMessageType } from './world.js';
@@ -225,8 +226,7 @@ test.describe('a placed token', () => {
       const baseName = (await names()).base;
 
       // Presence: an edit made on the base sheet itself re-runs the base sheet's readers.
-      await baseSheet.locator('.document-name input').fill(`${baseName} Edited`);
-      await baseSheet.locator('.document-name input').blur();
+      await commitText(baseSheet.locator('.document-name input'), `${baseName} Edited`);
       await expect.poll(async () => (await names()).base, { message: 'the base sheet stored the name' })
          .toBe(`${baseName} Edited`);
       await expect.poll(async () => (await reads()).base, { message: 'a base sheet edit re-ran its readers' })
@@ -245,8 +245,7 @@ test.describe('a placed token', () => {
       // Absence: the same kind of edit on the unlinked token's sheet leaves the base sheet's readers alone.
       /** @type {{base: number, token: number}} The reads before the token sheet edit. */
       const readsBefore = await reads();
-      await tokenSheet.locator('.document-name input').fill('E2E Header Token Edited');
-      await tokenSheet.locator('.document-name input').blur();
+      await commitText(tokenSheet.locator('.document-name input'), 'E2E Header Token Edited');
       await expect.poll(async () => (await names()).token, { message: 'the token sheet stored the name' })
          .toBe('E2E Header Token Edited');
       await expect(tokenSheet.locator('.document-name input')).toHaveValue('E2E Header Token Edited');

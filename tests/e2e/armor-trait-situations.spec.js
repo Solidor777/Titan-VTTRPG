@@ -2,6 +2,7 @@ import { expect, test } from './harness.js';
 import { login } from './fixtures.js';
 import { attachPageErrors, clearChat, closeAllApps, deleteFixtureActor } from './world.js';
 import { clickRoll, readNewestCheckFlags, setSelectField } from './checkDialog.js';
+import { settle } from './settle.js';
 
 /**
  * Equipped Heavy, Encumbering, and Loud armor offer their check rules as situational modifiers: Heavy's Greater
@@ -298,4 +299,5 @@ async function setStoredSituation(messageId, situation) {
       id: messageId,
       entry: situation,
    });
+   await settle(page);
 }

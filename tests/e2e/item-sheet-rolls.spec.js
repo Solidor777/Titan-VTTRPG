@@ -1,4 +1,5 @@
 import { expect, test } from './harness.js';
+import { clickSheetTab, commitText } from './actions.js';
 import { login, openSheetByUuid } from './fixtures.js';
 import { addAttack, addCheck, createActor, createOwnedItem, createWorldItem } from './flows.js';
 import { selectTitanOption } from './select.js';
@@ -69,8 +70,7 @@ test.beforeAll(async ({ browser }) => {
       FIRST_ATTACK_LABEL,
       SECOND_ATTACK_LABEL,
    ].entries()) {
-      await attackLabels.nth(index).fill(label);
-      await attackLabels.nth(index).blur();
+      await commitText(attackLabels.nth(index), label);
 
       // A stored row re-renders the list, which can reset a later row's input, so each label is awaited first.
       await expect.poll(
@@ -163,7 +163,7 @@ test.describe('the Checks tab', () => {
    test('the equipment check settings panel shows the roll-preview button', async () => {
       /** @type {import('@playwright/test').Locator} The equipment's sheet. */
       const sheet = await openSheetByUuid(page, itemUuids.equipment);
-      await sheet.locator('.tab-list').getByText('Checks', { exact: true }).first().click();
+      await clickSheetTab(sheet, 'Checks');
 
       // A check row mounts expanded, so the preview is read without a click (a click would collapse the row).
       await expect(
@@ -209,7 +209,7 @@ test.describe('damage reduction', () => {
 
       /** @type {import('@playwright/test').Locator} The ability's sheet. */
       const sheet = await openSheetByUuid(page, uuid);
-      await sheet.locator('.tab-list').getByText('Checks', { exact: true }).first().click();
+      await clickSheetTab(sheet, 'Checks');
 
       /** @type {import('@playwright/test').Locator} The check's row. */
       const row = sheet.locator('.check').filter({ has: page.locator('.header .label input') }).first();
@@ -249,8 +249,7 @@ test.describe('damage reduction', () => {
 
       /** @type {import('@playwright/test').Locator} The Initial Value input, shown once Damage is ticked. */
       const initialValue = field('Initial Value').locator('input');
-      await initialValue.fill('3');
-      await initialValue.blur();
+      await commitText(initialValue, '3');
       await expect.poll(() => stored('initialValue'), { message: 'the Initial Value typed' }).toBe(3);
       await selectTitanOption(page, field('Damage Reduced By').locator('[role="combobox"]'), damageReducedBy);
       await expect.poll(() => stored('damageReducedBy'), { message: 'Damage Reduced By chosen' })

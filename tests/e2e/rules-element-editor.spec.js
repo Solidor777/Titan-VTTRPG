@@ -1,4 +1,5 @@
 import { expect, test } from './harness.js';
+import { clickSheetTab } from './actions.js';
 import { login, openSheetByUuid } from './fixtures.js';
 import { addRulesElement, createWorldItem } from './flows.js';
 import { attachPageErrors, closeAllApps } from './world.js';
@@ -60,7 +61,7 @@ async function openRulesElements() {
 
    /** @type {string} The localized Rules Elements tab label. */
    const label = await page.evaluate(() => game.i18n.localize('LOCAL.rulesElements.text'));
-   await sheet.locator('.tab-list').getByText(label, { exact: true }).first().click();
+   await clickSheetTab(sheet, label);
    await expect(sheet.locator('.add-entry-button button'), 'the rules elements tab rendered').toBeVisible();
    openedSheet = sheet;
    return sheet;

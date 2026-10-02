@@ -1,4 +1,6 @@
 import { expect } from '@playwright/test';
+import { selectTitanOption } from './select.js';
+import { settle } from './settle.js';
 
 /**
  * Page-object helpers for driving the rendered Svelte check-option dialogs from Playwright.
@@ -100,8 +102,7 @@ export async function setNumberField(dialog, key, value) {
 export async function setSelectField(dialog, key, value) {
    // The combobox trigger inside the field wrapper.
    const trigger = dialog.getByTestId(`check-field-${key}`).locator('[role="combobox"]');
-   await trigger.click();
-   await dialog.page().locator(`[role="option"][data-value="${value}"]`).click();
+   await selectTitanOption(dialog.page(), trigger, value);
 }
 
 /**
@@ -117,6 +118,8 @@ export async function setCheckbox(dialog, key, desired) {
    const checked = (await field.locator('i.fa-check').count()) > 0;
    if (checked !== desired) {
       await field.locator('button').click();
+      await expect(field.locator('i.fa-check'), `the ${key} checkbox is ${desired ? '' : 'un'}checked`)
+         .toHaveCount(desired ? 1 : 0);
    }
 }
 
@@ -142,6 +145,8 @@ export async function readSummary(dialog, key) {
 export async function clickRoll(dialog, page) {
    const baseline = await page.evaluate(() => game.messages.size);
    await dialog.getByTestId('check-dialog-roll').click();
+   await expect(dialog, 'the roll closed the dialog').toHaveCount(0);
+   await settle(page);
    return baseline;
 }
 

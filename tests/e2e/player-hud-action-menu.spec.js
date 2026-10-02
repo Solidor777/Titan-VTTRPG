@@ -8,6 +8,7 @@ import {
    deleteFixtureActor,
    deleteOrphanedTokens,
 } from './world.js';
+import { settle } from './settle.js';
 
 /** @type {import('@playwright/test').Page} The file-shared, logged-in page (one world boot per file). */
 let page;
@@ -610,13 +611,14 @@ function iconUsesAccent(page, testId) {
  * @param {string} attribute - The attribute key.
  * @returns {Promise<void>} Resolves once the update completes.
  */
-function setAthleticsAttribute(actorId, attribute) {
-   return page.evaluate(({ id, value }) => {
+async function setAthleticsAttribute(actorId, attribute) {
+   await page.evaluate(({ id, value }) => {
       return game.actors.get(id).update({ 'system.skill.athletics.defaultAttribute': value });
    }, {
       id: actorId,
       value: attribute,
    });
+   await settle(page);
 }
 
 /**

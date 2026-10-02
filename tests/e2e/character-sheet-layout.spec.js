@@ -1,4 +1,5 @@
 import { expect, test } from './harness.js';
+import { commitText } from './actions.js';
 import { login, openSheetByUuid, openSheetTab } from './fixtures.js';
 import { BULK_COUNT, createActor, shared } from './flows.js';
 import { attachPageErrors, closeAllApps } from './world.js';
@@ -94,8 +95,7 @@ test.describe('the Skills tab and the sidebar', () => {
          /** @type {import('@playwright/test').Locator} The training base value input of the skill's row. */
          const input = sheet.locator('.skill', { hasText: label }).locator('.stats .stat').first()
             .getByRole('textbox').first();
-         await input.fill(String(value));
-         await input.blur();
+         await commitText(input, String(value));
          await expect.poll(
             () => page.evaluate(
                async ({ uuid, skill }) => (await fromUuid(uuid)).system.skill[skill].training.baseValue,

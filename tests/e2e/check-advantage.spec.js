@@ -3,6 +3,7 @@ import { login } from './fixtures.js';
 import { attachPageErrors, clearChat, closeAllApps, deleteFixtureActor, showChatLog } from './world.js';
 import { forceDice, resetDice } from './dice.js';
 import { readNewestCheckFlags } from './checkDialog.js';
+import { settle } from './settle.js';
 
 /**
  * Advantage, Disadvantage, and Automatic Failure on rolled checks: the parameters the check engine stores, the
@@ -467,6 +468,7 @@ async function updateStoredParameters(targetPage, id, changes) {
       messageId: id,
       parameterChanges: changes,
    });
+   await settle(targetPage);
 }
 
 test.describe('chat card tags', () => {

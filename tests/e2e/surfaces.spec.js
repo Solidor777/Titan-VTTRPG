@@ -1,4 +1,5 @@
 import { expect, test } from './harness.js';
+import { clickSheetTab } from './actions.js';
 import { collectLocalizationOffenders, login, openSheetByUuid, renderSheet } from './fixtures.js';
 import {
    addEffect,
@@ -177,7 +178,7 @@ test.describe('sheet layouts', () => {
 
    test('the spells tab renders a spell row with a custom trait', async () => {
       const sheet = await renderSheet(page, await sharedUuid(page, 'roller'), '.titan-player-sheet', errors);
-      await sheet.locator('.tab-list').getByText('Spells', { exact: true }).click();
+      await clickSheetTab(sheet, 'Spells');
       await expect(sheet.locator('[data-item-id]', { hasText: 'E2E Shared Spell' })).toBeVisible();
    });
 });
@@ -260,7 +261,7 @@ test.describe('check-options dialogs', () => {
                page,
                `${rollerUuid}.Item.${items.find((item) => item.type === 'weapon').id}`,
             );
-            await sheet.locator('.tab-list').getByText('Attacks', { exact: true }).click();
+            await clickSheetTab(sheet, 'Attacks');
             await sheet.locator('.attack .check-button button').first().click();
          },
       };

@@ -1,4 +1,5 @@
 import { recordSetting } from './registry.js';
+import { settle } from './settle.js';
 
 // `setWorldSetting` records the value a world setting held before the suite first set it on the running list
 // (`registry.js`), so `global-teardown.js` restores it. Setting through the API is the interpretation of the Project
@@ -38,6 +39,7 @@ export async function setWorldSetting(pageGm, key, value) {
          value,
       },
    );
+   await settle(pageGm);
 }
 
 /**
@@ -55,6 +57,7 @@ export async function setClientSetting(page, key, value) {
          value,
       },
    );
+   await settle(page);
 }
 
 /**

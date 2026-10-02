@@ -1,4 +1,5 @@
 import { installPoll } from './poll.js';
+import { installSettle } from './settle.js';
 import { attachPageErrors, flushHookErrorReports, installHookErrorReporting } from './world.js';
 
 // The world-joining module: it holds what every logged-in page needs and nothing that depends on the test runner, so
@@ -93,6 +94,7 @@ export async function joinWorld(page, user, origin) {
    // Install the in-page poll helper and hook-error reporting before navigating (addInitScript runs on document
    // load).
    await installPoll(page);
+   await installSettle(page);
    await installHookErrorReporting(page);
 
    /** @type {import('./join.js').WorldPage} The page's record; its collector receives errors from now on. */

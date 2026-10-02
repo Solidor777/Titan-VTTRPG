@@ -1062,12 +1062,21 @@ default is 1000 (`tests/e2e/poll.js`), so a call that names no ceiling gets 1 s;
 lower. Playwright retries an assertion at growing intervals (100, 250, 500 ms; read in `playwright-core/lib`, version
 1.60.0), so a condition that settles at 400 ms (Svelte's default `slide` transition duration, read in
 `svelte/src/transition/index.js`) is first seen at 850 ms (measured: the collapse assertions in
-`e2e-measure-1-slowops.json` finished at 805 to 930 ms). A product delay or animation longer than the ceiling is not waited out: the test acts on the
-instance that skips it (`html-sanitization.spec.js` shows the tooltip through tippy's `show`, because
-`TooltipAction.js` delays a hover's show by 1000 ms), or removes the cause (the last test of
-`condition-description.spec.js` reloads, which ends core's 2 s scrolling text, before it deactivates the scene).
-A flow that clicks an element which a pending request will re-render waits for the re-render first (`pickPortrait`
-marks the picker's file list and waits for the browse to replace it).
+`e2e-measure-1-slowops.json` finished at 805 to 930 ms). A product delay or animation longer than the ceiling is not waited out: the test removes the cause (the last test of
+`condition-description.spec.js` reloads, which ends core's 2 s scrolling text, before it deactivates the scene). The one
+exception is the real-hover test below.
+
+**Action helpers return only after the effect of their action is observable**, so no caller has to wait before its next
+action (OPEN_BUGS #131: a re-render of the previous action discarded or reordered the next one). `settle.js` counts the
+document operations (`createDocuments`, `updateDocuments`, `deleteDocuments` of `foundry.abstract.Document`) and
+`ApplicationV2#render` calls in flight in the page, installed by `joinWorld` on every document load, and `settle(page)`
+waits for zero within 1 s. `actions.js` holds `clickSheetTab` (waits for the tab to be the active one) and `commitText`
+(fill, blur, `settle`); `selectTitanOption` waits for the trigger's `data-value` and the closing of the list;
+`setCheckbox`, `clickRoll`, `addAttack`, `addCustomAspect`, `pickPortrait`, `dragGripToMove` (`drag.spec.js`: the dragged
+row's element changes position) and the spec setters that write through the API call or wait as well. What the counter
+cannot see: a write that a handler starts after an `await` of its own, a socket request that is not a document operation
+(the file picker's browse: `pickPortrait` marks the old list and waits for it to be replaced), and the commit of a dialog's
+number input (`setNumberField`: it changes dialog state only, and the caller reads the dialog's summary).
 
 The exemptions wait on a process starting and are not polls on a loaded page:
 - a `game.ready` world boot (`fixtures.js`, `join.js`; the teardown's and the setup recovery's own login goes through
@@ -1075,6 +1084,10 @@ The exemptions wait on a process starting and are not polls on a loaded page:
 - a mid-file reload through `world.js` `reloadWorld(page, { ready })` (15 s for the `/game` URL, 60 s for the
   readiness predicate, `game.ready` by default), used by the last test of `condition-description.spec.js`, the reload
   test of `player-hud-layout.spec.js` and both portrait tests of `surfaces.spec.js`;
+- the one real-hover test (`html-sanitization.spec.js`, "a report tag tooltip holds the cleaned HTML ..."): a hover shows a
+  tooltip after `TOOLTIP_DELAY[0]` (1000 ms) and animates it for `TOOLTIP_DURATION[0]` (400 ms), both set in
+  `src/helpers/svelte-actions/TooltipAction.js` and passed to tippy as `delay` and `duration`; its wait is 2500 ms. The
+  user exempted it because it waits out the product's own hover-delay timer;
 - `use.actionTimeout` (10 s safety net for actions) and per-test and hook limits (`test.setTimeout`, e.g. 120 s or
   300 s for the tests that reload and 240 s for the `beforeAll` of `drag.spec.js`).
 

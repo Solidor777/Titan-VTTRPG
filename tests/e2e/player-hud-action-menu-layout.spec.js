@@ -9,6 +9,7 @@ import {
    deleteOrphanedTokens,
    waitForAnimations,
 } from './world.js';
+import { settle } from './settle.js';
 
 /** @type {import('@playwright/test').Page} The file-shared, logged-in page (one world boot per file). */
 let page;
@@ -110,6 +111,7 @@ async function setMenuOptions(page, patch) {
       await game.settings.set('titan', 'playerHudOptions',
          foundry.utils.mergeObject(current, { actionMenu: patch }, { inplace: false }));
    }, patch);
+   await settle(page);
 }
 
 /**

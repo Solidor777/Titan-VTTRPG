@@ -1,4 +1,5 @@
 import { expect, test } from './harness.js';
+import { commitText } from './actions.js';
 import { login } from './fixtures.js';
 import {
    clearProbeEvents,
@@ -112,8 +113,7 @@ test.describe('component probe — TextAreaInput', () => {
          events: ['onchange'],
       });
       const textarea = page.locator(`${selector} textarea`);
-      await textarea.fill('hello world');
-      await textarea.blur();
+      await commitText(textarea, 'hello world');
       await expect(textarea).toHaveValue('hello world');
       const events = await readProbeEvents(page);
       expect(events.some((e) => e.event === 'onchange')).toBe(true);

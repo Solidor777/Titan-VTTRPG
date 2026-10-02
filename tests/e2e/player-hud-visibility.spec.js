@@ -9,6 +9,7 @@ import {
    deleteFixtureActor,
    deleteOrphanedTokens,
 } from './world.js';
+import { settle } from './settle.js';
 
 /** @type {import('@playwright/test').Page} The file-shared, logged-in page (one world boot per file). */
 let page;
@@ -115,6 +116,7 @@ async function resetHudOptions(page) {
    await page.evaluate(async () => {
       await game.settings.set('titan', 'playerHudOptions', {});
    });
+   await settle(page);
 }
 
 test('GM sees the portrait for a single selected character', async () => {

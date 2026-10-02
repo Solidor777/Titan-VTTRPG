@@ -139,6 +139,7 @@ test.describe('shared AttackTags across surfaces', () => {
       // The weapon's inventory row, then expand it (first button in the header label area).
       const row = page.locator('.application.titan-document-sheet [data-item-id]').first();
       await row.locator('.header .label .button button').first().click();
+      await expect(row.locator('.expandable-content'), 'the weapon row expanded').toBeVisible();
       return row;
    }
 

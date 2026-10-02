@@ -1,4 +1,5 @@
 import { expect, test } from './harness.js';
+import { clickSheetTab, commitText } from './actions.js';
 import { login, openSheetByUuid } from './fixtures.js';
 import {
    addAttack,
@@ -14,6 +15,7 @@ import {
    openSidebarTab,
    shared,
 } from './flows.js';
+import { settle } from './settle.js';
 import { attachPageErrors, closeAllApps } from './world.js';
 
 /**
@@ -192,7 +194,7 @@ async function openList(uuid, kind) {
       }),
       await sheet.getAttribute('id'),
    );
-   await sheet.locator('.tab-list').getByText(LISTS[kind].tab, { exact: true }).first().click();
+   await clickSheetTab(sheet, LISTS[kind].tab);
    return sheet;
 }
 
@@ -230,8 +232,7 @@ async function fillList(uuid, kind, tokens) {
    for (const [index, token] of tokens.entries()) {
       /** @type {import('@playwright/test').Locator} The input that tells row `index` apart. */
       const input = rows.nth(index).locator(LISTS[kind].token).first();
-      await input.fill(token);
-      await input.blur();
+      await commitText(input, token);
 
       // A stored row re-renders the list, which can reset a later row's input, so each token is awaited first.
       await expect.poll(
@@ -259,12 +260,13 @@ function readRenderedTokens(rows, kind) {
 }
 
 /**
- * Drags the grip of a row onto another row.
+ * Drags the grip of a row onto another row and waits until the operations the drop started have finished. The drop's
+ * own effect (a reorder, a copy, a refusal) differs by caller, so the caller waits for it.
  * @param {import('@playwright/test').Locator} source - The row whose grip is dragged.
  * @param {import('@playwright/test').Locator} target - The row the grip is dropped on.
  * @param {'top' | 'bottom'} half - Whether the drop lands in the upper or the lower half of the target row, which
  * decides whether the dragged row is inserted before or after it.
- * @returns {Promise<void>} Resolves once the drop has been dispatched.
+ * @returns {Promise<void>} Resolves once the drop has been dispatched and its operations have finished.
  */
 async function dragGrip(source, target, half) {
    /** @type {{height: number}} The target row's box. */
@@ -275,6 +277,31 @@ async function dragGrip(source, target, half) {
          y: half === 'top' ? 3 : box.height - 3,
       },
    });
+   await settle(source.page());
+}
+
+/**
+ * Drags the grip of a row onto another row of its own list, which must move the row, and waits until the dragged row's
+ * element has a new position in its list (the list keys its rows, so a reorder moves the element) or has been replaced.
+ * @param {import('@playwright/test').Locator} source - The row whose grip is dragged.
+ * @param {import('@playwright/test').Locator} target - The row of the same list the grip is dropped on.
+ * @param {'top' | 'bottom'} half - Whether the drop lands in the upper or the lower half of the target row.
+ * @returns {Promise<void>} Resolves once the row has moved and the operations of the drop have finished.
+ */
+async function dragGripToMove(source, target, half) {
+   /** @type {import('@playwright/test').ElementHandle} The dragged row's element. */
+   const handle = await source.elementHandle();
+
+   /** @type {number} The row's position in its list before the drag. */
+   const from = await handle.evaluate((element) => [...element.parentElement.children].indexOf(element));
+   await dragGrip(source, target, half);
+   await expect.poll(
+      () => handle.evaluate(
+         (element, index) => !element.isConnected || [...element.parentElement.children].indexOf(element) !== index,
+         from,
+      ),
+      { message: 'the dragged row moved in its list' },
+   ).toBe(true);
 }
 
 test.describe('character sheet lists', () => {
@@ -293,7 +320,7 @@ test.describe('character sheet lists', () => {
       test(`dragging a row's grip in the ${label} list to the end and back stores the sort order`, async () => {
          /** @type {import('@playwright/test').Locator} The character's sheet. */
          const sheet = await openSheetByUuid(page, characterUuid);
-         await sheet.locator('.tab-list').getByText(tab, { exact: true }).first().click();
+         await clickSheetTab(sheet, tab);
 
          /** @type {import('@playwright/test').Locator} The list's rows. */
          const rows = sheet.locator(`li.reorder-row[${attribute}]`);
@@ -324,7 +351,7 @@ test.describe('character sheet lists', () => {
          const [first, second, third] = await renderedIds();
 
          // The first row goes below the last one.
-         await dragGrip(rows.nth(0), rows.nth(2), 'bottom');
+         await dragGripToMove(rows.nth(0), rows.nth(2), 'bottom');
          await expect.poll(renderedIds, { message: 'the first row moved to the end' }).toEqual([
             second,
             third,
@@ -337,7 +364,7 @@ test.describe('character sheet lists', () => {
          ]);
 
          // The row at the end goes back above the first one, which restores the list for the next test.
-         await dragGrip(rows.nth(2), rows.nth(0), 'top');
+         await dragGripToMove(rows.nth(2), rows.nth(0), 'top');
          await expect.poll(renderedIds, { message: 'the last row moved back to the top' }).toEqual([
             first,
             second,
@@ -355,7 +382,7 @@ test.describe('character sheet lists', () => {
    test('a weapon dragged from its own sheet onto another row sorts it relative to that row', async () => {
       /** @type {import('@playwright/test').Locator} The character's sheet on the Inventory tab. */
       const sheet = await openSheetByUuid(page, characterUuid);
-      await sheet.locator('.tab-list').getByText('Inventory', { exact: true }).first().click();
+      await clickSheetTab(sheet, 'Inventory');
 
       /** @type {import('@playwright/test').Locator} The weapon rows. */
       const rows = sheet.locator('li.reorder-row[data-item-id]');
@@ -404,19 +431,20 @@ test.describe('character sheet lists', () => {
                y: 3,
             },
          });
+         await settle(page);
          await itemSheet.locator('header.window-header [data-action="close"]').click();
       };
 
       // Core's sort direction is automatic (read: Foundry 14.364 `performIntegerSort`, `client/utils/helpers.mjs:277`):
       // the dropped item goes before the target when its sort is greater than the target's, otherwise after it. Equal
       // sorts (a list no drag has touched) give no direction, so a grip drag out and back first stores distinct sorts.
-      await dragGrip(rows.nth(0), rows.nth(2), 'bottom');
+      await dragGripToMove(rows.nth(0), rows.nth(2), 'bottom');
       await expect.poll(storedIds, { message: 'the first grip drag moved the first weapon last' }).toEqual([
          second,
          third,
          first,
       ]);
-      await dragGrip(rows.nth(2), rows.nth(0), 'top');
+      await dragGripToMove(rows.nth(2), rows.nth(0), 'top');
       await expect.poll(storedIds, { message: 'the grip drags stored distinct sorts in the original order' }).toEqual([
          first,
          second,
@@ -497,7 +525,7 @@ test.describe('item sheet lists', () => {
             ]);
          }
 
-         await dragGrip(rows.nth(0), rows.nth(2), 'bottom');
+         await dragGripToMove(rows.nth(0), rows.nth(2), 'bottom');
          await expect.poll(() => readTokens(uuid(), kind), { message: 'the stored order moved the first row last' })
             .toEqual([
                second,
@@ -518,7 +546,7 @@ test.describe('item sheet lists', () => {
          }
 
          // The row at the end goes back above the first one, which restores the list.
-         await dragGrip(rows.nth(2), rows.nth(0), 'top');
+         await dragGripToMove(rows.nth(2), rows.nth(0), 'top');
          await expect.poll(() => readTokens(uuid(), kind), { message: 'the stored order moved the row back' })
             .toEqual([
                first,

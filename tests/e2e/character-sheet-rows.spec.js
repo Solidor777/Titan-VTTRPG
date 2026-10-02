@@ -1,4 +1,5 @@
 import { expect, test } from './harness.js';
+import { clickSheetTab, commitText } from './actions.js';
 import { login, openSheetByUuid } from './fixtures.js';
 import {
    addCheck,
@@ -14,6 +15,7 @@ import { withClients } from './multiClient.js';
 import { selectTitanOption } from './select.js';
 import { setClientSetting } from './settings.js';
 import { attachPageErrors, closeAllApps, newestMessageType } from './world.js';
+import { settle } from './settle.js';
 
 /**
  * The rows of the character sheet's Abilities, Spells, Inventory and Effects tabs, on documents made through the
@@ -158,7 +160,7 @@ test.afterAll(async () => {
 async function openActorTab(tab, uuid = actorUuid) {
    /** @type {import('@playwright/test').Locator} The actor's sheet. */
    const sheet = await openSheetByUuid(page, uuid);
-   await sheet.locator('.tab-list').getByText(tab, { exact: true }).first().click();
+   await clickSheetTab(sheet, tab);
    return sheet;
 }
 
@@ -202,8 +204,7 @@ async function withDocumentSheet(row, documentName, id, edit) {
  * @returns {Promise<void>} Resolves once the value has been typed and committed.
  */
 async function typeInto(input, value) {
-   await input.fill(String(value));
-   await input.blur();
+   await commitText(input, String(value));
 }
 
 /**
@@ -575,7 +576,7 @@ test.describe('weapon and commodity rows', () => {
       await expect(damage, 'the damage tag renders').toHaveText(shownDamage(original.damage));
 
       await withDocumentSheet(row, 'Item', id, async (documentSheet) => {
-         await documentSheet.locator('.tab-list').getByText('Attacks', { exact: true }).first().click();
+         await clickSheetTab(documentSheet, 'Attacks');
          /** @type {import('@playwright/test').Locator} The first attack's section. */
          const attack = documentSheet.locator('.attack').first();
          /** @type {import('@playwright/test').Locator} The attack label input. */
@@ -945,7 +946,7 @@ test.describe('effect check list', () => {
    test('dragging a check above another on the effect sheet reorders the checks', async () => {
       /** @type {import('@playwright/test').Locator} The effect sheet. */
       const sheet = await openSheetByUuid(page, effectUuid);
-      await sheet.locator('.tab-list').getByText('Checks', { exact: true }).first().click();
+      await clickSheetTab(sheet, 'Checks');
       /** @type {import('@playwright/test').Locator} The check rows of the effect sheet. */
       const rows = sheet.locator('li.reorder-row');
       await expect(rows, 'both checks render').toHaveCount(2);
@@ -977,7 +978,7 @@ test.describe('effect check list', () => {
    test('dropping a check from an equipment sheet onto the effect sheet copies it in', async () => {
       /** @type {import('@playwright/test').Locator} The effect sheet. */
       const sheet = await openSheetByUuid(page, effectUuid);
-      await sheet.locator('.tab-list').getByText('Checks', { exact: true }).first().click();
+      await clickSheetTab(sheet, 'Checks');
       /** @type {import('@playwright/test').Locator} The check rows of the effect sheet. */
       const rows = sheet.locator('li.reorder-row');
       await expect(rows, 'both checks render').toHaveCount(2);
@@ -987,7 +988,7 @@ test.describe('effect check list', () => {
       // The two windows open on top of each other, so they are moved apart (a window position is not a document).
       /** @type {import('@playwright/test').Locator} The equipment's sheet. */
       const itemSheet = await openSheetByUuid(page, `${actorUuid}.Item.${itemIds.parity}`);
-      await itemSheet.locator('.tab-list').getByText('Checks', { exact: true }).first().click();
+      await clickSheetTab(itemSheet, 'Checks');
       await page.evaluate(([itemSheetId, effectSheetId]) => {
          foundry.applications.instances.get(itemSheetId).setPosition({ left: 10 });
          foundry.applications.instances.get(effectSheetId).setPosition({ left: 900 });
@@ -1505,6 +1506,7 @@ test.describe('owned items', () => {
       await dialog.locator('li', { has: page.getByText(label, { exact: true }) }).locator('button').click();
       await dialog.getByRole('button', { name: 'Apply Edits' }).click();
       await expect(dialog, 'Apply Edits closes the dialog').toHaveCount(0);
+      await settle(page);
    }
 
    test('the shield Edit Traits dialog stores the chosen trait', async () => {
@@ -1551,7 +1553,7 @@ test.describe('owned items', () => {
       const row = itemRow(sheet, itemId);
       await expandRow(row);
       await withDocumentSheet(row, 'Item', itemId, async (documentSheet) => {
-         await documentSheet.locator('.tab-list').getByText('Attacks', { exact: true }).first().click();
+         await clickSheetTab(documentSheet, 'Attacks');
          await applyTrait(documentSheet.locator('.traits:has(.traits-header)'), 'Cleave');
          await expect.poll(
             () => readPath(uuid, 'system.attack.0.trait'),

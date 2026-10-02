@@ -1,4 +1,5 @@
 import { expect, test } from './harness.js';
+import { clickSheetTab } from './actions.js';
 import { login, openSheetByUuid } from './fixtures.js';
 import { addCustomAspect, createWorldItem, enableAspect } from './flows.js';
 import { withClients } from './multiClient.js';
@@ -90,7 +91,7 @@ test.afterAll(async () => {
 async function openSpellTab(uuid, tab, on = page) {
    /** @type {import('@playwright/test').Locator} The spell's sheet. */
    const sheet = await openSheetByUuid(on, uuid);
-   await sheet.locator('.tab-list').getByText(tab, { exact: true }).first().click();
+   await clickSheetTab(sheet, tab);
    return sheet;
 }
 
@@ -268,9 +269,9 @@ test.describe('Casting Check tab', () => {
       await expect.poll(() => content.evaluate((element) => element.scrollTop)).toBe(40);
 
       // Tabs are lazy-mounted, so leaving and returning re-mounts the container from the bound state.
-      await sheet.locator('.tab-list').getByText('Standard Aspects', { exact: true }).first().click();
+      await clickSheetTab(sheet, 'Standard Aspects');
       await expect(content).toHaveCount(0);
-      await sheet.locator('.tab-list').getByText('Casting Check', { exact: true }).first().click();
+      await clickSheetTab(sheet, 'Casting Check');
       await expect(content).toBeVisible();
       await expect.poll(() => content.evaluate((element) => element.scrollTop)).toBe(40);
       expect(errors, `uncaught errors:\n${errors.join('\n')}`).toEqual([]);

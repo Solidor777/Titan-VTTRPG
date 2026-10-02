@@ -1,4 +1,5 @@
 import { expect, test } from './harness.js';
+import { clickSheetTab } from './actions.js';
 import { login, openSheetByUuid, openSheetTab } from './fixtures.js';
 import { addCheck, addEffect, createActor, createOwnedItem, createWorldItem } from './flows.js';
 import { attachPageErrors, closeAllApps } from './world.js';
@@ -96,7 +97,7 @@ test.afterAll(async () => {
 async function openActorSheet(tab) {
    /** @type {import('@playwright/test').Locator} The actor's sheet. */
    const sheet = await openSheetByUuid(page, actorUuid);
-   await sheet.locator('.tab-list').getByText(tab, { exact: true }).first().click();
+   await clickSheetTab(sheet, tab);
    return sheet;
 }
 
@@ -108,7 +109,7 @@ async function openActorSheet(tab) {
  */
 async function expectRowCounts(sheet, counts) {
    for (const [key, count] of Object.entries(counts)) {
-      await sheet.locator('.tab-list').getByText(LISTS[key].tab, { exact: true }).first().click();
+      await clickSheetTab(sheet, LISTS[key].tab);
       await expect(sheet.locator(LISTS[key].row), `${key} rows`).toHaveCount(count);
    }
 }
@@ -140,7 +141,7 @@ test.describe('character sheet tab filters', () => {
          }
          finally {
             // The sheet keeps the typed text, so the filter is emptied for the tests that follow.
-            await sheet.locator('.tab-list').getByText(list.tab, { exact: true }).first().click();
+            await clickSheetTab(sheet, list.tab);
             await sheet.locator('.tab .header .input input').first().fill('');
          }
       });

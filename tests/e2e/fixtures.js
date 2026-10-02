@@ -2,6 +2,7 @@ import path from 'node:path';
 import { DEFAULT_GM } from './users.js';
 import { joinWorld } from './join.js';
 import { expect, flushPageErrors, test } from './harness.js';
+import { clickSheetTab } from './actions.js';
 
 export { joinWorld };
 
@@ -79,11 +80,7 @@ export async function renderSheet(page, uuid, expectedSelector, errors) {
  * @returns {Promise<void>} Resolves once the tab button has been clicked.
  */
 export async function openSheetTab(page, label) {
-   await page
-      .locator('.application.titan-document-sheet .tab-list')
-      .getByText(label, { exact: true })
-      .first()
-      .click();
+   await clickSheetTab(page.locator('.application.titan-document-sheet').first(), label);
 }
 
 /**
