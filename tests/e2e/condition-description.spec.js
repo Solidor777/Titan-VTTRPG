@@ -277,15 +277,20 @@ test('with no scene active, the fixture token is placed on a fully drawn fallbac
    test.setTimeout(120_000);
 
    // Precondition, established here: no scene is active and the client boots with a blank canvas. Only a test scene
-   // may be deactivated, and Foundry has no control that deactivates a scene, so the flag is cleared directly. The page
-   // reloads first: deactivating the viewed scene while a status's scrolling text still animates (the earlier tests
-   // add effects) throws `Cannot read properties of null (reading 'off')` in core's `createScrollingText` when the
-   // animation ends (measured with a probe; waiting out the 2 s animation avoids it). It reloads again to boot blank.
+   // may be deactivated, and Foundry has no control that deactivates a scene, so the flag is cleared directly. The
+   // earlier tests add effects, whose scrolling text core animates on the interface group; the deactivation waits until
+   // no such animation runs. The page then reloads to boot with a blank canvas.
    /** @type {string|null} The name of the scene active at the start, if any. */
    const activeName = await page.evaluate(() => game.scenes.active?.name ?? null);
    expect(activeName === null || activeName.startsWith('E2E '), `the active scene is a test scene: ${activeName}`)
       .toBe(true);
-   await reloadPage();
+
+   // Deactivating the viewed scene while core's scrolling text animates throws (OPEN_BUGS #114).
+   await expect.poll(() => page.evaluate(() => Reflect.ownKeys(foundry.canvas.animation.CanvasAnimation.animations)
+      .some((key) => foundry.canvas.animation.CanvasAnimation.animations[key].context === canvas.interface)), {
+      message: 'no scrolling text animates on the interface group',
+      timeout: 10_000,
+   }).toBe(false);
    await page.evaluate(async () => {
       await game.scenes.active?.update({ active: false });
    });
