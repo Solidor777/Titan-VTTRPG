@@ -1250,3 +1250,56 @@ when fixed.
     unchanged, the pack stays locked, and once the tokens are deleted the next load starts no migration.
   - The legacy-Item orphan case is unit-gated only: the server rejects the unregistered `effect` Item subtype, so no
     e2e can seed a legacy effect Item.
+
+### 112. The Effect Tray's pack list did not show a compendium created after the tray was built
+
+- **What:** `EffectTrayState` read the ActiveEffect packs once, in its constructor, and its hooks refreshed only on
+  Active Effect and Folder changes. The tray is a sidebar tab built at ready, so a compendium created later in the
+  session was never offered in `effect-tray-pack-select`, and a deleted one stayed listed. Measured: once the Phase 0
+  sweep had removed the world pack `E2E Tray Effects`, `effect-tray.spec.js:331` failed. Its `beforeEach` re-created
+  the pack, and the select offered only `TITAN Effects Effects TITAN Effects (Copy)`.
+- **Found:** 2026-10-01, Phase 0 of the test-suite rewrite.
+- **Fixed:** 2026-10-01.
+  - Core fires no hook named for a compendium's creation or deletion. It changes `game.packs` and then calls
+    `ui.compendium.render()`. This runs on the creating client and, through the `manageCompendium` socket, on every
+    other client. A world compendium configuration change does the same. Read:
+    `client/documents/collections/compendium-collection.mjs:736-749, 917-926, 935-942, 950-966`.
+  - That re-render calls the `renderCompendiumDirectory` hook (read: `client/applications/api/application.mjs:588-589,
+    1674-1680`). The directory has always rendered by then, because the sidebar force-renders every visible tab at
+    startup (read: `client/applications/sidebar/sidebar.mjs:198-213`).
+  - `EffectTrayState` (`src/sidebar/tray/EffectTrayState.svelte.js`) now registers `renderCompendiumDirectory`. On
+    each call it re-reads `getEffectCompendiums()` and replaces `compendiums` when the list differs. When the selected
+    pack is gone, the selection falls back as it does on construction (`#resolveSelection`) and the tray reloads.
+  - Measured with two GM clients (probe script, not checked in): a pack created on one client appeared in both tray
+    selects, and deleting it removed it from both. The client that had it selected fell back to `TITAN Effects`.
+  - Gated by `tests/e2e/effect-tray.spec.js:331` from a world swept by `node tests/e2e/census.js --sweep` (no
+    `E2E Tray Effects` pack at login). It passed in the full run of 2026-10-01: `npm run test:e2e`, 654 passed.
+    The test moves with the `effect-tray` rewrite (test-suite rewrite Phase 6).
+
+### 113. `condition-description.spec.js` failed when no scene was active at its start
+
+- **What:** after the Phase 0 sweep deleted the active scene, `condition-description.spec.js:103` failed. Its
+  `toggleStatusEffect` threw `TypeError: Cannot read properties of undefined (reading 'OBJECTS')` in `RenderFlags.set`,
+  and the page logged `Cannot read properties of undefined (reading 'addChild')`.
+- **Cause, measured:** a probe replayed `controlFixtureActorToken` (`tests/e2e/world.js`) from a login with no active
+  scene.
+  - Right after `Scene.create({ active: true })`: `canvas.loading` was true, `canvas.ready` was false, and
+    `canvas.pendingRenderFlags` and `canvas.tokens.objects` did not exist.
+  - The token created next had a placeable at once, but an unparented one. So the helper's wait for `tokenDoc.object`
+    passed immediately.
+  - `Token._draw` → `TokenRuler.draw` → `GridLayer.addHighlightLayer` threw the `addChild` error. The actor update
+    reached `TokenDocument._onRelatedUpdate` → `RenderFlags.set`, which reads `canvas.pendingRenderFlags[priority]`
+    (read: `client/canvas/interaction/render-flags.mjs:94-100`).
+  - `Canvas#draw` creates `pendingRenderFlags` only when it activates its ticker, after loading textures (read:
+    `client/canvas/board.mjs:1209, 2550-2587`).
+  - Every stack frame is core's, and the draw finished about 270 ms later with the placeable parented. The fault is
+    the helper's order: it creates the token before the canvas has drawn the scene it just activated.
+- **Found:** 2026-10-01, Phase 0 of the test-suite rewrite.
+- **Fixed:** 2026-10-01.
+  - `controlFixtureActorToken` waits for `canvas.ready && canvas.scene?.id === scene.id` (`titanWait`) before creating
+    the token.
+  - The same probe, waiting for the draw, threw nothing; the placeable was parented and `toggleStatusEffect`
+    succeeded.
+  - Gated by `tests/e2e/condition-description.spec.js:103`, the first spec in the run to place a fixture token with no
+    scene active, from a world swept by `node tests/e2e/census.js --sweep`. It passed in the full run of 2026-10-01:
+    `npm run test:e2e`, 654 passed. The helper and the spec are replaced in the test-suite rewrite (Phases 5-6).
