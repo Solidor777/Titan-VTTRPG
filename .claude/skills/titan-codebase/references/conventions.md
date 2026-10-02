@@ -837,8 +837,8 @@ which calls the script's setter), and an exposed binding pushes each report, as 
 <message>`, into every array `attachPageErrors` returned for that page. The binding is asynchronous, so the document
 also counts its reports; `flushHookErrorReports(page)` waits until the delivered count matches.
 **Harness gate (every test, every world page).** Every spec imports `expect` and `test` from `tests/e2e/harness.js`,
-never from `@playwright/test` (`tests/unit/E2eTestImport.test.js` fails on any other way of reaching Playwright's
-`test`). `fixtures.js` `joinWorld` (which `login` calls, and `withClients` through it for every second client) attaches
+never from `@playwright/test` (the gate runs only through `harness.js`'s `test`; review checks the import).
+`fixtures.js` `joinWorld` (which `login` calls, and `withClients` through it for every second client) attaches
 a collector before the page's first navigation and records the page (`harness.js` `trackWorldPage`), so it collects
 from boot onward. `test` carries
 two automatic fixtures: after each test, including its `afterEach` hooks, it flushes every recorded open page and fails
@@ -900,59 +900,11 @@ never a bare `entry.click()`: it clicks, then waits for `#context-menu` to detac
 the instance's CURRENT menu element after its 200 ms collapse, and every document click while `ui.context` is set
 queues another close, so clicks made during the collapse leave closes pending that remove the instance's next menu
 (a re-opened pack or folder menu never shows). Dismissing an open menu without choosing uses
-`ui.context?.close({ animate: false })`, which closes synchronously. `tests/unit/E2eContextMenuClicks.test.js` scans
-every `.js` under `tests/e2e` except `contextMenu.js` and fails on a direct context-menu entry click: a
-`click`/`dblclick`/`tap`/click-`dispatchEvent` whose receiver chain or `page.click` selector names `#context-menu`,
-`.context-menu`, or `context-item`, or starts from a variable or function (file-wide, no scopes) holding or returning
-one.
+`ui.context?.close({ animate: false })`, which closes synchronously. No test scans for a direct context-menu entry
+click; whoever writes a spec uses `chooseContextMenuEntry` and review checks it.
 
-**Real-document guards** (`.claude/claude.md` "Tests use genuine live documents"). The guards that read test
-sources as syntax parse them through `tests/unit/helpers/parseSource.js`: `parseNodes(source, file)` parses with
-ESLint's own parser (`Linter` of the `eslint` devDependency, latest syntax, as a module) and lists every ESTree node
-with `parent` and `loc`, so each syntactic form of a property, method, field, assignment or call is one node type,
-whatever its spelling. It also reads the code held in strings (e2e specs pass code to the browser:
-`page.evaluate('…')`, `new Function('actor', src)`): every string literal, template literal (each `${…}` read as
-`_`) or `+` concatenation of those whose text parses as a module or a function body is parsed too, recursively,
-its nodes carrying the outer source's lines; keys and module specifiers are names, not code; prose and selectors do
-not parse and yield nothing. A source that does not parse throws, naming the file. `staticKeyName(key, computed)`
-reads a bare, quoted or computed-string name. The whole-tree tests set `TREE_SCAN_TIMEOUT` (60 s), since vitest's 5 s
-default is passed under a full parallel run.
-`tests/unit/E2eRealDocuments.test.js` scans every `.js`/`.mjs` under `tests/e2e` and `tests/shared` for call and
-`new` expressions, matched by the callee's name (an identifier, or a member's property: dotted, optional or a computed
-string), that create documents through the API or fake gestures: `<Class>.create(` for Actor, Item, Scene, Combat,
-ChatMessage, ActiveEffect, Folder, Adventure and Macro (directly or through a namespace), any other `<alias>.create(`
-except `Object.create(` (matched as `.create(`), the member calls `.createDocuments(`, `.import(` and
-`.createCompendium(` (the dot keeps the flow helper `createCompendium(page, …)` legal), the calls
-`createEmbeddedDocuments(`, `updateEmbeddedDocuments(`, `getTokenDocument(`, `toggleStatusEffect(`,
-`importFromJSON(` and `performIntegerSort(` (bare or as a member), `new DragEvent('drop'`, `new DataTransfer(`,
-`new Function(`, and any `keepId` name. Under `tests/e2e` only, it also matches `.update(` and `.system.<action>(`
-calls (action prefixes `request`, `roll`, `apply`, `spend`, `equip`, `unEquip`, `onTurn`, `shortRest`,
-`longRest`, `removeCombatEffects`, `toggleInspiration`, `add`, `move`, `delete`). Each match is written as its
-canonical text on the line where that text starts. A `.update(`/`.system.<action>(` site is permitted when it
-matches a `{ file, pattern, field, reason }` entry of `tests/e2e/direct-updates.allowlist.json` (`pattern` is a regex
-over the site's source line; an entry permitting no site fails). In `e2e/global-teardown.js` and `e2e/registry.js` a
-match whose text contains `delete` is exempt; only `.system.delete…(` can be one (`.delete(`,
-`deleteEmbeddedDocuments(` and `deleteCompendium(` are not banned anywhere). The offender set must equal
-`tests/e2e/burn-down.json` as a multiset of `{ file, match, source }` (file relative to `tests`, the matched text, the
-trimmed source line — no line numbers, so unrelated edits do not churn it); the failure message prints the missing or
-extra entries as JSON. Once `tests/unit/phase.json` exceeds 6 the burn-down file must be gone and the set empty. Not
-matched: a callee named through a variable (`actor[method](`).
-`tests/unit/UnitFakeDocuments.test.js` scans `tests/unit` (except itself) for a fake write surface: a binding of
-`create`, `createDocuments`, `update`, `delete`, `createEmbeddedDocuments`, `deleteEmbeddedDocuments`,
-`updateEmbeddedDocuments`, `createEffects`, `updateEffects`, `deleteEffects` or `deleteItems` to a value that may be a
-function (anything but a literal, template, object, array, `undefined`, or a unary, binary or update expression;
-conditional and logical expressions by their branches), as an object-literal property (plain or shorthand `{ update }`),
-method or getter; a class field, method or getter, static or not; a member assignment (`=`, `||=`, `&&=`, `??=`);
-a destructuring default (`const { update = vi.fn() } = …`); or `vi.spyOn(target, '<name>')`. A `_source` binding is a
-fake whatever its value (object-literal property or getter, class field or getter, member assignment). Names may be
-bare, quoted or computed strings. Not found: a computed key held in a variable, and bindings through
-`Object.defineProperty`, `Reflect.set` or `Reflect.defineProperty`. Every matching file must be listed in
-`tests/unit/fake-documents.allowlist.json`: `permitted` (`{ file, clause }`) or `burnDown` (`{ file, removedInPhase }`);
-a listed file that is gone or no longer matches fails, and a burn-down file fails once `phase.json`'s `phase` exceeds
-its `removedInPhase`. Each guard's self-tests list every form it flags and the near misses it passes.
-`E2eContextMenuClicks.test.js` still scans text: it masks sources through `tests/unit/helpers/maskSource.js`
-(`maskSource(source, { strings })`: comments always blanked, string contents replaced only with `strings: true`; every
-index and line break kept; regular-expression literals are not recognized).
+**Test rules** (`.claude/claude.md` "Project Scope"). No unit test scans test code. Whoever writes a test follows
+the rules (genuine live documents, no fake write surfaces, real user flows), and review checks them.
 
 **E2E census** — every world document an e2e test creates (actor, item, scene, folder, macro, roll table, journal
 entry, playlist, cards, world compendium label) is named with the `E2E ` prefix; the sweep finds leftovers by that
@@ -1059,11 +1011,9 @@ where `ready` is the in-page predicate of step (5) (`game.ready` by default); a 
 `game.users.activeGM?.isSelf`, because only the active GM migrates and core's `getDesignatedUser` makes the active GM
 with the highest role that GM. The last test of `condition-description.spec.js`, the reload test of
 `player-hud-layout.spec.js` and `portrait-persistence.spec.js`'s `readImageAfterReload` call `reloadWorld(page)` with
-the default predicate. `tests/unit/E2eReloads.test.js` reads every source under `tests/e2e` and `tests/shared` as
-syntax (`parseSource.js`, code strings included) and fails on any page navigation outside its two permitted sites —
-`world.js`'s one `.reload(` (in `reloadWorld`) and `fixtures.js`'s one `.goto(` (in `joinWorld`): a `reload(` or
-`debouncedReload(` call through any receiver (`page.reload(`, `location.reload(`), `location.assign(`/`.replace(`, an
-assignment to `location` or `location.href`, or a `goto(`/`goBack(`/`goForward(` call. `page.on('console')` and
+the default predicate. A spec navigates only through `reloadWorld` and `joinWorld` (the one `.reload(` in `world.js`
+and the one `.goto(` in `fixtures.js`), never an inline `page.reload(`, `location` change or `goto(`; no test scans for
+it, and review checks it. `page.on('console')` and
 `attachPageErrors` listeners survive reloads (they attach to the Page object). Sequence:
 (1) PROVE the first boot's ready work finished BEFORE clearing the capture buffer —
 `waitForFunction(() => !!game.titan?.playerHud)`, since the Player HUD is built after the GM's migration attempt

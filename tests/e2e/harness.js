@@ -75,7 +75,7 @@ async function takeUncheckedErrors() {
  * page that joined the world (`fixtures.js` `joinWorld`), including second clients that have closed since. Errors
  * raised in a `beforeAll` after the boot therefore fail the file's first test; errors raised in an `afterAll` fail the
  * next test of the worker, and those after the worker's last test fail its teardown. Every spec imports `test` from
- * here (`tests/unit/E2eTestImport.test.js` guards it).
+ * here.
  * @type {typeof base}
  */
 export const test = base.extend({

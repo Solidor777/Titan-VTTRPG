@@ -1342,7 +1342,7 @@ when fixed.
   - Gated by `tests/e2e/condition-description.spec.js` 'with no scene active, the fixture token is placed on a fully
     drawn fallback scene' (its last test). It establishes and asserts its own precondition:
     - it waits until no scrolling text animates (OPEN_BUGS #114), clears the active flag of the active test scene
-      (`direct-updates.allowlist.json`: no control deactivates a scene) and reloads;
+      (a direct update: no control deactivates a scene) and reloads;
     - it asserts that no scene is active or drawn.
   - The test then:
     - calls `controlFixtureActorToken` with a new fallback name;
