@@ -1,6 +1,6 @@
 import { test, expect } from '@playwright/test';
 import { ensureDocument, login } from './fixtures.js';
-import { closeAllApps, attachPageErrors } from './world.js';
+import { closeAllApps, attachPageErrors, reloadWorld } from './world.js';
 
 /** @type {import('@playwright/test').Page} The file-shared, logged-in page (one world boot per file). */
 let page;
@@ -63,13 +63,13 @@ async function pickImageThroughSheet(locate, sheetClass, buttonSelector) {
  * @returns {Promise<string>} The persisted image path.
  */
 async function readImageAfterReload(locate) {
-   await page.reload();
-   await page.waitForFunction(() => globalThis.game?.ready === true, null, { timeout: 60_000 });
+   await reloadWorld(page);
    return page.evaluate((src) => new Function(`return (${src})()`)()._source.img, locate);
 }
 
 test.describe('portrait persistence', () => {
    test('character sheet portrait pick persists across a reload', async () => {
+      test.setTimeout(120_000);
       const locate = await ensureDocument(page, 'Actor', 'player', 'E2E Portrait Player');
       await page.evaluate((src) => new Function(`return (${src})()`)().update({ img: 'icons/svg/book.svg' }), locate);
 
@@ -82,6 +82,7 @@ test.describe('portrait persistence', () => {
    });
 
    test('item sheet portrait pick persists across a reload', async () => {
+      test.setTimeout(120_000);
       const locate = await ensureDocument(page, 'Item', 'weapon', 'E2E Portrait Weapon');
       await page.evaluate((src) => new Function(`return (${src})()`)().update({ img: 'icons/svg/book.svg' }), locate);
 

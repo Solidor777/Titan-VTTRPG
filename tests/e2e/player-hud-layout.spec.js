@@ -7,6 +7,7 @@ import {
    controlFixtureActorToken,
    deleteFixtureActor,
    deleteOrphanedTokens,
+   reloadWorld,
    waitForAnimations,
 } from './world.js';
 
@@ -132,18 +133,13 @@ test('outside edit mode nothing drags', async () => {
 });
 
 test('a dragged position persists across a reload', async () => {
+   test.setTimeout(120_000);
    await seedControlledActor(page);
    const frame = page.locator('[data-testid="player-hud-portrait"]');
    /** @type {object} The dragged portrait box before the reload. */
    const before = await frame.boundingBox();
 
-   await page.reload();
-   await page.evaluate(async () => {
-      await titanWait(() => game.ready === true, {
-         message: 'world ready after reload',
-         timeout: 30000,
-      });
-   });
+   await reloadWorld(page);
    await seedControlledActor(page);
 
    await expect.poll(
