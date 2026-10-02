@@ -4850,8 +4850,8 @@ export default class CharacterDataModel extends TitanActorDataModel {
          this.parent.name,
       ) && this.parent.effects.some((effect) => effect.type === 'effect' && effect.system.isExpired)) {
 
-         // Remove effects if removal does not need to be confirmed.
-         if (!shouldConfirmDeletingItems()) {
+         // Remove effects if removal does not need to be confirmed (the setting for deleting Effects).
+         if (!shouldConfirmDeletingEffects()) {
             await this.removeExpiredEffects();
          }
 

@@ -1,6 +1,6 @@
 import { expect, test } from './harness.js';
 import { login, openSheetByUuid } from './fixtures.js';
-import { addCustomTrait, addEffect, createActor, createWorldItem } from './flows.js';
+import { addAttack, addCustomTrait, addEffect, createActor, createWorldItem } from './flows.js';
 import { attachPageErrors, closeAllApps } from './world.js';
 
 /**
@@ -109,6 +109,7 @@ async function editTrait(sidebar, uuid) {
 
    // The dialog is found by its element-id prefix, which carries a generated suffix.
    await sidebar.locator('.fa-pen-to-square').click();
+   /** @type {import('@playwright/test').Locator} The Edit Custom Trait dialog on the page. */
    const dialog = page.locator('[id^="titan-edit-custom-trait-dialog-"]');
    await expect(dialog, 'edit-custom-trait dialog should open').toBeVisible();
    await dialog.locator('input').first().fill(EDITED_NAME);
@@ -140,9 +141,11 @@ test.describe('custom traits on items', () => {
    test('the Add Custom Trait button opens the dialog; Add Trait persists and renders the trait', async () => {
       /** @type {string} The new weapon's uuid. */
       const uuid = await makeWeapon('E2E Trait Add Weapon');
+      /** @type {import('@playwright/test').Locator} The document's sheet. */
       const sheet = await openSheetByUuid(page, uuid);
       await sheet.getByText('Add Custom Trait', { exact: true }).first().click();
 
+      /** @type {import('@playwright/test').Locator} The Add Custom Trait dialog on the page. */
       const dialog = page.locator('.titan-add-custom-item-trait-dialog');
       await expect(dialog, 'add-custom-trait dialog should open').toBeVisible();
       await dialog.locator('input').first().fill(ORIGINAL_NAME);
@@ -159,6 +162,7 @@ test.describe('custom traits on items', () => {
    test('editing a custom trait persists the new name and re-renders the tag', async () => {
       /** @type {string} The weapon's uuid. */
       const uuid = await makeWeaponWithTrait('E2E Trait Edit Weapon');
+      /** @type {import('@playwright/test').Locator} The document's sheet. */
       const sheet = await openSheetByUuid(page, uuid);
       await editTrait(sheet.locator('.sidebar'), uuid);
    });
@@ -166,6 +170,7 @@ test.describe('custom traits on items', () => {
    test('deleting a custom trait removes it and re-renders without the tag', async () => {
       /** @type {string} The weapon's uuid. */
       const uuid = await makeWeaponWithTrait('E2E Trait Delete Weapon');
+      /** @type {import('@playwright/test').Locator} The document's sheet. */
       const sheet = await openSheetByUuid(page, uuid);
       await deleteTrait(sheet.locator('.sidebar'), uuid);
    });
@@ -181,7 +186,9 @@ test.describe('custom traits on items', () => {
       test('the edit and delete icons use the FontAwesome font (glyphs render)', async () => {
          // A glyph renders only when its element resolves to the FontAwesome family; on a bare `<button>` Foundry's UI
          // font wins and the glyph falls back to the missing-glyph box.
+         /** @type {import('@playwright/test').Locator} The document's sheet. */
          const sheet = await openSheetByUuid(page, uuid);
+         /** @type {object} The font families of the trait tag's glyph elements. */
          const families = await traitSidebar(sheet).evaluate((sidebar) => ({
             edit: getComputedStyle(sidebar.querySelector('.fa-pen-to-square')).fontFamily,
             delete: getComputedStyle(sidebar.querySelector('.fa-trash')).fontFamily,
@@ -192,9 +199,12 @@ test.describe('custom traits on items', () => {
 
       test('the custom-trait description tooltip is shown verbatim, not localized', async () => {
          // The description is a real localization key; a localized tooltip would read its localized value.
+         /** @type {import('@playwright/test').Locator} The document's sheet. */
          const sheet = await openSheetByUuid(page, uuid);
          await expect(sheet.locator('.sidebar').getByText(ORIGINAL_NAME).first()).toBeVisible();
+         /** @type {object} The tooltip content read from the page. */
          const tooltipContent = await traitSidebar(sheet).evaluate((sidebar, name) => {
+            /** @type {Element|undefined} The trait tag element that carries the marker. */
             const label = [...sidebar.querySelectorAll('.tag *')]
                .find((element) => element._tippy && element.textContent.trim() === name);
             return label ? label._tippy.props.content : null;
@@ -203,6 +213,7 @@ test.describe('custom traits on items', () => {
       });
 
       test('the edit dialog carries its stable CSS class', async () => {
+         /** @type {import('@playwright/test').Locator} The document's sheet. */
          const sheet = await openSheetByUuid(page, uuid);
          await sheet.locator('.sidebar .fa-pen-to-square').click();
          await expect(page.locator('[id^="titan-edit-custom-trait-dialog-"]'), 'the edit dialog opens').toBeVisible();
@@ -214,6 +225,7 @@ test.describe('custom traits on items', () => {
    test('a live tooltip updated to user HTML is cleaned on update', async () => {
       /** @type {string} The weapon's uuid; the starting description is plain HTML. */
       const uuid = await makeWeaponWithTrait('E2E Trait Sanitize Weapon', '<p>E2E first description</p>');
+      /** @type {import('@playwright/test').Locator} The document's sheet. */
       const sheet = await openSheetByUuid(page, uuid);
       await expect(sheet.locator('.sidebar').getByText(ORIGINAL_NAME).first()).toBeVisible();
 
@@ -229,6 +241,7 @@ test.describe('custom traits on items', () => {
       // Mark the trait label that carries the tooltip, and read its first content.
       /** @type {string|null} The tooltip's first content, or null when the label is not found. */
       const first = await traitSidebar(sheet).evaluate((sidebar, name) => {
+         /** @type {Element|undefined} The trait tag element that carries the marker. */
          const label = [...sidebar.querySelectorAll('.tag *')]
             .find((element) => element._tippy && element.textContent.trim() === name);
          if (!label) {
@@ -241,6 +254,7 @@ test.describe('custom traits on items', () => {
 
       // The description is edited to the payload in the Edit dialog's description area.
       await sheet.locator('.sidebar .fa-pen-to-square').click();
+      /** @type {import('@playwright/test').Locator} The Edit Custom Trait dialog on the page. */
       const dialog = page.locator('[id^="titan-edit-custom-trait-dialog-"]');
       await expect(dialog).toBeVisible();
       await dialog.locator('textarea').fill(PAYLOAD);
@@ -252,6 +266,7 @@ test.describe('custom traits on items', () => {
 
       // The same, still marked, label holds the cleaned payload: the mounted tooltip was cleaned on update.
       await expect.poll(() => traitSidebar(sheet).evaluate((sidebar) => {
+         /** @type {Element|undefined} The trait tag element that carries the marker. */
          const label = [...sidebar.querySelectorAll('.tag *')].find((element) => element.__e2eMarked);
          return label ? label._tippy?.props?.content : 'the marked label was replaced';
       })).toBe(cleaned.payload);
@@ -287,6 +302,7 @@ test.describe('custom traits on effects', () => {
    test('editing an effect custom trait persists the new name and re-renders', async () => {
       /** @type {string} The effect's uuid. */
       const uuid = await makeEffectWithTrait('E2E Trait Edit Effect');
+      /** @type {import('@playwright/test').Locator} The document's sheet. */
       const sheet = await openSheetByUuid(page, uuid);
       await editTrait(sheet.locator('.sidebar'), uuid);
    });
@@ -294,7 +310,109 @@ test.describe('custom traits on effects', () => {
    test('deleting an effect custom trait removes it and re-renders', async () => {
       /** @type {string} The effect's uuid. */
       const uuid = await makeEffectWithTrait('E2E Trait Delete Effect');
+      /** @type {import('@playwright/test').Locator} The document's sheet. */
       const sheet = await openSheetByUuid(page, uuid);
       await deleteTrait(sheet.locator('.sidebar'), uuid);
+   });
+});
+
+test.describe('custom traits on a weapon attack', () => {
+   /**
+    * Makes a world weapon that has one attack and opens its Attacks tab.
+    * @param {string} name - Display name of the new weapon.
+    * @returns {Promise<{uuid: string, sheet: import('@playwright/test').Locator}>} The weapon's uuid and sheet.
+    */
+   async function weaponWithAttack(name) {
+      /** @type {string} The new weapon's uuid. */
+      const uuid = await makeWeapon(name);
+
+      /** @type {number} The number of attacks the new weapon starts with. */
+      const attacks = await page.evaluate(async (uuid) => (await fromUuid(uuid)).system.attack.length, uuid);
+      if (attacks === 0) {
+         await addAttack(page, uuid);
+      }
+
+      /** @type {import('@playwright/test').Locator} The weapon's sheet. */
+      const sheet = await openSheetByUuid(page, uuid);
+      await sheet.locator('.tab-list').getByText('Attacks', { exact: true }).first().click();
+      return {
+         uuid: uuid,
+         sheet: sheet,
+      };
+   }
+
+   /**
+    * Reads the names of the first attack's custom traits.
+    * @param {string} uuid - The weapon's uuid.
+    * @returns {Promise<string[]>} The stored names, in list order.
+    */
+   function readAttackTraitNames(uuid) {
+      return page.evaluate(
+         async (uuid) => (await fromUuid(uuid)).system.attack[0].customTrait.map((trait) => trait.name),
+         uuid,
+      );
+   }
+
+   test('the attack Add Custom Trait dialog stores the trait and renders its tag', async () => {
+      /** @type {{uuid: string, sheet: import('@playwright/test').Locator}} The weapon's uuid and sheet. */
+      const { uuid, sheet } = await weaponWithAttack('E2E Attack Trait Add Weapon');
+      /** @type {import('@playwright/test').Locator} The attack's traits section. */
+      const traits = sheet.locator('.traits:has(.traits-header)');
+      await traits.getByText('Add Custom Trait', { exact: true }).click();
+
+      /** @type {import('@playwright/test').Locator} The Add Custom Trait dialog of the attack. */
+      const dialog = page.locator('[id^="add-custom-attack-trait-dialog-"]');
+      await expect(dialog, 'the add dialog opens').toBeVisible();
+      await dialog.locator('input').first().fill(ORIGINAL_NAME);
+      await dialog.locator('.buttons .button button').first().click();
+
+      await expect(dialog, 'Add Trait closes the dialog').toHaveCount(0);
+      await expect.poll(() => readAttackTraitNames(uuid), { message: 'the attack stored the trait once' })
+         .toEqual([ORIGINAL_NAME]);
+      await expect(traits.getByText(ORIGINAL_NAME).first(), 'the trait renders as a tag').toBeVisible();
+      expect(errors, `uncaught errors:\n${errors.join('\n')}`).toEqual([]);
+   });
+
+   test('the attack Edit dialog stores the edited trait in place', async () => {
+      /** @type {{uuid: string, sheet: import('@playwright/test').Locator}} The weapon's uuid and sheet. */
+      const { uuid, sheet } = await weaponWithAttack('E2E Attack Trait Edit Weapon');
+      /** @type {import('@playwright/test').Locator} The attack's traits section. */
+      const traits = sheet.locator('.traits:has(.traits-header)');
+      await traits.getByText('Add Custom Trait', { exact: true }).click();
+      await page.locator('[id^="add-custom-attack-trait-dialog-"] input').first().fill(ORIGINAL_NAME);
+      await page.locator('[id^="add-custom-attack-trait-dialog-"] .buttons .button button').first().click();
+      await expect.poll(() => readAttackTraitNames(uuid), { message: 'the attack stored the trait' })
+         .toEqual([ORIGINAL_NAME]);
+
+      await traits.locator('.traits-container .fa-pen-to-square').click();
+      /** @type {import('@playwright/test').Locator} The Edit Custom Trait dialog of the attack. */
+      const dialog = page.locator('[id^="edit-custom-attack-traits-dialog-"]');
+      await expect(dialog, 'the edit dialog opens').toBeVisible();
+      await dialog.locator('input').first().fill(EDITED_NAME);
+      await dialog.locator('.buttons .button button').first().click();
+
+      await expect(dialog, 'Apply Edits closes the dialog').toHaveCount(0);
+      await expect.poll(() => readAttackTraitNames(uuid), { message: 'the trait was edited in place' })
+         .toEqual([EDITED_NAME]);
+      await expect(traits.getByText(EDITED_NAME).first(), 'the edited name renders').toBeVisible();
+      expect(errors, `uncaught errors:\n${errors.join('\n')}`).toEqual([]);
+   });
+
+   test('the attack trait tag delete icon removes the trait', async () => {
+      /** @type {{uuid: string, sheet: import('@playwright/test').Locator}} The weapon's uuid and sheet. */
+      const { uuid, sheet } = await weaponWithAttack('E2E Attack Trait Delete Weapon');
+      /** @type {import('@playwright/test').Locator} The attack's traits section. */
+      const traits = sheet.locator('.traits:has(.traits-header)');
+      await traits.getByText('Add Custom Trait', { exact: true }).click();
+      await page.locator('[id^="add-custom-attack-trait-dialog-"] input').first().fill(ORIGINAL_NAME);
+      await page.locator('[id^="add-custom-attack-trait-dialog-"] .buttons .button button').first().click();
+      await expect.poll(() => readAttackTraitNames(uuid), { message: 'the attack stored the trait' })
+         .toEqual([ORIGINAL_NAME]);
+
+      await traits.locator('.traits-container .fa-trash').click();
+      await expect.poll(() => readAttackTraitNames(uuid), { message: 'the trait was removed from the attack' })
+         .toEqual([]);
+      await expect(traits.getByText(ORIGINAL_NAME), 'the deleted tag no longer renders').toHaveCount(0);
+      expect(errors, `uncaught errors:\n${errors.join('\n')}`).toEqual([]);
    });
 });

@@ -19,8 +19,7 @@ export default class EditAttackTraitsDialog extends TitanDialog {
             class: EditAttackTraitsDialogShell,
             props: {
                attackIdx: attackIdx,
-               document: item,
-
+               item: item,
             },
          },
          id: `edit-attack-traits-dialog-${item._id}`,

@@ -294,7 +294,8 @@ export default class TitanItem extends Item {
    /**
     * Marks the item as being deleted before actually deleting the item
     * so that asynchronous update operations will not apply.
-    * @returns {Promise<void|boolean>} Resolves once the item is deleted, or false if the deletion could not proceed.
+    * @returns {Promise<boolean>} Resolves true once the item is deleted, or false if the deletion could not proceed or
+    * was refused.
     */
    async safeDelete() {
       if (assert(
@@ -314,7 +315,20 @@ export default class TitanItem extends Item {
             },
          });
 
-         return this.delete();
+         // A refused delete (a preDelete hook returned false) resolves undefined and leaves the item in place, so the
+         // mark is cleared to keep the item deletable.
+         if (await this.delete() === undefined) {
+            await this.update({
+               flags: {
+                  titan: {
+                     isMarkedForDeletion: false,
+                  },
+               },
+            });
+            return false;
+         }
+
+         return true;
       }
 
       return false;

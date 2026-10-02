@@ -19,7 +19,7 @@
     * @returns {void}
     */
    function deleteFunction() {
-      document.data.deleteCustomAttackTrait(attackIdx, traitIdx);
+      document.data.system.deleteCustomAttackTrait(attackIdx, traitIdx);
    }
 
    /**
@@ -27,7 +27,7 @@
     * @returns {void}
     */
    function editFunction() {
-      document.data.editCustomAttackTrait(attackIdx, traitIdx);
+      document.data.system.editCustomAttackTrait(attackIdx, traitIdx);
    }
 </script>
 

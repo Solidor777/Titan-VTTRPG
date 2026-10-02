@@ -31,14 +31,17 @@
     * @returns {void}
     */
    function addTrait() {
-      const attack = document.system.attack[attackIdx];
+      /** @type {object[]} A copy of the attacks, so the document's own data is changed only by the update. */
+      const attacks = structuredClone(document.system.attack);
 
-      if (attack) {
-         attack.customTrait.push(newTrait);
+      if (attacks[attackIdx]) {
+         // The new trait is a reactive proxy, which `structuredClone` and the update cannot copy; the snapshot is
+         // plain.
+         attacks[attackIdx].customTrait.push($state.snapshot(newTrait));
 
          document.update({
             system: {
-               attack: structuredClone(document.system.attack),
+               attack: attacks,
             },
          });
       }

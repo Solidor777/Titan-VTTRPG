@@ -1,4 +1,5 @@
-import EditCustomTraitDialogShell from '~/document/types/item/dialog/EditCustomTraitDialogShell.svelte';
+import EditCustomAttackTraitDialogShell
+   from '~/document/types/item/types/weapon/dialog/EditCustomAttackTraitDialogShell.svelte';
 import TitanDialog from '~/helpers/dialogs/Dialog.js';
 
 /**
@@ -17,10 +18,10 @@ export default class EditCustomAttackTraitDialog extends TitanDialog {
       super({
          title: `${item.name}: ${item.system.attack[attackIdx].label}`,
          content: {
-            class: EditCustomTraitDialogShell,
+            class: EditCustomAttackTraitDialogShell,
             props: {
                attackIdx: attackIdx,
-               item: item,
+               document: item,
                traitIdx: traitIdx,
             },
          },

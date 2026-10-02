@@ -279,6 +279,7 @@ async function setEquipped(row, type, uuid, equipped) {
     * @returns {Promise<boolean>} True when it is.
     */
    const read = () => page.evaluate(async ({ uuid, type }) => {
+      /** @type {object} The fixture item. */
       const item = await fromUuid(uuid);
       return type === 'armor' || type === 'shield'
          ? item.parent.system.equipped[type] === item.id
@@ -401,6 +402,7 @@ test.describe('item rows: a functional sweep per type', () => {
             {
                label: 'XP',
                path: 'system.xpCost',
+               hiddenAtZero: true,
                to: 5,
                tag: '.tag:has(> .label) .value',
                tagLabel: 'XP Cost',
@@ -412,14 +414,20 @@ test.describe('item rows: a functional sweep per type', () => {
 
    for (const { type, tab, checked } of ITEM_TYPES) {
       test(`${type} row: expand, edit-sheet reactivity, send to chat, roll and equip`, async () => {
+         /** @type {string} The fixture item's id. */
          const id = itemIds[type];
+         /** @type {string} The document's uuid. */
          const uuid = `${actorUuid}.Item.${id}`;
+         /** @type {import('@playwright/test').Locator} The actor's sheet. */
          const sheet = await openActorTab(tab);
+         /** @type {import('@playwright/test').Locator} The item's row. */
          const row = itemRow(sheet, id);
          await expandRow(row);
 
          // The Edit button opens the item's own sheet; edits made there reach the row in place.
+         /** @type {object} The probe of the item type. */
          const probe = PROBES[type];
+         /** @type {import('@playwright/test').Locator} The row's footer. */
          const footer = row.locator(probe.footer);
          await withDocumentSheet(row, 'Item', id, async (documentSheet) => {
             // A rarity edit moves the rarity tag from common to rare and back.
@@ -438,12 +446,18 @@ test.describe('item rows: a functional sweep per type', () => {
                const shown = stat.tagLabel
                   ? footer.locator('.tag:has(> .label)', { hasText: stat.tagLabel }).locator('.value')
                   : footer.locator(stat.tag).first();
+               /** @type {import('@playwright/test').Locator} The input under test. */
                const input = headerStat(documentSheet, stat.label).locator('input').nth(stat.inputIndex ?? 0);
 
                // A tag that a zero hides is absent until the edit and appears in place.
                if (stat.hiddenAtZero) {
-                  expect(original, `${type} ${stat.label} starts at 0`).toBe(0);
-                  await expect(shown, `${type} ${stat.label} tag starts hidden`).toHaveCount(0);
+                  // A type whose stored value starts above 0 (the ability's XP cost) is typed down to 0 first.
+                  if (original !== 0) {
+                     await typeInto(input, 0);
+                     await expect.poll(() => readPath(uuid, stat.path), { message: `${type} ${stat.label} is zeroed` })
+                        .toBe(0);
+                  }
+                  await expect(shown, `${type} ${stat.label} tag is hidden at 0`).toHaveCount(0);
                }
                await typeInto(input, stat.to);
                await expect.poll(() => readPath(uuid, stat.path), { message: `${type} ${stat.label} is stored` })
@@ -466,8 +480,8 @@ test.describe('item rows: a functional sweep per type', () => {
                      stat.tagLabel
                         ? footer.locator('.tag:has(> .label)', { hasText: stat.tagLabel })
                         : footer.locator(stat.tag),
-                     `${type} ${stat.label} tag hides again`,
-                  ).toHaveCount(0);
+                     `${type} ${stat.label} tag follows the restored value`,
+                  ).toHaveCount(original === 0 ? 0 : 1);
                }
             }
             await chooseRarity(documentSheet, 'common');
@@ -507,7 +521,7 @@ test.describe('item rows: a functional sweep per type', () => {
                .toBe('itemCheck');
          }
 
-         // Equip: the toggle in the expanded content equips and unequips the item.
+         // Equip: the row's Equipped toggle equips and unequips the item.
          if (type === 'armor' || type === 'shield') {
             await setEquipped(row, type, uuid, true);
             await setEquipped(row, type, uuid, false);
@@ -523,14 +537,19 @@ test.describe('item rows: a functional sweep per type', () => {
 
 test.describe('weapon and commodity rows', () => {
    test('the weapon row attack label and AttackTags follow edits made in the weapon sheet', async () => {
+      /** @type {string} The fixture item's id. */
       const id = itemIds.weapon;
+      /** @type {string} The document's uuid. */
       const uuid = `${actorUuid}.Item.${id}`;
+      /** @type {import('@playwright/test').Locator} The actor's sheet. */
       const sheet = await openActorTab('Inventory');
+      /** @type {import('@playwright/test').Locator} The item's row. */
       const row = itemRow(sheet, id);
       await expandRow(row);
 
       /** @type {{label: string, damage: number}} The first attack as made. */
       const original = await page.evaluate(async (uuid) => {
+         /** @type {object} The weapon's first attack, as stored. */
          const attack = (await fromUuid(uuid)).system.attack[0];
          return {
             label: attack.label,
@@ -539,18 +558,28 @@ test.describe('weapon and commodity rows', () => {
       }, uuid);
 
       // The unequipped weapon renders its attack label as a plain header label.
+      /** @type {import('@playwright/test').Locator} The weapon row's rendered attack label. */
       const attackLabel = row.locator('.attack .header .label').first();
+      /** @type {import('@playwright/test').Locator} The damage tag's value. */
       const damage = row.getByTestId('attack-tags-damage').locator('.value');
 
       // The tag shows the damage and, when the attack adds extra successes, a suffix after it.
+      /**
+       * Builds the pattern of a damage tag that shows a damage value.
+       * @param {number} value - The damage value the tag starts with.
+       * @returns {RegExp} Matches the value followed by a space or the end of the text.
+       */
       const shownDamage = (value) => new RegExp(`^${value}( |$)`);
       await expect(attackLabel, 'the attack label renders').toContainText(original.label);
       await expect(damage, 'the damage tag renders').toHaveText(shownDamage(original.damage));
 
       await withDocumentSheet(row, 'Item', id, async (documentSheet) => {
          await documentSheet.locator('.tab-list').getByText('Attacks', { exact: true }).first().click();
+         /** @type {import('@playwright/test').Locator} The first attack's section. */
          const attack = documentSheet.locator('.attack').first();
+         /** @type {import('@playwright/test').Locator} The attack label input. */
          const labelInput = attack.locator('.header .label input');
+         /** @type {import('@playwright/test').Locator} The attack damage input. */
          const damageInput = attack.locator('.field').filter({ has: page.getByText('Damage', { exact: true }) })
             .locator('input.titan-number-input').first();
 
@@ -568,13 +597,18 @@ test.describe('weapon and commodity rows', () => {
 
    test('the commodity quantity input reflects an item sheet edit and persists typed and incremented values',
       async () => {
+         /** @type {string} The fixture item's id. */
          const id = itemIds.commodity;
+         /** @type {string} The document's uuid. */
          const uuid = `${actorUuid}.Item.${id}`;
+         /** @type {import('@playwright/test').Locator} The actor's sheet. */
          const sheet = await openActorTab('Inventory');
+         /** @type {import('@playwright/test').Locator} The item's row. */
          const row = itemRow(sheet, id);
 
          /** @type {number} The quantity the commodity was made with, put back at the end. */
          const original = await readPath(uuid, 'system.quantity');
+         /** @type {import('@playwright/test').Locator} The commodity row's quantity number input. */
          const quantityInput = row.locator('input.titan-number-input').first();
          await expect(quantityInput, 'the input shows the stored quantity').toHaveValue(String(original));
 
@@ -602,9 +636,13 @@ test.describe('weapon and commodity rows', () => {
       });
 
    test('the commodity quantity input evaluates math expressions and relative deltas', async () => {
+      /** @type {string} The fixture item's id. */
       const id = itemIds.commodity;
+      /** @type {string} The document's uuid. */
       const uuid = `${actorUuid}.Item.${id}`;
+      /** @type {import('@playwright/test').Locator} The actor's sheet. */
       const sheet = await openActorTab('Inventory');
+      /** @type {import('@playwright/test').Locator} The item's row. */
       const quantityInput = itemRow(sheet, id).locator('input.titan-number-input').first();
 
       /** @type {number} The quantity the commodity was made with, put back at the end. */
@@ -639,7 +677,9 @@ test.describe('effect rows', () => {
     * actor sheet and the expanded row.
     */
    async function openExpandedEffectRow(role) {
+      /** @type {import('@playwright/test').Locator} The actor's sheet. */
       const sheet = await openActorTab('Effects');
+      /** @type {import('@playwright/test').Locator} The effect's row. */
       const row = effectRow(sheet, effectIds[role]);
       await expandRow(row);
       return {
@@ -659,20 +699,27 @@ test.describe('effect rows', () => {
    }
 
    test('the effect footer duration and expired tags follow edits made in the effect sheet', async () => {
+      /** @type {string} The document's uuid. */
       const uuid = `${actorUuid}.ActiveEffect.${effectIds.timed}`;
+      /** @type {import('@playwright/test').Locator} The expanded effect row. */
       const { row } = await openExpandedEffectRow('timed');
 
       // The DurationTag is told apart from the other tags by its bold label; its remaining count is its last value.
+      /** @type {import('@playwright/test').Locator} The row's footer. */
       const footer = row.locator('.section.footer');
+      /** @type {import('@playwright/test').Locator} The effect footer's labelled duration tag. */
       const durationTag = footer.locator('.tag', { has: page.locator('.label', { hasText: 'Duration' }) });
+      /** @type {import('@playwright/test').Locator} The remaining count of the duration tag. */
       const remaining = durationTag.locator('.value').last();
 
       // The Expired tag wraps a `Tag`, so only the wrapper is counted.
+      /** @type {import('@playwright/test').Locator} The Expired tag. */
       const expired = footer.locator('.stats > .stat', { hasText: 'Expired' });
       await expect(remaining, 'the effect starts with a remaining count of 1').toHaveText('1');
       await expect(expired, 'the Expired tag is absent').toHaveCount(0);
 
       await withDocumentSheet(row, 'ActiveEffect', effectIds.timed, async (documentSheet) => {
+         /** @type {import('@playwright/test').Locator} The input under test. */
          const input = headerStat(documentSheet, 'Remaining').locator('input.titan-number-input');
          await typeInto(input, 7);
          await expect(remaining, 'the remaining count updates in place').toHaveText('7');
@@ -691,10 +738,13 @@ test.describe('effect rows', () => {
 
    test('the duration remaining input reflects an effect sheet edit and persists typed and incremented values',
       async () => {
+         /** @type {string} The document's uuid. */
          const uuid = `${actorUuid}.ActiveEffect.${effectIds.timed}`;
+         /** @type {import('@playwright/test').Locator} The expanded effect row. */
          const { row } = await openExpandedEffectRow('timed');
 
          // A timed effect renders only the remaining field, so the first number input is the remaining count.
+         /** @type {import('@playwright/test').Locator} The effect row's remaining number input. */
          const remainingInput = row.locator('input.titan-number-input').first();
          await expect(remainingInput, 'the input starts at 1').toHaveValue('1');
 
@@ -718,16 +768,20 @@ test.describe('effect rows', () => {
       });
 
    test('the duration initiative input reflects an effect sheet edit and persists typed values', async () => {
+      /** @type {string} The document's uuid. */
       const uuid = `${actorUuid}.ActiveEffect.${effectIds.timed}`;
+      /** @type {import('@playwright/test').Locator} The expanded effect row. */
       const { row } = await openExpandedEffectRow('timed');
 
       /** @type {number} The initiative the effect was made with, put back at the end. */
       const original = await readPath(uuid, 'system.duration.initiative');
 
       // With an initiative duration the initiative input comes before the remaining input.
+      /** @type {import('@playwright/test').Locator} The effect row's initiative number input. */
       const initiativeInput = row.locator('input.titan-number-input').first();
       await withDocumentSheet(row, 'ActiveEffect', effectIds.timed, async (documentSheet) => {
          await chooseDurationType(documentSheet, 'initiative');
+         /** @type {import('@playwright/test').Locator} The number inputs of the effect sheet header. */
          const headerInputs = documentSheet.locator('.header input.titan-number-input');
 
          // The initiative input slides in before the remaining input.
@@ -754,19 +808,26 @@ test.describe('effect rows', () => {
    });
 
    test('the effect row name and DurationTag update in place', async () => {
+      /** @type {string} The document's uuid. */
       const uuid = `${actorUuid}.ActiveEffect.${effectIds.timed}`;
+      /** @type {import('@playwright/test').Locator} The expanded effect row. */
       const { row } = await openExpandedEffectRow('timed');
+      /** @type {import('@playwright/test').Locator} The row's name. */
       const name = row.locator('.header .label .name');
 
       // The DurationTag's values are, in order, the localized type and the remaining count.
+      /** @type {import('@playwright/test').Locator} The effect row's duration tag. */
       const durationTag = row.getByTestId('effect-row-duration');
+      /** @type {import('@playwright/test').Locator} The duration type value. */
       const durationType = durationTag.locator('.value').first();
+      /** @type {import('@playwright/test').Locator} The remaining count value. */
       const durationRemaining = durationTag.locator('.value').last();
       await expect(name, 'the name renders').toHaveText('E2E Rows Timed Effect');
       await expect(durationType, 'the duration type renders').toHaveText('Turn Start');
       await expect(durationRemaining, 'the remaining count renders').toHaveText('1');
 
       await withDocumentSheet(row, 'ActiveEffect', effectIds.timed, async (documentSheet) => {
+         /** @type {import('@playwright/test').Locator} The document name input. */
          const nameInput = documentSheet.locator('.document-name input');
          await typeInto(nameInput, 'E2E Rows Timed Effect Renamed');
          await chooseDurationType(documentSheet, 'turnEnd');
@@ -787,10 +848,13 @@ test.describe('effect rows', () => {
    });
 
    test('clicking the active toggle flips the rendered checkmark without a tab switch', async () => {
+      /** @type {string} The document's uuid. */
       const uuid = `${actorUuid}.ActiveEffect.${effectIds.permanent}`;
+      /** @type {import('@playwright/test').Locator} The actor's sheet. */
       const sheet = await openActorTab('Effects');
 
       // Only a permanent effect renders the toggle; its checkmark is the only square icon of the row.
+      /** @type {import('@playwright/test').Locator} The effect's row. */
       const row = effectRow(sheet, effectIds.permanent);
       await expect(row.locator('i.fa-square-check'), 'the effect starts active').toHaveCount(1);
       await row.locator('i.fa-square-check').click();
@@ -805,10 +869,14 @@ test.describe('effect rows', () => {
 
    test('an effect row functional sweep: toggle, send to chat, check roll and confirm-gated delete', async () => {
       // A timed effect of its own: the sweep ends by deleting it.
+      /** @type {string} The new effect's id. */
       const id = await addEffect(page, actorId, 'E2E Rows Sweep Effect');
+      /** @type {string} The document's uuid. */
       const uuid = `${actorUuid}.ActiveEffect.${id}`;
       await addCheck(page, uuid, { label: CHECK_LABEL });
+      /** @type {import('@playwright/test').Locator} The actor's sheet. */
       const sheet = await openActorTab('Effects');
+      /** @type {import('@playwright/test').Locator} The effect's row. */
       const row = effectRow(sheet, id);
       await expandRow(row);
 
@@ -837,6 +905,7 @@ test.describe('effect rows', () => {
       // With confirmation on the delete button opens the dialog, and the effect lives until it is confirmed.
       await setClientSetting(page, 'confirmDeletingEffects', true);
       await row.getByRole('button', { name: 'Delete Effect' }).click();
+      /** @type {import('@playwright/test').Locator} The confirmation dialog a delete click opened. */
       const dialog = page.locator('.application.titan-dialog');
       await expect(dialog.first(), 'the confirm dialog opens').toBeVisible();
       expect(await readPath(uuid, 'id'), 'the effect lives until it is confirmed').toBe(id);
@@ -876,9 +945,13 @@ test.describe('expanding rows', () => {
       ],
    ]) {
       test(`${label} rows expand and collapse in place`, async () => {
+         /** @type {import('@playwright/test').Locator} The actor's sheet. */
          const sheet = await openActorTab(tab);
+         /** @type {import('@playwright/test').Locator} The first row of the list. */
          const row = sheet.locator(selector).first();
+         /** @type {import('@playwright/test').Locator} The row's expandable content. */
          const content = row.locator('.expandable-content');
+         /** @type {import('@playwright/test').Locator} The row's expand toggle. */
          const toggle = row.locator('.header .label .button button').first();
 
          // The sheet keeps a row's state between renders, so a row is collapsed first when it is not.
@@ -950,14 +1023,29 @@ test.describe('deleting rows', () => {
    /** @type {string} Selector of the confirmation dialog of an item or effect delete. */
    const CONFIRMATION = '.application.titan-dialog[id^="titan-confirmation-dialog"]';
 
+   /**
+    * Waits two animation frames. A dialog that the code after a refused delete would open is rendered within the same
+    * task as the refusal (a chain of promise continuations), so two frames after the refusal was counted show it.
+    * @returns {Promise<void>} Resolves after the second frame.
+    */
+   function settleFrames() {
+      return page.evaluate(() => new Promise((resolve) => {
+         requestAnimationFrame(() => requestAnimationFrame(resolve));
+      }));
+   }
+
    test('with confirmation on, an item row delete asks first: Cancel keeps the item, Delete Item removes it',
       async () => {
+         /** @type {string} The new item's id. */
          const id = await makeWeapon('E2E Rows Confirm Weapon');
+         /** @type {import('@playwright/test').Locator} The actor's sheet. */
          const sheet = await openActorTab('Inventory');
+         /** @type {import('@playwright/test').Locator} The item's row. */
          const row = itemRow(sheet, id);
          await setClientSetting(page, 'confirmDeletingItems', true);
 
          await row.getByRole('button', { name: 'Delete Item' }).click();
+         /** @type {import('@playwright/test').Locator} The confirmation dialog a delete click opened. */
          const dialog = page.locator(CONFIRMATION);
          await expect(dialog, 'the confirmation dialog opens').toBeVisible();
          await dialog.getByRole('button', { name: 'Cancel' }).click();
@@ -973,12 +1061,16 @@ test.describe('deleting rows', () => {
       });
 
    test('with confirmation on, an effect row delete asks first: Cancel keeps the effect', async () => {
+      /** @type {string} The new effect's id. */
       const id = await addEffect(page, actorId, 'E2E Rows Confirm Effect');
+      /** @type {import('@playwright/test').Locator} The actor's sheet. */
       const sheet = await openActorTab('Effects');
+      /** @type {import('@playwright/test').Locator} The effect's row. */
       const row = effectRow(sheet, id);
       await setClientSetting(page, 'confirmDeletingEffects', true);
 
       await row.getByRole('button', { name: 'Delete Effect' }).click();
+      /** @type {import('@playwright/test').Locator} The confirmation dialog a delete click opened. */
       const dialog = page.locator(CONFIRMATION);
       await expect(dialog, 'the confirmation dialog opens').toBeVisible();
       await dialog.getByRole('button', { name: 'Cancel' }).click();
@@ -987,7 +1079,9 @@ test.describe('deleting rows', () => {
    });
 
    test('with confirmation off, an item row delete removes the item and opens no dialog', async () => {
+      /** @type {string} The new item's id. */
       const id = await makeWeapon('E2E Rows Immediate Weapon');
+      /** @type {import('@playwright/test').Locator} The actor's sheet. */
       const sheet = await openActorTab('Inventory');
       await itemRow(sheet, id).getByRole('button', { name: 'Delete Item' }).click();
       await expect.poll(() => actorHas('items', id), { message: 'the click deleted the item at once' }).toBe(false);
@@ -995,7 +1089,9 @@ test.describe('deleting rows', () => {
    });
 
    test('with confirmation off, an effect row delete removes the effect and opens no dialog', async () => {
+      /** @type {string} The new effect's id. */
       const id = await addEffect(page, actorId, 'E2E Rows Immediate Effect');
+      /** @type {import('@playwright/test').Locator} The actor's sheet. */
       const sheet = await openActorTab('Effects');
       await effectRow(sheet, id).getByRole('button', { name: 'Delete Effect' }).click();
       await expect.poll(() => actorHas('effects', id), { message: 'the click deleted the effect at once' })
@@ -1003,36 +1099,123 @@ test.describe('deleting rows', () => {
       await expect(page.locator('.application.titan-dialog'), 'no dialog opened').toHaveCount(0);
    });
 
-   test('with confirmation off, a refused item delete leaves the item and opens no dialog', async () => {
+   test('with confirmation off, a refused item delete leaves the item deletable and opens no dialog', async () => {
+      /** @type {string} The new item's id. */
       const id = await makeWeapon('E2E Rows Refused Weapon');
+      /** @type {import('@playwright/test').Locator} The actor's sheet. */
       const sheet = await openActorTab('Inventory');
       await refuseDeletes('Item');
       try {
          await itemRow(sheet, id).getByRole('button', { name: 'Delete Item' }).click();
          await expect.poll(() => page.evaluate(() => window.__e2eRefused), { message: 'the delete was refused' })
             .toBe(1);
+         await settleFrames();
          await expect(page.locator('.application.titan-dialog'), 'no dialog opened').toHaveCount(0);
          expect(await actorHas('items', id), 'the refused delete left the item').toBe(true);
+         expect(
+            await page.evaluate(({ actorId, id }) => game.actors.get(actorId).items.get(id).isMarkedForDeletion, {
+               actorId,
+               id,
+            }),
+            'the refused delete left no deletion mark on the item',
+         ).toBe(false);
       }
       finally {
          await allowDeletes('Item');
       }
+
+      // With the refusal gone, the same row deletes the item.
+      await itemRow(sheet, id).getByRole('button', { name: 'Delete Item' }).click();
+      await expect.poll(() => actorHas('items', id), { message: 'the second delete removed the item' }).toBe(false);
+      expect(errors, `uncaught errors:\n${errors.join('\n')}`).toEqual([]);
    });
 
-   test('with confirmation off, a refused effect delete leaves the effect and opens no dialog', async () => {
+   test('with confirmation off, a refused effect delete leaves the effect deletable and opens no dialog', async () => {
+      /** @type {string} The new effect's id. */
       const id = await addEffect(page, actorId, 'E2E Rows Refused Effect');
+      /** @type {import('@playwright/test').Locator} The actor's sheet. */
       const sheet = await openActorTab('Effects');
       await refuseDeletes('ActiveEffect');
       try {
          await effectRow(sheet, id).getByRole('button', { name: 'Delete Effect' }).click();
          await expect.poll(() => page.evaluate(() => window.__e2eRefused), { message: 'the delete was refused' })
             .toBe(1);
+         await settleFrames();
          await expect(page.locator('.application.titan-dialog'), 'no dialog opened').toHaveCount(0);
          expect(await actorHas('effects', id), 'the refused delete left the effect').toBe(true);
       }
       finally {
          await allowDeletes('ActiveEffect');
       }
+
+      await effectRow(sheet, id).getByRole('button', { name: 'Delete Effect' }).click();
+      await expect.poll(() => actorHas('effects', id), { message: 'the second delete removed the effect' })
+         .toBe(false);
+   });
+
+   test('with confirmation on, a refused confirmed item delete leaves the item deletable', async () => {
+      /** @type {string} The new item's id. */
+      const id = await makeWeapon('E2E Rows Refused Confirmed Weapon');
+      /** @type {import('@playwright/test').Locator} The actor's sheet. */
+      const sheet = await openActorTab('Inventory');
+      await setClientSetting(page, 'confirmDeletingItems', true);
+      /** @type {import('@playwright/test').Locator} The item's row. */
+      const row = itemRow(sheet, id);
+      await refuseDeletes('Item');
+      try {
+         await row.getByRole('button', { name: 'Delete Item' }).click();
+         await page.locator(CONFIRMATION).getByRole('button', { name: 'Delete Item' }).click();
+         await expect.poll(() => page.evaluate(() => window.__e2eRefused), { message: 'the delete was refused' })
+            .toBe(1);
+         await settleFrames();
+         expect(await actorHas('items', id), 'the refused delete left the item').toBe(true);
+      }
+      finally {
+         await allowDeletes('Item');
+      }
+
+      await row.getByRole('button', { name: 'Delete Item' }).click();
+      await page.locator(CONFIRMATION).getByRole('button', { name: 'Delete Item' }).click();
+      await expect.poll(() => actorHas('items', id), { message: 'the second confirmed delete removed the item' })
+         .toBe(false);
+      expect(errors, `uncaught errors:\n${errors.join('\n')}`).toEqual([]);
+   });
+
+   test('Remove Expired Effects follows the effects confirmation setting, not the items setting', async () => {
+      /** @type {string} The new effect's id. */
+      const id = await addEffect(page, actorId, 'E2E Rows Expiring Effect');
+      /** @type {import('@playwright/test').Locator} The actor's sheet. */
+      const sheet = await openActorTab('Effects');
+      /** @type {import('@playwright/test').Locator} The effect's row. */
+      const row = effectRow(sheet, id);
+      await expandRow(row);
+      await typeInto(row.locator('input.titan-number-input').first(), 0);
+      await expect.poll(
+         () => page.evaluate(({ actorId, id }) => game.actors.get(actorId).effects.get(id).system.isExpired, {
+            actorId,
+            id,
+         }),
+         { message: 'the effect is expired' },
+      ).toBe(true);
+
+      // Effects confirmation on, items off: the click asks first, and Cancel keeps the effect.
+      await setClientSetting(page, 'confirmDeletingEffects', true);
+      await setClientSetting(page, 'confirmDeletingItems', false);
+      await sheet.getByRole('button', { name: 'Remove Expired Effects' }).click();
+      /** @type {import('@playwright/test').Locator} The confirmation dialog that Remove Expired Effects opened. */
+      const dialog = page.locator('.application.titan-dialog');
+      await expect(dialog, 'the confirmation dialog opens').toBeVisible();
+      await dialog.getByRole('button', { name: 'Cancel' }).click();
+      await expect(dialog, 'Cancel closes the dialog').toHaveCount(0);
+      expect(await actorHas('effects', id), 'Cancel keeps the effect').toBe(true);
+
+      // Effects confirmation off, items on: the click removes the expired effect at once.
+      await setClientSetting(page, 'confirmDeletingEffects', false);
+      await setClientSetting(page, 'confirmDeletingItems', true);
+      await sheet.getByRole('button', { name: 'Remove Expired Effects' }).click();
+      await expect.poll(() => actorHas('effects', id), { message: 'the click removed the expired effect' })
+         .toBe(false);
+      await expect(dialog, 'no dialog opened').toHaveCount(0);
    });
 
    for (const confirming of [
@@ -1041,9 +1224,13 @@ test.describe('deleting rows', () => {
    ]) {
       test(`deleting an equipped armor row with confirmation ${confirming ? 'on' : 'off'} un-equips it quietly`,
          async () => {
+            /** @type {string} The new item's id. */
             const id = await createOwnedItem(page, actorId, 'armor', 'E2E Rows Worn Armor');
+            /** @type {string} The document's uuid. */
             const uuid = `${actorUuid}.Item.${id}`;
+            /** @type {import('@playwright/test').Locator} The actor's sheet. */
             const sheet = await openActorTab('Inventory');
+            /** @type {import('@playwright/test').Locator} The item's row. */
             const row = itemRow(sheet, id);
             await expandRow(row);
             await setEquipped(row, 'armor', uuid, true);
@@ -1071,9 +1258,11 @@ test.describe('owned items', () => {
          name: 'E2E Rows Add Actor',
          type: 'player',
       });
+      /** @type {string} The new item's id. */
       const itemId = await createOwnedItem(page, id, 'ability', 'E2E Rows Added Ability');
       expect(
          await page.evaluate(({ id, itemId }) => {
+            /** @type {object} The actor read from the world, for its item count. */
             const actor = game.actors.get(id);
             return {
                count: actor.items.size,
@@ -1088,8 +1277,87 @@ test.describe('owned items', () => {
          count: 1,
          type: 'ability',
       });
+      /** @type {import('@playwright/test').Locator} The actor's sheet. */
       const sheet = await openActorTab('Abilities', `Actor.${id}`);
       await expect(itemRow(sheet, itemId), 'the Abilities tab lists the new ability').toBeVisible();
+      expect(errors, `uncaught errors:\n${errors.join('\n')}`).toEqual([]);
+   });
+
+   /**
+    * Applies a trait in a document sheet's Edit Traits dialog.
+    * @param {import('@playwright/test').Locator} scope - The sheet or tab section holding the Edit Traits button.
+    * @param {string} label - The trait's label in the dialog.
+    * @returns {Promise<void>} Resolves once the dialog has closed.
+    */
+   async function applyTrait(scope, label) {
+      await scope.getByText('Edit Traits', { exact: true }).first().click();
+
+      /** @type {import('@playwright/test').Locator} The Edit Traits dialog. */
+      const dialog = page.locator('.application.titan-dialog', {
+         has: page.getByRole('button', { name: 'Apply Edits' }),
+      });
+      await expect(dialog, 'the Edit Traits dialog opens').toBeVisible();
+      await dialog.locator('li', { has: page.getByText(label, { exact: true }) }).locator('button').click();
+      await dialog.getByRole('button', { name: 'Apply Edits' }).click();
+      await expect(dialog, 'Apply Edits closes the dialog').toHaveCount(0);
+   }
+
+   test('the shield Edit Traits dialog stores the chosen trait', async () => {
+      /** @type {string} The new actor's id. */
+      const id = await createActor(page, {
+         name: 'E2E Rows Shield Actor',
+         type: 'player',
+      });
+      /** @type {string} The new item's id. */
+      const itemId = await createOwnedItem(page, id, 'shield', 'E2E Rows Trait Shield');
+      /** @type {import('@playwright/test').Locator} The actor's sheet. */
+      const sheet = await openActorTab('Inventory', `Actor.${id}`);
+      /** @type {import('@playwright/test').Locator} The item's row. */
+      const row = itemRow(sheet, itemId);
+      await expandRow(row);
+      await withDocumentSheet(row, 'Item', itemId, async (documentSheet) => {
+         await applyTrait(documentSheet, 'Magical');
+         await expect.poll(
+            () => readPath(`Actor.${id}.Item.${itemId}`, 'system.trait'),
+            { message: 'the dialog stored the Magical trait' },
+         ).toEqual([
+            {
+               name: 'magical',
+               value: true,
+            },
+         ]);
+      });
+      expect(errors, `uncaught errors:\n${errors.join('\n')}`).toEqual([]);
+   });
+
+   test('the weapon attack Edit Traits dialog stores the chosen trait', async () => {
+      /** @type {string} The new actor's id. */
+      const id = await createActor(page, {
+         name: 'E2E Rows Attack Actor',
+         type: 'player',
+      });
+      /** @type {string} The new item's id. */
+      const itemId = await createOwnedItem(page, id, 'weapon', 'E2E Rows Trait Weapon');
+      /** @type {string} The document's uuid. */
+      const uuid = `Actor.${id}.Item.${itemId}`;
+      /** @type {import('@playwright/test').Locator} The actor's sheet. */
+      const sheet = await openActorTab('Inventory', `Actor.${id}`);
+      /** @type {import('@playwright/test').Locator} The item's row. */
+      const row = itemRow(sheet, itemId);
+      await expandRow(row);
+      await withDocumentSheet(row, 'Item', itemId, async (documentSheet) => {
+         await documentSheet.locator('.tab-list').getByText('Attacks', { exact: true }).first().click();
+         await applyTrait(documentSheet.locator('.traits:has(.traits-header)'), 'Cleave');
+         await expect.poll(
+            () => readPath(uuid, 'system.attack.0.trait'),
+            { message: 'the dialog stored the Cleave trait on the attack' },
+         ).toEqual([
+            {
+               name: 'cleave',
+               value: true,
+            },
+         ]);
+      });
       expect(errors, `uncaught errors:\n${errors.join('\n')}`).toEqual([]);
    });
 
@@ -1099,15 +1367,20 @@ test.describe('owned items', () => {
          name: 'E2E Rows Heavy Actor',
          type: 'player',
       });
+      /** @type {string} The new item's id. */
       const itemId = await createOwnedItem(page, id, 'armor', 'E2E Rows Heavy Plate');
+      /** @type {string} The document's uuid. */
       const uuid = `Actor.${id}.Item.${itemId}`;
+      /** @type {import('@playwright/test').Locator} The actor's sheet. */
       const sheet = await openActorTab('Inventory', `Actor.${id}`);
+      /** @type {import('@playwright/test').Locator} The item's row. */
       const row = itemRow(sheet, itemId);
       await expandRow(row);
 
       // The Heavy trait is chosen in the armor's own Edit Traits dialog.
       await withDocumentSheet(row, 'Item', itemId, async (documentSheet) => {
          await documentSheet.getByText('Edit Traits', { exact: true }).first().click();
+         /** @type {import('@playwright/test').Locator} The Edit Traits dialog that the sheet button opened. */
          const dialog = page.locator('.application.titan-dialog', {
             has: page.getByRole('button', { name: 'Apply Edits' }),
          });
@@ -1131,6 +1404,7 @@ test.describe('owned items', () => {
        * @returns {Promise<{stride: number, fly: number}>} The speeds as the sheet derives them.
        */
       const speeds = () => page.evaluate((id) => {
+         /** @type {object} The actor read from the world, for its speeds. */
          const actor = game.actors.get(id);
          return {
             stride: actor.system.speed.stride.value,
@@ -1184,6 +1458,7 @@ test.describe('check tags across surfaces', () => {
       /** @type {Record<string, string>} The captured texts. */
       const values = {};
       for (const testId of expectedIds) {
+         /** @type {import('@playwright/test').Locator} The check tag. */
          const tag = scope.getByTestId(testId);
          await expect(tag, `${surface} renders ${testId}`).toBeVisible();
          values[testId] = ((await tag.textContent()) ?? '').replace(/\s+/g, ' ').trim();
@@ -1193,16 +1468,21 @@ test.describe('check tags across surfaces', () => {
    }
 
    test('equipment check tags render identical values on the item sheet and the character sheet', async () => {
+      /** @type {import('@playwright/test').Locator} The document's sheet. */
       const itemSheet = await openSheetByUuid(page, `${actorUuid}.Item.${itemIds.parity}`);
+      /** @type {Record<string, string>} The captured check tag texts by test id. */
       const sidebarValues = await captureCheckTagValues(itemSheet, 'item sheet sidebar', SIDEBAR_CHECK_TAG_TEST_IDS);
 
       // An owner's sidebar check header carries the condensed roll button in place of the hidden basics tag.
       await expect(itemSheet.locator('.sidebar-check .header .roll button').first(), 'the sidebar roll button')
          .toBeVisible();
 
+      /** @type {import('@playwright/test').Locator} The actor's sheet. */
       const sheet = await openActorTab('Inventory');
+      /** @type {import('@playwright/test').Locator} The item's row. */
       const row = itemRow(sheet, itemIds.parity);
       await expandRow(row);
+      /** @type {Record<string, string>} The captured check tag texts by test id. */
       const rowValues = await captureCheckTagValues(row, 'character sheet equipment row');
       expect(rowValues['check-tags-resolve-cost'], 'the resolve cost tag shows the typed cost')
          .toContain(String(PARITY_RESOLVE_COST));
@@ -1214,19 +1494,25 @@ test.describe('check tags across surfaces', () => {
    });
 
    test('effect check tags render identical values on the character sheet and the Effect HUD', async () => {
+      /** @type {import('@playwright/test').Locator} The actor's sheet. */
       const sheet = await openActorTab('Effects');
+      /** @type {import('@playwright/test').Locator} The effect's row. */
       const row = effectRow(sheet, effectIds.checked);
       await expandRow(row);
+      /** @type {Record<string, string>} The captured check tag texts by test id. */
       const rowValues = await captureCheckTagValues(row, 'character sheet effect row');
 
       // The HUD shows the effects of a controlled token's actor: the actor's token is placed on the shared scene and
       // taken under control with a click.
       await viewScene(page, await shared(page, 'scene'));
+      /** @type {string} The placed token's id. */
       const tokenId = await placeToken(page, actorId);
       await controlPlacedToken(page, tokenId);
+      /** @type {import('@playwright/test').Locator} The Effect HUD effects panel. */
       const panel = page.locator('[data-testid="player-hud-effects-panel"]');
       await expect(panel, 'the effects panel shows for the controlled token').toBeVisible();
       await panel.locator('[data-testid="player-hud-effect-row"]', { hasText: 'E2E Rows Checked Effect' }).click();
+      /** @type {Record<string, string>} The captured check tag texts by test id. */
       const hudValues = await captureCheckTagValues(panel, 'Effect HUD row');
       for (const testId of CHECK_TAG_TEST_IDS) {
          expect(hudValues[testId], `${testId}: the Effect HUD row equals the character sheet row`)
