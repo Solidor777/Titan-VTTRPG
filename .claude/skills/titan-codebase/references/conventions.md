@@ -907,14 +907,16 @@ through `tests/unit/helpers/maskSource.js` (`maskSource(source, { strings })`: c
 contents replaced only with `strings: true`; every index and line break kept; regular-expression literals are not
 recognized).
 
-**E2E census** — `tests/e2e/census.js` exports `takeCensus(page, { since? })` (per kind: `E2E `-prefixed actors,
+**E2E census** — every world document an e2e test creates (actor, item, scene, folder, macro, roll table, journal
+entry, playlist, cards, world compendium label) is named with the `E2E ` prefix; the sweep finds leftovers by that
+prefix alone, so an unprefixed name survives every cleanup. `tests/e2e/census.js` exports `takeCensus(page, { since? })` (per kind: `E2E `-prefixed actors,
 items, scenes, folders, macros, roll tables, journal entries, playlists, cards and world compendia; tokens on any scene
 whose actor does not resolve; hotbar entries of the four E2E users whose macro does not resolve; chat messages from
 `since` on when given), `sweepWorld(page)` (removes all of those except messages through the API — scenes first,
 folders after their contents, orphaned tokens and dangling hotbar slots last; never User documents) and
 `countCensus(census)`. Both `takeCensus` and `sweepWorld` throw before reading or deleting anything unless
-`game.world.id` is `test-titan` (`CENSUS_WORLD`). Run directly (`node tests/e2e/census.js [--sweep]`) it logs in to localhost:30000 as
-`E2E GM 1`, prints JSON counts, and exits 1 when the final census is not empty.
+`game.world.id` is `test-titan` (`CENSUS_WORLD`). Run directly (`node tests/e2e/census.js [--sweep]`) it logs in
+to localhost:30000 as `E2E GM 1`, prints JSON counts, and exits 1 when the final census is not empty.
 
 **No e2e operation may exceed 1 second**, and wait ceilings are set to that budget so a breach fails
 loudly instead of silently absorbing 15s: explicit `timeout:` values are `1000`. Inherently
