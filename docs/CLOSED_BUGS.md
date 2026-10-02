@@ -1586,7 +1586,7 @@ The evidence files named here are in `.superpowers/sdd/test-suite-rewrite/phase-
 
 - **Cause (measured):** the spec replaced `game.user.targets` with a `Set` of plain `{ actor }` objects during each
   roll. Core's token-layer ticker calls `t._drawTargetArrows(config)` on every entry each frame
-  (`foundry/client/canvas/layers/tokens.mjs:466` in the V14 install, version 14.368.0, found with `grep -n`), so a frame inside the roll window threw. Alone the spec passed
+  (`client/canvas/layers/tokens.mjs:460` in Foundry 14.364.0, the dev install at `C:\FoundryVTT\V14\dev\foundry` that serves the world, found with `grep -n`), so a frame inside the roll window threw. Alone the spec passed
   7 of 7 runs (`phase-3/opposed-alone-1.log`, `phase-3/opposed-alone-r1.log` to `-r6.log`); right after the "check tags across
   surfaces" tests of `character-sheet-rows.spec.js`, which view the shared scene as E2E GM 1, it failed 3 of 3
   (`phase-3/rows-then-opposed-1.log` to `-3.log`). Both earlier Part A full runs failed on it.
