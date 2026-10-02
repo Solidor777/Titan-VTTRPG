@@ -25,6 +25,13 @@ export default defineConfig({
    use: {
       baseURL: 'http://localhost:30000',
       headless: true,
+      // Caps each Playwright action (click, fill, drag, hover, and any page method called without its own timeout),
+      // so an action waiting on a missing element fails after 10 s instead of at the 60 s test timeout (the default
+      // is no limit). Measured 2026-10-02 over a full run with the slow-operation threshold at 0 ms: the longest
+      // action was 916 ms (a click in rules-element-crud.spec.js:86) and the longest flow action 384 ms, so 10 s is
+      // about ten times the longest. Waits that legitimately take longer pass their own timeout (world boot 60 s,
+      // reload 60 s, scene draw 30 s).
+      actionTimeout: 10_000,
       // Foundry v14 requires 1366x768 and otherwise raises a permanent resolution warning whose
       // notification banner spans the viewport and intercepts clicks on anything beneath it (the
       // player HUD sits under that band). Playwright's 1280x720 default is below that minimum.

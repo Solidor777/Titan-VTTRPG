@@ -89,3 +89,8 @@ Completed items are deleted, not marked done.
 
 - Extend immunity beyond effects and conditions (user ruling 2026-09-27): immunity to abilities, damage and other
   things by trait. The first cut covers effect/condition immunity by condition id or effect name only.
+
+- Remove or sync `.agents/skills/titan-codebase/`, a tracked copy of `.claude/skills/titan-codebase/` that differs in every
+  reference file (last touched by commit `5526adee`). Measured 2026-10-02: no file in the repo, script or config reads
+  it (`grep -rn "\.agents"` finds only the note in `docs/POST_WORK_FINDINGS.md`); whether an external agent tool reads
+  `.agents/skills/` is not verified. `.agents/skills/graphify/` is separate.

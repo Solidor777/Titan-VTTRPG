@@ -328,12 +328,12 @@ follow the sub-option direction. In a horizontal layout the flyout lane stays in
 category via a measured `margin-left`. In a vertical layout the flyout lane is lifted out of flow and
 absolutely anchored beside the category column at the open button's row — its top to the button (flow down) or
 its bottom to the button (flow up), measured from the active button's `offsetTop`/`offsetHeight` — so opening a
-category never reflows the bar. The per-user `directions.vertical.subOptionsFlow` (`down`/`up`, default `up` — matching
-the default bottom-anchored dock so the flyout grows on-screen) chooses the stacking direction; flow up renders the
-visible window reversed so the first logical option is the bottom-most row, on the button. `.categories` reserves a
-gutter on the chip's edge so the minimize chip never overlaps the buttons. Sub-options window to `windowSize` entries
-with wheel scrolling (non-passive listener via a `use:` action) and gradient scroll fades; the whole flyout lane
-swooshes in with a directional `in:fly`
+category never reflows the bar. The per-user `directions.vertical.subOptionsFlow` (`down`/`up`, default `up` —
+matching the default bottom-anchored dock so the flyout grows on-screen) chooses the stacking direction; flow up
+renders the visible window reversed so the first logical option is the bottom-most row, on the button. `.categories`
+reserves a gutter on the chip's edge so the minimize chip never overlaps the buttons. Sub-options window to
+`windowSize` entries with wheel scrolling (non-passive listener via a `use:` action) and gradient scroll fades; the
+whole flyout lane swooshes in with a directional `in:fly`
 from the open category toward the sub-options (horizontal slide in a vertical layout, vertical in a
 horizontal one). The sub-option moved-over (`onpointermove`, NOT `onpointerenter`, so a flyout swooshing in
 under a stationary cursor never auto-opens a sub-option) or keyboard-focused reveals its sub-buttons in an
@@ -392,8 +392,8 @@ module flag is no longer stamped on effects or conditions — this HUD replaces 
   `needsEffectItemConversion`, `needsInheritedConversionHidden`, `convertStoredActor`).
 - `SyncConditionEffects.js` — condition effects → their definitions (`getConditionEffectUpdate(s)`,
   `syncStoredActorConditions`).
-- `actor/`, `item/` — the per-type version-chain migration arrays (`ActorMigrations.js`, `WeaponMigrations.js`, …; all
-  empty today).
+- `actor/`, `item/` — the per-type version-chain migration arrays (`ActorMigrations.js`, `WeaponMigrations.js`, …;
+  all empty today).
 - `ConfirmMigrateWorldDialog.js` — the Prompt-mode dialog; confirming calls `migrateWorld()`.
 
 **What triggers it — `onceReady` (src/hooks/OnceReady.js)**
@@ -464,30 +464,30 @@ read. The scan reads stored data only — `actor._source`, a token's stored delt
 cannot read a dotted field through an embedded array. The server keeps a projected embedded array whole and expands a
 projected Scene token fully, delta included; an Adventure's `actors`/`scenes` are inline data, read whole (all measured
 live when the stored-actor migration was written; no test covers it now). A pack whose projection fails, and a pack
-lock that cannot be restored, are reported and pushed onto the caller's `failures` array (`StoredActorWalkFailure` `{ subject, error }`),
-and the walk goes on; a pack the walk could not read is not read again in the same walk, so an Adventure pack (walked
-for its actors and its scene tokens) is one failure. `source.open()` resolves a `StoredActorTarget` —
-`readItems`/`readEffects` (what the actor holds itself), `readInheritedEffects` (the effects an unlinked token inherits
-and does not override, read from its base actor's stored data; none for any other actor), `createEffects` (keeps the
-given `_id`: `keepId`), `updateEffects`, `deleteEffects` (an inherited effect is hidden by an ActorDelta tombstone, as
-core deletes it from a synthetic actor), `deleteItems` (each resolves what it changed, read back from stored data: core
-splices a deleted invalid Item from the client source, and on a synthetic actor a tombstone takes the place of an entry
-whose id the base actor holds, which counts as deleted), and `stored()` — or null when nothing is left to write to (a
-pack entry, or a token's base actor, gone since the scan). Opening a packed source unlocks its locked pack, logging
-`Unlocked world pack "<label>" to migrate it.`; a scan that writes nothing never touches a lock, and the walk locks the
-pack again when it leaves it (also when its consumer stops early). Write paths: world and packed actors through their
-documents; an unlinked token through its synthetic actor (core routes its embedded writes to the token's ActorDelta).
-These writes are stored as made (`stored()` resolves at once). Core gives a newly created unlinked token a delta only
-when its name differs from its base actor's (`client/documents/token.mjs:1657`). OPEN_BUGS #102, an unconfirmed loss of
-multi-document writes on such a token, awaits a real-path repro. A token the pass has work on always holds delta
-entries, so its delta exists. An Adventure's actors and scene tokens are data (`SetField` of
-`EmbeddedDataField`): their targets edit a per-walk working copy of the field (`AdventureContent`), and the walk stores
-it in one `adventure.update({ actors })` or `({ scenes })` when it leaves the Adventure — one write per field, because
-core validates every element of a replaced array on each write, so a legacy `effect` Item (unregistered subtype) left in
-any actor fails the write. The write is checked (core resolves `undefined` for a write it did not store), and `stored()`
-of every target of that Adventure settles with it; a failed write's error names the entries still holding a legacy
-`effect` Item (`describeLegacyHolders`), the ones to fix for the Adventure to migrate. Created effects are built by
-`TitanActiveEffect.buildCreationSource` and keep their ids. An Adventure target follows core's ActorDelta rules
+lock that cannot be restored, are reported and pushed onto the caller's `failures` array (`StoredActorWalkFailure` `{
+subject, error }`), and the walk goes on; a pack the walk could not read is not read again in the same walk, so an
+Adventure pack (walked for its actors and its scene tokens) is one failure. `source.open()` resolves a
+`StoredActorTarget` — `readItems`/`readEffects` (what the actor holds itself), `readInheritedEffects` (the effects an
+unlinked token inherits and does not override, read from its base actor's stored data; none for any other actor),
+`createEffects` (keeps the given `_id`: `keepId`), `updateEffects`, `deleteEffects` (an inherited effect is hidden by an
+ActorDelta tombstone, as core deletes it from a synthetic actor), `deleteItems` (each resolves what it changed, read
+back from stored data: core splices a deleted invalid Item from the client source, and on a synthetic actor a tombstone
+takes the place of an entry whose id the base actor holds, which counts as deleted), and `stored()` — or null when
+nothing is left to write to (a pack entry, or a token's base actor, gone since the scan). Opening a packed source
+unlocks its locked pack, logging `Unlocked world pack "<label>" to migrate it.`; a scan that writes nothing never
+touches a lock, and the walk locks the pack again when it leaves it (also when its consumer stops early). Write paths:
+world and packed actors through their documents; an unlinked token through its synthetic actor (core routes its embedded
+writes to the token's ActorDelta). These writes are stored as made (`stored()` resolves at once). Core gives a newly
+created unlinked token a delta only when its name differs from its base actor's (`client/documents/token.mjs:1657`).
+OPEN_BUGS #102, an unconfirmed loss of multi-document writes on such a token, awaits a real-path repro. A token the pass
+has work on always holds delta entries, so its delta exists. An Adventure's actors and scene tokens are data (`SetField`
+of `EmbeddedDataField`): their targets edit a per-walk working copy of the field (`AdventureContent`), and the walk
+stores it in one `adventure.update({ actors })` or `({ scenes })` when it leaves the Adventure — one write per field,
+because core validates every element of a replaced array on each write, so a legacy `effect` Item (unregistered subtype)
+left in any actor fails the write. The write is checked (core resolves `undefined` for a write it did not store), and
+`stored()` of every target of that Adventure settles with it; a failed write's error names the entries still holding a
+legacy `effect` Item (`describeLegacyHolders`), the ones to fix for the Adventure to migrate. Created effects are built
+by `TitanActiveEffect.buildCreationSource` and keep their ids. An Adventure target follows core's ActorDelta rules
 (`deleteFromData`): a deletion removes the entry the data holds and leaves a tombstone where the base actor's collection
 holds the id, as core stores a world token's deletion (read back after a reload, live with a raw-data token, pending
 real-path re-run: a tombstone over a valid base Item, none for an Item the base lacks); a base actor's legacy `effect`
@@ -520,9 +520,9 @@ items). `buildEffectData` gives the effect its Item's `_id` and maps native `nam
 `transfer: false` (the value core's `_preCreate` stores for an effect whose parent is an Actor, so data written directly
 matches a created document), and deep-cloned `system.rulesElement`/`duration`/`check`/`customTrait` (the migrated
 `duration.initiative` keeps `TitanActiveEffect._preCreate` from overriding combat initiative; creation applies
-`getEffectCreationChanges` — `_preCreate` for a document, `buildCreationSource` for an Adventure's data — so `showIcon`
-is set and an expired timed effect is stored disabled), and stamps `flags.titan.convertedFromItem = <item _id>`.
-Identity: core relates an unlinked token's delta to its base actor only by `_id` within each collection
+`getEffectCreationChanges` — `_preCreate` for a document, `buildCreationSource` for an Adventure's data — so
+`showIcon` is set and an expired timed effect is stored disabled), and stamps `flags.titan.convertedFromItem = <item
+_id>`. Identity: core relates an unlinked token's delta to its base actor only by `_id` within each collection
 (`#mergeEmbeddedCollection`), so a conversion takes its Item's id to keep the Item's override and removal relations; the
 stamp marks an effect as a conversion (an effect with the id but no stamp is a collision: the Item is kept and the
 converter throws after its other writes), and it is the only identity of effects older versions converted with random

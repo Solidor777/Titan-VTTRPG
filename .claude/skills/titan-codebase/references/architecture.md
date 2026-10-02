@@ -196,8 +196,9 @@ distinct. Vitest is configured in `vitest.config.mjs` (`environment: 'happy-dom'
 - `tests/e2e/` — Playwright end-to-end specs targeting a live Foundry instance.
   - Harness (no specs): `registry.js` (the running list of everything the suite made, `test/state/registry.json`,
     gitignored), `flows.js` (real-UI flows that create documents and record them), `global-setup.js` /
-    `global-teardown.js` (crash recovery and suite-end deletion over the list), `census.js` (the `E2E `-prefix census
-    and sweep the teardown reuses), `settings.js` (setters that record prior values). Details in `conventions.md`
+    `global-teardown.js` (crash recovery and suite-end deletion over the list), `join.js` (the runner-free world join the
+    setup, teardown and census share), `census.js` (the `E2E `-prefix census
+    and sweep the teardown reuses), `settings.js` (the world setter records its prior value). Details in `conventions.md`
     "E2E registry, flows and teardown".
   - `combat-seed.spec.js` — Phase 4 smoke test (1 test): seeds a two-combatant encounter with
     `seedCombatEncounter`, then probes that `combat.turns.length === 2`, `combatant.actor` resolves to the
@@ -241,8 +242,9 @@ distinct. Vitest is configured in `vitest.config.mjs` (`environment: 'happy-dom'
 - Entry `src/test-probe/probeBundleEntry.js`; output a self-contained IIFE (`formats: ['iife']`,
   `name: 'TitanProbe'`, `fileName: 'probe'`) → `test/build/probe.iife.js`, plus the extracted global
   stylesheet `test/build/probe.css`. `emptyOutDir: true` self-cleans (Strict Rule 2). Built with
-  `createSveltePlugin({ emitCss: false })`. Playwright's `tests/e2e/global-setup.js` builds this first (its
-  clean wipes `test/build/`), then bundles fast-check via esbuild. The harness injects the IIFE on demand
+  `createSveltePlugin({ emitCss: false })`. Playwright's `tests/e2e/global-setup.js` first tears down a crashed
+  run's leftovers and starts the run (`registry.js`), then builds this (its clean wipes `test/build/`), then bundles
+  fast-check via esbuild. The harness injects the IIFE on demand
   (see `references/conventions.md`).
 
 **Manifest wiring** (`system.json`):
