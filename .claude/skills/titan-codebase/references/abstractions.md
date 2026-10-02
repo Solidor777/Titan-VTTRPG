@@ -321,8 +321,8 @@ cards, the 13 report cards, and the effect card are all registered and active; t
   `document.data.system.resource.X` and self-render via `TitanChatMessage#renderHTML`. Registered in
   `OnceInit.js` `CONFIG.ChatMessage.dataModels` + `system.json` `documentTypes.ChatMessage` +
   `lang/en.json` `TYPES.ChatMessage`. Schema parity is gated by
-  `tests/unit/ReportChatMessageSchemaEquivalence.test.js`; the hoist is gated by
-  `tests/unit/ReportChatMessageDataModel.test.js`. (Restart-gated: subtype registration happens at world
+  `tests/unit/ReportChatMessageSchemaEquivalence.test.js`; the hoist has no test (no migration
+  tests while none is active). (Restart-gated: subtype registration happens at world
   load.)
 - `EffectChatMessageDataModel` (`src/document/types/active-effect/chat-message/EffectChatMessageDataModel.js`)
   extends `TitanChatMessageDataModel`. The `effect` chat-card subtype: its schema is the effect snapshot —

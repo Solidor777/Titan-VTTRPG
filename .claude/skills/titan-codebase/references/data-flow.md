@@ -435,7 +435,7 @@ by a one-off cleanup outside the code), and no test seeds one.
 **Stored actors — `walkStoredActorSources(failures)`**
 An async generator yielding one `StoredActorSource`
 (`{ location, name, items, effects, inheritedEffects, open, orphan }`) per stored actor, in `STORED_ACTOR_LOCATIONS`
-order (a unit test pins the list): `worldActor`; `sceneToken` (unlinked tokens on world scenes whose base actor exists,
+order: `worldActor`; `sceneToken` (unlinked tokens on world scenes whose base actor exists,
 read from `token._source.delta`, with `inheritedEffects` from the base actor's `_source` as core's
 `#mergeEmbeddedCollection` merges them — the base actor's legacy Items convert there); `actorPack`; `scenePackToken`
 (unlinked tokens whose base world actor exists); `adventureActor`; `adventureSceneToken` (every unlinked scene token,
@@ -462,9 +462,9 @@ read. The scan reads stored data only — `actor._source`, a token's stored delt
 `documentClass.database.get(documentClass, { index: true, indexFields, pack, query: {} })`, which loads no document).
 `CompendiumCollection#getIndex` is not used: its cached index re-indexes a loaded document through `getProperty`, which
 cannot read a dotted field through an embedded array. The server keeps a projected embedded array whole and expands a
-projected Scene token fully, delta included; an Adventure's `actors`/`scenes` are inline data, read whole (all verified
-live by `tests/e2e/condition-migration.spec.js`). A pack whose projection fails, and a pack lock that cannot be
-restored, are reported and pushed onto the caller's `failures` array (`StoredActorWalkFailure` `{ subject, error }`),
+projected Scene token fully, delta included; an Adventure's `actors`/`scenes` are inline data, read whole (all measured
+live when the stored-actor migration was written; no test covers it now). A pack whose projection fails, and a pack
+lock that cannot be restored, are reported and pushed onto the caller's `failures` array (`StoredActorWalkFailure` `{ subject, error }`),
 and the walk goes on; a pack the walk could not read is not read again in the same walk, so an Adventure pack (walked
 for its actors and its scene tokens) is one failure. `source.open()` resolves a `StoredActorTarget` —
 `readItems`/`readEffects` (what the actor holds itself), `readInheritedEffects` (the effects an unlinked token inherits

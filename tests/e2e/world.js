@@ -442,16 +442,3 @@ export async function reloadWorld(page, { ready = () => globalThis.game?.ready =
    await page.waitForURL('**/game', { timeout: 15_000 });
    await page.waitForFunction(ready, null, { timeout: 60_000 });
 }
-
-/**
- * Sets the migration mode and reloads the world as the same GM, returning once the load has passed its migration
- * attempt (onceReady builds the Player HUD after it, whether or not it succeeded) and its GM is the active GM.
- * @param {import('@playwright/test').Page} page - The logged-in page.
- * @param {string} mode - The migration mode.
- * @returns {Promise<void>} Resolves once the reloaded world finished onceReady.
- */
-export async function reloadWithMode(page, mode) {
-   await page.evaluate((value) => game.settings.set('titan', 'migrationMode', value), mode);
-   await reloadWorld(page, { ready: () => globalThis.game?.ready === true && !!game.titan?.playerHud });
-   await expectActiveGM(page);
-}

@@ -13,9 +13,9 @@ import { attachPageErrors, closeAllApps } from './world.js';
  * "Import Spreadsheet" entries, and the sidebar-header "Import spreadsheet" button, against a real
  * browser download/upload. `titan.effects` is this system's one shipped compendium and other specs
  * only ever read from it, so every scenario that mutates or creates pack documents (Steps 2-4 below)
- * creates, seeds, and deletes its own scratch world-package compendium instead — see
- * `tests/e2e/pack-conversion.spec.js` for the precedent this follows (`configure({ locked: false })`
- * then `deleteCompendium()`, with a stale-pack sweep at the start).
+ * creates, seeds, and deletes its own scratch world-package compendium instead: `seedScratchPack` first
+ * sweeps a same-id pack a crashed run left (`configure({ locked: false })` then `deleteCompendium()`), and
+ * `deleteScratchPackIfExists` cleans up after the test.
  */
 
 /** @type {import('@playwright/test').Page} The file-shared, logged-in page (one world boot per file). */
@@ -360,7 +360,7 @@ test.describe('compendium spreadsheet export/import', () => {
    test('importing into "New Compendium" creates a pack with the imported documents', async () => {
       // This scenario creates a compendium and bulk-imports the full seeded effects pack's content into
       // it (many documents across depths), which legitimately takes longer than the suite's default
-      // per-test budget under load — see pack-conversion.spec.js's identical extension for a heavier op.
+      // per-test budget under load.
       test.setTimeout(120_000);
 
       /** @type {string} */

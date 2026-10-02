@@ -906,6 +906,21 @@ click; whoever writes a spec uses `chooseContextMenuEntry` and review checks it.
 **Test rules** (`.claude/claude.md` "Project Scope"). No unit test scans test code. Whoever writes a test follows
 the rules (genuine live documents, no fake write surfaces, real user flows), and review checks them.
 
+**No migration tests while no migration is active** (`.claude/claude.md` "Project Scope"). The migration system
+(`MigrateWorld`, version chains, the stored-actor walker, `migrateData` hooks) stays in `src/helpers/migration/` with no
+unit or e2e test; the nine migration unit files and the four migration specs were deleted. It was confirmed once
+(2026-10-02) by a one-off run on documents the flows above made in `test-titan`, with a temporary version-1 entry in
+`ActorMigrations.js` and `ItemMigrations.js` (reverted, never committed). Measured: a Disabled load showed no dialog and
+logged no migration line; a Prompt load showed `ConfirmMigrateWorldDialog` and Cancel changed nothing; an Automatic load
+showed no dialog, logged `TITAN | Starting world migration.`, `TITAN | Stored-actor migration finished: 0 updated, 0
+skipped; failures: 0.` and `TITAN | World migration complete.` (core echoes both notifications to the console), and every
+world actor, owned item and world item (11) reached `documentVersion` 1 carrying the entry's flag, while a locked world
+pack's actor, the pack lock and an unlinked token's stored delta were unchanged; a Prompt load afterwards showed no
+dialog. No test covers the stored-actor write paths (condition sync, effect Item conversion, a locked pack's unlock and
+relock, Adventure writes, orphaned-token failures), version-chain failure semantics, or the chat-message `migrateData`
+hoists. A synthetic token actor reads its base actor's merged data, so after a migration it shows the base actor's
+version.
+
 **E2E census** — every world document an e2e test creates (actor, item, scene, folder, macro, roll table, journal
 entry, playlist, cards, world compendium label) is named with the `E2E ` prefix; the sweep finds leftovers by that
 prefix alone, so an unprefixed name survives every cleanup. `tests/e2e/census.js` exports
@@ -962,19 +977,16 @@ which a teardown Chromium does not share (inferred from Foundry's client storage
 
 **No e2e operation may exceed 1 second**, and wait ceilings are set to that budget so a breach fails loudly instead of
 silently absorbing 15s: explicit `timeout:` values are `1000`. Inherently multi-second waits are deliberately exempt:
-- a `game.ready` world boot (`fixtures.js`, and the Player HUD wait in the `beforeAll` of `pack-conversion.spec.js`,
-  `condition-migration.spec.js`, and `converted-effect-identity.spec.js`);
+- a `game.ready` world boot (`fixtures.js`; the teardown's and the setup recovery's own login goes through it too);
 - a mid-file reload through `world.js` `reloadWorld(page, { ready })` (15 s for the `/game` URL, 60 s for the
-  readiness predicate, `game.ready` by default). `reloadWithMode` uses it (by `pack-conversion.spec.js`,
-  `condition-migration.spec.js` and `converted-effect-identity.spec.js`), and so do the last test of
-  `condition-description.spec.js`, the reload test of `player-hud-layout.spec.js` and both tests of
-  `portrait-persistence.spec.js`;
+  readiness predicate, `game.ready` by default), used by the last test of `condition-description.spec.js`, the reload
+  test of `player-hud-layout.spec.js` and both tests of `portrait-persistence.spec.js`;
+- a scene draw on the canvas after a scene is created while none is viewed, viewed or activated (`flows.js`
+  `waitForSceneDrawn`, 30 s);
 - a second browser context finishing login (`multiClient.js`, used by the last test of `effect-tray.spec.js` for its
   E2E GM 2 client);
 - core's 2 s scrolling text finishing before the viewed scene is deactivated (`condition-description.spec.js`, last
-  test, 10 s; OPEN_BUGS #114);
-- a migration confirmed from the Prompt dialog, a full pass over every stored actor (`condition-migration.spec.js`,
-  60 s).
+  test, 10 s; OPEN_BUGS #114).
 
 The tests that reload raise `test.setTimeout` to 120 s or 300 s (`condition-description.spec.js`'s last test: 120 s).
 Do not sweep those to 1s. A ceiling is a failure bound, not a duration: a `waitForFunction` returns the moment its
@@ -1047,13 +1059,11 @@ open flyout first (`Escape` when `player-hud-flyout` is present), as the `openCa
 
 **Mid-file `page.reload()` idiom.** Steps (3)-(5) below are `tests/e2e/world.js` `reloadWorld(page, { ready })`,
 where `ready` is the in-page predicate of step (5) (`game.ready` by default); a spec never repeats them inline.
-`reloadWithMode(page, mode)` (used by `pack-conversion.spec.js`, `condition-migration.spec.js`, and
-`converted-effect-identity.spec.js`) sets the `migrationMode` setting, calls `reloadWorld` with
-`game.ready && game.titan.playerHud` as `ready`, and then `expectActiveGM(page)` (also in `world.js`) asserts
-`game.users.activeGM?.isSelf`, because only the active GM migrates and core's `getDesignatedUser` makes the active GM
-with the highest role that GM. The last test of `condition-description.spec.js`, the reload test of
-`player-hud-layout.spec.js` and `portrait-persistence.spec.js`'s `readImageAfterReload` call `reloadWorld(page)` with
-the default predicate. A spec navigates only through `reloadWorld` and `joinWorld` (the one `.reload(` in `world.js`
+`expectActiveGM(page)` (also in `world.js`) asserts `game.users.activeGM?.isSelf`, because only the active GM migrates
+and core's `getDesignatedUser` makes the active GM with the highest role that GM. The last test of
+`condition-description.spec.js`, the reload test of `player-hud-layout.spec.js` and `portrait-persistence.spec.js`'s
+`readImageAfterReload` call `reloadWorld(page)` with the default predicate. A spec navigates only through
+`reloadWorld` and `joinWorld` (the one `.reload(` in `world.js`
 and the one `.goto(` in `fixtures.js`), never an inline `page.reload(`, `location` change or `goto(`; no test scans for
 it, and review checks it. `page.on('console')` and
 `attachPageErrors` listeners survive reloads (they attach to the Page object). Sequence:
