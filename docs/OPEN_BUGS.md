@@ -206,3 +206,21 @@ The evidence files named here are in `.superpowers/sdd/test-suite-rewrite/phase-
 - **Cause not located.**
 - **Found:** 2026-10-02 in the Part B review fixes.
 - **Status:** Open.
+
+### 131. Action helpers return before the effect of their action is observable, so the caller's next action races the re-render
+
+The evidence files named here are in `.superpowers/sdd/test-suite-rewrite/phase-3/` (local, not checked in).
+
+- **What:** four failures share one mechanism: an action is taken before the previous action's re-render has finished,
+  and the re-render discards or reorders the later action. #122 (a typed check label stored as "Check"), #128 (the
+  same in `fillList`), the second grip drag of the #127 gate (`e2e-full-fix2.clean.txt`, failure 1: the rows came out
+  reversed) and #130 (the file picker). Fixing each test did not stop the next one.
+- **Read, per helper:** `selectTitanOption`, `setSelectField`, `setCheckbox`, `clickRoll`, `openSheetTab`, `openTab`,
+  `addAttack`, `addCustomAspect`, `pickPortrait`, `dragGrip`, the inline `fill` plus `blur` pairs of the flows and
+  specs, `typeInto` (whose comment said it waited for the document to store the value and did not) and the setters
+  that write through the API returned at the click or at the awaited write, before the renders that write queued had
+  finished. `titanSelectOptionValues` returned before its list closed. The flows that read the stored document after the
+  action (`addCheck`, `addRulesElement`, `enableAspect`, `createOwnedItem`, `placeToken`) already waited for it.
+- **Not reproduced as a single failure:** the effect of the fix is judged by repeated runs, listed in the report.
+- **Found:** 2026-10-02 in the Part B review fixes.
+- **Status:** Open.
