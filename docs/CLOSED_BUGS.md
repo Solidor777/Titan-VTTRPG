@@ -1383,13 +1383,13 @@ citations refer to Foundry 14.364 at `C:\FoundryVTT\V14\dev\foundry`.
 - **Measured** (`fix6-probe-116.mjs`; `fix6-probe-116-as-is.log`, `fix6-probe-116-as-is-timeline.log`; `test-titan`,
   TITAN loaded, E2E GM 1 seeding, E2E Player 1 observing): a wrapper recorded every `CombatTracker#_onRender` on the
   player's page.
-  - `test-titan` holds one combat of its own (id `HEMLYsZTfLuZU2oi`: no scene, four combatants, none E2E-named, so the
-    census does not count it; `fix6-inspect-world-1.log`). Before the seed, every client's tracker viewed it.
+  - `test-titan` holds one combat of its own (id `HEMLYsZTfLuZU2oi`: no scene, four combatants, none E2E-named; read: `census.js` `takeCensus` lists only actors, items, scenes, folders, macros, tables,
+    journal, playlists and cards, so it does not count combats; `fix6-inspect-world-1.log`). Before the seed, every client's tracker viewed it.
   - The seeded combat's `startCombat` updates (round, then turn) rendered the player's tracker with the seeded
     combat's data while `viewed` was still `HEMLY...`: `renderData` held only the seeded combat's id, `find` found
-    nothing, and both renders threw. About 1 s later the tracker's `viewed` changed to the seeded combat (a render with
-    a `combat` option; what issued it was not traced, and it is inferred to be the scene activation of #118), and
-    later updates did not throw.
+    nothing, and both renders threw. The log holds four renders: the create, the two throwing updates, and a last render about 1 s
+    later (no render context) whose `viewed` is the seeded combat and which did not throw. What issued the last render
+    was not traced; it is inferred to be the scene activation of #118.
   - With the seeded scene created inactive (the #118 fix) and no `viewCombat`, the player's tracker never left
     `HEMLY...` and the updates of the seeded combat threw (`fix6-probe-116-inactive-scene-no-viewCombat.log`).
 - **Cause:** a core defect with a test-setup trigger. Read: `CombatTracker#_onRender` evaluates `"turn" in data` on the
@@ -1419,8 +1419,9 @@ citations refer to Foundry 14.364 at `C:\FoundryVTT\V14\dev\foundry`.
 - **Measured** (`fix6-probe-117.mjs`, `fix6-probe-117.log`; E2E GM 1, TITAN loaded, plain `ChatMessage.create`, 3
   repeats per delay, delay counted from the card appearing in `#chat`): the deletion raised exactly this error in 3 of
   3 at 0 ms, 3 of 3 at 20 ms, 1 of 3 at 60 ms, 2 of 3 at 100 ms, and 0 of 3 at 150, 300 and 600 ms.
-  `fix6-probe-117-dom.log` (one message): the notification element (in `#chat-notifications`) was still `hidden` 50 ms
-  after the first sample and shown at 150 ms after it.
+  `fix6-probe-117-dom.log` (one message, five samples each printed after waiting its label's delay): the notification
+  element (in `#chat-notifications`) is `hidden` at the samples labelled +0 ms and +50 ms and shown from the one
+  labelled +100 ms on.
 - **Cause:** a core defect with a test trigger. The spec deleted its card in the `finally` block right after the card
   appeared in `#chat` (`tests/e2e/spell-rules-regressions.spec.js`), inside that window. The race needs no TITAN
   document (the probe used a base message), but no run without TITAN loaded was made.
@@ -1438,8 +1439,9 @@ citations refer to Foundry 14.364 at `C:\FoundryVTT\V14\dev\foundry`.
 - **Reported:** with no active scene, `combat-seed.spec.js` raised `TypeError: Cannot read properties of undefined
   (reading 'addChild')` twice at `GridLayer.addHighlightLayer` <- `TokenRuler.draw` <- `Token._draw`
   (`fix5e-diag-stacks-combat-seed-no-active-scene.log`); `socket-sync.spec.js` also raised `Cannot read properties of
-  undefined (reading 'OBJECTS')` at `RenderFlags.set` <- `TokenDocument._onRelatedUpdate` on E2E Player 1
-  (`fix5e-diag-stacks-socket-sync-after-115-fix.log`).
+  undefined (reading 'OBJECTS')` at `RenderFlags.set` <- `TokenDocument._onRelatedUpdate` on E2E Player 1, E2E GM 1 and
+  E2E GM 2 (counts of the error lines in `fix5e-diag-stacks-all.log`: 10, 12 and 2;
+  `fix5e-diag-stacks-socket-sync-after-115-fix.log`).
 - **Measured** (`fix6-probe-116-as-is.log`; `test-titan` with no active scene before the seed): after
   `seedCombatEncounter`, the scene it created was the active and viewed scene on both clients
   (`activeScene: "E2E Probe116 Scene"`). The earlier description of this bug, a scene that is not activated, did not
@@ -1448,9 +1450,13 @@ citations refer to Foundry 14.364 at `C:\FoundryVTT\V14\dev\foundry`.
   `active` (`client/documents/scene.mjs:1038-1042`), and `_onActivate` views it (`:1401-1402`), which draws its canvas
   on every client. The helper then created tokens, and the test later updated actors, while those canvases were still
   drawing. The frames are the ones of CLOSED_BUGS #113, whose cause was the same order of events.
-- **Fixed:** 2026-10-02. `seedCombatEncounter` creates its scene with `active: false`, so it is never drawn. No combat
-  code reads the canvas (read: `grep` of `src` finds `canvas.` only in `GetControlledTokens.js`); the combatants
-  resolve through the scene's token documents.
+- **Fixed:** 2026-10-02. `seedCombatEncounter` creates its scene with `active: false`, so it is never drawn. Read: the
+  grep `canvas\.` over `src` finds one line, `GetControlledTokens.js:6` (`canvas.tokens.controlled`); the
+  optional-chained reads `canvas?.` remain at `GetActorFromSpeaker.js:8` and `TitanPlayerHud.js:134, 139, 161`. Read,
+  not run: none is on the combat path. `GetActorFromSpeaker` is called only by the chat-card apply, revert and remove
+  buttons and the chat context menu (`OnGetChatLogEntryContext.js`), and `TitanPlayerHud.js` is the Player HUD, whose
+  `refresh` unmounts it when `canvas?.scene` is empty (`:161`); the turn hooks (`OnCombatNextTurn.js`,
+  `OnCombatPreviousTurn.js`) name none of them. The combatants resolve through the scene's token documents.
 - **Gate test:** `combat-seed.spec.js` and `socket-sync.spec.js` with no active scene (the state of `test-titan`).
   Before: 6 of 6 failed (`fix6-before-combat-seed-socket-sync.log`). After: 6 of 6 passed
   (`fix6-after-combat-seed-socket-sync.log`); full e2e 656 of 656 (`e2e-fix6-gate.log`).

@@ -80,6 +80,13 @@ async function takeUncheckedErrors() {
  */
 export const test = base.extend({
    worldPageErrorGate: [
+      /**
+       * Runs after each test and its `afterEach` hooks, and fails the test on the errors collected on any world page
+       * since the previous check.
+       * @param {object} fixtures - The fixtures this one requests (none).
+       * @param {() => Promise<void>} use - Runs the test; the gate runs once it resolves.
+       * @returns {Promise<void>} Resolves once the check passed.
+       */
       async ({}, use) => {
          await use();
 
@@ -90,6 +97,13 @@ export const test = base.extend({
       { auto: true },
    ],
    workerWorldPageErrorGate: [
+      /**
+       * Runs once after the worker's last test, and fails the run on the errors collected on any world page since the
+       * last check.
+       * @param {object} fixtures - The fixtures this one requests (none).
+       * @param {() => Promise<void>} use - Runs the worker's tests; the gate runs once it resolves.
+       * @returns {Promise<void>} Resolves once the check passed.
+       */
       async ({}, use) => {
          await use();
 

@@ -96,7 +96,7 @@ export async function renderSheet(page, locateSrc, expectedSelector, errors) {
    expect(found, 'document fixture not found in world').toBe(true);
    await expect(page.locator(expectedSelector).first()).toBeVisible();
    await flushPageErrors(page);
-   expect(errors,`uncaught errors during render:\n${errors.join('\n')}`).toEqual([]);
+   expect(errors, `uncaught errors during render:\n${errors.join('\n')}`).toEqual([]);
 }
 
 /**

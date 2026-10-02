@@ -2,6 +2,8 @@
  * Seeds a two-combatant encounter inside the live Foundry world. The effect actor is placed at the
  * LOWER initiative (turn index 1) so a single nextTurn() from the started state begins its turn.
  * Designed to be passed to page.evaluate — references only in-page globals.
+ * A test with other clients passes `start: false`, makes each client view the combat (`viewCombat`), then starts it
+ * (`startCombatEncounter`).
  * @param {object} opts - The seeding options.
  * @param {string} opts.sceneName - Name for the throwaway scene.
  * @param {object} opts.effectActor - Actor.create payload for the effect-bearing actor.
@@ -12,9 +14,7 @@
  * @param {number} [opts.staminaValue] - If set, the effect actor's stamina is pre-seeded to this value.
  * @param {number} [opts.resolveValue] - If set, the effect actor's resolve is pre-seeded to this value.
  * @param {string} [opts.observerUserName] - If set, this user is granted OWNER on the effect actor.
- * @param {boolean} [opts.start] - Whether to start the encounter (round 1, turn 0). Defaults to true. A test with
- *    other clients passes false, makes each client view the combat (`viewCombat`), then starts it
- *    (`startCombatEncounter`).
+ * @param {boolean} [opts.start] - Whether to start the encounter at round 1, turn 0 (defaults to true).
  * @returns {Promise<{sceneId: string, combatId: string, effectActorId: string, otherActorId: string,
  *    effectCombatantId: string}>} The created document ids.
  */
