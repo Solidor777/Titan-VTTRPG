@@ -6,6 +6,7 @@ import ProbeDocument from '~/test-probe/ProbeDocument.svelte.js';
  * Recursively replace `{ __probeComponent: name }` markers with the registered component constructor.
  * @param {*} value - Any prop value possibly containing component markers.
  * @returns {*} The value with markers resolved to component constructors.
+ * @throws {Error} When a marker names a component that is not registered.
  */
 function resolveProbeComponents(value) {
    if (Array.isArray(value)) {
@@ -122,6 +123,7 @@ export default function registerProbe() {
          target.style.zIndex = '2147483647';
          document.body.appendChild(target);
 
+         /** @type {Map<string, *>} The context map with its document markers resolved. */
          const resolvedContext = resolveProbeDocuments(context);
          const handle = mount(Component, {
             target,

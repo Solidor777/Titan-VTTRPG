@@ -1221,9 +1221,9 @@ the source) or inferred:
   attribute, skill, auto-calculate, difficulty and complexity controls) and a sheet shows one tab at a time, so the
   re-pricing test has a second client (`E2E GM 2`) change the range on the Standard Aspects tab while the first
   client's Casting Check panel is open.
-- The Casting Check panel's list scrolls once the spell has 13 custom aspects at the default sheet size: 1 to 8 gave no
-  overflow, 9 and 10 gave 2 px, 11 and 12 gave 39 px, 13 and 14 gave 77 px (`spell-overflow-measure.log`); the test
-  scrolls 40 px and uses 14.
+- The Casting Check panel's list at the default sheet size: 1 to 8 custom aspects gave no overflow, 9 and 10 gave 2 px,
+  11 and 12 gave 39 px, 13 and 14 gave 77 px (`spell-overflow-measure.log`). The test scrolls 40 px, which first fits
+  at 13 custom aspects; it uses 14, which gives the same 77 px.
 - A folder's own header Create button creates a document inside that folder (read: `templates/sidebar/partials/
   folder-partial.hbs`, `create-entry`, and `DocumentDirectory#_onCreateFolder` / `_onCreateEntry` in Foundry 14.364 at
   `C:\FoundryVTT\V14\dev\foundry`), which is how `createWorldItem` and `createActor` fill a folder. Dragging a folder's

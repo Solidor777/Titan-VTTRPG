@@ -32,7 +32,7 @@ let scrollUuid;
  * scrolls. Measured at the sheet's default size
  * (`.superpowers/sdd/test-suite-rewrite/phase-3/spell-overflow-measure.log`, local): with 1 to 8 custom aspects the
  * list has no overflow, with 9 and 10 it has 2 px, with 11 and 12 it has 39 px, and with 13 and 14 it has 77 px. The
- * count is 14, one row of tags past the first count that scrolls far enough.
+ * first count that scrolls the 40 px is 13; the count is 14, which gives the same 77 px.
  * @type {number}
  */
 const SCROLL_CUSTOM_COUNT = 14;
@@ -227,11 +227,19 @@ test.describe('Casting Check tab', () => {
          try {
             await selectTitanOption(editor, select, 10);
 
-            /** @type {string} The Range aspect's cost as the document computes it. */
-            const repriced = await page.evaluate(async (uuid) => String(
+            /**
+             * Reads the Range aspect's cost on this client as the document computes it.
+             * @returns {Promise<string>} The cost as a string, as the panel's tag shows it.
+             */
+            const readCost = () => page.evaluate(async (uuid) => String(
                (await fromUuid(uuid)).system.aspect.find((aspect) => aspect.label === 'range').cost,
             ), panelUuid);
-            expect(repriced, 'the document re-prices the aspect').not.toBe('0');
+
+            // The option click returns before the other client's update arrives, so the cost is polled.
+            await expect.poll(readCost, { message: 'the document re-prices the aspect' }).not.toBe('0');
+
+            /** @type {string} The Range aspect's cost after the update. */
+            const repriced = await readCost();
             await expect(rangeValue, 'the open panel follows the document').toHaveText(repriced);
          }
          finally {

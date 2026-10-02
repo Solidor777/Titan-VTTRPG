@@ -18,6 +18,11 @@ export default class ProbeDocument {
     */
    constructor(data) {
       this.#data = data;
+      /**
+       * Merges changes into the data and re-renders its readers.
+       * @param {object} changes - The changes to merge, in the shape of a document update.
+       * @returns {Promise<void>} Resolves once the changes are merged.
+       */
       this.#data.update = async (changes) => {
          foundry.utils.mergeObject(this.#data, changes);
          this.#version += 1;

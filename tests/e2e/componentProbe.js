@@ -80,7 +80,8 @@ export async function mountProbe(page, name, { props = {}, events = [], context 
 
 /**
  * Build a Svelte context object exposing a minimal non-reactive `document` store for components that read
- * `getContext('document')`. Sufficient for render/click probes; reactivity is covered by the Phase 3d sweep.
+ * `getContext('document')`. Sufficient for render/click probes; the object is not reactive, so a component that must
+ * re-render after it writes uses `syntheticDocumentContext`.
  * @param {{ isOwner?: boolean }} [options] - Owner flag the component reads via `document.data.isOwner`.
  * @returns {{ document: { data: { isOwner: boolean } } }} The context object passed to `mountProbe`.
  */

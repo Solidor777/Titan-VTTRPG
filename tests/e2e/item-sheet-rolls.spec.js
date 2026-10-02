@@ -108,7 +108,7 @@ async function rollAndRead(button, type) {
    /** @type {number} The world message count before the roll. */
    const before = await page.evaluate(() => game.messages.size);
    await button.click();
-   await expect.poll(() => newestMessageType(page, before), { message: `the roll posts an ${type}` }).toBe(type);
+   await expect.poll(() => newestMessageType(page, before), { message: `the roll posts a ${type} message` }).toBe(type);
    return page.evaluate(() => game.messages.contents[game.messages.size - 1].system.parameters);
 }
 
