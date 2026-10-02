@@ -1363,3 +1363,53 @@ test.describe('effect tray sidebar tab', () => {
       });
    });
 });
+
+test('the tray follows a world compendium created and deleted in the Compendium directory', async () => {
+   /** @type {string} A pack label no earlier run used, so the tray state cannot have read the pack at load. */
+   const label = `E2E Tray Pack ${Date.now()}`;
+   /** @type {import('@playwright/test').Locator} The tray select's options. */
+   const options = page.locator('[data-testid="effect-tray-pack-select"] option');
+   /**
+    * Reads the label of the tray's selected pack.
+    * @returns {Promise<string>} The selected option's text.
+    */
+   const selectedLabel = () => page.locator('[data-testid="effect-tray-pack-select"]')
+      .evaluate((select) => select.options[select.selectedIndex]?.textContent.trim());
+
+   // The tray is built before the pack exists, and does not offer it.
+   await openTray(page);
+   await expect(options.filter({ hasText: label })).toHaveCount(0);
+
+   // Create the pack through the Compendium directory's Create Compendium dialog.
+   await page.locator('#sidebar nav.tabs [data-tab="compendium"]').click();
+   await page.locator('#compendium [data-action="createEntry"]').first().click();
+   /** @type {import('@playwright/test').Locator} The core Create Compendium dialog. */
+   const createDialog = page.locator('#create-compendium');
+   await createDialog.locator('input[name="label"]').fill(label);
+   await createDialog.locator('select[name="type"]').selectOption('ActiveEffect');
+   await createDialog.locator('button[data-action="ok"]').click();
+   await expect(createDialog).toHaveCount(0);
+
+   // The tray offers the new pack, and selecting it there selects it.
+   await page.locator('#sidebar nav.tabs [data-tab="titanEffects"]').click();
+   await expect(options.filter({ hasText: label })).toHaveCount(1);
+   await page.locator('[data-testid="effect-tray-pack-select"]').selectOption({ label });
+   await expect.poll(selectedLabel).toBe(label);
+
+   // Delete the pack through the directory entry's context menu and its confirmation dialog.
+   /** @type {string} The created pack's collection id. */
+   const packId = await page.evaluate((packLabel) => game.packs.find((pack) => pack.metadata.label === packLabel)
+      ?.collection, label);
+   /** @type {string} The localized label of the directory's Delete Compendium entry. */
+   const deleteLabel = await page.evaluate(() => game.i18n.localize('COMPENDIUM.Delete.Option'));
+   await page.locator('#sidebar nav.tabs [data-tab="compendium"]').click();
+   await page.locator(`#compendium .directory-item[data-pack="${packId}"]`).click({ button: 'right' });
+   await chooseContextMenuEntry(page, page.locator('#context-menu .context-item', { hasText: deleteLabel }));
+   await page.locator('.application.dialog button[data-action="yes"]').click();
+   await expect.poll(() => page.evaluate((id) => !!game.packs.get(id), packId)).toBe(false);
+
+   // The tray no longer offers the pack, and its selection falls back to the system effects pack.
+   await page.locator('#sidebar nav.tabs [data-tab="titanEffects"]').click();
+   await expect(options.filter({ hasText: label })).toHaveCount(0);
+   await expect.poll(selectedLabel).toBe('TITAN Effects');
+});
