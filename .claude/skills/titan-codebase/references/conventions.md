@@ -828,8 +828,13 @@ and returns the shared `errors` array; per-test `page.on('pageerror', …)` is b
 reused page) — fold any per-test error assertion onto the shared `errors`, which is reset each `afterEach`.
 A `pageerror` never includes a hook listener's throw: core's `Hooks.#call` catches it and reports it through
 `Hooks.onError`, which logs it and calls the `error` hook (Foundry 14.364 `client/helpers/hooks.mjs:158-168,
-182-188`). A test that must prove a listener raised nothing records the `error` hook, as `effect-tray.spec.js`
-`recordHookErrors` does for the #112 test on both clients; console output is not used (it carries unrelated noise).
+182-188`). So `login` (`fixtures.js`) calls `world.js` `installHookErrorReporting(page)` before navigating: an init
+script registers an `error` hook listener the moment core assigns the `Hooks` global (`client/client.mjs` assigns it
+through `Object.assign(globalThis, …)`, which calls the script's setter), and an exposed binding pushes each report,
+as `Hooks.onError (<location>): <message>`, into every array `attachPageErrors` returned for that page. Every
+spec that asserts its `errors` therefore also fails on errors core reports through `Hooks.onError`, on every client
+page (`multiClient.js` logs in through `login`); a collector attached after login sees reports from then on. Console
+output is not read, so its noise (`ERR_CONNECTION_REFUSED`, vendor warnings) never reaches the array.
 **Not migrated** (self-managed `BrowserContext`s via `multiClient.js`): `multi-client.spec.js`,
 `socket-sync.spec.js`, `permissions-compendium.spec.js`, `permissions-ownership.spec.js`,
 `permissions-auto-open.spec.js`. Fast-check (`injectFastCheck` → `page.addInitScript`) must run in

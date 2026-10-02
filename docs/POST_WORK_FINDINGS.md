@@ -154,17 +154,15 @@ it ever bites in play, the principled fix is a per-message serial queue around
 
 ## 2026-09-09 — E2E 1-second operation budget
 
-- **Wait ceilings equal the budget.** 34 explicit `timeout:` values across `tests/e2e` and `tests/shared` are
-  1000 ms, so an operation exceeding the budget fails loudly instead of silently absorbing 15 s. The deliberate
-  multi-second exemptions are listed in titan-codebase `conventions.md` ("No e2e operation may exceed 1 second"):
-  the world boot (`fixtures.js:35`), the shared reload (`world.js:359-360`, `reloadWorld`, which every mid-file
-  reload goes through), a second client's login (`multiClient.js:49`), the Player HUD waits after a boot
-  (`pack-conversion.spec.js:51`, `condition-migration.spec.js:186`, `converted-effect-identity.spec.js:109`), the
-  scrolling-text wait (`condition-description.spec.js:283`) and the confirmed migration
+- **Wait ceilings equal the budget.** 37 explicit `timeout:` values across `tests/e2e` and `tests/shared` are
+  1000 ms, so an operation exceeding the budget fails loudly instead of silently absorbing 15 s. Every other explicit
+  ceiling is a deliberate multi-second exemption listed in titan-codebase `conventions.md` ("No e2e operation may
+  exceed 1 second"): the world boot (`fixtures.js:38`), the shared reload (`world.js:408-409`, `reloadWorld`, which
+  every mid-file reload goes through), a second client's login (`multiClient.js:49`), the Player HUD waits after a
+  boot (`pack-conversion.spec.js:51`, `condition-migration.spec.js:186`, `converted-effect-identity.spec.js:109`),
+  the scrolling-text wait (`condition-description.spec.js:283`) and the confirmed migration
   (`condition-migration.spec.js:532`). Do not sweep these to 1 s. Measured 2026-10-01
-  (`.superpowers/sdd/test-suite-rewrite/phase-0/fix5b-e2e-timeouts.txt`): three other ceilings are above 1 s and are
-  not in that list: `compendium-spreadsheet.spec.js:404` (60 s), `permissions-observer-navigation.spec.js:69` (2 s)
-  and `sheet-zoom.spec.js:213` (3 s).
+  (`.superpowers/sdd/test-suite-rewrite/phase-0/fix5c-e2e-timeouts.txt`).
 - **`titanWait`'s default timeout is 1000ms** (`tests/e2e/poll.js`), and no call passes a longer one: of 118
   `titanWait(` calls, 3 pass `timeout: 1000` and the rest use the default (measured 2026-10-01, same file). In the
   2026-09-09 two consecutive full-suite runs (497/497 each) no `titanWait timed out after 1000ms` failure occurred.
@@ -265,15 +263,3 @@ it ever bites in play, the principled fix is a per-message serial queue around
   when their `createNewId()` resolves. Measured in `test-titan` (Task 5 fix round 2): entries with their own `_id`
   came first in 3 of 3 runs, and generated ones came back reordered (for example `[C1, C3, C2]`) in 2 of 3 runs. Code
   and tests that pair created documents with their inputs must match them by id or name, never by position.
-
-## 2026-10-01 — A page-error assertion cannot see a throw inside a hook listener
-
-- **Core's `Hooks.#call` catches a listener's throw and logs it to the console** (read: Foundry 14.364
-  `client/helpers/hooks.mjs:158-168`, through `Hooks.onError`), so it never becomes a `pageerror`. Measured in Phase 0
-  fix round 5 of the test-suite rewrite: a throw added at the end of `EffectTrayState`'s `renderCompendiumDirectory`
-  listener, after its fallback, left the CLOSED_BUGS #112 gate test passing on both clients while it asserted page
-  errors only (`.superpowers/sdd/test-suite-rewrite/phase-0/fix5b-mut112-throw-at-end-on-gm1-before-test-fix.log`,
-  `-gm2-…`). `Hooks.onError` also calls the `error` hook (`hooks.mjs:187`), so a test records exactly those errors
-  with an `error` hook listener, without console noise; `effect-tray.spec.js` `recordHookErrors` does this, and with
-  it the same mutation fails the #112 test on the mutated client (`fix5b-…-after-test-fix.log`). Other specs that
-  must prove a hook listener raised nothing need the same recording; only the #112 test has it.

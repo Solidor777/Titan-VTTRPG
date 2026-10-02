@@ -1288,8 +1288,10 @@ when fixed.
       pack's top-level folders and root effects;
     - it asserts that neither client raised a page error, and that core reported no error through `Hooks.onError` on
       either client. Core catches a hook listener's throw in `Hooks.#call` and reports it through `Hooks.onError`,
-      which calls the `error` hook (read: `client/helpers/hooks.mjs:158-168, 182-188`), so the test records the
-      `error` hook on both clients rather than reading the console.
+      which calls the `error` hook (read: `client/helpers/hooks.mjs:158-168, 182-188`). The shared page-error
+      harness collects both: `login` installs `installHookErrorReporting` (`tests/e2e/world.js`) on every client
+      page, and each `attachPageErrors` collector receives the page's `pageerror` messages and its `Hooks.onError`
+      reports. The console is not read.
   - Measured mutations of `EffectTrayState`, one run each, each rebuilt and then restored (script
     `fix5-mutate-e2e.mjs`, output `fix5-mut112-*.log`):
     - the `renderCompendiumDirectory` hook renamed away: fails, expected 1 option, received 0;
@@ -1300,9 +1302,10 @@ when fixed.
       fails, the selection never falls back (expected `TITAN Effects`, received `undefined`); for E2E GM 2, which
       client's iteration failed is likewise inferred;
     - the same throw at the end of the hook, after the fallback, on E2E GM 1 only and then on E2E GM 2 only: fails
-      at the hook-error assertion of the mutated client, which names the client and lists the reported error
-      (`fix5b-mut112-throw-at-end-on-gm1-after-test-fix.log`, `-gm2-after-test-fix.log`). Before the hook-error
-      recording was added, both runs passed (`fix5b-…-before-test-fix.log`).
+      at the error assertion of the mutated client, which names the client and lists the reported
+      `Hooks.onError (Hooks.#call): …` error (`fix5c-mut112-throw-at-end-on-gm1-shared-harness.log`,
+      `-gm2-shared-harness.log`; script `fix5-mutate-e2e.mjs`, restore record `fix5c-mutate.out`). Before hook errors were collected, both runs passed
+      (`fix5b-…-before-test-fix.log`).
   - The test moves with the `effect-tray` rewrite (test-suite rewrite Phase 6).
 
 ### 113. `condition-description.spec.js` failed when no scene was active at its start
