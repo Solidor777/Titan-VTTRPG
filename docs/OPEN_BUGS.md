@@ -157,6 +157,30 @@ Deferred/known bugs. Todos (planned work) live in `docs/TODO.md`; this file is b
   - Result: the page throws `TypeError: Cannot read properties of null (reading 'off')` at `PreciseText.destroy` ←
     `InterfaceCanvasGroup.createScrollingText` (`client/canvas/groups/interface.mjs:174`).
   - Control: the same steps with a 2.6 s wait before the deactivation threw nothing.
-- **Cause:** not yet located. Attribution to core or TITAN not measured.
+- **Cause, measured:** core destroys the text twice (probe `probe114`, `test-titan`, E2E GM 1, Foundry 14.364).
+  A wrapper on `PreciseText.prototype.destroy` recorded each call's stack:
+  1. The deactivation runs `Scene.unview` → `Canvas.draw` → `Canvas.tearDown` → `InterfaceCanvasGroup.tearDown`.
+     The group's `_tearDown` destroys every non-layer child with its children
+     (`client/canvas/groups/canvas-group-mixin.mjs:172-177`, `tearDownChildren = true` at `:35`), and so destroys the
+     scrolling text.
+  2. `Canvas.tearDown` first terminates the running animations (`client/canvas/board.mjs:1326`). That resolves the
+     fade-in that `createScrollingText` awaits, so it goes on and starts the scroll animation
+     (`client/canvas/groups/interface.mjs:211-230`). The scroll animation's next frame writes `y` on the destroyed text
+     and logs `TypeError: Cannot read properties of null (reading 'position')`. `CanvasAnimation.animate` catches and
+     logs it (`client/canvas/animation/canvas-animation.mjs:151-152`).
+  3. `createScrollingText` then runs its clean-up (`interface.mjs:233-234`). `text.destroy()` runs on the destroyed
+     text, whose texture is now `null`, and PIXI's `Sprite.destroy` throws `Cannot read properties of null (reading
+     'off')`. The second destroy is recorded with `alreadyDestroyed: true` and `_texture === null`.
+- **Excluding TITAN, measured:**
+  - A direct core call, `canvas.interface.createScrollingText(...)` followed by deactivating the scene, throws the
+    same error with the same destroy sequence. No TITAN document is involved.
+  - The status-toggle trigger gives the same sequence.
+  - Every frame in both destroy stacks and in both error stacks is `foundry.mjs`, `pixi.min.js`, or the probe wrapper.
+  - Read: TITAN's `src/` has no PIXI or prototype patch and no canvas tear-down hook, and `dist/index.js` has no
+    reference to `createScrollingText`, `InterfaceCanvasGroup` or `tearDownChildren`.
+  - Not run: a world without TITAN. A world switch is out of bounds for this campaign.
+- **Control, measured:** the core call with a 2.6 s wait before the deactivation destroys the text once, from
+  `createScrollingText`, and throws nothing.
 - **Found:** 2026-10-01 while writing the gate test of CLOSED_BUGS #113 (test-suite rewrite, Phase 0 fix round 1).
-- **Status:** Open. The #113 gate test reloads the page before it deactivates the scene, which avoids the throw.
+- **Status:** Open. The cause is in core, with no TITAN trigger. The #113 gate test reloads the page before it
+  deactivates the scene, which avoids the throw.
