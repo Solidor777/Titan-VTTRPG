@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { existsSync, readdirSync, readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import path from 'node:path';
+import maskSource from './helpers/maskSource.js';
 
 // Every e2e test of a document runs on documents made through real Foundry user flows, and a mid-test change goes
 // through the control a user would use (`.claude/claude.md`, "Tests use genuine live documents"). This guard scans the
@@ -10,17 +11,17 @@ import path from 'node:path';
 // Scan 1 covers `tests/e2e/**` and `tests/shared/**`: document creation, embedded writes, imports, synthetic drops,
 // source-string evaluation and sort writes. Scan 2 covers `tests/e2e/**` only: `.update(` and the `CharacterDataModel`
 // action methods (`.system.request…(`, `.system.roll…(`, …), each permitted only where it matches an entry of
-// `tests/e2e/direct-updates.allowlist.json` (a field that no sheet, HUD, tracker or tray control edits). Deletion calls
-// in `global-teardown.js` and `registry.js` are allowed by file: they are the suite's own cleanup.
+// `tests/e2e/direct-updates.allowlist.json` (a field that no sheet, HUD, tracker or tray control edits). In
+// `global-teardown.js` and `registry.js`, the suite's own cleanup, a match whose text contains `delete` is exempt; of
+// the patterns here only `.system.delete…(` can produce one, since no other pattern names a deletion (`.delete(`,
+// `deleteEmbeddedDocuments(` and `deleteCompendium(` are not banned anywhere).
 //
 // Until the rewrite's Phase 6 the offender set must equal `tests/e2e/burn-down.json` exactly (one entry per offending
 // call, keyed by file, matched text and source line, so an unrelated edit that shifts line numbers changes nothing).
 // Each phase removes the entries of the files it rewrites; Phase 6 deletes the list, after which the set must be empty.
 //
 // Known limits of the scan: comments are skipped, string contents are not (a banned call quoted in a string is
-// flagged); a regular-expression literal containing a quote character is read as the start of a string, which hides
-// the text up to the next matching quote from the comment masking, and one containing `//` or `/*` is read as a
-// comment.
+// flagged), and the masking limits of `helpers/maskSource.js` apply (a regular-expression literal is not recognized).
 
 /** @type {string} The repository's `tests` directory. */
 const TESTS_DIRECTORY = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
@@ -43,7 +44,7 @@ const PHASE_PATH = path.join(TESTS_DIRECTORY, 'unit', 'phase.json');
 /** @type {number} The last phase in which the burn-down list may exist; it is deleted in this phase. */
 const BURN_DOWN_LAST_PHASE = 6;
 
-/** @type {string[]} The e2e sources whose deletion calls are the suite's own cleanup, relative to `tests`. */
+/** @type {string[]} The cleanup sources, relative to `tests`, whose matches naming `delete` are exempt. */
 const DELETION_SOURCES = [
    'e2e/global-teardown.js',
    'e2e/registry.js',
@@ -138,55 +139,6 @@ const EDIT_PATTERNS = [
  * @property {string} reason - Why no control can make the change.
  */
 
-/** @type {string[]} The characters that open a string or template literal. */
-const QUOTES = [
-   '\'',
-   '"',
-   '`',
-];
-
-/**
- * Masks the comments of a source as spaces, keeping string contents and every index and line break, so a banned call
- * named in a comment is not flagged while one built inside a string still is.
- * @param {string} source - The source text.
- * @returns {string} The masked text, the same length as the source.
- */
-function maskComments(source) {
-   /** @type {string[]} The masked characters. */
-   const out = [...source];
-   /** @type {number} The scan position. */
-   let index = 0;
-   while (index < source.length) {
-      /** @type {string} The two characters at the scan position. */
-      const pair = source.slice(index, index + 2);
-      if (pair === '//' || pair === '/*') {
-         /** @type {number} The index of the line break or block close ending the comment; -1 if none. */
-         const terminator = source.indexOf(pair === '//' ? '\n' : '*/', index + 2);
-         /** @type {number} The index just past the comment (a line comment keeps its line break). */
-         const end = terminator === -1 ? source.length : terminator + (pair === '//' ? 0 : 2);
-         for (let position = index; position < end; position++) {
-            if (out[position] !== '\n') {
-               out[position] = ' ';
-            }
-         }
-         index = end;
-      }
-      else if (QUOTES.includes(source[index])) {
-         /** @type {string} The quote that closes the string. */
-         const quote = source[index];
-         index++;
-         while (index < source.length && source[index] !== quote) {
-            index += source[index] === '\\' ? 2 : 1;
-         }
-         index++;
-      }
-      else {
-         index++;
-      }
-   }
-   return out.join('');
-}
-
 /**
  * Finds the banned calls in one source.
  * @param {string} file - The source path relative to `tests`, with forward slashes.
@@ -194,8 +146,8 @@ function maskComments(source) {
  * @returns {(Offender & {line: number})[]} One entry per banned call, with the 1-based line it starts on.
  */
 function findOffenders(file, source) {
-   /** @type {string} The source with its comments masked. */
-   const masked = maskComments(source);
+   /** @type {string} The source with its comments masked (strings kept, so a call built in a string is found). */
+   const masked = maskSource(source);
    /** @type {string[]} The source lines. */
    const lines = source.split('\n');
    /** @type {RegExp[]} The patterns that apply to this source. */

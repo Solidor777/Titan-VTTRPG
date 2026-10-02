@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { readdirSync, readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import path from 'node:path';
+import maskSource from './helpers/maskSource.js';
 
 // Core `ContextMenu#close()` removes whatever menu element the instance holds when its 200 ms collapse ends, and every
 // document click while `ui.context` is set queues another close, so an e2e test that clicks a context-menu entry and
@@ -11,9 +12,8 @@ import path from 'node:path';
 // or starts from a variable or function that holds or returns one.
 //
 // Known limits of the scan: a locator passed into a helper as a function parameter is not traced back to its call
-// site, so a context-menu locator handed to such a helper and clicked there is not seen; and a regular-expression
-// literal containing a quote character is masked as the start of a string, which hides the text up to the next
-// matching quote from the scan.
+// site, so a context-menu locator handed to such a helper and clicked there is not seen; and the masking limits of
+// `helpers/maskSource.js` apply (a regular-expression literal is not recognized).
 
 /** @type {string} The e2e test directory. */
 const E2E_DIRECTORY = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../e2e');
@@ -29,62 +29,6 @@ const CLICK_CALL = /\.\s*(click|dblclick|tap|dispatchEvent)\s*\(/g;
 
 /** @type {RegExp} A `dispatchEvent` argument that dispatches a click. */
 const CLICK_EVENT_ARGUMENT = /^\s*(['"`])(?:click|dblclick)\1/;
-
-/** @type {string[]} The characters that open a string or template literal. */
-const QUOTES = [
-   '\'',
-   '"',
-   '`',
-];
-
-/**
- * Masks a source for structural scanning: comments become spaces and string or template contents become `x`, keeping
- * every index and line break, so brackets inside strings or comments never unbalance a walk.
- * @param {string} source - The source text.
- * @returns {string} The masked text, the same length as the source.
- */
-function maskSource(source) {
-   /** @type {string[]} The masked characters. */
-   const out = [...source];
-   /** @type {number} The scan position. */
-   let index = 0;
-   while (index < source.length) {
-      /** @type {string} The two characters at the scan position. */
-      const pair = source.slice(index, index + 2);
-      if (pair === '//' || pair === '/*') {
-         /** @type {number} The index just past the comment. */
-         const end = pair === '//'
-            ? (source.indexOf('\n', index) + 1 || source.length)
-            : source.indexOf('*/', index + 2) + 2;
-         for (let position = index; position < end; position++) {
-            if (out[position] !== '\n') {
-               out[position] = ' ';
-            }
-         }
-         index = end;
-      }
-      else if (QUOTES.includes(source[index])) {
-         /** @type {string} The quote that closes the string. */
-         const quote = source[index];
-         index++;
-         while (index < source.length && source[index] !== quote) {
-            if (source[index] === '\\') {
-               out[index] = 'x';
-               index++;
-            }
-            if (out[index] !== '\n') {
-               out[index] = 'x';
-            }
-            index++;
-         }
-         index++;
-      }
-      else {
-         index++;
-      }
-   }
-   return out.join('');
-}
 
 /**
  * Finds the index of the bracket that opens the group closed at a position, walking left over balanced groups.
@@ -256,7 +200,7 @@ function findDirectContextMenuClicks(relativePath, source) {
    }
 
    /** @type {string} The masked source. */
-   const masked = maskSource(source);
+   const masked = maskSource(source, { strings: true });
    /** @type {Set<string>} The names holding or returning a context-menu locator. */
    const names = findContextMenuNames(source, masked);
 
