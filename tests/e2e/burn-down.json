@@ -1081,18 +1081,8 @@
    },
    {
       "file": "e2e/effect-sheet-layout.spec.js",
-      "match": "Actor.create(",
-      "source": "?? await Actor.create({"
-   },
-   {
-      "file": "e2e/effect-sheet-layout.spec.js",
-      "match": "Actor.create(",
-      "source": "?? await Actor.create({"
-   },
-   {
-      "file": "e2e/effect-sheet-layout.spec.js",
       "match": "createEmbeddedDocuments(",
-      "source": "const [created] = await actor.createEmbeddedDocuments('ActiveEffect', ["
+      "source": "const [effect] = await actor.createEmbeddedDocuments('ActiveEffect', ["
    },
    {
       "file": "e2e/effect-sheet-layout.spec.js",
