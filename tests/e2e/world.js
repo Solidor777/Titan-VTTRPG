@@ -102,8 +102,10 @@ const HOOK_ERROR_PAGES = new WeakSet();
  * it never reaches `pageerror` (Foundry 14.364, `client/helpers/hooks.mjs:158-168, 182-188`). An init script, run on
  * every document load, registers an `error` hook listener the moment core assigns the `Hooks` global
  * (`client/client.mjs` assigns it with `Object.assign(globalThis, …)`, which calls a setter), so no hook fires before
- * it. Each reported error is pushed to every collector `attachPageErrors` attached to the page. Only errors reported
- * through `Hooks.onError` are collected, never other console output.
+ * it. Each reported error is pushed to every collector `attachPageErrors` attached to the page, and to the
+ * document's own list `globalThis.titanHookErrorReports`, which `readHookErrorReports` returns; that list keeps the
+ * reports made before any collector was attached (`login` asserts it is empty once the world is ready). Only errors
+ * reported through `Hooks.onError` are collected, never other console output.
  * @param {import('@playwright/test').Page} page - A page that has not navigated yet.
  * @returns {Promise<void>} Resolves once the binding and the init script are registered.
  */
@@ -120,6 +122,12 @@ export async function installHookErrorReporting(page) {
    await page.addInitScript(() => {
       /** @type {object | undefined} The core `Hooks` class, once assigned. */
       let hooks;
+
+      /** @type {string[]} Every hook error reported in this document, in order. */
+      const reports = [];
+      Object.defineProperty(globalThis, 'titanHookErrorReports', {
+         value: reports,
+      });
       Object.defineProperty(globalThis, 'Hooks', {
          configurable: true,
          enumerable: true,
@@ -127,11 +135,25 @@ export async function installHookErrorReporting(page) {
          set: (value) => {
             hooks = value;
             value.on('error', (location, error) => {
-               void globalThis.titanReportHookError(`Hooks.onError (${location}): ${error?.message}`);
+               /** @type {string} The reported error, prefixed with where core caught it. */
+               const message = `Hooks.onError (${location}): ${error?.message}`;
+               reports.push(message);
+               void globalThis.titanReportHookError(message);
             });
          },
       });
    });
+}
+
+/**
+ * Reads every hook error reported in the page's current document, including those reported before any
+ * `attachPageErrors` collector was attached. The list is filled synchronously inside the page, so a read that follows a
+ * hook call sees its report, unlike the asynchronous binding that feeds the collectors.
+ * @param {import('@playwright/test').Page} page - A page with hook-error reporting installed.
+ * @returns {Promise<string[]>} The reported errors, in order.
+ */
+export async function readHookErrorReports(page) {
+   return page.evaluate(() => [...globalThis.titanHookErrorReports]);
 }
 
 /**

@@ -1,7 +1,7 @@
 import { expect } from '@playwright/test';
 import { DEFAULT_GM } from './users.js';
 import { installPoll } from './poll.js';
-import { attachPageErrors, installHookErrorReporting } from './world.js';
+import { attachPageErrors, installHookErrorReporting, readHookErrorReports } from './world.js';
 
 /**
  * Authenticate against the live Foundry v14 `/join` screen and wait for the
@@ -11,10 +11,14 @@ import { attachPageErrors, installHookErrorReporting } from './world.js';
  * `select[name="userid"]` is the user picker (options labelled by user name);
  * `input[name="password"]` is the optional user password field;
  * `button[name="join"]` is the "Join Game Session" submit button.
+ *
+ * The boot itself must be error-free: no spec's collector exists yet, so `login` fails when the world raised an
+ * uncaught page error or core reported an error through `Hooks.onError` (including from any `init`, `setup` or `ready`
+ * listener) before it became ready.
  * @param {import('@playwright/test').Page} page - The Playwright page to drive.
  * @param {string} [user] - The display name of the Foundry user to log in as.
  * Defaults to `FOUNDRY_USER` env var when set, otherwise `DEFAULT_GM` (`'E2E GM 1'`).
- * @returns {Promise<void>} Resolves once `game.ready === true`.
+ * @returns {Promise<void>} Resolves once `game.ready === true` and the boot raised no error.
  */
 export async function login(page, user = process.env.FOUNDRY_USER || DEFAULT_GM) {
 
@@ -23,19 +27,46 @@ export async function login(page, user = process.env.FOUNDRY_USER || DEFAULT_GM)
    await installPoll(page);
    await installHookErrorReporting(page);
 
-   // Navigate to the join screen and select the configured user.
-   await page.goto('/join');
-   await page.selectOption('select[name="userid"]', { label: user });
+   /** @type {string[]} The uncaught page errors raised from the join screen until the world is ready. */
+   const bootPageErrors = [];
 
-   // Fill the password only when one is configured (the test world has none).
-   if (process.env.FOUNDRY_PASSWORD) {
-      await page.fill('input[name="password"]', process.env.FOUNDRY_PASSWORD);
+   /**
+    * Records an uncaught page error raised during the login.
+    * @param {Error} error - The uncaught error.
+    * @returns {void}
+    */
+   const onBootPageError = (error) => {
+      bootPageErrors.push(error.message);
+   };
+   page.on('pageerror', onBootPageError);
+
+   try {
+      // Navigate to the join screen and select the configured user.
+      await page.goto('/join');
+      await page.selectOption('select[name="userid"]', { label: user });
+
+      // Fill the password only when one is configured (the test world has none).
+      if (process.env.FOUNDRY_PASSWORD) {
+         await page.fill('input[name="password"]', process.env.FOUNDRY_PASSWORD);
+      }
+
+      // Submit the join form and wait for the world to load and become ready.
+      await page.click('button[name="join"]');
+      await page.waitForURL('**/game');
+      await page.waitForFunction(() => globalThis.game?.ready === true, null, { timeout: 60_000 });
+   }
+   finally {
+      page.off('pageerror', onBootPageError);
    }
 
-   // Submit the join form and wait for the world to load and become ready.
-   await page.click('button[name="join"]');
-   await page.waitForURL('**/game');
-   await page.waitForFunction(() => globalThis.game?.ready === true, null, { timeout: 60_000 });
+   // Core sets `game.ready` and then calls the `ready` hook synchronously (client/game.mjs:777-779), so every
+   // synchronous listener has run, and its report is in the page's list, by the time this read executes.
+   /** @type {string[]} The errors the boot raised, page errors first. */
+   const bootErrors = [
+      ...bootPageErrors,
+      ...await readHookErrorReports(page),
+   ];
+   expect(bootErrors, `errors while the world booted for ${user}:\n${bootErrors.join('\n')}`).toEqual([]);
 }
 
 /**
