@@ -12,8 +12,10 @@ import { Linter } from 'eslint';
 // specifier is a name, not code. Prose, selectors and other text that does not parse yield no nodes.
 
 /**
- * @type {number} The ceiling, in ms, of a guard test that parses a whole test tree. Parsing the 113 e2e sources with
- * their code strings takes 1.3 to 1.4 s alone and passes vitest's 5 s default under a full parallel run, so the
+ * @type {number} The ceiling, in ms, of a guard test that parses a whole test tree. Under a full parallel `npx vitest
+ * run`, the whole-tree test of `E2eRealDocuments.test.js` ran past vitest's 5 s default test timeout (measured
+ * 2026-10-01 with this ceiling set to 5000;
+ * `.superpowers/sdd/test-suite-rewrite/phase-0/fix5-tree-scan-timeout-5s.log`, local, not checked in), so the
  * whole-tree tests set this failure bound instead.
  */
 export const TREE_SCAN_TIMEOUT = 60_000;
