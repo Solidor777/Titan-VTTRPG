@@ -897,15 +897,19 @@ extra entries as JSON. Once `tests/unit/phase.json` exceeds 6 the burn-down file
 `tests/unit/UnitFakeDocuments.test.js` scans `tests/unit` (except itself) for a fake write surface — an object-literal
 key (after `{` or `,`) whose value is not a boolean, `null`, `undefined`, number, string, object or array; an
 object-literal or class method (after `{`, `,`, `}`, `;` or at a line start, its body opening on the line that closes
-the parameters); a member assignment; or a `vi.spyOn` — named `create`, `createDocuments`, `update`,
-`delete`, `createEmbeddedDocuments`, `deleteEmbeddedDocuments`, `updateEmbeddedDocuments`, `createEffects`,
-`updateEffects`, `deleteEffects`, `deleteItems`, or an object-literal `_source` key. Every matching file must be listed
-in `tests/unit/fake-documents.allowlist.json`: `permitted` (`{ file, clause }`) or `burnDown`
-(`{ file, removedInPhase }`); a listed file that is gone or no longer matches fails, and a burn-down file fails once
-`phase.json`'s `phase` exceeds its `removedInPhase`. Both guards and `E2eContextMenuClicks.test.js` mask sources
-through `tests/unit/helpers/maskSource.js` (`maskSource(source, { strings })`: comments always blanked, string
-contents replaced only with `strings: true`; every index and line break kept; regular-expression literals are not
-recognized).
+the parameters); a class field (optionally `static`, after `{`, `}`, `;` or at a line start; the same shape also finds
+a destructuring default or an assignment statement) whose value is not one of those; a member assignment; or a
+`vi.spyOn` — named `create`, `createDocuments`, `update`, `delete`, `createEmbeddedDocuments`,
+`deleteEmbeddedDocuments`, `updateEmbeddedDocuments`, `createEffects`, `updateEffects`, `deleteEffects`,
+`deleteItems`, or an object-literal `_source` key. A key, method or field name may be bare, quoted (`'update'(d) {}`)
+or a computed string key (`['update']`; a computed field is caught as a member assignment). Not found: a computed key
+held in a variable, an accessor, and bindings through `Object.defineProperty`, `Reflect.set`, `Object.assign` or a
+spread. Every matching file must be listed in `tests/unit/fake-documents.allowlist.json`: `permitted`
+(`{ file, clause }`) or `burnDown` (`{ file, removedInPhase }`); a listed file that is gone or no longer matches fails,
+and a burn-down file fails once `phase.json`'s `phase` exceeds its `removedInPhase`. Both guards and
+`E2eContextMenuClicks.test.js` mask sources through `tests/unit/helpers/maskSource.js`
+(`maskSource(source, { strings })`: comments always blanked, string contents replaced only with `strings: true`; every
+index and line break kept; regular-expression literals are not recognized).
 
 **E2E census** — every world document an e2e test creates (actor, item, scene, folder, macro, roll table, journal
 entry, playlist, cards, world compendium label) is named with the `E2E ` prefix; the sweep finds leftovers by that
@@ -919,19 +923,26 @@ contents, orphaned tokens and dangling hotbar slots last; never User documents) 
 (`CENSUS_WORLD`). Run directly (`node tests/e2e/census.js [--sweep]`) it logs in to localhost:30000 as `E2E GM 1`,
 prints JSON counts, and exits 1 when the final census is not empty.
 
-**No e2e operation may exceed 1 second**, and wait ceilings are set to that budget so a breach fails
-loudly instead of silently absorbing 15s: explicit `timeout:` values are `1000`. Inherently
-multi-second waits are deliberately exempt — a `game.ready` world boot (`fixtures.js`,
-`player-hud-layout.spec.js`, and the Player HUD wait in the `beforeAll` of `pack-conversion.spec.js`,
-`condition-migration.spec.js`, and `converted-effect-identity.spec.js`), a mid-file reload (`world.js`
-`reloadWithMode`, used by `pack-conversion.spec.js`, `condition-migration.spec.js`, and
-`converted-effect-identity.spec.js`), a second browser context finishing login (`multiClient.js`), and a
-migration confirmed from the Prompt dialog, a full pass over every stored actor
-(`condition-migration.spec.js`, 60 s). The same specs raise `test.setTimeout` for their reloads. Do not
-sweep those to 1s. A ceiling is a failure bound, not a duration: a `waitForFunction` returns the
-moment its predicate holds. **`titanWait`'s default timeout is also 1000ms** (`tests/e2e/poll.js`), so
-the budget is the default everywhere and the exceptions are the few explicit overrides — pass an
-explicit `timeout` only for an inherently multi-second wait, such as a world boot.
+**No e2e operation may exceed 1 second**, and wait ceilings are set to that budget so a breach fails loudly instead of
+silently absorbing 15s: explicit `timeout:` values are `1000`. Inherently multi-second waits are deliberately exempt:
+- a `game.ready` world boot (`fixtures.js`, `player-hud-layout.spec.js`, and the Player HUD wait in the `beforeAll` of
+  `pack-conversion.spec.js`, `condition-migration.spec.js`, and `converted-effect-identity.spec.js`);
+- a mid-file reload through `world.js` `reloadWorld(page, { ready })` (15 s for the `/game` URL, 60 s for the
+  readiness predicate, `game.ready` by default). `reloadWithMode` uses it (by `pack-conversion.spec.js`,
+  `condition-migration.spec.js` and `converted-effect-identity.spec.js`), and so does the last test of
+  `condition-description.spec.js`;
+- a second browser context finishing login (`multiClient.js`, used by the last test of `effect-tray.spec.js` for its
+  E2E GM 2 client);
+- core's 2 s scrolling text finishing before the viewed scene is deactivated (`condition-description.spec.js`, last
+  test, 10 s; OPEN_BUGS #114);
+- a migration confirmed from the Prompt dialog, a full pass over every stored actor (`condition-migration.spec.js`,
+  60 s).
+
+The tests that reload raise `test.setTimeout` to 120 s or 300 s (`condition-description.spec.js`'s last test: 120 s).
+Do not sweep those to 1s. A ceiling is a failure bound, not a duration: a `waitForFunction` returns the moment its
+predicate holds. **`titanWait`'s default timeout is also 1000ms** (`tests/e2e/poll.js`), so the budget is the default
+everywhere and the exceptions are the few explicit overrides — pass an explicit `timeout` only for an inherently
+multi-second wait, such as a world boot.
 
 Invalid core or priority values are hard errors, never silent fallbacks to the default.
 
@@ -996,12 +1007,15 @@ next. A test that clicks the SAME category the previous test left open TOGGLES i
 open flyout first (`Escape` when `player-hud-flyout` is present), as the `openCategory` helper in
 `player-hud-action-menu-layout.spec.js` does.
 
-**Mid-file `page.reload()` idiom** (`tests/e2e/world.js` `reloadWithMode(page, mode)`, used by
-`pack-conversion.spec.js`, `condition-migration.spec.js`, and `converted-effect-identity.spec.js`): it sets the
-`migrationMode` setting, runs steps (3)-(5) below, and then `expectActiveGM(page)` (also in `world.js`) asserts
+**Mid-file `page.reload()` idiom.** Steps (3)-(5) below are `tests/e2e/world.js` `reloadWorld(page, { ready })`,
+where `ready` is the in-page predicate of step (5) (`game.ready` by default); a spec never repeats them inline.
+`reloadWithMode(page, mode)` (used by `pack-conversion.spec.js`, `condition-migration.spec.js`, and
+`converted-effect-identity.spec.js`) sets the `migrationMode` setting, calls `reloadWorld` with
+`game.ready && game.titan.playerHud` as `ready`, and then `expectActiveGM(page)` (also in `world.js`) asserts
 `game.users.activeGM?.isSelf`, because only the active GM migrates and core's `getDesignatedUser` makes the active GM
-with the highest role that GM.
-`page.on('console')` and `attachPageErrors` listeners survive reloads (they attach to the Page object). Sequence:
+with the highest role that GM. The last test of `condition-description.spec.js` calls `reloadWorld(page)` with the
+default predicate. `page.on('console')` and `attachPageErrors` listeners survive reloads (they attach to the Page
+object). Sequence:
 (1) PROVE the first boot's ready work finished BEFORE clearing the capture buffer —
 `waitForFunction(() => !!game.titan?.playerHud)`, since the Player HUD is built after the GM's migration attempt
 (`game.ready` is set before the un-awaited ready hooks finish, so login resolving proves nothing about them);
