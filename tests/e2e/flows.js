@@ -828,8 +828,13 @@ export async function addCheck(page, documentUuid, { label, resolveCost, resista
       },
    );
 
+   /** @type {import('@playwright/test').Locator} Every check row of the sheet. */
+   const rows = sheet.locator('.check').filter({ has: page.locator('.header .label input') });
    /** @type {import('@playwright/test').Locator} The new check's row. */
-   const row = sheet.locator('.check').filter({ has: page.locator('.header .label input') }).nth(before);
+   const row = rows.nth(before);
+
+   // The sheet has rendered every stored check before the row is edited, so a late render cannot replace the input.
+   await expect(rows, 'the sheet rendered a row for every stored check').toHaveCount(before + 1);
    if (label !== undefined) {
       /** @type {import('@playwright/test').Locator} The new row's label input. */
       const input = row.locator('.header .label input');

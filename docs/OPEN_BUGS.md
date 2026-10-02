@@ -59,15 +59,6 @@ Deferred/known bugs. Todos (planned work) live in `docs/TODO.md`; this file is b
 - **Found:** 2026-10-01 while the Task 5 fix round 2 identity e2e (plan B) was seeding its tokens.
 - **Status:** Open. Reproduced through real flows; cause not yet located.
 
-### 103. Deleting an item or effect without confirmation still tries to open the confirmation dialog
-
-- **What:** `requestItemDeletion` and `requestEffectDeletion` (`CharacterDataModel.js:6331-6351`, `:6375-6396`)
-  delete at once when confirmation is off. They then fall through to the "Otherwise, confirm" branch: there is no
-  `else`. The document is normally already gone, so no dialog opens. If the delete was vetoed or failed, the
-  confirmation dialog opens after the user turned confirmation off.
-- **Found:** 2026-10-01 while diagnosing #102 (read in code).
-- **Status:** Open.
-
 ### 106. `player-hud-visibility.spec.js` leaves tokens whose actors it deleted
 
 - **What:** After the spec runs (also when it runs alone), the world still holds the unlinked `HUD Vis NPC` token and
@@ -181,3 +172,20 @@ Core citations below refer to Foundry 14.364 at `C:\FoundryVTT\V14\dev\foundry`,
 - **Status:** Open; attribution awaits the no-TITAN control. TITAN does not patch core. The #113 gate test waits until
   no animation runs on `canvas.interface` before it deactivates the scene. Measured without that wait: the spec failed
   with this error in 6 of 6 runs (`fix5-mut114-no-scrolling-text-wait-run1.log` to `-run6.log`).
+
+### 121. `checks-opposed.spec.js` throws `_drawTargetArrows is not a function` when GM 1 views a drawn scene
+
+- **What:** the spec replaces `game.user.targets` with a `Set` of plain `{ actor }` objects during each roll. Core's
+  token-layer ticker (`foundry/client/canvas/layers/tokens.mjs:466`) calls `t._drawTargetArrows(config)` on every entry
+  of `game.user.targets` each frame, so a frame that lands inside the roll window throws on the fake entries. The ticker
+  runs only while a scene is drawn (read from the source).
+- **Measured:** `checks-opposed.spec.js` alone passed in 7 of 7 runs
+  (`opposed-alone-1.log`, `opposed-alone-r1.log` to `-r6.log`). Run after the "check tags across surfaces" tests of
+  `character-sheet-rows.spec.js` (which view the shared scene as E2E GM 1), it failed in 3 of 3 runs
+  (`rows-then-opposed-1.log` to `-3.log`). Both full runs of Phase 3 Part A failed on it (`e2e-full.log`,
+  `e2e-full-2.log`); the Phase 2 full run passed (`phase-2/e2e-full-review-fixes.log`).
+- **Inferred, not measured:** the viewed scene persists on the E2E GM 1 user across logins, so the next GM 1 page draws
+  it.
+- **Found:** 2026-10-02 in Phase 3 Part A.
+- **Status:** Open. The cure is the spec's rewrite to real targeting (plan Phase 4 lists `checks-opposed` with "real
+  targeting"); no targeting flow exists yet in `tests/e2e/flows.js`.

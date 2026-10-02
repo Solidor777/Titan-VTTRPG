@@ -122,7 +122,8 @@ when fixed.
   `TypeError: can't access property "items", this.parent is null`.
 - **Found:** 2026-06-10 by the user during the theming-foundation visual pass (pre-existing on main).
 - **Fixed:** 2026-06-10 on `feature/theme-foundation` — reads `this.items`; regression-locked by
-  `tests/e2e/sheet-regressions.spec.js` ("createItemFromType adds an owned item to a world actor").
+  `tests/e2e/character-sheet-rows.spec.js` ("the Abilities tab add button gives a world actor an owned ability": the
+  tab's add button on a world actor's sheet).
 
 ### 11. Sheet drag-drop never fired: no DragDrop binding + un-wrapped single-item payloads
 
@@ -384,6 +385,9 @@ when fixed.
   (`embedded-context-check-parity.spec.js` x2, `embedded-context-effects.spec.js`). Measured, not
   inferred: the probe read `innerWidth/innerHeight` 1280x720 against the banner's rect and the
   panel's rect.
+- **Gate now:** the effect-row clicks of `tests/e2e/character-sheet-rows.spec.js` and, for the Effect HUD, the HUD
+  tests still in `embedded-context-check-parity.spec.js` and `embedded-context-effects.spec.js`; the viewport is
+  `use.viewport` of `playwright.config.mjs`.
 - **Fix:** `use.viewport` set to 1920x1080 — above Foundry's minimum, so the warning never fires.
   Full suite 497/497 after the change.
 
@@ -395,7 +399,9 @@ when fixed.
     `252dac10` ("route effect row header through HudButton so its text no longer clips").
     `.row-header` exists nowhere in `src/`; the name now lives at `.row .name`, and the row carries
     `data-testid="player-hud-effect-row"` (the idiom `player-hud-effects-panel.spec.js` already
-    used). Affected `embedded-context-check-parity.spec.js` and `embedded-context-effects.spec.js`.
+    used). Affected `embedded-context-check-parity.spec.js` and `embedded-context-effects.spec.js`; the character-sheet
+    and Effect HUD check tag comparison is now `tests/e2e/character-sheet-rows.spec.js` ("effect check tags render
+    identical values on the character sheet and the Effect HUD").
   - `theme.spec.js` hardcoded `#f4f4f6` as the light world default. `010c2e1e` ("step light-theme
     panels darker") deliberately changed `HeritageLight`'s `app-background` to `#fbfbfc`. The theme
     system was verified working live — the core scheme flips `body.theme-light`, `prefersDark()`
@@ -646,7 +652,8 @@ when fixed.
 - **What:** `CharacterDataModel.preDeleteItem` asserted `!this.parent.uuid === item.parent?.uuid` (always false),
   raising an error toast on every confirmed delete and skipping the armor/shield un-equip branch.
 - **Fixed:** 2026-09-26 — the assertion compares ownership correctly and `TitanActor.deleteItem` awaits `preDeleteItem`.
-  Gated by `spell-rules-regressions.spec.js`.
+  Gated by `tests/e2e/character-sheet-rows.spec.js` ("deleting an equipped armor row with confirmation on un-equips it
+  quietly": no error notification, the equipped slot cleared).
 
 ### 52. Spell sheet "resisted by" tag rendered empty
 
@@ -675,14 +682,17 @@ when fixed.
 - **What:** the check button and attribute select had content-driven widths and absorbed the row's squeeze, so columns
   started at different x per row and the widest rows clipped at the 850px sheet width. The skills filter's attribute
   fallback also read `defaultAttribute` off `[key, value]` entries.
-- **Fixed:** 2026-09-26 — fixed-size row parts that wrap identically. Gated by `character-sheet-layout.spec.js`.
+- **Fixed:** 2026-09-26 — fixed-size row parts that wrap identically. Gated by `character-sheet-layout.spec.js`
+  ("every skill row places its parts identically and nothing is cut off") and `sheet-filters.spec.js` ("the skills
+  filter falls back to matching the default attribute").
 
 ### 56. Browser zoom clipped the character sheet
 
 - **What:** the auto-height character sheet sized itself to its sidebar; when zoom shrank the viewport, Foundry clamped
   the window but the window content clipped the sheet's sidebar and tab lists.
-- **Fixed:** 2026-09-26 — the sheet is bounded by the window and the sidebar scrolls. Gated by `sheet-zoom.spec.js`
-  (character, item and effect sheets; last entry of a long list fully visible at 50–150% zoom).
+- **Fixed:** 2026-09-26 — the sheet is bounded by the window and the sidebar scrolls. Gated by the "browser zoom" tests
+  of `character-sheet-layout.spec.js` (character, item and effect sheets of the shared bulk actor; last entry of a long
+  list fully visible at 50–150% zoom).
 
 ### 57. Observers could not switch tabs or expand rows
 
@@ -693,7 +703,8 @@ when fixed.
 
 ### 58. Character sidebar section labels touched their contents
 
-- **Fixed:** 2026-09-26 — `.section-label` has the standard bottom margin. Gated by `character-sheet-layout.spec.js`.
+- **Fixed:** 2026-09-26 — `.section-label` has the standard bottom margin. Gated by `character-sheet-layout.spec.js`
+  ("sidebar section labels are spaced from the items they contain").
 
 ### 59. Player HUD toggles and actions lacked icons and state
 
@@ -715,7 +726,9 @@ when fixed.
 
 - **What:** the equipped-armor pass compared trait names against `'heavy.armor'`; the trait is named `'heavy'`, so the
   -1 to all speeds never applied. Its zero-speed guard also read the not-yet-derived `speed.value`.
-- **Fixed:** 2026-09-27 — matches `'heavy'` and guards with `baseValue` plus mods. Gated by `armor-heavy-trait.spec.js`.
+- **Fixed:** 2026-09-27 — matches `'heavy'` and guards with `baseValue` plus mods. Gated by
+  `tests/e2e/character-sheet-rows.spec.js` ("equipping Heavy armor lowers non-zero speeds by 1": the Heavy trait is
+  chosen in the armor's Edit Traits dialog and the armor equipped with its row toggle).
 
 ### 62. Compendium: rules elements that disagreed with the rules text
 
@@ -976,8 +989,9 @@ when fixed.
 - **Fixed:** 2026-09-30 — `tooltipAction` cleans every non-blank tooltip with `foundry.utils.cleanHTML` (the cleaner
   core's TooltipManager applies) before tippy receives it, on creation and on update, and `RichText` cleans its value
   before `enrichHTML`. Gated by `tests/e2e/html-sanitization.spec.js` (a report message and a report tag tooltip
-  carrying an `onerror` payload render their text and markup with no handler, a live custom-trait tooltip updated to
-  the payload is cleaned, and icon markup survives).
+  carrying an `onerror` payload render their text and markup with no handler, and icon markup survives) and by
+  `tests/e2e/custom-traits.spec.js` ("a live tooltip updated to user HTML is cleaned on update": the description is
+  edited to the payload in the Edit dialog).
 
 ### 85. Turn-start and turn-end report messages rendered blank
 
@@ -1229,6 +1243,26 @@ when fixed.
   stores their deltas, #102), and one in an Adventure in a locked world Adventure pack: an Automatic load hides the
   conversions of Items the token removed or converted itself, older-id ones included, leaves an unclaimed one, and the
   next load writes nothing; the imported Adventure token no longer shows the hidden conversions).
+
+### 103. Deleting an item or effect without confirmation still tried to open the confirmation dialog
+
+The evidence files named here are in `.superpowers/sdd/test-suite-rewrite/phase-3/` (local, not checked in).
+
+- **What:** `requestItemDeletion` and `requestEffectDeletion` deleted at once when confirmation was off, then fell
+  through to the confirmation branch (read: there was no `else`). The document is normally already gone, so no dialog
+  opened. When the delete was refused (a `preDelete` hook that returns false), the confirmation dialog opened after the
+  user had turned confirmation off.
+- **Found:** 2026-10-01 while diagnosing #102 (read in code).
+- **Fixed:** 2026-10-02. The confirmation branch is the `else` of the `shouldConfirm...` check in both methods.
+- **Gate tests:** `tests/e2e/character-sheet-rows.spec.js` ("with confirmation off, a refused item delete leaves the
+  item and opens no dialog" and the same for an effect): the test installs a `preDelete` listener that returns false,
+  clicks the row's delete button with confirmation off, waits until the listener refused the delete (the positive
+  edge), and expects no dialog and the document still there. Before: the item test failed with a dialog present
+  (`Expected 0, Received 1`, `gate103-before-fix.log`) and the effect test failed the same way
+  (`gate103-before-fix-effect.log`; run alone, because the item test's failure restarts the worker and the file's
+  `beforeAll` then makes the actor again). After: both passed (`gate103-after-fix.log`). The plain confirmation-off
+  delete of an item and of an effect (no dialog, the document gone) and the confirmation-on cancel and confirm paths
+  are tested beside them.
 
 ### 104. Open sheets re-rendered on changes to a different actor that shared their id
 
@@ -1485,3 +1519,36 @@ citations refer to Foundry 14.364 at `C:\FoundryVTT\V14\dev\foundry`.
 - **Gate test:** `combat-seed.spec.js` and `socket-sync.spec.js` with no active scene (the state of `test-titan`).
   Before: 6 of 6 failed (`fix6-before-combat-seed-socket-sync.log`). After: 6 of 6 passed
   (`fix6-after-combat-seed-socket-sync.log`); full e2e 656 of 656 (`e2e-fix6-gate.log`).
+
+### 119. Deleting an equipped armor with confirmation off left the actor's equipped slot set
+
+The evidence files named here are in `.superpowers/sdd/test-suite-rewrite/phase-3/` (local, not checked in).
+
+- **What:** `CharacterDataModel#safeDeleteItem`, which the row delete button uses when confirmation is off, deleted
+  through `deleteEmbeddedDocuments`. The confirmation dialog uses `TitanActor#deleteItem`, which first un-equips armor
+  and shields (`preDeleteItem`, read: `CharacterDataModel.js` armor and shield cases). With confirmation off the armor
+  row was deleted and `system.equipped.armor` kept its value (measured); the shield case is the same code path (read,
+  not run). The defect class is the one of #51, on the other path.
+- **Found:** 2026-10-02 while writing the equipped-armor delete test of `character-sheet-rows.spec.js` through the
+  row's delete button.
+- **Fixed:** 2026-10-02. `safeDeleteItem` deletes through `TitanActor#deleteItem`.
+- **Gate tests:** `tests/e2e/character-sheet-rows.spec.js` ("deleting an equipped armor row with confirmation off
+  un-equips it quietly", and the same with confirmation on). Before: the confirmation-off test failed, `equipped.armor`
+  still held an id after the item was gone (`gate119-before-fix.log`; inferred: the id of the deleted armor, which
+  the test had equipped). After: both passed (`gate119-after-fix.log`).
+
+### 120. Apply Edits in the Edit Traits dialog threw and stored nothing
+
+The evidence files named here are in `.superpowers/sdd/test-suite-rewrite/phase-3/` (local, not checked in).
+
+- **What:** `EditTraitsDialogBase.applyTraitEdits` assigned the filtered trait options, which are reactive state
+  proxies, to the item's traits and then called `structuredClone(item.system)`. The browser raised `Failed to execute
+  'structuredClone' on 'Window': #<Object> could not be cloned`, the dialog stayed open and the traits were not
+  stored. The armor, shield and attack trait dialogs share this component. Cause: inferred from the proxy values
+  and the removal of the error by the fix.
+- **Found:** 2026-10-02 by the harness page-error gate during the Heavy armor test of `character-sheet-rows.spec.js`
+  (measured: `git grep` over `tests` at `6b7ce703` finds no test that opens the Edit Traits dialog).
+- **Fixed:** 2026-10-02. The options are copied with `$state.snapshot` before they are assigned.
+- **Gate test:** `tests/e2e/character-sheet-rows.spec.js` ("equipping Heavy armor lowers non-zero speeds by 1": the
+  Heavy trait is chosen and applied in the armor's Edit Traits dialog). Before: failed with the `structuredClone`
+  error and the dialog still open (`gate120-before-fix.log`). After: passed (`gate120-after-fix.log`).

@@ -514,8 +514,10 @@ and one or more inner Svelte component trees.
   types. Its delete button routes through `sheetDocument.data.system.requestEffectDeletion(...)`, which —
   gated by the `confirmDeletingEffects` client setting (default true, Shift inverts, via
   `ShouldConfirmDeletingEffects`) — either shows `ConfirmDeleteEffectDialog` or immediately calls
-  `safeDeleteEffect` (owner-gated `deleteEmbeddedDocuments('ActiveEffect', …)`). This mirrors the
-  item path (`requestItemDeletion`/`safeDeleteItem`/`ConfirmDeleteItemDialog`/`confirmDeletingItems`).
+  `safeDeleteEffect` (owner-gated `deleteEmbeddedDocuments('ActiveEffect', …)`); exactly one of the two runs. This
+  mirrors the item path (`requestItemDeletion`/`safeDeleteItem`/`ConfirmDeleteItemDialog`/`confirmDeletingItems`),
+  where both `safeDeleteItem` and the dialog delete through `TitanActor#deleteItem`, so an equipped armor or shield
+  is un-equipped first.
 
 **Item sheets**
 

@@ -711,6 +711,11 @@ static `actions` map. To refresh a dynamic control's icon/label after a state ch
 
 ## Other gotchas
 
+- **`structuredClone` rejects `$state` proxies** — a value read from `$state` (a `$bindable` array of options, for
+  example) must be copied with `$state.snapshot(...)` before it is assigned into data that is later passed to
+  `structuredClone` or a document update (measured: `EditTraitsDialogBase` threw `could not be cloned` until it
+  snapshotted the trait options; `.superpowers/sdd/test-suite-rewrite/phase-3/gate120-before-fix.log`).
+
 - **`localize()` wrapper** — All i18n calls go through `src/helpers/utility-functions/Localize.js` rather than
   calling `game.i18n.localize` directly. It automatically prepends `"LOCAL."` and appends `".text"` to the key,
   so `localize('attackCheck')` resolves to `game.i18n.localize('LOCAL.attackCheck.text')`.
@@ -801,8 +806,13 @@ flow-made documents with zero uncaught page errors and no `LOCAL.` text; the col
 portrait pick through Foundry's file picker; opening a sheet from the directory; the Edit Unique ID dialog),
 `sheet-header.spec.js` (the window-header controls menu, the inline header buttons, unlinking from the sheet a token
 double-click opens, and the `ReactiveDocument` identity pin), `interaction-rolls.spec.js` (each `roll<Type>Check`
-posts a chat message of the expected subtype (`message.type`) and the card renders), and `interaction-dialogs.spec.js`
-(check/confirm/trait dialogs mount). `tests/e2e/harness.js` provides `test`, `expect` and
+posts a chat message of the expected subtype (`message.type`) and the card renders), `character-sheet-rows.spec.js`
+(the Abilities, Spells, Inventory and Effects rows of one flow-made actor: a functional sweep per item type, rows
+following edits made in the item or effect sheet, delete confirmation and the confirmation-off path, check tag parity
+across the item sheet, the character sheet and the Effect HUD), `custom-traits.spec.js` (the Add Custom Trait dialog,
+the tag's edit and delete icons, the tooltip, on items and effects), `sheet-filters.spec.js` (the name filters of the
+character sheet tabs and of the item Checks tab) and `character-sheet-layout.spec.js` (Skills row geometry, sidebar
+labels, browser zoom on the shared bulk actor). `tests/e2e/harness.js` provides `test`, `expect` and
 `flushPageErrors`; `tests/e2e/join.js` (no test-runner imports, so the setup, teardown and census load it without
 `harness.js`) provides `joinWorld`, `trackWorldPage`, `flushPageErrors` and `takeUncheckedErrors`; `tests/e2e/fixtures.js`
 re-exports `joinWorld` and provides `login`, `openSheetByUuid(page, uuid)` (`fromUuid` then `sheet.render`, waits for
@@ -963,10 +973,11 @@ through the API. Flows: `createActor` (Actors tab Create button and core dialog)
 Abilities/Spells tab add button or the Inventory tab's add button and its item-type dialog, then the new item is
 renamed in its own sheet opened by the row's Edit button), `dragItemOntoSheet` (drags an Items-tab entry onto the
 open actor sheet), `addEffect` (the Effects tab add button, the effect renamed in its sheet, and optionally its
-duration type chosen in the sheet header), `addCheck` (the Checks tab add button, then the row's label input),
+duration type chosen in the sheet header), `addCheck` (the Checks tab add button, then the row's label input and,
+when asked, its Resolve Cost input, Resistance Check select and Opposed Check box),
 `addRulesElement` (the Rules Elements tab add button, the operation select, and the `ccm-*` selects and value input
 of a conditional check modifier), `createWorldItem`, `addCustomTrait`, `addAttack`, `enableAspect` and
-`addCustomAspect` (the Add Custom Trait dialog, the weapon Attacks tab add button, the spell Standard Aspects
+`addCustomAspect` (the Add Custom Trait dialog with an optional description, the weapon Attacks tab add button, the spell Standard Aspects
 toggle with its option toggles and resistance select, the spell Custom Aspects tab add button), `pickPortrait` (the
 sheet's portrait button opens Foundry's own file picker, the Core Data tab is chosen when it is not the open one (the
 picker of a player actor opened on the User Data tab: `.superpowers/sdd/test-suite-rewrite/phase-2/review-measure-1.log`, `actor picker tabs`),
@@ -982,9 +993,10 @@ determined (`.superpowers/sdd/test-suite-rewrite/phase-2/review-measure-2.log`);
 controlled tokens: measured on a scene with `tokenVision` true, a second token had `visible` false while the first
 was controlled and `visible` true after Escape, and with `tokenVision` false it stayed visible while the first was
 controlled (`.superpowers/sdd/test-suite-rewrite/phase-2/review-measure-1.log`, `A controlled`, `after Escape`, `tokenVision false`), and a token that is
-not visible takes no pointer events), `toggleTokenLink` and `unlinkPlacedToken` (the sheet header buttons; `unlinkPlacedToken` moves the pointer
-onto the token and waits for `token.object.hover` before the double-click that opens the sheet, then waits for the
-reopened synthetic actor's sheet), `createCompendium` / `setCompendiumLocked` (Compendium tab Create dialog, entry
+not visible takes no pointer events), `toggleTokenLink`, `unlinkPlacedToken` and `controlPlacedToken` (the sheet header buttons; the token flows close the
+open windows, release control, move the pointer onto the token and wait for `token.object.hover` before the
+double-click that opens the sheet (`unlinkPlacedToken`, which then waits for the reopened synthetic actor's sheet) or
+the click that takes control (`controlPlacedToken`)), `createCompendium` / `setCompendiumLocked` (Compendium tab Create dialog, entry
 context menu Lock/Unlock), `putInPack` (opens the pack's popout window and drags the world entry onto its
 `.directory-list`; the pack index is polled for the new id; the caller passes the world entry's locator, and the flow
 reopens that entry's sidebar tab before the drag). The creation dialogs are `DialogV2` forms whose content
@@ -1003,7 +1015,7 @@ Resilience resistance; stored values: `.superpowers/sdd/test-suite-rewrite/phase
 dragged onto its sheet); `situationalActor` (a player owning an ability with a conditional dice +2, a conditional
 Advantage and a conditional dice +1 situation); `bulkActor` (30 abilities, an equipment with 30 checks and an effect
 with 30 rules elements; built in 69.1 s in one run, `.superpowers/sdd/test-suite-rewrite/phase-2/review-measure-1.log`, `build bulkActor`, so its first
-consumer raises its own timeout; at the default zoom the 30 abilities overflow the actor sheet's Abilities tab, 1976 px
+consumer (`character-sheet-layout.spec.js`'s browser zoom describe) raises its own timeout; at the default zoom the 30 abilities overflow the actor sheet's Abilities tab, 1976 px
 of content in 563 px, `.superpowers/sdd/test-suite-rewrite/phase-2/review-measure-3.log`; the equipment's checks and the effect's rules elements were not
 measured for overflow); `scene` (created and
 viewed); `trayPack` (an unlocked `ActiveEffect` pack holding one effect). `playwright.config.mjs` sets
@@ -1149,7 +1161,25 @@ and time out. Sheet tabs are clicked with `openSheetTab(page, label)` (`tests/e2
 `.application.titan-document-sheet .tab-list`). A HUD category persists open across tests and clicking an open
 category closes it; Escape with no flyout open falls through to Foundry and releases token control.
 
-**E2E browser-zoom emulation** — `sheet-zoom.spec.js` emulates page zoom z through a CDP session:
+**E2E sheet-row tests (`character-sheet-rows`, `sheet-filters`, `custom-traits`, `character-sheet-layout`)** — measured
+while writing them:
+- A document's sheet instance keeps each row's expanded state and each tab's filter text across renders, so closing the
+  window does not reset them: a helper clicks an expander only on a collapsed row, and a test empties the filters it
+  reads first.
+- An edit that must reach an open row is made in the item or effect sheet opened by the row's Edit button (header
+  inputs found by their label; `NumberInput` commits on the native change event, so `fill` then `blur`, and a store read
+  after it needs a poll). An effect sheet's initiative input slides in beside the remaining input, so wait for both.
+- The weapon item sheet renders more than one `.sidebar` element; trait tags are read in the one that holds the
+  trait's delete icon. A skill row's check button contains its own `.stat`, so the training inputs are under
+  `.stats .stat`. A row's Equipped toggle is in its controls and, for an item with checks or attacks, also in its
+  expanded content.
+- A refused delete (a `preDelete<Document>` listener that returns false, installed in the page and removed in a
+  `finally`) is the way to reach the confirmation-off path that falls through; a listener counts the refusals so the
+  test waits for the delete to have run.
+- When a test fails, Playwright restarts the worker and runs the file's `beforeAll` again, which then finds a second
+  document of the same name and fails inside the flow; the first failure is the one to read.
+
+**E2E browser-zoom emulation** — the browser zoom tests of `character-sheet-layout.spec.js` emulate page zoom z through a CDP session:
 `Emulation.setDeviceMetricsOverride({ width: 1920 / z, height: 1080 / z, deviceScaleFactor: z })`. Foundry
 re-clamps and repositions open windows after the resize, so layout assertions poll until they settle.
 

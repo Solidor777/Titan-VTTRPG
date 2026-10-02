@@ -1035,23 +1035,33 @@ test.describe('deleting rows', () => {
       }
    });
 
-   test('deleting an equipped armor row raises no error and un-equips it', async () => {
-      const id = await createOwnedItem(page, actorId, 'armor', 'E2E Rows Worn Armor');
-      const uuid = `${actorUuid}.Item.${id}`;
-      const sheet = await openActorTab('Inventory');
-      const row = itemRow(sheet, id);
-      await expandRow(row);
-      await setEquipped(row, 'armor', uuid, true);
+   for (const confirming of [
+      false,
+      true,
+   ]) {
+      test(`deleting an equipped armor row with confirmation ${confirming ? 'on' : 'off'} un-equips it quietly`,
+         async () => {
+            const id = await createOwnedItem(page, actorId, 'armor', 'E2E Rows Worn Armor');
+            const uuid = `${actorUuid}.Item.${id}`;
+            const sheet = await openActorTab('Inventory');
+            const row = itemRow(sheet, id);
+            await expandRow(row);
+            await setEquipped(row, 'armor', uuid, true);
+            await setClientSetting(page, 'confirmDeletingItems', confirming);
 
-      await row.getByRole('button', { name: 'Delete Item' }).click();
-      await expect.poll(() => actorHas('items', id), { message: 'the click deleted the armor' }).toBe(false);
-      expect(
-         await page.evaluate((actorId) => game.actors.get(actorId).system.equipped.armor, actorId),
-         'the deleted armor is no longer equipped',
-      ).toBeFalsy();
-      await expect(page.locator('#notifications .notification.error'), 'no error notification').toHaveCount(0);
-      expect(errors, `uncaught errors:\n${errors.join('\n')}`).toEqual([]);
-   });
+            await row.getByRole('button', { name: 'Delete Item' }).click();
+            if (confirming) {
+               await page.locator(CONFIRMATION).getByRole('button', { name: 'Delete Item' }).click();
+            }
+            await expect.poll(() => actorHas('items', id), { message: 'the delete removed the armor' }).toBe(false);
+            expect(
+               await page.evaluate((actorId) => game.actors.get(actorId).system.equipped.armor, actorId),
+               'the deleted armor is no longer equipped',
+            ).toBeFalsy();
+            await expect(page.locator('#notifications .notification.error'), 'no error notification').toHaveCount(0);
+            expect(errors, `uncaught errors:\n${errors.join('\n')}`).toEqual([]);
+         });
+   }
 });
 
 test.describe('owned items', () => {
