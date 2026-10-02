@@ -1480,7 +1480,8 @@ citations refer to Foundry 14.364 at `C:\FoundryVTT\V14\dev\foundry`.
 The evidence files named here are in `.superpowers/sdd/test-suite-rewrite/phase-0/` (local, not checked in). Core
 citations refer to Foundry 14.364 at `C:\FoundryVTT\V14\dev\foundry`.
 
-- **Reported:** `spell-rules-regressions.spec.js:473` raised `TypeError: Cannot set properties of null (setting
+- **Reported:** the `spell-rules-regressions.spec.js` test "the character sheet spell row and the spell chat card list
+  the displayed aspect tags by size" raised `TypeError: Cannot set properties of null (setting
   'hidden')` at `#postNotification` (`e2e-fix5e-gate.log`, `fix5e-diag-stacks-all.log`).
 - **Read:** `ChatLog#postNotification` awaits a 100 ms spacer animation, then re-queries the notification by message
   id and sets `element.hidden = false` with no null check (`client/applications/sidebar/tabs/chat.mjs:1296-1304`), and
@@ -1496,7 +1497,7 @@ citations refer to Foundry 14.364 at `C:\FoundryVTT\V14\dev\foundry`.
   document (the probe used a base message), but no run without TITAN loaded was made.
 - **Fixed:** 2026-10-02. The spec waits for the notification to be shown
   (`#chat-notifications .message[data-message-id=...]:not([hidden])`) before it deletes the card.
-- **Gate test:** `spell-rules-regressions.spec.js:473`. Before: failed in 3 of 3 runs
+- **Gate test:** the same `spell-rules-regressions.spec.js` test. Before: failed in 3 of 3 runs
   (`fix6-before-spell-rules-regressions-run1.log` to `-run3.log`). After: the file passed 9 of 9 in each of 3 runs
   (`fix6-after-spell-rules-regressions-run1.log` to `-run3.log`); full e2e 656 of 656 (`e2e-fix6-gate.log`).
 
@@ -1727,3 +1728,32 @@ The evidence files named here are in `.superpowers/sdd/test-suite-rewrite/phase-
   harness failed the test on a core `ClientDatabaseBackend##preCreateDocumentArray` validation error for the actor
   data it tried to add as an item (`actor-folder-old-code.log`, a temporary spec run once). After: 13 of 13 passed on a
   build made after the edit (`build-107.log`, `drag-3.log`).
+
+### 127. An owned item dropped on another row of its own actor's sheet threw and sorted nothing
+
+The evidence files named here are in `.superpowers/sdd/test-suite-rewrite/phase-3/` (local, not checked in).
+
+- **What:** `TitanActorSheet#_onSortItem` (`src/document/types/actor/sheet/TitanActorSheet.js`) has four faults, read:
+  it looks the source up with `items.get(itemData.id)` while `_onDropItem` passes `item.toObject()`, which carries `_id`
+  and no `id`, so `source` is undefined; it sorts only `if (source.id === target.id)`, the inverse of core's
+  `if ( source.id === target.id ) return;` (Foundry 14.364, `client/applications/sheets/actor-sheet.mjs:384`); it writes
+  the sort updates with `update.id` where `updateEmbeddedDocuments` needs `_id`; and it calls the deprecated global
+  `SortingHelpers`. Measured live with a real drag: dragging the Copy UUID button of an owned weapon's sheet (a drag
+  source for the item, core `document-sheet.mjs` `_renderFrame`) onto another weapon row raised "Cannot read properties
+  of undefined (reading 'id')" and the order stayed as it was (`gate127-before-fix.log`).
+- **Reach:** a character sheet's own rows reorder through the list's drop zone, which stops the event, so the drop
+  reaches this method only for an owned item dragged from somewhere else (read: `CharacterSheetItemList.svelte` and
+  `CharacterSheetMultiItemList.svelte` write `toDragData()` payloads and `reorderDropZone` handles only an active grip
+  drag). The other drop paths of the sheet were read: `_onDropActiveEffect` returns at once for an effect of this actor,
+  `_onDropFolder` is CLOSED_BUGS #107, and `_onDropItem` creates a copy for any other actor's item.
+- **Found:** 2026-10-02 in the review of Phase 3 Part B.
+- **Fixed:** `_onSortItem` reads `itemData._id`, returns false when there is no source, row or target, and writes
+  `_id` on each update; it calls `foundry.utils.performIntegerSort`. Its direction is core's automatic one (read:
+  `client/utils/helpers.mjs:277`): before the target when the dropped item's sort is greater, else after it. The
+  weapons start with equal sorts, so the first drop lands after the target (measured: first live gate run, sorts
+  printed 100000/300000/200000 for rows first/second/third after a drop of the third on the first).
+- **Gate:** `drag.spec.js` "a weapon dragged from its own sheet onto another row sorts it relative to that row".
+  Before the fix (`gate127-before-fix.log` for the first version of the test, `gate127-before-fix-final-test.log` for
+  the final test): failed with the page error "Cannot read properties of undefined (reading 'id')". After
+  (`gate127-after-fix.log`): passed.
+- **Status:** Closed 2026-10-02.

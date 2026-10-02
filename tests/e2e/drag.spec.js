@@ -284,7 +284,7 @@ test.describe('character sheet lists', () => {
          'data-effect-id',
       ],
    ]) {
-      test(`dragging a ${label} row's grip to the end and back stores the sort order`, async () => {
+      test(`dragging a row's grip in the ${label} list to the end and back stores the sort order`, async () => {
          /** @type {import('@playwright/test').Locator} The character's sheet. */
          const sheet = await openSheetByUuid(page, characterUuid);
          await sheet.locator('.tab-list').getByText(tab, { exact: true }).first().click();
@@ -345,6 +345,97 @@ test.describe('character sheet lists', () => {
          expect(errors, `uncaught errors:\n${errors.join('\n')}`).toEqual([]);
       });
    }
+
+   test('a weapon dragged from its own sheet onto another row sorts it relative to that row', async () => {
+      /** @type {import('@playwright/test').Locator} The character's sheet on the Inventory tab. */
+      const sheet = await openSheetByUuid(page, characterUuid);
+      await sheet.locator('.tab-list').getByText('Inventory', { exact: true }).first().click();
+
+      /** @type {import('@playwright/test').Locator} The weapon rows. */
+      const rows = sheet.locator('li.reorder-row[data-item-id]');
+      await expect(rows, 'three rows render').toHaveCount(3);
+
+      /**
+       * Reads the stored weapon ids in sort order.
+       * @returns {Promise<string[]>} The ids of the character's weapons, by their `sort`.
+       */
+      const storedIds = () => page.evaluate(
+         async (uuid) => (await fromUuid(uuid)).items
+            .filter((item) => item.type === 'weapon')
+            .sort((a, b) => a.sort - b.sort)
+            .map((item) => item.id),
+         characterUuid,
+      );
+
+      /** @type {string[]} The weapon ids before any drag. */
+      const [first, second, third] = await rows.evaluateAll(
+         (elements) => elements.map((element) => element.dataset.itemId),
+      );
+
+      /**
+       * Drags an owned weapon's Copy UUID button, which is a drag source for the item (read: core
+       * `DocumentSheetV2#_renderFrame`), onto a row of the actor's sheet. This is a drop of an owned item that no list
+       * zone owns, so the sheet's own drop handler sorts it.
+       * @param {string} itemId - The id of the owned weapon whose item sheet supplies the drag.
+       * @param {import('@playwright/test').Locator} row - The row the weapon is dropped on.
+       * @returns {Promise<void>} Resolves once the drop has been dispatched.
+       */
+      const dropOwnSheetOn = async (itemId, row) => {
+         /** @type {import('@playwright/test').Locator} The weapon's item sheet. */
+         const itemSheet = await openSheetByUuid(page, `${characterUuid}.Item.${itemId}`);
+
+         // The two windows open on top of each other, so they are moved apart (a window position is not a document).
+         await page.evaluate(([itemSheetId, actorSheetId]) => {
+            foundry.applications.instances.get(itemSheetId).setPosition({ left: 10 });
+            foundry.applications.instances.get(actorSheetId).setPosition({ left: 900 });
+         }, [
+            await itemSheet.getAttribute('id'),
+            await sheet.getAttribute('id'),
+         ]);
+         await itemSheet.locator('button[data-action="copyUuid"]').dragTo(row, {
+            targetPosition: {
+               x: 20,
+               y: 3,
+            },
+         });
+         await itemSheet.locator('header.window-header [data-action="close"]').click();
+      };
+
+      // Core's sort direction is automatic (read: Foundry 14.364 `performIntegerSort`, `client/utils/helpers.mjs:277`):
+      // the dropped item goes before the target when its sort is greater than the target's, otherwise after it. The
+      // weapons start with equal sorts, so the first drop lands after the target.
+      await dropOwnSheetOn(third, rows.nth(0));
+      await expect.poll(storedIds, { message: 'a drop on a row of equal sort sorted the weapon after it' }).toEqual([
+         first,
+         third,
+         second,
+      ]);
+
+      // The sorts are now distinct, so a weapon below the target goes before it.
+      await dropOwnSheetOn(second, rows.nth(0));
+      await expect.poll(storedIds, { message: 'a drop on a row of lower sort sorted the weapon before it' }).toEqual([
+         second,
+         first,
+         third,
+      ]);
+      await expect.poll(
+         () => rows.evaluateAll((elements) => elements.map((element) => element.dataset.itemId)),
+         { message: 'the rendered list follows' },
+      ).toEqual([
+         second,
+         first,
+         third,
+      ]);
+      expect(errors, `uncaught errors:\n${errors.join('\n')}`).toEqual([]);
+
+      // The grip puts the weapon back after the first, which restores the list for the next test.
+      await dragGrip(rows.nth(0), rows.nth(1), 'bottom');
+      await expect.poll(storedIds, { message: 'the grip drag restored the order' }).toEqual([
+         first,
+         second,
+         third,
+      ]);
+   });
 });
 
 test.describe('item sheet lists', () => {
@@ -366,7 +457,7 @@ test.describe('item sheet lists', () => {
          () => sourceSpellUuid,
       ],
    ]) {
-      test(`dragging a ${kind} row's grip to the end and back reorders the list`, async () => {
+      test(`dragging a row's grip in the ${kind} list to the end and back reorders the list`, async () => {
          /** @type {import('@playwright/test').Locator} The rows of the list. */
          const rows = (await openList(uuid(), kind)).locator('li.reorder-row');
          await expect(rows, 'three rows render').toHaveCount(3);
@@ -521,7 +612,7 @@ test.describe('copying a row between item sheets', () => {
          () => targetSpellUuid,
       ],
    ]) {
-      test(`dropping a ${kind} row on another sheet's list copies it with a fresh uuid and leaves the source intact`,
+      test(`dropping a row of the ${kind} list on another sheet's list copies it with a fresh uuid`,
          async () => {
             /** @type {object[]} The source entries before the drop. */
             const sourceBefore = await readEntries(sourceUuid(), property);
@@ -636,15 +727,19 @@ test.describe('copying a row between item sheets', () => {
 
          /** @type {import('@playwright/test').Locator} The target spell's custom aspect rows. */
          const rows = (await openList(targetSpellUuid, 'customAspect')).locator('li.reorder-row');
-         for (let held = (await readEntries(targetSpellUuid, 'customAspect')).length; held > before.length; held--) {
+
+         /** @type {number} The number of custom aspects the target spell still holds. */
+         let held = (await readEntries(targetSpellUuid, 'customAspect')).length;
+         while (held > before.length) {
             await rows.nth(0).getByRole('button', {
                name: 'Delete',
                exact: true,
             }).click();
+            held -= 1;
             await expect.poll(
                async () => (await readEntries(targetSpellUuid, 'customAspect')).length,
                { message: 'a copy was deleted' },
-            ).toBe(held - 1);
+            ).toBe(held);
          }
       }
    });
@@ -744,8 +839,9 @@ test.describe('dropping directory entries on an actor sheet', () => {
       const actors = await openSidebarTab(page, 'actors');
       await actors.locator(`.directory-item.folder[data-folder-id="${actorFolderId}"] > header`).dragTo(sheet);
 
-      // A later drop proves the sheet handled the Actor folder drop before it: the item drop lands after the folder
-      // drop, and the owned items are only the folder's two and the dropped one.
+      // Nothing observable marks the end of a refused drop, so the check below follows a later item drop, which is
+      // inferred to be handled after the folder drop (drops are dispatched in order; not measured). The owned items
+      // must be only the Item folder's two and the dropped one.
       await dragItemOntoSheet(page, await shared(page, 'equipment'), actorId);
       expect(await readOwned(), 'the Actor folder added nothing').toEqual([
          {
