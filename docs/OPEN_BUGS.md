@@ -124,3 +124,19 @@ Deferred/known bugs. Todos (planned work) live in `docs/TODO.md`; this file is b
 - **Found:** 2026-10-01 by a plan reviewer reading the code (Task 5 fix round 4 plan review).
 - **Status:** Open. The user deferred it on 2026-10-01 to a future document inheritance campaign
   (`docs/TODO.md`). For now GMs may edit a condition's rules elements.
+
+### 111. A condition's description edited in its sheet is ignored by the HUD and chat reports
+
+- **What, read, not run:**
+  - The Player HUD's effect detail shows an Open Sheet button for conditions too
+    (`src/ui/player-hud/elements/effects-panel/EffectsDetailBody.svelte:86-92`).
+  - The Active Effect sheet's Description tab is not gated on type
+    (`src/document/types/active-effect/sheet/ActiveEffectSheetTabs.svelte:14-29`), so a GM can edit a condition
+    effect's `description`.
+  - The HUD shows the definition text for a non-effect (`EffectsDetailBody.svelte:28-32`).
+  - Turn-start reports carry the condition's `descriptionKey`
+    (`src/document/types/actor/types/character/CharacterDataModel.js:5590-5605`).
+  - So the edit is never shown.
+- **Found:** 2026-10-01 by a reviewer of the test-suite rewrite plan.
+- **Status:** Open. The user deferred it on 2026-10-01 to the document inheritance campaign (`docs/TODO.md`), together
+  with #110.
