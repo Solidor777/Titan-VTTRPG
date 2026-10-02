@@ -20,6 +20,39 @@ export async function login(page, user = process.env.FOUNDRY_USER || DEFAULT_GM)
 }
 
 /**
+ * Opens a document's sheet by uuid (a read-side render, not a document change) and waits until its content has
+ * mounted.
+ * @param {import('@playwright/test').Page} page - The Playwright page to drive.
+ * @param {string} uuid - The document's uuid (`Actor.<id>`, `Actor.<id>.Item.<id>`, `Scene.<id>.Token.<id>`, ...).
+ * @returns {Promise<import('@playwright/test').Locator>} The sheet's window element.
+ */
+export async function openSheetByUuid(page, uuid) {
+   /** @type {string|null} The element id of the rendered sheet, or null when the uuid resolves to nothing. */
+   const appId = await page.evaluate(async (uuid) => {
+      /** @type {foundry.abstract.Document|null} The document the uuid names. */
+      const document = await fromUuid(uuid);
+      if (!document) {
+         return null;
+      }
+
+      /** @type {foundry.applications.api.ApplicationV2} The rendered sheet. */
+      const app = await document.sheet.render({ force: true });
+      await titanWait(
+         () => !!app.element?.querySelector('.window-content')?.children.length,
+         { message: 'sheet mounted' },
+      );
+      return app.id;
+   }, uuid);
+   expect(appId, `the uuid ${uuid} resolves to a document`).not.toBeNull();
+
+   // An attribute selector: an AppV2 id can hold characters a CSS id selector rejects.
+   /** @type {import('@playwright/test').Locator} The sheet's window element. */
+   const sheet = page.locator(`[id="${appId}"]`);
+   await expect(sheet).toBeVisible();
+   return sheet;
+}
+
+/**
  * Render a single document's sheet inside the live world and assert it appears with no uncaught page
  * errors.
  *
