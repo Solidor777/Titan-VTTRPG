@@ -46,7 +46,7 @@
   `waitForFunction`, `titanWait`, `toPass`, and explicit `timeout:` values on assertions and actions) has a ceiling of
   at most 1000 ms. A wait that needs longer is a defect to find and fix, not a ceiling to raise. World boot, login,
   page reload, the build, the `actionTimeout` safety net and per-test limits wait on a process starting and are
-  outside this rule.
+  outside this rule. So is the one real-hover test, which waits out the product's own hover-delay timer.
 
 ## Fable-class models
 
