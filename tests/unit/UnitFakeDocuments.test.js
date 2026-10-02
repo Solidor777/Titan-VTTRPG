@@ -9,11 +9,12 @@ import maskSource from './helpers/maskSource.js';
 // documents"). A fake document that accepts writes stands in for a live document, so this guard finds every unit
 // source that builds a fake write surface and requires it to be listed in `tests/unit/fake-documents.allowlist.json`.
 //
-// A fake write surface is a document write method bound by the test — an object-literal key whose value is not a
-// boolean, null, number, string, object or array; an object-literal or class method; a member assignment; or a
-// `vi.spyOn` — named `create`, `createDocuments`, `update`, `delete`, `createEmbeddedDocuments`,
+// A fake write surface is a document write method bound by the test — an object-literal key or class field whose
+// value is not a boolean, null, number, string, object or array; an object-literal or class method; a member
+// assignment; or a `vi.spyOn` — named `create`, `createDocuments`, `update`, `delete`, `createEmbeddedDocuments`,
 // `deleteEmbeddedDocuments`, `updateEmbeddedDocuments`, `createEffects`, `updateEffects`, `deleteEffects` or
-// `deleteItems`, or an object-literal `_source` key.
+// `deleteItems`, or an object-literal `_source` key. A key, method or field name may be bare, quoted, or a computed
+// string key such as `['update']`.
 //
 // The allowlist has two kinds. A permitted entry names the clause of the rule that allows the file's fakes. A burn-down
 // entry names the rewrite phase that deletes the file; the guard reads the current phase from `tests/unit/phase.json`
@@ -21,7 +22,9 @@ import maskSource from './helpers/maskSource.js';
 // file that is not listed, and on a listed file that is gone or no longer matches.
 //
 // Known limits of the scan: comments are skipped, string contents are not, and the masking limits of
-// `helpers/maskSource.js` apply (a regular-expression literal is not recognized).
+// `helpers/maskSource.js` apply (a regular-expression literal is not recognized). A name the scan cannot read in place
+// is not found: a computed key held in a variable (`[key]`), an accessor (`get update()`), and a binding made through
+// `Object.defineProperty`, `Reflect.set`, `Object.assign` from another object, or a spread.
 
 /** @type {string} The unit test directory. */
 const UNIT_DIRECTORY = path.dirname(fileURLToPath(import.meta.url));
@@ -36,7 +39,7 @@ const PHASE_PATH = path.join(UNIT_DIRECTORY, 'phase.json');
 const GUARD_SOURCE = 'UnitFakeDocuments.test.js';
 
 /** @type {string} The document write methods a fake may not bind, as a regular-expression alternation. */
-const WRITE_KEYS = [
+const WRITE_NAMES = [
    'createEmbeddedDocuments',
    'deleteEmbeddedDocuments',
    'updateEmbeddedDocuments',
@@ -51,6 +54,13 @@ const WRITE_KEYS = [
 ].join('|');
 
 /**
+ * @type {string} A write method's name as written in an object-literal key or a method: bare, quoted, or a computed
+ * string key such as `['update']`. Its named groups hold the quotes, so a pattern may use it once.
+ */
+const WRITE_KEY = `(?:(?<keyQuote>['"]?)(?:${WRITE_NAMES})\\k<keyQuote>`
+   + `|\\[\\s*(?<computedQuote>['"\`])(?:${WRITE_NAMES})\\k<computedQuote>\\s*\\])`;
+
+/**
  * @typedef {object} FakeSurfacePattern
  * @property {string} kind - What the pattern finds.
  * @property {RegExp} regex - The global regular expression that finds it.
@@ -63,7 +73,7 @@ const FAKE_SURFACE_PATTERNS = [
       // `case 'update':` label are not keys. The guard then drops a key whose value is not a function (see
       // `NON_FUNCTION_VALUE`), so an options object such as `{ diff: false, update: true }` is not a fake.
       kind: 'object-literal key',
-      regex: new RegExp(`(?<=[{,]\\s*)(['"]?)(?:${WRITE_KEYS})\\1\\s*:(?!:)`, 'g'),
+      regex: new RegExp(`(?<=[{,]\\s*)${WRITE_KEY}\\s*:(?!:)`, 'g'),
    },
    {
       // A `_source` key in an object literal, whatever its value: a fake document's stored data.
@@ -76,17 +86,32 @@ const FAKE_SURFACE_PATTERNS = [
       // parameter list, which a call statement never does.
       kind: 'method',
       regex: new RegExp(
-         `(?<=(?:^|[{},;])[ \\t\\r\\n]*)(?:static\\s+)?(?:async\\s+)?(?:\\*\\s*)?(?:${WRITE_KEYS})\\s*\\(`,
+         `(?<=(?:^|[{},;])[ \\t\\r\\n]*)(?:static\\s+)?(?:async\\s+)?(?:\\*\\s*)?${WRITE_KEY}\\s*\\(`,
+         'gm',
+      ),
+   },
+   {
+      // A class field, bare or quoted, with an optional `static`: it follows a `{`, `}` or `;` or starts a line. The
+      // same shape also finds a destructuring default and an assignment statement that bind a write method's name.
+      // As for a key, the guard drops a field whose value is not a function. A computed field (`['update'] = …`) is a
+      // member assignment.
+      kind: 'class field',
+      regex: new RegExp(
+         `(?<=(?:^|[{};])[ \\t\\r\\n]*)(?:static\\s+)?(?<fieldQuote>['"]?)(?:${WRITE_NAMES})\\k<fieldQuote>`
+            + '\\s*=(?![=>])',
          'gm',
       ),
    },
    {
       kind: 'member assignment',
-      regex: new RegExp(`(?:\\.\\s*(?:${WRITE_KEYS})|\\[\\s*(['"])(?:${WRITE_KEYS})\\1\\s*\\])\\s*=(?![=>])`, 'g'),
+      regex: new RegExp(
+         `(?:\\.\\s*(?:${WRITE_NAMES})|\\[\\s*(['"\`])(?:${WRITE_NAMES})\\1\\s*\\])\\s*=(?![=>])`,
+         'g',
+      ),
    },
    {
       kind: 'vi.spyOn',
-      regex: new RegExp(`\\bvi\\s*\\.\\s*spyOn\\s*\\([^,]+,\\s*(['"\`])(?:${WRITE_KEYS})\\1`, 'g'),
+      regex: new RegExp(`\\bvi\\s*\\.\\s*spyOn\\s*\\([^,]+,\\s*(['"\`])(?:${WRITE_NAMES})\\1`, 'g'),
    },
 ];
 
@@ -151,7 +176,8 @@ function findFakeSurfaces(source) {
    const found = [];
    for (const { kind, regex } of FAKE_SURFACE_PATTERNS) {
       for (const match of masked.matchAll(regex)) {
-         if (kind === 'object-literal key' && NON_FUNCTION_VALUE.test(masked.slice(match.index + match[0].length))) {
+         if ((kind === 'object-literal key' || kind === 'class field')
+            && NON_FUNCTION_VALUE.test(masked.slice(match.index + match[0].length))) {
             continue;
          }
          if (kind === 'method') {
@@ -187,6 +213,15 @@ describe('unit fake documents', () => {
          'class FakeActor {\n   get name() {\n      return \'a\';\n   }\n'
             + '   async update(data) {\n      return data;\n   }\n}',
          'class FakePack {\n   static async createDocuments(data) {\n      return data;\n   }\n}',
+         'class FakeActor {\n   update = vi.fn();\n}',
+         'class FakePack {\n   static create = async (data) => data;\n}',
+         'class FakeActor {\n   \'delete\' = mockDelete;\n}',
+         'const actor = { [\'update\']: vi.fn() };',
+         'const pack = { [`createDocuments`]: async (data) => data };',
+         'class FakeActor {\n   [\'update\'](data) {\n      return data;\n   }\n}',
+         'class FakePack {\n   static [\'create\'] = vi.fn();\n}',
+         'const doc = { \'update\'(data) {\n   return data;\n} };',
+         'class FakeActor {\n   async "deleteEffects"(ids) {\n      return ids;\n   }\n}',
       ];
       for (const source of fakes) {
          expect.soft(findFakeSurfaces(source), source).toHaveLength(1);
@@ -209,6 +244,11 @@ describe('unit fake documents', () => {
          'await actor.update(data, { diff: false, update: true });',
          'const options = { update: { system: {} }, create: \'x\', delete: [1] };',
          'update(data)\n{\n   x();\n}',
+         'class Options {\n   update = true;\n   static create = null;\n}',
+         'const flags = { [\'update\']: false };',
+         'if ([\'update\', \'delete\'].includes(kind)) {\n   x();\n}',
+         'items.forEach((update) => apply(update));',
+         'if (update === other) {\n   x();\n}',
       ];
       for (const source of others) {
          expect.soft(findFakeSurfaces(source), source).toEqual([]);
