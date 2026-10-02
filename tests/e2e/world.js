@@ -90,20 +90,69 @@ export async function clearChat(page) {
    });
 }
 
+/** @type {WeakMap<import('@playwright/test').Page, string[][]>} The error collectors attached to each page. */
+const PAGE_ERROR_COLLECTORS = new WeakMap();
+
+/** @type {WeakSet<import('@playwright/test').Page>} The pages whose hook-error reporting is installed. */
+const HOOK_ERROR_PAGES = new WeakSet();
+
+/**
+ * Installs hook-error reporting on a page before its first navigation (`login` calls it). Core catches a hook
+ * listener's throw in `Hooks.#call` and reports it through `Hooks.onError`, which logs it and calls the `error` hook;
+ * it never reaches `pageerror` (Foundry 14.364, `client/helpers/hooks.mjs:158-168, 182-188`). An init script, run on
+ * every document load, registers an `error` hook listener the moment core assigns the `Hooks` global
+ * (`client/client.mjs` assigns it with `Object.assign(globalThis, …)`, which calls a setter), so no hook fires before
+ * it. Each reported error is pushed to every collector `attachPageErrors` attached to the page. Only errors reported
+ * through `Hooks.onError` are collected, never other console output.
+ * @param {import('@playwright/test').Page} page - A page that has not navigated yet.
+ * @returns {Promise<void>} Resolves once the binding and the init script are registered.
+ */
+export async function installHookErrorReporting(page) {
+   if (HOOK_ERROR_PAGES.has(page)) {
+      return;
+   }
+   HOOK_ERROR_PAGES.add(page);
+   await page.exposeBinding('titanReportHookError', (source, message) => {
+      for (const errors of PAGE_ERROR_COLLECTORS.get(page) ?? []) {
+         errors.push(message);
+      }
+   });
+   await page.addInitScript(() => {
+      /** @type {object | undefined} The core `Hooks` class, once assigned. */
+      let hooks;
+      Object.defineProperty(globalThis, 'Hooks', {
+         configurable: true,
+         enumerable: true,
+         get: () => hooks,
+         set: (value) => {
+            hooks = value;
+            value.on('error', (location, error) => {
+               void globalThis.titanReportHookError(`Hooks.onError (${location}): ${error?.message}`);
+            });
+         },
+      });
+   });
+}
+
 /**
  * Attach a single page-error collector to the shared page and return its backing array. Wire this ONCE in
  * the spec's `beforeAll`; clear it each `afterEach` (`errors.length = 0`) so each test still asserts
  * "no uncaught errors during MY actions". Replaces per-test `page.on('pageerror', …)` listeners, which
- * would otherwise stack on a reused page.
+ * would otherwise stack on a reused page. The array also receives every error core reports through
+ * `Hooks.onError` on the page from then on (`installHookErrorReporting`, which `login` installs).
  * @param {import('@playwright/test').Page} page - The shared page.
- * @returns {string[]} The live array of collected uncaught-error messages.
+ * @returns {string[]} The live array of collected uncaught-error and hook-error messages.
  */
 export function attachPageErrors(page) {
-   /** @type {string[]} The collected uncaught page-error messages. */
+   /** @type {string[]} The collected uncaught page-error and hook-error messages. */
    const errors = [];
    page.on('pageerror', (error) => {
       errors.push(error.message);
    });
+   PAGE_ERROR_COLLECTORS.set(page, [
+      ...PAGE_ERROR_COLLECTORS.get(page) ?? [],
+      errors,
+   ]);
    return errors;
 }
 

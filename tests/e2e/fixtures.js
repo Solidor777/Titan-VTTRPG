@@ -1,6 +1,7 @@
 import { expect } from '@playwright/test';
 import { DEFAULT_GM } from './users.js';
 import { installPoll } from './poll.js';
+import { attachPageErrors, installHookErrorReporting } from './world.js';
 
 /**
  * Authenticate against the live Foundry v14 `/join` screen and wait for the
@@ -17,8 +18,10 @@ import { installPoll } from './poll.js';
  */
 export async function login(page, user = process.env.FOUNDRY_USER || DEFAULT_GM) {
 
-   // Install the in-page poll helper before navigating (addInitScript runs on document load).
+   // Install the in-page poll helper and hook-error reporting before navigating (addInitScript runs on document
+   // load).
    await installPoll(page);
+   await installHookErrorReporting(page);
 
    // Navigate to the join screen and select the configured user.
    await page.goto('/join');
@@ -46,17 +49,12 @@ export async function login(page, user = process.env.FOUNDRY_USER || DEFAULT_GM)
  * @param {string} locateSrc - Stringified locator: a function returning the document.
  * @param {string} expectedSelector - CSS selector the rendered sheet must expose.
  * @param {string[]} [errors] - Optional shared page-error collector (from `attachPageErrors`). When
- * omitted, a local listener is attached for this single render (legacy/unmigrated behavior).
+ * omitted, a collector is attached for this single render (legacy/unmigrated behavior).
  * @returns {Promise<void>} Resolves once the sheet is visible and asserted error-free.
  */
 export async function renderSheet(page, locateSrc, expectedSelector, errors) {
-   // Use the shared collector when supplied; otherwise attach a local one for this render only.
-   const localErrors = errors ?? [];
-   if (!errors) {
-      page.on('pageerror', (err) => {
-         localErrors.push(err.message);
-      });
-   }
+   // Use the shared collector when supplied; otherwise attach one for this render (page and hook errors).
+   const localErrors = errors ?? attachPageErrors(page);
 
    // Locate the document and trigger its sheet render inside the Foundry runtime.
    const found = await page.evaluate(async (src) => {
