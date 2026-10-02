@@ -366,43 +366,24 @@ export default class CharacterDataModel extends TitanActorDataModel {
    }
 
    /**
-    * Called before an Item is removed from this Actor.
+    * Called after an Item is removed from this Actor: an equipped Armor or Shield that was deleted is un-equipped.
+    * Runs only after a confirmed delete, so a refused delete leaves the equipped slot alone.
     * @override
-    * @param {TitanItem} item - The Item being deleted.
+    * @param {string} id - The ID of the Item that was deleted.
+    * @param {string} type - The Type of the Item that was deleted.
+    * @returns {Promise<void>} Resolves once the slot is cleared.
     */
-   async preDeleteItem(item) {
+   async postDeleteItem(id, type) {
       if (assert(
          this.parent.isOwner,
          'Cannot modify document %s if not owner.',
          this.parent.name,
-      ) && assert(
-         this.parent.uuid === item.parent?.uuid,
-         'Cannot delete item %s: it is not owned by actor %s.',
-         item.name,
-         this.parent.name,
       )) {
-
-         // Perform type specific deletion operations.
-         switch (item.type) {
-
-            // Un-equip armor before deletion.
-            case 'armor': {
-               if (this.equipped.armor === item._id) {
-                  return this.unEquipArmor();
-               }
-               break;
-            }
-
-            // Un-equip should before deletion.
-            case 'shield': {
-               if (this.equipped.shield === item._id) {
-                  return this.unEquipShield();
-               }
-               break;
-            }
-            default: {
-               break;
-            }
+         if (type === 'armor' && this.equipped.armor === id) {
+            await this.unEquipArmor();
+         }
+         else if (type === 'shield' && this.equipped.shield === id) {
+            await this.unEquipShield();
          }
       }
    }

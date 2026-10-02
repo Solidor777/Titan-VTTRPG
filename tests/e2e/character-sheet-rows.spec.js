@@ -1153,6 +1153,44 @@ test.describe('deleting rows', () => {
          .toBe(false);
    });
 
+   test('a refused delete of an equipped armor leaves it equipped and its row expanded', async () => {
+      const id = await createOwnedItem(page, actorId, 'armor', 'E2E Rows Refused Worn Armor');
+      const uuid = `${actorUuid}.Item.${id}`;
+      const sheet = await openActorTab('Inventory');
+      const row = itemRow(sheet, id);
+      await expandRow(row);
+      await setEquipped(row, 'armor', uuid, true);
+      await refuseDeletes('Item');
+      try {
+         await row.getByRole('button', { name: 'Delete Item' }).click();
+         await expect.poll(() => page.evaluate(() => window.__e2eRefused), { message: 'the delete was refused' })
+            .toBe(1);
+         await settleFrames();
+         expect(await actorHas('items', id), 'the refused delete left the armor').toBe(true);
+         expect.soft(
+            await page.evaluate((actorId) => game.actors.get(actorId).system.equipped.armor, actorId),
+            'the refused delete left the armor equipped',
+         ).toBe(id);
+         // The sheet keeps each row's expanded state, so a reopened sheet shows whether the delete cleared it.
+         await closeAllApps(page);
+         const reopened = itemRow(await openActorTab('Inventory'), id);
+         await expect.soft(reopened.locator('.expandable-content'), 'the refused delete left the row expanded')
+            .toBeVisible();
+      }
+      finally {
+         await allowDeletes('Item');
+      }
+
+      // With the refusal gone, the row deletes the armor and the equipped slot empties.
+      await itemRow(await openActorTab('Inventory'), id).getByRole('button', { name: 'Delete Item' }).click();
+      await expect.poll(() => actorHas('items', id), { message: 'the second delete removed the armor' }).toBe(false);
+      await expect.poll(
+         () => page.evaluate((actorId) => game.actors.get(actorId).system.equipped.armor, actorId),
+         { message: 'the deleted armor is no longer equipped' },
+      ).toBeFalsy();
+      expect(errors, `uncaught errors:\n${errors.join('\n')}`).toEqual([]);
+   });
+
    test('with confirmation on, a refused confirmed item delete leaves the item deletable', async () => {
       /** @type {string} The new item's id. */
       const id = await makeWeapon('E2E Rows Refused Confirmed Weapon');

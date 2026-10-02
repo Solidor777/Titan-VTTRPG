@@ -33,12 +33,13 @@ export default class TitanCharacterSheet extends TitanActorSheet {
    }
 
    /**
-    * Called before an Item is removed from this Actor.
+    * Called after an Item is removed from this Actor.
     * @override
-    * @param {TitanItem} item - The Item being deleted.
+    * @param {string} id - The ID of the Item that was deleted.
+    * @param {string} type - The Type of the Item that was deleted.
     */
-   preDeleteItem(item) {
-      this.applicationState.preDeleteItem(item);
+   postDeleteItem(id, type) {
+      this.applicationState.postDeleteItem(id, type);
    }
 
    /**

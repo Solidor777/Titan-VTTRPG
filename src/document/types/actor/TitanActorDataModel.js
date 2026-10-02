@@ -30,18 +30,10 @@ export default class TitanActorDataModel extends TitanDataModel {
    }
 
    /**
-    * Called before an Item is removed from this Data Model's Actor.
-    * @param {TitanItem} item - The Item being deleted.
-    * @returns {void}
-    */
-   preDeleteItem(item) {
-   }
-
-   /**
     * Called after an Item is removed from this Data Model's Actor.
     * @param {string} id - The ID of the item that was deleted.
     * @param {string} type - The Type of the item that was deleted.
-    * @returns {void}
+    * @returns {Promise<void>|void} Resolves once the follow-up work is done.
     */
    postDeleteItem(id, type) {
    }

@@ -404,13 +404,6 @@ export default class TitanActorSheet extends TitanDocumentSheet {
    }
 
    /**
-    * Called before an Item is removed from this Sheet's Actor.
-    * @param {TitanItem} item - The Item being deleted.
-    */
-   preDeleteItem(item) {
-   }
-
-   /**
     * Called after an Item is removed from this Sheet's Actor.
     * @param {string} id - The ID of the item that was deleted.
     * @param {string} type - The Type of the item that was deleted.

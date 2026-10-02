@@ -193,18 +193,14 @@ export default class TitanActor extends Actor {
                item.name,
             )) {
 
-            // Execute pre-delete operations.
-            await this.system.preDeleteItem(item);
-            this.sheet.preDeleteItem(item);
-
             // Cache the item type.
             const type = item.type;
 
-            // Delete the item.
+            // Delete the item. A refused delete changes nothing else: the follow-up work runs only after a delete.
             if (await item.safeDelete() !== false) {
 
                // Execute post-delete operations.
-               this.system.postDeleteItem(id, type);
+               await this.system.postDeleteItem(id, type);
                this.sheet.postDeleteItem(id, type);
             }
          }

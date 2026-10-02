@@ -57,14 +57,15 @@ export default function createCharacterSheetState(actor) {
    }
 
    /**
-    * Updates the reactive state store in response to an Item being deleted.
-    * @param {TitanItem} item - The Item about to be deleted.
+    * Updates the reactive state store in response to an Item having been deleted: its row's expanded state is dropped.
+    * @param {string} id - The ID of the Item that was deleted.
+    * @param {string} type - The Type of the Item that was deleted.
     */
-   function preDeleteItem(item) {
+   function postDeleteItem(id, type) {
       update((data) => {
-         switch (item.type) {
+         switch (type) {
             case 'ability': {
-               delete data.tabs.abilities.isExpanded[item._id];
+               delete data.tabs.abilities.isExpanded[id];
                break;
             }
             case 'armor':
@@ -72,11 +73,11 @@ export default function createCharacterSheetState(actor) {
             case 'equipment':
             case 'shield':
             case 'weapon': {
-               delete data.tabs.inventory.isExpanded[item._id];
+               delete data.tabs.inventory.isExpanded[id];
                break;
             }
             case 'spell': {
-               delete data.tabs.spells.isExpanded[item._id];
+               delete data.tabs.spells.isExpanded[id];
                break;
             }
             default: {
@@ -93,6 +94,6 @@ export default function createCharacterSheetState(actor) {
       update,
       subscribe,
       postAddItem,
-      preDeleteItem,
+      postDeleteItem,
    };
 }

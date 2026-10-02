@@ -292,10 +292,11 @@ export default class TitanItem extends Item {
    }
 
    /**
-    * Marks the item as being deleted before actually deleting the item
-    * so that asynchronous update operations will not apply.
+    * Marks the item as being deleted, then deletes it. While the mark is set, `TitanActor#deleteItem` refuses a second
+    * delete of the item and the character sheet's row expand button ignores clicks (these are the readers of
+    * `isMarkedForDeletion`). The mark is cleared again when the delete is refused or rejects.
     * @returns {Promise<boolean>} Resolves true once the item is deleted, or false if the deletion could not proceed or
-    * was refused.
+    * was refused. Rejects when the delete rejects.
     */
    async safeDelete() {
       if (assert(
@@ -315,20 +316,26 @@ export default class TitanItem extends Item {
             },
          });
 
-         // A refused delete (a preDelete hook returned false) resolves undefined and leaves the item in place, so the
-         // mark is cleared to keep the item deletable.
-         if (await this.delete() === undefined) {
-            await this.update({
-               flags: {
-                  titan: {
-                     isMarkedForDeletion: false,
+         /** @type {boolean} Whether the delete went through. */
+         let deleted = false;
+         try {
+            // A refused delete (a preDelete hook returned false) resolves undefined and leaves the item in place.
+            deleted = (await this.delete()) !== undefined;
+         }
+         finally {
+            // The item is still there after a refused or rejected delete: clear the mark to keep it deletable.
+            if (!deleted && this.collection?.has(this.id)) {
+               await this.update({
+                  flags: {
+                     titan: {
+                        isMarkedForDeletion: false,
+                     },
                   },
-               },
-            });
-            return false;
+               });
+            }
          }
 
-         return true;
+         return deleted;
       }
 
       return false;
