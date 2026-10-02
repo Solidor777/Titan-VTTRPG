@@ -151,17 +151,17 @@ Deferred/known bugs. Todos (planned work) live in `docs/TODO.md`; this file is b
 
 ### 114. Deactivating the viewed scene while a status's scrolling text is on screen throws
 
-Core citations below refer to Foundry 14.364 at `C:\FoundryVTT\V14\dev\foundry`, the build the server runs (the
-probe read `game.release` as 14.364). Probe evidence is in `.superpowers/sdd/test-suite-rewrite/phase-0/`
-(`probe114-*.json`, local and not checked in).
+Core citations below refer to Foundry 14.364 at `C:\FoundryVTT\V14\dev\foundry`, the build the server runs
+(`probe114-status-wait.json` records `game.release` as 14.364). The evidence files named here are in
+`.superpowers/sdd/test-suite-rewrite/phase-0/` (local and not checked in).
 
 - **Measured** (probe, `test-titan`, logged in as E2E GM 1, TITAN loaded):
   - Setup: a token's actor gains a status (`toggleStatusEffect`), which starts the 2 s scrolling text. The viewed
     scene is then deactivated at once (`scene.update({ active: false })`).
   - Result: the page throws `TypeError: Cannot read properties of null (reading 'off')` at `PreciseText.destroy` ←
     `InterfaceCanvasGroup.createScrollingText` (`client/canvas/groups/interface.mjs:174`) (`probe114-status.json`).
-- **Destroy sequence, measured:** the scrolling text is destroyed twice. A wrapper on
-  `PreciseText.prototype.destroy` recorded each call's stack:
+- **Destroy sequence, measured** (`probe114-status.json`, `probe114-core.json`): the scrolling text is destroyed
+  twice. A wrapper on `PreciseText.prototype.destroy` recorded each call's stack:
   1. The deactivation runs `Scene.unview` → `Canvas.draw` → `Canvas.tearDown` → `InterfaceCanvasGroup.tearDown`.
      Read: the group's `_tearDown` destroys every non-layer child with its children
      (`client/canvas/groups/canvas-group-mixin.mjs:172-177`, `tearDownChildren = true` at `:35`).
@@ -180,7 +180,7 @@ probe read `game.release` as 14.364). Probe evidence is in `.superpowers/sdd/tes
   - The status-toggle trigger gives the same sequence (`probe114-status.json`).
   - Every frame in both destroy stacks and in both error stacks is `foundry.mjs`, `pixi.min.js`, or the probe wrapper.
   - Read: TITAN's `src/` has no PIXI or prototype patch and no canvas tear-down hook, and `dist/index.js` has no
-    reference to `createScrollingText`, `InterfaceCanvasGroup` or `tearDownChildren`.
+    reference to `createScrollingText`, `InterfaceCanvasGroup` or `tearDownChildren` (`fix5-grep-114-titan.txt`).
 - **Not run:** a control in a world without TITAN. Every measurement above ran with TITAN loaded, so attribution to
   core is not confirmed. The user will run that control.
 - **Controls, measured:** with a 2.6 s wait before the deactivation, the text is destroyed once, from
@@ -188,5 +188,5 @@ probe read `game.release` as 14.364). Probe evidence is in `.superpowers/sdd/tes
   status toggle (`probe114-status-wait.json`).
 - **Found:** 2026-10-01 while writing the gate test of CLOSED_BUGS #113 (test-suite rewrite, Phase 0 fix round 1).
 - **Status:** Open; attribution awaits the no-TITAN control. TITAN does not patch core. The #113 gate test waits until
-  no animation runs on `canvas.interface` before it deactivates the scene; measured, without that wait it fails with
-  this error in 5 of 6 runs.
+  no animation runs on `canvas.interface` before it deactivates the scene. Measured without that wait: the spec failed
+  with this error in 6 of 6 runs (`fix5-mut114-no-scrolling-text-wait-run1.log` to `-run6.log`).

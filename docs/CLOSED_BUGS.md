@@ -1257,7 +1257,9 @@ when fixed.
   Active Effect and Folder changes. The tray is a sidebar tab built at ready, so a compendium created later in the
   session was never offered in `effect-tray-pack-select`, and a deleted one stayed listed. Measured: once the Phase 0
   sweep had removed the world pack `E2E Tray Effects`, `effect-tray.spec.js:331` failed. Its `beforeEach` re-created
-  the pack, and the select offered only `TITAN Effects Effects TITAN Effects (Copy)`.
+  the pack, and the select offered only `TITAN Effects Effects TITAN Effects (Copy)` (`e2e-phase0.log`).
+- **Evidence:** the files named in this entry are in `.superpowers/sdd/test-suite-rewrite/phase-0/` (local, not checked
+  in).
 - **Found:** 2026-10-01, Phase 0 of the test-suite rewrite.
 - **Fixed:** 2026-10-01.
   - Core citations in this entry refer to Foundry 14.364 at `C:\FoundryVTT\V14\dev\foundry`, the build the server runs.
@@ -1271,8 +1273,9 @@ when fixed.
   - `EffectTrayState` (`src/sidebar/tray/EffectTrayState.svelte.js`) now registers `renderCompendiumDirectory`. On
     each call it re-reads `getEffectCompendiums()` and replaces `compendiums` when the list differs. When the selected
     pack is gone, the selection falls back as it does on construction (`#resolveSelection`) and the tray reloads.
-  - Measured with two GM clients (probe script, not checked in): a pack created on one client appeared in both tray
-    selects, and deleting it removed it from both. The client that had it selected fell back to `TITAN Effects`.
+  - Measured with two GM clients (probe `diag112.mjs`, result `diag112.json`): a pack created on one client appeared in
+    both tray selects, and deleting it removed it from both. The client that had it selected fell back to
+    `TITAN Effects`.
   - Gated by `tests/e2e/effect-tray.spec.js` 'the tray follows a world compendium created and deleted in the Compendium
     directory, on both GM clients' (its last test). It needs no leftover state; every step uses a real control. It
     runs on the spec's E2E GM 1 page and on a second client logged in as E2E GM 2, which sees the pack change only
@@ -1284,20 +1287,29 @@ when fixed.
     - on each client it asserts the tray no longer offers the pack, has fallen back to `TITAN Effects`, and lists that
       pack's top-level folders and root effects;
     - it asserts that neither client raised a page error.
-  - Measured mutations of `EffectTrayState`, one run each; every one fails the test:
-    - the `renderCompendiumDirectory` hook renamed away: expected 1 option, received 0;
-    - no reload after the fallback: the empty-pack state is still shown;
-    - the hook skipped on E2E GM 2 only: the second client's tray never offers the pack;
-    - a throw after a pack deletion on E2E GM 1 only, then on E2E GM 2 only: the matching page-error assertion fails.
+  - Measured mutations of `EffectTrayState`, one run each, each rebuilt and then restored (script
+    `fix5-mutate-e2e.mjs`, output `fix5-mut112-*.log`):
+    - the `renderCompendiumDirectory` hook renamed away: fails, expected 1 option, received 0;
+    - no reload after the fallback: fails, the empty-pack state is still shown;
+    - the hook skipped on E2E GM 2 only: fails at the option count, expected 1, received 0. Which client's iteration
+      failed is inferred, not measured: the failure output does not name the client, and only E2E GM 2 was mutated;
+    - a throw inside the hook after a pack deletion, before the fallback, on E2E GM 1 only and then on E2E GM 2 only:
+      fails, the selection never falls back (expected `TITAN Effects`, received `undefined`); for E2E GM 2, which
+      client's iteration failed is likewise inferred;
+    - not caught: the same throw at the end of the hook, after the fallback, on either client. The test passes.
+      Read: core's `Hooks.#call` catches a listener's throw and logs it to the console
+      (`client/helpers/hooks.mjs:158-168`), so it never reaches the test's page-error assertions.
   - The test moves with the `effect-tray` rewrite (test-suite rewrite Phase 6).
 
 ### 113. `condition-description.spec.js` failed when no scene was active at its start
 
 - **What:** after the Phase 0 sweep deleted the active scene, `condition-description.spec.js:103` failed. Its
   `toggleStatusEffect` threw `TypeError: Cannot read properties of undefined (reading 'OBJECTS')` in `RenderFlags.set`,
-  and the page logged `Cannot read properties of undefined (reading 'addChild')`.
-- **Cause, measured:** a probe replayed `controlFixtureActorToken` (`tests/e2e/world.js`) from a login with no active
-  scene.
+  and the page logged `Cannot read properties of undefined (reading 'addChild')` (`e2e-phase0.log`).
+- **Evidence:** the files named in this entry are in `.superpowers/sdd/test-suite-rewrite/phase-0/` (local, not checked
+  in).
+- **Cause, measured:** a probe (`diag113.mjs`) replayed `controlFixtureActorToken` (`tests/e2e/world.js`) from a login
+  with no active scene (`diag113-a.json`).
   - Right after `Scene.create({ active: true })`: `canvas.loading` was true, `canvas.ready` was false, and
     `canvas.pendingRenderFlags` and `canvas.tokens.objects` did not exist.
   - The token created next had a placeable at once, but an unparented one. So the helper's wait for `tokenDoc.object`
@@ -1315,7 +1327,7 @@ when fixed.
   - `controlFixtureActorToken` waits for `canvas.ready && canvas.scene?.id === scene.id` (`titanWait`) before creating
     the token.
   - The same probe, waiting for the draw, threw nothing; the placeable was parented and `toggleStatusEffect`
-    succeeded.
+    succeeded (`diag113-b.json`).
   - Gated by `tests/e2e/condition-description.spec.js` 'with no scene active, the fixture token is placed on a fully
     drawn fallback scene' (its last test). It establishes and asserts its own precondition:
     - it waits until no scrolling text animates (OPEN_BUGS #114), clears the active flag of the active test scene
@@ -1325,5 +1337,7 @@ when fixed.
     - calls `controlFixtureActorToken` with a new fallback name;
     - asserts the token sits on the drawn scene's token layer;
     - applies Deafened through the token HUD, with no page error.
-  - Measured: with the helper's canvas-ready wait removed, the test fails with the `'OBJECTS'` TypeError. The helper and
-    the spec are replaced in the test-suite rewrite (Phases 5-6).
+  - Measured with the helper's canvas-ready wait removed (`fix5-mut113-no-canvas-ready-wait.log`): the test fails. Its
+    placement check finds no token placeable for the actor (`TypeError: Cannot read properties of undefined (reading
+    'center')`), the page logs the `addChild` error, and the file's teardown hits the `'OBJECTS'` TypeError in
+    `RenderFlags.clear`. The helper and the spec are replaced in the test-suite rewrite (Phases 5-6).

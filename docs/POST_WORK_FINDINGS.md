@@ -262,3 +262,13 @@ it ever bites in play, the principled fix is a per-message serial queue around
   when their `createNewId()` resolves. Measured in `test-titan` (Task 5 fix round 2): entries with their own `_id`
   came first in 3 of 3 runs, and generated ones came back reordered (for example `[C1, C3, C2]`) in 2 of 3 runs. Code
   and tests that pair created documents with their inputs must match them by id or name, never by position.
+
+## 2026-10-01 — A page-error assertion cannot see a throw inside a hook listener
+
+- **Core's `Hooks.#call` catches a listener's throw and logs it to the console** (read: Foundry 14.364
+  `client/helpers/hooks.mjs:158-168`, through `Hooks.onError`), so it never becomes a `pageerror`. Measured in Phase 0
+  fix round 5 of the test-suite rewrite: a throw added at the end of `EffectTrayState`'s `renderCompendiumDirectory`
+  listener, after its fallback, left the CLOSED_BUGS #112 gate test passing on both clients
+  (`.superpowers/sdd/test-suite-rewrite/phase-0/fix5-mut112-throw-at-end-after-deletion-on-gm1.log`, `-gm2.log`).
+  An e2e test that must prove a hook listener raised nothing needs a console-error capture as well as
+  `attachPageErrors`. Status: needs review.
