@@ -260,3 +260,93 @@ test('a turn-start report tags a turn-start effect with the Turn Start tag and i
    await expect.poll(() => entry.locator('.tag .tag').evaluate((element) => element._tippy?.props?.content))
       .toBe(report.expected);
 });
+
+/**
+ * Reloads the shared page and waits for the world to be ready again. A world boot is an inherently multi-second wait.
+ * @returns {Promise<void>} Resolves once `game.ready` holds on the reloaded page.
+ */
+async function reloadPage() {
+   await page.reload();
+   await page.waitForURL('**/game', { timeout: 15_000 });
+   await page.waitForFunction(() => globalThis.game?.ready === true, null, { timeout: 60_000 });
+}
+
+// The last test of the file: it reloads the page and leaves its new fallback scene active.
+test('with no scene active, the fixture token is placed on a fully drawn fallback scene', async () => {
+   // A world boot inside the test exceeds the 60 s default under the throttled runner.
+   test.setTimeout(120_000);
+
+   // Precondition, established here: no scene is active and the client boots with a blank canvas. Only a test scene
+   // may be deactivated, and Foundry has no control that deactivates a scene, so the flag is cleared directly. The page
+   // reloads first: deactivating the viewed scene while a status's scrolling text still animates (the earlier tests
+   // add effects) throws `Cannot read properties of null (reading 'off')` in core's `createScrollingText` when the
+   // animation ends (measured with a probe; waiting out the 2 s animation avoids it). It reloads again to boot blank.
+   /** @type {string|null} The name of the scene active at the start, if any. */
+   const activeName = await page.evaluate(() => game.scenes.active?.name ?? null);
+   expect(activeName === null || activeName.startsWith('E2E '), `the active scene is a test scene: ${activeName}`)
+      .toBe(true);
+   await reloadPage();
+   await page.evaluate(async () => {
+      await game.scenes.active?.update({ active: false });
+   });
+   await reloadPage();
+   expect(await page.evaluate(() => ({
+      active: game.scenes.active?.id ?? null,
+      viewed: canvas.scene?.id ?? null,
+   })), 'no scene is active or drawn').toEqual({
+      active: null,
+      viewed: null,
+   });
+
+   /** @type {string} A fallback scene name no earlier run used, so the helper creates and activates the scene. */
+   const sceneName = `E2E Fallback Scene ${Date.now()}`;
+   await controlFixtureActorToken(page, {
+      actorName: ACTOR_NAME,
+      fallbackSceneName: sceneName,
+   });
+
+   // The token sits on the new scene's token layer, and the canvas has finished drawing that scene.
+   /** @type {{viewed: string, ready: boolean, parented: boolean, client: {x: number, y: number}}} The placement. */
+   const placed = await page.evaluate(async (name) => {
+      /** @type {Token} The actor's token on the viewed scene. */
+      const token = canvas.tokens.placeables.find((placeable) => placeable.actor?.name === name);
+      canvas.pan({
+         x: token.center.x,
+         y: token.center.y,
+      });
+
+      // Pointer hit-testing reads the transforms of the last rendered frame, so a click is aimed only after the panned
+      // stage has rendered.
+      await new Promise((resolve) => {
+         requestAnimationFrame(() => {
+            requestAnimationFrame(resolve);
+         });
+      });
+      return {
+         viewed: canvas.scene?.name,
+         ready: canvas.ready,
+         parented: token.parent === canvas.tokens.objects,
+         client: canvas.clientCoordinatesFromCanvas(token.center),
+      };
+   }, ACTOR_NAME);
+   expect({
+      viewed: placed.viewed,
+      ready: placed.ready,
+      parented: placed.parented,
+   }).toEqual({
+      viewed: sceneName,
+      ready: true,
+      parented: true,
+   });
+
+   // Change the actor through the token HUD: the actor update re-renders the token through its render flags, the step
+   // that threw when the token was placed before the scene was drawn. The afterEach hook asserts no page error.
+   await expect.poll(() => page.evaluate((name) => game.actors.getName(name).statuses.has('deafened'), ACTOR_NAME))
+      .toBe(false);
+   await page.mouse.click(placed.client.x, placed.client.y, { button: 'right' });
+   await expect(page.locator('#token-hud')).toBeVisible();
+   await page.locator('#token-hud [data-action="togglePalette"][data-palette="effects"]').click();
+   await page.locator('#token-hud .effect-control[data-status-id="deafened"]').click();
+   await expect.poll(() => page.evaluate((name) => game.actors.getName(name).statuses.has('deafened'), ACTOR_NAME))
+      .toBe(true);
+});
