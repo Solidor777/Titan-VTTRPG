@@ -45,17 +45,22 @@ export async function openSidebarTab(page, tab) {
 }
 
 /**
- * Creates a document of the directory's kind through the directory's Create button and the core creation dialog.
+ * Creates a document of the directory's kind through the directory's Create button and the core creation dialog. A
+ * document made for a folder uses that folder's own Create button, which creates it inside the folder.
  * @param {import('@playwright/test').Page} page - A logged-in GM page.
  * @param {string} tab - The sidebar tab of the directory (`actors`, `items`, `scenes`).
  * @param {string} name - The new document's name.
  * @param {string} [type] - The document subtype to choose in the dialog; omitted for kinds with no subtype.
+ * @param {string} [folderId] - The id of the folder that receives the document; omitted for the directory root.
  * @returns {Promise<string>} The id of the new document, read from its directory entry.
  */
-async function createFromDirectory(page, tab, name, type) {
+async function createFromDirectory(page, tab, name, type, folderId) {
    /** @type {import('@playwright/test').Locator} The directory's panel. */
    const panel = await openSidebarTab(page, tab);
-   await panel.locator('header.directory-header [data-action="createEntry"]').click();
+   await (folderId === undefined
+      ? panel.locator('header.directory-header [data-action="createEntry"]')
+      : panel.locator(`.directory-item.folder[data-folder-id="${folderId}"] > header [data-action="createEntry"]`))
+      .click();
 
    /** @type {import('@playwright/test').Locator} The core creation dialog. */
    const dialog = page.locator('dialog.application.dialog:has(.dialog-content input[name="name"])');
@@ -80,11 +85,12 @@ async function createFromDirectory(page, tab, name, type) {
  * @param {object} options - What to create.
  * @param {string} options.name - The display name; it starts with `E2E ` so the census finds the actor.
  * @param {string} options.type - The actor subtype (`player` or `npc`).
+ * @param {string} [options.folderId] - The id of an Actor folder to create the actor in.
  * @returns {Promise<string>} The actor's id.
  */
-export async function createActor(page, { name, type }) {
+export async function createActor(page, { name, type, folderId }) {
    /** @type {string} The new actor's id. */
-   const id = await createFromDirectory(page, 'actors', name, type);
+   const id = await createFromDirectory(page, 'actors', name, type, folderId);
    record({
       documentName: 'Actor',
       id,
@@ -99,13 +105,49 @@ export async function createActor(page, { name, type }) {
  * @param {object} options - What to create.
  * @param {string} options.name - The display name; it starts with `E2E ` so the census finds the item.
  * @param {string} options.type - The item subtype (`weapon`, `ability`, ...).
+ * @param {string} [options.folderId] - The id of an Item folder to create the item in.
  * @returns {Promise<string>} The item's id.
  */
-export async function createWorldItem(page, { name, type }) {
+export async function createWorldItem(page, { name, type, folderId }) {
    /** @type {string} The new item's id. */
-   const id = await createFromDirectory(page, 'items', name, type);
+   const id = await createFromDirectory(page, 'items', name, type, folderId);
    record({
       documentName: 'Item',
+      id,
+      createdBy: currentSpec(),
+   });
+   return id;
+}
+
+/**
+ * Creates a folder in a document directory through the directory's Create Folder button and the folder configuration
+ * window.
+ * @param {import('@playwright/test').Page} page - A logged-in GM page.
+ * @param {string} tab - The sidebar tab of the directory (`actors`, `items`).
+ * @param {string} name - The folder's name; it starts with `E2E ` so the census finds the folder.
+ * @returns {Promise<string>} The folder's id, read from its directory entry.
+ */
+export async function createFolder(page, tab, name) {
+   /** @type {import('@playwright/test').Locator} The directory's panel. */
+   const panel = await openSidebarTab(page, tab);
+   await panel.locator('header.directory-header [data-action="createFolder"]').click();
+
+   /** @type {import('@playwright/test').Locator} The folder configuration window. */
+   const config = page.locator('.application.folder-config');
+   await config.locator('input[name="name"]').fill(name);
+   await config.locator('button[type="submit"]').click();
+   await expect(config).toHaveCount(0);
+
+   /** @type {import('@playwright/test').Locator} The directory entry of the new folder. */
+   const entry = panel.locator('.directory-item.folder', {
+      has: page.locator('header .folder-name', { hasText: exactText(name) }),
+   });
+   await expect(entry).toHaveCount(1);
+
+   /** @type {string} The new folder's id. */
+   const id = await entry.getAttribute('data-folder-id');
+   record({
+      documentName: 'Folder',
       id,
       createdBy: currentSpec(),
    });
