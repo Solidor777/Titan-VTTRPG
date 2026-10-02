@@ -1286,7 +1286,10 @@ when fixed.
     - it deletes the pack through the first client's directory context menu and confirmation;
     - on each client it asserts the tray no longer offers the pack, has fallen back to `TITAN Effects`, and lists that
       pack's top-level folders and root effects;
-    - it asserts that neither client raised a page error.
+    - it asserts that neither client raised a page error, and that core reported no error through `Hooks.onError` on
+      either client. Core catches a hook listener's throw in `Hooks.#call` and reports it through `Hooks.onError`,
+      which calls the `error` hook (read: `client/helpers/hooks.mjs:158-168, 182-188`), so the test records the
+      `error` hook on both clients rather than reading the console.
   - Measured mutations of `EffectTrayState`, one run each, each rebuilt and then restored (script
     `fix5-mutate-e2e.mjs`, output `fix5-mut112-*.log`):
     - the `renderCompendiumDirectory` hook renamed away: fails, expected 1 option, received 0;
@@ -1296,9 +1299,10 @@ when fixed.
     - a throw inside the hook after a pack deletion, before the fallback, on E2E GM 1 only and then on E2E GM 2 only:
       fails, the selection never falls back (expected `TITAN Effects`, received `undefined`); for E2E GM 2, which
       client's iteration failed is likewise inferred;
-    - not caught: the same throw at the end of the hook, after the fallback, on either client. The test passes.
-      Read: core's `Hooks.#call` catches a listener's throw and logs it to the console
-      (`client/helpers/hooks.mjs:158-168`), so it never reaches the test's page-error assertions.
+    - the same throw at the end of the hook, after the fallback, on E2E GM 1 only and then on E2E GM 2 only: fails
+      at the hook-error assertion of the mutated client, which names the client and lists the reported error
+      (`fix5b-mut112-throw-at-end-on-gm1-after-test-fix.log`, `-gm2-after-test-fix.log`). Before the hook-error
+      recording was added, both runs passed (`fix5b-…-before-test-fix.log`).
   - The test moves with the `effect-tray` rewrite (test-suite rewrite Phase 6).
 
 ### 113. `condition-description.spec.js` failed when no scene was active at its start

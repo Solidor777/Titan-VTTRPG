@@ -154,17 +154,20 @@ it ever bites in play, the principled fix is a per-message serial queue around
 
 ## 2026-09-09 — E2E 1-second operation budget
 
-- **Wait ceilings now equal the budget.** 34 explicit `timeout:` values across the e2e suite are set
-  to 1000ms, so an operation exceeding the budget fails loudly instead of silently absorbing 15s.
-  **Six are deliberately exempt** because they are inherently multi-second and would break at 1s:
-  `fixtures.js:35` and `player-hud-layout.spec.js:139` (`game.ready`, world boot),
-  `multiClient.js:48` (a second browser context finishing login), and `pack-conversion.spec.js`
-  129/133/138 (login navigation plus the bulk pack conversion). Do not sweep these to 1s.
-- **`titanWait`'s default timeout is 1000ms** (`tests/e2e/poll.js`), so the budget is the default at
-  all 101 call sites that pass no explicit `timeout`. The single override is the exempt 30s world
-  boot in `player-hud-layout.spec.js:139`. Verified across two consecutive full-suite runs: 497/497
-  each, with zero `titanWait timed out after 1000ms` failures — no wait in the suite needs more than
-  a second.
+- **Wait ceilings equal the budget.** 34 explicit `timeout:` values across `tests/e2e` and `tests/shared` are
+  1000 ms, so an operation exceeding the budget fails loudly instead of silently absorbing 15 s. The deliberate
+  multi-second exemptions are listed in titan-codebase `conventions.md` ("No e2e operation may exceed 1 second"):
+  the world boot (`fixtures.js:35`), the shared reload (`world.js:359-360`, `reloadWorld`, which every mid-file
+  reload goes through), a second client's login (`multiClient.js:49`), the Player HUD waits after a boot
+  (`pack-conversion.spec.js:51`, `condition-migration.spec.js:186`, `converted-effect-identity.spec.js:109`), the
+  scrolling-text wait (`condition-description.spec.js:283`) and the confirmed migration
+  (`condition-migration.spec.js:532`). Do not sweep these to 1 s. Measured 2026-10-01
+  (`.superpowers/sdd/test-suite-rewrite/phase-0/fix5b-e2e-timeouts.txt`): three other ceilings are above 1 s and are
+  not in that list: `compendium-spreadsheet.spec.js:404` (60 s), `permissions-observer-navigation.spec.js:69` (2 s)
+  and `sheet-zoom.spec.js:213` (3 s).
+- **`titanWait`'s default timeout is 1000ms** (`tests/e2e/poll.js`), and no call passes a longer one: of 118
+  `titanWait(` calls, 3 pass `timeout: 1000` and the rest use the default (measured 2026-10-01, same file). In the
+  2026-09-09 two consecutive full-suite runs (497/497 each) no `titanWait timed out after 1000ms` failure occurred.
 - **A world that is not launched looks like a code failure.** After the machine slept, Foundry served
   `/setup` while still answering `/join` with HTTP 200 and a `Critical Failure!` title. Every
   `beforeAll` then died at `page.selectOption('select[name="userid"]')`, producing a wall of `0ms`
@@ -268,7 +271,9 @@ it ever bites in play, the principled fix is a per-message serial queue around
 - **Core's `Hooks.#call` catches a listener's throw and logs it to the console** (read: Foundry 14.364
   `client/helpers/hooks.mjs:158-168`, through `Hooks.onError`), so it never becomes a `pageerror`. Measured in Phase 0
   fix round 5 of the test-suite rewrite: a throw added at the end of `EffectTrayState`'s `renderCompendiumDirectory`
-  listener, after its fallback, left the CLOSED_BUGS #112 gate test passing on both clients
-  (`.superpowers/sdd/test-suite-rewrite/phase-0/fix5-mut112-throw-at-end-after-deletion-on-gm1.log`, `-gm2.log`).
-  An e2e test that must prove a hook listener raised nothing needs a console-error capture as well as
-  `attachPageErrors`. Status: needs review.
+  listener, after its fallback, left the CLOSED_BUGS #112 gate test passing on both clients while it asserted page
+  errors only (`.superpowers/sdd/test-suite-rewrite/phase-0/fix5b-mut112-throw-at-end-on-gm1-before-test-fix.log`,
+  `-gm2-…`). `Hooks.onError` also calls the `error` hook (`hooks.mjs:187`), so a test records exactly those errors
+  with an `error` hook listener, without console noise; `effect-tray.spec.js` `recordHookErrors` does this, and with
+  it the same mutation fails the #112 test on the mutated client (`fix5b-…-after-test-fix.log`). Other specs that
+  must prove a hook listener raised nothing need the same recording; only the #112 test has it.
