@@ -13,8 +13,9 @@ import { readTitanSelectValue, selectTitanOption, titanSelectOptionValues } from
  * types and check types against each other, offers the Resistance selectors, and offers a Skill narrowing on a
  * situation.
  *
- * The weapon is made once. Each test adds the rows it needs through the tab's controls and the `afterEach` hook deletes
- * every row through the row's delete button, so a test starts with an empty list. Stored values the editor cannot
+ * The weapon is made once. Each test adds the rows it needs through the tab's controls and the `afterEach` hook
+ * deletes every row through the row's delete button in the sheet the test left open, so a test starts with an empty
+ * list. Stored values the editor cannot
  * produce (an Advantage value outside the four levels, an unknown check type, a missing rounding) are probed in
  * `component-probe-inputs.spec.js`.
  */
@@ -25,6 +26,8 @@ let page;
 let errors;
 /** @type {string} The uuid of the weapon whose Rules Elements tab the tests edit. */
 let weaponUuid;
+/** @type {import('@playwright/test').Locator | null} The weapon sheet the current test opened, or null. */
+let openedSheet = null;
 
 test.beforeAll(async ({ browser }) => {
    page = await browser.newPage();
@@ -39,6 +42,7 @@ test.beforeAll(async ({ browser }) => {
 test.afterEach(async () => {
    await clearRulesElements();
    await closeAllApps(page);
+   openedSheet = null;
    errors.length = 0;
 });
 
@@ -58,16 +62,18 @@ async function openRulesElements() {
    const label = await page.evaluate(() => game.i18n.localize('LOCAL.rulesElements.text'));
    await sheet.locator('.tab-list').getByText(label, { exact: true }).first().click();
    await expect(sheet.locator('.add-entry-button button'), 'the rules elements tab rendered').toBeVisible();
+   openedSheet = sheet;
    return sheet;
 }
 
 /**
- * Deletes every rules element of the weapon through the rows' delete buttons.
+ * Deletes every rules element of the weapon through the rows' delete buttons, in the sheet the test left open (the
+ * sheet is opened only when the test opened none).
  * @returns {Promise<void>} Resolves once the list is empty.
  */
 async function clearRulesElements() {
-   /** @type {import('@playwright/test').Locator} The weapon's sheet. */
-   const sheet = await openRulesElements();
+   /** @type {import('@playwright/test').Locator} The weapon's sheet on its Rules Elements tab. */
+   const sheet = openedSheet ?? await openRulesElements();
 
    /** @type {import('@playwright/test').Locator} The rule element rows. */
    const rows = sheet.locator('.rules-element');
