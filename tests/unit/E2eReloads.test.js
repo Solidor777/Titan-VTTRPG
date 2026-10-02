@@ -56,7 +56,7 @@ const PERMITTED = [
    {
       file: 'e2e/fixtures.js',
       text: '.goto(',
-      reason: '`login`, the first navigation of a fresh page to `/join`.',
+      reason: '`joinWorld` (which `login` calls), the first navigation of a fresh page to `/join`.',
    },
 ];
 

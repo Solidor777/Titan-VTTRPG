@@ -1,4 +1,4 @@
-import { test, expect } from '@playwright/test';
+import { expect, test } from './harness.js';
 import { login } from './fixtures.js';
 import { unmountAll, clearProbeEvents, mountProbe } from './componentProbe.js';
 import { closeAllApps, clearChat, attachPageErrors } from './world.js';

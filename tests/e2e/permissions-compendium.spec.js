@@ -1,7 +1,7 @@
 import { readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { dirname, resolve } from 'node:path';
-import { expect, test } from '@playwright/test';
+import { expect, test } from './harness.js';
 import { withClients } from './multiClient.js';
 
 // Resolve system.json once in the Node process — same pattern as integration-manifest.spec.js.

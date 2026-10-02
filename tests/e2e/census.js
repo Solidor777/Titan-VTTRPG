@@ -1,6 +1,6 @@
 import { chromium } from '@playwright/test';
 import { pathToFileURL } from 'node:url';
-import { login } from './fixtures.js';
+import { joinWorld } from './fixtures.js';
 import { DEFAULT_GM, E2E_USERS } from './users.js';
 
 // Counts, and on request removes, what the e2e suite has left in the `test-titan` world: `E2E `-prefixed documents
@@ -11,7 +11,8 @@ import { DEFAULT_GM, E2E_USERS } from './users.js';
 // Run as a script against the live world on localhost:30000, logged in as `E2E GM 1`:
 //    node tests/e2e/census.js            counts only
 //    node tests/e2e/census.js --sweep    counts, removes through the API, and counts again
-// The script prints the counts as JSON and exits 1 when the final count is not zero.
+// The script prints the counts, and the errors the world's boot raised, as JSON, and exits 1 when the final count is
+// not zero or the boot raised an error.
 
 /** @type {string} The name prefix of every document the e2e suite makes. */
 export const E2E_PREFIX = 'E2E ';
@@ -211,7 +212,7 @@ export function countCensus(census) {
 
 /**
  * Runs the census from the command line: logs in as the default E2E GM, counts, and with `--sweep` removes and counts
- * again. Prints the result as JSON and sets exit code 1 when the final census is not empty.
+ * again. Prints the result as JSON and sets exit code 1 when the final census is not empty or the boot raised an error.
  * @returns {Promise<void>} Resolves once the browser has closed.
  */
 async function main() {
@@ -228,12 +229,18 @@ async function main() {
             height: 1080,
          },
       })).newPage();
-      await login(page, DEFAULT_GM);
+      // Joined without `login`'s assertion: a boot error is reported in the result and the exit code, and never stops
+      // the census or the sweep, which may be what clears the documents that caused it.
+      /** @type {string[]} The errors the world's boot raised. */
+      const bootErrors = await joinWorld(page, DEFAULT_GM, 'census.js');
 
       /** @type {Census} The census before any removal. */
       const before = await takeCensus(page);
       /** @type {object} The printed result. */
-      const result = { before };
+      const result = {
+         bootErrors,
+         before,
+      };
       /** @type {Census} The final census. */
       let final = before;
       if (sweep) {
@@ -246,7 +253,7 @@ async function main() {
          ...(sweep ? { after: countCensus(final) } : {}),
       };
       console.log(JSON.stringify(result, null, 3));
-      process.exitCode = Object.values(final).some((entries) => entries.length > 0) ? 1 : 0;
+      process.exitCode = bootErrors.length > 0 || Object.values(final).some((entries) => entries.length > 0) ? 1 : 0;
    }
    finally {
       await browser.close();

@@ -1,4 +1,4 @@
-import { expect, test } from '@playwright/test';
+import { expect, test } from './harness.js';
 import { withClients } from './multiClient.js';
 import { attachPageErrors, buildCheck, closeAllApps } from './world.js';
 import { GM_USERS, PLAYER_USERS } from './users.js';

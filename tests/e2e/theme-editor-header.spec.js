@@ -1,4 +1,4 @@
-import { test, expect } from '@playwright/test';
+import { expect, test } from './harness.js';
 import { login } from './fixtures.js';
 
 // Empirical guards (CLOSED_BUGS #30/#31): validated by reading the FINAL COMPUTED STYLE of the live

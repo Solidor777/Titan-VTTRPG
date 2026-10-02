@@ -1,4 +1,4 @@
-import { test, expect } from '@playwright/test';
+import { expect, test } from './harness.js';
 import { login } from './fixtures.js';
 
 // The HUD canvas rect anchors to the LEFT of the EXPANDED sidebar and stays there when the sidebar

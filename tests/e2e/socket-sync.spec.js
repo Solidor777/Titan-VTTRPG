@@ -1,4 +1,4 @@
-import { expect, test } from '@playwright/test';
+import { expect, test } from './harness.js';
 import { withClients } from './multiClient.js';
 import { setWorldSetting } from './settings.js';
 import { seedCombatEncounter, teardownCombatEncounter } from '../shared/combat.js';

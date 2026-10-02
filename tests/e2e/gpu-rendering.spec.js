@@ -1,4 +1,4 @@
-import { expect, test } from '@playwright/test';
+import { expect, test } from './harness.js';
 
 /**
  * Reads the unmasked WebGL renderer string from a page. ANGLE resolves one graphics backend per

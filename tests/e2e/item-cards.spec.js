@@ -1,4 +1,4 @@
-import { test, expect } from '@playwright/test';
+import { expect, test } from './harness.js';
 import { login } from './fixtures.js';
 import { closeAllApps, clearChat, attachPageErrors, showChatLog } from './world.js';
 

@@ -1,71 +1,69 @@
-import { expect } from '@playwright/test';
+import path from 'node:path';
 import { DEFAULT_GM } from './users.js';
 import { installPoll } from './poll.js';
-import { attachPageErrors, installHookErrorReporting, readHookErrorReports } from './world.js';
+import { attachPageErrors, installHookErrorReporting } from './world.js';
+import { expect, flushPageErrors, test, trackWorldPage } from './harness.js';
 
 /**
- * Authenticate against the live Foundry v14 `/join` screen and wait for the
- * world to become fully ready.
+ * Joins the live world as a user and returns the errors its boot raised, without asserting them.
  *
  * Verified selectors against the running v14 join page:
  * `select[name="userid"]` is the user picker (options labelled by user name);
  * `input[name="password"]` is the optional user password field;
  * `button[name="join"]` is the "Join Game Session" submit button.
  *
- * The boot itself must be error-free: no spec's collector exists yet, so `login` fails when the world raised an
- * uncaught page error or core reported an error through `Hooks.onError` (including from any `init`, `setup` or `ready`
- * listener) before it became ready.
+ * Before navigating, the page gets the in-page poll helper, hook-error reporting, and a collector (`attachPageErrors`)
+ * that the gates of `harness.js` `test` check, so the page collects from its first document onward. Core sets
+ * `game.ready` and calls the `ready` hook synchronously (`client/game.mjs:777-779`), so the boot's errors are read
+ * after every synchronous `init`, `setup` and `ready` listener has run. They are marked checked, so the gates do not
+ * report them again.
+ * @param {import('@playwright/test').Page} page - A page that has not navigated yet.
+ * @param {string} user - The display name of the Foundry user to join as.
+ * @param {string} origin - What joined the page, named when a gate reports its errors.
+ * @returns {Promise<string[]>} The uncaught page errors and hook errors raised from the join screen until ready.
+ */
+export async function joinWorld(page, user, origin) {
+   // Install the in-page poll helper and hook-error reporting before navigating (addInitScript runs on document
+   // load).
+   await installPoll(page);
+   await installHookErrorReporting(page);
+
+   /** @type {import('./harness.js').WorldPage} The page's record; its collector receives errors from now on. */
+   const record = trackWorldPage(page, user, origin, attachPageErrors(page));
+
+   // Navigate to the join screen and select the configured user.
+   await page.goto('/join');
+   await page.selectOption('select[name="userid"]', { label: user });
+
+   // Fill the password only when one is configured (the test world has none).
+   if (process.env.FOUNDRY_PASSWORD) {
+      await page.fill('input[name="password"]', process.env.FOUNDRY_PASSWORD);
+   }
+
+   // Submit the join form and wait for the world to load and become ready.
+   await page.click('button[name="join"]');
+   await page.waitForURL('**/game');
+   await page.waitForFunction(() => globalThis.game?.ready === true, null, { timeout: 60_000 });
+
+   await flushPageErrors(page);
+
+   /** @type {string[]} The errors the boot raised. */
+   const bootErrors = record.errors.slice(record.checked);
+   record.checked = record.errors.length;
+   return bootErrors;
+}
+
+/**
+ * Logs a test page in to the live world as a user and fails when the boot raised an error: an uncaught page error, or
+ * an `Error` core reported through `Hooks.onError` (including from any `init`, `setup` or `ready` listener).
  * @param {import('@playwright/test').Page} page - The Playwright page to drive.
  * @param {string} [user] - The display name of the Foundry user to log in as.
  * Defaults to `FOUNDRY_USER` env var when set, otherwise `DEFAULT_GM` (`'E2E GM 1'`).
  * @returns {Promise<void>} Resolves once `game.ready === true` and the boot raised no error.
  */
 export async function login(page, user = process.env.FOUNDRY_USER || DEFAULT_GM) {
-
-   // Install the in-page poll helper and hook-error reporting before navigating (addInitScript runs on document
-   // load).
-   await installPoll(page);
-   await installHookErrorReporting(page);
-
-   /** @type {string[]} The uncaught page errors raised from the join screen until the world is ready. */
-   const bootPageErrors = [];
-
-   /**
-    * Records an uncaught page error raised during the login.
-    * @param {Error} error - The uncaught error.
-    * @returns {void}
-    */
-   const onBootPageError = (error) => {
-      bootPageErrors.push(error.message);
-   };
-   page.on('pageerror', onBootPageError);
-
-   try {
-      // Navigate to the join screen and select the configured user.
-      await page.goto('/join');
-      await page.selectOption('select[name="userid"]', { label: user });
-
-      // Fill the password only when one is configured (the test world has none).
-      if (process.env.FOUNDRY_PASSWORD) {
-         await page.fill('input[name="password"]', process.env.FOUNDRY_PASSWORD);
-      }
-
-      // Submit the join form and wait for the world to load and become ready.
-      await page.click('button[name="join"]');
-      await page.waitForURL('**/game');
-      await page.waitForFunction(() => globalThis.game?.ready === true, null, { timeout: 60_000 });
-   }
-   finally {
-      page.off('pageerror', onBootPageError);
-   }
-
-   // Core sets `game.ready` and then calls the `ready` hook synchronously (client/game.mjs:777-779), so every
-   // synchronous listener has run, and its report is in the page's list, by the time this read executes.
-   /** @type {string[]} The errors the boot raised, page errors first. */
-   const bootErrors = [
-      ...bootPageErrors,
-      ...await readHookErrorReports(page),
-   ];
+   /** @type {string[]} The errors the boot raised. */
+   const bootErrors = await joinWorld(page, user, path.basename(test.info().file));
    expect(bootErrors, `errors while the world booted for ${user}:\n${bootErrors.join('\n')}`).toEqual([]);
 }
 
@@ -79,14 +77,10 @@ export async function login(page, user = process.env.FOUNDRY_USER || DEFAULT_GM)
  * @param {import('@playwright/test').Page} page - The Playwright page to drive.
  * @param {string} locateSrc - Stringified locator: a function returning the document.
  * @param {string} expectedSelector - CSS selector the rendered sheet must expose.
- * @param {string[]} [errors] - Optional shared page-error collector (from `attachPageErrors`). When
- * omitted, a collector is attached for this single render (legacy/unmigrated behavior).
+ * @param {string[]} errors - The spec's shared page-error collector (from `attachPageErrors`).
  * @returns {Promise<void>} Resolves once the sheet is visible and asserted error-free.
  */
 export async function renderSheet(page, locateSrc, expectedSelector, errors) {
-   // Use the shared collector when supplied; otherwise attach one for this render (page and hook errors).
-   const localErrors = errors ?? attachPageErrors(page);
-
    // Locate the document and trigger its sheet render inside the Foundry runtime.
    const found = await page.evaluate(async (src) => {
       // Reconstruct the locator function from its stringified body.
@@ -101,7 +95,8 @@ export async function renderSheet(page, locateSrc, expectedSelector, errors) {
    // The fixture must exist; assert the sheet is visible and no errors were thrown.
    expect(found, 'document fixture not found in world').toBe(true);
    await expect(page.locator(expectedSelector).first()).toBeVisible();
-   expect(localErrors, `uncaught errors during render:\n${localErrors.join('\n')}`).toEqual([]);
+   await flushPageErrors(page);
+   expect(errors,`uncaught errors during render:\n${errors.join('\n')}`).toEqual([]);
 }
 
 /**

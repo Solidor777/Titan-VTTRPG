@@ -1,4 +1,4 @@
-import { expect, test } from '@playwright/test';
+import { expect, test } from './harness.js';
 import { STORED_ACTOR_LOCATIONS } from '~/helpers/migration/StoredActorSources.js';
 import { login } from './fixtures.js';
 import {

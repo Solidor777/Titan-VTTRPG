@@ -1,32 +1,41 @@
 import { login } from './fixtures.js';
+import { flushPageErrors } from './harness.js';
 
 /**
  * Runs a callback with several simultaneous, independent Foundry clients.
  * Each client is its own browser context (separate session/cookies), logged in as the named user.
  * @param {import('@playwright/test').Browser} browser - The Playwright browser from the test fixture.
- * @param {Object<string, string>} clientSpec - Map of label to Foundry user display name.
- * @param {(pages: Object<string, import('@playwright/test').Page>) => Promise<void>} fn - Callback
+ * @param {{[label: string]: string}} clientSpec - Map of label to Foundry user display name.
+ * @param {(pages: {[label: string]: import('@playwright/test').Page}) => Promise<void>} fn - Callback
  * receiving the page map.
  * @returns {Promise<void>} Resolves once the callback completes and all contexts are closed.
  */
 export async function withClients(browser, clientSpec, fn) {
-   /** @type {import('@playwright/test').BrowserContext[]} */
+   /** @type {import('@playwright/test').BrowserContext[]} The contexts opened so far, closed on exit. */
    const contexts = [];
 
-   /** @type {Object<string, import('@playwright/test').Page>} */
+   /** @type {{[label: string]: import('@playwright/test').Page}} Each client's logged-in page, by label. */
    const pages = {};
 
    try {
       // Create and log in each client sequentially (single-worker world).
       for (const [label, userName] of Object.entries(clientSpec)) {
+         /** @type {import('@playwright/test').BrowserContext} The client's own session; closed even if login fails. */
          const context = await browser.newContext();
+         contexts.push(context);
+
+         /** @type {import('@playwright/test').Page} The client's page. */
          const page = await context.newPage();
          await login(page, userName);
-         contexts.push(context);
          pages[label] = page;
       }
 
       await fn(pages);
+
+      // Deliver every client's errors before its context closes, so the harness gate of `test` sees them.
+      for (const page of Object.values(pages)) {
+         await flushPageErrors(page);
+      }
    }
    finally {
       // Always tear down every context, even if the callback threw.

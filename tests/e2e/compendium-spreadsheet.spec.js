@@ -1,4 +1,4 @@
-import { expect, test } from '@playwright/test';
+import { expect, test } from './harness.js';
 import { strFromU8, strToU8, unzipSync, zipSync } from 'fflate';
 import { readFile, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
