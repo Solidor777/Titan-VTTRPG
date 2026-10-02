@@ -878,36 +878,51 @@ every `.js` under `tests/e2e` except `contextMenu.js` and fails on a direct cont
 `.context-menu`, or `context-item`, or starts from a variable or function (file-wide, no scopes) holding or returning
 one.
 
-**Real-document guards** (`.claude/claude.md` "Tests use genuine live documents"). `tests/unit/E2eRealDocuments.test.js`
-scans every `.js`/`.mjs` under `tests/e2e` and `tests/shared` (comments skipped, strings not) for API document creation
-and faked gestures (`Actor.create(` and the other named classes, any other `<alias>.create(` except `Object.create(`,
-`.createDocuments(`, `createEmbeddedDocuments(`, `updateEmbeddedDocuments(`, `getTokenDocument(`, `.createCompendium(`,
-`toggleStatusEffect(`, `.import(`, `importFromJSON(`, `new DragEvent('drop'`, `new DataTransfer(`, `keepId`,
-`new Function(`, `performIntegerSort(`) and, under `tests/e2e` only, for `.update(` and `.system.<action>(` calls
-(action prefixes `request`, `roll`, `apply`, `spend`, `equip`, `unEquip`, `onTurn`, `shortRest`, `longRest`,
-`removeCombatEffects`, `toggleInspiration`, `add`, `move`, `delete`). A `.update(`/`.system.<action>(` site is
-permitted when it matches a `{ file, pattern, field, reason }` entry of `tests/e2e/direct-updates.allowlist.json`
-(`pattern` is a regex over the site's source line; an entry permitting no site fails). In `e2e/global-teardown.js`
-and `e2e/registry.js` a match whose text contains `delete` is exempt; of the patterns only `.system.delete…(` can
-produce one (`.delete(`, `deleteEmbeddedDocuments(` and `deleteCompendium(` are not banned anywhere). The offender set
-must equal
+**Real-document guards** (`.claude/claude.md` "Tests use genuine live documents"). The guards that read test
+sources as syntax parse them through `tests/unit/helpers/parseSource.js`: `parseNodes(source, file)` parses with
+ESLint's own parser (`Linter` of the `eslint` devDependency, latest syntax, as a module) and lists every ESTree node
+with `parent` and `loc`, so each syntactic form of a property, method, field, assignment or call is one node type,
+whatever its spelling. It also reads the code held in strings (e2e specs pass code to the browser:
+`page.evaluate('…')`, `new Function('actor', src)`): every string literal, template literal (each `${…}` read as
+`_`) or `+` concatenation of those whose text parses as a module or a function body is parsed too, recursively,
+its nodes carrying the outer source's lines; keys and module specifiers are names, not code; prose and selectors do
+not parse and yield nothing. A source that does not parse throws, naming the file. `staticKeyName(key, computed)`
+reads a bare, quoted or computed-string name. The whole-tree tests set `TREE_SCAN_TIMEOUT` (60 s), since vitest's 5 s
+default is passed under a full parallel run.
+`tests/unit/E2eRealDocuments.test.js` scans every `.js`/`.mjs` under `tests/e2e` and `tests/shared` for call and
+`new` expressions, matched by the callee's name (an identifier, or a member's property: dotted, optional or a computed
+string), that create documents through the API or fake gestures: `<Class>.create(` for Actor, Item, Scene, Combat,
+ChatMessage, ActiveEffect, Folder, Adventure and Macro (directly or through a namespace), any other `<alias>.create(`
+except `Object.create(` (matched as `.create(`), the member calls `.createDocuments(`, `.import(` and
+`.createCompendium(` (the dot keeps the flow helper `createCompendium(page, …)` legal), the calls
+`createEmbeddedDocuments(`, `updateEmbeddedDocuments(`, `getTokenDocument(`, `toggleStatusEffect(`,
+`importFromJSON(` and `performIntegerSort(` (bare or as a member), `new DragEvent('drop'`, `new DataTransfer(`,
+`new Function(`, and any `keepId` name. Under `tests/e2e` only, it also matches `.update(` and `.system.<action>(`
+calls (action prefixes `request`, `roll`, `apply`, `spend`, `equip`, `unEquip`, `onTurn`, `shortRest`,
+`longRest`, `removeCombatEffects`, `toggleInspiration`, `add`, `move`, `delete`). Each match is written as its
+canonical text on the line where that text starts. A `.update(`/`.system.<action>(` site is permitted when it
+matches a `{ file, pattern, field, reason }` entry of `tests/e2e/direct-updates.allowlist.json` (`pattern` is a regex
+over the site's source line; an entry permitting no site fails). In `e2e/global-teardown.js` and `e2e/registry.js` a
+match whose text contains `delete` is exempt; only `.system.delete…(` can be one (`.delete(`,
+`deleteEmbeddedDocuments(` and `deleteCompendium(` are not banned anywhere). The offender set must equal
 `tests/e2e/burn-down.json` as a multiset of `{ file, match, source }` (file relative to `tests`, the matched text, the
 trimmed source line — no line numbers, so unrelated edits do not churn it); the failure message prints the missing or
-extra entries as JSON. Once `tests/unit/phase.json` exceeds 6 the burn-down file must be gone and the set empty.
-`tests/unit/UnitFakeDocuments.test.js` scans `tests/unit` (except itself) for a fake write surface — an object-literal
-key (after `{` or `,`) whose value is not a boolean, `null`, `undefined`, number, string, object or array; an
-object-literal or class method (after `{`, `,`, `}`, `;` or at a line start, its body opening on the line that closes
-the parameters); a class field (optionally `static`, after `{`, `}`, `;` or at a line start; the same shape also finds
-a destructuring default or an assignment statement) whose value is not one of those; a member assignment; or a
-`vi.spyOn` — named `create`, `createDocuments`, `update`, `delete`, `createEmbeddedDocuments`,
-`deleteEmbeddedDocuments`, `updateEmbeddedDocuments`, `createEffects`, `updateEffects`, `deleteEffects`,
-`deleteItems`, or an object-literal `_source` key. A key, method or field name may be bare, quoted (`'update'(d) {}`)
-or a computed string key (`['update']`; a computed field is caught as a member assignment). Not found: a computed key
-held in a variable, an accessor, and bindings through `Object.defineProperty`, `Reflect.set`, `Object.assign` or a
-spread. Every matching file must be listed in `tests/unit/fake-documents.allowlist.json`: `permitted`
-(`{ file, clause }`) or `burnDown` (`{ file, removedInPhase }`); a listed file that is gone or no longer matches fails,
-and a burn-down file fails once `phase.json`'s `phase` exceeds its `removedInPhase`. Both guards and
-`E2eContextMenuClicks.test.js` mask sources through `tests/unit/helpers/maskSource.js`
+extra entries as JSON. Once `tests/unit/phase.json` exceeds 6 the burn-down file must be gone and the set empty. Not
+matched: a callee named through a variable (`actor[method](`).
+`tests/unit/UnitFakeDocuments.test.js` scans `tests/unit` (except itself) for a fake write surface: a binding of
+`create`, `createDocuments`, `update`, `delete`, `createEmbeddedDocuments`, `deleteEmbeddedDocuments`,
+`updateEmbeddedDocuments`, `createEffects`, `updateEffects`, `deleteEffects` or `deleteItems` to a value that may be a
+function (anything but a literal, template, object, array, `undefined`, or a unary, binary or update expression;
+conditional and logical expressions by their branches), as an object-literal property (plain or shorthand `{ update }`),
+method or getter; a class field, method or getter, static or not; a member assignment (`=`, `||=`, `&&=`, `??=`);
+a destructuring default (`const { update = vi.fn() } = …`); or `vi.spyOn(target, '<name>')`. A `_source` binding is a
+fake whatever its value (object-literal property or getter, class field or getter, member assignment). Names may be
+bare, quoted or computed strings. Not found: a computed key held in a variable, and bindings through
+`Object.defineProperty`, `Reflect.set` or `Reflect.defineProperty`. Every matching file must be listed in
+`tests/unit/fake-documents.allowlist.json`: `permitted` (`{ file, clause }`) or `burnDown` (`{ file, removedInPhase }`);
+a listed file that is gone or no longer matches fails, and a burn-down file fails once `phase.json`'s `phase` exceeds
+its `removedInPhase`. Each guard's self-tests list every form it flags and the near misses it passes.
+`E2eContextMenuClicks.test.js` still scans text: it masks sources through `tests/unit/helpers/maskSource.js`
 (`maskSource(source, { strings })`: comments always blanked, string contents replaced only with `strings: true`; every
 index and line break kept; regular-expression literals are not recognized).
 
@@ -925,12 +940,13 @@ prints JSON counts, and exits 1 when the final census is not empty.
 
 **No e2e operation may exceed 1 second**, and wait ceilings are set to that budget so a breach fails loudly instead of
 silently absorbing 15s: explicit `timeout:` values are `1000`. Inherently multi-second waits are deliberately exempt:
-- a `game.ready` world boot (`fixtures.js`, `player-hud-layout.spec.js`, and the Player HUD wait in the `beforeAll` of
-  `pack-conversion.spec.js`, `condition-migration.spec.js`, and `converted-effect-identity.spec.js`);
+- a `game.ready` world boot (`fixtures.js`, and the Player HUD wait in the `beforeAll` of `pack-conversion.spec.js`,
+  `condition-migration.spec.js`, and `converted-effect-identity.spec.js`);
 - a mid-file reload through `world.js` `reloadWorld(page, { ready })` (15 s for the `/game` URL, 60 s for the
   readiness predicate, `game.ready` by default). `reloadWithMode` uses it (by `pack-conversion.spec.js`,
-  `condition-migration.spec.js` and `converted-effect-identity.spec.js`), and so does the last test of
-  `condition-description.spec.js`;
+  `condition-migration.spec.js` and `converted-effect-identity.spec.js`), and so do the last test of
+  `condition-description.spec.js`, the reload test of `player-hud-layout.spec.js` and both tests of
+  `portrait-persistence.spec.js`;
 - a second browser context finishing login (`multiClient.js`, used by the last test of `effect-tray.spec.js` for its
   E2E GM 2 client);
 - core's 2 s scrolling text finishing before the viewed scene is deactivated (`condition-description.spec.js`, last
@@ -1013,9 +1029,14 @@ where `ready` is the in-page predicate of step (5) (`game.ready` by default); a 
 `converted-effect-identity.spec.js`) sets the `migrationMode` setting, calls `reloadWorld` with
 `game.ready && game.titan.playerHud` as `ready`, and then `expectActiveGM(page)` (also in `world.js`) asserts
 `game.users.activeGM?.isSelf`, because only the active GM migrates and core's `getDesignatedUser` makes the active GM
-with the highest role that GM. The last test of `condition-description.spec.js` calls `reloadWorld(page)` with the
-default predicate. `page.on('console')` and `attachPageErrors` listeners survive reloads (they attach to the Page
-object). Sequence:
+with the highest role that GM. The last test of `condition-description.spec.js`, the reload test of
+`player-hud-layout.spec.js` and `portrait-persistence.spec.js`'s `readImageAfterReload` call `reloadWorld(page)` with
+the default predicate. `tests/unit/E2eReloads.test.js` reads every source under `tests/e2e` and `tests/shared` as
+syntax (`parseSource.js`, code strings included) and fails on any page navigation outside its two permitted sites —
+`world.js`'s one `.reload(` (in `reloadWorld`) and `fixtures.js`'s one `.goto(` (in `login`): a `reload(` or
+`debouncedReload(` call through any receiver (`page.reload(`, `location.reload(`), `location.assign(`/`.replace(`, an
+assignment to `location` or `location.href`, or a `goto(`/`goBack(`/`goForward(` call. `page.on('console')` and
+`attachPageErrors` listeners survive reloads (they attach to the Page object). Sequence:
 (1) PROVE the first boot's ready work finished BEFORE clearing the capture buffer —
 `waitForFunction(() => !!game.titan?.playerHud)`, since the Player HUD is built after the GM's migration attempt
 (`game.ready` is set before the un-awaited ready hooks finish, so login resolving proves nothing about them);
