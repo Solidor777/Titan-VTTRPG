@@ -216,9 +216,8 @@ export async function controlFixtureActorToken(page, { actorName, fallbackSceneN
       /** @type {string|null} The created fallback scene's id, when no scene was created before. */
       let fallbackId = null;
 
-      // Reuse a same-named fallback from an earlier run before adding another to the world. Only one
-      // of the ten callers deletes the id returned below, so creating unconditionally leaked a scene
-      // per fallback (26 duplicates accumulated, measurably slowing world load).
+      // Reuses a same-named fallback scene before creating one, so the world holds at most one scene per
+      // fallback name even though most callers never delete the id returned below.
       if (!scene) {
          scene = game.scenes.getName(sceneName) ?? null;
          if (scene) {
