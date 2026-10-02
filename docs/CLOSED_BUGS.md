@@ -1749,11 +1749,12 @@ The evidence files named here are in `.superpowers/sdd/test-suite-rewrite/phase-
 - **Found:** 2026-10-02 in the review of Phase 3 Part B.
 - **Fixed:** `_onSortItem` reads `itemData._id`, returns false when there is no source, row or target, and writes
   `_id` on each update; it calls `foundry.utils.performIntegerSort`. Its direction is core's automatic one (read:
-  `client/utils/helpers.mjs:277`): before the target when the dropped item's sort is greater, else after it. The
-  weapons start with equal sorts, so the first drop lands after the target (measured: first live gate run, sorts
-  printed 100000/300000/200000 for rows first/second/third after a drop of the third on the first).
-- **Gate:** `drag.spec.js` "a weapon dragged from its own sheet onto another row sorts it relative to that row".
-  Before the fix (`gate127-before-fix.log` for the first version of the test, `gate127-before-fix-final-test.log` for
-  the final test): failed with the page error "Cannot read properties of undefined (reading 'id')". After
-  (`gate127-after-fix.log`): passed.
+  `client/utils/helpers.mjs:277`): before the target when the dropped item's sort is greater, else after it, so a drop
+  on a row of equal sort lands after it (measured: with all three weapons at sort 0, a drop of the third on the first
+  stored sorts 100000, 300000, 200000 for first, second, third).
+- **Gate:** `drag.spec.js` "a weapon dragged from its own sheet onto another row sorts it relative to that row": a grip
+  drag out and back stores distinct sorts, then the last weapon dropped on the first row sorts before it, and dropped on
+  the last row sorts after it. Before the fix (`gate127-before-fix-final-test.log`; `gate127-before-fix.log` is the
+  first version of the test): failed with the page error "Cannot read properties of undefined (reading 'id')". After
+  (`gate127-after-fix.log`, and `drag-fix-1.log` to `drag-fix-3.log` for the whole file): passed.
 - **Status:** Closed 2026-10-02.

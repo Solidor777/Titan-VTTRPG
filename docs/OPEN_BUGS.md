@@ -178,3 +178,31 @@ The evidence files named here are in `.superpowers/sdd/test-suite-rewrite/phase-
   one. Whether that removes the failure is not known, because the failure never recurred without it. Cause not located.
 - **Found:** 2026-10-02 in Phase 3 Part A.
 - **Status:** Open.
+
+### 128. A typed check label was once stored as the default "Check" in the drag spec's fixture
+
+The evidence files named here are in `.superpowers/sdd/test-suite-rewrite/phase-3/` (local, not checked in).
+
+- **What:** in one full e2e run, the `beforeAll` of `drag.spec.js` failed in `fillList` for the `check` list: the
+  stored labels were "E2E Drag Source Check 1", "Check", "E2E Drag Source Check 3" where the second was typed
+  (`e2e-full-fix.clean.txt`, failure 2). This is the second occurrence of a typed check label stored as "Check"
+  (first: #122).
+- **Shared mechanism, read:** both are a `fill` plus `blur` on a check label input followed by a later check on the stored
+  value; `fillList` filled all rows and polled once at the end, while `addCheck` (after #122) waits for the rows to
+  render and polls per field. **Inferred, not measured:** an update from the previous row's commit re-renders the list
+  and resets a later row's input before it commits.
+- **Not reproduced:** 0 failures in 3 later full runs of the file (`drag-fix-1.log` to `drag-fix-3.log`).
+- **Mitigation applied, effect unproven:** `fillList` (`drag.spec.js`) and the attack-label loop in
+  `item-sheet-rolls.spec.js` now poll each row's stored value before the next row is filled. The cause in the product (a
+  sheet input that loses a typed value to a re-render) is not located; if it is one, it is a product defect.
+- **Found:** 2026-10-02 in the Part B review fixes.
+- **Status:** Open.
+
+### 129. `condition-description.spec.js` "with no scene active, the fixture token is placed on a fully drawn fallback scene" once found no Token HUD
+
+- **What:** in one full e2e run the test failed at `condition-description.spec.js:343`: after a right-click on the placed
+  token, `#token-hud` was not found within 5 s (`e2e-full-fix.clean.txt`, failure 1). The spec is not touched by Part B.
+- **Not reproduced:** 0 failures in 3 isolated runs of the file (`cd-fix-1.log` to `cd-fix-3.log`).
+- **Cause not located.**
+- **Found:** 2026-10-02 in the Part B review fixes.
+- **Status:** Open.

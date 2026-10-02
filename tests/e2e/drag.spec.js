@@ -232,6 +232,12 @@ async function fillList(uuid, kind, tokens) {
       const input = rows.nth(index).locator(LISTS[kind].token).first();
       await input.fill(token);
       await input.blur();
+
+      // A stored row re-renders the list, which can reset a later row's input, so each token is awaited first.
+      await expect.poll(
+         async () => (await readTokens(uuid, kind))[index],
+         { message: `row ${index} of the ${kind} list stored its token` },
+      ).toBe(token);
    }
    await expect.poll(
       async () => (await readTokens(uuid, kind)).slice(0, tokens.length),
@@ -402,39 +408,40 @@ test.describe('character sheet lists', () => {
       };
 
       // Core's sort direction is automatic (read: Foundry 14.364 `performIntegerSort`, `client/utils/helpers.mjs:277`):
-      // the dropped item goes before the target when its sort is greater than the target's, otherwise after it. The
-      // weapons start with equal sorts, so the first drop lands after the target.
-      await dropOwnSheetOn(third, rows.nth(0));
-      await expect.poll(storedIds, { message: 'a drop on a row of equal sort sorted the weapon after it' }).toEqual([
+      // the dropped item goes before the target when its sort is greater than the target's, otherwise after it. Equal
+      // sorts (a list no drag has touched) give no direction, so a grip drag out and back first stores distinct sorts.
+      await dragGrip(rows.nth(0), rows.nth(2), 'bottom');
+      await dragGrip(rows.nth(2), rows.nth(0), 'top');
+      await expect.poll(storedIds, { message: 'the grip drags stored distinct sorts in the original order' }).toEqual([
          first,
-         third,
          second,
+         third,
       ]);
 
-      // The sorts are now distinct, so a weapon below the target goes before it.
-      await dropOwnSheetOn(second, rows.nth(0));
+      // The last weapon has the greatest sort, so dropped on the first row it goes before it.
+      await dropOwnSheetOn(third, rows.nth(0));
       await expect.poll(storedIds, { message: 'a drop on a row of lower sort sorted the weapon before it' }).toEqual([
-         second,
-         first,
          third,
+         first,
+         second,
       ]);
       await expect.poll(
          () => rows.evaluateAll((elements) => elements.map((element) => element.dataset.itemId)),
          { message: 'the rendered list follows' },
       ).toEqual([
-         second,
+         third,
          first,
+         second,
+      ]);
+
+      // That weapon now has the least sort, so dropped on the last row it goes after it, which restores the list.
+      await dropOwnSheetOn(third, rows.nth(2));
+      await expect.poll(storedIds, { message: 'a drop on a row of greater sort sorted the weapon after it' }).toEqual([
+         first,
+         second,
          third,
       ]);
       expect(errors, `uncaught errors:\n${errors.join('\n')}`).toEqual([]);
-
-      // The grip puts the weapon back after the first, which restores the list for the next test.
-      await dragGrip(rows.nth(0), rows.nth(1), 'bottom');
-      await expect.poll(storedIds, { message: 'the grip drag restored the order' }).toEqual([
-         first,
-         second,
-         third,
-      ]);
    });
 });
 

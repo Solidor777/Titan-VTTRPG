@@ -71,6 +71,15 @@ test.beforeAll(async ({ browser }) => {
    ].entries()) {
       await attackLabels.nth(index).fill(label);
       await attackLabels.nth(index).blur();
+
+      // A stored row re-renders the list, which can reset a later row's input, so each label is awaited first.
+      await expect.poll(
+         async () => (await page.evaluate(
+            async (uuid) => (await fromUuid(uuid)).system.attack.map((attack) => attack.label),
+            itemUuids.weapon,
+         ))[index],
+         { message: `the label input stored attack ${index}` },
+      ).toBe(label);
    }
    await expect.poll(
       () => page.evaluate(
