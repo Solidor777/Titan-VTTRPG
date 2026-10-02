@@ -1215,13 +1215,16 @@ function sharedItem(type, label, shape) {
 
 /**
  * The number of entries in each list of the bulk fixture: abilities, checks on the equipment and rules elements on the
- * effect. Measured at every tested zoom (`.superpowers/sdd/test-suite-rewrite/phase-3/entry-count-measure.log`, with
- * 30 entries): the Abilities tab's scroll area is 563 px high at 100% zoom (358 px at 150%) and its rows are 66 px
- * apart, so 9 rows fill it and the tenth overflows it; the Checks tab's area is 412 px with rows 359 px apart, and the
- * rules elements list's is 412 px with rows 146 px apart. 10 entries therefore overflow all three at every zoom.
+ * effect. Measured at every tested zoom with this many entries
+ * (`.superpowers/sdd/test-suite-rewrite/phase-3/entry-count-measure-12.log`, local): the Abilities tab's scroll area is
+ * 563 px high at 100% zoom and holds 788 px (225 px, 3.4 rows of 66 px, to scroll; the least of any zoom), the Checks
+ * tab's area is 412 px and holds 4346 px, and the rules elements list's is 412 px and holds 1790 px. With 10 entries
+ * the Abilities tab had 93 px (1.4 rows) to scroll at 100% zoom (`entry-count-measure-10.log`). The sidebar's
+ * sections are not bulk entries: 5 sections hold 872 px in an 855 px area (17 px) at 100% zoom and more at higher
+ * zooms (the same logs, `sidebar` rows).
  * @type {number}
  */
-export const BULK_COUNT = 10;
+export const BULK_COUNT = 12;
 
 /**
  * The shared fixtures a flow can build, by key. `shared` runs the flow of a key that is not on the list. Items are

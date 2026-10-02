@@ -12,6 +12,10 @@ import { attachPageErrors, closeAllApps } from './world.js';
  * for its tooltip; it is passed verbatim. A description edited to HTML with an event handler is cleaned in the tooltip
  * that is already mounted.
  *
+ * A second describe covers the custom traits of a weapon's attack: the Add Custom Trait dialog of the Attacks tab, the
+ * attack tag's edit and delete icons and the Edit dialog. They are separate components from the item-level ones
+ * (under `src/document/types/item/types/weapon/`).
+ *
  * The documents come from flows: world weapons made through the Items tab, one effect per test on a player actor.
  */
 
@@ -202,9 +206,9 @@ test.describe('custom traits on items', () => {
          /** @type {import('@playwright/test').Locator} The document's sheet. */
          const sheet = await openSheetByUuid(page, uuid);
          await expect(sheet.locator('.sidebar').getByText(ORIGINAL_NAME).first()).toBeVisible();
-         /** @type {object} The tooltip content read from the page. */
+         /** @type {string|null} The tooltip content read from the page, or null when no label carries a tooltip. */
          const tooltipContent = await traitSidebar(sheet).evaluate((sidebar, name) => {
-            /** @type {Element|undefined} The trait tag element that carries the marker. */
+            /** @type {Element|undefined} The trait tag element that carries the tooltip. */
             const label = [...sidebar.querySelectorAll('.tag *')]
                .find((element) => element._tippy && element.textContent.trim() === name);
             return label ? label._tippy.props.content : null;
@@ -241,7 +245,7 @@ test.describe('custom traits on items', () => {
       // Mark the trait label that carries the tooltip, and read its first content.
       /** @type {string|null} The tooltip's first content, or null when the label is not found. */
       const first = await traitSidebar(sheet).evaluate((sidebar, name) => {
-         /** @type {Element|undefined} The trait tag element that carries the marker. */
+         /** @type {Element|undefined} The trait tag element that carries the tooltip; it is marked below. */
          const label = [...sidebar.querySelectorAll('.tag *')]
             .find((element) => element._tippy && element.textContent.trim() === name);
          if (!label) {
@@ -266,7 +270,7 @@ test.describe('custom traits on items', () => {
 
       // The same, still marked, label holds the cleaned payload: the mounted tooltip was cleaned on update.
       await expect.poll(() => traitSidebar(sheet).evaluate((sidebar) => {
-         /** @type {Element|undefined} The trait tag element that carries the marker. */
+         /** @type {Element|undefined} The trait tag element marked before the edit, if it is still mounted. */
          const label = [...sidebar.querySelectorAll('.tag *')].find((element) => element.__e2eMarked);
          return label ? label._tippy?.props?.content : 'the marked label was replaced';
       })).toBe(cleaned.payload);

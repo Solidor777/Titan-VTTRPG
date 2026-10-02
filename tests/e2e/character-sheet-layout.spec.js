@@ -259,11 +259,12 @@ test.describe('browser zoom', () => {
     * fully visible: inside every clipping ancestor, inside the viewport, and the topmost element at its corners.
     * @param {string} appId - The sheet application's element id.
     * @param {string} rowSelector - Selector of one list entry inside the sheet.
-    * @returns {Promise<object>} The entry count and the visibility verdict with the failing reason, if any.
+    * @returns {Promise<object>} The entry count, whether the list overflowed before scrolling, and the visibility
+    * verdict with the failing reason, if any.
     */
    function scrollToLastAndMeasure(appId, rowSelector) {
       return page.evaluate(({ id, selector }) => {
-         /** @type {import('@playwright/test').Locator} The document's sheet. */
+         /** @type {HTMLElement} The sheet's application element in the page. */
          const sheet = document.getElementById(id);
          /** @type {NodeListOf<Element>} The list entries. */
          const rows = sheet.querySelectorAll(selector);
@@ -271,11 +272,16 @@ test.describe('browser zoom', () => {
          /** @type {Element} The last list entry. */
          const last = rows[rows.length - 1];
 
-         // Only containers a user can scroll (overflow auto/scroll) are scrolled.
+         // Only containers a user can scroll (overflow auto/scroll) are scrolled. `overflows` records whether any of
+         // them has more content than it shows, measured before scrolling: without that, the test would pass on a list
+         // that fits.
+         /** @type {boolean} Whether a scrollable ancestor of the last entry holds more than it shows. */
+         let overflows = false;
          for (let element = last.parentElement; element && element !== document.body; element = element.parentElement) {
             /** @type {string} The element's vertical overflow setting. */
             const overflow = getComputedStyle(element).overflowY;
             if (overflow === 'auto' || overflow === 'scroll') {
+               overflows ||= element.scrollHeight > element.clientHeight;
                element.scrollTop = element.scrollHeight;
             }
          }
@@ -337,6 +343,7 @@ test.describe('browser zoom', () => {
 
          return {
             entries: rows.length,
+            overflows,
             visible: reason === null,
             reason,
          };
@@ -395,6 +402,7 @@ test.describe('browser zoom', () => {
             timeout: 1000,
          }).toEqual({
             entries: entryCount,
+            overflows: true,
             visible: true,
             reason: null,
          });
