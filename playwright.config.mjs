@@ -13,6 +13,9 @@ const chromiumArgs = process.env.TITAN_E2E_GPU === '0' ? [] : ['--enable-gpu'];
 export default defineConfig({
    testDir: './tests/e2e',
    timeout: 60_000,
+   // Every wait on something inside an already-loaded page is at most 1 s (`.claude/claude.md` "Project Scope");
+   // `expect` and `expect.poll` use this ceiling unless a call sets a lower one.
+   expect: { timeout: 1000 },
    fullyParallel: false,
    workers: 1,
    globalSetup: './tests/e2e/global-setup.js',

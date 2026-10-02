@@ -305,7 +305,7 @@ async function waitForSceneDrawn(page, sceneId) {
    await page.waitForFunction(
       (sceneId) => canvas.ready && canvas.scene?.id === sceneId,
       sceneId,
-      { timeout: 30_000 },
+      { timeout: 1000 },
    );
 }
 
@@ -745,7 +745,17 @@ export async function pickPortrait(page, sheet, fileName) {
    /** @type {import('@playwright/test').Locator} The picker's address bar. */
    const address = picker.locator('input[name="target"]');
    await address.fill('icons/svg');
+
+   // The address bar's Enter browses the directory and re-renders the file list (read: core `FilePicker#browse`), which
+   // drops a file selected before it finishes, so the old list is marked and the pick waits for the marker to go.
+   /** @type {import('@playwright/test').Locator} The picker's file list, marked until the browse replaces it. */
+   const staleList = picker.locator('section.body[data-stale]');
+   await picker.locator('section.body').evaluate((element) => {
+      element.dataset.stale = 'true';
+   });
+   await expect(staleList, 'the file list is marked before the browse').toHaveCount(1);
    await address.press('Enter');
+   await expect(staleList, 'the browse replaced the file list').toHaveCount(0);
    await picker.locator(`[data-action="pickFile"][data-name="${fileName}"]`).click();
    await picker.locator('button[type="submit"]').click();
    await expect(picker).toHaveCount(0);

@@ -14,7 +14,7 @@ test('theme editor h3 uses the header token, and light-theme panel-1 is stepped'
          const editor = new (game.settings.menus.get('titan.themeEditor').type)();
          await editor.render(true);
          const start = Date.now();
-         while (!editor.element?.querySelector('section h3') && Date.now() - start < 5000) {
+         while (!editor.element?.querySelector('section h3') && Date.now() - start < 1000) {
             await new Promise((r) => requestAnimationFrame(r));
          }
          const h3 = editor.element.querySelector('section h3');
@@ -55,7 +55,7 @@ test('theme editor preview shows the three stepped panels and per-level headers'
          const editor = new (game.settings.menus.get('titan.themeEditor').type)();
          await editor.render(true);
          const start = Date.now();
-         while (!editor.element?.querySelector('.preview .panel-3') && Date.now() - start < 5000) {
+         while (!editor.element?.querySelector('.preview .panel-3') && Date.now() - start < 1000) {
             await new Promise((r) => requestAnimationFrame(r));
          }
          const preview = editor.element.querySelector('.preview');

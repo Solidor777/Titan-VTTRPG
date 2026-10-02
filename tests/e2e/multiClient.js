@@ -56,7 +56,7 @@ export async function awaitUsersActive(page, userNames) {
    await page.waitForFunction(
       (names) => names.every((name) => game.users.getName(name)?.active === true),
       userNames,
-      { timeout: 30_000 },
+      { timeout: 1000 },
    );
 }
 

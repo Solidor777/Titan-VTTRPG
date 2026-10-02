@@ -411,6 +411,11 @@ test.describe('character sheet lists', () => {
       // the dropped item goes before the target when its sort is greater than the target's, otherwise after it. Equal
       // sorts (a list no drag has touched) give no direction, so a grip drag out and back first stores distinct sorts.
       await dragGrip(rows.nth(0), rows.nth(2), 'bottom');
+      await expect.poll(storedIds, { message: 'the first grip drag moved the first weapon last' }).toEqual([
+         second,
+         third,
+         first,
+      ]);
       await dragGrip(rows.nth(2), rows.nth(0), 'top');
       await expect.poll(storedIds, { message: 'the grip drags stored distinct sorts in the original order' }).toEqual([
          first,

@@ -52,7 +52,7 @@ test.afterAll(async () => {
 async function openPackContextMenu(page, packId) {
    await page.locator('#sidebar-tabs [data-tab="compendium"]').click();
    await page.locator(`.directory-item[data-pack="${packId}"]`).click({ button: 'right' });
-   await page.locator('#context-menu').waitFor();
+   await page.locator('#context-menu').waitFor({ timeout: 1000 });
 }
 
 /**
@@ -107,7 +107,7 @@ async function seedScratchPack(page, fixture) {
       // reliably exercise the same readiness gate as a write, so retry the real create call itself.
       for (const documentData of documents) {
          /** @type {number} */
-         const readyDeadline = Date.now() + 5000;
+         const readyDeadline = Date.now() + 1000;
          for (;;) {
             try {
                await Item.create(documentData, { pack: `world.${packName}` });
@@ -127,7 +127,7 @@ async function seedScratchPack(page, fixture) {
       /** @type {CompendiumCollection} */
       const pack = game.packs.get(packId);
       /** @type {number} */
-      const readDeadline = Date.now() + 5000;
+      const readDeadline = Date.now() + 1000;
       for (;;) {
          try {
             await pack.getDocuments();
@@ -164,7 +164,7 @@ async function seedScratchActorPack(page, fixture) {
       });
 
       /** @type {number} */
-      const readyDeadline = Date.now() + 5000;
+      const readyDeadline = Date.now() + 1000;
       /** @type {object} */
       let actor;
       for (;;) {
@@ -211,7 +211,7 @@ async function seedScratchActorPack(page, fixture) {
       /** @type {CompendiumCollection} */
       const pack = game.packs.get(packId);
       /** @type {number} */
-      const readDeadline = Date.now() + 5000;
+      const readDeadline = Date.now() + 1000;
       for (;;) {
          try {
             await pack.getDocuments();
@@ -266,7 +266,7 @@ test.describe('compendium spreadsheet export/import', () => {
    test('exporting the seeded effects pack produces a manifest and one row per effect', async () => {
       await openPackContextMenu(page, 'titan.effects');
       /** @type {Promise<import('@playwright/test').Download>} */
-      const downloadPromise = page.waitForEvent('download');
+      const downloadPromise = page.waitForEvent('download', { timeout: 1000 });
       await choosePackMenuEntry(page, 'Export to Spreadsheet');
       // Default format/layout (xlsx/wide) exports as a single .xlsx with no dialog interaction needed —
       // the context-menu action opens the dialog; accept its defaults by clicking the confirm button.
@@ -302,7 +302,7 @@ test.describe('compendium spreadsheet export/import', () => {
 
          await openPackContextMenu(page, packId);
          /** @type {Promise<import('@playwright/test').Download>} */
-         const downloadPromise = page.waitForEvent('download');
+         const downloadPromise = page.waitForEvent('download', { timeout: 1000 });
          await choosePackMenuEntry(page, 'Export to Spreadsheet');
          await selectTitanOption(page, page.locator('[data-testid="export-format-select"]'), 'csv');
          await page.locator('[data-testid="export-confirm-button"]').click();
@@ -368,7 +368,7 @@ test.describe('compendium spreadsheet export/import', () => {
       try {
          await openPackContextMenu(page, 'titan.effects');
          /** @type {Promise<import('@playwright/test').Download>} */
-         const downloadPromise = page.waitForEvent('download');
+         const downloadPromise = page.waitForEvent('download', { timeout: 1000 });
          await choosePackMenuEntry(page, 'Export to Spreadsheet');
          await selectTitanOption(page, page.locator('[data-testid="export-format-select"]'), 'csv');
          await page.locator('[data-testid="export-confirm-button"]').click();
@@ -438,7 +438,7 @@ test.describe('compendium spreadsheet export/import', () => {
 
          await openPackContextMenu(page, packId);
          /** @type {Promise<import('@playwright/test').Download>} */
-         const downloadPromise = page.waitForEvent('download');
+         const downloadPromise = page.waitForEvent('download', { timeout: 1000 });
          await choosePackMenuEntry(page, 'Export to Spreadsheet');
          await selectTitanOption(page, page.locator('[data-testid="export-format-select"]'), 'csv');
          await page.locator('[data-testid="export-confirm-button"]').click();
@@ -562,7 +562,7 @@ test.describe('compendium spreadsheet export/import', () => {
 
          await openPackContextMenu(page, packId);
          /** @type {Promise<import('@playwright/test').Download>} */
-         const downloadPromise = page.waitForEvent('download');
+         const downloadPromise = page.waitForEvent('download', { timeout: 1000 });
          await choosePackMenuEntry(page, 'Export to Spreadsheet');
          await selectTitanOption(page, page.locator('[data-testid="export-format-select"]'), 'csv');
          await page.locator('[data-testid="export-confirm-button"]').click();

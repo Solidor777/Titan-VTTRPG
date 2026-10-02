@@ -1758,3 +1758,26 @@ The evidence files named here are in `.superpowers/sdd/test-suite-rewrite/phase-
   first version of the test): failed with the page error "Cannot read properties of undefined (reading 'id')". After
   (`gate127-after-fix.log`, and `drag-fix-1.log` to `drag-fix-3.log` for the whole file): passed.
 - **Status:** Closed 2026-10-02.
+
+### 130. `pickPortrait` selected a file before the file picker's browse re-rendered the list, so the pick was lost
+
+The evidence files named here are in `.superpowers/sdd/test-suite-rewrite/phase-3/` (local, not checked in).
+
+- **What:** the two portrait tests of `surfaces.spec.js` failed intermittently once `expect` was capped at 1 s: 2 of 5
+  runs (`audit-surfaces-3.log`: the first pick was not stored, stored value still `icons/svg/sword.svg`;
+  `audit-surfaces-5.log`: the second pick was not stored) and 1 of 6 runs with a 10 s ceiling
+  (`measure-portrait-6.log`: the file picker stayed open after the submit click for the whole 10 s). In the passing runs
+  the stored value settled in 1 to 5 ms (`measure-portrait-1.json` to `-6.json`), so the failures were not a slow
+  update.
+- **Read:** the flow (`pickPortrait`, `tests/e2e/flows.js`) pressed Enter in the picker's address bar and then clicked
+  the file. Enter calls `FilePicker#browse`, which awaits a server request and then renders the picker again
+  (`client/applications/apps/file-picker.mjs:645-690`, `:999-1003`); the submit handler stores nothing and raises
+  "You must select a file to proceed." when no file is selected (`:1127-1134`). **Inferred, not measured:** a file
+  clicked before the re-render lost its selection to it.
+- **Found:** 2026-10-02 in the 1 s wait audit.
+- **Fixed:** `pickPortrait` marks the picker's file list (`data-stale`), presses Enter, and waits for the marker to go
+  before it clicks the file.
+- **Gate:** the two portrait tests of `surfaces.spec.js`. Before: failures in `audit-surfaces-3.log`,
+  `audit-surfaces-5.log` and `measure-portrait-6.log`. After: 8 of 8 runs passed under the 1 s ceiling
+  (`audit-portrait-fix-1.log` to `-8.log`).
+- **Status:** Closed 2026-10-02.

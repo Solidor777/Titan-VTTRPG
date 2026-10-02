@@ -23,7 +23,7 @@ const PROBE_STYLES = path.resolve(
 async function ensureProbe(page) {
    // Wait for the system to finish init before injecting: a mid-boot injection skips the IIFE's
    // immediate-registration path and would strand the current test.
-   await page.waitForFunction(() => !!globalThis.game?.titan);
+   await page.waitForFunction(() => !!globalThis.game?.titan, null, { timeout: 1000 });
 
    // Whether the probe API is already registered on this page.
    const present = await page.evaluate(() => !!globalThis.game?.titan?._probe);
@@ -33,7 +33,7 @@ async function ensureProbe(page) {
 
       // Block until registration lands, so a ready-hook fallback registration cannot strand the
       // first probe call of the file.
-      await page.waitForFunction(() => !!globalThis.game?.titan?._probe);
+      await page.waitForFunction(() => !!globalThis.game?.titan?._probe, null, { timeout: 1000 });
    }
 }
 

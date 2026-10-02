@@ -104,8 +104,10 @@ test('a report tag tooltip holds the cleaned HTML and renders it without the eve
    await expect(tag).toContainText('E2E Sanitized Condition');
    await expect.poll(() => tag.evaluate((element) => element._tippy?.props?.content)).toBe(expected);
 
-   // Hovering renders the tooltip: its image is inserted and its failed load settles without a handler.
-   await tag.hover();
+   // The tooltip is shown through tippy's `show`, which skips the hover delay: `TooltipAction.js` delays a hover's show
+   // by 1000 ms and animates it for 400 ms, longer than the suite's 1 s ceiling on a wait inside a loaded page. The
+   // image is inserted and its failed load settles without a handler.
+   await tag.evaluate((element) => element._tippy.show());
 
    /** @type {import('@playwright/test').Locator} The rendered tooltip's image. */
    const tooltipImage = page.locator('.tippy-box img[src="e2e-missing-image.png"]');

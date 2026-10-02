@@ -898,7 +898,7 @@ auto-waiting action (`.click()`/`.fill()`) — the assertion/action already poll
 (guard the poll body so it returns a sentinel rather than throwing on early iterations); (3) inside a
 `page.evaluate`, use `await titanWait(syncPredicate, { message })` — `globalThis.titanWait`
 (`tests/e2e/poll.js`), installed by `login()` via `installPoll`/`addInitScript` before navigation, polls a
-synchronous predicate (50 ms interval, 5 s default timeout). **There are now no fixed sleeps in the suite
+synchronous predicate (50 ms interval, 1000 ms default timeout). **There are now no fixed sleeps in the suite
 at all**, including assert-absence tests. When a negative assertion appears to have no pollable positive
 edge, look for a **happens-after edge**: an observable the code under test emits strictly LATER than the
 decision being asserted. `permissions-auto-open.spec.js` waits on a turn-start fast-healing change,
@@ -1053,28 +1053,35 @@ before the probe build. `settings.js` `setWorldSetting` records the prior value 
 set it (measured: a value set in one context read its default in another context and in another browser), so it ends
 with its context and needs no restore.
 
-**No e2e operation may exceed 1 second**, and wait ceilings are set to that budget so a breach fails loudly instead of
-silently absorbing 15s: explicit `timeout:` values are `1000`. Inherently multi-second waits are deliberately exempt:
-- a `game.ready` world boot (`fixtures.js`; the teardown's and the setup recovery's own login goes through it too);
+**No test poll lasts longer than 1 second** (`.claude/claude.md` "Project Scope"). Everything in the suite runs on
+one machine, so a replicated update or a render lands at once, and a wait that needs longer is a defect to find and fix,
+not a ceiling to raise. The rule covers every wait on something inside an already-loaded page: `expect.poll`, web-first
+`expect` assertions, `waitForFunction`, `waitFor`, `waitForEvent`, `titanWait`, `toPass`, the in-page retry loops of
+specs, and every explicit `timeout:` on them. `playwright.config.mjs` sets `expect.timeout` to 1000, and `titanWait`'s
+default is 1000 (`tests/e2e/poll.js`), so a call that names no ceiling gets 1 s; an explicit `timeout:` is `1000` or
+lower. Playwright retries an assertion at growing intervals (100, 250, 500 ms; read in `playwright-core/lib`, version
+1.60.0), so a condition that settles at 400 ms (Svelte's default `slide` transition duration, read in
+`svelte/src/transition/index.js`) is first seen at 850 ms (measured: the collapse assertions in
+`e2e-measure-1-slowops.json` finished at 805 to 930 ms). A product delay or animation longer than the ceiling is not waited out: the test acts on the
+instance that skips it (`html-sanitization.spec.js` shows the tooltip through tippy's `show`, because
+`TooltipAction.js` delays a hover's show by 1000 ms), or removes the cause (the last test of
+`condition-description.spec.js` reloads, which ends core's 2 s scrolling text, before it deactivates the scene).
+A flow that clicks an element which a pending request will re-render waits for the re-render first (`pickPortrait`
+marks the picker's file list and waits for the browse to replace it).
+
+The exemptions wait on a process starting and are not polls on a loaded page:
+- a `game.ready` world boot (`fixtures.js`, `join.js`; the teardown's and the setup recovery's own login goes through
+  it, as does a second browser context's login in `multiClient.js`);
 - a mid-file reload through `world.js` `reloadWorld(page, { ready })` (15 s for the `/game` URL, 60 s for the
   readiness predicate, `game.ready` by default), used by the last test of `condition-description.spec.js`, the reload
   test of `player-hud-layout.spec.js` and both portrait tests of `surfaces.spec.js`;
-- a scene draw on the canvas after a scene is created while none is viewed, viewed or activated (`flows.js`
-  `waitForSceneDrawn`, 30 s);
-- building the `bulkActor` shared fixture (`flows.js`; through the sheet controls, `BULK_COUNT` abilities,
-  checks and rules elements; 69.1 s with 30 of each in one run,
-  `.superpowers/sdd/test-suite-rewrite/phase-2/review-measure-1.log`), whose first consumer raises its own
-  timeout;
-- a second browser context finishing login (`multiClient.js`, used by the last test of `effect-tray.spec.js` for its
-  E2E GM 2 client);
-- core's 2 s scrolling text finishing before the viewed scene is deactivated (`condition-description.spec.js`, last
-  test, 10 s; OPEN_BUGS #114).
+- `use.actionTimeout` (10 s safety net for actions) and per-test and hook limits (`test.setTimeout`, e.g. 120 s or
+  300 s for the tests that reload and 240 s for the `beforeAll` of `drag.spec.js`).
 
-The tests that reload raise `test.setTimeout` to 120 s or 300 s (`condition-description.spec.js`'s last test: 120 s).
-Do not sweep those to 1s. A ceiling is a failure bound, not a duration: a `waitForFunction` returns the moment its
-predicate holds. **`titanWait`'s default timeout is also 1000ms** (`tests/e2e/poll.js`), so the budget is the default
-everywhere and the exceptions are the few explicit overrides — pass an explicit `timeout` only for an inherently
-multi-second wait, such as a world boot.
+Building the `bulkActor` shared fixture (69.1 s with 30 entries of each in one run,
+`.superpowers/sdd/test-suite-rewrite/phase-2/review-measure-1.log`) is a long sequence of short waits inside a hook
+limit, not one wait. `closeAllApps` (`world.js`) is an `evaluate` that awaits each window's close and reached 1049 ms
+in a full run; it is not a poll.
 
 Invalid core or priority values are hard errors, never silent fallbacks to the default.
 
@@ -1263,7 +1270,7 @@ throws. `seedEncounterForClients(gm, viewers, seed)` seeds an encounter unstarte
 scene-less combat, from the first render), and core's `CombatTracker#_onRender` throws on each round or turn update of
 a combat it does not view, so a client must view the encounter before it starts.
 `awaitUsersActive(page, userNames)` polls `game.users.getName(name)?.active`
-inside `page.waitForFunction` (30 s timeout) until all named users are active on that client. Because
+inside `page.waitForFunction` (1000 ms timeout) until all named users are active on that client. Because
 `playwright.config.mjs` uses `workers: 1`, logins are sequential and there are no race conditions on
 the `/join` form. The smoke test is `tests/e2e/multi-client.spec.js`.
 

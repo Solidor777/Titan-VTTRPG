@@ -8,7 +8,7 @@ test('HUD rect anchors to the expanded sidebar edge and does not move on collaps
    await login(page);
 
    // The GM's Ready hook awaits its migrations before building the HUD, so the HUD appears after `game.ready`.
-   await page.waitForFunction(() => Boolean(globalThis.game.titan?.playerHud));
+   await page.waitForFunction(() => Boolean(globalThis.game.titan?.playerHud), null, { timeout: 1000 });
 
    const result = await page.evaluate(async () => {
       const sb = ui.sidebar;

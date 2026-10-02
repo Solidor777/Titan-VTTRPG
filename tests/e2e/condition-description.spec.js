@@ -269,19 +269,20 @@ test('with no scene active, the fixture token is placed on a fully drawn fallbac
 
    // Precondition, established here: no scene is active and the client boots with a blank canvas. Only a test scene
    // may be deactivated, and Foundry has no control that deactivates a scene, so the flag is cleared directly. The
-   // earlier tests add effects, whose scrolling text core animates on the interface group; the deactivation waits until
-   // no such animation runs. The page then reloads to boot with a blank canvas.
+   // earlier tests add effects, whose scrolling text core animates for 2 s on the interface group, so the page reloads
+   // first, which ends those animations, and then the scene is deactivated and the page reloads again to boot with a
+   // blank canvas.
    /** @type {string|null} The name of the scene active at the start, if any. */
    const activeName = await page.evaluate(() => game.scenes.active?.name ?? null);
    expect(activeName === null || activeName.startsWith('E2E '), `the active scene is a test scene: ${activeName}`)
       .toBe(true);
 
-   // Deactivating the viewed scene while core's scrolling text animates throws (OPEN_BUGS #114).
-   await expect.poll(() => page.evaluate(() => Reflect.ownKeys(foundry.canvas.animation.CanvasAnimation.animations)
-      .some((key) => foundry.canvas.animation.CanvasAnimation.animations[key].context === canvas.interface)), {
-      message: 'no scrolling text animates on the interface group',
-      timeout: 10_000,
-   }).toBe(false);
+   // Deactivating the viewed scene while core's scrolling text animates throws (OPEN_BUGS #114). The reload leaves none
+   // running.
+   await reloadWorld(page);
+   expect(await page.evaluate(() => Reflect.ownKeys(foundry.canvas.animation.CanvasAnimation.animations)
+      .some((key) => foundry.canvas.animation.CanvasAnimation.animations[key].context === canvas.interface)),
+   'no scrolling text animates on the interface group').toBe(false);
    await page.evaluate(async () => {
       await game.scenes.active?.update({ active: false });
    });
