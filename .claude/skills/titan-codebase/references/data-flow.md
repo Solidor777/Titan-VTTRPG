@@ -170,7 +170,7 @@ component to render.
 **2. Reactive UI state — `CharacterSheetState` (src/document/types/actor/types/character/sheet/
 CharacterSheetState.js)**
 `TitanCharacterSheet._createReactiveState()` calls `createCharacterSheetState(actor)`, which returns a
-plain Svelte `writable` store augmented with `postAddItem` / `preDeleteItem` methods (still a store, not a
+plain Svelte `writable` store augmented with `postAddItem` / `postDeleteItem` methods (still a store, not a
 rune). It is passed into the Svelte tree as the `applicationState` prop and made available to all children
 via `setContext('applicationState', applicationState)` inside `DocumentSheetShell.svelte`.
 

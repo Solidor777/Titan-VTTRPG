@@ -977,8 +977,8 @@ duration type chosen in the sheet header), `addCheck` (the Checks tab add button
 when asked, its Resolve Cost input, Resistance Check select and Opposed Check box),
 `addRulesElement` (the Rules Elements tab add button, the operation select, and the `ccm-*` selects and value input
 of a conditional check modifier), `createWorldItem`, `addCustomTrait`, `addAttack`, `enableAspect` and
-`addCustomAspect` (the Add Custom Trait dialog with an optional description, the weapon Attacks tab add button, the
-spell Standard Aspects
+`addCustomAspect` (the Add Custom Trait dialog with an optional description, the weapon Attacks tab add
+button, the spell Standard Aspects
 toggle with its option toggles and resistance select, the spell Custom Aspects tab add button), `pickPortrait` (the
 sheet's portrait button opens Foundry's own file picker, the Core Data tab is chosen when it is not the open one (the
 picker of a player actor opened on the User Data tab: `.superpowers/sdd/test-suite-rewrite/phase-2/review-measure-1.log`, `actor picker tabs`),
@@ -994,13 +994,14 @@ determined (`.superpowers/sdd/test-suite-rewrite/phase-2/review-measure-2.log`);
 controlled tokens: measured on a scene with `tokenVision` true, a second token had `visible` false while the first
 was controlled and `visible` true after Escape, and with `tokenVision` false it stayed visible while the first was
 controlled (`.superpowers/sdd/test-suite-rewrite/phase-2/review-measure-1.log`, `A controlled`, `after Escape`, `tokenVision false`), and a token that is
-not visible takes no pointer events), `toggleTokenLink`, `unlinkPlacedToken` and `controlPlacedToken` (the sheet header
-buttons; the token flows close the
-open windows, release control, move the pointer onto the token and wait for `token.object.hover` before the
-double-click that opens the sheet (`unlinkPlacedToken`, which then waits for the reopened synthetic actor's sheet) or
-the click that takes control (`controlPlacedToken`)), `targetPlacedToken` / `releaseTargets` / `targetedTokenIds`
-(core's Target key T on the hovered token, Shift+T adds; `game.user.targets` then holds real Token objects, as `checks-
-opposed.spec.js` uses), `createCompendium` / `setCompendiumLocked` (Compendium tab Create dialog, entry
+not visible takes no pointer events), `toggleTokenLink`, `unlinkPlacedToken` and `controlPlacedToken` (the
+sheet header buttons; the token flows close the open windows, release control, move the pointer onto the
+token and wait for `token.object.hover` before the double-click that opens the sheet (`unlinkPlacedToken`,
+which then waits for the reopened synthetic actor's sheet) or the click that takes control
+(`controlPlacedToken`)), `targetPlacedToken` / `releaseTargets` / `targetedTokenIds` (core's Target key T on
+the hovered token, Shift+T adds; `game.user.targets` then holds real Token objects, as
+`checks-opposed.spec.js` uses), `createCompendium` / `setCompendiumLocked` (Compendium tab Create dialog,
+entry
 context menu Lock/Unlock), `putInPack` (opens the pack's popout window and drags the world entry onto its
 `.directory-list`; the pack index is polled for the new id; the caller passes the world entry's locator, and the flow
 reopens that entry's sidebar tab before the drag). The creation dialogs are `DialogV2` forms whose content
@@ -1017,18 +1018,16 @@ Resilience resistance; stored values: `.superpowers/sdd/test-suite-rewrite/phase
 `equipment`, `commodity`; `effectHost` (a player that holds only the two effects) with `effect` and `conditionalEffect`
 (permanent, one conditional dice modifier); `roller` (a player owning copies of the shared weapon, spell and ability,
 dragged onto its sheet); `situationalActor` (a player owning an ability with a conditional dice +2, a conditional
-Advantage and a conditional dice +1 situation); `bulkActor` (`BULK_COUNT` = 10 abilities, an equipment with 10 checks
-and an effect with 10 rules elements; each list overflows its scroll area at every tested zoom, measured with 30 entries
-in `.superpowers/sdd/test-suite-rewrite/phase-3/entry-count-measure.log` (local): the Abilities tab scrolls 563 px at
-66 px per row; with 30 entries the build took 69.1 s in one run, `phase-2/review-measure-1.log`, `build bulkActor`, and
-the layout spec ran in 1.4 min (`phase-3/layout-rerun-1.log`), with 10 entries in 37.2 s
-(`phase-3/layout-after-count.log`), so its first consumer, the browser zoom describe of `character-sheet-
-layout.spec.js`,
-raises its own timeout); `scene` (created and
-viewed); `trayPack` (an unlocked `ActiveEffect` pack holding one effect). `playwright.config.mjs` sets
-`use.actionTimeout` to 10 s
-(about ten times the longest action measured in a full run, 916 ms), so a flow that waits on a missing element fails
-after 10 s; a wait that legitimately takes longer passes its own timeout.
+Advantage and a conditional dice +1 situation); `bulkActor` (`BULK_COUNT` = 12 abilities, an equipment with 12
+checks and an effect with 12 rules elements; measured at every tested zoom in
+`.superpowers/sdd/test-suite-rewrite/phase-3/entry-count-measure-12.log` (local): the Abilities tab has 225 px
+to scroll at the least, the Checks tab 3934 px and the rules elements list 1378 px; the build took 69.1 s with 30
+entries of each in one run (`.superpowers/sdd/test-suite-rewrite/phase-2/review-measure-1.log`, `build bulkActor`),
+so its first consumer, the browser zoom describe of `character-sheet-layout.spec.js`, raises its own timeout);
+`scene` (created and viewed); `trayPack` (an unlocked `ActiveEffect` pack holding one effect).
+`playwright.config.mjs` sets `use.actionTimeout` to 10 s (about ten times the longest action measured in a full run,
+916 ms), so a flow that waits on a missing element fails after 10 s; a wait that legitimately takes longer passes its
+own timeout.
 `tests/e2e/global-teardown.js` (Playwright `globalTeardown`) launches one Chromium, logs in as `E2E GM 1`, asserts the
 census world and in order deletes the list through the API (combats; tokens by their scene; scenes; embedded
 documents by their parent; world actors, items, macros, roll tables, journal entries, playlists, cards, folders; recorded
@@ -1053,10 +1052,10 @@ silently absorbing 15s: explicit `timeout:` values are `1000`. Inherently multi-
   test of `player-hud-layout.spec.js` and both portrait tests of `surfaces.spec.js`;
 - a scene draw on the canvas after a scene is created while none is viewed, viewed or activated (`flows.js`
   `waitForSceneDrawn`, 30 s);
-- building the `bulkActor` shared fixture (`flows.js`; through the sheet controls, `BULK_COUNT` abilities, checks and
-  rules elements; 69.1 s with 30 of each in one run, `.superpowers/sdd/test-suite-rewrite/phase-2/review-
-  measure-1.log`),
-  whose first consumer raises its own timeout;
+- building the `bulkActor` shared fixture (`flows.js`; through the sheet controls, `BULK_COUNT` abilities,
+  checks and rules elements; 69.1 s with 30 of each in one run,
+  `.superpowers/sdd/test-suite-rewrite/phase-2/review-measure-1.log`), whose first consumer raises its own
+  timeout;
 - a second browser context finishing login (`multiClient.js`, used by the last test of `effect-tray.spec.js` for its
   E2E GM 2 client);
 - core's 2 s scrolling text finishing before the viewed scene is deactivated (`condition-description.spec.js`, last
@@ -1188,17 +1187,22 @@ from writing them; each says whether it was measured (with its saved log, under
   and, for an item with checks or attacks, also in its expanded content. Observed as Playwright strict-mode violations
   while writing the specs; no log of them was saved, so these are inferred from the locators that failed.
 - A refused delete (a `preDelete<Document>` listener that returns false, installed in the page and removed in a
-  `finally`) reaches the path where the delete is refused after the code has marked the item; a listener counts the
-  refusals so the test waits for the delete to have run. Measured: `gates-fix-before.log`,
-  `gate103-settle-before-fix.log`.
+  `finally`) reaches the path where the delete is refused; a listener counts the refusals so the test waits for
+  the delete to have run. For an item, the code had marked the item before the refusal and had un-equipped an
+  armor and dropped the row's expanded state; effects are never marked (`TitanItem#safeDelete` is the only
+  writer of the mark, read). Measured: `gates-fix-before.log`, `gate119-predelete-before-fix.log` and, for the
+  dialog branch, `gate103-else-before-fix-item.log` (all under
+  `.superpowers/sdd/test-suite-rewrite/phase-3/`).
 - When a test fails, Playwright restarts the worker and runs the file's `beforeAll` again, which then finds a second
   document of the same name and fails inside the flow; the first failure is the one to read. Measured: the second
   failure in `gates-fix-before.log` (two `E2E Rows Actor` directory entries).
 
-**E2E browser-zoom emulation** — the browser zoom tests of `character-sheet-layout.spec.js` emulate page zoom z through
-a CDP session:
+**E2E browser-zoom emulation** — the browser zoom tests of `character-sheet-layout.spec.js` emulate page zoom
+z through a CDP session:
 `Emulation.setDeviceMetricsOverride({ width: 1920 / z, height: 1080 / z, deviceScaleFactor: z })`. Foundry
-re-clamps and repositions open windows after the resize, so layout assertions poll until they settle.
+re-clamps and repositions open windows after the resize, so layout assertions poll until they settle. Each
+zoom step first checks that the list overflows its scroll area, so a fixture too short to scroll fails
+instead of passing.
 
 **E2E helpers must not blind-toggle expanders** — verify a row's mount default before clicking its
 expand/collapse toggle: weapon-sheet sidebar attacks mount EXPANDED (`WeaponSheetData` seeds `isExpanded`

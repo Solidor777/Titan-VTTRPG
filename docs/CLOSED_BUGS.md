@@ -1258,13 +1258,16 @@ The evidence files named here are in `.superpowers/sdd/test-suite-rewrite/phase-
   item deletable and opens no dialog" and the same for an effect). The tests install a `preDelete` listener that
   returns false, a test instrument in the page: with a delete that succeeds, "the row deletes and no dialog opens"
   cannot fail before the fix. The test clicks the row's delete button with confirmation off, waits until the listener
-  refused the delete (the positive edge), waits two animation frames (the code after a refusal runs as promise
-  continuations within one task, so a dialog it would open exists by then), and expects no dialog and the document
-  still there. Before (the code of commit `45532000~1`, built): the item test failed with a dialog present
-  (`Expected 0, Received 1`, `phase-3/gate103-settle-before-fix.log`); the effect test was run alone earlier and
-  failed the same way (`phase-3/gate103-before-fix-effect.log`). After: both passed (`phase-3/gates-fix-after.log`).
-  The plain confirmation-off delete of an item and of an effect (no dialog, the document gone) and the
-  confirmation-on cancel and confirm paths are tested beside them.
+  refused the delete (the positive edge), waits two animation frames, and expects no dialog and the document still
+  there. Before, measured with only the `else` of the confirm branch removed in both methods (the rest of the current
+  code kept, built; `phase-3/build-before-fix103-else.log`): the item test failed with a dialog present
+  (`Expected 0, Received 1`, `phase-3/gate103-else-before-fix-item.log` and `-item-run1.log` to `-run5.log`: 6 of 6
+  runs) and the effect test failed the same way (`phase-3/gate103-else-before-fix-effect.log` and
+  `-effect-run1.log` to `-run5.log`: 6 of 6 runs). The delay between the refusal and the dialog was not measured, so
+  the two-frame wait is justified only by those 12 failures. The earlier effect-variant evidence
+  (`phase-3/gate103-before-fix-effect.log`) was for an earlier form of the test and is superseded. After: both
+  passed (`phase-3/gates-fix-after.log`). The plain confirmation-off delete of an item and of an effect (no dialog,
+  the document gone) and the confirmation-on cancel and confirm paths are tested beside them.
 
 ### 104. Open sheets re-rendered on changes to a different actor that shared their id
 
@@ -1545,13 +1548,27 @@ The evidence files named here are in `.superpowers/sdd/test-suite-rewrite/phase-
   the "already marked for deletion" assertion in `TitanActor#deleteItem` (read). `deleteItem` is the path of the
   confirmation dialog and of the row button with confirmation off.
 - **Second fix:** `safeDelete` clears the mark and returns false when the delete resolves undefined; `deleteItem`
-  skips `postDeleteItem` for a false result. `preDeleteItem`, which un-equips armor and shields, has already run when
-  a delete is refused, so the refused item stays un-equipped (read; not changed).
+  skips `postDeleteItem` for a false result.
 - **Second gate tests:** "with confirmation off, a refused item delete leaves the item deletable and opens no dialog"
   (asserts no deletion mark, then removes the refusal and deletes the same row) and "with confirmation on, a refused
   confirmed item delete leaves the item deletable". Before: the first failed with the mark true
-  (`phase-3/gates-fix-before.log`) and the second failed at the second confirmed delete
-  (`phase-3/gates-fix-before-refused-confirmed-item.log`). After: both passed (`phase-3/gates-fix-after.log`).
+  (`gates-fix-before.log`) and the second failed at the second confirmed delete
+  (`gates-fix-before-refused-confirmed-item.log`). After: both passed (`gates-fix-after.log`).
+- **Third defect, found 2026-10-02 in the second review of this fix:** `TitanActor#deleteItem` ran
+  `system.preDeleteItem` (un-equips a deleted armor or shield, `CharacterDataModel.js`) and `sheet.preDeleteItem`
+  (drops the row's expanded state, `CharacterSheetState.js`) before `safeDelete`, so a refused delete still un-equipped
+  the armor and dropped the expanded state (read). Measured before the fix: a refused delete of an equipped armor left
+  `system.equipped.armor` null, and a reopened sheet showed the row collapsed (`gate119-predelete-before-fix.log`).
+- **Third fix:** the two `preDeleteItem` hooks are removed. `TitanActor#deleteItem` awaits `system.postDeleteItem(id,
+  type)` and calls `sheet.postDeleteItem(id, type)` only after a confirmed delete; `CharacterDataModel#postDeleteItem`
+  un-equips the deleted armor or shield and `CharacterSheetState` drops the expanded flag. With the item gone,
+  `getEquippedArmor` returns false for the stale id until the update lands (read: it returns `false` when
+  `items.get` finds nothing).
+- **Third gate test:** "a refused delete of an equipped armor leaves it equipped and its row expanded" (then removes
+  the refusal, deletes again and expects the slot empty). Before: failed on both assertions
+  (`gate119-predelete-before-fix.log`). After: passed (`gate119-predelete-after-fix.log`, with the other delete tests).
+- **Robustness:** `safeDelete` clears the mark in a `finally` when `delete()` rejects. No gate: I found no flow
+  through the UI that makes `delete()` reject, and did not measure it.
 
 ### 120. Apply Edits in the Edit Traits dialog threw and stored nothing
 
@@ -1582,19 +1599,20 @@ The evidence files named here are in `.superpowers/sdd/test-suite-rewrite/phase-
 
 ### 121. `checks-opposed.spec.js` threw `_drawTargetArrows is not a function` when GM 1 viewed a drawn scene
 
-The evidence files named here are in `.superpowers/sdd/test-suite-rewrite/phase-3/` (local, not checked in).
+The evidence files named here are in `.superpowers/sdd/test-suite-rewrite/phase-3/` (local, not checked in). Core line
+numbers are from Foundry 14.364.0, the install at `C:\FoundryVTT\V14\dev\foundry` that serves the world.
 
 - **Cause (measured):** the spec replaced `game.user.targets` with a `Set` of plain `{ actor }` objects during each
   roll. Core's token-layer ticker calls `t._drawTargetArrows(config)` on every entry each frame
-  (`client/canvas/layers/tokens.mjs:460` in Foundry 14.364.0, the dev install at `C:\FoundryVTT\V14\dev\foundry` that serves the world, found with `grep -n`), so a frame inside the roll window threw. Alone the spec passed
-  7 of 7 runs (`phase-3/opposed-alone-1.log`, `phase-3/opposed-alone-r1.log` to `-r6.log`); right after the "check tags across
-  surfaces" tests of `character-sheet-rows.spec.js`, which view the shared scene as E2E GM 1, it failed 3 of 3
-  (`phase-3/rows-then-opposed-1.log` to `-3.log`). Both earlier Part A full runs failed on it.
+  (`client/canvas/layers/tokens.mjs:460`, found with `grep -n`), so a frame inside the roll window threw. Alone the
+  spec passed 7 of 7 runs (`opposed-alone-1.log`, `opposed-alone-r1.log` to `-r6.log`). Right after the "check tags
+  across surfaces" tests of `character-sheet-rows.spec.js`, which view the shared scene as E2E GM 1, it failed 3 of 3
+  (`rows-then-opposed-1.log` to `-3.log`). Both earlier Part A full runs failed on it.
 - **Fix:** the spec targets real placed tokens through core's Target key (`targetPlacedToken`, `releaseTargets` in
   `tests/e2e/flows.js`), so `game.user.targets` holds real Token objects. No fake targets remain.
-- **Gate:** `checks-opposed.spec.js` passes alone (`phase-3/opposed-real-alone-1.log`), after the rows spec's token
-  tests in 2 of 2 runs (`phase-3/rows-then-opposed-real-1.log`, `-2.log`), and in full-suite order (`phase-3/e2e-full-3.log`:
-  628 passed, 0 failed, census zero).
+- **Gate:** `checks-opposed.spec.js` passes alone (`opposed-real-alone-1.log`), after the rows spec's token tests
+  in 2 of 2 runs (`rows-then-opposed-real-1.log`, `-2.log`), and in full-suite order (`e2e-full-3.log`: 628 passed,
+  0 failed, census zero).
 - **Found:** 2026-10-02 in Phase 3 Part A. **Closed:** 2026-10-02.
 
 ### 123. The attack Edit Traits dialog failed to render
@@ -1638,3 +1656,24 @@ The evidence files named here are in `.superpowers/sdd/test-suite-rewrite/phase-
   both failed, the edit test on "the edit dialog opens" with the not-a-function error and the delete test on "the
   trait was removed from the attack" (`phase-3/gate125-attack-controls-before-fix.log`). After: both passed
   (`phase-3/gates-fix-after.log`).
+
+### 126. The Checks tab of an effect sheet could not reorder checks or accept a dropped check
+
+The evidence files named here are in `.superpowers/sdd/test-suite-rewrite/phase-3/` (local, not checked in).
+
+- **What:** `ItemSheetChecksTab` calls `document.data.moveCheck` and `document.data.insertCheck` for a drag reorder and
+  for a check dropped from another sheet; `ActiveEffectSheetTabs.svelte` mounts the same tab for effects, and
+  `TitanActiveEffect` had neither method (read). Measured live: dragging the second check of an effect above the first
+  raised "moveCheck is not a function" and changed nothing; dropping an equipment's check onto the effect raised
+  "insertCheck is not a function" (`gate-effect-checks-before-fix-dragging-a-check-above.log`,
+  `gate-effect-checks-before-fix-dropping-a-check-from-an-equipment.log`). The rest of the tab calls `addCheck` and
+  `deleteCheck` (which the effect had) and reads `system.check` and `uuid` (read: `grep` of `document.data` in
+  `src/document/types/item/sheet/check`).
+- **Found:** 2026-10-02 in the second review of Part A fixes.
+- **Fixed:** 2026-10-02. The four check-list mutators (`addCheck`, `deleteCheck`, `moveCheck`, `insertCheck`) live in
+  `CheckListMixin`, which `TitanItem` and `TitanActiveEffect` both use; the effect sheet gains `postMoveCheck` and
+  `postInsertCheck`.
+- **Gate tests:** `tests/e2e/character-sheet-rows.spec.js` ("dragging a check above another on the effect sheet
+  reorders the checks", "dropping a check from an equipment sheet onto the effect sheet copies it in"), driven by
+  dragging the rows' drag handles. Before: both failed with the not-a-function page errors
+  (`gate-effect-checks-before-fix-*.log`). After: both passed (`gate-effect-checks-after-fix.log`).

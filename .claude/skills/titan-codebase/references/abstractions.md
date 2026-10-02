@@ -15,7 +15,7 @@ management). Data model classes hold the schema, field validation, and derived-d
   and post-add/delete callbacks to the data model.
 - `TitanActorDataModel` (`src/document/types/actor/TitanActorDataModel.js`) extends
   `TitanDataModel`. Base class for all actor data models; adds `onPreCreate` (which calls
-  `_getInitialPrototypeTokenData`), and the `postAddItem` / `preDeleteItem` / `postDeleteItem`
+  `_getInitialPrototypeTokenData`), and the `postAddItem` / `postDeleteItem`
   lifecycle hooks that subclasses override.
 - `CharacterDataModel` (`src/document/types/actor/types/character/CharacterDataModel.js`) extends
   `TitanActorDataModel`. Its `_defineDocumentSchema()` is built from the shared shape template
@@ -60,8 +60,10 @@ management). Data model classes hold the schema, field validation, and derived-d
   `buildChatMessageData` (pure: returns `{ type, system }` from the prepared system snapshot —
   `system.getRollData()` minus document-level `id`/`type`, plus `name`/`img` as label metadata),
   `sendToChat` (sends that `type` + `system` as a first-class chat-message subtype, NOT `flags.titan`),
-  custom-trait management, and the `isMarkedForDeletion` guard flag (`safeDelete` sets it, deletes, and clears it again
-  when the delete is refused, resolving false).
+  custom-trait management, the check-list mutators (`addCheck` / `deleteCheck` / `moveCheck` / `insertCheck`, from
+  `CheckListMixin`, which `TitanActiveEffect` also uses), and the `isMarkedForDeletion` flag (`safeDelete` sets it,
+  deletes, and clears it again when the delete is refused or rejects, resolving false; `TitanActor#deleteItem` and the
+  row expand button read it).
 - `TitanItemDataModel` (`src/document/types/item/TitanItemDataModel.js`) extends `TitanDataModel`.
   Adds `description`, a `check` array (item check templates), and a `customTrait` array — its
   `_defineDocumentSchema()` is built from the shared shape template
@@ -117,10 +119,12 @@ management). Data model classes hold the schema, field validation, and derived-d
   the prepared `getRollData()` snapshot minus the document-level `id`/`type`, plus `name`/`img` as label
   metadata; the chat subtype is hardcoded `'effect'` (a condition's own subtype is not a registered chat
   subtype). `sendToChat` posts that payload as a first-class chat-message subtype, NOT `flags.titan`.
-  The class also carries check and custom-trait mutators with the same bodies as `TitanItem` (`addCheck`
-  / `deleteCheck` / `addCustomTrait` / `editCustomTrait` / `deleteCustomTrait`), ported inline (not via a
-  shared mixin); they operate on `system.check` / `system.customTrait` via `this.update(...)`, notify the
-  sheet through `this.sheet.postAddCheck()` / `preDeleteCheck(idx)`, and reuse the item
+  The class takes the check-list mutators (`addCheck` / `deleteCheck` / `moveCheck` / `insertCheck`) from
+  `CheckListMixin` (`src/document/types/item/CheckListMixin.js`, shared with `TitanItem`) and carries the
+  custom-trait mutators (`addCustomTrait` / `editCustomTrait` / `deleteCustomTrait`) inline; they operate on
+  `system.check` / `system.customTrait` via `this.update(...)`, notify the sheet through
+  `this.sheet.postAddCheck()` / `preDeleteCheck(idx)` / `postMoveCheck(from, to)` / `postInsertCheck(idx)`, and
+  reuse the item
   `AddCustomTraitDialog` / `EditCustomTraitDialog` (passed `this`). They are invoked by the reused item
   Checks tab and Custom-Traits sidebar via `document.data.*`. The effect chat component
   (`EffectChatMessage.svelte`) lives in `src/document/types/active-effect/chat-message/` beside
@@ -492,7 +496,7 @@ and one or more inner Svelte component trees.
   `actorLink` via `_onToggleTokenLink`; placed linked token → irreversible unlink via
   `_onUnlinkToken`; placed unlinked token → informational no-op), and a compendium Import control
   (`_onImportActor`, GM-only when `actor.pack`). Also provides actor-level item lifecycle callbacks
-  (`postAddItem`, `preDeleteItem`, `postDeleteItem`).
+  (`postAddItem`, `postDeleteItem`).
 - `TitanCharacterSheet` (`src/document/types/actor/types/character/sheet/CharacterSheet.js`)
   extends `TitanActorSheet`. Adds the `CharacterSheetState` reactive store and character-specific
   add/delete item handling.
