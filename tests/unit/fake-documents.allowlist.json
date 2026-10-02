@@ -1,0 +1,42 @@
+{
+   "permitted": [
+      {
+         "file": "BuildActionMenuModel.test.js",
+         "clause": "Intermediate computation: the HUD model is built from an actor shape."
+      },
+      {
+         "file": "check/check-send-to-chat.test.js",
+         "clause": "Intermediate computation: the message data is built from given inputs."
+      },
+      {
+         "file": "Macros.test.js",
+         "clause": "Intermediate computation: the macro command text is built from given inputs."
+      }
+   ],
+   "burnDown": [
+      {
+         "file": "ConvertEffectItemsToActiveEffects.test.js",
+         "removedInPhase": 1
+      },
+      {
+         "file": "MigrateStoredActors.test.js",
+         "removedInPhase": 1
+      },
+      {
+         "file": "MigrateWorld.test.js",
+         "removedInPhase": 1
+      },
+      {
+         "file": "StoredActorSources.test.js",
+         "removedInPhase": 1
+      },
+      {
+         "file": "SyncConditionEffects.test.js",
+         "removedInPhase": 1
+      },
+      {
+         "file": "spreadsheet/io/ApplyImport.test.js",
+         "removedInPhase": 6
+      }
+   ]
+}
