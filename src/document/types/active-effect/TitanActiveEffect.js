@@ -1,7 +1,5 @@
-import AddCustomTraitDialog from '~/document/types/item/dialog/AddCustomTraitDialog.js';
-import EditCustomTraitDialog from '~/document/types/item/dialog/EditCustomTraitDialog.js';
 import CheckListMixin from '~/document/types/item/CheckListMixin.js';
-import assert from '~/helpers/utility-functions/Assert.js';
+import CustomTraitMixin from '~/document/types/item/CustomTraitMixin.js';
 import getEffectCreationChanges from '~/helpers/utility-functions/GetEffectCreationChanges.js';
 
 /**
@@ -11,7 +9,7 @@ import getEffectCreationChanges from '~/helpers/utility-functions/GetEffectCreat
  * @property {TitanActiveEffectDataModel} system - The typed system data model for this Active Effect.
  * @extends {foundry.documents.ActiveEffect}
  */
-export default class TitanActiveEffect extends CheckListMixin(foundry.documents.ActiveEffect) {
+export default class TitanActiveEffect extends CustomTraitMixin(CheckListMixin(foundry.documents.ActiveEffect)) {
 
    /**
     * Builds the source data an Active Effect created from the given data stores, for an effect written as data instead
@@ -110,64 +108,6 @@ export default class TitanActiveEffect extends CheckListMixin(foundry.documents.
     */
    getRollData() {
       return this.system.getRollData();
-   }
-
-   /**
-    * Creates a dialog for adding a new Custom Trait to this Active Effect.
-    * @returns {void}
-    */
-   addCustomTrait() {
-      if (assert(
-         this.isOwner,
-         'Cannot modify document %s if not owner.',
-         this.name,
-      )) {
-         /** @type {AddCustomTraitDialog} - The dialog used to add a new Custom Trait to this Active Effect. */
-         const dialog = new AddCustomTraitDialog(this);
-         dialog.render(true);
-      }
-   }
-
-   /**
-    * Creates a dialog for editing an existing Custom Trait belonging to this Active Effect.
-    * @param {number} traitIdx - The index of the Custom Trait in this Active Effect's Custom Traits array.
-    * @returns {void}
-    */
-   editCustomTrait(traitIdx) {
-      if (assert(
-         this.isOwner,
-         'Cannot modify document %s if not owner.',
-         this.name,
-      )) {
-         /** @type {EditCustomTraitDialog} - The dialog used to edit an existing Custom Trait on this Active Effect. */
-         const dialog = new EditCustomTraitDialog(
-            this,
-            traitIdx,
-         );
-         dialog.render(true);
-      }
-   }
-
-   /**
-    * Removes a Custom Trait from this Active Effect.
-    * @param {number} traitIdx - The index of the Custom Trait in this Active Effect's Custom Traits array.
-    * @returns {Promise<void>}
-    */
-   async deleteCustomTrait(traitIdx) {
-      if (assert(
-         this.isOwner,
-         'Cannot modify document %s if not owner.',
-         this.name,
-      )) {
-         /** @type {object[]} A fresh array with the targeted Custom Trait removed. */
-         const next = this.system.customTrait.filter((trait, idx) => idx !== traitIdx);
-
-         await this.update({
-            system: {
-               customTrait: next,
-            },
-         });
-      }
    }
 
    /**

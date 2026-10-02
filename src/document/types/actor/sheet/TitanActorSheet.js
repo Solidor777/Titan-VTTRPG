@@ -74,7 +74,7 @@ export default class TitanActorSheet extends TitanDocumentSheet {
     * handlers itself, so without this binding `_onDrop` never fires and sheet drops silently no-op.
     * @override
     * @param {object} context - Prepared render context.
-    * @param {object} options - Render options.
+    * @param {object} options - The render options, forwarded unchanged to `super._onRender`.
     * @returns {Promise<void>} Resolves once the listeners are bound.
     * @protected
     */

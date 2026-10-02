@@ -6336,7 +6336,8 @@ export default class CharacterDataModel extends TitanActorDataModel {
 
    /**
     * Deletes an Item from this Character without confirmation dialog, through the same path the confirmation dialog
-    * uses (`TitanActor#deleteItem`), so equipped armor and shields are un-equipped first.
+    * uses (`TitanActor#deleteItem`), so an equipped armor or shield is un-equipped after the delete
+    * (`postDeleteItem`).
     * @param {string} itemId - The ID of the Item to be deleted.
     * @returns {Promise<void>}
     */

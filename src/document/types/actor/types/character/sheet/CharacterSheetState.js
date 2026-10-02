@@ -11,8 +11,8 @@ import createCharacterSheetData from '~/document/types/actor/types/character/she
  * subscriber notified on every state change.
  * @property {(item: TitanItem) => void} postAddItem - Updates the reactive state store in response to an Item being
  * added.
- * @property {(item: TitanItem) => void} preDeleteItem - Updates the reactive state store in response to an Item being
- * deleted.
+ * @property {(id: string, type: string) => void} postDeleteItem - Updates the reactive state store in response to an
+ * Item having been deleted.
  */
 
 /**
@@ -60,6 +60,7 @@ export default function createCharacterSheetState(actor) {
     * Updates the reactive state store in response to an Item having been deleted: its row's expanded state is dropped.
     * @param {string} id - The ID of the Item that was deleted.
     * @param {string} type - The Type of the Item that was deleted.
+    * @returns {void}
     */
    function postDeleteItem(id, type) {
       update((data) => {

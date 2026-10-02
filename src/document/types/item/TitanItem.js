@@ -1,6 +1,5 @@
-import AddCustomTraitDialog from '~/document/types/item/dialog/AddCustomTraitDialog.js';
-import EditCustomTraitDialog from '~/document/types/item/dialog/EditCustomTraitDialog.js';
 import CheckListMixin from '~/document/types/item/CheckListMixin.js';
+import CustomTraitMixin from '~/document/types/item/CustomTraitMixin.js';
 import generateUUID from '~/helpers/utility-functions/GenerateUUID.js';
 import assert from '~/helpers/utility-functions/Assert.js';
 
@@ -9,7 +8,7 @@ import assert from '~/helpers/utility-functions/Assert.js';
  * @property {TitanItemSheet} sheet - The Sheet that represents this Item.
  * @extends {Item}
  */
-export default class TitanItem extends CheckListMixin(Item) {
+export default class TitanItem extends CustomTraitMixin(CheckListMixin(Item)) {
 
    /**
     * Returns whether the item is marked for deletion.
@@ -130,62 +129,6 @@ export default class TitanItem extends CheckListMixin(Item) {
    }
 
    /**
-    * Creates a dialog for adding a new Custom Trait to this item.
-    * @returns {void}
-    */
-   addCustomTrait() {
-      if (assert(
-         this.isOwner,
-         'Cannot modify document %s if not owner.',
-         this.name,
-      )) {
-         const dialog = new AddCustomTraitDialog(this);
-         dialog.render(true);
-      }
-   }
-
-   /**
-    * Creates a dialog for editing an existing Custom Trait belonging to this item.
-    * @param {number} traitIdx - The index of the Custom Trait in this item's Custom Traits array.
-    * @returns {void}
-    */
-   editCustomTrait(traitIdx) {
-      if (assert(
-         this.isOwner,
-         'Cannot modify document %s if not owner.',
-         this.name,
-      )) {
-         const dialog = new EditCustomTraitDialog(
-            this,
-            traitIdx,
-         );
-         dialog.render(true);
-      }
-   }
-
-   /**
-    * Removes a Custom Trait from this item.
-    * @param {number} traitIdx - The index of the Custom Trait in this item's Custom Traits array.
-    * @returns {Promise<void>}
-    */
-   async deleteCustomTrait(traitIdx) {
-      if (assert(
-         this.isOwner,
-         'Cannot modify document %s if not owner.',
-         this.name,
-      )) {
-         /** @type {object[]} A fresh array with the targeted Custom Trait removed. */
-         const next = this.system.customTrait.filter((trait, idx) => idx !== traitIdx);
-
-         await this.update({
-            system: {
-               customTrait: next,
-            },
-         });
-      }
-   }
-
-   /**
     * Marks the item as being deleted, then deletes it. While the mark is set, `TitanActor#deleteItem` refuses a second
     * delete of the item and the character sheet's row expand button ignores clicks (these are the readers of
     * `isMarkedForDeletion`). The mark is cleared again when the delete is refused or rejects.
@@ -212,13 +155,21 @@ export default class TitanItem extends CheckListMixin(Item) {
 
          /** @type {boolean} Whether the delete went through. */
          let deleted = false;
+
+         /** @type {*} The first error raised, rethrown after the mark is cleared. */
+         let failure = null;
          try {
             // A refused delete (a preDelete hook returned false) resolves undefined and leaves the item in place.
             deleted = (await this.delete()) !== undefined;
          }
-         finally {
-            // The item is still there after a refused or rejected delete: clear the mark to keep it deletable.
-            if (!deleted && this.collection?.has(this.id)) {
+         catch (rejection) {
+            failure = rejection;
+         }
+
+         // The item is still there after a refused or rejected delete: clear the mark to keep it deletable. An error
+         // of this update does not replace the first error.
+         if (!deleted && this.collection?.has(this.id)) {
+            try {
                await this.update({
                   flags: {
                      titan: {
@@ -227,6 +178,12 @@ export default class TitanItem extends CheckListMixin(Item) {
                   },
                });
             }
+            catch (rejection) {
+               failure ??= rejection;
+            }
+         }
+         if (failure !== null) {
+            throw failure;
          }
 
          return deleted;

@@ -2,6 +2,7 @@ import generateUUID from '~/helpers/utility-functions/GenerateUUID.js';
 import localize from '~/helpers/utility-functions/Localize.js';
 import capitalize from '~/helpers/utility-functions/Capitalize.js';
 import assert from '~/helpers/utility-functions/Assert.js';
+import error from '~/helpers/utility-functions/Error.js';
 
 /**
  * @typedef {object} SpeakerData An object containing data on a Chat Message's speaker.
@@ -193,16 +194,48 @@ export default class TitanActor extends Actor {
                item.name,
             )) {
 
-            // Cache the item type.
-            const type = item.type;
+            // The follow-up work of a confirmed delete runs in `_onDeleteDescendantDocuments`, for every delete.
+            await item.safeDelete();
+         }
+      }
+   }
 
-            // Delete the item. A refused delete changes nothing else: the follow-up work runs only after a delete.
-            if (await item.safeDelete() !== false) {
+   /**
+    * Runs the follow-up work of Items that were deleted from this Actor, whoever deleted them and however (the sheet
+    * rows, a macro, a module). Foundry calls this on every client; the sheet cleanup is local state, so every client
+    * runs it, while the data cleanup writes to the Actor, so only the client of the User who deleted the Items runs it.
+    * @override
+    * @param {Document} parent - The direct parent of the deleted Documents.
+    * @param {string} collection - The collection the Documents were deleted from.
+    * @param {Document[]} documents - The deleted Documents.
+    * @param {string[]} ids - The IDs of the deleted Documents.
+    * @param {object} options - Options that modified the deletion.
+    * @param {string} userId - The ID of the User who deleted the Documents.
+    * @returns {void}
+    * @protected
+    */
+   _onDeleteDescendantDocuments(parent, collection, documents, ids, options, userId) {
+      super._onDeleteDescendantDocuments(parent, collection, documents, ids, options, userId);
+      if (parent !== this || collection !== 'items') {
+         return;
+      }
 
-               // Execute post-delete operations.
-               await this.system.postDeleteItem(id, type);
-               this.sheet.postDeleteItem(id, type);
-            }
+      // Every client drops its own sheet state; one failure does not stop the other cleanup.
+      for (const item of documents) {
+         try {
+            this.sheet.postDeleteItem(item.id, item.type);
+         }
+         catch (failure) {
+            error('Failed to update the sheet after deleting an Item.', failure);
+         }
+      }
+
+      // Only the deleting client writes to the Actor.
+      if (userId === game.user.id) {
+         for (const item of documents) {
+            Promise.resolve(this.system.postDeleteItem(item.id, item.type)).catch((failure) => {
+               error('Failed to update the Actor after deleting an Item.', failure);
+            });
          }
       }
    }

@@ -37,6 +37,7 @@ export default class TitanCharacterSheet extends TitanActorSheet {
     * @override
     * @param {string} id - The ID of the Item that was deleted.
     * @param {string} type - The Type of the Item that was deleted.
+    * @returns {void}
     */
    postDeleteItem(id, type) {
       this.applicationState.postDeleteItem(id, type);

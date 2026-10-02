@@ -1,4 +1,5 @@
 import TitanDocumentSheet from '~/document/sheet/TitanDocumentSheet.js';
+import CheckListSheetMixin from '~/document/types/item/sheet/CheckListSheetMixin.js';
 import ActiveEffectSheetHeaderButtons from '~/document/types/active-effect/sheet/ActiveEffectSheetHeaderButtons.svelte';
 import ActiveEffectSheetShell from '~/document/types/active-effect/sheet/ActiveEffectSheetShell.svelte';
 import createRulesElementItemSheetState from '~/document/types/item/sheet/RulesElementItemSheetState.js';
@@ -13,7 +14,7 @@ import { SEND_TO_CHAT_ICON } from '~/system/Icons.js';
  * @property {RulesElementItemSheetState} applicationState - The reactive application state store.
  * @extends {TitanDocumentSheet}
  */
-export default class TitanActiveEffectSheet extends TitanDocumentSheet {
+export default class TitanActiveEffectSheet extends CheckListSheetMixin(TitanDocumentSheet) {
    /**
     * Merges the Active Effect sheet CSS classes into the options before delegating to the base document sheet.
     * @param {TitanActiveEffect} sheetDocument - The Active Effect this sheet represents.
@@ -101,41 +102,5 @@ export default class TitanActiveEffectSheet extends TitanDocumentSheet {
       });
 
       return controls;
-   }
-
-   /**
-    * Called after a Check is added to this Sheet's Active Effect.
-    * @returns {void}
-    */
-   postAddCheck() {
-      this.applicationState.postAddCheck();
-   }
-
-   /**
-    * Called before a Check is deleted from this Sheet's Active Effect.
-    * @param {number} idx - The index of the Check about to be deleted.
-    * @returns {void}
-    */
-   preDeleteCheck(idx) {
-      this.applicationState.preDeleteCheck(idx);
-   }
-
-   /**
-    * Called after a Check of this Sheet's Active Effect is moved.
-    * @param {number} fromIdx - The Check's previous index.
-    * @param {number} toIdx - The insertion point the Check moved to.
-    * @returns {void}
-    */
-   postMoveCheck(fromIdx, toIdx) {
-      this.applicationState.postMoveCheck(fromIdx, toIdx);
-   }
-
-   /**
-    * Called after a Check is inserted into this Sheet's Active Effect.
-    * @param {number} atIdx - The index the Check was inserted at.
-    * @returns {void}
-    */
-   postInsertCheck(atIdx) {
-      this.applicationState.postInsertCheck(atIdx);
    }
 }

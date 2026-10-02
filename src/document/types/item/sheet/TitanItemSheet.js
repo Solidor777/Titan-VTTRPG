@@ -1,4 +1,5 @@
 import TitanDocumentSheet from '~/document/sheet/TitanDocumentSheet.js';
+import CheckListSheetMixin from '~/document/types/item/sheet/CheckListSheetMixin.js';
 import ItemSheetHeaderButtons from '~/document/types/item/sheet/ItemSheetHeaderButtons.svelte';
 import mergeArrays from '~/helpers/utility-functions/MergeArrays.js';
 import createRulesElementItemSheetState from '~/document/types/item/sheet/RulesElementItemSheetState.js';
@@ -10,7 +11,7 @@ import { IMPORT_ICON, SEND_TO_CHAT_ICON } from '~/system/Icons.js';
  * @property {RulesElementItemSheetState} applicationState - The reactive application state store.
  * @extends {TitanDocumentSheet}
  */
-export default class TitanItemSheet extends TitanDocumentSheet {
+export default class TitanItemSheet extends CheckListSheetMixin(TitanDocumentSheet) {
    /**
     * Merges the Item sheet CSS class into the options before delegating to the base document sheet.
     * @param {TitanItem} sheetDocument - The Document this sheet represents.
@@ -100,37 +101,5 @@ export default class TitanItemSheet extends TitanDocumentSheet {
     */
    async _onImportItem() {
       return this.item.collection.importFromCompendium(this.item.compendium, this.item.id);
-   }
-
-   /**
-    * Called after an Item Check is added to this Sheet's Item.
-    */
-   postAddCheck() {
-      this.applicationState.postAddCheck();
-   }
-
-   /**
-    * Called before an Item Check is deleted from this Sheet's Item.
-    * @param {number} idx - The index of the Check about to be deleted.
-    */
-   preDeleteCheck(idx) {
-      this.applicationState.preDeleteCheck(idx);
-   }
-
-   /**
-    * Called after an Item Check is reordered, to keep per-check expansion state aligned.
-    * @param {number} fromIdx - The check's previous index.
-    * @param {number} toIdx - The insertion point it moved before.
-    */
-   postMoveCheck(fromIdx, toIdx) {
-      this.applicationState.postMoveCheck(fromIdx, toIdx);
-   }
-
-   /**
-    * Called after a copied Item Check is inserted, to seed its expansion state.
-    * @param {number} atIdx - The insertion point.
-    */
-   postInsertCheck(atIdx) {
-      this.applicationState.postInsertCheck(atIdx);
    }
 }
