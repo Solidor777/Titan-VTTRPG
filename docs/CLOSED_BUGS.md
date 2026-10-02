@@ -146,7 +146,7 @@ when fixed.
 - **Found:** 2026-06-10 by the user during the theming-foundation visual pass (pre-existing on main).
 - **Fixed:** 2026-06-10 on `feature/theme-foundation` — path corrected to `tabs.attacks` with an
   `?? true` fallback for freshly added attacks; regression-locked by
-  `tests/e2e/sheet-regressions.spec.js` ("the weapon attacks tab renders its seeded attack").
+  `tests/e2e/surfaces.spec.js` ("the weapon attacks tab renders its seeded attack").
 
 ### 13. Adding a check crashed the open sheet (`props_invalid_value` on an undefined bind)
 
@@ -214,7 +214,8 @@ when fixed.
 - **Fixed:** 2026-06-10 on `main` — `_configureRenderOptions` captures the originating token onto a
   private field, the `token` getter validates it (same actor, still on its scene), and
   `_onUnlinkToken` keeps the pre-update reference for the close-and-reopen onto the synthetic
-  actor's sheet, with an assert guard. Regression-locked in `tests/e2e/sheet-regressions.spec.js`.
+  actor's sheet, with an assert guard. Regression-locked in `tests/e2e/sheet-header.spec.js` ("the Unlink button of
+  the sheet a token double-click opens unlinks the token, not the prototype").
 
 ### 19. Effect HUD rendered in the bottom right with its elements smooshed together (was OPEN_BUGS #1)
 
@@ -440,8 +441,9 @@ when fixed.
   `LOCAL.Attacker Melee.text`, `LOCAL.Target Defense.text`, `LOCAL.Type.text`, and
   `LOCAL.Resistance.text`. The localization e2e scanned only the casting-check dialog.
 - **Found:** 2026-09-10, from a screenshot sweep of every TITAN surface for the redesign passes.
-- **Fix:** the five fields pass the raw key like every other dialog field. `localization.spec.js`
-  now opens all five check-options dialogs against a rebuilt roller fixture and scans each.
+- **Fix:** the five fields pass the raw key like every other dialog field. `surfaces.spec.js` ("every check type
+  opens its options dialog without LOCAL. text") opens all five check-options dialogs from the shared roller's
+  sheets and scans each.
 
 ### 37. Six item sheet headers rendered "Rarity" twice
 
@@ -450,8 +452,8 @@ when fixed.
   a labelled `LabeledElement`, so the header read "Rarity Rarity Common". The ability header used
   the select alone and was correct.
 - **Found:** 2026-09-10, from the surface screenshot sweep.
-- **Fix:** the six headers keep only the self-labelled select. `sheet-regressions.spec.js` asserts
-  every rarity-bearing item sheet header shows exactly one "Rarity" label.
+- **Fix:** the six headers keep only the self-labelled select. `surfaces.spec.js` (the item sheet tests, one per
+  item type) asserts every rarity-bearing item sheet header shows exactly one "Rarity" label.
 
 ### 38. The effect sheet's description tab rendered an empty inactive editor
 
@@ -462,8 +464,9 @@ when fixed.
   Item description tabs did not share the defect because `DocumentBoundEditorInput` enriches first.
 - **Found:** 2026-09-10, from the surface screenshot sweep (the seeded description never appeared).
 - **Fix:** the tab now uses `DocumentEditorInput` with `path: 'description'`, which enriches the
-  native field for the inactive view and persists edits through the document. `effect-sheet-layout.spec.js`
-  asserts the inactive editor shows a seeded description.
+  native field for the inactive view and persists edits through the document. `surfaces.spec.js` ("the effect
+  sheet shows a description typed in the editor in the inactive view") asserts the inactive editor shows a
+  description typed in the editor and saved.
 
 ### 39. Effect Tray folders created after a pack's expansion state was saved rendered collapsed
 
@@ -610,7 +613,8 @@ when fixed.
 - **Found:** 2026-09-26, user report; reproduced live on the `test-titan` world (in-memory `img` changed,
   `_source.img` did not).
 - **Fixed:** 2026-09-26 — `DocumentImagePicker` now persists with `document.data.update({ img })`, as
-  `DocumentIconPicker` does. Gated by `tests/e2e/portrait-persistence.spec.js` (actor and item portrait picks
+  `DocumentIconPicker` does. Gated by `tests/e2e/surfaces.spec.js` ("a character sheet portrait pick persists
+  across a reload", "an item sheet portrait pick persists across a reload": picks through Foundry's file picker,
   read back after a full page reload).
 
 ### 48. E2E tab clicks matched hidden compendium pack labels (12 timeouts)
@@ -648,7 +652,8 @@ when fixed.
 
 - **What:** `SpellSheetSidebarStandardAspect.svelte` passed a `label` prop `ResistanceTag` no longer accepts, so the tag
   had no text.
-- **Fixed:** 2026-09-26 — the text is child content. Gated by `spell-rules-regressions.spec.js`.
+- **Fixed:** 2026-09-26 — the text is child content. Gated by `tests/e2e/surfaces.spec.js` ("the spell sheet
+  sidebar labels the aspect resistance").
 
 ### 53. Effect Tray list could not scroll
 
@@ -1224,6 +1229,26 @@ when fixed.
   stores their deltas, #102), and one in an Adventure in a locked world Adventure pack: an Automatic load hides the
   conversions of Items the token removed or converted itself, older-id ones included, leaves an unclaimed one, and the
   next load writes nothing; the imported Adventure token no longer shows the hidden conversions).
+
+### 104. Open sheets re-rendered on changes to a different actor that shared their id
+
+The evidence files named here are in `.superpowers/sdd/test-suite-rewrite/phase-2/` (local, not checked in).
+
+- **What:** `ReactiveDocument.svelte.js` invalidated on `update<Document>` and on embedded Item/ActiveEffect hooks when
+  the changed document's `id`, or its parent's, equaled the bridged document's `id`. An unlinked token's synthetic
+  actor has its base actor's id, so an edit to a token's synthetic actor invalidated an open base-actor sheet.
+- **Found:** 2026-10-01 while diagnosing #102 (read in code).
+- **Fixed:** 2026-10-02. The three comparisons use `uuid` (`changed?.uuid`, `parent?.uuid`, `parent?.parent?.uuid`
+  against `this.doc.uuid`).
+- **Gate tests:**
+  - `tests/unit/ReactiveDocument.test.js`, two cases with two fakes that share `id` and differ in `uuid` (an update, and
+    an embedded Item and ActiveEffect update, of the sibling leave the reader alone; those of the wrapped document
+    re-render it). Before: 2 failed, 1 passed (`unit-before-fix.log`). After: 3 passed (`unit-after-fix.log`).
+  - `tests/e2e/sheet-header.spec.js` ("an edit on an unlinked token sheet leaves the open base actor sheet
+    unchanged"): a counting getter on the base actor's `system` and on the token's synthetic actor's `system` counts
+    what the open sheets read. An edit of the name on the base sheet raises the base count (presence), the same edit
+    on the unlinked token's sheet raises the token count and leaves the base count unchanged. Before: failed, the base
+    count went from 588 to 1129 (`pin-before-fix.log`). After: passed (`pin-after-fix.log`).
 
 ### 105. Orphaned tokens with pending migration work were skipped silently
 

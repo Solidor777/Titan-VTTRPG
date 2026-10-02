@@ -68,15 +68,6 @@ Deferred/known bugs. Todos (planned work) live in `docs/TODO.md`; this file is b
 - **Found:** 2026-10-01 while diagnosing #102 (read in code).
 - **Status:** Open.
 
-### 104. Open sheets re-render on changes to a different actor that shares their id
-
-- **What:** `ReactiveDocument.svelte.js` invalidates on `update<Document>` and on embedded Item/ActiveEffect hooks
-  when the changed document's `id`, or its parent's, equals the bridged document's `id`. An unlinked token's synthetic
-  actor has its base actor's id, so changes to any token's synthetic actor invalidate an open base-actor sheet, and
-  the reverse. It should compare document identity, or `uuid`.
-- **Found:** 2026-10-01 while diagnosing #102 (read in code).
-- **Status:** Open.
-
 ### 106. `player-hud-visibility.spec.js` leaves tokens whose actors it deleted
 
 - **What:** After the spec runs (also when it runs alone), the world still holds the unlinked `HUD Vis NPC` token and
@@ -104,7 +95,7 @@ Deferred/known bugs. Todos (planned work) live in `docs/TODO.md`; this file is b
 - **What:** `src/document/types/actor/TitanActor.js:83` calls `game.combat?.getCombatantByActor(this.id)`. Foundry
   logs a deprecation warning: deprecated since v14 and removed in v15 (measured console warning in the #102 repro).
   The call passes `this.id`; for a token's synthetic actor that is the base actor's id (read), the same identity
-  pattern as #104. Whether it then finds the wrong combatant has not been measured.
+  pattern as CLOSED_BUGS #104. Whether it then finds the wrong combatant has not been measured.
 - **Found:** 2026-10-01 during the #102 real-flow repro.
 - **Status:** Open.
 

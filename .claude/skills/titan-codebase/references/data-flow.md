@@ -205,7 +205,9 @@ sidebar (`overflow: hidden auto`) and tab lists instead of clipping them.
 Foundry update (`document.data.update(...)`) — or an embedded item/effect CRUD operation — fires the hooks
 the subscriber registered (`update<DocumentName>`, `create/update/deleteItem`,
 `create/update/deleteActiveEffect`), invalidating every reactive reader so `document.data.*` references and
-`$derived` blocks re-run and the UI re-renders. Hooks tear down automatically when the sheet unmounts.
+`$derived` blocks re-run and the UI re-renders. A hook invalidates the bridge only for the bridged document itself or
+one embedded in it, matched by `uuid` (an unlinked token's synthetic actor shares its base actor's `id`). Hooks tear down
+automatically when the sheet unmounts.
 
 **6. Teardown — `_onClose`**
 `TitanDocumentSheet._onClose` calls `super._onClose(options)`, `unmount(this.#mountHandle, { outro: true })`,

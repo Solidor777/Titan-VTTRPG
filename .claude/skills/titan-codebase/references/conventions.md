@@ -163,7 +163,10 @@ when the document changes. The subscriber registers `update<DocumentName>` plus 
 `create/update/deleteItem` and `create/update/deleteActiveEffect` hooks and tears them down
 automatically when the last reactive reader unsubscribes (on unmount). Because `.data` is the live
 document, reads (`.data.system.x`), writes (`.data.update(...)`), collections (`.data.items`), and
-methods all go through the same accessor.
+methods all go through the same accessor. A hook invalidates the bridge only when the changed document, or for an
+embedded hook its parent or grandparent, has the bridged document's `uuid`: an unlinked token's synthetic actor shares
+its base actor's `id` and has its own `uuid`, so an `id` match would re-render an open base-actor sheet on every edit
+of a token's actor (pinned by `tests/unit/ReactiveDocument.test.js` and `tests/e2e/sheet-header.spec.js`).
 
 **Always read displayed document values through a bridge's `document.data`, never off a raw prop** —
 Svelte 5's fine-grained reactivity only tracks reads that go through the `.data` accessor of a
@@ -549,8 +552,9 @@ and renders `LOCAL.<text>.text` to the user. Fixes: drop the redundant `localize
 (`tooltip={'x'}`), or wrap already-localized/dynamic/user text as `{ text, localize: false }`. Note
 `label` / aria-label props are **not** routed through `processTextData`, so those stay
 `label={localize('x')}`. Trait-description maps (`ATTACK_/ARMOR_/SHIELD_TRAIT_DESCRIPTIONS`) hold **keys**,
-not display text. A comprehensive e2e guard, `tests/e2e/localization.spec.js`, renders every actor/item/
-effect sheet and the effects sidebar and fails on any rendered text/tippy-tooltip containing `LOCAL.`;
+not display text. A comprehensive e2e guard, `tests/e2e/surfaces.spec.js`, renders every actor/item/
+effect sheet, every spell tab, the five check-options dialogs and the effects sidebar and fails on any rendered
+text/tippy-tooltip containing `LOCAL.`;
 `tests/unit/LocalizationKeys.test.js` guards `lang/en.json` values against embedded `LOCAL.` keys.
 `tooltipAction` cleans every non-blank tooltip with `foundry.utils.cleanHTML` (the cleaner core's `TooltipManager`
 applies) before tippy renders it as HTML, when created and on update, so tooltip text built from document or chat
@@ -792,15 +796,19 @@ from the sibling `foundry/` install (paths derived from the repo location; `FOUN
 the run or when the Playwright runner process itself disappears (it watches the nearest non-shell ancestor
 pid, polling liveness once a second), so a hard-killed run never leaves a Foundry holding the port and the
 pack LevelDB locks. `tests/unit/SuperviseServer.test.js` covers spawn/reuse/teardown. Specs live in
-`tests/e2e/`: `render-smoke.spec.js` (renders every document type's
-sheet, asserts zero uncaught page errors), `interaction-rolls.spec.js` (each `roll<Type>Check` posts a
-chat message of the expected subtype (`message.type`) and the card renders), and `interaction-dialogs.spec.js`
-(check/confirm/trait/edit-UUID dialogs mount). `tests/e2e/harness.js` provides `test`, `expect` and
+`tests/e2e/`: `surfaces.spec.js` (every sheet type, spell tab, check-options dialog and the effect tray renders on
+flow-made documents with zero uncaught page errors and no `LOCAL.` text; the collapsed-layout regressions; the
+portrait pick through Foundry's file picker; opening a sheet from the directory; the Edit Unique ID dialog),
+`sheet-header.spec.js` (the window-header controls menu, the inline header buttons, unlinking from the sheet a token
+double-click opens, and the `ReactiveDocument` identity pin), `interaction-rolls.spec.js` (each `roll<Type>Check`
+posts a chat message of the expected subtype (`message.type`) and the card renders), and `interaction-dialogs.spec.js`
+(check/confirm/trait dialogs mount). `tests/e2e/harness.js` provides `test`, `expect` and
 `flushPageErrors`; `tests/e2e/join.js` (no test-runner imports, so the setup, teardown and census load it without
 `harness.js`) provides `joinWorld`, `trackWorldPage`, `flushPageErrors` and `takeUncheckedErrors`; `tests/e2e/fixtures.js`
-re-exports `joinWorld` and provides `login`, `renderSheet` and `ensureDocument` (creates
-missing world fixtures; `renderSheet` takes the spec's `errors` collector as its 4th argument — see the shared-world
-harness below). Drives the real built system at
+re-exports `joinWorld` and provides `login`, `openSheetByUuid(page, uuid)` (`fromUuid` then `sheet.render`, waits for
+the content to mount, returns the window's locator; a read-side render, not a document change) and `renderSheet(page,
+uuid, expectedSelector, errors)` (opens by uuid, asserts the frame class, flushes and asserts the spec's `errors`
+collector is empty; see the shared-world harness below). Drives the real built system at
 the repo root, so it catches v14 API breaks that the mocked Vitest tier cannot.
 
 **Shared-world E2E harness (one world boot per FILE)** — every eligible spec boots the world ONCE per
@@ -953,19 +961,44 @@ mid-run, and a test that edits one restores the field through the same control o
 made from the DOM or a read-only API call, records it and returns it; it never creates, updates or deletes a document
 through the API. Flows: `createActor` (A1: Actors tab Create button and core dialog), `createOwnedItem` (A2: the
 Abilities/Spells tab add button or the Inventory tab's add button and its item-type dialog, then the new item is
-renamed in its own sheet opened by the row's Edit button), `createWorldItem` (A6), `createScene` / `viewScene` /
-`activateScene` (S1: Scenes tab, entry context menu View/Activate; core views a scene created while none is viewed, so
-`createScene` then waits for the draw, and `viewScene` skips the menu for a viewed scene), `placeToken` (T1: drags the
-actor's directory entry onto `#board`, which core handles as an Actor drop; open windows are closed first),
-`toggleTokenLink` and `unlinkPlacedToken` (T2: the sheet header buttons; `unlinkPlacedToken` moves the pointer onto the
-token and waits for `token.object.hover` before the double-click that opens the sheet, then waits for the reopened
-synthetic actor's sheet), `createCompendium` / `setCompendiumLocked` (P1: Compendium tab Create dialog, entry context menu
-Lock/Unlock), `putInPack` (P3: opens the pack's popout window and drags the world entry onto its `.directory-list`;
-the pack index is polled for the new id; the caller passes the world entry's locator, and the flow reopens that entry's
-sidebar tab before the drag). The creation dialogs are `DialogV2` forms whose content
+renamed in its own sheet opened by the row's Edit button), `dragItemOntoSheet` (A2b: drags an Items-tab entry onto the
+open actor sheet), `addEffect` (A3: the Effects tab add button, the effect renamed in its sheet, and optionally its
+duration type chosen in the sheet header), `addCheck` (A4: the Checks tab add button, then the row's label input),
+`addRulesElement` (A5: the Rules Elements tab add button, the operation select, and the `ccm-*` selects and value input
+of a conditional check modifier), `createWorldItem` (A6), `addCustomTrait`, `addAttack`, `enableAspect` and
+`addCustomAspect` (A7: the Add Custom Trait dialog, the weapon Attacks tab add button, the spell Standard Aspects
+toggle with its option toggles and resistance select, the spell Custom Aspects tab add button), `pickPortrait` (F1:
+the sheet's portrait button opens Foundry's own file picker, the Core Data tab is chosen when it is not the open one,
+the directory is typed into the address bar and the file is clicked and confirmed; nothing is stubbed),
+`createTrayEffect` (the Effect Tray's create button in an unlocked effect pack, the effect renamed in the sheet the
+create opens), `createScene` / `viewScene` / `activateScene` (S1: Scenes tab, entry context menu View/Activate; core
+views a scene created while none is viewed, so `createScene` then waits for the draw, and `viewScene` skips the menu
+for a viewed scene), `placeToken` (T1: drags the actor's directory entry onto a free spot near the centre of `#board`,
+which core handles as an Actor drop; each token on the scene takes the next spot, because tokens dropped on one spot
+stack; open windows are closed first and the Escape key releases the controlled tokens, because with token vision on a
+GM who controls a token sees only what it sees, so a token placed or hovered then is invisible and takes no pointer
+events), `toggleTokenLink` and `unlinkPlacedToken` (T2: the sheet header buttons; `unlinkPlacedToken` moves the pointer
+onto the token and waits for `token.object.hover` before the double-click that opens the sheet, then waits for the
+reopened synthetic actor's sheet), `createCompendium` / `setCompendiumLocked` (P1: Compendium tab Create dialog, entry
+context menu Lock/Unlock), `putInPack` (P3: opens the pack's popout window and drags the world entry onto its
+`.directory-list`; the pack index is polled for the new id; the caller passes the world entry's locator, and the flow
+reopens that entry's sidebar tab before the drag). The creation dialogs are `DialogV2` forms whose content
 lacks the template's `form#document-create` id, so the flows find them by `dialog.application.dialog` with the
-`.dialog-content` fields. Sheet windows are found by element id suffix (`.application[id$="Actor-<id>"]`); a TitanDialog
-id carries a generated suffix (`[id^="add-inventory-item-dialog-<actorId>"]`). `playwright.config.mjs` sets `use.actionTimeout` to 10 s
+`.dialog-content` fields. A flow opens the sheet it drives with `openSheetByUuid` and clicks its tabs inside that sheet
+(`openTab`), so another open TITAN sheet's tab strip is never clicked; the Standard Aspects tab and the sidebar both
+use the class `aspect`, so the flow looks inside `.standard-aspects-tab`. A TitanDialog
+id carries a generated suffix (`[id^="add-inventory-item-dialog-<actorId>"]`). A document's sheet instance keeps its
+last tab, so a shared fixture's sheet can come up on the tab a flow last used; a test that needs a tab opens it.
+`shared(page, key)` and `sharedUuid(page, key)` (the uuid, for `openSheetByUuid` and `fromUuid`) serve `SHARED_FIXTURES`:
+`player`, `npc`, the seven world items `weapon`, `ability` (one check), `spell` (the Void custom trait; range, duration
+and inflict-condition aspects, the last with the Stunned option and a Resilience resistance), `armor`, `shield`,
+`equipment`, `commodity`; `effectHost` (a player that holds only the two effects) with `effect` and `conditionalEffect`
+(permanent, one conditional dice modifier); `roller` (a player owning copies of the shared weapon, spell and ability,
+dragged onto its sheet); `situationalActor` (a player owning an ability with a conditional dice +2, a conditional
+Advantage and a conditional dice +1 situation); `bulkActor` (30 abilities, an equipment with 30 checks and an effect
+with 30 rules elements; about 70 s to build, so its first consumer raises its own timeout); `scene` (created and
+viewed); `trayPack` (an unlocked `ActiveEffect` pack holding one effect). `playwright.config.mjs` sets
+`use.actionTimeout` to 10 s
 (about ten times the longest action measured in a full run, 916 ms), so a flow that waits on a missing element fails
 after 10 s; a wait that legitimately takes longer passes its own timeout.
 `tests/e2e/global-teardown.js` (Playwright `globalTeardown`) launches one Chromium, logs in as `E2E GM 1`, asserts the
@@ -989,9 +1022,11 @@ silently absorbing 15s: explicit `timeout:` values are `1000`. Inherently multi-
 - a `game.ready` world boot (`fixtures.js`; the teardown's and the setup recovery's own login goes through it too);
 - a mid-file reload through `world.js` `reloadWorld(page, { ready })` (15 s for the `/game` URL, 60 s for the
   readiness predicate, `game.ready` by default), used by the last test of `condition-description.spec.js`, the reload
-  test of `player-hud-layout.spec.js` and both tests of `portrait-persistence.spec.js`;
+  test of `player-hud-layout.spec.js` and both portrait tests of `surfaces.spec.js`;
 - a scene draw on the canvas after a scene is created while none is viewed, viewed or activated (`flows.js`
   `waitForSceneDrawn`, 30 s);
+- building the `bulkActor` shared fixture (`flows.js`; about 70 s measured, 30 abilities, 30 checks and 30 rules elements
+  through the sheet controls), whose first consumer raises its own timeout;
 - a second browser context finishing login (`multiClient.js`, used by the last test of `effect-tray.spec.js` for its
   E2E GM 2 client);
 - core's 2 s scrolling text finishing before the viewed scene is deactivated (`condition-description.spec.js`, last
@@ -1070,8 +1105,8 @@ open flyout first (`Escape` when `player-hud-flyout` is present), as the `openCa
 where `ready` is the in-page predicate of step (5) (`game.ready` by default); a spec never repeats them inline.
 `expectActiveGM(page)` (also in `world.js`) asserts `game.users.activeGM?.isSelf`, because only the active GM migrates
 and core's `getDesignatedUser` makes the active GM with the highest role that GM. The last test of
-`condition-description.spec.js`, the reload test of `player-hud-layout.spec.js` and `portrait-persistence.spec.js`'s
-`readImageAfterReload` call `reloadWorld(page)` with the default predicate. A spec navigates only through
+`condition-description.spec.js`, the reload test of `player-hud-layout.spec.js` and the portrait tests of
+`surfaces.spec.js` call `reloadWorld(page)` with the default predicate. A spec navigates only through
 `reloadWorld` and `joinWorld` (the one `.reload(` in `world.js`
 and the one `.goto(` in `fixtures.js`), never an inline `page.reload(`, `location` change or `goto(`; no test scans for
 it, and review checks it. `page.on('console')` and
