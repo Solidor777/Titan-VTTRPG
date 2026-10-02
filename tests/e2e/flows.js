@@ -221,7 +221,7 @@ export async function createOwnedItem(page, actorId, type, name) {
    });
 
    // The new item carries a default name; the item sheet's name field renames it.
-   /** @type {import('@playwright/test').Locator} The item's sheet, opened from its row's Edit button. */
+   /** @type {import('@playwright/test').Locator} The item's row in the actor sheet. */
    const row = sheet.locator(`[data-item-id="${id}"]`);
    await row.getByRole('button', { name: 'Edit Item' }).click();
 
