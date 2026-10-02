@@ -36,18 +36,19 @@ export default class ReactiveDocument {
             if (options?.diff === false) {
                return;
             }
-            if (changed?.id === this.doc.id) {
+            if (changed?.uuid === this.doc.uuid) {
                update();
             }
          };
 
          /**
-          * Invalidate when an embedded item/effect belonging to this document changes.
+          * Invalidate when an embedded item/effect belonging to this document changes. Documents are compared by
+          * `uuid`: an unlinked token's synthetic actor shares its base actor's `id` and has its own `uuid`.
           * @param {foundry.abstract.Document} embedded - The embedded document.
           */
          const onEmbedded = (embedded) => {
             const parent = embedded?.parent;
-            if (parent?.id === this.doc.id || parent?.parent?.id === this.doc.id) {
+            if (parent?.uuid === this.doc.uuid || parent?.parent?.uuid === this.doc.uuid) {
                update();
             }
          };
