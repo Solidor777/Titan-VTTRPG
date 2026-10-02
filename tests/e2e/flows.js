@@ -251,6 +251,7 @@ export async function createOwnedItem(page, actorId, type, name) {
       );
       return added.length;
    }, { message: 'the add button created one owned item' }).toBe(1);
+   await settle(page);
    const [id] = added;
    record({
       documentName: 'Item',
@@ -481,6 +482,7 @@ export async function toggleTokenLink(page, actorId) {
       () => page.evaluate((actorId) => game.actors.get(actorId).prototypeToken.actorLink, actorId),
       { message: 'the toggle flipped the prototype token link' },
    ).toBe(!linked);
+   await settle(page);
    return !linked;
 }
 
@@ -665,6 +667,7 @@ export async function setCompendiumLocked(page, packId, locked) {
       () => page.evaluate((packId) => game.packs.get(packId).locked, packId),
       { message: 'the context menu changed the pack lock' },
    ).toBe(locked);
+   await settle(page);
 }
 
 /**
@@ -709,6 +712,7 @@ export async function putInPack(page, entryLocator, packId) {
       );
       return added.length;
    }, { message: 'the drop copied one document into the pack' }).toBe(1);
+   await settle(page);
    const [id] = added;
    record({
       documentName: await page.evaluate(({ packId }) => game.packs.get(packId).documentName, { packId }),
@@ -796,6 +800,7 @@ export async function dragItemOntoSheet(page, itemId, actorId) {
       );
       return added.length;
    }, { message: 'the drop onto the sheet created one owned item' }).toBe(1);
+   await settle(page);
    const [id] = added;
    record({
       documentName: 'Item',
@@ -842,6 +847,7 @@ export async function addEffect(page, actorId, name, { duration } = {}) {
       );
       return added.length;
    }, { message: 'the add button created one effect' }).toBe(1);
+   await settle(page);
    const [id] = added;
    record({
       documentName: 'ActiveEffect',
@@ -909,6 +915,7 @@ export async function addCheck(page, documentUuid, { label, resolveCost, resista
       () => page.evaluate(async (uuid) => (await fromUuid(uuid)).system.check.length, documentUuid),
       { message: 'the add button created one check' },
    ).toBe(before + 1);
+   await settle(page);
 
    /**
     * Reads one field of the new check.
@@ -931,6 +938,7 @@ export async function addCheck(page, documentUuid, { label, resolveCost, resista
 
    // Waits until the sheet shows one row per stored check before the new row is edited.
    await expect(rows, 'the sheet rendered a row for every stored check').toHaveCount(before + 1);
+   await settle(page);
    if (label !== undefined) {
       /** @type {import('@playwright/test').Locator} The new row's label input. */
       const input = row.locator('.header .label input');
@@ -995,6 +1003,7 @@ export async function addRulesElement(page, documentUuid, element) {
       () => page.evaluate(async (uuid) => (await fromUuid(uuid)).system.rulesElement.length, documentUuid),
       { message: 'the add button created one rules element' },
    ).toBe(before + 1);
+   await settle(page);
 
    /** @type {import('@playwright/test').Locator} The new row. */
    const row = sheet.locator('.rules-element').nth(before);
@@ -1081,6 +1090,7 @@ export async function addCustomTrait(page, documentUuid, name, description) {
       ),
       { message: 'the dialog stored the custom trait' },
    ).toContain(name);
+   await settle(page);
 }
 
 /**
@@ -1144,6 +1154,7 @@ export async function enableAspect(page, spellUuid, label, { initialValue, optio
       },
    );
    await expect.poll(async () => !!(await stored()), { message: `the toggle enabled ${label}` }).toBe(true);
+   await settle(page);
    if (initialValue !== undefined) {
       await selectTitanOption(page, aspect.locator('[role="combobox"]').first(), initialValue);
       await expect.poll(async () => (await stored()).initialValue, { message: 'the select stored the initial value' })
@@ -1153,6 +1164,7 @@ export async function enableAspect(page, spellUuid, label, { initialValue, optio
       await aspect.getByTestId(`spell-aspect-option-${label}-${option}`).click();
       await expect.poll(async () => (await stored()).option, { message: `the toggle switched on ${option}` })
          .toContain(option);
+      await settle(page);
    }
    if (resistanceCheck !== undefined) {
       await selectTitanOption(page, aspect.locator('[role="combobox"]').last(), resistanceCheck);
@@ -1216,6 +1228,7 @@ export async function createTrayEffect(page, packId, name) {
       );
       return added.length;
    }, { message: 'the tray create button created one effect in the pack' }).toBe(1);
+   await settle(page);
    const [id] = added;
    record({
       documentName: 'ActiveEffect',
