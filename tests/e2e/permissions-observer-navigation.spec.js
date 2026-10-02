@@ -66,7 +66,7 @@ test('an observer can switch character and item sheet tabs and expand rows, but 
    }, async ({ gm, player }) => {
       const actorId = await seedObservedActor(gm, 'E2E Player 1');
       try {
-         await player.waitForFunction((id) => !!game.actors.get(id), actorId, { timeout: 2000 });
+         await player.waitForFunction((id) => !!game.actors.get(id), actorId, { timeout: 1000 });
          expect(await player.evaluate((id) => game.actors.get(id).isOwner, actorId), 'player is not an owner')
             .toBe(false);
 

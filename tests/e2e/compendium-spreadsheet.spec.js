@@ -401,7 +401,7 @@ test.describe('compendium spreadsheet export/import', () => {
             /** @type {object} */
             const index = await pack.getIndex();
             return index.size ?? index.length;
-         }, newPackLabel), { timeout: 60_000 }).toBeGreaterThan(0);
+         }, newPackLabel), { timeout: 1000 }).toBeGreaterThan(0);
       }
       finally {
          // The context-menu export never wrote to titan.effects; only the freshly created pack needs cleanup.

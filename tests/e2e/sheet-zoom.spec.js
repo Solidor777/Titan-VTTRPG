@@ -210,7 +210,7 @@ async function expectLastEntryReachableAtEveryZoom(appId, rowSelector, entryCoun
       // layout settles rather than measuring the first frame.
       await expect.poll(() => scrollToLastAndMeasure(appId, rowSelector), {
          message: `last entry at ${Math.round(zoom * 100)}% zoom`,
-         timeout: 3000,
+         timeout: 1000,
       }).toEqual({
          entries: entryCount,
          visible: true,
