@@ -75,7 +75,7 @@ async function createFromDirectory(page, tab, name, type) {
 }
 
 /**
- * A1: creates a world Actor through the Actors tab.
+ * Creates a world Actor through the Actors tab.
  * @param {import('@playwright/test').Page} page - A logged-in GM page.
  * @param {object} options - What to create.
  * @param {string} options.name - The display name; it starts with `E2E ` so the census finds the actor.
@@ -94,7 +94,7 @@ export async function createActor(page, { name, type }) {
 }
 
 /**
- * A6: creates a world Item through the Items tab.
+ * Creates a world Item through the Items tab.
  * @param {import('@playwright/test').Page} page - A logged-in GM page.
  * @param {object} options - What to create.
  * @param {string} options.name - The display name; it starts with `E2E ` so the census finds the item.
@@ -113,7 +113,7 @@ export async function createWorldItem(page, { name, type }) {
 }
 
 /**
- * S1: creates a Scene through the Scenes tab. Core views a scene created while no scene is viewed (measured: a second
+ * Creates a Scene through the Scenes tab. Core views a scene created while no scene is viewed (measured: a second
  * scene created while one is viewed is not viewed), so the flow then waits for the canvas to finish drawing it.
  * @param {import('@playwright/test').Page} page - A logged-in GM page.
  * @param {object} options - What to create.
@@ -159,7 +159,7 @@ async function closeWindow(application) {
 }
 
 /**
- * A2: adds an owned Item to an Actor through the actor sheet: the Abilities or Spells tab's add button, or the
+ * Adds an owned Item to an Actor through the actor sheet: the Abilities or Spells tab's add button, or the
  * Inventory tab's add button and its item-type dialog; then renames the new item in its own sheet.
  * @param {import('@playwright/test').Page} page - A logged-in page.
  * @param {string} actorId - The id of the actor that receives the item.
@@ -268,7 +268,7 @@ async function waitForSceneDrawn(page, sceneId) {
 }
 
 /**
- * S1: views a scene through its directory entry's context menu (the menu offers View only for a scene that is not
+ * Views a scene through its directory entry's context menu (the menu offers View only for a scene that is not
  * already the viewed one, so a viewed scene is only awaited).
  * @param {import('@playwright/test').Page} page - A logged-in GM page.
  * @param {string} sceneId - The scene to view.
@@ -285,7 +285,7 @@ export async function viewScene(page, sceneId) {
 }
 
 /**
- * S1: activates a scene through its directory entry's context menu, so every client views it.
+ * Activates a scene through its directory entry's context menu, so every client views it.
  * @param {import('@playwright/test').Page} page - A logged-in GM page.
  * @param {string} sceneId - The scene to activate.
  * @returns {Promise<void>} Resolves once the canvas has drawn the scene.
@@ -296,9 +296,11 @@ export async function activateScene(page, sceneId) {
 }
 
 /**
- * Releases control of every token the way a user does: the Escape key, which core binds to releasing control. With
- * token vision on, a GM who controls a token sees only what that token sees, so a token placed or hovered while
- * another is controlled can be invisible and take no pointer events.
+ * Releases control of every token the way a user does: the Escape key, which core binds to releasing control. Measured
+ * (`.superpowers/sdd/test-suite-rewrite/phase-2/review-measure-1.log`): on a scene with `tokenVision` true, a GM who
+ * controls one token sees a second token with `visible` false, and releasing control makes it `visible` true; with
+ * `tokenVision` false the second token stays visible while the first is controlled. A token that is not visible takes
+ * no pointer events.
  * @param {import('@playwright/test').Page} page - A logged-in GM page viewing a drawn scene.
  * @returns {Promise<void>} Resolves once no token is controlled.
  */
@@ -320,9 +322,14 @@ const TOKEN_COLUMNS = 7;
 const TOKEN_SPACING = 130;
 
 /**
- * T1: places a token for an actor by dragging the actor's directory entry onto a free spot near the centre of the
+ * Places a token for an actor by dragging the actor's directory entry onto a free spot near the centre of the
  * canvas, which core handles as an Actor drop (`TokenLayer#_onDropActorData`). The viewed scene must be drawn. Open
- * windows are closed first: one over the canvas centre would take the drop.
+ * windows are closed first: one over the canvas centre would take the drop. The spots form a grid of
+ * `TOKEN_COLUMNS` by `TOKEN_SPACING` pixels, filled row by row from the centre; a spot with a token on it (whatever
+ * order the scene's tokens were placed or deleted in) is skipped, because tokens dropped on one spot stack and the
+ * pointer reaches only the topmost. Measured at a 1920 by 1080 viewport
+ * (`.superpowers/sdd/test-suite-rewrite/phase-2/review-measure-2.log`): 34 tokens were placed, and the drop for the
+ * 35th timed out (cause not determined).
  * @param {import('@playwright/test').Page} page - A logged-in GM page.
  * @param {string} actorId - The actor to place.
  * @returns {Promise<string>} The id of the placed token.
@@ -340,18 +347,57 @@ export async function placeToken(page, actorId) {
    /** @type {import('@playwright/test').Locator} The actors tab. */
    const panel = await openSidebarTab(page, 'actors');
 
-   // Each token lands on its own spot, near the canvas centre: tokens dropped on one spot stack, and the pointer
-   // reaches only the topmost.
-   /** @type {{width: number, height: number}} The canvas element's size. */
-   const board = await page.locator('#board').evaluate((element) => ({
-      width: element.clientWidth,
-      height: element.clientHeight,
-   }));
+   /** @type {{x: number, y: number}} The first drop spot with no token on it, relative to the canvas element. */
+   const spot = await page.evaluate(({ columns, spacing }) => {
+      const board = document.querySelector('#board');
+
+      /**
+       * A drop spot.
+       * @param {number} index - The spot's number, counted from the first spot.
+       * @returns {{x: number, y: number}} The spot relative to the canvas element.
+       */
+      const position = (index) => ({
+         x: board.clientWidth / 2 + ((index % columns) - Math.floor(columns / 2)) * spacing,
+         y: board.clientHeight / 2 + Math.floor(index / columns) * spacing,
+      });
+      const outline = board.getBoundingClientRect();
+
+      /**
+       * The canvas coordinates of a drop spot.
+       * @param {{x: number, y: number}} spot - A spot relative to the canvas element.
+       * @returns {{x: number, y: number}} The point on the scene.
+       */
+      const onScene = (spot) => canvas.canvasCoordinatesFromClient({
+         x: outline.left + spot.x,
+         y: outline.top + spot.y,
+      });
+      const first = onScene(position(0));
+      const next = onScene(position(1));
+
+      // A token dropped on a spot snaps to the grid, so its centre lands within a grid cell of the spot; half the
+      // distance between neighbouring spots separates "on this spot" from "on the next".
+      const reach = Math.hypot(next.x - first.x, next.y - first.y) / 2;
+      const centres = canvas.scene.tokens.map((token) => ({
+         x: token.x + (token.width * canvas.grid.size) / 2,
+         y: token.y + (token.height * canvas.grid.size) / 2,
+      }));
+      for (let index = 0; index < columns * 100; index++) {
+         const candidate = position(index);
+         if (candidate.y >= board.clientHeight) {
+            break;
+         }
+         const point = onScene(candidate);
+         if (!centres.some((centre) => Math.hypot(centre.x - point.x, centre.y - point.y) < reach)) {
+            return candidate;
+         }
+      }
+      throw new Error('There is no free drop spot left on the canvas.');
+   }, {
+      columns: TOKEN_COLUMNS,
+      spacing: TOKEN_SPACING,
+   });
    await panel.locator(`.directory-item.entry[data-entry-id="${actorId}"]`).dragTo(page.locator('#board'), {
-      targetPosition: {
-         x: board.width / 2 + ((before.length % TOKEN_COLUMNS) - Math.floor(TOKEN_COLUMNS / 2)) * TOKEN_SPACING,
-         y: board.height / 2 + Math.floor(before.length / TOKEN_COLUMNS) * TOKEN_SPACING,
-      },
+      targetPosition: spot,
    });
 
    /** @type {string[]} The ids that appeared on the scene. */
@@ -375,7 +421,7 @@ export async function placeToken(page, actorId) {
 }
 
 /**
- * T2: flips whether an actor's prototype token is linked, with the toggle button in the header of the actor's sheet.
+ * Flips whether an actor's prototype token is linked, with the toggle button in the header of the actor's sheet.
  * Tokens placed afterwards take the new setting.
  * @param {import('@playwright/test').Page} page - A logged-in GM page.
  * @param {string} actorId - The world actor.
@@ -396,7 +442,7 @@ export async function toggleTokenLink(page, actorId) {
 }
 
 /**
- * T2: unlinks a placed token with the Unlink button in the header of its actor's sheet, which the double-click on the
+ * Unlinks a placed token with the Unlink button in the header of its actor's sheet, which the double-click on the
  * token opened. The unlink is irreversible: the sheet closes and the token's own synthetic actor's sheet opens.
  * @param {import('@playwright/test').Page} page - A logged-in GM page viewing the token's scene.
  * @param {string} tokenId - The linked token on the viewed scene.
@@ -447,7 +493,7 @@ async function packEntry(page, packId) {
 }
 
 /**
- * P1: creates a world compendium through the Compendium tab's Create button and its dialog.
+ * Creates a world compendium through the Compendium tab's Create button and its dialog.
  * @param {import('@playwright/test').Page} page - A logged-in GM page.
  * @param {object} options - What to create.
  * @param {string} options.label - The display label; it starts with `E2E ` so the census finds the pack.
@@ -483,7 +529,7 @@ export async function createCompendium(page, { label, type }) {
 }
 
 /**
- * P1: locks or unlocks a compendium with its directory entry's context menu. Does nothing but check the state when the
+ * Locks or unlocks a compendium with its directory entry's context menu. Does nothing but check the state when the
  * pack is already in it.
  * @param {import('@playwright/test').Page} page - A logged-in GM page.
  * @param {string} packId - The pack's collection id.
@@ -509,7 +555,7 @@ export async function setCompendiumLocked(page, packId, locked) {
 }
 
 /**
- * P3: copies a world document into an unlocked compendium by dragging its directory entry onto the pack's open
+ * Copies a world document into an unlocked compendium by dragging its directory entry onto the pack's open
  * window, which core handles as a drop of the document into the pack (`DocumentDirectory#_handleDroppedEntry`).
  * @param {import('@playwright/test').Page} page - A logged-in GM page.
  * @param {import('@playwright/test').Locator} entryLocator - The world document's directory entry, visible.
@@ -562,7 +608,7 @@ export async function putInPack(page, entryLocator, packId) {
 }
 
 /**
- * F1: picks a portrait through Foundry's own FilePicker: the sheet's portrait button opens it, the Core Data source is
+ * Picks a portrait through Foundry's own FilePicker: the sheet's portrait button opens it, the Core Data source is
  * chosen, the directory path is typed into its address bar, the file is clicked and the picker is confirmed.
  * @param {import('@playwright/test').Page} page - A logged-in page.
  * @param {import('@playwright/test').Locator} sheet - The open sheet whose portrait button is clicked.
@@ -594,7 +640,7 @@ export async function pickPortrait(page, sheet, fileName) {
 }
 
 /**
- * A2b: adds a world Item to an Actor by dragging the item's Items-tab entry onto the open actor sheet, which the sheet
+ * Adds a world Item to an Actor by dragging the item's Items-tab entry onto the open actor sheet, which the sheet
  * handles as an Item drop (`TitanActorSheet#_onDropItem`).
  * @param {import('@playwright/test').Page} page - A logged-in GM page.
  * @param {string} itemId - The id of the world item.
@@ -637,7 +683,7 @@ export async function dragItemOntoSheet(page, itemId, actorId) {
 }
 
 /**
- * A3: adds an Active Effect to an Actor through the Effects tab's add button, renames it in its own sheet and, when
+ * Adds an Active Effect to an Actor through the Effects tab's add button, renames it in its own sheet and, when
  * asked, sets its duration type in the sheet header.
  * @param {import('@playwright/test').Page} page - A logged-in page.
  * @param {string} actorId - The id of the actor that receives the effect.
@@ -717,7 +763,7 @@ export async function addEffect(page, actorId, name, { duration } = {}) {
 }
 
 /**
- * A4: adds a check to a document that carries checks (an item or an effect) through the Checks tab's add button and
+ * Adds a check to a document that carries checks (an item or an effect) through the Checks tab's add button and
  * fills the row's inputs.
  * @param {import('@playwright/test').Page} page - A logged-in page.
  * @param {string} documentUuid - The uuid of the item or effect.
@@ -750,7 +796,7 @@ export async function addCheck(page, documentUuid, { label } = {}) {
 }
 
 /**
- * A5: adds a rules element to a document that carries them (an item or an effect) through the Rules Elements tab's
+ * Adds a rules element to a document that carries them (an item or an effect) through the Rules Elements tab's
  * add button and fills the new row's controls. A new row is a flat modifier; any other operation is chosen in the
  * row's operation select first.
  * @param {import('@playwright/test').Page} page - A logged-in page.
@@ -830,7 +876,7 @@ export async function addRulesElement(page, documentUuid, element) {
    }
    if (element.value !== undefined) {
       /** @type {import('@playwright/test').Locator} The value input. */
-      const input = row.getByTestId('ccm-value').locator('input').or(row.getByTestId('ccm-value')).first();
+      const input = row.getByTestId('ccm-value');
       await input.fill(String(element.value));
       await input.blur();
       await expect.poll(() => stored('value'), { message: 'the value input stored the value' }).toBe(element.value);
@@ -838,7 +884,7 @@ export async function addRulesElement(page, documentUuid, element) {
 }
 
 /**
- * A7: adds a custom trait to an item through the sidebar's Add Custom Trait button and its dialog.
+ * Adds a custom trait to an item through the sidebar's Add Custom Trait button and its dialog.
  * @param {import('@playwright/test').Page} page - A logged-in page.
  * @param {string} itemUuid - The uuid of the item that receives the trait.
  * @param {string} name - Text typed into the dialog's name input.
@@ -865,7 +911,7 @@ export async function addCustomTrait(page, itemUuid, name) {
 }
 
 /**
- * A7: adds an attack to a weapon through the Attacks tab's add button.
+ * Adds an attack to a weapon through the Attacks tab's add button.
  * @param {import('@playwright/test').Page} page - A logged-in page.
  * @param {string} weaponUuid - The uuid of the weapon that receives the attack.
  * @returns {Promise<void>} Resolves once the attack is stored.
@@ -885,17 +931,18 @@ export async function addAttack(page, weaponUuid) {
 }
 
 /**
- * A7: enables a standard aspect on a spell through the Standard Aspects tab's toggle button, then sets the aspect's
+ * Enables a standard aspect on a spell through the Standard Aspects tab's toggle button, then sets the aspect's
  * options and resistance check in the controls the toggle reveals.
  * @param {import('@playwright/test').Page} page - A logged-in page.
  * @param {string} spellUuid - The uuid of the spell that receives the aspect.
  * @param {string} label - The aspect's key (`range`, `duration`, `inflictCondition`, ...).
  * @param {object} [settings] - What to set once the aspect is enabled.
+ * @param {string|number} [settings.initialValue] - The value to choose in the aspect's initial value select.
  * @param {string[]} [settings.options] - Option toggles to switch on (`stunned`, ...).
  * @param {string} [settings.resistanceCheck] - The resistance check to choose (`resilience`, ...).
  * @returns {Promise<void>} Resolves once the aspect is stored with the settings.
  */
-export async function enableAspect(page, spellUuid, label, { options = [], resistanceCheck } = {}) {
+export async function enableAspect(page, spellUuid, label, { initialValue, options = [], resistanceCheck } = {}) {
    /** @type {import('@playwright/test').Locator} The spell's sheet. */
    const sheet = await openSheetByUuid(page, spellUuid);
    await openTab(sheet, 'Standard Aspects');
@@ -922,6 +969,11 @@ export async function enableAspect(page, spellUuid, label, { options = [], resis
       },
    );
    await expect.poll(async () => !!(await stored()), { message: `the toggle enabled ${label}` }).toBe(true);
+   if (initialValue !== undefined) {
+      await selectTitanOption(page, aspect.locator('[role="combobox"]').first(), initialValue);
+      await expect.poll(async () => (await stored()).initialValue, { message: 'the select stored the initial value' })
+         .toBe(initialValue);
+   }
    for (const option of options) {
       await aspect.getByTestId(`spell-aspect-option-${label}-${option}`).click();
       await expect.poll(async () => (await stored()).option, { message: `the toggle switched on ${option}` })
@@ -935,7 +987,7 @@ export async function enableAspect(page, spellUuid, label, { options = [], resis
 }
 
 /**
- * A7: adds a custom aspect to a spell through the Custom Aspects tab's add button.
+ * Adds a custom aspect to a spell through the Custom Aspects tab's add button.
  * @param {import('@playwright/test').Page} page - A logged-in page.
  * @param {string} spellUuid - The uuid of the spell that receives the custom aspect.
  * @returns {Promise<void>} Resolves once the custom aspect is stored.
@@ -963,10 +1015,7 @@ export async function addCustomAspect(page, spellUuid) {
  * @returns {Promise<string>} The effect's id.
  */
 export async function createTrayEffect(page, packId, name) {
-   await page.evaluate(async () => {
-      await ui.titanEffects.render(true);
-      ui.titanEffects.activate();
-   });
+   await openSidebarTab(page, 'titanEffects');
    await page.locator('[data-testid="effect-tray-pack-select"]').selectOption(packId);
 
    /** @type {string[]} The ids the pack's index holds before the create. */
@@ -1022,7 +1071,8 @@ export async function createTrayEffect(page, packId, name) {
 const SHARED_PREFIX = 'E2E Shared ';
 
 /**
- * Builds the flow of a shared world item: A6 creates it, A7 and A4 shape it where the fixture needs it.
+ * Builds the flow of a shared world item: `createWorldItem` makes it, and the optional shaping flow adds what the
+ * fixture needs (a check, a custom trait, aspects).
  * @param {string} type - The item subtype.
  * @param {string} label - The title-cased type label of the fixture's name.
  * @param {(page: import('@playwright/test').Page, uuid: string) => Promise<void>} [shape] - Extra flows.
@@ -1041,7 +1091,10 @@ function sharedItem(type, label, shape) {
 }
 
 /**
- * The number of entries in each list of the bulk fixture; enough to overflow every sheet at every tested zoom.
+ * The number of entries in each list of the bulk fixture: abilities, checks on the equipment and rules elements on the
+ * effect. Measured at the default zoom (`.superpowers/sdd/test-suite-rewrite/phase-2/review-measure-3.log`): 30
+ * abilities overflow the actor sheet's Abilities tab (1976 px of content in 563 px). The checks list and the rules
+ * elements list were not measured.
  * @type {number}
  */
 export const BULK_COUNT = 30;
@@ -1065,7 +1118,7 @@ export const SHARED_FIXTURES = {
    ability: sharedItem('ability', 'Ability', (page, uuid) => addCheck(page, uuid, { label: 'E2E Shared Check' })),
    spell: sharedItem('spell', 'Spell', async (page, uuid) => {
       await addCustomTrait(page, uuid, 'Void');
-      await enableAspect(page, uuid, 'range');
+      await enableAspect(page, uuid, 'range', { initialValue: 10 });
       await enableAspect(page, uuid, 'duration');
       await enableAspect(page, uuid, 'inflictCondition', {
          options: ['stunned'],

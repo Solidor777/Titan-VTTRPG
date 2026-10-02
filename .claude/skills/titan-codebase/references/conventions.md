@@ -959,28 +959,33 @@ otherwise a new one made by the flow in `SHARED_FIXTURES` and recorded under the
 mid-run, and a test that edits one restores the field through the same control or uses a per-test document).
 `tests/e2e/flows.js` has one exported async function per flow; each drives the DOM like a user, reads the id of what it
 made from the DOM or a read-only API call, records it and returns it; it never creates, updates or deletes a document
-through the API. Flows: `createActor` (A1: Actors tab Create button and core dialog), `createOwnedItem` (A2: the
+through the API. Flows: `createActor` (Actors tab Create button and core dialog), `createOwnedItem` (the
 Abilities/Spells tab add button or the Inventory tab's add button and its item-type dialog, then the new item is
-renamed in its own sheet opened by the row's Edit button), `dragItemOntoSheet` (A2b: drags an Items-tab entry onto the
-open actor sheet), `addEffect` (A3: the Effects tab add button, the effect renamed in its sheet, and optionally its
-duration type chosen in the sheet header), `addCheck` (A4: the Checks tab add button, then the row's label input),
-`addRulesElement` (A5: the Rules Elements tab add button, the operation select, and the `ccm-*` selects and value input
-of a conditional check modifier), `createWorldItem` (A6), `addCustomTrait`, `addAttack`, `enableAspect` and
-`addCustomAspect` (A7: the Add Custom Trait dialog, the weapon Attacks tab add button, the spell Standard Aspects
-toggle with its option toggles and resistance select, the spell Custom Aspects tab add button), `pickPortrait` (F1:
-the sheet's portrait button opens Foundry's own file picker, the Core Data tab is chosen when it is not the open one,
+renamed in its own sheet opened by the row's Edit button), `dragItemOntoSheet` (drags an Items-tab entry onto the
+open actor sheet), `addEffect` (the Effects tab add button, the effect renamed in its sheet, and optionally its
+duration type chosen in the sheet header), `addCheck` (the Checks tab add button, then the row's label input),
+`addRulesElement` (the Rules Elements tab add button, the operation select, and the `ccm-*` selects and value input
+of a conditional check modifier), `createWorldItem`, `addCustomTrait`, `addAttack`, `enableAspect` and
+`addCustomAspect` (the Add Custom Trait dialog, the weapon Attacks tab add button, the spell Standard Aspects
+toggle with its option toggles and resistance select, the spell Custom Aspects tab add button), `pickPortrait` (the
+sheet's portrait button opens Foundry's own file picker, the Core Data tab is chosen when it is not the open one (the
+picker of a player actor opened on the User Data tab: `.superpowers/sdd/test-suite-rewrite/phase-2/review-measure-1.log`, `actor picker tabs`),
 the directory is typed into the address bar and the file is clicked and confirmed; nothing is stubbed),
-`createTrayEffect` (the Effect Tray's create button in an unlocked effect pack, the effect renamed in the sheet the
-create opens), `createScene` / `viewScene` / `activateScene` (S1: Scenes tab, entry context menu View/Activate; core
+`createTrayEffect` (the Effect Tray's sidebar tab button and create button in an unlocked effect pack, the effect renamed in the sheet the
+create opens), `createScene` / `viewScene` / `activateScene` (Scenes tab, entry context menu View/Activate; core
 views a scene created while none is viewed, so `createScene` then waits for the draw, and `viewScene` skips the menu
-for a viewed scene), `placeToken` (T1: drags the actor's directory entry onto a free spot near the centre of `#board`,
-which core handles as an Actor drop; each token on the scene takes the next spot, because tokens dropped on one spot
-stack; open windows are closed first and the Escape key releases the controlled tokens, because with token vision on a
-GM who controls a token sees only what it sees, so a token placed or hovered then is invisible and takes no pointer
-events), `toggleTokenLink` and `unlinkPlacedToken` (T2: the sheet header buttons; `unlinkPlacedToken` moves the pointer
+for a viewed scene), `placeToken` (drags the actor's directory entry onto a free spot near the centre of `#board`,
+which core handles as an Actor drop; the spots are a 7-column grid with 130 px spacing and a spot that already holds a
+token is skipped, because two tokens dropped on one point took the same `x`/`y`
+(`.superpowers/sdd/test-suite-rewrite/phase-2/review-measure-1.log`, `stack`); 34 tokens fit at 1920x1080 and the 35th drop timed out, cause not
+determined (`.superpowers/sdd/test-suite-rewrite/phase-2/review-measure-2.log`); open windows are closed first and the Escape key releases the
+controlled tokens: measured on a scene with `tokenVision` true, a second token had `visible` false while the first
+was controlled and `visible` true after Escape, and with `tokenVision` false it stayed visible while the first was
+controlled (`.superpowers/sdd/test-suite-rewrite/phase-2/review-measure-1.log`, `A controlled`, `after Escape`, `tokenVision false`), and a token that is
+not visible takes no pointer events), `toggleTokenLink` and `unlinkPlacedToken` (the sheet header buttons; `unlinkPlacedToken` moves the pointer
 onto the token and waits for `token.object.hover` before the double-click that opens the sheet, then waits for the
-reopened synthetic actor's sheet), `createCompendium` / `setCompendiumLocked` (P1: Compendium tab Create dialog, entry
-context menu Lock/Unlock), `putInPack` (P3: opens the pack's popout window and drags the world entry onto its
+reopened synthetic actor's sheet), `createCompendium` / `setCompendiumLocked` (Compendium tab Create dialog, entry
+context menu Lock/Unlock), `putInPack` (opens the pack's popout window and drags the world entry onto its
 `.directory-list`; the pack index is polled for the new id; the caller passes the world entry's locator, and the flow
 reopens that entry's sidebar tab before the drag). The creation dialogs are `DialogV2` forms whose content
 lacks the template's `form#document-create` id, so the flows find them by `dialog.application.dialog` with the
@@ -990,13 +995,17 @@ use the class `aspect`, so the flow looks inside `.standard-aspects-tab`. A Tita
 id carries a generated suffix (`[id^="add-inventory-item-dialog-<actorId>"]`). A document's sheet instance keeps its
 last tab, so a shared fixture's sheet can come up on the tab a flow last used; a test that needs a tab opens it.
 `shared(page, key)` and `sharedUuid(page, key)` (the uuid, for `openSheetByUuid` and `fromUuid`) serve `SHARED_FIXTURES`:
-`player`, `npc`, the seven world items `weapon`, `ability` (one check), `spell` (the Void custom trait; range, duration
-and inflict-condition aspects, the last with the Stunned option and a Resilience resistance), `armor`, `shield`,
+`player`, `npc`, the seven world items `weapon`, `ability` (one check), `spell` (the Void custom trait; a range aspect of 10 and a rounds-scaling
+duration aspect, as the old localization seed held, and an inflict-condition aspect with the Stunned option and a
+Resilience resistance; stored values: `.superpowers/sdd/test-suite-rewrite/phase-2/review-measure-3.log`, `spell aspects`), `armor`, `shield`,
 `equipment`, `commodity`; `effectHost` (a player that holds only the two effects) with `effect` and `conditionalEffect`
 (permanent, one conditional dice modifier); `roller` (a player owning copies of the shared weapon, spell and ability,
 dragged onto its sheet); `situationalActor` (a player owning an ability with a conditional dice +2, a conditional
 Advantage and a conditional dice +1 situation); `bulkActor` (30 abilities, an equipment with 30 checks and an effect
-with 30 rules elements; about 70 s to build, so its first consumer raises its own timeout); `scene` (created and
+with 30 rules elements; built in 69.1 s in one run, `.superpowers/sdd/test-suite-rewrite/phase-2/review-measure-1.log`, `build bulkActor`, so its first
+consumer raises its own timeout; at the default zoom the 30 abilities overflow the actor sheet's Abilities tab, 1976 px
+of content in 563 px, `.superpowers/sdd/test-suite-rewrite/phase-2/review-measure-3.log`; the equipment's checks and the effect's rules elements were not
+measured for overflow); `scene` (created and
 viewed); `trayPack` (an unlocked `ActiveEffect` pack holding one effect). `playwright.config.mjs` sets
 `use.actionTimeout` to 10 s
 (about ten times the longest action measured in a full run, 916 ms), so a flow that waits on a missing element fails
@@ -1025,8 +1034,8 @@ silently absorbing 15s: explicit `timeout:` values are `1000`. Inherently multi-
   test of `player-hud-layout.spec.js` and both portrait tests of `surfaces.spec.js`;
 - a scene draw on the canvas after a scene is created while none is viewed, viewed or activated (`flows.js`
   `waitForSceneDrawn`, 30 s);
-- building the `bulkActor` shared fixture (`flows.js`; about 70 s measured, 30 abilities, 30 checks and 30 rules elements
-  through the sheet controls), whose first consumer raises its own timeout;
+- building the `bulkActor` shared fixture (`flows.js`; 69.1 s in one run, `.superpowers/sdd/test-suite-rewrite/phase-2/review-measure-1.log`, 30 abilities,
+  30 checks and 30 rules elements through the sheet controls), whose first consumer raises its own timeout;
 - a second browser context finishing login (`multiClient.js`, used by the last test of `effect-tray.spec.js` for its
   E2E GM 2 client);
 - core's 2 s scrolling text finishing before the viewed scene is deactivated (`condition-description.spec.js`, last

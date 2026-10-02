@@ -152,9 +152,13 @@ test.describe('sheet layouts', () => {
    });
 
    test('the effect sheet shows a description typed in the editor in the inactive view', async () => {
-      // A per-test effect: its description is typed into the editor and saved.
-      /** @type {string} The id of the effect host actor. */
-      const hostId = await shared(page, 'effectHost');
+      // A per-test actor and effect: the description is typed into the editor and saved, so the shared effects stay
+      // as they are.
+      /** @type {string} The id of the effect's host actor. */
+      const hostId = await createActor(page, {
+         name: `E2E Described Host ${Date.now()}`,
+         type: 'player',
+      });
       /** @type {string} The new effect's id. */
       const effectId = await addEffect(page, hostId, `E2E Described Effect ${Date.now()}`);
       const sheet = await openSheetByUuid(page, `Actor.${hostId}.ActiveEffect.${effectId}`);
