@@ -194,6 +194,11 @@ distinct. Vitest is configured in `vitest.config.mjs` (`environment: 'happy-dom'
     `startCombatEncounter(combatId)` starts it. `teardownCombatEncounter` deletes combat, scene, and both actors
     in that order. A multi-client spec seeds through `seedEncounterForClients` (`tests/e2e/multiClient.js`).
 - `tests/e2e/` — Playwright end-to-end specs targeting a live Foundry instance.
+  - Harness (no specs): `registry.js` (the running list of everything the suite made, `test/state/registry.json`,
+    gitignored), `flows.js` (real-UI flows that create documents and record them), `global-setup.js` /
+    `global-teardown.js` (crash recovery and suite-end deletion over the list), `census.js` (the `E2E `-prefix census
+    and sweep the teardown reuses), `settings.js` (setters that record prior values). Details in `conventions.md`
+    "E2E registry, flows and teardown".
   - `combat-seed.spec.js` — Phase 4 smoke test (1 test): seeds a two-combatant encounter with
     `seedCombatEncounter`, then probes that `combat.turns.length === 2`, `combatant.actor` resolves to the
     seeded effect actor, `actor.system.isCharacter === true`, `getCharacterCombatants().length === 2`, and

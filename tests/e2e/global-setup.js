@@ -3,17 +3,26 @@ import { build as viteBuild } from 'vite';
 import { mkdir } from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { tearDownAndReport } from './global-teardown.js';
+import { hasWork, readRegistry, startRun } from './registry.js';
 
 /** @type {string} The directory of this setup file, used to resolve repo paths. */
 const dirname = path.dirname(fileURLToPath(import.meta.url));
 
 /**
- * Playwright global setup: build the two self-contained test bundles into `test/build/`.
+ * Playwright global setup: tears down what a crashed run left on the running list, starts a new run, and builds the
+ * two self-contained test bundles into `test/build/`.
  * Builds the component-probe IIFE (Vite + Svelte) first — its `emptyOutDir` cleans `test/build/`.
  * Then builds the fast-check IIFE (esbuild) so the probe's clean does not wipe it.
  * @returns {Promise<void>} Resolves once both bundles have been written.
  */
 export default async function globalSetup() {
+   // A list that still shows a run in flight, or holds entries, belongs to a run that never reached its teardown.
+   if (hasWork(readRegistry())) {
+      await tearDownAndReport('global-setup.js');
+   }
+   startRun();
+
    /** @type {string} The repo root, used as the module-resolution base and the config location. */
    const repoRoot = path.resolve(dirname, '../..');
 

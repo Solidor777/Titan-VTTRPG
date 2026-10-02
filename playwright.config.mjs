@@ -16,6 +16,7 @@ export default defineConfig({
    fullyParallel: false,
    workers: 1,
    globalSetup: './tests/e2e/global-setup.js',
+   globalTeardown: './tests/e2e/global-teardown.js',
    // The default list output, plus a diagnostic ranking of operations over the duration budget.
    reporter: [
       ['list'],

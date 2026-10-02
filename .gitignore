@@ -16,6 +16,7 @@ packs/*
 !packs/_source/
 *.old
 test/build/
+test/state/
 .superpowers/
 graphify-out/
 .claude/scheduled_tasks.lock

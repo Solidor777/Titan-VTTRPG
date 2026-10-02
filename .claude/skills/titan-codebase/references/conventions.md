@@ -915,8 +915,50 @@ entries of the four E2E users whose macro does not resolve; chat messages from `
 `sweepWorld(page)` (removes all of those except messages through the API — scenes first, folders after their
 contents, orphaned tokens and dangling hotbar slots last; never User documents) and `countCensus(census)`. Both
 `takeCensus` and `sweepWorld` throw before reading or deleting anything unless `game.world.id` is `test-titan`
-(`CENSUS_WORLD`). Run directly (`node tests/e2e/census.js [--sweep]`) it logs in to localhost:30000 as `E2E GM 1`,
-prints JSON counts, and exits 1 when the final census is not empty.
+(`CENSUS_WORLD`; `assertCensusWorld` is exported and the teardown calls it too). Run directly
+(`node tests/e2e/census.js [--sweep]`) it logs in to localhost:30000 as `E2E GM 1`, prints JSON counts, and exits 1
+when the final census is not empty.
+
+**E2E registry, flows and teardown (documents made through real user flows)** — a test of a document runs on a document
+a flow made. `tests/e2e/registry.js` keeps the running list in `test/state/registry.json` (gitignored; not `test/build/`,
+which the probe build empties): `runStartedAt`, every created document `{ key?, documentName, id, parent (uuid|null),
+sceneId?, packId?, createdBy (spec file) }` (a world compendium is `documentName: 'Compendium'` with the pack collection
+id as `id`), hotbar assignments `{ userId, slot, macroId }` and `settings` `{ scope, namespace, key, prior }`. It is a
+file because it must outlive a spec file, a mid-file reload and the worker, and be read by the runner; the file is
+overwritten, never deleted. Exports: `record`, `recordHotbar`, `recordSetting` (a setting keeps its FIRST prior value),
+`resolves(page, entry)`, `shared(page, key)` (the id of the shared fixture `key` when the list has it and it still
+resolves, otherwise a new one made by the flow in `flows.js` `SHARED_FIXTURES` and recorded under the key; shared
+fixtures are never deleted mid-run, and a test that edits one restores the field through the same control or uses a
+per-test document), `startRun`, `resetRegistry`, `hasWork`.
+`tests/e2e/flows.js` has one exported async function per flow; each drives the DOM like a user, reads the id of what it
+made from the DOM or a read-only API call, records it and returns it; it never creates, updates or deletes a document
+through the API. Flows: `createActor` (A1: Actors tab Create button and core dialog), `createOwnedItem` (A2: the
+Abilities/Spells tab add button or the Inventory tab's add button and its item-type dialog, then the new item is
+renamed in its own sheet opened by the row's Edit button), `createWorldItem` (A6), `createScene` / `viewScene` /
+`activateScene` (S1: Scenes tab, entry context menu View/Activate; core views a scene created while none is viewed, so
+`createScene` then waits for the draw, and `viewScene` skips the menu for a viewed scene), `placeToken` (T1: drags the
+actor's directory entry onto `#board`, which core handles as an Actor drop; open windows are closed first),
+`toggleTokenLink` and `unlinkPlacedToken` (T2: the sheet header buttons; `unlinkPlacedToken` moves the pointer onto the
+token and waits for `token.object.hover` before the double-click that opens the sheet, then waits for the reopened
+synthetic actor's sheet), `createCompendium` / `setCompendiumLocked` (P1: Compendium tab Create dialog, entry context menu
+Lock/Unlock), `putInPack` (P3: opens the pack's popout window and drags the world entry onto its `.directory-list`;
+the pack index is polled for the new id) and `directoryEntry`. The creation dialogs are `DialogV2` forms whose content
+lacks the template's `form#document-create` id, so the flows find them by `dialog.application.dialog` with the
+`.dialog-content` fields. Sheet windows are found by element id suffix (`.application[id$="Actor-<id>"]`); a TitanDialog
+id carries a generated suffix (`[id^="add-inventory-item-dialog-<actorId>"]`). Playwright's default action timeout is
+unlimited, so a flow that waits on a missing element hangs until the test timeout.
+`tests/e2e/global-teardown.js` (Playwright `globalTeardown`) launches one Chromium, logs in as `E2E GM 1`, asserts the
+census world and in order deletes the list through the API (combats; tokens by their scene; scenes; embedded
+documents by their parent; world actors, items, macros, roll tables, journal entries, playlists, cards, folders; recorded
+pack documents whose pack is not recorded; world compendia after unlocking), clears each recorded hotbar slot that still
+holds its recorded macro (`user.assignHotbarMacro(null, slot)`: deleting a Macro does not clear its slot, which lives on
+the User), deletes every chat message with `timestamp >= runStartedAt`, restores each recorded setting, runs
+`sweepWorld` (its per-kind counts are printed; they are not a failure in Phases 1-5) and `takeCensus` (which must be
+all zero or the run fails), prints one `e2e teardown (...)` JSON line and resets the list. `global-setup.js` runs the
+same `tearDownAndReport` over a list that still shows a run in flight or holds entries (a crashed run), then `startRun()`
+before the probe build. `settings.js` `setWorldSetting` / `setClientSetting` record the prior value before they write; a
+`game.settings.set` made directly in a spec is not recorded. Client-scope values live in the browser context's storage,
+which a teardown Chromium does not share (inferred from Foundry's client storage; not measured).
 
 **No e2e operation may exceed 1 second**, and wait ceilings are set to that budget so a breach fails loudly instead of
 silently absorbing 15s: explicit `timeout:` values are `1000`. Inherently multi-second waits are deliberately exempt:

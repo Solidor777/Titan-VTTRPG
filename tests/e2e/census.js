@@ -25,7 +25,7 @@ export const CENSUS_WORLD = 'test-titan';
  * @param {import('@playwright/test').Page} page - A logged-in page.
  * @returns {Promise<void>} Resolves when the page's world is the census world.
  */
-async function assertCensusWorld(page) {
+export async function assertCensusWorld(page) {
    /** @type {string} The id of the world the page is logged in to. */
    const worldId = await page.evaluate(() => game.world.id);
    if (worldId !== CENSUS_WORLD) {
