@@ -6,6 +6,7 @@ import {
    controlFixtureActorToken,
    deleteFixtureActor,
    deleteOrphanedTokens,
+   reloadWorld,
    showChatLog,
 } from './world.js';
 
@@ -261,16 +262,6 @@ test('a turn-start report tags a turn-start effect with the Turn Start tag and i
       .toBe(report.expected);
 });
 
-/**
- * Reloads the shared page and waits for the world to be ready again. A world boot is an inherently multi-second wait.
- * @returns {Promise<void>} Resolves once `game.ready` holds on the reloaded page.
- */
-async function reloadPage() {
-   await page.reload();
-   await page.waitForURL('**/game', { timeout: 15_000 });
-   await page.waitForFunction(() => globalThis.game?.ready === true, null, { timeout: 60_000 });
-}
-
 // The last test of the file: it reloads the page and leaves its new fallback scene active.
 test('with no scene active, the fixture token is placed on a fully drawn fallback scene', async () => {
    // A world boot inside the test exceeds the 60 s default under the throttled runner.
@@ -294,7 +285,7 @@ test('with no scene active, the fixture token is placed on a fully drawn fallbac
    await page.evaluate(async () => {
       await game.scenes.active?.update({ active: false });
    });
-   await reloadPage();
+   await reloadWorld(page);
    expect(await page.evaluate(() => ({
       active: game.scenes.active?.id ?? null,
       viewed: canvas.scene?.id ?? null,
@@ -344,8 +335,8 @@ test('with no scene active, the fixture token is placed on a fully drawn fallbac
       parented: true,
    });
 
-   // Change the actor through the token HUD: the actor update re-renders the token through its render flags, the step
-   // that threw when the token was placed before the scene was drawn. The afterEach hook asserts no page error.
+   // Change the actor through the token HUD: the actor update re-renders the token through its render flags, which
+   // read the token layer of a fully drawn scene. The afterEach hook asserts no page error.
    await expect.poll(() => page.evaluate((name) => game.actors.getName(name).statuses.has('deafened'), ACTOR_NAME))
       .toBe(false);
    await page.mouse.click(placed.client.x, placed.client.y, { button: 'right' });

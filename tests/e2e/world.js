@@ -347,6 +347,20 @@ export async function expectActiveGM(page) {
 }
 
 /**
+ * Reloads the world as the same user and waits until a readiness predicate holds on the reloaded page. A world boot is
+ * an inherently multi-second wait: the URL check fails a lost session within 15 s, and the boot gets 60 s.
+ * @param {import('@playwright/test').Page} page - The logged-in page.
+ * @param {object} [options] - How the reload decides the world is ready.
+ * @param {() => boolean} [options.ready] - The in-page predicate that marks the world ready; `game.ready` by default.
+ * @returns {Promise<void>} Resolves once the predicate holds.
+ */
+export async function reloadWorld(page, { ready = () => globalThis.game?.ready === true } = {}) {
+   await page.reload();
+   await page.waitForURL('**/game', { timeout: 15_000 });
+   await page.waitForFunction(ready, null, { timeout: 60_000 });
+}
+
+/**
  * Sets the migration mode and reloads the world as the same GM, returning once the load has passed its migration
  * attempt (onceReady builds the Player HUD after it, whether or not it succeeded) and its GM is the active GM.
  * @param {import('@playwright/test').Page} page - The logged-in page.
@@ -355,12 +369,6 @@ export async function expectActiveGM(page) {
  */
 export async function reloadWithMode(page, mode) {
    await page.evaluate((value) => game.settings.set('titan', 'migrationMode', value), mode);
-   await page.reload();
-   await page.waitForURL('**/game', { timeout: 15_000 });
-   await page.waitForFunction(
-      () => globalThis.game?.ready === true && !!game.titan?.playerHud,
-      null,
-      { timeout: 60_000 },
-   );
+   await reloadWorld(page, { ready: () => globalThis.game?.ready === true && !!game.titan?.playerHud });
    await expectActiveGM(page);
 }
