@@ -884,27 +884,31 @@ export async function addRulesElement(page, documentUuid, element) {
 }
 
 /**
- * Adds a custom trait to an item through the sidebar's Add Custom Trait button and its dialog.
+ * Adds a custom trait to an item or effect through the sidebar's Add Custom Trait button and its dialog.
  * @param {import('@playwright/test').Page} page - A logged-in page.
- * @param {string} itemUuid - The uuid of the item that receives the trait.
+ * @param {string} documentUuid - The uuid of the item or effect that receives the trait.
  * @param {string} name - Text typed into the dialog's name input.
+ * @param {string} [description] - Text typed into the dialog's description area.
  * @returns {Promise<void>} Resolves once the trait is stored.
  */
-export async function addCustomTrait(page, itemUuid, name) {
-   /** @type {import('@playwright/test').Locator} The item's sheet. */
-   const sheet = await openSheetByUuid(page, itemUuid);
+export async function addCustomTrait(page, documentUuid, name, description) {
+   /** @type {import('@playwright/test').Locator} The document's sheet. */
+   const sheet = await openSheetByUuid(page, documentUuid);
    await sheet.getByText('Add Custom Trait', { exact: true }).first().click();
 
    /** @type {import('@playwright/test').Locator} The Add Custom Trait dialog. */
    const dialog = page.locator('.titan-add-custom-item-trait-dialog');
    await expect(dialog).toBeVisible();
    await dialog.locator('input').first().fill(name);
+   if (description !== undefined) {
+      await dialog.locator('textarea').fill(description);
+   }
    await dialog.locator('.buttons .button button').first().click();
    await expect(dialog).toHaveCount(0);
    await expect.poll(
       () => page.evaluate(
          async (uuid) => (await fromUuid(uuid)).system.customTrait.map((trait) => trait.name),
-         itemUuid,
+         documentUuid,
       ),
       { message: 'the dialog stored the custom trait' },
    ).toContain(name);

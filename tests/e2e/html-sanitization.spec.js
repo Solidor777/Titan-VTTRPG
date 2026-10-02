@@ -7,7 +7,8 @@ import { attachPageErrors, closeAllApps, showChatLog } from './world.js';
  * User-written HTML reaches two sinks: tooltips (tippy renders its content as HTML) and rich text (enrichHTML assigns
  * its input to a live element, then the component renders the result). Both clean it with core's HTML cleaner first:
  * a report message and a report tag tooltip carrying an event-handler payload render their text and markup with no
- * handler, a live tooltip updated to the payload is cleaned on update, and icon markup survives cleaning.
+ * handler, and icon markup survives cleaning. The live custom-trait tooltip that is updated to the payload is covered
+ * in `custom-traits.spec.js`.
  */
 
 /** @type {string} HTML whose image carries an event handler that sets a page flag when the image fails to load. */
@@ -15,12 +16,6 @@ const PAYLOAD = '<p>E2E sanitized text</p><img src="e2e-missing-image.png" onerr
 
 /** @type {string} The payload's image once cleaned: the same element without its handler. */
 const CLEAN_IMAGE = '<img src="e2e-missing-image.png">';
-
-/** @type {string} Name of the throwaway weapon whose custom-trait tooltip is updated live. */
-const ITEM_NAME = 'E2E Sanitization Weapon';
-
-/** @type {string} Name of the weapon's custom trait. */
-const TRAIT_NAME = 'E2E Sanitized Trait';
 
 /** @type {import('@playwright/test').Page} The file-shared, logged-in page (one world boot per file). */
 let page;
@@ -42,9 +37,6 @@ test.afterEach(async () => {
 });
 
 test.afterAll(async () => {
-   await page.evaluate(async (name) => {
-      await game.items.getName(name)?.delete();
-   }, ITEM_NAME);
    await page?.close();
 });
 
@@ -121,77 +113,6 @@ test('a report tag tooltip holds the cleaned HTML and renders it without the eve
    await expect.poll(() => tooltipImage.evaluate((element) => element.complete)).toBe(true);
    expect(await tooltipImage.getAttribute('onerror')).toBeNull();
    expect(await page.evaluate(() => window.__titanXss)).toBeUndefined();
-});
-
-test('a live tooltip updated to user HTML is cleaned on update', async () => {
-   /** @type {{first: string, payload: string}} The first description and the payload, cleaned by core's cleaner. */
-   const cleaned = await page.evaluate(async ({ itemName, payload, traitName }) => {
-      await game.items.getName(itemName)?.delete();
-
-      /** @type {TitanItem} A weapon with one custom trait. */
-      const item = await Item.create({
-         name: itemName,
-         system: {
-            customTrait: [
-               {
-                  description: '<p>E2E first description</p>',
-                  name: traitName,
-                  uuid: 'e2e-sanitization-trait',
-               },
-            ],
-         },
-         type: 'weapon',
-      });
-
-      /** @type {ApplicationV2} The weapon's sheet. */
-      const app = await item.sheet.render(true);
-      await titanWait(() => !!app?.element?.querySelector('.sidebar'), { message: 'sheet mounted' });
-      return {
-         first: foundry.utils.cleanHTML('<p>E2E first description</p>'),
-         payload: foundry.utils.cleanHTML(payload),
-      };
-   }, {
-      itemName: ITEM_NAME,
-      payload: PAYLOAD,
-      traitName: TRAIT_NAME,
-   });
-
-   // Mark the trait label that carries the tooltip, and read its first content.
-   /** @type {string|null} The tooltip's first content, or null when the label is not found. */
-   const first = await page.evaluate((name) => {
-      /** @type {Element|undefined} The trait label carrying the tooltip. */
-      const label = [...document.querySelectorAll('.sidebar .tag *')]
-         .find((element) => element._tippy && element.textContent.trim() === name);
-      if (!label) {
-         return null;
-      }
-      label.__e2eMarked = true;
-      return label._tippy.props.content;
-   }, TRAIT_NAME);
-   expect(first).toBe(cleaned.first);
-
-   await page.evaluate(async ({ itemName, payload }) => {
-      /** @type {TitanItem} The weapon. */
-      const item = game.items.getName(itemName);
-      await item.update({
-         'system.customTrait': [
-            {
-               ...item.system.customTrait[0],
-               description: payload,
-            },
-         ],
-      });
-   }, {
-      itemName: ITEM_NAME,
-      payload: PAYLOAD,
-   });
-
-   // The same (still marked) label holds the cleaned payload, so the action's update path cleaned it.
-   await expect.poll(() => page.evaluate(() => {
-      /** @type {Element|undefined} The marked label, if it was kept. */
-      const label = [...document.querySelectorAll('.sidebar .tag *')].find((element) => element.__e2eMarked);
-      return label ? label._tippy?.props?.content : 'the marked label was replaced';
-   })).toBe(cleaned.payload);
 });
 
 test('tooltip icon markup survives cleaning while an event handler does not', async () => {
