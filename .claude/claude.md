@@ -41,6 +41,12 @@
   direct update only for a field that has no control.
 * **Never make unverified claims.** Docs, comments and reports state only what was measured (with the command or log)
   or read (with the source location). Anything inferred is labelled as such.
+* **No test poll lasts longer than 1 second.** Everything in the e2e suite runs on one machine, so a replicated
+  update or a render lands at once. Every wait on something inside an already-loaded page (`expect.poll`,
+  `waitForFunction`, `titanWait`, `toPass`, and explicit `timeout:` values on assertions and actions) has a ceiling of
+  at most 1000 ms. A wait that needs longer is a defect to find and fix, not a ceiling to raise. World boot, login,
+  page reload, the build, the `actionTimeout` safety net and per-test limits wait on a process starting and are
+  outside this rule.
 
 ## Fable-class models
 
