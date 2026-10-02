@@ -317,59 +317,68 @@ export default class TitanActorSheet extends TitanDocumentSheet {
    }
 
    /**
-    * Handle a drop event for an existing embedded Item to sort that Item relative to its siblings.
+    * Handle a drop event for an existing embedded Item to sort that Item relative to the row it was dropped on, among
+    * the rows that share that row's list. The direction is core's automatic one: before the target when the dropped
+    * item's sort is greater than the target's, otherwise after it. Mirrors core's `ActorSheet#_onSortItem` (Foundry
+    * 14.364, `client/applications/sheets/actor-sheet.mjs`).
     * @param {DragEvent} event - The concluding DragEvent which contains drop data.
-    * @param {object} itemData - The item data requested for sorting.
-    * @returns {Promise<TitanItem[] | boolean>} The updated item instances, or false if the data was invalid.
+    * @param {object} itemData - The data of the dropped item, as `Item#toObject` returns it (it carries `_id`).
+    * @returns {Promise<TitanItem[] | boolean>} The updated item instances, or false when the drop is not on another
+    * row of this actor's items.
     * @private
     */
    async _onSortItem(event, itemData) {
       // Get the drag source and drop target.
+      /** @type {Collection<TitanItem>} The actor's items. */
       const items = this.actor.items;
-      const source = items.get(itemData.id);
+
+      /** @type {TitanItem | undefined} The dropped item. */
+      const source = items.get(itemData._id);
+
+      /** @type {Element | null} The row the item was dropped on. */
       const dropTarget = event.target.closest('[data-item-id]');
+      if (!source || !dropTarget) {
+         return false;
+      }
 
-      // If the drop target is valid.
-      if (dropTarget) {
-         const target = items.get(dropTarget.dataset.itemId);
+      /** @type {TitanItem | undefined} The item of the row it was dropped on. */
+      const target = items.get(dropTarget.dataset.itemId);
 
-         // If the dropped item is the target.
-         if (source.id === target.id) {
+      // Dropping an item on its own row changes nothing.
+      if (!target || source.id === target.id) {
+         return false;
+      }
 
-            // Identify sibling items based on adjacent HTML elements.
-            const siblings = [];
-            for (let itemElement of dropTarget.parentElement.children) {
-               const siblingId = itemElement.dataset.itemId;
-               if (siblingId && (siblingId !== source.id)) {
-                  siblings.push(items.get(itemElement.dataset.itemId));
-               }
-            }
-
-            // Perform the sort.
-            const sortUpdates = SortingHelpers.performIntegerSort(source, {
-               target,
-               siblings,
-            });
-            const updateData = sortUpdates.map((entry) => {
-               const update = entry.update;
-               update.id = entry.target.id;
-               return update;
-            });
-
-            // Perform the update.
-            return /** @type Promise<TitanItem[]> */ this.actor.updateEmbeddedDocuments(
-               'Item',
-               updateData,
-            );
+      // Identify sibling items based on adjacent HTML elements.
+      /** @type {TitanItem[]} The items of the target row's list other than the dropped one. */
+      const siblings = [];
+      for (const itemElement of dropTarget.parentElement.children) {
+         const siblingId = itemElement.dataset.itemId;
+         if (siblingId && (siblingId !== source.id)) {
+            siblings.push(items.get(siblingId));
          }
       }
 
-      return false;
+      // Perform the sort.
+      const sortUpdates = foundry.utils.performIntegerSort(source, {
+         target,
+         siblings,
+      });
+      const updateData = sortUpdates.map((entry) => {
+         return {
+            ...entry.update,
+            _id: entry.target._id,
+         };
+      });
+
+      // Perform the update.
+      return /** @type Promise<TitanItem[]> */ this.actor.updateEmbeddedDocuments('Item', updateData);
    }
 
    /**
     * Handle dropping of a Folder on an Actor Sheet.
-    * The core sheet currently supports dropping a Folder of Items to create all items as owned items.
+    * A Folder of Items creates an owned copy of each item in it; a Folder of any other type is refused. Core's
+    * `ActorSheet#_onDropFolder` creates nothing (Foundry 14.364, `client/applications/sheets/actor-sheet.mjs:363-365`).
     * @param {DragEvent} event - The concluding DragEvent which contains drop data.
     * @param {object} data - The data transfer extracted from the event.
     * @returns {Promise<Item[] | boolean>} The created Item instances, or false if the folder was invalid or not of type
