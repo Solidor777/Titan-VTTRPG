@@ -1272,9 +1272,15 @@ when fixed.
     pack is gone, the selection falls back as it does on construction (`#resolveSelection`) and the tray reloads.
   - Measured with two GM clients (probe script, not checked in): a pack created on one client appeared in both tray
     selects, and deleting it removed it from both. The client that had it selected fell back to `TITAN Effects`.
-  - Gated by `tests/e2e/effect-tray.spec.js:331` from a world swept by `node tests/e2e/census.js --sweep` (no
-    `E2E Tray Effects` pack at login). It passed in the full run of 2026-10-01: `npm run test:e2e`, 654 passed.
-    The test moves with the `effect-tray` rewrite (test-suite rewrite Phase 6).
+  - Gated by `tests/e2e/effect-tray.spec.js` 'the tray follows a world compendium created and deleted in the Compendium
+    directory' (its last test). It needs no leftover state; every step uses a real control:
+    - with the tray already built, it creates a pack with a run-unique `E2E Tray Pack <timestamp>` label through the
+      Compendium directory's Create Compendium dialog;
+    - it asserts the tray offers the pack, then selects it in the tray;
+    - it deletes the pack through the directory entry's context menu and confirmation;
+    - it asserts the tray no longer offers the pack and has fallen back to `TITAN Effects`.
+  - Measured: with the tray's `renderCompendiumDirectory` hook renamed away, the test fails (expected 1 option, received
+    0). The test moves with the `effect-tray` rewrite (test-suite rewrite Phase 6).
 
 ### 113. `condition-description.spec.js` failed when no scene was active at its start
 
@@ -1300,6 +1306,14 @@ when fixed.
     the token.
   - The same probe, waiting for the draw, threw nothing; the placeable was parented and `toggleStatusEffect`
     succeeded.
-  - Gated by `tests/e2e/condition-description.spec.js:103`, the first spec in the run to place a fixture token with no
-    scene active, from a world swept by `node tests/e2e/census.js --sweep`. It passed in the full run of 2026-10-01:
-    `npm run test:e2e`, 654 passed. The helper and the spec are replaced in the test-suite rewrite (Phases 5-6).
+  - Gated by `tests/e2e/condition-description.spec.js` 'with no scene active, the fixture token is placed on a fully
+    drawn fallback scene' (its last test). It establishes and asserts its own precondition:
+    - it clears the active flag of the active test scene (`direct-updates.allowlist.json`: no control deactivates a
+      scene) and reloads;
+    - it asserts that no scene is active or drawn.
+  - The test then:
+    - calls `controlFixtureActorToken` with a new fallback name;
+    - asserts the token sits on the drawn scene's token layer;
+    - applies Deafened through the token HUD, with no page error.
+  - Measured: with the helper's canvas-ready wait removed, the test fails with the `'OBJECTS'` TypeError. The helper and
+    the spec are replaced in the test-suite rewrite (Phases 5-6).
