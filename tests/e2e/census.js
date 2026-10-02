@@ -5,7 +5,8 @@ import { DEFAULT_GM, E2E_USERS } from './users.js';
 
 // Counts, and on request removes, what the e2e suite has left in the `test-titan` world: `E2E `-prefixed documents
 // of the world document kinds and world compendia, tokens whose actor does not resolve, chat messages since a run
-// started, and hotbar entries of the E2E users whose macro does not resolve. User documents are never touched.
+// started, and hotbar entries of the E2E users whose macro does not resolve. User documents are never touched, and
+// both functions throw on any world other than `test-titan` before reading or deleting anything.
 //
 // Run as a script against the live world on localhost:30000, logged in as `E2E GM 1`:
 //    node tests/e2e/census.js            counts only
@@ -14,6 +15,22 @@ import { DEFAULT_GM, E2E_USERS } from './users.js';
 
 /** @type {string} The name prefix of every document the e2e suite makes. */
 export const E2E_PREFIX = 'E2E ';
+
+/** @type {string} The only world the census may count or sweep: the e2e world, never a user's world. */
+export const CENSUS_WORLD = 'test-titan';
+
+/**
+ * Throws unless the page is logged in to the census world, so a sweep can never delete documents from another world.
+ * @param {import('@playwright/test').Page} page - A logged-in page.
+ * @returns {Promise<void>} Resolves when the page's world is the census world.
+ */
+async function assertCensusWorld(page) {
+   /** @type {string} The id of the world the page is logged in to. */
+   const worldId = await page.evaluate(() => game.world.id);
+   if (worldId !== CENSUS_WORLD) {
+      throw new Error(`The census runs only against the "${CENSUS_WORLD}" world; this page is in "${worldId}".`);
+   }
+}
 
 /**
  * @typedef {object} CensusEntry
@@ -33,9 +50,10 @@ export const E2E_PREFIX = 'E2E ';
  * @param {import('@playwright/test').Page} page - A page logged in as a GM.
  * @param {object} [options] - What else to count.
  * @param {number} [options.since] - A run's start time (ms since the epoch); messages from then on are counted.
- * @returns {Promise<Census>} The entries of each kind.
+ * @returns {Promise<Census>} The entries of each kind. Throws when the page is not in the census world.
  */
 export async function takeCensus(page, { since } = {}) {
+   await assertCensusWorld(page);
    return page.evaluate(({ prefix, userNames, since }) => {
       /** @type {Record<string, string>} The world collection of each prefixed document kind. */
       const collections = {
@@ -105,9 +123,11 @@ export async function takeCensus(page, { since } = {}) {
  * Scenes go first (taking their tokens), folders after their contents, then orphaned tokens and dangling hotbar
  * entries, which the earlier deletions can create.
  * @param {import('@playwright/test').Page} page - A page logged in as a GM.
- * @returns {Promise<Record<string, number>>} The number removed of each kind.
+ * @returns {Promise<Record<string, number>>} The number removed of each kind. Throws when the page is not in the
+ * census world.
  */
 export async function sweepWorld(page) {
+   await assertCensusWorld(page);
    return page.evaluate(async ({ prefix, userNames }) => {
       /** @type {string[]} The world collections of the prefixed document kinds, in deletion order. */
       const collections = [
@@ -233,6 +253,8 @@ async function main() {
    }
 }
 
-if (import.meta.url === pathToFileURL(process.argv[1]).href) {
+// Runs the command line only when this file is the entry script; an importer (or `node -e`, with no script path)
+// gets the exports alone.
+if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
    await main();
 }
