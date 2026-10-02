@@ -60,10 +60,12 @@ management). Data model classes hold the schema, field validation, and derived-d
   `buildChatMessageData` (pure: returns `{ type, system }` from the prepared system snapshot —
   `system.getRollData()` minus document-level `id`/`type`, plus `name`/`img` as label metadata),
   `sendToChat` (sends that `type` + `system` as a first-class chat-message subtype, NOT `flags.titan`),
-  custom-trait management, the check-list mutators (`addCheck` / `deleteCheck` / `moveCheck` / `insertCheck`, from
-  `CheckListMixin`, which `TitanActiveEffect` also uses), and the `isMarkedForDeletion` flag (`safeDelete` sets it,
-  deletes, and clears it again when the delete is refused or rejects, resolving false; `TitanActor#deleteItem` and the
-  row expand button read it).
+  the custom-trait mutators (`CustomTraitMixin`, `src/document/types/item/CustomTraitMixin.js`), the check-list
+  mutators `addCheck` / `deleteCheck` / `moveCheck` / `insertCheck` (`CheckListMixin`,
+  `src/document/types/item/CheckListMixin.js`), both mixins shared with `TitanActiveEffect`, and the
+  `isMarkedForDeletion` flag. `safeDelete` sets the flag, deletes, and clears the flag again when the delete is
+  refused (it resolves false) or rejects (it rejects with the original error); `TitanActor#deleteItem` and the row
+  expand button read the flag.
 - `TitanItemDataModel` (`src/document/types/item/TitanItemDataModel.js`) extends `TitanDataModel`.
   Adds `description`, a `check` array (item check templates), and a `customTrait` array — its
   `_defineDocumentSchema()` is built from the shared shape template
@@ -120,8 +122,8 @@ management). Data model classes hold the schema, field validation, and derived-d
   metadata; the chat subtype is hardcoded `'effect'` (a condition's own subtype is not a registered chat
   subtype). `sendToChat` posts that payload as a first-class chat-message subtype, NOT `flags.titan`.
   The class takes the check-list mutators (`addCheck` / `deleteCheck` / `moveCheck` / `insertCheck`) from
-  `CheckListMixin` (`src/document/types/item/CheckListMixin.js`, shared with `TitanItem`) and carries the
-  custom-trait mutators (`addCustomTrait` / `editCustomTrait` / `deleteCustomTrait`) inline; they operate on
+  `CheckListMixin` and the custom-trait mutators (`addCustomTrait` / `editCustomTrait` / `deleteCustomTrait`) from
+  `CustomTraitMixin`, the same mixins `TitanItem` uses (`src/document/types/item/`). They operate on
   `system.check` / `system.customTrait` via `this.update(...)`, notify the sheet through
   `this.sheet.postAddCheck()` / `preDeleteCheck(idx)` / `postMoveCheck(from, to)` / `postInsertCheck(idx)`, and
   reuse the item
@@ -521,9 +523,11 @@ and one or more inner Svelte component trees.
   `ShouldConfirmDeletingEffects`) — either shows `ConfirmDeleteEffectDialog` or immediately calls
   `safeDeleteEffect` (owner-gated `deleteEmbeddedDocuments('ActiveEffect', …)`); exactly one of the two runs. This
   mirrors the item path (`requestItemDeletion`/`safeDeleteItem`/`ConfirmDeleteItemDialog`/`confirmDeletingItems`),
-  where both `safeDeleteItem` and the dialog delete through `TitanActor#deleteItem`, so an equipped armor or shield
-  is un-equipped first. `requestRemoveExpiredEffects` is gated by `confirmDeletingEffects` too, since it deletes
-  Active Effects.
+  where both `safeDeleteItem` and the dialog delete through `TitanActor#deleteItem`. The follow-up work of any item
+  delete (the row buttons, a macro, a module) runs in `TitanActor#_onDeleteDescendantDocuments`, which Foundry calls
+  on every client: every client drops its own sheet state (`sheet.postDeleteItem`), and only the client of the user
+  who deleted writes `system.postDeleteItem`, which un-equips a deleted armor or shield.
+  `requestRemoveExpiredEffects` is gated by `confirmDeletingEffects` too, since it deletes Active Effects.
 
 **Item sheets**
 
@@ -609,9 +613,11 @@ and one or more inner Svelte component trees.
 
 - `TitanActiveEffectSheet` (`src/document/types/active-effect/sheet/TitanActiveEffectSheet.js`)
   extends `TitanDocumentSheet` directly (NOT `TitanItemSheet`, to avoid item-only send-to-chat/import
-  header controls). Reuses `createRulesElementItemSheetState` (document-agnostic) and exposes
-  `postAddCheck`/`preDeleteCheck`. Registered as the default sheet for `ActiveEffect` subtype
-  `effect` via `foundry.applications.apps.DocumentSheetConfig.registerSheet(foundry.documents.ActiveEffect, …)`
+  header controls). Reuses `createRulesElementItemSheetState` (document-agnostic) and takes the check-list
+  notifications `postAddCheck` / `preDeleteCheck` / `postMoveCheck` / `postInsertCheck` from `CheckListSheetMixin`
+  (`src/document/types/item/sheet/CheckListSheetMixin.js`, shared with `TitanItemSheet`). Registered as the default
+  sheet for `ActiveEffect` subtype `effect` via
+  `foundry.applications.apps.DocumentSheetConfig.registerSheet(foundry.documents.ActiveEffect, …)`
   in `OnceInit.js`. Mounts `ActiveEffectSheetShell.svelte`, which composes the generic
   `ItemSheetBase` + `ItemSheetSidebar` with `ActiveEffectSheetHeader` (duration controls plus a
   native-`disabled` active toggle for permanent effects) and `ActiveEffectSheetTabs` (Description /

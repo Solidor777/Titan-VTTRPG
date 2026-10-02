@@ -1567,8 +1567,25 @@ The evidence files named here are in `.superpowers/sdd/test-suite-rewrite/phase-
 - **Third gate test:** "a refused delete of an equipped armor leaves it equipped and its row expanded" (then removes
   the refusal, deletes again and expects the slot empty). Before: failed on both assertions
   (`gate119-predelete-before-fix.log`). After: passed (`gate119-predelete-after-fix.log`, with the other delete tests).
-- **Robustness:** `safeDelete` clears the mark in a `finally` when `delete()` rejects. No gate: I found no flow
-  through the UI that makes `delete()` reject, and did not measure it.
+- **Fourth defect, found 2026-10-02 in the closing review:** a delete that does not go through `TitanActor#deleteItem`
+  (a macro or module calling `item.delete()`) never un-equipped a deleted armor or shield, because the cleanup hung off
+  `deleteItem`. Measured: deleting an equipped armor with `item.delete()` left `system.equipped.armor` holding the id
+  (`gate-outside-delete-before-fix.log`).
+- **Fourth fix:** the cleanup hangs off `TitanActor#_onDeleteDescendantDocuments`, which Foundry calls on every client
+  for a deletion (read: `client/data/client-backend.mjs` `#handleDeleteDocuments` dispatches the `onDelete` descendant
+  event, and `client/documents/abstract/client-document.mjs` `_dispatchDescendantDocumentEvents` calls the method; dev
+  install 14.364.0). Every client drops its own sheet state; only the client whose user id equals the `userId` argument
+  (the deleting user) writes the un-equip, so there is one writer. `deleteItem` no longer calls the post-delete hooks.
+- **Fourth gate tests:** "an equipped armor deleted outside the sheet, as a macro deletes it, is un-equipped" (the
+  delete is `item.delete()`, since no control but the row button deletes an owned item) and "only the client that
+  deletes an equipped armor writes the un-equip" (a second client, E2E GM 2, counts its own `preUpdateActor` calls and
+  expects 0). Before: the first failed (`gate-outside-delete-before-fix.log`) and the second failed because the slot
+  never emptied on the observer (`gate-single-writer-before-fix.log`). After: both passed
+  (`gate-outside-delete-after-fix.log`). With the writer guard replaced by `true` the second test failed with 1
+  observer write (`gate-single-writer-guard-removed.log`), so the counter detects a second writer.
+- **Robustness:** `safeDelete` clears the mark when `delete()` rejects or is refused, and rethrows the first error (an
+  error of the clearing update does not replace it). No gate: I found no flow through the UI that makes `delete()`
+  reject, and did not measure it.
 
 ### 120. Apply Edits in the Edit Traits dialog threw and stored nothing
 
@@ -1672,8 +1689,14 @@ The evidence files named here are in `.superpowers/sdd/test-suite-rewrite/phase-
 - **Found:** 2026-10-02 in the second review of Part A fixes.
 - **Fixed:** 2026-10-02. The four check-list mutators (`addCheck`, `deleteCheck`, `moveCheck`, `insertCheck`) live in
   `CheckListMixin`, which `TitanItem` and `TitanActiveEffect` both use; the effect sheet gains `postMoveCheck` and
-  `postInsertCheck`.
+  `postInsertCheck`. In the closing review the duplicated pieces were moved to shared places too: the three custom-trait
+  mutators to `CustomTraitMixin` (both documents) and the four sheet forwarders to `CheckListSheetMixin` (both
+  sheets), so a method cannot exist on one and not the other.
 - **Gate tests:** `tests/e2e/character-sheet-rows.spec.js` ("dragging a check above another on the effect sheet
   reorders the checks", "dropping a check from an equipment sheet onto the effect sheet copies it in"), driven by
   dragging the rows' drag handles. Before: both failed with the not-a-function page errors
-  (`gate-effect-checks-before-fix-*.log`). After: both passed (`gate-effect-checks-after-fix.log`).
+  (`gate-effect-checks-before-fix-*.log`). After: both passed (`gate-effect-checks-after-fix.log`). The tests also
+  collapse the first check before the move or insert and expect the collapsed state to stay with that check; with the
+  `postMoveCheck` and `postInsertCheck` forwarders emptied, the reorder test failed on "the collapsed check stays
+  collapsed" (`gate-effect-checks-expansion-before-fix.log`; the insert test then failed in the restarted worker, so the
+  insert assertion has no separate before-fix run). After: both passed (`gate-effect-checks-expansion-after-fix.log`).

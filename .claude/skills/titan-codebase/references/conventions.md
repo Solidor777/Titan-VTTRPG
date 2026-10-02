@@ -405,7 +405,8 @@ insertion line is kept; flip is dropped.
 `moveX(fromIdx, toIdx)` (uses `moveArrayEntry`, insertion-point semantics) and `insertX(element,
 atIdx)` (uses `cloneElementWithNewUuid` → fresh uuid, copy semantics). Locations:
 `moveRulesElement`/`insertRulesElement` on `RulesElementMixin`; `moveCheck`/`insertCheck` on
-`TitanItem` (the check array is `system.check` but its mutators live on the Item, like `addCheck`);
+`CheckListMixin` (the check array is `system.check`; its mutators live on the document, shared by `TitanItem` and
+`TitanActiveEffect`, like `addCheck`);
 `moveAttack`/`insertAttack` on `WeaponDataModel`; `moveCustomAspect`/`insertCustomAspect` on
 `SpellDataModel`.
 
@@ -977,9 +978,9 @@ duration type chosen in the sheet header), `addCheck` (the Checks tab add button
 when asked, its Resolve Cost input, Resistance Check select and Opposed Check box),
 `addRulesElement` (the Rules Elements tab add button, the operation select, and the `ccm-*` selects and value input
 of a conditional check modifier), `createWorldItem`, `addCustomTrait`, `addAttack`, `enableAspect` and
-`addCustomAspect` (the Add Custom Trait dialog with an optional description, the weapon Attacks tab add
-button, the spell Standard Aspects
-toggle with its option toggles and resistance select, the spell Custom Aspects tab add button), `pickPortrait` (the
+`addCustomAspect` (the Add Custom Trait dialog with an optional description, the weapon Attacks tab add button,
+the spell Standard Aspects toggle with its option toggles and resistance select, the spell Custom Aspects tab add
+button), `pickPortrait` (the
 sheet's portrait button opens Foundry's own file picker, the Core Data tab is chosen when it is not the open one (the
 picker of a player actor opened on the User Data tab: `.superpowers/sdd/test-suite-rewrite/phase-2/review-measure-1.log`, `actor picker tabs`),
 the directory is typed into the address bar and the file is clicked and confirmed; nothing is stubbed),
@@ -1000,8 +1001,7 @@ token and wait for `token.object.hover` before the double-click that opens the s
 which then waits for the reopened synthetic actor's sheet) or the click that takes control
 (`controlPlacedToken`)), `targetPlacedToken` / `releaseTargets` / `targetedTokenIds` (core's Target key T on
 the hovered token, Shift+T adds; `game.user.targets` then holds real Token objects, as
-`checks-opposed.spec.js` uses), `createCompendium` / `setCompendiumLocked` (Compendium tab Create dialog,
-entry
+`checks-opposed.spec.js` uses), `createCompendium` / `setCompendiumLocked` (Compendium tab Create dialog, entry
 context menu Lock/Unlock), `putInPack` (opens the pack's popout window and drags the world entry onto its
 `.directory-list`; the pack index is polled for the new id; the caller passes the world entry's locator, and the flow
 reopens that entry's sidebar tab before the drag). The creation dialogs are `DialogV2` forms whose content
@@ -1187,12 +1187,11 @@ from writing them; each says whether it was measured (with its saved log, under
   and, for an item with checks or attacks, also in its expanded content. Observed as Playwright strict-mode violations
   while writing the specs; no log of them was saved, so these are inferred from the locators that failed.
 - A refused delete (a `preDelete<Document>` listener that returns false, installed in the page and removed in a
-  `finally`) reaches the path where the delete is refused; a listener counts the refusals so the test waits for
-  the delete to have run. For an item, the code had marked the item before the refusal and had un-equipped an
-  armor and dropped the row's expanded state; effects are never marked (`TitanItem#safeDelete` is the only
-  writer of the mark, read). Measured: `gates-fix-before.log`, `gate119-predelete-before-fix.log` and, for the
-  dialog branch, `gate103-else-before-fix-item.log` (all under
-  `.superpowers/sdd/test-suite-rewrite/phase-3/`).
+  `finally`) leaves the document, its deletion mark, an equipped armor's slot and the row's expanded state as they
+  were; a listener counts the refusals so the test waits for the delete to have run. Effects are never marked
+  (`TitanItem#safeDelete` is the only writer of the mark, read). Gates: `gates-fix-after.log`,
+  `gate119-predelete-after-fix.log` and `gate103-else-before-fix-item.log` (it fails with the confirm branch's
+  `else` removed), under `.superpowers/sdd/test-suite-rewrite/phase-3/`.
 - When a test fails, Playwright restarts the worker and runs the file's `beforeAll` again, which then finds a second
   document of the same name and fails inside the flow; the first failure is the one to read. Measured: the second
   failure in `gates-fix-before.log` (two `E2E Rows Actor` directory entries).
