@@ -1,6 +1,7 @@
 import { expect, test } from '@playwright/test';
 import { chooseContextMenuEntry } from './contextMenu.js';
 import { login } from './fixtures.js';
+import { withClients } from './multiClient.js';
 import {
    attachPageErrors,
    clearChat,
@@ -1364,52 +1365,128 @@ test.describe('effect tray sidebar tab', () => {
    });
 });
 
-test('the tray follows a world compendium created and deleted in the Compendium directory', async () => {
-   /** @type {string} A pack label no earlier run used, so the tray state cannot have read the pack at load. */
-   const label = `E2E Tray Pack ${Date.now()}`;
-   /** @type {import('@playwright/test').Locator} The tray select's options. */
-   const options = page.locator('[data-testid="effect-tray-pack-select"] option');
-   /**
-    * Reads the label of the tray's selected pack.
-    * @returns {Promise<string>} The selected option's text.
-    */
-   const selectedLabel = () => page.locator('[data-testid="effect-tray-pack-select"]')
+/**
+ * Locates a client's tray pack-select options.
+ * @param {import('@playwright/test').Page} client - The client page.
+ * @returns {import('@playwright/test').Locator} The options of the tray's pack select.
+ */
+function trayPackOptions(client) {
+   return client.locator('[data-testid="effect-tray-pack-select"] option');
+}
+
+/**
+ * Reads the label of a client's selected tray pack.
+ * @param {import('@playwright/test').Page} client - The client page.
+ * @returns {Promise<string>} The selected option's text.
+ */
+function selectedTrayPackLabel(client) {
+   return client.locator('[data-testid="effect-tray-pack-select"]')
       .evaluate((select) => select.options[select.selectedIndex]?.textContent.trim());
+}
 
-   // The tray is built before the pack exists, and does not offer it.
-   await openTray(page);
-   await expect(options.filter({ hasText: label })).toHaveCount(0);
+/**
+ * Reads a pack's top-level folder names and root effect names as the tray lists them, sorted. TITAN system packs list
+ * only effect-subtype Active Effects (`EffectTrayState#refresh`); the pack used here holds no other subtype.
+ * @param {import('@playwright/test').Page} client - The client page.
+ * @param {string} packId - The pack's collection id.
+ * @returns {Promise<{folders: string[], effects: string[]}>} The names the tray should list.
+ */
+function packListing(client, packId) {
+   return client.evaluate(async (id) => {
+      /** @type {CompendiumCollection} The compendium the tray should list. */
+      const pack = game.packs.get(id);
+      /** @type {Collection<string, object>} The pack's index with each entry's folder. */
+      const index = await pack.getIndex({ fields: ['folder'] });
+      return {
+         folders: pack.folders.filter((folder) => !folder.folder).map((folder) => folder.name).sort(),
+         effects: index.filter((entry) => !entry.folder).map((entry) => entry.name).sort(),
+      };
+   }, packId);
+}
 
-   // Create the pack through the Compendium directory's Create Compendium dialog.
-   await page.locator('#sidebar nav.tabs [data-tab="compendium"]').click();
-   await page.locator('#compendium [data-action="createEntry"]').first().click();
-   /** @type {import('@playwright/test').Locator} The core Create Compendium dialog. */
-   const createDialog = page.locator('#create-compendium');
-   await createDialog.locator('input[name="label"]').fill(label);
-   await createDialog.locator('select[name="type"]').selectOption('ActiveEffect');
-   await createDialog.locator('button[data-action="ok"]').click();
-   await expect(createDialog).toHaveCount(0);
+/**
+ * Reads the top-level folder names and root effect names a client's tray lists, sorted.
+ * @param {import('@playwright/test').Page} client - The client page.
+ * @returns {Promise<{folders: string[], effects: string[]}>} The listed names.
+ */
+async function trayListing(client) {
+   /** @type {import('@playwright/test').Locator} The tray's list. */
+   const list = client.locator('[data-testid="effect-tray-list"]');
+   return {
+      folders: (await topLevelFolderNames(client)).sort(),
+      effects: (await list.locator(':scope > [data-testid="effect-tray-row"] .entry-name').allInnerTexts()).sort(),
+   };
+}
 
-   // The tray offers the new pack, and selecting it there selects it.
-   await page.locator('#sidebar nav.tabs [data-tab="titanEffects"]').click();
-   await expect(options.filter({ hasText: label })).toHaveCount(1);
-   await page.locator('[data-testid="effect-tray-pack-select"]').selectOption({ label });
-   await expect.poll(selectedLabel).toBe(label);
+test('the tray follows a world compendium created and deleted in the Compendium directory, on both GM clients',
+   async ({ browser }) => {
+      /** @type {string} A pack label no earlier run used, so neither tray state can have read the pack at load. */
+      const label = `E2E Tray Pack ${Date.now()}`;
 
-   // Delete the pack through the directory entry's context menu and its confirmation dialog.
-   /** @type {string} The created pack's collection id. */
-   const packId = await page.evaluate((packLabel) => game.packs.find((pack) => pack.metadata.label === packLabel)
-      ?.collection, label);
-   /** @type {string} The localized label of the directory's Delete Compendium entry. */
-   const deleteLabel = await page.evaluate(() => game.i18n.localize('COMPENDIUM.Delete.Option'));
-   await page.locator('#sidebar nav.tabs [data-tab="compendium"]').click();
-   await page.locator(`#compendium .directory-item[data-pack="${packId}"]`).click({ button: 'right' });
-   await chooseContextMenuEntry(page, page.locator('#context-menu .context-item', { hasText: deleteLabel }));
-   await page.locator('.application.dialog button[data-action="yes"]').click();
-   await expect.poll(() => page.evaluate((id) => !!game.packs.get(id), packId)).toBe(false);
+      // A second GM client sees the pack change only through the `manageCompendium` socket.
+      await withClients(browser, { second: 'E2E GM 2' }, async ({ second }) => {
+         /** @type {string[]} Uncaught page errors on the second client. */
+         const secondErrors = attachPageErrors(second);
+         /** @type {import('@playwright/test').Page[]} The deleting client and the socket-receiving client. */
+         const clients = [
+            page,
+            second,
+         ];
 
-   // The tray no longer offers the pack, and its selection falls back to the system effects pack.
-   await page.locator('#sidebar nav.tabs [data-tab="titanEffects"]').click();
-   await expect(options.filter({ hasText: label })).toHaveCount(0);
-   await expect.poll(selectedLabel).toBe('TITAN Effects');
-});
+         // Each tray is built before the pack exists, and does not offer it.
+         for (const client of clients) {
+            await openTray(client);
+            await expect(trayPackOptions(client).filter({ hasText: label })).toHaveCount(0);
+         }
+
+         // Create the pack through the first client's Create Compendium dialog.
+         await page.locator('#sidebar nav.tabs [data-tab="compendium"]').click();
+         await page.locator('#compendium [data-action="createEntry"]').first().click();
+         /** @type {import('@playwright/test').Locator} The core Create Compendium dialog. */
+         const createDialog = page.locator('#create-compendium');
+         await createDialog.locator('input[name="label"]').fill(label);
+         await createDialog.locator('select[name="type"]').selectOption('ActiveEffect');
+         await createDialog.locator('button[data-action="ok"]').click();
+         await expect(createDialog).toHaveCount(0);
+         await page.locator('#sidebar nav.tabs [data-tab="titanEffects"]').click();
+
+         // Both trays offer the new pack. Selecting it lists it, and the new pack is empty.
+         for (const client of clients) {
+            await expect(trayPackOptions(client).filter({ hasText: label })).toHaveCount(1);
+            await client.locator('[data-testid="effect-tray-pack-select"]').selectOption({ label });
+            await expect.poll(() => selectedTrayPackLabel(client)).toBe(label);
+            await expect(client.locator('[data-testid="effect-tray-empty"]')).toBeVisible();
+         }
+
+         // Delete the pack through the first client's directory context menu and its confirmation dialog.
+         /** @type {string} The created pack's collection id. */
+         const packId = await page.evaluate((packLabel) => game.packs.find((pack) => pack.metadata.label === packLabel)
+            ?.collection, label);
+         /** @type {string} The localized label of the directory's Delete Compendium entry. */
+         const deleteLabel = await page.evaluate(() => game.i18n.localize('COMPENDIUM.Delete.Option'));
+         await page.locator('#sidebar nav.tabs [data-tab="compendium"]').click();
+         await page.locator(`#compendium .directory-item[data-pack="${packId}"]`).click({ button: 'right' });
+         await chooseContextMenuEntry(page, page.locator('#context-menu .context-item', { hasText: deleteLabel }));
+         await page.locator('.application.dialog button[data-action="yes"]').click();
+         await page.locator('#sidebar nav.tabs [data-tab="titanEffects"]').click();
+
+         // Neither tray offers the pack. Each selection falls back to the system effects pack, and each list reloads
+         // with that pack's contents.
+         for (const client of clients) {
+            await expect.poll(() => client.evaluate((id) => !!game.packs.get(id), packId)).toBe(false);
+            await expect(trayPackOptions(client).filter({ hasText: label })).toHaveCount(0);
+            await expect.poll(() => selectedTrayPackLabel(client)).toBe('TITAN Effects');
+
+            /** @type {{folders: string[], effects: string[]}} What the system effects pack holds. */
+            const expected = await packListing(client, 'titan.effects');
+            expect(expected.folders.length + expected.effects.length, 'the system effects pack is not empty')
+               .toBeGreaterThan(0);
+            await expect(client.locator('[data-testid="effect-tray-empty"]')).toHaveCount(0);
+            await expect.poll(() => trayListing(client)).toEqual(expected);
+         }
+
+         // The deletion raised no page error on either client.
+         expect(errors, `uncaught errors on the deleting client:\n${errors.join('\n')}`).toEqual([]);
+         expect(secondErrors, `uncaught errors on the second client:\n${secondErrors.join('\n')}`).toEqual([]);
+      });
+   });
