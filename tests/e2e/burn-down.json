@@ -921,21 +921,6 @@
    },
    {
       "file": "e2e/converted-effect-identity.spec.js",
-      "match": "keepId",
-      "source": "test('an effect created with keepId keeps its id beside an Item with the same id on the same actor', async () => {"
-   },
-   {
-      "file": "e2e/converted-effect-identity.spec.js",
-      "match": "keepId",
-      "source": "test('an effect created with keepId on a packed actor keeps its id beside its Item, as the pack stores it',"
-   },
-   {
-      "file": "e2e/converted-effect-identity.spec.js",
-      "match": "keepId",
-      "source": "test('an effect created with keepId on a packed scene\\'s unlinked token keeps its id, as the pack stores its delta',"
-   },
-   {
-      "file": "e2e/converted-effect-identity.spec.js",
       "match": "Scene.create(",
       "source": "const packedScene = await Scene.create(packedSceneData, { pack: `world.${pack.name}` });"
    },

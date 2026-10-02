@@ -1,6 +1,6 @@
-// Source masking shared by the static guard tests that scan test sources (E2eContextMenuClicks, E2eRealDocuments,
-// UnitFakeDocuments). Masking keeps every index and line break, so a match in the masked text maps back to the same
-// position and line in the source.
+// Source masking for the static guard test that scans test sources as text (E2eContextMenuClicks; the guards that read
+// sources as syntax use `parseSource.js`). Masking keeps every index and line break, so a match in the masked text maps
+// back to the same position and line in the source.
 //
 // Known limits: template-literal `${…}` expressions are treated as string content, and a regular-expression literal is
 // not recognized, so one containing a quote character reads as the start of a string (hiding the text up to the next

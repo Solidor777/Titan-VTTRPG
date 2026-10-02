@@ -2,26 +2,30 @@ import { describe, expect, it } from 'vitest';
 import { existsSync, readdirSync, readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import path from 'node:path';
-import maskSource from './helpers/maskSource.js';
+import { parseNodes, staticKeyName, TREE_SCAN_TIMEOUT } from './helpers/parseSource.js';
 
 // Every e2e test of a document runs on documents made through real Foundry user flows, and a mid-test change goes
 // through the control a user would use (`.claude/claude.md`, "Tests use genuine live documents"). This guard scans the
 // e2e sources for the calls that make or change a document through the API instead, or fake a user gesture.
 //
-// Scan 1 covers `tests/e2e/**` and `tests/shared/**`: document creation, embedded writes, imports, synthetic drops,
-// source-string evaluation and sort writes. Scan 2 covers `tests/e2e/**` only: `.update(` and the `CharacterDataModel`
-// action methods (`.system.request…(`, `.system.roll…(`, …), each permitted only where it matches an entry of
-// `tests/e2e/direct-updates.allowlist.json` (a field that no sheet, HUD, tracker or tray control edits). In
-// `global-teardown.js` and `registry.js`, the suite's own cleanup, a match whose text contains `delete` is exempt; of
-// the patterns here only `.system.delete…(` can produce one, since no other pattern names a deletion (`.delete(`,
-// `deleteEmbeddedDocuments(` and `deleteCompendium(` are not banned anywhere).
+// The guard reads each source's syntax tree (`helpers/parseSource.js`), with the code held in its strings, and matches
+// call and `new` expressions by the callee's name: an identifier, or a member's property, dotted, optional (`?.`) or a
+// computed string. Scan 1 covers `tests/e2e/**` and `tests/shared/**`: document creation, embedded writes, imports,
+// synthetic drops, source-string evaluation and sort writes, and any `keepId` name. Scan 2 covers `tests/e2e/**` only:
+// `.update(` and the `CharacterDataModel` action methods (`.system.request…(`, `.system.roll…(`, …), each permitted
+// only where it matches an entry of `tests/e2e/direct-updates.allowlist.json` (a field that no sheet, HUD, tracker or
+// tray control edits). In `global-teardown.js` and `registry.js`, the suite's own cleanup, a match whose text contains
+// `delete` is exempt; of the matches here only `.system.delete…(` can be one, since no other names a deletion
+// (`.delete(`, `deleteEmbeddedDocuments(` and `deleteCompendium(` are not banned anywhere).
 //
-// Until the rewrite's Phase 6 the offender set must equal `tests/e2e/burn-down.json` exactly (one entry per offending
-// call, keyed by file, matched text and source line, so an unrelated edit that shifts line numbers changes nothing).
-// Each phase removes the entries of the files it rewrites; Phase 6 deletes the list, after which the set must be empty.
+// Each match is written as its canonical text (`Actor.create(`, `.update(`, `.system.rollAttackCheck(`,
+// `new DragEvent('drop'`), on the line where that text starts. Until the rewrite's Phase 6 the offender set must equal
+// `tests/e2e/burn-down.json` exactly (one entry per offending call, keyed by file, matched text and source line, so an
+// unrelated edit that shifts line numbers changes nothing). Each phase removes the entries of the files it rewrites;
+// Phase 6 deletes the list, after which the set must be empty.
 //
-// Known limits of the scan: comments are skipped, string contents are not (a banned call quoted in a string is
-// flagged), and the masking limits of `helpers/maskSource.js` apply (a regular-expression literal is not recognized).
+// Known limit of the scan: a callee reached through a computed name held in a variable (`actor[method](`) is not
+// matched, and code held in a string is found only when the string's text alone parses.
 
 /** @type {string} The repository's `tests` directory. */
 const TESTS_DIRECTORY = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
@@ -50,85 +54,84 @@ const DELETION_SOURCES = [
    'e2e/registry.js',
 ];
 
-/**
- * Builds the regular expression for a literal call pattern, allowing whitespace before an opening parenthesis.
- * @param {string} literal - The literal text, such as `Actor.create(`.
- * @returns {RegExp} A global regular expression matching the literal.
- */
-function literalPattern(literal) {
-   return new RegExp(literal.replace(/[.*+?^${}()|[\]\\]/g, '\\$&').replace(/\\\($/, '\\s*\\('), 'g');
-}
-
-/** @type {RegExp[]} Scan 1: calls that make a document, write embedded data, or fake a user gesture. */
-const CREATION_PATTERNS = [
-   'Actor.create(',
-   'Item.create(',
-   'Scene.create(',
-   'Combat.create(',
-   'ChatMessage.create(',
-   'ActiveEffect.create(',
-   'Folder.create(',
-   'Adventure.create(',
-   'Macro.create(',
-   '.createDocuments(',
-   'createEmbeddedDocuments(',
-   'updateEmbeddedDocuments(',
-   'getTokenDocument(',
-   'toggleStatusEffect(',
-   '.import(',
-   'importFromJSON(',
-   'new DataTransfer(',
-   'keepId',
-   'new Function(',
-   'performIntegerSort(',
-].map(literalPattern).concat([
-   // The leading dot names the API (`CompendiumCollection.createCompendium(`), so the flow helper of the same name
-   // (`createCompendium(page, …)`, which drives the Compendium tab's create dialog) is not flagged.
-   /\.\s*createCompendium\s*\(/g,
-   // `new DragEvent('drop'`, in any quote style.
-   /new\s+DragEvent\s*\(\s*(['"`])drop\1/g,
-   // A document class reached through an alias (`cls.create(`, `getDocumentClass('Actor').create(`). The named classes
-   // above already cover their own receivers, and `Object.create(` makes no document.
-   new RegExp(`(?<!(?:${[
-      'Actor',
-      'Item',
-      'Scene',
-      'Combat',
-      'ChatMessage',
-      'ActiveEffect',
-      'Folder',
-      'Adventure',
-      'Macro',
-      'Object',
-   ].join('|')}))\\.\\s*create\\s*\\(`, 'g'),
+/** @type {Set<string>} The document classes whose `create(` is matched under the class's own name. */
+const DOCUMENT_CLASSES = new Set([
+   'Actor',
+   'Item',
+   'Scene',
+   'Combat',
+   'ChatMessage',
+   'ActiveEffect',
+   'Folder',
+   'Adventure',
+   'Macro',
 ]);
 
-/** @type {RegExp[]} Scan 2 (e2e only): document updates and `CharacterDataModel` actions called directly. */
-const EDIT_PATTERNS = [
-   /\.\s*update\s*\(/g,
-   new RegExp(`\\.system\\??\\.(?:${[
-      'request',
-      'roll',
-      'apply',
-      'spend',
-      'equip',
-      'unEquip',
-      'onTurn',
-      'shortRest',
-      'longRest',
-      'removeCombatEffects',
-      'toggleInspiration',
-      'add',
-      'move',
-      'delete',
-   ].join('|')})\\w*\\s*\\(`, 'g'),
-];
+/**
+ * @type {Set<string>} Scan 1 calls matched by name, whether the callee is a bare identifier or a member, written
+ * `<name>(`.
+ */
+const NAMED_CALLS = new Set([
+   'createEmbeddedDocuments',
+   'updateEmbeddedDocuments',
+   'getTokenDocument',
+   'toggleStatusEffect',
+   'importFromJSON',
+   'performIntegerSort',
+]);
+
+/**
+ * @type {Set<string>} Scan 1 calls matched only as a member, written `.<name>(`. The member form of `createCompendium`
+ * names the API (`CompendiumCollection.createCompendium(`), so the flow helper of the same name
+ * (`createCompendium(page, …)`, which drives the Compendium tab's create dialog) is not matched.
+ */
+const MEMBER_CALLS = new Set([
+   'createDocuments',
+   'import',
+   'createCompendium',
+]);
+
+/** @type {Set<string>} Scan 1 constructors, written `new <name>(`. `new DragEvent(` is matched only for a drop. */
+const CONSTRUCTORS = new Set([
+   'DataTransfer',
+   'Function',
+]);
+
+/** @type {string} The option that keeps a document's id on import or creation, matched as any name. */
+const KEEP_ID = 'keepId';
+
+/** @type {RegExp} Scan 2: a `CharacterDataModel` action method, called on a `system` member. */
+const SYSTEM_ACTION = new RegExp(`^(?:${[
+   'request',
+   'roll',
+   'apply',
+   'spend',
+   'equip',
+   'unEquip',
+   'onTurn',
+   'shortRest',
+   'longRest',
+   'removeCombatEffects',
+   'toggleInspiration',
+   'add',
+   'move',
+   'delete',
+].join('|')})\\w*$`);
 
 /**
  * @typedef {object} Offender
  * @property {string} file - The source path relative to `tests`, with forward slashes.
- * @property {string} match - The matched text, whitespace collapsed.
+ * @property {string} match - The matched text.
  * @property {string} source - The trimmed source line the match starts on.
+ */
+
+/**
+ * @typedef {object} FoundOffender
+ * @property {string} file - The source path relative to `tests`, with forward slashes.
+ * @property {string} match - The matched text.
+ * @property {string} source - The trimmed source line the match starts on.
+ * @property {number} line - The 1-based line the match starts on.
+ * @property {boolean} edit - Whether the match is a scan-2 edit, which a direct-update entry may permit.
  */
 
 /**
@@ -140,43 +143,206 @@ const EDIT_PATTERNS = [
  */
 
 /**
+ * @typedef {object} NodeMatch
+ * @property {string} text - The matched text.
+ * @property {object} at - The node whose first line is the line the text starts on.
+ * @property {boolean} edit - Whether the match is a scan-2 edit.
+ */
+
+/**
+ * Reads the last name of a call's receiver: an identifier, or a member's static property name.
+ * @param {object} node - The receiver expression.
+ * @returns {{name: string, at: object} | null} The name and its node, or `null` when the receiver has no static name.
+ */
+function receiverName(node) {
+   if (node.type === 'Identifier') {
+      return {
+         name: node.name,
+         at: node,
+      };
+   }
+   if (node.type === 'MemberExpression') {
+      /** @type {string | null} The member's property name. */
+      const name = staticKeyName(node.property, node.computed);
+      return name === null
+         ? null
+         : {
+            name,
+            at: node.property,
+         };
+   }
+   return null;
+}
+
+/**
+ * Matches a call expression against both scans.
+ * @param {object} node - A `CallExpression`.
+ * @param {boolean} withEdits - Whether scan 2 applies.
+ * @returns {NodeMatch | null} The match, or `null` when the call is not banned.
+ */
+function matchCall(node, withEdits) {
+   /** @type {object} The callee. */
+   const { callee } = node;
+   if (callee.type === 'Identifier') {
+      return NAMED_CALLS.has(callee.name)
+         ? {
+            text: `${callee.name}(`,
+            at: callee,
+            edit: false,
+         }
+         : null;
+   }
+   if (callee.type !== 'MemberExpression') {
+      return null;
+   }
+
+   /** @type {string | null} The called method's name. */
+   const name = staticKeyName(callee.property, callee.computed);
+   /** @type {{name: string, at: object} | null} The receiver's last name. */
+   const receiver = receiverName(callee.object);
+   /** @type {object} The called method's node. */
+   const at = callee.property;
+   if (NAMED_CALLS.has(name)) {
+      return {
+         text: `${name}(`,
+         at,
+         edit: false,
+      };
+   }
+   if (MEMBER_CALLS.has(name)) {
+      return {
+         text: `.${name}(`,
+         at,
+         edit: false,
+      };
+   }
+   if (name === 'create') {
+      // A document class reached through an alias (`cls.create(`, `getDocumentClass('Actor').create(`) is matched as
+      // `.create(`; `Object.create(` makes no document.
+      if (receiver?.name === 'Object') {
+         return null;
+      }
+      return DOCUMENT_CLASSES.has(receiver?.name)
+         ? {
+            text: `${receiver.name}.create(`,
+            at: receiver.at,
+            edit: false,
+         }
+         : {
+            text: '.create(',
+            at,
+            edit: false,
+         };
+   }
+   if (!withEdits) {
+      return null;
+   }
+   if (name === 'update') {
+      return {
+         text: '.update(',
+         at,
+         edit: true,
+      };
+   }
+   if (SYSTEM_ACTION.test(name ?? '') && receiver?.name === 'system') {
+      return {
+         text: `.system${callee.optional ? '?' : ''}.${name}(`,
+         at: receiver.at,
+         edit: true,
+      };
+   }
+   return null;
+}
+
+/**
+ * Matches a `new` expression against scan 1.
+ * @param {object} node - A `NewExpression`.
+ * @returns {NodeMatch | null} The match, or `null` when the construction is not banned.
+ */
+function matchNew(node) {
+   if (node.callee.type !== 'Identifier') {
+      return null;
+   }
+   if (CONSTRUCTORS.has(node.callee.name)) {
+      return {
+         text: `new ${node.callee.name}(`,
+         at: node,
+         edit: false,
+      };
+   }
+   /** @type {object | undefined} The event type argument. */
+   const [type] = node.arguments;
+   if (node.callee.name === 'DragEvent' && type && staticKeyName(type, true) === 'drop') {
+      return {
+         text: `new DragEvent(${type.type === 'Literal' ? type.raw : `\`${type.quasis[0].value.raw}\``}`,
+         at: node,
+         edit: false,
+      };
+   }
+   return null;
+}
+
+/**
+ * Decides whether a node names `keepId`: an identifier (a variable, a key or a member), or a string written as a key
+ * (`{ 'keepId': true }`, `options['keepId']`). Any other string naming it is read as code and yields the identifier.
+ * @param {object} node - A syntax-tree node.
+ * @returns {boolean} Whether the node names `keepId`.
+ */
+function isKeepId(node) {
+   /** @type {object | undefined} The node's parent. */
+   const { parent } = node;
+   if (node.type === 'Identifier') {
+      // A shorthand `{ keepId }` holds two identifier nodes; its key alone is matched.
+      return node.name === KEEP_ID && !(parent?.type === 'Property' && parent.shorthand && parent.value === node);
+   }
+   return (node.type === 'Literal' || node.type === 'TemplateLiteral') && staticKeyName(node, true) === KEEP_ID
+      && ((parent?.type === 'Property' && parent.key === node)
+         || (parent?.type === 'MemberExpression' && parent.property === node));
+}
+
+/**
  * Finds the banned calls in one source.
  * @param {string} file - The source path relative to `tests`, with forward slashes.
  * @param {string} source - The source text.
- * @returns {(Offender & {line: number})[]} One entry per banned call, with the 1-based line it starts on.
+ * @returns {FoundOffender[]} One entry per banned call, with the 1-based line it starts on.
  */
 function findOffenders(file, source) {
-   /** @type {string} The source with its comments masked (strings kept, so a call built in a string is found). */
-   const masked = maskSource(source);
    /** @type {string[]} The source lines. */
    const lines = source.split('\n');
-   /** @type {RegExp[]} The patterns that apply to this source. */
-   const patterns = file.startsWith('e2e/')
-      ? [
-         ...CREATION_PATTERNS,
-         ...EDIT_PATTERNS,
-      ]
-      : CREATION_PATTERNS;
+   /** @type {boolean} Whether scan 2 applies to this source. */
+   const withEdits = file.startsWith('e2e/');
 
-   /** @type {(Offender & {line: number})[]} The banned calls found. */
+   /** @type {FoundOffender[]} The banned calls found. */
    const found = [];
-   for (const regex of patterns) {
-      for (const match of masked.matchAll(regex)) {
-         /** @type {string} The matched text, whitespace collapsed. */
-         const text = match[0].replace(/\s+/g, ' ');
-         if (DELETION_SOURCES.includes(file) && /delete/i.test(text)) {
-            continue;
-         }
-
-         /** @type {number} The 1-based line the match starts on. */
-         const line = source.slice(0, match.index).split('\n').length;
-         found.push({
-            file,
-            match: text,
-            source: lines[line - 1].trim(),
-            line,
-         });
+   for (const node of parseNodes(source, file)) {
+      /** @type {NodeMatch | null} The node's match. */
+      let match = null;
+      if (node.type === 'CallExpression') {
+         match = matchCall(node, withEdits);
       }
+      else if (node.type === 'NewExpression') {
+         match = matchNew(node);
+      }
+      else if (isKeepId(node)) {
+         match = {
+            text: KEEP_ID,
+            at: node,
+            edit: false,
+         };
+      }
+      if (match === null || (DELETION_SOURCES.includes(file) && /delete/i.test(match.text))) {
+         continue;
+      }
+
+      /** @type {number} The 1-based line the match starts on. */
+      const line = match.at.loc.start.line;
+      found.push({
+         file,
+         match: match.text,
+         source: lines[line - 1].trim(),
+         line,
+         edit: match.edit,
+      });
    }
    return found;
 }
@@ -184,20 +350,18 @@ function findOffenders(file, source) {
 /**
  * Removes the offenders a direct-update allowlist entry permits: scan-2 matches in the entry's file whose source line
  * matches the entry's pattern.
- * @param {(Offender & {line: number})[]} offenders - The offenders found.
+ * @param {FoundOffender[]} offenders - The offenders found.
  * @param {DirectUpdate[]} allowlist - The permitted direct updates.
- * @returns {{offenders: (Offender & {line: number})[], unused: DirectUpdate[]}} The offenders left and the allowlist
- * entries that permitted nothing.
+ * @returns {{offenders: FoundOffender[], unused: DirectUpdate[]}} The offenders left and the allowlist entries that
+ * permitted nothing.
  */
 function applyDirectUpdates(offenders, allowlist) {
    /** @type {Set<DirectUpdate>} The allowlist entries that permitted at least one site. */
    const used = new Set();
-   /** @type {(Offender & {line: number})[]} The offenders no entry permits. */
+   /** @type {FoundOffender[]} The offenders no entry permits. */
    const remaining = offenders.filter((offender) => {
-      /** @type {boolean} Whether the offender is a scan-2 match. */
-      const isEdit = EDIT_PATTERNS.some((regex) => new RegExp(`^${regex.source}$`).test(offender.match));
       /** @type {DirectUpdate | undefined} The entry permitting the offender. */
-      const entry = isEdit
+      const entry = offender.edit
          ? allowlist.find(({ file, pattern }) => file === offender.file && new RegExp(pattern).test(offender.source))
          : undefined;
       if (entry) {
@@ -268,39 +432,122 @@ function listSources(directory) {
 }
 
 describe('e2e real documents', () => {
-   it('flags each banned call once, and skips comments and other calls', () => {
+   it('flags each banned call once, in every callee form', () => {
       /** @type {[string, string][]} Each source with the one match it must yield. */
       const flagged = [
+         // Named document classes, directly, through a namespace, optionally, or with a computed name.
          [
             'await Actor.create({ name: \'X\', type: \'player\' });',
             'Actor.create(',
          ],
          [
+            'await foundry.documents.Scene.create({ name: \'S\' });',
+            'Scene.create(',
+         ],
+         [
+            'await Item?.create(data);',
+            'Item.create(',
+         ],
+         [
+            'await Macro[\'create\'](data);',
+            'Macro.create(',
+         ],
+         // An alias of a document class.
+         [
             'const cls = Item; await cls.create(data);',
             '.create(',
          ],
+         [
+            'await getDocumentClass(\'Actor\').create(data);',
+            '.create(',
+         ],
+         // Member-only calls.
          [
             'await foundry.documents.collections.CompendiumCollection.createCompendium({ label });',
             '.createCompendium(',
          ],
          [
-            'tray.dispatchEvent(new DragEvent("drop", { dataTransfer }));',
-            'new DragEvent("drop"',
-         ],
-         [
-            'await actor.createEmbeddedDocuments(\'Item\', [data]);',
-            'createEmbeddedDocuments(',
+            'await Actor.createDocuments([data]);',
+            '.createDocuments(',
          ],
          [
             'await adventure.import({ dialog: false });',
             '.import(',
          ],
+         // Calls matched by name, as a member or a bare identifier.
+         [
+            'await actor.createEmbeddedDocuments(\'Item\', [data]);',
+            'createEmbeddedDocuments(',
+         ],
+         [
+            'await actor?.[\'updateEmbeddedDocuments\'](\'Item\', []);',
+            'updateEmbeddedDocuments(',
+         ],
+         [
+            'await toggleStatusEffect(\'prone\');',
+            'toggleStatusEffect(',
+         ],
+         [
+            'await actor.toggleStatusEffect(\'prone\');',
+            'toggleStatusEffect(',
+         ],
+         [
+            'const token = await actor.getTokenDocument();',
+            'getTokenDocument(',
+         ],
+         [
+            'await item.importFromJSON(json);',
+            'importFromJSON(',
+         ],
+         [
+            'const updates = SortingHelpers.performIntegerSort(source, options);',
+            'performIntegerSort(',
+         ],
+         // Constructors.
+         [
+            'tray.dispatchEvent(new DragEvent("drop", { dataTransfer }));',
+            'new DragEvent("drop"',
+         ],
+         [
+            'tray.dispatchEvent(new DragEvent(`drop`));',
+            'new DragEvent(`drop`',
+         ],
+         [
+            'const transfer = new DataTransfer();',
+            'new DataTransfer(',
+         ],
+         [
+            'const doc = new Function(`return (${src})()`)();',
+            'new Function(',
+         ],
+         // `keepId` as a key, a quoted key, shorthand, or a member.
          [
             'await pack.importDocument(item, { keepId: true });',
             'keepId',
          ],
          [
+            'await pack.importDocument(item, { \'keepId\': true });',
+            'keepId',
+         ],
+         [
+            'await pack.importDocument(item, { keepId });',
+            'keepId',
+         ],
+         [
+            'const keep = options.keepId;',
+            'keepId',
+         ],
+         // Scan 2: updates and action methods, dotted, optional or computed.
+         [
             'await actor?.update({ name: \'Y\' });',
+            '.update(',
+         ],
+         [
+            'await actor[\'update\']({ name: \'Y\' });',
+            '.update(',
+         ],
+         [
+            'await game.actors.getName(\'X\')\n   .update({ name: \'Y\' });',
             '.update(',
          ],
          [
@@ -311,26 +558,75 @@ describe('e2e real documents', () => {
             'await actor.system?.rollAttributeCheck({});',
             '.system?.rollAttributeCheck(',
          ],
+         [
+            'await actor?.system.applyDamage(1);',
+            '.system.applyDamage(',
+         ],
+         // Code passed to the browser as a string: a literal, a concatenation, a template with an expression.
+         [
+            'await page.evaluate(\'actor.system.rollAttackCheck({})\');',
+            '.system.rollAttackCheck(',
+         ],
+         [
+            'const src = \'actor.system.requestItemCheck({ itemId: id, \' +\n   \'checkIdx: 0 })\';',
+            '.system.requestItemCheck(',
+         ],
+         [
+            'await triggerInWorld(page, `\n   const actor = game.actors.getName(\'${name}\');\n'
+               + '   await Item.create({}, { parent: actor });\n`);',
+            'Item.create(',
+         ],
+         [
+            'await page.evaluate(\'game.packs.get(id).importDocument(item, { keepId: true })\');',
+            'keepId',
+         ],
       ];
       for (const [source, match] of flagged) {
          expect.soft(findOffenders('e2e/x.spec.js', source).map((offender) => offender.match), source)
             .toEqual([match]);
       }
+   });
 
+   it('reads a code string as code: a function body, and the source line of each match', () => {
+      expect(findOffenders('e2e/x.spec.js', 'const run = new Function(\'actor\', \'return actor.update({})\');')
+         .map((offender) => offender.match)).toEqual([
+         'new Function(',
+         '.update(',
+      ]);
+      expect(findOffenders('e2e/x.spec.js', 'await run(`\n   const a = 1;\n   await Actor.create({});\n`);')
+         .map((offender) => offender.line)).toEqual([3]);
+      expect(findOffenders('e2e/x.spec.js', 'const src = \'const a = 1; \' +\n   \'Actor.create({})\';')
+         .map((offender) => offender.line)).toEqual([2]);
+   });
+
+   it('passes comments, prose strings, other calls and the flow helpers', () => {
       /** @type {string[]} Sources with no banned call. */
       const clean = [
          '// await Actor.create({ name: \'X\' });',
          '/* actor.update({}) */',
+         'const text = \'Actor.create({}) and actor.update({})\';',
+         'test(\'an effect created with keepId keeps its id\', async () => {});',
+         'const selector = \'[data-action="update"]\';',
          'await createCompendium(page, { label: \'E2E Pack\', type: \'Item\' });',
          'const proto = Object.create(null);',
          'window.dispatchEvent(new DragEvent(\'dragend\'));',
          'await actor.delete();',
          'await game.settings.set(\'titan\', \'key\', 1);',
          'const url = \'http://localhost:30000\'; await actor.sheet.render(true);',
+         'const { create, update } = handlers;',
+         'const options = { keepIds: true };',
+         'await actor.system.isOwner();',
+         'const fn = Function.prototype;',
+         'await page.evaluate(() => actor.updateSource({}));',
       ];
       for (const source of clean) {
          expect.soft(findOffenders('e2e/x.spec.js', source), source).toEqual([]);
       }
+   });
+
+   it('fails on a source that does not parse, naming it', () => {
+      expect(() => findOffenders('e2e/broken.spec.js', 'await Actor.create({'))
+         .toThrow(/e2e\/broken\.spec\.js:1:\d+ does not parse/);
    });
 
    it('applies the edit scan to tests/e2e only, and spares deletions in the cleanup sources', () => {
@@ -341,7 +637,7 @@ describe('e2e real documents', () => {
    });
 
    it('permits a scan-2 site that matches a direct-update allowlist entry, and reports an unused entry', () => {
-      /** @type {(Offender & {line: number})[]} A direct update and a creation on the same source line. */
+      /** @type {FoundOffender[]} A direct update and a creation on the same source line. */
       const offenders = findOffenders('e2e/x.spec.js', 'await Actor.create({}); await token.update({ x: 1 });');
       /** @type {DirectUpdate[]} One entry permitting the update, one permitting nothing. */
       const allowlist = [
@@ -358,7 +654,7 @@ describe('e2e real documents', () => {
             reason: 'synthetic',
          },
       ];
-      /** @type {{offenders: (Offender & {line: number})[], unused: DirectUpdate[]}} What is left. */
+      /** @type {{offenders: FoundOffender[], unused: DirectUpdate[]}} What is left. */
       const result = applyDirectUpdates(offenders, allowlist);
       expect(result.offenders.map((offender) => offender.match)).toEqual(['Actor.create(']);
       expect(result.unused).toEqual([allowlist[1]]);
@@ -368,7 +664,7 @@ describe('e2e real documents', () => {
       expect(findOffenders('e2e/x.spec.js', 'a;\nb;\nawait Actor.create({});')[0].line).toBe(3);
    });
 
-   it('finds exactly the burn-down offenders under tests/e2e and tests/shared', () => {
+   it('finds exactly the burn-down offenders under tests/e2e and tests/shared', { timeout: TREE_SCAN_TIMEOUT }, () => {
       /** @type {string[]} The scanned sources, relative to `tests`. */
       const sources = [
          ...listSources(E2E_DIRECTORY),
@@ -391,7 +687,7 @@ describe('e2e real documents', () => {
          ).toBe(true);
       }
 
-      /** @type {{offenders: (Offender & {line: number})[], unused: DirectUpdate[]}} The offenders left. */
+      /** @type {{offenders: FoundOffender[], unused: DirectUpdate[]}} The offenders left. */
       const { offenders, unused } = applyDirectUpdates(sources.flatMap((file) => findOffenders(
          file,
          readFileSync(path.join(TESTS_DIRECTORY, file), 'utf8'),
@@ -407,16 +703,10 @@ describe('e2e real documents', () => {
          `tests/e2e/burn-down.json must be deleted by the end of phase ${BURN_DOWN_LAST_PHASE}`,
       ).toBe(false);
 
-      /** @type {Offender[]} The offenders found, without line numbers. */
-      const found = offenders.map(({ file, match, source }) => ({
-         file,
-         match,
-         source,
-      }));
-      /** @type {(Offender & {line: number})[]} Offenders the burn-down list does not hold. */
+      /** @type {FoundOffender[]} Offenders the burn-down list does not hold. */
       const unexpected = subtractOffenders(offenders, burnDown);
       /** @type {Offender[]} Burn-down entries no longer found. */
-      const resolved = subtractOffenders(burnDown, found);
+      const resolved = subtractOffenders(burnDown, offenders);
       expect.soft(
          unexpected.map(({ file, line, source }) => `${file}:${line} — ${source}`),
          'banned calls not in tests/e2e/burn-down.json (make the document or the change through the real flow):\n'
