@@ -1,13 +1,14 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { SHARED_FIXTURES } from './flows.js';
 
 // The running list of everything the e2e suite makes in the `test-titan` world: documents, hotbar assignments and
 // prior setting values. Flows append to it as they create; `global-teardown.js` deletes everything on it when the run
 // ends, and `global-setup.js` does the same over a list a crashed run left behind. The list is a file, not module
 // state, because it must outlive a spec file, a mid-file reload and the worker process, and be read by the runner.
-// Shared fixtures are created lazily by the first spec that asks for them and then reused by every later one.
+// A leaf module: it imports no flow and no test runner code, so the setup and the teardown load it freely. The shared
+// fixtures that read it (`flows.js` `shared`) are created lazily by the first spec that asks and reused by every
+// later one.
 
 /** @type {string} The directory of this module, used to resolve the repo root. */
 const dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -38,7 +39,7 @@ export const REGISTRY_PATH = path.join(STATE_DIR, 'registry.json');
 
 /**
  * @typedef {object} RegistrySetting
- * @property {string} scope - The setting scope (`world`, `client` or `user`).
+ * @property {'world'} scope - The setting scope; only world settings are recorded.
  * @property {string} namespace - The setting namespace.
  * @property {string} key - The setting key.
  * @property {*} prior - The value the setting held before the suite first set it.
@@ -168,64 +169,4 @@ export function recordSetting(entry) {
    }
    registry.settings.push(entry);
    writeRegistry(registry);
-}
-
-/**
- * Whether a recorded document still resolves in the world.
- * @param {import('@playwright/test').Page} page - A logged-in page.
- * @param {RegistryDocument} entry - The recorded document.
- * @returns {Promise<boolean>} True when the document exists.
- */
-export async function resolves(page, entry) {
-   return page.evaluate(async ({ documentName, id, parent, packId }) => {
-      if (documentName === 'Compendium') {
-         return game.packs.has(id);
-      }
-      if (packId) {
-         return game.packs.get(packId)?.index.has(id) ?? false;
-      }
-      if (parent) {
-         /** @type {foundry.abstract.Document|null} The embedding document. */
-         const embedder = await fromUuid(parent);
-         return embedder?.getEmbeddedCollection(documentName).has(id) ?? false;
-      }
-      return game.collections.get(documentName)?.has(id) ?? false;
-   }, entry);
-}
-
-/**
- * Returns the id of a shared fixture: the one on the list when it still resolves, otherwise a new one made by the
- * fixture's flow and recorded under the key. Shared fixtures are never deleted mid-run, so a spec may rely on one
- * existing but not on what an earlier spec left in it.
- * @param {import('@playwright/test').Page} page - A logged-in GM page.
- * @param {string} key - The fixture name, a key of `SHARED_FIXTURES`.
- * @returns {Promise<string>} The fixture's document id.
- */
-export async function shared(page, key) {
-   /** @type {(page: import('@playwright/test').Page) => Promise<string>|undefined} The fixture's flow. */
-   const create = SHARED_FIXTURES[key];
-   if (!create) {
-      throw new Error(`There is no shared fixture "${key}"; the keys are ${Object.keys(SHARED_FIXTURES).join(', ')}.`);
-   }
-
-   /** @type {RegistryDocument|undefined} The fixture's entry, when one is on the list. */
-   const existing = readRegistry().documents.find((entry) => entry.key === key);
-   if (existing && await resolves(page, existing)) {
-      return existing.id;
-   }
-
-   /** @type {string} The id of the document the flow made, which the flow has recorded. */
-   const id = await create(page);
-
-   // A stale entry of the key (a fixture a test deleted) gives up the key, so the lookup finds the new one.
-   /** @type {Registry} The list, with the flow's entry. */
-   const registry = readRegistry();
-   for (const entry of registry.documents) {
-      if (entry.key === key) {
-         delete entry.key;
-      }
-   }
-   registry.documents.find((entry) => entry.id === id).key = key;
-   writeRegistry(registry);
-   return id;
 }

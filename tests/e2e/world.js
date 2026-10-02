@@ -97,7 +97,7 @@ const PAGE_ERROR_COLLECTORS = new WeakMap();
 const HOOK_ERROR_DELIVERIES = new WeakMap();
 
 /**
- * Installs hook-error reporting on a page before its first navigation (`fixtures.js` `joinWorld` calls it). Core
+ * Installs hook-error reporting on a page before its first navigation (`join.js` `joinWorld` calls it). Core
  * catches a hook listener's throw in `Hooks.#call` and passes it to `Hooks.onError`, which calls the `error` hook only
  * when the thrown value is an `Error` (`Error.isError`); a thrown non-`Error` value is logged as a console warning by
  * `Hooks.#call` and reported nowhere, so it is not collected. Neither reaches `pageerror` (Foundry 14.364,

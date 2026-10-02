@@ -1,19 +1,20 @@
 import { recordSetting } from './registry.js';
 
-// Every setter records the value the setting held before the suite first set it on the running list (`registry.js`),
-// so `global-teardown.js` restores it. Setting through the API is the interpretation of the Project Scope rule that
-// settings are configuration, not documents.
+// `setWorldSetting` records the value a world setting held before the suite first set it on the running list
+// (`registry.js`), so `global-teardown.js` restores it. Setting through the API is the interpretation of the Project
+// Scope rule that settings are configuration, not documents. A client-scope setting is not recorded: it lives in the
+// browser context that set it and no other context or browser sees it (measured: `getCheckOptions` set in one context
+// read its default in another context and in another browser), so it ends with its context.
 
 /**
- * Records a TITAN setting's current value as its prior value, unless the suite already recorded one.
- * @param {import('@playwright/test').Page} page - The client that is about to change the setting.
- * @param {'world'|'client'} scope - The setting's scope.
+ * Records a world setting's current value as its prior value, unless the suite already recorded one.
+ * @param {import('@playwright/test').Page} page - A GM client that is about to change the setting.
  * @param {string} key - The setting key (without the 'titan.' namespace).
  * @returns {Promise<void>} Resolves once the prior value is on the list.
  */
-async function recordPriorValue(page, scope, key) {
+async function recordPriorValue(page, key) {
    recordSetting({
-      scope,
+      scope: 'world',
       namespace: 'titan',
       key,
       prior: await page.evaluate((key) => game.settings.get('titan', key), key),
@@ -29,7 +30,7 @@ async function recordPriorValue(page, scope, key) {
  * @returns {Promise<void>} Resolves once the setting is written.
  */
 export async function setWorldSetting(pageGm, key, value) {
-   await recordPriorValue(pageGm, 'world', key);
+   await recordPriorValue(pageGm, key);
    await pageGm.evaluate(
       ({ key, value }) => game.settings.set('titan', key, value),
       {
@@ -40,15 +41,13 @@ export async function setWorldSetting(pageGm, key, value) {
 }
 
 /**
- * Sets a client-scope TITAN setting on a specific client (each client holds its own value), recording the prior value
- * for the teardown.
+ * Sets a client-scope TITAN setting on a specific client (each client holds its own value).
  * @param {import('@playwright/test').Page} page - The client whose setting to change.
  * @param {string} key - The setting key (without the 'titan.' namespace).
  * @param {*} value - The value to store.
  * @returns {Promise<void>} Resolves once the setting is written.
  */
 export async function setClientSetting(page, key, value) {
-   await recordPriorValue(page, 'client', key);
    await page.evaluate(
       ({ key, value }) => game.settings.set('titan', key, value),
       {

@@ -2,7 +2,7 @@ import path from 'node:path';
 import { expect, test } from './harness.js';
 import { chooseContextMenuEntry } from './contextMenu.js';
 import { openSheetTab } from './fixtures.js';
-import { record } from './registry.js';
+import { readRegistry, record, writeRegistry } from './registry.js';
 import { selectTitanOption } from './select.js';
 import { closeAllApps } from './world.js';
 
@@ -401,19 +401,6 @@ export async function unlinkPlacedToken(page, tokenId) {
 }
 
 /**
- * Opens a directory tab and returns the entry of a world document in it.
- * @param {import('@playwright/test').Page} page - A logged-in page.
- * @param {string} tab - The sidebar tab of the directory (`actors`, `items`, `scenes`).
- * @param {string} documentId - The id the entry carries in `data-entry-id`.
- * @returns {Promise<import('@playwright/test').Locator>} The entry's list item in the open tab.
- */
-export async function directoryEntry(page, tab, documentId) {
-   /** @type {import('@playwright/test').Locator} The directory's panel. */
-   const panel = await openSidebarTab(page, tab);
-   return panel.locator(`.directory-item.entry[data-entry-id="${documentId}"]`);
-}
-
-/**
  * Returns a world compendium's entry in the Compendium tab.
  * @param {import('@playwright/test').Page} page - A logged-in page.
  * @param {string} packId - The pack's collection id (`world.<name>`).
@@ -554,3 +541,63 @@ export const SHARED_FIXTURES = {
       type: 'npc',
    }),
 };
+
+/**
+ * Whether a recorded document still resolves in the world.
+ * @param {import('@playwright/test').Page} page - A logged-in page.
+ * @param {import('./registry.js').RegistryDocument} entry - The recorded document.
+ * @returns {Promise<boolean>} True when the document exists.
+ */
+export async function resolves(page, entry) {
+   return page.evaluate(async ({ documentName, id, parent, packId }) => {
+      if (documentName === 'Compendium') {
+         return game.packs.has(id);
+      }
+      if (packId) {
+         return game.packs.get(packId)?.index.has(id) ?? false;
+      }
+      if (parent) {
+         /** @type {foundry.abstract.Document|null} The embedding document. */
+         const embedder = await fromUuid(parent);
+         return embedder?.getEmbeddedCollection(documentName).has(id) ?? false;
+      }
+      return game.collections.get(documentName)?.has(id) ?? false;
+   }, entry);
+}
+
+/**
+ * Returns the id of a shared fixture: the one on the list when it still resolves, otherwise a new one made by the
+ * fixture's flow and recorded under the key. Shared fixtures are never deleted mid-run, so a spec may rely on one
+ * existing but not on what an earlier spec left in it.
+ * @param {import('@playwright/test').Page} page - A logged-in GM page.
+ * @param {string} key - The fixture name, a key of `SHARED_FIXTURES`.
+ * @returns {Promise<string>} The fixture's document id.
+ */
+export async function shared(page, key) {
+   /** @type {(page: import('@playwright/test').Page) => Promise<string>|undefined} The fixture's flow. */
+   const create = SHARED_FIXTURES[key];
+   if (!create) {
+      throw new Error(`There is no shared fixture "${key}"; the keys are ${Object.keys(SHARED_FIXTURES).join(', ')}.`);
+   }
+
+   /** @type {import('./registry.js').RegistryDocument|undefined} The fixture's entry, when one is on the list. */
+   const existing = readRegistry().documents.find((entry) => entry.key === key);
+   if (existing && await resolves(page, existing)) {
+      return existing.id;
+   }
+
+   /** @type {string} The id of the document the flow made, which the flow has recorded. */
+   const id = await create(page);
+
+   // A stale entry of the key (a fixture a test deleted) gives up the key, so the lookup finds the new one.
+   /** @type {import('./registry.js').Registry} The list, with the flow's entry. */
+   const registry = readRegistry();
+   for (const entry of registry.documents) {
+      if (entry.key === key) {
+         delete entry.key;
+      }
+   }
+   registry.documents.find((entry) => entry.id === id).key = key;
+   writeRegistry(registry);
+   return id;
+}

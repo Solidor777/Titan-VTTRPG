@@ -1,57 +1,9 @@
 import path from 'node:path';
 import { DEFAULT_GM } from './users.js';
-import { installPoll } from './poll.js';
-import { attachPageErrors, installHookErrorReporting } from './world.js';
-import { expect, flushPageErrors, test, trackWorldPage } from './harness.js';
+import { joinWorld } from './join.js';
+import { expect, flushPageErrors, test } from './harness.js';
 
-/**
- * Joins the live world as a user and returns the errors its boot raised, without asserting them.
- *
- * Verified selectors against the running v14 join page:
- * `select[name="userid"]` is the user picker (options labelled by user name);
- * `input[name="password"]` is the optional user password field;
- * `button[name="join"]` is the "Join Game Session" submit button.
- *
- * Before navigating, the page gets the in-page poll helper, hook-error reporting, and a collector (`attachPageErrors`)
- * that the gates of `harness.js` `test` check, so the page collects from its first document onward. Core sets
- * `game.ready` and calls the `ready` hook synchronously (`client/game.mjs:777-779`), so the boot's errors are read
- * after every synchronous `init`, `setup` and `ready` listener has run. They are marked checked, so the gates do not
- * report them again.
- * @param {import('@playwright/test').Page} page - A page that has not navigated yet.
- * @param {string} user - The display name of the Foundry user to join as.
- * @param {string} origin - What joined the page, named when a gate reports its errors.
- * @returns {Promise<string[]>} The uncaught page errors and hook errors raised from the join screen until ready.
- */
-export async function joinWorld(page, user, origin) {
-   // Install the in-page poll helper and hook-error reporting before navigating (addInitScript runs on document
-   // load).
-   await installPoll(page);
-   await installHookErrorReporting(page);
-
-   /** @type {import('./harness.js').WorldPage} The page's record; its collector receives errors from now on. */
-   const record = trackWorldPage(page, user, origin, attachPageErrors(page));
-
-   // Navigate to the join screen and select the configured user.
-   await page.goto('/join');
-   await page.selectOption('select[name="userid"]', { label: user });
-
-   // Fill the password only when one is configured (the test world has none).
-   if (process.env.FOUNDRY_PASSWORD) {
-      await page.fill('input[name="password"]', process.env.FOUNDRY_PASSWORD);
-   }
-
-   // Submit the join form and wait for the world to load and become ready.
-   await page.click('button[name="join"]');
-   await page.waitForURL('**/game');
-   await page.waitForFunction(() => globalThis.game?.ready === true, null, { timeout: 60_000 });
-
-   await flushPageErrors(page);
-
-   /** @type {string[]} The errors the boot raised. */
-   const bootErrors = record.errors.slice(record.checked);
-   record.checked = record.errors.length;
-   return bootErrors;
-}
+export { joinWorld };
 
 /**
  * Logs a test page in to the live world as a user and fails when the boot raised an error: an uncaught page error, or

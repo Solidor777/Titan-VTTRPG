@@ -1,6 +1,6 @@
 import { chromium } from '@playwright/test';
 import { assertCensusWorld, countCensus, sweepWorld, takeCensus } from './census.js';
-import { joinWorld } from './fixtures.js';
+import { joinWorld } from './join.js';
 import { DEFAULT_GM } from './users.js';
 import { hasWork, readRegistry, resetRegistry } from './registry.js';
 
@@ -84,10 +84,21 @@ async function deleteRegisteredDocuments(page, documents) {
          .filter((document) => document.documentName === 'Compendium')
          .map((document) => document.id));
       for (const entry of documents.filter((document) => document.packId && !recordedPacks.has(document.packId))) {
+         /** @type {foundry.documents.collections.CompendiumCollection|undefined} The pack the document lives in. */
+         const pack = game.packs.get(entry.packId);
+
          /** @type {foundry.abstract.Document|null} The document in the pack. */
-         const document = await game.packs.get(entry.packId)?.getDocument(entry.id);
+         const document = await pack?.getDocument(entry.id);
          if (document) {
+            // A locked pack refuses the deletion; it is unlocked for it and locked again after.
+            const wasLocked = pack.locked;
+            if (wasLocked) {
+               await pack.configure({ locked: false });
+            }
             await document.delete();
+            if (wasLocked) {
+               await pack.configure({ locked: true });
+            }
             count(entry.documentName);
          }
       }
@@ -147,7 +158,9 @@ async function deleteMessagesSince(page, since) {
 }
 
 /**
- * Restores each recorded setting to the value it held before the suite first set it.
+ * Restores each recorded world setting to the value it held before the suite first set it. Client-scope settings live
+ * in the browser context that set them and no other context or browser sees them (measured: a value set in one context
+ * read its default in another context and in another browser), so they are neither recorded nor restored.
  * @param {import('@playwright/test').Page} page - A page logged in as a GM to the census world.
  * @param {import('./registry.js').RegistrySetting[]} settings - The recorded settings.
  * @returns {Promise<number>} The number of settings restored.
@@ -171,7 +184,7 @@ async function restoreSettings(page, settings) {
 
 /**
  * Tears down a run: the running list, then the census's sweep, then the census, in one browser logged in as the
- * default E2E GM. The list is emptied afterwards (the file is overwritten, never deleted).
+ * default E2E GM. The list is left as it is: the caller empties it only once the census is zero.
  * @param {string} origin - What runs the teardown, named when the boot reports errors.
  * @returns {Promise<TeardownResult>} What was removed and what is left.
  */
@@ -207,7 +220,6 @@ export async function tearDownRun(origin) {
 
       /** @type {Record<string, number>} What is left. */
       const census = countCensus(await takeCensus(page, { since: registry.runStartedAt ?? undefined }));
-      resetRegistry();
       return {
          bootErrors,
          registered,
@@ -222,7 +234,8 @@ export async function tearDownRun(origin) {
 
 /**
  * Tears a run down, prints what was removed, and throws when the census is not zero or the teardown's boot raised an
- * error.
+ * error. The running list is emptied (the file is overwritten, never deleted) only after both checks pass, so a failed
+ * teardown leaves the list for the next `global-setup.js` to retry.
  * @param {string} origin - What runs the teardown, named when the boot reports errors.
  * @returns {Promise<void>} Resolves once the world is clean.
  */
@@ -236,6 +249,7 @@ export async function tearDownAndReport(origin) {
    if (Object.values(result.census).some((count) => count > 0)) {
       throw new Error(`The census is not zero after the teardown: ${JSON.stringify(result.census)}`);
    }
+   resetRegistry();
 }
 
 /**

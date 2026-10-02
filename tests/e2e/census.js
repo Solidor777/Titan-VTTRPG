@@ -1,6 +1,6 @@
 import { chromium } from '@playwright/test';
 import { pathToFileURL } from 'node:url';
-import { joinWorld } from './fixtures.js';
+import { joinWorld } from './join.js';
 import { DEFAULT_GM, E2E_USERS } from './users.js';
 
 // Counts, and on request removes, what the e2e suite has left in the `test-titan` world: `E2E `-prefixed documents
