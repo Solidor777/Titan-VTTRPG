@@ -46,8 +46,9 @@
       // If the document and traits are still valid.
       if (item && documentTraits) {
 
-         // Set the document's traits to equal the active traits from the trait options.
-         documentTraits = traitOptions.filter((trait) =>
+         // Set the document's traits to equal the active traits from the trait options. The options are deeply
+         // reactive proxies, which `structuredClone` cannot copy; `$state.snapshot` copies them to plain objects.
+         documentTraits = $state.snapshot(traitOptions).filter((trait) =>
             (typeof (trait.value) === 'boolean' && trait.value === true) ||
                (typeof (trait.value) === 'number' && trait.value > 0),
          );
