@@ -876,7 +876,7 @@ export async function addCheck(page, documentUuid, { label, resolveCost, resista
    /** @type {import('@playwright/test').Locator} The new check's row. */
    const row = rows.nth(before);
 
-   // The sheet has rendered every stored check before the row is edited, so a late render cannot replace the input.
+   // Waits until the sheet shows one row per stored check before the new row is edited.
    await expect(rows, 'the sheet rendered a row for every stored check').toHaveCount(before + 1);
    if (label !== undefined) {
       /** @type {import('@playwright/test').Locator} The new row's label input. */
@@ -1215,12 +1215,13 @@ function sharedItem(type, label, shape) {
 
 /**
  * The number of entries in each list of the bulk fixture: abilities, checks on the equipment and rules elements on the
- * effect. Measured at the default zoom (`.superpowers/sdd/test-suite-rewrite/phase-2/review-measure-3.log`): 30
- * abilities overflow the actor sheet's Abilities tab (1976 px of content in 563 px). The checks list and the rules
- * elements list were not measured.
+ * effect. Measured at every tested zoom (`.superpowers/sdd/test-suite-rewrite/phase-3/entry-count-measure.log`, with
+ * 30 entries): the Abilities tab's scroll area is 563 px high at 100% zoom (358 px at 150%) and its rows are 66 px
+ * apart, so 9 rows fill it and the tenth overflows it; the Checks tab's area is 412 px with rows 359 px apart, and the
+ * rules elements list's is 412 px with rows 146 px apart. 10 entries therefore overflow all three at every zoom.
  * @type {number}
  */
-export const BULK_COUNT = 30;
+export const BULK_COUNT = 10;
 
 /**
  * The shared fixtures a flow can build, by key. `shared` runs the flow of a key that is not on the list. Items are

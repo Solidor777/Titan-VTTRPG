@@ -88,18 +88,14 @@ test.afterAll(async () => {
 });
 
 /**
- * Opens the actor's sheet on a tab with its filter emptied. The sheet instance keeps its tab filters between tests, so
- * each test starts from the emptied filter of every tab it reads.
+ * Opens the actor's sheet on a tab. The sheet instance keeps its tab filters between tests, so each test that types
+ * into a filter empties it again before it ends.
  * @param {string} tab - The tab label.
  * @returns {Promise<import('@playwright/test').Locator>} The sheet's window element.
  */
 async function openActorSheet(tab) {
    /** @type {import('@playwright/test').Locator} The actor's sheet. */
    const sheet = await openSheetByUuid(page, actorUuid);
-   for (const list of Object.values(LISTS)) {
-      await sheet.locator('.tab-list').getByText(list.tab, { exact: true }).first().click();
-      await sheet.locator('.tab .header .input input').first().fill('');
-   }
    await sheet.locator('.tab-list').getByText(tab, { exact: true }).first().click();
    return sheet;
 }
@@ -120,37 +116,48 @@ async function expectRowCounts(sheet, counts) {
 test.describe('character sheet tab filters', () => {
    for (const [key, list] of Object.entries(LISTS)) {
       test(`typing in the ${key} filter narrows only the ${key} list`, async () => {
+         /** @type {import('@playwright/test').Locator} The actor's sheet. */
          const sheet = await openActorSheet(list.tab);
          await expect(sheet.locator(list.row), `both ${key} rows before filtering`).toHaveCount(2);
+         try {
+            // A substring of only the first entry's name; the match ignores case.
+            await sheet.locator('.tab .header .input input').first().fill(list.names[0].slice(4, 12).toUpperCase());
+            await expect(sheet.locator(list.row), `${key} narrowed to the matching entry`).toHaveCount(1);
+            await expect(sheet.locator(list.row).first(), `the matching ${key} row`).toContainText(list.names[0]);
 
-         // A substring of only the first entry's name; the match ignores case.
-         await sheet.locator('.tab .header .input input').first().fill(list.names[0].slice(4, 12).toUpperCase());
-         await expect(sheet.locator(list.row), `${key} narrowed to the matching entry`).toHaveCount(1);
-         await expect(sheet.locator(list.row).first(), `the matching ${key} row`).toContainText(list.names[0]);
+            // A filter that matches nothing empties the list.
+            await sheet.locator('.tab .header .input input').first().fill('no such entry');
+            await expect(sheet.locator(list.row), `${key} rows when nothing matches`).toHaveCount(0);
 
-         // A filter that matches nothing empties the list.
-         await sheet.locator('.tab .header .input input').first().fill('no such entry');
-         await expect(sheet.locator(list.row), `${key} rows when nothing matches`).toHaveCount(0);
-
-         // The other tabs list both of their entries.
-         await expectRowCounts(sheet, Object.fromEntries(
-            Object.keys(LISTS).filter((other) => other !== key).map((other) => [
-               other,
-               2,
-            ]),
-         ));
-         expect(errors, `uncaught errors:\n${errors.join('\n')}`).toEqual([]);
+            // The other tabs list both of their entries.
+            await expectRowCounts(sheet, Object.fromEntries(
+               Object.keys(LISTS).filter((other) => other !== key).map((other) => [
+                  other,
+                  2,
+               ]),
+            ));
+            expect(errors, `uncaught errors:\n${errors.join('\n')}`).toEqual([]);
+         }
+         finally {
+            // The sheet keeps the typed text, so the filter is emptied for the tests that follow.
+            await sheet.locator('.tab-list').getByText(list.tab, { exact: true }).first().click();
+            await sheet.locator('.tab .header .input input').first().fill('');
+         }
       });
    }
 
    test('the skills filter falls back to matching the default attribute', async () => {
+      /** @type {import('@playwright/test').Locator} The actor's sheet. */
       const sheet = await openActorSheet('Skills');
+      /** @type {import('@playwright/test').Locator} The matching rows. */
       const rows = sheet.locator('.skill');
       await expect(rows).toHaveCount(18);
       await sheet.locator('.skill-tab .header .filter input').fill('soul');
 
       // No skill name contains "soul"; the fallback lists the skills whose default attribute is Soul.
+      /** @type {number} The number of skills whose default attribute is Soul. */
       const expected = await page.evaluate(async (uuid) => {
+         /** @type {object[]} The actor's skills. */
          const skills = Object.values((await fromUuid(uuid)).system.skill);
          return skills.filter((skill) => skill.defaultAttribute === 'soul').length;
       }, actorUuid);
@@ -175,11 +182,14 @@ test.describe('item sheet checks filter', () => {
       await addCheck(page, `Item.${id}`, { label: 'AlphaCheck' });
       await addCheck(page, `Item.${id}`, { label: 'BravoCheck' });
 
+      /** @type {import('@playwright/test').Locator} The document's sheet. */
       const sheet = await openSheetByUuid(page, `Item.${id}`);
       await openSheetTab(page, 'Checks');
 
       // The checks list <ol> and the filter input both live inside the checks tab.
+      /** @type {import('@playwright/test').Locator} The checks listed on the sheet. */
       const checkItems = sheet.locator('.scrolling-content > ol > li');
+      /** @type {import('@playwright/test').Locator} The checks filter input. */
       const filterInput = sheet.locator('.filter input');
       await expect(checkItems).toHaveCount(2);
 

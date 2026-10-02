@@ -20,7 +20,7 @@ import {
 import { expectedCheckResults } from '../shared/checkOracle.js';
 
 /**
- * 2b-4 checks-opposed: prove the two opposed mechanics through the dialog-bypassing roll APIs.
+ * Proves the two opposed mechanics through the dialog-bypassing roll APIs.
  * Part A (attack vs Defense) targets placed tokens with the Target key so `targetDefense` auto-populates
  * from the target; Part B (resistance vs damage) passes `damageToReduce` like the Resist button.
  */
@@ -56,7 +56,7 @@ function targetName(mod) {
  * Mirrors the engine's difficulty clamp: clamp(targetDefense - attackerRating + 4, 2, 6).
  * @param {number} targetDefense - The target's Defense rating.
  * @param {number} attackerRating - The attacker's attack rating.
- * @returns {number} The expected difficulty.
+ * @returns {number} The difficulty the engine should derive, between 2 and 6.
  */
 function expectedDifficulty(targetDefense, attackerRating) {
    return Math.min(6, Math.max(2, targetDefense - attackerRating + 4));

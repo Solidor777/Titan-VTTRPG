@@ -1,6 +1,6 @@
 import { expect, test } from './harness.js';
 import { login, openSheetByUuid, openSheetTab } from './fixtures.js';
-import { createActor, shared } from './flows.js';
+import { BULK_COUNT, createActor, shared } from './flows.js';
 import { attachPageErrors, closeAllApps } from './world.js';
 
 /**
@@ -16,9 +16,6 @@ import { attachPageErrors, closeAllApps } from './world.js';
 
 /** @type {string} Name of the actor whose Skills tab rows are measured; `E2E ` lets the census find it. */
 const LAYOUT_ACTOR_NAME = 'E2E Layout Actor';
-
-/** @type {number} The number of entries in each long list of the shared bulk actor. */
-const ENTRY_COUNT = 30;
 
 /** @type {number[]} Browser zoom factors under test (50% to 150%). */
 const ZOOM_LEVELS = [
@@ -123,18 +120,25 @@ test.describe('the Skills tab and the sidebar', () => {
     */
    function measureSkillRows() {
       return page.evaluate(() => {
+         /** @type {Element[]} The list entries. */
          const rows = [...document.querySelectorAll('.application.titan-document-sheet .skill')];
+         /** @type {object} The names of a skill row's parts and their measured boxes. */
          const parts = {
             check: new Set(),
             attribute: new Set(),
             stats: new Set(),
          };
+         /** @type {number} The number of parts cut off by the row. */
          let clipped = 0;
          for (const row of rows) {
+            /** @type {DOMRect} The skill row's box. */
             const rowBox = row.getBoundingClientRect();
             for (const name of Object.keys(parts)) {
+               /** @type {DOMRect} The measured element's box. */
                const box = row.querySelector(`:scope > .${name}`).getBoundingClientRect();
+               /** @type {number} The part's left offset inside the row. */
                const left = Math.round(box.left - rowBox.left);
+               /** @type {number} The part's top offset inside the row. */
                const top = Math.round(box.top - rowBox.top);
                parts[name].add(`${left}/${top}/${Math.round(box.width)}`);
                if (box.right > rowBox.right + 0.5 || box.left < rowBox.left - 0.5) {
@@ -188,9 +192,11 @@ test.describe('the Skills tab and the sidebar', () => {
    });
 
    test('sidebar sections carry uppercase labels', async () => {
+      /** @type {import('@playwright/test').Locator} The sidebar section labels. */
       const labels = page.locator('.section-label');
       await expect(labels, 'sidebar shows the three labelled sections').toHaveCount(3);
 
+      /** @type {string[]} The sidebar section label texts. */
       const texts = await labels.allTextContents();
       expect(texts, 'sidebar labels match the localized Ratings/Mods/Speeds text').toEqual([
          'Ratings',
@@ -198,6 +204,7 @@ test.describe('the Skills tab and the sidebar', () => {
          'Speeds',
       ]);
 
+      /** @type {string[]} The sidebar section labels' text transforms. */
       const transforms = await labels.evaluateAll(
          (elements) => elements.map((el) => globalThis.getComputedStyle(el).textTransform),
       );
@@ -209,6 +216,7 @@ test.describe('the Skills tab and the sidebar', () => {
    });
 
    test('sidebar section labels are spaced from the items they contain', async () => {
+      /** @type {object[]} The spacing between each section label and its items. */
       const gaps = await page.locator('.section-label').evaluateAll((labels) => labels.map((label) => {
          return label.nextElementSibling.getBoundingClientRect().top - label.getBoundingClientRect().bottom;
       }));
@@ -255,22 +263,34 @@ test.describe('browser zoom', () => {
     */
    function scrollToLastAndMeasure(appId, rowSelector) {
       return page.evaluate(({ id, selector }) => {
+         /** @type {import('@playwright/test').Locator} The document's sheet. */
          const sheet = document.getElementById(id);
+         /** @type {NodeListOf<Element>} The list entries. */
          const rows = sheet.querySelectorAll(selector);
+
+         /** @type {Element} The last list entry. */
          const last = rows[rows.length - 1];
 
          // Only containers a user can scroll (overflow auto/scroll) are scrolled.
          for (let element = last.parentElement; element && element !== document.body; element = element.parentElement) {
+            /** @type {string} The element's vertical overflow setting. */
             const overflow = getComputedStyle(element).overflowY;
             if (overflow === 'auto' || overflow === 'scroll') {
                element.scrollTop = element.scrollHeight;
             }
          }
 
+         /** @type {DOMRect} The measured element's box. */
          const box = last.getBoundingClientRect();
+         /**
+          * Tests whether the last entry's box lies inside a box, within one pixel.
+          * @param {{top: number, left: number, bottom: number, right: number}} outer - The enclosing box.
+          * @returns {boolean} True when the entry is inside it.
+          */
          const inside = (outer) => box.top >= outer.top - 1 && box.bottom <= outer.bottom + 1
             && box.left >= outer.left - 1 && box.right <= outer.right + 1;
 
+         /** @type {string|null} Why the entry is not fully visible, or null while it is. */
          let reason = null;
          if (!inside({
             top: 0,
@@ -278,12 +298,16 @@ test.describe('browser zoom', () => {
             bottom: window.innerHeight,
             right: window.innerWidth,
          })) {
+            /** @type {string} The entry's top and bottom edges. */
             const span = `${box.top.toFixed(1)}-${box.bottom.toFixed(1)}`;
             reason = `outside the viewport (entry ${span}, viewport ${window.innerHeight})`;
          }
          for (let element = last.parentElement; !reason && element && element !== document.body;
             element = element.parentElement) {
+            /** @type {CSSStyleDeclaration} The ancestor's computed style. */
             const style = getComputedStyle(element);
+
+            /** @type {boolean} Whether the ancestor clips or scrolls its content. */
             const clips = [
                style.overflowX,
                style.overflowY,
@@ -294,6 +318,7 @@ test.describe('browser zoom', () => {
          }
 
          // The entry's corners must hit the entry itself (nothing painted over it).
+         /** @type {number} The distance in pixels of the probed corners from the entry's edges. */
          const inset = 2;
          for (const [x, y] of [
             [
@@ -356,7 +381,8 @@ test.describe('browser zoom', () => {
     * @param {number} [entryCount] - The number of entries the selector matches.
     * @returns {Promise<void>} Resolves once every zoom level has been checked.
     */
-   async function expectLastEntryReachableAtEveryZoom(appId, rowSelector, entryCount = ENTRY_COUNT) {
+   async function expectLastEntryReachableAtEveryZoom(appId, rowSelector, entryCount = BULK_COUNT) {
+      /** @type {import('@playwright/test').Locator} The matching rows. */
       const rows = page.locator(`[id="${appId}"] ${rowSelector}`);
       await expect(rows, 'the long list rendered').toHaveCount(entryCount);
       for (const zoom of ZOOM_LEVELS) {
@@ -376,25 +402,30 @@ test.describe('browser zoom', () => {
    }
 
    test('the character sheet ability list reaches its last entry at 50-150% zoom', async () => {
+      /** @type {string} The sheet application's element id. */
       const appId = await openSheetAtFullZoom(`Actor.${bulkId}`);
       await openSheetTab(page, 'Abilities');
       await expectLastEntryReachableAtEveryZoom(appId, '[data-item-id]');
    });
 
    test('the character sheet sidebar reaches its last section at 50-150% zoom', async () => {
+      /** @type {string} The sheet application's element id. */
       const appId = await openSheetAtFullZoom(`Actor.${bulkId}`);
+      /** @type {import('@playwright/test').Locator} The sidebar sections. */
       const sections = page.locator(`[id="${appId}"] .titan-sheet > .sidebar .section`);
       await expect(sections.first(), 'the sidebar rendered').toBeVisible();
       await expectLastEntryReachableAtEveryZoom(appId, '.titan-sheet > .sidebar .section', await sections.count());
    });
 
    test('the item sheet checks list reaches its last entry at 50-150% zoom', async () => {
+      /** @type {string} The sheet application's element id. */
       const appId = await openSheetAtFullZoom(await bulkUuid('items', 'E2E Bulk Equipment'));
       await openSheetTab(page, 'Checks');
       await expectLastEntryReachableAtEveryZoom(appId, 'li.reorder-row');
    });
 
    test('the effect sheet rules-element list reaches its last entry at 50-150% zoom', async () => {
+      /** @type {string} The sheet application's element id. */
       const appId = await openSheetAtFullZoom(await bulkUuid('effects', 'E2E Bulk Effect'));
       await openSheetTab(page, 'Rules Elements');
       await expectLastEntryReachableAtEveryZoom(appId, 'li.reorder-row');
