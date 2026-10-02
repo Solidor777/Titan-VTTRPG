@@ -174,8 +174,11 @@ The evidence files named here are in `.superpowers/sdd/test-suite-rewrite/phase-
   full-suite order, without the wait added afterwards (`phase-3/layout-nowait-1.log` to `-10.log`,
   `layout-nowait-summary.txt`); 0 in 4 isolated runs of the layout spec (`layout-rerun-1.log` to `-4.log`); 0 in the
   two later full runs (`e2e-full-2.log`, `e2e-full-3.log`).
-- **Unverified:** `addCheck` now waits until the sheet renders a row for every stored check before it edits the new
-  one. Whether that removes the failure is not known, because the failure never recurred without it. Cause not located.
+- **Cause (measured, 2026-10-02, CLOSED_BUGS #131):** the Add Check button changes the local document state 0 to 1 ms
+  after the click and the server echo re-renders 15 to 26 ms later (`measure-optimistic-length.log`); typing in that window
+  is undone by the echo. `addCheck` and the other add flows now wait for the pending operations to finish
+  (`settle`). The failure recurred once before that change (`e2e-r2-gate-1.log`) and did not in the 12 runs after it
+  (2 full, 10 of the layout set); that is too few to call it fixed, so the entry stays open.
 - **Found:** 2026-10-02 in Phase 3 Part A.
 - **Status:** Open.
 
@@ -192,9 +195,9 @@ The evidence files named here are in `.superpowers/sdd/test-suite-rewrite/phase-
   render and polls per field. **Inferred, not measured:** an update from the previous row's commit re-renders the list
   and resets a later row's input before it commits.
 - **Not reproduced:** 0 failures in 3 later full runs of the file (`drag-fix-1.log` to `drag-fix-3.log`).
-- **Mitigation applied, effect unproven:** `fillList` (`drag.spec.js`) and the attack-label loop in
-  `item-sheet-rolls.spec.js` now poll each row's stored value before the next row is filled. The cause in the product (a
-  sheet input that loses a typed value to a re-render) is not located; if it is one, it is a product defect.
+- **Cause and mitigation:** the same race as #122: the local state shows the new row before the server echo, and the
+  echo's re-render resets text typed in that window. `fillList` and the attack-label loop poll each row, and the add flows
+  now `settle` (CLOSED_BUGS #131). Not reproduced in 10 runs of `drag.spec.js` (`dist-run-1.log` to `-10.log`).
 - **Found:** 2026-10-02 in the Part B review fixes.
 - **Status:** Open.
 
@@ -203,24 +206,10 @@ The evidence files named here are in `.superpowers/sdd/test-suite-rewrite/phase-
 - **What:** in one full e2e run the test failed at `condition-description.spec.js:343`: after a right-click on the placed
   token, `#token-hud` was not found within 5 s (`e2e-full-fix.clean.txt`, failure 1). The spec is not touched by Part B.
 - **Not reproduced:** 0 failures in 3 isolated runs of the file (`cd-fix-1.log` to `cd-fix-3.log`).
+- **Also not reproduced:** 0 failures in 20 further runs of the file (`reverify-run-1.log` to `-10.log`,
+  `reverify2-run-1.log` to `-10.log`) and in 5 full runs (`e2e-r2-1.log`, `e2e-r2-gate-1.log`, `-2.log`,
+  `e2e-r2b-gate-1.log`, `-2.log`); its 10 s scrolling-text wait was replaced by a reload in the same period, so the
+  runs do not test the original code.
 - **Cause not located.**
-- **Found:** 2026-10-02 in the Part B review fixes.
-- **Status:** Open.
-
-### 131. Action helpers return before the effect of their action is observable, so the caller's next action races the re-render
-
-The evidence files named here are in `.superpowers/sdd/test-suite-rewrite/phase-3/` (local, not checked in).
-
-- **What:** four failures share one mechanism: an action is taken before the previous action's re-render has finished,
-  and the re-render discards or reorders the later action. #122 (a typed check label stored as "Check"), #128 (the
-  same in `fillList`), the second grip drag of the #127 gate (`e2e-full-fix2.clean.txt`, failure 1: the rows came out
-  reversed) and #130 (the file picker). Fixing each test did not stop the next one.
-- **Read, per helper:** `selectTitanOption`, `setSelectField`, `setCheckbox`, `clickRoll`, `openSheetTab`, `openTab`,
-  `addAttack`, `addCustomAspect`, `pickPortrait`, `dragGrip`, the inline `fill` plus `blur` pairs of the flows and
-  specs, `typeInto` (whose comment said it waited for the document to store the value and did not) and the setters
-  that write through the API returned at the click or at the awaited write, before the renders that write queued had
-  finished. `titanSelectOptionValues` returned before its list closed. The flows that read the stored document after the
-  action (`addCheck`, `addRulesElement`, `enableAspect`, `createOwnedItem`, `placeToken`) already waited for it.
-- **Not reproduced as a single failure:** the effect of the fix is judged by repeated runs, listed in the report.
 - **Found:** 2026-10-02 in the Part B review fixes.
 - **Status:** Open.

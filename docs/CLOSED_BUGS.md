@@ -1781,3 +1781,34 @@ The evidence files named here are in `.superpowers/sdd/test-suite-rewrite/phase-
   `audit-surfaces-5.log` and `measure-portrait-6.log`. After: 8 of 8 runs passed under the 1 s ceiling
   (`audit-portrait-fix-1.log` to `-8.log`).
 - **Status:** Closed 2026-10-02.
+
+### 131. Action helpers return before the effect of their action is observable, so the caller's next action races the re-render
+
+The evidence files named here are in `.superpowers/sdd/test-suite-rewrite/phase-3/` (local, not checked in).
+
+- **What:** four failures share one mechanism: an action is taken before the previous action's re-render has finished,
+  and the re-render discards or reorders the later action. #122 (a typed check label stored as "Check"), #128 (the
+  same in `fillList`), the second grip drag of the #127 gate (`e2e-full-fix2.clean.txt`, failure 1: the rows came out
+  reversed) and #130 (the file picker). Fixing each test did not stop the next one.
+- **Read, per helper:** `selectTitanOption`, `setSelectField`, `setCheckbox`, `clickRoll`, `openSheetTab`, `openTab`,
+  `addAttack`, `addCustomAspect`, `pickPortrait`, `dragGrip`, the inline `fill` plus `blur` pairs of the flows and
+  specs, `typeInto` (whose comment said it waited for the document to store the value and did not) and the setters
+  that write through the API returned at the click or at the awaited write, before the renders that write queued had
+  finished. `titanSelectOptionValues` returned before its list closed. The flows that read the stored document after the
+  action (`addCheck`, `addRulesElement`, `enableAspect`, `createOwnedItem`, `placeToken`) already waited for it.
+- **Found:** 2026-10-02 in the Part B review fixes.
+- **Cause of the residual race (measured, `measure-optimistic-length.log`):** the Add buttons change the sheet's local
+  document state at once and send the update afterwards, so a check count read from the document shows the new check
+  0 to 1 ms after the click while 2 operations and renders are pending until 15 to 26 ms later. A flow that typed into
+  the new row when the count appeared could be undone by the server echo's re-render. The first full run after the
+  helper change failed once this way (`e2e-r2-gate-1.log`: `addCheck` stored "Check" for "E2E Bulk Check 2"); the add
+  flows now call `settle` after the count shows (commit `ed09de31`).
+- **Fixed:** `settle.js` (in-flight document operations and renders, installed by `joinWorld`), `actions.js`
+  (`clickSheetTab`, `commitText`), and waits for the effect in `selectTitanOption`, `titanSelectOptionValues`,
+  `setSelectField`, `setCheckbox`, `clickRoll`, the add flows of `flows.js`, `pickPortrait`, `dragGripToMove` and the API
+  setters of the specs.
+- **Gate:** no single test; the evidence is runs after the final change: 2 full runs of 644 passed with census zero
+  (`e2e-r2b-gate-1.log`, `-2.log`), 10 runs of the 44 tests of `armor-trait-situations`, `attack-tags`,
+  `character-sheet-layout`, `condition-description` and `surfaces` (`reverify2-run-1.log` to `-10.log`), and 10 runs of
+  86 tests of the sheet list specs and `drag` (`dist-run-1.log` to `-10.log`, run before the `ed09de31` change).
+- **Status:** Closed 2026-10-02.
