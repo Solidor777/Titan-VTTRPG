@@ -95,6 +95,48 @@ export function documentContext({ isOwner = true } = {}) {
 }
 
 /**
+ * Build a Svelte context object exposing a synthetic, owned `document` bridge for components that persist through
+ * `document.data.update`. The page replaces the marker with a `ProbeDocument`
+ * (`src/test-probe/ProbeDocument.svelte.js`): `data` is the plain object given here, and its `update` merges changes
+ * into it and re-renders the readers, so a probe sees the same write-then-render cycle a document edit gives a sheet.
+ * For stored data that no control can produce.
+ * @param {object} system - The `document.data.system` object the component reads and writes.
+ * @returns {{ document: { __probeDocument: true, data: { isOwner: true, system: object } } }} The context object
+ * passed to `mountProbe`.
+ */
+export function syntheticDocumentContext(system) {
+   return {
+      document: {
+         __probeDocument: true,
+         data: {
+            isOwner: true,
+            system,
+         },
+      },
+   };
+}
+
+/**
+ * Read a value from the context a probe was mounted with, at a dot-separated path.
+ * @param {import('@playwright/test').Page} page - The Playwright page to drive.
+ * @param {string} probeId - The probe id `mountProbe` returned.
+ * @param {string} path - The path from the context map, such as `document.data.system.rulesElement.0.rounding`.
+ * @returns {Promise<*>} The value at the path, or undefined when the path does not resolve.
+ */
+export async function readProbeContext(page, probeId, path) {
+   return page.evaluate(
+      ({ probeId, path }) => path.split('.').reduce(
+         (value, key) => value?.[key],
+         Object.fromEntries(globalThis.game.titan._probe.context(probeId) ?? []),
+      ),
+      {
+         probeId,
+         path,
+      },
+   );
+}
+
+/**
  * Build a marker the harness resolves in-page to a registered component constructor, for props that take a
  * component reference (functions cannot cross the Node<->page boundary).
  * @param {string} name - A registered component name (see game.titan._probe.components).

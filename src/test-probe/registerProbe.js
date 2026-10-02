@@ -1,5 +1,6 @@
 import { mount, unmount, createRawSnippet } from 'svelte';
 import componentRegistry from '~/test-probe/componentRegistry.js';
+import ProbeDocument from '~/test-probe/ProbeDocument.svelte.js';
 
 /**
  * Recursively replace `{ __probeComponent: name }` markers with the registered component constructor.
@@ -25,6 +26,19 @@ function resolveProbeComponents(value) {
       return out;
    }
    return value;
+}
+
+/**
+ * Replace each `{ __probeDocument: true, data }` context value with a `ProbeDocument` around its `data`: the marker is
+ * the form of a document bridge that survives the Node-to-page boundary.
+ * @param {Map<string, *>} context - The context map handed to `mount`.
+ * @returns {Map<string, *>} A map with the markers resolved.
+ */
+function resolveProbeDocuments(context) {
+   return new Map([...context].map(([key, value]) => [
+      key,
+      value?.__probeDocument === true ? new ProbeDocument(value.data) : value,
+   ]));
 }
 
 /**
@@ -108,19 +122,30 @@ export default function registerProbe() {
          target.style.zIndex = '2147483647';
          document.body.appendChild(target);
 
+         const resolvedContext = resolveProbeDocuments(context);
          const handle = mount(Component, {
             target,
             props: finalProps,
-            context,
+            context: resolvedContext,
          });
          handles.set(id, {
             handle,
             target,
+            context: resolvedContext,
          });
          return {
             id,
             selector: `[data-titan-probe="${id}"]`,
          };
+      },
+
+      /**
+       * Read a mounted probe's context map, so a test can see what the component wrote into a synthetic document.
+       * @param {string} id - The probe id returned from `mount`.
+       * @returns {Map<string, *> | undefined} The context map, or undefined when the probe is not mounted.
+       */
+      context(id) {
+         return handles.get(id)?.context;
       },
 
       /**

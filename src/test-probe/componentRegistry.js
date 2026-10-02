@@ -81,10 +81,15 @@ import InitiativeEffectTag from '~/helpers/svelte-components/tag/effects/Initiat
 import PermanentEffectTag from '~/helpers/svelte-components/tag/effects/PermanentEffectTag.svelte';
 import TurnEndEffectTag from '~/helpers/svelte-components/tag/effects/TurnEndEffectTag.svelte';
 import TurnStartEffectTag from '~/helpers/svelte-components/tag/effects/TurnStartEffectTag.svelte';
+import ItemSheetConditionalCheckModifierSettings from
+   '~/document/types/item/sheet/rules-element/ItemSheetConditionalCheckModifierSettings.svelte';
+import ItemSheetMulBaseSettings from '~/document/types/item/sheet/rules-element/ItemSheetMulBaseSettings.svelte';
+import ItemSheetMulSumSettings from '~/document/types/item/sheet/rules-element/ItemSheetMulSumSettings.svelte';
 
 /**
- * Registry of base primitives the test probe can mount in isolation. Keyed by the name passed to
- * `game.titan._probe.mount`. Extended one entry at a time as the probe coverage grows.
+ * Registry of base primitives, and of the rules-element settings editors that read a document context, which the test
+ * probe can mount in isolation. Keyed by the name passed to `game.titan._probe.mount`. Extended one entry at a time as
+ * the probe coverage grows.
  * @type {Record<string, import('svelte').Component>}
  */
 const componentRegistry = {
@@ -171,6 +176,9 @@ const componentRegistry = {
    PermanentEffectTag,
    TurnEndEffectTag,
    TurnStartEffectTag,
+   ItemSheetConditionalCheckModifierSettings,
+   ItemSheetMulBaseSettings,
+   ItemSheetMulSumSettings,
 };
 
 export default componentRegistry;

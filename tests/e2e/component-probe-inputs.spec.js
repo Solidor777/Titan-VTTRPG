@@ -1,6 +1,14 @@
 import { expect, test } from './harness.js';
 import { login } from './fixtures.js';
-import { mountProbe, readProbeEvents, clearProbeEvents, unmountAll } from './componentProbe.js';
+import {
+   clearProbeEvents,
+   mountProbe,
+   readProbeContext,
+   readProbeEvents,
+   syntheticDocumentContext,
+   unmountAll,
+} from './componentProbe.js';
+import { titanSelectOptionValues } from './select.js';
 import { closeAllApps, clearChat, attachPageErrors } from './world.js';
 
 /** @type {import('@playwright/test').Page} The file-shared, logged-in page (one world boot per file). */
@@ -437,4 +445,156 @@ test.describe('component probe — TopFilter', () => {
       });
       await expect(page.locator(`${selector} .labeled-element > .label`)).toContainText('Search Items');
    });
+});
+
+
+// ─── Rules-element editors handed stored data no control can produce ─────────────────────────────────────────────────
+//
+// A flow never stores these shapes (the factories always set `rounding`, and the editor offers only known levels and
+// check types), so the probes mount the editor on a synthetic document context (`syntheticDocumentContext`) and read
+// the synthetic element back to see what the editor wrote into it.
+
+test.describe('component probe — conditional check modifier editor with unusual stored data', () => {
+   /** Tear down every mounted probe so containers never leak between tests. */
+   test.afterEach(async () => {
+      await unmountAll(page);
+      await clearProbeEvents(page);
+   });
+
+   for (const [stored, shown] of [
+      [
+         0,
+         '1',
+      ],
+      [
+         -3,
+         '-2',
+      ],
+      [
+         3,
+         '2',
+      ],
+   ]) {
+      test(`an Advantage value of ${stored} shows level ${shown} and is not rewritten`, async () => {
+         /** @type {{id: string, selector: string}} The mounted editor. */
+         const probe = await mountProbe(page, 'ItemSheetConditionalCheckModifierSettings', {
+            props: { idx: 0 },
+            context: syntheticDocumentContext({
+               rulesElement: [
+                  {
+                     checkType: 'any',
+                     key: '',
+                     modifierType: 'advantage',
+                     operation: 'conditionalCheckModifier',
+                     selector: 'any',
+                     skill: '',
+                     uuid: 'probe-ccm-advantage',
+                     value: stored,
+                  },
+               ],
+            }),
+         });
+         await expect(page.locator(`${probe.selector} [data-testid="ccm-advantage-level"]`))
+            .toHaveAttribute('data-value', shown);
+         expect(
+            await readProbeContext(page, probe.id, 'document.data.system.rulesElement.0.value'),
+            `the stored ${stored} is left as it was`,
+         ).toBe(stored);
+      });
+   }
+
+   // 'toString' is an inherited property name, not an own key of the check-type tables.
+   for (const checkType of [
+      'unknownCheck',
+      'toString',
+   ]) {
+      test(`an unknown check type "${checkType}" still renders the modifier types and the any selectors`, async () => {
+         /** @type {{id: string, selector: string}} The mounted editor. */
+         const probe = await mountProbe(page, 'ItemSheetConditionalCheckModifierSettings', {
+            props: { idx: 0 },
+            context: syntheticDocumentContext({
+               rulesElement: [
+                  {
+                     checkType,
+                     key: '',
+                     modifierType: 'healing',
+                     operation: 'conditionalCheckModifier',
+                     selector: 'any',
+                     skill: '',
+                     uuid: 'probe-ccm-check-type',
+                     value: 1,
+                  },
+               ],
+            }),
+         });
+
+         /** @type {import('@playwright/test').Locator} The modifier type select's trigger. */
+         const modifierType = page.locator(`${probe.selector} [data-testid="ccm-modifier-type"]`);
+         await expect(modifierType).toHaveAttribute('data-value', 'healing');
+         expect(await titanSelectOptionValues(page, modifierType)).toEqual([
+            'damage',
+            'dice',
+            'expertise',
+            'training',
+            'healing',
+            'advantage',
+            'automaticFailure',
+         ]);
+         expect(await titanSelectOptionValues(page, page.locator(`${probe.selector} [data-testid="ccm-selector"]`)))
+            .toEqual([
+               'any',
+               'attribute',
+               'skill',
+               'customTrait',
+               'situation',
+            ]);
+      });
+   }
+});
+
+test.describe('component probe — multiplier editors with no stored rounding', () => {
+   /** Tear down every mounted probe so containers never leak between tests. */
+   test.afterEach(async () => {
+      await unmountAll(page);
+      await clearProbeEvents(page);
+   });
+
+   for (const [component, testId, element] of [
+      [
+         'ItemSheetMulBaseSettings',
+         'mulbase-rounding',
+         {
+            key: 'body',
+            operation: 'mulBase',
+            selector: 'attribute',
+            uuid: 'probe-rounding-mulbase',
+            value: 2,
+         },
+      ],
+      [
+         'ItemSheetMulSumSettings',
+         'mulsum-rounding',
+         {
+            key: 'stride',
+            operation: 'mulSum',
+            selector: 'speed',
+            uuid: 'probe-rounding-mulsum',
+            value: 0.5,
+         },
+      ],
+   ]) {
+      test(`${component} shows down for an element with no rounding and stores down`, async () => {
+         /** @type {{id: string, selector: string}} The mounted editor. */
+         const probe = await mountProbe(page, component, {
+            props: { idx: 0 },
+            context: syntheticDocumentContext({ rulesElement: [element] }),
+         });
+         await expect(page.locator(`${probe.selector} [data-testid="${testId}"]`))
+            .toHaveAttribute('data-value', 'down');
+         await expect.poll(
+            () => readProbeContext(page, probe.id, 'document.data.system.rulesElement.0.rounding'),
+            { message: 'the editor stores the engine default, down' },
+         ).toBe('down');
+      });
+   }
 });
