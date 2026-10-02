@@ -1,6 +1,6 @@
 import AddCustomTraitDialog from '~/document/types/item/dialog/AddCustomTraitDialog.js';
 import EditCustomTraitDialog from '~/document/types/item/dialog/EditCustomTraitDialog.js';
-import createItemCheckTemplate from '~/check/types/item-check/ItemCheckTemplate.js';
+import CheckListMixin from '~/document/types/item/CheckListMixin.js';
 import assert from '~/helpers/utility-functions/Assert.js';
 import getEffectCreationChanges from '~/helpers/utility-functions/GetEffectCreationChanges.js';
 
@@ -11,7 +11,7 @@ import getEffectCreationChanges from '~/helpers/utility-functions/GetEffectCreat
  * @property {TitanActiveEffectDataModel} system - The typed system data model for this Active Effect.
  * @extends {foundry.documents.ActiveEffect}
  */
-export default class TitanActiveEffect extends foundry.documents.ActiveEffect {
+export default class TitanActiveEffect extends CheckListMixin(foundry.documents.ActiveEffect) {
 
    /**
     * Builds the source data an Active Effect created from the given data stores, for an effect written as data instead
@@ -110,55 +110,6 @@ export default class TitanActiveEffect extends foundry.documents.ActiveEffect {
     */
    getRollData() {
       return this.system.getRollData();
-   }
-
-   /**
-    * Adds a new Check to this Active Effect.
-    * @returns {Promise<void>}
-    */
-   async addCheck() {
-      if (assert(
-         this.isOwner,
-         'Cannot modify document %s if not owner.',
-         this.name,
-      )) {
-         this.system.check.push(createItemCheckTemplate());
-         await this.update({
-            system: {
-               check: structuredClone(this.system.check),
-            },
-         });
-
-         // Notify the sheet of the added check.
-         if (this.sheet) {
-            this.sheet.postAddCheck();
-         }
-      }
-   }
-
-   /**
-    * Removes a Check from this Active Effect.
-    * @param {number} idx - The index of the Check in this Active Effect's Checks array.
-    * @returns {Promise<void>}
-    */
-   async deleteCheck(idx) {
-      if (assert(
-         this.isOwner,
-         'Cannot modify document %s if not owner.',
-         this.name,
-      )) {
-         // Notify the sheet before deletion.
-         if (this.sheet) {
-            this.sheet.preDeleteCheck(idx);
-         }
-
-         this.system.check.splice(idx, 1);
-         await this.update({
-            system: {
-               check: structuredClone(this.system.check),
-            },
-         });
-      }
    }
 
    /**

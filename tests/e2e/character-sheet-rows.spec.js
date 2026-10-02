@@ -921,6 +921,75 @@ test.describe('effect rows', () => {
    });
 });
 
+test.describe('effect check list', () => {
+   /** @type {string} The uuid of the effect whose checks the tests reorder. */
+   let effectUuid;
+
+   /**
+    * Reads the labels of the effect's checks.
+    * @returns {Promise<string[]>} The labels, in list order.
+    */
+   function readLabels() {
+      return page.evaluate(async (uuid) => (await fromUuid(uuid)).system.check.map((check) => check.label), effectUuid);
+   }
+
+   test.beforeEach(async () => {
+      /** @type {string} The new effect's id. */
+      const id = await addEffect(page, actorId, 'E2E Rows Check List Effect');
+      effectUuid = `${actorUuid}.ActiveEffect.${id}`;
+      await addCheck(page, effectUuid, { label: 'E2E Rows List Check A' });
+      await addCheck(page, effectUuid, { label: 'E2E Rows List Check B' });
+   });
+
+   test('dragging a check above another on the effect sheet reorders the checks', async () => {
+      const sheet = await openSheetByUuid(page, effectUuid);
+      await sheet.locator('.tab-list').getByText('Checks', { exact: true }).first().click();
+      const rows = sheet.locator('li.reorder-row');
+      await expect(rows, 'both checks render').toHaveCount(2);
+      await rows.nth(1).locator('[data-drag-handle]').dragTo(rows.nth(0), {
+         targetPosition: {
+            x: 20,
+            y: 3,
+         },
+      });
+      await expect.poll(readLabels, { message: 'the drag moved the second check first' }).toEqual([
+         'E2E Rows List Check B',
+         'E2E Rows List Check A',
+      ]);
+      expect(errors, `uncaught errors:\n${errors.join('\n')}`).toEqual([]);
+   });
+
+   test('dropping a check from an equipment sheet onto the effect sheet copies it in', async () => {
+      const sheet = await openSheetByUuid(page, effectUuid);
+      await sheet.locator('.tab-list').getByText('Checks', { exact: true }).first().click();
+      const rows = sheet.locator('li.reorder-row');
+      await expect(rows, 'both checks render').toHaveCount(2);
+
+      // The two windows open on top of each other, so they are moved apart (a window position is not a document).
+      const itemSheet = await openSheetByUuid(page, `${actorUuid}.Item.${itemIds.parity}`);
+      await itemSheet.locator('.tab-list').getByText('Checks', { exact: true }).first().click();
+      await page.evaluate(([itemSheetId, effectSheetId]) => {
+         foundry.applications.instances.get(itemSheetId).setPosition({ left: 10 });
+         foundry.applications.instances.get(effectSheetId).setPosition({ left: 900 });
+      }, [
+         await itemSheet.getAttribute('id'),
+         await sheet.getAttribute('id'),
+      ]);
+      await itemSheet.locator('li.reorder-row').first().locator('[data-drag-handle]').dragTo(rows.nth(0), {
+         targetPosition: {
+            x: 20,
+            y: 3,
+         },
+      });
+      await expect.poll(readLabels, { message: 'the drop copied the item check in at the top' }).toEqual([
+         'E2E Rows Parity Item Check',
+         'E2E Rows List Check A',
+         'E2E Rows List Check B',
+      ]);
+      expect(errors, `uncaught errors:\n${errors.join('\n')}`).toEqual([]);
+   });
+});
+
 test.describe('expanding rows', () => {
    for (const [label, tab, selector] of [
       [
@@ -1024,8 +1093,11 @@ test.describe('deleting rows', () => {
    const CONFIRMATION = '.application.titan-dialog[id^="titan-confirmation-dialog"]';
 
    /**
-    * Waits two animation frames. A dialog that the code after a refused delete would open is rendered within the same
-    * task as the refusal (a chain of promise continuations), so two frames after the refusal was counted show it.
+    * Waits two animation frames after a refused delete was counted, so that code which runs after the refusal has had
+    * time to act before a test asserts that nothing happened. Measured: with the confirm branch's `else` removed
+    * again, the dialog was present at the check in 6 of 6 runs of the item test and 6 of 6 of the effect test
+    * (`gate103-else-before-fix-item.log`, `gate103-else-before-fix-effect.log` and the `-run1` to `-run5` logs).
+    * The delay between the refusal and the dialog was not measured.
     * @returns {Promise<void>} Resolves after the second frame.
     */
    function settleFrames() {

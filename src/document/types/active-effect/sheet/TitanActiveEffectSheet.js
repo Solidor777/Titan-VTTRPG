@@ -119,4 +119,23 @@ export default class TitanActiveEffectSheet extends TitanDocumentSheet {
    preDeleteCheck(idx) {
       this.applicationState.preDeleteCheck(idx);
    }
+
+   /**
+    * Called after a Check of this Sheet's Active Effect is moved.
+    * @param {number} fromIdx - The Check's previous index.
+    * @param {number} toIdx - The insertion point the Check moved to.
+    * @returns {void}
+    */
+   postMoveCheck(fromIdx, toIdx) {
+      this.applicationState.postMoveCheck(fromIdx, toIdx);
+   }
+
+   /**
+    * Called after a Check is inserted into this Sheet's Active Effect.
+    * @param {number} atIdx - The index the Check was inserted at.
+    * @returns {void}
+    */
+   postInsertCheck(atIdx) {
+      this.applicationState.postInsertCheck(atIdx);
+   }
 }
