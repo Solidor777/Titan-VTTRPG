@@ -154,15 +154,15 @@ it ever bites in play, the principled fix is a per-message serial queue around
 
 ## 2026-09-09 — E2E 1-second operation budget
 
-- **Wait ceilings equal the budget.** 37 explicit `timeout:` values across `tests/e2e` and `tests/shared` are
+- **Wait ceilings equal the budget.** 38 explicit `timeout:` values across `tests/e2e` and `tests/shared` are
   1000 ms, so an operation exceeding the budget fails loudly instead of silently absorbing 15 s. Every other explicit
   ceiling is a deliberate multi-second exemption listed in titan-codebase `conventions.md` ("No e2e operation may
-  exceed 1 second"): the world boot (`fixtures.js:56`), the shared reload (`world.js:430-431`, `reloadWorld`, which
-  every mid-file reload goes through), a second client's login (`multiClient.js:49`), the Player HUD waits after a
+  exceed 1 second"): the world boot (`fixtures.js:46`), the shared reload (`world.js:442-443`, `reloadWorld`, which
+  every mid-file reload goes through), a second client's login (`multiClient.js:58`), the Player HUD waits after a
   boot (`pack-conversion.spec.js:51`, `condition-migration.spec.js:186`, `converted-effect-identity.spec.js:109`),
   the scrolling-text wait (`condition-description.spec.js:283`) and the confirmed migration
   (`condition-migration.spec.js:532`). Do not sweep these to 1 s. Measured 2026-10-01
-  (`.superpowers/sdd/test-suite-rewrite/phase-0/fix5d-e2e-timeouts.txt`).
+  (`.superpowers/sdd/test-suite-rewrite/phase-0/fix5e-e2e-timeouts.txt`).
 - **`titanWait`'s default timeout is 1000ms** (`tests/e2e/poll.js`), and no call passes a longer one: of 118
   `titanWait(` calls, 3 pass `timeout: 1000` and the rest use the default (measured 2026-10-01, same file). In the
   2026-09-09 two consecutive full-suite runs (497/497 each) no `titanWait timed out after 1000ms` failure occurred.

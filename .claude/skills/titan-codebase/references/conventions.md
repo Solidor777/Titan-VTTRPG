@@ -795,10 +795,11 @@ pack LevelDB locks. `tests/unit/SuperviseServer.test.js` covers spawn/reuse/tear
 `tests/e2e/`: `render-smoke.spec.js` (renders every document type's
 sheet, asserts zero uncaught page errors), `interaction-rolls.spec.js` (each `roll<Type>Check` posts a
 chat message of the expected subtype (`message.type`) and the card renders), and `interaction-dialogs.spec.js`
-(check/confirm/trait/edit-UUID dialogs mount). `tests/e2e/fixtures.js` provides `login`, `renderSheet`,
-and `ensureDocument` (creates missing world fixtures; `renderSheet` takes an optional 4th `errors`
-collector — see the shared-world harness below). Drives the real built system at the repo root, so it
-catches v14 API breaks that the mocked Vitest tier cannot.
+(check/confirm/trait/edit-UUID dialogs mount). `tests/e2e/harness.js` provides `test`, `expect` and
+`flushPageErrors`; `tests/e2e/fixtures.js` provides `joinWorld`, `login`, `renderSheet` and `ensureDocument` (creates
+missing world fixtures; `renderSheet` takes the spec's `errors` collector as its 4th argument — see the shared-world
+harness below). Drives the real built system at
+the repo root, so it catches v14 API breaks that the mocked Vitest tier cannot.
 
 **Shared-world E2E harness (one world boot per FILE)** — every eligible spec boots the world ONCE per
 file, not per test. The pattern: module-scoped `let page; let errors;` plus three inline lifecycle hooks
@@ -826,20 +827,33 @@ scoped to the open sheet — `page.locator('.application.titan-document-sheet [d
 GM→player socket replication does not time out). `attachPageErrors(page)` wires ONE `pageerror` listener
 and returns the shared `errors` array; per-test `page.on('pageerror', …)` is banned (it would stack on the
 reused page) — fold any per-test error assertion onto the shared `errors`, which is reset each `afterEach`.
-A `pageerror` never includes a hook listener's throw: core's `Hooks.#call` catches it and reports it through
-`Hooks.onError`, which logs it and calls the `error` hook (Foundry 14.364 `client/helpers/hooks.mjs:158-168,
-182-188`). So `login` (`fixtures.js`) calls `world.js` `installHookErrorReporting(page)` before navigating: an init
-script registers an `error` hook listener the moment core assigns the `Hooks` global (`client/client.mjs` assigns it
-through `Object.assign(globalThis, …)`, which calls the script's setter), and an exposed binding pushes each report,
-as `Hooks.onError (<location>): <message>`, into every array `attachPageErrors` returned for that page. Every
-spec that asserts its `errors` therefore also fails on errors core reports through `Hooks.onError`, on every client
-page (`multiClient.js` logs in through `login`); a collector attached after login sees reports from then on. The boot
-itself is gated by `login`: it collects the page errors raised from the join screen until `game.ready`, reads the
-document's own report list (`readHookErrorReports`, filled synchronously by the same init script, so it holds the
-reports made before any collector existed, including from `init`/`setup`/`ready` listeners), and fails when either is
-non-empty. Core sets `game.ready` and calls the `ready` hook synchronously (`client/game.mjs:777-779`), so that read
-follows every synchronous `ready` listener. Console output is not read, so its noise (`ERR_CONNECTION_REFUSED`,
-vendor warnings) never reaches the array.
+A `pageerror` never includes a hook listener's throw: core's `Hooks.#call` catches it and passes it to
+`Hooks.onError`, which logs it and calls the `error` hook only when the thrown value is an `Error`
+(`Error.isError`); a thrown non-`Error` value is logged by `Hooks.#call` as a console warning and reported nowhere, so
+no harness sees it (Foundry 14.364 `client/helpers/hooks.mjs:158-168, 182-188`). `world.js`
+`installHookErrorReporting(page)` runs before the first navigation: an init script registers an `error` hook listener
+the moment core assigns the `Hooks` global (`client/client.mjs` assigns it through `Object.assign(globalThis, …)`,
+which calls the script's setter), and an exposed binding pushes each report, as `Hooks.onError (<location>):
+<message>`, into every array `attachPageErrors` returned for that page. The binding is asynchronous, so the document
+also counts its reports; `flushHookErrorReports(page)` waits until the delivered count matches.
+**Harness gate (every test, every world page).** Every spec imports `expect` and `test` from `tests/e2e/harness.js`,
+never from `@playwright/test` (`tests/unit/E2eTestImport.test.js` fails on any other way of reaching Playwright's
+`test`). `fixtures.js` `joinWorld` (which `login` calls, and `withClients` through it for every second client) attaches
+a collector before the page's first navigation and records the page (`harness.js` `trackWorldPage`), so it collects
+from boot onward. `test` carries
+two automatic fixtures: after each test, including its `afterEach` hooks, it flushes every recorded open page and fails
+the test on any error collected since the previous check, naming the user and the spec that logged the page in; a
+worker-scoped one does the same after the worker's last test. Errors raised in a `beforeAll` after the boot fail the
+file's first test; errors in an `afterAll` fail the next test of the worker, or the worker's teardown after the last
+one. `withClients` flushes each client before closing its context (a closed page cannot be flushed). A spec's own
+`attachPageErrors` collector is optional: it adds an assertion at a chosen point, on a chosen page.
+**Boot gate.** `login` fails when the boot raised an error: `joinWorld` waits for `game.ready`, flushes, and returns
+the page errors and hook errors collected from the join screen on, including from `init`/`setup`/`ready` listeners;
+they are marked checked, so the harness gate does not report them again. Core sets `game.ready` and calls the `ready`
+hook synchronously (`client/game.mjs:777-779`), so the read follows every synchronous `ready` listener. The cleanup
+tool `census.js` calls `joinWorld` without the assertion: a boot error is printed in its JSON (`bootErrors`) and sets
+exit code 1, but never stops the census or the sweep, which may be what removes the documents behind the error.
+Console output is not read, so its noise (`ERR_CONNECTION_REFUSED`, vendor warnings) never reaches a collector.
 **Not migrated** (self-managed `BrowserContext`s via `multiClient.js`): `multi-client.spec.js`,
 `socket-sync.spec.js`, `permissions-compendium.spec.js`, `permissions-ownership.spec.js`,
 `permissions-auto-open.spec.js`. Fast-check (`injectFastCheck` → `page.addInitScript`) must run in
@@ -1047,7 +1061,7 @@ with the highest role that GM. The last test of `condition-description.spec.js`,
 `player-hud-layout.spec.js` and `portrait-persistence.spec.js`'s `readImageAfterReload` call `reloadWorld(page)` with
 the default predicate. `tests/unit/E2eReloads.test.js` reads every source under `tests/e2e` and `tests/shared` as
 syntax (`parseSource.js`, code strings included) and fails on any page navigation outside its two permitted sites —
-`world.js`'s one `.reload(` (in `reloadWorld`) and `fixtures.js`'s one `.goto(` (in `login`): a `reload(` or
+`world.js`'s one `.reload(` (in `reloadWorld`) and `fixtures.js`'s one `.goto(` (in `joinWorld`): a `reload(` or
 `debouncedReload(` call through any receiver (`page.reload(`, `location.reload(`), `location.assign(`/`.replace(`, an
 assignment to `location` or `location.href`, or a `goto(`/`goBack(`/`goForward(` call. `page.on('console')` and
 `attachPageErrors` listeners survive reloads (they attach to the Page object). Sequence:
@@ -1101,8 +1115,9 @@ shell on this machine crashes its worker processes at startup with Windows statu
 **Multi-client harness** — `tests/e2e/multiClient.js` (Phase 4) provides two helpers for tests that
 require simultaneous Foundry sessions: `withClients(browser, clientSpec, fn)` creates one independent
 `BrowserContext` per entry in `clientSpec` (a `{label: userName}` map), logs each in via `login()`, then
-calls `fn(pages)` where `pages` maps each label to its `Page`. All contexts are closed in `finally` even
-if the callback throws. `awaitUsersActive(page, userNames)` polls `game.users.getName(name)?.active`
+calls `fn(pages)` where `pages` maps each label to its `Page`, then flushes each client's errors
+(`flushPageErrors`) for the harness gate. All contexts are closed in `finally` even if the callback or a login
+throws. `awaitUsersActive(page, userNames)` polls `game.users.getName(name)?.active`
 inside `page.waitForFunction` (30 s timeout) until all named users are active on that client. Because
 `playwright.config.mjs` uses `workers: 1`, logins are sequential and there are no race conditions on
 the `/join` form. The smoke test is `tests/e2e/multi-client.spec.js`.
