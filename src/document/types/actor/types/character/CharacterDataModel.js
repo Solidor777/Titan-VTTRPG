@@ -6341,18 +6341,21 @@ export default class CharacterDataModel extends TitanActorDataModel {
          }
 
          // Otherwise, confirm deleting the item.
-         const item = this.parent.items.get(itemId);
-         if (item) {
-            new ConfirmDeleteItemDialog(
-               this.parent,
-               item,
-            ).render(true);
+         else {
+            const item = this.parent.items.get(itemId);
+            if (item) {
+               new ConfirmDeleteItemDialog(
+                  this.parent,
+                  item,
+               ).render(true);
+            }
          }
       }
    }
 
    /**
-    * Deletes an Item from this Character without confirmation dialog.
+    * Deletes an Item from this Character without confirmation dialog, through the same path the confirmation dialog
+    * uses (`TitanActor#deleteItem`), so equipped armor and shields are un-equipped first.
     * @param {string} itemId - The ID of the Item to be deleted.
     * @returns {Promise<void>}
     */
@@ -6362,7 +6365,7 @@ export default class CharacterDataModel extends TitanActorDataModel {
          'Cannot modify document %s if not owner.',
          this.parent.name,
       )) {
-         await this.parent.deleteEmbeddedDocuments('Item', [itemId]);
+         await this.parent.deleteItem(itemId);
       }
    }
 
@@ -6385,12 +6388,14 @@ export default class CharacterDataModel extends TitanActorDataModel {
          }
 
          // Otherwise, confirm deleting the effect.
-         const effect = this.parent.effects.get(effectId);
-         if (effect) {
-            new ConfirmDeleteEffectDialog(
-               this.parent,
-               effect,
-            ).render(true);
+         else {
+            const effect = this.parent.effects.get(effectId);
+            if (effect) {
+               new ConfirmDeleteEffectDialog(
+                  this.parent,
+                  effect,
+               ).render(true);
+            }
          }
       }
    }
