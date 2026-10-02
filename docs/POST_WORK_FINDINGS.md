@@ -262,17 +262,3 @@ it ever bites in play, the principled fix is a per-message serial queue around
   when their `createNewId()` resolves. Measured in `test-titan` (Task 5 fix round 2): entries with their own `_id`
   came first in 3 of 3 runs, and generated ones came back reordered (for example `[C1, C3, C2]`) in 2 of 3 runs. Code
   and tests that pair created documents with their inputs must match them by id or name, never by position.
-
-## 2026-10-01 — Deactivating the viewed scene during a status's scrolling text throws
-
-- **Measured** (probe, `test-titan`, logged in as E2E GM 1):
-  - Setup: a token's actor gains a status (`toggleStatusEffect`), which starts core's 2 s scrolling text. The viewed
-    scene is then deactivated at once (`scene.update({ active: false })`).
-  - Result: the page throws `TypeError: Cannot read properties of null (reading 'off')` at `PreciseText.destroy` ←
-    `InterfaceCanvasGroup.createScrollingText` (`client/canvas/groups/interface.mjs:174`).
-  - Control: the same steps with a 2.6 s wait before the deactivation threw nothing.
-- **Inferred, not verified:** the canvas teardown destroys the running text, and the animation's own `destroy` then
-  runs a second time.
-- **Attribution not measured:** no run without TITAN was made.
-- **Impact:** the e2e test of CLOSED_BUGS #113 (`condition-description.spec.js`, last test) reloads the page
-  before it deactivates the scene, so no earlier test's scrolling text is still running.

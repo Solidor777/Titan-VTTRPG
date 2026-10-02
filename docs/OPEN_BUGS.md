@@ -148,3 +148,15 @@ Deferred/known bugs. Todos (planned work) live in `docs/TODO.md`; this file is b
 - **Found:** 2026-10-01 by a reviewer of the test-suite rewrite plan.
 - **Status:** Open. The user deferred it on 2026-10-01 to the document inheritance campaign (`docs/TODO.md`), together
   with #110.
+
+### 114. Deactivating the viewed scene while a status's scrolling text is on screen throws
+
+- **Measured** (probe, `test-titan`, logged in as E2E GM 1):
+  - Setup: a token's actor gains a status (`toggleStatusEffect`), which starts the 2 s scrolling text. The viewed
+    scene is then deactivated at once (`scene.update({ active: false })`).
+  - Result: the page throws `TypeError: Cannot read properties of null (reading 'off')` at `PreciseText.destroy` ←
+    `InterfaceCanvasGroup.createScrollingText` (`client/canvas/groups/interface.mjs:174`).
+  - Control: the same steps with a 2.6 s wait before the deactivation threw nothing.
+- **Cause:** not yet located. Attribution to core or TITAN not measured.
+- **Found:** 2026-10-01 while writing the gate test of CLOSED_BUGS #113 (test-suite rewrite, Phase 0 fix round 1).
+- **Status:** Open. The #113 gate test reloads the page before it deactivates the scene, which avoids the throw.
