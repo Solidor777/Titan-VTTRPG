@@ -1062,12 +1062,16 @@ shell on this machine crashes its worker processes at startup with Windows statu
 (process-initialization failure), so the run dies before any test executes. Always run
 `npm run test:e2e` from a foreground shell.
 
-**Multi-client harness** — `tests/e2e/multiClient.js` (Phase 4) provides two helpers for tests that
+**Multi-client harness** — `tests/e2e/multiClient.js` (Phase 4) provides three helpers for tests that
 require simultaneous Foundry sessions: `withClients(browser, clientSpec, fn)` creates one independent
 `BrowserContext` per entry in `clientSpec` (a `{label: userName}` map), logs each in via `login()`, then
 calls `fn(pages)` where `pages` maps each label to its `Page`, then flushes each client's errors
 (`flushPageErrors`) for the harness gate. All contexts are closed in `finally` even if the callback or a login
-throws. `awaitUsersActive(page, userNames)` polls `game.users.getName(name)?.active`
+throws. `seedEncounterForClients(gm, viewers, seed)` seeds an encounter unstarted on the GM's client, calls
+`viewCombat` on every other client, then starts it: a combat tracker keeps viewing the combat it has (the world's own
+scene-less combat, from the first render), and core's `CombatTracker#_onRender` throws on each round or turn update of
+a combat it does not view, so a client must view the encounter before it starts.
+`awaitUsersActive(page, userNames)` polls `game.users.getName(name)?.active`
 inside `page.waitForFunction` (30 s timeout) until all named users are active on that client. Because
 `playwright.config.mjs` uses `workers: 1`, logins are sequential and there are no race conditions on
 the `/join` form. The smoke test is `tests/e2e/multi-client.spec.js`.

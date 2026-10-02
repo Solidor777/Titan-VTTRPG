@@ -183,13 +183,16 @@ distinct. Vitest is configured in `vitest.config.mjs` (`environment: 'happy-dom'
   - `builders.js` — pure factory functions returning plain `Document.create` payloads (no live documents,
     no side effects); consumed by Vitest directly and by Playwright via `Document.create` or
     `page.evaluate`.
-  - `combat.js` — `seedCombatEncounter` and `teardownCombatEncounter`: self-contained async functions
-    designed to be passed directly to `page.evaluate`. `seedCombatEncounter` creates two actors, a scene,
-    one token per actor on the scene, a `Combat` document bound to the scene, and two `Combatant` documents
-    with explicit deterministic initiative (effect actor at the lower value = turn index 1; other actor at
-    the higher value = turn index 0 after `startCombat`). Returns `{sceneId, combatId, effectActorId,
-    otherActorId, effectCombatantId}`. `teardownCombatEncounter` deletes combat, scene, and both actors in
-    that order.
+  - `combat.js` — `seedCombatEncounter`, `viewCombat`, `startCombatEncounter` and `teardownCombatEncounter`:
+    self-contained async functions designed to be passed directly to `page.evaluate`. `seedCombatEncounter`
+    creates two actors, an INACTIVE scene (`active: false`; an activated scene draws its canvas on every client
+    while tokens are created on it), one token per actor on the scene, a `Combat` document bound to the scene,
+    and two `Combatant` documents with explicit deterministic initiative (effect actor at the lower value = turn
+    index 1; other actor at the higher value = turn index 0 after `startCombat`). It sets the seeding client's
+    `ui.combat.viewed` and starts the combat unless `start: false`. Returns `{sceneId, combatId, effectActorId,
+    otherActorId, effectCombatantId}`. `viewCombat(combatId)` makes another client's tracker view the combat and
+    `startCombatEncounter(combatId)` starts it. `teardownCombatEncounter` deletes combat, scene, and both actors
+    in that order. A multi-client spec seeds through `seedEncounterForClients` (`tests/e2e/multiClient.js`).
 - `tests/e2e/` — Playwright end-to-end specs targeting a live Foundry instance.
   - `combat-seed.spec.js` — Phase 4 smoke test (1 test): seeds a two-combatant encounter with
     `seedCombatEncounter`, then probes that `combat.turns.length === 2`, `combatant.actor` resolves to the

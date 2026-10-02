@@ -1352,3 +1352,105 @@ when fixed.
     placement check finds no token placeable for the actor (`TypeError: Cannot read properties of undefined (reading
     'center')`), the page logs the `addChild` error, and the file's teardown hits the `'OBJECTS'` TypeError in
     `RenderFlags.clear`. The helper and the spec are replaced in the test-suite rewrite (Phases 5-6).
+
+### 115. A turn report threw when an owning player had no assigned character
+
+Found 2026-10-01 when the e2e harness gate began failing tests on page errors (test-suite rewrite, Phase 0 fix round
+5e). The evidence files named here are in `.superpowers/sdd/test-suite-rewrite/phase-0/` (local, not checked in).
+
+- **Measured** (`e2e-fix5e-gate.log`; stacks in `fix5e-diag-stacks-all.log`): every `socket-sync.spec.js` test raised
+  `TypeError: Cannot read properties of null (reading 'id')` on E2E GM 1, in a `filter` callback of
+  `getBestPlayerOwner` <- `_getTurnReportUserID` <- `onTurnStart` / `onTurnStartReverted`.
+- **Cause, read:** `src/helpers/utility-functions/GetBestPlayerOwner.js` compared `owner.character.id` for each player
+  owner. A user's `character` is a nullable `ForeignDocumentField` (Foundry 14.364 `common/documents/user.mjs:57`;
+  `common/data/fields.mjs` `ForeignDocumentField` defaults `nullable: true`), so an owner with no assigned character
+  throws.
+- **Fixed:** 2026-10-01 (commit `7ee14f8b`): both comparisons read `owner.character?.id`. Measured after the fix
+  (`fix5e-diag-stacks-socket-sync-after-115-fix.log`): 0 `reading 'id'` errors (20 matching lines before,
+  `fix5e-diag-stacks-all.log`).
+- **Gate test:** `socket-sync.spec.js` (A1-A5) under the harness gate, which fails on this error. It also failed on
+  #116 and #118 until those were fixed: 5 of 5 failed in `fix6-before-combat-seed-socket-sync.log`, and all passed in
+  `fix6-after-combat-seed-socket-sync.log`. The full e2e passed 656 of 656 (`e2e-fix6-gate.log`).
+
+### 116. The combat tracker of a client threw on every update of an encounter it was not viewing
+
+The evidence files named here are in `.superpowers/sdd/test-suite-rewrite/phase-0/` (local, not checked in). Core
+citations refer to Foundry 14.364 at `C:\FoundryVTT\V14\dev\foundry`.
+
+- **Reported:** in every `socket-sync.spec.js` test, the E2E Player 1 client (and in A5 the E2E GM 2 client) raised
+  `TypeError: Cannot use 'in' operator to search for 'turn' in undefined` at `CombatTracker._onRender`
+  (`e2e-fix5e-gate.log`, `fix5e-diag-stacks-all.log`). Every stack frame is `foundry.mjs`.
+- **Measured** (`fix6-probe-116.mjs`; `fix6-probe-116-as-is.log`, `fix6-probe-116-as-is-timeline.log`; `test-titan`,
+  TITAN loaded, E2E GM 1 seeding, E2E Player 1 observing): a wrapper recorded every `CombatTracker#_onRender` on the
+  player's page.
+  - `test-titan` holds one combat of its own (id `HEMLYsZTfLuZU2oi`: no scene, four combatants, none E2E-named, so the
+    census does not count it; `fix6-inspect-world-1.log`). Before the seed, every client's tracker viewed it.
+  - The seeded combat's `startCombat` updates (round, then turn) rendered the player's tracker with the seeded
+    combat's data while `viewed` was still `HEMLY...`: `renderData` held only the seeded combat's id, `find` found
+    nothing, and both renders threw. About 1 s later the tracker's `viewed` changed to the seeded combat (a render with
+    a `combat` option; what issued it was not traced, and it is inferred to be the scene activation of #118), and
+    later updates did not throw.
+  - With the seeded scene created inactive (the #118 fix) and no `viewCombat`, the player's tracker never left
+    `HEMLY...` and the updates of the seeded combat threw (`fix6-probe-116-inactive-scene-no-viewCombat.log`).
+- **Cause:** a core defect with a test-setup trigger. Read: `CombatTracker#_onRender` evaluates `"turn" in data` on the
+  `find` result with no check (`client/applications/sidebar/tabs/combat-tracker.mjs:185-188`), and
+  `_configureRenderOptions` infers a combat to view only while `viewed` is null (`:105-113`, `#inferCombat` `:759`).
+  The trigger is the test's: `seedCombatEncounter` set `ui.combat.viewed` on the seeding client only, so each other
+  client kept viewing the world's own combat while the seeded one started. No TITAN frame is in any stack. **Not
+  run:** a control in a world without TITAN.
+- **Fixed:** 2026-10-02, in the test layer. `tests/shared/combat.js` gains `viewCombat(combatId)` (sets the client's
+  `ui.combat.viewed`, the way core documents for changing the viewed combat, `combat-tracker.mjs:786-789`) and
+  `startCombatEncounter(combatId)`; `seedCombatEncounter` takes `start` (default true).
+  `seedEncounterForClients(gm, viewers, seed)` in `tests/e2e/multiClient.js` seeds unstarted, calls `viewCombat` on
+  every other client, then starts. `socket-sync.spec.js` seeds through it (A1-A4 with the player, A5 with E2E GM 2).
+- **Gate test:** `socket-sync.spec.js` A1-A5. Before: 5 of 5 failed (`fix6-before-combat-seed-socket-sync.log`). After:
+  5 of 5 passed (`fix6-after-combat-seed-socket-sync.log`); full e2e 656 of 656 (`e2e-fix6-gate.log`).
+
+### 117. Deleting a chat message while core posted its notification threw
+
+The evidence files named here are in `.superpowers/sdd/test-suite-rewrite/phase-0/` (local, not checked in). Core
+citations refer to Foundry 14.364 at `C:\FoundryVTT\V14\dev\foundry`.
+
+- **Reported:** `spell-rules-regressions.spec.js:473` raised `TypeError: Cannot set properties of null (setting
+  'hidden')` at `#postNotification` (`e2e-fix5e-gate.log`, `fix5e-diag-stacks-all.log`).
+- **Read:** `ChatLog#postNotification` awaits a 100 ms spacer animation, then re-queries the notification by message
+  id and sets `element.hidden = false` with no null check (`client/applications/sidebar/tabs/chat.mjs:1296-1304`), and
+  deleting a message removes its notification element (`:1234`).
+- **Measured** (`fix6-probe-117.mjs`, `fix6-probe-117.log`; E2E GM 1, TITAN loaded, plain `ChatMessage.create`, 3
+  repeats per delay, delay counted from the card appearing in `#chat`): the deletion raised exactly this error in 3 of
+  3 at 0 ms, 3 of 3 at 20 ms, 1 of 3 at 60 ms, 2 of 3 at 100 ms, and 0 of 3 at 150, 300 and 600 ms.
+  `fix6-probe-117-dom.log` (one message): the notification element (in `#chat-notifications`) was still `hidden` 50 ms
+  after the first sample and shown at 150 ms after it.
+- **Cause:** a core defect with a test trigger. The spec deleted its card in the `finally` block right after the card
+  appeared in `#chat` (`tests/e2e/spell-rules-regressions.spec.js`), inside that window. The race needs no TITAN
+  document (the probe used a base message), but no run without TITAN loaded was made.
+- **Fixed:** 2026-10-02. The spec waits for the notification to be shown
+  (`#chat-notifications .message[data-message-id=...]:not([hidden])`) before it deletes the card.
+- **Gate test:** `spell-rules-regressions.spec.js:473`. Before: failed in 3 of 3 runs
+  (`fix6-before-spell-rules-regressions-run1.log` to `-run3.log`). After: the file passed 9 of 9 in each of 3 runs
+  (`fix6-after-spell-rules-regressions-run1.log` to `-run3.log`); full e2e 656 of 656 (`e2e-fix6-gate.log`).
+
+### 118. Seeding a combat with no active scene created tokens on a scene whose canvas was still drawing
+
+The evidence files named here are in `.superpowers/sdd/test-suite-rewrite/phase-0/` (local, not checked in). Core
+citations refer to Foundry 14.364 at `C:\FoundryVTT\V14\dev\foundry`.
+
+- **Reported:** with no active scene, `combat-seed.spec.js` raised `TypeError: Cannot read properties of undefined
+  (reading 'addChild')` twice at `GridLayer.addHighlightLayer` <- `TokenRuler.draw` <- `Token._draw`
+  (`fix5e-diag-stacks-combat-seed-no-active-scene.log`); `socket-sync.spec.js` also raised `Cannot read properties of
+  undefined (reading 'OBJECTS')` at `RenderFlags.set` <- `TokenDocument._onRelatedUpdate` on E2E Player 1
+  (`fix5e-diag-stacks-socket-sync-after-115-fix.log`).
+- **Measured** (`fix6-probe-116-as-is.log`; `test-titan` with no active scene before the seed): after
+  `seedCombatEncounter`, the scene it created was the active and viewed scene on both clients
+  (`activeScene: "E2E Probe116 Scene"`). The earlier description of this bug, a scene that is not activated, did not
+  hold for this world state.
+- **Read:** `Scene._preCreateOperation` activates a created scene when no scene is active, unless the scene's data names
+  `active` (`client/documents/scene.mjs:1038-1042`), and `_onActivate` views it (`:1401-1402`), which draws its canvas
+  on every client. The helper then created tokens, and the test later updated actors, while those canvases were still
+  drawing. The frames are the ones of CLOSED_BUGS #113, whose cause was the same order of events.
+- **Fixed:** 2026-10-02. `seedCombatEncounter` creates its scene with `active: false`, so it is never drawn. No combat
+  code reads the canvas (read: `grep` of `src` finds `canvas.` only in `GetControlledTokens.js`); the combatants
+  resolve through the scene's token documents.
+- **Gate test:** `combat-seed.spec.js` and `socket-sync.spec.js` with no active scene (the state of `test-titan`).
+  Before: 6 of 6 failed (`fix6-before-combat-seed-socket-sync.log`). After: 6 of 6 passed
+  (`fix6-after-combat-seed-socket-sync.log`); full e2e 656 of 656 (`e2e-fix6-gate.log`).

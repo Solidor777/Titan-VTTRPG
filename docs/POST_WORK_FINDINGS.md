@@ -117,17 +117,16 @@ HUD silently stale — no error surfaces. Flagged by the 2026-06-11 final branch
 
 Core's `CombatTracker._onRender` (`client/applications/sidebar/tabs/combat-tracker.mjs:185-188`)
 does `data = renderData.find(d => d._id === this.viewed?.id)` and then `"turn" in data` — when an
-`updateCombat` render arrives for a combat the tracker is NOT viewing (e.g. a combat bound to a
-non-viewed scene), the `find` returns `undefined` and the render throws an uncaught
-`Cannot use 'in' operator to search for 'turn' in undefined` on every round/turn update. Core bug,
-not ours (we have no engine fork). Mitigation in our harness: `tests/shared/combat.js`
-`seedCombatEncounter` sets `ui.combat.viewed` to the seeded combat (the posture of a GM actually
-running the encounter) and `teardownCombatEncounter` clears it. The mitigation is PER-CLIENT: it
-covers only the page that evaluated the seeder, so a multi-client spec that attaches page-error
-assertions to a NON-seeding client must set `ui.combat.viewed` on that client too (today
-`socket-sync.spec.js` does not assert page errors on the remote client, so the throw is unobserved
-there); likewise any combat-driving e2e that bypasses the shared seeder. Surfaced by the
-`effectsExpiredReport` e2e (TODO #13).
+`updateCombat` render arrives for a combat the tracker is NOT viewing, the `find` returns
+`undefined` and the render throws an uncaught
+`Cannot use 'in' operator to search for 'turn' in undefined` on every round/turn update. The tracker
+keeps the combat it views (`_configureRenderOptions` infers one only while `viewed` is null). Measured
+in `test-titan` (CLOSED_BUGS #116): every client views the world's own scene-less combat, so a seeded
+encounter's updates throw on each client that does not view it. Harness: `seedCombatEncounter` sets
+`ui.combat.viewed` on the seeding client and `teardownCombatEncounter` clears it; a spec with other
+clients seeds through `seedEncounterForClients` (`tests/e2e/multiClient.js`), which makes each client
+view the combat before it starts. Any other combat-driving e2e that bypasses the shared seeder must do
+the same on every connected client. Surfaced by the `effectsExpiredReport` e2e (TODO #13).
 
 ### Clone-then-update chat handlers: last-write-wins window (TODO #11 refactor, 2026-06-06)
 
