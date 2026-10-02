@@ -826,6 +826,10 @@ scoped to the open sheet — `page.locator('.application.titan-document-sheet [d
 GM→player socket replication does not time out). `attachPageErrors(page)` wires ONE `pageerror` listener
 and returns the shared `errors` array; per-test `page.on('pageerror', …)` is banned (it would stack on the
 reused page) — fold any per-test error assertion onto the shared `errors`, which is reset each `afterEach`.
+A `pageerror` never includes a hook listener's throw: core's `Hooks.#call` catches it and reports it through
+`Hooks.onError`, which logs it and calls the `error` hook (Foundry 14.364 `client/helpers/hooks.mjs:158-168,
+182-188`). A test that must prove a listener raised nothing records the `error` hook, as `effect-tray.spec.js`
+`recordHookErrors` does for the #112 test on both clients; console output is not used (it carries unrelated noise).
 **Not migrated** (self-managed `BrowserContext`s via `multiClient.js`): `multi-client.spec.js`,
 `socket-sync.spec.js`, `permissions-compendium.spec.js`, `permissions-ownership.spec.js`,
 `permissions-auto-open.spec.js`. Fast-check (`injectFastCheck` → `page.addInitScript`) must run in
