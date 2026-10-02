@@ -484,6 +484,49 @@ export async function controlPlacedToken(page, tokenId) {
 }
 
 /**
+ * Reads the ids of the tokens the logged-in user targets.
+ * @param {import('@playwright/test').Page} page - A logged-in GM page.
+ * @returns {Promise<string[]>} The ids of the targeted tokens, in the order they were targeted.
+ */
+export async function targetedTokenIds(page) {
+   return page.evaluate(() => [...game.user.targets].map((token) => token.id));
+}
+
+/**
+ * Targets a placed token with core's Target key (T) while the pointer hovers it; Shift+T adds to the current targets
+ * instead of replacing them. `game.user.targets` then holds the real Token object.
+ * @param {import('@playwright/test').Page} page - A logged-in GM page viewing the token's scene.
+ * @param {string} tokenId - The token on the viewed scene.
+ * @param {object} [options] - Targeting options.
+ * @param {boolean} [options.add] - Whether to keep the other targets.
+ * @returns {Promise<void>} Resolves once the token is targeted.
+ */
+export async function targetPlacedToken(page, tokenId, { add = false } = {}) {
+   await hoverToken(page, tokenId);
+   await page.keyboard.press(add ? 'Shift+KeyT' : 'KeyT');
+   await expect.poll(
+      () => targetedTokenIds(page),
+      { message: 'the Target key targeted the token' },
+   ).toContain(tokenId);
+}
+
+/**
+ * Releases every target with the Target key, one hovered token at a time.
+ * @param {import('@playwright/test').Page} page - A logged-in GM page viewing the targeted tokens' scene.
+ * @returns {Promise<void>} Resolves once the user targets no token.
+ */
+export async function releaseTargets(page) {
+   for (const tokenId of await targetedTokenIds(page)) {
+      await hoverToken(page, tokenId);
+      await page.keyboard.press('KeyT');
+      await expect.poll(
+         () => targetedTokenIds(page),
+         { message: 'the Target key released the token' },
+      ).not.toContain(tokenId);
+   }
+}
+
+/**
  * Unlinks a placed token with the Unlink button in the header of its actor's sheet, which the double-click on the
  * token opened. The unlink is irreversible: the sheet closes and the token's own synthetic actor's sheet opens.
  * @param {import('@playwright/test').Page} page - A logged-in GM page viewing the token's scene.

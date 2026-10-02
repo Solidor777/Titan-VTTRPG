@@ -1552,3 +1552,19 @@ The evidence files named here are in `.superpowers/sdd/test-suite-rewrite/phase-
 - **Gate test:** `tests/e2e/character-sheet-rows.spec.js` ("equipping Heavy armor lowers non-zero speeds by 1": the
   Heavy trait is chosen and applied in the armor's Edit Traits dialog). Before: failed with the `structuredClone`
   error and the dialog still open (`gate120-before-fix.log`). After: passed (`gate120-after-fix.log`).
+
+### 121. `checks-opposed.spec.js` threw `_drawTargetArrows is not a function` when GM 1 viewed a drawn scene
+
+- **Cause (measured):** the spec replaced `game.user.targets` with a `Set` of plain `{ actor }` objects during each
+  roll. Core's token-layer ticker calls `t._drawTargetArrows(config)` on every entry each frame
+  (`foundry/client/canvas/layers/tokens.mjs:466`, read), so a frame inside the roll window threw. Alone the spec passed
+  7 of 7 runs (`phase-3/opposed-alone-1.log`, `opposed-alone-r1.log` to `-r6.log`); right after the "check tags across
+  surfaces" tests of `character-sheet-rows.spec.js`, which view the shared scene as E2E GM 1, it failed 3 of 3
+  (`rows-then-opposed-1.log` to `-3.log`). Both earlier Part A full runs failed on it.
+- **Fix:** the spec targets real placed tokens through core's Target key (`targetPlacedToken`, `releaseTargets` in
+  `tests/e2e/flows.js`), so `game.user.targets` holds real Token objects. No fake targets remain.
+- **Gate:** `checks-opposed.spec.js` passes alone (`phase-3/opposed-real-alone-1.log`), after the rows spec's token
+  tests in 2 of 2 runs (`rows-then-opposed-real-1.log`, `-2.log`), and in full-suite order (`phase-3/e2e-full-3.log`:
+  628 passed, 0 failed, census zero).
+- **Found:** 2026-10-02 in Phase 3 Part A. **Closed:** 2026-10-02.
+

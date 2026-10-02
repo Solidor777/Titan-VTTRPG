@@ -3,6 +3,14 @@ import { login } from './fixtures.js';
 import { attachPageErrors, clearChat, closeAllApps } from './world.js';
 import { forceDice, resetDice } from './dice.js';
 import {
+   placeToken,
+   releaseTargets,
+   shared,
+   targetPlacedToken,
+   targetedTokenIds,
+   viewScene,
+} from './flows.js';
+import {
    buildE2EAttackerRatingItemData,
    buildE2ERollerActorData,
    buildE2ERollerItemData,
@@ -13,7 +21,7 @@ import { expectedCheckResults } from '../shared/checkOracle.js';
 
 /**
  * 2b-4 checks-opposed: prove the two opposed mechanics through the dialog-bypassing roll APIs.
- * Part A (attack vs Defense) feeds a fake `game.user.targets` set so `targetDefense` auto-populates
+ * Part A (attack vs Defense) targets placed tokens with the Target key so `targetDefense` auto-populates
  * from the target; Part B (resistance vs damage) passes `damageToReduce` like the Resist button.
  */
 
@@ -55,11 +63,10 @@ function expectedDifficulty(targetDefense, attackerRating) {
 }
 
 /**
- * Rolls the roller's weapon attack against a fake target set built from the named target actors
- * (empty when `targetNames` is empty), forcing FORCED_FACES, and returns the new message's flags plus
- * the live-read Defense ratings of the named targets. Restores `game.user.targets` in a `finally`.
+ * Rolls the roller's weapon attack against the user's current targets (none when no token is targeted), forcing
+ * FORCED_FACES, and returns the new message's flags plus the live-read Defense ratings of the named target actors.
  * @param {import('@playwright/test').Page} page - The Playwright page bound to the live world.
- * @param {string[]} targetNames - The world names of the target actors to put in `game.user.targets`.
+ * @param {string[]} targetNames - The world names of the actors whose Defense ratings are read.
  * @returns {Promise<object>} `{ created, parameters, results, targetDefenses }`.
  */
 async function rollAttackWithTargets(page, targetNames) {
@@ -67,43 +74,44 @@ async function rollAttackWithTargets(page, targetNames) {
    return page.evaluate(async (names) => {
       const roller = game.actors.getName('E2E Roller');
       const weaponId = roller.items.find((item) => item.type === 'weapon').id;
-
-      // The fake target set carries exactly what getTargetedCharacters() reads: `.actor`.
       const targetActors = names.map((name) => game.actors.getName(name));
-      const fakeTargets = new Set(targetActors.map((actor) => ({ actor })));
-
-      const original = game.user.targets;
       const before = game.messages.size;
-      let parameters;
-      let results;
-      try {
-         game.user.targets = fakeTargets;
-         await roller.system.rollAttackCheck({
-            itemId: weaponId,
-            attackIdx: 0,
-         });
-         await titanWait(() => game.messages.size > before, { message: 'new chat message' });
-         const newest = game.messages.contents[game.messages.size - 1];
-         parameters = newest?.system?.parameters;
-         results = newest?.system?.results;
-      }
-      finally {
-         game.user.targets = original;
-      }
-
+      await roller.system.rollAttackCheck({
+         itemId: weaponId,
+         attackIdx: 0,
+      });
+      await titanWait(() => game.messages.size > before, { message: 'new chat message' });
+      const newest = game.messages.contents[game.messages.size - 1];
       return {
          created: game.messages.size > before,
-         parameters: parameters,
-         results: results,
+         parameters: newest?.system?.parameters,
+         results: newest?.system?.results,
          targetDefenses: targetActors.map((actor) => actor.system.getRollData().rating.defense.value),
       };
    }, targetNames);
+}
+
+/**
+ * Targets the tokens of the named actors with the Target key (Shift adds), in order, then rolls the attack.
+ * @param {import('@playwright/test').Page} page - The Playwright page bound to the live world.
+ * @param {string[]} targetNames - The names of the target actors, in targeting order.
+ * @returns {Promise<object>} The roll's flags, as `rollAttackWithTargets` returns them.
+ */
+async function targetAndRoll(page, targetNames) {
+   for (const [index, name] of targetNames.entries()) {
+      await targetPlacedToken(page, tokenIds.get(name), { add: index > 0 });
+   }
+   expect(await targetedTokenIds(page), 'the user targets exactly the named tokens')
+      .toEqual(targetNames.map((name) => tokenIds.get(name)));
+   return rollAttackWithTargets(page, targetNames);
 }
 
 /** @type {import('@playwright/test').Page} The file-shared, logged-in page (one world boot per file). */
 let page;
 /** @type {string[]} Uncaught page errors collected during the current test (cleared each afterEach). */
 let errors;
+/** @type {Map<string, string>} The id of each target actor's placed token, by actor name. */
+const tokenIds = new Map();
 
 test.beforeAll(async ({ browser }) => {
    page = await browser.newPage();
@@ -113,6 +121,7 @@ test.beforeAll(async ({ browser }) => {
 });
 
 test.afterEach(async () => {
+   await releaseTargets(page);
    await closeAllApps(page);
    errors.length = 0;
 });
@@ -123,15 +132,18 @@ test.afterAll(async () => {
 
 test.describe('v14 opposed checks (forced dice)', () => {
 
-   // Rebuild the roller (with the attack-rating boost) and the three target actors before each test.
-   test.beforeEach(async () => {
+   // Build the roller (with the attack-rating boost) and the three target actors once, and place a token for each
+   // target on the shared scene.
+   test.beforeAll(async () => {
+      test.setTimeout(120_000);
+
       // Precondition: the TITAN system must have initialized.
       const systemReady = await page.evaluate(() => typeof game.titan !== 'undefined'
          && !!CONFIG.Actor?.dataModels?.player);
       expect(systemReady, 'TITAN system failed to initialize before opposed-checks walk').toBe(true);
 
       await page.evaluate(async ({ rollerActor, rollerItems, attackerBoostItem, targets }) => {
-         // Rebuild the roller with a boosted attack rating so both difficulty clamps are reachable.
+         // Build the roller with a boosted attack rating so both difficulty clamps are reachable.
          const staleRoller = game.actors.getName('E2E Roller');
          if (staleRoller) {
             await staleRoller.delete();
@@ -142,7 +154,7 @@ test.describe('v14 opposed checks (forced dice)', () => {
             attackerBoostItem,
          ]);
 
-         // Rebuild each target actor carrying its Defense flat-modifier ability.
+         // Build each target actor carrying its Defense flat-modifier ability.
          for (const target of targets) {
             const stale = game.actors.getName(target.actor.name);
             if (stale) {
@@ -160,6 +172,12 @@ test.describe('v14 opposed checks (forced dice)', () => {
             item: buildE2ETargetDefenseItemData(mod),
          })),
       });
+
+      await viewScene(page, await shared(page, 'scene'));
+      for (const mod of TARGET_MODS) {
+         const actorId = await page.evaluate((name) => game.actors.getName(name).id, targetName(mod));
+         tokenIds.set(targetName(mod), await placeToken(page, actorId));
+      }
    });
 
    // Always restore the RNG, even if a test fails mid-roll.
@@ -168,7 +186,7 @@ test.describe('v14 opposed checks (forced dice)', () => {
    });
 
    test('targeted attack derives difficulty from the target Defense (interior)', async () => {
-      const flags = await rollAttackWithTargets(page, [targetName(6)]);
+      const flags = await targetAndRoll(page, [targetName(6)]);
 
       expect(flags.created, 'an attack message was created').toBe(true);
 
@@ -202,14 +220,14 @@ test.describe('v14 opposed checks (forced dice)', () => {
 
    test('attack difficulty clamps to both bounds (2 and 6)', async () => {
       // High bound: a far-above-attacker Defense pins the difficulty to 6.
-      const high = await rollAttackWithTargets(page, [targetName(8)]);
+      const high = await targetAndRoll(page, [targetName(8)]);
       const highDefense = high.targetDefenses[0];
       const highRaw = highDefense - high.parameters.attackerRating + 4;
       expect(highRaw, 'high case exceeds the upper bound before clamping').toBeGreaterThan(6);
       expect(high.parameters.difficulty, 'difficulty clamps to 6').toBe(6);
 
       // Low bound: a floored (0) Defense against the boosted attacker pins the difficulty to 2.
-      const low = await rollAttackWithTargets(page, [targetName(-8)]);
+      const low = await targetAndRoll(page, [targetName(-8)]);
       const lowDefense = low.targetDefenses[0];
       const lowRaw = lowDefense - low.parameters.attackerRating + 4;
       expect(lowRaw, 'low case falls below the lower bound before clamping').toBeLessThan(2);
@@ -217,7 +235,7 @@ test.describe('v14 opposed checks (forced dice)', () => {
    });
 
    test('with multiple targets the first target Defense is used', async () => {
-      const flags = await rollAttackWithTargets(page, [
+      const flags = await targetAndRoll(page, [
          targetName(6),
          targetName(8),
       ]);
@@ -230,6 +248,7 @@ test.describe('v14 opposed checks (forced dice)', () => {
    });
 
    test('with no target the attack falls back to the attacker rating (difficulty 4)', async () => {
+      expect(await targetedTokenIds(page), 'no token is targeted').toEqual([]);
       const flags = await rollAttackWithTargets(page, []);
 
       expect(flags.created, 'an attack message was created').toBe(true);

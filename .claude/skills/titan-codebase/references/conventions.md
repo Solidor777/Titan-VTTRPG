@@ -996,7 +996,7 @@ controlled (`.superpowers/sdd/test-suite-rewrite/phase-2/review-measure-1.log`, 
 not visible takes no pointer events), `toggleTokenLink`, `unlinkPlacedToken` and `controlPlacedToken` (the sheet header buttons; the token flows close the
 open windows, release control, move the pointer onto the token and wait for `token.object.hover` before the
 double-click that opens the sheet (`unlinkPlacedToken`, which then waits for the reopened synthetic actor's sheet) or
-the click that takes control (`controlPlacedToken`)), `createCompendium` / `setCompendiumLocked` (Compendium tab Create dialog, entry
+the click that takes control (`controlPlacedToken`)), `targetPlacedToken` / `releaseTargets` / `targetedTokenIds` (core's Target key T on the hovered token, Shift+T adds; `game.user.targets` then holds real Token objects, as `checks-opposed.spec.js` uses), `createCompendium` / `setCompendiumLocked` (Compendium tab Create dialog, entry
 context menu Lock/Unlock), `putInPack` (opens the pack's popout window and drags the world entry onto its
 `.directory-list`; the pack index is polled for the new id; the caller passes the world entry's locator, and the flow
 reopens that entry's sidebar tab before the drag). The creation dialogs are `DialogV2` forms whose content
