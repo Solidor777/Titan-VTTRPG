@@ -192,9 +192,10 @@ export async function deleteOrphanedTokens(page) {
 
 /**
  * Places a token for the named actor on the active scene (creating a fallback scene when none is
- * active), waits until the placeable is DRAWN (throwing with a clear message on exhaustion — a
- * never-drawn placeable must fail here, not at a later, less-diagnostic timeout), controls it, and
- * refreshes the Effect HUD and Player HUD so the GM resolution ladders resolve the actor.
+ * active) once the canvas has finished drawing that scene, waits until the placeable is DRAWN (throwing
+ * with a clear message on exhaustion — a never-drawn placeable must fail here, not at a later,
+ * less-diagnostic timeout), controls it, and refreshes the Effect HUD and Player HUD so the GM resolution
+ * ladders resolve the actor.
  * @param {import('@playwright/test').Page} page - The shared page.
  * @param {object} options - Selects the fixture token and how it is controlled.
  * @param {string} options.actorName - The fixture actor's name (must already exist).
@@ -232,6 +233,13 @@ export async function controlFixtureActorToken(page, { actorName, fallbackSceneN
          });
          fallbackId = scene.id;
       }
+
+      // Activating a scene starts an asynchronous canvas draw. A token created before it finishes gets a
+      // placeable at once, but drawn against layers and render-flag queues that do not exist yet
+      // (`GridLayer.addHighlightLayer` reads an undefined container, and a later update throws in
+      // `RenderFlags.set` on the undefined `canvas.pendingRenderFlags`, which `Canvas#draw` creates only in
+      // its ticker activation, client/canvas/board.mjs:1209, 2550-2587). So wait for the scene's draw first.
+      await titanWait(() => canvas.ready && canvas.scene?.id === scene.id, { message: 'scene canvas drawn' });
 
       const [tokenDoc] = await scene.createEmbeddedDocuments('Token', [
          await actor.getTokenDocument({
