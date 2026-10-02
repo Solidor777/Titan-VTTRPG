@@ -1255,14 +1255,16 @@ The evidence files named here are in `.superpowers/sdd/test-suite-rewrite/phase-
 - **Found:** 2026-10-01 while diagnosing #102 (read in code).
 - **Fixed:** 2026-10-02. The confirmation branch is the `else` of the `shouldConfirm...` check in both methods.
 - **Gate tests:** `tests/e2e/character-sheet-rows.spec.js` ("with confirmation off, a refused item delete leaves the
-  item and opens no dialog" and the same for an effect): the test installs a `preDelete` listener that returns false,
-  clicks the row's delete button with confirmation off, waits until the listener refused the delete (the positive
-  edge), and expects no dialog and the document still there. Before: the item test failed with a dialog present
-  (`Expected 0, Received 1`, `gate103-before-fix.log`) and the effect test failed the same way
-  (`gate103-before-fix-effect.log`; run alone, because the item test's failure restarts the worker and the file's
-  `beforeAll` then makes the actor again). After: both passed (`gate103-after-fix.log`). The plain confirmation-off
-  delete of an item and of an effect (no dialog, the document gone) and the confirmation-on cancel and confirm paths
-  are tested beside them.
+  item deletable and opens no dialog" and the same for an effect). The tests install a `preDelete` listener that
+  returns false, a test instrument in the page: with a delete that succeeds, "the row deletes and no dialog opens"
+  cannot fail before the fix. The test clicks the row's delete button with confirmation off, waits until the listener
+  refused the delete (the positive edge), waits two animation frames (the code after a refusal runs as promise
+  continuations within one task, so a dialog it would open exists by then), and expects no dialog and the document
+  still there. Before (the code of commit `45532000~1`, built): the item test failed with a dialog present
+  (`Expected 0, Received 1`, `phase-3/gate103-settle-before-fix.log`); the effect test was run alone earlier and
+  failed the same way (`phase-3/gate103-before-fix-effect.log`). After: both passed (`phase-3/gates-fix-after.log`).
+  The plain confirmation-off delete of an item and of an effect (no dialog, the document gone) and the
+  confirmation-on cancel and confirm paths are tested beside them.
 
 ### 104. Open sheets re-rendered on changes to a different actor that shared their id
 
@@ -1533,9 +1535,23 @@ The evidence files named here are in `.superpowers/sdd/test-suite-rewrite/phase-
   row's delete button.
 - **Fixed:** 2026-10-02. `safeDeleteItem` deletes through `TitanActor#deleteItem`.
 - **Gate tests:** `tests/e2e/character-sheet-rows.spec.js` ("deleting an equipped armor row with confirmation off
-  un-equips it quietly", and the same with confirmation on). Before: the confirmation-off test failed, `equipped.armor`
-  still held an id after the item was gone (`gate119-before-fix.log`; inferred: the id of the deleted armor, which
-  the test had equipped). After: both passed (`gate119-after-fix.log`).
+  un-equips it quietly", and the same with confirmation on). Before (`safeDeleteItem` back on
+  `deleteEmbeddedDocuments`, built): the confirmation-off test failed with "the deleted armor is no longer equipped"
+  (`phase-3/gate119-split-before-fix.log`; the confirmation-on test then failed in the restarted worker, a cascade of
+  the first failure). After: both passed (`phase-3/gate119-split-after-fix.log`).
+- **Second defect, found 2026-10-02 in review of this fix:** `TitanItem#safeDelete` writes
+  `flags.titan.isMarkedForDeletion: true` and then calls `this.delete()`, which resolves undefined when a `preDelete`
+  hook refuses the delete. The item stayed marked, `postDeleteItem` still ran, and every later delete of the item hit
+  the "already marked for deletion" assertion in `TitanActor#deleteItem` (read). `deleteItem` is the path of the
+  confirmation dialog and of the row button with confirmation off.
+- **Second fix:** `safeDelete` clears the mark and returns false when the delete resolves undefined; `deleteItem`
+  skips `postDeleteItem` for a false result. `preDeleteItem`, which un-equips armor and shields, has already run when
+  a delete is refused, so the refused item stays un-equipped (read; not changed).
+- **Second gate tests:** "with confirmation off, a refused item delete leaves the item deletable and opens no dialog"
+  (asserts no deletion mark, then removes the refusal and deletes the same row) and "with confirmation on, a refused
+  confirmed item delete leaves the item deletable". Before: the first failed with the mark true
+  (`phase-3/gates-fix-before.log`) and the second failed at the second confirmed delete
+  (`phase-3/gates-fix-before-refused-confirmed-item.log`). After: both passed (`phase-3/gates-fix-after.log`).
 
 ### 120. Apply Edits in the Edit Traits dialog threw and stored nothing
 
@@ -1552,19 +1568,73 @@ The evidence files named here are in `.superpowers/sdd/test-suite-rewrite/phase-
 - **Gate test:** `tests/e2e/character-sheet-rows.spec.js` ("equipping Heavy armor lowers non-zero speeds by 1": the
   Heavy trait is chosen and applied in the armor's Edit Traits dialog). Before: failed with the `structuredClone`
   error and the dialog still open (`gate120-before-fix.log`). After: passed (`gate120-after-fix.log`).
+- **Siblings, same defect (found 2026-10-02 in review):** `AddCustomAttackTraitDialogShell` pushed a state proxy into
+  the document's attack data and called `structuredClone` on it; `EditCustomAttackTraitDialogShell` assigned a state
+  proxy and did the same. Both now clone the attacks first and put `$state.snapshot` copies into the clone. Other sites
+  checked (`rg structuredClone src --glob "*.svelte"`, read): every other clone is of plain document data or a
+  constant; `AddCustomTraitDialogShell` and `EditCustomTraitDialogShell` pass their state objects to
+  `item.update` without `structuredClone`, and the custom-traits tests that add and edit through them pass.
+- **Sibling gate tests:** `tests/e2e/custom-traits.spec.js` ("the attack Add Custom Trait dialog stores the trait and
+  renders its tag", "the attack Edit dialog stores the edited trait in place"). Before: the add test failed with the
+  dialog still open and the page error (`phase-3/gates-fix-before-attack-traits.log`); the edit shell was reachable
+  only after #125 and, with that fixed and the shell not, failed with the `structuredClone` error
+  (`phase-3/gate120-edit-shell-before-fix.log`). After: both passed (`phase-3/gates-fix-after.log`).
 
 ### 121. `checks-opposed.spec.js` threw `_drawTargetArrows is not a function` when GM 1 viewed a drawn scene
 
+The evidence files named here are in `.superpowers/sdd/test-suite-rewrite/phase-3/` (local, not checked in).
+
 - **Cause (measured):** the spec replaced `game.user.targets` with a `Set` of plain `{ actor }` objects during each
   roll. Core's token-layer ticker calls `t._drawTargetArrows(config)` on every entry each frame
-  (`foundry/client/canvas/layers/tokens.mjs:466`, read), so a frame inside the roll window threw. Alone the spec passed
-  7 of 7 runs (`phase-3/opposed-alone-1.log`, `opposed-alone-r1.log` to `-r6.log`); right after the "check tags across
+  (`foundry/client/canvas/layers/tokens.mjs:466` in the V14 install, version 14.368.0, found with `grep -n`), so a frame inside the roll window threw. Alone the spec passed
+  7 of 7 runs (`phase-3/opposed-alone-1.log`, `phase-3/opposed-alone-r1.log` to `-r6.log`); right after the "check tags across
   surfaces" tests of `character-sheet-rows.spec.js`, which view the shared scene as E2E GM 1, it failed 3 of 3
-  (`rows-then-opposed-1.log` to `-3.log`). Both earlier Part A full runs failed on it.
+  (`phase-3/rows-then-opposed-1.log` to `-3.log`). Both earlier Part A full runs failed on it.
 - **Fix:** the spec targets real placed tokens through core's Target key (`targetPlacedToken`, `releaseTargets` in
   `tests/e2e/flows.js`), so `game.user.targets` holds real Token objects. No fake targets remain.
 - **Gate:** `checks-opposed.spec.js` passes alone (`phase-3/opposed-real-alone-1.log`), after the rows spec's token
-  tests in 2 of 2 runs (`rows-then-opposed-real-1.log`, `-2.log`), and in full-suite order (`phase-3/e2e-full-3.log`:
+  tests in 2 of 2 runs (`phase-3/rows-then-opposed-real-1.log`, `-2.log`), and in full-suite order (`phase-3/e2e-full-3.log`:
   628 passed, 0 failed, census zero).
 - **Found:** 2026-10-02 in Phase 3 Part A. **Closed:** 2026-10-02.
 
+### 123. The attack Edit Traits dialog failed to render
+
+The evidence files named here are in `.superpowers/sdd/test-suite-rewrite/phase-3/` (local, not checked in).
+
+- **What:** `EditAttackTraitsDialog` passed the weapon as the prop `document`; `EditAttackTraitsDialogShell` reads
+  `item`. Opening the dialog raised "Cannot read properties of undefined (reading 'system')" and no window opened.
+- **Found:** 2026-10-02 by the shield and attack Edit Traits gate added in review.
+- **Fixed:** 2026-10-02. The dialog passes `item`.
+- **Gate test:** `tests/e2e/character-sheet-rows.spec.js` ("the weapon attack Edit Traits dialog stores the chosen
+  trait"). Before: failed, "the Edit Traits dialog opens" plus the render error
+  (`phase-3/gates-fix-before-weapon-attack-Edit-Traits.log`). After: passed (`phase-3/gates-fix-after.log`).
+
+### 124. Remove Expired Effects asked for confirmation by the items setting
+
+The evidence files named here are in `.superpowers/sdd/test-suite-rewrite/phase-3/` (local, not checked in).
+
+- **What:** `CharacterDataModel#requestRemoveExpiredEffects` decided whether to ask with `shouldConfirmDeletingItems`.
+  It deletes Active Effects, and the setting for those is `confirmDeletingEffects` ("Confirm Deleting Effects from
+  Actors", `lang/en.json`). The two settings were independent, so the button followed the wrong one (read).
+- **Found:** 2026-10-02 in review (read in code).
+- **Fixed:** 2026-10-02. It uses `shouldConfirmDeletingEffects`.
+- **Gate test:** `tests/e2e/character-sheet-rows.spec.js` ("Remove Expired Effects follows the effects confirmation
+  setting, not the items setting"). Before: failed, "the confirmation dialog opens"
+  (`phase-3/gates-fix-before-Remove-Expired-Effects-follows.log`). After: passed (`phase-3/gates-fix-after.log`).
+
+### 125. The attack custom trait tag's edit and delete icons did nothing, and its Edit dialog opened the wrong shell
+
+The evidence files named here are in `.superpowers/sdd/test-suite-rewrite/phase-3/` (local, not checked in).
+
+- **What:** `WeaponSheetAttackCustomTraitTag` called `document.data.editCustomAttackTrait` and
+  `document.data.deleteCustomAttackTrait`; both methods are on `document.data.system` (the weapon's data model), so
+  the click raised "n.data.editCustomAttackTrait is not a function". `EditCustomAttackTraitDialog` also mounted the
+  item-level `EditCustomTraitDialogShell` instead of `EditCustomAttackTraitDialogShell`, which nothing mounted.
+- **Found:** 2026-10-02 while writing the gate of the #120 siblings.
+- **Fixed:** 2026-10-02. The tag calls the data-model methods; the dialog mounts the attack shell with the weapon as
+  `document`.
+- **Gate tests:** `tests/e2e/custom-traits.spec.js` ("the attack Edit dialog stores the edited trait in place", "the
+  attack trait tag delete icon removes the trait"). Before (the add fix in, the tag and dialog at their old code):
+  both failed, the edit test on "the edit dialog opens" with the not-a-function error and the delete test on "the
+  trait was removed from the attack" (`phase-3/gate125-attack-controls-before-fix.log`). After: both passed
+  (`phase-3/gates-fix-after.log`).

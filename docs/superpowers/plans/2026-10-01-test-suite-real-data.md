@@ -282,6 +282,8 @@ An Item folder dropped on an actor or token sheet creates one owned item per ite
 
 With confirmation off the method deletes and returns; the confirm branch runs only when confirmation is on (read `CharacterDataModel.js:6331-6351`, `:6375-6396`). Gated by the `character-sheet-rows` confirmation-off test.
 
+Deliberate deviation from "gated by the confirmation-off test": with confirmation off, "the row deletes and no dialog opens" cannot fail before the fix, because the stray dialog opens only when the delete is refused or fails. The gate installs a `preDelete` listener in the page that returns false (a test instrument, not a document, a mechanism or a code seam), clicks the row's delete button, and expects no dialog; the same test then removes the listener and deletes the row again. Measured before and after the fix: `.superpowers/sdd/test-suite-rewrite/phase-3/gate103-settle-before-fix.log` and `gates-fix-after.log` (local, not checked in).
+
 ### 7.3 OPEN_BUGS #104 — `ReactiveDocument` identity (Phase 2)
 
 `ReactiveDocument.svelte.js:39` and `:50` compare `uuid`, not `id`. Gated by the `sheet-header` pin and a `ReactiveDocument.test.js` case.

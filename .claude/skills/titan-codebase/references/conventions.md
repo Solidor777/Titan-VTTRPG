@@ -977,7 +977,8 @@ duration type chosen in the sheet header), `addCheck` (the Checks tab add button
 when asked, its Resolve Cost input, Resistance Check select and Opposed Check box),
 `addRulesElement` (the Rules Elements tab add button, the operation select, and the `ccm-*` selects and value input
 of a conditional check modifier), `createWorldItem`, `addCustomTrait`, `addAttack`, `enableAspect` and
-`addCustomAspect` (the Add Custom Trait dialog with an optional description, the weapon Attacks tab add button, the spell Standard Aspects
+`addCustomAspect` (the Add Custom Trait dialog with an optional description, the weapon Attacks tab add button, the
+spell Standard Aspects
 toggle with its option toggles and resistance select, the spell Custom Aspects tab add button), `pickPortrait` (the
 sheet's portrait button opens Foundry's own file picker, the Core Data tab is chosen when it is not the open one (the
 picker of a player actor opened on the User Data tab: `.superpowers/sdd/test-suite-rewrite/phase-2/review-measure-1.log`, `actor picker tabs`),
@@ -993,10 +994,13 @@ determined (`.superpowers/sdd/test-suite-rewrite/phase-2/review-measure-2.log`);
 controlled tokens: measured on a scene with `tokenVision` true, a second token had `visible` false while the first
 was controlled and `visible` true after Escape, and with `tokenVision` false it stayed visible while the first was
 controlled (`.superpowers/sdd/test-suite-rewrite/phase-2/review-measure-1.log`, `A controlled`, `after Escape`, `tokenVision false`), and a token that is
-not visible takes no pointer events), `toggleTokenLink`, `unlinkPlacedToken` and `controlPlacedToken` (the sheet header buttons; the token flows close the
+not visible takes no pointer events), `toggleTokenLink`, `unlinkPlacedToken` and `controlPlacedToken` (the sheet header
+buttons; the token flows close the
 open windows, release control, move the pointer onto the token and wait for `token.object.hover` before the
 double-click that opens the sheet (`unlinkPlacedToken`, which then waits for the reopened synthetic actor's sheet) or
-the click that takes control (`controlPlacedToken`)), `targetPlacedToken` / `releaseTargets` / `targetedTokenIds` (core's Target key T on the hovered token, Shift+T adds; `game.user.targets` then holds real Token objects, as `checks-opposed.spec.js` uses), `createCompendium` / `setCompendiumLocked` (Compendium tab Create dialog, entry
+the click that takes control (`controlPlacedToken`)), `targetPlacedToken` / `releaseTargets` / `targetedTokenIds`
+(core's Target key T on the hovered token, Shift+T adds; `game.user.targets` then holds real Token objects, as `checks-
+opposed.spec.js` uses), `createCompendium` / `setCompendiumLocked` (Compendium tab Create dialog, entry
 context menu Lock/Unlock), `putInPack` (opens the pack's popout window and drags the world entry onto its
 `.directory-list`; the pack index is polled for the new id; the caller passes the world entry's locator, and the flow
 reopens that entry's sidebar tab before the drag). The creation dialogs are `DialogV2` forms whose content
@@ -1013,11 +1017,14 @@ Resilience resistance; stored values: `.superpowers/sdd/test-suite-rewrite/phase
 `equipment`, `commodity`; `effectHost` (a player that holds only the two effects) with `effect` and `conditionalEffect`
 (permanent, one conditional dice modifier); `roller` (a player owning copies of the shared weapon, spell and ability,
 dragged onto its sheet); `situationalActor` (a player owning an ability with a conditional dice +2, a conditional
-Advantage and a conditional dice +1 situation); `bulkActor` (30 abilities, an equipment with 30 checks and an effect
-with 30 rules elements; built in 69.1 s in one run, `.superpowers/sdd/test-suite-rewrite/phase-2/review-measure-1.log`, `build bulkActor`, so its first
-consumer (`character-sheet-layout.spec.js`'s browser zoom describe) raises its own timeout; at the default zoom the 30 abilities overflow the actor sheet's Abilities tab, 1976 px
-of content in 563 px, `.superpowers/sdd/test-suite-rewrite/phase-2/review-measure-3.log`; the equipment's checks and the effect's rules elements were not
-measured for overflow); `scene` (created and
+Advantage and a conditional dice +1 situation); `bulkActor` (`BULK_COUNT` = 10 abilities, an equipment with 10 checks
+and an effect with 10 rules elements; each list overflows its scroll area at every tested zoom, measured with 30 entries
+in `.superpowers/sdd/test-suite-rewrite/phase-3/entry-count-measure.log` (local): the Abilities tab scrolls 563 px at
+66 px per row; with 30 entries the build took 69.1 s in one run, `phase-2/review-measure-1.log`, `build bulkActor`, and
+the layout spec ran in 1.4 min (`phase-3/layout-rerun-1.log`), with 10 entries in 37.2 s
+(`phase-3/layout-after-count.log`), so its first consumer, the browser zoom describe of `character-sheet-
+layout.spec.js`,
+raises its own timeout); `scene` (created and
 viewed); `trayPack` (an unlocked `ActiveEffect` pack holding one effect). `playwright.config.mjs` sets
 `use.actionTimeout` to 10 s
 (about ten times the longest action measured in a full run, 916 ms), so a flow that waits on a missing element fails
@@ -1046,8 +1053,10 @@ silently absorbing 15s: explicit `timeout:` values are `1000`. Inherently multi-
   test of `player-hud-layout.spec.js` and both portrait tests of `surfaces.spec.js`;
 - a scene draw on the canvas after a scene is created while none is viewed, viewed or activated (`flows.js`
   `waitForSceneDrawn`, 30 s);
-- building the `bulkActor` shared fixture (`flows.js`; 69.1 s in one run, `.superpowers/sdd/test-suite-rewrite/phase-2/review-measure-1.log`, 30 abilities,
-  30 checks and 30 rules elements through the sheet controls), whose first consumer raises its own timeout;
+- building the `bulkActor` shared fixture (`flows.js`; through the sheet controls, `BULK_COUNT` abilities, checks and
+  rules elements; 69.1 s with 30 of each in one run, `.superpowers/sdd/test-suite-rewrite/phase-2/review-
+  measure-1.log`),
+  whose first consumer raises its own timeout;
 - a second browser context finishing login (`multiClient.js`, used by the last test of `effect-tray.spec.js` for its
   E2E GM 2 client);
 - core's 2 s scrolling text finishing before the viewed scene is deactivated (`condition-description.spec.js`, last
@@ -1161,25 +1170,33 @@ and time out. Sheet tabs are clicked with `openSheetTab(page, label)` (`tests/e2
 `.application.titan-document-sheet .tab-list`). A HUD category persists open across tests and clicking an open
 category closes it; Escape with no flyout open falls through to Foundry and releases token control.
 
-**E2E sheet-row tests (`character-sheet-rows`, `sheet-filters`, `custom-traits`, `character-sheet-layout`)** — measured
-while writing them:
+**E2E sheet-row tests (`character-sheet-rows`, `sheet-filters`, `custom-traits`, `character-sheet-layout`)** — notes
+from writing them; each says whether it was measured (with its saved log, under
+`.superpowers/sdd/test-suite-rewrite/phase-3/`, local), read (with the source) or inferred:
 - A document's sheet instance keeps each row's expanded state and each tab's filter text across renders, so closing the
-  window does not reset them: a helper clicks an expander only on a collapsed row, and a test empties the filters it
-  reads first.
+  window does not reset them: a helper clicks an expander only on a collapsed row, and a test that types into a filter
+  empties it again before it ends. Inferred from the tests, not measured on its own: a later test saw the text an
+  earlier one typed.
 - An edit that must reach an open row is made in the item or effect sheet opened by the row's Edit button (header
-  inputs found by their label; `NumberInput` commits on the native change event, so `fill` then `blur`, and a store read
-  after it needs a poll). An effect sheet's initiative input slides in beside the remaining input, so wait for both.
-- The weapon item sheet renders more than one `.sidebar` element; trait tags are read in the one that holds the
-  trait's delete icon. A skill row's check button contains its own `.stat`, so the training inputs are under
-  `.stats .stat`. A row's Equipped toggle is in its controls and, for an item with checks or attacks, also in its
-  expanded content.
+  inputs found by their label). `NumberInput` commits on the native change event and on Enter (read:
+  `src/helpers/svelte-components/input/NumberInput.svelte`, the comment above the commit function), so `fill` then
+  `blur`, and a store read after it needs a poll. An effect sheet's initiative input slides in beside the remaining
+  input, so a test waits for both (inferred from a locator that resolved too early; no log saved).
+- The weapon item sheet renders more than one `.sidebar` element, and a weapon's Attacks tab more than one `.traits`
+  element (the sidebar's trait list and each attack's `.traits:has(.traits-header)`). A skill row's check button
+  contains its own `.stat`, so the training inputs are under `.stats .stat`. A row's Equipped toggle is in its controls
+  and, for an item with checks or attacks, also in its expanded content. Observed as Playwright strict-mode violations
+  while writing the specs; no log of them was saved, so these are inferred from the locators that failed.
 - A refused delete (a `preDelete<Document>` listener that returns false, installed in the page and removed in a
-  `finally`) is the way to reach the confirmation-off path that falls through; a listener counts the refusals so the
-  test waits for the delete to have run.
+  `finally`) reaches the path where the delete is refused after the code has marked the item; a listener counts the
+  refusals so the test waits for the delete to have run. Measured: `gates-fix-before.log`,
+  `gate103-settle-before-fix.log`.
 - When a test fails, Playwright restarts the worker and runs the file's `beforeAll` again, which then finds a second
-  document of the same name and fails inside the flow; the first failure is the one to read.
+  document of the same name and fails inside the flow; the first failure is the one to read. Measured: the second
+  failure in `gates-fix-before.log` (two `E2E Rows Actor` directory entries).
 
-**E2E browser-zoom emulation** — the browser zoom tests of `character-sheet-layout.spec.js` emulate page zoom z through a CDP session:
+**E2E browser-zoom emulation** — the browser zoom tests of `character-sheet-layout.spec.js` emulate page zoom z through
+a CDP session:
 `Emulation.setDeviceMetricsOverride({ width: 1920 / z, height: 1080 / z, deviceScaleFactor: z })`. Foundry
 re-clamps and repositions open windows after the resize, so layout assertions poll until they settle.
 

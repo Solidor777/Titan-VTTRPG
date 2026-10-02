@@ -175,12 +175,14 @@ Core citations below refer to Foundry 14.364 at `C:\FoundryVTT\V14\dev\foundry`,
 
 ### 122. `addCheck` once stored the default label "Check" instead of the typed one
 
+The evidence files named here are in `.superpowers/sdd/test-suite-rewrite/phase-3/` (local, not checked in).
+
 - **What:** in one full e2e run, `addCheck` (`tests/e2e/flows.js`) failed at the label step on the sixth check of the
   `bulkActor` fixture: expected "E2E Bulk Check 5", stored "Check" (`phase-3/e2e-full.log`, failure 1).
 - **Not reproduced:** 0 failures in 10 runs of `armor-trait-situations`, `attack-tags` and `character-sheet-layout` in
   full-suite order, without the wait added afterwards (`phase-3/layout-nowait-1.log` to `-10.log`,
   `layout-nowait-summary.txt`); 0 in 4 isolated runs of the layout spec (`layout-rerun-1.log` to `-4.log`); 0 in the
-  three later full runs (`e2e-full-2.log`, `e2e-full-3.log`).
+  two later full runs (`e2e-full-2.log`, `e2e-full-3.log`).
 - **Unverified:** `addCheck` now waits until the sheet renders a row for every stored check before it edits the new
   one. Whether that removes the failure is not known, because the failure never recurred without it. Cause not located.
 - **Found:** 2026-10-02 in Phase 3 Part A.

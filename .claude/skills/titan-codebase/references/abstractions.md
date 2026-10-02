@@ -60,7 +60,8 @@ management). Data model classes hold the schema, field validation, and derived-d
   `buildChatMessageData` (pure: returns `{ type, system }` from the prepared system snapshot —
   `system.getRollData()` minus document-level `id`/`type`, plus `name`/`img` as label metadata),
   `sendToChat` (sends that `type` + `system` as a first-class chat-message subtype, NOT `flags.titan`),
-  custom-trait management, and the `isMarkedForDeletion` guard flag.
+  custom-trait management, and the `isMarkedForDeletion` guard flag (`safeDelete` sets it, deletes, and clears it again
+  when the delete is refused, resolving false).
 - `TitanItemDataModel` (`src/document/types/item/TitanItemDataModel.js`) extends `TitanDataModel`.
   Adds `description`, a `check` array (item check templates), and a `customTrait` array — its
   `_defineDocumentSchema()` is built from the shared shape template
@@ -517,7 +518,8 @@ and one or more inner Svelte component trees.
   `safeDeleteEffect` (owner-gated `deleteEmbeddedDocuments('ActiveEffect', …)`); exactly one of the two runs. This
   mirrors the item path (`requestItemDeletion`/`safeDeleteItem`/`ConfirmDeleteItemDialog`/`confirmDeletingItems`),
   where both `safeDeleteItem` and the dialog delete through `TitanActor#deleteItem`, so an equipped armor or shield
-  is un-equipped first.
+  is un-equipped first. `requestRemoveExpiredEffects` is gated by `confirmDeletingEffects` too, since it deletes
+  Active Effects.
 
 **Item sheets**
 
