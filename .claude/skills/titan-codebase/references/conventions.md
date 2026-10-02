@@ -878,6 +878,36 @@ every `.js` under `tests/e2e` except `contextMenu.js` and fails on a direct cont
 `.context-menu`, or `context-item`, or starts from a variable or function (file-wide, no scopes) holding or returning
 one.
 
+**Real-document guards** (`.claude/claude.md` "Tests use genuine live documents"). `tests/unit/E2eRealDocuments.test.js`
+scans every `.js`/`.mjs` under `tests/e2e` and `tests/shared` (comments skipped, strings not) for API document creation
+and faked gestures (`Actor.create(` and the other named classes, any other `<alias>.create(` except `Object.create(`,
+`.createDocuments(`, `createEmbeddedDocuments(`, `updateEmbeddedDocuments(`, `getTokenDocument(`, `.createCompendium(`,
+`toggleStatusEffect(`, `.import(`, `importFromJSON(`, `new DragEvent('drop'`, `new DataTransfer(`, `keepId`,
+`new Function(`, `performIntegerSort(`) and, under `tests/e2e` only, for `.update(` and `.system.<action>(` calls
+(action prefixes `request`, `roll`, `apply`, `spend`, `equip`, `unEquip`, `onTurn`, `shortRest`, `longRest`,
+`removeCombatEffects`, `toggleInspiration`, `add`, `move`, `delete`). A `.update(`/`.system.<action>(` site is
+permitted when it matches a `{ file, pattern, field, reason }` entry of `tests/e2e/direct-updates.allowlist.json`
+(`pattern` is a regex over the site's source line; an entry permitting no site fails); deletion calls in
+`e2e/global-teardown.js` and `e2e/registry.js` are allowed by file. The offender set must equal
+`tests/e2e/burn-down.json` as a multiset of `{ file, match, source }` (file relative to `tests`, the matched text, the
+trimmed source line — no line numbers, so unrelated edits do not churn it); the failure message prints the missing or
+extra entries as JSON. Once `tests/unit/phase.json` exceeds 6 the burn-down file must be gone and the set empty.
+`tests/unit/UnitFakeDocuments.test.js` scans `tests/unit` (except itself) for a fake write surface — an object-literal
+key or method (after `{` or `,`), a member assignment, or a `vi.spyOn` named `create`, `createDocuments`, `update`,
+`delete`, `createEmbeddedDocuments`, `deleteEmbeddedDocuments`, `updateEmbeddedDocuments`, `createEffects`,
+`updateEffects`, `deleteEffects`, `deleteItems`, or an object-literal `_source` key. Every matching file must be listed
+in `tests/unit/fake-documents.allowlist.json`: `permitted` (`{ file, clause }`) or `burnDown`
+(`{ file, removedInPhase }`); a listed file that is gone or no longer matches fails, and a burn-down file fails once
+`phase.json`'s `phase` exceeds its `removedInPhase`.
+
+**E2E census** — `tests/e2e/census.js` exports `takeCensus(page, { since? })` (per kind: `E2E `-prefixed actors,
+items, scenes, folders, macros, roll tables, journal entries, playlists, cards and world compendia; tokens on any scene
+whose actor does not resolve; hotbar entries of the four E2E users whose macro does not resolve; chat messages from
+`since` on when given), `sweepWorld(page)` (removes all of those except messages through the API — scenes first,
+folders after their contents, orphaned tokens and dangling hotbar slots last; never User documents) and
+`countCensus(census)`. Run directly (`node tests/e2e/census.js [--sweep]`) it logs in to localhost:30000 as
+`E2E GM 1`, prints JSON counts, and exits 1 when the final census is not empty.
+
 **No e2e operation may exceed 1 second**, and wait ceilings are set to that budget so a breach fails
 loudly instead of silently absorbing 15s: explicit `timeout:` values are `1000`. Inherently
 multi-second waits are deliberately exempt — a `game.ready` world boot (`fixtures.js`,
