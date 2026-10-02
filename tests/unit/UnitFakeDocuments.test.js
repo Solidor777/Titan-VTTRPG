@@ -2,14 +2,16 @@ import { describe, expect, it } from 'vitest';
 import { existsSync, readdirSync, readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import path from 'node:path';
+import maskSource from './helpers/maskSource.js';
 
 // A unit test may use synthetic data only for UI elements, document-agnostic operations, intermediate computations on
 // given inputs, and tests that invalid data is rejected or handled (`.claude/claude.md`, "Tests use genuine live
 // documents"). A fake document that accepts writes stands in for a live document, so this guard finds every unit
 // source that builds a fake write surface and requires it to be listed in `tests/unit/fake-documents.allowlist.json`.
 //
-// A fake write surface is a document write method bound by the test — an object-literal key or method, a member
-// assignment, or a `vi.spyOn` — named `create`, `createDocuments`, `update`, `delete`, `createEmbeddedDocuments`,
+// A fake write surface is a document write method bound by the test — an object-literal key whose value is not a
+// boolean, null, number, string, object or array; an object-literal or class method; a member assignment; or a
+// `vi.spyOn` — named `create`, `createDocuments`, `update`, `delete`, `createEmbeddedDocuments`,
 // `deleteEmbeddedDocuments`, `updateEmbeddedDocuments`, `createEffects`, `updateEffects`, `deleteEffects` or
 // `deleteItems`, or an object-literal `_source` key.
 //
@@ -18,8 +20,8 @@ import path from 'node:path';
 // (bumped in each phase's first commit) and fails once the file outlives its phase. The guard also fails on a matching
 // file that is not listed, and on a listed file that is gone or no longer matches.
 //
-// Known limits of the scan: comments are skipped, string contents are not; a regular-expression literal containing a
-// quote character is read as the start of a string, and one containing `//` or `/*` is read as a comment.
+// Known limits of the scan: comments are skipped, string contents are not, and the masking limits of
+// `helpers/maskSource.js` apply (a regular-expression literal is not recognized).
 
 /** @type {string} The unit test directory. */
 const UNIT_DIRECTORY = path.dirname(fileURLToPath(import.meta.url));
@@ -57,15 +59,26 @@ const WRITE_KEYS = [
 /** @type {FakeSurfacePattern[]} The shapes of a fake write surface. */
 const FAKE_SURFACE_PATTERNS = [
    {
-      // A key in an object literal: it follows the literal's `{` or a `,`, so a ternary's `? update :` and a
-      // `case 'update':` label are not keys.
+      // A write key in an object literal: it follows the literal's `{` or a `,`, so a ternary's `? update :` and a
+      // `case 'update':` label are not keys. The guard then drops a key whose value is not a function (see
+      // `NON_FUNCTION_VALUE`), so an options object such as `{ diff: false, update: true }` is not a fake.
       kind: 'object-literal key',
-      regex: new RegExp(`(?<=[{,]\\s*)(['"]?)(?:${WRITE_KEYS}|_source)\\1\\s*:(?!:)`, 'g'),
+      regex: new RegExp(`(?<=[{,]\\s*)(['"]?)(?:${WRITE_KEYS})\\1\\s*:(?!:)`, 'g'),
    },
    {
-      // A method in an object literal; the guard confirms a body follows the parameter list.
-      kind: 'object-literal method',
-      regex: new RegExp(`(?<=[{,]\\s*)(?:async\\s+)?(?:\\*\\s*)?(?:${WRITE_KEYS})\\s*\\(`, 'g'),
+      // A `_source` key in an object literal, whatever its value: a fake document's stored data.
+      kind: 'object-literal _source key',
+      regex: /(?<=[{,]\s*)(['"]?)_source\1\s*:(?!:)/g,
+   },
+   {
+      // A method in an object literal or a class body: it follows a `{`, `,`, `}` or `;` or starts a line, with
+      // optional `static`, `async` and `*` modifiers. The guard confirms a body opens on the line that closes the
+      // parameter list, which a call statement never does.
+      kind: 'method',
+      regex: new RegExp(
+         `(?<=(?:^|[{},;])[ \\t\\r\\n]*)(?:static\\s+)?(?:async\\s+)?(?:\\*\\s*)?(?:${WRITE_KEYS})\\s*\\(`,
+         'gm',
+      ),
    },
    {
       kind: 'member assignment',
@@ -95,53 +108,12 @@ const FAKE_SURFACE_PATTERNS = [
  * @property {BurnDownEntry[]} burnDown - Files that remain until the phase that deletes them.
  */
 
-/** @type {string[]} The characters that open a string or template literal. */
-const QUOTES = [
-   '\'',
-   '"',
-   '`',
-];
-
 /**
- * Masks the comments of a source as spaces, keeping string contents and every index and line break.
- * @param {string} source - The source text.
- * @returns {string} The masked text, the same length as the source.
+ * @type {RegExp} The start of an object-literal value that is not a function: a boolean, `null`, `undefined`, a number,
+ * a string or template, an object or an array. Any other value (a `vi.fn`, a function, an arrow, an identifier or a
+ * call that may hold or return one) makes the key a write surface.
  */
-function maskComments(source) {
-   /** @type {string[]} The masked characters. */
-   const out = [...source];
-   /** @type {number} The scan position. */
-   let index = 0;
-   while (index < source.length) {
-      /** @type {string} The two characters at the scan position. */
-      const pair = source.slice(index, index + 2);
-      if (pair === '//' || pair === '/*') {
-         /** @type {number} The index of the line break or block close ending the comment; -1 if none. */
-         const terminator = source.indexOf(pair === '//' ? '\n' : '*/', index + 2);
-         /** @type {number} The index just past the comment (a line comment keeps its line break). */
-         const end = terminator === -1 ? source.length : terminator + (pair === '//' ? 0 : 2);
-         for (let position = index; position < end; position++) {
-            if (out[position] !== '\n') {
-               out[position] = ' ';
-            }
-         }
-         index = end;
-      }
-      else if (QUOTES.includes(source[index])) {
-         /** @type {string} The quote that closes the string. */
-         const quote = source[index];
-         index++;
-         while (index < source.length && source[index] !== quote) {
-            index += source[index] === '\\' ? 2 : 1;
-         }
-         index++;
-      }
-      else {
-         index++;
-      }
-   }
-   return out.join('');
-}
+const NON_FUNCTION_VALUE = /^\s*(?:(?:true|false|null|undefined)\b|[-+]?\d|['"`{[])/;
 
 /**
  * Finds the index of the parenthesis that closes the group opened at a position.
@@ -172,17 +144,20 @@ function findClosing(masked, openIndex) {
  * @returns {string[]} One `line — text` entry per fake write surface.
  */
 function findFakeSurfaces(source) {
-   /** @type {string} The source with its comments masked. */
-   const masked = maskComments(source);
+   /** @type {string} The source with its comments masked (strings kept, so a quoted key is still read). */
+   const masked = maskSource(source);
 
    /** @type {string[]} The fake write surfaces found. */
    const found = [];
    for (const { kind, regex } of FAKE_SURFACE_PATTERNS) {
       for (const match of masked.matchAll(regex)) {
-         if (kind === 'object-literal method') {
+         if (kind === 'object-literal key' && NON_FUNCTION_VALUE.test(masked.slice(match.index + match[0].length))) {
+            continue;
+         }
+         if (kind === 'method') {
             /** @type {number} The index of the parenthesis closing the parameter list. */
             const close = findClosing(masked, match.index + match[0].length - 1);
-            if (!/^\s*\{/.test(masked.slice(close + 1))) {
+            if (!/^[ \t]*\{/.test(masked.slice(close + 1))) {
                continue;
             }
          }
@@ -208,13 +183,17 @@ describe('unit fake documents', () => {
          'vi.spyOn(actor, \'update\').mockResolvedValue(actor);',
          'const stored = { id: \'a\', _source: { items: [] } };',
          'globalThis.Macro = { create: async (data) => data };',
+         'const pack = { getIndex: vi.fn(), create: mockCreate };',
+         'class FakeActor {\n   get name() {\n      return \'a\';\n   }\n'
+            + '   async update(data) {\n      return data;\n   }\n}',
+         'class FakePack {\n   static async createDocuments(data) {\n      return data;\n   }\n}',
       ];
       for (const source of fakes) {
          expect.soft(findFakeSurfaces(source), source).toHaveLength(1);
       }
    });
 
-   it('passes calls, reads, ternaries, switch labels and comments', () => {
+   it('passes calls, reads, ternaries, switch labels, comments and non-function options', () => {
       /** @type {string[]} Sources that build no fake write surface. */
       const others = [
          'await actor.update({ name: \'x\' });',
@@ -227,6 +206,9 @@ describe('unit fake documents', () => {
          'expect([a, create({})]).toEqual([]);',
          'if (actor._source.items) {\n   x();\n}',
          'const names = [\'createEffects\', \'deleteItems\'];',
+         'await actor.update(data, { diff: false, update: true });',
+         'const options = { update: { system: {} }, create: \'x\', delete: [1] };',
+         'update(data)\n{\n   x();\n}',
       ];
       for (const source of others) {
          expect.soft(findFakeSurfaces(source), source).toEqual([]);
