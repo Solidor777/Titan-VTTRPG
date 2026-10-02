@@ -14,7 +14,7 @@ let page;
 /** @type {string[]} Uncaught page errors collected during the current test (cleared each afterEach). */
 let errors;
 /** @type {string} The single fixture actor this file drives. */
-const FIXTURE_NAME = 'HUD Portrait Player';
+const FIXTURE_NAME = 'E2E HUD Portrait Player';
 
 test.beforeAll(async ({ browser }) => {
    page = await browser.newPage();

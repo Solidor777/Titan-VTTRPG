@@ -26,8 +26,8 @@ test.beforeAll(async ({ browser }) => {
 
    // Start from a clean slate: a crashed prior run can leave stale fixtures with duplicate items.
    for (const name of [
-      'HUD Layout Player',
-      'HUD Layout Player 2',
+      'E2E HUD Layout Player',
+      'E2E HUD Layout Player 2',
    ]) {
       await deleteFixtureActor(page, name);
    }
@@ -157,7 +157,7 @@ async function openCategory(page, key) {
  * @returns {Promise<string>} The fixture weapon's id.
  */
 async function seedWeaponFixture(page) {
-   const actorId = await seedControlledActor(page, { name: 'HUD Layout Player' });
+   const actorId = await seedControlledActor(page, { name: 'E2E HUD Layout Player' });
    return page.evaluate(async (id) => {
       const actor = game.actors.get(id);
       if (!actor.items.getName('HUD Layout Blade')) {
@@ -172,7 +172,7 @@ async function seedWeaponFixture(page) {
 }
 
 test('vertical layout stacks categories in a column; horizontal in a row', async () => {
-   await seedControlledActor(page, { name: 'HUD Layout Player' });
+   await seedControlledActor(page, { name: 'E2E HUD Layout Player' });
    const skills = page.locator('[data-testid="player-hud-category-skills"]');
    const resistances = page.locator('[data-testid="player-hud-category-resistances"]');
 
@@ -193,7 +193,7 @@ test('vertical layout stacks categories in a column; horizontal in a row', async
 });
 
 test('sub-options expand to the configured side and lanes never overlap', async () => {
-   await seedControlledActor(page, { name: 'HUD Layout Player' });
+   await seedControlledActor(page, { name: 'E2E HUD Layout Player' });
    const flyout = page.locator('[data-testid="player-hud-flyout"]');
    const skills = page.locator('[data-testid="player-hud-category-skills"]');
 
@@ -259,7 +259,7 @@ test('sub-options expand to the configured side and lanes never overlap', async 
 });
 
 test('the vertical flyout anchors to the open category button and flows up or down', async () => {
-   await seedControlledActor(page, { name: 'HUD Layout Player' });
+   await seedControlledActor(page, { name: 'E2E HUD Layout Player' });
    const flyout = page.locator('[data-testid="player-hud-flyout"]');
    const skills = page.locator('[data-testid="player-hud-category-skills"]');
 
@@ -371,7 +371,7 @@ test('the configured direction is honored at the screen edge (no auto-flip)', as
 });
 
 test('long lists window and wheel-scroll', async () => {
-   await seedControlledActor(page, { name: 'HUD Layout Player' });
+   await seedControlledActor(page, { name: 'E2E HUD Layout Player' });
    // Pin flow down so the scroll fades and wheel direction assert the natural top-to-bottom window.
    await setMenuOptions(page, {
       windowSize: 5,
@@ -398,7 +398,7 @@ test('long lists window and wheel-scroll', async () => {
 });
 
 test('per-category disable removes the category', async () => {
-   await seedControlledActor(page, { name: 'HUD Layout Player' });
+   await seedControlledActor(page, { name: 'E2E HUD Layout Player' });
    await expect(page.locator('[data-testid="player-hud-category-skills"]')).toBeVisible();
 
    await setMenuOptions(page, { categories: { skills: false } });
@@ -412,7 +412,7 @@ test('per-category disable removes the category', async () => {
 test('group mode shows only the three group categories', async () => {
    await seedWeaponFixture(page);
    await seedControlledActor(page, {
-      name: 'HUD Layout Player 2',
+      name: 'E2E HUD Layout Player 2',
       releaseOthers: false,
    });
 

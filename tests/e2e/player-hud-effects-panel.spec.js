@@ -17,7 +17,7 @@ let errors;
 /** @type {string[]} Fixture actor names created by this file, deleted in afterAll. */
 const fixtureNames = [];
 /** @type {string} The single-character fixture this file drives. */
-const FIXTURE_NAME = 'HUD Effects Player';
+const FIXTURE_NAME = 'E2E HUD Effects Player';
 
 test.beforeAll(async ({ browser }) => {
    page = await browser.newPage();
@@ -29,7 +29,7 @@ test.beforeAll(async ({ browser }) => {
    // Start from a clean slate: a crashed prior run can leave stale fixtures behind.
    for (const name of [
       FIXTURE_NAME,
-      'HUD Effects Player 2',
+      'E2E HUD Effects Player 2',
    ]) {
       await deleteFixtureActor(page, name);
    }
@@ -321,7 +321,7 @@ test('group selection hides the panel', async () => {
    await expect(page.locator('[data-testid="player-hud-effects-panel"]')).toBeVisible();
 
    await seedControlledActor(page, {
-      name: 'HUD Effects Player 2',
+      name: 'E2E HUD Effects Player 2',
       releaseOthers: false,
    });
    await expect(page.locator('[data-testid="player-hud-effects-panel"]')).toHaveCount(0);

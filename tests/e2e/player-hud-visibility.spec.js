@@ -118,12 +118,12 @@ async function resetHudOptions(page) {
 }
 
 test('GM sees the portrait for a single selected character', async () => {
-   await seedControlledActor(page, { name: 'HUD Vis Player' });
+   await seedControlledActor(page, { name: 'E2E HUD Vis Player' });
    await expect(page.locator('[data-testid="player-hud-portrait"]')).toBeVisible();
 });
 
 test('GM with no selection shows no HUD elements', async () => {
-   await seedControlledActor(page, { name: 'HUD Vis Player' });
+   await seedControlledActor(page, { name: 'E2E HUD Vis Player' });
    await expect(page.locator('[data-testid="player-hud-portrait"]')).toBeVisible();
 
    await page.evaluate(() => {
@@ -135,7 +135,7 @@ test('GM with no selection shows no HUD elements', async () => {
 
 test('NPC selection shows the portrait without the inspiration button', async () => {
    await seedControlledActor(page, {
-      name: 'HUD Vis NPC',
+      name: 'E2E HUD Vis NPC',
       type: 'npc',
    });
    await expect(page.locator('[data-testid="player-hud-portrait"]')).toBeVisible();
@@ -144,18 +144,18 @@ test('NPC selection shows the portrait without the inspiration button', async ()
 });
 
 test('group selection hides the portrait', async () => {
-   await seedControlledActor(page, { name: 'HUD Vis Player' });
+   await seedControlledActor(page, { name: 'E2E HUD Vis Player' });
    await expect(page.locator('[data-testid="player-hud-portrait"]')).toBeVisible();
 
    await seedControlledActor(page, {
-      name: 'HUD Vis Player 2',
+      name: 'E2E HUD Vis Player 2',
       releaseOthers: false,
    });
    await expect(page.locator('[data-testid="player-hud-portrait"]')).toHaveCount(0);
 });
 
 test('master disable unmounts the HUD and re-enable restores it', async () => {
-   await seedControlledActor(page, { name: 'HUD Vis Player' });
+   await seedControlledActor(page, { name: 'E2E HUD Vis Player' });
    await expect(page.locator('[data-testid="player-hud-portrait"]')).toBeVisible();
 
    await page.evaluate(() => game.settings.set('titan', 'enablePlayerHud', false));
@@ -166,7 +166,7 @@ test('master disable unmounts the HUD and re-enable restores it', async () => {
 });
 
 test('per-element disable hides only that element', async () => {
-   await seedControlledActor(page, { name: 'HUD Vis Player' });
+   await seedControlledActor(page, { name: 'E2E HUD Vis Player' });
    await expect(page.locator('[data-testid="player-hud-portrait"]')).toBeVisible();
 
    await page.evaluate(async () => {
@@ -179,7 +179,7 @@ test('per-element disable hides only that element', async () => {
 });
 
 test('combat-only hides the portrait outside combat and shows it during combat', async () => {
-   const actorId = await seedControlledActor(page, { name: 'HUD Vis Player' });
+   const actorId = await seedControlledActor(page, { name: 'E2E HUD Vis Player' });
    await expect(page.locator('[data-testid="player-hud-portrait"]')).toBeVisible();
 
    await page.evaluate(async () => {
@@ -222,7 +222,7 @@ test('combat-only hides the portrait outside combat and shows it during combat',
 });
 
 test('switching to a tokenless scene hides the HUD; returning restores it', async () => {
-   await seedControlledActor(page, { name: 'HUD Vis Player' });
+   await seedControlledActor(page, { name: 'E2E HUD Vis Player' });
    await expect(page.locator('[data-testid="player-hud-portrait"]')).toBeVisible();
 
    /** @type {{tempId: string, originalId: string}} The temp and original scene ids. */
@@ -264,12 +264,12 @@ test('switching to a tokenless scene hides the HUD; returning restores it', asyn
       await game.scenes.get(originalId).activate();
       await game.scenes.get(tempId)?.delete();
    }, ids);
-   await seedControlledActor(page, { name: 'HUD Vis Player' });
+   await seedControlledActor(page, { name: 'E2E HUD Vis Player' });
    await expect(page.locator('[data-testid="player-hud-portrait"]')).toBeVisible();
 });
 
 test('player with no selection falls back to an owned token on the scene', async ({ browser }) => {
-   const actorId = await seedControlledActor(page, { name: 'HUD Vis Owned' });
+   const actorId = await seedControlledActor(page, { name: 'E2E HUD Vis Owned' });
    await page.evaluate(async (id) => {
       const player = game.users.getName('E2E Player 1');
       await game.actors.get(id).update({

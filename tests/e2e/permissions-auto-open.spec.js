@@ -11,9 +11,9 @@ test.describe('permissions — auto-open character sheets', () => {
 
          // Effect actor at lower initiative → its turn starts after one nextTurn.
          const seed = {
-            sceneName: 'B4 All Scene',
-            effectActor: buildTurnEffectActorData('B4 All Actor'),
-            otherActor: buildTurnEffectActorData('B4 All Other'),
+            sceneName: 'E2E B4 All Scene',
+            effectActor: buildTurnEffectActorData('E2E B4 All Actor'),
+            otherActor: buildTurnEffectActorData('E2E B4 All Other'),
             effectInitiative: 10,
             otherInitiative: 20,
          };
@@ -48,10 +48,10 @@ test.describe('permissions — auto-open character sheets', () => {
          // updates after it, so an observed heal proves the auto-open decision has already been made
          // and declined to render. Stamina is pre-seeded below max so the +2 heal moves the value.
          const seed = {
-            sceneName: 'B4 Off Scene',
-            effectActor: buildTurnEffectActorData('B4 Off Actor'),
-            effectAbilities: [buildFastHealingAbilityData('B4 Off Fast Healing', 2)],
-            otherActor: buildTurnEffectActorData('B4 Off Other'),
+            sceneName: 'E2E B4 Off Scene',
+            effectActor: buildTurnEffectActorData('E2E B4 Off Actor'),
+            effectAbilities: [buildFastHealingAbilityData('E2E B4 Off Fast Healing', 2)],
+            otherActor: buildTurnEffectActorData('E2E B4 Off Other'),
             effectInitiative: 10,
             otherInitiative: 20,
             staminaValue: 1,

@@ -20,10 +20,10 @@ test.describe('socket sync — replicated turn-effect state', () => {
 
          // Effect actor (lower initiative → turn 1) carries persistent damage 1; observer = the player.
          const seed = {
-            sceneName: 'A1 Scene',
-            effectActor: buildTurnEffectActorData('A1 Effect Actor'),
-            effectAbilities: [buildPersistentDamageAbilityData('A1 PD', 1)],
-            otherActor: buildTurnEffectActorData('A1 Other Actor'),
+            sceneName: 'E2E A1 Scene',
+            effectActor: buildTurnEffectActorData('E2E A1 Effect Actor'),
+            effectAbilities: [buildPersistentDamageAbilityData('E2E A1 PD', 1)],
+            otherActor: buildTurnEffectActorData('E2E A1 Other Actor'),
             effectInitiative: 10,
             otherInitiative: 20,
             observerUserName: 'E2E Player 1',
@@ -72,10 +72,10 @@ test.describe('socket sync — replicated turn-effect state', () => {
 
          // Pre-seed stamina to 1 so a +2 heal is observable (heal is capped at max).
          const seed = {
-            sceneName: 'A2 Scene',
-            effectActor: buildTurnEffectActorData('A2 Effect Actor'),
-            effectAbilities: [buildFastHealingAbilityData('A2 FH', 2)],
-            otherActor: buildTurnEffectActorData('A2 Other Actor'),
+            sceneName: 'E2E A2 Scene',
+            effectActor: buildTurnEffectActorData('E2E A2 Effect Actor'),
+            effectAbilities: [buildFastHealingAbilityData('E2E A2 FH', 2)],
+            otherActor: buildTurnEffectActorData('E2E A2 Other Actor'),
             effectInitiative: 10,
             otherInitiative: 20,
             staminaValue: 1,
@@ -120,10 +120,10 @@ test.describe('socket sync — replicated turn-effect state', () => {
          const expectedResolve = 1;
 
          const seed = {
-            sceneName: 'A3 Scene',
-            effectActor: buildTurnEffectActorData('A3 Effect Actor'),
-            effectAbilities: [buildResolveRegainAbilityData('A3 RR', 1)],
-            otherActor: buildTurnEffectActorData('A3 Other Actor'),
+            sceneName: 'E2E A3 Scene',
+            effectActor: buildTurnEffectActorData('E2E A3 Effect Actor'),
+            effectAbilities: [buildResolveRegainAbilityData('E2E A3 RR', 1)],
+            otherActor: buildTurnEffectActorData('E2E A3 Other Actor'),
             effectInitiative: 10,
             otherInitiative: 20,
             resolveValue: 0,
@@ -167,10 +167,10 @@ test.describe('socket sync — replicated turn-effect state', () => {
          await setWorldSetting(gm, 'autoRevertPersistentDamage', 'enabled');
 
          const seed = {
-            sceneName: 'A4 Scene',
-            effectActor: buildTurnEffectActorData('A4 Effect Actor'),
-            effectAbilities: [buildPersistentDamageAbilityData('A4 PD', 1)],
-            otherActor: buildTurnEffectActorData('A4 Other Actor'),
+            sceneName: 'E2E A4 Scene',
+            effectActor: buildTurnEffectActorData('E2E A4 Effect Actor'),
+            effectAbilities: [buildPersistentDamageAbilityData('E2E A4 PD', 1)],
+            otherActor: buildTurnEffectActorData('E2E A4 Other Actor'),
             effectInitiative: 10,
             otherInitiative: 20,
             observerUserName: 'E2E Player 1',
@@ -229,10 +229,10 @@ test.describe('socket sync — replicated turn-effect state', () => {
          expect(gm1IsBestOwner, 'GM 1 must be the first active GM').toBe(true);
 
          const seed = {
-            sceneName: 'A5 Scene',
-            effectActor: buildTurnEffectActorData('A5 Effect Actor'),
-            effectAbilities: [buildPersistentDamageAbilityData('A5 PD', 1)],
-            otherActor: buildTurnEffectActorData('A5 Other Actor'),
+            sceneName: 'E2E A5 Scene',
+            effectActor: buildTurnEffectActorData('E2E A5 Effect Actor'),
+            effectAbilities: [buildPersistentDamageAbilityData('E2E A5 PD', 1)],
+            otherActor: buildTurnEffectActorData('E2E A5 Other Actor'),
             effectInitiative: 10,
             otherInitiative: 20,
          };

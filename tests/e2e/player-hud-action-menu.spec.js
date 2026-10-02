@@ -27,9 +27,9 @@ test.beforeAll(async ({ browser }) => {
 
    // Start from a clean slate: a crashed prior run can leave stale fixtures with duplicate items.
    for (const name of [
-      'HUD Menu Player',
-      'HUD Menu Player 2',
-      'HUD Menu Empty',
+      'E2E HUD Menu Player',
+      'E2E HUD Menu Player 2',
+      'E2E HUD Menu Empty',
    ]) {
       await deleteFixtureActor(page, name);
    }
@@ -178,14 +178,14 @@ function fullCheck(label) {
 }
 
 test('categories with no sub-options are hidden', async () => {
-   await seedControlledActor(page, { name: 'HUD Menu Empty' });
+   await seedControlledActor(page, { name: 'E2E HUD Menu Empty' });
    await expect(page.locator('[data-testid="player-hud-category-skills"]')).toBeVisible();
    await expect(page.locator('[data-testid="player-hud-category-weapons"]')).toHaveCount(0);
    await expect(page.locator('[data-testid="player-hud-category-spells"]')).toHaveCount(0);
 });
 
 test('equipped weapon main action rolls the first attack to chat', async () => {
-   const actorId = await seedControlledActor(page, { name: 'HUD Menu Player' });
+   const actorId = await seedControlledActor(page, { name: 'E2E HUD Menu Player' });
    await seedDocuments(page, actorId, {
       items: [{
          name: 'HUD Longsword',
@@ -206,7 +206,7 @@ test('equipped weapon main action rolls the first attack to chat', async () => {
 });
 
 test('unequipped weapon main action equips it', async () => {
-   const actorId = await seedControlledActor(page, { name: 'HUD Menu Player' });
+   const actorId = await seedControlledActor(page, { name: 'E2E HUD Menu Player' });
    const { itemIds } = await seedDocuments(page, actorId, {
       items: [{
          name: 'HUD Sidearm',
@@ -228,7 +228,7 @@ test('unequipped weapon main action equips it', async () => {
 });
 
 test('weapon sub-buttons send to chat and open the sheet', async () => {
-   const actorId = await seedControlledActor(page, { name: 'HUD Menu Player' });
+   const actorId = await seedControlledActor(page, { name: 'E2E HUD Menu Player' });
    /** @type {string} The equipped fixture weapon's id. */
    const weaponId = await page.evaluate((id) => {
       return game.actors.get(id).items.find((item) => item.name === 'HUD Longsword').id;
@@ -262,9 +262,9 @@ test('weapon sub-buttons send to chat and open the sheet', async () => {
 });
 
 test('skill roll for a group hits every selected actor', async () => {
-   await seedControlledActor(page, { name: 'HUD Menu Player' });
+   await seedControlledActor(page, { name: 'E2E HUD Menu Player' });
    await seedControlledActor(page, {
-      name: 'HUD Menu Player 2',
+      name: 'E2E HUD Menu Player 2',
       releaseOthers: false,
    });
    /** @type {number} The chat message count before the group roll. */
@@ -285,9 +285,9 @@ test('skill roll for a group hits every selected actor', async () => {
 });
 
 test('resistance roll rolls for all selected actors', async () => {
-   await seedControlledActor(page, { name: 'HUD Menu Player' });
+   await seedControlledActor(page, { name: 'E2E HUD Menu Player' });
    await seedControlledActor(page, {
-      name: 'HUD Menu Player 2',
+      name: 'E2E HUD Menu Player 2',
       releaseOthers: false,
    });
    const before = await messageCount(page);
@@ -307,9 +307,9 @@ test('resistance roll rolls for all selected actors', async () => {
 });
 
 test('apply damage dialog applies the amount to all selected actors', async () => {
-   const firstId = await seedControlledActor(page, { name: 'HUD Menu Player' });
+   const firstId = await seedControlledActor(page, { name: 'E2E HUD Menu Player' });
    const secondId = await seedControlledActor(page, {
-      name: 'HUD Menu Player 2',
+      name: 'E2E HUD Menu Player 2',
       releaseOthers: false,
    });
 
@@ -354,7 +354,7 @@ test('apply damage dialog applies the amount to all selected actors', async () =
 });
 
 test('spell main action rolls a casting check', async () => {
-   const actorId = await seedControlledActor(page, { name: 'HUD Menu Player' });
+   const actorId = await seedControlledActor(page, { name: 'E2E HUD Menu Player' });
    const { itemIds } = await seedDocuments(page, actorId, {
       items: [{
          name: 'HUD Spark',
@@ -373,7 +373,7 @@ test('spell main action rolls a casting check', async () => {
 });
 
 test('ability and effect main actions roll their first check', async () => {
-   const actorId = await seedControlledActor(page, { name: 'HUD Menu Player' });
+   const actorId = await seedControlledActor(page, { name: 'E2E HUD Menu Player' });
    const { itemIds } = await seedDocuments(page, actorId, {
       items: [{
          name: 'HUD Trick',
@@ -416,7 +416,7 @@ test('ability and effect main actions roll their first check', async () => {
 });
 
 test('effect duration and remove sub-buttons update and delete the effect', async () => {
-   const actorId = await seedControlledActor(page, { name: 'HUD Menu Player' });
+   const actorId = await seedControlledActor(page, { name: 'E2E HUD Menu Player' });
    /** @type {string} The fixture effect's id. */
    const effectId = await page.evaluate((id) => {
       return game.actors.get(id).effects.find((effect) => effect.name === 'HUD Burning').id;
@@ -450,7 +450,7 @@ test('effect duration and remove sub-buttons update and delete the effect', asyn
 });
 
 test('commodity quantity sub-buttons step the quantity', async () => {
-   const actorId = await seedControlledActor(page, { name: 'HUD Menu Player' });
+   const actorId = await seedControlledActor(page, { name: 'E2E HUD Menu Player' });
    const { itemIds } = await seedDocuments(page, actorId, {
       items: [{
          name: 'HUD Rations',
@@ -490,7 +490,7 @@ test('commodity quantity sub-buttons step the quantity', async () => {
 });
 
 test('the weapons filter hides action-less weapons until disabled', async () => {
-   const actorId = await seedControlledActor(page, { name: 'HUD Menu Player' });
+   const actorId = await seedControlledActor(page, { name: 'E2E HUD Menu Player' });
 
    // Seed an action-less weapon AND a normal one: the category itself disappears when every
    // weapon is filtered, so the normal weapon keeps the category clickable in any test order.
@@ -529,7 +529,7 @@ test('the weapons filter hides action-less weapons until disabled', async () => 
 });
 
 test('a disabled sub-button gate removes that sub-button from the flyout', async () => {
-   const actorId = await seedControlledActor(page, { name: 'HUD Menu Player' });
+   const actorId = await seedControlledActor(page, { name: 'E2E HUD Menu Player' });
    const { itemIds } = await seedDocuments(page, actorId, {
       items: [{
          name: 'HUD Gate Blade',
@@ -570,7 +570,7 @@ test('a disabled sub-button gate removes that sub-button from the flyout', async
 });
 
 test('Escape and click-away close the cascade', async () => {
-   await seedControlledActor(page, { name: 'HUD Menu Player' });
+   await seedControlledActor(page, { name: 'E2E HUD Menu Player' });
    await page.locator('[data-testid="player-hud-category-skills"]').click();
    await expect(page.locator('[data-testid="player-hud-flyout"]')).toBeVisible();
    await page.keyboard.press('Escape');
@@ -636,7 +636,7 @@ async function openCategory(key) {
 }
 
 test('skill sub-options show the icon of the actor\'s current default attribute', async () => {
-   const actorId = await seedControlledActor(page, { name: 'HUD Menu Player' });
+   const actorId = await seedControlledActor(page, { name: 'E2E HUD Menu Player' });
    await setAthleticsAttribute(actorId, 'body');
 
    await openCategory('skills');
@@ -651,7 +651,7 @@ test('skill sub-options show the icon of the actor\'s current default attribute'
 });
 
 test('resistance and utility sub-options carry icons', async () => {
-   await seedControlledActor(page, { name: 'HUD Menu Player' });
+   await seedControlledActor(page, { name: 'E2E HUD Menu Player' });
    await openCategory('resistances');
    await expect(page.locator('[data-testid="player-hud-sub-option-resistances-reflexes"] i'))
       .toHaveClass(/(?:^|\s)fas\sfa-rabbit-running(?:\s|$)/);
@@ -676,7 +676,7 @@ test('resistance and utility sub-options carry icons', async () => {
 });
 
 test('inspiration toggles show whether inspiration applies', async () => {
-   const actorId = await seedControlledActor(page, { name: 'HUD Menu Player' });
+   const actorId = await seedControlledActor(page, { name: 'E2E HUD Menu Player' });
    await page.evaluate((id) => game.actors.get(id).update({ 'system.inspiration': true }), actorId);
 
    const portraitToggle = page.locator('[data-testid="player-hud-toggle-inspiration"]');

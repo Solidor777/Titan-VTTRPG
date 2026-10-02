@@ -77,7 +77,7 @@ test.describe('permissions — sheet ownership levels', () => {
          gm: 'E2E GM 1',
          player: 'E2E Player 1',
       }, async ({ gm, player }) => {
-         const id = await seedOwnedActor(gm, 'B1 Owner Actor', 'E2E Player 1', 'OWNER');
+         const id = await seedOwnedActor(gm, 'E2E B1 Owner Actor', 'E2E Player 1', 'OWNER');
          try {
             await player.waitForFunction((id) => !!game.actors.get(id), id, { timeout: 1000 });
             const state = await readSheetState(player, id);
@@ -96,7 +96,7 @@ test.describe('permissions — sheet ownership levels', () => {
          gm: 'E2E GM 1',
          player: 'E2E Player 1',
       }, async ({ gm, player }) => {
-         const id = await seedOwnedActor(gm, 'B1 Observer Actor', 'E2E Player 1', 'OBSERVER');
+         const id = await seedOwnedActor(gm, 'E2E B1 Observer Actor', 'E2E Player 1', 'OBSERVER');
          try {
             await player.waitForFunction((id) => !!game.actors.get(id), id, { timeout: 1000 });
             const state = await readSheetState(player, id);
@@ -115,7 +115,7 @@ test.describe('permissions — sheet ownership levels', () => {
          gm: 'E2E GM 1',
          player: 'E2E Player 1',
       }, async ({ gm, player }) => {
-         const id = await seedOwnedActor(gm, 'B1 Limited Actor', 'E2E Player 1', 'LIMITED');
+         const id = await seedOwnedActor(gm, 'E2E B1 Limited Actor', 'E2E Player 1', 'LIMITED');
          try {
             await player.waitForFunction((id) => !!game.actors.get(id), id, { timeout: 1000 });
             // LIMITED meets the default viewPermission (LIMITED) so the sheet is visible, but not editable.
@@ -142,7 +142,7 @@ test.describe('permissions — sheet ownership levels', () => {
          gm: 'E2E GM 1',
          player: 'E2E Player 1',
       }, async ({ gm, player }) => {
-         const id = await seedOwnedActor(gm, 'B1 None Actor', 'E2E Player 1', 'NONE');
+         const id = await seedOwnedActor(gm, 'E2E B1 None Actor', 'E2E Player 1', 'NONE');
          try {
             // Foundry replicates the Actor document to ALL clients regardless of ownership — permission
             // gates VISIBILITY, not collection membership. So the doc IS present in the player's
