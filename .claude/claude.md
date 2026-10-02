@@ -34,9 +34,11 @@
 * **Tests use genuine live documents.** Any test of a change to a document runs on documents made through real Foundry
   user flows. Tests may share documents; the suite keeps a running list and deletes every test document when it is done.
   Cleanup may use the API `delete`. Records from the user's world are never checked in as test data. Synthetic data is
-  allowed only for UI elements, document-agnostic operations such as localization, and intermediate computations on
-  given inputs. World settings may be set through the API. Mid-test document edits go through sheet and HUD controls,
-  with a direct update only for a field that has no control.
+  allowed only for UI elements, document-agnostic operations such as localization, intermediate computations on given
+  inputs, and tests that invalid data is rejected or handled (real flows cannot produce invalid data). Values the system
+  derives, such as a check's Dice Mod or Advantage from rules elements, are set up through the real flows that produce
+  them. World settings may be set through the API. Mid-test document edits go through sheet and HUD controls, with a
+  direct update only for a field that has no control.
 * **Never make unverified claims.** Docs, comments and reports state only what was measured (with the command or log)
   or read (with the source location). Anything inferred is labelled as such.
 
