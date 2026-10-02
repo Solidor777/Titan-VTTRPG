@@ -379,7 +379,7 @@ export default class TitanActorSheet extends TitanDocumentSheet {
    async _onDropFolder(event, data) {
       // Create folder from the drop data.
       const folder = await Folder.implementation.fromDropData(data);
-      if (folder && folder.type !== 'Item') {
+      if (folder && folder.type === 'Item') {
 
          // Get the contents of the folder.
          const droppedItemData = await Promise.all(folder.contents.map(async (item) => {
