@@ -719,14 +719,14 @@ export default class EffectTrayState {
          });
       }
 
-      // Core fires no hook named for a compendium's creation or deletion. It changes `game.packs` and then
-      // re-renders the compendium directory, on the creating client and, through the `manageCompendium`
-      // socket, on every other client (client/documents/collections/compendium-collection.mjs:736-749,
-      // 917-926, 935-942); a world compendium configuration change (visibility, ownership) re-renders it too
-      // (:950-966). Each re-render calls the `renderCompendiumDirectory` hook (client/applications/api/
-      // application.mjs:588-589, 1674-1680). The directory is never skipped as an unrendered first render,
-      // because the sidebar force-renders every visible tab at startup (client/applications/sidebar/
-      // sidebar.mjs:198-213; the skip is application.mjs:520-521).
+      // Core fires no hook named for a compendium's creation or deletion; the cited lines are Foundry 14.364's. It
+      // changes `game.packs` and then re-renders the compendium directory, on the creating client and, through the
+      // `manageCompendium` socket, on every other client (client/documents/collections/compendium-collection.mjs:
+      // 736-749, 917-926, 935-942); a world compendium configuration change (visibility, ownership) re-renders it too
+      // (:950-966). Each re-render calls the `renderCompendiumDirectory` hook (client/applications/api/application.mjs:
+      // 588-589, 1674-1680). The directory is never skipped as an unrendered first render, because the sidebar
+      // force-renders every visible tab at startup (client/applications/sidebar/sidebar.mjs:198-213; the skip is
+      // application.mjs:520-521).
       /**
        * Re-reads the available packs after the compendium directory re-renders. The hook's arguments (the
        * directory application, its element, context and options) are not needed: `game.packs` is the source.

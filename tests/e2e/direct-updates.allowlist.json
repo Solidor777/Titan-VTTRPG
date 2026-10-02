@@ -3,6 +3,6 @@
       "file": "e2e/condition-description.spec.js",
       "pattern": "^await game\\.scenes\\.active\\?\\.update\\(\\{ active: false \\}\\);$",
       "field": "Scene active",
-      "reason": "Foundry has no control that deactivates a scene: the scene directory and navigation offer Activate only (client/applications/sidebar/tabs/scene-directory.mjs, client/applications/ui/scene-navigation.mjs; lang key SCENE.Activate, no Deactivate). The #113 test needs a world with no active scene."
+      "reason": "Foundry has no control that deactivates a scene: the scene directory and navigation offer Activate only (client/applications/sidebar/tabs/scene-directory.mjs, client/applications/ui/scene-navigation.mjs; lang key SCENE.Activate, no Deactivate; core paths refer to Foundry 14.364 at C:\\FoundryVTT\\V14\\dev\\foundry). The #113 test needs a world with no active scene."
    }
 ]

@@ -151,34 +151,41 @@ Deferred/known bugs. Todos (planned work) live in `docs/TODO.md`; this file is b
 
 ### 114. Deactivating the viewed scene while a status's scrolling text is on screen throws
 
-- **Measured** (probe, `test-titan`, logged in as E2E GM 1):
+Core citations below refer to Foundry 14.364 at `C:\FoundryVTT\V14\dev\foundry`, the build the server runs (the
+probe read `game.release` as 14.364). Probe evidence is in `.superpowers/sdd/test-suite-rewrite/phase-0/`
+(`probe114-*.json`, local and not checked in).
+
+- **Measured** (probe, `test-titan`, logged in as E2E GM 1, TITAN loaded):
   - Setup: a token's actor gains a status (`toggleStatusEffect`), which starts the 2 s scrolling text. The viewed
     scene is then deactivated at once (`scene.update({ active: false })`).
   - Result: the page throws `TypeError: Cannot read properties of null (reading 'off')` at `PreciseText.destroy` ←
-    `InterfaceCanvasGroup.createScrollingText` (`client/canvas/groups/interface.mjs:174`).
-  - Control: the same steps with a 2.6 s wait before the deactivation threw nothing.
-- **Destroy sequence, measured** (probe, `test-titan`, E2E GM 1, Foundry 14.364, TITAN loaded): the scrolling text is
-  destroyed twice. A wrapper on `PreciseText.prototype.destroy` recorded each call's stack:
+    `InterfaceCanvasGroup.createScrollingText` (`client/canvas/groups/interface.mjs:174`) (`probe114-status.json`).
+- **Destroy sequence, measured:** the scrolling text is destroyed twice. A wrapper on
+  `PreciseText.prototype.destroy` recorded each call's stack:
   1. The deactivation runs `Scene.unview` → `Canvas.draw` → `Canvas.tearDown` → `InterfaceCanvasGroup.tearDown`.
      Read: the group's `_tearDown` destroys every non-layer child with its children
      (`client/canvas/groups/canvas-group-mixin.mjs:172-177`, `tearDownChildren = true` at `:35`).
   2. Read: `Canvas.tearDown` first terminates the running animations (`client/canvas/board.mjs:1326`), which resolves
      the fade-in that `createScrollingText` awaits, so it starts the scroll animation
      (`client/canvas/groups/interface.mjs:211-230`). Measured: a console error `TypeError: Cannot read properties of
-     null (reading 'position')` at `set y` ← `#updateAttribute` ← `#animateFrame`.
-  3. `createScrollingText`'s clean-up (`interface.mjs:233-234`, read) calls `text.destroy()` a second time. Measured:
-     the second call sees `destroyed === true` and `_texture === null`, and throws the `'off'` page error.
+     null (reading 'position')` at `set y` ← `#updateAttribute` ← `#animateFrame`. Read: `#animateFrame` catches the
+     error and rejects the animation (`client/canvas/animation/canvas-animation.mjs:270-271`), and `animate` logs it
+     (`:159`), so the awaited promise settles.
+  3. `createScrollingText`'s clean-up removes the text (`interface.mjs:234`) and calls `text.destroy()` a second time
+     (`:235`). Measured: the second call sees `destroyed === true` and `_texture === null`, and throws the `'off'`
+     page error.
 - **Measured, bearing on attribution:**
   - A direct core call, `canvas.interface.createScrollingText(...)` followed by deactivating the scene, throws the
-    same error with the same destroy sequence. No TITAN document is involved.
-  - The status-toggle trigger gives the same sequence.
+    same error with the same destroy sequence (`probe114-core.json`). No TITAN document is involved.
+  - The status-toggle trigger gives the same sequence (`probe114-status.json`).
   - Every frame in both destroy stacks and in both error stacks is `foundry.mjs`, `pixi.min.js`, or the probe wrapper.
   - Read: TITAN's `src/` has no PIXI or prototype patch and no canvas tear-down hook, and `dist/index.js` has no
     reference to `createScrollingText`, `InterfaceCanvasGroup` or `tearDownChildren`.
 - **Not run:** a control in a world without TITAN. Every measurement above ran with TITAN loaded, so attribution to
   core is not confirmed. The user will run that control.
-- **Control, measured:** the core call with a 2.6 s wait before the deactivation destroys the text once, from
-  `createScrollingText`, and throws nothing.
+- **Controls, measured:** with a 2.6 s wait before the deactivation, the text is destroyed once, from
+  `createScrollingText`, and nothing throws. This holds for the core call (`probe114-core-wait.json`) and for the
+  status toggle (`probe114-status-wait.json`).
 - **Found:** 2026-10-01 while writing the gate test of CLOSED_BUGS #113 (test-suite rewrite, Phase 0 fix round 1).
 - **Status:** Open; attribution awaits the no-TITAN control. TITAN does not patch core. The #113 gate test waits until
   no animation runs on `canvas.interface` before it deactivates the scene; measured, without that wait it fails with

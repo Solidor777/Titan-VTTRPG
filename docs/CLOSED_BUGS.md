@@ -1260,6 +1260,7 @@ when fixed.
   the pack, and the select offered only `TITAN Effects Effects TITAN Effects (Copy)`.
 - **Found:** 2026-10-01, Phase 0 of the test-suite rewrite.
 - **Fixed:** 2026-10-01.
+  - Core citations in this entry refer to Foundry 14.364 at `C:\FoundryVTT\V14\dev\foundry`, the build the server runs.
   - Core fires no hook named for a compendium's creation or deletion. It changes `game.packs` and then calls
     `ui.compendium.render()`. This runs on the creating client and, through the `manageCompendium` socket, on every
     other client. A world compendium configuration change does the same. Read:
@@ -1273,14 +1274,22 @@ when fixed.
   - Measured with two GM clients (probe script, not checked in): a pack created on one client appeared in both tray
     selects, and deleting it removed it from both. The client that had it selected fell back to `TITAN Effects`.
   - Gated by `tests/e2e/effect-tray.spec.js` 'the tray follows a world compendium created and deleted in the Compendium
-    directory' (its last test). It needs no leftover state; every step uses a real control:
-    - with the tray already built, it creates a pack with a run-unique `E2E Tray Pack <timestamp>` label through the
-      Compendium directory's Create Compendium dialog;
-    - it asserts the tray offers the pack, then selects it in the tray;
-    - it deletes the pack through the directory entry's context menu and confirmation;
-    - it asserts the tray no longer offers the pack and has fallen back to `TITAN Effects`.
-  - Measured: with the tray's `renderCompendiumDirectory` hook renamed away, the test fails (expected 1 option, received
-    0). The test moves with the `effect-tray` rewrite (test-suite rewrite Phase 6).
+    directory, on both GM clients' (its last test). It needs no leftover state; every step uses a real control. It
+    runs on the spec's E2E GM 1 page and on a second client logged in as E2E GM 2, which sees the pack change only
+    through the `manageCompendium` socket:
+    - with both trays already built, it creates a pack with a run-unique `E2E Tray Pack <timestamp>` label through
+      the first client's Create Compendium dialog;
+    - on each client it asserts the tray offers the pack, selects it in the tray, and sees the empty-pack state;
+    - it deletes the pack through the first client's directory context menu and confirmation;
+    - on each client it asserts the tray no longer offers the pack, has fallen back to `TITAN Effects`, and lists that
+      pack's top-level folders and root effects;
+    - it asserts that neither client raised a page error.
+  - Measured mutations of `EffectTrayState`, one run each; every one fails the test:
+    - the `renderCompendiumDirectory` hook renamed away: expected 1 option, received 0;
+    - no reload after the fallback: the empty-pack state is still shown;
+    - the hook skipped on E2E GM 2 only: the second client's tray never offers the pack;
+    - a throw after a pack deletion on E2E GM 1 only, then on E2E GM 2 only: the matching page-error assertion fails.
+  - The test moves with the `effect-tray` rewrite (test-suite rewrite Phase 6).
 
 ### 113. `condition-description.spec.js` failed when no scene was active at its start
 
@@ -1302,6 +1311,7 @@ when fixed.
     the helper's order: it creates the token before the canvas has drawn the scene it just activated.
 - **Found:** 2026-10-01, Phase 0 of the test-suite rewrite.
 - **Fixed:** 2026-10-01.
+  - Core citations in this entry refer to Foundry 14.364 at `C:\FoundryVTT\V14\dev\foundry`, the build the server runs.
   - `controlFixtureActorToken` waits for `canvas.ready && canvas.scene?.id === scene.id` (`titanWait`) before creating
     the token.
   - The same probe, waiting for the draw, threw nothing; the placeable was parented and `toggleStatusEffect`
