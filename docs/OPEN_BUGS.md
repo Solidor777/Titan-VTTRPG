@@ -72,15 +72,6 @@ Deferred/known bugs. Todos (planned work) live in `docs/TODO.md`; this file is b
   after it counted 0 orphaned tokens (measured). The full e2e run that followed left the same four tokens on the
   re-created scene (`node tests/e2e/census.js` after it: 4 orphaned tokens, measured).
 
-### 107. Dropping an Item folder on an actor sheet creates nothing
-
-- **What:** `TitanActorSheet#_onDropFolder` (`src/document/types/actor/sheet/TitanActorSheet.js:382`) reads
-  `if (folder && folder.type !== 'Item')`. The condition is inverted, so it turns away every Item folder and handles
-  only folders of other types. Dropping an Item folder from the Items sidebar onto an actor or token sheet creates no
-  Item, with no notification and no error. This was measured on two token sheets in the #102 repro.
-- **Found:** 2026-10-01 during the #102 real-path repro.
-- **Status:** Open.
-
 ### 108. `TitanActor#getCombatant` uses a core API that is deprecated and removed in v15
 
 - **What:** `src/document/types/actor/TitanActor.js:83` calls `game.combat?.getCombatantByActor(this.id)`. Foundry

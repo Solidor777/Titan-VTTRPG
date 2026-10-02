@@ -812,8 +812,15 @@ posts a chat message of the expected subtype (`message.type`) and the card rende
 following edits made in the item or effect sheet, delete confirmation and the confirmation-off path, check tag parity
 across the item sheet, the character sheet and the Effect HUD), `custom-traits.spec.js` (the Add Custom Trait dialog,
 the tag's edit and delete icons, the tooltip, on items and effects), `sheet-filters.spec.js` (the name filters of the
-character sheet tabs and of the item Checks tab) and `character-sheet-layout.spec.js` (Skills row geometry, sidebar
-labels, browser zoom on the shared bulk actor). `tests/e2e/harness.js` provides `test`, `expect` and
+character sheet tabs and of the item Checks tab), `character-sheet-layout.spec.js` (Skills row geometry, sidebar
+labels, browser zoom on the shared bulk actor), `rules-element-editor.spec.js` (the Rules Elements tab of a flow-made
+weapon: add and delete, the selector's default key, the rounding select of Multiply Base and Multiply Sum, the
+conditional check modifier editor), `item-sheet-rolls.spec.js` (the sidebar roll buttons of an owned equipment, weapon
+and spell, the Checks tab roll preview, a check added while the sheet is open, damage-reduction settings in the
+posted check parameters), `spell-sheet.spec.js` (the condition aspects' Off-Balance option, the Casting Check tab's
+aspect costs, its re-pricing by a second client and its scroll position) and `drag.spec.js` (real pointer drags:
+character sheet item and effect lists, the four item sheet lists, a row copied between sheets and refused by a list
+of another kind, a world item or a folder dropped on an actor sheet). `tests/e2e/harness.js` provides `test`, `expect` and
 `flushPageErrors`; `tests/e2e/join.js` (no test-runner imports, so the setup, teardown and census load it without
 `harness.js`) provides `joinWorld`, `trackWorldPage`, `flushPageErrors` and `takeUncheckedErrors`; `tests/e2e/fixtures.js`
 re-exports `joinWorld` and provides `login`, `openSheetByUuid(page, uuid)` (`fromUuid` then `sheet.render`, waits for
@@ -977,7 +984,9 @@ open actor sheet), `addEffect` (the Effects tab add button, the effect renamed i
 duration type chosen in the sheet header), `addCheck` (the Checks tab add button, then the row's label input and,
 when asked, its Resolve Cost input, Resistance Check select and Opposed Check box),
 `addRulesElement` (the Rules Elements tab add button, the operation select, and the `ccm-*` selects and value input
-of a conditional check modifier), `createWorldItem`, `addCustomTrait`, `addAttack`, `enableAspect` and
+of a conditional check modifier), `createWorldItem`, `createFolder` (the directory's Create Folder button and the folder
+configuration window; `createActor` and `createWorldItem` take a `folderId` and then use that folder's own Create
+button, which creates the document inside the folder), `addCustomTrait`, `addAttack`, `enableAspect` and
 `addCustomAspect` (the Add Custom Trait dialog with an optional description, the weapon Attacks tab add button,
 the spell Standard Aspects toggle with its option toggles and resistance select, the spell Custom Aspects tab add
 button), `pickPortrait` (the
@@ -1196,6 +1205,33 @@ from writing them; each says whether it was measured (with its saved log, under
   document of the same name and fails inside the flow; the first failure is the one to read. Measured: the second
   failure in `gates-fix-before.log` (two `E2E Rows Actor` directory entries).
 
+**E2E drag and item sheet tests (`drag`, `rules-element-editor`, `item-sheet-rolls`, `spell-sheet`)** — notes; each says
+whether it was measured (with its saved log, under `.superpowers/sdd/test-suite-rewrite/phase-3/`, local), read (with
+the source) or inferred:
+- A grip drag (`dragTo` from a row's `[data-drag-handle]` to another row, with `targetPosition`) moves a row only when
+  both ends are on screen. Measured: with three checks, one of them expanded (302 px), in an item sheet at its default
+  650 px height, the first row was scrolled out of view behind the filter and two drags from its grip to the last row
+  moved nothing (`zz-check-drag.log`, `zz-check-drag.png`); `drag.spec.js` sets each sheet to `top: 10, height: 1000`
+  with `setPosition` (a window size, not a document). The drop half decides before or after: `computeIndex` compares
+  the pointer with the row's midpoint (read: `DragReorderActions.js`), so a move to the end drops in the lower half of
+  the last row, and the drag tests collapse the first and last rows so that half stays short and on screen.
+- A list's `<ol>` renders only when the list has a row (read: `{#if ...length > 0}` in `ItemSheetRulesElementsTab.svelte`
+  and `ItemSheetChecksTab.svelte`), so a sheet that receives a copied row needs one row of its own to drop on.
+- The Casting Check tab has no control that changes an aspect (read: `SpellSheetCastingCheckTab.svelte` holds only the
+  attribute, skill, auto-calculate, difficulty and complexity controls) and a sheet shows one tab at a time, so the
+  re-pricing test has a second client (`E2E GM 2`) change the range on the Standard Aspects tab while the first
+  client's Casting Check panel is open.
+- The Casting Check panel's list scrolls once the spell has 13 custom aspects at the default sheet size: 1 to 8 gave no
+  overflow, 9 and 10 gave 2 px, 11 and 12 gave 39 px, 13 and 14 gave 77 px (`spell-overflow-measure.log`); the test
+  scrolls 40 px and uses 14.
+- A folder's own header Create button creates a document inside that folder (read: `templates/sidebar/partials/
+  folder-partial.hbs`, `create-entry`, and `DocumentDirectory#_onCreateFolder` / `_onCreateEntry` in Foundry 14.364 at
+  `C:\FoundryVTT\V14\dev\foundry`), which is how `createWorldItem` and `createActor` fill a folder. Dragging a folder's
+  header onto an actor sheet is dispatched to `TitanActorSheet#_onDrop` as `type: 'Folder'` (read).
+- With the inverted `_onDropFolder` an Actor folder dropped on an actor sheet created no item and the harness failed the
+  test on a core `preCreateDocumentArray` validation error (`actor-folder-old-code.log`), so the Actor folder step of
+  the folder test fails on the old code as well as the Item folder step.
+
 **E2E browser-zoom emulation** — the browser zoom tests of `character-sheet-layout.spec.js` emulate page zoom
 z through a CDP session:
 `Emulation.setDeviceMetricsOverride({ width: 1920 / z, height: 1080 / z, deviceScaleFactor: z })`. Foundry
@@ -1260,15 +1296,25 @@ probe-free. The Playwright page object `tests/e2e/componentProbe.js` exposes
 `mountProbe`/`readProbeEvents`/`clearProbeEvents`/`unmountAll`, the marker builder `probeComponent(name)`,
 and `documentContext({ isOwner })` (a minimal non-reactive `document`
 context for components reading `getContext('document')`); callbacks are instrumented INSIDE `page.evaluate`
-(functions cannot cross the Node↔page boundary) and record into `window.__titanProbeEvents`.
+(functions cannot cross the Node↔page boundary) and record into `window.__titanProbeEvents`. A component that persists
+through `document.data.update` and must re-render on it (the rules-element settings editors) is mounted on
+`syntheticDocumentContext(system)`: the page replaces its `{ __probeDocument: true, data }` marker with a
+`ProbeDocument` (`src/test-probe/ProbeDocument.svelte.js`), whose `data` is the plain object the test gave and whose
+`update` merges changes into it and re-renders the readers, as the real bridge does on a document update.
+`readProbeContext(page, probeId, path)` reads what the component wrote into that object (through
+`game.titan._probe.context(id)`). Without it the plain context is not reactive: a write through a bound prop changes the
+object and the DOM keeps what it first rendered. `component-probe-inputs.spec.js` uses it for stored data no control
+produces: an Advantage value outside the four levels, an unknown check type, and a Multiply Base or Multiply Sum
+element with no `rounding`.
 
 **Coverage is complete:** all **83** primitives in `src/helpers/svelte-components/**` are registered in
-`componentRegistry.js` and probed. Specs are split by family (each describe = one component):
+`componentRegistry.js` and probed (the registry also holds the three rules-element settings editors
+`ItemSheetConditionalCheckModifierSettings`, `ItemSheetMulBaseSettings` and `ItemSheetMulSumSettings`). Specs are split by family (each describe = one component):
 `tests/e2e/component-probe.spec.js` (core: `Button`, `TextInput`, `NumberInput`, `IntegerInput`,
 `CheckboxInput`, `Select`, `LabelTag`); `-context.spec.js` (`RichText`, the `EffectTag` family + its six
 duration-variant wrappers, `CondensedCheckButton`, `ProseMirrorEditor`); `-tags.spec.js`
 (17 `tag/` primitives incl. `EditDeleteTag` whose probe also locks in the FontAwesome `font-family`
-regression); `-labels.spec.js` (5 `label/`); `-inputs.spec.js` (8 `input/` non-select); `-selects.spec.js`
+regression); `-labels.spec.js` (5 `label/`); `-inputs.spec.js` (8 `input/` non-select, and the editors above); `-selects.spec.js`
 (16 `input/select/` typed wrappers); `-buttons.spec.js` (13 `button/`); `-display.spec.js` (`Meter`, `Text`,
 `Tabs`, `ScrollingContainer`, `LabeledElement`, `BorderedColumnList`, `TagContainer`). Every primitive
 carries a `testId` (`data-testid` passthrough) **except `Text`**, which renders `{processTextData(text)}`

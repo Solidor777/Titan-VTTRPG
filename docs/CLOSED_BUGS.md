@@ -137,7 +137,8 @@ when fixed.
 - **Fixed:** 2026-06-10 on `feature/theme-foundation` — `_onRender` binds a
   `foundry.applications.ux.DragDrop` controller (drop permission = `isEditable`), the instanceof
   guards are parenthesized, and `_onDrop` uses the namespaced v14 `TextEditor`. Regression-locked by
-  the synthetic-drop e2e in `tests/e2e/sheet-regressions.spec.js`.
+  `tests/e2e/drag.spec.js` ("a world item dragged from the Items directory creates an owned copy that keeps its
+  name", a real drag from the Items directory).
 
 ### 12. Weapon attacks tab crashed on load (`$appState.attacks` does not exist)
 
@@ -158,7 +159,7 @@ when fixed.
 - **Found:** 2026-06-10 by the user during the theming-foundation visual pass (pre-existing on main).
 - **Fixed:** 2026-06-10 on `feature/theme-foundation` — the bind is a function binding falling back
   to the seeded expanded default; same treatment on the weapon attack sidebar. Regression-locked by
-  `tests/e2e/sheet-regressions.spec.js` ("adding a check while the sheet is open").
+  `tests/e2e/item-sheet-rolls.spec.js` ("adding a check while the sheet is open renders the new check row").
 
 ### 14. Every TITAN setting name rendered as a raw `SETTINGS.*.text` key
 
@@ -899,7 +900,10 @@ when fixed.
 - **Found:** 2026-09-29 while planning the `nearest` rounding option.
 - **Fixed:** 2026-09-29 — both editors read `ROUNDING_DIRECTIONS`, led by `down` (Task 1). Gated by
   `tests/unit/RoundingDirections.test.js` (the list order and every rounding editor on it) and
-  `tests/e2e/rules-element-rounding-editor.spec.js` (an element with no stored rounding opens and stays `down`).
+  `tests/e2e/component-probe-inputs.spec.js` (the "multiplier editors with no stored rounding" probes mount both editors
+  on a synthetic element with no `rounding`: the select shows `down` and the element stores `down`) and
+  `tests/e2e/rules-element-editor.spec.js` (the rounding select of both editors offers every direction and stores
+  `nearest`).
 
 ### 78. A turn-start report never showed the conditions of an actor with no other effect
 
@@ -1019,8 +1023,9 @@ when fixed.
   read the wrong path, and the scroll binding wrote to a misspelled `tabs.castingCheck.ScrollTop`.
 - **Found:** 2026-09-30 (Task 1 fix round 2; e2e "lists the spell aspect costs" failed with `.aspect-costs` not found).
 - **Fixed:** 2026-09-30 — the panel gates on `displayedAspects.length > 0` (output of a shared selector), the `{#each}`
-  reads the correct path, and scroll binding uses `scrollTop`. Gated by `tests/e2e/spell-rules-regressions.spec.js`
-  and `tests/unit/SheetStatePaths.test.js` (checks every `$appState` dotted path against the initial state factory).
+  reads the correct path, and scroll binding uses `scrollTop`. Gated by `tests/e2e/spell-sheet.spec.js` ("lists the
+  aspects that make up the total cost", "keeps its aspect list scroll position across tab switches") and
+  `tests/unit/SheetStatePaths.test.js` (checks every `$appState` dotted path against the initial state factory).
 
 ### 88. That tab's scroll position was bound to a misspelled state key (`ScrollTop`)
 
@@ -1700,3 +1705,25 @@ The evidence files named here are in `.superpowers/sdd/test-suite-rewrite/phase-
   `postMoveCheck` and `postInsertCheck` forwarders emptied, the reorder test failed on "the collapsed check stays
   collapsed" (`gate-effect-checks-expansion-before-fix.log`; the insert test then failed in the restarted worker, so the
   insert assertion has no separate before-fix run). After: both passed (`gate-effect-checks-expansion-after-fix.log`).
+
+### 107. Dropping an Item folder on an actor sheet created nothing
+
+The evidence files named here are in `.superpowers/sdd/test-suite-rewrite/phase-3/` (local, not checked in).
+
+- **What:** `TitanActorSheet#_onDropFolder` (`src/document/types/actor/sheet/TitanActorSheet.js`) read
+  `if (folder && folder.type !== 'Item')`. The condition was inverted, so it turned away every Item folder and handled
+  only folders of other types. Dropping an Item folder from the Items sidebar onto an actor sheet created no Item, with
+  no notification and no error (measured on two token sheets in the #102 repro, and on an actor sheet in
+  `gate107-before-fix.log`: the actor held no item after the drop).
+- **Found:** 2026-10-01 during the #102 real-path repro.
+- **Fixed:** 2026-10-02. The condition is `folder.type === 'Item'`; a folder of another type is refused (`false`) with
+  no error. The method serves every `TitanActorSheet`, so the token sheet path is the same code (read).
+- **Gate test:** `tests/e2e/drag.spec.js` ("an Item folder creates an owned copy of each item in it and an Actor folder
+  creates nothing"). It makes an Item folder holding a weapon and a spell and an Actor folder holding an actor through
+  the sidebar's own Create Folder and Create buttons, drags each folder's header onto an actor sheet, and expects one
+  owned copy per Item folder item, nothing from the Actor folder and no page error. Before: the Item folder step failed
+  with the actor holding no item (`gate107-before-fix.log`; the `dist/` served was built at 07:57 by
+  `build-final-3.log`, before the edit). The Actor folder step on that old build: the drop created no item and the
+  harness failed the test on a core `ClientDatabaseBackend##preCreateDocumentArray` validation error for the actor
+  data it tried to add as an item (`actor-folder-old-code.log`, a temporary spec run once). After: 13 of 13 passed on a
+  build made after the edit (`build-107.log`, `drag-3.log`).
