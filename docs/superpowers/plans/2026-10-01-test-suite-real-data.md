@@ -113,6 +113,8 @@ Each row is one file in the rewritten suite. "Sources" are today's files and the
 
 Hand-editing exported JSON and re-importing it is not used anywhere (ruling 10).
 
+Deliberate addition (Phase 3 Part B; the plan above did not name it): the probe bundle (`src/test-probe/`, built only into `test/build/probe.iife.js`) also holds `ProbeDocument` (`ProbeDocument.svelte.js`, a reactive stand-in for `ReactiveDocument` with an `update` that merges changes and re-renders readers), a document-marker resolution in `registerProbe.js` that turns a marker in the mount context into a `ProbeDocument`, and, in `tests/e2e/componentProbe.js`, `syntheticDocumentContext` and `readProbeContext`. The reason is in `.superpowers/sdd/test-suite-rewrite/phase-3/probe-inputs-1.log`: with the plain context object the modifier-type select mounted disabled and could not be opened (lines 53 and 91: `<button disabled ... data-testid="ccm-modifier-type">`), and the rounding probes failed their `data-value` read at `component-probe-inputs.spec.js:601` (lines 142 and 171) because a non-reactive context never re-renders after the component writes `rounding`. An owned, reactive context with an `update` is what the editors need. No shipping code is touched.
+
 ### 3.2 Unit (140 files; counts are vitest's, `unit-file-stats.txt`)
 
 | Class | Files / tests | Disposition |
@@ -292,7 +294,7 @@ Deliberate deviation from "gated by the confirmation-off test": with confirmatio
 
 Resolves the combatant from `game.combat?.combatants` by actor identity instead of the deprecated `getCombatantByActor(this.id)` (read `TitanActor.js:83`); gated by the `combat-turns` deprecation listener.
 
-### 7.5 Nothing else in `src/` changes. No seam, no extension point, no code for testability. The probe registry (`src/test-probe/componentRegistry.js`) is probe-bundle code, not shipping code. Test-only fixtures that mirror `src/` constants import them instead.
+### 7.5 Nothing else in `src/` changes. No seam, no extension point, no code for testability. The probe registry (`src/test-probe/componentRegistry.js`) is probe-bundle code, not shipping code. So are `src/test-probe/ProbeDocument.svelte.js` and the document-marker resolution in `src/test-probe/registerProbe.js`, added in Phase 3 Part B as a deliberate addition (§3.1.c); they build only into `test/build/probe.iife.js`. Test-only fixtures that mirror `src/` constants import them instead.
 
 ---
 
