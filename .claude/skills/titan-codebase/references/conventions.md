@@ -833,8 +833,13 @@ script registers an `error` hook listener the moment core assigns the `Hooks` gl
 through `Object.assign(globalThis, …)`, which calls the script's setter), and an exposed binding pushes each report,
 as `Hooks.onError (<location>): <message>`, into every array `attachPageErrors` returned for that page. Every
 spec that asserts its `errors` therefore also fails on errors core reports through `Hooks.onError`, on every client
-page (`multiClient.js` logs in through `login`); a collector attached after login sees reports from then on. Console
-output is not read, so its noise (`ERR_CONNECTION_REFUSED`, vendor warnings) never reaches the array.
+page (`multiClient.js` logs in through `login`); a collector attached after login sees reports from then on. The boot
+itself is gated by `login`: it collects the page errors raised from the join screen until `game.ready`, reads the
+document's own report list (`readHookErrorReports`, filled synchronously by the same init script, so it holds the
+reports made before any collector existed, including from `init`/`setup`/`ready` listeners), and fails when either is
+non-empty. Core sets `game.ready` and calls the `ready` hook synchronously (`client/game.mjs:777-779`), so that read
+follows every synchronous `ready` listener. Console output is not read, so its noise (`ERR_CONNECTION_REFUSED`,
+vendor warnings) never reaches the array.
 **Not migrated** (self-managed `BrowserContext`s via `multiClient.js`): `multi-client.spec.js`,
 `socket-sync.spec.js`, `permissions-compendium.spec.js`, `permissions-ownership.spec.js`,
 `permissions-auto-open.spec.js`. Fast-check (`injectFastCheck` → `page.addInitScript`) must run in
