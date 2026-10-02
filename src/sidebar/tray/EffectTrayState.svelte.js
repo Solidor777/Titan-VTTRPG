@@ -727,10 +727,17 @@ export default class EffectTrayState {
       // application.mjs:588-589, 1674-1680). The directory is never skipped as an unrendered first render,
       // because the sidebar force-renders every visible tab at startup (client/applications/sidebar/
       // sidebar.mjs:198-213; the skip is application.mjs:520-521).
-      /** @type {number} The hook registration id returned by Hooks.on. */
-      const directoryId = Hooks.on('renderCompendiumDirectory', () => {
+      /**
+       * Re-reads the available packs after the compendium directory re-renders. The hook's arguments (the
+       * directory application, its element, context and options) are not needed: `game.packs` is the source.
+       * @returns {void}
+       */
+      const onDirectoryRender = () => {
          this.#onCompendiumsChanged();
-      });
+      };
+
+      /** @type {number} The hook registration id returned by Hooks.on. */
+      const directoryId = Hooks.on('renderCompendiumDirectory', onDirectoryRender);
       this.#hookIds.push({
          hook: 'renderCompendiumDirectory',
          id: directoryId,
