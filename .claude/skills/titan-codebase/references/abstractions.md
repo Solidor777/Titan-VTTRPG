@@ -645,8 +645,11 @@ and one or more inner Svelte component trees.
   and the set lives only as long as the state (no setting). `toggleSearchMode()` / `toggleSortingMode()` call the
   core collection toggles (stored by core per collection, shared with the compendium window). The last-selected
   pack persists in the per-user `effectTrayLastPack` client setting. The state registers create/update/delete
-  hooks for both `ActiveEffect` and `Folder`, refreshing only when `document.pack === selectedPackId`; `destroy()`
-  (called from the tab's `_onClose`) removes them. `isOwner` getter = `pack.getUserLevel(game.user) >= OWNER`.
+  hooks for both `ActiveEffect` and `Folder`, refreshing only when `document.pack === selectedPackId`, plus
+  `renderCompendiumDirectory`, which re-reads `getEffectCompendiums()` (core fires no compendium create/delete hook;
+  it re-renders the compendium directory after changing `game.packs`, on every client) and, when the selected pack
+  is gone, falls back as on construction and refreshes; `destroy()` (called from the tab's `_onClose`) removes them
+  all. `isOwner` getter = `pack.getUserLevel(game.user) >= OWNER`.
   `canEdit` getter = `!this.isLocked && this.isOwner`. `toggleLock()` calls `await pack.configure({ locked })` then
   updates the mirror; owner-gated. `createBlankEffect(folderId?)` / `createFolder(parent?)` create at the root or
   inside a folder. `requestDeleteEffect()` prompts via `ConfirmationDialog`; `canEdit`-gated. `maxFolderDepth` =

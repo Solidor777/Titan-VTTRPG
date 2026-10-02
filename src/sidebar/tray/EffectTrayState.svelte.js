@@ -23,7 +23,8 @@ import getEffectCompendiums from '~/sidebar/tray/GetEffectCompendiums.js';
  * Reactive state for the Effect Tray: the available compendiums, the selected pack, its loaded
  * effect documents arranged in the pack's folder tree, the search filter and mode, and expanded-folder
  * tracking. Lives in Svelte context and is read by every tray component. Refreshes itself when the
- * selected pack's contents change.
+ * selected pack's contents change, and re-reads the pack list when a world compendium is created,
+ * deleted or reconfigured.
  *
  * The tree mirrors the pack's core `tree` (`DirectoryCollectionMixin`), so folder nesting and sort order
  * match the core compendium and sidebar directories, including the pack's alphabetical/manual sorting
@@ -84,15 +85,7 @@ export default class EffectTrayState {
       this.compendiums = getEffectCompendiums();
 
       // Restore the last-selected pack, falling back to the system effects pack, then the first.
-      /** @type {string} The persisted last-selected pack id. */
-      const remembered = game.settings.get('titan', 'effectTrayLastPack');
-
-      /** @type {string[]} The collection ids of every available pack. */
-      const ids = this.compendiums.map((pack) => pack.collection);
-
-      this.selectedPackId = ids.includes(remembered)
-         ? remembered
-         : (ids.find((id) => id === `${game.system.id}.effects`) ?? ids[0] ?? '');
+      this.selectedPackId = this.#resolveSelection(game.settings.get('titan', 'effectTrayLastPack'));
 
       // Seed the lock mirror synchronously so CRUD affordances are correct before the first refresh.
       this.isLocked = !!this.selectedPack?.locked;
@@ -646,9 +639,52 @@ export default class EffectTrayState {
    }
 
    /**
-    * Registers Foundry hooks that refresh the tray when the selected pack's contents change. The
-    * registration ids are stored so the listeners can be removed in `destroy()`, preventing leaks
-    * when the sidebar popout path constructs a second tray state.
+    * Chooses the pack to select from the available packs: the preferred pack when it is available, else
+    * the system effects pack, else the first pack, else none.
+    * @param {string} preferred - The collection id of the pack to keep or restore.
+    * @returns {string} The collection id to select, or an empty string when no pack is available.
+    */
+   #resolveSelection(preferred) {
+      /** @type {string[]} The collection ids of every available pack. */
+      const ids = this.compendiums.map((pack) => pack.collection);
+
+      return ids.includes(preferred)
+         ? preferred
+         : (ids.find((id) => id === `${game.system.id}.effects`) ?? ids[0] ?? '');
+   }
+
+   /**
+    * Re-reads the available packs after the world's set of compendiums may have changed. When the list
+    * differs, it replaces `compendiums`; when the selected pack is no longer available, the selection
+    * falls back as on construction and the tray reloads.
+    * @returns {void}
+    */
+   #onCompendiumsChanged() {
+      /** @type {CompendiumCollection[]} The visible ActiveEffect packs now. */
+      const compendiums = getEffectCompendiums();
+
+      /** @type {boolean} Whether the packs or their order differ from the current list. */
+      const changed = compendiums.length !== this.compendiums.length
+         || compendiums.some((pack, index) => pack.collection !== this.compendiums[index].collection);
+      if (!changed) {
+         return;
+      }
+
+      this.compendiums = compendiums;
+
+      /** @type {string} The selection after the change. */
+      const selection = this.#resolveSelection(this.selectedPackId);
+      if (selection !== this.selectedPackId) {
+         this.selectedPackId = selection;
+         void this.refresh();
+      }
+   }
+
+   /**
+    * Registers Foundry hooks that refresh the tray when the selected pack's contents change, and that
+    * re-read the pack list when the world's compendiums change. The registration ids are stored so the
+    * listeners can be removed in `destroy()`, preventing leaks when the sidebar popout path constructs a
+    * second tray state.
     * @returns {void}
     */
    #registerHooks() {
@@ -682,6 +718,23 @@ export default class EffectTrayState {
             id,
          });
       }
+
+      // Core fires no hook named for a compendium's creation or deletion. It changes `game.packs` and then
+      // re-renders the compendium directory, on the creating client and, through the `manageCompendium`
+      // socket, on every other client (client/documents/collections/compendium-collection.mjs:736-749,
+      // 917-926, 935-942); a world compendium configuration change (visibility, ownership) re-renders it too
+      // (:950-966). Each re-render calls the `renderCompendiumDirectory` hook (client/applications/api/
+      // application.mjs:588-589, 1674-1680). The directory is never skipped as an unrendered first render,
+      // because the sidebar force-renders every visible tab at startup (client/applications/sidebar/
+      // sidebar.mjs:198-213; the skip is application.mjs:520-521).
+      /** @type {number} The hook registration id returned by Hooks.on. */
+      const directoryId = Hooks.on('renderCompendiumDirectory', () => {
+         this.#onCompendiumsChanged();
+      });
+      this.#hookIds.push({
+         hook: 'renderCompendiumDirectory',
+         id: directoryId,
+      });
    }
 
    /**
