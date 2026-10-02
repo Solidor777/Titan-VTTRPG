@@ -27,8 +27,9 @@ exists, where it lives, and how to fit new work in. It is **descriptive, not pre
   come from the live Foundry install — `jsconfig.json` includes `../../../../foundry/common/**` and
   `foundry/public/scripts/**`; there is no `foundry-vtt-types` dependency.
 - Build: Vite 8 (Rolldown-based) with `@sveltejs/vite-plugin-svelte`. Source lives in `src/`; build
-  output goes to the repo root. The Svelte plugin sets `configFile: false` (inline `preprocess`, no
-  `svelte.config.js`); node-module resolution is native (no `@rollup/plugin-node-resolve`).
+  output goes to `dist/` (`dist/index.js`, `dist/style.css`). The Svelte plugin sets `configFile: false`
+  (inline `preprocess`, no `svelte.config.js`); node-module resolution is native (no
+  `@rollup/plugin-node-resolve`).
 
 ## Sibling skills — route here for framework/API knowledge
 
@@ -43,7 +44,7 @@ codebase — that stack was removed in the v14 migration.
 
 ## Knowledge map — open the file you need
 
-- `references/architecture.md` — the `src/` directory layout, module boundaries, build → root output.
+- `references/architecture.md` — the `src/` directory layout, module boundaries, build → `dist/` output.
 - `references/abstractions.md` — the core classes and how they relate.
 - `references/data-flow.md` — lifecycles and control/data flow (a check from dialog to chat report,
   sheet render, migration, combat turns).
