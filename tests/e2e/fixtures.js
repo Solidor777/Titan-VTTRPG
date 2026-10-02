@@ -53,35 +53,21 @@ export async function openSheetByUuid(page, uuid) {
 }
 
 /**
- * Render a single document's sheet inside the live world and assert it appears with no uncaught page
- * errors.
- *
- * The document is located inside the page via a stringified locator function body (e.g.
- * `"() => game.actors.find((a) => a.type === 'player')"`) so the lookup runs in the Foundry runtime, not
- * the Node test process.
+ * Opens a document's sheet by uuid, asserts the expected frame is visible, and asserts the render raised no uncaught
+ * page error.
  * @param {import('@playwright/test').Page} page - The Playwright page to drive.
- * @param {string} locateSrc - Stringified locator: a function returning the document.
- * @param {string} expectedSelector - CSS selector the rendered sheet must expose.
+ * @param {string} uuid - The document's uuid.
+ * @param {string} expectedSelector - CSS selector the rendered sheet's frame must expose (`.titan-player-sheet`, ...).
  * @param {string[]} errors - The spec's shared page-error collector (from `attachPageErrors`).
- * @returns {Promise<void>} Resolves once the sheet is visible and asserted error-free.
+ * @returns {Promise<import('@playwright/test').Locator>} The sheet's window element.
  */
-export async function renderSheet(page, locateSrc, expectedSelector, errors) {
-   // Locate the document and trigger its sheet render inside the Foundry runtime.
-   const found = await page.evaluate(async (src) => {
-      // Reconstruct the locator function from its stringified body.
-      const doc = new Function(`return (${src})()`)();
-      if (!doc) {
-         return false;
-      }
-      await doc.sheet.render(true);
-      return true;
-   }, locateSrc);
-
-   // The fixture must exist; assert the sheet is visible and no errors were thrown.
-   expect(found, 'document fixture not found in world').toBe(true);
-   await expect(page.locator(expectedSelector).first()).toBeVisible();
+export async function renderSheet(page, uuid, expectedSelector, errors) {
+   /** @type {import('@playwright/test').Locator} The sheet's window element. */
+   const sheet = await openSheetByUuid(page, uuid);
+   await expect(sheet).toHaveClass(new RegExp(`(^|\\s)${RegExp.escape(expectedSelector.replace('.', ''))}(\\s|$)`));
    await flushPageErrors(page);
    expect(errors, `uncaught errors during render:\n${errors.join('\n')}`).toEqual([]);
+   return sheet;
 }
 
 /**
@@ -98,42 +84,6 @@ export async function openSheetTab(page, label) {
       .getByText(label, { exact: true })
       .first()
       .click();
-}
-
-/**
- * Ensure a document of the given type exists in the world, creating a minimal
- * one when absent, and return a stringified locator that finds it again.
- * @param {import('@playwright/test').Page} page - The Playwright page to drive.
- * @param {('Actor'|'Item')} documentType - The base document class name.
- * @param {string} subtype - The document subtype to ensure.
- * @param {string} name - The name to use for a created fixture.
- * @returns {Promise<string>} A stringified locator function body for the ensured document.
- */
-export async function ensureDocument(page, documentType, subtype, name) {
-   // Create the document only if no document of the subtype already exists.
-   await page.evaluate(async ({ documentType, subtype, name }) => {
-      // The world collection for the requested document class.
-      const collection = documentType === 'Actor' ? globalThis.game.actors : globalThis.game.items;
-
-      // Locate an existing fixture of the subtype, if any.
-      const existing = collection.find((d) => d.type === subtype);
-      if (!existing) {
-         const cls = documentType === 'Actor' ? globalThis.Actor : globalThis.Item;
-         await cls.create({
-            name,
-            type: subtype,
-         });
-      }
-   }, {
-      documentType,
-      subtype,
-      name,
-   });
-
-   // Prefer the named fixture (created here) and fall back to any of the subtype.
-   const collectionExpr = documentType === 'Actor' ? 'game.actors' : 'game.items';
-   return `() => ${collectionExpr}.find((d) => d.type === '${subtype}' && d.name === '${name}') `
-      + `?? ${collectionExpr}.find((d) => d.type === '${subtype}')`;
 }
 
 /**

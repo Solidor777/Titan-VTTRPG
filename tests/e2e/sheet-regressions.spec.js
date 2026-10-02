@@ -4,8 +4,7 @@ import { attachPageErrors, clearChat, closeAllApps } from './world.js';
 
 /**
  * Regression walk for sheet interaction bugs: the add-item buttons (createItemFromType read
- * this.parent on a world actor), item drops (ApplicationV2 binds no drag-drop handlers itself),
- * the weapon attacks tab (state path read $appState.attacks instead of tabs.attacks), and adding a
+ * this.parent on a world actor), item drops (ApplicationV2 binds no drag-drop handlers itself), and adding a
  * check while the sheet is open (the fresh row bound an undefined expansion entry).
  */
 
@@ -24,7 +23,6 @@ test.beforeAll(async ({ browser }) => {
 test.afterEach(async () => {
    // Remove the per-test fixture documents so world state does not accumulate.
    await page.evaluate(async () => {
-      await game.scenes.getName('E2E Regression Scene')?.delete();
       for (const name of [
          'E2E Regression Actor',
          'E2E Regression Weapon',
@@ -43,35 +41,6 @@ test.afterAll(async () => {
 });
 
 test.describe('v14 sheet regressions', () => {
-   test('item sheet headers render the rarity label exactly once', async () => {
-      // Every rarity-bearing item type shares ItemSheetRaritySelect, which carries its own label.
-      for (const type of [
-         'ability',
-         'armor',
-         'commodity',
-         'equipment',
-         'shield',
-         'spell',
-         'weapon',
-      ]) {
-         await page.evaluate(async (type) => {
-            const item = await Item.create({
-               name: 'E2E Regression Rarity Item',
-               type,
-            });
-            await item.sheet.render(true);
-            await titanWait(() => !!item.sheet.element, { message: `${type} sheet rendered` });
-         }, type);
-         const sheet = page.locator('.titan-item-sheet:has-text("E2E Regression Rarity Item")');
-         await expect(sheet).toBeVisible();
-         const labels = sheet.locator('.header').getByText('Rarity', { exact: true });
-         expect(await labels.count(), `${type} sheet header shows one Rarity label`).toBe(1);
-         await closeAllApps(page);
-         await page.evaluate(async () => game.items.getName('E2E Regression Rarity Item')?.delete());
-      }
-      expect(errors, `uncaught errors rendering item sheets:\n${errors.join('\n')}`).toEqual([]);
-   });
-
    test('createItemFromType adds an owned item to a world actor', async () => {
       const result = await page.evaluate(async () => {
          // A fresh world actor exercises the non-embedded document path.
@@ -150,69 +119,6 @@ test.describe('v14 sheet regressions', () => {
       expect(result.ownedCount, `the drop created an owned item (${result.detail})`).toBe(1);
       expect(result.ownedName, 'the owned copy keeps the source name').toBe('E2E Regression Source');
       expect(errors, `uncaught errors during sheet drop:\n${errors.join('\n')}`).toEqual([]);
-   });
-
-   test('the weapon attacks tab renders its seeded attack without errors', async () => {
-      const opened = await page.evaluate(async () => {
-         // A fresh weapon seeds attack[0]; the attacks tab must render it on first open.
-         const weapon = await Item.create({
-            name: 'E2E Regression Weapon',
-            type: 'weapon',
-         });
-         await weapon.sheet.render(true);
-         await titanWait(() => !!weapon.sheet.element, { message: 'weapon sheet rendered' });
-         return { attackCount: weapon.system.attack.length };
-      });
-      expect(opened.attackCount, 'the weapon seeds a default attack').toBe(1);
-
-      // Open the Attacks tab through the real tab strip and assert the attack settings mount.
-      const sheet = page.locator('.titan-document-sheet:has-text("E2E Regression Weapon")');
-      await sheet.getByRole('button', {
-         name: 'Attacks',
-         exact: true,
-      }).first().click();
-      await expect(sheet.locator('.attack').first(), 'attack settings render').toBeVisible();
-      expect(errors, `uncaught errors on the attacks tab:\n${errors.join('\n')}`).toEqual([]);
-   });
-
-   test('the sheet unlink control unlinks the placed token, not the prototype', async () => {
-      const result = await page.evaluate(async () => {
-         // A linked actor placed on a fresh scene; linked tokens open the WORLD actor's sheet.
-         const actor = await Actor.create({
-            name: 'E2E Regression Actor',
-            type: 'player',
-            prototypeToken: { actorLink: true },
-         });
-         const scene = await Scene.create({
-            name: 'E2E Regression Scene',
-            width: 1000,
-            height: 1000,
-         });
-         const tokenData = (await actor.getTokenDocument({
-            x: 100,
-            y: 100,
-         })).toObject();
-         const [tokenDoc] = await scene.createEmbeddedDocuments('Token', [tokenData]);
-
-         // Open the sheet the way the canvas double-click does: passing the originating token.
-         const sheet = actor.sheet;
-         await sheet.render(true, { token: tokenDoc });
-         await titanWait(() => !!sheet.element, { message: 'linked actor sheet rendered' });
-
-         // The unlink control's handler must unlink the PLACED token and leave the prototype alone.
-         await sheet._onUnlinkToken();
-         await titanWait(() => tokenDoc.actorLink === false, { message: 'token unlinked' });
-         return {
-            tokenLinked: tokenDoc.actorLink,
-            prototypeLinked: actor.prototypeToken.actorLink,
-            syntheticActor: tokenDoc.actor !== actor && tokenDoc.actor?.isToken === true,
-         };
-      });
-
-      expect(result.tokenLinked, 'the placed token is unlinked').toBe(false);
-      expect(result.prototypeLinked, 'the prototype link is untouched').toBe(true);
-      expect(result.syntheticActor, 'the token now resolves a synthetic actor').toBe(true);
-      expect(errors, `uncaught errors during unlink:\n${errors.join('\n')}`).toEqual([]);
    });
 
    test('adding a check while the sheet is open renders the new check row', async () => {

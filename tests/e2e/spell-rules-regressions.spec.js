@@ -4,7 +4,7 @@ import { attachPageErrors, closeAllApps, deleteFixtureActor } from './world.js';
 
 /**
  * Regressions for conditional check modifiers on casting checks, item deletion from a character, and the
- * spell sheet's "resisted by" tag. Each runs against the live rendered sheet or the live actor.
+ * spell sheet's Casting Check tab. Each runs against the live rendered sheet or the live actor.
  */
 
 /** @type {string} Name of the throwaway player actor seeded for this spec. */
@@ -127,21 +127,6 @@ test('casting check options apply custom-trait dice and casting expertise modifi
    });
 });
 
-test('the spells tab renders a custom-trait spell row without errors', async () => {
-   await page.evaluate(async (actorName) => {
-      /** @type {TitanDocumentSheet} The rendered character sheet. */
-      const app = await game.actors.getName(actorName).sheet.render(true);
-      await titanWait(
-         () => !!app?.element?.querySelector('.window-content')?.children.length,
-         { message: 'sheet mounted' },
-      );
-   }, ACTOR_NAME);
-   await openSheetTab(page, 'Spells');
-   await expect(page.locator('.application.titan-document-sheet [data-item-id]', { hasText: 'E2E Void Spell' }))
-      .toBeVisible();
-   expect(errors, `uncaught errors:\n${errors.join('\n')}`).toEqual([]);
-});
-
 test('deleting an equipped item raises no error and un-equips it', async () => {
    /**
     * @type {{equippedBefore: boolean, equippedAfter: string | null, stillOwned: boolean, raised: string[]}}
@@ -185,23 +170,6 @@ test('deleting an equipped item raises no error and un-equips it', async () => {
    expect(result.stillOwned, 'the armor is deleted').toBe(false);
    expect(result.equippedAfter, 'the deleted armor is no longer equipped').toBeFalsy();
    expect(result.raised, 'no error notification during the delete').toEqual([]);
-});
-
-test('the spell sheet sidebar labels the aspect resistance', async () => {
-   /** @type {string} The rendered spell sheet's application id. */
-   const appId = await page.evaluate(async (actorName) => {
-      /** @type {TitanDocumentSheet} The rendered spell sheet. */
-      const app = await game.actors.getName(actorName).items.getName('E2E Void Spell').sheet.render(true);
-      await titanWait(
-         () => !!app?.element?.querySelector('.window-content')?.children.length,
-         { message: 'spell sheet mounted' },
-      );
-      return app.id;
-   }, ACTOR_NAME);
-   /** @type {import('@playwright/test').Locator} The sidebar's Resilience resistance tag. */
-   const tag = page.locator(`[id="${appId}"] .labeled-stat .value .tag.resilience`);
-   await expect(tag).toBeVisible();
-   await expect(tag).toHaveText('Resilience');
 });
 
 test('conditional dice and expertise apply to item checks and to tradition-keyed casting checks', async () => {

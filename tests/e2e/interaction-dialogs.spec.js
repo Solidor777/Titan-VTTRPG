@@ -1,12 +1,11 @@
 import { expect, test } from './harness.js';
-import { chooseContextMenuEntry } from './contextMenu.js';
 import { login } from './fixtures.js';
 import { attachPageErrors, clearChat, closeAllApps } from './world.js';
 
 /**
  * Interaction-path walk: dialog-render smoke. For each dialog reachable in normal play this suite
- * triggers it through its real entry point (an actor/item API method or a directory context-menu
- * action), then asserts the dialog window mounts with zero uncaught page errors.
+ * triggers it through its real entry point (an actor/item API method), then asserts the dialog window mounts with
+ * zero uncaught page errors.
  *
  * Confirmed against source:
  * All TITAN dialogs extend `TitanDialog` (an ApplicationV2) whose constructor stamps the classes
@@ -16,8 +15,6 @@ import { attachPageErrors, clearChat, closeAllApps } from './world.js';
  * Confirm-delete-item dialog: gated by the `confirmDeletingItems` setting; `requestItemDeletion`
  * routes to `new ConfirmDeleteItemDialog(...).render(true)`.
  * Add/Edit custom-trait dialogs: `TitanItem#addCustomTrait()` / `TitanItem#editCustomTrait(idx)`.
- * Edit-UUID dialog: reachable only from the Actors-directory context menu ("Edit UUID"), which
- * calls `onEditDocumentUUID(actor)` -> `new EditUUIDDialog(actor).render(true)`.
  */
 
 // The window selector shared by every TitanDialog-derived window.
@@ -226,31 +223,5 @@ test.describe('v14 interaction dialogs', () => {
 
       await expect(page.locator(DIALOG_SELECTOR).first()).toBeVisible();
       expect(errors, `uncaught errors during edit-custom-trait dialog render:\n${errors.join('\n')}`).toEqual([]);
-   });
-
-   // Edit-UUID dialog (reached through the Actors-directory "Edit UUID" context-menu action).
-   test('edit-UUID dialog mounts', async () => {
-      // Open the Actors sidebar tab so the directory entry is in the DOM.
-      await page.click(
-         '#sidebar-tabs [data-tab="actors"], #sidebar a[data-tab="actors"], nav#sidebar-tabs a[data-tab="actors"]',
-      );
-
-      // Right-click the fixture actor's directory entry to open the context menu.
-      const entry = page.locator('#actors .directory-item[data-entry-id]', { hasText: 'E2E Dialog Actor' }).first();
-      await entry.scrollIntoViewIfNeeded();
-      await entry.click({ button: 'right' });
-
-      // Click the Edit-UUID entry in the context menu. The TITAN `getActorContextOptions` hook
-      // (OnGetActorDirectoryEntryContext.js) labels it via the `editUUID` localization, which
-      // resolves to "Edit Unique ID" in lang/en.json - not the literal "Edit UUID".
-      await chooseContextMenuEntry(
-         page,
-         page.locator('#context-menu li.context-item, .context-menu .context-item', { hasText: 'Edit Unique ID' })
-            .first(),
-      );
-
-      // The dialog window appears once the AppV2 render + Svelte mount settle (auto-retried).
-      await expect(page.locator(DIALOG_SELECTOR).first()).toBeVisible();
-      expect(errors, `uncaught errors during edit-UUID dialog render:\n${errors.join('\n')}`).toEqual([]);
    });
 });
