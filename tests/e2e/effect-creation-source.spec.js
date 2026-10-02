@@ -11,8 +11,9 @@ import { attachPageErrors, closeAllApps, deleteFixtureActor } from './world.js';
  * `showIcon`, and `transfer` the same input stores when created as a document on a world actor, and both equal the
  * expected values. One input has the shape `buildEffectData` gives a legacy effect Item (stamp, description, v2.1.0
  * rules elements, no `check`/`customTrait`). A parentless effect's data preparation reports a failure through
- * `Hooks.onError` (a console error, `client/documents/abstract/client-document.mjs` `_safePrepareData`), never as a
- * page error, so the console is read for it.
+ * `Hooks.onError` (`client/documents/abstract/client-document.mjs` `_safePrepareData`), never as a page error. The
+ * report reaches the `attachPageErrors` collector, which `afterEach` asserts empty, and core also logs it to the
+ * console as "Failed data preparation for <uuid>", which the test reads and asserts absent.
  */
 
 /** @type {string} Name of the throwaway world actor the document path creates its effects on. */
