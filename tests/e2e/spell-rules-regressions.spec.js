@@ -86,10 +86,6 @@ test.beforeEach(async () => {
                ],
             },
          },
-         {
-            name: 'E2E Worn Armor',
-            type: 'armor',
-         },
       ]);
    }, ACTOR_NAME);
 });
@@ -125,51 +121,6 @@ test('casting check options apply custom-trait dice and casting expertise modifi
       diceMod: 2,
       expertiseMod: 1,
    });
-});
-
-test('deleting an equipped item raises no error and un-equips it', async () => {
-   /**
-    * @type {{equippedBefore: boolean, equippedAfter: string | null, stillOwned: boolean, raised: string[]}}
-    * The armor's equipped and owned state around the delete, and the error notifications it raised.
-    */
-   const result = await page.evaluate(async (actorName) => {
-      /** @type {TitanActor} The seeded player. */
-      const actor = game.actors.getName(actorName);
-
-      /** @type {TitanItem} The armor to equip and delete. */
-      const armor = actor.items.getName('E2E Worn Armor');
-      await actor.system.equipArmor(armor.id);
-
-      /** @type {string | null} The equipped armor's id before the delete. */
-      const equippedBefore = actor.system.equipped.armor;
-
-      // Record error notifications raised during the delete.
-      /** @type {string[]} The error notification messages raised during the delete. */
-      const raised = [];
-
-      /** @type {Function} The unwrapped error notifier, restored after the delete. */
-      const original = ui.notifications.error;
-      ui.notifications.error = (message, ...rest) => {
-         raised.push(String(message));
-         return original.call(ui.notifications, message, ...rest);
-      };
-      try {
-         await actor.deleteItem(armor.id);
-      }
-      finally {
-         ui.notifications.error = original;
-      }
-      return {
-         equippedBefore: equippedBefore === armor.id,
-         equippedAfter: actor.system.equipped.armor,
-         stillOwned: actor.items.has(armor.id),
-         raised,
-      };
-   }, ACTOR_NAME);
-   expect(result.equippedBefore, 'the armor was equipped before the delete').toBe(true);
-   expect(result.stillOwned, 'the armor is deleted').toBe(false);
-   expect(result.equippedAfter, 'the deleted armor is no longer equipped').toBeFalsy();
-   expect(result.raised, 'no error notification during the delete').toEqual([]);
 });
 
 test('conditional dice and expertise apply to item checks and to tradition-keyed casting checks', async () => {

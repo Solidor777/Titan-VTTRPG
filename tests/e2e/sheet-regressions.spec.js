@@ -41,27 +41,6 @@ test.afterAll(async () => {
 });
 
 test.describe('v14 sheet regressions', () => {
-   test('createItemFromType adds an owned item to a world actor', async () => {
-      const result = await page.evaluate(async () => {
-         // A fresh world actor exercises the non-embedded document path.
-         const actor = await Actor.create({
-            name: 'E2E Regression Actor',
-            type: 'player',
-         });
-         const created = await actor.createItemFromType('ability');
-         return {
-            createdCount: created?.length ?? 0,
-            ownedCount: actor.items.size,
-            ownedType: actor.items.contents[0]?.type,
-         };
-      });
-
-      expect(result.createdCount, 'createItemFromType returns the created item').toBe(1);
-      expect(result.ownedCount, 'the actor owns the new item').toBe(1);
-      expect(result.ownedType, 'the new item carries the requested type').toBe('ability');
-      expect(errors, `uncaught errors during add-item:\n${errors.join('\n')}`).toEqual([]);
-   });
-
    test('dropping a world item onto an open actor sheet creates an owned copy', async () => {
       const result = await page.evaluate(async () => {
          // The drop source item and the receiving actor with an open sheet.

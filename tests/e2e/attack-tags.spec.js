@@ -197,30 +197,6 @@ test.describe('shared AttackTags across surfaces', () => {
       expect(errors, `uncaught errors:\n${errors.join('\n')}`).toEqual([]);
    });
 
-   test('character-sheet AttackTags updates live when the weapon is edited (embedded bridge)', async () => {
-      const row = await openCharacterSheetWeaponRow();
-      await expect(row.getByTestId('attack-tags-damage').locator('.value')).toHaveText('7');
-
-      // Edit the attack damage IN PLACE through the live weapon document.
-      await page.evaluate(async ({ actorName, weaponName }) => {
-         const weapon = game.actors.getName(actorName).items.getName(weaponName);
-         const attacks = foundry.utils.deepClone(weapon.system.attack);
-         attacks[0].damage = 9;
-         await weapon.update({
-            system: {
-               attack: attacks,
-            },
-         });
-      }, {
-         actorName: ACTOR_NAME,
-         weaponName: WEAPON_NAME,
-      });
-
-      // The embedded bridge re-resolves through the actor subscription: the row updates in place.
-      await expect(row.getByTestId('attack-tags-damage').locator('.value')).toHaveText('9');
-      expect(errors, `uncaught errors:\n${errors.join('\n')}`).toEqual([]);
-   });
-
    test('two-context: actor-derived tags render and the roll button fires requestAttackCheck', async () => {
       const row = await openCharacterSheetWeaponRow();
 

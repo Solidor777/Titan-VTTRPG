@@ -442,13 +442,14 @@ export async function toggleTokenLink(page, actorId) {
 }
 
 /**
- * Unlinks a placed token with the Unlink button in the header of its actor's sheet, which the double-click on the
- * token opened. The unlink is irreversible: the sheet closes and the token's own synthetic actor's sheet opens.
+ * Closes the open windows, releases control of every token and moves the pointer onto a placed token the way a user
+ * does: the canvas processes a click only on a hovered token, and a pointer that has rested where the token appeared
+ * (the drop of the placing drag) raises no hover.
  * @param {import('@playwright/test').Page} page - A logged-in GM page viewing the token's scene.
- * @param {string} tokenId - The linked token on the viewed scene.
- * @returns {Promise<void>} Resolves once the synthetic actor's sheet is open.
+ * @param {string} tokenId - The token on the viewed scene.
+ * @returns {Promise<{x: number, y: number}>} The token's centre in client (page) coordinates.
  */
-export async function unlinkPlacedToken(page, tokenId) {
+async function hoverToken(page, tokenId) {
    await closeAllApps(page);
    await releaseTokenControl(page);
 
@@ -457,15 +458,41 @@ export async function unlinkPlacedToken(page, tokenId) {
       const token = canvas.scene.tokens.get(tokenId).object;
       return canvas.clientCoordinatesFromCanvas(token.center);
    }, tokenId);
-
-   // A user moves the pointer onto the token before clicking it: the canvas processes a click only on a hovered token,
-   // and a pointer that has rested where the token appeared (the drop of the placing drag) raises no hover.
    await page.mouse.move(centre.x + 200, centre.y);
    await page.mouse.move(centre.x, centre.y, { steps: 5 });
    await expect.poll(
       () => page.evaluate((tokenId) => canvas.scene.tokens.get(tokenId).object.hover, tokenId),
       { message: 'the pointer hovers the token' },
    ).toBe(true);
+   return centre;
+}
+
+/**
+ * Takes control of a placed token with a click on it.
+ * @param {import('@playwright/test').Page} page - A logged-in GM page viewing the token's scene.
+ * @param {string} tokenId - The token on the viewed scene.
+ * @returns {Promise<void>} Resolves once the token is the only controlled token.
+ */
+export async function controlPlacedToken(page, tokenId) {
+   /** @type {{x: number, y: number}} The token's centre in client (page) coordinates. */
+   const centre = await hoverToken(page, tokenId);
+   await page.mouse.click(centre.x, centre.y);
+   await expect.poll(
+      () => page.evaluate(() => canvas.tokens.controlled.map((token) => token.id)),
+      { message: 'the click took control of the token' },
+   ).toEqual([tokenId]);
+}
+
+/**
+ * Unlinks a placed token with the Unlink button in the header of its actor's sheet, which the double-click on the
+ * token opened. The unlink is irreversible: the sheet closes and the token's own synthetic actor's sheet opens.
+ * @param {import('@playwright/test').Page} page - A logged-in GM page viewing the token's scene.
+ * @param {string} tokenId - The linked token on the viewed scene.
+ * @returns {Promise<void>} Resolves once the synthetic actor's sheet is open.
+ */
+export async function unlinkPlacedToken(page, tokenId) {
+   /** @type {{x: number, y: number}} The token's centre in client (page) coordinates. */
+   const centre = await hoverToken(page, tokenId);
    await page.mouse.dblclick(centre.x, centre.y);
 
    /** @type {import('@playwright/test').Locator} The sheet the double-click opened. */
@@ -769,9 +796,12 @@ export async function addEffect(page, actorId, name, { duration } = {}) {
  * @param {string} documentUuid - The uuid of the item or effect.
  * @param {object} [fields] - The row's inputs to fill.
  * @param {string} [fields.label] - Text typed into the new row's label input.
- * @returns {Promise<void>} Resolves once the check is stored with its label.
+ * @param {number} [fields.resolveCost] - Value typed into the row's Resolve Cost input.
+ * @param {string} [fields.resistanceCheck] - Resistance chosen in the row's Resistance Check select.
+ * @param {boolean} [fields.opposed] - Whether to tick the row's Opposed Check box.
+ * @returns {Promise<void>} Resolves once the check is stored with its fields.
  */
-export async function addCheck(page, documentUuid, { label } = {}) {
+export async function addCheck(page, documentUuid, { label, resolveCost, resistanceCheck, opposed } = {}) {
    /** @type {import('@playwright/test').Locator} The document's sheet. */
    const sheet = await openSheetByUuid(page, documentUuid);
 
@@ -783,15 +813,56 @@ export async function addCheck(page, documentUuid, { label } = {}) {
       () => page.evaluate(async (uuid) => (await fromUuid(uuid)).system.check.length, documentUuid),
       { message: 'the add button created one check' },
    ).toBe(before + 1);
+
+   /**
+    * Reads one field of the new check.
+    * @param {string} field - The check field.
+    * @returns {Promise<*>} The stored value.
+    */
+   const stored = (field) => page.evaluate(
+      async ({ uuid, index, field }) => (await fromUuid(uuid)).system.check[index][field],
+      {
+         uuid: documentUuid,
+         index: before,
+         field,
+      },
+   );
+
+   /** @type {import('@playwright/test').Locator} The new check's row. */
+   const row = sheet.locator('.check').filter({ has: page.locator('.header .label input') }).nth(before);
    if (label !== undefined) {
       /** @type {import('@playwright/test').Locator} The new row's label input. */
-      const input = sheet.locator('.check .header .label input').nth(before);
+      const input = row.locator('.header .label input');
       await input.fill(label);
       await input.blur();
-      await expect.poll(
-         async () => page.evaluate(async (uuid) => (await fromUuid(uuid)).system.check.at(-1).label, documentUuid),
-         { message: 'the label input stored the check label' },
-      ).toBe(label);
+      await expect.poll(() => stored('label'), { message: 'the label input stored the check label' }).toBe(label);
+   }
+
+   // The row's other settings sit in its expandable content, which mounts expanded.
+   /**
+    * Finds a field of the new row by its label.
+    * @param {string} text - The field's label.
+    * @returns {import('@playwright/test').Locator} The field's element.
+    */
+   const field = (text) => row.locator('.field').filter({ has: page.getByText(text, { exact: true }) }).first();
+   if (resolveCost !== undefined) {
+      /** @type {import('@playwright/test').Locator} The Resolve Cost input. */
+      const input = field('Resolve Cost').locator('input');
+      await input.fill(String(resolveCost));
+      await input.blur();
+      await expect.poll(() => stored('resolveCost'), { message: 'the input stored the resolve cost' })
+         .toBe(resolveCost);
+   }
+   if (resistanceCheck !== undefined) {
+      await selectTitanOption(page, field('Resistance Check').locator('[role="combobox"]'), resistanceCheck);
+      await expect.poll(() => stored('resistanceCheck'), { message: 'the select stored the resistance check' })
+         .toBe(resistanceCheck);
+   }
+   if (opposed) {
+      await field('Opposed Check').locator('button').click();
+      await expect.poll(async () => (await stored('opposedCheck')).enabled, {
+         message: 'the checkbox enabled the opposed check',
+      }).toBe(true);
    }
 }
 
