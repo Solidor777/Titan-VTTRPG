@@ -117,7 +117,7 @@ The user ruled on four questions the plan buddy check raised. Each is implemente
   (or, where a presence→absence transition is impossible by design, the subject is first proven resolved/present and
   the absence follows a happens-after positive edge, per `conventions.md`); context-menu entry clicks go through
   `chooseContextMenuEntry`
-  (`tests/e2e/contextMenu.js`; `tests/unit/E2eContextMenuClicks.test.js` enforces it); no fixed sleeps
+  (`tests/e2e/contextMenu.js`; checked in review); no fixed sleeps
   (`expect.poll`, web-first assertions, `titanWait`); chat locators are scoped to
   `#chat .message[data-message-id="…"]`; sheet locators to `.application.titan-document-sheet`.
 - A GM login runs migrations (`onceReady`). From Task 5 on, the first E2E GM login rewrites the test world's stale
