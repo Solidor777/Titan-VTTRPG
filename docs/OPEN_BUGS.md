@@ -102,8 +102,8 @@ Deferred/known bugs. Todos (planned work) live in `docs/TODO.md`; this file is b
 - **Note (read, not run):** TITAN's Active Effect sheet, which has the Rules Elements tab, is registered for the
   `effect` subtype only (`src/hooks/OnceInit.js:247-251`). A condition may therefore open core's config instead, and
   this trigger path may not exist as written.
-- **Status:** Open. The user deferred it on 2026-10-01 to a future document inheritance campaign
-  (`docs/TODO.md`). For now GMs may edit a condition's rules elements.
+- **Status:** Open, tabled by the user on 2026-10-07. The user deferred it on 2026-10-01 to a future document
+  inheritance campaign (`docs/TODO.md`). For now GMs may edit a condition's rules elements.
 
 ### 111. A condition's description edited in its sheet is ignored by the HUD and chat reports
 
@@ -125,8 +125,9 @@ Deferred/known bugs. Todos (planned work) live in `docs/TODO.md`; this file is b
   showed the definition text and not the edit (the test passed in
   `.superpowers/sdd/test-suite-rewrite/phase-4/e2e-full-6.log`).
 - **Found:** 2026-10-01 by a reviewer of the test-suite rewrite plan.
-- **Status:** Open. The user deferred it on 2026-10-01 to the document inheritance campaign (`docs/TODO.md`), together
-  with #110.
+- **Status:** Open. User ruling 2026-10-07: a condition effect opens TITAN's own Active Effect sheet and an edited
+  description is what the HUD and the chat reports show. In progress (brief
+  `.superpowers/sdd/2026-10-01-test-suite-real-data/bug-111-brief.md`).
 
 ### 114. Deactivating the viewed scene while a status's scrolling text is on screen throws
 
