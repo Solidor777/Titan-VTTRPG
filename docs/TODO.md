@@ -15,13 +15,22 @@ Completed items are deleted, not marked done.
   themselves: open the exported .xlsx in Google Sheets, edit one cell's data (not the format), then
   File > Download > Microsoft Excel (.xlsx), and hand the resulting file over.
 
-- Conditions rework to the 2026-09-26 rules (`src/system/Conditions.js`; the compendium Rules journal already has the
-  new text). Blinded, Contaminated, Prone, Restrained and Stunned move from a flat -1 to "-1/4 of base value, rounded
-  up" (Prone: attackers within 1 space get +1/4, beyond 10 spaces -1/4 per 10 spaces; Prone/Sleeping speed and
-  Awareness use "1/2, rounded up"). Frightened becomes Disadvantage on all checks, and Off-Balance is a new condition
-  (-1/4 of base Accuracy, Awareness, Melee, Defense, rounded up) that needs a definition, icon and localization.
-  Open design question: how a rules element expresses "-1/4 of base, rounded up". The journal text also has an
-  unfixed source typo (Blinded reads "--1/4 of their total" instead of "-1/4 of their base value").
+- Conditions rework to the 2026-09-26 rules, remaining part. Plan B
+  (`docs/superpowers/plans/2026-09-29-conditions-rework.md`) has Tasks 1 to 4 complete and Task 5 implemented. Read in
+  `src/system/Conditions.js`: the quarter-of-base penalties for Blinded, Contaminated, Prone, Restrained and Stunned,
+  the new Off-Balance condition, Frightened as Disadvantage on every check, and the Prone and Sleeping speed and
+  Awareness rules exist. Remaining plan B work is Tasks 6 to 17:
+  - Tasks 6 and 7: one rules-element operation registry and one source list (behaviour-preserving);
+  - Tasks 8 to 11: the `immunity` rules element, the engine, the suppressed-condition markers and the Immunity
+    Handling setting;
+  - Tasks 12 and 13: targeting and distance helpers and target-aware attack checks, which carry the Prone
+    attacker modifier (+1/4 of base within 1 space, -1/4 per 10 spaces beyond 10 spaces);
+  - Task 14: Unconscious applies Prone and Incapacitated and drops held gear;
+  - Tasks 15 and 16: the Rules journal typos (Blinded reads "--1/4 of their total" instead of "-1/4 of their base
+    value"; Prone's "1 space" wording) and Metal Attunement and Effulgent Gaze granting condition immunity (compendium
+    module);
+  - Task 17: documentation, skill, memory and full verification.
+  Task 5's fix round 4 is parked (see below).
 
 - Compendium audit findings awaiting a rules decision (2026-09-27; module `src/packs`, rules 2026-09-26):
   - Force Slow: `mulBase` halves only the base speed and rounds down; the text gives no rounding.
@@ -38,7 +47,7 @@ Completed items are deleted, not marked done.
   - Urderic Glaivegun: Strike range 2 versus no range in the rules.
   - Light Attunement: custom trait "Attunement" versus the rules' "Light" trait.
   - Shockwave: radius 5 versus "each creature adjacent to you".
-  - Metal Attunement and Effulgent Gaze: `removeCondition` where the rules grant immunity.
+  - Metal Attunement and Effulgent Gaze: `removeCondition` where the rules grant immunity (plan B Task 16).
   - Missing spell aspects: Charm Creature, Dominate Creature, Infiltrate Dreams, Enlarge/Reduce Creature (resistance),
     Create Fissure (damage), Grasping Earth (duration), Abyssal Darkness (Defense/Reflexes +2), Chained Bolts (extra
     targets).
@@ -62,6 +71,11 @@ Completed items are deleted, not marked done.
 
   Every result gated by a synthetic-document test is unconfirmed until it is re-run the real way. That covers the
   live gates in `docs/CLOSED_BUGS.md`, and #102 in `docs/OPEN_BUGS.md`.
+
+  Status: in progress as `docs/superpowers/plans/2026-10-01-test-suite-real-data.md`. Phases 0 to 2 and Phase 3 Part A
+  are complete. Phase 3 Part B is built and awaiting its third fix round and a final review. Phases 4 to 8 remain
+  (checks and rules; tokens, HUD, combat, chat, macros, ownership and theme; packs, tray, spreadsheet and probe merges;
+  unit-test edits; documentation). #102 is re-evaluated on the new suite once it is done.
 
 - Plan B Task 5 fix round 4, parked by the user on 2026-10-01 until the test-suite rewrite is done. The plan
   (`.superpowers/sdd/2026-09-29-conditions-rework/task-5-fix4-plan.md`, revision 2) and its unreconciled reviews
@@ -88,7 +102,8 @@ Completed items are deleted, not marked done.
   minimum of 1" (rules 09_26 line 7696), which until then ships as a -1 default the GM edits per target.
 
 - Extend immunity beyond effects and conditions (user ruling 2026-09-27): immunity to abilities, damage and other
-  things by trait. The first cut covers effect/condition immunity by condition id or effect name only.
+  things by trait. The first cut covers effect/condition immunity by condition id or effect name only; it is plan B
+  Tasks 8 to 11 and has not been started.
 
 - Remove or sync `.agents/skills/titan-codebase/`, a tracked copy of `.claude/skills/titan-codebase/` that differs in every
   reference file (last touched by commit `5526adee`). Measured 2026-10-02: no file in the repo, script or config reads
