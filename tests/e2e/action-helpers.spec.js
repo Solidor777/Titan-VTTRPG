@@ -8,7 +8,7 @@ import {
    createActor,
    createWorldItem,
 } from './flows.js';
-import { clickSheetTab, clickTabButton, commitText, dragGrip } from './actions.js';
+import { commitText, dragGrip } from './actions.js';
 import { clickRoll } from './checkDialog.js';
 import { selectTitanOption } from './select.js';
 import { settle } from './settle.js';
@@ -16,16 +16,16 @@ import { setWorldSetting } from './settings.js';
 import { attachPageErrors, closeAllApps } from './world.js';
 
 /**
- * The contract of the action helpers: each returns only after the document operations and renders its action started
- * have finished and, for the helpers that add or move a row the caller then edits, after the window transitions have
- * ended (`settle.js`), so the caller's next action cannot land before the re-render of the previous one (CLOSED_BUGS
- * #131). Each test makes the documents it needs through the real flows (the suite's registry deletes them), brings the
+ * The contract of the action helpers that write documents: each returns only after the document operations and renders
+ * its action started have finished and, for the helpers that add or move a row the caller then edits, after the window
+ * transitions have ended (`settle.js`), so the caller's next action cannot land before the re-render of the previous
+ * one. Each test makes the documents it needs through the real flows (the suite's registry deletes them), brings the
  * page to rest, runs one helper and reads what is in flight in a single `evaluate` the moment the helper returns, with
- * no wait in between. The row helpers read the tracked operations and the transitions; the tab and select helpers read
- * the tracked operations only, because the content they reveal slides in after they return and the helpers do not
- * wait for it. The tests of `selectTitanOption`, `clickRoll`, `dragGrip` and `commitText` read the helper's stored
- * effect in the same `evaluate`. A last test types into two fields of a new row back to back and reads both stored
- * values (the shape of #122 and #128).
+ * no wait in between. The row helpers read the tracked operations and the transitions. `selectTitanOption` reads the
+ * tracked operations only, because the content it reveals slides in after it returns. The tab helpers end at their own
+ * active-tab assertion and have no test here. `selectTitanOption`, `clickRoll`, `dragGrip` and `commitText` also read
+ * the helper's stored effect in the same `evaluate`. A last test types into two fields of a new row back to back and
+ * reads both stored values, the shape of the typed-label failures in CLOSED_BUGS #131.
  */
 
 /** @type {import('@playwright/test').Page} The file-shared, logged-in page (one world boot per file). */
@@ -114,14 +114,6 @@ function readInFlight() {
    }));
 }
 
-/**
- * Reads the tracked document operations and renders in flight in the page right now, in one `evaluate`.
- * @returns {Promise<number>} The number of tracked operations and renders in flight.
- */
-function readPending() {
-   return page.evaluate(() => globalThis.titanPending);
-}
-
 test.describe('an action helper returns with nothing in flight', () => {
    test('addAttack', async () => {
       const { uuid } = await makeItem('weapon', 'E2E Action Helpers Weapon addAttack');
@@ -152,24 +144,6 @@ test.describe('an action helper returns with nothing in flight', () => {
       await rest();
       await addCustomAspect(page, uuid);
       expect(await readInFlight()).toEqual(IDLE);
-      expect(errors, `uncaught errors:\n${errors.join('\n')}`).toEqual([]);
-   });
-
-   test('clickSheetTab', async () => {
-      const { uuid } = await makeItem('weapon', 'E2E Action Helpers Weapon clickSheetTab');
-      const sheet = await openSheetByUuid(page, uuid);
-      await rest();
-      await clickSheetTab(sheet, 'Rules Elements');
-      expect(await readPending()).toBe(0);
-      expect(errors, `uncaught errors:\n${errors.join('\n')}`).toEqual([]);
-   });
-
-   test('clickTabButton', async () => {
-      const { uuid } = await makeItem('weapon', 'E2E Action Helpers Weapon clickTabButton');
-      const sheet = await openSheetByUuid(page, uuid);
-      await rest();
-      await clickTabButton(sheet.locator('.tab-list button').filter({ hasText: 'Rules Elements' }));
-      expect(await readPending()).toBe(0);
       expect(errors, `uncaught errors:\n${errors.join('\n')}`).toEqual([]);
    });
 
