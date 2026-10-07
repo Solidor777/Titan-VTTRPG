@@ -86,7 +86,7 @@ import sortObjectsIntoContainerByFunctionValue
    from '~/helpers/utility-functions/SortObjectsIntoContainerByFunctionValue.js';
 import sortObjectsIntoContainerByKeyValue from '~/helpers/utility-functions/SortObjectsIntoContainerByKeyValue.js';
 import { DYNAMIC_MOD_BUCKETS } from '~/system/ModBuckets.js';
-import { getConditionDescriptionKey } from '~/system/Conditions.js';
+import { getConditionDescriptionKey, getEditedConditionDescription } from '~/system/Conditions.js';
 import AddInventoryItemDialog from '~/document/types/actor/dialogs/AddInventoryItemDialog.js';
 import assert from '~/helpers/utility-functions/Assert.js';
 
@@ -229,9 +229,9 @@ import assert from '~/helpers/utility-functions/Assert.js';
  * @typedef {object} EffectReportData
  * @property {string} label - The name of the Effect item.
  * @property {string} img - The image used by the Effect item.
- * @property {string} [description] - The description of the Effect item, if any.
- * @property {string} [descriptionKey] - For a condition, the localization key of its description, which the report
- * localizes when it renders (EffectTag); a condition entry stores no description text.
+ * @property {string} [description] - The description of the Effect item, or of a condition a GM edited, if any.
+ * @property {string} [descriptionKey] - For an unedited condition, the localization key of its description, which the
+ * report localizes when it renders (EffectTag); such an entry stores no description text.
  */
 
 /**
@@ -5561,10 +5561,11 @@ export default class CharacterDataModel extends TitanActorDataModel {
    }
 
    /**
-    * Retrieves the Report Data for this Character's condition Active Effects, sorted by name. A condition's entry
+    * Retrieves the Report Data for this Character's condition Active Effects, sorted by name. The entry of a condition
+    * whose description a GM edited stores that text (getEditedConditionDescription). Any other condition's entry
     * stores its description's localization key (getConditionDescriptionKey), not text: the chat snapshot is read on
     * every client, and EffectTag localizes the key in each reader's language. A condition applying no system condition
-    * (a custom status) has no key.
+    * (a custom status) and carrying no edit has neither.
     * @param {ActiveEffect[]} conditions - The condition Active Effects to get report data for.
     * @returns {EffectReportData[]} Array of objects containing the report data for each condition.
     */
@@ -5576,9 +5577,14 @@ export default class CharacterDataModel extends TitanActorDataModel {
             label: condition.name,
          };
 
+         /** @type {string} The description a GM edited on the condition; empty when unedited. */
+         const editedDescription = getEditedConditionDescription(condition);
+
          /** @type {string} The localization key of the condition's description; empty for a custom status. */
          const descriptionKey = getConditionDescriptionKey(condition);
-         if (descriptionKey) {
+         if (editedDescription) {
+            entry.description = editedDescription;
+         } else if (descriptionKey) {
             entry.descriptionKey = descriptionKey;
          }
          return entry;

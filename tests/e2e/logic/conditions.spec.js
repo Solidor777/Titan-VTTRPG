@@ -14,7 +14,7 @@ import {
    shared,
    viewScene,
 } from '../flows.js';
-import { setClientSetting } from '../settings.js';
+import { setClientSetting, setWorldSetting } from '../settings.js';
 import { attachPageErrors, clearChat, closeAllApps } from '../world.js';
 
 /**
@@ -24,8 +24,8 @@ import { attachPageErrors, clearChat, closeAllApps } from '../world.js';
  * each stat sits well above 0; a test captures a baseline, applies the conditions, and asserts each stat's change from
  * that baseline. The sheet's Defense label and its breakdown tooltip show the condition's penalty, the check rules of
  * the conditions (Frightened, Incapacitated, Restrained, Blinded and Deafened) act on rolls made from the sheet's
- * buttons, and the Player HUD shows a condition's definition text, which a description edited in the condition's own
- * sheet does not change.
+ * buttons, and a condition opens TITAN's own sheet, whose edited description replaces the definition text in the
+ * Player HUD and in the turn-start report.
  */
 
 /** @type {import('@playwright/test').Page} The file-shared, logged-in page (one world boot per file). */
@@ -503,8 +503,11 @@ test.describe('conditions — check rules', () => {
 });
 
 test.describe('conditions — the Player HUD', () => {
-   test('the HUD shows a condition\'s definition text, and a description edited in its sheet does not change it',
+   test('a condition opens TITAN\'s own sheet, and a description edited there is what the HUD and the report show',
       async () => {
+         // Turn-start reports list the actor's conditions.
+         await setWorldSetting(page, 'reportEffects', true);
+
          /** @type {{name: string, text: string}} Blinded's localized name and its definition's plain text. */
          const blinded = await page.evaluate(() => {
             /** @type {HTMLDivElement} A detached element that turns the definition HTML into plain text. */
@@ -526,16 +529,20 @@ test.describe('conditions — the Player HUD', () => {
          const detail = row.locator('.detail');
          await expect(detail).toContainText(blinded.text);
 
-         // The condition's own sheet is core's effect configuration: TITAN registers its sheet for the `effect`
-         // subtype only. Its Details tab holds the description editor.
+         // The Open Sheet button opens TITAN's condition sheet, not core's effect configuration.
          await row.getByTestId('player-hud-effect-sheet').click();
 
          /** @type {import('@playwright/test').Locator} The condition's sheet. */
-         const sheet = page.locator('.application.active-effect-config');
+         const sheet = page.locator('.application.titan-condition-sheet');
          await expect(sheet).toBeVisible();
-         await sheet.locator('prose-mirror [contenteditable="true"]').click();
+         await expect(page.locator('.application.active-effect-config')).toHaveCount(0);
+
+         // The sheet's description editor: open it, type, and save it with the editor's save button.
+         await sheet.locator('prose-mirror').hover();
+         await sheet.locator('prose-mirror button.toggle').click();
+         await sheet.locator('prose-mirror .ProseMirror').click();
          await page.keyboard.type(EDITED_DESCRIPTION);
-         await sheet.locator('button[type="submit"]').click();
+         await sheet.locator('prose-mirror button[data-action="save"]').click();
          await expect.poll(
             () => page.evaluate(
                (id) => game.actors.get(id).effects.find((effect) => effect.statuses.has('blinded')).description,
@@ -544,8 +551,27 @@ test.describe('conditions — the Player HUD', () => {
             { message: 'the sheet stored the edited description' },
          ).toContain(EDITED_DESCRIPTION);
 
-         // The edit reached the document and the HUD still shows the definition text.
-         await expect(detail).toContainText(blinded.text);
-         await expect(detail).not.toContainText(EDITED_DESCRIPTION);
+         // The HUD shows the edit in place of the definition text.
+         await expect(detail).toContainText(EDITED_DESCRIPTION);
+         await expect(detail).not.toContainText(blinded.text);
+
+         // A turn start posts a report whose Blinded tag shows the edit and not the definition text.
+         /** @type {string} The turn-start report's chat-message id. */
+         const reportId = await page.evaluate(async (id) => {
+            /** @type {number} The chat-message count before the turn start. */
+            const before = game.messages.size;
+            await game.actors.get(id).system.onTurnStart();
+            await titanWait(() => game.messages.size > before, { message: 'turn-start report posted' });
+            return game.messages.contents.at(-1).id;
+         }, actorId);
+
+         /** @type {import('@playwright/test').Locator} The report card's Blinded tag. */
+         const tag = page.locator(`#chat .message[data-message-id="${reportId}"] .report .effects .tag`).first();
+         await expect(tag).toContainText(blinded.name);
+         await expect.poll(
+            () => tag.evaluate((element) => element._tippy?.props?.content),
+            { message: 'the tag\'s tooltip is the edited description' },
+         ).toContain(EDITED_DESCRIPTION);
+         expect(await tag.evaluate((element) => element._tippy?.props?.content)).not.toContain(blinded.text);
       });
 });

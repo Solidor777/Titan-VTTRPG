@@ -35,7 +35,8 @@ export default class TurnStartReportChatMessageDataModel extends ReportChatMessa
          message: createArrayField(createStringField(), []),
 
          // Active conditions snapshot: each entry is a `{ label, img, descriptionKey }` object, the key localized when
-         // the card renders; an entry from a report posted before conditions stored keys holds `description` text.
+         // the card renders; the entry of a condition a GM edited, and an entry from a report posted before conditions
+         // stored keys, holds `description` text instead.
          conditions: createArrayField(createObjectField(), []),
       };
    }

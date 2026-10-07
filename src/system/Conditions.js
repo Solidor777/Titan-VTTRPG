@@ -1,3 +1,4 @@
+import isHTMLBlank from '~/helpers/utility-functions/IsHTMLBlank.js';
 import localize from '~/helpers/utility-functions/Localize.js';
 import sortAscending from '~/helpers/utility-functions/SortAscending.js';
 import { CANONICAL_SITUATIONS } from '~/system/CanonicalSituations.js';
@@ -269,8 +270,9 @@ export function findConditionDefinition(statuses) {
 
 /**
  * Gets the localization key of the description of the system condition an Active Effect applies, for `localize()`.
- * Condition effects store no description: a stored copy would freeze its creator's language and go stale when the
- * rules text changes. A chat snapshot stores this key and each reader localizes it (the turn-start report).
+ * Condition effects are created with no description: a stored copy would freeze its creator's language and go stale
+ * when the rules text changes. A chat snapshot of an unedited condition stores this key and each reader localizes it
+ * (the turn-start report); a description edited on the effect is read by getEditedConditionDescription instead.
  * @param {TitanActiveEffect} [effect] - The condition Active Effect; undefined in a row's mid-deletion frame.
  * @returns {string} The key (`<id>.desc`), or an empty string when the effect applies no system condition.
  */
@@ -281,20 +283,33 @@ export function getConditionDescriptionKey(effect) {
 }
 
 /**
- * Gets the description of the system condition an Active Effect applies, localized on this client.
+ * Gets the description a GM wrote on a condition Active Effect in its sheet. A condition effect is created with a blank
+ * description, so a non-blank one is an edit, and it replaces the definition's text for every reader.
  * @param {TitanActiveEffect} [effect] - The condition Active Effect; undefined in a row's mid-deletion frame.
- * @returns {string} The localized description HTML, or an empty string when the effect applies no system condition
- * (`localize` returns an empty string for an empty key).
+ * @returns {string} The edited description HTML, or an empty string when the effect's description is blank.
+ */
+export function getEditedConditionDescription(effect) {
+   /** @type {string} The effect's own description. */
+   const description = effect?.description ?? '';
+   return isHTMLBlank(description) ? '' : description;
+}
+
+/**
+ * Gets the description of a condition Active Effect: the one edited on the effect, else the system condition's
+ * definition text, localized on this client.
+ * @param {TitanActiveEffect} [effect] - The condition Active Effect; undefined in a row's mid-deletion frame.
+ * @returns {string} The description HTML, or an empty string when the effect has no edit and applies no system
+ * condition (`localize` returns an empty string for an empty key).
  */
 export function getConditionDescription(effect) {
-   return localize(getConditionDescriptionKey(effect));
+   return getEditedConditionDescription(effect) || localize(getConditionDescriptionKey(effect));
 }
 
 /**
  * Sets up the system conditions, registering each as a CONFIG.statusEffects entry flagged with its subtype. A
  * condition's description is not copied onto its entry, so the Active Effects core creates from the entry store none;
- * readers look it up by status id (getConditionDescription, getConditionDescriptionKey) and localize it on their own
- * client.
+ * readers use the effect's own edited description, else look the definition up by status id (getConditionDescription,
+ * getConditionDescriptionKey) and localize it on their own client.
  * @returns {void}
  */
 export default function setupConditions() {

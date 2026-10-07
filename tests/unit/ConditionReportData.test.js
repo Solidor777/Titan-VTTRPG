@@ -27,6 +27,38 @@ afterAll(() => {
 });
 
 describe('_getConditionReportData', () => {
+   it('lists a condition whose description was edited with that text and no localization key', () => {
+      /** @type {object} A bare Character. */
+      const model = Object.create(CharacterDataModel.prototype);
+      expect(model._getConditionReportData([
+         {
+            description: '<p>edited text</p>',
+            img: 'blinded.svg',
+            name: 'Blinded',
+            statuses: new Set(['blinded']),
+            type: 'condition',
+         },
+         {
+            description: '<p></p>',
+            img: 'prone.svg',
+            name: 'Prone',
+            statuses: new Set(['prone']),
+            type: 'condition',
+         },
+      ])).toEqual([
+         {
+            description: '<p>edited text</p>',
+            img: 'blinded.svg',
+            label: 'Blinded',
+         },
+         {
+            descriptionKey: 'prone.desc',
+            img: 'prone.svg',
+            label: 'Prone',
+         },
+      ]);
+   });
+
    it('lists conditions by name with their descriptions\' localization keys, never stored text', () => {
       /** @type {object} A bare Character. */
       const model = Object.create(CharacterDataModel.prototype);

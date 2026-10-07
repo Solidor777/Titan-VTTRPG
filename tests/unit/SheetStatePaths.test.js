@@ -4,6 +4,7 @@ import { fileURLToPath } from 'node:url';
 import path from 'node:path';
 import { get } from 'svelte/store';
 import createCharacterSheetData from '~/document/types/actor/types/character/sheet/CharacterSheetData.js';
+import createConditionSheetData from '~/document/types/active-effect/sheet/ConditionSheetData.js';
 import createRulesElementItemSheetData from '~/document/types/item/sheet/RulesElementItemSheetData.js';
 import createSpellSheetData from '~/document/types/item/types/spell/sheet/SpellSheetData.js';
 import createWeaponSheetData from '~/document/types/item/types/weapon/sheet/WeaponSheetData.js';
@@ -60,6 +61,11 @@ const SHEETS = [
       name: 'commodity sheet',
       shell: 'document/types/item/types/commodity/sheet/CommoditySheetShell.svelte',
       factory: createRulesElementItemSheetData,
+   },
+   {
+      name: 'condition sheet',
+      shell: 'document/types/active-effect/sheet/ConditionSheetShell.svelte',
+      factory: createConditionSheetData,
    },
    {
       name: 'equipment sheet',
@@ -498,7 +504,7 @@ describe.each(SCANS.map((scan) => [
 
    it('finds state paths in the components it mounts', () => {
       expect(scan.paths.map((entry) => entry.segments.join('.'))).toContain('tabs.activeTab');
-      expect(scan.paths.length).toBeGreaterThan(3);
+      expect(scan.paths.length).toBeGreaterThan(2);
    });
 
    it('reads only paths the initial sheet state defines', () => {

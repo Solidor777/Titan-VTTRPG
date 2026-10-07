@@ -30,16 +30,16 @@
       <div class="body">
 
          <!--Sidebar-->
-         <div class="sidebar">
-            {#if sidebar}
+         {#if sidebar}
+            <div class="sidebar">
                {#each [sidebar] as Sidebar}
                   <Sidebar/>
                {/each}
-            {/if}
-         </div>
+            </div>
+         {/if}
 
          <!--Tabs-->
-         <div class="tabs">
+         <div class="tabs" class:with-sidebar={!!sidebar}>
             {#if tabs}
                {#each [tabs] as TabsComp}
                   <TabsComp/>
@@ -76,11 +76,14 @@
 
          .tabs {
             @include panel-1;
-            @include margin-left-large;
 
             border-radius: var(--titan-border-radius);
             overflow: hidden;
             width: 100%;
+
+            &.with-sidebar {
+               @include margin-left-large;
+            }
          }
       }
    }

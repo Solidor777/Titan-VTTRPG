@@ -162,7 +162,12 @@ management). Data model classes hold the schema, field validation, and derived-d
   (and their seeded `rulesElement` arrays) come from `buildConditionDefinitions()` in
   `src/system/Conditions.js`, pushed onto `CONFIG.statusEffects` by `setupConditions()`; toggling a
   status effect on a token instantiates this subtype, and its mechanics derive through
-  `CharacterDataModel._applyRulesElements` like any other rules element.
+  `CharacterDataModel._applyRulesElements` like any other rules element. A condition effect is created with a blank
+  `description`; its text is read from the effect's own non-blank `description` (`getEditedConditionDescription`,
+  `Conditions.js`, set by a GM in the condition sheet), else from the definition by status id
+  (`getConditionDescriptionKey` / `getConditionDescription`, localized on the reading client). Readers:
+  `EffectsDetailBody.svelte` (Player HUD detail) and `CharacterDataModel._getConditionReportData` (turn-start
+  report entries carry the edited `description`, else the `descriptionKey`).
 - Effect rows render inline check buttons via `CharacterSheetEffectChecks` /
   `CharacterSheetEffectCheck` (`src/document/types/actor/types/character/sheet/items/effect/`), mirrors
   of the item `CharacterSheetItemChecks` / `CharacterSheetItemCheck`. They reuse the **item-check
@@ -624,6 +629,13 @@ and one or more inner Svelte component trees.
   Checks / Rules Elements). The Description tab (`ActiveEffectSheetDescriptionTab.svelte`) edits the
   NATIVE `description` field, persisting via `document.data.update({ description })`; the Checks and
   Rules Elements tabs reuse the item `ItemSheet*` components unchanged.
+- `TitanConditionSheet` (`src/document/types/active-effect/sheet/TitanConditionSheet.js`) extends
+  `TitanDocumentSheet` and is registered in `OnceInit.js` as the default `ActiveEffect` sheet for subtype `condition`
+  (the `effect` registration above covers only `effect`; any other subtype opens core's `ActiveEffectConfig`). Its
+  shell (`ConditionSheetShell.svelte`) is `ItemSheetBase` with `ItemSheetHeader` (name and image only), no sidebar,
+  and `ConditionSheetTabs` (Description via `ActiveEffectSheetDescriptionTab`, Rules Elements via
+  `ItemSheetRulesElementsTab`); state is `createConditionSheetState` (no per-check state, since a condition has no
+  `system.check`). `ItemSheetBase` renders its sidebar column only when given a `sidebar`.
 
 **Effect Tray sidebar tab**
 

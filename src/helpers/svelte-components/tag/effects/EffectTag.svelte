@@ -54,8 +54,8 @@
     * @property {string} label - The label to display for the effect.
     * @property {string} img - The image to display for the effect.
     * @property {string} [descriptionKey] - The localization key of the condition's description, localized at render.
-    * @property {string} [description] - The condition's localized description, which only an entry from a report
-    * posted before conditions stored keys carries.
+    * @property {string} [description] - The condition's description text, which only the entry of an edited condition
+    * and an entry from a report posted before conditions stored keys carry.
     */
 
    /**

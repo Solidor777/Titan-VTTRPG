@@ -90,7 +90,7 @@ Deferred/known bugs. Todos (planned work) live in `docs/TODO.md`; this file is b
 - **Found:** 2026-10-01 during the #102 real-flow repro.
 - **Status:** Open; unconfirmed until reproduced.
 
-### 110. A condition effect whose rules elements a GM edited may be overwritten by migration (unconfirmed)
+### 110. A condition effect whose rules elements a GM edited is overwritten by migration
 
 - **What, read, not run:** the Active Effect sheet's Rules Elements tab
   (`src/document/types/active-effect/sheet/ActiveEffectSheetTabs.svelte:28`) does not gate on effect
@@ -99,35 +99,18 @@ Deferred/known bugs. Todos (planned work) live in `docs/TODO.md`; this file is b
   that check. So a hand-edited condition effect may make every Prompt or Automatic GM load prompt for migration, and
   then have its edits overwritten. No document says this is intended.
 - **Found:** 2026-10-01 by a plan reviewer reading the code (Task 5 fix round 4 plan review).
-- **Note (read, not run):** TITAN's Active Effect sheet, which has the Rules Elements tab, is registered for the
-  `effect` subtype only (`src/hooks/OnceInit.js:247-251`). A condition may therefore open core's config instead, and
-  this trigger path may not exist as written.
+- **Measured, 2026-10-07 (after the #111 fix made the condition effect open TITAN's own sheet):** with the world's
+  `migrationMode` at its default `prompt`, a Blinded effect applied from the Token HUD held 4 rules elements. A
+  reload of the GM client showed no migration dialog (control). The Rules Elements tab of the effect's own sheet
+  (class `titan-condition-sheet`) added a fifth element through the add button (the `addRulesElement` flow), and the
+  next reload of the GM client showed the "Migrate World" confirmation dialog. Confirming it left the effect with 4
+  rules elements again, so the edit was overwritten (`.superpowers/sdd/test-suite-rewrite/bug-111/measure-110-run1.log`
+  and `measure-110-run2.log`; run 1 clicked the dialog's last button, Cancel, and read 5, run 2 clicked "Migrate World"
+  and read 4; the scratch spec is kept as `measure-110.spec.js.txt`). Not measured: editing an existing element instead
+  of adding one.
 - **Status:** Open, tabled by the user on 2026-10-07. The user deferred it on 2026-10-01 to a future document
-  inheritance campaign (`docs/TODO.md`). For now GMs may edit a condition's rules elements.
-
-### 111. A condition's description edited in its sheet is ignored by the HUD and chat reports
-
-- **What, read, not run:**
-  - The Player HUD's effect detail shows an Open Sheet button for conditions too
-    (`src/ui/player-hud/elements/effects-panel/EffectsDetailBody.svelte:86-92`).
-  - TITAN's Active Effect sheet is registered for the `effect` subtype only (`src/hooks/OnceInit.js:247-251`, read).
-    So a condition most likely opens core's `ActiveEffectConfig`, whose Details tab edits the native `description`
-    (`templates/sheets/active-effect/details.hbs:3`). The sheet that opens at runtime was observed on 2026-10-07 (the
-    Measured entry below).
-  - The HUD shows the definition text for a non-effect (`EffectsDetailBody.svelte:28-32`).
-  - Turn-start reports carry the condition's `descriptionKey`
-    (`src/document/types/actor/types/character/CharacterDataModel.js:5590-5605`).
-  - So the edit is never shown.
-- **Measured, 2026-10-07:** `tests/e2e/logic/conditions.spec.js` "the HUD shows a condition's definition text, and a
-  description edited in its sheet does not change it" applies Blinded from the Token HUD and clicks the Player HUD row's
-  Open Sheet button. Core's `.application.active-effect-config` opened, not a TITAN sheet. After typing into its
-  description editor and submitting, the effect's `description` held the edit, and the Player HUD row's detail still
-  showed the definition text and not the edit (the test passed in
-  `.superpowers/sdd/test-suite-rewrite/phase-4/e2e-full-6.log`).
-- **Found:** 2026-10-01 by a reviewer of the test-suite rewrite plan.
-- **Status:** Open. User ruling 2026-10-07: a condition effect opens TITAN's own Active Effect sheet and an edited
-  description is what the HUD and the chat reports show. In progress (brief
-  `.superpowers/sdd/2026-10-01-test-suite-real-data/bug-111-brief.md`).
+  inheritance campaign (`docs/TODO.md`). For now GMs may edit a condition's rules elements, and the next migration
+  overwrites the edit.
 
 ### 114. Deactivating the viewed scene while a status's scrolling text is on screen throws
 

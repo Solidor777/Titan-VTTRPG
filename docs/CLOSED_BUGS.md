@@ -1950,3 +1950,31 @@ The evidence files named here are in `.superpowers/sdd/test-suite-rewrite/phase-
   four failed on the single-notice assertion (Expected 1, Received 2; `gate135-a2-two-notices.log`). On the final code
   the file passed with no create click over 1000 ms (`e2e-full-7.log`).
 - **Status:** Closed 2026-10-07.
+
+### 111. A condition's description edited in its sheet was ignored by the HUD and chat reports
+
+The evidence files named here are in `.superpowers/sdd/test-suite-rewrite/bug-111/` (local, not checked in).
+
+- **Symptom:** a condition effect opened core's `ActiveEffectConfig`; a description typed into it was stored on the
+  effect, and the Player HUD detail and the turn-start report kept showing the condition's definition text.
+- **Cause (read):** TITAN's Active Effect sheet was registered for the `effect` subtype only (`src/hooks/OnceInit.js`),
+  and `EffectsDetailBody.svelte` and `CharacterDataModel._getConditionReportData` read only the definition text for a
+  condition.
+- **Measured:** the pre-change test run opened no TITAN sheet (`gate-pre-change.log`); the earlier measurement of the
+  same flow on the old code is in `.superpowers/sdd/test-suite-rewrite/phase-4/e2e-full-6.log`.
+- **Found:** 2026-10-01 by a reviewer of the test-suite rewrite plan.
+- **Ruling:** user, 2026-10-07: a condition effect opens TITAN's own Active Effect sheet and an edited description is
+  what the HUD and the chat reports show.
+- **Fixed:** 2026-10-07. A new `TitanConditionSheet` (Description and Rules Elements tabs, name and image header, no
+  sidebar) is the default `ActiveEffect` sheet for the `condition` subtype. A condition effect is still created with a
+  blank description; `getEditedConditionDescription` (`src/system/Conditions.js`) returns its description when
+  non-blank, and the HUD detail (`getConditionDescription`) and the turn-start report entry (`description` in place of
+  `descriptionKey`) read it before the definition. An unedited condition shows the same text as before.
+- **Gate:** `tests/e2e/logic/conditions.spec.js` "a condition opens TITAN's own sheet, and a description edited there
+  is what the HUD and the report show": applies Blinded from the Token HUD, opens the sheet from the Player HUD row,
+  types into the description editor, saves, and reads the edit in the Player HUD detail and in the Blinded tag of the
+  turn-start report. On the pre-change code it failed at the sheet assertion (`.application.titan-condition-sheet` not
+  found; `gate-pre-change.log`). On the fixed code it passed (`gate-post-change-1.log`), and the full e2e passed 645 of
+  645 with census zero (`e2e-full-1.log`). Unit: `tests/unit/ConditionReportData.test.js` covers the edited and blank
+  descriptions (1513 of 1513, `unit.log`).
+- **Status:** Closed 2026-10-07.

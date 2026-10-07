@@ -217,6 +217,7 @@
       "defaultArmorSheet.text": "Default Armor Sheet",
       "defaultAttribute.desc.text": "The default <strong>Attribute</strong> to use when rolling this <strong>Skill</strong>.",
       "defaultCommoditySheet.text": "Default Commodity Sheet",
+      "defaultConditionSheet.text": "Default Condition Sheet",
       "defaultEffectSheet.text": "Default Effect Sheet",
       "defaultEquipmentSheet.text": "Default Equipment Sheet",
       "defaultNpcSheet.text": "Default NPC Sheet",

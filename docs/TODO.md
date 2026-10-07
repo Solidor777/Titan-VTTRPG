@@ -79,8 +79,8 @@ Completed items are deleted, not marked done.
   and the orphan e2e's precondition comment (D11).
 
 - Document inheritance campaign (user, 2026-10-01): a future campaign covering how documents inherit from their
-  definitions. It covers OPEN_BUGS #110 (a condition effect a GM edited may be treated as stale and overwritten) and
-  #111 (a condition's edited description is ignored by the HUD and reports).
+  definitions. It covers OPEN_BUGS #110 (a condition effect a GM edited is treated as stale and overwritten by the next
+  migration).
 
 - Report world documents that fail to load (user ruling 2026-10-01: no systemic fix now). Foundry leaves an invalid
   actor, scene or item out of its world collection (`invalidDocumentIds`), so the migration scan never sees one that

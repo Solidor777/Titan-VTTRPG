@@ -85,6 +85,7 @@ import TitanActiveEffect from '~/document/types/active-effect/TitanActiveEffect.
 import TitanActiveEffectDataModel from '~/document/types/active-effect/TitanActiveEffectDataModel.js';
 import ConditionDataModel from '~/document/types/active-effect/ConditionDataModel.js';
 import TitanActiveEffectSheet from '~/document/types/active-effect/sheet/TitanActiveEffectSheet.js';
+import TitanConditionSheet from '~/document/types/active-effect/sheet/TitanConditionSheet.js';
 
 // Sidebar tab.
 import TitanEffectTrayTab from '~/sidebar/TitanEffectTrayTab.js';
@@ -244,12 +245,19 @@ export default function onceInit() {
       },
    );
 
-   // Register the Active Effect sheet for the 'effect' subtype.
+   // Register the Active Effect sheet for the 'effect' subtype and the condition sheet for the 'condition' subtype.
    foundry.applications.apps.DocumentSheetConfig.registerSheet(
       foundry.documents.ActiveEffect, 'titan', TitanActiveEffectSheet, {
          types: ['effect'],
          makeDefault: true,
          label: localize('defaultEffectSheet'),
+      },
+   );
+   foundry.applications.apps.DocumentSheetConfig.registerSheet(
+      foundry.documents.ActiveEffect, 'titan', TitanConditionSheet, {
+         types: ['condition'],
+         makeDefault: true,
+         label: localize('defaultConditionSheet'),
       },
    );
 
