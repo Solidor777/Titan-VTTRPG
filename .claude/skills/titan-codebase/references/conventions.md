@@ -1004,8 +1004,10 @@ input is a relative change), `addTrait` (the Edit Traits dialog of a weapon atta
 skill row in the Skills tab), `applyCondition` / `removeCondition` (the Token HUD of a placed token: right-click, the
 status effects palette, the status icon, then a left click on the token closes the HUD, so the next call's right-click
 opens it; core's right-click toggles the HUD, so a second right-click does not close it reliably). The pointer reaches
-the token through `restOnToken` before each click (it moves in from outside the token and waits for the token's `hover`
-and two animation frames; whether it is needed is not measured, see CLOSED_BUGS #134); `hoverToken` first makes the chat
+the token through `restOnToken` before each click (it moves in from outside the token and waits for the token's `hover`,
+because a token's interaction manager handles a pointer-down only from its HOVER state on, read at
+`client/canvas/interaction/mouse-handler.mjs:474-475` and `565-566` of Foundry 14.364; whether it is needed is not
+measured, see CLOSED_BUGS #134); `hoverToken` first makes the chat
 tab the active sidebar tab, because a chat message posted while another tab is active shows as a card over the canvas
 for 5 s and takes the pointer from a token under it (CLOSED_BUGS #134). A right-click that opened no HUD has been seen
 without a located cause (OPEN_BUGS #129). Further flows are `createWorldItem`, `createFolder` (the directory's Create

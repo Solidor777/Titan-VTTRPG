@@ -3,9 +3,6 @@
 Previously closed bugs and their history. Open bugs live in `docs/OPEN_BUGS.md`; entries move here
 when fixed.
 
-A file name followed by † is a test deleted in the test-suite rewrite: commit `d874870b` deleted the migration tests
-(no migration tests are kept while no migration is active). No live gate stands behind that reference.
-
 ### 1. Casting-check roll-time auto-max added the purchase count, not the increment-scaled amount
 
 - **What:** `calculateCastingCheckResults` (`src/check/types/casting-check/CastingCheckResults.js`),
@@ -191,8 +188,9 @@ A file name followed by † is a test deleted in the test-suite rewrite: commit 
   `CheckDialogTrainingModField` pre-localized its field label; both feed `Text`-localizing leaves,
   so the rendered strings re-localized to `LOCAL.Self.text`, `LOCAL.Rounds.text`,
   `LOCAL.Training Mod.text`, etc.
-- **Found:** 2026-06-10 by the user (aspect options); pinned by the extended localization e2e guard,
-  which now walks every spell tab with enabled aspects plus the casting-check dialog.
+- **Found:** 2026-06-10 by the user (aspect options); pinned today by `tests/e2e/surfaces.spec.js` ("every spell tab
+  shows no LOCAL. text with range, duration and
+  inflict-condition aspects" and "every check type opens its options dialog without LOCAL. text").
 - **Fixed:** 2026-06-10 on `feature/theme-foundation` — both sites pass raw i18n keys per the
   Text/tooltip value contract.
 
@@ -450,7 +448,7 @@ A file name followed by † is a test deleted in the test-suite rewrite: commit 
   `…TargetDefenseField`, and `ResistanceCheckDialogResistanceField` passed `label={localize('…')}`
   into `CheckDialogField`, whose `<Text>` localizes the label again, so the dialogs rendered
   `LOCAL.Attacker Melee.text`, `LOCAL.Target Defense.text`, `LOCAL.Type.text`, and
-  `LOCAL.Resistance.text`. The localization e2e scanned only the casting-check dialog.
+  `LOCAL.Resistance.text`. The localization e2e of the time scanned only the casting-check dialog.
 - **Found:** 2026-09-10, from a screenshot sweep of every TITAN surface for the redesign passes.
 - **Fix:** the five fields pass the raw key like every other dialog field. `surfaces.spec.js` ("every check type
   opens its options dialog without LOCAL. text") opens all five check-options dialogs from the shared roller's
@@ -891,9 +889,9 @@ A file name followed by † is a test deleted in the test-suite rewrite: commit 
 - **Found:** 2026-09-29 while planning the condition-effect sync (spec B, conditions rework).
 - **Fixed:** 2026-09-29 (the version chain) and 2026-09-30 (the converter) — `resolveMigrationAction(mode,
   needsMigration)` (`src/helpers/migration/MigrateWorld.js`) maps the mode to none / migrate / prompt before any scan,
-  and every migration step runs inside `migrateWorld` (#82). Gated by `tests/unit/MigrationAction.test.js†`,
-  `tests/unit/OnceReady.test.js†` (Disabled scans and converts nothing), and `tests/e2e/condition-migration.spec.js†` (a
-  Disabled reload leaves every seeded stale condition untouched in every location).
+  and every migration step runs inside `migrateWorld` (#82). No live gate: the tests that gated it
+  (`tests/unit/MigrationAction.test.js`, `tests/unit/OnceReady.test.js`,
+  `tests/e2e/condition-migration.spec.js`) were deleted in `d874870b` (no migration tests while no migration is active).
 
 ### 75. Stat breakdowns never listed condition modifiers
 
@@ -974,12 +972,11 @@ A file name followed by † is a test deleted in the test-suite rewrite: commit 
 - **Fixed:** 2026-09-30 — the converter runs only inside `migrateWorld`, per stored actor in `migrateStoredActors`
   (`src/helpers/migration/MigrateStoredActors.js`) before the version chains, and `worldNeedsMigration` reports legacy
   effect Items, so all three modes govern it; only the active GM migrates, a token's actor is read only to write it,
-  and the final notification counts failures. Gated by `tests/unit/OnceReady.test.js†`,
-  `tests/unit/MigrateStoredActors.test.js†`, and `tests/unit/MigrateWorld.test.js†` (the routing), and by
-  `tests/e2e/condition-migration.spec.js†` and `tests/e2e/pack-conversion.spec.js†` (the same routing live, through
-  stale conditions). The converter itself is unit-gated only (`tests/unit/ConvertEffectItemsToActiveEffects.test.js†`,
-  `tests/unit/StoredActorSources.test.js†`): the server rejects the unregistered `effect` Item subtype, so no e2e can
-  seed a legacy effect Item.
+  and the final notification counts failures. No live gate: the tests that gated it (`tests/unit/OnceReady.test.js`,
+  `tests/unit/MigrateStoredActors.test.js`,
+  `tests/unit/MigrateWorld.test.js`, `tests/unit/ConvertEffectItemsToActiveEffects.test.js`,
+  `tests/unit/StoredActorSources.test.js`, `tests/e2e/condition-migration.spec.js`,
+  `tests/e2e/pack-conversion.spec.js`) were deleted in `d874870b` (no migration tests while no migration is active).
 
 ### 83. Condition sync and effect-item converter missed actors stored in world Scene and Adventure packs
 
@@ -995,10 +992,8 @@ A file name followed by † is a test deleted in the test-suite rewrite: commit 
   orphaned token (an unlinked token whose base actor is gone) on a world scene or in a world Scene pack is never
   written, because Foundry v14 core cannot create or delete entries in its delta (#96); one with pending work is
   reported as a failure that names it and says to delete it (#105). An Adventure's scene tokens are data, and are
-  walked whatever their base actor. Gated by `tests/unit/StoredActorSources.test.js†` (the location list is pinned
-  and walked in order) and `tests/e2e/condition-migration.spec.js†` (the condition sync in every location, packs
-  locked, on an Automatic load and not again on the next). The converter over these locations is unit-gated only: the
-  server rejects the unregistered `effect` Item subtype, so no e2e can seed a legacy effect Item.
+  walked whatever their base actor. No live gate: the tests that gated it (`tests/unit/StoredActorSources.test.js`,
+  `tests/e2e/condition-migration.spec.js`) were deleted in `d874870b` (no migration tests while no migration is active).
 
 ### 84. Report text reached tooltips and rich text as unsanitized HTML
 
@@ -1104,13 +1099,9 @@ A file name followed by † is a test deleted in the test-suite rewrite: commit 
   fails the write of its whole Adventure field, because core validates every element of the field; the failure names
   each entry still holding a legacy effect Item. The cure is to resolve the failure the pass reports for that entry by
   name (its conversion's own error), or to remove the entry from the Adventure; the next migrating GM load then stores
-  the field. Gated by `tests/unit/StoredActorSources.test.js†` (one
-  write per field once the walk leaves the Adventure, every actor's conversion in it, no write when nothing changed, a
-  write core did not store or that throws rejects its targets and names the entries still holding a legacy effect
-  Item, the next walk starts from the stored field, and the pass counts those actors as failed),
-  `tests/unit/MigrateStoredActors.test.js†` (an actor counts as updated only once stored, read after
-  the walk), and `tests/e2e/condition-migration.spec.js†` (a `preUpdateAdventure` veto makes the confirmed migration
-  report 2 failures and leaves both Adventure locations unmigrated).
+  the field. No live gate: the tests that gated it (`tests/unit/StoredActorSources.test.js`,
+  `tests/unit/MigrateStoredActors.test.js`, `tests/e2e/condition-migration.spec.js`) were deleted in `d874870b` (no
+  migration tests while no migration is active).
 
 ### 94. Legacy timed effects converted inside an Adventure were stored enabled after they expired
 
@@ -1126,10 +1117,10 @@ A file name followed by † is a test deleted in the test-suite rewrite: commit 
   `TitanActiveEffect.buildCreationSource`, which constructs the effect (so its schema cleans the data as creation does)
   and applies the same rule and core's `transfer: false`. The data path stores what creation stores except `start`,
   which records a creation moment that inline data lacks. Gated by `tests/unit/GetEffectCreationChanges.test.js` (the
-  rule), `tests/unit/StoredActorSources.test.js†` (the Adventure path builds each created effect through it), and
-  `tests/e2e/effect-creation-source.spec.js†` (live: for string, missing, expired, and running durations, permanent
-  effects, a condition, and a legacy-shaped effect as `buildEffectData` builds it, the data built for an Adventure
-  stores the `disabled`, `showIcon`, and `transfer` a created document stores, and no input fails data preparation).
+  rule). The tests that also gated it (`tests/unit/StoredActorSources.test.js`,
+  `tests/e2e/effect-creation-source.spec.js`) were deleted in `d874870b` (no migration tests while no migration is
+  active); the Adventure write path and the stored `disabled`,
+  `showIcon` and `transfer` have no live gate.
 
 ### 95. Migration showed "complete" when a world pack could not be read or re-locked
 
@@ -1142,9 +1133,9 @@ A file name followed by † is a test deleted in the test-suite rewrite: commit 
   restore; `migrateStoredActors` adds them to `failed`, and `storedActorsNeedMigration` reports work when a pack could
   not be read, so a pack that stays unreadable is reported as a failure on every migrating load. A pack the walk
   could not read is not read again in the same walk, so an Adventure pack, walked for its actors and its scene tokens,
-  counts as one failure. Gated by `tests/unit/StoredActorSources.test.js†` (both failures recorded; an unreadable
-  Adventure pack read once and recorded once; an unreadable pack makes the scan report work and the pass count a
-  failure) and `tests/unit/MigrateStoredActors.test.js†` (walk failures are counted, and make the scan report work).
+  counts as one failure. No live gate: the tests that gated it (`tests/unit/StoredActorSources.test.js`,
+  `tests/unit/MigrateStoredActors.test.js`) were deleted in `d874870b` (no migration tests while no migration is
+  active).
 
 ### 96. Unlinked tokens whose base actor is gone were never migrated in world scenes and Scene packs
 
@@ -1182,9 +1173,8 @@ A file name followed by † is a test deleted in the test-suite rewrite: commit 
   - The walker comments state the reasons, and CLOSED_BUGS #83 states the exception.
   - An Adventure's scene tokens are inline data written through the Adventure, which core writes cleanly whatever the
     base actor (live with a raw-data token, pending real-path re-run), so they are migrated.
-  - Gated by `tests/unit/StoredActorSources.test.js†`: orphaned tokens on a world scene and in a Scene pack are
-    never opened or written (#105 lists the reporting gates); an Adventure token whose actor id names no actor is
-    walked and written.
+  - No live gate: `tests/unit/StoredActorSources.test.js` were deleted in `d874870b` (no migration tests while no
+    migration is active).
 
 ### 97. A failed version migration stored part-migrated data under the previous version
 
@@ -1195,8 +1185,8 @@ A file name followed by † is a test deleted in the test-suite rewrite: commit 
 - **Found:** 2026-09-30 by the buddy check of the Task 5 fix round (plan B).
 - **Fixed:** 2026-09-30 — `migrateDocument` copies the update data after each fully completed version
   (`foundry.utils.deepClone`, which keeps an update operator such as `_del` by reference) and writes that copy, so no
-  part of a failed version is stored. Gated by `tests/unit/MigrateWorld.test.js†` (a version whose second level throws
-  after its first changed the data in place stores only the previous version's data, its operator intact).
+  part of a failed version is stored. No live gate: `tests/unit/MigrateWorld.test.js` were deleted in `d874870b` (no
+  migration tests while no migration is active).
 
 ### 98. A stored actor whose migration write a hook vetoed counted as skipped
 
@@ -1205,8 +1195,8 @@ A file name followed by † is a test deleted in the test-suite rewrite: commit 
   announced completion, and the next GM load found the same work again.
 - **Found:** 2026-09-30 while planning the fix for #93.
 - **Fixed:** 2026-09-30 — after its writes, each actor's data is checked again (`storedActorNeedsMigration`); an
-  actor with work left counts as failed and is reported. Gated by `tests/unit/MigrateStoredActors.test.js†` (a vetoed
-  update counts as failed; an actor that holds no work once opened counts as skipped).
+  actor with work left counts as failed and is reported. No live gate: `tests/unit/MigrateStoredActors.test.js` were
+  deleted in `d874870b` (no migration tests while no migration is active).
 
 ### 99. An Adventure token whose legacy Item overrode its base actor's legacy Item ended up with two converted effects
 
@@ -1220,13 +1210,9 @@ A file name followed by † is a test deleted in the test-suite rewrite: commit 
   (`common/documents/actor-delta.mjs` `#mergeEmbeddedCollection`). The token's own Item converts into the token's own
   effect in the base conversion's slot (hidden by a tombstone first, then created over it), so core's merge shows one
   effect, the token's. An Adventure token's base actor is the Adventure's actor with its actor id, else the world
-  actor. Gated by `tests/unit/StoredActorSources.test.js†` (an overriding legacy Item converts into the token's own
-  effect over the base actor's; a token's own non-overriding Item converts on the token) and
-  `tests/unit/ConvertEffectItemsToActiveEffects.test.js†`; the core behaviour it rests on is gated live by
-  `tests/e2e/converted-effect-identity.spec.js†` (`keepId` beside an Item; a tombstone, then a `keepId` create over it,
-  overriding the base actor's effect; an imported Adventure token showing its own effect over its Adventure actor's,
-  hiding the one its delta tombstones, and inheriting from a world actor when no Adventure actor has its actor id).
-  Converting a legacy Item is unit-gated only: no e2e can seed one.
+  actor. No live gate: the tests that gated it (`tests/unit/StoredActorSources.test.js`,
+  `tests/unit/ConvertEffectItemsToActiveEffects.test.js`, `tests/e2e/converted-effect-identity.spec.js`)
+  were deleted in `d874870b` (no migration tests while no migration is active).
 
 ### 100. A token's overriding legacy Item converted into a duplicate when its base actor's conversion was not stored
 
@@ -1242,12 +1228,8 @@ A file name followed by † is a test deleted in the test-suite rewrite: commit 
   with a raw-data token, pending real-path re-run). A legacy `effect` Item of the base actor takes no tombstone: it is
   an invalid document, which core's base collection never holds, and core's client deletion tombstones only an id its
   base collection holds. That case follows core's client deletion and is not measured: the server refuses a legacy Item,
-  so none can be seeded. Gated by `tests/unit/StoredActorSources.test.js†`: "keeps one effect on an Adventure token
-  whose base actor converts only on a later load" (the first load's `actors` write is not stored) and "keeps one effect
-  on a world token whose base actor's conversion is stored only on a later load" (the base actor's creation is not
-  stored); in both the next load converts the base actor, and the token keeps one effect and takes no write. "stores an
-  Adventure token's Item deletion as core stores a token's" gates the tombstones. Unit-gated only: no e2e can seed a
-  legacy effect Item.
+  so none can be seeded. No live gate: `tests/unit/StoredActorSources.test.js` were deleted in `d874870b` (no migration
+  tests while no migration is active).
 
 ### 101. An inherited legacy Item a token removed came back as a converted effect
 
@@ -1258,13 +1240,10 @@ A file name followed by † is a test deleted in the test-suite rewrite: commit 
 - **Fixed:** 2026-10-01 — a token's inherited conversion of an Item its own data claims (an Item entry of its delta,
   a tombstone included, or a conversion it holds itself) is hidden with an effects tombstone, as core deletes an
   inherited effect from a synthetic actor; every walked source carries the effects it inherits, so the scan finds such
-  a token, and the stamp also finds the conversions older versions created under random ids. Gated by
-  `tests/unit/StoredActorSources.test.js†` (the removed Item's conversion and older-id conversions hidden, an unclaimed
-  one left), `tests/unit/MigrateStoredActors.test.js†`, and `tests/e2e/converted-effect-identity.spec.js†` (live, for an
-  unlinked token on a world scene, one in a locked world Scene pack (both named apart from their base actors, so core
-  stores their deltas, #102), and one in an Adventure in a locked world Adventure pack: an Automatic load hides the
-  conversions of Items the token removed or converted itself, older-id ones included, leaves an unclaimed one, and the
-  next load writes nothing; the imported Adventure token no longer shows the hidden conversions).
+  a token, and the stamp also finds the conversions older versions created under random ids. No live gate: the tests
+  that gated it (`tests/unit/StoredActorSources.test.js`,
+  `tests/unit/MigrateStoredActors.test.js`, `tests/e2e/converted-effect-identity.spec.js`)
+  were deleted in `d874870b` (no migration tests while no migration is active).
 
 ### 103. Deleting an item or effect without confirmation still tried to open the confirmation dialog
 
@@ -1325,17 +1304,9 @@ The evidence files named here are in `.superpowers/sdd/test-suite-rewrite/phase-
   the migration does not write to it. Delete the token.` It never opens or writes the token, and never changes the
   lock of its Scene pack (#96 gives the reasons). An orphaned token with nothing pending is silent. The GM sees a
   migration prompt or a reported failure on every load until the token is deleted.
-  - Gated by `tests/unit/StoredActorSources.test.js†`, both locations: pending work (a stale condition, and a legacy
-    `effect` Item) is reported by the scan and counted as one failure each with the exact console line; the orphan is
-    never opened and none of its writers is called; the Scene pack is only projected, `configure` is never called,
-    and it stays locked; an orphan with nothing pending is silent. Also gated by
-    `tests/unit/MigrateStoredActors.test.js†` (the scan and the pass over orphan sources).
-  - Gated by `tests/e2e/condition-migration.spec.js†` (live with raw-data tokens, pending real-path re-run) with a stale
-    condition in each orphan's own delta, on a world scene and in a locked world Scene pack: an Automatic load reports
-    both with their console lines and `World migration finished with failures: 2.`, both stored deltas read back
-    unchanged, the pack stays locked, and once the tokens are deleted the next load starts no migration.
-  - The legacy-Item orphan case is unit-gated only: the server rejects the unregistered `effect` Item subtype, so no
-    e2e can seed a legacy effect Item.
+  - No live gate: the tests that gated it (`tests/unit/StoredActorSources.test.js`,
+    `tests/unit/MigrateStoredActors.test.js`, `tests/e2e/condition-migration.spec.js`) were deleted in `d874870b` (no
+    migration tests while no migration is active).
 
 ### 112. The Effect Tray's pack list did not show a compendium created after the tray was built
 
@@ -1654,10 +1625,9 @@ numbers are from Foundry 14.364.0, the install at `C:\FoundryVTT\V14\dev\foundry
   in 2 of 2 runs (`rows-then-opposed-real-1.log`, `-2.log`), and in full-suite order (`e2e-full-3.log`: 628 passed,
   0 failed, census zero). Phase 4 merged that spec into `check-math.spec.js`, whose tests "targeted attack derives
   difficulty from the target Defense (interior)", "attack difficulty clamps to both bounds (2 and 6)", "with multiple
-  targets the first target Defense is used" and "with no target the attack falls back to the attacker rating
-  (difficulty 4)" target real placed tokens through `targetPlacedToken` and `releaseTargets`; they passed in the
-  full-suite order run `phase-4/e2e-full-6.log` (644 passed, census zero). No run of the merged tests before the
-  Phase 3 fix exists.
+  targets the first target Defense is used" and "with no target the attack falls back to the attacker rating (difficulty
+  4)" target real placed tokens through `targetPlacedToken` and `releaseTargets`; they passed in the full-suite order
+  run `phase-4/e2e-full-6.log` (644 passed, census zero). No run of the merged tests before the Phase 3 fix exists.
 - **Found:** 2026-10-02 in Phase 3 Part A. **Closed:** 2026-10-02.
 
 ### 123. The attack Edit Traits dialog failed to render
@@ -1891,24 +1861,25 @@ The evidence files named here are in `.superpowers/sdd/test-suite-rewrite/phase-
 
 The evidence files named here are in `.superpowers/sdd/test-suite-rewrite/phase-4/` (local, not checked in).
 
-- **What:** deleting an owned weapon, spell or ability while its item sheet was open threw "Cannot read properties of
-  undefined (reading 'system')" (`gate133-prefix.log`), and a check dialog opened from the sheet's roll button stayed
-  open. The same error was first seen on `item.delete()` with the weapon's sheet open and no dialog
+- **What:** deleting an owned weapon, spell or ability while its item sheet was open threw a page error (the weapon and
+  the spell: "Cannot read properties of undefined (reading 'system')"; the ability: "Cannot read properties of undefined
+  (reading 'check')"; `gate133-prefix.log`), and a check dialog opened from the sheet's roll button stayed open. The
+  weapon's "reading 'system'" error was first seen on `item.delete()` with the weapon's sheet open and no dialog
   (`scratch-delete.json` variant `a`; its stack was read from the console and the file was overwritten, so only the
   message survives).
 - **Cause (read):** the item sheet's `CondensedAttackCheckButton`, `CondensedCastingCheckButton` and
   `CondensedItemCheckButton` read `rollActor.data.system.initialize<Type>CheckOptions` in a `$derived` guarded only by
   the sheet's own item bridge (`git show
-  9103a659^:src/document/svelte-components/check/CondensedAttackCheckButton.svelte`).
-  Why the derived ran without the item was not traced: the order in which the roll actor and the bridge drop the item
-  was not instrumented.
+  9103a659^:src/document/svelte-components/check/CondensedAttackCheckButton.svelte`). Why the derived ran without the
+  item was not traced: the order in which the roll actor and the bridge drop the item was not instrumented.
 - **Fixed:** the three buttons also require `rollActor.data.system.validate<Type>CheckOptions(checkOptions, false)`, as
   the dialogs' rebuild does (commit `9103a659`); a comment states that the roll actor validates the options first.
 - **Gate:** `tests/e2e/check-dialog.spec.js`, "deleting the owned weapon, spell and ability while its dialog is open
-  closes the dialog without a page error": each opens the dialog from the item sheet's roll button and deletes the
-  item with the Delete button of its row. Measured on the final code with only the three guards removed
+  closes the dialog without a page error": each opens the dialog from the item sheet's roll button and deletes the item
+  with the Delete button of its row. Measured on the final code with only the three guards removed
   (`gate133-prefix.log`): the weapon, spell and ability tests all failed with the dialog still open and the page error
-  above; the effect test, which uses no item button, passed. With the guards in place all passed (`e2e-full-7.log`).
+  named above for each; the effect test, which uses no item button, passed. With the guards in place all passed
+  (`e2e-full-7.log`).
 - **Status:** Closed 2026-10-07.
 
 ### 134. The Token HUD flows were blocked by a chat card over the token
@@ -1927,11 +1898,18 @@ The evidence files named here are in `.superpowers/sdd/test-suite-rewrite/phase-
   failed 0 times (`scratch-hud4.json`).
 - **Found:** 2026-10-07 in the Phase 4 full run.
 - **Fixed:** `hoverToken` makes the chat tab the active sidebar tab (`showChatLog`) before it moves the pointer, so no
-  card is on the canvas (`tests/e2e/flows.js`). The same change added `restOnToken` (the pointer moves onto the token
-  from outside it, the flow waits for `hover` and two animation frames); its effect is not measured, because the flow
-  without it also failed 0 of 720 toggles in later runs (`hud-probe-run1.json` to `-run3.json`).
+  card is on the canvas (`tests/e2e/flows.js`). The same change added `restOnToken`: the pointer moves onto the token
+  from outside it and the flow waits for `hover`; the closing click re-enters the token first, because a token's
+  interaction manager handles a pointer-down only from its HOVER state on (read: `#handleLeftDown` and
+  `#handleRightDown`, `client/canvas/interaction/mouse-handler.mjs:474-475` and `565-566`, Foundry 14.364 at
+  `C:\FoundryVTT\V14\dev\foundry`). An earlier `restOnToken` also waited two animation frames; that wait is removed,
+  because it waited on nothing observable and could hide OPEN_BUGS #129. Whether `restOnToken` is needed is not
+  measured: the only saved run of the unchanged earlier flow is `scratch-hud.json` (21 of 240 toggles failed), and the
+  flows with it failed 0 of 720 toggles in three runs without the wait (`hud-flows-nopad-run1.json` to `-run3.json`,
+  spec `hud-flows.spec.js.txt`).
 - **Gate:** `logic/conditions.spec.js` failed at the same test in `e2e-full-2.log` and `e2e-full-3.log` before the
-  change and passed in the full runs after it (`e2e-full-4.log`, `e2e-full-5.log`, `e2e-full-6.log`, `e2e-full-7.log`).
+  change and passed in the full runs after it (`e2e-full-4.log`, `e2e-full-5.log`, `e2e-full-6.log`, `e2e-full-7.log`,
+  and the final run of fix round 2).
 - **Not closed here:** an earlier run failed with no `#token-hud` after a right-click (`e2e-full-1.log`, test 453), and
   a loop of 240 toggles failed 21 times for the same symptom (`scratch-hud.json`). That symptom has no located cause
   and is tracked in OPEN_BUGS #129.

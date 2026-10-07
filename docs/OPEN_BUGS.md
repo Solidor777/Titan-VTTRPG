@@ -112,8 +112,8 @@ Deferred/known bugs. Todos (planned work) live in `docs/TODO.md`; this file is b
     (`src/ui/player-hud/elements/effects-panel/EffectsDetailBody.svelte:86-92`).
   - TITAN's Active Effect sheet is registered for the `effect` subtype only (`src/hooks/OnceInit.js:247-251`, read).
     So a condition most likely opens core's `ActiveEffectConfig`, whose Details tab edits the native `description`
-    (`templates/sheets/active-effect/details.hbs:3`). The sheet that opens at runtime was observed on 2026-10-07
-    (the Measured entry below).
+    (`templates/sheets/active-effect/details.hbs:3`). The sheet that opens at runtime was observed on 2026-10-07 (the
+    Measured entry below).
   - The HUD shows the definition text for a non-effect (`EffectsDetailBody.svelte:28-32`).
   - Turn-start reports carry the condition's `descriptionKey`
     (`src/document/types/actor/types/character/CharacterDataModel.js:5590-5605`).
@@ -231,11 +231,16 @@ The Phase 4 evidence files named here are in `.superpowers/sdd/test-suite-rewrit
   on the first token placed in the scene (`scratch-hud.json`): in 7 the right-click opened no HUD, in 8 the closing
   left-click left the HUD open, and 6 later toggles failed their "condition is on before the click" check as a result.
   The file holds only the state after each failure (`hover` false, no token controlled, no HUD), not the state before
-  the click. A probe that recorded the token's `hover`, its interaction manager's state and the controlled tokens before
-  each click, on the same flow, failed in 0 of 240 toggles in each of three runs (`hud-probe-run1.json` to `-run3.json`;
-  the spec is `hud-probe.spec.js.txt`). The flow with `restOnToken` failed in 0 of 720 toggles in three runs
-  (`scratch-hud3-run1.json` to `-run3.json`). Waiting for the `hover` flag before the right-click therefore did not
-  prevent the failures of `scratch-hud.json`, and no later run of either flow reproduced them.
+  the click. That is the only saved run of the unchanged earlier flow. Three later runs of 240 toggles used other flows
+  and also failed 0 times, so they do not show that the earlier flow stopped failing:
+  - a probe (`hud-probe-run1.json` to `-run3.json`, spec `hud-probe.spec.js.txt`) that differs from the earlier flow in
+    running a `page.evaluate` round trip (reading `hover`, the manager state and the controlled tokens) before every
+    right-click and closing click, in releasing control with `canvas.tokens.releaseAll()` instead of the flow's
+    `releaseTokenControl`, and in never calling `showChatLog`;
+  - the flows with `restOnToken` and its two-frame wait (`scratch-hud3-run1.json` to `-run3.json`), then without the
+    wait (`hud-flows-nopad-run1.json` to `-run3.json`, spec `hud-flows.spec.js.txt`).
+  A pre-click delay of the probe's kind and `restOnToken` are alike in giving the canvas time before the click, so these
+  runs cannot separate "the drop needs no cure" from "a pre-click delay prevents it".
 - **Cause not located.** An unrelated cause of failed Token HUD flows, a chat card over the token, was found and fixed
   (CLOSED_BUGS #134); nothing measured connects it to this symptom.
 - **Found:** 2026-10-02 in the Part B review fixes; the second measurement 2026-10-07.
@@ -249,11 +254,13 @@ The evidence files named here are in `.superpowers/sdd/test-suite-rewrite/phase-
   opened by `actor.system.requestAttackCheck`, deleting the weapon closed the dialog and threw two "Cannot read
   properties of undefined (reading 'remove')" page errors (`scratch-13.log`, `scratch-delete.json`; the stack was not
   kept).
-- **Not reproduced:** the same setup (spec saved as `variant-c.spec.js.txt`) threw no page error in 10 of 10 runs on the
-  final code (`variant-c-final.log`), in 10 of 10 on the code before the fixes of CLOSED_BUGS #133 and #135
-  (`variant-c-prefix-all.log`: the item buttons without their guard, the shells validating with reporting and raising
-  the info notice), and in 3 of 3 with the dialog opened from the item sheet's roll button
-  (`scratch-variant-c-after2.log`). The first run's setup differed in details that were not saved.
+- **Not reproduced:** the setup of the first run was rebuilt (spec saved as `variant-c.spec.js.txt`; the first run's own
+  setup differed in details that were not saved) and threw no page error in 10 of 10 runs on the code of the final build
+  (`variant-c-final.log`: commit `f9a69009` plus the removal of the shells' info notice that became `a44e43ef`; the tree
+  hash was not recorded), in 10 of 10 on the code before the fixes of CLOSED_BUGS #133 and #135
+  (`variant-c-prefix-all.log`: the working tree of commit `a44e43ef` with the item buttons' guard removed, the shells'
+  `validate` reporting restored and the info notice restored by `sed`; the tree hash was not recorded), and in 3 of 3
+  with the dialog opened from the item sheet's roll button (`scratch-variant-c-after2.log`).
 - **Cause not located.**
 - **Found:** 2026-10-07 while rewriting the Phase 4 delete tests.
 - **Status:** Open.
