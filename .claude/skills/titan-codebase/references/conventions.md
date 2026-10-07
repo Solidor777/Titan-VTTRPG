@@ -1004,7 +1004,9 @@ the status effects palette, the status icon, then a left click on the token clos
 right-click opens it; core's right-click toggles the HUD, so a second right-click does not close it reliably). The
 pointer reaches the token through `restOnToken` before each click (it moves in from outside the token and waits for
 the token's `hover` and two animation frames), because core handles a click only on a hovered token and a click sent
-in the frame of the move was dropped in 21 of 240 toggles (CLOSED_BUGS #134), `createWorldItem`, `createFolder` (the directory's Create Folder button and the folder
+in the frame of the move was dropped in 21 of 240 toggles; `hoverToken` first makes the chat tab the active sidebar
+tab, because a chat message posted while another tab is active shows as a card over the canvas for 5 s and takes the
+pointer from a token under it (CLOSED_BUGS #134), `createWorldItem`, `createFolder` (the directory's Create Folder button and the folder
 configuration window; `createActor` and `createWorldItem` take a `folderId` and then use that folder's own Create
 button, which creates the document inside the folder), `addCustomTrait`, `addAttack`, `enableAspect` and
 `addCustomAspect` (the Add Custom Trait dialog with an optional description, the weapon Attacks tab add button,

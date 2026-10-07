@@ -6,7 +6,7 @@ import { openSheetByUuid } from './fixtures.js';
 import { readRegistry, record, writeRegistry } from './registry.js';
 import { selectTitanOption } from './select.js';
 import { settle } from './settle.js';
-import { closeAllApps } from './world.js';
+import { closeAllApps, showChatLog } from './world.js';
 
 // One exported async function per real Foundry user flow. Each flow drives the DOM the way a user does (sidebar
 // buttons, dialogs, sheet controls, drags), reads the id of what it made from the DOM, records it on the running list
@@ -491,13 +491,16 @@ export async function toggleTokenLink(page, actorId) {
 /**
  * Closes the open windows, releases control of every token and moves the pointer onto a placed token the way a user
  * does: the canvas processes a click only on a hovered token, and a pointer that has rested where the token appeared
- * (the drop of the placing drag) raises no hover.
+ * (the drop of the placing drag) raises no hover. The chat tab is made the active sidebar tab first: while another tab
+ * is active, a posted chat message shows as a card over the canvas for 5 s (`ChatLog.NOTIFY_DURATION`), and the card
+ * takes the pointer from a token under it.
  * @param {import('@playwright/test').Page} page - A logged-in GM page viewing the token's scene.
  * @param {string} tokenId - The token on the viewed scene.
  * @returns {Promise<{x: number, y: number}>} The token's centre in client (page) coordinates.
  */
 async function hoverToken(page, tokenId) {
    await closeAllApps(page);
+   await showChatLog(page);
    await releaseTokenControl(page);
 
    /** @type {{x: number, y: number}} The token's centre in client (page) coordinates. */

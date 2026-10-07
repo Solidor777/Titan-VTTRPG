@@ -1903,30 +1903,42 @@ The evidence files named here are in `.superpowers/sdd/test-suite-rewrite/phase-
   `dialog-2.log`); the three passed after it (`dialog-3.log`).
 - **Status:** Closed 2026-10-07.
 
-### 134. `applyCondition` and `removeCondition` sometimes found no Token HUD, or left it open
+### 134. The Token HUD flows dropped a click on a hovered token, and a chat card covered the token
 
 The evidence files named here are in `.superpowers/sdd/test-suite-rewrite/phase-4/` (local, not checked in).
 
-- **What:** the flows right-click a hovered token to open the Token HUD, click a status in its palette, and left-click the
-  token to close the HUD. In the full run `logic/conditions.spec.js` failed once in its `afterEach` ("#token-hud" not
-  visible when `removeCondition` right-clicked, `e2e-full-1.log`), and 14 tests after it did not run.
-- **Measured:** 240 toggles (40 rounds of apply and remove for three conditions) failed 21 times
-  (`scratch-hud.json`): the right-click opened no HUD (the token was neither controlled nor hovered afterwards), or the
-  closing left-click left the HUD open with the token controlled. Three later runs of a copy of the flow that probed the
-  pointer before each click failed 8, 6 and 0 times of 240; only the last run's file survives (`scratch-hud2.json`,
-  0 failures), the other two counts were read from the console and are not saved. In the 8-failure run the probe showed
-  the failing left-clicks starting with the token not hovered (manager state 0, the pointer having been on the HUD's
-  palette) and the failing right-clicks starting with it hovered (state 1); the event log of the 6-failure run, read at
-  the time and not saved, showed the right button's pointerdown and pointerup reaching the canvas and a `hoverToken`
-  false 8 ms later with no HUD bound. Core's `MouseInteractionManager` handles a click only in the HOVER state
-  (`mouse-handler.mjs`, `#handleRightDown`, `#handlePointerOut`). The mechanism of the dropped right-click is not
-  established, and the failure rate varied between runs from 0 to 21 of 240.
+- **What:** `applyCondition` and `removeCondition` right-click a hovered token to open the Token HUD, click a status in
+  its palette, and left-click the token to close the HUD. `logic/conditions.spec.js` failed in the full run in its
+  `afterEach`, in two different ways (`e2e-full-1.log` test 453: no `#token-hud` after the right-click; `e2e-full-2.log`
+  and `e2e-full-3.log` test 464: "the pointer hovers the token" timed out), and the tests after the failure did not run.
+- **Cause 1 (dropped clicks), measured:** 240 toggles (40 rounds of apply and remove for three conditions) on the first
+  placed token failed 21 times (`scratch-hud.json`): the right-click opened no HUD (the token was neither controlled nor
+  hovered afterwards), or the closing left-click left the HUD open with the token controlled. Three later runs of a copy
+  of the flow that probed the pointer before each click failed 8, 6 and 0 times of 240; only the last run's file
+  survives (`scratch-hud2.json`, 0 failures), the other two counts were read from the console and are not saved. In the
+  8-failure run the probe showed the failing left-clicks starting with the token not hovered (manager state 0, the
+  pointer having been on the HUD's palette) and the failing right-clicks starting with it hovered (state 1). Core's
+  `MouseInteractionManager` handles a click only in the HOVER state (`mouse-handler.mjs`, `#handleRightDown`,
+  `#handlePointerOut`). The mechanism of the dropped right-click is not established, and the failure rate varied between
+  runs from 0 to 21 of 240.
+- **Cause 2 (a chat card over the token), measured:** a diagnostic written when the hover wait failed in
+  `e2e-full-3.log` (`hud-diag-run3.jsonl`) shows the token visible, in the viewed scene, with no stuck interaction
+  manager, and `document.elementFromPoint` at the token's centre (x 1335, y 565, the seventh token placed in the shared
+  scene) returning a `.stat` inside the `.check-chat-message` card of a chat notification: the Reflexes check rolled by
+  the test a moment earlier. Read in core: `ChatLog.NOTIFY_DURATION` is 5000 ms and `_toggleNotifications` hides the
+  notification log only while the chat tab is the active sidebar tab (`sidebar/tabs/chat.mjs`). The failure needs a
+  token placed far enough right to sit under the cards, which a spec that runs after other token specs gets; the loops
+  above placed the first token and rolled nothing, and 150 toggles on the seventh token with no roll failed 0 times
+  (`scratch-hud4.json`).
 - **Found:** 2026-10-07 in the Phase 4 full run.
-- **Fixed:** `hoverToken` and the closing click go through `restOnToken` (`tests/e2e/flows.js`): the pointer moves onto
-  the token from outside it, the flow waits for the token's `hover`, and two animation frames draw before the click. The
-  closing left-click re-enters the token first, because the pointer is on the HUD's palette.
-- **Gate:** the real `applyCondition` and `removeCondition` in the same loop, three runs of 240 toggles, 0 failures
-  (`scratch-hud3-run1.json` under concurrent unit-test load, `-run2.json`, `-run3.json`). The failure before the change
-  came at 21 of 240 (`scratch-hud.json`), but the probe copy's runs (8, 6 and 0 of 240) show the rate is not constant,
-  so 720 clean toggles lower the rate and do not prove it zero.
+- **Fixed:** `hoverToken` makes the chat tab the active sidebar tab (`showChatLog`) before it moves the pointer, so no
+  card is on the canvas; `hoverToken` and the closing click go through `restOnToken` (`tests/e2e/flows.js`): the pointer
+  moves onto the token from outside it, the flow waits for the token's `hover`, and two animation frames draw before the
+  click; the closing left-click re-enters the token first, because the pointer is on the HUD's palette.
+- **Gate:** for cause 1, the real `applyCondition` and `removeCondition` in the same loop, three runs of 240 toggles, 0
+  failures (`scratch-hud3-run1.json` under concurrent unit-test load, `-run2.json`, `-run3.json`); the failure before
+  the change came at 21 of 240, and the probe copy's runs (8, 6 and 0 of 240) show the rate is not constant, so 720 clean
+  toggles lower the rate and do not prove it zero. For cause 2, `logic/conditions.spec.js` in the full run: it failed at
+  the same test in `e2e-full-2.log` and `e2e-full-3.log` before the change and passed in the full run after it
+  (`e2e-full-4.log`).
 - **Status:** Closed 2026-10-07.
