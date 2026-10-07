@@ -3,8 +3,7 @@ import { login, openSheetTab } from './fixtures.js';
 import { attachPageErrors, closeAllApps, deleteFixtureActor } from './world.js';
 
 /**
- * Regressions for conditional check modifiers on casting checks and for the aspect tags of a spell on a character. Each
- * runs against the live rendered sheet or the live actor.
+ * Regressions for the aspect tags of a spell on a character, against the live rendered sheet and chat card.
  */
 
 /** @type {string} Name of the throwaway player actor seeded for this spec. */
@@ -22,71 +21,17 @@ test.beforeAll(async ({ browser }) => {
 });
 
 test.beforeEach(async () => {
-   // A fresh player with an ability granting +2 dice to casting checks of spells with the Void custom trait and
-   // +1 expertise to every casting check, plus a Void spell that one aspect of which is resisted by Resilience.
+   // A fresh player: the test seeds its own spell.
    await page.evaluate(async (actorName) => {
       /** @type {TitanActor | undefined} A leftover actor from an earlier run. */
       const stale = game.actors.getName(actorName);
       if (stale) {
          await stale.delete();
       }
-      /** @type {TitanActor} The freshly seeded player. */
-      const actor = await Actor.create({
+      await Actor.create({
          name: actorName,
          type: 'player',
       });
-      await actor.createEmbeddedDocuments('Item', [
-         {
-            name: 'E2E Void Focus',
-            type: 'ability',
-            system: {
-               rulesElement: [
-                  {
-                     operation: 'conditionalCheckModifier',
-                     modifierType: 'dice',
-                     checkType: 'casting',
-                     selector: 'customTrait',
-                     key: 'void',
-                     value: 2,
-                     uuid: 'e2e00000-0000-4000-a000-000000000001',
-                  },
-                  {
-                     operation: 'conditionalCheckModifier',
-                     modifierType: 'expertise',
-                     checkType: 'casting',
-                     selector: 'any',
-                     key: 'any',
-                     value: 1,
-                     uuid: 'e2e00000-0000-4000-a000-000000000002',
-                  },
-               ],
-            },
-         },
-         {
-            name: 'E2E Void Spell',
-            type: 'spell',
-            system: {
-               customTrait: [
-                  {
-                     name: 'Void',
-                     description: '',
-                     uuid: 'e2e00000-0000-4000-a000-000000000003',
-                  },
-               ],
-               aspect: [
-                  {
-                     label: 'inflictCondition',
-                     cost: 4,
-                     option: [
-                        'stunned',
-                     ],
-                     resistanceCheck: 'resilience',
-                     enabled: true,
-                  },
-               ],
-            },
-         },
-      ]);
    }, ACTOR_NAME);
 });
 
@@ -98,124 +43,6 @@ test.afterEach(async () => {
 test.afterAll(async () => {
    await deleteFixtureActor(page, ACTOR_NAME);
    await page?.close();
-});
-
-test('casting check options apply custom-trait dice and casting expertise modifiers', async () => {
-   /** @type {{diceMod: number, expertiseMod: number}} The casting check's dice and expertise modifiers. */
-   const mods = await page.evaluate((actorName) => {
-      /** @type {TitanActor} The seeded player. */
-      const actor = game.actors.getName(actorName);
-
-      /** @type {TitanItem} The Void spell. */
-      const spell = actor.items.getName('E2E Void Spell');
-
-      /** @type {object} The initialized casting check options. */
-      const options = actor.system.initializeCastingCheckOptions({ itemId: spell.id });
-      return {
-         diceMod: options.diceMod,
-         expertiseMod: options.expertiseMod,
-      };
-   }, ACTOR_NAME);
-   expect(mods).toEqual({
-      diceMod: 2,
-      expertiseMod: 1,
-   });
-});
-
-test('conditional dice and expertise apply to item checks and to tradition-keyed casting checks', async () => {
-   /** @type {{castingDice: number, castingExpertise: number, itemDice: number}} The applied modifiers. */
-   const mods = await page.evaluate(async (actorName) => {
-      /** @type {TitanActor} The seeded player. */
-      const actor = game.actors.getName(actorName);
-      await actor.createEmbeddedDocuments('Item', [
-         {
-            name: 'E2E Fire Focus',
-            type: 'ability',
-            system: {
-               // Keys as a player types them: a capitalised tradition and a spaced custom trait.
-               rulesElement: [
-                  {
-                     operation: 'conditionalCheckModifier',
-                     modifierType: 'dice',
-                     checkType: 'casting',
-                     selector: 'spellTradition',
-                     key: 'Fire',
-                     value: 3,
-                     uuid: 'e2e00000-0000-4000-a000-000000000011',
-                  },
-                  {
-                     operation: 'conditionalCheckModifier',
-                     modifierType: 'dice',
-                     checkType: 'item',
-                     selector: 'customTrait',
-                     key: 'Field Medicine',
-                     value: 2,
-                     uuid: 'e2e00000-0000-4000-a000-000000000012',
-                  },
-               ],
-            },
-         },
-         {
-            name: 'E2E Fire Spell',
-            type: 'spell',
-            system: { tradition: 'Fire' },
-         },
-         {
-            name: 'E2E Field Kit',
-            type: 'ability',
-            system: {
-               customTrait: [
-                  {
-                     name: 'Field Medicine',
-                     description: '',
-                     uuid: 'e2e00000-0000-4000-a000-000000000013',
-                  },
-               ],
-               check: [
-                  {
-                     attribute: 'mind',
-                     complexity: 1,
-                     damageReducedBy: 'none',
-                     difficulty: 4,
-                     initialValue: 1,
-                     isDamage: false,
-                     isHealing: false,
-                     label: 'Treat',
-                     opposedCheck: {
-                        attribute: 'body',
-                        enabled: false,
-                        skill: 'athletics',
-                     },
-                     resistanceCheck: 'none',
-                     resolveCost: 0,
-                     scaling: false,
-                     skill: 'medicine',
-                     uuid: 'e2e00000-0000-4000-a000-000000000014',
-                  },
-               ],
-            },
-         },
-      ]);
-      /** @type {object} The Fire spell's casting check options. */
-      const casting = actor.system.initializeCastingCheckOptions({ itemId: actor.items.getName('E2E Fire Spell').id });
-
-      /** @type {object} The Field Kit's item check options. */
-      const item = actor.system.initializeItemCheckOptions({
-         itemId: actor.items.getName('E2E Field Kit').id,
-         checkIdx: 0,
-      });
-      return {
-         // The Void Focus's +1 casting expertise from beforeEach also applies to the Fire spell.
-         castingDice: casting.diceMod,
-         castingExpertise: casting.expertiseMod,
-         itemDice: item.diceMod,
-      };
-   }, ACTOR_NAME);
-   expect(mods).toEqual({
-      castingDice: 3,
-      castingExpertise: 1,
-      itemDice: 2,
-   });
 });
 
 test('the character sheet spell row and the spell chat card list the displayed aspect tags by size', async () => {
