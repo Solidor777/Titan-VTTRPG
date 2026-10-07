@@ -1059,13 +1059,22 @@ not a ceiling to raise. The rule covers every wait on something inside an alread
 `expect` assertions, `waitForFunction`, `waitFor`, `waitForEvent`, `titanWait`, `toPass`, the in-page retry loops of
 specs, and every explicit `timeout:` on them. `playwright.config.mjs` sets `expect.timeout` to 1000, and `titanWait`'s
 default is 1000 (`tests/e2e/poll.js`), so a call that names no ceiling gets 1 s; an explicit `timeout:` is `1000` or
-lower. Playwright retries actions and web-first assertions at 20, 50, 100 ms and then every 100 ms under a 1 s ceiling
+lower. Playwright retries a web-first assertion at 20, 50, 100 ms and then every 100 ms under the 1 s ceiling
 (`retryWithProgressAndBackoff`, `playwright-core/lib/coreBundle.js:17979-17985`: `[20, 50, 100, 100, 500]`, with the
-500 dropped while it exceeds a fifth of the timeout; the web-first assertion path calls it at `:18298`); only
-`expect.poll` uses 100, 250, 500, 1000 (`:4377`). Svelte's default `slide` transition lasts 400 ms (read in
-`svelte/src/transition/index.js`), and a click on a row that is still moving retries until the row stops: the longest
-such click measured 965 ms once (`flows.js:860`, the Edit Item button of a new effect row, in
-`e2e-r3d-gate-2-slowops.json`; 385 to 432 ms in its other samples and runs). A test therefore waits for a transition with `settle(page, { transitions: true })` or collapses and expands
+500 dropped while it exceeds a fifth of the timeout; the assertion path calls it at `:18298`). An action retries
+through `_retryAction` (`:16201-16203`) after waits of 0, 20, 100, 100 and then 500 ms each, under the `actionTimeout`
+(10 s), not under the 1 s ceiling. `expect.poll` uses the intervals 100, 250, 500, 1000 (`:4377`) and stops once the
+next interval would pass the deadline (`:4377-4393`), so under 1 s it checks at 0, 100, 350 and 850 ms and not again;
+a poll on something that can take 350 to 850 ms sets `intervals`. `chat-message-mounts.spec.js` sets `[100]` for the
+dismissed notification: its poll took 357 and 865 ms (`e2e-r3d-gate-1-slowops.json`, `e2e-r3d-gate-2-slowops.json`,
+`:146`) and 449 ms in both round 4 runs (`e2e-r4-gate-1-slowops.json`, `e2e-r4-gate-2-slowops.json`, `:152`).
+Svelte's default `slide` transition lasts 400 ms (read in `svelte/src/transition/index.js`), and a click on a row that
+is still moving retries until the row stops: before `createOwnedItem` and `addEffect` settled with transitions, the
+Edit Item click on the new row took 54 to 965 ms in 54 samples of `flows.js:860` and 51 to 928 ms in 134 samples of
+`flows.js:266` (over 50 ms, four full runs: `e2e-r3c-gate-1-slowops.json`, `-2`, `e2e-r3d-gate-1-slowops.json`, `-2`; 51
+and 54 samples of 380 to 450 ms, and 965, 928 and 919 ms once each); in the two round 4 full runs neither location has
+a sample over 50 ms (`e2e-r4-gate-1-slowops.json`, `e2e-r4-gate-2-slowops.json`). A test therefore waits for a
+transition with `settle(page, { transitions: true })` or collapses and expands
 rows in an order that does not move the next target, instead of leaving the transition to a retry. A product delay or
 animation longer than the ceiling is not waited out: the test removes the cause (the last test of
 `condition-description.spec.js` reloads, which ends core's 2 s scrolling text, before it deactivates the scene). The one
@@ -1076,24 +1085,34 @@ action (CLOSED_BUGS #131: a re-render of the previous action discarded or reorde
 the document operations (`createDocuments`, `updateDocuments`, `deleteDocuments` of `foundry.abstract.Document`) and
 `ApplicationV2#render` calls in flight in the page, installed by `joinWorld` on every document load, and `settle(page)`
 waits for zero within 1 s; `settle(page, { transitions: true })` also waits for the finite, unfinished animations inside
-a window's content (Svelte row transitions), and the helpers that add or delete a row use it (`addCheck`, `addAttack`,
-`addCustomAspect`, `addRulesElement`, the delete loops). `joinWorld` calls `verifySettle(page)` after `game.ready`: it
-runs an empty `Item.updateDocuments` and a `ui.chat.render()` and throws when the counter was not above 0 during each,
-so a page the wrappers do not reach fails at login (saved: `verify-settle-wrapper-disabled.log`).
+a window's content (Svelte row transitions, counted by `globalThis.titanWindowTransitions()`, which `installSettle`
+defines next to the counter). The helpers that add, move or delete a row, after which the caller edits the row, use it
+(`addCheck`, `addAttack`, `addCustomAspect`, `addRulesElement`, `createOwnedItem`, `addEffect`, `dragGrip`, the delete
+loops). `clickSheetTab`, `clickTabButton` and `selectTitanOption` settle without transitions: with transitions the
+three specs `character-sheet-rows`, `rules-element-editor` and `surfaces` (74 tests) took 4.3 min, and 2.4 min without
+(`r4-cost-A-with-tab-transitions.log`, `r4-cost-B-without-tab-transitions.log`). A caller that clicks into content
+that is still sliding in after one of them settles with transitions itself (`item-sheet-rolls.spec.js`: 11 and 6
+animations were in flight right before a click that took 940 ms once, `r4-item-sheet-rolls-predamage.log`,
+`e2e-r4-gate-1-slowops.json`).
+`joinWorld` calls `verifySettle(page)` after `game.ready`: for `Item.createDocuments([])`, `Item.updateDocuments([])`,
+`Item.deleteDocuments([])` and `ui.chat.render()` it reads the counter right before the call and right after it
+starts, in the same synchronous turn, and throws unless the counter rose by exactly 1. It waits on nothing. Run with
+each of the four wrappers left out of `installSettle` in turn, login fails and the error names the call
+(`r4-verify-settle-disabled-createDocuments.log`, `-updateDocuments.log`, `-deleteDocuments.log`, `-render.log`); the
+check shows the four wrappers are installed on the page, not that every write goes through them.
 `actions.js` holds `clickSheetTab` (waits for the tab to be the active one), `clickTabButton` (the same for a tab
-button the caller already located) and `commitText` (fill, blur, `settle`); `selectTitanOption` waits for the
-trigger's `data-value` and the closing of the list;
-`setCheckbox`, `clickRoll`, `addAttack`, `addCustomAspect`, `pickPortrait`, `dragGripToMove` (`drag.spec.js`: the dragged
-row's element changes position) and the spec setters that write through the API call or wait as well. What the counter
+button the caller already located), `commitText` (fill, blur, `settle`) and `dragGrip` (the drag, then `settle` with
+transitions); `selectTitanOption` waits for the trigger's `data-value` and the closing of the list;
+`setCheckbox` waits for the checkbox state, `clickRoll` and `addAttack` call `settle`, as do `addCustomAspect`,
+`pickPortrait` and `dragGripToMove` (`drag.spec.js`: the dragged row's element changes position), and the spec setters
+that write through the API call or wait as well. What the counter
 cannot see: a write that a handler starts after an `await` of its own, a socket request that is not a document operation
 (the file picker's browse: `pickPortrait` marks the old list and waits for it to be replaced), and the commit of a dialog's
 number input (`setNumberField`: it changes dialog state only, and the caller reads the dialog's summary).
 
 The exemptions wait on a process starting and are not polls on a loaded page:
 - a `game.ready` world boot (`fixtures.js`, `join.js`; the teardown's and the setup recovery's own login goes through
-  it, as does a second browser context's login in `multiClient.js`; `verifySettle`'s wait for the boot's own renders
-  to finish has the boot's 60 s ceiling: at 1 s it failed once, in a run during which `npm test` ran on the same machine
-  (`final-reverify-run-1.log`; the load as the cause is inferred, not isolated);
+  it, as does a second browser context's login in `multiClient.js`);
 - a mid-file reload through `world.js` `reloadWorld(page, { ready })` (15 s for the `/game` URL, 60 s for the
   readiness predicate, `game.ready` by default), used by the last test of `condition-description.spec.js`, the reload
   test of `player-hud-layout.spec.js` and both portrait tests of `surfaces.spec.js`;
@@ -1107,13 +1126,23 @@ The exemptions wait on a process starting and are not polls on a loaded page:
 Building the `bulkActor` shared fixture (69.1 s with 30 entries of each in one run,
 `.superpowers/sdd/test-suite-rewrite/phase-2/review-measure-1.log`) is a long sequence of short waits inside a hook
 limit, not one wait. `closeAllApps` (`world.js`) closes each window with `close({ animate: false })`: core waits up to
-1000 ms for a window's close transition otherwise (`application.mjs:973,982`), and the call measured 2057 ms in a
-`beforeAll` and 1013 ms in an `afterEach` before the option (`e2e-r2b-gate-2-slowops.json`, `world.js:31`) and 275 to
-277 ms in an `afterEach` after it (`e2e-r3b-gate-1-slowops.json`, `e2e-r3b-gate-2-slowops.json`). It is an `evaluate`, not
-a poll, and is under 1 s.
-`tests/e2e/action-helpers.spec.js` fails when `addAttack` or `addRulesElement` returns with an operation or a row
-transition in flight (saved: `gate131-before-fix-*.log` with `settle` disabled, `gate131-after-fix.log`); `commitText` is
-in it but passes without `settle`, so it is not gated.
+1000 ms for a window's close transition otherwise (`client/applications/api/application.mjs:982`, 14.364), and the call
+measured 2057 ms in a `beforeAll` and 1013 ms in an `afterEach` before the option (`e2e-r2b-gate-2-slowops.json`,
+`world.js:31`) and 275 to 277 ms in an `afterEach` after it (`e2e-r3b-gate-1-slowops.json`,
+`e2e-r3b-gate-2-slowops.json`). It is an `evaluate`, not a poll, and is under 1 s.
+`tests/e2e/action-helpers.spec.js` runs `addAttack`, `addRulesElement`, `addCheck`, `addCustomAspect`, `clickSheetTab`,
+`clickTabButton`, `selectTitanOption`, `clickRoll`, `dragGrip` and `commitText` on documents it makes through the flows
+and reads in one `evaluate`, the moment each returns, what is still in flight and, where the helper has one, its stored
+effect (11 tests, all pass: `r4-gate-intact-final.log`). With the helper's own `settle` call removed, 10 repeats each
+on the final code (`r4f-gate-disabled-<helper>.log`): `addAttack`, `addRulesElement`, `addCheck`, `addCustomAspect`
+(6 to 16 finite window animations in flight; `addRulesElement` also 1 operation), `selectTitanOption` and `commitText`
+(1 operation in flight; the stored value was already the typed one) fail 10 of 10. `clickSheetTab`, `clickTabButton`,
+`clickRoll`, `dragGrip` and the test that runs `commitText` twice in a row on the fields of a new row (the shape of
+#122 and #128) pass 10 of 10 without their `settle`, so no test shows those `settle` calls necessary. The tab helpers
+return with no operation in flight; the tab's content slides in after they return and they do not wait for it.
+`dragGrip` failed 1 of 10 in an earlier run of the same test (operation in flight, order not stored yet,
+`r4-gate-disabled-repeat10-dragGrip.log`); the other `commitText` and `clickRoll` repeat runs are
+`r4-gate-disabled-repeat10-commitText-twice.log` and `r4-gate-disabled-repeat10-clickRoll.log` (10 of 10 passed each).
 
 Invalid core or priority values are hard errors, never silent fallbacks to the default.
 

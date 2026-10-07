@@ -62,7 +62,7 @@ Completed items are deleted, not marked done.
   live gates in `docs/CLOSED_BUGS.md`, and #102 in `docs/OPEN_BUGS.md`.
 
   Status: in progress as `docs/superpowers/plans/2026-10-01-test-suite-real-data.md`. Phases 0 to 2 and Phase 3 Part A
-  are complete. Phase 3 Part B is built and awaiting its third fix round and a final review. Phases 4 to 8 remain
+  are complete. Phase 3 Part B has had its fourth fix round and awaits a final review. Phases 4 to 8 remain
   (checks and rules; tokens, HUD, combat, chat, macros, ownership and theme; packs, tray, spreadsheet and probe merges;
   unit-test edits; documentation). #102 is re-evaluated on the new suite once it is done.
 

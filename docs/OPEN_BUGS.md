@@ -201,7 +201,9 @@ The evidence files named here are in `.superpowers/sdd/test-suite-rewrite/phase-
 - **Not reproduced:** 0 failures in 3 later full runs of the file (`drag-fix-1.log` to `drag-fix-3.log`).
 - **Cause and mitigation:** the same race as #122: the local state shows the new row before the server echo, and the
   echo's re-render resets text typed in that window. `fillList` and the attack-label loop poll each row, and the add flows
-  now `settle` (CLOSED_BUGS #131). Not reproduced in 19 runs of `drag.spec.js` with the final code (`final-dist-run-1.log` to `-10.log`, `final2-dist-run-1.log` to `-9.log`).
+  now `settle` (CLOSED_BUGS #131). Not reproduced in 10 runs (`final-dist-run-1.log` to `-10.log`) and 9 runs
+  (`final2-dist-run-1.log` to `-9.log`) of the 86 tests of the sheet list specs and `drag.spec.js` on the round 3 code,
+  nor in 3 full runs of 655 tests on the round 4 code (`e2e-r4-gate-1.log`, `-2.log`, `-3.log`).
 - **Found:** 2026-10-02 in the Part B review fixes.
 - **Status:** Open.
 
@@ -216,19 +218,4 @@ The evidence files named here are in `.superpowers/sdd/test-suite-rewrite/phase-
   runs do not test the original code.
 - **Cause not located.**
 - **Found:** 2026-10-02 in the Part B review fixes.
-- **Status:** Open.
-
-### 132. `verifySettle` once timed out at 1 s waiting for the boot renders at login
-
-The evidence files named here are in `.superpowers/sdd/test-suite-rewrite/phase-3/` (local, not checked in).
-
-- **What:** in 1 of 10 runs of the 44 tests of `armor-trait-situations`, `attack-tags`, `character-sheet-layout`,
-  `condition-description` and `surfaces`, `armor-trait-situations.spec.js:121` failed in `login` with "titanWait timed
-  out after 1000ms waiting for: the boot renders finished" (`verifySettle`, `settle.js`); run 1 of `final-reverify-run-1.log`
-  to `-10.log`, the other 9 passed. 3 full runs of 647 tests and 19 runs of the sheet list set did not fail this way.
-- **Context (read):** `npm test` ran on the same machine during that run. **Inferred, not diagnosed:** machine load slowed the
-  boot's renders past 1 s. Not isolated with a run that varies the load.
-- **Mitigation:** the wait now has the boot's 60 s ceiling (`settle.js`), because it waits on the world boot. No reverify
-  run was made after that change, so whether the failure recurs is unmeasured.
-- **Found:** 2026-10-07 in Phase 3 Part B round 3.
 - **Status:** Open.

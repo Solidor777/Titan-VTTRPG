@@ -1751,14 +1751,15 @@ The evidence files named here are in `.superpowers/sdd/test-suite-rewrite/phase-
   `_id` on each update; it calls `foundry.utils.performIntegerSort`. Its direction is core's automatic one (read:
   `client/utils/helpers.mjs:277`): before the target when the dropped item's sort is greater, else after it, so a drop
   on a row of equal sort lands after it (measured, `measure-127-sorts.log` from `scripts/measure-127-sorts.spec.js`:
-  three fresh weapons A, B, C all at sort 0; after C was dropped on A's row the sorts were A 100000, B 300000, C 200000).
+  three fresh weapons A, B, C all at sort 0; after C was dropped on A's row the sorts were A 100000, B 300000,
+  C 200000).
 - **Gate:** `drag.spec.js` "a weapon dragged from its own sheet onto another row sorts it relative to that row": a grip
   drag out and back stores distinct sorts, then the last weapon dropped on the first row sorts before it, and dropped on
   the last row sorts after it. Before the fix (`gate127-before-fix-final-test.log`; `gate127-before-fix.log` is the
   first version of the test): failed with the page error "Cannot read properties of undefined (reading 'id')". After
   (`gate127-after-fix.log`, and `drag-fix-1.log` to `drag-fix-3.log` for the whole file): passed.
-- **Process note:** this entry was written alongside the fix; the OPEN_BUGS entry was not committed before the fix commit
-  (c819dd1b), and history is not rewritten.
+- **Process note:** this entry was written alongside the fix; the OPEN_BUGS entry was not committed before the fix
+  commit (c819dd1b), and history is not rewritten.
 - **Status:** Closed 2026-10-02.
 
 ### 130. `pickPortrait` selected a file before the file picker's browse re-rendered the list, so the pick was lost
@@ -1803,22 +1804,58 @@ The evidence files named here are in `.superpowers/sdd/test-suite-rewrite/phase-
   `phase-3/scripts/measure-settle.spec.js`):** the Add Check button changes the sheet's local document state at once
   and sends the update afterwards, so the new check's count showed 0 to 4 ms after the click with 2 operations pending
   (field `pendingWhenVisible`), and the pending count reached 0 at 17 to 31 ms (field `pendingZeroMs`). The same file's
-  `TRACKER` line shows the counter at 1 during an `Item.update`, 2 after it resolved and 0 after the awaited render. A flow that typed into
-  the new row when the count appeared could be undone by the server echo's re-render. The first full run after the
-  helper change failed once this way (`e2e-r2-gate-1.log`: `addCheck` stored "Check" for "E2E Bulk Check 2"); the add
-  flows now call `settle` after the count shows (commit `ed09de31`).
-- **Fixed:** `settle.js` (in-flight document operations and renders, installed by `joinWorld`), `actions.js`
-  (`clickSheetTab`, `commitText`), and waits for the effect in `selectTitanOption`, `titanSelectOptionValues`,
-  `setSelectField`, `setCheckbox`, `clickRoll`, the add flows of `flows.js`, `pickPortrait`, `dragGripToMove` and the API
+  `TRACKER` line shows the counter at 1 during an `Item.update`, 2 after it resolved and 0 after the awaited render. A
+  flow that typed into the new row when the count appeared could be undone by the server echo's re-render. The first
+  full run after the helper change failed once this way (`e2e-r2-gate-1.log`: `addCheck` stored "Check" for "E2E Bulk
+  Check 2"); the add flows now call `settle` after the count shows (commit `ed09de31`).
+- **Fixed:** `settle.js` (in-flight document operations, renders and window transitions, installed by `joinWorld`),
+  `actions.js` (`clickSheetTab`, `clickTabButton`, `commitText`, `dragGrip`), and waits for the effect in
+  `selectTitanOption`, `titanSelectOptionValues`, `setSelectField`, `setCheckbox`, `clickRoll`, the add flows of
+  `flows.js` (those after which the caller edits the new row wait for its transition: `addCheck`, `addAttack`,
+  `addCustomAspect`, `addRulesElement`, `createOwnedItem`, `addEffect`), `pickPortrait`, `dragGripToMove` and the API
   setters of the specs.
-- **Gate (2026-10-07):** `tests/e2e/action-helpers.spec.js` asserts that `addAttack`, `commitText` and `addRulesElement` return with no
-  document operation, render or row transition in flight. With `settle` made a no-op, `addAttack` and `addRulesElement` fail
-  (`phase-3/gate131-before-fix-addAttack.log`, `-addRulesElement.log`; 13 animations in flight) and with it they pass
-  (`gate131-after-fix.log`, 3 passed). `commitText` passes without `settle` (`gate131-before-fix-commitText.log`), so
-  it is not gated. Runs of the final code: 2 full runs of 647 passed with census zero (`e2e-r3d-gate-1.log`, `-2.log`; also
-  `e2e-r3c-gate-1.log`, `-2.log` before the `verifySettle` timeout change), 9 runs of 86 tests of the sheet list specs and
-  `drag` (`final2-dist-run-1.log` to `-9.log`; `final-dist-run-1.log` to `-10.log` before that change), and 10 runs of the 44
-  tests of `armor-trait-situations`, `attack-tags`, `character-sheet-layout`, `condition-description` and `surfaces`:
-  9 passed and 1 failed in `verifySettle` at login (`final-reverify-run-1.log`, see OPEN_BUGS note below). The tab clicks of
+- **Gate (2026-10-07):** `tests/e2e/action-helpers.spec.js` runs ten helpers and reads what is in flight, and the
+  helper's stored effect where it has one, in one `evaluate` the moment each returns (11 tests, all pass:
+  `phase-3/r4-gate-intact-final.log`). With the helper's own `settle` call removed, 10 repeats each on the final code
+  (`phase-3/r4f-gate-disabled-<helper>.log`):
+  - fail 10 of 10: `addAttack`, `addRulesElement`, `addCheck`, `addCustomAspect` (6 to 16 finite window animations in
+    flight; `addRulesElement` also 1 operation), `selectTitanOption` (1 operation in flight) and `commitText` (1
+    operation in flight; the stored label was already the typed one);
+  - pass 10 of 10, so these `settle` calls are **not shown necessary by any test**: `clickSheetTab` and
+    `clickTabButton` (no operation is in flight once the active-tab assertion has passed; the tab's content slides in
+    afterwards and these helpers do not wait for it), `clickRoll` (the chat message exists and nothing is in flight
+    once the dialog has closed), `dragGrip` and a test that types into two fields of a new row back to back after
+    `commitText` (the shape of #122 and #128). `commitText` twice also passed 10 of 10 on an earlier run of the same
+    test (`phase-3/r4-gate-disabled-repeat10-commitText-twice.log`), and `clickRoll` 10 of 10
+    (`r4-gate-disabled-repeat10-clickRoll.log`); `dragGrip` failed 1 of 10 in that earlier run (operation in flight,
+    order not stored yet, `r4-gate-disabled-repeat10-dragGrip.log`) and 0 of 10 in the final run.
+  The `settle` calls of those five helpers are kept as the contract of the helpers; their necessity for the #122 and
+  #128 race in isolation is **not demonstrated**.
+- **Runs of the final code:** 3 full runs of 655 passed with census zero (`phase-3/e2e-r4-gate-1.log` before the
+  `item-sheet-rolls.spec.js` change, `-2.log` before the comment-only change of `playwright.config.mjs`, `-3.log` on the
+  final code), and 10 runs of the 44 tests of `armor-trait-situations`, `attack-tags`, `character-sheet-layout`,
+  `condition-description` and `surfaces`, all passed (`r4-reverify-run-1.log` to `-10.log`). The tab clicks of
   `surfaces.spec.js` go through `clickTabButton`; other inline tab clicks in specs do not.
 - **Status:** Closed 2026-10-02.
+
+### 132. `verifySettle` once timed out at 1 s waiting for the boot renders at login
+
+The evidence files named here are in `.superpowers/sdd/test-suite-rewrite/phase-3/` (local, not checked in).
+
+- **What:** in 1 of 10 runs of the 44 tests of `armor-trait-situations`, `attack-tags`, `character-sheet-layout`,
+  `condition-description` and `surfaces`, `armor-trait-situations.spec.js:121` failed in `login` with "titanWait timed
+  out after 1000ms waiting for: the boot renders finished" (`verifySettle`, `settle.js`); run 1 of
+  `final-reverify-run-1.log` to `-10.log` failed 1 test and the other 9 passed.
+- **Context (read):** `npm test` ran on the same machine during that run. **Inferred, not diagnosed:** machine load
+  slowed the boot's renders past 1 s.
+- **Cause (read):** `verifySettle` first waited on the loaded page until the counter was 0, so that a rise during its
+  own calls could not come from the boot's renders. That wait is the one that timed out.
+- **Fixed:** the wait is removed. `verifySettle` reads the counter right before each probe call and right after the
+  call starts, in the same synchronous turn, and asserts it rose by 1, so renders of the boot cannot change the result
+  and the check waits on nothing.
+- **Gate:** 10 runs of the same 44 tests on the final code, all passed (`r4-reverify-run-1.log` to `-10.log`); with
+  each of the four wrappers left out of `installSettle`, login fails and names the call
+  (`r4-verify-settle-disabled-createDocuments.log`, `-updateDocuments.log`, `-deleteDocuments.log`, `-render.log`). The
+  load that was present in the failing run was not reproduced, and the wait that failed no longer exists, so the runs
+  show that the code does not wait, not that load cannot break login.
+- **Status:** Closed 2026-10-07.
