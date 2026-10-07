@@ -389,11 +389,9 @@ when fixed.
   (`embedded-context-check-parity.spec.js` x2, `embedded-context-effects.spec.js`). Measured, not
   inferred: the probe read `innerWidth/innerHeight` 1280x720 against the banner's rect and the
   panel's rect.
-- **Gate now:** the effect-row clicks of `tests/e2e/character-sheet-rows.spec.js` and, for the Effect HUD, the HUD
-  tests still in `embedded-context-check-parity.spec.js` and `embedded-context-effects.spec.js`; the viewport is
-  `use.viewport` of `playwright.config.mjs`.
-  (Both specs are merged into `tests/e2e/player-hud.spec.js`; its effects-panel tests click the effect rows at the
-  configured viewport.)
+- **Gate now:** the effect-row clicks of `tests/e2e/character-sheet-rows.spec.js` and, for the Player HUD, the clicks
+  of `tests/e2e/player-hud.spec.js` "a row expands to its description and controls" and "the duration controls step the
+  effect duration"; the viewport is `use.viewport` of `playwright.config.mjs`.
 - **Fix:** `use.viewport` set to 1920x1080 — above Foundry's minimum, so the warning never fires.
   Full suite 497/497 after the change.
 
@@ -2000,20 +1998,25 @@ The evidence files named here are in `.superpowers/sdd/test-suite-rewrite/bug-11
   (250 ms) and 5 px as a double click, which opens the token's actor sheet and does not control the token.
 - **Read in core:** `client/canvas/interaction/mouse-handler.mjs` (press handling around lines 480-497 and 905-913);
   `manager.lcTime` and `manager.rcTime` are public fields.
-- **Measured before the fix:** an event log of the failing presses showed the pointerup landing on a sheet DIV or
-  BUTTON and not on the canvas. 5 failures in each of three runs of 18 control-the-token loops
-  (`.superpowers/sdd/test-suite-rewrite/phase-5/scratch-ctl-2.log`, `scratch-ctl-3.log`, `scratch-ctl-4.log`).
+- **Found:** 2026-10-07 while building the player-hud specs (test-suite rewrite, Phase 5 Part A).
+- **Measured before the fix** (sources and logs in `.superpowers/sdd/test-suite-rewrite/phase-5/`): 18 loops of
+  `controlPlacedToken` alternating between two tokens (`ctl-loop-18.spec.js.txt`) failed 5 times
+  (`scratch-ctl-2.log`). Two variants that press with `page.mouse.click` and log the pointer events
+  (`ctl-diagnostic-3.spec.js.txt`, with the edit in `ctl-diagnostic-4-edit.txt`) also failed 5 of 18 each
+  (`scratch-ctl-3.log`, `scratch-ctl-4.log`); their event logs showed the pointerup landing on a sheet DIV or BUTTON and
+  not on the canvas.
 - **Fixed:** 2026-10-07. `restOnToken` (`tests/e2e/flows.js`) waits until `performance.now()` minus the later of
   `lcTime` and `rcTime` exceeds `DOUBLE_CLICK_TIME_MS` before the caller presses.
-- **Gate:** the same loop after the fix: 0 failures in 60 loops, slowest 181 ms (`scratch-ctl-5.log`). The loop is a
-  scratch spec kept in the evidence directory and not in `tests/`; the player-hud and player-hud-action-menu specs
-  press a token in nearly every test.
+- **Gate:** the same loop with 60 iterations and no event log, after the fix (`ctl-loop-60.spec.js.txt`): 0 failures,
+  slowest 181 ms (`scratch-ctl-5.log`). The loop sources are text files in the evidence directory, not specs in
+  `tests/`; the player-hud and player-hud-action-menu specs press a token in nearly every test.
 - **Relation to OPEN_BUGS #129:** not established. #129 (a right-click that opens no Token HUD) has a different
   symptom; the fix here was not measured against it. #129 stays open.
 - **Status:** Closed 2026-10-07.
 
 ### 138. Escape did not release token control after the action menu's open category left the menu
 
+- **Found:** 2026-10-07 while building the player-hud-action-menu spec (test-suite rewrite, Phase 5 Part A).
 - **What:** `ActionMenuElement` consumes the Escape key (closes the cascade and stops core from releasing control)
   whenever `layoutState.openCategory` holds a key. After the open category leaves the model (inferred: the Effects
   category disappears with its last entry), the stored key still names it, no cascade is shown

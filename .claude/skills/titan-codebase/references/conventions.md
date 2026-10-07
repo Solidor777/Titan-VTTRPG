@@ -1010,8 +1010,7 @@ because a token's interaction manager handles a pointer-down only from its HOVER
 measured, see CLOSED_BUGS #134); it then waits until `DOUBLE_CLICK_TIME_MS` (250 ms) has passed since the later of
 the interaction manager's `lcTime` and `rcTime`, because a press within 250 ms and 5 px of the previous press on
 the token is a double click, which opens the token's sheet and does not control it (read at
-`client/canvas/interaction/mouse-handler.mjs:480-497`; 5 failures in each of three 18-loop runs before the wait and
-0 in 60 loops after it, CLOSED_BUGS #137); `hoverToken` first makes the chat
+`client/canvas/interaction/mouse-handler.mjs:480-497`; CLOSED_BUGS #137); `hoverToken` first makes the chat
 tab the active sidebar tab, because a chat message posted while another tab is active shows as a card over the canvas
 for 5 s and takes the pointer from a token under it (CLOSED_BUGS #134). A right-click that opened no HUD has been seen
 without a located cause (OPEN_BUGS #129). Further flows are `createWorldItem`, `createFolder` (the directory's Create
@@ -1046,7 +1045,13 @@ the hovered token, Shift+T adds; `game.user.targets` then holds real Token objec
 `check-math.spec.js` uses), `createCompendium` / `setCompendiumLocked` (Compendium tab Create dialog, entry
 context menu Lock/Unlock), `putInPack` (opens the pack's popout window and drags the world entry onto its
 `.directory-list`; the pack index is polled for the new id; the caller passes the world entry's locator, and the flow
-reopens that entry's sidebar tab before the drag). `setDescription` (types into the rich text editor of an item's or effect's sheet and saves with the editor's save button), `setOwnership` (the Configure Ownership window of an actor's directory entry), `createCombat` (the Combat Tracker's create button; waits until the combat is `game.combat`), `addCombatant` (the Token HUD's combat button), `startCombat` / `endCombat` (the Combat Tracker's Begin and End buttons; `endCombat` also confirms the dialog), `setSkillDefaultAttribute` (the select of a skill row), `setEquipped` (the Equipped toggle of an Inventory row, clicked only when the state differs) and `deleteAttack` (the delete button of an attack row in the weapon sheet). The creation dialogs are `DialogV2` forms whose content
+reopens that entry's sidebar tab before the drag). `setDescription` (types into the rich text editor of an item's or
+effect's sheet and saves with the editor's save button), `setOwnership` (the Configure Ownership window of an actor's
+directory entry), `createCombat` (the Combat Tracker's create button; waits until the combat is `game.combat`),
+`addCombatant` (the Token HUD's combat button), `startCombat` / `endCombat` (the Combat Tracker's Begin and End
+buttons; `endCombat` also confirms the dialog), `setSkillDefaultAttribute` (the select of a skill row), `setEquipped`
+(the Equipped toggle of an Inventory row, clicked only when the state differs) and `deleteAttack` (the delete button
+of an attack row in the weapon sheet). The creation dialogs are `DialogV2` forms whose content
 lacks the template's `form#document-create` id, so the flows find them by `dialog.application.dialog` with the
 `.dialog-content` fields. A flow opens the sheet it drives with `openSheetByUuid` and clicks its tabs inside that sheet
 (`openTab`), so another open TITAN sheet's tab strip is never clicked; the Standard Aspects tab and the sidebar both
