@@ -1072,7 +1072,7 @@ dismissed notification: its poll took 357 to 865 ms before (four runs: `e2e-r3c-
 `svelte/src/transition/index.js`), and a click on a row that is still moving retries until the row stops: before
 `createOwnedItem` and `addEffect` settled with transitions, the Edit Item click on the new row took 51 to 928 ms in 134
 samples (`createOwnedItem`) and 54 to 965 ms in 54 samples (`addEffect`), over 50 ms, in four full runs (the same four
-files; 51 and 54 samples of 380 to 450 ms, and 965, 928 and 919 ms once each). After, the same two clicks took 51 to 81
+files; 54 (`createOwnedItem`) and 51 (`addEffect`) samples of 380 to 450 ms, and 965, 928 and 919 ms once each). After, the same two clicks took 51 to 81
 ms in the samples over 50 ms (`e2e-r4-gate-1`, `-2`, `-3`, `e2e-r5-gate-1-slowops.json`: 89 and 32 samples; the
 `createOwnedItem` click at most 78 ms and the `addEffect` click at most 81 ms). Samples are matched by their locator
 title, never by the line number alone, which moves when the file is edited (`phase-3/scripts/recheck-slowops.py`,
