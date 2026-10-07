@@ -66,7 +66,10 @@
       itemSnapshot.system.check.forEach((check, idx) => {
          itemCheckOptions.push({
             value: idx,
-            label: `${check.label} (${idx + 1})`,
+            label: {
+               text: `${check.label} (${idx + 1})`,
+               localize: false,
+            },
          });
       });
    }
@@ -91,7 +94,10 @@
             itemSnapshot.system.attack.forEach((attack, idx) => {
                attackOptions.push({
                   value: idx,
-                  label: `${attack.label} (${idx + 1})`,
+                  label: {
+                     text: `${attack.label} (${idx + 1})`,
+                     localize: false,
+                  },
                });
             });
          }
