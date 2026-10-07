@@ -788,7 +788,11 @@ test.describe('conditions and turn effects in a turn start report', () => {
             () => foundry.utils.cleanHTML(game.i18n.localize('LOCAL.effect.turnStart.desc.text')),
          ));
 
-      // This combat is not ended: the suite-end teardown deletes it.
+      // This combat ends like the others. A new combat is then created and left unstarted for the suite-end teardown to
+      // delete: a started combat left behind is the viewed combat of every later spec, and an unstarted one is not
+      // read as a running combat (`game.combat?.started`).
+      await endCombat(gm);
+      await createCombat(gm);
    });
 });
 
