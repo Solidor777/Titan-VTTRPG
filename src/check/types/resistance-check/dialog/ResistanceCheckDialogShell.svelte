@@ -59,7 +59,6 @@
     * Called when the check becomes invalid.
     */
    function onCheckInvalid() {
-      ui.notifications.info(localize('resistanceCheckNoLongerValid'));
       warn(
          localize('resistanceCheckNoLongerValid'),
          checkOptions,

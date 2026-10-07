@@ -25,7 +25,7 @@
 
    /** @type {ItemCheckParameters|undefined} Resolved dice and modifiers for the item check this button rolls. */
    let checkParameters = $derived.by(() => {
-      // The item sheet's bridge outlives the owned item by a tick, so the roll actor validates the item first.
+      // The roll actor validates the options first, so a deleted owned item is never read.
       if (rollActor && document.data?.system.check.length > 0 &&
          rollActor.data.system.validateItemCheckOptions(checkOptions, false)) {
          return rollActor.data.system.getItemCheckParameters(

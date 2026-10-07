@@ -69,7 +69,6 @@
     * Called when the check becomes invalid.
     */
    function onCheckInvalid() {
-      ui.notifications.info(localize('castingCheckNoLongerValid'));
       warn(
          localize('castingCheckNoLongerValid'),
          checkOptions,

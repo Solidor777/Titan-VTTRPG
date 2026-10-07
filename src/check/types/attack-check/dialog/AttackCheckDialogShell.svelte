@@ -73,7 +73,6 @@
     * Called when the check becomes invalid.
     */
    function onCheckInvalid() {
-      ui.notifications.info(localize('attackCheckNoLongerValid'));
       warn(
          localize('attackCheckNoLongerValid'),
          checkOptions,

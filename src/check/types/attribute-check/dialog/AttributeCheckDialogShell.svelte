@@ -64,7 +64,6 @@
     * Called when the check becomes invalid.
     */
    function onCheckInvalid() {
-      ui.notifications.info(localize('attributeCheckNoLongerValid'));
       warn(
          localize('attributeCheckNoLongerValid'),
          checkOptions,
