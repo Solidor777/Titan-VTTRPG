@@ -12,17 +12,14 @@ import {
 
 /**
  * A condition's description comes from its definition, localized on the reading client, never from text stored on the
- * effect: the Player HUD shows the current text for a condition carrying a stale stored description, a turn-start
- * report stores the description's localization key and its condition tag's tooltip shows that text alone, localized
- * once (also for an actor with conditions and no other effect), and a turn-start effect is tagged with the Turn Start
- * tag, whose tooltip leads with its duration. A report posted before conditions stored keys shows its stored text.
+ * effect: a turn-start report stores the description's localization key and its condition tag's tooltip shows that text
+ * alone, localized once (also for an actor with conditions and no other effect), and a turn-start effect is tagged with
+ * the Turn Start tag, whose tooltip leads with its duration. A report posted before conditions stored keys shows its
+ * stored text. The Player HUD's condition text is tested in `logic/conditions.spec.js`.
  */
 
 /** @type {string} Name of the throwaway player actor seeded for this spec. */
 const ACTOR_NAME = 'E2E Condition Description Actor';
-
-/** @type {string} A stale description stored on the condition effect, which the HUD must not show. */
-const STALE_TEXT = 'E2E stale stored description';
 
 /** @type {string} The localized description text an older turn-start report stored for its condition. */
 const LEGACY_REPORT_TEXT = '<p>E2E legacy report description</p>';
@@ -100,40 +97,6 @@ function readReportTagTooltip(messageId) {
    return page.locator(`#chat .message[data-message-id="${messageId}"] .report .effects .tag`).first()
       .evaluate((element) => element._tippy?.props?.content);
 }
-
-test('the HUD shows a condition\'s definition text, not a stale stored description', async () => {
-   /** @type {{name: string, text: string}} Blinded's localized name and its description's plain text. */
-   const blinded = await page.evaluate(async ({ name, staleText }) => {
-      /** @type {TitanActor} The fixture actor. */
-      const actor = game.actors.getName(name);
-      await actor.toggleStatusEffect('blinded', { active: true });
-      await actor.effects.find((effect) => effect.statuses.has('blinded')).update({
-         'flags.titan.description': `<p>${staleText}</p>`,
-      });
-
-      /** @type {HTMLDivElement} A detached element that turns the description HTML into plain text. */
-      const holder = document.createElement('div');
-      holder.innerHTML = game.i18n.localize('LOCAL.blinded.desc.text');
-      return {
-         name: game.i18n.localize('LOCAL.blinded.text'),
-         text: holder.textContent.trim(),
-      };
-   }, {
-      name: ACTOR_NAME,
-      staleText: STALE_TEXT,
-   });
-
-   /** @type {import('@playwright/test').Locator} The Blinded row. */
-   const row = page.locator('[data-testid="player-hud-effect-row"]', { hasText: blinded.name });
-   await row.click();
-
-   /** @type {import('@playwright/test').Locator} The row's expanded detail. */
-   const detail = row.locator('.detail');
-   await expect(detail).toContainText(blinded.text);
-
-   // The detail rendered its description above (the positive edge); the stored text had to appear in that same render.
-   await expect(detail).not.toContainText(STALE_TEXT);
-});
 
 test('a turn-start report stores the description key and its tooltip shows the text, with no effect', async () => {
    /** @type {{id: string, conditions: object[], expected: string, label: string}} The report and the text it shows. */

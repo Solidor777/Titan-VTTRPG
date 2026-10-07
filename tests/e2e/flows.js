@@ -574,6 +574,70 @@ export async function releaseTargets(page) {
 }
 
 /**
+ * Turns a condition on or off through the token HUD: a right click on the hovered token opens the HUD, its Status
+ * Effects palette lists every condition, and a click on a condition's control toggles it on the token's actor. A
+ * left click on the token closes the HUD again and leaves the token controlled.
+ * @param {import('@playwright/test').Page} page - A logged-in GM page viewing the token's scene.
+ * @param {string} tokenId - The token on the viewed scene.
+ * @param {string} statusId - The condition's status id (`blinded`, `offBalance`, ...).
+ * @param {boolean} active - Whether the condition is on after the click.
+ * @returns {Promise<void>} Resolves once the token's actor shows the requested state and the HUD is closed.
+ */
+async function toggleCondition(page, tokenId, statusId, active) {
+   /**
+    * Reads whether the token's actor carries the condition.
+    * @returns {Promise<boolean>} True when the actor's statuses hold the condition.
+    */
+   const isActive = () => page.evaluate(
+      ({ tokenId, statusId }) => canvas.scene.tokens.get(tokenId).actor.statuses.has(statusId),
+      {
+         tokenId,
+         statusId,
+      },
+   );
+   expect(await isActive(), `the condition ${statusId} is ${active ? 'off' : 'on'} before the click`).toBe(!active);
+
+   /** @type {{x: number, y: number}} The token's centre in client (page) coordinates. */
+   const centre = await hoverToken(page, tokenId);
+   await page.mouse.click(centre.x, centre.y, { button: 'right' });
+
+   /** @type {import('@playwright/test').Locator} The token HUD. */
+   const hud = page.locator('#token-hud');
+   await expect(hud).toBeVisible();
+   await hud.locator('[data-action="togglePalette"][data-palette="effects"]').click();
+   await hud.locator(`.effect-control[data-status-id="${statusId}"]`).click();
+   await expect.poll(isActive, { message: `the HUD turned ${statusId} ${active ? 'on' : 'off'}` }).toBe(active);
+   await settle(page);
+
+   // A left click on the token closes the HUD (read: `PlaceableObject#_onClickLeft`, `placeable-object.mjs:1220`) and
+   // leaves the token controlled.
+   await page.mouse.click(centre.x, centre.y);
+   await expect(hud).toBeHidden();
+}
+
+/**
+ * Turns a condition on for a placed token's actor through the token HUD.
+ * @param {import('@playwright/test').Page} page - A logged-in GM page viewing the token's scene.
+ * @param {string} tokenId - The token on the viewed scene.
+ * @param {string} statusId - The condition's status id (`blinded`, `offBalance`, ...).
+ * @returns {Promise<void>} Resolves once the token's actor carries the condition.
+ */
+export async function applyCondition(page, tokenId, statusId) {
+   await toggleCondition(page, tokenId, statusId, true);
+}
+
+/**
+ * Turns a condition off for a placed token's actor through the token HUD.
+ * @param {import('@playwright/test').Page} page - A logged-in GM page viewing the token's scene.
+ * @param {string} tokenId - The token on the viewed scene.
+ * @param {string} statusId - The condition's status id (`blinded`, `offBalance`, ...).
+ * @returns {Promise<void>} Resolves once the token's actor no longer carries the condition.
+ */
+export async function removeCondition(page, tokenId, statusId) {
+   await toggleCondition(page, tokenId, statusId, false);
+}
+
+/**
  * Unlinks a placed token with the Unlink button in the header of its actor's sheet, which the double-click on the
  * token opened. The unlink is irreversible: the sheet closes and the token's own synthetic actor's sheet opens.
  * @param {import('@playwright/test').Page} page - A logged-in GM page viewing the token's scene.
@@ -905,9 +969,16 @@ export async function addEffect(page, actorId, name, { duration } = {}) {
  * @param {number} [fields.resolveCost] - Value typed into the row's Resolve Cost input.
  * @param {string} [fields.resistanceCheck] - Resistance chosen in the row's Resistance Check select.
  * @param {boolean} [fields.opposed] - Whether to tick the row's Opposed Check box.
+ * @param {boolean} [fields.isDamage] - Whether to tick the row's Damage box.
+ * @param {number} [fields.initialValue] - Value typed into the Initial Value input the Damage box shows.
+ * @param {string} [fields.damageReducedBy] - Option chosen in the Damage Reduced By select the Damage box shows.
  * @returns {Promise<void>} Resolves once the check is stored with its fields.
  */
-export async function addCheck(page, documentUuid, { label, resolveCost, resistanceCheck, opposed } = {}) {
+export async function addCheck(
+   page,
+   documentUuid,
+   { label, resolveCost, resistanceCheck, opposed, isDamage, initialValue, damageReducedBy } = {},
+) {
    /** @type {import('@playwright/test').Locator} The document's sheet. */
    const sheet = await openSheetByUuid(page, documentUuid);
 
@@ -975,21 +1046,49 @@ export async function addCheck(page, documentUuid, { label, resolveCost, resista
          message: 'the checkbox enabled the opposed check',
       }).toBe(true);
    }
+   if (isDamage) {
+      // The Damage field moves while the rows above it slide in; a click on a moving field retries until it stops.
+      await settle(page, { transitions: true });
+      await field('Damage').locator('button').click();
+      await expect.poll(() => stored('isDamage'), { message: 'the checkbox ticked Damage' }).toBe(true);
+   }
+   if (initialValue !== undefined) {
+      await commitText(field('Initial Value').locator('input'), String(initialValue));
+      await expect.poll(() => stored('initialValue'), { message: 'the input stored the initial value' })
+         .toBe(initialValue);
+   }
+   if (damageReducedBy !== undefined) {
+      await selectTitanOption(page, field('Damage Reduced By').locator('[role="combobox"]'), damageReducedBy);
+      await expect.poll(() => stored('damageReducedBy'), { message: 'the select stored Damage Reduced By' })
+         .toBe(damageReducedBy);
+   }
 }
 
 /**
  * Adds a rules element to a document that carries them (an item or an effect) through the Rules Elements tab's
  * add button and fills the new row's controls. A new row is a flat modifier; any other operation is chosen in the
- * row's operation select first.
+ * row's operation select first. The operation settings are filled in the order their controls depend on each other (a
+ * selector change resets the key, so the selector comes first).
+ *
+ * The settings row of a flat modifier, Multiply Base, Multiply Sum and Set Sum holds the selector, the key (a select
+ * of the stats the selector names), the value input and, for the last three, the rounding or mode select; that of a
+ * conditional rating modifier holds the rating, the selector and the key; that of a conditional check modifier holds
+ * the modifier type, the check type, the selector, the key (a text input or a select, only when the selector is not
+ * `any`), the Skill narrowing of a situation and the value.
  * @param {import('@playwright/test').Page} page - A logged-in page.
  * @param {string} documentUuid - The uuid of the item or effect.
  * @param {object} element - What the row holds.
  * @param {string} [element.operation] - The operation (`conditionalCheckModifier`, `flatModifier`, ...).
  * @param {string} [element.modifierType] - A conditional check modifier's modifier type.
  * @param {string} [element.checkType] - A conditional check modifier's check type.
- * @param {string} [element.selector] - A conditional check modifier's selector.
+ * @param {string} [element.rating] - A conditional rating modifier's rating.
+ * @param {string} [element.selector] - The selector of the element.
+ * @param {string} [element.key] - The key of the element: chosen in a select or typed into a text input.
+ * @param {string} [element.skill] - A conditional check modifier situation's Skill narrowing.
  * @param {number} [element.advantageLevel] - A conditional Advantage modifier's level (`-2`, `-1`, `1`, `2`).
  * @param {number} [element.value] - The value input of a modifier that has one.
+ * @param {string} [element.rounding] - The rounding direction of a Multiply Base or Multiply Sum element.
+ * @param {string} [element.mode] - The mode of a Set Sum element (`set`, `min`, `max`).
  * @returns {Promise<void>} Resolves once the row holds the requested fields.
  */
 export async function addRulesElement(page, documentUuid, element) {
@@ -1032,24 +1131,100 @@ export async function addRulesElement(page, documentUuid, element) {
          .toBe(element.operation);
    }
 
-   for (const [field, testId] of [
-      [
-         'modifierType',
-         'ccm-modifier-type',
-      ],
-      [
-         'checkType',
-         'ccm-check-type',
-      ],
-      [
-         'selector',
-         'ccm-selector',
-      ],
-   ]) {
-      if (element[field] !== undefined) {
-         await selectTitanOption(page, row.getByTestId(testId), element[field]);
-         await expect.poll(() => stored(field), { message: `the ${testId} select stored ${field}` })
-            .toBe(element[field]);
+   /** @type {import('@playwright/test').Locator} The select and text fields of the operation settings, in order. */
+   const fields = row.locator('.operation-settings .field.select');
+
+   /**
+    * Fills a settings field that is a select or a text input, then waits until the element stores the value.
+    * @param {number} position - The field's position among the settings' select fields.
+    * @param {string} field - The stored element field the control writes.
+    * @param {string} value - The value to choose or type.
+    * @returns {Promise<void>} Resolves once the element stores the value.
+    */
+   const fill = async (position, field, value) => {
+      /** @type {import('@playwright/test').Locator} The settings field. */
+      const control = fields.nth(position);
+      if (await control.locator('input').count() > 0) {
+         await commitText(control.locator('input'), value);
+      }
+      else {
+         await selectTitanOption(page, control.locator('[role="combobox"]'), value);
+      }
+      await expect.poll(() => stored(field), { message: `the control stored ${field}` }).toBe(value);
+   };
+
+   if (element.operation === 'conditionalCheckModifier') {
+      for (const [field, testId] of [
+         [
+            'modifierType',
+            'ccm-modifier-type',
+         ],
+         [
+            'checkType',
+            'ccm-check-type',
+         ],
+         [
+            'selector',
+            'ccm-selector',
+         ],
+      ]) {
+         if (element[field] !== undefined) {
+            await selectTitanOption(page, row.getByTestId(testId), element[field]);
+            await expect.poll(() => stored(field), { message: `the ${testId} select stored ${field}` })
+               .toBe(element[field]);
+         }
+      }
+
+      // The key field follows the modifier type, the check type and the selector, and exists only for a selector other
+      // than `any`.
+      if (element.key !== undefined) {
+         await fill(3, 'key', element.key);
+      }
+      if (element.skill !== undefined) {
+         await selectTitanOption(page, row.getByTestId('ccm-situation-skill'), element.skill);
+         await expect.poll(() => stored('skill'), { message: 'the Skill narrowing stored the Skill' })
+            .toBe(element.skill);
+      }
+   }
+   else if (element.operation === 'conditionalRatingModifier') {
+      for (const [position, field] of [
+         [
+            0,
+            'rating',
+         ],
+         [
+            1,
+            'selector',
+         ],
+         [
+            2,
+            'key',
+         ],
+      ]) {
+         if (element[field] !== undefined) {
+            await fill(position, field, element[field]);
+         }
+      }
+   }
+   else {
+      // A flat modifier, Multiply Base, Multiply Sum or Set Sum: the selector, the key, and the select after the value.
+      for (const [position, field] of [
+         [
+            0,
+            'selector',
+         ],
+         [
+            1,
+            'key',
+         ],
+         [
+            2,
+            element.operation === 'setSum' ? 'mode' : 'rounding',
+         ],
+      ]) {
+         if (element[field] !== undefined) {
+            await fill(position, field, element[field]);
+         }
       }
    }
    if (element.advantageLevel !== undefined) {
@@ -1059,8 +1234,13 @@ export async function addRulesElement(page, documentUuid, element) {
    }
    if (element.value !== undefined) {
       /** @type {import('@playwright/test').Locator} The value input. */
-      const input = row.getByTestId('ccm-value');
-      await commitText(input, String(element.value));
+      const input = element.operation === 'conditionalCheckModifier'
+         ? row.getByTestId('ccm-value')
+         : row.locator('.operation-settings .field.number input');
+
+      // A number input reads an entry that starts with an operator as a change to its current value (`-1` on 1 is 0),
+      // so a negative value is typed in parentheses.
+      await commitText(input, element.value < 0 ? `(${element.value})` : String(element.value));
       await expect.poll(() => stored('value'), { message: 'the value input stored the value' }).toBe(element.value);
    }
 }
@@ -1117,6 +1297,56 @@ export async function addAttack(page, weaponUuid) {
    ).toBe(before + 1);
    await expect(sheet.locator('li.reorder-row'), 'the Attacks tab rendered the new row').toHaveCount(before + 1);
    await settle(page, { transitions: true });
+}
+
+/**
+ * Adds a trait to a weapon attack, an armor or a shield through the sheet's Edit Traits button and its dialog.
+ * @param {import('@playwright/test').Page} page - A logged-in page.
+ * @param {string} documentUuid - The uuid of the weapon, armor or shield.
+ * @param {string} label - The trait's label in the dialog (`Penetrating`, `Heavy`, ...).
+ * @param {object} [options] - Which trait list the dialog edits.
+ * @param {number} [options.attackIndex] - The position of the weapon attack whose traits are edited.
+ * @returns {Promise<void>} Resolves once the document stores the trait.
+ */
+export async function addTrait(page, documentUuid, label, { attackIndex } = {}) {
+   /** @type {import('@playwright/test').Locator} The document's sheet. */
+   const sheet = await openSheetByUuid(page, documentUuid);
+
+   /**
+    * Counts the traits of the list the dialog edits.
+    * @returns {Promise<number>} The number of stored traits.
+    */
+   const count = () => page.evaluate(
+      async ({ uuid, attackIndex }) => {
+         /** @type {TitanItem} The weapon, armor or shield. */
+         const item = await fromUuid(uuid);
+         return (attackIndex === undefined ? item.system.trait : item.system.attack[attackIndex].trait).length;
+      },
+      {
+         uuid: documentUuid,
+         attackIndex,
+      },
+   );
+
+   /** @type {number} The number of traits before the dialog. */
+   const before = await count();
+
+   /** @type {import('@playwright/test').Locator} The part of the sheet that holds the Edit Traits button. */
+   let scope = sheet;
+   if (attackIndex !== undefined) {
+      await openTab(sheet, 'Attacks');
+      scope = sheet.locator('.traits:has(.traits-header)').nth(attackIndex);
+   }
+   await scope.getByText('Edit Traits', { exact: true }).first().click();
+
+   /** @type {import('@playwright/test').Locator} The Edit Traits dialog. */
+   const dialog = page.locator('.application.titan-dialog', { has: page.getByRole('button', { name: 'Apply Edits' }) });
+   await expect(dialog, 'the Edit Traits dialog opens').toBeVisible();
+   await dialog.locator('li', { has: page.getByText(label, { exact: true }) }).locator('button').click();
+   await dialog.getByRole('button', { name: 'Apply Edits' }).click();
+   await expect(dialog, 'Apply Edits closes the dialog').toHaveCount(0);
+   await expect.poll(count, { message: `the dialog stored the ${label} trait` }).toBe(before + 1);
+   await settle(page);
 }
 
 /**
@@ -1197,6 +1427,68 @@ export async function addCustomAspect(page, spellUuid) {
    ).toBe(before + 1);
    await expect(sheet.locator('li.reorder-row'), 'the Custom Aspects tab rendered the new row').toHaveCount(before + 1);
    await settle(page, { transitions: true });
+}
+
+/**
+ * Types an Attribute's base value into the actor sheet's header.
+ * @param {import('@playwright/test').Page} page - A logged-in page.
+ * @param {string} actorUuid - The uuid of the character.
+ * @param {string} attribute - The Attribute (`body`, `mind` or `soul`).
+ * @param {number} value - The base value to type.
+ * @returns {Promise<void>} Resolves once the actor stores the value.
+ */
+export async function setAttributeBase(page, actorUuid, attribute, value) {
+   /** @type {import('@playwright/test').Locator} The actor's sheet. */
+   const sheet = await openSheetByUuid(page, actorUuid);
+
+   // The Attribute's container holds its check button (classed with the Attribute) and the base and static inputs.
+   /** @type {import('@playwright/test').Locator} The Attribute's base value input. */
+   const input = sheet.locator(`.container:has(> .button > button.${attribute}) .stats input`).first();
+   await commitText(input, value);
+   await expect.poll(
+      async () => page.evaluate(
+         async ({ uuid, attribute }) => (await fromUuid(uuid)).system.attribute[attribute].baseValue,
+         {
+            uuid: actorUuid,
+            attribute,
+         },
+      ),
+      { message: `the sheet input stored the ${attribute} base value` },
+   ).toBe(value);
+}
+
+/**
+ * Types a Skill's Training base value into the actor sheet's Skills tab.
+ * @param {import('@playwright/test').Page} page - A logged-in page.
+ * @param {string} actorUuid - The uuid of the character.
+ * @param {string} skill - The Skill key (`dexterity`, `meleeWeapons`, ...).
+ * @param {number} value - The Training base value to type.
+ * @returns {Promise<void>} Resolves once the actor stores the value.
+ */
+export async function setSkillTraining(page, actorUuid, skill, value) {
+   /** @type {import('@playwright/test').Locator} The actor's sheet. */
+   const sheet = await openSheetByUuid(page, actorUuid);
+   await openTab(sheet, 'Skills');
+
+   /** @type {string} The Skill's localized name, which its row's check button shows. */
+   const label = await page.evaluate((skill) => game.i18n.localize(`LOCAL.${skill}.text`), skill);
+
+   // The row's first stat is Training: its first input is the base value, its second the static modifier.
+   /** @type {import('@playwright/test').Locator} The Skill's row. */
+   const row = sheet.locator('.skill', {
+      has: page.locator('.check-button .label', { hasText: new RegExp(`^\\s*${RegExp.escape(label)}\\s*$`) }),
+   });
+   await commitText(row.locator('.stats .stat').first().locator('input').first(), value);
+   await expect.poll(
+      async () => page.evaluate(
+         async ({ uuid, skill }) => (await fromUuid(uuid)).system.skill[skill].training.baseValue,
+         {
+            uuid: actorUuid,
+            skill,
+         },
+      ),
+      { message: `the sheet input stored the ${skill} Training base value` },
+   ).toBe(value);
 }
 
 /**
