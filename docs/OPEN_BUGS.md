@@ -112,12 +112,18 @@ Deferred/known bugs. Todos (planned work) live in `docs/TODO.md`; this file is b
     (`src/ui/player-hud/elements/effects-panel/EffectsDetailBody.svelte:86-92`).
   - TITAN's Active Effect sheet is registered for the `effect` subtype only (`src/hooks/OnceInit.js:247-251`, read).
     So a condition most likely opens core's `ActiveEffectConfig`, whose Details tab edits the native `description`
-    (`templates/sheets/active-effect/details.hbs:3`). Read, not run: which sheet opens at runtime has not been
-    observed.
+    (`templates/sheets/active-effect/details.hbs:3`). The sheet that opens at runtime was observed on 2026-10-07
+    (the Measured entry below).
   - The HUD shows the definition text for a non-effect (`EffectsDetailBody.svelte:28-32`).
   - Turn-start reports carry the condition's `descriptionKey`
     (`src/document/types/actor/types/character/CharacterDataModel.js:5590-5605`).
   - So the edit is never shown.
+- **Measured, 2026-10-07:** `tests/e2e/logic/conditions.spec.js` "the HUD shows a condition's definition text, and a
+  description edited in its sheet does not change it" applies Blinded from the Token HUD and clicks the Player HUD row's
+  Open Sheet button. Core's `.application.active-effect-config` opened, not a TITAN sheet. After typing into its
+  description editor and submitting, the effect's `description` held the edit, and the Player HUD row's detail still
+  showed the definition text and not the edit (the test passed in
+  `.superpowers/sdd/test-suite-rewrite/phase-4/e2e-full-6.log`).
 - **Found:** 2026-10-01 by a reviewer of the test-suite rewrite plan.
 - **Status:** Open. The user deferred it on 2026-10-01 to the document inheritance campaign (`docs/TODO.md`), together
   with #110.
@@ -208,15 +214,46 @@ The evidence files named here are in `.superpowers/sdd/test-suite-rewrite/phase-
 - **Found:** 2026-10-02 in the Part B review fixes.
 - **Status:** Open.
 
-### 129. `condition-description.spec.js` "with no scene active, the fixture token is placed on a fully drawn fallback scene" once found no Token HUD
+### 129. A right-click on a placed token sometimes opens no Token HUD (`#token-hud` not found)
 
-- **What:** in one full e2e run the test failed at `condition-description.spec.js:343`: after a right-click on the placed
-  token, `#token-hud` was not found within 5 s (`e2e-full-fix.clean.txt`, failure 1). The spec is not touched by Part B.
-- **Not reproduced:** 0 failures in 3 isolated runs of the file (`cd-fix-1.log` to `cd-fix-3.log`).
-- **Also not reproduced:** 0 failures in 20 further runs of the file (`reverify-run-1.log` to `-10.log`,
-  `reverify2-run-1.log` to `-10.log`) and in 5 full runs (`e2e-r2-1.log`, `e2e-r2-gate-1.log`, `-2.log`,
-  `e2e-r2b-gate-1.log`, `-2.log`); its 10 s scrolling-text wait was replaced by a reload in the same period, so the
-  runs do not test the original code.
+The Phase 4 evidence files named here are in `.superpowers/sdd/test-suite-rewrite/phase-4/` (local, not checked in).
+
+- **What:** in one full e2e run `condition-description.spec.js` "with no scene active, the fixture token is placed on a
+  fully drawn fallback scene" failed at line 343: after a right-click on the placed token, `#token-hud` was not found
+  within 5 s (`e2e-full-fix.clean.txt`, failure 1). The spec is not touched by Part B.
+- **Not reproduced (Part B):** 0 failures in 3 isolated runs of the file (`cd-fix-1.log` to `cd-fix-3.log`), in 20
+  further runs of the file (`reverify-run-1.log` to `-10.log`, `reverify2-run-1.log` to `-10.log`) and in 5 full runs
+  (`e2e-r2-1.log`, `e2e-r2-gate-1.log`, `-2.log`, `e2e-r2b-gate-1.log`, `-2.log`); its 10 s scrolling-text wait was
+  replaced by a reload in the same period, so the runs do not test the original code.
+- **Same symptom in Phase 4 (2026-10-07), measured:** `applyCondition` and `removeCondition` as they were before
+  `restOnToken` (`hoverToken` moved the pointer in from outside the token and polled the token's `hover` flag, read in
+  `git show 21386edf^:tests/e2e/flows.js`; the right-click followed once `hover` was true) failed in 21 of 240 toggles
+  on the first token placed in the scene (`scratch-hud.json`): in 7 the right-click opened no HUD, in 8 the closing
+  left-click left the HUD open, and 6 later toggles failed their "condition is on before the click" check as a result.
+  The file holds only the state after each failure (`hover` false, no token controlled, no HUD), not the state before
+  the click. A probe that recorded the token's `hover`, its interaction manager's state and the controlled tokens before
+  each click, on the same flow, failed in 0 of 240 toggles in each of three runs (`hud-probe-run1.json` to `-run3.json`;
+  the spec is `hud-probe.spec.js.txt`). The flow with `restOnToken` failed in 0 of 720 toggles in three runs
+  (`scratch-hud3-run1.json` to `-run3.json`). Waiting for the `hover` flag before the right-click therefore did not
+  prevent the failures of `scratch-hud.json`, and no later run of either flow reproduced them.
+- **Cause not located.** An unrelated cause of failed Token HUD flows, a chat card over the token, was found and fixed
+  (CLOSED_BUGS #134); nothing measured connects it to this symptom.
+- **Found:** 2026-10-02 in the Part B review fixes; the second measurement 2026-10-07.
+- **Status:** Open.
+
+### 136. Deleting a weapon with its actor sheet open on Inventory once threw two "reading 'remove'" page errors
+
+The evidence files named here are in `.superpowers/sdd/test-suite-rewrite/phase-4/` (local, not checked in).
+
+- **What:** in one scratch run (variant `c`), with the actor sheet open on the Inventory tab and an Attack Check dialog
+  opened by `actor.system.requestAttackCheck`, deleting the weapon closed the dialog and threw two "Cannot read
+  properties of undefined (reading 'remove')" page errors (`scratch-13.log`, `scratch-delete.json`; the stack was not
+  kept).
+- **Not reproduced:** the same setup (spec saved as `variant-c.spec.js.txt`) threw no page error in 10 of 10 runs on the
+  final code (`variant-c-final.log`), in 10 of 10 on the code before the fixes of CLOSED_BUGS #133 and #135
+  (`variant-c-prefix-all.log`: the item buttons without their guard, the shells validating with reporting and raising
+  the info notice), and in 3 of 3 with the dialog opened from the item sheet's roll button
+  (`scratch-variant-c-after2.log`). The first run's setup differed in details that were not saved.
 - **Cause not located.**
-- **Found:** 2026-10-02 in the Part B review fixes.
+- **Found:** 2026-10-07 while rewriting the Phase 4 delete tests.
 - **Status:** Open.

@@ -819,19 +819,21 @@ and spell, the Checks tab roll preview, a check added while the sheet is open, d
 posted check parameters), `spell-sheet.spec.js` (the condition aspects' Off-Balance option, the Casting Check tab's
 aspect costs, its re-pricing by a second client and its scroll position), `drag.spec.js` (real pointer drags:
 character sheet item and effect lists, the four item sheet lists, a row copied between sheets and refused by a list
-of another kind, a world item or a folder dropped on an actor sheet), `check-math.spec.js` (every check type rolled
-from its sheet button with forced dice and compared to the independent oracle in `tests/shared/checkOracle.js`, with
-the card mounted; an attack's Difficulty from targeted tokens; the Resist button and the damage buttons of a card;
-the die click, reset and scaling-aspect controls of a card; Advantage and Automatic Failure set in the dialog),
-`check-dialog.spec.js` (each check type's dialog opened from the sheet's roll button: totals recomputed as the fields
-change, the Advantage, Automatic Failure, situation and derived fields following effects added and deleted and items
-edited in the sheets while the dialog is open, a user-set field kept, the dialog closing when its item or effect is
-deleted (the tests read the "no longer valid" notices, assert no "failed before construction" notice and dismiss the
-notices, which would otherwise cover the next create dialog), the `getCheckOptions` setting, Heavy, Encumbering and Loud armor, a condition's situation),
-`logic/rules-elements.spec.js` (rules elements added in the Rules Elements tab, read from the sheet's derived Body
-value, the check dialogs and the posted check parameters) and `logic/conditions.spec.js` (conditions applied from the
-Token HUD, read from derived stats, the sheet's tooltip, rolled checks and the Player HUD). `tests/e2e/harness.js` provides `test`, `expect` and
-`flushPageErrors`; `tests/e2e/join.js` (no test-runner imports, so the setup, teardown and census load it without
+of another kind, a world item or a folder dropped on an actor sheet), `check-math.spec.js` (every check type rolled from
+its sheet button with forced dice and compared to the independent oracle in `tests/shared/checkOracle.js`, with the card
+mounted; an attack's Difficulty from targeted tokens; the Resist button and the damage buttons of a card; the die click,
+reset and scaling-aspect controls of a card; Advantage and Automatic Failure set in the dialog), `check-dialog.spec.js`
+(each check type's dialog opened from the sheet's roll button: totals recomputed as the fields change, the Advantage,
+Automatic Failure and derived fields following permanent effects switched on and off with the Effects tab's active
+toggle (and one effect deleted) and items edited in the sheets while the dialog is open, the starting Dice Mod and
+Advantage that an active effect's rules elements give a dialog, a user-set field kept, the dialog closing when its item
+or effect is deleted (the tests read the one "no longer valid" notice, assert no "failed before construction" notice and
+dismiss the notice, which would otherwise cover the next create dialog), the `getCheckOptions` setting, Heavy,
+Encumbering and Loud armor, a condition's situation), `logic/rules-elements.spec.js` (rules elements added in the Rules
+Elements tab, read from the sheet's derived Body value, the check dialogs and the posted check parameters) and
+`logic/conditions.spec.js` (conditions applied from the Token HUD, read from derived stats, the sheet's tooltip, rolled
+checks and the Player HUD). `tests/e2e/harness.js` provides `test`, `expect` and `flushPageErrors`; `tests/e2e/join.js`
+(no test-runner imports, so the setup, teardown and census load it without
 `harness.js`) provides `joinWorld`, `trackWorldPage`, `flushPageErrors` and `takeUncheckedErrors`; `tests/e2e/fixtures.js`
 re-exports `joinWorld` and provides `login`, `openSheetByUuid(page, uuid)` (`fromUuid` then `sheet.render`, waits for
 the content to mount, returns the window's locator; a read-side render, not a document change) and `renderSheet(page,
@@ -993,21 +995,21 @@ renamed in its own sheet opened by the row's Edit button), `dragItemOntoSheet` (
 open actor sheet), `addEffect` (the Effects tab add button, the effect renamed in its sheet, and optionally its
 duration type chosen in the sheet header), `addCheck` (the Checks tab add button, then the row's label input and,
 when asked, its Resolve Cost input, Resistance Check select, Opposed Check box, Damage box, Initial Value input and
-Damage Reduced By select),
-`addRulesElement` (the Rules Elements tab add button, the operation select, and the controls of the operation: the
-`ccm-*` selects, key input and value input of a conditional check modifier; the rating, selector and key of a
-conditional rating modifier; the selector, key, value and rounding or mode of the flat, Multiply Base, Multiply Sum
-and Set Sum operations; a negative value is typed in parentheses because a leading operator in a number input is a
-relative change), `addTrait` (the Edit Traits dialog of a weapon attack, an armor or a shield),
-`setAttributeBase` and `setSkillTraining` (the base input of an attribute in the sheet header, the training input of
-a skill row in the Skills tab), `applyCondition` / `removeCondition` (the Token HUD of a placed token: right-click,
-the status effects palette, the status icon, then a left click on the token closes the HUD, so the next call's
-right-click opens it; core's right-click toggles the HUD, so a second right-click does not close it reliably). The
-pointer reaches the token through `restOnToken` before each click (it moves in from outside the token and waits for
-the token's `hover` and two animation frames), because core handles a click only on a hovered token and a click sent
-in the frame of the move was dropped in 21 of 240 toggles; `hoverToken` first makes the chat tab the active sidebar
-tab, because a chat message posted while another tab is active shows as a card over the canvas for 5 s and takes the
-pointer from a token under it (CLOSED_BUGS #134), `createWorldItem`, `createFolder` (the directory's Create Folder button and the folder
+Damage Reduced By select), `addRulesElement` (the Rules Elements tab add button, the operation select, and the controls
+of the operation: the `ccm-*` selects, key input and value input of a conditional check modifier; the rating, selector
+and key of a conditional rating modifier; the selector, key, value and rounding or mode of the flat, Multiply Base,
+Multiply Sum and Set Sum operations; a negative value is typed in parentheses because a leading operator in a number
+input is a relative change), `addTrait` (the Edit Traits dialog of a weapon attack, an armor or a shield),
+`setAttributeBase` and `setSkillTraining` (the base input of an attribute in the sheet header, the training input of a
+skill row in the Skills tab), `applyCondition` / `removeCondition` (the Token HUD of a placed token: right-click, the
+status effects palette, the status icon, then a left click on the token closes the HUD, so the next call's right-click
+opens it; core's right-click toggles the HUD, so a second right-click does not close it reliably). The pointer reaches
+the token through `restOnToken` before each click (it moves in from outside the token and waits for the token's `hover`
+and two animation frames; whether it is needed is not measured, see CLOSED_BUGS #134); `hoverToken` first makes the chat
+tab the active sidebar tab, because a chat message posted while another tab is active shows as a card over the canvas
+for 5 s and takes the pointer from a token under it (CLOSED_BUGS #134). A right-click that opened no HUD has been seen
+without a located cause (OPEN_BUGS #129). Further flows are `createWorldItem`, `createFolder` (the directory's Create
+Folder button and the folder
 configuration window; `createActor` and `createWorldItem` take a `folderId` and then use that folder's own Create
 button, which creates the document inside the folder), `addCustomTrait`, `addAttack`, `enableAspect` and
 `addCustomAspect` (the Add Custom Trait dialog with an optional description, the weapon Attacks tab add button,
@@ -1432,9 +1434,10 @@ used `disabled` for its off state, which made toggled-off filter options permane
 off-state class is now `not-enabled`.
 
 **Logic layer — Playwright + fast-check** — The in-client logic tier uses Playwright `page.evaluate`
-calls against the live v14 runtime (no external module dependency). Property-based tests inject the
-`fast-check` library as the `fc` page global and drive data-model operations directly in the running
-Foundry world. Quench 0.10.0 was **removed** because its `runBatches` executes 0 tests under Foundry
+calls against the live v14 runtime (no external module dependency). `tests/e2e/fast-check.js` injects the
+`fast-check` library as the `fc` page global (`injectFastCheck`); the only property run in the page is the trivial one
+of `logic/fast-check-smoke.spec.js`, which checks the injection (the flat-modifier stacking property runs in vitest, see
+the rules-element spec below). Quench 0.10.0 was **removed** because its `runBatches` executes 0 tests under Foundry
 v14: the async-`describe` / ApplicationV2 timing mismatch causes all batch registrations to be skipped
 silently. `src/quench/` and `tests/e2e/quench-runner.spec.js` were deleted; the `test:e2e:quench` npm
 script was removed. No Quench code remains in `src/` or `tests/`.
@@ -1445,18 +1448,23 @@ reads the result where a user does: the sheet's derived attribute value (flat mo
 Set Sum, rounding), the dialogs of a casting check and an item check, and the posted parameters of rolled checks
 (damage, healing, Advantage, Automatic Failure). Abilities apply their rules elements on mere ownership (no equip),
 making them the canonical fixture type for derived-stat assertions. The flat-modifier stacking invariant (Body =
-max(0, 1 + sum) for any list of flat modifiers) is a unit property over the real data-model pipeline,
-`tests/unit/RulesElementStacking.property.test.js`; changing its `1 +` to `2 +` fails it with the counterexample `[[]]`
-(`.superpowers/sdd/test-suite-rewrite/phase-4/stacking-mutation.log`).
+max(0, 1 + sum) for any list of flat modifiers) is a vitest property,
+`tests/unit/RulesElementStacking.property.test.js`:
+it builds a bare model (`Object.create(CharacterDataModel.prototype)`) with hand-set stats and a parent holding one
+ability with the generated flat-modifier rules elements, runs the model's `_applyRulesElements` and `_applyMods`, and
+compares Body's `value` with the formula. It does not run Foundry's data preparation or a document. Measured: with
+`Math.max(stat.value + mod, 0)` in `_applyMods` replaced by `stat.value + mod` the property fails with the
+counterexample `[[-2]]` (`.superpowers/sdd/test-suite-rewrite/phase-4/stacking-engine-mutation.log`); the unmutated
+code passes (`stacking-unmutated.log`).
 
-**`checkDialog.js`** — `tests/e2e/checkDialog.js` drives the check dialogs. `openCheckDialog(page, type, uuid,
-{ button, index })` opens the sheet of the actor (Attribute and Resistance checks: the header button named for the
-attribute or resistance) or of the owned item (Attack, Casting and Item checks: the `index`-th roll button of the
-sidebar) and clicks the button; the `getCheckOptions` setting must make the click open a dialog. `moveDialogAside`
-drags a dialog off the sheet it opened over (a dialog opens over the middle of the sheet and can cover the controls
-a test clicks next). `setNumberField`, `setSelectField`, `setCheckbox`, `readSummary`, `clickRoll` and
-`readNewestCheckFlags` set a field, read a summary, roll and read the posted message by the dialog's test ids
-(`check-field-<key>`, `check-summary-<key>`, `check-dialog-roll`). No spec reaches a dialog through `request<Type>Check`.
+**`checkDialog.js`** — `tests/e2e/checkDialog.js` drives the check dialogs. `openCheckDialog(page, type, uuid, { button,
+index })` opens the sheet of the actor (Attribute and Resistance checks: the header button named for the attribute or
+resistance) or of the owned item (Attack, Casting and Item checks: the `index`-th roll button of the sidebar) and clicks
+the button; the `getCheckOptions` setting must make the click open a dialog. `moveDialogAside` drags a dialog to the
+left edge of the page so that it leaves the controls of the sheet behind it uncovered. `setNumberField`,
+`setSelectField`, `setCheckbox`, `readSummary`, `clickRoll` and `readNewestCheckFlags` set a field, read a summary, roll
+and read the posted message by the dialog's test ids (`check-field-<key>`, `check-summary-<key>`, `check-dialog-roll`).
+No spec reaches a dialog through `request<Type>Check`.
 
 **`buildFlatModifierAbilityData` builder** — `tests/shared/builders.js` exports
 `buildFlatModifierAbilityData(name, values)`: accepts a `string` name and a `number[]` of modifier values; returns an

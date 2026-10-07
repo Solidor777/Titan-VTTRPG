@@ -250,15 +250,3 @@ it ever bites in play, the principled fix is a per-message serial queue around
   when their `createNewId()` resolves. Measured in `test-titan` (Task 5 fix round 2): entries with their own `_id`
   came first in 3 of 3 runs, and generated ones came back reordered (for example `[C1, C3, C2]`) in 2 of 3 runs. Code
   and tests that pair created documents with their inputs must match them by id or name, never by position.
-
-## 2026-10-07 — A deleted weapon closed an Attack Check dialog with two page errors in one setup
-
-- **Measured, not explained.** With the actor sheet open on the Inventory tab and an Attack Check dialog opened by
-  `requestAttackCheck`, deleting the weapon closed the dialog and threw two "Cannot read properties of undefined (reading
-  'remove')" page errors (`.superpowers/sdd/test-suite-rewrite/phase-4/scratch-13.log`, `scratch-delete.json`, variant
-  `c`; run before the fix of CLOSED_BUGS #133). After the fixes of #133 and #135, three runs of a flow with the actor
-  sheet open on the Inventory tab and the dialog opened from the item sheet's roll button, then the weapon deleted from
-  the actor sheet's row, threw no page errors (`scratch-variant-c-after2.log`, spec saved as
-  `scratch-variant-c-after.spec.js.txt`). That flow differs from variant `c` in how the dialog is opened (the roll
-  button, not `requestAttackCheck`), and the source of the `remove` call was never traced, so the original error is not
-  shown fixed or explained.
