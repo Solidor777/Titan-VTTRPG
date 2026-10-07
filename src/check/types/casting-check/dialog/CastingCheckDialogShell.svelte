@@ -96,7 +96,7 @@
    $effect(() => {
       /** @type {TitanActor|undefined} The live Actor, read through its bridge so this effect tracks it. */
       const liveActor = checkActor?.data;
-      if (liveActor?.system.validateCastingCheckOptions($checkOptions)) {
+      if (liveActor?.system.validateCastingCheckOptions($checkOptions, false)) {
          $checkParameters = liveActor.system.getCastingCheckParameters($checkOptions);
       }
       else {

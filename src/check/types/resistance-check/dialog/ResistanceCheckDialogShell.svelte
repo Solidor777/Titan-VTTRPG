@@ -86,7 +86,7 @@
    $effect(() => {
       /** @type {TitanActor|undefined} The live Actor, read through its bridge so this effect tracks it. */
       const liveActor = checkActor?.data;
-      if (liveActor?.system.validateResistanceCheckOptions($checkOptions)) {
+      if (liveActor?.system.validateResistanceCheckOptions($checkOptions, false)) {
          $checkParameters = liveActor.system.getResistanceCheckParameters($checkOptions);
       }
       else {
