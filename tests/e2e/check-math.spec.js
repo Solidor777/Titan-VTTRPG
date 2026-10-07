@@ -123,7 +123,6 @@ function targetName(mod) {
 }
 
 test.beforeAll(async ({ browser }) => {
-   test.setTimeout(300_000);
    page = await browser.newPage();
    errors = attachPageErrors(page);
    await login(page);
@@ -180,8 +179,9 @@ test.beforeAll(async ({ browser }) => {
          name: targetName(mod),
          type: 'player',
       });
-      /** @type {string} The uuid of the target's ability. */
+      /** @type {string} The id of the target's ability. */
       const abilityId = await createOwnedItem(page, targetId, 'ability', 'E2E Math Defense');
+      /** @type {string} The uuid of the target's ability. */
       const abilityUuid = `Actor.${targetId}.Item.${abilityId}`;
       await addRulesElement(page, abilityUuid, {
          selector: 'rating',
@@ -249,6 +249,7 @@ async function roll(type, expectedType, uuid, index) {
  */
 function readCheckState(messageId) {
    return page.evaluate((id) => {
+      /** @type {object} The posted message's system data. */
       const system = game.messages.get(id).system.toObject();
       return {
          dice: system.results.dice.map((die) => ({
@@ -265,9 +266,11 @@ test.describe('v14 checks (forced dice)', () => {
    for (const checkCase of CHECK_CASES) {
       test(`${checkCase.name} check assembles parameters, plumbs forced dice and renders its card`, async () => {
          await forceDice(page, FORCED_FACES);
+         /** @type {{id: string, type: string, parameters: object, results: object}} The rolled check's message. */
          const flags = await roll(checkCase.name, checkCase.expectedType);
 
          // A Resistance Check rolls the dice of the Resilience stat as the actor shows it.
+         /** @type {number} The dice count the check rolls. */
          const expectedTotalDice = checkCase.expectedTotalDice ??
             await page.evaluate((id) => game.actors.get(id).system.resistance.resilience.value, rollerId);
 
@@ -281,6 +284,7 @@ test.describe('v14 checks (forced dice)', () => {
          /** @type {{difficulty: number, complexity: number}} The spell's stored casting check. */
          const stored = await page.evaluate(
             async (uuid) => {
+               /** @type {{difficulty: number, complexity: number}} The spell's casting check. */
                const { difficulty, complexity } = (await fromUuid(uuid)).system.castingCheck;
                return {
                   difficulty,
@@ -297,6 +301,7 @@ test.describe('v14 checks (forced dice)', () => {
 
          // (2) The forced dice plumbed through: results.dice[].base == forced faces, sorted desc, truncated to the
          // number of dice actually rolled.
+         /** @type {number[]} The forced faces the roll consumes, highest first. */
          const consumedFaces = FORCED_FACES.slice(0, expectedTotalDice)
             .slice()
             .sort((a, b) => b - a);
@@ -308,6 +313,7 @@ test.describe('v14 checks (forced dice)', () => {
             .toEqual(consumedFaces);
 
          // (3) Results equal the independent oracle, exactly.
+         /** @type {object} The oracle's expected results. */
          const expected = expectedCheckResults(consumedFaces, {
             difficulty: flags.parameters.difficulty,
             complexity: flags.parameters.complexity,
@@ -339,6 +345,7 @@ test.describe('v14 checks (forced dice)', () => {
 
       // Non-vacuous: the stored label must be non-empty before the equality proves anything.
       expect(label, 'the weapon attack label is non-empty').not.toBe('');
+      /** @type {{id: string, type: string, parameters: object, results: object}} The rolled check's message. */
       const flags = await roll('attack', 'attackCheck');
       expect(flags.parameters.attackName, 'attackName matches the rolled attack label').toBe(label);
 
@@ -355,6 +362,7 @@ test.describe('check chat-card interactions (clone-then-update parity)', () => {
       // Difficulty 4, Expertise 2 typed in the dialog, forced [3, 1, 1]: roll-time auto-expertise raises the 3 to 4
       // (cheapest first) and leaves 1 expertise remaining with two clickable failure dice.
       await setClientSetting(page, 'getCheckOptions', 'always');
+      /** @type {import('@playwright/test').Locator} The Attribute Check dialog. */
       const dialog = await openCheckDialog(page, 'attribute', rollerUuid);
       await setNumberField(dialog, 'expertiseMod', 2);
       await forceDice(page, [
@@ -444,8 +452,9 @@ test.describe('check chat-card interactions (clone-then-update parity)', () => {
    test('scaling aspect increase/decrease/reset adjust the clone-backed results', async () => {
       // A spell of its own with one scaling damage aspect of initial value 2 and cost 1: the increment (2) differs from
       // the cost (1), so an operand swap in the handlers cannot cancel out.
-      /** @type {string} The uuid of the new spell. */
+      /** @type {string} The id of the new spell. */
       const spellId = await createOwnedItem(page, rollerId, 'spell', 'E2E Math Scaling Spell');
+      /** @type {string} The uuid of the new spell. */
       const spellUuid = `${rollerUuid}.Item.${spellId}`;
       await addCustomAspect(page, spellUuid);
 
@@ -460,6 +469,7 @@ test.describe('check chat-card interactions (clone-then-update parity)', () => {
        * @param {string} text - The field's label.
        * @returns {import('@playwright/test').Locator} The field's element.
        */
+      /** @type {(text: string) => {import('@playwright/test').Locator}} Finds a labelled field of the row. */
       const field = (text) => row.locator('.field').filter({ has: page.getByText(text, { exact: true }) }).first();
       await settle(page, { transitions: true });
       await field('Damage').locator('button').click();
@@ -496,7 +506,9 @@ test.describe('check chat-card interactions (clone-then-update parity)', () => {
        * Reads a plain snapshot of the casting message's scaling state.
        * @returns {Promise<object>} `{ currentValue, extraSuccessesRemaining, damage }`.
        */
+      /** @type {() => Promise<object>} Reads the posted card's scaling state. */
       const readScalingState = () => page.evaluate((id) => {
+         /** @type {object} The posted message's system data. */
          const system = game.messages.get(id).system.toObject();
          return {
             currentValue: system.results.scalingAspect[0].currentValue,
@@ -573,6 +585,7 @@ test.describe('v14 opposed checks (forced dice)', () => {
       expect(await targetedTokenIds(page), 'the user targets exactly the named tokens')
          .toEqual(names.map((name) => tokenIds.get(name)));
       await forceDice(page, FORCED_FACES);
+      /** @type {{id: string, type: string, parameters: object, results: object}} The rolled check's message. */
       const flags = await roll('attack', 'attackCheck');
       return {
          parameters: flags.parameters,
@@ -595,8 +608,11 @@ test.describe('v14 opposed checks (forced dice)', () => {
    }
 
    test('targeted attack derives difficulty from the target Defense (interior)', async () => {
+      /** @type {{parameters: object, results: object, targetDefenses: number[]}} The attack's message. */
       const flags = await targetAndRoll([targetName(5)]);
+      /** @type {number} The Defense of the target. */
       const targetDefense = flags.targetDefenses[0];
+      /** @type {{attackerRating: number, difficulty: number}} The attack's parameters. */
       const { attackerRating, difficulty } = flags.parameters;
 
       // The target path populated targetDefense from the target, not the attacker fallback.
@@ -604,6 +620,7 @@ test.describe('v14 opposed checks (forced dice)', () => {
       expect(targetDefense, 'target Defense differs from the attacker rating').not.toBe(attackerRating);
 
       // The difficulty follows the clamp formula and lands strictly inside the band (interior).
+      /** @type {number} The difficulty before it is limited to the die faces. */
       const raw = targetDefense - attackerRating + 4;
       expect(raw, 'interior case is not clamped (above lower bound)').toBeGreaterThan(2);
       expect(raw, 'interior case is not clamped (below upper bound)').toBeLessThan(6);
@@ -611,6 +628,7 @@ test.describe('v14 opposed checks (forced dice)', () => {
          .toBe(expectedDifficulty(targetDefense, attackerRating));
 
       // The full results pipeline still holds at this non-4 difficulty.
+      /** @type {object} The oracle's expected results. */
       const expected = expectedCheckResults([...FORCED_FACES].sort((a, b) => b - a), {
          difficulty,
          complexity: flags.parameters.complexity,
@@ -626,24 +644,30 @@ test.describe('v14 opposed checks (forced dice)', () => {
 
    test('attack difficulty clamps to both bounds (2 and 6)', async () => {
       // High bound: a far-above-attacker Defense pins the difficulty to 6.
+      /** @type {{parameters: object, results: object, targetDefenses: number[]}} The high-Defense attack. */
       const high = await targetAndRoll([targetName(9)]);
+      /** @type {number} The difficulty before it is limited, for the high-Defense target. */
       const highRaw = high.targetDefenses[0] - high.parameters.attackerRating + 4;
       expect(highRaw, 'high case exceeds the upper bound before clamping').toBeGreaterThan(6);
       expect(high.parameters.difficulty, 'difficulty clamps to 6').toBe(6);
       await releaseTargets(page);
 
       // Low bound: a floored (0) Defense against the boosted attacker pins the difficulty to 2.
+      /** @type {{parameters: object, results: object, targetDefenses: number[]}} The low-Defense attack. */
       const low = await targetAndRoll([targetName(-8)]);
+      /** @type {number} The difficulty before it is limited, for the low-Defense target. */
       const lowRaw = low.targetDefenses[0] - low.parameters.attackerRating + 4;
       expect(lowRaw, 'low case falls below the lower bound before clamping').toBeLessThan(2);
       expect(low.parameters.difficulty, 'difficulty clamps to 2').toBe(2);
    });
 
    test('with multiple targets the first target Defense is used', async () => {
+      /** @type {{parameters: object, results: object, targetDefenses: number[]}} The attack's message. */
       const flags = await targetAndRoll([
          targetName(5),
          targetName(9),
       ]);
+      /** @type {number[]} The Defense of each target. */
       const [firstDefense, secondDefense] = flags.targetDefenses;
       expect(firstDefense, 'the targets have distinct Defense').not.toBe(secondDefense);
       expect(flags.parameters.targetDefense, 'targetDefense uses the first target').toBe(firstDefense);
@@ -653,6 +677,7 @@ test.describe('v14 opposed checks (forced dice)', () => {
 
    test('with no target the attack falls back to the attacker rating (difficulty 4)', async () => {
       expect(await targetedTokenIds(page), 'no token is targeted').toEqual([]);
+      /** @type {{parameters: object, results: object, targetDefenses: number[]}} The attack's message. */
       const flags = await targetAndRoll([]);
       expect(flags.parameters.targetDefense, 'targetDefense falls back to the attacker rating')
          .toBe(flags.parameters.attackerRating);
@@ -665,7 +690,6 @@ test.describe('the damage card of a damaging check', () => {
    let strikeUuid;
 
    test.beforeAll(async () => {
-      test.setTimeout(120_000);
       strikeUuid = `${rollerUuid}.Item.${await createOwnedItem(page, rollerId, 'ability', 'E2E Math Strike')}`;
       await addCheck(page, strikeUuid, {
          label: 'Strike',
@@ -704,6 +728,7 @@ test.describe('the damage card of a damaging check', () => {
    test('failed resistance reduces incoming damage by the successes rolled', async () => {
       // Two Strike successes bank one extra success, so the Resist button asks for 2 successes; the defender's one die
       // shows a 4, a success against Difficulty 4, which leaves the check one success short.
+      /** @type {{strike: object, resist: object}} The Strike check and the Resilience check it caused. */
       const { strike, resist } = await strikeAndResist([
          6,
          6,
@@ -713,6 +738,7 @@ test.describe('the damage card of a damaging check', () => {
       expect(resist.parameters.complexity, 'the Resist button carries the complexity').toBe(2);
       expect(resist.results.dice.length, 'Resilience rolls a single die').toBe(1);
 
+      /** @type {object} The oracle's expected results. */
       const oracle = expectedCheckResults([4], {
          difficulty: 4,
          complexity: 2,
@@ -731,6 +757,7 @@ test.describe('the damage card of a damaging check', () => {
 
    test('successful resistance takes no damage', async () => {
       // One Strike success asks for 1 success; the defender's one die shows a 4, which succeeds.
+      /** @type {{strike: object, resist: object}} The Strike check and the Resilience check it caused. */
       const { strike, resist } = await strikeAndResist([
          6,
          1,
@@ -752,7 +779,6 @@ test.describe('the damage card of an attack', () => {
    let defenderTokenId;
 
    test.beforeAll(async () => {
-      test.setTimeout(180_000);
 
       // A weapon with two attacks that deal 4 damage, the second with the Penetrating trait.
       bladeUuid = `${rollerUuid}.Item.${await createOwnedItem(page, rollerId, 'weapon', 'E2E Math Blade')}`;
@@ -782,8 +808,9 @@ test.describe('the damage card of an attack', () => {
          name: 'E2E Math Armored Target',
          type: 'player',
       });
-      /** @type {string} The uuid of the defender's armor. */
+      /** @type {string} The id of the defender's armor. */
       const armorId = await createOwnedItem(page, defenderId, 'armor', 'E2E Math Armor');
+      /** @type {string} The uuid of the defender's armor. */
       const armorUuid = `Actor.${defenderId}.Item.${armorId}`;
       /** @type {import('@playwright/test').Locator} The armor sheet's Armor stat. */
       const armor = (await openSheetByUuid(page, armorUuid)).locator('.header .stat, .header .labeled-element')
@@ -879,6 +906,7 @@ test.describe('the damage card of an attack', () => {
 
    test('Penetrating damage is resisted by half the Armor, rounded up', async () => {
       // Armor 5 halves to 3, so 1 of the 4 damage lands.
+      /** @type {{before: number, after: number}} The defender's stamina before and after the button. */
       const { before, after } = await applyAttackDamage(1);
       expect(before - after, 'Penetrating leaves ceil(5 / 2) = 3 Armor, so 1 damage lands').toBe(1);
    });
@@ -970,6 +998,7 @@ test.describe('Advantage and Automatic Failure in check options', () => {
    test('an automatically failed check rolls its dice but has no successes', async () => {
       // Positive control: the same forced die succeeds without Automatic Failure.
       await forceDice(page, [6]);
+      /** @type {{id: string, type: string, parameters: object, results: object}} The rolled check's message. */
       const control = await rollPlain();
       expect(control.results).toMatchObject({
          successes: 1,
@@ -977,6 +1006,7 @@ test.describe('Advantage and Automatic Failure in check options', () => {
       });
 
       await forceDice(page, [6]);
+      /** @type {{id: string, type: string, parameters: object, results: object}} The rolled check's message. */
       const failed = await rollPlain({ automaticFailure: true });
       expect(failed.parameters.automaticFailure).toBe(true);
       expect(failed.results.dice.map((die) => die.base)).toEqual([6]);
@@ -992,6 +1022,7 @@ test.describe('Advantage and Automatic Failure in check options', () => {
 
       // Positive control: without Automatic Failure the Expertise raises the 3, and the card shows "3 + 1".
       await forceDice(page, [3]);
+      /** @type {{id: string, type: string, parameters: object, results: object}} The rolled check's message. */
       const control = await rollPlain({ expertiseMod: 1 });
       expect(control.results.expertiseRemaining).toBe(0);
       expect(control.results.dice.map((die) => die.expertiseApplied)).toEqual([1]);
@@ -1003,6 +1034,7 @@ test.describe('Advantage and Automatic Failure in check options', () => {
 
       // The same roll with Automatic Failure spends nothing: the Expertise remains and the die shows its face alone.
       await forceDice(page, [3]);
+      /** @type {{id: string, type: string, parameters: object, results: object}} The rolled check's message. */
       const failed = await rollPlain({
          expertiseMod: 1,
          automaticFailure: true,
@@ -1047,6 +1079,7 @@ test.describe('Advantage and Automatic Failure in check options', () => {
             6,
             2,
          ]);
+         /** @type {{id: string, type: string, parameters: object, results: object}} The rolled check's message. */
          const control = await rollPlain({
             expertiseMod: 1,
             trainingMod: 1,
@@ -1065,6 +1098,7 @@ test.describe('Advantage and Automatic Failure in check options', () => {
             6,
             2,
          ]);
+         /** @type {{id: string, type: string, parameters: object, results: object}} The rolled check's message. */
          const failed = await rollPlain({
             expertiseMod: 1,
             trainingMod: 1,

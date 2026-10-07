@@ -105,14 +105,15 @@ const ATTRIBUTE_DIALOG = '.application.titan-dialog[id^="titan-attribute-check-d
 const ATTACK_DIALOG = '.application.titan-dialog[id^="titan-attack-check-dialog-"]';
 
 /**
- * Makes a character and returns its id and uuid.
+ * Makes a character and returns its id and uuid. The name carries the worker's index: a failed test restarts the
+ * worker, whose characters then still exist, and a repeated name would make the directory entry ambiguous.
  * @param {string} name - The character's name.
  * @returns {Promise<{id: string, uuid: string}>} The character.
  */
 async function makeActor(name) {
    /** @type {string} The character's id. */
    const id = await createActor(page, {
-      name,
+      name: `${name} w${test.info().workerIndex}`,
       type: 'player',
    });
    return {
@@ -200,23 +201,65 @@ async function deleteItem(actorUuid, tab, itemUuid) {
 }
 
 /**
- * Reads the "no longer valid" notices a check dialog raises when it closes because its source was deleted (an info
- * notice and a warning notice), checks that no "failed before construction" error accompanies them, then dismisses
- * each with a click as a user does; an undismissed notice covers the OK button of the next create dialog.
- * @returns {Promise<void>} Resolves once the notices are gone.
+ * Switches a permanent effect on or off with the active toggle of its row in the actor's Effects tab.
+ * @param {string} actorUuid - The uuid of the actor.
+ * @param {string} effectUuid - The uuid of the effect.
+ * @param {boolean} active - Whether the effect ends up active.
+ * @returns {Promise<void>} Resolves once the effect is in the requested state.
+ */
+async function setEffectActive(actorUuid, effectUuid, active) {
+   /** @type {import('@playwright/test').Locator} The actor's sheet. */
+   const sheet = await openSheetByUuid(page, actorUuid);
+   await clickSheetTab(sheet, 'Effects');
+   await settle(page, { transitions: true });
+
+   /** @type {import('@playwright/test').Locator} The effect's row. */
+   const row = sheet.locator(`[data-effect-id="${effectUuid.split('.').at(-1)}"]`);
+   await row.locator(active ? 'i.fa-square' : 'i.fa-square-check').click();
+   await expect.poll(
+      () => page.evaluate(async (uuid) => (await fromUuid(uuid)).system.isActive, effectUuid),
+      { message: `the active toggle left the effect ${active ? '' : 'in'}active` },
+   ).toBe(active);
+   await settle(page);
+}
+
+/**
+ * Adds a permanent effect with always-on conditional check modifiers (any check, no situation) to an actor and
+ * switches it off with its active toggle, so that a test can switch it on while a dialog is open.
+ * @param {{id: string, uuid: string}} actor - The actor.
+ * @param {string} name - The effect's name.
+ * @param {object[]} elements - The rules elements of the effect, one row each, as `addRulesElement` takes them.
+ * @returns {Promise<string>} The uuid of the effect.
+ */
+async function addSwitchedOffEffect(actor, name, elements) {
+   /** @type {string} The effect's uuid. */
+   const uuid = `${actor.uuid}.ActiveEffect.${await addEffect(page, actor.id, name, { duration: 'permanent' })}`;
+   for (const element of elements) {
+      await addRulesElement(page, uuid, {
+         operation: 'conditionalCheckModifier',
+         checkType: 'any',
+         selector: 'any',
+         ...element,
+      });
+   }
+   await setEffectActive(actor.uuid, uuid, false);
+   return uuid;
+}
+
+/**
+ * Reads the one "no longer valid" notice a check dialog raises when it closes because its source was deleted, checks
+ * that no "failed before construction" error accompanies it, then dismisses it with a click as a user does; an
+ * undismissed notice covers the OK button of the next create dialog.
+ * @returns {Promise<void>} Resolves once the notice is gone.
  */
 async function dismissNoLongerValidNotice() {
-   /** @type {import('@playwright/test').Locator} The notices. */
-   const notices = page.locator('#notifications .notification', { hasText: /no longer valid/i });
-   await expect(notices.first()).toBeVisible();
+   /** @type {import('@playwright/test').Locator} The notice. */
+   const notice = page.locator('#notifications .notification', { hasText: /no longer valid/i });
+   await expect(notice).toHaveCount(1);
    await expect(page.locator('#notifications .notification', { hasText: /failed before construction/i }))
       .toHaveCount(0);
-
-   // The locators are index-based, so the last notice is dismissed first and the earlier indexes stay valid.
-   for (const notice of (await notices.all()).reverse()) {
-      await notice.click();
-   }
-   await expect(notices).toHaveCount(0);
+   await notice.click();
+   await expect(notice).toHaveCount(0);
 }
 
 /**
@@ -335,6 +378,7 @@ async function setEquipped(actorUuid, armorId, equipped) {
     * Reads whether the actor wears the armor.
     * @returns {Promise<boolean>} True when it does.
     */
+   /** @type {() => Promise<boolean>} Reads whether the armor is equipped. */
    const read = () => page.evaluate(
       async ({ uuid, id }) => (await fromUuid(uuid)).system.equipped.armor === id,
       {
@@ -351,7 +395,6 @@ async function setEquipped(actorUuid, armorId, equipped) {
 }
 
 test.beforeAll(async ({ browser }) => {
-   test.setTimeout(480_000);
    page = await browser.newPage();
    errors = attachPageErrors(page);
    await login(page);
@@ -433,7 +476,9 @@ test.describe('the dialog of each check type', () => {
          await expect(dialog.getByTestId('check-summary-difficulty')).toBeVisible();
 
          // Baseline totals straight from the freshly opened dialog.
+         /** @type {number} The Total Dice before the change. */
          const baseDice = await readSummary(dialog, 'totalDice');
+         /** @type {number} The Total Expertise before the change. */
          const baseExpertise = await readSummary(dialog, 'totalExpertise');
          expect(baseExpertise, 'baseline expertise is zero (untrained roller)').toBe(0);
 
@@ -456,18 +501,22 @@ test.describe('the dialog of each check type', () => {
          await expect(dialog.getByTestId('check-summary-totalExpertise')).toHaveText('0');
 
          // diceMod stays at 2, so the rolled check uses baseDice + 2 dice.
+         /** @type {number} The dice the roll uses. */
          const rolledDice = baseDice + 2;
          await expect(dialog.getByTestId('check-summary-totalDice')).toHaveText(String(rolledDice));
 
          // (4) Roll handoff: force dice, roll, then read the produced message.
          await forceDice(page, FORCED_FACES);
+         /** @type {number} The chat-message count before the roll. */
          const baseline = await clickRoll(dialog, page);
+         /** @type {{id: string, type: string, parameters: object, results: object}} The rolled check's message. */
          const flags = await readNewestCheckFlags(page, baseline);
          expect(flags.type, 'message type').toBe(checkCase.expectedType);
          expect(flags.parameters.totalDice, 'rolled totalDice reflects dialog diceMod').toBe(rolledDice);
          expect(flags.parameters.totalExpertise, 'rolled totalExpertise is zero after reset').toBe(0);
 
          // Forced faces plumbed into the dice (sorted desc, truncated to the dice rolled).
+         /** @type {number[]} The forced faces the roll consumes, highest first. */
          const consumedFaces = FORCED_FACES.slice(0, rolledDice).slice().sort((a, b) => b - a);
          expect(flags.results.dice.map((die) => die.base), 'rolled dice bases match forced faces')
             .toEqual(consumedFaces);
@@ -475,6 +524,7 @@ test.describe('the dialog of each check type', () => {
             .toEqual(consumedFaces);
 
          // Results equal the independent oracle, exactly.
+         /** @type {object} The oracle's expected results. */
          const expected = expectedCheckResults(consumedFaces, {
             difficulty: flags.parameters.difficulty,
             complexity: flags.parameters.complexity,
@@ -492,6 +542,7 @@ test.describe('the dialog of each check type', () => {
    test('attribute dialog difficulty select flows through without changing dice', async () => {
       /** @type {import('@playwright/test').Locator} The dialog. */
       const dialog = await openCheckDialog(page, 'attribute', rollerUuid);
+      /** @type {number} The Total Dice before the change. */
       const baseDice = await readSummary(dialog, 'totalDice');
 
       // Difficulty is a 1-6 Select combobox; changing it must not change the dice count.
@@ -500,7 +551,9 @@ test.describe('the dialog of each check type', () => {
 
       // It flows into the rolled difficulty.
       await forceDice(page, FORCED_FACES);
+      /** @type {number} The chat-message count before the roll. */
       const baseline = await clickRoll(dialog, page);
+      /** @type {{id: string, type: string, parameters: object, results: object}} The rolled check's message. */
       const flags = await readNewestCheckFlags(page, baseline);
       expect(flags.type, 'message type').toBe('attributeCheck');
       expect(flags.parameters.difficulty, 'dialog difficulty select flows into rolled params').toBe(6);
@@ -513,7 +566,9 @@ test.describe('the dialog of each check type', () => {
       // A high targetDefense drives difficulty to its clamp ceiling (6); the raw value flows through.
       await setNumberField(dialog, 'targetDefense', 10);
       await forceDice(page, FORCED_FACES);
+      /** @type {number} The chat-message count before the roll. */
       const baseline = await clickRoll(dialog, page);
+      /** @type {{id: string, type: string, parameters: object, results: object}} The rolled check's message. */
       const flags = await readNewestCheckFlags(page, baseline);
       expect(flags.type, 'message type').toBe('attackCheck');
       expect(flags.parameters.targetDefense, 'dialog targetDefense flows into rolled params').toBe(10);
@@ -642,6 +697,7 @@ test.describe('a situation and the Advantage field', () => {
 
       /** @type {number} The chat-message count before the roll. */
       const baseline = await clickRoll(dialog, page);
+      /** @type {{id: string, type: string, parameters: object, results: object}} The rolled check's message. */
       const flags = await readNewestCheckFlags(page, baseline);
       expect(flags.parameters).toMatchObject({
          advantage: 1,
@@ -663,7 +719,9 @@ test.describe('a situation and the Advantage field', () => {
       const dialog = await openCheckDialog(page, 'attribute', actors.situation);
       await setCheckbox(dialog, 'automaticFailure', true);
       await forceDice(page, [6]);
+      /** @type {number} The chat-message count before the roll. */
       const baseline = await clickRoll(dialog, page);
+      /** @type {{id: string, type: string, parameters: object, results: object}} The rolled check's message. */
       const flags = await readNewestCheckFlags(page, baseline);
       expect(flags.parameters.automaticFailure).toBe(true);
 
@@ -755,7 +813,8 @@ test.describe('fields that follow the actor while the dialog is open', () => {
    });
 
    /**
-    * Adds an effect with one always-on conditional check modifier (any check, no situation) to an actor.
+    * Adds an effect with one always-on conditional check modifier (any check, no situation) to an actor. The effect
+    * is active as soon as it exists.
     * @param {string} actorId - The id of the actor.
     * @param {string} name - The effect's name.
     * @param {object[]} elements - The rules elements of the effect, one row each.
@@ -776,73 +835,117 @@ test.describe('fields that follow the actor while the dialog is open', () => {
    }
 
    /**
-    * Makes a character, opens its Attribute Check dialog and moves the dialog off the sheet.
+    * Makes a character with switched-off permanent effects, opens its Attribute Check dialog and moves the dialog off
+    * the sheet.
     * @param {string} name - The character's name.
-    * @returns {Promise<{id: string, uuid: string, dialog: import('@playwright/test').Locator}>} The character and its
-    * dialog.
+    * @param {{name: string, elements: object[]}[]} effects - The effects to make, in order.
+    * @returns {Promise<{id: string, uuid: string, effects: string[], dialog: import('@playwright/test').Locator}>}
+    * The character, the uuids of its effects and the dialog.
     */
-   async function openPlainDialog(name) {
+   async function openDialogWithSwitchedOffEffects(name, effects) {
       /** @type {{id: string, uuid: string}} The character. */
       const actor = await makeActor(name);
+
+      /** @type {string[]} The uuids of the character's effects. */
+      const effectUuids = [];
+      for (const effect of effects) {
+         effectUuids.push(await addSwitchedOffEffect(actor, effect.name, effect.elements));
+      }
 
       /** @type {import('@playwright/test').Locator} The dialog. */
       const dialog = await openCheckDialog(page, 'attribute', actor.uuid);
       await moveDialogAside(dialog);
       return {
          ...actor,
+         effects: effectUuids,
          dialog,
       };
    }
 
-   test('Advantage follows an always-on Actor effect, presence to absence, and the rolled check carries the ' +
-      're-derived value', async () => {
-      const { id, uuid, dialog } = await openPlainDialog('E2E Dialog Advantage Actor');
+   test('Advantage follows the active toggle of an Actor effect, and the rolled check carries the re-derived value',
+      async () => {
+         /** @type {{uuid: string, effects: string[], dialog: object}} The character, its effects and the dialog. */
+         const { uuid, effects: [effect], dialog } = await openDialogWithSwitchedOffEffects(
+            'E2E Dialog Advantage Actor',
+            [
+               {
+                  name: 'E2E Always Disadvantage',
+                  elements: [
+                     {
+                        modifierType: 'advantage',
+                        advantageLevel: -1,
+                     },
+                  ],
+               },
+            ],
+         );
 
-      /** @type {import('@playwright/test').Locator} The Advantage select's trigger. */
-      const advantageSelect = dialog.getByTestId('check-field-advantage').locator('[role="combobox"]');
+         /** @type {import('@playwright/test').Locator} The Advantage select's trigger. */
+         const advantageSelect = dialog.getByTestId('check-field-advantage').locator('[role="combobox"]');
 
-      /** @type {import('@playwright/test').Locator} The effective-Difficulty summary. */
-      const difficulty = dialog.getByTestId('check-summary-difficulty');
-      await expect(difficulty).toHaveText('4');
-      await expect(advantageSelect).toHaveAttribute('data-value', '0');
+         /** @type {import('@playwright/test').Locator} The effective-Difficulty summary. */
+         const difficulty = dialog.getByTestId('check-summary-difficulty');
+         await expect(difficulty).toHaveText('4');
+         await expect(advantageSelect).toHaveAttribute('data-value', '0');
 
-      // An always-on Disadvantage effect (selector "any", so never offered as a checkbox) is added while the dialog is
-      // open: the select and the effective Difficulty follow it.
-      /** @type {string} The effect's uuid. */
-      const effect = await addAlwaysOnEffect(id, 'E2E Always Disadvantage', [
-         {
-            modifierType: 'advantage',
-            advantageLevel: -1,
-         },
-      ]);
-      await expect(advantageSelect).toHaveAttribute('data-value', '-1');
-      await expect(difficulty).toHaveText('5');
+         // Switching the Disadvantage effect on (selector "any", so never offered as a checkbox) while the dialog is
+         // open: the select and the effective Difficulty follow it.
+         await setEffectActive(uuid, effect, true);
+         await expect(advantageSelect).toHaveAttribute('data-value', '-1');
+         await expect(difficulty).toHaveText('5');
 
-      // Rolling carries the re-derived value, not the stale value the dialog opened with.
-      /** @type {number} The chat-message count before the roll. */
-      const baseline = await clickRoll(dialog, page);
-      const flags = await readNewestCheckFlags(page, baseline);
-      expect(flags.parameters.advantage).toBe(-1);
-      expect(flags.parameters.difficulty).toBe(5);
+         // Rolling carries the re-derived value, not the stale value the dialog opened with.
+         /** @type {number} The chat-message count before the roll. */
+         const baseline = await clickRoll(dialog, page);
 
-      // Removing the effect from a new dialog returns both to their prior state.
-      await setClientSetting(page, 'getCheckOptions', 'always');
+         /** @type {{parameters: object}} The rolled check's flags. */
+         const flags = await readNewestCheckFlags(page, baseline);
+         expect(flags.parameters.advantage).toBe(-1);
+         expect(flags.parameters.difficulty).toBe(5);
 
-      /** @type {import('@playwright/test').Locator} The second dialog. */
-      const second = await openCheckDialog(page, 'attribute', uuid);
-      await moveDialogAside(second);
+         // A new dialog opens with the effect on; switching the effect off returns both to their prior state.
+         await setClientSetting(page, 'getCheckOptions', 'always');
 
-      /** @type {import('@playwright/test').Locator} The second dialog's Advantage select. */
-      const secondSelect = second.getByTestId('check-field-advantage').locator('[role="combobox"]');
-      await expect(secondSelect).toHaveAttribute('data-value', '-1');
-      await deleteEffect(uuid, effect);
-      await expect(secondSelect).toHaveAttribute('data-value', '0');
-      await expect(second.getByTestId('check-summary-difficulty')).toHaveText('4');
-   });
+         /** @type {import('@playwright/test').Locator} The second dialog. */
+         const second = await openCheckDialog(page, 'attribute', uuid);
+         await moveDialogAside(second);
 
-   test('Advantage keeps a user override against a later always-on Actor effect (synced on a visible Total Dice ' +
+         /** @type {import('@playwright/test').Locator} The second dialog's Advantage select. */
+         const secondSelect = second.getByTestId('check-field-advantage').locator('[role="combobox"]');
+         await expect(secondSelect).toHaveAttribute('data-value', '-1');
+         await setEffectActive(uuid, effect, false);
+         await expect(secondSelect).toHaveAttribute('data-value', '0');
+         await expect(second.getByTestId('check-summary-difficulty')).toHaveText('4');
+
+         // Deleting the effect while it is on removes the value from the open dialog as well.
+         await setEffectActive(uuid, effect, true);
+         await expect(secondSelect).toHaveAttribute('data-value', '-1');
+         await deleteEffect(uuid, effect);
+         await expect(secondSelect).toHaveAttribute('data-value', '0');
+         await expect(second.getByTestId('check-summary-difficulty')).toHaveText('4');
+      });
+
+   test('Advantage keeps a user override against a later Actor effect switched on (synced on a visible Total Dice ' +
       'change)', async () => {
-      const { id, dialog } = await openPlainDialog('E2E Dialog Advantage Override Actor');
+      /** @type {{uuid: string, effects: string[], dialog: object}} The character, its effects and the dialog. */
+      const { uuid, effects: [effect], dialog } = await openDialogWithSwitchedOffEffects(
+         'E2E Dialog Advantage Override Actor',
+         [
+            {
+               name: 'E2E Always Disadvantage And Dice',
+               elements: [
+                  {
+                     modifierType: 'advantage',
+                     advantageLevel: -1,
+                  },
+                  {
+                     modifierType: 'dice',
+                     value: 3,
+                  },
+               ],
+            },
+         ],
+      );
 
       /** @type {import('@playwright/test').Locator} The Advantage select's trigger. */
       const advantageSelect = dialog.getByTestId('check-field-advantage').locator('[role="combobox"]');
@@ -853,7 +956,7 @@ test.describe('fields that follow the actor while the dialog is open', () => {
       /** @type {import('@playwright/test').Locator} The Total Dice summary. */
       const totalDice = dialog.getByTestId('check-summary-totalDice');
 
-      /** @type {number} The Total Dice before any effect is added. */
+      /** @type {number} The Total Dice before the effect is switched on. */
       const baselineDice = await readSummary(dialog, 'totalDice');
 
       // The user picks Greater Advantage in the dialog.
@@ -861,48 +964,66 @@ test.describe('fields that follow the actor while the dialog is open', () => {
       await expect(advantageSelect).toHaveAttribute('data-value', '2');
       await expect(difficulty).toHaveText('2');
 
-      // A further always-on effect carries BOTH a Disadvantage modifier (which must not overwrite the user's Advantage)
-      // and a Dice modifier (a visible, untouched field). Waiting for the Dice change first proves the effect was
-      // processed before Advantage is asserted to have held.
-      await addAlwaysOnEffect(id, 'E2E Always Disadvantage And Dice', [
-         {
-            modifierType: 'advantage',
-            advantageLevel: -1,
-         },
-         {
-            modifierType: 'dice',
-            value: 3,
-         },
-      ]);
+      // The effect carries BOTH a Disadvantage modifier (which must not overwrite the user's Advantage) and a Dice
+      // modifier (a visible, untouched field). Waiting for the Dice change first proves the effect was processed
+      // before Advantage is asserted to have held.
+      await setEffectActive(uuid, effect, true);
       await expect(totalDice).toHaveText(String(baselineDice + 3));
       await expect(advantageSelect).toHaveAttribute('data-value', '2');
       await expect(difficulty).toHaveText('2');
    });
 
-   test('Automatic Failure follows an always-on Actor effect, presence to absence, presence again', async () => {
-      const { id, uuid, dialog } = await openPlainDialog('E2E Dialog Auto Failure Actor');
+   test('Automatic Failure follows the active toggle of an Actor effect, off and on again', async () => {
+      /** @type {{uuid: string, effects: string[], dialog: object}} The character, its effects and the dialog. */
+      const { uuid, effects: [effect], dialog } = await openDialogWithSwitchedOffEffects(
+         'E2E Dialog Auto Failure Actor',
+         [
+            {
+               name: 'E2E Always Auto-Fail',
+               elements: [{ modifierType: 'automaticFailure' }],
+            },
+         ],
+      );
 
       /** @type {import('@playwright/test').Locator} The Automatic Failure field wrapper. */
       const field = dialog.getByTestId('check-field-automaticFailure');
       await expect(field.locator('i.fa-check')).toHaveCount(0);
 
-      // An always-on Automatic Failure effect is added while the dialog is open: the checkbox follows it.
-      /** @type {string} The effect's uuid. */
-      const effect = await addAlwaysOnEffect(id, 'E2E Always Auto-Fail', [{ modifierType: 'automaticFailure' }]);
+      // Switching the effect on while the dialog is open: the checkbox follows it.
+      await setEffectActive(uuid, effect, true);
       await expect(field.locator('i.fa-check')).toHaveCount(1);
 
-      // Deleting it before the user edits anything ticks it back off.
-      await deleteEffect(uuid, effect);
+      // Switching it off before the user edits anything ticks it back off.
+      await setEffectActive(uuid, effect, false);
       await expect(field.locator('i.fa-check')).toHaveCount(0);
 
-      // Adding it again ticks it back on: the follow behavior is not a one-shot.
-      await addAlwaysOnEffect(id, 'E2E Always Auto-Fail Again', [{ modifierType: 'automaticFailure' }]);
+      // Switching it on again ticks it back on: the follow behavior is not a one-shot.
+      await setEffectActive(uuid, effect, true);
       await expect(field.locator('i.fa-check')).toHaveCount(1);
    });
 
-   test('Automatic Failure keeps a user override against a later always-on Actor effect (synced on a visible ' +
+   test('Automatic Failure keeps a user override against a later Actor effect switched on (synced on a visible ' +
       'Total Dice change)', async () => {
-      const { id, dialog } = await openPlainDialog('E2E Dialog Auto Failure Override Actor');
+      /** @type {{uuid: string, effects: string[], dialog: object}} The character, its effects and the dialog. */
+      const { uuid, effects: [first, second], dialog } = await openDialogWithSwitchedOffEffects(
+         'E2E Dialog Auto Failure Override Actor',
+         [
+            {
+               name: 'E2E Always Auto-Fail',
+               elements: [{ modifierType: 'automaticFailure' }],
+            },
+            {
+               name: 'E2E Always Auto-Fail And Dice',
+               elements: [
+                  { modifierType: 'automaticFailure' },
+                  {
+                     modifierType: 'dice',
+                     value: 3,
+                  },
+               ],
+            },
+         ],
+      );
 
       /** @type {import('@playwright/test').Locator} The Automatic Failure field wrapper. */
       const field = dialog.getByTestId('check-field-automaticFailure');
@@ -910,26 +1031,56 @@ test.describe('fields that follow the actor while the dialog is open', () => {
       /** @type {import('@playwright/test').Locator} The Total Dice summary. */
       const totalDice = dialog.getByTestId('check-summary-totalDice');
 
-      /** @type {number} The Total Dice before any effect is added. */
+      /** @type {number} The Total Dice before any effect is switched on. */
       const baselineDice = await readSummary(dialog, 'totalDice');
 
-      // An always-on effect ticks the checkbox on; the user unticks it (an override against the live derivation).
-      await addAlwaysOnEffect(id, 'E2E Always Auto-Fail', [{ modifierType: 'automaticFailure' }]);
+      // The first effect ticks the checkbox on; the user unticks it (an override against the live derivation).
+      await setEffectActive(uuid, first, true);
       await expect(field.locator('i.fa-check')).toHaveCount(1);
       await setCheckbox(dialog, 'automaticFailure', false);
       await expect(field.locator('i.fa-check')).toHaveCount(0);
 
-      // A further effect carries another Automatic Failure source (which must not re-tick the checkbox) and a Dice
+      // The second effect carries another Automatic Failure source (which must not re-tick the checkbox) and a Dice
       // modifier (a visible, untouched field); the Dice change proves it was processed.
-      await addAlwaysOnEffect(id, 'E2E Always Auto-Fail And Dice', [
-         { modifierType: 'automaticFailure' },
+      await setEffectActive(uuid, second, true);
+      await expect(totalDice).toHaveText(String(baselineDice + 3));
+      await expect(field.locator('i.fa-check')).toHaveCount(0);
+   });
+
+   test('rules elements give the Attribute Check dialog its starting Dice Mod and Advantage, and the rolled check ' +
+      'carries them', async () => {
+      /** @type {{id: string, uuid: string}} A character whose effect carries a Dice modifier and an Advantage. */
+      const actor = await makeActor('E2E Dialog Starting Values Actor');
+      await addAlwaysOnEffect(actor.id, 'E2E Starting Values', [
          {
             modifierType: 'dice',
             value: 3,
          },
+         {
+            modifierType: 'advantage',
+            advantageLevel: 1,
+         },
       ]);
-      await expect(totalDice).toHaveText(String(baselineDice + 3));
-      await expect(field.locator('i.fa-check')).toHaveCount(0);
+
+      /** @type {import('@playwright/test').Locator} The dialog, opened from the sheet's attribute button. */
+      const dialog = await openCheckDialog(page, 'attribute', actor.uuid);
+      await expect(dialog.getByTestId('check-field-diceMod').locator('input')).toHaveValue('3');
+      await expect(dialog.getByTestId('check-field-advantage').locator('[role="combobox"]'))
+         .toHaveAttribute('data-value', '1');
+      await expect(dialog.getByTestId('check-summary-difficulty')).toHaveText('3');
+
+      /** @type {number} The Total Dice the dialog shows before the roll. */
+      const shownDice = await readSummary(dialog, 'totalDice');
+
+      /** @type {number} The chat-message count before the roll. */
+      const baseline = await clickRoll(dialog, page);
+
+      /** @type {{parameters: object}} The rolled check's flags. */
+      const flags = await readNewestCheckFlags(page, baseline, 'attributeCheck');
+      expect(flags.parameters.diceMod).toBe(3);
+      expect(flags.parameters.advantage).toBe(1);
+      expect(flags.parameters.difficulty).toBe(3);
+      expect(flags.parameters.totalDice).toBe(shownDice);
    });
 
    test('an untouched derived field re-derives immediately when the user changes a derivation input (Skill)',
@@ -961,9 +1112,10 @@ test.describe('fields that follow the actor while the dialog is open', () => {
    test('a caller-supplied value survives dialog mount and rolls with its value', async () => {
       // A check that deals with an opposed Attribute Check: its card's button opens the dialog with the complexity
       // the roll's extra successes set (extra successes + 1).
-      /** @type {string} The uuid of the roller's ability with an opposed check. */
       /** @type {string} The id of the ability. */
       const abilityId = await createOwnedItem(page, rollerId, 'ability', 'E2E Opposed Ability');
+
+      /** @type {string} The uuid of the roller's ability with an opposed check. */
       const abilityUuid = `${rollerUuid}.Item.${abilityId}`;
       await addCheck(page, abilityUuid, {
          label: 'Opposed',
@@ -981,6 +1133,7 @@ test.describe('fields that follow the actor while the dialog is open', () => {
       /** @type {number} The chat-message count before the roll. */
       const first = await page.evaluate(() => game.messages.size);
       await (await openSheetByUuid(page, abilityUuid)).locator('.sidebar-check .header .roll button').first().click();
+
       /** @type {{id: string, parameters: object, results: object}} The opposed check's message. */
       const message = await readNewestCheckFlags(page, first, 'itemCheck');
       expect(message.results.extraSuccesses, 'the roll banked two extra successes').toBe(2);
@@ -999,7 +1152,11 @@ test.describe('fields that follow the actor while the dialog is open', () => {
       const complexity = dialog.getByTestId('check-field-complexity').locator('input');
       await expect(complexity, 'the dialog opens with the caller-supplied complexity').toHaveValue('3');
       await resetDice(page);
+
+      /** @type {number} The chat-message count before the roll. */
       const baseline = await clickRoll(dialog, page);
+
+      /** @type {{parameters: object}} The rolled check's flags. */
       const flags = await readNewestCheckFlags(page, baseline, 'attributeCheck');
       expect(flags.parameters.complexity).toBe(3);
    });
@@ -1010,10 +1167,24 @@ test.describe('fields that follow the owned item while the dialog is open', () =
       await setClientSetting(page, 'getCheckOptions', 'always');
    });
 
-   test('Attacker Melee follows an always-on rating-modifier Actor effect (presence to absence on the same ' +
-      'locator)', async () => {
+   test('Attacker Melee follows the active toggle of a rating-modifier Actor effect (presence to absence on the ' +
+      'same locator)', async () => {
       /** @type {{id: string, uuid: string, itemUuid: string}} A character with the shared weapon. */
       const actor = await makeActorWith('E2E Dialog Melee Actor', 'weapon');
+
+      // A permanent rating modifier for every Melee attack, switched off before the dialog opens.
+      /** @type {string} The effect's uuid. */
+      const effect = `${actor.uuid}.ActiveEffect.${await addEffect(page, actor.id, 'E2E Melee Rating Boost', {
+         duration: 'permanent',
+      })}`;
+      await addRulesElement(page, effect, {
+         operation: 'conditionalRatingModifier',
+         rating: 'melee',
+         selector: 'attackType',
+         key: 'melee',
+         value: 2,
+      });
+      await setEffectActive(actor.uuid, effect, false);
 
       /** @type {import('@playwright/test').Locator} The Attack Check dialog. */
       const dialog = await openCheckDialog(page, 'attack', actor.itemUuid);
@@ -1022,24 +1193,15 @@ test.describe('fields that follow the owned item while the dialog is open', () =
       /** @type {import('@playwright/test').Locator} The Melee field's number input. */
       const meleeField = dialog.getByTestId('check-field-attackerMelee').locator('input');
 
-      /** @type {string} The Melee rating before any rating-modifier effect is added. */
+      /** @type {string} The Melee rating while the effect is off. */
       const baselineMelee = await meleeField.inputValue();
 
-      // An always-on rating modifier (every Melee attack) is added while the dialog is open: the untouched Melee field
-      // follows it.
-      /** @type {string} The effect's uuid. */
-      const effect = `${actor.uuid}.ActiveEffect.${await addEffect(page, actor.id, 'E2E Melee Rating Boost')}`;
-      await addRulesElement(page, effect, {
-         operation: 'conditionalRatingModifier',
-         rating: 'melee',
-         selector: 'attackType',
-         key: 'melee',
-         value: 2,
-      });
+      // Switching the effect on while the dialog is open: the untouched Melee field follows it.
+      await setEffectActive(actor.uuid, effect, true);
       await expect(meleeField).toHaveValue(String(Number(baselineMelee) + 2));
 
-      // Removing the effect returns Melee to its prior value (presence to absence on the same locator).
-      await deleteEffect(actor.uuid, effect);
+      // Switching it off returns Melee to its prior value (presence to absence on the same locator).
+      await setEffectActive(actor.uuid, effect, false);
       await expect(meleeField).toHaveValue(baselineMelee);
    });
 
@@ -1064,7 +1226,9 @@ test.describe('fields that follow the owned item while the dialog is open', () =
       await expect(typeSelect).toHaveAttribute('data-value', 'ranged');
       await expect(dialog.getByTestId('check-field-attackerAccuracy')).toBeVisible();
 
+      /** @type {number} The chat-message count before the roll. */
       const baseline = await clickRoll(dialog, page);
+      /** @type {{id: string, type: string, parameters: object, results: object}} The rolled check's message. */
       const flags = await readNewestCheckFlags(page, baseline);
       expect(flags.parameters.type).toBe('ranged');
       expect(flags.parameters.cleave).toBe(true);
@@ -1125,7 +1289,9 @@ test.describe('fields that follow the owned item while the dialog is open', () =
       await expect(difficultySelect).toHaveAttribute('data-value', '5');
       await expect(skillSelect).toHaveAttribute('data-value', 'athletics');
 
+      /** @type {number} The chat-message count before the roll. */
       const baseline = await clickRoll(dialog, page);
+      /** @type {{id: string, type: string, parameters: object, results: object}} The rolled check's message. */
       const flags = await readNewestCheckFlags(page, baseline);
       expect(flags.parameters.difficulty).toBe(5);
       expect(flags.parameters.skill).toBe('athletics');
@@ -1157,7 +1323,9 @@ test.describe('fields that follow the owned item while the dialog is open', () =
       await expect(difficultySelect).toHaveAttribute('data-value', '5');
       await expect(skillSelect).toHaveAttribute('data-value', 'athletics');
 
+      /** @type {number} The chat-message count before the roll. */
       const baseline = await clickRoll(dialog, page);
+      /** @type {{id: string, type: string, parameters: object, results: object}} The rolled check's message. */
       const flags = await readNewestCheckFlags(page, baseline);
       expect(flags.parameters.skill).toBe('athletics');
    });
@@ -1282,6 +1450,7 @@ test.describe('an effect-sourced Item Check dialog', () => {
 
    test('an untouched Difficulty follows an edit to the effect\'s check, and the rolled check carries it',
       async () => {
+         /** @type {{effectUuid: string, dialog: object}} The effect and the dialog. */
          const { effectUuid, dialog } = await openEffectCheckDialog('E2E Dialog Effect Difficulty Actor');
 
          /** @type {import('@playwright/test').Locator} The Difficulty select's trigger. */
@@ -1290,13 +1459,16 @@ test.describe('an effect-sourced Item Check dialog', () => {
          await setCheckSelect(effectUuid, 'Difficulty', 5);
          await expect(difficultySelect).toHaveAttribute('data-value', '5');
 
+         /** @type {number} The chat-message count before the roll. */
          const baseline = await clickRoll(dialog, page);
+         /** @type {{id: string, type: string, parameters: object, results: object}} The rolled check's message. */
          const flags = await readNewestCheckFlags(page, baseline);
          expect(flags.parameters.difficulty).toBe(5);
       });
 
    test('deleting the effect while its Item Check dialog is open closes the dialog without a page error',
       async () => {
+         /** @type {{actor: object, effectUuid: string, dialog: object}} The character, the effect and the dialog. */
          const { actor, effectUuid, dialog } = await openEffectCheckDialog('E2E Dialog Effect Delete Actor');
          await deleteEffect(actor.uuid, effectUuid);
          await expect(dialog).toHaveCount(0);
@@ -1391,7 +1563,9 @@ test.describe('equipped armor traits', () => {
       const dialog = await openAthleticsDialog(actors.heavy);
       await situationRow(dialog, KEYS.swim).locator('[data-testid^="situation-toggle-"]').click();
       await expect(dialog.getByTestId('check-summary-difficulty')).toHaveText('6');
+      /** @type {number} The chat-message count before the roll. */
       const baseline = await clickRoll(dialog, page);
+      /** @type {{id: string, type: string, parameters: object, results: object}} The rolled check's message. */
       const flags = await readNewestCheckFlags(page, baseline);
       expect(flags.parameters).toMatchObject({
          advantage: -2,
@@ -1407,7 +1581,9 @@ test.describe('equipped armor traits', () => {
       await situationRow(dialog, KEYS.jump).locator('[data-testid^="situation-toggle-"]').click();
       await setSelectField(dialog, 'skill', 'dexterity');
       await expect(situationRow(dialog, KEYS.jump)).toHaveCount(0);
+      /** @type {number} The chat-message count before the roll. */
       const baseline = await clickRoll(dialog, page);
+      /** @type {{id: string, type: string, parameters: object, results: object}} The rolled check's message. */
       const flags = await readNewestCheckFlags(page, baseline);
       expect(flags.parameters.automaticFailure).toBe(false);
       expect(flags.parameters.situations).toEqual([]);
@@ -1424,6 +1600,7 @@ test.describe('equipped armor traits', () => {
           * @param {string} skill - The check's Skill.
           * @returns {object[]} The Advantage-type entries.
           */
+         /** @type {(skill: string) => object[]} The Advantage-only situations offered for a Skill. */
          const advantageOnly = (skill) => system.getSituationalCheckModifiers('attribute', { skill })
             .filter((modifier) => modifier.modifierType === 'advantage');
          return {

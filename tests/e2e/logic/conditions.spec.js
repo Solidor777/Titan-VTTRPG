@@ -98,7 +98,6 @@ const SKILL_TRAINING = {
 };
 
 test.beforeAll(async ({ browser }) => {
-   test.setTimeout(240_000);
    page = await browser.newPage();
    errors = attachPageErrors(page);
    await login(page);
@@ -175,6 +174,7 @@ function snapshot() {
        * @param {Record<string, object>} stats - The stat group (attributes, ratings, or resistances).
        * @returns {Record<string, {base: number, value: number}>} Each stat's base and value.
        */
+      /** @type {(stats: object) => object} Reads the values of a set of derived stats. */
       const read = (stats) => Object.fromEntries(Object.entries(stats).map(([key, stat]) => [
          key,
          {
@@ -479,6 +479,7 @@ test.describe('conditions — check rules', () => {
 
          /** @type {number} The chat-message count before the roll. */
          const failedBaseline = await clickRoll(dialog, page);
+         /** @type {{id: string, type: string, parameters: object, results: object}} The rolled check's message. */
          const failed = await readNewestCheckFlags(page, failedBaseline);
          expect(failed.parameters.automaticFailure).toBe(true);
          expect(failed.parameters.situations).toEqual([
@@ -495,6 +496,7 @@ test.describe('conditions — check rules', () => {
 
          /** @type {number} The chat-message count before the second roll. */
          const unaffectedBaseline = await clickRoll(dialog, page);
+         /** @type {{id: string, type: string, parameters: object, results: object}} The rolled check's message. */
          const unaffected = await readNewestCheckFlags(page, unaffectedBaseline);
          expect(unaffected.parameters.automaticFailure).toBe(false);
       });

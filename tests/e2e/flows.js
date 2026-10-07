@@ -514,8 +514,7 @@ async function hoverToken(page, tokenId) {
 
 /**
  * Moves the pointer onto a placed token from outside it and waits until the canvas shows the token hovered and has
- * drawn two frames with the pointer there. The canvas processes a click only on a hovered token and handles pointer
- * input as the frames draw, so a click sent in the frame of the move can be dropped.
+ * drawn two frames with the pointer there. The canvas processes a click only on a hovered token.
  * @param {import('@playwright/test').Page} page - A logged-in GM page viewing the token's scene.
  * @param {string} tokenId - The token on the viewed scene.
  * @param {{x: number, y: number}} centre - The token's centre in client (page) coordinates.
@@ -1475,6 +1474,7 @@ export async function setAttributeBase(page, actorUuid, attribute, value) {
       ),
       { message: `the sheet input stored the ${attribute} base value` },
    ).toBe(value);
+   await settle(page);
 }
 
 /**
@@ -1509,6 +1509,7 @@ export async function setSkillTraining(page, actorUuid, skill, value) {
       ),
       { message: `the sheet input stored the ${skill} Training base value` },
    ).toBe(value);
+   await settle(page);
 }
 
 /**

@@ -108,7 +108,6 @@ test.describe('rules elements — derived attribute math', () => {
    let abilityUuid;
 
    test.beforeAll(async () => {
-      test.setTimeout(120_000);
 
       // A new player has Body 1: the math below starts from that base.
       /** @type {string} The character's id. */
@@ -290,7 +289,6 @@ test.describe('conditional check modifiers on owned items', () => {
    let kitUuid;
 
    test.beforeAll(async () => {
-      test.setTimeout(240_000);
 
       /** @type {string} The character's id. */
       const actorId = await createActor(page, {
@@ -464,7 +462,6 @@ test.describe('conditional check modifiers on rolled checks', () => {
    let hitUuid;
 
    test.beforeAll(async () => {
-      test.setTimeout(180_000);
 
       // Body, Mind and Soul 4 give Reflexes and Willpower 6.
       /** @type {string} The character's id. */

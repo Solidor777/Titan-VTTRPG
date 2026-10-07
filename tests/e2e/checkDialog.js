@@ -69,10 +69,10 @@ export async function openCheckDialog(page, type, uuid, { button, index = 0 } = 
 }
 
 /**
- * Drags a dialog's window by its header to the left edge of the page, so that the sheet it opened from is not under
- * it: a dialog opens over the middle of the sheet and covers controls the test then clicks.
+ * Drags a dialog's window by its header to the left edge of the page, so that the dialog leaves uncovered the controls
+ * behind it that the test clicks next.
  * @param {import('@playwright/test').Locator} dialog - The dialog root locator.
- * @returns {Promise<void>} Resolves once the dialog sits left of the sheet's left edge.
+ * @returns {Promise<void>} Resolves once the dialog's left edge is less than 200 px from the left edge of the page.
  */
 export async function moveDialogAside(dialog) {
    /** @type {import('@playwright/test').Page} The page the dialog is on. */
@@ -99,6 +99,7 @@ export async function moveDialogAside(dialog) {
  */
 export async function setNumberField(dialog, key, value) {
    // The native number input inside the field wrapper.
+   /** @type {import('@playwright/test').Locator} The field's native input. */
    const input = dialog.getByTestId(`check-field-${key}`).locator('input');
    await input.fill(String(value));
 
@@ -116,6 +117,7 @@ export async function setNumberField(dialog, key, value) {
  */
 export async function setSelectField(dialog, key, value) {
    // The combobox trigger inside the field wrapper.
+   /** @type {import('@playwright/test').Locator} The select's trigger. */
    const trigger = dialog.getByTestId(`check-field-${key}`).locator('[role="combobox"]');
    await selectTitanOption(dialog.page(), trigger, value);
 }
@@ -129,7 +131,9 @@ export async function setSelectField(dialog, key, value) {
  */
 export async function setCheckbox(dialog, key, desired) {
    // The field wrapper; checked state is the presence of the check icon.
+   /** @type {import('@playwright/test').Locator} The field wrapper. */
    const field = dialog.getByTestId(`check-field-${key}`);
+   /** @type {boolean} Whether the checkbox is ticked. */
    const checked = (await field.locator('i.fa-check').count()) > 0;
    if (checked !== desired) {
       await field.locator('button').click();
@@ -145,6 +149,7 @@ export async function setCheckbox(dialog, key, desired) {
  * @returns {Promise<number>} The parsed numeric value.
  */
 export async function readSummary(dialog, key) {
+   /** @type {string} The summary's text. */
    const text = await dialog.getByTestId(`check-summary-${key}`).innerText();
    return Number(text.trim());
 }
@@ -158,6 +163,7 @@ export async function readSummary(dialog, key) {
  * @returns {Promise<number>} The chat-message count captured immediately before the roll.
  */
 export async function clickRoll(dialog, page) {
+   /** @type {number} The chat-message count before the roll. */
    const baseline = await page.evaluate(() => game.messages.size);
    await dialog.getByTestId('check-dialog-roll').click();
    await expect(dialog, 'the roll closed the dialog').toHaveCount(0);
