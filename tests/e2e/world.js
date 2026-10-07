@@ -195,40 +195,6 @@ export function attachPageErrors(page) {
 }
 
 /**
- * Builds a COMPLETE item/effect check entry mirroring createItemCheckTemplate()
- * (src/check/types/item-check/ItemCheckTemplate.js). Node-side data factory: build the object here
- * and pass it INTO page.evaluate as data (the template module is not importable in the browser
- * context, and omitting fields like opposedCheck makes getItemCheckParameters throw).
- * @param {string} label - The check's display label (rendered on its ItemCheckButton).
- * @param {string} uuid - A unique id for the check entry.
- * @param {object} [overrides] - Field overrides merged over the complete default entry.
- * @returns {object} The complete check entry.
- */
-export function buildCheck(label, uuid, overrides = {}) {
-   return {
-      attribute: 'body',
-      complexity: 1,
-      damageReducedBy: 'none',
-      difficulty: 4,
-      initialValue: 1,
-      isDamage: false,
-      isHealing: false,
-      label: label,
-      opposedCheck: {
-         attribute: 'mind',
-         enabled: true,
-         skill: 'perception',
-      },
-      resistanceCheck: 'reflexes',
-      resolveCost: 2,
-      scaling: true,
-      skill: 'arcana',
-      uuid: uuid,
-      ...overrides,
-   };
-}
-
-/**
  * Deletes a fixture actor by name (when present) along with any token it left on the active scene
  * (deleting an actor does NOT delete its placed tokens). Serves both the stale sweep at seed time
  * and final afterAll cleanup.

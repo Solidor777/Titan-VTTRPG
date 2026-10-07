@@ -1382,6 +1382,71 @@ export async function addAttack(page, weaponUuid) {
 }
 
 /**
+ * Types a number into the Range or Damage input of a weapon attack on the Attacks tab.
+ * @param {import('@playwright/test').Page} page - A logged-in page.
+ * @param {string} weaponUuid - The uuid of the weapon.
+ * @param {number} index - The position of the attack.
+ * @param {'range'|'damage'} field - The attack field to set.
+ * @param {number} value - The number to type.
+ * @returns {Promise<void>} Resolves once the weapon stores the value.
+ */
+export async function setAttackStat(page, weaponUuid, index, field, value) {
+   /** @type {import('@playwright/test').Locator} The weapon's sheet. */
+   const sheet = await openSheetByUuid(page, weaponUuid);
+   await openTab(sheet, 'Attacks');
+
+   /** @type {import('@playwright/test').Locator} The attack's row. */
+   const row = sheet.locator('li.reorder-row').nth(index);
+
+   /** @type {import('@playwright/test').Locator} The labelled field of the attack's settings. */
+   const stat = row.locator('.field').filter({ hasText: field === 'range' ? 'Range' : 'Damage' }).first();
+   await commitText(stat.locator('input').first(), value);
+   await expect.poll(
+      () => page.evaluate(async ({ uuid, index, field }) => (await fromUuid(uuid)).system.attack[index][field], {
+         uuid: weaponUuid,
+         index,
+         field,
+      }),
+      { message: `the ${field} input stored the value` },
+   ).toBe(value);
+}
+
+/**
+ * Adds a custom trait to a weapon attack through the attack's Add Custom Trait button and its dialog.
+ * @param {import('@playwright/test').Page} page - A logged-in page.
+ * @param {string} weaponUuid - The uuid of the weapon.
+ * @param {number} index - The position of the attack.
+ * @param {string} name - Text typed into the dialog's name input.
+ * @param {string} description - Text typed into the dialog's description area.
+ * @returns {Promise<void>} Resolves once the attack stores the trait.
+ */
+export async function addAttackCustomTrait(page, weaponUuid, index, name, description) {
+   /** @type {import('@playwright/test').Locator} The weapon's sheet. */
+   const sheet = await openSheetByUuid(page, weaponUuid);
+   await openTab(sheet, 'Attacks');
+   await sheet.locator('li.reorder-row').nth(index).getByText('Add Custom Trait', { exact: true }).click();
+
+   /** @type {import('@playwright/test').Locator} The Add Custom Trait dialog of the attack. */
+   const dialog = page.locator('.application[id^="add-custom-attack-trait-dialog-"]');
+   await expect(dialog).toBeVisible();
+   await dialog.locator('input').first().fill(name);
+   await dialog.locator('textarea').fill(description);
+   await dialog.getByRole('button', { name: 'Add Trait' }).click();
+   await expect(dialog).toHaveCount(0);
+   await expect.poll(
+      () => page.evaluate(
+         async ({ uuid, index }) => (await fromUuid(uuid)).system.attack[index].customTrait.map((trait) => trait.name),
+         {
+            uuid: weaponUuid,
+            index,
+         },
+      ),
+      { message: 'the dialog stored the custom trait on the attack' },
+   ).toContain(name);
+   await settle(page);
+}
+
+/**
  * Adds a trait to a weapon attack, an armor or a shield through the sheet's Edit Traits button and its dialog.
  * @param {import('@playwright/test').Page} page - A logged-in page.
  * @param {string} documentUuid - The uuid of the weapon, armor or shield.
@@ -1729,6 +1794,29 @@ export async function setEquipped(page, actorId, itemId, equipped) {
    }
    await expect.poll(read, { message: `the Equipped toggle left the item ${equipped ? '' : 'un'}equipped` })
       .toBe(equipped);
+   await settle(page);
+}
+
+/**
+ * Deletes an owned item with the Delete Item button of its row in a tab of the actor's sheet. The
+ * `confirmDeletingItems` setting must be off, or the click opens a confirmation instead.
+ * @param {import('@playwright/test').Page} page - A logged-in page.
+ * @param {string} actorUuid - The uuid of the actor.
+ * @param {string} tab - The sheet tab that lists the item.
+ * @param {string} itemUuid - The uuid of the owned item.
+ * @returns {Promise<void>} Resolves once the item is gone.
+ */
+export async function deleteOwnedItem(page, actorUuid, tab, itemUuid) {
+   /** @type {import('@playwright/test').Locator} The actor's sheet. */
+   const sheet = await openSheetByUuid(page, actorUuid);
+   await openTab(sheet, tab);
+   await settle(page, { transitions: true });
+   await sheet.locator(`[data-item-id="${itemUuid.split('.').at(-1)}"]`)
+      .getByRole('button', { name: 'Delete Item' }).click();
+   await expect.poll(
+      () => page.evaluate(async (uuid) => (await fromUuid(uuid)) === null, itemUuid),
+      { message: 'the Delete Item button deleted the item' },
+   ).toBe(true);
    await settle(page);
 }
 
