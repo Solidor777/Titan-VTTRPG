@@ -163,6 +163,9 @@ Core citations below refer to Foundry 14.364 at `C:\FoundryVTT\V14\dev\foundry`,
 - **Status:** Open; attribution awaits the no-TITAN control. TITAN does not patch core. The #113 gate test waits until
   no animation runs on `canvas.interface` before it deactivates the scene. Measured without that wait: the spec failed
   with this error in 6 of 6 runs (`fix5-mut114-no-scrolling-text-wait-run1.log` to `-run6.log`).
+  Under the 1 s poll rule the wait cannot last the 2 s of the animation, so the last test of
+  `condition-description.spec.js` reloads the page first (a reload ends the animations) and then deactivates the scene;
+  the earlier wait for the animation to end is gone.
 
 ### 122. `addCheck` once stored the default label "Check" instead of the typed one
 
@@ -174,9 +177,10 @@ The evidence files named here are in `.superpowers/sdd/test-suite-rewrite/phase-
   full-suite order, without the wait added afterwards (`phase-3/layout-nowait-1.log` to `-10.log`,
   `layout-nowait-summary.txt`); 0 in 4 isolated runs of the layout spec (`layout-rerun-1.log` to `-4.log`); 0 in the
   two later full runs (`e2e-full-2.log`, `e2e-full-3.log`).
-- **Cause (measured, 2026-10-02, CLOSED_BUGS #131):** the Add Check button changes the local document state 0 to 1 ms
-  after the click and the server echo re-renders 15 to 26 ms later (`measure-optimistic-length.log`); typing in that window
-  is undone by the echo. `addCheck` and the other add flows now wait for the pending operations to finish
+- **Cause (measured, 2026-10-07, CLOSED_BUGS #131):** in 8 samples of the Add Check button the new check's count showed
+  0 to 4 ms after the click, with 2 operations pending at that moment, and the pending count reached 0 at 17 to 31 ms
+  (`phase-3/measure-settle.log`, line `OPTIMISTIC`; script `phase-3/scripts/measure-settle.spec.js`); typing in that
+  window is undone by the echo. `addCheck` and the other add flows now wait for the pending operations to finish
   (`settle`). The failure recurred once before that change (`e2e-r2-gate-1.log`) and did not in the 12 runs after it
   (2 full, 10 of the layout set); that is too few to call it fixed, so the entry stays open.
 - **Found:** 2026-10-02 in Phase 3 Part A.
@@ -197,7 +201,7 @@ The evidence files named here are in `.superpowers/sdd/test-suite-rewrite/phase-
 - **Not reproduced:** 0 failures in 3 later full runs of the file (`drag-fix-1.log` to `drag-fix-3.log`).
 - **Cause and mitigation:** the same race as #122: the local state shows the new row before the server echo, and the
   echo's re-render resets text typed in that window. `fillList` and the attack-label loop poll each row, and the add flows
-  now `settle` (CLOSED_BUGS #131). Not reproduced in 10 runs of `drag.spec.js` (`dist-run-1.log` to `-10.log`).
+  now `settle` (CLOSED_BUGS #131). Not reproduced in 19 runs of `drag.spec.js` with the final code (`final-dist-run-1.log` to `-10.log`, `final2-dist-run-1.log` to `-9.log`).
 - **Found:** 2026-10-02 in the Part B review fixes.
 - **Status:** Open.
 
@@ -212,4 +216,19 @@ The evidence files named here are in `.superpowers/sdd/test-suite-rewrite/phase-
   runs do not test the original code.
 - **Cause not located.**
 - **Found:** 2026-10-02 in the Part B review fixes.
+- **Status:** Open.
+
+### 132. `verifySettle` once timed out at 1 s waiting for the boot renders at login
+
+The evidence files named here are in `.superpowers/sdd/test-suite-rewrite/phase-3/` (local, not checked in).
+
+- **What:** in 1 of 10 runs of the 44 tests of `armor-trait-situations`, `attack-tags`, `character-sheet-layout`,
+  `condition-description` and `surfaces`, `armor-trait-situations.spec.js:121` failed in `login` with "titanWait timed
+  out after 1000ms waiting for: the boot renders finished" (`verifySettle`, `settle.js`); run 1 of `final-reverify-run-1.log`
+  to `-10.log`, the other 9 passed. 3 full runs of 647 tests and 19 runs of the sheet list set did not fail this way.
+- **Context (read):** `npm test` ran on the same machine during that run. **Inferred, not diagnosed:** machine load slowed the
+  boot's renders past 1 s. Not isolated with a run that varies the load.
+- **Mitigation:** the wait now has the boot's 60 s ceiling (`settle.js`), because it waits on the world boot. No reverify
+  run was made after that change, so whether the failure recurs is unmeasured.
+- **Found:** 2026-10-07 in Phase 3 Part B round 3.
 - **Status:** Open.

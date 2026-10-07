@@ -1034,9 +1034,9 @@ to scroll at the least, the Checks tab 3934 px and the rules elements list 1378 
 entries of each in one run (`.superpowers/sdd/test-suite-rewrite/phase-2/review-measure-1.log`, `build bulkActor`),
 so its first consumer, the browser zoom describe of `character-sheet-layout.spec.js`, raises its own timeout);
 `scene` (created and viewed); `trayPack` (an unlocked `ActiveEffect` pack holding one effect).
-`playwright.config.mjs` sets `use.actionTimeout` to 10 s (about ten times the longest action measured in a full run,
-916 ms), so a flow that waits on a missing element fails after 10 s; a wait that legitimately takes longer passes its
-own timeout.
+`playwright.config.mjs` sets `use.actionTimeout` to 10 s (its comment cites the slow-operation files of the runs that
+measured the longest action), so a flow that waits on a missing element fails after 10 s; a wait that legitimately takes
+longer passes its own timeout.
 `tests/e2e/global-teardown.js` (Playwright `globalTeardown`) launches one Chromium, logs in as `E2E GM 1`, asserts the
 census world and in order deletes the list through the API (combats; tokens by their scene; scenes; embedded
 documents by their parent; world actors, items, macros, roll tables, journal entries, playlists, cards, folders; recorded
@@ -1059,19 +1059,30 @@ not a ceiling to raise. The rule covers every wait on something inside an alread
 `expect` assertions, `waitForFunction`, `waitFor`, `waitForEvent`, `titanWait`, `toPass`, the in-page retry loops of
 specs, and every explicit `timeout:` on them. `playwright.config.mjs` sets `expect.timeout` to 1000, and `titanWait`'s
 default is 1000 (`tests/e2e/poll.js`), so a call that names no ceiling gets 1 s; an explicit `timeout:` is `1000` or
-lower. Playwright retries an assertion at growing intervals (100, 250, 500 ms; read in `playwright-core/lib`, version
-1.60.0), so a condition that settles at 400 ms (Svelte's default `slide` transition duration, read in
-`svelte/src/transition/index.js`) is first seen at 850 ms (measured: the collapse assertions in
-`e2e-measure-1-slowops.json` finished at 805 to 930 ms). A product delay or animation longer than the ceiling is not waited out: the test removes the cause (the last test of
+lower. Playwright retries actions and web-first assertions at 20, 50, 100 ms and then every 100 ms under a 1 s ceiling
+(`retryWithProgressAndBackoff`, `playwright-core/lib/coreBundle.js:17979-17985`: `[20, 50, 100, 100, 500]`, with the
+500 dropped while it exceeds a fifth of the timeout; the web-first assertion path calls it at `:18298`); only
+`expect.poll` uses 100, 250, 500, 1000 (`:4377`). Svelte's default `slide` transition lasts 400 ms (read in
+`svelte/src/transition/index.js`), and a click on a row that is still moving retries until the row stops: the longest
+such click measured 965 ms once (`flows.js:860`, the Edit Item button of a new effect row, in
+`e2e-r3d-gate-2-slowops.json`; 385 to 432 ms in its other samples and runs). A test therefore waits for a transition with `settle(page, { transitions: true })` or collapses and expands
+rows in an order that does not move the next target, instead of leaving the transition to a retry. A product delay or
+animation longer than the ceiling is not waited out: the test removes the cause (the last test of
 `condition-description.spec.js` reloads, which ends core's 2 s scrolling text, before it deactivates the scene). The one
 exception is the real-hover test below.
 
 **Action helpers return only after the effect of their action is observable**, so no caller has to wait before its next
-action (OPEN_BUGS #131: a re-render of the previous action discarded or reordered the next one). `settle.js` counts the
-document operations (`createDocuments`, `updateDocuments`, `deleteDocuments` of `foundry.abstract.Document`) and
+action (CLOSED_BUGS #131: a re-render of the previous action discarded or reordered the next one). `settle.js` counts
+the document operations (`createDocuments`, `updateDocuments`, `deleteDocuments` of `foundry.abstract.Document`) and
 `ApplicationV2#render` calls in flight in the page, installed by `joinWorld` on every document load, and `settle(page)`
-waits for zero within 1 s. `actions.js` holds `clickSheetTab` (waits for the tab to be the active one) and `commitText`
-(fill, blur, `settle`); `selectTitanOption` waits for the trigger's `data-value` and the closing of the list;
+waits for zero within 1 s; `settle(page, { transitions: true })` also waits for the finite, unfinished animations inside
+a window's content (Svelte row transitions), and the helpers that add or delete a row use it (`addCheck`, `addAttack`,
+`addCustomAspect`, `addRulesElement`, the delete loops). `joinWorld` calls `verifySettle(page)` after `game.ready`: it
+runs an empty `Item.updateDocuments` and a `ui.chat.render()` and throws when the counter was not above 0 during each,
+so a page the wrappers do not reach fails at login (saved: `verify-settle-wrapper-disabled.log`).
+`actions.js` holds `clickSheetTab` (waits for the tab to be the active one), `clickTabButton` (the same for a tab
+button the caller already located) and `commitText` (fill, blur, `settle`); `selectTitanOption` waits for the
+trigger's `data-value` and the closing of the list;
 `setCheckbox`, `clickRoll`, `addAttack`, `addCustomAspect`, `pickPortrait`, `dragGripToMove` (`drag.spec.js`: the dragged
 row's element changes position) and the spec setters that write through the API call or wait as well. What the counter
 cannot see: a write that a handler starts after an `await` of its own, a socket request that is not a document operation
@@ -1080,7 +1091,9 @@ number input (`setNumberField`: it changes dialog state only, and the caller rea
 
 The exemptions wait on a process starting and are not polls on a loaded page:
 - a `game.ready` world boot (`fixtures.js`, `join.js`; the teardown's and the setup recovery's own login goes through
-  it, as does a second browser context's login in `multiClient.js`);
+  it, as does a second browser context's login in `multiClient.js`; `verifySettle`'s wait for the boot's own renders
+  to finish has the boot's 60 s ceiling: at 1 s it failed once, in a run during which `npm test` ran on the same machine
+  (`final-reverify-run-1.log`; the load as the cause is inferred, not isolated);
 - a mid-file reload through `world.js` `reloadWorld(page, { ready })` (15 s for the `/game` URL, 60 s for the
   readiness predicate, `game.ready` by default), used by the last test of `condition-description.spec.js`, the reload
   test of `player-hud-layout.spec.js` and both portrait tests of `surfaces.spec.js`;
@@ -1093,8 +1106,14 @@ The exemptions wait on a process starting and are not polls on a loaded page:
 
 Building the `bulkActor` shared fixture (69.1 s with 30 entries of each in one run,
 `.superpowers/sdd/test-suite-rewrite/phase-2/review-measure-1.log`) is a long sequence of short waits inside a hook
-limit, not one wait. `closeAllApps` (`world.js`) is an `evaluate` that awaits each window's close and reached 1049 ms
-in a full run; it is not a poll.
+limit, not one wait. `closeAllApps` (`world.js`) closes each window with `close({ animate: false })`: core waits up to
+1000 ms for a window's close transition otherwise (`application.mjs:973,982`), and the call measured 2057 ms in a
+`beforeAll` and 1013 ms in an `afterEach` before the option (`e2e-r2b-gate-2-slowops.json`, `world.js:31`) and 275 to
+277 ms in an `afterEach` after it (`e2e-r3b-gate-1-slowops.json`, `e2e-r3b-gate-2-slowops.json`). It is an `evaluate`, not
+a poll, and is under 1 s.
+`tests/e2e/action-helpers.spec.js` fails when `addAttack` or `addRulesElement` returns with an operation or a row
+transition in flight (saved: `gate131-before-fix-*.log` with `settle` disabled, `gate131-after-fix.log`); `commitText` is
+in it but passes without `settle`, so it is not gated.
 
 Invalid core or priority values are hard errors, never silent fallbacks to the default.
 

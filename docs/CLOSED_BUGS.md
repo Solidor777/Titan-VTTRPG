@@ -1714,8 +1714,8 @@ The evidence files named here are in `.superpowers/sdd/test-suite-rewrite/phase-
 - **What:** `TitanActorSheet#_onDropFolder` (`src/document/types/actor/sheet/TitanActorSheet.js`) read
   `if (folder && folder.type !== 'Item')`. The condition was inverted, so it turned away every Item folder and handled
   only folders of other types. Dropping an Item folder from the Items sidebar onto an actor sheet created no Item, with
-  no notification and no error (measured on two token sheets in the #102 repro, and on an actor sheet in
-  `gate107-before-fix.log`: the actor held no item after the drop).
+  no notification and no error (measured on an actor sheet in `gate107-before-fix.log`: the actor held no item
+  after the drop; the observation on two token sheets in the #102 repro has no saved log).
 - **Found:** 2026-10-01 during the #102 real-path repro.
 - **Fixed:** 2026-10-02. The condition is `folder.type === 'Item'`; a folder of another type is refused (`false`) with
   no error. The method serves every `TitanActorSheet`, so the token sheet path is the same code (read).
@@ -1750,13 +1750,15 @@ The evidence files named here are in `.superpowers/sdd/test-suite-rewrite/phase-
 - **Fixed:** `_onSortItem` reads `itemData._id`, returns false when there is no source, row or target, and writes
   `_id` on each update; it calls `foundry.utils.performIntegerSort`. Its direction is core's automatic one (read:
   `client/utils/helpers.mjs:277`): before the target when the dropped item's sort is greater, else after it, so a drop
-  on a row of equal sort lands after it (measured: with all three weapons at sort 0, a drop of the third on the first
-  stored sorts 100000, 300000, 200000 for first, second, third).
+  on a row of equal sort lands after it (measured, `measure-127-sorts.log` from `scripts/measure-127-sorts.spec.js`:
+  three fresh weapons A, B, C all at sort 0; after C was dropped on A's row the sorts were A 100000, B 300000, C 200000).
 - **Gate:** `drag.spec.js` "a weapon dragged from its own sheet onto another row sorts it relative to that row": a grip
   drag out and back stores distinct sorts, then the last weapon dropped on the first row sorts before it, and dropped on
   the last row sorts after it. Before the fix (`gate127-before-fix-final-test.log`; `gate127-before-fix.log` is the
   first version of the test): failed with the page error "Cannot read properties of undefined (reading 'id')". After
   (`gate127-after-fix.log`, and `drag-fix-1.log` to `drag-fix-3.log` for the whole file): passed.
+- **Process note:** this entry was written alongside the fix; the OPEN_BUGS entry was not committed before the fix commit
+  (c819dd1b), and history is not rewritten.
 - **Status:** Closed 2026-10-02.
 
 ### 130. `pickPortrait` selected a file before the file picker's browse re-rendered the list, so the pick was lost
@@ -1797,9 +1799,11 @@ The evidence files named here are in `.superpowers/sdd/test-suite-rewrite/phase-
   finished. `titanSelectOptionValues` returned before its list closed. The flows that read the stored document after the
   action (`addCheck`, `addRulesElement`, `enableAspect`, `createOwnedItem`, `placeToken`) already waited for it.
 - **Found:** 2026-10-02 in the Part B review fixes.
-- **Cause of the residual race (measured, `measure-optimistic-length.log`):** the Add buttons change the sheet's local
-  document state at once and send the update afterwards, so a check count read from the document shows the new check
-  0 to 1 ms after the click while 2 operations and renders are pending until 15 to 26 ms later. A flow that typed into
+- **Cause of the residual race (measured, `phase-3/measure-settle.log`, line `OPTIMISTIC`, 8 samples; script
+  `phase-3/scripts/measure-settle.spec.js`):** the Add Check button changes the sheet's local document state at once
+  and sends the update afterwards, so the new check's count showed 0 to 4 ms after the click with 2 operations pending
+  (field `pendingWhenVisible`), and the pending count reached 0 at 17 to 31 ms (field `pendingZeroMs`). The same file's
+  `TRACKER` line shows the counter at 1 during an `Item.update`, 2 after it resolved and 0 after the awaited render. A flow that typed into
   the new row when the count appeared could be undone by the server echo's re-render. The first full run after the
   helper change failed once this way (`e2e-r2-gate-1.log`: `addCheck` stored "Check" for "E2E Bulk Check 2"); the add
   flows now call `settle` after the count shows (commit `ed09de31`).
@@ -1807,8 +1811,14 @@ The evidence files named here are in `.superpowers/sdd/test-suite-rewrite/phase-
   (`clickSheetTab`, `commitText`), and waits for the effect in `selectTitanOption`, `titanSelectOptionValues`,
   `setSelectField`, `setCheckbox`, `clickRoll`, the add flows of `flows.js`, `pickPortrait`, `dragGripToMove` and the API
   setters of the specs.
-- **Gate:** no single test; the evidence is runs after the final change: 2 full runs of 644 passed with census zero
-  (`e2e-r2b-gate-1.log`, `-2.log`), 10 runs of the 44 tests of `armor-trait-situations`, `attack-tags`,
-  `character-sheet-layout`, `condition-description` and `surfaces` (`reverify2-run-1.log` to `-10.log`), and 10 runs of
-  86 tests of the sheet list specs and `drag` (`dist-run-1.log` to `-10.log`, run before the `ed09de31` change).
+- **Gate (2026-10-07):** `tests/e2e/action-helpers.spec.js` asserts that `addAttack`, `commitText` and `addRulesElement` return with no
+  document operation, render or row transition in flight. With `settle` made a no-op, `addAttack` and `addRulesElement` fail
+  (`phase-3/gate131-before-fix-addAttack.log`, `-addRulesElement.log`; 13 animations in flight) and with it they pass
+  (`gate131-after-fix.log`, 3 passed). `commitText` passes without `settle` (`gate131-before-fix-commitText.log`), so
+  it is not gated. Runs of the final code: 2 full runs of 647 passed with census zero (`e2e-r3d-gate-1.log`, `-2.log`; also
+  `e2e-r3c-gate-1.log`, `-2.log` before the `verifySettle` timeout change), 9 runs of 86 tests of the sheet list specs and
+  `drag` (`final2-dist-run-1.log` to `-9.log`; `final-dist-run-1.log` to `-10.log` before that change), and 10 runs of the 44
+  tests of `armor-trait-situations`, `attack-tags`, `character-sheet-layout`, `condition-description` and `surfaces`:
+  9 passed and 1 failed in `verifySettle` at login (`final-reverify-run-1.log`, see OPEN_BUGS note below). The tab clicks of
+  `surfaces.spec.js` go through `clickTabButton`; other inline tab clicks in specs do not.
 - **Status:** Closed 2026-10-02.
