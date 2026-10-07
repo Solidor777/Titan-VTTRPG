@@ -239,8 +239,14 @@ The Phase 4 evidence files named here are in `.superpowers/sdd/test-suite-rewrit
     `releaseTokenControl`, and in never calling `showChatLog`;
   - the flows with `restOnToken` and its two-frame wait (`scratch-hud3-run1.json` to `-run3.json`), then without the
     wait (`hud-flows-nopad-run1.json` to `-run3.json`, spec `hud-flows.spec.js.txt`).
-  A pre-click delay of the probe's kind and `restOnToken` are alike in giving the canvas time before the click, so these
-  runs cannot separate "the drop needs no cure" from "a pre-click delay prevents it".
+  A pre-click delay of the probe's kind and `restOnToken` are alike in giving the canvas time before the click
+  (inferred), so these runs cannot separate "the drop needs no cure" from "a pre-click delay prevents it".
+- **Earlier flow rerun without recording, 2026-10-07 (fix round 3), measured:** the real `applyCondition` and
+  `removeCondition` with the chat-tab activation and the closing-click re-entry removed (the earlier `hoverToken` and
+  closing click; no `page.evaluate` before any click; spec `hud-flows.spec.js.txt`), 3 runs of 240 toggles on the first
+  placed token: 1 failure in 720 (run 1, toggle 94, `stunned` remove: the closing left-click left the HUD open;
+  `hud-flows-prefix-run1.json` to `-run3.json`, logs `hud-flows-prefix-run1.log` to `-run3.log`). The 21 of 240 of
+  `scratch-hud.json` did not recur on this flow. No cause is claimed.
 - **Cause not located.** An unrelated cause of failed Token HUD flows, a chat card over the token, was found and fixed
   (CLOSED_BUGS #134); nothing measured connects it to this symptom.
 - **Found:** 2026-10-02 in the Part B review fixes; the second measurement 2026-10-07.

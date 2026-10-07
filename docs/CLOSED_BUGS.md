@@ -1173,7 +1173,7 @@ when fixed.
   - The walker comments state the reasons, and CLOSED_BUGS #83 states the exception.
   - An Adventure's scene tokens are inline data written through the Adventure, which core writes cleanly whatever the
     base actor (live with a raw-data token, pending real-path re-run), so they are migrated.
-  - No live gate: `tests/unit/StoredActorSources.test.js` were deleted in `d874870b` (no migration tests while no
+  - No live gate: `tests/unit/StoredActorSources.test.js` was deleted in `d874870b` (no migration tests while no
     migration is active).
 
 ### 97. A failed version migration stored part-migrated data under the previous version
@@ -1185,7 +1185,7 @@ when fixed.
 - **Found:** 2026-09-30 by the buddy check of the Task 5 fix round (plan B).
 - **Fixed:** 2026-09-30 — `migrateDocument` copies the update data after each fully completed version
   (`foundry.utils.deepClone`, which keeps an update operator such as `_del` by reference) and writes that copy, so no
-  part of a failed version is stored. No live gate: `tests/unit/MigrateWorld.test.js` were deleted in `d874870b` (no
+  part of a failed version is stored. No live gate: `tests/unit/MigrateWorld.test.js` was deleted in `d874870b` (no
   migration tests while no migration is active).
 
 ### 98. A stored actor whose migration write a hook vetoed counted as skipped
@@ -1195,7 +1195,7 @@ when fixed.
   announced completion, and the next GM load found the same work again.
 - **Found:** 2026-09-30 while planning the fix for #93.
 - **Fixed:** 2026-09-30 — after its writes, each actor's data is checked again (`storedActorNeedsMigration`); an
-  actor with work left counts as failed and is reported. No live gate: `tests/unit/MigrateStoredActors.test.js` were
+  actor with work left counts as failed and is reported. No live gate: `tests/unit/MigrateStoredActors.test.js` was
   deleted in `d874870b` (no migration tests while no migration is active).
 
 ### 99. An Adventure token whose legacy Item overrode its base actor's legacy Item ended up with two converted effects
@@ -1228,7 +1228,7 @@ when fixed.
   with a raw-data token, pending real-path re-run). A legacy `effect` Item of the base actor takes no tombstone: it is
   an invalid document, which core's base collection never holds, and core's client deletion tombstones only an id its
   base collection holds. That case follows core's client deletion and is not measured: the server refuses a legacy Item,
-  so none can be seeded. No live gate: `tests/unit/StoredActorSources.test.js` were deleted in `d874870b` (no migration
+  so none can be seeded. No live gate: `tests/unit/StoredActorSources.test.js` was deleted in `d874870b` (no migration
   tests while no migration is active).
 
 ### 101. An inherited legacy Item a token removed came back as a converted effect
@@ -1874,8 +1874,10 @@ The evidence files named here are in `.superpowers/sdd/test-suite-rewrite/phase-
   item was not traced: the order in which the roll actor and the bridge drop the item was not instrumented.
 - **Fixed:** the three buttons also require `rollActor.data.system.validate<Type>CheckOptions(checkOptions, false)`, as
   the dialogs' rebuild does (commit `9103a659`); a comment states that the roll actor validates the options first.
-- **Gate:** `tests/e2e/check-dialog.spec.js`, "deleting the owned weapon, spell and ability while its dialog is open
-  closes the dialog without a page error": each opens the dialog from the item sheet's roll button and deletes the item
+- **Gate:** `tests/e2e/check-dialog.spec.js`, "deleting the owned weapon while its attack dialog is open closes the
+  dialog without a page error", "deleting the owned spell while its casting dialog is open closes the dialog without a
+  page error" and "deleting the owned ability while its item dialog is open closes the dialog without a page error":
+  each opens the dialog from the item sheet's roll button and deletes the item
   with the Delete button of its row. Measured on the final code with only the three guards removed
   (`gate133-prefix.log`): the weapon, spell and ability tests all failed with the dialog still open and the page error
   named above for each; the effect test, which uses no item button, passed. With the guards in place all passed
@@ -1903,13 +1905,13 @@ The evidence files named here are in `.superpowers/sdd/test-suite-rewrite/phase-
   interaction manager handles a pointer-down only from its HOVER state on (read: `#handleLeftDown` and
   `#handleRightDown`, `client/canvas/interaction/mouse-handler.mjs:474-475` and `565-566`, Foundry 14.364 at
   `C:\FoundryVTT\V14\dev\foundry`). An earlier `restOnToken` also waited two animation frames; that wait is removed,
-  because it waited on nothing observable and could hide OPEN_BUGS #129. Whether `restOnToken` is needed is not
-  measured: the only saved run of the unchanged earlier flow is `scratch-hud.json` (21 of 240 toggles failed), and the
-  flows with it failed 0 of 720 toggles in three runs without the wait (`hud-flows-nopad-run1.json` to `-run3.json`,
+  because (inferred) it waited on nothing observable and could hide OPEN_BUGS #129. Whether `restOnToken` is needed is
+  not measured: the only saved run of the unchanged earlier flow is `scratch-hud.json` (21 of 240 toggles failed), and
+  the flows with it failed 0 of 720 toggles in three runs without the wait (`hud-flows-nopad-run1.json` to `-run3.json`,
   spec `hud-flows.spec.js.txt`).
 - **Gate:** `logic/conditions.spec.js` failed at the same test in `e2e-full-2.log` and `e2e-full-3.log` before the
   change and passed in the full runs after it (`e2e-full-4.log`, `e2e-full-5.log`, `e2e-full-6.log`, `e2e-full-7.log`,
-  and the final run of fix round 2).
+  and `e2e-full-8.log`).
 - **Not closed here:** an earlier run failed with no `#token-hud` after a right-click (`e2e-full-1.log`, test 453), and
   a loop of 240 toggles failed 21 times for the same symptom (`scratch-hud.json`). That symptom has no located cause
   and is tracked in OPEN_BUGS #129.
