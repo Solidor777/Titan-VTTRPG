@@ -1,18 +1,26 @@
 import { expect, test } from '../harness.js';
 import { clickSheetTab } from '../actions.js';
 import { clickRoll, readNewestCheckFlags } from '../checkDialog.js';
+import { forceDice, resetDice } from '../dice.js';
 import { login, openSheetByUuid } from '../fixtures.js';
 import {
+   addCombatant,
    addRulesElement,
    applyCondition,
    createActor,
+   controlPlacedToken,
+   createCombat,
    createOwnedItem,
+   endCombat,
+   nextTurn,
    placeToken,
    removeCondition,
+   rollInitiative,
    setAttributeBase,
    setDescription,
    setSkillTraining,
    shared,
+   startCombat,
    viewScene,
 } from '../flows.js';
 import { setClientSetting, setWorldSetting } from '../settings.js';
@@ -525,6 +533,23 @@ test.describe('conditions — the Player HUD', () => {
          await applyCondition(page, tokenId, 'blinded');
          applied.push('blinded');
 
+         // Turn-start reports come from the combat's turns: the conditions actor and an NPC are the combatants, and
+         // each Next Turn press moves between the two.
+         await createCombat(page);
+         await addCombatant(page, tokenId);
+         await addCombatant(page, await placeToken(page, await shared(page, 'npc')));
+         await forceDice(page, [
+            1,
+            1,
+            6,
+            6,
+         ]);
+         await rollInitiative(page);
+         await resetDice(page);
+         await startCombat(page);
+
+         // The Player HUD of the conditions actor's controlled token lists the condition; its row shows the definition.
+         await controlPlacedToken(page, tokenId);
          /** @type {import('@playwright/test').Locator} The Blinded row of the Player HUD. */
          const row = page.locator('[data-testid="player-hud-effect-row"]', { hasText: blinded.name });
          await row.click();
@@ -534,18 +559,27 @@ test.describe('conditions — the Player HUD', () => {
          await expect(detail).toContainText(blinded.text);
 
          /**
-          * Posts a turn-start report and reads the tooltip of its Blinded tag.
+          * Presses Next Turn until the conditions actor's turn starts, and reads the tooltip of the Blinded tag of the
+          * turn-start report it posts.
           * @returns {Promise<string>} The tooltip's HTML.
           */
          const readReportTooltip = async () => {
-            /** @type {string} The turn-start report's chat-message id. */
-            const reportId = await page.evaluate(async (id) => {
-               /** @type {number} The chat-message count before the turn start. */
-               const before = game.messages.size;
-               await game.actors.get(id).system.onTurnStart();
-               await titanWait(() => game.messages.size > before, { message: 'turn-start report posted' });
-               return game.messages.contents.at(-1).id;
-            }, actorId);
+            /** @type {number} The chat-message count before the turns. */
+            const before = await page.evaluate(() => game.messages.size);
+            do {
+               await nextTurn(page);
+            } while (!await page.evaluate((id) => game.combat.combatant.actorId === id, actorId));
+
+            /** @type {string|undefined} The turn-start report's chat-message id. */
+            let reportId;
+            await expect.poll(async () => {
+               reportId = await page.evaluate(
+                  (before) => game.messages.contents.slice(before).find((message) => message.type === 'turnStartReport')
+                     ?.id,
+                  before,
+               );
+               return reportId;
+            }, { message: 'the turn start posted a turn-start report' }).toBeTruthy();
 
             /** @type {import('@playwright/test').Locator} The report card's Blinded tag. */
             const tag = page.locator(`#chat .message[data-message-id="${reportId}"] .report .effects .tag`).first();
@@ -588,5 +622,6 @@ test.describe('conditions — the Player HUD', () => {
          const edited = await readReportTooltip();
          expect(edited, 'the edited report shows the edit').toContain(EDITED_DESCRIPTION);
          expect(edited, 'the edited report no longer shows the definition').not.toContain(DEFINITION_PHRASE);
+         await endCombat(page);
       });
 });

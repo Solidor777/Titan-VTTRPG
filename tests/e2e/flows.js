@@ -926,9 +926,12 @@ export async function dragItemOntoSheet(page, itemId, actorId) {
  * @param {string} name - The name to give the effect.
  * @param {object} [options] - Optional settings.
  * @param {string} [options.duration] - The duration type to choose in the header (`permanent`, `turnStart`, ...).
+ * @param {number} [options.remaining] - The value to type into the header's Remaining input.
+ * @param {number} [options.initiative] - The value to type into the header's initiative input of an `initiative`
+ * duration.
  * @returns {Promise<string>} The effect's id.
  */
-export async function addEffect(page, actorId, name, { duration } = {}) {
+export async function addEffect(page, actorId, name, { duration, remaining, initiative } = {}) {
    /** @type {import('@playwright/test').Locator} The actor's sheet. */
    const sheet = await openSheetByUuid(page, `Actor.${actorId}`);
 
@@ -995,6 +998,38 @@ export async function addEffect(page, actorId, name, { duration } = {}) {
          ),
          { message: 'the duration select changed the duration type' },
       ).toBe(duration);
+   }
+
+   /**
+    * Types a number into a header input of the effect sheet and waits until the effect stores it.
+    * @param {import('@playwright/test').Locator} input - The header's number input.
+    * @param {number} value - The value to type.
+    * @param {string} field - The `system.duration` field the input writes.
+    * @returns {Promise<void>} Resolves once the effect stores the value.
+    */
+   const typeDuration = async (input, value, field) => {
+      await commitText(input, String(value));
+      await expect.poll(
+         () => page.evaluate(
+            ({ actorId, id, field }) => game.actors.get(actorId).effects.get(id).system.duration[field],
+            {
+               actorId,
+               id,
+               field,
+            },
+         ),
+         { message: `the header input stored the duration ${field}` },
+      ).toBe(value);
+   };
+   if (initiative !== undefined) {
+      await typeDuration(effectSheet.locator('.stat:not(:has(.label)) input'), initiative, 'initiative');
+   }
+   if (remaining !== undefined) {
+      await typeDuration(
+         effectSheet.locator('.stat', { hasText: 'Remaining' }).locator('input'),
+         remaining,
+         'remaining',
+      );
    }
    await closeWindow(effectSheet);
    return id;
@@ -1247,6 +1282,12 @@ export async function addRulesElement(page, documentUuid, element) {
          }
       }
    }
+   else if (element.operation === 'fastHealing' || element.operation === 'persistentDamage') {
+      // The turn the element fires on is the settings' selector (Persistent Damage repeats the operation select first).
+      if (element.selector !== undefined) {
+         await fill(element.operation === 'persistentDamage' ? 1 : 0, 'selector', element.selector);
+      }
+   }
    else {
       // A flat modifier, Multiply Base, Multiply Sum or Set Sum: the selector, the key, and the select after the value.
       for (const [position, field] of [
@@ -1495,6 +1536,37 @@ export async function setAttributeBase(page, actorUuid, attribute, value) {
          },
       ),
       { message: `the sheet input stored the ${attribute} base value` },
+   ).toBe(value);
+   await settle(page);
+}
+
+/**
+ * Types a Resource's current value into the meter row of the actor sheet's sidebar.
+ * @param {import('@playwright/test').Page} page - A logged-in page.
+ * @param {string} actorUuid - The uuid of the character.
+ * @param {string} resource - The Resource (`stamina`, `resolve`, ...).
+ * @param {number} value - The current value to type.
+ * @returns {Promise<void>} Resolves once the actor stores the value.
+ */
+export async function setResource(page, actorUuid, resource, value) {
+   /** @type {import('@playwright/test').Locator} The actor's sheet. */
+   const sheet = await openSheetByUuid(page, actorUuid);
+
+   // The Resource's container holds a label row and a meter row; the meter row's first input is the current value.
+   /** @type {import('@playwright/test').Locator} The Resource's current value input. */
+   const input = sheet.locator(`.middle.${resource}`)
+      .locator('xpath=ancestor::div[contains(@class, "container")][1]')
+      .locator('.row').nth(1).locator('.side input').first();
+   await commitText(input, String(value));
+   await expect.poll(
+      () => page.evaluate(
+         async ({ uuid, resource }) => (await fromUuid(uuid)).system.resource[resource].value,
+         {
+            uuid: actorUuid,
+            resource,
+         },
+      ),
+      { message: `the sheet input stored the ${resource} value` },
    ).toBe(value);
    await settle(page);
 }
@@ -1914,6 +1986,63 @@ export async function endCombat(page) {
       { message: 'the End Combat button deleted the combat' },
    ).toBe(false);
    await settle(page);
+}
+
+/**
+ * Rolls initiative for every combatant of the active combat that has none, with the Combat Tracker's Roll All button.
+ * The caller forces the dice (`forceDice`) to choose the turn order: the combatants roll in the order they joined.
+ * @param {import('@playwright/test').Page} page - A logged-in GM page.
+ * @returns {Promise<void>} Resolves once every combatant of the active combat has an initiative.
+ */
+export async function rollInitiative(page) {
+   await clickCombatControl(page, 'rollAll');
+   await expect.poll(
+      () => page.evaluate(() => game.combat.combatants.every((combatant) => combatant.initiative !== null)),
+      { message: 'the Roll All button gave every combatant an initiative' },
+   ).toBe(true);
+   await settle(page);
+}
+
+/**
+ * Presses one of the Combat Tracker's turn buttons and waits for the combat to move.
+ * @param {import('@playwright/test').Page} page - A logged-in GM page.
+ * @param {'nextTurn'|'previousTurn'} action - The button's `data-action`.
+ * @returns {Promise<void>} Resolves once the combat's round or turn differs from before the click.
+ */
+async function stepCombat(page, action) {
+   /** @type {{round: number, turn: number}} The position before the click. */
+   const before = await page.evaluate(() => ({
+      round: game.combat.round,
+      turn: game.combat.turn,
+   }));
+   await clickCombatControl(page, action);
+   await expect.poll(
+      () => page.evaluate(
+         ({ round, turn }) => game.combat.round !== round || game.combat.turn !== turn,
+         before,
+      ),
+      { message: `the ${action} button moved the combat` },
+   ).toBe(true);
+   await settle(page);
+}
+
+/**
+ * Advances the active combat to the next turn with the Combat Tracker's Next Turn button. The start-of-turn updates and
+ * reports run after the turn changes; the caller waits for the effect it asserts.
+ * @param {import('@playwright/test').Page} page - A logged-in GM page.
+ * @returns {Promise<void>} Resolves once the combat's turn has changed.
+ */
+export async function nextTurn(page) {
+   await stepCombat(page, 'nextTurn');
+}
+
+/**
+ * Returns the active combat to the previous turn with the Combat Tracker's Previous Turn button.
+ * @param {import('@playwright/test').Page} page - A logged-in GM page.
+ * @returns {Promise<void>} Resolves once the combat's turn has changed.
+ */
+export async function previousTurn(page) {
+   await stepCombat(page, 'previousTurn');
 }
 
 /**

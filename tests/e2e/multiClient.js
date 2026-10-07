@@ -1,6 +1,5 @@
 import { login } from './fixtures.js';
 import { flushPageErrors } from './harness.js';
-import { seedCombatEncounter, startCombatEncounter, viewCombat } from '../shared/combat.js';
 
 /**
  * Runs a callback with several simultaneous, independent Foundry clients.
@@ -58,26 +57,4 @@ export async function awaitUsersActive(page, userNames) {
       userNames,
       { timeout: 1000 },
    );
-}
-
-/**
- * Seeds an encounter on the GM's client, makes every other client's combat tracker view it, then starts it. Core's
- * `CombatTracker#_onRender` throws on each round or turn update of a combat the tracker is not viewing, so a client
- * that only views the combat after it starts reports an error for the start's own updates.
- * @param {import('@playwright/test').Page} gm - The client that seeds and runs the encounter.
- * @param {import('@playwright/test').Page[]} viewers - The other clients that stay connected while it advances.
- * @param {object} seed - The `seedCombatEncounter` options.
- * @returns {Promise<object>} The ids `seedCombatEncounter` returned.
- */
-export async function seedEncounterForClients(gm, viewers, seed) {
-   /** @type {object} The ids of the seeded documents. */
-   const ids = await gm.evaluate(seedCombatEncounter, {
-      ...seed,
-      start: false,
-   });
-   for (const viewer of viewers) {
-      await viewer.evaluate(viewCombat, ids.combatId);
-   }
-   await gm.evaluate(startCombatEncounter, ids.combatId);
-   return ids;
 }
