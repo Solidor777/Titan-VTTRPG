@@ -2,14 +2,13 @@ import { expect } from '@playwright/test';
 import { settle } from './settle.js';
 
 // Action helpers shared by the flows and the specs. Each returns only after the observable effect of its own action:
-// the control shows the new state, and the document operations, renders and (for an action that changes what the
-// window shows) window transitions the action started have finished (`settle.js`). A caller therefore never has to
-// wait before its next action.
+// the control shows the new state, and the document operations and renders the action started have finished (and,
+// for a drag that moves a row, the window transitions: `settle.js`). A caller therefore never has to wait before its
+// next action.
 
 /**
- * Clicks a tab in a sheet's tab strip and waits until the tab is the active one and the operations, renders and
- * transitions the click started have finished (the tab's content slides in after the click's render). Scoped to the
- * given sheet so another open sheet's tab strip is never clicked.
+ * Clicks a tab in a sheet's tab strip and waits until the tab is the active one and the operations the click started
+ * have finished. Scoped to the given sheet so another open sheet's tab strip is never clicked.
  * @param {import('@playwright/test').Locator} sheet - The sheet's window element.
  * @param {string} label - The tab's visible label.
  * @returns {Promise<void>} Resolves once the tab is active.
@@ -20,12 +19,12 @@ export async function clickSheetTab(sheet, label) {
       sheet.locator('.tab-list .button.active').getByText(label, { exact: true }).first(),
       `the ${label} tab is active`,
    ).toBeVisible();
-   await settle(sheet.page(), { transitions: true });
+   await settle(sheet.page());
 }
 
 /**
- * Clicks a tab button of a sheet's tab strip and waits until its tab is the active one and the operations, renders and
- * transitions the click started have finished.
+ * Clicks a tab button of a sheet's tab strip and waits until its tab is the active one and the operations the click
+ * started have finished.
  * @param {import('@playwright/test').Locator} button - The tab's button inside `.tab-list`.
  * @returns {Promise<void>} Resolves once the tab is active.
  */
@@ -37,7 +36,7 @@ export async function clickTabButton(button) {
       button.locator('xpath=ancestor::div[contains(concat(" ", normalize-space(@class), " "), " button ")][1]'),
       'the tab is active',
    ).toHaveClass(/(^|\s)active(\s|$)/);
-   await settle(button.page(), { transitions: true });
+   await settle(button.page());
 }
 
 /**

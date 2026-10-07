@@ -16,14 +16,16 @@ import { setWorldSetting } from './settings.js';
 import { attachPageErrors, closeAllApps } from './world.js';
 
 /**
- * The contract of the action helpers: each returns only after the document operations, renders and (for the helpers
- * that add or move a row, switch a tab or change a choice) window transitions its action started have finished
- * (`settle.js`), so the caller's next action cannot land before the re-render of the previous one (CLOSED_BUGS #131).
- * Each test makes the documents it needs through the real flows (the suite's registry deletes them), brings the page
- * to rest, runs one helper and reads what is in flight in a single `evaluate` the moment the helper returns, with no
- * wait in between. The tests of `selectTitanOption`, `clickRoll`, `dragGrip` and `commitText` read the helper's
- * stored effect in the same `evaluate`. A last test types into two fields of a new row back to back and reads both
- * stored values (the shape of #122 and #128).
+ * The contract of the action helpers: each returns only after the document operations and renders its action started
+ * have finished and, for the helpers that add or move a row the caller then edits, after the window transitions have
+ * ended (`settle.js`), so the caller's next action cannot land before the re-render of the previous one (CLOSED_BUGS
+ * #131). Each test makes the documents it needs through the real flows (the suite's registry deletes them), brings the
+ * page to rest, runs one helper and reads what is in flight in a single `evaluate` the moment the helper returns, with
+ * no wait in between. The row helpers read the tracked operations and the transitions; the tab and select helpers read
+ * the tracked operations only, because the content they reveal slides in after they return and the helpers do not
+ * wait for it. The tests of `selectTitanOption`, `clickRoll`, `dragGrip` and `commitText` read the helper's stored
+ * effect in the same `evaluate`. A last test types into two fields of a new row back to back and reads both stored
+ * values (the shape of #122 and #128).
  */
 
 /** @type {import('@playwright/test').Page} The file-shared, logged-in page (one world boot per file). */
@@ -112,6 +114,14 @@ function readInFlight() {
    }));
 }
 
+/**
+ * Reads the tracked document operations and renders in flight in the page right now, in one `evaluate`.
+ * @returns {Promise<number>} The number of tracked operations and renders in flight.
+ */
+function readPending() {
+   return page.evaluate(() => globalThis.titanPending);
+}
+
 test.describe('an action helper returns with nothing in flight', () => {
    test('addAttack', async () => {
       const { uuid } = await makeItem('weapon', 'E2E Action Helpers Weapon addAttack');
@@ -150,7 +160,7 @@ test.describe('an action helper returns with nothing in flight', () => {
       const sheet = await openSheetByUuid(page, uuid);
       await rest();
       await clickSheetTab(sheet, 'Rules Elements');
-      expect(await readInFlight()).toEqual(IDLE);
+      expect(await readPending()).toBe(0);
       expect(errors, `uncaught errors:\n${errors.join('\n')}`).toEqual([]);
    });
 
@@ -159,7 +169,7 @@ test.describe('an action helper returns with nothing in flight', () => {
       const sheet = await openSheetByUuid(page, uuid);
       await rest();
       await clickTabButton(sheet.locator('.tab-list button').filter({ hasText: 'Rules Elements' }));
-      expect(await readInFlight()).toEqual(IDLE);
+      expect(await readPending()).toBe(0);
       expect(errors, `uncaught errors:\n${errors.join('\n')}`).toEqual([]);
    });
 
@@ -174,15 +184,14 @@ test.describe('an action helper returns with nothing in flight', () => {
          'conditionalCheckModifier',
       );
 
-      /** @type {{operation: string, pending: number, animations: number}} The operation and what is in flight. */
+      /** @type {{operation: string, pending: number}} The stored operation and the operations in flight. */
       const read = await page.evaluate((id) => ({
          operation: game.items.get(id).system.rulesElement[0].operation,
          pending: globalThis.titanPending,
-         animations: globalThis.titanWindowTransitions(),
       }), id);
       expect(read).toEqual({
          operation: 'conditionalCheckModifier',
-         ...IDLE,
+         pending: 0,
       });
       expect(errors, `uncaught errors:\n${errors.join('\n')}`).toEqual([]);
    });
