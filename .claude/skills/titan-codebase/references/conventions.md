@@ -1007,7 +1007,11 @@ opens it; core's right-click toggles the HUD, so a second right-click does not c
 the token through `restOnToken` before each click (it moves in from outside the token and waits for the token's `hover`,
 because a token's interaction manager handles a pointer-down only from its HOVER state on, read at
 `client/canvas/interaction/mouse-handler.mjs:474-475` and `565-566` of Foundry 14.364; whether it is needed is not
-measured, see CLOSED_BUGS #134); `hoverToken` first makes the chat
+measured, see CLOSED_BUGS #134); it then waits until `DOUBLE_CLICK_TIME_MS` (250 ms) has passed since the later of
+the interaction manager's `lcTime` and `rcTime`, because a press within 250 ms and 5 px of the previous press on
+the token is a double click, which opens the token's sheet and does not control it (read at
+`client/canvas/interaction/mouse-handler.mjs:480-497`; 5 failures in each of three 18-loop runs before the wait and
+0 in 60 loops after it, CLOSED_BUGS #137); `hoverToken` first makes the chat
 tab the active sidebar tab, because a chat message posted while another tab is active shows as a card over the canvas
 for 5 s and takes the pointer from a token under it (CLOSED_BUGS #134). A right-click that opened no HUD has been seen
 without a located cause (OPEN_BUGS #129). Further flows are `createWorldItem`, `createFolder` (the directory's Create
@@ -1035,12 +1039,14 @@ not visible takes no pointer events), `toggleTokenLink`, `unlinkPlacedToken` and
 sheet header buttons; the token flows close the open windows, release control, move the pointer onto the
 token and wait for `token.object.hover` before the double-click that opens the sheet (`unlinkPlacedToken`,
 which then waits for the reopened synthetic actor's sheet) or the click that takes control
-(`controlPlacedToken`)), `targetPlacedToken` / `releaseTargets` / `targetedTokenIds` (core's Target key T on
+(`controlPlacedToken`)), `controlPlacedTokens` (drags a selection rectangle over the given tokens and asserts that
+exactly those are controlled: while one token is controlled a second is not visible to the pointer, so Shift-click
+cannot add it), `targetPlacedToken` / `releaseTargets` / `targetedTokenIds` (core's Target key T on
 the hovered token, Shift+T adds; `game.user.targets` then holds real Token objects, as
 `check-math.spec.js` uses), `createCompendium` / `setCompendiumLocked` (Compendium tab Create dialog, entry
 context menu Lock/Unlock), `putInPack` (opens the pack's popout window and drags the world entry onto its
 `.directory-list`; the pack index is polled for the new id; the caller passes the world entry's locator, and the flow
-reopens that entry's sidebar tab before the drag). The creation dialogs are `DialogV2` forms whose content
+reopens that entry's sidebar tab before the drag). `setDescription` (types into the rich text editor of an item's or effect's sheet and saves with the editor's save button), `setOwnership` (the Configure Ownership window of an actor's directory entry), `createCombat` (the Combat Tracker's create button; waits until the combat is `game.combat`), `addCombatant` (the Token HUD's combat button), `startCombat` / `endCombat` (the Combat Tracker's Begin and End buttons; `endCombat` also confirms the dialog), `setSkillDefaultAttribute` (the select of a skill row), `setEquipped` (the Equipped toggle of an Inventory row, clicked only when the state differs) and `deleteAttack` (the delete button of an attack row in the weapon sheet). The creation dialogs are `DialogV2` forms whose content
 lacks the template's `form#document-create` id, so the flows find them by `dialog.application.dialog` with the
 `.dialog-content` fields. A flow opens the sheet it drives with `openSheetByUuid` and clicks its tabs inside that sheet
 (`openTab`), so another open TITAN sheet's tab strip is never clicked; the Standard Aspects tab and the sidebar both
@@ -1148,7 +1154,7 @@ The exemptions wait on a process starting and are not polls on a loaded page:
   it, as does a second browser context's login in `multiClient.js`);
 - a mid-file reload through `world.js` `reloadWorld(page, { ready })` (15 s for the `/game` URL, 60 s for the
   readiness predicate, `game.ready` by default), used by the last test of `condition-description.spec.js`, the reload
-  test of `player-hud-layout.spec.js` and both portrait tests of `surfaces.spec.js`;
+  test of `player-hud.spec.js` and both portrait tests of `surfaces.spec.js`;
 - the one real-hover test (`html-sanitization.spec.js`, "a report tag tooltip holds the cleaned HTML ..."): a hover shows a
   tooltip after `TOOLTIP_DELAY[0]` (1000 ms) and animates it for `TOOLTIP_DURATION[0]` (400 ms), both set in
   `src/helpers/svelte-actions/TooltipAction.js` and passed to tippy as `delay` and `duration`; its wait is 2500 ms. The
@@ -1195,8 +1201,9 @@ HUD included, which makes row clicks retry until the test times out with no visi
 
 **`createEmbeddedDocuments` return order is NOT input order.** Never map the returned array by index
 to your payloads — resolve created ids by NAME afterward (`actor.items.getName(payload.name)?.id`),
-as the player-hud specs' `seedDocuments` helpers do. Index-mapping produced wrong-id assertions that
-only failed in multi-payload creates.
+as the older spec helpers that created several documents in one call did. Index-mapping produced wrong-id
+assertions that only failed in multi-payload creates. The HUD specs create their documents through the flows, which
+record each id.
 
 **One-shot `boundingBox()` snapshots race layout settling.** `boundingBox()` and in-page
 `getBoundingClientRect()` are non-retrying reads, and `toBeVisible()` resolves at the START of a reveal
@@ -1209,7 +1216,7 @@ mechanisms, in preference order:
    follows a reveal, drag, edit-mode toggle, or sidebar expand — `#titan-player-hud` is the HUD root.
 2. **Retry (when the settle has no event, e.g. a ResizeObserver re-flow after a setting write):**
    `expect.poll` re-reading the boxes each attempt — see `expectBoxes` in
-   `player-hud-action-menu-layout.spec.js`.
+   `player-hud-action-menu.spec.js`.
 
 **Chat cards render TWICE — always target `#chat`.** Every TITAN card mounts in the persistent `#chat`
 log AND as a transient toast in `#chat-notifications`. They are siblings under `#ui-right` and the
@@ -1230,6 +1237,9 @@ mounted card: `expect(page.locator('#chat .message[data-message-id="…"] .check
 This class of race stays latent while rendering is slow enough to mask it: under the SwiftShader software
 rasterizer the Playwright round-trip outlasted the transition, and enabling GPU rendering exposed it.
 
+Releasing control presses Escape once, or twice when an action-menu cascade is open, because the cascade consumes
+the first Escape (`releaseTokenControl`).
+
 **Foundry core Escape releases token control.** Any canvas-overlay UI that closes on Escape must
 consume the event in the WINDOW CAPTURE phase (`onkeydowncapture` + `stopImmediatePropagation`),
 or core deselects the token and selection-driven UI unmounts mid-interaction (the player HUD's
@@ -1239,13 +1249,13 @@ cascade and effect popout both do this).
 layout state and `afterEach` only closes apps, so a cascade left open by one test survives into the
 next. A test that clicks the SAME category the previous test left open TOGGLES it closed; dismiss any
 open flyout first (`Escape` when `player-hud-flyout` is present), as the `openCategory` helper in
-`player-hud-action-menu-layout.spec.js` does.
+`player-hud-action-menu.spec.js` does.
 
 **Mid-file `page.reload()` idiom.** Steps (3)-(5) below are `tests/e2e/world.js` `reloadWorld(page, { ready })`,
 where `ready` is the in-page predicate of step (5) (`game.ready` by default); a spec never repeats them inline.
 `expectActiveGM(page)` (also in `world.js`) asserts `game.users.activeGM?.isSelf`, because only the active GM migrates
 and core's `getDesignatedUser` makes the active GM with the highest role that GM. The last test of
-`condition-description.spec.js`, the reload test of `player-hud-layout.spec.js` and the portrait tests of
+`condition-description.spec.js`, the reload test of `player-hud.spec.js` and the portrait tests of
 `surfaces.spec.js` call `reloadWorld(page)` with the default predicate. A spec navigates only through
 `reloadWorld` and `joinWorld` (the one `.reload(` in `world.js`
 and the one `.goto(` in `fixtures.js`), never an inline `page.reload(`, `location` change or `goto(`; no test scans for

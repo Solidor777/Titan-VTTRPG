@@ -269,6 +269,7 @@ when fixed.
 - **Found:** 2026-06-11 in the full-suite verification on the `item-sheet-roll-checks` branch.
 - **Fixed:** 2026-06-11 — expectation updated to `portraitDx: 250` to match the current default;
   `player-hud-layout.spec.js` passes 10/10.
+- **Gate (2026-10-07):** `tests/e2e/player-hud.spec.js`, "the settings app reset-all restores options and layout".
 
 ### 22. Player-HUD effect row header clipped its text out the bottom
 
@@ -391,6 +392,8 @@ when fixed.
 - **Gate now:** the effect-row clicks of `tests/e2e/character-sheet-rows.spec.js` and, for the Effect HUD, the HUD
   tests still in `embedded-context-check-parity.spec.js` and `embedded-context-effects.spec.js`; the viewport is
   `use.viewport` of `playwright.config.mjs`.
+  (Both specs are merged into `tests/e2e/player-hud.spec.js`; its effects-panel tests click the effect rows at the
+  configured viewport.)
 - **Fix:** `use.viewport` set to 1920x1080 — above Foundry's minimum, so the warning never fires.
   Full suite 497/497 after the change.
 
@@ -412,6 +415,9 @@ when fixed.
 - **Fix:** the row specs use the `player-hud-effect-row` testid; `theme.spec.js` resolves both
   expected backgrounds from the theme registry via `getSchemeTheme()` and additionally asserts the
   resolved theme ids differ, so a future palette change cannot silently stale it again.
+- **Gate (2026-10-07):** `tests/e2e/player-hud.spec.js` effects-panel tests (the `player-hud-effect-row` testid) and
+  `tests/e2e/theme.spec.js` "auto follows the Foundry core color scheme" (both expected backgrounds from
+  `getSchemeTheme()`).
 
 ### 34. Chat resource-mod tag gradients referenced an undefined named palette
 
@@ -686,6 +692,7 @@ when fixed.
 - **Fixed:** 2026-09-26 — `content-link-background` and `content-link-border-color` theme tokens (panel-2 pair per
   theme); saved custom themes are completed with later contract tokens. Gated by a WCAG AA unit test and
   `content-link-theme.spec.js`.
+- **Gate (2026-10-07):** `tests/e2e/theme.spec.js`, the `content links` tests, one per built-in theme.
 
 ### 55. Skill rows clipped and misaligned
 
@@ -722,6 +729,9 @@ when fixed.
   icons.
 - **Fixed:** 2026-09-26 — `pressed` prop on `HudButton`/`IconButton`; skills show the primary actor's current default
   attribute icon. Gated by `BuildActionMenuModel.test.js` and `player-hud-action-menu.spec.js`.
+- **Gate (2026-10-07):** `tests/e2e/player-hud-action-menu.spec.js`, "skill sub-options show the icon of the actor's
+  current default attribute", "resistance and utility sub-options carry icons" and "inspiration toggles show whether
+  inspiration applies".
 
 ### 60. Compendium: legacy rules elements, Mystwalker icon, Healer's Kit
 
@@ -1981,4 +1991,42 @@ The evidence files named here are in `.superpowers/sdd/test-suite-rewrite/bug-11
   holds it (`gate-absence-half-can-fail.log`). On the final code it passed, and the full e2e passed 645 of
   645 with census zero (`e2e-full-1.log`). Unit: `tests/unit/ConditionReportData.test.js` covers the edited and blank
   descriptions (1513 of 1513, `unit.log`).
+- **Status:** Closed 2026-10-07.
+
+### 137. The test flow that takes control of a token read a second press on the same token as a double click
+
+- **What:** `controlPlacedToken` failed about 1 time in 4 when it pressed a token that the previous call had already
+  pressed less than 250 ms earlier: core reads two presses within `MouseInteractionManager.DOUBLE_CLICK_TIME_MS`
+  (250 ms) and 5 px as a double click, which opens the token's actor sheet and does not control the token.
+- **Read in core:** `client/canvas/interaction/mouse-handler.mjs` (press handling around lines 480-497 and 905-913);
+  `manager.lcTime` and `manager.rcTime` are public fields.
+- **Measured before the fix:** an event log of the failing presses showed the pointerup landing on a sheet DIV or
+  BUTTON and not on the canvas. 5 failures in each of three runs of 18 control-the-token loops
+  (`.superpowers/sdd/test-suite-rewrite/phase-5/scratch-ctl-2.log`, `scratch-ctl-3.log`, `scratch-ctl-4.log`).
+- **Fixed:** 2026-10-07. `restOnToken` (`tests/e2e/flows.js`) waits until `performance.now()` minus the later of
+  `lcTime` and `rcTime` exceeds `DOUBLE_CLICK_TIME_MS` before the caller presses.
+- **Gate:** the same loop after the fix: 0 failures in 60 loops, slowest 181 ms (`scratch-ctl-5.log`). The loop is a
+  scratch spec kept in the evidence directory and not in `tests/`; the player-hud and player-hud-action-menu specs
+  press a token in nearly every test.
+- **Relation to OPEN_BUGS #129:** not established. #129 (a right-click that opens no Token HUD) has a different
+  symptom; the fix here was not measured against it. #129 stays open.
+- **Status:** Closed 2026-10-07.
+
+### 138. Escape did not release token control after the action menu's open category left the menu
+
+- **What:** `ActionMenuElement` consumes the Escape key (closes the cascade and stops core from releasing control)
+  whenever `layoutState.openCategory` holds a key. After the open category leaves the model (inferred: the Effects
+  category disappears with its last entry), the stored key still names it, no cascade is shown
+  and the first Escape does nothing visible.
+- **Read:** `src/ui/player-hud/elements/action-menu/ActionMenuElement.svelte`, `onWindowKeyDown` read
+  `layoutState.openCategory` while the shown cascade is the derived `openCategory`, which is null when the model no
+  longer lists the key.
+- **Measured before the fix:** after the spec test that removes an effect through the Effects sub-button, pressing
+  Escape left the token controlled (`phase-5/menu-2.log`, "options > the weapons filter hides action-less weapons
+  until disabled": the Escape key released the controlled tokens, expected 0, received 1).
+- **Fixed:** 2026-10-07. The handler tests the derived `openCategory`.
+- **Gate:** `tests/e2e/player-hud-action-menu.spec.js` "effect duration and remove sub-buttons update and delete the
+  effect" followed by "the weapons filter hides action-less weapons until disabled", whose `control` call releases
+  control with Escape; it passed after the fix and a rebuild (`phase-5/menu-3.log`, `menu-4.log`). The flow
+  `releaseTokenControl` also closes an open cascade first when one is shown.
 - **Status:** Closed 2026-10-07.
