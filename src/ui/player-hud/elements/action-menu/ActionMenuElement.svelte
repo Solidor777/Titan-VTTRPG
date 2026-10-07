@@ -203,12 +203,13 @@
 
    /**
     * Closes the cascade on Escape, consuming the event so Foundry's core Escape handling (which
-    * releases token control and would unmount the whole HUD) only fires when no cascade is open.
+    * releases token control and would unmount the whole HUD) only fires when no cascade is shown. The stored
+    * category key can name a category the model no longer lists, which shows no cascade and must not consume Escape.
     * @param {KeyboardEvent} event - The window-level keyboard event (capture phase).
     * @returns {void}
     */
    function onWindowKeyDown(event) {
-      if (event.key === 'Escape' && layoutState.openCategory) {
+      if (event.key === 'Escape' && openCategory) {
          layoutState.openCategory = null;
          event.preventDefault();
          event.stopImmediatePropagation();
