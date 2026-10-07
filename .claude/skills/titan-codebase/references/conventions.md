@@ -826,7 +826,8 @@ the die click, reset and scaling-aspect controls of a card; Advantage and Automa
 `check-dialog.spec.js` (each check type's dialog opened from the sheet's roll button: totals recomputed as the fields
 change, the Advantage, Automatic Failure, situation and derived fields following effects added and deleted and items
 edited in the sheets while the dialog is open, a user-set field kept, the dialog closing when its item or effect is
-deleted, the `getCheckOptions` setting, Heavy, Encumbering and Loud armor, a condition's situation),
+deleted (the tests read the "no longer valid" notices, assert no "failed before construction" notice and dismiss the
+notices, which would otherwise cover the next create dialog), the `getCheckOptions` setting, Heavy, Encumbering and Loud armor, a condition's situation),
 `logic/rules-elements.spec.js` (rules elements added in the Rules Elements tab, read from the sheet's derived Body
 value, the check dialogs and the posted check parameters) and `logic/conditions.spec.js` (conditions applied from the
 Token HUD, read from derived stats, the sheet's tooltip, rolled checks and the Player HUD). `tests/e2e/harness.js` provides `test`, `expect` and

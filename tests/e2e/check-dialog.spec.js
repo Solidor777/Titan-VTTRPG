@@ -200,6 +200,26 @@ async function deleteItem(actorUuid, tab, itemUuid) {
 }
 
 /**
+ * Reads the "no longer valid" notices a check dialog raises when it closes because its source was deleted (an info
+ * notice and a warning notice), checks that no "failed before construction" error accompanies them, then dismisses
+ * each with a click as a user does; an undismissed notice covers the OK button of the next create dialog.
+ * @returns {Promise<void>} Resolves once the notices are gone.
+ */
+async function dismissNoLongerValidNotice() {
+   /** @type {import('@playwright/test').Locator} The notices. */
+   const notices = page.locator('#notifications .notification', { hasText: /no longer valid/i });
+   await expect(notices.first()).toBeVisible();
+   await expect(page.locator('#notifications .notification', { hasText: /failed before construction/i }))
+      .toHaveCount(0);
+
+   // The locators are index-based, so the last notice is dismissed first and the earlier indexes stay valid.
+   for (const notice of (await notices.all()).reverse()) {
+      await notice.click();
+   }
+   await expect(notices).toHaveCount(0);
+}
+
+/**
  * Chooses a value in a select of the first check of an item or effect, in the sheet's Checks tab.
  * @param {string} documentUuid - The uuid of the item or effect.
  * @param {string} label - The select's label (`Difficulty`, `Skill`).
@@ -1213,6 +1233,7 @@ test.describe('fields that follow the owned item while the dialog is open', () =
          await moveDialogAside(dialog);
          await deleteItem(actor.uuid, tab, actor.itemUuid);
          await expect(dialog).toHaveCount(0);
+         await dismissNoLongerValidNotice();
       });
    }
 });
@@ -1279,6 +1300,7 @@ test.describe('an effect-sourced Item Check dialog', () => {
          const { actor, effectUuid, dialog } = await openEffectCheckDialog('E2E Dialog Effect Delete Actor');
          await deleteEffect(actor.uuid, effectUuid);
          await expect(dialog).toHaveCount(0);
+         await dismissNoLongerValidNotice();
       });
 });
 

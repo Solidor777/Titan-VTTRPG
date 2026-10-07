@@ -1942,3 +1942,31 @@ The evidence files named here are in `.superpowers/sdd/test-suite-rewrite/phase-
   the same test in `e2e-full-2.log` and `e2e-full-3.log` before the change and passed in the full run after it
   (`e2e-full-4.log`).
 - **Status:** Closed 2026-10-07.
+
+### 135. A check dialog closed by a deleted item or effect raised an error notice besides its own, and the notices covered the next create dialog
+
+- **Symptom:** In the Phase 4 full run, `Click` of the core create dialog's OK button at `tests/e2e/flows.js` took
+  3.6 to 4.8 s four times (`e2e-full-4.log`, `e2e-full-5.log`), over the 1000 ms ceiling.
+- **Measured:** a diagnostic that listed the `#notifications` toasts before each OK click recorded, for the four actor
+  creations that followed the delete tests, an info notice, a warning notice ("TITAN | Attack Check no longer valid.")
+  and an error notice ("TITAN | Attack Check failed before construction. Item ID was invalid.", or for an Item Check "No
+  valid Item ID, Effect ID, or Item Roll Data was provided.") (`ok-diag2.jsonl`, taken with the info notice already
+  dismissed by the test, so it lists the warning and the error). The first diagnostic showed a `LI.notification.info`
+  at the OK button's position, x 1307, y 157 (`ok-diag.jsonl`). Wrapping `ui.notifications` in the spec showed each
+  delete raising one info and one warning notice and no further ones (`notification-log.jsonl`).
+- **Cause (read):** the `$effect` in the five check dialog shells (`src/check/types/<type>-check/dialog/*Shell.svelte`)
+  called `validate<Type>CheckOptions($checkOptions)` with `report` defaulting to `true`, so the validation that
+  detects the deleted source also reported it as an error through `game.titan.error`; the method's own comment says an
+  open dialog tests speculative options silently. The error, warning and info notices stay on screen for 5 s and
+  cover the create dialog's OK button.
+- **Found:** 2026-10-07 in the Phase 4 full run.
+- **Fixed:** the five shells' validity `$effect` passes `false`; the delete tests in `check-dialog.spec.js` read the
+  "no longer valid" notices, assert no "failed before construction" notice exists, and dismiss the notices with a
+  click as a user does.
+- **Gate:** `tests/e2e/check-dialog.spec.js`, the four tests "deleting the owned ... while its ... dialog is open
+  closes the dialog without a page error" and "deleting the effect while its Item Check dialog is open ...".
+  `dialog-11.log`: 36 passed, the only slow operation `join.js` (outside the rule). Before the shell change and the
+  dismissal, `e2e-full-5.log` had four create-click samples (max 4651 ms); with the shell change and only the info
+  notice dismissed, `dialog-6.log` and `dialog-7.log` still had two (4654 and 4649 ms), the remaining cover being the
+  warning notice (`ok-diag3` output read in the session; the file was not kept).
+- **Status:** Closed 2026-10-07.
