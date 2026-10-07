@@ -505,13 +505,29 @@ async function hoverToken(page, tokenId) {
       const token = canvas.scene.tokens.get(tokenId).object;
       return canvas.clientCoordinatesFromCanvas(token.center);
    }, tokenId);
+   await restOnToken(page, tokenId, centre);
+   return centre;
+}
+
+/**
+ * Moves the pointer onto a placed token from outside it and waits until the canvas shows the token hovered and has
+ * drawn two frames with the pointer there. The canvas processes a click only on a hovered token and handles pointer
+ * input as the frames draw, so a click sent in the frame of the move can be dropped.
+ * @param {import('@playwright/test').Page} page - A logged-in GM page viewing the token's scene.
+ * @param {string} tokenId - The token on the viewed scene.
+ * @param {{x: number, y: number}} centre - The token's centre in client (page) coordinates.
+ * @returns {Promise<void>} Resolves once the token is hovered and the frames have drawn.
+ */
+async function restOnToken(page, tokenId, centre) {
    await page.mouse.move(centre.x + 200, centre.y);
    await page.mouse.move(centre.x, centre.y, { steps: 5 });
    await expect.poll(
       () => page.evaluate((tokenId) => canvas.scene.tokens.get(tokenId).object.hover, tokenId),
       { message: 'the pointer hovers the token' },
    ).toBe(true);
-   return centre;
+   await page.evaluate(() => new Promise((resolve) => {
+      requestAnimationFrame(() => requestAnimationFrame(resolve));
+   }));
 }
 
 /**
@@ -610,7 +626,8 @@ async function toggleCondition(page, tokenId, statusId, active) {
    await settle(page);
 
    // A left click on the token closes the HUD (read: `PlaceableObject#_onClickLeft`, `placeable-object.mjs:1220`) and
-   // leaves the token controlled.
+   // leaves the token controlled. The pointer is on the HUD's palette, so it re-enters the token before the click.
+   await restOnToken(page, tokenId, centre);
    await page.mouse.click(centre.x, centre.y);
    await expect(hud).toBeHidden();
 }
