@@ -8,6 +8,8 @@ Completed items are deleted, not marked done.
   Sheets, derived from this feature's real `titan.effects` export, added as
   `tests/fixtures/spreadsheet/google-sheets-edited.xlsx` with a matching test in `Xlsx.test.js` (see the
   existing "decodes an .xlsx file ... re-saved by real Microsoft Excel" test for the pattern to follow).
+  Status 2026-10-07: attempted through the Google Drive connector; `create_file` returns "Insufficient scope" (it needs
+  the `drive` write scopes), so the upload is blocked until the connector is re-authorized with write access.
   The Excel half is done: `tests/fixtures/spreadsheet/excel-edited.xlsx` was produced by exporting
   titan.effects, editing one cell's value in real Excel 16.0 via COM automation, and re-saving, with a
   passing round-trip test. Google Sheets requires a real Google account signed into a browser, which
