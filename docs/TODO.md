@@ -4,19 +4,6 @@ Work that has been intentionally parked. Each item should graduate into its own
 spec (`docs/superpowers/specs/`) and plan (`docs/superpowers/plans/`) when picked up.
 Completed items are deleted, not marked done.
 
-- One checked-in XLSX test fixture is still needed from the user: a `.xlsx` exported by real Google
-  Sheets, derived from this feature's real `titan.effects` export, added as
-  `tests/fixtures/spreadsheet/google-sheets-edited.xlsx` with a matching test in `Xlsx.test.js` (see the
-  existing "decodes an .xlsx file ... re-saved by real Microsoft Excel" test for the pattern to follow).
-  Status 2026-10-07: attempted through the Google Drive connector; `create_file` returns "Insufficient scope" (it needs
-  the `drive` write scopes), so the upload is blocked until the connector is re-authorized with write access.
-  The Excel half is done: `tests/fixtures/spreadsheet/excel-edited.xlsx` was produced by exporting
-  titan.effects, editing one cell's value in real Excel 16.0 via COM automation, and re-saving, with a
-  passing round-trip test. Google Sheets requires a real Google account signed into a browser, which
-  this agent has no access to and should not be given credentials for; the user needs to do this step
-  themselves: open the exported .xlsx in Google Sheets, edit one cell's data (not the format), then
-  File > Download > Microsoft Excel (.xlsx), and hand the resulting file over.
-
 - Conditions rework to the 2026-09-26 rules, remaining part. Plan B
   (`docs/superpowers/plans/2026-09-29-conditions-rework.md`) has Tasks 1 to 4 complete and Task 5 implemented. Read in
   `src/system/Conditions.js`: the quarter-of-base penalties for Blinded, Contaminated, Prone, Restrained and Stunned,
