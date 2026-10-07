@@ -1,6 +1,6 @@
 import path from 'node:path';
 import { expect, test } from './harness.js';
-import { clickSheetTab, commitText } from './actions.js';
+import { clickSheetTab, clickTabButton, commitText } from './actions.js';
 import { chooseContextMenuEntry } from './contextMenu.js';
 import { openSheetByUuid } from './fixtures.js';
 import { readRegistry, record, writeRegistry } from './registry.js';
@@ -513,14 +513,15 @@ async function hoverToken(page, tokenId) {
 }
 
 /**
- * Moves the pointer onto a placed token from outside it and waits until the canvas shows the token hovered. A token's
+ * Moves the pointer onto a placed token from outside it and waits until the canvas shows the token hovered and its
+ * last press is older than the double-click time. A token's
  * interaction manager handles a pointer-down only from its HOVER state on (read: `#handleLeftDown` and
  * `#handleRightDown`, `client/canvas/interaction/mouse-handler.mjs:474-475` and `565-566`, Foundry 14.364 at
  * `C:\FoundryVTT\V14\dev\foundry`), so the pointer re-enters the token whenever it has been elsewhere.
  * @param {import('@playwright/test').Page} page - A logged-in GM page viewing the token's scene.
  * @param {string} tokenId - The token on the viewed scene.
  * @param {{x: number, y: number}} centre - The token's centre in client (page) coordinates.
- * @returns {Promise<void>} Resolves once the token is hovered.
+ * @returns {Promise<void>} Resolves once the token is hovered and a press on it is a single click.
  */
 async function restOnToken(page, tokenId, centre) {
    await page.mouse.move(centre.x + 200, centre.y);
@@ -529,6 +530,21 @@ async function restOnToken(page, tokenId, centre) {
       () => page.evaluate((tokenId) => canvas.scene.tokens.get(tokenId).object.hover, tokenId),
       { message: 'the pointer hovers the token' },
    ).toBe(true);
+
+   // The token's interaction manager reads a left or right press within `DOUBLE_CLICK_TIME_MS` of its last press, and
+   // within `DOUBLE_CLICK_DISTANCE_PX` of where it was, as a double click (read: `#isDoubleClick`,
+   // `client/canvas/interaction/mouse-handler.mjs:905-913`, Foundry 14.364 at `C:\FoundryVTT\V14\dev\foundry`). The
+   // double click opens the token's sheet and the single click's work (control, the HUD) does not run, so a press
+   // that follows an earlier press on the token too soon is held back until that press is old enough.
+   await page.evaluate(async (tokenId) => {
+      /** @type {foundry.canvas.interaction.MouseInteractionManager} The token's interaction manager. */
+      const manager = canvas.scene.tokens.get(tokenId).object.mouseInteractionManager;
+      await titanWait(
+         () => globalThis.performance.now() - Math.max(manager.lcTime, manager.rcTime)
+            > foundry.canvas.interaction.MouseInteractionManager.DOUBLE_CLICK_TIME_MS,
+         { message: 'the token\'s last press is older than the double-click time' },
+      );
+   }, tokenId);
 }
 
 /**
@@ -1512,6 +1528,103 @@ export async function setSkillTraining(page, actorUuid, skill, value) {
 }
 
 /**
+ * Chooses the attribute a skill defaults to with the select in the skill's row of the Skills tab.
+ * @param {import('@playwright/test').Page} page - A logged-in page.
+ * @param {string} actorUuid - The uuid of the actor.
+ * @param {string} skill - The skill key (`athletics`, `meleeWeapons`, ...).
+ * @param {string} attribute - The attribute key to choose (`body`, `mind`, `soul`).
+ * @returns {Promise<void>} Resolves once the actor stores the attribute.
+ */
+export async function setSkillDefaultAttribute(page, actorUuid, skill, attribute) {
+   /** @type {import('@playwright/test').Locator} The actor's sheet. */
+   const sheet = await openSheetByUuid(page, actorUuid);
+   await openTab(sheet, 'Skills');
+
+   /** @type {string} The Skill's localized name, which its row's check button shows. */
+   const label = await page.evaluate((skill) => game.i18n.localize(`LOCAL.${skill}.text`), skill);
+
+   /** @type {import('@playwright/test').Locator} The Skill's row. */
+   const row = sheet.locator('.skill', {
+      has: page.locator('.check-button .label', { hasText: new RegExp(`^\\s*${RegExp.escape(label)}\\s*$`) }),
+   });
+   await selectTitanOption(page, row.locator('.attribute [role="combobox"]'), attribute);
+   await expect.poll(
+      async () => page.evaluate(
+         async ({ uuid, skill }) => (await fromUuid(uuid)).system.skill[skill].defaultAttribute,
+         {
+            uuid: actorUuid,
+            skill,
+         },
+      ),
+      { message: `the row's select stored the ${skill} default attribute` },
+   ).toBe(attribute);
+   await settle(page);
+}
+
+/**
+ * Sets whether an owned weapon, armor or shield is equipped with the Equipped toggle of its row in the Inventory tab,
+ * clicking only when the state differs.
+ * @param {import('@playwright/test').Page} page - A logged-in page.
+ * @param {string} actorId - The id of the actor that owns the item.
+ * @param {string} itemId - The id of the owned item.
+ * @param {boolean} equipped - The state to leave the item in.
+ * @returns {Promise<void>} Resolves once the actor shows the state.
+ */
+export async function setEquipped(page, actorId, itemId, equipped) {
+   /** @type {import('@playwright/test').Locator} The actor's sheet. */
+   const sheet = await openSheetByUuid(page, `Actor.${actorId}`);
+   await openTab(sheet, 'Inventory');
+   await settle(page, { transitions: true });
+
+   /**
+    * Reads whether the item is equipped: armor and shield equip into an actor slot, the others set their own flag.
+    * @returns {Promise<boolean>} True when it is.
+    */
+   const read = () => page.evaluate(({ actorId, itemId }) => {
+      /** @type {Item} The owned item. */
+      const item = game.actors.get(actorId).items.get(itemId);
+      return item.type === 'armor' || item.type === 'shield'
+         ? item.parent.system.equipped[item.type] === item.id
+         : item.system.equipped;
+   }, {
+      actorId,
+      itemId,
+   });
+   if (await read() !== equipped) {
+      await sheet.locator(`[data-item-id="${itemId}"]`).getByRole('button', { name: 'Equipped' }).first().click();
+   }
+   await expect.poll(read, { message: `the Equipped toggle left the item ${equipped ? '' : 'un'}equipped` })
+      .toBe(equipped);
+   await settle(page);
+}
+
+/**
+ * Deletes an attack of a weapon with the delete button of its row in the weapon sheet's Attacks tab.
+ * @param {import('@playwright/test').Page} page - A logged-in page.
+ * @param {string} weaponUuid - The uuid of the weapon.
+ * @param {number} [index] - The position of the attack.
+ * @returns {Promise<void>} Resolves once the weapon has one attack fewer.
+ */
+export async function deleteAttack(page, weaponUuid, index = 0) {
+   /** @type {import('@playwright/test').Locator} The weapon's sheet. */
+   const sheet = await openSheetByUuid(page, weaponUuid);
+
+   /** @type {number} The number of attacks before the delete. */
+   const before = await page.evaluate(async (uuid) => (await fromUuid(uuid)).system.attack.length, weaponUuid);
+   await openTab(sheet, 'Attacks');
+   await settle(page, { transitions: true });
+   await sheet.locator('li.reorder-row').nth(index).getByRole('button', {
+      name: 'Delete',
+      exact: true,
+   }).click();
+   await expect.poll(
+      () => page.evaluate(async (uuid) => (await fromUuid(uuid)).system.attack.length, weaponUuid),
+      { message: 'the delete button removed the attack' },
+   ).toBe(before - 1);
+   await settle(page, { transitions: true });
+}
+
+/**
  * Creates a blank effect in an editable effect pack with the Effect Tray's create button and renames it in the sheet
  * the create opens.
  * @param {import('@playwright/test').Page} page - A logged-in GM page.
@@ -1567,6 +1680,238 @@ export async function createTrayEffect(page, packId, name) {
    ).toBe(name);
    await closeWindow(effectSheet);
    return id;
+}
+
+/**
+ * Types a description into the rich text editor of a document's sheet and saves it with the editor's save button.
+ * The editor is on the sheet's first tab (an item's Description tab, an effect's sheet).
+ * @param {import('@playwright/test').Page} page - A logged-in page.
+ * @param {string} documentUuid - The uuid of the item or effect.
+ * @param {string} text - The text to type; an `@UUID[...]{label}` link in it is enriched when the editor shows it.
+ * @returns {Promise<import('@playwright/test').Locator>} The editor element, showing the saved description.
+ */
+export async function setDescription(page, documentUuid, text) {
+   /** @type {import('@playwright/test').Locator} The document's sheet. */
+   const sheet = await openSheetByUuid(page, documentUuid);
+   await clickTabButton(sheet.locator('.tab-list button').first());
+
+   /** @type {import('@playwright/test').Locator} The description editor element. */
+   const editor = sheet.locator('prose-mirror');
+   await editor.hover();
+   await editor.locator('button.toggle').click();
+   await editor.locator('[contenteditable="true"]').click();
+   await page.keyboard.type(text);
+   await editor.locator('[data-action="save"]').click();
+   await expect(editor, 'the editor shows the saved description').toHaveClass(/inactive/);
+   await settle(page);
+   return editor;
+}
+
+/**
+ * Takes control of several placed tokens with the canvas's selection rectangle: a pointer drag across empty canvas
+ * controls every token inside the rectangle. The tokens must sit next to each other with no other token between them.
+ * Control by Shift-click is not used: while one token is controlled, a second token on a scene with token vision is
+ * not visible to the pointer (measured, see `placeToken`).
+ * @param {import('@playwright/test').Page} page - A logged-in GM page viewing the tokens' scene.
+ * @param {string[]} tokenIds - The tokens to control.
+ * @returns {Promise<void>} Resolves once exactly those tokens are controlled.
+ */
+export async function controlPlacedTokens(page, tokenIds) {
+   await closeAllApps(page);
+   await releaseTokenControl(page);
+
+   /**
+    * The rectangle around the tokens in client (page) coordinates, half a grid cell wider than the tokens.
+    * @type {{left: number, top: number, right: number, bottom: number}}
+    */
+   const area = await page.evaluate((tokenIds) => {
+      /** @type {number} Half of a grid cell in client pixels. */
+      const margin = canvas.grid.size * canvas.stage.scale.x / 2;
+      const corners = tokenIds.map((id) => {
+         const bounds = canvas.scene.tokens.get(id).object.bounds;
+         return {
+            min: canvas.clientCoordinatesFromCanvas({
+               x: bounds.left,
+               y: bounds.top,
+            }),
+            max: canvas.clientCoordinatesFromCanvas({
+               x: bounds.right,
+               y: bounds.bottom,
+            }),
+         };
+      });
+      return {
+         left: Math.min(...corners.map((corner) => corner.min.x)) - margin,
+         top: Math.min(...corners.map((corner) => corner.min.y)) - margin,
+         right: Math.max(...corners.map((corner) => corner.max.x)) + margin,
+         bottom: Math.max(...corners.map((corner) => corner.max.y)) + margin,
+      };
+   }, tokenIds);
+   await page.mouse.move(area.left, area.top);
+   await page.mouse.down();
+   await page.mouse.move(area.right, area.bottom, { steps: 8 });
+   await page.mouse.up();
+   await expect.poll(
+      () => page.evaluate(() => canvas.tokens.controlled.map((token) => token.id).sort()),
+      { message: 'the selection rectangle controlled exactly the tokens' },
+   ).toEqual([...tokenIds].sort());
+}
+
+/**
+ * The numeric values of the ownership levels the Configure Ownership window offers.
+ * @type {Record<string, number>}
+ */
+const OWNERSHIP_LEVELS = {
+   NONE: 0,
+   LIMITED: 1,
+   OBSERVER: 2,
+   OWNER: 3,
+};
+
+/**
+ * Sets one user's ownership level of a world actor in the Configure Ownership window the actor's directory entry opens.
+ * @param {import('@playwright/test').Page} page - A logged-in GM page.
+ * @param {string} actorId - The world actor.
+ * @param {string} userName - The display name of the user.
+ * @param {'NONE'|'LIMITED'|'OBSERVER'|'OWNER'} level - The level to give the user.
+ * @returns {Promise<void>} Resolves once the actor stores the level for the user.
+ */
+export async function setOwnership(page, actorId, userName, level) {
+   /** @type {import('@playwright/test').Locator} The actors tab. */
+   const panel = await openSidebarTab(page, 'actors');
+   await panel.locator(`.directory-item.entry[data-entry-id="${actorId}"]`).click({ button: 'right' });
+   await chooseContextMenuEntry(
+      page,
+      page.locator('#context-menu li.context-item', { hasText: exactText('Configure Ownership') }),
+   );
+
+   /** @type {import('@playwright/test').Locator} The Configure Ownership window. */
+   const config = page.locator('.application.document-ownership');
+   await expect(config).toBeVisible();
+
+   /** @type {string} The id of the user whose level is set. */
+   const userId = await page.evaluate((userName) => game.users.getName(userName).id, userName);
+   await config.locator(`select[name="${userId}"]`).selectOption(String(OWNERSHIP_LEVELS[level]));
+   await config.locator('button[type="submit"]').click();
+   await expect(config).toHaveCount(0);
+   await expect.poll(
+      () => page.evaluate(({ actorId, userId }) => game.actors.get(actorId).ownership[userId], {
+         actorId,
+         userId,
+      }),
+      { message: `the window stored ${level} for ${userName}` },
+   ).toBe(OWNERSHIP_LEVELS[level]);
+   await settle(page);
+}
+
+/**
+ * Creates a combat with the Combat Tracker's create button, which also makes it the active combat.
+ * @param {import('@playwright/test').Page} page - A logged-in GM page viewing a drawn scene.
+ * @returns {Promise<string>} The combat's id.
+ */
+export async function createCombat(page) {
+   /** @type {string[]} The ids of the combats before the create. */
+   const before = await page.evaluate(() => game.combats.map((combat) => combat.id));
+   await closeAllApps(page);
+
+   /** @type {import('@playwright/test').Locator} The Combat Tracker. */
+   const panel = await openSidebarTab(page, 'combat');
+   await panel.locator('[data-action="createCombat"]').click();
+
+   /** @type {string[]} The ids that appeared. */
+   let added = [];
+   await expect.poll(async () => {
+      added = await page.evaluate(
+         (before) => game.combats.filter((combat) => !before.includes(combat.id)).map((combat) => combat.id),
+         before,
+      );
+      return added.length;
+   }, { message: 'the create button made one combat' }).toBe(1);
+   const [id] = added;
+   record({
+      documentName: 'Combat',
+      id,
+      createdBy: currentSpec(),
+   });
+   await expect.poll(
+      () => page.evaluate(() => game.combat?.id),
+      { message: 'the new combat is the active combat' },
+   ).toBe(id);
+   await settle(page);
+   return id;
+}
+
+/**
+ * Adds a placed token to the active combat with the Token HUD's combat button: a right click on the hovered token opens
+ * the HUD, and a left click on the token closes it again.
+ * @param {import('@playwright/test').Page} page - A logged-in GM page viewing the token's scene.
+ * @param {string} tokenId - The token on the viewed scene.
+ * @returns {Promise<void>} Resolves once the active combat holds a combatant for the token and the HUD is closed.
+ */
+export async function addCombatant(page, tokenId) {
+   /** @type {{x: number, y: number}} The token's centre in client (page) coordinates. */
+   const centre = await hoverToken(page, tokenId);
+   await page.mouse.click(centre.x, centre.y, { button: 'right' });
+
+   /** @type {import('@playwright/test').Locator} The token HUD. */
+   const hud = page.locator('#token-hud');
+   await expect(hud).toBeVisible();
+   await hud.locator('[data-action="combat"]').click();
+   await expect.poll(
+      () => page.evaluate(
+         (tokenId) => game.combat.combatants.some((combatant) => combatant.tokenId === tokenId),
+         tokenId,
+      ),
+      { message: 'the HUD added the token to the active combat' },
+   ).toBe(true);
+   await settle(page);
+   await restOnToken(page, tokenId, centre);
+   await page.mouse.click(centre.x, centre.y);
+   await expect(hud).toBeHidden();
+}
+
+/**
+ * Clicks one of the active combat's control buttons in the Combat Tracker.
+ * @param {import('@playwright/test').Page} page - A logged-in GM page.
+ * @param {string} action - The button's `data-action` (`startCombat`, `endCombat`, ...).
+ * @returns {Promise<void>} Resolves once the click is dispatched; the caller waits for its effect.
+ */
+async function clickCombatControl(page, action) {
+   /** @type {import('@playwright/test').Locator} The Combat Tracker. */
+   const panel = await openSidebarTab(page, 'combat');
+   await panel.locator(`button.combat-control[data-action="${action}"]`).click();
+}
+
+/**
+ * Starts the active combat with the Combat Tracker's Begin Combat button.
+ * @param {import('@playwright/test').Page} page - A logged-in GM page.
+ * @returns {Promise<void>} Resolves once the active combat is started.
+ */
+export async function startCombat(page) {
+   await clickCombatControl(page, 'startCombat');
+   await expect.poll(
+      () => page.evaluate(() => game.combat.started),
+      { message: 'the Begin Combat button started the combat' },
+   ).toBe(true);
+   await settle(page);
+}
+
+/**
+ * Ends the active combat with the Combat Tracker's End Combat button and its confirmation dialog, which deletes the
+ * combat.
+ * @param {import('@playwright/test').Page} page - A logged-in GM page.
+ * @returns {Promise<void>} Resolves once the combat is deleted.
+ */
+export async function endCombat(page) {
+   /** @type {string} The id of the combat that ends. */
+   const id = await page.evaluate(() => game.combat.id);
+   await clickCombatControl(page, 'endCombat');
+   await page.locator('dialog.application.dialog [data-action="yes"]').click();
+   await expect.poll(
+      () => page.evaluate((id) => game.combats.has(id), id),
+      { message: 'the End Combat button deleted the combat' },
+   ).toBe(false);
+   await settle(page);
 }
 
 /**

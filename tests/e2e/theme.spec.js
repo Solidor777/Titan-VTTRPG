@@ -2,7 +2,7 @@ import { readFileSync } from 'node:fs';
 import { expect, test } from './harness.js';
 import { clickSheetTab } from './actions.js';
 import { login, openSheetByUuid } from './fixtures.js';
-import { createWorldItem, sharedUuid } from './flows.js';
+import { createWorldItem, setDescription, sharedUuid } from './flows.js';
 import { getSetting, setClientSetting } from './settings.js';
 import { attachPageErrors, clearChat, closeAllApps, showChatLog } from './world.js';
 
@@ -42,13 +42,7 @@ test.beforeAll(async ({ browser }) => {
 
    /** @type {string} The uuid of the document the link points at. */
    const targetUuid = await sharedUuid(page, 'player');
-   const sheet = await openSheetByUuid(page, linkItemUuid);
-   const editor = sheet.locator('prose-mirror');
-   await editor.hover();
-   await editor.locator('button.toggle').click();
-   await editor.locator('[contenteditable="true"]').click();
-   await page.keyboard.type(`See @UUID[${targetUuid}]{${LINK_TEXT}} here.`);
-   await editor.locator('[data-action="save"]').click();
+   const editor = await setDescription(page, linkItemUuid, `See @UUID[${targetUuid}]{${LINK_TEXT}} here.`);
    await expect(editor.locator('a.content-link'), 'the saved description shows the link').toHaveText(LINK_TEXT);
    await closeAllApps(page);
 });
