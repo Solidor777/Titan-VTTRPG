@@ -30,10 +30,10 @@ export default defineConfig({
       headless: true,
       // Caps each Playwright action (click, fill, drag, hover, and any page method called without its own timeout),
       // so an action waiting on a missing element fails after 10 s instead of at the 60 s test timeout (the default
-      // is no limit). Measured over two full runs with the slow-operation threshold at 50 ms
-      // (`e2e-r3d-gate-1-slowops.json`, `e2e-r3d-gate-2-slowops.json`): the longest action was 965 ms (a click on a new
-      // effect row's Edit Item button, `flows.js:860`; 464 ms in the other run), so 10 s is about ten times the longest. Waits that legitimately
-      // take longer pass their own timeout (world boot 60 s, reload 60 s).
+      // is no limit). Measured over a full run with the slow-operation threshold at 50 ms
+      // (`e2e-r4-gate-2-slowops.json`): the longest action was 468 ms (a drag and drop, `flows.js:445`), so 10 s is
+      // more than twenty times the longest. Waits that legitimately take longer pass their own timeout (world boot
+      // 60 s, reload 60 s).
       actionTimeout: 10_000,
       // Foundry v14 requires 1366x768 and otherwise raises a permanent resolution warning whose
       // notification banner spans the viewport and intercepts clicks on anything beneath it (the
