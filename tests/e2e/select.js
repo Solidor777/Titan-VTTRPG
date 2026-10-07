@@ -9,7 +9,8 @@ import { settle } from './settle.js';
 
 /**
  * Opens the given Select trigger, clicks the option carrying the target value, and waits until the trigger shows that
- * value, the list has closed and the operations the choice started have finished.
+ * value, the list has closed and the operations, renders and transitions the choice started have finished (a choice can
+ * change which rows the window shows).
  * @param {import('@playwright/test').Page} page - The Playwright page.
  * @param {import('@playwright/test').Locator} trigger - The Select trigger (role=combobox).
  * @param {string|number} value - The `data-value` of the option to choose.
@@ -20,7 +21,7 @@ export async function selectTitanOption(page, trigger, value) {
    await page.locator(`[role="option"][data-value="${value}"]`).click();
    await expect(trigger, `the select shows ${value}`).toHaveAttribute('data-value', String(value));
    await expect(page.locator('[role="option"]'), 'the option list closed').toHaveCount(0);
-   await settle(page);
+   await settle(page, { transitions: true });
 }
 
 /**

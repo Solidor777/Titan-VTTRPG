@@ -1,5 +1,5 @@
 import { expect, test } from './harness.js';
-import { clickSheetTab, commitText } from './actions.js';
+import { clickSheetTab, commitText, dragGrip } from './actions.js';
 import { login, openSheetByUuid } from './fixtures.js';
 import {
    addAttack,
@@ -257,28 +257,6 @@ function readRenderedTokens(rows, kind) {
       (elements, token) => elements.map((element) => element.querySelector(token).value),
       LISTS[kind].token,
    );
-}
-
-/**
- * Drags the grip of a row onto another row and waits until the operations and row transitions the drop started have
- * finished. The drop's
- * own effect (a reorder, a copy, a refusal) differs by caller, so the caller waits for it.
- * @param {import('@playwright/test').Locator} source - The row whose grip is dragged.
- * @param {import('@playwright/test').Locator} target - The row the grip is dropped on.
- * @param {'top' | 'bottom'} half - Whether the drop lands in the upper or the lower half of the target row, which
- * decides whether the dragged row is inserted before or after it.
- * @returns {Promise<void>} Resolves once the drop has been dispatched and its operations have finished.
- */
-async function dragGrip(source, target, half) {
-   /** @type {{height: number}} The target row's box. */
-   const box = await target.boundingBox();
-   await source.locator('[data-drag-handle]').first().dragTo(target, {
-      targetPosition: {
-         x: 20,
-         y: half === 'top' ? 3 : box.height - 3,
-      },
-   });
-   await settle(source.page(), { transitions: true });
 }
 
 /**

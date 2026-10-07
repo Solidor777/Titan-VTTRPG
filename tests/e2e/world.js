@@ -54,6 +54,8 @@ export async function closeAllApps(page) {
             continue;
          }
          try {
+            // `animate: false` skips the close transition, which core awaits for up to 1000 ms per window
+            // (`client/applications/api/application.mjs:982`, 14.364).
             await app.close({ animate: false });
          }
          catch (error) {
@@ -65,6 +67,8 @@ export async function closeAllApps(page) {
       const appV1 = Object.values(globalThis.ui?.windows ?? {});
       for (const app of appV1) {
          try {
+            // `animate: false` skips the 200 ms slide-up of the window (`client/appv1/api/application-v1.mjs:850-858`,
+            // 14.364).
             await app.close({ animate: false });
          }
          catch (error) {

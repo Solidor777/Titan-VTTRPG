@@ -268,7 +268,7 @@ test.describe('compendium spreadsheet export/import', () => {
       await choosePackMenuEntry(page, 'Export to Spreadsheet');
       // Default format/layout (xlsx/wide) exports as a single .xlsx with no dialog interaction needed —
       // the context-menu action opens the dialog; accept its defaults by clicking the confirm button.
-      /** @type {Promise<import('@playwright/test').Download>} */
+      /** @type {Promise<import('@playwright/test').Download>} The download the confirm click starts. */
       const downloadPromise = page.waitForEvent('download', { timeout: 1000 });
       await page.locator('[data-testid="export-confirm-button"]').click();
       /** @type {import('@playwright/test').Download} */
@@ -303,7 +303,7 @@ test.describe('compendium spreadsheet export/import', () => {
          await openPackContextMenu(page, packId);
          await choosePackMenuEntry(page, 'Export to Spreadsheet');
          await selectTitanOption(page, page.locator('[data-testid="export-format-select"]'), 'csv');
-         /** @type {Promise<import('@playwright/test').Download>} */
+         /** @type {Promise<import('@playwright/test').Download>} The download the confirm click starts. */
          const downloadPromise = page.waitForEvent('download', { timeout: 1000 });
          await page.locator('[data-testid="export-confirm-button"]').click();
          /** @type {string} */
@@ -369,7 +369,7 @@ test.describe('compendium spreadsheet export/import', () => {
          await openPackContextMenu(page, 'titan.effects');
          await choosePackMenuEntry(page, 'Export to Spreadsheet');
          await selectTitanOption(page, page.locator('[data-testid="export-format-select"]'), 'csv');
-         /** @type {Promise<import('@playwright/test').Download>} */
+         /** @type {Promise<import('@playwright/test').Download>} The download the confirm click starts. */
          const downloadPromise = page.waitForEvent('download', { timeout: 1000 });
          await page.locator('[data-testid="export-confirm-button"]').click();
          /** @type {import('@playwright/test').Download} */
@@ -439,7 +439,7 @@ test.describe('compendium spreadsheet export/import', () => {
          await openPackContextMenu(page, packId);
          await choosePackMenuEntry(page, 'Export to Spreadsheet');
          await selectTitanOption(page, page.locator('[data-testid="export-format-select"]'), 'csv');
-         /** @type {Promise<import('@playwright/test').Download>} */
+         /** @type {Promise<import('@playwright/test').Download>} The download the confirm click starts. */
          const downloadPromise = page.waitForEvent('download', { timeout: 1000 });
          await page.locator('[data-testid="export-confirm-button"]').click();
          /** @type {string} */
@@ -563,7 +563,7 @@ test.describe('compendium spreadsheet export/import', () => {
          await openPackContextMenu(page, packId);
          await choosePackMenuEntry(page, 'Export to Spreadsheet');
          await selectTitanOption(page, page.locator('[data-testid="export-format-select"]'), 'csv');
-         /** @type {Promise<import('@playwright/test').Download>} */
+         /** @type {Promise<import('@playwright/test').Download>} The download the confirm click starts. */
          const downloadPromise = page.waitForEvent('download', { timeout: 1000 });
          await page.locator('[data-testid="export-confirm-button"]').click();
          /** @type {string} */

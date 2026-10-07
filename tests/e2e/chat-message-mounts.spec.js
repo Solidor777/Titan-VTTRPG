@@ -137,13 +137,19 @@ test.describe('chat-message mount keying', () => {
             .toBeGreaterThan(0);
          await expect.poll(hookCount, { message: 'still two live mounts after update' }).toBe(baseline + 2);
 
-         // Dismissing the notification removes its element with no render; the observer unmounts it.
+         // Dismissing the notification removes its element with no render; the observer unmounts it. Core's dismissal
+         // animates for 250 ms and then 100 ms before it removes the element (`client/applications/sidebar/tabs/`
+         // `chat.mjs` `#dismissNotification`), so the poll checks every 100 ms: the default intervals (100, 250, 500,
+         // 1000) check at 0, 100, 350 and 850 ms and then stop (`playwright-core/lib/coreBundle.js:4377-4393`).
          await page.evaluate((id) => {
             document.querySelector(
                `#chat-notifications li[data-message-id="${id}"] [data-action="dismissMessage"]`,
             ).click();
          }, messageId);
-         await expect.poll(hookCount, { message: 'notification mount torn down' }).toBe(baseline + 1);
+         await expect.poll(hookCount, {
+            message: 'notification mount torn down',
+            intervals: [100],
+         }).toBe(baseline + 1);
 
          // Deleting the message tears the remaining mount down via deleteChatMessage.
          await page.evaluate(async (id) => {

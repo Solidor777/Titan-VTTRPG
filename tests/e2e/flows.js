@@ -251,7 +251,9 @@ export async function createOwnedItem(page, actorId, type, name) {
       );
       return added.length;
    }, { message: 'the add button created one owned item' }).toBe(1);
-   await settle(page);
+
+   // The new row slides in (`transition:slide`); its Edit Item button is clicked next, so the slide must end first.
+   await settle(page, { transitions: true });
    const [id] = added;
    record({
       documentName: 'Item',
@@ -847,7 +849,9 @@ export async function addEffect(page, actorId, name, { duration } = {}) {
       );
       return added.length;
    }, { message: 'the add button created one effect' }).toBe(1);
-   await settle(page);
+
+   // The new row slides in (`transition:slide`); its Edit Item button is clicked next, so the slide must end first.
+   await settle(page, { transitions: true });
    const [id] = added;
    record({
       documentName: 'ActiveEffect',

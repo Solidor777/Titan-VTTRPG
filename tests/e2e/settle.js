@@ -23,6 +23,18 @@ export async function installSettle(page) {
       globalThis.titanPending = 0;
 
       /**
+       * Counts the finite animations that are running inside an application window's content, such as the Svelte
+       * transition of a row that appears or goes. Infinite animations (spinners) and animations outside the windows
+       * are not counted.
+       * @returns {number} The number of unfinished finite animations inside application windows.
+       */
+      globalThis.titanWindowTransitions = () => document.getAnimations().filter(
+         (animation) => animation.playState !== 'finished'
+            && Number.isFinite(animation.effect?.getComputedTiming().endTime)
+            && animation.effect.target?.closest?.('.application .window-content'),
+      ).length;
+
+      /**
        * Wraps a function that returns a promise so the promise counts as pending until it settles.
        * @param {Function} original - The function to wrap.
        * @returns {Function} The wrapper.
@@ -68,45 +80,47 @@ export async function installSettle(page) {
 }
 
 /**
- * Fails when the tracker is not in the path of the page's document operations and renders. It calls the real static
- * `Item.updateDocuments` with no updates and `ui.chat.render`, and asserts the counter moved on each call. Without
- * this, a wrapper that never installed would leave every `settle` returning at once and the races it prevents would
- * come back without any error.
+ * Fails when the tracker is not in the path of the page's document operations and renders. For each of the four
+ * wrapped functions (`createDocuments`, `updateDocuments` and `deleteDocuments` of `Item`, called with no data, and
+ * `ui.chat.render`) it reads the counter right before the call and right after it starts (in the same synchronous turn,
+ * so nothing else can move it between the two reads), and asserts the counter rose by exactly 1. Without this, a
+ * wrapper that never installed would leave every `settle` returning at once and the races it prevents would come back
+ * without any error.
  * @param {import('@playwright/test').Page} page - A page that has reached `game.ready`.
- * @returns {Promise<void>} Resolves when both calls moved the counter; rejects when either did not.
+ * @returns {Promise<void>} Resolves when each call raised the counter by 1; rejects naming each that did not.
  */
 export async function verifySettle(page) {
-   /** @type {{operation: number, render: number}} The counter right after each call started. */
-   const moved = await page.evaluate(async () => {
-      // The boot's own renders must have finished, so a counter above 0 below comes from the call itself. This wait
-      // is part of the world boot (it waits on the boot's renders, not on a loaded page), so it has the boot's ceiling.
-      await globalThis.titanWait(() => globalThis.titanPending === 0, {
-         timeout: 60_000,
-         message: 'the boot renders finished',
-      });
-
-      /** @type {Promise<*>} The operation, started and not yet awaited. */
-      const operation = foundry.documents.Item.updateDocuments([]);
-
-      /** @type {number} The counter while the operation is in flight. */
-      const duringOperation = globalThis.titanPending;
-      await operation;
-
-      /** @type {Promise<*>} The render, started and not yet awaited. */
-      const render = ui.chat.render();
-
-      /** @type {number} The counter while the render is in flight. */
-      const duringRender = globalThis.titanPending;
-      await render;
-      return {
-         operation: duringOperation,
-         render: duringRender,
+   /** @type {Record<string, number>} How far each call raised the counter while it was in flight. */
+   const rose = await page.evaluate(async () => {
+      /** @type {Record<string, function(): Promise<*>>} The calls, each started and not awaited by its entry. */
+      const calls = {
+         createDocuments: () => foundry.documents.Item.createDocuments([]),
+         updateDocuments: () => foundry.documents.Item.updateDocuments([]),
+         deleteDocuments: () => foundry.documents.Item.deleteDocuments([]),
+         render: () => ui.chat.render(),
       };
+
+      /** @type {Record<string, number>} How far each call raised the counter. */
+      const result = {};
+      for (const [name, call] of Object.entries(calls)) {
+         /** @type {number} The counter right before the call starts. */
+         const before = globalThis.titanPending;
+
+         /** @type {Promise<*>} The call, started and not yet awaited. */
+         const started = call();
+         result[name] = globalThis.titanPending - before;
+         await started;
+      }
+      return result;
    });
-   if (!(moved.operation > 0) || !(moved.render > 0)) {
+
+   /** @type {string[]} The calls that did not raise the counter by exactly 1, with how far they raised it. */
+   const missed = Object.entries(rose)
+      .filter(([, amount]) => amount !== 1)
+      .map(([name, amount]) => `${name} (rose by ${amount})`);
+   if (missed.length > 0) {
       throw new Error(
-         `settle.js is not tracking this page: the counter was ${moved.operation} during Item.updateDocuments `
-         + `and ${moved.render} during ApplicationV2#render (each must be above 0).`,
+         `settle.js is not tracking this page: each call must raise the counter by 1; ${missed.join(', ')}.`,
       );
    }
 }
@@ -115,8 +129,9 @@ export async function verifySettle(page) {
  * Waits until no document operation or render is in flight. With `transitions` it also waits until no finite animation
  * (a Svelte transition, for example the 400 ms `slide` of a row that appears or goes) is running inside an application
  * window: a helper after which the caller clicks or types into a row that is still moving asks for it, because
- * Playwright's own stability wait for an action retries at growing intervals (20, 50, 100, 100, 500 ms), so an action
- * that meets a row moving for 430 ms completes at about 900 ms.
+ * Playwright retries an action on a moving element after waits of 0, 20, 100, 100 and then 500 ms
+ * (`playwright-core/lib/coreBundle.js:16203`), so a click on a row that is still moving completes up to a retry
+ * interval after the row stops.
  * @param {import('@playwright/test').Page} page - The page that ran the action.
  * @param {object} [options] - What to wait for besides the operations and renders.
  * @param {boolean} [options.transitions] - Also wait for the window transitions to end.
@@ -124,11 +139,7 @@ export async function verifySettle(page) {
  */
 export async function settle(page, { transitions = false } = {}) {
    await page.evaluate((withTransitions) => globalThis.titanWait(
-      () => globalThis.titanPending === 0 && !(withTransitions && document.getAnimations().some(
-         (animation) => animation.playState !== 'finished'
-            && Number.isFinite(animation.effect?.getComputedTiming().endTime)
-            && animation.effect.target?.closest?.('.application .window-content'),
-      )),
+      () => globalThis.titanPending === 0 && !(withTransitions && globalThis.titanWindowTransitions() > 0),
       { message: 'the document operations, renders and requested window transitions finished' },
    ), transitions);
 }
