@@ -203,7 +203,8 @@ The evidence files named here are in `.superpowers/sdd/test-suite-rewrite/phase-
   echo's re-render resets text typed in that window. `fillList` and the attack-label loop poll each row, and the add flows
   now `settle` (CLOSED_BUGS #131). Not reproduced in 10 runs (`final-dist-run-1.log` to `-10.log`) and 9 runs
   (`final2-dist-run-1.log` to `-9.log`) of the 86 tests of the sheet list specs and `drag.spec.js` on the round 3 code,
-  nor in 3 full runs of 655 tests on the round 4 code (`e2e-r4-gate-1.log`, `-2.log`, `-3.log`).
+  nor in 3 full runs of 655 tests on the round 4 code (`e2e-r4-gate-1.log`, `-2.log`, `-3.log`) and 1 of 653 tests on
+  the round 5 code (`e2e-r5-gate-1.log`).
 - **Found:** 2026-10-02 in the Part B review fixes.
 - **Status:** Open.
 

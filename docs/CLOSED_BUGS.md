@@ -1809,33 +1809,36 @@ The evidence files named here are in `.superpowers/sdd/test-suite-rewrite/phase-
   full run after the helper change failed once this way (`e2e-r2-gate-1.log`: `addCheck` stored "Check" for "E2E Bulk
   Check 2"); the add flows now call `settle` after the count shows (commit `ed09de31`).
 - **Fixed:** `settle.js` (in-flight document operations, renders and window transitions, installed by `joinWorld`),
-  `actions.js` (`clickSheetTab`, `clickTabButton`, `commitText`, `dragGrip`), and waits for the effect in
-  `selectTitanOption`, `titanSelectOptionValues`, `setSelectField`, `setCheckbox`, `clickRoll`, the add flows of
-  `flows.js` (those after which the caller edits the new row wait for its transition: `addCheck`, `addAttack`,
-  `addCustomAspect`, `addRulesElement`, `createOwnedItem`, `addEffect`), `pickPortrait`, `dragGripToMove` and the API
-  setters of the specs.
-- **Gate (2026-10-07):** `tests/e2e/action-helpers.spec.js` runs ten helpers and reads what is in flight, and the
-  helper's stored effect where it has one, in one `evaluate` the moment each returns (11 tests, all pass:
-  `phase-3/r4-gate-intact-final.log`). With the helper's own `settle` call removed, 10 repeats each on the final code
-  (`phase-3/r4f-gate-disabled-<helper>.log`):
+  `actions.js` (`clickSheetTab` and `clickTabButton` end at their active-tab assertion and do not settle; `commitText`
+  and `dragGrip` settle), and waits for the effect in `selectTitanOption`, `titanSelectOptionValues`, `setSelectField`,
+  `setCheckbox`, `clickRoll`, the add flows of `flows.js` (those after which the caller edits the new row wait for its
+  transition: `addCheck`, `addAttack`, `addCustomAspect`, `addRulesElement`, `createOwnedItem`, `addEffect`),
+  `pickPortrait`, `dragGripToMove` and the API setters of the specs.
+- **Gate (2026-10-07):** `tests/e2e/action-helpers.spec.js` runs eight helpers and reads what is in flight, and the
+  helper's stored effect where it has one, in one `evaluate` the moment each returns (9 tests, all pass, twice:
+  `phase-3/r5-gate-intact-1.log`, `-2.log`). The tab helpers have no `settle` and no test: a pending-only test of them
+  could not fail without a `settle` (`r4f-gate-disabled-clickSheetTab.log`, `-clickTabButton.log`: 10 of 10 passed with
+  their `settle` removed), and their own active-tab assertion is their contract. With the helper's own `settle` call
+  removed, 10 repeats each (`phase-3/r4f-gate-disabled-<helper>.log`):
   - fail 10 of 10: `addAttack`, `addRulesElement`, `addCheck`, `addCustomAspect` (6 to 16 finite window animations in
     flight; `addRulesElement` also 1 operation), `selectTitanOption` (1 operation in flight) and `commitText` (1
     operation in flight; the stored label was already the typed one);
-  - pass 10 of 10, so these `settle` calls are **not shown necessary by any test**: `clickSheetTab` and
-    `clickTabButton` (no operation is in flight once the active-tab assertion has passed; the tab's content slides in
-    afterwards and these helpers do not wait for it), `clickRoll` (the chat message exists and nothing is in flight
-    once the dialog has closed), `dragGrip` and a test that types into two fields of a new row back to back after
-    `commitText` (the shape of #122 and #128). `commitText` twice also passed 10 of 10 on an earlier run of the same
-    test (`phase-3/r4-gate-disabled-repeat10-commitText-twice.log`), and `clickRoll` 10 of 10
-    (`r4-gate-disabled-repeat10-clickRoll.log`); `dragGrip` failed 1 of 10 in that earlier run (operation in flight,
-    order not stored yet, `r4-gate-disabled-repeat10-dragGrip.log`) and 0 of 10 in the final run.
-  The `settle` calls of those five helpers are kept as the contract of the helpers; their necessity for the #122 and
-  #128 race in isolation is **not demonstrated**.
-- **Runs of the final code:** 3 full runs of 655 passed with census zero (`phase-3/e2e-r4-gate-1.log` before the
-  `item-sheet-rolls.spec.js` change, `-2.log` before the comment-only change of `playwright.config.mjs`, `-3.log` on the
-  final code), and 10 runs of the 44 tests of `armor-trait-situations`, `attack-tags`, `character-sheet-layout`,
-  `condition-description` and `surfaces`, all passed (`r4-reverify-run-1.log` to `-10.log`). The tab clicks of
-  `surfaces.spec.js` go through `clickTabButton`; other inline tab clicks in specs do not.
+  - `dragGrip`: 0 of 10 failed in the final run (`r4f-gate-disabled-dragGrip.log`) and 1 of 10 in an earlier run of the
+    same test (operation and animation in flight, order not stored yet, `r4-gate-disabled-repeat10-dragGrip.log`), so
+    1 of 20 runs: **shown necessary at a low rate**;
+  - `clickRoll` and a test that types into two fields of a new row back to back after `commitText` (the shape of #122
+    and #128) passed 20 of 20 each without their `settle` (`r4f-gate-disabled-clickRoll.log`,
+    `r4-gate-disabled-repeat10-clickRoll.log`; `r4f-gate-disabled-commitText-twice.log`,
+    `r4-gate-disabled-repeat10-commitText-twice.log`): **no run shows those two `settle` calls necessary**, and the
+    necessity of `commitText`'s `settle` for the #122 and #128 race in isolation is not demonstrated. The `settle` calls
+    stay as the contract of the helpers.
+- **Runs of the final code:** 653 passed with census zero in the full run on the final code
+  (`phase-3/e2e-r5-gate-1.log`). Before it, 3 full runs of 655 that included the two tab tests (`e2e-r4-gate-1.log`
+  before the `item-sheet-rolls.spec.js` change, `-2.log` before the comment-only change of `playwright.config.mjs`,
+  `-3.log`), and 10 runs of the 44 tests of `armor-trait-situations`, `attack-tags`, `character-sheet-layout`,
+  `condition-description` and `surfaces`, all passed (`r4-reverify-run-1.log` to `-10.log`; the only later change to
+  the code is the removal of the `settle` call of the two tab helpers). The tab clicks of `surfaces.spec.js` go
+  through `clickTabButton`; other inline tab clicks in specs do not.
 - **Status:** Closed 2026-10-02.
 
 ### 132. `verifySettle` once timed out at 1 s waiting for the boot renders at login
@@ -1853,9 +1856,11 @@ The evidence files named here are in `.superpowers/sdd/test-suite-rewrite/phase-
 - **Fixed:** the wait is removed. `verifySettle` reads the counter right before each probe call and right after the
   call starts, in the same synchronous turn, and asserts it rose by 1, so renders of the boot cannot change the result
   and the check waits on nothing.
-- **Gate:** 10 runs of the same 44 tests on the final code, all passed (`r4-reverify-run-1.log` to `-10.log`); with
-  each of the four wrappers left out of `installSettle`, login fails and names the call
-  (`r4-verify-settle-disabled-createDocuments.log`, `-updateDocuments.log`, `-deleteDocuments.log`, `-render.log`). The
-  load that was present in the failing run was not reproduced, and the wait that failed no longer exists, so the runs
-  show that the code does not wait, not that load cannot break login.
+- **Gate:** 10 runs of the same 44 tests on the code of commit `b8f14185`, all passed (`r4-reverify-run-1.log` to
+  `-10.log`; the later changes do not touch `verifySettle`); with each of the four wrappers left out of
+  `installSettle`, login fails and names the call (`r4-verify-settle-disabled-createDocuments.log`,
+  `-updateDocuments.log`, `-deleteDocuments.log`, `-render.log`). The load that was present in the failing run was not
+  reproduced, and the wait that failed no longer exists, so the runs show that the code does not wait, not that load
+  cannot break login.
+- **Found:** 2026-10-07 in Phase 3 Part B round 3.
 - **Status:** Closed 2026-10-07.
