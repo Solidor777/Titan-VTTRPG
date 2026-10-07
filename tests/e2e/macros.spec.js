@@ -1,88 +1,70 @@
 import { expect, test } from './harness.js';
+import { readNewestCheckFlags } from './checkDialog.js';
 import { login } from './fixtures.js';
 import {
-   attachPageErrors,
-   buildCheck,
-   clearChat,
-   closeAllApps,
-   controlFixtureActorToken,
-   deleteFixtureActor,
-   deleteOrphanedTokens,
-} from './world.js';
+   controlPlacedToken,
+   createItemMacro,
+   openCreateMacroDialog,
+   placeToken,
+   runHotbarMacro,
+   shared,
+   viewScene,
+} from './flows.js';
+import { setClientSetting } from './settings.js';
+import { attachPageErrors, clearChat, closeAllApps } from './world.js';
 
 /**
- * Hotbar macros: every macro kind the Create Macro dialog offers (`game.titan.macros.get<Kind>Macro`) is created in
- * the live world and executed through `Macro#execute`, so each generated command must resolve to a real method. A
- * check macro rolls for the controlled Character through its `request<Type>Check` (the `never` check-options choice
- * rolls straight to chat); the sheet-toggle macro opens and then closes the Item's sheet.
+ * Hotbar macros, made the way a user makes them: an owned item's row is dragged onto a slot of the core hotbar and the
+ * Create Macro dialog fills in the kind and the way the macro finds the item. Each macro kind is then run with a click
+ * on its slot, so each generated command must resolve to a real method. A check macro rolls for the controlled
+ * Character through its `request<Type>Check` (the `never` check-options choice rolls straight to chat); the
+ * sheet-toggle macro opens and then closes the Item's sheet. The macros and their hotbar slots are on the running
+ * list, and the suite-end teardown clears the slots and deletes the macros.
  */
-
-/** @type {string} Name of the throwaway player actor seeded for this spec. */
-const ACTOR_NAME = 'E2E Macro Actor';
-
-/** @type {string} Name prefix shared by every macro this spec creates, so cleanup finds them all. */
-const MACRO_PREFIX = 'E2E Macro';
 
 /** @type {import('@playwright/test').Page} The file-shared, logged-in page (one world boot per file). */
 let page;
 /** @type {string[]} Uncaught page errors collected during the current test (cleared each afterEach). */
 let errors;
-/** @type {string} The `getCheckOptions` choice before this spec, restored afterwards. */
-let originalCheckOptionsMode;
+/** @type {string} The uuid of the Character that owns the items. */
+let rollerUuid;
+/** @type {string} The id of the Character's placed token. */
+let tokenId;
+/** @type {Record<string, string>} The ids of the Character's weapon, spell and ability, by type. */
+const itemIds = {};
 
 test.beforeAll(async ({ browser }) => {
    page = await browser.newPage();
    errors = attachPageErrors(page);
    await login(page);
    await clearChat(page);
-   await deleteOrphanedTokens(page);
 
-   // Roll straight to chat, and seed a Character owning a weapon, a spell, and an ability with one check.
-   originalCheckOptionsMode = await page.evaluate(async ({ actorName, check }) => {
-      /** @type {string} The current check-options choice. */
-      const mode = game.settings.get('titan', 'getCheckOptions');
-      await game.settings.set('titan', 'getCheckOptions', 'never');
-      await game.actors.getName(actorName)?.delete();
+   // The core hotbar is hidden until the client shows it, and the check options dialog stays closed so a macro rolls
+   // straight to chat.
+   await setClientSetting(page, 'showFoundryHotbar', true);
+   await setClientSetting(page, 'getCheckOptions', 'never');
 
-      /** @type {TitanActor} The macro's Character. */
-      const actor = await Actor.create({
-         name: actorName,
-         type: 'player',
-      });
-      await actor.createEmbeddedDocuments('Item', [
+   // The shared roller owns copies of the shared weapon, spell and ability (the ability has one check); a check macro
+   // rolls for the Characters whose tokens are controlled.
+   /** @type {string} The Character's id. */
+   const rollerId = await shared(page, 'roller');
+   rollerUuid = `Actor.${rollerId}`;
+   for (const type of [
+      'weapon',
+      'spell',
+      'ability',
+   ]) {
+      itemIds[type] = await page.evaluate(
+         ({ rollerId, type }) => game.actors.get(rollerId).items.find((item) => item.type === type).id,
          {
-            name: 'E2E Macro Weapon',
-            type: 'weapon',
+            rollerId,
+            type,
          },
-         {
-            name: 'E2E Macro Spell',
-            type: 'spell',
-         },
-         {
-            name: 'E2E Macro Ability',
-            system: { check: [check] },
-            type: 'ability',
-         },
-      ]);
-      return mode;
-   }, {
-      actorName: ACTOR_NAME,
-      check: buildCheck('E2E Macro Check', 'e2e-macro-check-0000-0000-000000000000', {
-         opposedCheck: {
-            attribute: 'body',
-            enabled: false,
-            skill: 'athletics',
-         },
-         resistanceCheck: 'none',
-         resolveCost: 0,
-      }),
-   });
-
-   // Check macros roll for the controlled Characters.
-   await controlFixtureActorToken(page, {
-      actorName: ACTOR_NAME,
-      fallbackSceneName: 'E2E Macro Scene',
-   });
+      );
+   }
+   await viewScene(page, await shared(page, 'scene'));
+   tokenId = await placeToken(page, rollerId);
+   await closeAllApps(page);
 });
 
 test.afterEach(async () => {
@@ -92,124 +74,100 @@ test.afterEach(async () => {
 });
 
 test.afterAll(async () => {
-   await page.evaluate(async ({ mode, prefix }) => {
-      await game.settings.set('titan', 'getCheckOptions', mode);
-
-      /** @type {string[]} The ids of the macros this spec created. */
-      const macroIds = game.macros.filter((macro) => macro.name.startsWith(prefix)).map((macro) => macro.id);
-      await Macro.deleteDocuments(macroIds);
-   }, {
-      mode: originalCheckOptionsMode,
-      prefix: MACRO_PREFIX,
-   });
-   await deleteFixtureActor(page, ACTOR_NAME);
    await page?.close();
 });
 
 /**
- * Creates a check macro for one of the seeded Items, executes it, and returns the subtype of the chat message it
- * posts.
- * @param {object} macroArgs - The macro to create.
- * @param {string} macroArgs.getter - The `game.titan.macros` method that creates the macro.
- * @param {string} macroArgs.itemName - The seeded Item the macro rolls.
- * @param {string} macroArgs.idMethod - How the command identifies the Item (uuid, name, or documentId).
- * @param {number} [macroArgs.idx] - The Attack or Item Check index, for the kinds that take one.
- * @returns {Promise<string>} The posted message's subtype.
+ * Makes a check macro of one of the Character's items, runs it with a click on its hotbar slot while the Character's
+ * token is controlled, and returns the subtype of the chat message it posts.
+ * @param {object} macro - The macro to make.
+ * @param {string} macro.itemType - The type of the owned item the macro rolls (`weapon`, `spell` or `ability`).
+ * @param {string} macro.type - The Macro Type to choose in the dialog.
+ * @param {string} macro.idMethod - The ID Method to choose in the dialog.
+ * @param {string} macro.name - The macro's name.
+ * @param {string} expectedType - The message subtype the macro rolls.
+ * @returns {Promise<string>} The subtype of the posted message.
  */
-async function executeCheckMacro({ getter, itemName, idMethod, idx }) {
-   /** @type {number} The chat-message count before the macro runs. */
-   const baseline = await page.evaluate(async ({ actorName, args, prefix }) => {
-      /** @type {TitanItem} The Item the macro rolls. */
-      const item = game.actors.getName(actorName).items.getName(args.itemName);
-
-      /** @type {Macro} The created macro. */
-      const macro = await game.titan.macros[args.getter](
-         item,
-         `${prefix} ${args.getter} ${args.idMethod}`,
-         item.img,
-         args.idMethod,
-         args.idx,
-      );
-
-      /** @type {number} The chat-message count before the macro runs. */
-      const size = game.messages.size;
-      await macro.execute();
-      return size;
-   }, {
-      actorName: ACTOR_NAME,
-      args: {
-         getter,
-         idMethod,
-         idx,
-         itemName,
-      },
-      prefix: MACRO_PREFIX,
+async function runCheckMacro({ itemType, type, idMethod, name }, expectedType) {
+   const { slot } = await createItemMacro(page, rollerUuid, itemIds[itemType], {
+      name,
+      type,
+      idMethod,
    });
+   await controlPlacedToken(page, tokenId);
 
-   // The macro's request rolls without being awaited by the command, so wait for its message.
-   await expect.poll(
-      () => page.evaluate((base) => game.messages.size > base, baseline),
-      { message: `the ${getter} macro posts a message` },
-   ).toBe(true);
-   return page.evaluate((base) => game.messages.contents[base].type, baseline);
+   /** @type {number} The chat-message count before the macro runs. */
+   const baseline = await page.evaluate(() => game.messages.size);
+   await runHotbarMacro(page, slot);
+   return (await readNewestCheckFlags(page, baseline, expectedType)).type;
 }
 
 test('an Attack Check macro identified by the Item\'s TITAN uuid rolls the Attack Check', async () => {
-   expect(await executeCheckMacro({
-      getter: 'getAttackCheckMacro',
+   expect(await runCheckMacro({
+      itemType: 'weapon',
+      type: 'attackCheck',
       idMethod: 'uuid',
-      idx: 0,
-      itemName: 'E2E Macro Weapon',
-   })).toBe('attackCheck');
+      name: 'E2E Macro Attack Check',
+   }, 'attackCheck')).toBe('attackCheck');
 });
 
 test('a Casting Check macro identified by the Item\'s name rolls the Casting Check', async () => {
-   expect(await executeCheckMacro({
-      getter: 'getCastingCheckMacro',
+   expect(await runCheckMacro({
+      itemType: 'spell',
+      type: 'castingCheck',
       idMethod: 'name',
-      itemName: 'E2E Macro Spell',
-   })).toBe('castingCheck');
+      name: 'E2E Macro Casting Check',
+   }, 'castingCheck')).toBe('castingCheck');
 });
 
 test('an Item Check macro identified by the Item\'s document id rolls the Item Check', async () => {
-   expect(await executeCheckMacro({
-      getter: 'getItemCheckMacro',
+   expect(await runCheckMacro({
+      itemType: 'ability',
+      type: 'itemCheck',
       idMethod: 'documentId',
-      idx: 0,
-      itemName: 'E2E Macro Ability',
-   })).toBe('itemCheck');
+      name: 'E2E Macro Item Check',
+   }, 'itemCheck')).toBe('itemCheck');
 });
 
 test('a sheet-toggle macro opens and then closes the Item\'s sheet', async () => {
-   // Create the macro and run it once: the sheet opens.
-   await page.evaluate(async ({ actorName, prefix }) => {
-      /** @type {TitanItem} The Item whose sheet the macro toggles. */
-      const item = game.actors.getName(actorName).items.getName('E2E Macro Weapon');
-
-      /** @type {Macro} The created macro. */
-      const macro = await game.titan.macros.getToggleDocumentSheetMacro(`${prefix} Sheet`, item.img, item.uuid);
-      await macro.execute();
-   }, {
-      actorName: ACTOR_NAME,
-      prefix: MACRO_PREFIX,
+   const { slot } = await createItemMacro(page, rollerUuid, itemIds.weapon, {
+      name: 'E2E Macro Sheet Toggle',
+      type: 'toggleDocumentSheet',
    });
-   await expect.poll(
-      () => page.evaluate(
-         (actorName) => game.actors.getName(actorName).items.getName('E2E Macro Weapon').sheet.rendered,
-         ACTOR_NAME,
-      ),
-      { message: 'the first run opens the sheet' },
-   ).toBe(true);
+   await closeAllApps(page);
 
-   // Run the same macro again: the sheet closes.
-   await page.evaluate(async (prefix) => {
-      await game.macros.getName(`${prefix} Sheet`).execute();
-   }, MACRO_PREFIX);
-   await expect.poll(
-      () => page.evaluate(
-         (actorName) => game.actors.getName(actorName).items.getName('E2E Macro Weapon').sheet.rendered,
-         ACTOR_NAME,
-      ),
-      { message: 'the second run closes the sheet' },
-   ).toBe(false);
+   /**
+    * Reads whether the weapon's sheet is open.
+    * @returns {Promise<boolean>} True when the sheet is rendered.
+    */
+   const sheetOpen = () => page.evaluate(
+      ({ rollerUuid, weaponId }) => fromUuid(rollerUuid).then((actor) => actor.items.get(weaponId).sheet.rendered),
+      {
+         rollerUuid,
+         weaponId: itemIds.weapon,
+      },
+   );
+   expect(await sheetOpen(), 'the sheet is closed before the macro runs').toBe(false);
+
+   // The first run opens the sheet; the same macro run again closes it.
+   await runHotbarMacro(page, slot);
+   await expect.poll(sheetOpen, { message: 'the first run opens the sheet' }).toBe(true);
+   await runHotbarMacro(page, slot);
+   await expect.poll(sheetOpen, { message: 'the second run closes the sheet' }).toBe(false);
+});
+
+test('the Create Macro dialog names the attack of a weapon, and a cancelled dialog makes no macro', async () => {
+   /** @type {number} The number of macros before the drop. */
+   const before = await page.evaluate(() => game.macros.size);
+   const { dialog, slot } = await openCreateMacroDialog(page, rollerUuid, itemIds.weapon);
+
+   // The Attack select lists the attack by its label and position, as plain text and not a localization key.
+   /** @type {string} The dialog's text. */
+   const text = await dialog.innerText();
+   expect(text, 'the dialog lists the attack by label and position').toMatch(/Attack \(1\)/);
+   expect(text, 'the dialog shows no untranslated text').not.toContain('LOCAL.');
+   await dialog.getByRole('button', { name: 'Cancel' }).click();
+   await expect(dialog, 'Cancel closes the dialog').toHaveCount(0);
+   expect(await page.evaluate((slot) => game.user.hotbar[slot], slot), 'the slot stays empty').toBeUndefined();
+   expect(await page.evaluate(() => game.macros.size), 'no macro was made').toBe(before);
 });

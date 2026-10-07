@@ -3,7 +3,7 @@ import { expect, test } from './harness.js';
 import { clickSheetTab, clickTabButton, commitText } from './actions.js';
 import { chooseContextMenuEntry } from './contextMenu.js';
 import { openSheetByUuid } from './fixtures.js';
-import { readRegistry, record, writeRegistry } from './registry.js';
+import { readRegistry, record, recordHotbar, writeRegistry } from './registry.js';
 import { selectTitanOption } from './select.js';
 import { settle } from './settle.js';
 import { closeAllApps, showChatLog } from './world.js';
@@ -1572,6 +1572,61 @@ export async function setResource(page, actorUuid, resource, value) {
 }
 
 /**
+ * Posts the chat card of an item or effect with the Send to Chat button of its sheet's window header.
+ * @param {import('@playwright/test').Page} page - A logged-in GM page.
+ * @param {string} documentUuid - The uuid of the item or effect.
+ * @returns {Promise<string>} The id of the chat message the button posted.
+ */
+export async function sendToChat(page, documentUuid) {
+   /** @type {import('@playwright/test').Locator} The document's sheet. */
+   const sheet = await openSheetByUuid(page, documentUuid);
+
+   /** @type {string[]} The ids of the chat messages before the click. */
+   const before = await page.evaluate(() => game.messages.map((message) => message.id));
+   await sheet.locator('.window-header .send-to-chat-button').click();
+
+   /** @type {string[]} The ids that appeared. */
+   let added = [];
+   await expect.poll(async () => {
+      added = await page.evaluate(
+         (before) => game.messages.filter((message) => !before.includes(message.id)).map((message) => message.id),
+         before,
+      );
+      return added.length;
+   }, { message: 'the Send to Chat button posted one message' }).toBe(1);
+   await settle(page);
+   return added[0];
+}
+
+/**
+ * Posts a plain chat message the way a user does: focuses the chat input, types the text and presses Enter.
+ * @param {import('@playwright/test').Page} page - A logged-in page.
+ * @param {string} text - The text typed into the chat input.
+ * @returns {Promise<string>} The id of the chat message the input posted.
+ */
+export async function typeChatMessage(page, text) {
+   await showChatLog(page);
+
+   /** @type {string[]} The ids of the chat messages before the message is sent. */
+   const before = await page.evaluate(() => game.messages.map((message) => message.id));
+   await page.locator('#chat-message').click();
+   await page.keyboard.type(text);
+   await page.keyboard.press('Enter');
+
+   /** @type {string[]} The ids that appeared. */
+   let added = [];
+   await expect.poll(async () => {
+      added = await page.evaluate(
+         (before) => game.messages.filter((message) => !before.includes(message.id)).map((message) => message.id),
+         before,
+      );
+      return added.length;
+   }, { message: 'Enter in the chat input posted one message' }).toBe(1);
+   await settle(page);
+   return added[0];
+}
+
+/**
  * Types a Skill's Training base value into the actor sheet's Skills tab.
  * @param {import('@playwright/test').Page} page - A logged-in page.
  * @param {string} actorUuid - The uuid of the character.
@@ -1986,6 +2041,127 @@ export async function endCombat(page) {
       { message: 'the End Combat button deleted the combat' },
    ).toBe(false);
    await settle(page);
+}
+
+/**
+ * Drags an owned item's row from the actor sheet onto the first empty slot of the core hotbar, which opens the Create
+ * Macro dialog. The core hotbar is hidden unless the client setting `showFoundryHotbar` is on, so the caller turns it
+ * on first.
+ * @param {import('@playwright/test').Page} page - A logged-in page.
+ * @param {string} actorUuid - The uuid of the actor that owns the item.
+ * @param {string} itemId - The id of the owned item.
+ * @returns {Promise<{dialog: import('@playwright/test').Locator, slot: number}>} The open dialog and the number of the
+ * slot the macro will take.
+ */
+export async function openCreateMacroDialog(page, actorUuid, itemId) {
+   /** @type {import('@playwright/test').Locator} The actor's sheet. */
+   const sheet = await openSheetByUuid(page, actorUuid);
+
+   /** @type {string} The item's type, which decides the sheet tab that lists it. */
+   const itemType = await page.evaluate(
+      async ({ actorUuid, itemId }) => (await fromUuid(actorUuid)).items.get(itemId).type,
+      {
+         actorUuid,
+         itemId,
+      },
+   );
+   await openTab(sheet, {
+      ability: 'Abilities',
+      spell: 'Spells',
+   }[itemType] ?? 'Inventory');
+   await settle(page, { transitions: true });
+
+   /** @type {import('@playwright/test').Locator} The first empty slot of the hotbar. */
+   const slot = page.locator('#hotbar .slot.open').first();
+   await expect(slot, 'the core hotbar shows an empty slot').toBeVisible();
+
+   /** @type {number} The number the empty slot carries on the hotbar. */
+   const slotNumber = Number(await slot.getAttribute('data-slot'));
+   await sheet.locator(`[data-item-id="${itemId}"] [data-drag-handle]`).first().dragTo(slot);
+
+   /** @type {import('@playwright/test').Locator} The Create Macro dialog. */
+   const dialog = page.locator('.application.titan-dialog[id^="titan-create-macro-dialog-"]');
+   await expect(dialog, 'the drop opened the Create Macro dialog').toBeVisible();
+   return {
+      dialog,
+      slot: slotNumber,
+   };
+}
+
+/**
+ * Makes a hotbar macro of an owned item the way a user does: drags the item's row onto the first empty slot of the core
+ * hotbar (`openCreateMacroDialog`), fills the Create Macro dialog and presses its Create Macro button. The macro and
+ * its hotbar slot are recorded for the teardown.
+ * @param {import('@playwright/test').Page} page - A logged-in page.
+ * @param {string} actorUuid - The uuid of the actor that owns the item.
+ * @param {string} itemId - The id of the owned item.
+ * @param {object} [options] - What the dialog is told.
+ * @param {string} [options.name] - The macro's name, typed into the dialog's name input.
+ * @param {string} [options.type] - The Macro Type to choose (`attackCheck`, `castingCheck`, `itemCheck`,
+ * `toggleDocumentSheet`); the dialog's own default is kept when omitted.
+ * @param {string} [options.idMethod] - The ID Method to choose (`uuid`, `name`, `documentId`); the dialog's default
+ * is kept when omitted.
+ * @returns {Promise<{macroId: string, slot: number}>} The macro and the hotbar slot that holds it.
+ */
+export async function createItemMacro(page, actorUuid, itemId, { name, type, idMethod } = {}) {
+   const { dialog, slot } = await openCreateMacroDialog(page, actorUuid, itemId);
+
+   /**
+    * Chooses a value in the select of one of the dialog's labelled rows.
+    * @param {string} label - The row's label.
+    * @param {string} value - The option's value.
+    * @returns {Promise<void>} Resolves once the select shows the value.
+    */
+   const choose = async (label, value) => {
+      await selectTitanOption(
+         page,
+         dialog.locator('.row', { has: page.getByText(label, { exact: true }) }).locator('[role="combobox"]'),
+         value,
+      );
+   };
+   if (name !== undefined) {
+      await commitText(dialog.locator('.row').first().locator('input'), name);
+   }
+   if (type !== undefined) {
+      await choose('Macro Type', type);
+   }
+   if (idMethod !== undefined) {
+      await choose('ID Method', idMethod);
+   }
+   await dialog.getByRole('button', { name: 'Create Macro' }).click();
+   await expect(dialog, 'Create Macro closes the dialog').toHaveCount(0);
+
+   /** @type {string} The id of the macro now in the slot. */
+   let macroId;
+   await expect.poll(async () => {
+      macroId = await page.evaluate((slot) => game.user.hotbar[slot], slot);
+      return macroId;
+   }, { message: 'the dialog assigned the macro to the slot' }).toBeTruthy();
+   await settle(page);
+   record({
+      documentName: 'Macro',
+      id: macroId,
+      createdBy: currentSpec(),
+   });
+   recordHotbar({
+      userId: await page.evaluate(() => game.user.id),
+      slot,
+      macroId,
+   });
+   return {
+      macroId,
+      slot,
+   };
+}
+
+/**
+ * Runs the macro in a hotbar slot with a click on the slot, as a user does.
+ * @param {import('@playwright/test').Page} page - A logged-in page.
+ * @param {number} slot - The number of the hotbar slot that holds the macro.
+ * @returns {Promise<void>} Resolves once the click is dispatched; the caller waits for the macro's effect.
+ */
+export async function runHotbarMacro(page, slot) {
+   await page.locator(`#hotbar .slot.full[data-slot="${slot}"]`).click();
 }
 
 /**
