@@ -640,13 +640,18 @@ when fixed.
   instead of its `conditionalCheckModifiers` parameter. Any check on an item with custom traits threw once the actor had
   a conditional check modifier from an ability or effect; spell rows on the Spells tab failed to render. The spells
   themselves carry no rules elements.
-- **Fixed:** 2026-09-26, gated by `spell-rules-regressions.spec.js`. `no-undef` is now enforced by ESLint.
+- **Fixed:** 2026-09-26. `no-undef` is now enforced by ESLint. Gated by `tests/e2e/logic/rules-elements.spec.js` ("casting
+  check options apply custom-trait dice and casting expertise modifiers" and "conditional dice and expertise apply to item
+  checks and to tradition-keyed casting checks": the dialogs of a casting check and an item check read the modifiers of
+  a Void custom trait and a tradition from rules elements added in the Rules Elements tab).
 
 ### 50. Conditional expertise modifiers never applied to casting or item checks
 
 - **What:** casting and item checks looked up conditional modifiers under `'expertiseMod'`; the rules-element sheet
   stores `'expertise'`, so bonuses such as Spellcasting Specialization's +1 expertise never applied.
-- **Fixed:** 2026-09-26, gated by `spell-rules-regressions.spec.js`.
+- **Fixed:** 2026-09-26. Gated by `tests/e2e/logic/rules-elements.spec.js` ("casting check options apply custom-trait dice
+  and casting expertise modifiers": the casting dialog shows the +1 expertise of an any-selector element; "conditional
+  dice and expertise apply to item checks and to tradition-keyed casting checks": the item dialog shows the expertise).
 
 ### 51. Deleting an item showed "Item is already owned by actor" and left armor equipped
 
@@ -767,7 +772,8 @@ when fixed.
   select no longer offers them), and the sidebar rows. No migration (first release): the soresokai world's 56
   actors and the compendium's Astral Assassin had only the default `static: 0` values, which were stripped directly;
   no rules element anywhere targeted them. Damage/healing conditional modifiers are gated by
-  `conditional-damage-healing-mods.spec.js`.
+  `tests/e2e/logic/rules-elements.spec.js` ("damage and healing conditional modifiers apply to attack, casting, and
+  item checks": the damage and healing parameters of rolled attack, casting and item checks).
 
 ### 66. Effect Tray offered Create Folder on folders already at the pack's depth limit
 
@@ -789,8 +795,10 @@ when fixed.
 - **Fixed:** 2026-09-28 — `_getItemCheckRollData` resolves an Item Check's source live: `itemId` names an owned item
   and `effectId` an effect among `actor.allApplicableEffects()`; `itemRollData` is used only when neither is given (the
   item chat card's snapshot). A deleted source fails validation and the dialog closes without a page error. Commits
-  `15f35020` (items) and `23b33c46` (effects). Gated by `check-dialog-advantage.spec.js` (deleting the owned item, or
-  the effect, while its Item Check dialog is open) and `rebuild-check-options.test.js`.
+  `15f35020` (items) and `23b33c46` (effects). Gated by `tests/e2e/check-dialog.spec.js` ("deleting the owned ability while
+  its item dialog is open closes the dialog without a page error", and "deleting the effect while its Item Check dialog
+  is open closes the dialog without a page error": the item or effect is deleted with its row's Delete button) and
+  `rebuild-check-options.test.js`.
 
 ### 68. An explicit Complexity or Difficulty of 0 on a Casting or Item Check was replaced by the derived value
 
@@ -889,7 +897,8 @@ when fixed.
 - **Fixed:** 2026-09-29 — the label takes the stat's `mod` object and the tooltip walks `MOD_BUCKET_LABELS`
   (`src/system/ModBuckets.js`), whose dynamic buckets `_resetDynamicMods` also reads. Gated by
   `tests/unit/ModBuckets.test.js` (bucket order, tooltip, and a scan rejecting any Svelte source that names a bucket)
-  and `tests/e2e/stat-breakdown-conditions.spec.js`.
+  and `tests/e2e/logic/conditions.spec.js` ("Blinded lowers the sheet's Defense by a quarter of its base and the
+  breakdown lists Conditions": Blinded is applied from the Token HUD and the sheet's Defense tooltip is read).
 
 ### 77. Opening a Multiply Base or Multiply Sum editor saved "up" for an element with no stored rounding
 
@@ -1863,4 +1872,61 @@ The evidence files named here are in `.superpowers/sdd/test-suite-rewrite/phase-
   reproduced, and the wait that failed no longer exists, so the runs show that the code does not wait, not that load
   cannot break login.
 - **Found:** 2026-10-07 in Phase 3 Part B round 3.
+- **Status:** Closed 2026-10-07.
+
+### 133. Deleting an owned item while its own sheet was open threw, and left a check dialog opened from that sheet open
+
+- **What:** the item sheet's `CondensedAttackCheckButton`, `CondensedCastingCheckButton` and `CondensedItemCheckButton`
+  read `rollActor.data.system.initialize<Type>CheckOptions` in a `$derived` guarded only by the sheet's own item
+  bridge. The derived ran against an item the roll actor no longer had and threw "Cannot read properties of undefined
+  (reading 'system')" from `initializeAttackCheckOptions` (read: the stack of the first scratch run named that method;
+  its output file was overwritten by the later runs, so only the message survives, in `scratch-delete.json` variant
+  `a`; inferred: the roll actor drops the item before the sheet's bridge does, which was not instrumented). A check dialog opened from the sheet's roll button stayed open after the item was deleted (whether the
+  throw is why the dialog stayed open is inferred; the fix removed both).
+- **Measured (`.superpowers/sdd/test-suite-rewrite/phase-4/`):** the weapon dialog test, which opens the dialog from the
+  item sheet's roll button and deletes the item, failed with the page error and an open dialog (`dialog-1.log` test 25;
+  `dialog-2.log`; the spell test after it failed on a duplicate actor name left by the worker restart, and the ability
+  test did not run). A scratch run with the weapon's sheet open and no dialog threw the same error on `item.delete()`
+  (`scratch-13.log`, `scratch-delete.json`, variant `a`); with the sheet closed before the delete the dialog closed and
+  no error was thrown (variant `b`). The same run's variant `c` (actor sheet open on Inventory, dialog opened by
+  `requestAttackCheck`) closed the dialog but threw two "Cannot read properties of undefined (reading 'remove')" errors
+  on the delete. That error was not seen in the two variants run after the fix with no sheet open (`scratch-15.log`,
+  `scratch-remove.json`); its source was not traced, and whether the fix removed it is not established (the variants
+  differ).
+- **Found:** 2026-10-07 while rewriting the dialog tests of Phase 4 to open from the sheets' roll buttons (the old tests
+  opened the dialog through `request<Type>Check` and never had a sheet open).
+- **Fixed:** the three buttons also require `rollActor.data.system.validate<Type>CheckOptions(checkOptions, false)`, as
+  the dialogs' rebuild does (commit `9103a659`).
+- **Gate:** `tests/e2e/check-dialog.spec.js`, the three tests "deleting the owned weapon, spell and ability while its
+  dialog is open closes the dialog without a page error": they open the dialog from the item sheet's roll button and
+  delete the item with the Delete button of its row. The weapon test failed before the fix (`dialog-1.log`,
+  `dialog-2.log`); the three passed after it (`dialog-3.log`).
+- **Status:** Closed 2026-10-07.
+
+### 134. `applyCondition` and `removeCondition` sometimes found no Token HUD, or left it open
+
+The evidence files named here are in `.superpowers/sdd/test-suite-rewrite/phase-4/` (local, not checked in).
+
+- **What:** the flows right-click a hovered token to open the Token HUD, click a status in its palette, and left-click the
+  token to close the HUD. In the full run `logic/conditions.spec.js` failed once in its `afterEach` ("#token-hud" not
+  visible when `removeCondition` right-clicked, `e2e-full-1.log`), and 14 tests after it did not run.
+- **Measured:** 240 toggles (40 rounds of apply and remove for three conditions) failed 21 times
+  (`scratch-hud.json`): the right-click opened no HUD (the token was neither controlled nor hovered afterwards), or the
+  closing left-click left the HUD open with the token controlled. Three later runs of a copy of the flow that probed the
+  pointer before each click failed 8, 6 and 0 times of 240; only the last run's file survives (`scratch-hud2.json`,
+  0 failures), the other two counts were read from the console and are not saved. In the 8-failure run the probe showed
+  the failing left-clicks starting with the token not hovered (manager state 0, the pointer having been on the HUD's
+  palette) and the failing right-clicks starting with it hovered (state 1); the event log of the 6-failure run, read at
+  the time and not saved, showed the right button's pointerdown and pointerup reaching the canvas and a `hoverToken`
+  false 8 ms later with no HUD bound. Core's `MouseInteractionManager` handles a click only in the HOVER state
+  (`mouse-handler.mjs`, `#handleRightDown`, `#handlePointerOut`). The mechanism of the dropped right-click is not
+  established, and the failure rate varied between runs from 0 to 21 of 240.
+- **Found:** 2026-10-07 in the Phase 4 full run.
+- **Fixed:** `hoverToken` and the closing click go through `restOnToken` (`tests/e2e/flows.js`): the pointer moves onto
+  the token from outside it, the flow waits for the token's `hover`, and two animation frames draw before the click. The
+  closing left-click re-enters the token first, because the pointer is on the HUD's palette.
+- **Gate:** the real `applyCondition` and `removeCondition` in the same loop, three runs of 240 toggles, 0 failures
+  (`scratch-hud3-run1.json` under concurrent unit-test load, `-run2.json`, `-run3.json`). The failure before the change
+  came at 21 of 240 (`scratch-hud.json`), but the probe copy's runs (8, 6 and 0 of 240) show the rate is not constant,
+  so 720 clean toggles lower the rate and do not prove it zero.
 - **Status:** Closed 2026-10-07.

@@ -806,8 +806,7 @@ pack LevelDB locks. `tests/unit/SuperviseServer.test.js` covers spawn/reuse/tear
 flow-made documents with zero uncaught page errors and no `LOCAL.` text; the collapsed-layout regressions; the
 portrait pick through Foundry's file picker; opening a sheet from the directory; the Edit Unique ID dialog),
 `sheet-header.spec.js` (the window-header controls menu, the inline header buttons, unlinking from the sheet a token
-double-click opens, and the `ReactiveDocument` identity pin), `interaction-rolls.spec.js` (each `roll<Type>Check`
-posts a chat message of the expected subtype (`message.type`) and the card renders), `character-sheet-rows.spec.js`
+double-click opens, and the `ReactiveDocument` identity pin), `character-sheet-rows.spec.js`
 (the Abilities, Spells, Inventory and Effects rows of one flow-made actor: a functional sweep per item type, rows
 following edits made in the item or effect sheet, delete confirmation and the confirmation-off path, check tag parity
 across the item sheet, the character sheet and the Effect HUD), `custom-traits.spec.js` (the Add Custom Trait dialog,
@@ -818,9 +817,19 @@ weapon: add and delete, the selector's default key, the rounding select of Multi
 conditional check modifier editor), `item-sheet-rolls.spec.js` (the sidebar roll buttons of an owned equipment, weapon
 and spell, the Checks tab roll preview, a check added while the sheet is open, damage-reduction settings in the
 posted check parameters), `spell-sheet.spec.js` (the condition aspects' Off-Balance option, the Casting Check tab's
-aspect costs, its re-pricing by a second client and its scroll position) and `drag.spec.js` (real pointer drags:
+aspect costs, its re-pricing by a second client and its scroll position), `drag.spec.js` (real pointer drags:
 character sheet item and effect lists, the four item sheet lists, a row copied between sheets and refused by a list
-of another kind, a world item or a folder dropped on an actor sheet). `tests/e2e/harness.js` provides `test`, `expect` and
+of another kind, a world item or a folder dropped on an actor sheet), `check-math.spec.js` (every check type rolled
+from its sheet button with forced dice and compared to the independent oracle in `tests/shared/checkOracle.js`, with
+the card mounted; an attack's Difficulty from targeted tokens; the Resist button and the damage buttons of a card;
+the die click, reset and scaling-aspect controls of a card; Advantage and Automatic Failure set in the dialog),
+`check-dialog.spec.js` (each check type's dialog opened from the sheet's roll button: totals recomputed as the fields
+change, the Advantage, Automatic Failure, situation and derived fields following effects added and deleted and items
+edited in the sheets while the dialog is open, a user-set field kept, the dialog closing when its item or effect is
+deleted, the `getCheckOptions` setting, Heavy, Encumbering and Loud armor, a condition's situation),
+`logic/rules-elements.spec.js` (rules elements added in the Rules Elements tab, read from the sheet's derived Body
+value, the check dialogs and the posted check parameters) and `logic/conditions.spec.js` (conditions applied from the
+Token HUD, read from derived stats, the sheet's tooltip, rolled checks and the Player HUD). `tests/e2e/harness.js` provides `test`, `expect` and
 `flushPageErrors`; `tests/e2e/join.js` (no test-runner imports, so the setup, teardown and census load it without
 `harness.js`) provides `joinWorld`, `trackWorldPage`, `flushPageErrors` and `takeUncheckedErrors`; `tests/e2e/fixtures.js`
 re-exports `joinWorld` and provides `login`, `openSheetByUuid(page, uuid)` (`fromUuid` then `sheet.render`, waits for
@@ -982,9 +991,20 @@ Abilities/Spells tab add button or the Inventory tab's add button and its item-t
 renamed in its own sheet opened by the row's Edit button), `dragItemOntoSheet` (drags an Items-tab entry onto the
 open actor sheet), `addEffect` (the Effects tab add button, the effect renamed in its sheet, and optionally its
 duration type chosen in the sheet header), `addCheck` (the Checks tab add button, then the row's label input and,
-when asked, its Resolve Cost input, Resistance Check select and Opposed Check box),
-`addRulesElement` (the Rules Elements tab add button, the operation select, and the `ccm-*` selects and value input
-of a conditional check modifier), `createWorldItem`, `createFolder` (the directory's Create Folder button and the folder
+when asked, its Resolve Cost input, Resistance Check select, Opposed Check box, Damage box, Initial Value input and
+Damage Reduced By select),
+`addRulesElement` (the Rules Elements tab add button, the operation select, and the controls of the operation: the
+`ccm-*` selects, key input and value input of a conditional check modifier; the rating, selector and key of a
+conditional rating modifier; the selector, key, value and rounding or mode of the flat, Multiply Base, Multiply Sum
+and Set Sum operations; a negative value is typed in parentheses because a leading operator in a number input is a
+relative change), `addTrait` (the Edit Traits dialog of a weapon attack, an armor or a shield),
+`setAttributeBase` and `setSkillTraining` (the base input of an attribute in the sheet header, the training input of
+a skill row in the Skills tab), `applyCondition` / `removeCondition` (the Token HUD of a placed token: right-click,
+the status effects palette, the status icon, then a left click on the token closes the HUD, so the next call's
+right-click opens it; core's right-click toggles the HUD, so a second right-click does not close it reliably). The
+pointer reaches the token through `restOnToken` before each click (it moves in from outside the token and waits for
+the token's `hover` and two animation frames), because core handles a click only on a hovered token and a click sent
+in the frame of the move was dropped in 21 of 240 toggles (CLOSED_BUGS #134), `createWorldItem`, `createFolder` (the directory's Create Folder button and the folder
 configuration window; `createActor` and `createWorldItem` take a `folderId` and then use that folder's own Create
 button, which creates the document inside the folder), `addCustomTrait`, `addAttack`, `enableAspect` and
 `addCustomAspect` (the Add Custom Trait dialog with an optional description, the weapon Attacks tab add button,
@@ -1010,7 +1030,7 @@ token and wait for `token.object.hover` before the double-click that opens the s
 which then waits for the reopened synthetic actor's sheet) or the click that takes control
 (`controlPlacedToken`)), `targetPlacedToken` / `releaseTargets` / `targetedTokenIds` (core's Target key T on
 the hovered token, Shift+T adds; `game.user.targets` then holds real Token objects, as
-`checks-opposed.spec.js` uses), `createCompendium` / `setCompendiumLocked` (Compendium tab Create dialog, entry
+`check-math.spec.js` uses), `createCompendium` / `setCompendiumLocked` (Compendium tab Create dialog, entry
 context menu Lock/Unlock), `putInPack` (opens the pack's popout window and drags the world entry onto its
 `.directory-list`; the pack index is polled for the new id; the caller passes the world entry's locator, and the flow
 reopens that entry's sidebar tab before the drag). The creation dialogs are `DialogV2` forms whose content
@@ -1416,12 +1436,24 @@ v14: the async-`describe` / ApplicationV2 timing mismatch causes all batch regis
 silently. `src/quench/` and `tests/e2e/quench-runner.spec.js` were deleted; the `test:e2e:quench` npm
 script was removed. No Quench code remains in `src/` or `tests/`.
 
-**Derived-data (rules-element) E2E spec** — `tests/e2e/logic/rules-elements.spec.js` asserts the live
-flatModifier pipeline: creates a fresh `player` actor (Body base = 1), attaches an `ability` item carrying
-a `+2 flatModifier` rules element via `buildFlatModifierAbilityData`, waits 100 ms for derived-data
-preparation to settle, and asserts `actor.system.attribute.body.value === 3`. Abilities apply their
-rules elements on mere ownership (no equip), making them the canonical fixture type for derived-stat
-assertions. The spec uses `test.afterEach` to delete the fixture actor so world state does not accumulate.
+**Derived-data (rules-element) E2E spec** — `tests/e2e/logic/rules-elements.spec.js` builds every rules element in the
+Rules Elements tab (`addRulesElement`) of an ability, an effect or an owned item of actors made through the flows, and
+reads the result where a user does: the sheet's derived attribute value (flat modifiers, Multiply Base, Multiply Sum,
+Set Sum, rounding), the dialogs of a casting check and an item check, and the posted parameters of rolled checks
+(damage, healing, Advantage, Automatic Failure). Abilities apply their rules elements on mere ownership (no equip),
+making them the canonical fixture type for derived-stat assertions. The flat-modifier stacking invariant (Body =
+max(0, 1 + sum) for any list of flat modifiers) is a unit property over the real data-model pipeline,
+`tests/unit/RulesElementStacking.property.test.js`; changing its `1 +` to `2 +` fails it with the counterexample `[[]]`
+(`.superpowers/sdd/test-suite-rewrite/phase-4/stacking-mutation.log`).
+
+**`checkDialog.js`** — `tests/e2e/checkDialog.js` drives the check dialogs. `openCheckDialog(page, type, uuid,
+{ button, index })` opens the sheet of the actor (Attribute and Resistance checks: the header button named for the
+attribute or resistance) or of the owned item (Attack, Casting and Item checks: the `index`-th roll button of the
+sidebar) and clicks the button; the `getCheckOptions` setting must make the click open a dialog. `moveDialogAside`
+drags a dialog off the sheet it opened over (a dialog opens over the middle of the sheet and can cover the controls
+a test clicks next). `setNumberField`, `setSelectField`, `setCheckbox`, `readSummary`, `clickRoll` and
+`readNewestCheckFlags` set a field, read a summary, roll and read the posted message by the dialog's test ids
+(`check-field-<key>`, `check-summary-<key>`, `check-dialog-roll`). No spec reaches a dialog through `request<Type>Check`.
 
 **`buildFlatModifierAbilityData` builder** — `tests/shared/builders.js` exports
 `buildFlatModifierAbilityData(name, values)`: accepts a `string` name and a `number[]` of modifier values; returns an
