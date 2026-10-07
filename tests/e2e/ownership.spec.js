@@ -149,7 +149,7 @@ test('OBSERVER: the player can view but not edit', async () => {
       .toBe(false);
 });
 
-test('LIMITED: the TITAN sheet shows a limited viewer what it shows an observer: the whole sheet, read-only', async () => {
+test('LIMITED: the TITAN sheet shows a limited viewer the whole sheet, read-only', async () => {
    // Pins the measured behaviour (the user's ruling: leave it as it is): a limited viewer meets the sheet's view
    // permission, so the sheet opens with every tab and the same controls as an observer's, all of them disabled.
    await giveLevel('LIMITED');
