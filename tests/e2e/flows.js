@@ -513,12 +513,14 @@ async function hoverToken(page, tokenId) {
 }
 
 /**
- * Moves the pointer onto a placed token from outside it and waits until the canvas shows the token hovered and has
- * drawn two frames with the pointer there. The canvas processes a click only on a hovered token.
+ * Moves the pointer onto a placed token from outside it and waits until the canvas shows the token hovered. A token's
+ * interaction manager handles a pointer-down only from its HOVER state on (read: `#handleLeftDown` and
+ * `#handleRightDown`, `client/canvas/interaction/mouse-handler.mjs:474-475` and `565-566`, Foundry 14.364 at
+ * `C:\FoundryVTT\V14\dev\foundry`), so the pointer re-enters the token whenever it has been elsewhere.
  * @param {import('@playwright/test').Page} page - A logged-in GM page viewing the token's scene.
  * @param {string} tokenId - The token on the viewed scene.
  * @param {{x: number, y: number}} centre - The token's centre in client (page) coordinates.
- * @returns {Promise<void>} Resolves once the token is hovered and the frames have drawn.
+ * @returns {Promise<void>} Resolves once the token is hovered.
  */
 async function restOnToken(page, tokenId, centre) {
    await page.mouse.move(centre.x + 200, centre.y);
@@ -527,9 +529,6 @@ async function restOnToken(page, tokenId, centre) {
       () => page.evaluate((tokenId) => canvas.scene.tokens.get(tokenId).object.hover, tokenId),
       { message: 'the pointer hovers the token' },
    ).toBe(true);
-   await page.evaluate(() => new Promise((resolve) => {
-      requestAnimationFrame(() => requestAnimationFrame(resolve));
-   }));
 }
 
 /**

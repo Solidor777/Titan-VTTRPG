@@ -378,7 +378,6 @@ async function setEquipped(actorUuid, armorId, equipped) {
     * Reads whether the actor wears the armor.
     * @returns {Promise<boolean>} True when it does.
     */
-   /** @type {() => Promise<boolean>} Reads whether the armor is equipped. */
    const read = () => page.evaluate(
       async ({ uuid, id }) => (await fromUuid(uuid)).system.equipped.armor === id,
       {
@@ -1600,7 +1599,6 @@ test.describe('equipped armor traits', () => {
           * @param {string} skill - The check's Skill.
           * @returns {object[]} The Advantage-type entries.
           */
-         /** @type {(skill: string) => object[]} The Advantage-only situations offered for a Skill. */
          const advantageOnly = (skill) => system.getSituationalCheckModifiers('attribute', { skill })
             .filter((modifier) => modifier.modifierType === 'advantage');
          return {

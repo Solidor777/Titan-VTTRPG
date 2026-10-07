@@ -469,7 +469,6 @@ test.describe('check chat-card interactions (clone-then-update parity)', () => {
        * @param {string} text - The field's label.
        * @returns {import('@playwright/test').Locator} The field's element.
        */
-      /** @type {(text: string) => {import('@playwright/test').Locator}} Finds a labelled field of the row. */
       const field = (text) => row.locator('.field').filter({ has: page.getByText(text, { exact: true }) }).first();
       await settle(page, { transitions: true });
       await field('Damage').locator('button').click();
@@ -506,7 +505,6 @@ test.describe('check chat-card interactions (clone-then-update parity)', () => {
        * Reads a plain snapshot of the casting message's scaling state.
        * @returns {Promise<object>} `{ currentValue, extraSuccessesRemaining, damage }`.
        */
-      /** @type {() => Promise<object>} Reads the posted card's scaling state. */
       const readScalingState = () => page.evaluate((id) => {
          /** @type {object} The posted message's system data. */
          const system = game.messages.get(id).system.toObject();

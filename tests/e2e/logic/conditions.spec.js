@@ -174,7 +174,6 @@ function snapshot() {
        * @param {Record<string, object>} stats - The stat group (attributes, ratings, or resistances).
        * @returns {Record<string, {base: number, value: number}>} Each stat's base and value.
        */
-      /** @type {(stats: object) => object} Reads the values of a set of derived stats. */
       const read = (stats) => Object.fromEntries(Object.entries(stats).map(([key, stat]) => [
          key,
          {
