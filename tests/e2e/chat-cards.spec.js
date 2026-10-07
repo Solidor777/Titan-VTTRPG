@@ -1,6 +1,7 @@
 import { expect, test } from './harness.js';
 import { clickSheetTab, commitText } from './actions.js';
 import { clickRoll, readNewestCheckFlags, setNumberField } from './checkDialog.js';
+import { chooseContextMenuEntry } from './contextMenu.js';
 import { forceDice, resetDice } from './dice.js';
 import { login, openSheetByUuid } from './fixtures.js';
 import {
@@ -954,6 +955,23 @@ test.describe('chat message mount keying', () => {
       });
    }
 
+   /**
+    * Deletes a chat message with the Delete entry of its context menu in the chat log, brought on screen first.
+    * @param {string} messageId - The chat message's id.
+    * @returns {Promise<void>} Resolves once the message is gone from the log.
+    */
+   async function deleteFromLog(messageId) {
+      await showChatLog(page);
+      await expect(chatMessage(messageId), 'the message shows in the log before it is deleted').toBeVisible();
+      await chatMessage(messageId).click({ button: 'right' });
+      await chooseContextMenuEntry(
+         page,
+         page.locator('#context-menu li.context-item', { hasText: 'Delete' }).first(),
+      );
+      await expect(chatMessage(messageId), 'the context menu deleted the message').toHaveCount(0);
+      await settle(page);
+   }
+
    test('notification pane and main log each hold a live mount through update, dismissal, delete', async () => {
       try {
          // Card notifications post because the sidebar is collapsed (a notification is suppressed while the chat tab
@@ -1017,10 +1035,8 @@ test.describe('chat message mount keying', () => {
             intervals: [100],
          }).toBe(baseline + 1);
 
-         // Deleting the message tears the remaining mount down.
-         await page.evaluate(async (id) => {
-            await game.messages.get(id).delete();
-         }, messageId);
+         // Deleting the message from the chat log tears the remaining mount down.
+         await deleteFromLog(messageId);
          await expect.poll(hookCount, { message: 'all mounts torn down' }).toBe(baseline);
       }
       finally {
@@ -1068,9 +1084,7 @@ test.describe('chat message mount keying', () => {
       await expect.poll(hookCount, { message: 'popout mount swept' }).toBe(baseline + 1);
 
       // Delete restores the baseline.
-      await page.evaluate(async (id) => {
-         await game.messages.get(id).delete();
-      }, messageId);
+      await deleteFromLog(messageId);
       await expect.poll(hookCount, { message: 'all mounts torn down' }).toBe(baseline);
    });
 });
