@@ -3,6 +3,7 @@ import { clickSheetTab, commitText } from './actions.js';
 import { login, openSheetByUuid } from './fixtures.js';
 import { addAttack, addCheck, createActor, createOwnedItem, createWorldItem } from './flows.js';
 import { selectTitanOption } from './select.js';
+import { settle } from './settle.js';
 import { setClientSetting } from './settings.js';
 import { attachPageErrors, closeAllApps, newestMessageType } from './world.js';
 
@@ -244,6 +245,8 @@ test.describe('damage reduction', () => {
          await expect.poll(() => stored('resistanceCheck'), { message: 'the Resistance Check chosen' })
             .toBe(resistanceCheck);
       }
+      // The Damage field moves while the rows above it slide in; a click on a moving field retries until it stops.
+      await settle(page, { transitions: true });
       await field('Damage').locator('button').click();
       await expect.poll(() => stored('isDamage'), { message: 'Damage ticked' }).toBe(true);
 
