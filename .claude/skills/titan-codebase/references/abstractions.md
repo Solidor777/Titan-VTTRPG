@@ -167,7 +167,8 @@ management). Data model classes hold the schema, field validation, and derived-d
   `Conditions.js`, set by a GM in the condition sheet), else from the definition by status id
   (`getConditionDescriptionKey` / `getConditionDescription`, localized on the reading client). Readers:
   `EffectsDetailBody.svelte` (Player HUD detail) and `CharacterDataModel._getConditionReportData` (turn-start
-  report entries carry the edited `description`, else the `descriptionKey`).
+  report entries carry the edited `description`, else the `descriptionKey`). Non-blank means edited, so blanking an
+  edited description reverts the HUD and the reports to the definition text.
 - Effect rows render inline check buttons via `CharacterSheetEffectChecks` /
   `CharacterSheetEffectCheck` (`src/document/types/actor/types/character/sheet/items/effect/`), mirrors
   of the item `CharacterSheetItemChecks` / `CharacterSheetItemCheck`. They reuse the **item-check

@@ -82,6 +82,11 @@ Completed items are deleted, not marked done.
   definitions. It covers OPEN_BUGS #110 (a condition effect a GM edited is treated as stale and overwritten by the next
   migration).
 
+- Convert tests that call `actor.system.onTurnStart()` directly (the condition-report test in
+  `tests/e2e/logic/conditions.spec.js`, and `tests/e2e/condition-description.spec.js`) to the combat-turn flow once
+  Phase 5 builds it (the real-flow rule: a turn-start report comes from advancing the combat). Blocked by the Phase 5
+  combat-advance flow (plan K1-K3), not yet started.
+
 - Report world documents that fail to load (user ruling 2026-10-01: no systemic fix now). Foundry leaves an invalid
   actor, scene or item out of its world collection (`invalidDocumentIds`), so the migration scan never sees one that
   holds pending work. A token whose base actor is invalid is reported as orphaned ("its base actor is gone").

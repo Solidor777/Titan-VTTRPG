@@ -22,6 +22,8 @@ const STATE_CONTEXT_MARKER = /getContext\(\s*(['"`])applicationState\1\s*\)/;
  * reached by following `.svelte` imports from here.
  * @property {(document: object) => object} factory - The initial-state factory the sheet's `_createReactiveState`
  * builds its state from. The state-factory tests below trace the sheet class to its factory and fail on a mismatch.
+ * @property {string[]} [expectedPaths] - When given, exactly the sorted, distinct state paths the sheet's components
+ * read.
  */
 
 /** @type {object} A minimal document stand-in: the initial-state factories read only these fields. */
@@ -66,6 +68,11 @@ const SHEETS = [
       name: 'condition sheet',
       shell: 'document/types/active-effect/sheet/ConditionSheetShell.svelte',
       factory: createConditionSheetData,
+      expectedPaths: [
+         'tabs.activeTab',
+         'tabs.description.scrollTop',
+         'tabs.rulesElements.filter',
+      ],
    },
    {
       name: 'equipment sheet',
@@ -504,7 +511,11 @@ describe.each(SCANS.map((scan) => [
 
    it('finds state paths in the components it mounts', () => {
       expect(scan.paths.map((entry) => entry.segments.join('.'))).toContain('tabs.activeTab');
-      expect(scan.paths.length).toBeGreaterThan(2);
+      expect(scan.paths.length).toBeGreaterThan(0);
+      if (scan.sheet.expectedPaths) {
+         expect([...new Set(scan.paths.map((entry) => entry.segments.join('.')))].sort())
+            .toEqual(scan.sheet.expectedPaths);
+      }
    });
 
    it('reads only paths the initial sheet state defines', () => {

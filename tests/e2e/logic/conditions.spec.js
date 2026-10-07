@@ -41,6 +41,9 @@ let tokenId;
 /** @type {string[]} The conditions the running test turned on and has not turned off. */
 let applied = [];
 
+/** @type {string} A phrase of Blinded's definition text that the report tooltip's HTML holds unbroken. */
+const DEFINITION_PHRASE = 'cannot see';
+
 /** @type {string} The description typed into the condition's own sheet. */
 const EDITED_DESCRIPTION = 'E2E edited condition description';
 
@@ -529,6 +532,29 @@ test.describe('conditions — the Player HUD', () => {
          const detail = row.locator('.detail');
          await expect(detail).toContainText(blinded.text);
 
+         /**
+          * Posts a turn-start report and reads the tooltip of its Blinded tag.
+          * @returns {Promise<string>} The tooltip's HTML.
+          */
+         const readReportTooltip = async () => {
+            /** @type {string} The turn-start report's chat-message id. */
+            const reportId = await page.evaluate(async (id) => {
+               /** @type {number} The chat-message count before the turn start. */
+               const before = game.messages.size;
+               await game.actors.get(id).system.onTurnStart();
+               await titanWait(() => game.messages.size > before, { message: 'turn-start report posted' });
+               return game.messages.contents.at(-1).id;
+            }, actorId);
+
+            /** @type {import('@playwright/test').Locator} The report card's Blinded tag. */
+            const tag = page.locator(`#chat .message[data-message-id="${reportId}"] .report .effects .tag`).first();
+            await expect(tag).toContainText(blinded.name);
+            return tag.evaluate((element) => element._tippy?.props?.content);
+         };
+
+         // An unedited condition's report tooltip carries the definition (the positive edge of the absence below).
+         expect(await readReportTooltip(), 'the unedited report shows the definition').toContain(DEFINITION_PHRASE);
+
          // The Open Sheet button opens TITAN's condition sheet, not core's effect configuration.
          await row.getByTestId('player-hud-effect-sheet').click();
 
@@ -555,23 +581,10 @@ test.describe('conditions — the Player HUD', () => {
          await expect(detail).toContainText(EDITED_DESCRIPTION);
          await expect(detail).not.toContainText(blinded.text);
 
-         // A turn start posts a report whose Blinded tag shows the edit and not the definition text.
-         /** @type {string} The turn-start report's chat-message id. */
-         const reportId = await page.evaluate(async (id) => {
-            /** @type {number} The chat-message count before the turn start. */
-            const before = game.messages.size;
-            await game.actors.get(id).system.onTurnStart();
-            await titanWait(() => game.messages.size > before, { message: 'turn-start report posted' });
-            return game.messages.contents.at(-1).id;
-         }, actorId);
-
-         /** @type {import('@playwright/test').Locator} The report card's Blinded tag. */
-         const tag = page.locator(`#chat .message[data-message-id="${reportId}"] .report .effects .tag`).first();
-         await expect(tag).toContainText(blinded.name);
-         await expect.poll(
-            () => tag.evaluate((element) => element._tippy?.props?.content),
-            { message: 'the tag\'s tooltip is the edited description' },
-         ).toContain(EDITED_DESCRIPTION);
-         expect(await tag.evaluate((element) => element._tippy?.props?.content)).not.toContain(blinded.text);
+         // The next turn start posts a report whose Blinded tag shows the edit and not the definition text.
+         /** @type {string} The edited condition's report tooltip. */
+         const edited = await readReportTooltip();
+         expect(edited, 'the edited report shows the edit').toContain(EDITED_DESCRIPTION);
+         expect(edited, 'the edited report no longer shows the definition').not.toContain(DEFINITION_PHRASE);
       });
 });

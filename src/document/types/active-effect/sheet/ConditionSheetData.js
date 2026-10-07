@@ -6,7 +6,6 @@
  * @property {number} tabs.description.scrollTop - The current top of the scrollbar for the Description tab.
  * @property {object} tabs.rulesElements - State for the Rules Elements tab.
  * @property {string} tabs.rulesElements.filter - The current filter text for the Rules Elements tab.
- * @property {number} tabs.rulesElements.scrollTop - The current top of the scrollbar for the Rules Elements tab.
  */
 
 /**
@@ -24,7 +23,6 @@ export default function createConditionSheetData(condition) {
          },
          rulesElements: {
             filter: '',
-            scrollTop: 0,
          },
       },
    };

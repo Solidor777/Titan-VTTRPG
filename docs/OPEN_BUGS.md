@@ -105,8 +105,8 @@ Deferred/known bugs. Todos (planned work) live in `docs/TODO.md`; this file is b
   (class `titan-condition-sheet`) added a fifth element through the add button (the `addRulesElement` flow), and the
   next reload of the GM client showed the "Migrate World" confirmation dialog. Confirming it left the effect with 4
   rules elements again, so the edit was overwritten (`.superpowers/sdd/test-suite-rewrite/bug-111/measure-110-run1.log`
-  and `measure-110-run2.log`; run 1 clicked the dialog's last button, Cancel, and read 5, run 2 clicked "Migrate World"
-  and read 4; the scratch spec is kept as `measure-110.spec.js.txt`). Not measured: editing an existing element instead
+  and `measure-110-run2.log`; run 1 read 5 after the dialog appeared; run 2 clicked "Migrate World" and read 4; the saved
+  scratch spec `measure-110.spec.js.txt` is run 2's script, and run 1's script is not saved). Not measured: editing an existing element instead
   of adding one.
 - **Status:** Open, tabled by the user on 2026-10-07. The user deferred it on 2026-10-01 to a future document
   inheritance campaign (`docs/TODO.md`). For now GMs may edit a condition's rules elements, and the next migration

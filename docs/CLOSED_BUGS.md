@@ -1973,8 +1973,12 @@ The evidence files named here are in `.superpowers/sdd/test-suite-rewrite/bug-11
 - **Gate:** `tests/e2e/logic/conditions.spec.js` "a condition opens TITAN's own sheet, and a description edited there
   is what the HUD and the report show": applies Blinded from the Token HUD, opens the sheet from the Player HUD row,
   types into the description editor, saves, and reads the edit in the Player HUD detail and in the Blinded tag of the
-  turn-start report. On the pre-change code it failed at the sheet assertion (`.application.titan-condition-sheet` not
-  found; `gate-pre-change.log`). On the fixed code it passed (`gate-post-change-1.log`), and the full e2e passed 645 of
+  turn-start report (before the edit the report's tooltip must hold the definition phrase; after it, the edit and not the
+  phrase). On the pre-change code it failed at the sheet assertion (`.application.titan-condition-sheet` not
+  found; `gate-pre-change.log`). With only the report reading reverted it failed at the report's edit assertion after passing the HUD and the unedited
+  report (`gate-pre-change-report-half.log`); with only the HUD reading reverted it failed at the HUD's edit assertion
+  (`gate-pre-change-hud-half.log`); with the absence assertion pointed at the edit text it failed on a tooltip that
+  holds it (`gate-absence-half-can-fail.log`). On the final code it passed, and the full e2e passed 645 of
   645 with census zero (`e2e-full-1.log`). Unit: `tests/unit/ConditionReportData.test.js` covers the edited and blank
   descriptions (1513 of 1513, `unit.log`).
 - **Status:** Closed 2026-10-07.

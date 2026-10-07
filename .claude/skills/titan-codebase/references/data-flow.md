@@ -369,9 +369,9 @@ Two user styles: the sectioned list (`EffectsListPanel` → id-keyed `EmbeddedDo
 `EffectsDetailPopout` clamped into the rect, Escape-consuming dismissal). Each list row is its own `panel-2`
 sub-panel (icon left, name-over-duration right, name ellipsis, controls that wrap), so expanding one row grows
 only that sub-panel and pushes its neighbours down rather than overlapping. Both expanded surfaces share
-`EffectsDetailBody`: description per subtype (conditions render `getConditionDescription(effect)` — the
-definition's description looked up by status id and localized on the reading client; effects the native
-`description`), embedded checks via `CharacterSheetEffectChecks`, duration −/+ steppers, send-to-chat (effect-only),
+`EffectsDetailBody`: description per subtype (a non-blank native `description` renders first, for effects and
+for conditions a GM edited; otherwise a condition renders `getConditionDescription(effect)` — the definition's
+description looked up by status id and localized on the reading client), embedded checks via `CharacterSheetEffectChecks`, duration −/+ steppers, send-to-chat (effect-only),
 open-sheet, and the owner-gated delete (`sheetDocument.data.system.requestEffectDeletion`). The
 outer panel has a fixed user-resizable width AND height (both persisted via the edit-mode handle); the header is
 pinned and the row list is a bounded `.body` (`flex: 1; min-height: 0; overflow-y: auto`) that scrolls
