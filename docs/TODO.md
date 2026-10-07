@@ -99,6 +99,13 @@ Completed items are deleted, not marked done.
   things by trait. The first cut covers effect/condition immunity by condition id or effect name only; it is plan B
   Tasks 8 to 11 and has not been started.
 
+- Drive the test-teardown sweep to zero and explain its count. Phase 5 Part A measured the full run's sweep at 1 scene, 6 actors
+  and 1 pack (`e2e-full-4.log`); eight of the 16 specs that still create documents through the API leave documents behind
+  (per-spec counts in `.superpowers/sdd/test-suite-rewrite/phase-5/leak-bisect.log`: actors 6 and the pack 1 match the
+  full run; the isolated scene counts sum to 6, against 1 in the full run, and the cause of the difference is not
+  investigated). Phase 5 Part B and Phase 6 convert those specs to real flows; investigate the scene difference while
+  converting, and the sweep count must be zero when the last one is converted.
+
 - Remove or sync `.agents/skills/titan-codebase/`, a tracked copy of `.claude/skills/titan-codebase/` that differs in every
   reference file (last touched by commit `5526adee`). Measured 2026-10-02: no file in the repo, script or config reads
   it (`grep -rn "\.agents"` finds only the note in `docs/POST_WORK_FINDINGS.md`); whether an external agent tool reads

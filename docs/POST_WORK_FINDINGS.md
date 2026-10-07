@@ -250,3 +250,10 @@ it ever bites in play, the principled fix is a per-message serial queue around
   when their `createNewId()` resolves. Measured in `test-titan` (Task 5 fix round 2): entries with their own `_id`
   came first in 3 of 3 runs, and generated ones came back reordered (for example `[C1, C3, C2]`) in 2 of 3 runs. Code
   and tests that pair created documents with their inputs must match them by id or name, never by position.
+
+## 2026-10-07 — A presence check must come before an `every` over a filtered list
+
+- **`array.filter(...).every(...)` is true when the filtered list is empty.** The player HUD resize test asserted
+  `.every` over the mounted HUD elements and passed while the effects panel was not mounted at all (found in Phase 5
+  Part A: the check failed on its first run once a presence assertion was added, `gate-resize-panel-absent-fail.log`).
+  Assert that each element is mounted before the quantified check.

@@ -1828,7 +1828,7 @@ export async function createCombat(page) {
       );
       return added.length;
    }, { message: 'the create button made one combat' }).toBe(1);
-   /** @type {string[]} The created combat's id. */
+   /** @type {string} The created combat's id. */
    const [id] = added;
    record({
       documentName: 'Combat',
