@@ -198,8 +198,8 @@ async function withDocumentSheet(row, documentName, id, edit) {
 }
 
 /**
- * Types a value into a number input of a sheet and waits for the document to store it.
- * @param {import('@playwright/test').Locator} input - The number input that receives the typed text.
+ * Types a value into a number or text input of a sheet, commits it, and waits for the operations the commit started.
+ * @param {import('@playwright/test').Locator} input - The input that receives the typed text.
  * @param {number|string} value - The value to type.
  * @returns {Promise<void>} Resolves once the value has been typed and committed.
  */

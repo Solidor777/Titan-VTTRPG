@@ -938,7 +938,7 @@ export async function addCheck(page, documentUuid, { label, resolveCost, resista
 
    // Waits until the sheet shows one row per stored check before the new row is edited.
    await expect(rows, 'the sheet rendered a row for every stored check').toHaveCount(before + 1);
-   await settle(page);
+   await settle(page, { transitions: true });
    if (label !== undefined) {
       /** @type {import('@playwright/test').Locator} The new row's label input. */
       const input = row.locator('.header .label input');
@@ -1003,7 +1003,7 @@ export async function addRulesElement(page, documentUuid, element) {
       () => page.evaluate(async (uuid) => (await fromUuid(uuid)).system.rulesElement.length, documentUuid),
       { message: 'the add button created one rules element' },
    ).toBe(before + 1);
-   await settle(page);
+   await settle(page, { transitions: true });
 
    /** @type {import('@playwright/test').Locator} The new row. */
    const row = sheet.locator('.rules-element').nth(before);
@@ -1112,7 +1112,7 @@ export async function addAttack(page, weaponUuid) {
       { message: 'the add button created one attack' },
    ).toBe(before + 1);
    await expect(sheet.locator('li.reorder-row'), 'the Attacks tab rendered the new row').toHaveCount(before + 1);
-   await settle(page);
+   await settle(page, { transitions: true });
 }
 
 /**
@@ -1192,7 +1192,7 @@ export async function addCustomAspect(page, spellUuid) {
       { message: 'the add button created one custom aspect' },
    ).toBe(before + 1);
    await expect(sheet.locator('li.reorder-row'), 'the Custom Aspects tab rendered the new row').toHaveCount(before + 1);
-   await settle(page);
+   await settle(page, { transitions: true });
 }
 
 /**

@@ -77,7 +77,7 @@ export async function renderSheet(page, uuid, expectedSelector, errors) {
  * "Abilities" and "Spells", which a page-wide text locator can match first.
  * @param {import('@playwright/test').Page} page - The Playwright page to drive.
  * @param {string} label - The visible tab label.
- * @returns {Promise<void>} Resolves once the tab button has been clicked.
+ * @returns {Promise<void>} Resolves once the tab is the active one and its operations have finished.
  */
 export async function openSheetTab(page, label) {
    await clickSheetTab(page.locator('.application.titan-document-sheet').first(), label);

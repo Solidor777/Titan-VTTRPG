@@ -1,5 +1,5 @@
 import { expect, test } from './harness.js';
-import { clickSheetTab } from './actions.js';
+import { clickSheetTab, clickTabButton } from './actions.js';
 import { collectLocalizationOffenders, login, openSheetByUuid, renderSheet } from './fixtures.js';
 import {
    addEffect,
@@ -68,10 +68,10 @@ async function expectNoLocalOffenders(rootSelector, what) {
  * Opens the first tab of a sheet. A document's sheet keeps the tab it last showed, so a shared fixture's sheet may
  * come up on another tab.
  * @param {import('@playwright/test').Locator} sheet - The open sheet.
- * @returns {Promise<void>} Resolves once the first tab's button has been clicked.
+ * @returns {Promise<void>} Resolves once the first tab is the active one.
  */
 async function showFirstTab(sheet) {
-   await sheet.locator('.tab-list button').first().click();
+   await clickTabButton(sheet.locator('.tab-list button').first());
 }
 
 test.describe('every sheet type renders without errors or LOCAL. text', () => {
@@ -197,7 +197,7 @@ test.describe('spell surfaces', () => {
       const tabCount = await tabButtons.count();
       expect(tabCount, 'the spell sheet has tabs').toBeGreaterThan(1);
       for (let index = 0; index < tabCount; index++) {
-         await tabButtons.nth(index).click();
+         await clickTabButton(tabButtons.nth(index));
          await expectNoLocalOffenders('.titan-item-sheet', `spell sheet tab ${index}`);
       }
    });

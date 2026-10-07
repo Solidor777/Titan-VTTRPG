@@ -265,11 +265,11 @@ function renameAllRows(csvText, suffix) {
 test.describe('compendium spreadsheet export/import', () => {
    test('exporting the seeded effects pack produces a manifest and one row per effect', async () => {
       await openPackContextMenu(page, 'titan.effects');
-      /** @type {Promise<import('@playwright/test').Download>} */
-      const downloadPromise = page.waitForEvent('download', { timeout: 1000 });
       await choosePackMenuEntry(page, 'Export to Spreadsheet');
       // Default format/layout (xlsx/wide) exports as a single .xlsx with no dialog interaction needed —
       // the context-menu action opens the dialog; accept its defaults by clicking the confirm button.
+      /** @type {Promise<import('@playwright/test').Download>} */
+      const downloadPromise = page.waitForEvent('download', { timeout: 1000 });
       await page.locator('[data-testid="export-confirm-button"]').click();
       /** @type {import('@playwright/test').Download} */
       const download = await downloadPromise;
@@ -301,10 +301,10 @@ test.describe('compendium spreadsheet export/import', () => {
          });
 
          await openPackContextMenu(page, packId);
-         /** @type {Promise<import('@playwright/test').Download>} */
-         const downloadPromise = page.waitForEvent('download', { timeout: 1000 });
          await choosePackMenuEntry(page, 'Export to Spreadsheet');
          await selectTitanOption(page, page.locator('[data-testid="export-format-select"]'), 'csv');
+         /** @type {Promise<import('@playwright/test').Download>} */
+         const downloadPromise = page.waitForEvent('download', { timeout: 1000 });
          await page.locator('[data-testid="export-confirm-button"]').click();
          /** @type {string} */
          const zipPath = await (await downloadPromise).path();
@@ -367,10 +367,10 @@ test.describe('compendium spreadsheet export/import', () => {
       const newPackLabel = 'E2E Imported Effects';
       try {
          await openPackContextMenu(page, 'titan.effects');
-         /** @type {Promise<import('@playwright/test').Download>} */
-         const downloadPromise = page.waitForEvent('download', { timeout: 1000 });
          await choosePackMenuEntry(page, 'Export to Spreadsheet');
          await selectTitanOption(page, page.locator('[data-testid="export-format-select"]'), 'csv');
+         /** @type {Promise<import('@playwright/test').Download>} */
+         const downloadPromise = page.waitForEvent('download', { timeout: 1000 });
          await page.locator('[data-testid="export-confirm-button"]').click();
          /** @type {import('@playwright/test').Download} */
          const download = await downloadPromise;
@@ -437,10 +437,10 @@ test.describe('compendium spreadsheet export/import', () => {
          });
 
          await openPackContextMenu(page, packId);
-         /** @type {Promise<import('@playwright/test').Download>} */
-         const downloadPromise = page.waitForEvent('download', { timeout: 1000 });
          await choosePackMenuEntry(page, 'Export to Spreadsheet');
          await selectTitanOption(page, page.locator('[data-testid="export-format-select"]'), 'csv');
+         /** @type {Promise<import('@playwright/test').Download>} */
+         const downloadPromise = page.waitForEvent('download', { timeout: 1000 });
          await page.locator('[data-testid="export-confirm-button"]').click();
          /** @type {string} */
          const zipPath = await (await downloadPromise).path();
@@ -561,10 +561,10 @@ test.describe('compendium spreadsheet export/import', () => {
          });
 
          await openPackContextMenu(page, packId);
-         /** @type {Promise<import('@playwright/test').Download>} */
-         const downloadPromise = page.waitForEvent('download', { timeout: 1000 });
          await choosePackMenuEntry(page, 'Export to Spreadsheet');
          await selectTitanOption(page, page.locator('[data-testid="export-format-select"]'), 'csv');
+         /** @type {Promise<import('@playwright/test').Download>} */
+         const downloadPromise = page.waitForEvent('download', { timeout: 1000 });
          await page.locator('[data-testid="export-confirm-button"]').click();
          /** @type {string} */
          const zipPath = await (await downloadPromise).path();

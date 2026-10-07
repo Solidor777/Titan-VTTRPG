@@ -1,5 +1,5 @@
 import { installPoll } from './poll.js';
-import { installSettle } from './settle.js';
+import { installSettle, verifySettle } from './settle.js';
 import { attachPageErrors, flushHookErrorReports, installHookErrorReporting } from './world.js';
 
 // The world-joining module: it holds what every logged-in page needs and nothing that depends on the test runner, so
@@ -113,6 +113,7 @@ export async function joinWorld(page, user, origin) {
    await page.click('button[name="join"]');
    await page.waitForURL('**/game');
    await page.waitForFunction(() => globalThis.game?.ready === true, null, { timeout: 60_000 });
+   await verifySettle(page);
 
    await flushPageErrors(page);
 

@@ -260,7 +260,8 @@ function readRenderedTokens(rows, kind) {
 }
 
 /**
- * Drags the grip of a row onto another row and waits until the operations the drop started have finished. The drop's
+ * Drags the grip of a row onto another row and waits until the operations and row transitions the drop started have
+ * finished. The drop's
  * own effect (a reorder, a copy, a refusal) differs by caller, so the caller waits for it.
  * @param {import('@playwright/test').Locator} source - The row whose grip is dragged.
  * @param {import('@playwright/test').Locator} target - The row the grip is dropped on.
@@ -277,7 +278,7 @@ async function dragGrip(source, target, half) {
          y: half === 'top' ? 3 : box.height - 3,
       },
    });
-   await settle(source.page());
+   await settle(source.page(), { transitions: true });
 }
 
 /**
@@ -411,7 +412,7 @@ test.describe('character sheet lists', () => {
        * zone owns, so the sheet's own drop handler sorts it.
        * @param {string} itemId - The id of the owned weapon whose item sheet supplies the drag.
        * @param {import('@playwright/test').Locator} row - The row the weapon is dropped on.
-       * @returns {Promise<void>} Resolves once the drop has been dispatched.
+       * @returns {Promise<void>} Resolves once the drop's operations have finished and the item sheet is closed.
        */
       const dropOwnSheetOn = async (itemId, row) => {
          /** @type {import('@playwright/test').Locator} The weapon's item sheet. */
@@ -516,13 +517,14 @@ test.describe('item sheet lists', () => {
          if (LISTS[kind].expands) {
             // The first and last rows are collapsed and the middle one is expanded, so a misaligned expansion state
             // shows after a move. The collapsed last row is also short enough for the drop to land in its lower half.
-            await rows.nth(0).getByRole('button', { name: 'Collapse' }).click();
+            // The last row goes first, so the collapse of the first row cannot move the button still to be clicked.
             await rows.nth(2).getByRole('button', { name: 'Collapse' }).click();
-            await expect.poll(readExpansion, { message: 'the first and last rows are collapsed' }).toEqual([
-               false,
-               true,
-               false,
-            ]);
+            await settle(page, { transitions: true });
+            await rows.nth(0).getByRole('button', { name: 'Collapse' }).click();
+            await settle(page, { transitions: true });
+            await expect(rows.nth(0).locator('.expandable-content'), 'the first row is collapsed').toHaveCount(0);
+            await expect(rows.nth(1).locator('.expandable-content'), 'the middle row is expanded').toHaveCount(1);
+            await expect(rows.nth(2).locator('.expandable-content'), 'the last row is collapsed').toHaveCount(0);
          }
 
          await dragGripToMove(rows.nth(0), rows.nth(2), 'bottom');
@@ -567,13 +569,18 @@ test.describe('item sheet lists', () => {
             ]);
 
             // The rows are expanded again, as they mount.
-            await rows.nth(0).getByRole('button', { name: 'Expand' }).click();
             await rows.nth(2).getByRole('button', { name: 'Expand' }).click();
-            await expect.poll(readExpansion, { message: 'the rows are expanded again' }).toEqual([
-               true,
-               true,
-               true,
-            ]);
+            await settle(page, { transitions: true });
+            await rows.nth(0).getByRole('button', { name: 'Expand' }).click();
+            await settle(page, { transitions: true });
+            for (const index of [
+               0,
+               1,
+               2,
+            ]) {
+               await expect(rows.nth(index).locator('.expandable-content'), `row ${index} is expanded again`)
+                  .toHaveCount(1);
+            }
          }
          expect(errors, `uncaught errors:\n${errors.join('\n')}`).toEqual([]);
       });
@@ -709,6 +716,7 @@ test.describe('copying a row between item sheets', () => {
                      async () => (await readEntries(targetUuid(), property)).length,
                      { message: 'the copy was deleted' },
                   ).toBe(targetBefore.length);
+                  await settle(page, { transitions: true });
                }
             }
          });
@@ -780,6 +788,7 @@ test.describe('copying a row between item sheets', () => {
                async () => (await readEntries(targetSpellUuid, 'customAspect')).length,
                { message: 'a copy was deleted' },
             ).toBe(held);
+            await settle(page, { transitions: true });
          }
       }
    });

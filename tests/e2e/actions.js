@@ -22,6 +22,19 @@ export async function clickSheetTab(sheet, label) {
 }
 
 /**
+ * Clicks a tab button of a sheet's tab strip and waits until its tab is the active one and the operations the click
+ * started have finished.
+ * @param {import('@playwright/test').Locator} button - The tab's button inside `.tab-list`.
+ * @returns {Promise<void>} Resolves once the tab is active.
+ */
+export async function clickTabButton(button) {
+   await button.click();
+   await expect(button.locator('xpath=ancestor::div[contains(@class, "button")][1]'), 'the tab is active')
+      .toHaveClass(/(^|\s)active(\s|$)/);
+   await settle(button.page());
+}
+
+/**
  * Types a value into a text or number input, commits it with a blur, and waits until the operations the commit started
  * have finished, so a re-render of the commit cannot discard what the caller does next.
  * @param {import('@playwright/test').Locator} input - The input that receives the text.

@@ -1,5 +1,6 @@
 import { expect, test } from './harness.js';
 import { clickSheetTab } from './actions.js';
+import { settle } from './settle.js';
 import { login, openSheetByUuid } from './fixtures.js';
 import { addRulesElement, createWorldItem } from './flows.js';
 import { attachPageErrors, closeAllApps } from './world.js';
@@ -81,6 +82,7 @@ async function clearRulesElements() {
    for (let remaining = await rows.count(); remaining > 0; remaining--) {
       await rows.first().locator('.delete-button button').click();
       await expect(rows).toHaveCount(remaining - 1);
+      await settle(sheet.page(), { transitions: true });
    }
 }
 
@@ -104,6 +106,7 @@ test.describe('adding and deleting rows', () => {
       await sheet.locator('.add-entry-button button').click();
       await expect.poll(async () => (await readElements()).length, { message: 'rules element persisted' }).toBe(1);
       await expect(rows, 'list re-rendered with the new row').toHaveCount(1);
+      await settle(page, { transitions: true });
 
       await rows.first().locator('.delete-button button').click();
       await expect.poll(async () => (await readElements()).length, { message: 'rules element removed' }).toBe(0);

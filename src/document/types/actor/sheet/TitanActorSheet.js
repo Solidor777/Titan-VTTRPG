@@ -306,8 +306,7 @@ export default class TitanActorSheet extends TitanDocumentSheet {
       // Make the item data into an object.
       const itemData = item.toObject();
 
-      // If this item is from this sheet's Actor, sort the item rather than.
-      // creating a new one.
+      // If this item is from this sheet's Actor, sort the item rather than creating a new one.
       if (this.actor.uuid === item.parent?.uuid) {
          return this._onSortItem(event, itemData);
       }
@@ -353,6 +352,7 @@ export default class TitanActorSheet extends TitanDocumentSheet {
       /** @type {TitanItem[]} The items of the target row's list other than the dropped one. */
       const siblings = [];
       for (const itemElement of dropTarget.parentElement.children) {
+         /** @type {string | undefined} The item id of the sibling row; undefined for an element that is not a row. */
          const siblingId = itemElement.dataset.itemId;
          if (siblingId && (siblingId !== source.id)) {
             siblings.push(items.get(siblingId));
@@ -360,10 +360,13 @@ export default class TitanActorSheet extends TitanDocumentSheet {
       }
 
       // Perform the sort.
+      /** @type {{target: TitanItem, update: {sort: number}}[]} The sort values to store, one per item to change. */
       const sortUpdates = foundry.utils.performIntegerSort(source, {
          target,
          siblings,
       });
+
+      /** @type {{_id: string, sort: number}[]} The embedded-document updates that store the sort values. */
       const updateData = sortUpdates.map((entry) => {
          return {
             ...entry.update,

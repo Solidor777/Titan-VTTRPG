@@ -54,7 +54,7 @@ export async function closeAllApps(page) {
             continue;
          }
          try {
-            await app.close();
+            await app.close({ animate: false });
          }
          catch (error) {
             // Ignore: a mid-teardown close failure must not abort the rest of cleanup.
@@ -65,7 +65,7 @@ export async function closeAllApps(page) {
       const appV1 = Object.values(globalThis.ui?.windows ?? {});
       for (const app of appV1) {
          try {
-            await app.close();
+            await app.close({ animate: false });
          }
          catch (error) {
             // Ignore: see above.

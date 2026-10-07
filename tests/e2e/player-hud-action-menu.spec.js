@@ -606,10 +606,10 @@ function iconUsesAccent(page, testId) {
 }
 
 /**
- * Sets the athletics skill's default attribute on an actor.
- * @param {string} actorId - The actor's id.
- * @param {string} attribute - The attribute key.
- * @returns {Promise<void>} Resolves once the update completes.
+ * Sets the attribute the athletics skill defaults to and waits for the renders of the update.
+ * @param {string} actorId - The id of the actor to change.
+ * @param {string} attribute - The key of the attribute the skill defaults to.
+ * @returns {Promise<void>} Resolves once the update and its renders have finished.
  */
 async function setAthleticsAttribute(actorId, attribute) {
    await page.evaluate(({ id, value }) => {
