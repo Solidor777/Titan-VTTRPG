@@ -24,6 +24,7 @@ import {
    placeToken,
    removeCondition,
    setAttributeBase,
+   setEquipped,
    shared,
    viewScene,
 } from './flows.js';
@@ -357,40 +358,8 @@ async function makeArmoredActor(name, traits) {
    for (const trait of traits) {
       await addTrait(page, `${actor.uuid}.Item.${armorId}`, trait);
    }
-   await setEquipped(actor.uuid, armorId, true);
+   await setEquipped(page, actor.id, armorId, true);
    return actor.uuid;
-}
-
-/**
- * Sets whether an actor's armor is equipped with the Equipped toggle of its row in the Inventory tab.
- * @param {string} actorUuid - The uuid of the actor.
- * @param {string} armorId - The id of the armor.
- * @param {boolean} equipped - The state to leave the armor in.
- * @returns {Promise<void>} Resolves once the actor shows the state.
- */
-async function setEquipped(actorUuid, armorId, equipped) {
-   /** @type {import('@playwright/test').Locator} The actor's sheet. */
-   const sheet = await openSheetByUuid(page, actorUuid);
-   await clickSheetTab(sheet, 'Inventory');
-   await settle(page, { transitions: true });
-
-   /**
-    * Reads whether the actor wears the armor.
-    * @returns {Promise<boolean>} True when it does.
-    */
-   const read = () => page.evaluate(
-      async ({ uuid, id }) => (await fromUuid(uuid)).system.equipped.armor === id,
-      {
-         uuid: actorUuid,
-         id: armorId,
-      },
-   );
-   if (await read() !== equipped) {
-      await sheet.locator(`[data-item-id="${armorId}"]`).getByRole('button', { name: 'Equipped' }).first().click();
-   }
-   await expect.poll(read, { message: `the Equipped toggle left the armor ${equipped ? '' : 'un'}equipped` })
-      .toBe(equipped);
-   await settle(page);
 }
 
 test.beforeAll(async ({ browser }) => {
@@ -1637,11 +1606,11 @@ test.describe('equipped armor traits', () => {
 
       /** @type {string} The id of the worn armor. */
       const armorId = await page.evaluate(async (uuid) => (await fromUuid(uuid)).system.equipped.armor, actors.heavy);
-      await setEquipped(actors.heavy, armorId, false);
+      await setEquipped(page, actors.heavy.replace('Actor.', ''), armorId, false);
       await expect(jump).toHaveCount(0);
       await expect(swim).toHaveCount(0);
 
       // The armor goes back on through the same toggle, so the file's other tests find it worn.
-      await setEquipped(actors.heavy, armorId, true);
+      await setEquipped(page, actors.heavy.replace('Actor.', ''), armorId, true);
    });
 });

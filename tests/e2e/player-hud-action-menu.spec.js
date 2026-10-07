@@ -38,6 +38,9 @@ const tokenIds = {};
 /** @type {Record<string, string>} The ids of the menu player's owned items and effect, by name key. */
 const itemIds = {};
 
+/** @type {number} The run stamp in every fixture name, so a worker restart that repeats the hook finds no duplicate. */
+const RUN = Date.now();
+
 /** @type {string[]} The world settings that gate the reports of the HUD's direct actions. */
 const REPORT_SETTINGS = [
    'reportTakingDamage',
@@ -117,6 +120,7 @@ async function openCategory(key) {
  */
 async function setMenuOptions(patch) {
    await page.evaluate(async (patch) => {
+      /** @type {object} The stored options. */
       const current = game.settings.get('titan', 'playerHudOptions') ?? {};
       await game.settings.set(
          'titan',
@@ -139,6 +143,20 @@ async function resetHud() {
       game.titan.playerHud.layoutState.editMode = false;
       game.titan.playerHud.resetLayout();
    });
+   // The reset persists through a client-setting write that the HUD does not await and settle does not track: the
+   // stored layout is read until it equals the layout the HUD now holds.
+   await expect.poll(
+      () => page.evaluate(() => {
+         /** @type {object} The layout the HUD state holds. */
+         const held = game.titan.playerHud.layoutState;
+         /** @type {object} The stored layout setting. */
+         const stored = game.settings.get('titan', 'playerHudLayout');
+         return JSON.stringify(stored.positions) === JSON.stringify(held.positions)
+            && JSON.stringify(stored.minimized) === JSON.stringify(held.minimized)
+            && JSON.stringify(stored.effectsPanelSize) === JSON.stringify(held.effectsPanelSize);
+      }),
+      { message: 'the reset layout is stored' },
+   ).toBe(true);
 }
 
 /**
@@ -214,12 +232,16 @@ async function setBar(actorId, resource, value) {
  */
 function iconUsesAccent(testId) {
    return page.evaluate((id) => {
+      /** @type {Element | null} The element with the test id. */
       const button = document.querySelector(`[data-testid="${id}"]`);
+      /** @type {Element | null} The button's icon. */
       const icon = button.querySelector('i');
       // Resolve the accent token in the same cascade scope as the icon.
+      /** @type {HTMLSpanElement} A span whose color resolves the accent token in the icon's scope. */
       const probe = document.createElement('span');
       probe.style.color = 'var(--titan-accent-color)';
       button.appendChild(probe);
+      /** @type {string} The resolved accent color. */
       const accent = getComputedStyle(probe).color;
       probe.remove();
       return getComputedStyle(icon).color === accent;
@@ -239,21 +261,21 @@ test.beforeAll(async ({ browser }) => {
    }
 
    // One scene whose tokens stand next to each other in this order, so that a selection rectangle can take two.
-   await viewScene(page, await createScene(page, { name: 'E2E HUD Menu Scene' }));
+   await viewScene(page, await createScene(page, { name: `E2E HUD Menu Scene ${RUN}` }));
    actorIds.menu = await createActor(page, {
-      name: 'E2E HUD Menu Player',
+      name: `E2E HUD Menu Player ${RUN}`,
       type: 'player',
    });
    actorIds.menu2 = await createActor(page, {
-      name: 'E2E HUD Menu Player 2',
+      name: `E2E HUD Menu Player 2 ${RUN}`,
       type: 'player',
    });
    actorIds.empty = await createActor(page, {
-      name: 'E2E HUD Menu Empty',
+      name: `E2E HUD Menu Empty ${RUN}`,
       type: 'player',
    });
    actorIds.report = await createActor(page, {
-      name: 'E2E HUD Report Player',
+      name: `E2E HUD Report Player ${RUN}`,
       type: 'player',
    });
    for (const key of [
@@ -333,8 +355,10 @@ test.describe('categories, main actions and sub-buttons', () => {
 
    test('weapon sub-buttons send to chat and open the sheet', async () => {
       await control('menu');
+      /** @type {string} The longsword's id. */
       const weaponId = itemIds.longsword;
       await hud('player-hud-category-weapons').click();
+      /** @type {import('@playwright/test').Locator} The longsword's sub-option. */
       const subOption = hud(`player-hud-sub-option-weapons-${weaponId}`);
       await subOption.hover();
       await expect(hud(`player-hud-sub-button-${weaponId}-attack-0`)).toBeVisible();
@@ -467,6 +491,7 @@ test.describe('categories, main actions and sub-buttons', () => {
       /** @type {number} The quantity before the steps. */
       const quantity = await read();
       await hud('player-hud-category-inventory').click();
+      /** @type {import('@playwright/test').Locator} The rations sub-option. */
       const subOption = hud(`player-hud-sub-option-inventory-${itemIds.rations}`);
       await subOption.hover();
       await hud(`player-hud-sub-button-${itemIds.rations}-quantity-increase`).click();
@@ -495,6 +520,7 @@ test.describe('categories, main actions and sub-buttons', () => {
       /** @type {number} The remaining duration before the step. */
       const remaining = await read();
       await hud('player-hud-category-effects').click();
+      /** @type {import('@playwright/test').Locator} The burning effect's sub-option. */
       const subOption = hud(`player-hud-sub-option-effects-${itemIds.burning}`);
       await subOption.hover();
       await hud(`player-hud-sub-button-${itemIds.burning}-duration-increase`).click();
@@ -525,6 +551,7 @@ test.describe('options', () => {
    test('a disabled sub-button gate removes that sub-button from the flyout', async () => {
       await control('menu');
       await hud('player-hud-category-weapons').click();
+      /** @type {import('@playwright/test').Locator} The longsword's sub-option. */
       const subOption = hud(`player-hud-sub-option-weapons-${itemIds.longsword}`);
       await subOption.hover();
 
@@ -564,11 +591,13 @@ test.describe('options', () => {
       await setSkillDefaultAttribute(page, actorUuid, 'athletics', 'body');
       await control('menu');
       await openCategory('skills');
+      /** @type {import('@playwright/test').Locator} The athletics sub-option's icon. */
       const icon = hud('player-hud-sub-option-skills-athletics').locator('i');
       await expect(icon).toHaveClass(/(?:^|\s)fas\sfa-hand-fist(?:\s|$)/);
 
-      // Changing the default attribute in the sheet re-derives the icon; the sheet's click closes the cascade, so
-      // the category is opened again.
+      // Changing the default attribute in the sheet re-derives the icon. A press outside the action menu closes the
+      // cascade (`onWindowPointerDown` in ActionMenuElement.svelte), and the sheet is outside it, so the category is
+      // opened again.
       await setSkillDefaultAttribute(page, actorUuid, 'athletics', 'mind');
       await closeAllApps(page);
       await openCategory('skills');
@@ -604,7 +633,9 @@ test.describe('options', () => {
 
    test('inspiration toggles show whether inspiration applies', async () => {
       await control('menu');
+      /** @type {import('@playwright/test').Locator} The portrait's inspiration toggle. */
       const portraitToggle = hud('player-hud-toggle-inspiration');
+      /** @type {import('@playwright/test').Locator} The utility menu's inspiration toggle. */
       const menuToggle = hud('player-hud-sub-option-utility-toggleInspiration');
       /** @type {boolean} Whether the actor has inspiration before the test. */
       const before = await page.evaluate((id) => game.actors.get(id).system.inspiration, actorIds.menu);
@@ -637,7 +668,9 @@ test.describe('options', () => {
 test.describe('layout', () => {
    test('vertical layout stacks categories in a column; horizontal in a row', async () => {
       await control('menu');
+      /** @type {import('@playwright/test').Locator} The Skills category button. */
       const skills = hud('player-hud-category-skills');
+      /** @type {import('@playwright/test').Locator} The Resistances category button. */
       const resistances = hud('player-hud-category-resistances');
 
       // A layout switch re-flows the bar asynchronously, so both arrangements are asserted through the settling
@@ -660,7 +693,9 @@ test.describe('layout', () => {
 
    test('sub-options expand to the configured side and lanes never overlap', async () => {
       await control('menu');
+      /** @type {import('@playwright/test').Locator} The open flyout. */
       const flyout = hud('player-hud-flyout');
+      /** @type {import('@playwright/test').Locator} The Skills category button. */
       const skills = hud('player-hud-category-skills');
 
       // Park the menu mid-screen so the flyout has room on every side: the move leaves a full flyout's height of space
@@ -719,7 +754,9 @@ test.describe('layout', () => {
 
    test('the vertical flyout anchors to the open category button and flows up or down', async () => {
       await control('menu');
+      /** @type {import('@playwright/test').Locator} The open flyout. */
       const flyout = hud('player-hud-flyout');
+      /** @type {import('@playwright/test').Locator} The Skills category button. */
       const skills = hud('player-hud-category-skills');
 
       // Park the menu mid-screen so the flyout has vertical room both above and below the bar.
@@ -748,6 +785,7 @@ test.describe('layout', () => {
 
    test('sub-buttons form a third disjoint lane', async () => {
       await control('menu');
+      /** @type {string} The longsword's id. */
       const weaponId = itemIds.longsword;
 
       // Pin the left cascade (the default is right) so the lanes run right-to-left.
@@ -758,6 +796,7 @@ test.describe('layout', () => {
       await openCategory('weapons');
       await hud(`player-hud-sub-option-weapons-${weaponId}`).hover();
 
+      /** @type {import('@playwright/test').Locator} The longsword's open-sheet sub-button. */
       const subButton = hud(`player-hud-sub-button-${weaponId}-open-sheet`);
       await expect(subButton).toBeVisible();
 
@@ -809,6 +848,7 @@ test.describe('layout', () => {
       });
       await openCategory('skills');
 
+      /** @type {import('@playwright/test').Locator} The skill sub-options. */
       const subOptions = page.locator('[data-testid^="player-hud-sub-option-skills-"]');
       await expect(subOptions).toHaveCount(5);
       await expect(hud('player-hud-flyout-down')).toBeVisible();
@@ -868,6 +908,7 @@ test.describe('report cards', () => {
       // Foundry renders each message in more than one log; the card is located by its root class `.report` and the
       // first visible mount is used. The chat log is shown first: a collapsed sidebar parks it off screen.
       await showChatLog(page);
+      /** @type {import('@playwright/test').Locator} The report card. */
       const card = page.locator(`#chat .message[data-message-id="${id}"] .report`).first();
       await expect(card, `the mounted ${type} card is visible`).toBeVisible();
 
@@ -905,12 +946,15 @@ test.describe('report cards', () => {
       const before = await messageCount();
       await useUtility('applyDamage');
       await confirmAmount(5);
+      /** @type {string} The damage report message's id. */
       const id = await expectReportCard(before, 'damageReport');
 
       // The report's resource snapshot maxima equal the actor's live maxima at the same path.
       expect(
          await page.evaluate(({ id, actorId }) => {
+            /** @type {object} The resource snapshot the report holds. */
             const report = game.messages.get(id).system.resource;
+            /** @type {object} The actor's live resources. */
             const live = game.actors.get(actorId).system.resource;
             return {
                stamina: report.stamina.max === live.stamina.max,
@@ -968,6 +1012,7 @@ test.describe('report cards', () => {
        */
       const armorBelowMax = () => page.evaluate(
          (id) => {
+            /** @type {Item} The worn armor. */
             const armor = game.actors.get(id).items.find((item) => item.type === 'armor');
             return armor.system.armor.value < armor.system.armor.max;
          },

@@ -7,6 +7,7 @@ import {
    createWorldItem,
    openSidebarTab,
    pickPortrait,
+   setDescription,
    shared,
    sharedUuid,
 } from './flows.js';
@@ -162,18 +163,10 @@ test.describe('sheet layouts', () => {
       });
       /** @type {string} The new effect's id. */
       const effectId = await addEffect(page, hostId, `E2E Described Effect ${Date.now()}`);
-      const sheet = await openSheetByUuid(page, `Actor.${hostId}.ActiveEffect.${effectId}`);
-
       /** @type {import('@playwright/test').Locator} The description editor element. */
-      const editor = sheet.locator('prose-mirror');
-      await editor.hover();
-      await editor.locator('button.toggle').click();
-      await editor.locator('[contenteditable="true"]').click();
-      await page.keyboard.type('Blessed by the sun.');
-      await editor.locator('[data-action="save"]').click();
+      const editor = await setDescription(page, `Actor.${hostId}.ActiveEffect.${effectId}`, 'Blessed by the sun.');
       await expect(editor.locator('.editor-content'), 'inactive editor view shows the description')
          .toHaveText('Blessed by the sun.');
-      await expect(editor).toHaveClass(/inactive/);
    });
 
    test('the spells tab renders a spell row with a custom trait', async () => {

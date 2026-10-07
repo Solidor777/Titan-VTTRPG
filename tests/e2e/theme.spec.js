@@ -42,6 +42,7 @@ test.beforeAll(async ({ browser }) => {
 
    /** @type {string} The uuid of the document the link points at. */
    const targetUuid = await sharedUuid(page, 'player');
+   /** @type {import('@playwright/test').Locator} The description editor showing the saved link. */
    const editor = await setDescription(page, linkItemUuid, `See @UUID[${targetUuid}]{${LINK_TEXT}} here.`);
    await expect(editor.locator('a.content-link'), 'the saved description shows the link').toHaveText(LINK_TEXT);
    await closeAllApps(page);
@@ -78,6 +79,7 @@ async function openThemeEditor() {
    await page.evaluate(async () => {
       await new (game.settings.menus.get('titan.themeEditor').type)().render(true);
    });
+   /** @type {import('@playwright/test').Locator} The theme editor window. */
    const editor = page.locator('.theme-editor');
    await expect(editor.locator('section h3').first(), 'the editor rendered its token groups').toBeVisible();
    return editor;
@@ -98,6 +100,7 @@ test.describe('v14 theme system', () => {
       // Force the core scheme light, then dark, asserting the world-default theme tracks it. The
       // expected backgrounds come from the theme registry rather than literals, so a palette change
       // cannot silently stale this test; the resolved theme ids below keep it a real assertion.
+      /** @type {object} The applied backgrounds and theme ids under each scheme. */
       const observed = await page.evaluate(async () => {
          await game.settings.set('titan', 'theme', 'auto');
 
@@ -136,7 +139,9 @@ test.describe('v14 theme system', () => {
             };
          }
 
+         /** @type {{background: string, id: string}} The applied background and theme id under the light scheme. */
          const light = await probe('light', expectedLight.tokens['app-background']);
+         /** @type {{background: string, id: string}} The applied background and theme id under the dark scheme. */
          const dark = await probe('dark', expectedDark.tokens['app-background']);
          await game.settings.set('core', 'uiConfig', original);
          return {
@@ -164,12 +169,16 @@ test.describe('v14 theme system', () => {
    });
 
    test('custom theme export text round-trips through import and applies', async () => {
+      /** @type {object} The imported theme's outcome. */
       const result = await page.evaluate(async () => {
          // Export Macchiato, retint its app background, and import it as a custom theme.
+         /** @type {object} The theme manager. */
          const themeManager = game.titan.themeManager;
+         /** @type {object} The Macchiato export, retinted. */
          const exported = JSON.parse(themeManager.exportThemeText(themeManager.getTheme('macchiato')));
          exported.name = 'E2E Custom';
          exported.tokens['app-background'] = '#123456';
+         /** @type {object} The import result. */
          const imported = await themeManager.importThemeText(JSON.stringify(exported));
          if (!imported.ok) {
             return { error: imported.error };
@@ -193,7 +202,9 @@ test.describe('v14 theme system', () => {
    });
 
    test('the editor imports through its hidden file input a theme file the same editor exported', async () => {
+      /** @type {import('@playwright/test').Locator} The theme editor window. */
       const editor = await openThemeEditor();
+      /** @type {import('@playwright/test').Locator} The theme picker. */
       const picker = editor.locator('select.picker');
 
       // A custom theme: a duplicate of Heritage Dark with a retinted app background, exactly as a user edits one.
@@ -208,6 +219,7 @@ test.describe('v14 theme system', () => {
       await editor.locator('.token-row', { hasText: 'App Background' }).locator('input[type="color"]').fill('#123456');
 
       // The editor's Export button downloads the draft as a theme file.
+      /** @type {[import('@playwright/test').Download, unknown]} The download the Export button starts. */
       const [download] = await Promise.all([
          page.waitForEvent('download', { timeout: 1000 }),
          editor.getByRole('button', {
@@ -264,6 +276,7 @@ test.describe('v14 theme system', () => {
          await page.evaluate(() => game.settings.set('core', 'messageMode', 'blind'));
          /** @type {number} The chat message count before the roll. */
          const before = await page.evaluate(() => game.messages.size);
+         /** @type {import('@playwright/test').Locator} The shared player's sheet. */
          const sheet = await openSheetByUuid(page, await sharedUuid(page, 'player'));
          await sheet.getByRole('button', {
             name: 'Body',
@@ -277,8 +290,10 @@ test.describe('v14 theme system', () => {
          expect(await page.evaluate((id) => game.messages.get(id).blind, messageId), 'roll posted as blind')
             .toBe(true);
 
+         /** @type {import('@playwright/test').Locator} The blind check's chat card. */
          const card = page.locator(`#chat .message[data-message-id="${messageId}"]`);
          await expect(card, 'the card carries titan-gm-only').toHaveClass(/titan-gm-only/);
+         /** @type {import('@playwright/test').Locator} The card's visibility badge. */
          const badge = card.locator('.titan-visibility-badge');
          await expect(badge, 'badge text').toHaveText('GM Only');
          expect(
@@ -298,8 +313,11 @@ test.describe('theme editor styles', () => {
 
    test('theme editor h3 uses the header token, and light-theme panel-1 is stepped', async () => {
       await setClientSetting(page, 'theme', 'heritage-light');
+      /** @type {import('@playwright/test').Locator} The theme editor window. */
       const editor = await openThemeEditor();
+      /** @type {import('@playwright/test').Locator} The first section heading. */
       const heading = editor.locator('section h3').first();
+      /** @type {() => Promise<string>} Reads the heading's computed color. */
       const colorOf = () => heading.evaluate((element) => getComputedStyle(element).color);
 
       expect(await colorOf()).toBe('rgb(38, 38, 38)');
@@ -323,7 +341,9 @@ test.describe('theme editor styles', () => {
 
    test('theme editor preview shows the three stepped panels and per-level headers', async () => {
       await setClientSetting(page, 'theme', 'heritage-light');
+      /** @type {import('@playwright/test').Locator} The theme editor window. */
       const editor = await openThemeEditor();
+      /** @type {import('@playwright/test').Locator} The editor's preview. */
       const preview = editor.locator('.preview');
       await expect(preview.locator('.panel-3')).toBeVisible();
 
@@ -334,8 +354,11 @@ test.describe('theme editor styles', () => {
        */
       const background = (selector) => preview.locator(selector)
          .evaluate((element) => getComputedStyle(element).backgroundColor);
+      /** @type {string} The first panel's background color. */
       const panel1 = await background('.panel-1');
+      /** @type {string} The second panel's background color. */
       const panel2 = await background('.panel-2');
+      /** @type {string} The third panel's background color. */
       const panel3 = await background('.panel-3');
 
       // The three preview panels render the (darkened) HeritageLight ramp, each distinct.
@@ -349,6 +372,7 @@ test.describe('theme editor styles', () => {
       ]).size).toBe(3);
 
       // The preview headers are driven by the per-level header tokens: the preview's own draft token moves the header.
+      /** @type {import('@playwright/test').Locator} The preview's level headers. */
       const header = preview.locator('.headers h3');
       expect(await header.evaluate((element) => getComputedStyle(element).color)).toBe('rgb(38, 38, 38)');
       await preview.evaluate((element) => element.style.setProperty('--titan-header-3-font-color', '#aa3377'));
@@ -368,21 +392,28 @@ test.describe('content links', () => {
    ]) {
       test(`a sheet content link uses the ${themeId} link colors`, async () => {
          await setClientSetting(page, 'theme', themeId);
+         /** @type {import('@playwright/test').Locator} The content-link item's sheet. */
          const sheet = await openSheetByUuid(page, linkItemUuid);
          await clickSheetTab(sheet, 'Description');
+         /** @type {import('@playwright/test').Locator} The enriched content link. */
          const link = sheet.locator('a.content-link');
          await expect(link, 'the enriched link').toBeVisible();
 
          // Resolve each token to a computed rgb string in the link's own cascade scope.
+         /** @type {{color: boolean, background: boolean, text: string}} Whether the link paints the tokens. */
          const result = await link.evaluate((element) => {
+            /** @type {(token: string) => string} Resolves a theme token to a computed color. */
             const resolve = (token) => {
+               /** @type {HTMLSpanElement} A span that resolves the token in the link's scope. */
                const probe = document.createElement('span');
                probe.style.color = `var(--titan-${token})`;
                element.parentElement.appendChild(probe);
+               /** @type {string} The probe's computed color. */
                const value = getComputedStyle(probe).color;
                probe.remove();
                return value;
             };
+            /** @type {CSSStyleDeclaration} The link's computed style. */
             const style = getComputedStyle(element);
             return {
                color: style.color === resolve('content-link-font-color'),

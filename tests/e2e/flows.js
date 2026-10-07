@@ -1734,7 +1734,9 @@ export async function controlPlacedTokens(page, tokenIds) {
    const area = await page.evaluate((tokenIds) => {
       /** @type {number} Half of a grid cell in client pixels. */
       const margin = canvas.grid.size * canvas.stage.scale.x / 2;
+      /** @type {object[]} The client-pixel corners of each token. */
       const corners = tokenIds.map((id) => {
+         /** @type {PIXI.Rectangle} The token's bounds in canvas coordinates. */
          const bounds = canvas.scene.tokens.get(id).object.bounds;
          return {
             min: canvas.clientCoordinatesFromCanvas({
@@ -1765,17 +1767,6 @@ export async function controlPlacedTokens(page, tokenIds) {
 }
 
 /**
- * The numeric values of the ownership levels the Configure Ownership window offers.
- * @type {Record<string, number>}
- */
-const OWNERSHIP_LEVELS = {
-   NONE: 0,
-   LIMITED: 1,
-   OBSERVER: 2,
-   OWNER: 3,
-};
-
-/**
  * Sets one user's ownership level of a world actor in the Configure Ownership window the actor's directory entry opens.
  * @param {import('@playwright/test').Page} page - A logged-in GM page.
  * @param {string} actorId - The world actor.
@@ -1798,7 +1789,10 @@ export async function setOwnership(page, actorId, userName, level) {
 
    /** @type {string} The id of the user whose level is set. */
    const userId = await page.evaluate((userName) => game.users.getName(userName).id, userName);
-   await config.locator(`select[name="${userId}"]`).selectOption(String(OWNERSHIP_LEVELS[level]));
+
+   /** @type {number} The numeric level, read from the client's ownership constant. */
+   const value = await page.evaluate((level) => CONST.DOCUMENT_OWNERSHIP_LEVELS[level], level);
+   await config.locator(`select[name="${userId}"]`).selectOption(String(value));
    await config.locator('button[type="submit"]').click();
    await expect(config).toHaveCount(0);
    await expect.poll(
@@ -1807,7 +1801,7 @@ export async function setOwnership(page, actorId, userName, level) {
          userId,
       }),
       { message: `the window stored ${level} for ${userName}` },
-   ).toBe(OWNERSHIP_LEVELS[level]);
+   ).toBe(value);
    await settle(page);
 }
 
@@ -1834,6 +1828,7 @@ export async function createCombat(page) {
       );
       return added.length;
    }, { message: 'the create button made one combat' }).toBe(1);
+   /** @type {string[]} The created combat's id. */
    const [id] = added;
    record({
       documentName: 'Combat',

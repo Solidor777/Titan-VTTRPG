@@ -10,6 +10,7 @@ import {
    placeToken,
    removeCondition,
    setAttributeBase,
+   setDescription,
    setSkillTraining,
    shared,
    viewScene,
@@ -563,12 +564,13 @@ test.describe('conditions — the Player HUD', () => {
          await expect(sheet).toBeVisible();
          await expect(page.locator('.application.active-effect-config')).toHaveCount(0);
 
-         // The sheet's description editor: open it, type, and save it with the editor's save button.
-         await sheet.locator('prose-mirror').hover();
-         await sheet.locator('prose-mirror button.toggle').click();
-         await sheet.locator('prose-mirror .ProseMirror').click();
-         await page.keyboard.type(EDITED_DESCRIPTION);
-         await sheet.locator('prose-mirror button[data-action="save"]').click();
+         // The sheet's description editor receives the text through the shared flow, which reuses the open sheet.
+         /** @type {string} The Blinded effect's id. */
+         const blindedId = await page.evaluate(
+            (id) => game.actors.get(id).effects.find((effect) => effect.statuses.has('blinded')).id,
+            actorId,
+         );
+         await setDescription(page, `${actorUuid}.ActiveEffect.${blindedId}`, EDITED_DESCRIPTION);
          await expect.poll(
             () => page.evaluate(
                (id) => game.actors.get(id).effects.find((effect) => effect.statuses.has('blinded')).description,

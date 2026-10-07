@@ -8,6 +8,7 @@ import {
    createActor,
    createOwnedItem,
    placeToken,
+   setEquipped,
    shared,
    viewScene,
 } from './flows.js';
@@ -266,35 +267,16 @@ async function chooseRarity(documentSheet, rarity) {
 }
 
 /**
- * Sets whether an item is equipped with the row's Equipped toggle, clicking only when the state differs, and waits
- * for the document to show it. The row's controls and, when the item has checks or attacks, its expanded content each
- * carry a toggle; the first one is clicked.
- * @param {import('@playwright/test').Locator} row - The expanded item row.
- * @param {string} type - The item type: armor and shield equip into an actor slot, the others set their own flag.
- * @param {string} uuid - The item's uuid.
- * @param {boolean} equipped - The state to leave the item in.
- * @returns {Promise<void>} Resolves once the document shows the state.
+ * Splits an owned item's uuid into the ids the shared equip flow takes.
+ * @param {string} uuid - The item's uuid, `Actor.<id>.Item.<id>`.
+ * @returns {[string, string]} The owning actor's id and the item's id.
  */
-async function setEquipped(row, type, uuid, equipped) {
-   /**
-    * Reads whether the item is equipped.
-    * @returns {Promise<boolean>} True when it is.
-    */
-   const read = () => page.evaluate(async ({ uuid, type }) => {
-      /** @type {object} The fixture item. */
-      const item = await fromUuid(uuid);
-      return type === 'armor' || type === 'shield'
-         ? item.parent.system.equipped[type] === item.id
-         : item.system.equipped;
-   }, {
-      uuid,
-      type,
-   });
-   if (await read() !== equipped) {
-      await row.getByRole('button', { name: 'Equipped' }).first().click();
-   }
-   await expect.poll(read, { message: `the Equipped toggle left the ${type} ${equipped ? '' : 'un'}equipped` })
-      .toBe(equipped);
+function ownedIds(uuid) {
+   const [, actorId, , itemId] = uuid.split('.');
+   return [
+      actorId,
+      itemId,
+   ];
 }
 
 test.describe('item rows: a functional sweep per type', () => {
@@ -506,11 +488,11 @@ test.describe('item rows: a functional sweep per type', () => {
          /** @type {number} The world message count before the roll. */
          const beforeRoll = await page.evaluate(() => game.messages.size);
          if (type === 'weapon') {
-            await setEquipped(row, 'weapon', uuid, true);
+            await setEquipped(page, ...ownedIds(uuid), true);
             await row.locator('.controls .check-button button').click();
             await expect.poll(() => newestMessageType(page, beforeRoll), { message: 'the attack posts a check card' })
                .toBe('attackCheck');
-            await setEquipped(row, 'weapon', uuid, false);
+            await setEquipped(page, ...ownedIds(uuid), false);
          }
          else if (type === 'spell') {
             await row.locator('.controls .check-button button').click();
@@ -525,12 +507,12 @@ test.describe('item rows: a functional sweep per type', () => {
 
          // Equip: the row's Equipped toggle equips and unequips the item.
          if (type === 'armor' || type === 'shield') {
-            await setEquipped(row, type, uuid, true);
-            await setEquipped(row, type, uuid, false);
+            await setEquipped(page, ...ownedIds(uuid), true);
+            await setEquipped(page, ...ownedIds(uuid), false);
          }
          else if (type === 'equipment') {
-            await setEquipped(row, type, uuid, true);
-            await setEquipped(row, type, uuid, false);
+            await setEquipped(page, ...ownedIds(uuid), true);
+            await setEquipped(page, ...ownedIds(uuid), false);
          }
          expect(errors, `uncaught errors:\n${errors.join('\n')}`).toEqual([]);
       });
@@ -1262,7 +1244,7 @@ test.describe('deleting rows', () => {
       /** @type {import('@playwright/test').Locator} The armor's row. */
       const row = itemRow(sheet, id);
       await expandRow(row);
-      await setEquipped(row, 'armor', uuid, true);
+      await setEquipped(page, ...ownedIds(uuid), true);
       await refuseDeletes('Item');
       try {
          await row.getByRole('button', { name: 'Delete Item' }).click();
@@ -1312,7 +1294,7 @@ test.describe('deleting rows', () => {
       /** @type {import('@playwright/test').Locator} The armor's row. */
       const row = itemRow(await openActorTab('Inventory'), id);
       await expandRow(row);
-      await setEquipped(row, 'armor', uuid, true);
+      await setEquipped(page, ...ownedIds(uuid), true);
 
       // There is no control but the row's delete button, so the delete is the document operation a macro makes.
       await page.evaluate(async ({ actorId, id }) => game.actors.get(actorId).items.get(id).delete(), {
@@ -1333,7 +1315,7 @@ test.describe('deleting rows', () => {
       /** @type {import('@playwright/test').Locator} The armor's row. */
       const row = itemRow(await openActorTab('Inventory'), id);
       await expandRow(row);
-      await setEquipped(row, 'armor', uuid, true);
+      await setEquipped(page, ...ownedIds(uuid), true);
       await withClients(browser, { observer: 'E2E GM 2' }, async ({ observer }) => {
          await expect.poll(() => equippedArmorOn(observer), { message: 'the observer sees the armor equipped' })
             .toBe(id);
@@ -1439,7 +1421,7 @@ test.describe('deleting rows', () => {
             /** @type {import('@playwright/test').Locator} The item's row. */
             const row = itemRow(sheet, id);
             await expandRow(row);
-            await setEquipped(row, 'armor', uuid, true);
+            await setEquipped(page, ...ownedIds(uuid), true);
             await setClientSetting(page, 'confirmDeletingItems', confirming);
 
             await row.getByRole('button', { name: 'Delete Item' }).click();
@@ -1622,7 +1604,7 @@ test.describe('owned items', () => {
          stride: 5,
          fly: 0,
       });
-      await setEquipped(row, 'armor', uuid, true);
+      await setEquipped(page, ...ownedIds(uuid), true);
       await expect.poll(speeds, { message: 'equipping Heavy armor lowers the non-zero speed' }).toEqual({
          stride: 4,
          fly: 0,

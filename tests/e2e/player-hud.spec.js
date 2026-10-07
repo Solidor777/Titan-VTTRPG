@@ -48,6 +48,9 @@ let npcId;
 /** @type {Record<string, string>} The ids of the placed tokens, by `player`, `player2` and `npc`. */
 const tokenIds = {};
 
+/** @type {number} The run stamp in every fixture name, so a worker restart that repeats the hook finds no duplicate. */
+const RUN = Date.now();
+
 /** @type {string} Name of the effect the panel tests read. */
 const PANEL_EFFECT = 'E2E HUD Panel Effect';
 /** @type {string} The description typed into the panel effect. */
@@ -85,6 +88,20 @@ async function resetHud() {
       game.titan.playerHud.layoutState.editMode = false;
       game.titan.playerHud.resetLayout();
    });
+   // The reset persists through a client-setting write that the HUD does not await and settle does not track: the
+   // stored layout is read until it equals the layout the HUD now holds.
+   await expect.poll(
+      () => page.evaluate(() => {
+         /** @type {object} The layout the HUD state holds. */
+         const held = game.titan.playerHud.layoutState;
+         /** @type {object} The stored layout setting. */
+         const stored = game.settings.get('titan', 'playerHudLayout');
+         return JSON.stringify(stored.positions) === JSON.stringify(held.positions)
+            && JSON.stringify(stored.minimized) === JSON.stringify(held.minimized)
+            && JSON.stringify(stored.effectsPanelSize) === JSON.stringify(held.effectsPanelSize);
+      }),
+      { message: 'the reset layout is stored' },
+   ).toBe(true);
 }
 
 /**
@@ -174,22 +191,22 @@ test.beforeAll(async ({ browser }) => {
    await setClientSetting(page, 'getCheckOptions', 'never');
 
    // Two scenes: the tokens' and an empty one. The tokens' scene is viewed last, so the HUD's canvas is its own.
-   sceneId = await createScene(page, { name: 'E2E HUD Scene' });
-   emptySceneId = await createScene(page, { name: 'E2E HUD Empty Scene' });
+   sceneId = await createScene(page, { name: `E2E HUD Scene ${RUN}` });
+   emptySceneId = await createScene(page, { name: `E2E HUD Empty Scene ${RUN}` });
    await viewScene(page, sceneId);
 
    // The actors are made in the Actors tab, and a drag from the directory places each token, next to each other
    // in this order so that a selection rectangle can take two of them.
    playerId = await createActor(page, {
-      name: 'E2E HUD Player',
+      name: `E2E HUD Player ${RUN}`,
       type: 'player',
    });
    player2Id = await createActor(page, {
-      name: 'E2E HUD Player 2',
+      name: `E2E HUD Player 2 ${RUN}`,
       type: 'player',
    });
    npcId = await createActor(page, {
-      name: 'E2E HUD NPC',
+      name: `E2E HUD NPC ${RUN}`,
       type: 'npc',
    });
    tokenIds.player = await placeToken(page, playerId);
@@ -220,6 +237,7 @@ test.describe('portrait', () => {
 
       /** @type {object} The rendered widths of the current-value input and the max-value label. */
       const widths = await page.evaluate(() => {
+         /** @type {(selector: string) => number} Reads the rounded width of the element a selector names. */
          const width = (selector) => Math.round(document.querySelector(selector).getBoundingClientRect().width);
          return {
             input: width('[data-testid="player-hud-bar-stamina-input"]'),
@@ -425,7 +443,7 @@ test.describe('visibility', () => {
          expect(
             await player.evaluate(() => game.titan.playerHud.resolveActors().primary.name),
             'the HUD shows the owned actor',
-         ).toBe('E2E HUD Player 2');
+         ).toBe(`E2E HUD Player 2 ${RUN}`);
       });
    });
 });
@@ -436,6 +454,7 @@ test.describe('layout', () => {
       await toggleEditMode(true);
 
       // Entering edit mode re-frames the element; the drag starts from the box read after that transition.
+      /** @type {{x: number, y: number, width: number, height: number}} The portrait box before the drag. */
       const before = await dragElement('player-hud-portrait', 120, -80);
       await toggleEditMode(false);
 
@@ -444,6 +463,7 @@ test.describe('layout', () => {
       expect(stored.dx).toBeGreaterThan(100);
 
       // Leaving edit mode re-frames the element again; the settled box is the one the drag produced.
+      /** @type {{x: number, y: number, width: number, height: number}} The portrait box after leaving edit mode. */
       const after = await hud('player-hud-portrait').boundingBox();
       expect(Math.abs(after.x - (before.x + 120))).toBeLessThanOrEqual(8);
       expect(Math.abs(after.y - (before.y - 80))).toBeLessThanOrEqual(8);
@@ -451,13 +471,30 @@ test.describe('layout', () => {
 
    test('outside edit mode nothing drags', async () => {
       await control();
+
+      // Presence: the same gesture moves the portrait while edit mode is on.
+      await toggleEditMode(true);
+
+      /** @type {{x: number, y: number, width: number, height: number}} The portrait box before the edit-mode drag. */
+      const start = await dragElement('player-hud-portrait', 100, -60);
+      await toggleEditMode(false);
+      await expect.poll(
+         async () => (await hud('player-hud-portrait').boundingBox()).x - start.x,
+         { message: 'the edit-mode drag moved the portrait' },
+      ).toBeGreaterThan(50);
+
+      // Absence: the gesture repeated outside edit mode leaves the settled box and the stored layout as they are.
       /** @type {object} The stored layout before the gesture. */
       const storedBefore = await getSetting(page, 'playerHudLayout');
-      const box = await dragElement('player-hud-portrait', 100, -60);
 
-      /** @type {object} The portrait box after the gesture. */
+      /** @type {{x: number, y: number, width: number, height: number}} The portrait box before the gesture. */
+      const box = await dragElement('player-hud-portrait', 100, -60);
+      await waitForAnimations(page, '#titan-player-hud');
+
+      /** @type {{x: number, y: number, width: number, height: number}} The portrait box after the gesture. */
       const after = await hud('player-hud-portrait').boundingBox();
       expect(Math.abs(after.x - box.x)).toBeLessThanOrEqual(1);
+      expect(Math.abs(after.y - box.y)).toBeLessThanOrEqual(1);
       expect(await getSetting(page, 'playerHudLayout')).toEqual(storedBefore);
    });
 
@@ -478,6 +515,7 @@ test.describe('layout', () => {
 
    test('the HUD anchors to the expanded sidebar edge and stays put when the sidebar toggles', async () => {
       await control();
+      /** @type {import('@playwright/test').Locator} The action menu. */
       const menu = hud('player-hud-action-menu');
 
       // The HUD anchors to the LEFT of the sidebar at its EXPANDED width, so its position is independent of the
@@ -496,19 +534,31 @@ test.describe('layout', () => {
       const sidebarLeft = await page.evaluate(() => ui.sidebar.element.getBoundingClientRect().left);
       expect(expanded.x + expanded.width).toBeLessThanOrEqual(sidebarLeft + 1);
 
-      // Collapsing the sidebar must NOT move the menu.
+      // Collapsing the sidebar must NOT move the menu. The sidebar's own edge moving right shows the collapse took
+      // effect; the window resize event then makes the HUD re-read the canvas rect, so the menu box is read after the
+      // re-anchor has had its chance.
       await page.evaluate(() => ui.sidebar.collapse());
       await expect.poll(
-         async () => Math.abs((await menu.boundingBox()).x - expanded.x) <= 2,
-         { message: 'the HUD stays put when the sidebar collapses' },
-      ).toBe(true);
+         () => page.evaluate(() => Math.round(ui.sidebar.element.getBoundingClientRect().left)),
+         { message: 'the sidebar collapsed' },
+      ).toBeGreaterThan(Math.round(sidebarLeft));
+      await waitForAnimations(page, 'body');
+      await page.evaluate(() => window.dispatchEvent(new Event('resize')));
+      await waitForAnimations(page, '#titan-player-hud');
+      expect(Math.abs((await menu.boundingBox()).x - expanded.x), 'the HUD stays put when the sidebar collapses')
+         .toBeLessThanOrEqual(2);
 
       // Re-expanding must also leave it in place.
       await page.evaluate(() => ui.sidebar.expand());
       await expect.poll(
-         async () => Math.abs((await menu.boundingBox()).x - expanded.x) <= 2,
-         { message: 'the HUD stays put when the sidebar re-expands' },
-      ).toBe(true);
+         () => page.evaluate(() => Math.round(ui.sidebar.element.getBoundingClientRect().left)),
+         { message: 'the sidebar re-expanded' },
+      ).toBe(Math.round(sidebarLeft));
+      await waitForAnimations(page, 'body');
+      await page.evaluate(() => window.dispatchEvent(new Event('resize')));
+      await waitForAnimations(page, '#titan-player-hud');
+      expect(Math.abs((await menu.boundingBox()).x - expanded.x), 'the HUD stays put when the sidebar re-expands')
+         .toBeLessThanOrEqual(2);
    });
 
    test('the layout rect ends exactly at the expanded sidebar edge and does not move on collapse', async () => {
@@ -522,6 +572,7 @@ test.describe('layout', () => {
          await waitForAnimations(page, 'body');
          await page.evaluate(() => window.dispatchEvent(new Event('resize')));
          return page.evaluate(() => {
+            /** @type {{left: number, width: number}} The HUD layout rect. */
             const rect = game.titan.playerHud.layoutState.rect;
             return {
                rectRight: rect.left + rect.width,
@@ -530,8 +581,10 @@ test.describe('layout', () => {
          });
       };
       await page.evaluate(() => ui.sidebar.expand());
+      /** @type {{rectRight: number, sidebarLeft: number}} The edges with the sidebar expanded. */
       const expanded = await edges();
       await page.evaluate(() => ui.sidebar.collapse());
+      /** @type {{rectRight: number, sidebarLeft: number}} The edges with the sidebar collapsed. */
       const collapsed = await edges();
 
       // The rect's right edge sits exactly at the expanded sidebar's left edge.
@@ -543,21 +596,43 @@ test.describe('layout', () => {
    });
 
    test('a window resize clamps elements into the canvas rect', async () => {
+      // The effects panel mounts only for an actor that has an effect.
+      await addEffect(page, playerId, 'E2E HUD Resize Effect');
+      await closeAllApps(page);
       await control();
+
+      // Presence: the three elements are mounted before the resize and after it, so the clamp check below cannot pass
+      // on an empty list.
+      for (const id of [
+         'player-hud-portrait',
+         'player-hud-action-menu',
+         'player-hud-effects-panel',
+      ]) {
+         await expect(hud(id), `${id} is mounted before the resize`).toBeVisible();
+      }
       await page.setViewportSize({
          width: 900,
          height: 600,
       });
+      for (const id of [
+         'player-hud-portrait',
+         'player-hud-action-menu',
+         'player-hud-effects-panel',
+      ]) {
+         await expect(hud(id), `${id} is mounted after the resize`).toBeVisible();
+      }
 
       await expect.poll(
          () => page.evaluate(() => {
             /** @type {number} The sidebar's current rendered width. */
             const sidebarWidth = ui.sidebar?.element?.getBoundingClientRect()?.width ?? 0;
+            /** @type {string} Selects the HUD element frames and test ids. */
             const selector = '#titan-player-hud .hud-element, #titan-player-hud [data-testid^="player-hud-"]';
 
             return Array.from(document.querySelectorAll(selector))
                .filter((node) => node.dataset.testid?.match(/^player-hud-(portrait|action-menu|effects-panel)$/))
                .every((node) => {
+                  /** @type {DOMRect} The element's box. */
                   const box = node.getBoundingClientRect();
                   return box.left >= -1 && box.top >= -1
                      && box.right <= (900 - sidebarWidth) + 1 && box.bottom <= 601;
@@ -569,7 +644,9 @@ test.describe('layout', () => {
 
    test('the action menu defaults to the right of the portrait with a right-opening flyout', async () => {
       await control();
+      /** @type {import('@playwright/test').Locator} The portrait. */
       const portrait = hud('player-hud-portrait');
+      /** @type {import('@playwright/test').Locator} The action menu. */
       const menu = hud('player-hud-action-menu');
       await expect(portrait).toBeVisible();
       await expect(menu).toBeVisible();
@@ -595,7 +672,9 @@ test.describe('layout', () => {
 
       // The flyout slides into its lane; measuring before that finishes reads a mid-slide position.
       await waitForAnimations(page, '#titan-player-hud');
+      /** @type {{x: number, y: number, width: number, height: number}} The flyout box. */
       const flyout = await hud('player-hud-flyout').boundingBox();
+      /** @type {{x: number, y: number, width: number, height: number}} The category strip box. */
       const categories = await page.locator('#titan-player-hud .categories').boundingBox();
       expect(flyout.x).toBeGreaterThanOrEqual(categories.x + categories.width - 2);
       await page.keyboard.press('Escape');
@@ -603,6 +682,7 @@ test.describe('layout', () => {
 
    test('the edit toolbar reset restores default positions', async () => {
       await control();
+      /** @type {import('@playwright/test').Locator} The portrait frame. */
       const frame = hud('player-hud-portrait');
       /** @type {object} The portrait box at its default position. */
       const defaultBox = await frame.boundingBox();
@@ -715,11 +795,16 @@ test.describe('effects panel', () => {
    test('the panel renders sections for conditions and effects', async () => {
       await control();
       await expect(hud('player-hud-effects-panel')).toBeVisible();
-      await expect(hud('player-hud-effect-row')).toHaveCount(2);
+
+      /** @type {number} The number of effects the player holds (conditions and effects share the panel). */
+      const held = await page.evaluate((id) => game.actors.get(id).effects.size, playerId);
+      expect(held, 'the player holds a condition and an effect at least').toBeGreaterThanOrEqual(2);
+      await expect(hud('player-hud-effect-row')).toHaveCount(held);
    });
 
    test('a row expands to its description and controls', async () => {
       await control();
+      /** @type {import('@playwright/test').Locator} The expanded panel row. */
       const row = await expandRow(panelRow());
       await expect(row.getByText(PANEL_DESCRIPTION)).toBeVisible();
       for (const id of [
@@ -744,6 +829,7 @@ test.describe('effects panel', () => {
          (uuid) => fromUuid(uuid).then((effect) => effect.system.duration.remaining),
          panelEffectUuid,
       );
+      /** @type {import('@playwright/test').Locator} The expanded panel row. */
       const row = await expandRow(panelRow());
 
       await row.locator('[data-testid="player-hud-effect-duration-up"]').click();
@@ -755,6 +841,7 @@ test.describe('effects panel', () => {
 
    test('send to chat creates the effect card', async () => {
       await control();
+      /** @type {import('@playwright/test').Locator} The expanded panel row. */
       const row = await expandRow(panelRow());
       await row.locator('[data-testid="player-hud-effect-chat"]').click();
       await expect.poll(
@@ -765,6 +852,7 @@ test.describe('effects panel', () => {
 
    test('open sheet opens the effect sheet', async () => {
       await control();
+      /** @type {import('@playwright/test').Locator} The expanded panel row. */
       const row = await expandRow(panelRow());
       await row.locator('[data-testid="player-hud-effect-sheet"]').click();
       await expect.poll(
@@ -777,6 +865,7 @@ test.describe('effects panel', () => {
 
    test('the row header updates in place when the effect is renamed in its sheet', async () => {
       await control();
+      /** @type {import('@playwright/test').Locator} The expanded panel row. */
       const row = await expandRow(panelRow());
       await expect(row.getByText(PANEL_DESCRIPTION)).toBeVisible();
       await expect(
@@ -788,8 +877,10 @@ test.describe('effects panel', () => {
       // follows in place, and the description still showing proves the row did not remount (its expanded state is
       // local to the row).
       await row.locator('[data-testid="player-hud-effect-sheet"]').click();
+      /** @type {import('@playwright/test').Locator} The effect's sheet window. */
       const sheet = page.locator(`.application[id$="ActiveEffect-${panelEffectId}"]`);
       await expect(sheet).toBeVisible();
+      /** @type {string} The name typed into the effect sheet. */
       const renamed = `${PANEL_EFFECT} Renamed`;
       try {
          await commitText(sheet.locator('.document-name input'), renamed);
@@ -808,6 +899,7 @@ test.describe('effects panel', () => {
 
    test('the embedded check of an expanded row rolls through the HUD and posts an item check', async () => {
       await control();
+      /** @type {import('@playwright/test').Locator} The expanded row's embedded check button. */
       const button = (await expandRow(panelRow())).getByRole('button').filter({ hasText: PANEL_CHECK }).first();
       await expect(button, 'the expanded row renders the embedded check').toBeVisible();
 
@@ -821,11 +913,13 @@ test.describe('effects panel', () => {
    });
 
    test('remove deletes the effect when deletions are not confirmed', async () => {
+      /** @type {string} The new effect's id. */
       const id = await addEffect(page, playerId, 'E2E HUD Removable Effect');
       await closeAllApps(page);
       await setClientSetting(page, 'confirmDeletingEffects', false);
       await control();
 
+      /** @type {import('@playwright/test').Locator} The new effect's row. */
       const row = hud('player-hud-effect-row').filter({ hasText: 'E2E HUD Removable Effect' });
       await expect(row).toBeVisible();
       await expandRow(row);
@@ -841,10 +935,12 @@ test.describe('effects panel', () => {
    });
 
    test('remove asks first when deletions are confirmed, and Cancel keeps the effect', async () => {
+      /** @type {string} The new effect's id. */
       const id = await addEffect(page, playerId, 'E2E HUD Kept Effect');
       await closeAllApps(page);
       await control();
 
+      /** @type {import('@playwright/test').Locator} The new effect's row. */
       const row = hud('player-hud-effect-row').filter({ hasText: 'E2E HUD Kept Effect' });
       await expandRow(row);
       await row.locator('[data-testid="player-hud-effect-delete"]').click();
@@ -872,12 +968,14 @@ test.describe('effects panel', () => {
    });
 
    test('the owner-gated remove confirms through, and the panel hides once the actor has no effects', async () => {
+      /** @type {string} The new effect's id. */
       const id = await addEffect(page, player2Id, 'E2E HUD Lone Effect');
       await closeAllApps(page);
       await control('player2');
 
       await expect(hud('player-hud-portrait'), 'the HUD shows the second player').toContainText('E2E HUD Player 2');
       await expect(hud('player-hud-effects-panel')).toBeVisible();
+      /** @type {import('@playwright/test').Locator} The expanded effect row. */
       const row = await expandRow(hud('player-hud-effect-row'));
       await row.locator('[data-testid="player-hud-effect-delete"]').click();
 
@@ -901,6 +999,7 @@ test.describe('effects panel', () => {
       await control();
       await setClientSetting(page, 'playerHudOptions', { effectsPanel: { style: 'tray' } });
 
+      /** @type {import('@playwright/test').Locator} The effect icons of the tray. */
       const icons = hud('player-hud-effect-icon');
       await expect(icons.first()).toBeVisible();
       await expect(hud('player-hud-effect-row')).toHaveCount(0);
@@ -928,6 +1027,7 @@ test.describe('effects panel', () => {
 
       /** @type {{width: number, height: number}} The panel size before the resize drag. */
       const before = await page.evaluate(() => ({ ...game.titan.playerHud.layoutState.effectsPanelSize }));
+      /** @type {import('@playwright/test').Locator} The panel's resize handle. */
       const handle = hud('player-hud-effects-panel-resize');
       await expect(handle).toBeVisible();
 
@@ -964,6 +1064,7 @@ test.describe('effects panel', () => {
       );
       await expect.poll(
          () => page.evaluate(() => {
+            /** @type {Element | null} The panel body element. */
             const body = document.querySelector('[data-testid="player-hud-effects-panel"] [class*="body"]');
             return !!body && body.scrollHeight > body.clientHeight;
          }),
@@ -984,7 +1085,11 @@ test.describe('after a reload', () => {
       const before = await hud('player-hud-portrait').boundingBox();
       expect(before, 'the portrait is shown').not.toBeNull();
 
-      await reloadWorld(page);
+      // The token click needs the reloaded scene drawn, not only the world ready.
+      await reloadWorld(page, {
+         ready: () => globalThis.game?.ready === true && globalThis.canvas?.ready === true
+            && !!globalThis.game.titan?.playerHud,
+      });
       await control();
 
       await expect.poll(
