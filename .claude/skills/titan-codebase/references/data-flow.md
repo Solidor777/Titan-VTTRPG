@@ -321,7 +321,9 @@ the `Shift+H` keybinding; `HudEditToolbar` offers Done / Reset Layout / Settings
 **Action menu — `BuildActionMenuModel.js` → cascade components**
 The pure builder derives categories → sub-options → sub-buttons from the live actors (skills/resistances/
 utility run for ALL resolved actors; weapons/inventory/abilities/spells/effects read the primary only and are
-omitted in group mode), applying the per-category gates, per-sub-button-type gates, and content filters from
+omitted in group mode; the utility sub-options are `toggleInspiration`, `spendResolve`, `shortRest`, `longRest`,
+`removeCombatEffects` and the four amount-prompt actions `applyDamage`, `applyHealing`, `applyRend`, `applyRepairs`),
+applying the per-category gates, per-sub-button-type gates, and content filters from
 `playerHudOptions().actionMenu`. Empty categories are omitted. `ActionMenuElement` renders the bar and wires
 the four amount-prompt utilities to `HudAmountDialog` (`applyDamage`/`applyHealing`/`applyRend`/`applyRepairs`
 for every resolved actor); the cascade's order follows the configured expand direction (authoritative — there

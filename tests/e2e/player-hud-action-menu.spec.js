@@ -23,8 +23,8 @@ import { attachPageErrors, clearChat, closeAllApps, showChatLog, waitForAnimatio
  * The Player HUD's action menu on flow-made actors, items and effects: which categories and sub-options it offers,
  * what its main actions and sub-buttons do (rolls, equip, chat, sheet, duration, quantity, the amount dialog), its
  * options (filters, sub-button gates, disabled categories, layouts and directions), its geometry, its icons, and the
- * report cards that its utility menu and the portrait's Spend Resolve button post. Settings are client settings; they
- * return to their defaults after each test.
+ * report cards that its utility menu posts. Settings are client settings; they return to their defaults after each
+ * test.
  */
 
 /** @type {import('@playwright/test').Page} The file-shared, logged-in page (one world boot per file). */
@@ -612,11 +612,17 @@ test.describe('options', () => {
       await expect(hud('player-hud-sub-option-resistances-reflexes').locator('i'))
          .toHaveClass(/(?:^|\s)fas\sfa-rabbit-running(?:\s|$)/);
 
+      // The window is widened so that every utility row is rendered; the test reads icons, not the scroll window.
+      await setMenuOptions({ windowSize: 10 });
       await openCategory('utility');
       for (const [key, icon] of [
          [
             'toggleInspiration',
             /(?:^|\s)fas\sfa-sun(?:\s|$)/,
+         ],
+         [
+            'spendResolve',
+            /(?:^|\s)fas\sfa-bolt(?:\s|$)/,
          ],
          [
             'shortRest',
@@ -921,13 +927,38 @@ test.describe('report cards', () => {
    }
 
    /**
+    * Finds a utility sub-option in the open Utility flyout. The flyout shows `windowSize` rows (8 by default) and
+    * the player's utility list is longer, so a row below the window is brought into view with the mouse wheel.
+    * @param {string} key - The utility sub-option key.
+    * @returns {Promise<import('@playwright/test').Locator>} The visible sub-option.
+    */
+   async function utilityOption(key) {
+      await openCategory('utility');
+      /** @type {import('@playwright/test').Locator} The sub-option. */
+      const option = hud(`player-hud-sub-option-utility-${key}`);
+      // The wheel direction that reveals the row depends on whether the flyout flows up or down, so a tick down is
+      // tried first and a tick up second.
+      for (const delta of [
+         120,
+         -120,
+      ]) {
+         if (await option.count() === 0) {
+            await hud('player-hud-flyout').hover();
+            await page.mouse.wheel(0, delta);
+            await expect(hud('player-hud-flyout')).toBeVisible();
+         }
+      }
+      await expect(option, `the ${key} sub-option is in view`).toBeVisible();
+      return option;
+   }
+
+   /**
     * Chooses a utility action in the action menu.
     * @param {string} key - The utility sub-option key.
     * @returns {Promise<void>} Resolves once the click is dispatched.
     */
    async function useUtility(key) {
-      await openCategory('utility');
-      await hud(`player-hud-sub-option-utility-${key}`).click();
+      await (await utilityOption(key)).click();
    }
 
    /**
@@ -988,7 +1019,7 @@ test.describe('report cards', () => {
       await setBar(actorIds.report, 'resolve', 0);
       /** @type {number} The message count before the click. */
       const before = await messageCount();
-      await hud('player-hud-spend-resolve').click();
+      await useUtility('spendResolve');
       await expectReportCard(before, 'spendResolveReport');
    });
 
