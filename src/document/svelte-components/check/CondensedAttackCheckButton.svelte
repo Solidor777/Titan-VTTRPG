@@ -26,7 +26,9 @@
 
    /** @type {AttackCheckParameters|undefined} Resolved dice and modifiers for the attack check this button rolls. */
    let checkParameters = $derived.by(() => {
-      if (rollActor && document.data?.system.attack.length > 0) {
+      // The item sheet's bridge outlives the owned item by a tick, so the roll actor validates the item first.
+      if (rollActor && document.data?.system.attack.length > 0 &&
+         rollActor.data.system.validateAttackCheckOptions(checkOptions, false)) {
          return rollActor.data.system.getAttackCheckParameters(
             rollActor.data.system.initializeAttackCheckOptions(checkOptions),
          );

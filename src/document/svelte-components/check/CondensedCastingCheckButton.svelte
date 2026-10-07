@@ -17,7 +17,9 @@
 
    /** @type {CastingCheckParameters|undefined} Resolved dice and modifiers for the casting check this button rolls. */
    let checkParameters = $derived.by(() => {
-      if (rollActor && document.data) {
+      // The item sheet's bridge outlives the owned item by a tick, so the roll actor validates the item first.
+      if (rollActor && document.data &&
+         rollActor.data.system.validateCastingCheckOptions(checkOptions, false)) {
          return rollActor.data.system.getCastingCheckParameters(
             rollActor.data.system.initializeCastingCheckOptions(checkOptions),
          );
