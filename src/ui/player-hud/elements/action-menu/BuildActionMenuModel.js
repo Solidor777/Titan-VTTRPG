@@ -15,6 +15,7 @@ import {
    SEND_TO_CHAT_ICON,
    SHEET_ICON,
    SHORT_REST_ICON,
+   SPEND_RESOLVE_ICON,
    getIcon,
 } from '~/system/Icons.js';
 import { DEFAULT_SKILL_ATTRIBUTES } from '~/system/DefaultSkillAttributes.js';
@@ -464,6 +465,18 @@ function buildUtility(actors) {
          subButtons: [],
       });
    }
+
+   subOptions.push({
+      key: 'spendResolve',
+      labelKey: 'spendResolve',
+      icon: SPEND_RESOLVE_ICON,
+      mainAction: () => {
+         for (const actor of actors) {
+            actor.system.spendResolve(1);
+         }
+      },
+      subButtons: [],
+   });
 
    for (const [key, icon] of [
       [

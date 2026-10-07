@@ -13,6 +13,7 @@ import {
    REPAIR_ICON,
    RESILIENCE_ICON,
    SHORT_REST_ICON,
+   SPEND_RESOLVE_ICON,
    WILLPOWER_ICON,
 } from '~/system/Icons.js';
 
@@ -93,6 +94,7 @@ describe('buildActionMenuModel', () => {
       expect(category(model, 'resistances').subOptions).toHaveLength(3);
       expect(category(model, 'utility').subOptions.map((s) => s.key)).toEqual([
          'toggleInspiration',
+         'spendResolve',
          'shortRest',
          'longRest',
          'removeCombatEffects',
@@ -181,6 +183,7 @@ describe('buildActionMenuModel', () => {
       const utility = category(model, 'utility').subOptions;
       expect(utility.map((s) => s.icon)).toEqual([
          INSPIRATION_ICON,
+         SPEND_RESOLVE_ICON,
          SHORT_REST_ICON,
          LONG_REST_ICON,
          REMOVE_TEMP_EFFECTS_ICON,
@@ -199,6 +202,22 @@ describe('buildActionMenuModel', () => {
       });
       expect(category(cleared, 'utility').subOptions.find((s) => s.key === 'toggleInspiration').pressed)
          .toBe(false);
+   });
+
+   it('spends one Resolve for every actor from the utility menu', () => {
+      const actors = [
+         mockActor({ id: 'a' }),
+         mockActor({ id: 'b' }),
+      ];
+      const model = buildActionMenuModel({
+         actors,
+         primary: actors[0],
+         options: createDefaultHudOptions().actionMenu,
+      });
+      category(model, 'utility').subOptions.find((s) => s.key === 'spendResolve').mainAction();
+      for (const actor of actors) {
+         expect(actor.system.spendResolve).toHaveBeenCalledWith(1);
+      }
    });
 
    it('omits inspiration from utility when no actor is a player', () => {
