@@ -1,11 +1,12 @@
 import { expect } from '@playwright/test';
+import { openSheetByUuid } from './fixtures.js';
 import { selectTitanOption } from './select.js';
 import { settle } from './settle.js';
 
 /**
  * Page-object helpers for driving the rendered Svelte check-option dialogs from Playwright.
  *
- * Each `request<Type>Check` opens its dialog when the `titan.getCheckOptions` setting is `always` (and no
+ * Each roll button opens its dialog when the `titan.getCheckOptions` setting is `always` (and no
  * modifier key inverts it — headless Playwright never holds one). Every dialog extends `TitanDialog`
  * (ApplicationV2) so its window root carries `.application.titan-dialog`; the per-type window is
  * identified by its element id prefix `titan-<type>-check-dialog-<actorId>...` (the actor id is
@@ -20,59 +21,73 @@ import { settle } from './settle.js';
  */
 
 /**
- * Per-type dialog metadata: the per-type window selector and the stringified request invocation that
- * opens the dialog from the E2E Roller actor. `fixtures` is resolved in {@link openCheckDialog}.
- * @type {Record<string, { selector: string, request: string }>}
+ * Per-type dialog metadata: the selector of the per-type window.
+ * @type {Record<string, string>}
  */
-const DIALOG_META = {
-   attribute: {
-      selector: '.application.titan-dialog[id^="titan-attribute-check-dialog-"]',
-      request: 'await actor.system.requestAttributeCheck({ attribute: "body" });',
-   },
-   resistance: {
-      selector: '.application.titan-dialog[id^="titan-resistance-check-dialog-"]',
-      request: 'await actor.system.requestResistanceCheck({ resistance: "resilience" });',
-   },
-   attack: {
-      selector: '.application.titan-dialog[id^="titan-attack-check-dialog-"]',
-      request: 'await actor.system.requestAttackCheck({ itemId: fixtures.weaponId, attackIdx: 0 });',
-   },
-   casting: {
-      selector: '.application.titan-dialog[id^="titan-casting-check-dialog-"]',
-      request: 'await actor.system.requestCastingCheck({ itemId: fixtures.spellId });',
-   },
-   item: {
-      selector: '.application.titan-dialog[id^="titan-item-check-dialog-"]',
-      request: 'await actor.system.requestItemCheck({ itemId: fixtures.abilityId, checkIdx: 0 });',
-   },
+const DIALOG_SELECTORS = {
+   attribute: '.application.titan-dialog[id^="titan-attribute-check-dialog-"]',
+   resistance: '.application.titan-dialog[id^="titan-resistance-check-dialog-"]',
+   attack: '.application.titan-dialog[id^="titan-attack-check-dialog-"]',
+   casting: '.application.titan-dialog[id^="titan-casting-check-dialog-"]',
+   item: '.application.titan-dialog[id^="titan-item-check-dialog-"]',
 };
 
 /**
- * Enables the check-options setting and opens the dialog for the given check type from the E2E Roller.
+ * Opens the dialog of a check type with the roll button a user clicks. An Attribute or Resistance Check opens from the
+ * actor's sheet header (a button named for the Attribute or Resistance); an Attack, Casting or Item Check opens from
+ * the roll button in the sidebar of the owned item's sheet (the attack or the check at the given position). The
+ * `getCheckOptions` setting must be `always` (or `situational` with a situational modifier on the check), or the click
+ * rolls straight to chat and no dialog opens.
  * @param {import('@playwright/test').Page} page - The Playwright page bound to the live world.
  * @param {('attribute'|'resistance'|'attack'|'casting'|'item')} type - The check type to open.
+ * @param {string} uuid - The uuid of the actor (an Attribute or Resistance Check) or of the owned item (an Attack,
+ * Casting or Item Check) whose roll button is clicked.
+ * @param {object} [options] - Which roll button to click.
+ * @param {string} [options.button] - The localized name of the header button of an Attribute or Resistance Check
+ * (`Body` and `Resilience` by default).
+ * @param {number} [options.index] - The position of the roll button among the item sheet's attacks or checks (0 by
+ * default).
  * @returns {Promise<import('@playwright/test').Locator>} A locator for the visible dialog root.
  */
-export async function openCheckDialog(page, type) {
-   // The per-type selector + request invocation for the requested check type.
-   const meta = DIALOG_META[type];
+export async function openCheckDialog(page, type, uuid, { button, index = 0 } = {}) {
+   /** @type {import('@playwright/test').Locator} The sheet that holds the roll button. */
+   const sheet = await openSheetByUuid(page, uuid);
+   if (type === 'attribute' || type === 'resistance') {
+      await sheet.getByRole('button', {
+         name: button ?? (type === 'attribute' ? 'Body' : 'Resilience'),
+         exact: true,
+      }).first().click();
+   }
+   else {
+      await sheet.locator('.sidebar-check .header .roll button').nth(index).click();
+   }
 
-   // Turn the dialog gate on, resolve the roller's owned-item ids, and fire the gated request.
-   await page.evaluate(async (requestSrc) => {
-      await game.settings.set('titan', 'getCheckOptions', 'always');
-      const actor = game.actors.getName('E2E Roller');
-      const fixtures = {
-         weaponId: actor.items.find((i) => i.type === 'weapon')?.id,
-         spellId: actor.items.find((i) => i.type === 'spell')?.id,
-         abilityId: actor.items.find((i) => i.type === 'ability')?.id,
-      };
-      await new Function('actor', 'fixtures', `return (async () => { ${requestSrc} })();`)(actor, fixtures);
-   }, meta.request);
-
-   // The dialog window root; assert it mounted before returning.
-   const dialog = page.locator(meta.selector).first();
+   /** @type {import('@playwright/test').Locator} The dialog window root; assert it mounted before returning. */
+   const dialog = page.locator(DIALOG_SELECTORS[type]).first();
    await expect(dialog).toBeVisible();
    return dialog;
+}
+
+/**
+ * Drags a dialog's window by its header to the left edge of the page, so that the sheet it opened from is not under
+ * it: a dialog opens over the middle of the sheet and covers controls the test then clicks.
+ * @param {import('@playwright/test').Locator} dialog - The dialog root locator.
+ * @returns {Promise<void>} Resolves once the dialog sits left of the sheet's left edge.
+ */
+export async function moveDialogAside(dialog) {
+   /** @type {import('@playwright/test').Page} The page the dialog is on. */
+   const page = dialog.page();
+
+   /** @type {{x: number, y: number, width: number, height: number}} The header's box. */
+   const header = await dialog.locator('header.window-header').boundingBox();
+   await page.mouse.move(header.x + (header.width / 2), header.y + (header.height / 2));
+   await page.mouse.down();
+   await page.mouse.move(100, header.y + (header.height / 2), { steps: 10 });
+   await page.mouse.up();
+   await expect.poll(
+      async () => (await dialog.boundingBox()).x,
+      { message: 'the drag moved the dialog to the left edge' },
+   ).toBeLessThan(200);
 }
 
 /**
