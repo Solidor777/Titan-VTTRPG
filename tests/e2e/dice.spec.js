@@ -25,7 +25,7 @@ test.afterAll(async () => {
 });
 
 /**
- * Guards the determinism seam the whole checks-integration approach depends on: stubbing
+ * Guards the determinism seam the forced-dice check tests (`check-math.spec.js`) depend on: stubbing
  * `CONFIG.Dice.randomUniform` so a d6 lands on a chosen face. If Foundry ever changes
  * `DiceTerm.mapRandomFace`, this spec fails loudly before the check tests do.
  */

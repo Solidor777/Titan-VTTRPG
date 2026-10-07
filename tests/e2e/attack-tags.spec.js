@@ -111,8 +111,7 @@ test.describe('shared AttackTags across surfaces', () => {
    });
 
    // Unconditionally restore the check-options dialog gate: a mid-test failure after the gate is set to always
-   // must not leak `getCheckOptions: 'always'` into specs that rely on the no-dialog setting (house pattern per
-   // checks-dialog.spec.js).
+   // must not leak `getCheckOptions: 'always'` into specs that rely on the no-dialog setting.
    test.afterEach(async () => {
       await page.evaluate(async () => {
          await game.settings.set('titan', 'getCheckOptions', 'never');

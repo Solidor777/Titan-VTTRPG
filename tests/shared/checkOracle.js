@@ -1,5 +1,6 @@
 /**
- * Independent oracle for TITAN check results, used by the E2E checks-integration tests.
+ * Independent oracle for TITAN check results, used by the forced-dice E2E tests (`check-math.spec.js`,
+ * `check-dialog.spec.js`).
  *
  * This is a deliberate, standalone reimplementation of the success/crit rules in
  * `src/check/CheckResults.js`; it is NOT imported from the engine, so it can catch an engine
