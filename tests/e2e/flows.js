@@ -354,6 +354,13 @@ async function releaseTokenControl(page) {
    if (await page.evaluate(() => canvas.tokens.controlled.length) === 0) {
       return;
    }
+   // An open action-menu cascade consumes the first Escape (it closes the cascade and leaves control alone).
+   /** @type {import('@playwright/test').Locator} The action-menu category buttons that hold an open cascade. */
+   const openCascade = page.locator('[data-testid^="player-hud-category-"].active');
+   if (await openCascade.count() > 0) {
+      await page.keyboard.press('Escape');
+      await expect(openCascade, 'the Escape key closed the open cascade').toHaveCount(0);
+   }
    await page.keyboard.press('Escape');
    await expect.poll(
       () => page.evaluate(() => canvas.tokens.controlled.length),
