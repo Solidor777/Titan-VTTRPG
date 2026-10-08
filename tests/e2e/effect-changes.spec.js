@@ -7,8 +7,10 @@ import { attachPageErrors, closeAllApps } from './world.js';
  * The core `changes` field of TITAN's Active Effects, driven through core's own Active Effect Config sheet: its Add
  * change button, its form and its change rows. TITAN has no changes editor, so the config sheet is opened by script
  * (as another module could); every edit after that goes through its controls. Locked in: the button stores core's
- * initial change (type `add`, phase `initial`) and the sheet renders it; saving leaves the priority unset so core's
- * per-type default applies, and the sheet shows that default; a malformed change type is rejected.
+ * initial change (type `add`, phase `initial`) and the sheet renders it; saving leaves the priority unset and the
+ * sheet shows each type's default as the priority placeholder; a malformed change type is rejected. Core applies
+ * the per-type default priority only on builds whose `ActiveEffect#prepareBaseData` reads `.defaultPriority`
+ * (14.368); the 14.364 build the e2e server runs prepares 0, so the applied order is not asserted.
  *
  * The documents come from flows: one player actor and one effect made through the Effects tab.
  */
@@ -30,6 +32,9 @@ test.beforeAll(async ({ browser }) => {
       name: 'E2E Changes Actor',
       type: 'player',
    });
+});
+
+test.beforeEach(async () => {
    effectId = await addEffect(page, actorId, 'E2E Changes Effect');
 });
 
@@ -78,7 +83,7 @@ async function openConfig() {
    return config;
 }
 
-test.describe.serial('core changes on a TITAN effect', () => {
+test.describe('core changes on a TITAN effect', () => {
    test('the Add change button stores core\'s initial change and the config sheet renders it', async () => {
       /** @type {import('@playwright/test').Locator} The config sheet. */
       const config = await openConfig();
@@ -103,6 +108,9 @@ test.describe.serial('core changes on a TITAN effect', () => {
    test('saving leaves the priority unset and the sheet shows each type\'s default priority', async () => {
       /** @type {import('@playwright/test').Locator} The config sheet. */
       const config = await openConfig();
+      await config.locator('[data-action="addChange"]').click();
+      await expect(config.locator('ol[data-changes] li')).toHaveCount(1);
+      await config.locator('[data-action="addChange"]').click();
       await expect(config.locator('ol[data-changes] li')).toHaveCount(2);
       await config.locator('[name="system.changes.0.key"]').fill('system.rating.awareness.mod.static');
       await config.locator('[name="system.changes.0.value"]').fill('3');
@@ -115,7 +123,8 @@ test.describe.serial('core changes on a TITAN effect', () => {
          'multiply',
       ]);
 
-      // A priority the user did not type stays unset, so core's per-type default applies at preparation.
+      // A priority the user did not type stays unset (null); core's per-type default fills it at preparation on
+      // builds that read `.defaultPriority` (14.368), and the running 14.364 prepares 0.
       const changes = await storedChanges();
       expect(changes.map((change) => change.priority ?? null)).toEqual([
          null,
@@ -131,6 +140,14 @@ test.describe.serial('core changes on a TITAN effect', () => {
    });
 
    test('a malformed change type is rejected and a well-formed one is stored', async () => {
+      // A change from core's Add change button gives the rejection a stored value to leave in place.
+      /** @type {import('@playwright/test').Locator} The config sheet. */
+      const config = await openConfig();
+      await config.locator('[data-action="addChange"]').click();
+      await expect(config.locator('ol[data-changes] li')).toHaveCount(1);
+      expect((await storedChanges()).map((change) => change.type)).toEqual(['add']);
+      await closeAllApps(page);
+
       // The update path is the only way to submit a malformed type: core's sheet offers a fixed list of types.
       const typesAfterBadUpdate = await page.evaluate(async ({ actorId, effectId }) => {
          const effect = game.actors.get(actorId).effects.get(effectId);
@@ -151,10 +168,7 @@ test.describe.serial('core changes on a TITAN effect', () => {
          actorId,
          effectId,
       });
-      expect(typesAfterBadUpdate).toEqual([
-         'add',
-         'multiply',
-      ]);
+      expect(typesAfterBadUpdate).toEqual(['add']);
 
       // Presence: a well-formed replacement is stored, so the rejection above was the type check and not a dead path.
       await page.evaluate(async ({ actorId, effectId }) => {

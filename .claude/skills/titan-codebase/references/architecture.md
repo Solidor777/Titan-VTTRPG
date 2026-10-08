@@ -164,8 +164,8 @@ self-contained Svelte UIs that live beside their check type.
 
 **`src/document/` depends on:** `src/helpers/` for utilities and shared Svelte components;
 `src/system/` for constants and enumerations; `src/check/` to launch checks from actor/item methods.
-Base classes (`TitanDataModel.js`, `TitanDocumentSheet.js`) in `document/data-model/` and `document/sheet/` are
-extended by every concrete type under `document/types/`.
+Base classes (`TitanDataModel.js`, `TitanDataModelMixin.js`, `TitanDocumentSheet.js`) in `document/data-model/` and
+`document/sheet/` are extended by every concrete type under `document/types/`.
 
 ## Test layout
 

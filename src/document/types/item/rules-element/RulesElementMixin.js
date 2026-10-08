@@ -6,7 +6,7 @@ import moveArrayEntry from '~/helpers/utility-functions/MoveArrayEntry.js';
 import cloneElementWithNewUuid from '~/helpers/utility-functions/CloneElementWithNewUuid.js';
 
 /**
- * Mixin that adds a Rules Elements array and its mutators to any TitanDataModel subclass.
+ * Mixin that adds a Rules Elements array and its mutators to any class built with TitanDataModelMixin.
  * @param {typeof foundry.abstract.TypeDataModel} BaseClass - The data model class to extend.
  * @returns {typeof foundry.abstract.TypeDataModel} The extended class with rules-element support.
  */

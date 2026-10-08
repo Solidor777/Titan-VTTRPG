@@ -1,14 +1,34 @@
 import createNumberField from '~/helpers/utility-functions/CreateNumberField.js';
 
 /**
+ * Instance members the mixin adds.
+ * @typedef {object} TitanDataModelMembers
+ * @property {object} components - The frozen map of the data model's components.
+ * @property {(data: object) => void} onPreCreate - Applies the initial document data before creation.
+ * @property {() => void} prepareDerivedData - Prepares component derived data, then the base class's.
+ * @property {() => object} getRollData - The base roll data (id, name, img, type).
+ */
+
+/**
+ * Static members the mixin adds.
+ * @typedef {object} TitanDataModelStatics
+ * @property {number} latestVersion - The data model's latest version number.
+ * @property {() => object} _defineDocumentSchema - The document schema, excluding component schemas.
+ * @property {(source: object) => object} _migrateComponentData - Migrates each component's data.
+ */
+
+/**
  * Mixin that adds the TITAN data model behaviour (frozen component map, documentVersion field, version-aware
  * migrateData, onPreCreate initial data, roll data base) to a Foundry data model class. Applying it to
  * foundry.abstract.TypeDataModel yields TitanDataModel; applying it to a specialized core model, such as
  * foundry.data.ActiveEffectTypeDataModel, keeps that model's schema and behaviour.
- * INVARIANT: a class that defines its own schema fields overrides `_defineDocumentSchema` and spreads
- * `super._defineDocumentSchema()` so the inherited core fields and documentVersion are kept.
- * @param {typeof foundry.abstract.TypeDataModel} BaseClass - The data model class to extend.
- * @returns {typeof foundry.abstract.TypeDataModel} The extended class with TITAN data model behaviour.
+ * Fields the base class defines in its own `defineSchema` are merged by the mixin's `defineSchema`. INVARIANT: a
+ * class that overrides `_defineDocumentSchema` spreads `super._defineDocumentSchema()` so `documentVersion` (and the
+ * fields of an inner mixin such as RulesElementMixin) are kept.
+ * @template {typeof foundry.abstract.TypeDataModel} T
+ * @param {T} BaseClass - The data model class to extend.
+ * @returns {T & TitanDataModelStatics & (new (...args: ConstructorParameters<T>) =>
+ * InstanceType<T> & TitanDataModelMembers)} The extended class with TITAN data model behaviour.
  */
 export default function TitanDataModelMixin(BaseClass) {
    return class TitanDataModelBase extends BaseClass {

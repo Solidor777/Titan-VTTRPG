@@ -141,8 +141,10 @@ management). Data model classes hold the schema, field validation, and derived-d
 - `TitanActiveEffectDataModel` (`src/document/types/active-effect/TitanActiveEffectDataModel.js`)
   extends `RulesElementMixin(TitanDataModelMixin(foundry.data.ActiveEffectTypeDataModel))`, so it inherits
   core's Active Effect model and its `changes` ArrayField unchanged (core's change element: `key`, `type`,
-  `value`, `phase`, `priority`; type validator, non-blank type/phase, nullable priority so core's per-type
-  default priority applies). TITAN never reads or writes `changes` (mechanics run through rules elements);
+  `value`, `phase`, `priority`; type validator, non-blank type/phase, nullable priority). A stored priority stays
+  unset unless the user types one; core fills in its per-type default (multiply 10, add 20) only on builds whose
+  `ActiveEffect#prepareBaseData` reads `.defaultPriority` (14.368); the 14.364 build the e2e server runs reads
+  `.priority` and prepares 0. TITAN never reads or writes `changes` (mechanics run through rules elements);
   core's `ActiveEffectConfig` can edit them. Registered as `CONFIG.ActiveEffect.dataModels.effect`.
   Beyond the mixin's `rulesElement` array, its schema adds a custom `duration` ({ type, remaining,
   initiative, custom }), a `check` array, and a `customTrait` array — all generated via
@@ -780,7 +782,7 @@ domain:
   (`buildSchemaFromShape(shape)`) recursively converts a plain-object shape template into a schema
   field map by value type — `string`/`boolean` → the matching `create*Field` seeded with the
   representative value; `number` → `createIntegerField` (the helper ASSUMES integer — the system has no
-  non-integer schema fields except the base `documentVersion`, defined directly in `TitanDataModel`, not
+  non-integer schema fields except the base `documentVersion`, defined directly in `TitanDataModelMixin`, not
   template-generated; float support is deliberately YAGNI); array → `createArrayField`
   whose element schema is derived from the first
   element (empty array → object element field), plain object → a `SchemaField` (recursing), and

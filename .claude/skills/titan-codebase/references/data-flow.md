@@ -561,7 +561,7 @@ count; the console lists each failure) instead of announcing `migrationComplete`
 
 **Version comparison — `documentNeedsMigration`**
 Each document stores its current schema version in `system.documentVersion` (a numeric field defined in
-`TitanDataModel._defineDocumentSchema` using `createNumberField(this.latestVersion)`). The migration check
+`TitanDataModelMixin._defineDocumentSchema` using `createNumberField(this.latestVersion)`). The migration check
 compares `document.system.documentVersion` against the highest `version` number found across all levels of
 that document type's migration chain. If any document in `game.actors` or `game.items` (including embedded
 items on actors) is behind the chain's latest version, `worldNeedsMigration()` resolves `true`.

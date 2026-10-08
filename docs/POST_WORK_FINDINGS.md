@@ -289,10 +289,10 @@ record finds none. A world that is not the server's active world has no LevelDB 
 server runs; the active world's and every loaded package's pack databases hold `LOCK` (a `cp` of their directories fails
 only on that file, and the copy opens).
 
-### The e2e server runs a different Foundry build than `C:\FoundryVTT\V14oundry` (2026-10-08)
+### The e2e server runs a different Foundry build than `C:\FoundryVTT\V14\foundry` (2026-10-08)
 
-Measured: `scripts/e2e-foundry-server.mjs` launches `appDir = <dataPath>/../foundry`, i.e. `C:\FoundryVTT\V14\devoundry`
-(`package.json` build 364; `/api/status` reports 14.364), while `C:\FoundryVTT\V14oundry` is build 368. The two differ in
+Measured: `scripts/e2e-foundry-server.mjs` launches `appDir = <dataPath>/../foundry`, i.e. `C:\FoundryVTT\V14\dev\foundry`
+(`package.json` build 364; `/api/status` reports 14.364), while `C:\FoundryVTT\V14\foundry` is build 368. The two differ in
 `ActiveEffect#prepareBaseData`: 364 reads `CHANGE_TYPES[type]?.priority` (`dev/foundry/public/scripts/foundry.mjs:49749`),
 which is never defined, so a change with an unset priority is prepared at priority 0; 368 reads `.defaultPriority`
 (`foundry/public/scripts/foundry.mjs:50013`), so multiply (10) runs before add (20). Measured on 364 with the model

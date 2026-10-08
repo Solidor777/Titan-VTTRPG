@@ -30,10 +30,18 @@ Deferred/known bugs. Todos (planned work) live in `docs/TODO.md`; this file is b
 - **Effect of the core-model inheritance, 2026-10-08 (`.superpowers/sdd/2026-10-01-test-suite-real-data/ae-mixin/`):**
   `TitanActiveEffectDataModel` and `ConditionDataModel` now extend core's `ActiveEffectTypeDataModel` (through
   `TitanDataModelMixin`) instead of redefining `changes`. `CONFIG.ActiveEffect.dataModels` still holds only `effect` and
-  `condition`, so a `base`-typed effect is still unconstructable and everything above is unchanged. What changed: a
-  foreign effect whose `changes` are core-valid now stores its changes on an `effect`/`condition` model without loss,
-  and registering core's model for `base` (`dataModels.base = foundry.data.ActiveEffectTypeDataModel`) needs no schema
-  work. Not done: that registration is a separate decision.
+  `condition`, so a `base`-typed effect is still unconstructable and everything above is unchanged. What changed: an
+  `effect`/`condition` effect now stores core-valid `changes` as core defines them. Not lossless for legacy data: a
+  `mode`-only change put into `system.changes` is stored as core's initial `type: add` and its `mode` is dropped,
+  because core's mode-to-type migration runs only on top-level `changes` (measured, `ae-mixin/after.json`, step
+  `api.legacyModeOnly`; top-level `changes` with `mode: 5` on construction gives `type: override`,
+  `legacyTopLevelOnConstruct`).
+- **Registering core's model for `base`, measured 2026-10-08 (`ae-mixin/base-probe.mjs`, `base-probe.json`; page-only
+  runtime assignment `dataModels.base = foundry.data.ActiveEffectTypeDataModel`, one throwaway actor, deleted):** a base
+  effect with a core-valid change constructs with `ActiveEffectTypeDataModel` as its `system`, and
+  `createEmbeddedDocuments` stores it (type `base`) with no notification, no page error and empty `invalidDocumentIds`.
+  Not measured: reloading the world with one stored, TITAN's UI on a base effect, and the permanent `OnceInit`
+  registration. That registration is a separate decision and was not made.
 - **Status:** Open. Not handled in code by user decision 2026-09-30; the existing local worlds hold none (inventory
   above). Fix options and the schema-compatibility analysis:
   `.superpowers/sdd/2026-10-01-test-suite-real-data/non-titan-effects-report.md`.

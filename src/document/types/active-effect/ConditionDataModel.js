@@ -1,8 +1,5 @@
-import TitanDataModelMixin from '~/document/data-model/TitanDataModelMixin.js';
+import TitanActiveEffectBase from '~/document/types/active-effect/TitanActiveEffectBase.js';
 import RulesElementMixin from '~/document/types/item/rules-element/RulesElementMixin.js';
-
-/** @type {typeof foundry.data.ActiveEffectTypeDataModel} - Core's Active Effect model plus TITAN behaviour. */
-const TitanEffectBase = TitanDataModelMixin(foundry.data.ActiveEffectTypeDataModel);
 
 /**
  * The typed system data model for Titan condition Active Effects (subtype 'condition').
@@ -12,5 +9,5 @@ const TitanEffectBase = TitanDataModelMixin(foundry.data.ActiveEffectTypeDataMod
  * @property {TitanActiveEffect} parent - The Active Effect that owns this data model.
  * @extends {foundry.data.ActiveEffectTypeDataModel}
  */
-export default class ConditionDataModel extends RulesElementMixin(TitanEffectBase) {
+export default class ConditionDataModel extends RulesElementMixin(TitanActiveEffectBase) {
 }

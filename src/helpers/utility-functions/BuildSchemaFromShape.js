@@ -19,7 +19,7 @@ import createStringField from '~/helpers/utility-functions/CreateStringField.js'
  * - `number` -> `createIntegerField(value)`. ALL numeric template values produce an integer-enforced
  *   field (matching the hand-written item schemas, which use `createIntegerField` for every numeric
  *   field). The float case is omitted by design: the system has no non-integer schema fields except the
- *   base `documentVersion`, which is defined directly in `TitanDataModel` (not via this helper), so this
+ *   base `documentVersion`, defined directly in `TitanDataModelMixin` (not via this helper), so this
  *   helper assumes integer for all numbers. If a genuine float field is ever templated, revisit this.
  * - `boolean` -> `createBooleanField(value)`.
  * - `Array` -> `createArrayField(<element field>, structuredClone(value))`. The TEMPLATE ARRAY IS THE
@@ -83,7 +83,7 @@ function buildFieldFromValue(value) {
       case 'number': {
          // All numeric template values map to an integer-enforced field (mirroring the hand-written item
          // schemas). The system has no non-integer schema fields except the base `documentVersion`, which
-         // is defined directly in `TitanDataModel` (not via this helper), so the float case is omitted by
+         // is defined directly in `TitanDataModelMixin` (not via this helper), so the float case is omitted by
          // design; if a genuine float field is ever templated, this assumption must be revisited.
          return createIntegerField(value);
       }
@@ -111,7 +111,7 @@ function buildFieldFromValue(value) {
  * `null`). Otherwise, `string`/`number`/`boolean` become the matching typed field (seeded with the
  * representative value),
  * where a `number` always becomes an integer-enforced field (the system has no non-integer schema
- * fields except the base `documentVersion`, defined directly in `TitanDataModel` rather than via this
+ * fields except the base `documentVersion`, defined directly in `TitanDataModelMixin` rather than via this
  * helper, so integer is assumed for all numbers). An ARRAY becomes an `ArrayField` whose `initial` is a
  * clone of the template array — the array literal IS the field's default contents (e.g. `attack:
  * [oneAttack]` defaults to one attack, `check: []` defaults to empty). Its element field is an UNTYPED

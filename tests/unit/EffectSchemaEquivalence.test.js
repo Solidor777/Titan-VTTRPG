@@ -10,19 +10,16 @@ import {
    stringField,
 } from './helpers/schemaFingerprint.js';
 
-// Golden-master gate for the effect schemas. Phase 4 refactors TitanActiveEffectDataModel to build
-// its duration/check/customTrait fields from the new createEffectSystemTemplate() shape (via
-// buildSchemaFromShape) and adds EffectChatMessageDataModel, whose snapshot schema builds from the
-// same template. This suite freezes a byte-exact fingerprint of the LIVE Active Effect schema
-// (DATA-INTEGRITY SENSITIVE: effects persist in worlds) authored from the CURRENT hand-built code,
-// so the refactor can be proven to leave the persisted data shape unchanged, and pins the chat
-// snapshot schema the same way. The fingerprint omits array-element initials by design: an array
-// element's initial is inert (Foundry populates the array from the array's own initial, never the
-// element's), so the hand-built element factories (e.g. createObjectField(() =>
-// createItemCheckTemplate())) and the shape-built bare createObjectField() elements compare equal.
-// The core `changes` field is inherited from foundry.data.ActiveEffectTypeDataModel and is not part of
-// _defineDocumentSchema(). The harness mirrors ItemDataModelSchemaEquivalence.test.js. Dynamic import is
-// permitted in tests (the no-dynamic-import rule governs the shipping bundle only).
+// Golden-master gate for the effect schemas. It freezes a byte-exact fingerprint of the LIVE Active Effect
+// schema (DATA-INTEGRITY SENSITIVE: effects persist in worlds), whose duration/check/customTrait fields are built
+// from createEffectSystemTemplate() via buildSchemaFromShape, and pins the effect chat-message snapshot schema
+// built from the same template. The fingerprint omits array-element initials by design: an array element's
+// initial is inert (Foundry populates the array from the array's own initial, never the element's), so
+// hand-built element factories and the shape-built bare createObjectField() elements compare equal. The core
+// `changes` field is inherited from foundry.data.ActiveEffectTypeDataModel through TitanDataModelMixin and is not
+// part of _defineDocumentSchema(); tests/unit/TitanDataModelMixin.test.js covers the merge. The harness mirrors
+// ItemDataModelSchemaEquivalence.test.js. Dynamic import is permitted in tests (the no-dynamic-import rule
+// governs the shipping bundle only).
 
 /** @type {object} Holds the dynamically imported effect DataModel classes keyed by a stable name. */
 const models = {};

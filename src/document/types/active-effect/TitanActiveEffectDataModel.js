@@ -1,10 +1,7 @@
-import TitanDataModelMixin from '~/document/data-model/TitanDataModelMixin.js';
+import TitanActiveEffectBase from '~/document/types/active-effect/TitanActiveEffectBase.js';
 import RulesElementMixin from '~/document/types/item/rules-element/RulesElementMixin.js';
 import buildSchemaFromShape from '~/helpers/utility-functions/BuildSchemaFromShape.js';
 import createEffectSystemTemplate from '~/document/types/active-effect/EffectSystemTemplate.js';
-
-/** @type {typeof foundry.data.ActiveEffectTypeDataModel} - Core's Active Effect model plus TITAN behaviour. */
-const TitanEffectBase = TitanDataModelMixin(foundry.data.ActiveEffectTypeDataModel);
 
 /**
  * The typed system data model for Titan Active Effects (subtype 'effect').
@@ -15,7 +12,7 @@ const TitanEffectBase = TitanDataModelMixin(foundry.data.ActiveEffectTypeDataMod
  * @property {TitanActiveEffect} parent - The Active Effect that owns this data model.
  * @extends {foundry.data.ActiveEffectTypeDataModel}
  */
-export default class TitanActiveEffectDataModel extends RulesElementMixin(TitanEffectBase) {
+export default class TitanActiveEffectDataModel extends RulesElementMixin(TitanActiveEffectBase) {
    /**
     * Defines the data schema for Titan Active Effect documents. The duration, check, and customTrait
     * fields are generated from the canonical effect shape template (the single source shared with the

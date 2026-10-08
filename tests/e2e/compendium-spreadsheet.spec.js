@@ -846,3 +846,99 @@ test.describe('importing the pack of an actor with an item and effects', () => {
       expect(actor.effects.map((effect) => effect.name)).toEqual(['E2E Actor Effect Renamed']);
    });
 });
+
+test('an effect with a change added in core\'s Active Effect Config survives export and re-import', async () => {
+   /** @type {string} The empty pack's collection id. */
+   const packId = await emptyActorPack('Change Round Trip');
+   /** @type {string} The actor that owns the effect. */
+   const actorId = await createActor(page, {
+      name: 'E2E Change NPC',
+      type: 'npc',
+   });
+   /** @type {string} The effect that receives the change. */
+   const effectId = await addEffect(page, actorId, 'E2E Change Effect');
+   await closeAllApps(page);
+
+   // The change comes from core's Add change button and form: TITAN has no changes editor of its own.
+   await page.evaluate(async ({ actorId, effectId }) => {
+      const sheet = new foundry.applications.sheets.ActiveEffectConfig({
+         document: game.actors.get(actorId).effects.get(effectId),
+      });
+      await sheet.render({ force: true });
+      await sheet.changeTab('changes', 'sheet');
+   }, {
+      actorId,
+      effectId,
+   });
+
+   /** @type {import('@playwright/test').Locator} Core's Active Effect Config sheet. */
+   const config = page.locator('.application.active-effect-config');
+   await config.locator('[data-action="addChange"]').click();
+   await expect(config.locator('ol[data-changes] li')).toHaveCount(1);
+   await config.locator('[name="system.changes.0.key"]').fill('name');
+   await config.locator('[name="system.changes.0.value"]').fill('E2E Changed Name');
+   await config.locator('[name="system.changes.0.type"]').selectOption('override');
+   await config.locator('button[type="submit"]').click();
+
+   /**
+    * Reads the effect's stored changes from the world actor.
+    * @returns {Promise<object[]>} The stored `system.changes`.
+    */
+   const storedChanges = () => page.evaluate(
+      ({ actorId, effectId }) => game.actors.get(actorId).effects.get(effectId).toObject().system.changes,
+      {
+         actorId,
+         effectId,
+      },
+   );
+   await expect.poll(storedChanges).toHaveLength(1);
+   await closeAllApps(page);
+   await putInPack(page, page.locator(`#actors .directory-item.entry[data-entry-id="${actorId}"]`), packId);
+
+   /** @type {import('~/spreadsheet/codec/Workbook.js').Workbook} The pack's export. */
+   const workbook = decodeExport(await exportPack(packId, 'csv'));
+   /** @type {{[column: string]: string}} The effect's row. */
+   const row = rowNamed(workbook, 'effect', 'E2E Change Effect');
+   expect(row['system.changes.0.type']).toBe('override');
+   expect(row['system.changes.0.value']).toBe('E2E Changed Name');
+   expect(row['system.changes.0.priority'], 'an unset priority exports as an empty cell').toBe('');
+
+   /**
+    * Reads the effect's changes from the pack copy of the actor.
+    * @returns {Promise<object[]>} The pack effect's stored `system.changes`.
+    */
+   const packChanges = () => page.evaluate(async ({ packId, actorId, effectId }) => {
+      /** @type {object} The pack's actor. */
+      const actor = await game.packs.get(packId).getDocument(actorId);
+      return actor.effects.get(effectId).toObject().system.changes;
+   }, {
+      packId,
+      actorId,
+      effectId,
+   });
+   expect(await packChanges()).toEqual(await storedChanges());
+
+   // The file unchanged: the empty priority cell stays unset instead of becoming 0.
+   await importInto(packId, zipOf(workbook), {
+      created: 0,
+      updated: 2,
+      deleted: 0,
+   });
+   expect((await packChanges())[0].priority ?? null).toBeNull();
+
+   // Edited cells: a new value and a typed priority.
+   row['system.changes.0.value'] = 'E2E Imported Name';
+   row['system.changes.0.priority'] = '5';
+   await importInto(packId, zipOf(workbook), {
+      created: 0,
+      updated: 2,
+      deleted: 0,
+   });
+   expect(await packChanges()).toEqual([{
+      key: 'name',
+      type: 'override',
+      phase: 'initial',
+      priority: 5,
+      value: 'E2E Imported Name',
+   }]);
+});

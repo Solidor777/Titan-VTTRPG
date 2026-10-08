@@ -55,8 +55,9 @@ codebase — that stack was removed in the v14 migration.
 
 Every document in TITAN — actor, item, chat message, combat — is a pair: a Foundry document class
 (`TitanActor`, `TitanItem`, `TitanChatMessage`, `TitanCombat`) and a `TitanDataModel` subclass that owns the
-schema, field validation, and derived-data logic. `TitanDataModel` introduces a frozen `#components` map for
-composable derived-data, a `documentVersion` field, and version-aware `migrateData`. Actor data models form a
+schema, field validation, and derived-data logic. `TitanDataModel` (`TitanDataModelMixin` applied to
+`TypeDataModel`) introduces a frozen `#components` map for composable derived-data, a `documentVersion` field,
+and version-aware `migrateData`. Actor data models form a
 hierarchy (`TitanActorDataModel` → `CharacterDataModel` → `PlayerDataModel` / `NPCDataModel`); item data models
 branch at `RulesElementItemDataModel` for the five item types that carry rules elements (Ability, Armor,
 Equipment, Shield, Weapon). Effects are native Active Effects, not items: `TitanActiveEffectDataModel` carries
