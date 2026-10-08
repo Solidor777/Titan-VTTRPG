@@ -471,11 +471,12 @@ function createAdventureContent(adventure, field) {
  * its parent collection holds (Foundry v14 `dist/database/backend/server-backend.mjs` `_createDocuments`). A deletion
  * removes the entry the data holds and, when the token's base actor holds the id, leaves a tombstone (deleteFromData):
  * what core stores for a world token's deletion, read back after a reload (a tombstone over a valid base Item, none for
- * an Item the base actor lacks; live with a raw-data token, pending real-path re-run). A legacy effect Item of the base
- * actor takes no tombstone: its subtype is unregistered, so it is an invalid document, which core never holds in a base
- * collection (`common/abstract/embedded-collection.mjs` `_initializeDocument`), and core's client deletion tombstones
- * only an id its base collection holds (`common/abstract/embedded-collection-delta.mjs` `_delete`). That case follows
- * core's client deletion; its stored outcome is not measured, because the server refuses a legacy Item, so none can be
+ * an Item the base actor lacks; live with a raw-data token, not re-run; no migration tests while no migration is
+ * active (project rule)). A legacy effect Item of the base actor takes no tombstone: its subtype is unregistered, so it
+ * is an invalid document, which core never holds in a base collection
+ * (`common/abstract/embedded-collection.mjs` `_initializeDocument`), and core's client deletion tombstones only an id
+ * its base collection holds (`common/abstract/embedded-collection-delta.mjs` `_delete`). That case follows core's
+ * client deletion; its stored outcome is not measured, because the server refuses a legacy Item, so none can be
  * seeded. A base entry invalid for any other reason is not detected, and its id still takes a tombstone.
  * @param {object} holder - The working copy's data holding `items` and `effects`.
  * @param {AdventureContent} content - The Adventure field the working copy belongs to.
@@ -709,14 +710,15 @@ function createOrphanSource(location, name, delta, orphan) {
  * sync's removal of a key inside an entry through a parent update has not been measured;
  * - the scan runs on every load, so a token left unwritten keeps being reported.
  *
- * The core evidence. Measured live with raw-data tokens, pending real-path re-run, on a world-scene and a Scene-pack
- * token, with a second GM connected and a reload read-back: a Token or Scene update that adds an entry to the delta
- * fails the client's dry run in `EmbeddedCollectionDelta#_prepareDeltaUpdate`
- * (`common/abstract/embedded-collection-delta.mjs:201`: no base collection) and stores nothing; one that drops an
- * entry from the array, or deletes it with an update operator, stores nothing; and one that updates an entry the delta
- * already holds is stored, its tombstones kept. Measured live with a raw-data token, pending real-path re-run, on the
- * Scene-pack token only: an embedded create on the delta (`token.delta.createEmbeddedDocuments`) throws on the
- * client. Read in core, not run: the throw site, `TokenDocument#_onRelatedUpdate` (`client/documents/token.mjs:3809`),
+ * The core evidence. Measured live with raw-data tokens, not re-run; no migration tests while no migration is active
+ * (project rule), on a world-scene and a Scene-pack token, with a second GM connected and a reload read-back: a Token
+ * or Scene update that adds an entry to the delta fails the client's dry run in
+ * `EmbeddedCollectionDelta#_prepareDeltaUpdate` (`common/abstract/embedded-collection-delta.mjs:201`: no base
+ * collection) and stores nothing; one that drops an entry from the array, or deletes it with an update operator, stores
+ * nothing; and one that updates an entry the delta already holds is stored, its tombstones kept. Measured live with a
+ * raw-data token, not re-run; no migration tests while no migration is active (project rule), on the Scene-pack token
+ * only: an embedded create on the delta (`token.delta.createEmbeddedDocuments`) throws on the client. Read in core, not
+ * run: the throw site, `TokenDocument#_onRelatedUpdate` (`client/documents/token.mjs:3809`),
  * which reads `this.actor.tokenActiveEffectChanges` while the token's actor is null, and which the world-scene token's
  * embedded create and every embedded update and delete reach too. Inferred, not read back: the throw comes after the
  * server write.
@@ -876,9 +878,9 @@ async function* walkAdventureActorRecord(pack, record, access) {
  * actors' conversions of this walk. A token whose actor id names no actor is walked like any other, inheriting
  * nothing: an Adventure's scene tokens are inline data written with the whole `scenes` field (createSourceTarget),
  * never as token documents, so the core limitation that keeps the migration from writing an orphaned token on a world
- * scene or in a Scene pack (walkSceneTokens) does not apply (live with a raw-data token, pending real-path re-run: one
- * `adventure.update({ scenes })` that removed an Item from such a token's delta, updated one effect, and added another
- * was stored, with no client error).
+ * scene or in a Scene pack (walkSceneTokens) does not apply (live with a raw-data token, not re-run; no migration
+ * tests while no migration is active (project rule): one `adventure.update({ scenes })` that removed an Item from such
+ * a token's delta, updated one effect, and added another was stored, with no client error).
  * @param {CompendiumCollection} pack - The world pack the record was projected from.
  * @param {object} record - The projected Adventure.
  * @param {PackWriteAccess} access - The pack's write access.
