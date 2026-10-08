@@ -425,6 +425,12 @@ functions in `src/document/types/item/rules-element/` create default instances:
 | `createRollMessageElement`       | `rollMessage`                | Display a message when a matching check is rolled. |
 | `createTurnMessageElement`       | `turnMessage`                | Display a message at the character's turn start/end|
 
+`RULES_ELEMENT_FACTORIES` (`src/document/types/item/rules-element/RulesElementFactories.js`) is the single
+operation-to-factory registry in editor display order. `RULES_ELEMENT_OPERATIONS` (`src/system/RulesElementOperations.js`)
+is its key list and `ItemSheetRulesElementOperationSelect` rebuilds a retyped element through it. Two switches stay
+switches and must name every key (`RulesElementOperationRegistry.test.js` pins both):
+`ItemSheetRulesElementSettings`' editor dispatch and `CharacterDataModel._applyRulesElements`' bucket switch.
+
 The shared `rulesElement` array plus its `addRulesElement` / `deleteRulesElement` mutators come from
 `RulesElementMixin` (`src/document/types/item/rules-element/RulesElementMixin.js`), used by both
 `RulesElementItemDataModel` and `TitanActiveEffectDataModel`. Items that carry rules elements: Ability,

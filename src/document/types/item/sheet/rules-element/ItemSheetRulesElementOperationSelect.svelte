@@ -2,17 +2,7 @@
    import { getContext } from 'svelte';
    import RulesElementOperationSelect
    from '~/helpers/svelte-components/input/select/RulesElementOperationSelect.svelte';
-   import createFlatModifierElement from '~/document/types/item/rules-element/FlatModifier.js';
-   import createMulBaseElement from '~/document/types/item/rules-element/MulBase.js';
-   import createMulSumElement from '~/document/types/item/rules-element/MulSum.js';
-   import createSetSumElement from '~/document/types/item/rules-element/SetSum.js';
-   import createFastHealingElement from '~/document/types/item/rules-element/FastHealing.js';
-   import createPersistentDamageElement from '~/document/types/item/rules-element/PersistentDamage.js';
-   import createTurnMessageElement from '~/document/types/item/rules-element/TurnMessage.js';
-   import createRollMessageElement from '~/document/types/item/rules-element/RollMessage.js';
-   import createConditionalRatingModifierElement
-   from '~/document/types/item/rules-element/ConditionalRatingModifier.js';
-   import createConditionalCheckModifierElement from '~/document/types/item/rules-element/ConditionalCheckModifier.js';
+   import { RULES_ELEMENT_FACTORIES } from '~/document/types/item/rules-element/RulesElementFactories.js';
    import error from '~/helpers/utility-functions/Error.js';
 
    /**
@@ -29,90 +19,21 @@
    const document = getContext('document');
 
    /**
-    * Updates a Rules Element when its Operation type changes.
+    * Rebuilds a Rules Element as its new operation's default element (keeping its uuid) when its Operation changes.
     * @returns {Promise<void>} Returns after the item owning the Rules Element has been updated.
     */
    async function onRulesElementOperationChanged() {
       if (document.data && idx < document.data?.system.rulesElement.length) {
-         switch (document.data.system.rulesElement[idx].operation) {
-            case 'flatModifier': {
-               document.data.system.rulesElement[idx] =
-                  createFlatModifierElement(
-                     document.data.system.rulesElement[idx],
-                  );
-               break;
-            }
-            case 'mulBase': {
-               document.data.system.rulesElement[idx] =
-                  createMulBaseElement(
-                     document.data.system.rulesElement[idx],
-                  );
-               break;
-            }
-            case 'mulSum': {
-               document.data.system.rulesElement[idx] =
-                  createMulSumElement(
-                     document.data.system.rulesElement[idx],
-                  );
-               break;
-            }
-            case 'setSum': {
-               document.data.system.rulesElement[idx] =
-                  createSetSumElement(
-                     document.data.system.rulesElement[idx],
-                  );
-               break;
-            }
-            case 'fastHealing': {
-               document.data.system.rulesElement[idx] =
-                  createFastHealingElement(
-                     document.data.system.rulesElement[idx],
-                  );
-               break;
-            }
-            case 'persistentDamage': {
-               document.data.system.rulesElement[idx] =
-                  createPersistentDamageElement(
-                     document.data.system.rulesElement[idx],
-                  );
-               break;
-            }
-            case 'turnMessage': {
-               document.data.system.rulesElement[idx] =
-                  createTurnMessageElement(
-                     document.data.system.rulesElement[idx],
-                  );
-               break;
-            }
-            case 'rollMessage': {
-               document.data.system.rulesElement[idx] =
-                  createRollMessageElement(
-                     document.data.system.rulesElement[idx],
-                  );
-               break;
-            }
-            case 'conditionalRatingModifier': {
-               document.data.system.rulesElement[idx] =
-                  createConditionalRatingModifierElement(
-                     document.data.system.rulesElement[idx],
-                  );
-               break;
-            }
-            case 'conditionalCheckModifier': {
-               document.data.system.rulesElement[idx] =
-                  createConditionalCheckModifierElement(
-                     document.data.system.rulesElement[idx],
-                  );
-               break;
-            }
-            default: {
-               const op =
-                  document.data.system.rulesElement[idx].operation;
-               error(`Invalid Rules Element operation ${op}`);
-               return;
-            }
+         /** @type {string} The element's new operation. */
+         const operation = document.data.system.rulesElement[idx].operation;
+         if (!Object.hasOwn(RULES_ELEMENT_FACTORIES, operation)) {
+            error(`Invalid Rules Element operation ${operation}`);
+            return;
          }
 
+         document.data.system.rulesElement[idx] = RULES_ELEMENT_FACTORIES[operation](
+            document.data.system.rulesElement[idx],
+         );
          await document.data.update({
             system: {
                rulesElement: structuredClone(document.data.system.rulesElement),
