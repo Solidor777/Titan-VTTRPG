@@ -40,6 +40,15 @@ function buildNotificationPane() {
    return log;
 }
 
+/**
+ * Waits for the pending MutationObserver notifications to be delivered. The DOM queues them as a microtask when a
+ * mutation is recorded, so one awaited microtask turn runs every callback queued before it.
+ * @returns {Promise<void>} Resolves once the queued observer callbacks have run.
+ */
+async function flushObservers() {
+   await Promise.resolve();
+}
+
 beforeEach(async () => {
    vi.resetModules();
    mocks.unmount.mockReset();
@@ -147,9 +156,8 @@ describe('notification observer', () => {
       registry.registerMount(element, 'm1', { id: 'h1' });
 
       element.remove();
-      await vi.waitFor(() => {
-         expect(mocks.unmount).toHaveBeenCalledTimes(1);
-      });
+      await flushObservers();
+      expect(mocks.unmount).toHaveBeenCalledTimes(1);
    });
 
    it('unmounts tracked descendants of a removed wrapper', async () => {
@@ -161,9 +169,8 @@ describe('notification observer', () => {
       registry.registerMount(element, 'm1', { id: 'h1' });
 
       wrapper.remove();
-      await vi.waitFor(() => {
-         expect(mocks.unmount).toHaveBeenCalledTimes(1);
-      });
+      await flushObservers();
+      expect(mocks.unmount).toHaveBeenCalledTimes(1);
    });
 
    it('re-attaches when the notification log element is replaced', async () => {
@@ -180,8 +187,7 @@ describe('notification observer', () => {
       registry.registerMount(freshElement, 'm2', { id: 'h2' });
 
       freshElement.remove();
-      await vi.waitFor(() => {
-         expect(mocks.unmount).toHaveBeenCalledWith({ id: 'h2' }, { outro: false });
-      });
+      await flushObservers();
+      expect(mocks.unmount).toHaveBeenCalledWith({ id: 'h2' }, { outro: false });
    });
 });
