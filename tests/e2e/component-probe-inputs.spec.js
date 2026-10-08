@@ -964,7 +964,11 @@ test.describe('component probe — SelectList', () => {
    test('rows show their icon and label, the value row is selected and the first row is highlighted', async () => {
       await mountProbe(page, 'SelectList', {
          props: LIST_PROPS,
-         events: ['floatingContent'],
+         events: [
+            'floatingContent',
+            'onhover',
+            'onselect',
+         ],
       });
       const list = page.locator('[data-testid="probe-select-list-list"]');
       await expect(list.locator('.option')).toHaveCount(3);
