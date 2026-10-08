@@ -101,6 +101,17 @@ strip, `CharacterSheetItemExpandButton`, and `SidebarCheck`'s toggle — so obse
 that changes no document state goes in such a container; editing controls gate themselves on ownership
 (`DocumentOwner*` components).
 
+**Shared vocabulary constants** — a string vocabulary that code and tests both name is defined once in `src/system/` and
+imported; a component-local or test-local copy is a defect. Effect duration types: `DURATION_TURN_END`,
+`DURATION_TURN_START`, `DURATION_INITIATIVE`, `DURATION_PERMANENT`, `DURATION_CUSTOM`, the list `DURATION_TYPES` (the
+order the effect sheet's select offers), and `TURN_DURATION_TYPES` (the turn pair, which is also the `selector` of the turn
+rules elements: turn message, fast healing, persistent damage) in `DurationTypes.js`. The key addressing every key under
+a rules-element selector: `ALL_KEY` (`AllKey.js`), expanded by `CharacterDataModel._expandAllKeyElements` and offered by
+the stat key selects through `allowAll`. `setSum` modes: `SET_SUM_MODE_SET/MIN/MAX` and `SET_SUM_MODES` in
+`SetSumModes.js`, where the mode table (mode to target total, read by `getSetSumTarget` and `computeSetSumDelta`) is the
+source of the list, so a mode has a rule and an editor entry together. Tests name these constants for inputs; an
+expected stored value (a seeded condition, a factory default, pack JSON) stays a literal so a changed constant fails it.
+
 **Conditional check modifiers** — `CONDITIONAL_CHECK_MODIFIER_TYPES` (`src/system/ConditionalCheckModifierTypes.js`)
 is the single list of `modifierType` values (`damage`, `dice`, `expertise`, `training`, `healing`, `advantage`,
 `automaticFailure`): the rules-element editor's options and the actor cache keys. `CHECK_TYPE_MODIFIER_TYPES` maps each

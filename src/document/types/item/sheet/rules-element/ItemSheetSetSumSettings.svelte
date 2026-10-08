@@ -8,6 +8,7 @@
    import DocumentResistanceSelect from '~/document/svelte-components/select/DocumentResistanceSelect.svelte';
    import DocumentResourceSelect from '~/document/svelte-components/select/DocumentResourceSelect.svelte';
    import DocumentSpeedSelect from '~/document/svelte-components/select/DocumentSpeedSelect.svelte';
+   import { SET_SUM_MODES } from '~/system/SetSumModes.js';
 
    /**
     * @typedef {object} ItemSheetSetSumSettingsProps
@@ -29,13 +30,6 @@
       'resource',
       'speed',
       'training',
-   ];
-
-   /** @type {string[]} Options for the set mode. */
-   const modeOptions = [
-      'set',
-      'min',
-      'max',
    ];
 
    /**
@@ -141,7 +135,7 @@
    <div class="field select">
       <DocumentSelect
          bind:value={document.data.system.rulesElement[idx].mode}
-         options={modeOptions}
+         options={SET_SUM_MODES}
       />
    </div>
 </div>

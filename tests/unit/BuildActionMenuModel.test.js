@@ -1,5 +1,6 @@
 import { describe, it, expect, vi } from 'vitest';
 import buildActionMenuModel from '~/ui/player-hud/elements/action-menu/BuildActionMenuModel.js';
+import { DURATION_TURN_START } from '~/system/DurationTypes.js';
 import { createDefaultHudOptions } from '~/ui/player-hud/PlayerHudDefaults.js';
 import {
    DAMAGE_ICON,
@@ -412,7 +413,7 @@ describe('buildActionMenuModel', () => {
          system: {
             check: [{ label: 'C' }],
             duration: {
-               type: 'turnStart',
+               type: DURATION_TURN_START,
                remaining: 2,
             },
          },

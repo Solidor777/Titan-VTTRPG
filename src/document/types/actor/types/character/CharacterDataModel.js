@@ -1,3 +1,10 @@
+import { ALL_KEY } from '~/system/AllKey.js';
+import {
+   DURATION_CUSTOM,
+   DURATION_INITIATIVE,
+   DURATION_TURN_END,
+   DURATION_TURN_START,
+} from '~/system/DurationTypes.js';
 import { CONDITION_TYPE, EFFECT_TYPE, TITAN_EFFECT_TYPES } from '~/system/EffectTypes.js';
 import ActionQueue from '~/helpers/ActionQueue.js';
 import TitanActorDataModel from '~/document/types/actor/TitanActorDataModel.js';
@@ -644,7 +651,7 @@ export default class CharacterDataModel extends TitanActorDataModel {
          // spell tradition, or situation label, or any other non-stat selector) yields none, and its element passes
          // through with its key as typed.
          /** @type {string[]} */
-         const keys = element.key === 'all' ? this._getSelectorKeys(element.selector) : [];
+         const keys = element.key === ALL_KEY ? this._getSelectorKeys(element.selector) : [];
          if (keys.length === 0) {
             expanded.push(element);
             continue;
@@ -5186,7 +5193,7 @@ export default class CharacterDataModel extends TitanActorDataModel {
          // Decrease the duration of effects with the Initiative duration type.
          if (autoDecreaseEffectDuration()) {
             let initiativeEffects = this.parent.effects.filter((effect) =>
-               effect.type === EFFECT_TYPE && effect.system.duration.type === 'initiative');
+               effect.type === EFFECT_TYPE && effect.system.duration.type === DURATION_INITIATIVE);
             if (initiativeEffects) {
 
                // Calculate which effects to advance.
@@ -5321,7 +5328,7 @@ export default class CharacterDataModel extends TitanActorDataModel {
          let shouldUpdateActor = false;
 
          // Calculate healing or damage.
-         if (await this._calculateTurnHealingAndDamage(reportData, 'turnStart')) {
+         if (await this._calculateTurnHealingAndDamage(reportData, DURATION_TURN_START)) {
             shouldUpdateActor = true;
          }
 
@@ -5346,7 +5353,7 @@ export default class CharacterDataModel extends TitanActorDataModel {
          }
 
          // Update the duration of turn effects.
-         await this._decreaseTurnEffectDuration(reportData, 'turnStart');
+         await this._decreaseTurnEffectDuration(reportData, DURATION_TURN_START);
 
          // Calculate whether to report effects and whether to remove expired.
          // effects.
@@ -5365,16 +5372,16 @@ export default class CharacterDataModel extends TitanActorDataModel {
                // Add effects to the report.
                for (const [key, value] of Object.entries(sortedEffects)) {
                   switch (key) {
-                     case 'turnEnd':
-                     case 'turnStart': {
+                     case DURATION_TURN_END:
+                     case DURATION_TURN_START: {
                         reportData.effects[key] = this._getTurnEffectReportData(value);
                         break;
                      }
-                     case 'initiative': {
+                     case DURATION_INITIATIVE: {
                         reportData.effects[key] = this._getInitiativeEffectReportData(value);
                         break;
                      }
-                     case 'custom': {
+                     case DURATION_CUSTOM: {
                         reportData.effects[key] = this._getCustomEffectReportData(value);
                         break;
                      }
@@ -5436,7 +5443,7 @@ export default class CharacterDataModel extends TitanActorDataModel {
          let shouldUpdateActor = false;
 
          // Calculate healing or damage.
-         if (await this._calculateTurnHealingAndDamage(reportData, 'turnEnd')) {
+         if (await this._calculateTurnHealingAndDamage(reportData, DURATION_TURN_END)) {
             shouldUpdateActor = true;
          }
 
@@ -5456,7 +5463,7 @@ export default class CharacterDataModel extends TitanActorDataModel {
          }
 
          // Update the duration of turn effects.
-         await this._decreaseTurnEffectDuration(reportData, 'turnEnd');
+         await this._decreaseTurnEffectDuration(reportData, DURATION_TURN_END);
 
          // Calculate whether to report effects and whether to remove expired.
          // effects.
@@ -5554,7 +5561,7 @@ export default class CharacterDataModel extends TitanActorDataModel {
       if (isCurrentUserBestOwner(this.parent)) {
          if (autoDecreaseEffectDuration()) {
             const initiativeEffects = this.parent.effects.filter((effect) =>
-               effect.type === EFFECT_TYPE && effect.system.duration.type === 'initiative');
+               effect.type === EFFECT_TYPE && effect.system.duration.type === DURATION_INITIATIVE);
             if (initiativeEffects) {
 
                // Calculate which effects to revert using the same filter as onInitiativeAdvanced.
@@ -5610,7 +5617,7 @@ export default class CharacterDataModel extends TitanActorDataModel {
          let shouldUpdateActor = false;
 
          // Revert healing and damage.
-         if (await this._calculateTurnHealingAndDamageRevert(reportData, 'turnStart')) {
+         if (await this._calculateTurnHealingAndDamageRevert(reportData, DURATION_TURN_START)) {
             shouldUpdateActor = true;
          }
 
@@ -5629,7 +5636,7 @@ export default class CharacterDataModel extends TitanActorDataModel {
          }
 
          // Revert the duration of turn start effects.
-         await this._increaseTurnEffectDuration('turnStart');
+         await this._increaseTurnEffectDuration(DURATION_TURN_START);
 
          // Send a report if appropriate.
          if (Object.keys(reportData).length > 0) {
@@ -5659,7 +5666,7 @@ export default class CharacterDataModel extends TitanActorDataModel {
          let shouldUpdateActor = false;
 
          // Revert healing and damage.
-         if (await this._calculateTurnHealingAndDamageRevert(reportData, 'turnEnd')) {
+         if (await this._calculateTurnHealingAndDamageRevert(reportData, DURATION_TURN_END)) {
             shouldUpdateActor = true;
          }
 
@@ -5673,7 +5680,7 @@ export default class CharacterDataModel extends TitanActorDataModel {
          }
 
          // Revert the duration of turn end effects.
-         await this._increaseTurnEffectDuration('turnEnd');
+         await this._increaseTurnEffectDuration(DURATION_TURN_END);
 
          // Send a report if appropriate.
          if (Object.keys(reportData).length > 0) {

@@ -1,4 +1,5 @@
 import { expect, test } from './harness.js';
+import { DURATION_TURN_START } from '~/system/DurationTypes.js';
 import { commitText } from './actions.js';
 import { login } from './fixtures.js';
 import {
@@ -306,7 +307,7 @@ test.describe('portrait', () => {
    });
 
    test('remove combat effects deletes a turn-start effect', async () => {
-      await addEffect(page, playerId, 'E2E HUD Combat Effect', { duration: 'turnStart' });
+      await addEffect(page, playerId, 'E2E HUD Combat Effect', { duration: DURATION_TURN_START });
       await closeAllApps(page);
       await control();
       expect(await page.evaluate((id) => game.actors.get(id).effects.size, playerId), 'the effect is there').toBe(1);

@@ -1,4 +1,5 @@
 import generateUUID from '~/helpers/utility-functions/GenerateUUID.js';
+import { DURATION_TURN_START } from '~/system/DurationTypes.js';
 
 /**
  * A Rules Element for displaying a message on a Character's turn.
@@ -17,7 +18,7 @@ import generateUUID from '~/helpers/utility-functions/GenerateUUID.js';
 export default function createTurnMessageElement(options) {
    return {
       operation: 'turnMessage',
-      selector: 'turnStart',
+      selector: DURATION_TURN_START,
       uuid: options?.uuid ?? generateUUID(),
    };
 }

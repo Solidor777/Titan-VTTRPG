@@ -8,6 +8,7 @@
  */
 
 import generateUUID from '~/helpers/utility-functions/GenerateUUID.js';
+import { DURATION_TURN_START } from '~/system/DurationTypes.js';
 
 /**
  * Creates a Rules Element for healing a Character every turn.
@@ -17,7 +18,7 @@ import generateUUID from '~/helpers/utility-functions/GenerateUUID.js';
 export default function createFastHealingElement(options) {
    return {
       operation: 'fastHealing',
-      selector: 'turnStart',
+      selector: DURATION_TURN_START,
       value: 1,
       uuid: options?.uuid ?? generateUUID(),
    };

@@ -1,5 +1,6 @@
 <script>
    import Select from '~/helpers/svelte-components/input/select/Select.svelte';
+   import { ALL_KEY } from '~/system/AllKey.js';
    import { ATTRIBUTES } from '~/system/Attributes.js';
    import AttributeInput from '~/helpers/svelte-components/input/AttributeInput.svelte';
    import Text from '~/helpers/svelte-components/Text.svelte';
@@ -42,7 +43,7 @@
          icon: ATTRIBUTE_ICONS[attribute],
       }));
       if (allowAll) {
-         list.unshift('all');
+         list.unshift(ALL_KEY);
       }
       if (allowNone) {
          list.push('none');

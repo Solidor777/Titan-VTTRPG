@@ -1,5 +1,6 @@
 import path from 'node:path';
 import { expect, test } from './harness.js';
+import { DURATION_PERMANENT } from '~/system/DurationTypes.js';
 import { clickSheetTab, clickTabButton, commitText } from './actions.js';
 import { chooseContextMenuEntry } from './contextMenu.js';
 import { openSheetByUuid } from './fixtures.js';
@@ -2610,7 +2611,7 @@ export const SHARED_FIXTURES = {
       const hostId = await shared(page, 'effectHost');
 
       /** @type {string} The new effect's id. */
-      const id = await addEffect(page, hostId, `${SHARED_PREFIX}Conditional Effect`, { duration: 'permanent' });
+      const id = await addEffect(page, hostId, `${SHARED_PREFIX}Conditional Effect`, { duration: DURATION_PERMANENT });
       await addRulesElement(page, `Actor.${hostId}.ActiveEffect.${id}`, {
          operation: 'conditionalCheckModifier',
          modifierType: 'dice',

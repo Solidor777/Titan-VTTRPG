@@ -3,6 +3,7 @@ import isSuppressedByImmunity from '~/document/types/active-effect/IsSuppressedB
 import RulesElementMixin from '~/document/types/item/rules-element/RulesElementMixin.js';
 import buildSchemaFromShape from '~/helpers/utility-functions/BuildSchemaFromShape.js';
 import createEffectSystemTemplate from '~/document/types/active-effect/EffectSystemTemplate.js';
+import { DURATION_CUSTOM, DURATION_PERMANENT } from '~/system/DurationTypes.js';
 
 /**
  * The typed system data model for Titan Active Effects (subtype 'effect').
@@ -46,7 +47,7 @@ export default class TitanActiveEffectDataModel extends RulesElementMixin(TitanA
     * @returns {boolean} Whether this effect's duration has expired.
     */
    get isExpired() {
-      return this.duration.type !== 'permanent' && this.duration.remaining <= 0;
+      return this.duration.type !== DURATION_PERMANENT && this.duration.remaining <= 0;
    }
 
    /**
@@ -64,7 +65,7 @@ export default class TitanActiveEffectDataModel extends RulesElementMixin(TitanA
     * @returns {boolean} Whether this effect is a Combat Effect.
     */
    get isCombatEffect() {
-      return this.duration.type !== 'permanent' && this.duration.type !== 'custom';
+      return this.duration.type !== DURATION_PERMANENT && this.duration.type !== DURATION_CUSTOM;
    }
 
    /**

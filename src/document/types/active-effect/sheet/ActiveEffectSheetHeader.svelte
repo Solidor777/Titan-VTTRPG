@@ -9,18 +9,15 @@
    from '~/document/svelte-components/input/DocumentIntegerIncrementInput.svelte';
    import CheckboxInput from '~/helpers/svelte-components/input/CheckboxInput.svelte';
    import ItemSheetHeader from '~/document/types/item/sheet/ItemSheetHeader.svelte';
+   import {
+      DURATION_CUSTOM,
+      DURATION_INITIATIVE,
+      DURATION_PERMANENT,
+      DURATION_TYPES,
+   } from '~/system/DurationTypes.js';
 
    /** @type {object} Reference to the reactive Document store. */
    const document = getContext('document');
-
-   /** @type {string[]} Options for the duration type of the effect. */
-   const durationOptions = [
-      'turnEnd',
-      'turnStart',
-      'initiative',
-      'permanent',
-      'custom',
-   ];
 
    /**
     * Whether this effect is currently active, derived from the native disabled flag. Only permanent
@@ -50,12 +47,12 @@
       <div class="input">
          <DocumentSelect
             bind:value={document.data.system.duration.type}
-            options={durationOptions}
+            options={DURATION_TYPES}
          />
       </div>
    </div>
 
-   {#if document.data.system.duration.type === 'custom'}
+   {#if document.data.system.duration.type === DURATION_CUSTOM}
       <!--Custom Duration Label-->
       <div
          class="stat text"
@@ -67,7 +64,7 @@
             />
          </div>
       </div>
-   {:else if document.data.system.duration.type === 'initiative'}
+   {:else if document.data.system.duration.type === DURATION_INITIATIVE}
       <div
          class="stat"
          transition:slide|local
@@ -82,7 +79,7 @@
    {/if}
 
    <!--Duration Remaining-->
-   {#if document.data.system.duration.type !== 'permanent'}
+   {#if document.data.system.duration.type !== DURATION_PERMANENT}
       <div
          class="stat"
          transition:slide|local
@@ -100,7 +97,7 @@
    {/if}
 
    <!--Active Toggle (permanent effects only; timed effects are active while their duration runs)-->
-   {#if document.data.system.duration.type === 'permanent'}
+   {#if document.data.system.duration.type === DURATION_PERMANENT}
       <div class="stat">
          <div class="label">
             {localize('active')}

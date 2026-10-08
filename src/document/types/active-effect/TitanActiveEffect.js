@@ -1,3 +1,4 @@
+import { DURATION_PERMANENT } from '~/system/DurationTypes.js';
 import { EFFECT_TYPE } from '~/system/EffectTypes.js';
 import CheckListMixin from '~/document/types/item/CheckListMixin.js';
 import CustomTraitMixin from '~/document/types/item/CustomTraitMixin.js';
@@ -104,7 +105,7 @@ export default class TitanActiveEffect extends CustomTraitMixin(CheckListMixin(f
          /** @type {string} - The duration type this update results in. */
          const durationType =
             foundry.utils.getProperty(changes, 'system.duration.type') ?? this.system.duration.type;
-         if (durationType !== 'permanent') {
+         if (durationType !== DURATION_PERMANENT) {
             /** @type {number} - The remaining duration this update results in. */
             const remaining =
                foundry.utils.getProperty(changes, 'system.duration.remaining') ?? this.system.duration.remaining;

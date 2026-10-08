@@ -1,4 +1,6 @@
 import { expect, test } from '../harness.js';
+import { DURATION_PERMANENT } from '~/system/DurationTypes.js';
+import { ALL_KEY } from '~/system/AllKey.js';
 import { clickSheetTab } from '../actions.js';
 import { clickRoll, readNewestCheckFlags } from '../checkDialog.js';
 import { forceDice, resetDice } from '../dice.js';
@@ -96,12 +98,12 @@ const BOOST_ELEMENTS = [
    },
    {
       selector: 'attribute',
-      key: 'all',
+      key: ALL_KEY,
       value: 4,
    },
    {
       selector: 'resistance',
-      key: 'all',
+      key: ALL_KEY,
       value: 4,
    },
    {
@@ -697,7 +699,7 @@ test.describe('conditions — immunity', () => {
 
    test.beforeAll(async () => {
       // The warded effect comes first: a ward in force would refuse a creation of that name.
-      wardedId = await addEffect(page, actorId, WARDED_EFFECT_NAME, { duration: 'permanent' });
+      wardedId = await addEffect(page, actorId, WARDED_EFFECT_NAME, { duration: DURATION_PERMANENT });
       await addRulesElement(page, `${actorUuid}.ActiveEffect.${wardedId}`, {
          key: 'melee',
          selector: 'rating',
@@ -705,7 +707,7 @@ test.describe('conditions — immunity', () => {
       });
 
       /** @type {string} The id of the effect that grants the immunities. */
-      const wardId = await addEffect(page, actorId, WARD_NAME, { duration: 'permanent' });
+      const wardId = await addEffect(page, actorId, WARD_NAME, { duration: DURATION_PERMANENT });
       wardUuid = `${actorUuid}.ActiveEffect.${wardId}`;
       await addRulesElement(page, wardUuid, {
          key: 'contaminated',
@@ -900,7 +902,7 @@ test.describe('conditions — immunity', () => {
 
       // Both effects exist before either grants an immunity: an immunity in force would refuse the other's creation.
       /** @type {string} The id of the first effect, worth Melee +3. */
-      const firstId = await addEffect(page, actorId, 'E2E Mutual First', { duration: 'permanent' });
+      const firstId = await addEffect(page, actorId, 'E2E Mutual First', { duration: DURATION_PERMANENT });
       await addRulesElement(page, `${actorUuid}.ActiveEffect.${firstId}`, {
          key: 'melee',
          selector: 'rating',
@@ -908,7 +910,7 @@ test.describe('conditions — immunity', () => {
       });
 
       /** @type {string} The id of the second effect, worth Melee +5. */
-      const secondId = await addEffect(page, actorId, 'E2E Mutual Second', { duration: 'permanent' });
+      const secondId = await addEffect(page, actorId, 'E2E Mutual Second', { duration: DURATION_PERMANENT });
       await addRulesElement(page, `${actorUuid}.ActiveEffect.${secondId}`, {
          key: 'melee',
          selector: 'rating',

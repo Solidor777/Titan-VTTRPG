@@ -1,5 +1,6 @@
 <script>
    import Select from '~/helpers/svelte-components/input/select/Select.svelte';
+   import { ALL_KEY } from '~/system/AllKey.js';
    import { RATINGS } from '~/system/Ratings.js';
 
    /**
@@ -28,7 +29,7 @@
    const options = $derived.by(() => {
       const list = structuredClone(RATINGS);
       if (allowAll) {
-         list.unshift('all');
+         list.unshift(ALL_KEY);
       }
       if (allowNone) {
          list.push('none');

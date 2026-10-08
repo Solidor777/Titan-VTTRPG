@@ -1,3 +1,5 @@
+import { DURATION_TURN_START } from '~/system/DurationTypes.js';
+
 /**
  * Creates the canonical plain-object shape of a Titan Active Effect's `system` data (the 'effect'
  * subtype), mirroring the shape-built portion of `TitanActiveEffectDataModel._defineDocumentSchema()`:
@@ -13,7 +15,7 @@ export default function createEffectSystemTemplate() {
    return {
       // Duration: the duration type, remaining turns, captured initiative, and custom description.
       duration: {
-         type: 'turnStart',
+         type: DURATION_TURN_START,
          remaining: 1,
          initiative: 1,
          custom: '',

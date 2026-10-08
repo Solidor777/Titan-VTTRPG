@@ -1,4 +1,7 @@
 import { expect, test } from '../harness.js';
+import { DURATION_PERMANENT } from '~/system/DurationTypes.js';
+import { ALL_KEY } from '~/system/AllKey.js';
+import { SET_SUM_MODE_MAX, SET_SUM_MODE_MIN, SET_SUM_MODE_SET } from '~/system/SetSumModes.js';
 import { clickSheetTab, commitText } from '../actions.js';
 import { clickRoll, openCheckDialog, readNewestCheckFlags } from '../checkDialog.js';
 import { forceDice, resetDice } from '../dice.js';
@@ -173,7 +176,7 @@ test.describe('rules elements — derived attribute math', () => {
 
    test('flatModifier with key "all" shifts every attribute', async () => {
       await addElement(abilityUuid, {
-         key: 'all',
+         key: ALL_KEY,
          value: 2,
       });
       expect({
@@ -219,7 +222,7 @@ test.describe('rules elements — derived attribute math', () => {
          ...ON_BODY,
          operation: 'setSum',
          value: 0,
-         mode: 'set',
+         mode: SET_SUM_MODE_SET,
       });
       expect(await derived(), 'a Set Sum of 0 forces Body to 0').toBe(0);
 
@@ -236,7 +239,7 @@ test.describe('rules elements — derived attribute math', () => {
          ...ON_BODY,
          operation: 'setSum',
          value: 5,
-         mode: 'min',
+         mode: SET_SUM_MODE_MIN,
       });
 
       // Body base 1, below the floor of 5 -> raised to 5.
@@ -249,7 +252,7 @@ test.describe('rules elements — derived attribute math', () => {
          ...ON_BODY,
          operation: 'setSum',
          value: 5,
-         mode: 'max',
+         mode: SET_SUM_MODE_MAX,
       });
 
       // Body base 1 + flat 7 = 8, capped at 5.
@@ -699,7 +702,7 @@ test.describe('rules elements — which sources apply, and to which bucket', () 
          itemIds[type] = await createOwnedItem(page, actorId, type, `E2E Rules Sources ${type}`);
       }
       effectUuid = `${actorUuid}.ActiveEffect.${await addEffect(page, actorId, 'E2E Rules Sources Effect', {
-         duration: 'permanent',
+         duration: DURATION_PERMANENT,
       })}`;
       await closeAllApps(page);
    });

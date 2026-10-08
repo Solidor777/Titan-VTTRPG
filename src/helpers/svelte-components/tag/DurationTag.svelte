@@ -1,6 +1,7 @@
 <script>
    import localize from '~/helpers/utility-functions/Localize.js';
    import tooltipAction from '~/helpers/svelte-actions/TooltipAction.js';
+   import { DURATION_PERMANENT } from '~/system/DurationTypes.js';
 
    /**
     * @typedef {object} DurationTagProps
@@ -26,7 +27,7 @@
    </div>
 
    <!--Remaining-->
-   {#if type !== 'permanent'}
+   {#if type !== DURATION_PERMANENT}
       <div class="value">
          {remaining}
       </div>

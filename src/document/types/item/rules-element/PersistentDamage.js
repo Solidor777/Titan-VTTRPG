@@ -1,4 +1,5 @@
 import generateUUID from '~/helpers/utility-functions/GenerateUUID.js';
+import { DURATION_TURN_START } from '~/system/DurationTypes.js';
 
 /**
  * A Rules Element for dealing damage to a Character every turn.
@@ -17,7 +18,7 @@ import generateUUID from '~/helpers/utility-functions/GenerateUUID.js';
 export default function createPersistentDamageElement(options) {
    return {
       operation: 'persistentDamage',
-      selector: 'turnStart',
+      selector: DURATION_TURN_START,
       value: 1,
       uuid: options?.uuid ?? generateUUID(),
    };

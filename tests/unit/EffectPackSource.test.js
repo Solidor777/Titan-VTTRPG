@@ -7,6 +7,9 @@ import { RATINGS } from '~/system/Ratings.js';
 import { RESOURCES } from '~/system/Resources.js';
 import { SPEEDS } from '~/system/Speeds.js';
 import { MODS } from '~/system/Mods.js';
+import { ALL_KEY } from '~/system/AllKey.js';
+import { DURATION_CUSTOM, DURATION_TYPES } from '~/system/DurationTypes.js';
+import { SET_SUM_MODES } from '~/system/SetSumModes.js';
 import {
    CONDITIONAL_CHECK_MODIFIER_CHECK_TYPE_OPTIONS,
    CHECK_TYPE_MODIFIER_TYPES,
@@ -20,23 +23,6 @@ const SOURCE_DIR = path.resolve(__dirname, '../../packs/_source/effects');
 const ID_PATTERN = /^[A-Za-z0-9]{16}$/;
 
 /**
- * The duration types `TitanActiveEffectDataModel` understands. No exported source constant lists them: the effect
- * sheet header holds its options in a component-local array, and `createEffectSystemTemplate()` holds only the
- * initial type.
- * @type {string[]}
- */
-const DURATION_TYPES = [
-   'turnStart',
-   'turnEnd',
-   'initiative',
-   'permanent',
-   'custom',
-];
-
-/** @type {string} The key a flat or set modifier uses to address every key under its selector. */
-const ALL_KEYS = 'all';
-
-/**
  * Stat vocabularies of the `flatModifier` and `setSum` selectors, derived from the system stat constants that
  * `CharacterDataModel._defineDocumentSchema()` builds its stats from; a seeded element that names a key outside
  * these applies to nothing at runtime.
@@ -45,27 +31,27 @@ const ALL_KEYS = 'all';
 const STAT_KEYS = {
    attribute: [
       ...ATTRIBUTES,
-      ALL_KEYS,
+      ALL_KEY,
    ],
    resistance: [
       ...RESISTANCES,
-      ALL_KEYS,
+      ALL_KEY,
    ],
    rating: [
       ...RATINGS,
-      ALL_KEYS,
+      ALL_KEY,
    ],
    resource: [
       ...RESOURCES,
-      ALL_KEYS,
+      ALL_KEY,
    ],
    speed: [
       ...SPEEDS,
-      ALL_KEYS,
+      ALL_KEY,
    ],
    mod: [
       ...MODS,
-      ALL_KEYS,
+      ALL_KEY,
    ],
 };
 
@@ -147,7 +133,7 @@ describe('standard effects compendium source', () => {
          expect(Number.isInteger(duration.remaining) && duration.remaining >= 1, `${file} remaining`).toBe(true);
          expect(Number.isInteger(duration.initiative), `${file} initiative`).toBe(true);
          expect(typeof duration.custom, `${file} custom`).toBe('string');
-         expect(duration.custom.length > 0, `${file} custom duration label`).toBe(duration.type === 'custom');
+         expect(duration.custom.length > 0, `${file} custom duration label`).toBe(duration.type === DURATION_CUSTOM);
          expect(check, `${file} checks`).toEqual([]);
          expect(customTrait, `${file} custom traits`).toEqual([]);
       }
@@ -165,11 +151,7 @@ describe('standard effects compendium source', () => {
                   expect(STAT_KEYS[element.selector], `${label} key`).toContain(element.key);
                   expect(Number.isInteger(element.value), `${label} value`).toBe(true);
                   if (element.operation === 'setSum') {
-                     expect([
-                        'set',
-                        'min',
-                        'max',
-                     ], `${label} mode`).toContain(element.mode);
+                     expect(SET_SUM_MODES, `${label} mode`).toContain(element.mode);
                   }
                   break;
                }

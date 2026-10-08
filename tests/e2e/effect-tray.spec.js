@@ -1,5 +1,6 @@
 import path from 'node:path';
 import { expect, test } from './harness.js';
+import { DURATION_PERMANENT } from '~/system/DurationTypes.js';
 import { clickSheetTab } from './actions.js';
 import { chooseContextMenuEntry } from './contextMenu.js';
 import { login, openSheetByUuid } from './fixtures.js';
@@ -598,7 +599,7 @@ test.describe('Apply to Target', () => {
       });
 
       /** @type {string} The id of the ward effect granting the immunity. */
-      const wardId = await addEffect(page, actorId, 'E2E Tray Ward', { duration: 'permanent' });
+      const wardId = await addEffect(page, actorId, 'E2E Tray Ward', { duration: DURATION_PERMANENT });
       await addRulesElement(page, `Actor.${actorId}.ActiveEffect.${wardId}`, {
          key: 'E2E Tray Effect',
          operation: 'immunity',

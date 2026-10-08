@@ -1,3 +1,4 @@
+import { DURATION_PERMANENT } from '~/system/DurationTypes.js';
 import { EFFECT_TYPE } from '~/system/EffectTypes.js';
 
 /**
@@ -33,7 +34,7 @@ export function buildEffectData(itemSource) {
    const active = typeof rawActive === 'string' ? rawActive === 'true' : Boolean(rawActive);
 
    /** @type {boolean} - Whether a permanent effect starts deactivated; creation sets a timed effect's state. */
-   const disabled = system.duration?.type === 'permanent' ? !active : false;
+   const disabled = system.duration?.type === DURATION_PERMANENT ? !active : false;
 
    return {
       _id: itemSource._id,

@@ -1,4 +1,10 @@
 import { expect, flushPageErrors, test } from './harness.js';
+import {
+   DURATION_INITIATIVE,
+   DURATION_PERMANENT,
+   DURATION_TURN_END,
+   DURATION_TURN_START,
+} from '~/system/DurationTypes.js';
 import { login } from './fixtures.js';
 import {
    addCombatant,
@@ -337,7 +343,7 @@ test.beforeAll(async ({ browser }) => {
          elements: [
             {
                operation: 'persistentDamage',
-               selector: 'turnStart',
+               selector: DURATION_TURN_START,
                value: 1,
             },
          ],
@@ -349,7 +355,7 @@ test.beforeAll(async ({ browser }) => {
          elements: [
             {
                operation: 'fastHealing',
-               selector: 'turnStart',
+               selector: DURATION_TURN_START,
                value: 2,
             },
          ],
@@ -359,7 +365,7 @@ test.beforeAll(async ({ browser }) => {
          elements: [
             {
                operation: 'fastHealing',
-               selector: 'turnEnd',
+               selector: DURATION_TURN_END,
                value: 2,
             },
          ],
@@ -610,7 +616,7 @@ test.describe('turn reports', () => {
             elements: [
                {
                   operation: 'turnMessage',
-                  selector: 'turnStart',
+                  selector: DURATION_TURN_START,
                   message: text,
                },
             ],
@@ -755,7 +761,7 @@ test.describe('turn reports', () => {
       /** @type {number} The timed character's initiative rating. */
       const rating = await gm.evaluate((id) => game.actors.get(id).system.rating.initiative.value, cast.timed.id);
       await addEffect(gm, cast.timed.id, 'E2E Expiring Effect', {
-         duration: 'initiative',
+         duration: DURATION_INITIATIVE,
          initiative: rating + 7,
          remaining: 1,
       });
@@ -815,7 +821,7 @@ test.describe('conditions and turn effects in a turn start report', () => {
 
    test('a turn-start report tags a turn-start effect with the Turn Start tag and its duration lead', async () => {
       await addEffect(gm, cast.timed.id, 'E2E Turn Start Effect', {
-         duration: 'turnStart',
+         duration: DURATION_TURN_START,
          remaining: 3,
       });
       await startEncounter('timed');
@@ -859,15 +865,15 @@ test.describe('immunity and turn durations', () => {
    // mutated separately.
    for (const [duration, turns] of [
       [
-         'turnStart',
+         DURATION_TURN_START,
          1,
       ],
       [
-         'turnEnd',
+         DURATION_TURN_END,
          2,
       ],
       [
-         'initiative',
+         DURATION_INITIATIVE,
          1,
       ],
    ]) {
@@ -889,13 +895,13 @@ test.describe('immunity and turn durations', () => {
          /** @type {string} The id of the timed effect the ward suppresses. */
          const timerId = await addEffect(gm, cast.conditioned.id, timerName, {
             duration,
-            ...duration === 'initiative' ? { initiative: rating + 7 } : {},
+            ...duration === DURATION_INITIATIVE ? { initiative: rating + 7 } : {},
             remaining: 3,
          });
 
          /** @type {string} The id of the ward, a permanent effect immune to the timer by name. */
          const wardId = await addEffect(gm, cast.conditioned.id, `E2E ${duration} Timer Ward`, {
-            duration: 'permanent',
+            duration: DURATION_PERMANENT,
          });
          await addRulesElement(gm, `${cast.conditioned.uuid}.ActiveEffect.${wardId}`, {
             key: timerName,

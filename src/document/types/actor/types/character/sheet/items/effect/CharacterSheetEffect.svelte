@@ -14,6 +14,7 @@
    import CharacterSheetEffectChecks
    from '~/document/types/actor/types/character/sheet/items/effect/CharacterSheetEffectChecks.svelte';
    import { DELETE_ICON, EDIT_ICON, SEND_TO_CHAT_ICON, SHEET_ICON } from '~/system/Icons.js';
+   import { DURATION_CUSTOM, DURATION_INITIATIVE, DURATION_PERMANENT } from '~/system/DurationTypes.js';
 
    /**
     * @typedef {object} CharacterSheetEffectProps
@@ -45,8 +46,8 @@
 <CharacterSheetItem bind:isExpanded>
    {#snippet controls()}
       <!--Duration-->
-      {#if durationType !== 'permanent'}
-         {#if durationType === 'initiative'}
+      {#if durationType !== DURATION_PERMANENT}
+         {#if durationType === DURATION_INITIATIVE}
             <!--Initiative-->
             <div class="field margin-right">
                <div class="label">
@@ -66,7 +67,7 @@
 
          <div class="field">
             <div class="label">
-               {durationType === 'custom'
+               {durationType === DURATION_CUSTOM
                   ? durationCustom
                   : localize('turns')}
             </div>
@@ -86,7 +87,7 @@
 
       <!--Toggle Active Button (permanent effects only; timed effects are active while their
       duration runs, so a manual toggle would be redundant)-->
-      {#if durationType === 'permanent'}
+      {#if durationType === DURATION_PERMANENT}
          <CharacterSheetEffectToggleActiveButton/>
       {/if}
 

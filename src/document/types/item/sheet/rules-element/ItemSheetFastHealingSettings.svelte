@@ -2,6 +2,7 @@
    import { getContext } from 'svelte';
    import DocumentSelect from '~/document/svelte-components/select/DocumentSelect.svelte';
    import DocumentIntegerInput from '~/document/svelte-components/input/DocumentIntegerInput.svelte';
+   import { TURN_DURATION_TYPES } from '~/system/DurationTypes.js';
 
    /**
     * @typedef {object} ItemSheetFastHealingSettingsProps
@@ -13,12 +14,6 @@
 
    /** @type {object} Reference to the reactive Document store. */
    const document = getContext('document');
-
-   /** @type {{label: string, value: string}[]} Options for when in the turn the Fast Healing activates. */
-   const selectorOptions = [
-      'turnStart',
-      'turnEnd',
-   ];
 </script>
 
 
@@ -29,7 +24,7 @@
    <div class="field select">
       <DocumentSelect
          bind:value={document.data.system.rulesElement[idx].selector}
-         options={selectorOptions}
+         options={TURN_DURATION_TYPES}
       />
    </div>
 

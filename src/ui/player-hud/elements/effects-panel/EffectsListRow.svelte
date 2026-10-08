@@ -1,4 +1,5 @@
 <script>
+   import { DURATION_PERMANENT } from '~/system/DurationTypes.js';
    import { EFFECT_TYPE } from '~/system/EffectTypes.js';
    import { getContext } from 'svelte';
    import localize from '~/helpers/utility-functions/Localize.js';
@@ -17,7 +18,7 @@
 
    /** @type {string} The effect's duration type (effects only; defaults to permanent when absent). */
    const durationType = $derived(
-      isEffect ? (document.data?.system.duration.type ?? 'permanent') : 'permanent',
+      isEffect ? (document.data?.system.duration.type ?? DURATION_PERMANENT) : DURATION_PERMANENT,
    );
 
    /** @type {number} The effect's remaining duration (effects only; conditions carry no duration). */
@@ -42,7 +43,7 @@
       />
       <span class="text">
          <span class="name">{document.data?.name}</span>
-         {#if isEffect && durationType !== 'permanent'}
+         {#if isEffect && durationType !== DURATION_PERMANENT}
             <span class="duration">
                <DurationTag
                   type={durationType}

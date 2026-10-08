@@ -2,6 +2,7 @@
    import { getContext } from 'svelte';
    import DocumentSelect from '~/document/svelte-components/select/DocumentSelect.svelte';
    import DocumentIntegerInput from '~/document/svelte-components/input/DocumentIntegerInput.svelte';
+   import { TURN_DURATION_TYPES } from '~/system/DurationTypes.js';
    import ItemSheetRulesElementOperationSelect
    from '~/document/types/item/sheet/rules-element/ItemSheetRulesElementOperationSelect.svelte';
 
@@ -15,12 +16,6 @@
 
    /** @type {object} Reference to the reactive Document store. */
    const document = getContext('document');
-
-   /** @type {string[]} Options for which turn the persistent damage activates. */
-   const selectorOptions = [
-      'turnStart',
-      'turnEnd',
-   ];
 </script>
 
 
@@ -34,7 +29,7 @@
    <div class="field select">
       <DocumentSelect
          bind:value={document.data.system.rulesElement[idx].selector}
-         options={selectorOptions}
+         options={TURN_DURATION_TYPES}
       />
    </div>
 

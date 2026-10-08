@@ -7,6 +7,7 @@ import createResistanceCheckOptions from '~/check/types/resistance-check/Resista
 import { installSchemaMocks, restoreSchemaMocks } from './helpers/schemaFingerprint.js';
 import camelize from '~/helpers/utility-functions/Camelize.js';
 import { TYPED_KEY_SELECTORS } from '~/system/ConditionalCheckModifierTypes.js';
+import { ALL_KEY } from '~/system/AllKey.js';
 
 // Check-modifier behavior of CharacterDataModel, exercised on a bare instance (Object.create over the prototype) whose
 // parent carries only a rules-elements cache and whose roll data is stubbed. The model is imported after the Foundry
@@ -1472,7 +1473,7 @@ describe('CharacterDataModel._expandAllKeyElements', () => {
    it('keeps a situation labelled "all" as a literal label instead of expanding or dropping it', () => {
       /** @type {object} A situation element whose typed label is the reserved word. */
       const situation = checkModifier({
-         key: 'all',
+         key: ALL_KEY,
          selector: 'situation',
       });
       expect(createModel()._expandAllKeyElements([situation])).toEqual([situation]);
@@ -1487,7 +1488,7 @@ describe('CharacterDataModel._expandAllKeyElements', () => {
       };
       expect(model._expandAllKeyElements([
          checkModifier({
-            key: 'all',
+            key: ALL_KEY,
             selector: 'attribute',
          }),
       ]).map((element) => element.key)).toEqual([
@@ -1534,7 +1535,7 @@ describe('CharacterDataModel._expandAllKeyElements — selectors with no stat ma
    ])('keeps a %s element with the stat-map-less %s selector, key "all" included, unchanged', (operation, selector) => {
       /** @type {object} An element whose typed key is the reserved word. */
       const element = {
-         key: 'all',
+         key: ALL_KEY,
          operation,
          selector,
       };

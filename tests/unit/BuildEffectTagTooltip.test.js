@@ -3,6 +3,7 @@ import { readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import path from 'node:path';
 import buildEffectTagTooltip from '~/helpers/utility-functions/BuildEffectTagTooltip.js';
+import { DURATION_TYPES } from '~/system/DurationTypes.js';
 
 /** @type {string} The repository root. */
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
@@ -12,7 +13,7 @@ const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..')
  * duration type is covered without editing this test.
  * @type {string[]}
  */
-const DURATION_TYPES = Object.keys(JSON.parse(readFileSync(path.join(ROOT, 'lang/en.json'), 'utf-8')).LOCAL)
+const REPORT_TAG_TYPES = Object.keys(JSON.parse(readFileSync(path.join(ROOT, 'lang/en.json'), 'utf-8')).LOCAL)
    .map((key) => /^effect\.(\w+)\.desc\.text$/.exec(key)?.[1])
    .filter(Boolean);
 
@@ -101,18 +102,14 @@ describe('buildEffectTagTooltip', () => {
 });
 
 describe('report effect tags', () => {
-   it('derives the six report duration types from the lead keys', () => {
-      expect([...DURATION_TYPES].sort()).toEqual([
-         'custom',
+   it('derives the report duration types from the lead keys: every duration type, then the expired state', () => {
+      expect([...REPORT_TAG_TYPES].sort()).toEqual([
+         ...DURATION_TYPES,
          'expired',
-         'initiative',
-         'permanent',
-         'turnEnd',
-         'turnStart',
-      ]);
+      ].sort());
    });
 
-   it.each(DURATION_TYPES)('the %s tag passes its own lead key', (type) => {
+   it.each(REPORT_TAG_TYPES)('the %s tag passes its own lead key', (type) => {
       expect(readSource(`src/helpers/svelte-components/tag/effects/${wrapperName(type)}.svelte`))
          .toContain(`leadKey="effect.${type}.desc"`);
    });
@@ -133,7 +130,7 @@ describe('report effect tags', () => {
          }
       }
       expect(rendered).toEqual({
-         ...Object.fromEntries(DURATION_TYPES.map((type) => [
+         ...Object.fromEntries(REPORT_TAG_TYPES.map((type) => [
             `ChatMessageEffectsTags.svelte:${type}`,
             wrapperName(type),
          ])),

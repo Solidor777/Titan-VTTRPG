@@ -1,4 +1,5 @@
 import { expect, test } from './harness.js';
+import { DURATION_PERMANENT } from '~/system/DurationTypes.js';
 import { clickSheetTab } from './actions.js';
 import {
    clickRoll,
@@ -212,7 +213,7 @@ async function deleteItem(actorUuid, tab, itemUuid) {
  */
 async function addSwitchedOffEffect(actor, name, elements) {
    /** @type {string} The effect's uuid. */
-   const uuid = `${actor.uuid}.ActiveEffect.${await addEffect(page, actor.id, name, { duration: 'permanent' })}`;
+   const uuid = `${actor.uuid}.ActiveEffect.${await addEffect(page, actor.id, name, { duration: DURATION_PERMANENT })}`;
    for (const element of elements) {
       await addRulesElement(page, uuid, {
          operation: 'conditionalCheckModifier',
@@ -538,7 +539,7 @@ test.describe('the situational setting', () => {
             key: 'Underwater',
             value: -1,
          },
-         { duration: 'permanent' },
+         { duration: DURATION_PERMANENT },
       );
 
       // With a situational modifier the dialog opens.
@@ -1121,7 +1122,7 @@ test.describe('fields that follow the owned item while the dialog is open', () =
       // A permanent rating modifier for every Melee attack, switched off before the dialog opens.
       /** @type {string} The effect's uuid. */
       const effect = `${actor.uuid}.ActiveEffect.${await addEffect(page, actor.id, 'E2E Melee Rating Boost', {
-         duration: 'permanent',
+         duration: DURATION_PERMANENT,
       })}`;
       await addRulesElement(page, effect, {
          operation: 'conditionalRatingModifier',

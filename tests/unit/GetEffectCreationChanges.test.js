@@ -1,4 +1,5 @@
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
+import { DURATION_PERMANENT, DURATION_TURN_END, DURATION_TURN_START } from '~/system/DurationTypes.js';
 import getEffectCreationChanges from '~/helpers/utility-functions/GetEffectCreationChanges.js';
 
 /** @type {Readonly<{NEVER: number, CONDITIONAL: number, ALWAYS: number}>} Core's status-icon modes. */
@@ -28,7 +29,7 @@ afterAll(() => {
  */
 function makeEffect({
    disabled = false,
-   durationType = 'turnStart',
+   durationType = DURATION_TURN_START,
    remaining = 1,
    showIcon = SHOW_ICON.CONDITIONAL,
 } = {}) {
@@ -56,7 +57,7 @@ describe('getEffectCreationChanges', () => {
    it('enables a timed effect with time remaining, even one stored disabled', () => {
       expect(getEffectCreationChanges(makeEffect({
          disabled: true,
-         durationType: 'turnEnd',
+         durationType: DURATION_TURN_END,
          remaining: 2,
          showIcon: SHOW_ICON.ALWAYS,
       }))).toEqual({ disabled: false });
@@ -65,7 +66,7 @@ describe('getEffectCreationChanges', () => {
    it('keeps a permanent effect\'s disabled state, a manual toggle', () => {
       expect(getEffectCreationChanges(makeEffect({
          disabled: true,
-         durationType: 'permanent',
+         durationType: DURATION_PERMANENT,
          remaining: 0,
       }))).toEqual({ showIcon: SHOW_ICON.ALWAYS });
    });

@@ -1,4 +1,5 @@
 import generateUUID from '~/helpers/utility-functions/GenerateUUID.js';
+import { SET_SUM_MODE_SET } from '~/system/SetSumModes.js';
 
 /**
  * A Rules Element for forcing the running total (base value plus all accumulated modifiers) of a
@@ -10,7 +11,7 @@ import generateUUID from '~/helpers/utility-functions/GenerateUUID.js';
  * @property {string} key - The key of the stat being modified (body, stride, etc.), or 'all' for every
  * key under the selector.
  * @property {number} value - The target total value.
- * @property {string} mode - 'set' (force exact), 'min' (floor), or 'max' (cap).
+ * @property {string} mode - One of SET_SUM_MODES: 'set' (force exact), 'min' (floor), or 'max' (cap).
  * @property {string} uuid - Unique identifier for the Rules Element, used to track the element across type changes.
  */
 
@@ -25,7 +26,7 @@ export default function createSetSumElement(options) {
       selector: 'speed',
       key: 'stride',
       value: 0,
-      mode: 'set',
+      mode: SET_SUM_MODE_SET,
       uuid: options?.uuid ?? generateUUID(),
    };
 }

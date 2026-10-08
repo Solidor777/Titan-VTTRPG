@@ -1,4 +1,5 @@
 import { describe, it, expect, beforeAll, afterAll } from 'vitest';
+import { DURATION_TURN_START } from '~/system/DurationTypes.js';
 
 // TitanActiveEffect extends foundry.documents.ActiveEffect, and its module graph pulls in dialog
 // classes that destructure foundry.applications.api.ApplicationV2 at import time. The shared test
@@ -50,7 +51,7 @@ describe('TitanActiveEffect#buildChatMessageData', () => {
          rulesElement: [],
          description: '<p>Blessed.</p>',
          duration: {
-            type: 'turnStart',
+            type: DURATION_TURN_START,
             remaining: 3,
             initiative: 12,
             custom: '',

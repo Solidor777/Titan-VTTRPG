@@ -2,6 +2,7 @@ import { expect, test } from './harness.js';
 import { login } from './fixtures.js';
 import { mountProbe, PAYLOAD, readProbeEvents, clearProbeEvents, unmountAll } from './componentProbe.js';
 import { closeAllApps, clearChat, attachPageErrors } from './world.js';
+import { DURATION_PERMANENT, DURATION_TURN_START } from '~/system/DurationTypes.js';
 import selectDisplayedSpellAspects from '~/document/types/item/types/spell/SelectDisplayedSpellAspects.js';
 
 /** @type {string} The payload's image once cleaned: the same element without its handler. */
@@ -1092,7 +1093,7 @@ test.describe('component probe — DurationTag', () => {
    test('renders type and remaining for a non-permanent duration, resolves testId', async () => {
       const { selector } = await mountProbe(page, 'DurationTag', {
          props: {
-            type: 'turnStart',
+            type: DURATION_TURN_START,
             remaining: 3,
             testId: 'probe-duration-tag',
          },
@@ -1106,7 +1107,7 @@ test.describe('component probe — DurationTag', () => {
    test('does not render remaining for permanent duration', async () => {
       const { selector } = await mountProbe(page, 'DurationTag', {
          props: {
-            type: 'permanent',
+            type: DURATION_PERMANENT,
             remaining: 99,
             testId: 'probe-duration-tag-perm',
          },
@@ -1118,7 +1119,7 @@ test.describe('component probe — DurationTag', () => {
    test('tooltip content is forwarded to tippy', async () => {
       const { selector } = await mountProbe(page, 'DurationTag', {
          props: {
-            type: 'turnStart',
+            type: DURATION_TURN_START,
             remaining: 2,
             tooltip: {
                text: 'Expires on turn start.',

@@ -1,4 +1,6 @@
+import { ALL_KEY } from '~/system/AllKey.js';
 import { CONDITION_TYPE } from '~/system/EffectTypes.js';
+import { SET_SUM_MODE_SET } from '~/system/SetSumModes.js';
 import isHTMLBlank from '~/helpers/utility-functions/IsHTMLBlank.js';
 import localize from '~/helpers/utility-functions/Localize.js';
 import sortAscending from '~/helpers/utility-functions/SortAscending.js';
@@ -102,8 +104,8 @@ export function buildConditionDefinitions() {
          type: CONDITION_TYPE,
          system: {
             rulesElement: [
-               createQuarterBasePenalty('contaminated', 'attribute', 'all', 'attributes'),
-               createQuarterBasePenalty('contaminated', 'resistance', 'all', 'resistances'),
+               createQuarterBasePenalty('contaminated', 'attribute', ALL_KEY, 'attributes'),
+               createQuarterBasePenalty('contaminated', 'resistance', ALL_KEY, 'resistances'),
             ],
          },
       },
@@ -181,7 +183,7 @@ export function buildConditionDefinitions() {
                {
                   operation: 'mulSum',
                   selector: 'speed',
-                  key: 'all',
+                  key: ALL_KEY,
                   value: 0.5,
                   rounding: 'up',
                   uuid: 'condition-prone-speed',
@@ -204,9 +206,9 @@ export function buildConditionDefinitions() {
                {
                   operation: 'setSum',
                   selector: 'speed',
-                  key: 'all',
+                  key: ALL_KEY,
                   value: 0,
-                  mode: 'set',
+                  mode: SET_SUM_MODE_SET,
                   uuid: 'condition-restrained-speed',
                },
                createReflexesAutomaticFailure('restrained'),

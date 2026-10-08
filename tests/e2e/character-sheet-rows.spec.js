@@ -1,4 +1,10 @@
 import { expect, test } from './harness.js';
+import {
+   DURATION_INITIATIVE,
+   DURATION_PERMANENT,
+   DURATION_TURN_END,
+   DURATION_TURN_START,
+} from '~/system/DurationTypes.js';
 import { clickSheetTab, commitText } from './actions.js';
 import { login, openSheetByUuid } from './fixtures.js';
 import {
@@ -129,7 +135,7 @@ test.beforeAll(async ({ browser }) => {
       opposed: true,
    });
    effectIds.timed = await addEffect(page, actorId, 'E2E Rows Timed Effect');
-   effectIds.permanent = await addEffect(page, actorId, 'E2E Rows Permanent Effect', { duration: 'permanent' });
+   effectIds.permanent = await addEffect(page, actorId, 'E2E Rows Permanent Effect', { duration: DURATION_PERMANENT });
    effectIds.checked = await addEffect(page, actorId, 'E2E Rows Checked Effect');
    await addCheck(page, `${actorUuid}.ActiveEffect.${effectIds.checked}`, {
       label: 'E2E Rows Parity Effect Check',
@@ -764,7 +770,7 @@ test.describe('effect rows', () => {
       /** @type {import('@playwright/test').Locator} The effect row's initiative number input. */
       const initiativeInput = row.locator('input.titan-number-input').first();
       await withDocumentSheet(row, 'ActiveEffect', effectIds.timed, async (documentSheet) => {
-         await chooseDurationType(documentSheet, 'initiative');
+         await chooseDurationType(documentSheet, DURATION_INITIATIVE);
          /** @type {import('@playwright/test').Locator} The number inputs of the effect sheet header. */
          const headerInputs = documentSheet.locator('.header input.titan-number-input');
 
@@ -786,7 +792,7 @@ test.describe('effect rows', () => {
       await expect.poll(() => readPath(uuid, 'system.duration.initiative'), { message: 'the initiative is put back' })
          .toBe(original);
       await withDocumentSheet(row, 'ActiveEffect', effectIds.timed, async (documentSheet) => {
-         await chooseDurationType(documentSheet, 'turnStart');
+         await chooseDurationType(documentSheet, DURATION_TURN_START);
       });
       expect(await readPath(uuid, 'system.duration.type')).toBe('turnStart');
    });
@@ -814,14 +820,14 @@ test.describe('effect rows', () => {
          /** @type {import('@playwright/test').Locator} The document name input. */
          const nameInput = documentSheet.locator('.document-name input');
          await typeInto(nameInput, 'E2E Rows Timed Effect Renamed');
-         await chooseDurationType(documentSheet, 'turnEnd');
+         await chooseDurationType(documentSheet, DURATION_TURN_END);
          await typeInto(headerStat(documentSheet, 'Remaining').locator('input.titan-number-input'), 3);
          await expect(name, 'the name updates in place').toHaveText('E2E Rows Timed Effect Renamed');
          await expect(durationType, 'the duration type updates in place').toHaveText('Turn End');
          await expect(durationRemaining, 'the remaining count updates in place').toHaveText('3');
 
          await typeInto(nameInput, 'E2E Rows Timed Effect');
-         await chooseDurationType(documentSheet, 'turnStart');
+         await chooseDurationType(documentSheet, DURATION_TURN_START);
          await typeInto(headerStat(documentSheet, 'Remaining').locator('input.titan-number-input'), 1);
          await expect(name, 'the name is restored in place').toHaveText('E2E Rows Timed Effect');
          await expect(durationType, 'the duration type is restored in place').toHaveText('Turn Start');
@@ -867,7 +873,7 @@ test.describe('effect rows', () => {
       // A timed effect shows no active toggle; a permanent duration chosen in its sheet adds one in place.
       await expect(row.locator('i.fa-square-check'), 'a timed effect shows no active toggle').toHaveCount(0);
       await withDocumentSheet(row, 'ActiveEffect', id, async (documentSheet) => {
-         await chooseDurationType(documentSheet, 'permanent');
+         await chooseDurationType(documentSheet, DURATION_PERMANENT);
       });
       await expect(row.locator('i.fa-square-check'), 'the permanent effect starts active').toHaveCount(1);
       await row.locator('i.fa-square-check').click();

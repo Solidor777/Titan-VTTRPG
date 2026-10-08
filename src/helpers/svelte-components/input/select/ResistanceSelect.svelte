@@ -1,6 +1,7 @@
 <script>
    import { RESISTANCES } from '~/system/Resistances.js';
    import Select from '~/helpers/svelte-components/input/select/Select.svelte';
+   import { ALL_KEY } from '~/system/AllKey.js';
    import ResistanceInput from '~/helpers/svelte-components/input/ResistanceInput.svelte';
 
    /**
@@ -29,7 +30,7 @@
    const options = $derived.by(() => {
       const list = structuredClone(RESISTANCES);
       if (allowAll) {
-         list.unshift('all');
+         list.unshift(ALL_KEY);
       }
       if (allowNone) {
          list.push('none');

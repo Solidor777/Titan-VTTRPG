@@ -3,6 +3,7 @@
    import localize from '~/helpers/utility-functions/Localize.js';
    import DurationTag from '~/helpers/svelte-components/tag/DurationTag.svelte';
    import Tag from '~/helpers/svelte-components/tag/Tag.svelte';
+   import { DURATION_PERMANENT } from '~/system/DurationTypes.js';
 
    /** @type {object} The nearest document bridge (embedded effect or chat-message snapshot). */
    const document = getContext('document');
@@ -17,7 +18,7 @@
     * @type {boolean} Whether the effect is expired, computed from the duration (the chat snapshot
     * carries no derived isExpired; this is TitanActiveEffectDataModel#isExpired's exact condition).
     */
-   const isExpired = $derived(durationType !== 'permanent' && durationRemaining <= 0);
+   const isExpired = $derived(durationType !== DURATION_PERMANENT && durationRemaining <= 0);
 
    /** @type {Array<object>} The effect's custom traits, read reactively through the document bridge. */
    const customTrait = $derived(document.data?.system.customTrait ?? []);

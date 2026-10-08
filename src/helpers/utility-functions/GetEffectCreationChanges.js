@@ -1,3 +1,4 @@
+import { DURATION_PERMANENT } from '~/system/DurationTypes.js';
 import { EFFECT_TYPE } from '~/system/EffectTypes.js';
 
 /**
@@ -19,7 +20,7 @@ export default function getEffectCreationChanges(effect) {
    if (effect.showIcon !== CONST.ACTIVE_EFFECT_SHOW_ICON.ALWAYS) {
       changes.showIcon = CONST.ACTIVE_EFFECT_SHOW_ICON.ALWAYS;
    }
-   if (effect.system.duration.type !== 'permanent') {
+   if (effect.system.duration.type !== DURATION_PERMANENT) {
       changes.disabled = effect.system.duration.remaining <= 0;
    }
    return changes;

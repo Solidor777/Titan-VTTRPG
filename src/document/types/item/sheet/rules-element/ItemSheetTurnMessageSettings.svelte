@@ -2,6 +2,7 @@
    import { getContext } from 'svelte';
    import DocumentSelect from '~/document/svelte-components/select/DocumentSelect.svelte';
    import DocumentBoundEditorInput from '~/document/svelte-components/input/DocumentBoundEditorInput.svelte';
+   import { TURN_DURATION_TYPES } from '~/system/DurationTypes.js';
 
    /**
     * @typedef {object} ItemSheetTurnMessageSettingsProps
@@ -13,12 +14,6 @@
 
    /** @type {object} Reference to the reactive Document store. */
    const document = getContext('document');
-
-   /** @type {string[]} Options for which turn the message is sent. */
-   const selectorOptions = [
-      'turnStart',
-      'turnEnd',
-   ];
 </script>
 
 <!--Operation settings-->
@@ -31,7 +26,7 @@
       <div class="field select">
          <DocumentSelect
             bind:value={document.data.system.rulesElement[idx].selector}
-            options={selectorOptions}
+            options={TURN_DURATION_TYPES}
          />
       </div>
    </div>
