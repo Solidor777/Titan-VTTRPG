@@ -3,9 +3,111 @@ import { buildTables, buildArrayPathMatcher, detectArrayPaths } from '~/spreadsh
 import { encodeXlsx, decodeXlsx } from '~/spreadsheet/format/Xlsx.js';
 import { encodeCsv, decodeCsv } from '~/spreadsheet/format/Csv.js';
 import { readTables } from '~/spreadsheet/codec/ReadTables.js';
+import createWeaponSystemTemplate from '~/document/types/item/types/weapon/WeaponSystemTemplate.js';
+import createArmorSystemTemplate from '~/document/types/item/types/armor/ArmorSystemTemplate.js';
+import createShieldSystemTemplate from '~/document/types/item/types/shield/ShieldSystemTemplate.js';
+import createAbilitySystemTemplate from '~/document/types/item/types/ability/AbilitySystemTemplate.js';
+import createSpellSystemTemplate from '~/document/types/item/types/spell/SpellSystemTemplate.js';
+import createEquipmentSystemTemplate from '~/document/types/item/types/equipment/EquipmentSystemTemplate.js';
+import createCommoditySystemTemplate from '~/document/types/item/types/commodity/CommoditySystemTemplate.js';
+import createEffectSystemTemplate from '~/document/types/active-effect/EffectSystemTemplate.js';
+import createItemCheckTemplate from '~/check/types/item-check/ItemCheckTemplate.js';
+import createCustomItemTraitTemplate from '~/document/types/item/CustomItemTrait.js';
+import createFlatModifierElement from '~/document/types/item/rules-element/FlatModifier.js';
+import createCustomAspectTemplate from '~/document/types/item/types/spell/SpellCustomAspect.js';
+import SpellAspects from '~/document/types/item/types/spell/SpellAspects.js';
+import { ATTACK_TRAITS } from '~/document/types/item/types/weapon/AttackTraits.js';
+import { ARMOR_TRAITS } from '~/document/types/item/types/armor/ArmorTraits.js';
+import { SHIELD_TRAITS } from '~/document/types/item/types/shield/ShieldTraits.js';
 
 /** A minimal typeSchemas stand-in: no schema-typed fields, so column order falls back to first-seen. */
 const NO_SCHEMA = {};
+
+/**
+ * Builds one document envelope per item and effect system shape template. Each system comes from the real
+ * `create*SystemTemplate()` function, and every object-array field its template holds is filled with entries built by
+ * the real element factories and constants, so the shapes are the ones the data models persist.
+ * @returns {object[]} The envelopes, one per document type.
+ */
+function buildRealShapeEnvelopes() {
+   /** @type {object[]} The document types with their system shape template and standard trait source. */
+   const types = [
+      {
+         documentType: 'weapon',
+         template: createWeaponSystemTemplate,
+         trait: ATTACK_TRAITS,
+      },
+      {
+         documentType: 'armor',
+         template: createArmorSystemTemplate,
+         trait: ARMOR_TRAITS,
+      },
+      {
+         documentType: 'shield',
+         template: createShieldSystemTemplate,
+         trait: SHIELD_TRAITS,
+      },
+      {
+         documentType: 'ability',
+         template: createAbilitySystemTemplate,
+      },
+      {
+         documentType: 'spell',
+         template: createSpellSystemTemplate,
+      },
+      {
+         documentType: 'equipment',
+         template: createEquipmentSystemTemplate,
+      },
+      {
+         documentType: 'commodity',
+         template: createCommoditySystemTemplate,
+      },
+      {
+         documentType: 'effect',
+         template: createEffectSystemTemplate,
+      },
+   ];
+
+   return types.map(({ documentType, template, trait }, idx) => {
+      /** @type {object} The system data of the shape template. */
+      const system = template();
+
+      // Fill each object-array field the template holds with entries from the real factories.
+      /** @type {object} The real array entries keyed by the system field they belong to. */
+      const entries = {
+         check: [createItemCheckTemplate()],
+         customTrait: [createCustomItemTraitTemplate()],
+         rulesElement: [createFlatModifierElement()],
+         trait: trait ? [{ ...trait[0] }] : void 0,
+         aspect: [{ ...SpellAspects.range.template }],
+         customAspect: [createCustomAspectTemplate()],
+      };
+      for (const [field, value] of Object.entries(entries)) {
+         if (field in system && value) {
+            system[field] = value;
+         }
+      }
+
+      // The weapon's attacks carry their own trait arrays.
+      for (const attack of system.attack ?? []) {
+         attack.trait = [{ ...ATTACK_TRAITS[0] }];
+         attack.customTrait = [createCustomItemTraitTemplate()];
+      }
+
+      return {
+         documentType,
+         source: {
+            _id: String.fromCharCode(97 + idx).repeat(16),
+            name: documentType,
+            type: documentType,
+            img: 'i.svg',
+            sort: 1,
+            system,
+         },
+      };
+   });
+}
 
 describe('buildTables — wide layout', () => {
    it('builds one sheet per document type with fixed columns first, plus a _manifest sheet', () => {
@@ -606,256 +708,18 @@ describe('buildTables — relational guards', () => {
       );
    });
 
-   it('does not throw for any real TITAN shape (one representative envelope per shape template)', () => {
-      /** @type {object[]} One representative envelope per item/actor-item/effect shape template. */
-      const envelopes = [
-         {
-            documentType: 'weapon',
-            source: {
-               _id: 'a'.repeat(16),
-               name: 'Sword',
-               type: 'weapon',
-               img: 'i.svg',
-               sort: 1,
-               system: {
-                  description: '',
-                  check: [],
-                  customTrait: [{
-                     name: 'Custom',
-                     description: 'x',
-                     uuid: 'u1',
-                  }],
-                  rulesElement: [{
-                     name: 'code',
-                     value: 'v',
-                  }],
-                  rarity: 'common',
-                  value: 0,
-                  equipped: false,
-                  attackNotes: '',
-                  trait: [{ name: 'Reach' }],
-                  attack: [
-                     {
-                        label: 'Slash',
-                        type: 'melee',
-                        range: 1,
-                        attribute: 'body',
-                        skill: 'meleeWeapons',
-                        damage: 5,
-                        plusExtraSuccessDamage: true,
-                        trait: [{ name: 'Heavy' }],
-                        customTrait: [{
-                           name: 'Custom Trait',
-                           description: 'y',
-                           uuid: 'u2',
-                        }],
-                        uuid: 'u3',
-                     },
-                  ],
-               },
-            },
-         },
-         {
-            documentType: 'armor',
-            source: {
-               _id: 'b'.repeat(16),
-               name: 'Plate',
-               type: 'armor',
-               img: 'i.svg',
-               sort: 1,
-               system: {
-                  description: '',
-                  check: [],
-                  customTrait: [{
-                     name: 'Custom',
-                     description: 'x',
-                     uuid: 'u4',
-                  }],
-                  rulesElement: [{
-                     name: 'code',
-                     value: 'v',
-                  }],
-                  rarity: 'common',
-                  value: 0,
-                  armor: {
-                     max: 1,
-                     value: 1,
-                  },
-                  trait: [{ name: 'Reach' }],
-               },
-            },
-         },
-         {
-            documentType: 'shield',
-            source: {
-               _id: 'c'.repeat(16),
-               name: 'Buckler',
-               type: 'shield',
-               img: 'i.svg',
-               sort: 1,
-               system: {
-                  description: '',
-                  check: [],
-                  customTrait: [{
-                     name: 'Custom',
-                     description: 'x',
-                     uuid: 'u5',
-                  }],
-                  rulesElement: [{
-                     name: 'code',
-                     value: 'v',
-                  }],
-                  rarity: 'common',
-                  value: 0,
-                  defense: 0,
-                  trait: [{ name: 'Reach' }],
-               },
-            },
-         },
-         {
-            documentType: 'ability',
-            source: {
-               _id: 'd'.repeat(16),
-               name: 'Feat of Strength',
-               type: 'ability',
-               img: 'i.svg',
-               sort: 1,
-               system: {
-                  description: '',
-                  check: [],
-                  customTrait: [{
-                     name: 'Custom',
-                     description: 'x',
-                     uuid: 'u6',
-                  }],
-                  rulesElement: [{
-                     name: 'code',
-                     value: 'v',
-                  }],
-                  xpCost: 1,
-                  rarity: 'common',
-                  action: false,
-                  reaction: false,
-                  passive: false,
-               },
-            },
-         },
-         {
-            documentType: 'spell',
-            source: {
-               _id: 'e'.repeat(16),
-               name: 'Fireball',
-               type: 'spell',
-               img: 'i.svg',
-               sort: 1,
-               system: {
-                  description: '',
-                  check: [],
-                  customTrait: [{
-                     name: 'Custom',
-                     description: 'x',
-                     uuid: 'u7',
-                  }],
-                  rarity: 'common',
-                  xpCost: 1,
-                  tradition: '',
-                  castingCheck: {
-                     attribute: 'mind',
-                     skill: 'arcana',
-                     difficulty: 4,
-                     complexity: 1,
-                     autoCalculateDC: true,
-                  },
-                  quantity: 1,
-                  aspect: [{
-                     name: 'Damage',
-                     value: 'v',
-                     option: [
-                        'ignoreArmor',
-                        'penetrating',
-                     ],
-                  }],
-                  customAspect: [{
-                     name: 'Custom Aspect',
-                     description: 'z',
-                     uuid: 'u8',
-                  }],
-               },
-            },
-         },
-         {
-            documentType: 'equipment',
-            source: {
-               _id: 'f'.repeat(16),
-               name: 'Rope',
-               type: 'equipment',
-               img: 'i.svg',
-               sort: 1,
-               system: {
-                  description: '',
-                  check: [],
-                  customTrait: [{
-                     name: 'Custom',
-                     description: 'x',
-                     uuid: 'u9',
-                  }],
-                  rulesElement: [{
-                     name: 'code',
-                     value: 'v',
-                  }],
-                  rarity: 'common',
-                  value: 0,
-                  equipped: false,
-               },
-            },
-         },
-         {
-            documentType: 'commodity',
-            source: {
-               _id: 'g'.repeat(16),
-               name: 'Gold',
-               type: 'commodity',
-               img: 'i.svg',
-               sort: 1,
-               system: {
-                  description: '',
-                  check: [],
-                  customTrait: [],
-                  rarity: 'common',
-                  value: 0,
-                  quantity: 1,
-               },
-            },
-         },
-         {
-            documentType: 'effect',
-            source: {
-               _id: 'h'.repeat(16),
-               name: 'Burning',
-               type: 'effect',
-               img: 'i.svg',
-               sort: 1,
-               system: {
-                  duration: {
-                     type: 'turnStart',
-                     remaining: 1,
-                     initiative: 1,
-                     custom: '',
-                  },
-                  check: [{
-                     name: 'Check',
-                     attribute: 'body',
-                  }],
-                  customTrait: [{
-                     name: 'Custom',
-                     description: 'x',
-                     uuid: 'u10',
-                  }],
-               },
-            },
-         },
-      ];
-      expect(() => buildTables(envelopes, 'relational', 'Item', NO_SCHEMA)).not.toThrow();
+   it('does not throw for any real TITAN shape (one envelope per system shape template)', () => {
+      // The shape templates localize and read settings while they build; stand in for both.
+      globalThis.game = {
+         i18n: { localize: (key) => key },
+         settings: { get: () => 1 },
+      };
+      try {
+         expect(() => buildTables(buildRealShapeEnvelopes(), 'relational', 'Item', NO_SCHEMA)).not.toThrow();
+      }
+      finally {
+         delete globalThis.game;
+      }
    });
 
    it('does not throw in wide layout for a shape that throws in relational layout, and yields a flat column', () => {
