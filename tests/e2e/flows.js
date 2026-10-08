@@ -1415,16 +1415,8 @@ export async function addRulesElement(page, documentUuid, element) {
       await editor.locator('[data-action="save"]').click();
       await expect(editor, 'the editor shows the saved message').toHaveClass(/inactive/);
 
-      // The stored element lives in the document's source: the live system data holds the typed text before the
-      // editor's own update has reached the database, and a sheet closed in between loses it.
       await expect.poll(
-         () => page.evaluate(
-            async ({ uuid, index }) => (await fromUuid(uuid))._source.system.rulesElement[index].message,
-            {
-               uuid: documentUuid,
-               index: before,
-            },
-         ),
+         async () => (await readServerSystem(page, documentUuid)).rulesElement[before].message,
          { message: 'the editor saved the message to the document' },
       ).toContain(element.message);
    }
@@ -2714,16 +2706,16 @@ export const SHARED_FIXTURES = {
 };
 
 /**
- * Reads the system data the server holds for a document. A client's own document carries an edit made through a bound
+ * Reads the data the server holds for a document. A client's own document carries an edit made through a bound
  * control before any update reaches the database, so a read through `fromUuid` cannot tell a saved edit from an unsaved
  * one; this asks the server (a read, not a document change). For an embedded document the query returned the first
  * sibling's data in place of the requested document's (probe-two.json: the second of two owned abilities, whose local
  * rules elements were empty, read the first ability's element), so the result is picked by id.
  * @param {import('@playwright/test').Page} page - A logged-in page.
  * @param {string} uuid - The uuid of a world or embedded document.
- * @returns {Promise<object>} The document's stored `system` data.
+ * @returns {Promise<object>} The document's stored data (`toObject()`).
  */
-export function readServerSystem(page, uuid) {
+export function readServerDocument(page, uuid) {
    return page.evaluate(async (uuid) => {
       /** @type {foundry.abstract.Document} The client's document, which names the class and the parent to ask for. */
       const document = await fromUuid(uuid);
@@ -2738,8 +2730,18 @@ export function readServerSystem(page, uuid) {
          },
          game.user,
       );
-      return found.find((candidate) => candidate.id === document.id).toObject().system;
+      return found.find((candidate) => candidate.id === document.id).toObject();
    }, uuid);
+}
+
+/**
+ * Reads the `system` data the server holds for a document (see `readServerDocument`).
+ * @param {import('@playwright/test').Page} page - A logged-in page.
+ * @param {string} uuid - The uuid of a world or embedded document.
+ * @returns {Promise<object>} The document's stored `system` data.
+ */
+export async function readServerSystem(page, uuid) {
+   return (await readServerDocument(page, uuid)).system;
 }
 
 /**

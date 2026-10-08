@@ -867,11 +867,15 @@ test.describe('conditions — immunity', () => {
                });
          }
          finally {
-            // A failed test must not leave the ability's immunity on the actor for the tests after it.
-            if (await page.evaluate((uuid) => fromUuid(uuid).then((item) => item !== null), abilityUuid)) {
-               await deleteOwnedItem(page, actorUuid, 'Abilities', abilityUuid);
+            try {
+               // A failed test must not leave the ability's immunity on the actor for the tests after it.
+               if (await page.evaluate((uuid) => fromUuid(uuid).then((item) => item !== null), abilityUuid)) {
+                  await deleteOwnedItem(page, actorUuid, 'Abilities', abilityUuid);
+               }
             }
-            await setClientSetting(page, 'confirmDeletingItems', confirmDeleting);
+            finally {
+               await setClientSetting(page, 'confirmDeletingItems', confirmDeleting);
+            }
          }
       });
 

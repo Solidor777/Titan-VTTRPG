@@ -7,6 +7,7 @@ import {
    createWorldItem,
    openSidebarTab,
    pickPortrait,
+   readServerDocument,
    setDescription,
    shared,
    sharedUuid,
@@ -299,11 +300,11 @@ test.describe('portrait pick through the file picker', () => {
    const PICKED = `icons/svg/${PICKED_FILE}`;
 
    /**
-    * Reads a document's stored (source) image.
+    * Reads the image the server stores for a document.
     * @param {string} uuid - The document's uuid.
     * @returns {Promise<string>} The stored image path.
     */
-   const storedImage = (uuid) => page.evaluate(async (uuid) => (await fromUuid(uuid))._source.img, uuid);
+   const storedImage = async (uuid) => (await readServerDocument(page, uuid)).img;
 
    /**
     * Picks two portraits through the open sheet's portrait button and checks that the last one survives a reload.
