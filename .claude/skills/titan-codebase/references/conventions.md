@@ -913,11 +913,10 @@ synchronous predicate (50 ms interval, 1000 ms default timeout). **There are now
 at all**, including assert-absence tests. When a negative assertion appears to have no pollable positive
 edge, look for a **happens-after edge**: an observable the code under test emits strictly LATER than the
 decision being asserted. `combat-turns.spec.js` wraps the character data model's `onTurnStart` in a call-through spy on
-a client
-and waits until the spy has seen the turn start return, because `onTurnStart` opens the sheet (or not) at its
-start, before its awaits — so the return proves the sheet's fate was already decided. Seeding an extra rules
-element purely as a synchronization signal is preferred over a bounded wait. Condition-polling
-`setInterval` canvas-readiness loops (`effect-tray.spec.js`) are NOT fixed sleeps and are fine.
+a client and waits until the spy has seen the turn start return, because `onTurnStart` opens the sheet (or not) at its
+start, before its awaits — so the return proves the sheet's fate was already decided. Seeding an extra rules element
+purely as a synchronization signal is preferred over a bounded wait. Condition-polling `setInterval` canvas-readiness
+loops (`effect-tray.spec.js`) are NOT fixed sleeps and are fine.
 
 **E2E runner configuration (all optional; defaults reproduce historical behavior).**
 `npm run test:e2e` wraps `playwright test` in `tests/e2e/run-e2e-throttled.ps1`, which throttles ITS OWN
@@ -1050,56 +1049,53 @@ effect's sheet and saves with the editor's save button), `setOwnership` (the Con
 directory entry), `createCombat` (the Combat Tracker's create button; waits until the combat is `game.combat`),
 `addCombatant` (the Token HUD's combat button), `startCombat` / `endCombat` (the Combat Tracker's Begin and End
 buttons; `endCombat` also confirms the dialog), `setSkillDefaultAttribute` (the select of a skill row), `setEquipped`
-(the Equipped toggle of an Inventory row, clicked only when the state differs), `deleteAttack` (the delete button
-of an attack row in the weapon sheet), `setAttackStat` (the Range or Damage input of an attack row),
-`addAttackCustomTrait`
+(the Equipped toggle of an Inventory row, clicked only when the state differs), `deleteAttack` (the delete button of an
+attack row in the weapon sheet), `setAttackStat` (the Range or Damage input of an attack row), `addAttackCustomTrait`
 (the attack row's Add Custom Trait button and its dialog), `deleteOwnedItem` (the Delete Item button of an Inventory
 row; the `confirmDeletingItems` client setting must be off), `setResource` (the meter row of the actor sheet's sidebar),
 `rollInitiative` (the Combat Tracker's Roll All button; the combatants roll in the order they joined, so a caller forces
 the dice with `forceDice` to choose the turn order), `nextTurn` / `previousTurn` (the Combat Tracker's turn buttons; the
 turn's updates and reports follow, so the caller waits for the effect it asserts), `sendToChat` (the Send to Chat button
-of
-an item's or effect's sheet header), `typeChatMessage` (types into the chat input and presses Enter),
-`openCreateMacroDialog`
-(drags an owned item's row onto the first empty slot of the core hotbar, which the `showFoundryHotbar` client setting
-must show), `createItemMacro` (that drag, the Create Macro dialog and its button; the macro and its slot are recorded
-for the teardown) and `runHotbarMacro` (a click on the slot). The creation dialogs are `DialogV2` forms whose content
-lacks the template's `form#document-create` id, so the flows find them by `dialog.application.dialog` with the
-`.dialog-content` fields. A flow opens the sheet it drives with `openSheetByUuid` and clicks its tabs inside that sheet
-(`openTab`), so another open TITAN sheet's tab strip is never clicked; the Standard Aspects tab and the sidebar both
-use the class `aspect`, so the flow looks inside `.standard-aspects-tab`. A TitanDialog
-id carries a generated suffix (`[id^="add-inventory-item-dialog-<actorId>"]`). A document's sheet instance keeps its
-last tab, so a shared fixture's sheet can come up on the tab a flow last used; a test that needs a tab opens it.
-`shared(page, key)` and `sharedUuid(page, key)` (the uuid, for `openSheetByUuid` and `fromUuid`) serve `SHARED_FIXTURES`:
-`player`, `npc`, the seven world items `weapon`, `ability` (one check), `spell` (the Void custom trait; a range aspect of 10 and a rounds-scaling
-duration aspect, as the old localization seed held, and an inflict-condition aspect with the Stunned option and a
-Resilience resistance; stored values: `.superpowers/sdd/test-suite-rewrite/phase-2/review-measure-3.log`, `spell aspects`), `armor`, `shield`,
-`equipment`, `commodity`; `effectHost` (a player that holds only the two effects) with `effect` and `conditionalEffect`
-(permanent, one conditional dice modifier); `roller` (a player owning copies of the shared weapon, spell and ability,
-dragged onto its sheet); `situationalActor` (a player owning an ability with a conditional dice +2, a conditional
-Advantage and a conditional dice +1 situation); `bulkActor` (`BULK_COUNT` = 12 abilities, an equipment with 12
-checks and an effect with 12 rules elements; measured at every tested zoom in
-`.superpowers/sdd/test-suite-rewrite/phase-3/entry-count-measure-12.log` (local): the Abilities tab has 225 px
-to scroll at the least, the Checks tab 3934 px and the rules elements list 1378 px; the build took 69.1 s with 30
-entries of each in one run (`.superpowers/sdd/test-suite-rewrite/phase-2/review-measure-1.log`, `build bulkActor`),
-so its first consumer, the browser zoom describe of `character-sheet-layout.spec.js`, raises its own timeout);
-`scene` (created and viewed); `trayPack` (an unlocked `ActiveEffect` pack holding one effect).
-`playwright.config.mjs` sets `use.actionTimeout` to 10 s (its comment cites the slow-operation files of the runs that
-measured the longest action), so a flow that waits on a missing element fails after 10 s; a wait that legitimately takes
-longer passes its own timeout.
-`tests/e2e/global-teardown.js` (Playwright `globalTeardown`) launches one Chromium, logs in as `E2E GM 1`, asserts the
-census world and in order deletes the list through the API (combats; tokens by their scene; scenes; embedded
-documents by their parent; world actors, items, macros, roll tables, journal entries, playlists, cards, folders; recorded
-pack documents whose pack is not recorded, unlocked for the deletion and locked again; world compendia after
-unlocking), clears each recorded hotbar slot that still
-holds its recorded macro (`user.assignHotbarMacro(null, slot)`: deleting a Macro does not clear its slot, which lives on
-the User), deletes every chat message with `timestamp >= runStartedAt`, restores each recorded world setting, runs
-`sweepWorld` (its per-kind counts are printed; they are not a failure in Phases 1-5) and `takeCensus` (which must be
-all zero or the run fails), prints one `e2e teardown (...)` JSON line and, only after the census is zero, resets the list
-(a failed teardown leaves the list for the next `global-setup.js` to retry; shown by forcing a non-zero census).
-`global-setup.js` runs the same `tearDownAndReport` over a list that still shows a run in flight or holds entries (a crashed run), then `startRun()`
-before the probe build. `settings.js` `setWorldSetting` records the prior value before it writes; `setClientSetting` and a
-`game.settings.set` made directly in a spec are not recorded. A client-scope setting lives in the browser context that
+of an item's or effect's sheet header), `typeChatMessage` (types into the chat input and presses Enter),
+`openCreateMacroDialog` (drags an owned item's row onto the first empty slot of the core hotbar, which the
+`showFoundryHotbar` client setting must show), `createItemMacro` (that drag, the Create Macro dialog and its button; the
+macro and its slot are recorded for the teardown) and `runHotbarMacro` (a click on the slot). The creation dialogs are
+`DialogV2` forms whose content lacks the template's `form#document-create` id, so the flows find them by
+`dialog.application.dialog` with the `.dialog-content` fields. A flow opens the sheet it drives with `openSheetByUuid`
+and clicks its tabs inside that sheet (`openTab`), so another open TITAN sheet's tab strip is never clicked; the
+Standard Aspects tab and the sidebar both use the class `aspect`, so the flow looks inside `.standard-aspects-tab`. A
+TitanDialog id carries a generated suffix (`[id^="add-inventory-item-dialog-<actorId>"]`). A document's sheet instance
+keeps its last tab, so a shared fixture's sheet can come up on the tab a flow last used; a test that needs a tab opens
+it. `shared(page, key)` and `sharedUuid(page, key)` (the uuid, for `openSheetByUuid` and `fromUuid`) serve
+`SHARED_FIXTURES`: `player`, `npc`, the seven world items `weapon`, `ability` (one check), `spell` (the Void custom
+trait; a range aspect of 10 and a rounds-scaling duration aspect, as the old localization seed held, and an
+inflict-condition aspect with the Stunned option and a Resilience resistance; stored values:
+`.superpowers/sdd/test-suite-rewrite/phase-2/review-measure-3.log`, `spell aspects`), `armor`, `shield`, `equipment`,
+`commodity`; `effectHost` (a player that holds only the two effects) with `effect` and `conditionalEffect` (permanent,
+one conditional dice modifier); `roller` (a player owning copies of the shared weapon, spell and ability, dragged onto
+its sheet); `situationalActor` (a player owning an ability with a conditional dice +2, a conditional Advantage and a
+conditional dice +1 situation); `bulkActor` (`BULK_COUNT` = 12 abilities, an equipment with 12 checks and an effect with
+12 rules elements; measured at every tested zoom in
+`.superpowers/sdd/test-suite-rewrite/phase-3/entry-count-measure-12.log` (local): the Abilities tab has 225 px to scroll
+at the least, the Checks tab 3934 px and the rules elements list 1378 px; the build took 69.1 s with 30 entries of each
+in one run (`.superpowers/sdd/test-suite-rewrite/phase-2/review-measure-1.log`, `build bulkActor`), so its first
+consumer, the browser zoom describe of `character-sheet-layout.spec.js`, raises its own timeout); `scene` (created and
+viewed); `trayPack` (an unlocked `ActiveEffect` pack holding one effect). `playwright.config.mjs` sets
+`use.actionTimeout` to 10 s (its comment cites the slow-operation files of the runs that measured the longest action),
+so a flow that waits on a missing element fails after 10 s; a wait that legitimately takes longer passes its own
+timeout. `tests/e2e/global-teardown.js` (Playwright `globalTeardown`) launches one Chromium, logs in as `E2E GM 1`,
+asserts the census world and in order deletes the list through the API (combats; tokens by their scene; scenes; embedded
+documents by their parent; world actors, items, macros, roll tables, journal entries, playlists, cards, folders;
+recorded pack documents whose pack is not recorded, unlocked for the deletion and locked again; world compendia after
+unlocking), clears each recorded hotbar slot that still holds its recorded macro (`user.assignHotbarMacro(null, slot)`:
+deleting a Macro does not clear its slot, which lives on the User), deletes every chat message with
+`timestamp >= runStartedAt`, restores each recorded world setting, runs `sweepWorld` (its per-kind counts are printed;
+they are not a failure in Phases 1-5) and `takeCensus` (which must be all zero or the run fails), prints one
+`e2e teardown (...)` JSON line and, only after the census is zero, resets the list (a failed teardown leaves the list
+for the next `global-setup.js` to retry; shown by forcing a non-zero census). `global-setup.js` runs the same
+`tearDownAndReport` over a list that still shows a run in flight or holds entries (a crashed run), then `startRun()`
+before the probe build. `settings.js` `setWorldSetting` records the prior value before it writes; `setClientSetting` and
+a `game.settings.set` made directly in a spec are not recorded. A client-scope setting lives in the browser context that
 set it (measured: a value set in one context read its default in another context and in another browser), so it ends
 with its context and needs no restore.
 

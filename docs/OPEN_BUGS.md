@@ -182,9 +182,8 @@ The Phase 4 evidence files named here are in `.superpowers/sdd/test-suite-rewrit
 
 - **What:** in one full e2e run `condition-description.spec.js` "with no scene active, the fixture token is placed on a
   fully drawn fallback scene" (now the last test of `combat-turns.spec.js`) failed at line 343 of the former file: after
-  a right-click on the placed
-  token, `#token-hud` was not found within 5 s (`e2e-full-fix.clean.txt`, failure 1). That run used the former
-  `condition-description.spec.js`, which is deleted.
+  a right-click on the placed token, `#token-hud` was not found within 5 s (`e2e-full-fix.clean.txt`, failure 1). That
+  run used the former `condition-description.spec.js`, which is deleted.
 - **Not reproduced (Part B):** 0 failures in 3 isolated runs of the file (`cd-fix-1.log` to `cd-fix-3.log`), in 20
   further runs of the file (`reverify-run-1.log` to `-10.log`, `reverify2-run-1.log` to `-10.log`) and in 5 full runs
   (`e2e-r2-1.log`, `e2e-r2-gate-1.log`, `-2.log`, `e2e-r2b-gate-1.log`, `-2.log`); its 10 s scrolling-text wait was

@@ -717,8 +717,8 @@ when fixed.
 - **What:** `DocumentSheetV2._onRender` disables every form control present at render when the viewer cannot edit, which
   included the tab strips and expand toggles; the item-row expand toggle was also a `DocumentOwnerButton`.
 - **Fixed:** 2026-09-26 — `TitanDocumentSheet._toggleDisabled` re-enables controls in `[data-view-controls]` containers.
-  Gated by `tests/e2e/ownership.spec.js` "an observer can switch character and item sheet tabs and expand rows, but
-  not edit".
+  Gated by `tests/e2e/ownership.spec.js` "an observer can switch character and item sheet tabs and expand rows,
+  but not edit".
 
 ### 58. Character sidebar section labels touched their contents
 
@@ -2068,8 +2068,7 @@ The evidence files named here are in `.superpowers/sdd/test-suite-rewrite/bug-11
   migration work would count as a migration failure in later specs (#105).
 - **Found:** 2026-10-01 by an orphan census after the Task 5 fix round 3 full e2e (654 passed).
 - **Fixed:** 2026-10-07 by the conversion of the player-hud specs to real flows (test-suite rewrite, Phase 5 Part A).
-  The
-  spec is deleted; `player-hud.spec.js` places its tokens with `placeToken`, which records each token on the running
+  The spec is deleted; `player-hud.spec.js` places its tokens with `placeToken`, which records each token on the running
   list, and the suite-end teardown deletes the tokens of every scene and sweeps orphans.
 - **Gate:** the teardown line of the final full run (`phase-5/b/e2e-full-b2.log`; 645 passed in 14.7 m) reports
   `"orphanTokens":0` in its sweep and in its census, and the census counts 0 of every document class. That run's
@@ -2081,8 +2080,8 @@ The evidence files named here are in `.superpowers/sdd/test-suite-rewrite/bug-11
 
 - **What:** `TitanActor#getCombatant` called `game.combat?.getCombatantByActor(this.id)`. Foundry logs a deprecation
   warning for it (deprecated since v14, removed in v15). The call passed `this.id`; for a token's synthetic actor that
-  is the base actor's id (read), the same identity pattern as #104. Whether it found the wrong combatant was not
-  measured.
+  is the base actor's id (read), the same identity pattern as #104. Whether it found the wrong
+  combatant was not measured.
 - **Measured before the fix:** with the deprecation listener of `combat-turns.spec.js` attached to all three clients,
   the warning `Combat#getCombatantByActor is deprecated` was logged on E2E GM 1 from `getCombatant` <-
   `_getInitialDocumentData` <- `onPreCreate` (read: the Active Effect data model's initiative capture,
@@ -2104,8 +2103,7 @@ The evidence files named here are in `.superpowers/sdd/test-suite-rewrite/bug-11
 ### 139. The Create Macro dialog showed an item's attacks and checks as `LOCAL.Attack (1).text`
 
 - **What:** the Attack and Check selects of `CreateItemMacroDialogShell.svelte` passed their option text, built from the
-  attack or check label and its position, through localization, so a weapon's attack listed as
-  `LOCAL.Attack (1).text`.
+  attack or check label and its position, through localization, so a weapon's attack listed as `LOCAL.Attack (1).text`.
 - **Found:** 2026-10-07 by the last test of `macros.spec.js` while it was written (test-suite rewrite, Phase 5 Part B).
 - **Measured before the fix:** that test failed on "the dialog shows no untranslated text"
   (`phase-5/b/gate-macro-label-before-fix.log`).

@@ -269,8 +269,10 @@ unstarted (`phase-5/b/leftover-combat-probe-2.log`: `game.combat` is the unstart
 
 `test-titan` held a combat created on 2026-06-18 (four combatants, no scene) that no spec made. The suite's
 `createCombat` changed it: its `modified` time equalled the suite-made combat's to the millisecond
-(`leftover-combat-probe-2.log`: 1791417134060 on both), it read `active: false` while the suite's combat existed, and
-`active: true` in a probe after the teardown. Inferred, not measured: core deactivates the previously active combat when
-a new one is activated and activates another when the active one is deleted. On the user's instruction of 2026-10-07 it
-was deleted (the only combat in the world; backup `phase-5/b/combats-backup-2026-10-08T03-10-48-197Z.json`,
-`delete-old-combats.log`). The census still has no Combat class (`docs/TODO.md`).
+(`leftover-combat-probe-2.log`: 1791417134060 on both) and it read `active: false` while the suite's combat existed.
+Read: `"active": true` at line 123 of `phase-5/b/combats-backup-2026-10-08T03-10-48-197Z.json`, the `toObject()` the
+delete script saved when it read the combat, before the delete. Inferred, not measured: core deactivates the previously
+active combat when a new one is activated and activates another when the active one is deleted. On the user's
+instruction of 2026-10-07 it was deleted (the only combat in the world; backup
+`phase-5/b/combats-backup-2026-10-08T03-10-48-197Z.json`, `delete-old-combats.log`). The census still has no Combat
+class (`docs/TODO.md`).
