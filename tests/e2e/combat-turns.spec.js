@@ -601,6 +601,43 @@ test.describe('turn reports', () => {
       await endCombat(gm);
    });
 
+   test('a turn message rules element posts its message in the turn-start report', async () => {
+      /** @type {string} The text typed into the Turn Message element's editor. */
+      const text = 'E2E turn message text';
+      await makeCharacter('messenger', [
+         {
+            name: 'E2E Turns Message',
+            elements: [
+               {
+                  operation: 'turnMessage',
+                  selector: 'turnStart',
+                  message: text,
+               },
+            ],
+         },
+      ], false);
+      await closeAllApps(gm);
+      await startEncounter('messenger');
+
+      /** @type {number} The number of messages before the turn. */
+      const baseline = await gm.evaluate(() => game.messages.size);
+      await nextTurn(gm);
+
+      /** @type {string} The turn start report's id. */
+      const id = await expectReport(baseline, 'turnStartReport');
+
+      // The card shows the message (the positive edge) before the stored report is compared.
+      /** @type {import('@playwright/test').Locator} The report's message entries. */
+      const messages = gm.locator(`#chat .message[data-message-id="${id}"] .report .messages .message`);
+      await expect(messages).toHaveCount(1);
+      await expect(messages.first()).toContainText(text);
+      expect(
+         await gm.evaluate((id) => game.messages.get(id).system.toObject().message.length, id),
+         'the report stores the one message',
+      ).toBe(1);
+      await endCombat(gm);
+   });
+
    test('the end of a turn posts a turnEndReport card', async () => {
       await setResource(gm, cast.healer.uuid, 'stamina', 0);
       await startEncounter('healer');
