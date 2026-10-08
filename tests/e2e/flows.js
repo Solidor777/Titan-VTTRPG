@@ -1847,23 +1847,119 @@ export async function deleteAttack(page, weaponUuid, index = 0) {
 }
 
 /**
- * Creates a blank effect in an editable effect pack with the Effect Tray's create button and renames it in the sheet
- * the create opens.
+ * Opens the Effect Tray's sidebar tab and selects a pack in its pack select.
+ * @param {import('@playwright/test').Page} page - A logged-in GM page.
+ * @param {string} packId - The pack's collection id.
+ * @returns {Promise<import('@playwright/test').Locator>} The tray's root element.
+ */
+export async function openTrayPack(page, packId) {
+   await openSidebarTab(page, 'titanEffects');
+   await page.locator('[data-testid="effect-tray-pack-select"]').selectOption(packId);
+   await expect.poll(
+      () => page.evaluate(() => game.settings.get('titan', 'effectTrayLastPack')),
+      { message: 'the pack select stored the chosen pack' },
+   ).toBe(packId);
+   return page.locator('[data-testid="effect-tray"]');
+}
+
+/**
+ * Creates a folder in an editable effect pack with the Effect Tray's Create Folder button (or an expanded folder's
+ * create-folder control, for a subfolder) and renames it with the folder context menu's Rename Folder entry.
+ * @param {import('@playwright/test').Page} page - A logged-in GM page.
+ * @param {string} packId - The pack's collection id; the pack is an unlocked `ActiveEffect` pack.
+ * @param {string} name - The name to give the folder.
+ * @param {object} [options] - Optional settings.
+ * @param {string} [options.parentId] - The id of the folder that receives the new folder; omitted for the pack root.
+ * @returns {Promise<string>} The folder's id.
+ */
+export async function createTrayFolder(page, packId, name, { parentId } = {}) {
+   await openTrayPack(page, packId);
+
+   /** @type {string[]} The ids of the pack's folders before the create. */
+   const before = await page.evaluate((packId) => game.packs.get(packId).folders.map((folder) => folder.id), packId);
+   if (parentId === undefined) {
+      await page.locator('[data-testid="effect-tray-new-folder"]').click();
+   }
+   else {
+      /** @type {import('@playwright/test').Locator} The parent folder's item. */
+      const parent = page.locator(`[data-testid="effect-tray-folder"][data-folder-id="${parentId}"]`);
+      if (!(await parent.evaluate((element) => element.classList.contains('expanded')))) {
+         await parent.locator(':scope > [data-testid="effect-tray-folder-header"]').click();
+      }
+      await parent.locator(':scope > [data-testid="effect-tray-folder-header"]')
+         .locator('[data-testid="effect-tray-folder-create-folder"]')
+         .click();
+   }
+
+   /** @type {string[]} The ids that appeared in the pack. */
+   let added = [];
+   await expect.poll(async () => {
+      added = await page.evaluate(
+         ({ packId, before }) => game.packs.get(packId).folders
+            .filter((folder) => !before.includes(folder.id))
+            .map((folder) => folder.id),
+         {
+            packId,
+            before,
+         },
+      );
+      return added.length;
+   }, { message: 'the tray created one folder in the pack' }).toBe(1);
+   await settle(page);
+   const [id] = added;
+   record({
+      documentName: 'Folder',
+      id,
+      packId,
+      createdBy: currentSpec(),
+   });
+
+   // The folder context menu's Rename Folder entry swaps the name for an input, which Enter commits.
+   /** @type {import('@playwright/test').Locator} The new folder's header. */
+   const header = page.locator(`[data-testid="effect-tray-folder"][data-folder-id="${id}"]`)
+      .locator(':scope > [data-testid="effect-tray-folder-header"]');
+   await header.click({ button: 'right' });
+   await chooseContextMenuEntry(page, page.locator('#context-menu li.context-item', { hasText: 'Rename Folder' }));
+
+   /** @type {import('@playwright/test').Locator} The inline rename input. */
+   const input = header.locator('[data-testid="effect-tray-folder-rename"]');
+   await input.fill(name);
+   await input.press('Enter');
+   await expect.poll(
+      () => page.evaluate(({ packId, id }) => game.packs.get(packId).folders.get(id).name, {
+         packId,
+         id,
+      }),
+      { message: 'the inline rename stored the folder name' },
+   ).toBe(name);
+   await settle(page);
+   return id;
+}
+
+/**
+ * Creates a blank effect in an editable effect pack with the Effect Tray's create button (or a folder's create-effect
+ * control) and renames it in the sheet the create opens.
  * @param {import('@playwright/test').Page} page - A logged-in GM page.
  * @param {string} packId - The pack's collection id; the pack is an unlocked `ActiveEffect` pack.
  * @param {string} name - The name to give the effect.
+ * @param {object} [options] - Optional settings.
+ * @param {string} [options.folderId] - The id of the folder that receives the effect; omitted for the pack root.
  * @returns {Promise<string>} The effect's id.
  */
-export async function createTrayEffect(page, packId, name) {
-   await openSidebarTab(page, 'titanEffects');
-   await page.locator('[data-testid="effect-tray-pack-select"]').selectOption(packId);
+export async function createTrayEffect(page, packId, name, { folderId } = {}) {
+   await openTrayPack(page, packId);
 
    /** @type {string[]} The ids the pack's index holds before the create. */
    const before = await page.evaluate(
       async (packId) => (await game.packs.get(packId).getIndex()).map((entry) => entry._id),
       packId,
    );
-   await page.locator('[data-testid="effect-tray-new"]').click();
+   await (folderId === undefined
+      ? page.locator('[data-testid="effect-tray-new"]')
+      : page.locator(`[data-testid="effect-tray-folder"][data-folder-id="${folderId}"]`)
+         .locator(':scope > [data-testid="effect-tray-folder-header"]')
+         .locator('[data-testid="effect-tray-folder-create-effect"]'))
+      .click();
 
    /** @type {string[]} The ids that appeared in the pack. */
    let added = [];
