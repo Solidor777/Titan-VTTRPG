@@ -1256,14 +1256,11 @@ export async function addRulesElement(page, documentUuid, element) {
    const sheet = await openSheetByUuid(page, documentUuid);
 
    /** @type {number} The number of rules elements before the add. */
-   const before = await page.evaluate(
-      async (uuid) => (await fromUuid(uuid)).system.rulesElement.length,
-      documentUuid,
-   );
+   const before = (await readServerSystem(page, documentUuid)).rulesElement.length;
    await openTab(sheet, 'Rules Elements');
    await sheet.locator('.add-entry-button button').click();
    await expect.poll(
-      () => page.evaluate(async (uuid) => (await fromUuid(uuid)).system.rulesElement.length, documentUuid),
+      async () => (await readServerSystem(page, documentUuid)).rulesElement.length,
       { message: 'the add button created one rules element' },
    ).toBe(before + 1);
    await settle(page, { transitions: true });
@@ -2719,9 +2716,9 @@ export const SHARED_FIXTURES = {
 /**
  * Reads the system data the server holds for a document. A client's own document carries an edit made through a bound
  * control before any update reaches the database, so a read through `fromUuid` cannot tell a saved edit from an unsaved
- * one; this asks the server (a read, not a document change). The server returns every sibling of an embedded
- * document for its query (measured: the first of two owned items came back for the second's id), so the result is
- * picked by id.
+ * one; this asks the server (a read, not a document change). For an embedded document the query returned the first
+ * sibling's data in place of the requested document's (probe-two.json: the second of two owned abilities, whose local
+ * rules elements were empty, read the first ability's element), so the result is picked by id.
  * @param {import('@playwright/test').Page} page - A logged-in page.
  * @param {string} uuid - The uuid of a world or embedded document.
  * @returns {Promise<object>} The document's stored `system` data.

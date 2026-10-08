@@ -1044,7 +1044,8 @@ that edits one restores the field through the same control or uses a per-test do
 <Type>`. `tests/e2e/flows.js` has one exported async function per flow; each drives the DOM like a user, reads the id of
 what it made from the DOM or a read-only API call, records it and returns it; it never creates, updates or deletes a
 document through the API. `readServerSystem(page, uuid)` reads the `system` data the server stores for a document
-(`CONFIG.DatabaseBackend.get`, picked by id because the server returns every sibling of an embedded document). A read
+(`CONFIG.DatabaseBackend.get`, picked by id: for an embedded document the first result held another sibling's data in
+one probe, `task-9-logs/fix1/probe-two.json`, local; that the server returns every sibling is inferred from it). A read
 through `fromUuid` returns the client's own document, which holds an edit made through a bound control before any update
 reaches the database (measured: with the condition picker's `onchange` made a no-op, `fromUuid` read the new key while
 the server held the old one, `task-9-logs/fix1/probe-mutant-server.json`, local), so a test that asserts a control saved
@@ -1174,12 +1175,13 @@ the teardown's own login raised an error, when the sweep deleted anything (the e
 document no flow recorded; shown with an unregistered `E2E ` actor made before a run, `phase-6/sweep-gate-fail.log`), or
 when the census is not all zero. Only after the sweep and the census are zero does it reset the list; a failed teardown
 leaves the list for the next `global-setup.js` to retry (shown by forcing a non-zero census). A sweep failure that
-follows a failing test is not a product failure: the worker restart re-runs the file's `beforeAll`, whose flow stops
-before it records the document it was making, and the sweep then deletes that document (observed: an actor swept after a
-mutated test failed, `task-9-logs/mutations/F1-never-suppressed-run.log`, local; the cause is inferred from the restart
-behaviour above). `global-setup.js` runs the same `tearDownAndReport` over a list that still shows a run in flight or
-holds entries (a crashed run), then `startRun()`, then builds the probe bundle and the fast-check bundle into
-`test/build/`.
+follows a failing test can come from the worker restart: the file's `beforeAll` runs again and its flow finds the
+document the first run made (measured: the second run's `createScene` locator resolved to 2 directory entries, and the
+sweep then deleted a scene no flow recorded, `task-9-logs/fix1/mutations/G1-turn-path-skips-suppressed-run.log`, local).
+It can also be a real leak of a document no flow recorded, so the log is read for which kind and name the sweep deleted
+before the failure is put down to the restart. `global-setup.js` runs the same `tearDownAndReport` over a list that
+still shows a run in flight or holds entries (a crashed run), then `startRun()`, then builds the probe bundle and the
+fast-check bundle into `test/build/`.
 
 **E2E settings.** `settings.js` `setWorldSetting` records the prior value of a world-scope setting on the list before it
 writes, and the teardown restores it; `setClientSetting` and a `game.settings.set` made directly in a spec are not

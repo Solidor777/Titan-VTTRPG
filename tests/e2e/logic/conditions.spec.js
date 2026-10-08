@@ -834,32 +834,45 @@ test.describe('conditions — immunity', () => {
 
    test('an ability that grants the immunity suppresses Contaminated, which returns when the ability is deleted',
       async () => {
+         /** @type {boolean} Whether deleting an item asks for confirmation, restored when the test ends. */
+         const confirmDeleting = await page.evaluate(() => game.settings.get('titan', 'confirmDeletingItems'));
          await setClientSetting(page, 'confirmDeletingItems', false);
 
          /** @type {string} The id of the ability that will grant the immunity. */
          const abilityId = await createOwnedItem(page, actorId, 'ability', 'E2E Immunity Ability');
-         await applyConditions(['contaminated']);
-         expect(await readContaminated()).toEqual({
-            active: true,
-            held: true,
-         });
-
-         await addRulesElement(page, `${actorUuid}.Item.${abilityId}`, {
-            key: 'contaminated',
-            operation: 'immunity',
-            selector: 'condition',
-         });
-         await expect.poll(readContaminated, { message: 'the ability grants it: the status is gone' }).toEqual({
-            active: false,
-            held: true,
-         });
-
-         await deleteOwnedItem(page, actorUuid, 'Abilities', `${actorUuid}.Item.${abilityId}`);
-         await expect.poll(readContaminated, { message: 'the ability is gone: Contaminated is a status again' })
-            .toEqual({
+         /** @type {string} The uuid of that ability. */
+         const abilityUuid = `${actorUuid}.Item.${abilityId}`;
+         try {
+            await applyConditions(['contaminated']);
+            expect(await readContaminated()).toEqual({
                active: true,
                held: true,
             });
+
+            await addRulesElement(page, abilityUuid, {
+               key: 'contaminated',
+               operation: 'immunity',
+               selector: 'condition',
+            });
+            await expect.poll(readContaminated, { message: 'the ability grants it: the status is gone' }).toEqual({
+               active: false,
+               held: true,
+            });
+
+            await deleteOwnedItem(page, actorUuid, 'Abilities', abilityUuid);
+            await expect.poll(readContaminated, { message: 'the ability is gone: Contaminated is a status again' })
+               .toEqual({
+                  active: true,
+                  held: true,
+               });
+         }
+         finally {
+            // A failed test must not leave the ability's immunity on the actor for the tests after it.
+            if (await page.evaluate((uuid) => fromUuid(uuid).then((item) => item !== null), abilityUuid)) {
+               await deleteOwnedItem(page, actorUuid, 'Abilities', abilityUuid);
+            }
+            await setClientSetting(page, 'confirmDeletingItems', confirmDeleting);
+         }
       });
 
    test('two effects each immune to the other are both suppressed', async () => {

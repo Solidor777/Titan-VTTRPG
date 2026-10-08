@@ -7,6 +7,7 @@ import {
    addRulesElement,
    createActor,
    createWorldItem,
+   readServerSystem,
 } from './flows.js';
 import { commitText, dragGrip } from './actions.js';
 import { clickRoll } from './checkDialog.js';
@@ -158,11 +159,11 @@ test.describe('an action helper returns with nothing in flight', () => {
          'conditionalCheckModifier',
       );
 
-      /** @type {{operation: string, pending: number}} The stored operation and the operations in flight. */
-      const read = await page.evaluate((id) => ({
-         operation: game.items.get(id).system.rulesElement[0].operation,
-         pending: globalThis.titanPending,
-      }), id);
+      /** @type {{operation: string, pending: number}} The server's stored operation and the operations in flight. */
+      const read = {
+         operation: (await readServerSystem(page, uuid)).rulesElement[0].operation,
+         pending: await page.evaluate(() => globalThis.titanPending),
+      };
       expect(read).toEqual({
          operation: 'conditionalCheckModifier',
          pending: 0,

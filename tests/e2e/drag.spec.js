@@ -13,6 +13,7 @@ import {
    createWorldItem,
    dragItemOntoSheet,
    openSidebarTab,
+   readServerSystem,
    shared,
 } from './flows.js';
 import { settle } from './settle.js';
@@ -155,22 +156,17 @@ test.afterAll(async () => {
 });
 
 /**
- * Reads the tokens of a list of an item from its stored data (see `LISTS`).
+ * Reads the tokens of a list of an item from the data the server stores (see `LISTS`).
  * @param {string} uuid - The uuid of the item.
  * @param {string} kind - A key of `LISTS`.
  * @returns {Promise<string[]>} The tokens of the list in stored order: a rules element's value, or an entry's label.
  */
-function readTokens(uuid, kind) {
-   return page.evaluate(async ({ uuid, kind }) => {
-      /** @type {object} The item's system data. */
-      const system = (await fromUuid(uuid)).system;
-      return kind === 'rulesElement'
-         ? system.rulesElement.map((entry) => String(entry.value))
-         : system[kind].map((entry) => entry.label);
-   }, {
-      uuid,
-      kind,
-   });
+async function readTokens(uuid, kind) {
+   /** @type {object} The item's stored system data. */
+   const system = await readServerSystem(page, uuid);
+   return kind === 'rulesElement'
+      ? system.rulesElement.map((entry) => String(entry.value))
+      : system[kind].map((entry) => entry.label);
 }
 
 /**
@@ -596,19 +592,13 @@ test.describe('copying a row between item sheets', () => {
    }
 
    /**
-    * Reads the stored list entries (the whole objects) of an item.
+    * Reads the list entries (the whole objects) the server stores for an item.
     * @param {string} uuid - The uuid of the item.
     * @param {string} property - The `system` property that holds the list.
     * @returns {Promise<object[]>} The entries in stored order.
     */
-   function readEntries(uuid, property) {
-      return page.evaluate(
-         async ({ uuid, property }) => foundry.utils.deepClone((await fromUuid(uuid)).system[property]),
-         {
-            uuid,
-            property,
-         },
-      );
+   async function readEntries(uuid, property) {
+      return (await readServerSystem(page, uuid))[property];
    }
 
    for (const [kind, property, sourceUuid, targetUuid] of [

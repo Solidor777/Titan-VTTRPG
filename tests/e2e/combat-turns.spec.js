@@ -854,6 +854,9 @@ test.describe('conditions and turn effects in a turn start report', () => {
 });
 
 test.describe('immunity and turn durations', () => {
+   // The turn-start and turn-end paths both call `_decreaseTurnEffectDuration`, so one filter serves both and a
+   // mutation of it fails both tests; the initiative path filters its effects in `onInitiativeAdvanced` and is
+   // mutated separately.
    for (const [duration, turns] of [
       [
          'turnStart',
