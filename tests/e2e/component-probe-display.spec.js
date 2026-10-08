@@ -5,14 +5,12 @@ import {
    unmountAll,
    clearProbeEvents,
    documentContext,
+   PAYLOAD,
    probeComponent,
    readProbeEvents,
 } from './componentProbe.js';
 import { selectTitanOption, readTitanSelectValue } from './select.js';
 import { closeAllApps, clearChat, attachPageErrors } from './world.js';
-
-/** @type {string} HTML whose image carries an event handler that sets a page flag when the image fails to load. */
-const PAYLOAD = '<p>E2E sanitized text</p><img src="e2e-missing-image.png" onerror="window.__titanXss = true">';
 
 /**
  * Reads a duration tag's tooltip and the text it should hold: the duration lead text, then the entry's description.

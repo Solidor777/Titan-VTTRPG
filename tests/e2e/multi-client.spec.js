@@ -11,7 +11,9 @@ import { withClients, awaitUsersActive } from './multiClient.js';
  */
 
 // Resolve system.json once in the Node process.
+/** @type {string} The directory of this spec file. */
 const HERE = dirname(fileURLToPath(import.meta.url));
+/** @type {string} The path of the system manifest. */
 const SYSTEM_JSON = resolve(HERE, '../../system.json');
 
 test.describe('multi-client harness', () => {

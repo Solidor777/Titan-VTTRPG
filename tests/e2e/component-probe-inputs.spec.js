@@ -744,7 +744,18 @@ const SELECT_CASES = [
 ];
 
 for (const selectCase of SELECT_CASES) {
-   const { component, options, testId, supportsNone, wrapperTestId, singleOption } = selectCase;
+   /** @type {string} The component's name in the probe registry. */
+   const component = selectCase.component;
+   /** @type {Array<string|number>} The options without `none`. */
+   const options = selectCase.options;
+   /** @type {string} The test id given to the mounted component. */
+   const testId = selectCase.testId;
+   /** @type {boolean} Whether the component has an `allowNone` prop. */
+   const supportsNone = selectCase.supportsNone;
+   /** @type {boolean} Whether the test id lands on a wrapper root. */
+   const wrapperTestId = selectCase.wrapperTestId;
+   /** @type {boolean|undefined} Whether the list holds one option. */
+   const singleOption = selectCase.singleOption;
    /** @type {string|number} The value the component starts on. */
    const first = options[0];
    /** @type {string|number} The option the change test selects: the second one, or `none` when there is one option. */

@@ -1,11 +1,8 @@
 import { expect, test } from './harness.js';
 import { login } from './fixtures.js';
-import { mountProbe, readProbeEvents, clearProbeEvents, unmountAll } from './componentProbe.js';
+import { mountProbe, PAYLOAD, readProbeEvents, clearProbeEvents, unmountAll } from './componentProbe.js';
 import { closeAllApps, clearChat, attachPageErrors } from './world.js';
 import selectDisplayedSpellAspects from '~/document/types/item/types/spell/SelectDisplayedSpellAspects.js';
-
-/** @type {string} HTML whose image carries an event handler that sets a page flag when the image fails to load. */
-const PAYLOAD = '<p>E2E sanitized text</p><img src="e2e-missing-image.png" onerror="window.__titanXss = true">';
 
 /** @type {string} The payload's image once cleaned: the same element without its handler. */
 const CLEAN_IMAGE = '<img src="e2e-missing-image.png">';

@@ -179,3 +179,6 @@ export async function unmountAll(page) {
       globalThis.game.titan._probe?.unmountAll();
    });
 }
+
+/** @type {string} HTML whose image carries an event handler that sets a page flag when the image fails to load. */
+export const PAYLOAD = '<p>E2E sanitized text</p><img src="e2e-missing-image.png" onerror="window.__titanXss = true">';
