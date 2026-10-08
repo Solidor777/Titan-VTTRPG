@@ -62,7 +62,8 @@ Completed items are deleted, not marked done.
   live gates in `docs/CLOSED_BUGS.md`, and #102 in `docs/OPEN_BUGS.md`.
 
   Status: in progress as `docs/superpowers/plans/2026-10-01-test-suite-real-data.md`. Phases 0 to 6 are
-  written (Phase 6 Part B awaits its review). Phases 7 and 8 remain (unit-test edits; documentation). #102 is re-evaluated on the new suite once it is done.
+  written (Phase 6 Part B is built and under review). Phases 7 and 8 remain (unit-test edits; documentation). #102 is
+  re-evaluated on the new suite once it is done.
 
 - Plan B Task 5 fix round 4, parked by the user on 2026-10-01 until the test-suite rewrite is done. The plan
   (`.superpowers/sdd/2026-09-29-conditions-rework/task-5-fix4-plan.md`, revision 2) and its unreconciled reviews

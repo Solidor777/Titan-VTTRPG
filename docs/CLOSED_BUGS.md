@@ -1036,17 +1036,17 @@ when fixed.
   content to tippy with `allowHTML: true`, and `RichText.svelte` passed its value to `enrichHTML` (which assigns it to
   a live element's `innerHTML`) and then `{@html}`, so a message author could run script in every reader's client.
 - **Found:** 2026-09-30 by the Task 5 buddy check (plan B).
-- **Fixed:** 2026-09-30 — `tooltipAction` cleans every non-blank tooltip with `foundry.utils.cleanHTML` (the cleaner
+- - **Fixed:** 2026-09-30 — `tooltipAction` cleans every non-blank tooltip with `foundry.utils.cleanHTML` (the cleaner
   core's TooltipManager applies) before tippy receives it, on creation and on update, and `RichText` cleans its value
   before `enrichHTML`. Gated, on synthetic props because a real flow cannot carry the handler into these sinks (read:
   `common/prosemirror/schema/attribute-capture.mjs:83-93` drops attributes that `ALLOWED_HTML_ATTRIBUTES` in
-  `common/constants.mjs` does not list, and that list has no event handlers), by `tests/e2e/component-probe-display.spec.js`
-  ('RichText HTML cleaning': a payload with an `onerror` image renders its text, the image keeps no handler and no page
-  flag is set) and `tests/e2e/component-probe-buttons-tags.spec.js` ('tooltip HTML cleaning': an `EffectTag` tooltip
-  holds core's cleaned HTML and renders it on a real hover with no handler, and a `Tag` tooltip keeps icon markup and
-  drops the handler), and by `tests/e2e/custom-traits.spec.js` ("a live tooltip updated to user HTML is cleaned on
-  update": the description is edited to the payload in the Edit dialog). The three probe tests fail when
-  `foundry.utils.cleanHTML` is replaced by the identity in the page before the mount
+  `common/constants.mjs` does not list, and that list has no event handlers), by
+  `tests/e2e/component-probe-display.spec.js` ('RichText HTML cleaning': a payload with an `onerror` image renders its
+  text, the image keeps no handler and no page flag is set) and `tests/e2e/component-probe-buttons-tags.spec.js`
+  ('tooltip HTML cleaning': an `EffectTag` tooltip holds core's cleaned HTML and renders it on a real hover with no
+  handler, and a `Tag` tooltip keeps icon markup and drops the handler), and by `tests/e2e/custom-traits.spec.js` ("a
+  live tooltip updated to user HTML is cleaned on update": the description is edited to the payload in the Edit dialog).
+  The three probe tests fail when `foundry.utils.cleanHTML` is replaced by the identity in the page before the mount
   (`.superpowers/sdd/test-suite-rewrite/phase-6/partB/mutations/M1-richtext-uncleaned-page-run.log`,
   `M2-tooltip-uncleaned-page-run.log`, `M2b-tag-uncleaned-page-run.log`). That replacement is a page-level stand-in for
   removing the two `cleanHTML` calls of `RichText.svelte` and `TooltipAction.js`; an edit of `RichText.svelte` itself
@@ -1058,10 +1058,13 @@ when fixed.
   every rules-element turn message rendered `enrichHTML(undefined)`, an empty string.
 - **Found:** 2026-09-30 by the Task 5 buddy check (plan B), by reading the code.
 - **Fixed:** 2026-09-30 — the component passes `value={message}`, together with #84 (the prop fix enables the rich-text
-  sink). The test that gated it was a turn-start report made by API whose message rendered its text. It
-  was replaced by the `RichText` probe of `tests/e2e/component-probe-display.spec.js` (synthetic `value`), which covers
-  `RichText`'s value handling and not the report component's prop wiring: `grep -rln turnMessage tests/e2e tests/unit`
-  finds no file, so no current test renders `ChatMessageRichTextMessages` (open question for the plan owner).
+  sink). Gated by `tests/e2e/combat-turns.spec.js` "a turn message rules element posts its message in the
+  turn-start report": a Turn Message element is typed into its editor on an ability, a combat is started with the Combat
+  Tracker flows, and the report card shows the message. With `ChatMessageRichTextMessages` passing `text` instead of
+  `value` that test fails (`.superpowers/sdd/test-suite-rewrite/phase-6/partB/mutations/M5-richtextprop-run.log`). The
+  test that gated it before was a turn-start report made by API; the `RichText` probe of
+  `tests/e2e/component-probe-display.spec.js` covers `RichText`'s value handling, not this wiring. Building the new test
+  found #144 and #145.
 
 ### 86. A two-way-bound prop whose parent bound an undefined value crashed with Svelte `props_invalid_value`
 
@@ -2195,4 +2198,41 @@ The evidence files named here are in `.superpowers/sdd/test-suite-rewrite/phase-
 - **Fixed:** 2026-10-08. `combat-turns.spec.js` creates its scene before the other clients join.
 - **Gate:** the spec run alone. Five runs after the fix passed (`scene-first/combat-turns-reordered-1.log` to `-4.log`,
   `drag-hunt2/combat-turns-rerun.log`); before it, 1 of 5 passed.
+- **Status:** Closed 2026-10-08.
+
+### 144. The message editor of a Turn Message or Roll Message rules element had no width when empty
+
+The evidence files named here are in `.superpowers/sdd/test-suite-rewrite/phase-6/partB/` (local, not checked in).
+
+- **What:** the rich-text editor of an empty Turn Message element measured 0 px wide and 150 px high
+  (`turnmessage-probe.log`), so its edit control could not be reached by hover or click; the Roll Message element's
+  editor measured the same (`rollmessage-probe.log`). The `.message` row of both settings components had no width.
+- **Found:** 2026-10-08 while writing the live turn-message test of #85 (the flow's hover on the editor timed out:
+  "element is not visible").
+- **Fixed:** 2026-10-08. `ItemSheetTurnMessageSettings.svelte` and `ItemSheetRollMessageSettings.svelte` give the
+  `.message` row `width: 100%`; both editors measure 414 px (`turnmessage-probe-after.log`,
+  `rollmessage-probe-after.log`).
+- **Gate:** `tests/e2e/combat-turns.spec.js` "a turn message rules element posts its message in the turn-start
+  report" types into the Turn Message editor through `addRulesElement`. The Roll Message editor has no test of its own.
+- **Status:** Closed 2026-10-08.
+
+### 145. A Turn Message or Roll Message typed into its editor was never saved to the document
+
+The evidence files named here are in `.superpowers/sdd/test-suite-rewrite/phase-6/partB/` (local, not checked in).
+
+- **What:** after a message was typed and saved in the editor of a Turn Message element, no item update was made in
+  1.5 s, the document's `_source` held no message and only the live `system` data did
+  (`turnmessage-persist-probe-3.log`); when the sheet closed the message was gone from the live data too
+  (`turnmessage-dbg4.log`, `D3`). The same editor on an item description did save (`description-persist-probe.log`).
+- **Found:** 2026-10-08 while writing the live turn-message test of #85 (a combat started with the element posted no
+  turn-start report, `turnmessage-dbg.log`).
+- **Cause (inferred from reading the component, not isolated):** `DocumentBoundEditorInput.svelte` saved through an
+  effect on its bound value. For a Turn Message the bound value is a property of the live document, which no reactive
+  state tracks, and the effect did not run (no update was made); the item description saved through the same
+  component.
+- **Fixed:** 2026-10-08. `ProseMirrorEditor.svelte` takes an `onchange` callback that it calls after writing a committed
+  edit to the bound value, and `DocumentBoundEditorInput.svelte` saves in that callback instead of in the effect.
+- **Gate:** the same test; its flow waits for the message in the document's `_source`. With the callback made a no-op
+  the test fails at that wait (`mutations/M6-editor-persist-run.log`; restore build `M6-restore-build.log`, source
+  diff checked).
 - **Status:** Closed 2026-10-08.

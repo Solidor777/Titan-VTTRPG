@@ -842,63 +842,57 @@ uuid, expectedSelector, errors)` (opens by uuid, asserts the frame class, flushe
 collector is empty; see the shared-world harness below). Drives the real built system at
 the repo root, so it catches v14 API breaks that the mocked Vitest tier cannot.
 
-**Shared-world E2E harness (one world boot per FILE)** — every eligible spec boots the world ONCE per
-file, not per test. The pattern: module-scoped `let page; let errors;` plus three inline lifecycle hooks
-at module scope — `test.beforeAll(async ({ browser }) => { page = await browser.newPage(); errors =
-attachPageErrors(page); await login(page); await clearChat(page); })`, `test.afterEach(async () => { await
-closeAllApps(page); errors.length = 0; })`, and `test.afterAll(async () => { await page?.close(); })`.
-Tests and `beforeEach`/`afterEach` hooks are `async () =>` (no `{ page }` fixture destructure) and use the
-closure `page`. The helpers live in `tests/e2e/world.js`: `closeAllApps(page)` closes transient apps
-(sheets/dialogs/HUDs) but DELIBERATELY KEEPS three classes of app — (1) core UI singletons (those held on
-`ui[key]` for each `key in CONFIG.ui` — `Sidebar`, `ChatLog`, `Hotbar`, the `titanEffects` tray, …);
-closing them tears down DOM that the sidebar tab-switch lifecycle depends on and crashes any later
-sidebar-activating test; (2) nested sub-apps OWNED by a kept singleton — any app whose `options.directory`
-is in the keep-set (the v14 `PlaceableDirectory` caches per-type `PlaceableTab` apps constructed with
-`{ directory: ui.placeables }`; closing one detaches the element its owner re-queries on every later
-render, so each subsequent token create/delete crashes `PlaceableDirectory#_renderTab` with a
-`null.replaceWith` TypeError); and (3) the canvas HUD container (`canvas.hud`, element id `hud` — NOT in
-`CONFIG.ui`): it renders only during canvas draw, and `BasePlaceableHUD#_insertElement` and `ChatBubbles`
-re-query its DOM with no null guard, so closing it crashes the first later test that opens a token HUD or
-emits a chat bubble.
-Because every sidebar tab is mounted (hidden) from ready, the Effects tray's `[data-effect-id]` rows (root
-effects and those in expanded folders) precede any sheet in document order; sheet row locators are therefore always
-scoped to the open sheet — `page.locator('.application.titan-document-sheet [data-item-id]')` /
-`[data-effect-id]` — never bare `page.locator('[data-…-id]')`.
-`clearChat(page)` deletes all chat messages in `beforeAll` (per-file world reset — keeps the world lean so
-GM→player socket replication does not time out). `attachPageErrors(page)` wires ONE `pageerror` listener
-and returns the shared `errors` array; per-test `page.on('pageerror', …)` is banned (it would stack on the
-reused page) — fold any per-test error assertion onto the shared `errors`, which is reset each `afterEach`.
-A `pageerror` never includes a hook listener's throw: core's `Hooks.#call` catches it and passes it to
-`Hooks.onError`, which logs it and calls the `error` hook only when the thrown value is an `Error`
-(`Error.isError`); a thrown non-`Error` value is logged by `Hooks.#call` as a console warning and reported nowhere, so
-no harness sees it (Foundry 14.364 `client/helpers/hooks.mjs:158-168, 182-188`). `world.js`
+**Shared-world E2E harness (one world boot per FILE)** — every eligible spec boots the world ONCE per file, not per
+test. The pattern: module-scoped `let page; let errors;` plus three inline lifecycle hooks at module scope —
+`test.beforeAll(async ({ browser }) => { page = await browser.newPage(); errors = attachPageErrors(page); await
+login(page); await clearChat(page); })`, `test.afterEach(async () => { await closeAllApps(page); errors.length = 0; })`,
+and `test.afterAll(async () => { await page?.close(); })`. Tests and `beforeEach`/`afterEach` hooks are `async () =>`
+(no `{ page }` fixture destructure) and use the closure `page`. The helpers live in `tests/e2e/world.js`:
+`closeAllApps(page)` closes transient apps (sheets/dialogs/HUDs) but DELIBERATELY KEEPS three classes of app — (1) core
+UI singletons (those held on `ui[key]` for each `key in CONFIG.ui` — `Sidebar`, `ChatLog`, `Hotbar`, the `titanEffects`
+tray, …); closing them tears down DOM that the sidebar tab-switch lifecycle depends on and crashes any later
+sidebar-activating test; (2) nested sub-apps OWNED by a kept singleton — any app whose `options.directory` is in the
+keep-set (the v14 `PlaceableDirectory` caches per-type `PlaceableTab` apps constructed with `{ directory: ui.placeables
+}`; closing one detaches the element its owner re-queries on every later render, so each subsequent token create/delete
+crashes `PlaceableDirectory#_renderTab` with a `null.replaceWith` TypeError); and (3) the canvas HUD container
+(`canvas.hud`, element id `hud` — NOT in `CONFIG.ui`): it renders only during canvas draw, and
+`BasePlaceableHUD#_insertElement` and `ChatBubbles` re-query its DOM with no null guard, so closing it crashes the first
+later test that opens a token HUD or emits a chat bubble. Because every sidebar tab is mounted (hidden) from ready, the
+Effects tray's `[data-effect-id]` rows (root effects and those in expanded folders) precede any sheet in document order;
+sheet row locators are therefore always scoped to the open sheet — `page.locator('.application.titan-document-sheet
+[data-item-id]')` / `[data-effect-id]` — never bare `page.locator('[data-…-id]')`. `clearChat(page)` deletes all chat
+messages in `beforeAll` (per-file world reset — keeps the world lean so GM→player socket replication does not time out).
+`attachPageErrors(page)` wires ONE `pageerror` listener and returns the shared `errors` array; per-test
+`page.on('pageerror', …)` is banned (it would stack on the reused page) — fold any per-test error assertion onto the
+shared `errors`, which is reset each `afterEach`. A `pageerror` never includes a hook listener's throw: core's
+`Hooks.#call` catches it and passes it to `Hooks.onError`, which logs it and calls the `error` hook only when the thrown
+value is an `Error` (`Error.isError`); a thrown non-`Error` value is logged by `Hooks.#call` as a console warning and
+reported nowhere, so no harness sees it (Foundry 14.364 `client/helpers/hooks.mjs:158-168, 182-188`). `world.js`
 `installHookErrorReporting(page)` runs before the first navigation: an init script registers an `error` hook listener
-the moment core assigns the `Hooks` global (`client/client.mjs` assigns it through `Object.assign(globalThis, …)`,
-which calls the script's setter), and an exposed binding pushes each report, as `Hooks.onError (<location>):
-<message>`, into every array `attachPageErrors` returned for that page. The binding is asynchronous, so the document
-also counts its reports; `flushHookErrorReports(page)` waits until the delivered count matches.
-**Harness gate (every test, every world page).** Every spec imports `expect` and `test` from `tests/e2e/harness.js`,
-never from `@playwright/test` (the gate runs only through `harness.js`'s `test`; review checks the import).
-`join.js` `joinWorld` (which `login` calls, and `withClients` through it for every second client) attaches
-a collector before the page's first navigation and records the page (`harness.js` `trackWorldPage`), so it collects
-from boot onward. `test` carries
-two automatic fixtures: after each test, including its `afterEach` hooks, it flushes every recorded open page and fails
-the test on any error collected since the previous check, naming the user and the spec that logged the page in; a
-worker-scoped one does the same after the worker's last test. Errors raised in a `beforeAll` after the boot fail the
-file's first test; errors in an `afterAll` fail the next test of the worker, or the worker's teardown after the last
-one. `withClients` flushes each client before closing its context (a closed page cannot be flushed). A spec's own
-`attachPageErrors` collector is optional: it adds an assertion at a chosen point, on a chosen page.
-**Boot gate.** `login` fails when the boot raised an error: `joinWorld` waits for `game.ready`, flushes, and returns
-the page errors and hook errors collected from the join screen on, including from `init`/`setup`/`ready` listeners;
-they are marked checked, so the harness gate does not report them again. Core sets `game.ready` and calls the `ready`
-hook synchronously (`client/game.mjs:777-779`), so the read follows every synchronous `ready` listener. The cleanup
-tool `census.js` calls `joinWorld` without the assertion: a boot error is printed in its JSON (`bootErrors`) and sets
-exit code 1, but never stops the census or the sweep, which may be what removes the documents behind the error.
-Console output is not read, so its noise (`ERR_CONNECTION_REFUSED`, vendor warnings) never reaches a collector.
-**Not migrated** (self-managed `BrowserContext`s): `multi-client.spec.js` (which also holds the compendium permissions test),
-`combat-turns.spec.js`, `ownership.spec.js`. Fast-check (`injectFastCheck` → `page.addInitScript`) must run in
-`beforeAll` BEFORE `login` (init scripts must precede navigation). A spec needing pristine per-test boots
-opts out by keeping `beforeEach(login)`.
+the moment core assigns the `Hooks` global (`client/client.mjs` assigns it through `Object.assign(globalThis, …)`, which
+calls the script's setter), and an exposed binding pushes each report, as `Hooks.onError (<location>): <message>`, into
+every array `attachPageErrors` returned for that page. The binding is asynchronous, so the document also counts its
+reports; `flushHookErrorReports(page)` waits until the delivered count matches. **Harness gate (every test, every world
+page).** Every spec imports `expect` and `test` from `tests/e2e/harness.js`, never from `@playwright/test` (the gate
+runs only through `harness.js`'s `test`; review checks the import). `join.js` `joinWorld` (which `login` calls, and
+`withClients` through it for every second client) attaches a collector before the page's first navigation and records
+the page (`harness.js` `trackWorldPage`), so it collects from boot onward. `test` carries two automatic fixtures: after
+each test, including its `afterEach` hooks, it flushes every recorded open page and fails the test on any error
+collected since the previous check, naming the user and the spec that logged the page in; a worker-scoped one does the
+same after the worker's last test. Errors raised in a `beforeAll` after the boot fail the file's first test; errors in
+an `afterAll` fail the next test of the worker, or the worker's teardown after the last one. `withClients` flushes each
+client before closing its context (a closed page cannot be flushed). A spec's own `attachPageErrors` collector is
+optional: it adds an assertion at a chosen point, on a chosen page. **Boot gate.** `login` fails when the boot raised an
+error: `joinWorld` waits for `game.ready`, flushes, and returns the page errors and hook errors collected from the join
+screen on, including from `init`/`setup`/`ready` listeners; they are marked checked, so the harness gate does not report
+them again. Core sets `game.ready` and calls the `ready` hook synchronously (`client/game.mjs:777-779`), so the read
+follows every synchronous `ready` listener. The cleanup tool `census.js` calls `joinWorld` without the assertion: a boot
+error is printed in its JSON (`bootErrors`) and sets exit code 1, but never stops the census or the sweep, which may be
+what removes the documents behind the error. Console output is not read, so its noise (`ERR_CONNECTION_REFUSED`, vendor
+warnings) never reaches a collector. **Not migrated** (self-managed `BrowserContext`s): `multi-client.spec.js` (which
+also holds the compendium permissions test), `combat-turns.spec.js`, `ownership.spec.js`. Fast-check (`injectFastCheck`
+→ `page.addInitScript`) must run in `beforeAll` BEFORE `login` (init scripts must precede navigation). A spec needing
+pristine per-test boots opts out by keeping `beforeEach(login)`.
 
 **No fixed sleeps in E2E (banned)** — never settle with a fixed-duration `await page.waitForTimeout(n)`
 or an in-page `await new Promise(r => setTimeout(r, n))`; they are slow and flaky. Wait on a deterministic
@@ -999,7 +993,9 @@ when asked, its Resolve Cost input, Resistance Check select, Opposed Check box, 
 Damage Reduced By select), `addRulesElement` (the Rules Elements tab add button, the operation select, and the controls
 of the operation: the `ccm-*` selects, key input and value input of a conditional check modifier; the rating, selector
 and key of a conditional rating modifier; the selector, key, value and rounding or mode of the flat, Multiply Base,
-Multiply Sum and Set Sum operations; a negative value is typed in parentheses because a leading operator in a number
+Multiply Sum and Set Sum operations; the selector and the rich-text message of a Turn Message, typed into its
+editor and awaited in the document's `_source` because the live data holds the text before the editor's update reaches
+the database, CLOSED_BUGS #145; a negative value is typed in parentheses because a leading operator in a number
 input is a relative change), `addTrait` (the Edit Traits dialog of a weapon attack, an armor or a shield),
 `setAttributeBase` and `setSkillTraining` (the base input of an attribute in the sheet header, the training input of a
 skill row in the Skills tab), `applyCondition` / `removeCondition` (the Token HUD of a placed token: right-click, the
@@ -1179,10 +1175,10 @@ The exemptions wait on a process starting and are not polls on a loaded page:
 - a mid-file reload through `world.js` `reloadWorld(page, { ready })` (15 s for the `/game` URL, 60 s for the
   readiness predicate, `game.ready` by default), used by the last test of `combat-turns.spec.js`, the reload
   test of `player-hud.spec.js` and both portrait tests of `surfaces.spec.js`;
-- the one real-hover test (`component-probe-buttons-tags.spec.js`, "an effect tag tooltip holds the cleaned HTML ..."): a hover shows a
-  tooltip after `TOOLTIP_DELAY[0]` (1000 ms) and animates it for `TOOLTIP_DURATION[0]` (400 ms), both set in
-  `src/helpers/svelte-actions/TooltipAction.js` and passed to tippy as `delay` and `duration`; its wait is 2500 ms. The
-  user exempted it because it waits out the product's own hover-delay timer;
+- the one real-hover test (`component-probe-buttons-tags.spec.js`, "an effect tag tooltip holds the cleaned
+  HTML ..."): a hover shows a tooltip after `TOOLTIP_DELAY[0]` (1000 ms) and animates it for `TOOLTIP_DURATION[0]`
+  (400 ms), both set in `src/helpers/svelte-actions/TooltipAction.js` and passed to tippy as `delay` and `duration`;
+  its wait is 2500 ms. The user exempted it because it waits out the product's own hover-delay timer;
 - `use.actionTimeout` (10 s safety net for actions) and per-test and hook limits (`test.setTimeout`, e.g. 120 s or
   300 s for the tests that reload and 240 s for the `beforeAll` of `drag.spec.js`).
 
@@ -1476,34 +1472,33 @@ element with no `rounding`.
 
 **Coverage is complete:** all **83** primitives in `src/helpers/svelte-components/**` are registered in
 `componentRegistry.js` and probed (the registry also holds the three rules-element settings editors
-`ItemSheetConditionalCheckModifierSettings`, `ItemSheetMulBaseSettings` and `ItemSheetMulSumSettings`). The probes are three specs, one world boot each (each describe = one component):
-`tests/e2e/component-probe-inputs.spec.js` (8 `input/` non-select primitives, the editors above, the invalid-data
-probes, and the 16 `input/select/` typed wrappers: 15 run from one table of `{component, options, testId,
-supportsNone, wrapperTestId}` whose options are the `src/` constants the components build their lists from
-(`ATTRIBUTES`, `SKILLS`, `RARITIES`, ..., `ARMOR_TRAITS`, `ATTACK_TRAITS`, `SHIELD_TRAITS`; imported through the `~/`
-alias), so a constant change cannot meet a stale hand count, and `DamageReducedBySelect`, whose list depends on two
-flags, is written out); `-buttons-tags.spec.js` (13 `button/` primitives, 17 `tag/` primitives incl. `EditDeleteTag`
-whose probe also locks in the FontAwesome `font-family` regression, with the `SpellAspectTags` entries built by
-`selectDisplayedSpellAspects` (a selector change fails the test, `M4-spellaspects-run.log`), and the tooltip HTML-cleaning probes: an `EffectTag` and a `Tag` mounted with an
-event-handler payload; the `EffectTag` one is the suite's one real-hover test); `-display.spec.js` (core
-`Button`, `TextInput`, `NumberInput`, `IntegerInput`, `CheckboxInput`, `Select`, `LabelTag`; the 5 `label/`
-primitives; `RichText`, the `EffectTag` family + its six duration-variant wrappers, `CondensedCheckButton`,
-`ProseMirrorEditor`; `Meter`, `Text`, `Tabs`, `ScrollingContainer`, `LabeledElement`, `BorderedColumnList`,
-`TagContainer`; and the `RichText` HTML-cleaning probe). The cleaning probes use synthetic props because a real flow
-cannot carry an event handler into these sinks (ProseMirror drops `on*` attributes on input); each fails when
-`foundry.utils.cleanHTML` is replaced by the identity in the page before the mount
+`ItemSheetConditionalCheckModifierSettings`, `ItemSheetMulBaseSettings` and `ItemSheetMulSumSettings`). The probes are
+three specs, one world boot each (each describe = one component): `tests/e2e/component-probe-inputs.spec.js` (8 `input/`
+non-select primitives, the editors above, the invalid-data probes, and the 16 `input/select/` typed wrappers: 15 run
+from one table of `{component, options, testId, supportsNone, wrapperTestId}` whose options are the `src/` constants the
+components build their lists from (`ATTRIBUTES`, `SKILLS`, `RARITIES`, ..., `ARMOR_TRAITS`, `ATTACK_TRAITS`,
+`SHIELD_TRAITS`; imported through the `~/` alias), so a constant change cannot meet a stale hand count, and
+`DamageReducedBySelect`, whose list depends on two flags, is written out); `-buttons-tags.spec.js` (13 `button/`
+primitives, 17 `tag/` primitives incl. `EditDeleteTag` whose probe also locks in the FontAwesome `font-family`
+regression, with the `SpellAspectTags` entries built by `selectDisplayedSpellAspects` (a selector change fails the test,
+`M4-spellaspects-run.log`), and the tooltip HTML-cleaning probes: an `EffectTag` and a `Tag` mounted with an
+event-handler payload; the `EffectTag` one is the suite's one real-hover test); `-display.spec.js` (core `Button`,
+`TextInput`, `NumberInput`, `IntegerInput`, `CheckboxInput`, `Select`, `LabelTag`; the 5 `label/` primitives;
+`RichText`, the `EffectTag` family + its six duration-variant wrappers, `CondensedCheckButton`, `ProseMirrorEditor`;
+`Meter`, `Text`, `Tabs`, `ScrollingContainer`, `LabeledElement`, `BorderedColumnList`, `TagContainer`; and the
+`RichText` HTML-cleaning probe). The cleaning probes use synthetic props because a real flow cannot carry an event
+handler into these sinks (ProseMirror drops `on*` attributes on input); each fails when `foundry.utils.cleanHTML` is
+replaced by the identity in the page before the mount
 (`.superpowers/sdd/test-suite-rewrite/phase-6/partB/mutations/M1-richtext-uncleaned-page-run.log`, `M2-...`, `M2b-...`),
-and the table fails when a select drops an option (`M3-attacktrait-slice-run.log`: `AttackTraitSelect` without its
-first trait fails 2 tests). Every primitive
-carries a `testId` (`data-testid` passthrough) **except `Text`**, which renders `{processTextData(text)}`
-inline with no root element — a wrapper would change its DOM contract, so its probe locates via the probe
-container selector instead. Wrapper components forward `testId` to their inner primitive's rendered root
-(e.g. wrapper selects → the `AttributeInput`/`RarityInput`/`ResistanceInput` div; bare selects → the inner
-`<Select>`'s combobox button (`[role="combobox"]`); `ImagePicker` → `ImageButton`'s `<button>`). To probe
-a new primitive: add it to `componentRegistry.js`, add a `testId` prop on its root if it lacks one (never
-add a wrapper element solely to host it), append a describe block, then re-run the spec — `test:e2e`'s
-global-setup rebuilds
-`test/build/probe.iife.js` and the harness re-injects it (no `dist/` rebuild needed).
+and the table fails when a select drops an option (`M3-attacktrait-slice-run.log`: `AttackTraitSelect` without its first
+trait fails 2 tests). Every primitive carries a `testId` (`data-testid` passthrough) **except `Text`**, which renders
+`{processTextData(text)}` inline with no root element — a wrapper would change its DOM contract, so its probe locates
+via the probe container selector instead. Wrapper components forward `testId` to their inner primitive's rendered root
+(e.g. wrapper selects → the `AttributeInput`/`RarityInput`/`ResistanceInput` div; bare selects → the inner `<Select>`'s
+combobox button (`[role="combobox"]`); `ImagePicker` → `ImageButton`'s `<button>`). To probe a new primitive: add it to
+`componentRegistry.js`, add a `testId` prop on its root if it lacks one (never add a wrapper element solely to host it),
+append a describe block, then re-run the spec — `test:e2e`'s global-setup rebuilds `test/build/probe.iife.js` and the
+harness re-injects it (no `dist/` rebuild needed).
 
 **Gotcha — Foundry global `.disabled`:** Foundry's `foundry2.css` defines `.disabled { pointer-events: none; }`.
 Never use `disabled` as a CSS class on an element wrapping interactive content — it silently blocks all
