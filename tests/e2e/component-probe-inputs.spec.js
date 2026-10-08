@@ -9,8 +9,22 @@ import {
    syntheticDocumentContext,
    unmountAll,
 } from './componentProbe.js';
-import { titanSelectOptionValues } from './select.js';
+import { selectTitanOption, titanSelectOptionValues, readTitanSelectValue } from './select.js';
 import { closeAllApps, clearChat, attachPageErrors } from './world.js';
+import { ARMOR_TRAITS } from '~/document/types/item/types/armor/ArmorTraits.js';
+import { ATTACK_TRAITS } from '~/document/types/item/types/weapon/AttackTraits.js';
+import { SHIELD_TRAITS } from '~/document/types/item/types/shield/ShieldTraits.js';
+import { ATTACK_TYPES } from '~/system/AttackTypes.js';
+import { ATTRIBUTES } from '~/system/Attributes.js';
+import { INVENTORY_ITEM_TYPES } from '~/system/InventoryItemTypes.js';
+import { MODS } from '~/system/Mods.js';
+import { RARITIES } from '~/system/Rarities.js';
+import { RATINGS } from '~/system/Ratings.js';
+import { RESISTANCES } from '~/system/Resistances.js';
+import { RESOURCES } from '~/system/Resources.js';
+import { RULES_ELEMENT_OPERATIONS } from '~/system/RulesElementOperations.js';
+import { SKILLS } from '~/system/Skills.js';
+import { SPEEDS } from '~/system/Speeds.js';
 
 /** @type {import('@playwright/test').Page} The file-shared, logged-in page (one world boot per file). */
 let page;
@@ -597,4 +611,303 @@ test.describe('component probe — multiplier editors with no stored rounding', 
          ).toBe('down');
       });
    }
+});
+
+// ─── Selects: one table over the option constants of `src/` ──────────────────────────────────────────────────────────
+
+/**
+ * @typedef {object} SelectCase
+ * @property {string} component - The select's name in the probe registry.
+ * @property {Array<string|number>} options - The options the select renders without `none`, in order. Derived from the
+ * constant the component builds its list from; the check-difficulty list is inline in its component.
+ * @property {string} testId - The test id given to the mounted component.
+ * @property {boolean} supportsNone - Whether the component has an `allowNone` prop.
+ * @property {boolean} wrapperTestId - Whether the test id lands on a wrapper root rather than on the select itself.
+ * @property {boolean} [singleOption] - Whether the list holds one option, so the change test switches to `none`.
+ */
+
+/** @type {SelectCase[]} The selects whose list is a constant, with where each one's test id lands. */
+const SELECT_CASES = [
+   {
+      component: 'AttributeSelect',
+      options: ATTRIBUTES,
+      testId: 'probe-attribute-select',
+      supportsNone: true,
+      wrapperTestId: true,
+   },
+   {
+      component: 'SkillSelect',
+      options: SKILLS,
+      testId: 'probe-skill-select',
+      supportsNone: true,
+      wrapperTestId: false,
+   },
+   {
+      component: 'RaritySelect',
+      options: RARITIES,
+      testId: 'probe-rarity-select',
+      supportsNone: false,
+      wrapperTestId: true,
+   },
+   {
+      component: 'RatingSelect',
+      options: RATINGS,
+      testId: 'probe-rating-select',
+      supportsNone: true,
+      wrapperTestId: false,
+   },
+   {
+      component: 'ResistanceSelect',
+      options: RESISTANCES,
+      testId: 'probe-resistance-select',
+      supportsNone: true,
+      wrapperTestId: true,
+   },
+   {
+      component: 'ResourceSelect',
+      options: RESOURCES,
+      testId: 'probe-resource-select',
+      supportsNone: true,
+      wrapperTestId: false,
+   },
+   {
+      component: 'SpeedSelect',
+      options: SPEEDS,
+      testId: 'probe-speed-select',
+      supportsNone: true,
+      wrapperTestId: false,
+   },
+   {
+      component: 'ModSelect',
+      options: MODS,
+      testId: 'probe-mod-select',
+      supportsNone: true,
+      wrapperTestId: false,
+   },
+   {
+      component: 'AttackTypeSelect',
+      options: ATTACK_TYPES,
+      testId: 'probe-attack-type-select',
+      supportsNone: false,
+      wrapperTestId: false,
+   },
+   {
+      component: 'CheckDifficultySelect',
+      options: [
+         1,
+         2,
+         3,
+         4,
+         5,
+         6,
+      ],
+      testId: 'probe-difficulty-select',
+      supportsNone: false,
+      wrapperTestId: false,
+   },
+   {
+      component: 'InventoryItemTypeSelect',
+      options: INVENTORY_ITEM_TYPES,
+      testId: 'probe-inventory-item-type-select',
+      supportsNone: true,
+      wrapperTestId: false,
+   },
+   {
+      component: 'RulesElementOperationSelect',
+      options: RULES_ELEMENT_OPERATIONS,
+      testId: 'probe-re-operation-select',
+      supportsNone: false,
+      wrapperTestId: false,
+   },
+   {
+      component: 'ArmorTraitSelect',
+      options: ARMOR_TRAITS.map((trait) => trait.name),
+      testId: 'probe-armor-trait-select',
+      supportsNone: true,
+      wrapperTestId: false,
+   },
+   {
+      component: 'AttackTraitSelect',
+      options: ATTACK_TRAITS.map((trait) => trait.name),
+      testId: 'probe-attack-trait-select',
+      supportsNone: true,
+      wrapperTestId: false,
+   },
+   {
+      component: 'ShieldTraitSelect',
+      options: SHIELD_TRAITS.map((trait) => trait.name),
+      testId: 'probe-shield-trait-select',
+      supportsNone: true,
+      wrapperTestId: false,
+      singleOption: true,
+   },
+];
+
+for (const selectCase of SELECT_CASES) {
+   const { component, options, testId, supportsNone, wrapperTestId, singleOption } = selectCase;
+   /** @type {string|number} The value the component starts on. */
+   const first = options[0];
+   /** @type {string|number} The option the change test selects: the second one, or `none` when there is one option. */
+   const picked = singleOption ? 'none' : options[1];
+
+   test.describe(`component probe — ${component}`, () => {
+      test.afterEach(async () => {
+         await unmountAll(page);
+         await clearProbeEvents(page);
+      });
+
+      test('renders exactly the options of its constant and fires onchange on change', async () => {
+         const { selector } = await mountProbe(page, component, {
+            props: {
+               value: first,
+               ...(supportsNone ? { allowNone: Boolean(singleOption) } : {}),
+               testId,
+            },
+            events: ['onchange'],
+         });
+
+         // Drop the mount-time clamp onchange (if any) before asserting user-driven change.
+         await clearProbeEvents(page);
+
+         const trigger = page.locator(`${selector} [role="combobox"]`);
+
+         // Numeric options serialize to strings in the DOM.
+         /** @type {string[]} The options the select renders. */
+         const optionValues = await titanSelectOptionValues(page, trigger);
+         expect(optionValues).toEqual([
+            ...options,
+            ...(singleOption ? ['none'] : []),
+         ].map(String));
+
+         await selectTitanOption(page, trigger, String(picked));
+         expect(await readTitanSelectValue(trigger)).toBe(String(picked));
+
+         const events = await readProbeEvents(page);
+         expect(events.filter((e) => e.event === 'onchange')).toHaveLength(1);
+      });
+
+      if (supportsNone) {
+         test(singleOption ? 'renders only its constant without allowNone' : 'adds a none option when allowNone is set',
+            async () => {
+               const { selector } = await mountProbe(page, component, {
+                  props: {
+                     value: singleOption ? first : 'none',
+                     allowNone: !singleOption,
+                  },
+               });
+
+               const trigger = page.locator(`${selector} [role="combobox"]`);
+               /** @type {string[]} The options the select renders. */
+               const optionValues = await titanSelectOptionValues(page, trigger);
+               expect(optionValues).toEqual(singleOption ? options : [
+                  ...options,
+                  'none',
+               ]);
+            });
+      }
+
+      test('disabled blocks selection', async () => {
+         const { selector } = await mountProbe(page, component, {
+            props: {
+               value: first,
+               disabled: true,
+            },
+         });
+         await expect(page.locator(`${selector} [role="combobox"]`)).toBeDisabled();
+      });
+
+      test(`testId resolves on the ${wrapperTestId ? 'wrapper root' : 'select element'}`, async () => {
+         const { selector } = await mountProbe(page, component, {
+            props: {
+               value: first,
+               testId,
+            },
+         });
+         await expect(page.locator(wrapperTestId
+            ? `${selector} [data-testid="${testId}"]`
+            : `${selector} [role="combobox"][data-testid="${testId}"]`)).toBeVisible();
+      });
+   });
+}
+
+test.describe('component probe — DamageReducedBySelect', () => {
+   test.afterEach(async () => {
+      await unmountAll(page);
+      await clearProbeEvents(page);
+   });
+
+   test('renders the base none option by default', async () => {
+      const { selector } = await mountProbe(page, 'DamageReducedBySelect', {
+         props: {
+            value: 'none',
+            testId: 'probe-damage-reduced-by',
+         },
+      });
+
+      const trigger = page.locator(`${selector} [role="combobox"]`);
+      expect(await titanSelectOptionValues(page, trigger)).toEqual(['none']);
+   });
+
+   test('adds resistanceCheck when allowResistanceCheck is set', async () => {
+      const { selector } = await mountProbe(page, 'DamageReducedBySelect', {
+         props: {
+            value: 'none',
+            allowResistanceCheck: true,
+            testId: 'probe-damage-reduced-by',
+         },
+      });
+
+      const trigger = page.locator(`${selector} [role="combobox"]`);
+      expect(await titanSelectOptionValues(page, trigger)).toEqual([
+         'none',
+         'resistanceCheck',
+      ]);
+   });
+
+   test('adds all options when both flags are set and fires onchange on change', async () => {
+      const { selector } = await mountProbe(page, 'DamageReducedBySelect', {
+         props: {
+            value: 'none',
+            allowResistanceCheck: true,
+            allowOpposedCheck: true,
+            testId: 'probe-damage-reduced-by',
+         },
+         events: ['onchange'],
+      });
+      await clearProbeEvents(page);
+
+      const trigger = page.locator(`${selector} [role="combobox"]`);
+      expect(await titanSelectOptionValues(page, trigger)).toEqual([
+         'none',
+         'resistanceCheck',
+         'opposedCheck',
+      ]);
+
+      await selectTitanOption(page, trigger, 'resistanceCheck');
+      expect(await readTitanSelectValue(trigger)).toBe('resistanceCheck');
+
+      const events = await readProbeEvents(page);
+      expect(events.filter((e) => e.event === 'onchange')).toHaveLength(1);
+   });
+
+   test('disabled blocks selection', async () => {
+      const { selector } = await mountProbe(page, 'DamageReducedBySelect', {
+         props: {
+            value: 'none',
+            disabled: true,
+         },
+      });
+      await expect(page.locator(`${selector} [role="combobox"]`)).toBeDisabled();
+   });
+
+   test('testId resolves on the select element', async () => {
+      const { selector } = await mountProbe(page, 'DamageReducedBySelect', {
+         props: {
+            value: 'none',
+            testId: 'probe-damage-reduced-by',
+         },
+      });
+      await expect(page.locator(`${selector} [role="combobox"][data-testid="probe-damage-reduced-by"]`))
+         .toBeVisible();
+   });
 });
