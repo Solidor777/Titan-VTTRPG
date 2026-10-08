@@ -79,8 +79,8 @@ export default class TitanActor extends Actor {
    /**
     * Gets this actor's Combatant in the active combat (if any). Otherwise, returns undefined. The combatant is found
     * by actor identity: a token's synthetic actor is its own actor, not the base actor with the same id, and a
-    * combatant of an unlinked token resolves to that token's synthetic actor. This replaces the deprecated
-    * `Combat#getCombatantByActor`, which core removes in v15.
+    * combatant of an unlinked token resolves to that token's synthetic actor. Core's `Combat#getCombatantByActor` is
+    * deprecated since v14 and removed in v15, so it is not called.
     * @returns {Combatant | undefined} This Actor's combatant in the active combat.
     */
    getCombatant() {
