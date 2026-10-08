@@ -72,7 +72,16 @@ function actorGraphFiles() {
 }
 
 describe('planImport', () => {
+   /** @type {object} The globals the suite replaces, captured so afterEach can put them back. */
+   let saved;
+
    beforeEach(() => {
+      saved = {
+         data: globalThis.foundry.data,
+         randomID: globalThis.foundry.utils.randomID,
+         CONFIG: globalThis.CONFIG,
+         getDocumentClass: globalThis.getDocumentClass,
+      };
       // resolveTypeSchemasForPack always resolves ActiveEffect too (every pack type can embed one), which
       // walks each registered subtype's static schema via instanceof checks against these field classes.
       globalThis.foundry.data = {
@@ -104,7 +113,25 @@ describe('planImport', () => {
    });
 
    afterEach(() => {
-      // Remove the field stand-ins so later suites keep the shared minimal mock.
+      // Put back (or remove) every global beforeEach and the tests replaced.
+      globalThis.foundry.utils.randomID = saved.randomID;
+      for (const [key, value] of Object.entries({
+         CONFIG: saved.CONFIG,
+         getDocumentClass: saved.getDocumentClass,
+      })) {
+         if (value === undefined) {
+            delete globalThis[key];
+         }
+         else {
+            globalThis[key] = value;
+         }
+      }
+      if (saved.data === undefined) {
+         delete globalThis.foundry.data;
+      }
+      else {
+         globalThis.foundry.data = saved.data;
+      }
    });
 
    it('plans a create for a row with no existing pack document', async () => {
@@ -314,7 +341,7 @@ describe('planImport', () => {
       /** Stand-in DataModel exposing the weapon subtype's schema with one string-typed field. */
       class WeaponDataModel {
          static get schema() {
-            return new MockSchemaField({ rarity: new MockStringField({ nullable: false }) });
+            return new MockSchemaField({ rarity: new MockStringField() });
          }
       }
       globalThis.CONFIG.Actor = {
@@ -571,7 +598,7 @@ describe('planImport', () => {
       /** Stand-in DataModel exposing a static schema with one number-typed field. */
       class WeaponDataModel {
          static get schema() {
-            return new MockSchemaField({ value: new MockNumberField({ nullable: false }) });
+            return new MockSchemaField({ value: new MockNumberField() });
          }
       }
       globalThis.CONFIG.Item.dataModels = { weapon: WeaponDataModel };
