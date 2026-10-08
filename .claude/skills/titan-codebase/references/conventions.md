@@ -912,7 +912,8 @@ auto-waiting action (`.click()`/`.fill()`) — the assertion/action already poll
 synchronous predicate (50 ms interval, 1000 ms default timeout). **There are now no fixed sleeps in the suite
 at all**, including assert-absence tests. When a negative assertion appears to have no pollable positive
 edge, look for a **happens-after edge**: an observable the code under test emits strictly LATER than the
-decision being asserted. `combat-turns.spec.js` wraps the character data model's `onTurnStart` in a call-through spy on a client
+decision being asserted. `combat-turns.spec.js` wraps the character data model's `onTurnStart` in a call-through spy on
+a client
 and waits until the spy has seen the turn start return, because `onTurnStart` opens the sheet (or not) at its
 start, before its awaits — so the return proves the sheet's fate was already decided. Seeding an extra rules
 element purely as a synchronization signal is preferred over a bounded wait. Condition-polling
@@ -1050,13 +1051,16 @@ directory entry), `createCombat` (the Combat Tracker's create button; waits unti
 `addCombatant` (the Token HUD's combat button), `startCombat` / `endCombat` (the Combat Tracker's Begin and End
 buttons; `endCombat` also confirms the dialog), `setSkillDefaultAttribute` (the select of a skill row), `setEquipped`
 (the Equipped toggle of an Inventory row, clicked only when the state differs), `deleteAttack` (the delete button
-of an attack row in the weapon sheet), `setAttackStat` (the Range or Damage input of an attack row), `addAttackCustomTrait`
+of an attack row in the weapon sheet), `setAttackStat` (the Range or Damage input of an attack row),
+`addAttackCustomTrait`
 (the attack row's Add Custom Trait button and its dialog), `deleteOwnedItem` (the Delete Item button of an Inventory
 row; the `confirmDeletingItems` client setting must be off), `setResource` (the meter row of the actor sheet's sidebar),
 `rollInitiative` (the Combat Tracker's Roll All button; the combatants roll in the order they joined, so a caller forces
 the dice with `forceDice` to choose the turn order), `nextTurn` / `previousTurn` (the Combat Tracker's turn buttons; the
-turn's updates and reports follow, so the caller waits for the effect it asserts), `sendToChat` (the Send to Chat button of
-an item's or effect's sheet header), `typeChatMessage` (types into the chat input and presses Enter), `openCreateMacroDialog`
+turn's updates and reports follow, so the caller waits for the effect it asserts), `sendToChat` (the Send to Chat button
+of
+an item's or effect's sheet header), `typeChatMessage` (types into the chat input and presses Enter),
+`openCreateMacroDialog`
 (drags an owned item's row onto the first empty slot of the core hotbar, which the `showFoundryHotbar` client setting
 must show), `createItemMacro` (that drag, the Create Macro dialog and its button; the macro and its slot are recorded
 for the teardown) and `runHotbarMacro` (a click on the slot). The creation dialogs are `DialogV2` forms whose content
@@ -1113,7 +1117,8 @@ through `_retryAction` (`:16201-16203`) after waits of 0, 20, 100, 100 and then 
 next interval would pass the deadline (`:4377-4393`), so under 1 s it checks at 0, 100, 350 and 850 ms and not again;
 a poll on something that can take 350 to 850 ms sets `intervals`. The mount-keying tests of `chat-cards.spec.js` set
 `[100]` for the dismissed notification: the poll of the former `chat-message-mounts.spec.js` took 357 to 865 ms before
-(four runs: `e2e-r3c-gate-1-slowops.json`, `-2`, `e2e-r3d-gate-1-slowops.json`, `-2`; 865 ms once, 357 to 379 ms in the others) and 443 to 449 ms after (`e2e-r4-gate-1`,
+(four runs: `e2e-r3c-gate-1-slowops.json`, `-2`, `e2e-r3d-gate-1-slowops.json`, `-2`; 865 ms once, 357 to 379 ms in the
+others) and 443 to 449 ms after (`e2e-r4-gate-1`,
 `-2`, `-3` and `e2e-r5-gate-1-slowops.json`). Svelte's default `slide` transition lasts 400 ms (read in
 `svelte/src/transition/index.js`), and a click on a row that is still moving retries until the row stops: before
 `createOwnedItem` and `addEffect` settled with transitions, the Edit Item click on the new row took 51 to 928 ms in 134
@@ -1379,19 +1384,15 @@ shell on this machine crashes its worker processes at startup with Windows statu
 (process-initialization failure), so the run dies before any test executes. Always run
 `npm run test:e2e` from a foreground shell.
 
-**Multi-client harness** — `tests/e2e/multiClient.js` (Phase 4) provides three helpers for tests that
-require simultaneous Foundry sessions: `withClients(browser, clientSpec, fn)` creates one independent
-`BrowserContext` per entry in `clientSpec` (a `{label: userName}` map), logs each in via `login()`, then
-calls `fn(pages)` where `pages` maps each label to its `Page`, then flushes each client's errors
-(`flushPageErrors`) for the harness gate. All contexts are closed in `finally` even if the callback or a login
-throws. `seedEncounterForClients(gm, viewers, seed)` seeds an encounter unstarted on the GM's client, calls
-`viewCombat` on every other client, then starts it: a combat tracker keeps viewing the combat it has (the world's own
-scene-less combat, from the first render), and core's `CombatTracker#_onRender` throws on each round or turn update of
-a combat it does not view, so a client must view the encounter before it starts.
-`awaitUsersActive(page, userNames)` polls `game.users.getName(name)?.active`
-inside `page.waitForFunction` (1000 ms timeout) until all named users are active on that client. Because
-`playwright.config.mjs` uses `workers: 1`, logins are sequential and there are no race conditions on
-the `/join` form. The smoke test is `tests/e2e/multi-client.spec.js`.
+**Multi-client harness** — `tests/e2e/multiClient.js` provides two helpers for tests that require simultaneous
+Foundry sessions: `withClients(browser, clientSpec, fn)` creates one independent `BrowserContext` per entry in
+`clientSpec` (a `{label: userName}` map), logs each in via `login()`, then calls `fn(pages)` where `pages` maps each
+label to its `Page`, then flushes each client's errors (`flushPageErrors`) for the harness gate. All contexts are
+closed in `finally` even if the callback or a login throws. `awaitUsersActive(page, userNames)` polls
+`game.users.getName(name)?.active` inside `page.waitForFunction` (1000 ms timeout) until all named users are active on
+that client. `combat-turns.spec.js` and `ownership.spec.js` open their extra clients in contexts of their own. Because
+`playwright.config.mjs` uses `workers: 1`, logins are sequential and there are no race conditions on the `/join` form.
+The smoke test is `tests/e2e/multi-client.spec.js`.
 
 **npm scripts** — `npm test` runs `vitest run` (single pass); `npm run test:watch` runs Vitest in watch
 mode; `npm run test:e2e` runs the Playwright suite above (its `global-setup.js` builds the test bundles into

@@ -267,6 +267,10 @@ the Combat Tracker's create button has no scene (`scene: null`), so on a page th
 portrait outside combat" failed on it (`e2e-full-b1.log`). A spec that leaves a combat for the teardown leaves it
 unstarted (`phase-5/b/leftover-combat-probe-2.log`: `game.combat` is the unstarted one).
 
-The census (`census.js`) has no Combat class, so a combat the suite leaked would not be counted. `test-titan` also holds a
-combat created on 2026-06-18 (four combatants, no scene; `created` in `leftover-combat-probe.log`) that is not a suite
-document and that the suite does not touch.
+`test-titan` held a combat created on 2026-06-18 (four combatants, no scene) that no spec made. The suite's
+`createCombat` changed it: its `modified` time equalled the suite-made combat's to the millisecond
+(`leftover-combat-probe-2.log`: 1791417134060 on both), it read `active: false` while the suite's combat existed, and
+`active: true` in a probe after the teardown. Inferred, not measured: core deactivates the previously active combat when
+a new one is activated and activates another when the active one is deleted. On the user's instruction of 2026-10-07 it
+was deleted (the only combat in the world; backup `phase-5/b/combats-backup-2026-10-08T03-10-48-197Z.json`,
+`delete-old-combats.log`). The census still has no Combat class (`docs/TODO.md`).

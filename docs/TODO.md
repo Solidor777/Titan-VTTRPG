@@ -93,13 +93,22 @@ Completed items are deleted, not marked done.
   things by trait. The first cut covers effect/condition immunity by condition id or effect name only; it is plan B
   Tasks 8 to 11 and has not been started.
 
+- Census class for Combat (a gate extension, needs the user's approval before it is built). `census.js` counts no Combat
+  documents, so a combat that a spec leaked without recording it is neither counted nor swept (read: the census classes
+  in `global-teardown.js` output list no combats). The combat from 2026-06-18 that no spec made, and that a suite run
+  modified (`.superpowers/sdd/test-suite-rewrite/phase-5/b/leftover-combat-probe-2.log`), was deleted on the user's
+  instruction of 2026-10-07 (backup `combats-backup-2026-10-08T03-10-48-197Z.json` in the same directory); the world
+  holds no combat, and the census still has no Combat class.
+
 - Drive the test-teardown sweep to zero. After Phase 5 Part B the full run sweeps 0 scenes, 2 actors and 1 pack
   (`.superpowers/sdd/test-suite-rewrite/phase-5/b/e2e-full-b2.log`), and only `effect-tray.spec.js` leaves documents
   when run alone: 1 scene, 2 actors and 1 pack (each of the 39 spec files run alone, `leak-bisect-b.log` and
-  `leak-bisect-b-summary.txt`). The scene difference between the full run and the isolated runs has a measured cause:
+  `leak-bisect-b-summary.txt`). The scene difference between the full run and the isolated runs comes from one
+  mechanism, measured on the helper:
   `controlFixtureActorToken` (`tests/e2e/world.js`) reuses the active scene and creates a fallback scene only when none
   is active. Two scratch specs that call it (`zz-sweep-a.spec.js.txt`, `zz-sweep-b.spec.js.txt`) leave 1 scene each when
-  run alone and 1 scene in all when run together (`sweep-mechanism-a.log`, `-b.log`, `-ab.log`); `effect-tray.spec.js` run after `combat-turns.spec.js` leaves 0 scenes
+  run alone and 1 scene in all when run together (`sweep-mechanism-a.log`, `-b.log`, `-ab.log`); `effect-tray.spec.js`
+  run after `combat-turns.spec.js` leaves 0 scenes
   (`sweep-mechanism-turns-tray.log`). The earlier sum of 6 isolated scenes against 1 in the full run
   (`phase-5/leak-bisect.log`) came from specs that are now deleted; their attribution to this mechanism is inferred, not
   re-run. Phase 6 converts `effect-tray.spec.js`; the sweep count must be zero when it is converted.

@@ -430,8 +430,8 @@ when fixed.
 - **Fix:** each tag now carries the themed identity pair of the resource it modifies — fast healing →
   `stamina`, persistent damage → `wounds`, resolve regain → `resolve` — setting both
   `--titan-tag-background` and `--titan-tag-font-color` so the theme contract's fill/text pairing
-  holds. the apply-confirm case (now "clicking apply heals the actor and partial-merges fastHealing (total survives)" in
-  `combat-turns.spec.js`) asserts the confirmed fast-healing tag's computed colors equal the resolved
+  holds. The apply-confirm case (now "clicking apply heals the actor and partial-merges fastHealing (total
+  survives)" in `combat-turns.spec.js`) asserts the confirmed fast-healing tag's computed colors equal the resolved
   `--titan-stamina-*` tokens.
 
 ### 35. The release workflow targeted a module layout this system does not have
@@ -1449,7 +1449,8 @@ Found 2026-10-01 when the e2e harness gate began failing tests on page errors (t
 - **Gate now:** the five replication tests of `tests/e2e/combat-turns.spec.js` (persistent damage, fast healing,
   resolve regain, the previous turn, a second GM) under the harness gate; they were not re-run against the code from
   before the fix.
-- **Gate test (before the rewrite):** `socket-sync.spec.js` (A1-A5) under the harness gate, which fails on this error. It also failed on
+- **Gate test (before the rewrite):** `socket-sync.spec.js` (A1-A5) under the harness gate, which fails on this error.
+  It also failed on
   #116 and #118 until those were fixed: 5 of 5 failed in `fix6-before-combat-seed-socket-sync.log`, and all passed in
   `fix6-after-combat-seed-socket-sync.log`. The full e2e passed 656 of 656 (`e2e-fix6-gate.log`).
 
@@ -1487,7 +1488,8 @@ citations refer to Foundry 14.364 at `C:\FoundryVTT\V14\dev\foundry`.
 - **Gate now:** `tests/shared/combat.js` and `seedEncounterForClients` are deleted; `combat-turns.spec.js` makes its
   combats through the Combat Tracker (the `createCombat`, `addCombatant` and `startCombat` flows), and its replication
   tests run under the harness gate, which fails a test on a page error of any client. The pre-fix code was not re-run.
-- **Gate test (before the rewrite):** `socket-sync.spec.js` A1-A5. Before: 5 of 5 failed (`fix6-before-combat-seed-socket-sync.log`). After:
+- **Gate test (before the rewrite):** `socket-sync.spec.js` A1-A5. Before: 5 of 5 failed
+  (`fix6-before-combat-seed-socket-sync.log`). After:
   5 of 5 passed (`fix6-after-combat-seed-socket-sync.log`); full e2e 656 of 656 (`e2e-fix6-gate.log`).
 
 ### 117. Deleting a chat message while core posted its notification threw
@@ -1546,7 +1548,8 @@ citations refer to Foundry 14.364 at `C:\FoundryVTT\V14\dev\foundry`.
   `OnCombatPreviousTurn.js`) name none of them. The combatants resolve through the scene's token documents.
 - **Gate now:** `seedCombatEncounter` is deleted. `combat-turns.spec.js` makes its scene with the `createScene` flow
   and its combats through the Combat Tracker; the pre-fix code was not re-run.
-- **Gate test (before the rewrite):** `combat-seed.spec.js` and `socket-sync.spec.js` with no active scene (the state of `test-titan`).
+- **Gate test (before the rewrite):** `combat-seed.spec.js` and `socket-sync.spec.js` with no active scene (the state of
+  `test-titan`).
   Before: 6 of 6 failed (`fix6-before-combat-seed-socket-sync.log`). After: 6 of 6 passed
   (`fix6-after-combat-seed-socket-sync.log`); full e2e 656 of 656 (`e2e-fix6-gate.log`).
 
@@ -2064,7 +2067,8 @@ The evidence files named here are in `.superpowers/sdd/test-suite-rewrite/bug-11
   leak came from another part of the spec's setup or cleanup. The cause was not diagnosed. A leaked orphan with pending
   migration work would count as a migration failure in later specs (#105).
 - **Found:** 2026-10-01 by an orphan census after the Task 5 fix round 3 full e2e (654 passed).
-- **Fixed:** 2026-10-07 by the conversion of the player-hud specs to real flows (test-suite rewrite, Phase 5 Part A). The
+- **Fixed:** 2026-10-07 by the conversion of the player-hud specs to real flows (test-suite rewrite, Phase 5 Part A).
+  The
   spec is deleted; `player-hud.spec.js` places its tokens with `placeToken`, which records each token on the running
   list, and the suite-end teardown deletes the tokens of every scene and sweeps orphans.
 - **Gate:** the teardown line of the final full run (`phase-5/b/e2e-full-b2.log`; 645 passed in 14.7 m) reports
@@ -2082,8 +2086,12 @@ The evidence files named here are in `.superpowers/sdd/test-suite-rewrite/bug-11
 - **Measured before the fix:** with the deprecation listener of `combat-turns.spec.js` attached to all three clients,
   the warning `Combat#getCombatantByActor is deprecated` was logged on E2E GM 1 from `getCombatant` <-
   `_getInitialDocumentData` <- `onPreCreate` (read: the Active Effect data model's initiative capture,
-  `TitanActiveEffectDataModel.js:93`), and the run ended with 2 failed, 15 passed and 1 not run
-  (`phase-5/b/gate-108-before-fix.log`).
+  `TitanActiveEffectDataModel.js:93`), and 2 tests failed, 15 passed and 1 did not run
+  (`phase-5/b/gate-108-before-fix.log`). Test 16 failed on the
+  deprecation listener (the stack runs `tp.getCombatant` -> `getCombatantByActor` in the built `dist/index.js`, the code
+  from before the fix). Test 17 failed at `flows.js:80` because 2 directory entries were named "E2E Turns Scene"; that
+  is a cascade (inferred: the failure restarted the worker, which re-ran the file's `beforeAll` and made the scene
+  again), not a second finding.
 - **Found:** 2026-10-01 during the #102 real-flow repro.
 - **Fixed:** 2026-10-07 (commit `d7a7acc7`). `getCombatant` returns `game.combat?.combatants.find((combatant) =>
   combatant.actor === this)`: the combatant is found by actor identity, so a token's synthetic actor is its own actor
