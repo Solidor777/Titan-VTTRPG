@@ -797,6 +797,41 @@ test.describe('the tags of a rolled check card', () => {
       await expect(card.getByTestId('check-chat-situation')).toHaveText(['Underwater']);
    });
 
+   test('a roll message rules element shows its message on the attribute check card', async () => {
+      /** @type {string} The text typed into the Roll Message element's editor. */
+      const text = 'E2E roll message text';
+
+      /** @type {string} The character's id. */
+      const actorId = await createActor(page, {
+         name: 'E2E Roll Message Actor',
+         type: 'player',
+      });
+
+      /** @type {string} The ability's id. */
+      const abilityId = await createOwnedItem(page, actorId, 'ability', 'E2E Roll Message');
+      /** @type {string} The ability's uuid. */
+      const abilityUuid = `Actor.${actorId}.Item.${abilityId}`;
+
+      // A new Roll Message element applies to any Attribute Check of Body.
+      await addRulesElement(page, abilityUuid, {
+         operation: 'rollMessage',
+         message: text,
+      });
+      await closeAllApps(page);
+
+      /** @type {{id: string}} The rolled check's message. */
+      const message = await rollBodyFromSheet(`Actor.${actorId}`);
+
+      // The card shows the message (the positive edge) before the stored check is compared.
+      /** @type {import('@playwright/test').Locator} The rolled check's card. */
+      const card = chatMessage(message.id);
+      await expect(card).toContainText(text);
+      expect(
+         await page.evaluate((id) => game.messages.get(id).system.toObject().message?.length ?? 0, message.id),
+         'the check stores the one message',
+      ).toBe(1);
+   });
+
    test('a card re-localizes a system situation from its stored labelKey', async () => {
       // Heavy armor offers the Swim, Fly, or Climb situation on Athletics checks.
       /** @type {string} The wearer's id. */

@@ -1174,7 +1174,7 @@ export async function addCheck(
  * @param {number} [element.value] - The value input of a modifier that has one.
  * @param {string} [element.rounding] - The rounding direction of a Multiply Base or Multiply Sum element.
  * @param {string} [element.mode] - The mode of a Set Sum element (`set`, `min`, `max`).
- * @param {string} [element.message] - The text of a Turn Message element, typed into the row's rich-text editor.
+ * @param {string} [element.message] - The text of a Turn Message or Roll Message element, typed into the row's editor.
  * @returns {Promise<void>} Resolves once the row holds the requested fields.
  */
 export async function addRulesElement(page, documentUuid, element) {
@@ -1296,29 +1296,6 @@ export async function addRulesElement(page, documentUuid, element) {
       if (element.selector !== undefined) {
          await fill(0, 'selector', element.selector);
       }
-      if (element.message !== undefined) {
-         /** @type {import('@playwright/test').Locator} The row's message editor. */
-         const editor = row.locator('.operation-settings .message prose-mirror');
-         await editor.hover();
-         await editor.locator('button.toggle').click();
-         await editor.locator('[contenteditable="true"]').click();
-         await page.keyboard.type(element.message);
-         await editor.locator('[data-action="save"]').click();
-         await expect(editor, 'the editor shows the saved message').toHaveClass(/inactive/);
-
-         // The stored element lives in the document's source: the live system data holds the typed text before the
-         // editor's own update has reached the database, and a sheet closed in between loses it.
-         await expect.poll(
-            () => page.evaluate(
-               async ({ uuid, index }) => (await fromUuid(uuid))._source.system.rulesElement[index].message,
-               {
-                  uuid: documentUuid,
-                  index: before,
-               },
-            ),
-            { message: 'the editor saved the message to the document' },
-         ).toContain(element.message);
-      }
    }
    else if (element.operation === 'fastHealing' || element.operation === 'persistentDamage') {
       // The turn the element fires on is the settings' selector (Persistent Damage repeats the operation select first).
@@ -1346,6 +1323,29 @@ export async function addRulesElement(page, documentUuid, element) {
             await fill(position, field, element[field]);
          }
       }
+   }
+   if (element.message !== undefined) {
+      /** @type {import('@playwright/test').Locator} The row's message editor (Turn Message and Roll Message). */
+      const editor = row.locator('.operation-settings .message prose-mirror');
+      await editor.hover();
+      await editor.locator('button.toggle').click();
+      await editor.locator('[contenteditable="true"]').click();
+      await page.keyboard.type(element.message);
+      await editor.locator('[data-action="save"]').click();
+      await expect(editor, 'the editor shows the saved message').toHaveClass(/inactive/);
+
+      // The stored element lives in the document's source: the live system data holds the typed text before the
+      // editor's own update has reached the database, and a sheet closed in between loses it.
+      await expect.poll(
+         () => page.evaluate(
+            async ({ uuid, index }) => (await fromUuid(uuid))._source.system.rulesElement[index].message,
+            {
+               uuid: documentUuid,
+               index: before,
+            },
+         ),
+         { message: 'the editor saved the message to the document' },
+      ).toContain(element.message);
    }
    if (element.advantageLevel !== undefined) {
       await selectTitanOption(page, row.getByTestId('ccm-advantage-level'), element.advantageLevel);
