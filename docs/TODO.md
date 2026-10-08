@@ -69,8 +69,8 @@ Completed items are deleted, not marked done.
   minimum of 1" (rules 09_26 line 7696), which until then ships as a -1 default the GM edits per target.
 
 - Extend immunity beyond effects and conditions (user ruling 2026-09-27): immunity to abilities, damage and other
-  things by trait. The first cut covers effect/condition immunity by condition id or effect name only; it is plan B
-  Tasks 8 to 11 and has not been started.
+  things by trait. The first cut, immunity to a condition by id or to an effect by name, is built (the element and
+  editor, the derivation, suppression and refusal); only the extension by trait remains deferred.
 
 - Remove or sync `.agents/skills/titan-codebase/`, a tracked copy of `.claude/skills/titan-codebase/` that differs in every
   reference file (last touched by commit `5526adee`). Measured 2026-10-02: no file in the repo, script or config reads
@@ -82,5 +82,5 @@ Completed items are deleted, not marked done.
   component-local array at `src/document/types/active-effect/sheet/ActiveEffectSheetHeader.svelte:17-23`, and the
   `setSum` modes are a `switch` in `src/helpers/utility-functions/ComputeSetSumDelta.js` and a local list in
   `ItemSheetSetSumSettings.svelte`. A change to any of them would not fail the pack-source lint, so the test can drift.
-  Fix: export one constant per vocabulary from `src/system/` and import it in the sheet and the test. Needs the
-  user's approval because the test-suite plan (section 7.5) allows no other `src` change.
+  Fix: export one constant per vocabulary from `src/system/` and import it in the sheet and the test. Approved by the
+  user 2026-10-08; queued after the #92 `base` registration task.

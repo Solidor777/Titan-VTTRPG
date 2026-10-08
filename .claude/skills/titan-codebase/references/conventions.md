@@ -802,7 +802,7 @@ the lone exception is `Text` (no root element). See the component-probe harness 
 coverage map, the wrapper-forwarding rules, and the selector each component resolves to.
 
 **Playwright E2E** — `npm run test:e2e` runs `playwright test` against the `test-titan` Foundry world on
-`http://localhost:30000`: 33 spec files, 687 tests (measured: `npx playwright test --list` → "Total: 687 tests in 33
+`http://localhost:30000`: 33 spec files, 692 tests (measured: `npx playwright test --list` → "Total: 692 tests in 33
 files"). `playwright.config.mjs` sets `timeout` 60 s, `expect.timeout` 1000 ms, `workers` 1, `fullyParallel` false,
 `globalSetup` and `globalTeardown`, the `list` reporter beside `slow-operation-reporter.js`, and for every test headless
 Chromium (with `--enable-gpu`), `viewport` 1920x1080 and `actionTimeout` 10 s. The users are the four dedicated
@@ -1043,30 +1043,36 @@ made by the flow in `SHARED_FIXTURES` and recorded under the key; shared fixture
 that edits one restores the field through the same control or uses a per-test document). Fixture names are `E2E Shared
 <Type>`. `tests/e2e/flows.js` has one exported async function per flow; each drives the DOM like a user, reads the id of
 what it made from the DOM or a read-only API call, records it and returns it; it never creates, updates or deletes a
-document through the API. Flows: `openSidebarTab` (the sidebar tab button of a directory), `createActor` (Actors tab
-Create button and core dialog), `createOwnedItem` (the Abilities/Spells tab add button or the Inventory tab's add button
-and its item-type dialog, then the new item is renamed in its own sheet opened by the row's Edit button),
-`dragItemOntoSheet` (drags an Items-tab entry onto the open actor sheet), `addEffect` (the Effects tab add button, the
-effect renamed in its sheet, and optionally its duration type chosen in the sheet header), `addCheck` (the Checks tab
-add button, then the row's label input and, when asked, its Resolve Cost input, Resistance Check select, Opposed Check
-box, Damage box, Initial Value input and Damage Reduced By select), `addRulesElement` (the Rules Elements tab add
-button, the operation select, and the controls of the operation: the `ccm-*` selects, key input and value input of a
-conditional check modifier; the rating, selector and key of a conditional rating modifier; the selector, key, value and
-rounding or mode of the flat, Multiply Base, Multiply Sum and Set Sum operations; the `immunity-selector` and
-`immunity-key` controls of an immunity (a condition picker, or a typed effect name); the selector and the rich-text
-message of a Turn Message or Roll Message, typed into its editor and awaited in the document's `_source` because the
-live data holds the text before the editor's update reaches the database, CLOSED_BUGS #145; a negative value is typed
-in parentheses because a leading operator in a number input is a relative change), `addTrait` (the Edit Traits dialog
-of a weapon attack, an armor or a shield), `setAttributeBase` and `setSkillTraining` (the base input of an attribute
-in the sheet header, the training input of a skill row in the Skills tab), `applyCondition` / `removeCondition` (the
-Token HUD of a placed token: right-click, the status effects palette, the status icon, then a left click on the token
-closes the HUD, so the next call's right-click opens it; core's right-click toggles the HUD, so a second right-click
-does not close it reliably). The pointer reaches the token through `restOnToken` before each click (it moves in from
-outside the token and waits for the token's `hover`, because a token's interaction manager handles a pointer-down only
-from its HOVER state on, read at `client/canvas/interaction/mouse-handler.mjs:474-475` and `565-566` of Foundry 14.364;
-whether it is needed is not measured, see CLOSED_BUGS #134); it then waits until `DOUBLE_CLICK_TIME_MS` (250 ms) has
-passed since the later of the interaction manager's `lcTime` and `rcTime`, because a press within 250 ms and 5 px of the
-previous press on the token is a double click, which opens the token's sheet and does not control it (read at
+document through the API. `readServerSystem(page, uuid)` reads the `system` data the server stores for a document
+(`CONFIG.DatabaseBackend.get`, picked by id because the server returns every sibling of an embedded document). A read
+through `fromUuid` returns the client's own document, which holds an edit made through a bound control before any update
+reaches the database (measured: with the condition picker's `onchange` made a no-op, `fromUuid` read the new key while
+the server held the old one, `task-9-logs/fix1/probe-mutant-server.json`, local), so a test that asserts a control saved
+its edit reads the server copy, as `addRulesElement` and `rules-element-editor.spec.js` do. Flows: `openSidebarTab` (the
+sidebar tab button of a directory), `createActor` (Actors tab Create button and core dialog), `createOwnedItem` (the
+Abilities/Spells tab add button or the Inventory tab's add button and its item-type dialog, then the new item is renamed
+in its own sheet opened by the row's Edit button), `dragItemOntoSheet` (drags an Items-tab entry onto the open actor
+sheet), `addEffect` (the Effects tab add button, the effect renamed in its sheet, and optionally its duration type
+chosen in the sheet header), `addCheck` (the Checks tab add button, then the row's label input and, when asked, its
+Resolve Cost input, Resistance Check select, Opposed Check box, Damage box, Initial Value input and Damage Reduced By
+select), `addRulesElement` (the Rules Elements tab add button, the operation select, and the controls of the operation:
+the `ccm-*` selects, key input and value input of a conditional check modifier; the rating, selector and key of a
+conditional rating modifier; the selector, key, value and rounding or mode of the flat, Multiply Base, Multiply Sum and
+Set Sum operations; the `immunity-selector` and `immunity-key` controls of an immunity (a condition picker, or a typed
+effect name); the selector and the rich-text message of a Turn Message or Roll Message, typed into its editor and
+awaited in the document's `_source` because the live data holds the text before the editor's update reaches the
+database, CLOSED_BUGS #145; a negative value is typed in parentheses because a leading operator in a number input is a
+relative change), `addTrait` (the Edit Traits dialog of a weapon attack, an armor or a shield), `setAttributeBase` and
+`setSkillTraining` (the base input of an attribute in the sheet header, the training input of a skill row in the Skills
+tab), `applyCondition` / `removeCondition` (the Token HUD of a placed token: right-click, the status effects palette,
+the status icon, then a left click on the token closes the HUD, so the next call's right-click opens it; core's
+right-click toggles the HUD, so a second right-click does not close it reliably). The pointer reaches the token through
+`restOnToken` before each click (it moves in from outside the token and waits for the token's `hover`, because a token's
+interaction manager handles a pointer-down only from its HOVER state on, read at
+`client/canvas/interaction/mouse-handler.mjs:474-475` and `565-566` of Foundry 14.364; whether it is needed is not
+measured, see CLOSED_BUGS #134); it then waits until `DOUBLE_CLICK_TIME_MS` (250 ms) has passed since the later of the
+interaction manager's `lcTime` and `rcTime`, because a press within 250 ms and 5 px of the previous press on the token
+is a double click, which opens the token's sheet and does not control it (read at
 `client/canvas/interaction/mouse-handler.mjs:480-497`; CLOSED_BUGS #137); `hoverToken` first makes the chat tab the
 active sidebar tab, because a chat message posted while another tab is active shows as a card over the canvas for 5 s
 and takes the pointer from a token under it (CLOSED_BUGS #134). A right-click that opened no HUD has been seen without a
@@ -1167,9 +1173,13 @@ It prints one `e2e teardown (...)` JSON line with the per-kind counts of each st
 the teardown's own login raised an error, when the sweep deleted anything (the error names the kinds and counts: a
 document no flow recorded; shown with an unregistered `E2E ` actor made before a run, `phase-6/sweep-gate-fail.log`), or
 when the census is not all zero. Only after the sweep and the census are zero does it reset the list; a failed teardown
-leaves the list for the next `global-setup.js` to retry (shown by forcing a non-zero census). `global-setup.js` runs the
-same `tearDownAndReport` over a list that still shows a run in flight or holds entries (a crashed run), then
-`startRun()`, then builds the probe bundle and the fast-check bundle into `test/build/`.
+leaves the list for the next `global-setup.js` to retry (shown by forcing a non-zero census). A sweep failure that
+follows a failing test is not a product failure: the worker restart re-runs the file's `beforeAll`, whose flow stops
+before it records the document it was making, and the sweep then deletes that document (observed: an actor swept after a
+mutated test failed, `task-9-logs/mutations/F1-never-suppressed-run.log`, local; the cause is inferred from the restart
+behaviour above). `global-setup.js` runs the same `tearDownAndReport` over a list that still shows a run in flight or
+holds entries (a crashed run), then `startRun()`, then builds the probe bundle and the fast-check bundle into
+`test/build/`.
 
 **E2E settings.** `settings.js` `setWorldSetting` records the prior value of a world-scope setting on the list before it
 writes, and the teardown restores it; `setClientSetting` and a `game.settings.set` made directly in a spec are not

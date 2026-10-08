@@ -1272,18 +1272,11 @@ export async function addRulesElement(page, documentUuid, element) {
    const row = sheet.locator('.rules-element').nth(before);
 
    /**
-    * Reads one field of the new row's stored element.
+    * Reads one field of the new row's element as the server stores it.
     * @param {string} field - The element field.
     * @returns {Promise<*>} The stored value.
     */
-   const stored = (field) => page.evaluate(
-      async ({ uuid, index, field }) => (await fromUuid(uuid)).system.rulesElement[index][field],
-      {
-         uuid: documentUuid,
-         index: before,
-         field,
-      },
-   );
+   const stored = async (field) => (await readServerSystem(page, documentUuid)).rulesElement[before][field];
 
    if (element.operation !== undefined && element.operation !== 'flatModifier') {
       await selectTitanOption(page, row.locator('.operation [role="combobox"]'), element.operation);
@@ -2722,6 +2715,35 @@ export const SHARED_FIXTURES = {
       return packId;
    },
 };
+
+/**
+ * Reads the system data the server holds for a document. A client's own document carries an edit made through a bound
+ * control before any update reaches the database, so a read through `fromUuid` cannot tell a saved edit from an unsaved
+ * one; this asks the server (a read, not a document change). The server returns every sibling of an embedded
+ * document for its query (measured: the first of two owned items came back for the second's id), so the result is
+ * picked by id.
+ * @param {import('@playwright/test').Page} page - A logged-in page.
+ * @param {string} uuid - The uuid of a world or embedded document.
+ * @returns {Promise<object>} The document's stored `system` data.
+ */
+export function readServerSystem(page, uuid) {
+   return page.evaluate(async (uuid) => {
+      /** @type {foundry.abstract.Document} The client's document, which names the class and the parent to ask for. */
+      const document = await fromUuid(uuid);
+
+      /** @type {foundry.abstract.Document[]} The documents the server returns for the query. */
+      const found = await CONFIG.DatabaseBackend.get(
+         document.constructor,
+         {
+            query: { _id: document.id },
+            parent: document.parent,
+            pack: document.pack,
+         },
+         game.user,
+      );
+      return found.find((candidate) => candidate.id === document.id).toObject().system;
+   }, uuid);
+}
 
 /**
  * Whether a recorded document still resolves in the world.

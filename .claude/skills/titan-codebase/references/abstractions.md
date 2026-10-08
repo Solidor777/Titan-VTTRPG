@@ -502,9 +502,10 @@ inactive (out of `actor.statuses`) and `_applyRulesElements` skips its modifiers
 apply (a mutually immune pair is both suppressed); its duration keeps ticking and it returns untouched when the
 immunity ends. `TitanActiveEffect#_preCreate` returns `false` for a creation the Character is immune to, with a
 `LOCAL.immuneToEffect.text` warning naming the actor, the effect and the sources; `applyEffectToTargets` counts only
-the copies a target accepted. Live pins: `tests/e2e/logic/conditions.spec.js` (suppression, refusal through the Token
-HUD), `effect-tray.spec.js` (refusal by Apply, the accepted count), `combat-turns.spec.js` (a suppressed timer ticks);
-`tests/unit/Immunity.test.js` pins the computations on given inputs.
+the copies a target accepted. Live pins: `tests/e2e/logic/conditions.spec.js` (suppression by an effect, an equipped
+item and an ability; refusal through the Token HUD; a mutually immune pair of effects, both suppressed),
+`effect-tray.spec.js` (refusal by Apply, the accepted count), `combat-turns.spec.js` (a suppressed timer ticks on the
+turn-start, turn-end and initiative paths); `tests/unit/Immunity.test.js` pins the computations on given inputs.
 
 
 ## Sheets

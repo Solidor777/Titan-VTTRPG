@@ -6,7 +6,7 @@ import isSuppressedByImmunity from '~/document/types/active-effect/IsSuppressedB
 // The immunity computations on given inputs: gathering immunities from a list of rules-element sources, matching an
 // Active Effect's identity against them, and the Character gate of the suppression rule. Which live sources feed the
 // list, the refusal of a creation and the suppression of an existing condition or effect are pinned on live documents
-// (tests/e2e/immunity.spec.js).
+// (tests/e2e/logic/conditions.spec.js, tests/e2e/effect-tray.spec.js and tests/e2e/combat-turns.spec.js).
 
 /** @type {Function} The dynamically imported CharacterDataModel class. */
 let CharacterDataModel;

@@ -13,6 +13,7 @@ import {
    controlPlacedToken,
    createCombat,
    createOwnedItem,
+   deleteOwnedItem,
    endCombat,
    nextTurn,
    placeToken,
@@ -21,6 +22,7 @@ import {
    setAttributeBase,
    setDescription,
    setEffectActive,
+   setEquipped,
    setSkillTraining,
    shared,
    startCombat,
@@ -794,5 +796,135 @@ test.describe('conditions — immunity', () => {
 
       await setEffectActive(page, actorUuid, wardUuid, false);
       await expect.poll(readWarded, { message: 'the immunity ended: the effect applies again' }).toEqual(before);
+   });
+
+   test('an equipped item that grants the immunity suppresses Contaminated, which returns when it is unequipped',
+      async () => {
+         /** @type {string} The id of the equipment the immunity comes from. */
+         const charmId = await createOwnedItem(page, actorId, 'equipment', 'E2E Immunity Charm');
+         await addRulesElement(page, `${actorUuid}.Item.${charmId}`, {
+            key: 'contaminated',
+            operation: 'immunity',
+            selector: 'condition',
+         });
+
+         // The charm is not equipped, so its immunity does not apply and Contaminated is a status.
+         await applyConditions(['contaminated']);
+         expect(await readContaminated()).toEqual({
+            active: true,
+            held: true,
+         });
+
+         await setEquipped(page, actorId, charmId, true);
+         try {
+            await expect.poll(readContaminated, { message: 'equipped: the status is gone, the effect is kept' })
+               .toEqual({
+                  active: false,
+                  held: true,
+               });
+         }
+         finally {
+            await setEquipped(page, actorId, charmId, false);
+         }
+         await expect.poll(readContaminated, { message: 'unequipped: Contaminated is a status again' }).toEqual({
+            active: true,
+            held: true,
+         });
+      });
+
+   test('an ability that grants the immunity suppresses Contaminated, which returns when the ability is deleted',
+      async () => {
+         await setClientSetting(page, 'confirmDeletingItems', false);
+
+         /** @type {string} The id of the ability that will grant the immunity. */
+         const abilityId = await createOwnedItem(page, actorId, 'ability', 'E2E Immunity Ability');
+         await applyConditions(['contaminated']);
+         expect(await readContaminated()).toEqual({
+            active: true,
+            held: true,
+         });
+
+         await addRulesElement(page, `${actorUuid}.Item.${abilityId}`, {
+            key: 'contaminated',
+            operation: 'immunity',
+            selector: 'condition',
+         });
+         await expect.poll(readContaminated, { message: 'the ability grants it: the status is gone' }).toEqual({
+            active: false,
+            held: true,
+         });
+
+         await deleteOwnedItem(page, actorUuid, 'Abilities', `${actorUuid}.Item.${abilityId}`);
+         await expect.poll(readContaminated, { message: 'the ability is gone: Contaminated is a status again' })
+            .toEqual({
+               active: true,
+               held: true,
+            });
+      });
+
+   test('two effects each immune to the other are both suppressed', async () => {
+      /**
+       * Reads whether each of the pair applies and the actor's Melee.
+       * @returns {Promise<{first: boolean, second: boolean, melee: number}>} Each effect's active state, and Melee.
+       */
+      const readPair = () => page.evaluate(({ id, firstId, secondId }) => {
+         /** @type {TitanActor} The conditions actor. */
+         const actor = game.actors.get(id);
+         return {
+            first: actor.effects.get(firstId).active,
+            melee: actor.system.rating.melee.value,
+            second: actor.effects.get(secondId).active,
+         };
+      }, {
+         firstId,
+         id: actorId,
+         secondId,
+      });
+
+      // Both effects exist before either grants an immunity: an immunity in force would refuse the other's creation.
+      /** @type {string} The id of the first effect, worth Melee +3. */
+      const firstId = await addEffect(page, actorId, 'E2E Mutual First', { duration: 'permanent' });
+      await addRulesElement(page, `${actorUuid}.ActiveEffect.${firstId}`, {
+         key: 'melee',
+         selector: 'rating',
+         value: 3,
+      });
+
+      /** @type {string} The id of the second effect, worth Melee +5. */
+      const secondId = await addEffect(page, actorId, 'E2E Mutual Second', { duration: 'permanent' });
+      await addRulesElement(page, `${actorUuid}.ActiveEffect.${secondId}`, {
+         key: 'melee',
+         selector: 'rating',
+         value: 5,
+      });
+
+      /** @type {{first: boolean, second: boolean, melee: number}} Both effects applying. */
+      const both = await readPair();
+      expect(both).toMatchObject({
+         first: true,
+         second: true,
+      });
+
+      await addRulesElement(page, `${actorUuid}.ActiveEffect.${firstId}`, {
+         key: 'E2E Mutual Second',
+         operation: 'immunity',
+         selector: 'effect',
+      });
+      await expect.poll(readPair, { message: 'the second is suppressed, the first still applies' }).toEqual({
+         first: true,
+         melee: both.melee - 5,
+         second: false,
+      });
+
+      await addRulesElement(page, `${actorUuid}.ActiveEffect.${secondId}`, {
+         key: 'E2E Mutual First',
+         operation: 'immunity',
+         selector: 'effect',
+      });
+      await expect.poll(readPair, { message: 'each is immune to the other: both are suppressed' }).toEqual({
+         first: false,
+         melee: both.melee - 8,
+         second: false,
+      });
    });
 });

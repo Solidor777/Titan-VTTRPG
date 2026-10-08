@@ -2,7 +2,7 @@ import { expect, test } from './harness.js';
 import { clickSheetTab, commitText } from './actions.js';
 import { settle } from './settle.js';
 import { login, openSheetByUuid } from './fixtures.js';
-import { addRulesElement, createWorldItem } from './flows.js';
+import { addRulesElement, createWorldItem, readServerSystem } from './flows.js';
 import { attachPageErrors, closeAllApps } from './world.js';
 import { ROUNDING_DIRECTIONS } from '../../src/helpers/utility-functions/RoundDirectional.js';
 import { CONDITION_IDS } from '../../src/system/Conditions.js';
@@ -89,11 +89,12 @@ async function clearRulesElements() {
 }
 
 /**
- * Reads the weapon's stored rules elements.
- * @returns {Promise<object[]>} The weapon's `system.rulesElement`.
+ * Reads the rules elements the server stores for the weapon. An edit made through a bound control shows on the client's
+ * document before it is saved, so only the server's copy shows that a control saved its edit.
+ * @returns {Promise<object[]>} The weapon's stored `system.rulesElement`.
  */
-function readElements() {
-   return page.evaluate(async (uuid) => (await fromUuid(uuid)).system.rulesElement, weaponUuid);
+async function readElements() {
+   return (await readServerSystem(page, weaponUuid)).rulesElement;
 }
 
 test.describe('adding and deleting rows', () => {

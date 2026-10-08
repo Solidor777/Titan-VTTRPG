@@ -854,53 +854,85 @@ test.describe('conditions and turn effects in a turn start report', () => {
 });
 
 test.describe('immunity and turn durations', () => {
-   test('a suppressed timed effect keeps counting down at the turn start', async () => {
-      await setWorldSetting(gm, 'autoDecreaseEffectDuration', true);
-      await setWorldSetting(gm, 'autoRemoveExpiredEffects', 'disabled');
+   for (const [duration, turns] of [
+      [
+         'turnStart',
+         1,
+      ],
+      [
+         'turnEnd',
+         2,
+      ],
+      [
+         'initiative',
+         1,
+      ],
+   ]) {
+      test(`a suppressed ${duration} effect keeps counting down`, async () => {
+         await setWorldSetting(gm, 'autoDecreaseEffectDuration', true);
+         await setWorldSetting(gm, 'autoRemoveExpiredEffects', 'disabled');
 
-      /** @type {string} The id of the timed effect the ward suppresses. */
-      const timerId = await addEffect(gm, cast.conditioned.id, 'E2E Suppressed Timer', {
-         duration: 'turnStart',
-         remaining: 3,
-      });
+         /** @type {string} The name of the timed effect the ward suppresses. */
+         const timerName = `E2E Suppressed ${duration} Timer`;
 
-      /** @type {string} The id of the ward, a permanent effect immune to the timer by name. */
-      const wardId = await addEffect(gm, cast.conditioned.id, 'E2E Timer Ward', { duration: 'permanent' });
-      await addRulesElement(gm, `${cast.conditioned.uuid}.ActiveEffect.${wardId}`, {
-         key: 'E2E Suppressed Timer',
-         operation: 'immunity',
-         selector: 'effect',
-      });
+         // An initiative effect lies between the two combatants' initiatives, so the turn from the plain character to
+         // the subject decrements it.
+         /** @type {number} The subject's initiative rating. */
+         const rating = await gm.evaluate(
+            (id) => game.actors.get(id).system.rating.initiative.value,
+            cast.conditioned.id,
+         );
 
-      /**
-       * Reads the timer's remaining turns and whether an immunity suppresses it.
-       * @returns {Promise<{remaining: number, suppressed: boolean}>} The timer's state.
-       */
-      const readTimer = () => gm.evaluate(({ id, effectId }) => {
-         /** @type {TitanActiveEffect} The timed effect the ward suppresses. */
-         const timer = game.actors.get(id).effects.get(effectId);
-         return {
-            remaining: timer.system.duration.remaining,
-            suppressed: timer.system.isSuppressed === true,
-         };
-      }, {
-         id: cast.conditioned.id,
-         effectId: timerId,
-      });
-      expect(await readTimer(), 'the ward suppresses the timer before the turn').toEqual({
-         remaining: 3,
-         suppressed: true,
-      });
+         /** @type {string} The id of the timed effect the ward suppresses. */
+         const timerId = await addEffect(gm, cast.conditioned.id, timerName, {
+            duration,
+            ...duration === 'initiative' ? { initiative: rating + 7 } : {},
+            remaining: 3,
+         });
 
-      await startEncounter('conditioned');
-      await nextTurn(gm);
-      await expect.poll(readTimer, { message: 'the suppressed timer counted down at the turn start' }).toEqual({
-         remaining: 2,
-         suppressed: true,
+         /** @type {string} The id of the ward, a permanent effect immune to the timer by name. */
+         const wardId = await addEffect(gm, cast.conditioned.id, `E2E ${duration} Timer Ward`, {
+            duration: 'permanent',
+         });
+         await addRulesElement(gm, `${cast.conditioned.uuid}.ActiveEffect.${wardId}`, {
+            key: timerName,
+            operation: 'immunity',
+            selector: 'effect',
+         });
+
+         /**
+          * Reads the timer's remaining turns and whether an immunity suppresses it.
+          * @returns {Promise<{remaining: number, suppressed: boolean}>} The timer's state.
+          */
+         const readTimer = () => gm.evaluate(({ id, effectId }) => {
+            /** @type {TitanActiveEffect} The timed effect the ward suppresses. */
+            const timer = game.actors.get(id).effects.get(effectId);
+            return {
+               remaining: timer.system.duration.remaining,
+               suppressed: timer.system.isSuppressed === true,
+            };
+         }, {
+            id: cast.conditioned.id,
+            effectId: timerId,
+         });
+         expect(await readTimer(), 'the ward suppresses the timer before the turn').toEqual({
+            remaining: 3,
+            suppressed: true,
+         });
+
+         await startEncounter('conditioned');
+         for (let turn = 0; turn < turns; turn++) {
+            await nextTurn(gm);
+         }
+         await expect.poll(readTimer, { message: `the suppressed timer counted down on its ${duration} path` })
+            .toEqual({
+               remaining: 2,
+               suppressed: true,
+            });
+         await endCombat(gm);
+         await createCombat(gm);
       });
-      await endCombat(gm);
-      await createCombat(gm);
-   });
+   }
 });
 
 // The last test of the file: it reloads the page and leaves its new scene active.
