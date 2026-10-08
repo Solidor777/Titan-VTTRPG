@@ -97,3 +97,11 @@ Completed items are deleted, not marked done.
   reference file (last touched by commit `5526adee`). Measured 2026-10-02: no file in the repo, script or config reads
   it (`grep -rn "\.agents"` finds only the note in `docs/POST_WORK_FINDINGS.md`); whether an external agent tool reads
   `.agents/skills/` is not verified. `.agents/skills/graphify/` is separate.
+- Export shared constants for vocabularies that tests still hold as literals. `tests/unit/EffectPackSource.test.js` keeps
+  `DURATION_TYPES` (turnStart, turnEnd, initiative, permanent, custom), the `'all'` stat key and the `setSum` modes
+  (set, min, max) as literal lists: no `src` constant exists for them. The effect duration options live in a
+  component-local array at `src/document/types/active-effect/sheet/ActiveEffectSheetHeader.svelte:15-22`, and the
+  `setSum` modes are a `switch` in `src/helpers/utility-functions/ComputeSetSumDelta.js` and a local list in
+  `ItemSheetSetSumSettings.svelte`. A change to any of them would not fail the pack-source lint, so the test can drift.
+  Fix: export one constant per vocabulary from `src/system/` and import it in the sheet and the test. Needs the
+  user's approval because the test-suite plan (section 7.5) allows no other `src` change.
