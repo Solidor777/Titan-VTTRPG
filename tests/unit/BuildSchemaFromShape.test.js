@@ -1,65 +1,19 @@
 import { describe, it, expect, beforeAll, afterAll } from 'vitest';
+import {
+   MockField,
+   MockStringField,
+   MockNumberField,
+   MockBooleanField,
+   MockObjectField,
+   MockArrayField,
+   MockSchemaField,
+} from './helpers/schemaFingerprint.js';
 
 // buildSchemaFromShape composes the create*Field helpers, which call foundry.data.fields.*. The shared
 // test setup only mocks foundry.abstract.Document + foundry.utils, so this suite installs stand-ins for
-// the data-field classes (mirroring the approach in ItemChatMessageDataModel.test.js), then dynamically
+// the data-field classes (the shared mocks of helpers/schemaFingerprint.js), then dynamically
 // imports the helper so its imports resolve against those stand-ins. Dynamic import is permitted in
 // tests (the no-dynamic-import rule governs the shipping bundle only).
-
-/**
- * Minimal stand-in for a Foundry DataField that records the options it was constructed with, so a test
- * can assert on the declared initial value and nullability the create*Field helpers pass through.
- */
-class MockField {
-   /**
-    * Stores the field options.
-    * @param {object} options - The field configuration (e.g. initial, nullable).
-    */
-   constructor(options = {}) {
-      /** @type {object} The field configuration. */
-      this.options = options;
-   }
-}
-
-/** Stand-in for StringField, distinct subclass so the produced field type can be asserted. */
-class MockStringField extends MockField {}
-
-/** Stand-in for NumberField, distinct subclass so the produced field type can be asserted. */
-class MockNumberField extends MockField {}
-
-/** Stand-in for BooleanField, distinct subclass so the produced field type can be asserted. */
-class MockBooleanField extends MockField {}
-
-/** Stand-in for ObjectField, distinct subclass so the produced field type can be asserted. */
-class MockObjectField extends MockField {}
-
-/** Stand-in for ArrayField that captures its element field as the first constructor argument. */
-class MockArrayField extends MockField {
-   /**
-    * Stores the element field and options.
-    * @param {MockField} element - The field describing each array element.
-    * @param {object} options - The array field configuration.
-    */
-   constructor(element, options = {}) {
-      super(options);
-      /** @type {MockField} The element field. */
-      this.element = element;
-   }
-}
-
-/** Stand-in for SchemaField that captures its sub-fields map as the first constructor argument. */
-class MockSchemaField extends MockField {
-   /**
-    * Stores the sub-fields map and options.
-    * @param {object} fields - The map of sub-field name to MockField.
-    * @param {object} options - The schema field configuration.
-    */
-   constructor(fields, options = {}) {
-      super(options);
-      /** @type {object} The map of sub-field name to MockField. */
-      this.fields = fields;
-   }
-}
 
 /** @type {Function} Holds the dynamically imported buildSchemaFromShape helper. */
 let buildSchemaFromShape;

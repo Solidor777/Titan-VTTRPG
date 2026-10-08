@@ -1,70 +1,43 @@
-import { describe, it, expect, beforeAll, afterAll } from 'vitest';
+import { describe, it, expect, beforeAll, afterAll, vi } from 'vitest';
+import {
+   booleanField,
+   emptyObjectArray,
+   fingerprintSchema,
+   installSchemaMocks,
+   integerField,
+   numberField,
+   objectElement,
+   restoreSchemaMocks,
+   sortFingerprint,
+   stringField,
+} from './helpers/schemaFingerprint.js';
 
 // The item chat-message data models chain through TitanChatMessageDataModel -> TitanDataModel ->
 // foundry.abstract.TypeDataModel and define their schema via the create*Field helpers, which call
 // foundry.data.fields.*. The shared test setup only mocks foundry.abstract.Document + foundry.utils,
-// so this suite installs stand-ins for TypeDataModel and the data-field classes (mirroring the
-// approach in BuildSchemaFromShape.test.js), then dynamically imports the data models so their imports
-// resolve against those stand-ins. Dynamic import is permitted in tests (the no-dynamic-import rule
-// governs the shipping bundle only).
+// so this suite installs the shared stand-ins of helpers/schemaFingerprint.js, then dynamically imports
+// the data models so their imports resolve against those stand-ins. Each leaf schema is asserted against a
+// hand-authored golden fingerprint, the same gate ItemDataModelSchemaEquivalence applies to the item
+// systems. Dynamic import is permitted in tests (the no-dynamic-import rule governs the shipping bundle
+// only).
+
+// The weapon attack template seeds a random uuid via generateUUID(); mock that module to a fixed
+// sentinel so the weapon attack array initial is deterministic and the golden can be a literal.
+vi.mock('~/helpers/utility-functions/GenerateUUID.js', () => {
+   return {
+      default: () => 'UUID',
+   };
+});
 
 /**
- * Minimal stand-in for a Foundry DataField that records the options it was constructed with, so a test
- * can assert on the field type produced for a given shape value.
+ * Distinct sentinel XP costs per setting key, so the golden also proves which setting feeds each
+ * type's xpCost (spell -> 777, ability -> 999).
+ * @type {object}
  */
-class MockField {
-   /**
-    * Stores the field options.
-    * @param {object} options - The field configuration, such as the initial value and nullability.
-    */
-   constructor(options = {}) {
-      /** @type {object} The field configuration. */
-      this.options = options;
-   }
-}
-
-/** Stand-in for StringField, a distinct subclass so the produced field type can be asserted. */
-class MockStringField extends MockField {}
-
-/** Stand-in for NumberField, a distinct subclass so the produced field type can be asserted. */
-class MockNumberField extends MockField {}
-
-/** Stand-in for BooleanField, a distinct subclass so the produced field type can be asserted. */
-class MockBooleanField extends MockField {}
-
-/** Stand-in for ObjectField, a distinct subclass so the produced field type can be asserted. */
-class MockObjectField extends MockField {}
-
-/** Stand-in for ArrayField that captures its element field as the first constructor argument. */
-class MockArrayField extends MockField {
-   /**
-    * Stores the element field and options.
-    * @param {MockField} element - The field describing each array element.
-    * @param {object} options - The array field configuration.
-    */
-   constructor(element, options = {}) {
-      super(options);
-      /** @type {MockField} The element field. */
-      this.element = element;
-   }
-}
-
-/** Stand-in for SchemaField that captures its sub-fields map as the first constructor argument. */
-class MockSchemaField extends MockField {
-   /**
-    * Stores the sub-fields map and options.
-    * @param {object} fields - The map of sub-field name to MockField.
-    * @param {object} options - The schema field configuration.
-    */
-   constructor(fields, options = {}) {
-      super(options);
-      /** @type {object} The map of sub-field name to MockField. */
-      this.fields = fields;
-   }
-}
-
-/** Stand-in for TypeDataModel so the data-model classes can be declared and their statics invoked. */
-class MockTypeDataModel {}
+const SENTINELS = {
+   'defaultXpCost.spell': 777,
+   'defaultXpCost.ability': 999,
+};
 
 /** @type {object} Holds the dynamically imported leaf data-model classes keyed by item type. */
 const leaves = {};
@@ -72,28 +45,12 @@ const leaves = {};
 /** @type {object} Holds the dynamically imported leaf Svelte components keyed by item type. */
 const components = {};
 
-/** @type {Function} Holds the dynamically imported WeaponChatMessageDataModel for schema tests. */
-let WeaponChatMessageDataModel;
-
 beforeAll(async () => {
-   // The shared shape templates call localize() (which reads game.i18n) when a schema is built, so
-   // provide a pass-through i18n stand-in for the duration of this suite.
-   globalThis.game = { i18n: { localize: (key) => key } };
-
-   // Install the TypeDataModel and data-field stand-ins before importing the data models.
-   globalThis.foundry.abstract.TypeDataModel = MockTypeDataModel;
-   // DataField is the common base class the buildSchemaFromShape pass-through rule instanceof-checks a
-   // shape value against; MockField plays that role since every other mock field extends it.
-   globalThis.foundry.data = {
-      fields: {
-         DataField: MockField,
-         StringField: MockStringField,
-         NumberField: MockNumberField,
-         BooleanField: MockBooleanField,
-         ObjectField: MockObjectField,
-         ArrayField: MockArrayField,
-         SchemaField: MockSchemaField,
-      },
+   // Install the shared Foundry stand-ins, then add the XP-cost settings the spell and ability
+   // templates read when a schema is built.
+   installSchemaMocks();
+   globalThis.game.settings = {
+      get: (namespace, key) => SENTINELS[key],
    };
 
    // Dynamically import every leaf data model and its corresponding Svelte component so the
@@ -141,16 +98,145 @@ beforeAll(async () => {
    components.commodity = (await import(
       '~/document/types/item/types/commodity/chat-message/CommodityChatMessage.svelte',
    )).default;
-
-   WeaponChatMessageDataModel = leaves.weapon;
 });
 
 afterAll(() => {
    // Remove the stand-ins so later suites keep the shared minimal mock.
-   delete globalThis.foundry.abstract.TypeDataModel;
-   delete globalThis.foundry.data;
-   delete globalThis.game;
+   restoreSchemaMocks();
 });
+
+/**
+ * The fingerprints every item chat-message leaf carries: the shared item snapshot fields
+ * (documentVersion, description, the two object-array snapshots) and the label metadata (name, img)
+ * that item.system does not hold.
+ * @returns {object} The fingerprints of the shared base fields keyed by field name.
+ */
+function baseFields() {
+   return {
+      check: emptyObjectArray(),
+      customTrait: emptyObjectArray(),
+      description: stringField(''),
+      documentVersion: numberField(0),
+      name: stringField(''),
+      img: stringField(''),
+   };
+}
+
+/**
+ * The committed golden fingerprints for each item chat-message leaf schema.
+ * @type {object}
+ */
+const GOLDENS = {
+   // Weapon: rules-element type with an attack array seeded with one default attack object.
+   weapon: {
+      ...baseFields(),
+      rulesElement: emptyObjectArray(),
+      rarity: stringField('common'),
+      value: integerField(0),
+      equipped: booleanField(false),
+      attack: {
+         element: objectElement(),
+         initial: [
+            {
+               attribute: 'body',
+               customTrait: [],
+               damage: 1,
+               label: 'LOCAL.attack.text',
+               plusExtraSuccessDamage: true,
+               range: 1,
+               skill: 'meleeWeapons',
+               trait: [],
+               type: 'melee',
+               uuid: 'UUID',
+            },
+         ],
+         kind: 'ArrayField',
+         nullable: false,
+         required: true,
+      },
+      attackNotes: stringField(''),
+      trait: emptyObjectArray(),
+   },
+
+   // Armor: rules-element type with a nested armor SchemaField (max/value integers, both initial 1).
+   armor: {
+      ...baseFields(),
+      rulesElement: emptyObjectArray(),
+      rarity: stringField('common'),
+      value: integerField(0),
+      armor: {
+         fields: {
+            max: integerField(1),
+            value: integerField(1),
+         },
+         kind: 'SchemaField',
+         nullable: false,
+         required: false,
+      },
+      trait: emptyObjectArray(),
+   },
+
+   // Spell: NOT a rules-element type (no rulesElement field); xpCost seeded from the spell setting (777).
+   spell: {
+      ...baseFields(),
+      rarity: stringField('common'),
+      xpCost: integerField(777),
+      tradition: stringField(''),
+      castingCheck: {
+         fields: {
+            attribute: stringField('mind'),
+            autoCalculateDC: booleanField(true),
+            complexity: integerField(1),
+            difficulty: integerField(4),
+            skill: stringField('arcana'),
+         },
+         kind: 'SchemaField',
+         nullable: false,
+         required: false,
+      },
+      quantity: integerField(1),
+      aspect: emptyObjectArray(),
+      customAspect: emptyObjectArray(),
+   },
+
+   // Ability: rules-element type; xpCost seeded from the ability setting (999), three boolean toggles.
+   ability: {
+      ...baseFields(),
+      rulesElement: emptyObjectArray(),
+      xpCost: integerField(999),
+      rarity: stringField('common'),
+      action: booleanField(false),
+      reaction: booleanField(false),
+      passive: booleanField(false),
+   },
+
+   // Shield: rules-element type with a flat integer defense field.
+   shield: {
+      ...baseFields(),
+      rulesElement: emptyObjectArray(),
+      rarity: stringField('common'),
+      value: integerField(0),
+      defense: integerField(0),
+      trait: emptyObjectArray(),
+   },
+
+   // Equipment: rules-element type with the simple rarity/value/equipped trio.
+   equipment: {
+      ...baseFields(),
+      rulesElement: emptyObjectArray(),
+      rarity: stringField('common'),
+      value: integerField(0),
+      equipped: booleanField(false),
+   },
+
+   // Commodity: NOT a rules-element type (no rulesElement field); rarity/value/quantity.
+   commodity: {
+      ...baseFields(),
+      rarity: stringField('common'),
+      value: integerField(0),
+      quantity: integerField(1),
+   },
+};
 
 describe('item chat-message leaf component getters', () => {
    it.each([
@@ -170,74 +256,19 @@ describe('item chat-message leaf component getters', () => {
    });
 });
 
-describe('WeaponChatMessageDataModel schema (path parity with weapon system)', () => {
-   /** @type {object} The flat schema field map produced for the weapon chat message system data. */
-   let schema;
+describe('item chat-message leaf schema characterization (golden master)', () => {
+   it.each([
+      ['weapon'],
+      ['armor'],
+      ['spell'],
+      ['ability'],
+      ['shield'],
+      ['equipment'],
+      ['commodity'],
+   ])('the %s schema fingerprint matches the committed golden', (type) => {
+      // Fingerprint the live schema and compare it, key-sorted, to the hand-authored golden.
+      const actual = fingerprintSchema(leaves[type]._defineDocumentSchema());
 
-   beforeAll(() => {
-      schema = WeaponChatMessageDataModel._defineDocumentSchema();
-   });
-
-   it('includes the shared item snapshot fields (description, check, customTrait) and label metadata', () => {
-      // Shared base fields, generated from createItemSystemTemplate().
-      expect(schema.description).toBeInstanceOf(MockStringField);
-      expect(schema.check).toBeInstanceOf(MockArrayField);
-      expect(schema.customTrait).toBeInstanceOf(MockArrayField);
-
-      // Label metadata not present in item.system.
-      expect(schema.name).toBeInstanceOf(MockStringField);
-      expect(schema.img).toBeInstanceOf(MockStringField);
-   });
-
-   it('round-trips the weapon-specific fields so system.rarity / value / attack survive', () => {
-      // rarity (string), value (number) survive with the right field types.
-      expect(schema.rarity).toBeInstanceOf(MockStringField);
-      expect(schema.value).toBeInstanceOf(MockNumberField);
-
-      // equipped (boolean) and attackNotes (string) survive too.
-      expect(schema.equipped).toBeInstanceOf(MockBooleanField);
-      expect(schema.attackNotes).toBeInstanceOf(MockStringField);
-
-      // attack is an array whose element is an untyped object bag (object-valued array element).
-      expect(schema.attack).toBeInstanceOf(MockArrayField);
-      expect(schema.attack.element).toBeInstanceOf(MockObjectField);
-
-      // rulesElement is an array of untyped object bags (empty-array fallback), and trait likewise.
-      expect(schema.rulesElement).toBeInstanceOf(MockArrayField);
-      expect(schema.rulesElement.element).toBeInstanceOf(MockObjectField);
-      expect(schema.trait).toBeInstanceOf(MockArrayField);
-      expect(schema.trait.element).toBeInstanceOf(MockObjectField);
-   });
-
-   it('seeds the weapon-specific string fields with their representative initials', () => {
-      // The create*Field helpers pass the representative value through as the field's initial.
-      expect(schema.rarity.options.initial).toBe('common');
-   });
-});
-
-describe('ItemChatMessageDataModel family schema', () => {
-   /** @type {object} The flat schema field map produced for the commodity (simple) chat message. */
-   let commoditySchema;
-
-   beforeAll(() => {
-      commoditySchema = leaves.commodity._defineDocumentSchema();
-   });
-
-   it('provides the shared base fields and label metadata to every leaf', () => {
-      // Even a leaf without rules elements inherits the shared base + label metadata.
-      expect(commoditySchema.description).toBeInstanceOf(MockStringField);
-      expect(commoditySchema.check).toBeInstanceOf(MockArrayField);
-      expect(commoditySchema.customTrait).toBeInstanceOf(MockArrayField);
-      expect(commoditySchema.name).toBeInstanceOf(MockStringField);
-      expect(commoditySchema.img).toBeInstanceOf(MockStringField);
-   });
-
-   it('adds the commodity-specific fields without a rulesElement field', () => {
-      expect(commoditySchema.rarity).toBeInstanceOf(MockStringField);
-      expect(commoditySchema.value).toBeInstanceOf(MockNumberField);
-      expect(commoditySchema.quantity).toBeInstanceOf(MockNumberField);
-
-      // Commodities do not carry rules elements.
-      expect(commoditySchema.rulesElement).toBeUndefined();
+      expect(actual).toEqual(sortFingerprint(GOLDENS[type]));
    });
 });
