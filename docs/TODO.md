@@ -5,13 +5,12 @@ spec (`docs/superpowers/specs/`) and plan (`docs/superpowers/plans/`) when picke
 Completed items are deleted, not marked done.
 
 - Conditions rework to the 2026-09-26 rules, remaining part. Plan B
-  (`docs/superpowers/plans/2026-09-29-conditions-rework.md`) has Tasks 1 to 4 complete and Task 5 implemented. Read in
-  `src/system/Conditions.js`: the quarter-of-base penalties for Blinded, Contaminated, Prone, Restrained and Stunned,
-  the new Off-Balance condition, Frightened as Disadvantage on every check, and the Prone and Sleeping speed and
-  Awareness rules exist. Remaining plan B work is Tasks 6 to 17:
-  - Tasks 6 and 7: one rules-element operation registry and one source list (behaviour-preserving);
-  - Tasks 8 to 11: the `immunity` rules element, the engine, the suppressed-condition markers and the Immunity
-    Handling setting;
+  (`docs/superpowers/plans/2026-09-29-conditions-rework.md`) has Tasks 1 to 4 complete, Task 5 implemented, and Tasks 6
+  to 9 built (the operation registry, the source list, the `immunity` element and editor, and the immunity engine:
+  derivation, suppression, refusal). Read in `src/system/Conditions.js`: the quarter-of-base penalties for Blinded,
+  Contaminated, Prone, Restrained and Stunned, the new Off-Balance condition, Frightened as Disadvantage on every
+  check, and the Prone and Sleeping speed and Awareness rules exist. Remaining plan B work is Tasks 10 to 17:
+  - Tasks 10 and 11: the suppressed-condition markers and the Immunity Handling setting;
   - Tasks 12 and 13: targeting and distance helpers and target-aware attack checks, which carry the Prone
     attacker modifier (+1/4 of base within 1 space, -1/4 per 10 spaces beyond 10 spaces);
   - Task 14: Unconscious applies Prone and Incapacitated and drops held gear;

@@ -33,6 +33,9 @@ and hides from unlinked tokens the converted effects their own changes replace (
   effect items carry over to the converted effects. The migration hides an actor's converted effect from each unlinked
   token that removed or replaced the original item, or already holds its own converted copy, including effects earlier
   versions converted: such a token no longer shows a removed effect or a second copy.
+- New Immunity rules element: an item or effect can make a character immune to a condition or to an effect by name.
+  Applying it is refused with a notification, and an existing one is suppressed until the immunity ends: its
+  modifiers stop applying; immunities it grants still apply.
 
 ## Version 2.1.0:
 Advantage and Disadvantage, situational modifiers, and bug fixes.

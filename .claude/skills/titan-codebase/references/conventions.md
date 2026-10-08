@@ -754,8 +754,8 @@ static `actions` map. To refresh a dynamic control's icon/label after a state ch
 `happy-dom`, `globals: true`, Svelte 5 (`@sveltejs/vite-plugin-svelte`), `svelte-preprocess` (same SCSS `prependData` as
 `vite.config.mjs`), and the `~/` / `$fonts/` aliases. `hookTimeout` is 60 s: the schema-equivalence golden-master
 suites' `beforeAll` dynamic imports are transform-heavy (Svelte compiles) and exceed the 10 s default under full
-parallelism. Tests live in `tests/unit/**/*.test.js`: 133 files, 1541 tests (measured: `npm test` → "Test Files  133
-passed (133)", "Tests  1541 passed (1541)"). There is NO test code under `src/`. Support files: `tests/setup.js`,
+parallelism. Tests live in `tests/unit/**/*.test.js`: 134 files, 1553 tests (measured: `npm test` → "Test Files  134
+passed (134)", "Tests  1553 passed (1553)"). There is NO test code under `src/`. Support files: `tests/setup.js`,
 `tests/components/*.svelte` (Svelte probes the unit tests mount), `tests/unit/helpers/schemaFingerprint.js`,
 `tests/shared/checkOracle.js` (the independent check oracle the e2e `check-math.spec.js` compares against) and
 `tests/fixtures/spreadsheet/excel-edited.xlsx` (read by `tests/unit/spreadsheet/format/Xlsx.test.js`).
@@ -802,7 +802,7 @@ the lone exception is `Text` (no root element). See the component-probe harness 
 coverage map, the wrapper-forwarding rules, and the selector each component resolves to.
 
 **Playwright E2E** — `npm run test:e2e` runs `playwright test` against the `test-titan` Foundry world on
-`http://localhost:30000`: 33 spec files, 681 tests (measured: `npx playwright test --list` → "Total: 681 tests in 33
+`http://localhost:30000`: 33 spec files, 687 tests (measured: `npx playwright test --list` → "Total: 687 tests in 33
 files"). `playwright.config.mjs` sets `timeout` 60 s, `expect.timeout` 1000 ms, `workers` 1, `fullyParallel` false,
 `globalSetup` and `globalTeardown`, the `list` reporter beside `slow-operation-reporter.js`, and for every test headless
 Chromium (with `--enable-gpu`), `viewport` 1920x1080 and `actionTimeout` 10 s. The users are the four dedicated
@@ -852,19 +852,22 @@ at the repo root, so it catches v14 API breaks that the mocked Vitest tier canno
   sheet's derived Body value, which owned sources apply and to which bucket, the check dialogs and the posted check
   parameters), `logic/conditions.spec.js`
   (conditions applied from the Token HUD, read from derived stats, the sheet's tooltip, rolled checks and the Player
-  HUD; a condition's own sheet and its edited description), `dice.spec.js` (the forced-dice seam: `forceDice` maps each
-  queued face onto a real Roll, `resetDice` restores the random source), `logic/fast-check-smoke.spec.js` (fast-check
-  is injected and runs a property in the page).
+  HUD; a condition's own sheet and its edited description; an immunity effect suppressing an existing condition or
+  effect and refusing a condition applied through the Token HUD), `dice.spec.js` (the forced-dice seam: `forceDice` maps
+  each queued face onto a real Roll, `resetDice` restores the random source), `logic/fast-check-smoke.spec.js`
+  (fast-check is injected and runs a property in the page).
 - Tokens, HUD, combat, chat. `player-hud.spec.js` (portrait, visibility, layout and effects panel of one controlled
   token, and a reload test), `player-hud-action-menu.spec.js` (categories, main actions and sub-buttons, options,
   layout, and the report cards of the HUD's direct actions), `combat-turns.spec.js` (turn effects replicated between
   clients, the sheet that opens at a turn start per setting, turn reports, the tags of conditions and turn effects in a
-  report, and a placed token on a new scene with none active), `chat-cards.spec.js` (item and effect cards, the attack
+  report, a suppressed timed effect still counting down, and a placed token on a new scene with none active),
+  `chat-cards.spec.js` (item and effect cards, the attack
   tags of a weapon, the tags of a rolled check card, and chat message mount keying), `macros.spec.js` (the item macros
   made by dragging an item row onto the hotbar), `ownership.spec.js` (OWNER, OBSERVER and LIMITED viewers of the TITAN
   sheet, observer tab switching, the roll button gated by ownership), `theme.spec.js` (the theme system, the theme
   editor and the content-link colors per built-in theme).
-- Packs. `effect-tray.spec.js` (the Effect Tray on packs, folders and effects made through the tray's own controls),
+- Packs. `effect-tray.spec.js` (the Effect Tray on packs, folders and effects made through the tray's own controls,
+  and Apply refused by an immune target),
   `compendium-spreadsheet.spec.js` (export and import of packs through the dialogs, including the outcomes of
   `ApplyImport`).
 - Harness and drift guards. `multi-client.spec.js` (two contexts log in as distinct users and see each other active;
@@ -1051,33 +1054,34 @@ button, the operation select, and the controls of the operation: the `ccm-*` sel
 conditional check modifier; the rating, selector and key of a conditional rating modifier; the selector, key, value and
 rounding or mode of the flat, Multiply Base, Multiply Sum and Set Sum operations; the `immunity-selector` and
 `immunity-key` controls of an immunity (a condition picker, or a typed effect name); the selector and the rich-text
-message
-of a Turn Message or Roll Message, typed into its editor and awaited in the document's `_source` because the live data
-holds the text before the editor's update reaches the database, CLOSED_BUGS #145; a negative value is typed in
-parentheses because a leading operator in a number input is a relative change), `addTrait` (the Edit Traits dialog of a
-weapon attack, an armor or a shield), `setAttributeBase` and `setSkillTraining` (the base input of an attribute in the
-sheet header, the training input of a skill row in the Skills tab), `applyCondition` / `removeCondition` (the Token HUD
-of a placed token: right-click, the status effects palette, the status icon, then a left click on the token closes the
-HUD, so the next call's right-click opens it; core's right-click toggles the HUD, so a second right-click does not close
-it reliably). The pointer reaches the token through `restOnToken` before each click (it moves in from outside the token
-and waits for the token's `hover`, because a token's interaction manager handles a pointer-down only from its HOVER
-state on, read at `client/canvas/interaction/mouse-handler.mjs:474-475` and `565-566` of Foundry 14.364; whether it is
-needed is not measured, see CLOSED_BUGS #134); it then waits until `DOUBLE_CLICK_TIME_MS` (250 ms) has passed since the
-later of the interaction manager's `lcTime` and `rcTime`, because a press within 250 ms and 5 px of the previous press
-on the token is a double click, which opens the token's sheet and does not control it (read at
+message of a Turn Message or Roll Message, typed into its editor and awaited in the document's `_source` because the
+live data holds the text before the editor's update reaches the database, CLOSED_BUGS #145; a negative value is typed
+in parentheses because a leading operator in a number input is a relative change), `addTrait` (the Edit Traits dialog
+of a weapon attack, an armor or a shield), `setAttributeBase` and `setSkillTraining` (the base input of an attribute
+in the sheet header, the training input of a skill row in the Skills tab), `applyCondition` / `removeCondition` (the
+Token HUD of a placed token: right-click, the status effects palette, the status icon, then a left click on the token
+closes the HUD, so the next call's right-click opens it; core's right-click toggles the HUD, so a second right-click
+does not close it reliably). The pointer reaches the token through `restOnToken` before each click (it moves in from
+outside the token and waits for the token's `hover`, because a token's interaction manager handles a pointer-down only
+from its HOVER state on, read at `client/canvas/interaction/mouse-handler.mjs:474-475` and `565-566` of Foundry 14.364;
+whether it is needed is not measured, see CLOSED_BUGS #134); it then waits until `DOUBLE_CLICK_TIME_MS` (250 ms) has
+passed since the later of the interaction manager's `lcTime` and `rcTime`, because a press within 250 ms and 5 px of the
+previous press on the token is a double click, which opens the token's sheet and does not control it (read at
 `client/canvas/interaction/mouse-handler.mjs:480-497`; CLOSED_BUGS #137); `hoverToken` first makes the chat tab the
 active sidebar tab, because a chat message posted while another tab is active shows as a card over the canvas for 5 s
 and takes the pointer from a token under it (CLOSED_BUGS #134). A right-click that opened no HUD has been seen without a
-located cause (OPEN_BUGS #129). Further flows are `createWorldItem`, `createFolder` (the directory's Create Folder
-button and the folder configuration window; `createActor` and `createWorldItem` take a `folderId` and then use that
-folder's own Create button, which creates the document inside the folder), `addCustomTrait`, `addAttack`, `enableAspect`
-and `addCustomAspect` (the Add Custom Trait dialog with an optional description, the weapon Attacks tab add button, the
-spell Standard Aspects toggle with its option toggles and resistance select, the spell Custom Aspects tab add button),
-`pickPortrait` (the sheet's portrait button opens Foundry's own file picker, the Core Data tab is chosen when it is not
-the open one (the picker of a player actor opened on the User Data tab:
-`.superpowers/sdd/test-suite-rewrite/phase-2/review-measure-1.log`, `actor picker tabs`), the directory is typed into
-the address bar and the file is clicked and confirmed; nothing is stubbed), `openTrayPack` (the Effect Tray's sidebar
-tab button, then the pack chosen in its pack select; it waits for the stored `effectTrayLastPack` setting),
+located cause (OPEN_BUGS #129). `applyConditionRefused` clicks the same control for an actor immune to the condition,
+waits for the refusal's warning notification (the creation's decision, so the absence of the condition follows a
+positive edge), returns its text and dismisses it with a click. Further flows are `createWorldItem`, `createFolder` (the
+directory's Create Folder button and the folder configuration window; `createActor` and `createWorldItem` take a
+`folderId` and then use that folder's own Create button, which creates the document inside the folder),
+`addCustomTrait`, `addAttack`, `enableAspect` and `addCustomAspect` (the Add Custom Trait dialog with an optional
+description, the weapon Attacks tab add button, the spell Standard Aspects toggle with its option toggles and resistance
+select, the spell Custom Aspects tab add button), `pickPortrait` (the sheet's portrait button opens Foundry's own file
+picker, the Core Data tab is chosen when it is not the open one (the picker of a player actor opened on the User Data
+tab: `.superpowers/sdd/test-suite-rewrite/phase-2/review-measure-1.log`, `actor picker tabs`), the directory is typed
+into the address bar and the file is clicked and confirmed; nothing is stubbed), `openTrayPack` (the Effect Tray's
+sidebar tab button, then the pack chosen in its pack select; it waits for the stored `effectTrayLastPack` setting),
 `createTrayFolder` (the tray's Create Folder button, or an expanded folder's create-subfolder control for a subfolder,
 then the folder context menu's Rename Folder entry and Enter), `createTrayEffect` (the tray's create button, or a
 folder's create-effect control when given a `folderId`, in an unlocked effect pack; the effect is renamed in the sheet
@@ -1108,35 +1112,34 @@ passes the world entry's locator, and the flow reopens that entry's sidebar tab 
 (the Configure Ownership window of an actor's directory entry), `createCombat` (the Combat Tracker's create button;
 waits until the combat is `game.combat`), `addCombatant` (the Token HUD's combat button), `startCombat` / `endCombat`
 (the Combat Tracker's Begin and End buttons; `endCombat` also confirms the dialog), `setSkillDefaultAttribute` (the
-select of a skill row), `setEquipped` (the Equipped toggle of an Inventory row, clicked only when the state differs;
-a collapsed row of an equipped weapon is expanded first, its toggle being inside the expanded content),
-`setEffectActive` (the active toggle of an effect's row in the Effects tab),
-`deleteAttack` (the delete button of an attack row in the weapon sheet), `setAttackStat` (the Range or Damage input of
-an attack row), `addAttackCustomTrait` (the attack row's Add Custom Trait button and its dialog), `deleteOwnedItem` (the
-Delete Item button of an Inventory row; the `confirmDeletingItems` client setting must be off), `setResource` (the meter
-row of the actor sheet's sidebar), `rollInitiative` (the Combat Tracker's Roll All button; the combatants roll in the
-order they joined, so a caller forces the dice with `forceDice` to choose the turn order), `nextTurn` / `previousTurn`
-(the Combat Tracker's turn buttons; the turn's updates and reports follow, so the caller waits for the effect it
-asserts), `sendToChat` (the Send to Chat button of an item's or effect's sheet header), `typeChatMessage` (types into
-the chat input and presses Enter), `openCreateMacroDialog` (drags an owned item's row onto the first empty slot of the
-core hotbar, which the `showFoundryHotbar` client setting must show), `createItemMacro` (that drag, the Create Macro
-dialog and its button; the macro and its slot are recorded for the teardown) and `runHotbarMacro` (a click on the slot).
-The creation dialogs are `DialogV2` forms whose content lacks the template's `form#document-create` id, so the flows
-find them by `dialog.application.dialog` with the `.dialog-content` fields. A flow opens the sheet it drives with
-`openSheetByUuid` and clicks its tabs inside that sheet (`openTab`), so another open TITAN sheet's tab strip is never
-clicked; the Standard Aspects tab and the sidebar both use the class `aspect`, so the flow looks inside
-`.standard-aspects-tab`. A TitanDialog id carries a generated suffix (`[id^="add-inventory-item-dialog-<actorId>"]`). A
-document's sheet instance keeps its last tab, so a shared fixture's sheet can come up on the tab a flow last used; a
-test that needs a tab opens it. `shared(page, key)` and `sharedUuid(page, key)` (the uuid, for `openSheetByUuid` and
-`fromUuid`) serve `SHARED_FIXTURES`: `player`, `npc`, the seven world items `weapon`, `ability` (one check), `spell`
-(the Void custom trait; a range aspect of 10, a rounds-scaling duration aspect, and an inflict-condition aspect with the
-Stunned option and a Resilience resistance; stored values:
-`.superpowers/sdd/test-suite-rewrite/phase-2/review-measure-3.log`, `spell aspects`), `armor`, `shield`, `equipment`,
-`commodity`; `effectHost` (a player that holds only the two effects) with `effect` and `conditionalEffect` (permanent,
-one conditional dice modifier); `roller` (a player owning copies of the shared weapon, spell and ability, dragged onto
-its sheet); `situationalActor` (a player owning an ability with a conditional dice +2, a conditional Advantage and a
-conditional dice +1 situation); `bulkActor` (`BULK_COUNT` = 12 abilities, an equipment with 12 checks and an effect with
-12 rules elements; measured at every tested zoom in
+select of a skill row), `setEquipped` (the Equipped toggle of an Inventory row, clicked only when the state differs; a
+collapsed row of an equipped weapon is expanded first, its toggle being inside the expanded content), `setEffectActive`
+(the active toggle of an effect's row in the Effects tab), `deleteAttack` (the delete button of an attack row in the
+weapon sheet), `setAttackStat` (the Range or Damage input of an attack row), `addAttackCustomTrait` (the attack row's
+Add Custom Trait button and its dialog), `deleteOwnedItem` (the Delete Item button of an Inventory row; the
+`confirmDeletingItems` client setting must be off), `setResource` (the meter row of the actor sheet's sidebar),
+`rollInitiative` (the Combat Tracker's Roll All button; the combatants roll in the order they joined, so a caller forces
+the dice with `forceDice` to choose the turn order), `nextTurn` / `previousTurn` (the Combat Tracker's turn buttons; the
+turn's updates and reports follow, so the caller waits for the effect it asserts), `sendToChat` (the Send to Chat button
+of an item's or effect's sheet header), `typeChatMessage` (types into the chat input and presses Enter),
+`openCreateMacroDialog` (drags an owned item's row onto the first empty slot of the core hotbar, which the
+`showFoundryHotbar` client setting must show), `createItemMacro` (that drag, the Create Macro dialog and its button; the
+macro and its slot are recorded for the teardown) and `runHotbarMacro` (a click on the slot). The creation dialogs are
+`DialogV2` forms whose content lacks the template's `form#document-create` id, so the flows find them by
+`dialog.application.dialog` with the `.dialog-content` fields. A flow opens the sheet it drives with `openSheetByUuid`
+and clicks its tabs inside that sheet (`openTab`), so another open TITAN sheet's tab strip is never clicked; the
+Standard Aspects tab and the sidebar both use the class `aspect`, so the flow looks inside `.standard-aspects-tab`. A
+TitanDialog id carries a generated suffix (`[id^="add-inventory-item-dialog-<actorId>"]`). A document's sheet instance
+keeps its last tab, so a shared fixture's sheet can come up on the tab a flow last used; a test that needs a tab opens
+it. `shared(page, key)` and `sharedUuid(page, key)` (the uuid, for `openSheetByUuid` and `fromUuid`) serve
+`SHARED_FIXTURES`: `player`, `npc`, the seven world items `weapon`, `ability` (one check), `spell` (the Void custom
+trait; a range aspect of 10, a rounds-scaling duration aspect, and an inflict-condition aspect with the Stunned option
+and a Resilience resistance; stored values: `.superpowers/sdd/test-suite-rewrite/phase-2/review-measure-3.log`, `spell
+aspects`), `armor`, `shield`, `equipment`, `commodity`; `effectHost` (a player that holds only the two effects) with
+`effect` and `conditionalEffect` (permanent, one conditional dice modifier); `roller` (a player owning copies of the
+shared weapon, spell and ability, dragged onto its sheet); `situationalActor` (a player owning an ability with a
+conditional dice +2, a conditional Advantage and a conditional dice +1 situation); `bulkActor` (`BULK_COUNT` = 12
+abilities, an equipment with 12 checks and an effect with 12 rules elements; measured at every tested zoom in
 `.superpowers/sdd/test-suite-rewrite/phase-3/entry-count-measure-12.log` (local): the Abilities tab has 225 px to scroll
 at the least, the Checks tab 3934 px and the rules elements list 1378 px; the build took 69.1 s with 30 entries of each
 in one run (`.superpowers/sdd/test-suite-rewrite/phase-2/review-measure-1.log`, `build bulkActor`), so its first
@@ -1428,8 +1431,8 @@ the source) or inferred:
   the pointer with the row's midpoint (read: `DragReorderActions.js`), so a move to the end drops in the lower half of
   the last row, and the drag tests collapse the first and last rows so that half stays short and on screen.
 - A list's `<ol>` renders only when the list has a row (read: `{#if ...length > 0}` in
-  `ItemSheetRulesElementsTab.svelte`
-  and `ItemSheetChecksTab.svelte`), so a sheet that receives a copied row needs one row of its own to drop on.
+  `ItemSheetRulesElementsTab.svelte` and `ItemSheetChecksTab.svelte`), so a sheet that receives a copied row needs one
+  row of its own to drop on.
 - The Casting Check tab has no control that changes an aspect (read: `SpellSheetCastingCheckTab.svelte` holds only the
   attribute, skill, auto-calculate, difficulty and complexity controls) and a sheet shows one tab at a time, so the
   re-pricing test has a second client (`E2E GM 2`) change the range on the Standard Aspects tab while the first
@@ -1458,25 +1461,23 @@ the source) or inferred:
   the shipped `titan.effects` pack come from its index and folders.
 - `compendium-spreadsheet.spec.js` imports `decodeSpreadsheetFiles`, `encodeCsv` and `zipFiles` from
   `src/spreadsheet/format/` through the `~/` alias (measured: the spec passed 17 of 17 with these imports,
-`phase-6/sheet-2.log`; that Playwright reads the
-  `paths` entry of `jsconfig.json` is inferred). A file is the Export dialog's CSV zip, decoded to sheets in Node,
-  edited the way a user edits a spreadsheet (a cell set, rows or a column deleted), encoded again and handed to the
-  dialog's file input as an in-memory buffer. The source pack holds an actor with a weapon and two effects
-  (`createActor`, `createOwnedItem`, `addEffect`, `putInPack`) and a second actor. No sheet creates an effect on an
-  owned item, so the file's item-effect row names the weapon in its `_parentId` cell, and the import creates the
-  depth-2 effect. Import behaviour read from `PlanImport.js` and `ApplyImport.js`: a row with a blank `_parentId` cell
-  whose id is no top-level pack document is looked up in the pack's embedded index, which is how a file with only the
-  edited weapon or effect row updates it; a row whose `_parentId` names a document that is not top-level and not in
-  the file is planned as a create (`resolveExistingDocument` finds no parent). A row that names a parent that exists
-  nowhere is therefore refused with the create branch's message, `Cannot create <class> documents under parent
-  "<id>"` (measured: with that message changed, the refusal test fails, `mutations/A-M6a-item-parent.log`; a second test
-  whose row had the id of a pack item reached the same branch, so it duplicated the first and was removed). The
-  `Cannot update` branch
-  is reached by a stale plan, measured: the Import dialog stays open and usable while the Compendium tab and a pack
-  window are operated, so a test previews an update of the weapon (blank parent cell, which resolves to the actor of the
-  pack), deletes the actor from the pack window's context menu, then applies; `Cannot update Item documents under
-  parent "<actor id>"` shows and the pack stays empty (`phase-6/stale-1.log`; with the message changed the test fails,
-  `phase-6/mutations/logs/M12-run.log`).
+  `phase-6/sheet-2.log`; that Playwright reads the `paths` entry of `jsconfig.json` is inferred). A file is the Export
+  dialog's CSV zip, decoded to sheets in Node, edited the way a user edits a spreadsheet (a cell set, rows or a column
+  deleted), encoded again and handed to the dialog's file input as an in-memory buffer. The source pack holds an actor
+  with a weapon and two effects (`createActor`, `createOwnedItem`, `addEffect`, `putInPack`) and a second actor. No
+  sheet creates an effect on an owned item, so the file's item-effect row names the weapon in its `_parentId` cell, and
+  the import creates the depth-2 effect. Import behaviour read from `PlanImport.js` and `ApplyImport.js`: a row with a
+  blank `_parentId` cell whose id is no top-level pack document is looked up in the pack's embedded index, which is how
+  a file with only the edited weapon or effect row updates it; a row whose `_parentId` names a document that is not
+  top-level and not in the file is planned as a create (`resolveExistingDocument` finds no parent). A row that names a
+  parent that exists nowhere is therefore refused with the create branch's message, `Cannot create <class> documents
+  under parent "<id>"` (measured: with that message changed, the refusal test fails, `mutations/A-M6a-item-parent.log`;
+  a second test whose row had the id of a pack item reached the same branch, so it duplicated the first and was
+  removed). The `Cannot update` branch is reached by a stale plan, measured: the Import dialog stays open and usable
+  while the Compendium tab and a pack window are operated, so a test previews an update of the weapon (blank parent
+  cell, which resolves to the actor of the pack), deletes the actor from the pack window's context menu, then applies;
+  `Cannot update Item documents under parent "<actor id>"` shows and the pack stays empty (`phase-6/stale-1.log`; with
+  the message changed the test fails, `phase-6/mutations/logs/M12-run.log`).
 
 **E2E browser-zoom emulation** — the browser zoom tests of `character-sheet-layout.spec.js` emulate page zoom
 z through a CDP session:

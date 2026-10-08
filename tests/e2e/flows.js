@@ -623,9 +623,44 @@ export async function releaseTargets(page) {
 }
 
 /**
- * Turns a condition on or off through the token HUD: a right click on the hovered token opens the HUD, its Status
- * Effects palette lists every condition, and a click on a condition's control toggles it on the token's actor. A
- * left click on the token closes the HUD again and leaves the token controlled.
+ * Clicks a condition's control in the token HUD: a right click on the hovered token opens the HUD and its Status
+ * Effects palette lists every condition.
+ * @param {import('@playwright/test').Page} page - A logged-in GM page viewing the token's scene.
+ * @param {string} tokenId - The token on the viewed scene.
+ * @param {string} statusId - The condition's status id (`blinded`, `offBalance`, ...).
+ * @returns {Promise<{x: number, y: number}>} The token's centre in client (page) coordinates.
+ */
+async function clickConditionControl(page, tokenId, statusId) {
+   /** @type {{x: number, y: number}} The token's centre in client (page) coordinates. */
+   const centre = await hoverToken(page, tokenId);
+   await page.mouse.click(centre.x, centre.y, { button: 'right' });
+
+   /** @type {import('@playwright/test').Locator} The token HUD. */
+   const hud = page.locator('#token-hud');
+   await expect(hud).toBeVisible();
+   await hud.locator('[data-action="togglePalette"][data-palette="effects"]').click();
+   await hud.locator(`.effect-control[data-status-id="${statusId}"]`).click();
+   return centre;
+}
+
+/**
+ * Closes the token HUD after a condition click. A left click on the token closes the HUD (read:
+ * `PlaceableObject#_onClickLeft`, `placeable-object.mjs:1220`) and leaves the token controlled. The pointer is on the
+ * HUD's palette, so it re-enters the token before the click.
+ * @param {import('@playwright/test').Page} page - A logged-in GM page viewing the token's scene.
+ * @param {string} tokenId - The token on the viewed scene.
+ * @param {{x: number, y: number}} centre - The token's centre in client (page) coordinates.
+ * @returns {Promise<void>} Resolves once the HUD is hidden.
+ */
+async function closeTokenHud(page, tokenId, centre) {
+   await restOnToken(page, tokenId, centre);
+   await page.mouse.click(centre.x, centre.y);
+   await expect(page.locator('#token-hud')).toBeHidden();
+}
+
+/**
+ * Turns a condition on or off through the token HUD: a click on a condition's control toggles it on the token's
+ * actor. A left click on the token closes the HUD again and leaves the token controlled.
  * @param {import('@playwright/test').Page} page - A logged-in GM page viewing the token's scene.
  * @param {string} tokenId - The token on the viewed scene.
  * @param {string} statusId - The condition's status id (`blinded`, `offBalance`, ...).
@@ -647,22 +682,36 @@ async function toggleCondition(page, tokenId, statusId, active) {
    expect(await isActive(), `the condition ${statusId} is ${active ? 'off' : 'on'} before the click`).toBe(!active);
 
    /** @type {{x: number, y: number}} The token's centre in client (page) coordinates. */
-   const centre = await hoverToken(page, tokenId);
-   await page.mouse.click(centre.x, centre.y, { button: 'right' });
-
-   /** @type {import('@playwright/test').Locator} The token HUD. */
-   const hud = page.locator('#token-hud');
-   await expect(hud).toBeVisible();
-   await hud.locator('[data-action="togglePalette"][data-palette="effects"]').click();
-   await hud.locator(`.effect-control[data-status-id="${statusId}"]`).click();
+   const centre = await clickConditionControl(page, tokenId, statusId);
    await expect.poll(isActive, { message: `the HUD turned ${statusId} ${active ? 'on' : 'off'}` }).toBe(active);
    await settle(page);
+   await closeTokenHud(page, tokenId, centre);
+}
 
-   // A left click on the token closes the HUD (read: `PlaceableObject#_onClickLeft`, `placeable-object.mjs:1220`) and
-   // leaves the token controlled. The pointer is on the HUD's palette, so it re-enters the token before the click.
-   await restOnToken(page, tokenId, centre);
-   await page.mouse.click(centre.x, centre.y);
-   await expect(hud).toBeHidden();
+/**
+ * Tries to turn a condition on through the token HUD for an actor that refuses it. The refusal is a warning
+ * notification, which is the positive edge that the creation was decided; the flow reads its text and dismisses it
+ * with a click, as a user does, so it does not cover the token.
+ * @param {import('@playwright/test').Page} page - A logged-in GM page viewing the token's scene.
+ * @param {string} tokenId - The token on the viewed scene.
+ * @param {string} statusId - The condition's status id (`blinded`, `offBalance`, ...).
+ * @returns {Promise<string>} The refusal notification's text.
+ */
+export async function applyConditionRefused(page, tokenId, statusId) {
+   /** @type {import('@playwright/test').Locator} The refusal notification. */
+   const notice = page.locator('#notifications .notification.warning', { hasText: /is immune to/i });
+   await expect(notice, 'no refusal notice is showing before the click').toHaveCount(0);
+
+   /** @type {{x: number, y: number}} The token's centre in client (page) coordinates. */
+   const centre = await clickConditionControl(page, tokenId, statusId);
+   await expect(notice).toHaveCount(1);
+
+   /** @type {string} The refusal notification's text. */
+   const text = (await notice.innerText()).trim();
+   await notice.click();
+   await expect(notice).toHaveCount(0);
+   await closeTokenHud(page, tokenId, centre);
+   return text;
 }
 
 /**

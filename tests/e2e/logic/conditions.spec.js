@@ -5,8 +5,10 @@ import { forceDice, resetDice } from '../dice.js';
 import { login, openSheetByUuid } from '../fixtures.js';
 import {
    addCombatant,
+   addEffect,
    addRulesElement,
    applyCondition,
+   applyConditionRefused,
    createActor,
    controlPlacedToken,
    createCombat,
@@ -18,6 +20,7 @@ import {
    rollInitiative,
    setAttributeBase,
    setDescription,
+   setEffectActive,
    setSkillTraining,
    shared,
    startCombat,
@@ -34,7 +37,9 @@ import { attachPageErrors, clearChat, closeAllApps } from '../world.js';
  * that baseline. The sheet's Defense label and its breakdown tooltip show the condition's penalty, the check rules of
  * the conditions (Frightened, Incapacitated, Restrained, Blinded and Deafened) act on rolls made from the sheet's
  * buttons, and a condition opens TITAN's own sheet, whose edited description replaces the definition text in the
- * Player HUD and in the turn-start report.
+ * Player HUD and in the turn-start report. An effect granting immunity suppresses an existing condition or effect,
+ * which returns when the immunity ends, and refuses a condition applied through the token HUD, naming the immunity's
+ * source.
  */
 
 /** @type {import('@playwright/test').Page} The file-shared, logged-in page (one world boot per file). */
@@ -55,6 +60,12 @@ const DEFINITION_PHRASE = 'cannot see';
 
 /** @type {string} The description typed into the condition's own sheet. */
 const EDITED_DESCRIPTION = 'E2E edited condition description';
+
+/** @type {string} The name of the effect that grants the immunities. */
+const WARD_NAME = 'E2E Immunity Ward';
+
+/** @type {string} The name of the effect the ward is immune to. */
+const WARDED_EFFECT_NAME = 'E2E Immunity Warded Effect';
 
 /**
  * The rules elements of the boost ability: ratings +5, all attributes +4, all resistances +4, stride speed +6.
@@ -630,4 +641,158 @@ test.describe('conditions — the Player HUD', () => {
          expect(edited, 'the edited report no longer shows the definition').not.toContain(DEFINITION_PHRASE);
          await endCombat(page);
       });
+});
+
+test.describe('conditions — immunity', () => {
+   /** @type {string} The uuid of the ward effect: permanent, immune to Contaminated and to the warded effect. */
+   let wardUuid;
+   /** @type {string} The id of the effect the ward is immune to: permanent, Melee +3. */
+   let wardedId;
+
+   /**
+    * Reads whether the actor shows Contaminated as a status and whether it still holds the condition's effect.
+    * @returns {Promise<{active: boolean, held: boolean}>} The status and the held effect.
+    */
+   function readContaminated() {
+      return page.evaluate((id) => {
+         /** @type {TitanActor} The conditions actor. */
+         const actor = game.actors.get(id);
+         return {
+            active: actor.statuses.has('contaminated'),
+            held: actor.effects.some((effect) => effect.statuses.has('contaminated')),
+         };
+      }, actorId);
+   }
+
+   /**
+    * Reads the warded effect's state and the actor's derived Melee.
+    * @returns {Promise<{active: boolean, melee: number}>} Whether the effect applies, and the Melee value.
+    */
+   function readWarded() {
+      return page.evaluate(({ id, effectId }) => {
+         /** @type {TitanActor} The conditions actor. */
+         const actor = game.actors.get(id);
+         return {
+            active: actor.effects.get(effectId).active,
+            melee: actor.system.rating.melee.value,
+         };
+      }, {
+         id: actorId,
+         effectId: wardedId,
+      });
+   }
+
+   /**
+    * Reads whether the ward effect is switched on.
+    * @returns {Promise<boolean>} True when the ward is not disabled.
+    */
+   function readWardOn() {
+      return page.evaluate(({ id, uuid }) => !game.actors.get(id).effects.get(uuid.split('.').at(-1)).disabled, {
+         id: actorId,
+         uuid: wardUuid,
+      });
+   }
+
+   test.beforeAll(async () => {
+      // The warded effect comes first: a ward in force would refuse a creation of that name.
+      wardedId = await addEffect(page, actorId, WARDED_EFFECT_NAME, { duration: 'permanent' });
+      await addRulesElement(page, `${actorUuid}.ActiveEffect.${wardedId}`, {
+         key: 'melee',
+         selector: 'rating',
+         value: 3,
+      });
+
+      /** @type {string} The id of the effect that grants the immunities. */
+      const wardId = await addEffect(page, actorId, WARD_NAME, { duration: 'permanent' });
+      wardUuid = `${actorUuid}.ActiveEffect.${wardId}`;
+      await addRulesElement(page, wardUuid, {
+         key: 'contaminated',
+         operation: 'immunity',
+         selector: 'condition',
+      });
+      await addRulesElement(page, wardUuid, {
+         key: WARDED_EFFECT_NAME,
+         operation: 'immunity',
+         selector: 'effect',
+      });
+
+      // Each test switches the ward on itself.
+      await setEffectActive(page, actorUuid, wardUuid, false);
+      await closeAllApps(page);
+   });
+
+   test.afterEach(async () => {
+      // The ward ends before the file's afterEach removes the conditions, which expects each to be a status.
+      if (await readWardOn()) {
+         await setEffectActive(page, actorUuid, wardUuid, false);
+      }
+   });
+
+   test('an immunity suppresses an existing Contaminated, which returns when the immunity ends', async () => {
+      /** @type {{baseline: object, after: object}} The stats before and after Contaminated. */
+      const { baseline, after } = await applyConditions(['contaminated']);
+      expect(after.attribute.body.value, 'Contaminated lowers Body').toBeLessThan(baseline.attribute.body.value);
+      expect(await readContaminated()).toEqual({
+         active: true,
+         held: true,
+      });
+
+      await setEffectActive(page, actorUuid, wardUuid, true);
+      await expect.poll(readContaminated, { message: 'suppressed: the status is gone, the effect is kept' })
+         .toEqual({
+            active: false,
+            held: true,
+         });
+      await expect.poll(async () => (await snapshot()).attribute, { message: 'suppressed: the penalty is gone' })
+         .toEqual(baseline.attribute);
+      expect((await snapshot()).resistance).toEqual(baseline.resistance);
+
+      await setEffectActive(page, actorUuid, wardUuid, false);
+      await expect.poll(readContaminated, { message: 'the immunity ended: Contaminated is a status again' })
+         .toEqual({
+            active: true,
+            held: true,
+         });
+      await expect.poll(async () => (await snapshot()).attribute, { message: 'the penalty applies again' })
+         .toEqual(after.attribute);
+   });
+
+   test('a condition the actor is immune to is refused with a notice naming the actor and the source', async () => {
+      await setEffectActive(page, actorUuid, wardUuid, true);
+
+      /** @type {string} The refusal notice's text. */
+      const notice = await applyConditionRefused(page, tokenId, 'contaminated');
+
+      /** @type {string} The localized name of the refused condition. */
+      const conditionName = await page.evaluate(() => game.i18n.localize(
+         CONFIG.statusEffects.find((status) => status.id === 'contaminated').name,
+      ));
+      expect(notice).toContain('E2E Conditions Actor');
+      expect(notice).toContain(conditionName);
+      expect(notice).toContain(WARD_NAME);
+      expect(await readContaminated(), 'the refused condition was not created').toEqual({
+         active: false,
+         held: false,
+      });
+
+      // An immunity covers its own condition only: another condition applies.
+      await applyCondition(page, tokenId, 'blinded');
+      applied.push('blinded');
+   });
+
+   test('an immunity to an effect by name suppresses it, and its modifiers return when the immunity ends', async () => {
+      /** @type {{active: boolean, melee: number}} The warded effect before the ward. */
+      const before = await readWarded();
+      expect(before.active, 'the warded effect applies before the ward').toBe(true);
+
+      await setEffectActive(page, actorUuid, wardUuid, true);
+      await expect.poll(readWarded, { message: 'suppressed: the effect stops applying and its Melee +3 leaves' })
+         .toEqual({
+            active: false,
+            melee: before.melee - 3,
+         });
+
+      await setEffectActive(page, actorUuid, wardUuid, false);
+      await expect.poll(readWarded, { message: 'the immunity ended: the effect applies again' }).toEqual(before);
+   });
 });

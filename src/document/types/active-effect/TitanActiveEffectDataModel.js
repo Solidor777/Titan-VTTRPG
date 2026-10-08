@@ -1,4 +1,5 @@
 import TitanActiveEffectBase from '~/document/types/active-effect/TitanActiveEffectBase.js';
+import isSuppressedByImmunity from '~/document/types/active-effect/IsSuppressedByImmunity.js';
 import RulesElementMixin from '~/document/types/item/rules-element/RulesElementMixin.js';
 import buildSchemaFromShape from '~/helpers/utility-functions/BuildSchemaFromShape.js';
 import createEffectSystemTemplate from '~/document/types/active-effect/EffectSystemTemplate.js';
@@ -29,6 +30,15 @@ export default class TitanActiveEffectDataModel extends RulesElementMixin(TitanA
       Object.assign(schema, buildSchemaFromShape(createEffectSystemTemplate()));
 
       return schema;
+   }
+
+   /**
+    * Whether this Active Effect is suppressed: true while its Character is immune to it; otherwise undefined, so core's
+    * expiry test decides.
+    * @returns {true|undefined} The immunity suppression.
+    */
+   get isSuppressed() {
+      return isSuppressedByImmunity(this.parent);
    }
 
    /**

@@ -36,8 +36,8 @@ export default class TitanActiveEffect extends CustomTraitMixin(CheckListMixin(f
    }
 
    /**
-    * Performs initialization logic before document creation.
-    * For the 'effect' subtype, captures initial document data, then applies the creation changes
+    * Performs initialization logic before document creation. Refuses a condition or effect the owning Character is
+    * immune to. For the 'effect' subtype, captures initial document data, then applies the creation changes
     * (getEffectCreationChanges): the status icon always shows, and a timed effect is disabled exactly when no time
     * remains.
     * @override
@@ -51,6 +51,18 @@ export default class TitanActiveEffect extends CustomTraitMixin(CheckListMixin(f
       /** @type {boolean|void} - The result of the parent pre-create handler. */
       const retVal = await super._preCreate(data, options, user);
       if (retVal === false) {
+         return false;
+      }
+
+      // Refuse a condition or effect the Character is immune to, naming the immunity's sources.
+      /** @type {ImmunitySource[]} The sources granting an immunity to this effect. */
+      const immunitySources = this.parent?.system?.isCharacter ? this.parent.system.getImmunitySources(this) : [];
+      if (immunitySources.length > 0) {
+         ui.notifications.warn(game.i18n.format('LOCAL.immuneToEffect.text', {
+            actor: this.parent.name,
+            effect: this.name,
+            sources: immunitySources.map((source) => source.name).join(', '),
+         }));
          return false;
       }
 

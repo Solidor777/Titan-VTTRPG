@@ -43,6 +43,7 @@ import createResistanceCheckParameters from '~/check/types/resistance-check/Resi
 import buildSchemaFromShape from '~/helpers/utility-functions/BuildSchemaFromShape.js';
 import createCharacterSystemTemplate from '~/document/types/actor/types/character/CharacterSystemTemplate.js';
 import createArmorTraitCheckModifiers from '~/document/types/item/types/armor/ArmorTraitCheckModifiers.js';
+import { createEmptyImmunities } from '~/document/types/item/rules-element/Immunity.js';
 import getBestPlayerOwner from '~/helpers/utility-functions/GetBestPlayerOwner.js';
 import getOwners from '~/helpers/utility-functions/GetOwners.js';
 import autoDecreaseEffectDuration from '~/helpers/Settings/AutoDecreaseEffectDuration.js';
@@ -285,6 +286,21 @@ import assert from '~/helpers/utility-functions/Assert.js';
  */
 
 /**
+ * The item or Active Effect granting an immunity.
+ * @typedef {object} ImmunitySource
+ * @property {string} id - The source document's id.
+ * @property {string} name - The source document's name, named in the refusal notification.
+ */
+
+/**
+ * A Character's immunities, each key mapped to the sources granting it: one Map per `IMMUNITY_SELECTORS` entry, built
+ * by `createEmptyImmunities`.
+ * @typedef {object} Immunities
+ * @property {Map<string, ImmunitySource[]>} condition - Condition immunities, keyed by condition id.
+ * @property {Map<string, ImmunitySource[]>} effect - Effect immunities, keyed by camel-case effect name.
+ */
+
+/**
  * Whether a selector key is blank. A blank key never matches a check: the rules-elements cache builders skip it and
  * the lookups ignore it, for a single key and inside an array of keys.
  * @param {*} key - The key to test.
@@ -341,6 +357,25 @@ export default class CharacterDataModel extends TitanActorDataModel {
          ...super._defineDocumentSchema(),
          ...buildSchemaFromShape(createCharacterSystemTemplate()),
       };
+   }
+
+   /**
+    * Derives this Character's immunities. Runs in the system's base-data pass, before `Actor#applyActiveEffects`
+    * (prepareEmbeddedDocuments) reads each Active Effect's `active`, which reads `isSuppressed`, which reads these
+    * immunities; derived data would be one preparation late.
+    * @override
+    */
+   prepareBaseData() {
+      super.prepareBaseData();
+      this.parent.immunities = this._getImmunities();
+   }
+
+   /**
+    * This Character's condition and effect immunities, derived in prepareBaseData. Empty before the first preparation.
+    * @returns {Immunities} The sources granting each immunity, keyed by condition id or camel-case effect name.
+    */
+   get immunities() {
+      return this.parent.immunities ?? createEmptyImmunities();
    }
 
    prepareDerivedData() {
@@ -626,6 +661,72 @@ export default class CharacterDataModel extends TitanActorDataModel {
    }
 
    /**
+    * Gathers this Character's immunities from the immunity elements of every applying rules-element source (the same
+    * sources `_applyRulesElements` reads). A source counts whether or not it is itself suppressed, because suppression
+    * is decided from these immunities. A blank key or an unknown selector grants nothing; a typed selector's key (an
+    * effect name) is camel-cased so it matches the effect's name regardless of case or spacing. A source granting the
+    * same immunity twice is listed once.
+    * @returns {Immunities} The sources granting each immunity, keyed by condition id or camel-case effect name.
+    * @private
+    */
+   _getImmunities() {
+      /** @type {Immunities} The immunities gathered so far, empty until a source grants one. */
+      const immunities = createEmptyImmunities();
+      for (const source of this._getRulesElementSources()) {
+         for (const element of source.elements) {
+            if (
+               element.operation !== 'immunity' ||
+               !Object.hasOwn(immunities, element.selector) ||
+               isBlankSelectorKey(element.key)
+            ) {
+               continue;
+            }
+
+            /** @type {string} The key the immunity is matched by. */
+            const key = TYPED_KEY_SELECTORS.immunity.includes(element.selector) ?
+               camelize(String(element.key)) :
+               element.key;
+
+            /** @type {ImmunitySource[]} The sources already granting this immunity. */
+            const keySources = immunities[element.selector].get(key) ?? [];
+            if (!keySources.some((entry) => entry.id === source.id)) {
+               keySources.push({
+                  id: source.id,
+                  name: source.name,
+               });
+            }
+            immunities[element.selector].set(key, keySources);
+         }
+      }
+      return immunities;
+   }
+
+   /**
+    * Gets the sources of this Character's immunities to an Active Effect: a condition by any of its statuses, an
+    * effect by its camel-cased name. An immunity never covers the effect granting it.
+    * @param {TitanActiveEffect} effect - The Active Effect (existing or pending creation).
+    * @returns {ImmunitySource[]} The sources granting an immunity to it, each once; empty when not immune.
+    */
+   getImmunitySources(effect) {
+      /** @type {Immunities} This Character's immunities. */
+      const immunities = this.immunities;
+
+      /** @type {ImmunitySource[]} Every matching source, possibly repeated. */
+      const matches = [];
+      if (effect.type === 'condition') {
+         for (const status of effect.statuses) {
+            matches.push(...(immunities.condition.get(status) ?? []));
+         }
+      }
+      else if (effect.type === 'effect') {
+         matches.push(...(immunities.effect.get(camelize(String(effect.name))) ?? []));
+      }
+
+      return matches.filter((source, index) => source.id !== effect.id &&
+         matches.findIndex((entry) => entry.id === source.id) === index);
+   }
+
+   /**
     * Lists the sources whose Rules Elements apply to this Character, in application order: owned items (abilities
     * always; armor and shields while equipped in their slot; weapons and equipment while equipped), then the equipped
     * armor's traits (synthetic situational check modifiers, sourced as the armor), then enabled `effect` Active
@@ -730,6 +831,13 @@ export default class CharacterDataModel extends TitanActorDataModel {
       /** @type {object[]} The gathered, tagged Rules Elements. */
       const rulesElements = [];
       for (const source of this._getRulesElementSources()) {
+         // A suppressed Active Effect's modifiers stop applying until the immunity ends; immunities it grants still
+         // apply (the prepareBaseData pre-pass reads every enabled source). Only the immunity suppression is read
+         // here: `disabled` is the gate for an effect's own state.
+         if (source.effect?.system.isSuppressed) {
+            continue;
+         }
+
          /** @type {object[]} Copies of the source's elements, safe to tag. */
          const copiedElements = structuredClone(source.elements);
          for (const element of copiedElements) {
@@ -817,7 +925,8 @@ export default class CharacterDataModel extends TitanActorDataModel {
                   break;
                }
                case 'immunity': {
-                  // An immunity modifies no stat or check, so it joins no applier.
+                  // Immunities are read by the prepareBaseData pre-pass (`_getImmunities`); an immunity modifies no
+                  // stat or check, so it joins no applier.
                   break;
                }
                default: {

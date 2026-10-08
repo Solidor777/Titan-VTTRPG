@@ -437,7 +437,8 @@ The immunity editor (`ItemSheetImmunitySettings`) holds two further switches ove
 (`onSelectorChange`, `getKeyInput`; the same test pins them): a condition immunity keys through `ConditionSelect` (every
 `CONDITION_IDS` entry, `src/system/Conditions.js`), an effect immunity through a typed name (its `TYPED_KEY_SELECTORS`
 entry). `_applyRulesElements` joins an `immunity` element to no stat or check applier, and `createEmptyImmunities`
-(`Immunity.js`) builds the `{ condition: Map, effect: Map }` shape of an immunities object.
+(`Immunity.js`) builds the `{ condition: Map, effect: Map }` shape of every immunities object (`_getImmunities`' result
+and the `immunities` getter's empty default). "Immunity" below describes derivation, suppression and refusal.
 
 The shared `rulesElement` array plus its `addRulesElement` / `deleteRulesElement` mutators come from
 `RulesElementMixin` (`src/document/types/item/rules-element/RulesElementMixin.js`), used by both
@@ -453,18 +454,19 @@ tagged `'ability'`; armor and shields while equipped in their slot, weapons and 
 (tagged `'equipment'`), enabled `effect`-subtype Active Effects (tagged `'effect'`), then enabled `condition`-subtype
 Active Effects (tagged `'condition'`); Active Effects need a non-empty `system.rulesElement`. The order is the order
 situational modifiers list their sources in. `CharacterDataModel._applyRulesElements` (called from
-`prepareDerivedData`) copies each source's elements, tagging each with its bucket (`type`) and its source's name
-(`sourceName`). Condition mechanics are derived entirely through this pipeline — the seeded `system.rulesElement` on
-each mechanically-active condition (see `Conditions.js`) feeds the same `flatModifier`/`mulSum`/`setSum` appliers,
-and each stat-mod bucket carries a `condition` entry (alongside `equipment`/`effect`/`ability`). There is no
-hardcoded condition `switch`; the old `_applyConditions` method was retired. All sources feed the character's
-derived stats. Before bucketing, `_expandAllKeyElements` rewrites every element whose `key === 'all'`
-into one element per concrete key under its selector (keys resolved by `_getSelectorKeys`, which maps
-`training`/`expertise` to `Object.keys(this.skill)` and otherwise reads `Object.keys(this[selector])`); an
-element whose selector resolves to no keys (a typed custom trait, spell tradition, or situation label, or any
-non-stat selector) passes through unchanged with its key as typed. Any operation carrying a key supports
-`'all'` at the engine level (`flatModifier`/`mulSum`/`setSum` are the additive/sum ops that use it), but the
-settings UI only exposes the `'all'` option (`allowAll` on the key select) for `mulSum` and `setSum`.
+`prepareDerivedData`) skips a source whose Active Effect has `system.isSuppressed` (an immunity covers it), and copies
+each other source's elements, tagging each with its bucket (`type`) and its source's name (`sourceName`). Condition
+mechanics are derived entirely through this pipeline — the seeded `system.rulesElement` on each mechanically-active
+condition (see `Conditions.js`) feeds the same `flatModifier`/`mulSum`/`setSum` appliers, and each stat-mod bucket
+carries a `condition` entry (alongside `equipment`/`effect`/`ability`). There is no hardcoded condition `switch`; the
+old `_applyConditions` method was retired. All sources feed the character's derived stats. Before bucketing,
+`_expandAllKeyElements` rewrites every element whose `key === 'all'` into one element per concrete key under its
+selector (keys resolved by `_getSelectorKeys`, which maps `training`/`expertise` to `Object.keys(this.skill)` and
+otherwise reads `Object.keys(this[selector])`); an element whose selector resolves to no keys (a typed custom trait,
+spell tradition, or situation label, or any non-stat selector) passes through unchanged with its key as typed. Any
+operation carrying a key supports `'all'` at the engine level (`flatModifier`/`mulSum`/`setSum` are the additive/sum ops
+that use it), but the settings UI only exposes the `'all'` option (`allowAll` on the key select) for `mulSum` and
+`setSum`.
 
 It then sorts the expanded elements into per-operation arrays and invokes per-op appliers in a fixed order:
 the additive appliers (`_applyMulBaseElements`, then `_applyFlatModifierElements`) run first, then the
@@ -485,6 +487,24 @@ Disadvantage on "Swim, Fly, or Climb" (Athletics); Loud → Disadvantage on "Rem
 The character `mod` stats are only `armor`, `resolveRegain`, and `woundRegain` (`src/system/Mods.js`); check damage
 and healing bonuses are not mods — they come only from `conditionalCheckModifier` elements with `modifierType`
 `damage`/`healing`, where check type `any` + selector `any` applies to every attack, casting, and item check.
+
+**Immunity.** `CharacterDataModel.prepareBaseData` stores `parent.immunities` (the `Immunities` typedef: a Map per
+`IMMUNITY_SELECTORS` entry, each key mapped to `ImmunitySource[]` of `{ id, name }`) from `_getImmunities`, which reads
+the `immunity` elements of every applying `_getRulesElementSources` source, suppressed or not (suppression is decided
+from them). It runs in the base-data pass because core's `Actor#applyActiveEffects` (prepareEmbeddedDocuments) reads
+each effect's `active`, which reads `isSuppressed`, before `prepareDerivedData`; a typed selector's key (an effect
+name) is camel-cased (`TYPED_KEY_SELECTORS.immunity`); the `immunities` getter is empty before the first preparation.
+`getImmunitySources(effect)` matches a condition by any of its statuses and an effect by its camel-cased name, never
+names the effect granting the immunity, and lists each source once. `ConditionDataModel#isSuppressed` and
+`TitanActiveEffectDataModel#isSuppressed` return `isSuppressedByImmunity(parent)` (`IsSuppressedByImmunity.js`): true
+while the Character is immune, otherwise undefined so core's duration-expiry test still decides. A suppressed effect is
+inactive (out of `actor.statuses`) and `_applyRulesElements` skips its modifiers, while the immunities it grants still
+apply (a mutually immune pair is both suppressed); its duration keeps ticking and it returns untouched when the
+immunity ends. `TitanActiveEffect#_preCreate` returns `false` for a creation the Character is immune to, with a
+`LOCAL.immuneToEffect.text` warning naming the actor, the effect and the sources; `applyEffectToTargets` counts only
+the copies a target accepted. Live pins: `tests/e2e/logic/conditions.spec.js` (suppression, refusal through the Token
+HUD), `effect-tray.spec.js` (refusal by Apply, the accepted count), `combat-turns.spec.js` (a suppressed timer ticks);
+`tests/unit/Immunity.test.js` pins the computations on given inputs.
 
 
 ## Sheets

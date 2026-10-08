@@ -5,7 +5,9 @@ import { chooseContextMenuEntry } from './contextMenu.js';
 import { login, openSheetByUuid } from './fixtures.js';
 import {
    addEffect,
+   addRulesElement,
    controlPlacedToken,
+   controlPlacedTokens,
    createActor,
    createCompendium,
    createFolder,
@@ -578,6 +580,78 @@ test.describe('Apply to Target', () => {
             { message: 'the effect must be copied onto the controlled token actor' },
          )
          .toEqual(['E2E Tray Effect']);
+   });
+
+   /**
+    * Makes a player actor whose permanent ward effect is immune to the shared tray pack's effect by name, and places
+    * its token on the shared scene.
+    * @param {string} name - The actor's name.
+    * @returns {Promise<{actorId: string, tokenId: string}>} The actor's id and its token's id.
+    */
+   async function immuneTarget(name) {
+      await viewScene(page, sceneId);
+
+      /** @type {string} The id of the actor that owns the ward. */
+      const actorId = await createActor(page, {
+         name,
+         type: 'player',
+      });
+
+      /** @type {string} The id of the ward effect granting the immunity. */
+      const wardId = await addEffect(page, actorId, 'E2E Tray Ward', { duration: 'permanent' });
+      await addRulesElement(page, `Actor.${actorId}.ActiveEffect.${wardId}`, {
+         key: 'E2E Tray Effect',
+         operation: 'immunity',
+         selector: 'effect',
+      });
+      return {
+         actorId,
+         tokenId: await placeToken(page, actorId),
+      };
+   }
+
+   test('an immune target refuses the applied effect and the notice counts only the targets that took it', async () => {
+      /** @type {{actorId: string, tokenId: string}} The target whose ward refuses the effect. */
+      const immune = await immuneTarget('E2E Tray Immune Target');
+      await viewScene(page, sceneId);
+
+      /** @type {string} The id of the target that takes the effect. */
+      const plainId = await createActor(page, {
+         name: 'E2E Tray Plain Target',
+         type: 'player',
+      });
+      await controlPlacedTokens(page, [
+         immune.tokenId,
+         await placeToken(page, plainId),
+      ]);
+      await openTrayPack(page, await shared(page, 'trayPack'));
+      await page.evaluate(() => ui.notifications.clear());
+      await trayRow(page, 'E2E Tray Effect').locator('[data-testid="effect-tray-apply"]').first().click();
+
+      // The refusal names the target and the ward; the outcome notice counts the one target that took the effect.
+      await expect(page.locator('#notifications .notification.warning', { hasText: /is immune to/i })).toHaveCount(1);
+      await expect(page.locator('#notifications .notification.warning')).toContainText('E2E Tray Immune Target');
+      await expect(page.locator('#notifications .notification.warning')).toContainText('E2E Tray Ward');
+      await expect(page.locator('#notifications .notification.info', {
+         hasText: 'Applied E2E Tray Effect to 1 actor(s).',
+      })).toHaveCount(1);
+      expect(await actorEffectNames(immune.actorId), 'the immune target took no copy').toEqual(['E2E Tray Ward']);
+      expect(await actorEffectNames(plainId), 'the other target took the copy').toEqual(['E2E Tray Effect']);
+   });
+
+   test('an effect every target refuses is not reported as applied', async () => {
+      /** @type {{actorId: string, tokenId: string}} The only target, whose ward refuses the effect. */
+      const immune = await immuneTarget('E2E Tray Sole Immune Target');
+      await controlPlacedToken(page, immune.tokenId);
+      await openTrayPack(page, await shared(page, 'trayPack'));
+      await page.evaluate(() => ui.notifications.clear());
+      await trayRow(page, 'E2E Tray Effect').locator('[data-testid="effect-tray-apply"]').first().click();
+      await expect(page.locator('#notifications .notification.warning', { hasText: /is immune to/i })).toHaveCount(1);
+
+      // The creation has resolved once no document operation is in flight, so the outcome notice would have been shown.
+      await settle(page);
+      await expect(page.locator('#notifications .notification.info', { hasText: /^Applied/ })).toHaveCount(0);
+      expect(await actorEffectNames(immune.actorId), 'the target took no copy').toEqual(['E2E Tray Ward']);
    });
 });
 

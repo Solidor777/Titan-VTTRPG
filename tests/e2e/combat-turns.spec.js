@@ -853,6 +853,56 @@ test.describe('conditions and turn effects in a turn start report', () => {
    });
 });
 
+test.describe('immunity and turn durations', () => {
+   test('a suppressed timed effect keeps counting down at the turn start', async () => {
+      await setWorldSetting(gm, 'autoDecreaseEffectDuration', true);
+      await setWorldSetting(gm, 'autoRemoveExpiredEffects', 'disabled');
+
+      /** @type {string} The id of the timed effect the ward suppresses. */
+      const timerId = await addEffect(gm, cast.conditioned.id, 'E2E Suppressed Timer', {
+         duration: 'turnStart',
+         remaining: 3,
+      });
+
+      /** @type {string} The id of the ward, a permanent effect immune to the timer by name. */
+      const wardId = await addEffect(gm, cast.conditioned.id, 'E2E Timer Ward', { duration: 'permanent' });
+      await addRulesElement(gm, `${cast.conditioned.uuid}.ActiveEffect.${wardId}`, {
+         key: 'E2E Suppressed Timer',
+         operation: 'immunity',
+         selector: 'effect',
+      });
+
+      /**
+       * Reads the timer's remaining turns and whether an immunity suppresses it.
+       * @returns {Promise<{remaining: number, suppressed: boolean}>} The timer's state.
+       */
+      const readTimer = () => gm.evaluate(({ id, effectId }) => {
+         /** @type {TitanActiveEffect} The timed effect the ward suppresses. */
+         const timer = game.actors.get(id).effects.get(effectId);
+         return {
+            remaining: timer.system.duration.remaining,
+            suppressed: timer.system.isSuppressed === true,
+         };
+      }, {
+         id: cast.conditioned.id,
+         effectId: timerId,
+      });
+      expect(await readTimer(), 'the ward suppresses the timer before the turn').toEqual({
+         remaining: 3,
+         suppressed: true,
+      });
+
+      await startEncounter('conditioned');
+      await nextTurn(gm);
+      await expect.poll(readTimer, { message: 'the suppressed timer counted down at the turn start' }).toEqual({
+         remaining: 2,
+         suppressed: true,
+      });
+      await endCombat(gm);
+      await createCombat(gm);
+   });
+});
+
 // The last test of the file: it reloads the page and leaves its new scene active.
 test('with no scene active, a token placed on a new scene is on a fully drawn canvas', async () => {
    // A world boot inside the test exceeds the 60 s default under the throttled runner.
