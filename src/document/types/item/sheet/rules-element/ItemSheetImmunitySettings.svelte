@@ -66,7 +66,7 @@
          bind:value={document.data.system.rulesElement[idx].selector}
          onchange={onSelectorChange}
          options={IMMUNITY_SELECTORS}
-         testId={'immunity-selector'}
+         testId="immunity-selector"
       />
    </div>
 
@@ -76,7 +76,7 @@
          {@const KeyInput = getKeyInput()}
          <KeyInput
             bind:value={document.data.system.rulesElement[idx].key}
-            testId={'immunity-key'}
+            testId="immunity-key"
          />
       {/if}
    </div>

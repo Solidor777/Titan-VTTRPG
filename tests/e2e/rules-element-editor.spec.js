@@ -462,7 +462,9 @@ test.describe('immunity editor', () => {
       /** @type {import('@playwright/test').Locator} The weapon's sheet. */
       const sheet = await openRulesElements();
 
-      // A condition immunity keys through a select, so the name input is absent until the selector changes.
+      // A condition immunity keys through a select, so the name input is absent until the selector changes. The
+      // select is shown first, so the absence is of the input the select replaces.
+      await expect(sheet.getByTestId('immunity-key')).toBeVisible();
       await expect(sheet.locator('input[data-testid="immunity-key"]')).toHaveCount(0);
       await selectTitanOption(page, sheet.getByTestId('immunity-selector'), 'effect');
       await expect.poll(readElement, { message: 'switching to effect clears the key' }).toEqual({
