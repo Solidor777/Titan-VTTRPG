@@ -5,10 +5,10 @@ attention. NOT a to-do list (deferred work goes to `docs/TODO.md`; bugs go to `d
 
 ### Foundry v14 core: a token's deletion stores a tombstone only where its base actor holds the id (2026-10-01)
 
-Measured live 3 times with a raw-data token, pending real-path re-run, as the active GM with Migration Mode Disabled, on
-an unlinked world-scene token named apart from its base actor (so its delta is stored, OPEN_BUGS #102). Each deletion
-was a one-id `deleteEmbeddedDocuments` through the token's synthetic actor, read back after a reload from
-`token._source.delta` and from a server fetch (`Scene.database.get`):
+Measured live 3 times with a raw-data token, not re-run; no migration tests while no migration is active (project
+rule), as the active GM with Migration Mode Disabled, on an unlinked world-scene token named apart from its base actor
+(so its delta is stored, OPEN_BUGS #102). Each deletion was a one-id `deleteEmbeddedDocuments` through the token's
+synthetic actor, read back after a reload from `token._source.delta` and from a server fetch (`Scene.database.get`):
 
 - the token's own Item, which the base actor lacks: no tombstone stored;
 - the token's own Active Effect, which the base actor lacks: no tombstone stored;
@@ -31,8 +31,8 @@ ActorDelta, so the stored-actor migration never writes such tokens on world scen
 delta holds pending work as a failure that names its scene and the token and says to delete the token (CLOSED_BUGS
 #105).
 
-Measured live with raw-data tokens, pending real-path re-run, on a world-scene token and a Scene-pack token, with a
-second GM connected and a reload read-back:
+Measured live with raw-data tokens, not re-run; no migration tests while no migration is active (project rule), on a
+world-scene token and a Scene-pack token, with a second GM connected and a reload read-back:
 
 - A parent write that adds an entry fails the client's dry run, and nothing is stored. This held for a Token update
   (default options, `recursive: false`, and `diff: false, recursive: false`) and for `scene.update({ tokens })`. The
@@ -42,9 +42,10 @@ second GM connected and a reload read-back:
   `delta.items`, stores nothing and logs nothing.
 - A parent update of an entry the delta already holds is stored with no error, and tombstones survive every write.
 
-Measured live with a raw-data token, pending real-path re-run, on the Scene-pack token only, without a read-back (the
-run stopped at the throw): an embedded create on the delta (`token.delta.createEmbeddedDocuments`) threw
-`Cannot read properties of null (reading 'tokenActiveEffectChanges')` on the client, from `#handleCreateDocuments`.
+Measured live with a raw-data token, not re-run; no migration tests while no migration is active (project rule), on the
+Scene-pack token only, without a read-back (the run stopped at the throw): an embedded create on the delta
+(`token.delta.createEmbeddedDocuments`) threw `Cannot read properties of null (reading 'tokenActiveEffectChanges')` on
+the client, from `#handleCreateDocuments`.
 
 Read in core, not run: the throw site is `TokenDocument#_onRelatedUpdate` (`client/documents/token.mjs:3809`), which
 reads `this.actor` while the token's actor is null (:253-257). The same create on the world-scene token, and every
@@ -54,11 +55,12 @@ Inferred, not read back: the throw comes after the server write, because `#handl
 server's response.
 
 An Adventure's scene tokens are inline data, written with `adventure.update({ scenes })`. One such write (live with a
-raw-data token, pending real-path re-run) stored a create, an update and a delete on a token whose actor id names no
-actor, with no client error, so Adventure tokens are migrated whatever their base actor. Orphaned tokens were removed
-from the user's worlds by a one-off cleanup outside the code (2026-10-01). Any other world keeps the stale conditions
-and legacy effect Items of its orphaned tokens until those tokens are deleted, and its GM sees a migration prompt
-(Prompt) or a reported failure (Automatic) on every load until then.
+raw-data token, not re-run; no migration tests while no migration is active (project rule)) stored a create, an update
+and a delete on a token whose actor id names no actor, with no client error, so Adventure tokens are migrated whatever
+their base actor. Orphaned tokens were removed from the user's worlds by a one-off cleanup outside the code
+(2026-10-01). Any other world keeps the stale conditions and legacy effect Items of its orphaned tokens until those
+tokens are deleted, and its GM sees a migration prompt (Prompt) or a reported failure (Automatic) on every load until
+then.
 
 ### Adventure packs are read whole on every Prompt or Automatic GM load (2026-09-30)
 

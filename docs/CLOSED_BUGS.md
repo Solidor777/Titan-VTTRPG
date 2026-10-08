@@ -699,8 +699,8 @@ when fixed.
 - **What:** `.titan .content-link` set only the text colour (`#191813` in every theme) over Foundry's scheme background,
   which is near-black in the dark scheme. Chat stayed readable because the chat log is a light-scheme region.
 - **Fixed:** 2026-09-26 — `content-link-background` and `content-link-border-color` theme tokens (panel-2 pair per
-  theme); saved custom themes are completed with later contract tokens. Gated by a WCAG AA unit test and
-  `content-link-theme.spec.js`.
+  theme); saved custom themes are completed with later contract tokens. Gated by a WCAG AA unit test
+  (`tests/unit/ThemeContract.test.js`) and the `content links` tests of `tests/e2e/theme.spec.js`.
 - **Gate (2026-10-07):** `tests/e2e/theme.spec.js`, the `content links` tests, one per built-in theme.
 
 ### 55. Skill rows clipped and misaligned
@@ -920,9 +920,11 @@ when fixed.
 - **Found:** 2026-09-29 while planning the condition-effect sync (spec B, conditions rework).
 - **Fixed:** 2026-09-29 (the version chain) and 2026-09-30 (the converter) — `resolveMigrationAction(mode,
   needsMigration)` (`src/helpers/migration/MigrateWorld.js`) maps the mode to none / migrate / prompt before any scan,
-  and every migration step runs inside `migrateWorld` (#82). No live gate: the tests that gated it
-  (`tests/unit/MigrationAction.test.js`, `tests/unit/OnceReady.test.js`,
-  `tests/e2e/condition-migration.spec.js`) were deleted in `d874870b` (no migration tests while no migration is active).
+  and every migration step runs inside `migrateWorld` (#82).
+- **Gate:** not tested: migration tests deleted 2026-10-02 (`d874870b`) by project rule (ruling 2026-10-01); the
+  migration system was confirmed once by the one-off check (§7.0 of
+  `docs/superpowers/plans/2026-10-01-test-suite-real-data.md`). The deleted tests were
+  `tests/unit/MigrationAction.test.js`, `tests/unit/OnceReady.test.js` and `tests/e2e/condition-migration.spec.js`.
 
 ### 75. Stat breakdowns never listed condition modifiers
 
@@ -1006,11 +1008,13 @@ when fixed.
 - **Fixed:** 2026-09-30 — the converter runs only inside `migrateWorld`, per stored actor in `migrateStoredActors`
   (`src/helpers/migration/MigrateStoredActors.js`) before the version chains, and `worldNeedsMigration` reports legacy
   effect Items, so all three modes govern it; only the active GM migrates, a token's actor is read only to write it,
-  and the final notification counts failures. No live gate: the tests that gated it (`tests/unit/OnceReady.test.js`,
-  `tests/unit/MigrateStoredActors.test.js`,
-  `tests/unit/MigrateWorld.test.js`, `tests/unit/ConvertEffectItemsToActiveEffects.test.js`,
-  `tests/unit/StoredActorSources.test.js`, `tests/e2e/condition-migration.spec.js`,
-  `tests/e2e/pack-conversion.spec.js`) were deleted in `d874870b` (no migration tests while no migration is active).
+  and the final notification counts failures.
+- **Gate:** not tested: migration tests deleted 2026-10-02 (`d874870b`) by project rule (ruling 2026-10-01); the
+  migration system was confirmed once by the one-off check (§7.0 of
+  `docs/superpowers/plans/2026-10-01-test-suite-real-data.md`). The deleted tests were `tests/unit/OnceReady.test.js`,
+  `tests/unit/MigrateStoredActors.test.js`, `tests/unit/MigrateWorld.test.js`,
+  `tests/unit/ConvertEffectItemsToActiveEffects.test.js`, `tests/unit/StoredActorSources.test.js`,
+  `tests/e2e/condition-migration.spec.js` and `tests/e2e/pack-conversion.spec.js`.
 
 ### 83. Condition sync and effect-item converter missed actors stored in world Scene and Adventure packs
 
@@ -1026,8 +1030,11 @@ when fixed.
   orphaned token (an unlinked token whose base actor is gone) on a world scene or in a world Scene pack is never
   written, because Foundry v14 core cannot create or delete entries in its delta (#96); one with pending work is
   reported as a failure that names it and says to delete it (#105). An Adventure's scene tokens are data, and are
-  walked whatever their base actor. No live gate: the tests that gated it (`tests/unit/StoredActorSources.test.js`,
-  `tests/e2e/condition-migration.spec.js`) were deleted in `d874870b` (no migration tests while no migration is active).
+  walked whatever their base actor.
+- **Gate:** not tested: migration tests deleted 2026-10-02 (`d874870b`) by project rule (ruling 2026-10-01); the
+  migration system was confirmed once by the one-off check (§7.0 of
+  `docs/superpowers/plans/2026-10-01-test-suite-real-data.md`). The deleted tests were
+  `tests/unit/StoredActorSources.test.js` and `tests/e2e/condition-migration.spec.js`.
 
 ### 84. Report text reached tooltips and rich text as unsanitized HTML
 
@@ -1149,9 +1156,12 @@ when fixed.
   fails the write of its whole Adventure field, because core validates every element of the field; the failure names
   each entry still holding a legacy effect Item. The cure is to resolve the failure the pass reports for that entry by
   name (its conversion's own error), or to remove the entry from the Adventure; the next migrating GM load then stores
-  the field. No live gate: the tests that gated it (`tests/unit/StoredActorSources.test.js`,
-  `tests/unit/MigrateStoredActors.test.js`, `tests/e2e/condition-migration.spec.js`) were deleted in `d874870b` (no
-  migration tests while no migration is active).
+  the field.
+- **Gate:** not tested: migration tests deleted 2026-10-02 (`d874870b`) by project rule (ruling 2026-10-01); the
+  migration system was confirmed once by the one-off check (§7.0 of
+  `docs/superpowers/plans/2026-10-01-test-suite-real-data.md`). The deleted tests were
+  `tests/unit/StoredActorSources.test.js`, `tests/unit/MigrateStoredActors.test.js` and
+  `tests/e2e/condition-migration.spec.js`.
 
 ### 94. Legacy timed effects converted inside an Adventure were stored enabled after they expired
 
@@ -1166,11 +1176,12 @@ when fixed.
   `_preCreate` applies it, and the Adventure write path builds every created effect with
   `TitanActiveEffect.buildCreationSource`, which constructs the effect (so its schema cleans the data as creation does)
   and applies the same rule and core's `transfer: false`. The data path stores what creation stores except `start`,
-  which records a creation moment that inline data lacks. Gated by `tests/unit/GetEffectCreationChanges.test.js` (the
-  rule). The tests that also gated it (`tests/unit/StoredActorSources.test.js`,
-  `tests/e2e/effect-creation-source.spec.js`) were deleted in `d874870b` (no migration tests while no migration is
-  active); the Adventure write path and the stored `disabled`,
-  `showIcon` and `transfer` have no live gate.
+  which records a creation moment that inline data lacks.
+- **Gate:** the rule is gated by `tests/unit/GetEffectCreationChanges.test.js`, which stays (its function is not
+  migration code). The Adventure write path and the stored `disabled`, `showIcon` and `transfer` are not tested:
+  migration tests deleted 2026-10-02 (`d874870b`) by project rule (ruling 2026-10-01); the migration system was
+  confirmed once by the one-off check (§7.0 of `docs/superpowers/plans/2026-10-01-test-suite-real-data.md`). The
+  deleted tests were `tests/unit/StoredActorSources.test.js` and `tests/e2e/effect-creation-source.spec.js`.
 
 ### 95. Migration showed "complete" when a world pack could not be read or re-locked
 
@@ -1183,9 +1194,11 @@ when fixed.
   restore; `migrateStoredActors` adds them to `failed`, and `storedActorsNeedMigration` reports work when a pack could
   not be read, so a pack that stays unreadable is reported as a failure on every migrating load. A pack the walk
   could not read is not read again in the same walk, so an Adventure pack, walked for its actors and its scene tokens,
-  counts as one failure. No live gate: the tests that gated it (`tests/unit/StoredActorSources.test.js`,
-  `tests/unit/MigrateStoredActors.test.js`) were deleted in `d874870b` (no migration tests while no migration is
-  active).
+  counts as one failure.
+- **Gate:** not tested: migration tests deleted 2026-10-02 (`d874870b`) by project rule (ruling 2026-10-01); the
+  migration system was confirmed once by the one-off check (§7.0 of
+  `docs/superpowers/plans/2026-10-01-test-suite-real-data.md`). The deleted tests were
+  `tests/unit/StoredActorSources.test.js` and `tests/unit/MigrateStoredActors.test.js`.
 
 ### 96. Unlinked tokens whose base actor is gone were never migrated in world scenes and Scene packs
 
@@ -1208,12 +1221,13 @@ when fixed.
 
   The write limitation comes from Foundry v14 core: core cannot create or delete entries in an orphaned token's
   delta, and the conversion needs both (`docs/POST_WORK_FINDINGS.md`, 2026-10-01).
-  - Measured live with raw-data tokens, pending real-path re-run, on a world-scene and a Scene-pack token, with a second
-    GM connected and a reload read-back: a parent Token or Scene update that adds an entry is rejected by the client's
-    dry run (`EmbeddedCollectionDelta#_prepareDeltaUpdate`); one that drops an entry, or deletes it with an update
-    operator, stores nothing; one that updates an entry the delta already holds is stored, and tombstones survive.
-  - Measured live with a raw-data token, pending real-path re-run, on the Scene-pack token only: an embedded create
-    through the token's ActorDelta threw on the client.
+  - Measured live with raw-data tokens, not re-run; no migration tests while no migration is active (project rule), on a
+    world-scene and a Scene-pack token, with a second GM connected and a reload read-back: a parent Token or Scene
+    update that adds an entry is rejected by the client's dry run (`EmbeddedCollectionDelta#_prepareDeltaUpdate`); one
+    that drops an entry, or deletes it with an update operator, stores nothing; one that updates an entry the delta
+    already holds is stored, and tombstones survive.
+  - Measured live with a raw-data token, not re-run; no migration tests while no migration is active (project rule), on
+    the Scene-pack token only: an embedded create through the token's ActorDelta threw on the client.
   - Read in core, not run: the throw site, `TokenDocument#_onRelatedUpdate` (`client/documents/token.mjs:3809`),
     which dereferences the token's null actor; the same create on the world-scene token; and the embedded update and
     delete, which reach the same line.
@@ -1222,9 +1236,12 @@ when fixed.
     `docs/TODO.md` and done 2026-10-01.
   - The walker comments state the reasons, and CLOSED_BUGS #83 states the exception.
   - An Adventure's scene tokens are inline data written through the Adventure, which core writes cleanly whatever the
-    base actor (live with a raw-data token, pending real-path re-run), so they are migrated.
-  - No live gate: `tests/unit/StoredActorSources.test.js` was deleted in `d874870b` (no migration tests while no
-    migration is active).
+    base actor (live with a raw-data token, not re-run; no migration tests while no migration is active (project
+    rule)), so they are migrated.
+- **Gate:** not tested: migration tests deleted 2026-10-02 (`d874870b`) by project rule (ruling 2026-10-01); the
+  migration system was confirmed once by the one-off check (§7.0 of
+  `docs/superpowers/plans/2026-10-01-test-suite-real-data.md`). The deleted test was
+  `tests/unit/StoredActorSources.test.js`.
 
 ### 97. A failed version migration stored part-migrated data under the previous version
 
@@ -1235,8 +1252,10 @@ when fixed.
 - **Found:** 2026-09-30 by the buddy check of the Task 5 fix round (plan B).
 - **Fixed:** 2026-09-30 — `migrateDocument` copies the update data after each fully completed version
   (`foundry.utils.deepClone`, which keeps an update operator such as `_del` by reference) and writes that copy, so no
-  part of a failed version is stored. No live gate: `tests/unit/MigrateWorld.test.js` was deleted in `d874870b` (no
-  migration tests while no migration is active).
+  part of a failed version is stored.
+- **Gate:** not tested: migration tests deleted 2026-10-02 (`d874870b`) by project rule (ruling 2026-10-01); the
+  migration system was confirmed once by the one-off check (§7.0 of
+  `docs/superpowers/plans/2026-10-01-test-suite-real-data.md`). The deleted test was `tests/unit/MigrateWorld.test.js`.
 
 ### 98. A stored actor whose migration write a hook vetoed counted as skipped
 
@@ -1245,8 +1264,11 @@ when fixed.
   announced completion, and the next GM load found the same work again.
 - **Found:** 2026-09-30 while planning the fix for #93.
 - **Fixed:** 2026-09-30 — after its writes, each actor's data is checked again (`storedActorNeedsMigration`); an
-  actor with work left counts as failed and is reported. No live gate: `tests/unit/MigrateStoredActors.test.js` was
-  deleted in `d874870b` (no migration tests while no migration is active).
+  actor with work left counts as failed and is reported.
+- **Gate:** not tested: migration tests deleted 2026-10-02 (`d874870b`) by project rule (ruling 2026-10-01); the
+  migration system was confirmed once by the one-off check (§7.0 of
+  `docs/superpowers/plans/2026-10-01-test-suite-real-data.md`). The deleted test was
+  `tests/unit/MigrateStoredActors.test.js`.
 
 ### 99. An Adventure token whose legacy Item overrode its base actor's legacy Item ended up with two converted effects
 
@@ -1260,9 +1282,12 @@ when fixed.
   (`common/documents/actor-delta.mjs` `#mergeEmbeddedCollection`). The token's own Item converts into the token's own
   effect in the base conversion's slot (hidden by a tombstone first, then created over it), so core's merge shows one
   effect, the token's. An Adventure token's base actor is the Adventure's actor with its actor id, else the world
-  actor. No live gate: the tests that gated it (`tests/unit/StoredActorSources.test.js`,
-  `tests/unit/ConvertEffectItemsToActiveEffects.test.js`, `tests/e2e/converted-effect-identity.spec.js`)
-  were deleted in `d874870b` (no migration tests while no migration is active).
+  actor.
+- **Gate:** not tested: migration tests deleted 2026-10-02 (`d874870b`) by project rule (ruling 2026-10-01); the
+  migration system was confirmed once by the one-off check (§7.0 of
+  `docs/superpowers/plans/2026-10-01-test-suite-real-data.md`). The deleted tests were
+  `tests/unit/StoredActorSources.test.js`, `tests/unit/ConvertEffectItemsToActiveEffects.test.js` and
+  `tests/e2e/converted-effect-identity.spec.js`.
 
 ### 100. A token's overriding legacy Item converted into a duplicate when its base actor's conversion was not stored
 
@@ -1275,11 +1300,14 @@ when fixed.
   first, and whether or not the other side's write is stored, the token's own effect overrides the base actor's. A
   token's Item deletion in an Adventure stores what core stores for a world token's deletion: a tombstone where the base
   actor holds a valid Item with the id, and none for an Item the base actor lacks (both read back after a reload; live
-  with a raw-data token, pending real-path re-run). A legacy `effect` Item of the base actor takes no tombstone: it is
-  an invalid document, which core's base collection never holds, and core's client deletion tombstones only an id its
-  base collection holds. That case follows core's client deletion and is not measured: the server refuses a legacy Item,
-  so none can be seeded. No live gate: `tests/unit/StoredActorSources.test.js` was deleted in `d874870b` (no migration
-  tests while no migration is active).
+  with a raw-data token, not re-run; no migration tests while no migration is active (project rule)). A legacy `effect`
+  Item of the base actor takes no tombstone: it is an invalid document, which core's base collection never holds, and
+  core's client deletion tombstones only an id its base collection holds. That case follows core's client deletion and
+  is not measured: the server refuses a legacy Item, so none can be seeded.
+- **Gate:** not tested: migration tests deleted 2026-10-02 (`d874870b`) by project rule (ruling 2026-10-01); the
+  migration system was confirmed once by the one-off check (§7.0 of
+  `docs/superpowers/plans/2026-10-01-test-suite-real-data.md`). The deleted test was
+  `tests/unit/StoredActorSources.test.js`.
 
 ### 101. An inherited legacy Item a token removed came back as a converted effect
 
@@ -1290,10 +1318,12 @@ when fixed.
 - **Fixed:** 2026-10-01 — a token's inherited conversion of an Item its own data claims (an Item entry of its delta,
   a tombstone included, or a conversion it holds itself) is hidden with an effects tombstone, as core deletes an
   inherited effect from a synthetic actor; every walked source carries the effects it inherits, so the scan finds such
-  a token, and the stamp also finds the conversions older versions created under random ids. No live gate: the tests
-  that gated it (`tests/unit/StoredActorSources.test.js`,
-  `tests/unit/MigrateStoredActors.test.js`, `tests/e2e/converted-effect-identity.spec.js`)
-  were deleted in `d874870b` (no migration tests while no migration is active).
+  a token, and the stamp also finds the conversions older versions created under random ids.
+- **Gate:** not tested: migration tests deleted 2026-10-02 (`d874870b`) by project rule (ruling 2026-10-01); the
+  migration system was confirmed once by the one-off check (§7.0 of
+  `docs/superpowers/plans/2026-10-01-test-suite-real-data.md`). The deleted tests were
+  `tests/unit/StoredActorSources.test.js`, `tests/unit/MigrateStoredActors.test.js` and
+  `tests/e2e/converted-effect-identity.spec.js`.
 
 ### 103. Deleting an item or effect without confirmation still tried to open the confirmation dialog
 
@@ -1354,9 +1384,11 @@ The evidence files named here are in `.superpowers/sdd/test-suite-rewrite/phase-
   the migration does not write to it. Delete the token.` It never opens or writes the token, and never changes the
   lock of its Scene pack (#96 gives the reasons). An orphaned token with nothing pending is silent. The GM sees a
   migration prompt or a reported failure on every load until the token is deleted.
-  - No live gate: the tests that gated it (`tests/unit/StoredActorSources.test.js`,
-    `tests/unit/MigrateStoredActors.test.js`, `tests/e2e/condition-migration.spec.js`) were deleted in `d874870b` (no
-    migration tests while no migration is active).
+- **Gate:** not tested: migration tests deleted 2026-10-02 (`d874870b`) by project rule (ruling 2026-10-01); the
+  migration system was confirmed once by the one-off check (§7.0 of
+  `docs/superpowers/plans/2026-10-01-test-suite-real-data.md`). The deleted tests were
+  `tests/unit/StoredActorSources.test.js`, `tests/unit/MigrateStoredActors.test.js` and
+  `tests/e2e/condition-migration.spec.js`.
 
 ### 112. The Effect Tray's pack list did not show a compendium created after the tray was built
 

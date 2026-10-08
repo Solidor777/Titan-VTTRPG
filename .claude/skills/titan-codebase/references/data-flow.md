@@ -451,20 +451,21 @@ pack is yielded in its location from its own stored delta, inheriting nothing, w
 opens or writes it, and never unlocks its Scene pack (CLOSED_BUGS #96, #105). Reasons, a token holding only a stale
 condition included: it has no actor in the game; deleting it is the remedy; removing a key inside an entry through a
 parent update is unmeasured; and the scan runs on every load, so it keeps being reported. Foundry v14 core cannot create
-or delete entries in its delta (recorded in `docs/POST_WORK_FINDINGS.md`). Measured live with raw-data tokens, pending
-real-path re-run, on both, with a second GM and a reload read-back: a parent update that adds an entry fails the dry run
-in `EmbeddedCollectionDelta#_prepareDeltaUpdate`, one that drops or operator-deletes an entry stores nothing, and one
-that updates an entry the delta holds is stored. Measured with a raw-data token, pending real-path re-run, on the
-Scene-pack token only: an embedded create on the delta threw. Read in core, not run: the throw site,
+or delete entries in its delta (recorded in `docs/POST_WORK_FINDINGS.md`). Measured live with raw-data tokens, not
+re-run; no migration tests while no migration is active (project rule), on both, with a second GM and a reload
+read-back: a parent update that adds an entry fails the dry run in `EmbeddedCollectionDelta#_prepareDeltaUpdate`, one
+that drops or operator-deletes an entry stores nothing, and one that updates an entry the delta holds is stored.
+Measured with a raw-data token, not re-run (same reason), on the Scene-pack token only: an embedded create on the delta
+threw. Read in core, not run: the throw site,
 `TokenDocument#_onRelatedUpdate` (`client/documents/token.mjs:3809`), which reads the token's null actor and which every
 embedded write reaches. Inferred, not read back: the throw comes after the server write. Orphaned tokens are deleted
 from worlds by hand. A token's cached synthetic actor (`TokenDocument#actor`) stays readable in the session its base
 actor is deleted, until a reload; `token.baseActor` and `game.actors.has(actorId)`, which the walk reads, are null and
-false at once (live with a raw-data token, pending real-path re-run). An Adventure's scene tokens are inline data
-written with the whole `scenes` field, which core stores whatever the base actor (live with a raw-data token, pending
-real-path re-run), so they are walked; one whose actor id names no actor inherits nothing. Only world-package packs are
-read. The scan reads stored data only — `actor._source`, a token's stored delta, and each pack's server projection
-(`PACK_PROJECTION_FIELDS`, read with
+false at once (live with a raw-data token, not re-run; no migration tests while no migration is active (project rule)).
+An Adventure's scene tokens are inline data written with the whole `scenes` field, which core stores whatever the base
+actor (live with a raw-data token, not re-run; same reason), so they are walked; one whose actor id names no actor
+inherits nothing. Only world-package packs are read. The scan reads stored data only — `actor._source`, a token's
+stored delta, and each pack's server projection (`PACK_PROJECTION_FIELDS`, read with
 `documentClass.database.get(documentClass, { index: true, indexFields, pack, query: {} })`, which loads no document).
 `CompendiumCollection#getIndex` is not used: its cached index re-indexes a loaded document through `getProperty`, which
 cannot read a dotted field through an embedded array. The server keeps a projected embedded array whole and expands a
@@ -495,8 +496,9 @@ left in any actor fails the write. The write is checked (core resolves `undefine
 legacy `effect` Item (`describeLegacyHolders`), the ones to fix for the Adventure to migrate. Created effects are built
 by `TitanActiveEffect.buildCreationSource` and keep their ids. An Adventure target follows core's ActorDelta rules
 (`deleteFromData`): a deletion removes the entry the data holds and leaves a tombstone where the base actor's collection
-holds the id, as core stores a world token's deletion (read back after a reload, live with a raw-data token, pending
-real-path re-run: a tombstone over a valid base Item, none for an Item the base lacks); a base actor's legacy `effect`
+holds the id, as core stores a world token's deletion (read back after a reload, live with a raw-data token, not re-run;
+no migration tests while no migration is active (project rule): a tombstone over a valid base Item, none for an Item
+the base lacks); a base actor's legacy `effect`
 Item is an invalid document, which core keeps out of a collection, so its id takes no tombstone (core's client
 `_delete`; not measured, as no legacy Item can be seeded); a creation replaces a tombstone with its id and refuses an id
 the token already shows. An Adventure scene token's base actor is the Adventure's actor with the token's `actorId`

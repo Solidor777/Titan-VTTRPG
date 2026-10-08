@@ -750,11 +750,15 @@ static `actions` map. To refresh a dynamic control's icon/label after a state ch
 
 ## Test infrastructure
 
-**Vitest harness** — `vitest.config.mjs` (project root) configures Vitest 2 with `happy-dom`, Svelte 5
-(`@sveltejs/vite-plugin-svelte` with `hot: false`), `svelte-preprocess` (same SCSS `prependData` as
-`vite.config.mjs`), and the `~/` / `$fonts/` aliases. `hookTimeout` is 60 s — the schema-equivalence
-golden-master suites' `beforeAll` dynamic imports are transform-heavy (Svelte compiles) and exceed the 10 s
-default under full parallelism. Tests live in `tests/unit/**/*.test.js`; there is NO test code under `src/`.
+**Vitest harness** — `vitest.config.mjs` (project root) configures Vitest 4 (`package.json`: `vitest ^4.1.7`) with
+`happy-dom`, `globals: true`, Svelte 5 (`@sveltejs/vite-plugin-svelte`), `svelte-preprocess` (same SCSS `prependData` as
+`vite.config.mjs`), and the `~/` / `$fonts/` aliases. `hookTimeout` is 60 s: the schema-equivalence golden-master
+suites' `beforeAll` dynamic imports are transform-heavy (Svelte compiles) and exceed the 10 s default under full
+parallelism. Tests live in `tests/unit/**/*.test.js`: 131 files, 1499 tests (measured: `npm test` → "Test Files  131
+passed (131)", "Tests  1499 passed (1499)"). There is NO test code under `src/`. Support files: `tests/setup.js`,
+`tests/components/*.svelte` (Svelte probes the unit tests mount), `tests/unit/helpers/schemaFingerprint.js`,
+`tests/shared/checkOracle.js` (the independent check oracle the e2e `check-math.spec.js` compares against) and
+`tests/fixtures/spreadsheet/excel-edited.xlsx` (read by `tests/unit/spreadsheet/format/Xlsx.test.js`).
 
 **No dynamic `import()` inside a test body** — a module imported with `await import(...)` inside an
 `it(...)`/`test(...)` body pays a cold Vite transform under that test's own timeout, which can exceed it
@@ -797,53 +801,88 @@ Essentially every base primitive in `src/helpers/svelte-components/**` now carri
 the lone exception is `Text` (no root element). See the component-probe harness entry below for the full
 coverage map, the wrapper-forwarding rules, and the selector each component resolves to.
 
-**Playwright E2E** — `npm run test:e2e` runs `playwright test` against a Foundry world on
-`http://localhost:30000` (`playwright.config.mjs`; env `FOUNDRY_USER` / optional `FOUNDRY_PASSWORD`). The
-config's `webServer` reuses a server already on the port and otherwise runs `scripts/e2e-foundry-server.mjs`,
-a supervisor (`scripts/lib/superviseServer.mjs`) that spawns `node main.js --dataPath=… --world=test-titan`
-from the sibling `foundry/` install (paths derived from the repo location; `FOUNDRY_APP_DIR` /
-`FOUNDRY_DATA_PATH` / `FOUNDRY_PORT` / `FOUNDRY_WORLD` override) and kills the whole tree when Playwright ends
-the run or when the Playwright runner process itself disappears (it watches the nearest non-shell ancestor
-pid, polling liveness once a second), so a hard-killed run never leaves a Foundry holding the port and the
-pack LevelDB locks. `tests/unit/SuperviseServer.test.js` covers spawn/reuse/teardown. Specs live in
-`tests/e2e/`: `surfaces.spec.js` (every sheet type, spell tab, check-options dialog and the effect tray renders on
-flow-made documents with zero uncaught page errors and no `LOCAL.` text; the collapsed-layout regressions; the
-portrait pick through Foundry's file picker; opening a sheet from the directory; the Edit Unique ID dialog),
-`sheet-header.spec.js` (the window-header controls menu, the inline header buttons, unlinking from the sheet a token
-double-click opens, and the `ReactiveDocument` identity pin), `character-sheet-rows.spec.js`
-(the Abilities, Spells, Inventory and Effects rows of one flow-made actor: a functional sweep per item type, rows
-following edits made in the item or effect sheet, delete confirmation and the confirmation-off path, check tag parity
-across the item sheet, the character sheet and the Effect HUD), `custom-traits.spec.js` (the Add Custom Trait dialog,
-the tag's edit and delete icons, the tooltip, on items and effects), `sheet-filters.spec.js` (the name filters of the
-character sheet tabs and of the item Checks tab), `character-sheet-layout.spec.js` (Skills row geometry, sidebar
-labels, browser zoom on the shared bulk actor), `rules-element-editor.spec.js` (the Rules Elements tab of a flow-made
-weapon: add and delete, the selector's default key, the rounding select of Multiply Base and Multiply Sum, the
-conditional check modifier editor), `item-sheet-rolls.spec.js` (the sidebar roll buttons of an owned equipment, weapon
-and spell, the Checks tab roll preview, a check added while the sheet is open, damage-reduction settings in the
-posted check parameters), `spell-sheet.spec.js` (the condition aspects' Off-Balance option, the Casting Check tab's
-aspect costs, its re-pricing by a second client and its scroll position), `drag.spec.js` (real pointer drags:
-character sheet item and effect lists, the four item sheet lists, a row copied between sheets and refused by a list
-of another kind, a world item or a folder dropped on an actor sheet), `check-math.spec.js` (every check type rolled from
-its sheet button with forced dice and compared to the independent oracle in `tests/shared/checkOracle.js`, with the card
-mounted; an attack's Difficulty from targeted tokens; the Resist button and the damage buttons of a card; the die click,
-reset and scaling-aspect controls of a card; Advantage and Automatic Failure set in the dialog), `check-dialog.spec.js`
-(each check type's dialog opened from the sheet's roll button: totals recomputed as the fields change, the Advantage,
-Automatic Failure and derived fields following permanent effects switched on and off with the Effects tab's active
-toggle (and one effect deleted) and items edited in the sheets while the dialog is open, the starting Dice Mod and
-Advantage that an active effect's rules elements give a dialog, a user-set field kept, the dialog closing when its item
-or effect is deleted (the tests read the one "no longer valid" notice, assert no "failed before construction" notice and
-dismiss the notice, which would otherwise cover the next create dialog), the `getCheckOptions` setting, Heavy,
-Encumbering and Loud armor, a condition's situation), `logic/rules-elements.spec.js` (rules elements added in the Rules
-Elements tab, read from the sheet's derived Body value, the check dialogs and the posted check parameters) and
-`logic/conditions.spec.js` (conditions applied from the Token HUD, read from derived stats, the sheet's tooltip, rolled
-checks and the Player HUD). `tests/e2e/harness.js` provides `test`, `expect` and `flushPageErrors`; `tests/e2e/join.js`
-(no test-runner imports, so the setup, teardown and census load it without
-`harness.js`) provides `joinWorld`, `trackWorldPage`, `flushPageErrors` and `takeUncheckedErrors`; `tests/e2e/fixtures.js`
-re-exports `joinWorld` and provides `login`, `openSheetByUuid(page, uuid)` (`fromUuid` then `sheet.render`, waits for
-the content to mount, returns the window's locator; a read-side render, not a document change) and `renderSheet(page,
-uuid, expectedSelector, errors)` (opens by uuid, asserts the frame class, flushes and asserts the spec's `errors`
-collector is empty; see the shared-world harness below). Drives the real built system at
-the repo root, so it catches v14 API breaks that the mocked Vitest tier cannot.
+**Playwright E2E** — `npm run test:e2e` runs `playwright test` against the `test-titan` Foundry world on
+`http://localhost:30000`: 33 spec files, 662 tests (measured: `npx playwright test --list` → "Total: 662 tests in 33
+files"). `playwright.config.mjs` sets `timeout` 60 s, `expect.timeout` 1000 ms, `workers` 1, `fullyParallel` false,
+`globalSetup` and `globalTeardown`, the `list` reporter beside `slow-operation-reporter.js`, and for every test headless
+Chromium (with `--enable-gpu`), `viewport` 1920x1080 and `actionTimeout` 10 s. The users are the four dedicated
+identities of `tests/e2e/users.js` (`E2E_USERS`: E2E GM 1, E2E GM 2, E2E Player 1, E2E Player 2; `DEFAULT_GM` is E2E GM
+1, never the developer's Gamemaster); env `FOUNDRY_USER` replaces the default user of `login`, and `FOUNDRY_PASSWORD` is
+filled into the join form only when set. The config's `webServer` reuses a server already on the port and otherwise runs
+`scripts/e2e-foundry-server.mjs`, a supervisor (`scripts/lib/superviseServer.mjs`) that spawns `node main.js
+--dataPath=… --world=test-titan` from the sibling `foundry/` install (paths derived from the repo location;
+`FOUNDRY_APP_DIR` / `FOUNDRY_DATA_PATH` / `FOUNDRY_PORT` / `FOUNDRY_WORLD` override) and kills the whole tree when
+Playwright ends the run or when the Playwright runner process itself disappears (it watches the nearest non-shell
+ancestor pid, polling liveness once a second), so a hard-killed run never leaves a Foundry holding the port and the pack
+LevelDB locks. `tests/unit/SuperviseServer.test.js` covers spawn/reuse/teardown. The suite drives the real built system
+at the repo root, so it catches v14 API breaks that the mocked Vitest tier cannot.
+
+**The 33 spec files** (`tests/e2e/`; `logic/` holds three of them):
+- Sheets and documents. `surfaces.spec.js` (every sheet type, spell tab, check-options dialog and the effect tray
+  renders on flow-made documents with zero uncaught page errors and no `LOCAL.` text; the collapsed-layout regressions;
+  the portrait pick through Foundry's file picker; opening a sheet from the directory; the Edit Unique ID dialog),
+  `sheet-header.spec.js` (the window-header controls menu, the inline header buttons, unlinking from the sheet a token
+  double-click opens, and the `ReactiveDocument` identity pin), `character-sheet-rows.spec.js` (the Abilities, Spells,
+  Inventory and Effects rows of one flow-made actor: a functional sweep per item type, rows following edits made in the
+  item or effect sheet, delete confirmation and the confirmation-off path, check tag parity across the item sheet, the
+  character sheet and the Effect HUD), `custom-traits.spec.js` (the Add Custom Trait dialog, the tag's edit and delete
+  icons, the tooltip, on items and effects), `sheet-filters.spec.js` (the name filters of the character sheet tabs and
+  of the item Checks tab), `character-sheet-layout.spec.js` (Skills row geometry, sidebar labels, browser zoom on the
+  shared bulk actor), `rules-element-editor.spec.js` (the Rules Elements tab of a flow-made weapon: add and delete, the
+  selector's default key, the rounding select of Multiply Base and Multiply Sum, the conditional check modifier editor),
+  `item-sheet-rolls.spec.js` (the sidebar roll buttons of an owned equipment, weapon and spell, the Checks tab roll
+  preview, a check added while the sheet is open, damage-reduction settings in the posted check parameters),
+  `spell-sheet.spec.js` (the condition aspects' Off-Balance option, the Casting Check tab's aspect costs, its re-pricing
+  by a second client and its scroll position), `drag.spec.js` (real pointer drags: character sheet item and effect
+  lists, the four item sheet lists, a row copied between sheets and refused by a list of another kind, a world item or a
+  folder dropped on an actor sheet), `effect-changes.spec.js` (core's `changes` on a TITAN effect: the Add change button
+  stores core's initial change, saving leaves the priority unset, a malformed change type is rejected).
+- Checks and rules. `check-math.spec.js` (every check type rolled from its sheet button with forced dice and compared
+  to the independent oracle in `tests/shared/checkOracle.js`, with the card mounted; an attack's Difficulty from
+  targeted tokens; the Resist button and the damage buttons of a card; the die click, reset and scaling-aspect controls
+  of a card; Advantage and Automatic Failure set in the dialog), `check-dialog.spec.js` (each check type's dialog opened
+  from the sheet's roll button: totals recomputed as the fields change, the Advantage, Automatic Failure and derived
+  fields following permanent effects switched on and off with the Effects tab's active toggle (and one effect deleted)
+  and items edited in the sheets while the dialog is open, the starting Dice Mod and Advantage that an active effect's
+  rules elements give a dialog, a user-set field kept, the dialog closing when its item or effect is deleted (the tests
+  read the one "no longer valid" notice, assert no "failed before construction" notice and dismiss the notice, which
+  would otherwise cover the next create dialog), the `getCheckOptions` setting, Heavy, Encumbering and Loud armor, a
+  condition's situation), `logic/rules-elements.spec.js` (rules elements added in the Rules Elements tab, read from the
+  sheet's derived Body value, the check dialogs and the posted check parameters), `logic/conditions.spec.js`
+  (conditions applied from the Token HUD, read from derived stats, the sheet's tooltip, rolled checks and the Player
+  HUD; a condition's own sheet and its edited description), `dice.spec.js` (the forced-dice seam: `forceDice` maps each
+  queued face onto a real Roll, `resetDice` restores the random source), `logic/fast-check-smoke.spec.js` (fast-check
+  is injected and runs a property in the page).
+- Tokens, HUD, combat, chat. `player-hud.spec.js` (portrait, visibility, layout and effects panel of one controlled
+  token, and a reload test), `player-hud-action-menu.spec.js` (categories, main actions and sub-buttons, options,
+  layout, and the report cards of the HUD's direct actions), `combat-turns.spec.js` (turn effects replicated between
+  clients, the sheet that opens at a turn start per setting, turn reports, the tags of conditions and turn effects in a
+  report, and a placed token on a new scene with none active), `chat-cards.spec.js` (item and effect cards, the attack
+  tags of a weapon, the tags of a rolled check card, and chat message mount keying), `macros.spec.js` (the item macros
+  made by dragging an item row onto the hotbar), `ownership.spec.js` (OWNER, OBSERVER and LIMITED viewers of the TITAN
+  sheet, observer tab switching, the roll button gated by ownership), `theme.spec.js` (the theme system, the theme
+  editor and the content-link colors per built-in theme).
+- Packs. `effect-tray.spec.js` (the Effect Tray on packs, folders and effects made through the tray's own controls),
+  `compendium-spreadsheet.spec.js` (export and import of packs through the dialogs, including the outcomes of
+  `ApplyImport`).
+- Harness and drift guards. `multi-client.spec.js` (two contexts log in as distinct users and see each other active;
+  the compendium permissions test), `action-helpers.spec.js` (the action helpers return with nothing in flight, see
+  below), `gpu-rendering.spec.js` (the suite renders on a hardware adapter), `integration-manifest.spec.js` (see the
+  Integration manifest drift guard section), and the three component-probe specs (see the Component-probe harness
+  entry): `component-probe-inputs.spec.js`, `component-probe-buttons-tags.spec.js`, `component-probe-display.spec.js`.
+
+**E2E helper modules** (`tests/e2e/`). `harness.js` provides `test`, `expect`, `flushPageErrors` and `trackWorldPage`.
+`join.js` (no test-runner imports, so the setup, teardown and census load it without `harness.js`) provides `joinWorld`,
+`trackWorldPage`, `flushPageErrors` and `takeUncheckedErrors`. `fixtures.js` re-exports `joinWorld` and provides
+`login`, `openSheetByUuid(page, uuid)` (`fromUuid` then `sheet.render`, waits for the content to mount, returns the
+window's locator; a read-side render, not a document change), `renderSheet(page, uuid, expectedSelector, errors)` (opens
+by uuid, asserts the frame class, flushes and asserts the spec's `errors` collector is empty), `openSheetTab(page,
+label)` and `collectLocalizationOffenders`. `world.js` holds `closeAllApps`, `clearChat`, `attachPageErrors`,
+`installHookErrorReporting`, `flushHookErrorReports`, `newestMessageType`, `waitForAnimations`, `showChatLog`,
+`expectActiveGM` and `reloadWorld`. `actions.js`, `select.js`, `contextMenu.js`, `dice.js`, `poll.js`, `settle.js`,
+`settings.js`, `multiClient.js`, `users.js`, `registry.js`, `flows.js`, `census.js`, `global-setup.js`,
+`global-teardown.js`, `checkDialog.js`, `componentProbe.js`, `fast-check.js` and `slow-operation-reporter.js` are
+described under the entries below. `run-e2e-throttled.ps1` is the runner wrapper.
 
 **Shared-world E2E harness (one world boot per FILE)** — every eligible spec boots the world ONCE per
 file, not per test. The pattern: module-scoped `let page; let errors;` plus three inline lifecycle hooks
@@ -898,30 +937,32 @@ hook synchronously (`client/game.mjs:777-779`), so the read follows every synchr
 tool `census.js` calls `joinWorld` without the assertion: a boot error is printed in its JSON (`bootErrors`) and sets
 exit code 1, but never stops the census or the sweep, which may be what removes the documents behind the error.
 Console output is not read, so its noise (`ERR_CONNECTION_REFUSED`, vendor warnings) never reaches a collector.
-**Not migrated** (self-managed `BrowserContext`s): `multi-client.spec.js` (which also holds the compendium
-permissions test), `combat-turns.spec.js`, `ownership.spec.js`. Fast-check (`injectFastCheck` →
-`page.addInitScript`) must run in `beforeAll` BEFORE `login` (init scripts must precede navigation). A spec needing
-pristine per-test boots opts out by keeping `beforeEach(login)`.
+**Specs that do not share one world page.** `gpu-rendering.spec.js` needs no world (a bare page identifies the graphics
+backend). `multi-client.spec.js` opens each test's clients with `withClients`. Every other spec boots the world once in
+`beforeAll` and shares that page; `combat-turns.spec.js` and `ownership.spec.js` add `BrowserContext`s of their own for
+the further users, and `character-sheet-rows.spec.js`, `effect-tray.spec.js`, `player-hud.spec.js` and
+`spell-sheet.spec.js` call `withClients` for a second client. Fast-check (`injectFastCheck` → `page.addInitScript`) must
+run in `beforeAll` BEFORE `login` (init scripts must precede navigation).
 
-**No fixed sleeps in E2E (banned)** — never settle with a fixed-duration `await page.waitForTimeout(n)`
-or an in-page `await new Promise(r => setTimeout(r, n))`; they are slow and flaky. Wait on a deterministic
-condition instead. Three patterns: (1) **delete** a sleep that precedes an auto-retrying Playwright
-web-first assertion (`expect(locator).toHaveText/.toHaveCount/.toBeVisible/.toHaveValue/...`) or an
-auto-waiting action (`.click()`/`.fill()`) — the assertion/action already polls; (2) before a
-**non-retrying read** (`await page.evaluate(...)`, `locator.textContent()/.inputValue()/.count()/
-.getAttribute()/.allTextContents()`), use `await expect.poll(() => <sameRead>, { message }).toBe(<value>)`
-(guard the poll body so it returns a sentinel rather than throwing on early iterations); (3) inside a
-`page.evaluate`, use `await titanWait(syncPredicate, { message })` — `globalThis.titanWait`
-(`tests/e2e/poll.js`), installed by `login()` via `installPoll`/`addInitScript` before navigation, polls a
-synchronous predicate (50 ms interval, 1000 ms default timeout). **There are now no fixed sleeps in the suite
-at all**, including assert-absence tests. When a negative assertion appears to have no pollable positive
-edge, look for a **happens-after edge**: an observable the code under test emits strictly LATER than the
-decision being asserted. `combat-turns.spec.js` wraps the character data model's `onTurnStart` in a call-through spy on
-a client and waits until the spy has seen the turn start return, because `onTurnStart` opens the sheet (or not) at its
-start, before its awaits — so the return proves the sheet's fate was already decided. Seeding an extra rules element
-purely as a synchronization signal is preferred over a bounded wait.
+**No fixed sleeps in E2E (banned)** — never settle with a fixed-duration `await page.waitForTimeout(n)` or an in-page
+`await new Promise(r => setTimeout(r, n))`; they are slow and flaky. Wait on a deterministic condition instead. Three
+patterns: (1) **delete** a sleep that precedes an auto-retrying Playwright web-first assertion
+(`expect(locator).toHaveText/.toHaveCount/.toBeVisible/.toHaveValue/...`) or an auto-waiting action
+(`.click()`/`.fill()`) — the assertion/action already polls; (2) before a **non-retrying read** (`await
+page.evaluate(...)`, `locator.textContent()/.inputValue()/.count()/ .getAttribute()/.allTextContents()`), use `await
+expect.poll(() => <sameRead>, { message }).toBe(<value>)` (guard the poll body so it returns a sentinel rather than
+throwing on early iterations); (3) inside a `page.evaluate`, use `await titanWait(syncPredicate, { message })` —
+`globalThis.titanWait` (`tests/e2e/poll.js`), installed by `login()` via `installPoll`/`addInitScript` before
+navigation, polls a synchronous predicate (50 ms interval, 1000 ms default timeout). **The suite has no fixed sleeps**,
+including assert-absence tests (measured: `grep -rn waitForTimeout tests` matches nothing, and `grep -rn setTimeout
+tests/e2e` matches only `test.setTimeout` calls and the polling interval inside `poll.js`). When a negative assertion
+appears to have no pollable positive edge, look for a **happens-after edge**: an observable the code under test emits
+strictly LATER than the decision being asserted. `combat-turns.spec.js` wraps the character data model's `onTurnStart`
+in a call-through spy on a client and waits until the spy has seen the turn start return, because `onTurnStart` opens
+the sheet (or not) at its start, before its awaits — so the return proves the sheet's fate was already decided. Seeding
+an extra rules element purely as a synchronization signal is preferred over a bounded wait.
 
-**E2E runner configuration (all optional; defaults reproduce historical behavior).**
+**E2E runner configuration (all optional).**
 `npm run test:e2e` wraps `playwright test` in `tests/e2e/run-e2e-throttled.ps1`, which throttles ITS OWN
 process before spawning anything, so npx, node, Foundry, and every Chromium inherit the limits:
 
@@ -949,140 +990,141 @@ click; whoever writes a spec uses `chooseContextMenuEntry` and review checks it.
 the rules (genuine live documents, no fake write surfaces, real user flows), and review checks them.
 
 **No migration tests while no migration is active** (`.claude/claude.md` "Project Scope"). The migration system
-(`MigrateWorld`, version chains, the stored-actor walker, `migrateData` hooks) stays in `src/helpers/migration/` with no
-unit or e2e test; the nine migration unit files and the four migration specs were deleted. It was confirmed once
-(2026-10-02) by a one-off run on documents the flows above made in `test-titan`, with a temporary version-1 entry in
-`ActorMigrations.js` and `ItemMigrations.js` (reverted, never committed). Measured: a Disabled load showed no dialog and
+(`MigrateWorld`, version chains, the stored-actor walker, `migrateData` hooks) lives in `src/helpers/migration/` with no
+unit or e2e test. It was confirmed once (2026-10-02) by a one-off run on documents the flows below made in `test-titan`,
+with a temporary version-1 entry in `ActorMigrations.js` and `ItemMigrations.js` (reverted, never committed; the record
+is `.superpowers/sdd/test-suite-rewrite/migration-one-off.md`, local). Measured: a Disabled load showed no dialog and
 logged no migration line; a Prompt load showed `ConfirmMigrateWorldDialog` and Cancel changed nothing; an Automatic load
 showed no dialog, logged `TITAN | Starting world migration.`, `TITAN | Stored-actor migration finished: 0 updated, 0
-skipped; failures: 0.` and `TITAN | World migration complete.` (core echoes both notifications to the console), and every
-world actor, owned item and world item (11) reached `documentVersion` 1 carrying the entry's flag, while a locked world
-pack's actor, the pack lock and an unlinked token's stored delta were unchanged; a Prompt load afterwards showed no
-dialog. No test covers the stored-actor write paths (condition sync, effect Item conversion, a locked pack's unlock and
-relock, Adventure writes, orphaned-token failures), version-chain failure semantics, the `onceReady` boot path (the
-five deleted `OnceReady.test.js` tests: Disabled scans nothing, Prompt asks first, a client that is not the active GM
-skips the migration, and a failed migration still registers the `hotbarDrop` hook and builds the Player HUD; the
-one-off ran only the success path), or the chat-message `migrateData` hoists. A synthetic token actor reads its base actor's merged data, so after a migration it shows the base actor's
-version.
+skipped; failures: 0.` and `TITAN | World migration complete.` (core echoes both notifications to the console), and
+every world actor, owned item and world item (11) reached `documentVersion` 1 carrying the entry's flag, while a locked
+world pack's actor, the pack lock and an unlinked token's stored delta were unchanged; a Prompt load afterwards showed
+no dialog. No test covers the stored-actor write paths (condition sync, effect Item conversion, a locked pack's unlock
+and relock, Adventure writes, orphaned-token failures), version-chain failure semantics, the `onceReady` boot path
+(Disabled scans nothing, Prompt asks first, a client that is not the active GM skips the migration, and a failed
+migration still registers the `hotbarDrop` hook and builds the Player HUD; the one-off ran only the success path), or
+the chat-message `migrateData` hoists. A synthetic token actor reads its base actor's merged data, so after a migration
+it shows the base actor's version.
 
-**E2E census** — every world document an e2e test creates (actor, item, scene, folder, macro, roll table, journal
-entry, playlist, cards, world compendium label) is named with the `E2E ` prefix; the sweep finds leftovers by that
-prefix alone, so an unprefixed name survives every cleanup. `tests/e2e/census.js` exports
-`takeCensus(page, { since? })` (per kind: `E2E `-prefixed actors, items, scenes, folders, macros, roll tables,
-journal entries, playlists, cards and world compendia; every combat, which has no name to prefix; tokens on any scene
-whose actor does not resolve; hotbar
-entries of the four E2E users whose macro does not resolve; chat messages from `since` on when given),
-`sweepWorld(page)` (removes all of those except messages through the API — scenes first, folders after their
-contents, combats first, orphaned tokens and dangling hotbar slots last; never User documents) and
-`countCensus(census)`. Both
-`takeCensus` and `sweepWorld` throw before reading or deleting anything unless `game.world.id` is `test-titan`
-(`CENSUS_WORLD`; `assertCensusWorld` is exported and the teardown calls it too). Run directly
-(`node tests/e2e/census.js [--sweep]`) it logs in to localhost:30000 as `E2E GM 1`, prints JSON counts, and exits 1
-when the final census is not empty.
+**E2E census** — every world document an e2e test creates (actor, item, scene, folder, macro, roll table, journal entry,
+playlist, cards, world compendium label) is named with the `E2E ` prefix (`E2E_PREFIX`); the sweep finds leftovers by
+that prefix alone, so an unprefixed name survives every cleanup. `tests/e2e/census.js` exports `E2E_PREFIX`,
+`CENSUS_WORLD`, `assertCensusWorld`, `takeCensus(page, { since? })`, `sweepWorld(page)` and `countCensus(census)`:
+- `takeCensus` returns, per kind: the `E2E `-prefixed `actors`, `items`, `scenes`, `folders`, `macros`, `tables` (roll
+  tables), `journal` entries, `playlists`, `cards` and `packs` (world compendia); `combats` (every combat, which has no
+  name to prefix); `orphanTokens` (tokens on any scene whose actor does not resolve); `hotbar` (hotbar entries of the
+  four E2E users whose macro does not resolve); and `messages` (chat messages from `since` on, when `since` is given).
+- `sweepWorld` deletes through the API, in this order: every combat; the prefixed scenes, actors, items, macros, roll
+  tables, journal entries, playlists, cards and folders (folders last, after their contents); the prefixed world
+  compendia (unlocked first); the orphaned tokens; the dangling hotbar slots of the E2E users
+  (`user.assignHotbarMacro(null, slot)`). It never touches messages or User documents, and returns the number removed
+  per kind.
+- Both throw before reading or deleting anything unless `game.world.id` is `test-titan` (`CENSUS_WORLD`;
+  `assertCensusWorld` is exported and the teardown calls it too). Run directly (`node tests/e2e/census.js [--sweep]`),
+  the file logs in to localhost:30000 as `E2E GM 1`, prints JSON counts and the boot errors, and exits 1 when the final
+  census is not empty or the boot raised an error.
 
 **E2E registry, flows and teardown (documents made through real user flows)** — a test of a document runs on a document
-a flow made. `tests/e2e/registry.js` keeps the running list in `test/state/registry.json` (gitignored; not `test/build/`,
-which the probe build empties): `runStartedAt`, every created document `{ key?, documentName, id, parent (uuid|null),
-sceneId?, packId?, createdBy (spec file) }` (a world compendium is `documentName: 'Compendium'` with the pack collection
-id as `id`), hotbar assignments `{ userId, slot, macroId }` and `settings` `{ scope, namespace, key, prior }`. It is a
-file because it must outlive a spec file, a mid-file reload and the worker, and be read by the runner; the file is
-overwritten, never deleted. Exports: `record`, `recordHotbar`, `recordSetting` (a setting keeps its FIRST prior value),
-`startRun`, `resetRegistry`, `hasWork`. The module is a leaf (it imports no flow). `flows.js` holds `resolves(page,
-entry)` and `shared(page, key)` (the id of the shared fixture `key` when the list has it and it still resolves,
-otherwise a new one made by the flow in `SHARED_FIXTURES` and recorded under the key; shared fixtures are never deleted
-mid-run, and a test that edits one restores the field through the same control or uses a per-test document).
-`tests/e2e/flows.js` has one exported async function per flow; each drives the DOM like a user, reads the id of what it
-made from the DOM or a read-only API call, records it and returns it; it never creates, updates or deletes a document
-through the API. Flows: `createActor` (Actors tab Create button and core dialog), `createOwnedItem` (the
-Abilities/Spells tab add button or the Inventory tab's add button and its item-type dialog, then the new item is
-renamed in its own sheet opened by the row's Edit button), `dragItemOntoSheet` (drags an Items-tab entry onto the
-open actor sheet), `addEffect` (the Effects tab add button, the effect renamed in its sheet, and optionally its
-duration type chosen in the sheet header), `addCheck` (the Checks tab add button, then the row's label input and,
-when asked, its Resolve Cost input, Resistance Check select, Opposed Check box, Damage box, Initial Value input and
-Damage Reduced By select), `addRulesElement` (the Rules Elements tab add button, the operation select, and the controls
-of the operation: the `ccm-*` selects, key input and value input of a conditional check modifier; the rating, selector
-and key of a conditional rating modifier; the selector, key, value and rounding or mode of the flat, Multiply Base,
-Multiply Sum and Set Sum operations; the selector and the rich-text message of a Turn Message or Roll Message, typed
-into its editor and awaited in the document's `_source` because the live data holds the text before the editor's update
-reaches the database, CLOSED_BUGS #145; a negative value is typed in parentheses because a leading operator in a number
-input is a relative change), `addTrait` (the Edit Traits dialog of a weapon attack, an armor or a shield),
-`setAttributeBase` and `setSkillTraining` (the base input of an attribute in the sheet header, the training input of a
-skill row in the Skills tab), `applyCondition` / `removeCondition` (the Token HUD of a placed token: right-click, the
-status effects palette, the status icon, then a left click on the token closes the HUD, so the next call's right-click
-opens it; core's right-click toggles the HUD, so a second right-click does not close it reliably). The pointer reaches
-the token through `restOnToken` before each click (it moves in from outside the token and waits for the token's `hover`,
-because a token's interaction manager handles a pointer-down only from its HOVER state on, read at
-`client/canvas/interaction/mouse-handler.mjs:474-475` and `565-566` of Foundry 14.364; whether it is needed is not
-measured, see CLOSED_BUGS #134); it then waits until `DOUBLE_CLICK_TIME_MS` (250 ms) has passed since the later of
-the interaction manager's `lcTime` and `rcTime`, because a press within 250 ms and 5 px of the previous press on
-the token is a double click, which opens the token's sheet and does not control it (read at
-`client/canvas/interaction/mouse-handler.mjs:480-497`; CLOSED_BUGS #137); `hoverToken` first makes the chat
-tab the active sidebar tab, because a chat message posted while another tab is active shows as a card over the canvas
-for 5 s and takes the pointer from a token under it (CLOSED_BUGS #134). A right-click that opened no HUD has been seen
-without a located cause (OPEN_BUGS #129). Further flows are `createWorldItem`, `createFolder` (the directory's Create
-Folder button and the folder
-configuration window; `createActor` and `createWorldItem` take a `folderId` and then use that folder's own Create
-button, which creates the document inside the folder), `addCustomTrait`, `addAttack`, `enableAspect` and
-`addCustomAspect` (the Add Custom Trait dialog with an optional description, the weapon Attacks tab add button,
-the spell Standard Aspects toggle with its option toggles and resistance select, the spell Custom Aspects tab add
-button), `pickPortrait` (the
-sheet's portrait button opens Foundry's own file picker, the Core Data tab is chosen when it is not the open one (the
-picker of a player actor opened on the User Data tab: `.superpowers/sdd/test-suite-rewrite/phase-2/review-measure-1.log`, `actor picker tabs`),
-the directory is typed into the address bar and the file is clicked and confirmed; nothing is stubbed),
-`openTrayPack` (the Effect Tray's sidebar tab button, then the pack chosen in its pack select; it waits for the stored
-`effectTrayLastPack` setting), `createTrayFolder` (the tray's Create Folder button, or an expanded folder's
-create-subfolder control for a subfolder, then the folder context menu's Rename Folder entry and Enter),
-`createTrayEffect` (the tray's create button, or a folder's create-effect control when given a `folderId`, in an
-unlocked effect pack; the effect is renamed in the sheet the create opens), `createScene` / `viewScene` /
-`activateScene` (Scenes tab, entry context menu View/Activate; core
-views a scene created while none is viewed, so `createScene` then waits for the draw, and `viewScene` skips the menu
-for a viewed scene), `placeToken` (drags the actor's directory entry onto a free spot near the centre of `#board`,
-which core handles as an Actor drop; the spots are a 7-column grid with 130 px spacing and a spot that already holds a
-token is skipped, because two tokens dropped on one point took the same `x`/`y`
+a flow made. `tests/e2e/registry.js` keeps the running list in `test/state/registry.json` (gitignored; not
+`test/build/`, which the probe build empties): `runStartedAt`, every created document `{ key?, documentName, id, parent
+(uuid|null), sceneId?, packId?, createdBy (spec file) }` (a world compendium is `documentName: 'Compendium'` with the
+pack collection id as `id`), hotbar assignments `{ userId, slot, macroId }` and `settings` `{ scope, namespace, key,
+prior }`. It is a file because it must outlive a spec file, a mid-file reload and the worker, and be read by the runner;
+the file is overwritten, never deleted. Exports: `STATE_DIR`, `REGISTRY_PATH`, `emptyRegistry`, `readRegistry`,
+`writeRegistry`, `startRun`, `resetRegistry`, `hasWork`, `record`, `recordHotbar` and `recordSetting` (a setting keeps
+its FIRST prior value). The module is a leaf (it imports no flow). `flows.js` holds `resolves(page, entry)` and
+`shared(page, key)` (the id of the shared fixture `key` when the list has it and it still resolves, otherwise a new one
+made by the flow in `SHARED_FIXTURES` and recorded under the key; shared fixtures are never deleted mid-run, and a test
+that edits one restores the field through the same control or uses a per-test document). Fixture names are `E2E Shared
+<Type>`. `tests/e2e/flows.js` has one exported async function per flow; each drives the DOM like a user, reads the id of
+what it made from the DOM or a read-only API call, records it and returns it; it never creates, updates or deletes a
+document through the API. Flows: `openSidebarTab` (the sidebar tab button of a directory), `createActor` (Actors tab
+Create button and core dialog), `createOwnedItem` (the Abilities/Spells tab add button or the Inventory tab's add button
+and its item-type dialog, then the new item is renamed in its own sheet opened by the row's Edit button),
+`dragItemOntoSheet` (drags an Items-tab entry onto the open actor sheet), `addEffect` (the Effects tab add button, the
+effect renamed in its sheet, and optionally its duration type chosen in the sheet header), `addCheck` (the Checks tab
+add button, then the row's label input and, when asked, its Resolve Cost input, Resistance Check select, Opposed Check
+box, Damage box, Initial Value input and Damage Reduced By select), `addRulesElement` (the Rules Elements tab add
+button, the operation select, and the controls of the operation: the `ccm-*` selects, key input and value input of a
+conditional check modifier; the rating, selector and key of a conditional rating modifier; the selector, key, value and
+rounding or mode of the flat, Multiply Base, Multiply Sum and Set Sum operations; the selector and the rich-text message
+of a Turn Message or Roll Message, typed into its editor and awaited in the document's `_source` because the live data
+holds the text before the editor's update reaches the database, CLOSED_BUGS #145; a negative value is typed in
+parentheses because a leading operator in a number input is a relative change), `addTrait` (the Edit Traits dialog of a
+weapon attack, an armor or a shield), `setAttributeBase` and `setSkillTraining` (the base input of an attribute in the
+sheet header, the training input of a skill row in the Skills tab), `applyCondition` / `removeCondition` (the Token HUD
+of a placed token: right-click, the status effects palette, the status icon, then a left click on the token closes the
+HUD, so the next call's right-click opens it; core's right-click toggles the HUD, so a second right-click does not close
+it reliably). The pointer reaches the token through `restOnToken` before each click (it moves in from outside the token
+and waits for the token's `hover`, because a token's interaction manager handles a pointer-down only from its HOVER
+state on, read at `client/canvas/interaction/mouse-handler.mjs:474-475` and `565-566` of Foundry 14.364; whether it is
+needed is not measured, see CLOSED_BUGS #134); it then waits until `DOUBLE_CLICK_TIME_MS` (250 ms) has passed since the
+later of the interaction manager's `lcTime` and `rcTime`, because a press within 250 ms and 5 px of the previous press
+on the token is a double click, which opens the token's sheet and does not control it (read at
+`client/canvas/interaction/mouse-handler.mjs:480-497`; CLOSED_BUGS #137); `hoverToken` first makes the chat tab the
+active sidebar tab, because a chat message posted while another tab is active shows as a card over the canvas for 5 s
+and takes the pointer from a token under it (CLOSED_BUGS #134). A right-click that opened no HUD has been seen without a
+located cause (OPEN_BUGS #129). Further flows are `createWorldItem`, `createFolder` (the directory's Create Folder
+button and the folder configuration window; `createActor` and `createWorldItem` take a `folderId` and then use that
+folder's own Create button, which creates the document inside the folder), `addCustomTrait`, `addAttack`, `enableAspect`
+and `addCustomAspect` (the Add Custom Trait dialog with an optional description, the weapon Attacks tab add button, the
+spell Standard Aspects toggle with its option toggles and resistance select, the spell Custom Aspects tab add button),
+`pickPortrait` (the sheet's portrait button opens Foundry's own file picker, the Core Data tab is chosen when it is not
+the open one (the picker of a player actor opened on the User Data tab:
+`.superpowers/sdd/test-suite-rewrite/phase-2/review-measure-1.log`, `actor picker tabs`), the directory is typed into
+the address bar and the file is clicked and confirmed; nothing is stubbed), `openTrayPack` (the Effect Tray's sidebar
+tab button, then the pack chosen in its pack select; it waits for the stored `effectTrayLastPack` setting),
+`createTrayFolder` (the tray's Create Folder button, or an expanded folder's create-subfolder control for a subfolder,
+then the folder context menu's Rename Folder entry and Enter), `createTrayEffect` (the tray's create button, or a
+folder's create-effect control when given a `folderId`, in an unlocked effect pack; the effect is renamed in the sheet
+the create opens), `createScene` / `viewScene` / `activateScene` (Scenes tab, entry context menu View/Activate; core
+views a scene created while none is viewed, so `createScene` then waits for the draw, and `viewScene` skips the menu for
+a viewed scene), `placeToken` (drags the actor's directory entry onto a free spot near the centre of `#board`, which
+core handles as an Actor drop; the spots are a 7-column grid with 130 px spacing and a spot that already holds a token
+is skipped, because two tokens dropped on one point took the same `x`/`y`
 (`.superpowers/sdd/test-suite-rewrite/phase-2/review-measure-1.log`, `stack`), as is a spot where
 `document.elementFromPoint` is not the canvas (a chat notification over the canvas held a drag for about 1.5 s,
-CLOSED_BUGS #141); 34 tokens fit at 1920x1080 and the 35th drop timed out, cause not
-determined (`.superpowers/sdd/test-suite-rewrite/phase-2/review-measure-2.log`); open windows are closed first and the Escape key releases the
-controlled tokens: measured on a scene with `tokenVision` true, a second token had `visible` false while the first
-was controlled and `visible` true after Escape, and with `tokenVision` false it stayed visible while the first was
-controlled (`.superpowers/sdd/test-suite-rewrite/phase-2/review-measure-1.log`, `A controlled`, `after Escape`, `tokenVision false`), and a token that is
-not visible takes no pointer events), `toggleTokenLink`, `unlinkPlacedToken` and `controlPlacedToken` (the
-sheet header buttons; the token flows close the open windows, release control, move the pointer onto the
-token and wait for `token.object.hover` before the double-click that opens the sheet (`unlinkPlacedToken`,
-which then waits for the reopened synthetic actor's sheet) or the click that takes control
+CLOSED_BUGS #141); 34 tokens fit at 1920x1080 and the 35th drop timed out, cause not determined
+(`.superpowers/sdd/test-suite-rewrite/phase-2/review-measure-2.log`); open windows are closed first and the Escape key
+releases the controlled tokens: measured on a scene with `tokenVision` true, a second token had `visible` false while
+the first was controlled and `visible` true after Escape, and with `tokenVision` false it stayed visible while the first
+was controlled (`.superpowers/sdd/test-suite-rewrite/phase-2/review-measure-1.log`, `A controlled`, `after Escape`,
+`tokenVision false`), and a token that is not visible takes no pointer events), `toggleTokenLink`, `unlinkPlacedToken`
+and `controlPlacedToken` (the sheet header buttons; the token flows close the open windows, release control, move the
+pointer onto the token and wait for `token.object.hover` before the double-click that opens the sheet
+(`unlinkPlacedToken`, which then waits for the reopened synthetic actor's sheet) or the click that takes control
 (`controlPlacedToken`)), `controlPlacedTokens` (drags a selection rectangle over the given tokens and asserts that
 exactly those are controlled: while one token is controlled a second is not visible to the pointer, so Shift-click
-cannot add it), `targetPlacedToken` / `releaseTargets` / `targetedTokenIds` (core's Target key T on
-the hovered token, Shift+T adds; `game.user.targets` then holds real Token objects, as
-`check-math.spec.js` uses), `createCompendium` / `setCompendiumLocked` (Compendium tab Create dialog, entry
-context menu Lock/Unlock), `putInPack` (opens the pack's popout window and drags the world entry onto its
-`.directory-list`; the pack index is polled for the new id; the caller passes the world entry's locator, and the flow
-reopens that entry's sidebar tab before the drag). `setDescription` (types into the rich text editor of an item's or
-effect's sheet and saves with the editor's save button), `setOwnership` (the Configure Ownership window of an actor's
-directory entry), `createCombat` (the Combat Tracker's create button; waits until the combat is `game.combat`),
-`addCombatant` (the Token HUD's combat button), `startCombat` / `endCombat` (the Combat Tracker's Begin and End
-buttons; `endCombat` also confirms the dialog), `setSkillDefaultAttribute` (the select of a skill row), `setEquipped`
-(the Equipped toggle of an Inventory row, clicked only when the state differs), `deleteAttack` (the delete button of an
-attack row in the weapon sheet), `setAttackStat` (the Range or Damage input of an attack row), `addAttackCustomTrait`
-(the attack row's Add Custom Trait button and its dialog), `deleteOwnedItem` (the Delete Item button of an Inventory
-row; the `confirmDeletingItems` client setting must be off), `setResource` (the meter row of the actor sheet's sidebar),
-`rollInitiative` (the Combat Tracker's Roll All button; the combatants roll in the order they joined, so a caller forces
-the dice with `forceDice` to choose the turn order), `nextTurn` / `previousTurn` (the Combat Tracker's turn buttons; the
-turn's updates and reports follow, so the caller waits for the effect it asserts), `sendToChat` (the Send to Chat button
-of an item's or effect's sheet header), `typeChatMessage` (types into the chat input and presses Enter),
-`openCreateMacroDialog` (drags an owned item's row onto the first empty slot of the core hotbar, which the
-`showFoundryHotbar` client setting must show), `createItemMacro` (that drag, the Create Macro dialog and its button; the
-macro and its slot are recorded for the teardown) and `runHotbarMacro` (a click on the slot). The creation dialogs are
-`DialogV2` forms whose content lacks the template's `form#document-create` id, so the flows find them by
-`dialog.application.dialog` with the `.dialog-content` fields. A flow opens the sheet it drives with `openSheetByUuid`
-and clicks its tabs inside that sheet (`openTab`), so another open TITAN sheet's tab strip is never clicked; the
-Standard Aspects tab and the sidebar both use the class `aspect`, so the flow looks inside `.standard-aspects-tab`. A
-TitanDialog id carries a generated suffix (`[id^="add-inventory-item-dialog-<actorId>"]`). A document's sheet instance
-keeps its last tab, so a shared fixture's sheet can come up on the tab a flow last used; a test that needs a tab opens
-it. `shared(page, key)` and `sharedUuid(page, key)` (the uuid, for `openSheetByUuid` and `fromUuid`) serve
-`SHARED_FIXTURES`: `player`, `npc`, the seven world items `weapon`, `ability` (one check), `spell` (the Void custom
-trait; a range aspect of 10 and a rounds-scaling duration aspect, as the old localization seed held, and an
-inflict-condition aspect with the Stunned option and a Resilience resistance; stored values:
+cannot add it), `targetPlacedToken` / `releaseTargets` / `targetedTokenIds` (core's Target key T on the hovered token,
+Shift+T adds; `game.user.targets` then holds real Token objects, as `check-math.spec.js` uses), `createCompendium` /
+`setCompendiumLocked` (Compendium tab Create dialog, entry context menu Lock/Unlock), `putInPack` (opens the pack's
+popout window and drags the world entry onto its `.directory-list`; the pack index is polled for the new id; the caller
+passes the world entry's locator, and the flow reopens that entry's sidebar tab before the drag). `setDescription`
+(types into the rich text editor of an item's or effect's sheet and saves with the editor's save button), `setOwnership`
+(the Configure Ownership window of an actor's directory entry), `createCombat` (the Combat Tracker's create button;
+waits until the combat is `game.combat`), `addCombatant` (the Token HUD's combat button), `startCombat` / `endCombat`
+(the Combat Tracker's Begin and End buttons; `endCombat` also confirms the dialog), `setSkillDefaultAttribute` (the
+select of a skill row), `setEquipped` (the Equipped toggle of an Inventory row, clicked only when the state differs),
+`deleteAttack` (the delete button of an attack row in the weapon sheet), `setAttackStat` (the Range or Damage input of
+an attack row), `addAttackCustomTrait` (the attack row's Add Custom Trait button and its dialog), `deleteOwnedItem` (the
+Delete Item button of an Inventory row; the `confirmDeletingItems` client setting must be off), `setResource` (the meter
+row of the actor sheet's sidebar), `rollInitiative` (the Combat Tracker's Roll All button; the combatants roll in the
+order they joined, so a caller forces the dice with `forceDice` to choose the turn order), `nextTurn` / `previousTurn`
+(the Combat Tracker's turn buttons; the turn's updates and reports follow, so the caller waits for the effect it
+asserts), `sendToChat` (the Send to Chat button of an item's or effect's sheet header), `typeChatMessage` (types into
+the chat input and presses Enter), `openCreateMacroDialog` (drags an owned item's row onto the first empty slot of the
+core hotbar, which the `showFoundryHotbar` client setting must show), `createItemMacro` (that drag, the Create Macro
+dialog and its button; the macro and its slot are recorded for the teardown) and `runHotbarMacro` (a click on the slot).
+The creation dialogs are `DialogV2` forms whose content lacks the template's `form#document-create` id, so the flows
+find them by `dialog.application.dialog` with the `.dialog-content` fields. A flow opens the sheet it drives with
+`openSheetByUuid` and clicks its tabs inside that sheet (`openTab`), so another open TITAN sheet's tab strip is never
+clicked; the Standard Aspects tab and the sidebar both use the class `aspect`, so the flow looks inside
+`.standard-aspects-tab`. A TitanDialog id carries a generated suffix (`[id^="add-inventory-item-dialog-<actorId>"]`). A
+document's sheet instance keeps its last tab, so a shared fixture's sheet can come up on the tab a flow last used; a
+test that needs a tab opens it. `shared(page, key)` and `sharedUuid(page, key)` (the uuid, for `openSheetByUuid` and
+`fromUuid`) serve `SHARED_FIXTURES`: `player`, `npc`, the seven world items `weapon`, `ability` (one check), `spell`
+(the Void custom trait; a range aspect of 10, a rounds-scaling duration aspect, and an inflict-condition aspect with the
+Stunned option and a Resilience resistance; stored values:
 `.superpowers/sdd/test-suite-rewrite/phase-2/review-measure-3.log`, `spell aspects`), `armor`, `shield`, `equipment`,
 `commodity`; `effectHost` (a player that holds only the two effects) with `effect` and `conditionalEffect` (permanent,
 one conditional dice modifier); `roller` (a player owning copies of the shared weapon, spell and ability, dragged onto
@@ -1096,23 +1138,49 @@ consumer, the browser zoom describe of `character-sheet-layout.spec.js`, raises 
 viewed); `trayPack` (an unlocked `ActiveEffect` pack holding one effect). `playwright.config.mjs` sets
 `use.actionTimeout` to 10 s (its comment cites the slow-operation files of the runs that measured the longest action),
 so a flow that waits on a missing element fails after 10 s; a wait that legitimately takes longer passes its own
-timeout. `tests/e2e/global-teardown.js` (Playwright `globalTeardown`) launches one Chromium, logs in as `E2E GM 1`,
-asserts the census world and in order deletes the list through the API (combats; tokens by their scene; scenes; embedded
-documents by their parent; world actors, items, macros, roll tables, journal entries, playlists, cards, folders;
-recorded pack documents whose pack is not recorded, unlocked for the deletion and locked again; world compendia after
-unlocking), clears each recorded hotbar slot that still holds its recorded macro (`user.assignHotbarMacro(null, slot)`:
-deleting a Macro does not clear its slot, which lives on the User), deletes every chat message with
-`timestamp >= runStartedAt`, restores each recorded world setting, runs `sweepWorld` (its per-kind counts are printed; a
-sweep that deleted anything fails the run, naming the kinds and counts: a document no flow recorded; shown with an
-unregistered `E2E ` actor made before a run, `phase-6/sweep-gate-fail.log`) and `takeCensus` (which must be all zero
-or the run fails), prints one `e2e teardown (...)` JSON line and, only after the sweep and the census are zero, resets
-the list (a failed teardown leaves the list for the next `global-setup.js` to retry; shown by forcing a non-zero
-census). `global-setup.js` runs the same
-`tearDownAndReport` over a list that still shows a run in flight or holds entries (a crashed run), then `startRun()`
-before the probe build. `settings.js` `setWorldSetting` records the prior value before it writes; `setClientSetting` and
-a `game.settings.set` made directly in a spec are not recorded. A client-scope setting lives in the browser context that
-set it (measured: a value set in one context read its default in another context and in another browser), so it ends
-with its context and needs no restore.
+timeout.
+
+**E2E teardown, sweep and census gate.** `tests/e2e/global-teardown.js` (Playwright `globalTeardown`; it runs only when
+the list shows work) launches one Chromium, logs in as `E2E GM 1`, asserts the census world and, in this order:
+1. deletes the recorded documents through the API: tokens by their scene; other embedded documents by their parent;
+   then combats, scenes, actors, items, macros, roll tables, journal entries, playlists, cards and folders; then
+   recorded pack documents whose pack is not recorded (the pack unlocked for the deletion and locked again); then the
+   recorded world compendia (unlocked first);
+2. clears each recorded hotbar slot that still holds its recorded macro (`user.assignHotbarMacro(null, slot)`: deleting
+   a Macro does not clear its slot, which lives on the User);
+3. deletes every chat message with `timestamp >= runStartedAt`;
+4. restores each recorded world setting to its prior value;
+5. runs `sweepWorld`, the census's sweep of everything `E2E `-prefixed that no flow recorded (plus every combat,
+   orphaned tokens and dangling hotbar slots);
+6. runs `takeCensus` over the same kinds plus messages since `runStartedAt`.
+
+It prints one `e2e teardown (...)` JSON line with the per-kind counts of each step. **The run fails** when the boot of
+the teardown's own login raised an error, when the sweep deleted anything (the error names the kinds and counts: a
+document no flow recorded; shown with an unregistered `E2E ` actor made before a run, `phase-6/sweep-gate-fail.log`), or
+when the census is not all zero. Only after the sweep and the census are zero does it reset the list; a failed teardown
+leaves the list for the next `global-setup.js` to retry (shown by forcing a non-zero census). `global-setup.js` runs the
+same `tearDownAndReport` over a list that still shows a run in flight or holds entries (a crashed run), then
+`startRun()`, then builds the probe bundle and the fast-check bundle into `test/build/`.
+
+**E2E settings.** `settings.js` `setWorldSetting` records the prior value of a world-scope setting on the list before it
+writes, and the teardown restores it; `setClientSetting` and a `game.settings.set` made directly in a spec are not
+recorded. A client-scope setting lives in the browser context that set it (measured: a value set in one context read its
+default in another context and in another browser), so it ends with its context and needs no restore. Keys the specs
+set (read from `tests/e2e/`):
+- client scope, through `setClientSetting`: `getCheckOptions` (`never`, `always` or `situational`),
+  `confirmDeletingItems`, `confirmDeletingEffects`, `themeCoreMessages`, `autoOpenCharacterSheetsGM`,
+  `autoOpenCharacterSheetsPlayer`, `showFoundryHotbar`, `enablePlayerHud`, `playerHudOptions`, `playerHudLayout`,
+  `theme` and `customThemes`;
+- world scope, through `setWorldSetting` (recorded and restored): `autoApplyPersistentDamage`, `autoApplyFastHealing`,
+  `autoRegainResolve`, `autoRevertPersistentDamage`, `autoDecreaseEffectDuration`, `autoRemoveExpiredEffects`,
+  `reportEffects`, `reportTakingDamage`, `reportHealingDamage`, `reportSpendingResolve`, `reportRendingArmor`,
+  `reportRepairingArmor` and `reportResting`;
+- set by `game.settings.set` in a spec's own `page.evaluate`, not recorded: the core settings `core.uiConfig`
+  (`chat-cards.spec.js`, `theme.spec.js`) and `core.messageMode` (`theme.spec.js`), which the test puts back itself
+  (read: `chat-cards.spec.js:1036`, `theme.spec.js:146` and `:305`), and the client settings `titan.playerHudOptions`
+  (`player-hud-action-menu.spec.js`) and `titan.theme` (`theme.spec.js`).
+Setting a client key through the API is an interpretation of the Project Scope clause that settings are configuration,
+not documents; the Configure Settings window is the alternative.
 
 **No test poll lasts longer than 1 second** (`.claude/claude.md` "Project Scope"). Everything in the suite runs on
 one machine, so a replicated update or a render lands at once, and a wait that needs longer is a defect to find and fix,
@@ -1127,20 +1195,19 @@ through `_retryAction` (`:16201-16203`) after waits of 0, 20, 100, 100 and then 
 (10 s), not under the 1 s ceiling. `expect.poll` uses the intervals 100, 250, 500, 1000 (`:4377`) and stops once the
 next interval would pass the deadline (`:4377-4393`), so under 1 s it checks at 0, 100, 350 and 850 ms and not again;
 a poll on something that can take 350 to 850 ms sets `intervals`. The mount-keying tests of `chat-cards.spec.js` set
-`[100]` for the dismissed notification: the poll of the former `chat-message-mounts.spec.js` took 357 to 865 ms before
-(four runs: `e2e-r3c-gate-1-slowops.json`, `-2`, `e2e-r3d-gate-1-slowops.json`, `-2`; 865 ms once, 357 to 379 ms in the
-others) and 443 to 449 ms after (`e2e-r4-gate-1`,
-`-2`, `-3` and `e2e-r5-gate-1-slowops.json`). Svelte's default `slide` transition lasts 400 ms (read in
-`svelte/src/transition/index.js`), and a click on a row that is still moving retries until the row stops: before
-`createOwnedItem` and `addEffect` settled with transitions, the Edit Item click on the new row took 51 to 928 ms in 134
-samples (`createOwnedItem`) and 54 to 965 ms in 54 samples (`addEffect`), over 50 ms, in four full runs (the same four
-files; 54 (`createOwnedItem`) and 51 (`addEffect`) samples of 380 to 450 ms, and 965, 928 and 919 ms once each). After, the same two clicks took 51 to 81
-ms in the samples over 50 ms (`e2e-r4-gate-1`, `-2`, `-3`, `e2e-r5-gate-1-slowops.json`: 89 and 32 samples; the
-`createOwnedItem` click at most 78 ms and the `addEffect` click at most 81 ms). Samples are matched by their locator
-title, never by the line number alone, which moves when the file is edited (`phase-3/scripts/recheck-slowops.py`,
-output `r5-recheck-slowops.out`). A test therefore waits for a
-transition with `settle(page, { transitions: true })` or collapses and expands
-rows in an order that does not move the next target, instead of leaving the transition to a retry. A product delay or
+`[100]` for the dismissed notification: with the default intervals the poll took 357 to 865 ms in four runs
+(`e2e-r3c-gate-1-slowops.json`, `-2`, `e2e-r3d-gate-1-slowops.json`, `-2`; 865 ms once, 357 to 379 ms in the others),
+and with `[100]` 443 to 449 ms (`e2e-r4-gate-1`, `-2`, `-3` and `e2e-r5-gate-1-slowops.json`). Svelte's default `slide`
+transition lasts 400 ms (read in `svelte/src/transition/index.js`), and a click on a row that is still moving retries
+until the row stops: without a transition settle, the Edit Item click on the new row took 51 to 928 ms in 134 samples
+(`createOwnedItem`) and 54 to 965 ms in 54 samples (`addEffect`), over 50 ms, in four full runs (the same four files;
+54 (`createOwnedItem`) and 51 (`addEffect`) samples of 380 to 450 ms, and 965, 928 and 919 ms once each). With
+`createOwnedItem` and `addEffect` settling with transitions, the same two clicks took 51 to 81 ms in the samples over
+50 ms (`e2e-r4-gate-1`, `-2`, `-3`, `e2e-r5-gate-1-slowops.json`: 89 and 32 samples; the `createOwnedItem` click at most
+78 ms and the `addEffect` click at most 81 ms). Samples are matched by their locator title, never by the line number
+alone, which moves when the file is edited (`phase-3/scripts/recheck-slowops.py`, output `r5-recheck-slowops.out`). A
+test therefore waits for a transition with `settle(page, { transitions: true })` or collapses and expands rows in an
+order that does not move the next target, instead of leaving the transition to a retry. A product delay or
 animation longer than the ceiling is not waited out: the test removes the cause (the last test of
 `combat-turns.spec.js` reloads, which ends core's 2 s scrolling text, before it deactivates the scene). The one
 exception is the real-hover test below.
@@ -1179,8 +1246,8 @@ the old list and waits for it to be replaced), and the commit of a dialog's
 number input (`setNumberField`: it changes dialog state only, and the caller reads the dialog's summary).
 
 The exemptions wait on a process starting and are not polls on a loaded page:
-- a `game.ready` world boot (`fixtures.js`, `join.js`; the teardown's and the setup recovery's own login goes through
-  it, as does a second browser context's login in `multiClient.js`);
+- a `game.ready` world boot (`join.js` `joinWorld`, which `login` in `fixtures.js` calls; the teardown's and the setup
+  recovery's own login goes through it, as does a second browser context's login in `multiClient.js`);
 - a mid-file reload through `world.js` `reloadWorld(page, { ready })` (15 s for the `/game` URL, 60 s for the
   readiness predicate, `game.ready` by default), used by the last test of `combat-turns.spec.js`, the reload
   test of `player-hud.spec.js` and both portrait tests of `surfaces.spec.js`;
@@ -1228,10 +1295,9 @@ full viewport width near the top and **intercepts pointer events on anything und
 HUD included, which makes row clicks retry until the test times out with no visible cause.
 
 **`createEmbeddedDocuments` return order is NOT input order.** Never map the returned array by index
-to your payloads — resolve created ids by NAME afterward (`actor.items.getName(payload.name)?.id`),
-as the older spec helpers that created several documents in one call did. Index-mapping produced wrong-id
-assertions that only failed in multi-payload creates. The HUD specs create their documents through the flows, which
-record each id.
+to your payloads — resolve created ids by NAME afterward (`actor.items.getName(payload.name)?.id`). Index-mapping gives
+wrong-id assertions that fail only in multi-payload creates. The specs create their documents through the flows, which
+read and record each id.
 
 **One-shot `boundingBox()` snapshots race layout settling.** `boundingBox()` and in-page
 `getBoundingClientRect()` are non-retrying reads, and `toBeVisible()` resolves at the START of a reveal
@@ -1286,7 +1352,7 @@ and core's `getDesignatedUser` makes the active GM with the highest role that GM
 `combat-turns.spec.js`, the reload test of `player-hud.spec.js` and the portrait tests of
 `surfaces.spec.js` call `reloadWorld(page)` with the default predicate. A spec navigates only through
 `reloadWorld` and `joinWorld` (the one `.reload(` in `world.js`
-and the one `.goto(` in `fixtures.js`), never an inline `page.reload(`, `location` change or `goto(`; no test scans for
+and the one `.goto(` in `join.js`), never an inline `page.reload(`, `location` change or `goto(`; no test scans for
 it, and review checks it. `page.on('console')` and
 `attachPageErrors` listeners survive reloads (they attach to the Page object). Sequence:
 (1) PROVE the first boot's ready work finished BEFORE clearing the capture buffer —
@@ -1368,9 +1434,6 @@ the source) or inferred:
   folder-partial.hbs`, `create-entry`, and `DocumentDirectory#_onCreateFolder` / `_onCreateEntry` in Foundry 14.364 at
   `C:\FoundryVTT\V14\dev\foundry`), which is how `createWorldItem` and `createActor` fill a folder. Dragging a folder's
   header onto an actor sheet is dispatched to `TitanActorSheet#_onDrop` as `type: 'Folder'` (read).
-- With the inverted `_onDropFolder` an Actor folder dropped on an actor sheet created no item and the harness failed the
-  test on a core `preCreateDocumentArray` validation error (`actor-folder-old-code.log`), so the Actor folder step of
-  the folder test fails on the old code as well as the Item folder step.
 
 **E2E effect tray and compendium spreadsheet specs (`effect-tray`, `compendium-spreadsheet`)** — notes; each says
 whether it was measured (with its saved log, under `.superpowers/sdd/test-suite-rewrite/phase-6/`, local), read (with
@@ -1421,8 +1484,7 @@ pushes `true` per existing check, for both `sidebar.checks` and `tabs.checks`). 
 a row actually COLLAPSES it and starts a 400 ms `slide`
 out-transition that subsequent assertions race — a latent flake that an unrelated bundle-timing shift can
 flip. Assert the expanded content directly (web-first assertions auto-wait) and click only to change state
-whose default you have verified. (Root-caused in the weapon-sheet helper of the former `attack-tags.spec.js`, whose
-tests are now in `chat-cards.spec.js`.)
+whose default you have verified.
 
 **Run e2e from a foreground shell (machine-local)** — launching Playwright from a DETACHED background
 shell on this machine crashes its worker processes at startup with Windows status `0xC0000142`
@@ -1435,16 +1497,19 @@ Foundry sessions: `withClients(browser, clientSpec, fn)` creates one independent
 label to its `Page`, then flushes each client's errors (`flushPageErrors`) for the harness gate. All contexts are
 closed in `finally` even if the callback or a login throws. `awaitUsersActive(page, userNames)` polls
 `game.users.getName(name)?.active` inside `page.waitForFunction` (1000 ms timeout) until all named users are active on
-that client. `combat-turns.spec.js` and `ownership.spec.js` open their extra clients in contexts of their own. Because
-`playwright.config.mjs` uses `workers: 1`, logins are sequential and there are no race conditions on the `/join` form.
-The smoke test is `tests/e2e/multi-client.spec.js`, which also holds the compendium permissions test.
+that client. `character-sheet-rows.spec.js`, `effect-tray.spec.js`, `player-hud.spec.js`, `spell-sheet.spec.js` and
+`multi-client.spec.js` call `withClients`; `combat-turns.spec.js` and `ownership.spec.js` open their extra clients in
+contexts of their own. Because `playwright.config.mjs` uses `workers: 1`, logins are sequential and there are no race
+conditions on the `/join` form. The smoke test is `tests/e2e/multi-client.spec.js`, which also holds the compendium
+permissions test.
 
 **npm scripts** — `npm test` runs `vitest run` (single pass); `npm run test:watch` runs Vitest in watch
 mode; `npm run test:e2e` runs the Playwright suite above (its `global-setup.js` builds the test bundles into
 `test/build/` first) and is THROTTLED by default — it wraps `playwright test` in
 `tests/e2e/run-e2e-throttled.ps1` (BelowNormal process priority, affinity limited to half the cores; filter
 args pass through) so a full run does not starve the machine. `npm run test:e2e:fast` is the unthrottled
-`playwright test` escape hatch. `npm run build:e2e` (`vite build --config vite.probe.config.mjs`) builds just
+`playwright test` escape hatch; `npm run test:e2e:headed` and `npm run test:e2e:ui` run `playwright test --headed` and
+`--ui`. `npm run build:e2e` (`vite build --config vite.probe.config.mjs`) builds just
 the standalone component-probe IIFE (see next entry).
 
 **Component-probe harness (externalized, test-only)** — `src/test-probe/` lets Playwright mount a single base
@@ -1477,27 +1542,30 @@ through `document.data.update` and must re-render on it (the rules-element setti
 `game.titan._probe.context(id)`). Without it the plain context is not reactive: a write through a bound prop changes the
 object and the DOM keeps what it first rendered. `component-probe-inputs.spec.js` uses it for stored data no control
 produces: an Advantage value outside the four levels, an unknown check type, and a Multiply Base or Multiply Sum
-element with no `rounding`.
+element with no `rounding`. `PAYLOAD` (also exported by `componentProbe.js`) is the cleaning-probe string, a paragraph
+and an image with an `onerror` handler.
 
-**Coverage is complete:** all **83** primitives in `src/helpers/svelte-components/**` are registered in
-`componentRegistry.js` and probed (the registry also holds the three rules-element settings editors
-`ItemSheetConditionalCheckModifierSettings`, `ItemSheetMulBaseSettings` and `ItemSheetMulSumSettings`). The probes are
-three specs, one world boot each (each describe = one component): `tests/e2e/component-probe-inputs.spec.js` (8 `input/`
-non-select primitives, the editors above, the invalid-data probes, and the 16 `input/select/` typed wrappers: 15 run
-from one table of `{component, options, testId, supportsNone, wrapperTestId}` whose options are the `src/` constants the
-components build their lists from (`ATTRIBUTES`, `SKILLS`, `RARITIES`, ..., `ARMOR_TRAITS`, `ATTACK_TRAITS`,
-`SHIELD_TRAITS`; imported through the `~/` alias), so a constant change cannot meet a stale hand count, and
-`DamageReducedBySelect`, whose list depends on two flags, is written out); `-buttons-tags.spec.js` (13 `button/`
-primitives, 17 `tag/` primitives incl. `EditDeleteTag` whose probe also locks in the FontAwesome `font-family`
-regression, with the `SpellAspectTags` entries built by `selectDisplayedSpellAspects` (a selector change fails the test,
-`M4-spellaspects-run.log`), and the tooltip HTML-cleaning probes: an `EffectTag` and a `Tag` mounted with an
-event-handler payload; the `EffectTag` one is the suite's one real-hover test); `-display.spec.js` (core `Button`,
-`TextInput`, `NumberInput`, `IntegerInput`, `CheckboxInput`, `Select`, `LabelTag`; the 5 `label/` primitives;
-`RichText`, the `EffectTag` family + its six duration-variant wrappers, `CondensedCheckButton`, `ProseMirrorEditor`;
-`Meter`, `Text`, `Tabs`, `ScrollingContainer`, `LabeledElement`, `BorderedColumnList`, `TagContainer`; and the
-`RichText` HTML-cleaning probe). The cleaning probes use synthetic props because a real flow cannot carry an event
-handler into these sinks (ProseMirror drops `on*` attributes on input); each fails when `foundry.utils.cleanHTML` is
-replaced by the identity in the page before the mount
+**Coverage:** `componentRegistry.js` holds 86 entries: 83 of the 87 `.svelte` files under
+`src/helpers/svelte-components/**` and the three rules-element settings editors
+`ItemSheetConditionalCheckModifierSettings`, `ItemSheetMulBaseSettings` and `ItemSheetMulSumSettings` (measured: a count
+of the registry's object keys and of the files). Not registered, so not probed: `button/HudButton.svelte`,
+`drag-reorder/DragHandle.svelte`, `drag-reorder/InsertionLine.svelte` and `input/select/SelectList.svelte` (no spec
+under `tests/e2e/` names them). The probes are three specs, one world boot each (each describe = one component):
+`tests/e2e/component-probe-inputs.spec.js` (8 `input/` non-select primitives, the editors above, the invalid-data
+probes, and the 16 `input/select/` typed wrappers: 15 run from one table of `{component, options, testId, supportsNone,
+wrapperTestId}` whose options are the `src/` constants the components build their lists from (`ATTRIBUTES`, `SKILLS`,
+`RARITIES`, ..., `ARMOR_TRAITS`, `ATTACK_TRAITS`, `SHIELD_TRAITS`; imported through the `~/` alias), so a constant
+change cannot meet a stale hand count, and `DamageReducedBySelect`, whose list depends on two flags, is written out);
+`-buttons-tags.spec.js` (13 `button/` primitives, 17 `tag/` primitives incl. `EditDeleteTag` whose probe also locks in
+the FontAwesome `font-family` regression, with the `SpellAspectTags` entries built by `selectDisplayedSpellAspects` (a
+selector change fails the test, `M4-spellaspects-run.log`), and the tooltip HTML-cleaning probes: an `EffectTag` and a
+`Tag` mounted with an event-handler payload; the `EffectTag` one is the suite's one real-hover test); `-display.spec.js`
+(core `Button`, `TextInput`, `NumberInput`, `IntegerInput`, `CheckboxInput`, `Select`, `LabelTag`; the 5 `label/`
+primitives; `RichText`, the `EffectTag` family + its six duration-variant wrappers, `CondensedCheckButton`,
+`ProseMirrorEditor`; `Meter`, `Text`, `Tabs`, `ScrollingContainer`, `LabeledElement`, `BorderedColumnList`,
+`TagContainer`; and the `RichText` HTML-cleaning probe). The cleaning probes use synthetic props because a real flow
+cannot carry an event handler into these sinks (ProseMirror drops `on*` attributes on input); each fails when
+`foundry.utils.cleanHTML` is replaced by the identity in the page before the mount
 (`.superpowers/sdd/test-suite-rewrite/phase-6/partB/mutations/M1-richtext-uncleaned-page-run.log`, `M2-...`, `M2b-...`),
 and the table fails when a select drops an option (`M3-attacktrait-slice-run.log`: `AttackTraitSelect` without its first
 trait fails 2 tests). Every primitive carries a `testId` (`data-testid` passthrough) **except `Text`**, which renders
@@ -1511,18 +1579,16 @@ harness re-injects it (no `dist/` rebuild needed).
 
 **Gotcha — Foundry global `.disabled`:** Foundry's `foundry2.css` defines `.disabled { pointer-events: none; }`.
 Never use `disabled` as a CSS class on an element wrapping interactive content — it silently blocks all
-pointer events on descendants. Use a non-colliding name (e.g. `not-enabled`). `ToggleOptionButton` originally
-used `disabled` for its off state, which made toggled-off filter options permanently un-clickable; the
-off-state class is now `not-enabled`.
+pointer events on descendants. Use a non-colliding name (e.g. `not-enabled`, the off-state class of
+`ToggleOptionButton`).
 
 **Logic layer — Playwright + fast-check** — The in-client logic tier uses Playwright `page.evaluate`
 calls against the live v14 runtime (no external module dependency). `tests/e2e/fast-check.js` injects the
 `fast-check` library as the `fc` page global (`injectFastCheck`); the only property run in the page is the trivial one
 of `logic/fast-check-smoke.spec.js`, which checks the injection (the flat-modifier stacking property runs in vitest, see
-the rules-element spec below). Quench 0.10.0 was **removed** because its `runBatches` executes 0 tests under Foundry
-v14: the async-`describe` / ApplicationV2 timing mismatch causes all batch registrations to be skipped
-silently. `src/quench/` and `tests/e2e/quench-runner.spec.js` were deleted; the `test:e2e:quench` npm
-script was removed. No Quench code remains in `src/` or `tests/`.
+the rules-element spec below). Quench is not used: its `runBatches` executes 0 tests under Foundry v14 (the
+async-`describe` / ApplicationV2 timing mismatch causes all batch registrations to be skipped silently). Measured:
+`grep -rli quench src tests package.json system.json` matches nothing.
 
 **Derived-data (rules-element) E2E spec** — `tests/e2e/logic/rules-elements.spec.js` builds every rules element in the
 Rules Elements tab (`addRulesElement`) of an ability, an effect or an owned item of actors made through the flows, and
@@ -1546,7 +1612,8 @@ the button; the `getCheckOptions` setting must make the click open a dialog. `mo
 left edge of the page so that it leaves the controls of the sheet behind it uncovered. `setNumberField`,
 `setSelectField`, `setCheckbox`, `readSummary`, `clickRoll` and `readNewestCheckFlags` set a field, read a summary, roll
 and read the posted message by the dialog's test ids (`check-field-<key>`, `check-summary-<key>`, `check-dialog-roll`).
-No spec reaches a dialog through `request<Type>Check`.
+The one dialog opened through `request<Type>Check` is the `clickRoll` test of `action-helpers.spec.js`
+(`requestAttributeCheck`), because that test is of the click helper and not of a document.
 
 ## Integration manifest drift guard
 
