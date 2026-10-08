@@ -969,7 +969,8 @@ journal entries, playlists, cards and world compendia; every combat, which has n
 whose actor does not resolve; hotbar
 entries of the four E2E users whose macro does not resolve; chat messages from `since` on when given),
 `sweepWorld(page)` (removes all of those except messages through the API — scenes first, folders after their
-contents, combats first, orphaned tokens and dangling hotbar slots last; never User documents) and `countCensus(census)`. Both
+contents, combats first, orphaned tokens and dangling hotbar slots last; never User documents) and
+`countCensus(census)`. Both
 `takeCensus` and `sweepWorld` throw before reading or deleting anything unless `game.world.id` is `test-titan`
 (`CENSUS_WORLD`; `assertCensusWorld` is exported and the teardown calls it too). Run directly
 (`node tests/e2e/census.js [--sweep]`) it logs in to localhost:30000 as `E2E GM 1`, prints JSON counts, and exits 1
@@ -1032,7 +1033,9 @@ views a scene created while none is viewed, so `createScene` then waits for the 
 for a viewed scene), `placeToken` (drags the actor's directory entry onto a free spot near the centre of `#board`,
 which core handles as an Actor drop; the spots are a 7-column grid with 130 px spacing and a spot that already holds a
 token is skipped, because two tokens dropped on one point took the same `x`/`y`
-(`.superpowers/sdd/test-suite-rewrite/phase-2/review-measure-1.log`, `stack`); 34 tokens fit at 1920x1080 and the 35th drop timed out, cause not
+(`.superpowers/sdd/test-suite-rewrite/phase-2/review-measure-1.log`, `stack`), as is a spot where
+`document.elementFromPoint` is not the canvas (a chat notification over the canvas held a drag for about 1.5 s,
+CLOSED_BUGS #141); 34 tokens fit at 1920x1080 and the 35th drop timed out, cause not
 determined (`.superpowers/sdd/test-suite-rewrite/phase-2/review-measure-2.log`); open windows are closed first and the Escape key releases the
 controlled tokens: measured on a scene with `tokenVision` true, a second token had `visible` false while the first
 was controlled and `visible` true after Escape, and with `tokenVision` false it stayed visible while the first was
@@ -1094,7 +1097,8 @@ recorded pack documents whose pack is not recorded, unlocked for the deletion an
 unlocking), clears each recorded hotbar slot that still holds its recorded macro (`user.assignHotbarMacro(null, slot)`:
 deleting a Macro does not clear its slot, which lives on the User), deletes every chat message with
 `timestamp >= runStartedAt`, restores each recorded world setting, runs `sweepWorld` (its per-kind counts are printed;
-they are not a failure in Phases 1-5) and `takeCensus` (which must be all zero or the run fails), prints one
+from Phase 6 on the plan requires every count to be zero, and `tearDownAndReport` itself throws only on boot errors and
+a non-zero census, read `global-teardown.js`) and `takeCensus` (which must be all zero or the run fails), prints one
 `e2e teardown (...)` JSON line and, only after the census is zero, resets the list (a failed teardown leaves the list
 for the next `global-setup.js` to retry; shown by forcing a non-zero census). `global-setup.js` runs the same
 `tearDownAndReport` over a list that still shows a run in flight or holds entries (a crashed run), then `startRun()`
@@ -1376,7 +1380,8 @@ the source) or inferred:
   table that core's Create Rollable Table folder action makes is recorded by the test (`record`). The row counts of
   the shipped `titan.effects` pack come from its index and folders.
 - `compendium-spreadsheet.spec.js` imports `decodeSpreadsheetFiles`, `encodeCsv` and `zipFiles` from
-  `src/spreadsheet/format/` through the `~/` alias (measured: the spec's runs resolve it; that Playwright reads the
+  `src/spreadsheet/format/` through the `~/` alias (measured: the spec passed 17 of 17 with these imports,
+`phase-6/sheet-2.log`; that Playwright reads the
   `paths` entry of `jsconfig.json` is inferred). A file is the Export dialog's CSV zip, decoded to sheets in Node,
   edited the way a user edits a spreadsheet (a cell set, rows or a column deleted), encoded again and handed to the
   dialog's file input as an in-memory buffer. The source pack holds an actor with a weapon and two effects
@@ -1388,8 +1393,12 @@ the source) or inferred:
   the file is planned as a create (`resolveExistingDocument` finds no parent). A row that names a parent that exists
   nowhere is therefore refused with the create branch's message, `Cannot create <class> documents under parent
   "<id>"` (measured: with that message changed, both refusal tests fail, `mutations/A-M6a-item-parent.log` and
-  `mutations/A-M6a-update-parent.log`). Inferred from reading both files, not exercised: `ApplyImport`'s `Cannot update`
-  branch has no path from the dialog, because a plan holds an update only when its parent resolved.
+  `mutations/A-M6a-update-parent.log`). The `Cannot update` branch
+  is reached by a stale plan, measured: the Import dialog stays open and usable while the Compendium tab and a pack
+  window are operated, so a test previews an update of the weapon (blank parent cell, which resolves to the actor of the
+  pack), deletes the actor from the pack window's context menu, then applies; `Cannot update Item documents under
+  parent "<actor id>"` shows and the pack stays empty (`phase-6/stale-1.log`; with the message changed the test fails,
+  `phase-6/mutations/logs/M12-run.log`).
 
 **E2E browser-zoom emulation** — the browser zoom tests of `character-sheet-layout.spec.js` emulate page zoom
 z through a CDP session:

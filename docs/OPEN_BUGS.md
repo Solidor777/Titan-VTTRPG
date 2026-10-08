@@ -233,3 +233,21 @@ The evidence files named here are in `.superpowers/sdd/test-suite-rewrite/phase-
 - **Cause not located.**
 - **Found:** 2026-10-07 while rewriting the Phase 4 delete tests.
 - **Status:** Open.
+
+### 140. A context menu of the Compendium directory stayed open after its entry was clicked (spreadsheet spec, one run)
+
+The evidence files named here are in `.superpowers/sdd/test-suite-rewrite/phase-6/` (local, not checked in).
+
+- **What:** in the first run of `compendium-spreadsheet.spec.js` after its rewrite, the test 'deleteMissing removes a
+  top-level pack document absent from the imported file' failed at `contextMenu.js:22`
+  (`expect(page.locator('#context-menu')).toHaveCount(0)`: expected 0, received 1 for 1000 ms), reached through
+  `choosePackMenuEntry` (spec :70) and `openImport` (spec :204) while choosing 'Import Spreadsheet' on a pack
+  (`sheet-1.log`). The next test then failed in the `beforeAll` that the worker restart re-ran: `createActor`
+  found 2 directory entries named 'E2E Original NPC' instead of 1 (`flows.js:80`), and the page reported "The Compendium
+  pack e2e-spreadsheet-source already exists in the World and cannot be created" (`sheet-1.log`). Read from the spec:
+  the first `beforeAll` had already made both, so the re-run duplicated them.
+- **Not reproduced:** the immediate re-run passed 17 of 17 (`sheet-2.log`), the full run passed 656 (`e2e-full-1.log`),
+  and 10 separate runs of the spec passed 18 of 18 each (`drag-hunt/sheet-run-1.log` to `sheet-run-10.log`).
+- **Cause not located.** Whether the entry click did not land or the menu was re-opened is not measured.
+- **Found:** 2026-10-07 during Phase 6 Part A.
+- **Status:** Open.

@@ -1405,8 +1405,9 @@ The evidence files named here are in `.superpowers/sdd/test-suite-rewrite/phase-
   - The test was rewritten in Phase 6 of the test-suite rewrite: the pack is made with the `createCompendium` flow
     (the Compendium tab's Create dialog) and deleted through the directory's context menu and confirmation, on E2E
     GM 1, with E2E GM 2 as the second client. With the `renderCompendiumDirectory` registration removed from
-    `EffectTrayState.svelte.js` it fails at 'the tray offers the pack' (expected 1 option, received 0;
-    `.superpowers/sdd/test-suite-rewrite/phase-6/mutations/D-T2-multi-client.log`). The throw-at-the-end mutation above
+    `EffectTrayState.svelte.js` the test fails on an unlabelled `toHaveCount(1)` of the tray's pack options filtered by the
+    new pack's label (expected 1, received 0; `effect-tray.spec.js:1278`;
+    `.superpowers/sdd/test-suite-rewrite/phase-6/mutations/D-T2-multi-client.log:18-40`). The throw-at-the-end mutation above
     was run on the earlier version of the test and not on the rewritten one.
 
 ### 113. `condition-description.spec.js` failed when no scene was active at its start
@@ -2135,3 +2136,24 @@ The evidence files named here are in `.superpowers/sdd/test-suite-rewrite/bug-11
   makes no macro" reads the dialog's text for `Attack (1)` and for no `LOCAL.`. It passed after the fix in the
   final full run (`phase-5/b/e2e-full-b2.log`, 645 passed).
 - **Status:** Closed 2026-10-07.
+
+### 141. `placeToken` waited about 1.5 s for a chat notification that covered its drop spot
+
+The evidence files named here are in `.superpowers/sdd/test-suite-rewrite/phase-6/` (local, not checked in).
+
+- **What:** the slow-operation record of a full run listed one 'Drag and drop' at `flows.js` (the drag in `placeToken`)
+  of about 1.5 s: 1545, 1528, 1527 and 1544 ms in four full runs (`e2e-full-1-slowops.json`, `e2e-full-2-slowops.json`,
+  `e2e-full-3-slowops.json`, `e2e-full-7.log`); it was absent when the ten spec files that call `placeToken` were run
+  alone (`drag-hunt/`).
+- **Measured cause:** a temporary timing line in `placeToken` named the test in two runs (`e2e-full-5-dragtime.log`,
+  `e2e-full-6-pwapi.log`): 'an edit on an unlinked token sheet leaves the open base actor sheet unchanged' of
+  `sheet-header.spec.js`. Playwright's call log of that drag shows six retries of "subtree intercepts pointer events"
+  (`e2e-full-6-pwapi.log`), and the element read at the drop point just before the drag was a `.section` inside a
+  `.chat-message` of `#chat-notifications`, with no application window open (`e2e-full-9-chain.log`). Inferred, not
+  measured: the cover is the notification of a card posted by one of the Send to Chat tests earlier in the file.
+- **Fixed:** 2026-10-08. The drop-spot search of `placeToken` skips a spot where `document.elementFromPoint` is not the
+  canvas.
+- **Gate:** the slow-operation record of the full run. It listed the drag in 8 of 8 full runs before the fix and not in
+  the full run after it (`e2e-full-10.log`, 657 passed, sweep and census zero). One run after the fix is a sample, not a
+  proof that the drag cannot recur.
+- **Status:** Closed 2026-10-08.
