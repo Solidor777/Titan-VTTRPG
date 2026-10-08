@@ -337,7 +337,8 @@ category never reflows the bar. The per-user `directions.vertical.subOptionsFlow
 matching the default bottom-anchored dock so the flyout grows on-screen) chooses the stacking direction; flow up
 renders the visible window reversed so the first logical option is the bottom-most row, on the button. `.categories`
 reserves a gutter on the chip's edge so the minimize chip never overlaps the buttons. Sub-options window to
-`windowSize` entries with wheel scrolling (non-passive listener via a `use:` action) and gradient scroll fades; the
+`windowSize` entries (default 9, the length of a player's Utility list) with wheel scrolling (non-passive listener
+via a `use:` action) and gradient scroll fades; the
 whole flyout lane swooshes in with a directional `in:fly`
 from the open category toward the sub-options (horizontal slide in a vertical layout, vertical in a
 horizontal one). The sub-option moved-over (`onpointermove`, NOT `onpointerenter`, so a flyout swooshing in

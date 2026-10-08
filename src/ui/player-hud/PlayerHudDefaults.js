@@ -57,7 +57,7 @@ export function createDefaultHudOptions() {
             remove: true,
             sendToChat: true,
          },
-         windowSize: 8,
+         windowSize: 9,
       },
       effectsPanel: {
          combatOnly: false,

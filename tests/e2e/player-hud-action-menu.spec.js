@@ -612,8 +612,7 @@ test.describe('options', () => {
       await expect(hud('player-hud-sub-option-resistances-reflexes').locator('i'))
          .toHaveClass(/(?:^|\s)fas\sfa-rabbit-running(?:\s|$)/);
 
-      // The window is widened so that every utility row is rendered; the test reads icons, not the scroll window.
-      await setMenuOptions({ windowSize: 10 });
+      // The default window of nine rows renders every row of a player's Utility flyout without scrolling.
       await openCategory('utility');
       for (const [key, icon] of [
          [
@@ -927,8 +926,8 @@ test.describe('report cards', () => {
    }
 
    /**
-    * Finds a utility sub-option in the open Utility flyout. The flyout shows `windowSize` rows (8 by default) and
-    * the player's utility list is longer, so a row below the window is brought into view with the mouse wheel.
+    * Finds a utility sub-option in the open Utility flyout. The flyout's default window of nine rows holds every
+    * utility row of a player, so no scrolling is needed.
     * @param {string} key - The utility sub-option key.
     * @returns {Promise<import('@playwright/test').Locator>} The visible sub-option.
     */
@@ -936,18 +935,6 @@ test.describe('report cards', () => {
       await openCategory('utility');
       /** @type {import('@playwright/test').Locator} The sub-option. */
       const option = hud(`player-hud-sub-option-utility-${key}`);
-      // The wheel direction that reveals the row depends on whether the flyout flows up or down, so a tick down is
-      // tried first and a tick up second.
-      for (const delta of [
-         120,
-         -120,
-      ]) {
-         if (await option.count() === 0) {
-            await hud('player-hud-flyout').hover();
-            await page.mouse.wheel(0, delta);
-            await expect(hud('player-hud-flyout')).toBeVisible();
-         }
-      }
       await expect(option, `the ${key} sub-option is in view`).toBeVisible();
       return option;
    }
