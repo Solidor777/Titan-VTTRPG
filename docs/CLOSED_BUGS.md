@@ -2322,9 +2322,11 @@ unless a path says otherwise.
     page error. TITAN registers its own sheets for `types: ['effect']` and `['condition']` only (`OnceInit.js`).
   - One shared test of "an effect TITAN defines", `isTitanEffect` with `EFFECT_TYPE`, `CONDITION_TYPE` and
     `TITAN_EFFECT_TYPES` (`src/system/EffectTypes.js`, unit-pinned in `tests/unit/EffectTypes.test.js`), serves the
-    action menu, the effects-panel visibility and the effects panel's lists.
+    action menu, the effects-panel visibility and, as its one filter, the effects panel's lists. Every other literal
+    Active Effect subtype test in `src/` uses the constants too; the hand-read table is `fix2/literal-sweep.md`.
   - A foreign `base` effect with `statuses: ['prone']` and a `flags.titan` description, measured
-    (`fix1/probe-statuses.json`): core's `actor.statuses` holds `prone`; the derived stats are unchanged;
+    (`fix2/probe-statuses.json`, snapshot of rating, speed, attribute, resource, resistance, mod and skill): core's
+    `actor.statuses` holds `prone`; the derived stats are unchanged;
     `getConditions()` is null, `getExpiredEffects()` and `getSortedEffects()` are false, the rules-element sources
     number 0 and the immunity sources 0; `toggleStatusEffect('prone')` (core) then removes the effect. So TITAN applies
     none of the Prone rules to it, and only core's status display and toggle see it. The e2e spec pins this against a
@@ -2353,10 +2355,11 @@ unless a path says otherwise.
   - Registration removed: all 10 tests fail, tests 3, 4 and 5 on their own assertion "the base effect was created"
     (`fix1/mut1-no-registration.log`; an earlier attempt hit the open bug #143's scene dialog,
     `fix1/mut1-attempt1-flake143.log`).
-  - `isTitanEffect` made always true: the HUD action-menu test and the effects-panel test fail, the other 8 pass, and
-    the unit pin fails (`fix1/mut2-predicate-always-true.log`, `fix1/mut2-unit.log`).
+  - `isTitanEffect` made always true: the Player HUD test fails at the effects-panel row count and the panel-hides test
+    fails at its row click (two rows), the other 8 pass, and the unit pin fails
+    (`fix2/mut-predicate-always-true.log`, `fix2/mut-predicate-unit.log`).
   - The two HUD fixes of the first round, removed: the same two tests fail (`mut2-no-hud-fixes.log`).
   - Restored files verified by sha256 (`fix1/sha-before.txt`, `fix1/sha-after-m1.txt`, `fix1/sha-after-m2.txt`).
-  - After the fix round: unit 1555 of 1555 (`fix1/unit.log`); full e2e 704 of 704 with the sweep and census at 0
-    (`fix1/e2e-full.log`).
+  - After the second fix round: unit 1555 of 1555 (`fix2/unit.log`); full e2e 704 of 704 with the sweep and census at 0
+    (`fix2/e2e-full.log`).
 - **Status:** Closed 2026-10-08.

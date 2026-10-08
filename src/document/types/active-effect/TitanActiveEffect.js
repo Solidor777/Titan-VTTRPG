@@ -1,3 +1,4 @@
+import { EFFECT_TYPE } from '~/system/EffectTypes.js';
 import CheckListMixin from '~/document/types/item/CheckListMixin.js';
 import CustomTraitMixin from '~/document/types/item/CustomTraitMixin.js';
 import getEffectCreationChanges from '~/helpers/utility-functions/GetEffectCreationChanges.js';
@@ -67,7 +68,7 @@ export default class TitanActiveEffect extends CustomTraitMixin(CheckListMixin(f
       }
 
       // Type-specific initialization only applies to the 'effect' subtype.
-      if (this.type === 'effect') {
+      if (this.type === EFFECT_TYPE) {
 
          // Allow the data model to capture initial document data (e.g. combat initiative).
          if (typeof this.system.onPreCreate === 'function') {
@@ -99,7 +100,7 @@ export default class TitanActiveEffect extends CustomTraitMixin(CheckListMixin(f
 
       // Timed effects derive their active state from their duration: active while time remains.
       // The disabled flag stays a manual toggle for permanent effects only.
-      if (this.type === 'effect') {
+      if (this.type === EFFECT_TYPE) {
          /** @type {string} - The duration type this update results in. */
          const durationType =
             foundry.utils.getProperty(changes, 'system.duration.type') ?? this.system.duration.type;

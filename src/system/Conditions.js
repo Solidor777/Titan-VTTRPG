@@ -1,3 +1,4 @@
+import { CONDITION_TYPE } from '~/system/EffectTypes.js';
 import isHTMLBlank from '~/helpers/utility-functions/IsHTMLBlank.js';
 import localize from '~/helpers/utility-functions/Localize.js';
 import sortAscending from '~/helpers/utility-functions/SortAscending.js';
@@ -84,7 +85,7 @@ export function buildConditionDefinitions() {
          id: 'blinded',
          name: 'LOCAL.blinded.text',
          img: 'icons/svg/blind.svg',
-         type: 'condition',
+         type: CONDITION_TYPE,
          system: {
             rulesElement: [
                createQuarterBasePenalty('blinded', 'rating', 'melee'),
@@ -98,7 +99,7 @@ export function buildConditionDefinitions() {
          id: 'contaminated',
          name: 'LOCAL.contaminated.text',
          img: 'icons/svg/poison.svg',
-         type: 'condition',
+         type: CONDITION_TYPE,
          system: {
             rulesElement: [
                createQuarterBasePenalty('contaminated', 'attribute', 'all', 'attributes'),
@@ -110,13 +111,13 @@ export function buildConditionDefinitions() {
          id: 'dead',
          name: 'LOCAL.dead.text',
          img: 'icons/svg/skull.svg',
-         type: 'condition',
+         type: CONDITION_TYPE,
       },
       {
          id: 'deafened',
          name: 'LOCAL.deafened.text',
          img: 'icons/svg/deaf.svg',
-         type: 'condition',
+         type: CONDITION_TYPE,
          system: {
             rulesElement: [
                createSenseAutomaticFailure('deafened', 'situationReliesOnHearing', 'hearing'),
@@ -127,7 +128,7 @@ export function buildConditionDefinitions() {
          id: 'frightened',
          name: 'LOCAL.frightened.text',
          img: 'icons/svg/terror.svg',
-         type: 'condition',
+         type: CONDITION_TYPE,
          system: {
             rulesElement: [
                // Disadvantage on every check. The rules scope it to while the creature can detect the source of its
@@ -149,7 +150,7 @@ export function buildConditionDefinitions() {
          id: 'incapacitated',
          name: 'LOCAL.incapacitated.text',
          img: 'icons/svg/paralysis.svg',
-         type: 'condition',
+         type: CONDITION_TYPE,
          system: {
             rulesElement: [
                createReflexesAutomaticFailure('incapacitated'),
@@ -160,7 +161,7 @@ export function buildConditionDefinitions() {
          id: 'offBalance',
          name: 'LOCAL.offBalance.text',
          img: 'icons/svg/daze.svg',
-         type: 'condition',
+         type: CONDITION_TYPE,
          system: {
             rulesElement: [
                createQuarterBasePenalty('offBalance', 'rating', 'accuracy'),
@@ -174,7 +175,7 @@ export function buildConditionDefinitions() {
          id: 'prone',
          name: 'LOCAL.prone.text',
          img: 'icons/svg/falling.svg',
-         type: 'condition',
+         type: CONDITION_TYPE,
          system: {
             rulesElement: [
                {
@@ -194,7 +195,7 @@ export function buildConditionDefinitions() {
          id: 'restrained',
          name: 'LOCAL.restrained.text',
          img: 'icons/svg/net.svg',
-         type: 'condition',
+         type: CONDITION_TYPE,
          system: {
             rulesElement: [
                createQuarterBasePenalty('restrained', 'rating', 'melee'),
@@ -216,7 +217,7 @@ export function buildConditionDefinitions() {
          id: 'stunned',
          name: 'LOCAL.stunned.text',
          img: 'icons/svg/stoned.svg',
-         type: 'condition',
+         type: CONDITION_TYPE,
          system: {
             rulesElement: [
                createQuarterBasePenalty('stunned', 'rating', 'defense'),
@@ -227,7 +228,7 @@ export function buildConditionDefinitions() {
          id: 'sleeping',
          name: 'LOCAL.sleeping.text',
          img: 'icons/svg/sleep.svg',
-         type: 'condition',
+         type: CONDITION_TYPE,
          system: {
             rulesElement: [
                {
@@ -245,7 +246,7 @@ export function buildConditionDefinitions() {
          id: 'unconscious',
          name: 'LOCAL.unconscious.text',
          img: 'icons/svg/unconscious.svg',
-         type: 'condition',
+         type: CONDITION_TYPE,
       },
    ];
 }

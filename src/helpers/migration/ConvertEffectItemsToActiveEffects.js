@@ -1,3 +1,5 @@
+import { EFFECT_TYPE } from '~/system/EffectTypes.js';
+
 /**
  * Builds Active Effect creation data from a legacy effect Item's raw source data.
  * Maps the legacy item's native and system fields onto the 'effect' Active Effect subtype. The old item used a
@@ -37,7 +39,7 @@ export function buildEffectData(itemSource) {
       _id: itemSource._id,
       name: itemSource.name,
       img: itemSource.img,
-      type: 'effect',
+      type: EFFECT_TYPE,
       description: system.description ?? '',
       disabled,
       transfer: false,

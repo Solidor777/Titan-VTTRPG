@@ -1,3 +1,4 @@
+import { CONDITION_TYPE, EFFECT_TYPE } from '~/system/EffectTypes.js';
 import TitanActor from '~/document/types/actor/TitanActor.js';
 import TitanItem from '~/document/types/item/TitanItem.js';
 import TitanPlayerSheet from '~/document/types/actor/types/character/types/player/PlayerSheet.js';
@@ -251,14 +252,14 @@ export default function onceInit() {
    // Register the Active Effect sheet for the 'effect' subtype and the condition sheet for the 'condition' subtype.
    foundry.applications.apps.DocumentSheetConfig.registerSheet(
       foundry.documents.ActiveEffect, 'titan', TitanActiveEffectSheet, {
-         types: ['effect'],
+         types: [EFFECT_TYPE],
          makeDefault: true,
          label: localize('defaultEffectSheet'),
       },
    );
    foundry.applications.apps.DocumentSheetConfig.registerSheet(
       foundry.documents.ActiveEffect, 'titan', TitanConditionSheet, {
-         types: ['condition'],
+         types: [CONDITION_TYPE],
          makeDefault: true,
          label: localize('defaultConditionSheet'),
       },

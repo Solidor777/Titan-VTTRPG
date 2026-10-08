@@ -1,4 +1,5 @@
 <script>
+   import { EFFECT_TYPE } from '~/system/EffectTypes.js';
    import { getContext } from 'svelte';
    import localize from '~/helpers/utility-functions/Localize.js';
    import HudButton from '~/helpers/svelte-components/button/HudButton.svelte';
@@ -12,7 +13,7 @@
    let isExpanded = $state(false);
 
    /** @type {boolean} Whether this entry is a full effect (vs an inert condition). */
-   const isEffect = $derived(document.data?.type === 'effect');
+   const isEffect = $derived(document.data?.type === EFFECT_TYPE);
 
    /** @type {string} The effect's duration type (effects only; defaults to permanent when absent). */
    const durationType = $derived(

@@ -119,11 +119,11 @@ management). Data model classes hold the schema, field validation, and derived-d
   unaffected: it runs `this.system.onPreCreate(data)` (the data model's initial-data capture, e.g. combat
   initiative) and applies `getEffectCreationChanges` (`src/helpers/utility-functions/GetEffectCreationChanges.js`:
   `showIcon` forced to `CONST.ACTIVE_EFFECT_SHOW_ICON.ALWAYS`, and a timed effect disabled exactly when
-  `remaining <= 0`). The static
-  `buildCreationSource(data)` constructs an effect (so its schema cleans the data) and applies the same changes plus
-  `transfer: false`, for an effect written as data (the stored-actor migration's Adventure path; core's Adventure import
-  runs no embedded `_preCreate`). `_preUpdate` keeps a timed effect's `disabled` synced to its remaining duration;
-  `disabled` is a manual toggle only for permanent effects.
+  `remaining <= 0`). The static `buildCreationSource(data)` constructs an effect (so its schema cleans the data) and
+  applies the same changes plus `transfer: false`, for an effect written as data (the stored-actor migration's
+  Adventure path; core's Adventure import runs no embedded `_preCreate`). `_preUpdate`
+  keeps a timed effect's `disabled` synced to its remaining duration; `disabled` is a manual toggle only for permanent
+  effects.
   `buildChatMessageData()` (pure, byte-parallel to `TitanItem`'s) returns `{ type: 'effect', system }` —
   the prepared `getRollData()` snapshot minus the document-level `id`/`type`, plus `name`/`img` as label
   metadata; the chat subtype is hardcoded `'effect'` (a condition's own subtype is not a registered chat

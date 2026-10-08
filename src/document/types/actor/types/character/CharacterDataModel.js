@@ -1,3 +1,4 @@
+import { CONDITION_TYPE, EFFECT_TYPE, TITAN_EFFECT_TYPES } from '~/system/EffectTypes.js';
 import ActionQueue from '~/helpers/ActionQueue.js';
 import TitanActorDataModel from '~/document/types/actor/TitanActorDataModel.js';
 import AttackCheck from '~/check/types/attack-check/AttackCheck.js';
@@ -449,7 +450,7 @@ export default class CharacterDataModel extends TitanActorDataModel {
     * @returns {ActiveEffect[]|null} Array of conditions affecting this actor, or null if there are none.
     */
    getConditions() {
-      const conditions = this.parent.effects.filter((effect) => effect.type === 'condition');
+      const conditions = this.parent.effects.filter((effect) => effect.type === CONDITION_TYPE);
       return conditions.length > 0 ? conditions : null;
    }
 
@@ -459,7 +460,7 @@ export default class CharacterDataModel extends TitanActorDataModel {
     * there are none.
     */
    getExpiredEffects() {
-      const effects = this.parent.effects.filter((effect) => effect.type === 'effect' && effect.system.isExpired);
+      const effects = this.parent.effects.filter((effect) => effect.type === EFFECT_TYPE && effect.system.isExpired);
       return effects.length > 0 ? effects : false;
    }
 
@@ -469,7 +470,7 @@ export default class CharacterDataModel extends TitanActorDataModel {
     * @returns {object|boolean} Object containing the sorted Effect Active Effects, or false if there are none.
     */
    getSortedEffects() {
-      const effects = this.parent.effects.filter((effect) => effect.type === 'effect');
+      const effects = this.parent.effects.filter((effect) => effect.type === EFFECT_TYPE);
       if (effects.length > 0) {
          return sortObjectsIntoContainerByFunctionValue(effects, (effect) => {
             return effect.system.isExpired ? 'expired' : effect.system.duration.type;
@@ -713,12 +714,12 @@ export default class CharacterDataModel extends TitanActorDataModel {
 
       /** @type {ImmunitySource[]} Every matching source, possibly repeated. */
       const matches = [];
-      if (effect.type === 'condition') {
+      if (effect.type === CONDITION_TYPE) {
          for (const status of effect.statuses) {
             matches.push(...(immunities.condition.get(status) ?? []));
          }
       }
-      else if (effect.type === 'effect') {
+      else if (effect.type === EFFECT_TYPE) {
          matches.push(...(immunities.effect.get(camelize(String(effect.name))) ?? []));
       }
 
@@ -772,11 +773,9 @@ export default class CharacterDataModel extends TitanActorDataModel {
          }
       }
 
-      // Enabled Active Effects: the 'effect' subtype, then the 'condition' subtype, each filling its own bucket.
-      for (const effectType of [
-         'effect',
-         'condition',
-      ]) {
+      // Enabled Active Effects: the 'effect' subtype, then the 'condition' subtype (the order of TITAN_EFFECT_TYPES),
+      // each filling its own bucket.
+      for (const effectType of TITAN_EFFECT_TYPES) {
          this.parent.effects.forEach((effect) => {
             if (effect.type === effectType && !effect.disabled && effect.system.rulesElement?.length > 0) {
                sources.push({
@@ -4958,7 +4957,7 @@ export default class CharacterDataModel extends TitanActorDataModel {
          this.parent.isOwner,
          'Cannot modify document %s if not owner.',
          this.parent.name,
-      ) && this.parent.effects.some((effect) => effect.type === 'effect' && effect.system.isExpired)) {
+      ) && this.parent.effects.some((effect) => effect.type === EFFECT_TYPE && effect.system.isExpired)) {
 
          // Remove effects if removal does not need to be confirmed (the setting for deleting Effects).
          if (!shouldConfirmDeletingEffects()) {
@@ -5009,7 +5008,7 @@ export default class CharacterDataModel extends TitanActorDataModel {
       )) {
          // Delete all combat Effect Active Effects.
          const combatEffects = this.parent.effects.filter((effect) =>
-            effect.type === 'effect' && effect.system.isCombatEffect);
+            effect.type === EFFECT_TYPE && effect.system.isCombatEffect);
          if (combatEffects.length > 0) {
             // Collect the IDs first, then delete in a single batch to avoid mutating the live collection while
             // iterating over it.
@@ -5187,7 +5186,7 @@ export default class CharacterDataModel extends TitanActorDataModel {
          // Decrease the duration of effects with the Initiative duration type.
          if (autoDecreaseEffectDuration()) {
             let initiativeEffects = this.parent.effects.filter((effect) =>
-               effect.type === 'effect' && effect.system.duration.type === 'initiative');
+               effect.type === EFFECT_TYPE && effect.system.duration.type === 'initiative');
             if (initiativeEffects) {
 
                // Calculate which effects to advance.
@@ -5501,7 +5500,7 @@ export default class CharacterDataModel extends TitanActorDataModel {
       // Decrease effect duration if appropriate.
       if (autoDecreaseEffectDuration()) {
          const turnEffects = this.parent.effects.filter((effect) =>
-            effect.type === 'effect' && effect.system.duration.type === selector);
+            effect.type === EFFECT_TYPE && effect.system.duration.type === selector);
          if (turnEffects.length > 0) {
             for (const effect of turnEffects) {
                effect.system.duration.remaining -= 1;
@@ -5527,7 +5526,7 @@ export default class CharacterDataModel extends TitanActorDataModel {
       // Increase effect duration if appropriate.
       if (autoDecreaseEffectDuration()) {
          const turnEffects = this.parent.effects.filter((effect) =>
-            effect.type === 'effect' && effect.system.duration.type === selector);
+            effect.type === EFFECT_TYPE && effect.system.duration.type === selector);
          if (turnEffects.length > 0) {
             for (const effect of turnEffects) {
                effect.system.duration.remaining += 1;
@@ -5555,7 +5554,7 @@ export default class CharacterDataModel extends TitanActorDataModel {
       if (isCurrentUserBestOwner(this.parent)) {
          if (autoDecreaseEffectDuration()) {
             const initiativeEffects = this.parent.effects.filter((effect) =>
-               effect.type === 'effect' && effect.system.duration.type === 'initiative');
+               effect.type === EFFECT_TYPE && effect.system.duration.type === 'initiative');
             if (initiativeEffects) {
 
                // Calculate which effects to revert using the same filter as onInitiativeAdvanced.
@@ -6306,7 +6305,7 @@ export default class CharacterDataModel extends TitanActorDataModel {
 
          // Update the Effect Active Effect if valid.
          const effect = this.parent.effects.get(effectId);
-         if (effect && effect.type === 'effect') {
+         if (effect && effect.type === EFFECT_TYPE) {
             await effect.update({
                disabled: !effect.disabled,
             });

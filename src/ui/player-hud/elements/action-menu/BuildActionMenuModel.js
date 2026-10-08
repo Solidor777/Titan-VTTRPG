@@ -19,7 +19,7 @@ import {
    getIcon,
 } from '~/system/Icons.js';
 import { DEFAULT_SKILL_ATTRIBUTES } from '~/system/DefaultSkillAttributes.js';
-import { isTitanEffect } from '~/system/EffectTypes.js';
+import { EFFECT_TYPE, isTitanEffect } from '~/system/EffectTypes.js';
 
 /** @type {Array<string>} The 18 skill keys, matching the character schema. */
 export const HUD_SKILLS = [
@@ -360,7 +360,7 @@ function buildEffects(primary, options) {
       .filter((effect) => !options.filters.effectsWithChecks || (effect.system?.check?.length ?? 0) > 0)
       .map((effect) => {
          /** @type {boolean} Whether this is a full effect (conditions carry no duration/chat card). */
-         const isEffect = effect.type === 'effect';
+         const isEffect = effect.type === EFFECT_TYPE;
 
          /** @type {number} The effect's embedded-check count. */
          const checkCount = effect.system?.check?.length ?? 0;

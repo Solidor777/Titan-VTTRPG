@@ -1,4 +1,5 @@
 <script>
+   import { EFFECT_TYPE } from '~/system/EffectTypes.js';
    import { getContext } from 'svelte';
    import { slide } from 'svelte/transition';
    import sortAscending from '~/helpers/utility-functions/SortAscending.js';
@@ -34,7 +35,7 @@
    let effects = $derived(
       document.data.effects.filter((effect) => {
          return (
-            effect.type === 'effect' &&
+            effect.type === EFFECT_TYPE &&
             effect.name.toLowerCase().indexOf(filter.toLowerCase()) !== -1
          );
       }).sort((a, b) => sortAscending(a.sort, b.sort)),

@@ -1,4 +1,5 @@
 <script>
+   import { EFFECT_TYPE } from '~/system/EffectTypes.js';
    import localize from '~/helpers/utility-functions/Localize.js';
    import { getContext } from 'svelte';
    import ScrollingContainer from '~/helpers/svelte-components/ScrollingContainer.svelte';
@@ -28,7 +29,7 @@
                onclick={() => {
                   document.data.createEmbeddedDocuments('ActiveEffect', [{
                      name: localize('newEffect'),
-                     type: 'effect',
+                     type: EFFECT_TYPE,
                   }]);
                }}
             />

@@ -1,3 +1,4 @@
+import { CONDITION_TYPE } from '~/system/EffectTypes.js';
 import { findConditionDefinition } from '~/system/Conditions.js';
 
 /**
@@ -40,7 +41,7 @@ export function toCanonicalJson(value) {
  * rules elements are current and it stores no description.
  */
 export function getConditionEffectUpdate(source) {
-   if (source.type !== 'condition') {
+   if (source.type !== CONDITION_TYPE) {
       return null;
    }
 

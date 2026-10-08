@@ -1,3 +1,4 @@
+import { EFFECT_TYPE } from '~/system/EffectTypes.js';
 import ConfirmationDialog from '~/helpers/dialogs/ConfirmationDialog.js';
 import localize from '~/helpers/utility-functions/Localize.js';
 import getEffectCompendiums from '~/sidebar/tray/GetEffectCompendiums.js';
@@ -225,7 +226,7 @@ export default class EffectTrayState {
       const isSystemPack = pack.metadata.packageType === 'system';
 
       this.effects = isSystemPack
-         ? documents.filter((effect) => effect.type === 'effect')
+         ? documents.filter((effect) => effect.type === EFFECT_TYPE)
          : documents;
 
       this.#buildTree(pack);
@@ -291,7 +292,7 @@ export default class EffectTrayState {
          [
             {
                name: game.i18n.localize('LOCAL.effectTrayNewName.text'),
-               type: 'effect',
+               type: EFFECT_TYPE,
                folder: folderId,
             },
          ],

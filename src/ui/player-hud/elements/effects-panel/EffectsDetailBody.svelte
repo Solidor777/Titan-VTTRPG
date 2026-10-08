@@ -1,4 +1,5 @@
 <script>
+   import { EFFECT_TYPE } from '~/system/EffectTypes.js';
    import { getContext } from 'svelte';
    import localize from '~/helpers/utility-functions/Localize.js';
    import { getConditionDescription } from '~/system/Conditions.js';
@@ -22,7 +23,7 @@
    const sheetDocument = getContext('sheetDocument');
 
    /** @type {boolean} Whether this entry is an effect (vs a condition, which has no checks of its own). */
-   const isEffect = $derived(document.data?.type === 'effect');
+   const isEffect = $derived(document.data?.type === EFFECT_TYPE);
 
    /** @type {string} The entry's description HTML: an effect's own, or a condition's from its definition. */
    const description = $derived(

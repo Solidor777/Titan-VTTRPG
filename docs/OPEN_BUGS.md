@@ -252,7 +252,9 @@ The evidence files named here are in `.superpowers/sdd/test-suite-rewrite/phase-
   a `toHaveCount` failure (its stack was not read, and its log was overwritten by the next run, so no saved file shows
   it); the sweep of that run's teardown then deleted a scene that no flow had recorded.
 - **Seen a third time, 2026-10-08:** the `beforeAll` of `base-effect.spec.js` failed in `createScene` at `flows.js:74`
-  (`toHaveCount(0)` of the creation dialog, received 1 for 1000 ms) in one run; the next run of the same code passed
+  (`toHaveCount(0)` of the creation dialog, received 1 for 1000 ms) in one run, which ran with the base registration
+  removed as a mutation (the scene is created before any base-effect work, so the mutation is inferred not to be the
+  cause; not measured); the next run of the same code passed
   (`.superpowers/sdd/2026-09-29-conditions-rework/bug92-logs/fix1/mut1-attempt1-flake143.log`).
 - **Not reproduced:** 5 other isolated runs passed (`drag-hunt/chat-cards.log`, `scene-first/chat-cards-1.log` to
   `-3.log`, `drag-hunt2/chat-cards-rerun.log`), and the spec passed in every full run.

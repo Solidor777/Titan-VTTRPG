@@ -1,4 +1,5 @@
 <script>
+   import { EFFECT_TYPE } from '~/system/EffectTypes.js';
    import EffectsDetailPopout from '~/ui/player-hud/elements/effects-panel/EffectsDetailPopout.svelte';
 
    /**
@@ -60,7 +61,7 @@
             src={effect.img}
             alt={effect.name}
          />
-         {#if effect.type === 'effect' && effect.system.duration.type !== 'permanent'}
+         {#if effect.type === EFFECT_TYPE && effect.system.duration.type !== 'permanent'}
             <span class="badge">{effect.system.duration.remaining}</span>
          {/if}
       </button>

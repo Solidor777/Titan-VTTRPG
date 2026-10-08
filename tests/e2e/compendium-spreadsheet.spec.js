@@ -960,8 +960,8 @@ function readPackEffect(packId, effectId, actorId) {
       const data = effect.toObject();
       delete data._stats;
 
-      // An unset change priority is undefined when the effect was created and null after an import: both are unset
-      // (the field is nullable and the spreadsheet decodes an empty cell to null).
+      // An unset change priority is undefined when the effect was created and null after an import. Core treats both
+      // as unset (`priority ??=` in `client/documents/active-effect.mjs:271`), so the comparison reads both as null.
       for (const change of data.system.changes) {
          change.priority ??= null;
       }
@@ -975,7 +975,7 @@ function readPackEffect(packId, effectId, actorId) {
 
 // EXCEPTION to real-flow documents: a `base` effect has no TITAN creation control, so the API creates it as a module
 // would (name, type and one native change); the packs and the actor are made through flows.
-test('a base effect row in an effect pack exports and re-imports unchanged', async () => {
+test('a base effect row in an effect pack re-imports unchanged (an unset priority reads null)', async () => {
    /** @type {string} The empty effect pack's collection id. */
    const packId = await createCompendium(page, {
       label: 'E2E Spreadsheet Base Pack',
@@ -1009,7 +1009,7 @@ test('a base effect row in an effect pack exports and re-imports unchanged', asy
    expect(await readPackEffect(packId, effectId)).toEqual(before);
 });
 
-test('a base effect row under an actor of an actor pack exports and re-imports unchanged', async () => {
+test('a base effect row under a pack actor re-imports unchanged (an unset priority reads null)', async () => {
    /** @type {string} The empty actor pack's collection id. */
    const packId = await emptyActorPack('Base Row Actor');
    /** @type {string} The actor that owns the effect. */

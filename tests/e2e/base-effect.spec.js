@@ -26,8 +26,9 @@ import { attachPageErrors, closeAllApps, reloadWorld } from './world.js';
  *
  * EXCEPTION to "documents come from real flows": a `base` effect has no TITAN creation control (TITAN offers only the
  * `effect` and `condition` subtypes), so each one is created through the document API as a module would create it
- * (invalid-data / module-made data), with a name and the type only, as a module's minimal call has it. Everything it
- * sits on is made through flows: the scene, the actors, the token, the owned ability, the effect pack and the TITAN
+ * (invalid-data / module-made data). Each carries a name and the type, as a module's minimal call has it; the main
+ * actor's also carries the `prone` status and TITAN's description flag, as a foreign export may. Everything it sits
+ * on is made through flows: the scene, the actors, the token, the owned ability, the effect pack and the TITAN
  * `effect` that proves the lists render other effects. Every edit after the creation goes through a control (the Add
  * change button and the form of core's Active Effect Config sheet, the HUD's row delete button), except the deletion of
  * a base effect, which has no control.

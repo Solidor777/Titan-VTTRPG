@@ -1,3 +1,5 @@
+import { EFFECT_TYPE } from '~/system/EffectTypes.js';
+
 /**
  * Gives the source changes the creation of an Active Effect applies: an `effect`-subtype effect always shows its
  * status icon, and a timed one (any duration but permanent) is disabled exactly when no time remains, while a
@@ -11,7 +13,7 @@
 export default function getEffectCreationChanges(effect) {
    /** @type {{disabled?: boolean, showIcon?: number}} The changes that apply. */
    const changes = {};
-   if (effect.type !== 'effect') {
+   if (effect.type !== EFFECT_TYPE) {
       return changes;
    }
    if (effect.showIcon !== CONST.ACTIVE_EFFECT_SHOW_ICON.ALWAYS) {
