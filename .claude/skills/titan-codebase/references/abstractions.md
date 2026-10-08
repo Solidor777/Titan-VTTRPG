@@ -424,12 +424,20 @@ functions in `src/document/types/item/rules-element/` create default instances:
 | `createPersistentDamageElement`  | `persistentDamage`           | Damage the character at turn start or end.         |
 | `createRollMessageElement`       | `rollMessage`                | Display a message when a matching check is rolled. |
 | `createTurnMessageElement`       | `turnMessage`                | Display a message at the character's turn start/end|
+| `createImmunityElement`          | `immunity`                   | Name a condition (picked from every condition id)  |
+|                                  |                              | or an effect (typed name, camel-case matched);     |
+|                                  |                              | selectors in `IMMUNITY_SELECTORS`.                 |
 
 `RULES_ELEMENT_FACTORIES` (`src/document/types/item/rules-element/RulesElementFactories.js`) is the single
 operation-to-factory registry in editor display order. `RULES_ELEMENT_OPERATIONS`
 (`src/system/RulesElementOperations.js`) is its key list and `ItemSheetRulesElementOperationSelect` rebuilds a retyped
 element through it. Two switches stay switches and must name every key (`RulesElementOperationRegistry.test.js` pins
 both): `ItemSheetRulesElementSettings`' editor dispatch and `CharacterDataModel._applyRulesElements`' bucket switch.
+The immunity editor (`ItemSheetImmunitySettings`) holds two further switches over `IMMUNITY_SELECTORS`
+(`onSelectorChange`, `getKeyInput`; the same test pins them): a condition immunity keys through `ConditionSelect` (every
+`CONDITION_IDS` entry, `src/system/Conditions.js`), an effect immunity through a typed name (its `TYPED_KEY_SELECTORS`
+entry). `_applyRulesElements` joins an `immunity` element to no stat or check applier, and `createEmptyImmunities`
+(`Immunity.js`) builds the `{ condition: Map, effect: Map }` shape of an immunities object.
 
 The shared `rulesElement` array plus its `addRulesElement` / `deleteRulesElement` mutators come from
 `RulesElementMixin` (`src/document/types/item/rules-element/RulesElementMixin.js`), used by both
@@ -446,8 +454,8 @@ tagged `'ability'`; armor and shields while equipped in their slot, weapons and 
 Active Effects (tagged `'condition'`); Active Effects need a non-empty `system.rulesElement`. The order is the order
 situational modifiers list their sources in. `CharacterDataModel._applyRulesElements` (called from
 `prepareDerivedData`) copies each source's elements, tagging each with its bucket (`type`) and its source's name
-(`sourceName`). Condition mechanics are derived entirely through this pipeline — the seeded `system.rulesElement` on each
-mechanically-active condition (see `Conditions.js`) feeds the same `flatModifier`/`mulSum`/`setSum` appliers,
+(`sourceName`). Condition mechanics are derived entirely through this pipeline — the seeded `system.rulesElement` on
+each mechanically-active condition (see `Conditions.js`) feeds the same `flatModifier`/`mulSum`/`setSum` appliers,
 and each stat-mod bucket carries a `condition` entry (alongside `equipment`/`effect`/`ability`). There is no
 hardcoded condition `switch`; the old `_applyConditions` method was retired. All sources feed the character's
 derived stats. Before bucketing, `_expandAllKeyElements` rewrites every element whose `key === 'all'`

@@ -816,6 +816,10 @@ export default class CharacterDataModel extends TitanActorDataModel {
                   }
                   break;
                }
+               case 'immunity': {
+                  // An immunity modifies no stat or check, so it joins no applier.
+                  break;
+               }
                default: {
                   break;
                }

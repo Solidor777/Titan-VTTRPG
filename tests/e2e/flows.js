@@ -1045,6 +1045,30 @@ export async function addEffect(page, actorId, name, { duration, remaining, init
 }
 
 /**
+ * Switches a permanent effect on or off with the active toggle of its row in the actor's Effects tab.
+ * @param {import('@playwright/test').Page} page - A logged-in page.
+ * @param {string} actorUuid - The uuid of the actor whose Effects tab holds the toggle.
+ * @param {string} effectUuid - The uuid of the actor's effect to switch.
+ * @param {boolean} active - Whether the effect ends up active.
+ * @returns {Promise<void>} Resolves once the effect is in the requested state.
+ */
+export async function setEffectActive(page, actorUuid, effectUuid, active) {
+   /** @type {import('@playwright/test').Locator} The actor's sheet. */
+   const sheet = await openSheetByUuid(page, actorUuid);
+   await openTab(sheet, 'Effects');
+   await settle(page, { transitions: true });
+
+   /** @type {import('@playwright/test').Locator} The effect's row. */
+   const row = sheet.locator(`[data-effect-id="${effectUuid.split('.').at(-1)}"]`);
+   await row.locator(active ? 'i.fa-square' : 'i.fa-square-check').click();
+   await expect.poll(
+      () => page.evaluate(async (uuid) => (await fromUuid(uuid)).system.isActive, effectUuid),
+      { message: `the active toggle left the effect ${active ? '' : 'in'}active` },
+   ).toBe(active);
+   await settle(page);
+}
+
+/**
  * Adds a check to a document that carries checks (an item or an effect) through the Checks tab's add button and
  * fills the row's inputs.
  * @param {import('@playwright/test').Page} page - A logged-in page.
@@ -1159,7 +1183,8 @@ export async function addCheck(
  * of the stats the selector names), the value input and, for the last three, the rounding or mode select; that of a
  * conditional rating modifier holds the rating, the selector and the key; that of a conditional check modifier holds
  * the modifier type, the check type, the selector, the key (a text input or a select, only when the selector is not
- * `any`), the Skill narrowing of a situation and the value.
+ * `any`), the Skill narrowing of a situation and the value; that of an immunity holds the selector (`condition` or
+ * `effect`) and the key (a condition picker, or a typed effect name).
  * @param {import('@playwright/test').Page} page - A logged-in page.
  * @param {string} documentUuid - The uuid of the item or effect.
  * @param {object} element - What the row holds.
@@ -1290,6 +1315,23 @@ export async function addRulesElement(page, documentUuid, element) {
          if (element[field] !== undefined) {
             await fill(position, field, element[field]);
          }
+      }
+   }
+   else if (element.operation === 'immunity') {
+      if (element.selector !== undefined) {
+         await selectTitanOption(page, row.getByTestId('immunity-selector'), element.selector);
+         await expect.poll(() => stored('selector'), { message: 'the immunity selector stored the selector' })
+            .toBe(element.selector);
+      }
+      if (element.key !== undefined) {
+         if (element.selector === 'effect') {
+            await commitText(row.locator('input[data-testid="immunity-key"]'), element.key);
+         }
+         else {
+            await selectTitanOption(page, row.getByTestId('immunity-key'), element.key);
+         }
+         await expect.poll(() => stored('key'), { message: 'the immunity key control stored the key' })
+            .toBe(element.key);
       }
    }
    else if (element.operation === 'turnMessage') {
@@ -1799,8 +1841,8 @@ export async function setSkillDefaultAttribute(page, actorUuid, skill, attribute
 }
 
 /**
- * Sets whether an owned weapon, armor or shield is equipped with the Equipped toggle of its row in the Inventory tab,
- * clicking only when the state differs.
+ * Sets whether an owned weapon, armor, shield or equipment item is equipped with the Equipped toggle of its row in the
+ * Inventory tab, clicking only when the state differs (a collapsed row of an equipped weapon is expanded first).
  * @param {import('@playwright/test').Page} page - A logged-in page.
  * @param {string} actorId - The id of the actor that owns the item.
  * @param {string} itemId - The id of the owned item.
@@ -1828,7 +1870,18 @@ export async function setEquipped(page, actorId, itemId, equipped) {
       itemId,
    });
    if (await read() !== equipped) {
-      await sheet.locator(`[data-item-id="${itemId}"]`).getByRole('button', { name: 'Equipped' }).first().click();
+      /** @type {import('@playwright/test').Locator} The item's row. */
+      const row = sheet.locator(`[data-item-id="${itemId}"]`);
+
+      /** @type {import('@playwright/test').Locator} The row's Equipped toggle. */
+      const toggle = row.getByRole('button', { name: 'Equipped' }).first();
+
+      // A collapsed weapon row shows its attack button in place of the toggle once the weapon is equipped; the toggle
+      // is then inside the row's expanded content.
+      if (await toggle.count() === 0) {
+         await row.locator('.header .label .button button').first().click();
+      }
+      await toggle.click();
    }
    await expect.poll(read, { message: `the Equipped toggle left the item ${equipped ? '' : 'un'}equipped` })
       .toBe(equipped);

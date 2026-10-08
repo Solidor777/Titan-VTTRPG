@@ -12,6 +12,8 @@ import {
    createOwnedItem,
    dragItemOntoSheet,
    setAttributeBase,
+   setEffectActive,
+   setEquipped,
    shared,
 } from '../flows.js';
 import { selectTitanOption } from '../select.js';
@@ -26,7 +28,8 @@ import { attachPageErrors, clearChat, closeAllApps, showChatLog } from '../world
  * delete buttons, so the next test starts from an empty list. The math (flat modifiers, Multiply Base, Multiply Sum
  * and Set Sum, with their rounding and modes) acts on one character whose Body is 1; the conditional check modifiers
  * act on a character with a weapon, a spell and two abilities, and on a character whose effect carries the elements of
- * the rolled Resistance and Attribute checks.
+ * the rolled Resistance and Attribute checks. The sources are an owned weapon, equipment item, shield and armor, which
+ * apply only while equipped, and a permanent effect, which applies only while enabled.
  */
 
 /** @type {import('@playwright/test').Page} The file-shared, logged-in page (one world boot per file). */
@@ -665,6 +668,108 @@ test.describe('conditional check modifiers on rolled checks', () => {
       expect(message.results).toMatchObject({
          successes: 0,
          succeeded: false,
+      });
+   });
+});
+
+test.describe('rules elements — which sources apply, and to which bucket', () => {
+   /** @type {string} The id of the character. */
+   let actorId;
+   /** @type {string} The uuid of the character. */
+   let actorUuid;
+   /** @type {Record<string, string>} The id of each owned item, keyed by item type. */
+   const itemIds = {};
+   /** @type {string} The uuid of the character's permanent effect. */
+   let effectUuid;
+
+   test.beforeAll(async () => {
+
+      // A new player has Body 1. Each source below gets a +2 Body flat modifier inside its own test.
+      actorId = await createActor(page, {
+         name: 'E2E Rules Sources Actor',
+         type: 'player',
+      });
+      actorUuid = `Actor.${actorId}`;
+      for (const type of [
+         'weapon',
+         'equipment',
+         'shield',
+         'armor',
+      ]) {
+         itemIds[type] = await createOwnedItem(page, actorId, type, `E2E Rules Sources ${type}`);
+      }
+      effectUuid = `${actorUuid}.ActiveEffect.${await addEffect(page, actorId, 'E2E Rules Sources Effect', {
+         duration: 'permanent',
+      })}`;
+      await closeAllApps(page);
+   });
+
+   /**
+    * Reads the character's derived Body and the sum its flat modifiers added in the equipment and effect buckets.
+    * @returns {Promise<{effect: number, equipment: number, value: number}>} Body's value and those two buckets.
+    */
+   function readBody() {
+      return page.evaluate(async (uuid) => {
+         /** @type {object} The derived Body. */
+         const body = (await fromUuid(uuid)).system.attribute.body;
+         return {
+            effect: body.mod.effect,
+            equipment: body.mod.equipment,
+            value: body.value,
+         };
+      }, actorUuid);
+   }
+
+   for (const type of [
+      'weapon',
+      'equipment',
+      'shield',
+      'armor',
+   ]) {
+      test(`the ${type}'s elements fill the equipment bucket only while it is equipped`, async () => {
+         await addElement(`${actorUuid}.Item.${itemIds[type]}`, { value: 2 });
+         await expect.poll(readBody, { message: `the unequipped ${type} adds nothing` }).toEqual({
+            effect: 0,
+            equipment: 0,
+            value: 1,
+         });
+
+         await setEquipped(page, actorId, itemIds[type], true);
+         await expect.poll(readBody, { message: `the equipped ${type} adds +2 in the equipment bucket` }).toEqual({
+            effect: 0,
+            equipment: 2,
+            value: 3,
+         });
+
+         await setEquipped(page, actorId, itemIds[type], false);
+         await expect.poll(readBody, { message: `the unequipped ${type} adds nothing again` }).toEqual({
+            effect: 0,
+            equipment: 0,
+            value: 1,
+         });
+      });
+   }
+
+   test('an effect\'s elements fill the effect bucket only while the effect is enabled', async () => {
+      await addElement(effectUuid, { value: 2 });
+      await expect.poll(readBody, { message: 'the enabled effect adds +2 in the effect bucket' }).toEqual({
+         effect: 2,
+         equipment: 0,
+         value: 3,
+      });
+
+      await setEffectActive(page, actorUuid, effectUuid, false);
+      await expect.poll(readBody, { message: 'the disabled effect adds nothing' }).toEqual({
+         effect: 0,
+         equipment: 0,
+         value: 1,
+      });
+
+      await setEffectActive(page, actorUuid, effectUuid, true);
+      await expect.poll(readBody, { message: 'the re-enabled effect adds +2 again' }).toEqual({
+         effect: 2,
+         equipment: 0,
+         value: 3,
       });
    });
 });

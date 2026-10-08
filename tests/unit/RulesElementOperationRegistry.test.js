@@ -4,6 +4,7 @@ import { fileURLToPath } from 'node:url';
 import path from 'node:path';
 import { RULES_ELEMENT_OPERATIONS } from '~/system/RulesElementOperations.js';
 import { RULES_ELEMENT_FACTORIES } from '~/document/types/item/rules-element/RulesElementFactories.js';
+import { IMMUNITY_SELECTORS } from '~/document/types/item/rules-element/Immunity.js';
 
 /** @type {string} The repository root. */
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
@@ -44,6 +45,7 @@ describe('rules-element operations', () => {
          'rollMessage',
          'conditionalRatingModifier',
          'conditionalCheckModifier',
+         'immunity',
       ]);
    });
 
@@ -63,6 +65,16 @@ describe('rules-element operations', () => {
          'src/document/types/actor/types/character/CharacterDataModel.js',
          'switch (element.operation) {',
       )).toEqual([...RULES_ELEMENT_OPERATIONS].sort());
+   });
+
+   it.each([
+      'function onSelectorChange()',
+      'function getKeyInput()',
+   ])('the immunity editor\'s %s switch handles exactly the immunity selectors', (switchStart) => {
+      expect(readSwitchCases(
+         'src/document/types/item/sheet/rules-element/ItemSheetImmunitySettings.svelte',
+         switchStart,
+      )).toEqual([...IMMUNITY_SELECTORS].sort());
    });
 });
 

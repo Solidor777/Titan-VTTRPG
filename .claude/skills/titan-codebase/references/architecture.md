@@ -183,9 +183,9 @@ distinct. Vitest is configured in `vitest.config.mjs` (`environment: 'happy-dom'
 - `tests/e2e/` — Playwright end-to-end specs targeting a live Foundry instance.
   - Harness (no specs): `registry.js` (the running list of everything the suite made, `test/state/registry.json`,
     gitignored), `flows.js` (real-UI flows that create documents and record them), `global-setup.js` /
-    `global-teardown.js` (crash recovery and suite-end deletion over the list), `join.js` (the runner-free world join the
-    setup, teardown and census share), `census.js` (the `E2E `-prefix census
-    and sweep the teardown reuses), `settings.js` (the world setter records its prior value). Details in `conventions.md`
+    `global-teardown.js` (crash recovery and suite-end deletion over the list), `join.js` (the runner-free world join
+    the setup, teardown and census share), `census.js` (the `E2E `-prefix census and sweep the teardown reuses),
+    `settings.js` (the world setter records its prior value). Details in `conventions.md`
     "E2E registry, flows and teardown".
   - `integration-manifest.spec.js` — Phase 3c "drift guard" suite (7 tests): declared documentTypes ↔
     registered dataModels parity (covers Actor, Item, ActiveEffect, ChatMessage); every manifest pack loaded

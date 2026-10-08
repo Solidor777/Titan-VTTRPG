@@ -8,6 +8,7 @@ import createTurnMessageElement from '~/document/types/item/rules-element/TurnMe
 import createRollMessageElement from '~/document/types/item/rules-element/RollMessage.js';
 import createConditionalRatingModifierElement from '~/document/types/item/rules-element/ConditionalRatingModifier.js';
 import createConditionalCheckModifierElement from '~/document/types/item/rules-element/ConditionalCheckModifier.js';
+import createImmunityElement from '~/document/types/item/rules-element/Immunity.js';
 
 /**
  * The factory of every rules-element operation, keyed by operation, in editor display order. The single source of the
@@ -28,4 +29,5 @@ export const RULES_ELEMENT_FACTORIES = Object.freeze({
    rollMessage: createRollMessageElement,
    conditionalRatingModifier: createConditionalRatingModifierElement,
    conditionalCheckModifier: createConditionalCheckModifierElement,
+   immunity: createImmunityElement,
 });

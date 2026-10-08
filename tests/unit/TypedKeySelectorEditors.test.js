@@ -21,6 +21,7 @@ const EDITOR_DIRECTORY = path.resolve(
 const EDITORS = {
    conditionalCheckModifier: 'ItemSheetConditionalCheckModifierSettings.svelte',
    conditionalRatingModifier: 'ItemSheetConditionalRatingModifierSettings.svelte',
+   immunity: 'ItemSheetImmunitySettings.svelte',
    rollMessage: 'ItemSheetRollMessageSettings.svelte',
 };
 

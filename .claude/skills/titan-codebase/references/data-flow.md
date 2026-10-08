@@ -207,8 +207,8 @@ Foundry update (`document.data.update(...)`) — or an embedded item/effect CRUD
 the subscriber registered (`update<DocumentName>`, `create/update/deleteItem`,
 `create/update/deleteActiveEffect`), invalidating every reactive reader so `document.data.*` references and
 `$derived` blocks re-run and the UI re-renders. A hook invalidates the bridge only for the bridged document itself or
-one embedded in it, matched by `uuid` (an unlinked token's synthetic actor shares its base actor's `id`). Hooks tear down
-automatically when the sheet unmounts.
+one embedded in it, matched by `uuid` (an unlinked token's synthetic actor shares its base actor's `id`). Hooks tear
+down automatically when the sheet unmounts.
 
 **6. Teardown — `_onClose`**
 `TitanDocumentSheet._onClose` calls `super._onClose(options)`, `unmount(this.#mountHandle, { outro: true })`,
@@ -375,7 +375,8 @@ sub-panel (icon left, name-over-duration right, name ellipsis, controls that wra
 only that sub-panel and pushes its neighbours down rather than overlapping. Both expanded surfaces share
 `EffectsDetailBody`: description per subtype (a non-blank native `description` renders first, for effects and
 for conditions a GM edited; otherwise a condition renders `getConditionDescription(effect)` — the definition's
-description looked up by status id and localized on the reading client), embedded checks via `CharacterSheetEffectChecks`, duration −/+ steppers, send-to-chat (effect-only),
+description looked up by status id and localized on the reading client), embedded checks via
+`CharacterSheetEffectChecks`, duration −/+ steppers, send-to-chat (effect-only),
 open-sheet, and the owner-gated delete (`sheetDocument.data.system.requestEffectDeletion`). The
 outer panel has a fixed user-resizable width AND height (both persisted via the edit-mode handle); the header is
 pinned and the row list is a bounded `.body` (`flex: 1; min-height: 0; overflow-y: auto`) that scrolls

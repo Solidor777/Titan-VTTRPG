@@ -16,6 +16,7 @@ import { ATTACK_TRAITS } from '~/document/types/item/types/weapon/AttackTraits.j
 import { SHIELD_TRAITS } from '~/document/types/item/types/shield/ShieldTraits.js';
 import { ATTACK_TYPES } from '~/system/AttackTypes.js';
 import { ATTRIBUTES } from '~/system/Attributes.js';
+import { CONDITION_IDS } from '~/system/Conditions.js';
 import { INVENTORY_ITEM_TYPES } from '~/system/InventoryItemTypes.js';
 import { MODS } from '~/system/Mods.js';
 import { RARITIES } from '~/system/Rarities.js';
@@ -702,6 +703,13 @@ const SELECT_CASES = [
          6,
       ],
       testId: 'probe-difficulty-select',
+      supportsNone: false,
+      wrapperTestId: false,
+   },
+   {
+      component: 'ConditionSelect',
+      options: CONDITION_IDS,
+      testId: 'probe-condition-select',
       supportsNone: false,
       wrapperTestId: false,
    },

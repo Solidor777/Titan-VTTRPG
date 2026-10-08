@@ -91,7 +91,6 @@ function activeEffect(id, type, value, disabled) {
       disabled,
       id,
       name: id,
-      statuses: new Set(),
       system: {
          rulesElement: sourceElements(value, `from ${id}`),
       },

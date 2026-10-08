@@ -127,10 +127,10 @@ lookup skips it, for a single key and inside an array of keys. `multiAttack` is 
 Boolean from `createAttackCheckOptions` onward. Typed keys (free-typed in the
 editor) are grouped and matched in camel case; the one source is the frozen `TYPED_KEY_SELECTORS` map in the same
 module, keyed by operation: `conditionalCheckModifier` (`customTrait`, `spellTradition`, `situation`),
-`conditionalRatingModifier` (`customArmorTrait`, `customShieldTrait`, `customWeaponTrait`), and `rollMessage`
-(`customTrait`, `spellTradition`). The check-modifier cache builder and lookups (`_normalizeConditionalCheckModKey`),
-the rating-modifier builder, and the roll-message builder each read their own entry, and
-`tests/unit/TypedKeySelectorEditors.test.js` asserts every editor's text-input selectors equal its entry.
+`conditionalRatingModifier` (`customArmorTrait`, `customShieldTrait`, `customWeaponTrait`), `immunity` (`effect`), and
+`rollMessage` (`customTrait`, `spellTradition`). The check-modifier cache builder and lookups
+(`_normalizeConditionalCheckModKey`), the rating-modifier builder, and the roll-message builder each read their own
+entry, and `tests/unit/TypedKeySelectorEditors.test.js` asserts every editor's text-input selectors equal its entry.
 `_expandAllKeyElements` does not use the map: it expands `'all'` only for a selector that `_getSelectorKeys` resolves
 to keys. Resistance checks read only the modifier types in `CHECK_TYPE_MODIFIER_TYPES.resistance` (`dice`,
 `expertise`, `advantage`, `automaticFailure`) via `getResistanceCheckMod`, whose table entry is checkType `any` +
@@ -754,8 +754,8 @@ static `actions` map. To refresh a dynamic control's icon/label after a state ch
 `happy-dom`, `globals: true`, Svelte 5 (`@sveltejs/vite-plugin-svelte`), `svelte-preprocess` (same SCSS `prependData` as
 `vite.config.mjs`), and the `~/` / `$fonts/` aliases. `hookTimeout` is 60 s: the schema-equivalence golden-master
 suites' `beforeAll` dynamic imports are transform-heavy (Svelte compiles) and exceed the 10 s default under full
-parallelism. Tests live in `tests/unit/**/*.test.js`: 131 files, 1499 tests (measured: `npm test` → "Test Files  131
-passed (131)", "Tests  1499 passed (1499)"). There is NO test code under `src/`. Support files: `tests/setup.js`,
+parallelism. Tests live in `tests/unit/**/*.test.js`: 133 files, 1541 tests (measured: `npm test` → "Test Files  133
+passed (133)", "Tests  1541 passed (1541)"). There is NO test code under `src/`. Support files: `tests/setup.js`,
 `tests/components/*.svelte` (Svelte probes the unit tests mount), `tests/unit/helpers/schemaFingerprint.js`,
 `tests/shared/checkOracle.js` (the independent check oracle the e2e `check-math.spec.js` compares against) and
 `tests/fixtures/spreadsheet/excel-edited.xlsx` (read by `tests/unit/spreadsheet/format/Xlsx.test.js`).
@@ -802,7 +802,7 @@ the lone exception is `Text` (no root element). See the component-probe harness 
 coverage map, the wrapper-forwarding rules, and the selector each component resolves to.
 
 **Playwright E2E** — `npm run test:e2e` runs `playwright test` against the `test-titan` Foundry world on
-`http://localhost:30000`: 33 spec files, 670 tests (measured: `npx playwright test --list` → "Total: 670 tests in 33
+`http://localhost:30000`: 33 spec files, 681 tests (measured: `npx playwright test --list` → "Total: 681 tests in 33
 files"). `playwright.config.mjs` sets `timeout` 60 s, `expect.timeout` 1000 ms, `workers` 1, `fullyParallel` false,
 `globalSetup` and `globalTeardown`, the `list` reporter beside `slow-operation-reporter.js`, and for every test headless
 Chromium (with `--enable-gpu`), `viewport` 1920x1080 and `actionTimeout` 10 s. The users are the four dedicated
@@ -829,7 +829,8 @@ at the repo root, so it catches v14 API breaks that the mocked Vitest tier canno
   icons, the tooltip, on items and effects), `sheet-filters.spec.js` (the name filters of the character sheet tabs and
   of the item Checks tab), `character-sheet-layout.spec.js` (Skills row geometry, sidebar labels, browser zoom on the
   shared bulk actor), `rules-element-editor.spec.js` (the Rules Elements tab of a flow-made weapon: add and delete, the
-  selector's default key, the rounding select of Multiply Base and Multiply Sum, the conditional check modifier editor),
+  selector's default key, the rounding select of Multiply Base and Multiply Sum, the conditional check modifier editor,
+  the immunity editor),
   `item-sheet-rolls.spec.js` (the sidebar roll buttons of an owned equipment, weapon and spell, the Checks tab roll
   preview, a check added while the sheet is open, damage-reduction settings in the posted check parameters),
   `spell-sheet.spec.js` (the condition aspects' Off-Balance option, the Casting Check tab's aspect costs, its re-pricing
@@ -848,7 +849,8 @@ at the repo root, so it catches v14 API breaks that the mocked Vitest tier canno
   read the one "no longer valid" notice, assert no "failed before construction" notice and dismiss the notice, which
   would otherwise cover the next create dialog), the `getCheckOptions` setting, Heavy, Encumbering and Loud armor, a
   condition's situation), `logic/rules-elements.spec.js` (rules elements added in the Rules Elements tab, read from the
-  sheet's derived Body value, the check dialogs and the posted check parameters), `logic/conditions.spec.js`
+  sheet's derived Body value, which owned sources apply and to which bucket, the check dialogs and the posted check
+  parameters), `logic/conditions.spec.js`
   (conditions applied from the Token HUD, read from derived stats, the sheet's tooltip, rolled checks and the Player
   HUD; a condition's own sheet and its edited description), `dice.spec.js` (the forced-dice seam: `forceDice` maps each
   queued face onto a real Roll, `resetDice` restores the random source), `logic/fast-check-smoke.spec.js` (fast-check
@@ -1047,7 +1049,9 @@ add button, then the row's label input and, when asked, its Resolve Cost input, 
 box, Damage box, Initial Value input and Damage Reduced By select), `addRulesElement` (the Rules Elements tab add
 button, the operation select, and the controls of the operation: the `ccm-*` selects, key input and value input of a
 conditional check modifier; the rating, selector and key of a conditional rating modifier; the selector, key, value and
-rounding or mode of the flat, Multiply Base, Multiply Sum and Set Sum operations; the selector and the rich-text message
+rounding or mode of the flat, Multiply Base, Multiply Sum and Set Sum operations; the `immunity-selector` and
+`immunity-key` controls of an immunity (a condition picker, or a typed effect name); the selector and the rich-text
+message
 of a Turn Message or Roll Message, typed into its editor and awaited in the document's `_source` because the live data
 holds the text before the editor's update reaches the database, CLOSED_BUGS #145; a negative value is typed in
 parentheses because a leading operator in a number input is a relative change), `addTrait` (the Edit Traits dialog of a
@@ -1104,7 +1108,9 @@ passes the world entry's locator, and the flow reopens that entry's sidebar tab 
 (the Configure Ownership window of an actor's directory entry), `createCombat` (the Combat Tracker's create button;
 waits until the combat is `game.combat`), `addCombatant` (the Token HUD's combat button), `startCombat` / `endCombat`
 (the Combat Tracker's Begin and End buttons; `endCombat` also confirms the dialog), `setSkillDefaultAttribute` (the
-select of a skill row), `setEquipped` (the Equipped toggle of an Inventory row, clicked only when the state differs),
+select of a skill row), `setEquipped` (the Equipped toggle of an Inventory row, clicked only when the state differs;
+a collapsed row of an equipped weapon is expanded first, its toggle being inside the expanded content),
+`setEffectActive` (the active toggle of an effect's row in the Effects tab),
 `deleteAttack` (the delete button of an attack row in the weapon sheet), `setAttackStat` (the Range or Damage input of
 an attack row), `addAttackCustomTrait` (the attack row's Add Custom Trait button and its dialog), `deleteOwnedItem` (the
 Delete Item button of an Inventory row; the `confirmDeletingItems` client setting must be off), `setResource` (the meter
@@ -1421,7 +1427,8 @@ the source) or inferred:
   with `setPosition` (a window size, not a document). The drop half decides before or after: `computeIndex` compares
   the pointer with the row's midpoint (read: `DragReorderActions.js`), so a move to the end drops in the lower half of
   the last row, and the drag tests collapse the first and last rows so that half stays short and on screen.
-- A list's `<ol>` renders only when the list has a row (read: `{#if ...length > 0}` in `ItemSheetRulesElementsTab.svelte`
+- A list's `<ol>` renders only when the list has a row (read: `{#if ...length > 0}` in
+  `ItemSheetRulesElementsTab.svelte`
   and `ItemSheetChecksTab.svelte`), so a sheet that receives a copied row needs one row of its own to drop on.
 - The Casting Check tab has no control that changes an aspect (read: `SpellSheetCastingCheckTab.svelte` holds only the
   attribute, skill, auto-calculate, difficulty and complexity controls) and a sheet shows one tab at a time, so the
@@ -1462,8 +1469,9 @@ the source) or inferred:
   edited weapon or effect row updates it; a row whose `_parentId` names a document that is not top-level and not in
   the file is planned as a create (`resolveExistingDocument` finds no parent). A row that names a parent that exists
   nowhere is therefore refused with the create branch's message, `Cannot create <class> documents under parent
-  "<id>"` (measured: with that message changed, the refusal test fails, `mutations/A-M6a-item-parent.log`; a second test whose
-  row had the id of a pack item reached the same branch, so it duplicated the first and was removed). The `Cannot update` branch
+  "<id>"` (measured: with that message changed, the refusal test fails, `mutations/A-M6a-item-parent.log`; a second test
+  whose row had the id of a pack item reached the same branch, so it duplicated the first and was removed). The
+  `Cannot update` branch
   is reached by a stale plan, measured: the Import dialog stays open and usable while the Compendium tab and a pack
   window are operated, so a test previews an update of the weapon (blank parent cell, which resolves to the actor of the
   pack), deletes the actor from the pack window's context menu, then applies; `Cannot update Item documents under
@@ -1545,14 +1553,14 @@ produces: an Advantage value outside the four levels, an unknown check type, and
 element with no `rounding`. `PAYLOAD` (also exported by `componentProbe.js`) is the cleaning-probe string, a paragraph
 and an image with an `onerror` handler.
 
-**Coverage:** `componentRegistry.js` holds 90 entries: all 87 `.svelte` files under `src/helpers/svelte-components/**`
+**Coverage:** `componentRegistry.js` holds 91 entries: all 88 `.svelte` files under `src/helpers/svelte-components/**`
 and the three rules-element settings editors `ItemSheetConditionalCheckModifierSettings`, `ItemSheetMulBaseSettings` and
 `ItemSheetMulSumSettings` (measured: a count of the registry's object keys and of the files, and a per-file check that
 each file's name is a key). The probes are three specs, one world boot each (each describe = one component):
 `tests/e2e/component-probe-inputs.spec.js` (8 `input/` non-select primitives, the editors above, the invalid-data
 probes, `SelectList` (mounted with instrumented `floatingContent`, `onhover` and `onselect` callbacks; its rows are
-portaled to the body, so the list is located by its `<testId>-list` test id), and the 16 `input/select/` typed wrappers:
-15 run from one table of `{component, options, testId, supportsNone, wrapperTestId}` whose options are the `src/`
+portaled to the body, so the list is located by its `<testId>-list` test id), and the 17 `input/select/` typed wrappers:
+16 run from one table of `{component, options, testId, supportsNone, wrapperTestId}` whose options are the `src/`
 constants the components build their lists from (`ATTRIBUTES`, `SKILLS`, `RARITIES`, ..., `ARMOR_TRAITS`,
 `ATTACK_TRAITS`, `SHIELD_TRAITS`; imported through the `~/` alias), so a constant change cannot meet a stale hand count,
 and `DamageReducedBySelect`, whose list depends on two flags, is written out); `-buttons-tags.spec.js` (14 `button/`
@@ -1599,9 +1607,11 @@ async-`describe` / ApplicationV2 timing mismatch causes all batch registrations 
 Rules Elements tab (`addRulesElement`) of an ability, an effect or an owned item of actors made through the flows, and
 reads the result where a user does: the sheet's derived attribute value (flat modifiers, Multiply Base, Multiply Sum,
 Set Sum, rounding), the dialogs of a casting check and an item check, and the posted parameters of rolled checks
-(damage, healing, Advantage, Automatic Failure). Abilities apply their rules elements on mere ownership (no equip),
-making them the canonical fixture type for derived-stat assertions. The flat-modifier stacking invariant (Body =
-max(0, 1 + sum) for any list of flat modifiers) is a vitest property,
+(damage, healing, Advantage, Automatic Failure), and the bucket each source fills (an owned weapon, equipment item,
+shield and armor fill `equipment` only while equipped; a permanent effect fills `effect` only while enabled; each test
+reads Body's value and `mod` buckets with the source absent, present, then absent again). Abilities apply their rules
+elements on mere ownership (no equip), making them the canonical fixture type for derived-stat assertions. The
+flat-modifier stacking invariant (Body = max(0, 1 + sum) for any list of flat modifiers) is a vitest property,
 `tests/unit/RulesElementStacking.property.test.js`:
 it builds a bare model (`Object.create(CharacterDataModel.prototype)`) with hand-set stats and a parent holding one
 ability with the generated flat-modifier rules elements, runs the model's `_applyRulesElements` and `_applyMods`, and

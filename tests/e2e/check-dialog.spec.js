@@ -24,6 +24,7 @@ import {
    placeToken,
    removeCondition,
    setAttributeBase,
+   setEffectActive,
    setEquipped,
    shared,
    viewScene,
@@ -202,29 +203,6 @@ async function deleteItem(actorUuid, tab, itemUuid) {
 }
 
 /**
- * Switches a permanent effect on or off with the active toggle of its row in the actor's Effects tab.
- * @param {string} actorUuid - The uuid of the actor.
- * @param {string} effectUuid - The uuid of the effect.
- * @param {boolean} active - Whether the effect ends up active.
- * @returns {Promise<void>} Resolves once the effect is in the requested state.
- */
-async function setEffectActive(actorUuid, effectUuid, active) {
-   /** @type {import('@playwright/test').Locator} The actor's sheet. */
-   const sheet = await openSheetByUuid(page, actorUuid);
-   await clickSheetTab(sheet, 'Effects');
-   await settle(page, { transitions: true });
-
-   /** @type {import('@playwright/test').Locator} The effect's row. */
-   const row = sheet.locator(`[data-effect-id="${effectUuid.split('.').at(-1)}"]`);
-   await row.locator(active ? 'i.fa-square' : 'i.fa-square-check').click();
-   await expect.poll(
-      () => page.evaluate(async (uuid) => (await fromUuid(uuid)).system.isActive, effectUuid),
-      { message: `the active toggle left the effect ${active ? '' : 'in'}active` },
-   ).toBe(active);
-   await settle(page);
-}
-
-/**
  * Adds a permanent effect with always-on conditional check modifiers (any check, no situation) to an actor and
  * switches it off with its active toggle, so that a test can switch it on while a dialog is open.
  * @param {{id: string, uuid: string}} actor - The actor.
@@ -243,7 +221,7 @@ async function addSwitchedOffEffect(actor, name, elements) {
          ...element,
       });
    }
-   await setEffectActive(actor.uuid, uuid, false);
+   await setEffectActive(page, actor.uuid, uuid, false);
    return uuid;
 }
 
@@ -858,7 +836,7 @@ test.describe('fields that follow the actor while the dialog is open', () => {
 
          // Switching the Disadvantage effect on (selector "any", so never offered as a checkbox) while the dialog is
          // open: the select and the effective Difficulty follow it.
-         await setEffectActive(uuid, effect, true);
+         await setEffectActive(page, uuid, effect, true);
          await expect(advantageSelect).toHaveAttribute('data-value', '-1');
          await expect(difficulty).toHaveText('5');
 
@@ -881,12 +859,12 @@ test.describe('fields that follow the actor while the dialog is open', () => {
          /** @type {import('@playwright/test').Locator} The second dialog's Advantage select. */
          const secondSelect = second.getByTestId('check-field-advantage').locator('[role="combobox"]');
          await expect(secondSelect).toHaveAttribute('data-value', '-1');
-         await setEffectActive(uuid, effect, false);
+         await setEffectActive(page, uuid, effect, false);
          await expect(secondSelect).toHaveAttribute('data-value', '0');
          await expect(second.getByTestId('check-summary-difficulty')).toHaveText('4');
 
          // Deleting the effect while it is on removes the value from the open dialog as well.
-         await setEffectActive(uuid, effect, true);
+         await setEffectActive(page, uuid, effect, true);
          await expect(secondSelect).toHaveAttribute('data-value', '-1');
          await deleteEffect(uuid, effect);
          await expect(secondSelect).toHaveAttribute('data-value', '0');
@@ -935,7 +913,7 @@ test.describe('fields that follow the actor while the dialog is open', () => {
       // The effect carries BOTH a Disadvantage modifier (which must not overwrite the user's Advantage) and a Dice
       // modifier (a visible, untouched field). Waiting for the Dice change first proves the effect was processed
       // before Advantage is asserted to have held.
-      await setEffectActive(uuid, effect, true);
+      await setEffectActive(page, uuid, effect, true);
       await expect(totalDice).toHaveText(String(baselineDice + 3));
       await expect(advantageSelect).toHaveAttribute('data-value', '2');
       await expect(difficulty).toHaveText('2');
@@ -958,15 +936,15 @@ test.describe('fields that follow the actor while the dialog is open', () => {
       await expect(field.locator('i.fa-check')).toHaveCount(0);
 
       // Switching the effect on while the dialog is open: the checkbox follows it.
-      await setEffectActive(uuid, effect, true);
+      await setEffectActive(page, uuid, effect, true);
       await expect(field.locator('i.fa-check')).toHaveCount(1);
 
       // Switching it off before the user edits anything ticks it back off.
-      await setEffectActive(uuid, effect, false);
+      await setEffectActive(page, uuid, effect, false);
       await expect(field.locator('i.fa-check')).toHaveCount(0);
 
       // Switching it on again ticks it back on: the follow behavior is not a one-shot.
-      await setEffectActive(uuid, effect, true);
+      await setEffectActive(page, uuid, effect, true);
       await expect(field.locator('i.fa-check')).toHaveCount(1);
    });
 
@@ -1003,14 +981,14 @@ test.describe('fields that follow the actor while the dialog is open', () => {
       const baselineDice = await readSummary(dialog, 'totalDice');
 
       // The first effect ticks the checkbox on; the user unticks it (an override against the live derivation).
-      await setEffectActive(uuid, first, true);
+      await setEffectActive(page, uuid, first, true);
       await expect(field.locator('i.fa-check')).toHaveCount(1);
       await setCheckbox(dialog, 'automaticFailure', false);
       await expect(field.locator('i.fa-check')).toHaveCount(0);
 
       // The second effect carries another Automatic Failure source (which must not re-tick the checkbox) and a Dice
       // modifier (a visible, untouched field); the Dice change proves it was processed.
-      await setEffectActive(uuid, second, true);
+      await setEffectActive(page, uuid, second, true);
       await expect(totalDice).toHaveText(String(baselineDice + 3));
       await expect(field.locator('i.fa-check')).toHaveCount(0);
    });
@@ -1152,7 +1130,7 @@ test.describe('fields that follow the owned item while the dialog is open', () =
          key: 'melee',
          value: 2,
       });
-      await setEffectActive(actor.uuid, effect, false);
+      await setEffectActive(page, actor.uuid, effect, false);
 
       /** @type {import('@playwright/test').Locator} The Attack Check dialog. */
       const dialog = await openCheckDialog(page, 'attack', actor.itemUuid);
@@ -1165,11 +1143,11 @@ test.describe('fields that follow the owned item while the dialog is open', () =
       const baselineMelee = await meleeField.inputValue();
 
       // Switching the effect on while the dialog is open: the untouched Melee field follows it.
-      await setEffectActive(actor.uuid, effect, true);
+      await setEffectActive(page, actor.uuid, effect, true);
       await expect(meleeField).toHaveValue(String(Number(baselineMelee) + 2));
 
       // Switching it off returns Melee to its prior value (presence to absence on the same locator).
-      await setEffectActive(actor.uuid, effect, false);
+      await setEffectActive(page, actor.uuid, effect, false);
       await expect(meleeField).toHaveValue(baselineMelee);
    });
 

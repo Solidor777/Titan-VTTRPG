@@ -13,6 +13,8 @@
    from '~/document/types/item/sheet/rules-element/ItemSheetConditionalRatingModifierSettings.svelte';
    import ItemSheetFlatModifierSettings
    from '~/document/types/item/sheet/rules-element/ItemSheetFlatModifierSettings.svelte';
+   import ItemSheetImmunitySettings
+   from '~/document/types/item/sheet/rules-element/ItemSheetImmunitySettings.svelte';
    import ItemSheetMulBaseSettings from '~/document/types/item/sheet/rules-element/ItemSheetMulBaseSettings.svelte';
    import ItemSheetMulSumSettings from '~/document/types/item/sheet/rules-element/ItemSheetMulSumSettings.svelte';
    import ItemSheetSetSumSettings from '~/document/types/item/sheet/rules-element/ItemSheetSetSumSettings.svelte';
@@ -55,6 +57,9 @@
          }
          case 'flatModifier': {
             return ItemSheetFlatModifierSettings;
+         }
+         case 'immunity': {
+            return ItemSheetImmunitySettings;
          }
          case 'mulBase': {
             return ItemSheetMulBaseSettings;

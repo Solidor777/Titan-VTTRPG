@@ -3,6 +3,11 @@ import createMulSumElement from '~/document/types/item/rules-element/MulSum.js';
 import createSetSumElement from '~/document/types/item/rules-element/SetSum.js';
 import createMulBaseElement from '~/document/types/item/rules-element/MulBase.js';
 import createConditionalCheckModifierElement from '~/document/types/item/rules-element/ConditionalCheckModifier.js';
+import createImmunityElement, {
+   createEmptyImmunities,
+   IMMUNITY_SELECTORS,
+} from '~/document/types/item/rules-element/Immunity.js';
+import { CONDITION_IDS, buildConditionDefinitions } from '~/system/Conditions.js';
 
 describe('rules-element factory defaults', () => {
    it('createMulSumElement returns the mulSum defaults with a uuid', () => {
@@ -57,5 +62,36 @@ describe('rules-element factory defaults', () => {
          selector: 'any',
          skill: '',
       });
+   });
+
+   it('createImmunityElement defaults to immunity to the first condition', () => {
+      expect(createImmunityElement({ uuid: 'fixed-uuid' })).toEqual({
+         key: CONDITION_IDS[0],
+         operation: 'immunity',
+         selector: 'condition',
+         uuid: 'fixed-uuid',
+      });
+   });
+
+   it('offers condition and effect immunity', () => {
+      expect(IMMUNITY_SELECTORS).toEqual([
+         'condition',
+         'effect',
+      ]);
+   });
+
+   it('lists every condition id in definition order', () => {
+      expect(CONDITION_IDS).toEqual(buildConditionDefinitions().map((condition) => condition.id));
+   });
+
+   it('builds empty immunities with one fresh Map per immunity selector', () => {
+      /** @type {Record<string, Map>} One empty immunities object. */
+      const immunities = createEmptyImmunities();
+      expect(Object.keys(immunities)).toEqual([...IMMUNITY_SELECTORS]);
+      for (const selector of IMMUNITY_SELECTORS) {
+         expect(immunities[selector]).toBeInstanceOf(Map);
+         expect(immunities[selector].size).toBe(0);
+      }
+      expect(createEmptyImmunities().condition).not.toBe(immunities.condition);
    });
 });

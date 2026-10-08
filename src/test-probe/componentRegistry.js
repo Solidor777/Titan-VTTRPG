@@ -29,6 +29,7 @@ import AttackTraitSelect from '~/helpers/svelte-components/input/select/AttackTr
 import AttackTypeSelect from '~/helpers/svelte-components/input/select/AttackTypeSelect.svelte';
 import AttributeSelect from '~/helpers/svelte-components/input/select/AttributeSelect.svelte';
 import CheckDifficultySelect from '~/helpers/svelte-components/input/select/CheckDifficultySelect.svelte';
+import ConditionSelect from '~/helpers/svelte-components/input/select/ConditionSelect.svelte';
 import DamageReducedBySelect from '~/helpers/svelte-components/input/select/DamageReducedBySelect.svelte';
 import InventoryItemTypeSelect from '~/helpers/svelte-components/input/select/InventoryItemTypeSelect.svelte';
 import ModSelect from '~/helpers/svelte-components/input/select/ModSelect.svelte';
@@ -128,6 +129,7 @@ const componentRegistry = {
    AttackTypeSelect,
    AttributeSelect,
    CheckDifficultySelect,
+   ConditionSelect,
    DamageReducedBySelect,
    InventoryItemTypeSelect,
    ModSelect,

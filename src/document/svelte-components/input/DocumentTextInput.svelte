@@ -8,6 +8,7 @@
     * @property {string} [value] - The value that this input should modify.
     * @property {boolean} [disabled] - Whether editing this input should be disabled.
     * @property {string | object} [tooltip] - The Tooltip to display for this element, if any.
+    * @property {string} [testId] - Optional stable selector forwarded to the inner input as `data-testid`.
     */
 
    /** @type {DocumentTextInputProps} */
@@ -15,6 +16,7 @@
       value = $bindable(),
       disabled = false,
       tooltip = void 0,
+      testId = void 0,
    } = $props();
 
    /** @type {object} Reference to the reactive Document store. */
@@ -34,5 +36,6 @@
    disabled={disabled || !document.data?.isOwner}
    onchange={updateDocument}
    onkeyup={updateDocument}
+   {testId}
    {tooltip}
 />

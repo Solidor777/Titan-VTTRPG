@@ -16,10 +16,10 @@ export const CONDITIONAL_CHECK_MODIFIER_TYPES = Object.freeze([
 ]);
 
 /**
- * The selectors whose keys the user types free-form (a custom trait name, a spell tradition, a situation label), keyed
- * by the rules-element operation that carries them. The single source for the cache builders in `CharacterDataModel`:
- * typed keys are grouped and matched in camel case, so "Field Medicine" matches "fieldMedicine". A unit test pins each
- * entry to the text inputs of that operation's rules-element editor.
+ * The selectors whose keys the user types free-form (a custom trait name, a spell tradition, a situation label, an
+ * effect name), keyed by the rules-element operation that carries them. The single source for the cache builders in
+ * `CharacterDataModel`: typed keys are grouped and matched in camel case, so "Field Medicine" matches "fieldMedicine".
+ * A unit test pins each entry to the text inputs of that operation's rules-element editor.
  * @type {Readonly<Record<string, readonly string[]>>}
  */
 export const TYPED_KEY_SELECTORS = Object.freeze({
@@ -33,6 +33,7 @@ export const TYPED_KEY_SELECTORS = Object.freeze({
       'customShieldTrait',
       'customWeaponTrait',
    ]),
+   immunity: Object.freeze(['effect']),
    rollMessage: Object.freeze([
       'customTrait',
       'spellTradition',

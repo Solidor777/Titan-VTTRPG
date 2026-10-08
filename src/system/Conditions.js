@@ -251,6 +251,12 @@ export function buildConditionDefinitions() {
 }
 
 /**
+ * Every condition id, in definition order. The options of a condition picker (the immunity editor).
+ * @type {readonly string[]}
+ */
+export const CONDITION_IDS = Object.freeze(buildConditionDefinitions().map((condition) => condition.id));
+
+/**
  * Finds the system condition an Active Effect applies, from the system's own definitions (never the mutable
  * CONFIG.statusEffects). Following core's `Actor#toggleStatusEffect`, an effect is a status's effect only when its
  * statuses hold exactly that one id, so an effect with several statuses, or with a status naming no system condition,

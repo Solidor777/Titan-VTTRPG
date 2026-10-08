@@ -1,10 +1,11 @@
 import { expect, test } from './harness.js';
-import { clickSheetTab } from './actions.js';
+import { clickSheetTab, commitText } from './actions.js';
 import { settle } from './settle.js';
 import { login, openSheetByUuid } from './fixtures.js';
 import { addRulesElement, createWorldItem } from './flows.js';
 import { attachPageErrors, closeAllApps } from './world.js';
 import { ROUNDING_DIRECTIONS } from '../../src/helpers/utility-functions/RoundDirectional.js';
+import { CONDITION_IDS } from '../../src/system/Conditions.js';
 import { readTitanSelectValue, selectTitanOption, titanSelectOptionValues } from './select.js';
 
 /**
@@ -13,7 +14,8 @@ import { readTitanSelectValue, selectTitanOption, titanSelectOptionValues } from
  * a Multiply Base and a Multiply Sum element offers every direction and stores the chosen one; and the conditional
  * check modifier editor writes the signed Advantage level, hides the value on Automatic Failure, filters modifier
  * types and check types against each other, offers the Resistance selectors, and offers a Skill narrowing on a
- * situation.
+ * situation; and the immunity editor offers the condition and effect selectors, a condition picker over every
+ * condition, a typed effect name, and builds the default condition immunity when a row is retyped to Immunity.
  *
  * The weapon is made once. Each test adds the rows it needs through the tab's controls and the `afterEach` hook
  * deletes every row through the row's delete button in the sheet the test left open, so a test starts with an empty
@@ -394,6 +396,87 @@ test.describe('conditional check modifier editor', () => {
       await expect.poll(readElement, { message: 'a returning situation is unnarrowed' }).toMatchObject({
          selector: 'situation',
          skill: '',
+      });
+      expect(errors, `uncaught errors:\n${errors.join('\n')}`).toEqual([]);
+   });
+});
+
+test.describe('immunity editor', () => {
+   /**
+    * Reads the edited element's stored selector and key.
+    * @returns {Promise<{key: string, selector: string}>} The element's selector and key.
+    */
+   async function readElement() {
+      /** @type {object} The edited element. */
+      const element = (await readElements())[0];
+      return {
+         key: element.key,
+         selector: element.selector,
+      };
+   }
+
+   test('retyping a row to Immunity builds the default condition immunity', async () => {
+      await addRulesElement(page, weaponUuid, {});
+
+      /** @type {import('@playwright/test').Locator} The weapon's sheet. */
+      const sheet = await openRulesElements();
+
+      // The new row is a flat modifier: its settings are on screen and hold no immunity controls.
+      await expect(sheet.locator('.rules-element .operation-settings .field.select').first()).toBeVisible();
+      await expect(sheet.getByTestId('immunity-selector')).toHaveCount(0);
+
+      await selectTitanOption(page, sheet.locator('.rules-element .operation [role="combobox"]').first(), 'immunity');
+      await expect(sheet.getByTestId('immunity-selector')).toBeVisible();
+      await expect.poll(readElement, { message: 'the default immunity is stored' }).toEqual({
+         key: CONDITION_IDS[0],
+         selector: 'condition',
+      });
+      expect(errors, `uncaught errors:\n${errors.join('\n')}`).toEqual([]);
+   });
+
+   test('a condition immunity picks from every condition and stores the choice', async () => {
+      await addRulesElement(page, weaponUuid, { operation: 'immunity' });
+
+      /** @type {import('@playwright/test').Locator} The weapon's sheet. */
+      const sheet = await openRulesElements();
+      expect(await titanSelectOptionValues(page, sheet.getByTestId('immunity-selector'))).toEqual([
+         'condition',
+         'effect',
+      ]);
+
+      /** @type {import('@playwright/test').Locator} The condition picker's trigger. */
+      const key = sheet.getByTestId('immunity-key');
+      expect(await titanSelectOptionValues(page, key)).toEqual(CONDITION_IDS);
+      await selectTitanOption(page, key, 'offBalance');
+      await expect.poll(readElement, { message: 'the chosen condition is stored' }).toEqual({
+         key: 'offBalance',
+         selector: 'condition',
+      });
+      expect(await readTitanSelectValue(key)).toBe('offBalance');
+      expect(errors, `uncaught errors:\n${errors.join('\n')}`).toEqual([]);
+   });
+
+   test('an effect immunity swaps the picker for a name input and stores the typed name', async () => {
+      await addRulesElement(page, weaponUuid, { operation: 'immunity' });
+
+      /** @type {import('@playwright/test').Locator} The weapon's sheet. */
+      const sheet = await openRulesElements();
+
+      // A condition immunity keys through a select, so the name input is absent until the selector changes.
+      await expect(sheet.locator('input[data-testid="immunity-key"]')).toHaveCount(0);
+      await selectTitanOption(page, sheet.getByTestId('immunity-selector'), 'effect');
+      await expect.poll(readElement, { message: 'switching to effect clears the key' }).toEqual({
+         key: '',
+         selector: 'effect',
+      });
+
+      /** @type {import('@playwright/test').Locator} The effect-name input. */
+      const key = sheet.locator('input[data-testid="immunity-key"]');
+      await expect(key).toBeVisible();
+      await commitText(key, 'Poisoned Blade');
+      await expect.poll(readElement, { message: 'the typed name is stored' }).toEqual({
+         key: 'Poisoned Blade',
+         selector: 'effect',
       });
       expect(errors, `uncaught errors:\n${errors.join('\n')}`).toEqual([]);
    });
