@@ -80,13 +80,28 @@ function buildRealShapeEnvelopes() {
          customTrait: [createCustomItemTraitTemplate()],
          rulesElement: [createFlatModifierElement()],
          trait: trait ? [{ ...trait[0] }] : void 0,
-         aspect: [{ ...SpellAspects.range.template }],
+         aspect: [
+            {
+               ...SpellAspects.damage.template,
+               option: [...SpellAspects.damage.settings.option],
+            },
+         ],
          customAspect: [createCustomAspectTemplate()],
       };
       for (const [field, value] of Object.entries(entries)) {
          if (field in system && value) {
             system[field] = value;
          }
+      }
+
+      // Every object-array field of the template is now filled, and the aspect carries its primitive option array.
+      for (const [field, value] of Object.entries(system)) {
+         if (Array.isArray(value)) {
+            expect(value.length, `${documentType} ${field} is filled`).toBeGreaterThan(0);
+         }
+      }
+      if (system.aspect) {
+         expect(system.aspect[0].option.length, `${documentType} aspect option is filled`).toBeGreaterThan(0);
       }
 
       // The weapon's attacks carry their own trait arrays.
