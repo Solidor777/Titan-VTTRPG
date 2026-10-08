@@ -122,8 +122,8 @@ export function needsInheritedConversionHidden({ effects, inheritedEffects = [],
  * Converts one stored actor's legacy effect Items into native 'effect' Active Effects, each taking its Item's `_id`
  * (buildEffectData). Discovery reads the actor's stored Item data: the 'effect' subtype is no longer registered, so
  * legacy Items are invalid documents excluded from collection iteration but present in stored data (and deletable by
- * id). Base-type Active Effects (the cosmetic copies older versions kept beside legacy Items) are not handled: TITAN
- * registers only the `effect` and `condition` Active Effect types, so the client cannot construct or delete one.
+ * id). Base-type Active Effects (the cosmetic copies older versions kept beside legacy Items) are not handled: the
+ * migration has no code for them.
  * Steps, each read back from stored data:
  * 1. Hide every inherited conversion of an Item the actor's own data claims (getClaimedItemIds): an unlinked token's
  * delta that overrides or removed a legacy Item, or holds its own conversion of it, must not show its base actor's

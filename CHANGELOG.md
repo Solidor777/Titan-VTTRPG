@@ -37,8 +37,9 @@ and hides from unlinked tokens the converted effects their own changes replace (
   Applying it is refused with a notification, and an existing one is suppressed until the immunity ends: its
   modifiers stop applying; immunities it grants still apply.
 - Other modules and systems can store core's `base` Active Effect on a TITAN actor, item or token. TITAN keeps it, loads
-  it after a reload, and ignores it (it appears in no TITAN effect list, report or Player HUD list); core still applies
-  its native changes. Before, creating one failed and a stored one stopped the world from loading.
+  it after a reload, and ignores it (no actor sheet, report or Player HUD list shows it; the Effect Tray lists one held
+  in a world or module pack); core still applies its native changes. Before, creating one failed and a stored one
+  stopped the world from loading.
 
 ## Version 2.1.0:
 Advantage and Disadvantage, situational modifiers, and bug fixes.

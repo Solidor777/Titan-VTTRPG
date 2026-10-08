@@ -942,3 +942,105 @@ test('an effect with a change added in core\'s Active Effect Config survives exp
       value: 'E2E Imported Name',
    }]);
 });
+
+/**
+ * Reads the stored data of a pack effect, without the modification stamp an update rewrites.
+ * @param {string} packId - The pack's collection id.
+ * @param {string} effectId - The id of the effect to read.
+ * @param {string} [actorId] - The id of the pack actor that owns the effect; omitted for a top-level pack effect.
+ * @returns {Promise<object>} The effect's `toObject()` data without `_stats`.
+ */
+function readPackEffect(packId, effectId, actorId) {
+   return page.evaluate(async ({ packId, effectId, actorId }) => {
+      /** @type {object} The effect: a pack document, or an embedded effect of a pack actor. */
+      const effect = actorId
+         ? (await game.packs.get(packId).getDocument(actorId)).effects.get(effectId)
+         : await game.packs.get(packId).getDocument(effectId);
+      /** @type {object} The effect's data. */
+      const data = effect.toObject();
+      delete data._stats;
+
+      // An unset change priority is undefined when the effect was created and null after an import: both are unset
+      // (the field is nullable and the spreadsheet decodes an empty cell to null).
+      for (const change of data.system.changes) {
+         change.priority ??= null;
+      }
+      return data;
+   }, {
+      packId,
+      effectId,
+      actorId,
+   });
+}
+
+// EXCEPTION to real-flow documents: a `base` effect has no TITAN creation control, so the API creates it as a module
+// would (name, type and one native change); the packs and the actor are made through flows.
+test('a base effect row in an effect pack exports and re-imports unchanged', async () => {
+   /** @type {string} The empty effect pack's collection id. */
+   const packId = await createCompendium(page, {
+      label: 'E2E Spreadsheet Base Pack',
+      type: 'ActiveEffect',
+   });
+   /** @type {string} The base effect's id. */
+   const effectId = await page.evaluate(async (packId) => (await ActiveEffect.create({
+      name: 'E2E Base Row Effect',
+      type: 'base',
+      system: {
+         changes: [{
+            key: 'name',
+            type: 'override',
+            phase: 'initial',
+            value: 'E2E Base Row Name',
+         }],
+      },
+   }, { pack: packId })).id, packId);
+   /** @type {object} The effect before the round trip. */
+   const before = await readPackEffect(packId, effectId);
+   expect(before.type).toBe('base');
+
+   /** @type {import('~/spreadsheet/codec/Workbook.js').Workbook} The pack's export. */
+   const workbook = decodeExport(await exportPack(packId, 'csv'));
+   expect(rowNamed(workbook, 'base', 'E2E Base Row Effect')['system.changes.0.value']).toBe('E2E Base Row Name');
+   await importInto(packId, zipOf(workbook), {
+      created: 0,
+      updated: 1,
+      deleted: 0,
+   });
+   expect(await readPackEffect(packId, effectId)).toEqual(before);
+});
+
+test('a base effect row under an actor of an actor pack exports and re-imports unchanged', async () => {
+   /** @type {string} The empty actor pack's collection id. */
+   const packId = await emptyActorPack('Base Row Actor');
+   /** @type {string} The actor that owns the effect. */
+   const actorId = await createActor(page, {
+      name: 'E2E Base Row NPC',
+      type: 'npc',
+   });
+   await putInPack(page, page.locator(`#actors .directory-item.entry[data-entry-id="${actorId}"]`), packId);
+   /** @type {string} The base effect's id. */
+   const effectId = await page.evaluate(async ({ packId, actorId }) => {
+      /** @type {object} The pack's actor. */
+      const actor = await game.packs.get(packId).getDocument(actorId);
+      return (await actor.createEmbeddedDocuments('ActiveEffect', [{
+         name: 'E2E Base Row Embedded',
+         type: 'base',
+      }]))[0].id;
+   }, {
+      packId,
+      actorId,
+   });
+   /** @type {object} The effect before the round trip. */
+   const before = await readPackEffect(packId, effectId, actorId);
+   expect(before.type).toBe('base');
+
+   /** @type {import('~/spreadsheet/codec/Workbook.js').Workbook} The pack's export. */
+   const workbook = decodeExport(await exportPack(packId, 'csv'));
+   rowNamed(workbook, 'base', 'E2E Base Row Embedded');
+   await importInto(packId, zipOf(workbook), {
+      created: 0,
+      updated: 2,
+      deleted: 0,
+   });
+   expect(await readPackEffect(packId, effectId, actorId)).toEqual(before);
+});

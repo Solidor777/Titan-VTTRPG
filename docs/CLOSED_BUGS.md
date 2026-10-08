@@ -2318,8 +2318,17 @@ unless a path says otherwise.
     HUD's effects-panel visibility (`PlayerHudShell.svelte`; an actor holding only a `base` effect kept the panel
     showing).
   - The sheet needed no change. Measured (`probe-sheet.json`): the sheet of a `base` effect is core's
-    `ActiveEffectConfig`, it renders with the name, disabled, show-icon, duration and changes controls and raises no page
-    error. TITAN registers its own sheets for `types: ['effect']` and `['condition']` only (`OnceInit.js`).
+    `ActiveEffectConfig`, it renders with the name, disabled, show-icon, duration and changes controls and raises no
+    page error. TITAN registers its own sheets for `types: ['effect']` and `['condition']` only (`OnceInit.js`).
+  - One shared test of "an effect TITAN defines", `isTitanEffect` with `EFFECT_TYPE`, `CONDITION_TYPE` and
+    `TITAN_EFFECT_TYPES` (`src/system/EffectTypes.js`, unit-pinned in `tests/unit/EffectTypes.test.js`), serves the
+    action menu, the effects-panel visibility and the effects panel's lists.
+  - A foreign `base` effect with `statuses: ['prone']` and a `flags.titan` description, measured
+    (`fix1/probe-statuses.json`): core's `actor.statuses` holds `prone`; the derived stats are unchanged;
+    `getConditions()` is null, `getExpiredEffects()` and `getSortedEffects()` are false, the rules-element sources
+    number 0 and the immunity sources 0; `toggleStatusEffect('prone')` (core) then removes the effect. So TITAN applies
+    none of the Prone rules to it, and only core's status display and toggle see it. The e2e spec pins this against a
+    control (a Blinded condition from the Token HUD changes the same stats of the same actor).
   - Measured with the registration (`specs-final.log`): a `base` effect made with a name and a type only is stored (the
     server copy has type `base`), its `system` is `ActiveEffectTypeDataModel`, and `invalidDocumentIds` is empty on the
     actor, on an owned ability and on an unlinked token's actor, including after a reload; the derived stats equal
@@ -2329,14 +2338,25 @@ unless a path says otherwise.
   - A `base` effect in a user (world or module) effect pack is listed by the Effect Tray (user packs show every subtype;
     system packs show only `effect`, `EffectTrayState.svelte.js:227-229`) and a click on its row opens core's config
     sheet.
-- **Gate:** `tests/e2e/base-effect.spec.js` (9 tests; module-made `base` effects created through the document API, the
-  rest through flows). The manifest drift guard (`tests/e2e/integration-manifest.spec.js`) compares the registered
-  Active Effect `dataModels` with the types `system.json` declares; it now leaves out core's `base` type, which no
-  manifest declares (`coreTypes`, `common/abstract/document.mjs:135`). Before that change it failed with `base` as the
-  one extra registered type (`e2e-full-1.log`). With the registration removed all 9 fail
-  (`mut1-no-registration.log`); with the two HUD fixes removed the HUD action-menu test and the effects-panel test
-  fail and the other 7 pass (`mut2-no-hud-fixes.log`). The full e2e run after the change passed 701 of 701 with the
-  sweep and census at 0 (`e2e-full-2.log`); unit tests passed 1553 of 1553 (`unit.log`).
-  Restored files were verified by sha256 (`sha-before.txt`, `sha-after-restore.txt`).
-- **Not exercised:** a native change on a `base` effect owned by an item; only the actor-level native change above is.
+  - Spreadsheet round trip: an exported and unchanged re-imported `base` row in an effect pack and under an
+    actor of an actor pack leave the stored effect as it was, except an unset change priority (undefined before, null
+    after; both unset). `tests/e2e/compendium-spreadsheet.spec.js` pins both.
+  - A native change on an item-owned `base` effect transfers to the actor: core yields an item's effects with
+    `transfer` true in `Actor#allApplicableEffects` (`client/documents/actor.mjs:310-316`; `transfer` initial true,
+    `common/documents/active-effect.mjs:71`), and the spec raises Awareness through the effect's config sheet.
+- **Gate:** `tests/e2e/base-effect.spec.js` (10 tests; module-made `base` effects created through the document API, the
+  rest through flows) and the two base-row pins of `tests/e2e/compendium-spreadsheet.spec.js`. The manifest drift guard
+  (`tests/e2e/integration-manifest.spec.js`) compares the registered Active Effect `dataModels` with the types
+  `system.json` declares; it now leaves out core's `base` type, which no manifest declares (`coreTypes`,
+  `common/abstract/document.mjs:135`); before that change it failed with `base` as the one extra registered type
+  (`e2e-full-1.log`).
+  - Registration removed: all 10 tests fail, tests 3, 4 and 5 on their own assertion "the base effect was created"
+    (`fix1/mut1-no-registration.log`; an earlier attempt hit the open bug #143's scene dialog,
+    `fix1/mut1-attempt1-flake143.log`).
+  - `isTitanEffect` made always true: the HUD action-menu test and the effects-panel test fail, the other 8 pass, and
+    the unit pin fails (`fix1/mut2-predicate-always-true.log`, `fix1/mut2-unit.log`).
+  - The two HUD fixes of the first round, removed: the same two tests fail (`mut2-no-hud-fixes.log`).
+  - Restored files verified by sha256 (`fix1/sha-before.txt`, `fix1/sha-after-m1.txt`, `fix1/sha-after-m2.txt`).
+  - After the fix round: unit 1555 of 1555 (`fix1/unit.log`); full e2e 704 of 704 with the sweep and census at 0
+    (`fix1/e2e-full.log`).
 - **Status:** Closed 2026-10-08.

@@ -3,6 +3,7 @@ import { clickSheetTab } from './actions.js';
 import { login, openSheetByUuid } from './fixtures.js';
 import {
    addEffect,
+   applyCondition,
    controlPlacedToken,
    createActor,
    createCompendium,
@@ -11,6 +12,8 @@ import {
    openTrayPack,
    placeToken,
    readServerDocument,
+   removeCondition,
+   setAttributeBase,
    unlinkPlacedToken,
    viewScene,
 } from './flows.js';
@@ -109,15 +112,17 @@ function readAwareness() {
  * Creates a `base` Active Effect on a document through the document API, as a module would.
  * @param {string} parentUuid - The uuid of the actor or item that receives the effect.
  * @param {string} name - The label the effect carries.
+ * @param {object} [extra] - More creation data, as a foreign export carries it (`statuses`, `flags`).
  * @returns {Promise<string>} The new effect's id.
  */
-function createBaseEffect(parentUuid, name) {
-   return page.evaluate(async ({ parentUuid, name }) => {
+function createBaseEffect(parentUuid, name, extra = {}) {
+   return page.evaluate(async ({ parentUuid, name, extra }) => {
       /** @type {foundry.abstract.Document} The actor or item. */
       const parent = await fromUuid(parentUuid);
 
       /** @type {ActiveEffect[]} The created effects. */
       const created = await parent.createEmbeddedDocuments('ActiveEffect', [{
+         ...extra,
          name,
          type: 'base',
       }]);
@@ -125,6 +130,37 @@ function createBaseEffect(parentUuid, name) {
    }, {
       parentUuid,
       name,
+      extra,
+   });
+}
+
+/**
+ * Asserts that the main actor holds its base effect, with the foreign data it was created with, so that an assertion
+ * of absence or of unchanged stats that follows is about an effect that exists.
+ * @returns {Promise<void>} Resolves once asserted.
+ */
+async function expectBaseEffectHeld() {
+   expect(baseId, 'the base effect was created').not.toBe('');
+   expect(
+      await page.evaluate(({ actorId, effectId }) => {
+         /** @type {ActiveEffect|undefined} The base effect. */
+         const effect = game.actors.get(actorId).effects.get(effectId);
+         return effect && {
+            type: effect.type,
+            statuses: [...effect.statuses],
+            description: effect.flags.titan?.description,
+            actorStatus: game.actors.get(actorId).statuses.has('prone'),
+         };
+      }, {
+         actorId: actorIds.main,
+         effectId: baseId,
+      }),
+      'the actor holds the base effect with its foreign data',
+   ).toEqual({
+      type: 'base',
+      statuses: ['prone'],
+      description: 'E2E foreign description',
+      actorStatus: true,
    });
 }
 
@@ -153,13 +189,27 @@ test.beforeAll(async ({ browser }) => {
    markerId = await addEffect(page, actorIds.main, `E2E Base Marker ${RUN}`);
    hudMarkerId = await addEffect(page, actorIds.hud, `E2E Base Hud Marker ${RUN}`);
    abilityId = await createOwnedItem(page, actorIds.main, 'ability', `E2E Base Ability ${RUN}`);
+
+   // Attributes of 8, so that a condition's quarter-of-base penalty (2) shows in the derived ratings.
+   for (const attribute of [
+      'body',
+      'mind',
+      'soul',
+   ]) {
+      await setAttributeBase(page, `Actor.${actorIds.main}`, attribute, 8);
+   }
    await closeAllApps(page);
 
    baselineDerived = await readDerived();
    baselineAwareness = await readAwareness();
 
    // The module-made effects: on the actor, on its owned ability, on a second actor, and on an unlinked token's actor.
-   baseId = await createBaseEffect(`Actor.${actorIds.main}`, BASE_NAME);
+   // The main actor's carries the data of a foreign export that TITAN would read if it read `base` effects: the
+   // `prone` status (a TITAN condition id, whose rules lower Melee and Accuracy) and TITAN's description flag.
+   baseId = await createBaseEffect(`Actor.${actorIds.main}`, BASE_NAME, {
+      statuses: ['prone'],
+      flags: { titan: { description: 'E2E foreign description' } },
+   });
    abilityBaseId = await createBaseEffect(`Actor.${actorIds.main}.Item.${abilityId}`, `E2E Base Ability Effect ${RUN}`);
    hudBaseId = await createBaseEffect(`Actor.${actorIds.hud}`, `E2E Base Hud Effect ${RUN}`);
    await unlinkPlacedToken(page, tokenIds.token);
@@ -253,13 +303,32 @@ test.describe('storage', () => {
 });
 
 test.describe('TITAN never uses a base effect', () => {
-   test('the derived stats are those of the actor without it', async () => {
-      expect(await readDerived()).toBe(baselineDerived);
+   test('the derived stats and conditions are those of the actor without it', async () => {
+      await expectBaseEffectHeld();
+      expect(await readDerived(), 'the stats equal those before the effect').toBe(baselineDerived);
+      expect(
+         await page.evaluate((actorId) => game.actors.get(actorId).system.getConditions(), actorIds.main),
+         'the `prone` status makes no TITAN condition',
+      ).toBeNull();
+
+      // Control: a TITAN condition changes the same stats, so equal stats above mean the base effect was not read.
+      await viewScene(page, sceneId);
+      await applyCondition(page, tokenIds.main, 'blinded');
+      try {
+         await expect.poll(readDerived, { message: 'the Blinded condition changed the stats' })
+            .not.toBe(baselineDerived);
+      }
+      finally {
+         await removeCondition(page, tokenIds.main, 'blinded');
+      }
+      await expect.poll(readDerived, { message: 'the stats return once the condition is removed' })
+         .toBe(baselineDerived);
    });
 
    test('the Effects tab lists the TITAN effect and not the base effect', async () => {
       /** @type {import('@playwright/test').Locator} The main actor's sheet. */
       const sheet = await openSheetByUuid(page, `Actor.${actorIds.main}`);
+      await expectBaseEffectHeld();
       await clickSheetTab(sheet, 'Effects');
       await expect(sheet.locator(`[data-effect-id="${markerId}"]`), 'the TITAN effect has a row').toBeVisible();
       await expect(sheet.locator(`[data-effect-id="${baseId}"]`)).toHaveCount(0);
@@ -267,6 +336,7 @@ test.describe('TITAN never uses a base effect', () => {
    });
 
    test('the Player HUD lists the TITAN effect and not the base effect', async () => {
+      await expectBaseEffectHeld();
       await viewScene(page, sceneId);
       await controlPlacedToken(page, tokenIds.main);
       await expect(hud('player-hud-effects-panel')).toBeVisible();
@@ -295,11 +365,7 @@ test.describe('TITAN never uses a base effect', () => {
       // The HUD row's Delete control and its confirmation remove the TITAN effect.
       /** @type {import('@playwright/test').Locator} The effect's row. */
       const row = hud('player-hud-effect-row');
-      /** @type {import('@playwright/test').Locator} The header button of the collapsed row. */
-      const collapsed = row.getByRole('button', { name: /: Expand$/ });
-      if (await collapsed.count() > 0) {
-         await collapsed.click();
-      }
+      await row.getByRole('button', { name: /: Expand$/ }).click();
       await expect(row.getByRole('button', { name: /: Collapse$/ }), 'the row is expanded').toBeVisible();
       await row.locator('[data-testid="player-hud-effect-delete"]').click();
       /** @type {import('@playwright/test').Locator} The confirmation dialog. */
@@ -379,10 +445,8 @@ test.describe('the sheet of a base effect', () => {
 test.describe('core applies its native changes', () => {
    test('a change entered in the config sheet applies to a TITAN stat until the effect is deleted', async () => {
       await page.evaluate(async ({ actorId, effectId }) => {
-         /** @type {foundry.applications.sheets.ActiveEffectConfig} The config sheet. */
-         const sheet = new foundry.applications.sheets.ActiveEffectConfig({
-            document: game.actors.get(actorId).effects.get(effectId),
-         });
+         /** @type {foundry.applications.sheets.ActiveEffectConfig} The effect's sheet, core's config sheet. */
+         const sheet = game.actors.get(actorId).effects.get(effectId).sheet;
          await sheet.render({ force: true });
          await sheet.changeTab('changes', 'sheet');
       }, {
@@ -425,5 +489,31 @@ test.describe('core applies its native changes', () => {
          ),
          'the base effect is gone',
       ).toBe(false);
+   });
+
+   test('a change entered on an owned ability\'s base effect transfers to the actor until it is deleted', async () => {
+      /** @type {string} The uuid of the ability's base effect. */
+      const uuid = `Actor.${actorIds.main}.Item.${abilityId}.ActiveEffect.${abilityBaseId}`;
+      await page.evaluate(async (uuid) => {
+         /** @type {foundry.applications.sheets.ActiveEffectConfig} The effect's sheet, core's config sheet. */
+         const sheet = (await fromUuid(uuid)).sheet;
+         await sheet.render({ force: true });
+         await sheet.changeTab('changes', 'sheet');
+      }, uuid);
+
+      /** @type {import('@playwright/test').Locator} The config sheet. */
+      const config = page.locator('.application.active-effect-config');
+      await expect(config).toBeVisible();
+      await config.locator('[data-action="addChange"]').click();
+      await expect(config.locator('ol[data-changes] li')).toHaveCount(1);
+      await config.locator('[name="system.changes.0.key"]').fill(NATIVE_KEY);
+      await config.locator('[name="system.changes.0.value"]').fill('2');
+      await config.locator('button[type="submit"]').click();
+      await expect.poll(readAwareness, { message: 'core transferred the change to the actor' })
+         .toBe(baselineAwareness + 2);
+
+      await page.evaluate(async (uuid) => (await fromUuid(uuid)).delete(), uuid);
+      await expect.poll(readAwareness, { message: 'the deleted effect no longer transfers' })
+         .toBe(baselineAwareness);
    });
 });

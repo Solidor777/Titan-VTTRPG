@@ -5,6 +5,7 @@
    import PortraitElement from '~/ui/player-hud/elements/portrait/PortraitElement.svelte';
    import ActionMenuElement from '~/ui/player-hud/elements/action-menu/ActionMenuElement.svelte';
    import EffectsPanelElement from '~/ui/player-hud/elements/effects-panel/EffectsPanelElement.svelte';
+   import { isTitanEffect } from '~/system/EffectTypes.js';
 
    /**
     * @typedef {object} PlayerHudShellProps
@@ -46,9 +47,7 @@
 
    /** @type {boolean} Effects panel visibility (single character with at least one `effect` or `condition` effect). */
    const effectsPanelVisible = $derived(
-      single && elementVisible('effectsPanel') && (documentStore.data.effects?.some(
-         (effect) => effect.type === 'effect' || effect.type === 'condition',
-      ) ?? false),
+      single && elementVisible('effectsPanel') && (documentStore.data.effects?.some(isTitanEffect) ?? false),
    );
 
    /** @type {string} The action menu's minimize-chip corner, kept on the stable (non-expanding) side. */
