@@ -802,7 +802,7 @@ the lone exception is `Text` (no root element). See the component-probe harness 
 coverage map, the wrapper-forwarding rules, and the selector each component resolves to.
 
 **Playwright E2E** — `npm run test:e2e` runs `playwright test` against the `test-titan` Foundry world on
-`http://localhost:30000`: 33 spec files, 662 tests (measured: `npx playwright test --list` → "Total: 662 tests in 33
+`http://localhost:30000`: 33 spec files, 670 tests (measured: `npx playwright test --list` → "Total: 670 tests in 33
 files"). `playwright.config.mjs` sets `timeout` 60 s, `expect.timeout` 1000 ms, `workers` 1, `fullyParallel` false,
 `globalSetup` and `globalTeardown`, the `list` reporter beside `slow-operation-reporter.js`, and for every test headless
 Chromium (with `--enable-gpu`), `viewport` 1920x1080 and `actionTimeout` 10 s. The users are the four dedicated
@@ -1545,34 +1545,39 @@ produces: an Advantage value outside the four levels, an unknown check type, and
 element with no `rounding`. `PAYLOAD` (also exported by `componentProbe.js`) is the cleaning-probe string, a paragraph
 and an image with an `onerror` handler.
 
-**Coverage:** `componentRegistry.js` holds 86 entries: 83 of the 87 `.svelte` files under
-`src/helpers/svelte-components/**` and the three rules-element settings editors
-`ItemSheetConditionalCheckModifierSettings`, `ItemSheetMulBaseSettings` and `ItemSheetMulSumSettings` (measured: a count
-of the registry's object keys and of the files). Not registered, so not probed: `button/HudButton.svelte`,
-`drag-reorder/DragHandle.svelte`, `drag-reorder/InsertionLine.svelte` and `input/select/SelectList.svelte` (no spec
-under `tests/e2e/` names them). The probes are three specs, one world boot each (each describe = one component):
+**Coverage:** `componentRegistry.js` holds 90 entries: all 87 `.svelte` files under `src/helpers/svelte-components/**`
+and the three rules-element settings editors `ItemSheetConditionalCheckModifierSettings`, `ItemSheetMulBaseSettings` and
+`ItemSheetMulSumSettings` (measured: a count of the registry's object keys and of the files, and a per-file check that
+each file's name is a key). The probes are three specs, one world boot each (each describe = one component):
 `tests/e2e/component-probe-inputs.spec.js` (8 `input/` non-select primitives, the editors above, the invalid-data
-probes, and the 16 `input/select/` typed wrappers: 15 run from one table of `{component, options, testId, supportsNone,
-wrapperTestId}` whose options are the `src/` constants the components build their lists from (`ATTRIBUTES`, `SKILLS`,
-`RARITIES`, ..., `ARMOR_TRAITS`, `ATTACK_TRAITS`, `SHIELD_TRAITS`; imported through the `~/` alias), so a constant
-change cannot meet a stale hand count, and `DamageReducedBySelect`, whose list depends on two flags, is written out);
-`-buttons-tags.spec.js` (13 `button/` primitives, 17 `tag/` primitives incl. `EditDeleteTag` whose probe also locks in
-the FontAwesome `font-family` regression, with the `SpellAspectTags` entries built by `selectDisplayedSpellAspects` (a
-selector change fails the test, `M4-spellaspects-run.log`), and the tooltip HTML-cleaning probes: an `EffectTag` and a
-`Tag` mounted with an event-handler payload; the `EffectTag` one is the suite's one real-hover test); `-display.spec.js`
-(core `Button`, `TextInput`, `NumberInput`, `IntegerInput`, `CheckboxInput`, `Select`, `LabelTag`; the 5 `label/`
-primitives; `RichText`, the `EffectTag` family + its six duration-variant wrappers, `CondensedCheckButton`,
-`ProseMirrorEditor`; `Meter`, `Text`, `Tabs`, `ScrollingContainer`, `LabeledElement`, `BorderedColumnList`,
-`TagContainer`; and the `RichText` HTML-cleaning probe). The cleaning probes use synthetic props because a real flow
-cannot carry an event handler into these sinks (ProseMirror drops `on*` attributes on input); each fails when
-`foundry.utils.cleanHTML` is replaced by the identity in the page before the mount
+probes, `SelectList` (mounted with instrumented `floatingContent`, `onhover` and `onselect` callbacks; its rows are
+portaled to the body, so the list is located by its `<testId>-list` test id), and the 16 `input/select/` typed wrappers:
+15 run from one table of `{component, options, testId, supportsNone, wrapperTestId}` whose options are the `src/`
+constants the components build their lists from (`ATTRIBUTES`, `SKILLS`, `RARITIES`, ..., `ARMOR_TRAITS`,
+`ATTACK_TRAITS`, `SHIELD_TRAITS`; imported through the `~/` alias), so a constant change cannot meet a stale hand count,
+and `DamageReducedBySelect`, whose list depends on two flags, is written out); `-buttons-tags.spec.js` (14 `button/`
+primitives, `HudButton` among them, 17 `tag/` primitives incl. `EditDeleteTag` whose probe also locks in the FontAwesome
+`font-family` regression, with the `SpellAspectTags` entries built by `selectDisplayedSpellAspects` (a selector change
+fails the test, `M4-spellaspects-run.log`), and the tooltip HTML-cleaning probes: an `EffectTag` and a `Tag` mounted
+with an event-handler payload; the `EffectTag` one is the suite's one real-hover test); `-display.spec.js` (core
+`Button`, `TextInput`, `NumberInput`, `IntegerInput`, `CheckboxInput`, `Select`, `LabelTag`; the 5 `label/` primitives;
+`RichText`, the `EffectTag` family + its six duration-variant wrappers, `CondensedCheckButton`, `ProseMirrorEditor`;
+`Meter`, `Text`, `Tabs`, `ScrollingContainer`, `LabeledElement`, `BorderedColumnList`, `TagContainer`; `DragHandle` and
+`InsertionLine` of `drag-reorder/`; and the `RichText` HTML-cleaning probe). The cleaning probes use synthetic props
+because a real flow cannot carry an event handler into these sinks (ProseMirror drops `on*` attributes on input); each
+fails when `foundry.utils.cleanHTML` is replaced by the identity in the page before the mount
 (`.superpowers/sdd/test-suite-rewrite/phase-6/partB/mutations/M1-richtext-uncleaned-page-run.log`, `M2-...`, `M2b-...`),
 and the table fails when a select drops an option (`M3-attacktrait-slice-run.log`: `AttackTraitSelect` without its first
-trait fails 2 tests). Every primitive carries a `testId` (`data-testid` passthrough) **except `Text`**, which renders
-`{processTextData(text)}` inline with no root element — a wrapper would change its DOM contract, so its probe locates
-via the probe container selector instead. Wrapper components forward `testId` to their inner primitive's rendered root
-(e.g. wrapper selects → the `AttributeInput`/`RarityInput`/`ResistanceInput` div; bare selects → the inner `<Select>`'s
-combobox button (`[role="combobox"]`); `ImagePicker` → `ImageButton`'s `<button>`). To probe a new primitive: add it to
+trait fails 2 tests). Each probe of `HudButton`, `DragHandle`, `InsertionLine` and `SelectList` fails when one line of
+its component is mutated (eight mutations, one saved log each,
+`.superpowers/sdd/2026-10-01-test-suite-real-data/phase-8/ mutations/M1-…` through `M8-…`; sources restored and compared
+with HEAD). Every primitive carries a `testId` (`data-testid` passthrough) **except `Text`, `DragHandle` and
+`InsertionLine`**, which have no root that takes one (`Text` renders `{processTextData(text)}` inline, and a wrapper
+would change its DOM contract), so their probes locate via the probe container selector, `[data-drag-handle]` and
+`.insertion-line`; `SelectList` takes `testId` as the `<testId>-list` id of its list root. Wrapper components forward
+`testId` to their inner primitive's rendered root (e.g. wrapper selects → the
+`AttributeInput`/`RarityInput`/`ResistanceInput` div; bare selects → the inner `<Select>`'s combobox button
+(`[role="combobox"]`); `ImagePicker` → `ImageButton`'s `<button>`). To probe a new primitive: add it to
 `componentRegistry.js`, add a `testId` prop on its root if it lacks one (never add a wrapper element solely to host it),
 append a describe block, then re-run the spec — `test:e2e`'s global-setup rebuilds `test/build/probe.iife.js` and the
 harness re-injects it (no `dist/` rebuild needed).

@@ -55,7 +55,8 @@ Deferred/known bugs. Todos (planned work) live in `docs/TODO.md`; this file is b
   burst. A token named like its base actor stored `delta: null`. On such a token, a create or delete of two or more
   embedded documents through `token.actor` was missing after a reload, and so was every later delta write until the
   Token record was written. One-document calls, updates, and calls after the delta existed were stored. Under the
-  real-data rule (`docs/TODO.md`) none of this is evidence about Foundry's behaviour until it is re-run the real way.
+  project rule "Tests use genuine live documents" (`.claude/claude.md`, Project Scope) none of this is evidence about
+  Foundry's behaviour until it is re-run the real way.
 - **Read in core, not run:** `client/documents/token.mjs:1657` gives a newly created unlinked token a delta only when
   its name differs from the base actor's. Changing `actorLink` on an existing token goes through `:2032` instead.
 - **Contradicting observation (user):** on real tokens, bulk Clear Expired Effects and single-value edits persist.

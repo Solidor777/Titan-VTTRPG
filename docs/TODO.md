@@ -85,9 +85,3 @@ Completed items are deleted, not marked done.
   `ItemSheetSetSumSettings.svelte`. A change to any of them would not fail the pack-source lint, so the test can drift.
   Fix: export one constant per vocabulary from `src/system/` and import it in the sheet and the test. Needs the
   user's approval because the test-suite plan (section 7.5) allows no other `src` change.
-- Probe four unregistered base components. `src/test-probe/componentRegistry.js` holds 83 of the 87 `.svelte` files
-  under `src/helpers/svelte-components/` (plus three rules-element editors); `button/HudButton.svelte`,
-  `drag-reorder/DragHandle.svelte`, `drag-reorder/InsertionLine.svelte` and `input/select/SelectList.svelte` are not
-  registered, and no spec under `tests/e2e/` names them (measured: a count of the registry keys and of the files, and
-  `grep -rl` of each name over `tests/e2e`). Fix: register each, give its root a `testId` where it lacks one, and add a
-  describe block to the matching `component-probe-*.spec.js`.
