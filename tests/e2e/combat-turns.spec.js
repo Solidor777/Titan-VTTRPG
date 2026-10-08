@@ -644,6 +644,43 @@ test.describe('turn reports', () => {
       await endCombat(gm);
    });
 
+   test('a turn message rules element posts its message in the turn-end report', async () => {
+      /** @type {string} The text typed into the Turn Message element's editor. */
+      const text = 'E2E turn end message text';
+      await makeCharacter('messengerEnd', [
+         {
+            name: 'E2E Turns End Message',
+            elements: [
+               {
+                  operation: 'turnMessage',
+                  selector: DURATION_TURN_END,
+                  message: text,
+               },
+            ],
+         },
+      ], false);
+      await closeAllApps(gm);
+      await startEncounter('messengerEnd');
+      await nextTurn(gm);
+
+      /** @type {number} The number of messages before the character's turn ends. */
+      const baseline = await gm.evaluate(() => game.messages.size);
+      await nextTurn(gm);
+
+      /** @type {string} The turn end report's id. */
+      const id = await expectReport(baseline, 'turnEndReport');
+
+      /** @type {import('@playwright/test').Locator} The report's message entries. */
+      const messages = gm.locator(`#chat .message[data-message-id="${id}"] .report .messages .message`);
+      await expect(messages).toHaveCount(1);
+      await expect(messages.first()).toContainText(text);
+      expect(
+         await gm.evaluate((id) => game.messages.get(id).system.toObject().message.length, id),
+         'the report stores the one message',
+      ).toBe(1);
+      await endCombat(gm);
+   });
+
    test('the end of a turn posts a turnEndReport card', async () => {
       await setResource(gm, cast.healer.uuid, 'stamina', 0);
       await startEncounter('healer');
@@ -833,8 +870,11 @@ test.describe('conditions and turn effects in a turn start report', () => {
       /** @type {string} The turn start report's id. */
       const id = await expectReport(baseline, 'turnStartReport');
       expect(
-         await gm.evaluate((id) => (game.messages.get(id).system.toObject().effects?.turnStart ?? [])
-            .map((entry) => entry.label), id),
+         await gm.evaluate(({ id, type }) => (game.messages.get(id).system.toObject().effects?.[type] ?? [])
+            .map((entry) => entry.label), {
+            id,
+            type: DURATION_TURN_START,
+         }),
          'the report lists the turn-start effect',
       ).toEqual(['E2E Turn Start Effect']);
 

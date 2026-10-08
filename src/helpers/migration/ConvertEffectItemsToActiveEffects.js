@@ -1,4 +1,3 @@
-import { DURATION_PERMANENT } from '~/system/DurationTypes.js';
 import { EFFECT_TYPE } from '~/system/EffectTypes.js';
 
 /**
@@ -33,8 +32,12 @@ export function buildEffectData(itemSource) {
    /** @type {boolean} - The normalized active state, mirroring BooleanField casting for template-era strings. */
    const active = typeof rawActive === 'string' ? rawActive === 'true' : Boolean(rawActive);
 
-   /** @type {boolean} - Whether a permanent effect starts deactivated; creation sets a timed effect's state. */
-   const disabled = system.duration?.type === DURATION_PERMANENT ? !active : false;
+   /**
+    * Whether a permanent effect starts deactivated; creation sets a timed effect's state. The stored `permanent` is the
+    * legacy Item's frozen duration form, so it stays a literal.
+    * @type {boolean}
+    */
+   const disabled = system.duration?.type === 'permanent' ? !active : false;
 
    return {
       _id: itemSource._id,

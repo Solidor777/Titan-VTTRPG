@@ -7,6 +7,13 @@
    import InitiativeEffectTag from '~/helpers/svelte-components/tag/effects/InitiativeEffectTag.svelte';
    import CustomEffectTag from '~/helpers/svelte-components/tag/effects/CustomEffectTag.svelte';
    import EffectTag from '~/helpers/svelte-components/tag/effects/EffectTag.svelte';
+   import {
+      DURATION_CUSTOM,
+      DURATION_INITIATIVE,
+      DURATION_PERMANENT,
+      DURATION_TURN_END,
+      DURATION_TURN_START,
+   } from '~/system/DurationTypes.js';
 
    /** @type {object} Reference to the reactive Document store. */
    const document = getContext('document');
@@ -22,8 +29,8 @@
    {/if}
 
    <!--Permanent Effects-->
-   {#if document.data.system.effects?.permanent}
-      {#each document.data.system.effects.permanent as effect}
+   {#if document.data.system.effects?.[DURATION_PERMANENT]}
+      {#each document.data.system.effects[DURATION_PERMANENT] as effect}
          <div class="effect">
             <PermanentEffectTag {effect}/>
          </div>
@@ -31,8 +38,8 @@
    {/if}
 
    <!--Turn Start Effects-->
-   {#if document.data.system.effects?.turnStart}
-      {#each document.data.system.effects.turnStart as effect}
+   {#if document.data.system.effects?.[DURATION_TURN_START]}
+      {#each document.data.system.effects[DURATION_TURN_START] as effect}
          <div class="effect">
             <TurnStartEffectTag {effect}/>
          </div>
@@ -40,8 +47,8 @@
    {/if}
 
    <!--Turn End Effects-->
-   {#if document.data.system.effects?.turnEnd}
-      {#each document.data.system.effects.turnEnd as effect}
+   {#if document.data.system.effects?.[DURATION_TURN_END]}
+      {#each document.data.system.effects[DURATION_TURN_END] as effect}
          <div class="effect">
             <TurnEndEffectTag {effect}/>
          </div>
@@ -49,8 +56,8 @@
    {/if}
 
    <!--Initiative Effects-->
-   {#if document.data.system.effects?.initiative}
-      {#each document.data.system.effects.initiative as effect}
+   {#if document.data.system.effects?.[DURATION_INITIATIVE]}
+      {#each document.data.system.effects[DURATION_INITIATIVE] as effect}
          <div class="effect">
             <InitiativeEffectTag {effect}/>
          </div>
@@ -58,8 +65,8 @@
    {/if}
 
    <!--Custom Effects-->
-   {#if document.data.system.effects?.custom}
-      {#each document.data.system.effects.custom as effect}
+   {#if document.data.system.effects?.[DURATION_CUSTOM]}
+      {#each document.data.system.effects[DURATION_CUSTOM] as effect}
          <div class="effect">
             <CustomEffectTag {effect}/>
          </div>

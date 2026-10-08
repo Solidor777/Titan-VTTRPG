@@ -5347,7 +5347,7 @@ export default class CharacterDataModel extends TitanActorDataModel {
          }
 
          // Get turn messages.
-         const message = this.rulesElementsCache?.turnMessage?.turnStart;
+         const message = this.rulesElementsCache?.turnMessage?.[DURATION_TURN_START];
          if (message) {
             reportData.message = structuredClone(message);
          }
@@ -5457,7 +5457,7 @@ export default class CharacterDataModel extends TitanActorDataModel {
          }
 
          // Get turn messages.
-         const message = this.rulesElementsCache?.turnMessage?.turnEnd;
+         const message = this.rulesElementsCache?.turnMessage?.[DURATION_TURN_END];
          if (message) {
             reportData.message = structuredClone(message);
          }

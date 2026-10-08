@@ -3,7 +3,7 @@ import { readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import path from 'node:path';
 import buildEffectTagTooltip from '~/helpers/utility-functions/BuildEffectTagTooltip.js';
-import { DURATION_TYPES } from '~/system/DurationTypes.js';
+import * as DurationTypes from '~/system/DurationTypes.js';
 
 /** @type {string} The repository root. */
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
@@ -104,7 +104,7 @@ describe('buildEffectTagTooltip', () => {
 describe('report effect tags', () => {
    it('derives the report duration types from the lead keys: every duration type, then the expired state', () => {
       expect([...REPORT_TAG_TYPES].sort()).toEqual([
-         ...DURATION_TYPES,
+         ...DurationTypes.DURATION_TYPES,
          'expired',
       ].sort());
    });
@@ -123,10 +123,11 @@ describe('report effect tags', () => {
       ]) {
          /** @type {string} The report tag component's source. */
          const source = readSource(`src/document/types/chat-message/components/tags/${file}`);
-         for (const [, type, body] of source.matchAll(
-            /\{#each document\.data\.system\.effects\.(\w+) as effect\}([\s\S]*?)\{\/each\}/g,
+         // A list is read as `effects.<state>` or, for a duration type, `effects[<DURATION_CONSTANT>]`.
+         for (const [, state, constant, body] of source.matchAll(
+            /\{#each document\.data\.system\.effects(?:\.(\w+)|\[(\w+)\]) as effect\}([\s\S]*?)\{\/each\}/g,
          )) {
-            rendered[`${file}:${type}`] = /<(\w+EffectTag)\b/.exec(body)?.[1];
+            rendered[`${file}:${state ?? DurationTypes[constant]}`] = /<(\w+EffectTag)\b/.exec(body)?.[1];
          }
       }
       expect(rendered).toEqual({
