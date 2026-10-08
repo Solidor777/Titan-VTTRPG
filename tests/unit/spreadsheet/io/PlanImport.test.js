@@ -1,5 +1,13 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { planImport } from '~/spreadsheet/io/PlanImport.js';
+import {
+   MockArrayField,
+   MockBooleanField,
+   MockNumberField,
+   MockObjectField,
+   MockSchemaField,
+   MockStringField,
+} from '../../helpers/schemaFingerprint.js';
 
 /**
  * Builds a minimal in-browser File-like object carrying CSV text.
@@ -12,17 +20,6 @@ function csvFile(name, text) {
       text: async () => text,
       arrayBuffer: async () => new TextEncoder().encode(text).buffer,
    };
-}
-
-/** Minimal stand-in for SchemaField, matched via instanceof by resolveFieldSchema. */
-class MockSchemaField {
-   /**
-    * @param {object} fields - Map of sub-field name to a mock field (empty for the stand-ins below).
-    */
-   constructor(fields) {
-      /** @type {object} */
-      this.fields = fields;
-   }
 }
 
 /**
@@ -78,7 +75,16 @@ describe('planImport', () => {
    beforeEach(() => {
       // resolveTypeSchemasForPack always resolves ActiveEffect too (every pack type can embed one), which
       // walks each registered subtype's static schema via instanceof checks against these field classes.
-      globalThis.foundry.data = { fields: { SchemaField: MockSchemaField } };
+      globalThis.foundry.data = {
+         fields: {
+            StringField: MockStringField,
+            NumberField: MockNumberField,
+            BooleanField: MockBooleanField,
+            ObjectField: MockObjectField,
+            ArrayField: MockArrayField,
+            SchemaField: MockSchemaField,
+         },
+      };
       globalThis.CONFIG = {
          Item: {
             dataModels: {},
@@ -95,6 +101,10 @@ describe('planImport', () => {
       let idCounter = 0;
       globalThis.foundry.utils.randomID = () => `fresh${String(idCounter++).padStart(11, '0')}`;
       globalThis.getDocumentClass = (name) => globalThis.CONFIG[name].documentClass;
+   });
+
+   afterEach(() => {
+      // Remove the field stand-ins so later suites keep the shared minimal mock.
    });
 
    it('plans a create for a row with no existing pack document', async () => {
@@ -301,22 +311,6 @@ describe('planImport', () => {
 
    it('decodes an embedded row\'s typed cell via resolveTypeSchemasForPack(\'Actor\') feeding the weapon\'s '
       + 'own Item schema into readTables', async () => {
-      /** Stand-in for StringField, matched via instanceof by resolveFieldSchema. */
-      class MockStringField {
-         constructor(options = {}) {
-            Object.assign(this, options);
-         }
-      }
-      globalThis.foundry.data = {
-         fields: {
-            StringField: MockStringField,
-            NumberField: class MockNumberField {},
-            BooleanField: class MockBooleanField {},
-            ObjectField: class MockObjectField {},
-            ArrayField: class MockArrayField {},
-            SchemaField: MockSchemaField,
-         },
-      };
       /** Stand-in DataModel exposing the weapon subtype's schema with one string-typed field. */
       class WeaponDataModel {
          static get schema() {
@@ -574,30 +568,6 @@ describe('planImport', () => {
    });
 
    it('returns a graceful error-only plan when readTables throws on a malformed typed cell', async () => {
-      /** Stand-in for NumberField, matched via instanceof by resolveFieldSchema. */
-      class MockNumberField {
-         constructor(options = {}) {
-            Object.assign(this, options);
-         }
-      }
-      /** Stand-in for SchemaField, matched via instanceof by resolveFieldSchema. */
-      class MockSchemaField {
-         constructor(fields, options = {}) {
-            Object.assign(this, options);
-            /** @type {object} */
-            this.fields = fields;
-         }
-      }
-      globalThis.foundry.data = {
-         fields: {
-            StringField: class MockStringField {},
-            NumberField: MockNumberField,
-            BooleanField: class MockBooleanField {},
-            ObjectField: class MockObjectField {},
-            ArrayField: class MockArrayField {},
-            SchemaField: MockSchemaField,
-         },
-      };
       /** Stand-in DataModel exposing a static schema with one number-typed field. */
       class WeaponDataModel {
          static get schema() {
@@ -635,8 +605,6 @@ describe('planImport', () => {
          column: '',
       });
       expect(plan.errors[0].message).toContain('Failed to read the file:');
-
-      delete globalThis.foundry.data;
    });
 
    it('returns a graceful error-only plan when the uploaded file itself cannot be decoded', async () => {
