@@ -5,8 +5,9 @@ import { DEFAULT_GM } from './users.js';
 import { hasWork, readRegistry, resetRegistry } from './registry.js';
 
 // Deletes everything the suite made, as the plan's suite-end deletion: the running list through the API in dependency
-// order, then the census's sweep of `E2E `-prefixed leftovers (its count is printed), then the census, which must be
-// zero. `global-setup.js` runs the same function over a list a crashed run left behind.
+// order, then the census's sweep of `E2E `-prefixed leftovers, then the census. The run fails when the sweep deleted
+// anything (a document no flow recorded) or the census is not zero; the per-kind sweep counts are printed either way.
+// `global-setup.js` runs the same function over a list a crashed run left behind.
 
 /**
  * Deletes the documents on the running list through the API, in dependency order: combats, tokens, scenes, embedded
@@ -233,8 +234,9 @@ export async function tearDownRun(origin) {
 }
 
 /**
- * Tears a run down, prints what was removed, and throws when the census is not zero or the teardown's boot raised an
- * error. The running list is emptied (the file is overwritten, never deleted) only after both checks pass, so a failed
+ * Tears a run down, prints what was removed, and throws when the sweep deleted anything, the census is not zero or the
+ * teardown's boot raised an error. The sweep has already deleted what it counted, so the world is clean when it throws.
+ * The running list is emptied (the file is overwritten, never deleted) only after all checks pass, so a failed
  * teardown leaves the list for the next `global-setup.js` to retry.
  * @param {string} origin - What runs the teardown, named when the boot reports errors.
  * @returns {Promise<void>} Resolves once the world is clean.
@@ -245,6 +247,13 @@ export async function tearDownAndReport(origin) {
    console.log(`e2e teardown (${origin}): ${JSON.stringify(result)}`);
    if (result.bootErrors.length > 0) {
       throw new Error(`The teardown's world boot raised errors:\n${result.bootErrors.join('\n')}`);
+   }
+   /** @type {string[]} The kinds the sweep deleted, with their counts. */
+   const swept = Object.entries(result.sweep)
+      .filter(([, count]) => count > 0)
+      .map(([kind, count]) => `${kind}: ${count}`);
+   if (swept.length > 0) {
+      throw new Error(`The sweep deleted documents no flow recorded: ${swept.join(', ')}`);
    }
    if (Object.values(result.census).some((count) => count > 0)) {
       throw new Error(`The census is not zero after the teardown: ${JSON.stringify(result.census)}`);

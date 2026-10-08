@@ -2096,8 +2096,9 @@ The evidence files named here are in `.superpowers/sdd/test-suite-rewrite/bug-11
   list, and the suite-end teardown deletes the tokens of every scene and sweeps orphans.
 - **Gate:** the teardown line of the final full run (`phase-5/b/e2e-full-b2.log`; 645 passed in 14.7 m) reports
   `"orphanTokens":0` in its sweep and in its census, and the census counts 0 of every document class. That run's
-  sweep removed 2 actors and 1 pack and no scene or token; they come from specs that are not yet converted (see the
-  sweep entry in `docs/TODO.md`).
+  sweep removed 2 actors and 1 pack and no scene or token; they came from specs that were not yet converted. Since Phase 6 Part A a
+  sweep that deletes anything fails the run (`phase-6/sweep-gate-fail.log`), and the sweep entry of `docs/TODO.md` is
+  deleted.
 - **Status:** Closed 2026-10-07.
 
 ### 108. `TitanActor#getCombatant` used a core API that is deprecated and removed in v15

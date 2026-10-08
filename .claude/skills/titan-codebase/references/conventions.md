@@ -1096,11 +1096,12 @@ documents by their parent; world actors, items, macros, roll tables, journal ent
 recorded pack documents whose pack is not recorded, unlocked for the deletion and locked again; world compendia after
 unlocking), clears each recorded hotbar slot that still holds its recorded macro (`user.assignHotbarMacro(null, slot)`:
 deleting a Macro does not clear its slot, which lives on the User), deletes every chat message with
-`timestamp >= runStartedAt`, restores each recorded world setting, runs `sweepWorld` (its per-kind counts are printed;
-from Phase 6 on the plan requires every count to be zero, and `tearDownAndReport` itself throws only on boot errors and
-a non-zero census, read `global-teardown.js`) and `takeCensus` (which must be all zero or the run fails), prints one
-`e2e teardown (...)` JSON line and, only after the census is zero, resets the list (a failed teardown leaves the list
-for the next `global-setup.js` to retry; shown by forcing a non-zero census). `global-setup.js` runs the same
+`timestamp >= runStartedAt`, restores each recorded world setting, runs `sweepWorld` (its per-kind counts are printed; a
+sweep that deleted anything fails the run, naming the kinds and counts: a document no flow recorded; shown with an
+unregistered `E2E ` actor made before a run, `phase-6/sweep-gate-fail.log`) and `takeCensus` (which must be all zero
+or the run fails), prints one `e2e teardown (...)` JSON line and, only after the sweep and the census are zero, resets
+the list (a failed teardown leaves the list for the next `global-setup.js` to retry; shown by forcing a non-zero
+census). `global-setup.js` runs the same
 `tearDownAndReport` over a list that still shows a run in flight or holds entries (a crashed run), then `startRun()`
 before the probe build. `settings.js` `setWorldSetting` records the prior value before it writes; `setClientSetting` and
 a `game.settings.set` made directly in a spec are not recorded. A client-scope setting lives in the browser context that
