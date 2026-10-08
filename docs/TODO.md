@@ -93,13 +93,6 @@ Completed items are deleted, not marked done.
   things by trait. The first cut covers effect/condition immunity by condition id or effect name only; it is plan B
   Tasks 8 to 11 and has not been started.
 
-- Census class for Combat (a gate extension, needs the user's approval before it is built). `census.js` counts no Combat
-  documents, so a combat that a spec leaked without recording it is neither counted nor swept (read: the census classes
-  in `global-teardown.js` output list no combats). The combat from 2026-06-18 that no spec made, and that a suite run
-  modified (`.superpowers/sdd/test-suite-rewrite/phase-5/b/leftover-combat-probe-2.log`), was deleted on the user's
-  instruction of 2026-10-07 (backup `combats-backup-2026-10-08T03-10-48-197Z.json` in the same directory); the world
-  holds no combat, and the census still has no Combat class.
-
 - Remove or sync `.agents/skills/titan-codebase/`, a tracked copy of `.claude/skills/titan-codebase/` that differs in every
   reference file (last touched by commit `5526adee`). Measured 2026-10-02: no file in the repo, script or config reads
   it (`grep -rn "\.agents"` finds only the note in `docs/POST_WORK_FINDINGS.md`); whether an external agent tool reads

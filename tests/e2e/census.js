@@ -4,8 +4,9 @@ import { joinWorld } from './join.js';
 import { DEFAULT_GM, E2E_USERS } from './users.js';
 
 // Counts, and on request removes, what the e2e suite has left in the `test-titan` world: `E2E `-prefixed documents
-// of the world document kinds and world compendia, tokens whose actor does not resolve, chat messages since a run
-// started, and hotbar entries of the E2E users whose macro does not resolve. User documents are never touched, and
+// of the world document kinds and world compendia, every combat (a combat has no name to prefix), tokens whose actor
+// does not resolve, chat messages since a run started, and hotbar entries of the E2E users whose macro does not
+// resolve. User documents are never touched, and
 // both functions throw on any world other than `test-titan` before reading or deleting anything.
 //
 // Run as a script against the live world on localhost:30000, logged in as `E2E GM 1`:
@@ -43,7 +44,7 @@ export async function assertCensusWorld(page) {
 /**
  * @typedef {Record<string, CensusEntry[]>} Census
  * The entries of each kind, keyed by kind: `actors`, `items`, `scenes`, `folders`, `macros`, `tables`, `journal`,
- * `playlists`, `cards`, `packs`, `orphanTokens`, `hotbar`, and `messages` when a run start is given.
+ * `playlists`, `cards`, `packs`, `combats`, `orphanTokens`, `hotbar`, and `messages` when a run start is given.
  */
 
 /**
@@ -86,6 +87,12 @@ export async function takeCensus(page, { since } = {}) {
             name: pack.metadata.label,
             detail: pack.collection,
          }));
+      // A combat has no name to carry the prefix, so every combat of the test world counts.
+      census.combats = game.combats.map((combat) => ({
+         id: combat.id,
+         name: `Combat round ${combat.round}`,
+         detail: combat.scene ? `scene ${combat.scene.id}` : 'no scene',
+      }));
       census.orphanTokens = game.scenes.contents.flatMap((scene) => scene.tokens
          .filter((token) => !token.actorId || !game.actors.get(token.actorId))
          .map((token) => ({
@@ -120,9 +127,9 @@ export async function takeCensus(page, { since } = {}) {
 
 /**
  * Removes, through the API, every `E2E `-prefixed document of the census kinds, every world compendium so labelled,
- * every token whose actor does not resolve, and every hotbar entry of the E2E users whose macro does not resolve.
- * Scenes go first (taking their tokens), folders after their contents, then orphaned tokens and dangling hotbar
- * entries, which the earlier deletions can create.
+ * every combat, every token whose actor does not resolve, and every hotbar entry of the E2E users whose macro does
+ * not resolve. Combats go first, then scenes (taking their tokens), folders after their contents, then orphaned
+ * tokens and dangling hotbar entries, which the earlier deletions can create.
  * @param {import('@playwright/test').Page} page - A page logged in as a GM.
  * @returns {Promise<Record<string, number>>} The number removed of each kind. Throws when the page is not in the
  * census world.
@@ -145,6 +152,14 @@ export async function sweepWorld(page) {
 
       /** @type {Record<string, number>} The number removed of each kind. */
       const removed = {};
+
+      // A combat has no name to carry the prefix, so every combat of the test world goes.
+      /** @type {Combat[]} Every combat. */
+      const combats = [...game.combats];
+      for (const combat of combats) {
+         await combat.delete();
+      }
+      removed.combats = combats.length;
       for (const collection of collections) {
          /** @type {foundry.abstract.Document[]} The prefixed documents of the kind. */
          const documents = game[collection].filter((document) => document.name?.startsWith(prefix));

@@ -275,5 +275,5 @@ Read: `"active": true` at line 123 of `phase-5/b/combats-backup-2026-10-08T03-10
 delete script saved when it read the combat, before the delete. Inferred, not measured: core deactivates the previously
 active combat when a new one is activated and activates another when the active one is deleted. On the user's
 instruction of 2026-10-07 it was deleted (the only combat in the world; backup
-`phase-5/b/combats-backup-2026-10-08T03-10-48-197Z.json`, `delete-old-combats.log`). The census still has no Combat
-class (`docs/TODO.md`).
+`phase-5/b/combats-backup-2026-10-08T03-10-48-197Z.json`, `delete-old-combats.log`). The census now counts every
+combat and the sweep removes any (`phase-6/combat-census-probe.log`).
