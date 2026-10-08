@@ -1,27 +1,26 @@
-import TitanDataModel from '~/document/data-model/TitanDataModel.js';
+import TitanDataModelMixin from '~/document/data-model/TitanDataModelMixin.js';
 import RulesElementMixin from '~/document/types/item/rules-element/RulesElementMixin.js';
-import createSchemaField from '~/helpers/utility-functions/CreateSchemaField.js';
-import createStringField from '~/helpers/utility-functions/CreateStringField.js';
-import createIntegerField from '~/helpers/utility-functions/CreateIntegerField.js';
-import createArrayField from '~/helpers/utility-functions/CreateArrayField.js';
-import createDataField from '~/helpers/utility-functions/CreateDataField.js';
 import buildSchemaFromShape from '~/helpers/utility-functions/BuildSchemaFromShape.js';
 import createEffectSystemTemplate from '~/document/types/active-effect/EffectSystemTemplate.js';
 
+/** @type {typeof foundry.data.ActiveEffectTypeDataModel} - Core's Active Effect model plus TITAN behaviour. */
+const TitanEffectBase = TitanDataModelMixin(foundry.data.ActiveEffectTypeDataModel);
+
 /**
  * The typed system data model for Titan Active Effects (subtype 'effect').
+ * Inherits core's Active Effect model (the core `changes` field) through TitanDataModelMixin.
  * Carries the Rules Elements, the custom Titan duration, item-check templates, and custom traits.
  * Active/inactive state is the native ActiveEffect.disabled field; the rich description is the native
  * ActiveEffect.description field.
  * @property {TitanActiveEffect} parent - The Active Effect that owns this data model.
- * @extends {TitanDataModel}
+ * @extends {foundry.data.ActiveEffectTypeDataModel}
  */
-export default class TitanActiveEffectDataModel extends RulesElementMixin(TitanDataModel) {
+export default class TitanActiveEffectDataModel extends RulesElementMixin(TitanEffectBase) {
    /**
     * Defines the data schema for Titan Active Effect documents. The duration, check, and customTrait
     * fields are generated from the canonical effect shape template (the single source shared with the
-    * effect chat-message snapshot schema); the changes field stays hand-built because the Foundry v14
-    * verifier requires an ArrayField of a typed SchemaField, which a shape cannot express.
+    * effect chat-message snapshot schema). The core `changes` field is inherited from
+    * foundry.data.ActiveEffectTypeDataModel and left unused by TITAN.
     * @override
     * @returns {object} Map of schema field instances keyed by field name, defining the persisted data shape.
     * @protected
@@ -31,20 +30,6 @@ export default class TitanActiveEffectDataModel extends RulesElementMixin(TitanD
 
       // Duration, Checks, and Custom Traits, generated from the canonical effect shape template.
       Object.assign(schema, buildSchemaFromShape(createEffectSystemTemplate()));
-
-      // Changes.
-      // Foundry v14 requires every ActiveEffect type data model to define `changes` as an ArrayField whose
-      // element is a SchemaField defining a numeric `priority` and string `type`/`phase` (see
-      // Game##verifyActiveEffectModels). We keep our own permissive change shape — without core's restrictive
-      // `type` validator or `blank: false` constraints — and supply those required fields so the verifier passes.
-      schema.changes = createArrayField(createSchemaField({
-         key: createStringField(),
-         value: createDataField(''),
-         mode: createIntegerField(0),
-         priority: createIntegerField(0),
-         type: createStringField(),
-         phase: createStringField(),
-      }));
 
       return schema;
    }

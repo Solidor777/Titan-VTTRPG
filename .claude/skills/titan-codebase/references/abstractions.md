@@ -49,8 +49,12 @@ management). Data model classes hold the schema, field validation, and derived-d
 
 **Data model base**
 
-- `TitanDataModel` (`src/document/data-model/TitanDataModel.js`) extends
-  `foundry.abstract.TypeDataModel`. Provides a frozen `#components` map (each component is
+- `TitanDataModelMixin` (`src/document/data-model/TitanDataModelMixin.js`) holds the TITAN data model
+  behaviour as a mixin; `TitanDataModel` (`src/document/data-model/TitanDataModel.js`) is
+  `TitanDataModelMixin(foundry.abstract.TypeDataModel)`. The mixin's `defineSchema` merges the base class's own
+  `defineSchema()` fields (skipped when the base inherits `DataModel.defineSchema`, which throws) with
+  `_defineDocumentSchema()` and the component schemas, so applying it to a specialized core model keeps that
+  model's fields. It provides a frozen `#components` map (each component is
   instantiated once from `_prototypeComponents`), a `documentVersion` field, schema composition
   via `defineSchema` + `_defineDocumentSchema`, component-aware `migrateData`, and a
   `prepareDerivedData` pass that iterates components.
@@ -135,17 +139,18 @@ management). Data model classes hold the schema, field validation, and derived-d
   block is the shared `EffectStats.svelte` (`src/document/types/active-effect/components/`), also
   consumed by the character sheet's effect row footer.
 - `TitanActiveEffectDataModel` (`src/document/types/active-effect/TitanActiveEffectDataModel.js`)
-  extends `RulesElementMixin(TitanDataModel)`. Registered as `CONFIG.ActiveEffect.dataModels.effect`.
+  extends `RulesElementMixin(TitanDataModelMixin(foundry.data.ActiveEffectTypeDataModel))`, so it inherits
+  core's Active Effect model and its `changes` ArrayField unchanged (core's change element: `key`, `type`,
+  `value`, `phase`, `priority`; type validator, non-blank type/phase, nullable priority so core's per-type
+  default priority applies). TITAN never reads or writes `changes` (mechanics run through rules elements);
+  core's `ActiveEffectConfig` can edit them. Registered as `CONFIG.ActiveEffect.dataModels.effect`.
   Beyond the mixin's `rulesElement` array, its schema adds a custom `duration` ({ type, remaining,
   initiative, custom }), a `check` array, and a `customTrait` array — all generated via
   `buildSchemaFromShape(createEffectSystemTemplate())` (`EffectSystemTemplate.js`, the single-source
   shape also feeding the effect chat-message snapshot schema; parity gated by
-  `tests/unit/EffectSchemaEquivalence.test.js`) — plus a hand-built `changes` ArrayField whose
-  element is a `SchemaField` ({ key, value, mode, priority, type, phase }) — Foundry v14's
-  `Game##verifyActiveEffectModels` requires every ActiveEffect type data model to define `changes` as
-  an ArrayField of SchemaField exposing a numeric `priority` and string `type`/`phase` (a shape cannot
-  express that typed element, so `changes` stays hand-built); TITAN keeps a
-  permissive shape (no core `type` validator) while satisfying that verifier. It provides `isExpired` /
+  `tests/unit/EffectSchemaEquivalence.test.js`, which fingerprints `_defineDocumentSchema()` and so excludes the
+  inherited `changes`; `tests/e2e/effect-changes.spec.js` covers `changes` through core's config sheet).
+  It provides `isExpired` /
   `isActive` (`!parent?.disabled`, for all duration types) / `isCombatEffect` getters and
   `_getInitialDocumentData` (captures the owning actor's active-combat initiative via
   `actor.getCombatant()?.initiative`). Active/inactive
@@ -155,10 +160,10 @@ management). Data model classes hold the schema, field validation, and derived-d
   duration, check, customTrait, ... }` — `description` is included so an effect check rolled through
   the shared item-check engine populates the chat card's description like an item does.
 - `ConditionDataModel` (`src/document/types/active-effect/ConditionDataModel.js`) extends
-  `RulesElementMixin(TitanDataModel)`. Registered as `CONFIG.ActiveEffect.dataModels.condition`; the
-  `condition` ActiveEffect subtype is declared in `system.json` `documentTypes.ActiveEffect.condition`.
-  Beyond the mixin's `rulesElement` array it adds only the v14-mandated permissive `changes` ArrayField
-  (the `Game##verifyActiveEffectModels` shape — `{ key, value, mode, priority, type, phase }`); unlike
+  `RulesElementMixin(TitanDataModelMixin(foundry.data.ActiveEffectTypeDataModel))`. Registered as
+  `CONFIG.ActiveEffect.dataModels.condition`; the `condition` ActiveEffect subtype is declared in `system.json`
+  `documentTypes.ActiveEffect.condition`. Beyond the mixin's `rulesElement` array it only inherits core's
+  `changes` ArrayField; unlike
   `TitanActiveEffectDataModel` it carries no `duration`, `check`, or `customTrait`. Condition definitions
   (and their seeded `rulesElement` arrays) come from `buildConditionDefinitions()` in
   `src/system/Conditions.js`, pushed onto `CONFIG.statusEffects` by `setupConditions()`; toggling a

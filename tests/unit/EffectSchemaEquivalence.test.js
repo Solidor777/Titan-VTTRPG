@@ -1,6 +1,5 @@
 import { describe, it, expect, beforeAll, afterAll } from 'vitest';
 import {
-   MockField,
    emptyObjectArray,
    fingerprintSchema,
    installSchemaMocks,
@@ -21,25 +20,20 @@ import {
 // element's initial is inert (Foundry populates the array from the array's own initial, never the
 // element's), so the hand-built element factories (e.g. createObjectField(() =>
 // createItemCheckTemplate())) and the shape-built bare createObjectField() elements compare equal.
-// The harness mirrors ItemDataModelSchemaEquivalence.test.js, adding a DataField stand-in (the AE
-// changes field uses createDataField). Dynamic import is permitted in tests (the no-dynamic-import
-// rule governs the shipping bundle only).
-
-/** Stand-in for DataField, a distinct subclass so the produced field type can be asserted. */
-class MockDataField extends MockField {}
+// The core `changes` field is inherited from foundry.data.ActiveEffectTypeDataModel and is not part of
+// _defineDocumentSchema(). The harness mirrors ItemDataModelSchemaEquivalence.test.js. Dynamic import is
+// permitted in tests (the no-dynamic-import rule governs the shipping bundle only).
 
 /** @type {object} Holds the dynamically imported effect DataModel classes keyed by a stable name. */
 const models = {};
 
 beforeAll(async () => {
    // Install the shared Foundry stand-ins (i18n, TypeDataModel, data fields, ApplicationV2), then add
-   // this suite's extras: an inert settings.get and the DataField stand-in (the AE changes field uses
-   // createDataField).
+   // this suite's extra: an inert settings.get.
    installSchemaMocks();
    globalThis.game.settings = {
       get: () => undefined,
    };
-   globalThis.foundry.data.fields.DataField = MockDataField;
 
    // Dynamically import the live Active Effect data model against the installed stand-ins.
    models.effect = (
@@ -56,21 +50,6 @@ afterAll(() => {
    // Remove the stand-ins so later suites keep the shared minimal mock.
    restoreSchemaMocks();
 });
-
-/**
- * Builds the golden fingerprint of a required, non-nullable DataField — the shape produced by
- * createDataField (the permissive value field inside the AE changes element).
- * @param {*} initial - The initial value.
- * @returns {object} The fingerprint of a DataField.
- */
-function dataField(initial) {
-   return {
-      initial,
-      kind: 'DataField',
-      nullable: false,
-      required: true,
-   };
-}
 
 /**
  * Builds the golden fingerprint of the custom Titan duration SchemaField — the shape shared by the
@@ -96,31 +75,11 @@ function durationField() {
 /**
  * The committed golden fingerprint of the LIVE Titan Active Effect ('effect' subtype) schema, frozen
  * from the hand-built code BEFORE the shape-template refactor. Any divergence after the refactor
- * signals a change to the persisted Active Effect data shape. The changes field is hand-built in the
- * data model (the Foundry v14 verifier requires an ArrayField of a typed SchemaField, which a shape
- * cannot express) and is expected to remain byte-identical.
+ * signals a change to the persisted Active Effect data shape. The core `changes` field is inherited
+ * and absent from this fingerprint.
  * @type {object}
  */
 const EFFECT_DATA_MODEL_GOLDEN = {
-   changes: {
-      element: {
-         fields: {
-            key: stringField(''),
-            mode: integerField(0),
-            phase: stringField(''),
-            priority: integerField(0),
-            type: stringField(''),
-            value: dataField(''),
-         },
-         kind: 'SchemaField',
-         nullable: false,
-         required: false,
-      },
-      initial: [],
-      kind: 'ArrayField',
-      nullable: false,
-      required: true,
-   },
    check: emptyObjectArray(),
    customTrait: emptyObjectArray(),
    documentVersion: numberField(0),

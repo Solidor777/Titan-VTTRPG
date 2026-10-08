@@ -288,3 +288,16 @@ effect is a `{_id, _tombstone: true}` record there. A scan that only walks an ar
 record finds none. A world that is not the server's active world has no LevelDB lock and can be copied and read while the
 server runs; the active world's and every loaded package's pack databases hold `LOCK` (a `cp` of their directories fails
 only on that file, and the copy opens).
+
+### The e2e server runs a different Foundry build than `C:\FoundryVTT\V14oundry` (2026-10-08)
+
+Measured: `scripts/e2e-foundry-server.mjs` launches `appDir = <dataPath>/../foundry`, i.e. `C:\FoundryVTT\V14\devoundry`
+(`package.json` build 364; `/api/status` reports 14.364), while `C:\FoundryVTT\V14oundry` is build 368. The two differ in
+`ActiveEffect#prepareBaseData`: 364 reads `CHANGE_TYPES[type]?.priority` (`dev/foundry/public/scripts/foundry.mjs:49749`),
+which is never defined, so a change with an unset priority is prepared at priority 0; 368 reads `.defaultPriority`
+(`foundry/public/scripts/foundry.mjs:50013`), so multiply (10) runs before add (20). Measured on 364 with the model
+inheriting core's `changes` (`ae-mixin/after.log`): add 3 then multiply 2 with no priority gives 6; with 368's
+`prepareBaseData` body patched in on the page (`patchedCorePriority`) it gives 3. A spec that asserts the applied order of
+unset-priority changes passes only on 368; `tests/e2e/effect-changes.spec.js` asserts the stored (unset) priority and the
+sheet's default-priority placeholder instead.
+

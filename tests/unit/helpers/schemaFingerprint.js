@@ -239,6 +239,7 @@ export function installSchemaMocks() {
          ArrayField: MockArrayField,
          SchemaField: MockSchemaField,
       },
+      ActiveEffectTypeDataModel: MockTypeDataModel,
    };
 
    // Some transitively imported modules destructure foundry.applications.api.ApplicationV2 at import

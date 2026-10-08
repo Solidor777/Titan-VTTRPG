@@ -27,6 +27,13 @@ Deferred/known bugs. Todos (planned work) live in `docs/TODO.md`; this file is b
     `TitanActiveEffect` with a plain-object `system`, passes `fromDropData`, and reaches `preCreateActiveEffect`
     (a veto hook stopped it there; nothing was stored). So the client would send it; that the server stores it, and
     that the stored effect then stops the world loading, is inferred from the 2026-09-30 measurement, not re-run.
+- **Effect of the core-model inheritance, 2026-10-08 (`.superpowers/sdd/2026-10-01-test-suite-real-data/ae-mixin/`):**
+  `TitanActiveEffectDataModel` and `ConditionDataModel` now extend core's `ActiveEffectTypeDataModel` (through
+  `TitanDataModelMixin`) instead of redefining `changes`. `CONFIG.ActiveEffect.dataModels` still holds only `effect` and
+  `condition`, so a `base`-typed effect is still unconstructable and everything above is unchanged. What changed: a
+  foreign effect whose `changes` are core-valid now stores its changes on an `effect`/`condition` model without loss,
+  and registering core's model for `base` (`dataModels.base = foundry.data.ActiveEffectTypeDataModel`) needs no schema
+  work. Not done: that registration is a separate decision.
 - **Status:** Open. Not handled in code by user decision 2026-09-30; the existing local worlds hold none (inventory
   above). Fix options and the schema-compatibility analysis:
   `.superpowers/sdd/2026-10-01-test-suite-real-data/non-titan-effects-report.md`.
