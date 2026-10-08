@@ -162,6 +162,12 @@ test.afterEach(async () => {
       await removeCondition(page, tokenId, statusId);
    }
    applied = [];
+
+   // A test that failed before its own endCombat would leave a started combat, which is the viewed combat of every
+   // later spec (it has no scene).
+   if (await page.evaluate(() => game.combat?.started === true)) {
+      await endCombat(page);
+   }
    await closeAllApps(page);
    expect(errors, `uncaught page errors:\n${errors.join('\n')}`).toEqual([]);
    errors.length = 0;

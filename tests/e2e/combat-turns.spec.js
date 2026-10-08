@@ -299,6 +299,18 @@ function sheetOpen(page, role) {
    return page.evaluate((id) => game.actors.get(id).sheet.rendered === true, cast[role].id);
 }
 
+/**
+ * Waits until a character's sheet reports rendered on a client. The turn start does not await the render of the
+ * sheet it opens, so a single read after the turn start can precede it.
+ * @param {import('@playwright/test').Page} page - The client.
+ * @param {string} role - The character's role.
+ * @param {string} message - What the assertion states.
+ * @returns {Promise<void>} Resolves once the sheet is rendered.
+ */
+async function expectSheetOpen(page, role, message) {
+   await expect.poll(() => sheetOpen(page, role), { message }).toBe(true);
+}
+
 test.beforeAll(async ({ browser }) => {
    gm = await browser.newPage();
    errors = attachPageErrors(gm);
@@ -370,6 +382,11 @@ test.beforeAll(async ({ browser }) => {
 });
 
 test.afterEach(async () => {
+   // A test that failed before its own endCombat would leave a started combat, which is the viewed combat of every
+   // later spec (it has no scene).
+   if (await gm.evaluate(() => game.combat?.started === true)) {
+      await endCombat(gm);
+   }
    await resetDice(gm);
    await closeAllApps(gm);
    await closeAllApps(player);
@@ -487,7 +504,7 @@ test.describe('the sheet of the character whose turn starts', () => {
       expect(await sheetOpen(gm, 'healer'), 'the sheet is closed before the turn').toBe(false);
       await nextTurn(gm);
       await expectTurnStartDone(gm, 'healer');
-      expect(await sheetOpen(gm, 'healer'), 'the sheet opened').toBe(true);
+      await expectSheetOpen(gm, 'healer', 'the sheet opened');
       await endCombat(gm);
    });
 
@@ -498,7 +515,7 @@ test.describe('the sheet of the character whose turn starts', () => {
       await startEncounter('healer');
       await nextTurn(gm);
       await expectTurnStartDone(gm, 'healer');
-      expect(await sheetOpen(gm, 'healer'), 'the sheet opened under "all"').toBe(true);
+      await expectSheetOpen(gm, 'healer', 'the sheet opened under "all"');
       await closeAllApps(gm);
       await setClientSetting(gm, 'autoOpenCharacterSheetsGM', 'disabled');
       await nextTurn(gm);
@@ -514,7 +531,7 @@ test.describe('the sheet of the character whose turn starts', () => {
          await startEncounter('healer');
          await nextTurn(gm);
          await expectTurnStartDone(gm, 'healer');
-         expect(await sheetOpen(gm, 'healer'), 'the sheet of the player-owned character opened').toBe(true);
+         await expectSheetOpen(gm, 'healer', 'the sheet of the player-owned character opened');
          await closeAllApps(gm);
 
          // Under "Non-Player owned actors" the character no player owns gets its sheet opened on its turn, and the
@@ -522,7 +539,7 @@ test.describe('the sheet of the character whose turn starts', () => {
          await setClientSetting(gm, 'autoOpenCharacterSheetsGM', 'npcsOnly');
          await nextTurn(gm);
          await expectTurnStartDone(gm, 'plain');
-         expect(await sheetOpen(gm, 'plain'), 'the character no player owns had its sheet opened').toBe(true);
+         await expectSheetOpen(gm, 'plain', 'the character no player owns had its sheet opened');
          await closeAllApps(gm);
          await nextTurn(gm);
          await expectTurnStartDone(gm, 'healer', 2);
@@ -537,7 +554,7 @@ test.describe('the sheet of the character whose turn starts', () => {
          expect(await sheetOpen(player, 'healer'), 'the sheet is closed before the turn').toBe(false);
          await nextTurn(gm);
          await expectTurnStartDone(player, 'healer');
-         expect(await sheetOpen(player, 'healer'), 'the sheet opened').toBe(true);
+         await expectSheetOpen(player, 'healer', 'the sheet opened');
          await endCombat(gm);
       });
 
@@ -548,7 +565,7 @@ test.describe('the sheet of the character whose turn starts', () => {
       await startEncounter('healer');
       await nextTurn(gm);
       await expectTurnStartDone(player, 'healer');
-      expect(await sheetOpen(player, 'healer'), 'the sheet opened with the setting on').toBe(true);
+      await expectSheetOpen(player, 'healer', 'the sheet opened with the setting on');
       await closeAllApps(player);
       await setClientSetting(player, 'autoOpenCharacterSheetsPlayer', false);
       await nextTurn(gm);

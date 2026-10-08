@@ -39,6 +39,7 @@ async function giveLevel(level) {
    await setOwnership(gm, actorId, 'E2E Player 1', level);
    await player.waitForFunction(
       ({ id, level }) => {
+         /** @type {Actor|undefined} The character in the player's client. */
          const actor = game.actors.get(id);
          return actor?.getUserLevel(game.user) === CONST.DOCUMENT_OWNERSHIP_LEVELS[level];
       },
@@ -110,6 +111,7 @@ test('OWNER: the player can view and edit', async () => {
 
    /** @type {import('@playwright/test').Locator} The player's view of the sheet. */
    const sheet = await openSheetByUuid(player, actorUuid);
+   /** @type {{inputs: number, disabledInputs: number, tabs: string[]}} The sheet's controls. */
    const controls = await readControls(sheet);
    expect(controls.tabs, 'every tab shows').toEqual([
       'Skills',
@@ -142,6 +144,7 @@ test('OBSERVER: the player can view but not edit', async () => {
 
    /** @type {import('@playwright/test').Locator} The player's view of the sheet. */
    const sheet = await openSheetByUuid(player, actorUuid);
+   /** @type {{inputs: number, disabledInputs: number, tabs: string[]}} The sheet's controls. */
    const controls = await readControls(sheet);
    expect(controls.inputs, 'the sheet has inputs').toBeGreaterThan(0);
    expect(controls.disabledInputs, 'every input is disabled').toBe(controls.inputs);
@@ -165,6 +168,7 @@ test('LIMITED: the TITAN sheet shows a limited viewer the whole sheet, read-only
 
    /** @type {import('@playwright/test').Locator} The player's view of the sheet. */
    const sheet = await openSheetByUuid(player, actorUuid);
+   /** @type {{inputs: number, disabledInputs: number, tabs: string[]}} The limited viewer's controls. */
    const limited = await readControls(sheet);
    expect(limited.tabs, 'every tab shows to a limited viewer').toEqual([
       'Skills',

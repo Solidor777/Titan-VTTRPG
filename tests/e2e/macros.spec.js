@@ -89,6 +89,7 @@ test.afterAll(async () => {
  * @returns {Promise<string>} The subtype of the posted message.
  */
 async function runCheckMacro({ itemType, type, idMethod, name }, expectedType) {
+   /** @type {{macroId: string, slot: number}} The macro and the hotbar slot that holds it. */
    const { slot } = await createItemMacro(page, rollerUuid, itemIds[itemType], {
       name,
       type,
@@ -130,6 +131,7 @@ test('an Item Check macro identified by the Item\'s document id rolls the Item C
 });
 
 test('a sheet-toggle macro opens and then closes the Item\'s sheet', async () => {
+   /** @type {{macroId: string, slot: number}} The macro and the hotbar slot that holds it. */
    const { slot } = await createItemMacro(page, rollerUuid, itemIds.weapon, {
       name: 'E2E Macro Sheet Toggle',
       type: 'toggleDocumentSheet',
@@ -159,6 +161,7 @@ test('a sheet-toggle macro opens and then closes the Item\'s sheet', async () =>
 test('the Create Macro dialog names the attack of a weapon, and a cancelled dialog makes no macro', async () => {
    /** @type {number} The number of macros before the drop. */
    const before = await page.evaluate(() => game.macros.size);
+   /** @type {{dialog: import('@playwright/test').Locator, slot: number}} The open dialog and the slot it fills. */
    const { dialog, slot } = await openCreateMacroDialog(page, rollerUuid, itemIds.weapon);
 
    // The Attack select lists the attack by its label and position, as plain text and not a localization key.

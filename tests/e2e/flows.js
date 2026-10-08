@@ -2192,6 +2192,7 @@ export async function openCreateMacroDialog(page, actorUuid, itemId) {
  * @returns {Promise<{macroId: string, slot: number}>} The macro and the hotbar slot that holds it.
  */
 export async function createItemMacro(page, actorUuid, itemId, { name, type, idMethod } = {}) {
+   /** @type {{dialog: import('@playwright/test').Locator, slot: number}} The open dialog and the slot it fills. */
    const { dialog, slot } = await openCreateMacroDialog(page, actorUuid, itemId);
 
    /**

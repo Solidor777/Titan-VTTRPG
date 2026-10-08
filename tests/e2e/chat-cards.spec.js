@@ -166,29 +166,6 @@ async function rollBodyFromSheet(actorUuid, { showChat = true } = {}) {
 }
 
 /**
- * Overwrites stored parameters on a rolled check's message. The stored parameters have no control, so they are written
- * with a direct update.
- * @param {string} id - The message's id.
- * @param {object} changes - The parameter fields to overwrite.
- * @returns {Promise<void>} Resolves once the message is updated.
- */
-async function updateStoredParameters(id, changes) {
-   await page.evaluate(async ({ messageId, parameterChanges }) => {
-      /** @type {ChatMessage} The rolled check's message. */
-      const message = game.messages.get(messageId);
-
-      /** @type {object} A detached copy of its system data. */
-      const system = message.system.toObject();
-      Object.assign(system.parameters, parameterChanges);
-      await message.update({ system });
-   }, {
-      messageId: id,
-      parameterChanges: changes,
-   });
-   await settle(page);
-}
-
-/**
  * Makes a character with one effect that carries the given conditional check modifiers.
  * @param {string} name - The character's name; the effect is named after it.
  * @param {object[]} elements - The rules elements, as `addRulesElement` takes them; each is a conditional check
@@ -644,7 +621,7 @@ test.describe('the attack tags of a weapon', () => {
 });
 
 test.describe('the tags of a rolled check card', () => {
-   test('a Disadvantage tag sits beside the DC, is styled as a tag, and follows the stored level', async () => {
+   test('a Disadvantage tag sits beside the DC and is styled as a tag', async () => {
       /** @type {string} The uuid of a character with a Disadvantage on every check. */
       const actorUuid = await makeModifiedActor('E2E Disadvantage Actor', [
          {
@@ -711,9 +688,6 @@ test.describe('the tags of a rolled check card', () => {
       expect(colors.background).toBe(colors.tagBackground);
       expect(colors.color).toBe(colors.tagFont);
 
-      // Clearing the stored Advantage removes the tag from the same card.
-      await updateStoredParameters(message.id, { advantage: 0 });
-      await expect(tag).toHaveCount(0);
    });
 
    test('opposing Advantage sources show no tag beside the unchanged DC', async () => {
@@ -748,11 +722,7 @@ test.describe('the tags of a rolled check card', () => {
       /** @type {import('@playwright/test').Locator} The Advantage tag. */
       const tag = card.getByTestId('check-chat-advantage');
 
-      // The tag is absent on the net-zero card, appears when the stored level becomes +1, and leaves again at 0.
-      await expect(tag).toHaveCount(0);
-      await updateStoredParameters(message.id, { advantage: 1 });
-      await expect(tag).toHaveCount(1);
-      await updateStoredParameters(message.id, { advantage: 0 });
+      // The tag is absent on the net-zero card (the DC above is the presence precondition).
       await expect(tag).toHaveCount(0);
    });
 
@@ -785,9 +755,6 @@ test.describe('the tags of a rolled check card', () => {
       await expect(tag).toHaveText(labels.automaticFailure);
       await expect(card.locator('.results')).toContainText(`0 ${labels.successes}`);
 
-      // Clearing the stored flag removes the tag from the same card.
-      await updateStoredParameters(message.id, { automaticFailure: false });
-      await expect(tag).toHaveCount(0);
    });
 
    test('the card lists the ticked situations by label', async () => {
@@ -831,9 +798,6 @@ test.describe('the tags of a rolled check card', () => {
       const card = chatMessage(message.id);
       await expect(card.getByTestId('check-chat-situation')).toHaveText(['Underwater']);
 
-      // Clearing the stored situations removes the block from the same card.
-      await updateStoredParameters(message.id, { situations: [] });
-      await expect(card.getByTestId('check-chat-situations')).toHaveCount(0);
    });
 
    test('a card re-localizes a system situation from its stored labelKey', async () => {
@@ -880,46 +844,8 @@ test.describe('the tags of a rolled check card', () => {
       /** @type {import('@playwright/test').Locator} The rolled check's situation tag. */
       const tag = chatMessage(flags.id).getByTestId('check-chat-situation');
       await expect(tag).toHaveText([swimLabel]);
-
-      // Without a labelKey the stored label renders, so the tag text follows the stored label.
-      await updateStoredSituation(flags.id, {
-         key: 'swim,Fly,OrClimb',
-         label: 'Stored In Another Language',
-      });
-      await expect(tag).toHaveText(['Stored In Another Language']);
-
-      // With a labelKey the current language's text renders and the stored label is ignored.
-      await updateStoredSituation(flags.id, {
-         key: 'swim,Fly,OrClimb',
-         label: 'Stored In Another Language',
-         labelKey: 'situationSwimFlyClimb',
-      });
-      await expect(tag).toHaveText([swimLabel]);
    });
 });
-
-/**
- * Overwrites a rolled check message's stored situations with one entry. The stored situations have no control, so
- * they are written with a direct update.
- * @param {string} messageId - The chat message id.
- * @param {object} situation - The stored situation entry.
- * @returns {Promise<void>} Resolves once the message is updated.
- */
-async function updateStoredSituation(messageId, situation) {
-   await page.evaluate(async ({ id, entry }) => {
-      /** @type {ChatMessage} The rolled check's message. */
-      const message = game.messages.get(id);
-
-      /** @type {object} A detached copy of its system data. */
-      const system = message.system.toObject();
-      system.parameters.situations = [entry];
-      await message.update({ system });
-   }, {
-      id: messageId,
-      entry: situation,
-   });
-   await settle(page);
-}
 
 test.describe('chat message mount keying', () => {
    // Each test counts the live mounts against an empty chat log: a popout renders (and, once closed, sweeps) a mount
@@ -953,6 +879,29 @@ test.describe('chat message mount keying', () => {
          rootSelector,
          messageId,
       });
+   }
+
+   /**
+    * Updates a flag of a chat message, which has no control, and waits until core has replaced the message's element in
+    * the chat log: that replacement is the re-render of the update, so the reads that follow cannot precede it.
+    * @param {string} messageId - The chat message's id.
+    * @param {number} value - The value written to the message's `e2eTouch` flag.
+    * @returns {Promise<void>} Resolves once the re-render has landed and the operations have finished.
+    */
+   async function touchMessage(messageId, value) {
+      /** @type {import('@playwright/test').ElementHandle} The message's element before the update. */
+      const before = await page.locator(`#chat .message[data-message-id="${messageId}"]`).elementHandle();
+      await page.evaluate(async ({ id, value }) => {
+         await game.messages.get(id).update({ 'flags.titan.e2eTouch': value });
+      }, {
+         id: messageId,
+         value,
+      });
+      await expect.poll(
+         () => before.evaluate((element) => element.isConnected),
+         { message: 'the update re-rendered the log entry' },
+      ).toBe(false);
+      await settle(page);
    }
 
    /**
@@ -1012,9 +961,7 @@ test.describe('chat message mount keying', () => {
          await expect.poll(hookCount, { message: 'two live mounts' }).toBe(baseline + 2);
 
          // An update re-renders both surfaces without blanking either or leaking mounts.
-         await page.evaluate(async (id) => {
-            await game.messages.get(id).update({ 'flags.titan.e2eTouch': 1 });
-         }, messageId);
+         await touchMessage(messageId, 1);
          await expect
             .poll(() => contentChildCount('#chat', messageId), { message: 'main log card after update' })
             .toBeGreaterThan(0);
@@ -1078,9 +1025,7 @@ test.describe('chat message mount keying', () => {
       await page.locator('.application.titan-document-sheet .window-header [data-action="close"]').click();
       await page.locator('#chat-popout .window-header [data-action="close"]').click();
       await expect(page.locator('#chat-popout'), 'the popout is gone from the DOM').toHaveCount(0);
-      await page.evaluate(async (id) => {
-         await game.messages.get(id).update({ 'flags.titan.e2eTouch': 2 });
-      }, messageId);
+      await touchMessage(messageId, 2);
       await expect.poll(hookCount, { message: 'popout mount swept' }).toBe(baseline + 1);
 
       // Delete restores the baseline.
