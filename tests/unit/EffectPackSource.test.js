@@ -1,6 +1,16 @@
 import { describe, it, expect } from 'vitest';
 import { readdirSync, readFileSync, statSync } from 'node:fs';
 import path from 'node:path';
+import { ATTRIBUTES } from '~/system/Attributes.js';
+import { RESISTANCES } from '~/system/Resistances.js';
+import { RATINGS } from '~/system/Ratings.js';
+import { RESOURCES } from '~/system/Resources.js';
+import { SPEEDS } from '~/system/Speeds.js';
+import { MODS } from '~/system/Mods.js';
+import {
+   CONDITIONAL_CHECK_MODIFIER_CHECK_TYPE_OPTIONS,
+   CONDITIONAL_CHECK_MODIFIER_TYPES,
+} from '~/system/ConditionalCheckModifierTypes.js';
 
 /** @type {string} The JSON source directory compiled into the shipped `titan.effects` compendium. */
 const SOURCE_DIR = path.resolve(__dirname, '../../packs/_source/effects');
@@ -8,7 +18,12 @@ const SOURCE_DIR = path.resolve(__dirname, '../../packs/_source/effects');
 /** @type {RegExp} Foundry document ids are sixteen alphanumeric characters. */
 const ID_PATTERN = /^[A-Za-z0-9]{16}$/;
 
-/** @type {string[]} The duration types `TitanActiveEffectDataModel` understands. */
+/**
+ * The duration types `TitanActiveEffectDataModel` understands. No exported source constant lists them: the effect
+ * sheet header holds its options in a component-local array, and `createEffectSystemTemplate()` holds only the
+ * initial type.
+ * @type {string[]}
+ */
 const DURATION_TYPES = [
    'turnStart',
    'turnEnd',
@@ -17,70 +32,47 @@ const DURATION_TYPES = [
    'custom',
 ];
 
+/** @type {string} The key a flat or set modifier uses to address every key under its selector. */
+const ALL_KEYS = 'all';
+
 /**
- * Stat vocabularies mirroring `CharacterDataModel._defineDocumentSchema()`; a seeded element that names a
- * key outside these applies to nothing at runtime.
+ * Stat vocabularies of the `flatModifier` and `setSum` selectors, derived from the system stat constants that
+ * `CharacterDataModel._defineDocumentSchema()` builds its stats from; a seeded element that names a key outside
+ * these applies to nothing at runtime.
  * @type {Object<string, string[]>}
  */
 const STAT_KEYS = {
    attribute: [
-      'body',
-      'mind',
-      'soul',
-      'all',
+      ...ATTRIBUTES,
+      ALL_KEYS,
    ],
    resistance: [
-      'reflexes',
-      'resilience',
-      'willpower',
-      'all',
+      ...RESISTANCES,
+      ALL_KEYS,
    ],
    rating: [
-      'awareness',
-      'defense',
-      'melee',
-      'accuracy',
-      'initiative',
-      'all',
+      ...RATINGS,
+      ALL_KEYS,
    ],
    resource: [
-      'stamina',
-      'resolve',
-      'wounds',
-      'all',
+      ...RESOURCES,
+      ALL_KEYS,
    ],
    speed: [
-      'stride',
-      'fly',
-      'climb',
-      'swim',
-      'burrow',
-      'all',
+      ...SPEEDS,
+      ALL_KEYS,
    ],
    mod: [
-      'armor',
-      'resolveRegain',
-      'woundRegain',
-      'all',
+      ...MODS,
+      ALL_KEYS,
    ],
 };
 
-/** @type {string[]} The `modifierType` values `ItemSheetConditionalCheckModifierSettings` offers. */
-const CHECK_MODIFIER_TYPES = [
-   'damage',
-   'dice',
-   'expertise',
-   'training',
-   'healing',
-];
+/** @type {readonly string[]} The `modifierType` values the conditional check modifier editor offers. */
+const CHECK_MODIFIER_TYPES = CONDITIONAL_CHECK_MODIFIER_TYPES;
 
-/** @type {string[]} The `checkType` values `ItemSheetConditionalCheckModifierSettings` offers. */
-const CHECK_TYPES = [
-   'any',
-   'attack',
-   'casting',
-   'item',
-];
+/** @type {string[]} The `checkType` values the conditional check modifier editor offers. */
+const CHECK_TYPES = CONDITIONAL_CHECK_MODIFIER_CHECK_TYPE_OPTIONS.map(({ value }) => value);
 
 /**
  * Reads every JSON document under the source directory, recursing into folder directories.
