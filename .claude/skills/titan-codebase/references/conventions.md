@@ -915,8 +915,7 @@ edge, look for a **happens-after edge**: an observable the code under test emits
 decision being asserted. `combat-turns.spec.js` wraps the character data model's `onTurnStart` in a call-through spy on
 a client and waits until the spy has seen the turn start return, because `onTurnStart` opens the sheet (or not) at its
 start, before its awaits — so the return proves the sheet's fate was already decided. Seeding an extra rules element
-purely as a synchronization signal is preferred over a bounded wait. Condition-polling `setInterval` canvas-readiness
-loops (`effect-tray.spec.js`) are NOT fixed sleeps and are fine.
+purely as a synchronization signal is preferred over a bounded wait.
 
 **E2E runner configuration (all optional; defaults reproduce historical behavior).**
 `npm run test:e2e` wraps `playwright test` in `tests/e2e/run-e2e-throttled.ps1`, which throttles ITS OWN
@@ -1022,8 +1021,12 @@ button), `pickPortrait` (the
 sheet's portrait button opens Foundry's own file picker, the Core Data tab is chosen when it is not the open one (the
 picker of a player actor opened on the User Data tab: `.superpowers/sdd/test-suite-rewrite/phase-2/review-measure-1.log`, `actor picker tabs`),
 the directory is typed into the address bar and the file is clicked and confirmed; nothing is stubbed),
-`createTrayEffect` (the Effect Tray's sidebar tab button and create button in an unlocked effect pack, the effect renamed in the sheet the
-create opens), `createScene` / `viewScene` / `activateScene` (Scenes tab, entry context menu View/Activate; core
+`openTrayPack` (the Effect Tray's sidebar tab button, then the pack chosen in its pack select; it waits for the stored
+`effectTrayLastPack` setting), `createTrayFolder` (the tray's Create Folder button, or an expanded folder's
+create-subfolder control for a subfolder, then the folder context menu's Rename Folder entry and Enter),
+`createTrayEffect` (the tray's create button, or a folder's create-effect control when given a `folderId`, in an
+unlocked effect pack; the effect is renamed in the sheet the create opens), `createScene` / `viewScene` /
+`activateScene` (Scenes tab, entry context menu View/Activate; core
 views a scene created while none is viewed, so `createScene` then waits for the draw, and `viewScene` skips the menu
 for a viewed scene), `placeToken` (drags the actor's directory entry onto a free spot near the centre of `#board`,
 which core handles as an Actor drop; the spots are a 7-column grid with 130 px spacing and a spot that already holds a
@@ -1200,13 +1203,12 @@ passed 20 of 20 each without their `settle` (`r4f-gate-disabled-clickRoll.log`,
 
 Invalid core or priority values are hard errors, never silent fallbacks to the default.
 
-**Fixture hygiene:** `controlFixtureActorToken` creates a fallback scene only when none is active and
-reuses a same-named one thereafter, so the world holds at most one scene per fallback name. It places the
-token only once `canvas.ready && canvas.scene?.id === scene.id`: a token created while a just-activated scene is
-still drawing gets an unparented placeable, and a later actor update throws in core's `RenderFlags.set` because
-`canvas.pendingRenderFlags` does not exist until the draw activates its ticker (measured; `docs/CLOSED_BUGS.md`
-#113). Killing a full-suite run mid-flight skips every `afterAll` and leaves its fixtures behind; accumulated
-fixtures show up as slow LOGIN (`Navigate to "/join"` and `game.ready`), not as slow tests.
+**Fixture hygiene:** a token placed while a just-activated scene is still drawing gets an unparented placeable, and a
+later actor update throws in core's `RenderFlags.set` because `canvas.pendingRenderFlags` does not exist until the draw
+activates its ticker (measured; `docs/CLOSED_BUGS.md` #113); `createScene`, `activateScene` and `viewScene` wait for the
+draw, and `placeToken` places on the viewed scene. Killing a full-suite run mid-flight skips the suite-end teardown;
+`global-setup.js` deletes what the next run finds on the running list, and accumulated fixtures show up as slow LOGIN
+(`Navigate to "/join"` and `game.ready`), not as slow tests.
 
 **The e2e viewport must stay at or above Foundry's 1366x768 minimum** (`use.viewport` is 1920x1080).
 Below it, Foundry raises a permanent resolution notification whose `#notifications` banner spans the
@@ -1357,6 +1359,36 @@ the source) or inferred:
 - With the inverted `_onDropFolder` an Actor folder dropped on an actor sheet created no item and the harness failed the
   test on a core `preCreateDocumentArray` validation error (`actor-folder-old-code.log`), so the Actor folder step of
   the folder test fails on the old code as well as the Item folder step.
+
+**E2E effect tray and compendium spreadsheet specs (`effect-tray`, `compendium-spreadsheet`)** — notes; each says
+whether it was measured (with its saved log, under `.superpowers/sdd/test-suite-rewrite/phase-6/`, local), read (with
+the source) or inferred:
+- `effect-tray.spec.js` makes every pack in the Compendium tab (`createCompendium`, type `ActiveEffect`) and every
+  folder and effect with the tray's own controls (`createTrayFolder`, `createTrayEffect`). A test that changes a pack
+  makes its own; the read-only tests share the `trayPack` fixture, or the nested pack (a parent folder, a child folder
+  with an effect, a root effect) that the `beforeAll` of their describe builds. A failure restarts the worker and runs
+  that hook again, and the second run's duplicate pack label fails it (measured for the spreadsheet source pack in
+  `sheet-1.log`; the tray's nested pack has the same shape and was not run that way). Folders and effects are recorded
+  with their pack and go with it at teardown. The Apply tests place a per-test actor's token on the shared scene and
+  control it (`createActor`, `placeToken`, `controlPlacedToken`); the stash tests drag the grip
+  (`[data-drag-handle]`) of an effect row in an actor sheet onto a tray folder header or the empty list; the rollable
+  table that core's Create Rollable Table folder action makes is recorded by the test (`record`). The row counts of
+  the shipped `titan.effects` pack come from its index and folders.
+- `compendium-spreadsheet.spec.js` imports `decodeSpreadsheetFiles`, `encodeCsv` and `zipFiles` from
+  `src/spreadsheet/format/` through the `~/` alias (measured: the spec's runs resolve it; that Playwright reads the
+  `paths` entry of `jsconfig.json` is inferred). A file is the Export dialog's CSV zip, decoded to sheets in Node,
+  edited the way a user edits a spreadsheet (a cell set, rows or a column deleted), encoded again and handed to the
+  dialog's file input as an in-memory buffer. The source pack holds an actor with a weapon and two effects
+  (`createActor`, `createOwnedItem`, `addEffect`, `putInPack`) and a second actor. No sheet creates an effect on an
+  owned item, so the file's item-effect row names the weapon in its `_parentId` cell, and the import creates the
+  depth-2 effect. Import behaviour read from `PlanImport.js` and `ApplyImport.js`: a row with a blank `_parentId` cell
+  whose id is no top-level pack document is looked up in the pack's embedded index, which is how a file with only the
+  edited weapon or effect row updates it; a row whose `_parentId` names a document that is not top-level and not in
+  the file is planned as a create (`resolveExistingDocument` finds no parent). A row that names a parent that exists
+  nowhere is therefore refused with the create branch's message, `Cannot create <class> documents under parent
+  "<id>"` (measured: with that message changed, both refusal tests fail, `mutations/A-M6a-item-parent.log` and
+  `mutations/A-M6a-update-parent.log`). Inferred from reading both files, not exercised: `ApplyImport`'s `Cannot update`
+  branch has no path from the dialog, because a plan holds an update only when its parent resolved.
 
 **E2E browser-zoom emulation** — the browser zoom tests of `character-sheet-layout.spec.js` emulate page zoom
 z through a CDP session:

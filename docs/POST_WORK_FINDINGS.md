@@ -186,7 +186,8 @@ it ever bites in play, the principled fix is a per-message serial queue around
   and returns the id for cleanup, but only ONE of its ten callers ever deleted it. The world had
   accumulated **26 duplicate `E2E Player HUD Scene`** entries plus ~30 orphaned timestamped fixture
   actors (`E2E ApplyFH 1780636195030` and similar). The helper now reuses and re-activates a
-  same-named fallback, so at most one exists per name; the existing duplicates were purged.
+  same-named fallback, so at most one exists per name; the existing duplicates were purged. (The helper was deleted
+  in Phase 6 of the test-suite rewrite; the specs make scenes, actors and tokens through the registry's flows.)
 - **World bloat shows up as slow LOGIN, not slow tests.** At 31 scenes / 71 actors a full run
   reported `Navigate to "/join"` at 4062ms and `game.ready` at 1865ms. After the purge (5 scenes /
   41 actors) the same suite reported **`Slow operations (> 1000ms): none`** — the first run with

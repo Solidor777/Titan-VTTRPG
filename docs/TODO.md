@@ -100,19 +100,6 @@ Completed items are deleted, not marked done.
   instruction of 2026-10-07 (backup `combats-backup-2026-10-08T03-10-48-197Z.json` in the same directory); the world
   holds no combat, and the census still has no Combat class.
 
-- Drive the test-teardown sweep to zero. After Phase 5 Part B the full run sweeps 0 scenes, 2 actors and 1 pack
-  (`.superpowers/sdd/test-suite-rewrite/phase-5/b/e2e-full-b2.log`), and only `effect-tray.spec.js` leaves documents
-  when run alone: 1 scene, 2 actors and 1 pack (each of the 39 spec files run alone, `leak-bisect-b.log` and
-  `leak-bisect-b-summary.txt`). The scene difference between the full run and the isolated runs is inferred to come
-  from one mechanism; what was measured is the helper's behavior and one pair of runs:
-  `controlFixtureActorToken` (`tests/e2e/world.js`) reuses the active scene and creates a fallback scene only when none
-  is active. Two scratch specs that call it (`zz-sweep-a.spec.js.txt`, `zz-sweep-b.spec.js.txt`) leave 1 scene each when
-  run alone and 1 scene in all when run together (`sweep-mechanism-a.log`, `-b.log`, `-ab.log`); `effect-tray.spec.js`
-  run after `combat-turns.spec.js` leaves 0 scenes
-  (`sweep-mechanism-turns-tray.log`). The earlier sum of 6 isolated scenes against 1 in the full run
-  (`phase-5/leak-bisect.log`) came from specs that are now deleted; attributing the full-run count to this mechanism
-  is inferred, not re-run. Phase 6 converts `effect-tray.spec.js`; the sweep count must be zero when it is converted.
-
 - Remove or sync `.agents/skills/titan-codebase/`, a tracked copy of `.claude/skills/titan-codebase/` that differs in every
   reference file (last touched by commit `5526adee`). Measured 2026-10-02: no file in the repo, script or config reads
   it (`grep -rn "\.agents"` finds only the note in `docs/POST_WORK_FINDINGS.md`); whether an external agent tool reads

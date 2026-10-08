@@ -493,8 +493,13 @@ when fixed.
 - **Fix:** the setting is now `effectTrayCollapsedFolders` (pack collection id → COLLAPSED folder ids).
   Every refresh derives `expandedFolders` as the pack's current folders minus that set, so absence means
   expanded; `toggleFolder` persists the current folders absent from the reactive set, which drops deleted
-  ids. `effect-tray.spec.js` creates a folder after a collapse was saved for the pack and asserts it renders
-  expanded while the stored entry lists only the collapsed id.
+  ids.
+- **Superseded:** the #63 rewrite (2026-09-27) replaced the saved list with an in-memory set of expanded folders
+  (`expandedFolders` in `EffectTrayState.svelte.js`; read: no file in `src` mentions `effectTrayCollapsedFolders`), so
+  no saved list can omit a new folder, and every folder starts collapsed. No test of the saved-list shape exists
+  because the shape does not. `effect-tray.spec.js` asserts the current rule in 'nested folders render inside their
+  parent folder, not at the top level' and 'collapsing a folder collapses its subfolders': folders are collapsed after
+  Collapse All and reopen with their subfolders collapsed.
 
 ### 40. The system failed to build on case-sensitive filesystems (miscased import)
 
@@ -684,7 +689,10 @@ when fixed.
 - **What:** the frameless sidebar tab root had no height bound, so the list grew to its content height and the sidebar
   clipped it.
 - **Fixed:** 2026-09-26 — the tab root clips like core directories and the tray is a `min-height: 0` flex child. Gated
-  by `effect-tray.spec.js`.
+  by `effect-tray.spec.js` 'the tray list scrolls so its last row can be brought fully into view': at 1366x768 the
+  shipped pack's rows overflow the list, the list stays inside the sidebar, and scrolling to the end shows the last
+  row. With `min-height: 0; overflow: hidden` in `EffectTray.svelte` replaced by `overflow: visible` the test fails at
+  its bounded-scroll-container assertion (`.superpowers/sdd/test-suite-rewrite/phase-6/mutations/A-T4-scroll.log`).
 
 ### 54. Sheet content links unreadable in dark themes
 
@@ -768,15 +776,23 @@ when fixed.
   Effects (Sacred Arts → path → Abilities/Apex) showed a dozen indistinguishable "Abilities N" rows (the user-reported
   "Abilitises" categories). Its look also differed from the core directories.
 - **Fixed:** 2026-09-27 — the tray mirrors the pack's core folder tree (`pack.tree`) in core directory markup styled by
-  core CSS, with core collapse, search, and sort behaviour. Gated by `effect-tray.spec.js` (nesting, collapse, search,
-  computed-style parity with the Items tab) and `FilterEffectTree.test.js`.
+  core CSS, with core collapse, search, and sort behaviour. Gated by `effect-tray.spec.js`, in its describe 'the folder
+  tree of a nested pack': 'nested folders render inside their parent folder, not at the top level', 'collapsing a
+  folder collapses its subfolders', 'searching shows matching effects inside their expanded folders' and 'tray folders
+  and entries match the core Items sidebar tab styles' (computed-style parity with the Items tab), and by
+  `FilterEffectTree.test.js`. With the render of a folder's child folders removed from `EffectTrayList.svelte`, the
+  describe's `beforeAll` cannot rename the child folder it creates, and the describe fails there before its test bodies
+  run (`.superpowers/sdd/test-suite-rewrite/phase-6/mutations/F-T5-nested.log`).
 
 ### 64. Move-to-Folder dialog showed localization keys for folder names
 
 - **What:** the dialog passed folder names (and the already-localized root label) to the TITAN `Select` as plain
   strings, which it runs through TITAN localization, so they displayed as `LOCAL.<name>.text`.
 - **Fixed:** 2026-09-27 — folder names pass as `{ text, localize: false }` and the root label as its key. Gated by
-  `effect-tray.spec.js` ("the move-to-folder dialog lists nested folders…").
+  `effect-tray.spec.js` 'the move-to-folder dialog lists nested folders by name under their parents'. With
+  `localize: false` changed to `localize: true` in `MoveEffectToFolderDialog.js` the test fails at the option list,
+  which holds `LOCAL.E2E Parent Folder.text`
+  (`.superpowers/sdd/test-suite-rewrite/phase-6/mutations/E-T3-move-dialog.log`).
 
 ### 65. Character `mod.damage` and `mod.healing` were never applied
 
@@ -800,8 +816,10 @@ when fixed.
   failed.
 - **Found:** 2026-09-27 while bringing the tray's folders to parity with core's compendium directory.
 - **Fixed:** 2026-09-27 — the control is gated on `trayState.maxFolderDepth` (`pack.maxFolderDepth`), as core's folder
-  partial gates it on the collection's `maxFolderDepth`. Gated by `effect-tray.spec.js` ("folder nesting stops at the
-  pack folder depth limit").
+  partial gates it on the collection's `maxFolderDepth`. Gated by `effect-tray.spec.js` 'folder nesting stops at the
+  pack folder depth limit'. With the gate replaced by `true` in `EffectTrayList.svelte` the test fails at the depth-3
+  folder's create-subfolder control (expected 0, received 1;
+  `.superpowers/sdd/test-suite-rewrite/phase-6/mutations/E-T1-depth.log`).
 
 ### 67. An open Item Check dialog kept rolling its source after the item or effect was deleted
 
@@ -1384,7 +1402,12 @@ The evidence files named here are in `.superpowers/sdd/test-suite-rewrite/phase-
       `fix5c-mut112-throw-at-end-on-gm2-shared-harness.log`; script `fix5-mutate-e2e.mjs`, restore record
       `fix5c-mutate.out`). Before hook errors were collected, both runs passed
       (`fix5b-mut112-throw-at-end-on-gm1-before-test-fix.log`, `fix5b-mut112-throw-at-end-on-gm2-before-test-fix.log`).
-  - The test moves with the `effect-tray` rewrite (test-suite rewrite Phase 6).
+  - The test was rewritten in Phase 6 of the test-suite rewrite: the pack is made with the `createCompendium` flow
+    (the Compendium tab's Create dialog) and deleted through the directory's context menu and confirmation, on E2E
+    GM 1, with E2E GM 2 as the second client. With the `renderCompendiumDirectory` registration removed from
+    `EffectTrayState.svelte.js` it fails at 'the tray offers the pack' (expected 1 option, received 0;
+    `.superpowers/sdd/test-suite-rewrite/phase-6/mutations/D-T2-multi-client.log`). The throw-at-the-end mutation above
+    was run on the earlier version of the test and not on the rewritten one.
 
 ### 113. `condition-description.spec.js` failed when no scene was active at its start
 
@@ -1416,16 +1439,16 @@ The evidence files named here are in `.superpowers/sdd/test-suite-rewrite/phase-
   - Gated by `tests/e2e/condition-description.spec.js` 'with no scene active, the fixture token is placed on a fully
     drawn fallback scene' (its last test). That spec is replaced by the last test of `tests/e2e/combat-turns.spec.js`,
     'with no scene active, a token placed on a new scene is on a fully drawn canvas', which makes the scene and the
-    token through the `createScene` and `placeToken` flows and not through `controlFixtureActorToken`; the helper's
-    only importer is now `effect-tray.spec.js` (read: grep). The old test established and asserted its own
-    precondition, and the new one does the same:
+    token through the `createScene` and `placeToken` flows and not through `controlFixtureActorToken`; the helper was
+    deleted in Phase 6 of the test-suite rewrite, once `effect-tray.spec.js` (its last importer, read: grep) moved to
+    the flows. The old test established and asserted its own precondition, and the new one does the same:
     - it waits until no scrolling text animates (OPEN_BUGS #114), clears the active flag of the active test scene
       (a direct update: no control deactivates a scene) and reloads;
     - it asserts that no scene is active or drawn.
-  - The test then:
-    - calls `controlFixtureActorToken` with a new fallback name;
-    - asserts the token sits on the drawn scene's token layer;
-    - applies Deafened through the token HUD, with no page error.
+  - The old test then:
+    - called `controlFixtureActorToken` with a new fallback name;
+    - asserted the token sat on the drawn scene's token layer;
+    - applied Deafened through the token HUD, with no page error.
   - Measured with the helper's canvas-ready wait removed (`fix5-mut113-no-canvas-ready-wait.log`): the test fails. Its
     placement check finds no token placeable for the actor (`TypeError: Cannot read properties of undefined (reading
     'center')`), the page logs the `addChild` error, and the file's teardown hits the `'OBJECTS'` TypeError in
