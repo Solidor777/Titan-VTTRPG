@@ -432,12 +432,17 @@ reaches the Adventure packs reads their `actors`/`scenes` whole on every Prompt 
 again with the `scenes` for the tokens' base actors (no projection narrows inline data; the cost is recorded in
 `docs/POST_WORK_FINDINGS.md`).
 
-**Base-type Active Effects are not handled.** `OnceInit` registers only the `effect` and `condition` Active Effect
-types (`CONFIG.ActiveEffect.dataModels`, replacing core's `base`), so the client cannot construct a base-type effect:
-creating one silently creates nothing, a world actor holding one stops the world from loading, and a packed one loads
-as an invalid document that cannot be deleted (OPEN_BUGS #92). By user decision the migration has no code for them
-(stale "mirror" copies of legacy effect Items and pre-subtype base-type conditions are removed from the user's worlds
-by a one-off cleanup outside the code), and no test seeds one.
+**Base-type Active Effects are stored and ignored.** `OnceInit` registers core's `foundry.data.ActiveEffectTypeDataModel`
+for `base` beside `effect` and `condition` (`CONFIG.ActiveEffect.dataModels`), so a module's or another system's `base`
+effect loads and persists on actors, owned items and unlinked tokens, and core applies its native `changes`. TITAN
+never reads one: every rules, duration, condition, turn-report, sheet-list, tray and migration reader selects the
+`effect` or `condition` subtype before it reads a TITAN field, including the Player HUD's action menu and effects-panel
+visibility. A `base` effect has no TITAN sheet (the sheets are registered for `effect` and `condition` only), so core's
+`ActiveEffectConfig` opens for it, from a user pack's Effect Tray row or by script. A new reader of
+`actor.effects` must test `effect.type` first: a `base` system has none of TITAN's fields, and `getRollData`, which
+`TitanActiveEffect#getRollData` calls on the system, is defined by `TitanDataModelMixin` and not by core's model. The migration
+has no code for them (stale "mirror" copies of legacy effect Items and pre-subtype base-type conditions were removed
+from the user's worlds by a one-off cleanup outside the code). Test: `tests/e2e/base-effect.spec.js`.
 
 **Stored actors — `walkStoredActorSources(failures)`**
 An async generator yielding one `StoredActorSource`

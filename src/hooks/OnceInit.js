@@ -139,7 +139,10 @@ export default function onceInit() {
 
    // Configure Active Effects.
    CONFIG.ActiveEffect.documentClass = TitanActiveEffect;
+   // Core's `base` model stays registered so a module's or another system's `base` effect loads and persists. TITAN
+   // stores it and never reads it: every TITAN reader of effects selects the `effect` or `condition` subtype.
    CONFIG.ActiveEffect.dataModels = {
+      base: foundry.data.ActiveEffectTypeDataModel,
       effect: TitanActiveEffectDataModel,
       condition: ConditionDataModel,
    };

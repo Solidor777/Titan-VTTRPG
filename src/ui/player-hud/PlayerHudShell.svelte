@@ -44,9 +44,11 @@
    /** @type {boolean} Action menu visibility (single or group). */
    const actionMenuVisible = $derived(elementVisible('actionMenu'));
 
-   /** @type {boolean} Effects panel visibility (single character with at least one effect). */
+   /** @type {boolean} Effects panel visibility (single character with at least one `effect` or `condition` effect). */
    const effectsPanelVisible = $derived(
-      single && elementVisible('effectsPanel') && (documentStore.data.effects?.size ?? 0) > 0,
+      single && elementVisible('effectsPanel') && (documentStore.data.effects?.some(
+         (effect) => effect.type === 'effect' || effect.type === 'condition',
+      ) ?? false),
    );
 
    /** @type {string} The action menu's minimize-chip corner, kept on the stable (non-expanding) side. */

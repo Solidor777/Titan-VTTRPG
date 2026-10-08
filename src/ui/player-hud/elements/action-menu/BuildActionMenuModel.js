@@ -347,13 +347,15 @@ function buildCheckItemCategory(primary, options, type) {
 }
 
 /**
- * Builds the effects category from the primary actor's active effects.
+ * Builds the effects category from the primary actor's `effect` and `condition` Active Effects; an Active Effect of
+ * any other type (core's `base`, stored for third parties) has no TITAN data and is left out.
  * @param {object} primary - The primary actor.
  * @param {object} options - The actionMenu options.
  * @returns {Array<object>} The effect sub-options.
  */
 function buildEffects(primary, options) {
    return Array.from(primary.effects)
+      .filter((effect) => effect.type === 'effect' || effect.type === 'condition')
       .filter((effect) => !options.filters.effectsWithChecks || (effect.system?.check?.length ?? 0) > 0)
       .map((effect) => {
          /** @type {boolean} Whether this is a full effect (conditions carry no duration/chat card). */

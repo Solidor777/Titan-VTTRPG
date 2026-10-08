@@ -1,0 +1,429 @@
+import { expect, test } from './harness.js';
+import { clickSheetTab } from './actions.js';
+import { login, openSheetByUuid } from './fixtures.js';
+import {
+   addEffect,
+   controlPlacedToken,
+   createActor,
+   createCompendium,
+   createOwnedItem,
+   createScene,
+   openTrayPack,
+   placeToken,
+   readServerDocument,
+   unlinkPlacedToken,
+   viewScene,
+} from './flows.js';
+import { setClientSetting } from './settings.js';
+import { attachPageErrors, closeAllApps, reloadWorld } from './world.js';
+
+/**
+ * A third party's `base` Active Effect (core's own type) on a TITAN actor, an item, a token and a pack: TITAN
+ * stores it, loads it after a reload and never uses it, while core applies its native `changes`.
+ *
+ * EXCEPTION to "documents come from real flows": a `base` effect has no TITAN creation control (TITAN offers only the
+ * `effect` and `condition` subtypes), so each one is created through the document API as a module would create it
+ * (invalid-data / module-made data), with a name and the type only, as a module's minimal call has it. Everything it
+ * sits on is made through flows: the scene, the actors, the token, the owned ability, the effect pack and the TITAN
+ * `effect` that proves the lists render other effects. Every edit after the creation goes through a control (the Add
+ * change button and the form of core's Active Effect Config sheet, the HUD's row delete button), except the deletion of
+ * a base effect, which has no control.
+ */
+
+/** @type {import('@playwright/test').Page} The file-shared, logged-in page (one world boot per file). */
+let page;
+/** @type {string[]} Uncaught page errors collected during the current test (cleared each afterEach). */
+let errors;
+/** @type {string} The scene the tokens stand on. */
+let sceneId;
+/** @type {Record<string, string>} The ids of the actors, by `main`, `hud` and `token`. */
+const actorIds = {};
+/** @type {Record<string, string>} The ids of the placed tokens, by `main`, `hud` and `token`. */
+const tokenIds = {};
+/** @type {string} The TITAN effect on the main actor. */
+let markerId;
+/** @type {string} The base effect on the main actor. */
+let baseId;
+/** @type {string} The ability the main actor owns. */
+let abilityId;
+/** @type {string} The base effect on the ability. */
+let abilityBaseId;
+/** @type {string} The TITAN effect on the HUD actor. */
+let hudMarkerId;
+/** @type {string} The base effect on the HUD actor. */
+let hudBaseId;
+/** @type {string} The base effect on the unlinked token's synthetic actor. */
+let tokenBaseId;
+/** @type {string} The derived stats of the main actor before its base effects, as JSON. */
+let baselineDerived;
+/** @type {number} The main actor's Awareness rating before any native change. */
+let baselineAwareness;
+
+/** @type {number} The run stamp in every fixture name, so a worker restart that repeats the hook finds no duplicate. */
+const RUN = Date.now();
+
+/** @type {string} The name of the base effect on the main actor. */
+const BASE_NAME = `E2E Base Effect ${RUN}`;
+
+/** @type {string} The key a native change targets: a TITAN stat that core's change pipeline can reach. */
+const NATIVE_KEY = 'system.rating.awareness.mod.static';
+
+/**
+ * Selects an element of the Player HUD by its test id.
+ * @param {string} id - The test id.
+ * @returns {import('@playwright/test').Locator} The element.
+ */
+function hud(id) {
+   return page.locator(`[data-testid="${id}"]`);
+}
+
+/**
+ * Reads the derived stats of the main actor that rules elements and effects feed.
+ * @returns {Promise<string>} The stats as JSON.
+ */
+function readDerived() {
+   return page.evaluate((actorId) => {
+      /** @type {Actor} The main actor. */
+      const actor = game.actors.get(actorId);
+      return JSON.stringify({
+         rating: actor.system.rating,
+         attribute: actor.system.attribute,
+         resource: actor.system.resource,
+         resistance: actor.system.resistance,
+         speed: actor.system.speed,
+         skill: actor.system.skill,
+         mod: actor.system.mod,
+      });
+   }, actorIds.main);
+}
+
+/**
+ * Reads the main actor's Awareness rating.
+ * @returns {Promise<number>} The rating's value.
+ */
+function readAwareness() {
+   return page.evaluate((actorId) => game.actors.get(actorId).system.rating.awareness.value, actorIds.main);
+}
+
+/**
+ * Creates a `base` Active Effect on a document through the document API, as a module would.
+ * @param {string} parentUuid - The uuid of the actor or item that receives the effect.
+ * @param {string} name - The label the effect carries.
+ * @returns {Promise<string>} The new effect's id.
+ */
+function createBaseEffect(parentUuid, name) {
+   return page.evaluate(async ({ parentUuid, name }) => {
+      /** @type {foundry.abstract.Document} The actor or item. */
+      const parent = await fromUuid(parentUuid);
+
+      /** @type {ActiveEffect[]} The created effects. */
+      const created = await parent.createEmbeddedDocuments('ActiveEffect', [{
+         name,
+         type: 'base',
+      }]);
+      return created[0]?.id ?? '';
+   }, {
+      parentUuid,
+      name,
+   });
+}
+
+test.beforeAll(async ({ browser }) => {
+   page = await browser.newPage();
+   errors = attachPageErrors(page);
+   await login(page);
+
+   sceneId = await createScene(page, { name: `E2E Base Scene ${RUN}` });
+   await viewScene(page, sceneId);
+   actorIds.main = await createActor(page, {
+      name: `E2E Base Main ${RUN}`,
+      type: 'player',
+   });
+   actorIds.hud = await createActor(page, {
+      name: `E2E Base Hud ${RUN}`,
+      type: 'player',
+   });
+   actorIds.token = await createActor(page, {
+      name: `E2E Base Token ${RUN}`,
+      type: 'player',
+   });
+   for (const key of Object.keys(actorIds)) {
+      tokenIds[key] = await placeToken(page, actorIds[key]);
+   }
+   markerId = await addEffect(page, actorIds.main, `E2E Base Marker ${RUN}`);
+   hudMarkerId = await addEffect(page, actorIds.hud, `E2E Base Hud Marker ${RUN}`);
+   abilityId = await createOwnedItem(page, actorIds.main, 'ability', `E2E Base Ability ${RUN}`);
+   await closeAllApps(page);
+
+   baselineDerived = await readDerived();
+   baselineAwareness = await readAwareness();
+
+   // The module-made effects: on the actor, on its owned ability, on a second actor, and on an unlinked token's actor.
+   baseId = await createBaseEffect(`Actor.${actorIds.main}`, BASE_NAME);
+   abilityBaseId = await createBaseEffect(`Actor.${actorIds.main}.Item.${abilityId}`, `E2E Base Ability Effect ${RUN}`);
+   hudBaseId = await createBaseEffect(`Actor.${actorIds.hud}`, `E2E Base Hud Effect ${RUN}`);
+   await unlinkPlacedToken(page, tokenIds.token);
+   await closeAllApps(page);
+   tokenBaseId = await page.evaluate(async ({ sceneId, tokenId }) => {
+      /** @type {Actor} The token's synthetic actor. */
+      const actor = game.scenes.get(sceneId).tokens.get(tokenId).actor;
+      const created = await actor.createEmbeddedDocuments('ActiveEffect', [{
+         name: 'E2E Base Token Effect',
+         type: 'base',
+      }]);
+      return created[0]?.id ?? '';
+   }, {
+      sceneId,
+      tokenId: tokenIds.token,
+   });
+});
+
+test.afterEach(async () => {
+   await closeAllApps(page);
+   expect(errors, `uncaught page errors:\n${errors.join('\n')}`).toEqual([]);
+   errors.length = 0;
+});
+
+test.afterAll(async () => {
+   await page?.close();
+});
+
+test.describe('storage', () => {
+   test('every base effect was created, and the server holds each one as the base type', async () => {
+      for (const id of [
+         baseId,
+         hudBaseId,
+         tokenBaseId,
+         abilityBaseId,
+      ]) {
+         expect(id, 'the creation returned an effect id').not.toBe('');
+      }
+      expect((await readServerDocument(page, `Actor.${actorIds.main}.ActiveEffect.${baseId}`)).type).toBe('base');
+      expect(
+         (await readServerDocument(
+            page,
+            `Actor.${actorIds.main}.Item.${abilityId}.ActiveEffect.${abilityBaseId}`,
+         )).type,
+      ).toBe('base');
+      expect((await readServerDocument(page, `Actor.${actorIds.hud}.ActiveEffect.${hudBaseId}`)).type).toBe('base');
+   });
+
+   test('the base effects load after a reload, with no invalid document', async () => {
+      await reloadWorld(page);
+      const state = await page.evaluate(({ actorIds, sceneId, tokenId, abilityId }) => {
+         /** @type {Actor} The main actor. */
+         const main = game.actors.get(actorIds.main);
+
+         /** @type {Actor} The unlinked token's synthetic actor. */
+         const tokenActor = game.scenes.get(sceneId).tokens.get(tokenId).actor;
+         return {
+            mainTypes: main.effects.map((effect) => `${effect.type}:${effect.name}`).sort(),
+            mainInvalid: [...main.effects.invalidDocumentIds],
+            baseSystemClass: main.effects.find((effect) => effect.type === 'base').system.constructor.name,
+            abilityTypes: main.items.get(abilityId).effects.map((effect) => effect.type),
+            abilityInvalid: [...main.items.get(abilityId).effects.invalidDocumentIds],
+            hudTypes: game.actors.get(actorIds.hud).effects.map((effect) => effect.type).sort(),
+            tokenTypes: tokenActor.effects.map((effect) => effect.type),
+            tokenInvalid: [...tokenActor.effects.invalidDocumentIds],
+            ready: game.ready,
+         };
+      }, {
+         actorIds,
+         sceneId,
+         tokenId: tokenIds.token,
+         abilityId,
+      });
+      expect(state.ready).toBe(true);
+      expect(state.mainTypes).toEqual([
+         `base:${BASE_NAME}`,
+         `effect:E2E Base Marker ${RUN}`,
+      ]);
+      expect(state.mainInvalid).toEqual([]);
+      expect(state.baseSystemClass, 'the system of a base effect is core\'s model')
+         .toBe('ActiveEffectTypeDataModel');
+      expect(state.abilityTypes).toEqual(['base']);
+      expect(state.abilityInvalid).toEqual([]);
+      expect(state.hudTypes).toEqual([
+         'base',
+         'effect',
+      ]);
+      expect(state.tokenTypes).toEqual(['base']);
+      expect(state.tokenInvalid).toEqual([]);
+   });
+});
+
+test.describe('TITAN never uses a base effect', () => {
+   test('the derived stats are those of the actor without it', async () => {
+      expect(await readDerived()).toBe(baselineDerived);
+   });
+
+   test('the Effects tab lists the TITAN effect and not the base effect', async () => {
+      /** @type {import('@playwright/test').Locator} The main actor's sheet. */
+      const sheet = await openSheetByUuid(page, `Actor.${actorIds.main}`);
+      await clickSheetTab(sheet, 'Effects');
+      await expect(sheet.locator(`[data-effect-id="${markerId}"]`), 'the TITAN effect has a row').toBeVisible();
+      await expect(sheet.locator(`[data-effect-id="${baseId}"]`)).toHaveCount(0);
+      await expect(sheet.locator('li.effect')).toHaveCount(1);
+   });
+
+   test('the Player HUD lists the TITAN effect and not the base effect', async () => {
+      await viewScene(page, sceneId);
+      await controlPlacedToken(page, tokenIds.main);
+      await expect(hud('player-hud-effects-panel')).toBeVisible();
+      await expect(hud('player-hud-effect-row')).toHaveCount(1);
+      await expect(hud('player-hud-effect-row')).toContainText(`E2E Base Marker ${RUN}`);
+
+      // The menu lists only effects with checks by default; the filter is off so that an effect without a check shows.
+      await setClientSetting(page, 'playerHudOptions', { actionMenu: { filters: { effectsWithChecks: false } } });
+      try {
+         await hud('player-hud-category-effects').click();
+         await expect(hud(`player-hud-sub-option-effects-${markerId}`), 'the TITAN effect has a sub-option')
+            .toBeVisible();
+         await expect(hud(`player-hud-sub-option-effects-${baseId}`)).toHaveCount(0);
+         await expect(page.locator('[data-testid^="player-hud-sub-option-effects-"]')).toHaveCount(1);
+      }
+      finally {
+         await setClientSetting(page, 'playerHudOptions', {});
+      }
+   });
+
+   test('the Effects panel hides when only a base effect is left', async () => {
+      await viewScene(page, sceneId);
+      await controlPlacedToken(page, tokenIds.hud);
+      await expect(hud('player-hud-effects-panel'), 'the panel shows while a TITAN effect is there').toBeVisible();
+
+      // The HUD row's Delete control and its confirmation remove the TITAN effect.
+      /** @type {import('@playwright/test').Locator} The effect's row. */
+      const row = hud('player-hud-effect-row');
+      /** @type {import('@playwright/test').Locator} The header button of the collapsed row. */
+      const collapsed = row.getByRole('button', { name: /: Expand$/ });
+      if (await collapsed.count() > 0) {
+         await collapsed.click();
+      }
+      await expect(row.getByRole('button', { name: /: Collapse$/ }), 'the row is expanded').toBeVisible();
+      await row.locator('[data-testid="player-hud-effect-delete"]').click();
+      /** @type {import('@playwright/test').Locator} The confirmation dialog. */
+      const dialog = page.locator('.application.titan-dialog[id^="titan-confirmation-dialog"]');
+      await expect(dialog).toBeVisible();
+      await dialog.getByRole('button', { name: 'Delete Effect' }).click();
+      await expect.poll(
+         () => page.evaluate(
+            ({ actorId, effectId }) => game.actors.get(actorId).effects.has(effectId),
+            {
+               actorId: actorIds.hud,
+               effectId: hudMarkerId,
+            },
+         ),
+         { message: 'the TITAN effect is gone' },
+      ).toBe(false);
+      expect(
+         await page.evaluate(
+            ({ actorId, effectId }) => game.actors.get(actorId).effects.get(effectId)?.type,
+            {
+               actorId: actorIds.hud,
+               effectId: hudBaseId,
+            },
+         ),
+         'the base effect is still stored',
+      ).toBe('base');
+      await expect(hud('player-hud-effects-panel')).toHaveCount(0);
+   });
+});
+
+test.describe('the sheet of a base effect', () => {
+   test("the Effect Tray lists a pack's base effect and a click opens core's Active Effect Config", async () => {
+      /** @type {string} The new effect pack's collection id. */
+      const packId = await createCompendium(page, {
+         label: `E2E Base Pack ${RUN}`,
+         type: 'ActiveEffect',
+      });
+      await page.evaluate(async ({ packId, name }) => {
+         await ActiveEffect.create({
+            name,
+            type: 'base',
+         }, { pack: packId });
+      }, {
+         packId,
+         name: `E2E Base Pack Effect ${RUN}`,
+      });
+      await openTrayPack(page, packId);
+
+      /** @type {import('@playwright/test').Locator} The tray row of the base effect. */
+      const row = page.locator('[data-testid="effect-tray-row"]', { hasText: `E2E Base Pack Effect ${RUN}` });
+      await expect(row).toBeVisible();
+      await row.click();
+
+      /** @type {import('@playwright/test').Locator} The sheet the click opened. */
+      const config = page.locator('.application.active-effect-config');
+      await expect(config).toBeVisible();
+      await expect(config.locator('[name="name"]')).toHaveValue(`E2E Base Pack Effect ${RUN}`);
+      await expect(page.locator('.application.titan-document-sheet')).toHaveCount(0);
+   });
+
+   test('an actor\'s base effect opens core\'s Active Effect Config', async () => {
+      await page.evaluate(async ({ actorId, effectId }) => {
+         await game.actors.get(actorId).effects.get(effectId).sheet.render({ force: true });
+      }, {
+         actorId: actorIds.main,
+         effectId: baseId,
+      });
+
+      /** @type {import('@playwright/test').Locator} The sheet. */
+      const config = page.locator('.application.active-effect-config');
+      await expect(config).toBeVisible();
+      await expect(config.locator('[name="name"]')).toHaveValue(BASE_NAME);
+      await expect(page.locator('.application.titan-document-sheet')).toHaveCount(0);
+   });
+});
+
+test.describe('core applies its native changes', () => {
+   test('a change entered in the config sheet applies to a TITAN stat until the effect is deleted', async () => {
+      await page.evaluate(async ({ actorId, effectId }) => {
+         /** @type {foundry.applications.sheets.ActiveEffectConfig} The config sheet. */
+         const sheet = new foundry.applications.sheets.ActiveEffectConfig({
+            document: game.actors.get(actorId).effects.get(effectId),
+         });
+         await sheet.render({ force: true });
+         await sheet.changeTab('changes', 'sheet');
+      }, {
+         actorId: actorIds.main,
+         effectId: baseId,
+      });
+
+      /** @type {import('@playwright/test').Locator} The config sheet. */
+      const config = page.locator('.application.active-effect-config');
+      await expect(config).toBeVisible();
+      await config.locator('[data-action="addChange"]').click();
+      await expect(config.locator('ol[data-changes] li')).toHaveCount(1);
+      await config.locator('[name="system.changes.0.key"]').fill(NATIVE_KEY);
+      await config.locator('[name="system.changes.0.value"]').fill('3');
+      await config.locator('button[type="submit"]').click();
+
+      await expect.poll(readAwareness, { message: 'core applied the change to Awareness' })
+         .toBe(baselineAwareness + 3);
+      expect(
+         (await readServerDocument(page, `Actor.${actorIds.main}.ActiveEffect.${baseId}`)).system.changes[0].key,
+         'the server holds the change',
+      ).toBe(NATIVE_KEY);
+
+      // A base effect has no deletion control, so the document API deletes it.
+      await page.evaluate(
+         ({ actorId, effectId }) => game.actors.get(actorId).effects.get(effectId).delete(),
+         {
+            actorId: actorIds.main,
+            effectId: baseId,
+         },
+      );
+      await expect.poll(readAwareness, { message: 'the deleted effect no longer applies' }).toBe(baselineAwareness);
+      expect(
+         await page.evaluate(
+            ({ actorId, effectId }) => game.actors.get(actorId).effects.has(effectId),
+            {
+               actorId: actorIds.main,
+               effectId: baseId,
+            },
+         ),
+         'the base effect is gone',
+      ).toBe(false);
+   });
+});

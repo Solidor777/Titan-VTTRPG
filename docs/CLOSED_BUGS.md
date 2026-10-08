@@ -2292,3 +2292,51 @@ The evidence files named here are in `.superpowers/sdd/test-suite-rewrite/phase-
   and `tests/unit/AppendUnique.test.js`. With the old assignment both fail (`mutations/M7-appendunique-run.log`,
   `mutations/M7-appendunique-unit.log`).
 - **Status:** Closed 2026-10-08.
+
+### 92. A world actor, token or pack holding a base-type Active Effect fails to load
+
+The evidence files named here are in `.superpowers/sdd/2026-09-29-conditions-rework/bug92-logs/` (local, not checked in)
+unless a path says otherwise.
+
+- **What:** TITAN set `CONFIG.ActiveEffect.dataModels` to `{ effect, condition }`, replacing core's
+  `{ base: ActiveEffectTypeDataModel }`. Measured earlier (2026-09-30, 2026-10-08, from the entry's former text):
+  `createEmbeddedDocuments` with a `base` effect and no `changes` stored nothing and raised `changes is not iterable`; a
+  world actor holding one stopped the world from loading; a packed actor holding one loaded it as an invalid document
+  that could not be deleted. A third-party module or another system therefore could not store a `base` effect on a TITAN
+  actor, item or token.
+- **Found:** 2026-09-30 by the Task 5 fix round (plan B). The existing local worlds and packs held no foreign Active
+  Effect (inventory 2026-10-08, `.superpowers/sdd/test-suite-rewrite/non-titan-effects/`).
+- **Decision (user, 2026-10-08):** register core's model for `base` permanently, so TITAN stores a `base` effect and
+  never uses it; core applies its native `changes`.
+- **Fixed:** 2026-10-08.
+  - `src/hooks/OnceInit.js` registers `base: foundry.data.ActiveEffectTypeDataModel` beside `effect` and `condition`.
+  - Audit of every TITAN read of effects: `bug92-audit.md` in the campaign folder
+    (`.superpowers/sdd/2026-09-29-conditions-rework/`). Every rules, duration, condition, turn-report, sheet-list, tray
+    and migration reader selects the `effect` or `condition` subtype before it reads a TITAN field. Two sites listed
+    every effect and are fixed: the Player HUD action menu's effects category (`BuildActionMenuModel.js` `buildEffects`;
+    its Send to chat button would call `TitanActiveEffect#getRollData`, which a `base` system does not define) and the
+    HUD's effects-panel visibility (`PlayerHudShell.svelte`; an actor holding only a `base` effect kept the panel
+    showing).
+  - The sheet needed no change. Measured (`probe-sheet.json`): the sheet of a `base` effect is core's
+    `ActiveEffectConfig`, it renders with the name, disabled, show-icon, duration and changes controls and raises no page
+    error. TITAN registers its own sheets for `types: ['effect']` and `['condition']` only (`OnceInit.js`).
+  - Measured with the registration (`specs-final.log`): a `base` effect made with a name and a type only is stored (the
+    server copy has type `base`), its `system` is `ActiveEffectTypeDataModel`, and `invalidDocumentIds` is empty on the
+    actor, on an owned ability and on an unlinked token's actor, including after a reload; the derived stats equal
+    those of the same actor before the effect existed; a native change to `system.rating.awareness.mod.static` (add 3,
+    entered in core's config sheet) raised Awareness by 3 and deleting the effect returned it. `probe-sheet.json`
+    (a `base` effect created with `system.changes: []`) read Awareness 1 and then 4.
+  - A `base` effect in a user (world or module) effect pack is listed by the Effect Tray (user packs show every subtype;
+    system packs show only `effect`, `EffectTrayState.svelte.js:227-229`) and a click on its row opens core's config
+    sheet.
+- **Gate:** `tests/e2e/base-effect.spec.js` (9 tests; module-made `base` effects created through the document API, the
+  rest through flows). The manifest drift guard (`tests/e2e/integration-manifest.spec.js`) compares the registered
+  Active Effect `dataModels` with the types `system.json` declares; it now leaves out core's `base` type, which no
+  manifest declares (`coreTypes`, `common/abstract/document.mjs:135`). Before that change it failed with `base` as the
+  one extra registered type (`e2e-full-1.log`). With the registration removed all 9 fail
+  (`mut1-no-registration.log`); with the two HUD fixes removed the HUD action-menu test and the effects-panel test
+  fail and the other 7 pass (`mut2-no-hud-fixes.log`). The full e2e run after the change passed 701 of 701 with the
+  sweep and census at 0 (`e2e-full-2.log`); unit tests passed 1553 of 1553 (`unit.log`).
+  Restored files were verified by sha256 (`sha-before.txt`, `sha-after-restore.txt`).
+- **Not exercised:** a native change on a `base` effect owned by an item; only the actor-level native change above is.
+- **Status:** Closed 2026-10-08.

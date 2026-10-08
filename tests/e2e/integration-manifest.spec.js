@@ -45,11 +45,14 @@ test.describe('integration manifest drift guard', () => {
          ChatMessage: Object.keys(manifest.documentTypes.ChatMessage ?? {}),
       };
 
-      // The registered dataModel keys per base document, read from the live CONFIG.
+      // The registered dataModel keys per base document, read from the live CONFIG. The Active Effect list leaves out
+      // core's own `base` type: a core type that no manifest declares (`coreTypes` in `common/abstract/document.mjs`),
+      // which the system registers so that a third party's `base` Active Effect is stored.
       const registered = await page.evaluate(() => ({
          Actor: Object.keys(CONFIG.Actor.dataModels ?? {}),
          Item: Object.keys(CONFIG.Item.dataModels ?? {}),
-         ActiveEffect: Object.keys(CONFIG.ActiveEffect.dataModels ?? {}),
+         ActiveEffect: Object.keys(CONFIG.ActiveEffect.dataModels ?? {})
+            .filter((type) => type !== CONST.BASE_DOCUMENT_TYPE),
          ChatMessage: Object.keys(CONFIG.ChatMessage.dataModels ?? {}),
       }));
 

@@ -2,50 +2,6 @@
 
 Deferred/known bugs. Todos (planned work) live in `docs/TODO.md`; this file is bugs only.
 
-### 92. A world actor, token or pack holding a base-type Active Effect fails to load
-
-- **What:** TITAN registers only the `effect` and `condition` Active Effect types.
-  `src/hooks/OnceInit.js` sets `CONFIG.ActiveEffect.dataModels` to `{ effect, condition }`, replacing core's
-  `{ base: ActiveEffectTypeDataModel }`, so the client cannot construct a base-type Active Effect (`changes is not
-  iterable` in core's `_shimChanges`). Measured live: `createEmbeddedDocuments` with a base-type effect creates
-  nothing and raises no error; a world actor holding one stops the world from loading (`game.ready` never set, page
-  error from `trackCollectionFailures`); a packed actor holding one loads with the effect in `invalidDocumentIds`, and
-  deleting that effect throws and leaves it stored.
-- **Found:** 2026-09-30 by the Task 5 fix round (plan B), measured live.
-- **Inventory, 2026-10-08 (measured):** zero Active Effects of a type other than `effect` or `condition` in `soresokai`
-  (offline read of a copy of its LevelDB; the world was not logged into), `test-titan` (client, raw `_source`, E2E GM
-  1), the system pack, the 11 compendium-module packs, the world pack, and the pack source JSON. Nothing was
-  converted or backed up because there was nothing to convert. Positive control: the same scanner with `effect`
-  counted as foreign returned 6 hits on `soresokai` actors, 2 on its scenes and 17 on the system pack. Logs:
-  `.superpowers/sdd/test-suite-rewrite/non-titan-effects/` (`inventory.json`, `inventory-offline.log`,
-  `inventory-test-titan-before.log`, `inventory-source-json.log`).
-- **Re-measured creation, 2026-10-08 (`probe-analysis.log`, `probe-drop.log`, one throwaway actor, deleted):**
-  - `createEmbeddedDocuments` and `ActiveEffect.create` with `{type: 'base'}` and no `changes` store nothing, resolve
-    empty, and raise an error notification and a hook error (`changes is not iterable`). The 2026-09-30 note that no
-    error is raised is wrong about the notification.
-  - A base effect that carries `changes` (top-level or `system.changes`, as any foreign export does) builds as a
-    `TitanActiveEffect` with a plain-object `system`, passes `fromDropData`, and reaches `preCreateActiveEffect`
-    (a veto hook stopped it there; nothing was stored). So the client would send it; that the server stores it, and
-    that the stored effect then stops the world loading, is inferred from the 2026-09-30 measurement, not re-run.
-- **Effect of the core-model inheritance, 2026-10-08 (`.superpowers/sdd/2026-10-01-test-suite-real-data/ae-mixin/`):**
-  `TitanActiveEffectDataModel` and `ConditionDataModel` now extend core's `ActiveEffectTypeDataModel` (through
-  `TitanDataModelMixin`) instead of redefining `changes`. `CONFIG.ActiveEffect.dataModels` still holds only `effect` and
-  `condition`, so a `base`-typed effect is still unconstructable and everything above is unchanged. What changed: an
-  `effect`/`condition` effect now stores core-valid `changes` as core defines them. Not lossless for legacy data: a
-  `mode`-only change put into `system.changes` is stored as core's initial `type: add` and its `mode` is dropped,
-  because core's mode-to-type migration runs only on top-level `changes` (measured, `ae-mixin/after.json`, step
-  `api.legacyModeOnly`; top-level `changes` with `mode: 5` on construction gives `type: override`,
-  `legacyTopLevelOnConstruct`).
-- **Registering core's model for `base`, measured 2026-10-08 (`ae-mixin/base-probe.mjs`, `base-probe.json`; page-only
-  runtime assignment `dataModels.base = foundry.data.ActiveEffectTypeDataModel`, one throwaway actor, deleted):** a base
-  effect with a core-valid change constructs with `ActiveEffectTypeDataModel` as its `system`, and
-  `createEmbeddedDocuments` stores it (type `base`) with no notification, no page error and empty `invalidDocumentIds`.
-  Not measured: reloading the world with one stored, TITAN's UI on a base effect, and the permanent `OnceInit`
-  registration. That registration is a separate decision and was not made.
-- **Status:** Open. Not handled in code by user decision 2026-09-30; the existing local worlds hold none (inventory
-  above). Fix options and the schema-compatibility analysis:
-  `.superpowers/sdd/2026-10-01-test-suite-real-data/non-titan-effects-report.md`.
-
 ### 102. Clearing expired effects on an unlinked token with no stored delta does not survive a reload
 
 - **Reported:** On an unlinked token, removing an Item the token inherits from its base actor did not persist across
