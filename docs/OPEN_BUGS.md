@@ -12,7 +12,24 @@ Deferred/known bugs. Todos (planned work) live in `docs/TODO.md`; this file is b
   error from `trackCollectionFailures`); a packed actor holding one loads with the effect in `invalidDocumentIds`, and
   deleting that effect throws and leaves it stored.
 - **Found:** 2026-09-30 by the Task 5 fix round (plan B), measured live.
-- **Status:** Not handled in code by user decision 2026-09-30 (local worlds cleaned one-off).
+- **Inventory, 2026-10-08 (measured):** zero Active Effects of a type other than `effect` or `condition` in `soresokai`
+  (offline read of a copy of its LevelDB; the world was not logged into), `test-titan` (client, raw `_source`, E2E GM
+  1), the system pack, the 11 compendium-module packs, the world pack, and the pack source JSON. Nothing was
+  converted or backed up because there was nothing to convert. Positive control: the same scanner with `effect`
+  counted as foreign returned 6 hits on `soresokai` actors, 2 on its scenes and 17 on the system pack. Logs:
+  `.superpowers/sdd/test-suite-rewrite/non-titan-effects/` (`inventory.json`, `inventory-offline.log`,
+  `inventory-test-titan-before.log`, `inventory-source-json.log`).
+- **Re-measured creation, 2026-10-08 (`probe-analysis.log`, `probe-drop.log`, one throwaway actor, deleted):**
+  - `createEmbeddedDocuments` and `ActiveEffect.create` with `{type: 'base'}` and no `changes` store nothing, resolve
+    empty, and raise an error notification and a hook error (`changes is not iterable`). The 2026-09-30 note that no
+    error is raised is wrong about the notification.
+  - A base effect that carries `changes` (top-level or `system.changes`, as any foreign export does) builds as a
+    `TitanActiveEffect` with a plain-object `system`, passes `fromDropData`, and reaches `preCreateActiveEffect`
+    (a veto hook stopped it there; nothing was stored). So the client would send it; that the server stores it, and
+    that the stored effect then stops the world loading, is inferred from the 2026-09-30 measurement, not re-run.
+- **Status:** Open. Not handled in code by user decision 2026-09-30; the existing local worlds hold none (inventory
+  above). Fix options and the schema-compatibility analysis:
+  `.superpowers/sdd/2026-10-01-test-suite-real-data/non-titan-effects-report.md`.
 
 ### 102. Clearing expired effects on an unlinked token with no stored delta does not survive a reload
 

@@ -277,3 +277,14 @@ active combat when a new one is activated and activates another when the active 
 instruction of 2026-10-07 it was deleted (the only combat in the world; backup
 `phase-5/b/combats-backup-2026-10-08T03-10-48-197Z.json`, `delete-old-combats.log`). The census now counts every
 combat and the sweep removes any (`phase-6/combat-census-probe.log`).
+
+### Foundry v14 world LevelDB: embedded documents live in their own sublevels, and a stopped world's database is readable (2026-10-08)
+
+Measured by reading a copy of `worlds/soresokai/data/*` with `classic-level` (scanner:
+`.superpowers/sdd/test-suite-rewrite/non-titan-effects/scan.mjs`). An actor's record holds only the ids of its effects
+(`effects: [id, ...]`); each effect's data is its own record under the sublevel `!actors.effects!<actorId>.<effectId>`,
+a token delta's under `!scenes.tokens.delta.effects!<sceneId>.<tokenId>.<actorId>.<effectId>`, and a deleted inherited
+effect is a `{_id, _tombstone: true}` record there. A scan that only walks an array of effect objects inside the parent
+record finds none. A world that is not the server's active world has no LevelDB lock and can be copied and read while the
+server runs; the active world's and every loaded package's pack databases hold `LOCK` (a `cp` of their directories fails
+only on that file, and the copy opens).
