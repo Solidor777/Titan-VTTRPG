@@ -393,6 +393,7 @@ test('importing into "New Compendium" creates a pack with the imported documents
    const exported = await exportPack('titan.effects', 'csv');
    /** @type {number} The number of documents the file holds. */
    const documentCount = rowCount(decodeExport(exported));
+   expect(documentCount, 'the exported file holds documents to create').toBeGreaterThan(0);
    await openImport(null);
    await page.locator('[data-testid="import-file-input"]').setInputFiles({
       name: exported.name,
@@ -740,7 +741,7 @@ test.describe('importing the pack of an actor with an item and effects', () => {
       expect(actor.effects.map((effect) => effect.name)).toEqual(['E2E Actor Effect']);
    });
 
-   test('a row of an item in the pack whose parent exists nowhere is refused with an error naming the parent id',
+   test('a row with the id of an item in the pack and a parent cell naming nothing is planned as a create and refused',
       async () => {
          /** @type {string} The populated pack's collection id. */
          const packId = await populatedPack('Unknown Update Parent');
@@ -752,11 +753,44 @@ test.describe('importing the pack of an actor with an item and effects', () => {
          const workbook = keepRows(graph, (sheet) => sheet === 'weapon');
          rowNamed(workbook, 'weapon', 'E2E Original Weapon')._parentId = unknownId;
          await openImport(packId);
-         await previewImport(zipOf(workbook));
+         await expect(await previewImport(zipOf(workbook))).toContainText(summaryText(1, 0, 0));
          await applyImportRefused(unknownId);
 
          expect((await readActor(packId, ids.actor)).items.map((item) => item.name)).toEqual(['E2E Original Weapon']);
       });
+
+   test('an update whose parent was deleted after the preview is refused, leaving the pack unchanged', async () => {
+      /** @type {string} The populated pack's collection id. */
+      const packId = await populatedPack('Stale Update Parent');
+
+      /** @type {import('~/spreadsheet/codec/Workbook.js').Workbook} The file with the weapon row only, parent blank. */
+      const workbook = keepRows(graph, (sheet) => sheet === 'weapon');
+      /** @type {{[column: string]: string}} The weapon row. */
+      const row = rowNamed(workbook, 'weapon', 'E2E Original Weapon');
+      row._parentId = '';
+      row.name = 'E2E Stale Weapon';
+
+      // The preview resolves the blank parent cell to the actor of the pack and plans an update of the weapon.
+      await openImport(packId);
+      await expect(await previewImport(zipOf(workbook))).toContainText(summaryText(0, 1, 0));
+
+      // The actor is deleted from the pack window while the dialog holds the plan.
+      await (await openSidebarTab(page, 'compendium'))
+         .locator(`.directory-item.compendium[data-pack="${packId}"] a.entry-name`).click();
+
+      /** @type {import('@playwright/test').Locator} The pack's window. */
+      const packWindow = page.locator(
+         `.application.compendium-directory[id="Compendium-${packId.replaceAll('.', '_')}"]`,
+      );
+      await packWindow.locator(`.directory-item.entry[data-entry-id="${ids.actor}"]`).click({ button: 'right' });
+      await chooseContextMenuEntry(page, page.locator('#context-menu .context-item', { hasText: 'Delete' }));
+      await page.locator('dialog.application.dialog button[data-action="yes"]').click();
+      await expect.poll(() => readPackIds(packId)).toEqual([]);
+
+      // The refused import writes nothing: the pack stays empty, with no weapon renamed or created anywhere.
+      await applyImportRefused(`Cannot update Item documents under parent "${ids.actor}"`);
+      expect(await readPackIds(packId)).toEqual([]);
+   });
 
    test('importing into a locked pack is refused, leaving the pack unchanged', async () => {
       /** @type {string} The populated pack's collection id. */

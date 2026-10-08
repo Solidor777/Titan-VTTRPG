@@ -380,7 +380,9 @@ const TOKEN_SPACING = 130;
  * windows are closed first: one over the canvas centre would take the drop. The spots form a grid of
  * `TOKEN_COLUMNS` by `TOKEN_SPACING` pixels, filled row by row from the centre; a spot with a token on it (whatever
  * order the scene's tokens were placed or deleted in) is skipped, because tokens dropped on one spot stack and the
- * pointer reaches only the topmost. Measured at a 1920 by 1080 viewport
+ * pointer reaches only the topmost. A spot that another element covers, such as a chat notification over the canvas, is
+ * skipped too: the pointer would wait for the cover to go (measured: a chat notification of the Send to Chat tests held
+ * the drop of `sheet-header.spec.js` for about 1.5 s, `e2e-full-9-chain.log`). Measured at a 1920 by 1080 viewport
  * (`.superpowers/sdd/test-suite-rewrite/phase-2/review-measure-2.log`): 34 tokens were placed, and the drop for the
  * 35th timed out (cause not determined).
  * @param {import('@playwright/test').Page} page - A logged-in GM page.
@@ -440,7 +442,12 @@ export async function placeToken(page, actorId) {
             break;
          }
          const point = onScene(candidate);
-         if (!centres.some((centre) => Math.hypot(centre.x - point.x, centre.y - point.y) < reach)) {
+
+         // A spot under another element (a chat notification, a window) is skipped: the drop takes effect only where
+         // the pointer reaches the canvas.
+         const topmost = document.elementFromPoint(outline.left + candidate.x, outline.top + candidate.y);
+         const reachesCanvas = topmost === board;
+         if (reachesCanvas && !centres.some((centre) => Math.hypot(centre.x - point.x, centre.y - point.y) < reach)) {
             return candidate;
          }
       }
@@ -1919,7 +1926,9 @@ export async function createTrayFolder(page, packId, name, { parentId } = {}) {
    const header = page.locator(`[data-testid="effect-tray-folder"][data-folder-id="${id}"]`)
       .locator(':scope > [data-testid="effect-tray-folder-header"]');
    await header.click({ button: 'right' });
-   await chooseContextMenuEntry(page, page.locator('#context-menu li.context-item', { hasText: 'Rename Folder' }));
+   /** @type {string} The tray's localized Rename Folder entry label. */
+   const renameLabel = await page.evaluate(() => game.i18n.localize('LOCAL.effectTrayRenameFolder.text'));
+   await chooseContextMenuEntry(page, page.locator('#context-menu li.context-item', { hasText: renameLabel }));
 
    /** @type {import('@playwright/test').Locator} The inline rename input. */
    const input = header.locator('[data-testid="effect-tray-folder-rename"]');
