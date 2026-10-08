@@ -774,7 +774,8 @@ schema golden-master suites) are the one place this pattern does not apply.
 Vitest's happy-dom environment with no tippy mocking. Non-blank tooltip content (and `RichText` values) pass through
 `foundry.utils.cleanHTML`, which only the Foundry client defines; the shared `tests/setup.js` defines a pass-through
 stand-in beside its other `foundry.utils` stand-ins. Sanitization itself is verified live
-(`tests/e2e/html-sanitization.spec.js`), never against that stand-in.
+(`component-probe-display.spec.js` for `RichText`, `component-probe-buttons-tags.spec.js` for `EffectTag` and `Tag`),
+never against that stand-in.
 
 **`data-testid` convention** — Stable E2E selectors are wired via `testId` props on shared dialog
 wrappers. `CheckDialogField` (`src/check/dialog/CheckDialogField.svelte`) forwards its `testId` prop
@@ -894,7 +895,7 @@ hook synchronously (`client/game.mjs:777-779`), so the read follows every synchr
 tool `census.js` calls `joinWorld` without the assertion: a boot error is printed in its JSON (`bootErrors`) and sets
 exit code 1, but never stops the census or the sweep, which may be what removes the documents behind the error.
 Console output is not read, so its noise (`ERR_CONNECTION_REFUSED`, vendor warnings) never reaches a collector.
-**Not migrated** (self-managed `BrowserContext`s): `multi-client.spec.js`, `permissions-compendium.spec.js`,
+**Not migrated** (self-managed `BrowserContext`s): `multi-client.spec.js` (which also holds the compendium permissions test),
 `combat-turns.spec.js`, `ownership.spec.js`. Fast-check (`injectFastCheck` → `page.addInitScript`) must run in
 `beforeAll` BEFORE `login` (init scripts must precede navigation). A spec needing pristine per-test boots
 opts out by keeping `beforeEach(login)`.
@@ -1178,7 +1179,7 @@ The exemptions wait on a process starting and are not polls on a loaded page:
 - a mid-file reload through `world.js` `reloadWorld(page, { ready })` (15 s for the `/game` URL, 60 s for the
   readiness predicate, `game.ready` by default), used by the last test of `combat-turns.spec.js`, the reload
   test of `player-hud.spec.js` and both portrait tests of `surfaces.spec.js`;
-- the one real-hover test (`html-sanitization.spec.js`, "a report tag tooltip holds the cleaned HTML ..."): a hover shows a
+- the one real-hover test (`component-probe-buttons-tags.spec.js`, "an effect tag tooltip holds the cleaned HTML ..."): a hover shows a
   tooltip after `TOOLTIP_DELAY[0]` (1000 ms) and animates it for `TOOLTIP_DURATION[0]` (400 ms), both set in
   `src/helpers/svelte-actions/TooltipAction.js` and passed to tippy as `delay` and `duration`; its wait is 2500 ms. The
   user exempted it because it waits out the product's own hover-delay timer;
@@ -1431,7 +1432,7 @@ closed in `finally` even if the callback or a login throws. `awaitUsersActive(pa
 `game.users.getName(name)?.active` inside `page.waitForFunction` (1000 ms timeout) until all named users are active on
 that client. `combat-turns.spec.js` and `ownership.spec.js` open their extra clients in contexts of their own. Because
 `playwright.config.mjs` uses `workers: 1`, logins are sequential and there are no race conditions on the `/join` form.
-The smoke test is `tests/e2e/multi-client.spec.js`.
+The smoke test is `tests/e2e/multi-client.spec.js`, which also holds the compendium permissions test.
 
 **npm scripts** — `npm test` runs `vitest run` (single pass); `npm run test:watch` runs Vitest in watch
 mode; `npm run test:e2e` runs the Playwright suite above (its `global-setup.js` builds the test bundles into
@@ -1475,14 +1476,25 @@ element with no `rounding`.
 
 **Coverage is complete:** all **83** primitives in `src/helpers/svelte-components/**` are registered in
 `componentRegistry.js` and probed (the registry also holds the three rules-element settings editors
-`ItemSheetConditionalCheckModifierSettings`, `ItemSheetMulBaseSettings` and `ItemSheetMulSumSettings`). Specs are split by family (each describe = one component):
-`tests/e2e/component-probe.spec.js` (core: `Button`, `TextInput`, `NumberInput`, `IntegerInput`,
-`CheckboxInput`, `Select`, `LabelTag`); `-context.spec.js` (`RichText`, the `EffectTag` family + its six
-duration-variant wrappers, `CondensedCheckButton`, `ProseMirrorEditor`); `-tags.spec.js`
-(17 `tag/` primitives incl. `EditDeleteTag` whose probe also locks in the FontAwesome `font-family`
-regression); `-labels.spec.js` (5 `label/`); `-inputs.spec.js` (8 `input/` non-select, and the editors above); `-selects.spec.js`
-(16 `input/select/` typed wrappers); `-buttons.spec.js` (13 `button/`); `-display.spec.js` (`Meter`, `Text`,
-`Tabs`, `ScrollingContainer`, `LabeledElement`, `BorderedColumnList`, `TagContainer`). Every primitive
+`ItemSheetConditionalCheckModifierSettings`, `ItemSheetMulBaseSettings` and `ItemSheetMulSumSettings`). The probes are three specs, one world boot each (each describe = one component):
+`tests/e2e/component-probe-inputs.spec.js` (8 `input/` non-select primitives, the editors above, the invalid-data
+probes, and the 16 `input/select/` typed wrappers: 15 run from one table of `{component, options, testId,
+supportsNone, wrapperTestId}` whose options are the `src/` constants the components build their lists from
+(`ATTRIBUTES`, `SKILLS`, `RARITIES`, ..., `ARMOR_TRAITS`, `ATTACK_TRAITS`, `SHIELD_TRAITS`; imported through the `~/`
+alias), so a constant change cannot meet a stale hand count, and `DamageReducedBySelect`, whose list depends on two
+flags, is written out); `-buttons-tags.spec.js` (13 `button/` primitives, 17 `tag/` primitives incl. `EditDeleteTag`
+whose probe also locks in the FontAwesome `font-family` regression, with the `SpellAspectTags` entries built by
+`selectDisplayedSpellAspects` (a selector change fails the test, `M4-spellaspects-run.log`), and the tooltip HTML-cleaning probes: an `EffectTag` and a `Tag` mounted with an
+event-handler payload; the `EffectTag` one is the suite's one real-hover test); `-display.spec.js` (core
+`Button`, `TextInput`, `NumberInput`, `IntegerInput`, `CheckboxInput`, `Select`, `LabelTag`; the 5 `label/`
+primitives; `RichText`, the `EffectTag` family + its six duration-variant wrappers, `CondensedCheckButton`,
+`ProseMirrorEditor`; `Meter`, `Text`, `Tabs`, `ScrollingContainer`, `LabeledElement`, `BorderedColumnList`,
+`TagContainer`; and the `RichText` HTML-cleaning probe). The cleaning probes use synthetic props because a real flow
+cannot carry an event handler into these sinks (ProseMirror drops `on*` attributes on input); each fails when
+`foundry.utils.cleanHTML` is replaced by the identity in the page before the mount
+(`.superpowers/sdd/test-suite-rewrite/phase-6/partB/mutations/M1-richtext-uncleaned-page-run.log`, `M2-...`, `M2b-...`),
+and the table fails when a select drops an option (`M3-attacktrait-slice-run.log`: `AttackTraitSelect` without its
+first trait fails 2 tests). Every primitive
 carries a `testId` (`data-testid` passthrough) **except `Text`**, which renders `{processTextData(text)}`
 inline with no root element — a wrapper would change its DOM contract, so its probe locates via the probe
 container selector instead. Wrapper components forward `testId` to their inner primitive's rendered root

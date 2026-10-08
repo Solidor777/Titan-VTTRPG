@@ -985,7 +985,7 @@ when fixed.
   none; `buildEffectTagTooltip` (`src/helpers/utility-functions/BuildEffectTagTooltip.js`) builds the tooltip. Gated by
   `tests/unit/BuildEffectTagTooltip.test.js` (the builder, plus scans deriving the duration types from the
   `effect.<type>.desc` keys: every duration tag passes its own key and every report list renders through its own tag),
-  `tests/e2e/component-probe-context.spec.js` (each tag's live tooltip leads with its own text), and
+  `tests/e2e/component-probe-display.spec.js` (each tag's live tooltip leads with its own text), and
   `tests/e2e/combat-turns.spec.js` "a turn-start report stores the description key and its tooltip shows the text,
   with no effect" (a condition tag's tooltip is its description alone).
 
@@ -1038,10 +1038,19 @@ when fixed.
 - **Found:** 2026-09-30 by the Task 5 buddy check (plan B).
 - **Fixed:** 2026-09-30 — `tooltipAction` cleans every non-blank tooltip with `foundry.utils.cleanHTML` (the cleaner
   core's TooltipManager applies) before tippy receives it, on creation and on update, and `RichText` cleans its value
-  before `enrichHTML`. Gated by `tests/e2e/html-sanitization.spec.js` (a report message and a report tag tooltip
-  carrying an `onerror` payload render their text and markup with no handler, and icon markup survives) and by
-  `tests/e2e/custom-traits.spec.js` ("a live tooltip updated to user HTML is cleaned on update": the description is
-  edited to the payload in the Edit dialog).
+  before `enrichHTML`. Gated, on synthetic props because a real flow cannot carry the handler into these sinks (read:
+  `common/prosemirror/schema/attribute-capture.mjs:83-93` drops attributes that `ALLOWED_HTML_ATTRIBUTES` in
+  `common/constants.mjs` does not list, and that list has no event handlers), by `tests/e2e/component-probe-display.spec.js`
+  ('RichText HTML cleaning': a payload with an `onerror` image renders its text, the image keeps no handler and no page
+  flag is set) and `tests/e2e/component-probe-buttons-tags.spec.js` ('tooltip HTML cleaning': an `EffectTag` tooltip
+  holds core's cleaned HTML and renders it on a real hover with no handler, and a `Tag` tooltip keeps icon markup and
+  drops the handler), and by `tests/e2e/custom-traits.spec.js` ("a live tooltip updated to user HTML is cleaned on
+  update": the description is edited to the payload in the Edit dialog). The three probe tests fail when
+  `foundry.utils.cleanHTML` is replaced by the identity in the page before the mount
+  (`.superpowers/sdd/test-suite-rewrite/phase-6/partB/mutations/M1-richtext-uncleaned-page-run.log`,
+  `M2-tooltip-uncleaned-page-run.log`, `M2b-tag-uncleaned-page-run.log`). That replacement is a page-level stand-in for
+  removing the two `cleanHTML` calls of `RichText.svelte` and `TooltipAction.js`; an edit of `RichText.svelte` itself
+  was refused by the tool permission check and is not run.
 
 ### 85. Turn-start and turn-end report messages rendered blank
 
@@ -1049,7 +1058,10 @@ when fixed.
   every rules-element turn message rendered `enrichHTML(undefined)`, an empty string.
 - **Found:** 2026-09-30 by the Task 5 buddy check (plan B), by reading the code.
 - **Fixed:** 2026-09-30 — the component passes `value={message}`, together with #84 (the prop fix enables the rich-text
-  sink). Gated by `tests/e2e/html-sanitization.spec.js` (a turn-start report's message renders its text).
+  sink). The test that gated it was a turn-start report made by API whose message rendered its text. It
+  was replaced by the `RichText` probe of `tests/e2e/component-probe-display.spec.js` (synthetic `value`), which covers
+  `RichText`'s value handling and not the report component's prop wiring: `grep -rln turnMessage tests/e2e tests/unit`
+  finds no file, so no current test renders `ChatMessageRichTextMessages` (open question for the plan owner).
 
 ### 86. A two-way-bound prop whose parent bound an undefined value crashed with Svelte `props_invalid_value`
 
