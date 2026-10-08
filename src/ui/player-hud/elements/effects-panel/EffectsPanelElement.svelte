@@ -2,7 +2,7 @@
    import { getContext } from 'svelte';
    import EffectsListPanel from '~/ui/player-hud/elements/effects-panel/EffectsListPanel.svelte';
    import EffectsIconTray from '~/ui/player-hud/elements/effects-panel/EffectsIconTray.svelte';
-   import { CONDITION_TYPE, isTitanEffect } from '~/system/EffectTypes.js';
+   import { CONDITION_TYPE, EFFECT_TYPE, isTitanEffect } from '~/system/EffectTypes.js';
 
    /**
     * @typedef {object} EffectsPanelElementProps
@@ -22,8 +22,8 @@
    /** @type {Array<TitanActiveEffect>} Condition-subtype effects on the active actor. */
    const conditions = $derived(titanEffects.filter((effect) => effect.type === CONDITION_TYPE));
 
-   /** @type {Array<TitanActiveEffect>} The other TITAN effects on the active actor (the effect subtype). */
-   const effects = $derived(titanEffects.filter((effect) => effect.type !== CONDITION_TYPE));
+   /** @type {Array<TitanActiveEffect>} Effect-subtype effects on the active actor. */
+   const effects = $derived(titanEffects.filter((effect) => effect.type === EFFECT_TYPE));
 </script>
 
 <div

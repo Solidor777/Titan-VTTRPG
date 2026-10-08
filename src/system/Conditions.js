@@ -330,7 +330,7 @@ export default function setupConditions() {
    for (const condition of conditions) {
       condition.flags = {
          titan: {
-            type: 'condition',
+            type: CONDITION_TYPE,
          },
       };
    }

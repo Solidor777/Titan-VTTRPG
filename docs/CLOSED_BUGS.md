@@ -2323,7 +2323,7 @@ unless a path says otherwise.
   - One shared test of "an effect TITAN defines", `isTitanEffect` with `EFFECT_TYPE`, `CONDITION_TYPE` and
     `TITAN_EFFECT_TYPES` (`src/system/EffectTypes.js`, unit-pinned in `tests/unit/EffectTypes.test.js`), serves the
     action menu, the effects-panel visibility and, as its one filter, the effects panel's lists. Every other literal
-    Active Effect subtype test in `src/` uses the constants too; the hand-read table is `fix2/literal-sweep.md`.
+    Active Effect subtype test in `src/` uses the constants too; the hand-read table is `fix3/literal-sweep.md`.
   - A foreign `base` effect with `statuses: ['prone']` and a `flags.titan` description, measured
     (`fix2/probe-statuses.json`, snapshot of rating, speed, attribute, resource, resistance, mod and skill): core's
     `actor.statuses` holds `prone`; the derived stats are unchanged;
@@ -2357,9 +2357,16 @@ unless a path says otherwise.
     `fix1/mut1-attempt1-flake143.log`).
   - `isTitanEffect` made always true: the Player HUD test fails at the effects-panel row count and the panel-hides test
     fails at its row click (two rows), the other 8 pass, and the unit pin fails
-    (`fix2/mut-predicate-always-true.log`, `fix2/mut-predicate-unit.log`).
+    (`fix2/mut-predicate-always-true.log`; the unit pin's failing test, "accepts an effect and a condition and rejects
+    any other subtype", is in `fix3/mut-predicate-unit.log`). Since the panel's `effects` list also tests
+    `=== EFFECT_TYPE`, the always-true predicate alone no longer adds a row to the panel lists; the effects-panel
+    visibility (`PlayerHudShell.svelte`) and the action menu carry that mutation.
+  - Only the action menu's `.filter(isTitanEffect)` removed: the Player HUD test fails on its own assertion that the
+    base effect has no sub-option (`base-effect.spec.js:353`), the other 9 pass (`fix3/mut-actionmenu-filter.log`).
   - The two HUD fixes of the first round, removed: the same two tests fail (`mut2-no-hud-fixes.log`).
-  - Restored files verified by sha256 (`fix1/sha-before.txt`, `fix1/sha-after-m1.txt`, `fix1/sha-after-m2.txt`).
-  - After the second fix round: unit 1555 of 1555 (`fix2/unit.log`); full e2e 704 of 704 with the sweep and census at 0
-    (`fix2/e2e-full.log`).
+  - Restored files verified by sha256 (`fix1/sha-before.txt`, `fix1/sha-after-m1.txt`, `fix1/sha-after-m2.txt`,
+    `fix2/sha-before.txt`, `fix2/sha-after.txt`, `fix3/sha-before.txt`, `fix3/sha-after-predicate.txt`,
+    `fix3/sha-after-actionmenu.txt`).
+  - After the third fix round: unit 1555 of 1555 (`fix3/unit.log`); full e2e 704 of 704 with the sweep and census at 0
+    (`fix3/e2e-full.log`).
 - **Status:** Closed 2026-10-08.

@@ -975,7 +975,7 @@ function readPackEffect(packId, effectId, actorId) {
 
 // EXCEPTION to real-flow documents: a `base` effect has no TITAN creation control, so the API creates it as a module
 // would (name, type and one native change); the packs and the actor are made through flows.
-test('a base effect row in an effect pack re-imports unchanged (an unset priority reads null)', async () => {
+test('a base effect pack row exports its value cell and re-imports unchanged (unset priority reads null)', async () => {
    /** @type {string} The empty effect pack's collection id. */
    const packId = await createCompendium(page, {
       label: 'E2E Spreadsheet Base Pack',
@@ -1009,7 +1009,7 @@ test('a base effect row in an effect pack re-imports unchanged (an unset priorit
    expect(await readPackEffect(packId, effectId)).toEqual(before);
 });
 
-test('a base effect row under a pack actor re-imports unchanged (an unset priority reads null)', async () => {
+test('a base effect row under a pack actor exports and re-imports unchanged (unset priority reads null)', async () => {
    /** @type {string} The empty actor pack's collection id. */
    const packId = await emptyActorPack('Base Row Actor');
    /** @type {string} The actor that owns the effect. */

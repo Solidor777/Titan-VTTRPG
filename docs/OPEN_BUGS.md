@@ -254,8 +254,9 @@ The evidence files named here are in `.superpowers/sdd/test-suite-rewrite/phase-
 - **Seen a third time, 2026-10-08:** the `beforeAll` of `base-effect.spec.js` failed in `createScene` at `flows.js:74`
   (`toHaveCount(0)` of the creation dialog, received 1 for 1000 ms) in one run, which ran with the base registration
   removed as a mutation (the scene is created before any base-effect work, so the mutation is inferred not to be the
-  cause; not measured); the next run of the same code passed
-  (`.superpowers/sdd/2026-09-29-conditions-rework/bug92-logs/fix1/mut1-attempt1-flake143.log`).
+  cause; not measured); the next run of the same code passed. The cited log
+  (`.superpowers/sdd/2026-09-29-conditions-rework/bug92-logs/fix1/mut1-attempt1-flake143.log`) shows only the probe
+  bundle's build, so whether the mutation had reached the system bundle in that run is not shown by it.
 - **Not reproduced:** 5 other isolated runs passed (`drag-hunt/chat-cards.log`, `scene-first/chat-cards-1.log` to
   `-3.log`, `drag-hunt2/chat-cards-rerun.log`), and the spec passed in every full run.
 - **Cause not located.**

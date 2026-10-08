@@ -144,8 +144,8 @@ export default function onceInit() {
    // stores it and never reads it: every TITAN reader of effects selects the `effect` or `condition` subtype.
    CONFIG.ActiveEffect.dataModels = {
       base: foundry.data.ActiveEffectTypeDataModel,
-      effect: TitanActiveEffectDataModel,
-      condition: ConditionDataModel,
+      [EFFECT_TYPE]: TitanActiveEffectDataModel,
+      [CONDITION_TYPE]: ConditionDataModel,
    };
 
    // Configure Chat Messages.
