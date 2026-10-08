@@ -317,12 +317,15 @@ test.beforeAll(async ({ browser }) => {
    listenForDeprecation(gm, 'E2E GM 1');
    await login(gm);
    await clearChat(gm);
+
+   // The session's scene, made before the other clients join: with none viewed, creating it draws the canvas, which
+   // is done while only this client is connected.
+   sceneId = await createScene(gm, { name: 'E2E Turns Scene' });
    gm2 = await openClient(browser, 'E2E GM 2');
    player = await openClient(browser, 'E2E Player 1');
    await showChatLog(gm);
 
-   // The session's scene: viewed by both GMs, so a combat made on it is the active combat of both clients.
-   sceneId = await createScene(gm, { name: 'E2E Turns Scene' });
+   // The scene is viewed by both GMs, so a combat made on it is the active combat of both clients.
    await viewScene(gm, sceneId);
    await viewScene(gm2, sceneId);
 

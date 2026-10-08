@@ -1393,8 +1393,8 @@ the source) or inferred:
   edited weapon or effect row updates it; a row whose `_parentId` names a document that is not top-level and not in
   the file is planned as a create (`resolveExistingDocument` finds no parent). A row that names a parent that exists
   nowhere is therefore refused with the create branch's message, `Cannot create <class> documents under parent
-  "<id>"` (measured: with that message changed, both refusal tests fail, `mutations/A-M6a-item-parent.log` and
-  `mutations/A-M6a-update-parent.log`). The `Cannot update` branch
+  "<id>"` (measured: with that message changed, the refusal test fails, `mutations/A-M6a-item-parent.log`; a second test whose
+  row had the id of a pack item reached the same branch, so it duplicated the first and was removed). The `Cannot update` branch
   is reached by a stale plan, measured: the Import dialog stays open and usable while the Compendium tab and a pack
   window are operated, so a test previews an update of the weapon (blank parent cell, which resolves to the actor of the
   pack), deletes the actor from the pack window's context menu, then applies; `Cannot update Item documents under

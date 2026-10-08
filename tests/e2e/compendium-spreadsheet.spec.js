@@ -741,24 +741,6 @@ test.describe('importing the pack of an actor with an item and effects', () => {
       expect(actor.effects.map((effect) => effect.name)).toEqual(['E2E Actor Effect']);
    });
 
-   test('a row with the id of an item in the pack and a parent cell naming nothing is planned as a create and refused',
-      async () => {
-         /** @type {string} The populated pack's collection id. */
-         const packId = await populatedPack('Unknown Update Parent');
-
-         /** @type {string} A parent id that is in neither the file nor the pack. */
-         const unknownId = 'yyyyyyyyyyyyyyyy';
-
-         /** @type {import('~/spreadsheet/codec/Workbook.js').Workbook} The file with the weapon row only. */
-         const workbook = keepRows(graph, (sheet) => sheet === 'weapon');
-         rowNamed(workbook, 'weapon', 'E2E Original Weapon')._parentId = unknownId;
-         await openImport(packId);
-         await expect(await previewImport(zipOf(workbook))).toContainText(summaryText(1, 0, 0));
-         await applyImportRefused(unknownId);
-
-         expect((await readActor(packId, ids.actor)).items.map((item) => item.name)).toEqual(['E2E Original Weapon']);
-      });
-
    test('an update whose parent was deleted after the preview is refused, leaving the pack unchanged', async () => {
       /** @type {string} The populated pack's collection id. */
       const packId = await populatedPack('Stale Update Parent');

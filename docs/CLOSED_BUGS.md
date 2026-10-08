@@ -1405,10 +1405,10 @@ The evidence files named here are in `.superpowers/sdd/test-suite-rewrite/phase-
   - The test was rewritten in Phase 6 of the test-suite rewrite: the pack is made with the `createCompendium` flow
     (the Compendium tab's Create dialog) and deleted through the directory's context menu and confirmation, on E2E
     GM 1, with E2E GM 2 as the second client. With the `renderCompendiumDirectory` registration removed from
-    `EffectTrayState.svelte.js` the test fails on an unlabelled `toHaveCount(1)` of the tray's pack options filtered by the
-    new pack's label (expected 1, received 0; `effect-tray.spec.js:1278`;
-    `.superpowers/sdd/test-suite-rewrite/phase-6/mutations/D-T2-multi-client.log:18-40`). The throw-at-the-end mutation above
-    was run on the earlier version of the test and not on the rewritten one.
+    `EffectTrayState.svelte.js` the test fails on an unlabelled `toHaveCount(1)` of the tray's pack options filtered
+    by the new pack's label (expected 1, received 0; `effect-tray.spec.js:1278`;
+    `.superpowers/sdd/test-suite-rewrite/phase-6/mutations/D-T2-multi-client.log:18-40`). The throw-at-the-end
+    mutation above was run on the earlier version of the test and not on the rewritten one.
 
 ### 113. `condition-description.spec.js` failed when no scene was active at its start
 
@@ -2096,9 +2096,9 @@ The evidence files named here are in `.superpowers/sdd/test-suite-rewrite/bug-11
   list, and the suite-end teardown deletes the tokens of every scene and sweeps orphans.
 - **Gate:** the teardown line of the final full run (`phase-5/b/e2e-full-b2.log`; 645 passed in 14.7 m) reports
   `"orphanTokens":0` in its sweep and in its census, and the census counts 0 of every document class. That run's
-  sweep removed 2 actors and 1 pack and no scene or token; they came from specs that were not yet converted. Since Phase 6 Part A a
-  sweep that deletes anything fails the run (`phase-6/sweep-gate-fail.log`), and the sweep entry of `docs/TODO.md` is
-  deleted.
+  sweep removed 2 actors and 1 pack and no scene or token; they came from
+  specs that were not yet converted. Since Phase 6 Part A a sweep that deletes anything fails the run
+  (`phase-6/sweep-gate-fail.log`), and the sweep entry of `docs/TODO.md` is deleted.
 - **Status:** Closed 2026-10-07.
 
 ### 108. `TitanActor#getCombatant` used a core API that is deprecated and removed in v15
@@ -2142,19 +2142,45 @@ The evidence files named here are in `.superpowers/sdd/test-suite-rewrite/bug-11
 
 The evidence files named here are in `.superpowers/sdd/test-suite-rewrite/phase-6/` (local, not checked in).
 
-- **What:** the slow-operation record of a full run listed one 'Drag and drop' at `flows.js` (the drag in `placeToken`)
-  of about 1.5 s: 1545, 1528, 1527 and 1544 ms in four full runs (`e2e-full-1-slowops.json`, `e2e-full-2-slowops.json`,
-  `e2e-full-3-slowops.json`, `e2e-full-7.log`); it was absent when the ten spec files that call `placeToken` were run
-  alone (`drag-hunt/`).
-- **Measured cause:** a temporary timing line in `placeToken` named the test in two runs (`e2e-full-5-dragtime.log`,
-  `e2e-full-6-pwapi.log`): 'an edit on an unlinked token sheet leaves the open base actor sheet unchanged' of
-  `sheet-header.spec.js`. Playwright's call log of that drag shows six retries of "subtree intercepts pointer events"
-  (`e2e-full-6-pwapi.log`), and the element read at the drop point just before the drag was a `.section` inside a
-  `.chat-message` of `#chat-notifications`, with no application window open (`e2e-full-9-chain.log`). Inferred, not
-  measured: the cover is the notification of a card posted by one of the Send to Chat tests earlier in the file.
+- **What:** the slow-operation record of a full run listed one 'Drag and drop' (the drag in `placeToken`, `flows.js`)
+  of about 1.5 s. It was listed in each of the 8 full runs that had the slow-operation reporter and the drag fix not yet
+  applied: runs 1, 2, 3 and 7 at 1545, 1528, 1527 and 1544 ms (`e2e-full-1.log`, `e2e-full-2.log`, `e2e-full-3.log`,
+  `e2e-full-7.log`), and runs 5, 6, 8 and 9, which carried temporary instrumentation, at 1585, 1510, 1010 and 1511 ms
+  (`e2e-full-5-dragtime.log`, `e2e-full-6-pwapi.log`, `e2e-full-8-cover.log`, `e2e-full-9-chain.log`). Run 4 used the
+  JSON reporter and has no slow-operation table. The ten spec files that call `placeToken`, run alone with the
+  reporter active, listed no drag (`drag-hunt2/`: eight completed runs with a table; `chat-cards` and `combat-turns`
+  were re-run to completion in `drag-hunt2/chat-cards-rerun.log` and `drag-hunt2/combat-turns-rerun.log`).
+- **Measured cause:** a temporary timing line in `placeToken` named the test in runs 5, 6, 8 and 9: 'an edit on an
+  unlinked token sheet leaves the open base actor sheet unchanged' of `sheet-header.spec.js`. Playwright's call log of
+  that drag (run 6) shows six retries of "subtree intercepts pointer events". The element read at the drop point just
+  before the drag (run 9) was a `.section` inside a `.chat-message` of `#chat-notifications`, with no application window
+  open (`e2e-full-9-chain.log:634`). Inferred, not measured: the cover is the notification of a card posted by one of
+  the Send to Chat tests earlier in the file.
+- **First hypothesis, falsified:** that core opens the new document's sheet after `createActor` returns and the sheet
+  renders after `closeAllApps`. Waiting for that sheet in `createFromDirectory` left the drag at 1544 ms
+  (`e2e-full-7.log`), and the change was reverted.
 - **Fixed:** 2026-10-08. The drop-spot search of `placeToken` skips a spot where `document.elementFromPoint` is not the
   canvas.
-- **Gate:** the slow-operation record of the full run. It listed the drag in 8 of 8 full runs before the fix and not in
-  the full run after it (`e2e-full-10.log`, 657 passed, sweep and census zero). One run after the fix is a sample, not a
-  proof that the drag cannot recur.
+- **Gate:** the slow-operation record of the full run. After the fix it lists no drag in runs 10, 11 and 12
+  (`e2e-full-10.log`, `e2e-full-11.log`, `e2e-full-12.log`; 657, 657 and 656 passed, sweep and census zero). Three runs
+  are a sample, not a proof that the drag cannot recur.
+- **Status:** Closed 2026-10-08.
+
+### 142. The first scene of `combat-turns.spec.js` timed out drawing when the spec was run alone
+
+The evidence files named here are in `.superpowers/sdd/test-suite-rewrite/phase-6/` (local, not checked in).
+
+- **What:** run alone, `combat-turns.spec.js` failed in its `beforeAll` in 4 of 5 runs: `waitForSceneDrawn`
+  (`flows.js:309`, 1000 ms) timed out inside `createScene` (spec line 325), so all 19 tests failed or did not run
+  (`drag-hunt/combat-turns.log`, `drag-hunt2/combat-turns.log`, `scene-first/combat-turns-2.log`,
+  `scene-first/combat-turns-3.log`; the passing run is `scene-first/combat-turns-1.log`). In full runs the spec passed.
+- **Measured:** creating the first scene in a page with one client took 421, 580 and 446 ms until the dialog closed and
+  424, 610 and 432 ms until `canvasReady` (`scene-first-draw-probe.log`, a throwaway spec, removed).
+- **Cause (inferred, not isolated):** the spec created the scene after opening two more clients, and the draw happened
+  with three clients connected. Moving `createScene` before `openClient` made the spec pass in 4 of 4 runs
+  (`scene-first/combat-turns-reordered-1.log` to `-4.log`), and in the re-run with the reporter
+  (`drag-hunt2/combat-turns-rerun.log`).
+- **Fixed:** 2026-10-08. `combat-turns.spec.js` creates its scene before the other clients join.
+- **Gate:** the spec run alone. Five runs after the fix passed (`scene-first/combat-turns-reordered-1.log` to `-4.log`,
+  `drag-hunt2/combat-turns-rerun.log`); before it, 1 of 5 passed.
 - **Status:** Closed 2026-10-08.

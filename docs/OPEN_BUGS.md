@@ -251,3 +251,16 @@ The evidence files named here are in `.superpowers/sdd/test-suite-rewrite/phase-
 - **Cause not located.** Whether the entry click did not land or the menu was re-opened is not measured.
 - **Found:** 2026-10-07 during Phase 6 Part A.
 - **Status:** Open.
+
+### 143. The first scene's creation dialog stayed open in one isolated run of `chat-cards.spec.js`
+
+The evidence files named here are in `.superpowers/sdd/test-suite-rewrite/phase-6/` (local, not checked in).
+
+- **What:** run alone, `chat-cards.spec.js` failed in its `beforeAll` once: `createFromDirectory` (`flows.js:74`)
+  expected the scene creation dialog count to be 0 and received 1 for 1000 ms, reached through `createScene` and the
+  `scene` shared fixture (`chat-cards.spec.js:93`); the other tests did not run (`drag-hunt2/chat-cards.log`).
+- **Not reproduced:** 5 other isolated runs passed (`drag-hunt/chat-cards.log`, `scene-first/chat-cards-1.log` to
+  `-3.log`, `drag-hunt2/chat-cards-rerun.log`), and the spec passed in every full run.
+- **Cause not located.**
+- **Found:** 2026-10-08 during Phase 6 Part A.
+- **Status:** Open.

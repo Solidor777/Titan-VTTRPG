@@ -381,10 +381,10 @@ const TOKEN_SPACING = 130;
  * `TOKEN_COLUMNS` by `TOKEN_SPACING` pixels, filled row by row from the centre; a spot with a token on it (whatever
  * order the scene's tokens were placed or deleted in) is skipped, because tokens dropped on one spot stack and the
  * pointer reaches only the topmost. A spot that another element covers, such as a chat notification over the canvas, is
- * skipped too: the pointer would wait for the cover to go (measured: a chat notification of the Send to Chat tests held
- * the drop of `sheet-header.spec.js` for about 1.5 s, `e2e-full-9-chain.log`). Measured at a 1920 by 1080 viewport
- * (`.superpowers/sdd/test-suite-rewrite/phase-2/review-measure-2.log`): 34 tokens were placed, and the drop for the
- * 35th timed out (cause not determined).
+ * skipped too: the pointer would wait for the cover to go (measured: the element at the drop spot of a 1.5 s drag in
+ * `sheet-header.spec.js` was a `.chat-message` in `#chat-notifications`, `e2e-full-9-chain.log`). Measured at a
+ * 1920 by 1080 viewport (`.superpowers/sdd/test-suite-rewrite/phase-2/review-measure-2.log`): 34 tokens were
+ * placed, and the drop for the 35th timed out (cause not determined).
  * @param {import('@playwright/test').Page} page - A logged-in GM page.
  * @param {string} actorId - The actor to place.
  * @returns {Promise<string>} The id of the placed token.
@@ -445,7 +445,9 @@ export async function placeToken(page, actorId) {
 
          // A spot under another element (a chat notification, a window) is skipped: the drop takes effect only where
          // the pointer reaches the canvas.
+         /** @type {Element | null} The element the pointer reaches at the spot. */
          const topmost = document.elementFromPoint(outline.left + candidate.x, outline.top + candidate.y);
+         /** @type {boolean} Whether the pointer at the spot reaches the canvas. */
          const reachesCanvas = topmost === board;
          if (reachesCanvas && !centres.some((centre) => Math.hypot(centre.x - point.x, centre.y - point.y) < reach)) {
             return candidate;
