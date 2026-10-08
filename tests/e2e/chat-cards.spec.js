@@ -687,7 +687,6 @@ test.describe('the tags of a rolled check card', () => {
       expect(colors.background).not.toBe('transparent');
       expect(colors.background).toBe(colors.tagBackground);
       expect(colors.color).toBe(colors.tagFont);
-
    });
 
    test('opposing Advantage sources show no tag beside the unchanged DC', async () => {
@@ -754,7 +753,6 @@ test.describe('the tags of a rolled check card', () => {
       const tag = card.getByTestId('check-chat-automatic-failure');
       await expect(tag).toHaveText(labels.automaticFailure);
       await expect(card.locator('.results')).toContainText(`0 ${labels.successes}`);
-
    });
 
    test('the card lists the ticked situations by label', async () => {
@@ -797,7 +795,6 @@ test.describe('the tags of a rolled check card', () => {
       /** @type {import('@playwright/test').Locator} The rolled check's card. */
       const card = chatMessage(message.id);
       await expect(card.getByTestId('check-chat-situation')).toHaveText(['Underwater']);
-
    });
 
    test('a card re-localizes a system situation from its stored labelKey', async () => {
@@ -883,7 +880,8 @@ test.describe('chat message mount keying', () => {
 
    /**
     * Updates a flag of a chat message, which has no control, and waits until core has replaced the message's element in
-    * the chat log: that replacement is the re-render of the update, so the reads that follow cannot precede it.
+    * the chat log and, when the notification pane holds the message, its element there: core re-renders the log first
+    * and then the notification pane in a second step, so each replacement is waited for.
     * @param {string} messageId - The chat message's id.
     * @param {number} value - The value written to the message's `e2eTouch` flag.
     * @returns {Promise<void>} Resolves once the re-render has landed and the operations have finished.
@@ -891,6 +889,12 @@ test.describe('chat message mount keying', () => {
    async function touchMessage(messageId, value) {
       /** @type {import('@playwright/test').ElementHandle} The message's element before the update. */
       const before = await page.locator(`#chat .message[data-message-id="${messageId}"]`).elementHandle();
+
+      /** @type {import('@playwright/test').JSHandle} The message's notification element before the update, or null. */
+      const beforeNotification = await page.evaluateHandle(
+         (id) => document.querySelector(`#chat-notifications .message[data-message-id="${id}"]`),
+         messageId,
+      );
       await page.evaluate(async ({ id, value }) => {
          await game.messages.get(id).update({ 'flags.titan.e2eTouch': value });
       }, {
@@ -901,6 +905,12 @@ test.describe('chat message mount keying', () => {
          () => before.evaluate((element) => element.isConnected),
          { message: 'the update re-rendered the log entry' },
       ).toBe(false);
+      if (beforeNotification.asElement()) {
+         await expect.poll(
+            () => beforeNotification.evaluate((element) => element.isConnected),
+            { message: 'the update re-rendered the notification entry' },
+         ).toBe(false);
+      }
       await settle(page);
    }
 
