@@ -45,7 +45,7 @@ async function ensureProbe(page) {
  * @param {string} name - The registered component name (see game.titan._probe.components).
  * @param {{ props?: object, events?: string[], context?: object }} [spec] - Scalar props plus the
  * callback prop names to instrument and an optional context object forwarded as a Svelte context
- * Map; each instrumented callback records `{ event, key }` into window.__titanProbeEvents.
+ * Map; each instrumented callback records `{ event, key, value }` into window.__titanProbeEvents.
  * @returns {Promise<{ id: string, selector: string }>} The probe id and its container selector.
  */
 export async function mountProbe(page, name, { props = {}, events = [], context = {} } = {}) {
@@ -65,6 +65,7 @@ export async function mountProbe(page, name, { props = {}, events = [], context 
             globalThis.window.__titanProbeEvents.push({
                event: ev,
                key: arg && arg.key,
+               value: arg !== null && typeof arg === 'object' ? arg.value : arg,
             });
          };
       }
@@ -152,7 +153,8 @@ export function probeComponent(name) {
 /**
  * Read the recorded probe event log.
  * @param {import('@playwright/test').Page} page - The Playwright page to drive.
- * @returns {Promise<Array<{ event: string, key?: string }>>} The recorded events.
+ * @returns {Promise<Array<{ event: string, key?: string, value?: * }>>} The recorded events; `value` is the callback's
+ * argument, or its `value` field when the argument is an object.
  */
 export async function readProbeEvents(page) {
    return page.evaluate(() => globalThis.window.__titanProbeEvents ?? []);

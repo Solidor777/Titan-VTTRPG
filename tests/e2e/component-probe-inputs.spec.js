@@ -922,3 +922,83 @@ test.describe('component probe — DamageReducedBySelect', () => {
          .toBeVisible();
    });
 });
+
+test.describe('component probe — SelectList', () => {
+   test.afterEach(async () => {
+      await unmountAll(page);
+      await clearProbeEvents(page);
+   });
+
+   /** @type {object} The props every SelectList probe shares. */
+   const LIST_PROPS = {
+      options: [
+         {
+            value: 'a',
+            label: {
+               text: 'Alpha',
+               localize: false,
+            },
+            icon: 'fas fa-dragon',
+         },
+         {
+            value: 'b',
+            label: {
+               text: 'Beta',
+               localize: false,
+            },
+         },
+         {
+            value: 'c',
+            label: {
+               text: 'Gamma',
+               localize: false,
+            },
+         },
+      ],
+      value: 'b',
+      hoverIndex: 0,
+      listId: 'probe-select-list-id',
+      testId: 'probe-select-list',
+   };
+
+   test('rows show their icon and label, the value row is selected and the first row is highlighted', async () => {
+      await mountProbe(page, 'SelectList', {
+         props: LIST_PROPS,
+         events: ['floatingContent'],
+      });
+      const list = page.locator('[data-testid="probe-select-list-list"]');
+      await expect(list.locator('.option')).toHaveCount(3);
+      await expect(list.locator('#probe-select-list-id-option-0')).toHaveText('Alpha');
+      await expect(list.locator('#probe-select-list-id-option-0 i.fa-dragon')).toHaveCount(1);
+      await expect(list.locator('#probe-select-list-id-option-1')).toHaveText('Beta');
+      await expect(list.locator('#probe-select-list-id-option-2')).toHaveText('Gamma');
+
+      const selected = list.locator('#probe-select-list-id-option-1');
+      await expect(selected).toHaveClass(/\bselected\b/);
+      await expect(selected).toHaveAttribute('aria-selected', 'true');
+      await expect(list.locator('#probe-select-list-id-option-0')).toHaveClass(/\bhover\b/);
+      await expect(list.locator('#probe-select-list-id-option-0')).not.toHaveClass(/\bselected\b/);
+      await expect(list.locator('#probe-select-list-id-option-0')).toHaveAttribute('aria-selected', 'false');
+      expect((await readProbeEvents(page)).filter((e) => e.event === 'floatingContent')).toHaveLength(1);
+   });
+
+   test('hovering a row reports its index and clicking it reports the option', async () => {
+      await mountProbe(page, 'SelectList', {
+         props: LIST_PROPS,
+         events: [
+            'floatingContent',
+            'onhover',
+            'onselect',
+         ],
+      });
+      const row = page.locator('[data-testid="probe-select-list-list"] #probe-select-list-id-option-2');
+      await row.hover();
+      await expect.poll(async () => (await readProbeEvents(page))
+         .filter((e) => e.event === 'onhover')
+         .map((e) => e.value)).toContain(2);
+      await row.click();
+      await expect.poll(async () => (await readProbeEvents(page))
+         .filter((e) => e.event === 'onselect')
+         .map((e) => e.value)).toEqual(['c']);
+   });
+});

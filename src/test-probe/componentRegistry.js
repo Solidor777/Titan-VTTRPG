@@ -81,6 +81,10 @@ import InitiativeEffectTag from '~/helpers/svelte-components/tag/effects/Initiat
 import PermanentEffectTag from '~/helpers/svelte-components/tag/effects/PermanentEffectTag.svelte';
 import TurnEndEffectTag from '~/helpers/svelte-components/tag/effects/TurnEndEffectTag.svelte';
 import TurnStartEffectTag from '~/helpers/svelte-components/tag/effects/TurnStartEffectTag.svelte';
+import HudButton from '~/helpers/svelte-components/button/HudButton.svelte';
+import DragHandle from '~/helpers/svelte-components/drag-reorder/DragHandle.svelte';
+import InsertionLine from '~/helpers/svelte-components/drag-reorder/InsertionLine.svelte';
+import SelectList from '~/helpers/svelte-components/input/select/SelectList.svelte';
 import ItemSheetConditionalCheckModifierSettings from
    '~/document/types/item/sheet/rules-element/ItemSheetConditionalCheckModifierSettings.svelte';
 import ItemSheetMulBaseSettings from '~/document/types/item/sheet/rules-element/ItemSheetMulBaseSettings.svelte';
@@ -176,6 +180,10 @@ const componentRegistry = {
    PermanentEffectTag,
    TurnEndEffectTag,
    TurnStartEffectTag,
+   HudButton,
+   DragHandle,
+   InsertionLine,
+   SelectList,
    ItemSheetConditionalCheckModifierSettings,
    ItemSheetMulBaseSettings,
    ItemSheetMulSumSettings,

@@ -11,6 +11,7 @@ import {
 } from './componentProbe.js';
 import { selectTitanOption, readTitanSelectValue } from './select.js';
 import { closeAllApps, clearChat, attachPageErrors } from './world.js';
+import { DRAG_HANDLE_ICON } from '~/system/Icons.js';
 
 /**
  * Reads a duration tag's tooltip and the text it should hold: the duration lead text, then the entry's description.
@@ -1307,6 +1308,58 @@ test.describe('component probe — TagContainer', () => {
       await expect(
          page.locator(`${selector} .tag-container[data-testid="probe-tag-container"]`),
       ).toBeVisible();
+   });
+});
+
+// ─── Drag-reorder primitives ─────────────────────────────────────────────────────────────────────────────────────────
+
+test.describe('component probe — DragHandle', () => {
+   test.afterEach(async () => {
+      await unmountAll(page);
+   });
+
+   test('the handle carries the drag marker, the default label and the grip icon', async () => {
+      const { selector } = await mountProbe(page, 'DragHandle');
+      const handle = page.locator(`${selector} [data-drag-handle]`);
+      await expect(handle).toBeVisible();
+      await expect(handle).toHaveAttribute('title', 'Drag to reorder');
+      await expect(handle).toHaveAttribute('aria-label', 'Drag to reorder');
+      for (const token of DRAG_HANDLE_ICON.split(' ')) {
+         await expect(handle.locator('i')).toHaveClass(new RegExp(`(^| )${token}( |$)`));
+      }
+      await expect(handle).toHaveCSS('cursor', 'grab');
+   });
+
+   test('the label prop replaces the default title and accessible label', async () => {
+      const { selector } = await mountProbe(page, 'DragHandle', { props: { label: 'Move this row' } });
+      const handle = page.locator(`${selector} [data-drag-handle]`);
+      await expect(handle).toHaveAttribute('title', 'Move this row');
+      await expect(handle).toHaveAttribute('aria-label', 'Move this row');
+   });
+});
+
+test.describe('component probe — InsertionLine', () => {
+   test.afterEach(async () => {
+      await unmountAll(page);
+   });
+
+   test('the line is hidden from assistive technology and draws a three pixel glowing bar', async () => {
+      const { selector } = await mountProbe(page, 'InsertionLine');
+      const line = page.locator(`${selector} .insertion-line`);
+      await expect(line).toBeAttached();
+      await expect(line).toHaveAttribute('aria-hidden', 'true');
+      await expect(line).toHaveCSS('height', '0px');
+
+      /** @type {{ height: string, boxShadow: string }} The drawn bar, the line's ::before box. */
+      const bar = await line.evaluate((element) => {
+         const style = getComputedStyle(element, '::before');
+         return {
+            height: style.height,
+            boxShadow: style.boxShadow,
+         };
+      });
+      expect(bar.height).toBe('3px');
+      expect(bar.boxShadow).not.toBe('none');
    });
 });
 

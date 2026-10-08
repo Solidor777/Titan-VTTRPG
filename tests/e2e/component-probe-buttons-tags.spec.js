@@ -757,6 +757,114 @@ test.describe('component probe — ToggleOptionButton', () => {
 });
 
 // ---------------------------------------------------------------------------
+// HudButton
+// ---------------------------------------------------------------------------
+test.describe('component probe — HudButton', () => {
+   /** Tear down every mounted probe so containers never leak between tests. */
+   test.afterEach(async () => {
+      await unmountAll(page);
+      await clearProbeEvents(page);
+   });
+
+   test('click, pointer move and focus fire their handlers and disabled suppresses the click', async () => {
+      const live = await mountProbe(page, 'HudButton', {
+         props: {
+            text: 'Go',
+            testId: 'probe-hud-button',
+         },
+         events: [
+            'onclick',
+            'onpointermove',
+            'onfocus',
+         ],
+      });
+      const button = page.locator(`${live.selector} button[data-testid="probe-hud-button"]`);
+      await expect(button).toHaveText('Go');
+      await button.click();
+      await expect.poll(async () => (await readProbeEvents(page)).map((e) => e.event))
+         .toEqual(expect.arrayContaining([
+            'onclick',
+            'onpointermove',
+            'onfocus',
+         ]));
+      expect((await readProbeEvents(page)).filter((e) => e.event === 'onclick')).toHaveLength(1);
+
+      await clearProbeEvents(page);
+      const dead = await mountProbe(page, 'HudButton', {
+         props: {
+            text: 'Stop',
+            disabled: true,
+         },
+         events: ['onclick'],
+      });
+      await expect(page.locator(`${dead.selector} button`)).toBeDisabled();
+      await page.locator(`${dead.selector} button`).click({ force: true });
+      expect((await readProbeEvents(page)).filter((e) => e.event === 'onclick')).toHaveLength(0);
+   });
+
+   test('variant, state and label props reach the button', async () => {
+      const set = await mountProbe(page, 'HudButton', {
+         props: {
+            text: 'Go',
+            variant: 'sub-option',
+            active: true,
+            accentEdge: 'left',
+            align: 'end',
+            pressed: true,
+            ariaLabel: 'Probe hud label',
+            testId: 'probe-hud-set',
+         },
+      });
+      const button = page.locator(`${set.selector} button`);
+      for (const token of [
+         'hud-button',
+         'sub-option',
+         'active',
+         'align-end',
+         'pressed',
+         'accent-left',
+      ]) {
+         await expect(button).toHaveClass(new RegExp(`(^| )${token}( |$)`));
+      }
+      await expect(button).toHaveAttribute('aria-pressed', 'true');
+      await expect(button).toHaveAttribute('aria-label', 'Probe hud label');
+      await expect(button).toHaveAttribute('data-testid', 'probe-hud-set');
+
+      const plain = await mountProbe(page, 'HudButton', { props: { text: 'Plain' } });
+      const plainButton = page.locator(`${plain.selector} button`);
+      await expect(plainButton).toHaveClass(/(^| )hud-button( |$)/);
+      await expect(plainButton).toHaveClass(/(^| )category( |$)/);
+      await expect(plainButton).not.toHaveClass(/(^| )(active|pressed|align-end|accent-left)( |$)/);
+      await expect(plainButton).not.toHaveAttribute('aria-pressed');
+      await expect(plainButton).toHaveAttribute('type', 'button');
+   });
+
+   test('the active and pressed states change what is drawn', async () => {
+      const plain = await mountProbe(page, 'HudButton', { props: { text: 'Plain' } });
+      const active = await mountProbe(page, 'HudButton', {
+         props: {
+            text: 'Active',
+            active: true,
+            pressed: true,
+         },
+      });
+
+      /**
+       * Reads the drawn state of a probe's button.
+       * @param {string} selector - The probe container selector.
+       * @returns {Promise<{ background: string, shadow: string }>} The computed background color and box shadow.
+       */
+      const drawn = (selector) => page.locator(`${selector} button`).evaluate((element) => ({
+         background: getComputedStyle(element).backgroundColor,
+         shadow: getComputedStyle(element).boxShadow,
+      }));
+      await expect.poll(async () => (await drawn(active.selector)).shadow).not.toBe('none');
+      expect((await drawn(plain.selector)).shadow).toBe('none');
+      expect((await drawn(active.selector)).background).not.toBe((await drawn(plain.selector)).background);
+   });
+});
+
+// ---------------------------------------------------------------------------
 // Tag
 // ---------------------------------------------------------------------------
 test.describe('component probe — Tag', () => {
