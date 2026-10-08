@@ -9,6 +9,7 @@ import { SPEEDS } from '~/system/Speeds.js';
 import { MODS } from '~/system/Mods.js';
 import {
    CONDITIONAL_CHECK_MODIFIER_CHECK_TYPE_OPTIONS,
+   CHECK_TYPE_MODIFIER_TYPES,
    CONDITIONAL_CHECK_MODIFIER_TYPES,
 } from '~/system/ConditionalCheckModifierTypes.js';
 
@@ -67,9 +68,6 @@ const STAT_KEYS = {
       ALL_KEYS,
    ],
 };
-
-/** @type {readonly string[]} The `modifierType` values the conditional check modifier editor offers. */
-const CHECK_MODIFIER_TYPES = CONDITIONAL_CHECK_MODIFIER_TYPES;
 
 /** @type {string[]} The `checkType` values the conditional check modifier editor offers. */
 const CHECK_TYPES = CONDITIONAL_CHECK_MODIFIER_CHECK_TYPE_OPTIONS.map(({ value }) => value);
@@ -176,8 +174,14 @@ describe('standard effects compendium source', () => {
                   break;
                }
                case 'conditionalCheckModifier': {
-                  expect(CHECK_MODIFIER_TYPES, `${label} modifierType`).toContain(element.modifierType);
+                  expect(CONDITIONAL_CHECK_MODIFIER_TYPES, `${label} modifierType`).toContain(element.modifierType);
                   expect(CHECK_TYPES, `${label} checkType`).toContain(element.checkType);
+
+                  // A modifier type is offered to a check only when that check type reads it; `any` reads all.
+                  if (element.checkType !== 'any') {
+                     expect(CHECK_TYPE_MODIFIER_TYPES[element.checkType], `${label} read modifier types`)
+                        .toContain(element.modifierType);
+                  }
                   expect(element.selector, `${label} selector`).toBe('any');
                   expect(Number.isInteger(element.value), `${label} value`).toBe(true);
                   break;
