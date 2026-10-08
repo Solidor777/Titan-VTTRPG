@@ -12,7 +12,7 @@ import { commitText, dragGrip } from './actions.js';
 import { clickRoll } from './checkDialog.js';
 import { selectTitanOption } from './select.js';
 import { settle } from './settle.js';
-import { setWorldSetting } from './settings.js';
+import { setClientSetting } from './settings.js';
 import { attachPageErrors, closeAllApps } from './world.js';
 
 /**
@@ -175,7 +175,7 @@ test.describe('an action helper returns with nothing in flight', () => {
          name: documentName('E2E Action Helpers Roller'),
          type: 'player',
       });
-      await setWorldSetting(page, 'getCheckOptions', 'always');
+      await setClientSetting(page, 'getCheckOptions', 'always');
       await page.evaluate(
          (actorId) => game.actors.get(actorId).system.requestAttributeCheck({ attribute: 'body' }),
          actorId,
