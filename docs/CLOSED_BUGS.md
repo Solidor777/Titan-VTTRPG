@@ -38,6 +38,8 @@ when fixed.
 - **Fixed:** 2026-06-06 on the `chat-mount-keying` branch — the test now polls
   `fastHealing.confirmed` via `expect.poll` before asserting `total`. Production code is unchanged
   (the handler's actor-then-message update ordering is legitimate).
+- **Gate now:** `tests/e2e/combat-turns.spec.js` "clicking apply heals the actor and partial-merges fastHealing (total
+  survives)" polls `fastHealing.confirmed` before it reads `total`.
 
 ### 3. `MoveEffectToFolderDialogShell` initial-only `$state(prop)` capture lint error (was OPEN_BUGS #1)
 
@@ -428,8 +430,9 @@ when fixed.
 - **Fix:** each tag now carries the themed identity pair of the resource it modifies — fast healing →
   `stamina`, persistent damage → `wounds`, resolve regain → `resolve` — setting both
   `--titan-tag-background` and `--titan-tag-font-color` so the theme contract's fill/text pairing
-  holds. `report-cards.spec.js`'s apply-confirm case now asserts the confirmed fast-healing tag's
-  computed colors equal the resolved `--titan-stamina-*` tokens.
+  holds. the apply-confirm case (now "clicking apply heals the actor and partial-merges fastHealing (total survives)" in
+  `combat-turns.spec.js`) asserts the confirmed fast-healing tag's computed colors equal the resolved
+  `--titan-stamina-*` tokens.
 
 ### 35. The release workflow targeted a module layout this system does not have
 
@@ -714,7 +717,8 @@ when fixed.
 - **What:** `DocumentSheetV2._onRender` disables every form control present at render when the viewer cannot edit, which
   included the tab strips and expand toggles; the item-row expand toggle was also a `DocumentOwnerButton`.
 - **Fixed:** 2026-09-26 — `TitanDocumentSheet._toggleDisabled` re-enables controls in `[data-view-controls]` containers.
-  Gated by `permissions-observer-navigation.spec.js`.
+  Gated by `tests/e2e/ownership.spec.js` "an observer can switch character and item sheet tabs and expand rows, but
+  not edit".
 
 ### 58. Character sidebar section labels touched their contents
 
@@ -849,8 +853,9 @@ when fixed.
 - **Found:** 2026-09-29 by the plan A final-wave e2e for the item card → dialog → Roll path (V1).
 - **Fixed:** 2026-09-29 — `sendToChat` passes `structuredClone` copies of `parameters` and `results`, so the message
   shares no array or object with the check. Gated by `tests/unit/check/check-send-to-chat.test.js` (a stub `create`
-  that cleans arrays in place, fed frozen parameters) and `tests/e2e/item-card-check-dialog.spec.js` (rolls a deleted
-  item's card check through the shown dialog and asserts the created message).
+  that cleans arrays in place, fed frozen parameters) and `tests/e2e/chat-cards.spec.js` "an item card's check rolls
+  through the shown dialog from the card snapshot" (rolls a deleted item's card check through the shown dialog and
+  asserts the created message).
 
 ### 71. Name-identified hotbar macros broke on names containing an apostrophe, backslash, or double quote
 
@@ -937,8 +942,9 @@ when fixed.
 - **Found:** 2026-09-30 while folding the report's condition-description key into the conditions rework plan.
 - **Fixed:** 2026-09-30 — the card mounts `ChatMessageEffectsTags` when effects or conditions are reported, and
   `ChatMessageEffectsTags` reads each duration list through `effects?.` (Task 5). Gated by
-  `tests/e2e/condition-description.spec.js` (a Blinded-only actor's turn-start report shows Blinded, and an older
-  report holding only a condition renders it).
+  `tests/e2e/combat-turns.spec.js` "a turn-start report stores the description key and its tooltip shows the text, with
+  no effect" (a Blinded-only actor's turn-start report shows Blinded). The older-report case is not tested: it fed
+  data of an earlier shape, which the rewritten suite does not test.
 
 ### 79. Report effect tags showed "LOCAL.….text" tooltips
 
@@ -948,7 +954,8 @@ when fixed.
 - **Found:** 2026-09-30 while folding the report's condition-description key into the conditions rework plan.
 - **Fixed:** 2026-09-30 — `EffectTag` passes its tooltip as `TextData` with `localize: false` (Task 5). Gated by
   `tests/unit/BuildEffectTagTooltip.test.js` (the tooltip is localized exactly once) and
-  `tests/e2e/condition-description.spec.js` (a live report tag's tooltip holds no `LOCAL.`).
+  `tests/e2e/combat-turns.spec.js` "a turn-start report stores the description key and its tooltip shows the text,
+  with no effect" (a live report tag's tooltip holds no `LOCAL.`).
 
 ### 80. Every report tag tooltip led with the Custom-duration text
 
@@ -961,7 +968,8 @@ when fixed.
   `tests/unit/BuildEffectTagTooltip.test.js` (the builder, plus scans deriving the duration types from the
   `effect.<type>.desc` keys: every duration tag passes its own key and every report list renders through its own tag),
   `tests/e2e/component-probe-context.spec.js` (each tag's live tooltip leads with its own text), and
-  `tests/e2e/condition-description.spec.js` (a condition tag's tooltip is its description alone).
+  `tests/e2e/combat-turns.spec.js` "a turn-start report stores the description key and its tooltip shows the text,
+  with no effect" (a condition tag's tooltip is its description alone).
 
 ### 81. Legacy base-type condition effects were inert and never migrated
 
@@ -1066,7 +1074,8 @@ when fixed.
 - **Fixed:** 2026-09-30 — `sortedAspects` derives via `[...aspects].sort(...)` by
   `calculateAspectTagSize(entry.aspect)`, operating on the aspect objects themselves (not index entries). Gated by
   `tests/unit/SpellAspectTags.test.js` (multiple aspect set with known sizes asserts order) and
-  `tests/e2e/spell-rules-regressions.spec.js` (character-sheet row and chat card both list aspects by size).
+  `tests/e2e/chat-cards.spec.js` "the spell card lists the displayed aspect tags by size, as the character sheet row
+  does" (character-sheet row and chat card both list aspects by size).
 
 ### 90. A `'none'` resistance check added 2 to an aspect tag's size though no resistance stat renders
 
@@ -1084,9 +1093,9 @@ when fixed.
   probe.
 - **Found:** 2026-09-30 while planning the fix for #80.
 - **Fixed:** 2026-09-30 — the list renders through `TurnStartEffectTag`. Gated by the report-list scan in
-  `tests/unit/BuildEffectTagTooltip.test.js` and `tests/e2e/condition-description.spec.js` (a live turn-start report
-  tags a turn-start effect with the Turn Start icon, not the Turn End one, and its tooltip leads with the Turn Start
-  text).
+  `tests/unit/BuildEffectTagTooltip.test.js` and `tests/e2e/combat-turns.spec.js` "a turn-start report tags a turn-start
+  effect with the Turn Start tag and its duration lead" (a live turn-start report tags a turn-start effect with the
+  Turn Start icon, not the Turn End one, and its tooltip leads with the Turn Start text).
 
 ### 93. Migration writes into an Adventure pack counted as stored when Foundry rejected them
 
@@ -1405,7 +1414,11 @@ The evidence files named here are in `.superpowers/sdd/test-suite-rewrite/phase-
   - The same probe, waiting for the draw, threw nothing; the placeable was parented and `toggleStatusEffect`
     succeeded (`diag113-b.json`).
   - Gated by `tests/e2e/condition-description.spec.js` 'with no scene active, the fixture token is placed on a fully
-    drawn fallback scene' (its last test). It establishes and asserts its own precondition:
+    drawn fallback scene' (its last test). That spec is replaced by the last test of `tests/e2e/combat-turns.spec.js`,
+    'with no scene active, a token placed on a new scene is on a fully drawn canvas', which makes the scene and the
+    token through the `createScene` and `placeToken` flows and not through `controlFixtureActorToken`; the helper's
+    only importer is now `effect-tray.spec.js` (read: grep). The old test established and asserted its own
+    precondition, and the new one does the same:
     - it waits until no scrolling text animates (OPEN_BUGS #114), clears the active flag of the active test scene
       (a direct update: no control deactivates a scene) and reloads;
     - it asserts that no scene is active or drawn.
@@ -1433,7 +1446,10 @@ Found 2026-10-01 when the e2e harness gate began failing tests on page errors (t
 - **Fixed:** 2026-10-01 (commit `7ee14f8b`): both comparisons read `owner.character?.id`. Measured after the fix
   (`fix5e-diag-stacks-socket-sync-after-115-fix.log`): 0 `reading 'id'` errors (20 matching lines before,
   `fix5e-diag-stacks-all.log`).
-- **Gate test:** `socket-sync.spec.js` (A1-A5) under the harness gate, which fails on this error. It also failed on
+- **Gate now:** the five replication tests of `tests/e2e/combat-turns.spec.js` (persistent damage, fast healing,
+  resolve regain, the previous turn, a second GM) under the harness gate; they were not re-run against the code from
+  before the fix.
+- **Gate test (before the rewrite):** `socket-sync.spec.js` (A1-A5) under the harness gate, which fails on this error. It also failed on
   #116 and #118 until those were fixed: 5 of 5 failed in `fix6-before-combat-seed-socket-sync.log`, and all passed in
   `fix6-after-combat-seed-socket-sync.log`. The full e2e passed 656 of 656 (`e2e-fix6-gate.log`).
 
@@ -1468,7 +1484,10 @@ citations refer to Foundry 14.364 at `C:\FoundryVTT\V14\dev\foundry`.
   `startCombatEncounter(combatId)`; `seedCombatEncounter` takes `start` (default true).
   `seedEncounterForClients(gm, viewers, seed)` in `tests/e2e/multiClient.js` seeds unstarted, calls `viewCombat` on
   every other client, then starts. `socket-sync.spec.js` seeds through it (A1-A4 with the player, A5 with E2E GM 2).
-- **Gate test:** `socket-sync.spec.js` A1-A5. Before: 5 of 5 failed (`fix6-before-combat-seed-socket-sync.log`). After:
+- **Gate now:** `tests/shared/combat.js` and `seedEncounterForClients` are deleted; `combat-turns.spec.js` makes its
+  combats through the Combat Tracker (the `createCombat`, `addCombatant` and `startCombat` flows), and its replication
+  tests run under the harness gate, which fails a test on a page error of any client. The pre-fix code was not re-run.
+- **Gate test (before the rewrite):** `socket-sync.spec.js` A1-A5. Before: 5 of 5 failed (`fix6-before-combat-seed-socket-sync.log`). After:
   5 of 5 passed (`fix6-after-combat-seed-socket-sync.log`); full e2e 656 of 656 (`e2e-fix6-gate.log`).
 
 ### 117. Deleting a chat message while core posted its notification threw
@@ -1493,7 +1512,9 @@ citations refer to Foundry 14.364 at `C:\FoundryVTT\V14\dev\foundry`.
   document (the probe used a base message), but no run without TITAN loaded was made.
 - **Fixed:** 2026-10-02. The spec waits for the notification to be shown
   (`#chat-notifications .message[data-message-id=...]:not([hidden])`) before it deletes the card.
-- **Gate test:** the same `spell-rules-regressions.spec.js` test. Before: failed in 3 of 3 runs
+- **Gate now:** none specific to this race: `chat-cards.spec.js` does not delete a card right after it appears (read:
+  only its mount-keying tests delete messages).
+- **Gate test (before the rewrite):** the same `spell-rules-regressions.spec.js` test. Before: failed in 3 of 3 runs
   (`fix6-before-spell-rules-regressions-run1.log` to `-run3.log`). After: the file passed 9 of 9 in each of 3 runs
   (`fix6-after-spell-rules-regressions-run1.log` to `-run3.log`); full e2e 656 of 656 (`e2e-fix6-gate.log`).
 
@@ -1523,7 +1544,9 @@ citations refer to Foundry 14.364 at `C:\FoundryVTT\V14\dev\foundry`.
   buttons and the chat context menu (`OnGetChatLogEntryContext.js`), and `TitanPlayerHud.js` is the Player HUD, whose
   `refresh` unmounts it when `canvas?.scene` is empty (`:161`); the turn hooks (`OnCombatNextTurn.js`,
   `OnCombatPreviousTurn.js`) name none of them. The combatants resolve through the scene's token documents.
-- **Gate test:** `combat-seed.spec.js` and `socket-sync.spec.js` with no active scene (the state of `test-titan`).
+- **Gate now:** `seedCombatEncounter` is deleted. `combat-turns.spec.js` makes its scene with the `createScene` flow
+  and its combats through the Combat Tracker; the pre-fix code was not re-run.
+- **Gate test (before the rewrite):** `combat-seed.spec.js` and `socket-sync.spec.js` with no active scene (the state of `test-titan`).
   Before: 6 of 6 failed (`fix6-before-combat-seed-socket-sync.log`). After: 6 of 6 passed
   (`fix6-after-combat-seed-socket-sync.log`); full e2e 656 of 656 (`e2e-fix6-gate.log`).
 
@@ -2032,4 +2055,54 @@ The evidence files named here are in `.superpowers/sdd/test-suite-rewrite/bug-11
   effect" followed by "the weapons filter hides action-less weapons until disabled", whose `control` call releases
   control with Escape; it passed after the fix and a rebuild (`phase-5/menu-3.log`, `menu-4.log`). The flow
   `releaseTokenControl` also closes an open cascade first when one is shown.
+- **Status:** Closed 2026-10-07.
+
+### 106. `player-hud-visibility.spec.js` leaves tokens whose actors it deleted
+
+- **What:** after the spec ran (also alone), the world still held the unlinked `HUD Vis NPC` token and three linked
+  tokens, all on scenes, whose actors were gone. `deleteFixtureActor` alone removes a placed token (measured), so the
+  leak came from another part of the spec's setup or cleanup. The cause was not diagnosed. A leaked orphan with pending
+  migration work would count as a migration failure in later specs (#105).
+- **Found:** 2026-10-01 by an orphan census after the Task 5 fix round 3 full e2e (654 passed).
+- **Fixed:** 2026-10-07 by the conversion of the player-hud specs to real flows (test-suite rewrite, Phase 5 Part A). The
+  spec is deleted; `player-hud.spec.js` places its tokens with `placeToken`, which records each token on the running
+  list, and the suite-end teardown deletes the tokens of every scene and sweeps orphans.
+- **Gate:** the teardown line of the final full run (`phase-5/b/e2e-full-b2.log`; 645 passed in 14.7 m) reports
+  `"orphanTokens":0` in its sweep and in its census, and the census counts 0 of every document class. That run's
+  sweep removed 2 actors and 1 pack and no scene or token; they come from specs that are not yet converted (see the
+  sweep entry in `docs/TODO.md`).
+- **Status:** Closed 2026-10-07.
+
+### 108. `TitanActor#getCombatant` used a core API that is deprecated and removed in v15
+
+- **What:** `TitanActor#getCombatant` called `game.combat?.getCombatantByActor(this.id)`. Foundry logs a deprecation
+  warning for it (deprecated since v14, removed in v15). The call passed `this.id`; for a token's synthetic actor that
+  is the base actor's id (read), the same identity pattern as #104. Whether it found the wrong combatant was not
+  measured.
+- **Measured before the fix:** with the deprecation listener of `combat-turns.spec.js` attached to all three clients,
+  the warning `Combat#getCombatantByActor is deprecated` was logged on E2E GM 1 from `getCombatant` <-
+  `_getInitialDocumentData` <- `onPreCreate` (read: the Active Effect data model's initiative capture,
+  `TitanActiveEffectDataModel.js:93`), and the run ended with 2 failed, 15 passed and 1 not run
+  (`phase-5/b/gate-108-before-fix.log`).
+- **Found:** 2026-10-01 during the #102 real-flow repro.
+- **Fixed:** 2026-10-07 (commit `d7a7acc7`). `getCombatant` returns `game.combat?.combatants.find((combatant) =>
+  combatant.actor === this)`: the combatant is found by actor identity, so a token's synthetic actor is its own actor
+  and a combatant of an unlinked token resolves to that token's synthetic actor.
+- **Gate:** `tests/e2e/combat-turns.spec.js` attaches a console listener to each of its three pages before the page
+  boots, and its `afterEach` fails the test if any warning naming `getCombatantByActor` has been logged. After the fix
+  the spec's 19 tests passed (`phase-5/b/gate-108-after-fix.log`).
+- **Status:** Closed 2026-10-07.
+
+### 139. The Create Macro dialog showed an item's attacks and checks as `LOCAL.Attack (1).text`
+
+- **What:** the Attack and Check selects of `CreateItemMacroDialogShell.svelte` passed their option text, built from the
+  attack or check label and its position, through localization, so a weapon's attack listed as
+  `LOCAL.Attack (1).text`.
+- **Found:** 2026-10-07 by the last test of `macros.spec.js` while it was written (test-suite rewrite, Phase 5 Part B).
+- **Measured before the fix:** that test failed on "the dialog shows no untranslated text"
+  (`phase-5/b/gate-macro-label-before-fix.log`).
+- **Fixed:** 2026-10-07 (commit `9b0bd916`). Both options pass their text as `{ text, localize: false }`.
+- **Gate:** `tests/e2e/macros.spec.js` "the Create Macro dialog names the attack of a weapon, and a cancelled dialog
+  makes no macro" reads the dialog's text for `Attack (1)` and for no `LOCAL.`. It passed after the fix in the
+  final full run (`phase-5/b/e2e-full-b2.log`, 645 passed).
 - **Status:** Closed 2026-10-07.

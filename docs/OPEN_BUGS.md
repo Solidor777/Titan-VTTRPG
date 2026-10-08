@@ -59,28 +59,6 @@ Deferred/known bugs. Todos (planned work) live in `docs/TODO.md`; this file is b
 - **Found:** 2026-10-01 while the Task 5 fix round 2 identity e2e (plan B) was seeding its tokens.
 - **Status:** Open. Reproduced through real flows; cause not yet located.
 
-### 106. `player-hud-visibility.spec.js` leaves tokens whose actors it deleted
-
-- **What:** After the spec runs (also when it runs alone), the world still holds the unlinked `HUD Vis NPC` token and
-  three linked tokens, all on scenes, whose actors are gone. `deleteFixtureActor` alone does remove a placed token
-  (measured), so the leak comes from another part of the spec's setup or cleanup. The cause has not been diagnosed.
-  A leaked orphan with pending migration work would count as a migration failure in later specs (#105).
-- **Found:** 2026-10-01 by an orphan census after the Task 5 fix round 3 full e2e (654 passed).
-- **Status:** Open. Fixed together with the conversion of the e2e specs to real Foundry data (`docs/TODO.md`). The four
-  orphans in `test-titan` (`HUD Vis Player`, `HUD Vis NPC`, `HUD Vis Player 2`, `HUD Vis Owned`, all on
-  `E2E Player HUD Scene`) were removed on 2026-10-01 with that scene by `node tests/e2e/census.js --sweep`; the census
-  after it counted 0 orphaned tokens (measured). The full e2e run that followed left the same four tokens on the
-  re-created scene (`node tests/e2e/census.js` after it: 4 orphaned tokens, measured).
-
-### 108. `TitanActor#getCombatant` uses a core API that is deprecated and removed in v15
-
-- **What:** `src/document/types/actor/TitanActor.js:83` calls `game.combat?.getCombatantByActor(this.id)`. Foundry
-  logs a deprecation warning: deprecated since v14 and removed in v15 (measured console warning in the #102 repro).
-  The call passes `this.id`; for a token's synthetic actor that is the base actor's id (read), the same identity
-  pattern as CLOSED_BUGS #104. Whether it then finds the wrong combatant has not been measured.
-- **Found:** 2026-10-01 during the #102 real-flow repro.
-- **Status:** Open.
-
 ### 109. A token sheet may highlight the Skills tab while showing the Effects tab (unconfirmed)
 
 - **What:** screenshots from the #102 real-flow repro show the tab strip still highlighting "Skills" after
@@ -154,7 +132,7 @@ Core citations below refer to Foundry 14.364 at `C:\FoundryVTT\V14\dev\foundry`,
   no animation runs on `canvas.interface` before it deactivates the scene. Measured without that wait: the spec failed
   with this error in 6 of 6 runs (`fix5-mut114-no-scrolling-text-wait-run1.log` to `-run6.log`).
   Under the 1 s poll rule the wait cannot last the 2 s of the animation, so the last test of
-  `condition-description.spec.js` reloads the page first (a reload ends the animations) and then deactivates the scene;
+  `combat-turns.spec.js` reloads the page first (a reload ends the animations) and then deactivates the scene;
   the earlier wait for the animation to end is gone.
 
 ### 122. `addCheck` once stored the default label "Check" instead of the typed one
@@ -203,7 +181,7 @@ The evidence files named here are in `.superpowers/sdd/test-suite-rewrite/phase-
 The Phase 4 evidence files named here are in `.superpowers/sdd/test-suite-rewrite/phase-4/` (local, not checked in).
 
 - **What:** in one full e2e run `condition-description.spec.js` "with no scene active, the fixture token is placed on a
-  fully drawn fallback scene" failed at line 343: after a right-click on the placed token, `#token-hud` was not found
+  fully drawn fallback scene" (now the last test of `combat-turns.spec.js`) failed at line 343: after a right-click on the placed token, `#token-hud` was not found
   within 5 s (`e2e-full-fix.clean.txt`, failure 1). The spec is not touched by Part B.
 - **Not reproduced (Part B):** 0 failures in 3 isolated runs of the file (`cd-fix-1.log` to `cd-fix-3.log`), in 20
   further runs of the file (`reverify-run-1.log` to `-10.log`, `reverify2-run-1.log` to `-10.log`) and in 5 full runs

@@ -93,7 +93,7 @@ travels in `message.system` (a `CheckChatMessageDataModel` subclass), NOT `flags
 are `structuredClone` copies: core cleans creation data in place (`ArrayField#_cleanType` assigns each element back),
 and a dialog-rolled check's parameters can alias its frozen Check Options (an Item Check's snapshot Custom Traits), so
 handing them over by reference throws "Cannot assign to read only property".
-`tests/unit/check/check-send-to-chat.test.js` and `tests/e2e/item-card-check-dialog.spec.js` cover it.
+`tests/unit/check/check-send-to-chat.test.js` and `tests/e2e/chat-cards.spec.js` ("an item card's check rolls through the shown dialog from the card snapshot") cover it.
 
 **6. Chat render — `TitanChatMessage#renderHTML` (the only TITAN chat render path)**
 

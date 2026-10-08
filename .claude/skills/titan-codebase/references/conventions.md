@@ -894,9 +894,8 @@ hook synchronously (`client/game.mjs:777-779`), so the read follows every synchr
 tool `census.js` calls `joinWorld` without the assertion: a boot error is printed in its JSON (`bootErrors`) and sets
 exit code 1, but never stops the census or the sweep, which may be what removes the documents behind the error.
 Console output is not read, so its noise (`ERR_CONNECTION_REFUSED`, vendor warnings) never reaches a collector.
-**Not migrated** (self-managed `BrowserContext`s via `multiClient.js`): `multi-client.spec.js`,
-`socket-sync.spec.js`, `permissions-compendium.spec.js`, `permissions-ownership.spec.js`,
-`permissions-auto-open.spec.js`. Fast-check (`injectFastCheck` → `page.addInitScript`) must run in
+**Not migrated** (self-managed `BrowserContext`s): `multi-client.spec.js`, `permissions-compendium.spec.js`,
+`combat-turns.spec.js`, `ownership.spec.js`. Fast-check (`injectFastCheck` → `page.addInitScript`) must run in
 `beforeAll` BEFORE `login` (init scripts must precede navigation). A spec needing pristine per-test boots
 opts out by keeping `beforeEach(login)`.
 
@@ -913,10 +912,10 @@ auto-waiting action (`.click()`/`.fill()`) — the assertion/action already poll
 synchronous predicate (50 ms interval, 1000 ms default timeout). **There are now no fixed sleeps in the suite
 at all**, including assert-absence tests. When a negative assertion appears to have no pollable positive
 edge, look for a **happens-after edge**: an observable the code under test emits strictly LATER than the
-decision being asserted. `permissions-auto-open.spec.js` waits on a turn-start fast-healing change,
-because `onTurnStart` resolves the auto-open branch BEFORE its resource updates — so the heal landing
-proves the sheet's fate was already decided. Seeding an extra rules element purely as a synchronization
-signal is preferred over a bounded wait. Condition-polling
+decision being asserted. `combat-turns.spec.js` wraps the character data model's `onTurnStart` in a call-through spy on a client
+and waits until the spy has seen the turn start return, because `onTurnStart` opens the sheet (or not) at its
+start, before its awaits — so the return proves the sheet's fate was already decided. Seeding an extra rules
+element purely as a synchronization signal is preferred over a bounded wait. Condition-polling
 `setInterval` canvas-readiness loops (`effect-tray.spec.js`) are NOT fixed sleeps and are fine.
 
 **E2E runner configuration (all optional; defaults reproduce historical behavior).**
@@ -1050,8 +1049,17 @@ effect's sheet and saves with the editor's save button), `setOwnership` (the Con
 directory entry), `createCombat` (the Combat Tracker's create button; waits until the combat is `game.combat`),
 `addCombatant` (the Token HUD's combat button), `startCombat` / `endCombat` (the Combat Tracker's Begin and End
 buttons; `endCombat` also confirms the dialog), `setSkillDefaultAttribute` (the select of a skill row), `setEquipped`
-(the Equipped toggle of an Inventory row, clicked only when the state differs) and `deleteAttack` (the delete button
-of an attack row in the weapon sheet). The creation dialogs are `DialogV2` forms whose content
+(the Equipped toggle of an Inventory row, clicked only when the state differs), `deleteAttack` (the delete button
+of an attack row in the weapon sheet), `setAttackStat` (the Range or Damage input of an attack row), `addAttackCustomTrait`
+(the attack row's Add Custom Trait button and its dialog), `deleteOwnedItem` (the Delete Item button of an Inventory
+row; the `confirmDeletingItems` client setting must be off), `setResource` (the meter row of the actor sheet's sidebar),
+`rollInitiative` (the Combat Tracker's Roll All button; the combatants roll in the order they joined, so a caller forces
+the dice with `forceDice` to choose the turn order), `nextTurn` / `previousTurn` (the Combat Tracker's turn buttons; the
+turn's updates and reports follow, so the caller waits for the effect it asserts), `sendToChat` (the Send to Chat button of
+an item's or effect's sheet header), `typeChatMessage` (types into the chat input and presses Enter), `openCreateMacroDialog`
+(drags an owned item's row onto the first empty slot of the core hotbar, which the `showFoundryHotbar` client setting
+must show), `createItemMacro` (that drag, the Create Macro dialog and its button; the macro and its slot are recorded
+for the teardown) and `runHotbarMacro` (a click on the slot). The creation dialogs are `DialogV2` forms whose content
 lacks the template's `form#document-create` id, so the flows find them by `dialog.application.dialog` with the
 `.dialog-content` fields. A flow opens the sheet it drives with `openSheetByUuid` and clicks its tabs inside that sheet
 (`openTab`), so another open TITAN sheet's tab strip is never clicked; the Standard Aspects tab and the sidebar both
@@ -1103,9 +1111,9 @@ lower. Playwright retries a web-first assertion at 20, 50, 100 ms and then every
 through `_retryAction` (`:16201-16203`) after waits of 0, 20, 100, 100 and then 500 ms each, under the `actionTimeout`
 (10 s), not under the 1 s ceiling. `expect.poll` uses the intervals 100, 250, 500, 1000 (`:4377`) and stops once the
 next interval would pass the deadline (`:4377-4393`), so under 1 s it checks at 0, 100, 350 and 850 ms and not again;
-a poll on something that can take 350 to 850 ms sets `intervals`. `chat-message-mounts.spec.js` sets `[100]` for the
-dismissed notification: its poll took 357 to 865 ms before (four runs: `e2e-r3c-gate-1-slowops.json`, `-2`,
-`e2e-r3d-gate-1-slowops.json`, `-2`; 865 ms once, 357 to 379 ms in the others) and 443 to 449 ms after (`e2e-r4-gate-1`,
+a poll on something that can take 350 to 850 ms sets `intervals`. The mount-keying tests of `chat-cards.spec.js` set
+`[100]` for the dismissed notification: the poll of the former `chat-message-mounts.spec.js` took 357 to 865 ms before
+(four runs: `e2e-r3c-gate-1-slowops.json`, `-2`, `e2e-r3d-gate-1-slowops.json`, `-2`; 865 ms once, 357 to 379 ms in the others) and 443 to 449 ms after (`e2e-r4-gate-1`,
 `-2`, `-3` and `e2e-r5-gate-1-slowops.json`). Svelte's default `slide` transition lasts 400 ms (read in
 `svelte/src/transition/index.js`), and a click on a row that is still moving retries until the row stops: before
 `createOwnedItem` and `addEffect` settled with transitions, the Edit Item click on the new row took 51 to 928 ms in 134
@@ -1118,7 +1126,7 @@ output `r5-recheck-slowops.out`). A test therefore waits for a
 transition with `settle(page, { transitions: true })` or collapses and expands
 rows in an order that does not move the next target, instead of leaving the transition to a retry. A product delay or
 animation longer than the ceiling is not waited out: the test removes the cause (the last test of
-`condition-description.spec.js` reloads, which ends core's 2 s scrolling text, before it deactivates the scene). The one
+`combat-turns.spec.js` reloads, which ends core's 2 s scrolling text, before it deactivates the scene). The one
 exception is the real-hover test below.
 
 **Action helpers return only after the effect of their action is observable**, so no caller has to wait before its next
@@ -1158,7 +1166,7 @@ The exemptions wait on a process starting and are not polls on a loaded page:
 - a `game.ready` world boot (`fixtures.js`, `join.js`; the teardown's and the setup recovery's own login goes through
   it, as does a second browser context's login in `multiClient.js`);
 - a mid-file reload through `world.js` `reloadWorld(page, { ready })` (15 s for the `/game` URL, 60 s for the
-  readiness predicate, `game.ready` by default), used by the last test of `condition-description.spec.js`, the reload
+  readiness predicate, `game.ready` by default), used by the last test of `combat-turns.spec.js`, the reload
   test of `player-hud.spec.js` and both portrait tests of `surfaces.spec.js`;
 - the one real-hover test (`html-sanitization.spec.js`, "a report tag tooltip holds the cleaned HTML ..."): a hover shows a
   tooltip after `TOOLTIP_DELAY[0]` (1000 ms) and animates it for `TOOLTIP_DURATION[0]` (400 ms), both set in
@@ -1229,7 +1237,7 @@ toast is FIRST in DOM order, so an unscoped `.message[data-message-id=…]` loca
 silently selects the toast — which has no layout box for ~500ms, is stable only to ~4750ms, and
 **removes itself from the DOM at ~5250ms**. Always scope to `` `#chat .message[data-message-id="…"]` ``
 (exactly one match, so `.first()` becomes redundant). The exception is
-`chat-message-mounts.spec.js`, which drives both panes deliberately.
+the mount-keying tests of `chat-cards.spec.js`, which drive both panes deliberately.
 
 Because the e2e client starts with the sidebar COLLAPSED, `#chat` sits at x=1920 in a 1920-wide
 viewport — off-screen. Text and `toBeVisible()` assertions still pass there (non-empty bounding box),
@@ -1260,7 +1268,7 @@ open flyout first (`Escape` when `player-hud-flyout` is present), as the `openCa
 where `ready` is the in-page predicate of step (5) (`game.ready` by default); a spec never repeats them inline.
 `expectActiveGM(page)` (also in `world.js`) asserts `game.users.activeGM?.isSelf`, because only the active GM migrates
 and core's `getDesignatedUser` makes the active GM with the highest role that GM. The last test of
-`condition-description.spec.js`, the reload test of `player-hud.spec.js` and the portrait tests of
+`combat-turns.spec.js`, the reload test of `player-hud.spec.js` and the portrait tests of
 `surfaces.spec.js` call `reloadWorld(page)` with the default predicate. A spec navigates only through
 `reloadWorld` and `joinWorld` (the one `.reload(` in `world.js`
 and the one `.goto(` in `fixtures.js`), never an inline `page.reload(`, `location` change or `goto(`; no test scans for
@@ -1363,7 +1371,8 @@ pushes `true` per existing check, for both `sidebar.checks` and `tabs.checks`). 
 a row actually COLLAPSES it and starts a 400 ms `slide`
 out-transition that subsequent assertions race — a latent flake that an unrelated bundle-timing shift can
 flip. Assert the expanded content directly (web-first assertions auto-wait) and click only to change state
-whose default you have verified. (Root-caused in `attack-tags.spec.js`'s weapon-sheet helper.)
+whose default you have verified. (Root-caused in the weapon-sheet helper of the former `attack-tags.spec.js`, whose
+tests are now in `chat-cards.spec.js`.)
 
 **Run e2e from a foreground shell (machine-local)** — launching Playwright from a DETACHED background
 shell on this machine crashes its worker processes at startup with Windows status `0xC0000142`
@@ -1482,12 +1491,6 @@ left edge of the page so that it leaves the controls of the sheet behind it unco
 `setSelectField`, `setCheckbox`, `readSummary`, `clickRoll` and `readNewestCheckFlags` set a field, read a summary, roll
 and read the posted message by the dialog's test ids (`check-field-<key>`, `check-summary-<key>`, `check-dialog-roll`).
 No spec reaches a dialog through `request<Type>Check`.
-
-**`buildFlatModifierAbilityData` builder** — `tests/shared/builders.js` exports
-`buildFlatModifierAbilityData(name, values)`: accepts a `string` name and a `number[]` of modifier values; returns an
-`Item.create` payload of type `'ability'` with one flatModifier rules element per value, each targeting
-`selector: 'attribute'`, `key: 'body'`, and `uuid: 'e2e-flatmod-{index}'`. The companion Vitest unit test lives in
-`tests/unit/builders.test.js`.
 
 ## Integration manifest drift guard
 

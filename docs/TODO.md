@@ -61,10 +61,9 @@ Completed items are deleted, not marked done.
   Every result gated by a synthetic-document test is unconfirmed until it is re-run the real way. That covers the
   live gates in `docs/CLOSED_BUGS.md`, and #102 in `docs/OPEN_BUGS.md`.
 
-  Status: in progress as `docs/superpowers/plans/2026-10-01-test-suite-real-data.md`. Phases 0 to 2 and Phase 3 Part A
-  are complete. Phase 3 Part B has had its fourth fix round and awaits a final review. Phases 4 to 8 remain
-  (checks and rules; tokens, HUD, combat, chat, macros, ownership and theme; packs, tray, spreadsheet and probe merges;
-  unit-test edits; documentation). #102 is re-evaluated on the new suite once it is done.
+  Status: in progress as `docs/superpowers/plans/2026-10-01-test-suite-real-data.md`. Phases 0 to 5 are
+  written (Phase 5 Part B awaits its review). Phases 6 to 8 remain (packs, tray, spreadsheet and probe merges; unit-test
+  edits; documentation). #102 is re-evaluated on the new suite once it is done.
 
 - Plan B Task 5 fix round 4, parked by the user on 2026-10-01 until the test-suite rewrite is done. The plan
   (`.superpowers/sdd/2026-09-29-conditions-rework/task-5-fix4-plan.md`, revision 2) and its unreconciled reviews
@@ -82,11 +81,6 @@ Completed items are deleted, not marked done.
   definitions. It covers OPEN_BUGS #110 (a condition effect a GM edited is treated as stale and overwritten by the next
   migration).
 
-- Convert tests that call `actor.system.onTurnStart()` directly (the condition-report test in
-  `tests/e2e/logic/conditions.spec.js`, and `tests/e2e/condition-description.spec.js`) to the combat-turn flow once
-  Phase 5 builds it (the real-flow rule: a turn-start report comes from advancing the combat). Blocked by the Phase 5
-  combat-advance flow (plan K1-K3), not yet started.
-
 - Report world documents that fail to load (user ruling 2026-10-01: no systemic fix now). Foundry leaves an invalid
   actor, scene or item out of its world collection (`invalidDocumentIds`), so the migration scan never sees one that
   holds pending work. A token whose base actor is invalid is reported as orphaned ("its base actor is gone").
@@ -99,12 +93,16 @@ Completed items are deleted, not marked done.
   things by trait. The first cut covers effect/condition immunity by condition id or effect name only; it is plan B
   Tasks 8 to 11 and has not been started.
 
-- Drive the test-teardown sweep to zero and explain its count. Phase 5 Part A measured the full run's sweep at 1 scene, 6 actors
-  and 1 pack (`e2e-full-4.log`); eight of the 16 specs that still create documents through the API leave documents behind
-  (per-spec counts in `.superpowers/sdd/test-suite-rewrite/phase-5/leak-bisect.log`: actors 6 and the pack 1 match the
-  full run; the isolated scene counts sum to 6, against 1 in the full run, and the cause of the difference is not
-  investigated). Phase 5 Part B and Phase 6 convert those specs to real flows; investigate the scene difference while
-  converting, and the sweep count must be zero when the last one is converted.
+- Drive the test-teardown sweep to zero. After Phase 5 Part B the full run sweeps 0 scenes, 2 actors and 1 pack
+  (`.superpowers/sdd/test-suite-rewrite/phase-5/b/e2e-full-b2.log`), and only `effect-tray.spec.js` leaves documents
+  when run alone: 1 scene, 2 actors and 1 pack (each of the 39 spec files run alone, `leak-bisect-b.log` and
+  `leak-bisect-b-summary.txt`). The scene difference between the full run and the isolated runs has a measured cause:
+  `controlFixtureActorToken` (`tests/e2e/world.js`) reuses the active scene and creates a fallback scene only when none
+  is active. Two scratch specs that call it (`zz-sweep-a.spec.js.txt`, `zz-sweep-b.spec.js.txt`) leave 1 scene each when
+  run alone and 1 scene in all when run together (`sweep-mechanism-a.log`, `-b.log`, `-ab.log`); `effect-tray.spec.js` run after `combat-turns.spec.js` leaves 0 scenes
+  (`sweep-mechanism-turns-tray.log`). The earlier sum of 6 isolated scenes against 1 in the full run
+  (`phase-5/leak-bisect.log`) came from specs that are now deleted; their attribution to this mechanism is inferred, not
+  re-run. Phase 6 converts `effect-tray.spec.js`; the sweep count must be zero when it is converted.
 
 - Remove or sync `.agents/skills/titan-codebase/`, a tracked copy of `.claude/skills/titan-codebase/` that differs in every
   reference file (last touched by commit `5526adee`). Measured 2026-10-02: no file in the repo, script or config reads

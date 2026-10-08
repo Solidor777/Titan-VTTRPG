@@ -178,21 +178,8 @@ distinct. Vitest is configured in `vitest.config.mjs` (`environment: 'happy-dom'
   and a fresh `HooksMock` on `globalThis.Hooks` before every test.
 - `tests/unit/` — Vitest unit tests (`.test.js`).
 - `tests/components/` — Svelte probe components used by unit tests (e.g. `DocumentProbe.svelte`).
-- `tests/shared/` — Framework-agnostic fixture helpers shared by Vitest and Playwright:
-  - `fixtureConstants.js` — typed constants for known fixture values (e.g. `FLAT_MODIFIER`).
-  - `builders.js` — pure factory functions returning plain `Document.create` payloads (no live documents,
-    no side effects); consumed by Vitest directly and by Playwright via `Document.create` or
-    `page.evaluate`.
-  - `combat.js` — `seedCombatEncounter`, `viewCombat`, `startCombatEncounter` and `teardownCombatEncounter`:
-    self-contained async functions designed to be passed directly to `page.evaluate`. `seedCombatEncounter`
-    creates two actors, an INACTIVE scene (`active: false`; an activated scene draws its canvas on every client
-    while tokens are created on it), one token per actor on the scene, a `Combat` document bound to the scene,
-    and two `Combatant` documents with explicit deterministic initiative (effect actor at the lower value = turn
-    index 1; other actor at the higher value = turn index 0 after `startCombat`). It sets the seeding client's
-    `ui.combat.viewed` and starts the combat unless `start: false`. Returns `{sceneId, combatId, effectActorId,
-    otherActorId, effectCombatantId}`. `viewCombat(combatId)` makes another client's tracker view the combat and
-    `startCombatEncounter(combatId)` starts it. `teardownCombatEncounter` deletes combat, scene, and both actors
-    in that order. A multi-client spec seeds through `seedEncounterForClients` (`tests/e2e/multiClient.js`).
+- `tests/shared/` — `checkOracle.js`, the independent check oracle the check-math e2e spec compares rolls against
+  (see `conventions.md`). Documents for tests are made through the real flows in `tests/e2e/flows.js`, not by factories.
 - `tests/e2e/` — Playwright end-to-end specs targeting a live Foundry instance.
   - Harness (no specs): `registry.js` (the running list of everything the suite made, `test/state/registry.json`,
     gitignored), `flows.js` (real-UI flows that create documents and record them), `global-setup.js` /
@@ -200,10 +187,6 @@ distinct. Vitest is configured in `vitest.config.mjs` (`environment: 'happy-dom'
     setup, teardown and census share), `census.js` (the `E2E `-prefix census
     and sweep the teardown reuses), `settings.js` (the world setter records its prior value). Details in `conventions.md`
     "E2E registry, flows and teardown".
-  - `combat-seed.spec.js` — Phase 4 smoke test (1 test): seeds a two-combatant encounter with
-    `seedCombatEncounter`, then probes that `combat.turns.length === 2`, `combatant.actor` resolves to the
-    seeded effect actor, `actor.system.isCharacter === true`, `getCharacterCombatants().length === 2`, and
-    `combat.turn === 0` (other actor holds turn 0 at start; effect actor waits at turn 1 for `nextTurn()`).
   - `integration-manifest.spec.js` — Phase 3c "drift guard" suite (7 tests): declared documentTypes ↔
     registered dataModels parity (covers Actor, Item, ActiveEffect, ChatMessage); every manifest pack loaded
     with correct metadata; grid/socket config; Titan document-class subclass identity; per-subtype sheet
@@ -212,12 +195,18 @@ distinct. Vitest is configured in `vitest.config.mjs` (`environment: 'happy-dom'
     titan status-effect conditions present in `CONFIG.statusEffects` and a representative set of
     `game.settings.settings` keys registered. (The former `'ChatMessage declares no document subtypes'` test
     was removed when ChatMessage gained 5 registered subtypes in Task 4.)
-  - `permissions-ownership.spec.js` — Phase 4b B1 ownership-level suite (4 tests): seeds a `player`-type actor
-    with `ownership: { default: 0, [playerId]: level }` for each of NONE/LIMITED/OBSERVER/OWNER; asserts the
-    player client's `testUserPermission` results and sheet render/visibility at each level. Key fixture decision:
-    `default: 0` is always set explicitly so world-default ownership does not leak into the NONE case. The NONE
-    test gates on `game.actors.get(id) === undefined` (actor absent from player collection) rather than on
-    `waitForFunction` resolving to a truthy value.
+  - `combat-turns.spec.js` — combats made in the Combat Tracker (`createCombat`, `addCombatant`, `startCombat`,
+    `nextTurn`, `previousTurn` in `flows.js`), run by E2E GM 1 with E2E GM 2 and E2E Player 1 on the same world: the
+    turn effects replicate between clients and the best owner applies them once, the sheet auto-open settings, every
+    turn report card, the condition and turn-start tags, and a deprecation listener on all three pages that fails the
+    run if any code path calls `Combat#getCombatantByActor`.
+  - `chat-cards.spec.js` — item and effect cards (`sendToChat` flow), the spell aspect and tradition tags, the weapon
+    attack tags, the check card tags (Advantage, Automatic Failure, situations) and the chat mount keying.
+  - `macros.spec.js` — item rows dragged onto the core hotbar, the Create Macro dialog, and the macros run with a
+    click on their slot.
+  - `ownership.spec.js` — E2E GM 1 sets one character's level in the Configure Ownership window (`setOwnership`) and
+    E2E Player 1 opens the sheets at OWNER, OBSERVER and LIMITED (the LIMITED viewer sees the whole sheet read-only, the
+    measured current behaviour).
 
 ## Build and output
 

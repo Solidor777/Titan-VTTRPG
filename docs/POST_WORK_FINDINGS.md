@@ -257,3 +257,16 @@ it ever bites in play, the principled fix is a per-message serial queue around
   `.every` over the mounted HUD elements and passed while the effects panel was not mounted at all (found in Phase 5
   Part A: the check failed on its first run once a presence assertion was added, `gate-resize-panel-absent-fail.log`).
   Assert that each element is mounted before the quantified check.
+
+## 2026-10-07 — A started combat left behind is the viewed combat of every later spec
+
+Measured (`.superpowers/sdd/test-suite-rewrite/phase-5/b/leftover-combat-probe.log`, Phase 5 Part B): a combat made with
+the Combat Tracker's create button has no scene (`scene: null`), so on a page that boots after `combat-turns.spec.js`,
+`game.combat` and `ui.combat.viewed` were that combat, started. The Player HUD's combat-only gate reads
+`game.combat?.started` (read: `TitanPlayerHud.js:259`), and the full run's `player-hud.spec.js` "combat-only hides the
+portrait outside combat" failed on it (`e2e-full-b1.log`). A spec that leaves a combat for the teardown leaves it
+unstarted (`phase-5/b/leftover-combat-probe-2.log`: `game.combat` is the unstarted one).
+
+The census (`census.js`) has no Combat class, so a combat the suite leaked would not be counted. `test-titan` also holds a
+combat created on 2026-06-18 (four combatants, no scene; `created` in `leftover-combat-probe.log`) that is not a suite
+document and that the suite does not touch.

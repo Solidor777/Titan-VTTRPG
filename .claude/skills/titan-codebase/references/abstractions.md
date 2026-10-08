@@ -9,8 +9,9 @@ management). Data model classes hold the schema, field validation, and derived-d
 
 - `TitanActor` (`src/document/types/actor/TitanActor.js`) extends Foundry's `Actor`. Adds
   `addItem`, `deleteItem`, `addActiveEffect`, `getItemsOfType`, `getSpeaker`, and `getCombatant`
-  (returns this actor's Combatant in the active combat via `game.combat?.getCombatantByActor(this.id)`,
-  whose `.initiative` is the source for effect initiative capture). On creation it
+  (returns this actor's Combatant in the active combat, found by actor identity in `game.combat?.combatants`: a
+  token's synthetic actor is its own actor, and core's `Combat#getCombatantByActor` is deprecated; its `.initiative` is
+  the source for effect initiative capture). On creation it
   assigns a system UUID (stored in `flags.titan.uuid`) and delegates prototype-token initialization
   and post-add/delete callbacks to the data model.
 - `TitanActorDataModel` (`src/document/types/actor/TitanActorDataModel.js`) extends
