@@ -43,9 +43,12 @@
       };
    });
 
-   // Persist committed edits by writing the whole system blob (no path needed). The editor calls this after it has
-   // written the edit to the bound value. An effect on the bound value did not save a Turn Message edit (measured: no
-   // update was made, `.superpowers/sdd/test-suite-rewrite/phase-6/partB/turnmessage-persist-probe-3.log`).
+   /**
+    * Saves the document's whole system data after the editor has written a committed edit to the bound value. The save
+    * runs from the editor's `onchange` callback and not from an effect on `value`: whether such an effect re-runs
+    * depends on the binding (it re-runs for an item description and does not for a rules element's message).
+    * @returns {void}
+    */
    function persist() {
       refreshSystemDocument(documentBridge.doc, disabled);
    }

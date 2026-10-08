@@ -1,12 +1,14 @@
-import mergeArrays from '~/helpers/utility-functions/MergeArrays.js';
+import pushUnique from '~/helpers/utility-functions/PushUnique.js';
 
 /**
- * Adds each entry from the source array to the destination array,
- * provided that said entry is not already in the destination array.
- * Note that if any arrays have duplicate entries, those entries will not be included in the returned result.
- * @param {*[]} [destination=[]] - The destination array.
- * @param {*[]} [source=[]] - The source array.
+ * Adds each entry from the source array to the destination array in place, provided that the entry is not already in
+ * the destination array.
+ * @param {*[]} [destination] - The array that receives the entries; it is modified.
+ * @param {*[]} [source] - The array whose entries are added.
+ * @returns {void}
  */
 export default function appendUnique(destination = [], source = []) {
-   destination = mergeArrays(destination, source);
+   for (const entry of source) {
+      pushUnique(destination, entry);
+   }
 }

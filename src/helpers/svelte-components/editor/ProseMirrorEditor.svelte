@@ -80,12 +80,12 @@
       builtEnriched = enriched;
 
       // Write committed edits back through the two-way binding.
-      const onChange = () => {
+      const commitEdit = () => {
          value = editor.value;
          onchange?.();
       };
-      editor.addEventListener('change', onChange);
-      removeChangeListener = () => editor.removeEventListener('change', onChange);
+      editor.addEventListener('change', commitEdit);
+      removeChangeListener = () => editor.removeEventListener('change', commitEdit);
 
       container.appendChild(editor);
    }
@@ -117,8 +117,8 @@
    // commit save() -> _refresh() repaints the inactive view from that stale snapshot. Rebuilding on a
    // new enriched value (whether it originated from this editor's own commit or an external update)
    // keeps the inactive view fresh. The active-state guard prevents tearing down the live ProseMirror
-   // instance mid-edit, and rebuilds never write `value`, so they cannot loop with the persisting effect
-   // in the parent input. `container` is bound before effects run, so building from this effect is safe.
+   // instance mid-edit, and rebuilds never write `value` or call `onchange`, so they cannot trigger a save.
+   // `container` is bound before effects run, so building from this effect is safe.
    $effect(() => {
       // Track the enriched HTML and its readiness so changes to either re-run this effect.
       void enriched;
