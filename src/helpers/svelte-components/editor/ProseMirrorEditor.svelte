@@ -13,6 +13,7 @@
     * @property {string | object} [tooltip] - The tooltip to display for the edit-pencil affordance, if any.
     * @property {boolean} [notOwner] - Whether the current user lacks edit permission.
     * @property {string} [testId] - Optional test identifier bound to the root element.
+    * @property {() => void} [onchange] - Called after a committed edit has been written to `value`.
     */
 
    /** @type {ProseMirrorEditorProps} */
@@ -26,6 +27,7 @@
       tooltip = void 0,
       notOwner = false,
       testId = void 0,
+      onchange = void 0,
    } = $props();
 
    /** @type {HTMLElement} The container the <prose-mirror> element is appended into. */
@@ -80,6 +82,7 @@
       // Write committed edits back through the two-way binding.
       const onChange = () => {
          value = editor.value;
+         onchange?.();
       };
       editor.addEventListener('change', onChange);
       removeChangeListener = () => editor.removeEventListener('change', onChange);

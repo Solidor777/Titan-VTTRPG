@@ -64,6 +64,10 @@
       .message {
          @include flex-row;
          @include flex-group-left;
+
+         // The editor is a flex child with no content width of its own: without a full-width row an empty message
+         // collapses to zero width and its edit control cannot be reached.
+         width: 100%;
       }
    }
 </style>

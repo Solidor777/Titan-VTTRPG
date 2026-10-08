@@ -18,11 +18,8 @@
    /** @type {boolean} Whether the first enrichment has resolved, gating the editor's initial build. */
    let enrichedReady = $state(false);
 
-   /** @type {boolean} Guards the initial effect run so we do not persist on mount. */
-   let initialized = false;
-
    // Re-enrich whenever the committed value changes so the inactive (rendered) view stays current.
-   // This only writes `enriched`, never `value`, so it cannot re-trigger the persist effect below.
+   // This only writes `enriched`, never `value`.
    $effect(() => {
       // Read the current value so the effect re-runs on change.
       const currentValue = value ?? '';
@@ -46,16 +43,12 @@
       };
    });
 
-   // Persist committed edits by writing the whole system blob (original mechanism, no path needed).
-   // The bound value is not derived from the bridge, so the update hook does not re-trigger this.
-   $effect(() => {
-      void value;
-      if (!initialized) {
-         initialized = true;
-         return;
-      }
+   // Persist committed edits by writing the whole system blob (no path needed). The editor calls this after it has
+   // written the edit to the bound value. An effect on the bound value did not save a Turn Message edit (measured: no
+   // update was made, `.superpowers/sdd/test-suite-rewrite/phase-6/partB/turnmessage-persist-probe-3.log`).
+   function persist() {
       refreshSystemDocument(documentBridge.doc, disabled);
-   });
+   }
 </script>
 
 <ProseMirrorEditor
@@ -65,6 +58,7 @@
    {enriched}
    enrichedReady={enrichedReady}
    documentUUID={documentBridge.doc.uuid}
+   onchange={persist}
    tooltip={tooltip}
    notOwner={!isOwner}
 />
