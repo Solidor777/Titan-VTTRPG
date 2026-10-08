@@ -1,3 +1,6 @@
+import { readFileSync } from 'node:fs';
+import { fileURLToPath } from 'node:url';
+import path from 'node:path';
 import { describe, it, expect, beforeAll, afterAll } from 'vitest';
 import { installSchemaMocks, restoreSchemaMocks } from './helpers/schemaFingerprint.js';
 
@@ -216,5 +219,99 @@ describe('rules-element sources', () => {
             ['conditionEnabled'],
          ],
       ]);
+   });
+});
+
+describe('_getRulesElementSources', () => {
+   it('lists each applying source with its bucket, id, name, and owning effect', () => {
+      /** @type {object} The model. */
+      const model = createSourcedCharacter();
+
+      /** @type {RulesElementSource[]} The sources. */
+      const sources = model._getRulesElementSources();
+      expect(sources.map((source) => [
+         source.type,
+         source.id,
+         source.name,
+         source.effect?.id,
+      ])).toEqual([
+         [
+            'ability',
+            'ability',
+            'ability',
+            undefined,
+         ],
+         [
+            'equipment',
+            'armorEquipped',
+            'armorEquipped',
+            undefined,
+         ],
+         [
+            'equipment',
+            'shieldEquipped',
+            'shieldEquipped',
+            undefined,
+         ],
+         [
+            'equipment',
+            'weaponEquipped',
+            'weaponEquipped',
+            undefined,
+         ],
+         [
+            'equipment',
+            'equipmentEquipped',
+            'equipmentEquipped',
+            undefined,
+         ],
+         [
+            'equipment',
+            'armorEquipped',
+            'armorEquipped',
+            undefined,
+         ],
+         [
+            'effect',
+            'effectEnabled',
+            'effectEnabled',
+            'effectEnabled',
+         ],
+         [
+            'condition',
+            'conditionEnabled',
+            'conditionEnabled',
+            'conditionEnabled',
+         ],
+      ]);
+   });
+
+   it('omits the armor trait source when the armor\'s traits impose nothing', () => {
+      /** @type {object} The model. */
+      const model = createSourcedCharacter();
+      model.parent.items.get('armorEquipped').system.trait = [];
+      expect(model._getRulesElementSources().filter((source) => source.id === 'armorEquipped')).toHaveLength(1);
+   });
+
+   it('gathers an enabled Active Effect of every subtype system.json declares, into its own bucket', () => {
+      /** @type {string[]} The Active Effect subtypes the system registers. */
+      const subtypes = Object.keys(JSON.parse(readFileSync(
+         path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../system.json'),
+         'utf-8',
+      )).documentTypes.ActiveEffect);
+      expect(subtypes.length).toBeGreaterThan(0);
+
+      /** @type {object} A model whose only sources are one enabled Active Effect per subtype. */
+      const model = createSourcedCharacter();
+      model.parent.items = new Map();
+      model.equipped = {
+         armor: null,
+         shield: null,
+      };
+      model.parent.effects = new Map(subtypes.map((subtype) => [
+         subtype,
+         activeEffect(subtype, subtype, 1, false),
+      ]));
+      expect(model._getRulesElementSources().map((source) => source.type).sort()).toEqual([...subtypes].sort());
    });
 });

@@ -426,10 +426,10 @@ functions in `src/document/types/item/rules-element/` create default instances:
 | `createTurnMessageElement`       | `turnMessage`                | Display a message at the character's turn start/end|
 
 `RULES_ELEMENT_FACTORIES` (`src/document/types/item/rules-element/RulesElementFactories.js`) is the single
-operation-to-factory registry in editor display order. `RULES_ELEMENT_OPERATIONS` (`src/system/RulesElementOperations.js`)
-is its key list and `ItemSheetRulesElementOperationSelect` rebuilds a retyped element through it. Two switches stay
-switches and must name every key (`RulesElementOperationRegistry.test.js` pins both):
-`ItemSheetRulesElementSettings`' editor dispatch and `CharacterDataModel._applyRulesElements`' bucket switch.
+operation-to-factory registry in editor display order. `RULES_ELEMENT_OPERATIONS`
+(`src/system/RulesElementOperations.js`) is its key list and `ItemSheetRulesElementOperationSelect` rebuilds a retyped
+element through it. Two switches stay switches and must name every key (`RulesElementOperationRegistry.test.js` pins
+both): `ItemSheetRulesElementSettings`' editor dispatch and `CharacterDataModel._applyRulesElements`' bucket switch.
 
 The shared `rulesElement` array plus its `addRulesElement` / `deleteRulesElement` mutators come from
 `RulesElementMixin` (`src/document/types/item/rules-element/RulesElementMixin.js`), used by both
@@ -438,15 +438,19 @@ Armor, Equipment, Shield, Weapon (all extend `RulesElementItemDataModel`); Commo
 Effect Active Effects carry rules elements via the same mixin on `TitanActiveEffectDataModel`, not as an
 item type.
 
-`CharacterDataModel._applyRulesElements` (called from `prepareDerivedData`) applies rules elements from
-three sources: every owned item's `rulesElement` array, a pass over the actor's `effect`-subtype Active
-Effects (tagged `'effect'`), and a sibling pass over the actor's `condition`-subtype Active Effects (tagged
-`'condition'`); both Active-Effect passes skip `disabled` effects and require a non-empty `system.rulesElement`.
-Condition mechanics are derived entirely through this pipeline — the seeded `system.rulesElement` on each
+`CharacterDataModel._getRulesElementSources()` is the one list of applying sources (`RulesElementSource`:
+`{ elements, type, id, name, effect? }`), in order: owned items with a non-empty `rulesElement` (abilities always,
+tagged `'ability'`; armor and shields while equipped in their slot, weapons and equipment while `equipped`, tagged
+`'equipment'`; `_getItemRulesElementType` decides), the equipped armor's trait check rules when they impose any
+(tagged `'equipment'`), enabled `effect`-subtype Active Effects (tagged `'effect'`), then enabled `condition`-subtype
+Active Effects (tagged `'condition'`); Active Effects need a non-empty `system.rulesElement`. The order is the order
+situational modifiers list their sources in. `CharacterDataModel._applyRulesElements` (called from
+`prepareDerivedData`) copies each source's elements, tagging each with its bucket (`type`) and its source's name
+(`sourceName`). Condition mechanics are derived entirely through this pipeline — the seeded `system.rulesElement` on each
 mechanically-active condition (see `Conditions.js`) feeds the same `flatModifier`/`mulSum`/`setSum` appliers,
 and each stat-mod bucket carries a `condition` entry (alongside `equipment`/`effect`/`ability`). There is no
-hardcoded condition `switch`; the old `_applyConditions` method was retired. All feed the character's derived
-stats. Before bucketing, `_expandAllKeyElements` rewrites every element whose `key === 'all'`
+hardcoded condition `switch`; the old `_applyConditions` method was retired. All sources feed the character's
+derived stats. Before bucketing, `_expandAllKeyElements` rewrites every element whose `key === 'all'`
 into one element per concrete key under its selector (keys resolved by `_getSelectorKeys`, which maps
 `training`/`expertise` to `Object.keys(this.skill)` and otherwise reads `Object.keys(this[selector])`); an
 element whose selector resolves to no keys (a typed custom trait, spell tradition, or situation label, or any
@@ -466,7 +470,7 @@ stat compound in order. Each applier records what it wrote under a same-named ke
 Equipped gear is applied in two places. Outside the rules-element pipeline (`_applyArmorAndShields`, the
 `equipment` mod buckets): the equipped shield adds its `defense` to the Defense rating, the equipped armor adds its
 armor value to `mod.armor`, and an armor trait named `heavy` subtracts 1 from each speed whose base plus mods-so-far
-is above 0. Inside it, `_applyRulesElements` gathers the equipped armor's trait check rules as synthetic situational
+is above 0. Inside it, `_getRulesElementSources` gathers the equipped armor's trait check rules as synthetic situational
 `conditionalCheckModifier` elements sourced as the armor (`createArmorTraitCheckModifiers`): Heavy → Greater
 Disadvantage on "Swim, Fly, or Climb" and Automatic Failure on "Jump", both narrowed to Athletics; Encumbering →
 Disadvantage on "Swim, Fly, or Climb" (Athletics); Loud → Disadvantage on "Remain Undetected by Hearing" (Stealth).

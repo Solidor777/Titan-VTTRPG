@@ -275,6 +275,16 @@ import assert from '~/helpers/utility-functions/Assert.js';
  */
 
 /**
+ * A source of rules elements on a Character: an owned item, the equipped armor's traits, or an Active Effect.
+ * @typedef {object} RulesElementSource
+ * @property {object[]} elements - The source's rules elements (not copied; callers copy before tagging).
+ * @property {string} type - The mod bucket its elements fill: ability, equipment, effect, or condition.
+ * @property {string} id - The owning item's or Active Effect's id.
+ * @property {string} name - The owning item's or Active Effect's name; situational modifiers list their sources by it.
+ * @property {TitanActiveEffect} [effect] - The owning Active Effect, for an effect or condition source.
+ */
+
+/**
  * Whether a selector key is blank. A blank key never matches a check: the rules-elements cache builders skip it and
  * the lookups ignore it, for a single key and inside an array of keys.
  * @param {*} key - The key to test.
@@ -616,112 +626,118 @@ export default class CharacterDataModel extends TitanActorDataModel {
    }
 
    /**
+    * Lists the sources whose Rules Elements apply to this Character, in application order: owned items (abilities
+    * always; armor and shields while equipped in their slot; weapons and equipment while equipped), then the equipped
+    * armor's traits (synthetic situational check modifiers, sourced as the armor), then enabled `effect` Active
+    * Effects, then enabled `condition` Active Effects. The order is the order situational modifiers list their
+    * sources in. Every rules-element pass reads this one list.
+    * @returns {RulesElementSource[]} The applying sources.
+    * @private
+    */
+   _getRulesElementSources() {
+      /** @type {RulesElementSource[]} The sources. */
+      const sources = [];
+      this.parent.items.forEach((item) => {
+         if (!(item.system.rulesElement?.length > 0)) {
+            return;
+         }
+
+         /** @type {string|null} The bucket the item's elements fill, or null when they do not apply. */
+         const type = this._getItemRulesElementType(item);
+         if (type) {
+            sources.push({
+               elements: item.system.rulesElement,
+               id: item.id,
+               name: item.name,
+               type,
+            });
+         }
+      });
+
+      // The equipped armor's traits add synthetic situational check modifiers, sourced as the armor. They are gathered
+      // here because the conditional-check caches are built before _applyArmorAndShields runs.
+      /** @type {TitanItem|boolean} The equipped armor, or false when none is equipped. */
+      const equippedArmor = this.getEquippedArmor();
+      if (equippedArmor) {
+         /** @type {ConditionalCheckModifierElement[]} The armor traits' situational modifiers. */
+         const traitElements = createArmorTraitCheckModifiers(equippedArmor.system.trait);
+         if (traitElements.length > 0) {
+            sources.push({
+               elements: traitElements,
+               id: equippedArmor.id,
+               name: equippedArmor.name,
+               type: 'equipment',
+            });
+         }
+      }
+
+      // Enabled Active Effects: the 'effect' subtype, then the 'condition' subtype, each filling its own bucket.
+      for (const effectType of [
+         'effect',
+         'condition',
+      ]) {
+         this.parent.effects.forEach((effect) => {
+            if (effect.type === effectType && !effect.disabled && effect.system.rulesElement?.length > 0) {
+               sources.push({
+                  effect,
+                  elements: effect.system.rulesElement,
+                  id: effect.id,
+                  name: effect.name,
+                  type: effectType,
+               });
+            }
+         });
+      }
+
+      return sources;
+   }
+
+   /**
+    * Gets the mod bucket an owned item's Rules Elements fill: abilities always apply; armor and shields apply while
+    * equipped in their slot; weapons and equipment apply while equipped.
+    * @param {TitanItem} item - The owned item.
+    * @returns {string|null} 'ability' or 'equipment', or null when the item's elements do not apply.
+    * @private
+    */
+   _getItemRulesElementType(item) {
+      switch (item.type) {
+         case 'ability': {
+            return 'ability';
+         }
+         case 'armor': {
+            return this.equipped.armor === item._id ? 'equipment' : null;
+         }
+         case 'shield': {
+            return this.equipped.shield === item._id ? 'equipment' : null;
+         }
+         case 'weapon':
+         case 'equipment': {
+            return item.system.equipped ? 'equipment' : null;
+         }
+         default: {
+            return null;
+         }
+      }
+   }
+
+   /**
     * Applies Rules Elements to the Character.
     * @private
     */
    _applyRulesElements() {
-      // Get all the Rules Elements.
-      /** @type {*[]} */
+      // Copy every applying source's Rules Elements, tagging each with its bucket and its source's name (situational
+      // modifiers list their sources).
+      /** @type {object[]} The gathered, tagged Rules Elements. */
       const rulesElements = [];
-
-      /**
-       * Copies a source array of Rules Elements into the shared Rules Elements array, tagging each with the provided
-       * category type and the name of the item or effect that owns it (situational modifiers list their sources).
-       * Shared by the owned-item pass and the Active Effect passes.
-       * @param {object[]} sourceElements - The source Rules Elements array to copy from.
-       * @param {string} type - The type by which to categorize the Rules Elements (ability, equipment, effect, or
-       * condition).
-       * @param {string} sourceName - The name of the owning item or effect.
-       */
-      function processElements(sourceElements, type, sourceName) {
-         /** @type {object[]} Copies of the source elements, safe to tag. */
-         const copiedElements = structuredClone(sourceElements);
+      for (const source of this._getRulesElementSources()) {
+         /** @type {object[]} Copies of the source's elements, safe to tag. */
+         const copiedElements = structuredClone(source.elements);
          for (const element of copiedElements) {
-            element.type = type;
-            element.sourceName = sourceName;
+            element.type = source.type;
+            element.sourceName = source.name;
          }
          rulesElements.push(...copiedElements);
       }
-
-      /**
-       * Copies the Rules Elements from an item to the Rules Elements array.
-       * @param {TitanItem} item - The Item to copy the Rules Elements from.
-       * @param {string} type - The type by which to categorize the item's Rules Elements (ability or equipment).
-       */
-      function processItemElements(item, type) {
-         processElements(item.system.rulesElement, type, item.name);
-      }
-
-      this.parent.items.forEach((item) => {
-         if (item.system.rulesElement && item.system.rulesElement.length > 0) {
-
-            // Equipment, armor, shields, and weapons only apply elements if they are equipped.
-            // Abilities always apply their Rules Elements.
-            switch (item.type) {
-               case 'ability': {
-                  processItemElements(item, 'ability');
-                  break;
-               }
-               case 'armor': {
-                  if (this.equipped.armor === item._id) {
-                     processItemElements(item, 'equipment');
-                  }
-                  break;
-               }
-               case 'shield': {
-                  if (this.equipped.shield === item._id) {
-                     processItemElements(item, 'equipment');
-                  }
-                  break;
-               }
-               case 'weapon':
-               case 'equipment': {
-                  if (item.system.equipped) {
-                     processItemElements(item, 'equipment');
-                  }
-                  break;
-               }
-               default: {
-                  break;
-               }
-            }
-         }
-      });
-
-      // The equipped armor's traits add synthetic situational check modifiers, sourced as the armor. They join the
-      // gathered elements here because the conditional-check caches are built below, before _applyArmorAndShields runs.
-      /** @type {TitanItem|boolean} The equipped armor, or false when none is equipped. */
-      const equippedArmor = this.getEquippedArmor();
-      if (equippedArmor) {
-         processElements(createArmorTraitCheckModifiers(equippedArmor.system.trait), 'equipment', equippedArmor.name);
-      }
-
-      // Process Rules Elements from the actor's Active Effects: the 'effect' subtype (tagged 'effect') and
-      // the 'condition' subtype (tagged 'condition') both contribute; disabled effects and other subtypes
-      // are skipped.
-      this.parent.effects.forEach((effect) => {
-         if (
-            effect.type === 'effect' &&
-            !effect.disabled &&
-            effect.system.rulesElement &&
-            effect.system.rulesElement.length > 0
-         ) {
-            processElements(effect.system.rulesElement, 'effect', effect.name);
-         }
-      });
-
-      // Also process Rules Elements from the actor's condition Active Effects. Conditions are the 'condition'
-      // subtype; their rules elements derive stats through the same pipeline as effects, tagged 'condition'.
-      this.parent.effects.forEach((effect) => {
-         if (
-            effect.type === 'condition' &&
-            !effect.disabled &&
-            effect.system.rulesElement &&
-            effect.system.rulesElement.length > 0
-         ) {
-            processElements(effect.system.rulesElement, 'condition', effect.name);
-         }
-      });
 
       // Expand any 'all'-key elements into one element per concrete key under the selector.
       const allElements = this._expandAllKeyElements(rulesElements);
