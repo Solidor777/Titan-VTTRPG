@@ -1036,7 +1036,7 @@ when fixed.
   content to tippy with `allowHTML: true`, and `RichText.svelte` passed its value to `enrichHTML` (which assigns it to
   a live element's `innerHTML`) and then `{@html}`, so a message author could run script in every reader's client.
 - **Found:** 2026-09-30 by the Task 5 buddy check (plan B).
-- - **Fixed:** 2026-09-30 — `tooltipAction` cleans every non-blank tooltip with `foundry.utils.cleanHTML` (the cleaner
+- **Fixed:** 2026-09-30 — `tooltipAction` cleans every non-blank tooltip with `foundry.utils.cleanHTML` (the cleaner
   core's TooltipManager applies) before tippy receives it, on creation and on update, and `RichText` cleans its value
   before `enrichHTML`. Gated, on synthetic props because a real flow cannot carry the handler into these sinks (read:
   `common/prosemirror/schema/attribute-capture.mjs:83-93` drops attributes that `ALLOWED_HTML_ATTRIBUTES` in
@@ -2216,23 +2216,47 @@ The evidence files named here are in `.superpowers/sdd/test-suite-rewrite/phase-
   report" types into the Turn Message editor through `addRulesElement`. The Roll Message editor has no test of its own.
 - **Status:** Closed 2026-10-08.
 
-### 145. A Turn Message or Roll Message typed into its editor was never saved to the document
+### 145. A Turn Message typed into its editor was never saved to the document
 
 The evidence files named here are in `.superpowers/sdd/test-suite-rewrite/phase-6/partB/` (local, not checked in).
 
 - **What:** after a message was typed and saved in the editor of a Turn Message element, no item update was made in
   1.5 s, the document's `_source` held no message and only the live `system` data did
   (`turnmessage-persist-probe-3.log`); when the sheet closed the message was gone from the live data too
-  (`turnmessage-dbg4.log`, `D3`). The same editor on an item description did save (`description-persist-probe.log`).
+  (`turnmessage-dbg4.log`, `D3`). The Roll Message element uses the same component; its saving before the fix was not
+  measured.
 - **Found:** 2026-10-08 while writing the live turn-message test of #85 (a combat started with the element posted no
   turn-start report, `turnmessage-dbg.log`).
-- **Cause (inferred from reading the component, not isolated):** `DocumentBoundEditorInput.svelte` saved through an
-  effect on its bound value. For a Turn Message the bound value is a property of the live document, which no reactive
-  state tracks, and the effect did not run (no update was made); the item description saved through the same
-  component.
+- **Measured:** with the component as it was (`DocumentBoundEditorInput.svelte` saving in an effect on its bound value),
+  the effect ran 3 times for an item description edit, which was saved with one item update, and 0 times after the Turn
+  Message edit, which made no update (`old-effect-probe.log`). Why the two bindings differ is not isolated; the
+  description control that saved is unexplained.
 - **Fixed:** 2026-10-08. `ProseMirrorEditor.svelte` takes an `onchange` callback that it calls after writing a committed
-  edit to the bound value, and `DocumentBoundEditorInput.svelte` saves in that callback instead of in the effect.
-- **Gate:** the same test; its flow waits for the message in the document's `_source`. With the callback made a no-op
-  the test fails at that wait (`mutations/M6-editor-persist-run.log`; restore build `M6-restore-build.log`, source
-  diff checked).
+  edit to the bound value, and `DocumentBoundEditorInput.svelte` saves in that callback instead of in the effect. The
+  item description still saves, with one update (`description-persist-probe-after.log`); an edit of the Turn Message
+  makes one update that carries the message (`turnmessage-update-count.log`; the two other updates of that probe are
+  the add and the operation select).
+- **Gate:** `tests/e2e/combat-turns.spec.js` "a turn message rules element posts its message in the turn-start report"
+  and `tests/e2e/chat-cards.spec.js` "a roll message rules element shows its message on the attribute check card": the
+  `addRulesElement` flow waits for the message in the document's `_source`. With the callback made a no-op both fail at
+  that wait (`mutations/M6-editor-persist-run.log`, `mutations/M8-rollmessage-persist-run.log`; restore build
+  `M6-restore-build.log`).
+- **Status:** Closed 2026-10-08.
+
+### 146. A Roll Message never reached the check it applies to
+
+The evidence files named here are in `.superpowers/sdd/test-suite-rewrite/phase-6/partB/` (local, not checked in).
+
+- **What:** the roll messages of an actor's rules elements were collected into an empty list: with a Roll Message for
+  Body checks on an actor, `_getAttributeCheckMessages({ attribute: 'body' })` returned `false` while the rules cache
+  held the message, and the rolled Body check stored no message (`rollmessage-dbg2.log`, `PRE` and `POST`). The helper
+  `appendUnique` assigned the merged array to its own parameter instead of changing the destination array, and every
+  roll-message collector (any, attribute, skill, resistance, attack type and trait, custom trait, multi-attack, spell
+  tradition) called it (read: `AppendUnique.js` and the callers in `CharacterDataModel.js`).
+- **Found:** 2026-10-08 while adding a live Roll Message test.
+- **Fixed:** 2026-10-08. `appendUnique` adds the missing entries to the destination array in place.
+- **Gate:** `tests/e2e/chat-cards.spec.js` "a roll message rules element shows its message on the attribute check card"
+  (typed through the editor, a Body check rolled from the sheet, the card shows the message and the check stores one)
+  and `tests/unit/AppendUnique.test.js`. With the old assignment both fail (`mutations/M7-appendunique-run.log`,
+  `mutations/M7-appendunique-unit.log`).
 - **Status:** Closed 2026-10-08.

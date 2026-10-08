@@ -369,7 +369,10 @@ longer wrap it in their own `.editor` div; instead they pass `tooltip` and `notO
 `not-owner` class. Foundry captures the toggled element's enriched HTML once at construction and
 `save()` → `_refresh()` repaints the inactive view from that snapshot, so the wrapper **rebuilds the
 element when `enriched` changes while inactive** (guarded by `classList.contains('active')`) to avoid
-stale rendered content; rebuilds never write `value`, so they do not loop with the persist effect.
+stale rendered content; rebuilds never write `value` or call `onchange`, so they never trigger a save.
+`ProseMirrorEditor` takes an optional `onchange` callback, called after a committed edit has been written to `value`:
+`DocumentBoundEditorInput` saves the document's whole system data in that callback, while `DocumentEditorInput` saves
+a path through an effect on its value.
 
 ## Drag-to-reorder lists & cross-sheet element copy
 
@@ -842,56 +845,62 @@ uuid, expectedSelector, errors)` (opens by uuid, asserts the frame class, flushe
 collector is empty; see the shared-world harness below). Drives the real built system at
 the repo root, so it catches v14 API breaks that the mocked Vitest tier cannot.
 
-**Shared-world E2E harness (one world boot per FILE)** — every eligible spec boots the world ONCE per file, not per
-test. The pattern: module-scoped `let page; let errors;` plus three inline lifecycle hooks at module scope —
-`test.beforeAll(async ({ browser }) => { page = await browser.newPage(); errors = attachPageErrors(page); await
-login(page); await clearChat(page); })`, `test.afterEach(async () => { await closeAllApps(page); errors.length = 0; })`,
-and `test.afterAll(async () => { await page?.close(); })`. Tests and `beforeEach`/`afterEach` hooks are `async () =>`
-(no `{ page }` fixture destructure) and use the closure `page`. The helpers live in `tests/e2e/world.js`:
-`closeAllApps(page)` closes transient apps (sheets/dialogs/HUDs) but DELIBERATELY KEEPS three classes of app — (1) core
-UI singletons (those held on `ui[key]` for each `key in CONFIG.ui` — `Sidebar`, `ChatLog`, `Hotbar`, the `titanEffects`
-tray, …); closing them tears down DOM that the sidebar tab-switch lifecycle depends on and crashes any later
-sidebar-activating test; (2) nested sub-apps OWNED by a kept singleton — any app whose `options.directory` is in the
-keep-set (the v14 `PlaceableDirectory` caches per-type `PlaceableTab` apps constructed with `{ directory: ui.placeables
-}`; closing one detaches the element its owner re-queries on every later render, so each subsequent token create/delete
-crashes `PlaceableDirectory#_renderTab` with a `null.replaceWith` TypeError); and (3) the canvas HUD container
-(`canvas.hud`, element id `hud` — NOT in `CONFIG.ui`): it renders only during canvas draw, and
-`BasePlaceableHUD#_insertElement` and `ChatBubbles` re-query its DOM with no null guard, so closing it crashes the first
-later test that opens a token HUD or emits a chat bubble. Because every sidebar tab is mounted (hidden) from ready, the
-Effects tray's `[data-effect-id]` rows (root effects and those in expanded folders) precede any sheet in document order;
-sheet row locators are therefore always scoped to the open sheet — `page.locator('.application.titan-document-sheet
-[data-item-id]')` / `[data-effect-id]` — never bare `page.locator('[data-…-id]')`. `clearChat(page)` deletes all chat
-messages in `beforeAll` (per-file world reset — keeps the world lean so GM→player socket replication does not time out).
-`attachPageErrors(page)` wires ONE `pageerror` listener and returns the shared `errors` array; per-test
-`page.on('pageerror', …)` is banned (it would stack on the reused page) — fold any per-test error assertion onto the
-shared `errors`, which is reset each `afterEach`. A `pageerror` never includes a hook listener's throw: core's
-`Hooks.#call` catches it and passes it to `Hooks.onError`, which logs it and calls the `error` hook only when the thrown
-value is an `Error` (`Error.isError`); a thrown non-`Error` value is logged by `Hooks.#call` as a console warning and
-reported nowhere, so no harness sees it (Foundry 14.364 `client/helpers/hooks.mjs:158-168, 182-188`). `world.js`
+**Shared-world E2E harness (one world boot per FILE)** — every eligible spec boots the world ONCE per
+file, not per test. The pattern: module-scoped `let page; let errors;` plus three inline lifecycle hooks
+at module scope — `test.beforeAll(async ({ browser }) => { page = await browser.newPage(); errors =
+attachPageErrors(page); await login(page); await clearChat(page); })`, `test.afterEach(async () => { await
+closeAllApps(page); errors.length = 0; })`, and `test.afterAll(async () => { await page?.close(); })`.
+Tests and `beforeEach`/`afterEach` hooks are `async () =>` (no `{ page }` fixture destructure) and use the
+closure `page`. The helpers live in `tests/e2e/world.js`: `closeAllApps(page)` closes transient apps
+(sheets/dialogs/HUDs) but DELIBERATELY KEEPS three classes of app — (1) core UI singletons (those held on
+`ui[key]` for each `key in CONFIG.ui` — `Sidebar`, `ChatLog`, `Hotbar`, the `titanEffects` tray, …);
+closing them tears down DOM that the sidebar tab-switch lifecycle depends on and crashes any later
+sidebar-activating test; (2) nested sub-apps OWNED by a kept singleton — any app whose `options.directory`
+is in the keep-set (the v14 `PlaceableDirectory` caches per-type `PlaceableTab` apps constructed with
+`{ directory: ui.placeables }`; closing one detaches the element its owner re-queries on every later
+render, so each subsequent token create/delete crashes `PlaceableDirectory#_renderTab` with a
+`null.replaceWith` TypeError); and (3) the canvas HUD container (`canvas.hud`, element id `hud` — NOT in
+`CONFIG.ui`): it renders only during canvas draw, and `BasePlaceableHUD#_insertElement` and `ChatBubbles`
+re-query its DOM with no null guard, so closing it crashes the first later test that opens a token HUD or
+emits a chat bubble.
+Because every sidebar tab is mounted (hidden) from ready, the Effects tray's `[data-effect-id]` rows (root
+effects and those in expanded folders) precede any sheet in document order; sheet row locators are therefore always
+scoped to the open sheet — `page.locator('.application.titan-document-sheet [data-item-id]')` /
+`[data-effect-id]` — never bare `page.locator('[data-…-id]')`.
+`clearChat(page)` deletes all chat messages in `beforeAll` (per-file world reset — keeps the world lean so
+GM→player socket replication does not time out). `attachPageErrors(page)` wires ONE `pageerror` listener
+and returns the shared `errors` array; per-test `page.on('pageerror', …)` is banned (it would stack on the
+reused page) — fold any per-test error assertion onto the shared `errors`, which is reset each `afterEach`.
+A `pageerror` never includes a hook listener's throw: core's `Hooks.#call` catches it and passes it to
+`Hooks.onError`, which logs it and calls the `error` hook only when the thrown value is an `Error`
+(`Error.isError`); a thrown non-`Error` value is logged by `Hooks.#call` as a console warning and reported nowhere, so
+no harness sees it (Foundry 14.364 `client/helpers/hooks.mjs:158-168, 182-188`). `world.js`
 `installHookErrorReporting(page)` runs before the first navigation: an init script registers an `error` hook listener
-the moment core assigns the `Hooks` global (`client/client.mjs` assigns it through `Object.assign(globalThis, …)`, which
-calls the script's setter), and an exposed binding pushes each report, as `Hooks.onError (<location>): <message>`, into
-every array `attachPageErrors` returned for that page. The binding is asynchronous, so the document also counts its
-reports; `flushHookErrorReports(page)` waits until the delivered count matches. **Harness gate (every test, every world
-page).** Every spec imports `expect` and `test` from `tests/e2e/harness.js`, never from `@playwright/test` (the gate
-runs only through `harness.js`'s `test`; review checks the import). `join.js` `joinWorld` (which `login` calls, and
-`withClients` through it for every second client) attaches a collector before the page's first navigation and records
-the page (`harness.js` `trackWorldPage`), so it collects from boot onward. `test` carries two automatic fixtures: after
-each test, including its `afterEach` hooks, it flushes every recorded open page and fails the test on any error
-collected since the previous check, naming the user and the spec that logged the page in; a worker-scoped one does the
-same after the worker's last test. Errors raised in a `beforeAll` after the boot fail the file's first test; errors in
-an `afterAll` fail the next test of the worker, or the worker's teardown after the last one. `withClients` flushes each
-client before closing its context (a closed page cannot be flushed). A spec's own `attachPageErrors` collector is
-optional: it adds an assertion at a chosen point, on a chosen page. **Boot gate.** `login` fails when the boot raised an
-error: `joinWorld` waits for `game.ready`, flushes, and returns the page errors and hook errors collected from the join
-screen on, including from `init`/`setup`/`ready` listeners; they are marked checked, so the harness gate does not report
-them again. Core sets `game.ready` and calls the `ready` hook synchronously (`client/game.mjs:777-779`), so the read
-follows every synchronous `ready` listener. The cleanup tool `census.js` calls `joinWorld` without the assertion: a boot
-error is printed in its JSON (`bootErrors`) and sets exit code 1, but never stops the census or the sweep, which may be
-what removes the documents behind the error. Console output is not read, so its noise (`ERR_CONNECTION_REFUSED`, vendor
-warnings) never reaches a collector. **Not migrated** (self-managed `BrowserContext`s): `multi-client.spec.js` (which
-also holds the compendium permissions test), `combat-turns.spec.js`, `ownership.spec.js`. Fast-check (`injectFastCheck`
-→ `page.addInitScript`) must run in `beforeAll` BEFORE `login` (init scripts must precede navigation). A spec needing
+the moment core assigns the `Hooks` global (`client/client.mjs` assigns it through `Object.assign(globalThis, …)`,
+which calls the script's setter), and an exposed binding pushes each report, as `Hooks.onError (<location>):
+<message>`, into every array `attachPageErrors` returned for that page. The binding is asynchronous, so the document
+also counts its reports; `flushHookErrorReports(page)` waits until the delivered count matches.
+**Harness gate (every test, every world page).** Every spec imports `expect` and `test` from `tests/e2e/harness.js`,
+never from `@playwright/test` (the gate runs only through `harness.js`'s `test`; review checks the import).
+`join.js` `joinWorld` (which `login` calls, and `withClients` through it for every second client) attaches
+a collector before the page's first navigation and records the page (`harness.js` `trackWorldPage`), so it collects
+from boot onward. `test` carries
+two automatic fixtures: after each test, including its `afterEach` hooks, it flushes every recorded open page and fails
+the test on any error collected since the previous check, naming the user and the spec that logged the page in; a
+worker-scoped one does the same after the worker's last test. Errors raised in a `beforeAll` after the boot fail the
+file's first test; errors in an `afterAll` fail the next test of the worker, or the worker's teardown after the last
+one. `withClients` flushes each client before closing its context (a closed page cannot be flushed). A spec's own
+`attachPageErrors` collector is optional: it adds an assertion at a chosen point, on a chosen page.
+**Boot gate.** `login` fails when the boot raised an error: `joinWorld` waits for `game.ready`, flushes, and returns
+the page errors and hook errors collected from the join screen on, including from `init`/`setup`/`ready` listeners;
+they are marked checked, so the harness gate does not report them again. Core sets `game.ready` and calls the `ready`
+hook synchronously (`client/game.mjs:777-779`), so the read follows every synchronous `ready` listener. The cleanup
+tool `census.js` calls `joinWorld` without the assertion: a boot error is printed in its JSON (`bootErrors`) and sets
+exit code 1, but never stops the census or the sweep, which may be what removes the documents behind the error.
+Console output is not read, so its noise (`ERR_CONNECTION_REFUSED`, vendor warnings) never reaches a collector.
+**Not migrated** (self-managed `BrowserContext`s): `multi-client.spec.js` (which also holds the compendium
+permissions test), `combat-turns.spec.js`, `ownership.spec.js`. Fast-check (`injectFastCheck` →
+`page.addInitScript`) must run in `beforeAll` BEFORE `login` (init scripts must precede navigation). A spec needing
 pristine per-test boots opts out by keeping `beforeEach(login)`.
 
 **No fixed sleeps in E2E (banned)** — never settle with a fixed-duration `await page.waitForTimeout(n)`
@@ -993,9 +1002,9 @@ when asked, its Resolve Cost input, Resistance Check select, Opposed Check box, 
 Damage Reduced By select), `addRulesElement` (the Rules Elements tab add button, the operation select, and the controls
 of the operation: the `ccm-*` selects, key input and value input of a conditional check modifier; the rating, selector
 and key of a conditional rating modifier; the selector, key, value and rounding or mode of the flat, Multiply Base,
-Multiply Sum and Set Sum operations; the selector and the rich-text message of a Turn Message, typed into its
-editor and awaited in the document's `_source` because the live data holds the text before the editor's update reaches
-the database, CLOSED_BUGS #145; a negative value is typed in parentheses because a leading operator in a number
+Multiply Sum and Set Sum operations; the selector and the rich-text message of a Turn Message or Roll Message, typed
+into its editor and awaited in the document's `_source` because the live data holds the text before the editor's update
+reaches the database, CLOSED_BUGS #145; a negative value is typed in parentheses because a leading operator in a number
 input is a relative change), `addTrait` (the Edit Traits dialog of a weapon attack, an armor or a shield),
 `setAttributeBase` and `setSkillTraining` (the base input of an attribute in the sheet header, the training input of a
 skill row in the Skills tab), `applyCondition` / `removeCondition` (the Token HUD of a placed token: right-click, the
