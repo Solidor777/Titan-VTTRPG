@@ -4,10 +4,37 @@ import moveArrayEntry from '~/helpers/utility-functions/MoveArrayEntry.js';
 import cloneElementWithNewUuid from '~/helpers/utility-functions/CloneElementWithNewUuid.js';
 
 /**
+ * Awaits an update of a document's check array and runs `undo` when the update did not commit. A check edit changes the
+ * live model and the sheet's expansion state before its update resolves, so the next edit's snapshot of `system`
+ * (`RefreshSystemDocumentData.js` sends the whole `system`) already carries the change and a later edit does not lose
+ * it; an update that a `preUpdate` hook vetoes (it resolves undefined) or that the server rejects must take those edits
+ * back, or the next edit would save them.
+ * @param {() => Promise<foundry.abstract.Document|undefined>} update - Sends the update.
+ * @param {() => void} undo - Takes back the edits made before the update.
+ * @returns {Promise<foundry.abstract.Document|undefined>} The updated document, or undefined when nothing committed.
+ */
+async function commitCheckUpdate(update, undo) {
+   /** @type {foundry.abstract.Document|undefined} The updated document. */
+   let committed;
+   try {
+      committed = await update();
+   }
+   catch (error) {
+      undo();
+      throw error;
+   }
+   if (!committed) {
+      undo();
+   }
+   return committed;
+}
+
+/**
  * Mixin that adds the mutators of a document's `system.check` array to a document class. Items and Active Effects
  * share the Checks tab (`ItemSheetChecksTab.svelte`), which calls these four methods on its document, so both
  * document classes take them from here. INVARIANT: the document's sheet implements `postAddCheck`, `preDeleteCheck`,
- * `postMoveCheck` and `postInsertCheck`, which keep the per-check expansion state aligned with the array.
+ * `postMoveCheck`, `postInsertCheck`, `snapshotCheckExpansion` and `restoreCheckExpansion`, which keep the per-check
+ * expansion state aligned with the array and take it back when an update does not commit.
  * @param {typeof foundry.abstract.Document} BaseClass - The document class to extend.
  * @returns {typeof foundry.abstract.Document} The extended class with check-list mutators.
  */
@@ -24,15 +51,30 @@ export default function CheckListMixin(BaseClass) {
             'Cannot modify document %s if not owner.',
             this.name,
          )) {
-            this.system.check.push(createItemCheckTemplate());
-            await this.update({
-               system: {
-                  check: structuredClone(this.system.check),
+            // The new Check goes into the live model first so an edit made before the update resolves carries it.
+            /** @type {ItemCheckTemplate} The new Check. */
+            const added = createItemCheckTemplate();
+            this.system.check.push(added);
+
+            /** @type {foundry.abstract.Document|undefined} The updated document, or undefined if none committed. */
+            const committed = await commitCheckUpdate(
+               () => this.update({
+                  system: {
+                     check: structuredClone(this.system.check),
+                  },
+               }),
+               () => {
+                  // The model is already rebuilt from the stored data when the new Check is not found.
+                  /** @type {number} The position of the new Check in the live model, or -1. */
+                  const idx = this.system.check.findIndex((check) => check.uuid === added.uuid);
+                  if (idx >= 0) {
+                     this.system.check.splice(idx, 1);
+                  }
                },
-            });
+            );
 
             // Notify the sheet of the added check.
-            if (this.sheet) {
+            if (committed && this.sheet) {
                this.sheet.postAddCheck();
             }
          }
@@ -49,17 +91,29 @@ export default function CheckListMixin(BaseClass) {
             'Cannot modify document %s if not owner.',
             this.name,
          )) {
+            /** @type {{tabs: boolean[], sidebar: boolean[]}|undefined} The expansion state before the deletion. */
+            const expansion = this.sheet?.snapshotCheckExpansion();
+
             // Notify the sheet before deletion.
             if (this.sheet) {
                this.sheet.preDeleteCheck(idx);
             }
 
-            this.system.check.splice(idx, 1);
-            await this.update({
-               system: {
-                  check: structuredClone(this.system.check),
+            /** @type {ItemCheck} The Check taken out of the live model. */
+            const [removed] = this.system.check.splice(idx, 1);
+            await commitCheckUpdate(
+               () => this.update({
+                  system: {
+                     check: structuredClone(this.system.check),
+                  },
+               }),
+               () => {
+                  if (!this.system.check.some((check) => check.uuid === removed.uuid)) {
+                     this.system.check.splice(idx, 0, removed);
+                  }
+                  this.sheet?.restoreCheckExpansion(expansion);
                },
-            });
+            );
          }
       }
 
@@ -75,16 +129,22 @@ export default function CheckListMixin(BaseClass) {
             'Cannot modify document %s if not owner.',
             this.name,
          )) {
+            /** @type {{tabs: boolean[], sidebar: boolean[]}|undefined} The expansion state before the move. */
+            const expansion = this.sheet?.snapshotCheckExpansion();
+
             // Keep per-check expansion state aligned before the reactive re-render.
             if (this.sheet) {
                this.sheet.postMoveCheck(fromIdx, toIdx);
             }
 
-            await this.update({
-               system: {
-                  check: moveArrayEntry(this.system.check, fromIdx, toIdx),
-               },
-            });
+            await commitCheckUpdate(
+               () => this.update({
+                  system: {
+                     check: moveArrayEntry(this.system.check, fromIdx, toIdx),
+                  },
+               }),
+               () => this.sheet?.restoreCheckExpansion(expansion),
+            );
          }
       }
 
@@ -104,16 +164,22 @@ export default function CheckListMixin(BaseClass) {
             const next = this.system.check.slice();
             next.splice(atIdx, 0, cloneElementWithNewUuid(element));
 
+            /** @type {{tabs: boolean[], sidebar: boolean[]}|undefined} The expansion state before the insertion. */
+            const expansion = this.sheet?.snapshotCheckExpansion();
+
             // Seed expansion state for the inserted row before the reactive re-render.
             if (this.sheet) {
                this.sheet.postInsertCheck(atIdx);
             }
 
-            await this.update({
-               system: {
-                  check: next,
-               },
-            });
+            await commitCheckUpdate(
+               () => this.update({
+                  system: {
+                     check: next,
+                  },
+               }),
+               () => this.sheet?.restoreCheckExpansion(expansion),
+            );
          }
       }
    };

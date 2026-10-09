@@ -17,6 +17,10 @@ import moveArrayEntry from '~/helpers/utility-functions/MoveArrayEntry.js';
  * lockstep with an Item Check reorder.
  * @property {(atIdx: number) => void} postInsertCheck - Splices an expanded flag into the per-check expansion arrays
  * when a copied Item Check is inserted.
+ * @property {() => {tabs: boolean[], sidebar: boolean[]}} snapshotCheckExpansion - Copies the per-check expansion
+ * arrays of the Checks tab and the sidebar.
+ * @property {(snapshot: {tabs: boolean[], sidebar: boolean[]}) => void} restoreCheckExpansion - Puts back the
+ * expansion arrays copied by `snapshotCheckExpansion`.
  */
 
 /**
@@ -79,6 +83,35 @@ export default function createTitanItemSheetState(item, overrideData) {
       });
    }
 
+   /**
+    * Copies the per-check expansion arrays so a check change that does not commit can be taken back.
+    * @returns {{tabs: boolean[], sidebar: boolean[]}} The copied expansion arrays of the Checks tab and the sidebar.
+    */
+   function snapshotCheckExpansion() {
+      /** @type {{tabs: boolean[], sidebar: boolean[]}} The copied arrays. */
+      let snapshot;
+      update((data) => {
+         snapshot = {
+            tabs: [...data.tabs.checks.isExpanded],
+            sidebar: [...data.sidebar.checks.isExpanded],
+         };
+         return data;
+      });
+      return snapshot;
+   }
+
+   /**
+    * Puts back the per-check expansion arrays copied by `snapshotCheckExpansion`.
+    * @param {{tabs: boolean[], sidebar: boolean[]}} snapshot - The copied expansion arrays.
+    */
+   function restoreCheckExpansion(snapshot) {
+      update((data) => {
+         data.tabs.checks.isExpanded = [...snapshot.tabs];
+         data.sidebar.checks.isExpanded = [...snapshot.sidebar];
+         return data;
+      });
+   }
+
    return {
       set,
       update,
@@ -87,5 +120,7 @@ export default function createTitanItemSheetState(item, overrideData) {
       preDeleteCheck,
       postMoveCheck,
       postInsertCheck,
+      snapshotCheckExpansion,
+      restoreCheckExpansion,
    };
 }

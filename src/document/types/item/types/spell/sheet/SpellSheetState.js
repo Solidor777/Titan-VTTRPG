@@ -28,6 +28,8 @@ export default function createSpellSheetState(item) {
       preDeleteCheck,
       postMoveCheck,
       postInsertCheck,
+      snapshotCheckExpansion,
+      restoreCheckExpansion,
    } = createTitanItemSheetState(item, createSpellSheetData(item));
 
    /**
@@ -88,5 +90,7 @@ export default function createSpellSheetState(item) {
       preDeleteCheck,
       postMoveCheck,
       postInsertCheck,
+      snapshotCheckExpansion,
+      restoreCheckExpansion,
    };
 }

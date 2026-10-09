@@ -28,6 +28,8 @@ export default function createWeaponSheetState(item) {
       preDeleteCheck,
       postMoveCheck,
       postInsertCheck,
+      snapshotCheckExpansion,
+      restoreCheckExpansion,
    } = createRulesElementItemSheetState(item, createWeaponSheetData(item));
 
    /**
@@ -92,5 +94,7 @@ export default function createWeaponSheetState(item) {
       preDeleteCheck,
       postMoveCheck,
       postInsertCheck,
+      snapshotCheckExpansion,
+      restoreCheckExpansion,
    };
 }

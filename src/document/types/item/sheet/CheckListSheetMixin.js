@@ -2,7 +2,8 @@
  * Mixin that adds the check-list notifications to a sheet class. `CheckListMixin` (the document side) calls these four
  * methods on `document.sheet` when it changes a check; each forwards to the sheet's `applicationState`, which keeps the
  * per-check expansion state aligned with the `system.check` array. INVARIANT: the sheet's `applicationState` provides
- * `postAddCheck`, `preDeleteCheck`, `postMoveCheck` and `postInsertCheck` (`TitanItemSheetState.js`).
+ * `postAddCheck`, `preDeleteCheck`, `postMoveCheck`, `postInsertCheck`, `snapshotCheckExpansion` and
+ * `restoreCheckExpansion` (`TitanItemSheetState.js`).
  * @param {typeof import('~/document/sheet/TitanDocumentSheet.js').default} BaseClass - The sheet class to extend.
  * @returns {typeof import('~/document/sheet/TitanDocumentSheet.js').default} The extended class.
  */
@@ -43,6 +44,23 @@ export default function CheckListSheetMixin(BaseClass) {
        */
       postInsertCheck(atIdx) {
          this.applicationState.postInsertCheck(atIdx);
+      }
+
+      /**
+       * Copies the per-check expansion state, for `restoreCheckExpansion` when a check change does not commit.
+       * @returns {{tabs: boolean[], sidebar: boolean[]}} The copied expansion arrays of the Checks tab and sidebar.
+       */
+      snapshotCheckExpansion() {
+         return this.applicationState.snapshotCheckExpansion();
+      }
+
+      /**
+       * Puts back the per-check expansion state copied by `snapshotCheckExpansion`.
+       * @param {{tabs: boolean[], sidebar: boolean[]}} snapshot - The copied expansion arrays.
+       * @returns {void}
+       */
+      restoreCheckExpansion(snapshot) {
+         this.applicationState.restoreCheckExpansion(snapshot);
       }
    };
 }
