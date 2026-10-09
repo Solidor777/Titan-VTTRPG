@@ -15,8 +15,11 @@
    /** @type {object} The item bridge: the embedded weapon on the actor sheet, the sheet's weapon on the item sheet. */
    const document = getContext('document');
 
+   /** @type {import('~/document/reactive/ResolveRollActor.js').RollActorReference} The sheet's roll actor reference. */
+   const rollActorReference = getContext('rollActor');
+
    /** @type {object|undefined} The actor that rolls this attack. */
-   const rollActor = getContext('rollActor');
+   const rollActor = $derived(rollActorReference.current);
 
    /** @type {AttackCheckOptions} Base options for the Attack Check, targeting this row's attack index. */
    const checkOptions = $derived({

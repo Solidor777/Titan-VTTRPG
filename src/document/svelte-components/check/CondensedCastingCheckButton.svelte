@@ -6,8 +6,11 @@
    /** @type {object} The item bridge: the embedded spell on the actor sheet, the sheet's spell on the item sheet. */
    const document = getContext('document');
 
+   /** @type {import('~/document/reactive/ResolveRollActor.js').RollActorReference} The sheet's roll actor reference. */
+   const rollActorReference = getContext('rollActor');
+
    /** @type {object|undefined} The actor that rolls this casting check. */
-   const rollActor = getContext('rollActor');
+   const rollActor = $derived(rollActorReference.current);
 
    // The item id is fixed for this component's lifetime; capturing it once in checkOptions is intentional.
    /** @type {CastingCheckOptions} Base options for the Casting Check. */

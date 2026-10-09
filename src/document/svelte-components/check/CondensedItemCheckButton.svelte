@@ -14,8 +14,11 @@
    /** @type {object} The item bridge: the embedded item on the actor sheet, the sheet's item on the item sheet. */
    const document = getContext('document');
 
+   /** @type {import('~/document/reactive/ResolveRollActor.js').RollActorReference} The sheet's roll actor reference. */
+   const rollActorReference = getContext('rollActor');
+
    /** @type {object|undefined} The actor that rolls this check (actor sheet's actor, or the item's parent actor). */
-   const rollActor = getContext('rollActor');
+   const rollActor = $derived(rollActorReference.current);
 
    /** @type {ItemCheckOptions} Base options for the Item Check, targeting this row's check index. */
    const checkOptions = $derived({

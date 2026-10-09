@@ -39,8 +39,11 @@
    /** @type {object} Reference to the Application State store. */
    const appState = getContext('applicationState');
 
+   /** @type {import('~/document/reactive/ResolveRollActor.js').RollActorReference} The sheet's roll actor reference. */
+   const rollActorReference = getContext('rollActor');
+
    /** @type {object|undefined} The actor that can roll this check, or undefined when the current user cannot. */
-   const rollActor = getContext('rollActor');
+   const rollActor = $derived(rollActorReference.current);
 
    /** @type {ItemCheck} The Check this component represents. */
    const check = $derived(document.data.system.check[idx]);

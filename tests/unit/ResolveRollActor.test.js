@@ -17,18 +17,21 @@ function makeCharacterActor(overrides = {}) {
 }
 
 /**
- * Wraps a fake doc in a minimal bridge shape ({ doc }) matching ReactiveDocument's accessor surface.
+ * Wraps a fake doc in a minimal bridge shape ({ doc, data }) matching ReactiveDocument's accessor surface.
  * @param {object} doc - The fake document to wrap.
  * @returns {object} A stub bridge.
  */
 function makeBridge(doc) {
-   return { doc };
+   return {
+      doc,
+      data: doc,
+   };
 }
 
 describe('resolveRollActor', () => {
    it('returns the same bridge for a character actor sheet', () => {
       const bridge = makeBridge(makeCharacterActor());
-      expect(resolveRollActor(bridge)).toBe(bridge);
+      expect(resolveRollActor(bridge).current).toBe(bridge);
    });
 
    it('returns a parent-actor bridge for an owned item whose parent is a character', () => {
@@ -39,7 +42,7 @@ describe('resolveRollActor', () => {
          isOwner: true,
          parent,
       });
-      const result = resolveRollActor(bridge);
+      const result = resolveRollActor(bridge).current;
       expect(result).toBeDefined();
       expect(result.doc).toBe(parent);
    });
@@ -51,7 +54,23 @@ describe('resolveRollActor', () => {
          isOwner: false,
          parent: makeCharacterActor(),
       });
-      expect(resolveRollActor(bridge)).toBeUndefined();
+      expect(resolveRollActor(bridge).current).toBeUndefined();
+   });
+
+   it('follows the ownership of the item after the reference is resolved', () => {
+      const parent = makeCharacterActor();
+      const doc = {
+         documentName: 'Item',
+         isEmbedded: true,
+         isOwner: false,
+         parent,
+      };
+      const reference = resolveRollActor(makeBridge(doc));
+      expect(reference.current, 'a non-owner has no roll actor').toBeUndefined();
+      doc.isOwner = true;
+      expect(reference.current?.doc, 'the owner has the parent').toBe(parent);
+      doc.isOwner = false;
+      expect(reference.current, 'the lost ownership removes it again').toBeUndefined();
    });
 
    it('returns undefined for a world item (not embedded)', () => {
@@ -61,7 +80,7 @@ describe('resolveRollActor', () => {
          isOwner: true,
          parent: null,
       });
-      expect(resolveRollActor(bridge)).toBeUndefined();
+      expect(resolveRollActor(bridge).current).toBeUndefined();
    });
 
    it('returns undefined for an owned item whose parent cannot roll checks', () => {
@@ -74,7 +93,7 @@ describe('resolveRollActor', () => {
             system: {},
          },
       });
-      expect(resolveRollActor(bridge)).toBeUndefined();
+      expect(resolveRollActor(bridge).current).toBeUndefined();
    });
 
    it('returns undefined for a non-character actor sheet', () => {
@@ -82,10 +101,10 @@ describe('resolveRollActor', () => {
          documentName: 'Actor',
          system: {},
       });
-      expect(resolveRollActor(bridge)).toBeUndefined();
+      expect(resolveRollActor(bridge).current).toBeUndefined();
    });
 
    it('returns undefined when given nothing', () => {
-      expect(resolveRollActor(undefined)).toBeUndefined();
+      expect(resolveRollActor(undefined).current).toBeUndefined();
    });
 });

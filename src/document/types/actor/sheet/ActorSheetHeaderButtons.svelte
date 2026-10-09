@@ -14,8 +14,10 @@
    /** @type {TokenDocument | null} The active Token, or null for a directory Actor. Stable per sheet. */
    const token = application.token;
 
-   /** @type {boolean} Whether the active user may configure this Actor's tokens. */
-   const canEditToken = game.user.isGM || (application.actor.isOwner && game.user.can('TOKEN_CONFIGURE'));
+   /** @type {boolean} Whether the active user may configure this Actor's tokens; follows the Actor's ownership. */
+   const canEditToken = $derived(
+      game.user.isGM || (document.data.isOwner && game.user.can('TOKEN_CONFIGURE')),
+   );
 
    /** @type {boolean} Whether the active user may import this Actor from its compendium pack. */
    const canImport = game.user.isGM && !!application.actor.pack;
