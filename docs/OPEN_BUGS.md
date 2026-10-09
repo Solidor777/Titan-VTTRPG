@@ -253,3 +253,20 @@ Files cited as `bugbatch1-logs/...` are in `.superpowers/sdd/2026-09-29-conditio
 - **Cause not located.**
 - **Found:** 2026-10-08 during Phase 6 Part A.
 - **Status:** Open.
+
+### 151. An open item sheet keeps its inputs editable after the viewer loses ownership
+
+The evidence files named here are in `.superpowers/sdd/2026-09-29-conditions-rework/bugbatch1-logs/` (local,
+not checked in).
+
+- **What (measured):** E2E Player 1 had the check label input of a weapon's sheet open and focused as an owner. The GM
+  set the player's ownership of the actor to Observer. The player's client then reported `isOwner` false for the item, and
+  the input stayed enabled and focused, also 3 s later. After the sheet was opened again the same input was disabled
+  (`diag-readonly.jsonl`; probe `readonly-probe.spec.js.txt`; build `96560d6f...`). The inputs disable themselves
+  with `disabled || !document.data?.isOwner` when they are rendered, and nothing in the probe re-rendered them.
+- **Not examined:** what an edit from that stale input does (the server's refusal, if any, was not run); whether
+  other sheets behave the same.
+- **Cause not located.**
+- **Found:** 2026-10-09 while measuring whether `DocumentTextInput`'s focus state can stick when its input becomes
+  disabled (it cannot be disabled while open, so it cannot stick).
+- **Status:** Open.

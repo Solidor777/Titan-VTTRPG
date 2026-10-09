@@ -2439,7 +2439,7 @@ not checked in).
   passes (`mut-u4-ime-oninput-run.log`).
 - **Unfocused input follows the model (measured):** two specs lock the other half of the focus guard: another client
   sets the label and this page's unfocused input shows it; a remote label arrives while the input is focused and
-  unedited, and the input shows it after the blur with nothing sent over it. Both pass (`r5-item-text-run2.log`;
+  unedited, and the input shows it after the blur with nothing sent over it. Both pass (`e2e-full-round5.log`;
   hashes in `r5-run-hashes.txt`); the copy `$effect` made inert (`if (false)`) fails both and nothing else
   (`mut-u5-copy-effect-run.log`; hashes in `mut-u5-copy-effect-hashes.log`).
 - **Cancelled composition, count (measured):** the cancel sends exactly one update (the `compositionend` send). The
