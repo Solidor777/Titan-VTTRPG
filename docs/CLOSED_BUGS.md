@@ -1490,7 +1490,7 @@ The evidence files named here are in `.superpowers/sdd/test-suite-rewrite/phase-
     token through the `createScene` and `placeToken` flows and not through `controlFixtureActorToken`; the helper was
     deleted in Phase 6 of the test-suite rewrite, once `effect-tray.spec.js` (its last importer, read: grep) moved to
     the flows. The old test established and asserted its own precondition, and the new one does the same:
-    - it waits until no scrolling text animates (OPEN_BUGS #114), clears the active flag of the active test scene
+    - it waits until no scrolling text animates (CLOSED_BUGS #114), clears the active flag of the active test scene
       (a direct update: no control deactivates a scene) and reloads;
     - it asserts that no scene is active or drawn.
   - The old test then:
@@ -2437,6 +2437,18 @@ not checked in).
   With this guard the label typed without a key event also survives a rebuild through the local text, so the
   `oninput` line is now needed by the key-by-key and held-key specs only: removed, those two fail and the label spec
   passes (`mut-u4-ime-oninput-run.log`).
+- **Unfocused input follows the model (measured):** two specs lock the other half of the focus guard: another client
+  sets the label and this page's unfocused input shows it; a remote label arrives while the input is focused and
+  unedited, and the input shows it after the blur with nothing sent over it. Both pass (`r5-item-text-run2.log`;
+  hashes in `r5-run-hashes.txt`); the copy `$effect` made inert (`if (false)`) fails both and nothing else
+  (`mut-u5-copy-effect-run.log`; hashes in `mut-u5-copy-effect-hashes.log`).
+- **Cancelled composition, count (measured):** the cancel sends exactly one update (the `compositionend` send). The
+  `oncompositionend` line removed fails the cancel spec on that count and the composition spec
+  (`mut-u5-compositionend-run.log`).
+- **Focus state when the input becomes disabled (measured):** a focused input cannot become disabled while its sheet is
+  open: after the viewer's ownership was lowered to Observer the input stayed enabled and focused, and only a reopened
+  sheet disabled it (OPEN_BUGS #151, `diag-readonly.jsonl`). The `focused` flag therefore cannot stick through that
+  path, and no other caller passes `disabled`, so no change was made and no spec was kept.
 - **Callers that bind into an array (read):** the check, custom aspect and attack label inputs bind
   `check.label`, `aspect.label` and `attack.label`, and the rules element key inputs (`customTrait`, `spellTradition`)
   bind `rulesElement[idx].key`. Their rows are `{#each ... (uuid)}` blocks keyed by the entry's uuid (`ItemSheetChecksTab`,
@@ -2569,45 +2581,71 @@ repro), `bugbatch2-logs/pf2e/` (the no-TITAN control) and `bugbatch2-logs/impl/`
   were made through the UI, token (a) by a canvas drop of an actor whose prototype token is unlinked, token (b) by
   unlinking a linked token with the Token config toggle. Both tokens stored `delta: null`. Clear Expired Effects sent
   one `modifyDocument` `delete` of both effects with parent `Scene.<id>.Token.<id>.ActorDelta.<id>`, and the reply
-  listed both ids with no error. The server copy of the token still held `delta: null` right after, 2 s later and after
-  a reload; the client showed the effects gone until the reload (`repro102b/run1.log` to `run4.log`). A one-effect delete
-  on a `delta: null` token, and the clear on a token whose delta a Stamina edit had created, were stored
-  (`repro102b/c1.log` to `c3.log`).
-- **Control with no TITAN, measured** (`test-pf2e`, pf2e 8.2.0, Foundry 14.364, no module enabled, 3 runs; with
-  `stylish-action-hud` enabled the same, 3 runs): a batch delete of two embedded Items on an unlinked token with
-  `delta: null` left the stored delta null in 3 of 3 runs, a single delete stored a delta with one tombstone in 3 of 3,
-  and a batch of two after a Token HUD toggle had created the delta stored in 3 of 3
+  listed both ids with no error. The server copy of the token still held `delta: null` right after, 2 s later and
+  after a reload; the client showed the effects gone until the reload (`repro102b/run1.log` to `run4.log`). A
+  one-effect delete on a `delta: null` token, and the clear on a token whose delta a Stamina edit had created, were
+  stored (`repro102b/c1.log` to `c3.log`).
+- **Control with no TITAN, delete side, measured** (`test-pf2e`, pf2e 8.2.0, Foundry 14.364, no module enabled, 3
+  runs; with `stylish-action-hud` enabled the same, 3 runs): a batch delete of two embedded Items on an unlinked token
+  with `delta: null` left the stored delta null in 3 of 3 runs, a single delete stored a delta with one tombstone in 3
+  of 3, and a batch of two after a Token HUD toggle had created the delta stored in 3 of 3
   (`bugbatch2-logs/pf2e/t102-final1.log` to `t102-final3.log`, `t102-nomod1.log` to `t102-nomod3.log`). pf2e cannot
-  author Active Effects (`createEmbeddedDocuments('ActiveEffect')` on a pf2e actor returned 0 documents), so the control
-  measured embedded Items, on the same ActorDelta path. The loss is a core defect.
-- **Mechanism, read in core (the loop is read, not instrumented; the failing and passing specs below are the
+  author Active Effects (`createEmbeddedDocuments('ActiveEffect')` on a pf2e actor returned 0 documents), so the
+  control measured embedded Items, on the same ActorDelta path. The delete-side loss is a core defect.
+- **Create side, attribution:** read, TITAN-world red, no-TITAN control pending. The server's create path hands the
+  same shared `writeParent` holder to each document (`_createDocuments`, `dist/database/backend/server-backend.mjs`),
+  and a folder drop of three items on a `delta: null` token stored none of them in the TITAN world (`red-1.log`). A
+  batch `createEmbeddedDocuments('Item', ...)` control in `test-pf2e` has not been run.
+- **Mechanism, read in core (the walk is read, not instrumented; the failing and passing specs below are the
   measurements that agree with it):** the server handles the documents of a batch one after another with the same
   `writeParent` holder. For each embedded document `EmbeddedDeltaMixin#batchWrite` and `#batchDelete`
   (`dist/database/backend/embedded-delta.mjs`, `#e`) walk up the ancestors, adopt every ancestor the parent's collection
-  does not manage yet, and return the nearest adopted one. The first document adopts the delta and then the token (the
-  token record has to be written to hold the delta), so the holder is the token. For the second document the delta is
-  managed already, so the walk returns only the delta, which replaces the token as the write parent. The token record is
-  then not written and the delta is lost. A one-document call, an update (`_preUpdate` adopts the document first), and a
-  batch after the delta is stored take no second adoption of the token. Read: the client's private
+  does not manage yet, and return the outermost ancestor they adopted. The first document adopts the delta and then the
+  token (the token record has to be written to hold the delta), so the holder is the token. For the second document the
+  delta is managed already, so the walk returns only the delta, which replaces the token as the write parent. The token
+  record is then not written and the delta is lost. A one-document call, an update (`_preUpdate` adopts the document
+  first), and a batch after the delta is stored take no second adoption of the token. Read: the client's private
   `TokenDocument#relinkActorDelta` (`client/documents/token.mjs:3964-3966`) sets the client's `_source.delta` before a
   descendant delete or update, which is inferred to be why the client shows the change until the reload.
 - **Fixed:** `TitanActor#createEmbeddedDocuments` and `#deleteEmbeddedDocuments` write the first document of a batch of
-  two or more alone when the actor is an unlinked token's synthetic actor (`isToken`) whose token holds no delta in its
-  source, and then the rest in one call (`needsDeltaFirst` in `src/document/types/actor/TitanActor.js`). The override is
-  a workaround for the core defect and every caller goes through it (Remove Expired Effects, the combat and auto-removal
-  paths, the folder drop, the stored-actor walker). A `deleteAll` operation passes no ids and is not split; no TITAN
-  caller uses it.
-- **Failing first (measured):** `tests/e2e/unlinked-token-delta.spec.js` makes the scene, an NPC actor with an unlinked
-  prototype token, three expired effects, an Item folder with three items and two tokens by canvas drops (each with a
-  server-read `delta: null` precondition). Test 1 clicks Remove Expired Effects on the token sheet, test 2 drops the
-  Item folder on the token sheet; each reloads and reads the client and the server copy. On the code without the
+  two or more alone when the actor is an unlinked token's synthetic actor (`isToken`) whose token source holds no
+  delta, and then the rest in one call (`needsDeltaFirst` and `writeInSteps` in
+  `src/document/types/actor/TitanActor.js`). The override is a workaround for the core defect. Callers that go through
+  the actor's methods are covered (Remove Expired Effects, the combat and auto-removal paths, the folder drop, the
+  stored-actor walker); a class-level call such as `Item.createDocuments(data, { parent })` bypasses it, and no TITAN
+  code makes one.
+  - **The guard reads client state** (`token._source.delta`). Core replaces it with the server's data on every load and
+    sets it only after the server accepted a first write below the token (read: `relinkActorDelta`, run from the
+    descendant events after the server's reply). It differs from the server only after a batch that bypassed the
+    overrides and was lost. A server read before every batch would cost a round trip for no other case.
+  - **The guard is tested again after each single write.** A document that a listener vetoed or that failed validation
+    is dropped before the request (read: `#preCreateDocumentArray` and `#preDeleteDocumentArray`,
+    `client/data/client-backend.mjs`), so it stores no delta and the next document goes alone too.
+  - **`deleteAll`** is resolved to the ids of the whole embedded collection, as core resolves it
+    (`client-backend.mjs`, `#preDeleteDocumentArray`), and split like any batch.
+  - **A delete naming an id the actor lacks** is rejected before the first write, as core rejects it (the same strict
+    `collection.get(id, { strict: true, invalid: true })`).
+  - **Not atomic.** Core sends a batch as one server operation. The split sends the first document and then the rest
+    as two operations, so when the server rejects the rest (for example a kept id that already exists), the first
+    document stays written, where core writes none. A neutral write that stores the delta first is not available: no
+    token field can be written without changing what the token inherits (not verified in core), and a client-side
+    check of the whole batch before the first write exists only for the unknown-id case above; core drops invalid or
+    vetoed documents one by one on the client and rejects whole batches only on the server (read). The hooks
+    (`preCreateItem`, `createItem` and the like) run once per write, not once per batch.
+- **Failing first** (measured, first version of the override and spec, `40b14d02`): the spec made the scene, an NPC
+  actor with an unlinked prototype token, three expired effects, an Item folder with three items and two tokens by
+  canvas drops (each with a server-read `delta: null` precondition). Remove Expired Effects on the token sheet and the
+  folder drop on the token sheet each reloaded and read the client and the server copy. On the code without the
   override both failed: 3 effects remained after the reload, and the token's actor owned 0 items
-  (`bugbatch2-logs/impl/red-1.log`). With the override both passed (`green-1.log`).
-- **Mutation (measured):** the delete override disabled fails test 1 only (`mut1-run.log`), the create override
-  disabled fails test 2 only (`mut2-run.log`); `git hash-object` and sha256 before, during and after, and the restored
-  text equal to the baseline copy, in `mut-hashes.log`; the build was run after each mutation and after the restore.
+  (`bugbatch2-logs/impl/red-1.log`). With the override both passed (`green-1.log`). Delete override disabled failed the
+  effects test only, create override disabled the folder test only (`mut1-run.log`, `mut2-run.log`; hashes in
+  `mut-hashes.log`).
+- **Final override and spec:** the override gained the repeated guard, `deleteAll`, the unknown-id check and one shared
+  helper, and the spec gained exact-two batches, the stored-delta path, `deleteAll`, the unknown id, a vetoed first
+  document and a rejected rest, with the database requests of each test counted. Written and linted; the red, green
+  and mutation runs of this version are pending a free server.
 - **Found:** 2026-10-01 while the Task 5 fix round 2 identity e2e (plan B) was seeding its tokens.
-- **Status:** Closed 2026-10-09.
+- **Status:** Closed 2026-10-09 for the delete side; the create side awaits the no-TITAN control and the final runs.
 
 ### 109. A token sheet highlighted the Skills tab while showing the Effects tab
 
@@ -2622,24 +2660,28 @@ checked in). Core citations refer to Foundry 14.364 at `C:\FoundryVTT\V14\dev\fo
   button held `active` and the Effects panel showed in 60 of 60, and the Skills button still painted highlighted
   immediately after the click in 60 of 60; after the buttons' animations finished only Effects painted highlighted in
   60 of 60. The tab buttons' computed `transition` was `all 0.5s` in 60 of 60.
-- **Cause:** not a defect. The only stylesheet rule that sets a transition on a tab button is core's `a.button, button`
-  with `transition: 0.5s` (`public/css/foundry2.css:4056`, measured in `t109/pilot8.log`), so the old tab fades for up to
-  0.5 s after a click and a screenshot taken inside that time shows the old highlight. TITAN sets no transition on the
-  buttons, and `Tabs.svelte` sets the `active` class and the panel from the same state.
-- **Status:** Closed 2026-10-09, not a defect.
+- **Cause and ruling:** the fade is core's, by design of core's button styling, and is not a TITAN defect (a ruling,
+  not a measurement of core's intent). The only stylesheet rule that sets a transition on a tab button is core's
+  `a.button, button` with `transition: 0.5s` (`public/css/foundry2.css:4056`, measured in `t109/pilot8.log`), so the
+  old tab fades for up to 0.5 s after a click and a screenshot taken inside that time shows the old highlight. TITAN
+  sets no transition on the buttons, and `Tabs.svelte` sets the `active` class and the panel from the same state.
+- **Status:** Closed 2026-10-09, ruled not a TITAN defect (core's button fade).
 
 ### 114. Deactivating the viewed scene while a status's scrolling text is on screen throws
 
 Core citations refer to Foundry 14.364 at `C:\FoundryVTT\V14\dev\foundry`. The evidence files named here are in
-`.superpowers/sdd/test-suite-rewrite/phase-0/` and `.superpowers/sdd/2026-09-29-conditions-rework/bugbatch2-logs/pf2e/`
-(local, not checked in).
+`.superpowers/sdd/test-suite-rewrite/phase-0/` and
+`.superpowers/sdd/2026-09-29-conditions-rework/bugbatch2-logs/pf2e/` (local, not checked in).
 
+- **User-reachable core defect with no TITAN fix.** A GM who deactivates the viewed scene within about 2 s of a
+  status's scrolling text gets the error below in the console. TITAN has no code involved and cannot prevent it; the
+  entry is closed per the convention for core defects (#116, #117), not because the error cannot occur for a user.
 - **Measured** (probe, `test-titan`, TITAN loaded): a token's actor gains a status (`toggleStatusEffect`), which starts
-  the 2 s scrolling text, and the viewed scene is deactivated at once (`scene.update({ active: false })`). The page throws
-  `TypeError: Cannot read properties of null (reading 'off')` at `PreciseText.destroy` <-
-  `InterfaceCanvasGroup.createScrollingText` (`client/canvas/groups/interface.mjs:174`) (`probe114-status.json`). A direct
-  core call `canvas.interface.createScrollingText(...)` followed by the deactivation throws the same error with the same
-  destroy sequence (`probe114-core.json`).
+  the 2 s scrolling text, and the viewed scene is deactivated at once (`scene.update({ active: false })`). The page
+  throws `TypeError: Cannot read properties of null (reading 'off')` at `PreciseText.destroy` <-
+  `InterfaceCanvasGroup.createScrollingText` (`client/canvas/groups/interface.mjs:174`) (`probe114-status.json`). A
+  direct core call `canvas.interface.createScrollingText(...)` followed by the deactivation throws the same error with
+  the same destroy sequence (`probe114-core.json`).
 - **Read:** the deactivation runs `Canvas.tearDown`, which destroys the group's children, including the scrolling text
   (`client/canvas/groups/canvas-group-mixin.mjs:172-177`) and terminates the running animations
   (`client/canvas/board.mjs:1326`), so the awaited fade-in resolves; `createScrollingText`'s clean-up then removes and
@@ -2650,18 +2692,18 @@ Core citations refer to Foundry 14.364 at `C:\FoundryVTT\V14\dev\foundry`. The e
   control"; with `stylish-action-hud` enabled and with no module, 3 runs each): a scrolling text created with
   `canvas.interface.createScrollingText` and the scene deactivated at once rejected with `TypeError: Cannot read
   properties of null (reading 'off')` in 12 of 12 trials with the module and 12 of 12 with none; the unobserved trials
-  raised the page error in 6 of 6 and 6 of 6, with the stack `PreciseText.destroy` <- `InterfaceCanvasGroup.createScrollingText`;
-  a 2.6 s wait before the deactivation threw nothing in 9 of 9 and 9 of 9 (`pf2e/t114-r1.log` to `t114-r3.log`,
-  `t114-nomod1.log` to `t114-nomod3.log`). With a 2.6 s wait the TITAN-world probes also threw nothing
-  (`probe114-core-wait.json`, `probe114-status-wait.json`).
-- **Cause:** a core defect, not fixable in TITAN: TITAN has no PIXI or canvas tear-down code (a search of `src/` and
-  `dist/index.js` found no reference to `createScrollingText`, `InterfaceCanvasGroup` or `tearDownChildren`,
-  `fix5-grep-114-titan.txt`), and the error occurs in a world without TITAN. It needs the scene to be deactivated within
-  about 2 s of a status's scrolling text.
+  raised the page error in 6 of 6 and 6 of 6, with the stack `PreciseText.destroy` <-
+  `InterfaceCanvasGroup.createScrollingText`; a 2.6 s wait before the deactivation threw nothing in 9 of 9 and 9 of 9
+  (`pf2e/t114-r1.log` to `t114-r3.log`, `t114-nomod1.log` to `t114-nomod3.log`). With a 2.6 s wait the TITAN-world
+  probes also threw nothing (`probe114-core-wait.json`, `probe114-status-wait.json`).
+- **Cause:** a core defect: TITAN has no PIXI or canvas tear-down code (a search of `src/` and `dist/index.js` found no
+  reference to `createScrollingText`, `InterfaceCanvasGroup` or `tearDownChildren`, `fix5-grep-114-titan.txt`), and the
+  error occurs in a world without TITAN. It needs the scene to be deactivated within about 2 s of a status's scrolling
+  text.
 - **Handling in the test layer:** the #113 gate test waits until no animation runs on `canvas.interface` before it
   deactivates the scene; without that wait the spec failed with this error in 6 of 6 runs
-  (`fix5-mut114-no-scrolling-text-wait-run1.log` to `-run6.log`). Under the 1 s poll rule the wait cannot last the 2 s of
-  the animation, so the last test of `combat-turns.spec.js` reloads the page first (a reload ends the animations) and
-  then deactivates the scene.
+  (`fix5-mut114-no-scrolling-text-wait-run1.log` to `-run6.log`). Under the 1 s poll rule the wait cannot last the 2 s
+  of the animation, so the last test of `combat-turns.spec.js` reloads the page first (a reload ends the animations)
+  and then deactivates the scene.
 - **Found:** 2026-10-01 while writing the gate test of CLOSED_BUGS #113 (test-suite rewrite, Phase 0 fix round 1).
 - **Status:** Closed 2026-10-09 as a core defect with the attribution measured (precedent: #116, #117).

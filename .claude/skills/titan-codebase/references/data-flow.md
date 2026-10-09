@@ -515,9 +515,10 @@ writes to the token's ActorDelta). These writes are stored as made (`stored()` r
 created unlinked token a delta only when its name differs from its base actor's (`client/documents/token.mjs:1657`).
 Core loses a create or delete of two or more embedded documents on such a token (CLOSED_BUGS #102);
 `TitanActor#createEmbeddedDocuments` and `#deleteEmbeddedDocuments` write the first document alone, which stores the
-delta, so these writes are safe. A token the pass has work on always holds delta entries, so its delta exists. An Adventure's actors and scene tokens are data (`SetField`
-of `EmbeddedDataField`): their targets edit a per-walk working copy of the field (`AdventureContent`), and the walk
-stores it in one `adventure.update({ actors })` or `({ scenes })` when it leaves the Adventure — one write per field,
+delta, and then the rest, so these writes are stored. The split is not atomic: when the server rejects the rest, the
+first document stays written (core rejects the whole batch). A token the pass has work on always holds delta entries,
+so its delta exists. An Adventure's actors and scene tokens are data (`SetField` of `EmbeddedDataField`): their targets edit a per-walk working copy of the field (`AdventureContent`), and
+the walk stores it in one `adventure.update({ actors })` or `({ scenes })` when it leaves the Adventure — one write per field,
 because core validates every element of a replaced array on each write, so a legacy `effect` Item (unregistered subtype)
 left in any actor fails the write. The write is checked (core resolves `undefined` for a write it did not store), and
 `stored()` of every target of that Adventure settles with it; a failed write's error names the entries still holding a
