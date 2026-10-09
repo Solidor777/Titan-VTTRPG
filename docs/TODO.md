@@ -21,32 +21,32 @@ Completed items are deleted, not marked done.
   - Task 17: documentation, skill, memory and full verification.
   Task 5's fix round 4 is parked (see below).
 
-- Compendium audit findings awaiting a rules decision (2026-09-27; module `src/packs`, rules 2026-09-26):
-  - Force Slow: `mulBase` halves only the base speed and rounds down; the text gives no rounding.
-  - Parch: -5 speed "to a minimum of 1"; the clamp is 0.
-  - Blood Frenzy: text grants +5 Speed; the effect has only a turn message.
-  - Force Speed and the three Elder Sibling effects: +5 to every speed grants Fly/Swim/Burrow/Climb 5 to creatures
-    without them; no operation can condition on a non-zero speed.
-  - Aether Blades, Inferno Blades, Radiant Blade, Sacred Arms of the Arbiter (Weapon): "+1 Damage" to chosen weapons
-    has no element; a conditional modifier would apply to every attack.
-  - Jade Perception: Awareness +1/2 Metaphysics Training has no element.
-  - Lord of Black Flames: roll message keyed to a custom trait "Unarmed" that no item carries.
-  - Empower Soul: roll message carries Aether Blades text.
-  - Blue Magister: casting roll message lacks its name prefix.
-  - Urderic Glaivegun: Strike range 2 versus no range in the rules.
-  - Light Attunement: custom trait "Attunement" versus the rules' "Light" trait.
-  - Shockwave: radius 5 versus "each creature adjacent to you".
-  - Metal Attunement and Effulgent Gaze: `removeCondition` where the rules grant immunity (plan B Task 16).
-  - Missing spell aspects: Charm Creature, Dominate Creature, Infiltrate Dreams, Enlarge/Reduce Creature (resistance),
+- Compendium audit rulings (plan C; module `src/packs`, rules 2026-09-26). User rulings of 2026-10-08. General rule:
+  round down unless the text states otherwise. To do in plan C:
+  - Force Slow: no change (it already rounds down).
+  - Blood Frenzy: add the +5 Speed effect.
+  - Aether Blades, Inferno Blades, Radiant Blade, Sacred Arms of the Arbiter (Weapon): the "+1 Damage" conditional
+    modifier stays a placeholder; the target is a modifier that applies to every attack the chosen weapon makes.
+  - Missing spell aspects (Charm Creature, Dominate Creature, Infiltrate Dreams, Enlarge/Reduce Creature (resistance),
     Create Fissure (damage), Grasping Earth (duration), Abyssal Darkness (Defense/Reflexes +2), Chained Bolts (extra
-    targets).
-  - Urderic Gunshield: document name versus the rules' "Urderic Gun Shield".
-  - Stray `type` fields on rules elements and trait entries (harmless, overwritten or unread).
-  - Tough: "add your Resilience to maximum Stamina" is a flat +1 placeholder; no operation adds one stat to another.
-  - Blood Probe, Conjurer of Urdokai, Pull of Urdokai, Warding of Urdokai: the text describes a check; no check entry.
-  - Hunger of Urdokai: description says "Range: 10 spaces"; the rules say Touch.
-  - Stormcaller's Tempest: flagged as an action; The Dragon Awakens and Being of Urdokai, which work the same way, are
-    passive.
+    targets)): add the aspects where the existing mechanics allow; no new mechanics.
+  - Blood Probe, Conjurer of Urdokai, Pull of Urdokai, Warding of Urdokai: add the check entries.
+  - Force Speed and the three Elder Sibling effects: no change; granting speeds the creature lacks is intended.
+  - Urderic Glaivegun: the rules text gains a range (the compendium's Strike range 2 stands).
+  - Light Attunement: carry both the "Attunement" and "Light" traits.
+  - Shockwave: match the rules ("each creature adjacent to you").
+  - Hunger of Urdokai: match the description (Range: 10 spaces).
+  - Urderic Gunshield: rename the document to the rules' "Urderic Gun Shield".
+  - Stormcaller's Tempest: mark passive, like The Dragon Awakens and Being of Urdokai.
+  - Empower Soul: replace the Aether Blades text in its roll message.
+  - Blue Magister: add the name prefix to the casting roll message.
+  - Stray `type` fields on rules elements and trait entries: strip them.
+  - Metal Attunement and Effulgent Gaze: `removeCondition` where the rules grant immunity (plan B Task 16).
+  - Parch: clamp Speed at 1, as the rules say "to a minimum of 1" (user ruling 2026-10-08). Check how the clamp
+    applies to Fly, Swim, Burrow and Climb when implementing.
+  - No change: Lord of Black Flames (the custom trait "Unarmed" in its roll message is a placeholder).
+- Operation that adds one stat to another (user ruling 2026-10-08): not in this campaign. Tough ("add your Resilience to
+  maximum Stamina") and Jade Perception (Awareness +1/2 Metaphysics Training) keep their placeholders until it exists.
 
 - Plan B Task 5 fix round 4, parked by the user on 2026-10-01 until the test-suite rewrite is done. The plan
   (`.superpowers/sdd/2026-09-29-conditions-rework/task-5-fix4-plan.md`, revision 2) and its unreconciled reviews
@@ -77,3 +77,23 @@ Completed items are deleted, not marked done.
   reference file (last touched by commit `5526adee`). Measured 2026-10-02: no file in the repo, script or config reads
   it (`grep -rn "\.agents"` finds only the note in `docs/POST_WORK_FINDINGS.md`); whether an external agent tool reads
   `.agents/skills/` is not verified. `.agents/skills/graphify/` is separate.
+
+- Field-scoped document updates instead of the whole-system read-modify-write in `refreshSystemDocument` (long-term
+  shape named by the bug batch 1 review, 2026-10-09). Read in
+  `src/helpers/utility-functions/RefreshSystemDocumentData.js`: every document-bound input event sends
+  `structuredClone(document.system)` and `document.flags`, so one edit carries every other field of the live model.
+  Inferred, not measured: an update built from a model that is behind the stored data can overwrite a newer stored
+  value. The check-list mutators edit the model before their update resolves and take the edit back when it does not
+  commit (`commitCheckUpdate` in `CheckListMixin.js`) because the next edit sends the whole `system`; CLOSED_BUGS
+  #147 and #148 were found on this shape. Target: each input sends only its own field path, and the mutators send only
+  their own array.
+
+- UI-only controls usable by read-only viewers. On a sheet the viewer cannot edit, core disables every control of the
+  window content at each render, and TITAN keeps that rule (the view-only tab strips and row expand toggles are
+  re-enabled in `TitanDocumentSheet._toggleDisabled`). Controls that change no document state, such as the Filter
+  inputs of the Skills tab and of the item sheet lists, are disabled with the rest. Idea: let observers and limited
+  viewers use such controls (filter a long list they can read). Needs a ruling on which controls count as UI-only and a
+  marker like `[data-view-controls]` for them, since `DocumentSheetV2` disables by form membership. Read from the
+  code, not measured: a tab first shown after a sheet turned read-only mounts its controls after the render that
+  disabled the rest, so its Filter would be usable by an observer while the Filter of the tab shown at the first
+  render is not.
