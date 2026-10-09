@@ -2393,9 +2393,22 @@ not checked in).
   the fixed build (`green-147-148-run1.log`; `dist/index.js` sha256 `fa2af98c...`, `dist-sha-fix.txt`).
 - **Mutation (measured):** `oninput` put back to `onkeyup`: the spec fails (`mut-m147-keyup-run.log`; before, mutated
   and after sha256 and `git hash-object` in `mut-m147-keyup-hashes.log`; restored build `fa2af98c...`).
-- **Not covered:** the numeric document inputs (`DocumentIntegerInput`, `DocumentNumberInput`,
-  `DocumentIntegerIncrementInput`) also bind to the model and send on `change` / `keyup`; they evaluate expressions on
-  commit and were not changed or tested. `DocumentNameInput` keeps its own local value and does not bind to the model.
+- **Numeric document inputs (read, then measured):** `DocumentIntegerInput`, `DocumentNumberInput` and
+  `DocumentIntegerIncrementInput` bind `value` to the model and send on `change` / `keyup`, but `NumberInput.svelte`
+  keeps the typed text in its own `input` state: the effect that copies the bound value into `input` runs only while
+  `editingActive` is false (`NumberInput.svelte:47-51`), and the value is written back on `change`.
+  `DocumentNameInput` keeps a local `value` and commits through its own `document.data.update({ name })`. Measured:
+  `item-text-input.spec.js` `fill`s a check's Resolve Cost with "7" and no key event, has a second client rename the
+  item, blurs and reads `resolveCost` from the server: it passes on build `cffa8268...`
+  (`green-undo-inverse-run2.log`), so the numeric inputs are not affected and the spec stays as a regression lock.
+  Mutation: the `editingActive` guard replaced by `true` fails the spec and leaves the other two passing
+  (`mut-u-numberinput-guard-run.log`; hashes in `mut-u-numberinput-guard-hashes.log`).
+- **Typed key by key (measured):** the same file types a check label with `pressSequentially` and no delay (every key
+  event dispatched at once, the send now on `input`). The input keeps the typed text and the server holds it before and
+  after the blur; it passes (`green-undo-inverse-run2.log`), so no new bug. Mutation: the `oninput` line of
+  `DocumentTextInput.svelte` removed fails this spec and the label spec above and leaves the numeric spec passing
+  (`mut-u-textinput-oninput-run.log`; hashes in `mut-u-textinput-oninput-hashes.log`). Held-key auto-repeat and
+  input-method composition were not run.
 - **Found:** 2026-10-08 while diagnosing #122.
 - **Status:** Closed 2026-10-09.
 
@@ -2412,20 +2425,89 @@ not checked in).
   edit saved them.
 - **Failing first (measured, `failfirst-148-*.log`, build `5490ae64...`):**
   `tests/e2e/check-list-refused-update.spec.js` makes a weapon with checks through the flows and refuses its updates
-  with a `preUpdateItem` listener that returns false (no flow refuses an update on demand), then edits another check
-  through the sheet. Refused Add Check: the edit saved the phantom check as well (one extra check stored). Refused
-  Delete: the expansion state came back as one entry (`[false]`) instead of `[true, false]`. Refused reorder: the
-  expansion state came back misaligned.
+  with a `preUpdateItem` listener that returns false, or rejects them with an `update` method on the item instance that
+  throws (no flow refuses or rejects an update on demand; neither is a real user flow), then edits another check through
+  the sheet. Refused Add Check: the edit saved the phantom check as well (one extra check stored). Refused Delete: the
+  expansion state came back as one entry (`[false]`) instead of `[true, false]`. Refused reorder: the expansion state
+  came back misaligned. The specs added afterwards (rejected Add Check, rejected Delete, upward reorder, insert, the
+  toggle in flight) were written against the fixed code and proved by the mutations below, except the toggle in flight,
+  which failed first on the build with the copy-back (below).
 - **Fixed:** `CheckListMixin` sends each update through `commitCheckUpdate`, which undoes the caller's edits when the
   update resolves undefined or rejects: `addCheck` removes its check by `uuid` (when the model was not already rebuilt),
-  `deleteCheck` puts its check back by `uuid`, and the three sheet-notifying mutators restore the expansion arrays
-  copied by the new `snapshotCheckExpansion` / `restoreCheckExpansion` (`TitanItemSheetState`, `CheckListSheetMixin`,
-  passed through `RulesElementItemSheetState`, `SpellSheetState`, `WeaponSheetState`). The model edits stay optimistic.
-  Green on build `fa2af98c...` (`green-147-148-run1.log`).
-- **Mutations (measured, `mut-m148-<name>-run.log`, hashes in `mut-m148-<name>-hashes.log`, each restored to build
-  `fa2af98c...`):** no undo at all: all 3 tests fail; the add undo removed: the Add Check test fails (2 pass); the
-  delete model restore removed: the Delete test fails; the delete expansion restore removed: the Delete test fails; the
-  move expansion restore removed: the reorder test fails. `insertCheck` takes the same undo as `moveCheck` and has no
-  test of its own.
+  `deleteCheck` puts its check back by `uuid` (skipped when the index named no check), and the sheet takes the
+  expansion flags back with `undoDeleteCheck(idx, removed)` (`preDeleteCheck` returns the removed flags),
+  `undoMoveCheck(from, to)` and `undoInsertCheck(at)` (`TitanItemSheetState`, `CheckListSheetMixin`, passed through
+  `RulesElementItemSheetState`, `SpellSheetState`, `WeaponSheetState`). Each undo reverses its own entry of the
+  arrays. The first text of the fix copied the arrays back from a snapshot taken before the change; measured on that
+  build, an expansion toggle made while a rejected Delete was in flight was lost (the second row, collapsed in flight,
+  was expanded again after the rejection: `inflight-toggle.jsonl`, last line), and the spec for it failed first on that
+  build with expected `[true, false]`, received `[true, true]` (`failfirst-inflight-old-dist.log`; dist and source
+  hashes in `failfirst-inflight-hashes.txt`). The model edits stay optimistic. Green on build `cffa8268...`
+  (`green-undo-inverse-run2.log`: 9 tests of the check-list spec plus the 3 of `item-text-input.spec.js`).
+- **Specs (9, each asserts the interception saw exactly one update, `toBe(1)`):** refused Add Check, refused Delete,
+  refused reorder down, refused reorder up, refused insert (a copy dragged from a second weapon), rejected Add Check,
+  rejected Delete, a toggle made while a rejected Delete is in flight (the held update throws only when the test says
+  so), and a click on the Add Check button sends only its own update (#149).
+- **Mutations (measured on build `cffa8268...`, whole spec file per mutation, `mut-u-<name>-run.log`, hashes in
+  `mut-u-<name>-hashes.log`, each restored to build `cffa8268...`):** the add undo removed: refused and rejected Add
+  Check fail; the delete model restore removed: refused Delete, rejected Delete and the toggle in flight fail; the
+  delete expansion undo removed: the same three; the move expansion undo removed: both refused reorders; the insert
+  expansion undo removed: the refused insert; the undo in the `catch` removed: rejected Add Check, rejected Delete and
+  the toggle in flight; the undo after a vetoed update (`!committed`) removed: the five refused specs; the inverse
+  move index set to the original index: the upward reorder only.
 - **Found:** 2026-10-08 while diagnosing #122.
+- **Status:** Closed 2026-10-09.
+
+### 149. A click on an untyped button of a TITAN sheet, and Enter in a text input, sent a second update
+
+The evidence files named here are in `.superpowers/sdd/2026-09-29-conditions-rework/bugbatch1-logs/` (local,
+not checked in).
+
+- **What:** `TitanDocumentSheet` extends `DocumentSheetV2`, whose form handler sends `document.update(formData)` when
+  the sheet's `<form>` submits (`_onSubmitForm` → `#onSubmitDocumentForm` → `_processSubmitData`, the stack in
+  `diag-second-update.jsonl`). The sheet's form has no named fields, yet a `<button>` without a `type` attribute inside
+  it submits the form. Measured on build `fa2af98c...`: a click on Add Check of a weapon sheet reached `preUpdateItem`
+  twice, with the keys `system, _id` (the check) and `type, _id` (`type: 'weapon'`, the form's data); collapse and
+  expand sent none and Delete one (`diag-button-updates.jsonl`); the sheet held 17 buttons without a `type` attribute
+  and 8 with `type="button"` (`diag-form.jsonl`). Enter in a check label input sent one `type, _id` update on a build
+  without the handler below and none on the fixed build (`diag-enter-updates.jsonl`). The `preUpdate` hooks ran for the
+  form update (measured); whether it reached the database is not verified.
+- **How it was found:** the second update of a refused Add Check, which loosened the assertions of the #148 specs to
+  `toBeGreaterThan(0)`. The first lead, `Select.svelte:114-121` calling `onchange` for a value outside its options, was
+  not the cause: the update's only key is `type` and its stack is the form submit.
+- **Failing first (measured):** the refused Add Check spec saw 2 updates where 1 was expected, and the own-update spec
+  saw 2 (`failfirst-form-refused-Add-Check.log`, `ff2-only-its-own-update.log`; the sources' `git hash-object` values in
+  `ff-form-hashes.txt`, `dist/index.js` sha256 `fa2af98c...`).
+- **Fixed:** `TitanDocumentSheet.DEFAULT_OPTIONS.form` sets `handler` to a no-op (`ignoreFormSubmission`), with
+  `submitOnChange` and `closeOnSubmit` false. The Svelte components write the documents themselves, and the handler
+  covers every button and Enter without editing each button. Green on build `cffa8268...`
+  (`green-undo-inverse-run2.log`).
+- **Mutation (measured):** the `handler` line removed: the refused Add Check spec and the own-update spec fail
+  (`mut-u-form-handler-run.log`; hashes in `mut-u-form-handler-hashes.log`; restored build `cffa8268...`).
+- **Found:** 2026-10-09 while fixing #148 (second review round).
+- **Status:** Closed 2026-10-09.
+
+### 150. After a failed test, the restarted `beforeAll` recorded the wrong document or failed in the creation flow
+
+The evidence files named here are in `.superpowers/sdd/2026-09-29-conditions-rework/bugbatch1-logs/` (local,
+not checked in).
+
+- **What:** `createFromDirectory` and `createFolder` found the new directory entry by its name. When a test of a file
+  fails, Playwright restarts the worker and runs the file's `beforeAll` again (already noted in the E2E conventions),
+  which creates a second document of the same name while the first stays until the teardown. The flow recorded the
+  first document's id again, so the second document was never recorded and the teardown reported `The sweep deleted
+  documents no flow recorded: actors: 1`; once the lookup failed on strict mode (two matches). The cause is inferred
+  from the registry, not from a log of the events: the wait for one matching entry is satisfied at once by the older
+  entry, before the new entry renders. Measured with a throwaway spec of one deliberately failing test
+  (`fail-probe.spec.js.txt`) against the by-name text of the flows (`mut-u-flows-by-name-run.log`; the registry shows
+  the first shared actor's id recorded twice and the second shared actor unrecorded:
+  `diag-fail-registry-by-name.jsonl`). The same sweep message ended the first run of the #148 specs after one of their
+  tests failed (`green-undo-inverse-run1.log`).
+- **Fixed:** the creation flows read the ids of the entries that already show the name before the click and take the
+  one new id after it (`readEntryIds` in `tests/e2e/flows.js`). With the fix the probe records all four documents and
+  the sweep deletes none (`diag-fail-registry-fixed.jsonl`).
+- **Mutation (measured):** the by-name text put back: the probe's teardown fails with the sweep message
+  (`mut-u-flows-by-name-run.log`; hashes in `mut-u-flows-by-name-hashes.log`).
+- **Not changed:** a lookup of a document by name elsewhere in the suite still finds both documents.
+- **Found:** 2026-10-09 while running the #148 specs.
 - **Status:** Closed 2026-10-09.

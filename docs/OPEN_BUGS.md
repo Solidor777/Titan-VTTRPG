@@ -242,7 +242,10 @@ Files cited as `bugbatch1-logs/...` are in `.superpowers/sdd/2026-09-29-conditio
 - **Page errors keep their stack (2026-10-08):** `attachPageErrors` and the hook-error report now collect
   `error.stack` (the message when there is none); the earlier harness kept `error.message` only, so no run could have
   saved a stack. Measured with a throwaway page that threw in a timer: the collected entry was
-  `Error: E2E diag stack probe\n    at throwsLater (...)` (`bugbatch1-logs/stack-capture-probe.log`). The source
+  `Error: E2E diag stack probe\n    at throwsLater (...)` (`bugbatch1-logs/stack-capture-probe.log`). The hook-error
+  path (`Hooks.onError`, `error?.stack`) was measured the same way with a listener that throws in a hook called from
+  the page: the collected entry was `Hooks.onError (E2E probe location): Error: E2E hook error probe\n    at
+  hookThatThrows (...)` (`bugbatch1-logs/hook-stack-probe.log`, `bugbatch1-logs/diag-hook-stack.jsonl`). The source
   frames of a minified stack map through `dist/index.js.map`.
 - **Not reproduced with stacks enabled (2026-10-08), measured:** 30 of 30 runs of the saved variant-c flow (real
   actor, weapon dragged onto it, Inventory tab, `requestAttackCheck`, Delete Item button, `confirmDeletingItems` off,
@@ -309,14 +312,21 @@ Files cited as `bugbatch1-logs/...` are in `.superpowers/sdd/2026-09-29-conditio
     creation dialog still open (`toHaveCount(0)` received 1) on the first page of the process
     (`diag-A-old-r*.jsonl`, `diag-A-new-r*.jsonl`, `diag-A-new2-r*.jsonl`, `diag-A-evt-r4.jsonl`, `-r6.jsonl`;
     `diag-A-old-r1.jsonl` also holds 2 earlier smoke lines).
-  - The cause of the throttled draw-wait failures is the polling wait, not the draw. At rate 4, 20 creations per wait
-    mechanism, the wait started 417 to 426 ms (median) after the click on OK and the first state read that showed the
-    scene drawn came at 1244 ms (default `waitForFunction` polling) and 1232 ms (`polling: 50`), against the
-    `canvasReady` hook at 866 and 863 ms; the wait on the hook resolved a median of 47 ms after the hook ran and
-    never took longer than 552 ms (`diag-A3-raf-r4.jsonl`, `diag-A3-poll50-r4.jsonl`, `diag-A3-hook-r4.jsonl`). Core
-    sets the canvas ready before it calls the hook (`board.mjs` `#initialize`, `#ready = true`, then the hook), so
-    the state was already true at the hook; that the polling read came about 380 ms late is inferred to be a main thread
-    busy after the hook (not measured). `waitForSceneDrawn` waits on the hook since `57ff347f`.
+  - The throttled draw-wait failures follow the polled wait, not the draw. The failure counts above are the
+    before/after comparison: at rate 4 the polled draw wait failed 15 of 20 (`e0a46d5d` and `249ccb24`) and 20 of 20
+    (intermediate text), the hook wait 0 of 20. The timings of the later probe (rate 4, 20 creations per wait
+    mechanism) are medians: the wait started 417.5 (frame-aligned), 426.5 (`polling: 50`) and 426.5 ms (hook) after
+    the click on OK; the `canvasReady` hook ran at 871.5, 865.5 and
+    865.5 ms; the first state read that showed the scene drawn came at 1245.5 ms (frame-aligned) and 1233.5 ms
+    (`polling: 50`). That read came a median of 358.5 and 364.5 ms after the hook (median of the per-creation
+    differences; the difference of the two medians is 374 and 368 ms), the same lag for both polling intervals, so it is
+    not the interval. 2 of the 20 frame-aligned waits lasted longer than 1000 ms (maximum 1067 ms), none of the 20
+    `polling: 50` waits (maximum 908 ms), so those timings alone do not reproduce the 15 of 20 failures of the
+    polled helper. The wait on the hook ended a median of 47 ms after the hook ran (maximum 51 ms) and the longest of
+    its 20 waits lasted 552 ms (`diag-A3-raf-r4.jsonl`, `diag-A3-poll50-r4.jsonl`, `diag-A3-hook-r4.jsonl`; medians
+    recomputed in `med-a3.log`). Core sets the canvas ready before it calls the hook (`board.mjs` `#initialize`,
+    `#ready = true`, then the hook), so the state was already true at the hook; that a main thread busy after the hook
+    delays the polled read is inferred (not measured). `waitForSceneDrawn` waits on the hook since `57ff347f`.
   - Event order from the click on OK, in 20 creations per run at no throttle (median, maximum), two runs
     (`diag-A-probe-old-r1.jsonl`, `diag-A-probe-new-r1.jsonl`, helper texts of those runs): the `createScene` hook 11.5
     (17) and 14.5 (20) ms, the directory entry 18.5 (24) and 21.5 (27) ms, the dialog gone 332.5 (358) and 333.5 (347)

@@ -85,6 +85,10 @@ extends `foundry.applications.api.DocumentSheetV2`. It mounts the Svelte tree wi
 and tears it down with `unmount(handle, { outro: true })` in `_onClose()`. `_renderHTML()` returns
 `{}`. The per-type subclass supplies the inner shell component via `this.options.svelte.props.shell` (a plain
 ApplicationV2 options object — the `svelte` key is a naming holdover, not TyphonJS middleware).
+`DEFAULT_OPTIONS.form.handler` is a no-op (`ignoreFormSubmission`): the sheet's `<form>` has no named fields, the
+Svelte components write the document themselves, and core's handler would send `document.update({ type })` (measured
+2026-10-09: `{type: 'weapon'}`) for every click on a `<button>` without a `type` attribute inside the form (the Add
+Check button) and for Enter in a text input (CLOSED_BUGS #149).
 `TitanDialog` (`src/helpers/dialogs/Dialog.js`) follows the same lifecycle on a bare
 `foundry.applications.api.ApplicationV2`, mounting `options.content.class` with `options.content.props`.
 Its constructor hardcodes element classes `['titan', 'titan-dialog']`; any
@@ -430,7 +434,10 @@ atIdx)` (uses `cloneElementWithNewUuid` → fresh uuid, copy semantics). Locatio
 **Per-row UI-state lockstep:** checks, attacks, and custom aspects keep index-keyed expansion arrays
 (`tabs.<kind>.isExpanded`, plus `sidebar.<kind>.isExpanded` for checks and attacks). A reorder/insert
 must reorder/splice those arrays via sheet-state methods (`postMove<Kind>`/`postInsert<Kind>`),
-invoked through the sheet before the `update()` re-render. These methods must be forwarded through
+invoked through the sheet before the `update()` re-render. The check list also takes its change back when the update
+is refused or rejected, with `undoDeleteCheck` / `undoMoveCheck` / `undoInsertCheck`; each reverses its own entry
+and does not copy the arrays back, so a toggle made while the update was in flight stays (measured: a copy-back lost
+it, `bugbatch1-logs/inflight-toggle.jsonl`, local). These methods must be forwarded through
 **every** wrapping sheet-state factory: `TitanItemSheetState` defines the check pair;
 `RulesElementItemSheetState`, `WeaponSheetState`, and `SpellSheetState` each re-destructure their
 parent and must re-export it, or the sheet's delegate throws `is not a function`.
@@ -1067,9 +1074,14 @@ one probe, `task-9-logs/fix1/probe-two.json`, local; that the server returns eve
 through `fromUuid` returns the client's own document, which holds an edit made through a bound control before any update
 reaches the database (measured: with the condition picker's `onchange` made a no-op, `fromUuid` read the new key while
 the server held the old one, `task-9-logs/fix1/probe-mutant-server.json`, local), so a test that asserts a control saved
-its edit reads the server copy, as `addCheck`, `addRulesElement`, `addAttack`, `addCustomAspect`, `setAttackStat`,
-`setAttributeBase`, `setResource`, `setSkillTraining`, `setSkillDefaultAttribute`, `deleteAttack` and
-`rules-element-editor.spec.js` do. Flows: `openSidebarTab` (the
+its edit reads the server copy, as `addCheck`, `addRulesElement`, `addAttack`, `addCustomAspect`, `enableAspect`,
+`setAttackStat`, `setAttributeBase`, `setResource`, `setSkillTraining`, `setSkillDefaultAttribute`, `deleteAttack` and
+`rules-element-editor.spec.js` do. Each of the nine helpers from `addAttack` to `setSkillDefaultAttribute` fails when
+the client model changes but the update is dropped (measured, in a probe spec of one test per helper: the update after
+the model edit of `addAttack`, `deleteAttack`, `addCustomAspect` and `addStandardAspect` replaced by a resolved
+promise, or the send of `refreshSystemDocument` disabled, fails the helper's own test, and the tests that use the
+dropped call in their setup, and no other; `mut-m6-*-run.log` and `m6-helpers-probe.spec.js.txt` under
+`.superpowers/sdd/2026-09-29-conditions-rework/bugbatch1-logs/`, local). Flows: `openSidebarTab` (the
 sidebar tab button of a directory), `createActor` (Actors tab Create button and core dialog), `createOwnedItem` (the
 Abilities/Spells tab add button or the Inventory tab's add button and its item-type dialog, then the new item is renamed
 in its own sheet opened by the row's Edit button), `dragItemOntoSheet` (drags an Items-tab entry onto the open actor
@@ -1100,7 +1112,8 @@ and takes the pointer from a token under it (CLOSED_BUGS #134). A right-click th
 located cause (OPEN_BUGS #129). `applyConditionRefused` clicks the same control for an actor immune to the condition,
 waits for the refusal's warning notification (the creation's decision, so the absence of the condition follows a
 positive edge), returns its text and dismisses it with a click. Further flows are `createWorldItem`, `createFolder` (the
-directory's Create Folder button and the folder configuration window; `createActor` and `createWorldItem` take a
+directory's Create Folder button and the folder configuration window, both flows take the id of the entry that is new
+after the click, not the first entry of that name; `createActor` and `createWorldItem` take a
 `folderId` and then use that folder's own Create button, which creates the document inside the folder),
 `addCustomTrait`, `addAttack`, `enableAspect` and `addCustomAspect` (the Add Custom Trait dialog with an optional
 description, the weapon Attacks tab add button, the spell Standard Aspects toggle with its option toggles and resistance
@@ -1453,9 +1466,25 @@ from writing them; each says whether it was measured (with its saved log, under
   (`TitanItem#safeDelete` is the only writer of the mark, read). Gates: `gates-fix-after.log`,
   `gate119-predelete-after-fix.log` and `gate103-else-before-fix-item.log` (it fails with the confirm branch's
   `else` removed), under `.superpowers/sdd/test-suite-rewrite/phase-3/`.
-- When a test fails, Playwright restarts the worker and runs the file's `beforeAll` again, which then finds a second
-  document of the same name and fails inside the flow; the first failure is the one to read. Measured: the second
-  failure in `gates-fix-before.log` (two `E2E Rows Actor` directory entries).
+- When a test fails, Playwright restarts the worker and runs the file's `beforeAll` again, which creates a second
+  document of the same name. The create flows (`createActor`, `createWorldItem`, `createScene`, `createFolder`)
+  compare the entry ids before and after the click (`readEntryIds`) and record the new one, so the second document is
+  recorded (measured: `diag-fail-registry-fixed.jsonl` against `diag-fail-registry-by-name.jsonl`, CLOSED_BUGS #150,
+  under `.superpowers/sdd/2026-09-29-conditions-rework/bugbatch1-logs/`, local); a lookup by name elsewhere still finds
+  both documents, and the first failure is the one to read (the older failure with two `E2E Rows Actor` directory
+  entries: `gates-fix-before.log`).
+- The check-list specs (`check-list-refused-update.spec.js`) make an update fail on demand, which no real flow does: a
+  `preUpdateItem` listener returning false is a module's veto (the update resolves undefined), and an `update` method
+  set on the item instance that throws stands for a failed database request (it is deleted again in `afterEach`; a
+  held variant throws when the test says so, to toggle a row while the update is in flight). A rejected update is
+  made by calling the document method directly, because the sheet's click handler does not await it. Every spec asserts
+  the exact number of updates the interception saw (`toBe(1)`), so a second update (CLOSED_BUGS #149) fails it. The
+  edits that prove the undo are in CLOSED_BUGS #148.
+- A drag from one check row to another moves a row only when both ends are inside the viewport: with three expanded
+  checks (355 px each) in a 1000 px sheet the first row's top edge was at y -121 and neither drop half of an upward drag
+  moved anything (measured: `diag-up-drag.jsonl`); the upward reorder spec collapses the outer rows first.
+- Typing specs: `fill` sends no key events, so the specs for a text sent on `input` use `pressSequentially` with no
+  delay as well; the numeric inputs keep the typed text in their own state while focused (CLOSED_BUGS #147).
 
 **E2E drag and item sheet tests (`drag`, `rules-element-editor`, `item-sheet-rolls`, `spell-sheet`)** — notes; each says
 whether it was measured (with its saved log, under `.superpowers/sdd/test-suite-rewrite/phase-3/`, local), read (with

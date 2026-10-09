@@ -69,8 +69,9 @@ management). Data model classes hold the schema, field validation, and derived-d
   mutators `addCheck` / `deleteCheck` / `moveCheck` / `insertCheck` (`CheckListMixin`,
   `src/document/types/item/CheckListMixin.js`: each edits the live model and the sheet's expansion state before its
   update resolves, so a following edit's whole-`system` snapshot carries the change, and takes both back when the
-  update is refused or rejected, using the sheet's `snapshotCheckExpansion` / `restoreCheckExpansion`), both mixins
-  shared with `TitanActiveEffect`, and the
+  update is refused or rejected: the model entry through `commitCheckUpdate`'s undo callback, the expansion flags
+  through the sheet's `undoDeleteCheck` / `undoMoveCheck` / `undoInsertCheck`, which reverse their own entry so an
+  expansion toggle made while the update was in flight stays), both mixins shared with `TitanActiveEffect`, and the
   `isMarkedForDeletion` flag. `safeDelete` sets the flag, deletes, and clears the flag again when the delete is
   refused (it resolves false) or rejects (it rejects with the original error); `TitanActor#deleteItem` and the row
   expand button read the flag.
@@ -136,8 +137,10 @@ management). Data model classes hold the schema, field validation, and derived-d
   `CheckListMixin` and the custom-trait mutators (`addCustomTrait` / `editCustomTrait` / `deleteCustomTrait`) from
   `CustomTraitMixin`, the same mixins `TitanItem` uses (`src/document/types/item/`). They operate on
   `system.check` / `system.customTrait` via `this.update(...)`, notify the sheet through
-  `this.sheet.postAddCheck()` / `preDeleteCheck(idx)` / `postMoveCheck(from, to)` / `postInsertCheck(idx)`, and
-  reuse the item
+  `this.sheet.postAddCheck()` / `preDeleteCheck(idx)` (returns the removed expansion flags) /
+  `postMoveCheck(from, to)` / `postInsertCheck(idx)`, take the expansion change back with
+  `undoDeleteCheck(idx, removed)` / `undoMoveCheck(from, to)` / `undoInsertCheck(idx)` when the update does not
+  commit, and reuse the item
   `AddCustomTraitDialog` / `EditCustomTraitDialog` (passed `this`). They are invoked by the reused item
   Checks tab and Custom-Traits sidebar via `document.data.*`. The effect chat component
   (`EffectChatMessage.svelte`) lives in `src/document/types/active-effect/chat-message/` beside
@@ -688,7 +691,8 @@ and one or more inner Svelte component trees.
 - `TitanActiveEffectSheet` (`src/document/types/active-effect/sheet/TitanActiveEffectSheet.js`)
   extends `TitanDocumentSheet` directly (NOT `TitanItemSheet`, to avoid item-only send-to-chat/import
   header controls). Reuses `createRulesElementItemSheetState` (document-agnostic) and takes the check-list
-  notifications `postAddCheck` / `preDeleteCheck` / `postMoveCheck` / `postInsertCheck` from `CheckListSheetMixin`
+  notifications `postAddCheck` / `preDeleteCheck` / `postMoveCheck` / `postInsertCheck` and their undo methods
+  `undoDeleteCheck` / `undoMoveCheck` / `undoInsertCheck` from `CheckListSheetMixin`
   (`src/document/types/item/sheet/CheckListSheetMixin.js`, shared with `TitanItemSheet`). Registered as the default
   sheet for `ActiveEffect` subtype `effect` via
   `foundry.applications.apps.DocumentSheetConfig.registerSheet(foundry.documents.ActiveEffect, …)`
