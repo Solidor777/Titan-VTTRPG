@@ -7,11 +7,11 @@ import {
    addRulesElement,
    applyCondition,
    createActor,
+   createScene,
    placeToken,
    removeCondition,
    restOnToken,
    setOwnership,
-   shared,
    viewScene,
 } from './flows.js';
 import { withClients } from './multiClient.js';
@@ -28,6 +28,8 @@ import { attachPageErrors, closeAllApps } from './world.js';
 let page;
 /** @type {string[]} Uncaught page errors collected during the current test (cleared each afterEach). */
 let errors;
+/** @type {string} The id of the scene of this file, which only these tests place tokens on. */
+let sceneId;
 
 /**
  * What a test works on: a Character with a token.
@@ -41,7 +43,8 @@ test.beforeAll(async ({ browser }) => {
    page = await browser.newPage();
    errors = attachPageErrors(page);
    await login(page);
-   await viewScene(page, await shared(page, 'scene'));
+   sceneId = await createScene(page, { name: 'E2E Unconscious Scene' });
+   await viewScene(page, sceneId);
 });
 
 test.afterEach(async () => {
@@ -179,9 +182,6 @@ test('only the client that creates Unconscious applies its companions', async ({
    await setOwnership(page, subject.actorId, 'E2E Player 1', 'OWNER');
 
    // Players view the active scene; the scene is restored after the test.
-   /** @type {string} The id of the scene the tokens stand on. */
-   const sceneId = await shared(page, 'scene');
-
    /** @type {string|undefined} The id of the scene that was active before. */
    const previousActiveId = await page.evaluate(() => game.scenes.active?.id);
    if (previousActiveId !== sceneId) {
