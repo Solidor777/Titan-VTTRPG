@@ -77,12 +77,12 @@ async function createFromDirectory(page, tab, name, type, folderId, { documentNa
    }
    await dialog.locator('button[data-action="ok"]').click();
 
-   // Each wait is on one event, in the order the events happen: the entry shows once the create resolved, the dialog
-   // closes after its close transition ended, and the first scene's draw ends last. Measured in 2 x 20 first-scene
-   // creations with no CPU throttle, from the click on OK, medians of the two runs: entry 19 and 22 ms, dialog gone 333
-   // and 334 ms, canvas ready 392 and 392 ms, and the dialog was gone first in 40 of 40
-   // (`.superpowers/sdd/2026-09-29-conditions-rework/bugbatch1-logs/diag-A-probe-{old,new}-r1.jsonl`). The document is
-   // recorded as soon as its id is known, so a later failed wait cannot leave it unrecorded.
+   // One wait per event, in the order the events happen. Page-side marks from the click on OK, in two runs of 20
+   // first-scene creations with no CPU throttle (median, maximum): entry 18.5 (24) and 21.5 (27) ms, dialog gone 332.5
+   // (358) and 333.5 (347) ms, canvas ready 392 (423) and 392 (408) ms; at throttle 4 the dialog went at 358 and 356.5
+   // ms and the canvas was ready at 921 and 890 ms (`.superpowers/sdd/2026-09-29-conditions-rework/bugbatch1-logs/
+   // diag-A-probe-{old,new}-r{1,4}.jsonl`, helper texts of those runs). The document is recorded as soon as its id is
+   // known, so a later failed wait cannot leave it unrecorded.
    /** @type {import('@playwright/test').Locator} The directory entry of the new document. */
    const entry = panel.locator('.directory-item.entry', {
       has: page.locator('.entry-name', { hasText: exactText(name) }),
@@ -309,16 +309,48 @@ async function chooseSceneMenuEntry(page, sceneId, label) {
 }
 
 /**
- * Waits until the canvas has finished drawing a scene.
+ * Waits at most 1000 ms for the canvas to finish drawing a scene, on core's `canvasReady` hook. A polling wait
+ * (`waitForFunction`, default and 50 ms) first saw the finished state a median of 405 and 410 ms after the hook ran
+ * and the hook wait resolved 47 ms after it, in 20 first-scene creations each at CPU throttle 4 (the polling lag
+ * is inferred to be a main thread busy after the hook;
+ * `.superpowers/sdd/2026-09-29-conditions-rework/bugbatch1-logs/diag-A3-{raf,poll50,hook}-r4.jsonl`).
  * @param {import('@playwright/test').Page} page - A logged-in page.
  * @param {string} sceneId - The scene being drawn.
  * @returns {Promise<void>} Resolves once the scene is drawn.
  */
 async function waitForSceneDrawn(page, sceneId) {
-   await page.waitForFunction(
-      (sceneId) => canvas.ready && canvas.scene?.id === sceneId,
-      sceneId,
-      { timeout: 1000 },
+   await page.evaluate(
+      ({ sceneId, timeout }) => new Promise((resolve, reject) => {
+         /**
+          * Whether the canvas has finished drawing the scene.
+          * @returns {boolean} True when the canvas is ready and shows the scene.
+          */
+         const drawn = () => canvas.ready && canvas.scene?.id === sceneId;
+         if (drawn()) {
+            resolve();
+            return;
+         }
+
+         // The check and the registration run in one task, so a draw that ends later always calls the hook.
+         /** @type {number} The id of the `canvasReady` listener. */
+         const hookId = Hooks.on('canvasReady', () => {
+            if (drawn()) {
+               clearTimeout(timer);
+               Hooks.off('canvasReady', hookId);
+               resolve();
+            }
+         });
+
+         /** @type {number} The timer that rejects the wait after the ceiling. */
+         const timer = setTimeout(() => {
+            Hooks.off('canvasReady', hookId);
+            reject(new Error(`The canvas did not finish drawing scene ${sceneId} within ${timeout} ms.`));
+         }, timeout);
+      }),
+      {
+         sceneId,
+         timeout: 1000,
+      },
    );
 }
 
