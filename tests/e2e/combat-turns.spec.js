@@ -26,7 +26,7 @@ import {
    viewScene,
 } from './flows.js';
 import { forceDice, resetDice } from './dice.js';
-import { setClientSetting, setWorldSetting } from './settings.js';
+import { getSetting, setClientSetting, setWorldSetting } from './settings.js';
 import { attachPageErrors, clearChat, closeAllApps, reloadWorld, showChatLog } from './world.js';
 
 /**
@@ -40,6 +40,8 @@ import { attachPageErrors, clearChat, closeAllApps, reloadWorld, showChatLog } f
 
 /** @type {import('@playwright/test').Page} The page of E2E GM 1, who runs the combat. */
 let gm;
+/** @type {string|undefined} The Immunity Handling value in force before a test of this file changed it. */
+let priorImmunityHandling;
 /** @type {import('@playwright/test').Page} The page of E2E GM 2, who is not the best owner. */
 let gm2;
 /** @type {import('@playwright/test').Page} The page of E2E Player 1, who owns the characters. */
@@ -405,6 +407,10 @@ test.afterEach(async () => {
 });
 
 test.afterAll(async () => {
+   if (priorImmunityHandling !== undefined) {
+      await setWorldSetting(gm, 'immunityHandling', priorImmunityHandling);
+   }
+
    // Each second client delivers its errors before its context closes: a closed page cannot be flushed.
    for (const client of [
       gm2,
@@ -919,6 +925,7 @@ test.describe('immunity and turn durations', () => {
    ]) {
       test(`a suppressed ${duration} effect keeps counting down`, async () => {
          // Remove would delete the timer the ward covers; the timer under test is suppressed.
+         priorImmunityHandling ??= await getSetting(gm, 'immunityHandling');
          await setWorldSetting(gm, 'immunityHandling', 'suppress');
          await setWorldSetting(gm, 'autoDecreaseEffectDuration', true);
          await setWorldSetting(gm, 'autoRemoveExpiredEffects', 'disabled');

@@ -30,7 +30,7 @@ import {
    startCombat,
    viewScene,
 } from '../flows.js';
-import { setClientSetting, setWorldSetting } from '../settings.js';
+import { getSetting, setClientSetting, setWorldSetting } from '../settings.js';
 import { attachPageErrors, clearChat, closeAllApps } from '../world.js';
 
 /**
@@ -697,8 +697,16 @@ test.describe('conditions — immunity', () => {
       });
    }
 
+   /** @type {string} The Immunity Handling value in force before this block. */
+   let priorImmunityHandling;
+
+   test.afterAll(async () => {
+      await setWorldSetting(page, 'immunityHandling', priorImmunityHandling);
+   });
+
    test.beforeAll(async () => {
       // These tests are of suppression; Remove would delete what the ward covers.
+      priorImmunityHandling = await getSetting(page, 'immunityHandling');
       await setWorldSetting(page, 'immunityHandling', 'suppress');
 
       // The warded effect comes first: a ward in force would refuse a creation of that name.

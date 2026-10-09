@@ -15,7 +15,7 @@ import {
    viewScene,
 } from './flows.js';
 import { withClients } from './multiClient.js';
-import { attachPageErrors, closeAllApps } from './world.js';
+import { attachPageErrors, closeAllApps, reloadWorld } from './world.js';
 
 /**
  * Falling Unconscious on real Characters with placed tokens, through the Token HUD: the Unconscious condition also
@@ -190,7 +190,8 @@ test('only the client that creates Unconscious applies its companions', async ({
    try {
       await withClients(browser, { player: 'E2E Player 1' }, async ({ player }) => {
          /**
-          * Counts, on a client, the calls its Actor class receives to toggle Prone on.
+          * Counts, on a client, the calls its Actor class receives to toggle Prone on. The page keeps the way back in
+          * `window.restoreToggle`.
           * @param {import('@playwright/test').Page} client - The client's page.
           * @returns {Promise<void>} Resolves once the counter wraps the toggle method.
           */
@@ -198,6 +199,9 @@ test('only the client that creates Unconscious applies its companions', async ({
             /** @type {Function} The Actor class's toggle method. */
             const original = CONFIG.Actor.documentClass.prototype.toggleStatusEffect;
             window.proneToggles = 0;
+            window.restoreToggle = () => {
+               CONFIG.Actor.documentClass.prototype.toggleStatusEffect = original;
+            };
             CONFIG.Actor.documentClass.prototype.toggleStatusEffect = function toggleStatusEffect(statusId, ...rest) {
                if (statusId === 'prone') {
                   window.proneToggles++;
@@ -207,48 +211,58 @@ test('only the client that creates Unconscious applies its companions', async ({
          });
          await countProneToggles(page);
          await countProneToggles(player);
+         try {
 
-         // The Player's only token is controlled on joining and the Escape key does not release it, so the Player
-         // opens the Token HUD on it directly instead of through the GM-seat flow.
-         // A window Foundry opens for the joined Player (the User Configuration) can cover the token.
-         await closeAllApps(player);
-         /** @type {{x: number, y: number}} The token's centre in the Player's client coordinates. */
-         const centre = await player.evaluate((tokenId) => canvas.clientCoordinatesFromCanvas(
-            canvas.scene.tokens.get(tokenId).object.center,
-         ), subject.tokenId);
-         await restOnToken(player, subject.tokenId, centre);
-         await player.mouse.click(centre.x, centre.y, { button: 'right' });
+            // The Player's only token is controlled on joining and the Escape key does not release it, so the Player
+            // opens the Token HUD on it directly instead of through the GM-seat flow.
+            // A window Foundry opens for the joined Player (the User Configuration) can cover the token.
+            await closeAllApps(player);
+            /** @type {{x: number, y: number}} The token's centre in the Player's client coordinates. */
+            const centre = await player.evaluate((tokenId) => canvas.clientCoordinatesFromCanvas(
+               canvas.scene.tokens.get(tokenId).object.center,
+            ), subject.tokenId);
+            await restOnToken(player, subject.tokenId, centre);
+            await player.mouse.click(centre.x, centre.y, { button: 'right' });
 
-         /** @type {import('@playwright/test').Locator} The Player's Token HUD. */
-         const hud = player.locator('#token-hud');
-         await expect(hud).toBeVisible();
-         await hud.locator('[data-action="togglePalette"][data-palette="effects"]').click();
-         await hud.locator('.effect-control[data-status-id="unconscious"]').click();
-         await expect.poll(() => readConditions(subject), { message: 'Unconscious brought its companions' }).toEqual({
-            incapacitated: 1,
-            prone: 1,
-            unconscious: 1,
-         });
-         expect(
+            /** @type {import('@playwright/test').Locator} The Player's Token HUD. */
+            const hud = player.locator('#token-hud');
+            await expect(hud).toBeVisible();
+            await hud.locator('[data-action="togglePalette"][data-palette="effects"]').click();
+            await hud.locator('.effect-control[data-status-id="unconscious"]').click();
+            await expect.poll(
+               () => readConditions(subject),
+               { message: 'Unconscious brought its companions' },
+            ).toEqual({
+               incapacitated: 1,
+               prone: 1,
+               unconscious: 1,
+            });
+            expect(
+               await Promise.all([
+                  player.evaluate(() => window.proneToggles),
+                  page.evaluate(() => window.proneToggles),
+               ]),
+               'the creating client toggled Prone once and the other client did not',
+            ).toEqual([
+               1,
+               0,
+            ]);
+         }
+         finally {
             await Promise.all([
-               player.evaluate(() => window.proneToggles),
-               page.evaluate(() => window.proneToggles),
-            ]),
-            'the creating client toggled Prone once and the other client did not',
-         ).toEqual([
-            1,
-            0,
-         ]);
+               page,
+               player,
+            ].map((client) => client.evaluate(() => window.restoreToggle?.())));
+         }
       });
    }
    finally {
       if (previousActiveId !== sceneId) {
-         await page.evaluate(async ({ previousActiveId, sceneId }) => {
-            await game.scenes.get(previousActiveId ?? sceneId).update({ active: previousActiveId !== undefined });
-         }, {
-            previousActiveId,
-            sceneId,
-         });
+         // The three conditions' scrolling texts run for about 2 s, and a scene change within that time makes core
+         // throw (CLOSED_BUGS #114). A reload ends them, so the scene is restored on a reloaded page, through the
+         // directory.
+         await reloadWorld(page);
+         await activateScene(page, previousActiveId);
       }
    }
 });

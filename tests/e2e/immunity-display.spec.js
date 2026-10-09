@@ -29,7 +29,7 @@ import {
    startCombat,
    viewScene,
 } from './flows.js';
-import { setClientSetting, setWorldSetting } from './settings.js';
+import { getSetting, setClientSetting, setWorldSetting } from './settings.js';
 import { attachPageErrors, clearChat, closeAllApps } from './world.js';
 
 /**
@@ -82,6 +82,9 @@ const PERMANENT_NAME = 'E2E Display Charm';
 /** @type {number} The most Next Turn presses that reach the actor's turn in a two-combatant encounter. */
 const MAX_TURN_PRESSES = 4;
 
+/** @type {string} The Immunity Handling value in force before this file. */
+let priorImmunityHandling;
+
 /** @type {number} The turns the blade starts with. */
 const BLADE_TURNS = 3;
 
@@ -92,6 +95,7 @@ test.beforeAll(async ({ browser }) => {
    await clearChat(page);
 
    // The display under test is of suppression; Remove would delete what the ward covers.
+   priorImmunityHandling = await getSetting(page, 'immunityHandling');
    await setWorldSetting(page, 'immunityHandling', 'suppress');
    actorId = await createActor(page, {
       name: ACTOR_NAME,
@@ -166,6 +170,7 @@ test.afterEach(async () => {
 });
 
 test.afterAll(async () => {
+   await setWorldSetting(page, 'immunityHandling', priorImmunityHandling);
    await page?.close();
 });
 

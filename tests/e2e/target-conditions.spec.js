@@ -8,8 +8,11 @@ import {
    setNumberField,
    setSelectField,
 } from './checkDialog.js';
+import { DURATION_PERMANENT } from '~/system/DurationTypes.js';
 import { login } from './fixtures.js';
 import {
+   addEffect,
+   addRulesElement,
    applyCondition,
    controlPlacedToken,
    createActor,
@@ -22,7 +25,7 @@ import {
    targetPlacedToken,
    viewScene,
 } from './flows.js';
-import { getSetting, setClientSetting } from './settings.js';
+import { getSetting, setClientSetting, setWorldSetting } from './settings.js';
 import { attachPageErrors, closeAllApps, showChatLog } from './world.js';
 
 /**
@@ -496,6 +499,67 @@ test('an explicit target that shares the attacker\'s actor is read as the target
       await page.evaluate(async (tokenId) => {
          await canvas.scene.tokens.get(tokenId)?.delete();
       }, sameActorTokenId);
+   }
+});
+
+test('a Prone target whose Prone an immunity suppresses gives the attacker no modifier', async () => {
+   /** @type {string} The Immunity Handling value in force before this test. */
+   const priorHandling = await getSetting(page, 'immunityHandling');
+
+   // Remove would delete the Prone the ward covers; this test is of the suppressed condition.
+   await setWorldSetting(page, 'immunityHandling', 'suppress');
+
+   /** @type {string} The id of the actor the target's token stands for. */
+   const targetActorId = await createActor(page, {
+      name: 'E2E Target Conditions Warded',
+      type: 'player',
+   });
+
+   /** @type {string} The id of the target's token, beside the attacker's. */
+   const targetTokenId = await placeToken(page, targetActorId, {
+      square: {
+         column: fixture.attackerSquare.column + 1,
+         row: fixture.attackerSquare.row + 1,
+      },
+   });
+   try {
+      await applyCondition(page, targetTokenId, 'prone');
+      await targetPlacedToken(page, targetTokenId);
+
+      /** @type {import('@playwright/test').Locator} The attack check dialog while the target is Prone. */
+      const prone = await openAttackDialog();
+      await expect(prone.getByTestId('attack-target-condition')).toHaveText([await label('prone', 'melee', '+1')]);
+      await closeAllApps(page);
+      await releaseTargets(page);
+
+      /** @type {string} The id of the effect that grants the immunity to Prone. */
+      const wardId = await addEffect(page, targetActorId, 'E2E Target Conditions Prone Ward', {
+         duration: DURATION_PERMANENT,
+      });
+      await addRulesElement(page, `Actor.${targetActorId}.ActiveEffect.${wardId}`, {
+         key: 'prone',
+         operation: 'immunity',
+         selector: 'condition',
+      });
+      await closeAllApps(page);
+      expect(
+         await page.evaluate((tokenId) => canvas.scene.tokens.get(tokenId).actor.statuses.has('prone'), targetTokenId),
+         'the ward suppressed the Prone of the target',
+      ).toBe(false);
+      await targetPlacedToken(page, targetTokenId);
+
+      /** @type {import('@playwright/test').Locator} The attack check dialog while the Prone is suppressed. */
+      const suppressed = await openAttackDialog();
+      await expect(suppressed.getByTestId('check-field-attackerMelee').locator('input')).toHaveValue('3');
+      await expect(suppressed.getByTestId('attack-target-conditions')).toHaveCount(0);
+   }
+   finally {
+      await closeAllApps(page);
+      await releaseTargets(page);
+      await page.evaluate(async (tokenId) => {
+         await canvas.scene.tokens.get(tokenId)?.delete();
+      }, targetTokenId);
+      await setWorldSetting(page, 'immunityHandling', priorHandling);
    }
 });
 
