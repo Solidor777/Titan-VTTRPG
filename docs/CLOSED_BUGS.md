@@ -2419,7 +2419,7 @@ not checked in).
 - **Fixed (composition):** `DocumentTextInput` sends on `input` only when `event.isComposing` is false and on
   `compositionend`; `TextInput` forwards `oncompositionend`. The composition spec asserts the count of updates the page
   sees (`preUpdateItem`): 0 across both `imeSetComposition` calls, and exactly 1 after `insertText`, so it no longer
-  depends on a race. Mutations on the shipped source (build `4121c5d7...` restored after each; hashes in
+  depends on a race. Mutations on the shipped source (build `f48707e8...` restored after each; hashes in
   `mut-u4-<name>-hashes.log`): the guard replaced by `true` fails 6 of 6 repeats of the composition spec
   (`mut-u4-ime-guard-run.log`); the `oncompositionend` line removed fails 6 of 6 (`mut-u4-ime-compositionend-run.log`).
 - **Cancelled composition (measured):** the spec sets a known label, composes " extra" at its end (the input shows the
@@ -2437,6 +2437,12 @@ not checked in).
   With this guard the label typed without a key event also survives a rebuild through the local text, so the
   `oninput` line is now needed by the key-by-key and held-key specs only: removed, those two fail and the label spec
   passes (`mut-u4-ime-oninput-run.log`).
+- **Callers that bind into an array (read):** the check, custom aspect and attack label inputs bind
+  `check.label`, `aspect.label` and `attack.label`, and the rules element key inputs (`customTrait`, `spellTradition`)
+  bind `rulesElement[idx].key`. Their rows are `{#each ... (uuid)}` blocks keyed by the entry's uuid (`ItemSheetChecksTab`,
+  `SpellSheetCustomAspectsTab`, `WeaponSheetAttacksTab`, `ItemSheetRulesElementsTab`), and each settings component derives
+  its entry from the `idx` prop (`ItemSheetCheckSettings.svelte:46`), so after a remote reorder the kept component
+  instance writes into the entry it shows, not into the row now at its old index. Not run as a spec (read evidence).
 - **Held-key auto-repeat (measured):** the spec presses one key down 12 times (auto-repeat `keydown` events), releases
   it, and finds all 12 characters in the input and on the server before and after the blur. It passes
   (`r4-item-text-run1.log`).

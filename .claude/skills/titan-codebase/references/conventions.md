@@ -1489,8 +1489,7 @@ from writing them; each says whether it was measured (with its saved log, under
   delay as well, and a CDP session (`Input.imeSetComposition`, `Input.insertText`) for an input method; the numeric
   inputs and `DocumentTextInput` keep the entered text in their own state while focused (CLOSED_BUGS #147; the IME
   specs count the page's `preUpdateItem` calls: none while a composition runs, one when it ends). Enter on an
-  unchanged input sends no
-  update (`check-list-refused-update.spec.js`, CLOSED_BUGS #149).
+  unchanged input sends no update (`check-list-refused-update.spec.js`, CLOSED_BUGS #149).
 - The expansion undo methods are covered by a unit test over every move of 1 to 7 rows
   (`tests/unit/TitanItemSheetStateUndo.test.js`; the state only moves entries, so it uses numbers for the flags).
 
