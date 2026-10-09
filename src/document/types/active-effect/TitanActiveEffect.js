@@ -1,13 +1,15 @@
 import { DURATION_PERMANENT } from '~/system/DurationTypes.js';
-import { EFFECT_TYPE } from '~/system/EffectTypes.js';
+import { CONDITION_TYPE, EFFECT_TYPE } from '~/system/EffectTypes.js';
 import CheckListMixin from '~/document/types/item/CheckListMixin.js';
 import CustomTraitMixin from '~/document/types/item/CustomTraitMixin.js';
 import getEffectCreationChanges from '~/helpers/utility-functions/GetEffectCreationChanges.js';
+import error from '~/helpers/utility-functions/Error.js';
 
 /**
  * Extends the base ActiveEffect class to implement system-specific logic for Titan.
  * The 'effect' subtype carries Rules Elements, a custom duration, item-check templates, and custom traits via
- * its data model; conditions and other Active Effect subtypes are left untouched by all type-specific logic here.
+ * its data model; conditions and other Active Effect subtypes are left untouched by all type-specific logic here,
+ * except that creating an Unconscious condition on a Character makes it fall Unconscious (`_onCreate`).
  * @property {TitanActiveEffectDataModel} system - The typed system data model for this Active Effect.
  * @extends {foundry.documents.ActiveEffect}
  */
@@ -114,6 +116,31 @@ export default class TitanActiveEffect extends CustomTraitMixin(CheckListMixin(f
       }
 
       return retVal;
+   }
+
+   /**
+    * Performs follow-up logic after document creation, on every client. On the creating client, an Unconscious
+    * condition on a Character makes it fall Unconscious (Prone and Incapacitated); the other clients receive those
+    * conditions as document creations.
+    * @override
+    * @param {object} data - The initial data object provided to the document creation request.
+    * @param {object} options - Additional options which modify the creation request.
+    * @param {string} userId - The id of the User who requested the creation.
+    * @protected
+    */
+   _onCreate(data, options, userId) {
+      super._onCreate(data, options, userId);
+      if (
+         userId === game.user.id &&
+         this.type === CONDITION_TYPE &&
+         this.statuses.has('unconscious') &&
+         this.parent?.system?.isCharacter
+      ) {
+         // _onCreate is synchronous; the follow-up creations run after it returns and report their own failure.
+         this.parent.system.fallUnconscious().catch((reason) => {
+            error(`Could not apply falling Unconscious to "${this.parent.name}".`, reason);
+         });
+      }
    }
 
    /**

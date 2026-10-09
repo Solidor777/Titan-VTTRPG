@@ -53,6 +53,8 @@ and hides from unlinked tokens the converted effects their own changes replace (
   when it opens, and the bonuses follow the attacker's ratings while it is open. A GM who targets nothing has their
   controlled tokens stand in as the target, except the attacker's own tokens; a token of the attacker's own actor that
   the GM targets explicitly is still the target.
+- Falling Unconscious also applies Prone and Incapacitated, each only if absent and unless the character is immune to
+  it; removing Unconscious leaves Prone and Incapacitated.
 
 ## Version 2.1.0:
 Advantage and Disadvantage, situational modifiers, and bug fixes.

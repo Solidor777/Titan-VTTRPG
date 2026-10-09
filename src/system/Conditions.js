@@ -77,7 +77,8 @@ function createReflexesAutomaticFailure(conditionId) {
  * Builds the static list of TITAN condition definitions for CONFIG.statusEffects. Every condition is the
  * 'condition' Active Effect subtype; every condition with mechanics carries a `system.rulesElement` array
  * expressing its stat and check rules (applied through the shared rules-element pipeline). Dead and Unconscious
- * carry none. This function is pure (no game/localization access) so it can be unit-tested.
+ * carry none; Unconscious's companion conditions (UNCONSCIOUS_COMPANION_CONDITIONS) are applied when it is created
+ * (CharacterDataModel#fallUnconscious). This function is pure (no game/localization access) so it can be unit-tested.
  * @returns {object[]} The condition definitions, each with id, name (localization key), img, type, and —
  * for mechanically-active conditions — system.rulesElement.
  */
@@ -258,6 +259,17 @@ export function buildConditionDefinitions() {
  * @type {readonly string[]}
  */
 export const CONDITION_IDS = Object.freeze(buildConditionDefinitions().map((condition) => condition.id));
+
+/**
+ * The conditions an Unconscious creature also has: it "falls Prone, and is Incapacitated". Applied once when
+ * Unconscious is created (CharacterDataModel#fallUnconscious); removing Unconscious removes neither, since standing up
+ * is a separate Move or Action. Source: TITAN Rules Compendium (09_26_2026), "Unconscious".
+ * @type {readonly string[]}
+ */
+export const UNCONSCIOUS_COMPANION_CONDITIONS = Object.freeze([
+   'prone',
+   'incapacitated',
+]);
 
 /**
  * Finds the system condition an Active Effect applies, from the system's own definitions (never the mutable

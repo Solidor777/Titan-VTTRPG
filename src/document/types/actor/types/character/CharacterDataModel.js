@@ -102,7 +102,11 @@ import sortObjectsIntoContainerByFunctionValue
    from '~/helpers/utility-functions/SortObjectsIntoContainerByFunctionValue.js';
 import sortObjectsIntoContainerByKeyValue from '~/helpers/utility-functions/SortObjectsIntoContainerByKeyValue.js';
 import { DYNAMIC_MOD_BUCKETS } from '~/system/ModBuckets.js';
-import { getConditionDescriptionKey, getEditedConditionDescription } from '~/system/Conditions.js';
+import {
+   getConditionDescriptionKey,
+   getEditedConditionDescription,
+   UNCONSCIOUS_COMPANION_CONDITIONS,
+} from '~/system/Conditions.js';
 import { getSuppressingImmunitySources } from '~/document/types/active-effect/IsSuppressedByImmunity.js';
 import AddInventoryItemDialog from '~/document/types/actor/dialogs/AddInventoryItemDialog.js';
 import assert from '~/helpers/utility-functions/Assert.js';
@@ -6522,6 +6526,27 @@ export default class CharacterDataModel extends TitanActorDataModel {
                },
             },
          });
+      }
+   }
+
+   /**
+    * Applies what falling Unconscious does besides the condition itself: the Character falls Prone and is
+    * Incapacitated, each applied only if absent. An immunity to either refuses it as for any other application.
+    * Source: TITAN Rules Compendium (09_26_2026), "Unconscious".
+    * @returns {Promise<void>}
+    */
+   async fallUnconscious() {
+      if (!assert(
+         this.parent.isOwner,
+         'Cannot modify document %s if not owner.',
+         this.parent.name,
+      )) {
+         return;
+      }
+
+      // An active toggle leaves a condition the Character already has alone.
+      for (const conditionId of UNCONSCIOUS_COMPANION_CONDITIONS) {
+         await this.parent.toggleStatusEffect(conditionId, { active: true });
       }
    }
 
