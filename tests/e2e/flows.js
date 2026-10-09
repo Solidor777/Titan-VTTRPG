@@ -32,25 +32,40 @@ function exactText(text) {
 }
 
 /**
- * Reads the ids of the directory entries (documents or folders) that show a name. A creation compares the ids before
- * and after to tell the new entry from older entries of the same name, which a repeated `beforeAll` leaves behind
- * when a failed test restarts its worker.
+ * Reads the ids of the directory entries (documents, folders or compendium packs) that show a name. A creation
+ * compares the ids before and after to tell the new entry from older entries of the same name, which a repeated
+ * `beforeAll` leaves behind when a failed test restarts its worker.
  * @param {import('@playwright/test').Locator} panel - The directory's panel.
- * @param {'entry' | 'folder'} kind - Whether to read document entries or folders.
+ * @param {'entry' | 'folder' | 'compendium'} kind - Whether to read document entries, folders or compendium packs.
  * @param {string} name - The name the entries show.
  * @returns {Promise<string[]>} The ids of the entries that show exactly the name.
  */
 function readEntryIds(panel, kind, name) {
+   /** @type {Record<string, {name: string, id: string}>} The element holding the name and the id attribute, by kind. */
+   const parts = {
+      entry: {
+         name: '.entry-name',
+         id: 'data-entry-id',
+      },
+      folder: {
+         name: 'header .folder-name',
+         id: 'data-folder-id',
+      },
+      compendium: {
+         name: '.entry-name strong',
+         id: 'data-pack',
+      },
+   };
    return panel.locator(`.directory-item.${kind}`).evaluateAll(
-      (elements, { kind, name }) => elements
+      (elements, { part, name }) => elements
          .filter((element) => {
             /** @type {Element|null} The element that holds the entry's name. */
-            const label = element.querySelector(kind === 'entry' ? '.entry-name' : 'header .folder-name');
+            const label = element.querySelector(part.name);
             return label?.textContent.replace(/\s+/g, ' ').trim() === name;
          })
-         .map((element) => element.getAttribute(kind === 'entry' ? 'data-entry-id' : 'data-folder-id')),
+         .map((element) => element.getAttribute(part.id)),
       {
-         kind,
+         part: parts[kind],
          name,
       },
    );
@@ -108,9 +123,8 @@ async function createFromDirectory(page, tab, name, type, folderId, { documentNa
    // One wait per event, in the order the events happen. Page-side marks from the click on OK, in two runs of 20
    // first-scene creations with no CPU throttle (median, maximum): entry 18.5 (24) and 21.5 (27) ms, dialog gone 332.5
    // (358) and 333.5 (347) ms, canvas ready 392 (423) and 392 (408) ms; at throttle 4 the dialog went at 358 and 356.5
-   // ms and the canvas was ready at 921 and 890 ms (`.superpowers/sdd/2026-09-29-conditions-rework/bugbatch1-logs/
-   // diag-A-probe-{old,new}-r{1,4}.jsonl`, helper texts of those runs). The document is recorded as soon as its id is
-   // known, so a later failed wait cannot leave it unrecorded.
+   // ms and the canvas was ready at 921 and 890 ms. The document is recorded as soon as its id is known, so a later
+   // failed wait cannot leave it unrecorded.
    /** @type {string[]} The ids of the new entries that show the name. */
    let added = [];
    await expect.poll(async () => {
@@ -347,9 +361,7 @@ async function chooseSceneMenuEntry(page, sceneId, label) {
  * median of 358.5 and 364.5 ms after the hook ran (median of the per-creation differences), and 2 of the 20
  * frame-aligned waits lasted longer than 1000 ms; the wait on the hook ended a median of 47 ms after the hook
  * (maximum 51 ms) and the longest of its 20 waits lasted 552 ms. The lag is the same for both polling intervals, so
- * it is not the interval; that a main thread busy after the hook causes it is inferred, not measured
- * (`.superpowers/sdd/2026-09-29-conditions-rework/bugbatch1-logs/diag-A3-{raf,poll50,hook}-r4.jsonl`, medians in
- * `med-a3.log` there).
+ * it is not the interval; that a main thread busy after the hook causes it is inferred, not measured.
  * @param {import('@playwright/test').Page} page - A logged-in page.
  * @param {string} sceneId - The scene being drawn.
  * @returns {Promise<void>} Resolves once the scene is drawn.
@@ -881,20 +893,24 @@ export async function createCompendium(page, { label, type }) {
 
    /** @type {import('@playwright/test').Locator} The creation dialog. */
    const dialog = page.locator('dialog.application.dialog#create-compendium');
+
+   /** @type {string[]} The ids of the packs that already show the label. */
+   const known = await readEntryIds(panel, 'compendium', label);
    await dialog.locator('#create-compendium-label').fill(label);
    await dialog.locator('select#create-compendium-type').selectOption(type);
    await dialog.locator('button[data-action="ok"]').click();
 
    // The entry shows once the create resolved; the dialog closes after the create resolved and its close transition
    // ended, so it is checked after the pack is recorded.
-   /** @type {import('@playwright/test').Locator} The new pack's directory entry. */
-   const entry = panel.locator('.directory-item.compendium', {
-      has: page.locator('.entry-name strong', { hasText: exactText(label) }),
-   });
-   await expect(entry).toHaveCount(1);
+   /** @type {string[]} The ids of the new packs that show the label. */
+   let added = [];
+   await expect.poll(async () => {
+      added = (await readEntryIds(panel, 'compendium', label)).filter((packId) => !known.includes(packId));
+      return added.length;
+   }, { message: `the directory shows one new pack labelled ${label}` }).toBe(1);
 
    /** @type {string} The pack's collection id. */
-   const packId = await entry.getAttribute('data-pack');
+   const [packId] = added;
    record({
       documentName: 'Compendium',
       id: packId,

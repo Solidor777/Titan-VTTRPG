@@ -158,3 +158,65 @@ test('a check label typed key by key with no delay is saved and the input keeps 
    expect(await input.inputValue(), 'the input still shows the typed label after the blur').toBe(typed);
    expect((await readServerSystem(page, uuid)).check[0].label, 'the server still stores it').toBe(typed);
 });
+
+test('a check label composed with an input method is saved and the input keeps the composition', async () => {
+   /** @type {string} The new actor's id. */
+   const actorId = await createActor(page, {
+      name: 'E2E Composition Actor',
+      type: 'player',
+   });
+
+   /** @type {string} The weapon's id. */
+   const itemId = await createOwnedItem(page, actorId, 'weapon', 'E2E Composition Weapon');
+
+   /** @type {string} The weapon's uuid. */
+   const uuid = `Actor.${actorId}.Item.${itemId}`;
+   await addCheck(page, uuid);
+
+   /** @type {import('@playwright/test').Locator} The weapon's sheet, open on the Checks tab. */
+   const sheet = await openSheetByUuid(page, uuid);
+
+   /** @type {import('@playwright/test').Locator} The new check's label input. */
+   const input = sheet.locator('.check .header .label input').first();
+
+   /** @type {import('@playwright/test').CDPSession} The browser session that drives the input method editor. */
+   const client = await page.context().newCDPSession(page);
+
+   /** @type {string} The text the composition ends with. */
+   const composed = 'E2E Composed Label';
+   await input.focus();
+   await input.press('Control+A');
+
+   // The browser shows the composition text in the input while the composition runs.
+   await client.send('Input.imeSetComposition', {
+      text: 'E2E Comp',
+      selectionStart: 8,
+      selectionEnd: 8,
+   });
+   await expect.poll(() => input.inputValue(), { message: 'the input shows the first composition text' })
+      .toBe('E2E Comp');
+   await client.send('Input.imeSetComposition', {
+      text: composed,
+      selectionStart: composed.length,
+      selectionEnd: composed.length,
+   });
+   await expect.poll(() => input.inputValue(), { message: 'the input shows the second composition text' })
+      .toBe(composed);
+   await settle(page);
+   await expect.poll(() => input.inputValue(), { message: 'the input keeps the composition after the updates' })
+      .toBe(composed);
+
+   // The composition ends with the text committed.
+   await client.send('Input.insertText', { text: composed });
+   await settle(page);
+   expect(await input.inputValue(), 'the input shows the committed text').toBe(composed);
+   await expect.poll(
+      async () => (await readServerSystem(page, uuid)).check[0].label,
+      { message: 'the server stores the committed text before the input blurs' },
+   ).toBe(composed);
+   await input.blur();
+   await settle(page);
+   expect(await input.inputValue(), 'the input still shows the committed text after the blur').toBe(composed);
+   expect((await readServerSystem(page, uuid)).check[0].label, 'the server still stores it').toBe(composed);
+   await client.detach();
+});

@@ -199,7 +199,10 @@ test('a refused Delete leaves the check and its expansion state for the next edi
    await expect(rows, 'both checks render').toHaveCount(2);
    await rows.nth(1).getByRole('button', { name: 'Collapse' }).click();
    await settle(page, { transitions: true });
-   expect(await readExpansion(rows), 'the first row is expanded and the second collapsed').toEqual([
+   await expect.poll(
+      () => readExpansion(rows),
+      { message: 'the first row is expanded and the second collapsed' },
+   ).toEqual([
       true,
       false,
    ]);
@@ -210,7 +213,10 @@ test('a refused Delete leaves the check and its expansion state for the next edi
    }).click();
    await settle(page, { transitions: true });
    expect(await releaseUpdates(), 'the delete update was refused').toBe(1);
-   expect(await readExpansion(rows), 'the expansion state is as before the refused delete').toEqual([
+   await expect.poll(
+      () => readExpansion(rows),
+      { message: 'the expansion state is as before the refused delete' },
+   ).toEqual([
       true,
       false,
    ]);
@@ -248,7 +254,10 @@ test('a refused reorder leaves the expansion state with its rows', async () => {
    await settle(page, { transitions: true });
    await rows.nth(0).getByRole('button', { name: 'Collapse' }).click();
    await settle(page, { transitions: true });
-   expect(await readExpansion(rows), 'the middle row is the only expanded one').toEqual([
+   await expect.poll(
+      () => readExpansion(rows),
+      { message: 'the middle row is the only expanded one' },
+   ).toEqual([
       false,
       true,
       false,
@@ -256,7 +265,10 @@ test('a refused reorder leaves the expansion state with its rows', async () => {
    await interceptUpdates(uuid, 'refuse');
    await dragGrip(rows.nth(0), rows.nth(2), 'bottom');
    expect(await releaseUpdates(), 'the reorder update was refused').toBe(1);
-   expect(await readExpansion(rows), 'the expansion state is as before the refused reorder').toEqual([
+   await expect.poll(
+      () => readExpansion(rows),
+      { message: 'the expansion state is as before the refused reorder' },
+   ).toEqual([
       false,
       true,
       false,
@@ -294,7 +306,10 @@ test('a refused upward reorder leaves the expansion state with its rows', async 
    await settle(page, { transitions: true });
    await rows.nth(0).getByRole('button', { name: 'Collapse' }).click();
    await settle(page, { transitions: true });
-   expect(await readExpansion(rows), 'the middle row is the only expanded one').toEqual([
+   await expect.poll(
+      () => readExpansion(rows),
+      { message: 'the middle row is the only expanded one' },
+   ).toEqual([
       false,
       true,
       false,
@@ -302,7 +317,10 @@ test('a refused upward reorder leaves the expansion state with its rows', async 
    await interceptUpdates(uuid, 'refuse');
    await dragGrip(rows.nth(2), rows.nth(0), 'top');
    expect(await releaseUpdates(), 'the reorder update was refused').toBe(1);
-   expect(await readExpansion(rows), 'the expansion state is as before the refused reorder').toEqual([
+   await expect.poll(
+      () => readExpansion(rows),
+      { message: 'the expansion state is as before the refused reorder' },
+   ).toEqual([
       false,
       true,
       false,
@@ -343,14 +361,20 @@ test('a refused insert leaves the expansion state with its rows', async () => {
    await expect(targetRows, 'the target checks render').toHaveCount(2);
    await targetRows.nth(1).getByRole('button', { name: 'Collapse' }).click();
    await settle(page, { transitions: true });
-   expect(await readExpansion(targetRows), 'the first target row is expanded and the second collapsed').toEqual([
+   await expect.poll(
+      () => readExpansion(targetRows),
+      { message: 'the first target row is expanded and the second collapsed' },
+   ).toEqual([
       true,
       false,
    ]);
    await interceptUpdates(target.uuid, 'refuse');
    await dragGrip(sourceRows.nth(0), targetRows.nth(0), 'top');
    expect(await releaseUpdates(), 'the insert update was refused').toBe(1);
-   expect(await readExpansion(targetRows), 'the expansion state is as before the refused insert').toEqual([
+   await expect.poll(
+      () => readExpansion(targetRows),
+      { message: 'the expansion state is as before the refused insert' },
+   ).toEqual([
       true,
       false,
    ]);
@@ -393,7 +417,10 @@ test('a rejected Delete leaves the check and its expansion state for the next ed
    expect(await callRejected(uuid, 'deleteCheck', 0), 'the delete update was rejected').toBe('E2E update rejected');
    expect(await releaseUpdates(), 'the rejected update reached the listener once').toBe(1);
    await settle(page, { transitions: true });
-   expect(await readExpansion(rows), 'the expansion state is as before the rejected delete').toEqual([
+   await expect.poll(
+      () => readExpansion(rows),
+      { message: 'the expansion state is as before the rejected delete' },
+   ).toEqual([
       true,
       false,
    ]);
@@ -437,10 +464,39 @@ test('a toggle made while a rejected Delete is in flight is kept', async () => {
    expect(await releaseUpdates(), 'the rejected update reached the item once').toBe(1);
    await expect(rows, 'the rejection put the first row back').toHaveCount(2);
    await settle(page, { transitions: true });
-   expect(await readExpansion(rows), 'the toggle of the second row survived the take-back').toEqual([
+   await expect.poll(
+      () => readExpansion(rows),
+      { message: 'the toggle of the second row survived the take-back' },
+   ).toEqual([
       true,
       false,
    ]);
+});
+
+test('Enter in a check label input sends no update', async () => {
+   const { uuid, sheet } = await weaponWithChecks('E2E Enter Weapon', ['E2E Enter A']);
+
+   /** @type {import('@playwright/test').Locator} The check's label input. */
+   const input = sheet.locator('li.reorder-row .header .label input').first();
+   await interceptUpdates(uuid, 'observe');
+
+   // An edit first proves that the interception sees this item's updates.
+   await commitText(input, 'E2E Enter B');
+   await expect.poll(
+      () => page.evaluate(() => globalThis.titanVeto.attempts),
+      { message: 'the edit reached the interception' },
+   ).toBeGreaterThan(0);
+   await settle(page);
+
+   /** @type {number} The updates seen before Enter. */
+   const before = await page.evaluate(() => globalThis.titanVeto.attempts);
+
+   // The input has not changed since it gained focus, so Enter fires no change event; only a form submission could
+   // send an update.
+   await input.focus();
+   await input.press('Enter');
+   await settle(page, { transitions: true });
+   expect(await releaseUpdates(), 'Enter sent no update').toBe(before);
 });
 
 test('a click on the Add Check button sends only its own update', async () => {
