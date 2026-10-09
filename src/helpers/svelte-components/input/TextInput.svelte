@@ -8,19 +8,21 @@
     * @property {string|object} [tooltip=undefined] - The Tooltip to display for this element, if any.
     * @property {Function} [onchange] - Callback forwarded from the native change event.
     * @property {Function} [oninput] - Callback forwarded from the native input event.
+    * @property {Function} [oncompositionend] - Callback forwarded from the native compositionend event.
     * @property {Function} [onkeyup] - Callback forwarded from the native keyup event.
     * @property {string} [testId] - Optional stable selector applied as `data-testid`.
     */
 
    /** @type {TextInputProps} */
    let {
-      value    = $bindable(),
-      disabled = false,
-      tooltip  = undefined,
-      onchange = undefined,
-      oninput  = undefined,
-      onkeyup  = undefined,
-      testId   = undefined,
+      value            = $bindable(),
+      disabled         = false,
+      tooltip          = undefined,
+      onchange         = undefined,
+      oninput          = undefined,
+      oncompositionend = undefined,
+      onkeyup          = undefined,
+      testId           = undefined,
    } = $props();
 </script>
 
@@ -29,6 +31,7 @@
    {disabled}
    {onchange}
    {oninput}
+   {oncompositionend}
    {onkeyup}
    data-testid={testId}
    use:tooltipAction={tooltip}
