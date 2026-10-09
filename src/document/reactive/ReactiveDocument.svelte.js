@@ -88,8 +88,14 @@ export default class ReactiveDocument {
             }
          };
 
-         /** @type {Set<string>} The document names of the ownership sources, one hook each. */
+         /**
+          * @type {Set<string>} The document names of the ownership sources, one hook each. A chat message always
+          * listens to actors: its speaker is resolved when an update arrives, and may not exist when the bridge starts.
+          */
          const sourceNames = new Set(getOwnershipSources(doc).map((source) => source.documentName));
+         if (name === 'ChatMessage') {
+            sourceNames.add('Actor');
+         }
 
          /**
           * Invalidate when the ownership of an ownership source changes: this document's permissions come from that
@@ -109,8 +115,11 @@ export default class ReactiveDocument {
 
          /**
           * Invalidate when the world's compendium configuration changes: the permission of a compendium document
-          * (ownership and lock of its pack) is read from that setting, and no document update hook fires for it.
-          * @param {foundry.documents.Setting} setting - The updated setting.
+          * (ownership and lock of its pack) is read from that setting, and no document update hook fires for it. The
+          * first configuration of a world creates the Setting document (`game.settings.set` creates it when none
+          * exists, `client/helpers/client-settings.mjs` `#setWorld`), and a Setting document can be deleted, so the
+          * create, update and delete hooks are all handled.
+          * @param {foundry.documents.Setting} setting - The created, updated or deleted setting.
           */
          const onSetting = (setting) => {
             if (setting?.key === 'core.compendiumConfiguration') {
@@ -125,8 +134,16 @@ export default class ReactiveDocument {
             ]),
             ...(doc.pack ? [
                [
+                  'createSetting',
+                  Hooks.on('createSetting', onSetting),
+               ],
+               [
                   'updateSetting',
                   Hooks.on('updateSetting', onSetting),
+               ],
+               [
+                  'deleteSetting',
+                  Hooks.on('deleteSetting', onSetting),
                ],
             ] : []),
             [

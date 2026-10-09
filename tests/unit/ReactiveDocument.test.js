@@ -388,22 +388,48 @@ describe('ReactiveDocument and the ownership sources of a document', () => {
 });
 
 describe('ReactiveDocument and the compendium configuration', () => {
-   it('re-renders a reader of a compendium document when the compendium configuration setting changes', () => {
-      const item = {
+   /**
+    * Builds a document of a compendium pack.
+    * @returns {object} The fake document.
+    */
+   function createPackDocument() {
+      return {
          id: 'i1',
          uuid: 'Compendium.pack.items.Item.i1',
          documentName: 'Item',
          pack: 'pack.items',
          system: { value: 1 },
       };
+   }
+
+   it.each([
+      'createSetting',
+      'updateSetting',
+      'deleteSetting',
+   ])('re-renders a reader of a compendium document on %s of the compendium configuration', (hook) => {
+      const item = createPackDocument();
       renderBridge(item);
       item.system.value = 2;
-      Hooks.call('updateSetting', { key: 'core.somethingElse' }, {}, {});
+      Hooks.call(hook, { key: 'core.somethingElse' }, {}, {});
       flushSync();
       expect(screen.getByTestId('value').textContent, 'another setting is ignored').toBe('1');
-      Hooks.call('updateSetting', { key: 'core.compendiumConfiguration' }, {}, {});
+      Hooks.call(hook, { key: 'core.compendiumConfiguration' }, {}, {});
       flushSync();
       expect(screen.getByTestId('value').textContent).toBe('2');
+   });
+
+   it('removes the setting handlers of a compendium document when its reader unmounts', async () => {
+      const { unmount } = renderBridge(createPackDocument());
+      for (const hook of [
+         'createSetting',
+         'updateSetting',
+         'deleteSetting',
+      ]) {
+         expect(Hooks.handlers[hook]?.size, `${hook} is registered`).toBe(1);
+      }
+      unmount();
+      await tick();
+      expect(Object.values(Hooks.handlers).reduce((total, handlers) => total + handlers.size, 0)).toBe(0);
    });
 
    it('registers no setting hook for a document outside a compendium', () => {
@@ -415,6 +441,36 @@ describe('ReactiveDocument and the compendium configuration', () => {
          system: { value: 1 },
       };
       renderBridge(item);
-      expect(Hooks.handlers.updateSetting?.size ?? 0).toBe(0);
+      for (const hook of [
+         'createSetting',
+         'updateSetting',
+         'deleteSetting',
+      ]) {
+         expect(Hooks.handlers[hook]?.size ?? 0, hook).toBe(0);
+      }
+   });
+});
+
+describe('ReactiveDocument and a chat message whose speaker resolves later', () => {
+   it('re-renders when the speaker actor, unresolved when the reader started, changes ownership', () => {
+      let speaker = null;
+      const message = {
+         id: 'm1',
+         uuid: 'ChatMessage.m1',
+         documentName: 'ChatMessage',
+         speaker: { actor: 'a1' },
+         constructor: { getSpeakerActor: () => speaker },
+         system: { value: 1 },
+      };
+      renderBridge(message);
+      speaker = {
+         id: 'a1',
+         uuid: 'Actor.a1',
+         documentName: 'Actor',
+      };
+      message.system.value = 2;
+      Hooks.call('updateActor', speaker, { ownership: { u1: 2 } }, {});
+      flushSync();
+      expect(screen.getByTestId('value').textContent).toBe('2');
    });
 });
