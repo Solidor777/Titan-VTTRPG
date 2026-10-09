@@ -185,10 +185,16 @@ methods all go through the same accessor. A hook invalidates the bridge only whe
 embedded hook its parent or grandparent, has the bridged document's `uuid`: an unlinked token's synthetic actor shares
 its base actor's `id` and has its own `uuid`, so an `id` match would re-render an open base-actor sheet on every edit
 of a token's actor (pinned by `tests/unit/ReactiveDocument.test.js` and `tests/e2e/sheet-header.spec.js`). It also
-registers `update<Ancestor>` hooks (an Item's Actor, ...) and invalidates when an ancestor's update carries `ownership`,
-because an embedded document's `isOwner` follows its parent and none of its own hooks fire for that change (read:
-`ReactiveDocument.svelte.js`; pinned by `tests/e2e/ownership.spec.js`, "an item sheet that is open when the player
-loses ownership ...").
+registers `update<Name>` hooks for the **ownership sources** of the document (`getOwnershipSources` in
+`ReactiveDocument.svelte.js`) and invalidates when an update of a source carries an `ownership` key: the ancestors
+(an Item's Actor, an effect's Item and Actor), the base actor of a token in the chain (core rebuilds an unlinked
+token's synthetic actor from its base actor without a hook of the synthetic actor, `TokenDocument#_onUpdateBaseActor`;
+the base actor's uuid is neither the synthetic actor's nor an ancestor's), and, for a chat message, the actor that
+spoke (`ChatMessage.getSpeakerActor`) and that actor's base actor. `isOwner` follows those documents and none of the
+document's own hooks fire for their ownership change. Pinned by `tests/e2e/ownership.spec.js` (item sheet, token
+actor and token item sheets, roll button, Edit Token button, Reset Expertise button) and the `ReactiveDocument` unit
+tests. A change of the viewing user's role logs that user out (`client/documents/user.mjs`), so no open sheet outlives
+it.
 
 **Always read displayed document values through a bridge's `document.data`, never off a raw prop** —
 Svelte 5's fine-grained reactivity only tracks reads that go through the `.data` accessor of a
@@ -273,12 +279,14 @@ second silently reverts the first (see `docs/POST_WORK_FINDINGS.md`).
 top-level bridge again under `'sheetDocument'`, and the check-rolling actor bridge under `'rollActor'`.
 `'document'` is always the NEAREST document — `EmbeddedDocumentProvider` shadows it for embedded subtrees
 — while `'sheetDocument'` always points at the owning sheet's top-level bridge and is never shadowed (the
-escape hatch for actor-coupled reads inside an embedded subtree). `'rollActor'` (resolved once by
-`src/document/reactive/ResolveRollActor.js`) is the actor that performs checks for the sheet: the actor
-itself on an actor sheet; an owned item's parent character actor on an item sheet, but only when the
-current user owns it (`item.isOwner` already means "owns the actor or is GM"); otherwise `undefined`. A
-present `'rollActor'` is the single gate for showing a roll button on an item sheet. Resolution mechanics
-live in data-flow.md, "Embedded-document contexts". Every descendant reads:
+escape hatch for actor-coupled reads inside an embedded subtree). `'rollActor'` is a reference object resolved once
+by `src/document/reactive/ResolveRollActor.js`; its `current` is the actor bridge that performs checks for the sheet:
+the actor itself on an actor sheet; an owned item's parent character actor on an item sheet, but only while the
+current user owns the item (`item.isOwner` means "owns the actor or is GM" and is read through the item's bridge, so
+`current` follows ownership changes); otherwise `undefined`. A consumer reads
+`const rollActor = $derived(getContext('rollActor').current)` (kept in two statements, because `getContext` runs at
+initialization only), and a defined `rollActor` is the single gate for showing a roll button on an item sheet.
+Resolution mechanics live in data-flow.md, "Embedded-document contexts". Every descendant reads:
 
 ```svelte
 import { getContext } from 'svelte';

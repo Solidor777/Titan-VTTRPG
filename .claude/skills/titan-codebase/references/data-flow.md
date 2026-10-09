@@ -181,8 +181,8 @@ DocumentSheetShell, { target: content, props: { document: this.#bridge, applicat
 stores the handle. Subsequent ApplicationV2 renders do not re-mount the Svelte tree — reactivity is driven by the
 `ReactiveDocument` bridge, not the render cycle. `DocumentSheetShell` sets `document` (the bridge),
 `applicationState`, `sheetDocument` (the same top-level bridge; see "Embedded-document contexts" below), and
-`rollActor` (the check-rolling actor, or `undefined`) into context, then renders the shell via
-`{#if shell}{@const Shell = shell}<Shell />{/if}`.
+`rollActor` (a reference whose `current` is the check-rolling actor bridge, or `undefined`) into context, then
+renders the shell via `{#if shell}{@const Shell = shell}<Shell />{/if}`.
 
 **4. Sheet body — e.g. `CharacterSheetBase.svelte`**
 Reads the bridge with `const document = getContext('document')`, gates rendering behind
@@ -262,7 +262,7 @@ bypassing the snapshot helper. See conventions.md, "Row two-way INPUTS to an emb
 
 **Two document context keys, one subscription.** `DocumentSheetShell.svelte` sets `'document'` (the sheet's
 `ReactiveDocument` bridge), `'applicationState'`, `'sheetDocument'` (the SAME top-level bridge), and
-`'rollActor'` (the check-rolling actor bridge, or `undefined`) at mount.
+`'rollActor'` (a reference whose `current` is the check-rolling actor bridge, or `undefined`) at mount.
 `PlayerHudShell.svelte` does the same for the Player HUD (both document keys; no `applicationState`, no
 `'rollActor'` — its action menu rolls through its own model, not the shared condensed buttons).
 `'document'` is always the *nearest* document and may be shadowed; `'sheetDocument'` always points at the
