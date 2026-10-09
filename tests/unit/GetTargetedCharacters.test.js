@@ -1,5 +1,6 @@
 import { describe, it, expect, afterEach } from 'vitest';
 import getTargetedCharacters from '~/helpers/utility-functions/GetTargetedCharacters.js';
+import getTargetedCharacterTokens from '~/helpers/utility-functions/GetTargetedCharacterTokens.js';
 
 /**
  * Builds a token whose actor is or is not a Character.
@@ -67,5 +68,25 @@ describe('getTargetedCharacters', () => {
          targets: [],
       });
       expect(getTargetedCharacters()).toEqual([]);
+   });
+});
+
+describe('getTargetedCharacterTokens', () => {
+   it('returns the Character tokens the characters come from, in target order', () => {
+      /** @type {object[]} The targeted tokens. */
+      const targets = [
+         token('Actor.a'),
+         token('Actor.loot', false),
+         token('Actor.b'),
+      ];
+      setTargeting({
+         controlled: [],
+         isGM: false,
+         targets,
+      });
+      expect(getTargetedCharacterTokens()).toEqual([
+         targets[0],
+         targets[2],
+      ]);
    });
 });

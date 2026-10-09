@@ -1,31 +1,10 @@
-import getTargetedTokens from '~/helpers/utility-functions/GetTargetedTokens.js';
-import getControlledTokens from '~/helpers/utility-functions/GetControlledTokens.js';
+import getTargetedCharacterTokens from '~/helpers/utility-functions/GetTargetedCharacterTokens.js';
 
 /**
- * Gets an array of Character Actors targeted by the current user.
- * If the user is Player, filters from targeted tokens.
- * If the user is GM, and no tokens are targeted, filters from controlled tokens.
- * @returns {TitanActor[]} Array of actors targeted by the current user.
+ * Gets the Character Actors targeted by the current user. A GM who targets nothing falls back to their controlled
+ * tokens.
+ * @returns {TitanActor[]} The actors of getTargetedCharacterTokens(), in target order.
  */
 export default function getTargetedCharacters() {
-   /** @type {*[]} */
-   const retVal = [];
-
-   // Get the targeted tokens.
-   let targetedTokens = getTargetedTokens();
-
-   // If there are no targeted tokens, and the current user is a GM, get the controlled.
-   // tokens.
-   if (targetedTokens.length < 1 && game.user.isGM) {
-      targetedTokens = getControlledTokens();
-   }
-
-   // Filter for Character actors.
-   for (const target of targetedTokens) {
-      if (target.actor?.system.isCharacter) {
-         retVal.push(target.actor);
-      }
-   }
-
-   return retVal;
+   return getTargetedCharacterTokens().map((token) => token.actor);
 }
