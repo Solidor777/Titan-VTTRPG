@@ -13,18 +13,56 @@ import error from '~/helpers/utility-functions/Error.js';
  */
 
 /**
- * Whether a batch of embedded documents has to be written in two steps because the actor is an unlinked token's
+ * Whether a batch of embedded documents has to be written one document first because the actor is an unlinked token's
  * synthetic actor whose token holds no delta yet. Workaround for a Foundry core defect: the server loses a create or a
- * delete of two or more embedded documents when the token's stored delta is null (read: the loop in `#e` of
- * `dist/database/backend/embedded-delta.mjs`, Foundry 14.364, hands the delta, not the token, to the batch write
- * parent when it handles the second document; measured in `test-pf2e`, which does not load TITAN). The first document
- * is written alone, which stores the delta in the token; the rest follows against the stored delta.
+ * delete of two or more embedded documents when the token's stored delta is null (read: the walk in `#e` of
+ * `dist/database/backend/embedded-delta.mjs`, Foundry 14.364, returns the outermost ancestor it adopted for the
+ * document; for the second document that is the delta, which replaces the token as the write parent of the batch, so
+ * the token record that has to hold the delta is not written; the loss is measured in `test-pf2e`, which does not load
+ * TITAN, for deletes of Items). Writing one document alone stores the delta; the rest follows against the stored delta.
+ * The guard reads client state (`token._source.delta`): core replaces it with the server's data on every load and sets
+ * it only after the server accepted a first write below the token (read: `TokenDocument#relinkActorDelta`, called from
+ * the descendant events that run after the server's reply, `client/documents/token.mjs`). It differs from the server
+ * only after a batch written around these overrides (a class-level call such as
+ * `Item.createDocuments(data, { parent })` that the server lost); no TITAN code makes one. A server read before every
+ * batch would cost a round trip for no other case.
  * @param {TitanActor} actor - The actor the batch is for.
  * @param {number} count - The number of documents in the batch.
- * @returns {boolean} True when the first document has to be written alone.
+ * @returns {boolean} True when one document has to be written alone first.
  */
 function needsDeltaFirst(actor, count) {
    return count > 1 && actor.isToken && !actor.token._source.delta;
+}
+
+/**
+ * Writes a batch of documents, one document at a time while `needsDeltaFirst` holds and the rest in one call. The guard
+ * is tested again after every single write: a document that a listener vetoed or that failed validation is dropped
+ * before the request (read: `#preCreateDocumentArray` and `#preDeleteDocumentArray`, `client/data/client-backend.mjs`),
+ * so it stores no delta and the next document has to go alone as well. The writes are separate server operations: when
+ * a later one is rejected, the documents of the earlier ones stay written, where core rejects the whole batch.
+ * @param {TitanActor} actor - The actor the batch is for.
+ * @param {object[] | string[]} items - The data (create) or the ids (delete) of the batch.
+ * @param {(items: object[] | string[], operation: object) => Promise<Document[]>} write - One core write of the items.
+ * @param {object} operation - The caller's operation parameters.
+ * @returns {Promise<Document[]>} The documents the writes returned, in order.
+ */
+async function writeInSteps(actor, items, write, operation) {
+   if (!needsDeltaFirst(actor, items.length)) {
+      return write(items, operation);
+   }
+
+   /** @type {Document[]} The documents the writes returned. */
+   const written = [];
+
+   /** @type {object[] | string[]} The items not written yet. */
+   let rest = items;
+   while (needsDeltaFirst(actor, rest.length)) {
+      // Core writes `parent`, `pack` and the items onto the operation it receives, so each write takes a copy.
+      written.push(...await write(rest.slice(0, 1), { ...operation }));
+      rest = rest.slice(1);
+   }
+   written.push(...await write(rest, { ...operation }));
+   return written;
 }
 
 /**
@@ -73,7 +111,9 @@ export default class TitanActor extends Actor {
 
    /**
     * Creates embedded documents. On an unlinked token's actor whose token holds no delta, the first document is
-    * created alone so the delta is stored before the rest (see `needsDeltaFirst`).
+    * created alone so the delta is stored before the rest (see `needsDeltaFirst` and `writeInSteps`). Not atomic in
+    * that case: when the rest is rejected by the server (for example a kept id that already exists), the first
+    * document stays created, where core creates none.
     * @override
     * @param {string} embeddedName - The name of the embedded document type.
     * @param {object[]} [data] - The data of each document to create.
@@ -81,23 +121,20 @@ export default class TitanActor extends Actor {
     * @returns {Promise<Document[]>} The created documents.
     */
    async createEmbeddedDocuments(embeddedName, data = [], operation = {}) {
-      if (needsDeltaFirst(this, data.length)) {
-         /** @type {Document[]} The first created document. */
-         const first = await super.createEmbeddedDocuments(embeddedName, data.slice(0, 1), { ...operation });
-
-         /** @type {Document[]} The rest of the created documents. */
-         const rest = await super.createEmbeddedDocuments(embeddedName, data.slice(1), { ...operation });
-         return [
-            ...first,
-            ...rest,
-         ];
-      }
-      return super.createEmbeddedDocuments(embeddedName, data, operation);
+      return writeInSteps(
+         this,
+         data,
+         (step, stepOperation) => super.createEmbeddedDocuments(embeddedName, step, stepOperation),
+         operation,
+      );
    }
 
    /**
     * Deletes embedded documents. On an unlinked token's actor whose token holds no delta, the first document is
-    * deleted alone so the delta is stored before the rest (see `needsDeltaFirst`).
+    * deleted alone so the delta is stored before the rest (see `needsDeltaFirst` and `writeInSteps`). A `deleteAll`
+    * operation is resolved to the ids of the whole embedded collection first, as core resolves it. An id the
+    * collection does not hold rejects the whole batch before the first write, as in core. A server rejection of the
+    * rest after the first write leaves the first document deleted, where core deletes none.
     * @override
     * @param {string} embeddedName - The name of the embedded document type.
     * @param {string[]} ids - The ids of the documents to delete.
@@ -105,18 +142,29 @@ export default class TitanActor extends Actor {
     * @returns {Promise<Document[]>} The deleted documents.
     */
    async deleteEmbeddedDocuments(embeddedName, ids, operation = {}) {
-      if (needsDeltaFirst(this, ids.length)) {
-         /** @type {Document[]} The first deleted document. */
-         const first = await super.deleteEmbeddedDocuments(embeddedName, ids.slice(0, 1), { ...operation });
+      /** @type {Collection} The embedded collection (core's own validation of the name). */
+      const collection = this.getEmbeddedCollection(embeddedName);
 
-         /** @type {Document[]} The rest of the deleted documents. */
-         const rest = await super.deleteEmbeddedDocuments(embeddedName, ids.slice(1), { ...operation });
-         return [
-            ...first,
-            ...rest,
-         ];
+      /** @type {string[]} The ids the operation deletes. */
+      const targets = operation.deleteAll ? Array.from(collection.keys()) : ids;
+      if (!needsDeltaFirst(this, targets.length)) {
+         return super.deleteEmbeddedDocuments(embeddedName, ids, operation);
       }
-      return super.deleteEmbeddedDocuments(embeddedName, ids, operation);
+      for (const id of targets) {
+         collection.get(id, {
+            strict: true,
+            invalid: true,
+         });
+      }
+      return writeInSteps(
+         this,
+         targets,
+         (step, stepOperation) => super.deleteEmbeddedDocuments(embeddedName, step, stepOperation),
+         {
+            ...operation,
+            deleteAll: false,
+         },
+      );
    }
 
    /**
