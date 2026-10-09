@@ -1,9 +1,11 @@
 import { expect, flushPageErrors, test } from './harness.js';
 import { clickSheetTab, commitText } from './actions.js';
 import { clickRoll, openCheckDialog, readNewestCheckFlags, setNumberField } from './checkDialog.js';
+import { forceDice, resetDice } from './dice.js';
 import { login, openSheetByUuid } from './fixtures.js';
 import {
    addCheck,
+   addCustomAspect,
    createActor,
    createOwnedItem,
    placeToken,
@@ -15,6 +17,7 @@ import {
    viewScene,
 } from './flows.js';
 import { setClientSetting } from './settings.js';
+import { settle } from './settle.js';
 import { attachPageErrors, clearChat, closeAllApps, showChatLog } from './world.js';
 
 /**
@@ -365,6 +368,38 @@ test('the Edit Token button of an open character sheet follows the player\'s own
    }
 });
 
+test('the Edit Token button of an open character sheet follows the Configure Token permission', async () => {
+   /** @type {object} The world's permission settings before the test. */
+   const original = await gm.evaluate(() => game.settings.get('core', 'permissions'));
+   try {
+      await giveLevel('OWNER');
+
+      /** @type {import('@playwright/test').Locator} The owner's view of the character sheet. */
+      const sheet = await openSheetByUuid(player, actorUuid);
+
+      /** @type {import('@playwright/test').Locator} The sheet's Edit Token button. */
+      const button = sheet.locator('.window-header .edit-token-button');
+      await expect(button, 'a player has no Configure Token permission by default').toHaveCount(0);
+      await gm.evaluate(async () => {
+         /** @type {object} The permission settings with the player role allowed to configure tokens. */
+         const permissions = foundry.utils.deepClone(game.settings.get('core', 'permissions'));
+         permissions.TOKEN_CONFIGURE = [
+            CONST.USER_ROLES.PLAYER,
+            CONST.USER_ROLES.TRUSTED,
+            CONST.USER_ROLES.ASSISTANT,
+            CONST.USER_ROLES.GAMEMASTER,
+         ];
+         await game.settings.set('core', 'permissions', permissions);
+      });
+      await expect(button, 'the open sheet shows the button once players may configure tokens').toHaveCount(1);
+      await gm.evaluate((permissions) => game.settings.set('core', 'permissions', permissions), original);
+      await expect(button, 'the open sheet hides the button again').toHaveCount(0);
+   }
+   finally {
+      await gm.evaluate((permissions) => game.settings.set('core', 'permissions', permissions), original);
+   }
+});
+
 test('an open compendium item sheet follows the compendium permission the GM sets for players', async () => {
    /** @type {{collection: string, id: string, ownership: object, locked: boolean}} The first item pack's entry. */
    const pack = await gm.evaluate(() => {
@@ -419,6 +454,61 @@ test('an open compendium item sheet follows the compendium permission the GM set
    }
 });
 
+test('an open compendium item sheet follows the first configuration of the compendium setting', async () => {
+   /** @type {object} The world's compendium configuration before the test. */
+   const original = await gm.evaluate(
+      () => foundry.utils.deepClone(game.settings.get('core', 'compendiumConfiguration')),
+   );
+
+   /** @type {{collection: string, id: string}} The first item pack and its first entry. */
+   const pack = await gm.evaluate(() => {
+      /** @type {CompendiumCollection} The first item pack with an entry. */
+      const found = game.packs.find((candidate) => candidate.documentName === 'Item' && candidate.index.size > 0);
+      return {
+         collection: found.collection,
+         id: found.index.contents[0]._id,
+      };
+   });
+   try {
+      // The Setting document is removed, so that setting the configuration creates it, as the first configuration of a
+      // world does (client/helpers/client-settings.mjs, #setWorld).
+      await gm.evaluate(async () => {
+         await game.settings.storage.get('world').getSetting('core.compendiumConfiguration').delete();
+      });
+
+      /** @type {import('@playwright/test').Locator} The player's view of the pack item's sheet. */
+      const sheet = await openSheetByUuid(player, `Compendium.${pack.collection}.Item.${pack.id}`);
+
+      /** @type {import('@playwright/test').Locator} The sheet's inputs. */
+      const inputs = sheet.locator('input');
+      expect(await inputs.count(), 'the sheet has inputs').toBeGreaterThan(0);
+      await expect(inputs.first(), 'a player cannot edit the pack by default').toBeDisabled();
+      await gm.evaluate(async ({ collection, original }) => {
+         /** @type {object} The configuration with the pack unlocked and owned by players. */
+         const configuration = foundry.utils.deepClone(original);
+         configuration[collection] = {
+            ...configuration[collection],
+            locked: false,
+            ownership: {
+               ...configuration[collection]?.ownership,
+               PLAYER: 'OWNER',
+            },
+         };
+         await game.settings.set('core', 'compendiumConfiguration', configuration);
+      }, {
+         collection: pack.collection,
+         original,
+      });
+      await expect(inputs.first(), 'the open sheet turns editable when the setting is created').toBeEnabled();
+   }
+   finally {
+      await gm.evaluate(
+         (configuration) => game.settings.set('core', 'compendiumConfiguration', configuration),
+         original,
+      );
+   }
+});
+
 test('an item sheet that is open when the player loses ownership turns read-only, and editable again on regaining it',
    async () => {
       await giveLevel('OWNER');
@@ -442,11 +532,16 @@ test('an item sheet that is open when the player loses ownership turns read-only
       await expect(addCheckButton, 'Add Check works again').toBeEnabled();
    });
 
-test('a character sheet that is open when the player loses ownership turns read-only', async () => {
+test('an open character sheet turns read-only on losing ownership and editable on regaining it', async () => {
    await giveLevel('OWNER');
 
    /** @type {import('@playwright/test').Locator} The player's view of the character sheet. */
    const sheet = await openSheetByUuid(player, actorUuid);
+
+   /** @type {import('@playwright/test').Locator} The Skills tab's Filter input, which no ownership binding gates. */
+   const filter = sheet.locator('.skill-tab .filter input');
+   await clickSheetTab(sheet, 'Skills');
+   await expect(filter, 'an owner can use the filter').toBeEnabled();
 
    /** @type {{inputs: number, disabledInputs: number}} The owner's controls. */
    const owned = await readControls(sheet);
@@ -460,6 +555,29 @@ test('a character sheet that is open when the player loses ownership turns read-
       },
       { message: 'every input of the open sheet is disabled' },
    ).toBe(true);
+   await expect(filter, 'core disables the filter of a read-only sheet').toBeDisabled();
+   await giveLevel('OWNER');
+   await expect.poll(
+      async () => (await readControls(sheet)).disabledInputs,
+      { message: 'no input of the open sheet stays disabled' },
+   ).toBe(0);
+   await expect(filter, 'the filter is enabled again').toBeEnabled();
+});
+
+test('the Filter input of an open item sheet follows the ownership of the player', async () => {
+   await giveLevel('OWNER');
+
+   /** @type {import('@playwright/test').Locator} The player's view of the equipment's sheet. */
+   const sheet = await openSheetByUuid(player, equipmentUuid);
+   await clickSheetTab(sheet, 'Checks');
+
+   /** @type {import('@playwright/test').Locator} The Checks tab's Filter input, which no ownership binding gates. */
+   const filter = sheet.locator('.filter input');
+   await expect(filter, 'an owner can use the filter').toBeEnabled();
+   await giveLevel('OBSERVER');
+   await expect(filter, 'the open sheet disables the filter for a viewer who cannot edit').toBeDisabled();
+   await giveLevel('OWNER');
+   await expect(filter, 'the filter is enabled again').toBeEnabled();
 });
 
 test('an unlinked token\'s actor sheet and item sheet follow the player\'s ownership of the base actor', async () => {
@@ -517,13 +635,14 @@ async function rollExpertiseCheck(uuid) {
 }
 
 /**
- * Checks that the Reset Expertise button of a check card in the player's open chat log follows the player's ownership
- * of the card's speaker. The button shows for an owner of the speaking actor only.
+ * Checks that a control of a check card in the player's open chat log follows the player's ownership of the card's
+ * speaker. The control shows for an owner of the speaking actor only.
  * @param {string} messageId - The id of the card's chat message.
  * @param {string} baseActorId - The id of the world character the speaker's ownership comes from.
- * @returns {Promise<void>} Resolves once the card has shown the button, hidden it and shown it again.
+ * @param {Function} findControl - Receives the card's locator and returns (a promise of) the control's locator.
+ * @returns {Promise<void>} Resolves once the card has shown the control, hidden it and shown it again.
  */
-async function expectResetButtonFollowsOwnership(messageId, baseActorId) {
+async function expectCardControlFollowsOwnership(messageId, baseActorId, findControl) {
    await giveLevel('OWNER', baseActorId);
    await showChatLog(player);
 
@@ -531,27 +650,39 @@ async function expectResetButtonFollowsOwnership(messageId, baseActorId) {
    const card = player.locator(`#chat .chat-log li[data-message-id="${messageId}"]`);
    await expect(card, 'the player has the card').toBeVisible();
 
+   /** @type {import('@playwright/test').Locator} The card's control. */
+   const control = await findControl(card);
+   await expect(control, 'an owner of the speaker sees the control').toHaveCount(1);
+   await giveLevel('OBSERVER', baseActorId);
+   await expect(control, 'the open card hides the control once the player no longer owns the speaker').toHaveCount(0);
+   await giveLevel('OWNER', baseActorId);
+   await expect(control, 'the open card shows the control again').toHaveCount(1);
+}
+
+/**
+ * Finds the Reset Expertise button of a check card.
+ * @param {import('@playwright/test').Locator} card - The card in the player's chat log.
+ * @returns {Promise<import('@playwright/test').Locator>} The button's locator.
+ */
+async function findResetButton(card) {
    /** @type {string} The localized label of the Reset Expertise button. */
    const resetLabel = await player.evaluate(() => game.i18n.localize('LOCAL.resetExpertise.text'));
-
-   /** @type {import('@playwright/test').Locator} The card's Reset Expertise button. */
-   const reset = card.getByRole('button', { name: resetLabel });
-   await expect(reset, 'an owner of the speaker sees the button').toHaveCount(1);
-   await giveLevel('OBSERVER', baseActorId);
-   await expect(reset, 'the open card hides the button once the player no longer owns the speaker').toHaveCount(0);
-   await giveLevel('OWNER', baseActorId);
-   await expect(reset, 'the open card shows the button again').toHaveCount(1);
+   return card.getByRole('button', { name: resetLabel });
 }
 
 test('the Reset Expertise button of an open check card follows the player\'s ownership of the speaking character',
    async () => {
-      await expectResetButtonFollowsOwnership(await rollExpertiseCheck(actorUuid), actorId);
+      await expectCardControlFollowsOwnership(await rollExpertiseCheck(actorUuid), actorId, findResetButton);
    });
 
 test('the Reset Expertise button of an open check card follows the player\'s ownership of a token\'s base actor',
    async () => {
       const token = await ensureToken();
-      await expectResetButtonFollowsOwnership(await rollExpertiseCheck(token.tokenActorUuid), token.actorId);
+      await expectCardControlFollowsOwnership(
+         await rollExpertiseCheck(token.tokenActorUuid),
+         token.actorId,
+         findResetButton,
+      );
    });
 
 test('a focused label input that turns read-only shows the label another client sets after ownership returns',
@@ -581,4 +712,57 @@ test('a focused label input that turns read-only shows the label another client 
          { message: 'the server stores the GM\'s label' },
       ).toBe('E2E Remote Label');
       await expect(input, 'the input shows the GM\'s label').toHaveValue('E2E Remote Label');
+   });
+
+test('the scaling aspects of an open casting card follow the ownership of the player over the speaking character',
+   async () => {
+      /** @type {string} The uuid of a new spell of the character. */
+      const spellUuid = `${actorUuid}.Item.${await createOwnedItem(gm, actorId, 'spell', 'E2E Ownership Spell')}`;
+      await addCustomAspect(gm, spellUuid);
+
+      /** @type {import('@playwright/test').Locator} The custom aspect's row on the spell's sheet. */
+      const row = (await openSheetByUuid(gm, spellUuid)).locator('li.reorder-row').first();
+      if (await row.locator('.expandable-content').count() === 0) {
+         await row.getByRole('button', { name: 'Expand' }).click();
+      }
+
+      /**
+       * Finds a labelled field of the aspect row.
+       * @param {string} text - The field's label.
+       * @returns {import('@playwright/test').Locator} The field's element.
+       */
+      const field = (text) => row.locator('.field').filter({ has: gm.getByText(text, { exact: true }) }).first();
+      await settle(gm, { transitions: true });
+      await field('Damage').locator('button').click();
+      await commitText(field('Initial Value').locator('input'), '2');
+      await expect.poll(
+         async () => (await readServerSystem(gm, spellUuid)).customAspect[0].scaling,
+         { message: 'the row stored a scaling aspect' },
+      ).toBe(true);
+
+      // Three forced successes against a complexity of one bank extra successes, which a scaling aspect spends: the
+      // card then offers the aspect to an owner of the speaker.
+      await setClientSetting(gm, 'getCheckOptions', 'always');
+      await forceDice(gm, [
+         6,
+         6,
+         6,
+      ]);
+
+      /** @type {import('@playwright/test').Locator} The casting check dialog. */
+      const dialog = await openCheckDialog(gm, 'casting', spellUuid);
+      await expect(dialog.getByTestId('check-field-damageMod'), 'the damaging spell offers the Damage Mod field')
+         .toHaveCount(1);
+
+      // Two more dice than the character's Mind gives, so that all three forced sixes are rolled.
+      await setNumberField(dialog, 'diceMod', 2);
+
+      /** @type {number} The chat-message count before the roll. */
+      const baseline = await clickRoll(dialog, gm);
+
+      /** @type {string} The id of the casting card. */
+      const messageId = (await readNewestCheckFlags(gm, baseline, 'castingCheck')).id;
+      await resetDice(gm);
+      await closeAllApps(gm);
+      await expectCardControlFollowsOwnership(messageId, actorId, (card) => card.locator('.aspect').first());
    });
