@@ -55,9 +55,13 @@ export async function openSidebarTab(page, tab) {
  * @param {string} name - The new document's name.
  * @param {string} [type] - The document subtype to choose in the dialog; omitted for kinds with no subtype.
  * @param {string} [folderId] - The id of the folder that receives the document; omitted for the directory root.
+ * @param {object} recording - How the new document is recorded and awaited.
+ * @param {string} recording.documentName - The document class name recorded on the running list.
+ * @param {(id: string) => Promise<void>} [recording.whenCreated] - Awaited once the document is recorded and the dialog
+ * is closed; the wait for what core does after the create.
  * @returns {Promise<string>} The id of the new document, read from its directory entry.
  */
-async function createFromDirectory(page, tab, name, type, folderId) {
+async function createFromDirectory(page, tab, name, type, folderId, { documentName, whenCreated }) {
    /** @type {import('@playwright/test').Locator} The directory's panel. */
    const panel = await openSidebarTab(page, tab);
    await (folderId === undefined
@@ -72,14 +76,29 @@ async function createFromDirectory(page, tab, name, type, folderId) {
       await dialog.locator('select[name="type"]').selectOption(type);
    }
    await dialog.locator('button[data-action="ok"]').click();
-   await expect(dialog).toHaveCount(0);
 
+   // Each wait is on one event, in the order the events happen: the entry shows once the create resolved, the dialog
+   // closes after its close transition ended, and the first scene's draw ends last. Measured in 2 x 20 first-scene
+   // creations with no CPU throttle, from the click on OK, medians of the two runs: entry 19 and 22 ms, dialog gone 333
+   // and 334 ms, canvas ready 392 and 392 ms, and the dialog was gone first in 40 of 40
+   // (`.superpowers/sdd/2026-09-29-conditions-rework/bugbatch1-logs/diag-A-probe-{old,new}-r1.jsonl`). The document is
+   // recorded as soon as its id is known, so a later failed wait cannot leave it unrecorded.
    /** @type {import('@playwright/test').Locator} The directory entry of the new document. */
    const entry = panel.locator('.directory-item.entry', {
       has: page.locator('.entry-name', { hasText: exactText(name) }),
    });
    await expect(entry).toHaveCount(1);
-   return (await entry.getAttribute('data-entry-id'));
+
+   /** @type {string} The new document's id. */
+   const id = await entry.getAttribute('data-entry-id');
+   record({
+      documentName,
+      id,
+      createdBy: currentSpec(),
+   });
+   await expect(dialog).toHaveCount(0);
+   await whenCreated?.(id);
+   return id;
 }
 
 /**
@@ -92,14 +111,7 @@ async function createFromDirectory(page, tab, name, type, folderId) {
  * @returns {Promise<string>} The actor's id.
  */
 export async function createActor(page, { name, type, folderId }) {
-   /** @type {string} The new actor's id. */
-   const id = await createFromDirectory(page, 'actors', name, type, folderId);
-   record({
-      documentName: 'Actor',
-      id,
-      createdBy: currentSpec(),
-   });
-   return id;
+   return createFromDirectory(page, 'actors', name, type, folderId, { documentName: 'Actor' });
 }
 
 /**
@@ -112,14 +124,7 @@ export async function createActor(page, { name, type, folderId }) {
  * @returns {Promise<string>} The item's id.
  */
 export async function createWorldItem(page, { name, type, folderId }) {
-   /** @type {string} The new item's id. */
-   const id = await createFromDirectory(page, 'items', name, type, folderId);
-   record({
-      documentName: 'Item',
-      id,
-      createdBy: currentSpec(),
-   });
-   return id;
+   return createFromDirectory(page, 'items', name, type, folderId, { documentName: 'Item' });
 }
 
 /**
@@ -139,8 +144,9 @@ export async function createFolder(page, tab, name) {
    const config = page.locator('.application.folder-config');
    await config.locator('input[name="name"]').fill(name);
    await config.locator('button[type="submit"]').click();
-   await expect(config).toHaveCount(0);
 
+   // The entry shows once the create resolved; the window closes after the create resolved and its close transition
+   // ended, so it is checked after the folder is recorded.
    /** @type {import('@playwright/test').Locator} The directory entry of the new folder. */
    const entry = panel.locator('.directory-item.folder', {
       has: page.locator('header .folder-name', { hasText: exactText(name) }),
@@ -154,32 +160,32 @@ export async function createFolder(page, tab, name) {
       id,
       createdBy: currentSpec(),
    });
+   await expect(config).toHaveCount(0);
+   await settle(page);
    return id;
 }
 
 /**
- * Creates a Scene through the Scenes tab. Core views a scene created while no scene is viewed (measured: a second
- * scene created while one is viewed is not viewed), so the flow then waits for the canvas to finish drawing it.
+ * Creates a Scene through the Scenes tab. Core activates a scene created while no scene is active (read: core
+ * `Scene._preCreateOperation` tests `game.scenes.active`) and the activation views and draws it, so then the flow
+ * waits for the canvas to finish drawing the new scene.
  * @param {import('@playwright/test').Page} page - A logged-in GM page.
  * @param {object} options - What to create.
  * @param {string} options.name - The display name; it starts with `E2E ` so the census finds the scene.
  * @returns {Promise<string>} The scene's id.
  */
 export async function createScene(page, { name }) {
-   /** @type {boolean} Whether a scene was viewed before the creation. */
-   const hadViewedScene = await page.evaluate(() => !!game.scenes.viewed);
+   /** @type {boolean} Whether a scene was active before the creation. */
+   const activeBefore = await page.evaluate(() => !!game.scenes.active);
 
-   /** @type {string} The new scene's id. */
-   const id = await createFromDirectory(page, 'scenes', name);
-   record({
+   return createFromDirectory(page, 'scenes', name, undefined, undefined, {
       documentName: 'Scene',
-      id,
-      createdBy: currentSpec(),
+      whenCreated: async (sceneId) => {
+         if (!activeBefore) {
+            await waitForSceneDrawn(page, sceneId);
+         }
+      },
    });
-   if (!hadViewedScene) {
-      await waitForSceneDrawn(page, id);
-   }
-   return id;
 }
 
 /**
@@ -218,6 +224,9 @@ export async function createOwnedItem(page, actorId, type, name) {
 
    /** @type {string[]} The ids of the actor's items before the add. */
    const before = await page.evaluate((actorId) => game.actors.get(actorId).items.map((item) => item.id), actorId);
+
+   /** @type {import('@playwright/test').Locator} The Inventory tab's item-type dialog; TitanDialog suffixes its id. */
+   const inventoryDialog = page.locator(`[id^="add-inventory-item-dialog-${actorId}"]`);
    if (type === 'ability') {
       await openTab(sheet, 'Abilities');
       await sheet.getByRole('button', { name: 'Add New Ability' }).click();
@@ -229,13 +238,9 @@ export async function createOwnedItem(page, actorId, type, name) {
    else {
       await openTab(sheet, 'Inventory');
       await sheet.getByRole('button', { name: 'Add New Item' }).click();
-
-      /** @type {import('@playwright/test').Locator} The item-type dialog; TitanDialog suffixes the id it is given. */
-      const dialog = page.locator(`[id^="add-inventory-item-dialog-${actorId}"]`);
-      await expect(dialog).toBeVisible();
-      await selectTitanOption(page, dialog.locator('[role="combobox"]'), type);
-      await dialog.getByRole('button', { name: 'Add New Item' }).click();
-      await expect(dialog).toHaveCount(0);
+      await expect(inventoryDialog).toBeVisible();
+      await selectTitanOption(page, inventoryDialog.locator('[role="combobox"]'), type);
+      await inventoryDialog.getByRole('button', { name: 'Add New Item' }).click();
    }
 
    /** @type {string[]} The ids that appeared on the actor. */
@@ -252,9 +257,6 @@ export async function createOwnedItem(page, actorId, type, name) {
       );
       return added.length;
    }, { message: 'the add button created one owned item' }).toBe(1);
-
-   // The new row slides in (`transition:slide`); its Edit Item button is clicked next, so the slide must end first.
-   await settle(page, { transitions: true });
    const [id] = added;
    record({
       documentName: 'Item',
@@ -262,6 +264,12 @@ export async function createOwnedItem(page, actorId, type, name) {
       parent: `Actor.${actorId}`,
       createdBy: currentSpec(),
    });
+   if (type !== 'ability' && type !== 'spell') {
+      await expect(inventoryDialog).toHaveCount(0);
+   }
+
+   // The new row slides in (`transition:slide`); its Edit Item button is clicked next, so the slide must end first.
+   await settle(page, { transitions: true });
 
    // The new item carries a default name; the item sheet's name field renames it.
    /** @type {import('@playwright/test').Locator} The item's row in the actor sheet. */
@@ -808,8 +816,9 @@ export async function createCompendium(page, { label, type }) {
    await dialog.locator('#create-compendium-label').fill(label);
    await dialog.locator('select#create-compendium-type').selectOption(type);
    await dialog.locator('button[data-action="ok"]').click();
-   await expect(dialog).toHaveCount(0);
 
+   // The entry shows once the create resolved; the dialog closes after the create resolved and its close transition
+   // ended, so it is checked after the pack is recorded.
    /** @type {import('@playwright/test').Locator} The new pack's directory entry. */
    const entry = panel.locator('.directory-item.compendium', {
       has: page.locator('.entry-name strong', { hasText: exactText(label) }),
@@ -823,6 +832,8 @@ export async function createCompendium(page, { label, type }) {
       id: packId,
       createdBy: currentSpec(),
    });
+   await expect(dialog).toHaveCount(0);
+   await settle(page);
    return packId;
 }
 
@@ -895,7 +906,6 @@ export async function putInPack(page, entryLocator, packId) {
       );
       return added.length;
    }, { message: 'the drop copied one document into the pack' }).toBe(1);
-   await settle(page);
    const [id] = added;
    record({
       documentName: await page.evaluate(({ packId }) => game.packs.get(packId).documentName, { packId }),
@@ -903,6 +913,7 @@ export async function putInPack(page, entryLocator, packId) {
       packId,
       createdBy: currentSpec(),
    });
+   await settle(page);
    await closeWindow(packWindow);
    return id;
 }
@@ -983,7 +994,6 @@ export async function dragItemOntoSheet(page, itemId, actorId) {
       );
       return added.length;
    }, { message: 'the drop onto the sheet created one owned item' }).toBe(1);
-   await settle(page);
    const [id] = added;
    record({
       documentName: 'Item',
@@ -991,6 +1001,7 @@ export async function dragItemOntoSheet(page, itemId, actorId) {
       parent: `Actor.${actorId}`,
       createdBy: currentSpec(),
    });
+   await settle(page);
    return id;
 }
 
@@ -1033,9 +1044,6 @@ export async function addEffect(page, actorId, name, { duration, remaining, init
       );
       return added.length;
    }, { message: 'the add button created one effect' }).toBe(1);
-
-   // The new row slides in (`transition:slide`); its Edit Item button is clicked next, so the slide must end first.
-   await settle(page, { transitions: true });
    const [id] = added;
    record({
       documentName: 'ActiveEffect',
@@ -1043,6 +1051,9 @@ export async function addEffect(page, actorId, name, { duration, remaining, init
       parent: `Actor.${actorId}`,
       createdBy: currentSpec(),
    });
+
+   // The new row slides in (`transition:slide`); its Edit Item button is clicked next, so the slide must end first.
+   await settle(page, { transitions: true });
 
    // The new effect carries a default name; the effect sheet's name field renames it.
    await sheet.locator(`[data-effect-id="${id}"]`).getByRole('button', { name: 'Edit Item' }).click();
@@ -1179,29 +1190,24 @@ export async function addCheck(
    /** @type {import('@playwright/test').Locator} The document's sheet. */
    const sheet = await openSheetByUuid(page, documentUuid);
 
-   /** @type {number} The number of checks before the add. */
-   const before = await page.evaluate(async (uuid) => (await fromUuid(uuid)).system.check.length, documentUuid);
+   /** @type {number} The number of checks the server holds before the add. */
+   const before = (await readServerSystem(page, documentUuid)).check.length;
    await openTab(sheet, 'Checks');
    await sheet.getByRole('button', { name: 'Add Check' }).click();
+
+   // The server holds the check once the update committed; the client model holds it at the click, before any update.
    await expect.poll(
-      () => page.evaluate(async (uuid) => (await fromUuid(uuid)).system.check.length, documentUuid),
-      { message: 'the add button created one check' },
+      async () => (await readServerSystem(page, documentUuid)).check.length,
+      { message: 'the server holds the new check' },
    ).toBe(before + 1);
    await settle(page);
 
    /**
-    * Reads one field of the new check.
+    * Reads one field of the new check from the server.
     * @param {string} field - The check field.
     * @returns {Promise<*>} The stored value.
     */
-   const stored = (field) => page.evaluate(
-      async ({ uuid, index, field }) => (await fromUuid(uuid)).system.check[index][field],
-      {
-         uuid: documentUuid,
-         index: before,
-         field,
-      },
-   );
+   const stored = async (field) => (await readServerSystem(page, documentUuid)).check[before][field];
 
    /** @type {import('@playwright/test').Locator} Every check row of the sheet. */
    const rows = sheet.locator('.check').filter({ has: page.locator('.header .label input') });
@@ -1498,7 +1504,6 @@ export async function addCustomTrait(page, documentUuid, name, description) {
       await dialog.locator('textarea').fill(description);
    }
    await dialog.locator('.buttons .button button').first().click();
-   await expect(dialog).toHaveCount(0);
    await expect.poll(
       () => page.evaluate(
          async (uuid) => (await fromUuid(uuid)).system.customTrait.map((trait) => trait.name),
@@ -1506,6 +1511,7 @@ export async function addCustomTrait(page, documentUuid, name, description) {
       ),
       { message: 'the dialog stored the custom trait' },
    ).toContain(name);
+   await expect(dialog).toHaveCount(0);
    await settle(page);
 }
 
@@ -1520,11 +1526,11 @@ export async function addAttack(page, weaponUuid) {
    const sheet = await openSheetByUuid(page, weaponUuid);
 
    /** @type {number} The number of attacks before the add. */
-   const before = await page.evaluate(async (uuid) => (await fromUuid(uuid)).system.attack.length, weaponUuid);
+   const before = (await readServerSystem(page, weaponUuid)).attack.length;
    await openTab(sheet, 'Attacks');
    await sheet.getByRole('button', { name: 'Add Attack' }).click();
    await expect.poll(
-      () => page.evaluate(async (uuid) => (await fromUuid(uuid)).system.attack.length, weaponUuid),
+      async () => (await readServerSystem(page, weaponUuid)).attack.length,
       { message: 'the add button created one attack' },
    ).toBe(before + 1);
    await expect(sheet.locator('li.reorder-row'), 'the Attacks tab rendered the new row').toHaveCount(before + 1);
@@ -1552,11 +1558,7 @@ export async function setAttackStat(page, weaponUuid, index, field, value) {
    const stat = row.locator('.field').filter({ hasText: field === 'range' ? 'Range' : 'Damage' }).first();
    await commitText(stat.locator('input').first(), value);
    await expect.poll(
-      () => page.evaluate(async ({ uuid, index, field }) => (await fromUuid(uuid)).system.attack[index][field], {
-         uuid: weaponUuid,
-         index,
-         field,
-      }),
+      async () => (await readServerSystem(page, weaponUuid)).attack[index][field],
       { message: `the ${field} input stored the value` },
    ).toBe(value);
 }
@@ -1582,7 +1584,6 @@ export async function addAttackCustomTrait(page, weaponUuid, index, name, descri
    await dialog.locator('input').first().fill(name);
    await dialog.locator('textarea').fill(description);
    await dialog.getByRole('button', { name: 'Add Trait' }).click();
-   await expect(dialog).toHaveCount(0);
    await expect.poll(
       () => page.evaluate(
          async ({ uuid, index }) => (await fromUuid(uuid)).system.attack[index].customTrait.map((trait) => trait.name),
@@ -1593,6 +1594,7 @@ export async function addAttackCustomTrait(page, weaponUuid, index, name, descri
       ),
       { message: 'the dialog stored the custom trait on the attack' },
    ).toContain(name);
+   await expect(dialog).toHaveCount(0);
    await settle(page);
 }
 
@@ -1641,8 +1643,8 @@ export async function addTrait(page, documentUuid, label, { attackIndex } = {}) 
    await expect(dialog, 'the Edit Traits dialog opens').toBeVisible();
    await dialog.locator('li', { has: page.getByText(label, { exact: true }) }).locator('button').click();
    await dialog.getByRole('button', { name: 'Apply Edits' }).click();
-   await expect(dialog, 'Apply Edits closes the dialog').toHaveCount(0);
    await expect.poll(count, { message: `the dialog stored the ${label} trait` }).toBe(before + 1);
+   await expect(dialog, 'Apply Edits closes the dialog').toHaveCount(0);
    await settle(page);
 }
 
@@ -1674,16 +1676,10 @@ export async function enableAspect(page, spellUuid, label, { initialValue, optio
    await aspect.locator('button').first().click();
 
    /**
-    * Reads the stored aspect.
-    * @returns {Promise<object|undefined>} The aspect, once the spell holds it.
+    * Reads the aspect the server stores.
+    * @returns {Promise<object|undefined>} The aspect, once the server holds it on the spell.
     */
-   const stored = () => page.evaluate(
-      async ({ uuid, label }) => (await fromUuid(uuid)).system.aspect.find((entry) => entry.label === label),
-      {
-         uuid: spellUuid,
-         label,
-      },
-   );
+   const stored = async () => (await readServerSystem(page, spellUuid)).aspect.find((entry) => entry.label === label);
    await expect.poll(async () => !!(await stored()), { message: `the toggle enabled ${label}` }).toBe(true);
    await settle(page);
    if (initialValue !== undefined) {
@@ -1715,11 +1711,11 @@ export async function addCustomAspect(page, spellUuid) {
    const sheet = await openSheetByUuid(page, spellUuid);
 
    /** @type {number} The number of custom aspects before the add. */
-   const before = await page.evaluate(async (uuid) => (await fromUuid(uuid)).system.customAspect.length, spellUuid);
+   const before = (await readServerSystem(page, spellUuid)).customAspect.length;
    await openTab(sheet, 'Custom Aspects');
    await sheet.getByRole('button', { name: 'Add Custom Aspect' }).click();
    await expect.poll(
-      () => page.evaluate(async (uuid) => (await fromUuid(uuid)).system.customAspect.length, spellUuid),
+      async () => (await readServerSystem(page, spellUuid)).customAspect.length,
       { message: 'the add button created one custom aspect' },
    ).toBe(before + 1);
    await expect(sheet.locator('li.reorder-row'), 'the Custom Aspects tab rendered the new row').toHaveCount(before + 1);
@@ -1743,13 +1739,7 @@ export async function setAttributeBase(page, actorUuid, attribute, value) {
    const input = sheet.locator(`.container:has(> .button > button.${attribute}) .stats input`).first();
    await commitText(input, value);
    await expect.poll(
-      async () => page.evaluate(
-         async ({ uuid, attribute }) => (await fromUuid(uuid)).system.attribute[attribute].baseValue,
-         {
-            uuid: actorUuid,
-            attribute,
-         },
-      ),
+      async () => (await readServerSystem(page, actorUuid)).attribute[attribute].baseValue,
       { message: `the sheet input stored the ${attribute} base value` },
    ).toBe(value);
    await settle(page);
@@ -1774,13 +1764,7 @@ export async function setResource(page, actorUuid, resource, value) {
       .locator('.row').nth(1).locator('.side input').first();
    await commitText(input, String(value));
    await expect.poll(
-      () => page.evaluate(
-         async ({ uuid, resource }) => (await fromUuid(uuid)).system.resource[resource].value,
-         {
-            uuid: actorUuid,
-            resource,
-         },
-      ),
+      async () => (await readServerSystem(page, actorUuid)).resource[resource].value,
       { message: `the sheet input stored the ${resource} value` },
    ).toBe(value);
    await settle(page);
@@ -1864,13 +1848,7 @@ export async function setSkillTraining(page, actorUuid, skill, value) {
    });
    await commitText(row.locator('.stats .stat').first().locator('input').first(), value);
    await expect.poll(
-      async () => page.evaluate(
-         async ({ uuid, skill }) => (await fromUuid(uuid)).system.skill[skill].training.baseValue,
-         {
-            uuid: actorUuid,
-            skill,
-         },
-      ),
+      async () => (await readServerSystem(page, actorUuid)).skill[skill].training.baseValue,
       { message: `the sheet input stored the ${skill} Training base value` },
    ).toBe(value);
    await settle(page);
@@ -1898,13 +1876,7 @@ export async function setSkillDefaultAttribute(page, actorUuid, skill, attribute
    });
    await selectTitanOption(page, row.locator('.attribute [role="combobox"]'), attribute);
    await expect.poll(
-      async () => page.evaluate(
-         async ({ uuid, skill }) => (await fromUuid(uuid)).system.skill[skill].defaultAttribute,
-         {
-            uuid: actorUuid,
-            skill,
-         },
-      ),
+      async () => (await readServerSystem(page, actorUuid)).skill[skill].defaultAttribute,
       { message: `the row's select stored the ${skill} default attribute` },
    ).toBe(attribute);
    await settle(page);
@@ -1993,7 +1965,7 @@ export async function deleteAttack(page, weaponUuid, index = 0) {
    const sheet = await openSheetByUuid(page, weaponUuid);
 
    /** @type {number} The number of attacks before the delete. */
-   const before = await page.evaluate(async (uuid) => (await fromUuid(uuid)).system.attack.length, weaponUuid);
+   const before = (await readServerSystem(page, weaponUuid)).attack.length;
    await openTab(sheet, 'Attacks');
    await settle(page, { transitions: true });
    await sheet.locator('li.reorder-row').nth(index).getByRole('button', {
@@ -2001,7 +1973,7 @@ export async function deleteAttack(page, weaponUuid, index = 0) {
       exact: true,
    }).click();
    await expect.poll(
-      () => page.evaluate(async (uuid) => (await fromUuid(uuid)).system.attack.length, weaponUuid),
+      async () => (await readServerSystem(page, weaponUuid)).attack.length,
       { message: 'the delete button removed the attack' },
    ).toBe(before - 1);
    await settle(page, { transitions: true });
@@ -2066,7 +2038,6 @@ export async function createTrayFolder(page, packId, name, { parentId } = {}) {
       );
       return added.length;
    }, { message: 'the tray created one folder in the pack' }).toBe(1);
-   await settle(page);
    const [id] = added;
    record({
       documentName: 'Folder',
@@ -2074,6 +2045,7 @@ export async function createTrayFolder(page, packId, name, { parentId } = {}) {
       packId,
       createdBy: currentSpec(),
    });
+   await settle(page);
 
    // The folder context menu's Rename Folder entry swaps the name for an input, which Enter commits.
    /** @type {import('@playwright/test').Locator} The new folder's header. */
@@ -2138,7 +2110,6 @@ export async function createTrayEffect(page, packId, name, { folderId } = {}) {
       );
       return added.length;
    }, { message: 'the tray create button created one effect in the pack' }).toBe(1);
-   await settle(page);
    const [id] = added;
    record({
       documentName: 'ActiveEffect',
@@ -2146,6 +2117,7 @@ export async function createTrayEffect(page, packId, name, { folderId } = {}) {
       packId,
       createdBy: currentSpec(),
    });
+   await settle(page);
 
    // The create opened the new effect's sheet; its name field renames the effect.
    /** @type {import('@playwright/test').Locator} The effect's sheet window. */
@@ -2268,7 +2240,6 @@ export async function setOwnership(page, actorId, userName, level) {
    const value = await page.evaluate((level) => CONST.DOCUMENT_OWNERSHIP_LEVELS[level], level);
    await config.locator(`select[name="${userId}"]`).selectOption(String(value));
    await config.locator('button[type="submit"]').click();
-   await expect(config).toHaveCount(0);
    await expect.poll(
       () => page.evaluate(({ actorId, userId }) => game.actors.get(actorId).ownership[userId], {
          actorId,
@@ -2276,6 +2247,7 @@ export async function setOwnership(page, actorId, userName, level) {
       }),
       { message: `the window stored ${level} for ${userName}` },
    ).toBe(value);
+   await expect(config).toHaveCount(0);
    await settle(page);
 }
 
@@ -2477,7 +2449,6 @@ export async function createItemMacro(page, actorUuid, itemId, { name, type, idM
       await choose('ID Method', idMethod);
    }
    await dialog.getByRole('button', { name: 'Create Macro' }).click();
-   await expect(dialog, 'Create Macro closes the dialog').toHaveCount(0);
 
    /** @type {string} The id of the macro now in the slot. */
    let macroId;
@@ -2485,7 +2456,6 @@ export async function createItemMacro(page, actorUuid, itemId, { name, type, idM
       macroId = await page.evaluate((slot) => game.user.hotbar[slot], slot);
       return macroId;
    }, { message: 'the dialog assigned the macro to the slot' }).toBeTruthy();
-   await settle(page);
    record({
       documentName: 'Macro',
       id: macroId,
@@ -2496,6 +2466,8 @@ export async function createItemMacro(page, actorUuid, itemId, { name, type, idM
       slot,
       macroId,
    });
+   await expect(dialog, 'Create Macro closes the dialog').toHaveCount(0);
+   await settle(page);
    return {
       macroId,
       slot,

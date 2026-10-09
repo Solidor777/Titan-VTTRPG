@@ -108,8 +108,9 @@ const HOOK_ERROR_DELIVERIES = new WeakMap();
  * `client/helpers/hooks.mjs:158-168, 182-188`). An init script, run on every document load, registers an `error` hook
  * listener the moment core assigns the `Hooks` global (`client/client.mjs` assigns it with `Object.assign(globalThis,
  * …)`, which calls a setter), so no hook fires before it. Each report is pushed, as `Hooks.onError (<location>):
- * <message>`, to every collector `attachPageErrors` attached to the page, and counted in the document
- * (`globalThis.titanHookErrorState`) so `flushHookErrorReports` can wait for the asynchronous binding to deliver it.
+ * <stack>` (the message when the error has no stack), to every collector `attachPageErrors` attached to the page, and
+ * counted in the document (`globalThis.titanHookErrorState`) so `flushHookErrorReports` can wait for the asynchronous
+ * binding to deliver it.
  * @param {import('@playwright/test').Page} page - A page that has not navigated yet.
  * @returns {Promise<void>} Resolves once the binding and the init script are registered.
  */
@@ -147,7 +148,10 @@ export async function installHookErrorReporting(page) {
             hooks = value;
             value.on('error', (location, error) => {
                state.count++;
-               void globalThis.titanReportHookError(state.token, `Hooks.onError (${location}): ${error?.message}`);
+               void globalThis.titanReportHookError(
+                  state.token,
+                  `Hooks.onError (${location}): ${error?.stack ?? error?.message}`,
+               );
             });
          },
       });
@@ -179,13 +183,13 @@ export async function flushHookErrorReports(page) {
  * `harness.js` already fails any test during which a logged-in page collects an error; a spec collector adds an
  * assertion at a chosen point, on a chosen page.
  * @param {import('@playwright/test').Page} page - The shared page.
- * @returns {string[]} The live array of collected uncaught-error and hook-error messages.
+ * @returns {string[]} The live array of collected uncaught-error and hook-error stacks (messages for errors with none).
  */
 export function attachPageErrors(page) {
-   /** @type {string[]} The collected uncaught page-error and hook-error messages. */
+   /** @type {string[]} The collected uncaught page-error and hook-error stacks (messages for errors with none). */
    const errors = [];
    page.on('pageerror', (error) => {
-      errors.push(error.message);
+      errors.push(error.stack ?? error.message);
    });
    PAGE_ERROR_COLLECTORS.set(page, [
       ...PAGE_ERROR_COLLECTORS.get(page) ?? [],
