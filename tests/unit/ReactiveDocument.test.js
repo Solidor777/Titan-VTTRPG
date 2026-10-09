@@ -120,3 +120,63 @@ describe('ReactiveDocument', () => {
       expect(screen.getByTestId('value').textContent).toBe('3');
    });
 });
+
+describe('ReactiveDocument and the ownership of an ancestor', () => {
+   /**
+    * Builds an actor, a sibling actor that shares its id, and an item of the first.
+    * @returns {{actor: object, sibling: object, item: object}} The fake documents.
+    */
+   function createDocuments() {
+      const actor = {
+         id: 'a1',
+         uuid: 'Actor.a1',
+         documentName: 'Actor',
+      };
+      const sibling = {
+         id: 'a1',
+         uuid: 'Scene.s1.Token.t1.Actor.a1',
+         documentName: 'Actor',
+      };
+      const item = {
+         id: 'i1',
+         uuid: 'Actor.a1.Item.i1',
+         documentName: 'Item',
+         parent: actor,
+         system: { value: 1 },
+      };
+      return {
+         actor,
+         sibling,
+         item,
+      };
+   }
+
+   it('re-renders a reader of an embedded document when its parent actor changes ownership', () => {
+      const { actor, item } = createDocuments();
+      renderBridge(item);
+
+      // The change happens without a hook; only an invalidation makes the reader read the item again.
+      item.system.value = 2;
+      Hooks.call('updateActor', actor, { ownership: { u1: 2 } }, {});
+      flushSync();
+      expect(screen.getByTestId('value').textContent).toBe('2');
+   });
+
+   it('ignores an update of the parent that does not change ownership', () => {
+      const { actor, item } = createDocuments();
+      renderBridge(item);
+      item.system.value = 2;
+      Hooks.call('updateActor', actor, { name: 'Renamed' }, {});
+      flushSync();
+      expect(screen.getByTestId('value').textContent).toBe('1');
+   });
+
+   it('ignores an ownership change of another actor that shares the parent\'s id', () => {
+      const { sibling, item } = createDocuments();
+      renderBridge(item);
+      item.system.value = 2;
+      Hooks.call('updateActor', sibling, { ownership: { u1: 2 } }, {});
+      flushSync();
+      expect(screen.getByTestId('value').textContent).toBe('1');
+   });
+});

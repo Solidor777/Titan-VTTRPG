@@ -4,7 +4,8 @@ import { createSubscriber } from 'svelte/reactivity';
  * @class ReactiveDocument
  * Bridges a Foundry Document into Svelte 5 reactivity. `.data` returns the LIVE document; when read
  * inside a component or `$derived` it subscribes to the document's update hooks (including embedded
- * item/effect CRUD), so reactive readers re-run whenever the document changes. Because `.data` is the
+ * item/effect CRUD) and when an ancestor's ownership changes (an embedded document's `isOwner` follows its parent), so
+ * reactive readers re-run whenever the document changes. Because `.data` is the
  * live document, reactive reads (`.data.system.x`), writes (`.data.update(...)`), collections
  * (`.data.items`), and methods (`.data.system.someMethod()`) all work through the same accessor.
  */
@@ -53,7 +54,36 @@ export default class ReactiveDocument {
             }
          };
 
+         /** @type {Set<string>} The document names of this document's ancestors (an Item's Actor, ...). */
+         const ancestorNames = new Set();
+         for (let ancestor = doc.parent; ancestor; ancestor = ancestor.parent) {
+            ancestorNames.add(ancestor.documentName);
+         }
+
+         /**
+          * Invalidate when an ancestor's ownership changes: this document's permissions come from its parent, and no
+          * update hook of this document fires for the change. Other updates of an ancestor do not invalidate.
+          * @param {foundry.abstract.Document} changed - The updated document.
+          * @param {object} diff - The change diff.
+          * @param {object} options - Flags accompanying the update.
+          */
+         const onAncestorUpdate = (changed, diff, options) => {
+            if (options?.diff === false || !diff || !Object.hasOwn(diff, 'ownership')) {
+               return;
+            }
+            for (let ancestor = this.doc.parent; ancestor; ancestor = ancestor.parent) {
+               if (ancestor.uuid === changed?.uuid) {
+                  update();
+                  return;
+               }
+            }
+         };
+
          const registered = [
+            ...[...ancestorNames].map((ancestorName) => [
+               `update${ancestorName}`,
+               Hooks.on(`update${ancestorName}`, onAncestorUpdate),
+            ]),
             [
                `update${name}`,
                Hooks.on(`update${name}`, onUpdate),
