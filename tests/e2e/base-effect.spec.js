@@ -599,6 +599,10 @@ test.describe('the row of a base effect', () => {
       await expect(row.locator('[data-testid="player-hud-effect-delete"]')).toBeVisible();
       await expect(row.locator('[data-testid="player-hud-effect-chat"]'), 'no TITAN-only control').toHaveCount(0);
       await expect(row.locator('[data-testid="player-hud-effect-duration-up"]')).toHaveCount(0);
+      await expect(
+         row.locator('.description'),
+         'the foreign prone status adds no TITAN condition text to the row',
+      ).toHaveCount(0);
 
       /** @type {import('@playwright/test').Locator} The row's active toggle. */
       const toggle = row.locator('[data-testid="player-hud-effect-active"]');
