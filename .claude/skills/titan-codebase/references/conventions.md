@@ -1487,7 +1487,9 @@ from writing them; each says whether it was measured (with its saved log, under
   moved anything (measured: `diag-up-drag.jsonl`); the upward reorder spec collapses the outer rows first.
 - Typing specs: `fill` sends no key events, so the specs for a text sent on `input` use `pressSequentially` with no
   delay as well, and a CDP session (`Input.imeSetComposition`, `Input.insertText`) for an input method; the numeric
-  inputs keep the typed text in their own state while focused (CLOSED_BUGS #147). Enter on an unchanged input sends no
+  inputs and `DocumentTextInput` keep the entered text in their own state while focused (CLOSED_BUGS #147; the IME
+  specs count the page's `preUpdateItem` calls: none while a composition runs, one when it ends). Enter on an
+  unchanged input sends no
   update (`check-list-refused-update.spec.js`, CLOSED_BUGS #149).
 - The expansion undo methods are covered by a unit test over every move of 1 to 7 rows
   (`tests/unit/TitanItemSheetStateUndo.test.js`; the state only moves entries, so it uses numbers for the flags).

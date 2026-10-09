@@ -2405,9 +2405,9 @@ not checked in).
   (`mut-u-numberinput-guard-run.log`; hashes in `mut-u-numberinput-guard-hashes.log`).
 - **Typed key by key (measured):** the same file types a check label with `pressSequentially` and no delay (every key
   event dispatched at once, the send now on `input`). The input keeps the typed text and the server holds it before and
-  after the blur; it passes (`green-undo-inverse-run2.log`), so no new bug. Mutation: the `oninput` line of
-  `DocumentTextInput.svelte` removed fails this spec and the label spec above and leaves the numeric spec passing
-  (`mut-u-textinput-oninput-run.log`; hashes in `mut-u-textinput-oninput-hashes.log`).
+  after the blur; it passes (`green-undo-inverse-run2.log`), so no new bug. Mutation, on the source before the later
+  fixes below: the `oninput` line of `DocumentTextInput.svelte` removed fails this spec and the label spec above and
+  leaves the numeric spec passing (`mut-u-textinput-oninput-run.log`; hashes in `mut-u-textinput-oninput-hashes.log`).
 - **Input-method composition (measured, a second defect of the same fix):** the spec drives Chromium's input method
   editor through CDP (`Input.imeSetComposition`, then `Input.insertText`). The events are `compositionstart`, an `input`
   event with `isComposing` true per composition update, and `compositionend` (`diag-ime-events.jsonl`). With a send on
@@ -2417,16 +2417,29 @@ not checked in).
   event in 9 of 12 runs, so the final `insertText` was appended to the finished text. That the echo of an own update
   rewrites the input's value and ends the composition is inferred, not measured.
 - **Fixed (composition):** `DocumentTextInput` sends on `input` only when `event.isComposing` is false and on
-  `compositionend`; `TextInput` forwards `oncompositionend`. The IME spec then passed 20 of 20 repeats with the other
-  three specs of the file (80 of 80, `ime-fixed-repeat20.log`; hashes in `ime-fixed-hashes.txt`). A cancelled
-  composition (empty composition text) was run once on the unguarded build in a console run, with the input and the
-  server empty together; its log was overwritten and it was not run with the guard. Mutations: the guard replaced by `true` fails
-  2 of 6 runs of the composition spec, as the failure is a race (`mut-u3-ime-guard-run.log`); the `oncompositionend` line
-  removed fails 6 of 6 (the server keeps "Check" before the blur, `mut-u3-ime-compositionend-run.log`); the `oninput`
-  line removed fails the composition, key-by-key and label specs (`mut-u3-ime-oninput-run.log`). Hashes of each in
-  `mut-u3-<name>-hashes.log`.
-- **Held-key auto-repeat:** not run. It dispatches the same `input` events as the key-by-key spec (inferred, not
-  measured).
+  `compositionend`; `TextInput` forwards `oncompositionend`. The composition spec asserts the count of updates the page
+  sees (`preUpdateItem`): 0 across both `imeSetComposition` calls, and exactly 1 after `insertText`, so it no longer
+  depends on a race. Mutations on the shipped source (build `4121c5d7...` restored after each; hashes in
+  `mut-u4-<name>-hashes.log`): the guard replaced by `true` fails 6 of 6 repeats of the composition spec
+  (`mut-u4-ime-guard-run.log`); the `oncompositionend` line removed fails 6 of 6 (`mut-u4-ime-compositionend-run.log`).
+- **Cancelled composition (measured):** the spec sets a known label, composes " extra" at its end (the input shows the
+  original plus the composition, no update is sent), then cancels with an empty composition text. The input and the
+  server hold the original label after the blur. It passes with the guard (`r4-item-text-run1.log`).
+- **A remote update during a composition (measured, a third defect):** with nothing sent during a composition, another
+  client's update that rebuilds the document replaced the input's text. The spec composes "E2E Remote", has a second
+  client rename the item and reads the input: it showed "Check" (the composition text was lost; failed first on build
+  `4121c5d7...`, `r4-item-text-run1.log`, hashes in `r4-run-hashes.txt`). Fix: `DocumentTextInput` keeps the text the
+  input shows in its own state and copies the stored value into it only while the input has no focus (as
+  `NumberInput` does with `editingActive`); `updateDocument` writes the text into the model before it sends, because
+  the model may have been rebuilt since the text was entered. `TextInput` forwards `onfocus` and `onblur`. The file's
+  7 specs then passed 10 of 10 repeats (70 of 70, `r4-item-text-fixed-repeat10.log`; hashes in `r4-fixed-hashes.txt`).
+  Mutation: the focus guard replaced by `true` fails the remote-composition spec only (`mut-u4-focus-guard-run.log`).
+  With this guard the label typed without a key event also survives a rebuild through the local text, so the
+  `oninput` line is now needed by the key-by-key and held-key specs only: removed, those two fail and the label spec
+  passes (`mut-u4-ime-oninput-run.log`).
+- **Held-key auto-repeat (measured):** the spec presses one key down 12 times (auto-repeat `keydown` events), releases
+  it, and finds all 12 characters in the input and on the server before and after the blur. It passes
+  (`r4-item-text-run1.log`).
 - **Found:** 2026-10-08 while diagnosing #122.
 - **Status:** Closed 2026-10-09.
 
