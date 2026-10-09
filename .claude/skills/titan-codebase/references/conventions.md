@@ -184,7 +184,11 @@ document, reads (`.data.system.x`), writes (`.data.update(...)`), collections (`
 methods all go through the same accessor. A hook invalidates the bridge only when the changed document, or for an
 embedded hook its parent or grandparent, has the bridged document's `uuid`: an unlinked token's synthetic actor shares
 its base actor's `id` and has its own `uuid`, so an `id` match would re-render an open base-actor sheet on every edit
-of a token's actor (pinned by `tests/unit/ReactiveDocument.test.js` and `tests/e2e/sheet-header.spec.js`).
+of a token's actor (pinned by `tests/unit/ReactiveDocument.test.js` and `tests/e2e/sheet-header.spec.js`). It also
+registers `update<Ancestor>` hooks (an Item's Actor, ...) and invalidates when an ancestor's update carries `ownership`,
+because an embedded document's `isOwner` follows its parent and none of its own hooks fire for that change (read:
+`ReactiveDocument.svelte.js`; pinned by `tests/e2e/ownership.spec.js`, "an item sheet that is open when the player
+loses ownership ...").
 
 **Always read displayed document values through a bridge's `document.data`, never off a raw prop** —
 Svelte 5's fine-grained reactivity only tracks reads that go through the `.data` accessor of a
