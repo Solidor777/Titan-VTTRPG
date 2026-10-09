@@ -519,10 +519,32 @@ inactive (out of `actor.statuses`) and `_applyRulesElements` skips its modifiers
 apply (a mutually immune pair is both suppressed); its duration keeps ticking and it returns untouched when the
 immunity ends. `TitanActiveEffect#_preCreate` returns `false` for a creation the Character is immune to, with a
 `LOCAL.immuneToEffect.text` warning naming the actor, the effect and the sources; `applyEffectToTargets` counts only
-the copies a target accepted. Live pins: `tests/e2e/logic/conditions.spec.js` (suppression by an effect, an equipped
-item and an ability; refusal through the Token HUD; a mutually immune pair of effects, both suppressed),
-`effect-tray.spec.js` (refusal by Apply, the accepted count), `combat-turns.spec.js` (a suppressed timer ticks on the
-turn-start, turn-end and initiative paths); `tests/unit/Immunity.test.js` pins the computations on given inputs.
+the copies a target accepted. Suppression and refusal do not read the Immunity Handling setting (below). Live pins, with
+Immunity Handling set to Suppress: `tests/e2e/logic/conditions.spec.js` (suppression by an effect, an equipped item and
+an ability; refusal through the Token HUD; a mutually immune pair of effects, both suppressed), `combat-turns.spec.js` (a
+suppressed timer ticks on the turn-start, turn-end and initiative paths); `effect-tray.spec.js` pins refusal by Apply and
+the accepted count (mode-independent); `tests/unit/Immunity.test.js` pins the computations on given inputs.
+
+**Immunity handling.** The world setting `titan.immunityHandling` (`'remove'` default, `'suppress'`; `restricted`;
+`immunityHandling()` in `src/helpers/Settings/ImmunityHandling.js`) decides only what happens to a condition or effect a
+Character already holds when an immunity to it arrives; Remove deletes it, Suppress leaves the suppression above in
+force. `TitanActor#_onUpdate`, `#_onCreateDescendantDocuments` and `#_onUpdateDescendantDocuments` call
+`#_removeImmuneEffectsAfterChange(userId)`, which acts for a Character on the client whose user made the change
+(`userId === game.user.id`) and never in data preparation. It runs `removeImmuneEffectsWithDependents(actor)`
+(`character/ImmuneEffectRemoval.js`): `removeImmuneEffects(actor)` for the actor, then, for a world actor, for each
+unlinked dependent token whose stored delta holds effects or items of its own (a token with an empty delta mirrors its
+world actor and its synthetic actor is not materialized). `removeImmuneEffects` queues behind the actor's pending removal
+(a `WeakMap` of promises), returns 0 unless the setting is Remove, decides with `resolveImmuneEffectRemovals(effects,
+getSources)`, deletes with `deleteEmbeddedDocuments('ActiveEffect', ids)` and posts one `LOCAL.immunityRemovedEffect.text`
+info notice per deleted effect (actor, effect, sources). The decision is grounded labelling (Dung 1995, Caminada 2006): an
+effect covered by an item or by a kept effect is deleted, an effect whose covers are all deleted is kept, and an effect
+left undecided (a mutually immune pair or a longer ring) stays and renders suppressed, because a deletion cannot be
+undone. The setting's `onChange('remove')` runs `removeImmuneEffectsFromWorld()` (the active GM only: every world actor
+with its dependents) so what Suppress kept is cleared. Live pins: `tests/e2e/immunity-handling.spec.js` (Remove on a new
+effect's rules element, an equipped equipment item, an equipped armor, a dropped ability and an unlinked token's own
+condition; Suppress keeps, the switch to Remove deletes and leaves a mutually immune pair; the settings window);
+`tests/unit/ImmuneEffectRemoval.test.js` and `TitanActorImmunityTriggers.test.js` pin the decision, the queue, the
+passes and the changing-client guard on fake actors.
 
 **Immunity display.** `getSuppressingImmunitySources(effect)` (`IsSuppressedByImmunity.js`; `isSuppressedByImmunity`
 delegates to it) returns the `ImmunitySource[]` suppressing an effect, `[]` for a missing effect or a non-Character

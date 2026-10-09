@@ -892,9 +892,11 @@ at the repo root, so it catches v14 API breaks that the mocked Vitest tier canno
   parameters), `logic/conditions.spec.js`
   (conditions applied from the Token HUD, read from derived stats, the sheet's tooltip, rolled checks and the Player
   HUD; a condition's own sheet and its edited description; an immunity effect suppressing an existing condition or
-  effect and refusing a condition applied through the Token HUD), `immunity-display.spec.js` (the "Suppressed" tag and
-  dimming of a suppressed effect or condition on the sheet, in the Player HUD list and tray, and in turn-start and
-  turn-end reports), `dice.spec.js` (the forced-dice seam: `forceDice` maps each queued face onto a real Roll,
+  effect and refusing a condition applied through the Token HUD; its immunity block sets Immunity Handling to Suppress),
+  `immunity-display.spec.js` (the "Suppressed" tag and dimming of a suppressed effect or condition on the sheet, in the
+  Player HUD list and tray, and in turn-start and turn-end reports; Immunity Handling is Suppress),
+  `immunity-handling.spec.js` (the Immunity Handling setting: Remove deletes a held condition when an immunity arrives,
+  Suppress keeps it and the switch to Remove clears it, a mutually immune pair stays, the settings window), `dice.spec.js` (the forced-dice seam: `forceDice` maps each queued face onto a real Roll,
   `resetDice` restores the random source), `logic/fast-check-smoke.spec.js`
   (fast-check is injected and runs a property in the page).
 - Tokens, HUD, combat, chat. `player-hud.spec.js` (portrait, visibility, layout and effects panel of one controlled
