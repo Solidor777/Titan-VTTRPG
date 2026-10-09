@@ -1154,8 +1154,8 @@ activates and draws a scene created while none is active (`Scene._preCreateOpera
 the order core produces them: the directory entry, then the record on the running list so a failed later wait cannot
 orphan the document, then the creation window's close, then the draw (`createScene` only; measured to end after the
 window's close in 40 of 40 first-scene creations), and `createFolder` and `createCompendium` end with `settle`),
-`placeToken` (drags the actor's directory entry onto a free spot near the centre of `#board`, which
-core handles as an Actor drop; the spots are a 7-column grid with 130 px spacing and a spot that already holds a token
+`placeToken` (drags the actor's directory entry onto a free spot near the centre of `#board`, or, with
+`{ square }`, onto the centre of that grid square, which core handles as an Actor drop; the spots are a 7-column grid with 130 px spacing and a spot that already holds a token
 is skipped, because two tokens dropped on one point took the same `x`/`y`
 (`.superpowers/sdd/test-suite-rewrite/phase-2/review-measure-1.log`, `stack`), as is a spot where
 `document.elementFromPoint` is not the canvas (a chat notification over the canvas held a drag for about 1.5 s,
@@ -1165,7 +1165,8 @@ releases the controlled tokens: measured on a scene with `tokenVision` true, a s
 the first was controlled and `visible` true after Escape, and with `tokenVision` false it stayed visible while the first
 was controlled (`.superpowers/sdd/test-suite-rewrite/phase-2/review-measure-1.log`, `A controlled`, `after Escape`,
 `tokenVision false`), and a token that is not visible takes no pointer events), `toggleTokenLink`, `unlinkPlacedToken`
-and `controlPlacedToken` (the sheet header buttons; the token flows close the open windows, release control, move the
+and `setTokenSize` (the Appearance tab of the Token Configuration window opened from the Token HUD's config button;
+width and height inputs), `controlPlacedToken` (the sheet header buttons; the token flows close the open windows, release control, move the
 pointer onto the token and wait for `token.object.hover` before the double-click that opens the sheet
 (`unlinkPlacedToken`, which then waits for the reopened synthetic actor's sheet, and `openPlacedTokenSheet`, which
 returns the sheet of an unlinked token's synthetic actor) or the click that takes control (`controlPlacedToken`)),
@@ -1620,7 +1621,9 @@ the standalone component-probe IIFE (see next entry).
 **Component-probe harness (externalized, test-only)** — `src/test-probe/` lets Playwright mount a single base
 Svelte primitive in isolation inside the live Foundry runtime, with controlled props, to assert its
 interaction contract independent of any sheet. `registerProbe.js` installs `game.titan._probe =
-{ components, mount(name, props?, context?), unmount(id), unmountAll() }`; `mount` creates a detached
+{ components, helpers, mount(name, props?, context?), unmount(id), unmountAll() }`; `helpers` holds system helpers
+that read the live canvas (`getTargetedCharacters`, `getTargetedCharacterTokens`, `measureTokenDistance`) for specs that
+call them on real tokens (`target-helpers.spec.js`); `mount` creates a detached
 `<div data-titan-probe="<id>">` (positioned `fixed`, max `z-index` so it sits above Foundry chrome and
 receives pointer events), mounts the named component from `componentRegistry.js`, and returns
 `{ id, selector }`. A string `text` prop is converted to a `children` snippet via `createRawSnippet`
@@ -1631,7 +1634,7 @@ probed; no registered primitive takes one. The probe is NEVER part of a system b
 standalone IIFE by `vite.probe.config.mjs` (`createSveltePlugin({ emitCss: false })`) to
 `test/build/probe.iife.js` (plus an extracted global stylesheet `test/build/probe.css`). `probeBundleEntry.js`
 is that bundle's entry — it calls `registerProbe()` immediately when `game.titan` already exists, else on the
-`ready` hook. Playwright injects it on demand: `componentProbe.js`'s `mountProbe` → `ensureProbe(page)` adds
+`ready` hook. Playwright injects it on demand: `componentProbe.js`'s `mountProbe` → `ensureProbe(page)` (exported) adds
 `probe.css` then `probe.iife.js` (the IIFE registers `game.titan._probe`) only when the API is absent. There
 is no `__TITAN_PROBE__` define and no dynamic `import()` anywhere — the production bundle is structurally
 probe-free. The Playwright page object `tests/e2e/componentProbe.js` exposes

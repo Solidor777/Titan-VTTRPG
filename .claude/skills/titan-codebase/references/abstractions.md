@@ -235,6 +235,16 @@ expertise, and computing type-specific results.
 - `ItemCheck` — roll triggered by an item's embedded check template. Results type:
   `ItemCheckResults`.
 
+**Target conditions** (`src/check/types/attack-check/TargetConditionModifiers.js`). Pure computations of what an
+attack takes from its target's conditions. `getTargetConditionModifiers({ statuses, distance, melee, accuracy })`
+returns `TargetConditionModifier` entries (`{ condition, modifier: 'melee'|'accuracy'|'difficulty', value }`): a Prone
+target within `PRONE_CLOSE_DISTANCE` (1) space gives Melee and Accuracy each `ceil(base / 4)`; beyond
+`PRONE_FAR_DISTANCE` (10) spaces, Accuracy loses `floor(base / 4 * floor(distance / 10))`, at most the current Accuracy;
+an Incapacitated target fixes the Difficulty at `INCAPACITATED_TARGET_DIFFICULTY` (2). A `null` distance (no tokens)
+gives no distance modifier and a modifier that rounds to 0 is left out. `sumTargetRatingModifiers`,
+`selectAttackTargetConditions`, `getTargetConditionDifficulty` and `getTargetConditionModifierLabel` read the entries.
+The attack check does not use them yet.
+
 **Parameters and options**
 
 Each check type has a companion factory function: `createAttackCheckParameters`,
@@ -888,7 +898,14 @@ domain:
   `null`/`undefined` → a nullable object field; it composes the `create*Field`/`createSchemaField`
   helpers so a data model can be defined from a canonical shape.
 - **Token / actor queries** — resolve the best owner or target set for a given operation
-  (e.g., `GetBestPlayerOwner`, `IsCurrentUserBestOwner`).
+  (e.g., `GetBestPlayerOwner`, `IsCurrentUserBestOwner`). `getTargetedCharacterTokens()` returns the current user's
+  targeted tokens whose actors are Characters, in target order; a GM who targets nothing gets the controlled tokens
+  instead. `getTargetedCharacters()` maps those tokens to their actors. `measureTokenDistance(fromToken, toToken)`
+  (`MeasureTokenDistance.js`; `TokenDocument`s) returns the spaces between the nearest squares the two tokens cover:
+  the minimum of the scene grid's own `measurePath` over every pair of covered-square centers
+  (`TokenDocument#getOccupiedGridSpaceOffsets`), divided by `grid.distance`, so the scene's diagonal rule applies; a
+  token covering no square (gridless) is measured from its center; it returns `null` for a missing token or tokens of
+  different scenes. No shipped code calls it yet; the live spec calls it through the test probe's `helpers`.
 - **Apply/revert automation** — entry points for applying or reverting damage, healing, rend, and
   repairs to one or more targets (e.g., `ApplyDamageToTargets`).
 - **Label / tooltip builders** — construct localised display strings and modifier breakdowns for
