@@ -3,7 +3,7 @@ import localize from '~/helpers/utility-functions/Localize.js';
 import capitalize from '~/helpers/utility-functions/Capitalize.js';
 import assert from '~/helpers/utility-functions/Assert.js';
 import error from '~/helpers/utility-functions/Error.js';
-import { removeImmuneEffectsWithDependents } from '~/document/types/actor/types/character/ImmuneEffectRemoval.js';
+import { removeImmuneEffectsReporting } from '~/document/types/actor/types/character/ImmuneEffectRemoval.js';
 
 /**
  * @typedef {object} SpeakerData An object containing data on a Chat Message's speaker.
@@ -166,10 +166,11 @@ export default class TitanActor extends Actor {
     * Actor. Every change that can grant an immunity (a source created, enabled, equipped, or its rules element edited)
     * is an Actor update or a descendant create or update, which an unlinked token's ActorDelta emulates on the
     * synthetic actor (read: `_onUpdate` and `_dispatchDescendantDocumentEvents` in `client/documents/actor-delta.mjs`,
-    * Foundry 14.364). A change to a world actor reaches the synthetic actors of its tokens only through
-    * `removeImmuneEffectsWithDependents` (measured: with that pass off, a token kept its condition after its world
-    * actor gained the immunity). The removal re-derives everything from the prepared Actor, so it
-    * needs no list of which fields changed. A deletion only ends immunities, so it triggers nothing.
+    * Foundry 14.364; a removal on a token's own sheet is measured live). A change to a world actor reaches the
+    * synthetic actors of its tokens only through the dependents pass of `removeImmuneEffectsReporting` (measured: with
+    * the pass off, a token kept its condition after its world actor gained the immunity). The removal re-derives
+    * everything from the prepared Actor, so it needs no list of which fields changed. A deletion only ends
+    * immunities, so it triggers nothing.
     * @param {string} userId - The id of the User who made the change.
     * @returns {void}
     * @private
@@ -180,9 +181,7 @@ export default class TitanActor extends Actor {
       }
 
       // The handlers are synchronous; the removal runs after they return and reports its own failure.
-      removeImmuneEffectsWithDependents(this).catch((reason) => {
-         error(`Could not remove the effects "${this.name}" is immune to.`, reason);
-      });
+      removeImmuneEffectsReporting(this);
    }
 
    /**

@@ -141,6 +141,21 @@ export async function removeImmuneEffectsWithDependents(actor) {
 }
 
 /**
+ * Removes the Active Effects an actor is immune to, with its dependent tokens' (removeImmuneEffectsWithDependents),
+ * reporting a failure through the project logger instead of rejecting.
+ * @param {TitanActor} actor - The changed actor.
+ * @returns {Promise<void>} Resolves once the removal settled; never rejects.
+ */
+export async function removeImmuneEffectsReporting(actor) {
+   try {
+      await removeImmuneEffectsWithDependents(actor);
+   }
+   catch (reason) {
+      error(`Could not remove the effects "${actor.name}" is immune to.`, reason);
+   }
+}
+
+/**
  * Removes, across the world, the Active Effects Characters are immune to: every world actor, with its unlinked tokens
  * holding effects or items of their own. Runs on the active GM only, when the Immunity Handling setting changes to
  * Remove, so no effect Suppress mode kept outlives the switch. An actor whose removal fails is reported and the rest
@@ -152,11 +167,6 @@ export async function removeImmuneEffectsFromWorld() {
       return;
    }
    for (const actor of game.actors) {
-      try {
-         await removeImmuneEffectsWithDependents(actor);
-      }
-      catch (reason) {
-         error(`Could not remove the effects "${actor.name}" is immune to.`, reason);
-      }
+      await removeImmuneEffectsReporting(actor);
    }
 }

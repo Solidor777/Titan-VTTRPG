@@ -8,9 +8,10 @@ Completed items are deleted, not marked done.
   (`docs/superpowers/plans/2026-09-29-conditions-rework.md`) has Tasks 1 to 4 complete, Task 5 implemented, and Tasks 6
   to 11 built (the operation registry, the source list, the `immunity` element and editor, the immunity engine:
   derivation, suppression, refusal, the suppressed-condition and effect markers on the sheet, the Player HUD and the
-  turn reports, and the Immunity Handling setting: Remove by default, or Suppress). Read in `src/system/Conditions.js`: the quarter-of-base penalties for Blinded,
-  Contaminated, Prone, Restrained and Stunned, the new Off-Balance condition, Frightened as Disadvantage on every
-  check, and the Prone and Sleeping speed and Awareness rules exist. Remaining plan B work is Tasks 12 to 17:
+  turn reports, and the Immunity Handling setting: Remove by default, or Suppress). Read in `src/system/Conditions.js`:
+  the quarter-of-base penalties for Blinded, Contaminated, Prone, Restrained and Stunned, the new Off-Balance condition,
+  Frightened as Disadvantage on every check, and the Prone and Sleeping speed and Awareness rules exist. Remaining plan
+  B work is Tasks 12 to 17:
   - Tasks 12 and 13: targeting and distance helpers and target-aware attack checks, which carry the Prone
     attacker modifier (+1/4 of base within 1 space, -1/4 per 10 spaces beyond 10 spaces);
   - Task 14: Unconscious applies Prone and Incapacitated and drops held gear;

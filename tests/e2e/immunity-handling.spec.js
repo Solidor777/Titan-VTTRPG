@@ -18,6 +18,7 @@ import {
    toggleTokenLink,
    viewScene,
 } from './flows.js';
+import { withClients } from './multiClient.js';
 import { setWorldSetting } from './settings.js';
 import { attachPageErrors, closeAllApps } from './world.js';
 
@@ -176,7 +177,9 @@ async function addWard(subject) {
 async function serverHoldsContaminated(uuid) {
    /** @type {object} The stored document; an unlinked token keeps its own effects in its delta. */
    const stored = await readServerDocument(page, uuid);
-   return (stored.delta ?? stored).effects.some((effect) => effect.statuses.includes('contaminated'));
+
+   // A delta entry that hides an inherited effect is a tombstone and carries no statuses.
+   return (stored.delta ?? stored).effects.some((effect) => effect.statuses?.includes('contaminated') === true);
 }
 
 /**
@@ -313,6 +316,145 @@ test('Remove reaches the condition an unlinked token holds itself when its world
       expect(await serverHoldsContaminated(tokenUuid), 'the token delta no longer holds it').toBe(false);
       await takeNotice(WARD_NAME);
    });
+
+/**
+ * Adds a permanent effect granting the Contaminated immunity on the sheet of a placed unlinked token's synthetic actor.
+ * @param {Subject} subject - The Character whose actor the token is of; the token is `tokenId`.
+ * @param {string} tokenId - The unlinked token that receives the ward.
+ * @returns {Promise<void>} Resolves once the ward holds the immunity element.
+ */
+async function addTokenWard(subject, tokenId) {
+   /** @type {string} The id of the new ward effect. */
+   const wardId = await addEffect(page, subject.actorId, WARD_NAME, {
+      duration: DURATION_PERMANENT,
+      tokenId,
+   });
+   /** @type {string} The ward's uuid on the token's synthetic actor. */
+   const wardUuid = await page.evaluate(
+      ({ tokenId, wardId }) => canvas.scene.tokens.get(tokenId).actor.effects.get(wardId).uuid,
+      {
+         tokenId,
+         wardId,
+      },
+   );
+   await addRulesElement(page, wardUuid, CONTAMINATED_IMMUNITY);
+}
+
+test('Remove deletes the condition an unlinked token holds when the ward is added on the token sheet', async () => {
+   await setWorldSetting(page, 'immunityHandling', 'remove');
+
+   /** @type {Subject} The subject, with an unlinked token. */
+   const subject = await createSubject('E2E Immunity Handling Token Sheet Actor', { unlinked: true });
+   /** @type {string} The uuid of the placed unlinked token. */
+   const tokenUuid = `Scene.${sceneId}.Token.${subject.tokenId}`;
+   /** @type {{baseline: number}} Body before the condition. */
+   const { baseline } = await applyContaminated(subject);
+   expect(await serverHoldsContaminated(tokenUuid), 'the token holds the condition in its delta').toBe(true);
+
+   await addTokenWard(subject, subject.tokenId);
+   await expect.poll(() => readContaminated(subject), { message: 'removed from the token actor' }).toEqual({
+      active: false,
+      body: baseline,
+      held: false,
+   });
+   expect(await serverHoldsContaminated(tokenUuid), 'the token delta no longer holds it').toBe(false);
+   expect(await serverHoldsContaminated(subject.actorUuid), 'the world actor never held it').toBe(false);
+   await takeNotice(WARD_NAME);
+});
+
+test('Remove deletes the condition an unlinked token inherits when the ward is added on the token sheet', async () => {
+   await setWorldSetting(page, 'immunityHandling', 'remove');
+
+   // The world actor takes the condition through a linked token; the actor is then unlinked and a second token
+   // inherits the condition.
+   /** @type {Subject} The subject, with a linked token. */
+   const subject = await createSubject('E2E Immunity Handling Inherited Actor');
+   /** @type {{baseline: number}} Body before the condition. */
+   const { baseline } = await applyContaminated(subject);
+   await toggleTokenLink(page, subject.actorId);
+   /** @type {Subject} The subject read through the unlinked token. */
+   const inheriting = {
+      ...subject,
+      tokenId: await placeToken(page, subject.actorId),
+   };
+   /** @type {string} The unlinked token's uuid. */
+   const tokenUuid = `Scene.${sceneId}.Token.${inheriting.tokenId}`;
+   expect(await readContaminated(inheriting), 'the token inherits the condition').toMatchObject({
+      active: true,
+      held: true,
+   });
+
+   await addTokenWard(subject, inheriting.tokenId);
+   await expect.poll(() => readContaminated(inheriting), { message: 'removed from the token actor' }).toEqual({
+      active: false,
+      body: baseline,
+      held: false,
+   });
+   expect(await serverHoldsContaminated(tokenUuid), 'the token delta holds no live condition').toBe(false);
+   expect(
+      (await readServerDocument(page, tokenUuid)).delta.effects.some((effect) => effect._tombstone === true),
+      'the token delta hides the inherited condition with a tombstone',
+   ).toBe(true);
+   expect(await serverHoldsContaminated(subject.actorUuid), 'the world actor keeps the condition').toBe(true);
+   await takeNotice(WARD_NAME);
+});
+
+test('only the client that made the change removes the condition and posts the notice', async ({ browser }) => {
+   await setWorldSetting(page, 'immunityHandling', 'remove');
+
+   /** @type {Subject} The Character the test works on. */
+   const subject = await createSubject('E2E Immunity Handling Two Clients Actor');
+   /** @type {{baseline: number}} Body before the condition. */
+   const { baseline } = await applyContaminated(subject);
+
+   /**
+    * Counts, on a client, the deletions of Active Effects it initiates from now on.
+    * @param {import('@playwright/test').Page} client - The browser page of the watched user.
+    * @returns {Promise<void>} Resolves once the counter listens.
+    */
+   const countDeletions = (client) => client.evaluate(() => {
+      globalThis.titanE2eDeletions = 0;
+      globalThis.titanE2eDeletionHook = Hooks.on('preDeleteActiveEffect', () => {
+         globalThis.titanE2eDeletions += 1;
+      });
+   });
+
+   /**
+    * Reads a client's deletion count and stops the counter.
+    * @param {import('@playwright/test').Page} client - The browser page of the watched user.
+    * @returns {Promise<number>} The deletions the client initiated.
+    */
+   const takeDeletions = (client) => client.evaluate(() => {
+      Hooks.off('preDeleteActiveEffect', globalThis.titanE2eDeletionHook);
+      return globalThis.titanE2eDeletions;
+   });
+
+   await withClients(browser, { second: 'E2E GM 2' }, async ({ second }) => {
+      /**
+       * Reads whether the second client's copy of the actor holds the Contaminated effect.
+       * @returns {Promise<boolean>} True when it does.
+       */
+      const secondHolds = () => second.evaluate((actorId) => game.actors.get(actorId).effects
+         .some((effect) => effect.statuses.has('contaminated')), subject.actorId);
+      await expect.poll(secondHolds, { message: 'the second client sees the condition' }).toBe(true);
+      await countDeletions(page);
+      await countDeletions(second);
+
+      await addWard(subject);
+      await expect.poll(secondHolds, { message: 'the second client sees the condition removed' }).toBe(false);
+      await expect.poll(() => readContaminated(subject), { message: 'removed on the first client' }).toEqual({
+         active: false,
+         body: baseline,
+         held: false,
+      });
+      await takeNotice(WARD_NAME);
+
+      expect(await takeDeletions(page), 'the changing client deleted once').toBe(1);
+      expect(await takeDeletions(second), 'the other client deleted nothing').toBe(0);
+      await expect(second.locator('#notifications .notification.info', { hasText: WARD_NAME }))
+         .toHaveCount(0);
+   });
+});
 
 test('Suppress keeps an existing condition suppressed, and switching to Remove deletes it', async () => {
    await setWorldSetting(page, 'immunityHandling', 'suppress');

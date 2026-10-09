@@ -5,6 +5,7 @@ import path from 'node:path';
 import {
    removeImmuneEffects,
    removeImmuneEffectsFromWorld,
+   removeImmuneEffectsReporting,
    removeImmuneEffectsWithDependents,
    resolveImmuneEffectRemovals,
 } from '~/document/types/actor/types/character/ImmuneEffectRemoval.js';
@@ -360,6 +361,20 @@ describe('removeImmuneEffectsWithDependents', () => {
       await removeImmuneEffectsWithDependents(tokenActor);
       expect(tokenActor.deleteEmbeddedDocuments).toHaveBeenCalledTimes(1);
       expect(tokenActor.getDependentTokens).not.toHaveBeenCalled();
+   });
+});
+
+describe('removeImmuneEffectsReporting', () => {
+   it('reports a failed removal through the project logger, naming the actor, and does not reject', async () => {
+      /** @type {Function} The console.error spy, silencing the expected error output. */
+      const consoleError = vi.spyOn(console, 'error').mockImplementation(() => {});
+
+      /** @type {object} The fake Character whose deletion fails. */
+      const actor = createContaminatedActor();
+      actor.deleteEmbeddedDocuments.mockRejectedValueOnce(new Error('delete refused'));
+      await expect(removeImmuneEffectsReporting(actor)).resolves.toBeUndefined();
+      expect(ui.notifications.error).toHaveBeenCalledWith(expect.stringContaining('Ward Bearer'));
+      consoleError.mockRestore();
    });
 });
 
