@@ -22,11 +22,28 @@
    /** @type {object} Reference to the reactive Document store. */
    const document = getContext('document');
 
+   /** @type {string} The text the input shows. It follows the model only while the input has no focus. */
+   let text = $state(value ?? '');
+
+   /** @type {boolean} Whether the input has focus. */
+   let focused = $state(false);
+
+   // Constraint: a focused input is never rewritten from the model. An update from another client rebuilds the document
+   // and would otherwise replace the text being entered and end a running input method composition.
+   $effect(() => {
+      const stored = value;
+      if (!focused) {
+         text = stored ?? '';
+      }
+   });
+
    /**
-    * Updates the document data when the input changes.
+    * Writes the entered text into the model and sends the document. The model may have been rebuilt since the text
+    * was entered, so the text is written again before the send.
     * @returns {void}
     */
    function updateDocument() {
+      value = text;
       refreshSystemDocument(document.data, disabled);
    }
 
@@ -47,10 +64,12 @@
 </script>
 
 <TextInput
-   bind:value
+   bind:value={text}
    disabled={disabled || !document.data?.isOwner}
    oncompositionend={updateDocument}
    onchange={updateDocument}
+   onblur={() => (focused = false)}
+   onfocus={() => (focused = true)}
    oninput={handleInput}
    {testId}
    {tooltip}

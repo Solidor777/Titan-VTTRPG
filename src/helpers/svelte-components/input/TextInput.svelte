@@ -9,6 +9,8 @@
     * @property {Function} [onchange] - Callback forwarded from the native change event.
     * @property {Function} [oninput] - Callback forwarded from the native input event.
     * @property {Function} [oncompositionend] - Callback forwarded from the native compositionend event.
+    * @property {Function} [onfocus] - Callback forwarded from the native focus event.
+    * @property {Function} [onblur] - Callback forwarded from the native blur event.
     * @property {Function} [onkeyup] - Callback forwarded from the native keyup event.
     * @property {string} [testId] - Optional stable selector applied as `data-testid`.
     */
@@ -21,6 +23,8 @@
       onchange         = undefined,
       oninput          = undefined,
       oncompositionend = undefined,
+      onfocus          = undefined,
+      onblur           = undefined,
       onkeyup          = undefined,
       testId           = undefined,
    } = $props();
@@ -32,6 +36,8 @@
    {onchange}
    {oninput}
    {oncompositionend}
+   {onfocus}
+   {onblur}
    {onkeyup}
    data-testid={testId}
    use:tooltipAction={tooltip}
