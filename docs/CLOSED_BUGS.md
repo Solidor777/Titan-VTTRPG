@@ -2592,10 +2592,16 @@ repro), `bugbatch2-logs/pf2e/` (the no-TITAN control) and `bugbatch2-logs/impl/`
   (`bugbatch2-logs/pf2e/t102-final1.log` to `t102-final3.log`, `t102-nomod1.log` to `t102-nomod3.log`). pf2e cannot
   author Active Effects (`createEmbeddedDocuments('ActiveEffect')` on a pf2e actor returned 0 documents), so the
   control measured embedded Items, on the same ActorDelta path. The delete-side loss is a core defect.
-- **Create side, attribution:** read, TITAN-world red, no-TITAN control pending. The server's create path hands the
-  same shared `writeParent` holder to each document (`_createDocuments`, `dist/database/backend/server-backend.mjs`),
-  and a folder drop of three items on a `delta: null` token stored none of them in the TITAN world (`red-1.log`). A
-  batch `createEmbeddedDocuments('Item', ...)` control in `test-pf2e` has not been run.
+- **Create side, control with no TITAN, measured** (`test-pf2e`, pf2e 8.2.0, Foundry 14.364; 3 runs with
+  `stylish-action-hud` enabled, 3 with no module, and a pilot, identical; `bugbatch2-logs/pf2e/t102c-mod1.log` to
+  `t102c-mod3.log`, `t102c-nomod1.log` to `t102c-nomod3.log`, `t102c-pilot.log`):
+  `token.actor.createEmbeddedDocuments('Item', ...)` of 2 and of 3 Items on an unlinked token with `delta: null`
+  returned all items and the client held them, but the server's token never stored a delta and held 0 created items at
+  all three reads (right after, +1.5 s, after a reload); a single create persisted, and a batch of 2 after a Token HUD
+  status toggle had created the delta persisted. Measured for Items, not Active Effects (pf2e authors none). The create
+  side is a core defect like the delete side. The server's create path hands the same shared `writeParent` holder to
+  each document (`_createDocuments`, `dist/database/backend/server-backend.mjs`); the mechanism inside core is read in
+  `embedded-delta.mjs`, not instrumented.
 - **Mechanism, read in core (the walk is read, not instrumented; the failing and passing specs below are the
   measurements that agree with it):** the server handles the documents of a batch one after another with the same
   `writeParent` holder. For each embedded document `EmbeddedDeltaMixin#batchWrite` and `#batchDelete`
@@ -2640,12 +2646,28 @@ repro), `bugbatch2-logs/pf2e/` (the no-TITAN control) and `bugbatch2-logs/impl/`
   (`bugbatch2-logs/impl/red-1.log`). With the override both passed (`green-1.log`). Delete override disabled failed the
   effects test only, create override disabled the folder test only (`mut1-run.log`, `mut2-run.log`; hashes in
   `mut-hashes.log`).
-- **Final override and spec:** the override gained the repeated guard, `deleteAll`, the unknown-id check and one shared
-  helper, and the spec gained exact-two batches, the stored-delta path, `deleteAll`, the unknown id, a vetoed first
-  document and a rejected rest, with the database requests of each test counted. Written and linted; the red, green
-  and mutation runs of this version are pending a free server.
+- **Final override and spec (measured, `bugbatch2-logs/impl/`):** the override has the repeated guard, `deleteAll`, the
+  unknown-id check and one shared helper; the spec (git `a3161e55...`, sha256 `33b7fe9c...`) has 9 tests: delete of
+  three and of exactly two effects, a token whose delta is stored (one request, no split), `deleteAll`, a delete naming
+  an unknown id (rejected, no request, delta still null), an Item folder drop of three and of exactly two items, a drop
+  whose first item a `preCreateItem` listener vetoes, and a create whose later documents the server rejects (a kept
+  `_id` that exists on the base actor: rejected with "already exists", the first document stays created). Each counts
+  the `modifyDocument` requests and asserts them after the stored state.
+  - **Red** (guard always false, `r1-red-run2.log`): 7 failed, 2 passed. The failures of the delete tests, `deleteAll`
+    and the three folder-drop tests are on the stored state after the reload (effects or items back or missing); the
+    rejected-rest test fails because core creates none of a rejected batch. The stored-delta test and the unknown-id
+    test pass.
+  - **Green:** 9 passed alone (`r1-green-alone.log`) and 28 passed after `base-effect.spec.js`
+    (`r1-green-after-base.log`).
+  - **Mutations** (`mut-hashes.log`: sha256 and `git hash-object` before, during and after each, build after each
+    mutation and restore, restored text identical to `TitanActor.r1-baseline.js`): (a) delete override off fails tests
+    1, 2, 4 only; (b) create override off fails 6, 7, 8, 9 only; (c) the repeated guard made a single split fails 8
+    only; (d) the `deleteAll` expansion off fails 4 only; (e) the unknown-id check off fails 5 only (`r1-mut-a-run.log`
+    to `r1-mut-e-run.log`).
+  - **Gates:** unit 140 files, 1583 tests passed; eslint clean on the override and the spec; full e2e 752 passed, 0
+    failed, 20.5 min, teardown sweep and census all 0 (`e2e-full-3.log`).
 - **Found:** 2026-10-01 while the Task 5 fix round 2 identity e2e (plan B) was seeding its tokens.
-- **Status:** Closed 2026-10-09 for the delete side; the create side awaits the no-TITAN control and the final runs.
+- **Status:** Closed 2026-10-09.
 
 ### 109. A token sheet highlighted the Skills tab while showing the Effects tab
 
