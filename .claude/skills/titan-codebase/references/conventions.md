@@ -103,7 +103,11 @@ edit, disabling every form control present at that render (controls mounted late
 `TitanDocumentSheet._toggleDisabled` re-enables buttons inside any `[data-view-controls]` container — the `Tabs`
 strip, `CharacterSheetItemExpandButton`, and `SidebarCheck`'s toggle — so observers can navigate. A control
 that changes no document state goes in such a container; editing controls gate themselves on ownership
-(`DocumentOwner*` components).
+(`DocumentOwner*` components). Core never enables the controls again, so `TitanDocumentSheet` remembers the ones
+core's disable switched off, and `syncDisabledControls` (called from `DocumentSheetShell`'s effect on
+`document.data.isOwner`) disables the controls of a sheet that has become read-only and enables the remembered ones
+when it becomes editable, for sheets that core does not render again as well. A control a component disabled itself
+before core's disable is not remembered and stays as the component set it.
 
 **Shared vocabulary constants** — a string vocabulary that code and tests both name is defined once in `src/system/`
 and imported; a component-local or test-local copy is a defect. Effect duration types: `DURATION_TURN_END`,
@@ -190,8 +194,10 @@ registers `update<Name>` hooks for the **ownership sources** of the document (`g
 (an Item's Actor, an effect's Item and Actor), the base actor of a token in the chain (core rebuilds an unlinked
 token's synthetic actor from its base actor without a hook of the synthetic actor, `TokenDocument#_onUpdateBaseActor`;
 the base actor's uuid is neither the synthetic actor's nor an ancestor's), and, for a chat message, the actor that
-spoke (`ChatMessage.getSpeakerActor`) and that actor's base actor. `isOwner` follows those documents and none of the
-document's own hooks fire for their ownership change. Pinned by `tests/e2e/ownership.spec.js` (item sheet, token
+spoke (`ChatMessage.getSpeakerActor`) and that actor's base actor (a chat message always listens to `updateActor`).
+`isOwner` follows those documents and none of the document's own hooks fire for their ownership change. A document of
+a compendium pack follows the world's `compendiumConfiguration` setting through `createSetting`, `updateSetting` and
+`deleteSetting`; `ActorSheetHeaderButtons` follows `core.permissions` the same way. Pinned by `tests/e2e/ownership.spec.js` (item sheet, token
 actor and token item sheets, roll button, Edit Token button, Reset Expertise button) and the `ReactiveDocument` unit
 tests. A change of the viewing user's role logs that user out (`client/documents/user.mjs`), so no open sheet outlives
 it.

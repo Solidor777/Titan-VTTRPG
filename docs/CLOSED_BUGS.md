@@ -2447,7 +2447,8 @@ not checked in).
   (`mut-u5-compositionend-run.log`).
 - **Focus state when the input becomes disabled (measured):** before CLOSED_BUGS #151 a focused input could not become
   disabled while its sheet was open (`diag-readonly.jsonl`). After #151 it can; the blur event fires then and the
-  `focused` flag does not stick (CLOSED_BUGS #151, "Focus when an input becomes disabled"), so no change was made.
+  `focused` flag does not stick (CLOSED_BUGS #151, "Focus when an input becomes disabled"); the flag is also reset from
+  the disabled state, so it does not depend on that event.
 - **Callers that bind into an array (read):** the check, custom aspect and attack label inputs bind
   `check.label`, `aspect.label` and `attack.label`, and the rules element key inputs (`customTrait`, `spellTradition`)
   bind `rulesElement[idx].key`. Their rows are `{#each ... (uuid)}` blocks keyed by the entry's uuid (`ItemSheetChecksTab`,
@@ -2775,9 +2776,9 @@ not checked in).
   invalidates its readers when the changed document is an ancestor and the diff has `ownership`; other updates of an
   ancestor and a same-id sibling actor are ignored. Unit tests: `tests/unit/ReactiveDocument.test.js` (3 tests; three
   mutations each fail exactly one: `mut-u6-rd-*`). Green on build `6f158e95...` (`r6-ownership-green.log`).
-- **Same class elsewhere (fix round, measured on the unfixed build `af543b73...`, `r7-head-ownership-run.log`;
-  hashes in `r7-head-build-hashes.log`):** the same stale `isOwner` reads existed on four more paths. Each failed first
-  in `tests/e2e/ownership.spec.js`, and passed on the fixed build (`r7-fixed2-ownership-run.log`, 14 of 14):
+- **Same class elsewhere (measured on the unfixed build `af543b73...`, `r7-head-ownership-run.log`;
+  hashes in `r7-head-build-hashes.log`):** the same stale reads existed on five more paths. Each failed first in
+  `tests/e2e/ownership.spec.js` and passed on the fixed build:
   - *Unlinked token.* A base-actor ownership change fires `updateActor` with the base actor's uuid only, which is
     neither the token's synthetic actor nor an ancestor. Probe P1 (`diag-r7.jsonl`, script `r7-probes.spec.js.txt`):
     after the GM lowered E2E Player 1 on the base actor, the synthetic actor's `ownership` held the lower level and
@@ -2786,56 +2787,132 @@ not checked in).
     actor from the base actor in `TokenDocument#_onUpdateBaseActor` (`client/documents/token.mjs:3778-3792`).
   - *Roll button.* `ResolveRollActor` read the item's `isOwner` once at mount; an open item sheet kept its info line
     after the player gained ownership.
-  - *Edit Token header button.* `ActorSheetHeaderButtons.svelte` read `isOwner` once; the button did not appear on
-    regaining ownership (probe P3 and the spec, with the world's `TOKEN_CONFIGURE` permission opened to players
-    through the settings API and restored). The window-header dropdown is built when it opens
+  - *Edit Token header button.* `ActorSheetHeaderButtons.svelte` read `isOwner` once, and `game.user.can(
+    'TOKEN_CONFIGURE')` without a dependency. The button did not appear on regaining ownership (probe P3 and the
+    spec, with the world's `TOKEN_CONFIGURE` permission opened to players through the settings API and restored), and
+    did not appear when the GM opened the permission while the sheet was open (received 0 of 1,
+    `r8-perm-failfirst-run.log`). The window-header dropdown is built when it opens
     (`client/applications/api/application.mjs:1839`) and was current: its entries after the raise were Detach Window,
     Configure Sheet, Edit Token, Toggle Token Link (probe P6, `diag-r7.jsonl`).
   - *Chat cards.* `CheckChatResults.svelte` (Reset Expertise) and `CastingCheckChatMessage.svelte` (scaling aspects)
     read `getSpeakerActor(...)?.isOwner` through the message's bridge, which listened to the message only. A card
     created while the player was an Observer showed no Reset Expertise button after the player became an Owner (spec,
-    linked speaker and unlinked-token speaker). The casting card reads the same expression through the same bridge;
-    it was not run separately.
+    linked speaker and unlinked-token speaker). The casting card has its own spec (a spell with a scaling damage
+    aspect, three forced sixes): it failed the same way with the speaker source disabled (`mut-r8-speaker-casting`).
   - *Compendium documents.* A compendium document's permission comes from the world's `compendiumConfiguration`
     setting (`client/documents/collections/compendium-collection.mjs:946-963` `_onConfigure`), which no document hook
     reports. Probe P9 (unlocked pack, the GM set players to Owner): `isOwner` and `sheet.isEditable` became true and
     both inputs of the open sheet stayed disabled; fixed build: enabled, and disabled again on the restore.
-- **Fixed (fix round):** `ReactiveDocument` takes its ownership sources from `getOwnershipSources`: ancestors, the base
+- **Fixed (second pass):** `ReactiveDocument` takes its ownership sources from `getOwnershipSources`: ancestors, the base
   actor of a token in the chain, and for a chat message the speaker actor and its base actor; it invalidates on an
   `update<Name>` of a source whose diff has `ownership` (the `options.diff === false` gate is gone: the `ownership`
-  key already filters, and a no-diff update that carries it is covered by a unit test). A document of a pack also
-  listens to `updateSetting` for `core.compendiumConfiguration`. `'rollActor'` is now a reference whose `current`
-  follows `document.data.isOwner` (nine consumers read `$derived(rollActorReference.current)`); `canEditToken` is a
-  `$derived` of `document.data.isOwner`. Unit tests (17 in `ReactiveDocument.test.js`, 8 in
-  `ResolveRollActor.test.js`; suite 1598) cover the two-level chain, the `ownership.default`-only diff, a no-diff
-  update, unmount cleanup (no handler left), the base actor, the speaker and its base actor, and the setting hook; 8 unit
-  mutations (8, and 2 for the setting hook) each fail (`mut-r7-*-hashes.log`). E2E mutations (hashes in `mut-r7-*-hashes.log`) each fail the spec
-  that targets them: `r7-base-actor`, `r7-speaker-base`, `r7-speaker`, `r7-roll-static`, `r7-header-static`,
-  `r7-pack-hook`, `r7-focus-sticky`. `tests/e2e/sheet-header.spec.js` (a base-actor edit does not re-render a token
-  sheet) passed beside them (21 of 21, `r7-fixed-ownership-header-run.log`). Full run on dist `7c7f4975...`: 760
-  passed (20.8 min), teardown clean, sweep and census 0 (`e2e-full-r7.log`; source hashes in `r7-full-hashes.txt`).
-  The e2e mutations ran on the build before the setting hook was added (`81ccfb90...`); the hook block touches none of
-  the mutated lines.
+  key already filters, and a no-diff update that carries it is covered by a unit test). The hook names are fixed when
+  the reader starts, so a chat message always listens to `updateActor` (its speaker is resolved when an update arrives
+  and may not exist when the reader starts; unit test). A document of a pack also listens to `createSetting`,
+  `updateSetting` and `deleteSetting` for `core.compendiumConfiguration`: `game.settings.set` creates the Setting
+  document when none exists (`client/helpers/client-settings.mjs` `#setWorld`), and `Setting#_onCreate` and
+  `#_onUpdate` call the setting's `onChange` before the hook (`client/documents/setting.mjs:39-51`), so the pack
+  configuration is current when the reader runs. `Setting` has no `_onDelete` that calls `onChange`, so a deleted
+  Setting document leaves the cached configuration unchanged; the delete hook is handled as the review asked and the
+  re-read it triggers shows no change (unit test only; no real flow changes anything). `'rollActor'` is a reference
+  whose `current` follows `document.data.isOwner` (nine consumers read `$derived(rollActorReference.current)`);
+  `canEditToken` is a `$derived` of `document.data.isOwner` and of a counter that the permission-setting hooks
+  advance. The first configuration of a world is a spec: the GM removes the Setting document and sets the
+  configuration (settings API), and the open sheet turns editable.
+- **Evidence and mutation counts (reconciled to `bugbatch1-logs/mut-r7-*-hashes.log` and `mut-r8-*-hashes.log`):**
+  unit mutations: 10 in the first round (`mut-r7-*`, 8 for the ownership sources and the roll actor, 2 for the pack
+  setting hook) and 6 in the second (`mut-r8-no-create-hook`, `no-delete-hook`, `no-update-hook`, `no-leak-cleanup`,
+  `no-actor-always`, `focus-reset`); each fails at least one test. E2E mutations that fail their target spec: 9 in the
+  first round (`r7-base-actor`, `r7-speaker-base`, `r7-speaker`, `r7-roll-static`, `r7-header-static`, `r7-pack-hook`,
+  `r7-focus-sticky`, `r7-charown-core-only`, `r7-charown-rd-core`) and 8 in the second (`r8-bridge-ignores-ownership`,
+  `r8-shell-effect-removed`, `r8-no-tracking`, `r8-sync-readonly-skipped`, `r8-perm-key`, `r8-speaker-casting`,
+  `r8-casting-rows-loop`, `r8-pack-create-hook`); two ran and passed, as measured controls (`r7-char-static`,
+  `r7-charown-rd-only`). Unit tests: `ReactiveDocument.test.js` 21, `ResolveRollActor.test.js` 8,
+  `DocumentTextInput.test.js` 1. `tests/e2e/sheet-header.spec.js` (a base-actor edit does not re-render a token sheet)
+  passed beside the ownership spec (`r7-fixed-ownership-header-run.log`, 21 of 21, and in the full runs). The first
+  round's mutations ran on the build before the setting hook was added (`81ccfb90...`); the hook block touches none of
+  the mutated lines. Full run of the second round on dist `48c42e91...`: 764 passed (21.1 min), teardown clean, sweep and census 0
+  (`e2e-full-r8.log`; source hashes `r8-full-hashes.txt`); unit 1603 passed.
 - **Role and ban (read, measured once):** a change of the viewing user's own `role` calls `game.logOut()`
   (`client/documents/user.mjs:364`). Probe P4: the GM set E2E Player 1 to Assistant GM and the player's page was at
-  `/join` afterwards. A ban is a role change (read, not run separately).
-- **Focus when an input becomes disabled (measured, resolves the premise change after this fix):** with an input
-  focused, the GM lowered the player to Observer (probe P2, `diag-r7.jsonl`): `blur` and `focusout` fired, the active
-  element became the body, the input was disabled; after the restore and a remote label from another client the input
-  showed the remote label. So `focused` does not stick through a disable, and `DocumentTextInput` is unchanged. The spec
-  "a focused label input that turns read-only shows the label another client sets after ownership returns" locks it;
-  the mutation `onblur={() => {}}` fails it (expected "E2E Remote Label", received the old label,
-  `mut-r7-focus-sticky-run.log`).
-- **Character sheet spec:** the spec now requires inputs on the owner's sheet and the same inputs disabled after the
-  drop. Measured mutations (`mut-r7-charown-*`): the bridge made to ignore an update that carries `ownership` alone
-  passes, because core disables every control on the sheet's own re-render (`DocumentSheetV2#_onRender`,
-  `client/applications/api/document-sheet.mjs:270`); `TitanDocumentSheet._toggleDisabled` made to skip core's
-  disable fails ("every input of the open sheet is disabled", received false), and so does the pair. A static
-  `DocumentTextInput` owner read alone passes (the sheet's other inputs and core cover it).
+  `/join` afterwards. A ban is the role `NONE` (`common/constants.mjs:1219-1224`: "You can use this role to temporarily
+  or permanently ban a user"), so it takes the same path; it was not run separately.
+- **Focus when an input becomes disabled:** with an input focused, the GM lowered the player to Observer (probe P2,
+  `diag-r7.jsonl`, Chromium under Playwright): `blur` and `focusout` fired, the active element became the body, the
+  input was disabled; after the restore and a remote label from another client the input showed the remote label. The
+  focus guard no longer depends on that event: `DocumentTextInput` resets `focused` from its disabled state (an effect
+  on `inactive`), which also holds where the browser dispatches no blur when it disables a focused element. Unit test
+  `DocumentTextInput.test.js` (jsdom dispatches no blur on disabling; `mut-r8-focus-reset` fails it). The spec "a
+  focused label input that turns read-only shows the label another client sets after ownership returns" locks the
+  behavior end to end; before the reset existed, the mutation `onblur={() => {}}` failed it (expected "E2E Remote
+  Label", received the old label, `mut-r7-focus-sticky-run.log`).
+- **Character sheet spec:** the spec requires inputs on the owner's sheet, the same inputs disabled after the drop, and
+  none disabled after the player regains ownership (CLOSED_BUGS #152). The mutation that makes the bridge ignore an
+  update carrying `ownership` fails it ("no input of the open sheet stays disabled", `mut-r8-bridge-ignores-ownership`).
+  Before #152's fix the same mutation passed, because core's disable on the sheet's own re-render covered the drop
+  (`mut-r7-charown-rd-only`).
 - **Evidence file renamed:** `r6-failfirst-old-dist.log` ran on the fixed build, so it was not a failing first. It is
   renamed `r6-run-on-fixed-build-not-failfirst.log` (hashes `r6-fixed-build-hashes.txt`). A real failing first: the
   item-sheet spec on a build with `ReactiveDocument` at the parent of the first fix commit (blob `3c36cd19`, dist
   `42e4d4bb...`, `r7-failfirst-pre151-run.log`, hashes `r7-failfirst-pre151-hashes.log`) failed ("the open sheet turns the
   label read-only", expected disabled, received enabled).
 - **Found:** 2026-10-09 while measuring whether `DocumentTextInput`'s focus state can stick (CLOSED_BUGS #147).
+- **Status:** Closed 2026-10-09.
+
+### 152. A control that core disabled on a read-only render stayed disabled after the viewer regained ownership
+
+The evidence files named here are in `.superpowers/sdd/2026-09-29-conditions-rework/bugbatch1-logs/` (local, not checked
+in).
+
+- **What (measured):** E2E Player 1 opened a character's sheet as an Owner (no input disabled), the GM lowered the
+  player to Observer (106 inputs disabled) and back to Owner. One input stayed disabled: the Filter input of the Skills
+  tab (`TopFilter` over `TextInput`, no `disabled` prop), parent chain `.filter > .header > .skill-tab`. The other
+  inputs were enabled again (probe P7, `diag-r7.jsonl`, script `r7-p6-p7-debug.spec.js.txt`; build `81ccfb90...`).
+- **Cause (read):** on every render of a sheet the viewer cannot edit, `DocumentSheetV2#_onRender` calls
+  `_toggleDisabled(true)`, which disables every control of the window content (`client/applications/api/document-sheet.mjs`
+  lines 230-244 and 268-271); core never calls `_toggleDisabled(false)`. A control whose `disabled` TITAN's component
+  derives from `document.data.isOwner` is enabled again by Svelte when ownership returns; a control with no such binding
+  (the Filter inputs) is not. A sheet of an embedded document is not rendered again when its parent's ownership changes
+  (CLOSED_BUGS #151), so such a sheet was never given the disabled state of a viewer who lost ownership.
+- **Ruling (the user, 2026-10-09):** what a read-only viewer sees does not change: core's blanket disable stays, and it
+  is made reversible.
+- **Failing first (measured, build `7c7f4975...`, `r8-failfirst-run.log`):** "an open character sheet turns read-only on
+  losing ownership and editable on regaining it" failed at "no input of the open sheet stays disabled" (expected 0,
+  received 1), and "the Filter input of an open item sheet follows the ownership of the player" failed at "the open sheet
+  disables the filter for a viewer who cannot edit" (expected disabled, received enabled).
+- **Fixed:** `TitanDocumentSheet._toggleDisabled` remembers the controls that were enabled until core's disable
+  switched them off. `TitanDocumentSheet.syncDisabledControls` disables the controls again when the sheet is not
+  editable and enables the remembered ones when it is. `DocumentSheetShell` runs it from an effect on
+  `document.data.isOwner`, so it follows every ownership change the bridge reports, for sheets that are rendered again
+  and for sheets that are not. A control that was already disabled when core disabled the controls (a component's own
+  state) is not remembered and stays as the component set it. Constraint, in the method's comment: a component that
+  disables a remembered control itself while the sheet is read-only has it enabled by the call.
+- **Mutations (hashes in `mut-r8-*-hashes.log`):** the bridge made to ignore an update that carries `ownership` fails the
+  character-sheet spec; the shell effect removed fails both specs; the remembering removed fails both
+  ("the filter is enabled again"); the read-only branch skipped fails the item-sheet spec.
+- **Not changed (read, listed in `docs/TODO.md`):** controls that a tab mounts after the sheet turned read-only are not
+  touched by core's render; the TODO entry records it with the feature idea of letting read-only viewers use UI-only
+  controls.
+- **Found:** 2026-10-09 by the "editable again" step of the character-sheet ownership spec.
+- **Status:** Closed 2026-10-09.
+
+### 153. The casting check dialog raised `effect_update_depth_exceeded` for a spell with damage or healing
+
+The evidence files named here are in `.superpowers/sdd/2026-09-29-conditions-rework/bugbatch1-logs/` (local, not checked
+in).
+
+- **What (measured):** opening the casting check dialog for a spell whose scaling aspect is a damage aspect raised the
+  uncaught page error `effect_update_depth_exceeded` once, on the build with the code before this round and on the HEAD
+  files (probe P10: the error came between the forced dice and the dialog opening; script `r8-depth-probe.spec.js.txt`,
+  `diag-r8.jsonl`). The dialog opened and rolled.
+- **Cause (read):** the effect of `CastingCheckDialogShell.svelte` that adds the Damage Mod and Healing Mod rows set
+  `rows = [...baseRows]` and then called `rows.splice(...)` on the `$state` array, so the effect read the state it
+  wrote and ran again without end whenever `$checkParameters.damage` or `.healing` was set.
+- **Failing first (measured):** the casting-card spec of `tests/e2e/ownership.spec.js` (its `afterEach` fails on an
+  uncaught page error) failed with `effect_update_depth_exceeded` on the GM's page (`r8-casting-run.log`, build
+  `daaa4606...`).
+- **Fixed:** the effect builds the rows in a local array and assigns `rows` once. The spec asserts the Damage Mod field
+  in the dialog besides the clean page. The mutation `const nextRows = rows;` brings the error back and fails the spec
+  with the error and with the missing field (`mut-r8-casting-rows-loop-run.log`).
+- **Found:** 2026-10-09 while adding the casting-card spec.
 - **Status:** Closed 2026-10-09.
