@@ -96,8 +96,12 @@ Completed items are deleted, not marked done.
   disabled the rest, so its Filter would be usable by an observer while the Filter of the tab shown at the first
   render is not.
 
-- Dying condition (user, 2026-10-09): a condition granted automatically when a Character reaches 0 Toughness while it
-  has wounds. Tempest Herald's immunity to all conditions except Dying depends on it.
+- Dying condition (user, 2026-10-09, in the user's words: "auto granted when a character reaches 0 toughness and has
+  wounds"). Tempest Herald's immunity to all conditions except Dying depends on it. The rules compendium
+  (`docs/TITAN Rules Compendium.md`, line 1433) words the start of Dying differently: "You start **Dying** when you take
+  damage in excess of your maximum **Wounds** and **Stamina**";
+  lines 1860 and 1919 say Dying starts when Wounds would go above their maximum. The trigger is settled when the
+  condition is built.
 
 - Immunity by trait (user ruling 2026-10-09; extends the entry above for the rules that need it): Light Attunement,
   Brightness ("cannot be Blinded by bright light", conditional on the source being a Light effect); Presence of the

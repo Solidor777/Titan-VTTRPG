@@ -304,7 +304,7 @@ unset-priority changes passes only on 368; `tests/e2e/effect-changes.spec.js` as
 sheet's default-priority placeholder instead.
 
 
-### Condition effects are synced to their definitions by the stored-actor migration (2026-09-29)
+### Condition effects are synced to their definitions by the stored-actor migration (2026-10-09)
 
 A condition Active Effect keeps the rules elements copied at creation, so a changed definition in
 `src/system/Conditions.js` reaches an existing condition only through `getConditionEffectUpdate`
@@ -323,7 +323,7 @@ load (OPEN_BUGS #110). Disabled resolves before any scan (`resolveMigrationActio
 Prompt mode a world with stale conditions shows the migration dialog on each GM load until the GM confirms; a failed
 migration is reported through `error()` and the hot-bar drop hook and the Player HUD still load (`OnceReady.js:22-37`).
 
-### Condition descriptions are read from the definitions, never stored (2026-09-30)
+### Condition descriptions are read from the definitions, never stored (2026-10-09)
 
 `setupConditions` flags `CONFIG.statusEffects` entries with `flags.titan.type` only (`Conditions.js:344-350`), so the
 condition Active Effects core creates carry no description. The Player HUD's `EffectsDetailBody` calls
@@ -336,7 +336,7 @@ key at render (`BuildEffectTagTooltip.js:17`), so each reader sees their own lan
 `flags.titan.description` (grep of `src`, 2026-10-09: only the sync that deletes it), so one left on an older effect is
 inert until the condition sync deletes it.
 
-### Immunity suppression is separate from `disabled` (2026-09-29)
+### Immunity suppression is separate from `disabled` (2026-10-09)
 
 An immunity suppresses a condition or effect through the data models' `isSuppressed` (`ConditionDataModel.js:20`,
 `TitanActiveEffectDataModel.js:41`; core then drops it from `actor.statuses`). `_applyRulesElements` skips only a source
@@ -344,32 +344,33 @@ whose Active Effect has `system.isSuppressed` (`CharacterDataModel.js:860`); `di
 own state, and `_getRulesElementSources` leaves a disabled effect out (`:804`). A suppressed effect's modifiers stop
 applying, but `_getImmunities` reads every source of that list (`:697-727`), suppressed or not, so the immunities it
 grants still apply: two effects each immune to the other are both suppressed, both immunities stay, and each one's tag
-names the other. Reasoning, not measured: suppressing only what an unsuppressed effect grants has two fixed points (either
-member of a mutually immune pair applying) and the rules supply no tiebreak. A suppressed effect's duration keeps
-ticking (pinned for the turn-start, turn-end and initiative paths by `tests/e2e/combat-turns.spec.js:920`). A suppressed
-entry stays in the actor's effects, and the sheet's effect rows, the Player HUD effects panel (list rows; tray icons dim
-and the popout carries the tag) and the turn-start and turn-end reports (`EffectTag`) dim it and show "Suppressed:
-<sources>", read from `getSuppressingImmunitySources` (`IsSuppressedByImmunity.js:10-20`), because `isSuppressed` is a
-boolean and carries no source.
+names the other. Reasoning, not measured: suppressing only what an unsuppressed effect grants has two fixed points
+(either member of a mutually immune pair applying) and the rules supply no tiebreak. A suppressed effect's duration
+keeps ticking (pinned for the turn-start, turn-end and initiative paths by `tests/e2e/combat-turns.spec.js:920`). A
+suppressed entry stays in the actor's effects, and the sheet's effect rows, the Player HUD effects panel (list rows;
+tray icons dim and the popout carries the tag) and the turn-start and turn-end reports (`EffectTag`) dim it and show
+"Suppressed: <sources>", read from `getSuppressingImmunitySources` (`IsSuppressedByImmunity.js:10-20`), because
+`isSuppressed` is a boolean and carries no source.
 
-### Immunity removal runs on the changing client, and a mutual pair is never deleted (2026-09-30)
+### Immunity removal runs on the changing client, and a mutual pair is never deleted (2026-10-09)
 
 In Immunity Handling's Remove mode (the default) the deletion of an effect an immunity covers runs once, on the client
 whose user made the change, from `TitanActor#_onUpdate`, `_onCreateDescendantDocuments` and
 `_onUpdateDescendantDocuments` (`TitanActor.js:124-161`, guard `userId !== game.user.id` at `:178-181`); read in core,
 Foundry dispatches the last two to an unlinked token's synthetic actor too (`TitanActor.js:166-170` cites
-`client/documents/actor-delta.mjs`, 14.364). The removal re-derives everything from the prepared actor, runs serially per
-actor (`pendingRemovals`, `ImmuneEffectRemoval.js:9`), and follows a world actor's change into its unlinked tokens whose
-delta holds effects or items of their own, after the world actor's deletions land (`removeImmuneEffectsWithDependents`,
-`:123-143`). `resolveImmuneEffectRemovals` is a grounded labelling of the effects' immunity graph (Dung 1995): an effect
-in an immunity cycle is undecided and stays suppressed instead of being deleted. Switching the setting to Remove makes
-the active GM run the removal over every world actor (`removeImmuneEffectsFromWorld`, `:165`). The condition sync of a
-migrating load writes through `actor.updateEmbeddedDocuments('ActiveEffect', ...)` for an actor document
-(`StoredActorSources.js:365`), a descendant update by the GM; inferred from that read and `TitanActor.js:158-161`, not
-run, in Remove mode such a load also runs the removal for each document-backed actor it syncs and deletes the condition
-effects an immunity covers. An Adventure target is plain data (`StoredActorSources.js:561`), so its sync triggers no
-removal. Anything that makes an effect immune without an actor update or a descendant create or update (none exists
-today) would bypass the removal until the actor's next change.
+`client/documents/actor-delta.mjs`, 14.364). The removal re-derives everything from the prepared actor, runs serially
+per actor (`pendingRemovals`, `ImmuneEffectRemoval.js:9`), and follows a world actor's change into its unlinked tokens
+whose delta holds effects or items of their own, after the world actor's deletions land
+(`removeImmuneEffectsWithDependents`, `:123-143`). `resolveImmuneEffectRemovals` is a grounded labelling of the effects'
+immunity graph (Dung 1995): an effect in an immunity cycle is undecided and stays suppressed instead of being deleted.
+Switching the setting to Remove makes the active GM run the removal over every world actor
+(`removeImmuneEffectsFromWorld`, `:165`). The condition sync of a migrating load writes through
+`actor.updateEmbeddedDocuments('ActiveEffect', ...)` for an actor document (`StoredActorSources.js:365`), a descendant
+update by the GM; inferred from that read and `TitanActor.js:158-161`, not run, in Remove mode such a load also runs the
+removal for each document-backed actor it syncs and deletes the condition effects an immunity covers. An Adventure
+target is plain data (`StoredActorSources.js:561`), so its sync triggers no removal. Anything that makes an effect
+immune without an actor update or a descendant create or update (none exists today) would bypass the removal until the
+actor's next change.
 
 ### Target distance is measured between the nearest occupied spaces, and the dialog pins the target's facts (2026-10-09)
 
@@ -381,9 +382,10 @@ applies (`TargetConditionModifiers.js:59`). The attacker's token is `_getAttacke
 which lists only the Actor's tokens on the viewed canvas scene and is empty without a ready canvas
 (`client/documents/actor.mjs:291-300`, build 364). The target is `_getAttackTargetToken()` (`:2807-2809`): the first
 token of the user's targets whose Actor is a Character; only the GM fallback to controlled tokens (nothing targeted)
-skips the attacker's own token ids (`GetTargetedCharacterTokens.js:10-21`), so an explicit target, even a second token of
-the attacker's own Actor, is a target. A target resolved when the dialog opens fixes its Defense and its `targetFacts`
-(`{ distance, statuses }`) in the dialog's `callerOptions` (`CharacterDataModel.js:2450-2466`); every rebuild derives the
-Melee and Accuracy bonuses from the pinned facts and the attacker's live base ratings (`:2748-2771`), so untargeting
-under the open dialog keeps the conditions (`tests/e2e/target-conditions.spec.js:372`) and a changed base rating changes
-the bonus (`:443`). With no target at open, the modifiers stay derived and pick up a later target.
+skips the attacker's own token ids (`GetTargetedCharacterTokens.js:10-21`), so an explicit target, even a second token
+of the attacker's own Actor, is a target. A target resolved when the dialog opens fixes its Defense and its
+`targetFacts` (`{ distance, statuses }`) in the dialog's `callerOptions` (`CharacterDataModel.js:2450-2466`); every
+rebuild derives the Melee and Accuracy bonuses from the pinned facts and the attacker's live base ratings
+(`:2748-2771`), so untargeting under the open dialog keeps the conditions (`tests/e2e/target-conditions.spec.js:372`)
+and a changed base rating changes the bonus (`:443`). With no target at open, the modifiers stay derived and pick up a
+later target.

@@ -947,13 +947,13 @@ when fixed.
   `getTargetedCharacters().length`), so a GM rolling from the attacker's own controlled token used the attacker's
   Defense as the target's.
 - **Found:** 2026-09-29 by the plan buddy check of the conditions rework (per the plan's bug list).
-- **Fixed:** 2026-10-09 — `getTargetedCharacterTokens(fallbackExcludedIds)` skips the given token ids in the GM
-  fallback only, and `_getAttackTargetToken()` passes the attacker's own token ids
-  (`src/helpers/utility-functions/GetTargetedCharacterTokens.js`, `CharacterDataModel.js` `_getAttackTargetToken`), so an
-  explicit target is never excluded, even a second token of the attacker's own Actor. Gated by the unit test
-  "never reads the attacker's own controlled token as a GM's target"
-  (`tests/unit/check/rebuild-check-options.test.js:1189`) and by `tests/e2e/target-conditions.spec.js` "a GM who controls a Prone attacker and targets nothing is not read as the
-  attacker's own target" and "an explicit target that shares the attacker's actor is read as the target"; the task's
+- **Fixed:** 2026-10-09 — `getTargetedCharacterTokens(fallbackExcludedIds)` skips the given token ids in the GM fallback
+  only, and `_getAttackTargetToken()` passes the attacker's own token ids
+  (`src/helpers/utility-functions/GetTargetedCharacterTokens.js`, `CharacterDataModel.js` `_getAttackTargetToken`), so
+  an explicit target is never excluded, even a second token of the attacker's own Actor. Gated by the unit test "never
+  reads the attacker's own controlled token as a GM's target" (`tests/unit/check/rebuild-check-options.test.js:1189`)
+  and by `tests/e2e/target-conditions.spec.js` "a GM who controls a Prone attacker and targets nothing is not read as
+  the attacker's own target" and "an explicit target that shares the attacker's actor is read as the target"; the task's
   mutation proof (removing the exclusion) failed the first
   (`.superpowers/sdd/2026-09-29-conditions-rework/task-14-logs/part-a-mutation.log`).
 
@@ -2763,6 +2763,13 @@ Core citations refer to Foundry 14.364 at `C:\FoundryVTT\V14\dev\foundry`. The e
   (`fix5-mut114-no-scrolling-text-wait-run1.log` to `-run6.log`). Under the 1 s poll rule the wait cannot last the 2 s
   of the animation, so the last test of `combat-turns.spec.js` reloads the page first (a reload ends the animations)
   and then deactivates the scene.
+  The seats test of `unconscious.spec.js` restores the previously active scene the same way (2026-10-09): measured with
+  another scene active before the file ran, the file followed by `unlinked-token-delta.spec.js` failed with this error
+  in 3 of 3 runs that started (the file's own last test twice, the next file's first test once), and with the restore
+  after a reload it passed in 3 of 3 (a run whose first sweep removed the pre-made scene stopped before any test and is
+  not counted); removing the reload failed again in 2 of 2 started runs (`task-17-logs/r1-pair-active-*.log`,
+  `r1-fixed-active-*.log`, `r1-mutation-reload*.log`). With no other scene active the file never switches scenes and
+  nothing fails (5 of 5 runs, `r1-pair-*.log`).
 - **Found:** 2026-10-01 while writing the gate test of CLOSED_BUGS #113 (test-suite rewrite, Phase 0 fix round 1).
 - **Status:** Closed 2026-10-09 as a core defect with the attribution measured (precedent: #116, #117).
 

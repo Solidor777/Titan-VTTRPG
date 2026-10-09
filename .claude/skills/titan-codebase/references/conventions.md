@@ -845,7 +845,7 @@ the lone exception is `Text` (no root element). See the component-probe harness 
 coverage map, the wrapper-forwarding rules, and the selector each component resolves to.
 
 **Playwright E2E** — `npm run test:e2e` runs `playwright test` against the `test-titan` Foundry world on
-`http://localhost:30000`: 33 spec files, 692 tests (measured: `npx playwright test --list` → "Total: 692 tests in 33
+`http://localhost:30000`: 42 spec files, 798 tests (measured: `npx playwright test --list` → "Total: 798 tests in 42
 files"). `playwright.config.mjs` sets `timeout` 60 s, `expect.timeout` 1000 ms, `workers` 1, `fullyParallel` false,
 `globalSetup` and `globalTeardown`, the `list` reporter beside `slow-operation-reporter.js`, and for every test headless
 Chromium (with `--enable-gpu`), `viewport` 1920x1080 and `actionTimeout` 10 s. The users are the four dedicated
@@ -860,7 +860,7 @@ ancestor pid, polling liveness once a second), so a hard-killed run never leaves
 LevelDB locks. `tests/unit/SuperviseServer.test.js` covers spawn/reuse/teardown. The suite drives the real built system
 at the repo root, so it catches v14 API breaks that the mocked Vitest tier cannot.
 
-**The 33 spec files** (`tests/e2e/`; `logic/` holds three of them):
+**The 42 spec files** (`tests/e2e/`; `logic/` holds three of them):
 - Sheets and documents. `surfaces.spec.js` (every sheet type, spell tab, check-options dialog and the effect tray
   renders on flow-made documents with zero uncaught page errors and no `LOCAL.` text; the collapsed-layout regressions;
   the portrait pick through Foundry's file picker; opening a sheet from the directory; the Edit Unique ID dialog),
@@ -880,7 +880,16 @@ at the repo root, so it catches v14 API breaks that the mocked Vitest tier canno
   by a second client and its scroll position), `drag.spec.js` (real pointer drags: character sheet item and effect
   lists, the four item sheet lists, a row copied between sheets and refused by a list of another kind, a world item or a
   folder dropped on an actor sheet), `effect-changes.spec.js` (core's `changes` on a TITAN effect: the Add change button
-  stores core's initial change, saving leaves the priority unset, a malformed change type is rejected).
+  stores core's initial change, saving leaves the priority unset, a malformed change type is rejected),
+  `base-effect.spec.js` (a third party's `base` Active Effect, made through the document API as a module makes one, on
+  an actor, an owned ability, a token and a pack: stored and reloaded as the base type, never used in TITAN stats,
+  listed as a plain row on the sheet, in the Player HUD list and tray and in the Effect Tray that opens core's Active
+  Effect Config, with toggle and delete; core's native `changes` apply), `item-text-input.spec.js` (text or a number
+  entered without a key event, by composition, or key by key, is saved and kept while another client's rename
+  replicates; an unfocused label input shows another client's label), `unlinked-token-delta.spec.js` (batches of
+  embedded documents on an unlinked token with no stored delta, through Remove Expired Effects, `deleteAll` and
+  Item-folder drops: persisted across a reload, rejected requests send nothing, a vetoed first document leaves the
+  rest).
 - Checks and rules. `check-math.spec.js` (every check type rolled from its sheet button with forced dice and compared
   to the independent oracle in `tests/shared/checkOracle.js`, with the card mounted; an attack's Difficulty from
   targeted tokens; the Resist button and the damage buttons of a card; the die click, reset and scaling-aspect controls
@@ -896,9 +905,17 @@ at the repo root, so it catches v14 API breaks that the mocked Vitest tier canno
   parameters), `logic/conditions.spec.js`
   (conditions applied from the Token HUD, read from derived stats, the sheet's tooltip, rolled checks and the Player
   HUD; a condition's own sheet and its edited description; an immunity effect suppressing an existing condition or
-  effect and refusing a condition applied through the Token HUD; its immunity block sets Immunity Handling to Suppress),
+  effect and refusing a condition applied through the Token HUD; its immunity block sets Immunity Handling to Suppress
+  and restores it),
+  `target-conditions.spec.js` (attack checks against a targeted token's Prone and Incapacitated conditions on real
+  tokens of a scene of its own: the dialog's and the card's target-condition tags, a typed rating dropping its entry,
+  the pinned facts after untargeting, a GM's controlled attacker never read as the target, a suppressed Prone giving no
+  modifier, the attacker's token for distance, a message stored without `targetConditions`), `target-helpers.spec.js`
+  (`measureTokenDistance` and the targeting helpers on real tokens), `unconscious.spec.js` (Unconscious applies Prone
+  and Incapacitated once, an immune Character gets Incapacitated alone, only the creating client applies them; the spec
+  has a scene of its own and restores the active scene on a reloaded page),
   `immunity-display.spec.js` (the "Suppressed" tag and dimming of a suppressed effect or condition on the sheet, in the
-  Player HUD list and tray, and in turn-start and turn-end reports; Immunity Handling is Suppress),
+  Player HUD list and tray, and in turn-start and turn-end reports; Immunity Handling is Suppress and is restored),
   `immunity-handling.spec.js` (the Immunity Handling setting: Remove deletes a held condition when an immunity arrives
   on a world actor or an unlinked token's sheet, only on the client that made the change; Suppress keeps it and the
   switch to Remove clears it; a mutually immune pair stays; the settings window),
