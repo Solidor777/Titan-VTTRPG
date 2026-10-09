@@ -65,6 +65,9 @@ function readStoredToken(tokenId) {
  * @returns {Promise<string>} The placed token's id.
  */
 async function placeBareToken() {
+   // A reload shows the active scene, which is another file's scene when the suite ran a spec before this one.
+   await viewScene(page, sceneId);
+
    /** @type {string} The placed token's id. */
    const tokenId = await placeToken(page, actorId);
    expect(
