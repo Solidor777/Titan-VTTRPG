@@ -993,7 +993,7 @@ test('with no scene active, a token placed on a new scene is on a fully drawn ca
    // may be deactivated, and Foundry has no control that deactivates a scene, so the flag is cleared directly. The
    // earlier tests apply conditions, whose scrolling text core animates for 2 s on the interface group, so the page
    // reloads first, which ends those animations, and then the scene is deactivated and the page reloads again to boot
-   // with a blank canvas (deactivating the viewed scene while the text animates throws in core: OPEN_BUGS #114).
+   // with a blank canvas (deactivating the viewed scene while the text animates throws in core: CLOSED_BUGS #114).
    /** @type {string|null} The name of the scene active at the start, if any. */
    const activeName = await gm.evaluate(() => game.scenes.active?.name ?? null);
    expect(activeName === null || activeName.startsWith('E2E '), `the active scene is a test scene: ${activeName}`)

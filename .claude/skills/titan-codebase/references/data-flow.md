@@ -513,8 +513,9 @@ touches a lock, and the walk locks the pack again when it leaves it (also when i
 world and packed actors through their documents; an unlinked token through its synthetic actor (core routes its embedded
 writes to the token's ActorDelta). These writes are stored as made (`stored()` resolves at once). Core gives a newly
 created unlinked token a delta only when its name differs from its base actor's (`client/documents/token.mjs:1657`).
-OPEN_BUGS #102, an unconfirmed loss of multi-document writes on such a token, awaits a real-path repro. A token the pass
-has work on always holds delta entries, so its delta exists. An Adventure's actors and scene tokens are data (`SetField`
+Core loses a create or delete of two or more embedded documents on such a token (CLOSED_BUGS #102);
+`TitanActor#createEmbeddedDocuments` and `#deleteEmbeddedDocuments` write the first document alone, which stores the
+delta, so these writes are safe. A token the pass has work on always holds delta entries, so its delta exists. An Adventure's actors and scene tokens are data (`SetField`
 of `EmbeddedDataField`): their targets edit a per-walk working copy of the field (`AdventureContent`), and the walk
 stores it in one `adventure.update({ actors })` or `({ scenes })` when it leaves the Adventure — one write per field,
 because core validates every element of a replaced array on each write, so a legacy `effect` Item (unregistered subtype)

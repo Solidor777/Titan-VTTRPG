@@ -7,7 +7,7 @@ attention. NOT a to-do list (deferred work goes to `docs/TODO.md`; bugs go to `d
 
 Measured live 3 times with a raw-data token, not re-run; no migration tests while no migration is active (project
 rule), as the active GM with Migration Mode Disabled, on an unlinked world-scene token named apart from its base actor
-(so its delta is stored, OPEN_BUGS #102). Each deletion was a one-id `deleteEmbeddedDocuments` through the token's
+(so its delta is stored; see CLOSED_BUGS #102). Each deletion was a one-id `deleteEmbeddedDocuments` through the token's
 synthetic actor, read back after a reload from `token._source.delta` and from a server fetch (`Scene.database.get`):
 
 - the token's own Item, which the base actor lacks: no tombstone stored;

@@ -2,61 +2,6 @@
 
 Deferred/known bugs. Todos (planned work) live in `docs/TODO.md`; this file is bugs only.
 
-### 102. Clearing expired effects on an unlinked token with no stored delta does not survive a reload
-
-- **Reported:** On an unlinked token, removing an Item the token inherits from its base actor did not persist across
-  a reload, even with Migration Mode Disabled. The user confirmed it is a bug.
-- **Measured, with tokens built from raw data only:** probes in `test-titan` created each scene and token in code.
-  The scene was never viewed, there was no canvas drop and no unlink click, and every write ran in one scripted
-  burst. A token named like its base actor stored `delta: null`. On such a token, a create or delete of two or more
-  embedded documents through `token.actor` was missing after a reload, and so was every later delta write until the
-  Token record was written. One-document calls, updates, and calls after the delta existed were stored. Under the
-  project rule "Tests use genuine live documents" (`.claude/claude.md`, Project Scope) none of this is evidence about
-  Foundry's behaviour until it is re-run the real way.
-- **Read in core, not run:** `client/documents/token.mjs:1657` gives a newly created unlinked token a delta only when
-  its name differs from the base actor's. Changing `actorLink` on an existing token goes through `:2032` instead.
-- **Contradicting observation (user):** on real tokens, bulk Clear Expired Effects and single-value edits persist.
-- **Real-flow repro, measured (`test-titan`, E2E GM 1, 4 runs, no synthetic documents):**
-  - **How the documents were made:**
-    - The scene, the actors and their effects were made through the UI.
-    - Each effect had a "Turn Start" duration with 1 remaining, and was expired by running a Combat Tracker combat on
-      linked tokens.
-    - Token (a) was a canvas drop of an actor whose prototype token was set unlinked, with the default name.
-    - Token (b) was a linked token unlinked with the Token config toggle, with its sheet reopened.
-  - **Before the clear:** both tokens stored `delta: null`.
-  - **The clear:** Clear Expired Effects, run from the sheet, sent one `modifyDocument` ActiveEffect `delete` of both
-    ids with parent `Scene.<id>.Token.<id>.ActorDelta.<id>`.
-  - **The server reply:** `result` held both ids, with no error (websocket capture, run 4).
-  - **What was stored:** the token's `delta` was still `null` on reads right after the clear and 2 s later, and after
-    a reload. The client showed the effects removed until the reload, then both were back. The base actor kept both
-    effects throughout.
-  - **Evidence:** `.superpowers/sdd/2026-09-29-conditions-rework/repro102b/` (`run1.log` to `run4.log`, `shots/`).
-  - An earlier run whose actors and effects were made through the document API gave the same result (`repro102/`).
-- **Cause:** unknown. Not attributed to Foundry core or to TITAN. TITAN's clear is one batch
-  `deleteEmbeddedDocuments('ActiveEffect', ids)` on the token's actor (`CharacterDataModel.js:4870-4883`, read).
-- **Follow-up, measured the same way (3 runs each, websocket frames in all; `repro102b/c1.log`-`c3.log`):**
-  - **One effect deleted** with its row button on a `delta: null` token is stored: a delta with one tombstone,
-    present right after the delete and after a reload.
-  - **The clear on a token whose delta already exists** is stored. The delta was created first by a real edit, a
-    Stamina change on the token sheet. Both tombstones were present right after the clear and after a reload.
-  - **The request shape is the same in all three cases:** one `ActiveEffect` `delete` with the same parent and a
-    success reply. Only the number of ids and whether a delta already existed differ.
-  - **Inferred, not proven:** only a delete of two or more documents on a token with no stored delta is lost. This
-    fits the user's report that bulk clears persist on tokens that have been edited.
-- **Next measurement:** the same steps in `test-pf2e`, which does not load TITAN, to separate a TITAN cause from a
-  Foundry one.
-- **Found:** 2026-10-01 while the Task 5 fix round 2 identity e2e (plan B) was seeding its tokens.
-- **Status:** Open. Reproduced through real flows; cause not yet located.
-
-### 109. A token sheet may highlight the Skills tab while showing the Effects tab (unconfirmed)
-
-- **What:** screenshots from the #102 real-flow repro show the tab strip still highlighting "Skills" after
-  Effects was clicked, while the Effects content shows (`repro102b/shots/run1-*-after-reload.png`,
-  `run3-*-A-before-clear.png`). A later re-render highlights Effects correctly. It has not been determined whether this
-  is a real defect or screenshot timing.
-- **Found:** 2026-10-01 during the #102 real-flow repro.
-- **Status:** Open; unconfirmed until reproduced.
-
 ### 110. A condition effect whose rules elements a GM edited is overwritten by migration
 
 - **What, read, not run:** the Active Effect sheet's Rules Elements tab
@@ -78,51 +23,6 @@ Deferred/known bugs. Todos (planned work) live in `docs/TODO.md`; this file is b
 - **Status:** Open, tabled by the user on 2026-10-07. The user deferred it on 2026-10-01 to a future document
   inheritance campaign (`docs/TODO.md`). For now GMs may edit a condition's rules elements, and the next migration
   overwrites the edit.
-
-### 114. Deactivating the viewed scene while a status's scrolling text is on screen throws
-
-Core citations below refer to Foundry 14.364 at `C:\FoundryVTT\V14\dev\foundry`, the build the server runs
-(`probe114-status-wait.json` records `game.release` as 14.364). The evidence files named here are in
-`.superpowers/sdd/test-suite-rewrite/phase-0/` (local and not checked in).
-
-- **Measured** (probe, `test-titan`, logged in as E2E GM 1, TITAN loaded):
-  - Setup: a token's actor gains a status (`toggleStatusEffect`), which starts the 2 s scrolling text. The viewed
-    scene is then deactivated at once (`scene.update({ active: false })`).
-  - Result: the page throws `TypeError: Cannot read properties of null (reading 'off')` at `PreciseText.destroy` ←
-    `InterfaceCanvasGroup.createScrollingText` (`client/canvas/groups/interface.mjs:174`) (`probe114-status.json`).
-- **Destroy sequence, measured** (`probe114-status.json`, `probe114-core.json`): the scrolling text is destroyed
-  twice. A wrapper on `PreciseText.prototype.destroy` recorded each call's stack:
-  1. The deactivation runs `Scene.unview` → `Canvas.draw` → `Canvas.tearDown` → `InterfaceCanvasGroup.tearDown`.
-     Read: the group's `_tearDown` destroys every non-layer child with its children
-     (`client/canvas/groups/canvas-group-mixin.mjs:172-177`, `tearDownChildren = true` at `:35`).
-  2. Read: `Canvas.tearDown` first terminates the running animations (`client/canvas/board.mjs:1326`), which resolves
-     the fade-in that `createScrollingText` awaits, so it starts the scroll animation
-     (`client/canvas/groups/interface.mjs:211-230`). Measured: a console error `TypeError: Cannot read properties of
-     null (reading 'position')` at `set y` ← `#updateAttribute` ← `#animateFrame`. Read: `#animateFrame` catches the
-     error and rejects the animation (`client/canvas/animation/canvas-animation.mjs:270-271`), and `animate` logs it
-     (`:159`), so the awaited promise settles.
-  3. `createScrollingText`'s clean-up removes the text (`interface.mjs:234`) and calls `text.destroy()` a second time
-     (`:235`). Measured: the second call sees `destroyed === true` and `_texture === null`, and throws the `'off'`
-     page error.
-- **Measured, bearing on attribution:**
-  - A direct core call, `canvas.interface.createScrollingText(...)` followed by deactivating the scene, throws the
-    same error with the same destroy sequence (`probe114-core.json`). No TITAN document is involved.
-  - The status-toggle trigger gives the same sequence (`probe114-status.json`).
-  - Every frame in both destroy stacks and in both error stacks is `foundry.mjs`, `pixi.min.js`, or the probe wrapper.
-  - Read: TITAN's `src/` has no PIXI or prototype patch and no canvas tear-down hook, and `dist/index.js` has no
-    reference to `createScrollingText`, `InterfaceCanvasGroup` or `tearDownChildren` (`fix5-grep-114-titan.txt`).
-- **Not run:** a control in a world without TITAN. Every measurement above ran with TITAN loaded, so attribution to
-  core is not confirmed. The user will run that control.
-- **Controls, measured:** with a 2.6 s wait before the deactivation, the text is destroyed once, from
-  `createScrollingText`, and nothing throws. This holds for the core call (`probe114-core-wait.json`) and for the
-  status toggle (`probe114-status-wait.json`).
-- **Found:** 2026-10-01 while writing the gate test of CLOSED_BUGS #113 (test-suite rewrite, Phase 0 fix round 1).
-- **Status:** Open; attribution awaits the no-TITAN control. TITAN does not patch core. The #113 gate test waits until
-  no animation runs on `canvas.interface` before it deactivates the scene. Measured without that wait: the spec failed
-  with this error in 6 of 6 runs (`fix5-mut114-no-scrolling-text-wait-run1.log` to `-run6.log`).
-  Under the 1 s poll rule the wait cannot last the 2 s of the animation, so the last test of
-  `combat-turns.spec.js` reloads the page first (a reload ends the animations) and then deactivates the scene;
-  the earlier wait for the animation to end is gone.
 
 ### 122. `addCheck` once stored the default label "Check" instead of the typed one
 

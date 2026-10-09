@@ -13,7 +13,12 @@ management). Data model classes hold the schema, field validation, and derived-d
   token's synthetic actor is its own actor, and core's `Combat#getCombatantByActor` is deprecated; its `.initiative` is
   the source for effect initiative capture). On creation it
   assigns a system UUID (stored in `flags.titan.uuid`) and delegates prototype-token initialization
-  and post-add/delete callbacks to the data model.
+  and post-add/delete callbacks to the data model. It overrides `createEmbeddedDocuments` and
+  `deleteEmbeddedDocuments` as a workaround for a Foundry core defect (CLOSED_BUGS #102): on an unlinked token's
+  synthetic actor (`isToken`) whose token source holds no delta, a batch of two or more documents is written as the
+  first document alone and then the rest, because core's server drops the delta of such a token on a batch. Every
+  embedded write of the actor goes through them; `deleteAll` operations are not split. Test:
+  `tests/e2e/unlinked-token-delta.spec.js`.
 - `TitanActorDataModel` (`src/document/types/actor/TitanActorDataModel.js`) extends
   `TitanDataModel`. Base class for all actor data models; adds `onPreCreate` (which calls
   `_getInitialPrototypeTokenData`), and the `postAddItem` / `postDeleteItem`

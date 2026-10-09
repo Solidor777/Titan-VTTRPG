@@ -1145,8 +1145,8 @@ was controlled (`.superpowers/sdd/test-suite-rewrite/phase-2/review-measure-1.lo
 `tokenVision false`), and a token that is not visible takes no pointer events), `toggleTokenLink`, `unlinkPlacedToken`
 and `controlPlacedToken` (the sheet header buttons; the token flows close the open windows, release control, move the
 pointer onto the token and wait for `token.object.hover` before the double-click that opens the sheet
-(`unlinkPlacedToken`, which then waits for the reopened synthetic actor's sheet) or the click that takes control
-(`controlPlacedToken`)), `controlPlacedTokens` (drags a selection rectangle over the given tokens and asserts that
+(`unlinkPlacedToken`, which then waits for the reopened synthetic actor's sheet, and `openPlacedTokenSheet`, which
+returns the sheet of an unlinked token's synthetic actor) or the click that takes control (`controlPlacedToken`)), `controlPlacedTokens` (drags a selection rectangle over the given tokens and asserts that
 exactly those are controlled: while one token is controlled a second is not visible to the pointer, so Shift-click
 cannot add it), `targetPlacedToken` / `releaseTargets` / `targetedTokenIds` (core's Target key T on the hovered token,
 Shift+T adds; `game.user.targets` then holds real Token objects, as `check-math.spec.js` uses), `createCompendium` /
