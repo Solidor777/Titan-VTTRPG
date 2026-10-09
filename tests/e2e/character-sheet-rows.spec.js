@@ -13,6 +13,7 @@ import {
    controlPlacedToken,
    createActor,
    createOwnedItem,
+   effectActiveToggle,
    placeToken,
    setEquipped,
    shared,
@@ -844,16 +845,16 @@ test.describe('effect rows', () => {
       const sheet = await openActorTab('Effects');
 
       // Only a permanent effect renders the toggle; its checkmark is the only square icon of the row.
-      /** @type {import('@playwright/test').Locator} The effect's row. */
-      const row = effectRow(sheet, effectIds.permanent);
-      await expect(row.locator('i.fa-square-check'), 'the effect starts active').toHaveCount(1);
-      await row.locator('i.fa-square-check').click();
-      await expect(row.locator('i.fa-square-check'), 'the checkmark clears in place').toHaveCount(0);
-      await expect(row.locator('i.fa-square'), 'the unchecked icon shows').toHaveCount(1);
+      /** @type {string} The permanent effect's id. */
+      const id = effectIds.permanent;
+      await expect(effectActiveToggle(sheet, id, false), 'the effect starts active').toHaveCount(1);
+      await effectActiveToggle(sheet, id, false).click();
+      await expect(effectActiveToggle(sheet, id, false), 'the checkmark clears in place').toHaveCount(0);
+      await expect(effectActiveToggle(sheet, id, true), 'the unchecked icon shows').toHaveCount(1);
       expect(await readPath(uuid, 'system.isActive'), 'the effect is inactive').toBe(false);
 
-      await row.locator('i.fa-square').click();
-      await expect(row.locator('i.fa-square-check'), 'the checkmark returns in place').toHaveCount(1);
+      await effectActiveToggle(sheet, id, true).click();
+      await expect(effectActiveToggle(sheet, id, false), 'the checkmark returns in place').toHaveCount(1);
       expect(await readPath(uuid, 'system.isActive'), 'the effect is active again').toBe(true);
    });
 
@@ -871,13 +872,13 @@ test.describe('effect rows', () => {
       await expandRow(row);
 
       // A timed effect shows no active toggle; a permanent duration chosen in its sheet adds one in place.
-      await expect(row.locator('i.fa-square-check'), 'a timed effect shows no active toggle').toHaveCount(0);
+      await expect(effectActiveToggle(sheet, id, false), 'a timed effect shows no active toggle').toHaveCount(0);
       await withDocumentSheet(row, 'ActiveEffect', id, async (documentSheet) => {
          await chooseDurationType(documentSheet, DURATION_PERMANENT);
       });
-      await expect(row.locator('i.fa-square-check'), 'the permanent effect starts active').toHaveCount(1);
-      await row.locator('i.fa-square-check').click();
-      await expect(row.locator('i.fa-square'), 'the toggle shows unchecked').toHaveCount(1);
+      await expect(effectActiveToggle(sheet, id, false), 'the permanent effect starts active').toHaveCount(1);
+      await effectActiveToggle(sheet, id, false).click();
+      await expect(effectActiveToggle(sheet, id, true), 'the toggle shows unchecked').toHaveCount(1);
       expect(await readPath(uuid, 'system.isActive')).toBe(false);
 
       /** @type {number} The world message count before the send. */

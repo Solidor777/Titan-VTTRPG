@@ -309,6 +309,8 @@ test.describe('storage', () => {
 test.describe('TITAN never uses a base effect', () => {
    test('the derived stats and conditions are those of the actor without it', async () => {
       await expectBaseEffectHeld();
+      // Checks only that listing the base effect leaves the derived stats unchanged.
+      // Not mutation-proven: a base effect carries no rules elements, so no plausible regression changes them.
       expect(await readDerived(), 'the stats equal those before the effect').toBe(baselineDerived);
       expect(
          await page.evaluate((actorId) => game.actors.get(actorId).system.getConditions(), actorIds.main),
@@ -337,6 +339,8 @@ test.describe('TITAN never uses a base effect', () => {
       await expect(sheet.locator(`[data-effect-id="${markerId}"]`), 'the TITAN effect has a row').toBeVisible();
       await expect(sheet.locator(`[data-effect-id="${baseId}"]`), 'the base effect has a row').toBeVisible();
       await expect(sheet.locator('li.effect')).toHaveCount(2);
+      // Checks only that listing the base effect in the Effects tab leaves the derived stats unchanged.
+      // Not mutation-proven: a base effect carries no rules elements, so no plausible regression changes them.
       expect(await readDerived(), 'the listed base effect leaves the stats as they were').toBe(baselineDerived);
    });
 
@@ -417,6 +421,15 @@ test.describe('the row of a base effect', () => {
       const sheet = await openSheetByUuid(page, `Actor.${actorIds.main}`);
       await clickSheetTab(sheet, 'Effects');
       return sheet;
+   }
+
+   /**
+    * Selects the Active Effect Config sheet of one effect: an application's element id ends in its document's id.
+    * @param {string} effectId - The id the sheet's element id ends in.
+    * @returns {import('@playwright/test').Locator} The sheet's window element.
+    */
+   function configOf(effectId) {
+      return page.locator(`.application.active-effect-config[id$="-ActiveEffect-${effectId}"]`);
    }
 
    /**
@@ -502,6 +515,8 @@ test.describe('the row of a base effect', () => {
          }
       }
       await expect.poll(() => readDisabled(uuid), { message: 'the toggle stored the effect enabled' }).toBe(false);
+      // Checks only that listing and toggling the base effect leaves the derived stats unchanged.
+      // Not mutation-proven: a base effect carries no rules elements, so no plausible regression changes them.
       expect(await readDerived(), 'the toggles left the stats as they were').toBe(baselineDerived);
    });
 
@@ -510,8 +525,8 @@ test.describe('the row of a base effect', () => {
       const sheet = await openEffectsTab();
       await sheet.locator(`li.effect[data-effect-id="${baseId}"]`).getByRole('button', { name: 'Edit Item' }).click();
 
-      /** @type {import('@playwright/test').Locator} The sheet the control opened. */
-      const config = page.locator('.application.active-effect-config');
+      /** @type {import('@playwright/test').Locator} The base effect's own Active Effect Config sheet. */
+      const config = configOf(baseId);
       await expect(config).toBeVisible();
       await expect(config.locator('[name="name"]')).toHaveValue(BASE_NAME);
    });
@@ -559,9 +574,10 @@ test.describe('the row of a base effect', () => {
          /** @type {import('@playwright/test').Locator} The effect's row. */
          const row = sheet.locator(`li.effect[data-effect-id="${id}"]`);
          await expect(row, 'the effect has a row').toBeVisible();
-         await expect(row.getByText(text), 'the collapsed row hides the description').toHaveCount(0);
          await row.locator('[data-view-controls] button').click();
          await expect(row.getByText(text), 'the expanded row shows the description').toBeVisible();
+         await row.locator('[data-view-controls] button').click();
+         await expect(row.getByText(text), 'the collapsed row hides the description').toHaveCount(0);
 
          await viewScene(page, sceneId);
          await controlPlacedToken(page, tokenIds.main);
@@ -569,9 +585,10 @@ test.describe('the row of a base effect', () => {
          /** @type {import('@playwright/test').Locator} The effect's HUD row. */
          const hudRow = hud('player-hud-effect-row').filter({ hasText: name });
          await expect(hudRow, 'the effect has a HUD row').toBeVisible();
-         await expect(hudRow.getByText(text), 'the collapsed HUD row hides the description').toHaveCount(0);
          await hudRow.getByRole('button', { name: /: Expand$/ }).click();
          await expect(hudRow.getByText(text), 'the expanded HUD row shows the description').toBeVisible();
+         await hudRow.getByRole('button', { name: /: Collapse$/ }).click();
+         await expect(hudRow.getByText(text), 'the collapsed HUD row hides the description').toHaveCount(0);
       }
       finally {
          // A base effect made for one test is removed through the document API, as no test keeps it.
@@ -623,8 +640,92 @@ test.describe('the row of a base effect', () => {
          .toBe(false);
 
       await row.locator('[data-testid="player-hud-effect-sheet"]').click();
-      await expect(page.locator('.application.active-effect-config'), 'the open control opens core\'s sheet')
-         .toBeVisible();
+      await expect(configOf(baseId), 'the open control opens core\'s sheet of the base effect').toBeVisible();
+   });
+
+   test('the HUD row delete control removes the stored base effect', async () => {
+      /** @type {string} The name of the effect made for this test. */
+      const name = `E2E Base Hud Delete ${RUN}`;
+      /** @type {string} The id of the effect made for this test. */
+      const id = await createBaseEffect(`Actor.${actorIds.main}`, name);
+      expect(id, 'the creation returned an effect id').not.toBe('');
+      try {
+         await viewScene(page, sceneId);
+         await controlPlacedToken(page, tokenIds.main);
+
+         /** @type {import('@playwright/test').Locator} The effect's HUD row. */
+         const row = hud('player-hud-effect-row').filter({ hasText: name });
+         await expect(row, 'the effect has a HUD row').toBeVisible();
+         await row.getByRole('button', { name: /: Expand$/ }).click();
+         await row.locator('[data-testid="player-hud-effect-delete"]').click();
+
+         /** @type {import('@playwright/test').Locator} The confirmation dialog. */
+         const dialog = page.locator('.application.titan-dialog[id^="titan-confirmation-dialog"]');
+         await expect(dialog).toBeVisible();
+         await dialog.getByRole('button', { name: 'Delete Effect' }).click();
+         await expect(row, 'the HUD row is gone').toHaveCount(0);
+         await expect.poll(
+            async () => (await readServerDocument(page, `Actor.${actorIds.main}`)).effects.some(
+               (effect) => effect._id === id,
+            ),
+            { message: 'the server no longer holds the effect' },
+         ).toBe(false);
+      }
+      finally {
+         // Removes the effect when the test failed before the control did; a no-op once it is gone.
+         await page.evaluate(
+            ({ actorId, effectId }) => game.actors.get(actorId).effects.get(effectId)?.delete(),
+            {
+               actorId: actorIds.main,
+               effectId: id,
+            },
+         );
+      }
+   });
+
+   test('the HUD tray lists a base effect as an icon whose popout holds its controls', async () => {
+      /** @type {string} The uuid of the base effect. */
+      const uuid = `Actor.${actorIds.main}.ActiveEffect.${baseId}`;
+      await viewScene(page, sceneId);
+      await controlPlacedToken(page, tokenIds.main);
+      await setClientSetting(page, 'playerHudOptions', { effectsPanel: { style: 'tray' } });
+      try {
+         /** @type {import('@playwright/test').Locator} The base effect's tray icon. */
+         const icon = page.locator(`[data-testid="player-hud-effect-icon"][data-effect-id="${baseId}"]`);
+         await expect(icon, 'the base effect has a tray icon').toBeVisible();
+         await icon.click();
+
+         /** @type {import('@playwright/test').Locator} The icon's detail popout. */
+         const popout = hud('player-hud-effect-popout');
+         await expect(popout).toBeVisible();
+         await expect(popout).toContainText(BASE_NAME);
+         await expect(popout.locator('[data-testid="player-hud-effect-delete"]')).toBeVisible();
+         await expect(popout.locator('[data-testid="player-hud-effect-chat"]'), 'no TITAN-only control')
+            .toHaveCount(0);
+
+         /** @type {import('@playwright/test').Locator} The popout's active toggle. */
+         const toggle = popout.locator('[data-testid="player-hud-effect-active"]');
+         await expect(toggle.locator('i.fa-square-check'), 'the toggle shows the effect active').toBeVisible();
+         try {
+            await toggle.click();
+            await expect.poll(() => readDisabled(uuid), { message: 'the popout toggle stored the effect disabled' })
+               .toBe(true);
+            await expect(toggle.locator('i.fa-square'), 'the toggle shows the effect inactive').toBeVisible();
+         }
+         finally {
+            if (await readDisabled(uuid)) {
+               await toggle.click();
+            }
+         }
+         await expect.poll(() => readDisabled(uuid), { message: 'the popout toggle stored the effect enabled' })
+            .toBe(false);
+
+         await popout.locator('[data-testid="player-hud-effect-sheet"]').click();
+         await expect(configOf(baseId), 'the open control opens core\'s sheet of the base effect').toBeVisible();
+      }
+      finally {
+         await setClientSetting(page, 'playerHudOptions', {});
+      }
    });
 });
 
