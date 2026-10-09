@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { flushSync } from 'svelte';
+import { flushSync, tick } from 'svelte';
 import { render, screen } from '@testing-library/svelte';
 import ReactiveDocument from '~/document/reactive/ReactiveDocument.svelte.js';
 import DocumentProbe from '../components/DocumentProbe.svelte';
@@ -7,10 +7,10 @@ import DocumentProbe from '../components/DocumentProbe.svelte';
 /**
  * Renders the probe reader against a bridge around a fake document.
  * @param {object} doc - The fake document to bridge.
- * @returns {void}
+ * @returns {object} The render result, which unmounts the probe.
  */
 function renderBridge(doc) {
-   render(DocumentProbe, {
+   return render(DocumentProbe, {
       context: new Map([[
          'document',
          new ReactiveDocument(doc),
@@ -178,5 +178,243 @@ describe('ReactiveDocument and the ownership of an ancestor', () => {
       Hooks.call('updateActor', sibling, { ownership: { u1: 2 } }, {});
       flushSync();
       expect(screen.getByTestId('value').textContent).toBe('1');
+   });
+});
+
+describe('ReactiveDocument and the ownership sources of a document', () => {
+   /**
+    * Counts the hook handlers registered on the mock.
+    * @returns {number} The number of registered handlers across all hooks.
+    */
+   function countHandlers() {
+      return Object.values(Hooks.handlers).reduce((total, handlers) => total + handlers.size, 0);
+   }
+
+   /**
+    * Builds an unlinked token's synthetic actor with an item, the token, the base actor, and an unrelated actor.
+    * @returns {{base: object, unrelated: object, synthetic: object, item: object}} The fake documents.
+    */
+   function createTokenDocuments() {
+      const base = {
+         id: 'a1',
+         uuid: 'Actor.a1',
+         documentName: 'Actor',
+      };
+      const token = {
+         id: 't1',
+         uuid: 'Scene.s1.Token.t1',
+         documentName: 'Token',
+         baseActor: base,
+         parent: {
+            id: 's1',
+            uuid: 'Scene.s1',
+            documentName: 'Scene',
+         },
+      };
+      const synthetic = {
+         id: 'a1',
+         uuid: 'Scene.s1.Token.t1.Actor.a1',
+         documentName: 'Actor',
+         parent: token,
+         system: { value: 1 },
+      };
+      const item = {
+         id: 'i1',
+         uuid: 'Scene.s1.Token.t1.Actor.a1.Item.i1',
+         documentName: 'Item',
+         parent: synthetic,
+         system: { value: 1 },
+      };
+      const unrelated = {
+         id: 'a2',
+         uuid: 'Actor.a2',
+         documentName: 'Actor',
+      };
+      return {
+         base,
+         unrelated,
+         synthetic,
+         item,
+      };
+   }
+
+   it('re-renders a reader of an effect on an item on an actor when the actor changes ownership', () => {
+      const actor = {
+         id: 'a1',
+         uuid: 'Actor.a1',
+         documentName: 'Actor',
+      };
+      const item = {
+         id: 'i1',
+         uuid: 'Actor.a1.Item.i1',
+         documentName: 'Item',
+         parent: actor,
+      };
+      const effect = {
+         id: 'e1',
+         uuid: 'Actor.a1.Item.i1.ActiveEffect.e1',
+         documentName: 'ActiveEffect',
+         parent: item,
+         system: { value: 1 },
+      };
+      renderBridge(effect);
+      effect.system.value = 2;
+      Hooks.call('updateItem', item, { ownership: { u1: 2 } }, {});
+      flushSync();
+      expect(screen.getByTestId('value').textContent, 'the parent item is a source').toBe('2');
+      effect.system.value = 3;
+      Hooks.call('updateActor', actor, { ownership: { u1: 2 } }, {});
+      flushSync();
+      expect(screen.getByTestId('value').textContent, 'the grandparent actor is a source').toBe('3');
+   });
+
+   it('re-renders for an update whose only ownership change is the default level', () => {
+      const actor = {
+         id: 'a1',
+         uuid: 'Actor.a1',
+         documentName: 'Actor',
+      };
+      const item = {
+         id: 'i1',
+         uuid: 'Actor.a1.Item.i1',
+         documentName: 'Item',
+         parent: actor,
+         system: { value: 1 },
+      };
+      renderBridge(item);
+      item.system.value = 2;
+      Hooks.call('updateActor', actor, { ownership: { default: 2 } }, {});
+      flushSync();
+      expect(screen.getByTestId('value').textContent).toBe('2');
+   });
+
+   it('re-renders for an ownership change of an update that applied no diff', () => {
+      const actor = {
+         id: 'a1',
+         uuid: 'Actor.a1',
+         documentName: 'Actor',
+      };
+      const item = {
+         id: 'i1',
+         uuid: 'Actor.a1.Item.i1',
+         documentName: 'Item',
+         parent: actor,
+         system: { value: 1 },
+      };
+      renderBridge(item);
+      item.system.value = 2;
+      Hooks.call('updateActor', actor, { ownership: { u1: 2 } }, { diff: false });
+      flushSync();
+      expect(screen.getByTestId('value').textContent).toBe('2');
+   });
+
+   it('removes every hook it registered when its reader unmounts', async () => {
+      const { item } = createTokenDocuments();
+      const { unmount } = renderBridge(item);
+      expect(countHandlers(), 'the reader registered handlers').toBeGreaterThan(0);
+      unmount();
+      await tick();
+      expect(countHandlers(), 'no handler is left').toBe(0);
+   });
+
+   it('re-renders a reader of a token actor\'s item when the base actor changes ownership', () => {
+      const { base, item } = createTokenDocuments();
+      renderBridge(item);
+      item.system.value = 2;
+      Hooks.call('updateActor', base, { ownership: { u1: 2 } }, {});
+      flushSync();
+      expect(screen.getByTestId('value').textContent).toBe('2');
+   });
+
+   it('re-renders a reader of a token actor when the base actor changes ownership', () => {
+      const { base, synthetic } = createTokenDocuments();
+      renderBridge(synthetic);
+      synthetic.system.value = 2;
+      Hooks.call('updateActor', base, { ownership: { u1: 2 } }, {});
+      flushSync();
+      expect(screen.getByTestId('value').textContent).toBe('2');
+   });
+
+   it('ignores an ownership change of an unrelated actor and a non-ownership update of the base actor', () => {
+      const { base, unrelated, item } = createTokenDocuments();
+      renderBridge(item);
+      item.system.value = 2;
+      Hooks.call('updateActor', unrelated, { ownership: { u1: 2 } }, {});
+      Hooks.call('updateActor', base, { name: 'Renamed' }, {});
+      flushSync();
+      expect(screen.getByTestId('value').textContent).toBe('1');
+   });
+
+   it('re-renders a reader of a chat message when the actor that spoke changes ownership', () => {
+      const speaker = {
+         id: 'a1',
+         uuid: 'Actor.a1',
+         documentName: 'Actor',
+      };
+      const message = {
+         id: 'm1',
+         uuid: 'ChatMessage.m1',
+         documentName: 'ChatMessage',
+         speaker: { actor: 'a1' },
+         constructor: { getSpeakerActor: () => speaker },
+         system: { value: 1 },
+      };
+      renderBridge(message);
+      message.system.value = 2;
+      Hooks.call('updateActor', speaker, { ownership: { u1: 2 } }, {});
+      flushSync();
+      expect(screen.getByTestId('value').textContent).toBe('2');
+   });
+
+   it('re-renders a reader of a chat message when the base actor of the speaking token actor changes ownership', () => {
+      const { base, synthetic } = createTokenDocuments();
+      const message = {
+         id: 'm1',
+         uuid: 'ChatMessage.m1',
+         documentName: 'ChatMessage',
+         speaker: {
+            scene: 's1',
+            token: 't1',
+         },
+         constructor: { getSpeakerActor: () => synthetic },
+         system: { value: 1 },
+      };
+      renderBridge(message);
+      message.system.value = 2;
+      Hooks.call('updateActor', base, { ownership: { u1: 2 } }, {});
+      flushSync();
+      expect(screen.getByTestId('value').textContent).toBe('2');
+   });
+});
+
+describe('ReactiveDocument and the compendium configuration', () => {
+   it('re-renders a reader of a compendium document when the compendium configuration setting changes', () => {
+      const item = {
+         id: 'i1',
+         uuid: 'Compendium.pack.items.Item.i1',
+         documentName: 'Item',
+         pack: 'pack.items',
+         system: { value: 1 },
+      };
+      renderBridge(item);
+      item.system.value = 2;
+      Hooks.call('updateSetting', { key: 'core.somethingElse' }, {}, {});
+      flushSync();
+      expect(screen.getByTestId('value').textContent, 'another setting is ignored').toBe('1');
+      Hooks.call('updateSetting', { key: 'core.compendiumConfiguration' }, {}, {});
+      flushSync();
+      expect(screen.getByTestId('value').textContent).toBe('2');
+   });
+
+   it('registers no setting hook for a document outside a compendium', () => {
+      const item = {
+         id: 'i1',
+         uuid: 'Item.i1',
+         documentName: 'Item',
+         pack: null,
+         system: { value: 1 },
+      };
+      renderBridge(item);
+      expect(Hooks.handlers.updateSetting?.size ?? 0).toBe(0);
    });
 });

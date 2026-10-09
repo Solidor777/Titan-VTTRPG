@@ -1,29 +1,63 @@
 import { createSubscriber } from 'svelte/reactivity';
 
 /**
+ * Lists the documents whose ownership decides this document's `isOwner`, apart from the document itself: its
+ * ancestors (an Item's Actor), the base actor of a token in its chain, and, for a chat message, the actor that spoke.
+ * The base actor of an unlinked token is neither the token's synthetic actor nor an ancestor of it. Core rebuilds the
+ * synthetic actor's data, ownership included, from the base actor when that changes
+ * (`TokenDocument#_onUpdateBaseActor`); measured: the only update hook that fires is the base actor's. The permission
+ * of a compendium document is not a document; the bridge reads it from the compendium configuration setting.
+ * @param {foundry.abstract.Document} doc - The document.
+ * @returns {foundry.abstract.Document[]} The documents; none of them is `doc`.
+ */
+function getOwnershipSources(doc) {
+   /** @type {foundry.abstract.Document[]} The sources found so far. */
+   const sources = [];
+   for (let current = doc; current; current = current.parent) {
+      if (current !== doc) {
+         sources.push(current);
+      }
+      if (current.baseActor) {
+         sources.push(current.baseActor);
+      }
+   }
+   if (doc.documentName === 'ChatMessage') {
+      /** @type {foundry.documents.Actor|null} The actor that spoke. */
+      const speaker = doc.constructor.getSpeakerActor?.(doc.speaker);
+      if (speaker) {
+         sources.push(speaker);
+         if (speaker.parent?.baseActor) {
+            sources.push(speaker.parent.baseActor);
+         }
+      }
+   }
+   return sources.filter((source) => source !== doc);
+}
+
+/**
  * @class ReactiveDocument
- * Bridges a Foundry Document into Svelte 5 reactivity. `.data` returns the LIVE document; when read
- * inside a component or `$derived` it subscribes to the document's update hooks (including embedded
- * item/effect CRUD) and when an ancestor's ownership changes (an embedded document's `isOwner` follows its parent), so
- * reactive readers re-run whenever the document changes. Because `.data` is the
- * live document, reactive reads (`.data.system.x`), writes (`.data.update(...)`), collections
- * (`.data.items`), and methods (`.data.system.someMethod()`) all work through the same accessor.
+ * Bridges a Foundry Document into Svelte 5 reactivity. `.data` returns the LIVE document; when read inside a component
+ * or `$derived` it subscribes to the document's update hooks, to embedded item/effect create, update and delete hooks,
+ * and to the ownership changes of the documents its `isOwner` depends on (for a compendium document, to changes of
+ * the world's compendium configuration), so reactive readers re-run whenever the document or its permissions change.
+ * Because `.data` is the live document, reactive reads (`.data.system.x`), writes (`.data.update(...)`),
+ * collections (`.data.items`), and methods (`.data.system.someMethod()`) all work through the same accessor.
  */
 export default class ReactiveDocument {
    /** @type {() => void} Subscriber registration returned by createSubscriber. */
    #subscribe;
 
    /**
-    * Wraps the Document and registers hooks that invalidate reactive readers when it or its embedded children change.
+    * Wraps the Document and registers hooks that invalidate reactive readers when it, its embedded children or the
+    * ownership of its ownership sources change.
     * @param {foundry.abstract.Document} doc - The Document to wrap.
     */
    constructor(doc) {
       /** @type {foundry.abstract.Document} The live Document; source of truth for reads and writes. */
       this.doc = doc;
 
-      // Register reactivity: invalidate reactive readers whenever this document — or one of its
-      // embedded items/effects — changes. createSubscriber tears these hooks down automatically when
-      // the last reactive reader unsubscribes (i.e. when the consuming UI unmounts).
+      // Registers the hooks that invalidate reactive readers. createSubscriber tears them down when the last reactive
+      // reader unsubscribes (when the consuming UI unmounts).
       this.#subscribe = createSubscriber((update) => {
          const name = doc.documentName;
 
@@ -54,36 +88,47 @@ export default class ReactiveDocument {
             }
          };
 
-         /** @type {Set<string>} The document names of this document's ancestors (an Item's Actor, ...). */
-         const ancestorNames = new Set();
-         for (let ancestor = doc.parent; ancestor; ancestor = ancestor.parent) {
-            ancestorNames.add(ancestor.documentName);
-         }
+         /** @type {Set<string>} The document names of the ownership sources, one hook each. */
+         const sourceNames = new Set(getOwnershipSources(doc).map((source) => source.documentName));
 
          /**
-          * Invalidate when an ancestor's ownership changes: this document's permissions come from its parent, and no
-          * update hook of this document fires for the change. Other updates of an ancestor do not invalidate.
+          * Invalidate when the ownership of an ownership source changes: this document's permissions come from that
+          * document, and no update hook of this document fires for the change. Other updates of a source do not
+          * invalidate. The check is the diff's `ownership` key, so it holds for an update that applied no diff too.
           * @param {foundry.abstract.Document} changed - The updated document.
           * @param {object} diff - The change diff.
-          * @param {object} options - Flags accompanying the update.
           */
-         const onAncestorUpdate = (changed, diff, options) => {
-            if (options?.diff === false || !diff || !Object.hasOwn(diff, 'ownership')) {
+         const onSourceUpdate = (changed, diff) => {
+            if (!diff || !Object.hasOwn(diff, 'ownership')) {
                return;
             }
-            for (let ancestor = this.doc.parent; ancestor; ancestor = ancestor.parent) {
-               if (ancestor.uuid === changed?.uuid) {
-                  update();
-                  return;
-               }
+            if (getOwnershipSources(this.doc).some((source) => source.uuid === changed?.uuid)) {
+               update();
+            }
+         };
+
+         /**
+          * Invalidate when the world's compendium configuration changes: the permission of a compendium document
+          * (ownership and lock of its pack) is read from that setting, and no document update hook fires for it.
+          * @param {foundry.documents.Setting} setting - The updated setting.
+          */
+         const onSetting = (setting) => {
+            if (setting?.key === 'core.compendiumConfiguration') {
+               update();
             }
          };
 
          const registered = [
-            ...[...ancestorNames].map((ancestorName) => [
-               `update${ancestorName}`,
-               Hooks.on(`update${ancestorName}`, onAncestorUpdate),
+            ...[...sourceNames].map((sourceName) => [
+               `update${sourceName}`,
+               Hooks.on(`update${sourceName}`, onSourceUpdate),
             ]),
+            ...(doc.pack ? [
+               [
+                  'updateSetting',
+                  Hooks.on('updateSetting', onSetting),
+               ],
+            ] : []),
             [
                `update${name}`,
                Hooks.on(`update${name}`, onUpdate),
