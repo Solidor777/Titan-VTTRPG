@@ -2660,25 +2660,30 @@ repro), `bugbatch2-logs/pf2e/` (the no-TITAN control) and `bugbatch2-logs/impl/`
   effects test only, create override disabled the folder test only (`mut1-run.log`, `mut2-run.log`; hashes in
   `mut-hashes.log`).
 - **Final override and spec (measured, `bugbatch2-logs/impl/`):** the override has the repeated guard, `deleteAll`, the
-  unknown-id check and one shared helper; the spec (git `a3161e55...`, sha256 `33b7fe9c...`) has 9 tests: delete of
-  three and of exactly two effects, a token whose delta is stored (one request, no split), `deleteAll`, a delete naming
-  an unknown id (rejected, no request, delta still null), an Item folder drop of three and of exactly two items, a drop
-  whose first item a `preCreateItem` listener vetoes, and a create whose later documents the server rejects (a kept
+  unknown-id check, core's `deleteAll`-with-ids error and one shared helper; the spec (git `0fe21350...`, sha256
+  `beedf32b...`) has 10 tests: delete of three and of exactly two effects, a token whose delta is stored (one request,
+  no split), `deleteAll`, a delete naming an unknown id (rejected, no request, delta still null), a `deleteAll` that
+  also names ids (rejected with core's message, no request), an Item folder drop of three and of exactly two items, a
+  drop whose first item a `preCreateItem` listener vetoes, and a create whose later documents the server rejects (a kept
   `_id` that exists on the base actor: rejected with "already exists", the first document stays created). Each counts
   the `modifyDocument` requests and asserts them after the stored state.
-  - **Red** (guard always false, `r1-red-run2.log`): 7 failed, 2 passed. The failures of the delete tests, `deleteAll`
-    and the three folder-drop tests are on the stored state after the reload (effects or items back or missing); the
-    rejected-rest test fails because core creates none of a rejected batch. The stored-delta test and the unknown-id
-    test pass.
-  - **Green:** 9 passed alone (`r1-green-alone.log`) and 28 passed after `base-effect.spec.js`
-    (`r1-green-after-base.log`).
+  - **Red** (guard always false, `r1-red-run2.log`, on the 9-test spec): 7 failed, 2 passed. The failures of the delete
+    tests, `deleteAll` and the three folder-drop tests are on the stored state after the reload (effects or items back
+    or missing); the rejected-rest test fails because core creates none of a rejected batch. The stored-delta test and
+    the unknown-id test pass.
+  - **Green:** 10 passed alone (`r2-green-alone.log`); 9 passed alone and 28 passed after `base-effect.spec.js` on the
+    9-test spec (`r1-green-alone.log`, `r1-green-after-base.log`).
   - **Mutations** (`mut-hashes.log`: sha256 and `git hash-object` before, during and after each, build after each
-    mutation and restore, restored text identical to `TitanActor.r1-baseline.js`): (a) delete override off fails tests
-    1, 2, 4 only; (b) create override off fails 6, 7, 8, 9 only; (c) the repeated guard made a single split fails 8
-    only; (d) the `deleteAll` expansion off fails 4 only; (e) the unknown-id check off fails 5 only (`r1-mut-a-run.log`
-    to `r1-mut-e-run.log`).
-  - **Gates:** unit 140 files, 1583 tests passed; eslint clean on the override and the spec; full e2e 752 passed, 0
-    failed, 20.5 min, teardown sweep and census all 0 (`e2e-full-3.log`).
+    mutation and restore, restored text identical to the baseline copies `TitanActor.r1-baseline.js` and
+    `TitanActor.r2-baseline.js`): (a) delete override off fails the delete tests (three effects, exactly two,
+    `deleteAll`) only; (b) create override off fails the three folder-drop tests and the rejected-rest test only; (c)
+    the repeated guard made a single split fails the vetoed-first test only; (d) the `deleteAll` expansion off fails the
+    `deleteAll` test only; (e) the unknown-id check off fails that test only (`r1-mut-a-run.log` to `r1-mut-e-run.log`,
+    nine-test numbering); (f) the `deleteAll`-with-ids throw off fails that test only (`r2-mut-f-run.log`); (g) the
+    guard ignoring the stored delta fails four tests, not one: the stored-delta test (requests [1,2] instead of [3]) and
+    the three-document tests, because the always-true guard keeps splitting the rest (`r2-mut-g-run.log`).
+  - **Gates:** unit 140 files, 1586 tests passed; eslint clean on the override and the spec; full e2e 753 passed, 0
+    failed, 20.6 min, teardown sweep and census all 0 (`e2e-full-4.log`).
 - **Found:** 2026-10-01 while the Task 5 fix round 2 identity e2e (plan B) was seeding its tokens.
 - **Status:** Closed 2026-10-09.
 
