@@ -21,8 +21,9 @@ export default function createRulesElementItemSheetState(item, overrideData) {
       preDeleteCheck,
       postMoveCheck,
       postInsertCheck,
-      snapshotCheckExpansion,
-      restoreCheckExpansion,
+      undoDeleteCheck,
+      undoMoveCheck,
+      undoInsertCheck,
    } = createTitanItemSheetState(item, overrideData ?? createRulesElementItemSheetData(item));
 
    return {
@@ -33,7 +34,8 @@ export default function createRulesElementItemSheetState(item, overrideData) {
       preDeleteCheck,
       postMoveCheck,
       postInsertCheck,
-      snapshotCheckExpansion,
-      restoreCheckExpansion,
+      undoDeleteCheck,
+      undoMoveCheck,
+      undoInsertCheck,
    };
 }

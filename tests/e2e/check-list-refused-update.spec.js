@@ -6,11 +6,14 @@ import { settle } from './settle.js';
 import { attachPageErrors, closeAllApps } from './world.js';
 
 /**
- * A change to an item's checks (add, delete, reorder) that an update hook refuses leaves the item, its sheet and the
- * next edit as they were. The item and its checks are made through the real flows; the refusal is a `preUpdateItem`
- * listener that returns false for the item, the way a module vetoes an update, because no flow refuses an update on
- * demand. Each test then edits another check through the sheet: that edit saves the whole `system` of the live model,
- * so a change the refused update left in the model is saved by it.
+ * A change to an item's checks (add, delete, reorder, insert) that an update hook refuses, or that the database
+ * rejects, leaves the item, its sheet and the next edit as they were. The item and its checks are made through the real
+ * flows. No flow refuses or rejects an update on demand, so the tests do it for the item: a `preUpdateItem` listener
+ * returning false is a module's veto (the update resolves undefined), and an `update` method that throws stands for a
+ * failed database request. A rejected update is made by calling the document's own method, because the sheet's click
+ * handler does not await it and would raise an unhandled rejection. Each test then edits another check through the
+ * sheet: that edit saves the whole `system` of the live model, so a change the failed update left in the model is
+ * saved by it.
  */
 
 /** @type {import('@playwright/test').Page} The file-shared, logged-in page (one world boot per file). */
@@ -33,7 +36,7 @@ test.beforeAll(async ({ browser }) => {
 test.afterEach(async () => {
    await page.evaluate(() => {
       if (globalThis.titanVeto) {
-         Hooks.off('preUpdateItem', globalThis.titanVeto.id);
+         globalThis.titanVeto.release();
          delete globalThis.titanVeto;
       }
    });
@@ -67,34 +70,94 @@ async function weaponWithChecks(name, labels) {
 }
 
 /**
- * Starts refusing every update of an item, as a `preUpdateItem` listener returning false does.
- * @param {string} uuid - The uuid of the item whose updates are refused.
- * @returns {Promise<void>} Resolves once the listener is registered.
+ * Intercepts the updates of one item.
+ * @param {string} uuid - The uuid of the item.
+ * @param {'refuse' | 'reject' | 'observe'} mode - `refuse` registers a `preUpdateItem` listener that returns false (a
+ * veto), `observe` registers one that only counts, and `reject` replaces the item's `update` method with one that
+ * throws, as a failed database request does.
+ * @param {boolean} [held] - Whether a rejected update stays in flight until `failHeldUpdate` is called.
+ * @returns {Promise<void>} Resolves once the interception is in place.
  */
-async function refuseUpdates(uuid) {
-   await page.evaluate((uuid) => {
+async function interceptUpdates(uuid, mode, held = false) {
+   await page.evaluate(async ({ uuid, mode, held }) => {
       globalThis.titanVeto = {
-         refused: 0,
-         id: Hooks.on('preUpdateItem', (item) => {
-            if (item.uuid === uuid) {
-               globalThis.titanVeto.refused++;
-               return false;
-            }
-         }),
+         attempts: 0,
+         release: () => undefined,
       };
-   }, uuid);
+      if (mode === 'reject') {
+         /** @type {foundry.documents.Item} The item, whose own `update` shadows the class method. */
+         const item = await fromUuid(uuid);
+         item.update = async () => {
+            globalThis.titanVeto.attempts++;
+            if (held) {
+               await new Promise((resolve) => {
+                  globalThis.titanVeto.fail = resolve;
+               });
+            }
+            throw new Error('E2E update rejected');
+         };
+         globalThis.titanVeto.release = () => {
+            delete item.update;
+         };
+         return;
+      }
+      /** @type {number} The id of the listener. */
+      const id = Hooks.on('preUpdateItem', (item) => {
+         if (item.uuid !== uuid) {
+            return undefined;
+         }
+         globalThis.titanVeto.attempts++;
+         return mode === 'refuse' ? false : undefined;
+      });
+      globalThis.titanVeto.release = () => Hooks.off('preUpdateItem', id);
+   }, {
+      uuid,
+      mode,
+      held,
+   });
 }
 
 /**
- * Stops refusing updates.
- * @returns {Promise<number>} The number of updates the listener refused.
+ * Lets the held rejected update throw.
+ * @returns {Promise<void>} Resolves once the update was told to fail.
  */
-async function allowUpdates() {
+async function failHeldUpdate() {
+   await page.evaluate(() => globalThis.titanVeto.fail());
+}
+
+/**
+ * Ends the interception.
+ * @returns {Promise<number>} The number of updates of the item that reached the interception.
+ */
+async function releaseUpdates() {
    return page.evaluate(() => {
-      Hooks.off('preUpdateItem', globalThis.titanVeto.id);
-      const { refused } = globalThis.titanVeto;
+      globalThis.titanVeto.release();
+      const { attempts } = globalThis.titanVeto;
       delete globalThis.titanVeto;
-      return refused;
+      return attempts;
+   });
+}
+
+/**
+ * Calls a check-list method of an item and reports whether it rejected.
+ * @param {string} uuid - The uuid of the item.
+ * @param {'addCheck' | 'deleteCheck'} method - The method to call.
+ * @param {...*} args - The method's arguments.
+ * @returns {Promise<string | null>} The rejection's message, or null when the call resolved.
+ */
+function callRejected(uuid, method, ...args) {
+   return page.evaluate(async ({ uuid, method, args }) => {
+      try {
+         await (await fromUuid(uuid))[method](...args);
+         return null;
+      }
+      catch (error) {
+         return error.message;
+      }
+   }, {
+      uuid,
+      method,
+      args,
    });
 }
 
@@ -111,10 +174,10 @@ function readExpansion(rows) {
 
 test('a refused Add Check leaves no check in the model for the next edit to save', async () => {
    const { uuid, sheet } = await weaponWithChecks('E2E Refused Add Weapon', ['E2E Refused Add A']);
-   await refuseUpdates(uuid);
+   await interceptUpdates(uuid, 'refuse');
    await sheet.getByRole('button', { name: 'Add Check' }).click();
    await settle(page);
-   expect(await allowUpdates(), 'the add check update was refused').toBeGreaterThan(0);
+   expect(await releaseUpdates(), 'the add check update was refused').toBe(1);
 
    /** @type {import('@playwright/test').Locator} The check rows. */
    const rows = sheet.locator('li.reorder-row');
@@ -140,13 +203,13 @@ test('a refused Delete leaves the check and its expansion state for the next edi
       true,
       false,
    ]);
-   await refuseUpdates(uuid);
+   await interceptUpdates(uuid, 'refuse');
    await rows.nth(0).getByRole('button', {
       name: 'Delete',
       exact: true,
    }).click();
    await settle(page, { transitions: true });
-   expect(await allowUpdates(), 'the delete update was refused').toBeGreaterThan(0);
+   expect(await releaseUpdates(), 'the delete update was refused').toBe(1);
    expect(await readExpansion(rows), 'the expansion state is as before the refused delete').toEqual([
       true,
       false,
@@ -190,9 +253,9 @@ test('a refused reorder leaves the expansion state with its rows', async () => {
       true,
       false,
    ]);
-   await refuseUpdates(uuid);
+   await interceptUpdates(uuid, 'refuse');
    await dragGrip(rows.nth(0), rows.nth(2), 'bottom');
-   expect(await allowUpdates(), 'the reorder update was refused').toBeGreaterThan(0);
+   expect(await releaseUpdates(), 'the reorder update was refused').toBe(1);
    expect(await readExpansion(rows), 'the expansion state is as before the refused reorder').toEqual([
       false,
       true,
@@ -206,4 +269,188 @@ test('a refused reorder leaves the expansion state with its rows', async () => {
       'E2E Refused Move B',
       'E2E Refused Move C',
    ]);
+});
+
+test('a refused upward reorder leaves the expansion state with its rows', async () => {
+   const { uuid, sheet } = await weaponWithChecks('E2E Refused Up Weapon', [
+      'E2E Refused Up A',
+      'E2E Refused Up B',
+      'E2E Refused Up C',
+   ]);
+
+   /** @type {import('@playwright/test').Locator} The check rows. */
+   const rows = sheet.locator('li.reorder-row');
+   await page.evaluate(
+      (id) => foundry.applications.instances.get(id).setPosition({
+         top: 10,
+         height: 1000,
+      }),
+      await sheet.getAttribute('id'),
+   );
+   await expect(rows, 'three checks render').toHaveCount(3);
+
+   // The outer rows are collapsed so that the first row's top edge, the drop point, is inside the viewport.
+   await rows.nth(2).getByRole('button', { name: 'Collapse' }).click();
+   await settle(page, { transitions: true });
+   await rows.nth(0).getByRole('button', { name: 'Collapse' }).click();
+   await settle(page, { transitions: true });
+   expect(await readExpansion(rows), 'the middle row is the only expanded one').toEqual([
+      false,
+      true,
+      false,
+   ]);
+   await interceptUpdates(uuid, 'refuse');
+   await dragGrip(rows.nth(2), rows.nth(0), 'top');
+   expect(await releaseUpdates(), 'the reorder update was refused').toBe(1);
+   expect(await readExpansion(rows), 'the expansion state is as before the refused reorder').toEqual([
+      false,
+      true,
+      false,
+   ]);
+});
+
+test('a refused insert leaves the expansion state with its rows', async () => {
+   const source = await weaponWithChecks('E2E Refused Insert Source Weapon', ['E2E Refused Insert Source A']);
+   const target = await weaponWithChecks('E2E Refused Insert Target Weapon', [
+      'E2E Refused Insert Target A',
+      'E2E Refused Insert Target B',
+   ]);
+
+   // The two windows open on top of each other and are made tall, so they are moved apart (a window position is not a
+   // document; the same setup as `drag.spec.js`).
+   await page.evaluate(([sourceId, targetId]) => {
+      foundry.applications.instances.get(sourceId).setPosition({
+         top: 10,
+         left: 10,
+         height: 1000,
+      });
+      foundry.applications.instances.get(targetId).setPosition({
+         top: 10,
+         left: 900,
+         height: 1000,
+      });
+   }, [
+      await source.sheet.getAttribute('id'),
+      await target.sheet.getAttribute('id'),
+   ]);
+
+   /** @type {import('@playwright/test').Locator} The source's check rows. */
+   const sourceRows = source.sheet.locator('li.reorder-row');
+
+   /** @type {import('@playwright/test').Locator} The target's check rows. */
+   const targetRows = target.sheet.locator('li.reorder-row');
+   await expect(sourceRows, 'the source check renders').toHaveCount(1);
+   await expect(targetRows, 'the target checks render').toHaveCount(2);
+   await targetRows.nth(1).getByRole('button', { name: 'Collapse' }).click();
+   await settle(page, { transitions: true });
+   expect(await readExpansion(targetRows), 'the first target row is expanded and the second collapsed').toEqual([
+      true,
+      false,
+   ]);
+   await interceptUpdates(target.uuid, 'refuse');
+   await dragGrip(sourceRows.nth(0), targetRows.nth(0), 'top');
+   expect(await releaseUpdates(), 'the insert update was refused').toBe(1);
+   expect(await readExpansion(targetRows), 'the expansion state is as before the refused insert').toEqual([
+      true,
+      false,
+   ]);
+   expect(
+      (await readServerSystem(page, target.uuid)).check.map((check) => check.label),
+      'the target stored no copy',
+   ).toEqual([
+      'E2E Refused Insert Target A',
+      'E2E Refused Insert Target B',
+   ]);
+});
+
+test('a rejected Add Check leaves no check in the model for the next edit to save', async () => {
+   const { uuid, sheet } = await weaponWithChecks('E2E Rejected Add Weapon', ['E2E Rejected Add A']);
+   await interceptUpdates(uuid, 'reject');
+   expect(await callRejected(uuid, 'addCheck'), 'the add check update was rejected').toBe('E2E update rejected');
+   expect(await releaseUpdates(), 'the rejected update reached the listener once').toBe(1);
+
+   /** @type {import('@playwright/test').Locator} The check rows. */
+   const rows = sheet.locator('li.reorder-row');
+   await commitText(rows.nth(0).locator('.header .label input'), 'E2E Rejected Add Edited');
+   await expect.poll(
+      async () => (await readServerSystem(page, uuid)).check.map((check) => check.label),
+      { message: 'the edit saved one check' },
+   ).toEqual(['E2E Rejected Add Edited']);
+});
+
+test('a rejected Delete leaves the check and its expansion state for the next edit to save', async () => {
+   const { uuid, sheet } = await weaponWithChecks('E2E Rejected Delete Weapon', [
+      'E2E Rejected Delete A',
+      'E2E Rejected Delete B',
+   ]);
+
+   /** @type {import('@playwright/test').Locator} The check rows. */
+   const rows = sheet.locator('li.reorder-row');
+   await expect(rows, 'both checks render').toHaveCount(2);
+   await rows.nth(1).getByRole('button', { name: 'Collapse' }).click();
+   await settle(page, { transitions: true });
+   await interceptUpdates(uuid, 'reject');
+   expect(await callRejected(uuid, 'deleteCheck', 0), 'the delete update was rejected').toBe('E2E update rejected');
+   expect(await releaseUpdates(), 'the rejected update reached the listener once').toBe(1);
+   await settle(page, { transitions: true });
+   expect(await readExpansion(rows), 'the expansion state is as before the rejected delete').toEqual([
+      true,
+      false,
+   ]);
+   await commitText(rows.nth(1).locator('.header .label input'), 'E2E Rejected Delete B Edited');
+   await expect.poll(
+      async () => (await readServerSystem(page, uuid)).check.map((check) => check.label),
+      { message: 'the edit saved both checks' },
+   ).toEqual([
+      'E2E Rejected Delete A',
+      'E2E Rejected Delete B Edited',
+   ]);
+});
+
+test('a toggle made while a rejected Delete is in flight is kept', async () => {
+   const { uuid, sheet } = await weaponWithChecks('E2E Inflight Weapon', [
+      'E2E Inflight A',
+      'E2E Inflight B',
+   ]);
+
+   /** @type {import('@playwright/test').Locator} The check rows. */
+   const rows = sheet.locator('li.reorder-row');
+   await expect(rows, 'both checks render').toHaveCount(2);
+   await settle(page, { transitions: true });
+   await interceptUpdates(uuid, 'reject', true);
+
+   // The method is called directly and not awaited: the rejection is read after the toggle.
+   await page.evaluate(async (uuid) => {
+      globalThis.titanVeto.pending = (await fromUuid(uuid)).deleteCheck(0).then(
+         () => null,
+         (error) => error.message,
+      );
+   }, uuid);
+   await expect(rows, 'the delete removed the first row from the sheet').toHaveCount(1);
+   await rows.nth(0).getByRole('button', { name: 'Collapse' }).click();
+   await expect.poll(() => readExpansion(rows), { message: 'the remaining row collapsed' }).toEqual([false]);
+   await failHeldUpdate();
+   expect(
+      await page.evaluate(() => globalThis.titanVeto.pending),
+      'the delete update was rejected',
+   ).toBe('E2E update rejected');
+   expect(await releaseUpdates(), 'the rejected update reached the item once').toBe(1);
+   await expect(rows, 'the rejection put the first row back').toHaveCount(2);
+   await settle(page, { transitions: true });
+   expect(await readExpansion(rows), 'the toggle of the second row survived the take-back').toEqual([
+      true,
+      false,
+   ]);
+});
+
+test('a click on the Add Check button sends only its own update', async () => {
+   const { uuid, sheet } = await weaponWithChecks('E2E Own Update Weapon', ['E2E Own Update A']);
+   await interceptUpdates(uuid, 'observe');
+   await sheet.getByRole('button', { name: 'Add Check' }).click();
+   await expect.poll(
+      async () => (await readServerSystem(page, uuid)).check.length,
+      { message: 'the click stored the new check' },
+   ).toBe(2);
+   await settle(page);
+   expect(await releaseUpdates(), 'the click sent one update').toBe(1);
 });

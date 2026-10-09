@@ -11,16 +11,25 @@ import moveArrayEntry from '~/helpers/utility-functions/MoveArrayEntry.js';
  * @property {import('svelte/store').Writable<TitanItemSheetData>['subscribe']} subscribe - Registers a reactive
  * subscriber notified on every state change.
  * @property {() => void} postAddCheck - Updates the reactive state store in response to an Item Check being added.
- * @property {(idx: number) => void} preDeleteCheck - Updates the reactive state store in response to an Item Check
- * being deleted.
+ * @property {(idx: number) => (CheckExpansionEntry|undefined)} preDeleteCheck - Updates the reactive state store in
+ * response to an Item Check being deleted. Returns the removed expansion flags, or undefined when no check is at the
+ * index.
  * @property {(fromIdx: number, toIdx: number) => void} postMoveCheck - Reorders the per-check expansion arrays in
  * lockstep with an Item Check reorder.
  * @property {(atIdx: number) => void} postInsertCheck - Splices an expanded flag into the per-check expansion arrays
  * when a copied Item Check is inserted.
- * @property {() => {tabs: boolean[], sidebar: boolean[]}} snapshotCheckExpansion - Copies the per-check expansion
- * arrays of the Checks tab and the sidebar.
- * @property {(snapshot: {tabs: boolean[], sidebar: boolean[]}) => void} restoreCheckExpansion - Puts back the
- * expansion arrays copied by `snapshotCheckExpansion`.
+ * @property {(idx: number, removed: CheckExpansionEntry) => void} undoDeleteCheck - Puts back the expansion flags
+ * `preDeleteCheck` removed, for a delete that did not commit.
+ * @property {(fromIdx: number, toIdx: number) => void} undoMoveCheck - Moves the expansion flags back, for a reorder
+ * that did not commit; takes the arguments of the `postMoveCheck` it takes back.
+ * @property {(atIdx: number) => void} undoInsertCheck - Removes the expansion flags `postInsertCheck` added, for an
+ * insert that did not commit.
+ */
+
+/**
+ * @typedef {object} CheckExpansionEntry The expansion flags of one check.
+ * @property {boolean} tabs - Whether the check is expanded in the Checks tab.
+ * @property {boolean} sidebar - Whether the check is expanded in the sidebar.
  */
 
 /**
@@ -47,13 +56,23 @@ export default function createTitanItemSheetState(item, overrideData) {
    /**
     * Updates the reactive state store in response to an Item Check being deleted.
     * @param {number} idx - The index of the Check about to be deleted.
+    * @returns {CheckExpansionEntry|undefined} The removed expansion flags, or undefined when no check is at the index.
     */
    function preDeleteCheck(idx) {
+      /** @type {CheckExpansionEntry|undefined} The flags taken out of the arrays. */
+      let removed;
       update((data) => {
-         data.tabs.checks.isExpanded.splice(idx, 1);
-         data.sidebar.checks.isExpanded.splice(idx, 1);
+         if (idx >= 0 && idx < data.tabs.checks.isExpanded.length) {
+            removed = {
+               tabs: data.tabs.checks.isExpanded[idx],
+               sidebar: data.sidebar.checks.isExpanded[idx],
+            };
+            data.tabs.checks.isExpanded.splice(idx, 1);
+            data.sidebar.checks.isExpanded.splice(idx, 1);
+         }
          return data;
       });
+      return removed;
    }
 
    /**
@@ -83,31 +102,50 @@ export default function createTitanItemSheetState(item, overrideData) {
       });
    }
 
+   // The three undo methods reverse one entry of the arrays, so an expansion toggle made while the update was in
+   // flight stays; copying the arrays back would overwrite it (measured: `inflight-toggle.jsonl`).
+
    /**
-    * Copies the per-check expansion arrays so a check change that does not commit can be taken back.
-    * @returns {{tabs: boolean[], sidebar: boolean[]}} The copied expansion arrays of the Checks tab and the sidebar.
+    * Puts back the expansion flags `preDeleteCheck` removed.
+    * @param {number} idx - The index the flags were removed from.
+    * @param {CheckExpansionEntry} removed - The flags `preDeleteCheck` returned.
     */
-   function snapshotCheckExpansion() {
-      /** @type {{tabs: boolean[], sidebar: boolean[]}} The copied arrays. */
-      let snapshot;
+   function undoDeleteCheck(idx, removed) {
       update((data) => {
-         snapshot = {
-            tabs: [...data.tabs.checks.isExpanded],
-            sidebar: [...data.sidebar.checks.isExpanded],
-         };
+         data.tabs.checks.isExpanded.splice(idx, 0, removed.tabs);
+         data.sidebar.checks.isExpanded.splice(idx, 0, removed.sidebar);
          return data;
       });
-      return snapshot;
    }
 
    /**
-    * Puts back the per-check expansion arrays copied by `snapshotCheckExpansion`.
-    * @param {{tabs: boolean[], sidebar: boolean[]}} snapshot - The copied expansion arrays.
+    * Moves the expansion flags back after a reorder that did not commit. The moved flag sits at the index the
+    * reorder's insertion point resolved to; the inverse insertion point is the original index, shifted past the moved
+    * flag when it lies after it (`moveArrayEntry` semantics).
+    * @param {number} fromIdx - The `fromIdx` of the `postMoveCheck` to take back.
+    * @param {number} toIdx - The `toIdx` of the `postMoveCheck` to take back.
     */
-   function restoreCheckExpansion(snapshot) {
+   function undoMoveCheck(fromIdx, toIdx) {
+      /** @type {number} The index the moved flag sits at after the reorder. */
+      const movedIdx = toIdx > fromIdx ? toIdx - 1 : toIdx;
+
+      /** @type {number} The insertion point that returns the flag to `fromIdx`. */
+      const backTo = fromIdx > movedIdx ? fromIdx + 1 : fromIdx;
       update((data) => {
-         data.tabs.checks.isExpanded = [...snapshot.tabs];
-         data.sidebar.checks.isExpanded = [...snapshot.sidebar];
+         data.tabs.checks.isExpanded = moveArrayEntry(data.tabs.checks.isExpanded, movedIdx, backTo);
+         data.sidebar.checks.isExpanded = moveArrayEntry(data.sidebar.checks.isExpanded, movedIdx, backTo);
+         return data;
+      });
+   }
+
+   /**
+    * Removes the expansion flags `postInsertCheck` added.
+    * @param {number} atIdx - The insertion point of the `postInsertCheck` to take back.
+    */
+   function undoInsertCheck(atIdx) {
+      update((data) => {
+         data.tabs.checks.isExpanded.splice(atIdx, 1);
+         data.sidebar.checks.isExpanded.splice(atIdx, 1);
          return data;
       });
    }
@@ -120,7 +158,8 @@ export default function createTitanItemSheetState(item, overrideData) {
       preDeleteCheck,
       postMoveCheck,
       postInsertCheck,
-      snapshotCheckExpansion,
-      restoreCheckExpansion,
+      undoDeleteCheck,
+      undoMoveCheck,
+      undoInsertCheck,
    };
 }

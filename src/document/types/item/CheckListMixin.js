@@ -33,8 +33,8 @@ async function commitCheckUpdate(update, undo) {
  * Mixin that adds the mutators of a document's `system.check` array to a document class. Items and Active Effects
  * share the Checks tab (`ItemSheetChecksTab.svelte`), which calls these four methods on its document, so both
  * document classes take them from here. INVARIANT: the document's sheet implements `postAddCheck`, `preDeleteCheck`,
- * `postMoveCheck`, `postInsertCheck`, `snapshotCheckExpansion` and `restoreCheckExpansion`, which keep the per-check
- * expansion state aligned with the array and take it back when an update does not commit.
+ * `postMoveCheck`, `postInsertCheck`, `undoDeleteCheck`, `undoMoveCheck` and `undoInsertCheck`, which keep the
+ * per-check expansion state aligned with the array and take it back when an update does not commit.
  * @param {typeof foundry.abstract.Document} BaseClass - The document class to extend.
  * @returns {typeof foundry.abstract.Document} The extended class with check-list mutators.
  */
@@ -91,15 +91,11 @@ export default function CheckListMixin(BaseClass) {
             'Cannot modify document %s if not owner.',
             this.name,
          )) {
-            /** @type {{tabs: boolean[], sidebar: boolean[]}|undefined} The expansion state before the deletion. */
-            const expansion = this.sheet?.snapshotCheckExpansion();
-
             // Notify the sheet before deletion.
-            if (this.sheet) {
-               this.sheet.preDeleteCheck(idx);
-            }
+            /** @type {object|undefined} The expansion flags the sheet removed with the check. */
+            const removedExpansion = this.sheet?.preDeleteCheck(idx);
 
-            /** @type {ItemCheck} The Check taken out of the live model. */
+            /** @type {ItemCheck|undefined} The Check taken out of the live model, if any. */
             const [removed] = this.system.check.splice(idx, 1);
             await commitCheckUpdate(
                () => this.update({
@@ -108,10 +104,13 @@ export default function CheckListMixin(BaseClass) {
                   },
                }),
                () => {
-                  if (!this.system.check.some((check) => check.uuid === removed.uuid)) {
+                  // The model is already rebuilt from the stored data when the Check is back in it.
+                  if (removed && !this.system.check.some((check) => check.uuid === removed.uuid)) {
                      this.system.check.splice(idx, 0, removed);
                   }
-                  this.sheet?.restoreCheckExpansion(expansion);
+                  if (removedExpansion) {
+                     this.sheet?.undoDeleteCheck(idx, removedExpansion);
+                  }
                },
             );
          }
@@ -129,9 +128,6 @@ export default function CheckListMixin(BaseClass) {
             'Cannot modify document %s if not owner.',
             this.name,
          )) {
-            /** @type {{tabs: boolean[], sidebar: boolean[]}|undefined} The expansion state before the move. */
-            const expansion = this.sheet?.snapshotCheckExpansion();
-
             // Keep per-check expansion state aligned before the reactive re-render.
             if (this.sheet) {
                this.sheet.postMoveCheck(fromIdx, toIdx);
@@ -143,7 +139,7 @@ export default function CheckListMixin(BaseClass) {
                      check: moveArrayEntry(this.system.check, fromIdx, toIdx),
                   },
                }),
-               () => this.sheet?.restoreCheckExpansion(expansion),
+               () => this.sheet?.undoMoveCheck(fromIdx, toIdx),
             );
          }
       }
@@ -164,9 +160,6 @@ export default function CheckListMixin(BaseClass) {
             const next = this.system.check.slice();
             next.splice(atIdx, 0, cloneElementWithNewUuid(element));
 
-            /** @type {{tabs: boolean[], sidebar: boolean[]}|undefined} The expansion state before the insertion. */
-            const expansion = this.sheet?.snapshotCheckExpansion();
-
             // Seed expansion state for the inserted row before the reactive re-render.
             if (this.sheet) {
                this.sheet.postInsertCheck(atIdx);
@@ -178,7 +171,7 @@ export default function CheckListMixin(BaseClass) {
                      check: next,
                   },
                }),
-               () => this.sheet?.restoreCheckExpansion(expansion),
+               () => this.sheet?.undoInsertCheck(atIdx),
             );
          }
       }

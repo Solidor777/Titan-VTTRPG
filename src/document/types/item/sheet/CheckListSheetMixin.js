@@ -1,9 +1,9 @@
 /**
- * Mixin that adds the check-list notifications to a sheet class. `CheckListMixin` (the document side) calls these four
+ * Mixin that adds the check-list notifications to a sheet class. `CheckListMixin` (the document side) calls these
  * methods on `document.sheet` when it changes a check; each forwards to the sheet's `applicationState`, which keeps the
- * per-check expansion state aligned with the `system.check` array. INVARIANT: the sheet's `applicationState` provides
- * `postAddCheck`, `preDeleteCheck`, `postMoveCheck`, `postInsertCheck`, `snapshotCheckExpansion` and
- * `restoreCheckExpansion` (`TitanItemSheetState.js`).
+ * per-check expansion state aligned with the `system.check` array and takes a change back when its update does not
+ * commit. INVARIANT: the sheet's `applicationState` provides `postAddCheck`, `preDeleteCheck`, `postMoveCheck`,
+ * `postInsertCheck`, `undoDeleteCheck`, `undoMoveCheck` and `undoInsertCheck` (`TitanItemSheetState.js`).
  * @param {typeof import('~/document/sheet/TitanDocumentSheet.js').default} BaseClass - The sheet class to extend.
  * @returns {typeof import('~/document/sheet/TitanDocumentSheet.js').default} The extended class.
  */
@@ -21,10 +21,11 @@ export default function CheckListSheetMixin(BaseClass) {
       /**
        * Called before a Check is deleted from this Sheet's document.
        * @param {number} idx - The index of the Check about to be deleted.
-       * @returns {void}
+       * @returns {import('~/document/types/item/sheet/TitanItemSheetState.js').CheckExpansionEntry|undefined} The
+       * expansion flags removed with the check, or undefined when no check is at the index.
        */
       preDeleteCheck(idx) {
-         this.applicationState.preDeleteCheck(idx);
+         return this.applicationState.preDeleteCheck(idx);
       }
 
       /**
@@ -47,20 +48,33 @@ export default function CheckListSheetMixin(BaseClass) {
       }
 
       /**
-       * Copies the per-check expansion state, for `restoreCheckExpansion` when a check change does not commit.
-       * @returns {{tabs: boolean[], sidebar: boolean[]}} The copied expansion arrays of the Checks tab and sidebar.
+       * Called when a Check delete did not commit, to put back the expansion flags `preDeleteCheck` removed.
+       * @param {number} idx - The index of the Check that was to be deleted.
+       * @param {import('~/document/types/item/sheet/TitanItemSheetState.js').CheckExpansionEntry} removed - The flags
+       * `preDeleteCheck` returned.
+       * @returns {void}
        */
-      snapshotCheckExpansion() {
-         return this.applicationState.snapshotCheckExpansion();
+      undoDeleteCheck(idx, removed) {
+         this.applicationState.undoDeleteCheck(idx, removed);
       }
 
       /**
-       * Puts back the per-check expansion state copied by `snapshotCheckExpansion`.
-       * @param {{tabs: boolean[], sidebar: boolean[]}} snapshot - The copied expansion arrays.
+       * Called when a Check reorder did not commit, to move the expansion flags back.
+       * @param {number} fromIdx - The `fromIdx` given to `postMoveCheck`.
+       * @param {number} toIdx - The `toIdx` given to `postMoveCheck`.
        * @returns {void}
        */
-      restoreCheckExpansion(snapshot) {
-         this.applicationState.restoreCheckExpansion(snapshot);
+      undoMoveCheck(fromIdx, toIdx) {
+         this.applicationState.undoMoveCheck(fromIdx, toIdx);
+      }
+
+      /**
+       * Called when a copied Check insert did not commit, to remove the expansion flags `postInsertCheck` added.
+       * @param {number} atIdx - The `atIdx` given to `postInsertCheck`.
+       * @returns {void}
+       */
+      undoInsertCheck(atIdx) {
+         this.applicationState.undoInsertCheck(atIdx);
       }
    };
 }
