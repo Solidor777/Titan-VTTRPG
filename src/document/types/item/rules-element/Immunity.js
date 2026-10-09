@@ -3,8 +3,10 @@ import { CONDITION_IDS } from '~/system/Conditions.js';
 
 /**
  * A Rules Element making a Character immune to a condition or to an effect. While it applies, creating a matching
- * condition or effect on the Character is refused, and an existing one is suppressed until the immunity ends: its
- * modifiers stop applying; immunities it grants still apply. An immunity never suppresses the effect granting it.
+ * condition or effect on the Character is refused, and an existing one is removed or suppressed as the Immunity
+ * Handling setting chooses: Remove (the default) deletes it, except that effects each immune to another in a ring
+ * stay suppressed; Suppress keeps it until the immunity ends, its modifiers stop applying, and immunities it grants
+ * still apply. An immunity never covers the effect granting it.
  * @typedef {object} ImmunityElement
  * @property {string} operation - The operation to be performed by the Rules Element (immunity).
  * @property {string} selector - What the immunity blocks: 'condition' or 'effect'.

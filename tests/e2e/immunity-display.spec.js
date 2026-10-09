@@ -90,6 +90,9 @@ test.beforeAll(async ({ browser }) => {
    errors = attachPageErrors(page);
    await login(page);
    await clearChat(page);
+
+   // The display under test is of suppression; Remove would delete what the ward covers.
+   await setWorldSetting(page, 'immunityHandling', 'suppress');
    actorId = await createActor(page, {
       name: ACTOR_NAME,
       type: 'player',

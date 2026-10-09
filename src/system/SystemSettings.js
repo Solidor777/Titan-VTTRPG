@@ -1,5 +1,6 @@
 import { BUILT_IN_THEMES, buildThemeChoices } from '~/theme/ThemeManager.js';
 import error from '~/helpers/utility-functions/Error.js';
+import { removeImmuneEffectsFromWorld } from '~/document/types/actor/types/character/ImmuneEffectRemoval.js';
 import resolveCheckOptionsMode from '~/helpers/utility-functions/ResolveCheckOptionsMode.js';
 import ThemeEditorApplication from '~/theme/editor/ThemeEditorApplication.js';
 import PlayerHudSettingsApplication from '~/ui/player-hud/settings/PlayerHudSettingsApplication.js';
@@ -409,6 +410,29 @@ export default function registerSystemSettings() {
       restricted: true,
       scope: 'world',
       type: String,
+   });
+
+   // Immunity Handling: what happens to a condition or effect a Character already has when it gains an immunity to it.
+   game.settings.register('titan', 'immunityHandling', {
+      choices: {
+         remove: 'SETTINGS.immunityHandling.remove',
+         suppress: 'SETTINGS.immunityHandling.suppress',
+      },
+      config: true,
+      default: 'remove',
+      hint: 'SETTINGS.immunityHandling.hint',
+      name: 'SETTINGS.immunityHandling.label',
+      restricted: true,
+      scope: 'world',
+      type: String,
+      onChange: (value) => {
+         // Switching to Remove deletes what Suppress kept; removeImmuneEffectsFromWorld runs on the active GM only.
+         if (value === 'remove') {
+            removeImmuneEffectsFromWorld().catch((reason) => {
+               error('Could not remove the effects characters are immune to.', reason);
+            });
+         }
+      },
    });
 
    // Report taking Damage.

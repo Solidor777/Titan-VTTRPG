@@ -34,8 +34,10 @@ and hides from unlinked tokens the converted effects their own changes replace (
   token that removed or replaced the original item, or already holds its own converted copy, including effects earlier
   versions converted: such a token no longer shows a removed effect or a second copy.
 - New Immunity rules element: an item or effect can make a character immune to a condition or to an effect by name.
-  Applying it is refused with a notification, and an existing one is suppressed until the immunity ends: its
-  modifiers stop applying; immunities it grants still apply.
+  Applying it is refused with a notification. A condition or effect the character already has is removed when the
+  immunity arrives (new world setting "Existing Effects on Gaining Immunity": Remove, the default; two effects each
+  immune to the other stay, suppressed) or kept suppressed until the immunity ends (Suppress: its modifiers stop
+  applying; immunities it grants still apply).
 - Other modules and systems can store core's `base` Active Effect on a TITAN actor, item or token. TITAN keeps it and
   loads it after a reload. The character sheet's Effects tab and the Player HUD's effects panel list it as a plain row
   (name, image, active toggle, open and delete controls) that opens in Foundry's default effect sheet, and the Effect

@@ -370,6 +370,7 @@
       "ignoreArmor.text": "Ignore Armor",
       "immuneToEffect.text": "{actor} is immune to {effect} ({sources}).",
       "immunity.text": "Immunity",
+      "immunityRemovedEffect.text": "{effect} was removed from {actor}, who is immune to it ({sources}).",
       "importActor.text": "Import Actor to World",
       "importActorToWorld.text": "Import this Actor to the game world.",
       "importIntoExisting.text": "Existing Compendium",
@@ -915,6 +916,12 @@
          "showButton": "Show Button",
          "enabled": "Enabled",
          "disabled": "Disabled"
+      },
+      "immunityHandling": {
+         "label": "Existing Effects on Gaining Immunity",
+         "hint": "What happens to a condition or effect a character already has when the character gains an immunity to it. Remove: it is deleted (two effects each immune to the other cannot be ordered, so they stay, suppressed). Suppress: it stays on the character and its modifiers stop applying until the immunity ends; immunities it grants still apply, and its duration keeps running. Applying a condition or effect a character is immune to is refused in both modes.",
+         "remove": "Remove",
+         "suppress": "Suppress"
       },
       "reportTakingDamage": {
          "label": "Report Taking Damage",

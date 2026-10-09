@@ -3,6 +3,7 @@ import localize from '~/helpers/utility-functions/Localize.js';
 import capitalize from '~/helpers/utility-functions/Capitalize.js';
 import assert from '~/helpers/utility-functions/Assert.js';
 import error from '~/helpers/utility-functions/Error.js';
+import { removeImmuneEffectsWithDependents } from '~/document/types/actor/types/character/ImmuneEffectRemoval.js';
 
 /**
  * @typedef {object} SpeakerData An object containing data on a Chat Message's speaker.
@@ -109,6 +110,79 @@ export default class TitanActor extends Actor {
       }
 
       return retVal;
+   }
+
+   /**
+    * Performs follow-up logic after this Actor is updated, on every client. The changing client removes the Active
+    * Effects an immunity the update granted covers (equipping armor or a shield in its slot can grant one).
+    * @override
+    * @param {object} changed - The differential data that was changed relative to the document's prior values.
+    * @param {object} options - Additional options which modify the update request.
+    * @param {string} userId - The id of the User who requested the update.
+    * @protected
+    */
+   _onUpdate(changed, options, userId) {
+      super._onUpdate(changed, options, userId);
+      this._removeImmuneEffectsAfterChange(userId);
+   }
+
+   /**
+    * Performs follow-up logic after descendant documents (items, Active Effects) are created, on every client. The
+    * changing client removes the Active Effects a new immunity source covers.
+    * @override
+    * @param {Document} parent - The direct parent of the created documents.
+    * @param {string} collection - The collection within which the documents were created.
+    * @param {Document[]} documents - The created documents.
+    * @param {object[]} data - The source data of the created documents.
+    * @param {object} options - Options which modified the creation operation.
+    * @param {string} userId - The id of the User who triggered the operation.
+    * @protected
+    */
+   _onCreateDescendantDocuments(parent, collection, documents, data, options, userId) {
+      super._onCreateDescendantDocuments(parent, collection, documents, data, options, userId);
+      this._removeImmuneEffectsAfterChange(userId);
+   }
+
+   /**
+    * Performs follow-up logic after descendant documents (items, Active Effects) are updated, on every client. The
+    * changing client removes the Active Effects an enabled, equipped, or edited immunity source now covers.
+    * @override
+    * @param {Document} parent - The direct parent of the updated documents.
+    * @param {string} collection - The collection within which the documents were updated.
+    * @param {Document[]} documents - The updated documents.
+    * @param {object[]} changes - The differential changes applied to the documents.
+    * @param {object} options - Options which modified the update operation.
+    * @param {string} userId - The id of the User who triggered the operation.
+    * @protected
+    */
+   _onUpdateDescendantDocuments(parent, collection, documents, changes, options, userId) {
+      super._onUpdateDescendantDocuments(parent, collection, documents, changes, options, userId);
+      this._removeImmuneEffectsAfterChange(userId);
+   }
+
+   /**
+    * Removes the Active Effects this Character's immunities now cover (Immunity Handling: Remove), on the client whose
+    * user made the change only: deleting world data must happen once, and that client is connected and may write this
+    * Actor. Every change that can grant an immunity (a source created, enabled, equipped, or its rules element edited)
+    * is an Actor update or a descendant create or update, which an unlinked token's ActorDelta emulates on the
+    * synthetic actor (read: `_onUpdate` and `_dispatchDescendantDocumentEvents` in `client/documents/actor-delta.mjs`,
+    * Foundry 14.364). A change to a world actor reaches the synthetic actors of its tokens only through
+    * `removeImmuneEffectsWithDependents` (measured: with that pass off, a token kept its condition after its world
+    * actor gained the immunity). The removal re-derives everything from the prepared Actor, so it
+    * needs no list of which fields changed. A deletion only ends immunities, so it triggers nothing.
+    * @param {string} userId - The id of the User who made the change.
+    * @returns {void}
+    * @private
+    */
+   _removeImmuneEffectsAfterChange(userId) {
+      if (userId !== game.user.id || !this.system?.isCharacter) {
+         return;
+      }
+
+      // The handlers are synchronous; the removal runs after they return and reports its own failure.
+      removeImmuneEffectsWithDependents(this).catch((reason) => {
+         error(`Could not remove the effects "${this.name}" is immune to.`, reason);
+      });
    }
 
    /**

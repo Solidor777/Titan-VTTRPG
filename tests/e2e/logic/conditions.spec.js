@@ -698,6 +698,9 @@ test.describe('conditions — immunity', () => {
    }
 
    test.beforeAll(async () => {
+      // These tests are of suppression; Remove would delete what the ward covers.
+      await setWorldSetting(page, 'immunityHandling', 'suppress');
+
       // The warded effect comes first: a ward in force would refuse a creation of that name.
       wardedId = await addEffect(page, actorId, WARDED_EFFECT_NAME, { duration: DURATION_PERMANENT });
       await addRulesElement(page, `${actorUuid}.ActiveEffect.${wardedId}`, {

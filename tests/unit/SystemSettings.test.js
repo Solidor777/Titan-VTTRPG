@@ -9,8 +9,12 @@ vi.mock('~/theme/ThemeManager.js', () => ({
 vi.mock('~/theme/editor/ThemeEditorApplication.js', () => ({ default: class {} }));
 vi.mock('~/ui/player-hud/settings/PlayerHudSettingsApplication.js', () => ({ default: class {} }));
 vi.mock('~/helpers/utility-functions/Error.js', () => ({ default: vi.fn() }));
+vi.mock('~/document/types/actor/types/character/ImmuneEffectRemoval.js', () => ({
+   removeImmuneEffectsFromWorld: vi.fn(async () => {}),
+}));
 
 import error from '~/helpers/utility-functions/Error.js';
+import { removeImmuneEffectsFromWorld } from '~/document/types/actor/types/character/ImmuneEffectRemoval.js';
 import registerSystemSettings from '~/system/SystemSettings.js';
 
 /** @type {Error} The failure the stubbed settings store rejects the rewrite with. */
@@ -37,6 +41,7 @@ beforeEach(() => {
 afterEach(() => {
    delete globalThis.game;
    vi.mocked(error).mockReset();
+   vi.mocked(removeImmuneEffectsFromWorld).mockClear();
 });
 
 describe('registerSystemSettings — stored check-options rewrite', () => {
@@ -48,5 +53,32 @@ describe('registerSystemSettings — stored check-options rewrite', () => {
       await vi.waitFor(() => {
          expect(error).toHaveBeenCalledWith(expect.stringContaining('getCheckOptions'), STORAGE_FAILURE);
       });
+   });
+});
+
+describe('registerSystemSettings — immunity handling', () => {
+   it('registers a GM world choice, Remove by default, whose switch to Remove clears immune effects', () => {
+      registerSystemSettings();
+
+      /** @type {object} The setting's registration. */
+      const config = game.settings.register.mock.calls.find(([, key]) => key === 'immunityHandling')[2];
+      expect(config).toMatchObject({
+         choices: {
+            remove: 'SETTINGS.immunityHandling.remove',
+            suppress: 'SETTINGS.immunityHandling.suppress',
+         },
+         config: true,
+         default: 'remove',
+         hint: 'SETTINGS.immunityHandling.hint',
+         name: 'SETTINGS.immunityHandling.label',
+         restricted: true,
+         scope: 'world',
+         type: String,
+      });
+
+      config.onChange('suppress');
+      expect(removeImmuneEffectsFromWorld).not.toHaveBeenCalled();
+      config.onChange('remove');
+      expect(removeImmuneEffectsFromWorld).toHaveBeenCalledTimes(1);
    });
 });

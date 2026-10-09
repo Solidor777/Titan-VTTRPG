@@ -918,6 +918,8 @@ test.describe('immunity and turn durations', () => {
       ],
    ]) {
       test(`a suppressed ${duration} effect keeps counting down`, async () => {
+         // Remove would delete the timer the ward covers; the timer under test is suppressed.
+         await setWorldSetting(gm, 'immunityHandling', 'suppress');
          await setWorldSetting(gm, 'autoDecreaseEffectDuration', true);
          await setWorldSetting(gm, 'autoRemoveExpiredEffects', 'disabled');
 
