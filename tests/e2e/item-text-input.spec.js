@@ -1,7 +1,7 @@
 import { expect, test } from './harness.js';
 import { login, openSheetByUuid } from './fixtures.js';
 import { addCheck, createActor, createOwnedItem, readServerSystem } from './flows.js';
-import { commitText } from './actions.js';
+import { clickSheetTab, commitText } from './actions.js';
 import { withClients } from './multiClient.js';
 import { settle } from './settle.js';
 import { attachPageErrors, closeAllApps } from './world.js';
@@ -317,6 +317,7 @@ test('a cancelled composition leaves the label as it was and sends nothing while
          .toBe('E2E Cancel Original');
       await input.blur();
       await settle(page);
+      expect(await readUpdateCount(), 'the end of the cancelled composition sent one update').toBe(1);
       expect(await input.inputValue(), 'the input shows the original label').toBe('E2E Cancel Original');
       expect((await readServerSystem(page, uuid)).check[0].label, 'the server holds the original label')
          .toBe('E2E Cancel Original');
@@ -395,4 +396,40 @@ test('a composition that is running when another client renames the item is not 
    finally {
       await client.detach();
    }
+});
+
+test('an unfocused label input shows the label another client set', async ({ browser }) => {
+   const { uuid, input } = await weaponWithCheck('Follow Unfocused');
+   await input.blur();
+   await withClients(browser, { other: 'E2E GM 2' }, async ({ other }) => {
+      /** @type {import('@playwright/test').Locator} The weapon's sheet on the other client. */
+      const otherSheet = await openSheetByUuid(other, uuid);
+      await clickSheetTab(otherSheet, 'Checks');
+      await commitText(otherSheet.locator('.check .header .label input').first(), 'E2E Remote Label');
+      await expect.poll(
+         async () => (await readServerSystem(page, uuid)).check[0].label,
+         { message: 'the server stores the remote label' },
+      ).toBe('E2E Remote Label');
+   });
+   await expect(input, 'the unfocused input shows the remote label').toHaveValue('E2E Remote Label');
+});
+
+test('a focused, unedited label input shows a label another client set once it loses focus', async ({ browser }) => {
+   const { uuid, input } = await weaponWithCheck('Follow After Blur');
+   await input.focus();
+   await withClients(browser, { other: 'E2E GM 2' }, async ({ other }) => {
+      /** @type {import('@playwright/test').Locator} The weapon's sheet on the other client. */
+      const otherSheet = await openSheetByUuid(other, uuid);
+      await clickSheetTab(otherSheet, 'Checks');
+      await commitText(otherSheet.locator('.check .header .label input').first(), 'E2E Remote Label');
+      await expect.poll(
+         () => page.evaluate(async (uuid) => (await fromUuid(uuid)).system.check[0].label, uuid),
+         { message: 'the remote label reached the first page' },
+      ).toBe('E2E Remote Label');
+   });
+   await input.blur();
+   await expect(input, 'the input shows the remote label after the blur').toHaveValue('E2E Remote Label');
+   await settle(page);
+   expect((await readServerSystem(page, uuid)).check[0].label, 'the blur changed nothing')
+      .toBe('E2E Remote Label');
 });
