@@ -545,6 +545,46 @@ test.describe('the row of a base effect', () => {
       ).toBe(false);
    });
 
+   test('an expanded row shows the description a base effect carries', async () => {
+      /** @type {string} The text of the description the module-made effect carries. */
+      const text = `E2E base description ${RUN}`;
+      /** @type {string} The name of the effect made for this test. */
+      const name = `E2E Base Described ${RUN}`;
+      /** @type {string} The id of the effect made for this test. */
+      const id = await createBaseEffect(`Actor.${actorIds.main}`, name, { description: `<p>${text}</p>` });
+      expect(id, 'the creation returned an effect id').not.toBe('');
+      try {
+         /** @type {import('@playwright/test').Locator} The main actor's sheet. */
+         const sheet = await openEffectsTab();
+         /** @type {import('@playwright/test').Locator} The effect's row. */
+         const row = sheet.locator(`li.effect[data-effect-id="${id}"]`);
+         await expect(row, 'the effect has a row').toBeVisible();
+         await expect(row.getByText(text), 'the collapsed row hides the description').toHaveCount(0);
+         await row.locator('[data-view-controls] button').click();
+         await expect(row.getByText(text), 'the expanded row shows the description').toBeVisible();
+
+         await viewScene(page, sceneId);
+         await controlPlacedToken(page, tokenIds.main);
+
+         /** @type {import('@playwright/test').Locator} The effect's HUD row. */
+         const hudRow = hud('player-hud-effect-row').filter({ hasText: name });
+         await expect(hudRow, 'the effect has a HUD row').toBeVisible();
+         await expect(hudRow.getByText(text), 'the collapsed HUD row hides the description').toHaveCount(0);
+         await hudRow.getByRole('button', { name: /: Expand$/ }).click();
+         await expect(hudRow.getByText(text), 'the expanded HUD row shows the description').toBeVisible();
+      }
+      finally {
+         // A base effect made for one test is removed through the document API, as no test keeps it.
+         await page.evaluate(
+            ({ actorId, effectId }) => game.actors.get(actorId).effects.get(effectId)?.delete(),
+            {
+               actorId: actorIds.main,
+               effectId: id,
+            },
+         );
+      }
+   });
+
    test('the HUD row expands to the toggle, open and delete controls of a base effect', async () => {
       /** @type {string} The uuid of the base effect. */
       const uuid = `Actor.${actorIds.main}.ActiveEffect.${baseId}`;
@@ -562,12 +602,13 @@ test.describe('the row of a base effect', () => {
 
       /** @type {import('@playwright/test').Locator} The row's active toggle. */
       const toggle = row.locator('[data-testid="player-hud-effect-active"]');
-      await expect(toggle).toBeVisible();
+      await expect(toggle.locator('i.fa-square-check'), 'the toggle shows the effect active').toBeVisible();
       expect(await readDisabled(uuid), 'the server holds the effect enabled').toBe(false);
       try {
          await toggle.click();
          await expect.poll(() => readDisabled(uuid), { message: 'the HUD toggle stored the effect disabled' })
             .toBe(true);
+         await expect(toggle.locator('i.fa-square'), 'the toggle shows the effect inactive').toBeVisible();
       }
       finally {
          if (await readDisabled(uuid)) {
