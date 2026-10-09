@@ -7,6 +7,12 @@ import resolveDocumentSheetArguments from '~/helpers/utility-functions/ResolveDo
 const { DocumentSheetV2 } = foundry.applications.api;
 
 /**
+ * Form handler of a TITAN document sheet: a submission of the sheet's form changes nothing.
+ * @returns {Promise<void>} Resolves at once.
+ */
+async function ignoreFormSubmission() {}
+
+/**
  * @class TitanDocumentSheet
  * @extends {DocumentSheetV2}
  * A Document Sheet that mounts a Svelte 5 component tree into the ApplicationV2 content element.
@@ -64,6 +70,15 @@ export default class TitanDocumentSheet extends DocumentSheetV2 {
       window: {
          resizable: false,
          minimizable: true,
+      },
+
+      // The Svelte components write the document themselves, and the sheet's form has no named fields. Core's form
+      // handler would send an update of the form data (measured: `{type}`) for every click on a button without a
+      // `type` attribute (the Add Check button) and for Enter in a text input.
+      form: {
+         handler: ignoreFormSubmission,
+         submitOnChange: false,
+         closeOnSubmit: false,
       },
    };
 
