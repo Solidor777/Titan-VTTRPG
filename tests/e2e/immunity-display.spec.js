@@ -1,5 +1,11 @@
 import { expect, test } from './harness.js';
-import { DURATION_PERMANENT, DURATION_TURN_END, DURATION_TURN_START } from '~/system/DurationTypes.js';
+import {
+   DURATION_CUSTOM,
+   DURATION_INITIATIVE,
+   DURATION_PERMANENT,
+   DURATION_TURN_END,
+   DURATION_TURN_START,
+} from '~/system/DurationTypes.js';
 import { clickSheetTab } from './actions.js';
 import { forceDice, resetDice } from './dice.js';
 import { login, openSheetByUuid } from './fixtures.js';
@@ -14,6 +20,7 @@ import {
    endCombat,
    nextTurn,
    placeToken,
+   readServerSystem,
    removeCondition,
    rollInitiative,
    setEffectActive,
@@ -62,6 +69,18 @@ const BLADE_NAME = 'E2E Display Blade';
 /** @type {string} Name of the turn-end effect the ward is immune to. */
 const TIMER_NAME = 'E2E Display Timer';
 
+/** @type {string} Name of the initiative-duration effect the ward is immune to. */
+const INITIATIVE_NAME = 'E2E Display Initiative';
+
+/** @type {string} Name of the custom-duration effect the ward is immune to. */
+const CUSTOM_NAME = 'E2E Display Custom';
+
+/** @type {string} Name of the permanent effect the ward is immune to. */
+const PERMANENT_NAME = 'E2E Display Charm';
+
+/** @type {number} The most Next Turn presses that reach the actor's turn in a two-combatant encounter. */
+const MAX_TURN_PRESSES = 4;
+
 /** @type {number} The turns the blade starts with. */
 const BLADE_TURNS = 3;
 
@@ -79,7 +98,7 @@ test.beforeAll(async ({ browser }) => {
    tokenId = await placeToken(page, actorId);
    opponentTokenId = await placeToken(page, await shared(page, 'npc'));
 
-   // The ward is immune to a condition and to two effects by name; it ends before the immune things are created,
+   // The ward is immune to a condition and to effects by name; it ends before the immune things are created,
    // because a ward in force refuses their creation.
    wardId = await addEffect(page, actorId, WARD_NAME, { duration: DURATION_PERMANENT });
    for (const element of [
@@ -95,6 +114,21 @@ test.beforeAll(async ({ browser }) => {
       },
       {
          key: TIMER_NAME,
+         operation: 'immunity',
+         selector: 'effect',
+      },
+      {
+         key: INITIATIVE_NAME,
+         operation: 'immunity',
+         selector: 'effect',
+      },
+      {
+         key: CUSTOM_NAME,
+         operation: 'immunity',
+         selector: 'effect',
+      },
+      {
+         key: PERMANENT_NAME,
          operation: 'immunity',
          selector: 'effect',
       },
@@ -243,20 +277,22 @@ test('a suppressed condition in the HUD tray is dimmed and its popout tagged unt
    await expect(popout).toBeVisible();
    await expect(tag).toHaveCount(0);
 
-   // The ward's toggle is in the sheet, and a press outside the popout dismisses it.
+   // The ward's toggle is in the sheet; a press outside the popout dismisses it, so the ward is switched with the
+   // keyboard on the toggle's button while the popout stays open.
    await setWard(true);
-   await closeAllApps(page);
    await expect(image).toHaveCSS('opacity', '0.5');
    await icon.click();
    await expect(popout).toBeVisible();
    await expect(tag).toContainText(WARD_NAME);
 
-   await setWard(false);
-   await closeAllApps(page);
-   await expect(image).toHaveCSS('opacity', '1');
-   await icon.click();
+   /** @type {import('@playwright/test').Locator} The ward row's active toggle. */
+   const wardToggle = page.locator(`.application.titan-document-sheet li.effect[data-effect-id="${wardId}"]`)
+      .locator('i.fa-square-check').locator('xpath=ancestor::button[1]');
+   await wardToggle.focus();
+   await page.keyboard.press('Enter');
+   await expect(tag, 'the open popout lost its tag when the immunity ended').toHaveCount(0);
    await expect(popout).toBeVisible();
-   await expect(tag).toHaveCount(0);
+   await expect(image).toHaveCSS('opacity', '1');
 
    // Escape dismisses the popout; an open popout would take the Escape key that releases the token's control.
    await page.keyboard.press('Escape');
@@ -293,9 +329,13 @@ async function nextTurnReport(type, untilActorTurn) {
    /** @type {number} The chat-message count before the turns. */
    const before = await page.evaluate(() => game.messages.size);
    if (untilActorTurn) {
-      do {
+      /** @type {boolean} Whether the actor holds the turn. */
+      let actorTurn = false;
+      for (let press = 0; press < MAX_TURN_PRESSES && !actorTurn; press++) {
          await nextTurn(page);
-      } while (!await page.evaluate((id) => game.combat.combatant.actorId === id, actorId));
+         actorTurn = await page.evaluate((id) => game.combat.combatant.actorId === id, actorId);
+      }
+      expect(actorTurn, `the actor's turn started within ${MAX_TURN_PRESSES} presses`).toBe(true);
    } else {
       await nextTurn(page);
    }
@@ -331,14 +371,12 @@ function reportSuppressedTags(messageId) {
 }
 
 /**
- * Reads the blade's remaining turns.
- * @returns {Promise<number>} The blade's remaining duration.
+ * Reads the remaining turns the server holds for an effect of the actor.
+ * @param {string} effectId - The id of the effect whose stored duration is read.
+ * @returns {Promise<number>} The effect's stored remaining duration.
  */
-function readBladeRemaining() {
-   return page.evaluate(({ id, effectId }) => game.actors.get(id).effects.get(effectId).system.duration.remaining, {
-      effectId: bladeId,
-      id: actorId,
-   });
+async function readRemaining(effectId) {
+   return (await readServerSystem(page, `${actorUuid}.ActiveEffect.${effectId}`)).duration.remaining;
 }
 
 test('a turn-start report tags a suppressed condition and a suppressed effect whose duration still ticks', async () => {
@@ -347,14 +385,15 @@ test('a turn-start report tags a suppressed condition and a suppressed effect wh
    await applyContaminated();
 
    /** @type {number} The blade's turns before the combat. */
-   const turnsBefore = await readBladeRemaining();
+   const turnsBefore = await readRemaining(bladeId);
    await setWard(true);
    await closeAllApps(page);
    await startEncounter();
 
    /** @type {{id: string, system: object}} The actor's turn-start report. */
    const report = await nextTurnReport('turnStartReport', true);
-   expect(await readBladeRemaining(), 'the suppressed blade ticked at the turn start').toBe(turnsBefore - 1);
+   await expect.poll(() => readRemaining(bladeId), { message: 'the suppressed blade ticked at the turn start' })
+      .toBe(turnsBefore - 1);
    expect(report.system.conditions).toEqual([
       expect.objectContaining({ suppressedBy: [WARD_NAME] }),
    ]);
@@ -396,13 +435,7 @@ test('a turn-end report tags a suppressed effect that expired while suppressed',
 
    /** @type {{id: string, system: object}} The actor's turn-end report. */
    const report = await nextTurnReport('turnEndReport', false);
-   expect(
-      await page.evaluate(({ id, effectId }) => game.actors.get(id).effects.get(effectId).system.duration.remaining, {
-         effectId: timerId,
-         id: actorId,
-      }),
-      'the suppressed timer ticked to expiry',
-   ).toBe(0);
+   await expect.poll(() => readRemaining(timerId), { message: 'the suppressed timer ticked to expiry' }).toBe(0);
    expect(report.system.effects.expired).toEqual([
       expect.objectContaining({
          label: TIMER_NAME,
@@ -411,4 +444,52 @@ test('a turn-end report tags a suppressed effect that expired while suppressed',
    ]);
    await expect(reportSuppressedTags(report.id)).toHaveCount(1);
    await expect(reportSuppressedTags(report.id)).toContainText(WARD_NAME);
+});
+
+test('a turn-start report tags suppressed initiative, custom and permanent effects in their own groups', async () => {
+   await setWorldSetting(page, 'reportEffects', true);
+
+   /** @type {string[]} The ids of the three effects, in the order of the groups. */
+   const ids = [
+      await addEffect(page, actorId, INITIATIVE_NAME, {
+         duration: DURATION_INITIATIVE,
+         initiative: 12,
+         remaining: 5,
+      }),
+      await addEffect(page, actorId, CUSTOM_NAME, {
+         duration: DURATION_CUSTOM,
+         remaining: 5,
+      }),
+      await addEffect(page, actorId, PERMANENT_NAME, { duration: DURATION_PERMANENT }),
+   ];
+   expect(ids, 'the three effects were created before the ward').toHaveLength(3);
+   await setWard(true);
+   await closeAllApps(page);
+   await startEncounter();
+
+   /** @type {{id: string, system: object}} The actor's turn-start report. */
+   const report = await nextTurnReport('turnStartReport', true);
+   expect(report.system.effects[DURATION_INITIATIVE]).toEqual([
+      expect.objectContaining({
+         initiative: 12,
+         label: INITIATIVE_NAME,
+         suppressedBy: [WARD_NAME],
+      }),
+   ]);
+   expect(report.system.effects[DURATION_CUSTOM]).toEqual([
+      expect.objectContaining({
+         label: CUSTOM_NAME,
+         suppressedBy: [WARD_NAME],
+      }),
+   ]);
+
+   // The permanent group lists the ward unmarked beside the suppressed charm.
+   /** @type {object[]} The permanent group's entries by label. */
+   const permanent = report.system.effects[DURATION_PERMANENT];
+   expect(permanent.find((entry) => entry.label === PERMANENT_NAME).suppressedBy).toEqual([WARD_NAME]);
+   expect(permanent.find((entry) => entry.label === WARD_NAME), 'the ward is listed').toBeDefined();
+   expect(permanent.find((entry) => entry.label === WARD_NAME).suppressedBy).toBeUndefined();
+
+   // The three new entries, the blade and the timer of the earlier tests are suppressed; the ward is not.
+   await expect(reportSuppressedTags(report.id)).toHaveCount(5);
 });

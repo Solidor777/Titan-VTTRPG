@@ -525,11 +525,12 @@ async function hoverToken(page, tokenId) {
       return canvas.clientCoordinatesFromCanvas(token.center);
    }, tokenId);
 
-   // The release of control clears the token's hover flag but not its interaction manager's hover state (read:
-   // `PlaceableObject#_onRelease`, `placeable-object.mjs:786`), and a manager in that state skips the next
-   // pointer-over (read: `#handlePointerOver`, `mouse-handler.mjs:405-411`), so `restOnToken` would never see the
-   // token hovered. The pointer enters and leaves the token before the release: the manager's own pointer-out ends
-   // the state while the token is still hovered.
+   // Read: the release of control sets the token's hover flag false without touching its interaction manager's state
+   // (`PlaceableObject#_onRelease`, `placeable-object.mjs:786`), and the manager skips a pointer-over while that state
+   // is not NONE (`#handlePointerOver`, `mouse-handler.mjs:405-411`). Measured: on failing runs the token had hover
+   // false and manager state HOVER after the release. Inferred, not established: the pointer-out that resets the
+   // state did not reach the manager. The pointer enters and leaves the token before the release so that a pointer-out
+   // arrives while the token is still hovered; `restOnToken` then requires the state NONE.
    await page.mouse.move(centre.x, centre.y, { steps: 5 });
    await page.mouse.move(centre.x + 200, centre.y);
    await releaseTokenControl(page);
@@ -538,8 +539,8 @@ async function hoverToken(page, tokenId) {
 }
 
 /**
- * Moves the pointer onto a placed token from outside it and waits until the canvas shows the token hovered and its
- * last press is older than the double-click time. A token's
+ * Moves the pointer onto a placed token from outside it and waits until its interaction manager has left the hover
+ * state, the canvas shows the token hovered and its last press is older than the double-click time. A token's
  * interaction manager handles a pointer-down only from its HOVER state on (read: `#handleLeftDown` and
  * `#handleRightDown`, `client/canvas/interaction/mouse-handler.mjs:474-475` and `565-566`, Foundry 14.364 at
  * `C:\FoundryVTT\V14\dev\foundry`), so the pointer re-enters the token whenever it has been elsewhere.
@@ -550,6 +551,14 @@ async function hoverToken(page, tokenId) {
  */
 async function restOnToken(page, tokenId, centre) {
    await page.mouse.move(centre.x + 200, centre.y);
+   await expect.poll(
+      () => page.evaluate((tokenId) => {
+         /** @type {Record<string, number>} The interaction states. */
+         const states = foundry.canvas.interaction.MouseInteractionManager.INTERACTION_STATES;
+         return canvas.scene.tokens.get(tokenId).object.mouseInteractionManager.state === states.NONE;
+      }, tokenId),
+      { message: 'the pointer-out left the interaction manager of the token in the state NONE' },
+   ).toBe(true);
    await page.mouse.move(centre.x, centre.y, { steps: 5 });
    await expect.poll(
       () => page.evaluate((tokenId) => canvas.scene.tokens.get(tokenId).object.hover, tokenId),

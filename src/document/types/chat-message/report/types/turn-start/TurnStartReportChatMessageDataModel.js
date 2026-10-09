@@ -34,10 +34,9 @@ export default class TurnStartReportChatMessageDataModel extends ReportChatMessa
          // Turn-start rich-text messages: each entry is an HTML string rendered by ChatMessageRichTextMessages.
          message: createArrayField(createStringField(), []),
 
-         // Active conditions snapshot: each entry is a `{ label, img, descriptionKey, suppressedBy? }` object, the key
-         // localized when the card renders and `suppressedBy` naming the immunities suppressing the condition; the
-         // entry of a condition a GM edited, and an entry from a report posted before conditions stored keys, holds
-         // `description` text instead.
+         // Active conditions snapshot: each entry is a `{ label, img, descriptionKey, suppressedBy? }` object. The card
+         // localizes `descriptionKey` when it renders; `suppressedBy` names the immunities suppressing the condition.
+         // The entry of a condition a GM edited holds `description` text instead of the key.
          conditions: createArrayField(createObjectField(), []),
       };
    }
