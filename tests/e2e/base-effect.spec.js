@@ -10,6 +10,7 @@ import {
    createOwnedItem,
    createScene,
    effectActiveToggle,
+   hudEffectToggleIcon,
    openTrayPack,
    placeToken,
    readServerDocument,
@@ -310,7 +311,8 @@ test.describe('TITAN never uses a base effect', () => {
    test('the derived stats and conditions are those of the actor without it', async () => {
       await expectBaseEffectHeld();
       // Checks only that listing the base effect leaves the derived stats unchanged.
-      // Not mutation-proven: a base effect carries no rules elements, so no plausible regression changes them.
+      // Not mutation-proven. Inferred: a base effect carries no rules elements, so no plausible regression changes
+      // them.
       expect(await readDerived(), 'the stats equal those before the effect').toBe(baselineDerived);
       expect(
          await page.evaluate((actorId) => game.actors.get(actorId).system.getConditions(), actorIds.main),
@@ -340,7 +342,8 @@ test.describe('TITAN never uses a base effect', () => {
       await expect(sheet.locator(`[data-effect-id="${baseId}"]`), 'the base effect has a row').toBeVisible();
       await expect(sheet.locator('li.effect')).toHaveCount(2);
       // Checks only that listing the base effect in the Effects tab leaves the derived stats unchanged.
-      // Not mutation-proven: a base effect carries no rules elements, so no plausible regression changes them.
+      // Not mutation-proven. Inferred: a base effect carries no rules elements, so no plausible regression changes
+      // them.
       expect(await readDerived(), 'the listed base effect leaves the stats as they were').toBe(baselineDerived);
    });
 
@@ -516,7 +519,8 @@ test.describe('the row of a base effect', () => {
       }
       await expect.poll(() => readDisabled(uuid), { message: 'the toggle stored the effect enabled' }).toBe(false);
       // Checks only that listing and toggling the base effect leaves the derived stats unchanged.
-      // Not mutation-proven: a base effect carries no rules elements, so no plausible regression changes them.
+      // Not mutation-proven. Inferred: a base effect carries no rules elements, so no plausible regression changes
+      // them.
       expect(await readDerived(), 'the toggles left the stats as they were').toBe(baselineDerived);
    });
 
@@ -623,13 +627,13 @@ test.describe('the row of a base effect', () => {
 
       /** @type {import('@playwright/test').Locator} The row's active toggle. */
       const toggle = row.locator('[data-testid="player-hud-effect-active"]');
-      await expect(toggle.locator('i.fa-square-check'), 'the toggle shows the effect active').toBeVisible();
+      await expect(hudEffectToggleIcon(toggle, true), 'the toggle shows the effect active').toBeVisible();
       expect(await readDisabled(uuid), 'the server holds the effect enabled').toBe(false);
       try {
          await toggle.click();
          await expect.poll(() => readDisabled(uuid), { message: 'the HUD toggle stored the effect disabled' })
             .toBe(true);
-         await expect(toggle.locator('i.fa-square'), 'the toggle shows the effect inactive').toBeVisible();
+         await expect(hudEffectToggleIcon(toggle, false), 'the toggle shows the effect inactive').toBeVisible();
       }
       finally {
          if (await readDisabled(uuid)) {
@@ -705,12 +709,12 @@ test.describe('the row of a base effect', () => {
 
          /** @type {import('@playwright/test').Locator} The popout's active toggle. */
          const toggle = popout.locator('[data-testid="player-hud-effect-active"]');
-         await expect(toggle.locator('i.fa-square-check'), 'the toggle shows the effect active').toBeVisible();
+         await expect(hudEffectToggleIcon(toggle, true), 'the toggle shows the effect active').toBeVisible();
          try {
             await toggle.click();
             await expect.poll(() => readDisabled(uuid), { message: 'the popout toggle stored the effect disabled' })
                .toBe(true);
-            await expect(toggle.locator('i.fa-square'), 'the toggle shows the effect inactive').toBeVisible();
+            await expect(hudEffectToggleIcon(toggle, false), 'the toggle shows the effect inactive').toBeVisible();
          }
          finally {
             if (await readDisabled(uuid)) {

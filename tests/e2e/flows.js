@@ -1124,6 +1124,17 @@ export function effectActiveToggle(sheet, effectId, active) {
 }
 
 /**
+ * Locates the state icon inside the active toggle of a Player HUD effect (a row's detail or a tray popout): the checked
+ * box shows an active effect, the unchecked box an inactive one.
+ * @param {import('@playwright/test').Locator} toggle - The HUD effect's active toggle button.
+ * @param {boolean} active - Whether the icon is the one an active effect shows (true) or an inactive one (false).
+ * @returns {import('@playwright/test').Locator} The toggle's state icon.
+ */
+export function hudEffectToggleIcon(toggle, active) {
+   return toggle.locator(active ? 'i.fa-square-check' : 'i.fa-square');
+}
+
+/**
  * Switches a permanent effect on or off with the active toggle of its row in the actor's Effects tab.
  * @param {import('@playwright/test').Page} page - A logged-in page.
  * @param {string} actorUuid - The uuid of the actor whose Effects tab holds the toggle.
