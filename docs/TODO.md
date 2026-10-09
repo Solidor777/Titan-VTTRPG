@@ -40,7 +40,8 @@ Completed items are deleted, not marked done.
     Create Fissure (damage), Grasping Earth (duration), Abyssal Darkness (Defense/Reflexes +2), Chained Bolts (extra
     targets)): add the aspects where the existing mechanics allow; no new mechanics.
   - Blood Probe, Conjurer of Urdokai, Pull of Urdokai, Warding of Urdokai: add the check entries.
-  - Force Speed and the three Elder Sibling effects: no change; granting speeds the creature lacks is intended.
+  - Force Speed and the three Elder Sibling effects: no change to the granted speeds; granting speeds the creature
+    lacks is intended. The Elder Sibling effects also gain immunity to Contaminated (user ruling 2026-10-09).
   - Urderic Glaivegun: the rules text gains a range (the compendium's Strike range 2 stands).
   - Light Attunement: carry both the "Attunement" and "Light" traits.
   - Shockwave: match the rules ("each creature adjacent to you").
@@ -50,7 +51,13 @@ Completed items are deleted, not marked done.
   - Empower Soul: replace the Aether Blades text in its roll message.
   - Blue Magister: add the name prefix to the casting roll message.
   - Stray `type` fields on rules elements and trait entries: strip them.
-  - Metal Attunement and Effulgent Gaze: `removeCondition` where the rules grant immunity (plan B Task 16).
+  - Condition immunities the rules grant (user rulings 2026-10-09; Metal Attunement and Effulgent Gaze are built in
+    plan B Task 16): Elder Sibling Body/Mind, Mind/Soul and Body/Soul gain an `immunity` element for Contaminated;
+    Blessing of the Arbiter, Sleepless gains Sleeping and Unconscious. Tempest Herald ("immune to all conditions
+    except Dying") gains one `immunity` element per existing condition id except `dead` (controller judgement,
+    inferred: Dying leads to Dead, so Dead must stay possible); add the Dying exception when the Dying condition exists.
+  - Review the compendium module for other effects whose text grants condition immunity: the plan B Task 16 review
+    searched `src/packs` by text and its output omitted very long lines.
   - Parch: clamp Speed at 1, as the rules say "to a minimum of 1" (user ruling 2026-10-08). Check how the clamp
     applies to Fly, Swim, Burrow and Climb when implementing.
   - No change: Lord of Black Flames (the custom trait "Unarmed" in its roll message is a placeholder).
@@ -106,3 +113,12 @@ Completed items are deleted, not marked done.
   code, not measured: a tab first shown after a sheet turned read-only mounts its controls after the render that
   disabled the rest, so its Filter would be usable by an observer while the Filter of the tab shown at the first
   render is not.
+
+- Dying condition (user, 2026-10-09): a condition granted automatically when a Character reaches 0 Toughness while it
+  has wounds. Tempest Herald's immunity to all conditions except Dying depends on it.
+
+- Immunity by trait (user ruling 2026-10-09; extends the entry above for the rules that need it): Light Attunement,
+  Brightness ("cannot be Blinded by bright light", conditional on the source being a Light effect); Presence of the
+  Arbiter (immunity to Charmed or Frightened for the caster and allies within 5 spaces) and Animate Corpse (immune to
+  mind-affecting conditions) wait for a trait covering mind control and similar effects, which the user will make
+  later. Cleansing Shroud ("immune to the chosen Condition") needs a way to choose the condition; not yet ruled.
