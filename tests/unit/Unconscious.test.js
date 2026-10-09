@@ -85,6 +85,19 @@ describe('fallUnconscious', () => {
       ]));
    });
 
+   it('attempts each condition even when an earlier toggle fails, and reports the failure', async () => {
+      /** @type {Function} The console.error spy, silencing the expected error output. */
+      const consoleError = vi.spyOn(console, 'error').mockImplementation(() => {});
+
+      /** @type {object} The model, whose first toggle fails. */
+      const model = createCharacter(true);
+      model.parent.toggleStatusEffect.mockRejectedValueOnce(new Error('update refused'));
+      await model.fallUnconscious();
+      expect(model.parent.toggleStatusEffect.mock.calls.map(([id]) => id)).toEqual(UNCONSCIOUS_COMPANION_CONDITIONS);
+      expect(consoleError).toHaveBeenCalledTimes(1);
+      consoleError.mockRestore();
+   });
+
    it('changes nothing for a non-owner', async () => {
       /** @type {Function} The console.assert spy, silencing the expected assertion output. */
       const consoleAssert = vi.spyOn(console, 'assert').mockImplementation(() => {});

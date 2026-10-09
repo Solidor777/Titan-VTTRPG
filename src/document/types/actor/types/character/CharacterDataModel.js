@@ -110,6 +110,7 @@ import {
 import { getSuppressingImmunitySources } from '~/document/types/active-effect/IsSuppressedByImmunity.js';
 import AddInventoryItemDialog from '~/document/types/actor/dialogs/AddInventoryItemDialog.js';
 import assert from '~/helpers/utility-functions/Assert.js';
+import error from '~/helpers/utility-functions/Error.js';
 
 /**
  * Options for applying Damage to a Character.
@@ -6532,7 +6533,10 @@ export default class CharacterDataModel extends TitanActorDataModel {
    /**
     * Applies what falling Unconscious does besides the condition itself: the Character falls Prone and is
     * Incapacitated, each applied only if absent. An immunity to either refuses it as for any other application.
-    * Source: TITAN Rules Compendium (09_26_2026), "Unconscious".
+    * Each condition is attempted independently: a failed toggle is reported and does not skip the other. Source: TITAN
+    * Rules Compendium (09_26_2026), "Unconscious".
+    * TODO: Unequip the Character's equipped weapons and shield (the rules' "drops anything it is holding"); logged in
+    * docs/TODO.md as "Unconscious drops held gear".
     * @returns {Promise<void>}
     */
    async fallUnconscious() {
@@ -6546,7 +6550,12 @@ export default class CharacterDataModel extends TitanActorDataModel {
 
       // An active toggle leaves a condition the Character already has alone.
       for (const conditionId of UNCONSCIOUS_COMPANION_CONDITIONS) {
-         await this.parent.toggleStatusEffect(conditionId, { active: true });
+         try {
+            await this.parent.toggleStatusEffect(conditionId, { active: true });
+         }
+         catch (reason) {
+            error(`Could not apply ${conditionId} to "${this.parent.name}" falling Unconscious.`, reason);
+         }
       }
    }
 

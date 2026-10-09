@@ -663,7 +663,7 @@ async function hoverToken(page, tokenId, { keepWindows = false } = {}) {
  * @param {{x: number, y: number}} centre - The token's centre in client (page) coordinates.
  * @returns {Promise<void>} Resolves once the token is hovered and a press on it is a single click.
  */
-async function restOnToken(page, tokenId, centre) {
+export async function restOnToken(page, tokenId, centre) {
    await page.mouse.move(centre.x + 200, centre.y);
    await expect.poll(
       () => page.evaluate((tokenId) => {

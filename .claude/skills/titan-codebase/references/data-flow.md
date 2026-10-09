@@ -30,8 +30,9 @@ store), `'checkActor'` (a `ReactiveDocument` bridge over the Actor), and `'check
 options from the caller's options and the user's edits whenever the Actor or an edit changes (see conventions.md,
 Dialog data passing). It delegates rendering to the type-specific shell (`AttributeCheckDialogShell`), which
 recomputes the displayed totals from `actor.system.getAttributeCheckParameters($checkOptions)` whenever the options
-or the Actor change and closes the dialog when the options stop validating. `CheckDialogBase` keys its rows by component (a shell's row list changes length, as the
-Attack shell's conditions row does, and the fields below keep their DOM) and lists the check's
+or the Actor change and closes the dialog when the options stop validating. `CheckDialogBase` keys its rows by
+component (a shell's row list changes length, as the Attack shell's conditions row does, and the fields below keep
+their DOM) and lists the check's
 situational modifiers below the rows (`CheckDialogSituationsField`, one checkbox per situation key, unticked by
 default; ticking writes `options.situations`), reading them through the `'checkActor'` bridge so the list follows the
 Actor's item and effect changes. Every shell offers the Advantage select (`CheckDialogAdvantageField`, which shows the

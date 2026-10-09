@@ -481,14 +481,75 @@ test('an explicit target that shares the attacker\'s actor is read as the target
       /** @type {import('@playwright/test').Locator} The attack check dialog. */
       const dialog = await openAttackDialog();
       await expect(dialog.getByTestId('attack-target-condition')).toHaveText([await label('prone', 'melee', '+1')]);
-      await closeAllApps(page);
-      await releaseTargets(page);
-      await removeCondition(page, sameActorTokenId, 'prone');
    }
    finally {
+      await closeAllApps(page);
+      await releaseTargets(page);
+      /** @type {boolean} Whether the second token's actor is still Prone. */
+      const prone = await page.evaluate(
+         (tokenId) => canvas.scene.tokens.get(tokenId).actor.statuses.has('prone'),
+         sameActorTokenId,
+      );
+      if (prone) {
+         await removeCondition(page, sameActorTokenId, 'prone');
+      }
       await page.evaluate(async (tokenId) => {
          await canvas.scene.tokens.get(tokenId)?.delete();
       }, sameActorTokenId);
+   }
+});
+
+test('the distance is measured from the controlled token of the attacker, else its first token', async () => {
+   // A second token of the attacker's actor stands beside the far target, 21 spaces from the attacker's first token.
+   /** @type {Square} The square of the far target's token. */
+   const farSquare = await page.evaluate((tokenId) => {
+      /** @type {TokenDocument} The far target's token. */
+      const token = canvas.scene.tokens.get(tokenId);
+      return {
+         column: token._source.x / canvas.grid.size,
+         row: token._source.y / canvas.grid.size,
+      };
+   }, fixture.farTokenId);
+
+   /** @type {string} The id of the attacker's second token. */
+   const nearFarTokenId = await placeToken(page, fixture.attackerId, {
+      square: {
+         column: farSquare.column - 1,
+         row: farSquare.row,
+      },
+   });
+   try {
+      // With the second token controlled the Prone target is 1 space away: the close Melee bonus applies.
+      // Targeting releases control, so the target is set first.
+      await targetPlacedToken(page, fixture.farTokenId);
+      await controlPlacedToken(page, nearFarTokenId);
+
+      /** @type {import('@playwright/test').Locator} The attack check dialog, opened with that token controlled. */
+      const controlled = await openAttackDialog();
+      await expect(controlled.getByTestId('attack-target-condition')).toHaveText([
+         await label('prone', 'melee', '+1'),
+      ]);
+      await closeAllApps(page);
+
+      // With none controlled the first token measures 21 spaces: a Melee attack takes no bonus.
+      await releaseTargets(page);
+      await targetPlacedToken(page, fixture.farTokenId);
+      expect(
+         await page.evaluate(() => canvas.tokens.controlled.length),
+         'targeting released the control of the second token',
+      ).toBe(0);
+
+      /** @type {import('@playwright/test').Locator} The attack check dialog, opened with no token controlled. */
+      const uncontrolled = await openAttackDialog();
+      await expect(uncontrolled.getByTestId('check-field-attackerMelee')).toBeVisible();
+      await expect(uncontrolled.getByTestId('attack-target-conditions')).toHaveCount(0);
+   }
+   finally {
+      await closeAllApps(page);
+      await releaseTargets(page);
+      await page.evaluate(async (tokenId) => {
+         await canvas.scene.tokens.get(tokenId)?.delete();
+      }, nearFarTokenId);
    }
 });
 

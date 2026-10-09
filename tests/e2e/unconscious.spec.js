@@ -2,21 +2,26 @@ import { expect, test } from './harness.js';
 import { DURATION_PERMANENT } from '~/system/DurationTypes.js';
 import { login } from './fixtures.js';
 import {
+   activateScene,
    addEffect,
    addRulesElement,
    applyCondition,
    createActor,
    placeToken,
    removeCondition,
+   restOnToken,
+   setOwnership,
    shared,
    viewScene,
 } from './flows.js';
+import { withClients } from './multiClient.js';
 import { attachPageErrors, closeAllApps } from './world.js';
 
 /**
  * Falling Unconscious on real Characters with placed tokens, through the Token HUD: the Unconscious condition also
  * applies Prone and Incapacitated, each once and only if absent, and removing Unconscious leaves both. A Character
- * immune to Prone gains Incapacitated, and the refusal is notified as for any other application.
+ * immune to Prone gains Incapacitated, and the refusal is notified as for any other application. When a Player applies
+ * Unconscious while a GM is logged in, only the Player's client applies Prone and Incapacitated.
  */
 
 /** @type {import('@playwright/test').Page} The file-shared, logged-in page (one world boot per file). */
@@ -52,9 +57,11 @@ test.afterAll(async () => {
 /**
  * Creates a Character and places its token.
  * @param {string} name - The actor's name.
+ * @param {{column: number, row: number}} [square] - The grid square to drop the token on; by default the next free
+ * spot.
  * @returns {Promise<Subject>} Resolves with the created Character and its token.
  */
-async function createSubject(name) {
+async function createSubject(name, square = undefined) {
    /** @type {string} The id of the new actor. */
    const actorId = await createActor(page, {
       name,
@@ -63,7 +70,7 @@ async function createSubject(name) {
    return {
       actorId,
       actorUuid: `Actor.${actorId}`,
-      tokenId: await placeToken(page, actorId),
+      tokenId: await placeToken(page, actorId, { square }),
    };
 }
 
@@ -157,4 +164,91 @@ test('a Character immune to Prone falls Unconscious and Incapacitated, and the r
    await expect(notice).toHaveCount(1);
    await notice.click();
    await expect(notice).toHaveCount(0);
+});
+
+test('only the client that creates Unconscious applies its companions', async ({ browser }) => {
+   /** @type {Subject} The Character, owned by E2E Player 1. */
+   // The token stands in the upper middle of the view, clear of the sidebar and the Player HUD that cover the
+   // Player's canvas at the edges.
+   /** @type {{column: number, row: number}} The square at the middle of the viewed scene, shifted up and left. */
+   const square = await page.evaluate(() => ({
+      column: Math.round(canvas.stage.pivot.x / canvas.grid.size) - 3,
+      row: Math.round(canvas.stage.pivot.y / canvas.grid.size) - 3,
+   }));
+   const subject = await createSubject('E2E Unconscious Seats Sleeper', square);
+   await setOwnership(page, subject.actorId, 'E2E Player 1', 'OWNER');
+
+   // Players view the active scene; the scene is restored after the test.
+   /** @type {string} The id of the scene the tokens stand on. */
+   const sceneId = await shared(page, 'scene');
+
+   /** @type {string|undefined} The id of the scene that was active before. */
+   const previousActiveId = await page.evaluate(() => game.scenes.active?.id);
+   if (previousActiveId !== sceneId) {
+      await activateScene(page, sceneId);
+   }
+   try {
+      await withClients(browser, { player: 'E2E Player 1' }, async ({ player }) => {
+         /**
+          * Counts, on a client, the calls its Actor class receives to toggle Prone on.
+          * @param {import('@playwright/test').Page} client - The client's page.
+          * @returns {Promise<void>} Resolves once the counter wraps the toggle method.
+          */
+         const countProneToggles = (client) => client.evaluate(() => {
+            /** @type {Function} The Actor class's toggle method. */
+            const original = CONFIG.Actor.documentClass.prototype.toggleStatusEffect;
+            window.proneToggles = 0;
+            CONFIG.Actor.documentClass.prototype.toggleStatusEffect = function toggleStatusEffect(statusId, ...rest) {
+               if (statusId === 'prone') {
+                  window.proneToggles++;
+               }
+               return original.call(this, statusId, ...rest);
+            };
+         });
+         await countProneToggles(page);
+         await countProneToggles(player);
+
+         // The Player's only token is controlled on joining and the Escape key does not release it, so the Player
+         // opens the Token HUD on it directly instead of through the GM-seat flow.
+         // A window Foundry opens for the joined Player (the User Configuration) can cover the token.
+         await closeAllApps(player);
+         /** @type {{x: number, y: number}} The token's centre in the Player's client coordinates. */
+         const centre = await player.evaluate((tokenId) => canvas.clientCoordinatesFromCanvas(
+            canvas.scene.tokens.get(tokenId).object.center,
+         ), subject.tokenId);
+         await restOnToken(player, subject.tokenId, centre);
+         await player.mouse.click(centre.x, centre.y, { button: 'right' });
+
+         /** @type {import('@playwright/test').Locator} The Player's Token HUD. */
+         const hud = player.locator('#token-hud');
+         await expect(hud).toBeVisible();
+         await hud.locator('[data-action="togglePalette"][data-palette="effects"]').click();
+         await hud.locator('.effect-control[data-status-id="unconscious"]').click();
+         await expect.poll(() => readConditions(subject), { message: 'Unconscious brought its companions' }).toEqual({
+            incapacitated: 1,
+            prone: 1,
+            unconscious: 1,
+         });
+         expect(
+            await Promise.all([
+               player.evaluate(() => window.proneToggles),
+               page.evaluate(() => window.proneToggles),
+            ]),
+            'the creating client toggled Prone once and the other client did not',
+         ).toEqual([
+            1,
+            0,
+         ]);
+      });
+   }
+   finally {
+      if (previousActiveId !== sceneId) {
+         await page.evaluate(async ({ previousActiveId, sceneId }) => {
+            await game.scenes.get(previousActiveId ?? sceneId).update({ active: previousActiveId !== undefined });
+         }, {
+            previousActiveId,
+            sceneId,
+         });
+      }
+   }
 });

@@ -254,9 +254,9 @@ than 1 (read: a diagonal neighbor, `dx = dy = 1`, measures 2 under `RECTILINEAR`
 `getTargetConditionModifierLabel` read the entries. `CharacterDataModel#initializeAttackCheckOptions` and
 `getAttackCheckParameters` use them: `AttackCheckOptions.targetConditions` holds both ratings' entries and the
 Difficulty's, `AttackCheckParameters.targetConditions` the attack's own rating's and the Difficulty's.
-`omitSuppliedRatingModifiers` drops the entries of a rating a caller or the user supplies. `AttackCheckOptions.targetFacts`
-(`TargetFacts`: the target's status ids and distance) is the input the modifiers derive from. The attack dialog lists
-them in `AttackCheckDialogTargetConditionsField` (only when any apply) and the chat card in
+`omitSuppliedRatingModifiers` drops the entries of a rating a caller or the user supplies.
+`AttackCheckOptions.targetFacts` (`TargetFacts`: the target's status ids and distance) is the input the modifiers
+derive from. The attack dialog lists them in `AttackCheckDialogTargetConditionsField` (only when any apply) and the chat card in
 `AttackCheckChatTargetConditions`.
 
 **Parameters and options**
@@ -912,9 +912,11 @@ domain:
   `null`/`undefined` → a nullable object field; it composes the `create*Field`/`createSchemaField`
   helpers so a data model can be defined from a canonical shape.
 - **Token / actor queries** — resolve the best owner or target set for a given operation
-  (e.g., `GetBestPlayerOwner`, `IsCurrentUserBestOwner`). `getTargetedCharacterTokens(fallbackExcludedIds)` returns the current user's
+  (e.g., `GetBestPlayerOwner`, `IsCurrentUserBestOwner`).
+  `getTargetedCharacterTokens(fallbackExcludedIds)` returns the current user's
   targeted tokens whose actors are Characters, in target order; a GM who targets nothing gets the controlled tokens
-  instead, minus the token ids passed (an explicit target is never excluded). `getTargetedCharacters()` maps those tokens to their actors. `measureTokenDistance(fromToken, toToken)`
+  instead, minus the token ids passed (an explicit target is never excluded).
+  `getTargetedCharacters()` maps those tokens to their actors. `measureTokenDistance(fromToken, toToken)`
   (`MeasureTokenDistance.js`; `TokenDocument`s) returns the spaces between the nearest squares the two tokens cover:
   the minimum of the scene grid's own `measurePath` over every pair of covered-square centers
   (`TokenDocument#getOccupiedGridSpaceOffsets`), divided by `grid.distance`, so the scene's diagonal rule applies; a
