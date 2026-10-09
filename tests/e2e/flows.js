@@ -472,11 +472,14 @@ const TOKEN_SPACING = 130;
  * skipped too: the pointer would wait for the cover to go (measured in a full run: the element at the drop spot of a
  * 1.5 s drag in `sheet-header.spec.js` was a `.chat-message` in `#chat-notifications`). Measured at a 1920 by 1080
  * viewport in a probe run: 34 tokens were placed, and the drop for the 35th timed out (cause not determined).
+ * With a `square` the drop is on that grid square instead, which the pointer must reach on the canvas.
  * @param {import('@playwright/test').Page} page - A logged-in GM page.
  * @param {string} actorId - The actor to place.
+ * @param {object} [options] - Optional settings.
+ * @param {{column: number, row: number}} [options.square] - The grid square to drop the token on.
  * @returns {Promise<string>} The id of the placed token.
  */
-export async function placeToken(page, actorId) {
+export async function placeToken(page, actorId, { square } = {}) {
    await closeAllApps(page);
    await releaseTokenControl(page);
 
@@ -490,8 +493,27 @@ export async function placeToken(page, actorId) {
    const panel = await openSidebarTab(page, 'actors');
 
    /** @type {{x: number, y: number}} The first drop spot with no token on it, relative to the canvas element. */
-   const spot = await page.evaluate(({ columns, spacing }) => {
+   const spot = await page.evaluate(({ columns, spacing, square }) => {
       const board = document.querySelector('#board');
+
+      // A wanted square is the drop spot: the center of the square, relative to the canvas element.
+      if (square) {
+         /** @type {DOMRect} The canvas element's box. */
+         const box = board.getBoundingClientRect();
+
+         /** @type {{x: number, y: number}} The square's center in client coordinates. */
+         const client = canvas.clientCoordinatesFromCanvas({
+            x: (square.column + 0.5) * canvas.grid.size,
+            y: (square.row + 0.5) * canvas.grid.size,
+         });
+         if (document.elementFromPoint(client.x, client.y) !== board) {
+            throw new Error(`The pointer does not reach the canvas at the square ${square.column}, ${square.row}.`);
+         }
+         return {
+            x: client.x - box.left,
+            y: client.y - box.top,
+         };
+      }
 
       /**
        * A drop spot.
@@ -544,6 +566,7 @@ export async function placeToken(page, actorId) {
    }, {
       columns: TOKEN_COLUMNS,
       spacing: TOKEN_SPACING,
+      square,
    });
    await panel.locator(`.directory-item.entry[data-entry-id="${actorId}"]`).dragTo(page.locator('#board'), {
       targetPosition: spot,
@@ -681,6 +704,49 @@ export async function controlPlacedToken(page, tokenId) {
       () => page.evaluate(() => canvas.tokens.controlled.map((token) => token.id)),
       { message: 'the click took control of the token' },
    ).toEqual([tokenId]);
+}
+
+/**
+ * Sets a placed token's width and height, in grid spaces, in the Appearance tab of its Token Configuration window,
+ * opened from the Token HUD.
+ * @param {import('@playwright/test').Page} page - A logged-in GM page viewing the token's scene.
+ * @param {string} tokenId - The token on the viewed scene.
+ * @param {number} size - The width and height to set.
+ * @returns {Promise<void>} Resolves once the token's document holds the size and the window is closed.
+ */
+export async function setTokenSize(page, tokenId, size) {
+   /** @type {{x: number, y: number}} The token's centre in client (page) coordinates. */
+   const centre = await hoverToken(page, tokenId);
+   await page.mouse.click(centre.x, centre.y, { button: 'right' });
+
+   /** @type {import('@playwright/test').Locator} The token HUD. */
+   const hud = page.locator('#token-hud');
+   await expect(hud).toBeVisible();
+   await hud.locator('[data-action="config"]').click();
+
+   /** @type {import('@playwright/test').Locator} The token's configuration window. */
+   const config = page.locator(`.application[id$="Token-${tokenId}"]`);
+   await expect(config).toBeVisible();
+   await config.locator('nav.tabs [data-tab="appearance"]').click();
+   await config.locator('input[name="width"]').fill(String(size));
+   await config.locator('input[name="height"]').fill(String(size));
+   await config.locator('button[type="submit"]').click();
+   await expect.poll(
+      () => page.evaluate((tokenId) => {
+         /** @type {TokenDocument} The token whose size is read. */
+         const token = canvas.scene.tokens.get(tokenId);
+         return [
+            token.width,
+            token.height,
+         ];
+      }, tokenId),
+      { message: 'the Token Configuration window stored the size' },
+   ).toEqual([
+      size,
+      size,
+   ]);
+   await expect(config).toHaveCount(0);
+   await settle(page);
 }
 
 /**

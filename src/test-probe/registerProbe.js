@@ -1,6 +1,9 @@
 import { mount, unmount, createRawSnippet } from 'svelte';
 import componentRegistry from '~/test-probe/componentRegistry.js';
 import ProbeDocument from '~/test-probe/ProbeDocument.svelte.js';
+import getTargetedCharacters from '~/helpers/utility-functions/GetTargetedCharacters.js';
+import getTargetedCharacterTokens from '~/helpers/utility-functions/GetTargetedCharacterTokens.js';
+import measureTokenDistance from '~/helpers/utility-functions/MeasureTokenDistance.js';
 
 /**
  * Recursively replace `{ __probeComponent: name }` markers with the registered component constructor.
@@ -74,6 +77,13 @@ export default function registerProbe() {
    game.titan._probe = {
       // The names available to mount.
       components: Object.keys(componentRegistry),
+
+      // System helpers that read the live canvas, called by tests with real tokens.
+      helpers: {
+         getTargetedCharacters,
+         getTargetedCharacterTokens,
+         measureTokenDistance,
+      },
 
       /**
        * Mount a registered component in isolation.

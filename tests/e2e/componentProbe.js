@@ -20,7 +20,7 @@ const PROBE_STYLES = path.resolve(
  * @param {import('@playwright/test').Page} page - The Playwright page (must already be at a ready world).
  * @returns {Promise<void>} Resolves once the probe bundle has been injected (or was already present).
  */
-async function ensureProbe(page) {
+export async function ensureProbe(page) {
    // Wait for the system to finish init before injecting: a mid-boot injection skips the IIFE's
    // immediate-registration path and would strand the current test.
    await page.waitForFunction(() => !!globalThis.game?.titan, null, { timeout: 1000 });
