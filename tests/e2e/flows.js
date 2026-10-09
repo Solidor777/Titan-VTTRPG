@@ -506,11 +506,11 @@ export async function toggleTokenLink(page, actorId) {
 }
 
 /**
- * Closes the open windows, releases control of every token and moves the pointer onto a placed token the way a user
- * does: the canvas processes a click only on a hovered token, and a pointer that has rested where the token appeared
- * (the drop of the placing drag) raises no hover. The chat tab is made the active sidebar tab first: while another tab
- * is active, a posted chat message shows as a card over the canvas for 5 s (`ChatLog.NOTIFY_DURATION`), and the card
- * takes the pointer from a token under it.
+ * Closes the open windows, lets the pointer enter and leave the token, releases control of every token and moves the
+ * pointer onto a placed token the way a user does: the canvas processes a click only on a hovered token, and a pointer
+ * that has rested where the token appeared (the drop of the placing drag) raises no hover. The chat tab is made the
+ * active sidebar tab first: while another tab is active, a posted chat message shows as a card over the canvas for 5 s
+ * (`ChatLog.NOTIFY_DURATION`), and the card takes the pointer from a token under it.
  * @param {import('@playwright/test').Page} page - A logged-in GM page viewing the token's scene.
  * @param {string} tokenId - The token on the viewed scene.
  * @returns {Promise<{x: number, y: number}>} The token's centre in client (page) coordinates.
@@ -518,13 +518,21 @@ export async function toggleTokenLink(page, actorId) {
 async function hoverToken(page, tokenId) {
    await closeAllApps(page);
    await showChatLog(page);
-   await releaseTokenControl(page);
 
    /** @type {{x: number, y: number}} The token's centre in client (page) coordinates. */
    const centre = await page.evaluate((tokenId) => {
       const token = canvas.scene.tokens.get(tokenId).object;
       return canvas.clientCoordinatesFromCanvas(token.center);
    }, tokenId);
+
+   // The release of control clears the token's hover flag but not its interaction manager's hover state (read:
+   // `PlaceableObject#_onRelease`, `placeable-object.mjs:786`), and a manager in that state skips the next
+   // pointer-over (read: `#handlePointerOver`, `mouse-handler.mjs:405-411`), so `restOnToken` would never see the
+   // token hovered. The pointer enters and leaves the token before the release: the manager's own pointer-out ends
+   // the state while the token is still hovered.
+   await page.mouse.move(centre.x, centre.y, { steps: 5 });
+   await page.mouse.move(centre.x + 200, centre.y);
+   await releaseTokenControl(page);
    await restOnToken(page, tokenId, centre);
    return centre;
 }
