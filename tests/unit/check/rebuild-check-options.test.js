@@ -186,7 +186,6 @@ function createCharacter(items = {}, effects = {}) {
       items: new Map(Object.entries(items)),
       name: 'Rebuild Test Character',
       rulesElementsCache: {},
-      uuid: 'Actor.rebuild',
    };
    model.getRollData = () => structuredClone(ROLL_DATA);
    model.skill = structuredClone(ROLL_DATA.skill);
@@ -249,10 +248,10 @@ function weaponRollData() {
  * @param {object} [options] - The target's conditions and position.
  * @param {string[]} [options.statuses] - The target's active condition ids.
  * @param {number} [options.x] - The token's center x on the fake gridless scene (100 pixels per space).
- * @param {string} [options.uuid] - The target actor's uuid.
+ * @param {string} [options.id] - The token's id.
  * @returns {object} A stand-in token for `game.user.targets`.
  */
-function targetToken(defense, { statuses = [], x = 100, uuid = 'Actor.target' } = {}) {
+function targetToken(defense, { statuses = [], x = 100, id = 'target-token' } = {}) {
    return {
       actor: {
          statuses: new Set(statuses),
@@ -260,9 +259,9 @@ function targetToken(defense, { statuses = [], x = 100, uuid = 'Actor.target' } 
             getRollData: () => ({ rating: { defense: { value: defense } } }),
             isCharacter: true,
          },
-         uuid,
       },
-      document: tokenDocument(x),
+      document: tokenDocument(x, id),
+      id,
    };
 }
 
@@ -286,15 +285,19 @@ const GRIDLESS_SCENE = {
 /**
  * Builds a token document centered at the given x on the gridless fake scene.
  * @param {number} x - The center x.
+ * @param {string} [id] - The token's id.
+ * @param {boolean} [controlled] - Whether the user controls the token.
  * @returns {object} The fake token document.
  */
-function tokenDocument(x) {
+function tokenDocument(x, id = 'attacker-token', controlled = false) {
    return {
       getCenterPoint: () => ({
          x,
          y: 0,
       }),
       getOccupiedGridSpaceOffsets: () => [],
+      id,
+      object: { controlled },
       parent: GRIDLESS_SCENE,
    };
 }
@@ -1189,8 +1192,8 @@ describe('Attack target conditions', () => {
       globalThis.game.user.isGM = true;
       globalThis.canvas.tokens.controlled = [
          targetToken(9, {
+            id: 'attacker-token',
             statuses: ['prone'],
-            uuid: 'Actor.rebuild',
          }),
       ];
       try {
@@ -1207,6 +1210,83 @@ describe('Attack target conditions', () => {
          globalThis.game.user.isGM = false;
          globalThis.canvas.tokens.controlled = [];
       }
+   });
+
+   it('reads another controlled token as a GM\'s target when nothing is targeted', () => {
+      /** @type {object} The Character, whose GM controls its own token and another Prone one. */
+      const system = withAttackerToken(createCharacter({ w: createItem(weaponRollData()) }));
+      globalThis.game.user.isGM = true;
+      globalThis.canvas.tokens.controlled = [
+         targetToken(9, { id: 'attacker-token' }),
+         targetToken(6, {
+            id: 'other-token',
+            statuses: ['prone'],
+         }),
+      ];
+      try {
+         expect(system.initializeAttackCheckOptions({
+            attackIdx: 0,
+            itemId: 'w',
+         })).toMatchObject({
+            attackerMelee: 10,
+            targetDefense: 6,
+         });
+      }
+      finally {
+         globalThis.game.user.isGM = false;
+         globalThis.canvas.tokens.controlled = [];
+      }
+   });
+
+   it('reads an explicit target that is one of the attacker\'s own tokens as the target', () => {
+      /** @type {object} The Character, whose GM targets its own Prone token. */
+      const system = withAttackerToken(createCharacter({ w: createItem(weaponRollData()) }));
+      globalThis.game.user.targets = new Set([
+         targetToken(9, {
+            id: 'attacker-token',
+            statuses: ['prone'],
+         }),
+      ]);
+      expect(system.initializeAttackCheckOptions({
+         attackIdx: 0,
+         itemId: 'w',
+      })).toMatchObject({
+         attackerMelee: 10,
+         targetDefense: 9,
+      });
+   });
+
+   it('measures the distance from the attacker\'s controlled token, else its first token', () => {
+      /** @type {object} The Character, whose second token is controlled. */
+      const system = withAttackerToken(createCharacter({ w: createItem(weaponRollData()) }));
+      system.parent.getActiveTokens = () => [
+         tokenDocument(0, 'first-token'),
+         tokenDocument(2500, 'second-token', true),
+      ];
+      globalThis.game.user.targets = new Set([
+         targetToken(5, {
+            statuses: ['prone'],
+            x: 2600,
+         }),
+      ]);
+
+      // 1 space from the controlled token and 26 from the first: the close bonus applies.
+      expect(system.initializeAttackCheckOptions({
+         attackIdx: 0,
+         itemId: 'w',
+      }).attackerMelee).toBe(10);
+
+      // With none controlled the first token measures 26 spaces: two quarters of the base 8 lower the ranged Accuracy
+      // 8 to 4.
+      system.parent.getActiveTokens = () => [
+         tokenDocument(0, 'first-token'),
+         tokenDocument(2500, 'second-token'),
+      ];
+      expect(system.initializeAttackCheckOptions({
+         attackIdx: 0,
+         itemId: 'w',
+         type: 'ranged',
+      }).attackerAccuracy).toBe(4);
    });
 
    it('keeps a caller\'s rating and target conditions, dropping that rating\'s target entries', () => {
@@ -1320,7 +1400,7 @@ describe('Attack target conditions', () => {
       expect(options.targetConditions).toHaveLength(2);
    });
 
-   it('drops the entries of a rating the user types from the conditions the dialog pinned at open', () => {
+   it('drops the entries of a rating the user types from the conditions derived from the pinned facts', () => {
       /** @type {object} The Character. */
       const system = attackTarget(['prone']);
       system._createAttackCheckDialog({
@@ -1346,7 +1426,7 @@ describe('Attack target conditions', () => {
       });
    });
 
-   it('records the target\'s conditions resolved at open as caller values, kept after untargeting', () => {
+   it('records the target\'s facts resolved at open as caller values, kept after untargeting', () => {
       /** @type {object} The Character. */
       const system = attackTarget(['prone']);
       system._createAttackCheckDialog({
@@ -1357,10 +1437,14 @@ describe('Attack target conditions', () => {
       /** @type {object} The caller options the dialog received. */
       const callerOptions = dialogCalls[0][3];
 
-      /** @type {TargetConditionModifier[]} The target conditions resolved at open. */
-      const pinned = dialogCalls[0][0].targetConditions;
-      expect(callerOptions.targetConditions).toEqual(pinned);
-      expect(pinned).toHaveLength(2);
+      /** @type {TargetConditionModifier[]} The target conditions derived at open. */
+      const opened = dialogCalls[0][0].targetConditions;
+      expect(callerOptions.targetFacts).toEqual({
+         distance: 1,
+         statuses: ['prone'],
+      });
+      expect(callerOptions.targetConditions).toBeUndefined();
+      expect(opened).toHaveLength(2);
 
       // Untargeted, then a +2 Melee rating modifier arrives: the rebuild keeps the pinned Prone bonus and Defense.
       globalThis.game.user.targets = new Set();
@@ -1372,14 +1456,14 @@ describe('Attack target conditions', () => {
          userEdits: {},
       })).toMatchObject({
          attackerMelee: 12,
-         targetConditions: pinned,
+         targetConditions: opened,
          targetDefense: 5,
       });
 
-      // Without the pinned conditions the same rebuild derives none from the absent target.
-      /** @type {object} The caller options without the pinned target conditions. */
+      // Without the pinned facts the same rebuild derives none from the absent target.
+      /** @type {object} The caller options without the pinned target facts. */
       const unpinned = { ...callerOptions };
-      delete unpinned.targetConditions;
+      delete unpinned.targetFacts;
       expect(rebuildCheckOptions({
          callerOptions: unpinned,
          checkType: 'attack',
@@ -1390,6 +1474,77 @@ describe('Attack target conditions', () => {
          attackerMelee: 10,
          targetConditions: [],
          targetDefense: 5,
+      });
+   });
+
+   it('follows a change of the attacker\'s base ratings while keeping the pinned facts', () => {
+      /** @type {object} The Character. */
+      const system = attackTarget(['prone']);
+      system._createAttackCheckDialog({
+         attackIdx: 0,
+         itemId: 'w',
+      });
+
+      // The base Melee and Accuracy rise from 8 to 12 (a quarter is 3), each current value by the same 4.
+      system.rating.melee.baseValue = 12;
+      system.rating.melee.value = 12;
+      system.rating.accuracy.baseValue = 12;
+      system.rating.accuracy.value = 12;
+      expect(rebuildCheckOptions({
+         callerOptions: dialogCalls[0][3],
+         checkType: 'attack',
+         currentOptions: dialogCalls[0][0],
+         system,
+         userEdits: {},
+      })).toMatchObject({
+         attackerAccuracy: 15,
+         attackerMelee: 15,
+         targetConditions: [
+            {
+               condition: 'prone',
+               modifier: 'melee',
+               value: 3,
+            },
+            {
+               condition: 'prone',
+               modifier: 'accuracy',
+               value: 3,
+            },
+         ],
+      });
+   });
+
+   it('keeps a caller-supplied list of conditions, dropping the entries of a rating the user types', () => {
+      /** @type {object} The Character. */
+      const system = attackTarget(['prone']);
+
+      /** @type {TargetConditionModifier[]} The list the caller supplies. */
+      const supplied = [
+         {
+            condition: 'prone',
+            modifier: 'melee',
+            value: 5,
+         },
+         {
+            condition: 'prone',
+            modifier: 'accuracy',
+            value: 6,
+         },
+      ];
+      expect(rebuildCheckOptions({
+         callerOptions: {
+            attackIdx: 0,
+            itemId: 'w',
+            targetConditions: supplied,
+         },
+         checkType: 'attack',
+         currentOptions: {},
+         system,
+         userEdits: { attackerMelee: 9 },
+      })).toMatchObject({
+         attackerAccuracy: 14,
+         attackerMelee: 9,
+         targetConditions: [supplied[1]],
       });
    });
 });

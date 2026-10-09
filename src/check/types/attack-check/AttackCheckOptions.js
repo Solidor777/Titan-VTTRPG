@@ -24,7 +24,9 @@
  * @property {number} [range] - The Range of the Attack.
  * @property {number} [targetDefense] - The Defense rating of the target actor.
  * @property {TargetConditionModifier[]} [targetConditions] - The target's condition modifiers to both of the
- * attacker's ratings and to the Difficulty; derived from the first target when omitted.
+ * attacker's ratings and to the Difficulty; derived from the target's facts when omitted.
+ * @property {TargetFacts} [targetFacts] - The target's conditions and distance, which the modifiers derive from;
+ * read from the first target when omitted. An open dialog keeps the facts read at open.
  * @property {number} [trainingMod] - Modifier for the amount of Training to be applied.
  * @property {string} [attribute] - The Attribute to use for the Check.
  * @property {string} itemId - The ID of the weapon being used for the attack.

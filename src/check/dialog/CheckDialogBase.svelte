@@ -71,7 +71,7 @@
 
 <div class="check-dialog">
    <!--Fields-->
-   {#each rows as Row}
+   {#each rows as Row (Row)}
       <div class="row">
          <Row/>
       </div>

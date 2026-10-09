@@ -30,7 +30,8 @@ store), `'checkActor'` (a `ReactiveDocument` bridge over the Actor), and `'check
 options from the caller's options and the user's edits whenever the Actor or an edit changes (see conventions.md,
 Dialog data passing). It delegates rendering to the type-specific shell (`AttributeCheckDialogShell`), which
 recomputes the displayed totals from `actor.system.getAttributeCheckParameters($checkOptions)` whenever the options
-or the Actor change and closes the dialog when the options stop validating. `CheckDialogBase` lists the check's
+or the Actor change and closes the dialog when the options stop validating. `CheckDialogBase` keys its rows by component (a shell's row list changes length, as the
+Attack shell's conditions row does, and the fields below keep their DOM) and lists the check's
 situational modifiers below the rows (`CheckDialogSituationsField`, one checkbox per situation key, unticked by
 default; ticking writes `options.situations`), reading them through the `'checkActor'` bridge so the list follows the
 Actor's item and effect changes. Every shell offers the Advantage select (`CheckDialogAdvantageField`, which shows the
@@ -53,15 +54,17 @@ Parameter derivation (attribute/attack/casting/item checks share `_initializeAtt
 `resistanceDice = resistance[x].value` instead. Attack difficulty is
 `clamp(targetDefense - attackerRating + 4, 2, 6)`; with no target selected `targetDefense` defaults to the
 attacker's own rating, yielding difficulty 4. `initializeAttackCheckOptions` also reads the target token
-(`_getAttackTargetToken()`: the first targeted Character token other than the attacker's own, a GM's controlled tokens
-standing in when nothing is targeted) and derives `targetConditions` (`getTargetConditionModifiers`) from its statuses
-and its grid distance to the attacker's first active token; the Melee and Accuracy entries join the ratings, and
+(`_getAttackTargetToken()`: the first targeted Character token, a GM's controlled tokens other than the attacker's own
+standing in when nothing is targeted) and derives `targetConditions` (`getTargetConditionModifiers`) from its
+`TargetFacts` (`_getAttackTargetFacts`: its statuses, and its grid distance from the attacker's controlled token, else
+first active token); the Melee and Accuracy entries join the ratings, and
 `getAttackCheckParameters` keeps the attack's own rating's entries (`selectAttackTargetConditions`) and sets an
 Incapacitated target's Difficulty of 2 after `_applyCheckAdvantage`. A supplied `attackerMelee` or `attackerAccuracy`
 replaces the derived rating and omits its derived entries (`omitSuppliedRatingModifiers`); a supplied
-`targetConditions` is kept as given. `_createAttackCheckDialog` adds the `targetDefense` and `targetConditions` a
-target resolved at open to the dialog's `callerOptions`, and `rebuildCheckOptions` omits the entries of a rating the
-user typed from that pinned list. Gotcha: resistances/ratings are derived from attribute
+`targetConditions` is kept as given. `_createAttackCheckDialog` adds the `targetDefense` and `targetFacts` a target
+resolved at open to the dialog's `callerOptions`, so each rebuild derives the modifiers from the pinned facts and the
+attacker's live base ratings; the attack entry's `adjustInput` hook in `CHECK_OPTIONS_METHODS` omits the entries of a
+rating the user typed from a caller-supplied list. Gotcha: resistances/ratings are derived from attribute
 **baseValues** (computed before mods), so a `flatModifier` on an attribute's `.value` does NOT propagate into
 resistance or rating dice — boost a resistance via a `resistance`-selector element, not an `attribute` one.
 Before the attribute-based totals, `_applySituationalModifiers` adds the situations `options.situations` names. After

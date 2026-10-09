@@ -363,7 +363,8 @@ change or edit, `CheckDialogShell` rebuilds the options (`rebuildCheckOptions`):
 `{ ...callerOptions, ...userEdits }` is validated quietly (`validate<Type>CheckOptions(options, false)` reports
 nothing); if it is invalid, each `'default'`-sentinel field it leaves unset (e.g. the Attribute after Skill
 "None") is pinned to its displayed value and validated again; if it is still invalid (its item or effect is
-gone), nothing is written and the type shell's own validation closes the dialog; otherwise
+gone), nothing is written and the type shell's own validation closes the dialog; a check type's optional
+`adjustInput(input, userEdits)` entry in `CHECK_OPTIONS_METHODS` reshapes the input before validation; otherwise
 `initialize<Type>CheckOptions(input)` derives every other field from the live Actor and is written only when
 structurally different. `tests/unit/check/check-dialog-option-writes.test.js` is the backstop scan: it reads
 every `.svelte`, `.js`, and `.svelte.js` under any `dialog` directory of `src/check`, plus every source in `src`

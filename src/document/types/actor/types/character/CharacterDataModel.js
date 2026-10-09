@@ -2442,17 +2442,21 @@ export default class CharacterDataModel extends TitanActorDataModel {
          // Calculate the parameters.
          const checkParameters = this.getAttackCheckParameters(checkOptions);
 
-         // A target's Defense and conditions resolved now are fixed for the dialog's lifetime, like a caller's values;
-         // without a target they stay derived, following the attacker's fallback rating and picking up a later target.
-         /** @type {boolean} Whether a target token resolved this check's target values. */
-         const hasTarget = this._getAttackTargetToken() !== undefined;
+         // A target's Defense and facts (its conditions and distance) resolved now are fixed for the dialog's lifetime,
+         // like a caller's values; the modifiers they give are derived on every rebuild from the attacker's live
+         // ratings. Without a target they stay derived, following the attacker's fallback rating and picking up a later
+         // target.
+         /** @type {Token|undefined} The token that resolved this check's target values. */
+         const targetToken = this._getAttackTargetToken();
 
          /** @type {object} The options the dialog keeps through its rebuilds. */
          const callerOptions = {
             ...options,
-            ...(hasTarget && options.targetDefense === undefined ? { targetDefense: checkOptions.targetDefense } : {}),
-            ...(hasTarget && options.targetConditions === undefined ?
-               { targetConditions: checkOptions.targetConditions } :
+            ...(targetToken && options.targetDefense === undefined ?
+               { targetDefense: checkOptions.targetDefense } :
+               {}),
+            ...(targetToken && options.targetConditions === undefined && options.targetFacts === undefined ?
+               { targetFacts: this._getAttackTargetFacts(targetToken) } :
                {}),
          };
 
@@ -2731,27 +2735,30 @@ export default class CharacterDataModel extends TitanActorDataModel {
 
       // The target, read only when a target value is not supplied by the caller.
       /** @type {Token|undefined} The first targeted Character token other than the attacker's own. */
-      const targetToken = options.targetDefense === undefined || options.targetConditions === undefined ?
+      const targetToken = options.targetDefense === undefined ||
+         (options.targetConditions === undefined && options.targetFacts === undefined) ?
          this._getAttackTargetToken() :
          undefined;
 
-      // Target conditions: modifiers to both ratings (the dialog can switch the attack type) and the Difficulty. A
-      // supplied list is kept as given; a derived one omits the entries of a rating the caller supplies, which replaces
-      // the derived rating, bonus included.
+      // Target conditions: modifiers to both ratings (the dialog can switch the attack type) and the Difficulty,
+      // derived from the target's facts and the attacker's live ratings. A supplied list is kept as given; a derived
+      // one omits the entries of a rating the caller supplies, which replaces the derived rating, bonus included.
       if (options.targetConditions === undefined) {
+         /** @type {TargetFacts|undefined} The target's conditions and distance. */
+         const targetFacts = options.targetFacts ?? (targetToken ? this._getAttackTargetFacts(targetToken) : undefined);
          checkOptions.targetConditions = omitSuppliedRatingModifiers(
-            targetToken ?
+            targetFacts ?
                getTargetConditionModifiers({
                   accuracy: {
                      base: this.rating.accuracy.baseValue,
                      value: getAttackRating('accuracy'),
                   },
-                  distance: measureTokenDistance(this.parent.getActiveTokens(false, true)[0], targetToken.document),
+                  distance: targetFacts.distance,
                   melee: {
                      base: this.rating.melee.baseValue,
                      value: getAttackRating('melee'),
                   },
-                  statuses: targetToken.actor.statuses,
+                  statuses: new Set(targetFacts.statuses),
                }) :
                [],
             options,
@@ -2786,14 +2793,39 @@ export default class CharacterDataModel extends TitanActorDataModel {
    }
 
    /**
-    * Gets the token an Attack Check targets: the first targeted Character token (a GM with no target falls back to
-    * their controlled tokens) other than the attacker's own, so a GM rolling from a controlled attacker never reads the
-    * attacker as its own target.
+    * Gets the token an Attack Check targets: the first targeted Character token. A GM who targets nothing falls back
+    * to their controlled Character tokens other than this Character's own, so a GM rolling from a controlled attacker
+    * never reads the attacker as its own target, while an explicit target of the same Actor stays a target.
     * @returns {Token|undefined} The target token, if any.
     * @private
     */
    _getAttackTargetToken() {
-      return getTargetedCharacterTokens().find((token) => token.actor.uuid !== this.parent.uuid);
+      return getTargetedCharacterTokens(this.parent.getActiveTokens(false, true).map((token) => token.id))[0];
+   }
+
+   /**
+    * Gets the token document an Attack Check measures its distance from: this Character's controlled token, else its
+    * first token on a scene.
+    * @returns {TokenDocument|undefined} The attacker's token, if it has one.
+    * @private
+    */
+   _getAttackerTokenDocument() {
+      /** @type {TokenDocument[]} The tokens of this Character. */
+      const tokens = this.parent.getActiveTokens(false, true);
+      return tokens.find((token) => token.object?.controlled) ?? tokens[0];
+   }
+
+   /**
+    * Reads the facts of a target that give an attack its target-condition modifiers.
+    * @param {Token} targetToken - The target's token.
+    * @returns {TargetFacts} The target's condition ids and its distance from the attacker's token.
+    * @private
+    */
+   _getAttackTargetFacts(targetToken) {
+      return {
+         distance: measureTokenDistance(this._getAttackerTokenDocument(), targetToken.document),
+         statuses: [...targetToken.actor.statuses],
+      };
    }
 
    /**

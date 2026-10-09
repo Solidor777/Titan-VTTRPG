@@ -7,8 +7,8 @@ import { omitSuppliedRatingModifiers } from '~/check/types/attack-check/TargetCo
 
 /**
  * Rebuilds an open check dialog's Check Options from their two sources of truth: the options the caller passed to
- * `request<Type>Check` (`callerOptions`, which for an Attack also carry a target's Defense and conditions resolved at
- * open) and the fields the user wrote in the dialog (`userEdits`, recorded by the tracked setter). The live Actor's
+ * `request<Type>Check` (`callerOptions`, which for an Attack also carry a target's Defense and facts resolved at open)
+ * and the fields the user wrote in the dialog (`userEdits`, recorded by the tracked setter). The live Actor's
  * `initialize<Type>CheckOptions` derives every other field on every pass, so each of its derivation branches (an
  * `undefined` test, a `=== undefined` Complexity or Difficulty, the `'default'` Attribute and Skill sentinels, a read
  * of the owned weapon, spell, item, or effect, and conditional rules elements) follows the Actor with no list of
@@ -26,10 +26,11 @@ import { omitSuppliedRatingModifiers } from '~/check/types/attack-check/TargetCo
 
 /**
  * The Check Options functions each check type's rebuild uses: the pure `create<Type>CheckOptions` (whose
- * `'default'` values mark the sentinel fields) and the live Actor's `initialize<Type>CheckOptions` and
- * `validate<Type>CheckOptions` method names.
- * @type {Readonly<Record<string, Readonly<{create: (options: object) => object, initialize: string, validate:
- * string}>>>}
+ * `'default'` values mark the sentinel fields), the live Actor's `initialize<Type>CheckOptions` and
+ * `validate<Type>CheckOptions` method names, and optionally an `adjustInput` hook that reshapes the rebuild input
+ * (the caller's options overlaid with the user's edits) given the user's edits before the Actor derives from it.
+ * @type {Readonly<Record<string, Readonly<{adjustInput?: (input: object, userEdits: object) => object, create:
+ * (options: object) => object, initialize: string, validate: string}>>>}
  */
 export const CHECK_OPTIONS_METHODS = Object.freeze({
    attribute: Object.freeze({
@@ -43,6 +44,14 @@ export const CHECK_OPTIONS_METHODS = Object.freeze({
       validate: 'validateResistanceCheckOptions',
    }),
    attack: Object.freeze({
+      // A rating the user typed replaces the derived one, bonus included: its target-condition entries leave a list
+      // the caller supplied, so the card never lists a bonus the typed value does not carry.
+      adjustInput: (input, userEdits) => input.targetConditions === undefined ?
+         input :
+         {
+            ...input,
+            targetConditions: omitSuppliedRatingModifiers(input.targetConditions, userEdits),
+         },
       create: createAttackCheckOptions,
       initialize: 'initializeAttackCheckOptions',
       validate: 'validateAttackCheckOptions',
@@ -257,7 +266,7 @@ function pinSentinelFields(input, create, currentOptions) {
  * current options (so the dialog's rebuild effect writes nothing and settles) or when the check is no longer valid.
  */
 export default function rebuildCheckOptions({ checkType, system, callerOptions, userEdits, currentOptions }) {
-   /** @type {{create: (options: object) => object, initialize: string, validate: string}} The type's functions. */
+   /** @type {typeof CHECK_OPTIONS_METHODS[string]} The type's functions. */
    const methods = CHECK_OPTIONS_METHODS[checkType];
 
    /** @type {object} The rebuild input: the user's edits over the caller's options. */
@@ -266,13 +275,8 @@ export default function rebuildCheckOptions({ checkType, system, callerOptions, 
       ...userEdits,
    };
 
-   // A rating the user typed replaces the derived one, bonus included: its target-condition entries leave the list the
-   // dialog pinned at open, so the card never lists a bonus the typed value does not carry.
-   if (checkType === 'attack' && input.targetConditions !== undefined) {
-      input = {
-         ...input,
-         targetConditions: omitSuppliedRatingModifiers(input.targetConditions, userEdits),
-      };
+   if (methods.adjustInput) {
+      input = methods.adjustInput(input, userEdits);
    }
 
    // Validate silently: an invalid input here is an expected dialog state, not a reportable error.

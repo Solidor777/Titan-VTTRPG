@@ -75,7 +75,10 @@ afterAll(() => {
 function createModel(rulesElementsCache = {}) {
    /** @type {object} The bare model. */
    const model = Object.create(CharacterDataModel.prototype);
-   model.parent = { rulesElementsCache };
+   model.parent = {
+      getActiveTokens: () => [],
+      rulesElementsCache,
+   };
    model.getRollData = () => structuredClone(ROLL_DATA);
    return model;
 }

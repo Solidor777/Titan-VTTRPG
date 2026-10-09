@@ -49,8 +49,10 @@ and hides from unlinked tokens the converted effects their own changes replace (
 - Attack checks read the target's conditions: a Prone target within 1 space raises the attacker's Melee or Accuracy
   by a quarter of its base, one beyond 10 spaces lowers Accuracy by a quarter per 10 spaces, and an Incapacitated
   target's Difficulty is 2. The dialog and the chat card list them; a Melee or Accuracy typed into the dialog
-  replaces the rating, bonus included, and drops its entry. A GM who targets nothing no longer has the attacker's own
-  controlled token read as the target.
+  replaces the rating, bonus included, and drops its entry. The dialog keeps the target's conditions and distance read
+  when it opens, and the bonuses follow the attacker's ratings while it is open. A GM who targets nothing has their
+  controlled tokens stand in as the target, except the attacker's own tokens; a token of the attacker's own actor that
+  the GM targets explicitly is still the target.
 
 ## Version 2.1.0:
 Advantage and Disadvantage, situational modifiers, and bug fixes.

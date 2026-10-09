@@ -1,6 +1,7 @@
 import { expect, test } from './harness.js';
 import {
    clickRoll,
+   moveDialogAside,
    openCheckDialog,
    readNewestCheckFlags,
    readSummary,
@@ -41,8 +42,8 @@ let errors;
 let originalCheckOptions;
 /**
  * The ids the fixture made.
- * @type {{attackerId: string, attackerTokenId: string, weaponUuid: string, nearTokenId: string,
- * incapacitatedTokenId: string, farTokenId: string}}
+ * @type {{attackerId: string, attackerSquare: Square, attackerTokenId: string, weaponUuid: string,
+ * nearTokenId: string, incapacitatedTokenId: string, farTokenId: string}}
  */
 let fixture;
 
@@ -113,6 +114,7 @@ test.beforeAll(async ({ browser }) => {
    };
    fixture = {
       attackerId,
+      attackerSquare,
       attackerTokenId: await placeToken(page, attackerId, { square: attackerSquare }),
       farTokenId: await place('E2E Target Conditions Far', {
          column: middle.column + 5,
@@ -140,6 +142,11 @@ test.beforeAll(async ({ browser }) => {
       1,
       21,
    ]);
+
+   // The targets' conditions are part of the fixture, so no test depends on another having applied one.
+   await applyCondition(page, fixture.nearTokenId, 'prone');
+   await applyCondition(page, fixture.farTokenId, 'prone');
+   await applyCondition(page, fixture.incapacitatedTokenId, 'incapacitated');
 });
 
 /**
@@ -240,7 +247,6 @@ test('an adjacent Prone target raises a melee attack\'s Melee by a quarter of it
       accuracy: 3,
       melee: 3,
    });
-   await applyCondition(page, fixture.nearTokenId, 'prone');
    await targetPlacedToken(page, fixture.nearTokenId);
 
    /** @type {import('@playwright/test').Locator} The attack check dialog. */
@@ -303,7 +309,6 @@ test('a Melee typed into the dialog replaces the rating, bonus included, and dro
 });
 
 test('a Prone target 21 spaces away lowers a ranged attack\'s Accuracy by two quarters of its base', async () => {
-   await applyCondition(page, fixture.farTokenId, 'prone');
    await targetPlacedToken(page, fixture.farTokenId);
 
    /** @type {import('@playwright/test').Locator} The attack check dialog, opened for the weapon's Melee attack. */
@@ -344,7 +349,6 @@ test('a Prone target 21 spaces away lowers a ranged attack\'s Accuracy by two qu
 });
 
 test('an Incapacitated target fixes the Difficulty at 2 even with Disadvantage', async () => {
-   await applyCondition(page, fixture.incapacitatedTokenId, 'incapacitated');
    await targetPlacedToken(page, fixture.incapacitatedTokenId);
 
    /** @type {import('@playwright/test').Locator} The attack check dialog. */
@@ -434,6 +438,75 @@ test('a GM who controls a Prone attacker and targets nothing is not read as the 
    await expect(untargeted.getByTestId('attack-target-conditions')).toHaveCount(0);
    await closeAllApps(page);
    await removeCondition(page, fixture.attackerTokenId, 'prone');
+});
+
+test('the pinned target conditions follow the attacker\'s base Melee while the dialog is open', async () => {
+   await targetPlacedToken(page, fixture.nearTokenId);
+
+   /** @type {import('@playwright/test').Locator} The attack check dialog. */
+   const dialog = await openAttackDialog();
+
+   /** @type {import('@playwright/test').Locator} The Melee field's input. */
+   const melee = dialog.getByTestId('check-field-attackerMelee').locator('input');
+   await expect(dialog.getByTestId('attack-target-condition')).toHaveText([await label('prone', 'melee', '+1')]);
+   await expect(melee).toHaveValue('4');
+   await moveDialogAside(dialog);
+   try {
+      // Body 10 makes the base Melee 5, and a quarter of it rounded up is 2.
+      await setAttributeBase(page, `Actor.${fixture.attackerId}`, 'body', 10);
+      expect(await readBaseRatings(), 'the attacker\'s base ratings after the Body change').toEqual({
+         accuracy: 3,
+         melee: 5,
+      });
+      await expect(dialog.getByTestId('attack-target-condition')).toHaveText([await label('prone', 'melee', '+2')]);
+      await expect(melee).toHaveValue('7');
+   }
+   finally {
+      await setAttributeBase(page, `Actor.${fixture.attackerId}`, 'body', 6);
+   }
+});
+
+test('an explicit target that shares the attacker\'s actor is read as the target', async () => {
+   /** @type {string} The id of a second token of the attacker's actor, on a square beside the attacker's. */
+   const sameActorTokenId = await placeToken(page, fixture.attackerId, {
+      square: {
+         column: fixture.attackerSquare.column + 1,
+         row: fixture.attackerSquare.row + 1,
+      },
+   });
+   try {
+      await applyCondition(page, sameActorTokenId, 'prone');
+      await targetPlacedToken(page, sameActorTokenId);
+
+      /** @type {import('@playwright/test').Locator} The attack check dialog. */
+      const dialog = await openAttackDialog();
+      await expect(dialog.getByTestId('attack-target-condition')).toHaveText([await label('prone', 'melee', '+1')]);
+      await closeAllApps(page);
+      await releaseTargets(page);
+      await removeCondition(page, sameActorTokenId, 'prone');
+   }
+   finally {
+      await page.evaluate(async (tokenId) => {
+         await canvas.scene.tokens.get(tokenId)?.delete();
+      }, sameActorTokenId);
+   }
+});
+
+test('a type switch that adds the conditions row keeps the fields below it mounted', async () => {
+   await targetPlacedToken(page, fixture.farTokenId);
+
+   /** @type {import('@playwright/test').Locator} The attack check dialog, opened for the weapon's Melee attack. */
+   const dialog = await openAttackDialog();
+   await expect(dialog.getByTestId('check-field-attackerMelee')).toBeVisible();
+   await expect(dialog.getByTestId('attack-target-conditions')).toHaveCount(0);
+
+   // Tag the Attack Type field's element: a remounted field is a new element without the tag.
+   await dialog.getByTestId('check-field-type').evaluate((element) => {
+      element.dataset.mountTag = 'tagged';
+   });
+   await setSelectField(dialog, 'type', 'ranged');
+   await expect(dialog.getByTestId('attack-target-conditions')).toBeVisible();
+   await expect(dialog.getByTestId('check-field-type')).toHaveAttribute('data-mount-tag', 'tagged');
 });
 
 test('an attack message without targetConditions loads it as none and renders', async () => {

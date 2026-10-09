@@ -30,6 +30,15 @@ export const PRONE_FAR_DISTANCE = 10;
  */
 
 /**
+ * The facts of a target that give an attack its condition modifiers, read once so an open dialog keeps them while the
+ * modifiers follow the attacker's live ratings.
+ * @typedef {object} TargetFacts
+ * @property {number|null} distance - The distance from the attacker's token in spaces, or null when it cannot be
+ * measured.
+ * @property {string[]} statuses - The target's active condition ids.
+ */
+
+/**
  * Computes the modifiers an attack takes from its target's conditions.
  * - Prone target within 1 space: Melee and Accuracy each gain ¼ of their base, rounded up (the attack uses one).
  * - Prone target beyond 10 spaces: Accuracy loses ¼ of its base per full 10 spaces, the resulting Accuracy rounded up

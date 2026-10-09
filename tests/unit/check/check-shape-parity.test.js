@@ -57,8 +57,8 @@ const OPTIONS = {
    resistance: 'reflexes',
    resolveCost: 0,
    skill: 'athletics',
-   targetDefense: 0,
    targetConditions: [],
+   targetDefense: 0,
    trainingMod: 0,
    type: 'melee',
 };

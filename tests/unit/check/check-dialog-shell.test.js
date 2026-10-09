@@ -79,6 +79,7 @@ function createActor() {
    /** @type {object} The Actor document. */
    const actor = {
       documentName: 'Actor',
+      getActiveTokens: () => [],
       id: 'a1',
       isOwner: true,
       items: new Map([
