@@ -22,6 +22,7 @@ import {
    createActor,
    createOwnedItem,
    dragItemOntoSheet,
+   effectActiveToggle,
    placeToken,
    removeCondition,
    setAttributeBase,
@@ -529,7 +530,8 @@ test.describe('the situational setting', () => {
 
       /** @type {{id: string, uuid: string}} A character whose permanent effect carries one situation. */
       const actor = await makeActor('E2E Check Options Actor');
-      await addModifierEffect(
+      /** @type {string} The uuid of the permanent effect. */
+      const effectUuid = await addModifierEffect(
          actor.id,
          'E2E Underwater',
          {
@@ -555,7 +557,7 @@ test.describe('the situational setting', () => {
       const sheet = await openSheetByUuid(page, actor.uuid);
       await clickSheetTab(sheet, 'Effects');
       await settle(page, { transitions: true });
-      await sheet.locator('[data-effect-id] i.fa-square-check').click();
+      await effectActiveToggle(sheet, effectUuid.split('.').at(-1), false).click();
       await expect.poll(
          () => page.evaluate(
             (id) => game.actors.get(id).system.getSituationalCheckModifiers('attribute', { skill: 'none' }).length,

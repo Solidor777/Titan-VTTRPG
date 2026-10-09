@@ -286,9 +286,11 @@ test('a suppressed condition in the HUD tray is dimmed and its popout tagged unt
    await expect(popout).toBeVisible();
    await expect(tag).toContainText(WARD_NAME);
 
+   /** @type {import('@playwright/test').Locator} The actor's sheet, picked by the actor id its element id ends in. */
+   const actorSheet = page.locator(`.application.titan-document-sheet[id$="-Actor-${actorId}"]`);
+
    /** @type {import('@playwright/test').Locator} The ward row's active toggle. */
-   const wardToggle = effectActiveToggle(page.locator('.application.titan-document-sheet').first(), wardId, false)
-      .locator('xpath=ancestor::button[1]');
+   const wardToggle = effectActiveToggle(actorSheet, wardId, false).locator('xpath=ancestor::button[1]');
    await wardToggle.focus();
    await page.keyboard.press('Enter');
    await expect(tag, 'the open popout lost its tag when the immunity ended').toHaveCount(0);
