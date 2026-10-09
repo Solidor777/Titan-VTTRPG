@@ -2407,8 +2407,26 @@ not checked in).
   event dispatched at once, the send now on `input`). The input keeps the typed text and the server holds it before and
   after the blur; it passes (`green-undo-inverse-run2.log`), so no new bug. Mutation: the `oninput` line of
   `DocumentTextInput.svelte` removed fails this spec and the label spec above and leaves the numeric spec passing
-  (`mut-u-textinput-oninput-run.log`; hashes in `mut-u-textinput-oninput-hashes.log`). Held-key auto-repeat and
-  input-method composition were not run.
+  (`mut-u-textinput-oninput-run.log`; hashes in `mut-u-textinput-oninput-hashes.log`).
+- **Input-method composition (measured, a second defect of the same fix):** the spec drives Chromium's input method
+  editor through CDP (`Input.imeSetComposition`, then `Input.insertText`). The events are `compositionstart`, an `input`
+  event with `isComposing` true per composition update, and `compositionend` (`diag-ime-events.jsonl`). With a send on
+  every `input` event the spec passed 3 times and then failed 8 of 20 repeated runs (`ime-repeat20.log`, build
+  `0d925153...` in `ime-repeat-hashes.txt`): the input held the committed text twice. The probe without waits between
+  the steps (`ime-probe3.spec.js.txt`) showed the composition ending after the second update with no `compositionend`
+  event in 9 of 12 runs, so the final `insertText` was appended to the finished text. That the echo of an own update
+  rewrites the input's value and ends the composition is inferred, not measured.
+- **Fixed (composition):** `DocumentTextInput` sends on `input` only when `event.isComposing` is false and on
+  `compositionend`; `TextInput` forwards `oncompositionend`. The IME spec then passed 20 of 20 repeats with the other
+  three specs of the file (80 of 80, `ime-fixed-repeat20.log`; hashes in `ime-fixed-hashes.txt`). A cancelled
+  composition (empty composition text) was run once on the unguarded build in a console run, with the input and the
+  server empty together; its log was overwritten and it was not run with the guard. Mutations: the guard replaced by `true` fails
+  2 of 6 runs of the composition spec, as the failure is a race (`mut-u3-ime-guard-run.log`); the `oncompositionend` line
+  removed fails 6 of 6 (the server keeps "Check" before the blur, `mut-u3-ime-compositionend-run.log`); the `oninput`
+  line removed fails the composition, key-by-key and label specs (`mut-u3-ime-oninput-run.log`). Hashes of each in
+  `mut-u3-<name>-hashes.log`.
+- **Held-key auto-repeat:** not run. It dispatches the same `input` events as the key-by-key spec (inferred, not
+  measured).
 - **Found:** 2026-10-08 while diagnosing #122.
 - **Status:** Closed 2026-10-09.
 
@@ -2482,8 +2500,11 @@ not checked in).
   `submitOnChange` and `closeOnSubmit` false. The Svelte components write the documents themselves, and the handler
   covers every button and Enter without editing each button. Green on build `cffa8268...`
   (`green-undo-inverse-run2.log`).
-- **Mutation (measured):** the `handler` line removed: the refused Add Check spec and the own-update spec fail
-  (`mut-u-form-handler-run.log`; hashes in `mut-u-form-handler-hashes.log`; restored build `cffa8268...`).
+- **Mutation (measured):** the `handler` line removed: the refused Add Check spec, the own-update spec and the spec
+  "Enter in a check label input sends no update" (an edit first shows the interception sees the item's updates, then
+  Enter on the unchanged input must add none) fail (`mut-u3-form-handler-run.log`; hashes in
+  `mut-u3-form-handler-hashes.log`; restored build `0d925153...`). The sheet's options no longer restate core's
+  `submitOnChange` and `closeOnSubmit` defaults (both false in core's `DocumentSheetV2`).
 - **Found:** 2026-10-09 while fixing #148 (second review round).
 - **Status:** Closed 2026-10-09.
 
@@ -2508,6 +2529,11 @@ not checked in).
   the sweep deletes none (`diag-fail-registry-fixed.jsonl`).
 - **Mutation (measured):** the by-name text put back: the probe's teardown fails with the sweep message
   (`mut-u-flows-by-name-run.log`; hashes in `mut-u-flows-by-name-hashes.log`).
+- **Compendium packs:** `createCompendium` takes the new pack's id the same way. Core refuses a second pack with one
+  label (`The Compendium pack e2e-dup-pack already exists in the World and cannot be created`,
+  `diag-pack-dup-new.jsonl`), so a restarted `beforeAll` fails there; the by-name text answered with the older pack's id
+  and recorded it twice, so the failure surfaced only as a page error (`diag-pack-dup-by-name.jsonl`,
+  `mut-u3-pack-by-name-run.log`).
 - **Not changed:** a lookup of a document by name elsewhere in the suite still finds both documents.
 - **Found:** 2026-10-09 while running the #148 specs.
 - **Status:** Closed 2026-10-09.

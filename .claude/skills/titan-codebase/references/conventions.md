@@ -1467,10 +1467,12 @@ from writing them; each says whether it was measured (with its saved log, under
   `gate119-predelete-after-fix.log` and `gate103-else-before-fix-item.log` (it fails with the confirm branch's
   `else` removed), under `.superpowers/sdd/test-suite-rewrite/phase-3/`.
 - When a test fails, Playwright restarts the worker and runs the file's `beforeAll` again, which creates a second
-  document of the same name. The create flows (`createActor`, `createWorldItem`, `createScene`, `createFolder`)
-  compare the entry ids before and after the click (`readEntryIds`) and record the new one, so the second document is
-  recorded (measured: `diag-fail-registry-fixed.jsonl` against `diag-fail-registry-by-name.jsonl`, CLOSED_BUGS #150,
-  under `.superpowers/sdd/2026-09-29-conditions-rework/bugbatch1-logs/`, local); a lookup by name elsewhere still finds
+  document of the same name. The create flows (`createActor`, `createWorldItem`, `createScene`, `createFolder`,
+  `createCompendium`) compare the entry ids before and after the click (`readEntryIds`) and record the new one, so
+  the second document is recorded (measured: `diag-fail-registry-fixed.jsonl` against
+  `diag-fail-registry-by-name.jsonl`, CLOSED_BUGS #150, under
+  `.superpowers/sdd/2026-09-29-conditions-rework/bugbatch1-logs/`, local; core refuses a second pack of one label, so
+  that creation fails loudly); a lookup by name elsewhere still finds
   both documents, and the first failure is the one to read (the older failure with two `E2E Rows Actor` directory
   entries: `gates-fix-before.log`).
 - The check-list specs (`check-list-refused-update.spec.js`) make an update fail on demand, which no real flow does: a
@@ -1484,7 +1486,11 @@ from writing them; each says whether it was measured (with its saved log, under
   checks (355 px each) in a 1000 px sheet the first row's top edge was at y -121 and neither drop half of an upward drag
   moved anything (measured: `diag-up-drag.jsonl`); the upward reorder spec collapses the outer rows first.
 - Typing specs: `fill` sends no key events, so the specs for a text sent on `input` use `pressSequentially` with no
-  delay as well; the numeric inputs keep the typed text in their own state while focused (CLOSED_BUGS #147).
+  delay as well, and a CDP session (`Input.imeSetComposition`, `Input.insertText`) for an input method; the numeric
+  inputs keep the typed text in their own state while focused (CLOSED_BUGS #147). Enter on an unchanged input sends no
+  update (`check-list-refused-update.spec.js`, CLOSED_BUGS #149).
+- The expansion undo methods are covered by a unit test over every move of 1 to 7 rows
+  (`tests/unit/TitanItemSheetStateUndo.test.js`; the state only moves entries, so it uses numbers for the flags).
 
 **E2E drag and item sheet tests (`drag`, `rules-element-editor`, `item-sheet-rolls`, `spell-sheet`)** — notes; each says
 whether it was measured (with its saved log, under `.superpowers/sdd/test-suite-rewrite/phase-3/`, local), read (with
