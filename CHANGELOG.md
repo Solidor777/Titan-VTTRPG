@@ -46,6 +46,11 @@ and hides from unlinked tokens the converted effects their own changes replace (
 - A condition or effect suppressed by an immunity shows a "Suppressed" tag naming the immunity, and a dimmed row, on
   the character sheet, in the Player HUD effects panel, and in turn-start and turn-end reports; its duration keeps
   running while suppressed.
+- Attack checks read the target's conditions: a Prone target within 1 space raises the attacker's Melee or Accuracy
+  by a quarter of its base, one beyond 10 spaces lowers Accuracy by a quarter per 10 spaces, and an Incapacitated
+  target's Difficulty is 2. The dialog and the chat card list them; a Melee or Accuracy typed into the dialog
+  replaces the rating, bonus included, and drops its entry. A GM who targets nothing no longer has the attacker's own
+  controlled token read as the target.
 
 ## Version 2.1.0:
 Advantage and Disadvantage, situational modifiers, and bug fixes.

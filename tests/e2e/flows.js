@@ -622,10 +622,15 @@ export async function toggleTokenLink(page, actorId) {
  * (`ChatLog.NOTIFY_DURATION`), and the card takes the pointer from a token under it.
  * @param {import('@playwright/test').Page} page - A logged-in GM page viewing the token's scene.
  * @param {string} tokenId - The token on the viewed scene.
+ * @param {object} [options] - Optional settings.
+ * @param {boolean} [options.keepWindows] - Whether to leave the open windows open, for a flow that works with a window
+ * open. No token may be controlled then: releasing control presses the Escape key.
  * @returns {Promise<{x: number, y: number}>} The token's centre in client (page) coordinates.
  */
-async function hoverToken(page, tokenId) {
-   await closeAllApps(page);
+async function hoverToken(page, tokenId, { keepWindows = false } = {}) {
+   if (!keepWindows) {
+      await closeAllApps(page);
+   }
    await showChatLog(page);
 
    /** @type {{x: number, y: number}} The token's centre in client (page) coordinates. */
@@ -804,11 +809,14 @@ export async function targetPlacedToken(page, tokenId, { add = false } = {}) {
 /**
  * Releases every target with the Target key, one hovered token at a time.
  * @param {import('@playwright/test').Page} page - A logged-in GM page viewing the targeted tokens' scene.
+ * @param {object} [options] - Optional settings.
+ * @param {boolean} [options.keepWindows] - Whether to leave the open windows open; no token may be controlled then,
+ * because releasing control presses the Escape key.
  * @returns {Promise<void>} Resolves once the user targets no token.
  */
-export async function releaseTargets(page) {
+export async function releaseTargets(page, { keepWindows = false } = {}) {
    for (const tokenId of await targetedTokenIds(page)) {
-      await hoverToken(page, tokenId);
+      await hoverToken(page, tokenId, { keepWindows });
       await page.keyboard.press('KeyT');
       await expect.poll(
          () => targetedTokenIds(page),

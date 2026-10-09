@@ -52,6 +52,11 @@ beforeAll(async () => {
       TOKEN_DISPLAY_MODES: { OWNER_HOVER: 50 },
       TOKEN_DISPOSITIONS: { FRIENDLY: 1 },
    };
+   globalThis.game.user = {
+      isGM: false,
+      targets: new Set(),
+   };
+   globalThis.canvas = { tokens: { controlled: [] } };
    CharacterDataModel = (await import('~/document/types/actor/types/character/CharacterDataModel.js')).default;
 });
 
@@ -59,6 +64,7 @@ afterAll(() => {
    restoreSchemaMocks();
    delete globalThis.Actor;
    delete globalThis.CONST;
+   delete globalThis.canvas;
 });
 
 /**

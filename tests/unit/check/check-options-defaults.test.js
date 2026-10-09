@@ -50,3 +50,19 @@ describe('check options — Advantage, Automatic Failure, situations', () => {
       });
    });
 });
+
+describe('attack options — target conditions', () => {
+   it('default to none and keep supplied ones', () => {
+      expect(createAttackCheckOptions({}).targetConditions).toEqual([]);
+
+      /** @type {TargetConditionModifier[]} A caller's Incapacitated Difficulty modifier. */
+      const targetConditions = [
+         {
+            condition: 'incapacitated',
+            modifier: 'difficulty',
+            value: 2,
+         },
+      ];
+      expect(createAttackCheckOptions({ targetConditions }).targetConditions).toEqual(targetConditions);
+   });
+});

@@ -82,7 +82,14 @@ import staminaBaseMultiplier from '~/helpers/Settings/StaminaBaseMultiplier.js';
 import woundsBaseMultiplier from '~/helpers/Settings/WoundsBaseMultiplier.js';
 import woundsBaseRegain from '~/helpers/Settings/WoundsBaseRegain.js';
 import getSumOfObjectValues from '~/helpers/utility-functions/GetSumOfObjectValues.js';
-import getTargetedCharacters from '~/helpers/utility-functions/GetTargetedCharacters.js';
+import getTargetedCharacterTokens from '~/helpers/utility-functions/GetTargetedCharacterTokens.js';
+import measureTokenDistance from '~/helpers/utility-functions/MeasureTokenDistance.js';
+import {
+   getTargetConditionDifficulty,
+   getTargetConditionModifiers,
+   omitSuppliedRatingModifiers,
+   sumTargetRatingModifiers,
+} from '~/check/types/attack-check/TargetConditionModifiers.js';
 import isCurrentUserBestOwner from '~/helpers/utility-functions/IsCurrentUserBestOwner.js';
 import isHTMLBlank from '~/helpers/utility-functions/IsHTMLBlank.js';
 import localize from '~/helpers/utility-functions/Localize.js';
@@ -2435,15 +2442,19 @@ export default class CharacterDataModel extends TitanActorDataModel {
          // Calculate the parameters.
          const checkParameters = this.getAttackCheckParameters(checkOptions);
 
-         // A target's Defense resolved now is fixed for the dialog's lifetime, like a caller's value; without a target
-         // the Defense stays derived, following the attacker's fallback rating and picking up a later target.
+         // A target's Defense and conditions resolved now are fixed for the dialog's lifetime, like a caller's values;
+         // without a target they stay derived, following the attacker's fallback rating and picking up a later target.
+         /** @type {boolean} Whether a target token resolved this check's target values. */
+         const hasTarget = this._getAttackTargetToken() !== undefined;
+
          /** @type {object} The options the dialog keeps through its rebuilds. */
-         const callerOptions = options.targetDefense === undefined && getTargetedCharacters().length > 0 ?
-            {
-               ...options,
-               targetDefense: checkOptions.targetDefense,
-            } :
-            options;
+         const callerOptions = {
+            ...options,
+            ...(hasTarget && options.targetDefense === undefined ? { targetDefense: checkOptions.targetDefense } : {}),
+            ...(hasTarget && options.targetConditions === undefined ?
+               { targetConditions: checkOptions.targetConditions } :
+               {}),
+         };
 
          // Create and display the check dialog.
          new AttackCheckDialog(
@@ -2704,33 +2715,65 @@ export default class CharacterDataModel extends TitanActorDataModel {
          ) > 0;
       }
 
+      /**
+       * Gets the attacker's rating for this attack before any target condition. Read only where a value is derived,
+       * so a caller supplying every rating and target value needs no rating data.
+       * @param {string} rating - 'melee' or 'accuracy'.
+       * @returns {number} The rating with the attack's conditional rating modifiers.
+       */
+      const getAttackRating = (rating) => this.rating[rating].value + this._getAttackRatingMod(
+         rating,
+         checkOptions.multiAttack,
+         checkOptions.type,
+         attackTraits,
+         customTraits,
+      );
+
+      // The target, read only when a target value is not supplied by the caller.
+      /** @type {Token|undefined} The first targeted Character token other than the attacker's own. */
+      const targetToken = options.targetDefense === undefined || options.targetConditions === undefined ?
+         this._getAttackTargetToken() :
+         undefined;
+
+      // Target conditions: modifiers to both ratings (the dialog can switch the attack type) and the Difficulty. A
+      // supplied list is kept as given; a derived one omits the entries of a rating the caller supplies, which replaces
+      // the derived rating, bonus included.
+      if (options.targetConditions === undefined) {
+         checkOptions.targetConditions = omitSuppliedRatingModifiers(
+            targetToken ?
+               getTargetConditionModifiers({
+                  accuracy: {
+                     base: this.rating.accuracy.baseValue,
+                     value: getAttackRating('accuracy'),
+                  },
+                  distance: measureTokenDistance(this.parent.getActiveTokens(false, true)[0], targetToken.document),
+                  melee: {
+                     base: this.rating.melee.baseValue,
+                     value: getAttackRating('melee'),
+                  },
+                  statuses: targetToken.actor.statuses,
+               }) :
+               [],
+            options,
+         );
+      }
+
       // Melee.
       if (options.attackerMelee === undefined) {
-         checkOptions.attackerMelee = this.rating.melee.value + this._getAttackRatingMod(
-            'melee',
-            checkOptions.multiAttack,
-            checkOptions.type,
-            attackTraits,
-            customTraits,
-         );
+         checkOptions.attackerMelee = getAttackRating('melee') +
+            sumTargetRatingModifiers(checkOptions.targetConditions, 'melee');
       }
 
       // Accuracy.
       if (options.attackerAccuracy === undefined) {
-         checkOptions.attackerAccuracy = this.rating.accuracy.value + this._getAttackRatingMod(
-            'accuracy',
-            checkOptions.multiAttack,
-            checkOptions.type,
-            attackTraits,
-            customTraits,
-         );
+         checkOptions.attackerAccuracy = getAttackRating('accuracy') +
+            sumTargetRatingModifiers(checkOptions.targetConditions, 'accuracy');
       }
 
-      // Target defense.
+      // Target defense: the target's, or without a target the attacker's own rating for the attack.
       if (options.targetDefense === undefined) {
-         const targets = getTargetedCharacters();
-         if (targets.length > 0) {
-            checkOptions.targetDefense = targets[0].system.getRollData().rating.defense.value;
+         if (targetToken) {
+            checkOptions.targetDefense = targetToken.actor.system.getRollData().rating.defense.value;
          }
          else {
             checkOptions.targetDefense = checkOptions.type === 'melee' ?
@@ -2740,6 +2783,17 @@ export default class CharacterDataModel extends TitanActorDataModel {
       }
 
       return checkOptions;
+   }
+
+   /**
+    * Gets the token an Attack Check targets: the first targeted Character token (a GM with no target falls back to
+    * their controlled tokens) other than the attacker's own, so a GM rolling from a controlled attacker never reads the
+    * attacker as its own target.
+    * @returns {Token|undefined} The target token, if any.
+    * @private
+    */
+   _getAttackTargetToken() {
+      return getTargetedCharacterTokens().find((token) => token.actor.uuid !== this.parent.uuid);
    }
 
    /**
@@ -2879,6 +2933,13 @@ export default class CharacterDataModel extends TitanActorDataModel {
 
       // Advantage adjusts the rating-derived Difficulty.
       this._applyCheckAdvantage(parameters);
+
+      // An Incapacitated target fixes the Difficulty after the rating math and Advantage.
+      /** @type {number|null} The Difficulty the target's conditions fix, if any. */
+      const targetDifficulty = getTargetConditionDifficulty(parameters.targetConditions);
+      if (targetDifficulty !== null) {
+         parameters.difficulty = targetDifficulty;
+      }
 
       // Cache the item and attack stats from the item roll data.
       const itemRollData = this.parent.items.get(options.itemId).system.getRollData();

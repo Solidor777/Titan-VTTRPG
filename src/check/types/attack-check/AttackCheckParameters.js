@@ -1,3 +1,5 @@
+import { selectAttackTargetConditions } from '~/check/types/attack-check/TargetConditionModifiers.js';
+
 /**
  * Calculated parameters for the creation of a new Attack Check, based off an Actor's data.
  * @typedef {CheckParameters} AttackCheckParameters
@@ -35,6 +37,8 @@
  * @property {number} totalTrainingDice - The total number of training dice to be rolled.
  * @property {number} trainingMod - Modifier for the amount of Training to be applied.
  * @property {SituationLabel[]} situations - The situational modifiers applied to the check.
+ * @property {TargetConditionModifier[]} targetConditions - The target-condition modifiers applied to the attack: its
+ * own rating's and the Difficulty.
  * @property {string[]} attackTrait - Array of standard attack traits applied to this attack.
  * @property {string[]} customTrait - Array of custom traits applied to this attack.
  * @property {string} attackName - The display name of the attack.
@@ -91,6 +95,7 @@ export function createAttackCheckParametersShape() {
       skill: '',
       skillExpertise: 0,
       skillTrainingDice: 0,
+      targetConditions: [],
       targetDefense: 0,
       totalDice: 0,
       totalExpertise: 0,
@@ -132,6 +137,7 @@ export default function createAttackCheckParameters(options) {
       range: options.range,
       rend: options.rend,
       skill: options.skill,
+      targetConditions: selectAttackTargetConditions(options.targetConditions, options.type),
       targetDefense: options.targetDefense,
       trainingMod: options.trainingMod,
       type: options.type,

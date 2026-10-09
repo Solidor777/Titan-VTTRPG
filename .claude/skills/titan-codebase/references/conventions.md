@@ -1176,7 +1176,9 @@ returns the sheet of an unlinked token's synthetic actor) or the click that take
 `controlPlacedTokens` (drags a selection rectangle over the given tokens and asserts that
 exactly those are controlled: while one token is controlled a second is not visible to the pointer, so Shift-click
 cannot add it), `targetPlacedToken` / `releaseTargets` / `targetedTokenIds` (core's Target key T on the hovered token,
-Shift+T adds; `game.user.targets` then holds real Token objects, as `check-math.spec.js` uses), `createCompendium` /
+Shift+T adds; `game.user.targets` then holds real Token objects, as `check-math.spec.js` uses; the hover helper
+closes the open windows first, and `releaseTargets(page, { keepWindows: true })` leaves them open for a test that
+untargets under an open check dialog, with no token controlled), `createCompendium` /
 `setCompendiumLocked` (Compendium tab Create dialog, entry context menu Lock/Unlock), `putInPack` (opens the pack's
 popout window and drags the world entry onto its `.directory-list`; the pack index is polled for the new id; the caller
 passes the world entry's locator, and the flow reopens that entry's sidebar tab before the drag). `setDescription`

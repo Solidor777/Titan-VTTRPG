@@ -3,11 +3,12 @@ import createAttributeCheckOptions from '~/check/types/attribute-check/Attribute
 import createCastingCheckOptions from '~/check/types/casting-check/CastingCheckOptions.js';
 import createItemCheckOptions from '~/check/types/item-check/ItemCheckOptions.js';
 import createResistanceCheckOptions from '~/check/types/resistance-check/ResistanceCheckOptions.js';
+import { omitSuppliedRatingModifiers } from '~/check/types/attack-check/TargetConditionModifiers.js';
 
 /**
  * Rebuilds an open check dialog's Check Options from their two sources of truth: the options the caller passed to
- * `request<Type>Check` (`callerOptions`, which for an Attack also carry a target's Defense resolved at open) and the
- * fields the user wrote in the dialog (`userEdits`, recorded by the tracked setter). The live Actor's
+ * `request<Type>Check` (`callerOptions`, which for an Attack also carry a target's Defense and conditions resolved at
+ * open) and the fields the user wrote in the dialog (`userEdits`, recorded by the tracked setter). The live Actor's
  * `initialize<Type>CheckOptions` derives every other field on every pass, so each of its derivation branches (an
  * `undefined` test, a `=== undefined` Complexity or Difficulty, the `'default'` Attribute and Skill sentinels, a read
  * of the owned weapon, spell, item, or effect, and conditional rules elements) follows the Actor with no list of
@@ -243,7 +244,7 @@ function pinSentinelFields(input, create, currentOptions) {
  * @property {string} checkType - The check type: attribute, resistance, attack, casting, or item.
  * @property {object} system - The live Actor's CharacterDataModel.
  * @property {object} [callerOptions] - The options the caller passed to `request<Type>Check`, plus any open-time
- * provenance (an Attack's target Defense).
+ * provenance (an Attack's target Defense and conditions).
  * @property {object} userEdits - The fields the user wrote in the dialog (field → value).
  * @property {object} currentOptions - The dialog's current Check Options.
  */
@@ -264,6 +265,15 @@ export default function rebuildCheckOptions({ checkType, system, callerOptions, 
       ...callerOptions,
       ...userEdits,
    };
+
+   // A rating the user typed replaces the derived one, bonus included: its target-condition entries leave the list the
+   // dialog pinned at open, so the card never lists a bonus the typed value does not carry.
+   if (checkType === 'attack' && input.targetConditions !== undefined) {
+      input = {
+         ...input,
+         targetConditions: omitSuppliedRatingModifiers(input.targetConditions, userEdits),
+      };
+   }
 
    // Validate silently: an invalid input here is an expected dialog state, not a reportable error.
    if (!system[methods.validate](input, false)) {

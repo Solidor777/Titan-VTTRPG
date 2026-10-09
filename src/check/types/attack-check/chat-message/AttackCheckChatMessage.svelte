@@ -9,6 +9,8 @@
    import ChatRendButtons from '~/document/types/chat-message/components/buttons/ChatMessageRendButtons.svelte';
    import AttackCheckChatDamageButtons
    from '~/check/types/attack-check/chat-message/AttackCheckChatDamageButtons.svelte';
+   import AttackCheckChatTargetConditions
+   from '~/check/types/attack-check/chat-message/AttackCheckChatTargetConditions.svelte';
 
    /** @type {object} Reference to the reactive Document store. */
    const document = getContext('document');
@@ -41,6 +43,13 @@
    <div class="section tags">
       <AttackCheckChatStats/>
    </div>
+
+   <!--Target Conditions-->
+   {#if document.data.system.parameters.targetConditions.length}
+      <div class="section tags">
+         <AttackCheckChatTargetConditions/>
+      </div>
+   {/if}
 
    <!--Dice Container-->
    <div class="section tags">

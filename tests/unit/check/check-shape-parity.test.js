@@ -58,6 +58,7 @@ const OPTIONS = {
    resolveCost: 0,
    skill: 'athletics',
    targetDefense: 0,
+   targetConditions: [],
    trainingMod: 0,
    type: 'melee',
 };

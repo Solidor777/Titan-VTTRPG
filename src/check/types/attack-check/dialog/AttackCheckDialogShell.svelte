@@ -21,6 +21,8 @@
    from '~/check/types/attack-check/dialog/AttackCheckDialogAttackerMeleeField.svelte';
    import AttackCheckDialogDefenseField
    from '~/check/types/attack-check/dialog/AttackCheckDialogTargetDefenseField.svelte';
+   import AttackCheckDialogTargetConditionsField
+   from '~/check/types/attack-check/dialog/AttackCheckDialogTargetConditionsField.svelte';
    import localize from '~/helpers/utility-functions/Localize.js';
    import warn from '~/helpers/utility-functions/Warn.js';
    import getApplication from '~/helpers/utility-functions/GetApplication.js';
@@ -47,12 +49,13 @@
    const checkActor = getContext('checkActor');
 
    /**
-    * @type {Array<typeof import('svelte').SvelteComponent>} Components for changing the options and
-    * displaying the parameters.
+    * @type {Array<typeof import('svelte').SvelteComponent>} Components for changing the options and displaying the
+    * parameters: the attack type's rating first, and the target's conditions only when any apply.
     */
-   let rows = $state([
-      AttackCheckDialogMeleeField,
+   let rows = $derived([
+      $checkOptions.type === 'melee' ? AttackCheckDialogMeleeField : AttackCheckDialogAccuracyField,
       AttackCheckDialogDefenseField,
+      ...($checkParameters.targetConditions.length > 0 ? [AttackCheckDialogTargetConditionsField] : []),
       AttackCheckDialogAttackTypeField,
       CheckDialogAttributeField,
       CheckDialogSkillField,
@@ -105,11 +108,6 @@
       else {
          onCheckInvalid();
       }
-   });
-
-   // Update the first row whenever the attack type is changed.
-   $effect(() => {
-      rows[0] = $checkOptions.type === 'melee' ? AttackCheckDialogMeleeField : AttackCheckDialogAccuracyField;
    });
 
 </script>

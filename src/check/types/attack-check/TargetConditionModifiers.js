@@ -107,6 +107,21 @@ export function sumTargetRatingModifiers(modifiers, rating) {
 }
 
 /**
+ * Omits the modifiers of an attacker rating that was supplied: the supplied value replaces the derived rating, bonus
+ * included, so the list never carries a modifier the value does not.
+ * @param {TargetConditionModifier[]} modifiers - The modifiers of both ratings and the Difficulty.
+ * @param {object} supplied - The ratings supplied.
+ * @param {number} [supplied.attackerAccuracy] - The supplied Accuracy; its modifiers are omitted when defined.
+ * @param {number} [supplied.attackerMelee] - The supplied Melee; its modifiers are omitted when defined.
+ * @returns {TargetConditionModifier[]} The modifiers of the other rating and the Difficulty.
+ */
+export function omitSuppliedRatingModifiers(modifiers, { attackerAccuracy, attackerMelee }) {
+   return modifiers.filter((modifier) =>
+      !(modifier.modifier === 'melee' && attackerMelee !== undefined) &&
+      !(modifier.modifier === 'accuracy' && attackerAccuracy !== undefined));
+}
+
+/**
  * Keeps the target-condition modifiers that apply to an attack: its own rating's (Melee for a melee attack, Accuracy
  * otherwise) and the Difficulty.
  * @param {TargetConditionModifier[]} modifiers - The modifiers for both ratings.

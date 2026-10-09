@@ -201,6 +201,7 @@ const GOLDENS = {
          skillExpertise: integerField(0),
          skillTrainingDice: integerField(0),
          targetDefense: integerField(0),
+         targetConditions: emptyObjectArray(),
          totalDice: integerField(0),
          totalExpertise: integerField(0),
          totalTrainingDice: integerField(0),

@@ -23,6 +23,8 @@
  * @property {number} [expertiseMod] - Modifier for the amount of Expertise to be applied.
  * @property {number} [range] - The Range of the Attack.
  * @property {number} [targetDefense] - The Defense rating of the target actor.
+ * @property {TargetConditionModifier[]} [targetConditions] - The target's condition modifiers to both of the
+ * attacker's ratings and to the Difficulty; derived from the first target when omitted.
  * @property {number} [trainingMod] - Modifier for the amount of Training to be applied.
  * @property {string} [attribute] - The Attribute to use for the Check.
  * @property {string} itemId - The ID of the weapon being used for the attack.
@@ -63,6 +65,7 @@ export default function createAttackCheckOptions(options) {
       rend: options.rend ?? false,
       situations: options.situations ?? [],
       skill: options.skill ?? 'default',
+      targetConditions: options.targetConditions ?? [],
       targetDefense: options.targetDefense ?? 0,
       trainingMod: options.trainingMod ?? 0,
       type: options.type ?? 'melee',

@@ -52,7 +52,16 @@ Parameter derivation (attribute/attack/casting/item checks share `_initializeAtt
 (×2 if `doubleExpertise`); an untrained skill contributes 0 training and 0 expertise. Resistance checks use
 `resistanceDice = resistance[x].value` instead. Attack difficulty is
 `clamp(targetDefense - attackerRating + 4, 2, 6)`; with no target selected `targetDefense` defaults to the
-attacker's own rating, yielding difficulty 4. Gotcha: resistances/ratings are derived from attribute
+attacker's own rating, yielding difficulty 4. `initializeAttackCheckOptions` also reads the target token
+(`_getAttackTargetToken()`: the first targeted Character token other than the attacker's own, a GM's controlled tokens
+standing in when nothing is targeted) and derives `targetConditions` (`getTargetConditionModifiers`) from its statuses
+and its grid distance to the attacker's first active token; the Melee and Accuracy entries join the ratings, and
+`getAttackCheckParameters` keeps the attack's own rating's entries (`selectAttackTargetConditions`) and sets an
+Incapacitated target's Difficulty of 2 after `_applyCheckAdvantage`. A supplied `attackerMelee` or `attackerAccuracy`
+replaces the derived rating and omits its derived entries (`omitSuppliedRatingModifiers`); a supplied
+`targetConditions` is kept as given. `_createAttackCheckDialog` adds the `targetDefense` and `targetConditions` a
+target resolved at open to the dialog's `callerOptions`, and `rebuildCheckOptions` omits the entries of a rating the
+user typed from that pinned list. Gotcha: resistances/ratings are derived from attribute
 **baseValues** (computed before mods), so a `flatModifier` on an attribute's `.value` does NOT propagate into
 resistance or rating dice — boost a resistance via a `resistance`-selector element, not an `attribute` one.
 Before the attribute-based totals, `_applySituationalModifiers` adds the situations `options.situations` names. After

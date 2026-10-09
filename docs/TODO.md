@@ -6,15 +6,15 @@ Completed items are deleted, not marked done.
 
 - Conditions rework to the 2026-09-26 rules, remaining part. Plan B
   (`docs/superpowers/plans/2026-09-29-conditions-rework.md`) has Tasks 1 to 4 complete, Task 5 implemented, and Tasks 6
-  to 12 built (the operation registry, the source list, the `immunity` element and editor, the immunity engine:
+  to 13 built (the operation registry, the source list, the `immunity` element and editor, the immunity engine:
   derivation, suppression, refusal, the suppressed-condition and effect markers on the sheet, the Player HUD and the
-  turn reports, the Immunity Handling setting: Remove by default, or Suppress, and the targeting, distance and
-  target-condition helpers). Read in `src/system/Conditions.js`:
+  turn reports, the Immunity Handling setting: Remove by default, or Suppress, the targeting, distance and
+  target-condition helpers, and the target-aware attack check: the target's Prone and Incapacitated conditions change
+  the attacker's Melee or Accuracy and the Difficulty, and the dialog and chat card list them). Read in
+  `src/system/Conditions.js`:
   the quarter-of-base penalties for Blinded, Contaminated, Prone, Restrained and Stunned, the new Off-Balance condition,
   Frightened as Disadvantage on every check, and the Prone and Sleeping speed and Awareness rules exist. Remaining plan
-  B work is Tasks 13 to 17:
-  - Task 13: target-aware attack checks, which carry the Prone attacker modifier (+1/4 of base within 1 space, -1/4 per
-    10 spaces beyond 10 spaces) and the Incapacitated Difficulty;
+  B work is Tasks 14 to 17:
   - Task 14: Unconscious applies Prone and Incapacitated and drops held gear;
   - Tasks 15 and 16: the Rules journal typos (Blinded reads "--1/4 of their total" instead of "-1/4 of their base
     value"; Prone's "1 space" wording) and Metal Attunement and Effulgent Gaze granting condition immunity (compendium
