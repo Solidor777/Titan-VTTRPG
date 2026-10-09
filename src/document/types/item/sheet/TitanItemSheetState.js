@@ -103,8 +103,7 @@ export default function createTitanItemSheetState(item, overrideData) {
    }
 
    // The three undo methods reverse one entry of the arrays, so an expansion toggle made while the update was in
-   // flight stays; copying the arrays back would overwrite it (measured: a row collapsed while a rejected delete was in
-   // flight was expanded again by the copy-back).
+   // flight stays. Constraint: copying a snapshot of the arrays back would overwrite that toggle.
 
    /**
     * Puts back the expansion flags `preDeleteCheck` removed.

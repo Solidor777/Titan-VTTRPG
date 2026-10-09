@@ -30,8 +30,7 @@ let scrollUuid;
 
 /**
  * The number of custom aspects of the spell whose Casting Check tab must scroll by more than the 40 px the test
- * scrolls. Measured at the sheet's default size
- * (`.superpowers/sdd/test-suite-rewrite/phase-3/spell-overflow-measure.log`, local): with 1 to 8 custom aspects the
+ * scrolls. Measured in a probe run at the sheet's default size: with 1 to 8 custom aspects the
  * list has no overflow, with 9 and 10 it has 2 px, with 11 and 12 it has 39 px, and with 13 and 14 it has 77 px. The
  * first count that scrolls the 40 px is 13; the count is 14, which gives the same 77 px.
  * @type {number}

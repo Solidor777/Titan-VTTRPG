@@ -181,8 +181,7 @@ async function openList(uuid, kind) {
 
    // The window is made tall so that every row of a list shows at once (a window size is not a document). At the
    // default window height three checks with one expanded did not fit: the first row was scrolled out of view behind
-   // the filter and a drag from its grip to the last row moved nothing
-   // (`.superpowers/sdd/test-suite-rewrite/phase-3/zz-check-drag.log` and `zz-check-drag.png`, local).
+   // the filter and a drag from its grip to the last row moved nothing (measured in a probe run).
    await page.evaluate(
       (id) => foundry.applications.instances.get(id).setPosition({
          top: 10,

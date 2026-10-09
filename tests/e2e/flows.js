@@ -431,11 +431,10 @@ export async function activateScene(page, sceneId) {
 }
 
 /**
- * Releases control of every token the way a user does: the Escape key, which core binds to releasing control. Measured
- * (`.superpowers/sdd/test-suite-rewrite/phase-2/review-measure-1.log`): on a scene with `tokenVision` true, a GM who
- * controls one token sees a second token with `visible` false, and releasing control makes it `visible` true; with
- * `tokenVision` false the second token stays visible while the first is controlled. A token that is not visible takes
- * no pointer events.
+ * Releases control of every token the way a user does: the Escape key, which core binds to releasing control. On a
+ * scene with `tokenVision` true (measured in a probe run), a GM who controls one token sees a second token with
+ * `visible` false, and releasing control makes it `visible` true; with `tokenVision` false the second token stays
+ * visible while the first is controlled. A token that is not visible takes no pointer events.
  * @param {import('@playwright/test').Page} page - A logged-in GM page viewing a drawn scene.
  * @returns {Promise<void>} Resolves once no token is controlled.
  */
@@ -470,10 +469,9 @@ const TOKEN_SPACING = 130;
  * `TOKEN_COLUMNS` by `TOKEN_SPACING` pixels, filled row by row from the centre; a spot with a token on it (whatever
  * order the scene's tokens were placed or deleted in) is skipped, because tokens dropped on one spot stack and the
  * pointer reaches only the topmost. A spot that another element covers, such as a chat notification over the canvas, is
- * skipped too: the pointer would wait for the cover to go (measured: the element at the drop spot of a 1.5 s drag in
- * `sheet-header.spec.js` was a `.chat-message` in `#chat-notifications`, `e2e-full-9-chain.log`). Measured at a
- * 1920 by 1080 viewport (`.superpowers/sdd/test-suite-rewrite/phase-2/review-measure-2.log`): 34 tokens were
- * placed, and the drop for the 35th timed out (cause not determined).
+ * skipped too: the pointer would wait for the cover to go (measured in a full run: the element at the drop spot of a
+ * 1.5 s drag in `sheet-header.spec.js` was a `.chat-message` in `#chat-notifications`). Measured at a 1920 by 1080
+ * viewport in a probe run: 34 tokens were placed, and the drop for the 35th timed out (cause not determined).
  * @param {import('@playwright/test').Page} page - A logged-in GM page.
  * @param {string} actorId - The actor to place.
  * @returns {Promise<string>} The id of the placed token.
@@ -2653,14 +2651,12 @@ function sharedItem(type, label, shape) {
 
 /**
  * The number of entries in each list of the bulk fixture: abilities, checks on the equipment and rules elements on the
- * effect. Measured at every tested zoom with this many entries
- * (`.superpowers/sdd/test-suite-rewrite/phase-3/entry-count-measure-12.log`, local): the Abilities tab's scroll area is
+ * effect. Measured in a probe run at every tested zoom with this many entries: the Abilities tab's scroll area is
  * 563 px high at 100% zoom and holds 788 px (225 px, 3.4 rows of 66 px, to scroll; the least of any zoom), the Checks
  * tab's area is 412 px and holds 4346 px, and the rules elements list's is 412 px and holds 1790 px. With 10 entries
- * the Abilities tab had 93 px (1.4 rows) to scroll at 100% zoom (`entry-count-measure-10.log`); 12 was chosen over 10
+ * the Abilities tab had 93 px (1.4 rows) to scroll at 100% zoom (the same probe with 10 entries); 12 was chosen over 10
  * for the margin: 225 px (3.4 rows) against 93 px (1.4 rows) at the tightest zoom. The sidebar's sections are not bulk
- * entries: 5 sections hold 872 px in an 855 px area (17 px) at 100% zoom and more at higher zooms (the same logs,
- * `sidebar` rows).
+ * entries: 5 sections hold 872 px in an 855 px area (17 px) at 100% zoom and more at higher zooms (the same probe).
  * @type {number}
  */
 export const BULK_COUNT = 12;

@@ -32,10 +32,10 @@
 
    /**
     * Sends the text as it is entered, whether or not a key produced it (a paste with the mouse, autofill), so another
-    * update that rebuilds the document before the `change` event cannot discard it. Nothing is sent while an input
-    * method composition runs. Measured: a send on every composition update ended the composition without a
-    * `compositionend` event in 9 of 12 probe runs and entered the committed text twice in 8 of 20 spec runs; the echo
-    * of an update rewriting the input's value is the inferred cause. The text is sent when the composition ends.
+    * update that rebuilds the document before the `change` event cannot discard it. Constraint: nothing is sent while
+    * an input method composition runs, because a send on every composition update ends the composition early and the
+    * committed text is then entered twice (inferred cause: the echo of the update rewrites the input's value). The text
+    * is sent when the composition ends.
     * @param {InputEvent} event - The native input event.
     * @returns {void}
     */
