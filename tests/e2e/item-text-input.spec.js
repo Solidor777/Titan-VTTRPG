@@ -10,7 +10,8 @@ import { attachPageErrors, closeAllApps } from './world.js';
  * Text entered into a document text input without a key event (the Playwright `fill`, a paste with the mouse, an input
  * method) is sent to the server even when another client's update reaches the page before the input loses focus. The
  * other client renames the same item through its own sheet, so the echo is a real replicated update that rebuilds the
- * first page's document while the typed text is still unsent.
+ * first page's document while the typed text is still unsent. The same holds for a numeric input (the Resolve Cost of a
+ * check). Text typed key by key with no delay between keys is saved and the input keeps what was typed.
  */
 
 /** @type {import('@playwright/test').Page} The file-shared, logged-in page (one world boot per file). */
@@ -76,3 +77,84 @@ test('a check label typed without a key event is saved when another client renam
       ).toBe('E2E Typed Label');
       await expect(input, 'the input shows the typed label').toHaveValue('E2E Typed Label');
    });
+
+test('a resolve cost typed without a key event is saved when another client renames the item before the input blurs',
+   async ({ browser }) => {
+      /** @type {string} The new actor's id. */
+      const actorId = await createActor(page, {
+         name: 'E2E Number Input Actor',
+         type: 'player',
+      });
+
+      /** @type {string} The weapon's id. */
+      const itemId = await createOwnedItem(page, actorId, 'weapon', 'E2E Number Input Weapon');
+
+      /** @type {string} The weapon's uuid. */
+      const uuid = `Actor.${actorId}.Item.${itemId}`;
+      await addCheck(page, uuid);
+
+      /** @type {import('@playwright/test').Locator} The weapon's sheet, open on the Checks tab. */
+      const sheet = await openSheetByUuid(page, uuid);
+
+      /** @type {import('@playwright/test').Locator} The new check's Resolve Cost input. */
+      const input = sheet.locator('.check .field')
+         .filter({ has: page.getByText('Resolve Cost', { exact: true }) })
+         .first()
+         .locator('input');
+      await expect(input, 'the new check shows its default resolve cost').toHaveValue('0');
+      await input.fill('7');
+      await withClients(browser, { other: 'E2E GM 2' }, async ({ other }) => {
+         /** @type {import('@playwright/test').Locator} The weapon's sheet on the other client. */
+         const otherSheet = await openSheetByUuid(other, uuid);
+         await commitText(otherSheet.locator('.document-name input'), 'E2E Number Input Weapon Renamed');
+         await expect.poll(
+            () => page.evaluate(async (uuid) => (await fromUuid(uuid)).name, uuid),
+            { message: 'the rename reached the first page' },
+         ).toBe('E2E Number Input Weapon Renamed');
+      });
+      await settle(page);
+      await input.blur();
+      await settle(page);
+      await expect.poll(
+         async () => (await readServerSystem(page, uuid)).check[0].resolveCost,
+         { message: 'the server stores the typed resolve cost' },
+      ).toBe(7);
+      await expect(input, 'the input shows the typed resolve cost').toHaveValue('7');
+   });
+
+test('a check label typed key by key with no delay is saved and the input keeps what was typed', async () => {
+   /** @type {string} The new actor's id. */
+   const actorId = await createActor(page, {
+      name: 'E2E Typing Actor',
+      type: 'player',
+   });
+
+   /** @type {string} The weapon's id. */
+   const itemId = await createOwnedItem(page, actorId, 'weapon', 'E2E Typing Weapon');
+
+   /** @type {string} The weapon's uuid. */
+   const uuid = `Actor.${actorId}.Item.${itemId}`;
+   await addCheck(page, uuid);
+
+   /** @type {import('@playwright/test').Locator} The weapon's sheet, open on the Checks tab. */
+   const sheet = await openSheetByUuid(page, uuid);
+
+   /** @type {import('@playwright/test').Locator} The new check's label input. */
+   const input = sheet.locator('.check .header .label input').first();
+
+   /** @type {string} The text typed key by key. */
+   const typed = 'E2E Typed Key By Key';
+   await input.focus();
+   await input.press('Control+A');
+   await input.pressSequentially(typed, { delay: 0 });
+   await settle(page);
+   expect(await input.inputValue(), 'the input keeps what was typed').toBe(typed);
+   await expect.poll(
+      async () => (await readServerSystem(page, uuid)).check[0].label,
+      { message: 'the server stores the typed label before the input blurs' },
+   ).toBe(typed);
+   await input.blur();
+   await settle(page);
+   expect(await input.inputValue(), 'the input still shows the typed label after the blur').toBe(typed);
+   expect((await readServerSystem(page, uuid)).check[0].label, 'the server still stores it').toBe(typed);
+});

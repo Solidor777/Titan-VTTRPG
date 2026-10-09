@@ -32,6 +32,31 @@ function exactText(text) {
 }
 
 /**
+ * Reads the ids of the directory entries (documents or folders) that show a name. A creation compares the ids before
+ * and after to tell the new entry from older entries of the same name, which a repeated `beforeAll` leaves behind
+ * when a failed test restarts its worker.
+ * @param {import('@playwright/test').Locator} panel - The directory's panel.
+ * @param {'entry' | 'folder'} kind - Whether to read document entries or folders.
+ * @param {string} name - The name the entries show.
+ * @returns {Promise<string[]>} The ids of the entries that show exactly the name.
+ */
+function readEntryIds(panel, kind, name) {
+   return panel.locator(`.directory-item.${kind}`).evaluateAll(
+      (elements, { kind, name }) => elements
+         .filter((element) => {
+            /** @type {Element|null} The element that holds the entry's name. */
+            const label = element.querySelector(kind === 'entry' ? '.entry-name' : 'header .folder-name');
+            return label?.textContent.replace(/\s+/g, ' ').trim() === name;
+         })
+         .map((element) => element.getAttribute(kind === 'entry' ? 'data-entry-id' : 'data-folder-id')),
+      {
+         kind,
+         name,
+      },
+   );
+}
+
+/**
  * Opens a sidebar tab the way a user does: clicking its tab button, which also expands the collapsed sidebar. Clicking
  * the tab that is already open changes nothing.
  * @param {import('@playwright/test').Page} page - A logged-in page.
@@ -64,6 +89,9 @@ export async function openSidebarTab(page, tab) {
 async function createFromDirectory(page, tab, name, type, folderId, { documentName, whenCreated }) {
    /** @type {import('@playwright/test').Locator} The directory's panel. */
    const panel = await openSidebarTab(page, tab);
+
+   /** @type {string[]} The ids of the entries that already show the name. */
+   const known = await readEntryIds(panel, 'entry', name);
    await (folderId === undefined
       ? panel.locator('header.directory-header [data-action="createEntry"]')
       : panel.locator(`.directory-item.folder[data-folder-id="${folderId}"] > header [data-action="createEntry"]`))
@@ -83,14 +111,15 @@ async function createFromDirectory(page, tab, name, type, folderId, { documentNa
    // ms and the canvas was ready at 921 and 890 ms (`.superpowers/sdd/2026-09-29-conditions-rework/bugbatch1-logs/
    // diag-A-probe-{old,new}-r{1,4}.jsonl`, helper texts of those runs). The document is recorded as soon as its id is
    // known, so a later failed wait cannot leave it unrecorded.
-   /** @type {import('@playwright/test').Locator} The directory entry of the new document. */
-   const entry = panel.locator('.directory-item.entry', {
-      has: page.locator('.entry-name', { hasText: exactText(name) }),
-   });
-   await expect(entry).toHaveCount(1);
+   /** @type {string[]} The ids of the new entries that show the name. */
+   let added = [];
+   await expect.poll(async () => {
+      added = (await readEntryIds(panel, 'entry', name)).filter((entryId) => !known.includes(entryId));
+      return added.length;
+   }, { message: `the directory shows one new entry named ${name}` }).toBe(1);
 
    /** @type {string} The new document's id. */
-   const id = await entry.getAttribute('data-entry-id');
+   const [id] = added;
    record({
       documentName,
       id,
@@ -142,19 +171,23 @@ export async function createFolder(page, tab, name) {
 
    /** @type {import('@playwright/test').Locator} The folder configuration window. */
    const config = page.locator('.application.folder-config');
+
+   /** @type {string[]} The ids of the folders that already show the name. */
+   const known = await readEntryIds(panel, 'folder', name);
    await config.locator('input[name="name"]').fill(name);
    await config.locator('button[type="submit"]').click();
 
    // The entry shows once the create resolved; the window closes after the create resolved and its close transition
    // ended, so it is checked after the folder is recorded.
-   /** @type {import('@playwright/test').Locator} The directory entry of the new folder. */
-   const entry = panel.locator('.directory-item.folder', {
-      has: page.locator('header .folder-name', { hasText: exactText(name) }),
-   });
-   await expect(entry).toHaveCount(1);
+   /** @type {string[]} The ids of the new folders that show the name. */
+   let added = [];
+   await expect.poll(async () => {
+      added = (await readEntryIds(panel, 'folder', name)).filter((folderId) => !known.includes(folderId));
+      return added.length;
+   }, { message: `the directory shows one new folder named ${name}` }).toBe(1);
 
    /** @type {string} The new folder's id. */
-   const id = await entry.getAttribute('data-folder-id');
+   const [id] = added;
    record({
       documentName: 'Folder',
       id,
@@ -309,11 +342,14 @@ async function chooseSceneMenuEntry(page, sceneId, label) {
 }
 
 /**
- * Waits at most 1000 ms for the canvas to finish drawing a scene, on core's `canvasReady` hook. A polling wait
- * (`waitForFunction`, default and 50 ms) first saw the finished state a median of 405 and 410 ms after the hook ran
- * and the hook wait resolved 47 ms after it, in 20 first-scene creations each at CPU throttle 4 (the polling lag
- * is inferred to be a main thread busy after the hook;
- * `.superpowers/sdd/2026-09-29-conditions-rework/bugbatch1-logs/diag-A3-{raf,poll50,hook}-r4.jsonl`).
+ * Waits at most 1000 ms for the canvas to finish drawing a scene, on core's `canvasReady` hook. In 20 first-scene
+ * creations each at CPU throttle 4, a frame-aligned wait and a 50 ms polling wait first saw the finished state a
+ * median of 358.5 and 364.5 ms after the hook ran (median of the per-creation differences), and 2 of the 20
+ * frame-aligned waits lasted longer than 1000 ms; the wait on the hook ended a median of 47 ms after the hook
+ * (maximum 51 ms) and the longest of its 20 waits lasted 552 ms. The lag is the same for both polling intervals, so
+ * it is not the interval; that a main thread busy after the hook causes it is inferred, not measured
+ * (`.superpowers/sdd/2026-09-29-conditions-rework/bugbatch1-logs/diag-A3-{raf,poll50,hook}-r4.jsonl`, medians in
+ * `med-a3.log` there).
  * @param {import('@playwright/test').Page} page - A logged-in page.
  * @param {string} sceneId - The scene being drawn.
  * @returns {Promise<void>} Resolves once the scene is drawn.
