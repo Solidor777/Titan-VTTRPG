@@ -556,6 +556,9 @@ test.describe('the row of a base effect', () => {
       await expect(dialog).toBeVisible();
       await dialog.getByRole('button', { name: 'Delete Effect' }).click();
       await expect(row, 'the row is gone').toHaveCount(0);
+      // Measured (task-10b-logs/fix2/mutations/g1-local-only-delete.log): a delete that removes the effect from the
+      // client collection only leaves the row on screen, so the row-gone assertion fails first; this server read is not
+      // separated from it by any mutation.
       await expect.poll(
          async () => (await readServerDocument(page, `Actor.${actorIds.main}`)).effects.some(
             (effect) => effect._id === id,
@@ -668,6 +671,9 @@ test.describe('the row of a base effect', () => {
          await expect(dialog).toBeVisible();
          await dialog.getByRole('button', { name: 'Delete Effect' }).click();
          await expect(row, 'the HUD row is gone').toHaveCount(0);
+         // Measured (task-10b-logs/fix2/mutations/g1-local-only-delete.log): a delete that removes the effect from the
+         // client collection only leaves the row on screen, so the row-gone assertion fails first; this server read is not
+         // separated from it by any mutation.
          await expect.poll(
             async () => (await readServerDocument(page, `Actor.${actorIds.main}`)).effects.some(
                (effect) => effect._id === id,
