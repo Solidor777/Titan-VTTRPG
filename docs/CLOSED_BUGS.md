@@ -939,6 +939,24 @@ when fixed.
   breakdown lists Conditions": Blinded is applied from the Token HUD and the sheet's Defense tooltip is read). No run of
   this test against the code before the fix exists.
 
+### 76. A GM targeting nothing had the attacker's own Defense read as the target's
+
+- **What:** `getTargetedCharacters` (via `getTargetedCharacterTokens`) falls back to a GM's controlled tokens when
+  nothing is targeted. Read at the commit before the fix (`c750ef41~1`): the attack check read the first of them as the
+  target (`CharacterDataModel.js` `initializeAttackCheckOptions` `targets[0]`, and `_createAttackCheckDialog` through
+  `getTargetedCharacters().length`), so a GM rolling from the attacker's own controlled token used the attacker's
+  Defense as the target's.
+- **Found:** 2026-09-29 by the plan buddy check of the conditions rework (per the plan's bug list).
+- **Fixed:** 2026-10-09 — `getTargetedCharacterTokens(fallbackExcludedIds)` skips the given token ids in the GM
+  fallback only, and `_getAttackTargetToken()` passes the attacker's own token ids
+  (`src/helpers/utility-functions/GetTargetedCharacterTokens.js`, `CharacterDataModel.js` `_getAttackTargetToken`), so an
+  explicit target is never excluded, even a second token of the attacker's own Actor. Gated by the unit test
+  "never reads the attacker's own controlled token as a GM's target"
+  (`tests/unit/check/rebuild-check-options.test.js:1189`) and by `tests/e2e/target-conditions.spec.js` "a GM who controls a Prone attacker and targets nothing is not read as the
+  attacker's own target" and "an explicit target that shares the attacker's actor is read as the target"; the task's
+  mutation proof (removing the exclusion) failed the first
+  (`.superpowers/sdd/2026-09-29-conditions-rework/task-14-logs/part-a-mutation.log`).
+
 ### 77. Opening a Multiply Base or Multiply Sum editor saved "up" for an element with no stored rounding
 
 - **What:** the rounding select listed `up` first; `Select`'s clamp effect writes its first option into an unlisted

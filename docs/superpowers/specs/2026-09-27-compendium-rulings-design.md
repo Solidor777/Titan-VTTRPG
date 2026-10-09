@@ -130,3 +130,16 @@ module repo's `main`; release is a separate step for the user.
 
 `docs/TODO.md` (delete the audit item; the two deferred rulings are already logged), `docs/CLOSED_BUGS.md` for any
 bug found on the way, the `titan-codebase` skill, and the module README if its workflow changes.
+
+## Delivered by the conditions rework (2026-10-09)
+
+Pack ruling 8 and C5 (Metal Attunement and Effulgent Gaze immunity) shipped with the conditions rework (spec B's
+plan) by user ruling on 2026-09-29: the effects carry `immunity` condition elements (`contaminated`, `blinded`) and
+the spells no longer offer the `removeCondition` aspect. Ruling 10 (the Attunement trait on Metal Attunement) and the
+rest of this spec are unchanged. The "Metal Attunement blocks Contaminated" e2e stays with this spec's plan (it reads
+the live packs, which change only after a recompile) and runs against the conditions rework's Immunity Handling
+setting at its default, Remove: applying Metal Attunement deletes a Contaminated the actor already has, and a new
+Contaminated is refused. The live packs were recompiled and checked in the test world on 2026-10-09: with the
+Metal Attunement effect present, applying Contaminated through `toggleStatusEffect` left the actor without it, and
+likewise Effulgent Gaze and Blinded
+(`.superpowers/sdd/2026-09-29-conditions-rework/task-17-logs/module-live-check.log`).

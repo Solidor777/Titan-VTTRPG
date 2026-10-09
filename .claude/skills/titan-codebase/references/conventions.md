@@ -175,7 +175,9 @@ synthetic situation elements (`createArmorTraitCheckModifiers`,
 `src/document/types/item/types/armor/ArmorTraitCheckModifiers.js`): each carries a canonical English `key` (its
 camel-case form is the situation key on every client), a localized `label`, and a `labelKey` that the chat card
 localizes again for the reading client; user-typed situations have no `labelKey`. Each is narrowed to the Skill its
-checks use (Athletics; Loud's is Stealth).
+checks use (Athletics; Loud's is Stealth). System situations (armor traits and conditions) are keyed by
+`CANONICAL_SITUATIONS` (`src/system/CanonicalSituations.js`); a condition's situation stores only `labelKey`, which the
+situational cache localizes (`CharacterDataModel.js:1680`).
 
 **`ReactiveDocument` bridge** — `src/document/reactive/ReactiveDocument.svelte.js` is the
 Foundry↔Svelte-5 reactivity bridge (it replaces TyphonJS `TJSDocument`). It wraps the live document;

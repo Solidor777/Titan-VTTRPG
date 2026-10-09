@@ -114,3 +114,73 @@ base value" and Stunned's duplicated "Defense decrease by".
 
 `docs/TODO.md` (delete the conditions item), the `titan-codebase` skill (conditions, immunity, target-aware attacks,
 rounding), and the `five-conditions-inert` auto-memory.
+
+## As built (2026-09-29, amended through 2026-10-09)
+
+- Immunities are `{ condition: Map, effect: Map }` of source lists (`{ id, name }`), not Sets: the refusal names the
+  source and an immunity must skip the effect granting it. They are derived in `CharacterDataModel.prepareBaseData`,
+  before core's `applyActiveEffects` reads `isSuppressed`, from the same source list as `_applyRulesElements`
+  (`_getRulesElementSources`); every immunities object is built by `createEmptyImmunities` from `IMMUNITY_SELECTORS`
+  (`src/document/types/item/rules-element/Immunity.js`).
+- Suppression is the data models' `isSuppressed` (true while immune, undefined otherwise so core's expiry test
+  decides).
+- **Amends §5's fourth bullet (lines 88-89).** What happens to an existing matching condition or effect is a GM world
+  setting, "Existing Effects on Gaining Immunity" (`immunityHandling`; user ruling 2026-09-30): **Remove** (default)
+  deletes it once, on the client that made the change, with a notification naming the immunity's source; **Suppress**
+  keeps §5's suppression. A suppressed effect's modifiers stop applying; immunities it grants still apply, an
+  exception the bullet did not state: reading every enabled source is the only well-defined rule, because suppressing
+  only what an unsuppressed effect grants has two fixed points (either member of a mutually immune pair applying) and
+  the rules supply no tiebreak (a naive simultaneous iteration oscillates). So in Suppress mode two effects each immune
+  to the other both have their modifiers stopped, both immunities stay, and each one's tag names the other; in Remove
+  mode such a pair (or a longer ring) is never deleted and falls back to that same suppression (grounded labelling,
+  Dung 1995). A suppressed effect returns untouched when the immunity ends, and its duration keeps ticking meanwhile.
+  Refusing an immune creation (`_preCreate`) applies in both modes. Switching the setting to Remove removes,
+  world-wide, what Suppress kept.
+- The Testing section's "an immunity effect blocks Contaminated and suppresses an existing one" is, as built: blocks
+  Contaminated in both modes, removes an existing one in Remove mode (the default), and suppresses it in Suppress mode.
+- Turn-start and turn-end reports list a suppressed condition or effect with the same "Suppressed: <sources>" tag as
+  the sheet and the Player HUD (user ruling 2026-09-30).
+- Stacked `mulBase` elements round per element: each condition's resulting value is rounded in sequence (base 6 with
+  Blinded and Off-Balance gives 4, base 7 gives 5; user ruling 2026-09-30).
+- **Amends §6.** The condition rewrite is an idempotent sync inside the migration system, not a version-chain step, so
+  Migration Mode governs it and unlinked token actors are covered: `getConditionEffectUpdate` /
+  `syncStoredActorConditions` (`src/helpers/migration/SyncConditionEffects.js`) run for every stored actor by the
+  stored-actor pass (`MigrateStoredActors.js`). A condition effect is matched by its single status against
+  `buildConditionDefinitions()` and is stale when its `system.rulesElement` differs or it still stores
+  `flags.titan.description`; one update per effect rewrites the rules elements when they differ and deletes the flag
+  with `_del`. The scan reads stored data only. Migration Mode "Disabled" skips migration without scanning (bug #74), and
+  a failed migration never blocks the load. There are no migration tests: the project does not test migrations while no
+  migration is active (`.claude/claude.md`, "Project Scope"), so the Testing section's "the migration rewrites a stale
+  condition AE" is not built as an automated test.
+- Condition descriptions are not stored on effects. The Player HUD uses the effect's own non-blank description (a GM's
+  edit in the condition sheet, bug #111), else looks the definition's text up by status id and localizes it at render;
+  the turn-start report stores an edit as `description` and an unedited condition's localization key as
+  `descriptionKey`, localized at render, and shows an older report's stored text as is. A turn-start report lists
+  conditions even when the actor has no other effect (bug #78), and report tags' tooltips are localized once (bug #79).
+- Condition situations store `labelKey` without a localized `label`; the canonical situation strings live in
+  `src/system/CanonicalSituations.js`.
+- Off-Balance's id is `offBalance`.
+- The rounding select lists `down`, `up`, `nearest`, so an element without a stored `rounding` shows and keeps the
+  engine's default (bug #77).
+- **Amends §3.** The attack's target is `_getAttackTargetToken()`: the first Character token the user targets. Only a
+  GM's fallback to controlled tokens (nothing targeted) skips the attacker's own token ids (bug #76), so an explicit
+  target is never excluded. The attacker's token, for distance, is the controlled token of the attacker's Actor, else
+  its first token on the viewed scene. Distance is measured between the nearest occupied spaces. When a target is
+  resolved as the dialog opens, the dialog pins the target's Defense and its `targetFacts` (statuses and distance);
+  every rebuild derives the Melee and Accuracy bonuses again from the pinned facts and the attacker's live base
+  ratings, so untargeting under an open dialog keeps the conditions. `options.targetConditions` carries both ratings'
+  modifiers and `parameters.targetConditions` the applied ones. A rating the user or caller supplies drops that
+  rating's derived entries; a caller-supplied `targetConditions` list is kept as given. The Prone penalty beyond 10
+  spaces applies to Accuracy only.
+- **Amends §1 (the Unconscious row, line 47), §4 (lines 74-78) and the Testing E2E line (lines 109-110).** Falling
+  Unconscious applies Prone and Incapacitated only, each if absent, on the creating client (user ruling 2026-10-09).
+  Unequipping the equipped weapons and the shield is not built: the user tabled it, and `docs/TODO.md` ("Unconscious
+  drops held gear") holds the intended behavior. The Testing E2E line therefore reads "Unconscious adds Prone and
+  Incapacitated" without the unequip.
+- The module's Stunned text was already correct; Prone's split `<strong>1 spac</strong>e` was fixed with Blinded's.
+- Stat breakdowns list condition modifiers (bug #75).
+- User rulings (2026-09-29): Off-Balance joins the Inflict Condition (cost 3) and Remove Condition (cost 2) spell
+  aspects, and `tests/unit/SpellAspectConditions.test.js` pins both lists to every condition except Dead and Sleeping;
+  a suppressed condition or effect shows a "Suppressed: <sources>" tag and a dimmed row on the sheet's effect rows and
+  in the Player HUD effects panel; the module's Metal Attunement and Effulgent Gaze effects carry `immunity` elements
+  (Contaminated, Blinded) and their spells no longer offer Remove Condition.

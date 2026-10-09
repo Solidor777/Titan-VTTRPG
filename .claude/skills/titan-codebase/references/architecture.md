@@ -69,6 +69,9 @@
   it for the live sheet's derived stats, and `src/spreadsheet/markdown/renderers/RenderSpell.js`
   delegates to the same function so a spell's rendered DC/enhancements match the sheet exactly. Enhancement
   `/ N` suffixes (renderer and `SpellAspectTag.svelte`) show `scalingCost ?? cost`, the per-increment ES charge.
+  `SpellAspects.inflictCondition` and `removeCondition` offer every condition but Dead and Sleeping (Inflict prices each
+  in `optionCosts`; Remove charges a uniform `optionCost`); `tests/unit/SpellAspectConditions.test.js` pins both lists
+  to `buildConditionDefinitions`, so a new condition fails until it is offered or listed as omitted.
 - `src/styles/` — Global SCSS: font imports (`Lato.scss`, `OpenSans.scss`), the STATIC structure tokens
   (`Variables.scss` — spacing, radii, border widths, font sizes; every color and font-family token is injected at
   runtime by the ThemeManager), global resets (`Global.scss`, incl. the chat visibility surface and badge), a
@@ -126,13 +129,20 @@
   `CONFIG.ui.titanEffects = TitanEffectTrayTab` (no `Sidebar` subclass; core instantiates `ui.titanEffects`).
 - `OnceSetup.js` (Foundry `setup` hook) calls `setupConditions()` from `src/system/Conditions.js`. That module
   exports a pure `buildConditionDefinitions()` (no `game`/localize access, unit-tested) returning the static
-  condition list — every entry is `type: 'condition'`, and the six mechanically-active conditions (blinded,
-  contaminated, prone, restrained, stunned, sleeping) carry a `system.rulesElement` array; `setupConditions()`
-  consumes it, localize-sorts, enriches each with `flags`, and pushes to `CONFIG.statusEffects`.
-- `OnceReady.js` (Foundry `ready` hook): on the active GM's client it resolves the Migration Mode
-  (`resolveMigrationAction`) and, as the mode allows, scans and runs `migrateWorld()` — the stored-actor pass (legacy
-  effect-Item conversion and condition sync over every stored actor), then the version chains — all from
-  `src/helpers/migration/`; for all users it registers the `hotbarDrop` sub-hook via `OnHotbarDrop.js` and builds the
+  condition list (every entry `type: 'condition'`; every condition but Dead and Unconscious carries a
+  `system.rulesElement` array), plus `CONDITION_IDS`, `UNCONSCIOUS_COMPANION_CONDITIONS`,
+  `findConditionDefinition(statuses)` (the system condition a single-status effect applies, from the definitions, never
+  `CONFIG.statusEffects`), `getConditionDescriptionKey(effect)` (that condition's description key, `<id>.desc`, which
+  chat snapshots store), `getEditedConditionDescription(effect)` (a GM's non-blank edit) and
+  `getConditionDescription(effect)` (the edit, else the key localized on the reading client; condition effects are
+  created with no description). `setupConditions()` localize-sorts the definitions, flags each with
+  `flags.titan.type`, and sets `CONFIG.statusEffects`.
+- `OnceReady.js` (Foundry `ready` hook), for the active GM, acts on
+  `resolveMigrationAction(migrationMode, worldNeedsMigration)` (the scan is passed as a function and runs only when
+  the mode is not Disabled): prompt renders `ConfirmMigrateWorldDialog`, migrate runs `migrateWorld()` (the stored-actor
+  pass: legacy effect-Item conversion and condition sync over every stored actor, then the version chains; all from
+  `src/helpers/migration/`), none does nothing. A failure anywhere in that attempt is reported through `error()` and
+  never stops the load; for all users it then registers the `hotbarDrop` sub-hook via `OnHotbarDrop.js` and builds the
   Player HUD.
 - `OnCombatNextTurn.js` / `OnCombatPreviousTurn.js` delegate to actor system methods (`onTurnStart`, `onTurnEnd`,
   `onInitiativeAdvanced`) on `TitanActor`.

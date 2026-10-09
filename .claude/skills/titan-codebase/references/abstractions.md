@@ -256,8 +256,8 @@ than 1 (read: a diagonal neighbor, `dx = dy = 1`, measures 2 under `RECTILINEAR`
 Difficulty's, `AttackCheckParameters.targetConditions` the attack's own rating's and the Difficulty's.
 `omitSuppliedRatingModifiers` drops the entries of a rating a caller or the user supplies.
 `AttackCheckOptions.targetFacts` (`TargetFacts`: the target's status ids and distance) is the input the modifiers
-derive from. The attack dialog lists them in `AttackCheckDialogTargetConditionsField` (only when any apply) and the chat card in
-`AttackCheckChatTargetConditions`.
+derive from. The attack dialog lists them in `AttackCheckDialogTargetConditionsField` (only when any apply) and the
+chat card in `AttackCheckChatTargetConditions`.
 
 **Parameters and options**
 
@@ -450,8 +450,9 @@ functions in `src/document/types/item/rules-element/` create default instances:
 |----------------------------------|------------------------------|----------------------------------------------------|
 | `createFlatModifierElement`      | `flatModifier`               | Add a flat bonus/penalty to an attribute, rating,  |
 |                                  |                              | training, expertise, resistance, or mod stat.      |
-| `createMulBaseElement`           | `mulBase`                    | Multiply the base value of a stat; carries an      |
-|                                  |                              | `up`/`down` `rounding` field for the scaled base.  |
+| `createMulBaseElement`           | `mulBase`                    | Multiply the base value of a stat; carries a       |
+|                                  |                              | `rounding` field (`ROUNDING_DIRECTIONS`: down/up/  |
+|                                  |                              | nearest) for the scaled base.                      |
 | `createMulSumElement`            | `mulSum`                     | Multiply a stat's post-additive running total      |
 |                                  |                              | (base plus all mod buckets); rounding-directional. |
 | `createSetSumElement`            | `setSum`                     | Force a stat's post-additive running total to a    |
@@ -498,9 +499,14 @@ situational modifiers list their sources in. `CharacterDataModel._applyRulesElem
 `prepareDerivedData`) skips a source whose Active Effect has `system.isSuppressed` (an immunity covers it), and copies
 each other source's elements, tagging each with its bucket (`type`) and its source's name (`sourceName`). Condition
 mechanics are derived entirely through this pipeline — the seeded `system.rulesElement` on each mechanically-active
-condition (see `Conditions.js`) feeds the same `flatModifier`/`mulSum`/`setSum` appliers, and each stat-mod bucket
-carries a `condition` entry (alongside `equipment`/`effect`/`ability`). There is no hardcoded condition `switch`; the
-old `_applyConditions` method was retired. All sources feed the character's derived stats. Before bucketing,
+condition (see `Conditions.js`) feeds the same appliers: "-1/4 of base, rounded up" is `mulBase` 0.75 with
+`rounding: 'up'` (`createQuarterBasePenalty`); the check rules are `conditionalCheckModifier` elements (Frightened:
+Advantage -1 on every check; Incapacitated and Restrained: Automatic Failure on Reflexes; Blinded and Deafened:
+situational Automatic Failure "Relies on Sight" / "Relies on Hearing" on Perception checks, stored with `labelKey`
+only). Each stat-mod bucket carries a `condition` entry: the buckets are `DYNAMIC_MOD_BUCKETS`
+(`src/system/ModBuckets.js`: equipment, effect, ability, condition, in the order `_resetDynamicMods` adds them) plus
+the persisted `static`. There is no hardcoded condition `switch`; the old `_applyConditions` method was retired. All
+sources feed the character's derived stats. Before bucketing,
 `_expandAllKeyElements` rewrites every element whose `key === 'all'` into one element per concrete key under its
 selector (keys resolved by `_getSelectorKeys`, which maps `training`/`expertise` to `Object.keys(this.skill)` and
 otherwise reads `Object.keys(this[selector])`); an element whose selector resolves to no keys (a typed custom trait,
@@ -585,7 +591,9 @@ the header image), `EffectsListRow` (dims icon and name; rows and tray icons car
 dims the entry). `CharacterDataModel#_getEffectReportEntry` builds the fields every report entry shares (label,
 image, a condition's edited `description` or `descriptionKey`, an effect's non-blank `description`, `suppressedBy`
 while suppressed) for `_getConditionReportData` and the four `_get*EffectReportData` builders; turn-start entries
-(`conditions` and every duration group) and turn-end `expired` entries carry it. Live pins:
+(`conditions` and every duration group) and turn-end `expired` entries carry it. `EffectTag` builds its tooltip with
+`buildEffectTagTooltip`, which localizes a `descriptionKey` at render (an entry without one shows its stored
+`description`) and returns `TextData` with `localize: false`, because the text is already localized. Live pins:
 `tests/e2e/immunity-display.spec.js` (sheet row, HUD list row, HUD tray icon and popout, turn-start and turn-end
 reports, the suppressed timers' ticking); probe rows in `component-probe-display.spec.js` (`EffectTag` suppressed
 entries, `SuppressedEffectTag`); `tests/unit/EffectReportData.test.js` pins the four builders' fields.
@@ -959,7 +967,8 @@ Reusable Svelte UI primitives consumed by sheet and chat-message components. Cat
   fields such as attributes and resistances (e.g., `TextInput`, `IntegerIncrementInput`,
   `CheckboxInput`, and others).
 - **Labels** — read-only display elements, including modified-value variants that show stat
-  breakdowns (e.g., `TextLabel`, `ModifiableStatValueLabel`, and others).
+  breakdowns (e.g., `TextLabel`, `ModifiableStatValueLabel` (takes the stat's `mod` object; its tooltip,
+  `createModifiableStatTooltip`, walks `MOD_BUCKET_LABELS`), and others).
 - **Tags** — compact inline badges for traits, ratings, durations, and check metadata
   (e.g., `TraitTag`, `DurationTag`, `TagContainer`, and others).
 - **Layout** — structural primitives: tab containers, scrolling wrappers, filtered lists, meters,

@@ -57,8 +57,9 @@ Parameter derivation (attribute/attack/casting/item checks share `_initializeAtt
 attacker's own rating, yielding difficulty 4. `initializeAttackCheckOptions` also reads the target token
 (`_getAttackTargetToken()`: the first targeted Character token, a GM's controlled tokens other than the attacker's own
 standing in when nothing is targeted) and derives `targetConditions` (`getTargetConditionModifiers`) from its
-`TargetFacts` (`_getAttackTargetFacts`: its statuses, and its grid distance from the attacker's controlled token, else
-first active token); the Melee and Accuracy entries join the ratings, and
+`TargetFacts` (`_getAttackTargetFacts`: its statuses, and its distance in spaces between the nearest spaces the
+tokens occupy, `measureTokenDistance`, from the attacker's controlled token, else its first token on the viewed
+scene); the Melee and Accuracy entries join the ratings, and
 `getAttackCheckParameters` keeps the attack's own rating's entries (`selectAttackTargetConditions`) and sets an
 Incapacitated target's Difficulty of 2 after `_applyCheckAdvantage`. A supplied `attackerMelee` or `attackerAccuracy`
 replaces the derived rating and omits its derived entries (`omitSuppliedRatingModifiers`); a supplied
@@ -672,7 +673,12 @@ destructures `const { type, ...system } = messageData` and calls `ChatMessage.cr
 message root and the rest as the typed `system` payload (plus `whisper: getOwners(actor)`), so Foundry selects
 the matching report `ChatMessage` subtype (e.g. `'turnStartReport'`, `'turnEndReport'`, `'effectsExpiredReport'`)
 and the card self-renders via `TitanChatMessage#renderHTML`. Report messages are visible only to document
-owners plus the GM.
+owners plus the GM. Every reported condition and effect entry comes from `_getEffectReportEntry`, which stores a
+condition's description as its localization key (`descriptionKey`; a GM's edit is stored as `description`) and adds
+`suppressedBy` (the suppressing immunities' names) while an immunity suppresses it. `EffectTag`, the leaf every report
+entry renders through, localizes the key at render (an entry that stores `description` text shows it as stored), shows
+the `SuppressedEffectTag`, and dims the entry. The turn-start card mounts its tags when effects or conditions are
+reported.
 
 **5. Revert — `TitanCombat.previousTurn` / `onCombatPreviousTurn`**
 Each revert handler is the inverse of its forward counterpart (see the turn-start/turn-end steps above).
