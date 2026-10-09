@@ -249,3 +249,42 @@ test('the roll button of an item sheet shows only when the player owns the item\
    await expect(observedSheet.locator(infoLine).first(), 'the observer sees the static info line').toBeVisible();
    await expect(observedSheet.locator(rollButton), 'the observer sees no roll button').toHaveCount(0);
 });
+
+test('an item sheet that is open when the player loses ownership turns read-only, and editable again on regaining it',
+   async () => {
+      await giveLevel('OWNER');
+
+      /** @type {import('@playwright/test').Locator} The player's view of the equipment's sheet. */
+      const sheet = await openSheetByUuid(player, equipmentUuid);
+      await clickSheetTab(sheet, 'Checks');
+
+      /** @type {import('@playwright/test').Locator} The check's label input. */
+      const input = sheet.locator('.check .header .label input').first();
+
+      /** @type {import('@playwright/test').Locator} The button that adds a check. */
+      const addCheckButton = sheet.getByRole('button', { name: 'Add Check' });
+      await expect(input, 'an owner can edit the label').toBeEnabled();
+      await expect(addCheckButton, 'an owner can add a check').toBeEnabled();
+      await giveLevel('OBSERVER');
+      await expect(input, 'the open sheet turns the label read-only').toBeDisabled();
+      await expect(addCheckButton, 'the open sheet disables Add Check').toBeDisabled();
+      await giveLevel('OWNER');
+      await expect(input, 'the label is editable again').toBeEnabled();
+      await expect(addCheckButton, 'Add Check works again').toBeEnabled();
+   });
+
+test('a character sheet that is open when the player loses ownership turns read-only', async () => {
+   await giveLevel('OWNER');
+
+   /** @type {import('@playwright/test').Locator} The player's view of the character sheet. */
+   const sheet = await openSheetByUuid(player, actorUuid);
+   expect((await readControls(sheet)).disabledInputs, 'an owner has no disabled input').toBe(0);
+   await giveLevel('OBSERVER');
+   await expect.poll(
+      async () => {
+         const controls = await readControls(sheet);
+         return controls.disabledInputs === controls.inputs;
+      },
+      { message: 'every input of the open sheet is disabled' },
+   ).toBe(true);
+});
