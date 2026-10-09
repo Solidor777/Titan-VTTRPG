@@ -77,8 +77,6 @@ export default class TitanDocumentSheet extends DocumentSheetV2 {
       // `type` attribute (the Add Check button) and for Enter in a text input.
       form: {
          handler: ignoreFormSubmission,
-         submitOnChange: false,
-         closeOnSubmit: false,
       },
    };
 
