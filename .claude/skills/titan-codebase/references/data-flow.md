@@ -219,7 +219,9 @@ and `this.#bridge?.destroy()` (a no-op — the subscriber already removed its ho
 *Document-bound inputs* (src/document/svelte-components/input/):
 Components like `DocumentIntegerInput.svelte` and `DocumentBoundEditorInput.svelte` use `bind:value` to
 mirror the `document.data.system.*` field, then call `refreshSystemDocument(document.data, disabled)`
-(src/helpers/utility-functions/RefreshSystemDocumentData.js) on `change` / `keyup`. That helper guards on
+(src/helpers/utility-functions/RefreshSystemDocumentData.js) on `change` / `keyup` (`DocumentTextInput`: `change` /
+`input`, so text entered without a key event is sent before another update's echo can rebuild the document). That
+helper guards on
 `!disabled && document?.isOwner`, then runs
 `document.update({ system: structuredClone(document.system), flags: structuredClone(document.flags) })`,
 writing the entire mutated system blob back to Foundry in one call.

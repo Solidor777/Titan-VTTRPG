@@ -67,7 +67,10 @@ management). Data model classes hold the schema, field validation, and derived-d
   `sendToChat` (sends that `type` + `system` as a first-class chat-message subtype, NOT `flags.titan`),
   the custom-trait mutators (`CustomTraitMixin`, `src/document/types/item/CustomTraitMixin.js`), the check-list
   mutators `addCheck` / `deleteCheck` / `moveCheck` / `insertCheck` (`CheckListMixin`,
-  `src/document/types/item/CheckListMixin.js`), both mixins shared with `TitanActiveEffect`, and the
+  `src/document/types/item/CheckListMixin.js`: each edits the live model and the sheet's expansion state before its
+  update resolves, so a following edit's whole-`system` snapshot carries the change, and takes both back when the
+  update is refused or rejected, using the sheet's `snapshotCheckExpansion` / `restoreCheckExpansion`), both mixins
+  shared with `TitanActiveEffect`, and the
   `isMarkedForDeletion` flag. `safeDelete` sets the flag, deletes, and clears the flag again when the delete is
   refused (it resolves false) or rejects (it rejects with the original error); `TitanActor#deleteItem` and the row
   expand button read the flag.

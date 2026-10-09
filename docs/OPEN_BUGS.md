@@ -211,7 +211,7 @@ Files cited as `bugbatch1-logs/...` are in `.superpowers/sdd/2026-09-29-conditio
   placed token: 1 failure in 720 (run 1, toggle 94, `stunned` remove: the closing left-click left the HUD open;
   `hud-flows-prefix-run1.json` to `-run3.json`, logs `hud-flows-prefix-run1.log` to `-run3.log`). The 21 of 240 of
   `scratch-hud.json` did not recur on this flow. No cause is claimed.
-- **Throttled repeat of the current flows, 2026-10-09, measured (`bugbatch1-logs/diag-C-newC-r1.jsonl` to `-r6.jsonl`,
+- **Throttled repeat of the current flows, 2026-10-08, measured (`bugbatch1-logs/diag-C-newC-r1.jsonl` to `-r6.jsonl`,
   `diagC-newC-r1.log` to `-r6.log`):** a throwaway spec created the first scene, an actor and a token through the
   flows, then ran 240 `applyCondition`/`removeCondition` toggles on that first token (40 rounds of `offBalance`,
   `stunned`, `blinded`, each on then off) with the page's CPU throttled through CDP at rate 1, 2, 4 and 6: 0 failures
@@ -267,7 +267,7 @@ Files cited as `bugbatch1-logs/...` are in `.superpowers/sdd/2026-09-29-conditio
   the first `beforeAll` had already made both, so the re-run duplicated them.
 - **Not reproduced:** the immediate re-run passed 17 of 17 (`sheet-2.log`), the full run passed 656 (`e2e-full-1.log`),
   and 10 separate runs of the spec passed 18 of 18 each (`drag-hunt/sheet-run-1.log` to `sheet-run-10.log`).
-- **Throttled repeat, 2026-10-09, measured (`bugbatch1-logs/diag-B-old-r1.jsonl` to `-r6.jsonl`, `diag-B-new-r1.jsonl`
+- **Throttled repeat, 2026-10-08, measured (`bugbatch1-logs/diag-B-old-r1.jsonl` to `-r6.jsonl`, `diag-B-new-r1.jsonl`
   to `-r6.jsonl`):** a throwaway spec made a Compendium pack through `createCompendium`, right-clicked its entry,
   chose 'Import Spreadsheet' through `chooseContextMenuEntry` and closed all windows, 40 iterations per cell, with the
   page's CPU throttled through CDP at rates 1, 2, 4 and 6. The text of `createCompendium` from before this change (no
@@ -298,56 +298,48 @@ Files cited as `bugbatch1-logs/...` are in `.superpowers/sdd/2026-09-29-conditio
   bundle's build, so whether the mutation had reached the system bundle in that run is not shown by it.
 - **Not reproduced:** 5 other isolated runs passed (`drag-hunt/chat-cards.log`, `scene-first/chat-cards-1.log` to
   `-3.log`, `drag-hunt2/chat-cards-rerun.log`), and the spec passed in every full run.
-- **Reproduced under measurement, 2026-10-09 (`bugbatch1-logs/diag-A-*.jsonl`, `diag-runs.txt`):** a throwaway spec
-  created the first scene of a world with no active scene (the world holds one inactive scene, so `active` and `viewed`
-  were null before every run), 20 fresh pages per cell, with the page's CPU throttled through CDP at rates 1, 2, 4 and
-  6. Failures per 20 with the text of `createFromDirectory`/`createScene` from before this change: rate 1: 1 (the
-  creation dialog still open 1000 ms after the click returned, `toHaveCount(0)` received 1, the first page of the
-  process), rate 2: 1 (the 1000 ms `waitForSceneDrawn`), rate 4: 15, rate 6: 20 (all `waitForSceneDrawn`). With the
-  current text: rate 1: 0, rate 2: 0, rate 4: 15, rate 6: 20 (all `waitForSceneDrawn`). With an intermediate text that
-  waited for the draw before the dialog: rate 1: 0, rate 2: 3, rate 4: 20, rate 6: 20.
-- **Event order, measured (`diag-A-probe-old-r1.jsonl`, `diag-A-probe-new-r1.jsonl`, `-r4.jsonl`):** from the click on
-  OK, at no throttle (medians of 20 runs each for the two texts): the `createScene` hook 12 and 15 ms, the directory
-  entry 19 and 22 ms, the dialog gone 333 and 334 ms, `canvasReady` 392 and 392 ms; the dialog was gone before
-  `canvasReady` in 40 of 40 runs. At rate 4 (20 runs each): dialog gone 358 and 357 ms, `canvasReady` 932 and 893 ms
-  (maximum 1461 and 1084 ms).
-- **What this shows and does not show:** the throttled failures are the 1000 ms wait on the first scene's draw, whose end
-  moves past that wait at CPU rates 2 and above; whether a first scene draw counts under the 1 s rule is not decided.
-  The single failure at rate 1 was the dialog-close wait; why that dialog stayed open for more than 1000 ms when it is
-  gone at about 333 ms in the 40 unthrottled probe runs is not measured (core's close waits for the dialog's
-  `transitionend` with a 1000 ms fallback, `application.mjs:982`; a transition that does not end would show as the
-  close at about 1000 ms; inferred, not observed). The reordering does not address it, and 1 failure in 20 against 0 in
-  20 is not enough to say the current text avoids it.
-- **Helper change (2026-10-09):** `createFromDirectory` waits for the directory entry, records the document, waits for
-  the dialog to close, then runs a `whenCreated` wait (`createScene` passes the draw wait when no scene was active, the
-  flag core tests, `Scene._preCreateOperation`); the old text recorded after every wait, so a failed wait left a created
-  document unrecorded (the second occurrence above), and the old `createScene` tested `game.scenes.viewed`.
+- **Measured 2026-10-08, throwaway spec with the page's CPU throttled through CDP (rates 1, 2, 4, 6), first scene of a
+  world with no active scene (it holds one inactive scene, so `active` and `viewed` were null before every run).** Texts
+  named by commit: `e0a46d5d` (the text before this work), an intermediate text that was never committed (entry, record,
+  polled draw wait, dialog), `249ccb24` (entry, record, dialog, polled draw wait: `waitForFunction`, 1000 ms) and
+  `57ff347f` (entry, record, dialog, draw wait on the `canvasReady` hook, 1000 ms).
+  - 20 pages in one process (`--repeat-each 20`), failures per 20 at rates 1, 2, 4, 6: `e0a46d5d` 1, 1, 15, 20;
+    intermediate 0, 3, 20, 20; `249ccb24` 0, 0, 15, 20; `57ff347f` rate 4: 0, rate 6: 0 (not run at 1 and 2 in this
+    form). All failures at rates 2 to 6 were the draw wait (`page.waitForFunction` timeout); the one at rate 1 was the
+    creation dialog still open (`toHaveCount(0)` received 1) on the first page of the process
+    (`diag-A-old-r*.jsonl`, `diag-A-new-r*.jsonl`, `diag-A-new2-r*.jsonl`, `diag-A-evt-r4.jsonl`, `-r6.jsonl`;
+    `diag-A-old-r1.jsonl` also holds 2 earlier smoke lines).
+  - The cause of the throttled draw-wait failures is the polling wait, not the draw. At rate 4, 20 creations per wait
+    mechanism, the wait started 417 to 426 ms (median) after the click on OK and the first state read that showed the
+    scene drawn came at 1244 ms (default `waitForFunction` polling) and 1232 ms (`polling: 50`), against the
+    `canvasReady` hook at 866 and 863 ms; the wait on the hook resolved a median of 47 ms after the hook ran and
+    never took longer than 552 ms (`diag-A3-raf-r4.jsonl`, `diag-A3-poll50-r4.jsonl`, `diag-A3-hook-r4.jsonl`). Core
+    sets the canvas ready before it calls the hook (`board.mjs` `#initialize`, `#ready = true`, then the hook), so
+    the state was already true at the hook; that the polling read came about 380 ms late is inferred to be a main thread
+    busy after the hook (not measured). `waitForSceneDrawn` waits on the hook since `57ff347f`.
+  - Event order from the click on OK, in 20 creations per run at no throttle (median, maximum), two runs
+    (`diag-A-probe-old-r1.jsonl`, `diag-A-probe-new-r1.jsonl`, helper texts of those runs): the `createScene` hook 11.5
+    (17) and 14.5 (20) ms, the directory entry 18.5 (24) and 21.5 (27) ms, the dialog gone 332.5 (358) and 333.5 (347)
+    ms, `canvasReady` 392 (423) and 392 (408) ms; the dialog was gone before `canvasReady` in 40 of 40. At rate 4: the
+    dialog gone 358 and 356.5 ms, `canvasReady` 921 (maximum 1461) and 890 (maximum 1084) ms.
+  - 20 separate processes per cell (a cold first page each), rates 1 and 2, texts `e0a46d5d`, intermediate, the
+    intermediate with the hook wait, and `57ff347f`: 0 failures in 160 processes (`diag-D-<text>-r1.jsonl`,
+    `-r2.jsonl`, `diagD-<text>-r<rate>-<n>.log`; every line records `git hash-object tests/e2e/flows.js`, which was
+    `ebced07ccbeb57cc022cbc23821685db00e88e3b` for all of them). The click-to-return time was a median of 929 to 1173 ms
+    at rate 1 and 1244 to 1372 ms at rate 2 (maximum 1480 ms). The failure of the creation dialog at rate 1 in the
+    single-process run was not reproduced, so the data does not separate the four texts and does not show that any of
+    them avoids the dialog failure.
+- **Dialog failure, still unexplained:** all earlier occurrences above and the one rate-1 failure were the creation
+  dialog still open 1000 ms after the click returned. Core's close waits for the dialog's `transitionend` with a 1000 ms
+  fallback (`application.mjs:982`, read), and the dialog was gone at a median of 332 to 437 ms per cell (maximum 473 ms)
+  in the 40 unthrottled probe runs and the 160 separate processes, without a failure; a transition that did not end
+  would leave the dialog until about 1000 ms (inferred, never observed).
+- **Helper change:** `createFromDirectory` waits for the directory entry, records the document, waits for the dialog to
+  close, then runs a `whenCreated` wait (`createScene` passes the draw wait when no scene was active, the flag core
+  tests, `Scene._preCreateOperation`); the earlier text recorded after every wait, so a failed wait left a created
+  document unrecorded (the second occurrence above), and the earlier `createScene` tested `game.scenes.viewed`. The
+  order of the dialog and the draw wait is kept as `57ff347f` has it because the dialog is the earlier event (above);
+  no run separates the orders.
 - **Cause not located.**
 - **Found:** 2026-10-08 during Phase 6 Part A.
-- **Status:** Open.
-
-### 147. A label typed into a `DocumentTextInput` without a `keyup` may be lost when an update echo lands before the `change` event
-
-- **What (read):** `DocumentTextInput` sends the update on `change` and on `keyup`
-  (`src/document/svelte-components/input/DocumentTextInput.svelte`). Text entered without a key event (the Playwright
-  `fill`, a mouse paste, an input method, autofill) is in the bound model only until the `change` event.
-- **Inferred, not reproduced:** an update echo that re-initializes the document's `system` between the `input` and the
-  `change` event makes the bound input show the stored value again, so the typed text is never sent (reading of
-  Svelte's `bind:value` and of core's `updateSource`/`_initialize`; no run has shown it). Related to #122 and #128.
-- **How to confirm:** a spec on real documents: add a check to an owned weapon, `fill` its label without blurring,
-  commit another update to the same item through its sheet header's name input, blur the label input, then read the
-  label with `readServerSystem`; the typed text surviving means the inference is wrong.
-- **Possible fix (needs a decision, it changes a shared primitive):** commit on the `input` event instead of `keyup`.
-- **Found:** 2026-10-08 while diagnosing #122.
-- **Status:** Open.
-
-### 148. `CheckListMixin.deleteCheck` notifies the sheet and edits the model before the update is known to commit
-
-- **What (read):** `deleteCheck` calls `sheet.preDeleteCheck(idx)` and splices the live model before
-  `await this.update(...)` (`src/document/types/item/CheckListMixin.js:53-61`); `addCheck` pushes into the live model
-  before its update and calls `sheet.postAddCheck()` after it whether or not the update changed anything (`:27-37`).
-- **Inferred, not reproduced:** an update that is refused (a `preUpdate` hook returning false) or rejected leaves the
-  model and the sheet's per-check expansion arrays out of step with the stored checks. No refusal path for check
-  updates was exercised.
-- **Found:** 2026-10-08 while diagnosing #122.
 - **Status:** Open.

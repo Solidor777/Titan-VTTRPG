@@ -2375,3 +2375,57 @@ unless a path says otherwise.
   - After the third fix round: unit 1555 of 1555 (`fix3/unit.log`); full e2e 704 of 704 with the sweep and census at 0
     (`fix3/e2e-full.log`).
 - **Status:** Closed 2026-10-08.
+### 147. A label typed without a key event into a `DocumentTextInput` was lost when another client's update arrived
+
+The evidence files named here are in `.superpowers/sdd/2026-09-29-conditions-rework/bugbatch1-logs/` (local,
+not checked in).
+
+- **What:** `DocumentTextInput` sent its update on `change` and `keyup`. Text entered without a key event (the
+  Playwright `fill`, a mouse paste, an input method, autofill) was only in the bound model until the `change` event, and
+  an update that rebuilt the document before then (here: another client renaming the item) reset the input to the stored
+  text, so the typed text was never sent. Related to the label failures of #122 and #128.
+- **Failing first (measured):** `tests/e2e/item-text-input.spec.js` makes a weapon with a check through the flows,
+  `fill`s the check's label without blurring, has a second client (E2E GM 2) rename the item through its sheet, waits
+  until the rename reached the first page, blurs the input and reads the label with `readServerSystem`. On the build
+  before the fix the server held "Check" (expected "E2E Typed Label") (`failfirst-147.log`; `dist/index.js` sha256
+  `5490ae64...`, `dist-sha-prefix.txt`).
+- **Fixed:** `TextInput` forwards `oninput`; `DocumentTextInput` sends on `change` and `input` (not `keyup`). Green on
+  the fixed build (`green-147-148-run1.log`; `dist/index.js` sha256 `fa2af98c...`, `dist-sha-fix.txt`).
+- **Mutation (measured):** `oninput` put back to `onkeyup`: the spec fails (`mut-m147-keyup-run.log`; before, mutated
+  and after sha256 and `git hash-object` in `mut-m147-keyup-hashes.log`; restored build `fa2af98c...`).
+- **Not covered:** the numeric document inputs (`DocumentIntegerInput`, `DocumentNumberInput`,
+  `DocumentIntegerIncrementInput`) also bind to the model and send on `change` / `keyup`; they evaluate expressions on
+  commit and were not changed or tested. `DocumentNameInput` keeps its own local value and does not bind to the model.
+- **Found:** 2026-10-08 while diagnosing #122.
+- **Status:** Closed 2026-10-09.
+
+### 148. A refused check update left the model and expansion state changed, and the next edit saved them
+
+The evidence files named here are in `.superpowers/sdd/2026-09-29-conditions-rework/bugbatch1-logs/` (local,
+not checked in).
+
+- **What:** `addCheck` pushed the new check into the live model, `deleteCheck` spliced it out and `deleteCheck`,
+  `moveCheck` and `insertCheck` changed the sheet's expansion arrays, all before `this.update(...)` resolved. The
+  model edit is deliberate: `refreshSystemDocument` sends `structuredClone(document.system)`
+  (`RefreshSystemDocumentData.js`), so an edit made before the echo must already carry the change. When a `preUpdate`
+  hook vetoed the update (it resolves undefined) or the server rejected it, nothing took the edits back, and the next
+  edit saved them.
+- **Failing first (measured, `failfirst-148-*.log`, build `5490ae64...`):**
+  `tests/e2e/check-list-refused-update.spec.js` makes a weapon with checks through the flows and refuses its updates
+  with a `preUpdateItem` listener that returns false (no flow refuses an update on demand), then edits another check
+  through the sheet. Refused Add Check: the edit saved the phantom check as well (one extra check stored). Refused
+  Delete: the expansion state came back as one entry (`[false]`) instead of `[true, false]`. Refused reorder: the
+  expansion state came back misaligned.
+- **Fixed:** `CheckListMixin` sends each update through `commitCheckUpdate`, which undoes the caller's edits when the
+  update resolves undefined or rejects: `addCheck` removes its check by `uuid` (when the model was not already rebuilt),
+  `deleteCheck` puts its check back by `uuid`, and the three sheet-notifying mutators restore the expansion arrays
+  copied by the new `snapshotCheckExpansion` / `restoreCheckExpansion` (`TitanItemSheetState`, `CheckListSheetMixin`,
+  passed through `RulesElementItemSheetState`, `SpellSheetState`, `WeaponSheetState`). The model edits stay optimistic.
+  Green on build `fa2af98c...` (`green-147-148-run1.log`).
+- **Mutations (measured, `mut-m148-<name>-run.log`, hashes in `mut-m148-<name>-hashes.log`, each restored to build
+  `fa2af98c...`):** no undo at all: all 3 tests fail; the add undo removed: the Add Check test fails (2 pass); the
+  delete model restore removed: the Delete test fails; the delete expansion restore removed: the Delete test fails; the
+  move expansion restore removed: the reorder test fails. `insertCheck` takes the same undo as `moveCheck` and has no
+  test of its own.
+- **Found:** 2026-10-08 while diagnosing #122.
+- **Status:** Closed 2026-10-09.
