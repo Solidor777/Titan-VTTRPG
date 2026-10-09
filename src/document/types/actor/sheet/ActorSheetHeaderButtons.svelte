@@ -14,10 +14,40 @@
    /** @type {TokenDocument | null} The active Token, or null for a directory Actor. Stable per sheet. */
    const token = application.token;
 
-   /** @type {boolean} Whether the active user may configure this Actor's tokens; follows the Actor's ownership. */
-   const canEditToken = $derived(
-      game.user.isGM || (document.data.isOwner && game.user.can('TOKEN_CONFIGURE')),
-   );
+   /** @type {number} Counts changes of the world's permission settings, which `game.user.can` reads. */
+   let permissionChanges = $state(0);
+
+   // The user's permissions come from the world's `permissions` setting, which no document hook of the Actor reports.
+   // The setting is created, updated or deleted as a Setting document, so all three hooks are handled.
+   $effect(() => {
+      /**
+       * Counts a change of the world's permission settings.
+       * @param {foundry.documents.Setting} setting - The created, updated or deleted setting.
+       * @returns {void}
+       */
+      const onSetting = (setting) => {
+         if (setting?.key === 'core.permissions') {
+            permissionChanges++;
+         }
+      };
+
+      /** @type {Array<[string, number]>} The registered hooks and their ids. */
+      const registered = [
+         'createSetting',
+         'updateSetting',
+         'deleteSetting',
+      ].map((hook) => [
+         hook,
+         Hooks.on(hook, onSetting),
+      ]);
+      return () => registered.forEach(([hook, id]) => Hooks.off(hook, id));
+   });
+
+   /** @type {boolean} Whether the active user may configure this Actor's tokens; follows ownership and permissions. */
+   const canEditToken = $derived.by(() => {
+      void permissionChanges;
+      return game.user.isGM || (document.data.isOwner && game.user.can('TOKEN_CONFIGURE'));
+   });
 
    /** @type {boolean} Whether the active user may import this Actor from its compendium pack. */
    const canImport = game.user.isGM && !!application.actor.pack;

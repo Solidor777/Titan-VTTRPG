@@ -28,6 +28,17 @@
    /** @type {boolean} Whether the input has focus. */
    let focused = $state(false);
 
+   /** @type {boolean} Whether the input is disabled by its caller or because the viewer does not own the document. */
+   const inactive = $derived(disabled || !document.data?.isOwner);
+
+   // A disabled input cannot hold focus. The flag is reset from the disabled state, so the input follows the model
+   // again whether or not the browser dispatches a blur event when it disables a focused element.
+   $effect(() => {
+      if (inactive) {
+         focused = false;
+      }
+   });
+
    // Constraint: a focused input is never rewritten from the model. An update from another client rebuilds the document
    // and would otherwise replace the text being entered and end a running input method composition.
    $effect(() => {
@@ -65,7 +76,7 @@
 
 <TextInput
    bind:value={text}
-   disabled={disabled || !document.data?.isOwner}
+   disabled={inactive}
    oncompositionend={updateDocument}
    onchange={updateDocument}
    onblur={() => (focused = false)}

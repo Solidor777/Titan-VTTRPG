@@ -150,6 +150,10 @@ describe('DocumentSheetShell sheetDocument context', () => {
             applicationState: {},
             shell: EmbeddedProbe,
          },
+         context: new Map([[
+            'application',
+            { syncDisabledControls() {} },
+         ]]),
       });
 
       expect(screen.getByTestId('document-id').textContent).toBe('a1');

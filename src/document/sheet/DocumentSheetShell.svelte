@@ -1,6 +1,7 @@
 <script>
    import { setContext } from 'svelte';
    import resolveRollActor from '~/document/reactive/ResolveRollActor.js';
+   import getApplication from '~/helpers/utility-functions/GetApplication.js';
 
    /**
     * @typedef {object} DocumentSheetShellProps
@@ -31,6 +32,17 @@
    const rollActor = resolveRollActor(document);
    // svelte-ignore state_referenced_locally
    setContext('rollActor', rollActor);
+
+   /** @type {import('~/document/sheet/TitanDocumentSheet.js').default} The sheet this shell is mounted in. */
+   const application = getApplication();
+
+   // Core disables every control of a sheet the viewer cannot edit when it renders and never enables them again, and
+   // does not render a sheet of an embedded document when its parent's ownership changes. The effect re-runs when the
+   // viewer's ownership of the document changes and applies the disabled state the sheet now needs.
+   $effect(() => {
+      void document.data.isOwner;
+      application.syncDisabledControls();
+   });
 </script>
 
 {#if shell}

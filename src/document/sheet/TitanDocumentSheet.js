@@ -27,6 +27,9 @@ export default class TitanDocumentSheet extends DocumentSheetV2 {
    /** @type {object | undefined} The mounted header-buttons Svelte component handle. */
    #headerMountHandle = void 0;
 
+   /** @type {Set<HTMLElement>} The controls that were enabled until core's blanket disable switched them off. */
+   #disabledByCore = new Set();
+
    /**
     * Resolves the polymorphic constructor arguments and applies the default CSS classes to the sheet.
     * @param {foundry.abstract.Document} sheetDocument - The Document this sheet represents.
@@ -140,21 +143,52 @@ export default class TitanDocumentSheet extends DocumentSheetV2 {
    }
 
    /**
-    * Disable or re-enable the sheet's form controls. DocumentSheetV2 disables every control present at render when
-    * the viewer cannot edit the document; controls inside a `[data-view-controls]` container (tab strips, row
-    * expand toggles) change no document state, so they are re-enabled and a non-owner can still read the whole
-    * sheet. Editing controls gate themselves on ownership in their components.
+    * Disable the sheet's form controls. DocumentSheetV2 disables every control present at render when the viewer
+    * cannot edit the document and never enables them again; controls inside a `[data-view-controls]` container (tab
+    * strips, row expand toggles) change no document state, so they are re-enabled and a non-owner can still read the
+    * whole sheet. Editing controls gate themselves on ownership in their components. The controls that core switched
+    * off are remembered, so `syncDisabledControls` can switch them on again.
     * @override
     * @param {boolean} disabled - Whether to disable the form controls.
     * @protected
     */
    _toggleDisabled(disabled) {
+      /** @type {HTMLElement[]} The controls that are enabled before core's toggle. */
+      const enabled = disabled ? Array.from(this.form?.elements ?? []).filter((control) => !control.disabled) : [];
       super._toggleDisabled(disabled);
       if (disabled) {
          for (const control of this.element.querySelectorAll('[data-view-controls] button')) {
             control.disabled = false;
          }
+         for (const control of enabled) {
+            if (control.disabled) {
+               this.#disabledByCore.add(control);
+            }
+         }
       }
+   }
+
+   /**
+    * Brings the disabled state of the sheet's controls in line with whether the viewer can edit the document. A sheet
+    * the viewer cannot edit has every control disabled (as at a render). When the sheet becomes editable, the controls
+    * that only core's disable had switched off are enabled again; a control that was already disabled when core
+    * disabled the controls (a TITAN component's own state) is not remembered and stays as the component set it.
+    * Constraint: a component that disables a remembered control itself while the sheet is read-only has the control
+    * enabled by this call. Called from the sheet shell whenever the viewer's ownership of the document changes, because
+    * a sheet of an embedded document is not rendered again when its parent's ownership changes.
+    * @returns {void}
+    */
+   syncDisabledControls() {
+      if (!this.isEditable) {
+         this._toggleDisabled(true);
+         return;
+      }
+      for (const control of this.#disabledByCore) {
+         if (control.isConnected) {
+            control.disabled = false;
+         }
+      }
+      this.#disabledByCore.clear();
    }
 
    /**
