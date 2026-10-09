@@ -527,10 +527,10 @@ async function hoverToken(page, tokenId) {
 
    // Read: the release of control sets the token's hover flag false without touching its interaction manager's state
    // (`PlaceableObject#_onRelease`, `placeable-object.mjs:786`), and the manager skips a pointer-over while that state
-   // is not NONE (`#handlePointerOver`, `mouse-handler.mjs:405-411`). Measured: on failing runs the token had hover
-   // false and manager state HOVER after the release. Inferred, not established: the pointer-out that resets the
-   // state did not reach the manager. The pointer enters and leaves the token before the release so that a pointer-out
-   // arrives while the token is still hovered; `restOnToken` then requires the state NONE.
+   // is not NONE (`#handlePointerOver`, `mouse-handler.mjs:405-411`). Inferred, not established: a release while the
+   // manager is in the hover state leaves it there when the pointer-out that resets the state does not reach the
+   // manager, and the next pointer-over is then skipped. The pointer enters and leaves the token before the release so
+   // that a pointer-out arrives while the token is still hovered; `restOnToken` then requires the state NONE.
    await page.mouse.move(centre.x, centre.y, { steps: 5 });
    await page.mouse.move(centre.x + 200, centre.y);
    await releaseTokenControl(page);
@@ -1112,6 +1112,18 @@ export async function addEffect(page, actorId, name, { duration, remaining, init
 }
 
 /**
+ * Locates the icon of the active toggle on an effect's row in an actor sheet's Effects tab: the unchecked box turns the
+ * effect on, the checked box turns it off.
+ * @param {import('@playwright/test').Locator} sheet - The actor's sheet.
+ * @param {string} effectId - The id of the actor's effect.
+ * @param {boolean} active - Whether the toggle is the one that makes the effect active (true) or inactive (false).
+ * @returns {import('@playwright/test').Locator} The toggle's icon.
+ */
+export function effectActiveToggle(sheet, effectId, active) {
+   return sheet.locator(`[data-effect-id="${effectId}"]`).locator(active ? 'i.fa-square' : 'i.fa-square-check');
+}
+
+/**
  * Switches a permanent effect on or off with the active toggle of its row in the actor's Effects tab.
  * @param {import('@playwright/test').Page} page - A logged-in page.
  * @param {string} actorUuid - The uuid of the actor whose Effects tab holds the toggle.
@@ -1125,9 +1137,7 @@ export async function setEffectActive(page, actorUuid, effectUuid, active) {
    await openTab(sheet, 'Effects');
    await settle(page, { transitions: true });
 
-   /** @type {import('@playwright/test').Locator} The effect's row. */
-   const row = sheet.locator(`[data-effect-id="${effectUuid.split('.').at(-1)}"]`);
-   await row.locator(active ? 'i.fa-square' : 'i.fa-square-check').click();
+   await effectActiveToggle(sheet, effectUuid.split('.').at(-1), active).click();
    await expect.poll(
       () => page.evaluate(async (uuid) => (await fromUuid(uuid)).system.isActive, effectUuid),
       { message: `the active toggle left the effect ${active ? '' : 'in'}active` },

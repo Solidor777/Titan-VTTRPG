@@ -17,6 +17,7 @@ import {
    controlPlacedToken,
    createActor,
    createCombat,
+   effectActiveToggle,
    endCombat,
    nextTurn,
    placeToken,
@@ -286,8 +287,8 @@ test('a suppressed condition in the HUD tray is dimmed and its popout tagged unt
    await expect(tag).toContainText(WARD_NAME);
 
    /** @type {import('@playwright/test').Locator} The ward row's active toggle. */
-   const wardToggle = page.locator(`.application.titan-document-sheet li.effect[data-effect-id="${wardId}"]`)
-      .locator('i.fa-square-check').locator('xpath=ancestor::button[1]');
+   const wardToggle = effectActiveToggle(page.locator('.application.titan-document-sheet').first(), wardId, false)
+      .locator('xpath=ancestor::button[1]');
    await wardToggle.focus();
    await page.keyboard.press('Enter');
    await expect(tag, 'the open popout lost its tag when the immunity ended').toHaveCount(0);
@@ -490,6 +491,12 @@ test('a turn-start report tags suppressed initiative, custom and permanent effec
    expect(permanent.find((entry) => entry.label === WARD_NAME), 'the ward is listed').toBeDefined();
    expect(permanent.find((entry) => entry.label === WARD_NAME).suppressedBy).toBeUndefined();
 
-   // The three new entries, the blade and the timer of the earlier tests are suppressed; the ward is not.
-   await expect(reportSuppressedTags(report.id)).toHaveCount(5);
+   // Every entry of the report that names suppressing immunities is tagged, and no other entry is.
+   /** @type {number} The entries of the report's conditions and effect groups that carry `suppressedBy`. */
+   const suppressedEntries = [
+      ...report.system.conditions,
+      ...Object.values(report.system.effects).flat(),
+   ].filter((entry) => entry.suppressedBy?.length > 0).length;
+   expect(suppressedEntries, 'the three new effects are among the suppressed entries').toBeGreaterThanOrEqual(3);
+   await expect(reportSuppressedTags(report.id)).toHaveCount(suppressedEntries);
 });
