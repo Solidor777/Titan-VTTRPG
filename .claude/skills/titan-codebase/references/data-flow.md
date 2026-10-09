@@ -517,22 +517,23 @@ Core loses a create or delete of two or more embedded documents on such a token 
 `TitanActor#createEmbeddedDocuments` and `#deleteEmbeddedDocuments` write the first document alone, which stores the
 delta, and then the rest, so these writes are stored. The split is not atomic: when the server rejects the rest, the
 first document stays written (core rejects the whole batch). A token the pass has work on always holds delta entries,
-so its delta exists. An Adventure's actors and scene tokens are data (`SetField` of `EmbeddedDataField`): their targets edit a per-walk working copy of the field (`AdventureContent`), and
-the walk stores it in one `adventure.update({ actors })` or `({ scenes })` when it leaves the Adventure — one write per field,
-because core validates every element of a replaced array on each write, so a legacy `effect` Item (unregistered subtype)
-left in any actor fails the write. The write is checked (core resolves `undefined` for a write it did not store), and
-`stored()` of every target of that Adventure settles with it; a failed write's error names the entries still holding a
-legacy `effect` Item (`describeLegacyHolders`), the ones to fix for the Adventure to migrate. Created effects are built
-by `TitanActiveEffect.buildCreationSource` and keep their ids. An Adventure target follows core's ActorDelta rules
+so its delta exists. An Adventure's actors and scene tokens are data (`SetField` of `EmbeddedDataField`): their targets
+edit a per-walk working copy of the field (`AdventureContent`), and the walk stores it in one
+`adventure.update({ actors })` or `({ scenes })` when it leaves the Adventure — one write per field, because core
+validates every element of a replaced array on each write, so a legacy `effect` Item (unregistered subtype) left in any
+actor fails the write. The write is checked (core resolves `undefined` for a write it did not store), and `stored()` of
+every target of that Adventure settles with it; a failed write's error names the entries still holding a legacy `effect`
+Item (`describeLegacyHolders`), the ones to fix for the Adventure to migrate. Created effects are built by
+`TitanActiveEffect.buildCreationSource` and keep their ids. An Adventure target follows core's ActorDelta rules
 (`deleteFromData`): a deletion removes the entry the data holds and leaves a tombstone where the base actor's collection
 holds the id, as core stores a world token's deletion (read back after a reload, live with a raw-data token, not re-run;
-no migration tests while no migration is active (project rule): a tombstone over a valid base Item, none for an Item
-the base lacks); a base actor's legacy `effect`
-Item is an invalid document, which core keeps out of a collection, so its id takes no tombstone (core's client
-`_delete`; not measured, as no legacy Item can be seeded); a creation replaces a tombstone with its id and refuses an id
-the token already shows. An Adventure scene token's base actor is the Adventure's actor with the token's `actorId`
-(core's Adventure import keeps ids), else the world actor (`readAdventureBaseSource`); the scene-token projection
-includes `actors` for it, read after the walk stored the Adventure's actors.
+no migration tests while no migration is active (project rule): a tombstone over a valid base Item, none for an Item the
+base lacks); a base actor's legacy `effect` Item is an invalid document, which core keeps out of a collection, so its id
+takes no tombstone (core's client `_delete`; not measured, as no legacy Item can be seeded); a creation replaces a
+tombstone with its id and refuses an id the token already shows. An Adventure scene token's base actor is the
+Adventure's actor with the token's `actorId` (core's Adventure import keeps ids), else the world actor
+(`readAdventureBaseSource`); the scene-token projection includes `actors` for it, read after the walk stored the
+Adventure's actors.
 
 **The stored-actor pass — `migrateStoredActors()`**
 For each source `storedActorNeedsMigration` flags: an orphaned token counts as one failure, logged (`error()`, so core's

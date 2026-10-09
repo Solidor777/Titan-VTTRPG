@@ -18,8 +18,10 @@ import error from '~/helpers/utility-functions/Error.js';
  * delete of two or more embedded documents when the token's stored delta is null (read: the walk in `#e` of
  * `dist/database/backend/embedded-delta.mjs`, Foundry 14.364, returns the outermost ancestor it adopted for the
  * document; for the second document that is the delta, which replaces the token as the write parent of the batch, so
- * the token record that has to hold the delta is not written; the loss is measured in `test-pf2e`, which does not load
- * TITAN, for deletes of Items). Writing one document alone stores the delta; the rest follows against the stored delta.
+ * the token record that has to hold the delta is not written; the loss of a batch delete and of a batch create of
+ * Items is measured in `test-pf2e`, which does not load TITAN, and pf2e authors no Active Effects, so no Active Effect
+ * was measured there: `bugbatch2-report.md` and its Addendum 2). Writing one document alone stores the delta; the rest
+ * follows against the stored delta.
  * The guard reads client state (`token._source.delta`): core replaces it with the server's data on every load and sets
  * it only after the server accepted a first write below the token (read: `TokenDocument#relinkActorDelta`, called from
  * the descendant events that run after the server's reply, `client/documents/token.mjs`). It differs from the server
@@ -137,11 +139,11 @@ export default class TitanActor extends Actor {
     * rest after the first write leaves the first document deleted, where core deletes none.
     * @override
     * @param {string} embeddedName - The name of the embedded document type.
-    * @param {string[]} ids - The ids of the documents to delete.
+    * @param {string[]} [ids] - The ids of the documents to delete; none with a `deleteAll` operation.
     * @param {object} [operation] - Parameters of the database deletion workflow.
     * @returns {Promise<Document[]>} The deleted documents.
     */
-   async deleteEmbeddedDocuments(embeddedName, ids, operation = {}) {
+   async deleteEmbeddedDocuments(embeddedName, ids = [], operation = {}) {
       /** @type {Collection} The embedded collection (core's own validation of the name). */
       const collection = this.getEmbeddedCollection(embeddedName);
 
@@ -149,6 +151,10 @@ export default class TitanActor extends Actor {
       const targets = operation.deleteAll ? Array.from(collection.keys()) : ids;
       if (!needsDeltaFirst(this, targets.length)) {
          return super.deleteEmbeddedDocuments(embeddedName, ids, operation);
+      }
+      // Core's own check (`Document.deleteDocuments`, `common/abstract/document.mjs`), which the split path would skip.
+      if (operation.deleteAll && ids?.length) {
+         throw new Error('A deleteAll operation must pass no IDs.');
       }
       for (const id of targets) {
          collection.get(id, {

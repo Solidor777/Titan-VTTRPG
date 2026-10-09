@@ -25,15 +25,18 @@ import { attachPageErrors, closeAllApps, reloadWorld } from './world.js';
  * delete of two or more embedded documents on such a token: the documents are written under the delta, but the token
  * record that has to hold the delta is not written (read: `dist/database/backend/embedded-delta.mjs` `#e` returns the
  * delta, not the token, as the write parent when it handles the second document, in Foundry 14.364 at
- * `C:\FoundryVTT\V14\dev\foundry`; the loss of a batch delete is measured in `test-pf2e`, which does not load TITAN).
+ * `C:\FoundryVTT\V14\dev\foundry`; the loss of a batch delete and of a batch create of Items is measured in
+ * `test-pf2e`, which does not load TITAN, and pf2e authors no Active Effects: `bugbatch2-report.md` and its
+ * Addendum 2).
  * `TitanActor` writes the first document alone so the delta exists before the rest is written. The tests use tokens
  * placed by dropping an actor from the Actors directory, so the stored delta is null until the first write.
  *
  * Everything is made and changed through the UI: the scene, the actors, the effects, the item folders and their
  * items, the token drops, Remove Expired Effects, the folder drops on the token's sheet and the Token HUD condition.
- * Exceptions, each a call with no control: `deleteAll` and a delete naming an id the actor lacks (a delete core
- * rejects), a create whose later document the server rejects, and a `preCreateItem` listener that vetoes a document
- * as a module does. The database requests a test sends are counted from `game.socket.emit` (a read-only wrapper).
+ * Exceptions, each a call with no control: `deleteAll`, a delete naming an id the actor lacks and a `deleteAll` that
+ * also names ids (deletes core rejects), a create whose later document the server rejects, and a `preCreateItem`
+ * listener that vetoes a document as a module does. The database requests a test sends are counted from
+ * `game.socket.emit` (a read-only wrapper).
  */
 
 /** @type {import('@playwright/test').Page} The file-shared, logged-in page (one world boot per file). */
@@ -473,6 +476,34 @@ test('a delete naming an effect the actor lacks is rejected before any request',
       }),
       'the call was rejected',
    ).toBe('rejected');
+   expect(await takeRequests('ActiveEffect', 'delete'), 'no request was sent').toEqual([]);
+   expect(await readEffectCount(tokenId), 'the token\'s actor keeps every effect').toBe(BATCH_SIZE);
+   expect((await readStoredToken(tokenId)).delta, 'the stored token still has no delta').toBeNull();
+});
+
+test('a deleteAll operation that also names ids is rejected before any request', async () => {
+   /** @type {string} The token under test. */
+   const tokenId = await placeBareToken();
+   expect(await readEffectCount(tokenId), 'the token\'s actor inherits the effects').toBe(BATCH_SIZE);
+
+   await spyRequests();
+   expect(
+      await page.evaluate(async ({ sceneId, tokenId, id }) => {
+         try {
+            await game.scenes.get(sceneId).tokens.get(tokenId).actor
+               .deleteEmbeddedDocuments('ActiveEffect', [id], { deleteAll: true });
+            return 'resolved';
+         }
+         catch (error) {
+            return error.message;
+         }
+      }, {
+         sceneId,
+         tokenId,
+         id: effectIds[0],
+      }),
+      'the call was rejected with core\'s message',
+   ).toBe('A deleteAll operation must pass no IDs.');
    expect(await takeRequests('ActiveEffect', 'delete'), 'no request was sent').toEqual([]);
    expect(await readEffectCount(tokenId), 'the token\'s actor keeps every effect').toBe(BATCH_SIZE);
    expect((await readStoredToken(tokenId)).delta, 'the stored token still has no delta').toBeNull();

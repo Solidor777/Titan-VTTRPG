@@ -2447,7 +2447,7 @@ not checked in).
   (`mut-u5-compositionend-run.log`).
 - **Focus state when the input becomes disabled (measured):** a focused input cannot become disabled while its sheet is
   open: after the viewer's ownership was lowered to Observer the input stayed enabled and focused, and only a reopened
-  sheet disabled it (OPEN_BUGS #151, `diag-readonly.jsonl`). The `focused` flag therefore cannot stick through that
+  sheet disabled it (CLOSED_BUGS #151, `diag-readonly.jsonl`). The `focused` flag therefore cannot stick through that
   path, and no other caller passes `disabled`, so no change was made and no spec was kept.
 - **Callers that bind into an array (read):** the check, custom aspect and attack label inputs bind
   `check.label`, `aspect.label` and `attack.label`, and the rules element key inputs (`customTrait`, `spellTradition`)
@@ -2631,6 +2631,19 @@ repro), `bugbatch2-logs/pf2e/` (the no-TITAN control) and `bugbatch2-logs/impl/`
     (`client-backend.mjs`, `#preDeleteDocumentArray`), and split like any batch.
   - **A delete naming an id the actor lacks** is rejected before the first write, as core rejects it (the same strict
     `collection.get(id, { strict: true, invalid: true })`).
+  - **A `deleteAll` that also names ids** throws core's own message, `A deleteAll operation must pass no IDs.`
+    (`Document.deleteDocuments`, `common/abstract/document.mjs:696`), which the split path would otherwise skip.
+  - **No TITAN flow creates two or more Active Effects on an unlinked token's actor (read, so the create-side split has
+    no Active Effect spec).** The callers of `createEmbeddedDocuments('ActiveEffect', ...)` and `addActiveEffect` are:
+    the Effects tab's Add New Effect button (one effect, `CharacterSheetEffectsTab.svelte`), the sheet drop of one
+    effect (`TitanActorSheet#_onDropActiveEffect`, `activeEffect.toObject()`), `applyEffectToTargets` (`[effectData]`,
+    one effect per target), core's `Actor#toggleStatusEffect` (one `ActiveEffect.create`,
+    `client/documents/actor.mjs:583`; the Token HUD calls it, `client/applications/hud/token-hud.mjs:329`), the
+    migration walker `StoredActorSources` (a batch, but a migration, not a user flow, and none is active) and the
+    spreadsheet import `ApplyImport` (parents resolved from a compendium pack, never a scene token). The Item folder
+    drop creates Items, whose transfer effects are not actor documents. Combat only deletes effects
+    (`removeCombatEffects`, `_processExpiredEffects`), which the delete tests cover. The create-side split is tested
+    with Items, the documents pf2e measured.
   - **Not atomic.** Core sends a batch as one server operation. The split sends the first document and then the rest
     as two operations, so when the server rejects the rest (for example a kept id that already exists), the first
     document stays written, where core writes none. A neutral write that stores the delta first is not available: no
@@ -2729,3 +2742,34 @@ Core citations refer to Foundry 14.364 at `C:\FoundryVTT\V14\dev\foundry`. The e
   and then deactivates the scene.
 - **Found:** 2026-10-01 while writing the gate test of CLOSED_BUGS #113 (test-suite rewrite, Phase 0 fix round 1).
 - **Status:** Closed 2026-10-09 as a core defect with the attribution measured (precedent: #116, #117).
+
+### 151. An open item sheet kept its inputs editable after the viewer lost ownership
+
+The evidence files named here are in `.superpowers/sdd/2026-09-29-conditions-rework/bugbatch1-logs/` (local,
+not checked in).
+
+- **What (measured):** E2E Player 1 had the check label input of a weapon's sheet open as an owner. The GM set the
+  player's ownership of the actor to Observer. The player's client then reported `isOwner` false for the item, and the
+  input stayed enabled and focused, also 3 s later; a reopened sheet disabled it (`diag-readonly.jsonl`; probe
+  `readonly-probe.spec.js.txt`). A character sheet opened as an owner did turn read-only (the updated document is the
+  actor itself).
+- **Cause (read):** core computes `isOwner` on each read from the permission (`client-document.mjs:153-155`) and
+  re-renders only the updated document's own sheets (`client-document.mjs:501-507`); `TitanDocumentSheet` ignores
+  later renders (`_replaceHTML` acts on the first render only). `ReactiveDocument` invalidated its readers on the
+  document's own `update<Name>` hook and on embedded-child hooks, so the parent actor's `updateActor` for an ownership
+  change never reached the `!document.data?.isOwner` readers of an item (or effect) sheet.
+- **A stale edit (measured, the old behavior):** the player filled the still-enabled label input and blurred it. The
+  input kept the typed text, the player's own model and the server kept the original label, and there was no notification
+  and no page error (`diag-stale-edit.jsonl`; probe `stale-edit-probe.spec.js.txt`; build with the fix made inert,
+  `7fd818d4...`). The edit was dropped silently.
+- **Failing first (measured):** `tests/e2e/ownership.spec.js` "an item sheet that is open when the player loses
+  ownership turns read-only, and editable again on regaining it" (GM lowers E2E Player 1 to Observer while the sheet is
+  open, then back to Owner): with the ancestor handler made inert the label input stayed enabled (expected disabled,
+  received enabled; `mut-u6-ownership-inert-run.log`, hashes in `mut-u6-ownership-inert-hashes.log`). The character
+  sheet spec beside it passes either way and is a regression lock.
+- **Fixed:** `ReactiveDocument` also listens to `update<Ancestor>` hooks for the document names of its ancestors and
+  invalidates its readers when the changed document is an ancestor and the diff has `ownership`; other updates of an
+  ancestor and a same-id sibling actor are ignored. Unit tests: `tests/unit/ReactiveDocument.test.js` (3 tests; three
+  mutations each fail exactly one: `mut-u6-rd-*`). Green on build `6f158e95...` (`r6-ownership-green.log`).
+- **Found:** 2026-10-09 while measuring whether `DocumentTextInput`'s focus state can stick (CLOSED_BUGS #147).
+- **Status:** Closed 2026-10-09.
