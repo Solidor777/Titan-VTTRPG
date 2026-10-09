@@ -529,8 +529,8 @@ and the accepted count (mode-independent); `tests/unit/Immunity.test.js` pins th
 `immunityHandling()` in `src/helpers/Settings/ImmunityHandling.js`) decides only what happens to a condition or effect a
 Character already holds when an immunity to it arrives; Remove deletes it, Suppress leaves the suppression above in
 force. `TitanActor#_onUpdate`, `#_onCreateDescendantDocuments` and `#_onUpdateDescendantDocuments` call
-`#_removeImmuneEffectsAfterChange(userId)`, which acts for a Character on the client whose user made the change (`userId
-=== game.user.id`) and never in data preparation. It calls `removeImmuneEffectsReporting(actor)`
+`#_removeImmuneEffectsAfterChange(userId)`, which acts for a Character on the client whose user made the change
+(`userId === game.user.id`) and never in data preparation. It calls `removeImmuneEffectsReporting(actor)`
 (`character/ImmuneEffectRemoval.js`; it reports a failure through the project logger and never rejects), which runs
 `removeImmuneEffectsWithDependents`: `removeImmuneEffects(actor)` for the actor, then, for a world actor, for each
 unlinked dependent token whose stored delta holds effects or items of its own (a token with an empty delta mirrors its

@@ -183,6 +183,17 @@ async function serverHoldsContaminated(uuid) {
 }
 
 /**
+ * Reads the names of the effects the server stores for an actor or an unlinked token.
+ * @param {string} uuid - The uuid of the world actor, or of the token for an unlinked token's own effects.
+ * @returns {Promise<string[]>} The stored effects' names; a tombstone entry in a token delta has none and is left out.
+ */
+async function serverEffectNames(uuid) {
+   /** @type {object} The stored document; an unlinked token keeps its own effects in its delta. */
+   const stored = await readServerDocument(page, uuid);
+   return (stored.delta ?? stored).effects.filter((effect) => effect._tombstone !== true).map((effect) => effect.name);
+}
+
+/**
  * Reads the info notices showing, and dismisses them with a click, as a user does, so they do not cover the token.
  * @param {string} text - Text the wanted notice contains.
  * @returns {Promise<string>} The notice's text.
@@ -305,7 +316,7 @@ test('Remove reaches the condition an unlinked token holds itself when its world
       /** @type {{baseline: number}} Body before the condition. */
       const { baseline } = await applyContaminated(subject);
       expect(await serverHoldsContaminated(tokenUuid), 'the token holds the condition in its delta').toBe(true);
-      expect(await serverHoldsContaminated(subject.actorUuid), 'the world actor does not hold it').toBe(false);
+      expect(await serverEffectNames(subject.actorUuid), 'the world actor holds no effect yet').toEqual([]);
 
       await addWard(subject);
       await expect.poll(() => readContaminated(subject), { message: 'removed from the token actor' }).toEqual({
@@ -314,6 +325,7 @@ test('Remove reaches the condition an unlinked token holds itself when its world
          held: false,
       });
       expect(await serverHoldsContaminated(tokenUuid), 'the token delta no longer holds it').toBe(false);
+      expect(await serverEffectNames(subject.actorUuid), 'the world actor holds the ward').toEqual([WARD_NAME]);
       await takeNotice(WARD_NAME);
    });
 
@@ -350,6 +362,8 @@ test('Remove deletes the condition an unlinked token holds when the ward is adde
    /** @type {{baseline: number}} Body before the condition. */
    const { baseline } = await applyContaminated(subject);
    expect(await serverHoldsContaminated(tokenUuid), 'the token holds the condition in its delta').toBe(true);
+   /** @type {string[]} The names of the effects the world actor holds before the ward. */
+   const worldBefore = await serverEffectNames(subject.actorUuid);
 
    await addTokenWard(subject, subject.tokenId);
    await expect.poll(() => readContaminated(subject), { message: 'removed from the token actor' }).toEqual({
@@ -358,7 +372,8 @@ test('Remove deletes the condition an unlinked token holds when the ward is adde
       held: false,
    });
    expect(await serverHoldsContaminated(tokenUuid), 'the token delta no longer holds it').toBe(false);
-   expect(await serverHoldsContaminated(subject.actorUuid), 'the world actor never held it').toBe(false);
+   expect(await serverEffectNames(tokenUuid), 'the ward went to the token delta').toContain(WARD_NAME);
+   expect(await serverEffectNames(subject.actorUuid), 'the world actor gained no effect').toEqual(worldBefore);
    await takeNotice(WARD_NAME);
 });
 
@@ -420,7 +435,8 @@ test('only the client that made the change removes the condition and posts the n
    });
 
    /**
-    * Reads a client's deletion count and stops the counter.
+    * Reads a client's deletion count and stops the counter. Safe to repeat and before the counter started:
+    * `Hooks.off` ignores an id it does not hold (client/helpers/hooks.mjs:81-92, build 364).
     * @param {import('@playwright/test').Page} client - The browser page of the watched user.
     * @returns {Promise<number>} The deletions the client initiated.
     */
@@ -437,22 +453,27 @@ test('only the client that made the change removes the condition and posts the n
       const secondHolds = () => second.evaluate((actorId) => game.actors.get(actorId).effects
          .some((effect) => effect.statuses.has('contaminated')), subject.actorId);
       await expect.poll(secondHolds, { message: 'the second client sees the condition' }).toBe(true);
-      await countDeletions(page);
-      await countDeletions(second);
+      try {
+         await countDeletions(page);
+         await countDeletions(second);
 
-      await addWard(subject);
-      await expect.poll(secondHolds, { message: 'the second client sees the condition removed' }).toBe(false);
-      await expect.poll(() => readContaminated(subject), { message: 'removed on the first client' }).toEqual({
-         active: false,
-         body: baseline,
-         held: false,
-      });
-      await takeNotice(WARD_NAME);
+         await addWard(subject);
+         await expect.poll(secondHolds, { message: 'the second client sees the condition removed' }).toBe(false);
+         await expect.poll(() => readContaminated(subject), { message: 'removed on the first client' }).toEqual({
+            active: false,
+            body: baseline,
+            held: false,
+         });
+         await takeNotice(WARD_NAME);
 
-      expect(await takeDeletions(page), 'the changing client deleted once').toBe(1);
-      expect(await takeDeletions(second), 'the other client deleted nothing').toBe(0);
-      await expect(second.locator('#notifications .notification.info', { hasText: WARD_NAME }))
-         .toHaveCount(0);
+         expect(await takeDeletions(page), 'the changing client deleted once').toBe(1);
+         expect(await takeDeletions(second), 'the other client deleted nothing').toBe(0);
+      }
+      finally {
+         // The shared page outlives the test: a counter left by a failed assertion would count later tests' deletions.
+         await takeDeletions(page);
+         await takeDeletions(second);
+      }
    });
 });
 

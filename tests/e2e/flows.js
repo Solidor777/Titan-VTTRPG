@@ -1106,6 +1106,30 @@ export async function dragItemOntoSheet(page, itemId, actorId) {
 }
 
 /**
+ * Reads the effects of the actor an effect is added to: a placed unlinked token's synthetic actor when a token id is
+ * given, otherwise the world actor.
+ * @param {import('@playwright/test').Page} page - A logged-in page.
+ * @param {string} actorId - The id of the world actor.
+ * @param {string} [tokenId] - The id of a placed unlinked token on the viewed scene.
+ * @returns {Promise<{id: string, name: string, duration: (object|undefined)}[]>} Each effect's id, name and
+ * `system.duration` (undefined for an effect without one).
+ */
+async function readHostEffects(page, actorId, tokenId) {
+   return page.evaluate(({ actorId, tokenId }) => {
+      /** @type {TitanActor} The token's synthetic actor, or the world actor. */
+      const actor = tokenId ? canvas.scene.tokens.get(tokenId).actor : game.actors.get(actorId);
+      return actor.effects.map((effect) => ({
+         duration: effect.system.duration ? JSON.parse(JSON.stringify(effect.system.duration)) : undefined,
+         id: effect.id,
+         name: effect.name,
+      }));
+   }, {
+      actorId,
+      tokenId,
+   });
+}
+
+/**
  * Adds an Active Effect to an Actor through the Effects tab's add button, renames it in its own sheet and, when
  * asked, sets its duration type in the sheet header.
  * @param {import('@playwright/test').Page} page - A logged-in page.
@@ -1127,35 +1151,16 @@ export async function addEffect(page, actorId, name, { duration, remaining, init
       : await openPlacedTokenSheet(page, tokenId);
 
    /** @type {string[]} The ids of the actor's effects before the add. */
-   const before = await page.evaluate(
-      ({ actorId, tokenId }) => {
-         /** @type {TitanActor} The token's synthetic actor, or the world actor. */
-         const actor = tokenId ? canvas.scene.tokens.get(tokenId).actor : game.actors.get(actorId);
-         return actor.effects.map((effect) => effect.id);
-      },
-      {
-         actorId,
-         tokenId,
-      },
-   );
+   const before = (await readHostEffects(page, actorId, tokenId)).map((effect) => effect.id);
    await openTab(sheet, 'Effects');
    await sheet.getByRole('button', { name: 'Add New Effect' }).click();
 
    /** @type {string[]} The ids that appeared on the actor. */
    let added = [];
    await expect.poll(async () => {
-      added = await page.evaluate(
-         ({ actorId, tokenId, before }) => {
-            /** @type {TitanActor} The token's synthetic actor, or the world actor. */
-            const actor = tokenId ? canvas.scene.tokens.get(tokenId).actor : game.actors.get(actorId);
-            return actor.effects.filter((effect) => !before.includes(effect.id)).map((effect) => effect.id);
-         },
-         {
-            actorId,
-            tokenId,
-            before,
-         },
-      );
+      added = (await readHostEffects(page, actorId, tokenId))
+         .filter((effect) => !before.includes(effect.id))
+         .map((effect) => effect.id);
       return added.length;
    }, { message: 'the add button created one effect' }).toBe(1);
    const [id] = added;
@@ -1179,15 +1184,7 @@ export async function addEffect(page, actorId, name, { duration, remaining, init
    await expect(effectSheet).toBeVisible();
    await commitText(effectSheet.locator('.document-name input'), name);
    await expect.poll(
-      () => page.evaluate(({ actorId, tokenId, id }) => {
-         /** @type {TitanActor} The token's synthetic actor, or the world actor. */
-         const actor = tokenId ? canvas.scene.tokens.get(tokenId).actor : game.actors.get(actorId);
-         return actor.effects.get(id).name;
-      }, {
-         actorId,
-         tokenId,
-         id,
-      }),
+      async () => (await readHostEffects(page, actorId, tokenId)).find((effect) => effect.id === id)?.name,
       { message: 'the effect sheet renamed the effect' },
    ).toBe(name);
    if (duration !== undefined) {
@@ -1197,18 +1194,7 @@ export async function addEffect(page, actorId, name, { duration, remaining, init
          duration,
       );
       await expect.poll(
-         () => page.evaluate(
-            ({ actorId, tokenId, id }) => {
-               /** @type {TitanActor} The token's synthetic actor, or the world actor. */
-               const actor = tokenId ? canvas.scene.tokens.get(tokenId).actor : game.actors.get(actorId);
-               return actor.effects.get(id).system.duration.type;
-            },
-            {
-               actorId,
-               tokenId,
-               id,
-            },
-         ),
+         async () => (await readHostEffects(page, actorId, tokenId)).find((effect) => effect.id === id)?.duration.type,
          { message: 'the duration select changed the duration type' },
       ).toBe(duration);
    }
@@ -1223,19 +1209,8 @@ export async function addEffect(page, actorId, name, { duration, remaining, init
    const typeDuration = async (input, value, field) => {
       await commitText(input, String(value));
       await expect.poll(
-         () => page.evaluate(
-            ({ actorId, tokenId, id, field }) => {
-               /** @type {TitanActor} The token's synthetic actor, or the world actor. */
-               const actor = tokenId ? canvas.scene.tokens.get(tokenId).actor : game.actors.get(actorId);
-               return actor.effects.get(id).system.duration[field];
-            },
-            {
-               actorId,
-               tokenId,
-               id,
-               field,
-            },
-         ),
+         async () => (await readHostEffects(page, actorId, tokenId))
+            .find((effect) => effect.id === id)?.duration[field],
          { message: `the header input stored the duration ${field}` },
       ).toBe(value);
    };
