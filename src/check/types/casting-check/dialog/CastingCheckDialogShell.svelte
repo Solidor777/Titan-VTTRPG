@@ -103,14 +103,15 @@
       }
    });
 
-   // Update whether Damage and Healing mod fields are displayed.
+   // Update whether Damage and Healing mod fields are displayed. The rows are built in a local array and assigned
+   // once: splicing the `rows` state itself would make the effect read the state it writes and re-run without end.
    $effect(() => {
-      // Reset the rows.
-      rows = [...baseRows];
+      /** @type {Array<typeof import('svelte').SvelteComponent>} The rows for the current parameters. */
+      const nextRows = [...baseRows];
 
       // Add the Healing Mod field.
       if ($checkParameters.healing) {
-         rows.splice(
+         nextRows.splice(
             4,
             0,
             CheckDialogHealingModField,
@@ -119,12 +120,13 @@
 
       // Add the Damage Mod field.
       if ($checkParameters.damage) {
-         rows.splice(
+         nextRows.splice(
             4,
             0,
             CheckDialogDamageModField,
          );
       }
+      rows = nextRows;
    });
 
 </script>
