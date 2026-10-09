@@ -253,3 +253,14 @@ Files cited as `bugbatch1-logs/...` are in `.superpowers/sdd/2026-09-29-conditio
 - **Cause not located.**
 - **Found:** 2026-10-08 during Phase 6 Part A.
 - **Status:** Open.
+
+### 154. An open pack-item sheet may keep its read-only state when only the pack's lock changes (unconfirmed)
+
+- **What, read, not run:** the shell effect of `DocumentSheetShell` runs on `document.data.isOwner`, while
+  `TitanDocumentSheet.syncDisabledControls` branches on `this.isEditable`, which also depends on `pack.locked`
+  (core `document-sheet.mjs`). A change of `locked` alone does not change `isOwner`, and core re-renders the pack, not
+  the open item sheet. So the controls of an open pack-item sheet would keep their disabled or enabled state when only
+  the lock flips. The existing compendium spec flips the lock and the ownership together. The reviewer read this
+  against the 14.368 install, not the 364 build the server runs, so the code paths need re-reading in 364.
+- **Found:** 2026-10-09 by the final review of the #151 follow-up round.
+- **Status:** Open; not reproduced.
