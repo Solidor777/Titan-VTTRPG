@@ -352,14 +352,9 @@ test('Remove Expired Effects of three effects on a token with no stored delta pe
       () => readEffectCount(tokenId),
       { message: 'the click removed the expired effects from the token\'s actor' },
    ).toBe(0);
-   expect(
-      await takeRequests('ActiveEffect', 'delete'),
-      'the first effect was deleted alone, then the other two together',
-   ).toEqual([
-      1,
-      BATCH_SIZE - 1,
-   ]);
 
+   /** @type {number[]} The sizes of the delete requests the click sent. */
+   const sent = await takeRequests('ActiveEffect', 'delete');
    await reloadWorld(page);
    expect(await readEffectCount(tokenId), 'the token\'s actor has no effect after the reload').toBe(0);
    await expectTombstones(tokenId, effectIds);
@@ -367,6 +362,10 @@ test('Remove Expired Effects of three effects on a token with no stored delta pe
       await page.evaluate((actorId) => game.actors.get(actorId).effects.size, actorId),
       'the base actor keeps its effects',
    ).toBe(BATCH_SIZE);
+   expect(sent, 'the first effect was deleted alone, then the other two together').toEqual([
+      1,
+      BATCH_SIZE - 1,
+   ]);
 });
 
 test('Remove Expired Effects of exactly two effects on a token with no stored delta persists across a reload',
@@ -381,15 +380,16 @@ test('Remove Expired Effects of exactly two effects on a token with no stored de
          () => readEffectCount(tokenId),
          { message: 'the click removed the expired effects from the token\'s actor' },
       ).toBe(0);
-      expect(await takeRequests('ActiveEffect', 'delete'), 'each effect was deleted in a request of its own')
-         .toEqual([
-            1,
-            1,
-         ]);
 
+      /** @type {number[]} The sizes of the delete requests the click sent. */
+      const sent = await takeRequests('ActiveEffect', 'delete');
       await reloadWorld(page);
       expect(await readEffectCount(tokenId), 'the token\'s actor has no effect after the reload').toBe(0);
       await expectTombstones(tokenId, pairEffectIds);
+      expect(sent, 'each effect was deleted in a request of its own').toEqual([
+         1,
+         1,
+      ]);
    });
 
 test('Remove Expired Effects on a token whose delta is stored sends one request and persists', async () => {
@@ -411,11 +411,12 @@ test('Remove Expired Effects on a token whose delta is stored sends one request 
       ),
       { message: 'the click removed the expired effects from the token\'s actor' },
    ).toBe(0);
-   expect(await takeRequests('ActiveEffect', 'delete'), 'the three effects were deleted in one request')
-      .toEqual([BATCH_SIZE]);
 
+   /** @type {number[]} The sizes of the delete requests the click sent. */
+   const sent = await takeRequests('ActiveEffect', 'delete');
    await reloadWorld(page);
    await expectTombstones(tokenId, effectIds);
+   expect(sent, 'the three effects were deleted in one request').toEqual([BATCH_SIZE]);
 });
 
 test('deleteAll on a token with no stored delta deletes every effect and persists across a reload', async () => {
@@ -435,15 +436,16 @@ test('deleteAll on a token with no stored delta deletes every effect and persist
       ),
       'the call deleted every effect',
    ).toBe(BATCH_SIZE);
-   expect(await takeRequests('ActiveEffect', 'delete'), 'the first effect was deleted alone, then the rest')
-      .toEqual([
-         1,
-         BATCH_SIZE - 1,
-      ]);
 
+   /** @type {number[]} The sizes of the delete requests the call sent. */
+   const sent = await takeRequests('ActiveEffect', 'delete');
    await reloadWorld(page);
    expect(await readEffectCount(tokenId), 'the token\'s actor has no effect after the reload').toBe(0);
    await expectTombstones(tokenId, effectIds);
+   expect(sent, 'the first effect was deleted alone, then the rest').toEqual([
+      1,
+      BATCH_SIZE - 1,
+   ]);
 });
 
 test('a delete naming an effect the actor lacks is rejected before any request', async () => {
@@ -487,12 +489,9 @@ test('an Item folder of three items dropped on a token with no stored delta pers
       () => readOwnedNames(tokenId),
       { message: 'the folder drop created an owned copy of each item' },
    ).toEqual(itemNames);
-   expect(await takeRequests('Item', 'create'), 'the first item was created alone, then the other two together')
-      .toEqual([
-         1,
-         BATCH_SIZE - 1,
-      ]);
 
+   /** @type {number[]} The sizes of the create requests the drop sent. */
+   const sent = await takeRequests('Item', 'create');
    await reloadWorld(page);
    expect(await readOwnedNames(tokenId), 'the token\'s actor owns the items after the reload').toEqual(itemNames);
 
@@ -500,6 +499,10 @@ test('an Item folder of three items dropped on a token with no stored delta pers
    const delta = (await readStoredToken(tokenId)).delta;
    expect(delta, 'the stored token has a delta').not.toBeNull();
    expect(delta.items.map((item) => item.name).sort(), 'the stored delta holds each created item').toEqual(itemNames);
+   expect(sent, 'the first item was created alone, then the other two together').toEqual([
+      1,
+      BATCH_SIZE - 1,
+   ]);
 });
 
 test('an Item folder of exactly two items dropped on a token with no stored delta persists across a reload',
@@ -514,11 +517,9 @@ test('an Item folder of exactly two items dropped on a token with no stored delt
          () => readOwnedNames(tokenId),
          { message: 'the folder drop created an owned copy of each item' },
       ).toEqual(pairItemNames);
-      expect(await takeRequests('Item', 'create'), 'each item was created in a request of its own').toEqual([
-         1,
-         1,
-      ]);
 
+      /** @type {number[]} The sizes of the create requests the drop sent. */
+      const sent = await takeRequests('Item', 'create');
       await reloadWorld(page);
       expect(await readOwnedNames(tokenId), 'the token\'s actor owns the items after the reload')
          .toEqual(pairItemNames);
@@ -528,6 +529,10 @@ test('an Item folder of exactly two items dropped on a token with no stored delt
       expect(delta, 'the stored token has a delta').not.toBeNull();
       expect(delta.items.map((item) => item.name).sort(), 'the stored delta holds each created item')
          .toEqual(pairItemNames);
+      expect(sent, 'each item was created in a request of its own').toEqual([
+         1,
+         1,
+      ]);
    });
 
 test('an Item folder whose first item a listener vetoes still persists the other items across a reload', async () => {
@@ -549,11 +554,9 @@ test('an Item folder whose first item a listener vetoes still persists the other
       () => readOwnedNames(tokenId),
       { message: 'the folder drop created a copy of each item the listener allowed' },
    ).toEqual(expected);
-   expect(await takeRequests('Item', 'create'), 'the veto sent no request; the other items went one by one').toEqual([
-      1,
-      1,
-   ]);
 
+   /** @type {number[]} The sizes of the create requests the drop sent. */
+   const sent = await takeRequests('Item', 'create');
    await reloadWorld(page);
    expect(await readOwnedNames(tokenId), 'the token\'s actor owns the items after the reload').toEqual(expected);
 
@@ -561,6 +564,10 @@ test('an Item folder whose first item a listener vetoes still persists the other
    const delta = (await readStoredToken(tokenId)).delta;
    expect(delta, 'the stored token has a delta').not.toBeNull();
    expect(delta.items.map((item) => item.name).sort(), 'the stored delta holds each created item').toEqual(expected);
+   expect(sent, 'the veto sent no request; the other items went one by one').toEqual([
+      1,
+      1,
+   ]);
 });
 
 test('a create whose later documents the server rejects leaves the first document created', async () => {
