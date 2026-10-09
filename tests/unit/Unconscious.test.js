@@ -76,7 +76,7 @@ describe('fallUnconscious', () => {
    }
 
    it('toggles each companion condition active, in order', async () => {
-      /** @type {object} The model. */
+      /** @type {object} The Character data model under test, whose parent is a stand-in actor. */
       const model = createCharacter(true);
       await model.fallUnconscious();
       expect(model.parent.toggleStatusEffect.mock.calls).toEqual(UNCONSCIOUS_COMPANION_CONDITIONS.map((id) => [
@@ -102,7 +102,7 @@ describe('fallUnconscious', () => {
       /** @type {Function} The console.assert spy, silencing the expected assertion output. */
       const consoleAssert = vi.spyOn(console, 'assert').mockImplementation(() => {});
 
-      /** @type {object} The model. */
+      /** @type {object} The Character data model under test, whose parent is a stand-in actor. */
       const model = createCharacter(false);
       await model.fallUnconscious();
       expect(model.parent.toggleStatusEffect).not.toHaveBeenCalled();

@@ -2822,7 +2822,7 @@ export default class CharacterDataModel extends TitanActorDataModel {
 
    /**
     * Reads the facts of a target that give an attack its target-condition modifiers.
-    * @param {Token} targetToken - The target's token.
+    * @param {Token} targetToken - The token of the attack's target, whose actor's statuses are read.
     * @returns {TargetFacts} The target's condition ids and its distance from the attacker's token.
     * @private
     */

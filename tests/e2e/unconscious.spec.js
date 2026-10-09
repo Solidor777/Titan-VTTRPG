@@ -87,7 +87,7 @@ function readConditions(subject) {
       /**
        * Counts the effects carrying a status.
        * @param {string} id - The status id.
-       * @returns {number} The count.
+       * @returns {number} How many of the actor's effects carry the status.
        */
       const count = (id) => actor.effects.filter((effect) => effect.statuses.has(id)).length;
       return {

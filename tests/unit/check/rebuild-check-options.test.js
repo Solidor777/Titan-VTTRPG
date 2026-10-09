@@ -248,7 +248,7 @@ function weaponRollData() {
  * @param {object} [options] - The target's conditions and position.
  * @param {string[]} [options.statuses] - The target's active condition ids.
  * @param {number} [options.x] - The token's center x on the fake gridless scene (100 pixels per space).
- * @param {string} [options.id] - The token's id.
+ * @param {string} [options.id] - The id the token reports, which a GM fallback exclusion matches.
  * @returns {object} A stand-in token for `game.user.targets`.
  */
 function targetToken(defense, { statuses = [], x = 100, id = 'target-token' } = {}) {
@@ -285,7 +285,7 @@ const GRIDLESS_SCENE = {
 /**
  * Builds a token document centered at the given x on the gridless fake scene.
  * @param {number} x - The center x.
- * @param {string} [id] - The token's id.
+ * @param {string} [id] - The id the token document reports, which the attacker's token ids list.
  * @param {boolean} [controlled] - Whether the user controls the token.
  * @returns {object} The fake token document.
  */
