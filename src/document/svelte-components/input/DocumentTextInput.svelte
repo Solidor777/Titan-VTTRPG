@@ -23,7 +23,9 @@
    const document = getContext('document');
 
    /**
-    * Updates the document data when the input changes.
+    * Updates the document data when the input changes. The `input` event sends the text as it is entered, whether or
+    * not a key produced it (a paste with the mouse, an input method, autofill), so another update that rebuilds the
+    * document before the `change` event cannot discard it.
     * @returns {void}
     */
    function updateDocument() {
@@ -35,7 +37,7 @@
    bind:value
    disabled={disabled || !document.data?.isOwner}
    onchange={updateDocument}
-   onkeyup={updateDocument}
+   oninput={updateDocument}
    {testId}
    {tooltip}
 />

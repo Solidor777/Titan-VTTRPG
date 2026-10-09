@@ -7,6 +7,7 @@
     * @property {boolean} [disabled=false] - Whether the input should currently be disabled.
     * @property {string|object} [tooltip=undefined] - The Tooltip to display for this element, if any.
     * @property {Function} [onchange] - Callback forwarded from the native change event.
+    * @property {Function} [oninput] - Callback forwarded from the native input event.
     * @property {Function} [onkeyup] - Callback forwarded from the native keyup event.
     * @property {string} [testId] - Optional stable selector applied as `data-testid`.
     */
@@ -17,6 +18,7 @@
       disabled = false,
       tooltip  = undefined,
       onchange = undefined,
+      oninput  = undefined,
       onkeyup  = undefined,
       testId   = undefined,
    } = $props();
@@ -26,6 +28,7 @@
    bind:value
    {disabled}
    {onchange}
+   {oninput}
    {onkeyup}
    data-testid={testId}
    use:tooltipAction={tooltip}
