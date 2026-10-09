@@ -750,6 +750,31 @@ export async function setTokenSize(page, tokenId, size) {
 }
 
 /**
+ * Sets a placed token's elevation in the elevation field of its Token HUD, which core submits as a HUD movement
+ * (read: `TokenHUD#_onSubmitElevation`, `client/applications/hud/token-hud.mjs:262-292`, Foundry 14.364).
+ * @param {import('@playwright/test').Page} page - A logged-in GM page viewing the token's scene.
+ * @param {string} tokenId - The token on the viewed scene.
+ * @param {number} elevation - The elevation to set, in grid units.
+ * @returns {Promise<void>} Resolves once the token's document holds the elevation and the HUD is closed.
+ */
+export async function setTokenElevation(page, tokenId, elevation) {
+   /** @type {{x: number, y: number}} The token's centre in client (page) coordinates. */
+   const centre = await hoverToken(page, tokenId);
+   await page.mouse.click(centre.x, centre.y, { button: 'right' });
+
+   /** @type {import('@playwright/test').Locator} The token HUD's elevation field. */
+   const field = page.locator('#token-hud input[name="elevation"]');
+   await expect(field).toBeVisible();
+   await field.fill(String(elevation));
+   await field.press('Enter');
+   await expect.poll(
+      () => page.evaluate((tokenId) => canvas.scene.tokens.get(tokenId).elevation, tokenId),
+      { message: 'the Token HUD stored the elevation' },
+   ).toBe(elevation);
+   await closeTokenHud(page, tokenId, centre);
+}
+
+/**
  * Reads the ids of the tokens the logged-in user targets.
  * @param {import('@playwright/test').Page} page - A logged-in GM page.
  * @returns {Promise<string[]>} The ids of the targeted tokens, in the order they were targeted.

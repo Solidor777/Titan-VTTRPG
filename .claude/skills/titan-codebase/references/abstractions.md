@@ -241,7 +241,12 @@ returns `TargetConditionModifier` entries (`{ condition, modifier: 'melee'|'accu
 target within `PRONE_CLOSE_DISTANCE` (1) space gives Melee and Accuracy each `ceil(base / 4)`; beyond
 `PRONE_FAR_DISTANCE` (10) spaces, Accuracy loses `floor(base / 4 * floor(distance / 10))`, at most the current Accuracy;
 an Incapacitated target fixes the Difficulty at `INCAPACITATED_TARGET_DIFFICULTY` (2). A `null` distance (no tokens)
-gives no distance modifier and a modifier that rounds to 0 is left out. `sumTargetRatingModifiers`,
+gives no distance modifier and a modifier that rounds to 0 is left out. The close bonus tests `distance <=
+PRONE_CLOSE_DISTANCE` on the grid's measured distance, so under a diagonal rule whose single diagonal step costs more
+than 1 (read: a diagonal neighbor, `dx = dy = 1`, measures 2 under `RECTILINEAR`, about 1.41 under `EXACT` and
+1.5 under `APPROXIMATE`; common/grid/square.mjs:550-553) a diagonal neighbor measures beyond 1 and gets no bonus; under
+`ALTERNATING_1` the first diagonal step measures 1 (computed from common/grid/square.mjs:554-573).
+`sumTargetRatingModifiers`,
 `selectAttackTargetConditions`, `getTargetConditionDifficulty` and `getTargetConditionModifierLabel` read the entries.
 The attack check does not use them yet.
 
@@ -904,8 +909,13 @@ domain:
   (`MeasureTokenDistance.js`; `TokenDocument`s) returns the spaces between the nearest squares the two tokens cover:
   the minimum of the scene grid's own `measurePath` over every pair of covered-square centers
   (`TokenDocument#getOccupiedGridSpaceOffsets`), divided by `grid.distance`, so the scene's diagonal rule applies; a
-  token covering no square (gridless) is measured from its center; it returns `null` for a missing token or tokens of
-  different scenes. No shipped code calls it yet; the live spec calls it through the test probe's `helpers`.
+  token covering no square (gridless) is measured from its center. Foundry's measurement applies unchanged:
+  elevation counts (the covered squares carry the token's elevation, client/documents/token.mjs:1466-1486, and the
+  square grid measures elevated points in 3D, common/grid/square.mjs:493, 543-545), and when the scene holds the
+  token's level a square hidden from the token's own position by walls or surfaces is not covered
+  (client/documents/token.mjs:1431-1459, 1482), the token's center standing in when none is covered. It returns
+  `null` for a missing token or tokens of different scenes. No shipped code calls it yet; the live spec calls it through the test probe's
+  `helpers`.
 - **Apply/revert automation** — entry points for applying or reverting damage, healing, rend, and
   repairs to one or more targets (e.g., `ApplyDamageToTargets`).
 - **Label / tooltip builders** — construct localised display strings and modifier breakdowns for

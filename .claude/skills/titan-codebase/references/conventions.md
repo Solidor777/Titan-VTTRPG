@@ -197,7 +197,8 @@ the base actor's uuid is neither the synthetic actor's nor an ancestor's), and, 
 spoke (`ChatMessage.getSpeakerActor`) and that actor's base actor (a chat message always listens to `updateActor`).
 `isOwner` follows those documents and none of the document's own hooks fire for their ownership change. A document of
 a compendium pack follows the world's `compendiumConfiguration` setting through `createSetting`, `updateSetting` and
-`deleteSetting`; `ActorSheetHeaderButtons` follows `core.permissions` the same way. Pinned by `tests/e2e/ownership.spec.js` (item sheet, token
+`deleteSetting`; `ActorSheetHeaderButtons` follows `core.permissions` the same way. Pinned by
+`tests/e2e/ownership.spec.js` (item sheet, token
 actor and token item sheets, roll button, Edit Token button, Reset Expertise button) and the `ReactiveDocument` unit
 tests. A change of the viewing user's role logs that user out (`client/documents/user.mjs`), so no open sheet outlives
 it.
@@ -1155,7 +1156,8 @@ the order core produces them: the directory entry, then the record on the runnin
 orphan the document, then the creation window's close, then the draw (`createScene` only; measured to end after the
 window's close in 40 of 40 first-scene creations), and `createFolder` and `createCompendium` end with `settle`),
 `placeToken` (drags the actor's directory entry onto a free spot near the centre of `#board`, or, with
-`{ square }`, onto the centre of that grid square, which core handles as an Actor drop; the spots are a 7-column grid with 130 px spacing and a spot that already holds a token
+`{ square }`, onto the centre of that grid square, which core handles as an Actor drop; the spots are a 7-column grid
+with 130 px spacing and a spot that already holds a token
 is skipped, because two tokens dropped on one point took the same `x`/`y`
 (`.superpowers/sdd/test-suite-rewrite/phase-2/review-measure-1.log`, `stack`), as is a spot where
 `document.elementFromPoint` is not the canvas (a chat notification over the canvas held a drag for about 1.5 s,
@@ -1166,8 +1168,9 @@ the first was controlled and `visible` true after Escape, and with `tokenVision`
 was controlled (`.superpowers/sdd/test-suite-rewrite/phase-2/review-measure-1.log`, `A controlled`, `after Escape`,
 `tokenVision false`), and a token that is not visible takes no pointer events), `toggleTokenLink`, `unlinkPlacedToken`
 and `setTokenSize` (the Appearance tab of the Token Configuration window opened from the Token HUD's config button;
-width and height inputs), `controlPlacedToken` (the sheet header buttons; the token flows close the open windows, release control, move the
-pointer onto the token and wait for `token.object.hover` before the double-click that opens the sheet
+width and height inputs), `setTokenElevation` (the Token HUD's elevation field, submitted with Enter),
+`controlPlacedToken` (the sheet header buttons; the token flows close the open windows, release control, move
+the pointer onto the token and wait for `token.object.hover` before the double-click that opens the sheet
 (`unlinkPlacedToken`, which then waits for the reopened synthetic actor's sheet, and `openPlacedTokenSheet`, which
 returns the sheet of an unlinked token's synthetic actor) or the click that takes control (`controlPlacedToken`)),
 `controlPlacedTokens` (drags a selection rectangle over the given tokens and asserts that

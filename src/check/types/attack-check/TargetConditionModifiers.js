@@ -1,22 +1,22 @@
 import localize from '~/helpers/utility-functions/Localize.js';
 
 /**
- * The Difficulty of an attack against an Incapacitated target. Source: docs/TITAN Rules Compendium - Source -
- * 09_26_2026.md:2158, "The Difficulty to hit an Incapacitated creature is always 2".
+ * The Difficulty of an attack against an Incapacitated target: the rules fix it at 2.
  * @type {number}
  */
 export const INCAPACITATED_TARGET_DIFFICULTY = 2;
 
 /**
- * The farthest distance, in spaces, at which an attacker gains the close Prone bonus. Source: docs/TITAN Rules
- * Compendium - Source - 09_26_2026.md:2172, "attacking a Prone within 1 space".
+ * The farthest distance, in spaces, at which an attacker gains the close Prone bonus: the rules grant it for attacking
+ * a Prone target within 1 space. The distance is the grid measurement, so under a grid whose diagonals cost more than
+ * 1 a diagonal neighbor measures beyond it and gets no bonus.
  * @type {number}
  */
 export const PRONE_CLOSE_DISTANCE = 1;
 
 /**
- * The distance step, in spaces, of the far Prone penalty: beyond it, Accuracy drops per full step. Source: docs/TITAN
- * Rules Compendium - Source - 09_26_2026.md:2174, "a distance greater than 10 spaces" and "per 10 spaces".
+ * The distance step, in spaces, of the far Prone penalty: the rules lower Accuracy for a Prone target at a distance
+ * greater than 10 spaces, per 10 spaces.
  * @type {number}
  */
 export const PRONE_FAR_DISTANCE = 10;
@@ -30,9 +30,7 @@ export const PRONE_FAR_DISTANCE = 10;
  */
 
 /**
- * Computes the modifiers an attack takes from its target's conditions. Source: docs/TITAN Rules Compendium - Source -
- * 09_26_2026.md:2158-2174 (Incapacitated, Prone), with the rounding of section 3 of
- * docs/superpowers/specs/2026-09-27-conditions-rework-design.md.
+ * Computes the modifiers an attack takes from its target's conditions.
  * - Prone target within 1 space: Melee and Accuracy each gain ¼ of their base, rounded up (the attack uses one).
  * - Prone target beyond 10 spaces: Accuracy loses ¼ of its base per full 10 spaces, the resulting Accuracy rounded up
  * (so the loss is rounded down), never below 0.

@@ -414,7 +414,7 @@ test('Remove deletes the condition an unlinked token inherits when the ward is a
    await takeNotice(WARD_NAME);
 });
 
-test('only the client that made the change removes the condition and posts the notice', async ({ browser }) => {
+test('the client that made the change alone deletes the condition, and it posts the notice', async ({ browser }) => {
    await setWorldSetting(page, 'immunityHandling', 'remove');
 
    /** @type {Subject} The Character the test works on. */

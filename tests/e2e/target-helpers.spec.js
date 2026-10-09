@@ -7,8 +7,8 @@ import {
    createScene,
    placeToken,
    releaseTargets,
+   setTokenElevation,
    setTokenSize,
-   shared,
    targetPlacedToken,
    targetedTokenIds,
    viewScene,
@@ -17,10 +17,11 @@ import { attachPageErrors, closeAllApps } from './world.js';
 
 /**
  * The targeting and distance helpers on real placed tokens, called through the test-only probe's `helpers` (no shipped
- * code reads the distance yet). Actors are made through the Actors tab, tokens are placed by the actor drop, targeted
- * with the Target key, controlled with a click, moved by dragging and resized in the Token Configuration window. The
- * expected distances are computed here from the tokens' stored positions and the scene grid's diagonal rule, read from
- * the Foundry constants, never from the helper.
+ * code reads the distance yet). Actors are made through the Actors tab, tokens are dropped on chosen squares of a scene
+ * of their own, targeted with the Target key, controlled with a click and resized in the Token Configuration window.
+ * Each test deletes its tokens when it ends, so no square holds two tokens and the pointer never reaches a stacked one.
+ * The expected distances are computed here from the tokens' stored positions and the scene grid's diagonal rule, read
+ * from the Foundry constants, never from the helper.
  */
 
 /** @type {import('@playwright/test').Page} The file-shared, logged-in page (one world boot per file). */
@@ -29,6 +30,8 @@ let page;
 let errors;
 /** @type {string} The id of the scene the tokens stand on. */
 let sceneId;
+/** @type {string[]} The ids of the tokens the current test placed (deleted when it ends). */
+let placedTokenIds = [];
 
 /**
  * A square of the grid.
@@ -41,14 +44,23 @@ test.beforeAll(async ({ browser }) => {
    page = await browser.newPage();
    errors = attachPageErrors(page);
    await login(page);
-   sceneId = await shared(page, 'scene');
+   sceneId = await createScene(page, { name: 'E2E Target Helpers Scene' });
    await viewScene(page, sceneId);
    await ensureProbe(page);
 });
 
 test.afterEach(async () => {
+   // Runs after a failed test too, so a test that left the scene is seen here.
+   expect(await page.evaluate(() => canvas.scene.id), 'the test ended on the scene made for this file').toBe(sceneId);
    await closeAllApps(page);
    await releaseTargets(page);
+   await page.evaluate(async (tokenIds) => {
+      for (const scene of game.scenes) {
+         await scene.deleteEmbeddedDocuments('Token', scene.tokens.filter((token) => tokenIds.includes(token.id))
+            .map((token) => token.id));
+      }
+   }, placedTokenIds);
+   placedTokenIds = [];
    expect(errors, `uncaught page errors:\n${errors.join('\n')}`).toEqual([]);
    errors.length = 0;
 });
@@ -58,12 +70,25 @@ test.afterAll(async () => {
 });
 
 /**
- * Creates a Character through the Actors tab and drops its token on a grid square of the viewed scene.
+ * Creates a Character through the Actors tab and drops its token on a grid square of the viewed scene, which no other
+ * token covers.
  * @param {string} name - The actor's name; it starts with `E2E ` so the census finds it.
  * @param {Square} square - The square to drop the token on.
  * @returns {Promise<string>} The id of the placed token.
  */
 async function createToken(name, square) {
+   expect(
+      await page.evaluate((square) => canvas.scene.tokens.some((token) => {
+         /** @type {number} The token's first column. */
+         const column = token._source.x / canvas.grid.size;
+         /** @type {number} The token's first row. */
+         const row = token._source.y / canvas.grid.size;
+         return square.column >= column && square.column < column + token._source.width &&
+            square.row >= row && square.row < row + token._source.height;
+      }), square),
+      'no token covers the square before the drop',
+   ).toBe(false);
+
    /** @type {string} The placed token's id. */
    const tokenId = await placeToken(
       page,
@@ -73,6 +98,7 @@ async function createToken(name, square) {
       }),
       { square },
    );
+   placedTokenIds.push(tokenId);
    expect(await squaresOf(tokenId), 'the drop put the token on the wanted square').toEqual([square]);
    return tokenId;
 }
@@ -102,7 +128,7 @@ async function squaresOf(tokenId) {
 }
 
 /**
- * Reads the square at the middle of the viewed scene, which the drags are placed around so every pointer position
+ * Reads the square at the middle of the viewed scene, which the drops are placed around so every pointer position
  * stays inside the window.
  * @returns {Promise<Square>} The square under the canvas pivot.
  */
@@ -117,13 +143,15 @@ async function middleSquare() {
  * Computes the distance in spaces between two sets of squares on the viewed scene from the grid's diagonal rule: the
  * shortest distance over every pair of squares. A straight line costs 1 per space; the rule ALTERNATING_1 makes the
  * diagonal steps cost 1, 2, 1, 2 and so on (read: `GRID_DIAGONALS.ALTERNATING_1`, common/constants.mjs:624-629,
- * Foundry 14.364), so a path with `diagonal` diagonal steps and `straight` straight steps costs
- * `straight + diagonal + floor(diagonal / 2)`.
+ * Foundry 14.364). The three axes (columns, rows and elevation levels apart) sorted from the largest, `di >= dj >= dk`,
+ * cost `di + floor((dj + dk / 2) / 2)` (read: common/grid/square.mjs:508-530), which for no elevation difference is
+ * `straight + floor(diagonal / 2)` over a longest axis `straight` and a diagonal count `diagonal`.
  * @param {Square[]} from - The squares of the first token.
  * @param {Square[]} to - The squares of the second token.
+ * @param {number} [levels] - The whole spaces of elevation between the two tokens.
  * @returns {Promise<number>} The distance in spaces.
  */
-async function expectedDistance(from, to) {
+async function expectedDistance(from, to, levels = 0) {
    expect(
       await page.evaluate(() => ({
          diagonals: canvas.grid.diagonals === CONST.GRID_DIAGONALS.ALTERNATING_1,
@@ -145,12 +173,25 @@ async function expectedDistance(from, to) {
          const columns = Math.abs(a.column - b.column);
          /** @type {number} The rows apart. */
          const rows = Math.abs(a.row - b.row);
-         /** @type {number} The diagonal steps of the shortest path. */
-         const diagonal = Math.min(columns, rows);
-         shortest = Math.min(shortest, Math.max(columns, rows) + Math.floor(diagonal / 2));
+         /** @type {number[]} The three axes apart, the largest first. */
+         const [di, dj, dk] = [
+            columns,
+            rows,
+            levels,
+         ].sort((first, second) => second - first);
+         shortest = Math.min(shortest, di + Math.floor((dj + (dk / 2)) / 2));
       }
    }
    return shortest;
+}
+
+/**
+ * Reads a token's stored elevation.
+ * @param {string} tokenId - A token on the viewed scene.
+ * @returns {Promise<number>} The elevation in grid units.
+ */
+async function elevationOf(tokenId) {
+   return page.evaluate((tokenId) => canvas.scene.tokens.get(tokenId)._source.elevation, tokenId);
 }
 
 /**
@@ -239,6 +280,32 @@ test('follows the diagonal rule of the scene grid for tokens apart on both axes'
    expect(await measure(firstId, secondId)).toBe(expected);
 });
 
+test('measures the elevation set in the Token HUD as a third axis of the grid path', async () => {
+   /** @type {Square} The middle of the scene. */
+   const middle = await middleSquare();
+   /** @type {string} The first token. */
+   const firstId = await createToken('E2E Target Helpers Elevation First', {
+      column: middle.column - 1,
+      row: middle.row,
+   });
+   /** @type {string} The token on the square beside it. */
+   const besideId = await createToken('E2E Target Helpers Elevation Beside', middle);
+
+   // Level with each other the tokens are adjacent.
+   expect(await elevationOf(besideId), 'the beside token starts at ground level').toBe(0);
+   expect(await expectedDistance(await squaresOf(firstId), await squaresOf(besideId))).toBe(1);
+   expect(await measure(firstId, besideId), 'level tokens').toBe(1);
+
+   // Raised 3 grid units, the beside token is 3 spaces up and 1 across: the longest axis decides, 3 spaces.
+   await setTokenElevation(page, besideId, 3);
+   /** @type {number} The spaces of elevation between the tokens (the grid is 1 unit per space, asserted below). */
+   const levels = Math.abs(await elevationOf(besideId) - await elevationOf(firstId));
+   expect(levels).toBe(3);
+   expect(await expectedDistance(await squaresOf(firstId), await squaresOf(besideId), levels)).toBe(3);
+   expect(await measure(firstId, besideId), 'the raised token is 3 spaces away').toBe(3);
+   expect(await measure(besideId, firstId), 'the same from the raised token').toBe(3);
+});
+
 test('measures from the nearest space a Large token covers, not from its center', async () => {
    /** @type {Square} The middle of the scene. */
    const middle = await middleSquare();
@@ -303,25 +370,29 @@ test('measures nothing between tokens of two scenes', async () => {
 
    /** @type {string} The second scene's id. */
    const otherSceneId = await createScene(page, { name: 'E2E Target Helpers Other Scene' });
-   await viewScene(page, otherSceneId);
-   /** @type {string} The token on the second scene. */
-   const otherId = await createToken('E2E Target Helpers Scenes Other', await middleSquare());
-   expect(
-      await page.evaluate(
-         ({ firstId, otherId, sceneId, otherSceneId }) => game.titan._probe.helpers.measureTokenDistance(
-            game.scenes.get(sceneId).tokens.get(firstId),
-            game.scenes.get(otherSceneId).tokens.get(otherId),
+   try {
+      await viewScene(page, otherSceneId);
+      /** @type {string} The token on the second scene. */
+      const otherId = await createToken('E2E Target Helpers Scenes Other', await middleSquare());
+      expect(
+         await page.evaluate(
+            ({ firstId, otherId, sceneId, otherSceneId }) => game.titan._probe.helpers.measureTokenDistance(
+               game.scenes.get(sceneId).tokens.get(firstId),
+               game.scenes.get(otherSceneId).tokens.get(otherId),
+            ),
+            {
+               firstId,
+               otherId,
+               otherSceneId,
+               sceneId,
+            },
          ),
-         {
-            firstId,
-            otherId,
-            otherSceneId,
-            sceneId,
-         },
-      ),
-      'tokens of two scenes have no distance',
-   ).toBeNull();
-   await viewScene(page, sceneId);
+         'tokens of two scenes have no distance',
+      ).toBeNull();
+   }
+   finally {
+      await viewScene(page, sceneId);
+   }
 });
 
 test('returns the targeted tokens and their actors in target order', async () => {
