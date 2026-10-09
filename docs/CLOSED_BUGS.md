@@ -1898,8 +1898,10 @@ The evidence files named here are in `.superpowers/sdd/test-suite-rewrite/phase-
   action (`addCheck`, `addRulesElement`, `enableAspect`, `createOwnedItem`, `placeToken`) already waited for it.
 - **Found:** 2026-10-02 in the Part B review fixes.
 - **Cause of the residual race (measured, `phase-3/measure-settle.log`, line `OPTIMISTIC`, 8 samples; script
-  `phase-3/scripts/measure-settle.spec.js`):** the Add Check button changes the sheet's local document state at once
-  and sends the update afterwards, so the new check's count showed 0 to 4 ms after the click with 2 operations pending
+  `phase-3/scripts/measure-settle.spec.js`):** the Add Check button changes the sheet's local document model at once
+  and sends the update afterwards (read: `CheckListMixin.addCheck` pushes into the live model before it sends the
+  update, `src/document/types/item/CheckListMixin.js:27-32`), so the model's check count (`item.system.check.length`,
+  read by the script; not a DOM row) showed the new check 0 to 4 ms after the click with 2 operations pending
   (field `pendingWhenVisible`), and the pending count reached 0 at 17 to 31 ms (field `pendingZeroMs`). The same file's
   `TRACKER` line shows the counter at 1 during an `Item.update`, 2 after it resolved and 0 after the awaited render. A
   flow that typed into the new row when the count appeared could be undone by the server echo's re-render. The first

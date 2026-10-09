@@ -938,7 +938,9 @@ no harness sees it (Foundry 14.364 `client/helpers/hooks.mjs:158-168, 182-188`).
 `installHookErrorReporting(page)` runs before the first navigation: an init script registers an `error` hook listener
 the moment core assigns the `Hooks` global (`client/client.mjs` assigns it through `Object.assign(globalThis, …)`,
 which calls the script's setter), and an exposed binding pushes each report, as `Hooks.onError (<location>):
-<message>`, into every array `attachPageErrors` returned for that page. The binding is asynchronous, so the document
+<stack>`, into every array `attachPageErrors` returned for that page. A collected entry is the error's `stack`
+(its message when the error has none), so a failure shows the source frame; `dist/index.js.map` maps a minified frame
+back to `src/`. The binding is asynchronous, so the document
 also counts its reports; `flushHookErrorReports(page)` waits until the delivered count matches.
 **Harness gate (every test, every world page).** Every spec imports `expect` and `test` from `tests/e2e/harness.js`,
 never from `@playwright/test` (the gate runs only through `harness.js`'s `test`; review checks the import).
@@ -1065,7 +1067,9 @@ one probe, `task-9-logs/fix1/probe-two.json`, local; that the server returns eve
 through `fromUuid` returns the client's own document, which holds an edit made through a bound control before any update
 reaches the database (measured: with the condition picker's `onchange` made a no-op, `fromUuid` read the new key while
 the server held the old one, `task-9-logs/fix1/probe-mutant-server.json`, local), so a test that asserts a control saved
-its edit reads the server copy, as `addRulesElement` and `rules-element-editor.spec.js` do. Flows: `openSidebarTab` (the
+its edit reads the server copy, as `addCheck`, `addRulesElement`, `addAttack`, `addCustomAspect`, `setAttackStat`,
+`setAttributeBase`, `setResource`, `setSkillTraining`, `setSkillDefaultAttribute`, `deleteAttack` and
+`rules-element-editor.spec.js` do. Flows: `openSidebarTab` (the
 sidebar tab button of a directory), `createActor` (Actors tab Create button and core dialog), `createOwnedItem` (the
 Abilities/Spells tab add button or the Inventory tab's add button and its item-type dialog, then the new item is renamed
 in its own sheet opened by the row's Edit button), `dragItemOntoSheet` (drags an Items-tab entry onto the open actor
@@ -1109,8 +1113,13 @@ sidebar tab button, then the pack chosen in its pack select; it waits for the st
 then the folder context menu's Rename Folder entry and Enter), `createTrayEffect` (the tray's create button, or a
 folder's create-effect control when given a `folderId`, in an unlocked effect pack; the effect is renamed in the sheet
 the create opens), `createScene` / `viewScene` / `activateScene` (Scenes tab, entry context menu View/Activate; core
-views a scene created while none is viewed, so `createScene` then waits for the draw, and `viewScene` skips the menu for
-a viewed scene), `placeToken` (drags the actor's directory entry onto a free spot near the centre of `#board`, which
+activates and draws a scene created while none is active (`Scene._preCreateOperation` tests `game.scenes.active`), so
+`createScene` then waits for the draw, and `viewScene` skips the menu for a viewed scene; the create flows
+(`createActor`, `createWorldItem`, `createScene`, `createFolder`, `createCompendium`) wait for one event at a time in
+the order core produces them: the directory entry, then the record on the running list so a failed later wait cannot
+orphan the document, then the creation window's close, then the draw (`createScene` only; measured to end after the
+window's close in 40 of 40 first-scene creations), and `createFolder` and `createCompendium` end with `settle`),
+`placeToken` (drags the actor's directory entry onto a free spot near the centre of `#board`, which
 core handles as an Actor drop; the spots are a 7-column grid with 130 px spacing and a spot that already holds a token
 is skipped, because two tokens dropped on one point took the same `x`/`y`
 (`.superpowers/sdd/test-suite-rewrite/phase-2/review-measure-1.log`, `stack`), as is a spot where

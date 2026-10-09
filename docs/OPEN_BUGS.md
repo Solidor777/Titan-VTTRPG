@@ -127,6 +127,7 @@ Core citations below refer to Foundry 14.364 at `C:\FoundryVTT\V14\dev\foundry`,
 ### 122. `addCheck` once stored the default label "Check" instead of the typed one
 
 The evidence files named here are in `.superpowers/sdd/test-suite-rewrite/phase-3/` (local, not checked in).
+Files cited as `bugbatch1-logs/...` are in `.superpowers/sdd/2026-09-29-conditions-rework/` (local, not checked in).
 
 - **What:** in one full e2e run, `addCheck` (`tests/e2e/flows.js`) failed at the label step on the sixth check of the
   `bulkActor` fixture: expected "E2E Bulk Check 5", stored "Check" (`phase-3/e2e-full.log`, failure 1).
@@ -134,12 +135,22 @@ The evidence files named here are in `.superpowers/sdd/test-suite-rewrite/phase-
   full-suite order, without the wait added afterwards (`phase-3/layout-nowait-1.log` to `-10.log`,
   `layout-nowait-summary.txt`); 0 in 4 isolated runs of the layout spec (`layout-rerun-1.log` to `-4.log`); 0 in the
   two later full runs (`e2e-full-2.log`, `e2e-full-3.log`).
-- **Cause (measured, 2026-10-07, CLOSED_BUGS #131):** in 8 samples of the Add Check button the new check's count showed
-  0 to 4 ms after the click, with 2 operations pending at that moment, and the pending count reached 0 at 17 to 31 ms
+- **Cause (measured, 2026-10-07, CLOSED_BUGS #131):** in 8 samples of the Add Check button the data model's check
+  count (`item.system.check.length`, read by the script; not a DOM row) showed the new check 0 to 4 ms after the click,
+  with 2 operations pending at that moment, and the pending count reached 0 at 17 to 31 ms
   (`phase-3/measure-settle.log`, line `OPTIMISTIC`; script `phase-3/scripts/measure-settle.spec.js`); typing in that
-  window is undone by the echo. `addCheck` and the other add flows now wait for the pending operations to finish
-  (`settle`). The failure recurred once before that change (`e2e-r2-gate-1.log`) and did not in the 12 runs after it
-  (2 full, 10 of the layout set); that is too few to call it fixed, so the entry stays open.
+  window is undone by the echo. Read: the model shows the check at once because `CheckListMixin.addCheck` pushes into
+  the live model before it sends the update (`src/document/types/item/CheckListMixin.js:27-32`). `addCheck` and the
+  other add flows now wait for the pending operations to finish (`settle`). The failure recurred once before that
+  change (`e2e-r2-gate-1.log`) and did not in the 12 runs after it (2 full, 10 of the layout set); that is too few to
+  call it fixed, so the entry stays open.
+- **Helper gap closed (2026-10-08):** `addCheck` counted the checks and read each stored field through `fromUuid`, the
+  client's model, which already holds a check at the click and a typed label at the `input` event, so neither read
+  showed that the server stored them. `addCheck` now reads the count and every stored field with `readServerSystem`
+  (the server's copy). Measured with the product mutated so `DocumentTextInput`'s `updateDocument` sends nothing
+  (hashes in `bugbatch1-logs/mut122-hashes.log`, restored to the HEAD blob `a1f02a08`): the previous `addCheck` passed
+  and left the server holding the label "Check" while the client model held "E2E Old Label"; the current `addCheck`
+  failed on its label read (expected "E2E New Label", received "Check") (`bugbatch1-logs/mut122-run-mutated.log`).
 - **Found:** 2026-10-02 in Phase 3 Part A.
 - **Status:** Open.
 
@@ -156,9 +167,9 @@ The evidence files named here are in `.superpowers/sdd/test-suite-rewrite/phase-
   render and polls per field. **Inferred, not measured:** an update from the previous row's commit re-renders the list
   and resets a later row's input before it commits.
 - **Not reproduced:** 0 failures in 3 later full runs of the file (`drag-fix-1.log` to `drag-fix-3.log`).
-- **Cause and mitigation:** the same race as #122: the local state shows the new row before the server echo, and the
-  echo's re-render resets text typed in that window. `fillList` and the attack-label loop poll each row, and the add flows
-  now `settle` (CLOSED_BUGS #131). Not reproduced in 10 runs (`final-dist-run-1.log` to `-10.log`) and 9 runs
+- **Cause and mitigation:** the same race as #122: the data model holds the new check before the server echo (not a DOM
+  row; see #122), and the echo's re-render resets text typed in that window. `fillList` and the attack-label loop poll
+  each row, and the add flows now `settle` (CLOSED_BUGS #131). Not reproduced in 10 runs (`final-dist-run-1.log` to `-10.log`) and 9 runs
   (`final2-dist-run-1.log` to `-9.log`) of the 86 tests of the sheet list specs and `drag.spec.js` on the round 3 code,
   nor in 3 full runs of 655 tests on the round 4 code (`e2e-r4-gate-1.log`, `-2.log`, `-3.log`) and 1 of 653 tests on
   the round 5 code (`e2e-r5-gate-1.log`).
@@ -168,6 +179,7 @@ The evidence files named here are in `.superpowers/sdd/test-suite-rewrite/phase-
 ### 129. A right-click on a placed token sometimes opens no Token HUD (`#token-hud` not found)
 
 The Phase 4 evidence files named here are in `.superpowers/sdd/test-suite-rewrite/phase-4/` (local, not checked in).
+Files cited as `bugbatch1-logs/...` are in `.superpowers/sdd/2026-09-29-conditions-rework/` (local, not checked in).
 
 - **What:** in one full e2e run `condition-description.spec.js` "with no scene active, the fixture token is placed on a
   fully drawn fallback scene" (now the last test of `combat-turns.spec.js`) failed at line 343 of the former file: after
@@ -199,6 +211,13 @@ The Phase 4 evidence files named here are in `.superpowers/sdd/test-suite-rewrit
   placed token: 1 failure in 720 (run 1, toggle 94, `stunned` remove: the closing left-click left the HUD open;
   `hud-flows-prefix-run1.json` to `-run3.json`, logs `hud-flows-prefix-run1.log` to `-run3.log`). The 21 of 240 of
   `scratch-hud.json` did not recur on this flow. No cause is claimed.
+- **Throttled repeat of the current flows, 2026-10-09, measured (`bugbatch1-logs/diag-C-newC-r1.jsonl` to `-r6.jsonl`,
+  `diagC-newC-r1.log` to `-r6.log`):** a throwaway spec created the first scene, an actor and a token through the
+  flows, then ran 240 `applyCondition`/`removeCondition` toggles on that first token (40 rounds of `offBalance`,
+  `stunned`, `blinded`, each on then off) with the page's CPU throttled through CDP at rate 1, 2, 4 and 6: 0 failures
+  in each of the four runs (960 toggles); the slowest toggle took 848, 885, 1010 and 1598 ms. The earlier flow that
+  failed 21 of 240 toggles was not run in this setting, so the runs do not show that the helper rewrite is what
+  removed the failures.
 - **Cause not located.** An unrelated cause of failed Token HUD flows, a chat card over the token, was found and fixed
   (CLOSED_BUGS #134); nothing measured connects it to this symptom.
 - **Found:** 2026-10-02 in the Part B review fixes; the second measurement 2026-10-07.
@@ -207,6 +226,7 @@ The Phase 4 evidence files named here are in `.superpowers/sdd/test-suite-rewrit
 ### 136. Deleting a weapon with its actor sheet open on Inventory once threw two "reading 'remove'" page errors
 
 The evidence files named here are in `.superpowers/sdd/test-suite-rewrite/phase-4/` (local, not checked in).
+Files cited as `bugbatch1-logs/...` are in `.superpowers/sdd/2026-09-29-conditions-rework/` (local, not checked in).
 
 - **What:** in one scratch run (variant `c`), with the actor sheet open on the Inventory tab and an Attack Check dialog
   opened by `actor.system.requestAttackCheck`, deleting the weapon closed the dialog and threw two "Cannot read
@@ -219,6 +239,15 @@ The evidence files named here are in `.superpowers/sdd/test-suite-rewrite/phase-
   (`variant-c-prefix-all.log`: the working tree of commit `a44e43ef` with the item buttons' guard removed, the shells'
   `validate` reporting restored and the info notice restored by `sed`; the tree hash was not recorded), and in 3 of 3
   with the dialog opened from the item sheet's roll button (`scratch-variant-c-after2.log`).
+- **Page errors keep their stack (2026-10-08):** `attachPageErrors` and the hook-error report now collect
+  `error.stack` (the message when there is none); the earlier harness kept `error.message` only, so no run could have
+  saved a stack. Measured with a throwaway page that threw in a timer: the collected entry was
+  `Error: E2E diag stack probe\n    at throwsLater (...)` (`bugbatch1-logs/stack-capture-probe.log`). The source
+  frames of a minified stack map through `dist/index.js.map`.
+- **Not reproduced with stacks enabled (2026-10-08), measured:** 30 of 30 runs of the saved variant-c flow (real
+  actor, weapon dragged onto it, Inventory tab, `requestAttackCheck`, Delete Item button, `confirmDeletingItems` off,
+  `expect(errors).toEqual([])` per run) threw no page error (`bugbatch1-logs/diag136-loop30.log`, spec in the
+  scratchpad directory, not committed).
 - **Cause not located.**
 - **Found:** 2026-10-07 while rewriting the Phase 4 delete tests.
 - **Status:** Open.
@@ -226,6 +255,7 @@ The evidence files named here are in `.superpowers/sdd/test-suite-rewrite/phase-
 ### 140. A context menu of the Compendium directory stayed open after its entry was clicked (spreadsheet spec, one run)
 
 The evidence files named here are in `.superpowers/sdd/test-suite-rewrite/phase-6/` (local, not checked in).
+Files cited as `bugbatch1-logs/...` are in `.superpowers/sdd/2026-09-29-conditions-rework/` (local, not checked in).
 
 - **What:** in the first run of `compendium-spreadsheet.spec.js` after its rewrite, the test 'deleteMissing removes a
   top-level pack document absent from the imported file' failed at `contextMenu.js:22`
@@ -237,6 +267,14 @@ The evidence files named here are in `.superpowers/sdd/test-suite-rewrite/phase-
   the first `beforeAll` had already made both, so the re-run duplicated them.
 - **Not reproduced:** the immediate re-run passed 17 of 17 (`sheet-2.log`), the full run passed 656 (`e2e-full-1.log`),
   and 10 separate runs of the spec passed 18 of 18 each (`drag-hunt/sheet-run-1.log` to `sheet-run-10.log`).
+- **Throttled repeat, 2026-10-09, measured (`bugbatch1-logs/diag-B-old-r1.jsonl` to `-r6.jsonl`, `diag-B-new-r1.jsonl`
+  to `-r6.jsonl`):** a throwaway spec made a Compendium pack through `createCompendium`, right-clicked its entry,
+  chose 'Import Spreadsheet' through `chooseContextMenuEntry` and closed all windows, 40 iterations per cell, with the
+  page's CPU throttled through CDP at rates 1, 2, 4 and 6. The text of `createCompendium` from before this change (no
+  trailing `settle`): 0 failures in 160 iterations. The current text (ends with `settle`): 0 failures in 160
+  iterations. The failure was not reproduced under either, so the inference that the pack-creation render causes it is
+  unconfirmed. `createCompendium` (and `createFolder`) now end with `settle`, a correct-by-construction change that is
+  not shown to cure this bug.
 - **Cause not located.** Whether the entry click did not land or the menu was re-opened is not measured.
 - **Found:** 2026-10-07 during Phase 6 Part A.
 - **Status:** Open.
@@ -244,6 +282,7 @@ The evidence files named here are in `.superpowers/sdd/test-suite-rewrite/phase-
 ### 143. The shared scene of `chat-cards.spec.js` failed to be created in isolated runs (dialog stayed open once)
 
 The evidence files named here are in `.superpowers/sdd/test-suite-rewrite/phase-6/` (local, not checked in).
+Files cited as `bugbatch1-logs/...` are in `.superpowers/sdd/2026-09-29-conditions-rework/` (local, not checked in).
 
 - **What:** run alone, `chat-cards.spec.js` failed in its `beforeAll` once: `createFromDirectory` (`flows.js:74`)
   expected the scene creation dialog count to be 0 and received 1 for 1000 ms, reached through `createScene` and the
@@ -259,6 +298,56 @@ The evidence files named here are in `.superpowers/sdd/test-suite-rewrite/phase-
   bundle's build, so whether the mutation had reached the system bundle in that run is not shown by it.
 - **Not reproduced:** 5 other isolated runs passed (`drag-hunt/chat-cards.log`, `scene-first/chat-cards-1.log` to
   `-3.log`, `drag-hunt2/chat-cards-rerun.log`), and the spec passed in every full run.
+- **Reproduced under measurement, 2026-10-09 (`bugbatch1-logs/diag-A-*.jsonl`, `diag-runs.txt`):** a throwaway spec
+  created the first scene of a world with no active scene (the world holds one inactive scene, so `active` and `viewed`
+  were null before every run), 20 fresh pages per cell, with the page's CPU throttled through CDP at rates 1, 2, 4 and
+  6. Failures per 20 with the text of `createFromDirectory`/`createScene` from before this change: rate 1: 1 (the
+  creation dialog still open 1000 ms after the click returned, `toHaveCount(0)` received 1, the first page of the
+  process), rate 2: 1 (the 1000 ms `waitForSceneDrawn`), rate 4: 15, rate 6: 20 (all `waitForSceneDrawn`). With the
+  current text: rate 1: 0, rate 2: 0, rate 4: 15, rate 6: 20 (all `waitForSceneDrawn`). With an intermediate text that
+  waited for the draw before the dialog: rate 1: 0, rate 2: 3, rate 4: 20, rate 6: 20.
+- **Event order, measured (`diag-A-probe-old-r1.jsonl`, `diag-A-probe-new-r1.jsonl`, `-r4.jsonl`):** from the click on
+  OK, at no throttle (medians of 20 runs each for the two texts): the `createScene` hook 12 and 15 ms, the directory
+  entry 19 and 22 ms, the dialog gone 333 and 334 ms, `canvasReady` 392 and 392 ms; the dialog was gone before
+  `canvasReady` in 40 of 40 runs. At rate 4 (20 runs each): dialog gone 358 and 357 ms, `canvasReady` 932 and 893 ms
+  (maximum 1461 and 1084 ms).
+- **What this shows and does not show:** the throttled failures are the 1000 ms wait on the first scene's draw, whose end
+  moves past that wait at CPU rates 2 and above; whether a first scene draw counts under the 1 s rule is not decided.
+  The single failure at rate 1 was the dialog-close wait; why that dialog stayed open for more than 1000 ms when it is
+  gone at about 333 ms in the 40 unthrottled probe runs is not measured (core's close waits for the dialog's
+  `transitionend` with a 1000 ms fallback, `application.mjs:982`; a transition that does not end would show as the
+  close at about 1000 ms; inferred, not observed). The reordering does not address it, and 1 failure in 20 against 0 in
+  20 is not enough to say the current text avoids it.
+- **Helper change (2026-10-09):** `createFromDirectory` waits for the directory entry, records the document, waits for
+  the dialog to close, then runs a `whenCreated` wait (`createScene` passes the draw wait when no scene was active, the
+  flag core tests, `Scene._preCreateOperation`); the old text recorded after every wait, so a failed wait left a created
+  document unrecorded (the second occurrence above), and the old `createScene` tested `game.scenes.viewed`.
 - **Cause not located.**
 - **Found:** 2026-10-08 during Phase 6 Part A.
+- **Status:** Open.
+
+### 147. A label typed into a `DocumentTextInput` without a `keyup` may be lost when an update echo lands before the `change` event
+
+- **What (read):** `DocumentTextInput` sends the update on `change` and on `keyup`
+  (`src/document/svelte-components/input/DocumentTextInput.svelte`). Text entered without a key event (the Playwright
+  `fill`, a mouse paste, an input method, autofill) is in the bound model only until the `change` event.
+- **Inferred, not reproduced:** an update echo that re-initializes the document's `system` between the `input` and the
+  `change` event makes the bound input show the stored value again, so the typed text is never sent (reading of
+  Svelte's `bind:value` and of core's `updateSource`/`_initialize`; no run has shown it). Related to #122 and #128.
+- **How to confirm:** a spec on real documents: add a check to an owned weapon, `fill` its label without blurring,
+  commit another update to the same item through its sheet header's name input, blur the label input, then read the
+  label with `readServerSystem`; the typed text surviving means the inference is wrong.
+- **Possible fix (needs a decision, it changes a shared primitive):** commit on the `input` event instead of `keyup`.
+- **Found:** 2026-10-08 while diagnosing #122.
+- **Status:** Open.
+
+### 148. `CheckListMixin.deleteCheck` notifies the sheet and edits the model before the update is known to commit
+
+- **What (read):** `deleteCheck` calls `sheet.preDeleteCheck(idx)` and splices the live model before
+  `await this.update(...)` (`src/document/types/item/CheckListMixin.js:53-61`); `addCheck` pushes into the live model
+  before its update and calls `sheet.postAddCheck()` after it whether or not the update changed anything (`:27-37`).
+- **Inferred, not reproduced:** an update that is refused (a `preUpdate` hook returning false) or rejected leaves the
+  model and the sheet's per-check expansion arrays out of step with the stored checks. No refusal path for check
+  updates was exercised.
+- **Found:** 2026-10-08 while diagnosing #122.
 - **Status:** Open.
