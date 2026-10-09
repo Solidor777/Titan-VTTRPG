@@ -123,7 +123,8 @@ management). Data model classes hold the schema, field validation, and derived-d
   runs no embedded `_preCreate`). `_preUpdate` keeps a timed effect's `disabled` synced to its remaining duration;
   `disabled` is a manual toggle only for permanent effects.
   Core's `base` subtype is registered too (`dataModels.base = foundry.data.ActiveEffectTypeDataModel`) and is stored
-  but never read by TITAN.
+  but TITAN reads no TITAN field off it; the character sheet and Player HUD effect lists show it as a plain row that
+  opens core's default sheet (`isBaseEffect`, `isListedEffect` in `src/system/EffectTypes.js`).
   `buildChatMessageData()` (pure, byte-parallel to `TitanItem`'s) returns `{ type: 'effect', system }` —
   the prepared `getRollData()` snapshot minus the document-level `id`/`type`, plus `name`/`img` as label
   metadata; the chat subtype is hardcoded `'effect'` (a condition's own subtype is not a registered chat

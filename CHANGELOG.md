@@ -43,6 +43,9 @@ and hides from unlinked tokens the converted effects their own changes replace (
 - A condition or effect suppressed by an immunity shows a "Suppressed" tag naming the immunity, and a dimmed row, on
   the character sheet, in the Player HUD effects panel, and in turn-start and turn-end reports; its duration keeps
   running while suppressed.
+- An Active Effect of core's own type, made by a module or another system, shows on the character sheet's Effects tab
+  and in the Player HUD's effects panel as a plain row (name, image, active toggle, open and delete controls) and opens
+  in Foundry's default effect sheet; TITAN's stats, durations, immunities and reports ignore it.
 
 ## Version 2.1.0:
 Advantage and Disadvantage, situational modifiers, and bug fixes.

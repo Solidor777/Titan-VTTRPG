@@ -1,11 +1,13 @@
 <script>
-   import { EFFECT_TYPE } from '~/system/EffectTypes.js';
+   import { EFFECT_TYPE, isBaseEffect } from '~/system/EffectTypes.js';
    import { getContext } from 'svelte';
    import { slide } from 'svelte/transition';
    import sortAscending from '~/helpers/utility-functions/SortAscending.js';
    import EmbeddedDocumentProvider from '~/document/reactive/EmbeddedDocumentProvider.svelte';
    import CharacterSheetEffect
    from '~/document/types/actor/types/character/sheet/items/effect/CharacterSheetEffect.svelte';
+   import CharacterSheetBaseEffect
+   from '~/document/types/actor/types/character/sheet/items/effect/CharacterSheetBaseEffect.svelte';
    import DragHandle from '~/helpers/svelte-components/drag-reorder/DragHandle.svelte';
    import InsertionLine from '~/helpers/svelte-components/drag-reorder/InsertionLine.svelte';
    import { draggableRow, reorderDropZone } from '~/helpers/svelte-components/drag-reorder/DragReorderActions.js';
@@ -30,12 +32,12 @@
    /** @type {string} Identity of this actor's effect list, distinguishing a reorder from a foreign drop. */
    const sourceKey = $derived(`${document.data.uuid}:effect`);
 
-   // Sort and filter the actor's effect Active Effects.
+   // Sort and filter the actor's `effect` and `base` Active Effects.
    /** @type {TitanActiveEffect[]} The filtered and sorted list of effects to display. */
    let effects = $derived(
       document.data.effects.filter((effect) => {
          return (
-            effect.type === EFFECT_TYPE &&
+            (effect.type === EFFECT_TYPE || isBaseEffect(effect)) &&
             effect.name.toLowerCase().indexOf(filter.toLowerCase()) !== -1
          );
       }).sort((a, b) => sortAscending(a.sort, b.sort)),
@@ -117,7 +119,11 @@
             <DragHandle/>
             <div class="row-content">
                <EmbeddedDocumentProvider doc={effect}>
-                  <CharacterSheetEffect bind:isExpanded={$appState.tabs.effects.isExpanded[effect.id]}/>
+                  {#if isBaseEffect(effect)}
+                     <CharacterSheetBaseEffect bind:isExpanded={$appState.tabs.effects.isExpanded[effect.id]}/>
+                  {:else}
+                     <CharacterSheetEffect bind:isExpanded={$appState.tabs.effects.isExpanded[effect.id]}/>
+                  {/if}
                </EmbeddedDocumentProvider>
             </div>
          </li>

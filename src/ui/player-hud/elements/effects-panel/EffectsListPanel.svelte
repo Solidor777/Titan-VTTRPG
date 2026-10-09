@@ -6,7 +6,7 @@
    /**
     * @typedef {object} EffectsListPanelProps
     * @property {Array<TitanActiveEffect>} conditions - Condition-subtype effects on the actor.
-    * @property {Array<TitanActiveEffect>} effects - Effect-subtype effects on the actor.
+    * @property {Array<TitanActiveEffect>} effects - Effect-subtype and `base` effects on the actor.
     */
 
    /** @type {EffectsListPanelProps} */

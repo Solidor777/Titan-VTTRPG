@@ -5,7 +5,7 @@ import {
    DURATION_TURN_END,
    DURATION_TURN_START,
 } from '~/system/DurationTypes.js';
-import { CONDITION_TYPE, EFFECT_TYPE, TITAN_EFFECT_TYPES } from '~/system/EffectTypes.js';
+import { CONDITION_TYPE, EFFECT_TYPE, TITAN_EFFECT_TYPES, isBaseEffect } from '~/system/EffectTypes.js';
 import ActionQueue from '~/helpers/ActionQueue.js';
 import TitanActorDataModel from '~/document/types/actor/TitanActorDataModel.js';
 import AttackCheck from '~/check/types/attack-check/AttackCheck.js';
@@ -6285,8 +6285,8 @@ export default class CharacterDataModel extends TitanActorDataModel {
    }
 
    /**
-    * Toggles the active state of an Effect Active Effect by flipping its native disabled flag.
-    * @param {string} effectId - The ID of the Effect Active Effect to toggle the active state for.
+    * Toggles the active state of an `effect` or `base` Active Effect by flipping its native disabled flag.
+    * @param {string} effectId - The ID of the Active Effect to toggle the active state for.
     * @returns {Promise<void>}
     */
    async toggleEffectActive(effectId) {
@@ -6296,9 +6296,9 @@ export default class CharacterDataModel extends TitanActorDataModel {
          this.parent.name,
       )) {
 
-         // Update the Effect Active Effect if valid.
+         // Update the Active Effect if it is an `effect` or a `base` subtype.
          const effect = this.parent.effects.get(effectId);
-         if (effect && effect.type === EFFECT_TYPE) {
+         if (effect && (effect.type === EFFECT_TYPE || isBaseEffect(effect))) {
             await effect.update({
                disabled: !effect.disabled,
             });

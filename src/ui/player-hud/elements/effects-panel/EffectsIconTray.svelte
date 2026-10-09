@@ -7,7 +7,7 @@
    /**
     * @typedef {object} EffectsIconTrayProps
     * @property {Array<TitanActiveEffect>} conditions - Condition-subtype effects on the actor.
-    * @property {Array<TitanActiveEffect>} effects - Effect-subtype effects on the actor.
+    * @property {Array<TitanActiveEffect>} effects - Effect-subtype and `base` effects on the actor.
     * @property {HudLayoutState} layoutState - Shared layout/UI state (for popout clamping).
     */
 

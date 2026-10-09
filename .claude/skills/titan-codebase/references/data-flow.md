@@ -434,17 +434,23 @@ reaches the Adventure packs reads their `actors`/`scenes` whole on every Prompt 
 again with the `scenes` for the tokens' base actors (no projection narrows inline data; the cost is recorded in
 `docs/POST_WORK_FINDINGS.md`).
 
-**Base-type Active Effects are stored and ignored.** `OnceInit` registers core's
+**Base-type Active Effects are stored, listed as plain rows and otherwise ignored.** `OnceInit` registers core's
 `foundry.data.ActiveEffectTypeDataModel` for `base` beside `effect` and `condition` (`CONFIG.ActiveEffect.dataModels`),
 so a module's or another system's `base` effect loads and persists on actors, owned items and unlinked tokens, and
 core applies its native `changes` (an owned item's transfers to its actor through core's
-`Actor#allApplicableEffects`). TITAN never reads one: every rules, duration, condition, turn-report, sheet-list and
-migration reader selects the `effect` or `condition` subtype before it reads a TITAN field, and the Player HUD's
-action menu and effects-panel visibility filter with `isTitanEffect` (`src/system/EffectTypes.js`, with
-`EFFECT_TYPE`, `CONDITION_TYPE` and `TITAN_EFFECT_TYPES`). The Effect Tray's list of a world or module pack is the
+`Actor#allApplicableEffects`). TITAN never reads a TITAN field off one: every rules, duration, condition, turn-report
+and migration reader selects the `effect` or `condition` subtype before it reads a TITAN field, and the Player HUD's
+action menu filters with `isTitanEffect` (`src/system/EffectTypes.js`, with `EFFECT_TYPE`, `CONDITION_TYPE`,
+`BASE_TYPE`, `TITAN_EFFECT_TYPES`, `isBaseEffect` and `isListedEffect`). The lists that show effects list a `base`
+effect as a plain row built from core's effect data only (name, image, the native `disabled` flag, `description`): the
+character sheet's Effects tab (`CharacterSheetEffectList` renders `CharacterSheetBaseEffect`: active toggle, open and
+delete, no duration, checks, send-to-chat or suppression), and the Player HUD effects panel, whose visibility,
+list and tray take `isListedEffect` (a `base` effect sits in the Effects section; `EffectsDetailBody` shows its
+description, active toggle, open and delete controls). `CharacterSheetEffectToggleActiveButton` reads `!disabled` for a
+`base` effect (the model has no `isActive`), and `toggleEffectActive` accepts the `effect` and `base` subtypes. The Effect Tray's list of a world or module pack is the
 exception: it lists every subtype, and only a system pack's list is filtered to `effect` (`EffectTrayState.svelte.js`
 `refresh`). A `base` effect has no TITAN sheet (the sheets are registered for `effect` and `condition` only), so core's
-`ActiveEffectConfig` opens for it, from that tray row or by script. A foreign `base` effect with `statuses: ['prone']`
+`ActiveEffectConfig` opens for it, from a list row's open control, the tray row, or by script. A foreign `base` effect with `statuses: ['prone']`
 puts `prone` in core's `actor.statuses` (so the Token HUD shows the status and toggling it removes the effect) but
 applies none of TITAN's Prone rules and is no `getConditions()` entry. A new reader of `actor.effects` must test the
 type first: a `base` system has none of TITAN's fields, and `getRollData`, which `TitanActiveEffect#getRollData` calls

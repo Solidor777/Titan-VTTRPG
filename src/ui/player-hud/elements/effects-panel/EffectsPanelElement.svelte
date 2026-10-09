@@ -2,7 +2,7 @@
    import { getContext } from 'svelte';
    import EffectsListPanel from '~/ui/player-hud/elements/effects-panel/EffectsListPanel.svelte';
    import EffectsIconTray from '~/ui/player-hud/elements/effects-panel/EffectsIconTray.svelte';
-   import { CONDITION_TYPE, EFFECT_TYPE, isTitanEffect } from '~/system/EffectTypes.js';
+   import { CONDITION_TYPE, isListedEffect } from '~/system/EffectTypes.js';
 
    /**
     * @typedef {object} EffectsPanelElementProps
@@ -16,14 +16,14 @@
    /** @type {object} The primary actor bridge. */
    const document = getContext('document');
 
-   /** @type {Array<TitanActiveEffect>} The effects on the active actor that TITAN defines (no `base` effect). */
-   const titanEffects = $derived(document.data.effects.filter(isTitanEffect));
+   /** @type {Array<TitanActiveEffect>} The effects on the active actor that the panel lists (`base` effects too). */
+   const listedEffects = $derived(document.data.effects.filter(isListedEffect));
 
    /** @type {Array<TitanActiveEffect>} Condition-subtype effects on the active actor. */
-   const conditions = $derived(titanEffects.filter((effect) => effect.type === CONDITION_TYPE));
+   const conditions = $derived(listedEffects.filter((effect) => effect.type === CONDITION_TYPE));
 
-   /** @type {Array<TitanActiveEffect>} Effect-subtype effects on the active actor. */
-   const effects = $derived(titanEffects.filter((effect) => effect.type === EFFECT_TYPE));
+   /** @type {Array<TitanActiveEffect>} Effect-subtype and `base` effects on the active actor. */
+   const effects = $derived(listedEffects.filter((effect) => effect.type !== CONDITION_TYPE));
 </script>
 
 <div

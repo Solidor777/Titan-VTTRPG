@@ -1,10 +1,11 @@
 <script>
-   import { EFFECT_TYPE } from '~/system/EffectTypes.js';
+   import { EFFECT_TYPE, isBaseEffect } from '~/system/EffectTypes.js';
    import { getContext } from 'svelte';
    import localize from '~/helpers/utility-functions/Localize.js';
    import { getConditionDescription } from '~/system/Conditions.js';
    import RichText from '~/helpers/svelte-components/RichText.svelte';
    import IconButton from '~/helpers/svelte-components/button/IconButton.svelte';
+   import ToggleButton from '~/helpers/svelte-components/button/ToggleButton.svelte';
    import DocumentOwnerIconButton from '~/document/svelte-components/DocumentOwnerIconButton.svelte';
    import CharacterSheetEffectChecks
    from '~/document/types/actor/types/character/sheet/items/effect/CharacterSheetEffectChecks.svelte';
@@ -25,9 +26,18 @@
    /** @type {boolean} Whether this entry is an effect (vs a condition, which has no checks of its own). */
    const isEffect = $derived(document.data?.type === EFFECT_TYPE);
 
-   /** @type {string} The entry's description HTML: an effect's own, or a condition's from its definition. */
+   /** @type {boolean} Whether this entry is a `base` effect, which carries only core's effect data. */
+   const isBase = $derived(isBaseEffect(document.data ?? {}));
+
+   /** @type {boolean} Whether the `base` effect is active: its native `disabled` flag is clear. */
+   const isBaseActive = $derived(isBase && !document.data?.disabled);
+
+   /**
+    * The entry's description HTML: an effect's or `base` effect's own, or a condition's from its definition.
+    * @type {string}
+    */
    const description = $derived(
-      isEffect
+      isEffect || isBase
          ? (document.data?.description ?? '')
          : getConditionDescription(document.data),
    );
@@ -63,6 +73,15 @@
 
 <!--Controls-->
 <div class="controls">
+   {#if isBase}
+      <ToggleButton
+         active={isBaseActive}
+         disabled={!document.data?.isOwner}
+         label={localize('active')}
+         testId="player-hud-effect-active"
+         onclick={() => sheetDocument.data.system.toggleEffectActive(document.data?.id)}
+      />
+   {/if}
    {#if isEffect}
       <IconButton
          icon={INCREMENT_ICON}
