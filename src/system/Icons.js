@@ -66,6 +66,7 @@ export const SHORT_REST_ICON = 'fas fa-face-exhaling';
 export const SOUL_ICON = 'fas fa-fire-flame-simple';
 export const SPEND_RESOLVE_ICON = 'fas fa-bolt';
 export const STAMINA_ICON = 'fas fa-heart';
+export const SUPPRESSED_ICON = 'fas fa-ban';
 export const TARGET_ICON = 'fas fa-bullseye-arrow';
 export const TRAINING_ICON = 'fas fa-dumbbell';
 export const TURN_END_ICON = 'fas fa-hourglass-end';

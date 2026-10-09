@@ -30,7 +30,7 @@ afterAll(() => {
 
 /**
  * Builds an effect-shaped input with every duration field set.
- * @param {string} name - The effect's name.
+ * @param {string} name - The name the effect carries, which also names its image.
  * @param {string} description - The effect's description HTML.
  * @returns {object} The effect-shaped input.
  */
@@ -53,7 +53,7 @@ function effect(name, description) {
 
 /**
  * Builds three effects out of name order: one with a description, one with none, one with an empty paragraph.
- * @returns {object[]} The effects.
+ * @returns {object[]} The three effects, out of name order.
  */
 function effects() {
    return [
@@ -66,7 +66,7 @@ function effects() {
 /**
  * The entries every builder shares for `effects()`, sorted by name, each with the given extra fields.
  * @param {object} extra - The builder's duration fields.
- * @returns {object[]} The expected entries.
+ * @returns {object[]} The entries sorted by name, each carrying the extra fields.
  */
 function expectedEntries(extra) {
    return [

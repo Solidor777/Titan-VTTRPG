@@ -78,6 +78,7 @@ import ProseMirrorEditor from '~/helpers/svelte-components/editor/ProseMirrorEdi
 import EffectTag from '~/helpers/svelte-components/tag/effects/EffectTag.svelte';
 import CustomEffectTag from '~/helpers/svelte-components/tag/effects/CustomEffectTag.svelte';
 import ExpiredEffectTag from '~/helpers/svelte-components/tag/effects/ExpiredEffectTag.svelte';
+import SuppressedEffectTag from '~/helpers/svelte-components/tag/effects/SuppressedEffectTag.svelte';
 import InitiativeEffectTag from '~/helpers/svelte-components/tag/effects/InitiativeEffectTag.svelte';
 import PermanentEffectTag from '~/helpers/svelte-components/tag/effects/PermanentEffectTag.svelte';
 import TurnEndEffectTag from '~/helpers/svelte-components/tag/effects/TurnEndEffectTag.svelte';
@@ -178,6 +179,7 @@ const componentRegistry = {
    EffectTag,
    CustomEffectTag,
    ExpiredEffectTag,
+   SuppressedEffectTag,
    InitiativeEffectTag,
    PermanentEffectTag,
    TurnEndEffectTag,

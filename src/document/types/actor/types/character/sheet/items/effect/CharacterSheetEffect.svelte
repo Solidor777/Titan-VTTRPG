@@ -13,6 +13,8 @@
    from '~/document/types/actor/types/character/sheet/items/effect/CharacterSheetEffectToggleActiveButton.svelte';
    import CharacterSheetEffectChecks
    from '~/document/types/actor/types/character/sheet/items/effect/CharacterSheetEffectChecks.svelte';
+   import SuppressedEffectTag from '~/helpers/svelte-components/tag/effects/SuppressedEffectTag.svelte';
+   import { getSuppressingImmunitySources } from '~/document/types/active-effect/IsSuppressedByImmunity.js';
    import { DELETE_ICON, EDIT_ICON, SEND_TO_CHAT_ICON, SHEET_ICON } from '~/system/Icons.js';
    import { DURATION_CUSTOM, DURATION_INITIATIVE, DURATION_PERMANENT } from '~/system/DurationTypes.js';
 
@@ -41,10 +43,32 @@
 
    /** @type {number} The effect's check count, read reactively through the embedded bridge. */
    const checkLength = $derived(document.data?.system.check.length ?? 0);
+
+   /**
+    * The names of the immunities suppressing this effect; empty while nothing suppresses it. Reading the embedded
+    * bridge subscribes to the actor's update and embedded-document hooks, so a ward added or removed re-derives it.
+    * @type {string[]}
+    */
+   const suppressingSources = $derived(
+      getSuppressingImmunitySources(document.data).map((source) => source.name),
+   );
 </script>
 
-<CharacterSheetItem bind:isExpanded>
+<CharacterSheetItem
+   bind:isExpanded
+   muted={suppressingSources.length > 0}
+>
    {#snippet controls()}
+      <!--Suppressed tag (an immunity suppresses this effect)-->
+      {#if suppressingSources.length > 0}
+         <div class="suppressed-tag">
+            <SuppressedEffectTag
+               sources={suppressingSources}
+               testId="character-sheet-effect-suppressed-tag"
+            />
+         </div>
+      {/if}
+
       <!--Duration-->
       {#if durationType !== DURATION_PERMANENT}
          {#if durationType === DURATION_INITIATIVE}
@@ -145,6 +169,10 @@
 <style lang="scss">
    .button:not(:first-child) {
       @include margin-left-standard;
+   }
+
+   .suppressed-tag {
+      @include margin-right-standard;
    }
 
    .section {

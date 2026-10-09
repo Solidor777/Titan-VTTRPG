@@ -2,6 +2,7 @@
    import { DURATION_PERMANENT } from '~/system/DurationTypes.js';
    import { EFFECT_TYPE } from '~/system/EffectTypes.js';
    import EffectsDetailPopout from '~/ui/player-hud/elements/effects-panel/EffectsDetailPopout.svelte';
+   import { getSuppressingImmunitySources } from '~/document/types/active-effect/IsSuppressedByImmunity.js';
 
    /**
     * @typedef {object} EffectsIconTrayProps
@@ -28,6 +29,19 @@
       ...effects,
    ]);
 
+   /**
+    * The names of the immunities suppressing each suppressed entry, keyed by effect id. It re-derives with
+    * `entries`, whose source arrays the panel derives from the actor bridge, so any actor or embedded-document
+    * change refreshes it.
+    * @type {Map<string, string[]>}
+    */
+   const suppressingSources = $derived(new Map(entries
+      .map((effect) => [
+         effect.id,
+         getSuppressingImmunitySources(effect).map((source) => source.name),
+      ])
+      .filter(([, names]) => names.length > 0)));
+
    /** @type {TitanActiveEffect | null} The selected effect, when it still exists. */
    const selected = $derived(entries.find((effect) => effect.id === selectedId) ?? null);
 
@@ -52,9 +66,11 @@
    {#each entries as effect (effect.id)}
       <button
          class="grid-icon"
+         class:suppressed={suppressingSources.has(effect.id)}
          type="button"
          title={effect.name}
          aria-label={effect.name}
+         data-effect-id={effect.id}
          data-testid="player-hud-effect-icon"
          onclick={(event) => select(effect, event)}
       >
@@ -75,6 +91,7 @@
       {anchor}
       {layoutState}
       onClose={() => selectedId = null}
+      suppressingSources={suppressingSources.get(selected.id) ?? []}
    />
 {/if}
 
@@ -111,6 +128,11 @@
             font-size: 10px;
             text-align: center;
             border-radius: var(--titan-border-radius);
+         }
+
+         // A suppressed entry's icon is dimmed; its popout names the immunity.
+         &.suppressed img {
+            opacity: 0.5;
          }
       }
    }

@@ -383,6 +383,8 @@ pinned and the row list is a bounded `.body` (`flex: 1; min-height: 0; overflow-
 internally when the effects exceed the panel height. The edit-mode mount is retained across token-selection
 changes while the layout is being edited, so the panel stays visible to resize. The `visual-active-effects`
 module flag is no longer stamped on effects or conditions — this HUD replaces it.
+A list row dims and tags (`SuppressedEffectTag`) an entry an immunity suppresses; the tray dims its icon and its
+popout carries the tag (`getSuppressingImmunitySources`, see `abstractions.md` → Immunity display).
 
 ---
 

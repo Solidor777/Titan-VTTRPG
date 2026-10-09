@@ -40,6 +40,9 @@ and hides from unlinked tokens the converted effects their own changes replace (
   it after a reload, and ignores it (no actor sheet, report or Player HUD list shows it; the Effect Tray lists one held
   in a world or module pack); core still applies its native changes. Before, creating one failed and a stored one
   stopped the world from loading.
+- A condition or effect suppressed by an immunity shows a "Suppressed" tag naming the immunity, and a dimmed row, on
+  the character sheet, in the Player HUD effects panel, and in turn-start and turn-end reports; its duration keeps
+  running while suppressed.
 
 ## Version 2.1.0:
 Advantage and Disadvantage, situational modifiers, and bug fixes.

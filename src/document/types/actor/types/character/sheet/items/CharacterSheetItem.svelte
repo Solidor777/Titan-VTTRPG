@@ -8,15 +8,17 @@
    /**
     * @typedef {object} CharacterSheetItemProps
     * @property {boolean} [isExpanded] Whether this Item is currently expanded.
+    * @property {boolean} [muted] Whether the header's image is dimmed (e.g. an effect suppressed by an
+    * immunity: its modifiers stop applying; immunities it grants still apply).
     * @property {import('svelte').Snippet} [controls] Controls content rendered in the header controls area.
     * @property {import('svelte').Snippet} [children] Expandable content rendered when the item is expanded.
     */
 
    /** @type {CharacterSheetItemProps} */
-   let { isExpanded = $bindable(), controls, children } = $props();
+   let { isExpanded = $bindable(), muted = false, controls, children } = $props();
 </script>
 
-<div class="item">
+<div class="item" class:muted>
    <!--Header-->
    <div class="header">
       <div class="label">
@@ -87,6 +89,11 @@
          border-radius: 0 0 var(--titan-border-radius) var(--titan-border-radius);
          width: calc(100% - 2 * var(--titan-spacing-standard));
          padding: 0 var(--titan-spacing-standard) var(--titan-spacing-standard);
+      }
+
+      // A muted row dims its image; its expand button and controls stay legible.
+      &.muted .header .label .image {
+         opacity: 0.5;
       }
    }
 </style>

@@ -1,6 +1,7 @@
 <script>
    import EmbeddedDocumentProvider from '~/document/reactive/EmbeddedDocumentProvider.svelte';
    import EffectsDetailBody from '~/ui/player-hud/elements/effects-panel/EffectsDetailBody.svelte';
+   import SuppressedEffectTag from '~/helpers/svelte-components/tag/effects/SuppressedEffectTag.svelte';
    import { clampPoint } from '~/ui/player-hud/HudGeometry.js';
 
    /**
@@ -9,10 +10,12 @@
     * @property {{x: number, y: number}} anchor - The clicked icon's viewport point.
     * @property {HudLayoutState} layoutState - Shared layout/UI state (for rect clamping).
     * @property {Function} onClose - Invoked when the popout dismisses.
+    * @property {string[]} [suppressingSources] - The names of the immunities suppressing the effect; empty when
+    * none does.
     */
 
    /** @type {EffectsDetailPopoutProps} */
-   const { effect, anchor, layoutState, onClose } = $props();
+   const { effect, anchor, layoutState, onClose, suppressingSources = [] } = $props();
 
    /** @type {HTMLElement | undefined} The popout root, for outside-press containment checks. */
    let rootEl = $state();
@@ -76,6 +79,14 @@
       />
       <span>{effect.name}</span>
    </div>
+   {#if suppressingSources.length > 0}
+      <div class="suppressed-tag">
+         <SuppressedEffectTag
+            sources={suppressingSources}
+            testId="player-hud-effect-popout-suppressed-tag"
+         />
+      </div>
+   {/if}
    <EmbeddedDocumentProvider doc={effect}>
       <EffectsDetailBody/>
    </EmbeddedDocumentProvider>
@@ -106,6 +117,12 @@
             height: 24px;
             object-fit: contain;
          }
+      }
+
+      .suppressed-tag {
+         @include margin-top-standard;
+
+         width: 100%;
       }
    }
 </style>

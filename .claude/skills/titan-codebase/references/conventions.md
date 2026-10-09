@@ -867,7 +867,8 @@ at the repo root, so it catches v14 API breaks that the mocked Vitest tier canno
   parameters), `logic/conditions.spec.js`
   (conditions applied from the Token HUD, read from derived stats, the sheet's tooltip, rolled checks and the Player
   HUD; a condition's own sheet and its edited description; an immunity effect suppressing an existing condition or
-  effect and refusing a condition applied through the Token HUD), `dice.spec.js` (the forced-dice seam: `forceDice` maps
+  effect and refusing a condition applied through the Token HUD), `immunity-display.spec.js` (the "Suppressed" tag and dimming of a suppressed effect or condition on the sheet,
+  in the Player HUD list and tray, and in turn-start and turn-end reports), `dice.spec.js` (the forced-dice seam: `forceDice` maps
   each queued face onto a real Roll, `resetDice` restores the random source), `logic/fast-check-smoke.spec.js`
   (fast-check is injected and runs a property in the page).
 - Tokens, HUD, combat, chat. `player-hud.spec.js` (portrait, visibility, layout and effects panel of one controlled
@@ -1596,7 +1597,8 @@ primitives, `HudButton` among them, 17 `tag/` primitives incl. `EditDeleteTag` w
 fails the test, `M4-spellaspects-run.log`), and the tooltip HTML-cleaning probes: an `EffectTag` and a `Tag` mounted
 with an event-handler payload; the `EffectTag` one is the suite's one real-hover test); `-display.spec.js` (core
 `Button`, `TextInput`, `NumberInput`, `IntegerInput`, `CheckboxInput`, `Select`, `LabelTag`; the 5 `label/` primitives;
-`RichText`, the `EffectTag` family + its six duration-variant wrappers, `CondensedCheckButton`, `ProseMirrorEditor`;
+`RichText`, the `EffectTag` family (suppressed entries included) + its six duration-variant wrappers,
+`SuppressedEffectTag`, `CondensedCheckButton`, `ProseMirrorEditor`;
 `Meter`, `Text`, `Tabs`, `ScrollingContainer`, `LabeledElement`, `BorderedColumnList`, `TagContainer`; `DragHandle` and
 `InsertionLine` of `drag-reorder/`; and the `RichText` HTML-cleaning probe). The cleaning probes use synthetic props
 because a real flow cannot carry an event handler into these sinks (ProseMirror drops `on*` attributes on input); each

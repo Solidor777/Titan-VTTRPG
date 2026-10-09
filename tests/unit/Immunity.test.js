@@ -1,12 +1,15 @@
 import { describe, it, expect, beforeAll, afterAll } from 'vitest';
 import { installSchemaMocks, restoreSchemaMocks } from './helpers/schemaFingerprint.js';
 import { TYPED_KEY_SELECTORS } from '~/system/ConditionalCheckModifierTypes.js';
-import isSuppressedByImmunity from '~/document/types/active-effect/IsSuppressedByImmunity.js';
+import isSuppressedByImmunity, {
+   getSuppressingImmunitySources,
+} from '~/document/types/active-effect/IsSuppressedByImmunity.js';
 
 // The immunity computations on given inputs: gathering immunities from a list of rules-element sources, matching an
 // Active Effect's identity against them, and the Character gate of the suppression rule. Which live sources feed the
 // list, the refusal of a creation and the suppression of an existing condition or effect are pinned on live documents
-// (tests/e2e/logic/conditions.spec.js, tests/e2e/effect-tray.spec.js and tests/e2e/combat-turns.spec.js).
+// (tests/e2e/logic/conditions.spec.js, tests/e2e/effect-tray.spec.js and tests/e2e/combat-turns.spec.js); the tags
+// and dimming that mark a suppressed entry are pinned in tests/e2e/immunity-display.spec.js.
 
 /** @type {Function} The dynamically imported CharacterDataModel class. */
 let CharacterDataModel;
@@ -255,5 +258,49 @@ describe('isSuppressedByImmunity', () => {
          statuses: new Set(['prone']),
          type: 'condition',
       })).toBeUndefined();
+   });
+});
+
+describe('getSuppressingImmunitySources', () => {
+   it('names an effect\'s suppressing sources; none when unsuppressed, missing, or not on a Character', () => {
+      /** @type {object} The bare Character model under test. */
+      const model = createDerived([source('ward', [immunity('condition', 'blinded')])]);
+      expect(getSuppressingImmunitySources({
+         parent: { system: model },
+         statuses: new Set(['blinded']),
+         type: 'condition',
+      })).toEqual([
+         {
+            id: 'ward',
+            name: 'ward name',
+         },
+      ]);
+      expect(getSuppressingImmunitySources({
+         parent: { system: model },
+         statuses: new Set(['prone']),
+         type: 'condition',
+      })).toEqual([]);
+      expect(getSuppressingImmunitySources(undefined)).toEqual([]);
+      expect(getSuppressingImmunitySources({
+         parent: { system: { isCharacter: false } },
+         statuses: new Set(['blinded']),
+         type: 'condition',
+      })).toEqual([]);
+   });
+
+   it('names every source immune to the effect, each once', () => {
+      /** @type {object} The bare Character model under test. */
+      const model = createDerived([
+         source('ward', [immunity('condition', 'blinded')]),
+         source('charm', [immunity('condition', 'blinded')]),
+      ]);
+      expect(getSuppressingImmunitySources({
+         parent: { system: model },
+         statuses: new Set(['blinded']),
+         type: 'condition',
+      }).map((entry) => entry.id)).toEqual([
+         'ward',
+         'charm',
+      ]);
    });
 });

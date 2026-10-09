@@ -509,6 +509,21 @@ item and an ability; refusal through the Token HUD; a mutually immune pair of ef
 `effect-tray.spec.js` (refusal by Apply, the accepted count), `combat-turns.spec.js` (a suppressed timer ticks on the
 turn-start, turn-end and initiative paths); `tests/unit/Immunity.test.js` pins the computations on given inputs.
 
+**Immunity display.** `getSuppressingImmunitySources(effect)` (`IsSuppressedByImmunity.js`; `isSuppressedByImmunity`
+delegates to it) returns the `ImmunitySource[]` suppressing an effect, `[]` for a missing effect or a non-Character
+parent. `SuppressedEffectTag` (props `sources`, `testId`; label `LOCAL.suppressedBy.text`, icon `SUPPRESSED_ICON`) is
+mounted only for a non-empty list, by `CharacterSheetEffect` (which also sets `CharacterSheetItem`'s `muted`, dimming
+the header image), `EffectsListRow` (dims icon and name; rows and tray icons carry `data-effect-id`),
+`EffectsIconTray` (a Map of source names keyed by effect id: dims the icon and passes `suppressingSources` to
+`EffectsDetailPopout`, which draws the tag) and `EffectTag` (a report entry's `suppressedBy: string[]`, which also
+dims the entry). `CharacterDataModel#_getEffectReportEntry` builds the fields every report entry shares (label,
+image, a condition's edited `description` or `descriptionKey`, an effect's non-blank `description`, `suppressedBy`
+while suppressed) for `_getConditionReportData` and the four `_get*EffectReportData` builders; turn-start entries
+(`conditions` and every duration group) and turn-end `expired` entries carry it. Live pins:
+`tests/e2e/immunity-display.spec.js` (sheet row, HUD list row, HUD tray icon and popout, turn-start and turn-end
+reports, the suppressed timers' ticking); probe rows in `component-probe-display.spec.js` (`EffectTag` suppressed
+entries, `SuppressedEffectTag`); `tests/unit/EffectReportData.test.js` pins the four builders' fields.
+
 
 ## Sheets
 

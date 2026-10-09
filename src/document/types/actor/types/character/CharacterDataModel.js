@@ -96,6 +96,7 @@ import sortObjectsIntoContainerByFunctionValue
 import sortObjectsIntoContainerByKeyValue from '~/helpers/utility-functions/SortObjectsIntoContainerByKeyValue.js';
 import { DYNAMIC_MOD_BUCKETS } from '~/system/ModBuckets.js';
 import { getConditionDescriptionKey, getEditedConditionDescription } from '~/system/Conditions.js';
+import { getSuppressingImmunitySources } from '~/document/types/active-effect/IsSuppressedByImmunity.js';
 import AddInventoryItemDialog from '~/document/types/actor/dialogs/AddInventoryItemDialog.js';
 import assert from '~/helpers/utility-functions/Assert.js';
 
@@ -241,6 +242,7 @@ import assert from '~/helpers/utility-functions/Assert.js';
  * @property {string} [description] - The description of the Effect item, or of a condition a GM edited, if any.
  * @property {string} [descriptionKey] - For an unedited condition, the localization key of its description, which the
  * report localizes when it renders (EffectTag); such an entry stores no description text.
+ * @property {string[]} [suppressedBy] - The names of the immunities suppressing it, when any do.
  */
 
 /**
@@ -249,6 +251,7 @@ import assert from '~/helpers/utility-functions/Assert.js';
  * @property {string} label - The name of the Effect item.
  * @property {string} img - The image used by the Effect item.
  * @property {string} [description] - The description of the Effect item, if any.
+ * @property {string[]} [suppressedBy] - The names of the immunities suppressing it, when any do.
  * @property {number} remaining - The remaining turns for the Effect item.
  */
 
@@ -258,6 +261,7 @@ import assert from '~/helpers/utility-functions/Assert.js';
  * @property {string} label - The name of the Effect item.
  * @property {string} img - The image used by the Effect item.
  * @property {string} [description] - The description of the Effect item, if appropriate.
+ * @property {string[]} [suppressedBy] - The names of the immunities suppressing it, when any do.
  * @property {number} remaining - The remaining turns for the Effect item.
  * @property {float} initiative - The initiative count on which the Effect duration is reduced.
  */
@@ -268,6 +272,7 @@ import assert from '~/helpers/utility-functions/Assert.js';
  * @property {string} label - The name of the Effect item.
  * @property {string} img - The image used by the Effect item.
  * @property {string} [description] - The description of the Effect item, if appropriate.
+ * @property {string[]} [suppressedBy] - The names of the immunities suppressing it, when any do.
  * @property {number} remaining - The remaining turns for the Effect item.
  * @property {string} custom - Custom duration of the Effect item.
  */
@@ -5696,34 +5701,57 @@ export default class CharacterDataModel extends TitanActorDataModel {
    }
 
    /**
-    * Retrieves the Report Data for this Character's condition Active Effects, sorted by name. The entry of a condition
-    * whose description a GM edited stores that text (getEditedConditionDescription). Any other condition's entry
-    * stores its description's localization key (getConditionDescriptionKey), not text: the chat snapshot is read on
-    * every client, and EffectTag localizes the key in each reader's language. A condition applying no system condition
-    * (a custom status) and carrying no edit has neither.
+    * Builds the report fields every reported condition and effect shares: its name and image; a condition's
+    * description (the text a GM edited on it, else its definition's localization key, which EffectTag localizes for
+    * each reader; a custom status without an edit has neither) or an effect's own description when not blank; and,
+    * while an immunity suppresses it, the names of the suppressing immunities, which the report's tag shows as
+    * "Suppressed: <sources>".
+    * @param {ActiveEffect} effect - The condition or effect Active Effect.
+    * @returns {EffectReportData} The shared report fields.
+    */
+   _getEffectReportEntry(effect) {
+      /** @type {EffectReportData} The report entry under construction. */
+      const entry = {
+         img: effect.img,
+         label: effect.name,
+      };
+
+      // A condition stores its description's key, localized at render, unless a GM edited the description; an effect
+      // stores its own description.
+      if (effect.type === CONDITION_TYPE) {
+         /** @type {string} The description a GM edited on the condition; empty when unedited. */
+         const editedDescription = getEditedConditionDescription(effect);
+
+         /** @type {string} The localization key of the condition's description; empty for a custom status. */
+         const descriptionKey = getConditionDescriptionKey(effect);
+         if (editedDescription) {
+            entry.description = editedDescription;
+         }
+         else if (descriptionKey) {
+            entry.descriptionKey = descriptionKey;
+         }
+      }
+      else if (!isHTMLBlank(effect.description)) {
+         entry.description = effect.description;
+      }
+
+      /** @type {string[]} The names of the immunities suppressing it. */
+      const suppressedBy = getSuppressingImmunitySources(effect).map((source) => source.name);
+      if (suppressedBy.length > 0) {
+         entry.suppressedBy = suppressedBy;
+      }
+      return entry;
+   }
+
+   /**
+    * Retrieves the Report Data for this Character's condition Active Effects, sorted by name (see
+    * _getEffectReportEntry for the entry's fields).
     * @param {ActiveEffect[]} conditions - The condition Active Effects to get report data for.
     * @returns {EffectReportData[]} Array of objects containing the report data for each condition.
     */
    _getConditionReportData(conditions) {
-      return conditions.sort((a, b) => sortAscending(a.name, b.name)).map((condition) => {
-         /** @type {EffectReportData} The condition's entry. */
-         const entry = {
-            img: condition.img,
-            label: condition.name,
-         };
-
-         /** @type {string} The description a GM edited on the condition; empty when unedited. */
-         const editedDescription = getEditedConditionDescription(condition);
-
-         /** @type {string} The localization key of the condition's description; empty for a custom status. */
-         const descriptionKey = getConditionDescriptionKey(condition);
-         if (editedDescription) {
-            entry.description = editedDescription;
-         } else if (descriptionKey) {
-            entry.descriptionKey = descriptionKey;
-         }
-         return entry;
-      });
+      return conditions.sort((a, b) => sortAscending(a.name, b.name))
+         .map((condition) => this._getEffectReportEntry(condition));
    }
 
    /**
@@ -5732,19 +5760,7 @@ export default class CharacterDataModel extends TitanActorDataModel {
     * @returns {EffectReportData[]} Array of objects containing the report data for the effect.
     */
    _getEffectReportData(effects) {
-      return effects.sort((a, b) => sortAscending(a.name, b.name)).map((effect) => {
-         const retVal = {
-            label: effect.name,
-            img: effect.img,
-         };
-
-         // Add the effect description if it is not blank.
-         if (!isHTMLBlank(effect.description)) {
-            retVal.description = effect.description;
-         }
-
-         return retVal;
-      });
+      return effects.sort((a, b) => sortAscending(a.name, b.name)).map((effect) => this._getEffectReportEntry(effect));
    }
 
    /**
@@ -5753,20 +5769,10 @@ export default class CharacterDataModel extends TitanActorDataModel {
     * @returns {TurnEffectReportData[]} Array of objects containing the report data for the effect.
     */
    _getTurnEffectReportData(effects) {
-      return effects.sort((a, b) => sortAscending(a.name, b.name)).map((effect) => {
-         const retVal = {
-            label: effect.name,
-            img: effect.img,
-            remaining: effect.system.duration.remaining,
-         };
-
-         // Add the effect description if it is not blank.
-         if (!isHTMLBlank(effect.description)) {
-            retVal.description = effect.description;
-         }
-
-         return retVal;
-      });
+      return effects.sort((a, b) => sortAscending(a.name, b.name)).map((effect) => ({
+         ...this._getEffectReportEntry(effect),
+         remaining: effect.system.duration.remaining,
+      }));
    }
 
    /**
@@ -5775,21 +5781,11 @@ export default class CharacterDataModel extends TitanActorDataModel {
     * @returns {InitiativeEffectReportData[]} Array of objects containing the report data for the effect.
     */
    _getInitiativeEffectReportData(effects) {
-      return effects.sort((a, b) => sortAscending(a.name, b.name)).map((effect) => {
-         const retVal = {
-            label: effect.name,
-            img: effect.img,
-            remaining: effect.system.duration.remaining,
-            initiative: effect.system.duration.initiative,
-         };
-
-         // Add the effect description if it is not blank.
-         if (!isHTMLBlank(effect.description)) {
-            retVal.description = effect.description;
-         }
-
-         return retVal;
-      });
+      return effects.sort((a, b) => sortAscending(a.name, b.name)).map((effect) => ({
+         ...this._getEffectReportEntry(effect),
+         remaining: effect.system.duration.remaining,
+         initiative: effect.system.duration.initiative,
+      }));
    }
 
    /**
@@ -5798,21 +5794,11 @@ export default class CharacterDataModel extends TitanActorDataModel {
     * @returns {CustomEffectReportData[]} Array of objects containing the report data for the effect.
     */
    _getCustomEffectReportData(effects) {
-      return effects.sort((a, b) => sortAscending(a.name, b.name)).map((effect) => {
-         const retVal = {
-            label: effect.name,
-            img: effect.img,
-            remaining: effect.system.duration.remaining,
-            custom: effect.system.duration.custom,
-         };
-
-         // Add the effect description if it is not blank.
-         if (!isHTMLBlank(effect.description)) {
-            retVal.description = effect.description;
-         }
-
-         return retVal;
-      });
+      return effects.sort((a, b) => sortAscending(a.name, b.name)).map((effect) => ({
+         ...this._getEffectReportEntry(effect),
+         remaining: effect.system.duration.remaining,
+         custom: effect.system.duration.custom,
+      }));
    }
 
    /**

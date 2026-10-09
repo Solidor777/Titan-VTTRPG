@@ -6,6 +6,8 @@
    import HudButton from '~/helpers/svelte-components/button/HudButton.svelte';
    import DurationTag from '~/helpers/svelte-components/tag/DurationTag.svelte';
    import EffectsDetailBody from '~/ui/player-hud/elements/effects-panel/EffectsDetailBody.svelte';
+   import SuppressedEffectTag from '~/helpers/svelte-components/tag/effects/SuppressedEffectTag.svelte';
+   import { getSuppressingImmunitySources } from '~/document/types/active-effect/IsSuppressedByImmunity.js';
 
    /** @type {object} The embedded effect bridge provided by EmbeddedDocumentProvider. */
    const document = getContext('document');
@@ -13,7 +15,7 @@
    /** @type {boolean} Whether this row is expanded to show its detail. */
    let isExpanded = $state(false);
 
-   /** @type {boolean} Whether this entry is a full effect (vs an inert condition). */
+   /** @type {boolean} Whether this entry is an effect (vs a condition, which carries no duration). */
    const isEffect = $derived(document.data?.type === EFFECT_TYPE);
 
    /** @type {string} The effect's duration type (effects only; defaults to permanent when absent). */
@@ -23,11 +25,22 @@
 
    /** @type {number} The effect's remaining duration (effects only; conditions carry no duration). */
    const durationRemaining = $derived(isEffect ? document.data?.system.duration.remaining : undefined);
+
+   /**
+    * The names of the immunities suppressing this entry; empty while nothing suppresses it. Reading the embedded
+    * bridge subscribes to the actor's update and embedded-document hooks, so a ward added or removed re-derives it.
+    * @type {string[]}
+    */
+   const suppressingSources = $derived(
+      getSuppressingImmunitySources(document.data).map((source) => source.name),
+   );
 </script>
 
 <div
    class="row"
    class:expanded={isExpanded}
+   class:suppressed={suppressingSources.length > 0}
+   data-effect-id={document.data?.id}
    data-testid="player-hud-effect-row"
 >
    <!--Row header (click to expand): icon centred against the stacked name/duration column-->
@@ -53,6 +66,16 @@
          {/if}
       </span>
    </HudButton>
+
+   <!--Suppressed tag (an immunity suppresses this entry)-->
+   {#if suppressingSources.length > 0}
+      <div class="suppressed-tag">
+         <SuppressedEffectTag
+            sources={suppressingSources}
+            testId="player-hud-effect-suppressed-tag"
+         />
+      </div>
+   {/if}
 
    {#if isExpanded}
       <div class="detail">
@@ -104,6 +127,20 @@
 
       // The detail shares the row's panel; a top margin separates it from the header.
       .detail {
+         @include margin-top-standard;
+
+         width: 100%;
+      }
+
+      // A suppressed entry dims its icon and name; its tag names the immunity.
+      &.suppressed {
+         .icon,
+         .name {
+            opacity: 0.5;
+         }
+      }
+
+      .suppressed-tag {
          @include margin-top-standard;
 
          width: 100%;

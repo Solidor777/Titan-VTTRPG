@@ -731,6 +731,91 @@ test.describe('component probe — EffectTag (plain effect data)', () => {
    });
 });
 
+test.describe('component probe — EffectTag (suppressed entries)', () => {
+   test.afterEach(async () => {
+      await unmountAll(page);
+      await clearProbeEvents(page);
+   });
+
+   test('an unsuppressed entry carries no tag and a suppressed entry is tagged and dimmed', async () => {
+      const { selector } = await mountProbe(page, 'EffectTag', {
+         props: {
+            effect: {
+               img: 'icons/svg/fire.svg',
+               label: 'E2E Plain Entry',
+            },
+            testId: 'probe-plain-entry',
+         },
+      });
+
+      /** @type {import('@playwright/test').Locator} The unsuppressed entry. */
+      const plain = page.locator(`${selector} [data-testid="probe-plain-entry"]`);
+      await expect(plain).toContainText('E2E Plain Entry');
+      await expect(plain.getByTestId('report-effect-suppressed-tag')).toHaveCount(0);
+      await expect(plain).not.toHaveClass(/suppressed/);
+      await unmountAll(page);
+
+      /** @type {{selector: string}} The mounted suppressed entry. */
+      const mounted = await mountProbe(page, 'EffectTag', {
+         props: {
+            effect: {
+               img: 'icons/svg/fire.svg',
+               label: 'E2E Suppressed Entry',
+               suppressedBy: [
+                  'E2E Ward',
+                  'E2E Charm',
+               ],
+            },
+            testId: 'probe-suppressed-entry',
+         },
+      });
+
+      /** @type {import('@playwright/test').Locator} The suppressed entry. */
+      const suppressed = page.locator(`${mounted.selector} [data-testid="probe-suppressed-entry"]`);
+      await expect(suppressed).toContainText('E2E Suppressed Entry');
+      await expect(suppressed).toHaveClass(/suppressed/);
+      await expect(suppressed.getByTestId('report-effect-suppressed-tag')).toContainText('E2E Ward, E2E Charm');
+      await expect(suppressed.locator('> img')).toHaveCSS('opacity', '0.5');
+      await expect(suppressed.locator('> .label')).toHaveCSS('opacity', '0.5');
+   });
+});
+
+test.describe('component probe — SuppressedEffectTag', () => {
+   test.afterEach(async () => {
+      await unmountAll(page);
+      await clearProbeEvents(page);
+   });
+
+   test('names every suppressing immunity in one label, draws the suppressed icon and explains itself', async () => {
+      const { selector } = await mountProbe(page, 'SuppressedEffectTag', {
+         props: {
+            sources: [
+               'E2E Ward',
+               'E2E Charm',
+            ],
+            testId: 'probe-suppressed-tag',
+         },
+      });
+
+      /** @type {import('@playwright/test').Locator} The suppressed tag under test. */
+      const tag = page.locator(`${selector} [data-testid="probe-suppressed-tag"]`);
+
+      /** @type {string} The label the tag should hold. */
+      const expectedLabel = await page.evaluate(
+         () => game.i18n.format('LOCAL.suppressedBy.text', { sources: 'E2E Ward, E2E Charm' }),
+      );
+      await expect(tag.locator('.label')).toHaveText(expectedLabel);
+      await expect(tag.locator('i.fa-ban')).toHaveCount(1);
+
+      /** @type {{content: string|undefined, expected: string}} The tooltip tippy holds, and the expected text. */
+      const tooltip = await tag.evaluate((element) => ({
+         content: element._tippy?.props?.content,
+         expected: foundry.utils.cleanHTML(game.i18n.localize('LOCAL.suppressedBy.desc.text')),
+      }));
+      expect(tooltip.content).toBe(tooltip.expected);
+   });
+});
+
 test.describe('component probe — CustomEffectTag', () => {
    test.afterEach(async () => {
       await unmountAll(page);

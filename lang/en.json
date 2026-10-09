@@ -673,6 +673,8 @@
       "successes.text": "Successes",
       "sufferedX%Wounds.text": "Suffered X% Wounds",
       "suggestedDifficultyAndComplexity.text": "Suggested Difficulty & Complexity",
+      "suppressedBy.desc.text": "<p>An immunity suppresses this effect: it stays on the character and its modifiers stop applying until the immunity ends; immunities it grants still apply.</p>",
+      "suppressedBy.text": "Suppressed: {sources}",
       "swim.desc.text": "<strong>Swim</strong> is the ability to move through water or other liquids.",
       "swim.text": "Swim",
       "swim.value.text": "Total Swim Speed",

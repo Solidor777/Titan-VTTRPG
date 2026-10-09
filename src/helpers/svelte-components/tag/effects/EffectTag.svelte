@@ -2,6 +2,7 @@
    import checkAddDarkSVGClass from '~/helpers/utility-functions/CheckAddDarkSVGClass.js';
    import buildEffectTagTooltip from '~/helpers/utility-functions/BuildEffectTagTooltip.js';
    import tooltipAction from '~/helpers/svelte-actions/TooltipAction.js';
+   import SuppressedEffectTag from '~/helpers/svelte-components/tag/effects/SuppressedEffectTag.svelte';
 
    /**
     * @typedef {object} CustomEffectData
@@ -9,6 +10,7 @@
     * @property {string} label - The label to display for the effect.
     * @property {string} img - The image to display for the effect.
     * @property {string} description - The description of the effect.
+    * @property {string[]} [suppressedBy] - The names of the immunities suppressing the effect, when any do.
     * @property {string} custom - The custom duration unit for the effect.
     * @property {number} remaining - The number of duration units remaining for the effect.
     */
@@ -19,6 +21,7 @@
     * @property {string} label - The label to display for the effect.
     * @property {string} img - The image to display for the effect.
     * @property {string} description - The description of the effect.
+    * @property {string[]} [suppressedBy] - The names of the immunities suppressing the effect, when any do.
     */
 
    /**
@@ -27,6 +30,7 @@
     * @property {string} label - The label to display for the effect.
     * @property {string} img - The image to display for the effect.
     * @property {string} description - The description of the effect.
+    * @property {string[]} [suppressedBy] - The names of the immunities suppressing the effect, when any do.
     * @property {number} initiative - The Initiative turn in combat on which this effect's duration should decrease.
     * @property {number} remaining - The number of duration units remaining for the effect.
     */
@@ -37,6 +41,7 @@
     * @property {string} label - The label to display for the effect.
     * @property {string} img - The image to display for the effect.
     * @property {string} description - The description of the effect.
+    * @property {string[]} [suppressedBy] - The names of the immunities suppressing the effect, when any do.
     */
 
    /**
@@ -45,6 +50,7 @@
     * @property {string} label - The label to display for the effect.
     * @property {string} img - The image to display for the effect.
     * @property {string} description - The description of the effect.
+    * @property {string[]} [suppressedBy] - The names of the immunities suppressing the effect, when any do.
     * @property {number} remaining - The number of duration units remaining for the effect.
     */
 
@@ -56,6 +62,7 @@
     * @property {string} [descriptionKey] - The localization key of the condition's description, localized at render.
     * @property {string} [description] - The condition's description text, which only the entry of an edited condition
     * and an entry from a report posted before conditions stored keys carry.
+    * @property {string[]} [suppressedBy] - The names of the immunities suppressing the effect, when any do.
     */
 
    /**
@@ -79,12 +86,17 @@
    const tooltip = $derived(buildEffectTagTooltip(effect, leadKey));
 </script>
 
-<div class="tag" data-testid={testId} use:tooltipAction={tooltip}>
+<div
+   class="tag"
+   class:suppressed={effect.suppressedBy?.length > 0}
+   data-testid={testId}
+   use:tooltipAction={tooltip}
+>
    <!--Image-->
    <img alt="img" class={checkAddDarkSVGClass(effect.img)} src={effect.img}/>
 
    <!--Label-->
-   <div>
+   <div class="label">
       {effect.label}
    </div>
 
@@ -108,6 +120,16 @@
    {#if icon}
       <i class={icon}></i>
    {/if}
+
+   <!--Suppressed tag (an immunity suppresses this entry)-->
+   {#if effect.suppressedBy?.length > 0}
+      <div class="suppressed-tag">
+         <SuppressedEffectTag
+            sources={effect.suppressedBy}
+            testId="report-effect-suppressed-tag"
+         />
+      </div>
+   {/if}
 </div>
 
 <style lang="scss">
@@ -126,6 +148,18 @@
       }
 
       i {
+         @include margin-left-standard;
+      }
+
+      // A suppressed entry dims its image and label; its tag names the immunity.
+      &.suppressed {
+         > img,
+         > .label {
+            opacity: 0.5;
+         }
+      }
+
+      .suppressed-tag {
          @include margin-left-standard;
       }
    }
