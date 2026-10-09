@@ -13,6 +13,21 @@ import error from '~/helpers/utility-functions/Error.js';
  */
 
 /**
+ * Whether a batch of embedded documents has to be written in two steps because the actor is an unlinked token's
+ * synthetic actor whose token holds no delta yet. Workaround for a Foundry core defect: the server loses a create or a
+ * delete of two or more embedded documents when the token's stored delta is null (read: the loop in `#e` of
+ * `dist/database/backend/embedded-delta.mjs`, Foundry 14.364, hands the delta, not the token, to the batch write
+ * parent when it handles the second document; measured in `test-pf2e`, which does not load TITAN). The first document
+ * is written alone, which stores the delta in the token; the rest follows against the stored delta.
+ * @param {TitanActor} actor - The actor the batch is for.
+ * @param {number} count - The number of documents in the batch.
+ * @returns {boolean} True when the first document has to be written alone.
+ */
+function needsDeltaFirst(actor, count) {
+   return count > 1 && actor.isToken && !actor.token._source.delta;
+}
+
+/**
  * Extends the base Actor class to implement additional system-specific logic for Titan.
  * @property {TitanItem[]} items - A collection of embedded Item documents.
  * @property {TitanActorSheet} sheet - The Sheet that represents this Actor.
@@ -54,6 +69,54 @@ export default class TitanActor extends Actor {
       }
 
       return retVal;
+   }
+
+   /**
+    * Creates embedded documents. On an unlinked token's actor whose token holds no delta, the first document is
+    * created alone so the delta is stored before the rest (see `needsDeltaFirst`).
+    * @override
+    * @param {string} embeddedName - The name of the embedded document type.
+    * @param {object[]} [data] - The data of each document to create.
+    * @param {object} [operation] - Parameters of the database creation workflow.
+    * @returns {Promise<Document[]>} The created documents.
+    */
+   async createEmbeddedDocuments(embeddedName, data = [], operation = {}) {
+      if (needsDeltaFirst(this, data.length)) {
+         /** @type {Document[]} The first created document. */
+         const first = await super.createEmbeddedDocuments(embeddedName, data.slice(0, 1), { ...operation });
+
+         /** @type {Document[]} The rest of the created documents. */
+         const rest = await super.createEmbeddedDocuments(embeddedName, data.slice(1), { ...operation });
+         return [
+            ...first,
+            ...rest,
+         ];
+      }
+      return super.createEmbeddedDocuments(embeddedName, data, operation);
+   }
+
+   /**
+    * Deletes embedded documents. On an unlinked token's actor whose token holds no delta, the first document is
+    * deleted alone so the delta is stored before the rest (see `needsDeltaFirst`).
+    * @override
+    * @param {string} embeddedName - The name of the embedded document type.
+    * @param {string[]} ids - The ids of the documents to delete.
+    * @param {object} [operation] - Parameters of the database deletion workflow.
+    * @returns {Promise<Document[]>} The deleted documents.
+    */
+   async deleteEmbeddedDocuments(embeddedName, ids, operation = {}) {
+      if (needsDeltaFirst(this, ids.length)) {
+         /** @type {Document[]} The first deleted document. */
+         const first = await super.deleteEmbeddedDocuments(embeddedName, ids.slice(0, 1), { ...operation });
+
+         /** @type {Document[]} The rest of the deleted documents. */
+         const rest = await super.deleteEmbeddedDocuments(embeddedName, ids.slice(1), { ...operation });
+         return [
+            ...first,
+            ...rest,
+         ];
+      }
+      return super.deleteEmbeddedDocuments(embeddedName, ids, operation);
    }
 
    /**

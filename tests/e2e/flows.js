@@ -865,6 +865,24 @@ export async function unlinkPlacedToken(page, tokenId) {
 }
 
 /**
+ * Opens the sheet of a placed unlinked token's synthetic actor with a double-click on the token.
+ * @param {import('@playwright/test').Page} page - A logged-in GM page viewing the token's scene.
+ * @param {string} tokenId - The unlinked token on the viewed scene.
+ * @returns {Promise<import('@playwright/test').Locator>} The synthetic actor's sheet; its element id carries the
+ * token's uuid.
+ */
+export async function openPlacedTokenSheet(page, tokenId) {
+   /** @type {{x: number, y: number}} The token's centre in client (page) coordinates. */
+   const centre = await hoverToken(page, tokenId);
+   await page.mouse.dblclick(centre.x, centre.y);
+
+   /** @type {import('@playwright/test').Locator} The sheet the double-click opened. */
+   const sheet = page.locator(`.application.titan-document-sheet[id*="Token-${tokenId}"]`);
+   await expect(sheet).toBeVisible();
+   return sheet;
+}
+
+/**
  * Returns a world compendium's entry in the Compendium tab.
  * @param {import('@playwright/test').Page} page - A logged-in page.
  * @param {string} packId - The pack's collection id (`world.<name>`).
