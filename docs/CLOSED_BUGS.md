@@ -2308,6 +2308,9 @@ unless a path says otherwise.
   Effect (inventory 2026-10-08, `.superpowers/sdd/test-suite-rewrite/non-titan-effects/`).
 - **Decision (user, 2026-10-08):** register core's model for `base` permanently, so TITAN stores a `base` effect and
   never uses it; core applies its native `changes`.
+- **Superseded (user ruling, 2026-10-08):** "never uses it" now reads: TITAN reads no TITAN field off a `base` effect,
+  and the character sheet's Effects tab and the Player HUD effects panel list it as a plain row that opens core's
+  default effect sheet.
 - **Fixed:** 2026-10-08.
   - `src/hooks/OnceInit.js` registers `base: foundry.data.ActiveEffectTypeDataModel` beside `effect` and `condition`.
   - Audit of every TITAN read of effects: `bug92-audit.md` in the campaign folder

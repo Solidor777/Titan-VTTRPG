@@ -15,7 +15,7 @@
    /** @type {boolean} Whether this row is expanded to show its detail. */
    let isExpanded = $state(false);
 
-   /** @type {boolean} Whether this entry is an effect (vs a condition, which carries no duration). */
+   /** @type {boolean} Whether this entry is an `effect` subtype (a condition or `base` effect carries no duration). */
    const isEffect = $derived(document.data?.type === EFFECT_TYPE);
 
    /** @type {string} The effect's duration type (effects only; defaults to permanent when absent). */

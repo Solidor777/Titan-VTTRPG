@@ -36,16 +36,14 @@ and hides from unlinked tokens the converted effects their own changes replace (
 - New Immunity rules element: an item or effect can make a character immune to a condition or to an effect by name.
   Applying it is refused with a notification, and an existing one is suppressed until the immunity ends: its
   modifiers stop applying; immunities it grants still apply.
-- Other modules and systems can store core's `base` Active Effect on a TITAN actor, item or token. TITAN keeps it, loads
-  it after a reload, and ignores it (no actor sheet, report or Player HUD list shows it; the Effect Tray lists one held
-  in a world or module pack); core still applies its native changes. Before, creating one failed and a stored one
-  stopped the world from loading.
+- Other modules and systems can store core's `base` Active Effect on a TITAN actor, item or token. TITAN keeps it and
+  loads it after a reload. The character sheet's Effects tab and the Player HUD's effects panel list it as a plain row
+  (name, image, active toggle, open and delete controls) that opens in Foundry's default effect sheet, and the Effect
+  Tray lists one held in a world or module pack. TITAN's stats, durations, immunities and reports ignore it, and core
+  still applies its native changes. Before, creating one failed and a stored one stopped the world from loading.
 - A condition or effect suppressed by an immunity shows a "Suppressed" tag naming the immunity, and a dimmed row, on
   the character sheet, in the Player HUD effects panel, and in turn-start and turn-end reports; its duration keeps
   running while suppressed.
-- An Active Effect of core's own type, made by a module or another system, shows on the character sheet's Effects tab
-  and in the Player HUD's effects panel as a plain row (name, image, active toggle, open and delete controls) and opens
-  in Foundry's default effect sheet; TITAN's stats, durations, immunities and reports ignore it.
 
 ## Version 2.1.0:
 Advantage and Disadvantage, situational modifiers, and bug fixes.

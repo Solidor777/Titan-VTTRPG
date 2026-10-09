@@ -45,7 +45,7 @@
    /** @type {boolean} Action menu visibility (single or group). */
    const actionMenuVisible = $derived(elementVisible('actionMenu'));
 
-   /** @type {boolean} Effects panel visibility (single character with at least one `effect` or `condition` effect). */
+   /** @type {boolean} Effects panel visibility (single character with an `effect`, `condition` or `base` effect). */
    const effectsPanelVisible = $derived(
       single && elementVisible('effectsPanel') && (documentStore.data.effects?.some(isListedEffect) ?? false),
    );

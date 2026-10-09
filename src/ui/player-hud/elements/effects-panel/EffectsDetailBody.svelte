@@ -23,7 +23,7 @@
    /** @type {object} The HUD's top-level actor bridge (never shadowed by providers). */
    const sheetDocument = getContext('sheetDocument');
 
-   /** @type {boolean} Whether this entry is an effect (vs a condition, which has no checks of its own). */
+   /** @type {boolean} Whether this entry is an `effect` subtype (a condition or `base` effect has no checks). */
    const isEffect = $derived(document.data?.type === EFFECT_TYPE);
 
    /** @type {boolean} Whether this entry is a `base` effect, which carries only core's effect data. */

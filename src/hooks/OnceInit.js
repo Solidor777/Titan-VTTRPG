@@ -1,4 +1,4 @@
-import { CONDITION_TYPE, EFFECT_TYPE } from '~/system/EffectTypes.js';
+import { BASE_TYPE, CONDITION_TYPE, EFFECT_TYPE } from '~/system/EffectTypes.js';
 import TitanActor from '~/document/types/actor/TitanActor.js';
 import TitanItem from '~/document/types/item/TitanItem.js';
 import TitanPlayerSheet from '~/document/types/actor/types/character/types/player/PlayerSheet.js';
@@ -141,9 +141,10 @@ export default function onceInit() {
    // Configure Active Effects.
    CONFIG.ActiveEffect.documentClass = TitanActiveEffect;
    // Core's `base` model stays registered so a module's or another system's `base` effect loads and persists. TITAN
-   // stores it and never reads it: every TITAN reader of effects selects the `effect` or `condition` subtype.
+   // lists it as a plain row that opens core's sheet and reads no TITAN field off it: every TITAN reader of effects
+   // selects the `effect` or `condition` subtype.
    CONFIG.ActiveEffect.dataModels = {
-      base: foundry.data.ActiveEffectTypeDataModel,
+      [BASE_TYPE]: foundry.data.ActiveEffectTypeDataModel,
       [EFFECT_TYPE]: TitanActiveEffectDataModel,
       [CONDITION_TYPE]: ConditionDataModel,
    };
