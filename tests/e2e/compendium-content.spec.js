@@ -205,8 +205,8 @@ async function scanSheet(sheet, rootSelector, what) {
          await clickTabButton(buttons.nth(index));
       }
       catch (error) {
-         problems.push(`${what}: tab ${index} did not activate: ${error.message.split('
-').slice(0, 8).join(' | ')}`);
+         const firstLines = error.message.split(/\r?\n/).slice(0, 8).join(' | '); // First lines of Playwright's click log.
+         problems.push(`${what}: tab ${index} did not activate: ${firstLines}`);
          continue;
       }
 
