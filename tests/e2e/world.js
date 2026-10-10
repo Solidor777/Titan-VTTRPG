@@ -199,6 +199,30 @@ export function attachPageErrors(page) {
 }
 
 /**
+ * Removes the collected errors that match a known defect from every collector of a page, so the harness gate and the
+ * spec's own assertion no longer report them. A caller names the defect in a comment with the source lines that
+ * explain it; an error that does not match stays and fails the test.
+ * @param {import('@playwright/test').Page} page - A page that joined the world.
+ * @param {(error: string) => boolean} matches - Whether a collected error is the known defect.
+ * @returns {Promise<number>} How many errors were removed.
+ */
+export async function discardKnownPageErrors(page, matches) {
+   await flushHookErrorReports(page);
+
+   /** @type {number} How many errors were removed. */
+   let removed = 0;
+   for (const errors of PAGE_ERROR_COLLECTORS.get(page) ?? []) {
+      for (let index = errors.length - 1; index >= 0; index--) {
+         if (matches(errors[index])) {
+            errors.splice(index, 1);
+            removed++;
+         }
+      }
+   }
+   return removed;
+}
+
+/**
  * Reads the newest chat message's subtype once a message beyond the given count exists. Returns
  * undefined while no new message has landed so `expect.poll` keeps retrying.
  * @param {import('@playwright/test').Page} page - The shared page.

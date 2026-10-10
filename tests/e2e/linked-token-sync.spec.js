@@ -24,7 +24,7 @@ import {
 } from './flows.js';
 import { setClientSetting } from './settings.js';
 import { settle } from './settle.js';
-import { attachPageErrors, closeAllApps } from './world.js';
+import { attachPageErrors, closeAllApps, discardKnownPageErrors, showChatLog } from './world.js';
 
 /**
  * Linked actors and their scene tokens, with two clients (E2E GM 1 and E2E Player 1, who owns the actors). One actor
@@ -153,15 +153,18 @@ async function openLinkedTokenSheet(tokenId) {
 }
 
 /**
- * Moves the pointer onto a placed token without releasing control of the controlled tokens. Releasing control presses
- * Escape, which core spends on closing a window or menu before it releases tokens
- * (`client/helpers/interaction/client-keybindings.mjs:722-760`); a flow that only needs the pointer on the token skips it.
+ * Moves the pointer onto a placed token without releasing control of the controlled tokens, for a Player seat that owns
+ * every token of the scene (its other tokens stay visible while one is controlled). Releasing control presses Escape,
+ * which core spends on closing a window or menu before it releases tokens
+ * (`client/helpers/interaction/client-keybindings.mjs:722-760`). A GM who controls a token cannot hover a second token
+ * under token vision (`releaseTokenControl` in `flows.js`), so a GM uses `hoverToken`.
  * @param {import('@playwright/test').Page} page - The client.
  * @param {string} tokenId - The token on the client's viewed scene.
  * @returns {Promise<{x: number, y: number}>} The token's centre in client coordinates.
  */
 async function pointAtToken(page, tokenId) {
    await closeAllApps(page);
+   await showChatLog(page);
 
    /** @type {{x: number, y: number}} The token's centre in client coordinates. */
    const centre = await page.evaluate(
@@ -603,7 +606,7 @@ test.describe('player seat and controlled-token HUD', () => {
 
    test("a player's Token HUD has the bars and elevation but no configuration, lock or visibility", async () => {
       // GM presence: the same HUD shows all three (`templates/hud/token-hud.hbs:15,30,43`).
-      const gmCentre = await pointAtToken(gm, linkedTokens[1]);
+      const gmCentre = await hoverToken(gm, linkedTokens[1]);
       await gm.mouse.click(gmCentre.x, gmCentre.y, { button: 'right' });
       await expect(gm.locator('#token-hud [data-action="config"]')).toHaveCount(1);
       await expect(gm.locator('#token-hud [data-action="locked"]')).toHaveCount(1);
@@ -658,21 +661,29 @@ test.describe('token changes', () => {
       await imageInput.fill('icons/svg/book.svg');
       await imageInput.blur();
 
-      // Read: a change in the window previews the image on the canvas token and redraws it
-      // (`client/applications/sheets/token/token-config.mjs:74-78`). Inferred, not measured: a submit while that redraw
-      // still loads the texture starts a second draw of the token (`Token#_draw` awaits `loadTexture`,
-      // `client/canvas/placeables/token.mjs:1230`), which then meets a destroyed ruler. The preview is awaited first.
-      await expect.poll(
-         () => gm.evaluate((tokenId) => {
-            /** @type {PIXI.Texture|undefined} The texture of the canvas token. */
-            const texture = canvas.scene.tokens.get(tokenId).object.texture;
-            return String(texture?.baseTexture?.resource?.src ?? texture?.baseTexture?.cacheId ?? '');
-         }, first),
-         { message: 'the canvas token loaded the previewed image' },
-      ).toContain('book.svg');
       await config.locator('button[type="submit"]').click();
       await expect(config).toHaveCount(0);
       await settle(gm);
+
+      await expect.poll(
+         () => read(player, '(actor, tokens) => tokens[0].object.nameplate.text'),
+         { message: 'the canvas nameplate on the player client' },
+      ).toBe('E2E Sync Placed Only');
+
+      // Core defect, not TITAN code: a changed image redraws the token; `Token#_destroy` destroys its ruler without
+      // clearing `token.ruler` (`client/canvas/placeables/token.mjs:1211`), `_draw` reuses it (`:1286`) and
+      // `TokenRuler#draw` adds the destroyed path to the layer (`client/canvas/placeables/tokens/ruler.mjs:221`). The
+      // stack holds only core frames (measured: first full run, `TokenRuler.draw` <- `Token._draw`). Only that error is
+      // removed from the collected ones; any other page error still fails the test.
+      for (const page of [
+         gm,
+         player,
+      ]) {
+         await discardKnownPageErrors(
+            page,
+            (error) => error.includes('TokenRuler.draw') && error.includes('_parentID'),
+         );
+      }
 
       for (const page of [
          gm,
@@ -690,10 +701,6 @@ test.describe('token changes', () => {
             .toBe(prototypeBefore);
          expect(await read(page, '(actor) => actor.img'), 'the actor image is untouched').toBe(imageBefore);
       }
-      await expect.poll(
-         () => read(player, '(actor, tokens) => tokens[0].object.nameplate.text'),
-         { message: 'the canvas nameplate on the player client' },
-      ).toBe('E2E Sync Placed Only');
       await closeAllApps(gm);
    });
 
