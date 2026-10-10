@@ -1,6 +1,7 @@
 <script>
    import applyDamageToTargets from '~/helpers/utility-functions/ApplyDamageToTargets.js';
    import applyHealingToTargets from '~/helpers/utility-functions/ApplyHealingToTargets.js';
+   import computeHalfDamage from '~/helpers/utility-functions/ComputeHalfDamage.js';
    import tooltipAction from '~/helpers/svelte-actions/TooltipAction.js';
    import Button from '~/helpers/svelte-components/button/Button.svelte';
    import {
@@ -52,7 +53,7 @@
    <div class="button" use:tooltipAction={'applyHalfDamage'}>
       <Button
          onclick={() =>
-            applyDamageToTargets(Math.floor(damage / 2), {
+            applyDamageToTargets(computeHalfDamage(damage), {
                ineffective: ineffective,
                penetrating: penetrating,
             })}
