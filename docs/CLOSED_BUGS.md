@@ -3168,3 +3168,35 @@ The evidence files named here are in `.superpowers/sdd/2026-10-10-e2e-coverage/t
   Flat Modifier, a Set Sum on the Armor mod with no armor, and a Multiply Sum doubling a worn armor plus ability).
 - **Found:** 2026-10-10 while building the stat-element matrix.
 - **Status:** Closed 2026-10-10 (pending the controller's run of the spec).
+
+### 162. The Vicious trait did not add a Wound
+
+- **What (measured):** a defender at 1 Stamina and 0 Wounds took 2 damage from an attack with the Vicious trait and
+  suffered 1 Wound; the rules say a Vicious attack that inflicts Wounds inflicts 1 more (`docs/TITAN Rules Compendium.md`,
+  Vicious, line 2286). The test expected 2 and received 1 (`t2-logs/vicious-measured-without-test-fail.log`). A Vicious
+  attack that inflicts no Wound adds none, which the product did correctly.
+- **Cause (read):** nothing in `src/` read Vicious outside the trait list, its description and the tag; unlike
+  Ineffective and Penetrating it set no flag in the attack check and passed no option to `applyDamage`.
+- **Fixed:** 2026-10-10 (user ruling: the check card carries the result it derived, as it does for the other traits):
+  `AttackCheckOptions` and `AttackCheckParameters` have a `vicious` flag (a persisted boolean of the attack check
+  message; the two schema golden masters list it), `initializeAttackCheckOptions` sets it from the Vicious trait, the
+  attack card's damage buttons pass it, and `applyDamage` adds 1 Wound when Wounds are inflicted. The Ineffective limit
+  of 1 Wound applies after the Vicious Wound, so a Vicious and Ineffective attack inflicts 1 (inferred from the rules
+  text "can only inflict 1 Wound per attack"; no rule names the combination). Covered by "Vicious adds 1 Wound when the
+  attack inflicts Wounds", "Vicious and Ineffective together inflict at most 1 Wound" and "Vicious adds no Wound when
+  the attack inflicts none" in `attack-traits.spec.js` (written, not run).
+- **Found:** 2026-10-10 while writing the attack traits spec.
+- **Status:** Closed 2026-10-10.
+
+### 170. Apply Half Damage applied no damage for a damage of 1 on four of the five cards
+
+- **What (read):** the item, casting, Resistance and Attribute cards applied `Math.floor(damage / 2)`, which is 0 for a
+  damage of 1, and `applyDamage` does nothing for 0, while the attack card applied `Math.max(Math.floor(damage / 2), 1)`.
+  The reviewer found the difference by reading; the failing run of the new tests was not made.
+- **Fixed:** 2026-10-10 (user ruling: at least 1 on every card): `computeHalfDamage`
+  (`src/helpers/utility-functions/ComputeHalfDamage.js`, unit test `ComputeHalfDamage.test.js`) is the one half-damage
+  rule and every card's button calls it. Covered by the "Apply Half Damage" tests of `resistance-checks.spec.js` (casting,
+  item, Resistance cards), `opposed-checks.spec.js` (Attribute card) and `attack-traits.spec.js` (attack card), written,
+  not run.
+- **Found:** 2026-10-10 by the review of the check card specs.
+- **Status:** Closed 2026-10-10.

@@ -927,12 +927,15 @@ at the repo root, so it catches v14 API breaks that the mocked Vitest tier canno
   would otherwise cover the next create dialog), the `getCheckOptions` setting, Heavy, Encumbering and Loud armor, a
   condition's situation), `resistance-checks.spec.js` (the Reflexes, Resilience and Willpower Resist buttons of a casting
   card and of item check cards: label, Difficulty 4 and Complexity extra successes + 1 whatever is spent or refunded on
-  the card, the Resist dialog, success exactly at the Complexity, the damage taken, several buttons and several checks),
+  the card, the Resist dialog, success exactly at the Complexity, the damage taken, several buttons and several checks;
+  E2E Player 1 clicking Resist on GM-rolled cards and seeing no damage buttons; a Body 8, Mind 2, Soul 2 defender that
+  pins Willpower to Soul plus half Mind; Apply Half Damage on the casting, item and Resistance cards),
   `chat-visibility.spec.js` and `chat-visibility-reports.spec.js` (four simultaneous clients, GM 1, GM 2, Player 1, Player 2: the chat mode buttons; plain chat, `/w` whispers, the five check kinds, the seven item cards, the effect card and the initiative roll in every mode; HUD utility reports and turn reports whispered to owners; each client's chat log DOM live and after a reload), `opposed-checks.spec.js` (the Opposed button of an item check for 0, 1, 2 and 5 extra successes, skill- and
   attribute-opposed, damage reduced by the opposed check, an opposed check beside a resistance check, the Opposed
   dialog, a casting card that has no Opposed button), `attack-traits.spec.js` (all eighteen attack traits alone on forced
   attacks, combinations, the Armor math of Penetrating and Ineffective with the Ignore Armor and Half buttons, Cleave and
-  Rend counts, Magical Armor, Repair, and the Wounds an attack inflicts; Vicious is pinned expected-to-fail),
+  Rend counts, Magical Armor, Repair, and the Wounds an attack inflicts, Vicious included; the Cleave, Rend and Repair
+  buttons compared with the same button on a card that has them),
   `attack-scaling.spec.js` (damage plus extra successes, a "+ ES" box turned off, a Damage Mod, Multi-Attack and Flurry
   halving the dice and Expertise, Expertise raised to 6s for Cleave), `logic/rules-elements.spec.js` (rules elements added in the Rules Elements tab, read from the
   sheet's derived Body value, which owned sources apply and to which bucket, the check dialogs and the posted check
@@ -997,7 +1000,8 @@ through the spell sheet, and readers for a casting card's result rows, dice, sca
 state), `checkCards.js` (the roll entry points `rollItemCheck` and `rollWeaponAttack`; `focusCharacter`, which makes a
 sheet the window a GM's chat-card buttons act on; `clickResist`, `clickOpposed`, `pressDamageButton` and
 `pressRendButton` with the report each posts; `readCardButtons`, `readResultRows` and `readVitals`; `createCharacter`,
-`wearArmor` and the sheet setters for a check's opposed Attribute and Skill, a custom aspect's Resistance, a trait with a
+`wearArmor`, `setArmorValue`, `loginPlayer` (a second client for E2E Player 1) and the sheet setters for a check's
+opposed Attribute and Skill, a custom aspect's Resistance, a trait with a
 number, a weapon's Multi-Attack and its "+ ES" box), `targeting.js` (`toggleTargetWithTokenHud`, `deleteTokenWithKey`, `retargetWithKey` and `targetWithKeyKeepingControl` for a Player whose only token stays controlled, `setSceneTokenVision` through the Scene Configuration window; used by `attack-targeting.spec.js`, and `sheet-hud-rolls.spec.js` rolls every check type from the sheet and the Player HUD on the GM and the owner Player seat), `componentProbe.js`, `fast-check.js` and `slow-operation-reporter.js` are described under the entries below. `run-e2e-throttled.ps1` is the runner wrapper.
 
 **Shared-world E2E harness (one world boot per FILE)** — every eligible spec boots the world ONCE per

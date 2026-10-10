@@ -137,3 +137,9 @@ Completed items are deleted, not marked done.
 - Conjurer of Urdokai's check has `resolveCost` 0 because the ability's 2 Resolve is its activation cost, while other
   sacred-art checks carry their ability's Cost as `resolveCost` (controller ruling during plan C Task 3, inferred
   from the plan; confirm with the user).
+
+- `docs/TITAN Rules Compendium.md` (user-owned, untracked) disagrees with the code in two places the user ruled the code
+  right on (2026-10-10): the Willpower section (line 1477) says Soul plus half of Body, rounded down, while
+  `_calculateBaseResistances` and the user's ruling are Soul plus half of Mind; the Penetrating sentence (line 2246)
+  says it ignores 1 point of Armor, while `ComputeDamageResistance.js` ignores half of the Armor, rounded up (rules
+  revision `a233d07c`, 2026-09-28). Fix the two sentences in the compendium; the specs assert the code's numbers.

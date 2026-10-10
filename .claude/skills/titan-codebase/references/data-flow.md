@@ -100,12 +100,14 @@ earned, so spending or refunding steps on the card never changes it (rules, "Opp
 caster distributes enhancements after the targets have rolled). An item card passes its damage as `damageToReduce` to
 the button that matches `damageReducedBy` and `0` to the other. The buttons roll for `getBestCharactersToUpdate()` (a
 GM: targeted characters, else controlled tokens, else the focused sheet's character), and a failed Resistance or
-Attribute Check takes `max(damageToReduce - successes, 0)`. Attack cards read six traits: Cleave, Flurry, Ineffective,
-Magical, Penetrating and Rend set a flag of their name in the check parameters; the other twelve (Blast, Close,
-Crushing, Loud, Piercing, Push, Reload, Restraining, Slashing, Splash, Two-Handed, Vicious) are tags the GM adjudicates.
+Attribute Check takes `max(damageToReduce - successes, 0)`. Attack cards read seven traits: Cleave, Flurry, Ineffective,
+Magical, Penetrating, Rend and Vicious set a flag of their name in the check parameters; the other eleven (Blast,
+Close, Crushing, Loud, Piercing, Push, Reload, Restraining, Slashing, Splash, Two-Handed) are tags the GM adjudicates.
+Every Apply Half Damage button applies `computeHalfDamage(damage)` (half rounded down, at least 1); the damage buttons
+show only to a GM, so a player's Resist and Opposed clicks post the check and the GM applies its damage taken.
 Cleave and Rend counts are `results.criticalSuccesses` (the 6s, which an attack with Cleave or Rend raises with spare
 Expertise in `AttackCheck#_applyExpertise`); Magical armor loses nothing to a Rend attack unless the attack is Magical;
-an Ineffective attack inflicts at most 1 Wound; a weapon's `system.multiAttack` halves an attack's dice (rounded up
+an Ineffective attack inflicts at most 1 Wound (after the +1 Wound of a Vicious attack that inflicts Wounds); a weapon's `system.multiAttack` halves an attack's dice (rounded up
 with Flurry) and Expertise (rounded down).
 
 Scaling aspects of a casting check: `getCastingCheckParameters` (`CharacterDataModel.js`, `processAspects`) skips a
