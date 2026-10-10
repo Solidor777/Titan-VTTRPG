@@ -9,6 +9,7 @@ import {
    actAsCharacter,
    assignCharacter,
    cardButton,
+   expectActsAs,
    cardOf,
    clickOpposed,
    clickResist,
@@ -124,6 +125,9 @@ async function opposeWith(card, dice, successes, page = gm) {
       }
    }
    await forceDice(page, facesWith(dice, successes));
+   if (page === player) {
+      await expectActsAs(page, defenderId);
+   }
 
    /** @type {{id: string, parameters: object, results: object}} The Attribute Check. */
    const check = await clickOpposed(page, card.id);
@@ -333,9 +337,9 @@ test.describe('E2E Player 1 on a GM-rolled card', () => {
          skill: 'athletics',
          complexity: 3,
          damageToReduce: 8,
+         totalDice: 6,
       });
-      expect(failed.results.damageTaken, 'at most 2 successes of 8 damage').toBeGreaterThanOrEqual(6);
-      expect(failed.results.damageTaken).toBeLessThanOrEqual(8);
+      expect(failed.results.damageTaken, 'damage 8 minus 2 successes').toBe(6);
 
       // The Attribute Check own damage button is the GM only.
       await showChatLog(gm);

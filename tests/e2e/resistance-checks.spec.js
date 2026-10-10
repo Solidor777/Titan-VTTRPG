@@ -16,6 +16,7 @@ import {
    cardButton,
    actAsCharacter,
    assignCharacter,
+   expectActsAs,
    cardOf,
    clickResist,
    createCharacter,
@@ -169,6 +170,9 @@ async function resistWith(cast, resistance, successes, { page = gm, actorId = de
       }
    }
    await forceDice(page, facesWith(dice ?? DEFENDER_DICE[resistance], successes));
+   if (page === player) {
+      await expectActsAs(page, actorId);
+   }
 
    /** @type {{id: string, parameters: object, results: object}} The Resistance Check. */
    const resist = await clickResist(page, cast.id, resistance);
@@ -527,9 +531,8 @@ test.describe('casting cards with fewer or more Resist buttons', () => {
       await expect(cardButton(cast.card, 'apply'), 'the GM sees the damage buttons of the same card').toHaveCount(1);
       await expect(cardButton(playerCard, 'apply'), 'the player does not').toHaveCount(0);
 
-      // Two forced successes miss Complexity 3 for any character the player's click rolls for.
       /** @type {{id: string, parameters: object, results: object}} The Resistance Check the player's click posts. */
-      const resist = await resistWith(cast, 'resilience', 2, { page: player });
+      const resist = await resistWith(cast, 'resilience', 3, { page: player });
       expect(await readMessageAuthor(player, resist.id), 'the player posted the check').toBe('E2E Player 1');
       test.info().annotations.push({
          type: 'player check rolled for',
@@ -539,8 +542,9 @@ test.describe('casting cards with fewer or more Resist buttons', () => {
          resistance: 'resilience',
          difficulty: 4,
          complexity: 3,
+         totalDice: DEFENDER_DICE.resilience,
       });
-      expect(resist.results.succeeded, 'at most 2 successes miss Complexity 3').toBe(false);
+      expect(resist.results.succeeded, '3 successes meet Complexity 3').toBe(true);
    });
 
    test('Apply Half Damage on a casting card applies at least 1 damage', async () => {
@@ -905,9 +909,9 @@ test.describe('item check cards with a Resist button', () => {
          resistance: 'reflexes',
          complexity: 3,
          damageToReduce: 7,
+         totalDice: DEFENDER_DICE.reflexes,
       });
-      expect(failed.results.damageTaken, 'at most 2 successes of 7 damage').toBeGreaterThanOrEqual(5);
-      expect(failed.results.damageTaken).toBeLessThanOrEqual(7);
+      expect(failed.results.damageTaken, 'damage 7 minus 2 successes').toBe(5);
 
       // The Resistance Check's own damage button is the GM's too.
       await showChatLog(gm);
