@@ -2960,7 +2960,9 @@ The evidence files named here are in `.superpowers/sdd/2026-10-10-e2e-coverage/t
 - **Fixed:** 2026-10-10: `_rollCheck` passes `check.parameters`. `tests/e2e/spell-casting.spec.js` ("Resolve spent by a
   cast") spends 2 Resolve for doubled Training and Expertise, spends 1 with the setting on and none with it off in
   one test, and spends 1 on a failed cast. The mutation that restores `_expendCheckResolve(check)` fails all three
-  (`mutation-resolve.log`).
+  (`mutation-resolve.log`). `tests/e2e/check-resolve.spec.js` rolls an Attribute, Resistance and Attack check with
+  Expertise doubled and an Item Check with a Resolve Cost of 2: each spends with its setting on and nothing with it off
+  on the same flow, and restoring `_expendCheckResolve(check)` fails all four (`mutation-f1-resolve-all-kinds.log`).
 - **Found:** 2026-10-10 while writing the Resolve test of the casting spec.
 - **Status:** Closed 2026-10-10.
 
@@ -2983,6 +2985,10 @@ The evidence files named here are in `.superpowers/sdd/2026-10-10-e2e-coverage/t
   the enabled check (`mutation-disabled-aspect.log`; an earlier attempt without the resistance test was not caught,
   because the cost guard excludes the disabled aspect too, `mutation-disabled-aspect-first-attempt-uncaught.log`) and
   `stepCost >= 0` (`mutation-zero-cost.log`) fail the spec.
+- **Free scaling aspect, as built (2026-10-10):** a scaling custom aspect needs a cost of at least 1, because a step
+  that costs nothing cannot be bounded by the extra successes. The Cost input of the custom aspect row keeps at least 1
+  while Scaling is on, and a row whose Scaling is on with a cost of 0 shows a warning (`scalingNeedsCost`). An aspect
+  with Scaling off may cost 0.
 - **Found:** 2026-10-10 while writing the aspect spending spec.
 - **Status:** Closed 2026-10-10.
 
@@ -2996,13 +3002,27 @@ The evidence files named here are in `.superpowers/sdd/2026-10-10-e2e-coverage/t
   (`CastingCheckChatMessage.svelte`, `getSpeakerActor(...)?.isOwner`), but core lets only a message's author and a GM
   write it (`common/documents/chat-message.mjs`, `getUserLevel`; the server rejects the update). Inferred, not
   measured: the same split holds for every other card control that writes the message.
-- **Fixed:** 2026-10-10: `TitanChatMessage#update` (`src/document/types/chat-message/ChatMessage.js`) sends the write of
-  a user who owns the speaker but cannot write the message to the active GM's client with the system socket hook
-  `relayChatMessageUpdate`; `onRelayChatMessageUpdate` (`src/hooks/OnRelayChatMessageUpdate.js`) checks that the sender
-  owns the speaking actor and writes only the `system` data. With no GM connected the user gets a warning.
-  `tests/e2e/spell-aspect-spending.spec.js` covers the player on a GM-rolled card, the player on the player's own card,
-  and a hand-sent request that is written while the sender owns the character and refused once the ownership is
-  `NONE`. The mutation that makes `update` always write directly fails the spec (`mutation-relay.log`).
+- **Fixed (first version, 2026-10-10):** `TitanChatMessage#update` sent the write of a speaker's owner to the active GM
+  through a socket hook whose arguments carried the sender's id. Review found the flaw: any client could emit that hook
+  with another user's id (a GM's passes every ownership check) and write any `system` data (`t1-review-1.md`).
+- **Fixed (hardened, 2026-10-10):** the sender comes from the transport. Foundry's server appends the sending user's id,
+  taken from the socket's authenticated session, as the second listener argument of every package socket event
+  (`dist/packages/package.mjs` `registerCustomSocket`, `dist/server/sockets.mjs` `handleCustomSocket`; core build 364),
+  and `SocketManager` now hands it to the handler (`registerRequestHandler`, `request`) instead of discarding it; a
+  request carries no identity. Only the active GM's client answers; its answer (written, or the reason for the refusal)
+  returns to the requester, who sees a warning for a refusal or for no answer within 5 seconds. The GM side derives
+  every figure itself (`src/check/types/casting-check/ScalingAspectChange.js`): the request names only the new
+  `currentValue` of each scaling aspect, which must be a step of the aspect that the extra successes pay for; the
+  remaining successes, damage and healing are computed from it, and the message must be a casting check whose
+  speaking actor the sender owns (`src/hooks/OnRelayChatMessageUpdate.js`). `TitanChatMessage#update` relays only an
+  update with no operation options whose difference from the stored results is the scaling aspects' values and the
+  figures derived from them; every other write (other fields, dotted keys, `operation` options, other message
+  types) goes to core unchanged and raises core's permission error.
+  `tests/e2e/spell-aspect-spending.spec.js` covers an owner's write and a refused one with its warning, the allow-list,
+  and forged identities (a sender field, a leading identity argument, the old broadcast form) from a client that owns
+  nothing; `tests/unit/ScalingAspectChange.test.js` covers the two pure functions. Mutations that trust a sender field
+  of the message, drop the GM-side ownership check, drop the allow-list, drop the step check, make every answer a
+  success, and relay a write with `operation` options each fail the spec (`mutation-f1-*.log`).
 - **Found:** 2026-10-10 while writing the owner-player test of the aspect spending spec.
 - **Status:** Closed 2026-10-10.
 

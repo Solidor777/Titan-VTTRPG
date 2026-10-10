@@ -114,7 +114,8 @@ step cost, `scalingCost ?? cost`, is at least 1 (a step that costs nothing could
 successes). The card's step cost is that value, so a resistance check that halves an aspect's cost halves its step
 cost too unless the aspect has a `scalingCost` (Damage and Duration do). Each step moves the value, and the damage or
 healing it carries, by `max(initialValue, 1)`. A Damage Mod or Healing Mod is added once, at roll time, and only to an
-amount above 0 (`CastingCheckResults.js`).
+amount above 0 (`CastingCheckResults.js`). The custom aspect row keeps a scaling aspect's Cost input at 1 or more and
+flags a scaling aspect whose cost is 0 (`scalingNeedsCost`).
 
 Casting-check roll-time auto-max: `calculateCastingCheckResults`
 (src/check/types/casting-check/CastingCheckResults.js) auto-maximizes the SINGLE affordable scaling aspect

@@ -845,7 +845,7 @@ the lone exception is `Text` (no root element). See the component-probe harness 
 coverage map, the wrapper-forwarding rules, and the selector each component resolves to.
 
 **Playwright E2E** — `npm run test:e2e` runs `playwright test` against the `test-titan` Foundry world on
-`http://localhost:30000`: 49 spec files, 949 tests (measured: `npx playwright test --list` → "Total: 949 tests in 49
+`http://localhost:30000`: 50 spec files, 955 tests (measured: `npx playwright test --list` → "Total: 955 tests in 50
 files"). `playwright.config.mjs` sets `timeout` 60 s, `expect.timeout` 1000 ms, `workers` 1, `fullyParallel` false,
 `globalSetup` and `globalTeardown`, the `list` reporter beside `slow-operation-reporter.js`, and for every test headless
 Chromium (with `--enable-gpu`), `viewport` 1920x1080 and `actionTimeout` 10 s. The users are the four dedicated
@@ -860,7 +860,7 @@ ancestor pid, polling liveness once a second), so a hard-killed run never leaves
 LevelDB locks. `tests/unit/SuperviseServer.test.js` covers spawn/reuse/teardown. The suite drives the real built system
 at the repo root, so it catches v14 API breaks that the mocked Vitest tier cannot.
 
-**The 49 spec files** (`tests/e2e/`; `logic/` holds three of them):
+**The 50 spec files** (`tests/e2e/`; `logic/` holds three of them):
 - Sheets and documents. `surfaces.spec.js` (every sheet type, spell tab, check-options dialog and the effect tray
   renders on flow-made documents with zero uncaught page errors and no `LOCAL.` text; the collapsed-layout regressions;
   the portrait pick through Foundry's file picker; opening a sheet from the directory; the Edit Unique ID dialog),
@@ -882,8 +882,10 @@ at the repo root, so it catches v14 API breaks that the mocked Vitest tier canno
   successes and card rows; a table of aspect-cost totals; a failed cast; Resolve spent by doubled Training and
   Expertise), `spell-aspect-spending.spec.js` (every scaling standard aspect and custom aspects of cost 1 to 4 bought
   and refunded with the card's Reset, Decrease and Increase controls; three aspects of different costs; the
-  one-affordable-aspect auto-spend; the owner of the speaker on a player client, relayed through the GM; disabled and
-  free aspects that cannot scale), `spell-damage-healing.spec.js` (damage and healing aspects scaling on the card,
+  one-affordable-aspect auto-spend; the owner of the speaker on a player client, relayed through the GM, with the
+  allow-list and forged-sender refusals; disabled and free aspects that cannot scale and the sheet's flag for a free
+  scaling aspect), `check-resolve.spec.js` (Resolve spent, or not with the setting off, by doubled Expertise on an
+  Attribute, Resistance and Attack check and by an Item Check's Resolve Cost), `spell-damage-healing.spec.js` (damage and healing aspects scaling on the card,
   Damage Mod and Healing Mod from a rules element reaching `results.damage` and `results.healing`, and the Apply
   buttons of the card on a targeted character), `drag.spec.js` (real pointer drags: character sheet item and effect
   lists, the four item sheet lists, a row copied between sheets and refused by a list of another kind, a world item or a

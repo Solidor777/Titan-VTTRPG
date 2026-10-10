@@ -903,10 +903,16 @@ sequencing future racy mutations.
 Listens on `system.titan` via `game.socket`. Received messages are dispatched as Foundry Hooks
 (`Hooks.callAll`). `triggerSocketHook(id, ...args)` fires the hook locally and emits it to all
 clients — the primary mechanism for cross-client automation (e.g., a player-owned actor applying
-damage on the GM's behalf). `TitanChatMessage#update` uses it to relay a write: core lets only a message's author and
-a GM write a message, so a user who owns the speaking actor but did not author the card sends the `system` change with
-the hook `relayChatMessageUpdate` and `onRelayChatMessageUpdate` (`src/hooks/OnRelayChatMessageUpdate.js`) writes it on
-the active GM's client after re-checking the sender's ownership.
+damage on the GM's behalf). Hook broadcasts carry the sender's own claims. A second kind of message, a request
+(`registerRequestHandler(name, handler)`, `request(name, ...args)`), runs `handler(senderId, ...args)` on the active GM's
+client only, with `senderId` taken from the transport (Foundry's server appends the authenticated sender as the second
+listener argument of package sockets) and never from the message, and sends the handler's return value or error back to
+the requester (5 s timeout). `TitanChatMessage#update` uses it: core lets only a message's author and a GM write a
+message, so for a casting card's scaling controls written by a user who owns the speaking actor, `update` requests
+`relayChatMessageUpdate` with only the new `currentValue` of each scaling aspect; `onRelayChatMessageUpdate`
+(`src/hooks/OnRelayChatMessageUpdate.js`) checks ownership and `applyScalingChange`
+(`src/check/types/casting-check/ScalingAspectChange.js`) derives remaining successes, damage and healing. Any other write
+goes to core unchanged.
 
 **`utility-functions/`** (`src/helpers/utility-functions/`)
 
