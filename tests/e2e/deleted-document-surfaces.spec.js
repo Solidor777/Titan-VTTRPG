@@ -226,8 +226,25 @@ test.describe('a placed token deleted with its Token Configuration window open',
          await expect(config).toBeVisible();
          await resetDeletionWatch(page, watch);
 
-         // Core's keyboard manager ignores a key pressed while a form field has focus (the window focuses a field).
-         await page.evaluate(() => document.activeElement?.blur());
+         // The window opens over the token. It is moved to the corner, and a click on the controlled token gives the
+         // canvas the focus, as a user does before pressing the Delete key; the click keeps the token controlled and
+         // closes the Token HUD. The cause of the earlier Delete-key refusal is not established (read: the keyboard
+         // manager ignores keys while a form control has focus, `keyboard-manager.mjs:186-194`).
+         await page.evaluate((tokenId) => canvas.scene.tokens.get(tokenId).sheet.setPosition({
+            left: 20,
+            top: 20,
+         }), tokenId);
+
+         /** @type {{x: number, y: number}} The token's centre in client coordinates. */
+         const centre = await page.evaluate((tokenId) => canvas.clientCoordinatesFromCanvas(
+            canvas.scene.tokens.get(tokenId).object.center,
+         ), tokenId);
+         await restOnToken(page, tokenId, centre);
+         await page.mouse.click(centre.x, centre.y);
+         await expect.poll(
+            () => page.evaluate((tokenId) => canvas.tokens.controlled.map((token) => token.id), tokenId),
+            { message: 'the token is still the controlled one' },
+         ).toEqual([tokenId]);
          await deleteControlledToken(page, tokenId);
          await expect(config, 'the configuration window closed with the token').toHaveCount(0);
          await expectNoDeletionErrors(page, watch, errors, 'a token with its configuration open');
