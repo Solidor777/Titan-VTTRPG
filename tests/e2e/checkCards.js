@@ -58,7 +58,27 @@ export async function actAsCharacter(page, actorId) {
       { message: 'no token is controlled' },
    ).toBe(0);
    await assignCharacter(page, actorId);
+   await expectActsAs(page, actorId);
    return previous;
+}
+
+/**
+ * Asserts that a player's chat-card buttons act on one character and no other: no token is controlled (controlled
+ * tokens come first) and the user's assigned character is that character (it comes second). The failure message names
+ * the controlled tokens and the assigned character the client holds.
+ * @param {import('@playwright/test').Page} page - A logged-in player page.
+ * @param {string} actorId - The id of the character the buttons must act on.
+ * @returns {Promise<void>} Resolves once the client holds exactly that state.
+ */
+export async function expectActsAs(page, actorId) {
+   await expect.poll(
+      () => page.evaluate((id) => ({
+         actsAsActor: (canvas.tokens?.controlled.length ?? 0) === 0 && game.user.character?.id === id,
+         controlled: (canvas.tokens?.controlled ?? []).map((token) => token.actor?.name),
+         character: game.user.character?.name ?? null,
+      }), actorId),
+      { message: 'the player\'s buttons act on the character: no controlled token and the character assigned' },
+   ).toMatchObject({ actsAsActor: true });
 }
 
 /**
