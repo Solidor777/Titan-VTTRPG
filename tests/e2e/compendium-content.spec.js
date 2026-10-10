@@ -175,7 +175,8 @@ async function openPackWindow(packId) {
       /** @type {import('@playwright/test').Locator} That folder. */
       const folder = packWindow.locator(`li.directory-item.folder[data-folder-id="${folderId}"]`);
       await folder.locator('> header.folder-header').click();
-      await expect(folder).toHaveClass(/expanded/);
+      await expect(packWindow.locator(`li.directory-item.folder.expanded[data-folder-id="${folderId}"]`))
+         .toHaveCount(1);
    }
    return packWindow;
 }

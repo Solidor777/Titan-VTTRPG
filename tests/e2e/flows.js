@@ -420,12 +420,17 @@ export async function viewScene(page, sceneId) {
 }
 
 /**
- * Activates a scene through its directory entry's context menu, so every client views it.
+ * Activates a scene through its directory entry's context menu, so every client views it. The menu offers Activate
+ * only for a scene that is not the active one, so an already active scene is only viewed.
  * @param {import('@playwright/test').Page} page - A logged-in GM page.
  * @param {string} sceneId - The scene to activate.
  * @returns {Promise<void>} Resolves once the canvas has drawn the scene.
  */
 export async function activateScene(page, sceneId) {
+   if (await page.evaluate((sceneId) => game.scenes.active?.id === sceneId, sceneId)) {
+      await viewScene(page, sceneId);
+      return;
+   }
    await chooseSceneMenuEntry(page, sceneId, 'Activate');
    await waitForSceneDrawn(page, sceneId);
 }
