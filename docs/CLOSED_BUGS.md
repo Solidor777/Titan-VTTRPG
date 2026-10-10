@@ -3215,3 +3215,16 @@ The evidence files named here are in `.superpowers/sdd/2026-10-10-e2e-coverage/t
   (written, not run).
 - **Found:** 2026-10-10 while reading the turn code for the turn matrix.
 - **Status:** Closed 2026-10-10.
+
+### 171. An open sheet's name input did not follow a rename made elsewhere, and its next key press wrote the stale name back
+
+- **What (measured):** the full e2e run failed "the name typed on the sheet reaches the clients and the HUD, not the placed
+  tokens" (`linked-token-sync.spec.js`): after the GM renamed a linked actor, the actor, both token actors and the Player
+  HUD showed the new name on both clients, but the player's open sheet kept the old name in `.document-name input`. Cause
+  (read): `DocumentNameInput.svelte` copied `document.data.name` into a local `$state` once and never read it again, and
+  its `onkeyup` handler sent that local value.
+- **Fixed:** 2026-10-10: the input follows the document name while it has no focus (the rule `DocumentTextInput.svelte`
+  uses), so a rename from another client or sheet shows and a focused input is never overwritten. Covered by the same
+  test (written, not run after the fix).
+- **Found:** 2026-10-10 by the full e2e run of `linked-token-sync.spec.js`.
+- **Status:** Closed 2026-10-10.

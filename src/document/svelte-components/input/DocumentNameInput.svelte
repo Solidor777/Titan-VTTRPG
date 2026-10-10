@@ -17,8 +17,20 @@
    /** @type {object} Reference to the reactive Document store. */
    const document = getContext('document');
 
-   /** @type {string} The name of the document. */
+   /** @type {string} The name the input shows. It follows the document only while the input has no focus. */
    let value = $state(document.data.name);
+
+   /** @type {boolean} Whether the input has focus. */
+   let focused = $state(false);
+
+   // Constraint: a focused input is never rewritten from the document. A rename from another client or sheet would
+   // otherwise replace the name being typed; without this follow, a stale name is written back by the next key press.
+   $effect(() => {
+      const stored = document.data.name;
+      if (!focused) {
+         value = stored;
+      }
+   });
 
    /**
     * Updates the document name when the input changes.
@@ -38,6 +50,12 @@
       bind:value={value}
       disabled={disabled || !document.data?.isOwner}
       onchange={updateDocument}
+      onfocus={() => {
+         focused = true;
+      }}
+      onblur={() => {
+         focused = false;
+      }}
       onkeyup={updateDocument}
       {tooltip}
    />
