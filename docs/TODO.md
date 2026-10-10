@@ -12,37 +12,42 @@ Completed items are deleted, not marked done.
   immediately drops anything it is holding, falls Prone, and is Incapacitated" (`docs/TITAN Rules Compendium.md`,
   "Unconscious"). The design spec records the ruling as an as-built amendment of its §1 and §4.
 
-- Compendium audit rulings (plan C; module `src/packs`, rules 2026-09-26). User rulings of 2026-10-08. General rule:
-  round down unless the text states otherwise. To do in plan C:
-  - Force Slow: no change (it already rounds down).
-  - Blood Frenzy: add the +5 Speed effect.
-  - Aether Blades, Inferno Blades, Radiant Blade, Sacred Arms of the Arbiter (Weapon): the "+1 Damage" conditional
-    modifier stays a placeholder; the target is a modifier that applies to every attack the chosen weapon makes.
-  - Missing spell aspects (Charm Creature, Dominate Creature, Infiltrate Dreams, Enlarge/Reduce Creature (resistance),
-    Create Fissure (damage), Grasping Earth (duration), Abyssal Darkness (Defense/Reflexes +2), Chained Bolts (extra
-    targets)): add the aspects where the existing mechanics allow; no new mechanics.
-  - Blood Probe, Conjurer of Urdokai, Pull of Urdokai, Warding of Urdokai: add the check entries.
-  - Force Speed and the three Elder Sibling effects: no change to the granted speeds; granting speeds the creature
-    lacks is intended. The Elder Sibling effects also gain immunity to Contaminated (user ruling 2026-10-09).
-  - Urderic Glaivegun: the rules text gains a range (the compendium's Strike range 2 stands).
-  - Light Attunement: carry both the "Attunement" and "Light" traits.
-  - Shockwave: match the rules ("each creature adjacent to you").
-  - Hunger of Urdokai: match the description (Range: 10 spaces).
-  - Urderic Gunshield: rename the document to the rules' "Urderic Gun Shield".
-  - Stormcaller's Tempest: mark passive, like The Dragon Awakens and Being of Urdokai.
-  - Empower Soul: replace the Aether Blades text in its roll message.
-  - Blue Magister: add the name prefix to the casting roll message.
-  - Stray `type` fields on rules elements and trait entries: strip them.
-  - Condition immunities the rules grant (user rulings 2026-10-09; Metal Attunement and Effulgent Gaze are built in
-    plan B Task 16): Elder Sibling Body/Mind, Mind/Soul and Body/Soul gain an `immunity` element for Contaminated;
-    Blessing of the Arbiter, Sleepless gains Sleeping and Unconscious. Tempest Herald ("immune to all conditions
-    except Dying") gains one `immunity` element per existing condition id except `dead` (controller judgement,
-    inferred: Dying leads to Dead, so Dead must stay possible); add the Dying exception when the Dying condition exists.
-  - Review the compendium module for other effects whose text grants condition immunity: the plan B Task 16 review
-    searched `src/packs` by text and its output omitted very long lines.
-  - Parch: clamp Speed at 1, as the rules say "to a minimum of 1" (user ruling 2026-10-08). Check how the clamp
-    applies to Fly, Swim, Burrow and Climb when implementing.
-  - No change: Lord of Black Flames (the custom trait "Unarmed" in its roll message is a placeholder).
+- Parch: clamp Speed at 1, as the rules say "to a minimum of 1" (user ruling 2026-10-08); tabled by the user on
+  2026-10-09, so the compendium Parch keeps its five reductions with no floor. Plan C Task 7 designed the clamp as an
+  optional `minimum` on Flat Modifier (`docs/superpowers/plans/2026-10-09-compendium-rulings.md`): it limits a reduction
+  to the room above the minimum and never raises a stat, since a Flat Modifier of -5 floors at 0 and `setSum` with `min`
+  1 would raise a speed the creature lacks. It is a new public rules-element field, so it needs the user's approval.
+  Read from `CharacterDataModel`, not measured: `_applyArmorAndShields` runs after the rules elements and lowers a
+  Heavy-armored character's non-zero speeds by 1, so a floor of 1 would end at 0 under Heavy armor; settle whether the
+  floor holds after armor. Check how the clamp applies to Fly, Swim, Burrow and Climb when implementing.
+- Weapon-targeted effects (user ruling 2026-10-08; design spec C3): Aether Blades (R:6305), Inferno Blades (R:5408),
+  Radiant Blade (R:7338) and Sacred Arms of the Arbiter (Weapon) (R:7880) grant "+1 Damage" and traits to the attacks of
+  one chosen weapon (rules lines in `docs/TITAN Rules Compendium - Source - 09_26_2026.md`). Their "+1 Damage" conditional
+  modifier stays a placeholder in the compendium; the target is a modifier that applies to every attack the chosen
+  weapon makes. Spec C3 records the design: a `weapon` selector on `conditionalCheckModifier` keyed by weapon name, a
+  `grantAttackProperty` operation, an Ignore Armor attack option, and a drop-on-weapon-row fill.
+
+- Spell radius "adjacent" (design spec C4): Shockwave's text applies to "each creature adjacent to you" (R:5129), and
+  `SpellAspects.js` `radius` offers only 5 and 10 (read), so the compendium Shockwave has no radius aspect. A radius
+  option of 1 needs a cost the rules do not publish.
+
+- Rules-source differences found by the compendium audit (the user owns the rules text; the compendium follows the
+  user's rulings): Urderic Glaivegun's Strike lists no range (R:2926-2929; the compendium's Strike range 2 stands);
+  Hunger of Urdokai's header says Range: Touch while its text says "within 10 spaces" (R:9759, R:9765); Shockwave's
+  header says Range: 10 spaces while its text says "each creature adjacent to you" (R:5122, R:5129); Light Attunement
+  lists only the Light trait (R:7305) and Metal Attunement only Metal (R:5625 onward) where the rulings give every
+  Attunement the Attunement trait; an untitled block (Cost: 1 Resolve, Traits: Path, Mystwalker) at R:9723-9733, between
+  Conjurer of Urdokai and Mirror of Urdokai, repeats the text of Fangs of Urdokai (R:9772-9782).
+
+- Mid-word `<strong>` splits in compendium descriptions (for example "<strong>Sou</strong>l"): 26 pack sources at the
+  module's commit `a5db712` hold a bold run that starts or ends inside a word (measured 2026-10-09:
+  `grep -rlE '\w</strong>[a-z]|[a-z]<strong>\w' src/packs` in the module, run in `src/packs`). Cosmetic; the compendium
+  rulings plan fixed only the two the design spec names (Aether Blades, Inferno Blades).
+- Review the compendium module for other effects whose text grants condition immunity: the plan B Task 16 review
+  searched `src/packs` by text and its output omitted very long lines.
+- Lord of Black Flames: no change by ruling (the custom trait "Unarmed" in its roll message is a placeholder). The
+  plan C Tasks 4-6 reviewer noted that its flags differ from the spec's "passive only" (reported, not re-checked);
+  confirm the ruling covers the flags.
 - Operation that adds one stat to another (user ruling 2026-10-08): not in this campaign. Tough ("add your Resilience to
   maximum Stamina") and Jade Perception (Awareness +1/2 Metaphysics Training) keep their placeholders until it exists.
 
@@ -69,7 +74,10 @@ Completed items are deleted, not marked done.
 
 - Extend immunity beyond effects and conditions (user ruling 2026-09-27): immunity to abilities, damage and other
   things by trait. The first cut, immunity to a condition by id or to an effect by name, is built (the element and
-  editor, the derivation, suppression and refusal); only the extension by trait remains deferred.
+  editor, the derivation, suppression and refusal); only the extension by trait remains deferred. Compendium texts that
+  grant such an immunity (read by hand 2026-10-09): Fire Attunement (damage from heat and flames), Force Attunement
+  (being pushed, shoved or moved), Earth Attunement (Shoved), Fox's Cunning (effects that force the truth), Path of the
+  Stormcaller (effects based on pain), Control Light (creatures that see in the dark).
 
 - Remove or sync `.agents/skills/titan-codebase/`, a tracked copy of `.claude/skills/titan-codebase/` that differs in every
   reference file (last touched by commit `5526adee`). Measured 2026-10-02: no file in the repo, script or config reads
@@ -101,13 +109,21 @@ Completed items are deleted, not marked done.
   (`docs/TITAN Rules Compendium.md`, line 1433) words the start of Dying differently: "You start **Dying** when you take
   damage in excess of your maximum **Wounds** and **Stamina**";
   lines 1860 and 1919 say Dying starts when Wounds would go above their maximum. The trigger is settled when the
-  condition is built.
+  condition is built. Tempest Herald (R:9251) carries one `immunity` element for each condition id except `dead`
+  (user ruling 2026-10-09 for the immunities; the exception for Dead is a controller judgement, inferred: Dying leads to
+  Dead, so Dead must stay possible), so when Dying exists the effect needs no element for it. The list is written by
+  hand: a condition added to `src/system/Conditions.js` later is not covered until the effect gains its own element
+  (the user accepted this gap on 2026-10-09; no selector or guard is built). Tempest Herald's "If you start Dying, you
+  are not stunned", Diehard's "you are not Stunned" at zero Stamina, and the "no longer Dying" lines of Dark Side and
+  Deathsinger's Rebirth wait for this condition.
 
 - Immunity by trait (user ruling 2026-10-09; extends the entry above for the rules that need it): Light Attunement,
   Brightness ("cannot be Blinded by bright light", conditional on the source being a Light effect); Presence of the
   Arbiter (immunity to Charmed or Frightened for the caster and allies within 5 spaces) and Animate Corpse (immune to
   mind-affecting conditions) wait for a trait covering mind control and similar effects, which the user will make
-  later. Cleansing Shroud ("immune to the chosen Condition") needs a way to choose the condition; not yet ruled.
+  later. Cleansing Shroud ("immune to the chosen Condition") needs a way to choose the condition; not yet ruled. Mountain King Style (the effect and the combat-style ability:
+  "you cannot be knocked Prone unless you choose to be") needs an immunity that can carry a voluntary exception, or a
+  ruling to convert it to an unconditional Prone immunity; both documents keep their text until then.
 
 - Specs that switch the active scene within about 2 seconds of a condition change can fail with the core
   `createScrollingText` error (CLOSED_BUGS #114; measured for `unconscious.spec.js` when a scene was already active,

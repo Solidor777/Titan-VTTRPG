@@ -797,8 +797,8 @@ static `actions` map. To refresh a dynamic control's icon/label after a state ch
 `happy-dom`, `globals: true`, Svelte 5 (`@sveltejs/vite-plugin-svelte`), `svelte-preprocess` (same SCSS `prependData` as
 `vite.config.mjs`), and the `~/` / `$fonts/` aliases. `hookTimeout` is 60 s: the schema-equivalence golden-master
 suites' `beforeAll` dynamic imports are transform-heavy (Svelte compiles) and exceed the 10 s default under full
-parallelism. Tests live in `tests/unit/**/*.test.js`: 134 files, 1553 tests (measured: `npm test` → "Test Files  134
-passed (134)", "Tests  1553 passed (1553)"). There is NO test code under `src/`. Support files: `tests/setup.js`,
+parallelism. Tests live in `tests/unit/**/*.test.js`: 147 files, 1687 tests (measured: `npm test` → "Test Files  147
+passed (147)", "Tests  1687 passed (1687)"). There is NO test code under `src/`. Support files: `tests/setup.js`,
 `tests/components/*.svelte` (Svelte probes the unit tests mount), `tests/unit/helpers/schemaFingerprint.js`,
 `tests/shared/checkOracle.js` (the independent check oracle the e2e `check-math.spec.js` compares against) and
 `tests/fixtures/spreadsheet/excel-edited.xlsx` (read by `tests/unit/spreadsheet/format/Xlsx.test.js`).

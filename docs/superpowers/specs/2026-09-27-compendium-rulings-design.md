@@ -143,3 +143,30 @@ Contaminated is refused. The live packs were recompiled and checked in the test 
 Metal Attunement effect present, applying Contaminated through `toggleStatusEffect` left the actor without it, and
 likewise Effulgent Gaze and Blinded
 (`.superpowers/sdd/2026-09-29-conditions-rework/task-17-logs/module-live-check.log`).
+
+## As built by the compendium rulings plan
+
+The user's rulings of 2026-10-08 and 2026-10-09 narrowed this spec; the plan
+(`docs/superpowers/plans/2026-10-09-compendium-rulings.md`) built these parts, and the rulings govern where they differ:
+
+- **Built (module commits `fccaf01` to `bcb4a2d`):** the pack rulings and fixes listed above, except as noted below;
+  Blood Frenzy's +5 on `speed` `all`; condition immunities for the Elder Sibling effects, Blessing of the Arbiter
+  (Sleepless) and Tempest Herald (one element per condition id except `dead`); Attunement traits on the Metal Attunement
+  spell and the Aether, Force, Metal and Void Attunement effects (ruling 10) and Light on the Light Attunement spell;
+  Empower Soul as a turn-start message; Abyssal Darkness's Stealth message as a situational Greater Advantage.
+- **Not built, by ruling:** C1 (stat-referenced values: Tough, Jade Perception keep their placeholders, TODO "Operation
+  that adds one stat to another"); C2's per-element `minimum` and with it Parch's floor (tabled by the user on
+  2026-10-09, TODO "Parch"); C3 (weapon-targeted effects: the four weapon effects keep their placeholders, TODO
+  "Weapon-targeted effects"); C4 (radius 1: Shockwave drops its radius aspect, TODO "Spell radius"); C2's
+  `existingOnly` (Force Speed, Blood Frenzy and the Elder Sibling effects grant speeds the creature lacks).
+- **Changed from the table above:** pack ruling 1 (Force Slow) keeps `mulBase` 0.5, which rounds down (ruling of
+  2026-10-08: round down unless the text states otherwise); ruling 2's Force Speed keeps its plain +5; ruling 5
+  (Shockwave) removes the radius aspect instead of adding radius 1; ruling 9 adds the Willpower aspect as a custom aspect
+  with `resistanceCheck` (no standard aspect carries one); the Urderic Glaivegun keeps Strike range 2.
+- **Testing:** no system code changed, so the system suites were not re-run for it. The module's pack content is checked
+  in the test world by `.work/live-check-rulings.mjs` (module, git-ignored; log in
+  `.superpowers/sdd/2026-10-09-compendium-rulings/logs/live-check.log`): Elder Sibling, Sleepless and Tempest Herald
+  refuse their conditions (with Immunity Handling at Remove, an existing Contaminated is removed), and Blood Frenzy adds 5
+  to every speed. The suite has no spec that reads the module's packs.
+- **Recompile:** the live packs were recompiled from `src/packs` and the module's `validate` ran with 0 errors
+  (`.superpowers/sdd/2026-10-09-compendium-rulings/logs/validate.log`).

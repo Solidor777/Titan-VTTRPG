@@ -3,6 +3,20 @@
 Living record of post-work review issues — gotchas, accepted limitations, and issues that deserve
 attention. NOT a to-do list (deferred work goes to `docs/TODO.md`; bugs go to `docs/OPEN_BUGS.md`).
 
+### Tempest Herald's immunities are a hand list of condition ids (2026-10-09)
+
+The compendium effect Tempest Herald carries one `immunity` element for each condition id of
+`buildConditionDefinitions` (`src/system/Conditions.js`) except `dead` (11 elements). A condition added to the system
+later is not covered until the effect gains its element; no system test or selector enforces the list (the user
+accepted this on 2026-10-09). The module's verification script checks the list against the system source at the time of
+the edit only.
+
+### Compendium edits reach new copies only (2026-10-09)
+
+The compendium corrections (speed and immunity effects, spell aspects, check entries and traits) change the module's
+packs. Items and effects already copied into a world, an actor, or an item keep the data they hold; no migration updates
+them (project scope: no migrations yet). A copy is refreshed by dropping the corrected compendium document again.
+
 ### Foundry v14 core: a token's deletion stores a tombstone only where its base actor holds the id (2026-10-01)
 
 Measured live 3 times with a raw-data token, not re-run; no migration tests while no migration is active (project
