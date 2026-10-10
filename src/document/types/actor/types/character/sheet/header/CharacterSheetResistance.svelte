@@ -54,6 +54,7 @@
             baseTooltip={localize(`${resistance}.baseValue`)}
             baseValue={document.data.system.resistance[resistance].baseValue}
             mod={document.data.system.resistance[resistance].mod}
+            testId={`sheet-resistance-${resistance}`}
             value={document.data.system.resistance[resistance].value}
          />
       </div>

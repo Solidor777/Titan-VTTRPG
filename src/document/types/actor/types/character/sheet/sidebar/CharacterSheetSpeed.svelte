@@ -36,6 +36,7 @@
       <div class="input">
          <DocumentIntegerInput
             bind:value={document.data.system.speed[speed].baseValue}
+            testId={`sheet-speed-${speed}-base`}
          />
       </div>
 
@@ -58,6 +59,7 @@
             baseTooltip={localize(`${speed}.desc`)}
             baseValue={document.data.system.speed[speed].baseValue}
             mod={document.data.system.speed[speed].mod}
+            testId={`sheet-speed-${speed}`}
             value={document.data.system.speed[speed].value}
          />
       </div>

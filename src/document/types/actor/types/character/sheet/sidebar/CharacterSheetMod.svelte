@@ -58,6 +58,7 @@
             baseTooltip={localize(`${mod}.baseValue`)}
             baseValue={0}
             mod={document.data.system.mod[mod].mod}
+            testId={`sheet-mod-${mod}`}
             value={document.data.system.mod[mod].value}
          />
       </div>

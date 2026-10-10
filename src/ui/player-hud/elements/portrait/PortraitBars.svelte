@@ -35,7 +35,9 @@
          <span class="value">
             <DocumentIntegerInput
                bind:value={document.data.system.resource[resource].value}
+               max={document.data.system.resource[resource].max}
                maxDigits={2}
+               min={0}
                testId={`player-hud-bar-${resource}-input`}
             />
             <ModifiableStatValueLabel

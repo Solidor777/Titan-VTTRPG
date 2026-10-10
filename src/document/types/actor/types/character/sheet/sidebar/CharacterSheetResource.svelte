@@ -57,6 +57,9 @@
       <div class="side">
          <DocumentIntegerInput
             bind:value={document.data.system.resource[resource].value}
+            max={document.data.system.resource[resource].max}
+            min={0}
+            testId={`sheet-resource-${resource}-input`}
          />
       </div>
 
@@ -77,6 +80,7 @@
             baseTooltip={localize(`${resource}.maxValue`)}
             baseValue={document.data.system.resource[resource].maxBase}
             mod={document.data.system.resource[resource].mod}
+            testId={`sheet-resource-${resource}-max`}
             value={document.data.system.resource[resource].max}
          />
       </div>

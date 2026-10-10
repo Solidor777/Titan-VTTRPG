@@ -74,7 +74,10 @@
 
          <!--Base Value-->
          <div class="input">
-            <DocumentIntegerInput bind:value={document.data.system.skill[key].training.baseValue}/>
+            <DocumentIntegerInput
+               bind:value={document.data.system.skill[key].training.baseValue}
+               testId={`sheet-skill-${key}-training-base`}
+            />
          </div>
 
          <!--Static Mod-->
@@ -93,6 +96,7 @@
                      checkParameters.trainingMod
                }
                currentValue={checkParameters.totalTrainingDice}
+               testId={`sheet-skill-${key}-training`}
                tooltip={{
                   text: totalTrainingTooltip,
                   localize: false,
@@ -107,7 +111,10 @@
 
          <!--Base Value-->
          <div class="input">
-            <DocumentIntegerInput bind:value={document.data.system.skill[key].expertise.baseValue}/>
+            <DocumentIntegerInput
+               bind:value={document.data.system.skill[key].expertise.baseValue}
+               testId={`sheet-skill-${key}-expertise-base`}
+            />
          </div>
 
          <!--Static Mod-->
@@ -126,6 +133,7 @@
                      checkParameters.expertiseMod
                }
                currentValue={checkParameters.totalExpertise}
+               testId={`sheet-skill-${key}-expertise`}
                tooltip={{
                   text: totalExpertiseTooltip,
                   localize: false,

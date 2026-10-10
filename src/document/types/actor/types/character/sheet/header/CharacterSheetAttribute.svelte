@@ -51,6 +51,7 @@
          <ModifiableStatValueLabel
             baseValue={document.data.system.attribute[attribute].baseValue}
             mod={document.data.system.attribute[attribute].mod}
+            testId={`sheet-attribute-${attribute}`}
             value={document.data.system.attribute[attribute].value}
          />
       </div>

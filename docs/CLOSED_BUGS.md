@@ -3090,3 +3090,17 @@ The evidence files named here are in `.superpowers/sdd/2026-10-10-e2e-coverage/t
   the spec (`t2-logs/mutation-atk20-weapon-multiattack-field.log`).
 - **Found:** 2026-10-10 while writing the multi-attack tests.
 - **Status:** Closed 2026-10-10.
+
+### 163. A resource value typed above its maximum or below zero was stored as typed
+
+- **What (measured):** typing `-9` over a Resolve of 1 into the character sheet's current-value input left the server
+  holding -8 (`t4-logs/resources-run1.log`, six failing tests of `resources.spec.js`: the above-maximum and the
+  below-zero entry of Stamina, Wounds and Resolve, on the sheet and on the Player HUD bar). The meters showed the
+  clamped value because data preparation clamps the in-memory value (`CharacterDataModel#_clampResources`), so a later
+  rise of the maximum would reveal the stored value.
+- **Cause (read):** the sheet input (`CharacterSheetResource.svelte`) and the HUD bar input (`PortraitBars.svelte`)
+  passed no `min` or `max` to `DocumentIntegerInput`, and `refreshSystemDocument` stores the system data as typed.
+- **Fixed:** 2026-10-10: both inputs pass `min={0}` and `max` of the resource, so the entry is clamped before it is
+  stored. Covered by `resources.spec.js` (14 tests pass after the fix, `t4-logs/resources-run2.log`).
+- **Found:** 2026-10-10 while writing the resource meter tests.
+- **Status:** Closed 2026-10-10.
