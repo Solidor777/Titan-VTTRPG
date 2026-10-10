@@ -163,6 +163,20 @@ async function openPackWindow(packId) {
       width: 420,
       height: 900,
    });
+
+   // Pack documents sit in folders that start collapsed; a folder header click expands one, and each expansion can
+   // show collapsed subfolders.
+   /** @type {import('@playwright/test').Locator} The folders of the window that show collapsed. */
+   const collapsedFolders = packWindow.locator('li.directory-item.folder:not(.expanded)').filter({ visible: true });
+   while (await collapsedFolders.count() > 0) {
+      /** @type {string} The id of the folder this pass expands. */
+      const folderId = await collapsedFolders.first().getAttribute('data-folder-id');
+
+      /** @type {import('@playwright/test').Locator} That folder. */
+      const folder = packWindow.locator(`li.directory-item.folder[data-folder-id="${folderId}"]`);
+      await folder.locator('> header.folder-header').click();
+      await expect(folder).toHaveClass(/expanded/);
+   }
    return packWindow;
 }
 
@@ -187,7 +201,14 @@ async function scanSheet(sheet, rootSelector, what) {
       problems.push(`${what}: the sheet has no tab strip`);
    }
    for (let index = 0; index < count; index++) {
-      await clickTabButton(buttons.nth(index));
+      try {
+         await clickTabButton(buttons.nth(index));
+      }
+      catch (error) {
+         problems.push(`${what}: tab ${index} did not activate: ${error.message.split('
+').slice(0, 8).join(' | ')}`);
+         continue;
+      }
 
       /** @type {string} The text the sheet's content shows. */
       const text = await sheet.locator('.window-content').innerText();
@@ -416,6 +437,8 @@ test.describe('compendium module content', () => {
                createdBy: 'compendium-content.spec.js',
             });
             problems.push(...(await takeFaults()).map((fault) => `${entry.name}: import: ${fault}`));
+            await packWindow.locator('header.window-header [data-action="close"]').click();
+            await expect(packWindow).toHaveCount(0);
 
             /** @type {{uuid: string, name: string}[]} The imported actor's items and effects. */
             const parts = await page.evaluate((actorId) => {
