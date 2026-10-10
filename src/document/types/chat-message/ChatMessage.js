@@ -5,11 +5,14 @@ import TitanChatMessageDataModel from '~/document/types/chat-message/ChatMessage
 import themeCoreMessages from '~/helpers/Settings/ThemeCoreMessages.js';
 import localize from '~/helpers/utility-functions/Localize.js';
 import warn from '~/helpers/utility-functions/Warn.js';
-import { extractScalingChange } from '~/check/types/casting-check/ScalingAspectChange.js';
+import { applyScalingSteps } from '~/check/types/casting-check/ScalingAspectChange.js';
 import {
    registerMount,
    sweepStaleMounts,
 } from '~/document/types/chat-message/ChatMessageMountRegistry.js';
+
+/** @type {WeakMap<TitanChatMessage, Promise<void>>} The latest queued change of each message on this client. */
+const scalingChangeQueues = new WeakMap();
 
 /**
  * Extends the base Chat Message class so TITAN chat message subtypes render their own Svelte
@@ -23,38 +26,64 @@ import {
  */
 export default class TitanChatMessage extends ChatMessage {
    /**
-    * Writes a change to the message. Core lets only the message's author and a GM write it. The one write relayed to
-    * the active GM's client is what a casting check card's scaling controls make for a user who owns the speaking
-    * actor but did not author the card: an update with no operation options whose only differences from the stored
-    * results are the scaling aspects' values and the figures derived from them. Every other write, including any with
-    * `operation` options, other fields or dotted keys that expand to other fields, goes to core unchanged, which
-    * refuses what the user may not do. The returned promise settles when the GM's client has answered; a refusal or no
-    * answer shows the user a warning.
-    * Hidden coupling: `onRelayChatMessageUpdate` answers the request and checks the sender's ownership itself.
-    * @override
-    * @param {object} [data] - The changes to write.
-    * @param {object} [operation] - Options forwarded to core.
-    * @returns {Promise<TitanChatMessage>} The message.
+    * Runs a change to this card after every earlier change to it on this client has settled, so changes that are
+    * derived from the stored card never read it before the previous change is written. A failure of one change does
+    * not stop the ones queued behind it.
+    * @param {Function} task - The change to run.
+    * @returns {Promise<void>} Settles with the change's outcome.
     */
-   async update(data = {}, operation = {}) {
-      if (this.canUserModify(game.user, 'update') || !ChatMessage.getSpeakerActor(this.speaker)?.isOwner) {
-         return super.update(data, operation);
-      }
+   #queueChange(task) {
+      /** @type {Promise<void>} The earlier changes to this card. */
+      const earlier = scalingChangeQueues.get(this) ?? Promise.resolve();
 
-      /** @type {number[]|null} The requested aspect values when the write is a scaling-control write. */
-      const currentValues = this.type === 'castingCheck' && Object.keys(operation).length === 0 ?
-         extractScalingChange(this.system.toObject().results, foundry.utils.expandObject(data)) :
-         null;
-      if (!currentValues) {
-         return super.update(data, operation);
-      }
+      /** @type {Promise<void>} This change, queued behind them. */
+      const change = earlier.then(task);
+      scalingChangeQueues.set(this, change.catch(() => {}));
+      return change;
+   }
+
+   /**
+    * Writes a signed number of steps of one scaling aspect, derived from the card as stored when the write runs and
+    * queued behind this client's other changes to the card. Used by the author and a GM directly, and by the GM's
+    * client to answer a relayed request, so both paths share one queue.
+    * @param {number} index - The position of the aspect among the card's scaling aspects.
+    * @param {number} steps - The signed number of steps.
+    * @returns {Promise<void>} Resolves once the change is written.
+    * @throws {Error} The reason when the change is not legal.
+    */
+   writeScalingSteps(index, steps) {
+      return this.#queueChange(async () => {
+         await this.update({ system: { results: applyScalingSteps(this.system.toObject().results, index, steps) } });
+      });
+   }
+
+   /**
+    * Changes one scaling aspect of a casting check card by a signed number of steps, which is what the card's Reset,
+    * Decrease and Increase controls do. The change is derived from the card as it is stored when it is applied, never
+    * from values the control read earlier, and a user's changes run one after another, so quick clicks on different
+    * aspects all stay. The author and a GM write the card; a user who only owns the speaking actor asks the active GM's
+    * client to write it (core lets only the author and a GM write a message), and any other user's write goes to core,
+    * which refuses it. The returned promise settles when the change is written or refused; a refusal shows a warning.
+    * Hidden coupling: `onRelayChatMessageUpdate` answers the request, checks the sender's ownership itself and writes
+    * through `writeScalingSteps`.
+    * @param {number} index - The position of the aspect among the card's scaling aspects.
+    * @param {number} steps - The signed number of steps: positive spends extra successes, negative refunds them.
+    * @returns {Promise<void>} Resolves once the change has been answered.
+    */
+   async changeScalingAspect(index, steps) {
       try {
-         await game.titan.socketManager.request('relayChatMessageUpdate', this.id, currentValues);
+         if (this.canUserModify(game.user, 'update') || !ChatMessage.getSpeakerActor(this.speaker)?.isOwner) {
+            await this.writeScalingSteps(index, steps);
+         }
+         else {
+            await this.#queueChange(
+               () => game.titan.socketManager.request('relayChatMessageUpdate', this.id, index, steps),
+            );
+         }
       }
       catch (error) {
          warn(`The change to the card was not made: ${error.message}`);
       }
-      return this;
    }
 
    /**

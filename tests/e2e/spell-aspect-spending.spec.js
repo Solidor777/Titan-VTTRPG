@@ -1360,6 +1360,67 @@ test.describe('aspects that a step cannot buy', () => {
 
 });
 
+test.describe('quick changes to different aspects of one card all stay', () => {
+   /** @type {{id: string, uuid: string}} The mixed spell (A: cost 1, step 2; B: cost 2, step 3; C: cost 3). */
+   let racing;
+
+   /** @type {MixedState} The state after one step of A and one of B, from seven extra successes. */
+   const bothBought = {
+      values: [
+         4,
+         6,
+         1,
+      ],
+      remaining: 4,
+      damage: 4,
+      healing: 6,
+   };
+
+   test.beforeAll(async () => {
+      test.setTimeout(120_000);
+      racing = await buildSpell(gm, casterId, 'E2E Spend Racing Mixed', MIXED_SPELL);
+      await closeAllApps(gm);
+   });
+
+   /**
+    * Clicks two controls at (nearly) the same moment, the way two quick clicks land before the first change replicates.
+    * @param {import('@playwright/test').Locator[]} controls - The controls to click.
+    * @returns {Promise<void>} Resolves once every click is made.
+    */
+   async function clickTogether(controls) {
+      await Promise.all(controls.map((control) => control.evaluate((element) => element.click())));
+   }
+
+   test('the owner\'s two quick clicks on a GM-rolled card both stay (relayed)', async () => {
+      const cast = await castWith(racing.uuid, 9);
+      const playerCard = await openCard(player, cast.id);
+      await clickTogether([
+         aspectControl(aspectBlock(playerCard, 0), 'increase'),
+         aspectControl(aspectBlock(playerCard, 1), 'increase'),
+      ]);
+      await expectMixedState(cast.card, cast.id, bothBought);
+   });
+
+   test('the GM\'s two quick clicks on different aspects of the GM\'s own card both stay (direct write)', async () => {
+      const cast = await castWith(racing.uuid, 9);
+      await clickTogether([
+         aspectControl(aspectBlock(cast.card, 0), 'increase'),
+         aspectControl(aspectBlock(cast.card, 1), 'increase'),
+      ]);
+      await expectMixedState(cast.card, cast.id, bothBought);
+   });
+
+   test('a GM\'s edit made while the owner player\'s change is on its way is not reverted', async () => {
+      const cast = await castWith(racing.uuid, 9);
+      const playerCard = await openCard(player, cast.id);
+      await Promise.all([
+         aspectControl(aspectBlock(cast.card, 0), 'increase').evaluate((element) => element.click()),
+         aspectControl(aspectBlock(playerCard, 1), 'increase').evaluate((element) => element.click()),
+      ]);
+      await expectMixedState(cast.card, cast.id, bothBought);
+   });
+});
+
 test.describe('the GM relay of a card write', () => {
    /** @type {string} The id of a character that nobody owns until a test grants it. */
    let strangerId;
@@ -1450,24 +1511,19 @@ test.describe('the GM relay of a card write', () => {
          healing: 1,
       });
 
-      // A write that names a value that is not a step of the aspect is refused, and the player is told.
-      await player.evaluate(async (id) => {
-         const message = game.messages.get(id);
-         const results = message.system.toObject().results;
-         results.scalingAspect[0].currentValue = 5;
-         await message.update({ system: { results } });
-      }, cast.id);
+      // A change that spends more extra successes than the card has is refused, and the player is told.
+      await player.evaluate((id) => game.messages.get(id).changeScalingAspect(1, 5), cast.id);
       await expect(
-         player.locator('#notifications .notification', { hasText: 'is not a step of the Aspect X aspect' }).first(),
+         player.locator('#notifications .notification', { hasText: 'spends more extra successes' }).first(),
          'the refusal reaches the requester',
       ).toBeVisible();
-      expect((await readScaling(gm, cast.id)).values, 'the refused write changed nothing').toEqual([
+      expect((await readScaling(gm, cast.id)).values, 'the refused change changed nothing').toEqual([
          4,
          1,
       ]);
    });
 
-   test('the allow-list: only scaling-aspect values are written, and every other write is core\'s', async () => {
+   test('the allow-list: only a step of one scaling aspect is written, and every other write is core\'s', async () => {
       await giveLevel('OWNER');
       const cast = await castStranger();
 
@@ -1491,27 +1547,12 @@ test.describe('the GM relay of a card write', () => {
          operation,
       });
 
-      // Presence: the controls' own shape is written; the GM's client derives the figures from the values, not from
-      // the request.
-      expect(await player.evaluate(async (id) => {
-         const message = game.messages.get(id);
-         const results = message.system.toObject().results;
-         results.scalingAspect[0].currentValue = 4;
-         results.damage = 999;
-         await message.update({ system: { results } });
-         return '';
-      }, cast.id)).toBe('');
-      await expect.poll(() => readScaling(gm, cast.id), { message: 'the values were written' }).toMatchObject({
-         values: [
-            4,
-            1,
-         ],
-         remaining: 2,
-         damage: 4,
-      });
-
-      // Everything else goes to core, which refuses a user who did not author the card.
+      // No update of a card the player did not author is relayed, whatever its shape: it is core's and is refused.
       const stored = await player.evaluate((id) => game.messages.get(id).system.toObject().results, cast.id);
+      const stepped = structuredClone(stored);
+      stepped.scalingAspect[0].currentValue = 4;
+      expect(await updateAsPlayer({ system: { results: stepped } }), 'the controls\' old shape')
+         .toContain('lacks permission');
       expect(await updateAsPlayer({
          system: {
             results: {
@@ -1521,45 +1562,128 @@ test.describe('the GM relay of a card write', () => {
          },
       }), 'another results field')
          .toContain('lacks permission');
-      expect(await updateAsPlayer({ 'system.results.damage': 99 }), 'a dotted key alone').toContain('lacks permission');
+      expect(await updateAsPlayer({ 'system.results.damage': 99 }), 'a dotted key').toContain('lacks permission');
       expect(await updateAsPlayer({ flags: { titan: { x: 1 } } }), 'a flag').toContain('lacks permission');
       expect(await updateAsPlayer({ system: { results: stored } }, { diff: false }), 'operation options')
          .toContain('lacks permission');
 
-      // A request by hand that names values the extra successes cannot pay for is refused by the GM's client.
-      const tooDear = await sendByHand({
+      // Requests by hand that are not one legal step of one aspect are refused by the GM's client, each for its reason.
+      /** @type {[string, unknown[], string][]} The request id, its arguments and the reason expected. */
+      const bad = [
+         [
+            'allow-1',
+            [
+               cast.id,
+               1,
+               2,
+            ],
+            'more extra successes',
+         ],
+         [
+            'allow-2',
+            [
+               cast.id,
+               0,
+               -1,
+            ],
+            'starting value',
+         ],
+         [
+            'allow-3',
+            [
+               cast.id,
+               5,
+               1,
+            ],
+            'does not match',
+         ],
+         [
+            'allow-4',
+            [
+               cast.id,
+               0,
+               1.5,
+            ],
+            'does not match',
+         ],
+         [
+            'allow-5',
+            [
+               cast.id,
+               '0',
+               1,
+            ],
+            'does not match',
+         ],
+         [
+            'allow-6',
+            [
+               cast.id,
+               0,
+               0,
+            ],
+            'does not match',
+         ],
+         [
+            'allow-7',
+            [
+               cast.id,
+               null,
+               1,
+            ],
+            'does not match',
+         ],
+      ];
+      for (const [requestId, args, reason] of bad) {
+         const answer = await sendByHand({
+            request: 'relayChatMessageUpdate',
+            requestId,
+            args,
+         });
+         expect(answer.ok, requestId).toBe(false);
+         expect(answer.error, requestId).toContain(reason);
+      }
+      const after = await readScaling(gm, cast.id);
+      expect(after.values, 'no refused request changed the card').toEqual([
+         2,
+         1,
+      ]);
+      expect(after.remaining).toBe(3);
+
+      // Presence on the same card: one legal step by hand is written, and the GM's client derives the figures.
+      const legal = await sendByHand({
          request: 'relayChatMessageUpdate',
-         requestId: 'allow-1',
+         requestId: 'allow-ok',
          args: [
             cast.id,
-            [
-               4,
-               6,
-            ],
+            0,
+            1,
          ],
       });
-      expect(tooDear.ok, 'values that cost more than the extra successes').toBe(false);
-      expect(tooDear.error).toContain('more extra successes');
-      expect((await readScaling(gm, cast.id)).damage, 'nothing changed').toBe(4);
-      expect((await readScaling(gm, cast.id)).extra, 'the earned successes are untouched').toBe(3);
+      expect(legal.ok).toBe(true);
+      await expect.poll(() => readScaling(gm, cast.id), { message: 'the legal step was written' }).toMatchObject({
+         values: [
+            4,
+            1,
+         ],
+         remaining: 2,
+         damage: 4,
+      });
    });
 
    test('the sender is the transport\'s: a forged identity, even a GM\'s, is refused', async () => {
       await giveLevel('OWNER');
       const cast = await castStranger();
-      const valid = [
-         cast.id,
-         [
-            4,
-            1,
-         ],
-      ];
 
       // Presence: while the player owns the character a request by hand is answered and written.
       const accepted = await sendByHand({
          request: 'relayChatMessageUpdate',
          requestId: 'forge-0',
-         args: valid,
+         args: [
+            cast.id,
+            0,
+            1,
+         ],
       });
       expect(accepted.ok, 'an owner\'s request').toBe(true);
       await expect.poll(() => readScaling(gm, cast.id), { message: 'the request was written' }).toMatchObject({
@@ -1577,10 +1701,8 @@ test.describe('the GM relay of a card write', () => {
             requestId: 'forge-1',
             args: [
                cast.id,
-               [
-                  6,
-                  1,
-               ],
+               0,
+               1,
             ],
          }),
          await sendByHand({
@@ -1590,10 +1712,8 @@ test.describe('the GM relay of a card write', () => {
             userId: gmUserId,
             args: [
                cast.id,
-               [
-                  6,
-                  1,
-               ],
+               0,
+               1,
             ],
          }),
          await sendByHand({
@@ -1602,10 +1722,8 @@ test.describe('the GM relay of a card write', () => {
             args: [
                gmUserId,
                cast.id,
-               [
-                  6,
-                  1,
-               ],
+               0,
+               1,
             ],
          }),
       ];
@@ -1615,35 +1733,9 @@ test.describe('the GM relay of a card write', () => {
       expect(refused[0].error, 'the transport names the player, who owns nothing').toContain('do not own');
       expect(refused[1].error, 'a sender field in the message is ignored').toContain('do not own');
       expect(refused[2].error, 'a leading identity argument is only an argument').toContain('no casting check card');
-
-      // The old broadcast form, which carried the sender in its arguments, reaches no handler.
-      await player.evaluate(
-         ({ gmUserId, id }) => game.socket.emit('system.titan', {
-            id: 'relayChatMessageUpdate',
-            args: [
-               gmUserId,
-               id,
-               { system: { results: { damage: 999 } } },
-            ],
-         }),
-         {
-            gmUserId,
-            id: cast.id,
-         },
-      );
-
-      // The socket keeps the order of one client's messages, so the answer to this later request means the broadcast
-      // above has been handled.
-      await sendByHand({
-         request: 'relayChatMessageUpdate',
-         requestId: 'forge-4',
-         args: valid,
-      });
-      const after = await readScaling(gm, cast.id);
-      expect(after.values, 'no forged request changed the card').toEqual([
+      expect((await readScaling(gm, cast.id)).values, 'no forged request changed the card').toEqual([
          4,
          1,
       ]);
-      expect(after.damage).toBe(4);
    });
 });
