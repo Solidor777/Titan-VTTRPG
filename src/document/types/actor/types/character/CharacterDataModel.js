@@ -1706,8 +1706,8 @@ export default class CharacterDataModel extends TitanActorDataModel {
    }
 
    /**
-    * Applies the Armor value of the worn armor and the Defense bonus of the shield to the equipment buckets. Runs before
-    * the rules elements so that the running total Multiply Sum and Set Sum read already holds them.
+    * Applies the Armor value of the worn armor and the Defense bonus of the shield to the equipment buckets. Runs
+    * before the rules elements so that the running total Multiply Sum and Set Sum read already holds them.
     * @private
     */
    _applyArmorAndShieldValues() {

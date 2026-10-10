@@ -11,7 +11,8 @@
    const document = getContext('document');
 
    /**
-    * Spends the resolve the regain gave, up to the resolve held, reverting the regain, and marks the button as confirmed.
+    * Spends the resolve the regain gave, up to the resolve held, reverting the regain, and marks the button as
+    * confirmed.
     */
    async function confirm() {
       if (assert(
