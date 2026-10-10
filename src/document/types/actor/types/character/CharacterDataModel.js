@@ -411,8 +411,9 @@ export default class CharacterDataModel extends TitanActorDataModel {
       this._calculateBaseResources();
       this._calculateBaseMods();
       this._resetDynamicMods();
+      this._applyArmorAndShieldValues();
       this._applyRulesElements();
-      this._applyArmorAndShields();
+      this._applyHeavyArmor();
       this._applyMods();
       this._clampResources();
 
@@ -795,7 +796,7 @@ export default class CharacterDataModel extends TitanActorDataModel {
       });
 
       // The equipped armor's traits add synthetic situational check modifiers, sourced as the armor. They are gathered
-      // here because the conditional-check caches are built before _applyArmorAndShields runs.
+      // here because the conditional-check caches are built before the armor and shield modifiers apply.
       /** @type {TitanItem|boolean} The equipped armor, or false when none is equipped. */
       const equippedArmor = this.getEquippedArmor();
       if (equippedArmor) {
@@ -1705,10 +1706,11 @@ export default class CharacterDataModel extends TitanActorDataModel {
    }
 
    /**
-    * Applies Armor and Shield modifiers to the Character's stats.
+    * Applies the Armor value of the worn armor and the Defense bonus of the shield to the equipment buckets. Runs before
+    * the rules elements so that the running total Multiply Sum and Set Sum read already holds them.
     * @private
     */
-   _applyArmorAndShields() {
+   _applyArmorAndShieldValues() {
 
       // Apply shield defense bonus.
       const shield = this.getShield();
@@ -1720,8 +1722,17 @@ export default class CharacterDataModel extends TitanActorDataModel {
       const armor = this.getEquippedArmor();
       if (armor) {
          this.mod.armor.mod.equipment += armor.system.armor.value;
+      }
+   }
 
-         // Add encumbrance if appropriate.
+   /**
+    * Applies the Heavy trait of the worn armor, which lowers every speed above 0 by 1. Runs after the rules elements
+    * because it reads the speed totals they leave.
+    * @private
+    */
+   _applyHeavyArmor() {
+      const armor = this.getEquippedArmor();
+      if (armor) {
          const armorTraits = armor.system.trait;
          for (let idx = 0; idx < armorTraits.length; idx++) {
 

@@ -525,10 +525,11 @@ appliers recompute the running total per element before computing a corrective d
 `computeSetSumDelta`) and writing it into the element's source mod bucket, so multiple sum ops on the same
 stat compound in order. Each applier records what it wrote under a same-named key on `rulesElementsCache`.
 
-Equipped gear is applied in two places. Outside the rules-element pipeline (`_applyArmorAndShields`, the
-`equipment` mod buckets): the equipped shield adds its `defense` to the Defense rating, the equipped armor adds its
-armor value to `mod.armor`, and an armor trait named `heavy` subtracts 1 from each speed whose base plus mods-so-far
-is above 0. Inside it, `_getRulesElementSources` gathers the equipped armor's trait check rules as synthetic situational
+Equipped gear is applied in two places. Outside the rules-element pipeline (the `equipment` mod
+buckets): `_applyArmorAndShieldValues` runs before the rules elements, so the running total of Multiply Sum and Set Sum
+already holds the equipped shield's `defense` (Defense rating) and the equipped armor's value (`mod.armor`);
+`_applyHeavyArmor` runs after them, and an armor trait named `heavy` subtracts 1 from each speed whose base plus
+mods-so-far is above 0. Inside it, `_getRulesElementSources` gathers the equipped armor's trait check rules as synthetic situational
 `conditionalCheckModifier` elements sourced as the armor (`createArmorTraitCheckModifiers`): Heavy → Greater
 Disadvantage on "Swim, Fly, or Climb" and Automatic Failure on "Jump", both narrowed to Athletics; Encumbering →
 Disadvantage on "Swim, Fly, or Climb" (Athletics); Loud → Disadvantage on "Remain Undetected by Hearing" (Stealth).

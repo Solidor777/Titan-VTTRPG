@@ -3228,3 +3228,16 @@ The evidence files named here are in `.superpowers/sdd/2026-10-10-e2e-coverage/t
   test (written, not run after the fix).
 - **Found:** 2026-10-10 by the full e2e run of `linked-token-sync.spec.js`.
 - **Status:** Closed 2026-10-10.
+
+### 172. Multiply Sum and Set Sum on the Armor mod or the Defense rating ignored the worn armor and the shield
+
+- **What (measured, `final-run/e2e.log`, `rules-element-stats.spec.js:522`):** with Armor worn at value 3 and an ability
+  adding a flat 2 to the Armor mod (5), a Multiply Sum of 2 on the Armor mod showed 7, not 10.
+- **Cause (read):** `prepareDerivedData` applied the rules elements before `_applyArmorAndShields`, which then added the
+  armor value and the shield's Defense, so the running total ("base value plus all accumulated modifiers",
+  `docs/superpowers/specs/2026-06-01-rules-element-sum-operations-design.md:62-63`) the sum operations read lacked them.
+- **Fixed:** 2026-10-10: `_applyArmorAndShieldValues` (armor value, shield Defense) now runs before
+  `_applyRulesElements`; the Heavy trait (`_applyHeavyArmor`) stays after, because it reads the speed totals the elements
+  leave. Covered by the Heavy armor test of `rules-element-stats.spec.js` (3 + 2 doubled is 10).
+- **Found:** 2026-10-10 by the full e2e run of the stat-element specs.
+- **Status:** Closed 2026-10-10 (pending the controller's re-run).
