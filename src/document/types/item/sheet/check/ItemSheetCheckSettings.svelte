@@ -208,7 +208,7 @@
                   <!--Opposed Check Attribute Select-->
                   <LabeledElement
                      label={'attribute'}
-                     tooltip={'check.opposedCheck.attribute.desc.text'}
+                     tooltip={'check.opposedCheck.attribute.desc'}
                   >
                      <DocumentAttributeSelect bind:value={check.opposedCheck.attribute}/>
                   </LabeledElement>
@@ -216,7 +216,7 @@
                   <!--Opposed Check Skill Select-->
                   <LabeledElement
                      label={'skill'}
-                     tooltip={'check.opposedCheck.skill.desc.text'}
+                     tooltip={'check.opposedCheck.skill.desc'}
                   >
                      <DocumentSkillSelect
                         bind:value={check.opposedCheck.skill}
