@@ -4514,7 +4514,7 @@ export default class CharacterDataModel extends TitanActorDataModel {
     */
    async _rollCheck(check, messages) {
       // Expend resolve if appropriate.
-      await this._expendCheckResolve(check);
+      await this._expendCheckResolve(check.parameters);
 
       // Evaluate the check and send it to chat.
       return await check.sendToChat({

@@ -1862,10 +1862,16 @@ export async function addTrait(page, documentUuid, label, { attackIndex } = {}) 
  * @param {object} [settings] - What to set once the aspect is enabled.
  * @param {string|number} [settings.initialValue] - The value to choose in the aspect's initial value select.
  * @param {string[]} [settings.options] - Option toggles to switch on (`stunned`, ...).
+ * @param {string} [settings.unit] - The unit to choose in the aspect's units select (`minutes` for Duration).
  * @param {string} [settings.resistanceCheck] - The resistance check to choose (`resilience`, ...).
  * @returns {Promise<void>} Resolves once the aspect is stored with the settings.
  */
-export async function enableAspect(page, spellUuid, label, { initialValue, options = [], resistanceCheck } = {}) {
+export async function enableAspect(
+   page,
+   spellUuid,
+   label,
+   { initialValue, options = [], unit, resistanceCheck } = {},
+) {
    /** @type {import('@playwright/test').Locator} The spell's sheet. */
    const sheet = await openSheetByUuid(page, spellUuid);
    await openTab(sheet, 'Standard Aspects');
@@ -1891,6 +1897,10 @@ export async function enableAspect(page, spellUuid, label, { initialValue, optio
       await selectTitanOption(page, aspect.locator('[role="combobox"]').first(), initialValue);
       await expect.poll(async () => (await stored()).initialValue, { message: 'the select stored the initial value' })
          .toBe(initialValue);
+   }
+   if (unit !== undefined) {
+      await selectTitanOption(page, aspect.locator('[role="combobox"]').first(), unit);
+      await expect.poll(async () => (await stored()).unit, { message: 'the select stored the unit' }).toBe(unit);
    }
    for (const option of options) {
       await aspect.getByTestId(`spell-aspect-option-${label}-${option}`).click();
@@ -1925,6 +1935,94 @@ export async function addCustomAspect(page, spellUuid) {
    ).toBe(before + 1);
    await expect(sheet.locator('li.reorder-row'), 'the Custom Aspects tab rendered the new row').toHaveCount(before + 1);
    await settle(page, { transitions: true });
+}
+
+/**
+ * Sets the fields of a custom aspect with the controls of its row on the Custom Aspects tab: the label input, the cost
+ * and initial value inputs, and the damage, healing and scaling toggles. A field the caller leaves out stays as it is.
+ * @param {import('@playwright/test').Page} page - A logged-in page.
+ * @param {string} spellUuid - The uuid of the spell that holds the custom aspect.
+ * @param {number} index - The position of the custom aspect among the spell's custom aspects.
+ * @param {object} settings - What to set.
+ * @param {string} [settings.label] - The text to type into the label input.
+ * @param {number} [settings.cost] - The aspect cost to type.
+ * @param {number} [settings.initialValue] - The initial value to type.
+ * @param {boolean} [settings.damage] - Whether the Damage toggle is on.
+ * @param {boolean} [settings.healing] - Whether the Healing toggle is on.
+ * @param {boolean} [settings.scaling] - Whether the Scaling toggle is on.
+ * @returns {Promise<void>} Resolves once the spell stores every requested field.
+ */
+export async function setCustomAspect(page, spellUuid, index, { label, cost, initialValue, damage, healing, scaling }) {
+   /** @type {import('@playwright/test').Locator} The spell's sheet. */
+   const sheet = await openSheetByUuid(page, spellUuid);
+   await openTab(sheet, 'Custom Aspects');
+
+   /** @type {import('@playwright/test').Locator} The aspect's row. */
+   const row = sheet.locator('li.reorder-row').nth(index);
+   if (await row.locator('.expandable-content').count() === 0) {
+      await row.getByRole('button', { name: 'Expand' }).click();
+      await expect(row.locator('.expandable-content'), 'the row expanded').toHaveCount(1);
+   }
+   await settle(page, { transitions: true });
+
+   /**
+    * Finds a labelled field of the aspect row.
+    * @param {string} text - The field's label.
+    * @returns {import('@playwright/test').Locator} The field's element.
+    */
+   const field = (text) => row.locator('.field').filter({ has: page.getByText(text, { exact: true }) }).first();
+
+   /**
+    * Reads one field of the aspect as the server stores it.
+    * @param {string} key - The aspect field.
+    * @returns {Promise<*>} The stored value.
+    */
+   const stored = async (key) => (await readServerSystem(page, spellUuid)).customAspect[index][key];
+
+   if (label !== undefined) {
+      await commitText(row.locator('.header .label input'), label);
+      await expect.poll(() => stored('label'), { message: 'the label input stored the label' }).toBe(label);
+   }
+   for (const [text, key, value] of [
+      [
+         'Cost',
+         'cost',
+         cost,
+      ],
+      [
+         'Initial Value',
+         'initialValue',
+         initialValue,
+      ],
+   ]) {
+      if (value !== undefined) {
+         await commitText(field(text).locator('input'), value);
+         await expect.poll(() => stored(key), { message: `the ${text} input stored ${key}` }).toBe(value);
+      }
+   }
+   for (const [text, key, value] of [
+      [
+         'Damage',
+         'isDamage',
+         damage,
+      ],
+      [
+         'Healing',
+         'isHealing',
+         healing,
+      ],
+      [
+         'Scaling',
+         'scaling',
+         scaling,
+      ],
+   ]) {
+      if (value !== undefined && await stored(key) !== value) {
+         await field(text).locator('button').click();
+         await expect.poll(() => stored(key), { message: `the ${text} toggle stored ${key}` }).toBe(value);
+      }
+   }
+   await settle(page);
 }
 
 /**
