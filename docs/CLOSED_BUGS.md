@@ -3241,3 +3241,17 @@ The evidence files named here are in `.superpowers/sdd/2026-10-10-e2e-coverage/t
   leave. Covered by the Heavy armor test of `rules-element-stats.spec.js` (3 + 2 doubled is 10).
 - **Found:** 2026-10-10 by the full e2e run of the stat-element specs.
 - **Status:** Closed 2026-10-10 (pending the controller's re-run).
+
+### 173. The Revert Resolve Regain button regained Resolve, and a revert of a capped regain spent nothing
+
+- **What (read; measured by the full run, `final-run/e2e.log`, `turn-matrix.spec.js` "resolve regain: autoRevertResolveRegain enabled / showButton"):** after a regain stopped at the maximum (1 of 1, offered 2), the revert left Resolve at 1: `spendResolve` does nothing when it holds less than the amount. The card's button called `regainResolve` instead of spending.
+- **Fixed:** 2026-10-10: the automatic revert (`_calculateResolveRegainRevert`) and the button spend at most the Resolve held; the button spends instead of regaining.
+- **Found:** 2026-10-10 by the full run of the turn matrix.
+- **Status:** Closed 2026-10-10.
+
+### 174. The Remove Expired Effects button on a turn report did nothing
+
+- **What (read; measured by the full run, "showButton: the card button removes the expired effects"):** the button tested `document?.isOwner` on the reactive bridge, which has no `isOwner` (only `data`), so its ownership assertion always failed and nothing was removed.
+- **Fixed:** 2026-10-10: it tests `document.data?.isOwner` like the other report buttons.
+- **Found:** 2026-10-10 by the full run of the turn matrix.
+- **Status:** Closed 2026-10-10.

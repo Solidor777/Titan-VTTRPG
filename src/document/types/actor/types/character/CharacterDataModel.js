@@ -6300,7 +6300,8 @@ export default class CharacterDataModel extends TitanActorDataModel {
             // Determine whether the revert is confirmed.
             const confirmed = autoRevertResolveRegainSetting === 'enabled';
             if (confirmed) {
-               await this.spendResolve(maxResolveToRevert, {
+               // A regain stops at the maximum, so at most the resolve held is spent.
+               await this.spendResolve(Math.min(maxResolveToRevert, this.resource.resolve.value), {
                   updateActor: false,
                   report: false,
                });

@@ -420,6 +420,7 @@ test.describe('turns and rounds advance', () => {
 
       // Mark the plain character defeated in the tracker.
       const row = gm.locator(`#combat .combatant[data-combatant-id]`, { hasText: cast.plain.name });
+      await row.hover();
       await row.locator('[data-action="toggleDefeated"]').click();
       await expect(row).toHaveClass(/defeated/);
 
@@ -442,6 +443,7 @@ test.describe('turns and rounds advance', () => {
       await expect(gm.locator('#token-hud')).toBeHidden();
 
       // Unmark the plain character: the Defeated mark is a status on its actor, which later tests share.
+      await row.hover();
       await row.locator('[data-action="toggleDefeated"]').click();
       await expect(row).not.toHaveClass(/defeated/);
    });
@@ -519,8 +521,8 @@ test.describe('effect expiry for every duration type and Auto-remove value', () 
 
          // The report is whispered to the owners of a character nobody else owns, so the player's client never holds
          // it.
-         expect(await player.evaluate((id) => game.messages.get(id) === undefined, startReport.id))
-            .toBe(true);
+         await showChatLog(player);
+         await expect(player.locator(`#chat .message[data-message-id="${startReport.id}"]`)).toHaveCount(0);
          if (mode === 'showButton') {
             await expect(card(gm, startReport.id).locator('button')).not.toHaveCount(0);
          }
@@ -1244,6 +1246,12 @@ test.describe('conditions, suppressed tags, unlinked tokens and the character sh
          await clickSheetTab(sheet, 'Effects');
          const row = sheet.locator(`li.effect[data-effect-id="${id}"]`);
          await expect(row).toBeVisible();
+
+         // The Expired tag is in the row's expandable footer.
+         if (await row.locator('.expandable-content').count() === 0) {
+            await row.locator('.header .label .button button').first().click();
+         }
+         await expect(row.locator('.expandable-content')).toBeVisible();
          await expect(row).not.toContainText(/expired/i);
          await nextTurn(gm);
          if (mode === 'disabled') {

@@ -15,7 +15,7 @@
    async function removeExpiredEffects() {
       // If we own this chat message and the actor associated with it.
       if (assert(
-         document?.isOwner,
+         document.data?.isOwner,
          'Cannot modify document %s if not owner.',
          document?.name,
       )) {

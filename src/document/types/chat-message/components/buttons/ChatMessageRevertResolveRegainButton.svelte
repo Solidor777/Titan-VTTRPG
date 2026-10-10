@@ -11,7 +11,7 @@
    const document = getContext('document');
 
    /**
-    * Regains resolve equal to the regain revert total, reverting the spend, and marks the button as confirmed.
+    * Spends the resolve the regain gave, up to the resolve held, reverting the regain, and marks the button as confirmed.
     */
    async function confirm() {
       if (assert(
@@ -22,9 +22,9 @@
          const actor = getActorFromSpeaker(document.data.speaker);
          if (actor && actor.isOwner && actor.system.isCharacter) {
 
-            // Regain resolve to undo the spend.
-            await actor.system.regainResolve(
-               document.data.system.resolveRegainRevert.total,
+            // Spend the regained resolve, at most what the character holds (a regain stops at the maximum).
+            await actor.system.spendResolve(
+               Math.min(document.data.system.resolveRegainRevert.total, actor.system.resource.resolve.value),
                { report: false },
             );
 
