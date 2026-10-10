@@ -212,11 +212,17 @@ test.describe('a placed token deleted with the Delete key', () => {
 });
 
 test.describe('a placed token deleted with its Token Configuration window open', () => {
+   // Opening the window releases every controlled token and moves the token's preview over it (read:
+   // `placeable-config.mjs:130-133`), so the Delete key and the pointer cannot reach the token; the token goes with
+   // its scene, deleted from the Scenes directory.
    for (const linked of [
       true,
       false,
    ]) {
-      test(`${linked ? 'a linked' : 'an unlinked'} token`, async () => {
+      test(`${linked ? 'a linked' : 'an unlinked'} token, deleted with its scene`, async () => {
+         /** @type {string} The id of a scene of its own. */
+         const ownSceneId = await createScene(page, { name: `E2E Deleted Token Scene ${RUN} ${linked}` });
+         await viewScene(page, ownSceneId);
          const { tokenId } = await actorWithToken('player', linked);
          await controlWithHuds(tokenId);
          await page.locator('#token-hud [data-action="config"]').click();
@@ -225,29 +231,10 @@ test.describe('a placed token deleted with its Token Configuration window open',
          const config = windowOf(`Token-${tokenId}`);
          await expect(config).toBeVisible();
          await resetDeletionWatch(page, watch);
-
-         // The window opens over the token. It is moved to the corner, and a click on the controlled token gives the
-         // canvas the focus, as a user does before pressing the Delete key; the click keeps the token controlled and
-         // closes the Token HUD. The cause of the earlier Delete-key refusal is not established (read: the keyboard
-         // manager ignores keys while a form control has focus, `keyboard-manager.mjs:186-194`).
-         await page.evaluate((tokenId) => canvas.scene.tokens.get(tokenId).sheet.setPosition({
-            left: 20,
-            top: 20,
-         }), tokenId);
-
-         /** @type {{x: number, y: number}} The token's centre in client coordinates. */
-         const centre = await page.evaluate((tokenId) => canvas.clientCoordinatesFromCanvas(
-            canvas.scene.tokens.get(tokenId).object.center,
-         ), tokenId);
-         await restOnToken(page, tokenId, centre);
-         await page.mouse.click(centre.x, centre.y);
-         await expect.poll(
-            () => page.evaluate((tokenId) => canvas.tokens.controlled.map((token) => token.id), tokenId),
-            { message: 'the token is still the controlled one' },
-         ).toEqual([tokenId]);
-         await deleteControlledToken(page, tokenId);
+         await deleteFromDirectory(page, 'scenes', ownSceneId);
          await expect(config, 'the configuration window closed with the token').toHaveCount(0);
          await expectNoDeletionErrors(page, watch, errors, 'a token with its configuration open');
+         await viewScene(page, sceneId);
       });
    }
 });
