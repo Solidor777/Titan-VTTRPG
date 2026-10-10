@@ -4,6 +4,7 @@
    import DocumentSkillSelect from '~/document/svelte-components/select/DocumentSkillSelect.svelte';
    import DocumentIntegerInput from '~/document/svelte-components/input/DocumentIntegerInput.svelte';
    import DocumentAttributeSelect from '~/document/svelte-components/select/DocumentAttributeSelect.svelte';
+   import DocumentModSelect from '~/document/svelte-components/select/DocumentModSelect.svelte';
    import DocumentRatingSelect from '~/document/svelte-components/select/DocumentRatingSelect.svelte';
    import DocumentResistanceSelect from '~/document/svelte-components/select/DocumentResistanceSelect.svelte';
    import DocumentResourceSelect from '~/document/svelte-components/select/DocumentResourceSelect.svelte';
@@ -25,6 +26,7 @@
    const selectorOptions = [
       'attribute',
       'expertise',
+      'mod',
       'rating',
       'resistance',
       'resource',
@@ -45,6 +47,10 @@
          case 'training':
          case 'expertise': {
             document.data.system.rulesElement[idx].key = 'arcana';
+            break;
+         }
+         case 'mod': {
+            document.data.system.rulesElement[idx].key = 'armor';
             break;
          }
          case 'rating': {
@@ -82,6 +88,9 @@
          case 'training':
          case 'expertise': {
             return DocumentSkillSelect;
+         }
+         case 'mod': {
+            return DocumentModSelect;
          }
          case 'rating': {
             return DocumentRatingSelect;

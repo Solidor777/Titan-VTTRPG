@@ -409,6 +409,7 @@ export default class CharacterDataModel extends TitanActorDataModel {
       this._calculateBaseRatings();
       this._calculateBaseResistances();
       this._calculateBaseResources();
+      this._calculateBaseMods();
       this._resetDynamicMods();
       this._applyRulesElements();
       this._applyArmorAndShields();
@@ -560,6 +561,18 @@ export default class CharacterDataModel extends TitanActorDataModel {
       // Wounds = Total Attribute mod / 2 rounded up.
       this.resource.wounds.maxBase = Math.max(Math.ceil(
          totalBaseAttributeValue * woundsBaseMultiplier()), 1);
+   }
+
+   /**
+    * Sets the base value of this Character's mods to 0. A mod is only the sum of its sources, but the rules element
+    * operations that read a stat's base (Multiply Base, Multiply Sum, Set Sum) compute from `baseValue`, which would
+    * otherwise be undefined and turn the mod into NaN.
+    * @protected
+    */
+   _calculateBaseMods() {
+      for (const mod of Object.values(this.mod)) {
+         mod.baseValue = 0;
+      }
    }
 
    /**

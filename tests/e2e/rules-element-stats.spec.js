@@ -305,8 +305,8 @@ for (const [operation, { fields, apply }] of Object.entries(OPERATIONS)) {
 
       for (const selector of Object.keys(SELECTORS)) {
          test(`${selector}: each key shows the element on the sheet`, async () => {
-            // A skill's Training and Expertise are many keys: for Multiply Sum and Set Sum, whose editors offer the
-            // `all` key, one element reaches each of them; the other operations get one element per key.
+            // A skill's Training and Expertise are many keys: for every operation but Flat Modifier (which gets one
+            // element per key) one element with the `all` key reaches each of them.
             /** @type {string[]} The keys the character holds. */
             const allKeys = await keysOf(selector);
 
@@ -314,16 +314,10 @@ for (const [operation, { fields, apply }] of Object.entries(OPERATIONS)) {
             const abilityId = await createOwnedItem(page, actorId, 'ability', `E2E ${operation} ${selector}`);
             sourceUuid = `${actorUuid}.Item.${abilityId}`;
 
-            // The editor of an operation offers the selectors it can act on; a selector it does not offer cannot be
-            // authored (only Flat Modifier offers the mods).
+            // The editor of every operation offers every selector the character's stats have.
             /** @type {string[]} The selectors the editor offers the operation. */
             const offered = await offeredSelectors(operation);
-            expect(offered, `the ${operation} editor offers the selectors of the stats it acts on`)
-               .toEqual(expect.arrayContaining(['attribute']));
-            if (!offered.includes(selector)) {
-               expect(selector, `only the mods are not offered to ${operation}`).toBe('mod');
-               return;
-            }
+            expect(offered, `the ${operation} editor offers the ${selector} selector`).toContain(selector);
 
             // The sheet shows the Armor mod only; the regain mods are read in rules-element-turns.spec.js.
             /** @type {string[]} The keys the sheet displays a total for. */
@@ -335,10 +329,7 @@ for (const [operation, { fields, apply }] of Object.entries(OPERATIONS)) {
                ).toHaveCount(1);
             }
             /** @type {boolean} Whether one `all` element stands for the keys. */
-            const useAll = SELECTORS[selector].data === 'skill' && [
-               'mulSum',
-               'setSum',
-            ].includes(operation);
+            const useAll = SELECTORS[selector].data === 'skill' && operation !== 'flatModifier';
             if (operation.startsWith('mul') && [
                'speed',
                'training',
@@ -556,6 +547,16 @@ test.describe('element sources and native changes', () => {
          value: 2,
       });
       expect((await readSheet('mod', ['armor'])).armor, 'a flat 2 adds to the worn armor').toBe(5);
+
+      // Multiply Sum doubles the whole total (the armor 3 and the ability's 2).
+      await author({
+         operation: 'mulSum',
+         selector: 'mod',
+         key: 'armor',
+         value: 2,
+         rounding: 'down',
+      });
+      expect((await readSheet('mod', ['armor'])).armor, 'Multiply Sum doubles the Armor mod').toBe(10);
    });
 
    test('changes entered in the Active Effect config of core reach each stat on the sheet', async () => {

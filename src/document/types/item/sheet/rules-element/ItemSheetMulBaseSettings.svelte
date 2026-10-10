@@ -26,6 +26,7 @@
    const selectorOptions = [
       'attribute',
       'expertise',
+      'mod',
       'rating',
       'resistance',
       'resource',
@@ -127,7 +128,10 @@
    <div class="field select">
       {#if getSelector()}
          {@const Selector = getSelector()}
-         <Selector bind:value={document.data.system.rulesElement[idx].key}/>
+         <Selector
+            allowAll
+            bind:value={document.data.system.rulesElement[idx].key}
+         />
       {/if}
    </div>
 

@@ -3151,3 +3151,20 @@ The evidence files named here are in `.superpowers/sdd/2026-10-10-e2e-coverage/t
   `turn-matrix.spec.js` (written, not run).
 - **Found:** 2026-10-10 while reading the report buttons for the turn matrix.
 - **Status:** Closed 2026-10-10.
+
+### 169. The Multiply Base, Multiply Sum and Set Sum editors offered no Mod selector (and Multiply Base no all key), and a mod had no base value
+
+- **What (measured, `t4-logs/stats-run1.log`: the option `mod` and the option `all` were not found):** the editors of the three operations list attribute,
+  expertise, rating, resistance, resource, speed and training; `mod` was missing, and the Multiply Base key select
+  offered no `all`. Read: a `mulSum`, `setSum` or `mulBase` element with the `mod` selector (which the sum-operations
+  design lists, `docs/superpowers/specs/2026-06-01-rules-element-sum-operations-design.md:73-74`, and which the
+  engine's generic appliers accept) read `stat.baseValue` of a mod, which was never set
+  (`CharacterSystemTemplate.js` derived stat shape has only `mod`; `CharacterSheetMod.svelte` passes `baseValue={0}`),
+  so the element would have made the mod NaN.
+- **Fixed:** 2026-10-10: `CharacterDataModel#_calculateBaseMods` sets each mod's `baseValue` to 0; the three editors
+  offer `mod` (the Multiply Base editor already had the key select for it) and the Multiply Base key select allows
+  `all` (the engine expands `all` for every operation, `_expandAllKeyElements`). Covered by `rules-element-stats.spec.js`
+  (written, not run: it expects every editor to offer every selector, authors `all` for skills with every operation but
+  Flat Modifier, a Set Sum on the Armor mod with no armor, and a Multiply Sum doubling a worn armor plus ability).
+- **Found:** 2026-10-10 while building the stat-element matrix.
+- **Status:** Closed 2026-10-10 (pending the controller's run of the spec).
