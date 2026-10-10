@@ -29,8 +29,9 @@ import { attachPageErrors, clearChat, closeAllApps, showChatLog } from './world.
  * Rolls from the character sheet and from the Player HUD, with forced dice and the result read from the chat card. The
  * roller has Body 5, Mind 5 and Soul 2 and Arcana Training 2. By the rules formulas of `CharacterDataModel` (read in
  * `_calculateBaseResistances`): Reflexes = Mind + floor(Body / 2) = 7, Resilience = Body + floor(Soul / 2) = 6,
- * Willpower = Soul + floor(Mind / 2) = 4; an Arcana check rolls Mind + Training = 7 dice, an Attribute or Attack check rolls 5, and
- * an Item check, whose default Skill is Arcana (`ItemCheckTemplate.js:53`), rolls Mind + Training = 7. With no target an attack is Difficulty 4, Complexity 1. The expected successes come from the oracle
+ * Willpower = Soul + floor(Mind / 2) = 4. An Arcana check rolls Mind + Training = 7 dice, and an Attribute or Attack
+ * check rolls 5. An Item check, whose default Skill is Arcana (`ItemCheckTemplate.js:53`), rolls 7 too. With no target
+ * an attack is Difficulty 4, Complexity 1. The expected successes come from the oracle
  * (`tests/shared/checkOracle.js`). A roll from the HUD gives the same dice, results and card as the same roll from
  * the sheet, and the owner's own client rolls from both too.
  */
