@@ -164,7 +164,7 @@ test.beforeAll(async ({ browser }) => {
 });
 
 test.afterEach(async () => {
-   if (await page.evaluate(() => game.combat !== null && game.combat !== undefined)) {
+   if (await page.evaluate(() => game.combat?.started === true)) {
       await endCombat(page);
    }
    for (const uuid of madeUuids) {
