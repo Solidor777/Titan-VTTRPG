@@ -25,6 +25,33 @@ describe('attribute & resistance results — damageTaken', () => {
       expect(r.damageTaken).toBe(3);
    });
 
+   it('takes no negative damage when the successes of a failed check exceed the damage', () => {
+      // Three successes miss Complexity 5 and exceed the damage of 1.
+      const params = {
+         difficulty: 4,
+         complexity: 5,
+         extraSuccessOnCritical: false,
+         extraFailureOnCritical: false,
+         damageToReduce: 1,
+      };
+      const attribute = calculateAttributeCheckResults(diceResults([
+         5,
+         4,
+         4,
+      ]), params);
+      expect(attribute.succeeded).toBe(false);
+      expect(attribute.successes).toBe(3);
+      expect(attribute.damageTaken).toBe(0);
+      const resistance = calculateResistanceCheckResults(diceResults([
+         5,
+         4,
+         4,
+      ]), params);
+      expect(resistance.succeeded).toBe(false);
+      expect(resistance.successes).toBe(3);
+      expect(resistance.damageTaken).toBe(0);
+   });
+
    it('takes no damage on a successful resistance check', () => {
       const params = {
          difficulty: 4,

@@ -42,7 +42,7 @@ export default function calculateResistanceCheckResults(diceResults, parameters)
       criticalFailures: baseResults.criticalFailures,
       criticalSuccesses: baseResults.criticalSuccesses,
       damageTaken: parameters.damageToReduce && !baseResults.succeeded ?
-         parameters.damageToReduce - baseResults.successes :
+         Math.max(parameters.damageToReduce - baseResults.successes, 0) :
          0,
       dice: baseResults.dice,
       expertiseRemaining: baseResults.expertiseRemaining,
