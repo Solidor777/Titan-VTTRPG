@@ -113,3 +113,11 @@ Completed items are deleted, not marked done.
   `createScrollingText` error (CLOSED_BUGS #114; measured for `unconscious.spec.js` when a scene was already active,
   fixed there by reloading and restoring the scene through `activateScene`). Search the e2e specs for other scene
   switches that follow a condition or effect change, and give each the same reload; none has been observed failing.
+
+- Tempest Herald's duration ends when the caster becomes Incapacitated (rules 09_26 line 9251-9256), and the
+  compendium effect now grants immunity to Incapacitated (user ruling 2026-10-09, plan C Task 1), so that end
+  condition cannot occur through the system. Decide with the Dying condition work whether the immunity list should
+  exclude Incapacitated or the end condition is dropped.
+- Conjurer of Urdokai's check has `resolveCost` 0 because the ability's 2 Resolve is its activation cost, while other
+  sacred-art checks carry their ability's Cost as `resolveCost` (controller ruling during plan C Task 3, inferred
+  from the plan; confirm with the user).
