@@ -627,7 +627,7 @@ export async function toggleTokenLink(page, actorId) {
  * open. No token may be controlled then: releasing control presses the Escape key.
  * @returns {Promise<{x: number, y: number}>} The token's centre in client (page) coordinates.
  */
-async function hoverToken(page, tokenId, { keepWindows = false } = {}) {
+export async function hoverToken(page, tokenId, { keepWindows = false } = {}) {
    if (!keepWindows) {
       await closeAllApps(page);
    }
@@ -855,7 +855,7 @@ async function clickConditionControl(page, tokenId, statusId) {
  * @param {{x: number, y: number}} centre - The token's centre in client (page) coordinates.
  * @returns {Promise<void>} Resolves once the HUD is hidden.
  */
-async function closeTokenHud(page, tokenId, centre) {
+export async function closeTokenHud(page, tokenId, centre) {
    await restOnToken(page, tokenId, centre);
    await page.mouse.click(centre.x, centre.y);
    await expect(page.locator('#token-hud')).toBeHidden();
