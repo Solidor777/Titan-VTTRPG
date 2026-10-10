@@ -1,5 +1,7 @@
 import { expect } from '@playwright/test';
-import { closeTokenHud, hoverToken, restOnToken, targetedTokenIds } from './flows.js';
+import { chooseContextMenuEntry } from './contextMenu.js';
+import { closeTokenHud, hoverToken, openSidebarTab, restOnToken, targetedTokenIds } from './flows.js';
+import { settle } from './settle.js';
 
 // Page objects for targeting a token the way a user does besides the Target key: the target control of the Token HUD,
 // and removing a token from the scene with the Delete key.
@@ -89,4 +91,35 @@ export async function targetWithKeyKeepingControl(page, tokenId) {
       () => targetedTokenIds(page),
       { message: 'the Target key targeted the token' },
    ).toContain(tokenId);
+}
+
+/**
+ * Sets a scene's Token Vision box in its Scene Configuration window (Visibility tab), which the Edit entry of the
+ * scene's directory context menu opens.
+ * @param {import('@playwright/test').Page} page - A logged-in GM page.
+ * @param {string} sceneId - The scene.
+ * @param {boolean} enabled - Whether Token Vision is on after the save.
+ * @returns {Promise<void>} Resolves once the scene stores the state and the window is closed.
+ */
+export async function setSceneTokenVision(page, sceneId, enabled) {
+   /** @type {import('@playwright/test').Locator} The Scenes tab. */
+   const panel = await openSidebarTab(page, 'scenes');
+   await panel.locator(`.directory-item.entry[data-entry-id="${sceneId}"]`).click({ button: 'right' });
+   await chooseContextMenuEntry(
+      page,
+      page.locator('#context-menu li.context-item', { hasText: /^\s*Edit\s*$/ }),
+   );
+
+   /** @type {import('@playwright/test').Locator} The Scene Configuration window. */
+   const config = page.locator('.application.scene-config');
+   await expect(config, 'the Edit entry opens the Scene Configuration window').toBeVisible();
+   await config.locator('nav.tabs [data-tab="visibility"]').click();
+   await config.locator('input[name="tokenVision"]').setChecked(enabled);
+   await config.locator('button[type="submit"]').click();
+   await expect.poll(
+      () => page.evaluate((id) => game.scenes.get(id).tokenVision, sceneId),
+      { message: 'the window stored Token Vision' },
+   ).toBe(enabled);
+   await expect(config).toHaveCount(0);
+   await settle(page);
 }

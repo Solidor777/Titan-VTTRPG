@@ -998,7 +998,7 @@ state), `checkCards.js` (the roll entry points `rollItemCheck` and `rollWeaponAt
 sheet the window a GM's chat-card buttons act on; `clickResist`, `clickOpposed`, `pressDamageButton` and
 `pressRendButton` with the report each posts; `readCardButtons`, `readResultRows` and `readVitals`; `createCharacter`,
 `wearArmor` and the sheet setters for a check's opposed Attribute and Skill, a custom aspect's Resistance, a trait with a
-number, a weapon's Multi-Attack and its "+ ES" box), `targeting.js` (`toggleTargetWithTokenHud`, `deleteTokenWithKey`, `retargetWithKey` and `targetWithKeyKeepingControl` for a Player whose only token stays controlled; used by `attack-targeting.spec.js`, and `sheet-hud-rolls.spec.js` rolls every check type from the sheet and the Player HUD on the GM and the owner Player seat), `componentProbe.js`, `fast-check.js` and `slow-operation-reporter.js` are described under the entries below. `run-e2e-throttled.ps1` is the runner wrapper.
+number, a weapon's Multi-Attack and its "+ ES" box), `targeting.js` (`toggleTargetWithTokenHud`, `deleteTokenWithKey`, `retargetWithKey` and `targetWithKeyKeepingControl` for a Player whose only token stays controlled, `setSceneTokenVision` through the Scene Configuration window; used by `attack-targeting.spec.js`, and `sheet-hud-rolls.spec.js` rolls every check type from the sheet and the Player HUD on the GM and the owner Player seat), `componentProbe.js`, `fast-check.js` and `slow-operation-reporter.js` are described under the entries below. `run-e2e-throttled.ps1` is the runner wrapper.
 
 **Shared-world E2E harness (one world boot per FILE)** — every eligible spec boots the world ONCE per
 file, not per test. The pattern: module-scoped `let page; let errors;` plus three inline lifecycle hooks

@@ -12,6 +12,7 @@ import {
    createOwnedItem,
    createScene,
    placeToken,
+   sendToChat,
    setAttributeBase,
    setEquipped,
    setOwnership,
@@ -138,6 +139,7 @@ test.beforeAll(async ({ browser }) => {
       name: 'E2E Sheet Roller',
       type: 'player',
    });
+   /** @type {string} The roller's uuid. */
    const rollerUuid = `Actor.${roller.actor}`;
    await setAttributeBase(gm, rollerUuid, 'body', 5);
    await setAttributeBase(gm, rollerUuid, 'mind', 5);
@@ -160,6 +162,7 @@ test.beforeAll(async ({ browser }) => {
       name: 'E2E Sheet Resolve Caster',
       type: 'player',
    });
+   /** @type {string} The caster's uuid. */
    const casterUuid = `Actor.${caster.actor}`;
    await setAttributeBase(gm, casterUuid, 'mind', 3);
    await setAttributeBase(gm, casterUuid, 'soul', 6);
@@ -272,6 +275,7 @@ async function clickHudEntry(on, entry) {
    if (!await on.evaluate((id) => canvas.tokens.controlled.some((token) => token.id === id), roller.token)) {
       await controlPlacedToken(on, roller.token);
    }
+   /** @type {string[]} The category and the sub-option of the entry. */
    const [category, sub] = entry;
    /** @type {import('@playwright/test').Locator} The category button. */
    const button = on.getByTestId(`player-hud-category-${category}`);
@@ -374,10 +378,12 @@ function essence({ parameters, results }) {
 test.describe('the GM rolls from the character sheet and the Player HUD', () => {
    for (const rollCase of CASES) {
       test(`${rollCase.name} check: sheet result is right and the HUD gives the same`, async () => {
+         /** @type {{id: string, parameters: object, results: object}} The check rolled from the sheet. */
          const fromSheet = await roll(gm, rollCase, 'sheet');
          await expectRoll(gm, rollCase, fromSheet);
          await closeAllApps(gm);
          if (rollCase.hud) {
+            /** @type {{id: string, parameters: object, results: object}} The check rolled from the HUD. */
             const fromHud = await roll(gm, rollCase, 'hud');
             await expectRoll(gm, rollCase, fromHud);
             expect(essence(fromHud), 'the HUD roll equals the sheet roll').toEqual(essence(fromSheet));
@@ -389,10 +395,12 @@ test.describe('the GM rolls from the character sheet and the Player HUD', () => 
 test.describe('the owner rolls on the player\'s own client', () => {
    for (const rollCase of CASES) {
       test(`${rollCase.name} check from the player's sheet${rollCase.hud ? ' and HUD' : ''}`, async () => {
+         /** @type {{id: string, parameters: object, results: object}} The check rolled from the sheet. */
          const fromSheet = await roll(player, rollCase, 'sheet');
          await expectRoll(player, rollCase, fromSheet);
          await closeAllApps(player);
          if (rollCase.hud) {
+            /** @type {{id: string, parameters: object, results: object}} The check rolled from the HUD. */
             const fromHud = await roll(player, rollCase, 'hud');
             await expectRoll(player, rollCase, fromHud);
             expect(essence(fromHud), 'the HUD roll equals the sheet roll').toEqual(essence(fromSheet));
@@ -434,6 +442,7 @@ test.describe('a cast that spends Resolve', () => {
       await forceDice(gm, FACES);
       /** @type {number} The message count before the roll. */
       const baseline = await clickRoll(dialog, gm);
+      /** @type {{id: string, type: string, parameters: object, results: object}} The posted check. */
       const flags = await readNewestCheckFlags(gm, baseline, 'castingCheck');
 
       // Mind 3 and Arcana Training 2 doubled: 3 + 4 = 7 dice, as the T1 cast spec worked out from the same rules.
@@ -462,5 +471,73 @@ test.describe('a cast that spends Resolve', () => {
          }
          await gm.getByTestId(`player-hud-sub-option-spells-${caster.spell}`).click();
       });
+   });
+});
+
+test.describe('the ability\'s chat card', () => {
+   test('its check button rolls the item check for the controlled character', async () => {
+      /** @type {string} The id of the card the ability's Send to Chat button posts. */
+      const cardId = await sendToChat(gm, `Actor.${roller.actor}.Item.${roller.ability}`);
+      await controlPlacedToken(gm, roller.token);
+      await showChatLog(gm);
+
+      /** @type {import('@playwright/test').Locator} The check button on the card. */
+      const button = gm.locator(`#chat .chat-log li[data-message-id="${cardId}"]`)
+         .locator('button', { hasText: CHECK_LABEL });
+      await expect(button, 'the card offers the check').toBeVisible();
+      await forceDice(gm, FACES);
+
+      /** @type {number} The message count before the click. */
+      const baseline = await gm.evaluate(() => game.messages.size);
+      await button.click();
+      await expectRoll(gm, CASES[5], await readNewestCheckFlags(gm, baseline, 'itemCheck'));
+   });
+});
+
+test.describe('a player who does not own the character', () => {
+   test('has the roll buttons of the sheet disabled where the owner has them enabled', async () => {
+      /** @type {string} The id of a character that the player may only observe. */
+      const strangerId = await createActor(gm, {
+         name: 'E2E Sheet Stranger',
+         type: 'player',
+      });
+      await setOwnership(gm, strangerId, 'E2E Player 1', 'OBSERVER');
+      await player.waitForFunction(
+         (id) => game.actors.get(id)?.testUserPermission(game.user, 'OBSERVER'),
+         strangerId,
+         { timeout: 1000 },
+      );
+
+      // Presence: on the same client, the owner's sheet has its Attribute and Resistance buttons enabled.
+      /** @type {import('@playwright/test').Locator} The sheet of the character the player owns. */
+      const owned = await openSheetByUuid(player, `Actor.${roller.actor}`);
+      /** @type {import('@playwright/test').Locator} The sheet of the character the player observes. */
+      const observed = await openSheetByUuid(player, `Actor.${strangerId}`);
+      for (const name of [
+         'Body',
+         'Reflexes',
+      ]) {
+         await expect(owned.getByRole('button', {
+            name,
+            exact: true,
+         }).first(), `the owner's ${name} button is enabled`).toBeEnabled();
+      }
+
+      // Absence: the same buttons on the observed character's sheet are disabled and roll nothing.
+      /** @type {number} The message count before the clicks. */
+      const baseline = await player.evaluate(() => game.messages.size);
+      for (const name of [
+         'Body',
+         'Reflexes',
+      ]) {
+         /** @type {import('@playwright/test').Locator} The observer's button. */
+         const button = observed.getByRole('button', {
+            name,
+            exact: true,
+         }).first();
+         await expect(button, `the observer's ${name} button is disabled`).toBeDisabled();
+         await button.click({ force: true });
+      }
+      expect(await player.evaluate(() => game.messages.size), 'the clicks rolled nothing').toBe(baseline);
    });
 });

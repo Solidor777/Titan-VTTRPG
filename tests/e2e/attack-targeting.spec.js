@@ -28,6 +28,7 @@ import { setClientSetting } from './settings.js';
 import {
    deleteTokenWithKey,
    retargetWithKey,
+   setSceneTokenVision,
    targetWithKeyKeepingControl,
    toggleTargetWithTokenHud,
 } from './targeting.js';
@@ -188,6 +189,7 @@ async function rollAndExpectCard(dialog, difficulty) {
 
    /** @type {number} The message count before the roll. */
    const baseline = await clickRoll(dialog, page);
+   /** @type {{id: string, type: string, parameters: object, results: object}} The posted check. */
    const flags = await readNewestCheckFlags(page, baseline, 'attackCheck');
    expect(flags.parameters.difficulty, 'the posted Difficulty').toBe(difficulty);
 
@@ -210,6 +212,7 @@ test.describe('the Target key', () => {
    for (const [key, spec] of Object.entries(TARGET_SPECS)) {
       test(`a Melee attack on the ${key} target (Defense ${spec.defense}) has Difficulty ${spec.melee}`, async () => {
          await targetPlacedToken(page, targets[key].tokenId);
+         /** @type {import('@playwright/test').Locator} The attack check dialog. */
          const dialog = await openCheckDialog(page, 'attack', weaponUuid);
          expect(await readDefenseField(dialog), 'the Defense field').toBe(String(spec.defense));
          expect(await readSummary(dialog, 'difficulty'), 'the dialog Difficulty').toBe(spec.melee);
@@ -218,6 +221,7 @@ test.describe('the Target key', () => {
 
       test(`a Ranged attack on the ${key} target has Difficulty ${spec.ranged} from Accuracy 5`, async () => {
          await targetPlacedToken(page, targets[key].tokenId);
+         /** @type {import('@playwright/test').Locator} The attack check dialog. */
          const dialog = await openCheckDialog(page, 'attack', weaponUuid);
          await setSelectField(dialog, 'type', 'ranged');
          expect(await readDefenseField(dialog), 'the Defense field is the target\'s whatever the type')
@@ -234,6 +238,7 @@ test.describe('the Target key', () => {
          targets.mid.tokenId,
          targets.low.tokenId,
       ]);
+      /** @type {import('@playwright/test').Locator} The attack check dialog. */
       let dialog = await openCheckDialog(page, 'attack', weaponUuid);
       expect(await readSummary(dialog, 'difficulty'), 'mid first').toBe(TARGET_SPECS.mid.melee);
       await rollAndExpectCard(dialog, TARGET_SPECS.mid.melee);
@@ -249,6 +254,7 @@ test.describe('the Target key', () => {
 
    test('no target: the Defense is the attacker\'s own rating and the Difficulty is 4, Melee and Ranged', async () => {
       expect(await targetedTokenIds(page), 'nothing is targeted').toEqual([]);
+      /** @type {import('@playwright/test').Locator} The attack check dialog. */
       const dialog = await openCheckDialog(page, 'attack', weaponUuid);
       expect(await readDefenseField(dialog), 'Defense = Melee 3').toBe('3');
       expect(await readSummary(dialog, 'difficulty')).toBe(4);
@@ -264,6 +270,7 @@ test.describe('the Token HUD target control', () => {
       await toggleTargetWithTokenHud(page, targets.mid.tokenId, true);
       expect(await targetedTokenIds(page)).toEqual([targets.mid.tokenId]);
       await page.evaluate(() => canvas.tokens.releaseAll());
+      /** @type {import('@playwright/test').Locator} The attack check dialog. */
       const dialog = await openCheckDialog(page, 'attack', weaponUuid);
       expect(await readDefenseField(dialog)).toBe('4');
       expect(await readSummary(dialog, 'difficulty')).toBe(TARGET_SPECS.mid.melee);
@@ -274,6 +281,7 @@ test.describe('the Token HUD target control', () => {
       await toggleTargetWithTokenHud(page, targets.mid.tokenId, false);
       expect(await targetedTokenIds(page)).toEqual([]);
       await page.evaluate(() => canvas.tokens.releaseAll());
+      /** @type {import('@playwright/test').Locator} The attack check dialog of the untargeted attack. */
       const untargeted = await openCheckDialog(page, 'attack', weaponUuid);
       expect(await readSummary(untargeted, 'difficulty')).toBe(4);
    });
@@ -286,6 +294,7 @@ test.describe('the Token HUD target control', () => {
          targets.high.tokenId,
       ]);
       await page.evaluate(() => canvas.tokens.releaseAll());
+      /** @type {import('@playwright/test').Locator} The attack check dialog. */
       const dialog = await openCheckDialog(page, 'attack', weaponUuid);
       expect(await readSummary(dialog, 'difficulty')).toBe(TARGET_SPECS.low.melee);
       await rollAndExpectCard(dialog, TARGET_SPECS.low.melee);
@@ -295,6 +304,7 @@ test.describe('the Token HUD target control', () => {
 test.describe('the target changes while the dialog is open', () => {
    test('retargeting with the dialog open keeps the Defense read at open', async () => {
       await targetPlacedToken(page, targets.mid.tokenId);
+      /** @type {import('@playwright/test').Locator} The attack check dialog. */
       const dialog = await openCheckDialog(page, 'attack', weaponUuid);
       await moveDialogAside(dialog);
       expect(await readSummary(dialog, 'difficulty')).toBe(TARGET_SPECS.mid.melee);
@@ -307,6 +317,7 @@ test.describe('the target changes while the dialog is open', () => {
 
    test('losing the target with the dialog open leaves the dialog\'s Difficulty and the roll', async () => {
       await targetPlacedToken(page, targets.mid.tokenId);
+      /** @type {import('@playwright/test').Locator} The attack check dialog. */
       const dialog = await openCheckDialog(page, 'attack', weaponUuid);
       await moveDialogAside(dialog);
       await page.evaluate(() => canvas.tokens.releaseAll());
@@ -321,6 +332,7 @@ test.describe('the target changes while the dialog is open', () => {
    });
 
    test('a target that appears while a no-target dialog is open: the roll follows what the dialog shows', async () => {
+      /** @type {import('@playwright/test').Locator} The attack check dialog. */
       const dialog = await openCheckDialog(page, 'attack', weaponUuid);
       await moveDialogAside(dialog);
       expect(await readSummary(dialog, 'difficulty'), 'no target at open').toBe(4);
@@ -332,11 +344,13 @@ test.describe('the target changes while the dialog is open', () => {
    });
 
    test('deleting the target token with the dialog open leaves the dialog\'s Difficulty and the roll', async () => {
+      /** @type {string} The id of the target that is deleted. */
       const doomedId = await createActor(page, {
          name: 'E2E Targeting Doomed A',
          type: 'player',
       });
       await setAttributeBase(page, `Actor.${doomedId}`, 'body', 8);
+      /** @type {string} The id of the token that is deleted. */
       const doomedToken = await placeToken(page, doomedId, {
          square: {
             column: await page.evaluate(() => Math.round(canvas.stage.pivot.x / canvas.grid.size)) + 4,
@@ -345,6 +359,7 @@ test.describe('the target changes while the dialog is open', () => {
       });
       await targetPlacedToken(page, doomedToken);
       await page.evaluate(() => canvas.tokens.releaseAll());
+      /** @type {import('@playwright/test').Locator} The attack check dialog. */
       const dialog = await openCheckDialog(page, 'attack', weaponUuid);
       await moveDialogAside(dialog);
       expect(await readSummary(dialog, 'difficulty')).toBe(TARGET_SPECS.mid.melee);
@@ -355,11 +370,13 @@ test.describe('the target changes while the dialog is open', () => {
    });
 
    test('deleting the target token after the roll leaves the card as it was', async () => {
+      /** @type {string} The id of the target that is deleted. */
       const doomedId = await createActor(page, {
          name: 'E2E Targeting Doomed B',
          type: 'player',
       });
       await setAttributeBase(page, `Actor.${doomedId}`, 'body', 8);
+      /** @type {string} The id of the token that is deleted. */
       const doomedToken = await placeToken(page, doomedId, {
          square: {
             column: await page.evaluate(() => Math.round(canvas.stage.pivot.x / canvas.grid.size)) + 6,
@@ -367,7 +384,9 @@ test.describe('the target changes while the dialog is open', () => {
          },
       });
       await targetPlacedToken(page, doomedToken);
+      /** @type {import('@playwright/test').Locator} The attack check dialog. */
       const dialog = await openCheckDialog(page, 'attack', weaponUuid);
+      /** @type {{id: string, type: string, parameters: object, results: object}} The posted check. */
       const flags = await rollAndExpectCard(dialog, TARGET_SPECS.mid.melee);
       await page.evaluate(() => canvas.tokens.releaseAll());
       await deleteTokenWithKey(page, doomedToken);
@@ -391,7 +410,7 @@ test.describe('the owner player\'s own client', () => {
       if (previousId !== sceneId) {
          await activateScene(page, sceneId);
       }
-      await page.evaluate((id) => game.scenes.get(id).update({ tokenVision: false }), sceneId);
+      await setSceneTokenVision(page, sceneId, false);
       try {
          await withClients(browser, { player: 'E2E Player 1' }, async ({ player }) => {
             await setClientSetting(player, 'getCheckOptions', 'always');
@@ -399,12 +418,14 @@ test.describe('the owner player\'s own client', () => {
             await closeAllApps(player);
             await targetWithKeyKeepingControl(player, targets.low.tokenId);
             expect(await targetedTokenIds(player), 'the player targets the token').toEqual([targets.low.tokenId]);
+            /** @type {import('@playwright/test').Locator} The attack check dialog. */
             const dialog = await openCheckDialog(player, 'attack', weaponUuid);
             expect(await readDefenseField(dialog), 'the Defense field').toBe('2');
             expect(await readSummary(dialog, 'difficulty')).toBe(TARGET_SPECS.low.melee);
 
             /** @type {number} The message count before the roll. */
             const baseline = await clickRoll(dialog, player);
+            /** @type {{id: string, type: string, parameters: object, results: object}} The posted check. */
             const flags = await readNewestCheckFlags(player, baseline, 'attackCheck');
             expect(flags.parameters.difficulty).toBe(TARGET_SPECS.low.melee);
             await showChatLog(player);
