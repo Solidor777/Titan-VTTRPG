@@ -442,7 +442,9 @@ test.describe('turns and rounds advance', () => {
       await gm.mouse.click(centre.x, centre.y);
       await expect(gm.locator('#token-hud')).toBeHidden();
 
-      // Unmark the plain character: the Defeated mark is a status on its actor, which later tests share.
+      // Unmark the plain character: the Defeated mark is a status on its actor, which later tests share. The token
+      // flows left the chat tab active, so the tracker tab is opened again first.
+      await openSidebarTab(gm, 'combat');
       await row.hover();
       await row.locator('[data-action="toggleDefeated"]').click();
       await expect(row).not.toHaveClass(/defeated/);
