@@ -808,3 +808,75 @@ test.describe('turn reports for every report setting value', () => {
       ).toEqual([]);
    });
 });
+
+test.describe('removal button and immunity handling at expiry', () => {
+   test.beforeEach(async () => {
+      await setWorldSetting(gm, 'reportEffects', true);
+      await setWorldSetting(gm, 'autoDecreaseEffectDuration', true);
+   });
+
+   test('showButton: the card button removes the expired effects', async () => {
+      await setWorldSetting(gm, 'autoRemoveExpiredEffects', 'showButton');
+      await clearEffects('timed');
+      await addEffect(gm, cast.timed.id, 'E2E Button Removed', {
+         duration: DURATION_TURN_START,
+         remaining: 1,
+      });
+      await startEncounter('timed');
+      const baseline = await gm.evaluate(() => game.messages.size);
+      await nextTurn(gm);
+      const report = await reportOf(baseline, 'turnStartReport');
+      await showChatLog(gm);
+      expect(Object.keys(await effectState('timed')), 'the expired effect stays until the button').toEqual([
+         'E2E Button Removed',
+      ]);
+      await card(gm, report.id).locator('button').first().click();
+      await expect.poll(async () => {
+         // A confirmation dialog stands between the button and the removal when effect deletions are confirmed.
+         const yes = gm.locator('dialog.application.dialog [data-action="yes"]');
+         if (await yes.count()) {
+            await yes.click();
+         }
+         return Object.keys(await effectState('timed'));
+      }, { message: 'the button removed the expired effect' }).toEqual([]);
+   });
+
+   for (const handling of [
+      'suppress',
+      'remove',
+   ]) {
+      test(`immunityHandling ${handling}: a timed effect covered by an immunity`, async () => {
+         await setWorldSetting(gm, 'immunityHandling', handling);
+         await setWorldSetting(gm, 'autoRemoveExpiredEffects', 'enabled');
+         await clearEffects('timed');
+         const timerName = `E2E Warded Timer ${handling}`;
+         await addEffect(gm, cast.timed.id, timerName, {
+            duration: DURATION_TURN_START,
+            remaining: 1,
+         });
+         expect(Object.keys(await effectState('timed')), 'the timer exists before the ward').toEqual([timerName]);
+         const wardId = await addEffect(gm, cast.timed.id, `E2E Ward ${handling}`, { duration: DURATION_PERMANENT });
+         await addRulesElement(gm, `${cast.timed.uuid}.ActiveEffect.${wardId}`, {
+            key: timerName,
+            operation: 'immunity',
+            selector: 'effect',
+         });
+         if (handling === 'remove') {
+            await expect.poll(async () => timerName in await effectState('timed'), { message: 'the timer was removed' })
+               .toBe(false);
+            return;
+         }
+         expect((await effectState('timed'))[timerName], 'suppressed, not removed').toBeDefined();
+         await startEncounter('timed');
+         const baseline = await gm.evaluate(() => game.messages.size);
+         await nextTurn(gm);
+         await expect.poll(async () => timerName in await effectState('timed'), { message: 'the timer expired away' })
+            .toBe(false);
+         const report = await reportOf(baseline, 'turnStartReport');
+         expect(report.system.effects.expired.map((entry) => [
+            entry.label,
+            entry.suppressedBy,
+         ])).toEqual([[timerName, [`E2E Ward ${handling}`]]]);
+      });
+   }
+});

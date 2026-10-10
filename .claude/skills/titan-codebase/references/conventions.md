@@ -961,6 +961,11 @@ at the repo root, so it catches v14 API breaks that the mocked Vitest tier canno
   layout, and the report cards of the HUD's direct actions), `combat-turns.spec.js` (turn effects replicated between
   clients, the sheet that opens at a turn start per setting, turn reports, the tags of conditions and turn effects in a
   report, a suppressed timed effect still counting down, and a placed token on a new scene with none active),
+  `turn-matrix.spec.js` (round and turn values through begin, next, previous, wrap-around and the round buttons, the
+  tracker DOM on three clients, expiry of every duration type under every Auto-remove value, the decrease setting,
+  revert of remaining, immunity handling at expiry, and every turn report setting value with apply and revert buttons;
+  its matrix constants live in `turnMatrix.js` and `tests/unit/TurnMatrixCoverage.test.js` checks them against the
+  duration types, the three-valued settings and the report types the turn code posts),
   `chat-cards.spec.js` (item and effect cards, the attack
   tags of a weapon, the tags of a rolled check card, and chat message mount keying), `macros.spec.js` (the item macros
   made by dragging an item row onto the hotbar), `ownership.spec.js` (OWNER, OBSERVER and LIMITED viewers of the TITAN
