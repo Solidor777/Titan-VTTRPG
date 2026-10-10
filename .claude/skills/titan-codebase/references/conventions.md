@@ -928,7 +928,7 @@ at the repo root, so it catches v14 API breaks that the mocked Vitest tier canno
   condition's situation), `resistance-checks.spec.js` (the Reflexes, Resilience and Willpower Resist buttons of a casting
   card and of item check cards: label, Difficulty 4 and Complexity extra successes + 1 whatever is spent or refunded on
   the card, the Resist dialog, success exactly at the Complexity, the damage taken, several buttons and several checks),
-  `opposed-checks.spec.js` (the Opposed button of an item check for 0, 1, 2 and 5 extra successes, skill- and
+  `chat-visibility.spec.js` and `chat-visibility-reports.spec.js` (four simultaneous clients, GM 1, GM 2, Player 1, Player 2: the chat mode buttons; plain chat, `/w` whispers, the five check kinds, the seven item cards, the effect card and the initiative roll in every mode; HUD utility reports and turn reports whispered to owners; each client's chat log DOM live and after a reload), `opposed-checks.spec.js` (the Opposed button of an item check for 0, 1, 2 and 5 extra successes, skill- and
   attribute-opposed, damage reduced by the opposed check, an opposed check beside a resistance check, the Opposed
   dialog, a casting card that has no Opposed button), `attack-traits.spec.js` (all eighteen attack traits alone on forced
   attacks, combinations, the Armor math of Penetrating and Ineffective with the Ignore Armor and Half buttons, Cleave and

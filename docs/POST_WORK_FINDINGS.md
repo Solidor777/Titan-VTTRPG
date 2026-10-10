@@ -417,3 +417,16 @@ later target.
   (`AttackCheckChatDamageButtons.svelte`), the item, casting and Resistance cards' button applies
   `Math.floor(damage / 2)` (`ChatMessageDamageButtons.svelte`), so half of 1 damage lands as 1 from an attack card and as
   nothing from the others. Read, not run; no rule in the compendium was found for it.
+
+### Chat visibility is applied by the client, not by delivery (2026-10-10, measured by `chat-visibility.spec.js`)
+
+- Measured (run `t6-logs/run2.log`): a message whispered or blind to other users is still held in `game.messages` of a
+  player who is not a recipient (`game.messages.has(id)` was true for Player 2 on a GM-mode message); the chat log DOM
+  does not show it (`ChatMessage#visible`, Foundry 14.364 `client/documents/chat-message.mjs:101`). The specs therefore
+  assert the DOM.
+- Measured (run `t6-logs/run3.log`, specs 5-12 passed with the audience below): a Self message is in the chat log of its
+  sender only; GMs do not see a Self message of a player. A GM-mode and a Blind message are in the logs of both GMs and
+  the sender.
+- Read, not measured: `ChatMessage#visible` returns true for any whispered message that carries rolls
+  (`chat-message.mjs:101-106`), so an initiative roll from the sheet button shows its entry to every client with its
+  content hidden by core (`isContentVisible`); `chat-visibility.spec.js` asserts the dice are absent for non-recipients.
