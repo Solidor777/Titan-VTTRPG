@@ -8,7 +8,7 @@ import {
    createCombat,
    createScene,
    endCombat,
-   nextTurn,
+   openSidebarTab,
    placeToken,
    rollInitiative,
    setOwnership,
@@ -247,9 +247,15 @@ test.describe('hooks mirrored over the socket', () => {
          { timeout: 1000 },
       );
 
+      // Beginning the combat fires the turn hook on the GM's client; the spy starts counting after it.
+      await gm.evaluate(() => {
+         globalThis.__hookCalls.length = 0;
+      });
+
       // Presence: the player ends the turn of the character the player owns with the tracker's Next Turn button, and
       // the GM's client receives the hook with the combatant whose turn ended.
-      await nextTurn(player);
+      await openSidebarTab(player, 'combat');
+      await player.locator('#sidebar section.tab#combat button.combat-control-lg[data-action="nextTurn"]').click();
       await expect.poll(() => callsOf(gm, 'combatNextTurn'), { message: 'the owner\'s turn end reached the GM' })
          .toEqual([
             [
