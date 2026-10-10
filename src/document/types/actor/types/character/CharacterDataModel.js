@@ -4581,6 +4581,11 @@ export default class CharacterDataModel extends TitanActorDataModel {
                   woundsSuffered = 1;
                }
 
+               // Ineffective attacks can only inflict 1 Wound per attack.
+               if (options?.ineffective) {
+                  woundsSuffered = Math.min(woundsSuffered, 1);
+               }
+
                // Update the wounds.
                wounds.value = Math.min(wounds.value + woundsSuffered, wounds.max);
             }
@@ -4926,9 +4931,8 @@ export default class CharacterDataModel extends TitanActorDataModel {
                }
             }
 
-            // If armor is magical, and the attack is not magical, then the rend.
-            // should be resisted.
-            const armorLost = (!isArmorMagical || options?.magical !== true) ?
+            // Magical armor can only be rent by a magical attack; the rend of any other attack is resisted.
+            const armorLost = (!isArmorMagical || options?.magical === true) ?
                Math.min(armor.system.armor.value, rend) :
                0;
 
