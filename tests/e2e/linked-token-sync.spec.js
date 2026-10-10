@@ -4,6 +4,7 @@ import { login, openSheetByUuid } from './fixtures.js';
 import {
    activateScene,
    addEffect,
+   controlPlacedToken,
    createActor,
    createOwnedItem,
    createScene,
@@ -171,17 +172,18 @@ async function openTokenConfig(tokenId) {
 /**
  * Closes the Token HUD the way a user does: a click on the token.
  * @param {string} tokenId - The token whose HUD is open.
+ * @param {import('@playwright/test').Page} [page] - The client; the GM's by default.
  * @returns {Promise<void>} Resolves once the HUD is hidden.
  */
-async function closeHud(tokenId) {
+async function closeHud(tokenId, page = gm) {
    /** @type {{x: number, y: number}} The token's centre in client coordinates. */
-   const centre = await gm.evaluate(
+   const centre = await page.evaluate(
       (tokenId) => canvas.clientCoordinatesFromCanvas(canvas.scene.tokens.get(tokenId).object.center),
       tokenId,
    );
-   await restOnToken(gm, tokenId, centre);
-   await gm.mouse.click(centre.x, centre.y);
-   await expect(gm.locator('#token-hud')).toBeHidden();
+   await restOnToken(page, tokenId, centre);
+   await page.mouse.click(centre.x, centre.y);
+   await expect(page.locator('#token-hud')).toBeHidden();
 }
 
 /**
@@ -523,6 +525,76 @@ test.describe('actor changes reach the tokens and the other client, both ways', 
    });
 });
 
+test.describe('player seat and controlled-token HUD', () => {
+   test('the Player HUD bar of a GM-controlled token writes the actor on both clients', async () => {
+      await setResource(gm, `Actor.${actorId}`, 'stamina', 2);
+      await closeAllApps(gm);
+      await controlPlacedToken(gm, linkedTokens[0]);
+      const input = gm.locator('[data-testid="player-hud-bar-stamina-input"]');
+      await expect(input).toHaveValue('2');
+      await commitText(input, 1);
+      await expectSystemEverywhere('resource.stamina.value', 1);
+      await expect(playerHud('player-hud-bar-stamina-input')).toHaveValue('1');
+      await expect(input).toHaveValue('1');
+   });
+
+   test('the portrait button opens no picker for a player without file browsing, and does for the GM', async () => {
+      // The picker refuses a user without FILES_BROWSE, default Trusted (`client/applications/apps/file-picker.mjs:648`,
+      // `common/constants.mjs:1303-1307`).
+      const gmSheet = await openSheetByUuid(gm, `Actor.${actorId}`);
+      await gmSheet.locator('.portrait button').first().click();
+      await expect(gm.locator('#file-picker'), 'the GM gets the picker').toBeVisible();
+      await closeAllApps(gm);
+      await expect(gm.locator('#file-picker')).toHaveCount(0);
+
+      const playerSheet = await openSheetByUuid(player, `Actor.${actorId}`);
+      const before = await read(player, '(actor) => actor.img');
+      await playerSheet.locator('.portrait button').first().click();
+      await settle(player);
+      await expect(player.locator('#file-picker'), 'the player gets no picker').toHaveCount(0);
+      expect(await read(player, '(actor) => actor.img'), 'the portrait is unchanged').toBe(before);
+   });
+
+   test('a player's Token HUD has the bars and elevation but no configuration, lock or visibility', async () => {
+      // GM presence: the same HUD shows all three (`templates/hud/token-hud.hbs:15,30,43`).
+      const gmCentre = await hoverToken(gm, linkedTokens[1]);
+      await gm.mouse.click(gmCentre.x, gmCentre.y, { button: 'right' });
+      await expect(gm.locator('#token-hud [data-action="config"]')).toHaveCount(1);
+      await expect(gm.locator('#token-hud [data-action="locked"]')).toHaveCount(1);
+      await expect(gm.locator('#token-hud [data-action="visibility"]')).toHaveCount(1);
+      await closeHud(linkedTokens[1]);
+
+      // The player's HUD: the owner may open it (`token.mjs:4713-4721`); the configuration button needs
+      // TOKEN_CONFIGURE (`token-hud.mjs:60`), the lock and visibility buttons a GM (`token-hud.hbs:15,43`).
+      const centre = await hoverToken(player, linkedTokens[1]);
+      await player.mouse.click(centre.x, centre.y, { button: 'right' });
+      await expect(player.locator('#token-hud')).toBeVisible();
+      await expect(player.locator('#token-hud input[name="elevation"]')).toBeVisible();
+      await expect(player.locator('#token-hud [data-action="config"]')).toHaveCount(0);
+      await expect(player.locator('#token-hud [data-action="locked"]')).toHaveCount(0);
+      await expect(player.locator('#token-hud [data-action="visibility"]')).toHaveCount(0);
+
+      // The bar writes the actor; the elevation writes the token. Both reach the GM.
+      const bar = player.locator('#token-hud input[name="bar1"]');
+      await bar.fill('2');
+      await bar.press('Enter');
+      await expectSystemEverywhere('resource.stamina.value', 2);
+      const elevation = player.locator('#token-hud input[name="elevation"]');
+      await elevation.fill('2');
+      await elevation.press('Enter');
+      for (const page of [
+         gm,
+         player,
+      ]) {
+         await expect.poll(
+            async () => (await readToken(page, linkedTokens[1])).elevation,
+            { message: 'the player's HUD elevation reached the token' },
+         ).toBe(2);
+      }
+      await closeHud(linkedTokens[1], player);
+   });
+});
+
 test.describe('token changes', () => {
    test('a placed linked token is configured alone: size, elevation, name and image', async () => {
       const [first, second] = linkedTokens;
@@ -556,8 +628,10 @@ test.describe('token changes', () => {
             .toBe(prototypeBefore);
          expect(await read(page, '(actor) => actor.img'), 'the actor image is untouched').toBe('icons/svg/skull.svg');
       }
-      expect(await read(player, '(actor, tokens) => tokens[0].object.nameplate.text'), 'the canvas nameplate')
-         .toBe('E2E Sync Placed Only');
+      await expect.poll(
+         () => read(player, '(actor, tokens) => tokens[0].object.nameplate.text'),
+         { message: 'the canvas nameplate on the player client' },
+      ).toBe('E2E Sync Placed Only');
       await closeAllApps(gm);
    });
 
@@ -567,7 +641,7 @@ test.describe('token changes', () => {
       await sheet.locator('.edit-token-button').click();
 
       /** @type {import('@playwright/test').Locator} The prototype token configuration window. */
-      const config = gm.locator('.application', { has: gm.locator('nav.tabs [data-tab="appearance"]') });
+      const config = gm.locator('.application.prototype-token-config');
       await expect(config).toBeVisible();
       await config.locator('nav.tabs [data-tab="identity"]').click();
       await config.locator('input[name="name"]').fill('E2E Sync Prototype');
@@ -606,6 +680,9 @@ test.describe('token changes', () => {
    });
 
    test('the player has no Edit Token control while the GM has', async () => {
+      // The denial rests on the default TOKEN_CONFIGURE role, Trusted (`common/constants.mjs:1393-1397`).
+      expect(await player.evaluate(() => game.user.role), 'the seat is a plain Player')
+         .toBe(await player.evaluate(() => CONST.USER_ROLES.PLAYER));
       const gmSheet = await openSheetByUuid(gm, `Actor.${actorId}`);
       await expect(gmSheet.locator('.edit-token-button')).toHaveCount(1);
       const playerSheet = await openSheetByUuid(player, `Actor.${actorId}`);
