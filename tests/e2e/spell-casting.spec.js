@@ -37,9 +37,11 @@ import { attachPageErrors, clearChat, closeAllApps } from './world.js';
 /**
  * Casting a spell through the entry points a user has: the spell sheet's roll button, the character sheet's spell row,
  * the Player HUD's Spells category and a player's own client. The expected numbers are worked out by hand from the
- * aspect costs of the spell (`SpellAspects.js`) and the rules text: the total aspect cost is the sum of the enabled
- * standard aspects' costs and the custom aspects' costs; a total of 5 or less is Difficulty 4 (5 when the total is 5)
- * and Complexity 1, and a larger total is Difficulty 5 and Complexity total - 4. Every die the roll uses is forced.
+ * aspect costs of the spell (`SpellAspects.js`) and the cost rules of `CalculateSpellAspectCosts.js` (the rules text
+ * publishes no spell-aspect costs, so these are the system's own): the total aspect cost is the sum of the enabled
+ * standard aspects' costs and the custom aspects' costs. A total of 4 or less is Difficulty 4 and Complexity 1, a
+ * total of 5 is Difficulty 5 and Complexity 1, and a larger total is Difficulty 5 and Complexity total - 4. Every die
+ * the roll uses is forced.
  */
 
 /** @type {import('@playwright/test').Page} The page of E2E GM 1, who builds the documents. */
@@ -241,6 +243,15 @@ test.describe('the three entry points give the same card', () => {
 
 test.describe('failed casts', () => {
    test('no success at all fails and applies nothing', async () => {
+      // Presence on the same spell cast the same way: a successful cast shows scaling aspects and damage buttons.
+      await forceDice(gm, MULTI_FACES);
+      /** @type {{id: string}} The successful cast. */
+      const succeeded = await castFromSpellSheet(gm, multi.uuid);
+      /** @type {import('@playwright/test').Locator} The successful cast's card. */
+      const succeededCard = await openCard(gm, succeeded.id);
+      await expect(succeededCard.locator('.aspects'), 'a successful cast shows scaling aspects').toHaveCount(1);
+      await expect(succeededCard.locator('.damage-buttons'), 'a successful cast shows damage buttons').toHaveCount(1);
+      await closeAllApps(gm);
       await forceDice(gm, [
          2,
          2,
@@ -563,8 +574,10 @@ test.describe('Resolve spent by a cast', () => {
       await setClientSetting(gm, 'getCheckOptions', 'always');
 
       /**
-       * Casts with Training doubled in the dialog and returns the Resolve the cast spent.
-       * @returns {Promise<number>} The Resolve before the cast minus the Resolve after it.
+       * Casts with Training doubled in the dialog and returns the Resolve before the cast. The roll spends its Resolve
+       * before it posts the card (`_rollCheck` awaits `_expendCheckResolve`), so once the card exists the Resolve is
+       * final.
+       * @returns {Promise<number>} The Resolve before the cast.
        */
       async function castDoubled() {
          /** @type {number} The Resolve before the cast. */
@@ -588,13 +601,19 @@ test.describe('Resolve spent by a cast', () => {
          const message = await readNewestCheckFlags(gm, baseline, 'castingCheck');
          expect(message.parameters.totalDice, 'Training was doubled').toBe(7);
          await resetDice(gm);
-         await settle(gm);
-         return before - await readResolve();
+         return before;
       }
 
-      expect(await castDoubled(), 'the setting is on, so the cast spent 1 Resolve').toBe(1);
+      // Presence: the setting is on, so the cast spends 1 Resolve.
+      /** @type {number} The Resolve before the first cast. */
+      const first = await castDoubled();
+      await expect.poll(readResolve, { message: 'the setting is on, so the cast spent 1 Resolve' }).toBe(first - 1);
+
+      // Absence on the same character and the same dialog flow: the setting is off, so the second cast spends nothing.
       await setClientSetting(gm, 'autoSpendResolveDoubleTraining', false);
-      expect(await castDoubled(), 'the setting is off, so the cast spent nothing').toBe(0);
+      /** @type {number} The Resolve before the second cast. */
+      const second = await castDoubled();
+      expect(await readResolve(), 'the setting is off, so the cast spent nothing').toBe(second);
    });
 
    test('a failed cast still spends the Resolve of the doubled Training', async () => {

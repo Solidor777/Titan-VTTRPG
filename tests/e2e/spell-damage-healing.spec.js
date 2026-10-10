@@ -1,6 +1,8 @@
 import { expect, test } from './harness.js';
+import { clickSheetTab, commitText } from './actions.js';
+import { DAMAGE_ICON, HALF_DAMAGE_ICON, HEALING_ICON, IGNORE_ARMOR_ICON } from '~/system/Icons.js';
 import { forceDice, resetDice } from './dice.js';
-import { login } from './fixtures.js';
+import { login, openSheetByUuid } from './fixtures.js';
 import {
    addRulesElement,
    createActor,
@@ -407,6 +409,33 @@ test.describe('the Apply buttons of a casting card', () => {
          type: 'player',
       });
       await setAttributeBase(gm, `Actor.${targetId}`, 'body', 6);
+
+      // The target wears Armor 1, made and equipped through the armor sheet and the Inventory tab.
+      /** @type {string} The id of the target's armor. */
+      const armorId = await createOwnedItem(gm, targetId, 'armor', 'E2E DH Armor');
+      /** @type {string} The uuid of the target's armor. */
+      const armorUuid = `Actor.${targetId}.Item.${armorId}`;
+      /** @type {import('@playwright/test').Locator} The armor sheet's Armor stat. */
+      const armorStat = (await openSheetByUuid(gm, armorUuid)).locator('.header .stat, .header .labeled-element')
+         .filter({ has: gm.getByText('Armor', { exact: true }) }).last();
+      await commitText(armorStat.locator('input').nth(1), '1');
+      await commitText(armorStat.locator('input').nth(0), '1');
+      await expect.poll(
+         () => gm.evaluate(async (uuid) => (await fromUuid(uuid)).system.armor, armorUuid),
+         { message: 'the inputs stored Armor 1' },
+      ).toMatchObject({
+         max: 1,
+         value: 1,
+      });
+      /** @type {import('@playwright/test').Locator} The target's sheet, on the Inventory tab. */
+      const targetSheet = await openSheetByUuid(gm, `Actor.${targetId}`);
+      await clickSheetTab(targetSheet, 'Inventory');
+      await targetSheet.locator(`[data-item-id="${armorId}"]`).getByRole('button', { name: 'Equipped' }).first()
+         .click();
+      await expect.poll(
+         () => gm.evaluate((id) => game.actors.get(id).system.getEquippedArmor()?.name ?? null, targetId),
+         { message: 'the toggle equipped the armor' },
+      ).toBe('E2E DH Armor');
       await viewScene(gm, await shared(gm, 'scene'));
       targetTokenId = await placeToken(gm, targetId);
       spell = await buildSpell(gm, boostedId, 'E2E DH Apply Spell', {
@@ -434,7 +463,7 @@ test.describe('the Apply buttons of a casting card', () => {
    test('Apply Damage, Half Damage, Ignore Armor, Heal and Heal N Damage change the target\'s Stamina by the card\'s '
       + 'current amounts', async () => {
       test.setTimeout(120_000);
-      await setResource(gm, `Actor.${targetId}`, 'stamina', 12);
+      await setResource(gm, `Actor.${targetId}`, 'stamina', 11);
       expect(await gm.evaluate((id) => game.actors.get(id).system.resource.stamina.max, targetId), 'maximum 16')
          .toBe(16);
 
@@ -446,13 +475,18 @@ test.describe('the Apply buttons of a casting card', () => {
       await closeAllApps(gm);
       await targetPlacedToken(gm, targetTokenId);
 
-      /** @type {import('@playwright/test').Locator} The card's damage buttons: damage, ignore armor, half, heal. */
-      const damageButtons = cast.card.locator('.damage-buttons .button button');
-      await expect(damageButtons, 'the card offers four damage buttons').toHaveCount(4);
+      /**
+       * Finds a button of the card's damage row by the icon it shows.
+       * @param {string} icon - The icon's class list, as `Icons.js` names it.
+       * @returns {import('@playwright/test').Locator} The button.
+       */
+      const damageButton = (icon) => cast.card.locator('.damage-buttons .button')
+         .filter({ has: gm.locator(`i.${icon.split(' ').join('.')}`) }).locator('button');
+      await expect(cast.card.locator('.damage-buttons .button'), 'the card offers four damage buttons').toHaveCount(4);
 
-      // Apply Damage at the roll's 3: 12 - 3 = 9.
-      await damageButtons.nth(0).click();
-      await expect.poll(readStamina, { message: 'Apply Damage took 3' }).toBe(9);
+      // Armor 1 resists 1 point of Apply Damage. At the roll's 3: 11 - (3 - 1) = 9.
+      await damageButton(DAMAGE_ICON).click();
+      await expect.poll(readStamina, { message: 'Apply Damage took 3 less the Armor 1' }).toBe(9);
 
       // The Heal N Damage button heals the card's 5: 9 + 5 = 14.
       await cast.card.getByRole('button', { name: 'Heal 5 Damage' }).click();
@@ -469,25 +503,25 @@ test.describe('the Apply buttons of a casting card', () => {
       await expect(cast.card.getByRole('button', { name: 'Heal 7 Damage' }), 'the button follows the healing')
          .toBeVisible();
 
-      // Apply Damage at 5: 14 - 5 = 9.
-      await damageButtons.nth(0).click();
-      await expect.poll(readStamina, { message: 'Apply Damage took 5' }).toBe(9);
+      // Apply Damage at 5 with Armor 1: 14 - 4 = 10.
+      await damageButton(DAMAGE_ICON).click();
+      await expect.poll(readStamina, { message: 'Apply Damage took 5 less the Armor 1' }).toBe(10);
 
-      // Half Damage is floor(5 / 2) = 2: 9 - 2 = 7.
-      await damageButtons.nth(2).click();
-      await expect.poll(readStamina, { message: 'Half Damage took 2' }).toBe(7);
+      // Half Damage is floor(5 / 2) = 2, which Armor 1 reduces to 1: 10 - 1 = 9.
+      await damageButton(HALF_DAMAGE_ICON).click();
+      await expect.poll(readStamina, { message: 'Half Damage took 2 less the Armor 1' }).toBe(9);
 
-      // Ignore Armor takes all 5 from a target with no armor: 7 - 5 = 2.
-      await damageButtons.nth(1).click();
-      await expect.poll(readStamina, { message: 'Ignore Armor took 5' }).toBe(2);
+      // Ignore Armor takes all 5 past the Armor: 9 - 5 = 4.
+      await damageButton(IGNORE_ARMOR_ICON).click();
+      await expect.poll(readStamina, { message: 'Ignore Armor took 5' }).toBe(4);
 
-      // The heal button of the damage row heals the damage amount, 5: 2 + 5 = 7.
-      await damageButtons.nth(3).click();
-      await expect.poll(readStamina, { message: 'the damage row\'s heal button restored 5' }).toBe(7);
+      // The heal button of the damage row heals the damage amount, 5: 4 + 5 = 9.
+      await damageButton(HEALING_ICON).click();
+      await expect.poll(readStamina, { message: 'the damage row heal button restored 5' }).toBe(9);
 
-      // Heal 7 Damage: 7 + 7 = 14.
+      // Heal 7 Damage: 9 + 7 = 16, the maximum.
       await cast.card.getByRole('button', { name: 'Heal 7 Damage' }).click();
-      await expect.poll(readStamina, { message: 'Heal 7 Damage restored 7' }).toBe(14);
+      await expect.poll(readStamina, { message: 'Heal 7 Damage restored 7' }).toBe(16);
    });
 
    test('healing stops at the Stamina maximum', async () => {
