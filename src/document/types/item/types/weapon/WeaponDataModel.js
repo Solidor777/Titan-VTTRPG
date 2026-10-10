@@ -40,6 +40,7 @@ export default class WeaponDataModel extends RulesElementItemDataModel {
       retVal.rarity = this.rarity;
       retVal.value = this.value;
       retVal.equipped = this.equipped;
+      retVal.multiAttack = this.multiAttack;
       retVal.attack = structuredClone(this.attack);
       retVal.attackNotes = this.attackNotes;
       retVal.trait = structuredClone(this.trait);

@@ -26,6 +26,9 @@ export default function createWeaponSystemTemplate() {
       // Whether the weapon is currently equipped.
       equipped: false,
 
+      // Whether the weapon's attacks are Multi-Attacks: each attack rolls half the dice and half the Expertise.
+      multiAttack: false,
+
       // Attacks: one representative element so the element schema mirrors a real weapon attack.
       attack: [
          createWeaponAttackTemplate(),

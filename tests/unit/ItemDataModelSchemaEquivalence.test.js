@@ -103,6 +103,7 @@ const GOLDENS = {
       rarity: stringField('common'),
       value: integerField(0),
       equipped: booleanField(false),
+      multiAttack: booleanField(false),
       attack: {
          element: objectElement(),
          initial: [
