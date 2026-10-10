@@ -513,7 +513,7 @@ selector (keys resolved by `_getSelectorKeys`, which maps `training`/`expertise`
 otherwise reads `Object.keys(this[selector])`); an element whose selector resolves to no keys (a typed custom trait,
 spell tradition, or situation label, or any non-stat selector) passes through unchanged with its key as typed. Any
 operation carrying a key supports `'all'` at the engine level (`flatModifier`/`mulSum`/`setSum` are the additive/sum ops
-that use it), but the settings UI only exposes the `'all'` option (`allowAll` on the key select) for `mulSum` and
+that use it), but the settings UI only exposes the `'all'` option (`allowAll` on the key select) for `flatModifier`, `mulSum` and
 `setSum`.
 
 It then sorts the expanded elements into per-operation arrays and invokes per-op appliers in a fixed order:

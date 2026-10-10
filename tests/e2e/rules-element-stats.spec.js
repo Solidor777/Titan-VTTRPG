@@ -497,6 +497,37 @@ test.describe('element sources and native changes', () => {
       await expect(sheet.getByTestId('sheet-attribute-body'), 'unequipping removes the bonus').toHaveText('4');
    });
 
+   test('a Flat Modifier with the all key reaches every key of every selector it is offered for', async () => {
+      sourceUuid = `${actorUuid}.Item.${await createOwnedItem(page, actorId, 'ability', 'E2E stat all keys')}`;
+      /** @type {string[]} The selectors the Flat Modifier editor offers that the sheet shows a total for. */
+      const selectors = [
+         'attribute',
+         'resistance',
+         'rating',
+         'speed',
+         'resource',
+      ];
+
+      /** @type {Record<string, Record<string, number>>} The totals before the elements, by selector. */
+      const before = {};
+      for (const selector of selectors) {
+         before[selector] = await readSheet(selector, await keysOf(selector));
+         await author({
+            operation: 'flatModifier',
+            selector,
+            key: ALL_KEY,
+            value: 2,
+         });
+      }
+      for (const selector of selectors) {
+         /** @type {Record<string, number>} The totals with the element. */
+         const after = await readSheet(selector, Object.keys(before[selector]));
+         for (const [key, total] of Object.entries(before[selector])) {
+            expect(after[key], `${selector} ${key} under the all key`).toBe(total + 2);
+         }
+      }
+   });
+
    test('worn Heavy armor lowers every speed above 0 by 1, and Armor elements act on the armor value', async () => {
       /** @type {string} The armor's uuid. */
       const armorUuid = await wearArmor(page, actorId, 'E2E stat armor', 3);
