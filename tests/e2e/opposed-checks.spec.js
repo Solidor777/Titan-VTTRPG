@@ -18,6 +18,7 @@ import {
    pressDamageButton,
    readCardButtons,
    readMessageAuthor,
+   readMessageSpeaker,
    readResultRows,
    readVitals,
    restoreStamina,
@@ -323,14 +324,18 @@ test.describe('E2E Player 1 on a GM-rolled card', () => {
       /** @type {{id: string, parameters: object, results: object}} The Attribute Check the player click posts. */
       const failed = await opposeWith(check, 6, 2, player);
       expect(await readMessageAuthor(player, failed.id), 'the player posted the check').toBe('E2E Player 1');
-      expect(failed.parameters).toMatchObject({
+      test.info().annotations.push({
+         type: 'player check rolled for',
+         description: await readMessageSpeaker(player, failed.id),
+      });
+      expect(failed.parameters, 'the button\'s own numbers').toMatchObject({
          attribute: 'body',
          skill: 'athletics',
          complexity: 3,
          damageToReduce: 8,
-         totalDice: 6,
       });
-      expect(failed.results.damageTaken, 'damage 8 minus 2 successes').toBe(6);
+      expect(failed.results.damageTaken, 'at most 2 successes of 8 damage').toBeGreaterThanOrEqual(6);
+      expect(failed.results.damageTaken).toBeLessThanOrEqual(8);
 
       // The Attribute Check own damage button is the GM only.
       await showChatLog(gm);

@@ -31,6 +31,16 @@ export async function loginPlayer(browser) {
 }
 
 /**
+ * Reads the alias a chat message speaks as, as the given client holds it.
+ * @param {import('@playwright/test').Page} page - A logged-in page.
+ * @param {string} messageId - The id of the chat message.
+ * @returns {Promise<string>} The speaker's alias.
+ */
+export function readMessageSpeaker(page, messageId) {
+   return page.evaluate((id) => game.messages.get(id).speaker.alias, messageId);
+}
+
+/**
  * Makes a character the one that a player's chat-card buttons act on. A player's buttons act on the controlled tokens
  * first, then on the user's assigned character, then on the focused sheet, so this releases the tokens the client has
  * controlled and assigns the character to the user. Call `assignCharacter(page, previousId)` with the id this returns
