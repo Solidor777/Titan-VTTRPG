@@ -30,6 +30,7 @@ import WeaponDataModel from '~/document/types/item/types/weapon/WeaponDataModel.
 import localize from '~/helpers/utility-functions/Localize.js';
 import TitanCombat from '~/document/types/combat/TitanCombat.js';
 import SocketManager from '~/helpers/SocketManager.js';
+import authorizeCombatTurnHook from '~/hooks/AuthorizeCombatTurnHook.js';
 import onRelayChatMessageUpdate from '~/hooks/OnRelayChatMessageUpdate.js';
 import ArmorDataModel from '~/document/types/item/types/armor/ArmorDataModel.js';
 import TitanChatMessage from '~/document/types/chat-message/ChatMessage.js';
@@ -109,6 +110,8 @@ export default function onceInit() {
       socketManager: new SocketManager(),
    };
    game.titan.socketManager.registerRequestHandler('relayChatMessageUpdate', onRelayChatMessageUpdate);
+   game.titan.socketManager.registerMirroredHook('combatNextTurn', authorizeCombatTurnHook);
+   game.titan.socketManager.registerMirroredHook('combatPreviousTurn', authorizeCombatTurnHook);
 
    // Register system settings.
    registerSystemSettings();

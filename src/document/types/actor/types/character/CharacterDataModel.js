@@ -5528,7 +5528,7 @@ export default class CharacterDataModel extends TitanActorDataModel {
          await this._processExpiredEffects(autoRemoveExpiredEffectsSetting, expiredEffects, reportData);
 
          // Send a report if appropriate.
-         if (Object.keys(reportData).length > 0) {
+         if (this._hasTurnReportContent(reportData)) {
 
             // Prepare the report data.
             reportData.type = 'turnStartReport';
@@ -5597,7 +5597,7 @@ export default class CharacterDataModel extends TitanActorDataModel {
          await this._processExpiredEffects(autoRemoveExpiredEffectsSetting, expiredEffects, reportData);
 
          // Send a report if appropriate.
-         if (Object.keys(reportData).length > 0) {
+         if (this._hasTurnReportContent(reportData)) {
 
             // Prepare Titan Flags.
             reportData.type = 'turnEndReport';
@@ -5624,6 +5624,17 @@ export default class CharacterDataModel extends TitanActorDataModel {
          const turnEffects = this.parent.effects.filter((effect) =>
             effect.type === EFFECT_TYPE && effect.system.duration.type === selector);
          if (turnEffects.length > 0) {
+   /**
+    * Whether turn report data holds anything a card can show. The expired-effects-removed flag alone shows nothing:
+    * its message renders only beside a reported effect list, so a report holding only the flag would be a blank card.
+    * @param {object} reportData - The report data a turn start or turn end collected.
+    * @returns {boolean} True when the data holds content other than the removal flag.
+    * @private
+    */
+   _hasTurnReportContent(reportData) {
+      return Object.keys(reportData).some((key) => key !== 'expiredEffectsRemoved');
+   }
+
             for (const effect of turnEffects) {
                effect.system.duration.remaining -= 1;
                await effect.update({

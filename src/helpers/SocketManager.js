@@ -1,3 +1,5 @@
+import warn from '~/helpers/utility-functions/Warn.js';
+
 /**
  * Class for managing Socket Events sent by this system. Two kinds of message travel on the system socket:
  * hook broadcasts (`triggerSocketHook`), whose arguments are the sender's own claims, and requests to the active GM
@@ -9,6 +11,9 @@
 export default class SocketManager {
    /** @type {Map<string, Function>} The request handlers by request name; only the active GM's client runs them. */
    #handlers = new Map();
+
+   /** @type {Map<string, Function|undefined>} The hooks a remote client may fire here, with their authorization. */
+   #mirroredHooks = new Map();
 
    /** @type {Map<string, {resolve: Function, reject: Function, timer: number}>} Requests awaiting an answer. */
    #pending = new Map();
@@ -32,8 +37,42 @@ export default class SocketManager {
          this.#onReply(message, senderId);
       }
       else {
-         Hooks.callAll(message.id, ...message.args);
+         this.#onHook(message, senderId);
       }
+   }
+
+   /**
+    * Fires a mirrored hook. Only hooks registered with `registerMirroredHook` can be fired from the transport, and a
+    * remote sender must pass the hook's authorization with the sender id the server reports.
+    * @param {object} message - The hook message: `{ id, args }`.
+    * @param {string} senderId - The ID of the user who sent it, as the server reports it.
+    * @returns {Promise<void>} Resolves once the hook has fired or been refused.
+    */
+   async #onHook(message, senderId) {
+      if (!this.#mirroredHooks.has(message.id) || !Array.isArray(message.args)) {
+         warn(`A socket message named the hook "${message.id}", which is not mirrored; it was refused.`, senderId);
+         return;
+      }
+
+      /** @type {Function|undefined} The hook's authorization. */
+      const authorize = this.#mirroredHooks.get(message.id);
+      if (senderId !== game.user.id && authorize && !await authorize(senderId, ...message.args)) {
+         warn(`The mirrored hook "${message.id}" was refused: its sender may not fire it.`, senderId);
+         return;
+      }
+      Hooks.callAll(message.id, ...message.args);
+   }
+
+   /**
+    * Registers a hook that `triggerSocketHook` mirrors to every client. A hook that is not registered cannot be fired
+    * by a message on the socket, whoever sends it.
+    * @param {string} id - The hook name.
+    * @param {(senderId: string, ...args: *[]) => Promise<boolean>|boolean} [authorize] - Decides whether a remote
+    * sender may fire the hook here, from the sender the server reports and the hook's arguments; without it any
+    * connected user may.
+    */
+   registerMirroredHook(id, authorize = undefined) {
+      this.#mirroredHooks.set(id, authorize);
    }
 
    /**

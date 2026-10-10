@@ -3104,3 +3104,34 @@ The evidence files named here are in `.superpowers/sdd/2026-10-10-e2e-coverage/t
   stored. Covered by `resources.spec.js` (14 tests pass after the fix, `t4-logs/resources-run2.log`).
 - **Found:** 2026-10-10 while writing the resource meter tests.
 - **Status:** Closed 2026-10-10.
+
+### 164. Any client could fire any hook on every other client through the system socket
+
+- **What (read):** `SocketManager._onSocketReceived` called `Hooks.callAll(message.id, ...message.args)` for every
+  message on `system.titan` that was not a request or reply, so a client could emit `{ id, args }` with any hook name
+  (core hooks included) and have it fire on the GM's and every other client, and the two combat turn hooks accepted
+  any sender, who could thereby run turn effects (persistent damage, fast healing, resolve regain) for a combatant the
+  sender had no right to move. The live reproduction is `tests/e2e/socket-hooks.spec.js` (written, not run).
+- **Cause (read):** the receiver trusted the hook name and the sender of a message that any connected client can emit.
+- **Fixed:** 2026-10-10: only hooks registered with `SocketManager#registerMirroredHook` fire from the transport, and a
+  remote sender must pass the hook's authorization with the sender id the server reports. `combatNextTurn` and
+  `combatPreviousTurn` are the only registered hooks (`src/hooks/OnceInit.js`); their authorization
+  (`src/hooks/AuthorizeCombatTurnHook.js`) allows a GM, or the owner of the combatant whose turn ended. A refusal shows
+  a warning on the receiving client. `triggerSocketHook` still fires locally without the check, for registered names
+  only. Covered by `tests/unit/SocketManager.test.js`, `tests/unit/AuthorizeCombatTurnHook.test.js` and
+  `tests/e2e/socket-hooks.spec.js` (all written, not run).
+- **Found:** 2026-10-10 in the review of the GM relay.
+- **Status:** Closed 2026-10-10.
+
+### 166. A turn start or turn end posted a blank report card when only expired effects were removed
+
+- **What (read, not run):** with Report Effects off and Auto-remove Expired Effects on, an expiring effect set
+  `reportData.expiredEffectsRemoved = true` in `_processExpiredEffects`; `onTurnStart` and `onTurnEnd` posted a report
+  whenever `reportData` had any key, so a card holding only the header was whispered to the owners. The removed-effects
+  message renders only beside a reported effect list (`TurnStartReportChatMessage.svelte`,
+  `TurnEndReportChatMessage.svelte`), so the card showed nothing.
+- **Fixed:** 2026-10-10: `CharacterDataModel#_hasTurnReportContent` ignores the flag; both methods post only when
+  other content exists. Covered by "reportEffects false with Auto-remove enabled removes expired effects and posts no
+  blank report" in `turn-matrix.spec.js` (written, not run).
+- **Found:** 2026-10-10 while reading the turn code for the turn matrix.
+- **Status:** Closed 2026-10-10.
