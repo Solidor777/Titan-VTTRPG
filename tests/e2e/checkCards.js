@@ -1,11 +1,18 @@
 import { expect } from '@playwright/test';
 import { clickSheetTab, commitText } from './actions.js';
 import { readNewestCheckFlags } from './checkDialog.js';
-import { createActor, createOwnedItem, readServerSystem, setAttributeBase, setEquipped } from './flows.js';
+import {
+   createActor,
+   createOwnedItem,
+   readServerSystem,
+   setAttributeBase,
+   setEquipped,
+   setResource,
+} from './flows.js';
 import { login, openSheetByUuid } from './fixtures.js';
 import { selectTitanOption } from './select.js';
 import { settle } from './settle.js';
-import { showChatLog } from './world.js';
+import { closeAllApps, showChatLog } from './world.js';
 
 // Page objects for the cards of item checks and attack checks, the buttons those cards offer (Resist, Opposed, the
 // damage buttons), the character that those buttons act on, and the settings of an item check row that `addCheck` does
@@ -21,6 +28,43 @@ export async function loginPlayer(browser) {
    const page = await (await browser.newContext()).newPage();
    await login(page, 'E2E Player 1');
    return page;
+}
+
+/**
+ * Makes a character the one that a player's chat-card buttons act on. A player's buttons act on the controlled tokens
+ * first, then on the user's assigned character, then on the focused sheet, so this releases the tokens the client has
+ * controlled and assigns the character to the user. Call `assignCharacter(page, previousId)` with the id this returns
+ * to leave the user as it was.
+ * @param {import('@playwright/test').Page} page - A logged-in player page.
+ * @param {string} actorId - The id of the character the buttons should act on.
+ * @returns {Promise<string|null>} The id of the character the user had assigned before, or null for none.
+ */
+export async function actAsCharacter(page, actorId) {
+   /** @type {string|null} The character assigned before. */
+   const previous = await page.evaluate(() => game.user.character?.id ?? null);
+   await page.evaluate(() => canvas.tokens?.releaseAll());
+   await expect.poll(
+      () => page.evaluate(() => canvas.tokens?.controlled.length ?? 0),
+      { message: 'no token is controlled' },
+   ).toBe(0);
+   await assignCharacter(page, actorId);
+   return previous;
+}
+
+/**
+ * Assigns a character to the logged-in user (or none), as the User Configuration's Character field does.
+ * @param {import('@playwright/test').Page} page - A logged-in page.
+ * @param {string|null} actorId - The id of the character, or null for none.
+ * @returns {Promise<void>} Resolves once the client holds the assignment.
+ */
+export async function assignCharacter(page, actorId) {
+   if (await page.evaluate(() => game.user.character?.id ?? null) !== actorId) {
+      await page.evaluate((id) => game.user.update({ character: id }), actorId);
+   }
+   await expect.poll(
+      () => page.evaluate(() => game.user.character?.id ?? null),
+      { message: 'the user holds the assigned character' },
+   ).toBe(actorId);
 }
 
 /**
@@ -284,6 +328,22 @@ export function readVitals(page, actorId) {
          woundsMax: resource.wounds.max,
       };
    }, actorId);
+}
+
+/**
+ * Tops a character's Stamina up to its maximum with the Stamina input of the sheet, so that the damage a test applies
+ * does not depend on what earlier tests took.
+ * @param {import('@playwright/test').Page} page - A logged-in GM page.
+ * @param {string} actorId - The id of the character.
+ * @returns {Promise<void>} Resolves once the character has full Stamina and the sheet is closed.
+ */
+export async function restoreStamina(page, actorId) {
+   /** @type {{stamina: number, staminaMax: number}} The character's Stamina. */
+   const { stamina, staminaMax } = await readVitals(page, actorId);
+   if (stamina < staminaMax) {
+      await setResource(page, `Actor.${actorId}`, 'stamina', staminaMax);
+      await closeAllApps(page);
+   }
 }
 
 /**

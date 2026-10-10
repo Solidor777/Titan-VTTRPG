@@ -14,6 +14,8 @@ import {
 } from './spellCasting.js';
 import {
    cardButton,
+   actAsCharacter,
+   assignCharacter,
    cardOf,
    clickResist,
    createCharacter,
@@ -25,6 +27,7 @@ import {
    readMessageAuthor,
    readResultRows,
    readVitals,
+   restoreStamina,
    rollItemCheck,
    setCheckExtras,
    setCustomAspectResistance,
@@ -48,6 +51,8 @@ import { attachPageErrors, clearChat, closeAllApps, showChatLog } from './world.
 let gm;
 /** @type {import('@playwright/test').Page} The page of E2E Player 1, who owns the defender. */
 let player;
+/** @type {string|null|undefined} The character assigned to E2E Player 1 before the spec (undefined until read). */
+let playerCharacter;
 /** @type {string} The id of the defender with Body 8, Mind 2 and Soul 2. */
 let oddDefenderId;
 /** @type {string} The id of the defender with the Stamina to absorb the half-damage tests. */
@@ -154,6 +159,14 @@ async function rollWith(itemUuid, index, successes) {
 async function resistWith(cast, resistance, successes, { page = gm, actorId = defenderId, dice } = {}) {
    await focusCharacter(page, `Actor.${actorId}`);
    await showChatLog(page);
+   if (page === player) {
+      // A player's buttons act on controlled tokens, then the assigned character, then the focused sheet.
+      /** @type {string|null} The character assigned before this click. */
+      const previous = await actAsCharacter(page, actorId);
+      if (playerCharacter === undefined) {
+         playerCharacter = previous;
+      }
+   }
    await forceDice(page, facesWith(dice ?? DEFENDER_DICE[resistance], successes));
 
    /** @type {{id: string, parameters: object, results: object}} The Resistance Check. */
@@ -211,6 +224,9 @@ test.afterEach(async () => {
 });
 
 test.afterAll(async () => {
+   if (playerCharacter !== undefined) {
+      await assignCharacter(player, playerCharacter);
+   }
    await flushPageErrors(player);
    await player?.context().close();
    await gm?.close();
@@ -528,9 +544,10 @@ test.describe('casting cards with fewer or more Resist buttons', () => {
       const cast = await castWith(single.uuid, 1);
       expect(cast.results.damage, 'a damage of 1').toBe(1);
 
+      await restoreStamina(gm, hardyId);
+
       /** @type {{report: object, before: {stamina: number}, after: {stamina: number}}} The press of the Half button. */
       const half = await pressDamageButton(gm, cast.id, hardyId, 'half');
-      expect(half.before.stamina, 'the defender can absorb it').toBeGreaterThanOrEqual(8);
       expect(half.report.damageTaken, 'half of 1 is at least 1').toBe(1);
       expect(half.before.stamina - half.after.stamina).toBe(1);
    });
@@ -894,8 +911,8 @@ test.describe('item check cards with a Resist button', () => {
       /** @type {object} The rolled check and its card in the GM's chat log. */
       const seven = await rollWith(strikes, 0, 3);
       /** @type {object} The damage report and the defender's vitals around the click. */
+      await restoreStamina(gm, hardyId);
       const halfSeven = await pressDamageButton(gm, seven.id, hardyId, 'half');
-      expect(halfSeven.before.stamina, 'the defender can absorb it').toBeGreaterThanOrEqual(8);
       expect(halfSeven.report.damageTaken, 'half of 7 rounded down').toBe(3);
       expect(halfSeven.before.stamina - halfSeven.after.stamina).toBe(3);
 
@@ -903,6 +920,7 @@ test.describe('item check cards with a Resist button', () => {
       const one = await rollWith(strikes, 5, 4);
       expect(one.results.damage, 'a damage that does not scale').toBe(1);
       /** @type {object} The damage report and the defender's vitals around the click. */
+      await restoreStamina(gm, hardyId);
       const halfOne = await pressDamageButton(gm, one.id, hardyId, 'half');
       expect(halfOne.report.damageTaken, 'half of 1 is at least 1').toBe(1);
       expect(halfOne.before.stamina - halfOne.after.stamina).toBe(1);
@@ -916,6 +934,7 @@ test.describe('item check cards with a Resist button', () => {
       const failed = await resistWith(strike, 'reflexes', 0);
       expect(failed.results.damageTaken, 'the whole damage of 1').toBe(1);
       /** @type {object} The damage report and the defender's vitals around the click. */
+      await restoreStamina(gm, hardyId);
       const half = await pressDamageButton(gm, failed.id, hardyId, 'half');
       expect(half.report.damageTaken, 'half of 1 is at least 1').toBe(1);
       expect(half.before.stamina - half.after.stamina).toBe(1);
