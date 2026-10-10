@@ -91,6 +91,14 @@ the chat-log Re-roll Failures, Double Training, and Double Expertise entries (`s
 the reset-Expertise button, and per-die Expertise — and `CheckChatMessageDie` styles each die as a failure (a 1 as a
 critical failure).
 
+Scaling aspects of a casting check: `getCastingCheckParameters` (`CharacterDataModel.js`, `processAspects`) skips a
+standard aspect whose derived `enabled` is `false` and lists an aspect as scaling only when `scaling` is set and its
+step cost, `scalingCost ?? cost`, is at least 1 (a step that costs nothing could not be bounded by the extra
+successes). The card's step cost is that value, so a resistance check that halves an aspect's cost halves its step
+cost too unless the aspect has a `scalingCost` (Damage and Duration do). Each step moves the value, and the damage or
+healing it carries, by `max(initialValue, 1)`. A Damage Mod or Healing Mod is added once, at roll time, and only to an
+amount above 0 (`CastingCheckResults.js`).
+
 Casting-check roll-time auto-max: `calculateCastingCheckResults`
 (src/check/types/casting-check/CastingCheckResults.js) auto-maximizes the SINGLE affordable scaling aspect
 at roll time — when exactly one scaling aspect has `cost <= extraSuccesses`, every whole purchase the extra

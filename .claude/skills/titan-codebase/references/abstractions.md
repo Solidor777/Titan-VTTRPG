@@ -903,7 +903,10 @@ sequencing future racy mutations.
 Listens on `system.titan` via `game.socket`. Received messages are dispatched as Foundry Hooks
 (`Hooks.callAll`). `triggerSocketHook(id, ...args)` fires the hook locally and emits it to all
 clients — the primary mechanism for cross-client automation (e.g., a player-owned actor applying
-damage on the GM's behalf).
+damage on the GM's behalf). `TitanChatMessage#update` uses it to relay a write: core lets only a message's author and
+a GM write a message, so a user who owns the speaking actor but did not author the card sends the `system` change with
+the hook `relayChatMessageUpdate` and `onRelayChatMessageUpdate` (`src/hooks/OnRelayChatMessageUpdate.js`) writes it on
+the active GM's client after re-checking the sender's ownership.
 
 **`utility-functions/`** (`src/helpers/utility-functions/`)
 

@@ -2941,3 +2941,67 @@ in).
   with the error and with the missing field (`mut-r8-casting-rows-loop-run.log`).
 - **Found:** 2026-10-09 while adding the casting-card spec.
 - **Status:** Closed 2026-10-09.
+
+### 155. A check never spent Resolve for doubled Training, doubled Expertise or a Resolve Cost
+
+The evidence files named here are in `.superpowers/sdd/2026-10-10-e2e-coverage/t1-logs/` (local, not checked in).
+
+- **What (measured):** a casting check rolled from its dialog with Double Training ticked, Expertise 1 and Double
+  Expertise ticked (settings `autoSpendResolveDoubleTraining` and `autoSpendResolveDoubleExpertise` on, their default)
+  left the character's Resolve at 3. The spec expected 1. The failing assertions were
+  `doubling Training and Expertise spent 2 Resolve` and `the failed cast spent 1 Resolve` (`resolve-before-fix.log`).
+- **Cause (read):** `CharacterDataModel#_rollCheck` called `this._expendCheckResolve(check)` with the `TitanCheck`
+  object (`src/document/types/actor/types/character/CharacterDataModel.js`, the `_rollCheck` body). `_expendCheckResolve`
+  reads `doubleTraining`, `doubleExpertise` and `resolveCost` from its argument, and a `TitanCheck` keeps them under
+  `check.parameters` (`src/check/Check.js` constructor), so every read was `undefined` and no Resolve was spent. All
+  five check types roll through `_rollCheck` (call sites in `CharacterDataModel.js` at the lines `await
+  this._rollCheck(check, checkMessages)`). Measured for the casting check only; the other four share the call and
+  are inferred to have been affected.
+- **Fixed:** 2026-10-10: `_rollCheck` passes `check.parameters`. `tests/e2e/spell-casting.spec.js` ("Resolve spent by a
+  cast") spends 2 Resolve for doubled Training and Expertise, spends 1 with the setting on and none with it off in
+  one test, and spends 1 on a failed cast. The mutation that restores `_expendCheckResolve(check)` fails all three
+  (`mutation-resolve.log`).
+- **Found:** 2026-10-10 while writing the Resolve test of the casting spec.
+- **Status:** Closed 2026-10-10.
+
+### 156. A spell's disabled standard aspect, and a custom aspect that costs nothing, scaled on the casting card
+
+- **What (measured):** a spell with Damage and a Decrease Mod aspect switched on with no option (the spell stores it as
+  disabled with a cost of 0) posted a casting card whose stored scaling aspects were `Damage` and `Decrease Mod`, and whose DOM listed a
+  `Decrease Mod` block with the cost `0 ES` (`spending2.log`, assertion `only Damage scales`; a probe run read the
+  block). Inferred, not measured: the roll then saw two affordable aspects and bought no Damage steps. A custom aspect with scaling on and cost 0 made the roll divide
+  by zero: the casting message failed to validate (`results.damage: must be an integer`,
+  `extraSuccessesRemaining: must be a number`), so no card posted and the page raised an error (`spending2.log`,
+  `a titan check chat message should be created after the roll`).
+- **Cause (read):** `getCastingCheckParameters` (`CharacterDataModel.js`, `processAspects`) added every standard and
+  custom aspect with `scaling` set to the scaling aspects, whatever its `enabled` flag or cost. A step of cost 0 makes
+  `Math.floor(extraSuccesses / cost)` in `calculateCastingCheckResults` infinite. A disabled aspect also still set the
+  Reflexes, Resilience and Willpower flags of the card.
+- **Fixed:** 2026-10-10: `processAspects` skips a standard aspect whose `enabled` is `false`, and adds a scaling aspect
+  only when its step cost (`scalingCost ?? cost`) is at least 1; the damage or healing a free aspect starts with still
+  counts. `tests/e2e/spell-aspect-spending.spec.js` ("aspects that a step cannot buy"). The mutations `if (false)` for
+  the enabled check (`mutation-disabled-aspect.log`; an earlier attempt without the resistance test was not caught,
+  because the cost guard excludes the disabled aspect too, `mutation-disabled-aspect-first-attempt-uncaught.log`) and
+  `stepCost >= 0` (`mutation-zero-cost.log`) fail the spec.
+- **Found:** 2026-10-10 while writing the aspect spending spec.
+- **Status:** Closed 2026-10-10.
+
+### 157. The owner of a character could not use the scaling-aspect controls of a casting card that a GM rolled
+
+- **What (measured):** E2E Player 1 owns the speaking character and saw the Increase control of a casting card that
+  E2E GM 1 rolled; clicking it left the stored value unchanged and raised `User E2E Player 1 lacks permission to update
+  ChatMessage` on the player's page (`spending2.log`, test `the player spends on a card that the GM cast for the
+  player's character`).
+- **Cause (read):** the card shows its controls to the owner of the speaking actor
+  (`CastingCheckChatMessage.svelte`, `getSpeakerActor(...)?.isOwner`), but core lets only a message's author and a GM
+  write it (`common/documents/chat-message.mjs`, `getUserLevel`; the server rejects the update). Inferred, not
+  measured: the same split holds for every other card control that writes the message.
+- **Fixed:** 2026-10-10: `TitanChatMessage#update` (`src/document/types/chat-message/ChatMessage.js`) sends the write of
+  a user who owns the speaker but cannot write the message to the active GM's client with the system socket hook
+  `relayChatMessageUpdate`; `onRelayChatMessageUpdate` (`src/hooks/OnRelayChatMessageUpdate.js`) checks that the sender
+  owns the speaking actor and writes only the `system` data. With no GM connected the user gets a warning.
+  `tests/e2e/spell-aspect-spending.spec.js` covers the player on a GM-rolled card, the player on the player's own card,
+  and a hand-sent request that is written while the sender owns the character and refused once the ownership is
+  `NONE`. The mutation that makes `update` always write directly fails the spec (`mutation-relay.log`).
+- **Found:** 2026-10-10 while writing the owner-player test of the aspect spending spec.
+- **Status:** Closed 2026-10-10.

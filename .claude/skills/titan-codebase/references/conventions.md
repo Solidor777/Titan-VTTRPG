@@ -845,7 +845,7 @@ the lone exception is `Text` (no root element). See the component-probe harness 
 coverage map, the wrapper-forwarding rules, and the selector each component resolves to.
 
 **Playwright E2E** — `npm run test:e2e` runs `playwright test` against the `test-titan` Foundry world on
-`http://localhost:30000`: 42 spec files, 798 tests (measured: `npx playwright test --list` → "Total: 798 tests in 42
+`http://localhost:30000`: 45 spec files, 858 tests (measured: `npx playwright test --list` → "Total: 858 tests in 45
 files"). `playwright.config.mjs` sets `timeout` 60 s, `expect.timeout` 1000 ms, `workers` 1, `fullyParallel` false,
 `globalSetup` and `globalTeardown`, the `list` reporter beside `slow-operation-reporter.js`, and for every test headless
 Chromium (with `--enable-gpu`), `viewport` 1920x1080 and `actionTimeout` 10 s. The users are the four dedicated
@@ -860,7 +860,7 @@ ancestor pid, polling liveness once a second), so a hard-killed run never leaves
 LevelDB locks. `tests/unit/SuperviseServer.test.js` covers spawn/reuse/teardown. The suite drives the real built system
 at the repo root, so it catches v14 API breaks that the mocked Vitest tier cannot.
 
-**The 42 spec files** (`tests/e2e/`; `logic/` holds three of them):
+**The 45 spec files** (`tests/e2e/`; `logic/` holds three of them):
 - Sheets and documents. `surfaces.spec.js` (every sheet type, spell tab, check-options dialog and the effect tray
   renders on flow-made documents with zero uncaught page errors and no `LOCAL.` text; the collapsed-layout regressions;
   the portrait pick through Foundry's file picker; opening a sheet from the directory; the Edit Unique ID dialog),
@@ -877,7 +877,15 @@ at the repo root, so it catches v14 API breaks that the mocked Vitest tier canno
   `item-sheet-rolls.spec.js` (the sidebar roll buttons of an owned equipment, weapon and spell, the Checks tab roll
   preview, a check added while the sheet is open, damage-reduction settings in the posted check parameters),
   `spell-sheet.spec.js` (the condition aspects' Off-Balance option, the Casting Check tab's aspect costs, its re-pricing
-  by a second client and its scroll position), `drag.spec.js` (real pointer drags: character sheet item and effect
+  by a second client and its scroll position), `spell-casting.spec.js` (one spell cast from the spell sheet, the
+  character sheet row, the Player HUD and an owner's player client with hand-worked dice, Difficulty, Complexity,
+  successes and card rows; a table of aspect-cost totals; a failed cast; Resolve spent by doubled Training and
+  Expertise), `spell-aspect-spending.spec.js` (every scaling standard aspect and custom aspects of cost 1 to 4 bought
+  and refunded with the card's Reset, Decrease and Increase controls; three aspects of different costs; the
+  one-affordable-aspect auto-spend; the owner of the speaker on a player client, relayed through the GM; disabled and
+  free aspects that cannot scale), `spell-damage-healing.spec.js` (damage and healing aspects scaling on the card,
+  Damage Mod and Healing Mod from a rules element reaching `results.damage` and `results.healing`, and the Apply
+  buttons of the card on a targeted character), `drag.spec.js` (real pointer drags: character sheet item and effect
   lists, the four item sheet lists, a row copied between sheets and refused by a list of another kind, a world item or a
   folder dropped on an actor sheet), `effect-changes.spec.js` (core's `changes` on a TITAN effect: the Add change button
   stores core's initial change, saving leaves the priority unset, a malformed change type is rejected),
@@ -952,8 +960,10 @@ label)` and `collectLocalizationOffenders`. `world.js` holds `closeAllApps`, `cl
 `installHookErrorReporting`, `flushHookErrorReports`, `newestMessageType`, `waitForAnimations`, `showChatLog`,
 `expectActiveGM` and `reloadWorld`. `actions.js`, `select.js`, `contextMenu.js`, `dice.js`, `poll.js`, `settle.js`,
 `settings.js`, `multiClient.js`, `users.js`, `registry.js`, `flows.js`, `census.js`, `global-setup.js`,
-`global-teardown.js`, `checkDialog.js`, `componentProbe.js`, `fast-check.js` and `slow-operation-reporter.js` are
-described under the entries below. `run-e2e-throttled.ps1` is the runner wrapper.
+`global-teardown.js`, `checkDialog.js`, `spellCasting.js` (the casting entry points `castFromSpellSheet`,
+`castFromCharacterSheet` and `castFromHud`, `buildSpell` which enables the standard aspects and fills the custom ones
+through the spell sheet, and readers for a casting card's result rows, dice, scaling-aspect blocks and stored scaling
+state), `componentProbe.js`, `fast-check.js` and `slow-operation-reporter.js` are described under the entries below. `run-e2e-throttled.ps1` is the runner wrapper.
 
 **Shared-world E2E harness (one world boot per FILE)** — every eligible spec boots the world ONCE per
 file, not per test. The pattern: module-scoped `let page; let errors;` plus three inline lifecycle hooks
