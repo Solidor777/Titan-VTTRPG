@@ -559,6 +559,28 @@ test.describe('element sources and native changes', () => {
       expect((await readSheet('mod', ['armor'])).armor, 'Multiply Sum doubles the Armor mod').toBe(10);
    });
 
+   test('an equipped shield applies its elements and an unequipped one does not', async () => {
+      /** @type {string} The id of the shield. */
+      const shieldId = await createOwnedItem(page, actorId, 'shield', 'E2E stat shield');
+      sourceUuid = `${actorUuid}.Item.${shieldId}`;
+      await author({
+         operation: 'flatModifier',
+         selector: 'attribute',
+         key: 'soul',
+         value: 2,
+      });
+
+      /** @type {import('@playwright/test').Locator} The character's sheet. */
+      const sheet = await openSheetByUuid(page, actorUuid);
+      /** @type {string} The Soul the sheet shows before the shield is equipped. */
+      const before = (await sheet.getByTestId('sheet-attribute-soul').innerText()).trim();
+      await setEquipped(page, actorId, shieldId, true);
+      await expect(sheet.getByTestId('sheet-attribute-soul'), 'the equipped shield adds 2')
+         .toHaveText(String(Number(before) + 2));
+      await setEquipped(page, actorId, shieldId, false);
+      await expect(sheet.getByTestId('sheet-attribute-soul'), 'unequipping removes the bonus').toHaveText(before);
+   });
+
    test('changes entered in the Active Effect config of core reach each stat on the sheet', async () => {
       /** @type {Array<[string, string, string]>} The selector, the key and the change key of each stat. */
       const targets = [];

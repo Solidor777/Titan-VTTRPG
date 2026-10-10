@@ -512,9 +512,9 @@ sources feed the character's derived stats. Before bucketing,
 selector (keys resolved by `_getSelectorKeys`, which maps `training`/`expertise` to `Object.keys(this.skill)` and
 otherwise reads `Object.keys(this[selector])`); an element whose selector resolves to no keys (a typed custom trait,
 spell tradition, or situation label, or any non-stat selector) passes through unchanged with its key as typed. Any
-operation carrying a key supports `'all'` at the engine level (`flatModifier`/`mulSum`/`setSum` are the additive/sum ops
-that use it), but the settings UI only exposes the `'all'` option (`allowAll` on the key select) for `flatModifier`, `mulSum` and
-`setSum`.
+operation carrying a key supports `'all'` at the engine level, and the key selects of `flatModifier`, `mulBase`,
+`mulSum` and `setSum` all offer it (`allowAll`). Each of those four editors also offers every selector (`mod` included);
+a mod has `baseValue` 0 (`_calculateBaseMods`), so the base-reading operations are defined on it.
 
 It then sorts the expanded elements into per-operation arrays and invokes per-op appliers in a fixed order:
 the additive appliers (`_applyMulBaseElements`, then `_applyFlatModifierElements`) run first, then the

@@ -4,7 +4,7 @@ import {
    CHECK_TYPE_MODIFIER_TYPES,
 } from '~/system/ConditionalCheckModifierTypes.js';
 import { clickSheetTab, commitText } from './actions.js';
-import { readNewestCheckFlags } from './checkDialog.js';
+import { clickRoll, openCheckDialog, readNewestCheckFlags } from './checkDialog.js';
 import { openWeaponRow, rollItemCheck, rollWeaponAttack, setMultiAttack } from './checkCards.js';
 import { login, openSheetByUuid } from './fixtures.js';
 import {
@@ -265,6 +265,8 @@ test.beforeAll(async ({ browser }) => {
 });
 
 test.afterEach(async () => {
+   await setClientSetting(page, 'getCheckOptions', 'never');
+
    // Cleanup: the effect (and so its elements) is deleted through the API.
    if (effectUuid) {
       await page.evaluate(async (uuid) => {
@@ -482,3 +484,77 @@ test.describe('conditional rating modifiers', () => {
       expect(await defense(), 'the armor elements stop applying').toBe(base + 4);
    });
 });
+
+/**
+ * Opens the dialog of each rolled check type with the roll button a user clicks.
+ * @type {Record<string, () => Promise<import('@playwright/test').Locator>>}
+ */
+const DIALOGS = {
+   attribute: () => openCheckDialog(page, 'attribute', actorUuid),
+   resistance: () => openCheckDialog(page, 'resistance', actorUuid, { button: 'Reflexes' }),
+   attack: () => openCheckDialog(page, 'attack', weaponUuid),
+   casting: () => openCheckDialog(page, 'casting', spellUuid),
+   item: () => openCheckDialog(page, 'item', abilityUuid),
+};
+
+for (const checkType of Object.keys(DIALOGS)) {
+   test.describe(`situational check modifiers on a ${checkType} check`, () => {
+      test.describe.configure({ timeout: 240_000 });
+
+      for (const elementCheckType of Object.keys(CHECK_TYPE_CONDITIONAL_SELECTORS[checkType])) {
+         test(`${elementCheckType} check type, situation selector: applies only when its box is ticked`, async () => {
+            await setClientSetting(page, 'getCheckOptions', 'situational');
+
+            /** @type {string[]} The modifier types the check reads. */
+            const types = CHECK_TYPE_MODIFIER_TYPES[checkType];
+            /** @type {string} The id of the effect that carries the situation elements. */
+            const effectId = await addEffect(page, actorId, `E2E situation ${checkType} ${elementCheckType}`);
+            effectUuid = `${actorUuid}.ActiveEffect.${effectId}`;
+            for (const modifierType of types) {
+               await addRulesElement(page, effectUuid, {
+                  operation: 'conditionalCheckModifier',
+                  modifierType,
+                  checkType: elementCheckType,
+                  selector: 'situation',
+                  key: 'Rough Terrain',
+                  ...MODIFIER_CASES[modifierType].fields,
+               });
+            }
+
+            // Presence before absence: the dialog lists the situation, and a roll that leaves it unticked takes none
+            // of its modifiers.
+            /** @type {import('@playwright/test').Locator} The dialog of the check. */
+            const unticked = await DIALOGS[checkType]();
+            await expect(unticked.getByTestId('situation-row-roughTerrain'), 'the dialog lists the situation')
+               .toBeVisible();
+            /** @type {number} The chat-message count before the roll. */
+            const untickedBaseline = await clickRoll(unticked, page);
+            /** @type {{parameters: object}} The check rolled with the box unticked. */
+            const plain = await readNewestCheckFlags(page, untickedBaseline, ROLLED[checkType].subtype);
+            for (const modifierType of types) {
+               expect(
+                  plain.parameters[MODIFIER_CASES[modifierType].parameter],
+                  `${modifierType} does not apply while the situation is unticked`,
+               ).not.toBe(MODIFIER_CASES[modifierType].expected);
+            }
+            expect(plain.parameters.situations, 'no situation is recorded').toHaveLength(0);
+
+            /** @type {import('@playwright/test').Locator} The dialog of the check, opened again. */
+            const ticked = await DIALOGS[checkType]();
+            await ticked.getByTestId('situation-toggle-roughTerrain').click();
+            /** @type {number} The chat-message count before the roll. */
+            const tickedBaseline = await clickRoll(ticked, page);
+            /** @type {{parameters: object}} The check rolled with the box ticked. */
+            const applied = await readNewestCheckFlags(page, tickedBaseline, ROLLED[checkType].subtype);
+            for (const modifierType of types) {
+               /** @type {{parameter: string, expected: number|boolean}} The modifier type's case. */
+               const modifierCase = MODIFIER_CASES[modifierType];
+               expect(applied.parameters[modifierCase.parameter], `${modifierType} applies once ticked`)
+                  .toBe(modifierCase.expected);
+            }
+            expect(applied.parameters.situations.map((situation) => situation.key), 'the roll records the situation')
+               .toEqual(['roughTerrain']);
+         });
+      }
+   });
+}
