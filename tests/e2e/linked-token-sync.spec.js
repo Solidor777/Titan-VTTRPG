@@ -153,6 +153,28 @@ async function openLinkedTokenSheet(tokenId) {
 }
 
 /**
+ * Moves the pointer onto a placed token without releasing control of the controlled tokens. Releasing control presses
+ * Escape, which core spends on closing a window or menu before it releases tokens
+ * (`client/helpers/interaction/client-keybindings.mjs:722-760`); a flow that only needs the pointer on the token skips it.
+ * @param {import('@playwright/test').Page} page - The client.
+ * @param {string} tokenId - The token on the client's viewed scene.
+ * @returns {Promise<{x: number, y: number}>} The token's centre in client coordinates.
+ */
+async function pointAtToken(page, tokenId) {
+   await closeAllApps(page);
+
+   /** @type {{x: number, y: number}} The token's centre in client coordinates. */
+   const centre = await page.evaluate(
+      (tokenId) => canvas.clientCoordinatesFromCanvas(canvas.scene.tokens.get(tokenId).object.center),
+      tokenId,
+   );
+   await page.mouse.move(centre.x, centre.y, { steps: 5 });
+   await page.mouse.move(centre.x + 200, centre.y);
+   await restOnToken(page, tokenId, centre);
+   return centre;
+}
+
+/**
  * Opens the Token Configuration window of a placed token from its Token HUD and returns it.
  * @param {string} tokenId - The placed token on the GM's viewed scene.
  * @returns {Promise<import('@playwright/test').Locator>} The configuration window.
@@ -581,7 +603,7 @@ test.describe('player seat and controlled-token HUD', () => {
 
    test("a player's Token HUD has the bars and elevation but no configuration, lock or visibility", async () => {
       // GM presence: the same HUD shows all three (`templates/hud/token-hud.hbs:15,30,43`).
-      const gmCentre = await hoverToken(gm, linkedTokens[1]);
+      const gmCentre = await pointAtToken(gm, linkedTokens[1]);
       await gm.mouse.click(gmCentre.x, gmCentre.y, { button: 'right' });
       await expect(gm.locator('#token-hud [data-action="config"]')).toHaveCount(1);
       await expect(gm.locator('#token-hud [data-action="locked"]')).toHaveCount(1);
@@ -590,7 +612,7 @@ test.describe('player seat and controlled-token HUD', () => {
 
       // The player's HUD: the owner may open it (`token.mjs:4713-4721`); the configuration button needs
       // TOKEN_CONFIGURE (`token-hud.mjs:60`), the lock and visibility buttons a GM (`token-hud.hbs:15,43`).
-      const centre = await hoverToken(player, linkedTokens[1]);
+      const centre = await pointAtToken(player, linkedTokens[1]);
       await player.mouse.click(centre.x, centre.y, { button: 'right' });
       await expect(player.locator('#token-hud')).toBeVisible();
       await expect(player.locator('#token-hud input[name="elevation"]')).toBeVisible();
@@ -632,7 +654,22 @@ test.describe('token changes', () => {
       await config.locator('nav.tabs [data-tab="identity"]').click();
       await config.locator('input[name="name"]').fill('E2E Sync Placed Only');
       await config.locator('nav.tabs [data-tab="appearance"]').click();
-      await config.locator('file-picker[name="texture.src"] input').first().fill('icons/svg/book.svg');
+      const imageInput = config.locator('file-picker[name="texture.src"] input').first();
+      await imageInput.fill('icons/svg/book.svg');
+      await imageInput.blur();
+
+      // Read: a change in the window previews the image on the canvas token and redraws it
+      // (`client/applications/sheets/token/token-config.mjs:74-78`). Inferred, not measured: a submit while that redraw
+      // still loads the texture starts a second draw of the token (`Token#_draw` awaits `loadTexture`,
+      // `client/canvas/placeables/token.mjs:1230`), which then meets a destroyed ruler. The preview is awaited first.
+      await expect.poll(
+         () => gm.evaluate((tokenId) => {
+            /** @type {PIXI.Texture|undefined} The texture of the canvas token. */
+            const texture = canvas.scene.tokens.get(tokenId).object.texture;
+            return String(texture?.baseTexture?.resource?.src ?? texture?.baseTexture?.cacheId ?? '');
+         }, first),
+         { message: 'the canvas token loaded the previewed image' },
+      ).toContain('book.svg');
       await config.locator('button[type="submit"]').click();
       await expect(config).toHaveCount(0);
       await settle(gm);
