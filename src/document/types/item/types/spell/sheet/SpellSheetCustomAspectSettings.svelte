@@ -96,7 +96,10 @@
 
                   <!--Input-->
                   <div class="input number">
-                     <DocumentIntegerInput bind:value={aspect.cost} min={0}/>
+                     <DocumentIntegerInput
+                        bind:value={aspect.cost}
+                        min={aspect.scaling ? 1 : 0}
+                     />
                   </div>
                </div>
 
@@ -171,6 +174,15 @@
                   </div>
                </div>
             </div>
+
+            <!--A scaling aspect with no cost cannot be bought with extra successes-->
+            {#if aspect.scaling && aspect.cost < 1}
+               <div class="row">
+                  <div class="warning" data-testid="spell-custom-aspect-needs-cost">
+                     {localize('scalingNeedsCost')}
+                  </div>
+               </div>
+            {/if}
          </div>
       {/if}
    </div>
@@ -216,6 +228,11 @@
 
          @include padding-standard;
          @include font-size-small;
+
+         .warning {
+            font-weight: bold;
+            color: var(--titan-failed-font-color);
+         }
 
          .row {
             @include flex-row;

@@ -610,6 +610,7 @@
       "rulesElements.text": "Rules Elements",
       "save.text": "Save",
       "scaling.text": "Scaling",
+      "scalingNeedsCost.text": "A scaling aspect needs a cost of at least 1 to spend extra successes on.",
       "self.text": "Self",
       "sendToChat.text": "Send to Chat",
       "sendItemToChat.desc.text": "<p>Display this <strong>Item</strong> in chat.</p>",
