@@ -1,8 +1,13 @@
 import { expect, flushPageErrors, test } from './harness.js';
-import { DURATION_TURN_END, DURATION_TURN_START } from '~/system/DurationTypes.js';
+import {
+   DURATION_INITIATIVE,
+   DURATION_TURN_END,
+   DURATION_TURN_START,
+} from '~/system/DurationTypes.js';
 import { login } from './fixtures.js';
 import {
    activateScene,
+   addEffect,
    addRulesElement,
    addCombatant,
    controlPlacedToken,
@@ -18,6 +23,7 @@ import {
    setEquipped,
    setOwnership,
    startCombat,
+   toggleTokenLink,
 } from './flows.js';
 import { forceDice, resetDice } from './dice.js';
 import { setWorldSetting } from './settings.js';
@@ -120,11 +126,22 @@ async function expectReportsSince(baseline, label) {
    for (const report of reports) {
       await expectAudience(
          report.id,
-         report.actorId === cast.owned.id ? AUDIENCE.owned : AUDIENCE.other,
-         `${label} ${report.type} of the ${report.actorId === cast.owned.id ? 'owned' : 'other'} character`,
+         ownedIds().includes(report.actorId) ? AUDIENCE.owned : AUDIENCE.other,
+         `${label} ${report.type} of ${ownedIds().includes(report.actorId) ? 'an owned' : 'the other'} character`,
       );
    }
    return reports.map((report) => report.type);
+}
+
+/**
+ * Lists the ids of the characters Player 1 owns.
+ * @returns {string[]} The ids.
+ */
+function ownedIds() {
+   return [
+      cast.owned.id,
+      cast.unlinked.id,
+   ];
 }
 
 /**
@@ -195,11 +212,15 @@ test.beforeAll(async ({ browser }) => {
    for (const key of [
       'owned',
       'other',
+      'unlinked',
    ]) {
       const id = await createActor(clients.gm1, {
          name: `E2E Visibility Report ${key}`,
          type: 'player',
       });
+      if (key === 'unlinked' && await clients.gm1.evaluate((id) => game.actors.get(id).prototypeToken.actorLink, id)) {
+         await toggleTokenLink(clients.gm1, id);
+      }
       cast[key] = {
          id,
          tokenId: await placeToken(clients.gm1, id),
@@ -209,7 +230,10 @@ test.beforeAll(async ({ browser }) => {
 
       // A turn report posts only when it has content: a turn message at the start and at the end of the turn.
       const abilityUuid = `Actor.${id}.Item.${await createOwnedItem(clients.gm1, id, 'ability', `E2E Turn ${key}`)}`;
-      for (const selector of [DURATION_TURN_START, DURATION_TURN_END]) {
+      for (const selector of [
+         DURATION_TURN_START,
+         DURATION_TURN_END,
+      ]) {
          await addRulesElement(clients.gm1, abilityUuid, {
             operation: 'turnMessage',
             selector,
@@ -218,6 +242,7 @@ test.beforeAll(async ({ browser }) => {
       }
    }
    await setOwnership(clients.gm1, cast.owned.id, NAMES.p1, 'OWNER');
+   await setOwnership(clients.gm1, cast.unlinked.id, NAMES.p1, 'OWNER');
    await closeAllApps(clients.gm1);
 });
 
@@ -341,5 +366,47 @@ test('turn reports of a combat reach only the owners of the character they repor
       'turnStartReport',
       'turnEndReport',
    ]));
+   await endCombat(clients.gm1);
+});
+
+test('effects-expired reports reach only the owners of the character whose effect expired', async () => {
+   await setWorldSetting(clients.gm1, 'autoDecreaseEffectDuration', true);
+   await setWorldSetting(clients.gm1, 'autoRemoveExpiredEffects', 'enabled');
+   for (const key of [
+      'owned',
+      'other',
+   ]) {
+      // An initiative effect one point of initiative above the rating lies between the two combatants' rolls.
+      const rating = await clients.gm1.evaluate(
+         (id) => game.actors.get(id).system.rating.initiative.value,
+         cast[key].id,
+      );
+      await addEffect(clients.gm1, cast[key].id, `E2E Visibility Expiring ${key}`, {
+         duration: DURATION_INITIATIVE,
+         initiative: rating + 7,
+         remaining: 1,
+      });
+   }
+   await closeAllApps(clients.gm1);
+   await createCombat(clients.gm1);
+   await addCombatant(clients.gm1, cast.owned.tokenId);
+   await addCombatant(clients.gm1, cast.other.tokenId);
+   await forceDice(clients.gm1, [
+      1,
+      1,
+      6,
+      6,
+   ]);
+   await rollInitiative(clients.gm1);
+   await resetDice(clients.gm1);
+   await startCombat(clients.gm1);
+
+   /** @type {number} The count before the turn that passes the effects' initiative. */
+   const baseline = await count();
+   await nextTurn(clients.gm1);
+   await expect.poll(async () => (await reportsSince(baseline)).map((r) => r.type), {
+      message: 'the turn posted an effects-expired report',
+   }).toContain('effectsExpiredReport');
+   await expectReportsSince(baseline, 'expired');
    await endCombat(clients.gm1);
 });
