@@ -861,6 +861,10 @@ LevelDB locks. `tests/unit/SuperviseServer.test.js` covers spawn/reuse/teardown.
 at the repo root, so it catches v14 API breaks that the mocked Vitest tier cannot.
 
 **The 50 spec files** (`tests/e2e/`; `logic/` holds three of them):
+- Compendium module content. `compendium-content.spec.js` (written, not run: reads every Item, ActiveEffect and Actor
+  document of the `titan-vttrpg-compendium` packs at run time, drags each from its open pack window onto a character
+  sheet in batches of 40 or imports the actor, then scans every tab of the character sheet, the owned copy's sheet and
+  the pack entry's sheet for page errors, error notifications, empty content and `LOCAL.` text).
 - Sheets and documents. `surfaces.spec.js` (every sheet type, spell tab, check-options dialog and the effect tray
   renders on flow-made documents with zero uncaught page errors and no `LOCAL.` text; the collapsed-layout regressions;
   the portrait pick through Foundry's file picker; opening a sheet from the directory; the Edit Unique ID dialog),
