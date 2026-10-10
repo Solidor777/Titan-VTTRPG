@@ -875,7 +875,11 @@ at the repo root, so it catches v14 API breaks that the mocked Vitest tier canno
   renders on flow-made documents with zero uncaught page errors and no `LOCAL.` text; the collapsed-layout regressions;
   the portrait pick through Foundry's file picker; opening a sheet from the directory; the Edit Unique ID dialog),
   `sheet-header.spec.js` (the window-header controls menu, the inline header buttons, unlinking from the sheet a token
-  double-click opens, and the `ReactiveDocument` identity pin), `character-sheet-rows.spec.js` (the Abilities, Spells,
+  double-click opens, and the `ReactiveDocument` identity pin), `linked-token-sync.spec.js` (two clients, GM and an
+  owning Player: a linked actor and its two placed tokens share the world actor, so resource, attribute, effect, item,
+  name and portrait writes from the actor sheet, a token's sheet, the Token HUD and the Player HUD show everywhere; the
+  placed token keeps its own name, image, size and elevation, and a prototype token edit reaches only tokens placed
+  afterwards; an unlinked token and its base actor stay independent), `character-sheet-rows.spec.js` (the Abilities, Spells,
   Inventory and Effects rows of one flow-made actor: a functional sweep per item type, rows following edits made in the
   item or effect sheet, delete confirmation and the confirmation-off path, check tag parity across the item sheet, the
   character sheet and the Effect HUD), `custom-traits.spec.js` (the Add Custom Trait dialog, the tag's edit and delete
