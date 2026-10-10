@@ -10,6 +10,7 @@ import {
    createScene,
    deleteOwnedItem,
    hoverToken,
+   openPlacedTokenSheet,
    pickPortrait,
    placeToken,
    restOnToken,
@@ -485,18 +486,18 @@ test.describe('actor changes reach the tokens and the other client, both ways', 
    });
 
    test('an unlinked token and its base actor stay independent in both directions, on both clients', async () => {
-      /** @type {string} The uuid of the unlinked token's synthetic actor. */
-      const tokenActorUuid = `Scene.${sceneId}.Token.${unlinkedTokenId}.Actor.${unlinkedActorId}`;
+      /** @type {string} The selector of the Body base input in a character sheet. */
+      const bodyInput = '.container:has(> .button > button.body) .stats input';
 
       /**
-       * Reads the stamina of the base actor and of the token's synthetic actor on a client.
+       * Reads the Body base value of the base actor and of the token's synthetic actor on a client.
        * @param {import('@playwright/test').Page} page - The client.
-       * @returns {Promise<number[]>} The base actor's and the synthetic actor's stamina.
+       * @returns {Promise<number[]>} The base actor's and the synthetic actor's Body base value.
        */
-      const stamina = (page) => page.evaluate(
+      const body = (page) => page.evaluate(
          ({ sceneId, tokenId, baseId }) => [
-            game.actors.get(baseId).system.resource.stamina.value,
-            game.scenes.get(sceneId).tokens.get(tokenId).actor.system.resource.stamina.value,
+            game.actors.get(baseId).system.attribute.body.baseValue,
+            game.scenes.get(sceneId).tokens.get(tokenId).actor.system.attribute.body.baseValue,
          ],
          {
             sceneId,
@@ -511,15 +512,31 @@ test.describe('actor changes reach the tokens and the other client, both ways', 
             tokenId: unlinkedTokenId,
          },
       ), 'the token is unlinked').toBe(false);
-      await setResource(gm, tokenActorUuid, 'stamina', 1);
-      await setResource(gm, `Actor.${unlinkedActorId}`, 'stamina', 2);
+      const [original] = await body(gm);
+
+      // The token actor's own sheet (opened by the token double-click) writes the synthetic actor only.
+      const tokenSheet = await openPlacedTokenSheet(gm, unlinkedTokenId);
+      await commitText(tokenSheet.locator(bodyInput).first(), original + 2);
       for (const page of [
          gm,
          player,
       ]) {
-         await expect.poll(() => stamina(page), { message: 'base 2, token actor 1' }).toEqual([
-            2,
-            1,
+         await expect.poll(() => body(page), { message: 'token actor changed, base unchanged' }).toEqual([
+            original,
+            original + 2,
+         ]);
+      }
+
+      // The base actor's sheet writes the base actor only.
+      await closeAllApps(gm);
+      await setAttributeBase(gm, `Actor.${unlinkedActorId}`, 'body', original + 1);
+      for (const page of [
+         gm,
+         player,
+      ]) {
+         await expect.poll(() => body(page), { message: 'base changed, token actor unchanged' }).toEqual([
+            original + 1,
+            original + 2,
          ]);
       }
    });
@@ -543,12 +560,19 @@ test.describe('player seat and controlled-token HUD', () => {
       // (`client/applications/apps/file-picker.mjs:648`, `common/constants.mjs:1303-1307`).
       const gmSheet = await openSheetByUuid(gm, `Actor.${actorId}`);
       await gmSheet.locator('.portrait button').first().click();
-      await expect(gm.locator('#file-picker'), 'the GM gets the picker').toBeVisible();
-      await closeAllApps(gm);
-      await expect(gm.locator('#file-picker')).toHaveCount(0);
+      const picker = gm.locator('#file-picker');
+      await expect(picker, 'the GM gets the picker').toBeVisible();
+
+      // The picker filters its file list after it renders (`FilePicker#_onSearchFilter` repositions the window), so the
+      // list is awaited before the window closes: a close in between leaves that filter without an element.
+      await expect(picker.locator('section.body')).toBeVisible();
+      await settle(gm);
+      await picker.locator('[data-action="close"]').first().click();
+      await expect(picker).toHaveCount(0);
 
       const playerSheet = await openSheetByUuid(player, `Actor.${actorId}`);
       const before = await read(player, '(actor) => actor.img');
+      expect(before, 'the portrait the GM picked earlier is still the actor image').toBe('icons/svg/skull.svg');
       await playerSheet.locator('.portrait button').first().click();
       await settle(player);
       await expect(player.locator('#file-picker'), 'the player gets no picker').toHaveCount(0);
@@ -599,6 +623,7 @@ test.describe('token changes', () => {
    test('a placed linked token is configured alone: size, elevation, name and image', async () => {
       const [first, second] = linkedTokens;
       const prototypeBefore = await read(gm, '(actor) => actor.prototypeToken.width');
+      const imageBefore = await read(gm, '(actor) => actor.img');
       const secondBefore = await readToken(gm, second);
       await setTokenSize(gm, first, 2);
       await setTokenElevation(gm, first, 3);
@@ -626,7 +651,7 @@ test.describe('token changes', () => {
          expect(await readToken(page, second), 'the second token is untouched').toEqual(secondBefore);
          expect(await read(page, '(actor) => actor.prototypeToken.width'), 'the prototype is untouched')
             .toBe(prototypeBefore);
-         expect(await read(page, '(actor) => actor.img'), 'the actor image is untouched').toBe('icons/svg/skull.svg');
+         expect(await read(page, '(actor) => actor.img'), 'the actor image is untouched').toBe(imageBefore);
       }
       await expect.poll(
          () => read(player, '(actor, tokens) => tokens[0].object.nameplate.text'),
