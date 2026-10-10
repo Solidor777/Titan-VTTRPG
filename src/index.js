@@ -8,7 +8,6 @@ import onGetActorDirectoryEntryContext from '~/hooks/OnGetActorDirectoryEntryCon
 import onGetChatLogEntryContext from '~/hooks/OnGetChatLogEntryContext.js';
 import onGetCompendiumContextOptions from '~/hooks/OnGetCompendiumContextOptions.js';
 import onGetItemDirectoryEntryContext from '~/hooks/OnGetItemDirectoryEntryContext.js';
-import onRelayChatMessageUpdate from '~/hooks/OnRelayChatMessageUpdate.js';
 import onRenderCompendiumDirectory from '~/hooks/OnRenderCompendiumDirectory.js';
 import onceInit from '~/hooks/OnceInit.js';
 import onceReady from '~/hooks/OnceReady.js';
@@ -21,7 +20,6 @@ Hooks.on('getActorContextOptions', onGetActorDirectoryEntryContext);
 Hooks.on('getChatMessageContextOptions', onGetChatLogEntryContext);
 Hooks.on('getCompendiumContextOptions', onGetCompendiumContextOptions);
 Hooks.on('getItemContextOptions', onGetItemDirectoryEntryContext);
-Hooks.on('relayChatMessageUpdate', onRelayChatMessageUpdate);
 Hooks.on('renderCompendiumDirectory', onRenderCompendiumDirectory);
 Hooks.once('init', onceInit);
 Hooks.once('ready', onceReady);

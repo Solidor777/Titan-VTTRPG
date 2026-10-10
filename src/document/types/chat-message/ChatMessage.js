@@ -5,6 +5,7 @@ import TitanChatMessageDataModel from '~/document/types/chat-message/ChatMessage
 import themeCoreMessages from '~/helpers/Settings/ThemeCoreMessages.js';
 import localize from '~/helpers/utility-functions/Localize.js';
 import warn from '~/helpers/utility-functions/Warn.js';
+import { extractScalingChange } from '~/check/types/casting-check/ScalingAspectChange.js';
 import {
    registerMount,
    sweepStaleMounts,
@@ -22,25 +23,37 @@ import {
  */
 export default class TitanChatMessage extends ChatMessage {
    /**
-    * Writes a change to the message. Core lets only the message's author and a GM write it, so a user who owns the
-    * actor that spoke the message but did not author it (the owner of a character whose check a GM rolled) asks the
-    * active GM's client to write the change; every other user's write goes through core, which refuses what the user
-    * may not do. Hidden coupling: `onRelayChatMessageUpdate` answers the request and re-checks the sender's ownership.
+    * Writes a change to the message. Core lets only the message's author and a GM write it. The one write relayed to
+    * the active GM's client is what a casting check card's scaling controls make for a user who owns the speaking
+    * actor but did not author the card: an update with no operation options whose only differences from the stored
+    * results are the scaling aspects' values and the figures derived from them. Every other write, including any with
+    * `operation` options, other fields or dotted keys that expand to other fields, goes to core unchanged, which
+    * refuses what the user may not do. The returned promise settles when the GM's client has answered; a refusal or no
+    * answer shows the user a warning.
+    * Hidden coupling: `onRelayChatMessageUpdate` answers the request and checks the sender's ownership itself.
     * @override
     * @param {object} [data] - The changes to write.
     * @param {object} [operation] - Options forwarded to core.
-    * @returns {Promise<TitanChatMessage>} The message; unchanged on the requesting client until the GM's write
-    * replicates when the write is relayed.
+    * @returns {Promise<TitanChatMessage>} The message.
     */
    async update(data = {}, operation = {}) {
       if (this.canUserModify(game.user, 'update') || !ChatMessage.getSpeakerActor(this.speaker)?.isOwner) {
          return super.update(data, operation);
       }
-      if (!game.users.activeGM) {
-         warn('The change needs a GM to be connected: only a GM can write a message that another user rolled.');
-         return this;
+
+      /** @type {number[]|null} The requested aspect values when the write is a scaling-control write. */
+      const currentValues = this.type === 'castingCheck' && Object.keys(operation).length === 0 ?
+         extractScalingChange(this.system.toObject().results, foundry.utils.expandObject(data)) :
+         null;
+      if (!currentValues) {
+         return super.update(data, operation);
       }
-      game.titan.socketManager.triggerSocketHook('relayChatMessageUpdate', game.user.id, this.id, data);
+      try {
+         await game.titan.socketManager.request('relayChatMessageUpdate', this.id, currentValues);
+      }
+      catch (error) {
+         warn(`The change to the card was not made: ${error.message}`);
+      }
       return this;
    }
 

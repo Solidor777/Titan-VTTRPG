@@ -1,7 +1,8 @@
 import { expect, flushPageErrors, test } from './harness.js';
+import { clickSheetTab, commitText } from './actions.js';
 import { forceDice, resetDice } from './dice.js';
-import { login } from './fixtures.js';
-import { createActor, setAttributeBase, setOwnership } from './flows.js';
+import { login, openSheetByUuid } from './fixtures.js';
+import { createActor, readServerSystem, setAttributeBase, setCustomAspect, setOwnership } from './flows.js';
 import { setClientSetting } from './settings.js';
 import {
    aspectBlock,
@@ -225,8 +226,9 @@ const STANDARD_CASES = [
       healing: false,
    },
    {
-      // One option at 2; a Reflexes resistance check halves the cost to 1, and because the aspect has no scaling
-      // cost the halved cost is also the step cost.
+      // One option at 2; a Reflexes resistance check halves the cost to 1 (`CalculateSpellAspectCosts.js`, the system's
+      // own rule; the rules text publishes no aspect costs). The aspect has no scaling cost, so the step cost is the
+      // aspect cost (`scalingCost ?? cost` in `getCastingCheckParameters`), which is the halved 1.
       name: 'decreaseMod with a resistance check',
       spell: {
          standard: [
@@ -1261,104 +1263,387 @@ test.describe('aspects that a step cannot buy', () => {
       await expect(cast.card.locator('.aspects > .aspect'), 'the card lists one aspect').toHaveCount(1);
    });
 
-   test('an aspect that is not enabled adds no Resist button, while an enabled one with the same resistance does',
-      async () => {
-         // Decrease Mod with Reflexes chosen but no option is stored disabled; Damage with Reflexes is enabled.
-         const disabled = await buildSpell(gm, casterId, 'E2E Spend Disabled Resisted', {
-            standard: [
-               { label: 'damage' },
-               {
-                  label: 'decreaseMod',
-                  resistanceCheck: 'reflexes',
-               },
-            ],
-         });
-         const enabled = await buildSpell(gm, casterId, 'E2E Spend Enabled Resisted', {
-            standard: [
-               {
-                  label: 'damage',
-                  resistanceCheck: 'reflexes',
-               },
-            ],
-         });
-
-         // An enabled resisted aspect shows the Reflexes button; four successes leave 3 extra successes.
-         const withResistance = await castWith(enabled.uuid, 4);
-         expect(withResistance.parameters.reflexesCheck, 'an enabled resisted aspect needs Reflexes').toBe(true);
-         await expect(withResistance.card.locator('.buttons > .button'), 'one Resist button').toHaveCount(1);
-
-         // The disabled aspect with the same resistance adds none.
-         const without = await castWith(disabled.uuid, 4);
-         expect(without.parameters.reflexesCheck, 'a disabled aspect needs no Reflexes').toBe(false);
-         await expect(without.card.locator('.buttons > .button'), 'no Resist button').toHaveCount(0);
-      });
-
-   test('a custom aspect that costs nothing cannot be bought with extra successes', async () => {
-      // A free scaling aspect has no price to pay a step with; its damage still counts.
-      const spell = await buildSpell(gm, casterId, 'E2E Spend Free', {
-         custom: [
+   test('an aspect that is not enabled adds no Resist button, and the same aspect with an option does', async () => {
+      // Decrease Mod with Reflexes chosen and no option is stored disabled.
+      const spell = await buildSpell(gm, casterId, 'E2E Spend Disabled Resisted', {
+         standard: [
+            { label: 'damage' },
             {
-               label: 'Free',
-               cost: 0,
-               initialValue: 2,
-               damage: true,
+               label: 'decreaseMod',
+               resistanceCheck: 'reflexes',
             },
          ],
       });
-      const cast = await castWith(spell.uuid, 4);
-      expect(cast.results.extraSuccesses, 'four successes against Complexity 1').toBe(3);
-      expect(cast.results.scalingAspect, 'a free aspect does not scale').toEqual([]);
-      expect(cast.results.damage, 'the free aspect still deals its 2').toBe(2);
-      expect(cast.results.extraSuccessesRemaining, 'nothing was spent').toBe(3);
-      expect((await readCardRows(cast.card)).damage).toBe('Damage: 2');
+
+      /**
+       * Reads the options of the spell's Decrease Mod aspect as the server stores them.
+       * @returns {Promise<string[]>} The chosen options.
+       */
+      const readOptions = async () => (await readServerSystem(gm, spell.uuid)).aspect
+         .find((aspect) => aspect.label === 'decreaseMod').option;
+
+      /**
+       * Clicks the Armor option of Decrease Mod in the Standard Aspects tab of the spell's sheet.
+       * @returns {Promise<void>} Resolves once the click is made.
+       */
+      const toggleArmor = async () => {
+         const sheet = await openSheetByUuid(gm, spell.uuid);
+         await clickSheetTab(sheet, 'Standard Aspects');
+         await sheet.getByTestId('spell-aspect-option-decreaseMod-armor').click();
+      };
+
+      // The option toggle of the spell sheet enables the aspect: with Armor chosen the same spell needs Reflexes.
+      await toggleArmor();
+      await expect.poll(readOptions, { message: 'the toggle chose Armor' }).toEqual(['armor']);
+      await closeAllApps(gm);
+      const enabled = await castWith(spell.uuid, 4);
+      expect(enabled.parameters.reflexesCheck, 'an enabled resisted aspect needs Reflexes').toBe(true);
+      await expect(enabled.card.locator('.buttons > .button'), 'one Resist button').toHaveCount(1);
+
+      // The same toggle switches the option off again: the aspect is disabled and the same spell needs no Reflexes.
+      await closeAllApps(gm);
+      await toggleArmor();
+      await expect.poll(readOptions, { message: 'the toggle cleared Armor' }).toEqual([]);
+      await closeAllApps(gm);
+      const disabled = await castWith(spell.uuid, 4);
+      expect(disabled.parameters.reflexesCheck, 'a disabled aspect needs no Reflexes').toBe(false);
+      await expect(disabled.card.locator('.buttons > .button'), 'no Resist button').toHaveCount(0);
    });
+
+   test('a custom aspect that costs nothing cannot be bought, the sheet flags it and keeps scaling aspects at cost 1',
+      async () => {
+         // A free aspect is made with Scaling off, because the Cost input of a scaling aspect keeps at least 1. Turning
+         // Scaling on afterwards leaves the cost at 0.
+         const spell = await buildSpell(gm, casterId, 'E2E Spend Free', {
+            custom: [
+               {
+                  label: 'Free',
+                  initialValue: 2,
+                  damage: true,
+                  scaling: false,
+               },
+            ],
+         });
+         await setCustomAspect(gm, spell.uuid, 0, { cost: 0 });
+         await setCustomAspect(gm, spell.uuid, 0, { scaling: true });
+
+         /** @type {import('@playwright/test').Locator} The spell's sheet on the Custom Aspects tab. */
+         const sheet = await openSheetByUuid(gm, spell.uuid);
+         await clickSheetTab(sheet, 'Custom Aspects');
+         await expect(sheet.getByTestId('spell-custom-aspect-needs-cost'), 'a scaling aspect at cost 0 is flagged')
+            .toBeVisible();
+         await closeAllApps(gm);
+
+         // A free scaling aspect has no price to pay a step with; its damage still counts.
+         const cast = await castWith(spell.uuid, 4);
+         expect(cast.results.extraSuccesses, 'four successes against Complexity 1').toBe(3);
+         expect(cast.results.scalingAspect, 'a free aspect does not scale').toEqual([]);
+         expect(cast.results.damage, 'the free aspect still deals its 2').toBe(2);
+         expect(cast.results.extraSuccessesRemaining, 'nothing was spent').toBe(3);
+         expect((await readCardRows(cast.card)).damage).toBe('Damage: 2');
+         await closeAllApps(gm);
+
+         // Costing 1 clears the flag on the same sheet, and the Cost input then refuses 0.
+         await setCustomAspect(gm, spell.uuid, 0, { cost: 1 });
+         /** @type {import('@playwright/test').Locator} The sheet again. */
+         const again = await openSheetByUuid(gm, spell.uuid);
+         await clickSheetTab(again, 'Custom Aspects');
+         await expect(again.getByTestId('spell-custom-aspect-needs-cost'), 'the flag is gone at cost 1').toHaveCount(0);
+         await commitText(
+            again.locator('li.reorder-row').first().locator('.field')
+               .filter({ has: gm.getByText('Cost', { exact: true }) }).first().locator('input'),
+            '0',
+         );
+         expect((await readServerSystem(gm, spell.uuid)).customAspect[0].cost, 'a scaling aspect keeps a cost of 1')
+            .toBe(1);
+      });
+
 });
 
-test('a relayed change to a card is written only while the sender owns the speaking character', async () => {
-   test.setTimeout(120_000);
+test.describe('the GM relay of a card write', () => {
+   /** @type {string} The id of a character that nobody owns until a test grants it. */
+   let strangerId;
+   /** @type {string} The id of E2E GM 1. */
+   let gmUserId;
+   /** @type {{id: string, uuid: string}} The stranger's pair spell (X cost 1 start 2; Y cost 3 start 1). */
+   let strangerSpell;
 
-   /** @type {string} The id of a character that nobody owns yet. */
-   const strangerId = await createActor(gm, {
-      name: 'E2E Spend Stranger',
-      type: 'player',
+   test.beforeAll(async () => {
+      test.setTimeout(120_000);
+      strangerId = await createActor(gm, {
+         name: 'E2E Spend Stranger',
+         type: 'player',
+      });
+      await setAttributeBase(gm, `Actor.${strangerId}`, 'mind', 12);
+      strangerSpell = await buildSpell(gm, strangerId, 'E2E Spend Stranger Spell', PAIR_SPELL);
+      gmUserId = await gm.evaluate(() => game.user.id);
+
+      // The player's client keeps every answer the GM's client sends it, for the tests that send requests by hand.
+      await player.evaluate(() => {
+         globalThis.__titanReplies = [];
+         game.socket.on('system.titan', (data) => {
+            if (data?.reply !== undefined) {
+               globalThis.__titanReplies.push(data);
+            }
+         });
+      });
+      await closeAllApps(gm);
    });
-   await setAttributeBase(gm, `Actor.${strangerId}`, 'mind', 12);
-
-   /** @type {{id: string, uuid: string}} The stranger's spell. */
-   const spell = await buildSpell(gm, strangerId, 'E2E Spend Stranger Spell', PAIR_SPELL);
-   const cast = await castWith(spell.uuid, 4);
-   expect(cast.results.extraSuccessesRemaining, 'three extra successes, none bought').toBe(3);
 
    /**
-    * Asks for the remaining extra successes of the card to be changed, the way a card control's write is relayed.
-    * @param {number} remaining - The value to ask for.
-    * @returns {Promise<void>} Resolves once the request is sent.
+    * Gives E2E Player 1 a level on the stranger and waits until the player's client holds it.
+    * @param {'NONE'|'OWNER'} level - The level to give.
+    * @returns {Promise<void>} Resolves once the player's client resolves that level.
     */
-   const requestRemaining = (remaining) => player.evaluate(
-      ({ id, remaining }) => game.titan.socketManager.triggerSocketHook(
-         'relayChatMessageUpdate',
-         game.user.id,
-         id,
-         { system: { results: { extraSuccessesRemaining: remaining } } },
-      ),
-      {
+   async function giveLevel(level) {
+      await setOwnership(gm, strangerId, 'E2E Player 1', level);
+      await player.waitForFunction(
+         ({ id, level }) => game.actors.get(id)?.getUserLevel(game.user) === CONST.DOCUMENT_OWNERSHIP_LEVELS[level],
+         {
+            id: strangerId,
+            level,
+         },
+         { timeout: 1000 },
+      );
+   }
+
+   /**
+    * Sends a request on the system socket from the player's client by hand and waits for the GM's answer.
+    * @param {object} message - The socket message; its `requestId` pairs the answer with it.
+    * @returns {Promise<{ok: boolean, error: string}>} The answer.
+    */
+   async function sendByHand(message) {
+      await player.evaluate((message) => game.socket.emit('system.titan', message), message);
+      await expect.poll(
+         () => player.evaluate(
+            (id) => globalThis.__titanReplies.some((reply) => reply.reply === id),
+            message.requestId,
+         ),
+         { message: `the GM answered ${message.requestId}` },
+      ).toBe(true);
+      return player.evaluate((id) => globalThis.__titanReplies.find((reply) => reply.reply === id), message.requestId);
+   }
+
+   /**
+    * Casts the stranger's pair spell: three extra successes, none bought, X at 2, Y at 1.
+    * @returns {Promise<{id: string}>} The cast.
+    */
+   function castStranger() {
+      return castWith(strangerSpell.uuid, 4);
+   }
+
+   test('an owner\'s card write is answered, written and shown; a refused one shows a warning', async () => {
+      await giveLevel('OWNER');
+      const cast = await castStranger();
+      const playerCard = await openCard(player, cast.id);
+
+      // Presence: Increase on X (the first aspect) is written by the GM's client: X 2 -> 4, one extra success spent.
+      await aspectControl(aspectBlock(playerCard, 0), 'increase').click();
+      await expect.poll(() => readScaling(gm, cast.id), { message: 'the owner\'s step was written' }).toEqual({
+         values: [
+            4,
+            1,
+         ],
+         remaining: 2,
+         extra: 3,
+         damage: 4,
+         healing: 1,
+      });
+
+      // A write that names a value that is not a step of the aspect is refused, and the player is told.
+      await player.evaluate(async (id) => {
+         const message = game.messages.get(id);
+         const results = message.system.toObject().results;
+         results.scalingAspect[0].currentValue = 5;
+         await message.update({ system: { results } });
+      }, cast.id);
+      await expect(
+         player.locator('#notifications .notification', { hasText: 'is not a step of the Aspect X aspect' }).first(),
+         'the refusal reaches the requester',
+      ).toBeVisible();
+      expect((await readScaling(gm, cast.id)).values, 'the refused write changed nothing').toEqual([
+         4,
+         1,
+      ]);
+   });
+
+   test('the allow-list: only scaling-aspect values are written, and every other write is core\'s', async () => {
+      await giveLevel('OWNER');
+      const cast = await castStranger();
+
+      /**
+       * Runs an update of the card on the player's client and reports the error it raises.
+       * @param {object} data - The update.
+       * @param {object} [operation] - The update's operation options.
+       * @returns {Promise<string>} The error message, or an empty string when the update raised none.
+       */
+      const updateAsPlayer = (data, operation) => player.evaluate(async ({ id, data, operation }) => {
+         try {
+            await game.messages.get(id).update(data, operation);
+            return '';
+         }
+         catch (error) {
+            return error.message;
+         }
+      }, {
          id: cast.id,
-         remaining,
-      },
-   );
+         data,
+         operation,
+      });
 
-   // With ownership the GM's client writes the change.
-   await setOwnership(gm, strangerId, 'E2E Player 1', 'OWNER');
-   await requestRemaining(2);
-   await expect.poll(() => readScaling(gm, cast.id), { message: 'the owner\'s request was written' })
-      .toMatchObject({ remaining: 2 });
+      // Presence: the controls' own shape is written; the GM's client derives the figures from the values, not from
+      // the request.
+      expect(await player.evaluate(async (id) => {
+         const message = game.messages.get(id);
+         const results = message.system.toObject().results;
+         results.scalingAspect[0].currentValue = 4;
+         results.damage = 999;
+         await message.update({ system: { results } });
+         return '';
+      }, cast.id)).toBe('');
+      await expect.poll(() => readScaling(gm, cast.id), { message: 'the values were written' }).toMatchObject({
+         values: [
+            4,
+            1,
+         ],
+         remaining: 2,
+         damage: 4,
+      });
 
-   // Without ownership the same request changes nothing.
-   await setOwnership(gm, strangerId, 'E2E Player 1', 'NONE');
-   await requestRemaining(1);
-   await expect(
-      gm.locator('#notifications .notification', { hasText: 'A chat message change was refused' }).first(),
-      'the refusal reaches the GM client',
-   ).toBeVisible();
-   expect((await readScaling(gm, cast.id)).remaining, 'the request of a non-owner was refused').toBe(2);
+      // Everything else goes to core, which refuses a user who did not author the card.
+      const stored = await player.evaluate((id) => game.messages.get(id).system.toObject().results, cast.id);
+      expect(await updateAsPlayer({
+         system: {
+            results: {
+               ...stored,
+               successes: 99,
+            },
+         },
+      }), 'another results field')
+         .toContain('lacks permission');
+      expect(await updateAsPlayer({ 'system.results.damage': 99 }), 'a dotted key alone').toContain('lacks permission');
+      expect(await updateAsPlayer({ flags: { titan: { x: 1 } } }), 'a flag').toContain('lacks permission');
+      expect(await updateAsPlayer({ system: { results: stored } }, { diff: false }), 'operation options')
+         .toContain('lacks permission');
+
+      // A request by hand that names values the extra successes cannot pay for is refused by the GM's client.
+      const tooDear = await sendByHand({
+         request: 'relayChatMessageUpdate',
+         requestId: 'allow-1',
+         args: [
+            cast.id,
+            [
+               4,
+               6,
+            ],
+         ],
+      });
+      expect(tooDear.ok, 'values that cost more than the extra successes').toBe(false);
+      expect(tooDear.error).toContain('more extra successes');
+      expect((await readScaling(gm, cast.id)).damage, 'nothing changed').toBe(4);
+      expect((await readScaling(gm, cast.id)).extra, 'the earned successes are untouched').toBe(3);
+   });
+
+   test('the sender is the transport\'s: a forged identity, even a GM\'s, is refused', async () => {
+      await giveLevel('OWNER');
+      const cast = await castStranger();
+      const valid = [
+         cast.id,
+         [
+            4,
+            1,
+         ],
+      ];
+
+      // Presence: while the player owns the character a request by hand is answered and written.
+      const accepted = await sendByHand({
+         request: 'relayChatMessageUpdate',
+         requestId: 'forge-0',
+         args: valid,
+      });
+      expect(accepted.ok, 'an owner\'s request').toBe(true);
+      await expect.poll(() => readScaling(gm, cast.id), { message: 'the request was written' }).toMatchObject({
+         values: [
+            4,
+            1,
+         ],
+      });
+
+      // Absence on the same card: without ownership the same request, however it names a sender, is refused.
+      await giveLevel('NONE');
+      const refused = [
+         await sendByHand({
+            request: 'relayChatMessageUpdate',
+            requestId: 'forge-1',
+            args: [
+               cast.id,
+               [
+                  6,
+                  1,
+               ],
+            ],
+         }),
+         await sendByHand({
+            request: 'relayChatMessageUpdate',
+            requestId: 'forge-2',
+            senderId: gmUserId,
+            userId: gmUserId,
+            args: [
+               cast.id,
+               [
+                  6,
+                  1,
+               ],
+            ],
+         }),
+         await sendByHand({
+            request: 'relayChatMessageUpdate',
+            requestId: 'forge-3',
+            args: [
+               gmUserId,
+               cast.id,
+               [
+                  6,
+                  1,
+               ],
+            ],
+         }),
+      ];
+      for (const answer of refused) {
+         expect(answer.ok, 'a forged request').toBe(false);
+      }
+      expect(refused[0].error, 'the transport names the player, who owns nothing').toContain('do not own');
+      expect(refused[1].error, 'a sender field in the message is ignored').toContain('do not own');
+      expect(refused[2].error, 'a leading identity argument is only an argument').toContain('no casting check card');
+
+      // The old broadcast form, which carried the sender in its arguments, reaches no handler.
+      await player.evaluate(
+         ({ gmUserId, id }) => game.socket.emit('system.titan', {
+            id: 'relayChatMessageUpdate',
+            args: [
+               gmUserId,
+               id,
+               { system: { results: { damage: 999 } } },
+            ],
+         }),
+         {
+            gmUserId,
+            id: cast.id,
+         },
+      );
+
+      // The socket keeps the order of one client's messages, so the answer to this later request means the broadcast
+      // above has been handled.
+      await sendByHand({
+         request: 'relayChatMessageUpdate',
+         requestId: 'forge-4',
+         args: valid,
+      });
+      const after = await readScaling(gm, cast.id);
+      expect(after.values, 'no forged request changed the card').toEqual([
+         4,
+         1,
+      ]);
+      expect(after.damage).toBe(4);
+   });
 });
