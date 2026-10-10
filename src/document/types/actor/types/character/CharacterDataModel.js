@@ -3388,6 +3388,11 @@ export default class CharacterDataModel extends TitanActorDataModel {
          // For each aspect.
          for (const aspect of aspects) {
 
+            // A standard aspect that is not enabled (it needs an option and has none) has no effect on the cast.
+            if (aspect.enabled === false) {
+               continue;
+            }
+
             // Cache whether this spell has resistance checks.
             switch (aspect.resistanceCheck) {
                case 'reflexes': {
@@ -3417,12 +3422,15 @@ export default class CharacterDataModel extends TitanActorDataModel {
                parameters.healing += aspect.initialValue;
             }
 
-            // If the aspect is scaling, add it to the scaling aspects.
-            if (aspect.scaling) {
+            // If the aspect is scaling and a step costs at least one extra success, add it to the scaling aspects.
+            // Constraint: a step that costs nothing could be bought without limit, which no extra success count bounds.
+            /** @type {number} The extra successes one step of the aspect costs. */
+            const stepCost = aspect.scalingCost ?? aspect.cost;
+            if (aspect.scaling && stepCost >= 1) {
                parameters.scalingAspect.push({
                   isDamage: aspect.isDamage,
                   isHealing: aspect.isHealing,
-                  cost: aspect.scalingCost ?? aspect.cost,
+                  cost: stepCost,
                   initialValue: aspect.initialValue,
                   label: aspect.label,
                });

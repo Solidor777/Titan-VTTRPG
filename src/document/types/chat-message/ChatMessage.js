@@ -4,6 +4,7 @@ import ChatMessageContent from '~/document/types/chat-message/ChatMessageContent
 import TitanChatMessageDataModel from '~/document/types/chat-message/ChatMessageDataModel.js';
 import themeCoreMessages from '~/helpers/Settings/ThemeCoreMessages.js';
 import localize from '~/helpers/utility-functions/Localize.js';
+import warn from '~/helpers/utility-functions/Warn.js';
 import {
    registerMount,
    sweepStaleMounts,
@@ -20,6 +21,29 @@ import {
  * @extends {ChatMessage}
  */
 export default class TitanChatMessage extends ChatMessage {
+   /**
+    * Writes a change to the message. Core lets only the message's author and a GM write it, so a user who owns the
+    * actor that spoke the message but did not author it (the owner of a character whose check a GM rolled) asks the
+    * active GM's client to write the change; every other user's write goes through core, which refuses what the user
+    * may not do. Hidden coupling: `onRelayChatMessageUpdate` answers the request and re-checks the sender's ownership.
+    * @override
+    * @param {object} [data] - The changes to write.
+    * @param {object} [operation] - Options forwarded to core.
+    * @returns {Promise<TitanChatMessage>} The message; unchanged on the requesting client until the GM's write
+    * replicates when the write is relayed.
+    */
+   async update(data = {}, operation = {}) {
+      if (this.canUserModify(game.user, 'update') || !ChatMessage.getSpeakerActor(this.speaker)?.isOwner) {
+         return super.update(data, operation);
+      }
+      if (!game.users.activeGM) {
+         warn('The change needs a GM to be connected: only a GM can write a message that another user rolled.');
+         return this;
+      }
+      game.titan.socketManager.triggerSocketHook('relayChatMessageUpdate', game.user.id, this.id, data);
+      return this;
+   }
+
    /**
     * Renders the chat message HTML. For TITAN subtypes, mounts the subtype's Svelte component into
     * the standard card content region and tracks it per rendered element.
