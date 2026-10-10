@@ -16,6 +16,7 @@
     * @property {number} [damage] - The amount of damage dealt by the attack.
     * @property {boolean} [ineffective] - Whether the attack is ineffective (deals half damage).
     * @property {boolean} [penetrating] - Whether the attack is penetrating (ignores some armor).
+    * @property {boolean} [vicious] - Whether the attack is vicious (a Wound inflicted is increased by 1).
     * @property {number} [cleave] - The number of cleave hits from critical successes.
     */
 
@@ -24,6 +25,7 @@
       damage = undefined,
       ineffective = false,
       penetrating = false,
+      vicious = false,
       cleave = 0,
    } = $props();
 </script>
@@ -36,6 +38,7 @@
             applyDamageToTargets(damage, {
                ineffective: ineffective,
                penetrating: penetrating,
+               vicious: vicious,
             });
          }}
       ><i class={DAMAGE_ICON}></i>
@@ -53,6 +56,7 @@
                applyDamageToTargets(cleave, {
                   ineffective: ineffective,
                   penetrating: penetrating,
+                  vicious: vicious,
                });
             }}
          >
@@ -71,6 +75,7 @@
             applyDamageToTargets(damage, {
                ineffective: ineffective,
                penetrating: penetrating,
+               vicious: vicious,
                ignoreArmor: true,
             });
          }}
@@ -85,6 +90,7 @@
             applyDamageToTargets(Math.max(Math.floor(damage / 2), 1), {
                ineffective: ineffective,
                penetrating: penetrating,
+               vicious: vicious,
             });
          }}
       >

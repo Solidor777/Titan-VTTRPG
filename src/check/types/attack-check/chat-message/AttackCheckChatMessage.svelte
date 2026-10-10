@@ -72,6 +72,7 @@
                   false}
                penetrating={document.data.system.parameters.penetrating ??
                   false}
+               vicious={document.data.system.parameters.vicious ?? false}
                cleave={document.data.system.parameters.cleave
                   ? document.data.system.results.criticalSuccesses
                   : 0}

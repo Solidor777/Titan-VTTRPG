@@ -207,6 +207,7 @@ const GOLDENS = {
          totalTrainingDice: integerField(0),
          trainingMod: integerField(0),
          type: stringField(''),
+         vicious: booleanField(false),
       }),
       results: schemaField({
          criticalFailures: integerField(0),

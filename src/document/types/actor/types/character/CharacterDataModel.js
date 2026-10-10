@@ -118,6 +118,7 @@ import error from '~/helpers/utility-functions/Error.js';
  * @property {boolean} [ignoreArmor = false] - Whether to Ignore Armor when applying the Damage.
  * @property {boolean} [ineffective = false] - Whether the Attack had the Ineffective trait.
  * @property {boolean} [penetrating = false] - Whether the Attack had the Penetrating trait.
+ * @property {boolean} [vicious = false] - Whether the Attack had the Vicious trait.
  * @property {boolean} [updateActor = true] - Whether to update the Character after applying the Damage.
  * When updating multiple values, it is useful to set this to false.
  * @property {boolean} [report = true] - Whether to send a Chat Message report, provided this setting is enabled.
@@ -2629,6 +2630,12 @@ export default class CharacterDataModel extends TitanActorDataModel {
                }
                break;
             }
+            case 'vicious': {
+               if (options.vicious === undefined) {
+                  checkOptions.vicious = true;
+               }
+               break;
+            }
             default: {
                break;
             }
@@ -4581,7 +4588,12 @@ export default class CharacterDataModel extends TitanActorDataModel {
                   woundsSuffered = 1;
                }
 
-               // Ineffective attacks can only inflict 1 Wound per attack.
+               // Vicious attacks that inflict Wounds inflict 1 more.
+               if (options?.vicious) {
+                  woundsSuffered += 1;
+               }
+
+               // Ineffective attacks can only inflict 1 Wound per attack; the cap applies to the Vicious Wound too.
                if (options?.ineffective) {
                   woundsSuffered = Math.min(woundsSuffered, 1);
                }

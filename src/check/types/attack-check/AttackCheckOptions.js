@@ -14,6 +14,7 @@
  * @property {boolean} [penetrating] - Whether this Attack is a Penetrating attack.
  * @property {boolean} [plusExtraSuccessDamage] - Whether to increase the damage for each extra success.
  * @property {boolean} [rend] - Whether this check is a Rend attack.
+ * @property {boolean} [vicious] - Whether this Attack is a Vicious attack.
  * @property {number} [advantage] - The summed Advantage (+) and Disadvantage (-) from always-on sources and the dialog.
  * @property {number} [attackIdx] - The index of the weapon's Attack being rolled.
  * @property {number} [attackerAccuracy] - The Accuracy rating of the attacker.
@@ -71,5 +72,6 @@ export default function createAttackCheckOptions(options) {
       targetDefense: options.targetDefense ?? 0,
       trainingMod: options.trainingMod ?? 0,
       type: options.type ?? 'melee',
+      vicious: options.vicious ?? false,
    };
 }

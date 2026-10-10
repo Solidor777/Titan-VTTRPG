@@ -16,6 +16,7 @@ import { selectAttackTargetConditions } from '~/check/types/attack-check/TargetC
  * @property {boolean} penetrating - Whether this Attack is a Penetrating attack.
  * @property {boolean} plusExtraSuccessDamage - Whether to increase the damage for each extra success.
  * @property {boolean} rend - Whether this check is a Rend attack.
+ * @property {boolean} vicious - Whether this Attack is a Vicious attack.
  * @property {number} advantage - The summed Advantage (+) and Disadvantage (-), ticked situations included.
  * @property {number} attackerAccuracy - The attacker's accuracy rating.
  * @property {number} attackerMelee - The attacker's melee rating.
@@ -102,6 +103,7 @@ export function createAttackCheckParametersShape() {
       totalTrainingDice: 0,
       trainingMod: 0,
       type: '',
+      vicious: false,
    };
 }
 
@@ -141,5 +143,6 @@ export default function createAttackCheckParameters(options) {
       targetDefense: options.targetDefense,
       trainingMod: options.trainingMod,
       type: options.type,
+      vicious: options.vicious,
    };
 }

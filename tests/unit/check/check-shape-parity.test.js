@@ -61,6 +61,7 @@ const OPTIONS = {
    targetDefense: 0,
    trainingMod: 0,
    type: 'melee',
+   vicious: false,
 };
 
 /** Parameter factory + shape pairs for all 5 check subtypes. */
