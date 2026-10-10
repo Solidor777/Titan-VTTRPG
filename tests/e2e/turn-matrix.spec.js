@@ -7,11 +7,12 @@ import {
    DURATION_TURN_START,
    DURATION_TYPES,
 } from '~/system/DurationTypes.js';
-import { login } from './fixtures.js';
+import { login, openSheetByUuid } from './fixtures.js';
 import {
    addCombatant,
    addEffect,
    addRulesElement,
+   applyCondition,
    createActor,
    createCombat,
    createOwnedItem,
@@ -21,14 +22,18 @@ import {
    openSidebarTab,
    placeToken,
    previousTurn,
+   removeCondition,
    restOnToken,
    rollInitiative,
    setOwnership,
    setResource,
    startCombat,
+   toggleTokenLink,
    viewScene,
 } from './flows.js';
 import { forceDice, resetDice } from './dice.js';
+import { clickSheetTab } from './actions.js';
+import { chooseContextMenuEntry } from './contextMenu.js';
 import { setWorldSetting } from './settings.js';
 import { MODES } from './turnMatrix.js';
 import { attachPageErrors, clearChat, closeAllApps, showChatLog } from './world.js';
@@ -96,20 +101,30 @@ async function makeCharacter(role, abilities, owned) {
 }
 
 /**
- * Starts an encounter: the plain character acts first (rolls 6 and 6), the subject second (rolls 1 and 1).
+ * Starts an encounter: the plain character acts first (rolls 6 and 6), the subject second (rolls 1 and 1); with
+ * `first` the subject acts first. The subject joins the combat first, so it rolls first.
  * @param {string} subject - The role of the subject character.
+ * @param {object} [options] - Optional settings.
+ * @param {boolean} [options.first] - Whether the subject acts first.
  * @returns {Promise<void>} Resolves once the combat is begun.
  */
-async function startEncounter(subject) {
+async function startEncounter(subject, { first = false } = {}) {
    await createCombat(gm);
    await addCombatant(gm, cast[subject].tokenId);
    await addCombatant(gm, cast.plain.tokenId);
-   await forceDice(gm, [
-      1,
-      1,
-      6,
-      6,
-   ]);
+   await forceDice(gm, first
+      ? [
+         6,
+         6,
+         1,
+         1,
+      ]
+      : [
+         1,
+         1,
+         6,
+         6,
+      ]);
    await rollInitiative(gm);
    await resetDice(gm);
    await startCombat(gm);
@@ -268,6 +283,18 @@ test.beforeAll(async ({ browser }) => {
          ],
       },
    ], true);
+   await makeCharacter('damageEnd', [
+      {
+         name: 'E2E Matrix PD End',
+         elements: [
+            {
+               operation: 'persistentDamage',
+               selector: DURATION_TURN_END,
+               value: 1,
+            },
+         ],
+      },
+   ], true);
    await makeCharacter('regain', [
       {
          name: 'E2E Matrix Regain',
@@ -413,6 +440,10 @@ test.describe('turns and rounds advance', () => {
       await expect(gm.locator('#combat .combatant')).toHaveCount(2);
       await gm.mouse.click(centre.x, centre.y);
       await expect(gm.locator('#token-hud')).toBeHidden();
+
+      // Unmark the plain character: the Defeated mark is a status on its actor, which later tests share.
+      await row.locator('[data-action="toggleDefeated"]').click();
+      await expect(row).not.toHaveClass(/defeated/);
    });
 });
 
@@ -655,6 +686,23 @@ test.describe('turn reports for every report setting value', () => {
             const report = await reportOf(baseline, 'turnStartReport');
             expect(report.system[family.key].total).toBe(family.total);
             expect(report.system[family.key].confirmed).toBe(mode === 'enabled');
+
+            // The report's resource snapshot holds the value after the turn start (the offer unapplied under
+            // showButton) and the resource's maximum, and a wounds snapshot only when the persistent damage is
+            // reported for a character that has Wounds.
+            const maxima = await gm.evaluate((id) => ({
+               max: game.actors.get(id).system.resource.stamina.max,
+               resolveMax: game.actors.get(id).system.resource.resolve.max,
+               woundsMax: game.actors.get(id).system.resource.wounds.max,
+            }), cast[family.role].id);
+            expect(report.system.resource[family.resource]).toMatchObject({
+               value: mode === 'enabled' ? before + family.forward : before,
+               max: family.resource === 'resolve' ? maxima.resolveMax : maxima.max,
+            });
+            if (family.key === 'persistentDamage') {
+               expect(Boolean(report.system.resource.wounds), 'wounds snapshot only with Wounds')
+                  .toBe(maxima.woundsMax > 0);
+            }
             await showChatLog(gm);
             const reportCard = card(gm, report.id);
             await expect(reportCard).toBeVisible();
@@ -879,4 +927,362 @@ test.describe('removal button and immunity handling at expiry', () => {
          ])).toEqual([[timerName, [`E2E Ward ${handling}`]]]);
       });
    }
+});
+
+test.describe('every route that moves the turn runs the same turn hooks', () => {
+   test.beforeEach(async () => {
+      await setWorldSetting(gm, 'reportEffects', true);
+      await setWorldSetting(gm, 'autoRemoveExpiredEffects', 'disabled');
+      await setWorldSetting(gm, 'autoApplyPersistentDamage', 'enabled');
+      await setWorldSetting(gm, 'autoRevertPersistentDamage', 'enabled');
+      await setWorldSetting(gm, 'autoApplyFastHealing', 'enabled');
+      await setWorldSetting(gm, 'autoRevertFastHealing', 'enabled');
+   });
+
+   test('beginning the combat starts the first combatant\'s turn once and posts its report', async () => {
+      await setResource(gm, cast.healer.uuid, 'stamina', 0);
+      const baseline = await gm.evaluate(() => game.messages.size);
+      await startEncounter('healer', { first: true });
+
+      // Fast healing of 2 at the first combatant's turn start, applied once (not again by a later move).
+      await expectResource(gm, 'healer', 'stamina', 2);
+      const report = await reportOf(baseline, 'turnStartReport');
+      expect(report.system.fastHealing).toMatchObject({
+         total: 2,
+         confirmed: true,
+      });
+      expect(await position()).toMatchObject({
+         round: 1,
+         turn: 0,
+         active: cast.healer.name,
+      });
+      expect(await readResource(player, 'healer', 'stamina'), 'applied once, on every client').toBe(2);
+   });
+
+   test('beginning the combat with a first combatant that has nothing to report posts no turn report', async () => {
+      // The same first-combatant flow posts a report when there is content (the test above); without content (Fast
+      // Healing disabled, nothing else to list) the begin posts none.
+      await setWorldSetting(gm, 'autoApplyFastHealing', 'disabled');
+      await setResource(gm, cast.healer.uuid, 'stamina', 0);
+      const baseline = await gm.evaluate(() => game.messages.size);
+      await startEncounter('healer', { first: true });
+      await nextTurn(gm);
+      await nextTurn(gm);
+      await expect.poll(position).toMatchObject({
+         round: 2,
+         turn: 0,
+      });
+      expect((await messagesSince(baseline)).filter((message) => message.type.startsWith('turn')), 'no report')
+         .toEqual([]);
+      expect(await readResource(gm, 'healer', 'stamina')).toBe(0);
+   });
+
+   test('Previous Turn from the first turn of round 1 reverts the begin\'s turn start', async () => {
+      await setResource(gm, cast.healer.uuid, 'stamina', 0);
+      await startEncounter('healer', { first: true });
+      await expectResource(gm, 'healer', 'stamina', 2);
+      const baseline = await gm.evaluate(() => game.messages.size);
+      await previousTurn(gm);
+      await expect.poll(() => gm.evaluate(() => ({
+         round: game.combat.round,
+         turn: game.combat.turn,
+      }))).toEqual({
+         round: 0,
+         turn: null,
+      });
+      await expectResource(gm, 'healer', 'stamina', 0);
+      const revert = await reportOf(baseline, 'turnStartRevertReport');
+      expect(revert.system.fastHealingRevert).toMatchObject({
+         total: 2,
+         confirmed: true,
+      });
+
+      // Begin again so the combat can end through the tracker: the turn start runs again, once.
+      await startCombat(gm);
+      await expectResource(gm, 'healer', 'stamina', 2);
+   });
+
+   test('Next Round and Previous Round end and start turns and revert them like Next Turn and Previous Turn',
+      async () => {
+         const before = await readResource(gm, 'damage', 'stamina');
+         await startEncounter('damage', { first: true });
+
+         // Begin: persistent damage of 1 at the first turn start.
+         await expectResource(gm, 'damage', 'stamina', before - 1);
+         const panel = await openSidebarTab(gm, 'combat');
+         await panel.locator('button.combat-control[data-action="nextRound"]').click();
+         await expect.poll(position).toMatchObject({
+            round: 2,
+            turn: 0,
+         });
+         await expectResource(gm, 'damage', 'stamina', before - 2);
+         await panel.locator('button.combat-control[data-action="previousRound"]').click();
+         await expect.poll(position).toMatchObject({
+            round: 1,
+            turn: 1,
+         });
+         await expectResource(gm, 'damage', 'stamina', before - 1);
+         expect(await readResource(player, 'damage', 'stamina'), 'no double firing on the player client')
+            .toBe(before - 1);
+      });
+});
+
+test.describe('persistent damage and resolve regain at the end of a turn', () => {
+   test.beforeEach(async () => {
+      await setWorldSetting(gm, 'reportEffects', true);
+      await setWorldSetting(gm, 'reportTakingDamage', true);
+      await setWorldSetting(gm, 'autoRemoveExpiredEffects', 'disabled');
+      await clearChat(gm);
+   });
+
+   for (const mode of MODES) {
+      test(`persistent damage at turn end: autoApplyPersistentDamage ${mode}`, async () => {
+         await setWorldSetting(gm, 'autoApplyPersistentDamage', mode);
+         await startEncounter('damageEnd');
+         const before = await readResource(gm, 'damageEnd', 'stamina');
+         await nextTurn(gm);
+         const baseline = await gm.evaluate(() => game.messages.size);
+         await nextTurn(gm);
+         if (mode === 'disabled') {
+            await expect.poll(position).toMatchObject({
+               round: 2,
+               turn: 0,
+            });
+            expect((await messagesSince(baseline)).map((message) => message.system.persistentDamage).filter(Boolean))
+               .toEqual([]);
+            expect(await readResource(gm, 'damageEnd', 'stamina')).toBe(before);
+            return;
+         }
+         const report = await reportOf(baseline, 'turnEndReport');
+         expect(report.system.persistentDamage).toMatchObject({
+            total: 1,
+            confirmed: mode === 'enabled',
+         });
+         expect(report.system.resolveRegain, 'a turn end never regains Resolve').toBeUndefined();
+         expect(report.system.resource.stamina).toMatchObject({ value: mode === 'enabled' ? before - 1 : before });
+         await showChatLog(gm);
+         const reportCard = card(gm, report.id);
+         await expect(reportCard).toBeVisible();
+         if (mode === 'enabled') {
+            await expectResource(player, 'damageEnd', 'stamina', before - 1);
+            await expect(reportCard.locator('.tag.persistent-damage')).toBeVisible();
+            await expect(reportCard.locator('button')).toHaveCount(0);
+         }
+         else {
+            await expect(reportCard.locator('button').first()).toContainText('1');
+            await reportCard.locator('button').first().click();
+            await expectResource(gm, 'damageEnd', 'stamina', before - 1);
+            await expect.poll(() => gm.evaluate(
+               (id) => game.messages.get(id).system.resource.stamina.value,
+               report.id,
+            )).toBe(before - 1);
+         }
+      });
+   }
+
+   test('resolve regain happens at the start of a turn only', async () => {
+      await setWorldSetting(gm, 'autoRegainResolve', 'enabled');
+      await setResource(gm, cast.regain.uuid, 'resolve', 0);
+      await startEncounter('regain');
+      await nextTurn(gm);
+      await expectResource(gm, 'regain', 'resolve', 1);
+      await setResource(gm, cast.regain.uuid, 'resolve', 0);
+      const baseline = await gm.evaluate(() => game.messages.size);
+      await nextTurn(gm);
+      await expect.poll(position).toMatchObject({
+         round: 2,
+         turn: 0,
+      });
+      expect(await readResource(gm, 'regain', 'resolve'), 'the turn end regained nothing').toBe(0);
+      expect((await messagesSince(baseline)).map((message) => message.system.resolveRegain).filter(Boolean))
+         .toEqual([]);
+   });
+});
+
+test.describe('conditions, suppressed tags, unlinked tokens and the character sheet', () => {
+   test.beforeEach(async () => {
+      await setWorldSetting(gm, 'autoDecreaseEffectDuration', true);
+      await setWorldSetting(gm, 'autoRemoveExpiredEffects', 'disabled');
+   });
+
+   for (const reported of [
+      true,
+      false,
+   ]) {
+      test(`reportEffects ${reported}: the conditions section of the turn-start report`, async () => {
+         await setWorldSetting(gm, 'reportEffects', reported);
+         await clearEffects('timed');
+         await applyCondition(gm, cast.timed.tokenId, 'blinded');
+         await startEncounter('timed');
+         const baseline = await gm.evaluate(() => game.messages.size);
+         await nextTurn(gm);
+         if (reported) {
+            const report = await reportOf(baseline, 'turnStartReport');
+            expect(report.system.conditions).toMatchObject([{ descriptionKey: 'blinded.desc' }]);
+            await showChatLog(gm);
+            await expect(card(gm, report.id).locator('.effects .tag').first()).toBeVisible();
+         }
+         else {
+            await expect.poll(position).toMatchObject({
+               round: 1,
+               turn: 1,
+            });
+            expect((await messagesSince(baseline)).filter((message) => message.type === 'turnStartReport'))
+               .toEqual([]);
+         }
+         await endCombat(gm);
+         await removeCondition(gm, cast.timed.tokenId, 'blinded');
+      });
+   }
+
+   test('a suppressed timed effect is listed with the suppressing immunity in the turn-start report', async () => {
+      await setWorldSetting(gm, 'reportEffects', true);
+      await setWorldSetting(gm, 'immunityHandling', 'suppress');
+      await clearEffects('timed');
+      await addEffect(gm, cast.timed.id, 'E2E Listed Warded', {
+         duration: DURATION_TURN_START,
+         remaining: 3,
+      });
+      const wardId = await addEffect(gm, cast.timed.id, 'E2E Listed Ward', { duration: DURATION_PERMANENT });
+      await addRulesElement(gm, `${cast.timed.uuid}.ActiveEffect.${wardId}`, {
+         key: 'E2E Listed Warded',
+         operation: 'immunity',
+         selector: 'effect',
+      });
+      await startEncounter('timed');
+      const baseline = await gm.evaluate(() => game.messages.size);
+      await nextTurn(gm);
+      const report = await reportOf(baseline, 'turnStartReport');
+      expect(report.system.effects[DURATION_TURN_START]).toMatchObject([
+        {
+           label: 'E2E Listed Warded',
+           remaining: 2,
+           suppressedBy: ['E2E Listed Ward'],
+        },
+      ]);
+   });
+
+   test('unlinked token: expiry and reports run on the token actor, not the world actor', async () => {
+      await setWorldSetting(gm, 'reportEffects', true);
+      await setWorldSetting(gm, 'autoRemoveExpiredEffects', 'enabled');
+      /** @type {string} The world actor's id. */
+      const actorId = await createActor(gm, {
+         name: 'E2E Matrix unlinked',
+         type: 'player',
+      });
+      if (await toggleTokenLink(gm, actorId)) {
+         await toggleTokenLink(gm, actorId);
+      }
+      /** @type {string} The unlinked token placed on the scene. */
+      const tokenId = await placeToken(gm, actorId);
+      expect(await gm.evaluate((tokenId) => canvas.scene.tokens.get(tokenId).actorLink, tokenId)).toBe(false);
+      cast.unlinked = {
+         id: actorId,
+         name: 'E2E Matrix unlinked',
+         uuid: `Actor.${actorId}`,
+         tokenId,
+      };
+      await addEffect(gm, actorId, 'E2E Token Start', {
+         duration: DURATION_TURN_START,
+         remaining: 1,
+         tokenId,
+      });
+      await addEffect(gm, actorId, 'E2E Token End', {
+         duration: DURATION_TURN_END,
+         remaining: 1,
+         tokenId,
+      });
+
+      /**
+       * Reads the names of the token actor's effects.
+       * @returns {Promise<string[]>} The names.
+       */
+      const tokenEffects = () => gm.evaluate(
+         (tokenId) => canvas.scene.tokens.get(tokenId).actor.effects.map((effect) => effect.name).sort(),
+         tokenId,
+      );
+      expect(await tokenEffects()).toEqual([
+         'E2E Token End',
+         'E2E Token Start',
+      ]);
+      expect(await gm.evaluate((id) => game.actors.get(id).effects.size, actorId), 'the world actor has none')
+         .toBe(0);
+      await startEncounter('unlinked');
+      const baseline = await gm.evaluate(() => game.messages.size);
+      await nextTurn(gm);
+      await expect.poll(tokenEffects).toEqual(['E2E Token End']);
+      const startReport = await reportOf(baseline, 'turnStartReport');
+      expect(startReport.system.effects.expired.map((entry) => entry.label)).toEqual(['E2E Token Start']);
+      expect(startReport.system.expiredEffectsRemoved).toBe(true);
+      const baselineEnd = await gm.evaluate(() => game.messages.size);
+      await nextTurn(gm);
+      await expect.poll(tokenEffects).toEqual([]);
+      const endReport = await reportOf(baselineEnd, 'turnEndReport');
+      expect(endReport.system.effects.expired.map((entry) => entry.label)).toEqual(['E2E Token End']);
+      expect(await gm.evaluate((id) => game.actors.get(id).effects.size, actorId)).toBe(0);
+   });
+
+   for (const mode of [
+      'disabled',
+      'enabled',
+   ]) {
+      test(`the character sheet's effect row after expiry: autoRemoveExpiredEffects ${mode}`, async () => {
+         await setWorldSetting(gm, 'reportEffects', true);
+         await setWorldSetting(gm, 'autoRemoveExpiredEffects', mode);
+         await clearEffects('timed');
+         const id = await addEffect(gm, cast.timed.id, `E2E Sheet Expiry ${mode}`, {
+            duration: DURATION_TURN_START,
+            remaining: 1,
+         });
+         await startEncounter('timed');
+         const sheet = await openSheetByUuid(gm, cast.timed.uuid);
+         await clickSheetTab(sheet, 'Effects');
+         const row = sheet.locator(`li.effect[data-effect-id="${id}"]`);
+         await expect(row).toBeVisible();
+         await expect(row).not.toContainText(/expired/i);
+         await nextTurn(gm);
+         if (mode === 'disabled') {
+            await expect(row).toContainText(/expired/i);
+         }
+         else {
+            await expect(row).toHaveCount(0);
+         }
+      });
+   }
+});
+
+test.describe('tracker controls', () => {
+   test('re-roll initiative from the combatant\'s context menu', async () => {
+      await startEncounter('timed');
+      /** @type {number} The timed character's initiative rating. */
+      const rating = await gm.evaluate((id) => game.actors.get(id).system.rating.initiative.value, cast.timed.id);
+      const panel = await openSidebarTab(gm, 'combat');
+      const row = panel.locator('.combatant', { hasText: cast.timed.name });
+
+      // The forced roll of 1 and 1 on top of the rating (formula: rating plus 2d6).
+      await expect(row.locator('.initiative-input')).toHaveValue(String(rating + 2));
+      await forceDice(gm, [
+         3,
+         3,
+      ]);
+      await row.click({ button: 'right' });
+      await chooseContextMenuEntry(
+         gm,
+         gm.locator('#context-menu li.context-item', { hasText: 'Re-roll Initiative' }),
+      );
+      await expect(row.locator('.initiative-input')).toHaveValue(String(rating + 6));
+   });
+
+   test('Cancel on the End Combat dialog keeps the combat; confirming deletes it', async () => {
+      await startEncounter('timed');
+      /** @type {string} The combat's id. */
+      const id = await gm.evaluate(() => game.combat.id);
+      const panel = await openSidebarTab(gm, 'combat');
+      await panel.locator('button.combat-control[data-action="endCombat"]').click();
+      await gm.locator('dialog.application.dialog [data-action="no"]').click();
+      await expect(gm.locator('dialog.application.dialog')).toHaveCount(0);
+      expect(await gm.evaluate((id) => game.combats.has(id) && game.combat.started, id), 'the combat stays').toBe(true);
+      await endCombat(gm);
+      expect(await gm.evaluate((id) => game.combats.has(id), id)).toBe(false);
+   });
 });

@@ -3200,3 +3200,18 @@ The evidence files named here are in `.superpowers/sdd/2026-10-10-e2e-coverage/t
   not run.
 - **Found:** 2026-10-10 by the review of the check card specs.
 - **Status:** Closed 2026-10-10.
+
+### 167. The first combatant's turn start never ran when the combat began, and Next Round, Previous Round and Previous Turn from round 1 skipped the turn hooks
+
+- **What (read, not run):** `TitanCombat` relayed `combatNextTurn` and `combatPreviousTurn` only from its `nextTurn` and
+  `previousTurn` overrides. `Combat#startCombat` (`C:\FoundryVTT\V14\dev\foundry\client\documents\combat.mjs:206-213`)
+  sets round 1 turn 0 and `nextRound` and `previousRound` (`:222-259`) update the turn directly, so none of them ran
+  `onTurnEnd`, `onTurnStart`, the initiative pass or the reverts; a Previous Turn from round 1 turn 0 relayed no restored
+  combatant and `onCombatPreviousTurn` warned and bailed.
+- **Fixed:** 2026-10-10: every one of those routes ends in `Combat#update` of `round` and `turn`, so `TitanCombat#update`
+  is the one place that relays the move (`options.direction` 1 or -1, or the update from round 0 to round 1 for Begin
+  Combat); the two hook handlers accept a missing ending or starting combatant. A report is posted only when it has
+  content (closed bug 166). Covered by "every route that moves the turn runs the same turn hooks" in `turn-matrix.spec.js`
+  (written, not run).
+- **Found:** 2026-10-10 while reading the turn code for the turn matrix.
+- **Status:** Closed 2026-10-10.

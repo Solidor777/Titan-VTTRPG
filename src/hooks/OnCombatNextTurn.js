@@ -2,21 +2,22 @@ import retryResolve from '~/helpers/utility-functions/RetryResolve.js';
 import warn from '~/helpers/utility-functions/Warn.js';
 
 /**
- * Called when combat advances from one turn to the next turn.
- * @param {string} currentCombatantId - The ID of the Combatant whose turn it currently is.
- * @param {string} previousCombatantId - The ID of the Combatant whose turn it previously was.
- * @param {string} combatId - The ID of the Combat that just advanced a turn.
+ * Called when a combat move goes forward: Begin Combat (no ending combatant), Next Turn and Next Round. The move
+ * ends the turn of the ending combatant, if any, and starts the turn of the current combatant, if any.
+ * @param {string|null} currentCombatantId - The ID of the Combatant whose turn starts, if any.
+ * @param {string|null} previousCombatantId - The ID of the Combatant whose turn ends, if any.
+ * @param {string} combatId - The ID of the Combat that just moved forward.
  */
 export default async function onCombatNextTurn(currentCombatantId, previousCombatantId, combatId) {
    // The socket relay delivers IDs (live document instances do not survive serialization), and the
    // socket can beat Foundry's native combat replication on a congested client, so re-resolve to live
-   // documents with a bounded retry before use.
+   // documents with a bounded retry before use. An ID the relay did not carry names no combatant to wait for.
    const context = await retryResolve(() => {
       // The live combat and its two relevant combatants, re-resolved from the relayed IDs.
       const combat = game.combats.get(combatId);
-      const currentCombatant = combat?.combatants.get(currentCombatantId);
-      const previousCombatant = combat?.combatants.get(previousCombatantId);
-      return combat && currentCombatant && previousCombatant
+      const currentCombatant = currentCombatantId ? combat?.combatants.get(currentCombatantId) : null;
+      const previousCombatant = previousCombatantId ? combat?.combatants.get(previousCombatantId) : null;
+      return combat && (!currentCombatantId || currentCombatant) && (!previousCombatantId || previousCombatant)
          ? {
             combat,
             currentCombatant,
@@ -41,35 +42,37 @@ export default async function onCombatNextTurn(currentCombatantId, previousComba
    // The re-resolved live documents.
    const { combat, currentCombatant, previousCombatant } = context;
 
-   // Handle Initiative based effects.
-   const currentInitiative = currentCombatant.initiative;
-   const previousInitiative = previousCombatant.initiative;
+   // Initiative based effects advance only when a turn passes from one combatant to another.
+   if (currentCombatant && previousCombatant) {
+      const currentInitiative = currentCombatant.initiative;
+      const previousInitiative = previousCombatant.initiative;
 
-   // Ensure that the combatants have initiative set.
-   if (currentInitiative === null || previousInitiative === null) {
-      warn(
-         'Current or Previous combatant had an Initiative of null. Initiative based effects will not function.',
-         currentCombatant,
-         previousCombatant,
-      );
-   }
-   else {
-      // Calculate whether this is a new round.
-      const isNewRound = currentInitiative > previousInitiative;
+      // Ensure that the combatants have initiative set.
+      if (currentInitiative === null || previousInitiative === null) {
+         warn(
+            'Current or Previous combatant had an Initiative of null. Initiative based effects will not function.',
+            currentCombatant,
+            previousCombatant,
+         );
+      }
+      else {
+         // Calculate whether this is a new round.
+         const isNewRound = currentInitiative > previousInitiative;
 
-      // For each character combatant.
-      for (const combatant of combat.getCharacterCombatants()) {
+         // For each character combatant.
+         for (const combatant of combat.getCharacterCombatants()) {
 
-         // Update initiative based effects on the character.
-         const actor = combatant?.actor;
-         if (actor) {
-            await actor.system.onInitiativeAdvanced(currentInitiative, previousInitiative, isNewRound);
+            // Update initiative based effects on the character.
+            const actor = combatant?.actor;
+            if (actor) {
+               await actor.system.onInitiativeAdvanced(currentInitiative, previousInitiative, isNewRound);
+            }
          }
       }
    }
 
-   // Perform end of turn updates for the previous character.
-   const previousCharacter = previousCombatant.actor;
+   // Perform end of turn updates for the ending character.
+   const previousCharacter = previousCombatant?.actor;
    if (previousCharacter && previousCharacter.system.isCharacter) {
       await previousCharacter.system.onTurnEnd();
    }

@@ -660,12 +660,16 @@ object; it must return the updated object. Entries must be in ascending version 
 
 ## Combat & turn flow
 
-**1. Advance — `TitanCombat.nextTurn` (src/document/types/combat/TitanCombat.js)**
-`TitanCombat` extends Foundry's `Combat`. `nextTurn()` stores `this.combatant` as `previousCombatant`,
-calls `super.nextTurn()` to advance Foundry's turn pointer, then calls
-`game.titan.socketManager.triggerSocketHook('combatNextTurn', currentCombatant?.id, previousCombatant?.id, this.id)`.
-IDs are emitted (not live document instances) because the `system.titan` socket JSON-serializes its
-payload — passing live documents would strip prototype methods and getters on the receiving client.
+**1. Advance — `TitanCombat#update` (src/document/types/combat/TitanCombat.js)**
+`TitanCombat` extends Foundry's `Combat`. Every route that moves the turn (Begin Combat, Next Turn, Previous Turn, Next
+Round, Previous Round) ends in one `Combat#update` of `round` and `turn`, and `update()` is the single place that relays
+the move: it stores `this.combatant`, calls `super.update()`, and when the round or turn changed calls
+`game.titan.socketManager.triggerSocketHook('combatNextTurn' | 'combatPreviousTurn', currentCombatant?.id,
+previousCombatant?.id, this.id)`. Core marks a move's direction in `options.direction` (1 forward, -1 backward); Begin
+Combat is the update from round 0 to round 1 and carries none, and relays `combatNextTurn` with no previous combatant.
+Moves between turns relay only when the combat has more than one turn. IDs are emitted (not live document instances)
+because the `system.titan` socket JSON-serializes its payload — passing live documents would strip prototype methods and
+getters on the receiving client.
 
 **2. Socket broadcast — `SocketManager` (src/helpers/SocketManager.js)**
 `triggerSocketHook` immediately fires `Hooks.callAll(id, ...args)` locally, then emits the same message on
@@ -675,7 +679,8 @@ every client processes turn effects, regardless of who clicked the next-turn but
 
 **3. Hook handler — `onCombatNextTurn` (src/hooks/OnCombatNextTurn.js)**
 Registered with `Hooks.on('combatNextTurn', onCombatNextTurn)` in `src/index.js`. The handler receives
-`(currentCombatantId, previousCombatantId, combatId)` and re-resolves them to live documents via
+`(currentCombatantId, previousCombatantId, combatId)` (either combatant ID may be missing: Begin Combat has no ending
+combatant, a Next Round from an unstarted turn has no starting one) and re-resolves them to live documents via
 `game.combats.get` / `combat.combatants.get` using a bounded retry (`retryResolve`, 5 attempts × 50 ms) —
 because the `system.titan` socket and Foundry's native combat replication are independent network paths, the
 relayed update may not have replicated yet on a congested client. On exhaustion it `warn`s and bails rather
@@ -709,10 +714,11 @@ entry renders through, localizes the key at render (an entry that stores `descri
 the `SuppressedEffectTag`, and dims the entry. The turn-start card mounts its tags when effects or conditions are
 reported.
 
-**5. Revert — `TitanCombat.previousTurn` / `onCombatPreviousTurn`**
+**5. Revert — `TitanCombat#update` / `onCombatPreviousTurn`**
 Each revert handler is the inverse of its forward counterpart (see the turn-start/turn-end steps above).
-`previousTurn()` mirrors `nextTurn()` — stores the displaced combatant, calls `super.previousTurn()`, then
-emits `'combatPreviousTurn'` with IDs (`restoredCombatant?.id, displacedCombatant?.id, this.id`) via socket.
+A backward move (`options.direction` -1: Previous Turn, Previous Round) emits `'combatPreviousTurn'` with IDs
+(`restoredCombatant?.id, displacedCombatant?.id, this.id`) via socket from the same `update()`; a Previous Turn from
+round 1 turn 0 returns the combat to round 0 with no restored combatant and reverts only the displaced turn start.
 `onCombatPreviousTurn` receives `(restoredCombatantId, displacedCombatantId, combatId)` and re-resolves to
 live documents before use. It calls:
   - `actor.system.onInitiativeReverted(...)` on every character combatant — increments the `remaining`

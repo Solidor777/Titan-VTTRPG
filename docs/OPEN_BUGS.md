@@ -264,18 +264,3 @@ Files cited as `bugbatch1-logs/...` are in `.superpowers/sdd/2026-09-29-conditio
   against the 14.368 install, not the 364 build the server runs, so the code paths need re-reading in 364.
 - **Found:** 2026-10-09 by the final review of the #151 follow-up round.
 - **Status:** Open; not reproduced.
-
-### 167. The first combatant's turn start never runs when the combat begins
-
-- **What (read, not run):** `TitanCombat` overrides only `nextTurn` and `previousTurn`; `Combat#startCombat`
-  (`C:\FoundryVTT\V14\dev\foundry\client\documents\combat.mjs:206-213`) sets round 1 turn 0 and fires no
-  `combatNextTurn`, so `onTurnStart` (Resolve regain, Persistent Damage, Fast Healing, turn messages, turn-start effect
-  durations) does not run for the combatant who acts first in round 1. The Begin Combat button is the only way to reach
-  it. The same read applies to Previous Turn from round 1 turn 0 (core's `previousRound` leaves `turn` null, so
-  `combatPreviousTurn` is emitted with no restored combatant and `onCombatPreviousTurn` warns and bails), and to the
-  Next Round and Previous Round buttons, which call `Combat#nextRound` and `#previousRound` directly and so tick no
-  durations and post no reports.
-- **Why it is open:** the fix adds a combat-start hook and relay (a new socket hook name and handler) and decides what
-  Next Round and Previous Round should do; that is a design decision for the user.
-- **Found:** 2026-10-10 while reading the turn code for the turn matrix.
-- **Status:** Open; not reproduced live.

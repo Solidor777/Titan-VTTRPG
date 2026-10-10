@@ -12,45 +12,38 @@ export default class TitanCombat extends Combat {
    }
 
    /**
-    * Advances to the next turn, triggering the combatNextTurn hook via socket for all clients.
-    * Emits combatant and combat IDs rather than live document instances so that the JSON-serialized
-    * socket payload delivers stable primitive values — handlers re-resolve to live documents on receipt.
+    * Updates the combat. Every route that moves the turn (Begin Combat, Next Turn, Previous Turn, Next Round and
+    * Previous Round) ends in one update of `round` and `turn`, so this is the single place that relays the move to every
+    * client. Core marks the direction of a move in `options.direction`; Begin Combat is the update from round 0 to
+    * round 1 and carries none. The relay emits combatant and combat IDs rather than live document instances so that the
+    * JSON-serialized socket payload delivers stable primitive values; the handlers re-resolve to live documents.
     * @override
+    * @param {object} [data] - The changes to apply.
+    * @param {object} [options] - The update operation; `direction` is 1 forward and -1 backward for a turn move.
     * @returns {Promise<Combat>} The updated Combat document.
     */
-   async nextTurn() {
-      let previousCombatant = this.combatant;
-      const retVal = await super.nextTurn();
-      if (this.turns.length > 1) {
-         const currentCombatant = this.combatant;
-         game.titan.socketManager.triggerSocketHook(
-            'combatNextTurn',
-            currentCombatant?.id,
-            previousCombatant?.id,
-            this.id,
-         );
-      }
-      return retVal;
-   }
+   async update(data = {}, options = {}) {
+      /** @type {number} The round before the update. */
+      const previousRound = this.round;
+      /** @type {number|null} The turn before the update. */
+      const previousTurn = this.turn;
+      /** @type {Combatant|null} The combatant whose turn it was before the update. */
+      const previousCombatant = this.combatant;
 
-   /**
-    * Retreats to the previous turn, triggering the combatPreviousTurn hook via socket for all clients.
-    * Emits combatant and combat IDs rather than live document instances so that the JSON-serialized
-    * socket payload delivers stable primitive values — handlers re-resolve to live documents on receipt.
-    * @override
-    * @returns {Promise<Combat>} The updated Combat document.
-    */
-   async previousTurn() {
-      let displacedCombatant = this.combatant;
-      const retVal = await super.previousTurn();
-      if (this.turns.length > 1) {
-         const restoredCombatant = this.combatant;
-         game.titan.socketManager.triggerSocketHook(
-            'combatPreviousTurn',
-            restoredCombatant?.id,
-            displacedCombatant?.id,
-            this.id,
-         );
+      const retVal = await super.update(data, options);
+
+      /** @type {boolean} Whether the update moved the round or the turn. */
+      const moved = retVal && (this.round !== previousRound || this.turn !== previousTurn);
+      if (moved) {
+         /** @type {boolean} Whether the update began the combat. */
+         const began = previousRound === 0 && this.round === 1;
+
+         // A solo combatant has no other turn to hand over to, so only the beginning of the combat is relayed.
+         if (began || (options.direction && this.turns.length > 1)) {
+            /** @type {string} The hook that carries the move: backward moves revert the forward hook's work. */
+            const hook = options.direction < 0 ? 'combatPreviousTurn' : 'combatNextTurn';
+            game.titan.socketManager.triggerSocketHook(hook, this.combatant?.id, previousCombatant?.id, this.id);
+         }
       }
       return retVal;
    }
