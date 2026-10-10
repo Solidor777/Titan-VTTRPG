@@ -667,8 +667,9 @@ payload — passing live documents would strip prototype methods and getters on 
 
 **2. Socket broadcast — `SocketManager` (src/helpers/SocketManager.js)**
 `triggerSocketHook` immediately fires `Hooks.callAll(id, ...args)` locally, then emits the same message on
-the `system.titan` socket so all other connected clients also call `Hooks.callAll`. This ensures every
-client processes turn effects, regardless of who clicked the next-turn button.
+the `system.titan` socket so all other connected clients also call `Hooks.callAll`, but only for hooks registered with
+`registerMirroredHook` and, for the combat turn hooks, only from a sender `AuthorizeCombatTurnHook` allows. This ensures
+every client processes turn effects, regardless of who clicked the next-turn button.
 
 **3. Hook handler — `onCombatNextTurn` (src/hooks/OnCombatNextTurn.js)**
 Registered with `Hooks.on('combatNextTurn', onCombatNextTurn)` in `src/index.js`. The handler receives

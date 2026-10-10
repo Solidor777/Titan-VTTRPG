@@ -3008,21 +3008,24 @@ The evidence files named here are in `.superpowers/sdd/2026-10-10-e2e-coverage/t
 - **Fixed (hardened, 2026-10-10):** the sender comes from the transport. Foundry's server appends the sending user's id,
   taken from the socket's authenticated session, as the second listener argument of every package socket event
   (`dist/packages/package.mjs` `registerCustomSocket`, `dist/server/sockets.mjs` `handleCustomSocket`; core build 364),
-  and `SocketManager` now hands it to the handler (`registerRequestHandler`, `request`) instead of discarding it; a
-  request carries no identity. Only the active GM's client answers; its answer (written, or the reason for the refusal)
-  returns to the requester, who sees a warning for a refusal or for no answer within 5 seconds. The GM side derives
-  every figure itself (`src/check/types/casting-check/ScalingAspectChange.js`): the request names only the new
-  `currentValue` of each scaling aspect, which must be a step of the aspect that the extra successes pay for; the
-  remaining successes, damage and healing are computed from it, and the message must be a casting check whose
-  speaking actor the sender owns (`src/hooks/OnRelayChatMessageUpdate.js`). `TitanChatMessage#update` relays only an
-  update with no operation options whose difference from the stored results is the scaling aspects' values and the
-  figures derived from them; every other write (other fields, dotted keys, `operation` options, other message
-  types) goes to core unchanged and raises core's permission error.
-  `tests/e2e/spell-aspect-spending.spec.js` covers an owner's write and a refused one with its warning, the allow-list,
-  and forged identities (a sender field, a leading identity argument, the old broadcast form) from a client that owns
-  nothing; `tests/unit/ScalingAspectChange.test.js` covers the two pure functions. Mutations that trust a sender field
-  of the message, drop the GM-side ownership check, drop the allow-list, drop the step check, make every answer a
-  success, and relay a write with `operation` options each fail the spec (`mutation-f1-*.log`).
+  and `SocketManager` hands it to the handler (`registerRequestHandler`, `request`); a request carries no identity.
+  Only the active GM's client answers, and only the active GM's answer settles a request; the answer (written, or the
+  reason for the refusal) returns to the requester, who sees a warning for a refusal or for no answer within 5 seconds.
+- **Fixed (delta wire, 2026-10-10):** the first hardened version sent the new `currentValue` of every aspect, so two
+  quick clicks on different aspects, or a GM edit in between, wrote one click's stale snapshot over the other's
+  change. The request now names ONE aspect index and a signed number of steps
+  (`TitanChatMessage#changeScalingAspect(index, steps)`), and the GM's client derives the result from the card as
+  stored when the write runs (`applyScalingSteps` in `src/check/types/casting-check/ScalingAspectChange.js`:
+  integer index and steps, remaining successes and damage or healing recomputed, refusal below the starting value or
+  beyond the extra successes). A user's changes to a card run through one per-card queue (`#queueChange`), shared by
+  the direct write (`writeScalingSteps`) and by the GM-side answer (`src/hooks/OnRelayChatMessageUpdate.js`, which
+  also requires the sender to own the speaking actor of a casting check card). The `update` override is gone, so every
+  other write (other fields, dotted keys, `operation` options, other message types) is core's and raises core's
+  permission error.
+  Tests (written, not run): `tests/unit/ScalingAspectChange.test.js` (`applyScalingSteps`),
+  `tests/unit/SocketManager.test.js` (no GM, 5 s timeout, only the active GM's reply counts, handler throw, no
+  handler, late reply, transport sender) and `tests/e2e/spell-aspect-spending.spec.js` (two quick clicks on different
+  aspects relayed and direct, a GM edit concurrent with a relayed click, the allow-list, forged identities).
 - **Found:** 2026-10-10 while writing the owner-player test of the aspect spending spec.
 - **Status:** Closed 2026-10-10.
 

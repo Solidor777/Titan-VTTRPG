@@ -887,8 +887,9 @@ at the repo root, so it catches v14 API breaks that the mocked Vitest tier canno
   Expertise), `spell-aspect-spending.spec.js` (every scaling standard aspect and custom aspects of cost 1 to 4 bought
   and refunded with the card's Reset, Decrease and Increase controls; three aspects of different costs; the
   one-affordable-aspect auto-spend; the owner of the speaker on a player client, relayed through the GM, with the
-  allow-list and forged-sender refusals; disabled and free aspects that cannot scale and the sheet's flag for a free
-  scaling aspect), `check-resolve.spec.js` (Resolve spent, or not with the setting off, by doubled Expertise on an
+  allow-list and forged-sender refusals, and quick clicks on different aspects that all stay; disabled and free aspects that cannot scale and the sheet's flag for a free
+  scaling aspect), `socket-hooks.spec.js` (a registered mirrored hook crosses clients, a forged hook name and a forged combat turn hook
+  are refused, the owner's own turn end still fires the hook), `check-resolve.spec.js` (Resolve spent, or not with the setting off, by doubled Expertise on an
   Attribute, Resistance and Attack check and by an Item Check's Resolve Cost), `spell-damage-healing.spec.js` (damage and healing aspects scaling on the card,
   Damage Mod and Healing Mod from a rules element reaching `results.damage` and `results.healing`, and the Apply
   buttons of the card on a targeted character), `drag.spec.js` (real pointer drags: character sheet item and effect
@@ -982,7 +983,7 @@ state), `checkCards.js` (the roll entry points `rollItemCheck` and `rollWeaponAt
 sheet the window a GM's chat-card buttons act on; `clickResist`, `clickOpposed`, `pressDamageButton` and
 `pressRendButton` with the report each posts; `readCardButtons`, `readResultRows` and `readVitals`; `createCharacter`,
 `wearArmor` and the sheet setters for a check's opposed Attribute and Skill, a custom aspect's Resistance, a trait with a
-number, a weapon's Multi-Attack and its "+ ES" box), `componentProbe.js`, `fast-check.js` and `slow-operation-reporter.js` are described under the entries below. `run-e2e-throttled.ps1` is the runner wrapper.
+number, a weapon's Multi-Attack and its "+ ES" box), `targeting.js` (`toggleTargetWithTokenHud`, `deleteTokenWithKey`, `retargetWithKey` and `targetWithKeyKeepingControl` for a Player whose only token stays controlled; used by `attack-targeting.spec.js`, and `sheet-hud-rolls.spec.js` rolls every check type from the sheet and the Player HUD on the GM and the owner Player seat), `componentProbe.js`, `fast-check.js` and `slow-operation-reporter.js` are described under the entries below. `run-e2e-throttled.ps1` is the runner wrapper.
 
 **Shared-world E2E harness (one world boot per FILE)** — every eligible spec boots the world ONCE per
 file, not per test. The pattern: module-scoped `let page; let errors;` plus three inline lifecycle hooks

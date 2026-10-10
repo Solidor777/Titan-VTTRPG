@@ -900,19 +900,21 @@ sequencing future racy mutations.
 
 **`SocketManager`** (`src/helpers/SocketManager.js`)
 
-Listens on `system.titan` via `game.socket`. Received messages are dispatched as Foundry Hooks
-(`Hooks.callAll`). `triggerSocketHook(id, ...args)` fires the hook locally and emits it to all
-clients — the primary mechanism for cross-client automation (e.g., a player-owned actor applying
-damage on the GM's behalf). Hook broadcasts carry the sender's own claims. A second kind of message, a request
-(`registerRequestHandler(name, handler)`, `request(name, ...args)`), runs `handler(senderId, ...args)` on the active GM's
-client only, with `senderId` taken from the transport (Foundry's server appends the authenticated sender as the second
-listener argument of package sockets) and never from the message, and sends the handler's return value or error back to
-the requester (5 s timeout). `TitanChatMessage#update` uses it: core lets only a message's author and a GM write a
-message, so for a casting card's scaling controls written by a user who owns the speaking actor, `update` requests
-`relayChatMessageUpdate` with only the new `currentValue` of each scaling aspect; `onRelayChatMessageUpdate`
-(`src/hooks/OnRelayChatMessageUpdate.js`) checks ownership and `applyScalingChange`
-(`src/check/types/casting-check/ScalingAspectChange.js`) derives remaining successes, damage and healing. Any other write
-goes to core unchanged.
+Listens on `system.titan` via `game.socket`. Two kinds of message travel on it. Hook broadcasts:
+`triggerSocketHook(id, ...args)` fires the hook locally and emits it to all clients; a received broadcast fires
+`Hooks.callAll` only if `registerMirroredHook(id, authorize?)` registered the name (`OnceInit.js` registers
+`combatNextTurn` and `combatPreviousTurn`, authorized by `AuthorizeCombatTurnHook`: a GM or the owner of the combatant
+whose turn ended), and a remote sender must pass `authorize(senderId, ...args)`; anything else is refused with a
+warning. Requests: `registerRequestHandler(name, handler)` and `request(name, ...args)` run
+`handler(senderId, ...args)` on the active GM's client only, with `senderId` taken from the transport (Foundry's server
+appends the authenticated sender as the second listener argument of package sockets) and never from the message, and
+send the return value or error back to the requester (5 s timeout; only the active GM's reply counts).
+`TitanChatMessage#changeScalingAspect(index, steps)` uses it: core lets only a message's author and a GM write a
+message, so a user who owns only the speaking actor requests `relayChatMessageUpdate(messageId, index, steps)`;
+`onRelayChatMessageUpdate` (`src/hooks/OnRelayChatMessageUpdate.js`) checks ownership and writes through
+`writeScalingSteps`, which applies `applyScalingSteps` (`src/check/types/casting-check/ScalingAspectChange.js`) to the
+card as stored. A card's changes on one client run through a per-card queue. No `update` override exists; every other
+write goes to core.
 
 **`utility-functions/`** (`src/helpers/utility-functions/`)
 
