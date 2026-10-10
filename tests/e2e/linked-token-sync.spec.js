@@ -53,6 +53,10 @@ const linkedTokens = [];
 let unlinkedTokenId;
 /** @type {string} The linked actor's name when the file starts. */
 let startName;
+/** @type {string|undefined} The scene that was active before the file activated its own. */
+let previousSceneId;
+/** @type {{confirmDeletingEffects: boolean, confirmDeletingItems: boolean}} The GM's settings before the file. */
+let previousSettings;
 
 /** @type {number} The run stamp in every fixture name. */
 const RUN = Date.now();
@@ -239,6 +243,11 @@ test.beforeAll(async ({ browser }) => {
    gm = await browser.newPage();
    errors = attachPageErrors(gm);
    await login(gm);
+   previousSettings = await gm.evaluate(() => ({
+      confirmDeletingEffects: game.settings.get('titan', 'confirmDeletingEffects'),
+      confirmDeletingItems: game.settings.get('titan', 'confirmDeletingItems'),
+   }));
+   previousSceneId = await gm.evaluate(() => game.scenes.active?.id);
    await setClientSetting(gm, 'confirmDeletingEffects', false);
    await setClientSetting(gm, 'confirmDeletingItems', false);
    player = await (await browser.newContext()).newPage();
@@ -277,6 +286,50 @@ test.afterEach(async () => {
 });
 
 test.afterAll(async () => {
+   // The file leaves the world as it found it: the previously active scene is active again, the GM's client settings
+   // are restored, and the scene, the tokens on it and both actors are deleted. Player 1 owns the actors, so a
+   // leftover would show to him as a character in later specs (the API delete is allowed for cleanup).
+   if (previousSceneId && await gm.evaluate((id) => game.scenes.has(id), previousSceneId)) {
+      await activateScene(gm, previousSceneId);
+   }
+   await closeAllApps(gm);
+   await setClientSetting(gm, 'confirmDeletingEffects', previousSettings.confirmDeletingEffects);
+   await setClientSetting(gm, 'confirmDeletingItems', previousSettings.confirmDeletingItems);
+   await gm.evaluate(async ({ sceneId, actorIds }) => {
+      await game.scenes.get(sceneId)?.delete();
+      for (const id of actorIds) {
+         await game.actors.get(id)?.delete();
+      }
+   }, {
+      sceneId,
+      actorIds: [
+         actorId,
+         unlinkedActorId,
+      ],
+   });
+   for (const page of [
+      gm,
+      player,
+   ]) {
+      await expect.poll(
+         () => page.evaluate(({ sceneId, actorIds }) => ({
+            scene: game.scenes.has(sceneId),
+            actors: actorIds.filter((id) => game.actors.has(id)),
+            active: game.scenes.active?.id,
+         }), {
+            sceneId,
+            actorIds: [
+               actorId,
+               unlinkedActorId,
+            ],
+         }),
+         { message: 'nothing the file made is left on the client' },
+      ).toEqual({
+         scene: false,
+         actors: [],
+         active: previousSceneId,
+      });
+   }
    await flushPageErrors(player);
    await player?.context().close();
    await gm?.close();
