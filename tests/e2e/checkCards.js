@@ -2,7 +2,7 @@ import { expect } from '@playwright/test';
 import { clickSheetTab, commitText } from './actions.js';
 import { readNewestCheckFlags } from './checkDialog.js';
 import { createActor, createOwnedItem, readServerSystem, setAttributeBase, setEquipped } from './flows.js';
-import { openSheetByUuid } from './fixtures.js';
+import { login, openSheetByUuid } from './fixtures.js';
 import { selectTitanOption } from './select.js';
 import { settle } from './settle.js';
 import { showChatLog } from './world.js';
@@ -10,6 +10,28 @@ import { showChatLog } from './world.js';
 // Page objects for the cards of item checks and attack checks, the buttons those cards offer (Resist, Opposed, the
 // damage buttons), the character that those buttons act on, and the settings of an item check row that `addCheck` does
 // not fill in.
+
+/**
+ * Opens a second Foundry client for E2E Player 1, who sees the chat cards the GM rolls and clicks their buttons.
+ * @param {import('@playwright/test').Browser} browser - The Playwright browser of the test fixture.
+ * @returns {Promise<import('@playwright/test').Page>} The player's logged-in page, in its own browser context.
+ */
+export async function loginPlayer(browser) {
+   /** @type {import('@playwright/test').Page} The player's page. */
+   const page = await (await browser.newContext()).newPage();
+   await login(page, 'E2E Player 1');
+   return page;
+}
+
+/**
+ * Reads the name of the user who authored a chat message, as the given client holds it.
+ * @param {import('@playwright/test').Page} page - A logged-in page.
+ * @param {string} messageId - The id of the chat message.
+ * @returns {Promise<string>} The author's name.
+ */
+export function readMessageAuthor(page, messageId) {
+   return page.evaluate((id) => game.messages.get(id).author.name, messageId);
+}
 
 /**
  * Counts the chat messages, so that the message a click adds is the one read.
@@ -185,6 +207,35 @@ export async function createCharacter(page, name, { body, mind, soul }) {
 }
 
 /**
+ * Opens an Armor item's sheet and finds its Armor stat (the current and maximum inputs).
+ * @param {import('@playwright/test').Page} page - A logged-in GM page.
+ * @param {string} armorUuid - The uuid of the armor.
+ * @returns {Promise<import('@playwright/test').Locator>} The Armor stat of the sheet's header.
+ */
+async function openArmorStat(page, armorUuid) {
+   return (await openSheetByUuid(page, armorUuid)).locator('.header .stat, .header .labeled-element')
+      .filter({ has: page.getByText('Armor', { exact: true }) }).last();
+}
+
+/**
+ * Sets the current Armor value of an Armor item with the current-value input of its sheet, so that a test that
+ * rends or repairs starts from a known value.
+ * @param {import('@playwright/test').Page} page - A logged-in GM page.
+ * @param {string} armorUuid - The uuid of the armor.
+ * @param {number} value - The current Armor value to type.
+ * @returns {Promise<void>} Resolves once the armor stores the value.
+ */
+export async function setArmorValue(page, armorUuid, value) {
+   /** @type {import('@playwright/test').Locator} The armor sheet's Armor stat. */
+   const armor = await openArmorStat(page, armorUuid);
+   await commitText(armor.locator('input').nth(0), String(value));
+   await expect.poll(
+      async () => (await readServerSystem(page, armorUuid)).armor.value,
+      { message: 'the input stored the Armor value' },
+   ).toBe(value);
+}
+
+/**
  * Gives a character an Armor item worn at a value: creates the Armor, types its Armor stat, and equips it with the
  * Equipped toggle of its row in the Inventory tab.
  * @param {import('@playwright/test').Page} page - A logged-in GM page.
@@ -201,8 +252,7 @@ export async function wearArmor(page, actorId, name, value) {
    const armorUuid = `Actor.${actorId}.Item.${armorId}`;
 
    /** @type {import('@playwright/test').Locator} The armor sheet's Armor stat. */
-   const armor = (await openSheetByUuid(page, armorUuid)).locator('.header .stat, .header .labeled-element')
-      .filter({ has: page.getByText('Armor', { exact: true }) }).last();
+   const armor = await openArmorStat(page, armorUuid);
    await commitText(armor.locator('input').nth(1), String(value));
    await commitText(armor.locator('input').nth(0), String(value));
    await expect.poll(

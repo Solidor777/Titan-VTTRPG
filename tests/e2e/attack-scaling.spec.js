@@ -169,6 +169,7 @@ test.describe('damage grows with the extra successes', () => {
    ]) {
       test(`${successes} on the dice: 3 + ${successes - 1} extra = ${damage} damage`,
          async () => {
+            /** @type {object} The rolled attack and its card in the GM's chat log. */
             const attack = await attackWith(scaleBlade, 0, faces(successes, 4));
             expect(attack.parameters.plusExtraSuccessDamage).toBe(true);
             expect(attack.parameters.damage, 'the attack\'s listed damage').toBe(3);
@@ -184,6 +185,7 @@ test.describe('damage grows with the extra successes', () => {
    }
 
    test('an attack without "+ ES" deals its listed damage whatever the extra successes', async () => {
+      /** @type {object} The rolled attack and its card in the GM's chat log. */
       const attack = await attackWith(scaleBlade, 1, faces(6, 4));
       expect(attack.parameters.plusExtraSuccessDamage).toBe(false);
       expect(attack.results.extraSuccesses, 'five extra successes').toBe(5);
@@ -192,8 +194,10 @@ test.describe('damage grows with the extra successes', () => {
    });
 
    test('a failed attack deals no damage and offers no damage button', async () => {
+      /** @type {object} The rolled attack and its card in the GM's chat log. */
       const hit = await attackWith(scaleBlade, 0, faces(1, 4));
       await expect(cardButton(hit.card, 'apply'), 'a hit has the damage buttons').toHaveCount(1);
+      /** @type {object} The rolled attack and its card in the GM's chat log. */
       const miss = await attackWith(scaleBlade, 0, faces(0, 4));
       expect(miss.results.succeeded).toBe(false);
       expect(miss.results.damage).toBe(0);
@@ -203,6 +207,7 @@ test.describe('damage grows with the extra successes', () => {
 
    test('a Damage Mod adds to the listed damage before the extra successes', async () => {
       // Three successes bank 2 extra successes: 3 + 2 (mod) + 2 = 7.
+      /** @type {object} The rolled attack and its card in the GM's chat log. */
       const attack = await attackWith(boostBlade, 0, faces(3, 4));
       expect(attack.parameters.damageMod).toBe(2);
       expect(attack.results.damage).toBe(7);
@@ -210,10 +215,24 @@ test.describe('damage grows with the extra successes', () => {
    });
 });
 
+/**
+ * Leaves the multi-attacker blade in a Multi-Attack state with its row button, so that no test depends on the state
+ * another test left.
+ * @param {boolean} multiAttack - The state to leave the blade in.
+ * @returns {Promise<void>} Resolves once the blade stores the state and the sheets are closed.
+ */
+async function holdMultiAttack(multiAttack) {
+   await setMultiAttack(gm, await openWeaponRow(gm, multiUuid, multiBladeId), multiBlade, multiAttack);
+   await closeAllApps(gm);
+}
+
 test.describe('multi-attack halves the dice and the Expertise', () => {
    test('the weapon row shows the halved dice and Expertise, and the toggle restores them', async () => {
+      /** @type {import('@playwright/test').Locator} The weapon's expanded row. */
       const row = await openWeaponRow(gm, multiUuid, multiBladeId);
+      /** @type {import('@playwright/test').Locator} The first attack's dice value. */
       const dice = row.getByTestId('attack-row-dice').first().locator('.value');
+      /** @type {import('@playwright/test').Locator} The first attack's Expertise value. */
       const expertise = row.getByTestId('attack-row-expertise').first().locator('.value');
       await expect(dice, 'Body 11 rolls 11 dice').toHaveText('11');
       await expect(expertise, 'Expertise 5').toHaveText('5');
@@ -233,6 +252,8 @@ test.describe('multi-attack halves the dice and the Expertise', () => {
    });
 
    test('a normal attack spends all 5 Expertise: eleven 3s become five successes', async () => {
+      await holdMultiAttack(false);
+      /** @type {object} The rolled attack and its card in the GM's chat log. */
       const attack = await attackWith(multiBlade, 0, faces(11, 3));
       expect(attack.parameters).toMatchObject({
          multiAttack: false,
@@ -246,6 +267,7 @@ test.describe('multi-attack halves the dice and the Expertise', () => {
    });
 
    test('a multi-attack rolls 5 dice with 2 Expertise, twice, and each card shows the tag', async () => {
+      /** @type {import('@playwright/test').Locator} The weapon's expanded row. */
       const row = await openWeaponRow(gm, multiUuid, multiBladeId);
       await setMultiAttack(gm, row, multiBlade, true);
       await closeAllApps(gm);
@@ -253,6 +275,7 @@ test.describe('multi-attack halves the dice and the Expertise', () => {
          'first',
          'second',
       ]) {
+         /** @type {object} The rolled attack and its card in the GM's chat log. */
          const attack = await attackWith(multiBlade, 0, faces(11, 3));
          expect(attack.parameters, `the ${label} attack`).toMatchObject({
             multiAttack: true,
@@ -268,6 +291,8 @@ test.describe('multi-attack halves the dice and the Expertise', () => {
    });
 
    test('a Flurry multi-attack rolls 6 dice with 2 Expertise', async () => {
+      await holdMultiAttack(true);
+      /** @type {object} The rolled attack and its card in the GM's chat log. */
       const attack = await attackWith(multiBlade, 1, faces(11, 3));
       expect(attack.parameters).toMatchObject({
          multiAttack: true,
@@ -280,9 +305,11 @@ test.describe('multi-attack halves the dice and the Expertise', () => {
    });
 
    test('turning Multi Attack off restores the full dice pool', async () => {
+      /** @type {import('@playwright/test').Locator} The weapon's expanded row. */
       const row = await openWeaponRow(gm, multiUuid, multiBladeId);
       await setMultiAttack(gm, row, multiBlade, false);
       await closeAllApps(gm);
+      /** @type {object} The rolled attack and its card in the GM's chat log. */
       const attack = await attackWith(multiBlade, 1, faces(11, 3));
       expect(attack.parameters).toMatchObject({
          multiAttack: false,
@@ -293,8 +320,13 @@ test.describe('multi-attack halves the dice and the Expertise', () => {
 });
 
 test.describe('Expertise buys the critical successes that Cleave counts', () => {
+   test.beforeEach(async () => {
+      await holdMultiAttack(false);
+   });
+
    test('a Cleave attack turns spare Expertise into 6s: eleven 5s become five Cleave', async () => {
       // Every die is already a success, so nothing is spent on failures; the 5 Expertise raise five 5s to 6s.
+      /** @type {object} The rolled attack and its card in the GM's chat log. */
       const cleave = await attackWith(multiBlade, 2, faces(11, 5));
       expect(cleave.results.successes).toBe(11);
       expect(cleave.results.criticalSuccesses, 'five 5s became 6s').toBe(5);
@@ -304,6 +336,7 @@ test.describe('Expertise buys the critical successes that Cleave counts', () => 
    });
 
    test('an attack without Cleave or Rend keeps the Expertise and shows no Cleave', async () => {
+      /** @type {object} The rolled attack and its card in the GM's chat log. */
       const plain = await attackWith(multiBlade, 0, faces(11, 5));
       expect(plain.results.criticalSuccesses).toBe(0);
       expect(plain.results.expertiseRemaining, 'the Expertise is not spent').toBe(5);
