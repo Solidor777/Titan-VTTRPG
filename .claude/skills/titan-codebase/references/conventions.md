@@ -865,6 +865,12 @@ at the repo root, so it catches v14 API breaks that the mocked Vitest tier canno
   document of the `titan-vttrpg-compendium` packs at run time, drags each from its open pack window onto a character
   sheet in batches of 40 or imports the actor, then scans every tab of the character sheet, the owned copy's sheet and
   the pack entry's sheet for page errors, error notifications, empty content and `LOCAL.` text).
+- Deleted documents. `deleted-document-surfaces.spec.js` (a world actor of each type, a world item and an owned item of
+  each type, an effect, a condition, a placed linked or unlinked token deleted through the sidebar Delete entry, the row
+  Delete buttons, the Delete key or the Token HUD while its sheet, Token HUD, Token Configuration window or Player HUD is
+  open, and a second client's open sheets: no uncaught page error, no console error and no warning or error
+  notification; `deletions.js` holds the watch, the notice recorder and the directory delete flow; refused connections to
+  Wiretap's port 31416 are filtered from the console errors).
 - Sheets and documents. `surfaces.spec.js` (every sheet type, spell tab, check-options dialog and the effect tray
   renders on flow-made documents with zero uncaught page errors and no `LOCAL.` text; the collapsed-layout regressions;
   the portrait pick through Foundry's file picker; opening a sheet from the directory; the Edit Unique ID dialog),
