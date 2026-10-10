@@ -21,6 +21,7 @@ import {
    openSidebarTab,
    placeToken,
    previousTurn,
+   restOnToken,
    rollInitiative,
    setOwnership,
    setResource,
@@ -309,7 +310,7 @@ test.describe('turns and rounds advance', () => {
       await startEncounter('timed');
 
       // Initiative order from forced dice: the plain character (6+6) acts before the timed one (1+1).
-      expect(await position()).toEqual({
+      await expect.poll(position).toEqual({
          round: 1,
          turn: 0,
          active: cast.plain.name,
@@ -321,7 +322,7 @@ test.describe('turns and rounds advance', () => {
       await expect(gm.locator('#combat .encounter-title')).toContainText('1');
 
       await nextTurn(gm);
-      expect(await position()).toEqual({
+      await expect.poll(position).toEqual({
          round: 1,
          turn: 1,
          active: cast.timed.name,
@@ -329,7 +330,7 @@ test.describe('turns and rounds advance', () => {
 
       // Wrap-around from the last combatant.
       await nextTurn(gm);
-      expect(await position()).toEqual({
+      await expect.poll(position).toEqual({
          round: 2,
          turn: 0,
          active: cast.plain.name,
@@ -338,13 +339,13 @@ test.describe('turns and rounds advance', () => {
 
       // Previous turn from the first combatant goes back to the last combatant of the prior round.
       await previousTurn(gm);
-      expect(await position()).toEqual({
+      await expect.poll(position).toEqual({
          round: 1,
          turn: 1,
          active: cast.timed.name,
       });
       await previousTurn(gm);
-      expect(await position()).toEqual({
+      await expect.poll(position).toEqual({
          round: 1,
          turn: 0,
          active: cast.plain.name,
@@ -405,11 +406,13 @@ test.describe('turns and rounds advance', () => {
          (tokenId) => canvas.clientCoordinatesFromCanvas(canvas.scene.tokens.get(tokenId).object.center),
          cast.damage.tokenId,
       );
-      await gm.mouse.move(centre.x, centre.y, { steps: 5 });
+      await restOnToken(gm, cast.damage.tokenId, centre);
       await gm.mouse.click(centre.x, centre.y, { button: 'right' });
       await gm.locator('#token-hud [data-action="combat"]').click();
       await expect.poll(() => gm.evaluate(() => game.combat.combatants.size)).toBe(2);
       await expect(gm.locator('#combat .combatant')).toHaveCount(2);
+      await gm.mouse.click(centre.x, centre.y);
+      await expect(gm.locator('#token-hud')).toBeHidden();
    });
 });
 
@@ -482,6 +485,10 @@ test.describe('effect expiry for every duration type and Auto-remove value', () 
          expect(startReport.system.expiredEffectsRemoved).toBe(mode === 'enabled');
          await showChatLog(gm);
          await expect(card(gm, startReport.id)).toBeVisible();
+
+         // The report is whispered to the owners of a character nobody else owns, so the player's client never holds it.
+         expect(await player.evaluate((id) => game.messages.get(id) === undefined, startReport.id))
+            .toBe(true);
          if (mode === 'showButton') {
             await expect(card(gm, startReport.id).locator('button')).not.toHaveCount(0);
          }
@@ -572,7 +579,7 @@ test.describe('effect expiry for every duration type and Auto-remove value', () 
 /**
  * The offer a turn report variant produces for each setting value, per family.
  * @type {{family: string, role: string, setting: string, key: string, revertSetting: string, revertKey: string,
- * type: string, resource: string, start: number, forward: number, tag: string}[]}
+ * resource: string, start: number|null, forward: number, total: number, tag: string}[]}
  */
 const FAMILIES = [
    {
@@ -585,6 +592,7 @@ const FAMILIES = [
       resource: 'stamina',
       start: 0,
       forward: 2,
+      total: 2,
       tag: '.tag.fast-healing',
    },
    {
@@ -597,6 +605,7 @@ const FAMILIES = [
       resource: 'stamina',
       start: null,
       forward: -1,
+      total: 1,
       tag: '.tag.persistent-damage',
    },
    {
@@ -609,6 +618,7 @@ const FAMILIES = [
       resource: 'resolve',
       start: 0,
       forward: 1,
+      total: 2,
       tag: '.tag.resolve-regain',
    },
 ];
@@ -643,7 +653,7 @@ test.describe('turn reports for every report setting value', () => {
                return;
             }
             const report = await reportOf(baseline, 'turnStartReport');
-            expect(report.system[family.key].total).toBe(Math.abs(family.forward));
+            expect(report.system[family.key].total).toBe(family.total);
             expect(report.system[family.key].confirmed).toBe(mode === 'enabled');
             await showChatLog(gm);
             const reportCard = card(gm, report.id);
@@ -655,10 +665,19 @@ test.describe('turn reports for every report setting value', () => {
             }
             else {
                expect(await readResource(gm, family.role, family.resource)).toBe(before);
-               await expect(reportCard.locator('button').first()).toContainText(String(Math.abs(family.forward)));
+               await expect(reportCard.locator('button').first()).toContainText(String(family.total));
                await reportCard.locator('button').first().click();
                await expectResource(gm, family.role, family.resource, before + family.forward);
                await expect(reportCard.locator(family.tag)).toBeVisible();
+
+               // The card's resource snapshot follows the apply (it is read from `system.resource`).
+               await expect.poll(() => gm.evaluate(
+                  ({ id, resource }) => game.messages.get(id).system.resource[resource].value,
+                  {
+                     id: report.id,
+                     resource: family.resource,
+                  },
+               ), { message: 'the snapshot shows the applied value' }).toBe(before + family.forward);
             }
 
             // The report is whispered to the owning player: their chat DOM shows the card, and a character the player
@@ -687,7 +706,7 @@ test.describe('turn reports for every report setting value', () => {
                return;
             }
             const report = await reportOf(baseline, 'turnStartRevertReport');
-            expect(report.system[family.revertKey].total).toBe(Math.abs(family.forward));
+            expect(report.system[family.revertKey].total).toBe(family.total);
             expect(report.system[family.revertKey].confirmed).toBe(mode === 'enabled');
             await showChatLog(gm);
             await expect(card(gm, report.id)).toBeVisible();
@@ -699,6 +718,13 @@ test.describe('turn reports for every report setting value', () => {
                expect(await readResource(gm, family.role, family.resource)).toBe(before + family.forward);
                await card(gm, report.id).locator('button').first().click();
                await expectResource(gm, family.role, family.resource, before);
+               await expect.poll(() => gm.evaluate(
+                  ({ id, resource }) => game.messages.get(id).system.resource[resource].value,
+                  {
+                     id: report.id,
+                     resource: family.resource,
+                  },
+               ), { message: 'the snapshot shows the reverted value' }).toBe(before);
             }
          });
       }

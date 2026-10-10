@@ -59,7 +59,9 @@
             await document.data.update({
                system: {
                   persistentDamageRevert: { confirmed: true },
-                  stamina: { value: actor.system.resource.stamina.value },
+                  resource: {
+                     stamina: { value: actor.system.resource.stamina.value },
+                  },
                },
             });
          }

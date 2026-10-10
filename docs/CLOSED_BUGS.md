@@ -3138,3 +3138,16 @@ The evidence files named here are in `.superpowers/sdd/2026-10-10-e2e-coverage/t
   blank report" in `turn-matrix.spec.js` (written, not run).
 - **Found:** 2026-10-10 while reading the turn code for the turn matrix.
 - **Status:** Closed 2026-10-10.
+
+### 168. A turn report's apply and revert buttons wrote the resource snapshot to a path the card does not read
+
+- **What (read, not run):** the Apply and Revert buttons of Persistent Damage, Fast Healing (apply) and Resolve Regain
+  updated `system.stamina`, `system.wounds` or `system.resolve` of the report message; the report schema and the card
+  read the snapshots at `system.resource.stamina|wounds|resolve`, so the update was dropped and the card kept showing
+  the value from before the click (`ChatMessageStamina.svelte` reads `system.resource.stamina.value`; the Revert Fast
+  Healing button already wrote `system.resource`).
+- **Fixed:** 2026-10-10: the five buttons write `system.resource.*`; the persistent damage button writes the wounds
+  snapshot only when the report has one. Covered by the snapshot assertions after each button click in
+  `turn-matrix.spec.js` (written, not run).
+- **Found:** 2026-10-10 while reading the report buttons for the turn matrix.
+- **Status:** Closed 2026-10-10.

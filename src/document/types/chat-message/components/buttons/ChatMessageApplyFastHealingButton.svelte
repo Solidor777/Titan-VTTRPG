@@ -60,7 +60,9 @@
             await document.data.update({
                system: {
                   fastHealing: { confirmed: true },
-                  stamina: { value: actor.system.resource.stamina.value },
+                  resource: {
+                     stamina: { value: actor.system.resource.stamina.value },
+                  },
                },
             });
          }

@@ -60,13 +60,21 @@
 
             // Update the chat message. The partial persistentDamage update deep-merges into the stored
             // object, preserving its total and per-source keys.
-            await document.data.update({
+            // The wounds snapshot exists only when the character has Wounds, and a partial update of an absent
+            // snapshot would store a value without its maximum.
+            /** @type {object} The data to update the document with. */
+            const updateData = {
                system: {
                   persistentDamage: { confirmed: true },
-                  stamina: { value: actor.system.resource.stamina.value },
-                  wounds: { value: actor.system.resource.wounds.value },
+                  resource: {
+                     stamina: { value: actor.system.resource.stamina.value },
+                  },
                },
-            });
+            };
+            if (document.data.system.resource.wounds) {
+               updateData.system.resource.wounds = { value: actor.system.resource.wounds.value };
+            }
+            await document.data.update(updateData);
          }
       }
    }

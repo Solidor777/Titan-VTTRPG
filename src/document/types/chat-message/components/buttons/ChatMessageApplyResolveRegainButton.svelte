@@ -60,7 +60,9 @@
             await document.data.update({
                system: {
                   resolveRegain: { confirmed: true },
-                  resolve: { value: actor.system.resource.resolve.value },
+                  resource: {
+                     resolve: { value: actor.system.resource.resolve.value },
+                  },
                },
             });
          }
