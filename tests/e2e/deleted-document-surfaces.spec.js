@@ -95,6 +95,15 @@ function windowOf(suffix) {
 }
 
 /**
+ * Locates the Player HUD's portrait; the HUD's own container element is always shown, so the portrait is the part that
+ * appears for a controlled token.
+ * @returns {import('@playwright/test').Locator} The portrait.
+ */
+function portrait() {
+   return page.locator('[data-testid="player-hud-portrait"]');
+}
+
+/**
  * Takes control of a placed token and opens its Token HUD with a right click, which shows the Player HUD as well.
  * @param {string} tokenId - The placed token.
  * @returns {Promise<void>} Resolves once the Token HUD and the Player HUD are visible.
@@ -109,7 +118,7 @@ async function controlWithHuds(tokenId) {
    await restOnToken(page, tokenId, centre);
    await page.mouse.click(centre.x, centre.y, { button: 'right' });
    await expect(page.locator('#token-hud'), 'the Token HUD is open').toBeVisible();
-   await expect(page.locator('#titan-player-hud'), 'the Player HUD shows the controlled token').toBeVisible();
+   await expect(portrait(), 'the Player HUD shows the controlled token').toBeVisible();
 }
 
 /**
@@ -192,7 +201,7 @@ test.describe('a placed token deleted with the Delete key', () => {
                );
                await resetDeletionWatch(page, watch);
                await deleteControlledToken(page, tokenId);
-               await expect(page.locator('#titan-player-hud'), 'the Player HUD left with the token').toBeHidden();
+               await expect(portrait(), 'the Player HUD left with the token').toBeHidden();
                if (!linked) {
                   await expect(sheet, 'the synthetic actor sheet closed with the token').toHaveCount(0);
                }
@@ -216,6 +225,9 @@ test.describe('a placed token deleted with its Token Configuration window open',
          const config = windowOf(`Token-${tokenId}`);
          await expect(config).toBeVisible();
          await resetDeletionWatch(page, watch);
+
+         // Core's keyboard manager ignores a key pressed while a form field has focus (the window focuses a field).
+         await page.evaluate(() => document.activeElement?.blur());
          await deleteControlledToken(page, tokenId);
          await expect(config, 'the configuration window closed with the token').toHaveCount(0);
          await expectNoDeletionErrors(page, watch, errors, 'a token with its configuration open');
