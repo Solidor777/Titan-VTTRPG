@@ -1,6 +1,6 @@
-import { expect, test } from './harness.js';
+import { expect, flushPageErrors, test } from './harness.js';
 import { clickTabButton } from './actions.js';
-import { collectLocalizationOffenders, flushPageErrors, login, openSheetByUuid } from './fixtures.js';
+import { collectLocalizationOffenders, login, openSheetByUuid } from './fixtures.js';
 import { createActor, openSidebarTab } from './flows.js';
 import { record } from './registry.js';
 import { settle } from './settle.js';

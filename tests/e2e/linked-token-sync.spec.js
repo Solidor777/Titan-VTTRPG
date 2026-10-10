@@ -539,8 +539,8 @@ test.describe('player seat and controlled-token HUD', () => {
    });
 
    test('the portrait button opens no picker for a player without file browsing, and does for the GM', async () => {
-      // The picker refuses a user without FILES_BROWSE, default Trusted (`client/applications/apps/file-picker.mjs:648`,
-      // `common/constants.mjs:1303-1307`).
+      // The picker refuses a user without FILES_BROWSE, default Trusted
+      // (`client/applications/apps/file-picker.mjs:648`, `common/constants.mjs:1303-1307`).
       const gmSheet = await openSheetByUuid(gm, `Actor.${actorId}`);
       await gmSheet.locator('.portrait button').first().click();
       await expect(gm.locator('#file-picker'), 'the GM gets the picker').toBeVisible();
@@ -555,7 +555,7 @@ test.describe('player seat and controlled-token HUD', () => {
       expect(await read(player, '(actor) => actor.img'), 'the portrait is unchanged').toBe(before);
    });
 
-   test('a player's Token HUD has the bars and elevation but no configuration, lock or visibility', async () => {
+   test("a player's Token HUD has the bars and elevation but no configuration, lock or visibility", async () => {
       // GM presence: the same HUD shows all three (`templates/hud/token-hud.hbs:15,30,43`).
       const gmCentre = await hoverToken(gm, linkedTokens[1]);
       await gm.mouse.click(gmCentre.x, gmCentre.y, { button: 'right' });
@@ -588,7 +588,7 @@ test.describe('player seat and controlled-token HUD', () => {
       ]) {
          await expect.poll(
             async () => (await readToken(page, linkedTokens[1])).elevation,
-            { message: 'the player's HUD elevation reached the token' },
+            { message: "the player's HUD elevation reached the token" },
          ).toBe(2);
       }
       await closeHud(linkedTokens[1], player);

@@ -12,8 +12,8 @@ import { settle } from './settle.js';
  */
 
 /**
- * Starts watching a page for console errors and records every warning or error notification the page raises (a read-only
- * wrapper around `ui.notifications.notify`). Call once per page.
+ * Starts watching a page for console errors and records every warning or error notification the page raises (a
+ * read-only wrapper around `ui.notifications.notify`). Call once per page.
  * @param {import('@playwright/test').Page} page - A logged-in page.
  * @returns {Promise<DeletionWatch>} The live console-error list.
  */

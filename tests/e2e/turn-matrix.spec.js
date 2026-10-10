@@ -517,7 +517,8 @@ test.describe('effect expiry for every duration type and Auto-remove value', () 
          await showChatLog(gm);
          await expect(card(gm, startReport.id)).toBeVisible();
 
-         // The report is whispered to the owners of a character nobody else owns, so the player's client never holds it.
+         // The report is whispered to the owners of a character nobody else owns, so the player's client never holds
+         // it.
          expect(await player.evaluate((id) => game.messages.get(id) === undefined, startReport.id))
             .toBe(true);
          if (mode === 'showButton') {
@@ -778,7 +779,7 @@ test.describe('turn reports for every report setting value', () => {
       }
    }
 
-   test('turn end: fast healing at turn end posts a turnEndReport and its revert posts a turnEndRevertReport', async () => {
+   test('turn end: fast healing posts a turnEndReport and its revert posts a turnEndRevertReport', async () => {
       await setWorldSetting(gm, 'autoApplyFastHealing', 'enabled');
       await setWorldSetting(gm, 'autoRevertFastHealing', 'enabled');
       await setResource(gm, cast.healerEnd.uuid, 'stamina', 0);
@@ -845,7 +846,8 @@ test.describe('turn reports for every report setting value', () => {
       await startEncounter('timed');
       const baseline = await gm.evaluate(() => game.messages.size);
       await nextTurn(gm);
-      await expect.poll(async () => 'E2E Silent Start' in await effectState('timed'), { message: 'start effect removed' })
+      await expect
+         .poll(async () => 'E2E Silent Start' in await effectState('timed'), { message: 'start effect removed' })
          .toBe(false);
       await nextTurn(gm);
       await expect.poll(async () => 'E2E Silent End' in await effectState('timed'), { message: 'end effect removed' })
@@ -924,7 +926,10 @@ test.describe('removal button and immunity handling at expiry', () => {
          expect(report.system.effects.expired.map((entry) => [
             entry.label,
             entry.suppressedBy,
-         ])).toEqual([[timerName, [`E2E Ward ${handling}`]]]);
+         ])).toEqual([[
+            timerName,
+            [`E2E Ward ${handling}`],
+         ]]);
       });
    }
 });
@@ -1154,11 +1159,11 @@ test.describe('conditions, suppressed tags, unlinked tokens and the character sh
       await nextTurn(gm);
       const report = await reportOf(baseline, 'turnStartReport');
       expect(report.system.effects[DURATION_TURN_START]).toMatchObject([
-        {
-           label: 'E2E Listed Warded',
-           remaining: 2,
-           suppressedBy: ['E2E Listed Ward'],
-        },
+         {
+            label: 'E2E Listed Warded',
+            remaining: 2,
+            suppressedBy: ['E2E Listed Ward'],
+         },
       ]);
    });
 

@@ -13,10 +13,11 @@ export default class TitanCombat extends Combat {
 
    /**
     * Updates the combat. Every route that moves the turn (Begin Combat, Next Turn, Previous Turn, Next Round and
-    * Previous Round) ends in one update of `round` and `turn`, so this is the single place that relays the move to every
-    * client. Core marks the direction of a move in `options.direction`; Begin Combat is the update from round 0 to
-    * round 1 and carries none. The relay emits combatant and combat IDs rather than live document instances so that the
-    * JSON-serialized socket payload delivers stable primitive values; the handlers re-resolve to live documents.
+    * Previous Round) ends in one update of `round` and `turn`, so this is the single place that relays the move to
+    * every client. Core marks the direction of a move in `options.direction`; Begin Combat is the update from round 0
+    * to round 1 and carries none. The relay emits combatant and combat IDs rather than live document instances so
+    * that the JSON-serialized socket payload delivers stable primitive values; the handlers re-resolve to live
+    * documents.
     * @override
     * @param {object} [data] - The changes to apply.
     * @param {object} [options] - The update operation; `direction` is 1 forward and -1 backward for a turn move.

@@ -29,10 +29,10 @@ import { setClientSetting } from './settings.js';
 import { attachPageErrors, closeAllApps } from './world.js';
 
 /**
- * Deleting a character, item, effect or token while a surface shows it raises no uncaught error, no console error and no
- * warning or error notification: the sheet of every actor and item type and of the effect and condition, the Token HUD,
- * the Player HUD and a second client's open sheets. Everything is made and deleted through the UI (sidebar Delete, the
- * row Delete buttons, the Delete key on a controlled token, the Token HUD condition control).
+ * Deleting a character, item, effect or token while a surface shows it raises no uncaught error, no console error and
+ * no warning or error notification: the sheet of every actor and item type and of the effect and condition, the Token
+ * HUD, the Player HUD and a second client's open sheets. Everything is made and deleted through the UI (sidebar
+ * Delete, the row Delete buttons, the Delete key on a controlled token, the Token HUD condition control).
  */
 
 /** @type {import('@playwright/test').Page} The file-shared, logged-in page (one world boot per file). */
@@ -177,7 +177,10 @@ test.describe('a world actor deleted from the Actors directory', () => {
 
 test.describe('a placed token deleted with the Delete key', () => {
    for (const type of ACTOR_TYPES) {
-      for (const linked of [true, false]) {
+      for (const linked of [
+         true,
+         false,
+      ]) {
          test(`${linked ? 'a linked' : 'an unlinked'} ${type} token under both HUDs with its actor sheet open`,
             async () => {
                const { tokenId } = await actorWithToken(type, linked);
@@ -200,7 +203,10 @@ test.describe('a placed token deleted with the Delete key', () => {
 });
 
 test.describe('a placed token deleted with its Token Configuration window open', () => {
-   for (const linked of [true, false]) {
+   for (const linked of [
+      true,
+      false,
+   ]) {
       test(`${linked ? 'a linked' : 'an unlinked'} token`, async () => {
          const { tokenId } = await actorWithToken('player', linked);
          await controlWithHuds(tokenId);
@@ -250,7 +256,10 @@ test.describe('an owned item', () => {
          await deleteOwnedItem(
             page,
             `Actor.${actorId}`,
-            { ability: 'Abilities', spell: 'Spells' }[type] ?? 'Inventory',
+            {
+               ability: 'Abilities',
+               spell: 'Spells',
+            }[type] ?? 'Inventory',
             `Actor.${actorId}.Item.${itemId}`,
          );
          await expect(itemSheet, 'the item sheet closed with the item').toHaveCount(0);
