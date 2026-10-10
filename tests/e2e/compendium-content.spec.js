@@ -142,7 +142,9 @@ async function openPackWindow(packId) {
    // The module's packs sit in a folder that starts collapsed; expanding it is a click on its header. The `has`
    // locator is matched inside each folder, so it is built from the page, not from the panel.
    /** @type {import('@playwright/test').Locator} The collapsed folders that hold the pack, outermost first. */
-   const collapsed = panel.locator('li.directory-item.folder:not(.expanded)').filter({ has: page.locator(`.directory-item.compendium[data-pack="${packId}"]`) });
+   const collapsed = panel.locator('li.directory-item.folder:not(.expanded)').filter({
+      has: page.locator(`.directory-item.compendium[data-pack="${packId}"]`),
+   });
    for (let remaining = await collapsed.count(); remaining > 0; remaining--) {
       await collapsed.first().locator('> header.folder-header').click();
       await expect(collapsed).toHaveCount(remaining - 1);
