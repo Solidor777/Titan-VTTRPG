@@ -3005,3 +3005,68 @@ The evidence files named here are in `.superpowers/sdd/2026-10-10-e2e-coverage/t
   `NONE`. The mutation that makes `update` always write directly fails the spec (`mutation-relay.log`).
 - **Found:** 2026-10-10 while writing the owner-player test of the aspect spending spec.
 - **Status:** Closed 2026-10-10.
+
+### 158. A failed Resistance or opposed check took negative damage when its successes exceeded the damage
+
+- **What (measured):** the Fixed Strike check of `resistance-checks.spec.js` deals 1 damage that does not scale and is
+  reduced by the Reflexes check. Four successes bank 3 extra successes, so the Resist button asks for Complexity 4; a
+  Reflexes check with 3 successes failed and the card stored `damageTaken` -2 (`t2-logs/res-run2.log`, test "a failed
+  Resistance never takes negative damage when its successes exceed the damage"). The unit test with the same numbers
+  for the Attribute and the Resistance results expected 0 and received -2 (`t2-logs/bug158-unit-before-fix.log`).
+- **Cause (read):** `ResistanceCheckResults.js` and `AttributeCheckResults.js` set `damageTaken` to
+  `damageToReduce - successes` for a failed check, with no lower bound.
+- **Fixed:** 2026-10-10: both results take `Math.max(damageToReduce - successes, 0)`. Covered by
+  `tests/unit/check/type-results.test.js`, the Fixed Strike test of `resistance-checks.spec.js` and the Opposed Fixed
+  test of `opposed-checks.spec.js`. The mutations that remove the floor from the Resistance result and from the
+  Attribute result fail those specs (`t2-logs/mutation-res06-resistance-damage-clamp.log`,
+  `mutation-res07-attribute-damage-clamp.log`).
+- **Found:** 2026-10-10 while writing the resistance check spec.
+- **Status:** Closed 2026-10-10.
+
+### 159. Rend destroyed Magical Armor when the attack was not Magical
+
+- **What (measured):** a defender wore Armor 4 with the Magical trait (the test asserts the stored trait). A Rend
+  attack without the Magical trait rolled three 6s and its Rend button took the Armor from 4 to 1
+  (`t2-logs/bug159-before-fix.log`: expected 4, received 1). The rules say Magical armor can only be destroyed by
+  Magical weapons (`docs/TITAN Rules Compendium.md`, Magical, lines 2236 and 2628).
+- **Cause (read):** `CharacterDataModel#applyRend` took the armor lost as `Math.min(armor, rend)` when
+  `!isArmorMagical || options.magical !== true`, which is true for Magical armor hit by a non-Magical attack. The same
+  condition is false for Magical armor hit by a Magical attack, so that attack lost nothing; this half was read, not
+  measured before the fix.
+- **Fixed:** 2026-10-10: the condition is `!isArmorMagical || options.magical === true`. Covered by "Rend cannot destroy
+  Magical Armor unless the attack is Magical" in `attack-traits.spec.js` (a non-Magical Rend leaves Armor 4, a Magical
+  Rend of three takes it to 1, Repair restores 4). The mutation that restores the old condition fails the spec
+  (`t2-logs/mutation-atk07-magical-armor.log`).
+- **Found:** 2026-10-10 while writing the attack traits spec.
+- **Status:** Closed 2026-10-10.
+
+### 160. An Ineffective attack could inflict more than 1 Wound
+
+- **What (measured):** a defender at 1 Stamina and 0 Wounds took an 8 damage attack with the Ineffective trait and
+  suffered 3 Wounds (`t2-logs/bug160-before-fix.log`: expected 1, received 3). The rules say Ineffective attacks can
+  only inflict 1 Wound per attack (`docs/TITAN Rules Compendium.md`, Ineffective, line 2224; the trait's description in
+  `lang/en.json` says the same).
+- **Cause (read):** `CharacterDataModel#applyDamage` derived the Wounds from the Stamina deficit and never read
+  `options.ineffective` for them.
+- **Fixed:** 2026-10-10: the Wounds suffered are at most 1 when `options.ineffective` is set. Covered by "Ineffective
+  attacks can only inflict 1 Wound per attack" in `attack-traits.spec.js`, next to the plain attack that inflicts 3. The
+  mutation that raises the limit to 3 fails the spec (`t2-logs/mutation-atk08-ineffective-wounds.log`).
+- **Found:** 2026-10-10 while writing the attack traits spec.
+- **Status:** Closed 2026-10-10.
+
+### 161. The Multi-Attack toggle of a weapon was never stored
+
+- **What (measured):** the Multi-Attack button of an expanded weapon row left the weapon's `system.multiAttack`
+  undefined on the server and the row's dice and Expertise unchanged (`t2-logs/bug161-before-fix.log`, the four
+  multi-attack tests of `attack-scaling.spec.js`).
+- **Cause (read):** the button calls `toggleMultiAttack`, which updates `system.multiAttack`, and
+  `initializeAttackCheckOptions` reads `itemRollData.multiAttack`, but the weapon's system template
+  (`WeaponSystemTemplate.js`) had no `multiAttack` field, so the update was dropped, and `WeaponDataModel#getRollData`
+  did not return it. When the field was last part of the schema was not traced.
+- **Fixed:** 2026-10-10: the template has `multiAttack: false` (so the weapon schema and the weapon chat card schema
+  have it) and `getRollData` returns it; the two schema golden masters list the field. Covered by the multi-attack
+  tests of `attack-scaling.spec.js` (the row shows 5 dice and 2 Expertise for Body 11 and Expertise 5, 6 dice for a
+  Flurry attack, and each rolled card carries the halved numbers). The mutation that removes the template field fails
+  the spec (`t2-logs/mutation-atk20-weapon-multiattack-field.log`).
+- **Found:** 2026-10-10 while writing the multi-attack tests.
+- **Status:** Closed 2026-10-10.

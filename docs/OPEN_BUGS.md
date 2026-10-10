@@ -264,3 +264,20 @@ Files cited as `bugbatch1-logs/...` are in `.superpowers/sdd/2026-09-29-conditio
   against the 14.368 install, not the 364 build the server runs, so the code paths need re-reading in 364.
 - **Found:** 2026-10-09 by the final review of the #151 follow-up round.
 - **Status:** Open; not reproduced.
+
+### 162. The Vicious trait does not add a Wound
+
+- **What (measured):** a defender at 1 Stamina and 0 Wounds took 2 damage from an attack with the Vicious trait and
+  suffered 1 Wound; the rules say a Vicious attack that inflicts Wounds inflicts 1 more (`docs/TITAN Rules Compendium.md`,
+  Vicious, line 2286). The test expected 2 and received 1 (`t2-logs/vicious-measured-without-test-fail.log`). A Vicious
+  attack that inflicts no Wound adds none, which the product does correctly.
+- **Cause (read):** nothing in `src/` reads Vicious outside the trait list, its description and the tag; unlike
+  Ineffective and Penetrating it sets no flag in the attack check and passes no option to `applyDamage`.
+- **Why it is open:** the fix adds a `vicious` flag to the attack check's options, parameters (a persisted chat-message
+  field) and the damage button options, plus the extra Wound in `applyDamage`, following the Ineffective and Penetrating
+  flags. A new persisted public field needs the user's decision first, so it is not built.
+- **Pinned by:** "Vicious adds 1 Wound when the attack inflicts Wounds" in `attack-traits.spec.js`, marked expected to
+  fail (`test.fail`); it passes the run until the trait works and then reports an unexpected pass, which is the cue to
+  remove the mark.
+- **Found:** 2026-10-10 while writing the attack traits spec.
+- **Status:** Open.

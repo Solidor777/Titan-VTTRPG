@@ -797,8 +797,8 @@ static `actions` map. To refresh a dynamic control's icon/label after a state ch
 `happy-dom`, `globals: true`, Svelte 5 (`@sveltejs/vite-plugin-svelte`), `svelte-preprocess` (same SCSS `prependData` as
 `vite.config.mjs`), and the `~/` / `$fonts/` aliases. `hookTimeout` is 60 s: the schema-equivalence golden-master
 suites' `beforeAll` dynamic imports are transform-heavy (Svelte compiles) and exceed the 10 s default under full
-parallelism. Tests live in `tests/unit/**/*.test.js`: 147 files, 1687 tests (measured: `npm test` → "Test Files  147
-passed (147)", "Tests  1687 passed (1687)"). There is NO test code under `src/`. Support files: `tests/setup.js`,
+parallelism. Tests live in `tests/unit/**/*.test.js`: 147 files, 1688 tests (measured: `npm test` → "Test Files  147
+passed (147)", "Tests  1688 passed (1688)"). There is NO test code under `src/`. Support files: `tests/setup.js`,
 `tests/components/*.svelte` (Svelte probes the unit tests mount), `tests/unit/helpers/schemaFingerprint.js`,
 `tests/shared/checkOracle.js` (the independent check oracle the e2e `check-math.spec.js` compares against) and
 `tests/fixtures/spreadsheet/excel-edited.xlsx` (read by `tests/unit/spreadsheet/format/Xlsx.test.js`).
@@ -845,7 +845,7 @@ the lone exception is `Text` (no root element). See the component-probe harness 
 coverage map, the wrapper-forwarding rules, and the selector each component resolves to.
 
 **Playwright E2E** — `npm run test:e2e` runs `playwright test` against the `test-titan` Foundry world on
-`http://localhost:30000`: 45 spec files, 858 tests (measured: `npx playwright test --list` → "Total: 858 tests in 45
+`http://localhost:30000`: 49 spec files, 949 tests (measured: `npx playwright test --list` → "Total: 949 tests in 49
 files"). `playwright.config.mjs` sets `timeout` 60 s, `expect.timeout` 1000 ms, `workers` 1, `fullyParallel` false,
 `globalSetup` and `globalTeardown`, the `list` reporter beside `slow-operation-reporter.js`, and for every test headless
 Chromium (with `--enable-gpu`), `viewport` 1920x1080 and `actionTimeout` 10 s. The users are the four dedicated
@@ -860,7 +860,7 @@ ancestor pid, polling liveness once a second), so a hard-killed run never leaves
 LevelDB locks. `tests/unit/SuperviseServer.test.js` covers spawn/reuse/teardown. The suite drives the real built system
 at the repo root, so it catches v14 API breaks that the mocked Vitest tier cannot.
 
-**The 45 spec files** (`tests/e2e/`; `logic/` holds three of them):
+**The 49 spec files** (`tests/e2e/`; `logic/` holds three of them):
 - Sheets and documents. `surfaces.spec.js` (every sheet type, spell tab, check-options dialog and the effect tray
   renders on flow-made documents with zero uncaught page errors and no `LOCAL.` text; the collapsed-layout regressions;
   the portrait pick through Foundry's file picker; opening a sheet from the directory; the Edit Unique ID dialog),
@@ -908,7 +908,16 @@ at the repo root, so it catches v14 API breaks that the mocked Vitest tier canno
   rules elements give a dialog, a user-set field kept, the dialog closing when its item or effect is deleted (the tests
   read the one "no longer valid" notice, assert no "failed before construction" notice and dismiss the notice, which
   would otherwise cover the next create dialog), the `getCheckOptions` setting, Heavy, Encumbering and Loud armor, a
-  condition's situation), `logic/rules-elements.spec.js` (rules elements added in the Rules Elements tab, read from the
+  condition's situation), `resistance-checks.spec.js` (the Reflexes, Resilience and Willpower Resist buttons of a casting
+  card and of item check cards: label, Difficulty 4 and Complexity extra successes + 1 whatever is spent or refunded on
+  the card, the Resist dialog, success exactly at the Complexity, the damage taken, several buttons and several checks),
+  `opposed-checks.spec.js` (the Opposed button of an item check for 0, 1, 2 and 5 extra successes, skill- and
+  attribute-opposed, damage reduced by the opposed check, an opposed check beside a resistance check, the Opposed
+  dialog, a casting card that has no Opposed button), `attack-traits.spec.js` (all eighteen attack traits alone on forced
+  attacks, combinations, the Armor math of Penetrating and Ineffective with the Ignore Armor and Half buttons, Cleave and
+  Rend counts, Magical Armor, Repair, and the Wounds an attack inflicts; Vicious is pinned expected-to-fail),
+  `attack-scaling.spec.js` (damage plus extra successes, a "+ ES" box turned off, a Damage Mod, Multi-Attack and Flurry
+  halving the dice and Expertise, Expertise raised to 6s for Cleave), `logic/rules-elements.spec.js` (rules elements added in the Rules Elements tab, read from the
   sheet's derived Body value, which owned sources apply and to which bucket, the check dialogs and the posted check
   parameters), `logic/conditions.spec.js`
   (conditions applied from the Token HUD, read from derived stats, the sheet's tooltip, rolled checks and the Player
@@ -963,7 +972,11 @@ label)` and `collectLocalizationOffenders`. `world.js` holds `closeAllApps`, `cl
 `global-teardown.js`, `checkDialog.js`, `spellCasting.js` (the casting entry points `castFromSpellSheet`,
 `castFromCharacterSheet` and `castFromHud`, `buildSpell` which enables the standard aspects and fills the custom ones
 through the spell sheet, and readers for a casting card's result rows, dice, scaling-aspect blocks and stored scaling
-state), `componentProbe.js`, `fast-check.js` and `slow-operation-reporter.js` are described under the entries below. `run-e2e-throttled.ps1` is the runner wrapper.
+state), `checkCards.js` (the roll entry points `rollItemCheck` and `rollWeaponAttack`; `focusCharacter`, which makes a
+sheet the window a GM's chat-card buttons act on; `clickResist`, `clickOpposed`, `pressDamageButton` and
+`pressRendButton` with the report each posts; `readCardButtons`, `readResultRows` and `readVitals`; `createCharacter`,
+`wearArmor` and the sheet setters for a check's opposed Attribute and Skill, a custom aspect's Resistance, a trait with a
+number, a weapon's Multi-Attack and its "+ ES" box), `componentProbe.js`, `fast-check.js` and `slow-operation-reporter.js` are described under the entries below. `run-e2e-throttled.ps1` is the runner wrapper.
 
 **Shared-world E2E harness (one world boot per FILE)** — every eligible spec boots the world ONCE per
 file, not per test. The pattern: module-scoped `let page; let errors;` plus three inline lifecycle hooks

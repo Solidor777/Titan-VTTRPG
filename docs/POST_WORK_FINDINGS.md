@@ -403,3 +403,17 @@ rebuild derives the Melee and Accuracy bonuses from the pinned facts and the att
 (`:2748-2771`), so untargeting under the open dialog keeps the conditions (`tests/e2e/target-conditions.spec.js:372`)
 and a changed base rating changes the bonus (`:443`). With no target at open, the modifiers stay derived and pick up a
 later target.
+
+### Rules text and code disagree on three points the attack and resistance specs touch (2026-10-10)
+
+- Willpower: the Rules Compendium's Willpower section (`docs/TITAN Rules Compendium.md:1477`) says Soul plus half of
+  Body, rounded down; its Mind section (line 1323) says Mind slightly affects Willpower; `_calculateBaseResistances`
+  (`CharacterDataModel.js`) uses Soul plus half of Mind. The e2e defenders have Body equal to Mind, so both readings give
+  the same dice and the specs assert neither. Not decided.
+- Penetrating: the compendium text (line 2246) says it ignores 1 point of Armor; `ComputeDamageResistance.js` ignores half
+  of the Armor, rounded up, after the rules revision of commit `a233d07c` (2026-09-28), and `lang/en.json` says half. The
+  specs assert half; the compendium file still holds the old sentence.
+- Half damage: the attack card's button applies `Math.max(Math.floor(damage / 2), 1)`
+  (`AttackCheckChatDamageButtons.svelte`), the item, casting and Resistance cards' button applies
+  `Math.floor(damage / 2)` (`ChatMessageDamageButtons.svelte`), so half of 1 damage lands as 1 from an attack card and as
+  nothing from the others. Read, not run; no rule in the compendium was found for it.
