@@ -264,3 +264,17 @@ Files cited as `bugbatch1-logs/...` are in `.superpowers/sdd/2026-09-29-conditio
   against the 14.368 install, not the 364 build the server runs, so the code paths need re-reading in 364.
 - **Found:** 2026-10-09 by the final review of the #151 follow-up round.
 - **Status:** Open; not reproduced.
+
+### 175. Opening a pack item sheet writes to the locked compendium when a check's damageReducedBy is missing (Rapid Fire)
+
+- **Measured:** the compendium content sweep (`compendium-content.spec.js`, items test) opened the pack entry sheet of
+  the ability Rapid Fire and collected the page error `You may not update documents in the locked compendium
+  "titan-vttrpg-compendium.abilities"` plus an error notification. The owned copy of the same ability opened without
+  an error. 37 checks in the module's pack sources lack `damageReducedBy`.
+- **Cause (read):** the check settings show `DocumentDamageReducedBySelect` only when a damage check has a resistance or
+  opposed check (`ItemSheetCheckSettings.svelte`). `Select.svelte` clamps a value outside its options on mount and calls
+  `onchange` (`Select.svelte:114-122`); the wrapper's `onchange` runs `refreshSystemDocument`, which calls
+  `document.update` when `document.isOwner` (`RefreshSystemDocumentData.js`). A GM owns a locked pack document, so the
+  update is attempted and core refuses it. Not verified: that the stored value is undefined at mount.
+- **Found:** 2026-10-10 by the compendium content sweep.
+- **Status:** Open; not fixed (a mount-time write on viewing a sheet needs a decision on where to guard).

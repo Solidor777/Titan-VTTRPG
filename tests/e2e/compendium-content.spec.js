@@ -182,8 +182,41 @@ async function openPackWindow(packId) {
 }
 
 /**
- * Scans a sheet: clicks every tab of its tab strip and on each asserts that content rendered and that no `LOCAL.`
- * text shows.
+ * Clicks one tab button and asserts the sheet then shows content and no `LOCAL.` text.
+ * @param {import('@playwright/test').Locator} sheet - The open sheet.
+ * @param {import('@playwright/test').Locator} button - The tab button.
+ * @param {string} rootSelector - CSS selector of the sheet's root, for the localization scan.
+ * @param {string} what - What the tab belongs to, for the problem lines.
+ * @returns {Promise<string[]>} The problems found; empty when the tab is sound.
+ */
+async function scanTab(sheet, button, rootSelector, what) {
+   /** @type {string[]} The problems found. */
+   const problems = [];
+   try {
+      await clickTabButton(button);
+   }
+   catch (error) {
+      /** @type {string} The first lines of Playwright's click log. */
+      const firstLines = error.message.split(/\r?\n/).slice(0, 8).join(' | ');
+      problems.push(`${what} did not activate: ${firstLines}`);
+      return problems;
+   }
+
+   /** @type {string} The text the sheet's content shows. */
+   const text = await sheet.locator('.window-content').innerText();
+   if (text.trim().length === 0) {
+      problems.push(`${what} rendered no content`);
+   }
+   for (const offender of await collectLocalizationOffenders(page, rootSelector)) {
+      problems.push(`${what} shows LOCAL. text: ${offender}`);
+   }
+   return problems;
+}
+
+/**
+ * Scans a sheet: clicks every tab of its own tab strip (the first `.tab-list`) and, on each, every tab of a strip
+ * nested in the shown tab (the spell sheet nests one), asserting that content rendered and no `LOCAL.` text shows. A
+ * nested strip exists only while its parent tab is shown, so its buttons are counted after the parent click.
  * @param {import('@playwright/test').Locator} sheet - The open sheet.
  * @param {string} rootSelector - CSS selector of the sheet's root, for the localization scan.
  * @param {string} what - What the sheet shows, for the problem lines.
@@ -193,8 +226,8 @@ async function scanSheet(sheet, rootSelector, what) {
    /** @type {string[]} The problems found. */
    const problems = [];
 
-   /** @type {import('@playwright/test').Locator} The tab buttons. */
-   const buttons = sheet.locator('.tab-list button');
+   /** @type {import('@playwright/test').Locator} The buttons of the sheet's own tab strip. */
+   const buttons = sheet.locator('.tab-list').first().locator('button');
 
    /** @type {number} How many tabs the sheet has. */
    const count = await buttons.count();
@@ -202,22 +235,29 @@ async function scanSheet(sheet, rootSelector, what) {
       problems.push(`${what}: the sheet has no tab strip`);
    }
    for (let index = 0; index < count; index++) {
-      try {
-         await clickTabButton(buttons.nth(index));
-      }
-      catch (error) {
-         const firstLines = error.message.split(/\r?\n/).slice(0, 8).join(' | '); // First lines of Playwright's click log.
-         problems.push(`${what}: tab ${index} did not activate: ${firstLines}`);
+      /** @type {string[]} The problems of the top-level tab. */
+      const tabProblems = await scanTab(sheet, buttons.nth(index), rootSelector, `${what}: tab ${index}`);
+      problems.push(...tabProblems);
+      if (tabProblems.length > 0) {
          continue;
       }
 
-      /** @type {string} The text the sheet's content shows. */
-      const text = await sheet.locator('.window-content').innerText();
-      if (text.trim().length === 0) {
-         problems.push(`${what}: tab ${index} rendered no content`);
-      }
-      for (const offender of await collectLocalizationOffenders(page, rootSelector)) {
-         problems.push(`${what}: tab ${index} shows LOCAL. text: ${offender}`);
+      /** @type {import('@playwright/test').Locator} The tab strips nested in the shown tab. */
+      const nested = sheet.locator('.tab-list').filter({ visible: true });
+
+      /** @type {number} How many strips show, the sheet's own included. */
+      const strips = await nested.count();
+      for (let strip = 1; strip < strips; strip++) {
+         /** @type {import('@playwright/test').Locator} The nested strip's buttons. */
+         const inner = nested.nth(strip).locator('button');
+         for (let innerIndex = 0, total = await inner.count(); innerIndex < total; innerIndex++) {
+            problems.push(...await scanTab(
+               sheet,
+               inner.nth(innerIndex),
+               rootSelector,
+               `${what}: tab ${index} nested tab ${innerIndex}`,
+            ));
+         }
       }
    }
    return problems;
