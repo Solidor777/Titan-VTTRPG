@@ -108,3 +108,8 @@ Completed items are deleted, not marked done.
   Arbiter (immunity to Charmed or Frightened for the caster and allies within 5 spaces) and Animate Corpse (immune to
   mind-affecting conditions) wait for a trait covering mind control and similar effects, which the user will make
   later. Cleansing Shroud ("immune to the chosen Condition") needs a way to choose the condition; not yet ruled.
+
+- Specs that switch the active scene within about 2 seconds of a condition change can fail with the core
+  `createScrollingText` error (CLOSED_BUGS #114; measured for `unconscious.spec.js` when a scene was already active,
+  fixed there by reloading and restoring the scene through `activateScene`). Search the e2e specs for other scene
+  switches that follow a condition or effect change, and give each the same reload; none has been observed failing.
