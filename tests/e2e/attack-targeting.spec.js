@@ -9,7 +9,7 @@ import {
 } from './checkDialog.js';
 import { readResultRows } from './checkCards.js';
 import { forceDice, resetDice } from './dice.js';
-import { login } from './fixtures.js';
+import { login, openSheetByUuid } from './fixtures.js';
 import {
    createActor,
    createOwnedItem,
@@ -301,12 +301,36 @@ test.describe('the Token HUD target control', () => {
    });
 });
 
+/**
+ * Closes the weapon's sheet, which the roll button opens in the middle of the window and which covers the canvas where
+ * a token must be hovered.
+ * @returns {Promise<void>} Resolves once the sheet is closed.
+ */
+async function closeWeaponSheet() {
+   /** @type {import('@playwright/test').Locator} The weapon's sheet. */
+   const sheet = await openSheetByUuid(page, weaponUuid);
+   await sheet.locator('header.window-header [data-action="close"]').click();
+   await expect(sheet, 'the weapon sheet closes').toHaveCount(0);
+}
+
+/**
+ * Opens the attack dialog and clears the canvas of the other windows: the weapon's sheet is closed and the dialog is
+ * moved to the left edge of the page, so that the tokens can be hovered while the dialog stays open.
+ * @returns {Promise<import('@playwright/test').Locator>} The attack check dialog.
+ */
+async function openDialogWithClearCanvas() {
+   /** @type {import('@playwright/test').Locator} The attack check dialog. */
+   const dialog = await openCheckDialog(page, 'attack', weaponUuid);
+   await closeWeaponSheet();
+   await moveDialogAside(dialog);
+   return dialog;
+}
+
 test.describe('the target changes while the dialog is open', () => {
    test('retargeting with the dialog open keeps the Defense read at open', async () => {
       await targetPlacedToken(page, targets.mid.tokenId);
       /** @type {import('@playwright/test').Locator} The attack check dialog. */
-      const dialog = await openCheckDialog(page, 'attack', weaponUuid);
-      await moveDialogAside(dialog);
+      const dialog = await openDialogWithClearCanvas();
       expect(await readSummary(dialog, 'difficulty')).toBe(TARGET_SPECS.mid.melee);
       await page.evaluate(() => canvas.tokens.releaseAll());
       await retargetWithKey(page, targets.low.tokenId);
@@ -318,8 +342,7 @@ test.describe('the target changes while the dialog is open', () => {
    test('losing the target with the dialog open leaves the dialog\'s Difficulty and the roll', async () => {
       await targetPlacedToken(page, targets.mid.tokenId);
       /** @type {import('@playwright/test').Locator} The attack check dialog. */
-      const dialog = await openCheckDialog(page, 'attack', weaponUuid);
-      await moveDialogAside(dialog);
+      const dialog = await openDialogWithClearCanvas();
       await page.evaluate(() => canvas.tokens.releaseAll());
 
       // The Target key on the targeted token releases it.
@@ -333,8 +356,7 @@ test.describe('the target changes while the dialog is open', () => {
 
    test('a target that appears while a no-target dialog is open: the roll follows what the dialog shows', async () => {
       /** @type {import('@playwright/test').Locator} The attack check dialog. */
-      const dialog = await openCheckDialog(page, 'attack', weaponUuid);
-      await moveDialogAside(dialog);
+      const dialog = await openDialogWithClearCanvas();
       expect(await readSummary(dialog, 'difficulty'), 'no target at open').toBe(4);
       await retargetWithKey(page, targets.high.tokenId);
 
@@ -360,8 +382,7 @@ test.describe('the target changes while the dialog is open', () => {
       await targetPlacedToken(page, doomedToken);
       await page.evaluate(() => canvas.tokens.releaseAll());
       /** @type {import('@playwright/test').Locator} The attack check dialog. */
-      const dialog = await openCheckDialog(page, 'attack', weaponUuid);
-      await moveDialogAside(dialog);
+      const dialog = await openDialogWithClearCanvas();
       expect(await readSummary(dialog, 'difficulty')).toBe(TARGET_SPECS.mid.melee);
       await deleteTokenWithKey(page, doomedToken);
       expect(await targetedTokenIds(page), 'the deleted token is no longer targeted').toEqual([]);
@@ -388,6 +409,7 @@ test.describe('the target changes while the dialog is open', () => {
       const dialog = await openCheckDialog(page, 'attack', weaponUuid);
       /** @type {{id: string, type: string, parameters: object, results: object}} The posted check. */
       const flags = await rollAndExpectCard(dialog, TARGET_SPECS.mid.melee);
+      await closeWeaponSheet();
       await page.evaluate(() => canvas.tokens.releaseAll());
       await deleteTokenWithKey(page, doomedToken);
 
