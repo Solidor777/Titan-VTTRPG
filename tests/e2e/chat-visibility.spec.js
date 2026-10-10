@@ -429,10 +429,12 @@ test('the initiative roll of the sheet button shows its dice only to the audienc
          /** @type {import('@playwright/test').Locator} The roll's chat log entry on the client. */
          const entry = clientOf(name).locator(`#chat .chat-log li[data-message-id="${ids[mode]}"]`);
          await expect(entry, `${mode}: ${CLIENT_NAMES[name]} has the roll's entry`).toHaveCount(1);
+
+         // Core renders a roll whose content is hidden with the total "?".
          await expect(
             entry.locator('.dice-total'),
             `${mode}: ${CLIENT_NAMES[name]} ${content[mode].includes(name) ? 'sees' : 'does not see'} the dice`,
-         ).toHaveCount(content[mode].includes(name) ? 1 : 0);
+         ).toHaveText(content[mode].includes(name) ? /^\s*\d+\s*$/ : /^\s*\?\s*$/);
       }
    }
 });

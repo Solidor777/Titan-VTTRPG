@@ -170,8 +170,10 @@ async function useUtility(page, key, amount) {
    }
    await page.locator(`[data-testid="player-hud-sub-option-utility-${key}"]`).click();
    if (amount !== undefined) {
+      await expect(page.locator('[data-testid="hud-amount-input"]')).toHaveCount(1);
       await page.locator('[data-testid="hud-amount-input"]').fill(String(amount));
       await page.locator('[data-testid="hud-amount-confirm"]').click();
+      await expect(page.locator('[data-testid="hud-amount-input"]'), 'the amount dialog closed').toHaveCount(0);
    }
 }
 
