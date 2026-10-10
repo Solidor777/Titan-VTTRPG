@@ -136,7 +136,17 @@ async function positionWindow(appId, position) {
 async function openPackWindow(packId) {
    /** @type {import('@playwright/test').Locator} The compendium directory's panel. */
    const panel = await openSidebarTab(page, 'compendium');
-   await panel.locator(`.directory-item.compendium[data-pack="${packId}"] a.entry-name`).click();
+   /** @type {import('@playwright/test').Locator} The pack's entry. */
+   const packEntry = panel.locator(`.directory-item.compendium[data-pack="${packId}"]`);
+
+   // The module's packs sit in a folder that starts collapsed; expanding it is a click on its header.
+   /** @type {import('@playwright/test').Locator} The collapsed folders that hold the pack, outermost first. */
+   const collapsed = panel.locator('li.directory-item.folder:not(.expanded)').filter({ has: packEntry });
+   for (let remaining = await collapsed.count(); remaining > 0; remaining--) {
+      await collapsed.first().locator('> header.folder-header').click();
+      await expect(collapsed).toHaveCount(remaining - 1);
+   }
+   await packEntry.locator('a.entry-name').click();
 
    /** @type {string} The pack window's element id. */
    const appId = `Compendium-${packId.replaceAll('.', '_')}`;
