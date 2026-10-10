@@ -2,6 +2,7 @@ import { expect, flushPageErrors, test } from './harness.js';
 import { forceDice, resetDice } from './dice.js';
 import { login } from './fixtures.js';
 import {
+   activateScene,
    addCombatant,
    createActor,
    createCombat,
@@ -12,7 +13,6 @@ import {
    rollInitiative,
    setOwnership,
    startCombat,
-   viewScene,
 } from './flows.js';
 import { attachPageErrors, clearChat, closeAllApps } from './world.js';
 
@@ -31,6 +31,10 @@ let gm;
 let player;
 /** @type {string[]} Uncaught page errors collected on the GM's page during the current test. */
 let errors;
+/** @type {string} The scene of the combat. */
+let sceneId;
+/** @type {string|undefined} The scene that was active before this file's scene was activated. */
+let previousSceneId;
 /** @type {{owned: {id: string, tokenId: string}, plain: {id: string, tokenId: string}}} The session's characters. */
 const cast = {};
 
@@ -121,10 +125,11 @@ test.beforeAll(async ({ browser }) => {
       });
    });
 
-   /** @type {string} The scene of the combat; both clients view it. */
-   const sceneId = await createScene(gm, { name: 'E2E Socket Hooks Scene' });
-   await viewScene(gm, sceneId);
-   await viewScene(player, sceneId);
+   // Players view the active scene, so the combat's scene is activated and the player's client is awaited on it.
+   previousSceneId = await gm.evaluate(() => game.scenes.active?.id);
+   sceneId = await createScene(gm, { name: 'E2E Socket Hooks Scene' });
+   await activateScene(gm, sceneId);
+   await player.waitForFunction((id) => game.scenes.viewed?.id === id, sceneId, { timeout: 1000 });
    for (const role of [
       'owned',
       'plain',
@@ -159,6 +164,9 @@ test.afterEach(async () => {
 });
 
 test.afterAll(async () => {
+   if (previousSceneId && previousSceneId !== sceneId) {
+      await activateScene(gm, previousSceneId);
+   }
    await flushPageErrors(player);
    await player?.context().close();
    await gm?.close();
