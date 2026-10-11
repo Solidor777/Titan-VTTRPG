@@ -301,6 +301,12 @@ carries `advantage`, `automaticFailure`, `baseDifficulty`, and `situations` (`{ 
   calls `super.renderHTML(options)` for the standard card chrome, applies TITAN styling classes, then mounts
   `ChatMessageContent.svelte` into the `.message-content` div, tracking the mount per rendered element in
   the mount registry below. Non-subtyped messages return the chrome unchanged.
+- `ChatMessageScrollAnchor.js` (`src/document/types/chat-message/ChatMessageScrollAnchor.js`) — default export
+  `keepLogAtBottom(element)`, called by `renderHTML` for TITAN subtypes: a `ResizeObserver` on the card that scrolls
+  its `.chat-scroll` log to the bottom when the card grows while the log was at its bottom (distance from the bottom
+  no more than the growth), because core scrolls once on append and a card's content (a rules element message through
+  `RichText.svelte`'s async `enrichHTML`) can still be filling in. A log scrolled up is not moved; the observer
+  disconnects when the card leaves the document.
 - `ChatMessageMountRegistry.js` (`src/document/types/chat-message/ChatMessageMountRegistry.js`) — a
   module-level `Map<HTMLElement, { handle, messageId, seen }>` keyed by the rendered card root element. One
   message holds up to three live mounts: the main chat log, the notification pane (`#chat-notifications`),

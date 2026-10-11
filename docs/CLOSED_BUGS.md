@@ -3284,3 +3284,48 @@ The evidence files named here are in `.superpowers/sdd/2026-10-10-e2e-coverage/t
   `t5-logs/full-run4.log`).
 - **Found:** 2026-10-10 by the full e2e run of `linked-token-sync.spec.js`.
 - **Status:** Closed 2026-10-10.
+
+### 176. Two-digit Resource values were cut off in the character sheet's sidebar
+
+- **Reported:** by the user 2026-10-10.
+- **Measured:** `sheet-layout-widths.spec.js` on a character with Stamina 80, Wounds 20 and Resolve 10: the Stamina
+  current value input had a scroll width of 29 px against a client width of 26 px (`.superpowers/sdd/2026-10-10-ui-bugs/logs/widths-before3.log`). The
+  Player HUD's bars passed the same measurement, so the HUD is not affected for two digits.
+- **Cause (read):** `CharacterSheetResource.svelte` gave the `.side` cells (current value, static mod, maximum) a
+  fixed `width: 28px`.
+- **Fixed:** 2026-10-10: the cells are `calc(var(--titan-input-digit-width) * 2 + 12px)` wide, the width formula
+  `NumberInput` and the HUD already use for two digits. The spec passes (`.superpowers/sdd/2026-10-10-ui-bugs/logs/after2.log`).
+- **Found:** 2026-10-10 by the user.
+- **Status:** Closed 2026-10-10.
+
+### 177. A skill roll button on the Skills tab grew to the full width of its row
+
+- **Reported:** by the user 2026-10-10: the button should be as wide as its text and no wider, a very long name should
+  wrap inside it, and the Attribute select, Training and Expertise should stay in a column to its right.
+- **Measured:** `sheet-layout-widths.spec.js`: the Arcana button was 360 px wider than its text, and with a 150-character
+  name the Expertise group sat at the same height as the Training group instead of below it (`.superpowers/sdd/2026-10-10-ui-bugs/logs/widths-before3.log`).
+- **Cause (read):** `CharacterSheetSkill.svelte` gave `.check` `flex: 1 0 172px` and `display: grid`, which
+  stretched the button to the free width, and laid the Attribute select and the Training and Expertise groups in one
+  wrapping line.
+- **Fixed:** 2026-10-10: `.check` is a shrinkable block whose button takes `auto` width and height, and the
+  Attribute select, Training and Expertise are one fixed column against the right edge. The spec passes
+  (`.superpowers/sdd/2026-10-10-ui-bugs/logs/after2.log`); `character-sheet-layout.spec.js` now expects the roll button's place, not its width, to be the
+  same in every row (`.superpowers/sdd/2026-10-10-ui-bugs/logs/layout-after.log`).
+- **Found:** 2026-10-10 by the user.
+- **Status:** Closed 2026-10-10.
+
+### 178. The chat log did not scroll to the bottom when a card with a rules element message was posted
+
+- **Reported:** by the user 2026-10-10.
+- **Measured:** `chat-autoscroll.spec.js`: after a Body check card with a Roll Message element was posted, the log
+  ended 156 px above its bottom for a roll by the GM and for a roll by another user (`.superpowers/sdd/2026-10-10-ui-bugs/logs/autoscroll-before.log`). A
+  probe in the same flow read the `.rich-text` block of the card at 156 px high, equal to the shortfall.
+- **Cause (read):** core scrolls the log once after appending a card (Foundry 14.364
+  `client/applications/sidebar/tabs/chat.mjs:1354`); `RichText.svelte` fills the message with
+  `enrichHTML(...).then(...)`, so the card gains its height after that scroll.
+- **Fixed:** 2026-10-10: `ChatMessageScrollAnchor.js` (`keepLogAtBottom`, called by `TitanChatMessage#renderHTML`)
+  observes the card's size and scrolls the log to the bottom when it grows while the log was at its bottom (the
+  distance from the bottom is no more than the growth). A log the user scrolled up is not moved. The spec passes
+  (`.superpowers/sdd/2026-10-10-ui-bugs/logs/after2.log`), including a roll by another user into a log the GM scrolled up.
+- **Found:** 2026-10-10 by the user.
+- **Status:** Closed 2026-10-10.

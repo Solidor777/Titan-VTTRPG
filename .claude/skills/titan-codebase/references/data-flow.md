@@ -234,10 +234,10 @@ Sub-components likewise call `getContext` and read `document.data.*`. `DocumentS
 label }` descriptor; a `label` renders a `localize()`d, uppercase `.section-label` (the `section-label`
 font mixin, `src/styles/Mixins/FontMixins.scss`) above the component. `CharacterSheetSidebar` labels
 Ratings/Mods/Speeds this way; Portrait and Resources stay bare. Each `CharacterSheetSkill.svelte` row
-(`.../sheet/tabs/skills/`) is a wrapping flex row of fixed-size parts so every row places them identically: a
-`.check` column (basis 172px, grows into spare width), a 100px `.attribute` select, and the training/expertise
-`.stats` (fixed glyph/symbol boxes) pushed to the right edge. A row narrower than the full layout wraps the stats
-onto a second line, the same way for every row; at the 850px character sheet width every row wraps. The
+(`.../sheet/tabs/skills/`) is a non-wrapping flex row of two parts: a `.check` cell whose roll button takes its
+text's width (`--titan-button-width/height: auto`, a shrinkable block, so a name wider than the free space wraps
+inside the button), and a fixed-size `.column` against the right edge that stacks the 100px `.attribute` select and
+the training/expertise `.stats` (fixed glyph/symbol boxes), so every row places the column identically. The
 `TRAINING_ICON`/`EXPERTISE_ICON` labels carry their meaning via `use:tooltipAction` only (no visible text label).
 The character sheet root (`CharacterSheetBase` `.titan-sheet`) is a `flex: 1; min-height: 0` child of the window
 content (a flex column), so a window Foundry clamps shorter than the sheet (zoom, short viewport) scrolls its

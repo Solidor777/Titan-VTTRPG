@@ -883,7 +883,11 @@ at the repo root, so it catches v14 API breaks that the mocked Vitest tier canno
   character sheet and the Effect HUD), `custom-traits.spec.js` (the Add Custom Trait dialog, the tag's edit and delete
   icons, the tooltip, on items and effects), `sheet-filters.spec.js` (the name filters of the character sheet tabs and
   of the item Checks tab), `character-sheet-layout.spec.js` (Skills row geometry, sidebar labels, browser zoom on the
-  shared bulk actor), `rules-element-editor.spec.js` (the Rules Elements tab of a flow-made weapon: add and delete, the
+  shared bulk actor), `sheet-layout-widths.spec.js` (live geometry of a two-digit Resource value, maximum and static
+  mod in the sidebar and the Player HUD bars, the Skills row roll button sized to its name, a replaced very long name
+  wrapping inside it, the right-hand column at one place in every row), `chat-autoscroll.spec.js` (the GM's chat log
+  at its bottom after a check card with a Roll Message element, for the GM's own roll and another user's roll, and
+  unmoved when the GM had scrolled up), `rules-element-editor.spec.js` (the Rules Elements tab of a flow-made weapon: add and delete, the
   selector's default key, the rounding select of Multiply Base and Multiply Sum, the conditional check modifier editor,
   the immunity editor),
   `item-sheet-rolls.spec.js` (the sidebar roll buttons of an owned equipment, weapon and spell, the Checks tab roll
