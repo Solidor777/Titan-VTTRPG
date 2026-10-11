@@ -1,6 +1,6 @@
 import { installPoll } from './poll.js';
 import { installSettle, verifySettle } from './settle.js';
-import { attachPageErrors, flushHookErrorReports, installHookErrorReporting } from './world.js';
+import { attachPageErrors, flushHookErrorReports, installHookErrorReporting, registerChatClient } from './world.js';
 
 // The world-joining module: it holds what every logged-in page needs and nothing that depends on the test runner, so
 // the setup, the teardown and the census tool can log in without loading `harness.js` (whose `test` extends
@@ -114,6 +114,7 @@ export async function joinWorld(page, user, origin) {
    await page.waitForURL('**/game');
    await page.waitForFunction(() => globalThis.game?.ready === true, null, { timeout: 60_000 });
    await verifySettle(page);
+   registerChatClient(page);
 
    await flushPageErrors(page);
 

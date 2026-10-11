@@ -78,14 +78,61 @@ export async function closeAllApps(page) {
    });
 }
 
+/** @type {Set<import('@playwright/test').Page>} The pages that joined the world and present its chat messages. */
+const CHAT_CLIENTS = new Set();
+
+/**
+ * Records a page that joined the world, so `clearChat` waits for its chat toasts before deleting messages.
+ * @param {import('@playwright/test').Page} page - A page whose world is ready.
+ * @returns {void}
+ */
+export function registerChatClient(page) {
+   CHAT_CLIENTS.add(page);
+}
+
+/**
+ * Waits until a client has finished presenting the chat messages it received within the lifetime of a toast. Core
+ * posts a new message's toast in steps (a hidden placeholder, the rendered card, a 100 ms spacer animation) and
+ * assumes the toast is still in the DOM when the last step runs; a message deleted while the toast is in those steps
+ * makes core throw `Cannot set properties of null (setting 'hidden')` in `#postNotification`
+ * (`foundry.mjs:130054-130090`, which `#deleteMessage` at `foundry.mjs:130016` races). A plain message with no TITAN
+ * content, created and deleted at once, raises the same error. The wait ends when every recent visible message has
+ * its card in the sidebar log (the toast is created in the same task) and no toast is hidden or animating.
+ * @param {import('@playwright/test').Page} page - A page that joined the world.
+ * @returns {Promise<void>} Resolves once the page shows no toast in progress.
+ */
+async function awaitChatToasts(page) {
+   await page.waitForFunction(() => {
+      if (!globalThis.game?.ready) {
+         return true;
+      }
+
+      /** @type {number} How long, in milliseconds, core keeps a toast on screen. */
+      const lifetime = globalThis.ui.chat.constructor.NOTIFY_DURATION;
+      return game.messages
+         .filter((message) => message.visible && Date.now() - message.timestamp < lifetime)
+         .every((message) => document.querySelector(`#chat .chat-log .message[data-message-id="${message.id}"]`))
+         && !document.querySelector('#chat-notifications .message[hidden], #chat-notifications .spacer');
+   }, undefined, { timeout: 1000 });
+}
+
 /**
  * Delete every chat message in the world. Keeps renders cheap, keeps assertions deterministic, and keeps
  * the world lean so GM-to-player socket replication does not exceed test timeouts. Targeted to chat only;
- * does NOT touch actors or items (specs use find-or-create fixtures).
+ * does NOT touch actors or items (specs use find-or-create fixtures). Every joined client first finishes presenting
+ * the messages it received lately (`awaitChatToasts`), so the delete never lands in the middle of a toast.
  * @param {import('@playwright/test').Page} page - The shared page.
  * @returns {Promise<void>} Resolves once all chat messages are deleted.
  */
 export async function clearChat(page) {
+   for (const client of new Set([
+      ...CHAT_CLIENTS,
+      page,
+   ])) {
+      if (!client.isClosed()) {
+         await awaitChatToasts(client);
+      }
+   }
    await page.evaluate(async () => {
       const ids = globalThis.game.messages.map((message) => message.id);
       if (ids.length > 0) {
