@@ -6,9 +6,9 @@ import { attachPageErrors, closeAllApps } from './world.js';
 
 /**
  * The character sheet's layout, measured from the live computed geometry of the real rendered elements: each Skills
- * tab row places its parts on one line and wraps at one point, the Ratings/Mods/Speeds sidebar sections are labelled
- * and spaced, and after a browser zoom change a long list in a character, item or effect sheet still scrolls to its
- * last entry with that entry fully visible, at every zoom from 50% to 150%.
+ * tab row places its roll button, Attribute select and stats at the same place in every row, the Ratings/Mods/Speeds
+ * sidebar sections are labelled and spaced, and after a browser zoom change a long list in a character, item or
+ * effect sheet still scrolls to its last entry with that entry fully visible, at every zoom from 50% to 150%.
  *
  * Browser zoom is emulated through the DevTools protocol: zooming by a factor z shrinks the CSS-pixel viewport by z and
  * raises the device pixel ratio by z, which is the layout effect of Chromium's page zoom. The sheet is opened at 100%
@@ -115,7 +115,8 @@ test.describe('the Skills tab and the sidebar', () => {
    });
 
    /**
-    * Measures every skill row: each part's offset and width relative to its row, and whether any part is clipped.
+    * Measures every skill row: each part's offset and width (the roll button's offset only) relative to its row, and
+    * whether any part is clipped.
     * @returns {Promise<object>} The per-part distinct offsets/widths across rows and the clipped part count.
     */
    function measureSkillRows() {
@@ -135,12 +136,13 @@ test.describe('the Skills tab and the sidebar', () => {
             const rowBox = row.getBoundingClientRect();
             for (const name of Object.keys(parts)) {
                /** @type {DOMRect} The measured element's box. */
-               const box = row.querySelector(`:scope > .${name}`).getBoundingClientRect();
+               const box = row.querySelector(`.${name}`).getBoundingClientRect();
                /** @type {number} The part's left offset inside the row. */
                const left = Math.round(box.left - rowBox.left);
                /** @type {number} The part's top offset inside the row. */
                const top = Math.round(box.top - rowBox.top);
-               parts[name].add(`${left}/${top}/${Math.round(box.width)}`);
+               // The roll button is as wide as its skill name, so only its place is the same in every row.
+               parts[name].add(name === 'check' ? `${left}/${top}` : `${left}/${top}/${Math.round(box.width)}`);
                if (box.right > rowBox.right + 0.5 || box.left < rowBox.left - 0.5) {
                   clipped += 1;
                }
@@ -167,7 +169,7 @@ test.describe('the Skills tab and the sidebar', () => {
       await openSheetTab(page, 'Skills');
       await expect(page.locator('.skill').first(), 'first skill row rendered').toBeVisible();
 
-      // At a narrow width that forces the rows to wrap, and at the default width the sheet is left at.
+      // At a narrow width and at the default width the sheet is left at.
       for (const width of [
          640,
          850,

@@ -110,7 +110,8 @@
             @include flex-group-center;
             @include flex-row;
 
-            width: 28px;
+            // Holds a two-digit value: the digits, the input padding and the border (the NumberInput width formula).
+            width: calc(var(--titan-input-digit-width) * 2 + 12px);
          }
 
          .middle {
