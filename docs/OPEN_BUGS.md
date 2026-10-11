@@ -264,3 +264,17 @@ Files cited as `bugbatch1-logs/...` are in `.superpowers/sdd/2026-09-29-conditio
   against the 14.368 install, not the 364 build the server runs, so the code paths need re-reading in 364.
 - **Found:** 2026-10-09 by the final review of the #151 follow-up round.
 - **Status:** Open; not reproduced.
+
+### 182. A character sheet open from the directory keeps its prototype header controls when one of the actor's tokens is double-clicked (needs a decision)
+
+- **What (measured):** `linked-token-sync.spec.js` "the header controls follow how the sheet was opened..." (run
+  `t5-logs/hdr-before.log`, `hdr-after.log`): with the actor's sheet open from the Actors directory, a double-click on a
+  linked token leaves the header with the prototype link toggle; the token's Unlink and an Edit Token that configures the
+  token appear only when the sheet is closed and the token is double-clicked. Read: core's `Token#_onClickLeft2` only
+  maximizes and raises a rendered sheet and renders it with the token only when it is closed
+  (`client/canvas/placeables/token.mjs:4807-4812`), so the sheet never learns of the token.
+- **Why open:** making the open sheet take the token needs the system to take over the token double-click (a custom Token
+  class or a canvas handler), an architecture choice. A header re-mount on a render that carries a token was written and
+  removed, because core never sends that render.
+- **Found:** 2026-10-10 while closing bug 180.
+- **Status:** Open; waiting for the user's decision. The test pins the current behaviour.
