@@ -110,15 +110,23 @@
    /** @type {object | undefined} The option matching the current value. */
    const selected = $derived(normalized.find((entry) => entry.value === value));
 
-   // Clamp value into the available options. Guarded so it converges: only writes when out of range.
+   /** @type {boolean} Whether the clamp below has run once; the first run is the mount. */
+   let clampMounted = false;
+
+   // Clamp value into the available options. Guarded so it converges: only writes when out of range. The clamp on
+   // mount corrects the shown value only: opening a sheet must not save its document, which a locked compendium
+   // refuses. A later clamp, caused by another control changing the options, is a user change and fires onchange.
    $effect(() => {
       if (!(normalized.length > 0)) {
          return;
       }
       if (!normalized.some((entry) => entry.value === value)) {
          value = normalized[0].value;
-         onchange?.();
+         if (clampMounted) {
+            onchange?.();
+         }
       }
+      clampMounted = true;
    });
 
    /**

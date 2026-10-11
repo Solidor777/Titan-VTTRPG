@@ -264,17 +264,24 @@ Files cited as `bugbatch1-logs/...` are in `.superpowers/sdd/2026-09-29-conditio
   against the 14.368 install, not the 364 build the server runs, so the code paths need re-reading in 364.
 - **Found:** 2026-10-09 by the final review of the #151 follow-up round.
 - **Status:** Open; not reproduced.
+### 176. Two-digit Resource values are cut off in the character sheet's sidebar
 
-### 175. Opening a pack item sheet writes to the locked compendium when a check's damageReducedBy is missing (Rapid Fire)
+- **Reported:** by the user 2026-10-10: double digit Resource values are slightly cut off on character sheets.
+- **Read:** `CharacterSheetResource.svelte` gives the current-value cell and the static-mod cell a fixed `width: 28px`.
+- **Status:** Open; being fixed with a live geometry spec (`sheet-layout-widths.spec.js`).
 
-- **Measured:** the compendium content sweep (`compendium-content.spec.js`, items test) opened the pack entry sheet of
-  the ability Rapid Fire and collected the page error `You may not update documents in the locked compendium
-  "titan-vttrpg-compendium.abilities"` plus an error notification. The owned copy of the same ability opened without
-  an error. 37 checks in the module's pack sources lack `damageReducedBy`.
-- **Cause (read):** the check settings show `DocumentDamageReducedBySelect` only when a damage check has a resistance or
-  opposed check (`ItemSheetCheckSettings.svelte`). `Select.svelte` clamps a value outside its options on mount and calls
-  `onchange` (`Select.svelte:114-122`); the wrapper's `onchange` runs `refreshSystemDocument`, which calls
-  `document.update` when `document.isOwner` (`RefreshSystemDocumentData.js`). A GM owns a locked pack document, so the
-  update is attempted and core refuses it. Not verified: that the stored value is undefined at mount.
-- **Found:** 2026-10-10 by the compendium content sweep.
-- **Status:** Open; not fixed (a mount-time write on viewing a sheet needs a decision on where to guard).
+### 177. A skill roll button on the character sheet's Skills tab grows to the full width of the row
+
+- **Reported:** by the user 2026-10-10: the button should be as wide as its text needs and no wider; a very long skill
+  name should wrap inside the button; the Attribute select, Training and Expertise stay in a column to its right.
+- **Read:** `CharacterSheetSkill.svelte` gives `.check` `flex: 1 0 172px` and `display: grid`, which stretches the button.
+- **Status:** Open; being fixed with a live geometry spec (`sheet-layout-widths.spec.js`).
+
+### 178. The chat log does not always scroll to the bottom when a card with a rules element message is posted
+
+- **Reported:** by the user 2026-10-10: chat messages are not always auto scrolling down when a new one has a chat
+  message from a rules element.
+- **Read:** core scrolls once after appending the card (`ChatLog#postOne` calls `scrollBottom({waitImages: true})`,
+  Foundry 14.364 `client/applications/sidebar/tabs/chat.mjs:1354`); `RichText.svelte` fills a rules element message with
+  `enrichHTML(...).then(...)`, after the card is in the log, so the card grows after the scroll. Not yet measured.
+- **Status:** Open; being replicated with `chat-autoscroll.spec.js`.

@@ -3255,3 +3255,11 @@ The evidence files named here are in `.superpowers/sdd/2026-10-10-e2e-coverage/t
 - **Fixed:** 2026-10-10: it tests `document.data?.isOwner` like the other report buttons.
 - **Found:** 2026-10-10 by the full run of the turn matrix.
 - **Status:** Closed 2026-10-10.
+
+### 175. Opening a pack item sheet wrote to the locked compendium (Rapid Fire)
+
+- **What (measured by the compendium content sweep, `compendium-content.spec.js`, and `sheet-open-writes-nothing.spec.js`):** opening the pack-entry sheet of the ability Rapid Fire raised the page error `You may not update documents in the locked compendium` and an error notification. A world ability whose stored Damage Reduced By is not among its options was saved by the open (one update sent).
+- **Cause (read):** `Select.svelte` clamped an out-of-range value on mount and called `onchange`; the Document wrapper's `onchange` runs `refreshSystemDocument`, which updates for any owner.
+- **Fixed:** 2026-10-10: the clamp on mount corrects the shown value only; a later clamp (another control changed the options) still fires `onchange`. Tests: `sheet-open-writes-nothing.spec.js` (failed before, passes after; failed again with the fix mutated away).
+- **Found:** 2026-10-10 by the compendium content sweep.
+- **Status:** Closed 2026-10-10.
