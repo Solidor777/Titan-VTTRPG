@@ -1,6 +1,7 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { render, cleanup, screen, fireEvent } from '@testing-library/svelte';
 import Select from '~/helpers/svelte-components/input/select/Select.svelte';
+import SelectOnPlainObject from './fixtures/SelectOnPlainObject.svelte';
 
 beforeEach(() => {
    // localize() routes through game.i18n; unwrap the `LOCAL.<key>.text` shape back to the key.
@@ -68,6 +69,26 @@ describe('Select', () => {
       });
       // The mount-time clamp corrects the shown value only; opening a sheet must not save its document.
       await expect.poll(() => screen.getByRole('combobox').getAttribute('data-value')).toBe('body');
+      expect(onchange).not.toHaveBeenCalled();
+   });
+
+   it('shows the first option for a missing value bound to a non-reactive source and saves nothing', async () => {
+      const onchange = vi.fn();
+
+      /** @type {{ field?: string }} A plain object, as a Foundry document's data is: writes to it notify nobody. */
+      const data = {};
+      render(SelectOnPlainObject, {
+         props: {
+            data,
+            options: [
+               'down',
+               'up',
+            ],
+            onchange,
+         },
+      });
+      await expect.poll(() => screen.getByRole('combobox').getAttribute('data-value')).toBe('down');
+      expect(screen.getByRole('combobox').textContent).toContain('down');
       expect(onchange).not.toHaveBeenCalled();
    });
 

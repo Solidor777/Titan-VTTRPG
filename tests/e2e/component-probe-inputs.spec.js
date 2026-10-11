@@ -598,7 +598,7 @@ test.describe('component probe — multiplier editors with no stored rounding', 
          },
       ],
    ]) {
-      test(`${component} shows down for an element with no rounding and stores down`, async () => {
+      test(`${component} shows down for an element with no rounding and holds down in memory`, async () => {
          /** @type {{id: string, selector: string}} The mounted editor. */
          const probe = await mountProbe(page, component, {
             props: { idx: 0 },
@@ -608,7 +608,7 @@ test.describe('component probe — multiplier editors with no stored rounding', 
             .toHaveAttribute('data-value', 'down');
          await expect.poll(
             () => readProbeContext(page, probe.id, 'document.data.system.rulesElement.0.rounding'),
-            { message: 'the editor stores the engine default, down' },
+            { message: 'the bound element holds the engine default, down; the open saves nothing' },
          ).toBe('down');
       });
    }

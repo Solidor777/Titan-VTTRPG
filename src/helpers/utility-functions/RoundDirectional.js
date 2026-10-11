@@ -1,8 +1,8 @@
 /**
  * The rounding directions a multiplicative rules element (`mulBase`, `mulSum`) offers, in editor display order. The
  * single source for both editors' rounding select; `roundDirectional` implements each. `down` is first because an
- * element with no stored `rounding` rounds down, and the Select writes (and its Document wrapper persists) its first
- * option when the bound value is not listed, so opening an editor never changes what the engine applies.
+ * element with no stored `rounding` rounds down, and the Select shows its first option when the bound value is not
+ * listed, so the editor of such an element shows the direction the engine applies. Opening the editor saves nothing.
  * @type {readonly string[]}
  */
 export const ROUNDING_DIRECTIONS = Object.freeze([

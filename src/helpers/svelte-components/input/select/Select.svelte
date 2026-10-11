@@ -107,8 +107,11 @@
    /** @type {Array<object>} The normalized option list. */
    const normalized = $derived((options ?? []).map(toOption));
 
-   /** @type {object | undefined} The option matching the current value. */
-   const selected = $derived(normalized.find((entry) => entry.value === value));
+   // The option shown: the one matching the current value, else the first option. A value outside the options is
+   // corrected by the clamp below, but a bound source that is not reactive (a Foundry document's data) does not tell
+   // this component about the correction, so the display falls back here instead of waiting for the bound value.
+   /** @type {object | undefined} The option shown on the trigger. */
+   const selected = $derived(normalized.find((entry) => entry.value === value) ?? normalized[0]);
 
    /** @type {boolean} Whether the clamp below has run once; the first run is the mount. */
    let clampMounted = false;
@@ -333,7 +336,7 @@
    aria-activedescendant={listOpen ? `${listId}-option-${hoverIndex}` : void 0}
    {disabled}
    data-testid={testId}
-   data-value={value}
+   data-value={selected ? selected.value : value}
    onclick={toggle}
    onkeydown={handleKeydown}
    use:tooltipAction={tooltip}
@@ -354,7 +357,7 @@
 {#if listOpen}
    <SelectList
       options={normalized}
-      {value}
+      value={selected ? selected.value : value}
       {listId}
       {testId}
       bind:hoverIndex

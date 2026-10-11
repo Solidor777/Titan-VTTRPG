@@ -3344,3 +3344,22 @@ The evidence files named here are in `.superpowers/sdd/2026-10-10-e2e-coverage/t
   the one measured failing first; the HUD assertions of the new test were not reached before the fix.
 - **Found:** 2026-10-10 while closing bug 176.
 - **Status:** Closed 2026-10-10.
+
+### 183. A select whose stored value is not among its options showed an empty control (a Multiply Base or Multiply Sum element with no rounding)
+
+- **Measured:** a weapon with a Multiply Base element whose stored `rounding` was removed (`item.update` with
+  `diff: false, recursive: false`, a state no control produces; the rounding is optional and the engine rounds down)
+  opened on the Rules Elements tab with the `mulbase-rounding` trigger at `data-value` null and no text, while the
+  client's in-memory element read `down` and the server's stored element still had no rounding. The probe tests
+  `component-probe-inputs.spec.js:601` (Multiply Base and Multiply Sum) failed with the same blank trigger.
+- **Cause (read):** bug 175's change made the clamp on mount write the first option into the bound value without
+  `onchange`. A Foundry document's data is not reactive, so the write reached the document but nothing told the Select
+  to re-read it: `selected` and `data-value` still derived from the old bound value.
+- **Fixed:** 2026-10-10: `Select.svelte` shows the first option while the bound value is not among the options (`selected`
+  falls back to `normalized[0]`, and `data-value` and the open list follow it). The clamp still corrects the bound value
+  and still fires `onchange` only after mount. Tests: `tests/unit/Select.test.js` (a Select bound to a non-reactive
+  object shows the first option and saves nothing; failed with the fallback removed),
+  `sheet-open-writes-nothing.spec.js` (a Multiply Base and a Multiply Sum element with no stored rounding show Round
+  Down and send no update; both failed on the previous build), and the probe tests, which pass.
+- **Found:** 2026-10-10 by the full e2e run after bug 175 was closed.
+- **Status:** Closed 2026-10-10.

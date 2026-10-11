@@ -1,7 +1,7 @@
 import { expect, test } from './harness.js';
 import { clickSheetTab } from './actions.js';
 import { login, openSheetByUuid } from './fixtures.js';
-import { addCheck, createWorldItem, readServerSystem } from './flows.js';
+import { addCheck, addRulesElement, createWorldItem, readServerSystem } from './flows.js';
 import { settle } from './settle.js';
 import { attachPageErrors, closeAllApps } from './world.js';
 
@@ -119,4 +119,57 @@ test.describe('opening a sheet writes nothing', () => {
          .toBe('opposedCheck');
       expect(errors, `uncaught errors:\n${errors.join('\n')}`).toEqual([]);
    });
+
+   for (const [operation, testId] of [
+      [
+         'mulBase',
+         'mulbase-rounding',
+      ],
+      [
+         'mulSum',
+         'mulsum-rounding',
+      ],
+   ]) {
+      test(`a ${operation} element with no stored rounding shows Round Down and is not saved by the open`, async () => {
+         /** @type {string} The new weapon's uuid. */
+         const uuid = `Item.${await createWorldItem(page, {
+            name: `E2E Open Writes Nothing ${operation}`,
+            type: 'weapon',
+         })}`;
+         await addRulesElement(page, uuid, { operation });
+         await closeAllApps(page);
+
+         // Stored data no control can produce: an element with no rounding, which the engine rounds down.
+         await page.evaluate(async (uuid) => {
+            /** @type {TitanItem} The weapon. */
+            const item = await fromUuid(uuid);
+
+            /** @type {object[]} The rules elements with the rounding removed. */
+            const elements = item.toObject().system.rulesElement;
+            delete elements[0].rounding;
+            await item.update({ 'system.rulesElement': elements }, {
+               diff: false,
+               recursive: false,
+            });
+         }, uuid);
+         expect((await readServerSystem(page, uuid)).rulesElement[0], 'the rounding is not stored')
+            .not.toHaveProperty('rounding');
+         await closeAllApps(page);
+         errors.length = 0;
+
+         await startCountingUpdates();
+         const sheet = await openSheetByUuid(page, uuid);
+         await clickSheetTab(sheet, await page.evaluate(() => game.i18n.localize('LOCAL.rulesElements.text')));
+         await expect(sheet.getByTestId(testId), 'the rounding select shows the engine default').toHaveAttribute(
+            'data-value',
+            'down',
+         );
+         await expect(sheet.getByTestId(testId)).toContainText('Round Down');
+         await settle(page, { transitions: true });
+         expect(await stopCountingUpdates(), 'no update was sent').toBe(0);
+         expect((await readServerSystem(page, uuid)).rulesElement[0], 'the rounding is still not stored')
+            .not.toHaveProperty('rounding');
+         expect(errors, `uncaught errors:\n${errors.join('\n')}`).toEqual([]);
+      });
+   }
 });
