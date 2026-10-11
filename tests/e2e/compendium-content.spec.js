@@ -36,7 +36,11 @@ const SHARD_SIZE = 50;
 
 /** @type {ModulePack[]} The module's packs of Items, Effects and Actors, read from its manifest. */
 const MODULE_PACKS = JSON.parse(fs.readFileSync(path.join(MODULE_DIR, 'module.json'), 'utf8')).packs
-   .filter((pack) => ['Item', 'ActiveEffect', 'Actor'].includes(pack.type))
+   .filter((pack) => [
+      'Item',
+      'ActiveEffect',
+      'Actor',
+   ].includes(pack.type))
    .map((pack) => ({
       name: pack.name,
       label: pack.label,

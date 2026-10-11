@@ -416,3 +416,14 @@ later target.
 - Read, not measured: `ChatMessage#visible` returns true for any whispered message that carries rolls
   (`chat-message.mjs:101-106`), so an initiative roll from the sheet button shows its entry to every client with its
   content hidden by core (`isContentVisible`); `chat-visibility.spec.js` asserts the dice are absent for non-recipients.
+
+### A token redraw can raise a `TokenRuler.draw` error in Foundry core (2026-10-10, read from `linked-token-sync.spec.js`)
+
+- Measured (run `e2e-rerun2.log`, `linked-token-sync.spec.js` placed-token test): after a Token Configuration submit that
+  changed the image, the GM page raised an uncaught `TokenRuler.draw … null._parentID` error. The measured stack held
+  only core frames, and `src/` has no `TokenRuler` or `rulerClass` code (grep).
+- Read, not reproduced without TITAN: `Token#_destroy` destroys the ruler without clearing `token.ruler`
+  (`client/canvas/placeables/token.mjs:1211`), `_draw` reuses it (`:1286`), and `TokenRuler#draw` adds the destroyed
+  path to the layer (`client/canvas/placeables/tokens/ruler.mjs:221`). Any token redraw may hit it.
+- The spec discards this one error by its message and stack (`discardKnownPageErrors` in `tests/e2e/world.js`); every
+  other page error still fails the test.

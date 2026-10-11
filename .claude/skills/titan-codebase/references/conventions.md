@@ -845,7 +845,7 @@ the lone exception is `Text` (no root element). See the component-probe harness 
 coverage map, the wrapper-forwarding rules, and the selector each component resolves to.
 
 **Playwright E2E** — `npm run test:e2e` runs `playwright test` against the `test-titan` Foundry world on
-`http://localhost:30000`: 50 spec files, 955 tests (measured: `npx playwright test --list` → "Total: 955 tests in 50
+`http://localhost:30000`: 67 spec files, 1276 tests (measured: `npx playwright test --list` → "Total: 1276 tests in 67
 files"). `playwright.config.mjs` sets `timeout` 60 s, `expect.timeout` 1000 ms, `workers` 1, `fullyParallel` false,
 `globalSetup` and `globalTeardown`, the `list` reporter beside `slow-operation-reporter.js`, and for every test headless
 Chromium (with `--enable-gpu`), `viewport` 1920x1080 and `actionTimeout` 10 s. The users are the four dedicated
@@ -860,7 +860,7 @@ ancestor pid, polling liveness once a second), so a hard-killed run never leaves
 LevelDB locks. `tests/unit/SuperviseServer.test.js` covers spawn/reuse/teardown. The suite drives the real built system
 at the repo root, so it catches v14 API breaks that the mocked Vitest tier cannot.
 
-**The 50 spec files** (`tests/e2e/`; `logic/` holds three of them):
+**The 67 spec files** (`tests/e2e/`; `logic/` holds three of them):
 - Compendium module content. `compendium-content.spec.js` (24 tests, measured full run 2026-10-10: all pass, each under
   40 s): one test per module pack, big packs sharded by 50 documents (the pack list and shard counts come from the
   module manifest and its `src/packs` file counts; the documents from the live packs at run time). Each document is

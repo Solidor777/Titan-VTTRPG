@@ -54,7 +54,7 @@ describe('Select', () => {
       expect(screen.getByRole('combobox').getAttribute('data-value')).toBe('soul');
    });
 
-   it('clamps an out-of-range value to the first option and fires onchange', async () => {
+   it('clamps an out-of-range value to the first option on mount without firing onchange', async () => {
       const onchange = vi.fn();
       render(Select, {
          props: {
@@ -66,8 +66,34 @@ describe('Select', () => {
             onchange,
          },
       });
-      // The clamp effect resets to the first option and notifies.
+      // The mount-time clamp corrects the shown value only; opening a sheet must not save its document.
       await expect.poll(() => screen.getByRole('combobox').getAttribute('data-value')).toBe('body');
+      expect(onchange).not.toHaveBeenCalled();
+   });
+
+   it('clamps a value that leaves the options after mount and fires onchange', async () => {
+      const onchange = vi.fn();
+      const { rerender } = render(Select, {
+         props: {
+            options: [
+               'body',
+               'mind',
+            ],
+            value: 'mind',
+            onchange,
+         },
+      });
+      await expect.poll(() => screen.getByRole('combobox').getAttribute('data-value')).toBe('mind');
+      expect(onchange).not.toHaveBeenCalled();
+
+      // Another control changes the options so that the value is no longer offered: a later clamp is a change.
+      await rerender({
+         options: [
+            'soul',
+            'body',
+         ],
+      });
+      await expect.poll(() => screen.getByRole('combobox').getAttribute('data-value')).toBe('soul');
       expect(onchange).toHaveBeenCalled();
    });
 

@@ -1,4 +1,4 @@
-## Unreleased:
+## Version 2.2.0:
 Conditions follow the 2026-09-26 rules.
 **Back up your world before updating. The active GM's first login rewrites every existing condition on world actors,
 unlinked tokens, and the actors and tokens in the world's Actor, Scene, and Adventure compendium packs to the new rules,
@@ -55,6 +55,24 @@ and hides from unlinked tokens the converted effects their own changes replace (
   the GM targets explicitly is still the target.
 - Falling Unconscious also applies Prone and Incapacitated, each only if absent and unless the character is immune to
   it; removing Unconscious leaves Prone and Incapacitated.
+- Resolve is spent for doubled Training, doubled Expertise and an item check's Resolve Cost on every kind of check.
+- On a casting card, disabled spell aspects and custom aspects that cost nothing no longer scale. A scaling custom aspect
+  costs at least 1, and the spell sheet warns about one that costs nothing. The owner of a character can spend and refund
+  extra successes on a casting card that a GM rolled; the GM validates and applies each change.
+- Only the combat turn hooks can be fired on other clients through the system socket, and only by a GM or the owner of
+  the combatant whose turn ends; before, any client could fire any hook on every client.
+- A failed Resistance or opposed check never takes negative damage. Rend no longer destroys Magical Armor when the
+  attack is not Magical, an Ineffective attack inflicts at most 1 Wound, Vicious adds a Wound, and the Multi-Attack
+  toggle of a weapon is stored. Apply Half Damage applies at least 1 damage on every card.
+- Resource values typed on the character sheet or the Player HUD are limited to 0 and the maximum.
+- The Multiply Base, Multiply Sum and Set Sum editors offer the Mod selector (Multiply Base also the All key), and mods
+  have a base value. The worn armor and the shield's Defense count in the running total that Multiply Sum and Set Sum
+  read.
+- A turn start no longer posts a blank report when only expired effects were removed. The apply and revert buttons of
+  persistent damage, fast healing and resolve regain reports update the report's snapshot, Revert Resolve Regain spends
+  the Resolve held, and the Remove Expired Effects button works. Beginning a combat runs the first combatant's turn
+  start, and Next Round, Previous Round and Previous Turn from round 1 run the same turn hooks as Next Turn.
+- An open sheet's name input follows a rename made elsewhere.
 
 ## Version 2.1.0:
 Advantage and Disadvantage, situational modifiers, and bug fixes.
