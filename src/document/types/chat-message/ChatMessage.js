@@ -6,6 +6,7 @@ import themeCoreMessages from '~/helpers/Settings/ThemeCoreMessages.js';
 import localize from '~/helpers/utility-functions/Localize.js';
 import warn from '~/helpers/utility-functions/Warn.js';
 import { applyScalingSteps } from '~/check/types/casting-check/ScalingAspectChange.js';
+import keepLogAtBottom from '~/document/types/chat-message/ChatMessageScrollAnchor.js';
 import {
    registerMount,
    sweepStaleMounts,
@@ -130,6 +131,9 @@ export default class TitanChatMessage extends ChatMessage {
          },
       });
       registerMount(html, this.id, handle);
+
+      // Keep the log at its bottom when the card grows after core has scrolled to it.
+      keepLogAtBottom(html);
 
       // Foundry replaces a re-rendered card's predecessor element AFTER this render returns
       // (ChatLog##rerenderMessage → replaceWith); sweep again once the DOM settles so the
