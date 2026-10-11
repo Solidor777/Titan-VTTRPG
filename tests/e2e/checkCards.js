@@ -42,9 +42,11 @@ export function readMessageSpeaker(page, messageId) {
 
 /**
  * Makes a character the one that a player's chat-card buttons act on. A player's buttons act on the controlled tokens
- * first, then on the user's assigned character, then on the focused sheet, so this releases the tokens the client has
- * controlled and assigns the character to the user. Call `assignCharacter(page, previousId)` with the id this returns
- * to leave the user as it was.
+ * first, then on the user's assigned character, then on the focused sheet, so this assigns the character to the user
+ * and releases the tokens the client has controlled. The assignment comes first: when the assigned character changes,
+ * core controls a token of the scene (`User#_onUpdate` calls `TokenLayer#cycleTokens`, `foundry.mjs:59038-59041` and
+ * `182001-182033`, 14.364), the character's token or else the first token in the scene the user can observe. Call
+ * `assignCharacter(page, previousId)` with the id this returns to leave the user as it was.
  * @param {import('@playwright/test').Page} page - A logged-in player page.
  * @param {string} actorId - The id of the character the buttons should act on.
  * @returns {Promise<string|null>} The id of the character the user had assigned before, or null for none.
@@ -52,12 +54,12 @@ export function readMessageSpeaker(page, messageId) {
 export async function actAsCharacter(page, actorId) {
    /** @type {string|null} The character assigned before. */
    const previous = await page.evaluate(() => game.user.character?.id ?? null);
+   await assignCharacter(page, actorId);
    await page.evaluate(() => canvas.tokens?.releaseAll());
    await expect.poll(
       () => page.evaluate(() => canvas.tokens?.controlled.length ?? 0),
       { message: 'no token is controlled' },
    ).toBe(0);
-   await assignCharacter(page, actorId);
    await expectActsAs(page, actorId);
    return previous;
 }
@@ -71,14 +73,20 @@ export async function actAsCharacter(page, actorId) {
  * @returns {Promise<void>} Resolves once the client holds exactly that state.
  */
 export async function expectActsAs(page, actorId) {
+   /** @type {string} The name of the character the buttons must act on, as the client holds it. */
+   const name = await page.evaluate((id) => game.actors.get(id).name, actorId);
    await expect.poll(
-      () => page.evaluate((id) => ({
-         actsAsActor: (canvas.tokens?.controlled.length ?? 0) === 0 && game.user.character?.id === id,
+      () => page.evaluate(() => ({
          controlled: (canvas.tokens?.controlled ?? []).map((token) => token.actor?.name),
          character: game.user.character?.name ?? null,
-      }), actorId),
+         characterId: game.user.character?.id ?? null,
+      })),
       { message: 'the player\'s buttons act on the character: no controlled token and the character assigned' },
-   ).toMatchObject({ actsAsActor: true });
+   ).toEqual({
+      controlled: [],
+      character: name,
+      characterId: actorId,
+   });
 }
 
 /**
