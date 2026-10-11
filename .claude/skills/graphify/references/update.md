@@ -164,7 +164,7 @@ if old_data:
 ```
 
 Before the merge step, save the old graph: `cp graphify-out/graph.json graphify-out/.graphify_old.json`
-Clean up after: `rm -f graphify-out/.graphify_old.json`
+Clean up after: `trash graphify-out/.graphify_old.json`
 
 ---
 

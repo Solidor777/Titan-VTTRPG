@@ -1,4 +1,21 @@
 {
+  "permissions": {
+    "allow": [
+      "Bash(trash *)",
+      "PowerShell(trash *)"
+    ],
+    "deny": [
+      "Bash(rm *)",
+      "Bash(sudo rm *)",
+      "PowerShell(rm *)",
+      "PowerShell(Remove-Item *)",
+      "PowerShell(ri *)",
+      "PowerShell(del *)",
+      "PowerShell(erase *)",
+      "PowerShell(rd *)",
+      "PowerShell(rmdir *)"
+    ]
+  },
   "hooks": {
     "PreToolUse": [
       {

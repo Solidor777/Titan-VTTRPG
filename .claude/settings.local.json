@@ -82,7 +82,18 @@
       "Bash(echo \"--- events ---\")",
       "Bash(cat C:/FoundryVTT/V14/dev/foundryuserdata/Data/systems/titan/.superpowers/brainstorm/1210-1781225525/state/events)",
       "Bash(echo \"--- stopped? ---\")",
-      "Bash(ls C:/FoundryVTT/V14/dev/foundryuserdata/Data/systems/titan/.superpowers/brainstorm/1210-1781225525/state)"
+      "Bash(ls C:/FoundryVTT/V14/dev/foundryuserdata/Data/systems/titan/.superpowers/brainstorm/1210-1781225525/state)",
+      "Bash(gh api *)",
+      "PowerShell(npx playwright test component-probe-selects.spec.js -g \"AttributeSelect\" --reporter=line 2>&1 | Select-Object -Last 50)"
     ]
+  },
+  "enabledPlugins": {
+    "foundry-vtt@personal-skills": true,
+    "web-ui@personal-skills": true,
+    "ui-core@personal-skills": true,
+    "frontend-design@claude-plugins-official": true,
+    "rust-analyzer-lsp@claude-plugins-official": false,
+    "clangd-lsp@claude-plugins-official": false,
+    "creative-writing-skills@cw": false
   }
 }

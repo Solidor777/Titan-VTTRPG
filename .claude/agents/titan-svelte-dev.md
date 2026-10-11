@@ -31,3 +31,7 @@ data flow, conventions) before locating where new work fits.
 - This codebase is pure Svelte 5 + Foundry v14. Use runes, `mount()`/`unmount()`, the `ReactiveDocument` bridge
   (`document.data.*` via `getContext('document')`), and `{@const}` dynamic dispatch.
 - Source lives in `src/`; the build output goes to the repo root (do not hand-edit build artifacts).
+
+## Report handoff
+
+Whether you are dispatched as a synchronous inline call or a named background agent, your final message IS your report — a summary of what you changed, the files touched, and the verification you ran. That final message is returned to whoever dispatched you (the controller / main session) as your result, and the controller acts on it directly. Do not hand it off with `SendMessage` or address it to anyone; just emit it as your final assistant message. Never end your turn on a tool call — if your last action was a Read/Write/Edit/Bash use, you have not reported yet and are not done.
