@@ -48,6 +48,7 @@
       "extract:packs": "node scripts/extract-packs.mjs",
       "build:e2e": "vite build --config vite.probe.config.mjs",
       "export:markdown": "node scripts/spreadsheet-to-markdown.mjs",
+      "fetch:compendium": "node scripts/fetch-compendium.mjs",
       "dev": "vite",
       "test": "vitest run",
       "test:watch": "vitest",

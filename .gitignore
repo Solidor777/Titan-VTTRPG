@@ -22,4 +22,4 @@ graphify-out/
 .claude/scheduled_tasks.lock
 debug/
 # The rules compendium source documents are the user's own and stay untracked.
-TITAN Rules Compendium*.md
+TITAN Rules Compendium*

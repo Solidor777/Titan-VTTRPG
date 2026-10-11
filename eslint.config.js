@@ -84,6 +84,7 @@ const NODE_GLOBALS = [
    'setInterval',
    'clearInterval',
    'structuredClone',
+   'fetch',
    'URL',
    'TextEncoder',
    'TextDecoder',
