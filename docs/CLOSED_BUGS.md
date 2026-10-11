@@ -3271,3 +3271,16 @@ The evidence files named here are in `.superpowers/sdd/2026-10-10-e2e-coverage/t
 - **Fixed:** 2026-10-10: the two keys are passed without the suffix. Proven by `compendium-content.spec.js` (Urderic Items shard passes; the unfixed code failed it, `t9-logs/probe-run6.log`).
 - **Found:** 2026-10-10 by the compendium content sweep.
 - **Status:** Closed 2026-10-10.
+
+### 180. A character sheet reopened from the directory stayed tied to the token it was last opened from
+
+- **What (measured):** after a linked token's double-click opened the world actor's sheet, closing it and opening it from
+  the Actors directory left `sheet.token` set to that token (`linked-token-sync.spec.js`, "a prototype token edit leaves
+  placed linked tokens alone...", diagnostic run `t5-logs/diag-run1.log`): the Edit Token button opened the placed
+  token's configuration (`TokenConfig-Scene-...-Token-...`) instead of the prototype token's. Cause (read):
+  `TitanActorSheet#originToken` was set from the render option `token` and never cleared.
+- **Fixed:** 2026-10-10: `TitanActorSheet#_onClose` clears the originating token, so a reopen from the directory has no
+  token and a reopen from a token passes it again. Covered by the same test (failed before, passes after in
+  `t5-logs/full-run4.log`).
+- **Found:** 2026-10-10 by the full e2e run of `linked-token-sync.spec.js`.
+- **Status:** Closed 2026-10-10.

@@ -657,18 +657,27 @@ test.describe('player seat and controlled-token HUD', () => {
       expect(await read(player, '(actor) => actor.img'), 'the portrait is unchanged').toBe(before);
    });
 
-   test("a player's Token HUD has the bars and elevation but no configuration, lock or visibility", async () => {
+   test("a player's Token HUD has the bars but no configuration, lock, visibility or elevation entry", async () => {
       // GM presence: the same HUD shows all three (`templates/hud/token-hud.hbs:15,30,43`).
       const gmCentre = await hoverToken(gm, linkedTokens[1]);
       await gm.mouse.click(gmCentre.x, gmCentre.y, { button: 'right' });
       await expect(gm.locator('#token-hud [data-action="config"]')).toHaveCount(1);
       await expect(gm.locator('#token-hud [data-action="locked"]')).toHaveCount(1);
       await expect(gm.locator('#token-hud [data-action="visibility"]')).toHaveCount(1);
+      await expect(gm.locator('#token-hud input[name="elevation"]')).toBeEnabled();
       await closeHud(linkedTokens[1]);
 
       // The player's HUD: the owner may open it (`token.mjs:4713-4721`); the configuration button needs
       // TOKEN_CONFIGURE (`token-hud.mjs:60`), the lock and visibility buttons a GM (`token-hud.hbs:15,43`).
-      const centre = await pointAtToken(player, linkedTokens[1]);
+      // Measured (t5-logs/hud-diag.log): while the player controls one token, the scene's token vision makes the
+      // player's other token invisible (`visible` false), so it takes no pointer events. The HUD is opened on the token
+      // the player controls, or on the second token when none is controlled.
+      /** @type {string} The token whose HUD the player opens. */
+      const target = await player.evaluate(
+         (fallback) => canvas.tokens.controlled[0]?.id ?? fallback,
+         linkedTokens[1],
+      );
+      const centre = await pointAtToken(player, target);
       await player.mouse.click(centre.x, centre.y, { button: 'right' });
       await expect(player.locator('#token-hud')).toBeVisible();
       await expect(player.locator('#token-hud input[name="elevation"]')).toBeVisible();
@@ -676,24 +685,27 @@ test.describe('player seat and controlled-token HUD', () => {
       await expect(player.locator('#token-hud [data-action="locked"]')).toHaveCount(0);
       await expect(player.locator('#token-hud [data-action="visibility"]')).toHaveCount(0);
 
-      // The bar writes the actor; the elevation writes the token. Both reach the GM.
+      // The bar writes the actor on both clients.
       const bar = player.locator('#token-hud input[name="bar1"]');
       await bar.fill('2');
       await bar.press('Enter');
       await expectSystemEverywhere('resource.stamina.value', 2);
+      // Measured (t5-logs/full-run.log): the player's elevation field is disabled. The template disables it for a locked
+      // token and, for a non-GM, while the game is paused (`templates/hud/token-hud.hbs:4`); the test world is paused and
+      // the token is not locked, so the cause is the pause. The GM's field is enabled.
       const elevation = player.locator('#token-hud input[name="elevation"]');
-      await elevation.fill('2');
-      await elevation.press('Enter');
-      for (const page of [
-         gm,
-         player,
-      ]) {
-         await expect.poll(
-            async () => (await readToken(page, linkedTokens[1])).elevation,
-            { message: "the player's HUD elevation reached the token" },
-         ).toBe(2);
-      }
-      await closeHud(linkedTokens[1], player);
+      await expect(elevation).toBeDisabled();
+      expect(
+         await player.evaluate((tokenId) => ({
+            paused: game.paused,
+            locked: canvas.scene.tokens.get(tokenId).locked,
+         }), target),
+         'the pause, not a lock, disables the field',
+      ).toEqual({
+         paused: true,
+         locked: false,
+      });
+      await closeHud(target, player);
    });
 });
 

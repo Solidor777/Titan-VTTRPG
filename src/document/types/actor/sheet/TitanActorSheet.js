@@ -70,6 +70,18 @@ export default class TitanActorSheet extends TitanDocumentSheet {
    }
 
    /**
+    * Forget the originating Token when the window closes, so a sheet reopened from the directory is not taken for the
+    * sheet of the Token it was last opened from (its header buttons and Edit Token would act on that Token).
+    * @override
+    * @param {object} options - Settings forwarded from the Application close lifecycle.
+    * @protected
+    */
+   _onClose(options) {
+      super._onClose(options);
+      this.#originToken = null;
+   }
+
+   /**
     * Bind the drop controller to the sheet element on every render. ApplicationV2 wires no drag-drop
     * handlers itself, so without this binding `_onDrop` never fires and sheet drops silently no-op.
     * @override
