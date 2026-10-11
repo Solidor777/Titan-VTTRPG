@@ -1,3 +1,6 @@
+import fs from 'node:fs';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { expect, flushPageErrors, test } from './harness.js';
 import { clickTabButton } from './actions.js';
 import { collectLocalizationOffenders, login, openSheetByUuid } from './fixtures.js';
@@ -16,6 +19,30 @@ import { attachPageErrors, closeAllApps } from './world.js';
 
 /** @type {string} The package name of the compendium module. */
 const MODULE = 'titan-vttrpg-compendium';
+
+/** @type {string} The compendium module's directory, a sibling of the systems directory that holds this repo. */
+const MODULE_DIR = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../../../modules', MODULE);
+
+/** @type {number} How many documents one test places and inspects at most; a pack with more is split in shards. */
+const SHARD_SIZE = 50;
+
+/**
+ * @typedef {object} ModulePack
+ * @property {string} name - The pack name in the module manifest.
+ * @property {string} label - The pack label.
+ * @property {string} type - The pack document type.
+ * @property {number} shards - How many tests the pack is split into.
+ */
+
+/** @type {ModulePack[]} The module's packs of Items, Effects and Actors, read from its manifest. */
+const MODULE_PACKS = JSON.parse(fs.readFileSync(path.join(MODULE_DIR, 'module.json'), 'utf8')).packs
+   .filter((pack) => ['Item', 'ActiveEffect', 'Actor'].includes(pack.type))
+   .map((pack) => ({
+      name: pack.name,
+      label: pack.label,
+      type: pack.type,
+      shards: Math.max(1, Math.ceil(fs.readdirSync(path.join(MODULE_DIR, 'src/packs', pack.name)).length / SHARD_SIZE)),
+   }));
 
 /** @type {string} The root class every TITAN document sheet carries. */
 const SHEET = '.titan-document-sheet';
@@ -405,114 +432,129 @@ async function placeBatch({ packId, label, number, entries, collection, document
 }
 
 /**
- * Places and inspects every entry of every module pack of a document type, in batches.
- * @param {'Item' | 'ActiveEffect'} documentName - The pack document type.
- * @returns {Promise<void>} Resolves once every document has been placed and inspected.
+ * Places and inspects one shard of the entries of one module pack, in batches. The shard takes every
+ * `shards`-th entry of the pack's index, so the shards together cover each entry once.
+ * @param {ModulePack} modulePack - The pack.
+ * @param {number} shard - The shard number, from 0.
+ * @returns {Promise<void>} Resolves once every document of the shard has been placed and inspected.
  */
-async function coverPacks(documentName) {
-   /** @type {{id: string, label: string, entries: object[]}[]} The packs. */
-   const packs = await readModulePacks(documentName);
-   expect(packs.length, `the module has ${documentName} packs`).toBeGreaterThan(0);
+async function coverPack(modulePack, shard) {
+   /** @type {{id: string, label: string, entries: object[]}|undefined} The pack, read from the live world. */
+   const pack = (await readModulePacks(modulePack.type))
+      .find((candidate) => candidate.id === `${MODULE}.${modulePack.name}`);
+   expect(pack, `the world has the pack ${modulePack.name}`).toBeDefined();
 
-   /** @type {string[]} The problems found across all packs. */
+   /** @type {object[]} The entries of this shard. */
+   const entries = pack.entries.filter((entry, index) => index % modulePack.shards === shard);
+   test.skip(entries.length === 0, 'the shard holds no document');
+
+   /** @type {string[]} The problems found. */
    const problems = [];
-   for (const pack of packs) {
-      for (let start = 0, number = 1; start < pack.entries.length; start += BATCH_SIZE, number++) {
-         problems.push(...await placeBatch({
-            packId: pack.id,
-            label: pack.label,
-            number,
-            entries: pack.entries.slice(start, start + BATCH_SIZE),
-            collection: documentName === 'Item' ? 'items' : 'effects',
-            documentName,
-         }));
-         await closeAllApps(page);
-      }
+   for (let start = 0, number = 1; start < entries.length; start += BATCH_SIZE, number++) {
+      problems.push(...await placeBatch({
+         packId: pack.id,
+         label: `${pack.label} shard ${shard + 1}`,
+         number,
+         entries: entries.slice(start, start + BATCH_SIZE),
+         collection: modulePack.type === 'Item' ? 'items' : 'effects',
+         documentName: modulePack.type,
+      }));
+      await closeAllApps(page);
    }
    expect(problems, `compendium documents that failed:\n${problems.join('\n')}`).toEqual([]);
 }
 
-test.describe('compendium module content', () => {
-   test.setTimeout(3_600_000);
+/**
+ * Imports every actor of one module pack into the world and inspects it, its items and effects, and the pack entry.
+ * @param {ModulePack} modulePack - The pack.
+ * @returns {Promise<void>} Resolves once every actor has been imported and inspected.
+ */
+async function coverActorPack(modulePack) {
+   /** @type {{id: string, label: string, entries: {id: string, name: string}[]}|undefined} The pack, read live. */
+   const pack = (await readModulePacks('Actor')).find((candidate) => candidate.id === `${MODULE}.${modulePack.name}`);
+   expect(pack, `the world has the pack ${modulePack.name}`).toBeDefined();
 
-   test('every module item places on a character and renders in the sheet, its own sheet and the pack', async () => {
-      await coverPacks('Item');
-   });
+   /** @type {string[]} The problems found. */
+   const problems = [];
+   for (const entry of pack.entries) {
+      /** @type {import('@playwright/test').Locator} The pack window. */
+      const packWindow = await openPackWindow(pack.id);
 
-   test('every module effect places on a character and renders in the sheet, its own sheet and the pack', async () => {
-      await coverPacks('ActiveEffect');
-   });
+      /** @type {string[]} The ids of the world actors before the import. */
+      const before = await page.evaluate(() => game.actors.map((actor) => actor.id));
 
-   test('every module actor imports to the world and renders with its items and effects', async () => {
-      /** @type {{id: string, label: string, entries: {id: string, name: string}[]}[]} The actor packs. */
-      const packs = await readModulePacks('Actor');
-      expect(packs.length, 'the module has Actor packs').toBeGreaterThan(0);
+      /** @type {import('@playwright/test').Locator} The Actors tab's panel, the drop target. */
+      const panel = await openSidebarTab(page, 'actors');
+      await packWindow.locator(`.directory-item.entry[data-entry-id="${entry.id}"]`)
+         .dragTo(panel.locator('.directory-list'));
 
-      /** @type {string[]} The problems found. */
-      const problems = [];
-      for (const pack of packs) {
-         for (const entry of pack.entries) {
-            /** @type {import('@playwright/test').Locator} The pack window. */
-            const packWindow = await openPackWindow(pack.id);
+      /** @type {string[]} The ids of the new world actors. */
+      let added = [];
+      await expect.poll(async () => {
+         added = await page.evaluate(
+            (before) => game.actors.filter((actor) => !before.includes(actor.id)).map((actor) => actor.id),
+            before,
+         );
+         return added.length;
+      }, { message: `the import of ${entry.name} created one actor` }).toBe(1);
+      record({
+         documentName: 'Actor',
+         id: added[0],
+         createdBy: 'compendium-content.spec.js',
+      });
+      problems.push(...(await takeFaults()).map((fault) => `${entry.name}: import: ${fault}`));
+      await packWindow.locator('header.window-header [data-action="close"]').click();
+      await expect(packWindow).toHaveCount(0);
 
-            /** @type {string[]} The ids of the world actors before the import. */
-            const before = await page.evaluate(() => game.actors.map((actor) => actor.id));
-
-            /** @type {import('@playwright/test').Locator} The Actors tab's panel, the drop target. */
-            const panel = await openSidebarTab(page, 'actors');
-            await packWindow.locator(`.directory-item.entry[data-entry-id="${entry.id}"]`)
-               .dragTo(panel.locator('.directory-list'));
-
-            /** @type {string[]} The ids of the new world actors. */
-            let added = [];
-            await expect.poll(async () => {
-               added = await page.evaluate(
-                  (before) => game.actors.filter((actor) => !before.includes(actor.id)).map((actor) => actor.id),
-                  before,
-               );
-               return added.length;
-            }, { message: `the import of ${entry.name} created one actor` }).toBe(1);
-            record({
-               documentName: 'Actor',
-               id: added[0],
-               createdBy: 'compendium-content.spec.js',
-            });
-            problems.push(...(await takeFaults()).map((fault) => `${entry.name}: import: ${fault}`));
-            await packWindow.locator('header.window-header [data-action="close"]').click();
-            await expect(packWindow).toHaveCount(0);
-
-            /** @type {{uuid: string, name: string}[]} The imported actor's items and effects. */
-            const parts = await page.evaluate((actorId) => {
-               /** @type {Actor} The imported actor. */
-               const actor = game.actors.get(actorId);
-               return [
-                  ...actor.items.map((item) => ({
-                     uuid: item.uuid,
-                     name: item.name,
-                     kind: 'item',
-                  })),
-                  ...actor.effects.map((effect) => ({
-                     uuid: effect.uuid,
-                     name: effect.name,
-                     kind: 'effect',
-                  })),
-               ];
-            }, added[0]);
-            problems.push(...await inspectOwnSheet(`Actor.${added[0]}`, SHEET, `${entry.name} actor sheet`));
-            for (const part of parts) {
-               problems.push(...await inspectOwnSheet(
-                  part.uuid,
-                  SHEET,
-                  `${entry.name} / ${part.name} ${part.kind} sheet`,
-               ));
-            }
-            problems.push(...await inspectOwnSheet(
-               `Compendium.${pack.id}.Actor.${entry.id}`,
-               SHEET,
-               `${entry.name} pack entry sheet`,
-            ));
-         }
+      /** @type {{uuid: string, name: string}[]} The imported actor's items and effects. */
+      const parts = await page.evaluate((actorId) => {
+         /** @type {Actor} The imported actor. */
+         const actor = game.actors.get(actorId);
+         return [
+            ...actor.items.map((item) => ({
+               uuid: item.uuid,
+               name: item.name,
+               kind: 'item',
+            })),
+            ...actor.effects.map((effect) => ({
+               uuid: effect.uuid,
+               name: effect.name,
+               kind: 'effect',
+            })),
+         ];
+      }, added[0]);
+      problems.push(...await inspectOwnSheet(`Actor.${added[0]}`, SHEET, `${entry.name} actor sheet`));
+      for (const part of parts) {
+         problems.push(...await inspectOwnSheet(
+            part.uuid,
+            SHEET,
+            `${entry.name} / ${part.name} ${part.kind} sheet`,
+         ));
       }
-      expect(problems, `compendium actors that failed:\n${problems.join('\n')}`).toEqual([]);
-   });
+      problems.push(...await inspectOwnSheet(
+         `Compendium.${pack.id}.Actor.${entry.id}`,
+         SHEET,
+         `${entry.name} pack entry sheet`,
+      ));
+   }
+
+   expect(problems, `compendium actors that failed:\n${problems.join('\n')}`).toEqual([]);
+}
+
+test.describe('compendium module content', () => {
+   test.setTimeout(300_000);
+
+   for (const modulePack of MODULE_PACKS) {
+      if (modulePack.type === 'Actor') {
+         test(`${modulePack.label}: every actor imports and renders with its items and effects`, async () => {
+            await coverActorPack(modulePack);
+         });
+         continue;
+      }
+      for (let shard = 0; shard < modulePack.shards; shard++) {
+         test(`${modulePack.label} ${shard + 1} of ${modulePack.shards}: documents place and render`, async () => {
+            await coverPack(modulePack, shard);
+         });
+      }
+   }
 });

@@ -861,16 +861,14 @@ LevelDB locks. `tests/unit/SuperviseServer.test.js` covers spawn/reuse/teardown.
 at the repo root, so it catches v14 API breaks that the mocked Vitest tier cannot.
 
 **The 50 spec files** (`tests/e2e/`; `logic/` holds three of them):
-- Compendium module content. `compendium-content.spec.js` (written, not run: reads every Item, ActiveEffect and Actor
-  document of the `titan-vttrpg-compendium` packs at run time, drags each from its open pack window onto a character
-  sheet in batches of 40 or imports the actor, then scans every tab of the character sheet, the owned copy's sheet and
-  the pack entry's sheet for page errors, error notifications, empty content and `LOCAL.` text).
-- Deleted documents. `deleted-document-surfaces.spec.js` (a world actor of each type, a world item and an owned item of
-  each type, an effect, a condition, a placed linked or unlinked token deleted through the sidebar Delete entry, the row
-  Delete buttons, the Delete key or the Token HUD while its sheet, Token HUD, Token Configuration window or Player HUD is
-  open, and a second client's open sheets: no uncaught page error, no console error and no warning or error
-  notification; `deletions.js` holds the watch, the notice recorder and the directory delete flow; refused connections to
-  Wiretap's port 31416 are filtered from the console errors).
+- Compendium module content. `compendium-content.spec.js` (24 tests, measured full run 2026-10-10: all pass, each under
+  40 s): one test per module pack, big packs sharded by 50 documents (the pack list and shard counts come from the
+  module manifest and its `src/packs` file counts; the documents from the live packs at run time). Each document is
+  dragged from its open pack window (collapsed folders expanded first) onto a character sheet, or the actor pack is
+  imported; then every tab and nested tab of the character sheet, the owned copy's sheet and the pack entry's sheet is
+  scanned for page errors, error notifications, empty content and `LOCAL.` text. `sheet-open-writes-nothing.spec.js`
+  (a sheet that is merely opened sends no document update: Rapid Fire in the locked pack, and a world ability whose
+  stored Damage Reduced By is outside its options).
 - Sheets and documents. `surfaces.spec.js` (every sheet type, spell tab, check-options dialog and the effect tray
   renders on flow-made documents with zero uncaught page errors and no `LOCAL.` text; the collapsed-layout regressions;
   the portrait pick through Foundry's file picker; opening a sheet from the directory; the Edit Unique ID dialog),

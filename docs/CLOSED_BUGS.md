@@ -3263,3 +3263,11 @@ The evidence files named here are in `.superpowers/sdd/2026-10-10-e2e-coverage/t
 - **Fixed:** 2026-10-10: the clamp on mount corrects the shown value only; a later clamp (another control changed the options) still fires `onchange`. Tests: `sheet-open-writes-nothing.spec.js` (failed before, passes after; failed again with the fix mutated away).
 - **Found:** 2026-10-10 by the compendium content sweep.
 - **Status:** Closed 2026-10-10.
+
+### 179. The opposed check attribute and skill tooltips on the item sheet showed raw lang keys
+
+- **What (measured by the compendium content sweep):** the Checks tab of the Urderic Grapple Gun (owned and pack entry) showed `LOCAL.check.opposedCheck.attribute.desc.text.text` and `...skill.desc.text.text`.
+- **Cause (read):** `ItemSheetCheckSettings.svelte` passed the keys with `.text` already appended while the tooltip action appends it.
+- **Fixed:** 2026-10-10: the two keys are passed without the suffix. Proven by `compendium-content.spec.js` (Urderic Items shard passes; the unfixed code failed it, `t9-logs/probe-run6.log`).
+- **Found:** 2026-10-10 by the compendium content sweep.
+- **Status:** Closed 2026-10-10.
