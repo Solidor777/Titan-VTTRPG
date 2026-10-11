@@ -6,6 +6,7 @@ import {
    createActor,
    createScene,
    placeToken,
+   readServerSystem,
    setAttributeBase,
    setResource,
    viewScene,
@@ -175,6 +176,84 @@ test.describe('the Resource bars of the Player HUD', () => {
                .toBeLessThanOrEqual(measured.available + 0.5);
          }
       }
+   });
+});
+
+test.describe('a three-digit Resource', () => {
+   test('a Stamina of 120 is not cut off in the sidebar or the Player HUD', async () => {
+      // Attributes of 20 give Stamina 120 with the default multiplier.
+      /** @type {string} The id of the actor with the three-digit Stamina. */
+      const bigId = await createActor(page, {
+         name: 'E2E Widths Big Actor',
+         type: 'player',
+      });
+      /** @type {string} The actor's uuid. */
+      const bigUuid = `Actor.${bigId}`;
+      for (const attribute of [
+         'body',
+         'mind',
+         'soul',
+      ]) {
+         await setAttributeBase(page, bigUuid, attribute, 20);
+      }
+
+      /** @type {import('@playwright/test').Locator} The actor's sheet. */
+      const sheet = await openSheetByUuid(page, bigUuid);
+      expect(await sheet.getByTestId('sheet-resource-stamina-max').textContent(), 'Stamina maximum').toBe('120');
+      await setResource(page, bigUuid, 'stamina', 120);
+      await commitText(sheet.locator('.middle.stamina').locator('xpath=ancestor::div[contains(@class, "container")][1]')
+         .locator('.row').first().locator('.side input'), '100');
+
+      /** @type {import('@playwright/test').Locator} The Stamina container. */
+      const container = sheet.locator('.middle.stamina')
+         .locator('xpath=ancestor::div[contains(@class, "container")][1]');
+      for (const [label, locator] of [
+         [
+            'current value input',
+            container.locator('.row').nth(1).locator('.side input').first(),
+         ],
+         [
+            'maximum label',
+            sheet.getByTestId('sheet-resource-stamina-max'),
+         ],
+         [
+            'static mod input',
+            container.locator('.row').first().locator('.side input'),
+         ],
+      ]) {
+         /** @type {Awaited<ReturnType<typeof measureText>>} The element's text and widths. */
+         const measured = await measureText(locator);
+         expect(measured.text.length, `sidebar ${label} holds three digits`).toBe(3);
+         expect(measured.scrollWidth, `sidebar ${label} is not scrolled out of its box`)
+            .toBeLessThanOrEqual(measured.clientWidth);
+         expect(measured.textWidth, `sidebar ${label} glyphs fit ${JSON.stringify(measured)}`)
+            .toBeLessThanOrEqual(measured.available + 0.5);
+      }
+      await closeAllApps(page);
+
+      /** @type {string} The scene the actor's token stands on. */
+      const sceneId = await createScene(page, { name: `E2E Widths Big Scene ${Date.now()}` });
+      await viewScene(page, sceneId);
+      await controlPlacedToken(page, await placeToken(page, bigId));
+      for (const part of [
+         'input',
+         'max',
+      ]) {
+         /** @type {Awaited<ReturnType<typeof measureText>>} The element's text and widths. */
+         const measured = await measureText(page.getByTestId(`player-hud-bar-stamina-${part}`));
+         expect(measured.text.length, `HUD stamina ${part} holds three digits`).toBe(3);
+         expect(measured.scrollWidth, `HUD stamina ${part} is not scrolled out of its box`)
+            .toBeLessThanOrEqual(measured.clientWidth);
+         expect(measured.textWidth, `HUD stamina ${part} glyphs fit ${JSON.stringify(measured)}`)
+            .toBeLessThanOrEqual(measured.available + 0.5);
+      }
+
+      // The HUD input accepts a three-digit value.
+      await commitText(page.getByTestId('player-hud-bar-stamina-input'), '110');
+      await expect.poll(
+         async () => (await readServerSystem(page, bigUuid)).resource.stamina.value,
+         { message: 'the HUD input stored a three-digit value' },
+      ).toBe(110);
    });
 });
 

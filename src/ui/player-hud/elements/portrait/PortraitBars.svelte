@@ -36,7 +36,7 @@
             <DocumentIntegerInput
                bind:value={document.data.system.resource[resource].value}
                max={document.data.system.resource[resource].max}
-               maxDigits={2}
+               maxDigits={3}
                min={0}
                testId={`player-hud-bar-${resource}-input`}
             />
@@ -88,8 +88,8 @@
             @include flex-row;
             @include flex-group-center;
 
-            // Size the max value (a bordered label) to match the 2-digit current-value input beside it.
-            --titan-label-width: calc(var(--titan-input-digit-width) * 2 + 12px);
+            // Size the max value (a bordered label) to match the 3-digit current-value input beside it.
+            --titan-label-width: calc(var(--titan-input-digit-width) * 3 + 12px);
 
             flex-shrink: 0;
             gap: 2px;

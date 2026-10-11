@@ -233,7 +233,7 @@ test.describe('portrait', () => {
       await setBar('stamina', 2);
    });
 
-   test('the bar max value is as wide as the 2-digit current-value input', async () => {
+   test('the bar max value is as wide as the 3-digit current-value input', async () => {
       await control();
 
       /** @type {object} The rendered widths of the current-value input and the max-value label. */

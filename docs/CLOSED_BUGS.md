@@ -3329,3 +3329,18 @@ The evidence files named here are in `.superpowers/sdd/2026-10-10-e2e-coverage/t
   (`.superpowers/sdd/2026-10-10-ui-bugs/logs/after2.log`), including a roll by another user into a log the GM scrolled up.
 - **Found:** 2026-10-10 by the user.
 - **Status:** Closed 2026-10-10.
+
+### 181. A three-digit Resource maximum or value was cut off in the sidebar and the Player HUD bars
+
+- **Measured:** with Body, Mind and Soul at 20 the Stamina maximum is 120 (`sheet-layout-widths.spec.js`); an earlier
+  run read the HUD Stamina max label's text at 27.8 px against 20 px available, and the sidebar current-value input had
+  scroll width 38 against client width 30 (`.superpowers/sdd/2026-10-10-ui-bugs/logs/three-before.log`).
+- **Cause (read):** nothing caps a derived maximum (`CharacterDataModel.js`); `PortraitBars.svelte` gave the input
+  `maxDigits={2}` and the label a two-digit width; `CharacterSheetResource.svelte` sized its cells for two digits,
+  and its cells shrank below that width in the narrow sidebar row.
+- **Fixed:** 2026-10-10: both use `calc(var(--titan-input-digit-width) * 3 + 12px)`, the HUD input takes
+  `maxDigits={3}`, and the sheet cells do not shrink. The spec passes with the two-digit and three-digit cases,
+  `character-sheet-layout.spec.js` and `player-hud.spec.js` pass (`.superpowers/sdd/2026-10-10-ui-bugs/logs/three-after3.log`). The sidebar assertion was
+  the one measured failing first; the HUD assertions of the new test were not reached before the fix.
+- **Found:** 2026-10-10 while closing bug 176.
+- **Status:** Closed 2026-10-10.
