@@ -455,6 +455,11 @@ test.describe('effect expiry for every duration type and Auto-remove value', () 
    test.beforeEach(async () => {
       await setWorldSetting(gm, 'reportEffects', true);
       await setWorldSetting(gm, 'autoDecreaseEffectDuration', true);
+
+      // The subject starts with its Resolve below the maximum, and at `showButton` its turn start report offers a
+      // Regain Resolve button. A world setting keeps the value another spec file set until the suite ends, so the
+      // value is pinned: these tests assert that a card holds no button other than Auto-remove's.
+      await setWorldSetting(gm, 'autoRegainResolve', 'disabled');
    });
 
    for (const mode of MODES) {

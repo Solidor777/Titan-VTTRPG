@@ -648,8 +648,11 @@ for full per-row styling. `AttributeSelect`/`AttackTypeSelect` populate `icon` f
 `attribute-colors` mixin (the closed control is tinted by the existing `AttributeInput` wrapper).
 
 Keyboard parity with the native element: Up/Down/Home/End, Enter/Space to commit, Esc/Tab to close,
-first-letter typeahead, plus `aria-expanded`/`aria-controls`/`aria-activedescendant`. The clamp `$effect`
-(reset to the first option when `value` is out of range) is preserved. Handled keys call
+first-letter typeahead, plus `aria-expanded`/`aria-controls`/`aria-activedescendant`. A `value` that is not among the
+options shows the first option (`selected` falls back to `normalized[0]`, which `data-value` and the open list follow),
+because a Foundry document's data is not reactive and a write to it does not re-render the Select. The clamp `$effect`
+also writes the first option into the bound value; it fires `onchange` only after mount, so opening a sheet saves
+nothing. Handled keys call
 `stopPropagation` so they do not leak to Foundry's bubble-phase keybindings — otherwise Esc pops the
 main `#menu` dialog and arrow keys pan the canvas while the list is open (unmodified single characters
 drive typeahead; Ctrl/Alt/Meta combos pass through to Foundry/browser shortcuts). This is also why e2e
@@ -845,7 +848,7 @@ the lone exception is `Text` (no root element). See the component-probe harness 
 coverage map, the wrapper-forwarding rules, and the selector each component resolves to.
 
 **Playwright E2E** — `npm run test:e2e` runs `playwright test` against the `test-titan` Foundry world on
-`http://localhost:30000`: 67 spec files, 1276 tests (measured: `npx playwright test --list` → "Total: 1276 tests in 67
+`http://localhost:30000`: 68 spec files, 1281 tests (measured: `npx playwright test --list` → "Total: 1281 tests in 68
 files"). `playwright.config.mjs` sets `timeout` 60 s, `expect.timeout` 1000 ms, `workers` 1, `fullyParallel` false,
 `globalSetup` and `globalTeardown`, the `list` reporter beside `slow-operation-reporter.js`, and for every test headless
 Chromium (with `--enable-gpu`), `viewport` 1920x1080 and `actionTimeout` 10 s. The users are the four dedicated
@@ -860,15 +863,17 @@ ancestor pid, polling liveness once a second), so a hard-killed run never leaves
 LevelDB locks. `tests/unit/SuperviseServer.test.js` covers spawn/reuse/teardown. The suite drives the real built system
 at the repo root, so it catches v14 API breaks that the mocked Vitest tier cannot.
 
-**The 67 spec files** (`tests/e2e/`; `logic/` holds three of them):
+**The 68 spec files** (`tests/e2e/`; `logic/` holds three of them):
 - Compendium module content. `compendium-content.spec.js` (24 tests, measured full run 2026-10-10: all pass, each under
   40 s): one test per module pack, big packs sharded by 50 documents (the pack list and shard counts come from the
   module manifest and its `src/packs` file counts; the documents from the live packs at run time). Each document is
   dragged from its open pack window (collapsed folders expanded first) onto a character sheet, or the actor pack is
   imported; then every tab and nested tab of the character sheet, the owned copy's sheet and the pack entry's sheet is
   scanned for page errors, error notifications, empty content and `LOCAL.` text. `sheet-open-writes-nothing.spec.js`
-  (a sheet that is merely opened sends no document update: Rapid Fire in the locked pack, and a world ability whose
-  stored Damage Reduced By is outside its options).
+  (a sheet that is merely opened sends no document update: Rapid Fire in the locked pack, a world ability whose
+  stored Damage Reduced By is outside its options, and a Multiply Base and a Multiply Sum element with no stored
+  rounding, whose select shows Round Down), `clear-chat.spec.js` (`clearChat` waits for another client's toast before
+  it deletes the message).
 - Sheets and documents. `surfaces.spec.js` (every sheet type, spell tab, check-options dialog and the effect tray
   renders on flow-made documents with zero uncaught page errors and no `LOCAL.` text; the collapsed-layout regressions;
   the portrait pick through Foundry's file picker; opening a sheet from the directory; the Edit Unique ID dialog),
@@ -993,7 +998,7 @@ at the repo root, so it catches v14 API breaks that the mocked Vitest tier canno
 window's locator; a read-side render, not a document change), `renderSheet(page, uuid, expectedSelector, errors)` (opens
 by uuid, asserts the frame class, flushes and asserts the spec's `errors` collector is empty), `openSheetTab(page,
 label)` and `collectLocalizationOffenders`. `world.js` holds `closeAllApps`, `clearChat`, `attachPageErrors`,
-`installHookErrorReporting`, `flushHookErrorReports`, `newestMessageType`, `waitForAnimations`, `showChatLog`,
+`registerChatClient`, `installHookErrorReporting`, `flushHookErrorReports`, `newestMessageType`, `waitForAnimations`, `showChatLog`,
 `expectActiveGM` and `reloadWorld`. `actions.js`, `select.js`, `contextMenu.js`, `dice.js`, `poll.js`, `settle.js`,
 `settings.js`, `multiClient.js`, `users.js`, `registry.js`, `flows.js`, `census.js`, `global-setup.js`,
 `global-teardown.js`, `checkDialog.js`, `spellCasting.js` (the casting entry points `castFromSpellSheet`,
@@ -1029,7 +1034,14 @@ effects and those in expanded folders) precede any sheet in document order; shee
 scoped to the open sheet — `page.locator('.application.titan-document-sheet [data-item-id]')` /
 `[data-effect-id]` — never bare `page.locator('[data-…-id]')`.
 `clearChat(page)` deletes all chat messages in `beforeAll` (per-file world reset — keeps the world lean so
-GM→player socket replication does not time out). `attachPageErrors(page)` wires ONE `pageerror` listener
+GM→player socket replication does not time out). It first waits until every joined client (`joinWorld` registers it
+with `registerChatClient`) shows no chat toast in progress: core posts a toast in steps and throws `Cannot set
+properties of null (setting 'hidden')` in `#postNotification` when the message is deleted before the steps end
+(`foundry.mjs:130054-130090`, 14.364; a plain message created and deleted at once raises it without any TITAN
+content). `checkCards.js` `actAsCharacter` assigns the character before it releases the controlled tokens, because
+core controls a token when the assigned character changes (`User#_onUpdate` → `TokenLayer#cycleTokens`). A world
+setting a spec sets through `setWorldSetting` keeps its value until `global-teardown.js`, so a spec whose assertions
+depend on a setting pins it. `attachPageErrors(page)` wires ONE `pageerror` listener
 and returns the shared `errors` array; per-test `page.on('pageerror', …)` is banned (it would stack on the
 reused page) — fold any per-test error assertion onto the shared `errors`, which is reset each `afterEach`.
 A `pageerror` never includes a hook listener's throw: core's `Hooks.#call` catches it and passes it to
