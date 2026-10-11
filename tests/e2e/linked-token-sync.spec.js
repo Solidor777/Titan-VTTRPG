@@ -690,9 +690,9 @@ test.describe('player seat and controlled-token HUD', () => {
       await bar.fill('2');
       await bar.press('Enter');
       await expectSystemEverywhere('resource.stamina.value', 2);
-      // Measured (t5-logs/full-run.log): the player's elevation field is disabled. The template disables it for a locked
-      // token and, for a non-GM, while the game is paused (`templates/hud/token-hud.hbs:4`); the test world is paused and
-      // the token is not locked, so the cause is the pause. The GM's field is enabled.
+      // Measured (t5-logs/full-run.log): the player's elevation field is disabled. The template disables it for a
+      // locked token and, for a non-GM, while the game is paused (`templates/hud/token-hud.hbs:4`); the test world is
+      // paused and the token is not locked, so the cause is the pause. The GM's field is enabled.
       const elevation = player.locator('#token-hud input[name="elevation"]');
       await expect(elevation).toBeDisabled();
       expect(
@@ -767,6 +767,48 @@ test.describe('token changes', () => {
          expect(await read(page, '(actor) => actor.img'), 'the actor image is untouched').toBe(imageBefore);
       }
       await closeAllApps(gm);
+   });
+
+   test('the header follows how the sheet was opened; a double-click on an open sheet only raises it', async () => {
+      const tokenId = linkedTokens[0];
+
+      // No token is controlled when the sheet is opened, so the pointer can later reach the token under the open sheet.
+      await hoverToken(gm, tokenId);
+      const sheet = await openSheetByUuid(gm, `Actor.${actorId}`);
+
+      // The sheet stands right of the tokens, which the placing drag put left of the canvas centre.
+      await gm.evaluate(
+         (id) => game.actors.get(id).sheet.setPosition({
+            left: 1000,
+            top: 40,
+         }),
+         actorId,
+      );
+      await expect(sheet.locator('.toggle-token-linked-button'), 'the prototype link toggle').toHaveCount(1);
+      await expect(sheet.locator('.unlink-token-button')).toHaveCount(0);
+
+      // Core raises an open sheet on a token double-click and renders nothing
+      // (`client/canvas/placeables/token.mjs:4807-4811`), so the sheet keeps the header it was opened with.
+      const centre = await hoverToken(gm, tokenId, { keepWindows: true });
+      await gm.mouse.dblclick(centre.x, centre.y);
+      await expect(gm.locator('.application.titan-document-sheet'), 'one sheet window').toHaveCount(1);
+      await expect(sheet.locator('.toggle-token-linked-button')).toHaveCount(1);
+      await expect(sheet.locator('.unlink-token-button')).toHaveCount(0);
+
+      // Closed, the same double-click opens the sheet with the token: Unlink, and Edit Token configures the token.
+      await closeAllApps(gm);
+      const fromToken = await openLinkedTokenSheet(tokenId);
+      await expect(fromToken.locator('.unlink-token-button')).toHaveCount(1);
+      await expect(fromToken.locator('.toggle-token-linked-button')).toHaveCount(0);
+      await fromToken.locator('.edit-token-button').click();
+      await expect(gm.locator(`.application[id$="Token-${tokenId}"]`)).toBeVisible();
+      await expect(gm.locator('.application.prototype-token-config')).toHaveCount(0);
+
+      // Closed and reopened from the directory, the controls are the prototype's again.
+      await closeAllApps(gm);
+      const reopened = await openSheetByUuid(gm, `Actor.${actorId}`);
+      await expect(reopened.locator('.toggle-token-linked-button')).toHaveCount(1);
+      await expect(reopened.locator('.unlink-token-button')).toHaveCount(0);
    });
 
    test('a prototype token edit leaves placed linked tokens alone and sets the next placed token', async () => {
