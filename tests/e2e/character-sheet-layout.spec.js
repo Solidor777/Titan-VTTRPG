@@ -19,7 +19,7 @@ import { attachPageErrors, closeAllApps } from './world.js';
 const LAYOUT_ACTOR_NAME = 'E2E Layout Actor';
 
 /** @type {number} The fixed width of a character sheet (TitanActorSheet `position.width`). */
-const SHEET_WIDTH = 1000;
+const SHEET_WIDTH = 900;
 
 /** @type {number[]} Browser zoom factors under test (50% to 150%). */
 const ZOOM_LEVELS = [

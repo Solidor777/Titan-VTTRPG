@@ -292,12 +292,24 @@ test.describe('the Skills tab rows', () => {
                buttonRight: buttonBox.right - rowBox.left,
                buttonWidth: buttonBox.width,
                buttonHeight: buttonBox.height,
+               nameColumn: document.querySelector('.application.titan-document-sheet .skill-tab .head-name')
+                  .getBoundingClientRect().width,
                contentWidth: content.width,
                overflow: button.scrollWidth - button.clientWidth,
                columnLefts: column.map((element) => element.getBoundingClientRect().left - rowBox.left),
                columnTops: column.map((element) => element.getBoundingClientRect().top - rowBox.top),
                columnBorders: column.map((element) => parseFloat(globalThis.getComputedStyle(element).borderLeftWidth)),
                rowHeight: rowBox.height,
+               rowCentre: rowBox.top + rowBox.height / 2,
+               buttonCentre: buttonBox.top + buttonBox.height / 2,
+               controlCentres: [
+                  row.querySelector('.attribute select, .attribute button'),
+                  ...row.querySelectorAll('.stats .stat .input, .stats .stat .value'),
+               ].filter(Boolean).map((element) => {
+                  /** @type {DOMRect} The control's box. */
+                  const box = element.getBoundingClientRect();
+                  return box.top + box.height / 2;
+               }),
             };
          });
       });
@@ -306,7 +318,7 @@ test.describe('the Skills tab rows', () => {
    /** @type {number} The padding and border a button adds around its content, with a little slack. */
    const BUTTON_CHROME = 30;
 
-   test('every skill is one line: the button, Attribute select, Training and Expertise side by side', async () => {
+   test('every skill sits on one line of columns: the button, Attribute select, Training and Expertise', async () => {
       await openSheetByUuid(page, actorUuid);
       await openSheetTab(page, 'Skills');
       await expect(page.locator('.application.titan-document-sheet .skill').first()).toBeVisible();
@@ -330,9 +342,17 @@ test.describe('the Skills tab rows', () => {
             expect(top, `${row.name} columns share one line`).toBeCloseTo(row.columnTops[0], 0);
          }
 
-         // One line of controls: the row is 40px (a 30px select and 5px padding) and no skill name wraps.
-         expect(row.rowHeight, `${row.name} row is one line tall`).toBeLessThanOrEqual(44);
-         expect(row.buttonHeight, `${row.name} name is on one line`).toBeLessThanOrEqual(rows[0].buttonHeight + 1);
+         // A name that fits the name column stays on one line, and the row is then one line of controls (a 30px
+         // select and 5px padding). A longer name wraps inside its button, which fills the column, and the row grows
+         // only as much as the button needs.
+         if (row.buttonWidth < row.nameColumn - 1) {
+            expect(row.buttonHeight, `${row.name} name is on one line`).toBeLessThanOrEqual(rows[0].buttonHeight + 1);
+            expect(row.rowHeight, `${row.name} row is one line tall`).toBeLessThanOrEqual(44);
+         }
+         else {
+            expect(row.rowHeight, `${row.name} row is no taller than its button needs`)
+               .toBeLessThanOrEqual(row.buttonHeight + 14);
+         }
 
          // A divider sits at the left edge of each of the three columns.
          for (const [index, borderLeft] of row.columnBorders.entries()) {
@@ -377,6 +397,17 @@ test.describe('the Skills tab rows', () => {
          expect(long.buttonHeight, 'the long name wraps onto several lines inside its button')
             .toBeGreaterThan(oneLine * 1.8);
          expect(long.overflow, 'the wrapped text is not cut off').toBeLessThanOrEqual(0);
+
+         // The taller row keeps every column on its vertical middle.
+         expect(long.rowHeight, 'the wrapped row is taller than a one-line row')
+            .toBeGreaterThan(others[0].rowHeight + 10);
+         expect(Math.abs(long.buttonCentre - long.rowCentre), 'the wrapped button is on the row middle')
+            .toBeLessThanOrEqual(1);
+         expect(long.controlCentres.length, 'the Attribute select and the six stat inputs are measured').toBe(7);
+         for (const centre of long.controlCentres) {
+            expect(Math.abs(centre - long.rowCentre), 'a column control is on the middle of the taller row')
+               .toBeLessThanOrEqual(1);
+         }
          expect(long.columnLefts[0], 'the column stays right of the wrapped button')
             .toBeGreaterThanOrEqual(long.buttonRight);
          expect(
@@ -520,16 +551,16 @@ test.describe('the Skills column header', () => {
    // Nested so these tests share `measureHeader`.
    test.describe('the width of a skill entry', () => {
    /** @type {number} The narrowest the skill name column is allowed to be (`--skill-name-min`). */
-      const NAME_MIN = 220;
+      const NAME_MIN = 165;
 
       /** @type {number} The widest the skill name column is allowed to be (`--skill-name-max`). */
-      const NAME_MAX = 260;
+      const NAME_MAX = 195;
 
       /**
-       * @type {number} The narrowest a skill entry is allowed to be: name minimum, 121 + 166 + 166 for the Attribute,
+       * @type {number} The narrowest a skill entry is allowed to be: name minimum, 121 + 145 + 145 for the Attribute,
        * Training and Expertise tracks, and 15 of row padding.
        */
-      const ENTRY_MIN_WIDTH = NAME_MIN + 121 + 166 + 166 + 15;
+      const ENTRY_MIN_WIDTH = NAME_MIN + 121 + 145 + 145 + 15;
 
       /**
        * Measures the columns of the open sheet's skill entries.
@@ -578,8 +609,8 @@ test.describe('the Skills column header', () => {
             .toBe(`${ENTRY_MIN_WIDTH}px`);
          expect(measured.nameColumn, 'the skill name column is at least its minimum').toBeGreaterThanOrEqual(NAME_MIN);
          expect(measured.nameColumn, 'the skill name column is at most its maximum').toBeLessThanOrEqual(NAME_MAX);
-         expect(measured.widestButton, 'the longest default skill name fits its column on one line')
-            .toBeLessThanOrEqual(NAME_MIN);
+         expect(measured.widestButton, 'a roll button is never wider than the skill name column')
+            .toBeLessThanOrEqual(measured.nameColumn);
       });
 
       test('a wider sheet leaves its extra room after the columns, which keep their place and the header alignment',
@@ -628,7 +659,7 @@ test.describe('the Skills column header', () => {
             }
             finally {
                await page.evaluate(async (uuid) => {
-                  (await fromUuid(uuid)).sheet.setPosition({ width: 1000 });
+                  (await fromUuid(uuid)).sheet.setPosition({ width: 900 });
                }, actorUuid);
             }
          });

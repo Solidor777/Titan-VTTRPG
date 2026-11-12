@@ -1,5 +1,4 @@
 <script>
-   import { EXPERTISE_ICON, TRAINING_ICON } from '~/system/Icons.js';
    import CharacterSheetCondensedSkillCheckButton
    from '~/document/types/actor/types/character/sheet/tabs/skills/CharacterSheetCondensedSkillCheckButton.svelte';
    import DocumentAttributeSelect from '~/document/svelte-components/select/DocumentAttributeSelect.svelte';
@@ -70,8 +69,6 @@
 
       <!--Training-->
       <div class="stat">
-         <i class={TRAINING_ICON} use:tooltipAction={'training.desc'}></i>
-
          <!--Base Value-->
          <div class="input">
             <DocumentIntegerInput
@@ -107,8 +104,6 @@
 
       <!--Expertise-->
       <div class="stat">
-         <i class={EXPERTISE_ICON} use:tooltipAction={'expertise.desc'}></i>
-
          <!--Base Value-->
          <div class="input">
             <DocumentIntegerInput
@@ -145,6 +140,8 @@
 </div>
 
 <style lang="scss">
+   // Every cell is aligned to the left and the vertical middle of its track, so when a long skill name wraps onto
+   // more lines and the row grows, the other columns stay centered on it while the dividers span the full height.
    // One line per skill on the column tracks defined by the Skills tab (`--skill-columns` and friends), the same
    // tracks the column header uses, so every cell sits under its label. The roll button is as wide as its skill name
    // needs inside the flexible first track; the Attribute select and the two stat groups are fixed-width tracks, each
@@ -172,6 +169,7 @@
 
          align-items: center;
          display: flex;
+         justify-content: flex-start;
          justify-self: start;
          max-width: 100%;
          min-width: 0;
@@ -180,7 +178,7 @@
       .attribute {
          @include separator-left-large;
 
-         align-content: center;
+         place-content: center start;
          display: grid;
       }
 
@@ -193,16 +191,11 @@
          .stat {
             @include separator-left-large;
 
-            align-content: center;
+            place-content: center start;
             align-items: center;
             column-gap: var(--skill-stat-gap);
             display: grid;
             grid-template-columns: var(--skill-stat-columns);
-
-            // Fixed glyph boxes keep both stat groups the same width whatever the glyph metrics.
-            i {
-               text-align: center;
-            }
 
             .input,
             .value {

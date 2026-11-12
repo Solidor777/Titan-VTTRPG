@@ -40,7 +40,7 @@
             </div>
             <div class="head-sub">
                {#each subLabels as subLabel, index (subLabel)}
-                  <span style:grid-column={index * 2 + 2}>{localize(subLabel)}</span>
+                  <span style:grid-column={index * 2 + 1}>{localize(subLabel)}</span>
                {/each}
             </div>
          </div>
