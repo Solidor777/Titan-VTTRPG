@@ -3,7 +3,8 @@
    import getApplication from '~/helpers/utility-functions/GetApplication.js';
    import localize from '~/helpers/utility-functions/Localize.js';
    import tooltipAction from '~/helpers/svelte-actions/TooltipAction.js';
-   import { EDIT_TOKEN_ICON, IMPORT_ICON, LINKED_ICON, UNLINKED_ICON } from '~/system/Icons.js';
+   import { EDIT_TOKEN_ICON, IMPORT_ICON, LINKED_ICON, MOD_ICON, SLASH_ICON, UNLINKED_ICON } from '~/system/Icons.js';
+   import { areStaticModsShown, setStaticModsShown } from '~/system/StaticMods.js';
 
    /** @type {object} The reactive Document bridge shared via context. */
    const document = getContext('document');
@@ -51,6 +52,9 @@
 
    /** @type {boolean} Whether the active user may import this Actor from its compendium pack. */
    const canImport = game.user.isGM && !!application.actor.pack;
+
+   /** @type {boolean} Whether this Actor's static modifier inputs are shown. */
+   const staticModsShown = $derived(areStaticModsShown(document.data));
 </script>
 
 {#if canImport}
@@ -115,6 +119,25 @@
          </button>
       </div>
    {/if}
+{/if}
+
+{#if document.data.isOwner}
+   <!-- Static Mods: toggles whether the static modifier inputs are shown -->
+   <button aria-label={localize('staticMods')}
+      aria-pressed={staticModsShown ? 'true' : 'false'}
+      class="header-control icon titan-header-button static-mods-button"
+      onclick={() => setStaticModsShown(document.data, !staticModsShown)}
+      use:tooltipAction={staticModsShown ? 'hideStaticModsButton.desc' : 'showStaticModsButton.desc'}
+   >
+      {#if staticModsShown}
+         <i class={MOD_ICON}></i>
+      {:else}
+         <span class="fa-stack">
+            <i class="fa-stack-1x {MOD_ICON}"></i>
+            <i class="fa-stack-1x {SLASH_ICON}"></i>
+         </span>
+      {/if}
+   </button>
 {/if}
 
 <style lang="scss">

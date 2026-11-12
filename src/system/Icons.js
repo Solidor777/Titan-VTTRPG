@@ -63,6 +63,7 @@ export const SEND_TO_CHAT_ICON = 'fas fa-comment';
 export const SETTINGS_ICON = 'fas fa-cog';
 export const SHEET_ICON = 'fas fa-memo';
 export const SHORT_REST_ICON = 'fas fa-face-exhaling';
+export const SLASH_ICON = 'fas fa-slash';
 export const SOUL_ICON = 'fas fa-fire-flame-simple';
 export const SPEND_RESOLVE_ICON = 'fas fa-bolt';
 export const STAMINA_ICON = 'fas fa-heart';

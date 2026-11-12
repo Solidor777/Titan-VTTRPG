@@ -2079,6 +2079,25 @@ export async function setResource(page, actorUuid, resource, value) {
 }
 
 /**
+ * Sets whether an actor sheet shows its static modifier inputs with the Static Mods button of its window header. The
+ * button is pressed only when the sheet's state differs from the wanted one.
+ * @param {import('@playwright/test').Locator} sheet - The open actor sheet's window element.
+ * @param {boolean} shown - True to show the static modifier inputs.
+ * @returns {Promise<void>} Resolves once the button reports the wanted state.
+ */
+export async function setStaticModsShown(sheet, shown) {
+   /** @type {import('@playwright/test').Locator} The Static Mods button. */
+   const button = sheet.locator('.window-header .static-mods-button');
+
+   /** @type {string | null} The button's current pressed state. */
+   const pressed = await button.getAttribute('aria-pressed');
+   if (pressed !== String(shown)) {
+      await button.click();
+   }
+   await expect(button).toHaveAttribute('aria-pressed', String(shown));
+}
+
+/**
  * Posts the chat card of an item or effect with the Send to Chat button of its sheet's window header.
  * @param {import('@playwright/test').Page} page - A logged-in GM page.
  * @param {string} documentUuid - The uuid of the item or effect.
