@@ -18,6 +18,9 @@ import { attachPageErrors, closeAllApps } from './world.js';
 /** @type {string} Name of the actor whose Skills tab rows are measured; `E2E ` lets the census find it. */
 const LAYOUT_ACTOR_NAME = 'E2E Layout Actor';
 
+/** @type {number} The fixed width of a character sheet (TitanActorSheet `position.width`). */
+const SHEET_WIDTH = 1000;
+
 /** @type {number[]} Browser zoom factors under test (50% to 150%). */
 const ZOOM_LEVELS = [
    0.5,
@@ -169,28 +172,19 @@ test.describe('the Skills tab and the sidebar', () => {
       await openSheetTab(page, 'Skills');
       await expect(page.locator('.skill').first(), 'first skill row rendered').toBeVisible();
 
-      // At a narrow width and at the default width the sheet is left at.
-      for (const width of [
-         640,
-         850,
-      ]) {
-         await page.evaluate(async ({ uuid, sheetWidth }) => {
-            (await fromUuid(uuid)).sheet.setPosition({ width: sheetWidth });
-         }, {
-            uuid: layoutUuid,
-            sheetWidth: width,
-         });
-         await expect.poll(() => page.evaluate(() => Math.round(
-            document.querySelector('.application.titan-document-sheet').getBoundingClientRect().width,
-         )), { message: `sheet resized to ${width}` }).toBe(width);
-         expect(await measureSkillRows(), `skill rows at ${width}px`).toEqual({
-            rows: 18,
-            check: 1,
-            attribute: 1,
-            stats: 1,
-            clipped: 0,
-         });
-      }
+      // The sheet is not resizable: it opens at its fixed width, the narrowest at which every row fits on one line.
+      expect(await page.evaluate(() => Math.round(
+         document.querySelector('.application.titan-document-sheet').getBoundingClientRect().width,
+      )), 'the sheet opens at its fixed width').toBe(SHEET_WIDTH);
+      expect(await page.evaluate(async (uuid) => (await fromUuid(uuid)).sheet.options.window.resizable, layoutUuid),
+         'the sheet is not resizable').toBe(false);
+      expect(await measureSkillRows(), `skill rows at ${SHEET_WIDTH}px`).toEqual({
+         rows: 18,
+         check: 1,
+         attribute: 1,
+         stats: 1,
+         clipped: 0,
+      });
    });
 
    test('sidebar sections carry uppercase labels', async () => {

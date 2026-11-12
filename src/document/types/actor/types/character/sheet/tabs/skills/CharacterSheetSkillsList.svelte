@@ -42,9 +42,12 @@
    ol {
       @include flex-column;
       @include flex-group-top;
-      @include list;
+      @include list-base;
       @include panel-1;
+      @include padding-standard;
 
+      // The list owns the spacing between rows (`gap`, not the per-item separator of `list`); each row is a stripe.
+      gap: var(--titan-spacing-standard);
       height: 100%;
       width: 100%;
 
@@ -54,16 +57,12 @@
          @include flex-row;
          @include flex-group-center;
 
+         // Foundry's base styles give list items a bottom margin; the list `gap` alone spaces the rows.
+         margin: 0;
+
+         // An entry never gets narrower than its one-line row (the width comes from the Skills tab).
+         min-width: var(--skill-row-min-width);
          width: 100%;
-
-         &:not(:first-child) {
-            @include border-top;
-         }
-
-         &:not(:last-child) {
-            @include border-bottom;
-            @include margin-bottom-large;
-         }
       }
    }
 </style>

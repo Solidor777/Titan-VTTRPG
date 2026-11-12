@@ -60,174 +60,160 @@
       <CharacterSheetCondensedSkillCheckButton {checkParameters}/>
    </div>
 
-   <!--Attribute, Training and Expertise-->
-   <div class="column">
+   <!--Default Attribute-->
+   <div class="attribute" use:tooltipAction={'defaultAttribute.desc'}>
+      <DocumentAttributeSelect bind:value={document.data.system.skill[key].defaultAttribute}/>
+   </div>
 
-      <!--Default Attribute-->
-      <div class="attribute" use:tooltipAction={'defaultAttribute.desc'}>
-         <DocumentAttributeSelect bind:value={document.data.system.skill[key].defaultAttribute}/>
-      </div>
+   <!--Training and Expertise stats-->
+   <div class="stats">
 
-      <!--Training and Expertise stats-->
-      <div class="stats">
+      <!--Training-->
+      <div class="stat">
+         <i class={TRAINING_ICON} use:tooltipAction={'training.desc'}></i>
 
-         <!--Training-->
-         <div class="stat">
-            <i class={TRAINING_ICON} use:tooltipAction={'training.desc'}></i>
-
-            <!--Base Value-->
-            <div class="input">
-               <DocumentIntegerInput
-                  bind:value={document.data.system.skill[key].training.baseValue}
-                  testId={`sheet-skill-${key}-training-base`}
-               />
-            </div>
-
-            <!--Static Mod-->
-            <div class="symbol">+</div>
-            <div class="input">
-               <DocumentIntegerInput bind:value={document.data.system.skill[key].training.mod.static}/>
-            </div>
-
-            <!--Total Value-->
-            <div class="symbol">=</div>
-            <div class="value">
-               <ModifiedValueLabel
-                  baseValue={
-                     document.data.system.skill[key].training.baseValue +
-                        getInnateModTotal(document.data.system.skill[key].training.mod) +
-                        checkParameters.trainingMod
-                  }
-                  currentValue={checkParameters.totalTrainingDice}
-                  testId={`sheet-skill-${key}-training`}
-                  tooltip={{
-                     text: totalTrainingTooltip,
-                     localize: false,
-                  }}
-               />
-            </div>
+         <!--Base Value-->
+         <div class="input">
+            <DocumentIntegerInput
+               bind:value={document.data.system.skill[key].training.baseValue}
+               testId={`sheet-skill-${key}-training-base`}
+            />
          </div>
 
-         <!--Expertise-->
-         <div class="stat">
-            <i class={EXPERTISE_ICON} use:tooltipAction={'expertise.desc'}></i>
+         <!--Static Mod-->
+         <div class="symbol">+</div>
+         <div class="input">
+            <DocumentIntegerInput bind:value={document.data.system.skill[key].training.mod.static}/>
+         </div>
 
-            <!--Base Value-->
-            <div class="input">
-               <DocumentIntegerInput
-                  bind:value={document.data.system.skill[key].expertise.baseValue}
-                  testId={`sheet-skill-${key}-expertise-base`}
-               />
-            </div>
+         <!--Total Value-->
+         <div class="symbol">=</div>
+         <div class="value">
+            <ModifiedValueLabel
+               baseValue={
+                  document.data.system.skill[key].training.baseValue +
+                     getInnateModTotal(document.data.system.skill[key].training.mod) +
+                     checkParameters.trainingMod
+               }
+               currentValue={checkParameters.totalTrainingDice}
+               testId={`sheet-skill-${key}-training`}
+               tooltip={{
+                  text: totalTrainingTooltip,
+                  localize: false,
+               }}
+            />
+         </div>
+      </div>
 
-            <!--Static Mod-->
-            <div class="symbol">+</div>
-            <div class="input">
-               <DocumentIntegerInput bind:value={document.data.system.skill[key].expertise.mod.static}/>
-            </div>
+      <!--Expertise-->
+      <div class="stat">
+         <i class={EXPERTISE_ICON} use:tooltipAction={'expertise.desc'}></i>
 
-            <!--Total Value-->
-            <div class="symbol">=</div>
-            <div class="value">
-               <ModifiedValueLabel
-                  baseValue={
-                     document.data.system.skill[key].expertise.baseValue +
-                        getInnateModTotal(document.data.system.skill[key].expertise.mod) +
-                        checkParameters.expertiseMod
-                  }
-                  currentValue={checkParameters.totalExpertise}
-                  testId={`sheet-skill-${key}-expertise`}
-                  tooltip={{
-                     text: totalExpertiseTooltip,
-                     localize: false,
-                  }}
-               />
-            </div>
+         <!--Base Value-->
+         <div class="input">
+            <DocumentIntegerInput
+               bind:value={document.data.system.skill[key].expertise.baseValue}
+               testId={`sheet-skill-${key}-expertise-base`}
+            />
+         </div>
+
+         <!--Static Mod-->
+         <div class="symbol">+</div>
+         <div class="input">
+            <DocumentIntegerInput bind:value={document.data.system.skill[key].expertise.mod.static}/>
+         </div>
+
+         <!--Total Value-->
+         <div class="symbol">=</div>
+         <div class="value">
+            <ModifiedValueLabel
+               baseValue={
+                  document.data.system.skill[key].expertise.baseValue +
+                     getInnateModTotal(document.data.system.skill[key].expertise.mod) +
+                     checkParameters.expertiseMod
+               }
+               currentValue={checkParameters.totalExpertise}
+               testId={`sheet-skill-${key}-expertise`}
+               tooltip={{
+                  text: totalExpertiseTooltip,
+                  localize: false,
+               }}
+            />
          </div>
       </div>
    </div>
 </div>
 
 <style lang="scss">
-   // The roll button is as wide as its skill name needs and no wider. Only when the name is wider than the row leaves
-   // beside the right-hand column does the button shrink, and then the name wraps inside it. The Attribute select,
-   // Training and Expertise are one fixed-size column against the right edge, so every row places them identically.
+   // One line per skill on the column tracks defined by the Skills tab (`--skill-columns` and friends), the same
+   // tracks the column header uses, so every cell sits under its label. The roll button is as wide as its skill name
+   // needs inside the flexible first track; the Attribute select and the two stat groups are fixed-width tracks, each
+   // behind a divider.
    .skill {
-      @include flex-row;
       @include panel-2;
 
-      align-items: flex-start;
-      gap: var(--titan-spacing-standard);
-      width: 100%;
+      align-items: stretch;
+      display: grid;
+      grid-template-columns: var(--skill-columns);
+
+      // Columns pack from the left; a wider entry leaves trailing space instead of spreading them apart.
+      justify-content: start;
+      min-width: var(--skill-row-min-width);
       padding: var(--titan-spacing-standard) var(--titan-spacing-standard) var(--titan-spacing-standard)
          var(--titan-spacing-large);
+      width: 100%;
 
-      // The button takes its text's width (auto width and height instead of the default fill) and the column
-      // shrinks with the row; the zero minimum width lets a long name wrap inside the button.
+      // The button takes its text's width (auto width and height instead of the default fill); the zero minimum
+      // width lets a name wider than the track wrap inside the button.
       .check {
          --titan-button-height: auto;
+         --titan-button-padding: 3px 10px;
          --titan-button-width: auto;
 
-         display: block;
-         flex: 0 1 auto;
+         align-items: center;
+         display: flex;
+         justify-self: start;
+         max-width: 100%;
          min-width: 0;
       }
 
-      .column {
-         @include flex-column;
-
-         align-items: flex-start;
-         flex: 0 0 auto;
-         gap: var(--titan-spacing-standard);
-         margin-left: auto;
-      }
-
-      // Fits the widest attribute select (icon, label and chevron, measured 97px).
       .attribute {
+         @include separator-left-large;
+
+         align-content: center;
          display: grid;
-         flex: 0 0 100px;
-         width: 100px;
       }
 
+      // The two stat groups span the two trailing tracks and keep their own two-track grid.
       .stats {
-         @include flex-column;
-
-         align-items: flex-start;
-         gap: var(--titan-spacing-standard);
+         display: grid;
+         grid-column: 3 / 5;
+         grid-template-columns: repeat(2, var(--skill-stat-track));
 
          .stat {
-            @include flex-row;
-            @include flex-group-right;
+            @include separator-left-large;
 
-            height: 100%;
+            align-content: center;
+            align-items: center;
+            column-gap: var(--skill-stat-gap);
+            display: grid;
+            grid-template-columns: var(--skill-stat-columns);
 
             // Fixed glyph boxes keep both stat groups the same width whatever the glyph metrics.
             i {
-               width: 16px;
                text-align: center;
-
-               @include margin-right-standard;
             }
 
-            .input {
-               @include flex-row;
-               @include flex-group-center;
-
-               height: 100%;
-               width: 28px;
-
-               @include margin-left-standard;
-            }
-
+            .input,
             .value {
                @include flex-row;
                @include flex-group-center;
 
-               font-weight: normal;
                height: 100%;
-               width: 28px;
+            }
 
-               @include margin-left-standard;
+            .value {
+               font-weight: normal;
             }
 
             .symbol {
@@ -235,9 +221,6 @@
                @include flex-group-center;
 
                height: 100%;
-               width: 10px;
-
-               @include margin-left-standard;
             }
          }
       }

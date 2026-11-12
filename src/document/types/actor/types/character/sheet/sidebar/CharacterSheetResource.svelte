@@ -28,10 +28,7 @@
       <i class={`${icon} side`}></i>
 
       <!--Label-->
-      <div class="middle" use:tooltipAction={`${resource}.desc`}>
-
-         <!--Spacer to center the label-->
-         <div class="side"></div>
+      <div class="middle labels" use:tooltipAction={`${resource}.desc`}>
 
          <!--Label-->
          <div class="label">
@@ -39,7 +36,7 @@
          </div>
 
          <!--Plus Sign-->
-         <div class=" side">+</div>
+         <div class="plus">+</div>
       </div>
 
       <!--Static Mod-->
@@ -95,10 +92,16 @@
       width: 100%;
       height: 100%;
 
+      // Both rows share the same three tracks, so the value, the bar and the mod/max column line up. The side tracks
+      // hold a three-digit value (the digits, the input padding and the border: the NumberInput width formula); the
+      // middle track may shrink to zero, so a long label is cut instead of pushing the right-hand input out.
       .row {
-         @include flex-row;
-         @include flex-space-between;
-
+         align-items: center;
+         display: grid;
+         grid-template-columns:
+            calc(var(--titan-input-digit-width) * 3 + 12px)
+            minmax(0, 1fr)
+            calc(var(--titan-input-digit-width) * 3 + 12px);
          width: 100%;
          height: 100%;
 
@@ -109,10 +112,6 @@
          .side {
             @include flex-group-center;
             @include flex-row;
-
-            // Holds a three-digit value: the digits, the input padding and the border (the NumberInput width formula).
-            flex-shrink: 0;
-            width: calc(var(--titan-input-digit-width) * 3 + 12px);
          }
 
          .middle {
@@ -120,8 +119,27 @@
             @include flex-space-between;
 
             height: 100%;
-            width: 100%;
-            flex: 1;
+            min-width: 0;
+
+            // The label sits in the centre cell and the plus sign against the right edge of the track.
+            &.labels {
+               display: grid;
+               grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+
+               .label {
+                  grid-column: 2;
+                  overflow: hidden;
+                  text-overflow: ellipsis;
+                  white-space: nowrap;
+               }
+
+               .plus {
+                  grid-column: 3;
+                  justify-self: end;
+
+                  @include padding-right-standard;
+               }
+            }
 
             &.resolve {
                --titan-meter-color: var(--titan-resolve-background);

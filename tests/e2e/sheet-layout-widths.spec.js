@@ -15,9 +15,10 @@ import { attachPageErrors, closeAllApps } from './world.js';
 
 /**
  * The character sheet's widths, measured from the live computed geometry of the real rendered elements in the default
- * theme: a two-digit Resource value in the sidebar is not cut off, and a Skills tab row sizes its roll button to the
- * skill name (wrapping a very long name inside the button) while the Attribute select, Training and Expertise keep one
- * column to its right at the same place in every row.
+ * theme: a two-digit Resource value in the sidebar is not cut off and no Resource row overflows the sidebar, a Skills
+ * tab row is one line that sizes its roll button to the skill name (wrapping a very long name inside the button) while
+ * the Attribute select, Training and Expertise keep one place to its right in every row, the column header above the
+ * list lines up with those columns, and a skill entry has a minimum width and a bounded name column.
  */
 
 /** @type {string} Name of the actor whose sheet is measured; `E2E ` lets the census find it. */
@@ -295,6 +296,8 @@ test.describe('the Skills tab rows', () => {
                overflow: button.scrollWidth - button.clientWidth,
                columnLefts: column.map((element) => element.getBoundingClientRect().left - rowBox.left),
                columnTops: column.map((element) => element.getBoundingClientRect().top - rowBox.top),
+               columnBorders: column.map((element) => parseFloat(globalThis.getComputedStyle(element).borderLeftWidth)),
+               rowHeight: rowBox.height,
             };
          });
       });
@@ -303,7 +306,7 @@ test.describe('the Skills tab rows', () => {
    /** @type {number} The padding and border a button adds around its content, with a little slack. */
    const BUTTON_CHROME = 30;
 
-   test('a roll button is as wide as its text and the right-hand column keeps one place', async () => {
+   test('every skill is one line: the button, Attribute select, Training and Expertise side by side', async () => {
       await openSheetByUuid(page, actorUuid);
       await openSheetTab(page, 'Skills');
       await expect(page.locator('.application.titan-document-sheet .skill').first()).toBeVisible();
@@ -316,16 +319,25 @@ test.describe('the Skills tab rows', () => {
             .toBeLessThanOrEqual(BUTTON_CHROME);
          expect(row.overflow, `${row.name} button text is not cut off`).toBeLessThanOrEqual(0);
 
-         // The Attribute select, Training and Expertise form one column right of the button, stacked in that order.
-         expect(row.columnLefts[0], `${row.name} Training starts at the Attribute select's left`)
-            .toBeCloseTo(row.columnLefts[1], 0);
-         expect(row.columnLefts[0], `${row.name} Expertise starts at the Attribute select's left`)
-            .toBeCloseTo(row.columnLefts[2], 0);
-         expect(row.columnLefts[0], `${row.name} column starts right of the button`)
+         // The Attribute select, Training and Expertise follow the button from left to right on one line.
+         expect(row.columnLefts[0], `${row.name} Attribute select starts right of the button`)
             .toBeGreaterThanOrEqual(row.buttonRight);
-         expect(row.columnTops[1], `${row.name} Training is below the Attribute select`)
-            .toBeGreaterThan(row.columnTops[0]);
-         expect(row.columnTops[2], `${row.name} Expertise is below Training`).toBeGreaterThan(row.columnTops[1]);
+         expect(row.columnLefts[1], `${row.name} Training starts right of the Attribute select`)
+            .toBeGreaterThan(row.columnLefts[0]);
+         expect(row.columnLefts[2], `${row.name} Expertise starts right of Training`)
+            .toBeGreaterThan(row.columnLefts[1]);
+         for (const top of row.columnTops) {
+            expect(top, `${row.name} columns share one line`).toBeCloseTo(row.columnTops[0], 0);
+         }
+
+         // One line of controls: the row is 40px (a 30px select and 5px padding) and no skill name wraps.
+         expect(row.rowHeight, `${row.name} row is one line tall`).toBeLessThanOrEqual(44);
+         expect(row.buttonHeight, `${row.name} name is on one line`).toBeLessThanOrEqual(rows[0].buttonHeight + 1);
+
+         // A divider sits at the left edge of each of the three columns.
+         for (const [index, borderLeft] of row.columnBorders.entries()) {
+            expect(borderLeft, `${row.name} column ${index} has a divider`).toBeGreaterThan(0);
+         }
       }
 
       expect(new Set(rows.map((row) => Math.round(row.columnLefts[0]))).size, 'one column place for every row')
@@ -371,8 +383,9 @@ test.describe('the Skills tab rows', () => {
             new Set(rows.map((row) => Math.round(row.columnLefts[0]))).size,
             'the long row keeps the column place of the short rows',
          ).toBe(1);
-         expect(long.columnTops[1], 'Training is below the Attribute select').toBeGreaterThan(long.columnTops[0]);
-         expect(long.columnTops[2], 'Expertise is below Training').toBeGreaterThan(long.columnTops[1]);
+         for (const top of long.columnTops) {
+            expect(top, 'the long row keeps the columns on one line').toBeCloseTo(long.columnTops[0], 0);
+         }
       }
       finally {
          await page.evaluate(({ skill, name }) => {
@@ -381,6 +394,282 @@ test.describe('the Skills tab rows', () => {
             skill: LONG_NAME_SKILL,
             name: original,
          });
+      }
+   });
+});
+
+test.describe('the Skills column header', () => {
+   /**
+    * Measures the column header against every skill row: the left and width of each column, and the horizontal centre
+    * of each sub-label against the control below it.
+    * @returns {Promise<object>} The header's texts and geometry, and the per-row differences.
+    */
+   function measureHeader() {
+      return page.evaluate(() => {
+         /** @type {Element} The open character sheet. */
+         const sheet = document.querySelector('.application.titan-document-sheet');
+
+         /** @type {Element} The column header. */
+         const head = sheet.querySelector('.skill-tab .head');
+
+         /** @type {Element} The scrolling area of the skill list. */
+         const content = sheet.querySelector('.skill-tab .scrolling-container .content');
+
+         /** @type {DOMRect[]} The boxes of the four header columns: name, Attribute, Training, Expertise. */
+         const cells = [...head.querySelectorAll('.head-cell')].map((cell) => cell.getBoundingClientRect());
+
+         /** @type {DOMRect[]} The boxes of the six sub-labels: Base, Mod and Total of Training then Expertise. */
+         const subLabels = [...head.querySelectorAll('.head-sub span')].map((span) => span.getBoundingClientRect());
+
+         /** @type {object[]} The per-row differences from the header. */
+         const rows = [...sheet.querySelectorAll('.skill')].map((row) => {
+            /** @type {DOMRect[]} The boxes of the row's Attribute select and two stat groups. */
+            const columns = [
+               row.querySelector('.attribute'),
+               ...row.querySelectorAll('.stats .stat'),
+            ].map((element) => element.getBoundingClientRect());
+
+            /** @type {DOMRect[]} The boxes of each stat group's base input, mod input and total. */
+            const controls = [...row.querySelectorAll('.stats .stat')].flatMap((stat) => [
+               ...stat.querySelectorAll('.input, .value'),
+            ]).map((element) => element.getBoundingClientRect());
+            return {
+               leftDifferences: columns.map((box, index) => Math.abs(box.left - cells[index + 1].left)),
+               widthDifferences: columns.map((box, index) => Math.abs(box.width - cells[index + 1].width)),
+               centreDifferences: controls.map((box, index) => Math.abs(
+                  box.left + box.width / 2 - (subLabels[index].left + subLabels[index].width / 2),
+               )),
+            };
+         });
+         return {
+            labels: [...head.querySelectorAll('.head-label')].map((label) => label.textContent.trim()),
+            subLabelTexts: [...head.querySelectorAll('.head-sub span')].map((span) => span.textContent.trim()),
+            headInsideScroller: content.contains(head),
+            headTop: head.getBoundingClientRect().top,
+            headGutter: head.offsetWidth - head.clientWidth,
+            listGutter: content.offsetWidth - content.clientWidth,
+            overflowing: content.scrollHeight > content.clientHeight,
+            rows,
+         };
+      });
+   }
+
+   test('the header labels the columns and lines up with every row, scrolled or not', async () => {
+      await openSheetByUuid(page, actorUuid);
+      await openSheetTab(page, 'Skills');
+      await expect(page.locator('.application.titan-document-sheet .skill').first()).toBeVisible();
+
+      /** @type {Awaited<ReturnType<typeof measureHeader>>} The header measured with the list at its top. */
+      const atTop = await measureHeader();
+      expect(atTop.labels, 'the group labels').toEqual([
+         'Skill',
+         'Attribute',
+         'Training',
+         'Expertise',
+      ]);
+      expect(atTop.subLabelTexts, 'the sub-labels of both groups').toEqual([
+         'Base',
+         'Mod',
+         'Total',
+         'Base',
+         'Mod',
+         'Total',
+      ]);
+      expect(atTop.headInsideScroller, 'the header is outside the scrolling list').toBe(false);
+      expect(atTop.overflowing, 'the list scrolls, so its scrollbar shows').toBe(true);
+      expect(atTop.headGutter, 'the header reserves the scrollbar width of the list').toBe(atTop.listGutter);
+      expect(atTop.rows.length, 'every skill row is measured').toBe(18);
+
+      // The list scrolls to its end; the header stays and the columns still line up.
+      await page.evaluate(() => {
+         /** @type {Element} The scrolling area of the skill list. */
+         const content = document.querySelector('.titan-document-sheet .skill-tab .scrolling-container .content');
+         content.scrollTop = content.scrollHeight;
+      });
+      /** @type {Awaited<ReturnType<typeof measureHeader>>} The header measured with the list at its end. */
+      let scrolled;
+      await expect.poll(async () => {
+         scrolled = await measureHeader();
+         return scrolled.headTop;
+      }, { message: 'the header does not move when the list scrolls' }).toBe(atTop.headTop);
+
+      for (const [position, measured] of [
+         [
+            'at the top',
+            atTop,
+         ],
+         [
+            'scrolled to the end',
+            scrolled,
+         ],
+      ]) {
+         for (const [index, row] of measured.rows.entries()) {
+            for (const [column, difference] of row.leftDifferences.entries()) {
+               expect(difference, `row ${index} column ${column} left edge ${position}`).toBeLessThanOrEqual(1);
+               expect(row.widthDifferences[column], `row ${index} column ${column} width ${position}`)
+                  .toBeLessThanOrEqual(1);
+            }
+            for (const [control, difference] of row.centreDifferences.entries()) {
+               expect(difference, `row ${index} control ${control} sits under its sub-label ${position}`)
+                  .toBeLessThanOrEqual(1);
+            }
+         }
+      }
+   });
+
+   // Nested so these tests share `measureHeader`.
+   test.describe('the width of a skill entry', () => {
+   /** @type {number} The narrowest the skill name column is allowed to be (`--skill-name-min`). */
+      const NAME_MIN = 220;
+
+      /** @type {number} The widest the skill name column is allowed to be (`--skill-name-max`). */
+      const NAME_MAX = 260;
+
+      /**
+       * @type {number} The narrowest a skill entry is allowed to be: name minimum, 121 + 166 + 166 for the Attribute,
+       * Training and Expertise tracks, and 15 of row padding.
+       */
+      const ENTRY_MIN_WIDTH = NAME_MIN + 121 + 166 + 166 + 15;
+
+      /**
+       * Measures the columns of the open sheet's skill entries.
+       * @returns {Promise<object>} The skill name column width, the entries' minimum widths, the widest roll button,
+       * the left edge of each column inside the first row, and the free space between the last column and the row's
+       * end.
+       */
+      function measureEntries() {
+         return page.evaluate(() => {
+            /** @type {Element} The open character sheet. */
+            const sheet = document.querySelector('.application.titan-document-sheet');
+
+            /** @type {Element[]} The skill rows. */
+            const rows = [...sheet.querySelectorAll('.skill')];
+
+            /** @type {DOMRect} The first row's box. */
+            const rowBox = rows[0].getBoundingClientRect();
+
+            /** @type {DOMRect[]} The boxes of the first row's Attribute select and stat groups. */
+            const columns = [
+               rows[0].querySelector('.attribute'),
+               ...rows[0].querySelectorAll('.stats .stat'),
+            ].map((element) => element.getBoundingClientRect());
+            return {
+               nameColumn: sheet.querySelector('.skill-tab .head-name').getBoundingClientRect().width,
+               rowMinWidth: globalThis.getComputedStyle(rows[0]).minWidth,
+               entryMinWidth: globalThis.getComputedStyle(rows[0].closest('li')).minWidth,
+               widestButton: Math.max(
+                  ...rows.map((row) => row.querySelector('.check button').getBoundingClientRect().width),
+               ),
+               columnLefts: columns.map((box) => Math.round(box.left - rowBox.left)),
+               trailingSpace: rowBox.right - columns.at(-1).right,
+            };
+         });
+      }
+
+      test('the entry has a minimum width and the skill name column stays within its bounds', async () => {
+         await openSheetByUuid(page, actorUuid);
+         await openSheetTab(page, 'Skills');
+         await expect(page.locator('.application.titan-document-sheet .skill').first()).toBeVisible();
+
+         /** @type {Awaited<ReturnType<typeof measureEntries>>} The measured entries. */
+         const measured = await measureEntries();
+         expect(measured.rowMinWidth, 'a skill row has the one-line minimum width').toBe(`${ENTRY_MIN_WIDTH}px`);
+         expect(measured.entryMinWidth, 'a skill list entry has the one-line minimum width')
+            .toBe(`${ENTRY_MIN_WIDTH}px`);
+         expect(measured.nameColumn, 'the skill name column is at least its minimum').toBeGreaterThanOrEqual(NAME_MIN);
+         expect(measured.nameColumn, 'the skill name column is at most its maximum').toBeLessThanOrEqual(NAME_MAX);
+         expect(measured.widestButton, 'the longest default skill name fits its column on one line')
+            .toBeLessThanOrEqual(NAME_MIN);
+      });
+
+      test('a wider sheet leaves its extra room after the columns, which keep their place and the header alignment',
+         async () => {
+            await openSheetByUuid(page, actorUuid);
+            await openSheetTab(page, 'Skills');
+            await expect(page.locator('.application.titan-document-sheet .skill').first()).toBeVisible();
+
+            /** @type {Awaited<ReturnType<typeof measureEntries>>[]} The entries at each wider sheet width. */
+            const measuredWidths = [];
+            try {
+               // Both widths leave more room than the columns need, so the name column is at its maximum in both.
+               for (const width of [
+                  1300,
+                  1500,
+               ]) {
+                  await page.evaluate(async ({ uuid, sheetWidth }) => {
+                     (await fromUuid(uuid)).sheet.setPosition({ width: sheetWidth });
+                  }, {
+                     uuid: actorUuid,
+                     sheetWidth: width,
+                  });
+                  await expect.poll(() => page.evaluate(() => Math.round(
+                     document.querySelector('.application.titan-document-sheet').getBoundingClientRect().width,
+                  )), { message: `the sheet is ${width}px wide` }).toBe(width);
+                  measuredWidths.push(await measureEntries());
+
+                  /** @type {Awaited<ReturnType<typeof measureHeader>>} The header against the rows. */
+                  const header = await measureHeader();
+                  for (const [index, row] of header.rows.entries()) {
+                     for (const [column, difference] of row.leftDifferences.entries()) {
+                        expect(difference, `row ${index} column ${column} left edge at ${width}px`)
+                           .toBeLessThanOrEqual(1);
+                     }
+                  }
+               }
+               const [
+                  narrower,
+                  wider,
+               ] = measuredWidths;
+               expect(narrower.nameColumn, 'the skill name column is at its maximum').toBe(NAME_MAX);
+               expect(wider.nameColumn, 'the skill name column stays at its maximum').toBe(NAME_MAX);
+               expect(wider.columnLefts, 'the columns keep their place in the row').toEqual(narrower.columnLefts);
+               expect(wider.trailingSpace, 'the extra room trails the columns')
+                  .toBeGreaterThanOrEqual(narrower.trailingSpace + 190);
+            }
+            finally {
+               await page.evaluate(async (uuid) => {
+                  (await fromUuid(uuid)).sheet.setPosition({ width: 1000 });
+               }, actorUuid);
+            }
+         });
+   });
+});
+
+test.describe('the Resource rows of the sidebar', () => {
+   test('no Resource row overflows the sidebar horizontally', async () => {
+      await openSheetByUuid(page, actorUuid);
+
+      /** @type {object[]} The measurement of each Resource's two rows. */
+      const measured = await page.evaluate((resources) => resources.map((resource) => {
+         /** @type {Element} The Resource's container. */
+         const container = document.querySelector(`.application.titan-document-sheet .middle.${resource}`)
+            .closest('.container');
+
+         /** @type {Element} The nearest ancestor that clips or scrolls horizontally: the sidebar. */
+         let sidebar = container.parentElement;
+         while (globalThis.getComputedStyle(sidebar).overflowX === 'visible') {
+            sidebar = sidebar.parentElement;
+         }
+         /** @type {DOMRect} The sidebar's box. */
+         const sidebarBox = sidebar.getBoundingClientRect();
+         return {
+            resource,
+            rows: [...container.querySelectorAll('.row')].map((row) => ({
+               overflow: row.scrollWidth - row.clientWidth,
+               rightOfSidebar: Math.max(...[...row.children].map((child) => child.getBoundingClientRect().right))
+                  - sidebarBox.right,
+            })),
+            sidebarOverflow: sidebar.scrollWidth - sidebar.clientWidth,
+         };
+      }), RESOURCES);
+      expect(measured.length, 'every Resource is measured').toBe(RESOURCES.length);
+      for (const resource of measured) {
+         expect(resource.rows.length, `${resource.resource} has a label row and a meter row`).toBe(2);
+         for (const row of resource.rows) {
+            expect(row.overflow, `${resource.resource} row does not overflow its box`).toBeLessThanOrEqual(0);
+            expect(row.rightOfSidebar, `${resource.resource} row ends inside the sidebar`).toBeLessThanOrEqual(0);
+         }
+         expect(resource.sidebarOverflow, `${resource.resource} does not widen the sidebar`).toBeLessThanOrEqual(0);
       }
    });
 });

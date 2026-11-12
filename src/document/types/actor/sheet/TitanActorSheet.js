@@ -48,10 +48,12 @@ export default class TitanActorSheet extends TitanDocumentSheet {
    /**
     * Default Application options. AppV2 merges `DEFAULT_OPTIONS` down the class chain onto the base
     * defined in TitanDocumentSheet, so only the actor-specific width override is needed here.
+    * The sheet is not resizable (`resizable: false` in TitanDocumentSheet), so this width is also its minimum: the
+    * Skills tab columns (name, Attribute, Training, Expertise) need it to hold every skill on one line.
     * @override
     */
    static DEFAULT_OPTIONS = {
-      position: { width: 850 },
+      position: { width: 1000 },
    };
 
    /**
