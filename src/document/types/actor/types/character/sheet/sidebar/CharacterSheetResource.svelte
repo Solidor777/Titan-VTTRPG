@@ -6,6 +6,7 @@
    import Meter from '~/helpers/svelte-components/Meter.svelte';
    import ModifiableStatValueLabel from '~/helpers/svelte-components/label/ModifiableStatValueLabel.svelte';
    import { getIcon } from '~/system/Icons.js';
+   import { areStaticModsShown } from '~/system/StaticMods.js';
 
    /**
     * @typedef {object} CharacterSheetResourceProps
@@ -18,6 +19,9 @@
 
    /** @type {object} Reference to the reactive Document store. */
    const document = getContext('document');
+
+   /** @type {boolean} True when the static modifier inputs are shown. */
+   const showStaticMods = $derived(areStaticModsShown(document.data));
 </script>
 
 <div class="container">
@@ -35,16 +39,21 @@
             {localize(resource)}
          </div>
 
-         <!--Plus Sign-->
-         <div class="plus">+</div>
+         {#if showStaticMods}
+            <!--Plus Sign-->
+            <div class="plus">+</div>
+         {/if}
       </div>
 
-      <!--Static Mod-->
-      <div class="side">
-         <DocumentIntegerInput
-            bind:value={document.data.system.resource[resource].mod.static}
-         />
-      </div>
+      {#if showStaticMods}
+         <!--Static Mod-->
+         <div class="side">
+            <DocumentIntegerInput
+               bind:value={document.data.system.resource[resource].mod.static}
+               testId={`sheet-resource-${resource}-mod`}
+            />
+         </div>
+      {/if}
    </div>
 
    <!--Meter bar row-->
@@ -104,6 +113,9 @@
             calc(var(--titan-input-digit-width) * 3 + 12px);
          width: 100%;
          height: 100%;
+
+         // The label row keeps the height of the static mod input when that input is hidden.
+         min-height: var(--titan-input-height);
 
          &:not(:first-child) {
             @include margin-top-standard;

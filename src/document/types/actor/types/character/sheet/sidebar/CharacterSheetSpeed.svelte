@@ -4,6 +4,7 @@
    import tooltipAction from '~/helpers/svelte-actions/TooltipAction.js';
    import DocumentIntegerInput from '~/document/svelte-components/input/DocumentIntegerInput.svelte';
    import { getIcon } from '~/system/Icons.js';
+   import { areStaticModsShown } from '~/system/StaticMods.js';
    import ModifiableStatValueLabel from '~/helpers/svelte-components/label/ModifiableStatValueLabel.svelte';
 
    /**
@@ -21,6 +22,9 @@
 
    /** @type {object} Reference to the reactive Document store. */
    const document = getContext('document');
+
+   /** @type {boolean} True when the static modifier inputs are shown. */
+   const showStaticMods = $derived(areStaticModsShown(document.data));
 </script>
 
 <div class="container">
@@ -40,15 +44,18 @@
          />
       </div>
 
-      <!--Plus Sign-->
-      <div class="symbol">+</div>
+      {#if showStaticMods}
+         <!--Plus Sign-->
+         <div class="symbol">+</div>
 
-      <!--Static Mod-->
-      <div class="input">
-         <DocumentIntegerInput
-            bind:value={document.data.system.speed[speed].mod.static}
-         />
-      </div>
+         <!--Static Mod-->
+         <div class="input">
+            <DocumentIntegerInput
+               bind:value={document.data.system.speed[speed].mod.static}
+               testId={`sheet-speed-${speed}-mod`}
+            />
+         </div>
+      {/if}
 
       <!--Equal Sign-->
       <div class="symbol">=</div>

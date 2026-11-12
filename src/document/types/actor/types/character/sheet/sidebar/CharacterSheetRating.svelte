@@ -4,6 +4,7 @@
    import DocumentIntegerInput from '~/document/svelte-components/input/DocumentIntegerInput.svelte';
    import ModifiableStatValueLabel from '~/helpers/svelte-components/label/ModifiableStatValueLabel.svelte';
    import { getIcon } from '~/system/Icons.js';
+   import { areStaticModsShown } from '~/system/StaticMods.js';
    import DocumentOwnerButton from '~/document/svelte-components/DocumentOwnerButton.svelte';
    import tooltipAction from '~/helpers/svelte-actions/TooltipAction.js';
 
@@ -23,6 +24,9 @@
 
    /** @type {object} Reference to the reactive Document store. */
    const document = getContext('document');
+
+   /** @type {boolean} True when the static modifier inputs are shown. */
+   const showStaticMods = $derived(areStaticModsShown(document.data));
 </script>
 
 <div class="container">
@@ -54,18 +58,21 @@
    <!--Stats-->
    <div class="stats">
 
-      <!--Plus Sign-->
-      <div class="label symbol">+</div>
+      {#if showStaticMods}
+         <!--Plus Sign-->
+         <div class="label symbol">+</div>
 
-      <!--Static Mod-->
-      <div class="input">
-         <DocumentIntegerInput
-            bind:value={document.data.system.rating[rating].mod.static}
-         />
-      </div>
+         <!--Static Mod-->
+         <div class="input">
+            <DocumentIntegerInput
+               bind:value={document.data.system.rating[rating].mod.static}
+               testId={`sheet-rating-${rating}-mod`}
+            />
+         </div>
 
-      <!--Equal Sign-->
-      <div class="label">=</div>
+         <!--Equal Sign-->
+         <div class="label">=</div>
+      {/if}
 
       <!--Total Value-->
       <div class="value">

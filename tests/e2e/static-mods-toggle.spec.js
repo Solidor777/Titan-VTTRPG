@@ -1,7 +1,12 @@
 import { expect, test } from './harness.js';
+import { commitText } from './actions.js';
 import { login, openSheetByUuid } from './fixtures.js';
-import { createActor, setStaticModsShown } from './flows.js';
+import { createActor, readServerSystem, setStaticModsShown } from './flows.js';
 import { attachPageErrors, closeAllApps } from './world.js';
+import { MODS } from '~/system/Mods.js';
+import { RATINGS } from '~/system/Ratings.js';
+import { RESOURCES } from '~/system/Resources.js';
+import { SPEEDS } from '~/system/Speeds.js';
 
 /**
  * The Static Mods header button: its pressed state, its icon, its size against the Edit Token button, the flag it
@@ -157,5 +162,124 @@ test.describe('the Static Mods header button', () => {
       await setStaticModsShown(sheet, true);
       await expect.poll(() => readFlag(page, uuid), { message: 'the flag is stored' }).toBe(true);
       await expect(sheet.locator('.window-header .static-mods-button')).toHaveAttribute('aria-pressed', 'true');
+   });
+});
+
+test.describe('the sidebar', () => {
+   /** @type {string[]} The test ids of every sidebar static mod input: 3 Resources, 5 Ratings, 1 Mod and 5 Speeds. */
+   const sidebarModIds = [
+      ...RESOURCES.map((resource) => `sheet-resource-${resource}-mod`),
+      ...RATINGS.map((rating) => `sheet-rating-${rating}-mod`),
+      ...MODS.filter((mod) => mod === 'armor').map((mod) => `sheet-mod-${mod}-mod`),
+      ...SPEEDS.map((speed) => `sheet-speed-${speed}-mod`),
+   ];
+
+   /** @type {string[]} The test ids of every sidebar total, which shows in both states. */
+   const sidebarTotalIds = [
+      ...RESOURCES.map((resource) => `sheet-resource-${resource}-max`),
+      ...RATINGS.map((rating) => `sheet-rating-${rating}`),
+      'sheet-mod-armor',
+      ...SPEEDS.map((speed) => `sheet-speed-${speed}`),
+   ];
+
+   /** @type {string} The uuid of the actor measured by the sidebar tests. */
+   let uuid;
+   /** @type {import('@playwright/test').Locator} The actor's open sheet. */
+   let sheet;
+
+   test.beforeAll(async () => {
+      uuid = `Actor.${await createActor(page, {
+         name: 'E2E Static Mods Sidebar',
+         type: 'player',
+      })}`;
+   });
+
+   test.beforeEach(async () => {
+      sheet = await openSheetByUuid(page, uuid);
+   });
+
+   /**
+    * Measures the sidebar: the width of its inner column, and the heights of its sections and of each Resource, Rating,
+    * Mod and Speed container.
+    * @returns {Promise<{width: number, sections: number[], containers: number[]}>} The rounded width and the heights.
+    */
+   function measureSidebar() {
+      return sheet.evaluate((element) => {
+         /** @type {Element} The sidebar column that sizes itself from the sidebar width. */
+         const column = element.querySelector('.titan-sheet > .sidebar > .sidebar');
+         return {
+            width: Math.round(column.getBoundingClientRect().width),
+            sections: [...element.querySelectorAll('.titan-sheet > .sidebar .section')]
+               .map((section) => section.getBoundingClientRect().height),
+            containers: [...element.querySelectorAll('.titan-sheet > .sidebar .section .container')]
+               .map((container) => container.getBoundingClientRect().height),
+         };
+      });
+   }
+
+   test('hidden: no sidebar static mod input exists and every total is still shown', async () => {
+      await setStaticModsShown(sheet, false);
+      for (const id of sidebarModIds) {
+         await expect(sheet.getByTestId(id), id).toHaveCount(0);
+      }
+      for (const id of sidebarTotalIds) {
+         await expect(sheet.getByTestId(id), id).toBeVisible();
+      }
+   });
+
+   test('shown: every sidebar static mod input exists (3 resources, 5 ratings, 1 mod, 5 speeds)', async () => {
+      await setStaticModsShown(sheet, true);
+      for (const id of sidebarModIds) {
+         await expect(sheet.getByTestId(id), id).toHaveCount(1);
+      }
+      expect(sidebarModIds).toHaveLength(14);
+   });
+
+   test('the sidebar is 184px wide hidden and 208px shown', async () => {
+      await setStaticModsShown(sheet, false);
+      await expect.poll(async () => (await measureSidebar()).width, { message: 'hidden width' }).toBe(184);
+      await setStaticModsShown(sheet, true);
+      await expect.poll(async () => (await measureSidebar()).width, { message: 'shown width' }).toBe(208);
+   });
+
+   test('toggling does not change any sidebar row height', async () => {
+      await setStaticModsShown(sheet, false);
+      await expect(sheet.getByTestId('sheet-rating-defense-mod')).toHaveCount(0);
+
+      /** @type {Awaited<ReturnType<typeof measureSidebar>>} The sidebar measured hidden. */
+      const hidden = await measureSidebar();
+      await setStaticModsShown(sheet, true);
+      await expect(sheet.getByTestId('sheet-rating-defense-mod')).toHaveCount(1);
+
+      /** @type {Awaited<ReturnType<typeof measureSidebar>>} The sidebar measured shown. */
+      const shown = await measureSidebar();
+      expect(shown.sections).toHaveLength(hidden.sections.length);
+      expect(shown.containers).toHaveLength(hidden.containers.length);
+      for (const [index, height] of hidden.sections.entries()) {
+         expect(Math.abs(shown.sections[index] - height), `section ${index} height`).toBeLessThanOrEqual(1);
+      }
+      for (const [index, height] of hidden.containers.entries()) {
+         expect(Math.abs(shown.containers[index] - height), `container ${index} height`).toBeLessThanOrEqual(1);
+      }
+   });
+
+   test('a typed static mod still counts while hidden', async () => {
+      await setStaticModsShown(sheet, true);
+
+      /** @type {import('@playwright/test').Locator} The Defense total. */
+      const total = sheet.getByTestId('sheet-rating-defense');
+
+      /** @type {number} The Defense total before the static mod is typed. */
+      const before = Number(await total.textContent());
+      await commitText(sheet.getByTestId('sheet-rating-defense-mod'), '2');
+      await expect(total).toHaveText(String(before + 2));
+      await expect.poll(
+         async () => (await readServerSystem(page, uuid)).rating.defense.mod.static,
+         { message: 'the static mod is stored' },
+      ).toBe(2);
+      await setStaticModsShown(sheet, false);
+      await expect(sheet.getByTestId('sheet-rating-defense-mod')).toHaveCount(0);
+      await expect(total).toHaveText(String(before + 2));
+      expect((await readServerSystem(page, uuid)).rating.defense.mod.static).toBe(2);
    });
 });

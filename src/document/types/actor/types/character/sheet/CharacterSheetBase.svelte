@@ -3,6 +3,7 @@
    import CharacterSheetSidebar
    from '~/document/types/actor/types/character/sheet/sidebar/CharacterSheetSidebar.svelte';
    import { getContext } from 'svelte';
+   import { areStaticModsShown } from '~/system/StaticMods.js';
 
    /**
     * @typedef {object} CharacterSheetBaseProps
@@ -14,10 +15,16 @@
 
    /** @type {object} Reference to the reactive Document store. */
    const document = getContext('document');
+
+   /** @type {boolean} True when the static modifier inputs are shown. */
+   const showStaticMods = $derived(areStaticModsShown(document.data));
 </script>
 {#if document.data}
    <!--Sheet-->
-   <div class="titan-sheet">
+   <div
+      class="titan-sheet"
+      class:static-mods-hidden={!showStaticMods}
+   >
       <!--Sidebar-->
       <div class="sidebar">
          <CharacterSheetSidebar/>
@@ -51,6 +58,11 @@
 
       flex: 1 1 auto;
       min-height: 0;
+
+      // Without the static mod inputs the sidebar columns are narrower; the sidebar sizes itself from this variable.
+      &.static-mods-hidden {
+         --titan-sidebar-width: 184px;
+      }
 
       // Rounded and clipped so square children cannot poke past the panel corners.
       .header {

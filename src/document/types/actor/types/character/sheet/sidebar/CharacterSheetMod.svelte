@@ -4,6 +4,7 @@
    import tooltipAction from '~/helpers/svelte-actions/TooltipAction.js';
    import DocumentIntegerInput from '~/document/svelte-components/input/DocumentIntegerInput.svelte';
    import { getIcon } from '~/system/Icons.js';
+   import { areStaticModsShown } from '~/system/StaticMods.js';
    import ModifiableStatValueLabel from '~/helpers/svelte-components/label/ModifiableStatValueLabel.svelte';
 
    /**
@@ -21,6 +22,9 @@
 
    /** @type {object} Reference to the reactive Document store. */
    const document = getContext('document');
+
+   /** @type {boolean} True when the static modifier inputs are shown. */
+   const showStaticMods = $derived(areStaticModsShown(document.data));
 </script>
 
 <div class="container">
@@ -39,18 +43,21 @@
    <!--Stats-->
    <div class="stats">
 
-      <!--Plus Sign-->
-      <div class="label">+</div>
+      {#if showStaticMods}
+         <!--Plus Sign-->
+         <div class="label">+</div>
 
-      <!--Static Mod-->
-      <div class="input">
-         <DocumentIntegerInput
-            bind:value={document.data.system.mod[mod].mod.static}
-         />
-      </div>
+         <!--Static Mod-->
+         <div class="input">
+            <DocumentIntegerInput
+               bind:value={document.data.system.mod[mod].mod.static}
+               testId={`sheet-mod-${mod}-mod`}
+            />
+         </div>
 
-      <!--Equal Sign-->
-      <div class="label">=</div>
+         <!--Equal Sign-->
+         <div class="label">=</div>
+      {/if}
 
       <!--Total Value-->
       <div class="value">

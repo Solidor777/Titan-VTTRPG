@@ -9,6 +9,7 @@ import {
    readServerSystem,
    setAttributeBase,
    setResource,
+   setStaticModsShown,
    viewScene,
 } from './flows.js';
 import { attachPageErrors, closeAllApps } from './world.js';
@@ -114,6 +115,7 @@ test.describe('the Resource values in the sidebar', () => {
    test('a two-digit value, maximum and static mod are not cut off', async () => {
       /** @type {import('@playwright/test').Locator} The actor's sheet. */
       const sheet = await openSheetByUuid(page, actorUuid);
+      await setStaticModsShown(sheet, true);
       for (const resource of RESOURCES) {
          /** @type {number} The Resource's maximum, read from the sheet. */
          const max = Number(await sheet.getByTestId(`sheet-resource-${resource}-max`).textContent());
@@ -123,7 +125,7 @@ test.describe('the Resource values in the sidebar', () => {
          /** @type {import('@playwright/test').Locator} The Resource's meter row and label row inputs. */
          const container = sheet.locator(`.middle.${resource}`)
             .locator('xpath=ancestor::div[contains(@class, "container")][1]');
-         await commitText(container.locator('.row').first().locator('.side input'), '10');
+         await commitText(sheet.getByTestId(`sheet-resource-${resource}-mod`), '10');
 
          for (const [label, locator] of [
             [
@@ -136,7 +138,41 @@ test.describe('the Resource values in the sidebar', () => {
             ],
             [
                'static mod input',
-               container.locator('.row').first().locator('.side input'),
+               sheet.getByTestId(`sheet-resource-${resource}-mod`),
+            ],
+         ]) {
+            /** @type {Awaited<ReturnType<typeof measureText>>} The element's text and widths. */
+            const measured = await measureText(locator);
+            expect(measured.text.length, `${resource} ${label} holds two digits`).toBe(2);
+            expect(measured.scrollWidth, `${resource} ${label} text is not scrolled out of its box`)
+               .toBeLessThanOrEqual(measured.clientWidth);
+            expect(measured.textWidth, `${resource} ${label} glyphs fit ${JSON.stringify(measured)}`)
+               .toBeLessThanOrEqual(measured.available + 0.5);
+         }
+      }
+   });
+
+   test('with the static mods hidden, a two-digit value and maximum are not cut off', async () => {
+      /** @type {import('@playwright/test').Locator} The actor's sheet. */
+      const sheet = await openSheetByUuid(page, actorUuid);
+      await setStaticModsShown(sheet, false);
+      for (const resource of RESOURCES) {
+         /** @type {number} The Resource's maximum, read from the sheet. */
+         const max = Number(await sheet.getByTestId(`sheet-resource-${resource}-max`).textContent());
+         expect(String(max).length, `${resource} maximum ${max} has two digits`).toBe(2);
+         await setResource(page, actorUuid, resource, max);
+
+         /** @type {import('@playwright/test').Locator} The Resource's container. */
+         const container = sheet.locator(`.middle.${resource}`)
+            .locator('xpath=ancestor::div[contains(@class, "container")][1]');
+         for (const [label, locator] of [
+            [
+               'current value input',
+               container.locator('.row').nth(1).locator('.side input').first(),
+            ],
+            [
+               'maximum label',
+               sheet.getByTestId(`sheet-resource-${resource}-max`),
             ],
          ]) {
             /** @type {Awaited<ReturnType<typeof measureText>>} The element's text and widths. */
@@ -202,8 +238,8 @@ test.describe('a three-digit Resource', () => {
       const sheet = await openSheetByUuid(page, bigUuid);
       expect(await sheet.getByTestId('sheet-resource-stamina-max').textContent(), 'Stamina maximum').toBe('120');
       await setResource(page, bigUuid, 'stamina', 120);
-      await commitText(sheet.locator('.middle.stamina').locator('xpath=ancestor::div[contains(@class, "container")][1]')
-         .locator('.row').first().locator('.side input'), '100');
+      await setStaticModsShown(sheet, true);
+      await commitText(sheet.getByTestId('sheet-resource-stamina-mod'), '100');
 
       /** @type {import('@playwright/test').Locator} The Stamina container. */
       const container = sheet.locator('.middle.stamina')
@@ -219,7 +255,7 @@ test.describe('a three-digit Resource', () => {
          ],
          [
             'static mod input',
-            container.locator('.row').first().locator('.side input'),
+            sheet.getByTestId('sheet-resource-stamina-mod'),
          ],
       ]) {
          /** @type {Awaited<ReturnType<typeof measureText>>} The element's text and widths. */
@@ -667,9 +703,24 @@ test.describe('the Skills column header', () => {
 });
 
 test.describe('the Resource rows of the sidebar', () => {
-   test('no Resource row overflows the sidebar horizontally', async () => {
-      await openSheetByUuid(page, actorUuid);
+   test('no Resource row overflows the sidebar horizontally, with the static mods shown or hidden', async () => {
+      /** @type {import('@playwright/test').Locator} The actor's sheet. */
+      const sheet = await openSheetByUuid(page, actorUuid);
+      for (const shown of [
+         true,
+         false,
+      ]) {
+         await setStaticModsShown(sheet, shown);
+         await expectNoResourceOverflow(shown);
+      }
+   });
 
+   /**
+    * Asserts that no Resource row of the open sheet overflows its box or the sidebar.
+    * @param {boolean} shown - True when the sheet currently shows its static mod inputs; named in failure messages.
+    * @returns {Promise<void>} Resolves once every Resource is measured and checked.
+    */
+   async function expectNoResourceOverflow(shown) {
       /** @type {object[]} The measurement of each Resource's two rows. */
       const measured = await page.evaluate((resources) => resources.map((resource) => {
          /** @type {Element} The Resource's container. */
@@ -695,12 +746,14 @@ test.describe('the Resource rows of the sidebar', () => {
       }), RESOURCES);
       expect(measured.length, 'every Resource is measured').toBe(RESOURCES.length);
       for (const resource of measured) {
-         expect(resource.rows.length, `${resource.resource} has a label row and a meter row`).toBe(2);
+         /** @type {string} The Resource and state named in the assertion messages. */
+         const name = `${resource.resource} (static mods ${shown ? 'shown' : 'hidden'})`;
+         expect(resource.rows.length, `${name} has a label row and a meter row`).toBe(2);
          for (const row of resource.rows) {
-            expect(row.overflow, `${resource.resource} row does not overflow its box`).toBeLessThanOrEqual(0);
-            expect(row.rightOfSidebar, `${resource.resource} row ends inside the sidebar`).toBeLessThanOrEqual(0);
+            expect(row.overflow, `${name} row does not overflow its box`).toBeLessThanOrEqual(0);
+            expect(row.rightOfSidebar, `${name} row ends inside the sidebar`).toBeLessThanOrEqual(0);
          }
-         expect(resource.sidebarOverflow, `${resource.resource} does not widen the sidebar`).toBeLessThanOrEqual(0);
+         expect(resource.sidebarOverflow, `${name} does not widen the sidebar`).toBeLessThanOrEqual(0);
       }
-   });
+   }
 });
