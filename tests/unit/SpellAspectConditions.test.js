@@ -9,6 +9,7 @@ import { buildConditionDefinitions } from '~/system/Conditions.js';
  * @type {string[]}
  */
 const OMITTED_CONDITIONS = [
+   'charmed',
    'dead',
    'sleeping',
 ];

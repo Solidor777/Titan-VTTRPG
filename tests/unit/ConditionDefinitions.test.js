@@ -171,14 +171,14 @@ describe('buildConditionDefinitions', () => {
       ]);
    });
 
-   it('seeds prone with halved speed (round up) and -¼ of base melee and accuracy', () => {
+   it('seeds prone with halved speed (round down) and -¼ of base melee and accuracy', () => {
       expect(def('prone').system.rulesElement).toEqual([
          {
             operation: 'mulSum',
             selector: 'speed',
             key: 'all',
             value: 0.5,
-            rounding: 'up',
+            rounding: 'down',
             uuid: 'condition-prone-speed',
          },
          quarterPenalty('prone', 'rating', 'melee'),
@@ -222,8 +222,9 @@ describe('buildConditionDefinitions', () => {
       ]);
    });
 
-   it('leaves dead and unconscious without rules elements', () => {
+   it('leaves charmed, dead and unconscious without rules elements', () => {
       for (const id of [
+         'charmed',
          'dead',
          'unconscious',
       ]) {

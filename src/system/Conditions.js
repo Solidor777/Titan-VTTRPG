@@ -76,7 +76,7 @@ function createReflexesAutomaticFailure(conditionId) {
 /**
  * Builds the static list of TITAN condition definitions for CONFIG.statusEffects. Every condition is the
  * 'condition' Active Effect subtype; every condition with mechanics carries a `system.rulesElement` array
- * expressing its stat and check rules (applied through the shared rules-element pipeline). Dead and Unconscious
+ * expressing its stat and check rules (applied through the shared rules-element pipeline). Charmed, Dead and Unconscious
  * carry none; Unconscious's companion conditions (UNCONSCIOUS_COMPANION_CONDITIONS) are applied when it is created
  * (CharacterDataModel#fallUnconscious). This function is pure (no game/localization access) so it can be unit-tested.
  * @returns {object[]} The condition definitions, each with id, name (localization key), img, type, and —
@@ -97,6 +97,12 @@ export function buildConditionDefinitions() {
                createSenseAutomaticFailure('blinded', 'situationReliesOnSight', 'sight'),
             ],
          },
+      },
+      {
+         id: 'charmed',
+         name: 'LOCAL.charmed.text',
+         img: 'icons/svg/aura.svg',
+         type: CONDITION_TYPE,
       },
       {
          id: 'contaminated',
@@ -186,7 +192,7 @@ export function buildConditionDefinitions() {
                   selector: 'speed',
                   key: ALL_KEY,
                   value: 0.5,
-                  rounding: 'up',
+                  rounding: 'down',
                   uuid: 'condition-prone-speed',
                },
                createQuarterBasePenalty('prone', 'rating', 'melee'),

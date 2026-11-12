@@ -298,10 +298,10 @@ test.describe('conditions — derived-stat mechanics', () => {
       expectRatingPenalty(await applyConditions(['stunned']), ['defense']);
    });
 
-   test('prone halves speed (round up) and lowers melee and accuracy by a quarter of their base', async () => {
+   test('prone halves speed (round down) and lowers melee and accuracy by a quarter of their base', async () => {
       /** @type {{baseline: object, after: object}} The stats before and after Prone. */
       const snapshots = await applyConditions(['prone']);
-      expect(snapshots.after.stride).toBe(Math.ceil(snapshots.baseline.stride / 2));
+      expect(snapshots.after.stride).toBe(Math.floor(snapshots.baseline.stride / 2));
       expectRatingPenalty(snapshots, [
          'melee',
          'accuracy',

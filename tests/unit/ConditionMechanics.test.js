@@ -230,6 +230,12 @@ describe('quarter-of-base condition penalties', () => {
       expect(model.rating.defense.value).toBe(8);
    });
 
+   it('Prone rounds an odd base speed down', () => {
+      /** @type {object} The Prone character with base-7 stats. */
+      const model = createConditionedCharacter(['prone'], 7);
+      expect(model.speed.stride.value).toBe(3);
+   });
+
    it('Restrained zeroes speed and lowers Melee, Accuracy, and Defense to 6', () => {
       /** @type {object} The Restrained character. */
       const model = createConditionedCharacter(['restrained']);
