@@ -278,3 +278,15 @@ Files cited as `bugbatch1-logs/...` are in `.superpowers/sdd/2026-09-29-conditio
   removed, because core never sends that render.
 - **Found:** 2026-10-10 while closing bug 180.
 - **Status:** Open; waiting for the user's decision. The test pins the current behaviour.
+
+### 184. The spreadsheet-to-Markdown CLI unit test fails when Node prints a deprecation warning on stderr
+
+- **What (measured, 2026-11-11, `npx vitest run`, 2 of 2 runs):** `tests/unit/spreadsheet/markdown/SpreadsheetToMarkdownCli.test.js`
+  "exits 1 with a stderr message for an Actor-pack workbook and does not write the output file" fails: the received
+  stderr is the expected message followed by `(node:NNNN) [DEP0205] DeprecationWarning: module.register() is
+  deprecated. Use module.registerHooks() instead.` The other 1722 tests pass. The test compares stderr for exact
+  equality, so a warning Node writes on its own (not from TITAN code) breaks it.
+- **Not measured:** which loader hook registers `module.register()` in the CLI child process, and whether the test passes
+  with the warning suppressed.
+- **Found:** 2026-11-11 while verifying the character sheet spacing work (no relation to it).
+- **Status:** Open.
