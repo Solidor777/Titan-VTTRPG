@@ -1,7 +1,17 @@
 import { expect, test } from './harness.js';
 import { commitText } from './actions.js';
 import { login, openSheetByUuid, openSheetTab } from './fixtures.js';
-import { createActor, readServerSystem, setStaticModsShown } from './flows.js';
+import {
+   createActor,
+   placeToken,
+   readServerSystem,
+   setOwnership,
+   setStaticModsShown,
+   shared,
+   unlinkPlacedToken,
+   viewScene,
+} from './flows.js';
+import { withClients } from './multiClient.js';
 import { attachPageErrors, closeAllApps } from './world.js';
 import { MODS } from '~/system/Mods.js';
 import { RATINGS } from '~/system/Ratings.js';
@@ -486,6 +496,8 @@ test.describe('the Skills tab', () => {
          return {
             nameColumn: element.querySelector('.skill-tab .head-name').getBoundingClientRect().width,
             statWidths: stats.map((stat) => {
+               // Content width: the border box minus the divider's left border and the padding, which is what the 76
+               // and 124 px group widths measure (the border box is 87 hidden and 135 shown).
                /** @type {CSSStyleDeclaration} The stat group's computed style. */
                const style = globalThis.getComputedStyle(stat);
                return stat.getBoundingClientRect().width - parseFloat(style.borderLeftWidth)
@@ -555,5 +567,105 @@ test.describe('the Skills tab', () => {
       ]);
       expect(shown.statTrack, 'shown stat track').toBe(145);
       expect(shown.rowMinWidth, 'shown entry minimum').toBe('591px');
+   });
+});
+
+test.describe('who sees and uses the button', () => {
+   test('an Observer sees the effect but no button; an Owner sees the button; a toggle reaches the other client',
+      async ({ browser }) => {
+         /** @type {string} The new actor's id. */
+         const actorId = await createActor(page, {
+            name: 'E2E Static Mods Observer',
+            type: 'player',
+         });
+
+         /** @type {string} The new actor's uuid. */
+         const uuid = `Actor.${actorId}`;
+
+         /**
+          * Gives E2E Player 1 an ownership level of the actor and waits until the player's client holds it.
+          * @param {import('@playwright/test').Page} playerPage - The logged-in client of E2E Player 1.
+          * @param {'OBSERVER'|'OWNER'} level - The level to give.
+          * @returns {Promise<void>} Resolves once the player's client resolves that level.
+          */
+         async function giveLevel(playerPage, level) {
+            await setOwnership(page, actorId, 'E2E Player 1', level);
+            await playerPage.waitForFunction(
+               ({ actorId, level }) => game.actors.get(actorId)?.getUserLevel(game.user)
+                  === CONST.DOCUMENT_OWNERSHIP_LEVELS[level],
+               {
+                  actorId,
+                  level,
+               },
+               { timeout: 1000 },
+            );
+         }
+
+         await withClients(browser, { player: 'E2E Player 1' }, async ({ player }) => {
+            await giveLevel(player, 'OBSERVER');
+
+            /** @type {import('@playwright/test').Locator} The player's view of the sheet. */
+            const playerSheet = await openSheetByUuid(player, uuid);
+
+            /** @type {import('@playwright/test').Locator} The GM's view of the sheet. */
+            const gmSheet = await openSheetByUuid(page, uuid);
+            await expect(playerSheet.locator('.window-header .static-mods-button'), 'an Observer has no button')
+               .toHaveCount(0);
+            await setStaticModsShown(gmSheet, true);
+
+            /** @type {import('@playwright/test').Locator} The Defense static mod input on the player's sheet. */
+            const playerInput = playerSheet.getByTestId('sheet-rating-defense-mod');
+            await expect(playerInput, 'the effect reaches the Observer without a reload').toBeVisible();
+            await expect(playerInput, 'the Observer cannot edit it').toBeDisabled();
+            await giveLevel(player, 'OWNER');
+
+            /** @type {import('@playwright/test').Locator} The player's Static Mods button. */
+            const playerButton = playerSheet.locator('.window-header .static-mods-button');
+            await expect(playerButton, 'an Owner has the button').toHaveCount(1);
+            await setStaticModsShown(playerSheet, false);
+            await expect(gmSheet.locator('.window-header .static-mods-button'), 'the GM button follows')
+               .toHaveAttribute('aria-pressed', 'false');
+            await expect(gmSheet.getByTestId('sheet-rating-defense-mod'), 'the GM inputs follow').toHaveCount(0);
+         });
+      });
+});
+
+test.describe('an unlinked token', () => {
+   test('its sheet keeps its own setting and leaves the base actor alone', async () => {
+      /** @type {string} The shared scene's id. */
+      const sceneId = await shared(page, 'scene');
+      await viewScene(page, sceneId);
+
+      /** @type {string} The new base actor's id. */
+      const actorId = await createActor(page, {
+         name: 'E2E Static Mods Token Actor',
+         type: 'player',
+      });
+
+      /** @type {string} The placed token's id. */
+      const tokenId = await placeToken(page, actorId);
+      await unlinkPlacedToken(page, tokenId);
+
+      /** @type {string} The uuid of the token's synthetic actor. */
+      const tokenActorUuid = await page.evaluate(
+         async (uuid) => (await fromUuid(uuid)).actor.uuid,
+         `Scene.${sceneId}.Token.${tokenId}`,
+      );
+
+      /** @type {string} The uuid of the base actor. */
+      const baseUuid = `Actor.${actorId}`;
+
+      /** @type {import('@playwright/test').Locator} The token actor's sheet. */
+      const tokenSheet = await openSheetByUuid(page, tokenActorUuid);
+
+      await setStaticModsShown(tokenSheet, true);
+      await expect.poll(() => readFlag(page, tokenActorUuid), { message: 'the token actor stores the flag' })
+         .toBe(true);
+      expect(await readFlag(page, baseUuid), 'the base actor stores no flag').toBeUndefined();
+
+      /** @type {import('@playwright/test').Locator} The base actor's sheet, opened over the token actor's. */
+      const baseSheet = await openSheetByUuid(page, baseUuid);
+      await expect(baseSheet.locator('.window-header .static-mods-button')).toHaveAttribute('aria-pressed', 'false');
+      await expect(tokenSheet.locator('.window-header .static-mods-button')).toHaveAttribute('aria-pressed', 'true');
    });
 });
