@@ -1,3 +1,12 @@
+## Version 2.3.0:
+The character sheet's Skills tab and sidebar have a new layout.
+- Each skill is one line: the roll button, the Attribute select, then Training and Expertise, with dividers between the
+  columns. A skill name wider than its column wraps inside its button, and the other columns stay centered on the row.
+- A column header under the Skills filter labels Skill, Attribute, Training and Expertise, with Base, Mod, and Total
+  over each group of inputs. Its columns line up with the rows, scrolled or not.
+- The character sheet is 900px wide, and about 11 skills show at once instead of 3.
+- The Stamina, Wounds, and Resolve modifier inputs in the sidebar are no longer cut off.
+
 ## Version 2.2.0:
 Conditions follow the 2026-09-26 rules.
 **Back up your world before updating. The active GM's first login rewrites every existing condition on world actors,
