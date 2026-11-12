@@ -8,6 +8,7 @@
    import ModifiedValueLabel from '~/helpers/svelte-components/label/ModifiedValueLabel.svelte';
    import createModifiableStatTooltip from '~/helpers/utility-functions/CreateModifiableStatTooltip.js';
    import { getInnateModTotal } from '~/system/ModBuckets.js';
+   import { areStaticModsShown } from '~/system/StaticMods.js';
 
    /**
     * @typedef {object} CharacterSheetSkillProps
@@ -19,6 +20,9 @@
 
    /** @type {object} Reference to the reactive Document store. */
    const document = getContext('document');
+
+   /** @type {boolean} True when the static modifier inputs are shown. */
+   const showStaticMods = $derived(areStaticModsShown(document.data));
 
    /** @type {AttributeCheckParameters} Resolved dice and modifiers for this skill's check. */
    let checkParameters = $derived(
@@ -77,11 +81,16 @@
             />
          </div>
 
-         <!--Static Mod-->
-         <div class="symbol">+</div>
-         <div class="input">
-            <DocumentIntegerInput bind:value={document.data.system.skill[key].training.mod.static}/>
-         </div>
+         {#if showStaticMods}
+            <!--Static Mod-->
+            <div class="symbol">+</div>
+            <div class="input">
+               <DocumentIntegerInput
+                  bind:value={document.data.system.skill[key].training.mod.static}
+                  testId={`sheet-skill-${key}-training-mod`}
+               />
+            </div>
+         {/if}
 
          <!--Total Value-->
          <div class="symbol">=</div>
@@ -112,11 +121,16 @@
             />
          </div>
 
-         <!--Static Mod-->
-         <div class="symbol">+</div>
-         <div class="input">
-            <DocumentIntegerInput bind:value={document.data.system.skill[key].expertise.mod.static}/>
-         </div>
+         {#if showStaticMods}
+            <!--Static Mod-->
+            <div class="symbol">+</div>
+            <div class="input">
+               <DocumentIntegerInput
+                  bind:value={document.data.system.skill[key].expertise.mod.static}
+                  testId={`sheet-skill-${key}-expertise-mod`}
+               />
+            </div>
+         {/if}
 
          <!--Total Value-->
          <div class="symbol">=</div>

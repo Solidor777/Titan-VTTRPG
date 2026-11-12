@@ -39,6 +39,43 @@ const LONG_NAME_SKILL = 'athletics';
 const LONG_NAME = 'An Extraordinarily Long Skill Name That Cannot Possibly Fit Beside The Attribute Select '
    + 'Training And Expertise Controls On A Single Line Of The Skills Tab';
 
+/**
+ * @type {object[]} The static mod states the Skills tab is measured in. Each has `shown` (boolean), `label` (string),
+ * `nameMax` (the widest the skill name column may be), `statTrack` (the width of one Training or Expertise track),
+ * `subLabels` (the column header's sub-labels) and `controls` (the number of controls in a row: the Attribute select
+ * plus the base inputs, static mod inputs and totals).
+ */
+const SKILL_STATES = [
+   {
+      shown: true,
+      label: 'shown',
+      nameMax: 195,
+      statTrack: 145,
+      subLabels: [
+         'Base',
+         'Mod',
+         'Total',
+         'Base',
+         'Mod',
+         'Total',
+      ],
+      controls: 7,
+   },
+   {
+      shown: false,
+      label: 'hidden',
+      nameMax: 300,
+      statTrack: 97,
+      subLabels: [
+         'Base',
+         'Total',
+         'Base',
+         'Total',
+      ],
+      controls: 5,
+   },
+];
+
 /** @type {import('@playwright/test').Page} The file-shared, logged-in page (one world boot per file). */
 let page;
 /** @type {string[]} Uncaught page errors collected during the current test (cleared each afterEach). */
@@ -354,10 +391,17 @@ test.describe('the Skills tab rows', () => {
    /** @type {number} The padding and border a button adds around its content, with a little slack. */
    const BUTTON_CHROME = 30;
 
-   test('every skill sits on one line of columns: the button, Attribute select, Training and Expertise', async () => {
-      await openSheetByUuid(page, actorUuid);
+   /**
+    * Asserts that every skill sits on one line of columns: the button, Attribute select, Training and Expertise.
+    * @param {typeof SKILL_STATES[number]} state - The static mod state to measure in.
+    * @returns {Promise<void>} Resolves once every row is measured and checked.
+    */
+   async function expectRowsOnOneLine(state) {
+      /** @type {import('@playwright/test').Locator} The actor's sheet. */
+      const sheet = await openSheetByUuid(page, actorUuid);
       await openSheetTab(page, 'Skills');
       await expect(page.locator('.application.titan-document-sheet .skill').first()).toBeVisible();
+      await setStaticModsShown(sheet, state.shown);
 
       /** @type {object[]} The measured rows. */
       const rows = await measureRows();
@@ -400,9 +444,20 @@ test.describe('the Skills tab rows', () => {
          .toBe(1);
       expect(new Set(rows.map((row) => Math.round(row.buttonWidth))).size, 'button widths follow the skill names')
          .toBeGreaterThan(3);
-   });
+   }
 
-   test('a very long skill name wraps inside its button and the column stays in place', async () => {
+   for (const state of SKILL_STATES) {
+      test(`every skill sits on one line of columns with the static mods ${state.label}`, async () => {
+         await expectRowsOnOneLine(state);
+      });
+   }
+
+   /**
+    * Asserts that a very long skill name wraps inside its button and the columns stay in place.
+    * @param {typeof SKILL_STATES[number]} state - The static mod state to measure in.
+    * @returns {Promise<void>} Resolves once the long-named row is measured and checked.
+    */
+   async function expectLongNameWraps(state) {
       /** @type {string} The skill's localized name before the test replaces it. */
       const original = await page.evaluate((skill) => game.i18n.localize(`LOCAL.${skill}.text`), LONG_NAME_SKILL);
       try {
@@ -416,9 +471,11 @@ test.describe('the Skills tab rows', () => {
             await page.evaluate((skill) => game.i18n.localize(`LOCAL.${skill}.text`), LONG_NAME_SKILL),
             'the replaced name is what the sheet will localize',
          ).toBe(LONG_NAME);
-         await openSheetByUuid(page, actorUuid);
+         /** @type {import('@playwright/test').Locator} The actor's sheet. */
+         const sheet = await openSheetByUuid(page, actorUuid);
          await openSheetTab(page, 'Skills');
          await expect(page.locator('.application.titan-document-sheet .skill').first()).toBeVisible();
+         await setStaticModsShown(sheet, state.shown);
 
          /** @type {object[]} The measured rows. */
          const rows = await measureRows();
@@ -439,7 +496,8 @@ test.describe('the Skills tab rows', () => {
             .toBeGreaterThan(others[0].rowHeight + 10);
          expect(Math.abs(long.buttonCentre - long.rowCentre), 'the wrapped button is on the row middle')
             .toBeLessThanOrEqual(1);
-         expect(long.controlCentres.length, 'the Attribute select and the six stat inputs are measured').toBe(7);
+         expect(long.controlCentres.length, 'the Attribute select and the stat controls are measured')
+            .toBe(state.controls);
          for (const centre of long.controlCentres) {
             expect(Math.abs(centre - long.rowCentre), 'a column control is on the middle of the taller row')
                .toBeLessThanOrEqual(1);
@@ -462,7 +520,13 @@ test.describe('the Skills tab rows', () => {
             name: original,
          });
       }
-   });
+   }
+
+   for (const state of SKILL_STATES) {
+      test(`a very long skill name wraps inside its button with the static mods ${state.label}`, async () => {
+         await expectLongNameWraps(state);
+      });
+   }
 });
 
 test.describe('the Skills column header', () => {
@@ -521,10 +585,17 @@ test.describe('the Skills column header', () => {
       });
    }
 
-   test('the header labels the columns and lines up with every row, scrolled or not', async () => {
-      await openSheetByUuid(page, actorUuid);
+   /**
+    * Asserts that the header labels the columns and lines up with every row, scrolled or not.
+    * @param {typeof SKILL_STATES[number]} state - The static mod state to measure in.
+    * @returns {Promise<void>} Resolves once the header is measured and checked.
+    */
+   async function expectHeaderAligned(state) {
+      /** @type {import('@playwright/test').Locator} The actor's sheet. */
+      const sheet = await openSheetByUuid(page, actorUuid);
       await openSheetTab(page, 'Skills');
       await expect(page.locator('.application.titan-document-sheet .skill').first()).toBeVisible();
+      await setStaticModsShown(sheet, state.shown);
 
       /** @type {Awaited<ReturnType<typeof measureHeader>>} The header measured with the list at its top. */
       const atTop = await measureHeader();
@@ -534,14 +605,7 @@ test.describe('the Skills column header', () => {
          'Training',
          'Expertise',
       ]);
-      expect(atTop.subLabelTexts, 'the sub-labels of both groups').toEqual([
-         'Base',
-         'Mod',
-         'Total',
-         'Base',
-         'Mod',
-         'Total',
-      ]);
+      expect(atTop.subLabelTexts, 'the sub-labels of both groups').toEqual(state.subLabels);
       expect(atTop.headInsideScroller, 'the header is outside the scrolling list').toBe(false);
       expect(atTop.overflowing, 'the list scrolls, so its scrollbar shows').toBe(true);
       expect(atTop.headGutter, 'the header reserves the scrollbar width of the list').toBe(atTop.listGutter);
@@ -582,21 +646,29 @@ test.describe('the Skills column header', () => {
             }
          }
       }
-   });
+   }
+
+   for (const state of SKILL_STATES) {
+      test(`the header labels the columns and lines up with every row with the static mods ${state.label}`,
+         async () => {
+            await expectHeaderAligned(state);
+         });
+   }
 
    // Nested so these tests share `measureHeader`.
    test.describe('the width of a skill entry', () => {
-   /** @type {number} The narrowest the skill name column is allowed to be (`--skill-name-min`). */
+      /** @type {number} The narrowest the skill name column is allowed to be (`--skill-name-min`). */
       const NAME_MIN = 165;
 
-      /** @type {number} The widest the skill name column is allowed to be (`--skill-name-max`). */
-      const NAME_MAX = 195;
-
       /**
-       * @type {number} The narrowest a skill entry is allowed to be: name minimum, 121 + 145 + 145 for the Attribute,
-       * Training and Expertise tracks, and 15 of row padding.
+       * Computes the narrowest a skill entry is allowed to be: name minimum, 121 for the Attribute track, two
+       * Training or Expertise tracks, and 15 of row padding.
+       * @param {typeof SKILL_STATES[number]} state - The static mod state.
+       * @returns {number} The minimum entry width in pixels.
        */
-      const ENTRY_MIN_WIDTH = NAME_MIN + 121 + 145 + 145 + 15;
+      function entryMinWidth(state) {
+         return NAME_MIN + 121 + 2 * state.statTrack + 15;
+      }
 
       /**
        * Measures the columns of the open sheet's skill entries.
@@ -633,72 +705,94 @@ test.describe('the Skills column header', () => {
          });
       }
 
-      test('the entry has a minimum width and the skill name column stays within its bounds', async () => {
-         await openSheetByUuid(page, actorUuid);
+      for (const state of SKILL_STATES) {
+         test(`the entry has a minimum width and the name column stays within its bounds, static mods ${state.label}`,
+            async () => {
+               /** @type {import('@playwright/test').Locator} The actor's sheet. */
+               const sheet = await openSheetByUuid(page, actorUuid);
+               await openSheetTab(page, 'Skills');
+               await expect(page.locator('.application.titan-document-sheet .skill').first()).toBeVisible();
+               await setStaticModsShown(sheet, state.shown);
+
+               /** @type {Awaited<ReturnType<typeof measureEntries>>} The measured entries. */
+               const measured = await measureEntries();
+               expect(measured.rowMinWidth, 'a skill row has the one-line minimum width')
+                  .toBe(`${entryMinWidth(state)}px`);
+               expect(measured.entryMinWidth, 'a skill list entry has the one-line minimum width')
+                  .toBe(`${entryMinWidth(state)}px`);
+               expect(measured.nameColumn, 'the skill name column is at least its minimum')
+                  .toBeGreaterThanOrEqual(NAME_MIN);
+               expect(measured.nameColumn, 'the skill name column is at most its maximum')
+                  .toBeLessThanOrEqual(state.nameMax);
+               expect(measured.widestButton, 'a roll button is never wider than the skill name column')
+                  .toBeLessThanOrEqual(measured.nameColumn);
+            });
+      }
+
+      for (const state of SKILL_STATES) {
+         test(`a wider sheet leaves its extra room after the columns, static mods ${state.label}`,
+            async () => {
+               await expectWiderSheetKeepsColumns(state);
+            });
+      }
+
+      /**
+       * Asserts that a wider sheet leaves its extra room after the columns, which keep their place and the header
+       * alignment.
+       * @param {typeof SKILL_STATES[number]} state - The static mod state to measure in.
+       * @returns {Promise<void>} Resolves once both widths are measured and checked.
+       */
+      async function expectWiderSheetKeepsColumns(state) {
+         /** @type {import('@playwright/test').Locator} The actor's sheet. */
+         const sheet = await openSheetByUuid(page, actorUuid);
          await openSheetTab(page, 'Skills');
          await expect(page.locator('.application.titan-document-sheet .skill').first()).toBeVisible();
+         await setStaticModsShown(sheet, state.shown);
 
-         /** @type {Awaited<ReturnType<typeof measureEntries>>} The measured entries. */
-         const measured = await measureEntries();
-         expect(measured.rowMinWidth, 'a skill row has the one-line minimum width').toBe(`${ENTRY_MIN_WIDTH}px`);
-         expect(measured.entryMinWidth, 'a skill list entry has the one-line minimum width')
-            .toBe(`${ENTRY_MIN_WIDTH}px`);
-         expect(measured.nameColumn, 'the skill name column is at least its minimum').toBeGreaterThanOrEqual(NAME_MIN);
-         expect(measured.nameColumn, 'the skill name column is at most its maximum').toBeLessThanOrEqual(NAME_MAX);
-         expect(measured.widestButton, 'a roll button is never wider than the skill name column')
-            .toBeLessThanOrEqual(measured.nameColumn);
-      });
+         /** @type {Awaited<ReturnType<typeof measureEntries>>[]} The entries at each wider sheet width. */
+         const measuredWidths = [];
+         try {
+            // Both widths leave more room than the columns need, so the name column is at its maximum in both.
+            for (const width of [
+               1300,
+               1500,
+            ]) {
+               await page.evaluate(async ({ uuid, sheetWidth }) => {
+                  (await fromUuid(uuid)).sheet.setPosition({ width: sheetWidth });
+               }, {
+                  uuid: actorUuid,
+                  sheetWidth: width,
+               });
+               await expect.poll(() => page.evaluate(() => Math.round(
+                  document.querySelector('.application.titan-document-sheet').getBoundingClientRect().width,
+               )), { message: `the sheet is ${width}px wide` }).toBe(width);
+               measuredWidths.push(await measureEntries());
 
-      test('a wider sheet leaves its extra room after the columns, which keep their place and the header alignment',
-         async () => {
-            await openSheetByUuid(page, actorUuid);
-            await openSheetTab(page, 'Skills');
-            await expect(page.locator('.application.titan-document-sheet .skill').first()).toBeVisible();
-
-            /** @type {Awaited<ReturnType<typeof measureEntries>>[]} The entries at each wider sheet width. */
-            const measuredWidths = [];
-            try {
-               // Both widths leave more room than the columns need, so the name column is at its maximum in both.
-               for (const width of [
-                  1300,
-                  1500,
-               ]) {
-                  await page.evaluate(async ({ uuid, sheetWidth }) => {
-                     (await fromUuid(uuid)).sheet.setPosition({ width: sheetWidth });
-                  }, {
-                     uuid: actorUuid,
-                     sheetWidth: width,
-                  });
-                  await expect.poll(() => page.evaluate(() => Math.round(
-                     document.querySelector('.application.titan-document-sheet').getBoundingClientRect().width,
-                  )), { message: `the sheet is ${width}px wide` }).toBe(width);
-                  measuredWidths.push(await measureEntries());
-
-                  /** @type {Awaited<ReturnType<typeof measureHeader>>} The header against the rows. */
-                  const header = await measureHeader();
-                  for (const [index, row] of header.rows.entries()) {
-                     for (const [column, difference] of row.leftDifferences.entries()) {
-                        expect(difference, `row ${index} column ${column} left edge at ${width}px`)
-                           .toBeLessThanOrEqual(1);
-                     }
+               /** @type {Awaited<ReturnType<typeof measureHeader>>} The header against the rows. */
+               const header = await measureHeader();
+               for (const [index, row] of header.rows.entries()) {
+                  for (const [column, difference] of row.leftDifferences.entries()) {
+                     expect(difference, `row ${index} column ${column} left edge at ${width}px`)
+                        .toBeLessThanOrEqual(1);
                   }
                }
-               const [
-                  narrower,
-                  wider,
-               ] = measuredWidths;
-               expect(narrower.nameColumn, 'the skill name column is at its maximum').toBe(NAME_MAX);
-               expect(wider.nameColumn, 'the skill name column stays at its maximum').toBe(NAME_MAX);
-               expect(wider.columnLefts, 'the columns keep their place in the row').toEqual(narrower.columnLefts);
-               expect(wider.trailingSpace, 'the extra room trails the columns')
-                  .toBeGreaterThanOrEqual(narrower.trailingSpace + 190);
             }
-            finally {
-               await page.evaluate(async (uuid) => {
-                  (await fromUuid(uuid)).sheet.setPosition({ width: 900 });
-               }, actorUuid);
-            }
-         });
+            const [
+               narrower,
+               wider,
+            ] = measuredWidths;
+            expect(narrower.nameColumn, 'the skill name column is at its maximum').toBe(state.nameMax);
+            expect(wider.nameColumn, 'the skill name column stays at its maximum').toBe(state.nameMax);
+            expect(wider.columnLefts, 'the columns keep their place in the row').toEqual(narrower.columnLefts);
+            expect(wider.trailingSpace, 'the extra room trails the columns')
+               .toBeGreaterThanOrEqual(narrower.trailingSpace + 190);
+         }
+         finally {
+            await page.evaluate(async (uuid) => {
+               (await fromUuid(uuid)).sheet.setPosition({ width: 900 });
+            }, actorUuid);
+         }
+      }
    });
 });
 

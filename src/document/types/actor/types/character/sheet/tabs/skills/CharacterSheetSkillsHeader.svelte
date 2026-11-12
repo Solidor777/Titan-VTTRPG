@@ -1,4 +1,6 @@
 <script>
+   import { getContext } from 'svelte';
+   import { areStaticModsShown } from '~/system/StaticMods.js';
    import localize from '~/helpers/utility-functions/Localize.js';
    import { EXPERTISE_ICON, TRAINING_ICON } from '~/system/Icons.js';
 
@@ -14,12 +16,21 @@
       },
    ];
 
-   /** @type {string[]} The sub-labels of each group, over the base input, the mod input and the total. */
-   const subLabels = [
+   /** @type {object} Reference to the reactive Document store. */
+   const document = getContext('document');
+
+   /** @type {boolean} True when the static modifier inputs are shown. */
+   const showStaticMods = $derived(areStaticModsShown(document.data));
+
+   /** @type {string[]} The sub-labels of each group, over the base input, the mod input (when shown) and the total. */
+   const subLabels = $derived(showStaticMods ? [
       'base',
       'mod',
       'total',
-   ];
+   ] : [
+      'base',
+      'total',
+   ]);
 </script>
 
 <!--Column labels, on the same tracks as the skill rows-->

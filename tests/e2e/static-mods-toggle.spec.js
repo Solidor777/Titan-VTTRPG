@@ -1,11 +1,12 @@
 import { expect, test } from './harness.js';
 import { commitText } from './actions.js';
-import { login, openSheetByUuid } from './fixtures.js';
+import { login, openSheetByUuid, openSheetTab } from './fixtures.js';
 import { createActor, readServerSystem, setStaticModsShown } from './flows.js';
 import { attachPageErrors, closeAllApps } from './world.js';
 import { MODS } from '~/system/Mods.js';
 import { RATINGS } from '~/system/Ratings.js';
 import { RESOURCES } from '~/system/Resources.js';
+import { SKILLS } from '~/system/Skills.js';
 import { SPEEDS } from '~/system/Speeds.js';
 
 /**
@@ -406,6 +407,22 @@ test.describe('the header', () => {
       for (const id of headerTotalIds) {
          await expect(sheet.getByTestId(id), id).toBeVisible();
       }
+
+      /** @type {string[]} The text of each Attribute and Resistance stats group. */
+      const statTexts = await sheet.evaluate((element, selectors) => selectors.map((selector) => {
+         /** @type {Element | null} The stats group. */
+         const stats = element.querySelector(selector);
+         return stats === null ? null : stats.textContent;
+      }), [
+         ...attributes.map((attribute) => `.container:has(> .button > button.${attribute}) .stats`),
+         ...resistances.map((resistance) => `.container[data-resistance="${resistance}"] .stats`),
+      ]);
+      expect(statTexts).toHaveLength(6);
+      for (const text of statTexts) {
+         expect(text, 'an Attribute or Resistance stats group exists').not.toBeNull();
+         expect(text, 'the + is gone').not.toContain('+');
+         expect(text, 'the = is kept').toContain('=');
+      }
    });
 
    test('shown: all six header static mod inputs exist', async () => {
@@ -431,5 +448,112 @@ test.describe('the header', () => {
          expect(width, `button ${index} exists`).toBeGreaterThan(0);
          expect(hidden[index] - width, `button ${index} growth`).toBeGreaterThan(40);
       }
+   });
+});
+
+test.describe('the Skills tab', () => {
+   /** @type {string} The uuid of the actor measured by the Skills tests. */
+   let uuid;
+   /** @type {import('@playwright/test').Locator} The actor's open sheet. */
+   let sheet;
+
+   test.beforeAll(async () => {
+      uuid = `Actor.${await createActor(page, {
+         name: 'E2E Static Mods Skills',
+         type: 'player',
+      })}`;
+   });
+
+   test.beforeEach(async () => {
+      sheet = await openSheetByUuid(page, uuid);
+      await openSheetTab(page, 'Skills');
+      await expect(sheet.locator('.skill').first()).toBeVisible();
+   });
+
+   /**
+    * Measures the Skills tab geometry: the skill name column, the content widths and the track of the stat groups of
+    * the first row, and its minimum width.
+    * @returns {Promise<{nameColumn: number, statWidths: number[], statTrack: number, rowMinWidth: string}>} The
+    * measured values.
+    */
+   function measureSkills() {
+      return sheet.evaluate((element) => {
+         /** @type {Element} The first skill row. */
+         const row = element.querySelector('.skill');
+
+         /** @type {Element[]} The Training and Expertise groups of the first row. */
+         const stats = [...row.querySelectorAll('.stats .stat')];
+         return {
+            nameColumn: element.querySelector('.skill-tab .head-name').getBoundingClientRect().width,
+            statWidths: stats.map((stat) => {
+               /** @type {CSSStyleDeclaration} The stat group's computed style. */
+               const style = globalThis.getComputedStyle(stat);
+               return stat.getBoundingClientRect().width - parseFloat(style.borderLeftWidth)
+                  - parseFloat(style.paddingLeft) - parseFloat(style.paddingRight);
+            }),
+            statTrack: stats[1].getBoundingClientRect().left - stats[0].getBoundingClientRect().left,
+            rowMinWidth: globalThis.getComputedStyle(row).minWidth,
+         };
+      });
+   }
+
+   test('hidden: no Training or Expertise mod input exists in any of the 18 skill rows, no Mod label', async () => {
+      await setStaticModsShown(sheet, false);
+      for (const skill of SKILLS) {
+         await expect(sheet.getByTestId(`sheet-skill-${skill}-training-mod`), skill).toHaveCount(0);
+         await expect(sheet.getByTestId(`sheet-skill-${skill}-expertise-mod`), skill).toHaveCount(0);
+         await expect(sheet.getByTestId(`sheet-skill-${skill}-training`), skill).toBeVisible();
+         await expect(sheet.getByTestId(`sheet-skill-${skill}-expertise`), skill).toBeVisible();
+      }
+      expect(await sheet.locator('.skill-tab .head-sub span').allTextContents()).toEqual([
+         'Base',
+         'Total',
+         'Base',
+         'Total',
+      ]);
+   });
+
+   test('shown: all 36 skill mod inputs exist and the header has Base, Mod and Total twice', async () => {
+      await setStaticModsShown(sheet, true);
+      for (const skill of SKILLS) {
+         await expect(sheet.getByTestId(`sheet-skill-${skill}-training-mod`), skill).toHaveCount(1);
+         await expect(sheet.getByTestId(`sheet-skill-${skill}-expertise-mod`), skill).toHaveCount(1);
+      }
+      expect(SKILLS).toHaveLength(18);
+      expect(await sheet.locator('.skill-tab .head-sub span').allTextContents()).toEqual([
+         'Base',
+         'Mod',
+         'Total',
+         'Base',
+         'Mod',
+         'Total',
+      ]);
+   });
+
+   test('hidden skill geometry: name column 300, stat 76, entry minimum 495; shown 195, 124, 591', async () => {
+      await setStaticModsShown(sheet, false);
+      await expect(sheet.getByTestId('sheet-skill-arcana-training-mod')).toHaveCount(0);
+
+      /** @type {Awaited<ReturnType<typeof measureSkills>>} The Skills tab measured hidden. */
+      const hidden = await measureSkills();
+      expect(hidden.nameColumn, 'hidden name column').toBe(300);
+      expect(hidden.statWidths, 'hidden stat widths').toEqual([
+         76,
+         76,
+      ]);
+      expect(hidden.statTrack, 'hidden stat track').toBe(97);
+      expect(hidden.rowMinWidth, 'hidden entry minimum').toBe('495px');
+      await setStaticModsShown(sheet, true);
+      await expect(sheet.getByTestId('sheet-skill-arcana-training-mod')).toHaveCount(1);
+
+      /** @type {Awaited<ReturnType<typeof measureSkills>>} The Skills tab measured shown. */
+      const shown = await measureSkills();
+      expect(shown.nameColumn, 'shown name column').toBe(195);
+      expect(shown.statWidths, 'shown stat widths').toEqual([
+         124,
+         124,
+      ]);
+      expect(shown.statTrack, 'shown stat track').toBe(145);
+      expect(shown.rowMinWidth, 'shown entry minimum').toBe('591px');
    });
 });

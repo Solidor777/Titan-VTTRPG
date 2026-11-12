@@ -2168,7 +2168,7 @@ export async function setSkillTraining(page, actorUuid, skill, value) {
    /** @type {string} The Skill's localized name, which its row's check button shows. */
    const label = await page.evaluate((skill) => game.i18n.localize(`LOCAL.${skill}.text`), skill);
 
-   // The row's first stat is Training: its first input is the base value, its second the static modifier.
+   // The row's first stat is Training and its first input is the base value; the static modifier input may be absent.
    /** @type {import('@playwright/test').Locator} The Skill's row. */
    const row = sheet.locator('.skill', {
       has: page.locator('.check-button .label', { hasText: new RegExp(`^\\s*${RegExp.escape(label)}\\s*$`) }),

@@ -6,12 +6,19 @@
    import CharacterSheetSkillsList
    from '~/document/types/actor/types/character/sheet/tabs/skills/CharacterSheetSkillsList.svelte';
    import ScrollingContainer from '~/helpers/svelte-components/ScrollingContainer.svelte';
+   import { areStaticModsShown } from '~/system/StaticMods.js';
 
    /** @type {object} Reference to the Application State store. */
    const appState = getContext('applicationState');
+
+   /** @type {object} Reference to the reactive Document store. */
+   const document = getContext('document');
+
+   /** @type {boolean} True when the static modifier inputs are shown. */
+   const showStaticMods = $derived(areStaticModsShown(document.data));
 </script>
 
-<div class="skill-tab">
+<div class="skill-tab" class:static-mods-hidden={!showStaticMods}>
    <!--Filter-->
    <div class="header">
       <TopFilter bind:value={$appState.tabs.skills.filter}/>
@@ -83,6 +90,14 @@
          position: relative;
          width: 100%;
          height: 100%;
+      }
+
+      // Without the static mod inputs a Training or Expertise group is base input, equals and total, and the room freed
+      // by the narrower groups goes to the skill name column.
+      &.static-mods-hidden {
+         --skill-name-max: 300px;
+         --skill-stat-columns: 28px 10px 28px;
+         --skill-stat-width: calc(66px + 2 * var(--skill-stat-gap));
       }
    }
 </style>
