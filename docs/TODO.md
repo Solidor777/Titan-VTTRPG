@@ -144,5 +144,3 @@ Completed items are deleted, not marked done.
   says it ignores 1 point of Armor, while `ComputeDamageResistance.js` ignores half of the Armor, rounded up (rules
   revision `a233d07c`, 2026-09-28). Fix the two sentences in the compendium; the specs assert the code's numbers.
 
-- Charmed (rules 11_11_2026) is a condition with no mechanics, and Inflict/Remove Condition do not offer it (it is in
-  `OMITTED_CONDITIONS` of `SpellAspectConditions.test.js`); pricing Inflict Charmed is a spell-aspect cost decision.

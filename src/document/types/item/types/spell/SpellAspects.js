@@ -447,6 +447,7 @@ export default deepFreeze({
          requireOption: true,
          option: [
             'blinded',
+            'charmed',
             'contaminated',
             'deafened',
             'frightened',
@@ -461,6 +462,7 @@ export default deepFreeze({
          // own; Off-Balance (3) sits with Frightened, between Prone (2) and Blinded, Contaminated, and Stunned (4).
          optionCosts: {
             blinded: 4,
+            charmed: 5,
             contaminated: 4,
             deafened: 1,
             frightened: 3,
@@ -487,6 +489,7 @@ export default deepFreeze({
          allOptionsCost: 5,
          option: [
             'blinded',
+            'charmed',
             'contaminated',
             'deafened',
             'frightened',

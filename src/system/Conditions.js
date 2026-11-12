@@ -76,9 +76,10 @@ function createReflexesAutomaticFailure(conditionId) {
 /**
  * Builds the static list of TITAN condition definitions for CONFIG.statusEffects. Every condition is the
  * 'condition' Active Effect subtype; every condition with mechanics carries a `system.rulesElement` array
- * expressing its stat and check rules (applied through the shared rules-element pipeline). Charmed, Dead and Unconscious
- * carry none; Unconscious's companion conditions (UNCONSCIOUS_COMPANION_CONDITIONS) are applied when it is created
- * (CharacterDataModel#fallUnconscious). This function is pure (no game/localization access) so it can be unit-tested.
+ * expressing its stat and check rules (applied through the shared rules-element pipeline). Charmed, Dead and
+ * Unconscious carry none; the companion conditions of Unconscious and Sleeping (UNCONSCIOUS_COMPANION_CONDITIONS) are
+ * applied when either is created (CharacterDataModel#fallUnconscious). This function is pure (no game/localization
+ * access) so it can be unit-tested.
  * @returns {object[]} The condition definitions, each with id, name (localization key), img, type, and —
  * for mechanically-active conditions — system.rulesElement.
  */

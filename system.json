@@ -2,7 +2,7 @@
    "id": "titan",
    "title": "Titan VTTRPG",
    "description": "A success based roll system designed for virtual tabletop.",
-   "version": "2.3.0",
+   "version": "2.4.0",
    "compatibility": {
       "minimum": "13",
       "verified": "14",

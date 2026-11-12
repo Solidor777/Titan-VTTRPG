@@ -1,3 +1,10 @@
+## Version 2.4.0:
+Conditions follow the 2026-11-11 rules.
+- The new Charmed condition has no stat changes. Spells can inflict Charmed (cost 5) and remove it (cost 2).
+- A Sleeping Character also falls Prone and Incapacitated, as an Unconscious one does.
+- Prone halves Speed rounded down instead of up.
+- The Charmed, Contaminated, Prone, and Sleeping descriptions use the new rules text.
+
 ## Version 2.3.0:
 The character sheet's Skills tab and sidebar have a new layout.
 - Each skill is one line: the roll button, the Attribute select, then Training and Expertise, with dividers between the
