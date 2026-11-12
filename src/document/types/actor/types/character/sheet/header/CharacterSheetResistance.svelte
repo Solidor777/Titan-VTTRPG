@@ -4,6 +4,7 @@
    import DocumentIntegerInput from '~/document/svelte-components/input/DocumentIntegerInput.svelte';
    import CharacterSheetResistanceCheckButton
    from '~/document/types/actor/types/character/sheet/header/CharacterSheetResistanceCheckButton.svelte';
+   import { areStaticModsShown } from '~/system/StaticMods.js';
    import ModifiableStatValueLabel from '~/helpers/svelte-components/label/ModifiableStatValueLabel.svelte';
    import localize from '~/helpers/utility-functions/Localize.js';
 
@@ -17,6 +18,9 @@
 
    /** @type {object} Reference to the reactive Document store. */
    const document = getContext('document');
+
+   /** @type {boolean} True when the static modifier inputs are shown. */
+   const showStaticMods = $derived(areStaticModsShown(document.data));
 </script>
 
 <div class="container" data-resistance={resistance}>
@@ -35,15 +39,18 @@
          </div>
       </div>
 
-      <!--Plus Sign-->
-      <div class="sign">+</div>
+      {#if showStaticMods}
+         <!--Plus Sign-->
+         <div class="sign">+</div>
 
-      <!--Static Mod-->
-      <div class="number">
-         <DocumentIntegerInput
-            bind:value={document.data.system.resistance[resistance].mod.static}
-         />
-      </div>
+         <!--Static Mod-->
+         <div class="number">
+            <DocumentIntegerInput
+               bind:value={document.data.system.resistance[resistance].mod.static}
+               testId={`sheet-resistance-${resistance}-mod`}
+            />
+         </div>
+      {/if}
 
       <!--Equal Sign-->
       <div class="sign">=</div>

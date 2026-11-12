@@ -1,6 +1,7 @@
 <script>
    import { getContext } from 'svelte';
    import DocumentIntegerInput from '~/document/svelte-components/input/DocumentIntegerInput.svelte';
+   import { areStaticModsShown } from '~/system/StaticMods.js';
    import ModifiableStatValueLabel from '~/helpers/svelte-components/label/ModifiableStatValueLabel.svelte';
    import CharacterSheetCondensedAttributeCheckButton
    from '~/document/types/actor/types/character/sheet/header/CharacterSheetAttributeCheckButton.svelte';
@@ -15,6 +16,9 @@
 
    /** @type {object} Reference to the reactive Document store. */
    const document = getContext('document');
+
+   /** @type {boolean} True when the static modifier inputs are shown. */
+   const showStaticMods = $derived(areStaticModsShown(document.data));
 </script>
 
 <div class="container">
@@ -33,15 +37,18 @@
          />
       </div>
 
-      <!--Plus Sign-->
-      <div class="sign">+</div>
+      {#if showStaticMods}
+         <!--Plus Sign-->
+         <div class="sign">+</div>
 
-      <!--Static Mod-->
-      <div class="input">
-         <DocumentIntegerInput
-            bind:value={document.data.system.attribute[attribute].mod.static}
-         />
-      </div>
+         <!--Static Mod-->
+         <div class="input">
+            <DocumentIntegerInput
+               bind:value={document.data.system.attribute[attribute].mod.static}
+               testId={`sheet-attribute-${attribute}-mod`}
+            />
+         </div>
+      {/if}
 
       <!--Equal Sign-->
       <div class="sign">=</div>
