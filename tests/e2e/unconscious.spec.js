@@ -125,6 +125,17 @@ test('falling Unconscious adds Prone and Incapacitated once, and removing Uncons
    });
 });
 
+test('falling Sleeping adds Prone and Incapacitated without the Unconscious condition', async () => {
+   /** @type {Subject} The Character. */
+   const subject = await createSubject('E2E Sleeping Sleeper');
+   await applyCondition(page, subject.tokenId, 'sleeping');
+   await expect.poll(() => readConditions(subject), { message: 'Sleeping brought its companions' }).toEqual({
+      incapacitated: 1,
+      prone: 1,
+      unconscious: 0,
+   });
+});
+
 test('a Character that is already Prone gains no second Prone', async () => {
    /** @type {Subject} The Character. */
    const subject = await createSubject('E2E Unconscious Prone Sleeper');

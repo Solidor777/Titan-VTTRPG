@@ -144,13 +144,5 @@ Completed items are deleted, not marked done.
   says it ignores 1 point of Armor, while `ComputeDamageResistance.js` ignores half of the Armor, rounded up (rules
   revision `a233d07c`, 2026-09-28). Fix the two sentences in the compendium; the specs assert the code's numbers.
 
-- Rules 11_11_2026 conditions the system does not yet enforce (the lang text matches the rules; the mechanics lag):
-  - Contaminated: "Their maximum Stamina, Wounds, and Resolve decrease accordingly, and any current value above its new
-    maximum is reduced to that maximum." `_calculateBaseResources` derives `maxBase` from the attributes' `baseValue`,
-    so the Contaminated attribute penalty never reaches the maxima. Settle whether "accordingly" means recomputing the
-    formulas from the reduced attributes or a ¼ `mulBase` on each maximum, and where the clamp of current values runs.
-  - Sleeping: "is Unconscious ... wakes if it takes Damage or if another creature uses an Action to wake it." The
-    Sleeping condition only halves Awareness; it does not apply Unconscious (and its Prone and Incapacitated companions)
-    or wake on Damage.
-  - Charmed is a new condition with no mechanics, and Inflict/Remove Condition do not offer it (it is in
-    `OMITTED_CONDITIONS` of `SpellAspectConditions.test.js`); pricing Inflict Charmed is a spell-aspect cost decision.
+- Charmed (rules 11_11_2026) is a condition with no mechanics, and Inflict/Remove Condition do not offer it (it is in
+  `OMITTED_CONDITIONS` of `SpellAspectConditions.test.js`); pricing Inflict Charmed is a spell-aspect cost decision.

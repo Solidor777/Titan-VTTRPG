@@ -152,6 +152,19 @@ describe('TitanActiveEffect#_onCreate', () => {
       })).not.toHaveBeenCalled();
    });
 
+   it('makes a Sleeping Character fall Unconscious on the creating client only', () => {
+      expect(create({
+         statuses: ['sleeping'],
+         type: 'condition',
+         userId: 'creator',
+      })).toHaveBeenCalledTimes(1);
+      expect(create({
+         statuses: ['sleeping'],
+         type: 'condition',
+         userId: 'someone-else',
+      })).not.toHaveBeenCalled();
+   });
+
    it('ignores other conditions and effect-subtype effects', () => {
       expect(create({
          statuses: ['prone'],

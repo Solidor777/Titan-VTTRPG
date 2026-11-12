@@ -129,7 +129,7 @@
   `CONFIG.ui.titanEffects = TitanEffectTrayTab` (no `Sidebar` subclass; core instantiates `ui.titanEffects`).
 - `OnceSetup.js` (Foundry `setup` hook) calls `setupConditions()` from `src/system/Conditions.js`. That module
   exports a pure `buildConditionDefinitions()` (no `game`/localize access, unit-tested) returning the static
-  condition list (every entry `type: 'condition'`; every condition but Dead and Unconscious carries a
+  condition list (every entry `type: 'condition'`; every condition but Charmed, Dead and Unconscious carries a
   `system.rulesElement` array), plus `CONDITION_IDS`, `UNCONSCIOUS_COMPANION_CONDITIONS`,
   `findConditionDefinition(statuses)` (the system condition a single-status effect applies, from the definitions, never
   `CONFIG.statusEffects`), `getConditionDescriptionKey(effect)` (that condition's description key, `<id>.desc`, which

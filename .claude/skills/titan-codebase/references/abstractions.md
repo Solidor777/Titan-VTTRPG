@@ -133,11 +133,11 @@ management). Data model classes hold the schema, field validation, and derived-d
   `buildCreationSource(data)` constructs an effect (so its schema cleans the data) and applies the same changes plus
   `transfer: false`, for an effect written as data (the stored-actor migration's Adventure path; core's Adventure import
   runs no embedded `_preCreate`). `_preUpdate` keeps a timed effect's `disabled` synced to its remaining duration;
-  `disabled` is a manual toggle only for permanent effects. `_onCreate` runs on every client; only an Unconscious
+  `disabled` is a manual toggle only for permanent effects. `_onCreate` runs on every client; only an Unconscious or Sleeping
   `condition` on a Character created by this client's user (`userId === game.user.id`) calls
   `CharacterDataModel#fallUnconscious`, which toggles each of `UNCONSCIOUS_COMPANION_CONDITIONS`
   (`src/system/Conditions.js`: Prone, then Incapacitated) active through core's `toggleStatusEffect` (an existing
-  condition is left alone, an immunity refuses through `_preCreate`); removing Unconscious removes neither, and a failed
+  condition is left alone, an immunity refuses through `_preCreate`); removing Unconscious removes neither (a Sleeping Character gets the companions but not the Unconscious condition), and a failed
   fall is reported through `error()`.
   Core's `base` subtype is registered too (`dataModels.base = foundry.data.ActiveEffectTypeDataModel`) and is stored
   but TITAN reads no TITAN field off it; the character sheet and Player HUD effect lists show it as a plain row that

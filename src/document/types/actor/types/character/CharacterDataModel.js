@@ -6591,8 +6591,8 @@ export default class CharacterDataModel extends TitanActorDataModel {
    }
 
    /**
-    * Applies what falling Unconscious does besides the condition itself: the Character falls Prone and is
-    * Incapacitated, each applied only if absent. An immunity to either refuses it as for any other application.
+    * Applies what falling Unconscious (or falling Sleeping, which is Unconscious) does besides the condition itself:
+    * the Character falls Prone and is Incapacitated, each applied only if absent. An immunity to either refuses it as for any other application.
     * Each condition is attempted independently: a failed toggle is reported and does not skip the other. Source: TITAN
     * Rules Compendium (09_26_2026), "Unconscious".
     * TODO: Unequip the Character's equipped weapons and shield (the rules' "drops anything it is holding"); logged in

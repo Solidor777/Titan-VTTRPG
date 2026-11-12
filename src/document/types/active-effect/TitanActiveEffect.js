@@ -119,9 +119,9 @@ export default class TitanActiveEffect extends CustomTraitMixin(CheckListMixin(f
    }
 
    /**
-    * Performs follow-up logic after document creation, on every client. On the creating client, an Unconscious
-    * condition on a Character makes it fall Unconscious (Prone and Incapacitated); the other clients receive those
-    * conditions as document creations.
+    * Performs follow-up logic after document creation, on every client. On the creating client, an Unconscious or
+    * Sleeping condition on a Character makes it fall Unconscious (Prone and Incapacitated), since a Sleeping creature
+    * is Unconscious; the other clients receive those conditions as document creations.
     * @override
     * @param {object} data - The initial data object provided to the document creation request.
     * @param {object} options - Additional options which modify the creation request.
@@ -133,7 +133,7 @@ export default class TitanActiveEffect extends CustomTraitMixin(CheckListMixin(f
       if (
          userId === game.user.id &&
          this.type === CONDITION_TYPE &&
-         this.statuses.has('unconscious') &&
+         (this.statuses.has('unconscious') || this.statuses.has('sleeping')) &&
          this.parent?.system?.isCharacter
       ) {
          // _onCreate is synchronous; the follow-up creations run after it returns and report their own failure.
