@@ -290,3 +290,20 @@ Files cited as `bugbatch1-logs/...` are in `.superpowers/sdd/2026-09-29-conditio
   with the warning suppressed.
 - **Found:** 2026-11-11 while verifying the character sheet spacing work (no relation to it).
 - **Status:** Open.
+
+### 185. The `incapacitated` condition is already on when its e2e check-rule test starts
+
+- **What (measured, 2026-11-12, `npm run test:e2e -- logic.conditions`, 2 of 2 runs; also failed in the 5-file run
+  `npm run test:e2e -- effect-changes effect-tray gpu-rendering logic.conditions logic.fast-check`):**
+  `tests/e2e/logic/conditions.spec.js:457` "conditions — check rules › incapacitated automatically fails Reflexes
+  checks but not Resilience checks" fails in `toggleCondition` (`tests/e2e/flows.js:890`) with "the condition
+  incapacitated is off before the click", expected `false`, received `true`. The other 23 tests of the file pass
+  (`restrained` in the same loop passes).
+- **Inferred (not measured):** the file's earlier test "sleeping halves awareness (round up)"
+  (`tests/e2e/logic/conditions.spec.js:362`) applies Sleeping, which also applies Incapacitated, and the test's cleanup
+  of what it applied may not remove the Incapacitated that Sleeping cascaded. Not excluded: any other earlier test in the
+  file that leaves it on.
+- **Not measured:** whether it fails without the static mod toggle commits. The test does not read a static mod input
+  and the failing step is a condition toggle.
+- **Found:** 2026-11-12 during the first-half e2e regression run of the static mod toggle.
+- **Status:** Open.
