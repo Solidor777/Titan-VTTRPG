@@ -1,3 +1,12 @@
+## Version 2.5.0:
+The character sheet can hide the static modifier inputs.
+- A new Static Mods button in the sheet header shows or hides the static modifier inputs of the Skills, Ratings,
+  Resources, Speeds, Mods, Attributes, and Resistances. Hidden, they no longer take room: each skill row, the
+  Attribute and Resistance buttons, and the sidebar rearrange to fit. Static modifiers still count toward every total.
+- The setting is saved with each character and is hidden by default, so every existing character starts hidden. Press
+  the button once to show them. Only users who can edit a character see its button; everyone sees the result.
+- The spreadsheet-to-Markdown script no longer prints a Node deprecation warning.
+
 ## Version 2.4.0:
 Conditions follow the 2026-11-11 rules.
 - The new Charmed condition has no stat changes. Spells can inflict Charmed (cost 5) and remove it (cost 2).
