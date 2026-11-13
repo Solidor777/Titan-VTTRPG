@@ -379,7 +379,7 @@ test.describe('conditions fill the condition bucket', () => {
       ).toHaveText(String(melee));
    });
 
-   test('Prone halves every speed, rounded up', async () => {
+   test('Prone halves every speed, rounded down', async () => {
       /** @type {Record<string, number>} The speeds the sheet shows before the condition. */
       const before = {};
       /** @type {string[]} The speeds. */
@@ -392,8 +392,8 @@ test.describe('conditions fill the condition bucket', () => {
       /** @type {import('@playwright/test').Locator} The defender's sheet. */
       const sheet = await openSheetByUuid(page, defender.uuid);
       for (const speed of speeds) {
-         await expect(sheet.getByTestId(`sheet-speed-${speed}`), `${speed} is halved, rounded up`)
-            .toHaveText(String(Math.ceil(before[speed] * 0.5)));
+         await expect(sheet.getByTestId(`sheet-speed-${speed}`), `${speed} is halved, rounded down`)
+            .toHaveText(String(Math.floor(before[speed] * 0.5)));
       }
       await removeCondition(page, defender.tokenId, 'prone');
    });

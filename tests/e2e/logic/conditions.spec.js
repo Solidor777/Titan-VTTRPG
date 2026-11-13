@@ -362,6 +362,10 @@ test.describe('conditions — derived-stat mechanics', () => {
    test('sleeping halves awareness (round up)', async () => {
       /** @type {{baseline: object, after: object}} The stats before and after Sleeping. */
       const { baseline, after } = await applyConditions(['sleeping']);
+
+      // A Sleeping character also falls Prone and Incapacitated; the file's afterEach removes them with Sleeping so the
+      // next test starts without them.
+      applied.push('prone', 'incapacitated');
       expect(after.rating.awareness.value).toBe(Math.ceil(baseline.rating.awareness.value / 2));
    });
 

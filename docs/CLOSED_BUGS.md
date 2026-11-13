@@ -3363,3 +3363,44 @@ The evidence files named here are in `.superpowers/sdd/2026-10-10-e2e-coverage/t
   Down and send no update; both failed on the previous build), and the probe tests, which pass.
 - **Found:** 2026-10-10 by the full e2e run after bug 175 was closed.
 - **Status:** Closed 2026-10-10.
+
+### 184. The spreadsheet-to-Markdown CLI unit test failed when Node printed a deprecation warning on stderr
+
+- **What (measured, 2026-11-11, `npx vitest run`, 2 of 2 runs):** `tests/unit/spreadsheet/markdown/SpreadsheetToMarkdownCli.test.js`
+  "exits 1 with a stderr message for an Actor-pack workbook and does not write the output file" failed: the received
+  stderr was the expected message followed by `(node:NNNN) [DEP0205] DeprecationWarning: module.register() is
+  deprecated. Use module.registerHooks() instead.` The test compares stderr for exact equality.
+- **Cause (read):** `scripts/lib/registerSrcAlias.mjs` called the deprecated `module.register()` (Node v26.11.1), so
+  every CLI process printed the warning to stderr.
+- **Fixed:** 2026-11-12: `registerSrcAlias.mjs` calls `module.registerHooks({ resolve })` and `srcAliasHooks.mjs` exports a
+  synchronous `resolve` (in-thread hooks are synchronous). Measured: `npx vitest run tests/unit/spreadsheet/markdown`:
+  19 files, 159 tests passed; the warning no longer appears. The `titan-codebase` skill's `conventions.md` describes the
+  new call.
+- **Found:** 2026-11-11 while verifying the character sheet spacing work (no relation to it).
+- **Status:** Closed 2026-11-12.
+
+### 185. The `incapacitated` condition was already on when its e2e check-rule test started
+
+- **What (measured, 2026-11-12, `npm run test:e2e -- logic.conditions`, 2 of 2 runs):**
+  `tests/e2e/logic/conditions.spec.js` "incapacitated automatically fails Reflexes checks but not Resilience checks"
+  failed in `toggleCondition` (`tests/e2e/flows.js`) with "the condition incapacitated is off before the click",
+  expected `false`, received `true`. The other 23 tests of the file passed.
+- **Cause (read):** commit `0fa0f5da` makes a Sleeping character fall Prone and Incapacitated. The earlier test "sleeping
+  halves awareness (round up)" applies Sleeping, and the file's `afterEach` removed only the statuses the test listed in
+  `applied`, so Prone and Incapacitated stayed on for every later test.
+- **Fixed:** 2026-11-12: the sleeping test adds `prone` and `incapacitated` to `applied`, so the `afterEach` removes them.
+  Measured: `npm run test:e2e -- logic.conditions rules-element-rolls`: 34 passed.
+- **Found:** 2026-11-12 during the first-half e2e regression run of the static mod toggle.
+- **Status:** Closed 2026-11-12.
+
+### 186. The e2e test "Prone halves every speed, rounded up" expected round-up but Prone rounds down
+
+- **What (measured, 2026-11-12, `npm run test:e2e -- rules-element-rolls`, 2 of 2 runs):**
+  `tests/e2e/rules-element-rolls.spec.js` "Prone halves every speed" failed: `sheet-speed-stride` showed "2" where the
+  test expected "3" (`Math.ceil(before * 0.5)`).
+- **Cause (read):** commit `12c99090` ("Prone rounds speed down") changed the Prone speed rule in `src/system/Conditions.js`
+  from `rounding: 'up'` to `rounding: 'down'` and updated `tests/e2e/logic/conditions.spec.js`, but not this spec.
+- **Fixed:** 2026-11-12: the test expects `Math.floor(before * 0.5)` and is titled "rounded down". Measured:
+  `npm run test:e2e -- logic.conditions rules-element-rolls`: 34 passed.
+- **Found:** 2026-11-12 during the second-half e2e regression run of the static mod toggle.
+- **Status:** Closed 2026-11-12.
