@@ -307,3 +307,15 @@ Files cited as `bugbatch1-logs/...` are in `.superpowers/sdd/2026-09-29-conditio
   and the failing step is a condition toggle.
 - **Found:** 2026-11-12 during the first-half e2e regression run of the static mod toggle.
 - **Status:** Open.
+
+### 186. The e2e test "Prone halves every speed, rounded up" expects round-up but Prone now rounds down
+
+- **What (measured, 2026-11-12, `npm run test:e2e -- rules-element-rolls`, 2 of 2 runs):**
+  `tests/e2e/rules-element-rolls.spec.js:382` fails: `sheet-speed-stride` shows "2" where the test expects "3"
+  (`Math.ceil(before * 0.5)`, line 396). The other 9 tests of the file pass.
+- **Read:** commit `12c99090` ("Prone rounds speed down") changed the Prone speed rule in `src/system/Conditions.js` from
+  `rounding: 'up'` to `rounding: 'down'` and updated `tests/e2e/logic/conditions.spec.js`, but did not touch this spec.
+- **Not measured:** whether any other speed in the test also differs.
+- **Found:** 2026-11-12 during the second-half e2e regression run of the static mod toggle (the test reads no static
+  mod input).
+- **Status:** Open.
