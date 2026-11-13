@@ -62,11 +62,12 @@ import localize from '~/helpers/utility-functions/Localize.js';
 
 `scripts/` CLI entry points (e.g. `spreadsheet-to-markdown.mjs`) are plain Node, not Vite-built, so they
 cannot rely on `vite.config.mjs`'s `resolve.alias` for `~/`-prefixed imports into `src/`. Instead,
-`scripts/lib/registerSrcAlias.mjs` calls Node's loader-registration API,
-`module.register(new URL('./srcAliasHooks.mjs', import.meta.url))`, which installs
-`scripts/lib/srcAliasHooks.mjs`'s `resolve(specifier, context, nextResolve)` hook — it resolves any
+`scripts/lib/registerSrcAlias.mjs` calls Node's in-thread hook API,
+`module.registerHooks({ resolve })` (the loader-thread `module.register()` is deprecated, DEP0205, and its warning
+reaches the CLI's stderr), which installs
+`scripts/lib/srcAliasHooks.mjs`'s synchronous `resolve(specifier, context, nextResolve)` hook — it resolves any
 `~/`-prefixed specifier to `src/` under the repo root and passes everything else to `nextResolve`
-unchanged. Because `module.register()` only affects imports resolved AFTER it runs, the entry script
+unchanged. Because `module.registerHooks()` only affects imports resolved AFTER it runs, the entry script
 bootstraps in two steps: a static `import './lib/registerSrcAlias.mjs'` (registers the hook), followed by
 a **dynamic** `await import('./lib/spreadsheetToMarkdownCli.mjs')` for the module that itself imports
 `~/`-prefixed `src/` modules. This dynamic import is a Node-script bootstrap ordering requirement, not a

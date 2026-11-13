@@ -10,14 +10,15 @@ const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..'
 /**
  * Node module customization hook: resolves `~/`-prefixed specifiers to `src/` under the repository
  * root, mirroring the Vite `~/` alias so `src/` modules import unmodified from Node scripts. Every
- * other specifier passes through to the next resolver in the chain unchanged.
+ * other specifier passes through to the next resolver in the chain unchanged. Synchronous because
+ * `module.registerHooks()` hooks run in-thread.
  * @param {string} specifier - The import specifier as written in the importing module.
  * @param {object} context - The resolution context (conditions, parent URL, import attributes).
  * @param {Function} nextResolve - The next resolve hook in the chain.
- * @returns {Promise<object>} The resolution result (`{ url, shortCircuit }` for `~/` specifiers,
+ * @returns {object} The resolution result (`{ url, shortCircuit }` for `~/` specifiers,
  * otherwise whatever `nextResolve` returns).
  */
-export async function resolve(specifier, context, nextResolve) {
+export function resolve(specifier, context, nextResolve) {
    if (specifier.startsWith('~/')) {
       /** @type {string} The resolved absolute filesystem path under `src/`. */
       const targetPath = path.join(repoRoot, 'src', specifier.slice(2));
