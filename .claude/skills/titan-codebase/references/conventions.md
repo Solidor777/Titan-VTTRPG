@@ -800,8 +800,8 @@ static `actions` map. To refresh a dynamic control's icon/label after a state ch
 `happy-dom`, `globals: true`, Svelte 5 (`@sveltejs/vite-plugin-svelte`), `svelte-preprocess` (same SCSS `prependData` as
 `vite.config.mjs`), and the `~/` / `$fonts/` aliases. `hookTimeout` is 60 s: the schema-equivalence golden-master
 suites' `beforeAll` dynamic imports are transform-heavy (Svelte compiles) and exceed the 10 s default under full
-parallelism. Tests live in `tests/unit/**/*.test.js`: 147 files, 1688 tests (measured: `npm test` → "Test Files  147
-passed (147)", "Tests  1688 passed (1688)"). There is NO test code under `src/`. Support files: `tests/setup.js`,
+parallelism. Tests live in `tests/unit/**/*.test.js`: 153 files, 1728 tests (measured: `npm test` → "Test Files  153",
+"Tests  1728"). There is NO test code under `src/`. Support files: `tests/setup.js`,
 `tests/components/*.svelte` (Svelte probes the unit tests mount), `tests/unit/helpers/schemaFingerprint.js`,
 `tests/shared/checkOracle.js` (the independent check oracle the e2e `check-math.spec.js` compares against) and
 `tests/fixtures/spreadsheet/excel-edited.xlsx` (read by `tests/unit/spreadsheet/format/Xlsx.test.js`).
@@ -841,14 +841,17 @@ Advantage, Automatic Failure, and situation dialog rows use `check-field-advanta
 `check-summary-difficulty` (the post-Advantage Difficulty), `check-field-situations`, and per situation
 `situation-row-<key>` / `situation-toggle-<key>`; check cards use `check-chat-dc`, `check-chat-advantage`,
 `check-chat-automatic-failure`, `check-chat-situations`, and `check-chat-situation`; the conditional-check-modifier
-editor uses `ccm-*` ids (`DocumentSelect` forwards `testId`).
+editor uses `ccm-*` ids (`DocumentSelect` forwards `testId`). The character sheet's static mod inputs use
+`sheet-attribute-<key>-mod`, `sheet-resistance-<key>-mod`, `sheet-rating-<key>-mod`, `sheet-mod-<key>-mod`,
+`sheet-resource-<key>-mod`, `sheet-speed-<key>-mod` and `sheet-skill-<key>-training-mod` / `-expertise-mod`; they are
+absent from the DOM while the static mods are hidden.
 Essentially every base primitive in `src/helpers/svelte-components/**` now carries an optional `testId`
 (`data-testid` passthrough on its root element, or forwarded to its inner primitive's root for wrappers) —
 the lone exception is `Text` (no root element). See the component-probe harness entry below for the full
 coverage map, the wrapper-forwarding rules, and the selector each component resolves to.
 
 **Playwright E2E** — `npm run test:e2e` runs `playwright test` against the `test-titan` Foundry world on
-`http://localhost:30000`: 68 spec files, 1281 tests (measured: `npx playwright test --list` → "Total: 1281 tests in 68
+`http://localhost:30000`: 69 spec files, 1309 tests (measured: `npx playwright test --list` → "Total: 1309 tests in 69
 files"). `playwright.config.mjs` sets `timeout` 60 s, `expect.timeout` 1000 ms, `workers` 1, `fullyParallel` false,
 `globalSetup` and `globalTeardown`, the `list` reporter beside `slow-operation-reporter.js`, and for every test headless
 Chromium (with `--enable-gpu`), `viewport` 1920x1080 and `actionTimeout` 10 s. The users are the four dedicated
@@ -863,7 +866,7 @@ ancestor pid, polling liveness once a second), so a hard-killed run never leaves
 LevelDB locks. `tests/unit/SuperviseServer.test.js` covers spawn/reuse/teardown. The suite drives the real built system
 at the repo root, so it catches v14 API breaks that the mocked Vitest tier cannot.
 
-**The 68 spec files** (`tests/e2e/`; `logic/` holds three of them):
+**The 69 spec files** (`tests/e2e/`; `logic/` holds three of them):
 - Compendium module content. `compendium-content.spec.js` (24 tests, measured full run 2026-10-10: all pass, each under
   40 s): one test per module pack, big packs sharded by 50 documents (the pack list and shard counts come from the
   module manifest and its `src/packs` file counts; the documents from the live packs at run time). Each document is
@@ -888,9 +891,11 @@ at the repo root, so it catches v14 API breaks that the mocked Vitest tier canno
   character sheet and the Effect HUD), `custom-traits.spec.js` (the Add Custom Trait dialog, the tag's edit and delete
   icons, the tooltip, on items and effects), `sheet-filters.spec.js` (the name filters of the character sheet tabs and
   of the item Checks tab), `character-sheet-layout.spec.js` (Skills row geometry, sidebar labels, browser zoom on the
-  shared bulk actor), `sheet-layout-widths.spec.js` (live geometry of a two-digit Resource value, maximum and static
-  mod in the sidebar and the Player HUD bars, the Skills row roll button sized to its name, a replaced very long name
-  wrapping inside it, the right-hand column at one place in every row), `chat-autoscroll.spec.js` (the GM's chat log
+  shared bulk actor), `sheet-layout-widths.spec.js` (live geometry in both static mod states, shown and hidden: a two-digit Resource
+  value, maximum and static mod in the sidebar and the Player HUD bars, the Skills row roll button sized to its name, a
+  replaced very long name wrapping inside it, the right-hand column at one place in every row), `static-mods-toggle.spec.js`
+  (the header Static Mods button hides and shows the static mod inputs of every consumer, the state persists in the
+  actor flag and follows to observers, a second client and unlinked tokens), `chat-autoscroll.spec.js` (the GM's chat log
   at its bottom after a check card with a Roll Message element, for the GM's own roll and another user's roll, and
   unmoved when the GM had scrolled up), `rules-element-editor.spec.js` (the Rules Elements tab of a flow-made weapon: add and delete, the
   selector's default key, the rounding select of Multiply Base and Multiply Sum, the conditional check modifier editor,

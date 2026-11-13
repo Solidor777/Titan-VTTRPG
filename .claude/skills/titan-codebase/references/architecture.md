@@ -91,7 +91,8 @@
   controlled Character, or `foundry.applications.ui.Hotbar.toggleDocumentSheet`; `idMethod` is `uuid` (the Item's
   `flags.titan.uuid`), `name`, or `documentId`; every string argument is `JSON.stringify`-encoded, so names with
   quotes or backslashes compile; `tests/unit/Macros.test.js` executes every generated command),
-  trackable attributes (`TrackableAttributes.js`), and enumeration files (roles, resistances,
+  trackable attributes (`TrackableAttributes.js`), the static mod visibility flag (`StaticMods.js`:
+  `areStaticModsShown(actor)` / `setStaticModsShown(actor, shown)` over `flags.titan.showStaticMods`), and enumeration files (roles, resistances,
   resources, speeds, etc.). Shared vocabularies live here as one export each: `EffectTypes.js`, `ModBuckets.js`,
   `DurationTypes.js`, `AllKey.js`, `SetSumModes.js` (see conventions, "Shared vocabulary constants").
 

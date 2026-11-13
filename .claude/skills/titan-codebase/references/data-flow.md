@@ -238,11 +238,20 @@ Ratings/Mods/Speeds this way; Portrait and Resources stay bare. Each `CharacterS
 its text's width (`--titan-button-width/height: auto`, so a name wider than the flexible first track wraps inside the
 button), then the `.attribute` select and the training/expertise `.stats` groups, each behind a
 `separator-left-large` divider. `CharacterSheetSkillsTab.svelte` defines the tracks once as custom properties
-(`--skill-columns`, `--skill-stat-columns`, ...; the name track is `minmax(165px, 195px)`, tracks pack left, and a row/li
+(`--skill-columns`, `--skill-stat-columns`, ...; the name track is `minmax(165px, 195px)` with static mods shown and `minmax(165px, 300px)` hidden, the stat
+group is 124px shown and 76px hidden, tracks pack left, and a row/li
 has `min-width: --skill-row-min-width`); `CharacterSheetSkillsHeader.svelte` (column labels Skill / Attribute /
-Training / Expertise over Base / Mod / Total, `head-*` class names) sits in the tab's fixed area under the filter and
+Training / Expertise over Base / Mod / Total shown and Base / Total hidden, `head-*` class names) sits in the tab's fixed area under the filter and
 reads the same properties, with an invisible `scrollbar-gutter: stable` bar matching the list's scrollbar. There is no
-narrow layout: the sheet is a fixed 900px.
+narrow layout: the sheet is a fixed 900px. The sidebar is 208px with static mods shown and 184px hidden
+(`CharacterSheetBase` sets `--titan-sidebar-width` on the `.titan-sheet` root).
+`flags.titan.showStaticMods` (boolean; missing means hidden) is read with `areStaticModsShown(document.data)`
+(`src/system/StaticMods.js`) in the seven consumers (`CharacterSheetAttribute`, `Resistance`, `Rating`, `Mod`,
+`Resource`, `Speed`, `Skill`), which render their static input behind `{#if}`; the layout components
+(`CharacterSheetBase`, `CharacterSheetSkillsTab`, `CharacterSheetSkillsHeader`) read it for the widths above. The
+Static Mods button in `ActorSheetHeaderButtons.svelte` (shown when `isOwner`, `aria-pressed` carries the state)
+writes it with `setStaticModsShown`; the flag is reactive through `ReactiveDocument` because a flag write is an Actor
+update.
 The character sheet root (`CharacterSheetBase` `.titan-sheet`) is a `flex: 1; min-height: 0` child of the window
 content (a flex column), so a window Foundry clamps shorter than the sheet (zoom, short viewport) scrolls its
 sidebar (`overflow: hidden auto`) and tab lists instead of clipping them.

@@ -3,6 +3,12 @@
 Living record of post-work review issues — gotchas, accepted limitations, and issues that deserve
 attention. NOT a to-do list (deferred work goes to `docs/TODO.md`; bugs go to `docs/OPEN_BUGS.md`).
 
+### Slow-operation warnings in the e2e join and world helpers (2026-11-12)
+
+The full e2e run of the static mod toggle work reported waits over 1000 ms in shared helpers: `tests/e2e/join.js:115`
+(1.0 to 1.3 s), `tests/e2e/world.js:369` (1.2 s), the click at `compendium-spreadsheet.spec.js:69` (1.6 s) and
+`component-probe-buttons-tags.spec.js:1588` (1.3 s). The feature's specs did not cause them and they were not changed.
+
 ### Tempest Herald's immunities are a hand list of condition ids (2026-10-09)
 
 The compendium effect Tempest Herald carries one `immunity` element for each condition id of
