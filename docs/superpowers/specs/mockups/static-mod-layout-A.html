@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>TITAN static modifiers: Layout A (Compact collapse)</title>
+<style>
+/* Tokens resolved from src/styles/Variables.scss and src/theme/themes/HeritageDark.js */
+:root{
+  --app-bg:#262836; --font:#d8dbe8; --border:#4d5063; --p1:#373949; --p2:#424557; --p3:#2e303c;
+  --sp:5px; --spl:10px; --btn-bg:#f2b58c; --btn-fg:#3d2a18; --dark:#1b1c26;
+  --in-bg:#c5bcf8; --in-fg:#23184d; --lb-bg:#a6ccf2; --lb-fg:#152a3d;
+  --greater-bg:#c5ffeb; --greater-fg:#023020; --lesser-bg:#ffd1d1; --lesser-fg:#8b0000;
+}
+*{box-sizing:border-box}
+body{margin:0;background:#14151c;color:var(--font);font:16px/1.3 'Lato','Segoe UI',sans-serif}
+ol,ul{list-style:none;margin:0;padding:0}
+.page{width:940px;margin:0 auto;padding:0 20px 60px}
+.toolbar{position:sticky;top:0;z-index:5;background:#14151cee;padding:12px 0;display:flex;gap:8px;align-items:center;border-bottom:1px solid var(--border)}
+.toolbar b{margin-right:6px}
+.tb{background:var(--btn-bg);color:var(--btn-fg);border:1px solid var(--dark);border-radius:10px;padding:4px 12px;font:bold 14px Lato,sans-serif;cursor:pointer}
+body[data-view=both] #v-both,body[data-view=shown] #v-shown,body[data-view=hidden] #v-hidden{outline:2px solid #3fb6dd}
+body[data-view=shown] .frame[data-state=hidden],body[data-view=hidden] .frame[data-state=shown]{display:none}
+h1{font-size:20px;margin:18px 0 4px} p.lead{margin:0 0 14px;color:#9da3ba;font-size:14px}
+h2.st{font-size:16px;margin:26px 0 6px} h2.st .tag{background:#3fb6dd;color:#0a2730;border-radius:6px;padding:1px 8px;margin-right:6px}
+.frame[data-state=shown] h2.st .tag{background:#9da3ba}
+.spec{font-size:13px;color:#9da3ba;margin:0 0 8px}
+
+/* ---- Per-state geometry (the only thing that differs between states) ---- */
+.frame[data-state=shown]{--sb-w:208px;--stat-cols:28px 10px 28px 10px 28px;--stat-w:124px;--name-max:195px;--total-col:5}
+.frame[data-state=hidden]{--sb-w:184px;--stat-cols:28px 10px 28px;--stat-w:76px;--name-max:300px;--total-col:3}
+.frame{--sep:21px;--attr-track:calc(100px + var(--sep));--stat-track:calc(var(--stat-w) + var(--sep));
+  --cols:minmax(165px,var(--name-max)) var(--attr-track) var(--stat-track) var(--stat-track)}
+.frame[data-state=hidden] .sm{display:none !important}
+.frame[data-state=shown] .ic-hidden,.frame[data-state=hidden] .ic-shown,
+.fs[data-state=shown] .ic-hidden,.fs[data-state=hidden] .ic-shown{display:none}
+
+/* ---- Foundry window ---- */
+.win{width:900px;background:var(--app-bg);border:1px solid var(--border);border-radius:10px;overflow:hidden;box-shadow:0 8px 30px #0008}
+.winbar{height:36px;background:var(--dark);display:flex;align-items:center;padding:0 8px 0 14px;font-weight:bold;gap:6px}
+.winbar .title{flex:1}
+.controls{display:flex;align-items:center;gap:2px}
+.hbtn{width:28px;height:28px;border:0;background:transparent;color:var(--font);border-radius:6px;display:grid;place-items:center;padding:0;cursor:pointer}
+.hbtn:hover{background:#ffffff1f}
+.hbtn svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+.hbtn.linked{color:darkorange;filter:drop-shadow(0 0 4px darkorange)}
+.hbtn.new{outline:1px dashed #3fb6dd;outline-offset:1px}
+.titan-sheet{display:flex;padding:8px;min-height:700px}
+
+/* ---- shared widgets ---- */
+.in,.lb{display:flex;align-items:center;justify-content:center;width:100%;height:26px;padding:0 5px;border:1px solid var(--dark);border-radius:6px;font-weight:bold;font-size:16px;text-align:center}
+.in{background:var(--in-bg);color:var(--in-fg)}
+.lb{background:var(--lb-bg);color:var(--lb-fg)}
+.lb.bonus{background:var(--greater-bg);color:var(--greater-fg)}
+.lb.penalty{background:var(--lesser-bg);color:var(--lesser-fg)}
+.btn{display:flex;align-items:center;justify-content:center;width:100%;min-height:32px;background:var(--bg,var(--btn-bg));color:var(--fg,var(--btn-fg));
+  border:1px solid var(--dark);border-radius:10px;padding:5px 10px;font:bold 16px/20px Lato,sans-serif;gap:5px;cursor:pointer}
+.c-body{--bg:#f29d8c;--fg:#3d1f18}.c-mind{--bg:#95f28c;--fg:#1c3d18}.c-soul{--bg:#b5f2e8;--fg:#143d36}
+.c-reflexes{--bg:#eff49a;--fg:#3a3d14}.c-resilience{--bg:#f2c88c;--fg:#3d2a14}.c-willpower{--bg:#f28cbf;--fg:#3d1429}
+.slabel{font-weight:bold;font-size:14px;letter-spacing:.84px;text-transform:uppercase;margin-bottom:5px;text-align:center}
+.sym{display:flex;align-items:center;justify-content:center;height:100%;font-style:normal}
+.stats{display:flex;align-items:center;justify-content:center}
+.stats>*:not(:first-child){margin-left:5px}
+.w28{width:28px;flex:none;display:flex;justify-content:center}
+
+/* ---- Sidebar ---- */
+.sidebar{background:var(--p1);border-radius:8px;width:var(--sb-w);min-width:var(--sb-w);flex:none;margin-right:10px;padding:5px;
+  display:flex;flex-direction:column;align-items:center}
+.sidebar>.sec{width:100%}
+.sidebar>.sec:not(:first-child){border-top:1px solid var(--border);margin-top:5px;padding-top:5px}
+.portrait{height:120px;margin:0 auto;width:120px;border-radius:8px;background:var(--p3);display:grid;place-items:center;color:#6b6e80;font-size:13px}
+.entry{width:100%;display:flex;justify-content:center}
+.entry:not(:first-child){border-top:1px solid var(--border);margin-top:5px;padding-top:5px}
+.res .row{display:grid;grid-template-columns:42px minmax(0,1fr) 42px;align-items:center;width:100%}
+.res .row+.row{margin-top:5px}
+.res .row>*{display:flex;justify-content:center;align-items:center}
+.labels{display:grid !important;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr)}
+.labels .label{grid-column:2;white-space:nowrap}.labels .plus{grid-column:3;justify-self:end;padding-right:5px}
+.meter{height:24px;width:100%;border-radius:25px;background:var(--dark);padding:3px;margin:0 5px;box-shadow:inset 0 -1px 1px #ffffff4d}
+.meter span{display:block;height:100%;border-radius:20px;background:var(--mc);box-shadow:inset 0 2px 9px #ffffff4d}
+.row-line{display:flex;justify-content:space-between;align-items:center;width:100%;min-height:26px}
+.row-line .lab{display:flex;align-items:center;gap:5px;margin-left:5px;white-space:nowrap}
+.row-line .lab i{width:20px;text-align:center;font-style:normal}
+.row-line .btn{width:auto;min-height:26px;padding:2px 8px;font-size:15px;border-radius:10px}
+
+/* ---- Body: header ---- */
+.body{flex:1;min-width:0;display:flex;flex-direction:column}
+.header{background:var(--p1);border-radius:8px;overflow:hidden}
+.header .inner{border:1px solid var(--border);border-radius:8px;padding:10px}
+.hrow{display:flex}
+.hrow+.hrow{border-top:1px solid var(--border);margin-top:5px;padding-top:5px}
+.hrow .name{flex:1;margin-left:5px}.hrow .xp{display:flex;align-items:center;margin:0 5px 0 5px;gap:5px;font-weight:bold}
+.hrow .xp .lb,.hrow .xp .in{width:40px}
+.hcol{width:100%;display:flex;justify-content:center}
+.hcol:not(:first-child){border-left:1px solid var(--border);padding-left:5px;margin-left:5px}
+.hlist{width:100%}
+.hentry{display:flex;justify-content:space-evenly;align-items:center;width:100%}
+.hentry:not(:first-child){border-top:1px solid var(--border);margin-top:5px;padding-top:5px}
+.hentry .btn{flex:1}.hentry .stats{margin-left:10px;height:100%}
+.hentry .stats .sym{margin:0}
+.hentry .w28 .lb,.hentry .w28 .in{width:28px}
+
+/* ---- Body: Skills tab ---- */
+.tabs{margin-top:10px;flex:1;display:flex}
+.skill-tab{background:var(--p1);width:100%;display:flex;flex-direction:column;border-radius:8px;overflow:hidden}
+.filter{padding:5px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:8px;font-weight:bold}
+.filter .in{text-align:left;justify-content:flex-start;font-weight:normal;color:#6c6598}
+.head{border-bottom:1px solid var(--border);padding-right:14px}
+.head-columns{display:grid;grid-template-columns:var(--cols);justify-content:start;margin:0 5px;padding:5px 5px 0 10px}
+.head-cell{display:flex;flex-direction:column;align-items:center;justify-content:center;min-width:0;padding-bottom:5px}
+.head-name{align-items:flex-start;padding-left:10px}
+.head-attribute,.head-group{border-left:1px solid var(--border);padding-left:10px;margin-left:10px}
+.head-label{font-weight:bold;font-size:14px;letter-spacing:.84px;text-transform:uppercase;line-height:18px;white-space:nowrap}
+.head-label i{margin-right:5px;font-style:normal}
+.head-sub{display:grid;grid-template-columns:var(--stat-cols);column-gap:5px;width:var(--stat-w);font-size:14px;opacity:.8}
+.head-sub span{justify-self:center;line-height:16px}
+.head-sub span:nth-child(1){grid-column:1}.head-sub span:nth-child(2){grid-column:3}.head-sub span:nth-child(3){grid-column:var(--total-col)}
+ol.list{padding:5px 19px 5px 5px;display:flex;flex-direction:column;gap:5px}
+.skill{background:var(--p2);display:grid;grid-template-columns:var(--cols);justify-content:start;align-items:stretch;
+  padding:5px 5px 5px 10px;width:100%;border-radius:8px}
+.skill .check{display:flex;align-items:center;justify-self:start;max-width:100%;min-width:0}
+.skill .check .btn{width:auto;min-height:0;padding:3px 10px}
+.skill .check .dice{border-left:1px solid var(--dark);padding-left:5px;margin-left:5px}
+.skill .attribute{border-left:1px solid var(--border);padding-left:10px;margin-left:10px;display:grid;align-content:center;justify-content:start}
+.sel{display:flex;align-items:center;justify-content:space-between;width:100px;height:26px;padding:0 5px;border:1px solid var(--dark);border-radius:6px;
+  background:var(--bg);color:var(--fg);font-weight:bold}
+.skill .stats-wrap{grid-column:3/5;display:grid;grid-template-columns:repeat(2,var(--stat-track))}
+.skill .stat{border-left:1px solid var(--border);padding-left:10px;margin-left:10px;display:grid;grid-template-columns:var(--stat-cols);column-gap:5px;align-items:center;justify-content:start}
+.skill .stat .sym{height:100%}
+.note{font-size:13px;color:#9da3ba;margin:6px 0 0}
+.closeup{display:flex;gap:30px;margin-top:10px}
+.closeup .cell{background:var(--dark);border:1px solid var(--border);border-radius:8px;padding:12px 16px}
+.closeup .controls{zoom:1.8;margin-top:4px}
+.closeup .cap{font-size:13px;color:#9da3ba;margin-top:12px;font-family:monospace}
+</style>
+</head>
+<body data-view="both">
+<!-- Icon symbols (inline SVG stand-ins for Font Awesome; FA itself is not loaded in this standalone file) -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="i-import" viewBox="0 0 16 16"><path d="M8 2v8M4.5 7 8 10.5 11.5 7M3 13.5h10"/></symbol>
+  <symbol id="i-token" viewBox="0 0 16 16"><circle cx="8" cy="8" r="6.5"/><circle cx="8" cy="6.3" r="2"/><path d="M4 12.3c1-2 2.5-2.6 4-2.6s3 .6 4 2.6"/></symbol>
+  <symbol id="i-link" viewBox="0 0 16 16"><path d="M6.8 9.2a2.5 2.5 0 0 0 3.5 0l2.2-2.2a2.5 2.5 0 0 0-3.5-3.5L8 4.5M9.2 6.8a2.5 2.5 0 0 0-3.5 0L3.5 9a2.5 2.5 0 0 0 3.5 3.5L8 11.5"/></symbol>
+  <symbol id="i-pm" viewBox="0 0 16 16"><path d="M8 1.5v6M5 4.5h6M5.5 10.5h5M3 14h10"/></symbol>
+  <symbol id="i-slash" viewBox="0 0 16 16"><path d="M2.5 2.5l11 11"/></symbol>
+  <symbol id="i-eye" viewBox="0 0 16 16"><path d="M1.5 8S4 3.5 8 3.5 14.5 8 14.5 8 12 12.5 8 12.5 1.5 8 1.5 8z"/><circle cx="8" cy="8" r="2"/></symbol>
+  <symbol id="i-close" viewBox="0 0 16 16"><path d="M3.5 3.5l9 9M12.5 3.5l-9 9"/></symbol>
+</svg>
+
+<div class="page">
+  <div class="toolbar">
+    <b>Layout A: Compact collapse</b>
+    <button class="tb" id="v-both" data-v="both">Compare both</button>
+    <button class="tb" id="v-shown" data-v="shown">SHOWN only</button>
+    <button class="tb" id="v-hidden" data-v="hidden">HIDDEN only</button>
+    <span style="font-size:13px;color:#9da3ba">(or click the dashed header button)</span>
+  </div>
+  <h1>Static modifier inputs: SHOWN (current) vs HIDDEN (Layout A)</h1>
+  <p class="lead">Hidden state drops every static-mod input plus its "+" (and the "=" where nothing is left to total), shrinks the fixed tracks, narrows the sidebar, and gives the freed width to the Skill name column and to the header check buttons. Colors are the real Heritage Dark theme; labels come from lang/en.json.</p>
+
+  <h2 class="st" style="margin-top:6px">Header button close-up</h2>
+  <div class="closeup" id="closeup"></div>
+  <p class="note">Intended classes: shown = <code>fa-solid fa-plus-minus</code>; hidden = <code>fa-solid fa-plus-minus</code> stacked with <code>fa-slash</code> (fa-stack), the same way the link button swaps <code>fa-link</code>/<code>fa-unlink</code>. Alternative if the stack looks fussy: <code>fa-solid fa-eye</code> / <code>fa-solid fa-eye-slash</code> (drawn below; ambiguous because the eye already means Awareness in this system). <code>fa-plus-minus</code> is the existing MOD_ICON.</p>
+  <div class="closeup" style="margin-top:6px"><div class="cell"><div class="controls"><button class="hbtn"><svg><use href="#i-eye"/></svg></button><button class="hbtn"><svg><use href="#i-eye"/><use href="#i-slash"/></svg></button></div><div class="cap">alt: fa-eye / fa-eye-slash</div></div></div>
+
+  <div id="mount"></div>
+</div>
+
+<template id="tpl">
+<section class="frame">
+  <h2 class="st"><span class="tag"></span><span class="ttl"></span></h2>
+  <p class="spec"></p>
+  <div class="win">
+    <div class="winbar">
+      <span class="title">Selene Marrow</span>
+      <span class="controls">
+        <button class="hbtn" title="Import Actor to World"><svg><use href="#i-import"/></svg></button>
+        <button class="hbtn" title="Edit Token"><svg><use href="#i-token"/></svg></button>
+        <button class="hbtn linked" title="Toggle Token Link"><svg><use href="#i-link"/></svg></button>
+        <button class="hbtn new" title="Static modifier toggle">
+          <svg class="ic-shown"><use href="#i-pm"/></svg>
+          <svg class="ic-hidden"><use href="#i-pm"/><use href="#i-slash"/></svg>
+        </button>
+        <button class="hbtn"><svg><use href="#i-close"/></svg></button>
+      </span>
+    </div>
+    <div class="titan-sheet">
+      <!-- ================= SIDEBAR ================= -->
+      <div class="sidebar">
+        <div class="sec"><div class="portrait">Portrait</div></div>
+        <div class="sec">
+          <div class="entry res" style="--mc:#37da88"><div style="width:100%">
+            <div class="row"><i class="ico" style="font-style:normal">&hearts;</i><div class="labels"><span class="label">Stamina</span><span class="plus sm">+</span></div><div class="sm"><div class="w28"><span class="in">0</span></div></div></div>
+            <div class="row"><div><div class="w28"><span class="in">14</span></div></div><div><div class="meter"><span style="width:100%"></span></div></div><div><span class="lb" style="width:36px">14</span></div></div>
+          </div></div>
+          <div class="entry res" style="--mc:#3fb6dd"><div style="width:100%">
+            <div class="row"><i style="font-style:normal">&#x03DF;</i><div class="labels"><span class="label">Resolve</span><span class="plus sm">+</span></div><div class="sm"><div class="w28"><span class="in">0</span></div></div></div>
+            <div class="row"><div><div class="w28"><span class="in">5</span></div></div><div><div class="meter"><span style="width:62%"></span></div></div><div><span class="lb bonus" style="width:36px">8</span></div></div>
+          </div></div>
+          <div class="entry res" style="--mc:#c55858"><div style="width:100%">
+            <div class="row"><i style="font-style:normal">&#x271A;</i><div class="labels"><span class="label">Wounds</span><span class="plus sm">+</span></div><div class="sm"><div class="w28"><span class="in">0</span></div></div></div>
+            <div class="row"><div><div class="w28"><span class="in">0</span></div></div><div><div class="meter"><span style="width:0%"></span></div></div><div><span class="lb" style="width:36px">4</span></div></div>
+          </div></div>
+        </div>
+        <div class="sec"><div class="slabel">Ratings</div>
+          <div class="entry"><div class="row-line"><div class="lab"><button class="btn"><i style="font-style:normal">&#9719;</i>Initiative</button></div><div class="stats"><i class="sym sm">+</i><span class="w28 sm"><span class="in">0</span></span><i class="sym sm">=</i><span class="w28"><span class="lb">4</span></span></div></div></div>
+          <div class="entry"><div class="row-line"><div class="lab"><i>&#9673;</i>Awareness</div><div class="stats"><i class="sym sm">+</i><span class="w28 sm"><span class="in">0</span></span><i class="sym sm">=</i><span class="w28"><span class="lb">3</span></span></div></div></div>
+          <div class="entry"><div class="row-line"><div class="lab"><i>&#9960;</i>Defense</div><div class="stats"><i class="sym sm">+</i><span class="w28 sm"><span class="in">1</span></span><i class="sym sm">=</i><span class="w28"><span class="lb bonus">6</span></span></div></div></div>
+          <div class="entry"><div class="row-line"><div class="lab"><i>&#9876;</i>Melee</div><div class="stats"><i class="sym sm">+</i><span class="w28 sm"><span class="in">0</span></span><i class="sym sm">=</i><span class="w28"><span class="lb">4</span></span></div></div></div>
+          <div class="entry"><div class="row-line"><div class="lab"><i>&#10551;</i>Accuracy</div><div class="stats"><i class="sym sm">+</i><span class="w28 sm"><span class="in">0</span></span><i class="sym sm">=</i><span class="w28"><span class="lb">2</span></span></div></div></div>
+        </div>
+        <div class="sec"><div class="slabel">Mods</div>
+          <div class="entry"><div class="row-line"><div class="lab"><i>&#9921;</i>Armor</div><div class="stats"><i class="sym sm">+</i><span class="w28 sm"><span class="in">0</span></span><i class="sym sm">=</i><span class="w28"><span class="lb">2</span></span></div></div></div>
+        </div>
+        <div class="sec"><div class="slabel">Speeds</div>
+          <div class="entry"><div class="row-line"><div class="lab">Stride</div><div class="stats"><span class="w28"><span class="in">6</span></span><i class="sym sm">+</i><span class="w28 sm"><span class="in">0</span></span><i class="sym">=</i><span class="w28"><span class="lb">6</span></span></div></div></div>
+          <div class="entry"><div class="row-line"><div class="lab">Fly</div><div class="stats"><span class="w28"><span class="in">0</span></span><i class="sym sm">+</i><span class="w28 sm"><span class="in">2</span></span><i class="sym">=</i><span class="w28"><span class="lb bonus">2</span></span></div></div></div>
+          <div class="entry"><div class="row-line"><div class="lab">Swim</div><div class="stats"><span class="w28"><span class="in">3</span></span><i class="sym sm">+</i><span class="w28 sm"><span class="in">0</span></span><i class="sym">=</i><span class="w28"><span class="lb">3</span></span></div></div></div>
+        </div>
+      </div>
+
+      <!-- ================= BODY ================= -->
+      <div class="body">
+        <div class="header"><div class="inner">
+          <div class="hrow">
+            <div class="name"><span class="in" style="justify-content:flex-start;font-weight:normal;height:28px">Selene Marrow</span></div>
+            <div class="xp"><span class="lb">20</span>/<span class="in">120</span><span>XP</span></div>
+          </div>
+          <div class="hrow">
+            <!-- Attributes -->
+            <div class="hcol"><div class="hlist">
+              <div class="hentry"><button class="btn c-body">&#9994; Body</button><div class="stats"><span class="w28"><span class="in">3</span></span><i class="sym sm">+</i><span class="w28 sm"><span class="in">0</span></span><i class="sym">=</i><span class="w28"><span class="lb">3</span></span></div></div>
+              <div class="hentry"><button class="btn c-mind">&#9672; Mind</button><div class="stats"><span class="w28"><span class="in">4</span></span><i class="sym sm">+</i><span class="w28 sm"><span class="in">1</span></span><i class="sym">=</i><span class="w28"><span class="lb bonus">5</span></span></div></div>
+              <div class="hentry"><button class="btn c-soul">&#9830; Soul</button><div class="stats"><span class="w28"><span class="in">2</span></span><i class="sym sm">+</i><span class="w28 sm"><span class="in">0</span></span><i class="sym">=</i><span class="w28"><span class="lb">2</span></span></div></div>
+            </div></div>
+            <!-- Resistances: base is a label, not an input -->
+            <div class="hcol"><div class="hlist">
+              <div class="hentry"><button class="btn c-reflexes">Reflexes</button><div class="stats"><span class="w28"><span class="lb">4</span></span><i class="sym sm">+</i><span class="w28 sm"><span class="in">0</span></span><i class="sym">=</i><span class="w28"><span class="lb">4</span></span></div></div>
+              <div class="hentry"><button class="btn c-resilience">Resilience</button><div class="stats"><span class="w28"><span class="lb">3</span></span><i class="sym sm">+</i><span class="w28 sm"><span class="in">-1</span></span><i class="sym">=</i><span class="w28"><span class="lb penalty">2</span></span></div></div>
+              <div class="hentry"><button class="btn c-willpower">Willpower</button><div class="stats"><span class="w28"><span class="lb">3</span></span><i class="sym sm">+</i><span class="w28 sm"><span class="in">0</span></span><i class="sym">=</i><span class="w28"><span class="lb">3</span></span></div></div>
+            </div></div>
+          </div>
+        </div></div>
+
+        <div class="tabs"><div class="skill-tab">
+          <div class="filter"><span>Filter</span><span class="in">Filter skills...</span></div>
+          <div class="head"><div class="head-columns">
+            <div class="head-cell head-name"><div class="head-label">Skill</div></div>
+            <div class="head-cell head-attribute"><div class="head-label">Attribute</div></div>
+            <div class="head-cell head-group"><div class="head-label"><i>&#9670;</i>Training</div><div class="head-sub"><span>Base</span><span class="sm">Mod</span><span>Total</span></div></div>
+            <div class="head-cell head-group"><div class="head-label"><i>&#10022;</i>Expertise</div><div class="head-sub"><span>Base</span><span class="sm">Mod</span><span>Total</span></div></div>
+          </div></div>
+          <ol class="list">
+            <li class="skill"><div class="check"><button class="btn c-mind"><span>Arcana</span><span class="dice">&#9861; 5</span></button></div><div class="attribute"><span class="sel c-mind"><span>&#9672; Mind</span><span>&#9662;</span></span></div>
+              <div class="stats-wrap"><div class="stat"><span class="in">2</span><i class="sym sm">+</i><span class="in sm">1</span><i class="sym">=</i><span class="lb bonus">3</span></div><div class="stat"><span class="in">1</span><i class="sym sm">+</i><span class="in sm">0</span><i class="sym">=</i><span class="lb">1</span></div></div></li>
+            <li class="skill"><div class="check"><button class="btn c-body"><span>Athletics</span><span class="dice">&#9861; 4</span></button></div><div class="attribute"><span class="sel c-body"><span>&#9994; Body</span><span>&#9662;</span></span></div>
+              <div class="stats-wrap"><div class="stat"><span class="in">3</span><i class="sym sm">+</i><span class="in sm">0</span><i class="sym">=</i><span class="lb">3</span></div><div class="stat"><span class="in">2</span><i class="sym sm">+</i><span class="in sm">1</span><i class="sym">=</i><span class="lb bonus">3</span></div></div></li>
+            <li class="skill"><div class="check"><button class="btn c-soul"><span>Deception</span><span class="dice">&#9861; 3</span></button></div><div class="attribute"><span class="sel c-soul"><span>&#9830; Soul</span><span>&#9662;</span></span></div>
+              <div class="stats-wrap"><div class="stat"><span class="in">1</span><i class="sym sm">+</i><span class="in sm">0</span><i class="sym">=</i><span class="lb">1</span></div><div class="stat"><span class="in">0</span><i class="sym sm">+</i><span class="in sm">0</span><i class="sym">=</i><span class="lb">0</span></div></div></li>
+            <li class="skill"><div class="check"><button class="btn c-soul"><span>Intimidation</span><span class="dice">&#9861; 2</span></button></div><div class="attribute"><span class="sel c-soul"><span>&#9830; Soul</span><span>&#9662;</span></span></div>
+              <div class="stats-wrap"><div class="stat"><span class="in">0</span><i class="sym sm">+</i><span class="in sm">-1</span><i class="sym">=</i><span class="lb penalty">0</span></div><div class="stat"><span class="in">1</span><i class="sym sm">+</i><span class="in sm">0</span><i class="sym">=</i><span class="lb">1</span></div></div></li>
+            <li class="skill"><div class="check"><button class="btn c-mind"><span>Medicine</span><span class="dice">&#9861; 6</span></button></div><div class="attribute"><span class="sel c-mind"><span>&#9672; Mind</span><span>&#9662;</span></span></div>
+              <div class="stats-wrap"><div class="stat"><span class="in">4</span><i class="sym sm">+</i><span class="in sm">1</span><i class="sym">=</i><span class="lb bonus">5</span></div><div class="stat"><span class="in">2</span><i class="sym sm">+</i><span class="in sm">0</span><i class="sym">=</i><span class="lb">2</span></div></div></li>
+            <li class="skill"><div class="check"><button class="btn c-body"><span>Stealth</span><span class="dice">&#9861; 3</span></button></div><div class="attribute"><span class="sel c-body"><span>&#9994; Body</span><span>&#9662;</span></span></div>
+              <div class="stats-wrap"><div class="stat"><span class="in">2</span><i class="sym sm">+</i><span class="in sm">0</span><i class="sym">=</i><span class="lb">2</span></div><div class="stat"><span class="in">1</span><i class="sym sm">+</i><span class="in sm">0</span><i class="sym">=</i><span class="lb">1</span></div></div></li>
+          </ol>
+        </div></div>
+      </div>
+    </div>
+  </div>
+</section>
+</template>
+
+<script>
+/* Demo plumbing only: clones the one sheet template into the two states (geometry differs via CSS variables). */
+const tpl = document.getElementById('tpl');
+const mount = document.getElementById('mount');
+const states = {
+  shown:  ['SHOWN', 'Current look', 'Skill row at full name width: name 195 | attribute 121 | 2 x stat track 145 (28 + 10 + 28 + 10 + 28, gap 5) = 606px, plus row padding. Sidebar 208px.'],
+  hidden: ['HIDDEN', 'Layout A, compact collapse', 'Skill row at full name width: name 300 | attribute 121 | 2 x stat track 97 (28 + 10 + 28, gap 5) = 615px, plus row padding. Stat tracks 145 to 97 each; name max 195 to 300. Sidebar 184px. Header check buttons gain 48px each.']
+};
+const closeup = document.getElementById('closeup');
+function setView(v) { document.body.dataset.view = v; }
+for (const key of ['shown', 'hidden']) {
+  const frag = tpl.content.cloneNode(true);
+  const frame = frag.querySelector('.frame');
+  frame.dataset.state = key;
+  frame.querySelector('.tag').textContent = states[key][0];
+  frame.querySelector('.ttl').textContent = states[key][1];
+  frame.querySelector('.spec').textContent = states[key][2];
+  frame.querySelector('.hbtn.new').addEventListener('click', () => setView(key === 'shown' ? 'hidden' : 'shown'));
+  // Close-up cell: copy of this state's header-button row (class "fs", not "frame", so the view filter never hides it).
+  const cell = document.createElement('div');
+  cell.className = 'cell';
+  const wrap = document.createElement('div');
+  wrap.className = 'fs'; wrap.dataset.state = key;
+  wrap.appendChild(frame.querySelector('.controls').cloneNode(true));
+  const cap = document.createElement('div');
+  cap.className = 'cap';
+  cap.textContent = states[key][0] + (key === 'shown' ? ': fa-solid fa-plus-minus' : ': fa-solid fa-plus-minus + fa-slash');
+  cell.append(wrap, cap);
+  closeup.appendChild(cell);
+  mount.appendChild(frag);
+}
+document.querySelectorAll('.tb').forEach(b => b.addEventListener('click', () => setView(b.dataset.v)));
+</script>
+</body>
+</html>

@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>TITAN static mods - Layout B: stable grid, emphasized total</title>
+<style>
+/* ---------- Tokens: Heritage Dark (src/theme/themes/HeritageDark.js) + Variables.scss ---------- */
+:root {
+  --app-bg:#262836; --app-fg:#d8dbe8; --border:#4d5063; --h6:#d8dbe8;
+  --p1:#373949; --p2:#424557; --p3:#2e303c;
+  --btn-bg:#f2b58c; --btn-fg:#3d2a18; --btn-border:#1b1c26;
+  --in-bg:#c5bcf8; --in-fg:#23184d; --in-border:#1b1c26;
+  --lab-bg:#a6ccf2; --lab-fg:#152a3d; --lab-border:#1b1c26;
+  --greater-bg:#c5ffeb; --greater-fg:#023020;
+  --body-bg:#f29d8c; --body-fg:#3d1f18; --mind-bg:#95f28c; --mind-fg:#1c3d18; --soul-bg:#b5f2e8; --soul-fg:#143d36;
+  --reflexes-bg:#eff49a; --reflexes-fg:#3a3d14; --resilience-bg:#f2c88c; --resilience-fg:#3d2a14;
+  --willpower-bg:#f28cbf; --willpower-fg:#3d1429;
+  --stamina:#37da88; --resolve:#3fb6dd; --wounds:#c55858; --meter-bg:#1b1c26;
+  --sp:5px; --spl:10px; --input-h:26px; --digit:10px;
+  --font:'Lato','Segoe UI',Helvetica,Arial,sans-serif;
+  /* Layout B geometry: the stat group keeps ONE width in both states (124px = 104 + 4 gaps, as --skill-stat-width). */
+  --grp-w:124px; --grp-shown:28px 10px 28px 10px 28px; --grp-hidden:46px 10px 58px; --total-hidden:58px;
+}
+* { box-sizing:border-box; }
+body { margin:0; padding:20px 24px 60px; background:#15161d; color:#c8cad6; font-family:var(--font); font-size:14px; }
+h1 { font-size:20px; margin:0 0 4px; } h2 { font-size:16px; margin:34px 0 8px; border-bottom:1px solid #33354a; padding-bottom:4px; }
+p.note { margin:0 0 10px; max-width:980px; line-height:1.4; color:#9da3ba; } code { color:#f2b58c; }
+.tag { display:inline-block; font-size:12px; font-weight:bold; letter-spacing:.06em; padding:2px 8px; border-radius:10px; margin:0 0 6px; }
+.tag.shown { background:#a6ccf2; color:#152a3d; } .tag.hidden { background:#f2b58c; color:#3d2a18; }
+.pair { display:flex; gap:28px; align-items:flex-start; flex-wrap:wrap; } .pair.stack { flex-direction:column; gap:18px; }
+#pageToggle { position:fixed; top:14px; right:18px; z-index:9; font:bold 14px var(--font); padding:7px 14px; border-radius:10px;
+  background:var(--btn-bg); color:var(--btn-fg); border:1px solid var(--btn-border); cursor:pointer; }
+
+/* ---------- Shared panel pieces ---------- */
+.p1 { background:var(--p1); color:var(--app-fg); font-family:var(--font); } .p2 { background:var(--p2); color:var(--app-fg); font-family:var(--font); }
+.sheet { width:900px; background:var(--app-bg); color:var(--app-fg); font-family:var(--font); font-size:16px; border-radius:8px; overflow:hidden; }
+.sheet-body { display:flex; gap:0; padding:8px; gap:8px; }
+.sep-l { border-left:1px solid var(--border); padding-left:var(--spl); margin-left:var(--spl); }
+.section-label { font-size:14px; font-weight:bold; letter-spacing:.84px; text-transform:uppercase; color:var(--h6); margin-bottom:var(--sp); text-align:center; }
+.ic { display:inline-block; width:20px; text-align:center; font-style:normal; font-size:13px; }
+
+/* number input (NumberInput + input mixin) and bordered label (ModifiedValueLabel / ModifiableStatValueLabel) */
+.in { display:flex; justify-content:center; align-items:center; width:100%; }
+.num, .lab { height:var(--input-h); width:100%; border:1px solid var(--in-border); border-radius:6px; font:bold 16px var(--font); text-align:center; padding:0 5px; }
+.num { background:var(--in-bg); color:var(--in-fg); outline:none; }
+.lab { display:flex; align-items:center; justify-content:center; background:var(--lab-bg); color:var(--lab-fg); border-color:var(--lab-border); }
+.lab.bonus { background:var(--greater-bg); color:var(--greater-fg); }
+.sym { display:flex; align-items:center; justify-content:center; height:100%; }
+
+/* ---------- Stat group: [base] + [static] = [total]  (the whole point of Layout B) ---------- */
+.sg { display:grid; grid-template-columns:var(--grp-shown); column-gap:var(--sp); width:var(--grp-w); align-items:center; }
+.sg.nob { display:flex; width:auto; justify-content:flex-end; }              /* Rating / Mod: no base input */
+.sg.nob .in, .sg.nob .t { width:28px; } .sg.nob .sym { width:10px; }
+.hsub { display:grid; grid-template-columns:var(--grp-shown); column-gap:var(--sp); width:var(--grp-w); font-size:14px; opacity:.8; }
+.hsub span { justify-self:center; line-height:16px; white-space:nowrap; } .hsub .c1{grid-column:1} .hsub .c3{grid-column:3} .hsub .c5{grid-column:5}
+
+/* HIDDEN: static input and its plus vanish; group width unchanged; base and total get the freed room; total is emphasized */
+.hide-static .sm { display:none; }
+.hide-static .sg, .hide-static .hsub { grid-template-columns:var(--grp-hidden); }
+.hide-static .hsub .c5 { grid-column:3; }
+.hide-static .sg.nob .t { width:var(--total-hidden); }
+.hide-static .t .lab { font-size:18px; font-weight:900; box-shadow:0 0 0 2px color-mix(in srgb, currentColor 32%, transparent); }
+.hide-static .b .num, .hide-static .b .lab { font-size:17px; }
+
+/* ---------- Skills tab (CharacterSheetSkillsTab / Header / Skill) ---------- */
+.skills-tab { --skill-separator:21px; --skill-attribute-track:121px; --skill-stat-track:145px;
+  --skill-columns:minmax(165px,195px) var(--skill-attribute-track) var(--skill-stat-track) var(--skill-stat-track);
+  width:668px; display:flex; flex-direction:column; flex:none; }
+.filter { padding:5px; } .filter div { height:var(--input-h); border:1px solid var(--in-border); border-radius:6px; background:var(--in-bg); color:#6a5fa8; padding:3px 8px; font-weight:bold; }
+.head { border-bottom:1px solid var(--border); }
+.head-columns, .skill { display:grid; grid-template-columns:var(--skill-columns); justify-content:start; }
+.head-columns { margin:0 5px; padding:5px 5px 0 10px; }
+.head-cell { display:flex; flex-direction:column; align-items:center; justify-content:center; padding-bottom:5px; min-width:0; }
+.head-name { align-items:flex-start; padding-left:10px; }
+.head-label { font-size:14px; font-weight:bold; letter-spacing:.84px; text-transform:uppercase; line-height:18px; white-space:nowrap; } .head-label i { font-style:normal; margin-right:5px; font-size:12px; }
+.skill-list { margin:0; padding:5px; list-style:none; display:flex; flex-direction:column; gap:5px; }
+.skill { background:var(--p2); padding:5px 5px 5px 10px; align-items:stretch; width:100%; }
+.check { display:flex; align-items:center; justify-self:start; max-width:100%; }
+.cbtn { display:flex; align-items:center; border:1px solid var(--btn-border); border-radius:10px; padding:3px 10px; font:bold 16px/20px var(--font); }
+.cbtn .dice { margin-left:5px; padding-left:5px; border-left:1px solid var(--btn-border); } .cbtn .dice i { font-style:normal; margin-right:4px; }
+.attr { display:grid; place-content:center start; } .attr .sel { display:flex; align-items:center; gap:5px; width:100px; height:var(--input-h); padding:0 5px; border:1px solid var(--in-border); border-radius:6px; font-weight:bold; }
+.attr .sel b { flex:1; font-weight:bold; } .attr .sel i { font-style:normal; font-size:12px; }
+.stats { display:grid; grid-column:3 / 5; grid-template-columns:repeat(2, var(--skill-stat-track)); }
+.stat { display:flex; align-items:center; border-left:1px solid var(--border); padding-left:var(--spl); margin-left:var(--spl); }
+.body { background:var(--body-bg); color:var(--body-fg); } .mind { background:var(--mind-bg); color:var(--mind-fg); } .soul { background:var(--soul-bg); color:var(--soul-fg); }
+.reflexes { background:var(--reflexes-bg); color:var(--reflexes-fg); } .resilience { background:var(--resilience-bg); color:var(--resilience-fg); } .willpower { background:var(--willpower-bg); color:var(--willpower-fg); }
+
+/* ---------- Sidebar (DocumentSheetSidebar + BorderedColumnList) ---------- */
+.sidebar { width:208px; min-width:208px; padding:5px; background:var(--p1); display:flex; flex-direction:column; align-items:center; font-size:16px; }
+.sidebar .section { width:100%; display:flex; flex-direction:column; align-items:center; }
+.sidebar .section + .section { border-top:1px solid var(--border); padding-top:5px; margin-top:5px; }
+.entries { width:100%; display:flex; flex-direction:column; align-items:center; }
+.entry { width:100%; display:flex; justify-content:center; align-items:center; }
+.entry + .entry { border-top:1px solid var(--border); margin-top:5px; padding-top:5px; }
+.row-sb { display:flex; justify-content:space-between; align-items:center; width:100%; }
+.row-sb .label { display:flex; align-items:center; justify-content:center; margin-left:5px; white-space:nowrap; }
+.row-sb .label.rt { margin-left:0; }
+.row-sb .rbtn { display:flex; align-items:center; background:var(--btn-bg); color:var(--btn-fg); border:1px solid var(--btn-border); border-radius:10px; padding:2px 8px 2px 4px; font:bold 16px/20px var(--font); }
+/* Resource: three shared tracks; Layout B only widens the side tracks (taking from the flexible meter) when hidden */
+.res { --side:42px; width:100%; }
+.hide-static .res { --side:50px; }
+.res .row { display:grid; grid-template-columns:var(--side) minmax(0,1fr) var(--side); align-items:center; width:100%; }
+.res .row + .row { margin-top:5px; }
+.res .side { display:flex; justify-content:center; align-items:center; }
+.res .labels { display:grid; grid-template-columns:minmax(0,1fr) auto minmax(0,1fr); } .res .labels .l { grid-column:2; } .res .labels .plus { grid-column:3; justify-self:end; padding-right:5px; }
+.meter { background:var(--meter-bg); border-radius:25px; box-shadow:inset 0 -1px 1px rgb(255 255 255/.3); height:24px; margin:0 5px; padding:3px; flex:1; }
+.meter span { display:block; height:100%; border-radius:20px; box-shadow:inset 0 1px 1px #ffffff4d, inset 0 -1px 1px #0006; }
+.hide-static .res .side .lab { font-size:18px; font-weight:900; box-shadow:0 0 0 2px color-mix(in srgb, currentColor 32%, transparent); }
+.hide-static .res .side .num { font-size:17px; }
+
+/* ---------- Character header (PlayerSheetHeader + Attribute/Resistance) ---------- */
+.char-header { border:1px solid var(--border); border-radius:8px; padding:10px; width:100%; background:transparent; }
+.hrow { display:flex; align-items:center; } .hrow + .hrow { border-top:1px solid var(--border); margin-top:5px; padding-top:5px; }
+.name { flex-grow:1; margin-left:5px; height:32px; border:1px solid var(--in-border); border-radius:6px; background:var(--in-bg); color:var(--in-fg); font:bold 16px var(--font); padding:0 5px; display:flex; align-items:center; }
+.xp { display:flex; align-items:center; margin:0 5px 0 5px; font-weight:bold; } .xp .lab, .xp .num { width:40px; } .xp .slash { margin:5px; } .xp .num { margin-right:10px; }
+.hcol { display:flex; justify-content:center; align-items:center; width:100%; } .hcol + .hcol { border-left:1px solid var(--border); padding-left:5px; margin-left:5px; }
+.hcol .entries { align-items:stretch; }
+.hrowitem { display:flex; justify-content:space-evenly; align-items:center; width:100%; }
+.hrowitem .btn { flex:1; width:100%; }
+.hbtn { display:flex; align-items:center; justify-content:center; width:100%; border:1px solid var(--btn-border); border-radius:10px; padding:5px 10px; font:bold 16px/20px var(--font); } .hbtn i { font-style:normal; margin-right:5px; }
+.hrowitem .sg { margin-left:var(--spl); flex:none; }
+
+/* ---------- Window header buttons (Foundry V14 header-control look, approximated) ---------- */
+.winbar { display:flex; align-items:center; gap:2px; width:420px; height:34px; padding:0 8px 0 12px; background:#1b1c22; color:#e4e4ea; border-radius:8px 8px 0 0; font-family:var(--font); }
+.winbar .title { flex:1; font-weight:bold; font-size:15px; }
+.hc { width:28px; height:28px; display:flex; align-items:center; justify-content:center; background:none; border:0; border-radius:6px; color:#d0d0da; cursor:pointer; padding:0; position:relative; }
+.hc:hover { background:#ffffff1a; color:#fff; } .hc svg { width:16px; height:16px; stroke:currentColor; fill:none; stroke-width:2; stroke-linecap:round; stroke-linejoin:round; }
+.hc.linked { color:darkorange; filter:drop-shadow(0 0 4px darkorange); }
+.hc.mods.off { color:#9da3ba; } .hc.mods.on { color:#e4e4ea; }
+.hc.mods .slash { display:none; } .hc.mods.off .slash { display:block; }
+.hc.mods .slash line { stroke-width:2.4; }
+.icon-note { margin-top:8px; font-size:13px; color:#9da3ba; line-height:1.5; }
+</style>
+</head>
+<body>
+<button id="pageToggle" type="button">Static mods: SHOWN (click to hide)</button>
+<h1>TITAN character sheet: static modifiers SHOWN vs HIDDEN - Layout B</h1>
+<p class="note"><b>Layout B, stable grid, emphasized total.</b> Hiding removes only the static input and its <code>+</code>. Every column, track, and row height keeps its size, so nothing moves when the toggle is pressed. Inside the unchanged 124px stat group the base input grows (28px to 46px) and the total grows (28px to 58px) and is set larger and bolder (18px, weight 900, soft outline ring). Resource side tracks widen 42px to 50px and take it from the flexible meter. The page button (top right) flips the live sheet; the pairs below always show both states.</p>
+
+<h2>0. Live sheet (toggle flips this)</h2>
+<div id="live"></div>
+
+<h2>1. Header button row (window header)</h2>
+<p class="note">New toggle button sits after the existing Import / Edit Token / Link buttons. Intended Font Awesome: shown = <code>fa-solid fa-plus-minus</code> (already <code>MOD_ICON</code> in src/system/Icons.js); hidden = the same icon in an <code>fa-stack</code> with <code>fa-solid fa-slash</code> over it, dimmed (alternative if a stack is unwanted: <code>fa-solid fa-eye</code> / <code>fa-solid fa-eye-slash</code>). The icons below are inline SVG stand-ins, not the real glyphs.</p>
+<div class="pair" id="hdrbtns"></div>
+
+<h2>2. Skills tab rows (Training and Expertise)</h2>
+<div class="pair stack" id="skills"></div>
+
+<h2>3. Sidebar items: Resources, Ratings, Mods, Speeds</h2>
+<div class="pair" id="sidebar"></div>
+
+<h2>4. Header items: Attributes and Resistances</h2>
+<div class="pair stack" id="header"></div>
+
+<script>
+/* Plain JS only builds the repeated markup and flips a class; all styling lives in the CSS above. */
+const I = v => `<div class="in"><input class="num" value="${v}"></div>`;
+const L = (v, c = '') => `<div class="lab ${c}">${v}</div>`;
+const SYMS = {body:'⬢', mind:'◍', soul:'✺'};
+/* [base] + [static] = [total]; the .sm cells are exactly what the hidden state removes */
+const grp = (b, s, t, o = {}) => `<div class="sg"><div class="b">${o.calc ? L(b) : I(b)}</div><div class="sym sm">+</div><div class="sm">${I(s)}</div><div class="sym">=</div><div class="t">${L(t, o.bonus ? 'bonus' : '')}</div></div>`;
+const nob = (s, t) => `<div class="sg nob"><div class="sym sm">+</div><div class="sm">${I(s)}</div><div class="sym">=</div><div class="t">${L(t)}</div></div>`;
+
+function skills() {
+  const rows = [
+    ['Arcana','mind',7,[2,1,3],[1,0,1]], ['Athletics','body',6,[3,0,3],[0,1,1,true]],
+    ['Deception','soul',5,[1,1,2],[0,0,0]], ['Melee Weapons','body',9,[4,2,6,true],[2,1,3]],
+    ['Perception','mind',5,[2,0,2],[1,0,1]], ['Stealth','body',4,[1,0,1],[0,0,0]],
+  ];
+  const stat = (a) => `<div class="stat">${grp(a[0], a[1], a[2], {bonus:a[3]})}</div>`;
+  return `<div class="skills-tab p1"><div class="filter"><div>Filter</div></div>
+   <div class="head"><div class="head-columns">
+     <div class="head-cell head-name"><div class="head-label">Skill</div></div>
+     <div class="head-cell sep-l"><div class="head-label">Attribute</div></div>
+     ${[['⌂','Training'],['✎','Expertise']].map(g => `<div class="head-cell sep-l"><div class="head-label"><i>${g[0]}</i>${g[1]}</div>
+       <div class="hsub"><span class="c1">Base</span><span class="c3 sm">Mod</span><span class="c5">Total</span></div></div>`).join('')}
+   </div></div>
+   <ol class="skill-list">${rows.map(r => `<li><div class="skill">
+     <div class="check"><div class="cbtn ${r[1]}">${r[0]}<span class="dice"><i>⚄</i>${r[2]}</span></div></div>
+     <div class="attr sep-l"><div class="sel ${r[1]}"><i>${SYMS[r[1]]}</i><b>${r[1][0].toUpperCase() + r[1].slice(1)}</b><i>⌄</i></div></div>
+     <div class="stats">${stat(r[3])}${stat(r[4])}</div></div></li>`).join('')}</ol></div>`;
+}
+
+function sidebar() {
+  const res = (n, ic, color, v, max, st) => `<div class="entry"><div class="res">
+    <div class="row"><div class="side"><i class="ic">${ic}</i></div><div class="labels"><div class="l">${n}</div><div class="plus sm">+</div></div><div class="side sm">${I(st)}</div></div>
+    <div class="row"><div class="side">${I(v)}</div><div class="meter"><span style="width:${Math.round(v / max * 100)}%;background:${color}"></span></div><div class="side">${L(max)}</div></div></div></div>`;
+  const rating = (n, ic, s, t, btn) => `<div class="entry"><div class="row-sb">${btn
+    ? `<div class="rbtn"><i class="ic">${ic}</i>${n}</div>` : `<div class="label"><i class="ic">${ic}</i>${n}</div>`}${nob(s, t)}</div></div>`;
+  const speed = (n, b, s, t) => `<div class="entry"><div class="row-sb"><div class="label">${n}</div>${grp(b, s, t)}</div></div>`;
+  return `<div class="sidebar p1">
+   <div class="section"><div class="entries">${res('Stamina','♥','var(--stamina)',34,40,2)}${res('Wounds','✚','var(--wounds)',3,12,1)}${res('Resolve','ϟ','var(--resolve)',7,10,0)}</div></div>
+   <div class="section"><div class="section-label">Ratings</div><div class="entries">${rating('Initiative','◷',1,5,true)}${rating('Awareness','◉',0,4)}${rating('Defense','▣',2,6)}${rating('Melee','✕',1,5)}${rating('Accuracy','◎',0,3)}</div></div>
+   <div class="section"><div class="section-label">Mods</div><div class="entries">${rating('Armor','▣',2,4)}</div></div>
+   <div class="section"><div class="section-label">Speeds</div><div class="entries">${speed('Stride',6,1,7)}${speed('Fly',0,0,0)}${speed('Swim',3,0,3)}</div></div></div>`;
+}
+
+function header() {
+  const attr = (n, k, b, s, t) => `<div class="entry"><div class="hrowitem"><div class="btn"><div class="hbtn ${k}"><i>${SYMS[k] || '●'}</i>${n}</div></div>${grp(b, s, t)}</div></div>`;
+  const resi = (n, k, b, s, t) => `<div class="entry"><div class="hrowitem"><div class="btn"><div class="hbtn ${k}"><i>◆</i>${n}</div></div>${grp(b, s, t, {calc:true})}</div></div>`;
+  return `<div class="char-header">
+   <div class="hrow"><div class="name">Aldric Vane</div><div class="xp"><div class="lab">12</div><span class="slash">/</span><input class="num" value="40">XP</div></div>
+   <div class="hrow"><div class="hcol"><div class="entries">${attr('Body','body',3,1,4)}${attr('Mind','mind',2,0,2)}${attr('Soul','soul',4,2,6)}</div></div>
+    <div class="hcol"><div class="entries">${resi('Reflexes','reflexes',4,0,4)}${resi('Resilience','resilience',5,1,6)}${resi('Willpower','willpower',3,0,3)}</div></div></div></div>`;
+}
+
+/* header buttons: SVG stand-ins for fa-download / fa-user-circle / fa-link / fa-plus-minus (+ fa-slash) */
+const svg = p => `<svg viewBox="0 0 16 16">${p}</svg>`;
+const ICONS = {
+  import: svg('<path d="M8 2v8M4.5 7 8 10.5 11.5 7M2.5 13.5h11"/>'),
+  token: svg('<circle cx="8" cy="8" r="6.2"/><circle cx="8" cy="6.4" r="2"/><path d="M4 12.2c1-1.7 2.4-2.3 4-2.3s3 .6 4 2.3"/>'),
+  link: svg('<path d="M6.8 9.2a3 3 0 0 0 4.2 0l2-2a3 3 0 0 0-4.2-4.2l-.8.8M9.2 6.8a3 3 0 0 0-4.2 0l-2 2a3 3 0 0 0 4.2 4.2l.8-.8"/>'),
+  mods: svg('<path d="M8 2.2v5M5.5 4.7h5M5.5 9.5h5M5.5 13.8h5"/><g class="slash"><line x1="2.5" y1="14" x2="13.5" y2="2"/></g>'),
+  close: svg('<path d="M3.5 3.5l9 9M12.5 3.5l-9 9"/>'),
+};
+const modsBtn = off => `<button class="hc mods ${off ? 'off' : 'on'}" type="button" aria-label="Toggle static modifiers">${ICONS.mods}</button>`;
+const winbar = off => `<div class="winbar"><div class="title">Aldric Vane</div>
+  <button class="hc" type="button">${ICONS.import}</button><button class="hc" type="button">${ICONS.token}</button>
+  <button class="hc linked" type="button">${ICONS.link}</button>${modsBtn(off)}<button class="hc" type="button">${ICONS.close}</button></div>`;
+
+const wrap = (inner, off, label) => `<div><span class="tag ${off ? 'hidden' : 'shown'}">${label}</span><div class="${off ? 'hide-static' : ''}">${inner}</div></div>`;
+const pair = (id, inner) => { document.getElementById(id).innerHTML = wrap(inner, false, 'SHOWN (current look)') + wrap(inner, true, 'HIDDEN (new look)'); };
+pair('skills', skills()); pair('sidebar', sidebar()); pair('header', header());
+document.getElementById('hdrbtns').innerHTML =
+  `<div><span class="tag shown">SHOWN (plus-minus icon)</span>${winbar(false)}</div><div><span class="tag hidden">HIDDEN (plus-minus + slash, dimmed)</span>${winbar(true)}</div>
+   <div class="icon-note">Both states use the same 28x28 button slot, so the header row never reflows.</div>`;
+
+/* live sheet: window bar + header + sidebar + skills tab, one class flips it */
+const live = document.getElementById('live');
+function renderLive(off) {
+  live.innerHTML = `<div class="sheet ${off ? 'hide-static' : ''}" style="width:900px"><div class="winbar" style="width:100%;border-radius:0">${winbar(off).replace(/^<div class="winbar">|<\/div>$/g, '')}</div>
+    <div style="padding:8px 8px 0">${header()}</div><div class="sheet-body">${sidebar()}${skills()}</div></div>`;
+  live.querySelector('.hc.mods').onclick = () => setState(!off);
+  const t = document.getElementById('pageToggle');
+  t.textContent = off ? 'Static mods: HIDDEN (click to show)' : 'Static mods: SHOWN (click to hide)';
+}
+function setState(off) { renderLive(off); }
+document.getElementById('pageToggle').onclick = () => setState(!live.firstElementChild.classList.contains('hide-static'));
+renderLive(false);
+</script>
+</body>
+</html>
